@@ -1,0 +1,8 @@
+package android.content
+
+import android.net.Uri
+
+object ContentUris {
+    @JvmStatic fun withAppendedId(uri: Uri, id: Long): Uri = Uri.parse("$uri/$id")
+    @JvmStatic fun parseId(uri: Uri): Long = uri.lastPathSegment?.toLongOrNull() ?: -1
+}

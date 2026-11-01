@@ -1,12 +1,7 @@
 package app.absentmotion.ui.editor.effects
 
 import app.absentmotion.editor.addEffectToChosen
-import android.graphics.drawable.AnimatedImageDrawable
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
-import android.widget.ImageView
 import app.absentmotion.platform.BackHandler
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -28,12 +23,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import app.absentmotion.platform.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import app.absentmotion.platform.LocalContext
@@ -43,7 +36,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import app.absentmotion.ai.AiAction
 import app.absentmotion.ai.AiTools
 import app.absentmotion.ai.QUICK_SHARPEN
@@ -74,8 +66,6 @@ import app.absentmotion.ui.theme.TilePress
 import app.absentmotion.ui.theme.pressScale
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 
@@ -340,26 +330,5 @@ internal fun PresetStar(favourite: Boolean, onToggle: () -> Unit) {
 
 @Composable
 internal fun Thumbnail(catalog: EffectCatalog, path: String?, modifier: Modifier, scale: ContentScale = ContentScale.Fit) {
-    val drawable by produceState<Drawable?>(null, catalog, path) {
-        value = withContext(Dispatchers.IO) { catalog.drawable(path) }
-    }
-    DisposableEffect(drawable) {
-        val shown = drawable
-        onDispose { if (android.os.Build.VERSION.SDK_INT >= 28) (shown as? AnimatedImageDrawable)?.stop() }
-    }
-    Box(modifier.background(RecommendedBg)) {
-        val d = drawable
-        when {
-            android.os.Build.VERSION.SDK_INT >= 28 && d is AnimatedImageDrawable -> AndroidView({ ImageView(it) }, Modifier.fillMaxSize().clipToBounds(), update = { v ->
-                v.scaleType = if (scale == ContentScale.Crop) ImageView.ScaleType.CENTER_CROP else ImageView.ScaleType.FIT_CENTER
-                if (v.drawable !== d) {
-                    v.setImageDrawable(d)
-                    d.repeatCount = AnimatedImageDrawable.REPEAT_INFINITE
-                    d.start()
-                }
-            })
-            d is BitmapDrawable -> Image(d.bitmap.asImageBitmap(), null, Modifier.fillMaxSize(), contentScale = scale)
-            else -> {}
-        }
-    }
+    Box(modifier.background(RecommendedBg)) { app.absentmotion.platform.EffectPicture(catalog, path, scale) }
 }

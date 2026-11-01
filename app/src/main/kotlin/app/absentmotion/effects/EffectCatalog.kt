@@ -34,12 +34,13 @@ data class EffectCatalog(
     val categories: List<Pair<String, String>> get() =
         ((if (definitions.any(::isNew)) listOf("new" to "New") else emptyList()) + EffectCategories).map { (k, v) -> k to (categoryNames[k] ?: v) }
 
-    fun drawable(path: String?): Drawable? = path?.let { p ->
-        runCatching { open?.invoke(p)?.use { stream ->
-            val bytes = stream.readBytes()
+    fun bytes(path: String?): ByteArray? = path?.let { p -> runCatching { open?.invoke(p)?.use { it.readBytes() } }.getOrNull() }
+
+    fun drawable(path: String?): Drawable? = bytes(path)?.let { bytes ->
+        runCatching {
             if (android.os.Build.VERSION.SDK_INT >= 28) ImageDecoder.decodeDrawable(ImageDecoder.createSource(java.nio.ByteBuffer.wrap(bytes)))
             else android.graphics.BitmapFactory.decodeByteArray(bytes, 0, bytes.size)?.let { android.graphics.drawable.BitmapDrawable(null, it) }
-        } }.getOrNull()
+        }.getOrNull()
     }
 
     fun loadInto(load: (String) -> String): EffectCatalog {

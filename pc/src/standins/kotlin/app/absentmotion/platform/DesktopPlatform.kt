@@ -1,0 +1,243 @@
+package app.absentmotion.platform
+
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.toComposeImageBitmap
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.isCtrlPressed
+import androidx.compose.ui.input.pointer.isMetaPressed
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.IntSize
+import app.absentmotion.desk.DeskFiles
+import app.absentmotion.fonts.composeFamily
+import java.io.ByteArrayOutputStream
+import java.io.InputStream
+
+typealias Context = android.content.Context
+typealias Uri = android.net.Uri
+typealias Bitmap = android.graphics.Bitmap
+typealias BitmapFactory = android.graphics.BitmapFactory
+typealias Color = android.graphics.Color
+typealias Matrix = android.graphics.Matrix
+typealias Log = android.util.Log
+typealias LruCache<K, V> = android.util.LruCache<K, V>
+typealias SystemClock = android.os.SystemClock
+typealias ContentResolver = android.content.ContentResolver
+typealias Toast = android.widget.Toast
+
+object ViewConfiguration {
+    fun get(context: Context) = this
+    val scaledTouchSlop = 8
+    val scaledDoubleTapSlop = 50
+    fun getLongPressTimeout() = 500
+    fun getDoubleTapTimeout() = 300
+    fun getTapTimeout() = 100
+}
+
+val LocalContext get() = androidx.compose.ui.platform.LocalContext
+
+fun Bitmap.asImageBitmap(): ImageBitmap = image.toComposeImageBitmap()
+
+fun xmlParser(): org.xmlpull.v1.XmlPullParser = org.xmlpull.v1.XmlPullParserFactory.newInstance().newPullParser()
+
+@Composable
+fun BackHandler(enabled: Boolean = true, onBack: () -> Unit) = app.absentmotion.desk.DeskBack.Handler(enabled, onBack)
+
+fun versionName(context: Context): String = app.absentmotion.desk.DeskInfo.version
+
+@Composable
+fun appVersion(): String = app.absentmotion.desk.DeskInfo.version
+
+@Composable
+fun SceneSurface(engine: app.absentmotion.engine.EngineThread, divisor: Int, size: IntSize, modifier: Modifier, onView: (Any) -> Unit = {}) {
+    remember(engine) { onView(engine); 0 }
+    androidx.compose.runtime.DisposableEffect(engine, divisor, size) {
+        engine.attachDesktop(divisor, size)
+        onDispose { engine.detach() }
+    }
+    val frame = engine.frame
+    Box(modifier) {
+        if (frame != null) Image(frame, null, androidx.compose.ui.Modifier.matchParentSize(), contentScale = ContentScale.FillBounds)
+    }
+}
+
+fun fontFamily(library: app.absentmotion.fonts.FontLibrary, name: String) = library.composeFamily(name)
+
+fun DrawScope.drawLiveStroke(path: DrawPath, filled: Boolean, color: Int, width: Float, opacity: Float, matrix: Matrix, eraser: Boolean) {
+    val v = matrix.v
+    val m = androidx.compose.ui.graphics.Matrix(floatArrayOf(v[0], v[3], 0f, v[6], v[1], v[4], 0f, v[7], 0f, 0f, 1f, 0f, v[2], v[5], 0f, v[8]))
+    val p = androidx.compose.ui.graphics.Path().apply { addPath(path.path); transform(m) }
+    val c = if (eraser) androidx.compose.ui.graphics.Color(0x66FFFFFF) else androidx.compose.ui.graphics.Color(color).let { it.copy(alpha = it.alpha * opacity) }
+    if (filled) drawPath(p, c)
+    else drawPath(p, c, style = androidx.compose.ui.graphics.drawscope.Stroke(width, cap = androidx.compose.ui.graphics.StrokeCap.Round, join = androidx.compose.ui.graphics.StrokeJoin.Round))
+}
+
+suspend fun slotPicture(context: Context, uri: String, video: Boolean): ImageBitmap? = DeskFiles.thumbnail(uri, video, 288)
+
+object ActivityResultContracts {
+    fun OpenDocument() = androidx.activity.result.contract.ActivityResultContracts.OpenDocument()
+    fun OpenMultipleDocuments() = androidx.activity.result.contract.ActivityResultContracts.OpenMultipleDocuments()
+}
+
+@Composable
+fun <I, O> rememberLauncherForActivityResult(contract: androidx.activity.result.contract.ActivityResultContract<I, O>, onResult: (O) -> Unit) =
+    androidx.activity.compose.rememberLauncherForActivityResult(contract, onResult)
+
+internal fun android.media.MediaFormat.intOr(key: String, default: Int): Int = if (containsKey(key)) getInteger(key) else default
+internal fun android.media.MediaFormat.numberOf(key: String): Number? = if (!containsKey(key)) null else runCatching<Number> { getInteger(key) }.getOrNull()
+internal val android.media.MediaCodecInfo.hardware: Boolean get() = false
+internal val android.media.MediaCodecInfo.alias: Boolean get() = false
+internal val android.content.pm.PackageInfo.versionCodeLong: Long get() = versionCode.toLong()
+internal fun android.media.MediaMetadataRetriever.scaledFrame(timeUs: Long, option: Int, width: Int, height: Int): Bitmap? = getScaledFrameAtTime(timeUs, option, width, height)
+internal fun webpFormat(lossless: Boolean) = android.graphics.Bitmap.CompressFormat.PNG
+
+class MediaPicker(private val launchBlock: () -> Unit) { fun launch() = launchBlock() }
+
+@Composable
+fun rememberMediaPicker(onResult: (Uri?) -> Unit): MediaPicker {
+    val latest by rememberUpdatedState(onResult)
+    return remember { MediaPicker { latest(DeskFiles.chooseOne(media = true)) } }
+}
+
+class DocumentPicker(private val launchBlock: () -> Unit) { fun launch() = launchBlock() }
+
+@Composable
+fun rememberDocumentPicker(onResult: (Uri?) -> Unit): DocumentPicker {
+    val latest by rememberUpdatedState(onResult)
+    return remember { DocumentPicker { latest(DeskFiles.chooseOne(media = false)) } }
+}
+
+fun wheel(onScroll: (delta: androidx.compose.ui.geometry.Offset, at: androidx.compose.ui.geometry.Offset, zoom: Boolean) -> Unit): Modifier =
+    Modifier.composed {
+        val latest by rememberUpdatedState(onScroll)
+        Modifier.pointerInput(Unit) {
+            awaitPointerEventScope {
+                while (true) {
+                    val event = awaitPointerEvent()
+                    if (event.type != PointerEventType.Scroll) continue
+                    val change = event.changes.firstOrNull() ?: continue
+                    latest(change.scrollDelta, change.position, event.keyboardModifiers.isCtrlPressed || event.keyboardModifiers.isMetaPressed)
+                    change.consume()
+                }
+            }
+        }
+    }
+
+fun makeBitmap(width: Int, height: Int): Bitmap = Bitmap.createBitmap(width, height)
+fun recycleBitmap(bitmap: Bitmap) = bitmap.recycle()
+
+fun encodeRgba(pixels: ByteArray, width: Int, height: Int, settings: app.absentmotion.export.ExportSettings, reuse: Bitmap?, out: java.io.OutputStream) {
+    val kind = settings.image
+    val source = if (kind.alpha) pixels else app.absentmotion.export.ImageEncode.flatten(pixels, settings.background, pixels)
+    if (kind == app.absentmotion.export.ImageKind.Bmp) return app.absentmotion.export.ImageEncode.bmp(source, width, height, out)
+    val bitmap = reuse ?: makeBitmap(width, height)
+    bitmap.copyPixelsFromBuffer(java.nio.ByteBuffer.wrap(source))
+    val format = if (kind == app.absentmotion.export.ImageKind.Jpeg) android.graphics.Bitmap.CompressFormat.JPEG else android.graphics.Bitmap.CompressFormat.PNG
+    app.absentmotion.export.exportCheck(bitmap.compress(format, if (kind.lossy) settings.imageQuality else 100, out)) {
+        app.absentmotion.i18n.txt(app.absentmotion.R.string.export_error_encode_image, app.absentmotion.i18n.txt(kind.label))
+    }
+}
+
+@Composable
+fun ExportBars(dark: Boolean, running: Boolean) {}
+
+internal const val MAX_SHARED_PICTURES = 500
+
+fun shareExport(context: Context, result: app.absentmotion.export.ExportResult) = DeskFiles.reveal(result.uris)
+
+@Composable
+fun ExportMediaPreview(kind: app.absentmotion.export.ExportKind, uris: List<Uri>, large: Boolean = false, onTap: (() -> Unit)? = null) = app.absentmotion.ui.export.ExportMediaPreview(kind, uris, large, onTap)
+
+fun effectsMessageOnHome() = false
+
+internal const val CAPTION_MODEL_NAME = "ggml-base-q5_1.bin"
+internal const val CAPTION_MODEL_BYTES = 59_707_625L
+internal fun loadCaptionLibrary() { throw UnsupportedOperationException("Auto captions are not available on this computer yet") }
+internal fun fastCaptionCpu(cpuinfo: String): Boolean = false
+
+internal fun captionTextHeight(fonts: app.absentmotion.fonts.FontLibrary, text: String, font: String, size: Float, wrap: Int): Float {
+    val measurer = androidx.compose.ui.text.TextMeasurer(androidx.compose.ui.text.font.createFontFamilyResolver(), androidx.compose.ui.unit.Density(1f), androidx.compose.ui.unit.LayoutDirection.Ltr)
+    return measurer.measure(text, androidx.compose.ui.text.TextStyle(fontFamily = fonts.composeFamily(font), fontSize = androidx.compose.ui.unit.TextUnit(size * 3f, androidx.compose.ui.unit.TextUnitType.Sp), textAlign = androidx.compose.ui.text.style.TextAlign.Center), constraints = androidx.compose.ui.unit.Constraints(maxWidth = wrap.coerceAtLeast(1))).size.height.toFloat()
+}
+
+internal fun fontPreviewStyle(): androidx.compose.ui.text.PlatformTextStyle? = null
+
+internal fun readPreviewPixel(surface: Any?, x: Float, y: Float, complete: (Int?) -> Unit) {
+    val engine = surface as? app.absentmotion.engine.EngineThread
+    complete(engine?.pixelAt(x, y))
+}
+
+internal fun captionDownloadDescription(context: Context, name: String, bytes: Long) =
+    context.getString(app.absentmotion.R.string.platform_caption_download, name, app.absentmotion.export.formatBytes(bytes))
+
+class Speech(context: Context) {
+    suspend fun voices(): List<app.absentmotion.ui.editor.SpeechVoice> = app.absentmotion.desk.DeskSpeech.voices()
+    fun preview(text: String, voice: app.absentmotion.ui.editor.SpeechVoice, rate: Float, pitch: Float) = app.absentmotion.desk.DeskSpeech.preview(text, voice, rate, pitch)
+    suspend fun toFile(text: String, voice: app.absentmotion.ui.editor.SpeechVoice, rate: Float, pitch: Float): Uri = app.absentmotion.desk.DeskSpeech.toFile(text, voice, rate, pitch)
+    fun close() {}
+    companion object { val MAX_CHARS = 4000 }
+}
+
+@Composable
+fun DialogStatusBarIcons(darkIcons: Boolean) {}
+
+fun sheetDialogProperties() = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)
+
+internal fun InputStream.readAtMost(limit: Int): ByteArray {
+    val out = ByteArrayOutputStream(minOf(limit, 8192))
+    val buffer = ByteArray(8192)
+    while (out.size() < limit) {
+        val n = read(buffer, 0, minOf(buffer.size, limit - out.size()))
+        if (n < 0) break
+        out.write(buffer, 0, n)
+    }
+    return out.toByteArray()
+}
+
+internal fun InputStream.readInto(target: ByteArray, offset: Int, length: Int): Int {
+    var done = 0
+    while (done < length) {
+        val n = read(target, offset + done, length - done)
+        if (n < 0) break
+        done += n
+    }
+    return done
+}
+
+internal fun InputStream.drain() {
+    val buffer = ByteArray(8192)
+    while (true) if (read(buffer) < 0) return
+}
+
+internal fun fitBitmap(full: Bitmap, width: Int, height: Int): Bitmap {
+    val scale = minOf(width.toFloat() / full.width, height.toFloat() / full.height)
+    if (scale >= 1f) return full
+    return Bitmap.createScaledBitmap(full, maxOf(1, Math.round(full.width * scale)), maxOf(1, Math.round(full.height * scale)), true)
+}
+
+internal fun sampledBitmap(maxSide: Int, open: () -> InputStream?): Bitmap? {
+    val bounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
+    open()?.use { BitmapFactory.decodeStream(it, null, bounds) }
+    if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null
+    val options = android.graphics.BitmapFactory.Options().apply { inSampleSize = maxOf(1, maxOf(bounds.outWidth, bounds.outHeight) / maxSide) }
+    return open()?.use { BitmapFactory.decodeStream(it, null, options) }
+}
+
+internal class StorageAccess {
+    fun ready(retry: () -> Unit): Boolean = true
+    fun answered(allowed: Boolean) {}
+}
+
+@Composable
+internal fun rememberStorageAccess(): StorageAccess = remember { StorageAccess() }

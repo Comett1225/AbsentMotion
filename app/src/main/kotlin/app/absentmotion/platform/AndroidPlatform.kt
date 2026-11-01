@@ -2,6 +2,7 @@ package app.absentmotion.platform
 
 import android.os.Build
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.foundation.layout.fillMaxSize
 import app.absentmotion.R
 import app.absentmotion.export.exportCheck
 import app.absentmotion.i18n.txt
@@ -309,4 +310,29 @@ internal fun webpFormat(lossless: Boolean) = when {
     Build.VERSION.SDK_INT < 30 -> android.graphics.Bitmap.CompressFormat.WEBP
     lossless -> android.graphics.Bitmap.CompressFormat.WEBP_LOSSLESS
     else -> android.graphics.Bitmap.CompressFormat.WEBP_LOSSY
+}
+
+@androidx.compose.runtime.Composable
+fun EffectPicture(catalog: app.absentmotion.effects.EffectCatalog, path: String?, scale: androidx.compose.ui.layout.ContentScale) {
+    val drawable by androidx.compose.runtime.produceState<android.graphics.drawable.Drawable?>(null, catalog, path) {
+        value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { catalog.drawable(path) }
+    }
+    androidx.compose.runtime.DisposableEffect(drawable) {
+        val shown = drawable
+        onDispose { if (Build.VERSION.SDK_INT >= 28) (shown as? android.graphics.drawable.AnimatedImageDrawable)?.stop() }
+    }
+    val d = drawable
+    when {
+        Build.VERSION.SDK_INT >= 28 && d is android.graphics.drawable.AnimatedImageDrawable -> androidx.compose.ui.viewinterop.AndroidView({ android.widget.ImageView(it) },
+            androidx.compose.ui.Modifier.fillMaxSize().clipToBounds(), update = { v ->
+                v.scaleType = if (scale == androidx.compose.ui.layout.ContentScale.Crop) android.widget.ImageView.ScaleType.CENTER_CROP else android.widget.ImageView.ScaleType.FIT_CENTER
+                if (v.drawable !== d) {
+                    v.setImageDrawable(d)
+                    d.repeatCount = android.graphics.drawable.AnimatedImageDrawable.REPEAT_INFINITE
+                    d.start()
+                }
+            })
+        d is android.graphics.drawable.BitmapDrawable -> androidx.compose.foundation.Image(d.bitmap.asImageBitmap(), null, androidx.compose.ui.Modifier.fillMaxSize(), contentScale = scale)
+        else -> {}
+    }
 }

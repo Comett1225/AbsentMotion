@@ -13,7 +13,14 @@ import androidx.compose.ui.window.rememberWindowState
 import app.absentmotion.model.Scene
 import app.absentmotion.pc.engine.DesktopEngine
 import app.absentmotion.pc.platform.DesktopPlatform
-import app.absentmotion.pc.ui.Workspace
+import app.absentmotion.desk.DeskApp
+import app.absentmotion.desk.DeskAppState
+import app.absentmotion.desk.DeskBack
+import app.absentmotion.desk.DeskFiles
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.type
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.math.roundToInt
@@ -42,8 +49,10 @@ fun main(args: Array<String>) {
         val x = prefs.getInt("windowX", (size.width - width) / 2).coerceIn(0, (size.width - 100).coerceAtLeast(0))
         val y = prefs.getInt("windowY", (size.height - height) / 2).coerceIn(0, (size.height - 100).coerceAtLeast(0))
         val state = rememberWindowState(position = WindowPosition(x.dp, y.dp), width = width.dp, height = height.dp)
-        val close = remember { mutableListOf<() -> Unit>() }
-        Window(onCloseRequest = { close.firstOrNull()?.invoke() }, title = "AbsentMotion", state = state) {
+        val desk = remember { DeskAppState() }
+        Window(onCloseRequest = { exitApplication() }, title = "AbsentMotion", state = state,
+            onPreviewKeyEvent = { it.type == KeyEventType.KeyDown && it.key == Key.Escape && DeskBack.back() }) {
+            DeskFiles.window = window
             DisposableEffect(window) {
                 val listener = object : ComponentAdapter() {
                     private fun save() {
@@ -57,7 +66,7 @@ fun main(args: Array<String>) {
                 window.addComponentListener(listener)
                 onDispose { window.removeComponentListener(listener) }
             }
-            Workspace(window, { exitApplication() }, args.firstOrNull()?.let(::File)?.takeIf { it.isFile }, close)
+            DeskApp(desk)
         }
     }
 }

@@ -516,7 +516,7 @@ private fun PausedBanner(onContinue: () -> Unit, onExit: () -> Unit) {
 
 @Composable
 private fun OfferDialog(onStart: () -> Unit, onLater: () -> Unit, onNever: () -> Unit) {
-    Dialog(onLater) {
+    Dialog(onDismissRequest = onLater) {
         ScaledFonts {
             val shape = RoundedCornerShape(18.dp)
             Column(Modifier.padding(horizontal = 16.dp).widthIn(max = 420.dp).clip(shape).background(Am.Card).verticalScroll(rememberScrollState()).padding(20.dp)) {
