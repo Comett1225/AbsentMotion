@@ -10,7 +10,7 @@ val phoneOnly = listOf(
     "app/absentmotion/platform/AndroidPlatform.kt", "app/absentmotion/platform/OldAndroid.kt", "app/absentmotion/platform/StorageAccess.kt",
     "app/absentmotion/engine/EngineThread.kt", "app/absentmotion/engine/NativeEngine.kt",
     "app/absentmotion/fonts/TextLayout.kt",
-    "app/absentmotion/audio/AudioEngine.kt",
+    "app/absentmotion/audio/AudioEngine.kt", "app/absentmotion/audio/PcmDecoder.kt",
     "app/absentmotion/i18n/AppLanguage.kt", "app/absentmotion/i18n/UiText.kt",
     "app/absentmotion/ui/home/UpdateDialog.kt", "app/absentmotion/media/VideoLibrary.kt",
     "app/absentmotion/ui/home/Updater.kt", "app/absentmotion/ui/home/UpdateVerify.kt", "app/absentmotion/ui/home/UnsupportedPhone.kt",

@@ -1,14 +1,12 @@
 package app.absentmotion.audio
 
-import android.content.ContentUris
 import android.content.Context
 import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.net.Uri
-import android.os.Build
-import android.provider.MediaStore
 import android.provider.OpenableColumns
 import app.absentmotion.model.MediaDeclaration
+import app.absentmotion.platform.deviceSounds
 import app.absentmotion.model.XmlNode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -92,25 +90,7 @@ fun List<DeviceAudio>.shelves(view: SoundView, names: Comparator<String> = sound
     return (if (view.sort == SoundSort.Name && view.descending) known.reversed() else known) + shelves.filter { it.key.isEmpty() }
 }
 
-private fun known(value: String?): String = value?.takeUnless { it == MediaStore.UNKNOWN_STRING }.orEmpty()
-
-suspend fun deviceAudio(context: Context): List<DeviceAudio> = withContext(Dispatchers.IO) {
-    val found = mutableListOf<DeviceAudio>()
-    val collection = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-    val place = if (Build.VERSION.SDK_INT >= 29) "relative_path" else "_data"
-    try {
-        context.contentResolver.query(collection, arrayOf("_id", "title", "_display_name", "duration", "date_added", "album", "artist", place),
-            "duration > 0", null, "date_added DESC, _id DESC")?.use { c ->
-            while (c.moveToNext()) {
-                val where = c.getString(7).orEmpty()
-                found += DeviceAudio(ContentUris.withAppendedId(collection, c.getLong(0)).toString(),
-                    c.getString(1)?.takeIf { it.isNotBlank() } ?: c.getString(2) ?: "", c.getLong(3), c.getLong(4), c.getString(2) ?: "", known(c.getString(5)), known(c.getString(6)),
-                    if (Build.VERSION.SDK_INT >= 29) where.trimEnd('/') else where.substringBeforeLast('/', ""))
-            }
-        }
-    } catch (_: Exception) { }
-    found
-}
+suspend fun deviceAudio(context: Context): List<DeviceAudio> = withContext(Dispatchers.IO) { deviceSounds(context) }
 
 suspend fun audioDeclaration(context: Context, uri: Uri): MediaDeclaration? = withContext(Dispatchers.IO) {
     val extractor = MediaExtractor()
