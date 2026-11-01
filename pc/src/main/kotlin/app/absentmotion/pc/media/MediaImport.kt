@@ -60,3 +60,52 @@ fun addMedia(state: ProjectState, media: MediaDeclaration) {
     state.edit { it.add(layer, listOf(media)) }
     state.selected = layer.id
 }
+
+fun importMedia(files: List<File>, project: File?): List<MediaDeclaration> = files.mapNotNull { source ->
+    runCatching {
+        val checked = inspectMedia(source) ?: return@runCatching null
+        if (project == null) checked else {
+            val folder = project.parentFile.resolve("${project.nameWithoutExtension}_media").also { it.mkdirs() }
+            val digest = java.security.MessageDigest.getInstance("SHA-256")
+            source.inputStream().use { input ->
+                val buffer = ByteArray(64 * 1024)
+                while (true) { val count = input.read(buffer); if (count < 0) break; digest.update(buffer, 0, count) }
+            }
+            val hash = digest.digest().take(8).joinToString("") { "%02x".format(it) }
+            val target = folder.resolve("$hash-${source.name}")
+            if (!target.exists()) source.copyTo(target)
+            MediaDeclaration(checked.node.with("uri", target.toURI().toString()))
+        }
+    }.getOrNull()
+}
+
+fun mediaThumbnail(media: MediaDeclaration, base: File?, cacheDir: File = DesktopPlatform.dataDir.resolve("thumbnails")): File? {
+    val source = runCatching {
+        val uri = java.net.URI(media.uri)
+        if (uri.scheme == "file") File(uri) else base?.resolve(media.uri) ?: File(media.uri)
+    }.getOrNull()?.takeIf { it.isFile } ?: return null
+    if (media.type.startsWith("image/")) return source
+    if (!media.type.startsWith("video/")) return null
+    val id = "${source.canonicalPath}:${source.length()}:${source.lastModified()}"
+    val hash = java.security.MessageDigest.getInstance("SHA-256").digest(id.toByteArray()).joinToString("") { "%02x".format(it) }
+    val cache = cacheDir.also { it.mkdirs() }.resolve("$hash.png")
+    if (cache.isFile) return cache
+    val temp = File.createTempFile("thumbnail-", ".png", cache.parentFile)
+    return try {
+        val process = ProcessBuilder(DesktopPlatform.executable("ffmpeg"), "-v", "error", "-i", source.absolutePath, "-frames:v", "1", "-vf", "scale=256:256:force_original_aspect_ratio=decrease", "-y", temp.absolutePath).redirectError(ProcessBuilder.Redirect.DISCARD).redirectOutput(ProcessBuilder.Redirect.DISCARD).start()
+        if (process.waitFor() == 0 && temp.length() > 0) { temp.copyTo(cache, overwrite = true); cache } else null
+    } finally { temp.delete() }
+}
+
+fun installFileDrop(window: java.awt.Window, receive: (List<File>) -> Unit): () -> Unit {
+    val target = java.awt.dnd.DropTarget(window, java.awt.dnd.DnDConstants.ACTION_COPY, object : java.awt.dnd.DropTargetAdapter() {
+        override fun drop(event: java.awt.dnd.DropTargetDropEvent) {
+            if (!event.isDataFlavorSupported(java.awt.datatransfer.DataFlavor.javaFileListFlavor)) { event.rejectDrop(); return }
+            event.acceptDrop(java.awt.dnd.DnDConstants.ACTION_COPY)
+            val files = runCatching { (event.transferable.getTransferData(java.awt.datatransfer.DataFlavor.javaFileListFlavor) as? List<*>)?.filterIsInstance<File>().orEmpty() }.getOrDefault(emptyList())
+            event.dropComplete(files.isNotEmpty())
+            if (files.isNotEmpty()) receive(files)
+        }
+    }, true)
+    return { target.isActive = false; window.dropTarget = null }
+}
