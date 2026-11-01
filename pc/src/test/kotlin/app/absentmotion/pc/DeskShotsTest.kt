@@ -25,6 +25,8 @@ class DeskShotsTest {
         val home = File("build/desk-home").also { it.deleteRecursively(); it.resolve("Pictures/Trip").mkdirs(); it.resolve("Movies").mkdirs() }
         File("../testdata/media").listFiles().orEmpty().filter { it.isFile }.forEach { f -> f.copyTo(home.resolve(if (f.extension == "mp4") "Movies/${f.name}" else "Pictures/Trip/${f.name}")) }
         System.setProperty("user.home", home.absolutePath)
+        app.absentmotion.desk.DeskLibrary.link(home.resolve("Pictures"))
+        app.absentmotion.desk.DeskLibrary.link(home.resolve("Movies"))
         val exports = File("build/desk-shots-exports").also { it.deleteRecursively() }
         System.setProperty("am.exports", exports.absolutePath)
         runSkikoComposeUiTest(size = Size(1600f, 1000f)) {

@@ -172,7 +172,12 @@ object PlatformFeatures {
     const val camera = false
     const val tools = false
     const val userFiles = true
+    const val linkFolders = true
 }
+
+fun linkFolderLabel(): String = "Link folder"
+
+fun linkMediaFolder() { app.absentmotion.desk.DeskLibrary.chooseFolder()?.let { app.absentmotion.desk.DeskLibrary.link(it) } }
 
 internal const val CAPTION_MODEL_NAME = "ggml-base-q5_1.bin"
 internal const val CAPTION_MODEL_BYTES = 59_707_625L

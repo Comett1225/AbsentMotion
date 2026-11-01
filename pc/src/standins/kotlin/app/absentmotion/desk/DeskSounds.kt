@@ -13,17 +13,10 @@ object DeskSounds {
     private const val LIMIT = 2000
     private const val DEPTH = 8
 
-    fun list(context: Context): List<DeviceAudio> {
-        val home = File(System.getProperty("user.home"))
-        return scan(listOf(home.resolve("Music"), home.resolve("Downloads")), home, File(context.cacheDir, "device-sounds.json"))
-    }
+    fun list(context: Context): List<DeviceAudio> =
+        scan(DeskLibrary.files(SOUNDS), File(System.getProperty("user.home")), File(context.cacheDir, "device-sounds.json"))
 
-    @Synchronized fun scan(roots: List<File>, home: File, cacheFile: File): List<DeviceAudio> {
-        val files = roots.filter { it.isDirectory }.flatMap { root ->
-            root.walkTopDown().maxDepth(DEPTH)
-                .onEnter { it == root || (!it.name.startsWith(".") && it.extension.lowercase() !in PACKAGES) }
-                .filter { it.isFile && !it.name.startsWith(".") && it.extension.lowercase() in SOUNDS }.toList()
-        }.distinct().take(LIMIT)
+    @Synchronized fun scan(files: List<File>, home: File, cacheFile: File): List<DeviceAudio> {
         val cache = runCatching { JSONObject(cacheFile.readText()) }.getOrElse { JSONObject() }
         val fresh = JSONObject()
         val stale = files.filter { f -> cache.optJSONObject(f.path)?.optString("stamp") != stamp(f) }

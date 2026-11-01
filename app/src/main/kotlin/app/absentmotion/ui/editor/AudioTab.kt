@@ -144,6 +144,7 @@ internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrar
         LazyHorizontalGrid(AtLeastTwo(84.dp), Modifier.fillMaxWidth().weight(1f).clipToBounds()) {
             item(key = "viewAll") { ActionTile(stringResource(R.string.view_all), { MediaGridIcon(Modifier.size(20.dp)) }) { browsing = true } }
             item(key = "files") { ActionTile(stringResource(R.string.sounds_from_files), { Icon(TextIcons.Import, null, Modifier.size(20.dp), tint = Am.OnDark) }, ::fromFiles) }
+            if (app.absentmotion.platform.PlatformFeatures.linkFolders) item(key = "folder") { ActionTile(app.absentmotion.platform.linkFolderLabel(), { Icon(app.absentmotion.ui.home.HomeIcons.Folder, null, Modifier.size(20.dp), tint = Am.OnDark) }) { app.absentmotion.platform.linkMediaFolder() } }
             item(key = "speech") { ActionTile(stringResource(R.string.text_to_speech), { Icon(ChromeIcons.Captions, null, Modifier.size(20.dp), tint = Am.OnDark) }) { speaking = true } }
             if (!allowed) item(key = "access", span = { GridItemSpan(maxLineSpan) }) {
                 AccessNotice(Modifier.width(168.dp).fillMaxHeight().padding(6.dp), blocked, ::ask)

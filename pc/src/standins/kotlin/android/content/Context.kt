@@ -106,8 +106,10 @@ object ContentResolver {
     fun query(uri: Uri, projection: Array<String>?, extras: android.os.Bundle?, signal: android.os.CancellationSignal?): android.database.Cursor? = null
     fun openFileDescriptor(uri: Uri, mode: String): android.os.ParcelFileDescriptor? = null
     fun openAssetFileDescriptor(uri: Uri, mode: String): android.content.res.AssetFileDescriptor? = file(uri)?.takeIf { it.isFile }?.let { android.content.res.AssetFileDescriptor(it) }
-    fun registerContentObserver(uri: Uri, descendants: Boolean, observer: android.database.ContentObserver) {}
-    fun unregisterContentObserver(observer: android.database.ContentObserver) {}
+    private val observers = java.util.concurrent.CopyOnWriteArrayList<android.database.ContentObserver>()
+    fun registerContentObserver(uri: Uri, descendants: Boolean, observer: android.database.ContentObserver) { observers += observer }
+    fun unregisterContentObserver(observer: android.database.ContentObserver) { observers -= observer }
+    fun notifyLibraryChanged() = observers.forEach { runCatching { it.onChange(true) } }
     fun insert(uri: Uri, values: android.content.ContentValues?): Uri? = null
     fun update(uri: Uri, values: android.content.ContentValues?, where: String?, args: Array<String>?): Int = 0
     fun notifyChange(uri: Uri, observer: android.database.ContentObserver?) {}

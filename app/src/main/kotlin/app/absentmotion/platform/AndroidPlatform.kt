@@ -197,7 +197,12 @@ object PlatformFeatures {
     const val camera = true
     const val tools = true
     const val userFiles = false
+    const val linkFolders = false
 }
+
+fun linkFolderLabel(): String = ""
+
+fun linkMediaFolder() {}
 
 internal const val CAPTION_MODEL_NAME = "ggml-base-q5_1.bin"
 internal const val CAPTION_MODEL_BYTES = 59_707_625L

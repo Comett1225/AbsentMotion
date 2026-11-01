@@ -40,7 +40,7 @@ object DeskFiles {
         dialog.isMultipleMode = multiple
         if (media) dialog.setFilenameFilter { _, name -> name.substringAfterLast('.', "").lowercase() in mediaExtensions }
         dialog.isVisible = true
-        return dialog.files.orEmpty().toList()
+        return dialog.files.orEmpty().toList().also { DeskLibrary.remember(it) }
     }
 
     fun chooseOne(media: Boolean): Uri? = chooseFiles(media, false).firstOrNull()?.let(Uri::fromFile)

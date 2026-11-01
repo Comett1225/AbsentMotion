@@ -12,29 +12,8 @@ object DeskGallery {
     private val videos = setOf("mp4", "mov", "m4v", "webm", "mkv", "avi")
     private val ids = ConcurrentHashMap<Long, File>()
     private val durations = ConcurrentHashMap<String, Long>()
-    private const val LIMIT = 4000
 
-    private fun roots(): List<File> {
-        val home = File(System.getProperty("user.home"))
-        return listOf("Pictures", "Movies", "Desktop", "Downloads", "Videos").map(home::resolve).filter { it.isDirectory }
-    }
-
-    private fun scan(video: Boolean): List<File> {
-        val wanted = if (video) videos else images
-        val found = ArrayList<File>()
-        fun walk(dir: File, depth: Int) {
-            if (found.size >= LIMIT || depth > 5) return
-            val entries = dir.listFiles() ?: return
-            for (f in entries) {
-                if (f.name.startsWith(".")) continue
-                if (f.isDirectory) { if (!f.name.contains('.')) walk(f, depth + 1) }
-                else if (f.extension.lowercase() in wanted && f.length() > 0) found += f
-                if (found.size >= LIMIT) return
-            }
-        }
-        roots().forEach { walk(it, 0) }
-        return found
-    }
+    private fun scan(video: Boolean): List<File> = DeskLibrary.files(if (video) videos else images)
 
     fun idOf(file: File): Long = (file.absolutePath.hashCode().toLong() and 0x7fffffffL).also { ids[it] = file }
 
@@ -54,7 +33,7 @@ object DeskGallery {
                     "_id" -> idOf(f)
                     "_display_name" -> f.name
                     "bucket_id" -> f.parentFile.absolutePath.hashCode().toString()
-                    "bucket_display_name" -> f.parentFile.name
+                    "bucket_display_name" -> f.parentFile?.name.orEmpty()
                     "date_added", "date_modified" -> f.lastModified() / 1000
                     "mime_type" -> android.content.Desk.mime(f.name)
                     "duration" -> if (video) duration(f) else 0L

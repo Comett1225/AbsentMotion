@@ -140,10 +140,16 @@ class DeskAudioTest {
         a.copyTo(File(home, "Music/Song.band/y.m4a").also { it.parentFile.mkdirs() })
         File(home, "Downloads/notes.txt").writeText("x")
         val cache = File(dir, "sounds-cache.json").also { it.delete() }
+        fun linked(home: File): List<File> {
+            app.absentmotion.desk.DeskLibrary.folders.forEach { app.absentmotion.desk.DeskLibrary.unlink(it) }
+            app.absentmotion.desk.DeskLibrary.link(File(home, "Music"))
+            app.absentmotion.desk.DeskLibrary.link(File(home, "Downloads"))
+            return app.absentmotion.desk.DeskLibrary.files(setOf("mp3", "m4a", "flac", "wav", "ogg", "opus", "aac", "txt").minus("txt"))
+        }
         val t0 = System.nanoTime()
-        val first = DeskSounds.scan(listOf(File(home, "Music"), File(home, "Downloads")), home, cache)
+        val first = DeskSounds.scan(linked(home), home, cache)
         val t1 = System.nanoTime()
-        val again = DeskSounds.scan(listOf(File(home, "Music"), File(home, "Downloads")), home, cache)
+        val again = DeskSounds.scan(linked(home), home, cache)
         println("device sounds: first scan %.1f ms, cached %.1f ms".format((t1 - t0) / 1e6, (System.nanoTime() - t1) / 1e6))
         assertEquals(2, first.size)
         assertEquals(first, again)

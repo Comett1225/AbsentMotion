@@ -33,6 +33,7 @@ class DeskSoundShotsTest {
         val repo = File("..").canonicalFile
         val oldHome = System.getProperty("user.home")
         System.setProperty("user.home", home.path)
+        app.absentmotion.desk.DeskLibrary.link(File(home, "Music"))
         DeskOutput.capture = { _, _ -> }
         try {
             runSkikoComposeUiTest(size = Size(1600f, 1000f)) {

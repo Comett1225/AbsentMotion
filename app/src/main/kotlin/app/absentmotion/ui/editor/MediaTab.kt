@@ -209,6 +209,7 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
                 Column(Modifier.width(97.dp).padding(6.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
                     if (app.absentmotion.platform.PlatformFeatures.camera) MediaSquare(CameraIcons.Camera, stringResource(R.string.camera), false) { state.playing = false; state.cameraOpen = true }
                     MediaSquare(TextIcons.Search, stringResource(R.string.search_hint), searching || search.isNotEmpty()) { searching = true }
+                    if (app.absentmotion.platform.PlatformFeatures.linkFolders) MediaSquare(app.absentmotion.ui.home.HomeIcons.Folder, app.absentmotion.platform.linkFolderLabel(), false) { app.absentmotion.platform.linkMediaFolder() }
                 }
             }
             item(key = "files") {

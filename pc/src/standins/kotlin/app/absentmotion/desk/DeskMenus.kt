@@ -17,6 +17,7 @@ import app.absentmotion.editor.duplicateSelected
 import app.absentmotion.editor.pasteLayer
 import app.absentmotion.editor.split
 import app.absentmotion.ui.editor.MediaPicks
+import app.absentmotion.platform.linkMediaFolder
 import kotlinx.coroutines.launch
 
 @Composable
@@ -37,6 +38,9 @@ fun FrameWindowScope.DeskMenus(app: DeskAppState) {
                 val files = DeskFiles.chooseFiles(media = false, multiple = true).map(Uri::fromFile)
                 if (files.isNotEmpty()) scope.launch { app.importFiles(files) }
             }
+            Item("Link Media Folder…") { linkMediaFolder() }
+            val linked = DeskLibrary.folders.also { DeskLibrary.revision.intValue }
+            if (linked.isNotEmpty()) Menu("Unlink Folder") { linked.forEach { folder -> Item(folder.name.ifEmpty { folder.path }) { DeskLibrary.unlink(folder) } } }
             Separator()
             Item("Export…", enabled = editor != null, shortcut = key(Key.E)) { editor?.let { it.playing = false; it.exportOpen = true } }
             Item("Close Project", enabled = editor != null, shortcut = key(Key.W)) { scope.launch { app.closeEditor() } }

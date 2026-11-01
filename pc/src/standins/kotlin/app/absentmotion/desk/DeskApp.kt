@@ -275,6 +275,7 @@ private class DeskDrop(private val app: DeskAppState, private val run: (suspend 
         if (!transfer.isDataFlavorSupported(java.awt.datatransfer.DataFlavor.javaFileListFlavor)) return false
         val files = (runCatching { transfer.getTransferData(java.awt.datatransfer.DataFlavor.javaFileListFlavor) as List<*> }.getOrNull() ?: return false).filterIsInstance<java.io.File>().filter { it.isFile }
         if (files.isEmpty()) return false
+        DeskLibrary.remember(files)
         val uris = files.map(Uri::fromFile)
         if (app.editor == null) { run { app.importFiles(uris) }; return true }
         val sounds = uris.filter { android.content.Desk.mime(it.toString())?.startsWith("audio/") == true }
