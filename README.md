@@ -161,6 +161,8 @@ which build to download.
 - Possibly an IPA file for sideloading on iPhones and iPads.
 - Better tablet use: layouts made for big screens, in portrait and landscape.
 - More tools in the Tools tab.
+- An ASCII effect: turn any video or picture into text art made of letters and symbols.
+- More effects for text, such as letters that shake on their own and typing with a short sound for each letter.
 - No more Play build. Phones with the Play build move to the FOSS build automatically when they update to 5.0; projects and settings stay.
 - Real 3D: layers, particles and the pieces of 3D effects sit in front of and behind each other in depth, with a camera, lights and 3D models.
 - Motion graphics tools: different offsets for each repeated copy, and linking one value to another.
