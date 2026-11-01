@@ -152,8 +152,6 @@ which build to download.
 
 ## Roadmap
 
-**4.4 is the last 4.x version.** If there is an effect or feature you would like, [request it](https://github.com/Comett1225/AbsentMotion/issues/new?template=feature_request.yml) now: from 5.0 on, new features will come more slowly and in smaller numbers than in the 4.x updates.
-
 [Go here for the full roadmap.](https://comett1225.github.io/AbsentMotion/roadmap.html)
 
 ### 5.0
@@ -164,6 +162,7 @@ which build to download.
 - Real 3D: layers, particles and the pieces of 3D effects sit in front of and behind each other in depth, with a camera, lights and 3D models.
 - Motion graphics tools: different offsets for each repeated copy, and linking one value to another.
 - More from Alight Motion projects: Parenting Helper, Scale Assist and 3D orientation.
+- A new licence: 5.0 and every later version are released under GPL-3.0. 4.4 and earlier stay under Apache-2.0.
 - During 5.0 and after, there won't be many major patches or features; most updates will focus on stability for the PC version and the new iOS file.
 
 ## Updates to AbsentMotion

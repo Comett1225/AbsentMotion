@@ -6,6 +6,40 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [4.4.0] - 2026-11-01 - The last 4.x
+
+### Added
+
+- A Tools tab on the home screen with Compress (videos and pictures to Low, Medium, High, Custom or a Discord size, with a full-screen before-and-after preview) and a Video Downloader (YouTube, Instagram, TikTok and more; needs a one-time 25 MB add-on).
+- Speed curves (Montage, Hero, Bullet, Jump Cut, Flash In, Flash Out or your own points) and a Speed ruler from 0.05x to 100x.
+- Reverse for video clips, sound included.
+- Screenshot: saves the frame of a video or GIF under the playhead at full size without effects, to the gallery and as a new layer; deleting that layer within 10 seconds removes the picture again.
+- Effects: Particles (with depth), nine Beat effects, Liquid Glass, Video Feedback, 3D Scatter and 3D Fracture. Stroke Taper also tapers the Stroke of lines and shapes.
+- Nine transitions: wipes in four directions, clock wipe, glow, swirl, pixelate and noise dissolve.
+- Several selected layers can get the same effect, animation or preset at once, and a transition on every cut between them.
+- Auto caption outlines with a thickness and colour, and custom caption colours.
+- Background removal: choose what to keep, with Softness and Grow / Shrink; Background removal 2.0 uses a newly trained model (ai-models-3).
+- Pre-render, help pages with pictures, and Spanish (Spain), Urdu and Japanese.
+
+### Changed
+
+- The tools sit on two pages; Crop, AI, Auto Captions, Reverse and Screenshot are on the second. Move & Transform opens on Basic Controls.
+- Export Cancel stops at once without asking. About links open the project page and the website.
+- A phone that draws pictures wrong with Vulkan switches to OpenGL by itself after a one-time check.
+- The previous background-removal model is deleted after the update.
+
+### Fixed
+
+- Video clips showed black on older GPUs such as the Galaxy S3 Neo's.
+- Large or detailed SVG files took minutes to import.
+- The screen went black for a moment after choosing a language on the first start (Android 12 and older).
+- Pictures from the Video Downloader kept their original date.
+- Auto captions could be up to a second off; speed could reach almost 0x; very fast clips could disappear; picking an effect while searching pushed the screen up; exact effect search matches now come first; and more.
+
+### Licence
+
+- 5.0 and every later version will be released under GPL-3.0. 4.4 and earlier stay under Apache-2.0.
+
 ## [4.3.0] - 2026-10-30 - Compatibility
 
 ### Added

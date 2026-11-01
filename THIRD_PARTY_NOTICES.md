@@ -322,8 +322,8 @@ can remove the add-on.
   COCO 2017 training set (https://cocodataset.org) and 10,224 from Open Images V7
   (https://storage.googleapis.com/openimages/web/factsfigures_v7.html). Changes: resized; JPEG re-encoded. Image
   rights remain with individual creators. No picture is part of this repository or the app. The creator, title, source page and licence of every picture are listed in the file
-  `AbsentMotion-training-image-credits.txt`, attached to each GitHub release that includes the model
-  (https://github.com/Comett1225/AbsentMotion/releases/latest/download/AbsentMotion-training-image-credits.txt); it is
+  `AbsentMotion-training-image-credits.txt`, attached to the `ai-models-3` release of this repository
+  (https://github.com/Comett1225/AbsentMotion/releases/download/ai-models-3/AbsentMotion-training-image-credits.txt); it is
   not part of this repository.
 - COCO annotations: training/ground-truth masks are based on COCO Consortium annotations under CC BY 4.0 (union of all
   annotated instances, resized). Citation: Tsung-Yi Lin et al., Microsoft COCO: Common Objects in Context, ECCV 2014.
