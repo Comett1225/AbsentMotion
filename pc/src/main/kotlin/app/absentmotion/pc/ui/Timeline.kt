@@ -36,7 +36,7 @@ import kotlin.math.*
 fun Timeline(state: ProjectState, zoom: Float, setZoom: (Float) -> Unit, status: String) {
     val scene = state.scene
     val layers = scene.layers.asReversed()
-    val selected = remember { mutableStateListOf<Long>() }
+    val selected = state.selectedIds
     val scroll = rememberScrollState()
     val vertical = rememberScrollState()
     val scope = rememberCoroutineScope()
@@ -49,19 +49,7 @@ fun Timeline(state: ProjectState, zoom: Float, setZoom: (Float) -> Unit, status:
     val total = scene.totalTime.coerceAtLeast(1000)
     val extent = maxOf(total.toLong() * 2, (layers.maxOfOrNull { it.endTime } ?: 0).toLong() + total / 2).coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
     val width = (800f * zoom * extent / total).coerceIn(800f, 100_000f)
-    fun choose(id: Long, add: Boolean) {
-        if (scene.layer(id)?.node?.get("locked") == "true") return
-        if (!add) selected.clear()
-        if (id !in selected) selected.add(id) else if (add) selected.remove(id)
-        state.selected = selected.lastOrNull() ?: 0L
-    }
-    LaunchedEffect(state.selected, scene) {
-        val layer = scene.layer(state.selected)
-        if (layer?.node?.get("locked") == "true") state.selected = 0
-        if (state.selected == 0L) selected.clear()
-        else if (state.selected !in selected) { selected.clear(); selected.add(state.selected) }
-        selected.removeAll { scene.layer(it) == null || scene.layer(it)?.node?.get("locked") == "true" }
-    }
+    fun choose(id: Long, add: Boolean) = state.select(id, add)
     fun changeZoom(value: Float, cursor: Float? = null) {
         val next = value.coerceIn(.5f, 15f)
         if (cursor != null && next != zoom) scope.launch {
@@ -75,9 +63,7 @@ fun Timeline(state: ProjectState, zoom: Float, setZoom: (Float) -> Unit, status:
         if (event.type != KeyEventType.KeyDown || renaming != 0L) false else when {
             event.isMetaPressed && event.key == Key.B -> { if (state.layer?.node?.get("locked") != "true") state.split(); true }
             !event.isMetaPressed && (event.key == Key.Delete || event.key == Key.Backspace) -> {
-                val ids = selected.toSet().ifEmpty { setOf(state.selected) }
-                state.edit { current -> ids.fold(current) { s, id -> if (s.layer(id)?.node?.get("locked") == "true") s else s.remove(id) } }
-                selected.clear(); state.selected = 0; true
+                state.delete(); true
             }
             !event.isMetaPressed && (event.key == Key.Plus || event.key == Key.Equals) -> { changeZoom(zoom * 1.5f); true }
             !event.isMetaPressed && event.key == Key.Minus -> { changeZoom(zoom / 1.5f); true }
@@ -99,7 +85,7 @@ fun Timeline(state: ProjectState, zoom: Float, setZoom: (Float) -> Unit, status:
                             Text(if (layer.hidden) "○" else "●", Modifier.testTag("eye-${layer.id}").clickable { state.edit { it.update(layer.id) { l -> l.withHidden(!l.hidden) } } }.padding(horizontal = 7.dp), color = muted, fontSize = 12.sp)
                             Text(if (locked) "▣" else "□", Modifier.testTag("lock-${layer.id}").clickable {
                                 state.edit { it.update(layer.id) { l -> l.copy(node = l.node.with("locked", if (locked) null else "true")) } }
-                                if (!locked) { selected.remove(layer.id); if (state.selected == layer.id) state.selected = selected.lastOrNull() ?: 0L }
+                                if (!locked) state.selectMany(selected - layer.id)
                             }.padding(horizontal = 5.dp), color = if (locked) accent else muted, fontSize = 13.sp)
                             if (renaming == layer.id) {
                                 var name by remember(layer.id) { mutableStateOf(layer.label.ifBlank { layer.kind }) }
@@ -194,9 +180,8 @@ fun Timeline(state: ProjectState, zoom: Float, setZoom: (Float) -> Unit, status:
                                         val hi = maxOf(down.position.x, current.x) / scale
                                         val top = (minOf(down.position.y, current.y) / rowHeight).toInt().coerceAtLeast(0)
                                         val bottom = (maxOf(down.position.y, current.y) / rowHeight).toInt().coerceAtMost(layers.lastIndex)
-                                        if (!shift) selected.clear()
-                                        if (top <= bottom) for (i in top..bottom) { val l = layers[i]; if (l.node["locked"] != "true" && l.endTime >= lo && l.startTime <= hi && l.id !in selected) selected.add(l.id) }
-                                        state.selected = selected.lastOrNull() ?: 0L
+                                        val hits = if (top <= bottom) (top..bottom).map { layers[it] }.filter { it.node["locked"] != "true" && it.endTime >= lo && it.startTime <= hi }.map { it.id } else emptyList()
+                                        state.selectMany((if (shift) selected else emptyList()) + hits)
                                     } else if (moved && mode == 4) {
                                         state.playing = false
                                     } else if (moved && layer != null && mode in 1..3) {
@@ -217,7 +202,7 @@ fun Timeline(state: ProjectState, zoom: Float, setZoom: (Float) -> Unit, status:
                                         } } }
                                     } else if (key != null) { state.playing = false; state.time = key }
                                     else if (hit && layer != null) choose(layer.id, shift)
-                                    else { state.playing = false; state.time = (down.position.x / scale).roundToInt().coerceIn(0, extent); if (!shift) { selected.clear(); state.selected = 0 } }
+                                    else { state.playing = false; state.time = (down.position.x / scale).roundToInt().coerceIn(0, extent); if (!shift) state.selected = 0 }
                                     marquee = null; snap = null
                                 }
                             }) {

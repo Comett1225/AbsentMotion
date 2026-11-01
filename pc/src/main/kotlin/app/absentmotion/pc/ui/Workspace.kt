@@ -23,6 +23,7 @@ import androidx.compose.ui.input.key.*
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,6 +42,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.withContext
 import java.awt.Window
+import java.awt.Toolkit
+import java.awt.datatransfer.DataFlavor
+import java.awt.datatransfer.StringSelection
 import java.io.File
 import java.util.prefs.Preferences
 import javax.swing.JOptionPane
@@ -50,9 +54,14 @@ private data class RenderRequest(val scene: Scene, val time: Int, val viewport: 
 
 @Composable
 fun FrameWindowScope.Workspace(window: Window, quit: () -> Unit, startFile: File?, close: MutableList<() -> Unit>) {
+    WorkspaceContent(window, quit, startFile, close, this)
+}
+
+@Composable
+fun WorkspaceContent(window: Window?, quit: () -> Unit, startFile: File?, close: MutableList<() -> Unit>, menuScope: FrameWindowScope? = null, project: ProjectState? = null, initialShortcuts: Boolean = false) {
     val assets = remember { DesktopPlatform.assets() }
     val engine = remember { DesktopEngine(assets, System.getProperty("am.repo")?.let(::File)) }
-    val state = remember { ProjectState() }
+    val state = remember { project ?: ProjectState() }
     val prefs = remember { Preferences.userNodeForPackage(ProjectState::class.java) }
     var status by remember { mutableStateOf("") }
     var recent by remember { mutableStateOf(runCatching { DesktopPlatform.dataDir.resolve("recent.txt").readLines().map(::File).filter(File::isFile).take(10) }.getOrDefault(emptyList())) }
@@ -67,9 +76,11 @@ fun FrameWindowScope.Workspace(window: Window, quit: () -> Unit, startFile: File
     var resolution by remember { mutableIntStateOf(1) }
     var loop by remember { mutableStateOf(false) }
     var settings by remember { mutableStateOf(false) }
+    var shortcuts by remember { mutableStateOf(initialShortcuts) }
     var viewport by remember { mutableStateOf(IntSize(800, 500)) }
     var image by remember { mutableStateOf<androidx.compose.ui.graphics.ImageBitmap?>(null) }
     var outline by remember { mutableStateOf<FloatArray?>(null) }
+    var renderedRequest by remember { mutableStateOf<RenderRequest?>(null) }
     val currentOutline by rememberUpdatedState(outline)
     val lock = remember { Any() }
     val scope = rememberCoroutineScope()
@@ -84,15 +95,15 @@ fun FrameWindowScope.Workspace(window: Window, quit: () -> Unit, startFile: File
             status = if (imported.size == files.size) "Imported ${imported.size} files" else "Imported ${imported.size} of ${files.size} files"
         }
     }
-    fun importMedia() = importFiles(DesktopPlatform.chooseMedia(window))
+    fun importMedia() = window?.let { importFiles(DesktopPlatform.chooseMedia(it)) } ?: Unit
     DisposableEffect(window) {
-        val remove = installFileDrop(window) { files -> scope.launch { importFiles(files) } }
+        val remove = window?.let { installFileDrop(it) { files -> scope.launch { importFiles(files) } } } ?: {}
         onDispose { remove() }
     }
 
     fun save(asNew: Boolean): Boolean {
-        val dest = (if (asNew) null else state.file) ?: DesktopPlatform.choose(window, true) ?: return false
-        return runCatching { dest.writeText(state.scene.toXml()); state.saved(dest); prefs.putBoolean("recoveryPending", false); DesktopPlatform.title(window, dest); status = "Saved"; true }.getOrElse { status = it.message ?: "Could not save project"; false }
+        val dest = (if (asNew) null else state.file) ?: window?.let { DesktopPlatform.choose(it, true) } ?: return false
+        return runCatching { dest.writeText(state.scene.toXml()); state.saved(dest); prefs.putBoolean("recoveryPending", false); window?.let { DesktopPlatform.title(it, dest) }; status = "Saved"; true }.getOrElse { status = it.message ?: "Could not save project"; false }
     }
     fun canClose(): Boolean {
         if (!state.dirty) return true
@@ -107,18 +118,30 @@ fun FrameWindowScope.Workspace(window: Window, quit: () -> Unit, startFile: File
         runCatching {
             val next = Scene.parse(source.readText())
             state.open(next, source)
-            DesktopPlatform.title(window, source)
+            window?.let { DesktopPlatform.title(it, source) }
             recent = (listOf(source) + recent.filter { it != source }).take(10)
             DesktopPlatform.dataDir.mkdirs()
             DesktopPlatform.dataDir.resolve("recent.txt").writeText(recent.joinToString("\n") { it.absolutePath })
             status = ""
         }.onFailure { status = it.message ?: "Could not open project" }
     }
-    fun newProject() { if (canClose()) { state.open(emptyScene(), null); DesktopPlatform.title(window, null) } }
+    fun copy(): Boolean {
+        val layers = state.scene.layers.filter { it.id in state.selectedIds }
+        if (layers.isEmpty()) return false
+        val uris = layers.flatMap { it.node.mediaUris() }.toSet()
+        val nodes = state.scene.node.children.filter { it.name == "media" && it["uri"] in uris || it.name in Scene.LAYER_TAGS && Layer(it).id in state.selectedIds }
+        return runCatching { Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(state.scene.node.copy(children = nodes).toXml()), null); true }.getOrElse { status = "Could not copy layers"; false }
+    }
+    fun paste() {
+        val text = runCatching { Toolkit.getDefaultToolkit().systemClipboard.getData(DataFlavor.stringFlavor) as? String }.getOrNull() ?: return
+        val scene = runCatching { Scene.parse(text) }.getOrNull() ?: return
+        state.paste(scene.layers, scene.media)
+    }
+    fun newProject() { if (canClose()) { state.open(emptyScene(), null); window?.let { DesktopPlatform.title(it, null) } } }
     SideEffect { close.clear(); close.add { if (canClose()) quit() } }
     LaunchedEffect(Unit) {
         val recovery = DesktopPlatform.dataDir.resolve("autosave/recovery.xml")
-        if (startFile == null && prefs.getBoolean("recoveryPending", false) && recovery.isFile) {
+        if (window != null && startFile == null && prefs.getBoolean("recoveryPending", false) && recovery.isFile) {
             if (JOptionPane.showConfirmDialog(window, "Recover the autosaved project?", "Recovery", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                 runCatching { state.open(Scene.parse(recovery.readText()), null); state.recovered() }.onFailure { status = "Could not recover project" }
             } else prefs.putBoolean("recoveryPending", false)
@@ -159,12 +182,12 @@ fun FrameWindowScope.Workspace(window: Window, quit: () -> Unit, startFile: File
                     if (renderedScene[0] != request.scene || renderedBase[0] != request.base) { engine.setScene(request.scene, request.base); renderedScene[0] = request.scene; renderedBase[0] = request.base }
                     engine.render(request.time, w, h).toComposeImageBitmap() to if (request.selected != 0L) engine.quad(request.selected, request.time) else null
                 }
-            } }.onSuccess { result -> if (state.scene == request.scene && state.time == request.time && state.selected == request.selected) { image = result.first; outline = result.second } }.onFailure { status = it.message ?: "Render failed" }
+            } }.onSuccess { result -> if (state.scene == request.scene && state.time == request.time && state.selected == request.selected) { image = result.first; outline = result.second; renderedRequest = request } }.onFailure { status = it.message ?: "Render failed" }
         }
     }
     LaunchedEffect(state.selected) { outline = null }
     DisposableEffect(Unit) { onDispose { synchronized(lock) { engine.close() } } }
-    MenuBar {
+    if (menuScope != null && window != null) with(menuScope) { MenuBar {
         Menu("File") {
             Item("New", onClick = ::newProject, shortcut = KeyShortcut(Key.N, meta = true))
             Item("Open…", onClick = { open(DesktopPlatform.choose(window, false)) }, shortcut = KeyShortcut(Key.O, meta = true))
@@ -180,23 +203,43 @@ fun FrameWindowScope.Workspace(window: Window, quit: () -> Unit, startFile: File
         Menu("Edit") {
             Item("Undo", onClick = state::undo, enabled = state.canUndo, shortcut = KeyShortcut(Key.Z, meta = true))
             Item("Redo", onClick = state::redo, enabled = state.canRedo, shortcut = KeyShortcut(Key.Z, meta = true, shift = true))
+            Separator()
+            Item("Cut", onClick = { if (copy()) state.delete() }, enabled = state.layer != null, shortcut = KeyShortcut(Key.X, meta = true))
+            Item("Copy", onClick = { copy() }, enabled = state.layer != null, shortcut = KeyShortcut(Key.C, meta = true))
+            Item("Paste", onClick = ::paste, shortcut = KeyShortcut(Key.V, meta = true))
             Item("Duplicate", onClick = state::duplicate, enabled = state.layer != null, shortcut = KeyShortcut(Key.D, meta = true))
             Item("Delete", onClick = state::delete, enabled = state.layer != null)
+            Item("Select All", onClick = state::selectAll, shortcut = KeyShortcut(Key.A, meta = true))
         }
         Menu("Layer") {
             Item("Add Text", onClick = { addText(state) })
             Menu("Add Shape") { shapes(assets).forEach { shape -> Item(shape["name"] ?: "Shape", onClick = { addShape(state, shape) }) } }
+            Item("Add Solid", onClick = { addSolid(state) })
             Item("Split at Playhead", onClick = state::split, enabled = state.layer != null, shortcut = KeyShortcut(Key.B, meta = true))
-            Item("Bring Forward", onClick = { val i = state.scene.layers.indexOfFirst { it.id == state.selected }; state.edit { it.reorder(state.selected, i + 1) } }, enabled = state.layer != null)
-            Item("Send Backward", onClick = { val i = state.scene.layers.indexOfFirst { it.id == state.selected }; state.edit { it.reorder(state.selected, i - 1) } }, enabled = state.layer != null)
+            Item("Bring Forward", onClick = { state.reorderSelection(true) }, enabled = state.layer != null)
+            Item("Send Backward", onClick = { state.reorderSelection(false) }, enabled = state.layer != null)
+            Item("Hide/Show", onClick = { val hide = state.layer?.hidden != true; state.updateSelection { it.withHidden(hide) } }, enabled = state.layer != null)
         }
-        Menu("Effect") { Item("Add Effect…", onClick = { tab = "Effects" }, enabled = state.layer != null) }
-        Menu("View") { listOf("Fit", "50%", "100%", "200%").forEach { item -> Item(item, onClick = { scaleMode = item }) } }
-        Menu("Window") { Item("Reset Layout", onClick = { leftWidth = 240f; rightWidth = 300f; timelineHeight = 245f }) }
-        Menu("Help") { Item("About AbsentMotion", onClick = { JOptionPane.showMessageDialog(window, "AbsentMotion 5.0.0") }) }
+        Menu("Effect") {
+            Item("Add Effect…", onClick = { tab = "Effects" }, enabled = state.layer != null)
+            Item("Remove", onClick = { state.update { it.removeEffect(it.effects.lastIndex) } }, enabled = state.layer?.effects?.isNotEmpty() == true)
+        }
+        Menu("View") {
+            listOf("Fit", "50%", "100%", "200%").forEach { item -> Item(item, onClick = { scaleMode = item }) }
+            Item("Zoom In", onClick = { scaleMode = "${(viewerScale(scaleMode, viewport.width.toFloat(), viewport.height.toFloat(), state.scene) * 150f).coerceAtMost(800f)}%" })
+            Item("Zoom Out", onClick = { scaleMode = "${(viewerScale(scaleMode, viewport.width.toFloat(), viewport.height.toFloat(), state.scene) / 1.5f * 100f).coerceAtLeast(5f)}%" })
+            CheckboxItem("Show Safe Area", checked = state.safeArea, onCheckedChange = { state.safeArea = it })
+        }
+        Menu("Window") { Item("Reset Layout", onClick = { leftWidth = 240f; rightWidth = 300f; timelineHeight = 245f; prefs.putFloat("leftWidth", leftWidth); prefs.putFloat("rightWidth", rightWidth); prefs.putFloat("timelineHeight", timelineHeight) }) }
+        Menu("Help") {
+            Item("About AbsentMotion 5.0.0", onClick = { JOptionPane.showMessageDialog(window, "AbsentMotion 5.0.0") })
+            Item("Keyboard Shortcuts", onClick = { shortcuts = true })
+        }
+    }
     }
     MaterialTheme(colors = darkColors(primary = accent, surface = panel, background = preview)) {
         CompositionLocalProvider(LocalContentColor provides Color.White) {
+        Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize().background(preview).onKeyEvent { event ->
             if (event.key == Key.Spacebar && !event.isMetaPressed && !event.isCtrlPressed) {
                 if (event.type == KeyEventType.KeyDown && !spaceDown) { spaceDown = true; spacePanned = false }
@@ -207,6 +250,7 @@ fun FrameWindowScope.Workspace(window: Window, quit: () -> Unit, startFile: File
                 Key.DirectionRight -> { state.playing = false; state.step(if (event.isShiftPressed) 10 else 1); true }
                 Key.Plus, Key.Equals -> { zoom = (zoom * 1.5f).coerceAtMost(15f); true }
                 Key.Minus -> { zoom = (zoom / 1.5f).coerceAtLeast(.5f); true }
+                Key.Delete, Key.Backspace -> { state.delete(); true }
                 Key.MoveHome -> { state.playing = false; state.time = 0; true }
                 Key.MoveEnd -> { state.playing = false; state.time = state.scene.frameStart(state.scene.lastFrame); true }
                 else -> false
@@ -235,7 +279,7 @@ fun FrameWindowScope.Workspace(window: Window, quit: () -> Unit, startFile: File
                 DividerDrag(true) { leftWidth = (leftWidth + it).coerceIn(160f, 430f); prefs.putFloat("leftWidth", leftWidth) }
                 Column(Modifier.weight(1f).fillMaxHeight()) {
                     val scene = state.scene
-                    Box(Modifier.weight(1f).fillMaxWidth()) {
+                    Box(Modifier.weight(1f).fillMaxWidth().testTag("rendered-${renderedRequest?.scene?.hashCode()}-${renderedRequest?.selected}")) {
                         Viewer(state, image, outline, scaleMode, { scaleMode = it }, spaceDown, { spacePanned = true }, { viewport = it }) { x, y ->
                             scope.launch {
                                 val selected = withContext(Dispatchers.Default) { synchronized(lock) { engine.hitTest(x, y, state.time) } }
@@ -255,7 +299,9 @@ fun FrameWindowScope.Workspace(window: Window, quit: () -> Unit, startFile: File
             DividerDrag(false) { timelineHeight = (timelineHeight - it).coerceIn(110f, 500f); prefs.putFloat("timelineHeight", timelineHeight) }
             Box(Modifier.height(timelineHeight.dp).fillMaxWidth()) { Timeline(state, zoom, { zoom = it }, status) }
         }
-        if (settings) ProjectSettings(state) { settings = false }
+        if (settings) ProjectSettings(state, { settings = false }, inline = window == null)
+        if (shortcuts) KeyboardShortcuts(inline = window == null) { shortcuts = false }
+        }
         }
     }
 }

@@ -1,5 +1,6 @@
 package app.absentmotion.pc.ui
 
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -20,6 +21,9 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.*
+import androidx.compose.ui.input.key.*
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.testTag
@@ -52,6 +56,7 @@ private fun rotationPoint(q: List<Offset>): Offset {
 @Composable
 fun Viewer(state: ProjectState, image: ImageBitmap?, outline: FloatArray?, mode: String, setMode: (String) -> Unit,
            space: Boolean, onPan: () -> Unit, onSize: (IntSize) -> Unit, hitTest: (Float, Float) -> Unit) {
+    val focus = remember { FocusRequester() }
     val scene = state.scene
     var pan by remember { mutableStateOf(Offset.Zero) }
     val currentOutline by rememberUpdatedState(outline)
@@ -67,22 +72,30 @@ fun Viewer(state: ProjectState, image: ImageBitmap?, outline: FloatArray?, mode:
         val scale = viewerScale(currentMode, viewport.width.toFloat(), viewport.height.toFloat(), currentScene)
         currentSetMode("${(scale * factor * 100f).coerceIn(5f, 800f)}%")
     }
-    Box(Modifier.fillMaxSize().clipToBounds().testTag("viewer").onSizeChanged { viewport = it; onSize(it) }
+    Box(Modifier.fillMaxSize().clipToBounds().testTag("viewer").focusRequester(focus).onKeyEvent { event ->
+        if (event.type != KeyEventType.KeyDown || event.isMetaPressed || event.isCtrlPressed || state.layer == null) false else {
+            val delta = if (event.isShiftPressed) 10f else 1f
+            val x = when (event.key) { Key.DirectionLeft -> -delta; Key.DirectionRight -> delta; else -> 0f }
+            val y = when (event.key) { Key.DirectionUp -> -delta; Key.DirectionDown -> delta; else -> 0f }
+            if (x == 0f && y == 0f) false else { state.updateSelection { layer -> val p = layer.location; layer.withTransform("location", p[0] + x, p[1] + y, p.getOrElse(2) { 0f }) }; true }
+        }
+    }.focusable().onSizeChanged { viewport = it; onSize(it) }
         .onPointerEvent(PointerEventType.Scroll) { event ->
             val change = event.changes.firstOrNull() ?: return@onPointerEvent
             if (event.keyboardModifiers.isMetaPressed || event.keyboardModifiers.isCtrlPressed) zoom(if (change.scrollDelta.y < 0) 1.1f else 1f / 1.1f)
             else pan -= change.scrollDelta * 28f
             change.consume()
         }
-        .pointerInput(state.selected, state.time) {
+        .pointerInput(state.selected, state.time, state.fillOpen) {
             awaitEachGesture {
                 val down = awaitFirstDown(requireUnconsumed = false)
+                focus.requestFocus()
                 val startScene = currentScene
                 val fit = viewerScale(currentMode, size.width.toFloat(), size.height.toFloat(), startScene)
                 val origin = Offset((size.width - startScene.width * fit) / 2f, (size.height - startScene.height * fit) / 2f) + currentPan
                 val quad = currentOutline?.takeIf { it.size >= 8 }?.let { a -> List(4) { i -> origin + Offset(a[i * 2], a[i * 2 + 1]) * fit } }
                 val layer = startScene.layerAt(state.selected, state.time)
-                val gradient = layer?.takeIf { it.fillType == "gradient" }?.gradient
+                val gradient = layer?.takeIf { state.fillOpen && it.fillType == "gradient" }?.gradient
                 val g0 = if (gradient != null && quad != null) boxPoint(quad, gradient.x0, gradient.y0) else Offset.Unspecified
                 val g1 = if (gradient != null && quad != null) boxPoint(quad, gradient.x1, gradient.y1) else Offset.Unspecified
                 val corner = quad?.indices?.minByOrNull { (quad[it] - down.position).getDistance() } ?: -1
@@ -159,10 +172,11 @@ fun Viewer(state: ProjectState, image: ImageBitmap?, outline: FloatArray?, mode:
         }, contentAlignment = Alignment.Center) {
         val fit = viewerScale(mode, viewport.width.toFloat(), viewport.height.toFloat(), scene)
         val base = viewerScale("Fit", viewport.width.toFloat(), viewport.height.toFloat(), scene)
-        image?.let { bitmap -> Image(bitmap, null, Modifier.fillMaxSize().graphicsLayer { scaleX = fit / base; scaleY = fit / base; translationX = pan.x; translationY = pan.y }, contentScale = ContentScale.Fit) }
+        image?.let { bitmap -> Image(bitmap, null, Modifier.fillMaxSize().testTag("viewer-image").graphicsLayer { scaleX = fit / base; scaleY = fit / base; translationX = pan.x; translationY = pan.y }, contentScale = ContentScale.Fit) }
         Canvas(Modifier.fillMaxSize()) {
             val origin = Offset((size.width - scene.width * fit) / 2f, (size.height - scene.height * fit) / 2f) + pan
             drawRect(Color.LightGray, origin, Size(scene.width * fit, scene.height * fit), style = Stroke(1f))
+            if (state.safeArea) drawRect(Color.White.copy(alpha = .7f), origin + Offset(scene.width * fit * .05f, scene.height * fit * .05f), Size(scene.width * fit * .9f, scene.height * fit * .9f), style = Stroke(1f))
             outline?.takeIf { it.size >= 8 }?.let { a ->
                 val q = List(4) { i -> origin + Offset(a[i * 2], a[i * 2 + 1]) * fit }
                 val path = Path().apply { moveTo(q[0].x, q[0].y); for (i in 1..3) lineTo(q[i].x, q[i].y); close() }
@@ -171,7 +185,7 @@ fun Viewer(state: ProjectState, image: ImageBitmap?, outline: FloatArray?, mode:
                 val rotate = rotationPoint(q)
                 drawLine(accent, (q[0] + q[1]) / 2f, rotate, 2f)
                 drawCircle(Color.White, 7f, rotate); drawCircle(accent, 5f, rotate)
-                state.scene.layerAt(state.selected, state.time)?.takeIf { it.fillType == "gradient" }?.gradient?.let { g ->
+                state.scene.layerAt(state.selected, state.time)?.takeIf { state.fillOpen && it.fillType == "gradient" }?.gradient?.let { g ->
                     val a0 = boxPoint(q, g.x0, g.y0); val a1 = boxPoint(q, g.x1, g.y1)
                     drawLine(Color.White, a0, a1, 2f)
                     drawCircle(Color.White, 8f, a0); drawCircle(Color(g.startColor), 6f, a0)

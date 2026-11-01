@@ -27,9 +27,9 @@ fun parseTime(text: String, fps: Int): Int? {
 }
 
 @Composable
-fun InspectorSection(title: String, initiallyOpen: Boolean = true, content: @Composable ColumnScope.() -> Unit) {
+fun InspectorSection(title: String, initiallyOpen: Boolean = true, onOpenChange: (Boolean) -> Unit = {}, content: @Composable ColumnScope.() -> Unit) {
     var open by remember(title) { mutableStateOf(initiallyOpen) }
-    Text("${if (open) "▾" else "▸"}  $title", Modifier.fillMaxWidth().background(Color(0xff30333b)).clickable { open = !open }.padding(horizontal = 10.dp, vertical = 7.dp), fontSize = 12.sp, color = Color.White)
+    Text("${if (open) "▾" else "▸"}  $title", Modifier.fillMaxWidth().background(Color(0xff30333b)).clickable { open = !open; onOpenChange(open) }.padding(horizontal = 10.dp, vertical = 7.dp), fontSize = 12.sp, color = Color.White)
     if (open) Column(content = content)
 }
 
@@ -72,7 +72,7 @@ fun FillFields(state: ProjectState, layer: Layer) {
     val types = listOf("none", "color", "gradient", "media")
     ChoiceField("Fill", layer.fillType, types) { type -> state.update { l -> l.withFill(type).let { if (type == "gradient" && it.node.child("gradient") == null) it.withGradient(it.gradient) else it } } }
     when (layer.fillType) {
-        "color" -> ColorField("Colour", layer.fillColor) { c -> state.update { it.withFill("color", c) } }
+        "color" -> ColorField("Color", layer.fillColor) { c -> state.update { it.withFill("color", c) } }
         "gradient" -> {
             val g = layer.gradient
             ChoiceField("Type", g.type, listOf("linear", "radial")) { v -> state.update { it.withGradient(it.gradient.copy(type = v)) } }
@@ -113,7 +113,7 @@ fun TextFields(state: ProjectState, layer: Layer) {
             target.withEffect(if (index < 0) target.effects.lastIndex else index) { e -> e.withEffectProperty(key, "float", n.toString(), target.t, target.snap) }
         } } }
     }
-    ColorField("Colour", layer.fillColor) { c -> state.update { it.withFill("color", c) } }
+    ColorField("Color", layer.fillColor) { c -> state.update { it.withFill("color", c) } }
 }
 
 @Composable
@@ -126,14 +126,14 @@ fun StyleFields(state: ProjectState, layer: Layer) {
             Text("×", Modifier.clickable { state.update { it.withBorderRemoved(b.index) } }.padding(5.dp))
         }
         ChoiceField("Direction", b.direction, listOf("inside", "centered", "outside")) { v -> state.update { it.withBorderDirection(b.index, v) } }
-        ColorField("Colour", b.color) { c -> state.update { it.withValue(b.colorRef, formatColor(c)) } }
+        ColorField("Color", b.color) { c -> state.update { it.withValue(b.colorRef, formatColor(c)) } }
         Field("Size", b.size.toString()) { v -> v.toFloatOrNull()?.takeIf { it.isFinite() && it >= 0 }?.let { n -> state.update { it.withValue(b.sizeRef, n.toString()) } } }
     }
     Text("+ Add Border", Modifier.clickable { state.update { it.withBorderAdded() } }.padding(8.dp), color = accent, fontSize = 12.sp)
     Row(verticalAlignment = Alignment.CenterVertically) { Checkbox(layer.shadow.enabled, { enabled -> state.update { it.withShadowEnabled(enabled) } }); Text("Shadow", fontSize = 12.sp) }
     if (layer.shadow.enabled) {
         val s = layer.shadow
-        ColorField("Colour", s.color) { c -> state.update { it.withValue(PropRef(PropRef.Kind.Child, "shadow/color"), formatColor(c)) } }
+        ColorField("Color", s.color) { c -> state.update { it.withValue(PropRef(PropRef.Kind.Child, "shadow/color"), formatColor(c)) } }
         listOf("Opacity" to s.opacity, "Size" to s.size).forEach { (label, value) -> Field(label, value.toString()) { v -> v.toFloatOrNull()?.takeIf { it.isFinite() && it >= 0 }?.let { n -> state.update { it.withValue(PropRef(PropRef.Kind.Child, "shadow/${label.lowercase()}"), (if (label == "Opacity") n.coerceAtMost(1f) else n).toString()) } } } }
         listOf("X" to s.x, "Y" to s.y).forEachIndexed { i, (label, value) -> Field(label, value.toString()) { v -> v.toFloatOrNull()?.takeIf(Float::isFinite)?.let { n -> state.update { l -> val now = l.shadow; val xy = floatArrayOf(now.x, now.y); xy[i] = n; l.withValue(PropRef(PropRef.Kind.Child, "shadow/offset"), formatFloats(xy)) } } } }
     }

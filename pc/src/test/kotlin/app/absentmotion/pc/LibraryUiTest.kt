@@ -81,7 +81,7 @@ class LibraryUiTest {
         screenshot(onRoot().captureToImage().toAwtImage(), "media-elements.png")
         onNodeWithText("test-image", substring = false).performTouchInput { doubleClick() }
         runOnIdle { assertEquals(media.uri, state.layer!!.node["fillImage"]); state.undo(); assertNull(state.scene.layer(state.selected)) }
-        onNodeWithText("Solid colour", substring = false).performClick()
+        onNodeWithText("Solid color", substring = false).performClick()
         runOnIdle { assertEquals(".rect", state.layer!!.node["s"]); state.undo(); assertNull(state.scene.layer(state.selected)) }
         onNodeWithText("Circle", substring = false).performTouchInput { swipe(Offset(20f, 8f), Offset(420f, 8f)) }
         runOnIdle { assertEquals(".circle", state.layer!!.node["s"]); state.undo() }

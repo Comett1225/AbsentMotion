@@ -33,7 +33,7 @@ fun shapes(assets: File): List<XmlNode> = runCatching { XmlNode.parse(assets.res
 fun addSolid(state: ProjectState) {
     val scene = state.scene
     val frame = scene.frameAt(state.time)
-    val layer = Layer(XmlNode("shape", mapOf("id" to "${Layer.newId()}", "label" to "Solid colour", "startTime" to "${scene.frameStart(frame)}", "endTime" to "${scene.endTimeFor(frame, 5000)}", "s" to ".rect", "fillType" to "color")))
+    val layer = Layer(XmlNode("shape", mapOf("id" to "${Layer.newId()}", "label" to "Solid color", "startTime" to "${scene.frameStart(frame)}", "endTime" to "${scene.endTimeFor(frame, 5000)}", "s" to ".rect", "fillType" to "color")))
         .withTransform("location", scene.width / 2f, scene.height / 2f, 0f).withProp("size", "vec2", scene.width / 2f, scene.height / 2f).withFill("color", 0xff7f7f7f.toInt())
     state.add(layer)
 }
@@ -43,7 +43,7 @@ fun Elements(state: ProjectState, assets: File) {
     val items = androidx.compose.runtime.remember(assets) { shapes(assets) }
     androidx.compose.foundation.lazy.LazyColumn {
         item { ElementRow("Text", "text") { addText(state) } }
-        item { ElementRow("Solid colour", "solid") { addSolid(state) } }
+        item { ElementRow("Solid color", "solid") { addSolid(state) } }
         item { SectionTitle("Shapes") }
         items(items.size) { index ->
             val shape = items[index]

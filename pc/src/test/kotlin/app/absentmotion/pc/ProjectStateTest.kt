@@ -74,4 +74,41 @@ class ProjectStateTest {
         state.update { it.withLabel("New") }
         assertFalse(state.canRedo)
     }
+
+    @Test fun sharedSelectionAndUndoableOperations() {
+        val state = project()
+        val ids = state.scene.layers.map { it.id }
+        state.selectMany(ids.take(2))
+        assertEquals(ids[1], state.selected)
+        state.updateSelection { it.withRotation(42f) }
+        assertTrue(ids.take(2).all { state.scene.layer(it)!!.rotation == 42f })
+        state.undo()
+        assertTrue(ids.take(2).all { state.scene.layer(it)!!.rotation != 42f })
+        state.redo()
+        state.duplicate()
+        assertEquals(2, state.selectedIds.size)
+        assertEquals(ids.size + 2, state.scene.layers.size)
+        state.delete()
+        assertEquals(ids.size, state.scene.layers.size)
+        state.undo()
+        assertEquals(ids.size + 2, state.scene.layers.size)
+    }
+
+    @Test fun pasteCopiesAtPlayheadAndRoundTrips() {
+        val state = project()
+        val originals = state.scene.layers.take(2)
+        val source = Scene(state.scene.node.copy(children = originals.map { it.node }))
+        val parsed = Scene.parse(source.toXml())
+        state.time = 2000
+        state.paste(parsed.layers, parsed.media)
+        val copies = state.selectedIds.map { state.scene.layer(it)!! }
+        assertEquals(2000, copies.minOf { it.startTime })
+        assertTrue(copies.none { it.id in originals.map { original -> original.id } })
+        val changed = state.scene
+        assertEquals(changed.layers.map { it.node }, Scene.parse(changed.toXml()).layers.map { it.node })
+        state.undo()
+        assertEquals(0, state.selectedIds.size)
+        state.redo()
+        assertEquals(changed, state.scene)
+    }
 }

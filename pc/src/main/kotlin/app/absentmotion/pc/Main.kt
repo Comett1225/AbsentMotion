@@ -1,7 +1,12 @@
 package app.absentmotion.pc
 
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.WindowPosition
+import java.awt.event.ComponentAdapter
+import java.awt.event.ComponentEvent
+import java.util.prefs.Preferences
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
@@ -31,9 +36,27 @@ fun main(args: Array<String>) {
     }
     application {
         val size = java.awt.Toolkit.getDefaultToolkit().screenSize
-        val state = rememberWindowState(width = (size.width * 0.9).dp, height = (size.height * 0.9).dp)
+        val prefs = remember { Preferences.userNodeForPackage(DesktopPlatform::class.java) }
+        val width = prefs.getInt("windowWidth", (size.width * 0.9).toInt()).coerceIn(640, size.width)
+        val height = prefs.getInt("windowHeight", (size.height * 0.9).toInt()).coerceIn(480, size.height)
+        val x = prefs.getInt("windowX", (size.width - width) / 2).coerceIn(0, (size.width - 100).coerceAtLeast(0))
+        val y = prefs.getInt("windowY", (size.height - height) / 2).coerceIn(0, (size.height - 100).coerceAtLeast(0))
+        val state = rememberWindowState(position = WindowPosition(x.dp, y.dp), width = width.dp, height = height.dp)
         val close = remember { mutableListOf<() -> Unit>() }
         Window(onCloseRequest = { close.firstOrNull()?.invoke() }, title = "AbsentMotion", state = state) {
+            DisposableEffect(window) {
+                val listener = object : ComponentAdapter() {
+                    private fun save() {
+                        if (!window.isShowing || window.extendedState != java.awt.Frame.NORMAL) return
+                        prefs.putInt("windowWidth", window.width); prefs.putInt("windowHeight", window.height)
+                        prefs.putInt("windowX", window.x); prefs.putInt("windowY", window.y)
+                    }
+                    override fun componentMoved(e: ComponentEvent) = save()
+                    override fun componentResized(e: ComponentEvent) = save()
+                }
+                window.addComponentListener(listener)
+                onDispose { window.removeComponentListener(listener) }
+            }
             Workspace(window, { exitApplication() }, args.firstOrNull()?.let(::File)?.takeIf { it.isFile }, close)
         }
     }

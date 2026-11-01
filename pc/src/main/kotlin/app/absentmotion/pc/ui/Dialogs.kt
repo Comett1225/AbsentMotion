@@ -1,6 +1,7 @@
 package app.absentmotion.pc.ui
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -12,13 +13,13 @@ import app.absentmotion.model.parseColor
 import app.absentmotion.pc.project.ProjectState
 
 @Composable
-fun ProjectSettings(state: ProjectState, dismiss: () -> Unit) {
+fun ProjectSettings(state: ProjectState, dismiss: () -> Unit, inline: Boolean = false) {
     var width by remember { mutableStateOf(state.scene.width.toString()) }
     var height by remember { mutableStateOf(state.scene.height.toString()) }
     var fps by remember { mutableStateOf(state.scene.fps.toString()) }
     var duration by remember { mutableStateOf((state.scene.totalTime / 1000f).toString()) }
     var color by remember { mutableStateOf(formatColor(state.scene.bgColor)) }
-    DialogWindow(onCloseRequest = dismiss, title = "Project Settings") {
+    val content: @Composable () -> Unit = {
         Surface(color = panel) {
             Column(Modifier.width(380.dp).padding(20.dp)) {
                 Text("Project Settings", style = MaterialTheme.typography.h6)
@@ -26,7 +27,7 @@ fun ProjectSettings(state: ProjectState, dismiss: () -> Unit) {
                     Row { row.forEach { (label, size) -> TextButton(onClick = { width = "${size.first}"; height = "${size.second}" }) { Text(label) } } }
                 }
                 Field("Width", width) { width = it }; Field("Height", height) { height = it }; Field("FPS", fps) { fps = it }
-                Field("Seconds", duration) { duration = it }; Field("Background", color) { color = it }
+                Field("Seconds", duration) { duration = it }; Field("Background", color, 95.dp) { color = it }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                     TextButton(onClick = dismiss) { Text("Cancel") }
                     TextButton(onClick = {
@@ -38,4 +39,29 @@ fun ProjectSettings(state: ProjectState, dismiss: () -> Unit) {
             }
         }
     }
+    if (inline) DialogOverlay(content) else DialogWindow(onCloseRequest = dismiss, title = "Project Settings") { content() }
+}
+
+@Composable
+fun KeyboardShortcuts(inline: Boolean = false, dismiss: () -> Unit) {
+    val content: @Composable () -> Unit = {
+        Surface(color = panel) {
+            Column(Modifier.width(400.dp).padding(20.dp)) {
+                Text("Keyboard Shortcuts", style = MaterialTheme.typography.h6)
+                listOf(
+                    "Play / Pause" to "Space", "Step Frame" to "Left / Right", "Step 10 Frames" to "Shift + Left / Right",
+                    "Start / End" to "Home / End", "Undo / Redo" to "Cmd + Z / Shift + Cmd + Z",
+                    "Cut / Copy / Paste" to "Cmd + X / C / V", "Select All" to "Cmd + A", "Duplicate" to "Cmd + D",
+                    "Delete" to "Delete", "Split" to "Cmd + B", "Timeline Zoom" to "+ / −", "Nudge Layer" to "Arrow keys"
+                ).forEach { (label, keys) -> Row(Modifier.fillMaxWidth().padding(vertical = 5.dp), horizontalArrangement = Arrangement.SpaceBetween) { Text(label); Text(keys, color = muted) } }
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) { TextButton(onClick = dismiss) { Text("Close") } }
+            }
+        }
+    }
+    if (inline) DialogOverlay(content) else DialogWindow(onCloseRequest = dismiss, title = "Keyboard Shortcuts") { content() }
+}
+
+@Composable
+private fun DialogOverlay(content: @Composable () -> Unit) {
+    Box(Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Color.Black.copy(alpha = .6f)), contentAlignment = androidx.compose.ui.Alignment.Center) { content() }
 }

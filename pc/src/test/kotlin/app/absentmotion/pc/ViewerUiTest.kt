@@ -79,4 +79,13 @@ class ViewerUiTest {
         onNodeWithTag("viewer").performTouchInput { click(Offset(175f, 25f)) }
         runOnIdle { assertEquals(5f, hit.x, .01f); assertEquals(5f, hit.y, .01f) }
     }
+
+    @Test fun closedFillDoesNotMoveGradient() = runSkikoComposeUiTest(size = Size(800f, 500f)) {
+        val state = state()
+        state.update { it.withFill("gradient").withGradient(it.gradient) }
+        state.fillOpen = false
+        setContent { Box(Modifier.size(800.dp, 500.dp)) { Viewer(state, null, quad, "Fit", {}, false, {}, {}) { _, _ -> } } }
+        onNodeWithTag("viewer").performTouchInput { swipe(Offset(250f, 100f), Offset(310f, 130f)) }
+        runOnIdle { assertEquals(0f, state.layer!!.gradient.x0, .01f); assertEquals(0f, state.layer!!.gradient.y0, .01f) }
+    }
 }

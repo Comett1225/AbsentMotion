@@ -16,7 +16,7 @@ import app.absentmotion.model.*
 import app.absentmotion.pc.project.ProjectState
 import app.absentmotion.pc.ui.*
 import java.io.File
-import java.util.prefs.Preferences
+import app.absentmotion.pc.ui.library.LibrarySettings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.skia.Image as SkiaImage
@@ -46,20 +46,19 @@ fun EffectCard(state: ProjectState, layer: Layer, index: Int, effect: XmlNode, d
 @Composable
 private fun Presets(state: ProjectState, layer: Layer, index: Int, def: EffectDefinition) {
     var expanded by remember { mutableStateOf(false) }
-    val prefs = remember { Preferences.userNodeForPackage(ProjectState::class.java).node("favorite-presets") }
-    var revision by remember { mutableIntStateOf(0) }
+    val settings = LibrarySettings.shared
     Box {
         Text("Presets ▾", Modifier.clickable { expanded = true }.padding(8.dp), color = muted, fontSize = 12.sp)
         DropdownMenu(expanded, { expanded = false }) {
             def.presets.forEach { preset ->
                 val favoriteKey = "${def.key}.${preset.slug}"
-                val favorite = revision.let { prefs.getBoolean(favoriteKey, false) }
+                val favorite = settings.contains(def.id, preset.slug)
                 Row(Modifier.width(220.dp).padding(4.dp), verticalAlignment = Alignment.CenterVertically) {
                     val assets = System.getProperty("am.assets")?.let(::File) ?: File("../app/src/main/assets")
                     val image by produceState<ImageBitmap?>(null, favoriteKey) { value = withContext(Dispatchers.IO) { runCatching { SkiaImage.makeFromEncoded(assets.resolve("effects/${def.thumbnail(preset)}").readBytes()).toComposeImageBitmap() }.getOrNull() } }
                     if (image != null) Image(image!!, null, Modifier.size(36.dp)) else Spacer(Modifier.size(36.dp))
                     Text(preset.name, Modifier.weight(1f).clickable { state.update { it.withEffect(index) { def.instance(preset, layer.endTime - layer.startTime) } }; expanded = false }.padding(6.dp), fontSize = 12.sp)
-                    Text(if (favorite) "★" else "☆", Modifier.clickable { prefs.putBoolean(favoriteKey, !favorite); revision++ }.padding(6.dp), color = accent)
+                    Text(if (favorite) "★" else "☆", Modifier.clickable { settings.toggle(def.id, preset.slug) }.padding(6.dp), color = accent)
                 }
             }
         }
@@ -116,7 +115,7 @@ private fun EffectField(state: ProjectState, layer: Layer, index: Int, param: Ef
             }
         }
         else -> Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.weight(1f)) { Field(param.label, value, ::set) }
+            Box(Modifier.weight(1f)) { Field(param.label, value, change = ::set) }
             EffectDiamond(state, layer, index, param, value)
         }
     }

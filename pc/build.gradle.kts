@@ -81,6 +81,8 @@ val sceneCheck by tasks.registering(JavaExec::class) {
 tasks.test {
     dependsOn(nativeBuild)
     systemProperty("am.native", layout.buildDirectory.file("native/libamdesktop.dylib").get().asFile.absolutePath)
+    systemProperty("am.assets", file("../app/src/main/assets").absolutePath)
+    systemProperty("am.repo", file("..").absolutePath)
     systemProperty("skiko.data.path", layout.buildDirectory.dir("skiko").get().asFile.absolutePath)
     systemProperty("java.awt.headless", "true")
     systemProperty("skiko.renderApi", "SOFTWARE")
