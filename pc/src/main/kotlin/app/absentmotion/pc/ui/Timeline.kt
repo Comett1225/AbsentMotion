@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.model.*
 import app.absentmotion.pc.project.ProjectState
+import app.absentmotion.pc.platform.DesktopPlatform
 import app.absentmotion.pc.ui.timeline.*
 import kotlinx.coroutines.launch
 import kotlin.math.*
@@ -61,12 +62,12 @@ fun Timeline(state: ProjectState, zoom: Float, setZoom: (Float) -> Unit, status:
     }
     Column(Modifier.fillMaxSize().background(timeline).focusRequester(focus).onKeyEvent { event ->
         if (event.type != KeyEventType.KeyDown || renaming != 0L) false else when {
-            event.isMetaPressed && event.key == Key.B -> { if (state.layer?.node?.get("locked") != "true") state.split(); true }
-            !event.isMetaPressed && (event.key == Key.Delete || event.key == Key.Backspace) -> {
+            (if (DesktopPlatform.mac) event.isMetaPressed else event.isCtrlPressed) && event.key == Key.B -> { if (state.layer?.node?.get("locked") != "true") state.split(); true }
+            !(if (DesktopPlatform.mac) event.isMetaPressed else event.isCtrlPressed) && (event.key == Key.Delete || event.key == Key.Backspace) -> {
                 state.delete(); true
             }
-            !event.isMetaPressed && (event.key == Key.Plus || event.key == Key.Equals) -> { changeZoom(zoom * 1.5f); true }
-            !event.isMetaPressed && event.key == Key.Minus -> { changeZoom(zoom / 1.5f); true }
+            !(if (DesktopPlatform.mac) event.isMetaPressed else event.isCtrlPressed) && (event.key == Key.Plus || event.key == Key.Equals) -> { changeZoom(zoom * 1.5f); true }
+            !(if (DesktopPlatform.mac) event.isMetaPressed else event.isCtrlPressed) && event.key == Key.Minus -> { changeZoom(zoom / 1.5f); true }
             else -> false
         }
     }.focusable()) {
@@ -114,7 +115,7 @@ fun Timeline(state: ProjectState, zoom: Float, setZoom: (Float) -> Unit, status:
                         if (event.type == PointerEventType.Scroll) {
                             val change = event.changes.first()
                             val delta = change.scrollDelta
-                            if (event.keyboardModifiers.isMetaPressed) changeZoom(zoom * if (delta.y < 0) 1.2f else 1f / 1.2f, change.position.x)
+                            if ((if (DesktopPlatform.mac) event.keyboardModifiers.isMetaPressed else event.keyboardModifiers.isCtrlPressed)) changeZoom(zoom * if (delta.y < 0) 1.2f else 1f / 1.2f, change.position.x)
                             else scope.launch { scroll.scrollBy((if (abs(delta.x) > .01f) delta.x else delta.y) * 48f) }
                             change.consume()
                         }
@@ -159,7 +160,7 @@ fun Timeline(state: ProjectState, zoom: Float, setZoom: (Float) -> Unit, status:
                                     while (true) {
                                         val event = awaitPointerEvent()
                                         val change = event.changes.firstOrNull { it.id == down.id } ?: break
-                                        meta = event.keyboardModifiers.isMetaPressed
+                                        meta = (if (DesktopPlatform.mac) event.keyboardModifiers.isMetaPressed else event.keyboardModifiers.isCtrlPressed)
                                         shift = event.keyboardModifiers.isShiftPressed
                                         current = change.position
                                         if ((current - down.position).getDistance() > 4f) moved = true

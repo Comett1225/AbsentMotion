@@ -23,6 +23,8 @@
 #include "include/effects/SkImageFilters.h"
 #ifdef __APPLE__
 #include "include/ports/SkFontMgr_mac_ct.h"
+#elif defined(_WIN32)
+#include "include/ports/SkTypeface_win.h"
 #else
 #include "include/ports/SkFontMgr_android.h"
 #endif
@@ -62,6 +64,8 @@ float number(const XmlNode& n, const char* key, float fallback) {
 sk_sp<SkFontMgr> systemFonts() {
 #ifdef __APPLE__
     static auto manager = SkFontMgr_New_CoreText(nullptr);
+#elif defined(_WIN32)
+    static auto manager = SkFontMgr_New_DirectWrite();
 #else
     static auto manager = SkFontMgr_New_Android(nullptr, SkFontScanner_Make_FreeType());
 #endif
@@ -86,6 +90,8 @@ sk_sp<SkTypeface> TextFace(const TextLayout& text, const sk_sp<SkFontMgr>& manag
     const bool found = stat(text.path.c_str(), &info) == 0;
 #ifdef __APPLE__
     const long nanos = (long)info.st_mtimespec.tv_nsec;
+#elif defined(_WIN32)
+    const long nanos = 0;
 #else
     const long nanos = (long)info.st_mtim.tv_nsec;
 #endif
@@ -205,6 +211,8 @@ void layout(TextLayout& text) {
     text.fonts->setDefaultFontManager(manager,
 #ifdef __APPLE__
         "Helvetica"
+#elif defined(_WIN32)
+        "Arial"
 #else
         "sans-serif"
 #endif

@@ -21,14 +21,18 @@ dependencies {
     testImplementation("org.jetbrains.compose.ui:ui-test-junit4-desktop:1.10.3")
 }
 
-val nativeBuild by tasks.registering(Exec::class) {
-    commandLine("sh", "native/build_mac.sh")
+val isWindows = System.getProperty("os.name").startsWith("Windows", ignoreCase = true)
+val nativeName = if (isWindows) "amdesktop.dll" else "libamdesktop.dylib"
+
+val nativeBuild = tasks.register<Exec>("nativeBuild") {
+    if (isWindows) commandLine("powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "native/build_win.ps1")
+    else commandLine("sh", "native/build_mac.sh")
 }
 
 tasks.withType<JavaExec>().matching { it.name == "run" }.configureEach {
     dependsOn(nativeBuild)
     systemProperty("am.assets", file("../app/src/main/assets").absolutePath)
-    systemProperty("am.native", file("build/native/libamdesktop.dylib").absolutePath)
+    systemProperty("am.native", file("build/native/$nativeName").absolutePath)
     systemProperty("am.repo", file("..").absolutePath)
     systemProperty("skiko.data.path", file("build/skiko").absolutePath)
 }
@@ -37,7 +41,7 @@ compose.desktop {
     application {
         mainClass = "app.absentmotion.pc.MainKt"
         nativeDistributions {
-            targetFormats(org.jetbrains.compose.desktop.application.dsl.TargetFormat.Dmg)
+            targetFormats(if (isWindows) org.jetbrains.compose.desktop.application.dsl.TargetFormat.Msi else org.jetbrains.compose.desktop.application.dsl.TargetFormat.Dmg)
             packageName = "AbsentMotion"
             packageVersion = "5.0.0"
             macOS { bundleID = "app.absentmotion.desktop" }
@@ -46,41 +50,42 @@ compose.desktop {
     }
 }
 
-val prepareResources by tasks.registering(Sync::class) {
+val prepareResources = tasks.register<Sync>("prepareResources") {
     dependsOn(nativeBuild)
     into(layout.buildDirectory.dir("app-resources/common"))
     from("../app/src/main/assets") { into("assets") }
-    from("build/native/libamdesktop.dylib")
+    from("build/native/$nativeName")
+    if (isWindows) from("build/native/icudtl.dat")
 }
 tasks.matching { it.name == "createDistributable" || it.name.startsWith("prepareAppResources") }.configureEach { dependsOn(prepareResources) }
 
-val renderCheck by tasks.registering(JavaExec::class) {
+val renderCheck = tasks.register<JavaExec>("renderCheck") {
     dependsOn(nativeBuild, tasks.named("classes"))
     classpath = sourceSets.main.get().runtimeClasspath
     mainClass = "app.absentmotion.pc.MainKt"
     args("--render-check")
     systemProperty("java.awt.headless", "true")
     systemProperty("am.assets", file("../app/src/main/assets").absolutePath)
-    systemProperty("am.native", file("build/native/libamdesktop.dylib").absolutePath)
+    systemProperty("am.native", file("build/native/$nativeName").absolutePath)
     systemProperty("am.repo", file("..").absolutePath)
     systemProperty("am.output", file("build").absolutePath)
 }
 
-val sceneCheck by tasks.registering(JavaExec::class) {
+val sceneCheck = tasks.register<JavaExec>("sceneCheck") {
     dependsOn(nativeBuild, tasks.named("classes"))
     classpath = sourceSets.main.get().runtimeClasspath
     mainClass = "app.absentmotion.pc.MainKt"
     args("--scene-check")
     systemProperty("java.awt.headless", "true")
     systemProperty("am.assets", file("../app/src/main/assets").absolutePath)
-    systemProperty("am.native", file("build/native/libamdesktop.dylib").absolutePath)
+    systemProperty("am.native", file("build/native/$nativeName").absolutePath)
     systemProperty("am.repo", file("..").absolutePath)
     systemProperty("am.output", file("build").absolutePath)
 }
 
 tasks.test {
     dependsOn(nativeBuild)
-    systemProperty("am.native", layout.buildDirectory.file("native/libamdesktop.dylib").get().asFile.absolutePath)
+    systemProperty("am.native", layout.buildDirectory.file("native/$nativeName").get().asFile.absolutePath)
     systemProperty("am.assets", file("../app/src/main/assets").absolutePath)
     systemProperty("am.repo", file("..").absolutePath)
     systemProperty("skiko.data.path", layout.buildDirectory.dir("skiko").get().asFile.absolutePath)

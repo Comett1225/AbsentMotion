@@ -20,7 +20,7 @@ struct Desktop {
     am::Scene scene;
     am::EffectRuntime runtime;
     std::map<std::string, sk_sp<SkImage>> pictures;
-    sk_sp<GrDirectContext> gpu;
+    std::unique_ptr<DesktopGpu> gpu;
     Desktop() : gpu(CreateDesktopGpu()) {}
     am::MediaPictures media() {
         return [this](const std::string& uri, int64_t) -> sk_sp<SkImage> {
@@ -94,7 +94,7 @@ JNIEXPORT jboolean JNICALL JNI(render)(JNIEnv* e, jobject, jlong h, jdouble time
     Desktop* d = ptr(h);
     if (!d || w <= 0 || height <= 0 || d->scene.width <= 0 || d->scene.height <= 0 || e->GetDirectBufferCapacity(buffer) < (jlong)w * height * 4) return false;
     auto info = SkImageInfo::Make(w, height, kBGRA_8888_SkColorType, kPremul_SkAlphaType, SkColorSpace::MakeSRGB());
-    auto surface = d->gpu ? SkSurfaces::RenderTarget(d->gpu.get(), skgpu::Budgeted::kNo, info) : nullptr;
+    auto surface = d->gpu && d->gpu->context() ? SkSurfaces::RenderTarget(d->gpu->context(), skgpu::Budgeted::kNo, info) : nullptr;
     if (!surface) surface = SkSurfaces::Raster(info);
     if (!surface) return false;
     am::LayerEffects fx;

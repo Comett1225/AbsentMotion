@@ -210,34 +210,34 @@ fun WorkspaceContent(window: Window?, quit: () -> Unit, startFile: File?, close:
     DisposableEffect(Unit) { onDispose { synchronized(lock) { engine.close() } } }
     if (menuScope != null && window != null) with(menuScope) { MenuBar {
         Menu("File") {
-            Item("New", onClick = ::newProject, shortcut = KeyShortcut(Key.N, meta = true))
-            Item("Open…", onClick = { open(DesktopPlatform.choose(window, false)) }, shortcut = KeyShortcut(Key.O, meta = true))
+            Item("New", onClick = ::newProject, shortcut = KeyShortcut(Key.N, meta = DesktopPlatform.mac, ctrl = !DesktopPlatform.mac))
+            Item("Open…", onClick = { open(DesktopPlatform.choose(window, false)) }, shortcut = KeyShortcut(Key.O, meta = DesktopPlatform.mac, ctrl = !DesktopPlatform.mac))
             Menu("Open Recent") { recent.forEach { entry -> Item(entry.name, onClick = { open(entry) }) } }
             Item("Import Media…", onClick = ::importMedia)
             Separator()
-            Item("Save", onClick = { save(false) }, shortcut = KeyShortcut(Key.S, meta = true))
-            Item("Save As…", onClick = { save(true) }, shortcut = KeyShortcut(Key.S, meta = true, shift = true))
-            Item("Export…", onClick = { exporting = true }, shortcut = KeyShortcut(Key.E, meta = true))
+            Item("Save", onClick = { save(false) }, shortcut = KeyShortcut(Key.S, meta = DesktopPlatform.mac, ctrl = !DesktopPlatform.mac))
+            Item("Save As…", onClick = { save(true) }, shortcut = KeyShortcut(Key.S, meta = DesktopPlatform.mac, ctrl = !DesktopPlatform.mac, shift = true))
+            Item("Export…", onClick = { exporting = true }, shortcut = KeyShortcut(Key.E, meta = DesktopPlatform.mac, ctrl = !DesktopPlatform.mac))
             Item("Project Settings…", onClick = { settings = true })
-            Item("Close", onClick = ::newProject, shortcut = KeyShortcut(Key.W, meta = true))
-            Item("Quit", onClick = { if (canClose()) quit() }, shortcut = KeyShortcut(Key.Q, meta = true))
+            Item("Close", onClick = ::newProject, shortcut = KeyShortcut(Key.W, meta = DesktopPlatform.mac, ctrl = !DesktopPlatform.mac))
+            Item("Quit", onClick = { if (canClose()) quit() }, shortcut = KeyShortcut(Key.Q, meta = DesktopPlatform.mac, ctrl = !DesktopPlatform.mac))
         }
         Menu("Edit") {
-            Item("Undo", onClick = state::undo, enabled = state.canUndo, shortcut = KeyShortcut(Key.Z, meta = true))
-            Item("Redo", onClick = state::redo, enabled = state.canRedo, shortcut = KeyShortcut(Key.Z, meta = true, shift = true))
+            Item("Undo", onClick = state::undo, enabled = state.canUndo, shortcut = KeyShortcut(Key.Z, meta = DesktopPlatform.mac, ctrl = !DesktopPlatform.mac))
+            Item("Redo", onClick = state::redo, enabled = state.canRedo, shortcut = KeyShortcut(Key.Z, meta = DesktopPlatform.mac, ctrl = !DesktopPlatform.mac, shift = true))
             Separator()
-            Item("Cut", onClick = { if (copy()) state.delete() }, enabled = state.layer != null, shortcut = KeyShortcut(Key.X, meta = true))
-            Item("Copy", onClick = { copy() }, enabled = state.layer != null, shortcut = KeyShortcut(Key.C, meta = true))
-            Item("Paste", onClick = ::paste, shortcut = KeyShortcut(Key.V, meta = true))
-            Item("Duplicate", onClick = state::duplicate, enabled = state.layer != null, shortcut = KeyShortcut(Key.D, meta = true))
+            Item("Cut", onClick = { if (copy()) state.delete() }, enabled = state.layer != null, shortcut = KeyShortcut(Key.X, meta = DesktopPlatform.mac, ctrl = !DesktopPlatform.mac))
+            Item("Copy", onClick = { copy() }, enabled = state.layer != null, shortcut = KeyShortcut(Key.C, meta = DesktopPlatform.mac, ctrl = !DesktopPlatform.mac))
+            Item("Paste", onClick = ::paste, shortcut = KeyShortcut(Key.V, meta = DesktopPlatform.mac, ctrl = !DesktopPlatform.mac))
+            Item("Duplicate", onClick = state::duplicate, enabled = state.layer != null, shortcut = KeyShortcut(Key.D, meta = DesktopPlatform.mac, ctrl = !DesktopPlatform.mac))
             Item("Delete", onClick = state::delete, enabled = state.layer != null)
-            Item("Select All", onClick = state::selectAll, shortcut = KeyShortcut(Key.A, meta = true))
+            Item("Select All", onClick = state::selectAll, shortcut = KeyShortcut(Key.A, meta = DesktopPlatform.mac, ctrl = !DesktopPlatform.mac))
         }
         Menu("Layer") {
             Item("Add Text", onClick = { addText(state) })
             Menu("Add Shape") { shapes(assets).forEach { shape -> Item(shape["name"] ?: "Shape", onClick = { addShape(state, shape) }) } }
             Item("Add Solid", onClick = { addSolid(state) })
-            Item("Split at Playhead", onClick = state::split, enabled = state.layer != null, shortcut = KeyShortcut(Key.B, meta = true))
+            Item("Split at Playhead", onClick = state::split, enabled = state.layer != null, shortcut = KeyShortcut(Key.B, meta = DesktopPlatform.mac, ctrl = !DesktopPlatform.mac))
             Item("Bring Forward", onClick = { state.reorderSelection(true) }, enabled = state.layer != null)
             Item("Send Backward", onClick = { state.reorderSelection(false) }, enabled = state.layer != null)
             Item("Hide/Show", onClick = { val hide = state.layer?.hidden != true; state.updateSelection { it.withHidden(hide) } }, enabled = state.layer != null)

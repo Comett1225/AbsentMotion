@@ -11,6 +11,7 @@ import app.absentmotion.model.Scene
 import app.absentmotion.model.formatColor
 import app.absentmotion.model.parseColor
 import app.absentmotion.pc.project.ProjectState
+import app.absentmotion.pc.platform.DesktopPlatform
 
 @Composable
 fun ProjectSettings(state: ProjectState, dismiss: () -> Unit, inline: Boolean = false) {
@@ -53,7 +54,7 @@ fun KeyboardShortcuts(inline: Boolean = false, dismiss: () -> Unit) {
                     "Start / End" to "Home / End", "Undo / Redo" to "Cmd + Z / Shift + Cmd + Z",
                     "Cut / Copy / Paste" to "Cmd + X / C / V", "Select All" to "Cmd + A", "Duplicate" to "Cmd + D",
                     "Delete" to "Delete", "Split" to "Cmd + B", "Timeline Zoom" to "+ / −", "Nudge Layer" to "Arrow keys"
-                ).forEach { (label, keys) -> Row(Modifier.fillMaxWidth().padding(vertical = 5.dp), horizontalArrangement = Arrangement.SpaceBetween) { Text(label); Text(keys, color = muted) } }
+                ).forEach { (label, keys) -> Row(Modifier.fillMaxWidth().padding(vertical = 5.dp), horizontalArrangement = Arrangement.SpaceBetween) { Text(label); Text(if (DesktopPlatform.mac) keys else keys.replace("Cmd", "Ctrl"), color = muted) } }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) { TextButton(onClick = dismiss) { Text("Close") } }
             }
         }
