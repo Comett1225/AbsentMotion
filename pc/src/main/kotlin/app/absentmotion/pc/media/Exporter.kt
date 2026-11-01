@@ -12,7 +12,7 @@ import javax.imageio.ImageIO
 
 class Exporter(private val assets: File, private val repo: File?) {
     enum class Format { MP4, GIF, PNG }
-    data class Options(val format: Format, val width: Int, val height: Int, val fps: Int, val bitrate: Int, val output: File, val hevc: Boolean = false)
+    data class Options(val format: Format, val width: Int, val height: Int, val fps: Int, val bitrate: Int, val output: File, val hevc: Boolean = false, val startMs: Int = 0, val endMs: Int? = null)
     data class Progress(val frame: Int, val total: Int, val secondsLeft: Long?)
     data class Result(val frames: Int, val duration: Double, val width: Int, val height: Int)
 
@@ -27,7 +27,11 @@ class Exporter(private val assets: File, private val repo: File?) {
         require(options.format != Format.MP4 || options.width % 2 == 0 && options.height % 2 == 0) { "Video size must be even" }
         require(!options.output.exists()) { "Output already exists" }
         require(options.output.parentFile?.isDirectory == true) { "Output folder does not exist" }
-        val count = if (options.fps == scene.fps) scene.lastFrame + 1 else (((scene.totalTime + 1L) * options.fps + 999) / 1000).toInt().coerceAtLeast(1)
+        val end = (options.endMs ?: scene.totalTime).coerceAtMost(scene.totalTime)
+        require(options.startMs in 0..end) { "Invalid export range" }
+        val first = (options.startMs.toLong() * options.fps / 1000).toInt()
+        val last = (end.toLong() * options.fps / 1000).toInt()
+        val count = last - first + 1
         val temp = java.nio.file.Files.createTempDirectory(options.output.parentFile.toPath(), ".export-").toFile()
         val result = try {
             DesktopEngine(assets, repo).use { engine ->
@@ -37,13 +41,32 @@ class Exporter(private val assets: File, private val repo: File?) {
                     val started = System.nanoTime()
                     for (i in 0 until count) {
                         checkCancelled()
-                        val image = engine.render((i * 1000L / options.fps).toInt(), options.width, options.height)
+                        val image = engine.render(((first + i) * 1000L / options.fps).toInt(), options.width, options.height)
                         check(ImageIO.write(image, "png", folder.resolve(String.format(Locale.ROOT, "frame_%05d.png", i + 1))))
                         report(i + 1, count, started, progress)
                     }
+                    val checked = verify(folder.resolve("frame_%05d.png"), options, count)
+                    checkCancelled()
                     check(folder.renameTo(options.output)) { "Could not save frames" }
-                    Result(count, count.toDouble() / options.fps, options.width, options.height)
+                    checked
                 } else {
+                    val audio = if (options.format == Format.MP4) temp.resolve("audio.f32").also { target ->
+                        AudioMixer(scene, base, repo) { child -> process = child; if (cancelled) child?.destroyForcibly(); checkCancelled() }.use { mixer ->
+                            target.outputStream().buffered().use { out ->
+                                val start = first.toLong() * AudioMixer.RATE / options.fps
+                                val total = count.toLong() * AudioMixer.RATE / options.fps
+                                var offset = 0L
+                                while (offset < total) {
+                                    checkCancelled()
+                                    val block = mixer.mix(start + offset, minOf(4096L, total - offset).toInt())
+                                    val bytes = java.nio.ByteBuffer.allocate(block.size * 4).order(java.nio.ByteOrder.LITTLE_ENDIAN)
+                                    block.forEach { bytes.putFloat(it) }
+                                    out.write(bytes.array())
+                                    offset += block.size / 2
+                                }
+                            }
+                        }
+                    } else null
                     val encoders = if (options.format == Format.MP4) exportEncoders(options.hevc) else listOf("gif")
                     var last: Throwable? = null
                     var verified: Result? = null
@@ -53,7 +76,7 @@ class Exporter(private val assets: File, private val repo: File?) {
                         output.delete()
                         try {
                             val args = mutableListOf(DesktopPlatform.executable("ffmpeg"), "-v", "error", "-f", "rawvideo", "-pix_fmt", "bgra", "-s", "${options.width}x${options.height}", "-r", "${options.fps}", "-i", "-")
-                            if (options.format == Format.MP4) args.addAll(listOf("-an", "-c:v", encoder, "-b:v", "${options.bitrate}", "-pix_fmt", "yuv420p"))
+                            if (options.format == Format.MP4) args.addAll(listOf("-f", "f32le", "-ar", "48000", "-ac", "2", "-i", audio!!.absolutePath, "-c:a", "aac", "-b:a", "192k", "-c:v", encoder, "-b:v", "${options.bitrate}", "-pix_fmt", "yuv420p"))
                             args.addAll(listOf("-y", output.absolutePath))
                             val log = temp.resolve("ffmpeg.log")
                             val child = ProcessBuilder(args).redirectError(log).redirectOutput(ProcessBuilder.Redirect.DISCARD).start()
@@ -64,7 +87,7 @@ class Exporter(private val assets: File, private val repo: File?) {
                             child.outputStream.buffered().use { stream ->
                                 for (i in 0 until count) {
                                     checkCancelled()
-                                    val image = engine.render((i * 1000L / options.fps).toInt(), options.width, options.height)
+                                    val image = engine.render(((first + i) * 1000L / options.fps).toInt(), options.width, options.height)
                                     image.getRGB(0, 0, options.width, options.height, pixels, 0, options.width)
                                     for (p in pixels.indices) {
                                         val v = pixels[p]; val at = p * 4
@@ -86,7 +109,7 @@ class Exporter(private val assets: File, private val repo: File?) {
                             last = error
                         } finally { process = null }
                     }
-                    verified ?: throw IllegalStateException("Could not encode export", last)
+                    verified ?: throw IllegalStateException("Could not encode export: ${last?.message ?: "unknown error"}", last)
                 }
             }
         } finally { temp.deleteRecursively() }
@@ -99,14 +122,26 @@ class Exporter(private val assets: File, private val repo: File?) {
     }
 
     private fun verify(file: File, options: Options, count: Int): Result {
-        val child = ProcessBuilder(DesktopPlatform.executable("ffprobe"), "-v", "error", "-select_streams", "v:0", "-count_frames", "-show_entries", "stream=width,height,nb_read_frames:format=duration", "-of", "json", file.absolutePath).redirectError(ProcessBuilder.Redirect.DISCARD).start()
+        val args = mutableListOf(DesktopPlatform.executable("ffprobe"), "-v", "error")
+        if (options.format == Format.PNG) args.addAll(listOf("-framerate", "${options.fps}"))
+        args.addAll(listOf("-select_streams", "v:0", "-count_frames", "-show_entries", "stream=width,height,nb_read_frames:format=duration", "-of", "json", file.absolutePath))
+        val child = ProcessBuilder(args).redirectError(ProcessBuilder.Redirect.DISCARD).start()
         process = child
         val json = JSONObject(child.inputStream.bufferedReader().readText())
         check(child.waitFor() == 0) { "Could not verify export" }
         val video = json.getJSONArray("streams").getJSONObject(0)
         val width = video.getInt("width"); val height = video.getInt("height"); val frames = video.getString("nb_read_frames").toInt()
-        val duration = json.getJSONObject("format").getString("duration").toDouble()
+        val duration = if (options.format == Format.PNG) frames.toDouble() / options.fps else json.getJSONObject("format").getString("duration").toDouble()
         check(width == options.width && height == options.height && frames == count && kotlin.math.abs(duration - count.toDouble() / options.fps) <= 1.0 / options.fps + .02) { "Export verification failed" }
+        if (options.format == Format.MP4) {
+            val audio = ProcessBuilder(DesktopPlatform.executable("ffprobe"), "-v", "error", "-select_streams", "a:0", "-show_entries", "stream=codec_name,sample_rate,channels", "-of", "json", file.absolutePath).redirectError(ProcessBuilder.Redirect.DISCARD).start()
+            process = audio
+            val info = JSONObject(audio.inputStream.bufferedReader().readText())
+            check(audio.waitFor() == 0) { "Could not verify audio" }
+            val stream = info.getJSONArray("streams").getJSONObject(0)
+            check(stream.getString("codec_name") == "aac" && stream.getString("sample_rate").toInt() == 48000 && stream.getInt("channels") == 2) { "Audio verification failed" }
+        }
+        checkCancelled()
         return Result(frames, duration, width, height)
     }
 }

@@ -74,7 +74,8 @@ class DesktopEngine(val assets: File, private val repo: File?) : AutoCloseable {
         val italic = parts["italic"] == "1"
         val folder = assets.resolve("fonts").resolve(family.replace(" ", ""))
         val files = folder.listFiles()?.filter { it.extension.lowercase() in setOf("ttf", "otf") }.orEmpty()
-        val selected = files.minByOrNull { f ->
+        val imported = if (font.startsWith("imported?")) parts["name"]?.let { name -> DesktopPlatform.dataDir.resolve("fonts/imported").resolve(File(name).name).takeIf { it.isFile } } else null
+        val selected = imported ?: files.minByOrNull { f ->
             val name = f.name.lowercase()
             (if (italic == ("italic" in name)) 0 else 4) + (if ((weight >= 600) == ("bold" in name)) 0 else 2)
         } ?: assets.resolve("fonts/Roboto/Roboto-Regular.ttf")

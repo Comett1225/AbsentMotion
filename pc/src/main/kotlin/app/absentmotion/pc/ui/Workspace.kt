@@ -31,6 +31,7 @@ import androidx.compose.ui.window.*
 import app.absentmotion.model.*
 import app.absentmotion.pc.engine.DesktopEngine
 import app.absentmotion.pc.platform.DesktopPlatform
+import app.absentmotion.pc.media.AudioPlayer
 import app.absentmotion.pc.media.importMedia as loadMedia
 import app.absentmotion.pc.media.installFileDrop
 import app.absentmotion.pc.media.addMedia
@@ -77,6 +78,7 @@ fun WorkspaceContent(window: Window?, quit: () -> Unit, startFile: File?, close:
     var resolution by remember { mutableIntStateOf(1) }
     var loop by remember { mutableStateOf(false) }
     var settings by remember { mutableStateOf(false) }
+    var exporting by remember { mutableStateOf(false) }
     var shortcuts by remember { mutableStateOf(initialShortcuts) }
     var viewport by remember { mutableStateOf(IntSize(800, 500)) }
     var image by remember { mutableStateOf<androidx.compose.ui.graphics.ImageBitmap?>(null) }
@@ -161,16 +163,32 @@ fun WorkspaceContent(window: Window?, quit: () -> Unit, startFile: File?, close:
     }
     LaunchedEffect(state.playing, state.scene, loop) {
         if (state.playing) {
-            val start = System.nanoTime()
-            val initial = state.time
-            while (true) {
-                val elapsed = ((System.nanoTime() - start) / 1_000_000).toInt()
-                val total = state.scene.totalTime.coerceAtLeast(1)
-                val raw = initial + elapsed
-                if (raw >= total && !loop) { state.time = state.scene.frameStart(state.scene.lastFrame); state.playing = false; break }
-                state.time = state.scene.frameStart(state.scene.frameAt(if (loop) raw % total else raw))
-                delay((1000L / state.scene.fps / 2).coerceAtLeast(5))
-            }
+            var player: AudioPlayer? = null
+            try {
+                while (state.playing) {
+                    val initial = state.time
+                    withContext(Dispatchers.IO) { player = AudioPlayer(state.scene, state.file?.parentFile, System.getProperty("am.repo")?.let(::File), initial) }
+                    val activePlayer = player ?: error("Audio player unavailable")
+                    var last = initial
+                    while (state.playing) {
+                        if (state.time != last) { state.playing = false; break }
+                        activePlayer.failure?.let { error(it) }
+                        val raw = activePlayer.timeMs
+                        if (raw > state.scene.totalTime) {
+                            if (loop) state.time = 0 else { state.time = state.scene.frameStart(state.scene.lastFrame); state.playing = false }
+                            break
+                        }
+                        last = state.scene.frameStart(state.scene.frameAt(raw))
+                        state.time = last
+                        delay((1000L / state.scene.fps / 2).coerceAtLeast(5))
+                    }
+                    withContext(Dispatchers.IO) { activePlayer.close() }
+                    player = null
+                }
+            } catch (error: Exception) {
+                if (error !is kotlinx.coroutines.CancellationException) { status = error.message ?: "Audio playback failed"; state.playing = false }
+                else throw error
+            } finally { player?.close() }
         }
     }
     LaunchedEffect(Unit) {
@@ -199,6 +217,7 @@ fun WorkspaceContent(window: Window?, quit: () -> Unit, startFile: File?, close:
             Separator()
             Item("Save", onClick = { save(false) }, shortcut = KeyShortcut(Key.S, meta = true))
             Item("Save As…", onClick = { save(true) }, shortcut = KeyShortcut(Key.S, meta = true, shift = true))
+            Item("Export…", onClick = { exporting = true }, shortcut = KeyShortcut(Key.E, meta = true))
             Item("Project Settings…", onClick = { settings = true })
             Item("Close", onClick = ::newProject, shortcut = KeyShortcut(Key.W, meta = true))
             Item("Quit", onClick = { if (canClose()) quit() }, shortcut = KeyShortcut(Key.Q, meta = true))
@@ -268,7 +287,7 @@ fun WorkspaceContent(window: Window?, quit: () -> Unit, startFile: File?, close:
                 Spacer(Modifier.width(12.dp))
                 Text("${state.scene.title.ifBlank { state.file?.nameWithoutExtension ?: "Untitled" }}${if (state.dirty) " •" else ""}   ${state.scene.width} × ${state.scene.height}  /  ${state.scene.fps} fps", Modifier.weight(1f), color = muted, fontSize = 12.sp)
                 ToolbarButton("Settings") { settings = true }
-                ToolbarButton("Export", false) {}
+                ToolbarButton("Export") { exporting = true }
             }
             Row(Modifier.weight(1f).fillMaxWidth()) {
                 Column(Modifier.width(leftWidth.dp).fillMaxHeight().background(panel)) {
@@ -302,6 +321,7 @@ fun WorkspaceContent(window: Window?, quit: () -> Unit, startFile: File?, close:
             DividerDrag(false) { timelineHeight = (timelineHeight - it).coerceIn(110f, 500f); prefs.putFloat("timelineHeight", timelineHeight) }
             Box(Modifier.height(timelineHeight.dp).fillMaxWidth()) { Timeline(state, zoom, { zoom = it }, status) }
         }
+        if (exporting) ExportDialog(state, window) { exporting = false }
         if (settings) ProjectSettings(state, { settings = false }, inline = window == null)
         if (shortcuts) KeyboardShortcuts(inline = window == null) { shortcuts = false }
         }
