@@ -40,7 +40,7 @@ fun ProjectSettings(state: ProjectState, dismiss: () -> Unit, inline: Boolean = 
             }
         }
     }
-    if (inline) DialogOverlay(content) else DialogWindow(onCloseRequest = dismiss, title = "Project Settings") { content() }
+    if (inline) DialogOverlay(content) else DialogWindow(onCloseRequest = dismiss, title = "Project Settings") { androidx.compose.foundation.layout.Box(Modifier.fillMaxSize().background(panel)) { content() } }
 }
 
 @Composable
@@ -59,7 +59,7 @@ fun KeyboardShortcuts(inline: Boolean = false, dismiss: () -> Unit) {
             }
         }
     }
-    if (inline) DialogOverlay(content) else DialogWindow(onCloseRequest = dismiss, title = "Keyboard Shortcuts") { content() }
+    if (inline) DialogOverlay(content) else DialogWindow(onCloseRequest = dismiss, title = "Keyboard Shortcuts") { androidx.compose.foundation.layout.Box(Modifier.fillMaxSize().background(panel)) { content() } }
 }
 
 @Composable

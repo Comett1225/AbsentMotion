@@ -92,7 +92,8 @@ class TimelineUiTest {
         runOnIdle { assertTrue(state.scene.layers.isEmpty()); state.undo(); assertEquals(2, state.scene.layers.size) }
         onNodeWithTag("tracks").performTouchInput { click(Offset(150f, 48f)) }
         runOnIdle { state.time = 2000 }
-        onRoot().performKeyInput { keyDown(Key.MetaLeft); pressKey(Key.B); keyUp(Key.MetaLeft) }
+        val command = if (System.getProperty("os.name").startsWith("Windows")) Key.CtrlLeft else Key.MetaLeft
+        onRoot().performKeyInput { keyDown(command); pressKey(Key.B); keyUp(command) }
         runOnIdle { assertEquals(3, state.scene.layers.size); state.undo(); assertEquals(2, state.scene.layers.size) }
     }
 

@@ -105,7 +105,7 @@ fun ExportDialog(state: ProjectState, window: Window?, dismiss: () -> Unit) {
         }
     }
     if (window == null) Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = .6f)), contentAlignment = Alignment.Center) { content() }
-    else DialogWindow(onCloseRequest = { if (!running) dismiss() }, title = "Export", state = rememberDialogState(width = 560.dp, height = 700.dp)) { content() }
+    else DialogWindow(onCloseRequest = { if (!running) dismiss() }, title = "Export", state = rememberDialogState(width = 560.dp, height = 700.dp)) { Box(Modifier.fillMaxSize().background(panel)) { content() } }
 }
 
 @Composable
