@@ -97,6 +97,17 @@ class DeskShotsTest {
             mainClock.advanceTimeBy(1000)
             shot("09-gif-selected.png")
             exportAndShoot("10-gif")
+            runOnIdle { editor.exportOpen = false }
+            runBlocking { app.closeEditor() }
+            val repo = File("..").canonicalFile
+            val mediaXml = File("../testdata/scenes/media.xml").readText().replace("\"testdata/", "\"" + repo.resolve("testdata").toURI().toString().replaceFirst("file:/", "file:///") + "/")
+            val mediaId = app.store.create(Scene.parse(mediaXml))
+            runBlocking { app.openNow(mediaId) }
+            runOnIdle { app.editor!!.frame = 45 }
+            mainClock.advanceTimeBy(2000)
+            Thread.sleep(3000)
+            mainClock.advanceTimeBy(1000)
+            shot("11-media-editor.png")
             val written = exports.walk().filter { it.isFile }.map { it.relativeTo(exports).path }.sorted().toList()
             println("exported: $written")
             check(written.any { it.endsWith(".mp4") } && written.any { it.endsWith(".gif") }) { "missing exports: $written" }

@@ -26,6 +26,7 @@ import app.absentmotion.model.fontNames
 import app.absentmotion.model.imageUris
 import app.absentmotion.model.videoTimeUs
 import app.absentmotion.pc.engine.FfmpegVideoSource
+import app.absentmotion.pc.engine.NativeVideoSource
 import app.absentmotion.pc.engine.VideoSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -34,6 +35,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -89,7 +91,7 @@ class EngineThread(private val background: Int, context: Context? = null, privat
     @Volatile private var mediaScene: Scene? = null
     @Volatile private var mediaJob: Job? = null
     private var mediaKey: Any? = null
-    private val videos = HashMap<String, VideoSource>()
+    private val videos = HashMap<String, AutoCloseable>()
     private var view: PreviewView? = null
     private var viewSerial = 0L
     private val serials = AtomicLong()
@@ -176,7 +178,7 @@ class EngineThread(private val background: Int, context: Context? = null, privat
         }
         for (uri in clips) {
             if (videos.containsKey(uri)) continue
-            val source = file(uri)?.let { f -> runCatching { FfmpegVideoSource(f, DeskMedia.ffmpeg, DeskMedia.ffprobe) }.getOrNull() } ?: continue
+            val source = file(uri)?.let { f -> runCatching { NativeVideoSource(f) }.getOrNull() ?: runCatching { FfmpegVideoSource(f, DeskMedia.ffmpeg, DeskMedia.ffprobe) }.getOrNull() } ?: continue
             withContext(dispatcher) { if (closed) source.close() else videos[uri] = source }
         }
         pictureRevision.update { it + 1 }
@@ -241,15 +243,19 @@ class EngineThread(private val background: Int, context: Context? = null, privat
         }
     }
 
-    private fun syncVideo(scene: Scene?, timeMs: Int) {
-        scene ?: return
+    private fun syncVideo(scene: Scene?, timeMs: Int, exact: Boolean = true): Boolean {
+        scene ?: return true
+        var current = true
         for (layer in scene.layers) {
             val uri = layer.node["fillVideo"] ?: continue
             if (timeMs < layer.startTime || timeMs > layer.endTime) continue
-            val source = videos[uri] ?: continue
-            val at = layer.videoTimeUs(timeMs, scene, VideoTiming(layer)).coerceAtLeast(0) / 1000
-            source.frame(at)?.let { engine().setFrame(uri, it.width, it.height, it.rgba) }
+            val at = layer.videoTimeUs(timeMs, scene, VideoTiming(layer)).coerceAtLeast(0)
+            when (val source = videos[uri]) {
+                is NativeVideoSource -> if (engine().showVideo(uri, source, at, exact) == 0) current = false
+                is VideoSource -> source.frame(at / 1000)?.let { engine().setFrame(uri, it.width, it.height, it.rgba) }
+            }
         }
+        return current
     }
 
     private fun renderNow() {
@@ -260,7 +266,7 @@ class EngineThread(private val background: Int, context: Context? = null, privat
             if (v == null || outSize.width <= 0 || outSize.height <= 0) return
             val w = (outSize.width / outDivisor).coerceAtLeast(1)
             val h = (outSize.height / outDivisor).coerceAtLeast(1)
-            syncVideo(mediaScene, v.timeMs)
+            if (!syncVideo(mediaScene, v.timeMs, exact = false)) mediaScope.launch { delay(8); requestRender() }
             val native = engine()
             native.setCameraView(v.camera)
             native.setAccurateBlur(v.accurateBlur)

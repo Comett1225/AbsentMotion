@@ -162,3 +162,5 @@ tasks.test {
     systemProperty("java.awt.headless", "true")
     systemProperty("skiko.renderApi", "SOFTWARE")
 }
+
+tasks.named<Jar>("jar") { from(runtimeStandins.output) }

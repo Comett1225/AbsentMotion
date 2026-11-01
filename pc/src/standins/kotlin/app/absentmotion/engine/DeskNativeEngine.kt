@@ -30,6 +30,8 @@ class NativeEngine(backend: Backend = Backend.GANESH) : AutoCloseable {
 
     fun setFrame(uri: String, width: Int, height: Int, rgba: ByteArray): Boolean = DesktopNative.setFrame(handle, uri, width, height, rgba)
 
+    fun showVideo(uri: String, source: app.absentmotion.pc.engine.NativeVideoSource, timeUs: Long, exact: Boolean): Int = source.show(handle, uri, timeUs, exact)
+
     fun setCameraView(on: Boolean) = DesktopNative.setCameraView(handle, on)
     fun setAccurateBlur(on: Boolean) = DesktopNative.setAccurateBlur(handle, on)
     fun trim() {}

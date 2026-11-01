@@ -13,6 +13,22 @@ data class VideoInfo(val width: Int, val height: Int, val durationMs: Long, val 
 
 data class VideoFrame(val width: Int, val height: Int, val rgba: ByteArray)
 
+class NativeVideoSource(file: File) : AutoCloseable {
+    private var video = DesktopNative.videoOpen(file.absolutePath).also { require(it != 0L) { "native decoder cannot open ${file.name}" } }
+    private val values = DesktopNative.videoInfo(video)
+    val info = VideoInfo(values[0].toInt(), values[1].toInt(), values[2].toLong() / 1000, values[3])
+    val orientation = values[4].toInt()
+    val hasAudio = values[5] != 0.0
+    val hardware = values[6] != 0.0
+
+    fun show(handle: Long, uri: String, timeUs: Long, exact: Boolean): Int = if (video == 0L) -1 else DesktopNative.videoFrame(handle, video, uri, timeUs, exact)
+
+    override fun close() {
+        if (video != 0L) DesktopNative.videoClose(video)
+        video = 0L
+    }
+}
+
 class FfmpegVideoSource(private val file: File, private val ffmpeg: String, ffprobe: String) : VideoSource {
     override val info: VideoInfo
     private val width: Int
@@ -45,7 +61,7 @@ class FfmpegVideoSource(private val file: File, private val ffmpeg: String, ffpr
         if (target == decodedFrame) return VideoFrame(width, height, bytes)
         if (stream == null || target < decodedFrame || target > decodedFrame + 3) {
             close()
-            process = ProcessBuilder(ffmpeg, "-v", "error", "-ss", "${target / fps}", "-i", file.absolutePath, "-an", "-vf", "scale=$width:$height", "-pix_fmt", "rgba", "-f", "rawvideo", "-").redirectError(ProcessBuilder.Redirect.DISCARD).start()
+            process = ProcessBuilder(ffmpeg, "-v", "error", "-ss", "${target / fps}", "-noautorotate", "-i", file.absolutePath, "-an", "-vf", "scale=$width:$height", "-pix_fmt", "rgba", "-f", "rawvideo", "-").redirectError(ProcessBuilder.Redirect.DISCARD).start()
             stream = process!!.inputStream
             decodedFrame = target - 1
         }

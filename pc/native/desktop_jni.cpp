@@ -10,6 +10,7 @@
 #include "drawing.h"
 #include "text.h"
 #include "preview.h"
+#include "video.h"
 #include "include/core/SkCanvas.h"
 #include "include/core/SkColorSpace.h"
 #include "include/core/SkData.h"
@@ -104,6 +105,9 @@ static std::string str(JNIEnv* env, jstring s) {
     return result;
 }
 static Desktop* ptr(jlong h) { return reinterpret_cast<Desktop*>(h); }
+GrDirectContext* DesktopContext(jlong h) { return ptr(h)->gpu ? ptr(h)->gpu->context() : nullptr; }
+std::string DesktopString(JNIEnv* env, jstring s) { return str(env, s); }
+void DesktopInstall(jlong h, const std::string& uri, sk_sp<SkImage> image) { ptr(h)->pictures[uri] = std::move(image); }
 #define JNI(name) Java_app_absentmotion_pc_engine_DesktopNative_##name
 extern "C" {
 JNIEXPORT jlong JNICALL JNI(create)(JNIEnv*, jobject) { return reinterpret_cast<jlong>(new Desktop()); }
