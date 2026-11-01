@@ -589,6 +589,7 @@ internal fun problemFor(raw: String): Int {
     val text = raw.lowercase()
     return when {
         "unsupported url" in text -> R.string.downloader_error_unsupported
+        "not a bot" in text -> R.string.downloader_error_bot
         "sign in" in text || "login" in text || "log in" in text || "authentication" in text || "cookies" in text || "age-restricted" in text || "confirm your age" in text -> R.string.downloader_error_login
         "private" in text -> R.string.downloader_error_private
         "tls fingerprint" in text || "impersonat" in text || "blocked" in text || "http error 403" in text || "rate-limit" in text || "too many requests" in text -> R.string.downloader_error_blocked

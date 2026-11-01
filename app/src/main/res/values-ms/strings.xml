@@ -136,6 +136,7 @@
     <string name="settings_keep_media_copies">Simpan salinan media yang diimport dalam projek</string>
     <string name="settings_about">Perihal</string>
     <string name="settings_report_issue">Laporkan masalah</string>
+    <string name="settings_suggest_feature">Cadangkan ciri</string>
     <string name="settings_help">Bantuan</string>
     <string name="tutorial_settings_start">Mulakan tutorial</string>
     <string name="tutorial_settings_continue">Teruskan tutorial</string>
@@ -480,6 +481,7 @@
     <string name="downloader_error_login">Siaran ini memerlukan akaun yang log masuk, jadi ia tidak boleh dimuat turun.</string>
     <string name="downloader_error_private">Video ini peribadi.</string>
     <string name="downloader_error_blocked">Laman ini menyekat muat turun. Cuba lagi nanti.</string>
+    <string name="downloader_error_bot">YouTube meminta pengesahan bahawa anda bukan bot. Ini sering berlaku apabila menggunakan VPN: matikannya atau cuba lagi nanti.</string>
     <string name="downloader_error_gone">Video ini tidak lagi tersedia.</string>
     <string name="downloader_error_novideo">Tiada apa-apa untuk dimuat turun dalam pautan ini.</string>
     <string name="downloader_error_network">Laman tidak dapat dihubungi. Semak sambungan.</string>
@@ -1975,4 +1977,11 @@
         <item quantity="other">%1$s potongan</item>
     </plurals>
     <string name="structure_svg_importing">Mengimport SVG…</string>
+    <string name="tools_download_addon">Muat turun (%1$d MB)</string>
+    <string name="tools_downloader_intro">Memuat turun video dan gambar dari YouTube, Instagram, TikTok dan media sosial lain terus ke galeri anda. Ia memerlukan tambahan sekali muat turun sebanyak %1$d MB.</string>
+    <string name="tools_download_progress">Memuat turun %1$d%%</string>
+    <string name="tools_more">Lebih banyak alat akan hadir dalam kemas kini akan datang...</string>
+    <string name="tools_suggestions">Ada cadangan alat? Kongsikannya di %1$s atau %2$s!</string>
+    <string name="tools_github">GitHub</string>
+    <string name="tools_form">Borang</string>
 </resources>

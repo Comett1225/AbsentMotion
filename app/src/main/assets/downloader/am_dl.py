@@ -11,6 +11,7 @@ from yt_dlp.utils import DownloadCancelled
 
 _lib = None
 _last = {}
+_warned = []
 _KEEP = 20 * 60
 
 
@@ -59,6 +60,7 @@ class _Logger:
         pass
 
     def warning(self, text):
+        _warned.append(text)
         if 'Requested format is not available' not in text and 'ffmpeg' not in text:
             call({'op': 'log', 'level': 'warning', 'text': text})
 
@@ -178,10 +180,15 @@ def _describe(entry):
 
 
 def _check(request):
+    _warned.clear()
     with yt_dlp.YoutubeDL(_options(request)) as ydl:
         info = ydl.extract_info(request['url'], download=False)
         info = ydl.sanitize_info(info)
     entries = _entries(info)
+    if entries and not any(_formats(entry) for entry in entries):
+        bot = next((text for text in _warned if 'not a bot' in text or 'HTTP Error 429' in text), None)
+        if bot:
+            raise RuntimeError('not a bot: ' + bot)
     _last.clear()
     _last.update(url=request['url'], entries=entries, at=time.monotonic())
     items = [_describe(entry) for entry in entries]

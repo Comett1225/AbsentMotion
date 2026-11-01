@@ -136,6 +136,7 @@
     <string name="settings_keep_media_copies">読み込んだメディアのコピーをプロジェクトに保持</string>
     <string name="settings_about">アプリについて</string>
     <string name="settings_report_issue">問題を報告</string>
+    <string name="settings_suggest_feature">機能をリクエスト</string>
     <string name="settings_help">ヘルプ</string>
     <string name="tutorial_settings_start">チュートリアルを開始</string>
     <string name="tutorial_settings_continue">チュートリアルを続ける</string>
@@ -480,6 +481,7 @@
     <string name="downloader_error_login">この投稿はログインが必要なため、ダウンロードできません。</string>
     <string name="downloader_error_private">この動画は非公開です。</string>
     <string name="downloader_error_blocked">サイトがダウンロードをブロックしました。しばらくしてからもう一度お試しください。</string>
+    <string name="downloader_error_bot">YouTube からボットではないことの確認を求められました。VPN 使用時によく起こります。VPN をオフにするか、後でもう一度お試しください。</string>
     <string name="downloader_error_gone">この動画は現在利用できません。</string>
     <string name="downloader_error_novideo">このリンクにはダウンロードできるものがありません。</string>
     <string name="downloader_error_network">サイトに接続できませんでした。接続を確認してください。</string>
@@ -1975,4 +1977,11 @@
         <item quantity="other">%1$sカット</item>
     </plurals>
     <string name="structure_svg_importing">SVGを読み込み中…</string>
+    <string name="tools_download_addon">ダウンロード（%1$d MB）</string>
+    <string name="tools_downloader_intro">YouTube、Instagram、TikTok などの SNS から動画や画像をギャラリーに直接ダウンロードします。初回のみ %1$d MB のアドオンが必要です。</string>
+    <string name="tools_download_progress">ダウンロード中 %1$d%%</string>
+    <string name="tools_more">今後のアップデートでツールが追加されます...</string>
+    <string name="tools_suggestions">追加してほしいツールはありますか？%1$sまたは%2$sでお知らせください！</string>
+    <string name="tools_github">GitHub</string>
+    <string name="tools_form">フォーム</string>
 </resources>

@@ -4415,5 +4415,14 @@
  "screenshot_failed": "The screenshot could not be made",
  "screenshot_outside": "Move the playhead onto the clip first",
  "screenshot_saved": "Saved to the gallery and added as a new layer",
- "structure_svg_importing": "Importing the SVG…"
+ "structure_svg_importing": "Importing the SVG…",
+ "tools_download_addon": "Download (%1$d MB)",
+ "tools_download_progress": "Downloading %1$d%%",
+ "tools_more": "More tools will appear in future updates...",
+ "tools_suggestions": "Got any tool suggestions? Leave it on %1$s, or %2$s!",
+ "tools_github": "GitHub",
+ "tools_form": "the Form",
+ "downloader_error_bot": "YouTube asked to confirm you are not a bot. This often happens on a VPN: turn it off or try again later.",
+ "tools_downloader_intro": "Downloads videos and pictures from YouTube, Instagram, TikTok and other social media straight to your gallery. It needs a one-time add-on of %1$d MB.",
+ "settings_suggest_feature": "Suggest a feature"
 }

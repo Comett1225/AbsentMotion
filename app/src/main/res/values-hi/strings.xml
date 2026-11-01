@@ -136,6 +136,7 @@
     <string name="settings_keep_media_copies">इम्पोर्ट किए गए मीडिया की कॉपी प्रोजेक्ट में रखें</string>
     <string name="settings_about">परिचय</string>
     <string name="settings_report_issue">समस्या की रिपोर्ट करें</string>
+    <string name="settings_suggest_feature">कोई फ़ीचर सुझाएँ</string>
     <string name="settings_help">सहायता</string>
     <string name="tutorial_settings_start">ट्यूटोरियल शुरू करें</string>
     <string name="tutorial_settings_continue">ट्यूटोरियल जारी रखें</string>
@@ -481,6 +482,7 @@
     <string name="downloader_error_login">इस पोस्ट के लिए साइन-इन किया हुआ अकाउंट चाहिए, इसलिए इसे डाउनलोड नहीं किया जा सकता।</string>
     <string name="downloader_error_private">यह वीडियो प्राइवेट है।</string>
     <string name="downloader_error_blocked">साइट ने डाउनलोड ब्लॉक कर दिया। बाद में फिर कोशिश करें।</string>
+    <string name="downloader_error_bot">YouTube ने पुष्टि करने को कहा कि आप बॉट नहीं हैं। ऐसा अक्सर VPN पर होता है: उसे बंद करें या बाद में फिर कोशिश करें।</string>
     <string name="downloader_error_gone">यह वीडियो अब उपलब्ध नहीं है।</string>
     <string name="downloader_error_novideo">इस लिंक में डाउनलोड करने के लिए कुछ नहीं है।</string>
     <string name="downloader_error_network">साइट तक नहीं पहुंचा जा सका। कनेक्शन जांचें।</string>
@@ -2004,4 +2006,11 @@
         <item quantity="other">%1$s कट</item>
     </plurals>
     <string name="structure_svg_importing">SVG इंपोर्ट हो रहा है…</string>
+    <string name="tools_download_addon">डाउनलोड (%1$d MB)</string>
+    <string name="tools_downloader_intro">YouTube, Instagram, TikTok और दूसरे सोशल मीडिया से वीडियो और तस्वीरें सीधे आपकी गैलरी में डाउनलोड करता है। इसके लिए एक बार %1$d MB का ऐड-ऑन चाहिए।</string>
+    <string name="tools_download_progress">डाउनलोड हो रहा है %1$d%%</string>
+    <string name="tools_more">आने वाले अपडेट में और टूल आएँगे...</string>
+    <string name="tools_suggestions">किसी टूल का सुझाव है? %1$s या %2$s पर बताएँ!</string>
+    <string name="tools_github">GitHub</string>
+    <string name="tools_form">फ़ॉर्म</string>
 </resources>

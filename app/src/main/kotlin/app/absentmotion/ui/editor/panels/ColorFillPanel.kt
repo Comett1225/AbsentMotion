@@ -100,8 +100,9 @@ private fun FillTabs(state: EditorState, layer: Layer, modifier: Modifier) {
             state.editSelected { l -> l.withFill("gradient").let { if (it.node.child("gradient") == null) it.withGradient(it.gradient) else it } }
         }
         val stored = layer.node["fillImage"] != null || layer.node["fillVideo"] != null
-        FillTab(PanelIcons.FillMedia, stringResource(R.string.add_tab_media), active = type == "media", enabled = layer.kind == "text" || stored) {
-            if (type != "media" && stored) state.editSelected { it.copy(node = it.node.with("fillType", "media")) } else if (layer.kind == "text") picker.launch()
+        val pickable = layer.kind == "text" || layer.kind == "shape"
+        FillTab(PanelIcons.FillMedia, stringResource(R.string.add_tab_media), active = type == "media", enabled = pickable || stored) {
+            if (type != "media" && stored) state.editSelected { it.copy(node = it.node.with("fillType", "media")) } else if (pickable) picker.launch()
         }
     }
 }

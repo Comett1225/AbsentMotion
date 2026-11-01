@@ -176,6 +176,11 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
                 Modifier.padding(horizontal = 6.dp).clickable { runCatching { links.openUri(REPORT_FORM) } }.padding(horizontal = 15.dp, vertical = 10.dp),
                 color = Am.HomeInk, fontSize = 13.sp, textDecoration = TextDecoration.Underline,
             )
+            Text(
+                stringResource(R.string.settings_suggest_feature),
+                Modifier.padding(horizontal = 6.dp).clickable { runCatching { links.openUri(FEATURE_FORM) } }.padding(horizontal = 15.dp, vertical = 10.dp),
+                color = Am.HomeInk, fontSize = 13.sp, textDecoration = TextDecoration.Underline,
+            )
             UpdateRows(settings) { crashLogs = true }
         }
     }

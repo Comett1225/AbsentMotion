@@ -136,6 +136,7 @@
     <string name="settings_keep_media_copies">Manter uma cópia da mídia importada no projeto</string>
     <string name="settings_about">Sobre</string>
     <string name="settings_report_issue">Relatar problema</string>
+    <string name="settings_suggest_feature">Sugerir um recurso</string>
     <string name="settings_help">Ajuda</string>
     <string name="tutorial_settings_start">Iniciar o tutorial</string>
     <string name="tutorial_settings_continue">Continuar o tutorial</string>
@@ -482,6 +483,7 @@
     <string name="downloader_error_login">Esta publicação exige uma conta conectada, então não pode ser baixada.</string>
     <string name="downloader_error_private">Este vídeo é privado.</string>
     <string name="downloader_error_blocked">O site bloqueou o download. Tente novamente mais tarde.</string>
+    <string name="downloader_error_bot">O YouTube pediu para confirmar que você não é um robô. Isso costuma acontecer com VPN: desative-a ou tente de novo mais tarde.</string>
     <string name="downloader_error_gone">Este vídeo não está mais disponível.</string>
     <string name="downloader_error_novideo">Não há nada para baixar neste link.</string>
     <string name="downloader_error_network">Não foi possível acessar o site. Verifique a conexão.</string>
@@ -2033,4 +2035,11 @@
         <item quantity="other">%1$s cortes</item>
     </plurals>
     <string name="structure_svg_importing">Importando o SVG…</string>
+    <string name="tools_download_addon">Baixar (%1$d MB)</string>
+    <string name="tools_downloader_intro">Baixa vídeos e imagens do YouTube, Instagram, TikTok e outras redes sociais direto para a sua galeria. Precisa de um complemento de %1$d MB, baixado uma única vez.</string>
+    <string name="tools_download_progress">Baixando %1$d%%</string>
+    <string name="tools_more">Mais ferramentas chegarão em futuras atualizações...</string>
+    <string name="tools_suggestions">Tem alguma sugestão de ferramenta? Deixe em %1$s ou no %2$s!</string>
+    <string name="tools_github">GitHub</string>
+    <string name="tools_form">formulário</string>
 </resources>

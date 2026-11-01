@@ -136,6 +136,7 @@
     <string name="settings_keep_media_copies">প্রজেক্টে ইমপোর্ট করা মিডিয়ার কপি রাখুন</string>
     <string name="settings_about">সম্পর্কে</string>
     <string name="settings_report_issue">সমস্যা জানান</string>
+    <string name="settings_suggest_feature">একটি ফিচার প্রস্তাব করুন</string>
     <string name="settings_help">সহায়তা</string>
     <string name="tutorial_settings_start">টিউটোরিয়াল শুরু করুন</string>
     <string name="tutorial_settings_continue">টিউটোরিয়াল চালিয়ে যান</string>
@@ -481,6 +482,7 @@
     <string name="downloader_error_login">এই পোস্টের জন্য সাইন-ইন করা অ্যাকাউন্ট দরকার, তাই এটি ডাউনলোড করা যায় না।</string>
     <string name="downloader_error_private">এই ভিডিওটি প্রাইভেট।</string>
     <string name="downloader_error_blocked">সাইটটি ডাউনলোড আটকে দিয়েছে। পরে আবার চেষ্টা করুন।</string>
+    <string name="downloader_error_bot">YouTube নিশ্চিত করতে বলেছে যে আপনি বট নন। এটি প্রায়ই VPN ব্যবহার করলে হয়: VPN বন্ধ করুন বা পরে আবার চেষ্টা করুন।</string>
     <string name="downloader_error_gone">এই ভিডিওটি আর পাওয়া যাচ্ছে না।</string>
     <string name="downloader_error_novideo">এই লিঙ্কে ডাউনলোড করার কিছু নেই।</string>
     <string name="downloader_error_network">সাইটে পৌঁছানো যায়নি। সংযোগ পরীক্ষা করুন।</string>
@@ -2004,4 +2006,11 @@
         <item quantity="other">%1$sটি কাট</item>
     </plurals>
     <string name="structure_svg_importing">SVG ইমপোর্ট করা হচ্ছে…</string>
+    <string name="tools_download_addon">ডাউনলোড (%1$d MB)</string>
+    <string name="tools_downloader_intro">YouTube, Instagram, TikTok ও অন্যান্য সোশ্যাল মিডিয়া থেকে ভিডিও ও ছবি সরাসরি আপনার গ্যালারিতে ডাউনলোড করে। এর জন্য একবার %1$d MB-এর একটি অ্যাড-অন লাগবে।</string>
+    <string name="tools_download_progress">ডাউনলোড হচ্ছে %1$d%%</string>
+    <string name="tools_more">ভবিষ্যতের আপডেটে আরও টুল আসবে...</string>
+    <string name="tools_suggestions">টুলের জন্য কোনো পরামর্শ আছে? %1$s বা %2$s-এ জানান!</string>
+    <string name="tools_github">GitHub</string>
+    <string name="tools_form">ফর্ম</string>
 </resources>

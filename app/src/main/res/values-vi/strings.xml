@@ -136,6 +136,7 @@
     <string name="settings_keep_media_copies">Giữ bản sao phương tiện đã nhập trong dự án</string>
     <string name="settings_about">Giới thiệu</string>
     <string name="settings_report_issue">Báo cáo sự cố</string>
+    <string name="settings_suggest_feature">Đề xuất tính năng</string>
     <string name="settings_help">Trợ giúp</string>
     <string name="tutorial_settings_start">Bắt đầu hướng dẫn</string>
     <string name="tutorial_settings_continue">Tiếp tục hướng dẫn</string>
@@ -480,6 +481,7 @@
     <string name="downloader_error_login">Bài đăng này cần tài khoản đã đăng nhập nên không thể tải xuống.</string>
     <string name="downloader_error_private">Video này là riêng tư.</string>
     <string name="downloader_error_blocked">Trang web đã chặn tải xuống. Hãy thử lại sau.</string>
+    <string name="downloader_error_bot">YouTube yêu cầu xác nhận bạn không phải là bot. Điều này thường xảy ra khi dùng VPN: hãy tắt VPN hoặc thử lại sau.</string>
     <string name="downloader_error_gone">Video này không còn khả dụng.</string>
     <string name="downloader_error_novideo">Không có gì để tải xuống trong liên kết này.</string>
     <string name="downloader_error_network">Không thể kết nối đến trang web. Kiểm tra kết nối.</string>
@@ -1975,4 +1977,11 @@
         <item quantity="other">%1$s điểm cắt</item>
     </plurals>
     <string name="structure_svg_importing">Đang nhập SVG…</string>
+    <string name="tools_download_addon">Tải xuống (%1$d MB)</string>
+    <string name="tools_downloader_intro">Tải video và hình ảnh từ YouTube, Instagram, TikTok và các mạng xã hội khác thẳng vào thư viện của bạn. Cần một tiện ích bổ sung %1$d MB, chỉ tải một lần.</string>
+    <string name="tools_download_progress">Đang tải %1$d%%</string>
+    <string name="tools_more">Sẽ có thêm công cụ trong các bản cập nhật sau...</string>
+    <string name="tools_suggestions">Bạn có đề xuất công cụ nào không? Hãy gửi qua %1$s hoặc %2$s!</string>
+    <string name="tools_github">GitHub</string>
+    <string name="tools_form">biểu mẫu</string>
 </resources>

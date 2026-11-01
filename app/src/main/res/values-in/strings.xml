@@ -136,6 +136,7 @@
     <string name="settings_keep_media_copies">Simpan salinan media impor di proyek</string>
     <string name="settings_about">Tentang</string>
     <string name="settings_report_issue">Laporkan masalah</string>
+    <string name="settings_suggest_feature">Sarankan fitur</string>
     <string name="settings_help">Bantuan</string>
     <string name="tutorial_settings_start">Mulai tutorial</string>
     <string name="tutorial_settings_continue">Lanjutkan tutorial</string>
@@ -480,6 +481,7 @@
     <string name="downloader_error_login">Postingan ini memerlukan akun yang sudah masuk, sehingga tidak dapat diunduh.</string>
     <string name="downloader_error_private">Video ini privat.</string>
     <string name="downloader_error_blocked">Situs memblokir unduhan. Coba lagi nanti.</string>
+    <string name="downloader_error_bot">YouTube meminta konfirmasi bahwa Anda bukan bot. Ini sering terjadi saat memakai VPN: matikan VPN atau coba lagi nanti.</string>
     <string name="downloader_error_gone">Video ini sudah tidak tersedia.</string>
     <string name="downloader_error_novideo">Tidak ada yang bisa diunduh dari tautan ini.</string>
     <string name="downloader_error_network">Situs tidak dapat dijangkau. Periksa koneksi.</string>
@@ -1975,4 +1977,11 @@
         <item quantity="other">%1$s potongan</item>
     </plurals>
     <string name="structure_svg_importing">Mengimpor SVG…</string>
+    <string name="tools_download_addon">Unduh (%1$d MB)</string>
+    <string name="tools_downloader_intro">Mengunduh video dan gambar dari YouTube, Instagram, TikTok, dan media sosial lain langsung ke galeri Anda. Perlu add-on sekali unduh sebesar %1$d MB.</string>
+    <string name="tools_download_progress">Mengunduh %1$d%%</string>
+    <string name="tools_more">Alat lainnya akan hadir dalam pembaruan mendatang...</string>
+    <string name="tools_suggestions">Punya saran alat? Sampaikan di %1$s atau %2$s!</string>
+    <string name="tools_github">GitHub</string>
+    <string name="tools_form">Formulir</string>
 </resources>

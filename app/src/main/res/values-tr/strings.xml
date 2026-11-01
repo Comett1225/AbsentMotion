@@ -136,6 +136,7 @@
     <string name="settings_keep_media_copies">İçe aktarılan medyanın bir kopyasını projede tut</string>
     <string name="settings_about">Hakkında</string>
     <string name="settings_report_issue">Sorun bildir</string>
+    <string name="settings_suggest_feature">Özellik öner</string>
     <string name="settings_help">Yardım</string>
     <string name="tutorial_settings_start">Eğitimi başlat</string>
     <string name="tutorial_settings_continue">Eğitime devam et</string>
@@ -481,6 +482,7 @@
     <string name="downloader_error_login">Bu gönderi oturum açılmış bir hesap gerektirdiği için indirilemez.</string>
     <string name="downloader_error_private">Bu video gizli.</string>
     <string name="downloader_error_blocked">Site indirmeyi engelledi. Daha sonra tekrar deneyin.</string>
+    <string name="downloader_error_bot">YouTube bot olmadığınızı doğrulamanızı istedi. Bu genellikle VPN kullanırken olur: VPN\'i kapatın veya daha sonra tekrar deneyin.</string>
     <string name="downloader_error_gone">Bu video artık kullanılamıyor.</string>
     <string name="downloader_error_novideo">Bu bağlantıda indirilecek bir şey yok.</string>
     <string name="downloader_error_network">Siteye ulaşılamadı. Bağlantıyı kontrol edin.</string>
@@ -2004,4 +2006,11 @@
         <item quantity="other">%1$s kesme</item>
     </plurals>
     <string name="structure_svg_importing">SVG içe aktarılıyor…</string>
+    <string name="tools_download_addon">İndir (%1$d MB)</string>
+    <string name="tools_downloader_intro">YouTube, Instagram, TikTok ve diğer sosyal medyadan videoları ve resimleri doğrudan galerinize indirir. Bir kerelik %1$d MB\'lık bir eklenti gerekir.</string>
+    <string name="tools_download_progress">İndiriliyor %1$d%%</string>
+    <string name="tools_more">Gelecek güncellemelerde daha fazla araç eklenecek...</string>
+    <string name="tools_suggestions">Araç öneriniz var mı? %1$s veya %2$s üzerinden paylaşın!</string>
+    <string name="tools_github">GitHub</string>
+    <string name="tools_form">Form</string>
 </resources>

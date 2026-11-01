@@ -62,7 +62,7 @@ Tabs at the top: **None**, **Color**, **Gradient**, **Media**.
 
 - **Color.** Fourteen swatches, then your saved colors. The bar at the top shows the color as #RRGGBB and its opacity; the **+** on it saves the current color. Three buttons: **Eyedropper** (touch the preview to sample a color), **Color sliders** and **Full color picker** (a color wheel or HSV and RGB sliders with a hex field).
 - **Gradient.** Pick linear, radial or sweep, then a start and an end color. Two handles on the preview move the gradient. A gradient has exactly two colors.
-- **Media.** Fills the shape with a photo or video. It is active when the layer already has a media fill or is a text layer; for text, tapping it opens the picker to fill the letters with a picture or video.
+- **Media.** Fills the shape or the letters of a text layer with a photo or video. Tapping it opens the picker.
 
 ![Fill & Color: the tabs (1), the color bar (2), the swatches (3) and Eyedropper, Color sliders and Full color picker (4).](img/lt-fill.webp)
 

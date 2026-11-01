@@ -123,6 +123,7 @@ class DownloadFormatsTest {
         assertEquals(R.string.downloader_error_login, problemFor("ERROR: [Reddit] 6rrwyj: Account authentication is required. Use --cookies-from-browser"))
         assertEquals(R.string.downloader_error_blocked, problemFor("ERROR: [vimeo] 1: This request has been blocked due to its TLS fingerprint"))
         assertEquals(R.string.downloader_error_unsupported, problemFor("ERROR: Unsupported URL: https://example.com"))
+        assertEquals(R.string.downloader_error_bot, problemFor("not a bot: [youtube] Sign in to confirm you’re not a bot. Use --cookies-from-browser"))
         assertEquals(R.string.downloader_error_private, problemFor("ERROR: [youtube] abc: Private video"))
         assertEquals(R.string.downloader_error_gone, problemFor("ERROR: [youtube] abc: Video unavailable"))
         assertEquals(R.string.downloader_error_unknown, problemFor("something odd"))

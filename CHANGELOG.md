@@ -6,6 +6,29 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [4.4.1] - 2026-11-01
+
+### Added
+
+- Fill & Color > Media works on shapes: fill any shape with a photo or a video.
+- Separate Bug Report and Feature Request forms, with a link to each in Settings.
+- The Tools tab says more tools are coming, with links to suggest one.
+
+### Changed
+
+- After swiping between the two tool pages, the first tap works straight away.
+- Photos show the AI button on page 2.
+- The Video Downloader is greyed out until its 25 MB add-on is downloaded; tapping it first explains what it does. On tablets it is centred, with two columns in landscape.
+- Reset position, scale, rotation and the rest clear that setting's keyframes instead of adding one.
+- A new project from the Assets tab starts as an Asset.
+
+### Fixed
+
+- When YouTube asks to confirm you are not a bot (often on a VPN), the Downloader showed the video as pictures; it now says what happened.
+- On Android 8 and 9, Screenshot, Compress and the Downloader could fail to save until storage access was allowed elsewhere.
+- Undo, then Redo of a Screenshot could bring back a picture whose file had been removed.
+- The README and store text said 184 effects; there are 207.
+
 ## [4.4.0] - 2026-11-01 - The last 4.x
 
 ### Added

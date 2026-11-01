@@ -14,7 +14,8 @@
   <a href="https://comett1225.github.io/AbsentMotion/"><img alt="Download for your phone" src="https://img.shields.io/badge/Download-for%20your%20phone-f07850?style=for-the-badge"></a>
   <a href="https://comett1225.github.io/AbsentMotion/roadmap.html"><img alt="Roadmap" src="https://img.shields.io/badge/Roadmap-what%27s%20next-7b61ff?style=for-the-badge"></a>
   <a href="https://comett1225.github.io/AbsentMotion/guide.html"><img alt="Guide and docs" src="https://img.shields.io/badge/Guide-and%20docs-2b2b33?style=for-the-badge"></a>
-  <a href="https://forms.gle/6bY8KBPMKc2iUypV6"><img alt="Send feedback" src="https://img.shields.io/badge/Send-feedback-2b2b33?style=for-the-badge"></a>
+  <a href="https://forms.gle/6bY8KBPMKc2iUypV6"><img alt="Report a bug" src="https://img.shields.io/badge/Report-a%20bug-2b2b33?style=for-the-badge"></a>
+  <a href="https://forms.gle/5ZohVpB2eBPvzhu4A"><img alt="Suggest a feature" src="https://img.shields.io/badge/Suggest-a%20feature-2b2b33?style=for-the-badge"></a>
   <a href="https://comett1225.github.io/AbsentMotion/effects/index.html"><img alt="All effects" src="https://img.shields.io/badge/All-effects-2b2b33?style=for-the-badge"></a>
   <a href="https://github.com/Comett1225/AbsentMotion/releases"><img alt="All versions" src="https://img.shields.io/badge/All-versions-2b2b33?style=for-the-badge"></a>
 </p>
@@ -158,6 +159,8 @@ which build to download.
 
 - PC support for Windows, Linux, macOS and Chromebook/ChromeOS, including Chromebooks with Intel or AMD chips.
 - Possibly an IPA file for sideloading on iPhones and iPads.
+- Better tablet use: layouts made for big screens, in portrait and landscape.
+- More tools in the Tools tab.
 - No more Play build. Phones with the Play build move to the FOSS build automatically when they update to 5.0; projects and settings stay.
 - Real 3D: layers, particles and the pieces of 3D effects sit in front of and behind each other in depth, with a camera, lights and 3D models.
 - Motion graphics tools: different offsets for each repeated copy, and linking one value to another.
@@ -174,7 +177,7 @@ There will be weekly updates at minimum, whether it's bug patches, improvement t
 AbsentMotion is a young project. Please know these before you rely on it:
 
 - **Some Alight Motion effects are still missing.** - Please if you're able to, make sure to make an issue for anything that isn't implemented correctly or is broken. If you can't or don't want to use GitHub issues, use the [bug report form](https://forms.gle/6bY8KBPMKc2iUypV6) instead.
-- **It's a new project, so it needs lots of feedback.** Tell us what breaks, what is confusing and what is missing: [GitHub issues](https://github.com/Comett1225/AbsentMotion/issues) or the [feedback form](https://forms.gle/6bY8KBPMKc2iUypV6).
+- **It's a new project, so it needs lots of feedback.** Tell us what breaks, what is confusing and what is missing: [GitHub issues](https://github.com/Comett1225/AbsentMotion/issues), the [bug report form](https://forms.gle/6bY8KBPMKc2iUypV6) or the [feature request form](https://forms.gle/5ZohVpB2eBPvzhu4A). Check the [roadmap](https://comett1225.github.io/AbsentMotion/roadmap.html) before suggesting something, it might already be planned.
 
 ## Why?
 

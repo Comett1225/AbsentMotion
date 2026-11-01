@@ -136,6 +136,7 @@
     <string name="settings_keep_media_copies">Magtabi ng kopya ng na-import na media sa proyekto</string>
     <string name="settings_about">Tungkol</string>
     <string name="settings_report_issue">Mag-ulat ng problema</string>
+    <string name="settings_suggest_feature">Magmungkahi ng feature</string>
     <string name="settings_help">Tulong</string>
     <string name="tutorial_settings_start">Simulan ang tutorial</string>
     <string name="tutorial_settings_continue">Ituloy ang tutorial</string>
@@ -481,6 +482,7 @@
     <string name="downloader_error_login">Kailangan ng naka-sign in na account para sa post na ito, kaya hindi ito ma-download.</string>
     <string name="downloader_error_private">Pribado ang bidyo na ito.</string>
     <string name="downloader_error_blocked">Hinadlangan ng site ang pag-download. Subukan ulit mamaya.</string>
+    <string name="downloader_error_bot">Hiniling ng YouTube na kumpirmahin na hindi ka bot. Madalas itong mangyari kapag naka-VPN: i-off ito o subukan ulit mamaya.</string>
     <string name="downloader_error_gone">Hindi na available ang bidyo na ito.</string>
     <string name="downloader_error_novideo">Walang ma-download sa link na ito.</string>
     <string name="downloader_error_network">Hindi maabot ang site. Tingnan ang koneksyon.</string>
@@ -2004,4 +2006,11 @@
         <item quantity="other">%1$s cut</item>
     </plurals>
     <string name="structure_svg_importing">Ini-import ang SVG…</string>
+    <string name="tools_download_addon">I-download (%1$d MB)</string>
+    <string name="tools_downloader_intro">Nagda-download ng mga video at larawan mula sa YouTube, Instagram, TikTok at iba pang social media diretso sa gallery mo. Kailangan nito ng isang beses na add-on na %1$d MB.</string>
+    <string name="tools_download_progress">Nagda-download %1$d%%</string>
+    <string name="tools_more">May mga darating pang tool sa mga susunod na update...</string>
+    <string name="tools_suggestions">May mungkahi ka bang tool? Ibahagi ito sa %1$s o sa %2$s!</string>
+    <string name="tools_github">GitHub</string>
+    <string name="tools_form">Form</string>
 </resources>

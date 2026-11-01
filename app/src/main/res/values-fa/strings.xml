@@ -136,6 +136,7 @@
     <string name="settings_keep_media_copies">نگه‌داشتن نسخه‌ای از رسانه‌های واردشده در پروژه</string>
     <string name="settings_about">درباره</string>
     <string name="settings_report_issue">گزارش مشکل</string>
+    <string name="settings_suggest_feature">پیشنهاد یک قابلیت</string>
     <string name="settings_help">راهنما</string>
     <string name="tutorial_settings_start">شروع آموزش</string>
     <string name="tutorial_settings_continue">ادامه آموزش</string>
@@ -481,6 +482,7 @@
     <string name="downloader_error_login">این پست به حساب واردشده نیاز دارد، بنابراین قابل دانلود نیست.</string>
     <string name="downloader_error_private">این ویدیو خصوصی است.</string>
     <string name="downloader_error_blocked">سایت دانلود را مسدود کرد. بعداً دوباره تلاش کنید.</string>
+    <string name="downloader_error_bot">YouTube خواست تأیید کنید که ربات نیستید. این معمولاً با VPN پیش می‌آید: آن را خاموش کنید یا بعداً دوباره امتحان کنید.</string>
     <string name="downloader_error_gone">این ویدیو دیگر در دسترس نیست.</string>
     <string name="downloader_error_novideo">در این لینک چیزی برای دانلود نیست.</string>
     <string name="downloader_error_network">سایت در دسترس نبود. اتصال را بررسی کنید.</string>
@@ -2004,4 +2006,11 @@
         <item quantity="other">%1$s برش</item>
     </plurals>
     <string name="structure_svg_importing">در حال واردکردن SVG…</string>
+    <string name="tools_download_addon">دانلود (%1$d MB)</string>
+    <string name="tools_downloader_intro">ویدیوها و عکس‌ها را از YouTube، Instagram، TikTok و دیگر شبکه‌های اجتماعی مستقیماً در گالری شما دانلود می‌کند. یک افزونهٔ یک‌باره به حجم %1$d مگابایت لازم دارد.</string>
+    <string name="tools_download_progress">در حال دانلود %1$d%%</string>
+    <string name="tools_more">ابزارهای بیشتری در به‌روزرسانی‌های بعدی اضافه می‌شوند...</string>
+    <string name="tools_suggestions">پیشنهادی برای ابزارها دارید؟ آن را در %1$s یا %2$s مطرح کنید!</string>
+    <string name="tools_github">GitHub</string>
+    <string name="tools_form">فرم</string>
 </resources>

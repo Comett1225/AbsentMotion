@@ -137,6 +137,7 @@
     <string name="settings_keep_media_copies">Keep a copy of imported media in the project</string>
     <string name="settings_about">About</string>
     <string name="settings_report_issue">Report issue</string>
+    <string name="settings_suggest_feature">Suggest a feature</string>
     <string name="settings_help">Help</string>
     <string name="tutorial_settings_start">Start the tutorial</string>
     <string name="tutorial_settings_continue">Continue the tutorial</string>
@@ -482,6 +483,7 @@
     <string name="downloader_error_login">This post needs a signed-in account, so it cannot be downloaded.</string>
     <string name="downloader_error_private">This video is private.</string>
     <string name="downloader_error_blocked">The site blocked the download. Try again later.</string>
+    <string name="downloader_error_bot">YouTube asked to confirm you are not a bot. This often happens on a VPN: turn it off or try again later.</string>
     <string name="downloader_error_gone">This video is no longer available.</string>
     <string name="downloader_error_novideo">There is nothing to download in this link.</string>
     <string name="downloader_error_network">The site could not be reached. Check the connection.</string>
@@ -2031,6 +2033,7 @@
     <string name="screenshot_failed">The screenshot could not be made</string>
     <string name="screenshot_outside">Move the playhead onto the clip first</string>
     <string name="tools_download_addon">Download (%1$d MB)</string>
+    <string name="tools_downloader_intro">Downloads videos and pictures from YouTube, Instagram, TikTok and other social media straight to your gallery. It needs a one-time add-on of %1$d MB.</string>
     <string name="tools_download_progress">Downloading %1$d%%</string>
     <string name="tools_more">More tools will appear in future updates...</string>
     <string name="tools_suggestions">Got any tool suggestions? Leave it on %1$s, or %2$s!</string>

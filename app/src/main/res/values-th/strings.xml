@@ -136,6 +136,7 @@
     <string name="settings_keep_media_copies">เก็บสำเนาสื่อที่นำเข้าไว้ในโปรเจกต์</string>
     <string name="settings_about">เกี่ยวกับ</string>
     <string name="settings_report_issue">รายงานปัญหา</string>
+    <string name="settings_suggest_feature">เสนอฟีเจอร์</string>
     <string name="settings_help">ช่วยเหลือ</string>
     <string name="tutorial_settings_start">เริ่มบทแนะนำ</string>
     <string name="tutorial_settings_continue">ทำบทแนะนำต่อ</string>
@@ -480,6 +481,7 @@
     <string name="downloader_error_login">โพสต์นี้ต้องเข้าสู่ระบบบัญชี จึงไม่สามารถดาวน์โหลดได้</string>
     <string name="downloader_error_private">วิดีโอนี้เป็นส่วนตัว</string>
     <string name="downloader_error_blocked">เว็บไซต์บล็อกการดาวน์โหลด ลองอีกครั้งภายหลัง</string>
+    <string name="downloader_error_bot">YouTube ขอให้ยืนยันว่าคุณไม่ใช่บอท ซึ่งมักเกิดขึ้นเมื่อใช้ VPN: ปิด VPN หรือลองใหม่ภายหลัง</string>
     <string name="downloader_error_gone">วิดีโอนี้ไม่พร้อมใช้งานแล้ว</string>
     <string name="downloader_error_novideo">ไม่มีอะไรให้ดาวน์โหลดในลิงก์นี้</string>
     <string name="downloader_error_network">ไม่สามารถเชื่อมต่อเว็บไซต์ได้ ตรวจสอบการเชื่อมต่อ</string>
@@ -1975,4 +1977,11 @@
         <item quantity="other">%1$s จุดตัด</item>
     </plurals>
     <string name="structure_svg_importing">กำลังนำเข้า SVG…</string>
+    <string name="tools_download_addon">ดาวน์โหลด (%1$d MB)</string>
+    <string name="tools_downloader_intro">ดาวน์โหลดวิดีโอและรูปภาพจาก YouTube, Instagram, TikTok และโซเชียลมีเดียอื่นๆ ลงแกลเลอรีของคุณโดยตรง ต้องดาวน์โหลดส่วนเสริมขนาด %1$d MB เพียงครั้งเดียว</string>
+    <string name="tools_download_progress">กำลังดาวน์โหลด %1$d%%</string>
+    <string name="tools_more">จะมีเครื่องมือเพิ่มเติมในการอัปเดตครั้งต่อไป...</string>
+    <string name="tools_suggestions">มีข้อเสนอแนะเรื่องเครื่องมือไหม แจ้งได้ที่ %1$s หรือ %2$s!</string>
+    <string name="tools_github">GitHub</string>
+    <string name="tools_form">แบบฟอร์ม</string>
 </resources>

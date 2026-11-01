@@ -136,6 +136,7 @@
     <string name="settings_keep_media_copies">الاحتفاظ بنسخة من الوسائط المستوردة في المشروع</string>
     <string name="settings_about">حول</string>
     <string name="settings_report_issue">الإبلاغ عن مشكلة</string>
+    <string name="settings_suggest_feature">اقترح ميزة</string>
     <string name="settings_help">مساعدة</string>
     <string name="tutorial_settings_start">بدء البرنامج التعليمي</string>
     <string name="tutorial_settings_continue">متابعة البرنامج التعليمي</string>
@@ -485,6 +486,7 @@
     <string name="downloader_error_login">يتطلب هذا المنشور تسجيل الدخول، لذا لا يمكن تنزيله.</string>
     <string name="downloader_error_private">هذا الفيديو خاص.</string>
     <string name="downloader_error_blocked">حجب الموقع التنزيل. حاول مرة أخرى لاحقًا.</string>
+    <string name="downloader_error_bot">طلب YouTube التأكد من أنك لست روبوتًا. يحدث هذا غالبًا عند استخدام VPN: أوقفه أو حاول مرة أخرى لاحقًا.</string>
     <string name="downloader_error_gone">لم يعد هذا الفيديو متاحًا.</string>
     <string name="downloader_error_novideo">لا يوجد شيء لتنزيله في هذا الرابط.</string>
     <string name="downloader_error_network">تعذر الوصول إلى الموقع. تحقق من الاتصال.</string>
@@ -2120,4 +2122,11 @@
         <item quantity="other">%1$s قطع</item>
     </plurals>
     <string name="structure_svg_importing">جارٍ استيراد SVG…</string>
+    <string name="tools_download_addon">تنزيل (%1$d MB)</string>
+    <string name="tools_downloader_intro">ينزّل الفيديوهات والصور من YouTube وInstagram وTikTok ومواقع التواصل الأخرى مباشرة إلى معرض الصور. يحتاج إلى إضافة لمرة واحدة بحجم %1$d ميغابايت.</string>
+    <string name="tools_download_progress">جارٍ التنزيل %1$d%%</string>
+    <string name="tools_more">ستظهر المزيد من الأدوات في التحديثات القادمة...</string>
+    <string name="tools_suggestions">هل لديك اقتراحات للأدوات؟ شاركها على %1$s أو عبر %2$s!</string>
+    <string name="tools_github">GitHub</string>
+    <string name="tools_form">النموذج</string>
 </resources>

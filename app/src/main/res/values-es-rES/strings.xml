@@ -136,6 +136,7 @@
     <string name="settings_keep_media_copies">Guardar una copia de los medios importados en el proyecto</string>
     <string name="settings_about">Acerca de</string>
     <string name="settings_report_issue">Informar de un problema</string>
+    <string name="settings_suggest_feature">Sugerir una función</string>
     <string name="settings_help">Ayuda</string>
     <string name="tutorial_settings_start">Empezar el tutorial</string>
     <string name="tutorial_settings_continue">Continuar el tutorial</string>
@@ -482,6 +483,7 @@
     <string name="downloader_error_login">Esta publicación necesita una cuenta con sesión iniciada, así que no se puede descargar.</string>
     <string name="downloader_error_private">Este vídeo es privado.</string>
     <string name="downloader_error_blocked">El sitio ha bloqueado la descarga. Inténtalo más tarde.</string>
+    <string name="downloader_error_bot">YouTube ha pedido confirmar que no eres un bot. Suele pasar con una VPN: desactívala o inténtalo más tarde.</string>
     <string name="downloader_error_gone">Este vídeo ya no está disponible.</string>
     <string name="downloader_error_novideo">No hay nada que descargar en este enlace.</string>
     <string name="downloader_error_network">No se pudo acceder al sitio. Comprueba la conexión.</string>
@@ -2033,4 +2035,11 @@
         <item quantity="other">%1$s cortes</item>
     </plurals>
     <string name="structure_svg_importing">Importando el SVG…</string>
+    <string name="tools_download_addon">Descargar (%1$d MB)</string>
+    <string name="tools_downloader_intro">Descarga vídeos e imágenes de YouTube, Instagram, TikTok y otras redes sociales directamente a tu galería. Necesita un complemento de %1$d MB que se descarga una sola vez.</string>
+    <string name="tools_download_progress">Descargando %1$d%%</string>
+    <string name="tools_more">Habrá más herramientas en futuras actualizaciones...</string>
+    <string name="tools_suggestions">¿Tienes alguna sugerencia de herramientas? ¡Déjala en %1$s o en %2$s!</string>
+    <string name="tools_github">GitHub</string>
+    <string name="tools_form">el formulario</string>
 </resources>

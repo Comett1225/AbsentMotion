@@ -1,0 +1,1 @@
+A quick patch for 4.4. Media fill works on shapes, the first tap after swiping tool pages works, Reset clears keyframes, the Video Downloader explains its add-on and fits tablets, a clear message when YouTube blocks a VPN, separate bug and feature forms, and storage fixes for Android 8 and 9.

@@ -8,6 +8,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -122,30 +123,27 @@ internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSett
     var engine by remember { mutableStateOf(if (!VideoDownloader.available) Engine.Unavailable else if (VideoDownloader.installed(context)) Engine.Ready else Engine.Missing) }
     var open by rememberSaveable { mutableIntStateOf(0) }
     var compressFrom by remember { mutableStateOf<Uri?>(null) }
+    var asking by remember { mutableStateOf(false) }
     LaunchedEffect(revision) {
         if (engine !is Engine.Getting) engine = if (!VideoDownloader.available) Engine.Unavailable else if (VideoDownloader.installed(context)) Engine.Ready else Engine.Missing
     }
-    fun selectDownloader() {
+    fun getDownloader() {
         if (engine is Engine.Getting) return
-        if (!VideoDownloader.available || VideoDownloader.installed(context)) {
-            open = 2
-        } else {
-            engine = Engine.Getting(0)
-            scope.launch {
-                engine = try {
-                    VideoDownloader.install(context) { fraction ->
-                        val percent = (fraction * 100).toInt().coerceIn(0, 100)
-                        if (engine != Engine.Getting(percent)) engine = Engine.Getting(percent)
-                    }
-                    Engine.Ready
-                } catch (e: CancellationException) {
-                    engine = Engine.Missing
-                    throw e
-                } catch (e: Exception) {
-                    val error = problem(e).takeIf { it != R.string.downloader_error_unknown } ?: R.string.downloader_engine_failed
-                    Toast.makeText(context, context.getString(error), Toast.LENGTH_LONG).show()
-                    Engine.Failed(error)
+        engine = Engine.Getting(0)
+        scope.launch {
+            engine = try {
+                VideoDownloader.install(context) { fraction ->
+                    val percent = (fraction * 100).toInt().coerceIn(0, 100)
+                    if (engine != Engine.Getting(percent)) engine = Engine.Getting(percent)
                 }
+                Engine.Ready
+            } catch (e: CancellationException) {
+                engine = Engine.Missing
+                throw e
+            } catch (e: Exception) {
+                val error = problem(e).takeIf { it != R.string.downloader_error_unknown } ?: R.string.downloader_engine_failed
+                Toast.makeText(context, context.getString(error), Toast.LENGTH_LONG).show()
+                Engine.Failed(error)
             }
         }
     }
@@ -154,9 +152,23 @@ internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSett
         ToolCard(HomeIcons.Compress, stringResource(R.string.tools_compress), stringResource(R.string.tools_compress_about)) { compressFrom = null; open = 1 }
         Spacer(Modifier.height(12.dp))
         ToolCard(HomeIcons.Download, stringResource(R.string.tools_downloader), stringResource(R.string.tools_downloader_about),
-            engine = engine, onClick = ::selectDownloader)
+            engine = engine) {
+            when {
+                engine is Engine.Getting -> Unit
+                !VideoDownloader.available || VideoDownloader.installed(context) -> open = 2
+                else -> asking = true
+            }
+        }
         Spacer(Modifier.height(28.dp))
         ToolsFooter()
+        if (asking) AlertDialog(
+            onDismissRequest = { asking = false },
+            title = { Text(stringResource(R.string.tools_downloader), color = Am.Navy) },
+            text = { Text(stringResource(R.string.tools_downloader_intro, (VideoDownloader.downloadBytes / (1024f * 1024f)).roundToInt()), color = Am.Navy) },
+            confirmButton = { TextButton({ asking = false; getDownloader() }) { Text(stringResource(R.string.downloader_download), color = Am.Accent) } },
+            dismissButton = { TextButton({ asking = false }) { Text(stringResource(R.string.home_back), color = Am.Navy) } },
+            containerColor = Am.Card,
+        )
         Spacer(Modifier.height(28.dp))
     }
     when (open) {
@@ -202,7 +214,7 @@ private fun ToolsFooter() {
     val style = TextLinkStyles(style = SpanStyle(color = Am.Navy, textDecoration = TextDecoration.Underline))
     val text = buildAnnotatedString {
         append(message)
-        listOf(github to "https://github.com/Comett1225/AbsentMotion/issues/new/choose", form to "https://forms.gle/6bY8KBPMKc2iUypV6").forEach { (label, url) ->
+        listOf(github to "https://github.com/Comett1225/AbsentMotion/issues/new/choose", form to FEATURE_FORM).forEach { (label, url) ->
             val start = message.indexOf(label)
             if (start >= 0) addLink(LinkAnnotation.Clickable(url, style) { runCatching { links.openUri(url) } }, start, start + label.length)
         }
@@ -213,21 +225,38 @@ private fun ToolsFooter() {
 }
 
 @Composable
-internal fun ToolSheet(title: String, onBack: () -> Unit, bounded: Boolean = false, bottom: @Composable ColumnScope.() -> Unit = {}, content: @Composable ColumnScope.() -> Unit) {
+internal fun ToolSheet(
+    title: String, onBack: () -> Unit, bounded: Boolean = false, bottom: @Composable ColumnScope.() -> Unit = {},
+    side: (@Composable ColumnScope.() -> Unit)? = null, content: @Composable ColumnScope.() -> Unit,
+) {
     Dialog(onBack, sheetDialogProperties()) {
-        val body: @Composable () -> Unit = {
+        val body: @Composable (Boolean) -> Unit = { twoColumns ->
             DialogStatusBarIcons(darkIcons = Am.Card.luminance() > 0.5f)
             Column(Modifier.fillMaxSize().background(Am.SheetBg).navigationBarsPadding()) {
                 TitleBar(title, ExportIcons.Back, stringResource(R.string.home_back), onBack)
-                Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp), content = content)
-                bottom()
+                if (twoColumns && side != null) Row(Modifier.weight(1f).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+                    Column(Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState()).padding(start = 16.dp), content = content)
+                    Column(Modifier.weight(1f).fillMaxHeight()) {
+                        Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()).padding(end = 16.dp), content = side)
+                        bottom()
+                    }
+                } else {
+                    Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)) {
+                        content()
+                        side?.invoke(this)
+                    }
+                    bottom()
+                }
             }
         }
-        if (bounded) Box(Modifier.fillMaxSize().background(Am.SheetBg), contentAlignment = Alignment.Center) {
-            Box(Modifier.widthIn(max = 560.dp).fillMaxSize()) { body() }
-        } else PhoneScreen { body() }
+        if (bounded) androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxSize().background(Am.SheetBg), contentAlignment = Alignment.Center) {
+            val twoColumns = side != null && maxWidth >= WideToolSheet && maxWidth > maxHeight
+            Box(Modifier.widthIn(max = if (twoColumns) 1040.dp else 560.dp).fillMaxSize()) { body(twoColumns) }
+        } else PhoneScreen { body(false) }
     }
 }
+
+private val WideToolSheet = 840.dp
 
 @Composable
 internal fun SectionTitle(text: String) {
@@ -432,7 +461,7 @@ private fun DownloaderScreen(store: ProjectStore, settings: AppSettings, onOpen:
             },
             onCompress = { media -> onCompress(media.uri) },
         )
-    }) {
+    }, content = {
         Spacer(Modifier.height(20.dp))
         Row(
             Modifier.fillMaxWidth().height(56.dp).clip(RoundedCornerShape(14.dp)).background(Am.Card).padding(start = 16.dp, end = 6.dp),
@@ -469,6 +498,7 @@ private fun DownloaderScreen(store: ProjectStore, settings: AppSettings, onOpen:
             Spacer(Modifier.height(12.dp))
             EngineCard(engine, ::getEngine)
         }
+    }, side = {
         SectionTitle(stringResource(R.string.downloader_what))
         Box {
             Column(Modifier.alpha(if (pictures) 0f else 1f)) {
@@ -487,7 +517,7 @@ private fun DownloaderScreen(store: ProjectStore, settings: AppSettings, onOpen:
         Spacer(Modifier.height(20.dp))
         SupportBlock { site, reason -> why = site to reason }
         Spacer(Modifier.height(24.dp))
-    }
+    })
     why?.let { (site, reason) ->
         AlertDialog(
             onDismissRequest = { why = null },

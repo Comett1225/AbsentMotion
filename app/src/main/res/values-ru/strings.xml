@@ -136,6 +136,7 @@
     <string name="settings_keep_media_copies">Хранить копию импортированных медиа в проекте</string>
     <string name="settings_about">О приложении</string>
     <string name="settings_report_issue">Сообщить о проблеме</string>
+    <string name="settings_suggest_feature">Предложить функцию</string>
     <string name="settings_help">Справка</string>
     <string name="tutorial_settings_start">Начать обучение</string>
     <string name="tutorial_settings_continue">Продолжить обучение</string>
@@ -483,6 +484,7 @@
     <string name="downloader_error_login">Для этого поста нужен аккаунт, поэтому скачать его нельзя.</string>
     <string name="downloader_error_private">Это видео приватное.</string>
     <string name="downloader_error_blocked">Сайт заблокировал загрузку. Повторите попытку позже.</string>
+    <string name="downloader_error_bot">YouTube попросил подтвердить, что вы не бот. Так часто бывает при включённом VPN: выключите его или попробуйте позже.</string>
     <string name="downloader_error_gone">Это видео больше недоступно.</string>
     <string name="downloader_error_novideo">По этой ссылке нечего скачивать.</string>
     <string name="downloader_error_network">Не удалось связаться с сайтом. Проверьте подключение.</string>
@@ -2062,4 +2064,11 @@
         <item quantity="other">%1$s склейки</item>
     </plurals>
     <string name="structure_svg_importing">Импорт SVG…</string>
+    <string name="tools_download_addon">Скачать (%1$d МБ)</string>
+    <string name="tools_downloader_intro">Скачивает видео и картинки из YouTube, Instagram, TikTok и других соцсетей прямо в галерею. Нужно один раз загрузить дополнение на %1$d МБ.</string>
+    <string name="tools_download_progress">Загрузка %1$d%%</string>
+    <string name="tools_more">В будущих обновлениях появятся новые инструменты...</string>
+    <string name="tools_suggestions">Есть предложения по инструментам? Поделитесь ими на %1$s или через %2$s!</string>
+    <string name="tools_github">GitHub</string>
+    <string name="tools_form">форму</string>
 </resources>
