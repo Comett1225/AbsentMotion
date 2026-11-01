@@ -33,6 +33,7 @@ import app.absentmotion.pc.platform.DesktopPlatform
 import app.absentmotion.pc.media.importMedia as loadMedia
 import app.absentmotion.pc.media.installFileDrop
 import app.absentmotion.pc.media.addMedia
+import app.absentmotion.pc.media.openProject
 import app.absentmotion.pc.project.ProjectState
 import app.absentmotion.pc.project.emptyScene
 import kotlinx.coroutines.Dispatchers
@@ -104,15 +105,17 @@ fun FrameWindowScope.Workspace(window: Window, quit: () -> Unit, startFile: File
     }
     fun open(source: File?) {
         if (source == null || !canClose()) return
+        scope.launch {
         runCatching {
-            val next = Scene.parse(source.readText())
-            state.open(next, source)
-            DesktopPlatform.title(window, source)
+            val (next, projectFile) = withContext(Dispatchers.IO) { openProject(source) }
+            state.open(next, projectFile)
+            DesktopPlatform.title(window, projectFile)
             recent = (listOf(source) + recent.filter { it != source }).take(10)
             DesktopPlatform.dataDir.mkdirs()
             DesktopPlatform.dataDir.resolve("recent.txt").writeText(recent.joinToString("\n") { it.absolutePath })
             status = ""
         }.onFailure { status = it.message ?: "Could not open project" }
+        }
     }
     fun newProject() { if (canClose()) { state.open(emptyScene(), null); DesktopPlatform.title(window, null) } }
     SideEffect { close.clear(); close.add { if (canClose()) quit() } }
