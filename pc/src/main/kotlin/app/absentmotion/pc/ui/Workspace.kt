@@ -30,7 +30,8 @@ import androidx.compose.ui.window.*
 import app.absentmotion.model.*
 import app.absentmotion.pc.engine.DesktopEngine
 import app.absentmotion.pc.platform.DesktopPlatform
-import app.absentmotion.pc.media.inspectMedia
+import app.absentmotion.pc.media.importMedia as loadMedia
+import app.absentmotion.pc.media.installFileDrop
 import app.absentmotion.pc.media.addMedia
 import app.absentmotion.pc.project.ProjectState
 import app.absentmotion.pc.project.emptyScene
@@ -74,14 +75,19 @@ fun FrameWindowScope.Workspace(window: Window, quit: () -> Unit, startFile: File
     val scope = rememberCoroutineScope()
     val renderedScene = remember { arrayOfNulls<Scene>(1) }
     val renderedBase = remember { arrayOfNulls<File>(1) }
-    fun importMedia() {
-        val files = DesktopPlatform.chooseMedia(window)
+    fun importFiles(files: List<File>) {
         if (files.isEmpty()) return
+        val project = state.file
         scope.launch {
-            val imported = withContext(Dispatchers.IO) { files.mapNotNull { runCatching { inspectMedia(it) }.getOrNull() } }
+            val imported = withContext(Dispatchers.IO) { loadMedia(files, project) }
             state.edit { scene -> imported.fold(scene) { result, media -> result.withMedia(media) } }
             status = if (imported.size == files.size) "Imported ${imported.size} files" else "Imported ${imported.size} of ${files.size} files"
         }
+    }
+    fun importMedia() = importFiles(DesktopPlatform.chooseMedia(window))
+    DisposableEffect(window) {
+        val remove = installFileDrop(window) { files -> scope.launch { importFiles(files) } }
+        onDispose { remove() }
     }
 
     fun save(asNew: Boolean): Boolean {
@@ -220,10 +226,7 @@ fun FrameWindowScope.Workspace(window: Window, quit: () -> Unit, startFile: File
                     Row { listOf("Media", "Effects", "Elements").forEach { name -> Text(name, Modifier.clickable { tab = name }.padding(10.dp), color = if (tab == name) accent else muted, fontSize = 12.sp) } }
                     when (tab) {
                         "Effects" -> EffectsLibrary(state, engine.definitions, assets)
-                        "Elements" -> Column(Modifier.verticalScroll(rememberScrollState())) {
-                            Text("Text", Modifier.fillMaxWidth().clickable { addText(state) }.padding(10.dp), color = accent)
-                            shapes(assets).forEach { shape -> Text(shape["name"] ?: "Shape", Modifier.fillMaxWidth().clickable { addShape(state, shape) }.padding(8.dp), fontSize = 12.sp) }
-                        }
+                        "Elements" -> Elements(state, assets)
                         else -> MediaPool(state, ::importMedia)
                     }
                 }
