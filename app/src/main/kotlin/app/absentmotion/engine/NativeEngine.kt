@@ -102,6 +102,8 @@ class NativeEngine(backend: Backend) : AutoCloseable {
 
         fun ease(easing: String, us: FloatArray): FloatArray = nativeEase(easing, us)
 
+        fun blipTimes(text: String, speed: Float, pause: Float, every: Int): FloatArray = nativeBlipTimes(text.toByteArray(), speed, pause, every)
+
         fun ease(easing: String, u: Float): Float = if (easing.isEmpty()) u else nativeEase(easing, floatArrayOf(u))[0]
 
         fun fastCaptionCpu(): Boolean = nativeFastCaptionCpu()
@@ -137,6 +139,7 @@ class NativeEngine(backend: Backend) : AutoCloseable {
         @JvmStatic private external fun nativeReleaseBuffers(engine: Long)
         @JvmStatic private external fun nativeTrim(engine: Long)
         @JvmStatic private external fun nativeEase(easing: String, us: FloatArray): FloatArray
+        @JvmStatic private external fun nativeBlipTimes(text: ByteArray, speed: Float, pause: Float, every: Int): FloatArray
         @JvmStatic private external fun nativeFastCaptionCpu(): Boolean
         @JvmStatic private external fun nativeLayerBounds(engine: Long, layerId: Long, timeMs: Double): FloatArray?
         @JvmStatic private external fun nativeLayerQuad(engine: Long, layerId: Long, timeMs: Double): FloatArray?

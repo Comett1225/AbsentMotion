@@ -2,6 +2,8 @@
 
 #include "particles.h"
 #include "pieces3d.h"
+#include "text.h"
+#include "textanim.h"
 #include "warp.h"
 #include "xml.h"
 #include "include/core/SkBBHFactory.h"
@@ -9,12 +11,15 @@
 #include "include/core/SkColorFilter.h"
 #include "include/core/SkColorSpace.h"
 #include "include/core/SkData.h"
+#include "include/core/SkFont.h"
+#include "include/core/SkFontMetrics.h"
 #include "include/core/SkImage.h"
 #include "include/core/SkM44.h"
 #include "include/core/SkPaint.h"
 #include "include/core/SkPicture.h"
 #include "include/core/SkPictureRecorder.h"
 #include "include/core/SkSurface.h"
+#include "include/core/SkTypeface.h"
 #include "include/effects/SkImageFilters.h"
 #include "src/core/SkCanvasPriv.h"
 #include "src/core/SkDevice.h"
@@ -260,7 +265,7 @@ bool Pointwise(const std::string& sksl) {
         size_t name = i;
         while (name > 0 && word(name - 1)) name--;
         const std::string child = sksl.substr(name, i - name);
-        if (child == "palette" || child == "thresholds") continue;
+        if (child == "palette" || child == "thresholds" || child == "glyphs") continue;
         int depth = 0;
         size_t close = std::string::npos;
         for (size_t k = i + 5; k < sksl.size(); k++) {
@@ -488,6 +493,100 @@ std::shared_ptr<const Palette> PaletteFor(std::vector<uint32_t> colors) {
     return p;
 }
 
+struct GlyphAtlas {
+    sk_sp<SkImage> image;
+    int count = 0, columns = 1;
+    float width = 1, height = 1;
+};
+
+std::shared_ptr<const GlyphAtlas> AtlasFor(const std::string& characters, float cell) {
+    const int w = std::clamp((int)std::lround(std::isfinite(cell) ? cell : 12.0f), 4, 128), h = (int)std::lround(w * 1.6f);
+    const std::string key = std::to_string(w) + "\n" + characters;
+    static std::mutex lock;
+    static std::map<std::string, std::shared_ptr<const GlyphAtlas>> made;
+    {
+        std::lock_guard<std::mutex> hold(lock);
+        if (auto found = made.find(key); found != made.end()) return found->second;
+    }
+    std::vector<uint32_t> ramp;
+    for (uint32_t c : textanim::CodePoints(characters)) {
+        if (c >= 32 && c != 0x7F && ramp.size() < 256 && std::find(ramp.begin(), ramp.end(), c) == ramp.end()) ramp.push_back(c);
+    }
+    if (ramp.empty()) ramp = {' ', '.', ':', '-', '=', '+', '*', '#', '%', '@'};
+    SkFont base(MonoFace('M'), 100);
+    base.setEdging(SkFont::Edging::kAntiAlias);
+    SkFontMetrics m;
+    base.getMetrics(&m);
+    const SkGlyphID em = base.unicharToGlyph('M');
+    SkScalar advance = 0;
+    base.getWidths({&em, 1}, {&advance, 1});
+    base.setSize(98 * std::min(w / std::max(advance, 1.0f), h / std::max(m.fDescent - m.fAscent, 1.0f)));
+    base.getMetrics(&m);
+    const float baseline = (h - (m.fDescent - m.fAscent)) / 2 - m.fAscent;
+    const auto draw = [&](SkCanvas* c, uint32_t ch, float x, float y) {
+        SkFont font = base;
+        font.setTypeface(MonoFace((int32_t)ch));
+        const SkGlyphID g = font.unicharToGlyph((SkUnichar)ch);
+        SkPaint paint;
+        paint.setColor(SK_ColorWHITE);
+        paint.setAntiAlias(true);
+        c->save();
+        c->translate(x, y);
+        if (ch >= 0x2580 && ch <= 0x259F) {
+            SkRect box;
+            font.getBounds({&g, 1}, {&box, 1}, nullptr);
+            if (!box.isEmpty()) c->concat(SkMatrix::RectToRect(box, SkRect::MakeIWH(w, h), SkMatrix::kFill_ScaleToFit));
+            const SkPoint at = {0, 0};
+            c->drawGlyphs({&g, 1}, {&at, 1}, {0, 0}, font, paint);
+        } else {
+            SkScalar a = 0;
+            font.getWidths({&g, 1}, {&a, 1});
+            const SkPoint at = {(w - a) / 2, baseline};
+            c->drawGlyphs({&g, 1}, {&at, 1}, {0, 0}, font, paint);
+        }
+        c->restore();
+    };
+    std::vector<std::pair<double, uint32_t>> order;
+    sk_sp<SkSurface> one = SkSurfaces::Raster(SkImageInfo::MakeA8(w, h));
+    SkPixmap pixels;
+    for (uint32_t ch : ramp) {
+        one->getCanvas()->clear(SK_ColorTRANSPARENT);
+        draw(one->getCanvas(), ch, 0, 0);
+        double sum = 0;
+        if (one->peekPixels(&pixels)) {
+            for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) sum += *pixels.addr8(x, y);
+        }
+        order.push_back({sum, ch});
+    }
+    std::stable_sort(order.begin(), order.end(), [](const auto& a, const auto& b) { return a.first < b.first; });
+    for (uint32_t ch : {(uint32_t)'|', (uint32_t)'-', (uint32_t)'/', (uint32_t)'\\'}) order.push_back({0, ch});
+    auto atlas = std::make_shared<GlyphAtlas>();
+    atlas->count = (int)ramp.size();
+    atlas->columns = std::min(16, (int)order.size());
+    atlas->width = (float)w;
+    atlas->height = (float)h;
+    const int rows = ((int)order.size() + atlas->columns - 1) / atlas->columns;
+    sk_sp<SkSurface> sheet = SkSurfaces::Raster(SkImageInfo::MakeN32Premul(atlas->columns * w, rows * h));
+    sheet->getCanvas()->clear(SK_ColorTRANSPARENT);
+    for (size_t i = 0; i < order.size(); i++) draw(sheet->getCanvas(), order[i].second, (float)(i % atlas->columns * w), (float)(i / atlas->columns * h));
+    atlas->image = sheet->makeImageSnapshot();
+    std::lock_guard<std::mutex> hold(lock);
+    if (made.size() >= 16) made.clear();
+    made[key] = atlas;
+    return atlas;
+}
+
+std::string Characters(const LayerEffect& e, const std::map<std::string, Anim>* defaults, const std::map<std::string, std::string>& texts, float t) {
+    static const char* const sets[] = {
+        " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~",
+        " .:-=+*#%@", " \u2591\u2592\u2593\u2588", " 01"};
+    const int set = std::clamp((int)std::lround(Value(e, defaults, "charset", 0, t, 0)), 0, 4);
+    if (set < 4) return sets[set];
+    const Property* p = e.prop("characters");
+    const auto fallback = texts.find("characters");
+    return p ? p->text : fallback == texts.end() ? std::string() : fallback->second;
+}
+
 int BayerRank(int x, int y, int n) {
     if (n == 1) return 0;
     const int h = n / 2, base[4] = {0, 2, 3, 1};
@@ -621,6 +720,7 @@ std::string EffectRuntime::load(const std::string& xml) {
         if (result.effect->findUniform("orient")) NoteOrientedEffect(id);
         d.palette = result.effect->findChild("palette") != nullptr;
         d.matrix = result.effect->findChild("thresholds") != nullptr;
+        d.glyphs = result.effect->findChild("glyphs") != nullptr;
         d.shader = std::move(result.effect);
     }
     fDefinitions[id] = std::move(d);
@@ -769,6 +869,8 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
             if (sk_sp<SkImage> tile = d->matrix ? OnGpu(MatrixFor(method(e, d, t))) : nullptr) {
                 b.child("thresholds") = tile->makeShader(SkTileMode::kRepeat, SkTileMode::kRepeat, SkSamplingOptions());
             }
+            const std::shared_ptr<const GlyphAtlas> letters = d->glyphs ? AtlasFor(Characters(e, defaults, d->texts, t), Value(e, defaults, "cell", 0, t, 12)) : nullptr;
+            if (sk_sp<SkImage> sheet = letters ? OnGpu(letters->image) : nullptr) b.child("glyphs") = sheet->makeShader(SkSamplingOptions(SkFilterMode::kLinear));
             std::optional<particles::Beat> beat;
             const auto beatNow = [&]() -> const particles::Beat& {
                 if (!beat) beat = particles::LastBeat(scene.beats, timeMs / 1000.0, 1 << std::clamp((int)std::lround(Value(e, defaults, "beats", 0, t, 0)), 0, 2),
@@ -798,6 +900,9 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
                         v[4 * i] = (c >> 16 & 255) / 255.0f, v[4 * i + 1] = (c >> 8 & 255) / 255.0f, v[4 * i + 2] = (c & 255) / 255.0f, v[4 * i + 3] = 1;
                     }
                 }
+                else if (automatic && name == "glyphCount") v = {letters ? (float)letters->count : 1.0f};
+                else if (automatic && name == "glyphColumns") v = {letters ? (float)letters->columns : 1.0f};
+                else if (automatic && name == "glyphCell") v = {letters ? letters->width : 1.0f, letters ? letters->height : 1.0f};
                 else if (automatic && name == "screen") v = {-area.left(), -area.top(), (float)scene.width, (float)scene.height};
                 else if (automatic && name == "beat") v = {particles::Envelope(beatNow().since, Value(e, defaults, "decay", 0, t, 0.4f))};
                 else if (automatic && name == "beatTime") v = {(float)beatNow().since};

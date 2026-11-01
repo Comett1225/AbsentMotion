@@ -41,7 +41,9 @@ class EffectPackTest {
                 (if ("screen" in uniforms) mapOf("screen" to ("float4" to false)) else emptyMap()) +
                 (if ("layer" in uniforms) mapOf("layer" to ("float2" to false)) else emptyMap()) +
                 listOf("toLayer", "fromLayer", "orient").filter { it in uniforms }.associateWith { "float3x3" to false } +
-                listOf("palette", "thresholds").filter { it in uniforms }.associateWith { "shader" to false } +
+                listOf("palette", "thresholds", "glyphs").filter { it in uniforms }.associateWith { "shader" to false } +
+                listOf("glyphCount", "glyphColumns").filter { it in uniforms }.associateWith { "float" to false } +
+                (if ("glyphCell" in uniforms) mapOf("glyphCell" to ("float2" to false)) else emptyMap()) +
                 listOf("paletteSize", "paletteSpread").filter { it in uniforms }.associateWith { "float" to false } +
                 listOf("beat", "beatTime", "beatIndex").filter { it in uniforms }.associateWith { "float" to false } +
                 effect.params.filter { it.kind != "text" }.associate { p ->

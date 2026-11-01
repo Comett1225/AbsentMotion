@@ -339,7 +339,7 @@ const SkRect& InkBounds(TextLayout& text) {
 }
 namespace {
 const char* const kTextIds[] = {"absent.textprogress", "absent.texttransform", "absent.textrandomizer", "absent.countupdown",
-                                "absent.timecode", "absent.textpath"};
+                                "absent.timecode", "absent.textpath", "absent.textshake", "absent.textblips"};
 
 struct Piece {
     Paragraph* paragraph;
@@ -510,10 +510,24 @@ SkColor4f Blend(SkColor4f under, SkColor4f over) {
     return {under.fR * u + over.fR * o, under.fG * u + over.fG * o, under.fB * u + over.fB * o, a};
 }
 
-void Apply(const Layer& l, float t, const textanim::Segments& seg, std::vector<Glyph>* glyphs) {
+void Type(const LayerEffect& e, float t, float seconds, const std::string& shown, const textanim::Segments& seg, std::vector<Glyph>* glyphs) {
+    if (e.value("reveal", t, 1) < 0.5f) return;
+    const std::vector<float> at = textanim::TypeTimes(shown, e.value("speed", t, 30), e.value("pause", t, 0.25f));
+    const float now = seconds - e.value("delay", t, 0) + 1e-4f;
+    for (Glyph& g : *glyphs) {
+        const int c = g.offset >= 0 && g.offset < (int)seg.character.size() ? seg.character[g.offset] : -1;
+        if (c >= 0 && c < (int)at.size() && at[c] > now) g.alpha = 0;
+    }
+}
+
+void Apply(const Layer& l, float t, float seconds, const std::string& shown, const textanim::Segments& seg, std::vector<Glyph>* glyphs) {
     for (const LayerEffect& e : l.effects) {
-        const bool progress = e.id == "absent.textprogress";
-        if (e.hidden || (!progress && e.id != "absent.texttransform")) continue;
+        if (!e.hidden && e.id == "absent.textblips") {
+            Type(e, t, seconds, shown, seg, glyphs);
+            continue;
+        }
+        const bool progress = e.id == "absent.textprogress", shake = e.id == "absent.textshake";
+        if (e.hidden || (!progress && !shake && e.id != "absent.texttransform")) continue;
         int count = 0, steps = 0;
         const std::vector<int> unit = Units(*glyphs, seg, Choice(e, "unit", t, 0, 2), &count);
         const int direction = progress ? Choice(e, "direction", t, 0, 3)
@@ -528,13 +542,23 @@ void Apply(const Layer& l, float t, const textanim::Segments& seg, std::vector<G
         }
         const float amount = std::clamp(e.value("progress", t, 1), 0.0f, 1.0f), softness = e.value("softness", t, 0);
         const float start = e.value("start", t, 0), end = e.value("end", t, 1), offset = e.value("offset", t, 0);
-        const int shape = Choice(e, "shape", t, 0, 5);
+        const int shape = Choice(e, "shape", t, 0, 5), style = Choice(e, "style", t, 1, 4);
+        const uint64_t seed = Seed(l, e, t);
+        const float speed = e.value("speed", t, 24), cycles = e.value("cycles", t, 1), spread = e.value("spread", t, 30);
+        const float size = e.value("amount", t, 4), turn = e.value("rotation", t, 0);
         std::vector<Look> looks(count);
         std::vector<SkMatrix> matrices(count);
         for (int u = 0; u < count; u++) {
-            looks[u] = progress ? Progress(e, t, textanim::Reveal(amount, rank[u], steps, softness) *
-                                                     (1 - textanim::Reveal(std::clamp(start, 0.0f, 1.0f), rank[u], steps, softness)))
-                                : Transform(e, t, textanim::RangeWeight(shape, rank[u], count, start + offset, end + offset));
+            if (shake) {
+                const float w = textanim::RangeWeight(textanim::kSquare, u, count, start, end);
+                const textanim::Wiggle g = textanim::Shake(style, u, seed, seconds, speed, cycles, spread, size, turn);
+                looks[u].move = {g.x * w, g.y * w};
+                looks[u].rotation = g.angle * w;
+            } else {
+                looks[u] = progress ? Progress(e, t, textanim::Reveal(amount, rank[u], steps, softness) *
+                                                         (1 - textanim::Reveal(std::clamp(start, 0.0f, 1.0f), rank[u], steps, softness)))
+                                    : Transform(e, t, textanim::RangeWeight(shape, rank[u], count, start + offset, end + offset));
+            }
             const SkPoint c = !progress && Choice(e, "anchor", t, 0, 1) == 1 ? SkPoint{0, 0}
                               : box[u].isEmpty() ? fallback[u] : box[u].center();
             matrices[u] = SkMatrix::Translate(-c.fX, -c.fY);
@@ -688,7 +712,7 @@ std::vector<int> WordBreaks(const std::string& text) {
 std::vector<Glyph> Animate(const Layer& l, float t, int fps) {
     std::string shown;
     std::vector<Glyph> glyphs = Collect(Pieces(*l.text, l, t, fps, &shown));
-    Apply(l, t, textanim::Split(shown, WordBreaks(shown)), &glyphs);
+    Apply(l, t, (float)(t * std::max(0, l.endTime - l.startTime) / 1000.0), shown, textanim::Split(shown, WordBreaks(shown)), &glyphs);
     OnPath(l, t, &glyphs);
     return glyphs;
 }
@@ -801,6 +825,23 @@ void DrawText(SkCanvas* canvas, const Layer& layer, float t, const SkPaint& pain
         canvas->restore();
     }
     if (part != TextPart::kPlain) DrawRuns(canvas, text, true, paint);
+}
+sk_sp<SkTypeface> MonoFace(int32_t character) {
+    static const sk_sp<SkTypeface> mono = [] {
+        for (const char* family : {"monospace", "Menlo", "Courier New"}) {
+            if (sk_sp<SkTypeface> face = systemFonts()->matchFamilyStyle(family, SkFontStyle())) return face;
+        }
+        return systemFonts()->legacyMakeTypeface(nullptr, SkFontStyle());
+    }();
+    if (!mono || mono->unicharToGlyph(character)) return mono;
+    static std::mutex lock;
+    static std::map<int32_t, sk_sp<SkTypeface>> fallbacks;
+    std::lock_guard<std::mutex> hold(lock);
+    auto [entry, fresh] = fallbacks.try_emplace(character, mono);
+    if (fresh) {
+        if (sk_sp<SkTypeface> face = systemFonts()->matchFamilyStyleCharacter("monospace", SkFontStyle(), nullptr, 0, character)) entry->second = face;
+    }
+    return entry->second;
 }
 SkRect TextInkBounds(const Layer& layer) {
     auto& text = *layer.text;

@@ -12,6 +12,7 @@
 #include "easing.h"
 #include "engine.h"
 #include "scene.h"
+#include "textanim.h"
 
 #define JNI_FN(name) Java_app_absentmotion_engine_NativeEngine_##name
 
@@ -222,6 +223,16 @@ JNIEXPORT jfloatArray JNICALL JNI_FN(nativeEase)(JNIEnv* env, jclass, jstring ea
     for (float& v : values) v = am::Ease(e, v);
     jfloatArray out = env->NewFloatArray(n);
     if (out) env->SetFloatArrayRegion(out, 0, n, values.data());
+    return out;
+}
+
+JNIEXPORT jfloatArray JNICALL JNI_FN(nativeBlipTimes)(JNIEnv* env, jclass, jbyteArray text, jfloat speed, jfloat pause, jint every) {
+    const jsize n = env->GetArrayLength(text);
+    std::string utf8((size_t)n, '\0');
+    env->GetByteArrayRegion(text, 0, n, reinterpret_cast<jbyte*>(utf8.data()));
+    const std::vector<float> times = am::textanim::BlipTimes(utf8, speed, pause, every);
+    jfloatArray out = env->NewFloatArray((jsize)times.size());
+    if (out) env->SetFloatArrayRegion(out, 0, (jsize)times.size(), times.data());
     return out;
 }
 

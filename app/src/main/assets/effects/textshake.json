@@ -1,0 +1,185 @@
+{
+ "id": "textshake",
+ "name": "Text Shake",
+ "category": "text",
+ "since": "5.0.0",
+ "native": true,
+ "description": "Shakes each letter on its own, like nervous dialogue in a game. Shake drifts between spots, Jitter jumps to a new spot at each step, Wave bobs the letters up and down, Circle moves them in small loops and Wobble tilts them back and forth.",
+ "params": [
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "Shake",
+    "Jitter",
+    "Wave",
+    "Circle",
+    "Wobble"
+   ]
+  },
+  {
+   "id": "amount",
+   "label": "Amount",
+   "type": "float",
+   "default": 4,
+   "min": 0,
+   "max": 200,
+   "step": 0.1,
+   "pixels": true
+  },
+  {
+   "id": "speed",
+   "label": "Speed",
+   "type": "float",
+   "default": 24,
+   "min": 0,
+   "max": 120,
+   "step": 0.1,
+   "unit": "/s",
+   "when": {
+    "style": [
+     0,
+     1
+    ]
+   }
+  },
+  {
+   "id": "cycles",
+   "label": "Speed",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 20,
+   "step": 0.01,
+   "unit": "Hz",
+   "when": {
+    "style": [
+     2,
+     3,
+     4
+    ]
+   }
+  },
+  {
+   "id": "spread",
+   "label": "Spread",
+   "type": "angle",
+   "default": 30,
+   "min": -360,
+   "max": 360,
+   "step": 0.5,
+   "when": {
+    "style": [
+     2,
+     3,
+     4
+    ]
+   }
+  },
+  {
+   "id": "rotation",
+   "label": "Rotation",
+   "type": "angle",
+   "default": 0,
+   "min": -180,
+   "max": 180,
+   "step": 0.1
+  },
+  {
+   "id": "unit",
+   "label": "Based On",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Character",
+    "Word",
+    "Line"
+   ]
+  },
+  {
+   "id": "start",
+   "label": "Start",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "end",
+   "label": "End",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "seed",
+   "label": "Seed",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1000,
+   "step": 1
+  }
+ ],
+ "presets": [
+  {
+   "name": "Nervous",
+   "params": {
+    "style": 1,
+    "amount": 3,
+    "speed": 20
+   }
+  },
+  {
+   "name": "Scared",
+   "params": {
+    "style": 1,
+    "amount": 8,
+    "speed": 30,
+    "rotation": 8
+   }
+  },
+  {
+   "name": "Floaty",
+   "params": {
+    "style": 0,
+    "amount": 6,
+    "speed": 3
+   }
+  },
+  {
+   "name": "Wavy",
+   "params": {
+    "style": 2,
+    "amount": 10,
+    "cycles": 1.2,
+    "spread": 35
+   }
+  },
+  {
+   "name": "Dizzy",
+   "params": {
+    "style": 3,
+    "amount": 5,
+    "cycles": 1.5,
+    "spread": 45
+   }
+  },
+  {
+   "name": "Wobbly",
+   "params": {
+    "style": 4,
+    "rotation": 15,
+    "cycles": 2,
+    "spread": 40
+   }
+  }
+ ]
+}

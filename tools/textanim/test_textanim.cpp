@@ -223,6 +223,35 @@ int main() {
         check(Scramble("abcd", 0, kFromStart, 1, 0, kCustom, "x", true, 1, 0.5f, 0.5f) == "abcd", "empty randomizer range leaves text alone");
         check(Scramble("é", 0, kFromStart, 1, 0, kCustom, "x", true) == "x", "a cluster scrambles as one character");
     }
+    {
+        const std::vector<float> at = TypeTimes("Hi, yo", 10, 0.5f);
+        check(at.size() == 6, "one time per character");
+        check(near(at[0], 0) && near(at[1], 0.1f) && near(at[2], 0.2f), "letters type at the speed");
+        check(near(at[3], 0.8f) && near(at[4], 0.8f), "a comma before a space pauses and the space takes no time");
+        check(near(at[5], 0.9f), "typing goes on after the pause");
+        const std::vector<float> wrapped = TypeTimes("Hi,\nyo", 10, 0.5f), spaced = TypeTimes("Hi, yo", 10, 0.5f);
+        check(near(wrapped[5], spaced[5]), "a line break times the same as a space");
+        check(near(TypeTimes("a...b", 10, 1)[4], 0.4f), "dots inside a word do not pause");
+        const std::vector<float> blips = BlipTimes("Hi, yo!", 10, 0, 1);
+        check(blips.size() == 4, "spaces and punctuation stay silent");
+        check(near(blips[2], 0.3f), "blips follow the typed letters");
+        check(BlipTimes("abcdef", 10, 0, 2).size() == 3, "every second letter blips");
+        check(BlipTimes("a\U0001F44D\U0001F3FD", 10, 0, 1).size() == 2, "an emoji blips once");
+    }
+    {
+        const Wiggle a = Shake(1, 3, 7, 0.10f, 10, 1, 30, 4, 0), b = Shake(1, 3, 7, 0.15f, 10, 1, 30, 4, 0), c = Shake(1, 3, 7, 0.25f, 10, 1, 30, 4, 0);
+        check(near(a.x, b.x) && near(a.y, b.y), "jitter holds still within a step");
+        check(!near(a.x, c.x) || !near(a.y, c.y), "jitter jumps on the next step");
+        check(std::fabs(a.x) <= 4 && std::fabs(a.y) <= 4, "jitter stays inside the amount");
+        const Wiggle s0 = Shake(0, 1, 7, 0.0999f, 10, 1, 30, 4, 0), s1 = Shake(0, 1, 7, 0.1001f, 10, 1, 30, 4, 0);
+        check(std::fabs(s0.x - s1.x) < 0.05f, "shake glides without jumps");
+        check(near(Shake(2, 0, 7, 0.25f, 0, 1, 0, 5, 0).y, 5), "wave peaks at a quarter cycle");
+        const Wiggle r = Shake(3, 0, 7, 0, 0, 1, 0, 5, 0);
+        check(near(r.x, 5) && near(r.y, 0), "circle starts on the right");
+        check(near(Shake(4, 0, 7, 0.25f, 0, 1, 0, 0, 20).angle, 20), "wobble turns by the rotation");
+        const Wiggle other = Shake(1, 4, 7, 0.10f, 10, 1, 30, 4, 0);
+        check(!near(a.x, other.x) || !near(a.y, other.y), "letters shake apart from each other");
+    }
     if (failures) return 1;
     printf("textanim: all checks passed\n");
     return 0;

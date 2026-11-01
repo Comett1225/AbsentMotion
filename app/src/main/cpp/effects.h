@@ -43,6 +43,7 @@ private:
         bool timed = false;
         bool palette = false;
         bool matrix = false;
+        bool glyphs = false;
         std::map<std::string, Anim> defaults;
         std::map<std::string, std::string> texts;
     };

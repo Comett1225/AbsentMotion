@@ -1,0 +1,152 @@
+{
+ "id": "textblips",
+ "name": "Text Blips",
+ "category": "text",
+ "since": "5.0.0",
+ "native": true,
+ "description": "Types the text out letter by letter with a short blip for each letter, like a character talking in a game. Pick a Voice, then set its Pitch, how fast the letters type and how long to pause after punctuation. Spaces and punctuation stay silent.",
+ "params": [
+  {
+   "id": "voice",
+   "label": "Voice",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Classic",
+    "Soft",
+    "Deep",
+    "High",
+    "Robot",
+    "Squeak",
+    "Typewriter",
+    "Chiptune"
+   ]
+  },
+  {
+   "id": "volume",
+   "label": "Volume",
+   "type": "float",
+   "default": 0.6,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true
+  },
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "type": "float",
+   "default": 0,
+   "min": -24,
+   "max": 24,
+   "step": 0.1,
+   "unit": "st"
+  },
+  {
+   "id": "variation",
+   "label": "Pitch Variation",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 12,
+   "step": 0.1,
+   "unit": "st"
+  },
+  {
+   "id": "speed",
+   "label": "Speed",
+   "type": "float",
+   "default": 30,
+   "min": 1,
+   "max": 120,
+   "step": 0.1,
+   "unit": "/s"
+  },
+  {
+   "id": "every",
+   "label": "Blip Every",
+   "type": "float",
+   "default": 1,
+   "min": 1,
+   "max": 8,
+   "step": 1
+  },
+  {
+   "id": "pause",
+   "label": "Punctuation Pause",
+   "type": "float",
+   "default": 0.25,
+   "min": 0,
+   "max": 3,
+   "step": 0.01,
+   "unit": "s"
+  },
+  {
+   "id": "delay",
+   "label": "Delay",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 3600,
+   "step": 0.01,
+   "unit": "s",
+   "layerTime": true
+  },
+  {
+   "id": "reveal",
+   "label": "Type Out",
+   "type": "switch",
+   "default": true
+  },
+  {
+   "id": "seed",
+   "label": "Seed",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1000,
+   "step": 1
+  }
+ ],
+ "presets": [
+  {
+   "name": "Hero",
+   "params": {
+    "voice": 0
+   }
+  },
+  {
+   "name": "Monster",
+   "params": {
+    "voice": 2,
+    "pitch": -5,
+    "speed": 18,
+    "pause": 0.4
+   }
+  },
+  {
+   "name": "Robot",
+   "params": {
+    "voice": 4,
+    "variation": 0
+   }
+  },
+  {
+   "name": "Fast Talker",
+   "params": {
+    "voice": 3,
+    "speed": 55,
+    "every": 2,
+    "pause": 0.12
+   }
+  },
+  {
+   "name": "Typewriter",
+   "params": {
+    "voice": 6,
+    "speed": 14,
+    "variation": 0.5
+   }
+  }
+ ]
+}

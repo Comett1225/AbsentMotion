@@ -1,8 +1,10 @@
 #include "textanim.h"
 
 #include <algorithm>
+#include <cctype>
 #include <cmath>
 #include <cstdio>
+#include <iterator>
 #include <numeric>
 
 namespace am::textanim {
@@ -292,4 +294,83 @@ std::string Scramble(const std::string& text, float progress, int direction, uin
     return out;
 }
 
+namespace {
+
+bool Stop(uint32_t c) {
+    static const uint32_t stops[] = {'.', ',', '!', '?', ';', ':', 0x2026, 0x3001, 0x3002, 0xFF01, 0xFF0C, 0xFF1A, 0xFF1B, 0xFF1F};
+    return std::find(std::begin(stops), std::end(stops), c) != std::end(stops);
 }
+
+bool Silent(uint32_t c) {
+    return Space(c) || Stop(c) || (c < 128 && !std::isalnum((int)c)) || Between(c, 0x2010, 0x205E) || Between(c, 0x3000, 0x303F) ||
+           Between(c, 0xFF01, 0xFF0F);
+}
+
+std::vector<uint32_t> Firsts(const std::string& text) {
+    std::vector<int> starts;
+    const std::vector<uint32_t> cps = CodePoints(text, &starts);
+    const Segments s = Split(text);
+    std::vector<uint32_t> first(s.characters, 0);
+    std::vector<bool> seen(s.characters, false);
+    for (size_t i = 0; i < cps.size(); i++) {
+        const int c = s.character[starts[i]];
+        if (c >= 0 && !seen[c]) seen[c] = true, first[c] = cps[i];
+    }
+    return first;
+}
+
+std::vector<float> Typed(const std::vector<uint32_t>& first, float speed, float pause) {
+    std::vector<float> at(first.size());
+    const float step = 1 / std::clamp(std::isfinite(speed) ? speed : 30.0f, 0.1f, 1000.0f);
+    pause = std::isfinite(pause) ? std::max(pause, 0.0f) : 0;
+    float clock = 0;
+    for (size_t k = 0; k < first.size(); k++) {
+        at[k] = clock;
+        if (Space(first[k])) continue;
+        clock += step;
+        if (Stop(first[k]) && (k + 1 == first.size() || Space(first[k + 1]))) clock += pause;
+    }
+    return at;
+}
+
+float Signed(uint64_t h) { return (float)(h >> 40) / 8388607.5f - 1; }
+
+}
+
+std::vector<float> TypeTimes(const std::string& text, float speed, float pause) { return Typed(Firsts(text), speed, pause); }
+
+std::vector<float> BlipTimes(const std::string& text, float speed, float pause, int every) {
+    const std::vector<uint32_t> first = Firsts(text);
+    const std::vector<float> at = Typed(first, speed, pause);
+    std::vector<float> out;
+    int n = 0;
+    for (size_t k = 0; k < first.size(); k++) {
+        if (Silent(first[k])) continue;
+        if (n++ % std::max(every, 1) == 0) out.push_back(at[k]);
+    }
+    return out;
+}
+
+Wiggle Shake(int style, int index, uint64_t seed, float seconds, float speed, float cycles, float spread, float amount, float turn) {
+    Wiggle w;
+    if (!std::isfinite(seconds)) return w;
+    const auto random = [&](int64_t step, uint64_t axis) { return Signed(Mix(seed ^ Mix((uint64_t)index * 0x9E3779B97F4A7C15ull ^ Mix((uint64_t)step ^ axis << 56)))); };
+    if (style <= 1) {
+        const double clock = (double)seconds * std::max(speed, 0.0f);
+        const int64_t step = (int64_t)std::floor(clock);
+        const float f = style == 0 ? (float)(clock - (double)step) : 0, s = f * f * (3 - 2 * f);
+        const auto at = [&](uint64_t axis) { return random(step, axis) + (random(step + 1, axis) - random(step, axis)) * s; };
+        w.x = amount * at(1);
+        w.y = amount * at(2);
+        w.angle = turn * at(3);
+        return w;
+    }
+    const float phase = 6.2831853f * (float)std::fmod((double)seconds * cycles, 1.0) - index * spread * 0.017453293f;
+    if (style == 2) w.y = amount * std::sin(phase);
+    else if (style == 3) w.x = amount * std::cos(phase), w.y = amount * std::sin(phase);
+    else w.angle = turn * std::sin(phase);
+    return w;
+}
+
+}
+
