@@ -155,6 +155,7 @@ val sceneCheck = tasks.register<JavaExec>("sceneCheck") {
 
 tasks.test {
     dependsOn(nativeBuild)
+    inputs.file(layout.buildDirectory.file("native/$nativeName"))
     systemProperty("am.native", layout.buildDirectory.file("native/$nativeName").get().asFile.absolutePath)
     systemProperty("am.assets", file("../app/src/main/assets").absolutePath)
     systemProperty("am.repo", file("..").absolutePath)

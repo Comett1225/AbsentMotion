@@ -6,6 +6,9 @@ import androidx.compose.ui.test.*
 import app.absentmotion.desk.DeskApp
 import app.absentmotion.desk.DeskAppState
 import app.absentmotion.editor.EditorPanel
+import app.absentmotion.editor.resetValue
+import app.absentmotion.model.PropRef
+import app.absentmotion.model.formatFloats
 import app.absentmotion.model.Scene
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
@@ -108,6 +111,25 @@ class DeskShotsTest {
             Thread.sleep(3000)
             mainClock.advanceTimeBy(1000)
             shot("11-media-editor.png")
+            runOnIdle { app.editor!!.canvasZoom = 2f }
+            mainClock.advanceTimeBy(500); Thread.sleep(1500); mainClock.advanceTimeBy(500)
+            shot("12-zoom-200.png")
+            runOnIdle { app.editor!!.frame = 50 }
+            mainClock.advanceTimeBy(500); Thread.sleep(1500); mainClock.advanceTimeBy(500)
+            shot("13-zoom-200-moved.png")
+            runOnIdle { app.editor!!.canvasZoom = 0.5f }
+            mainClock.advanceTimeBy(500); Thread.sleep(1500); mainClock.advanceTimeBy(500)
+            shot("14-zoom-50.png")
+            runOnIdle { app.editor!!.canvasZoom = 1f; app.editor!!.selectedId = 8004L }
+            for (factor in listOf(2f, 3f)) {
+                runOnIdle { app.editor!!.edit { sc -> sc.update(8004L) { l -> l.resetValue(PropRef.Scale, formatFloats(floatArrayOf(factor, factor))) } } }
+                mainClock.advanceTimeBy(500); Thread.sleep(1500); mainClock.advanceTimeBy(500)
+                shot("15-video-scale-${factor.toInt()}.png")
+            }
+            runOnIdle { app.editor!!.playing = true }
+            Thread.sleep(700); mainClock.advanceTimeBy(700)
+            shot("16-video-scaled-playing.png")
+            runOnIdle { app.editor!!.playing = false }
             val written = exports.walk().filter { it.isFile }.map { it.relativeTo(exports).path }.sorted().toList()
             println("exported: $written")
             check(written.any { it.endsWith(".mp4") } && written.any { it.endsWith(".gif") }) { "missing exports: $written" }

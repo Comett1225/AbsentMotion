@@ -92,6 +92,7 @@ class EngineThread(private val background: Int, context: Context? = null, privat
     @Volatile private var mediaJob: Job? = null
     private var mediaKey: Any? = null
     private val videos = HashMap<String, AutoCloseable>()
+    private var loadedPictures: Set<String> = emptySet()
     private var view: PreviewView? = null
     private var viewSerial = 0L
     private val serials = AtomicLong()
@@ -174,6 +175,8 @@ class EngineThread(private val background: Int, context: Context? = null, privat
         withContext(dispatcher) {
             val native = engine()
             pictures.forEach { uri -> file(uri)?.let { native.setPictureFile(uri, it.absolutePath) } }
+            (loadedPictures - pictures).forEach { native.setPicture(it, null) }
+            loadedPictures = pictures
             (videos.keys - clips).forEach { videos.remove(it)?.close() }
         }
         for (uri in clips) {

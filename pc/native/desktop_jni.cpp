@@ -120,7 +120,6 @@ JNIEXPORT jstring JNICALL JNI(setScene)(JNIEnv* e, jobject, jlong h, jstring xml
     std::string error;
     if (!am::ParseScene(str(e, xml), &next, &error)) return e->NewStringUTF(error.c_str());
     ptr(h)->scene = std::move(next);
-    ptr(h)->pictures.clear();
     return nullptr;
 }
 JNIEXPORT jboolean JNICALL JNI(setPicture)(JNIEnv* e, jobject, jlong h, jstring uri, jstring path) {
