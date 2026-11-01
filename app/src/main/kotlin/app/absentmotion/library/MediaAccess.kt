@@ -21,7 +21,7 @@ class MediaAccess private constructor(private val filesDir: File?, private val o
         if (filesDir == null) return true
         return when (uri.substringBefore(':', "").lowercase()) {
             "content" -> uri.startsWith("content://", ignoreCase = true) && uri.substring("content://".length).substringBefore('/').isNotEmpty()
-            "file" -> inMediaFolder(filesDir, uri) || own.any { inside(it, uri) }
+            "file" -> inMediaFolder(filesDir, uri) || own.any { inside(it, uri) } || app.absentmotion.platform.PlatformFeatures.userFiles && !inside(filesDir, uri)
             else -> false
         }
     }

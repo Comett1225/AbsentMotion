@@ -113,7 +113,7 @@ compose.desktop {
             targetFormats(if (isWindows) org.jetbrains.compose.desktop.application.dsl.TargetFormat.Msi else org.jetbrains.compose.desktop.application.dsl.TargetFormat.Dmg)
             packageName = "AbsentMotion"
             packageVersion = "5.0.0"
-            macOS { bundleID = "app.absentmotion.desktop" }
+            macOS { bundleID = "app.absentmotion.desktop"; iconFile.set(file("icon/AbsentMotion.icns")) }
             appResourcesRootDir.set(project.layout.buildDirectory.dir("app-resources"))
         }
     }

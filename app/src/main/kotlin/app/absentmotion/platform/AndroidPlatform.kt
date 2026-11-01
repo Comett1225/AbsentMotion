@@ -196,6 +196,7 @@ object PlatformFeatures {
     const val ai = true
     const val camera = true
     const val tools = true
+    const val userFiles = false
 }
 
 internal const val CAPTION_MODEL_NAME = "ggml-base-q5_1.bin"

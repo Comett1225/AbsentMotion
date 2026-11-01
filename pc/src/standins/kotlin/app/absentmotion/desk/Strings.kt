@@ -20,6 +20,9 @@ object Strings {
         val tag = runCatching { android.content.SharedPreferences.named("language").getString("tag", null) }.getOrNull()
             ?: java.util.Locale.getDefault().toLanguageTag()
         folderFor(tag)?.let { load(resDir().resolve("$it/strings.xml")) }
+        val os = System.getProperty("os.name").lowercase()
+        val reveal = when { os.contains("mac") -> "Show in Finder"; os.contains("win") -> "Show in Explorer"; else -> "Show in Folder" }
+        listOf("export_share", "export_share_video", "export_share_gif", "export_share_sequence", "export_share_image", "export_share_xml", "compress_share").forEach { strings[it] = reveal }
     }
 
     private fun folderFor(tag: String): String? {
