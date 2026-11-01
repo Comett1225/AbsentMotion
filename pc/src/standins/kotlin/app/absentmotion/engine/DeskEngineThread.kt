@@ -347,7 +347,7 @@ class EngineThread(private val background: Int, context: Context? = null, privat
         suspend fun render(target: Long, timeMs: Int, presentTimeNs: Long): Boolean = false
         suspend fun stampsPresentTime(): Boolean = false
         suspend fun openGl(): Boolean = false
-        suspend fun renderInto(buffer: HardwareBuffer, timeMs: Int): Boolean = false
+        suspend fun renderInto(buffer: HardwareBuffer, timeMs: Int): Boolean = still(timeMs, buffer.width, buffer.height) != null
         suspend fun releaseBuffers() {}
         private var textTime = 0
         private fun applyFonts(timeMs: Int) {

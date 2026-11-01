@@ -14,7 +14,8 @@ val phoneOnly = listOf(
     "app/absentmotion/i18n/AppLanguage.kt", "app/absentmotion/i18n/UiText.kt",
     "app/absentmotion/ui/home/UpdateDialog.kt", "app/absentmotion/media/VideoLibrary.kt",
     "app/absentmotion/ui/home/Updater.kt", "app/absentmotion/ui/home/UpdateVerify.kt", "app/absentmotion/ui/home/UnsupportedPhone.kt",
-    "app/absentmotion/export/ExportService.kt", "app/absentmotion/ui/tutorial/Grip.kt", "app/absentmotion/ui/editor/panels/EffectRuler.kt",
+    "app/absentmotion/export/ExportService.kt", "app/absentmotion/export/VideoExport.kt", "app/absentmotion/export/AudioExport.kt",
+    "app/absentmotion/export/ExportVerify.kt", "app/absentmotion/export/ExportStore.kt", "app/absentmotion/ui/tutorial/Grip.kt", "app/absentmotion/ui/editor/panels/EffectRuler.kt",
 )
 
 val androidJar = (System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT") ?: rootDir.resolve("../local.properties").takeIf { it.isFile }?.readLines()?.firstOrNull { it.startsWith("sdk.dir=") }?.substringAfter("=") ?: "${System.getProperty("user.home")}/Library/Android/sdk")
@@ -37,6 +38,8 @@ kotlin {
         kotlin.exclude(phoneOnly)
     }
 }
+
+val runtimeStandins: SourceSet = sourceSets.create("runtimeStandins")
 
 val generateStrings = tasks.register("generateStrings") {
     val source = file("../app/src/main/res/values/strings.xml")
@@ -78,6 +81,7 @@ dependencies {
     implementation("org.json:json:20250517")
     implementation("net.sf.kxml:kxml2:2.3.0")
     if (androidJar != null) compileOnly(files(androidApi))
+    runtimeOnly(runtimeStandins.output)
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.compose.ui:ui-test-junit4-desktop:1.10.3")
 }

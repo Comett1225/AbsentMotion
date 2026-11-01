@@ -17,6 +17,8 @@ class DeskShotsTest {
     @Test fun phoneUiOnDesktop() {
         val data = File("build/desk-data").also { it.deleteRecursively(); it.mkdirs() }
         System.setProperty("am.data", data.absolutePath)
+        val exports = File("build/desk-shots-exports").also { it.deleteRecursively() }
+        System.setProperty("am.exports", exports.absolutePath)
         runSkikoComposeUiTest(size = Size(1600f, 1000f)) {
             val app = DeskAppState()
             val shots = File("build/desk-shots").also { it.mkdirs() }
@@ -43,6 +45,27 @@ class DeskShotsTest {
             runOnIdle { editor.effectBrowserOpen = false; editor.panel = EditorPanel.Tools; editor.exportOpen = true }
             mainClock.advanceTimeBy(1000)
             shot("07-export.png")
+            fun exportAndShoot(prefix: String) {
+                onAllNodesWithText("Export").onLast().performClick()
+                waitUntil(timeoutMillis = 10_000) { onAllNodesWithText("Saved to storage").fetchSemanticsNodes().isEmpty() }
+                mainClock.advanceTimeBy(300)
+                shot("$prefix-running.png")
+                waitUntil(timeoutMillis = 120_000) { onAllNodesWithText("Saved to storage").fetchSemanticsNodes().isNotEmpty() }
+                mainClock.advanceTimeBy(1500)
+                Thread.sleep(800)
+                mainClock.advanceTimeBy(200)
+                shot("$prefix-done.png")
+                onNodeWithText("OK").performClick()
+                mainClock.advanceTimeBy(1000)
+            }
+            exportAndShoot("08-video")
+            onNodeWithText("GIF").performClick()
+            mainClock.advanceTimeBy(1000)
+            shot("09-gif-selected.png")
+            exportAndShoot("10-gif")
+            val written = exports.walk().filter { it.isFile }.map { it.relativeTo(exports).path }.sorted().toList()
+            println("exported: $written")
+            check(written.any { it.endsWith(".mp4") } && written.any { it.endsWith(".gif") }) { "missing exports: $written" }
         }
     }
 }

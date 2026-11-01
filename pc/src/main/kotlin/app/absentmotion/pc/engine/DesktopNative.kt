@@ -29,5 +29,6 @@ object DesktopNative {
     external fun layerOutline(handle: Long, id: Long, timeMs: Double): String?
     external fun shapeIcon(handle: Long, xml: String, size: Int, color: Int): ByteArray?
     external fun ease(easing: String, u: Float): Float
+    external fun encodeWebp(rgba: ByteArray, width: Int, height: Int, quality: Int, lossless: Boolean): ByteArray?
     external fun blipTimes(text: String, speed: Float, pause: Float, every: Int): FloatArray
 }
