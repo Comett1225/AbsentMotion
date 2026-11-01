@@ -12,3 +12,8 @@ object Resources {
     val configuration = Configuration()
     @JvmStatic fun getSystem() = this
 }
+
+class AssetFileDescriptor(val file: java.io.File) : java.io.Closeable {
+    val length: Long get() = file.length()
+    override fun close() {}
+}

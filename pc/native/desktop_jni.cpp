@@ -16,6 +16,9 @@
 #include "include/core/SkImage.h"
 #include "include/core/SkSurface.h"
 #include "include/codec/SkCodec.h"
+#include "include/core/SkPixmap.h"
+#include "include/core/SkStream.h"
+#include "include/encode/SkWebpEncoder.h"
 #include "include/gpu/ganesh/SkSurfaceGanesh.h"
 #include "include/gpu/ganesh/GrDirectContext.h"
 
@@ -284,5 +287,19 @@ JNIEXPORT jfloatArray JNICALL JNI(blipTimes)(JNIEnv* e, jobject, jstring text, j
     auto result = e->NewFloatArray((jsize)times.size());
     e->SetFloatArrayRegion(result, 0, (jsize)times.size(), times.data());
     return result;
+}
+JNIEXPORT jbyteArray JNICALL JNI(encodeWebp)(JNIEnv* e, jobject, jbyteArray rgba, jint w, jint h, jint quality, jboolean lossless) {
+    std::vector<uint8_t> px((size_t)e->GetArrayLength(rgba));
+    if (w <= 0 || h <= 0 || px.size() < (size_t)w * h * 4) return nullptr;
+    e->GetByteArrayRegion(rgba, 0, (jsize)px.size(), reinterpret_cast<jbyte*>(px.data()));
+    SkPixmap pixmap(SkImageInfo::Make(w, h, kRGBA_8888_SkColorType, kUnpremul_SkAlphaType), px.data(), (size_t)w * 4);
+    SkWebpEncoder::Options options;
+    options.fCompression = lossless ? SkWebpEncoder::Compression::kLossless : SkWebpEncoder::Compression::kLossy;
+    options.fQuality = (float)quality;
+    SkDynamicMemoryWStream out;
+    if (!SkWebpEncoder::Encode(&out, pixmap, options)) return nullptr;
+    sk_sp<SkData> data = out.detachAsData();
+    const uint8_t* start = data->bytes();
+    return bytes(e, std::vector<uint8_t>(start, start + data->size()));
 }
 }

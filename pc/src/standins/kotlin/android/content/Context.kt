@@ -105,7 +105,7 @@ object ContentResolver {
     }
     fun query(uri: Uri, projection: Array<String>?, extras: android.os.Bundle?, signal: android.os.CancellationSignal?): android.database.Cursor? = null
     fun openFileDescriptor(uri: Uri, mode: String): android.os.ParcelFileDescriptor? = null
-    fun openAssetFileDescriptor(uri: Uri, mode: String): android.content.res.AssetFileDescriptor? = null
+    fun openAssetFileDescriptor(uri: Uri, mode: String): android.content.res.AssetFileDescriptor? = file(uri)?.takeIf { it.isFile }?.let { android.content.res.AssetFileDescriptor(it) }
     fun registerContentObserver(uri: Uri, descendants: Boolean, observer: android.database.ContentObserver) {}
     fun unregisterContentObserver(observer: android.database.ContentObserver) {}
     fun insert(uri: Uri, values: android.content.ContentValues?): Uri? = null

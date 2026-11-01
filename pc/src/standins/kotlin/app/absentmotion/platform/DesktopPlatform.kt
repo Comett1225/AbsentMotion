@@ -141,23 +141,29 @@ fun encodeRgba(pixels: ByteArray, width: Int, height: Int, settings: app.absentm
     val kind = settings.image
     val source = if (kind.alpha) pixels else app.absentmotion.export.ImageEncode.flatten(pixels, settings.background, pixels)
     if (kind == app.absentmotion.export.ImageKind.Bmp) return app.absentmotion.export.ImageEncode.bmp(source, width, height, out)
-    val bitmap = reuse ?: makeBitmap(width, height)
-    bitmap.copyPixelsFromBuffer(java.nio.ByteBuffer.wrap(source))
-    val format = if (kind == app.absentmotion.export.ImageKind.Jpeg) android.graphics.Bitmap.CompressFormat.JPEG else android.graphics.Bitmap.CompressFormat.PNG
-    app.absentmotion.export.exportCheck(bitmap.compress(format, if (kind.lossy) settings.imageQuality else 100, out)) {
+    val webp = kind == app.absentmotion.export.ImageKind.Webp || kind == app.absentmotion.export.ImageKind.WebpLossless
+    val data = if (webp) app.absentmotion.pc.engine.DesktopNative.encodeWebp(source, width, height, if (kind.lossy) settings.imageQuality else 75, !kind.lossy) else {
+        val format = if (kind == app.absentmotion.export.ImageKind.Jpeg) org.jetbrains.skia.EncodedImageFormat.JPEG else org.jetbrains.skia.EncodedImageFormat.PNG
+        val info = org.jetbrains.skia.ImageInfo(width, height, org.jetbrains.skia.ColorType.RGBA_8888, org.jetbrains.skia.ColorAlphaType.UNPREMUL)
+        org.jetbrains.skia.Image.makeRaster(info, source, width * 4).use { image -> image.encodeToData(format, if (kind.lossy) settings.imageQuality else 100)?.use { it.bytes } }
+    }
+    app.absentmotion.export.exportCheck(data != null) {
         app.absentmotion.i18n.txt(app.absentmotion.R.string.export_error_encode_image, app.absentmotion.i18n.txt(kind.label))
     }
+    out.write(data!!)
 }
 
 @Composable
-fun ExportBars(dark: Boolean, running: Boolean) {}
+fun ExportBars(dark: Boolean, running: Boolean) {
+    remember { app.absentmotion.export.DeskEncoders.seedReport(android.content.Desk.context) }
+}
 
 internal const val MAX_SHARED_PICTURES = 500
 
 fun shareExport(context: Context, result: app.absentmotion.export.ExportResult) = DeskFiles.reveal(result.uris)
 
 @Composable
-fun ExportMediaPreview(kind: app.absentmotion.export.ExportKind, uris: List<Uri>, large: Boolean = false, onTap: (() -> Unit)? = null) = app.absentmotion.ui.export.ExportMediaPreview(kind, uris, large, onTap)
+fun ExportMediaPreview(kind: app.absentmotion.export.ExportKind, uris: List<Uri>, large: Boolean = false, onTap: (() -> Unit)? = null) = app.absentmotion.ui.export.DeskExportPreview(kind, uris)
 
 fun effectsMessageOnHome() = false
 
