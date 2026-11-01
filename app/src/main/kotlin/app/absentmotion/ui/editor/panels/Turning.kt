@@ -33,6 +33,7 @@ import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.KeyTarget
 import app.absentmotion.editor.KeypadField
 import app.absentmotion.editor.KeypadRequest
+import app.absentmotion.editor.resetValue
 import app.absentmotion.effects.EffectCatalog
 import app.absentmotion.effects.EffectParam
 import app.absentmotion.model.Layer
@@ -79,7 +80,15 @@ internal data class Turn(val effect: Int = -1, private val axes: List<EffectPara
         return withValues(layer, FloatArray(3) { now[it] + step[it] })
     }
 
-    fun reset(layer: Layer): Layer = withValues(layer, FloatArray(3) { if (effect < 0) 0f else axes[it].default.finiteFloat() ?: 0f })
+    fun reset(layer: Layer): Layer {
+        val values = FloatArray(3) { if (effect < 0) 0f else axes[it].default.finiteFloat() ?: 0f }
+        val next = withValues(layer, values)
+        val refs = if (effect < 0) listOf(PropRef.Tilt, PropRef.Rotation) else axes.map { PropRef.effect(effect, it.id) }
+        return refs.foldIndexed(next) { i, l, ref ->
+            if (l.element(ref)?.children?.none { it.name == "kf" } != false) l
+            else l.resetValue(ref, if (effect < 0 && i == 0) formatFloats(floatArrayOf(0f, 0f)) else formatFloats(floatArrayOf(if (effect < 0) 0f else values[i])))
+        }
+    }
 
     fun target(axis: Int): KeyTarget =
         if (effect >= 0) KeyTarget(PropRef.effect(effect, axes[axis].id), axes[axis].default, axes[axis].type)

@@ -8,6 +8,9 @@ import androidx.annotation.StringRes
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.key
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.rememberPagerState
 import app.absentmotion.editor.KeyTarget
 import app.absentmotion.editor.toggleKeyframe
@@ -202,31 +205,34 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
         val video = state.selected?.mediaFill?.video == true
         val editorScope = LocalEditorScope.current
         var shooting by remember { mutableStateOf(false) }
+        val storage = app.absentmotion.platform.rememberStorageAccess()
         val outside = stringResource(R.string.screenshot_outside)
         val saved = stringResource(R.string.screenshot_saved)
         val failed = stringResource(R.string.screenshot_failed)
         val more = listOfNotNull(
             if (state.selected?.canCrop == true) Tile(Crop) { state.openCrop() } else null,
-            if (video) Tile(AiTools) { openEffectBrowser(state, "ai") } else null,
+            if (state.selected?.mediaFill != null) Tile(AiTools) { openEffectBrowser(state, "ai") } else null,
             if (video) Tile(CaptionTools) { state.playing = false; captions = true } else null,
             if (video) Tile(ReverseTool, enabled = ai.running == null, active = state.selected?.reverseMark != null) { state.playing = false; ai.apply(AiAction.Reverse) } else null,
             if (video) Tile(ScreenshotTool, enabled = !shooting) {
                 state.playing = false
-                if (!state.canScreenshot(state.selected)) Toast.makeText(context, outside, Toast.LENGTH_SHORT).show()
-                else {
+                fun shoot() {
                     shooting = true
                     editorScope.launch {
                         val done = try { state.screenshotFrame(context, editorScope) } catch (e: kotlinx.coroutines.CancellationException) { throw e } catch (e: Exception) { false } finally { shooting = false }
                         Toast.makeText(context, if (done) saved else failed, Toast.LENGTH_SHORT).show()
                     }
                 }
+                if (!state.canScreenshot(state.selected)) Toast.makeText(context, outside, Toast.LENGTH_SHORT).show()
+                else if (storage.ready { shoot() }) shoot()
             } else null,
         )
         if (side) TileRows((rows.flatten() + more).chunked(2), 2)
         else if (more.isEmpty()) TileRows(rows, null)
         else key(state.selectedId) {
             val pager = rememberPagerState { 2 }
-            HorizontalPager(pager, Modifier.fillMaxWidth().height((rows.size * 160 + (rows.size - 1) * 17).px), pageSpacing = 17.px, verticalAlignment = Alignment.Top) { page ->
+            HorizontalPager(pager, Modifier.fillMaxWidth().height((rows.size * 160 + (rows.size - 1) * 17).px), pageSpacing = 17.px, verticalAlignment = Alignment.Top,
+                flingBehavior = PagerDefaults.flingBehavior(pager, snapAnimationSpec = tween(ToolPageSnapMs, easing = FastOutSlowInEasing))) { page ->
                 Column { TileRows(if (page == 0) rows else more.chunked(4), if (page == 0) null else 4) }
             }
             Row(Modifier.fillMaxWidth().padding(top = 14.px, bottom = 14.px), Arrangement.Center) {
@@ -286,6 +292,7 @@ private val Effects = Tool(R.string.layer_tool_effects, PanelIcons.Effects, 19.6
 private val Crop = Tool(R.string.layer_tool_crop, PanelIcons.Crop, 18.1f)
 private val CaptionTools = Tool(R.string.auto_captions, ChromeIcons.Captions, 19.4f)
 private val AiTools = Tool(R.string.ai, PanelIcons.Bot, 19.4f)
+private const val ToolPageSnapMs = 120
 private val CutoutEdge = Tool(R.string.cutout_edge, PanelIcons.TabBorder, 18.1f)
 private val ReverseTool = Tool(R.string.speed_reverse, PanelIcons.Reverse, 19.4f)
 private val ScreenshotTool = Tool(R.string.layer_tool_screenshot, PanelIcons.Screenshot, 19.4f)

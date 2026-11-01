@@ -24,7 +24,7 @@ The large buttons come in two pages. Swipe the grid sideways to go from one page
 
 A photo or video is a rectangle with a picture fill, so it has the same tools as a shape.
 
-The table lists page 1. Page 2 holds **Crop** for every layer you can see except a 3D model: shapes, text, drawings, groups, photos and videos. A video clip has four more buttons there: **AI**, **Auto Captions**, **Reverse** and **Screenshot**. Audio, camera, null and 3D model layers have a single page.
+The table lists page 1. Page 2 holds **Crop** for every layer you can see except a 3D model: shapes, text, drawings, groups, photos and videos. A video clip has four more buttons there: **AI**, **Auto Captions**, **Reverse** and **Screenshot**; a photo has **AI** there too. Audio, camera, null and 3D model layers have a single page.
 
 ![The second page of a video's tool grid: Crop (1), AI (2), Auto Captions (3) and Reverse (4).](img/lt-grid-2.webp)
 
@@ -98,7 +98,7 @@ For sound and for videos. See [Audio](@audio).
 
 ### AI, Auto Captions, Reverse and Screenshot
 
-These four buttons are on page 2 of a video clip's grid (a GIF counts as a video). **AI** opens the AI category of the Effects Library (an audio layer has the same button on its only page). **Auto Captions** makes captions for this clip alone: see [AI tools](@ai-tools). **Reverse** plays the clip backwards: see [Media](@media).
+These four buttons are on page 2 of a video clip's grid (a GIF counts as a video). **AI** opens the AI category of the Effects Library; a photo has it on page 2 too (for Remove Background), and an audio layer has the same button on its only page. **Auto Captions** makes captions for this clip alone: see [AI tools](@ai-tools). **Reverse** plays the clip backwards: see [Media](@media).
 
 **Screenshot** saves the clip's frame under the playhead as a picture, at the clip's own full size. It is the plain footage: effects, crop, borders and the layer's position are left out, while trims, speed changes and Reverse are followed. The picture goes to the phone's gallery (Pictures/AbsentMotion) and is added to the project as a new layer above the clip. If you delete that new layer within 10 seconds, the picture is also removed from the gallery. The playhead must be on the clip.
 

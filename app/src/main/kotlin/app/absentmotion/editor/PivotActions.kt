@@ -424,4 +424,16 @@ fun EditorState.setPivot(x: Float, y: Float, key: Any? = null) {
     edit(key) { it.withPivotMoved(id, sampleMs, x, y, timeMs) }
 }
 
-fun EditorState.resetPivot() = setPivot(0f, 0f)
+internal fun Scene.withPivotReset(id: Long, timeMs: Int, seenMs: Int = timeMs): Scene {
+    val layer = layer(id) ?: return this
+    if (layer.kind == "camera") return this
+    val next = withPivotMoved(id, timeMs, 0f, 0f, seenMs)
+    val pivot = next.layer(id)?.at(timeMs, fps) ?: return next
+    if (pivot.element(PropRef.Pivot)?.children?.none { it.name == "kf" } != false) return next
+    return next.update(id) { it.resetValue(PropRef.Pivot, formatFloats(floatArrayOf(0f, 0f, pivot.pivot[2]))) }
+}
+
+fun EditorState.resetPivot() {
+    val id = selectedId ?: return
+    edit { it.withPivotReset(id, sampleMs, timeMs) }
+}

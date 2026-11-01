@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -38,6 +39,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -57,8 +59,14 @@ import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -108,13 +116,47 @@ import kotlin.math.roundToInt
 
 @Composable
 internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSettings, onOpen: (String) -> Unit) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val revision by VideoDownloader.revision.collectAsState()
+    var engine by remember { mutableStateOf(if (!VideoDownloader.available) Engine.Unavailable else if (VideoDownloader.installed(context)) Engine.Ready else Engine.Missing) }
     var open by rememberSaveable { mutableIntStateOf(0) }
     var compressFrom by remember { mutableStateOf<Uri?>(null) }
+    LaunchedEffect(revision) {
+        if (engine !is Engine.Getting) engine = if (!VideoDownloader.available) Engine.Unavailable else if (VideoDownloader.installed(context)) Engine.Ready else Engine.Missing
+    }
+    fun selectDownloader() {
+        if (engine is Engine.Getting) return
+        if (!VideoDownloader.available || VideoDownloader.installed(context)) {
+            open = 2
+        } else {
+            engine = Engine.Getting(0)
+            scope.launch {
+                engine = try {
+                    VideoDownloader.install(context) { fraction ->
+                        val percent = (fraction * 100).toInt().coerceIn(0, 100)
+                        if (engine != Engine.Getting(percent)) engine = Engine.Getting(percent)
+                    }
+                    Engine.Ready
+                } catch (e: CancellationException) {
+                    engine = Engine.Missing
+                    throw e
+                } catch (e: Exception) {
+                    val error = problem(e).takeIf { it != R.string.downloader_error_unknown } ?: R.string.downloader_engine_failed
+                    Toast.makeText(context, context.getString(error), Toast.LENGTH_LONG).show()
+                    Engine.Failed(error)
+                }
+            }
+        }
+    }
     Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)) {
         Spacer(Modifier.height(24.dp))
         ToolCard(HomeIcons.Compress, stringResource(R.string.tools_compress), stringResource(R.string.tools_compress_about)) { compressFrom = null; open = 1 }
         Spacer(Modifier.height(12.dp))
-        ToolCard(HomeIcons.Download, stringResource(R.string.tools_downloader), stringResource(R.string.tools_downloader_about)) { open = 2 }
+        ToolCard(HomeIcons.Download, stringResource(R.string.tools_downloader), stringResource(R.string.tools_downloader_about),
+            engine = engine, onClick = ::selectDownloader)
+        Spacer(Modifier.height(28.dp))
+        ToolsFooter()
         Spacer(Modifier.height(28.dp))
     }
     when (open) {
@@ -124,28 +166,56 @@ internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSett
 }
 
 @Composable
-private fun ToolCard(icon: ImageVector, title: String, about: String, onClick: () -> Unit) {
+private fun ToolCard(icon: ImageVector, title: String, about: String, engine: Engine? = null, onClick: () -> Unit) {
+    val missing = engine == Engine.Missing || engine is Engine.Getting || engine is Engine.Failed
     Row(
         Modifier.fillMaxWidth().heightIn(min = 104.dp).clip(RoundedCornerShape(12.dp)).background(Am.Card).clickable(onClick = onClick).padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(Modifier.size(56.dp).background(Am.Navy, CircleShape), contentAlignment = Alignment.Center) {
+        Box(Modifier.size(56.dp).alpha(if (missing) 0.45f else 1f).background(Am.Navy, CircleShape), contentAlignment = Alignment.Center) {
             Icon(icon, null, Modifier.size(28.dp), tint = Am.OnNavy)
         }
         Spacer(Modifier.width(16.dp))
         Column(Modifier.weight(1f)) {
-            Text(title, color = Am.Navy, fontSize = 19.sp, fontWeight = FontWeight.Bold)
+            Text(title, Modifier.alpha(if (missing) 0.45f else 1f), color = Am.Navy, fontSize = 19.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(4.dp))
-            Text(about, color = Am.HomeDim, fontSize = 15.sp, lineHeight = 20.sp)
+            Box(Modifier.fillMaxWidth()) {
+                Text(about, if (missing) Modifier.alpha(0f).clearAndSetSemantics {} else Modifier, color = Am.HomeDim, fontSize = 15.sp, lineHeight = 20.sp)
+                if (missing) Text(
+                    if (engine is Engine.Getting) stringResource(R.string.tools_download_progress, engine.percent)
+                    else stringResource(R.string.tools_download_addon, (VideoDownloader.downloadBytes / (1024f * 1024f)).roundToInt()),
+                    Modifier.matchParentSize(), color = Am.Accent, fontSize = 15.sp, lineHeight = 20.sp,
+                    fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
-        Icon(HomeIcons.ChevronRight, null, Modifier.size(24.dp), tint = Am.HomeMid)
+        Icon(HomeIcons.ChevronRight, null, Modifier.size(24.dp).alpha(if (missing) 0.45f else 1f), tint = Am.HomeMid)
     }
 }
 
 @Composable
-internal fun ToolSheet(title: String, onBack: () -> Unit, bottom: @Composable ColumnScope.() -> Unit = {}, content: @Composable ColumnScope.() -> Unit) {
+private fun ToolsFooter() {
+    val links = LocalUriHandler.current
+    val github = stringResource(R.string.tools_github)
+    val form = stringResource(R.string.tools_form)
+    val message = stringResource(R.string.tools_suggestions, github, form)
+    val style = TextLinkStyles(style = SpanStyle(color = Am.Navy, textDecoration = TextDecoration.Underline))
+    val text = buildAnnotatedString {
+        append(message)
+        listOf(github to "https://github.com/Comett1225/AbsentMotion/issues/new/choose", form to "https://forms.gle/6bY8KBPMKc2iUypV6").forEach { (label, url) ->
+            val start = message.indexOf(label)
+            if (start >= 0) addLink(LinkAnnotation.Clickable(url, style) { runCatching { links.openUri(url) } }, start, start + label.length)
+        }
+    }
+    Text(stringResource(R.string.tools_more), color = Am.HomeDim, fontSize = 13.sp, lineHeight = 18.sp)
+    Spacer(Modifier.height(6.dp))
+    Text(text, color = Am.HomeDim, fontSize = 13.sp, lineHeight = 18.sp)
+}
+
+@Composable
+internal fun ToolSheet(title: String, onBack: () -> Unit, bounded: Boolean = false, bottom: @Composable ColumnScope.() -> Unit = {}, content: @Composable ColumnScope.() -> Unit) {
     Dialog(onBack, sheetDialogProperties()) {
-        PhoneScreen {
+        val body: @Composable () -> Unit = {
             DialogStatusBarIcons(darkIcons = Am.Card.luminance() > 0.5f)
             Column(Modifier.fillMaxSize().background(Am.SheetBg).navigationBarsPadding()) {
                 TitleBar(title, ExportIcons.Back, stringResource(R.string.home_back), onBack)
@@ -153,6 +223,9 @@ internal fun ToolSheet(title: String, onBack: () -> Unit, bottom: @Composable Co
                 bottom()
             }
         }
+        if (bounded) Box(Modifier.fillMaxSize().background(Am.SheetBg), contentAlignment = Alignment.Center) {
+            Box(Modifier.widthIn(max = 560.dp).fillMaxSize()) { body() }
+        } else PhoneScreen { body() }
     }
 }
 
@@ -249,6 +322,7 @@ private fun problem(e: Exception): Int = (e as? DownloadProblem)?.text ?: R.stri
 
 @Composable
 private fun DownloaderScreen(store: ProjectStore, settings: AppSettings, onOpen: (String) -> Unit, onCompress: (Uri) -> Unit, onClose: () -> Unit) {
+    val storage = app.absentmotion.platform.rememberStorageAccess()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var text by rememberSaveable { mutableStateOf("") }
@@ -316,6 +390,7 @@ private fun DownloaderScreen(store: ProjectStore, settings: AppSettings, onOpen:
 
     fun startDownload() {
         val target = checked ?: return
+        if (!storage.ready { startDownload() }) return
         fetch = Fetch.Running(0)
         work = scope.launch {
             fetch = try {
@@ -339,7 +414,7 @@ private fun DownloaderScreen(store: ProjectStore, settings: AppSettings, onOpen:
     }
 
     val back = { if (running) work?.cancel() ?: Unit else onClose() }
-    ToolSheet(stringResource(R.string.tools_downloader), back, bottom = {
+    ToolSheet(stringResource(R.string.tools_downloader), back, bounded = true, bottom = {
         val view = LocalView.current
         DisposableEffect(running) {
             view.keepScreenOn = running

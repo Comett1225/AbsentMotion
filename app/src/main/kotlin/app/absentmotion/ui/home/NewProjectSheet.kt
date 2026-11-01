@@ -117,9 +117,9 @@ private val Aspects = listOf(
 
 private const val CUSTOM = "custom"
 
-private class Form(saved: NewProjectChoice, val titles: List<String>, val names: DefaultNames) {
-    var element by mutableStateOf(false)
-    var name by mutableStateOf(names.of(false, titles))
+private class Form(saved: NewProjectChoice, val titles: List<String>, val names: DefaultNames, initialElement: Boolean) {
+    var element by mutableStateOf(initialElement)
+    var name by mutableStateOf(names.of(initialElement, titles))
     var aspect by mutableStateOf(saved.aspect)
     var resolution by mutableIntStateOf(saved.resolution)
     var customW by mutableStateOf(saved.customWidth.toString())
@@ -191,12 +191,14 @@ fun NewProjectSheet(
     store: ProjectStore,
     settings: AppSettings,
     existingTitles: List<String>,
+    initialElement: Boolean,
+    opening: Int,
     onClose: () -> Unit,
     onOpen: (String) -> Unit,
 ) {
     BackHandler(onBack = onClose)
     val context = LocalContext.current
-    val form = remember { Form(settings.newProject, existingTitles, DefaultNames(context)) }
+    val form = remember(opening) { Form(settings.newProject, existingTitles, DefaultNames(context), initialElement) }
     val scope = rememberCoroutineScope()
     var creating by remember { mutableStateOf(false) }
     Box(Modifier.fillMaxSize()) {

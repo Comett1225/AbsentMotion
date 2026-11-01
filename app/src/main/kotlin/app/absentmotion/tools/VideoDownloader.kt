@@ -25,6 +25,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -65,6 +67,8 @@ object VideoDownloader {
         23_027_305, "423c80b957330cf0ebb92b9b20f2294c292144a441bdb0ceb8c69d14928e569b",
     )
     private val lock = Mutex()
+    private val changes = MutableStateFlow(0)
+    val revision = changes.asStateFlow()
     @Volatile private var running = false
     @Volatile private var restartNeeded = false
 
@@ -87,6 +91,7 @@ object VideoDownloader {
         folder(context).deleteRecursively()
         prefs(context).edit().clear().apply()
         if (running) restartNeeded = true
+        changes.value += 1
     }
 
     suspend fun install(context: Context, progress: (Float) -> Unit) = withContext(Dispatchers.IO) {

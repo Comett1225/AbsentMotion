@@ -2030,4 +2030,10 @@
     <string name="screenshot_saved">Saved to the gallery and added as a new layer</string>
     <string name="screenshot_failed">The screenshot could not be made</string>
     <string name="screenshot_outside">Move the playhead onto the clip first</string>
+    <string name="tools_download_addon">Download (%1$d MB)</string>
+    <string name="tools_download_progress">Downloading %1$d%%</string>
+    <string name="tools_more">More tools will appear in future updates...</string>
+    <string name="tools_suggestions">Got any tool suggestions? Leave it on %1$s, or %2$s!</string>
+    <string name="tools_github">GitHub</string>
+    <string name="tools_form">the Form</string>
 </resources>

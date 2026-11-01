@@ -134,6 +134,7 @@ private val FactText get() = Am.HomeDim
 private val MenuScrim get() = Am.MenuScrim
 private val BarHeight = 72.dp
 private val PlusOverhang = 16.dp
+internal fun newProjectIsAsset(page: Int, tab: Int) = page == 0 && tab == 1
 internal fun dateHeader(locale: Locale): DateTimeFormatter =
     if (locale.language == "en") DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.ENGLISH)
     else DateTimeFormatter.ofLocalizedDate(java.time.format.FormatStyle.LONG).withLocale(locale)
@@ -166,6 +167,9 @@ fun HomeScreen(
     var tab by rememberSaveable { mutableIntStateOf(0) }
     var page by rememberSaveable { mutableIntStateOf(0) }
     var creating by remember { mutableStateOf(false) }
+    var opening by remember { mutableIntStateOf(0) }
+    var initialElement by remember { mutableStateOf(false) }
+    val newProject = { initialElement = newProjectIsAsset(page, tab); opening++; creating = true }
     var duplicating by remember { mutableStateOf(false) }
     var search by remember { mutableStateOf<String?>(null) }
     val query = app.absentmotion.ui.editor.debounced(search.orEmpty())
@@ -196,7 +200,7 @@ fun HomeScreen(
     ) {
         Box(Modifier.fillMaxSize().background(Am.HomeBg)) {
             Column(Modifier.fillMaxSize().statusBarsPadding()) {
-                if (wide) WideHeader(page, tab, { p, t -> page = p; tab = t; if (p == 2) search = null }, onSettings = { scope.launch { drawer.open() } }, onNew = { creating = true }, search, { search = it })
+                if (wide) WideHeader(page, tab, { p, t -> page = p; tab = t; if (p == 2) search = null }, onSettings = { scope.launch { drawer.open() } }, onNew = newProject, search, { search = it })
                 else TopBar(onMenu = { scope.launch { drawer.open() } }, search, page, { search = it })
                 val narrow = Modifier.weight(1f).then(if (wide) Modifier.widthIn(max = 760.dp).align(Alignment.CenterHorizontally) else Modifier)
                 if (page == 2) ToolsTab(narrow, store, settings) { id -> version++; onOpen(id) }
@@ -220,11 +224,11 @@ fun HomeScreen(
                 )
                 Spacer(Modifier.height(if (wide) navInset else BarHeight + navInset))
             }
-            if (!wide) BottomBar(onNew = { creating = true }, page, { page = it; if (it == 2) search = null }, Modifier.align(Alignment.BottomCenter), navInset)
+            if (!wide) BottomBar(onNew = newProject, page, { page = it; if (it == 2) search = null }, Modifier.align(Alignment.BottomCenter), navInset)
             if (toReport.isNotEmpty()) ImportDialog(toReport, onDismiss = onImportShown, onOpen = { onImportShown(); toReport.first().let { if (it.template) onTemplate(it.id) else onOpen(it.id) } })
             Presence(creating) {
                 NewProjectSheet(
-                    store, settings, projects.map { it.title }, onClose = { creating = false },
+                    store, settings, projects.map { it.title }, initialElement, opening, onClose = { creating = false },
                     onOpen = { id -> version++; onOpen(id) },
                 )
             }

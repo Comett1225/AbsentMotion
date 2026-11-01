@@ -180,7 +180,9 @@ class UiContracts(unittest.TestCase):
         self.assertIn('listOf(PanelIcons.TabMove, PanelIcons.TabRotate, PanelIcons.TabSize, PanelIcons.TabTilt, PanelIcons.TabSkew, PanelIcons.TabPivot)', text)
         self.assertIn('KeyTarget(PropRef.Location, "0.000000,0.000000,0.000000"),\n    KeyTarget(PropRef.Rotation, "0.000000"),\n    KeyTarget(PropRef.Scale, "1.000000,1.000000"),\n    KeyTarget(PropRef.Tilt, "0.000000,0.000000"),', text)
         self.assertIn('KeyTarget(PropRef.Pivot, "0.000000,0.000000,0.000000"),', text)
-        self.assertIn('1 -> l.withRotation(0f)\n                2 -> if (l.kind == "camera") l.withCameraFov(60f) else l.withTransform("scale", 1f, 1f)\n                3 -> l.withTilt(0f, 0f)', source('editor/EditorActions.kt'))
+        reset = source('editor/EditorActions.kt').split('internal fun Scene.resetTransform', 1)[1].split('\nfun EditorState.toggleKeyframe', 1)[0]
+        for tab, ref in [(1, 'PropRef.Rotation'), (2, 'PropRef.Scale'), (3, 'PropRef.Tilt')]:
+            self.assertTrue(any(line.strip().startswith(f'{tab} -> ') and f'resetValue({ref}' in line for line in reset.splitlines()))
         self.assertIn('val usable = i <= SIZE_TAB || selected.kind != "camera"', text)
         self.assertIn('PanelIcon(icon, tint, size = 17.dp)\n                            Text(\n                                stringResource(names[i])', text)
         self.assertIn('2 -> if (layer.kind == "camera") CameraSizeTab(state, layer) else SizeTab(state, layer)', source('ui/editor/panels/MoveTransformPanel.kt'))

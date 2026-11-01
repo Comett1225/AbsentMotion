@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.compose.runtime.snapshotFlow
 import app.absentmotion.export.MediaStoreExport
 import app.absentmotion.export.stillFits
+import app.absentmotion.library.MediaKeeper
 import app.absentmotion.media.mediaDeclaration
 import app.absentmotion.model.Layer
 import app.absentmotion.model.MediaDeclaration
@@ -54,12 +55,15 @@ suspend fun EditorState.screenshotFrame(context: Context, scope: CoroutineScope)
     try {
         if (!engine.stillPng(raw.scene.toXml(), timeMs, raw.width, raw.height, png)) return false
         val name = "Screenshot " + SimpleDateFormat("yyyy-MM-dd HH-mm-ss", Locale.ROOT).format(Date()) + ".png"
-        val store = MediaStoreExport(context)
-        val saved = withContext(Dispatchers.IO) { store.save(null, name, "image/png") { out -> png.inputStream().use { it.copyTo(out) } } }
-        val picture = mediaDeclaration(context, saved) ?: run { withContext(Dispatchers.IO) { store.delete(saved) }; return false }
-        addImage(keepCopy(context, picture))
+        val gallery = MediaStoreExport(context)
+        val saved = withContext(Dispatchers.IO) { gallery.save(null, name, "image/png") { out -> png.inputStream().use { it.copyTo(out) } } }
+        val picture = mediaDeclaration(context, saved) ?: run { withContext(Dispatchers.IO) { gallery.delete(saved) }; return false }
+        val own = withContext(Dispatchers.IO) {
+            runCatching { MediaKeeper(store, { uri -> context.contentResolver.openInputStream(Uri.parse(uri)) }).keep(projectId, picture, scene) }.getOrNull()
+        }
+        addImage(own?.takeIf { store.inMediaFolder(it.uri) } ?: keepCopy(context, picture))
         val added = selectedId ?: return true
-        scope.launch { dropIfRemoved(added, saved, store) }
+        scope.launch { dropIfRemoved(added, saved, gallery) }
         return true
     } finally {
         withContext(Dispatchers.IO) { png.delete() }

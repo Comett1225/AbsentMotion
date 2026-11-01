@@ -107,6 +107,7 @@ private val DiscordNames = listOf(R.string.compress_discord_free, R.string.compr
 @Composable
 internal fun CompressScreen(initial: android.net.Uri? = null, onClose: () -> Unit) {
     val context = LocalContext.current
+    val storage = app.absentmotion.platform.rememberStorageAccess()
     val scope = rememberCoroutineScope()
     var picked by remember { mutableStateOf<PickedMedia?>(null) }
     var unreadable by remember { mutableStateOf(false) }
@@ -175,15 +176,18 @@ internal fun CompressScreen(initial: android.net.Uri? = null, onClose: () -> Uni
             onStart = ::start,
             onCancel = { work?.cancel() },
             onSave = { done ->
-                scope.launch {
-                    try {
-                        val where = saveToGallery(context, done.result)
-                        if (step == done) step = done.copy(saved = true)
-                        Toast.makeText(context, context.getString(R.string.compress_saved_to, where), Toast.LENGTH_SHORT).show()
-                    } catch (e: Exception) {
-                        Toast.makeText(context, context.getString(R.string.compress_save_failed, e.message.orEmpty()), Toast.LENGTH_LONG).show()
+                fun save() {
+                    scope.launch {
+                        try {
+                            val where = saveToGallery(context, done.result)
+                            if (step == done) step = done.copy(saved = true)
+                            Toast.makeText(context, context.getString(R.string.compress_saved_to, where), Toast.LENGTH_SHORT).show()
+                        } catch (e: Exception) {
+                            Toast.makeText(context, context.getString(R.string.compress_save_failed, e.message.orEmpty()), Toast.LENGTH_LONG).show()
+                        }
                     }
                 }
+                if (storage.ready { save() }) save()
             },
             onShare = { done -> runCatching { shareCompressed(context, done.result) } },
         )

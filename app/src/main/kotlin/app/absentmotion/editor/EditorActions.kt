@@ -11,7 +11,7 @@ import kotlin.math.roundToInt
 import app.absentmotion.model.Scene
 import app.absentmotion.model.copyLayers
 import app.absentmotion.model.isMask
-import app.absentmotion.model.withCameraFov
+import app.absentmotion.model.CameraFov
 import app.absentmotion.model.withSplit
 import app.absentmotion.model.pinnedPath
 import app.absentmotion.model.withPinnedClock
@@ -140,19 +140,25 @@ fun EditorState.skipForward() {
 
 fun EditorState.resetTransform(tabs: List<Int>) {
     if (tabs == listOf(5)) return resetPivot()
-    editSelected { layer ->
-        tabs.sortedDescending().fold(layer) { l, tab ->
-            when (tab) {
-                0 -> scene.centred(l, sampleMs)
-                1 -> l.withRotation(0f)
-                2 -> if (l.kind == "camera") l.withCameraFov(60f) else l.withTransform("scale", 1f, 1f)
-                3 -> l.withTilt(0f, 0f)
-                4 -> l.withSkew(0f, 0f)
-                else -> if (l.kind == "camera" || l.node.child("transform")?.child("pivot") == null) l else l.withTransform("pivot", 0f, 0f, 0f)
-            }
+    editSelected { scene.resetTransform(it, sampleMs, tabs) }
+}
+
+internal fun Layer.resetValue(ref: PropRef, value: String): Layer {
+    val element = element(ref) ?: XmlNode(ref.name)
+    return withElement(ref, element.copy(children = element.children.filterNot { it.name == "kf" }).with("value", value))
+}
+
+internal fun Scene.resetTransform(layer: Layer, timeMs: Int, tabs: List<Int>): Layer =
+    tabs.sortedDescending().fold(layer) { l, tab ->
+        when (tab) {
+            0 -> centred(l, timeMs).let { moved -> moved.resetValue(PropRef.Location, formatFloats(moved.location)) }
+            1 -> l.resetValue(PropRef.Rotation, formatFloats(floatArrayOf(0f)))
+            2 -> if (l.kind == "camera") l.resetValue(CameraFov, formatFloats(floatArrayOf(60f))) else l.resetValue(PropRef.Scale, formatFloats(floatArrayOf(1f, 1f)))
+            3 -> l.resetValue(PropRef.Tilt, formatFloats(floatArrayOf(0f, 0f)))
+            4 -> l.resetValue(PropRef.Skew, formatFloats(floatArrayOf(0f, 0f)))
+            else -> if (l.kind == "camera" || l.element(PropRef.Pivot) == null) l else l.resetValue(PropRef.Pivot, formatFloats(floatArrayOf(0f, 0f, 0f)))
         }
     }
-}
 
 fun EditorState.toggleKeyframe() {
     val target = keyTarget ?: return
