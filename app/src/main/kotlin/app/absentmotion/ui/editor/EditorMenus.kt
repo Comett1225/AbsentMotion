@@ -95,6 +95,8 @@ import androidx.compose.ui.window.PopupProperties
 import app.absentmotion.editor.resetTransform
 import app.absentmotion.ui.editor.panels.Turn
 import app.absentmotion.editor.EditorState
+import app.absentmotion.editor.isPlainGroup
+import app.absentmotion.editor.askUngroup
 import app.absentmotion.editor.canPaste
 import app.absentmotion.editor.canSavePreset
 import app.absentmotion.editor.savePreset
@@ -208,10 +210,12 @@ internal fun LayerMenu(state: EditorState, onDismiss: () -> Unit) {
             MenuRow(stringResource(R.string.menu_fit_to_canvas)) { scope.launch { state.compositionArea("fit"); onDismiss() } }
             MenuRow(stringResource(R.string.menu_fill_the_canvas)) { scope.launch { state.compositionArea("fill"); onDismiss() } }
             MenuRow(stringResource(R.string.menu_stretch_to_canvas)) { scope.launch { state.compositionArea("stretch"); onDismiss() } }
-            MenuRow(stringResource(if (state.selected?.node?.get("clippingMask") == "true") R.string.menu_release_clipping_mask else R.string.menu_create_clipping_mask), enabled = state.canClip, divider = true) {
+            val group = state.selected?.isPlainGroup == true && !MultiSelect.active
+            MenuRow(stringResource(if (state.selected?.node?.get("clippingMask") == "true") R.string.menu_release_clipping_mask else R.string.menu_create_clipping_mask), enabled = state.canClip, divider = !group) {
                 state.toggleClippingMask()
                 onDismiss()
             }
+            if (group) MenuRow(stringResource(R.string.layer_tool_ungroup), divider = true) { onDismiss(); state.askUngroup() }
             MenuRow(stringResource(R.string.menu_convert_to_outline), enabled = state.selected?.let { it.kind == "text" || (it.kind == "shape" && it.shape.isNotEmpty()) } == true) {
                 scope.launch { state.convertToOutline(); onDismiss() }
             }

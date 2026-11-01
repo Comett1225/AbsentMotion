@@ -82,8 +82,77 @@ class EditorState(
     val settings: AppSettings,
     val saver: ProjectSaver,
 ) {
-    var scene by mutableStateOf(initial.withMattesFollowing())
+    private var root by mutableStateOf(initial.withMattesFollowing())
+
+    var groupPath by mutableStateOf<List<Long>>(emptyList())
         private set
+
+    val project: Scene get() = root
+
+    private var focusFor: Pair<Scene, List<Long>>? = null
+    private var focusScene: Scene? = null
+
+    val scene: Scene
+        get() {
+            val path = groupPath
+            val whole = root
+            if (path.isEmpty()) return whole
+            val cached = focusFor
+            if (cached != null && cached.first.node === whole.node && cached.second == path) focusScene?.let { return it }
+            return (whole.focused(path) ?: whole).also { focusFor = whole to path; focusScene = it }
+        }
+
+    val inGroup: Boolean get() = groupPath.isNotEmpty()
+
+    val groupNames: List<String>
+        get() {
+            var inner = root
+            return groupPath.map { id -> inner.layer(id)?.also { l -> l.nested?.let { inner = it } }?.label.orEmpty() }
+        }
+
+    fun exitTo(depth: Int) { while (groupPath.size > depth.coerceAtLeast(0)) exitGroup() }
+
+    fun enterGroup(id: Long) {
+        val group = scene.layer(id)?.takeIf { it.isPlainGroup } ?: return
+        val inner = group.nested ?: return
+        endGesture()
+        playing = false
+        val hostMs = timeMs
+        MultiSelect.clear()
+        selectedId = null
+        panel = EditorPanel.Tools
+        groupPath = groupPath + id
+        frame = inner.frameAt((hostMs - group.startTime).coerceIn(0, inner.totalTime)).coerceIn(0, maxOf(scene.lastFrame, 0))
+        engine.setScene(scene)
+    }
+
+    fun exitGroup() {
+        val id = groupPath.lastOrNull() ?: return
+        endGesture()
+        playing = false
+        val innerMs = timeMs
+        MultiSelect.clear()
+        panel = EditorPanel.Tools
+        groupPath = groupPath.dropLast(1)
+        val group = scene.layer(id)
+        selectedId = group?.id
+        frame = scene.frameAt((group?.startTime ?: 0) + innerMs).coerceIn(0, maxOf(scene.lastFrame, 0))
+        engine.setScene(scene)
+    }
+
+    fun leaveGroups() { while (groupPath.isNotEmpty()) exitGroup() }
+
+    var ungroupAsk by mutableStateOf(false)
+
+    val exportFrame: Int
+        get() {
+            if (groupPath.isEmpty()) return frame
+            var ms = timeMs
+            var inner = root
+            val offsets = groupPath.map { id -> inner.layer(id)!!.also { inner = it.nested ?: inner }.startTime }
+            ms += offsets.sum()
+            return root.frameAt(ms).coerceIn(0, maxOf(root.lastFrame, 0))
+        }
 
     private var selection by mutableStateOf<Long?>(null)
 
@@ -185,7 +254,7 @@ class EditorState(
 
     var addingMedia by mutableStateOf(false)
 
-    private val history = EditHistory({ scene }, ::apply)
+    private val history = EditHistory({ root }, ::apply)
 
     val selected: Layer? get() = selectedId?.let { scene.layerAt(it, sampleMs) }
 
@@ -216,8 +285,10 @@ class EditorState(
         }
 
     private fun show(next: Scene, xml: Lazy<String>) {
+        val path = groupPath
+        val shown = if (path.isEmpty()) next else next.focused(path) ?: next
         val change = previewChange
-        if (change == null) engine.setScene(next, xml) else engine.setScene(change(next))
+        if (change == null) engine.setScene(shown, if (shown.node === next.node) xml else lazy { shown.toXml() }) else engine.setScene(change(shown))
     }
 
     var volumeOpen by mutableStateOf(false)
@@ -235,7 +306,7 @@ class EditorState(
     fun edit(key: Any? = null, change: (Scene) -> Scene) {
         Glide.interrupt()
         val before = scene
-        history.edit(key, change(before).withMattesFollowing(before))
+        history.edit(key, root.withFocused(groupPath, change(before).withMattesFollowing(before)))
     }
 
     fun endGesture() {
@@ -243,8 +314,8 @@ class EditorState(
         val ended = history.endGesture()
         if (pending || ended) {
             dropDraft()
-            val xml = scene.toXml()
-            if (pending) show(scene, lazyOf(xml))
+            val xml = root.toXml()
+            if (pending) show(root, lazyOf(xml))
             if (ended) saver.commit(xml) else saver.draft(xml)
         }
         saver.flush()
@@ -270,9 +341,9 @@ class EditorState(
 
     val gestureOpen: Boolean get() = history.gesturing
 
-    fun amend(next: Scene) = history.amend(next.withMattesFollowing(scene))
+    fun amend(next: Scene) = history.amend(root.withFocused(groupPath, next.withMattesFollowing(scene)))
 
-    internal fun forgetEdit(after: Scene?): Boolean = history.forget(after)
+    internal fun forgetEdit(after: Scene?): Boolean = after != null && scene.node === after.node && history.forget(root)
 
     fun editSelected(key: Any? = null, change: (Layer) -> Layer) {
         val id = selectedId ?: return
@@ -308,12 +379,14 @@ class EditorState(
 
     private fun apply(next: Scene, save: Boolean) {
         val previous = scene
-        scene = next
-        if (MultiSelect.active) MultiSelect.ids = MultiSelect.ids.filter { next.layer(it) != null }.toSet()
+        root = next
+        groupPath = next.openablePath(groupPath)
+        val now = scene
+        if (MultiSelect.active) MultiSelect.ids = MultiSelect.ids.filter { now.layer(it) != null }.toSet()
         canUndo = history.canUndo
         canRedo = history.canRedo
-        if (selectedId != null && next.layer(selectedId!!) == null) selectedId = null
-        frame = keptFrame(previous, next, frame)
+        if (selectedId != null && now.layer(selectedId!!) == null) selectedId = null
+        frame = keptFrame(previous, now, frame)
         if (!save) {
             if (drafted == null) Choreographer.getInstance().postFrameCallback(sendDraft)
             drafted = next

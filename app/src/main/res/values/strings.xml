@@ -1055,6 +1055,10 @@
     <string name="layer_tool_edit_text">Edit Text</string>
     <string name="layer_tool_edit_points">Edit Points</string>
     <string name="layer_tool_edit_drawing">Edit Drawing</string>
+    <string name="layer_tool_edit_group">Edit Group</string>
+    <string name="layer_tool_ungroup">Ungroup</string>
+    <string name="group_leave">Leave group</string>
+    <string name="ungroup_loses_style">Ungrouping removes the group\'s own effects, speed, opacity and blending. Its layers keep their place and look.</string>
     <string name="layer_tool_camera_options">Camera Options</string>
     <string name="layer_tool_voice_filters">Voice filters</string>
     <string name="effects_category_audio">Audio</string>

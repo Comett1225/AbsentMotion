@@ -14,6 +14,11 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -75,7 +80,8 @@ fun EditorTopBar(state: EditorState, onExit: () -> Unit, modifier: Modifier = Mo
     }
     val cell = Modifier.width(40.dp).fillMaxHeight()
     Row(modifier.animatedBackground(color), verticalAlignment = Alignment.CenterVertically) {
-        BarButton(
+        val crumbs = layer == null && state.inGroup
+        if (!crumbs) BarButton(
             if (layer == null) ChromeIcons.Exit else ChromeIcons.Back,
             stringResource(if (layer == null) R.string.topbar_exit_to_project_list else R.string.topbar_back), cell.tutorialTarget(if (layer == null) null else "back"),
         ) {
@@ -83,6 +89,25 @@ fun EditorTopBar(state: EditorState, onExit: () -> Unit, modifier: Modifier = Mo
         }
         if (inPanel) {
             Text(stringResource(state.panel.title), Modifier.weight(1f).enterFade(), color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
+        } else if (crumbs) {
+            val names = state.groupNames
+            Row(Modifier.weight(1f).padding(start = 8.dp).enterFade(), verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    Modifier.weight(1f, fill = false).clip(RoundedCornerShape(6.dp)).background(Am.Field).clickable { act { state.leaveGroups() } }
+                        .padding(horizontal = 6.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(SelectionIcons.ToProject, stringResource(R.string.group_leave), Modifier.size(16.dp), tint = Am.OnDark)
+                    Spacer(Modifier.width(4.dp))
+                    Text(state.project.title, color = Am.OnDark, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                }
+                names.forEachIndexed { i, name ->
+                    Icon(SelectionIcons.Previous, null, Modifier.padding(horizontal = 4.dp).size(16.dp), tint = Am.OnDarkDim)
+                    val last = i == names.lastIndex
+                    Text(name, (if (last) Modifier else Modifier.clickable { act { state.exitTo(i + 1) } }).weight(1f, fill = false),
+                        color = if (last) Am.OnDark else Am.OnDarkDim, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                }
+            }
         } else {
             key(layer?.id) {
                 val id = layer?.id
@@ -92,7 +117,7 @@ fun EditorTopBar(state: EditorState, onExit: () -> Unit, modifier: Modifier = Mo
             }
         }
         if (layer == null) {
-            BarButton(ChromeIcons.Gear, stringResource(R.string.topbar_project_settings), cell.enterFade().tutorialTarget("gear")) { act { settingsOpen = true } }
+            if (!state.inGroup) BarButton(ChromeIcons.Gear, stringResource(R.string.topbar_project_settings), cell.enterFade().tutorialTarget("gear")) { act { settingsOpen = true } }
             BarButton(ChromeIcons.Share, stringResource(R.string.topbar_export_share), cell.enterFade().tutorialTarget("export")) { act { state.playing = false; state.exportOpen = true } }
         } else if (!inPanel) {
             Spacer(Modifier.width(5.dp))

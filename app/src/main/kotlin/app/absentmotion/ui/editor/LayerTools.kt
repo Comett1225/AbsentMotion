@@ -45,6 +45,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
+import app.absentmotion.editor.isPlainGroup
+import app.absentmotion.editor.ungroupSelected
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -140,6 +142,13 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
         ElementProperties(state, { properties = false }, modifier)
         return
     }
+    if (state.ungroupAsk) androidx.compose.material3.AlertDialog(
+        onDismissRequest = { state.ungroupAsk = false },
+        text = { Text(stringResource(R.string.ungroup_loses_style), color = Am.OnDark) },
+        confirmButton = { androidx.compose.material3.TextButton({ state.ungroupAsk = false; state.ungroupSelected() }) { Text(stringResource(R.string.layer_tool_ungroup), color = Am.Accent) } },
+        dismissButton = { androidx.compose.material3.TextButton({ state.ungroupAsk = false }) { Text(stringResource(R.string.cancel), color = Am.Accent) } },
+        containerColor = Am.Field,
+    )
     Column(modifier.background(Am.Panel).verticalScroll(rememberScrollState()).padding(start = 62.px, top = 42.px, end = 62.px)) {
         Row(Modifier.fillMaxWidth().height(107.px)) {
             SmallTool(PanelIcons.Speed, stringResource(R.string.a11y_speed), Modifier.width(183.px), ToolShape, enabled = state.selected?.mediaFill?.video == true || state.selected?.kind == "audio") { state.panel = EditorPanel.Speed }
@@ -191,7 +200,8 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
                 val edit = when {
                     kind == "text" -> Tile(EditText) { state.panel = EditorPanel.EditText }
                     kind == "embedScene" -> if (state.selected?.link != null) Tile(ElementPropsButton) { properties = true }
-                        else if (state.selected?.cutoutEdge != null) Tile(CutoutEdge) { state.panel = EditorPanel.Edge } else null
+                        else if (state.selected?.cutoutEdge != null) Tile(CutoutEdge) { state.panel = EditorPanel.Edge }
+                        else if (state.selected?.isPlainGroup == true) Tile(EditGroup) { state.selectedId?.let(state::enterGroup) } else null
                     kind == "drawing" -> Tile(EditDrawing) { state.editDrawing() }
                     drawn -> Tile(EditPoints, enabled = state.selected?.contours != null) { state.editPoints() }
                     else -> Tile(EditShape) { state.panel = EditorPanel.EditShape }
@@ -293,6 +303,7 @@ private val Crop = Tool(R.string.layer_tool_crop, PanelIcons.Crop, 18.1f)
 private val CaptionTools = Tool(R.string.auto_captions, ChromeIcons.Captions, 19.4f)
 private val AiTools = Tool(R.string.ai, PanelIcons.Bot, 19.4f)
 private const val ToolPageSnapMs = 120
+private val EditGroup = Tool(R.string.layer_tool_edit_group, SelectionIcons.EnterGroup, 18.1f)
 private val CutoutEdge = Tool(R.string.cutout_edge, PanelIcons.TabBorder, 18.1f)
 private val ReverseTool = Tool(R.string.speed_reverse, PanelIcons.Reverse, 19.4f)
 private val ScreenshotTool = Tool(R.string.layer_tool_screenshot, PanelIcons.Screenshot, 19.4f)

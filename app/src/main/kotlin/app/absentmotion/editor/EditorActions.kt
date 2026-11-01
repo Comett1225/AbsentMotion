@@ -68,7 +68,7 @@ fun EditorState.addShape(def: ShapeDef) {
 fun EditorState.stepBack(): Boolean {
     when {
         MultiSelect.active -> MultiSelect.clear()
-        selectedId == null -> return false
+        selectedId == null -> if (inGroup) exitGroup() else return false
         easingOpen -> easingOpen = false
         panel == EditorPanel.Effects && effectIndex >= 0 -> effectIndex = -1
         panel != EditorPanel.Tools -> panel = EditorPanel.Tools

@@ -136,6 +136,7 @@ class DeskAppState {
         state.playing = false
         PreviewCache.remove()
         state.endGesture()
+        state.leaveGroups()
         val scene = state.scene
         try {
             withContext(Dispatchers.IO) { runCatching { state.saver.flush().get() } }
@@ -252,14 +253,14 @@ fun DeskApp(app: DeskAppState) {
                     CompositionLocalProvider(LocalDensity provides Density(density.density, density.fontScale.coerceAtMost(1.3f))) {
                         key(open) { Ltr { EditorScreen(open, onExit = { scope.launch { app.closeEditor() } }) } }
                     }
-                    if (open.exportOpen) ExportScreen(open.scene, open.frame, app.engine, fromProjectList = false, null) { open.exportOpen = false }
+                    if (open.exportOpen) ExportScreen(open.project, open.exportFrame, app.engine, fromProjectList = false, null) { open.exportOpen = false }
                 }
             }
             if (app.opening) OpeningOverlay { app.job?.cancel() }
             app.openFailed?.let { id -> OpenFailedDialog({ app.openFailed = null; app.historyFor = Triple(id, "", false) }, null) { app.openFailed = null } }
             app.importFailed?.let { reason -> AlertDialog(onDismissRequest = { app.importFailed = null }, text = { Text(stringResource(R.string.home_import_failed, reason), color = Am.Navy) },
                 confirmButton = { TextButton({ app.importFailed = null }) { Text(stringResource(R.string.ok), color = Am.Navy) } }, containerColor = Am.Card) }
-            if (open?.historyOpen == true) VersionHistory(app.store, open.projectId, open.scene.title, app.engine, onRestore = { v -> scope.launch { app.restoreVersion(open.projectId, v) } }, editor = true) { open.historyOpen = false }
+            if (open?.historyOpen == true) VersionHistory(app.store, open.projectId, open.project.title, app.engine, onRestore = { v -> scope.launch { app.restoreVersion(open.projectId, v) } }, editor = true) { open.historyOpen = false }
             app.historyFor?.let { (id, title, _) ->
                 VersionHistory(app.store, id, title, app.engine, onRestore = { v -> scope.launch { app.restoreVersion(id, v) } }) { app.historyFor = null }
             }

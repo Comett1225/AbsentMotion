@@ -162,7 +162,7 @@ class MainActivity : ComponentActivity() {
         templates = TemplateStore(this)
         recovery = Recovery(File(filesDir, "recovery"))
         CrashLogs.install(this)
-        RecoveryHandler.install(recovery) { editor?.let { it.projectId to it.scene.toXml() } }
+        RecoveryHandler.install(recovery) { editor?.let { it.projectId to it.project.toXml() } }
         val reopen = savedInstanceState?.getString(OPEN_PROJECT)
         lifecycleScope.launch {
             val (offer, crash) = withContext(DiskThread.dispatcher) { runCatching { recovery.pending(store) }.getOrNull() to runCatching { CrashLogs.collect(applicationContext) }.getOrNull() }
@@ -189,7 +189,7 @@ class MainActivity : ComponentActivity() {
             runCatching { app.absentmotion.ai.AiModel.dropReplaced(applicationContext) }
         }
         val openElement: (String) -> Unit = { id ->
-            editor?.let { it.playing = false; it.endGesture(); it.saver.snapshot(it.scene.toXml()) }
+            editor?.let { it.playing = false; it.endGesture(); it.saver.snapshot(it.project.toXml()) }
             MultiSelect.clear()
             open(id)
         }
@@ -271,7 +271,7 @@ class MainActivity : ComponentActivity() {
                                 key(open) { Ltr { EditorScreen(open, onExit = ::closeEditor) } }
                             }
                         }
-                        if (open.exportOpen) ExportScreen(open.scene, open.frame, engine, fromProjectList = false, outdated) { open.exportOpen = false }
+                        if (open.exportOpen) ExportScreen(open.project, open.exportFrame, engine, fromProjectList = false, outdated) { open.exportOpen = false }
                     }
                 }
                 if (opening || openingProject) OpeningOverlay { openJob?.cancel() }
@@ -307,7 +307,7 @@ class MainActivity : ComponentActivity() {
                     dismissButton = { TextButton({ saveFailed = false; closeAnyway = true; closeEditor() }) { Text(stringResource(R.string.home_save_failed_leave), color = Am.Accent) } },
                     containerColor = Am.Field, textContentColor = Am.OnDark,
                 )
-                if (open?.historyOpen == true) VersionHistory(store, open.projectId, open.scene.title, engine, onRestore = { restoreVersion(open.projectId, it) }, editor = true) { open.historyOpen = false }
+                if (open?.historyOpen == true) VersionHistory(store, open.projectId, open.project.title, engine, onRestore = { restoreVersion(open.projectId, it) }, editor = true) { open.historyOpen = false }
                 historyFor?.let { (id, title, damaged) ->
                     VersionHistory(store, id, title, engine, onRestore = { restoreVersion(id, it) }, onDelete = if (damaged) { { deleteDamaged(id) } } else null) { historyFor = null }
                 }
@@ -385,7 +385,7 @@ class MainActivity : ComponentActivity() {
         val library = engine.fonts ?: return
         if (state.projectId in fontsDeclined) return
         lifecycleScope.launch {
-            val missing = withContext(Dispatchers.IO) { state.scene.fontNames().filter { FontName.parse(it).source == "googlefonts" && library.localFile(it) == null } }
+            val missing = withContext(Dispatchers.IO) { state.project.fontNames().filter { FontName.parse(it).source == "googlefonts" && library.localFile(it) == null } }
             if (missing.isNotEmpty() && editor === state) fontOffer = state to missing
         }
     }
@@ -594,6 +594,7 @@ class MainActivity : ComponentActivity() {
         closing.playing = false
         app.absentmotion.editor.PreviewCache.remove()
         closing.endGesture()
+        closing.leaveGroups()
         val scene = closing.scene
         lifecycleScope.launch {
             withContext(Dispatchers.IO) { runCatching { closing.saver.flush().get() } }
