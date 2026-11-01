@@ -192,6 +192,12 @@ fun ExportMediaPreview(kind: app.absentmotion.export.ExportKind, uris: List<Uri>
 
 fun effectsMessageOnHome() = false
 
+object PlatformFeatures {
+    const val ai = true
+    const val camera = true
+    const val tools = true
+}
+
 internal const val CAPTION_MODEL_NAME = "ggml-base-q5_1.bin"
 internal const val CAPTION_MODEL_BYTES = 59_707_625L
 internal fun loadCaptionLibrary() {

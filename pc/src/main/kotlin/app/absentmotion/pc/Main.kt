@@ -51,7 +51,8 @@ fun main(args: Array<String>) {
         val state = rememberWindowState(position = WindowPosition(x.dp, y.dp), width = width.dp, height = height.dp)
         val desk = remember { DeskAppState() }
         Window(onCloseRequest = { exitApplication() }, title = "AbsentMotion", state = state,
-            onPreviewKeyEvent = { it.type == KeyEventType.KeyDown && it.key == Key.Escape && DeskBack.back() }) {
+            onPreviewKeyEvent = { it.type == KeyEventType.KeyDown && it.key == Key.Escape && DeskBack.back() },
+            onKeyEvent = { app.absentmotion.desk.DeskKeys.handle(desk, it) }) {
             DeskFiles.window = window
             DisposableEffect(window) {
                 val listener = object : ComponentAdapter() {

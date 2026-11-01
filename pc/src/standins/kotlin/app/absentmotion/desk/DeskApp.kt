@@ -5,6 +5,9 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
+import androidx.compose.foundation.draganddrop.dragAndDropTarget
+import androidx.compose.ui.draganddrop.awtTransferable
+import android.content.mime
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -190,6 +193,7 @@ class DeskAppState {
     }
 }
 
+@OptIn(androidx.compose.ui.ExperimentalComposeUiApi::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun DeskApp(app: DeskAppState) {
     val scope = rememberCoroutineScope()
@@ -216,7 +220,8 @@ fun DeskApp(app: DeskAppState) {
     val density = LocalDensity.current
     val homePress = remember(Am.PressHome) { PressIndication(Am.PressHome) }
     val editorPress = remember(Am.PressEditor) { PressIndication(Am.PressEditor) }
-    BoxWithConstraints(Modifier.fillMaxSize().background(if (open == null) Am.HomeBg else Am.TopBar)) {
+    val drop = remember(app) { DeskDrop(app) { block -> run(block) } }
+    BoxWithConstraints(Modifier.fillMaxSize().background(if (open == null) Am.HomeBg else Am.TopBar).dragAndDropTarget(shouldStartDragAndDrop = { true }, target = drop)) {
         val config = remember(maxWidth, maxHeight) {
             android.content.res.Configuration().apply {
                 screenWidthDp = maxWidth.value.toInt(); screenHeightDp = maxHeight.value.toInt()
@@ -259,6 +264,23 @@ fun DeskApp(app: DeskAppState) {
             }
             ToastHost(Modifier.align(Alignment.BottomCenter))
         }
+    }
+}
+
+@OptIn(androidx.compose.ui.ExperimentalComposeUiApi::class)
+private class DeskDrop(private val app: DeskAppState, private val run: (suspend () -> Unit) -> Unit) : androidx.compose.ui.draganddrop.DragAndDropTarget {
+    override fun onDrop(event: androidx.compose.ui.draganddrop.DragAndDropEvent): Boolean {
+        val transfer = event.awtTransferable
+        if (!transfer.isDataFlavorSupported(java.awt.datatransfer.DataFlavor.javaFileListFlavor)) return false
+        val files = (runCatching { transfer.getTransferData(java.awt.datatransfer.DataFlavor.javaFileListFlavor) as List<*> }.getOrNull() ?: return false).filterIsInstance<java.io.File>().filter { it.isFile }
+        if (files.isEmpty()) return false
+        val uris = files.map(Uri::fromFile)
+        if (app.editor == null) { run { app.importFiles(uris) }; return true }
+        val sounds = uris.filter { android.content.Desk.mime(it.toString())?.startsWith("audio/") == true }
+        val pictures = uris - sounds.toSet()
+        if (pictures.isNotEmpty()) MediaPicks.addPictures(pictures)
+        if (sounds.isNotEmpty()) MediaPicks.addSounds(sounds)
+        return true
     }
 }
 

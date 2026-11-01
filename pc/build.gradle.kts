@@ -14,7 +14,7 @@ val phoneOnly = listOf(
     "app/absentmotion/i18n/AppLanguage.kt", "app/absentmotion/i18n/UiText.kt",
     "app/absentmotion/ui/home/UpdateDialog.kt", "app/absentmotion/media/VideoLibrary.kt",
     "app/absentmotion/ui/home/Updater.kt", "app/absentmotion/ui/home/UpdateVerify.kt", "app/absentmotion/ui/home/UnsupportedPhone.kt",
-    "app/absentmotion/export/ExportService.kt", "app/absentmotion/ui/tutorial/Grip.kt", "app/absentmotion/ui/editor/panels/EffectRuler.kt",
+    "app/absentmotion/export/ExportService.kt", "app/absentmotion/ui/tutorial/Grip.kt", "app/absentmotion/ui/home/HelpScreen.kt", "app/absentmotion/ui/editor/panels/EffectRuler.kt",
 )
 
 val androidJar = (System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT") ?: rootDir.resolve("../local.properties").takeIf { it.isFile }?.readLines()?.firstOrNull { it.startsWith("sdk.dir=") }?.substringAfter("=") ?: "${System.getProperty("user.home")}/Library/Android/sdk")
