@@ -411,7 +411,7 @@ internal fun DateLabel(text: String, first: Boolean) {
     Text(text, Modifier.padding(top = if (first) 0.dp else 12.dp, bottom = 12.dp), color = Am.Navy, fontSize = 15.sp, lineHeight = 19.sp)
 }
 
-private fun listRows(list: List<ProjectInfo>, byName: Boolean, dates: DateTimeFormatter): List<ListRow> =
+internal fun listRows(list: List<ProjectInfo>, byName: Boolean, dates: DateTimeFormatter): List<ListRow> =
     if (byName) {
         list.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.title }).map { ListRow.Card(it) }
     } else {
@@ -544,7 +544,7 @@ private fun Fact(icon: ImageVector, text: String) {
     }
 }
 
-private fun facts(p: ProjectInfo): List<List<Pair<ImageVector, String>>> {
+internal fun facts(p: ProjectInfo): List<List<Pair<ImageVector, String>>> {
     val ratio = aspectName(p.width, p.height)
     val first = if (ratio != null) {
         listOf(HomeIcons.Aspect to ratio, HomeIcons.Resolution to "${minOf(p.width, p.height)}p")
@@ -554,7 +554,7 @@ private fun facts(p: ProjectInfo): List<List<Pair<ImageVector, String>>> {
     return listOf(first, listOf(HomeIcons.Folder to formatBytes(p.sizeBytes), HomeIcons.FrameRate to "${p.fps}fps"))
 }
 
-private fun duration(ms: Int): String {
+internal fun duration(ms: Int): String {
     val s = (ms + 500) / 1000
     return String.format(Locale.ROOT, "%02d:%02d:%02d", s / 3600, s / 60 % 60, s % 60)
 }

@@ -2068,4 +2068,17 @@
     <string name="desk_layers">Layers</string>
     <string name="desk_objects">Objects</string>
     <string name="desk_fit">Fit to window</string>
+    <string name="desk_import">Import</string>
+    <string name="desk_drop_hint">Drop project files here to import them</string>
+    <string name="desk_new_asset">New asset</string>
+    <string name="desk_aspect_ratio">Aspect ratio</string>
+    <string name="desk_name">Name</string>
+    <string name="desk_custom">Custom</string>
+    <string name="desk_create_project">Create project</string>
+    <string name="desk_create_asset">Create asset</string>
+    <string name="desk_updates">Updates</string>
+    <string name="desk_language_note">Choose the language of the app.</string>
+    <string name="desk_language_restart">Restart AbsentMotion to use the new language.</string>
+    <string name="desk_help_contents">Contents</string>
+    <string name="desk_help_browser">Open in browser</string>
 </resources>

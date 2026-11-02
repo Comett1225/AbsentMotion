@@ -35,7 +35,7 @@ class DeskShotsTest {
             fun shot(name: String) { waitForIdle(); ImageIO.write(onAllNodes(isRoot()).onFirst().captureToImage().toAwtImage(), "png", shots.resolve(name)) }
             setContent { DeskApp(app) }
             shot("01-home-empty.png")
-            onNodeWithText("New project", substring = false).performClick()
+            onAllNodesWithText("New project", substring = false).onFirst().performClick()
             mainClock.advanceTimeBy(1500)
             shot("01b-new-project.png")
             DeskBackPress()
