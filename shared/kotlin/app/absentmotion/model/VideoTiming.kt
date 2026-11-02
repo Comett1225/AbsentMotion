@@ -207,9 +207,14 @@ fun Scene.trimStartAt(layer: Layer, frame: Int): Layer? =
 fun Scene.trimEndAt(layer: Layer, frame: Int): Layer? =
     frameEnd(frame).takeIf { it < layer.endTime && showsAnyFrame(layer.startTime, it) }?.let { layer.trimmedTo(layer.startTime, it) }
 
-fun Scene.splitAt(layer: Layer, frame: Int, newId: Long): Pair<Layer, Layer>? {
+fun Scene.canSplitAt(layer: Layer, frame: Int): Boolean {
     val cut = frameStart(frame)
-    if (cut <= layer.startTime || !showsAnyFrame(layer.startTime, cut - 1) || !showsAnyFrame(cut, layer.endTime)) return null
+    return cut > layer.startTime && showsAnyFrame(layer.startTime, cut - 1) && showsAnyFrame(cut, layer.endTime)
+}
+
+fun Scene.splitAt(layer: Layer, frame: Int, newId: Long): Pair<Layer, Layer>? {
+    if (!canSplitAt(layer, frame)) return null
+    val cut = frameStart(frame)
     val second = layer.nested?.let { layer.copy(node = layer.node.withChild("scene", it.withCopiedLayerIds().node)) } ?: layer
     return layer.trimmedTo(layer.startTime, cut - 1).withoutMotionMarks(MotionSlot.Out) to
         second.withId(newId).trimmedTo(cut, layer.endTime).withoutMotionMarks(MotionSlot.In)

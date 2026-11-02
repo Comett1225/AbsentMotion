@@ -45,7 +45,9 @@ import app.absentmotion.editor.moveClipEdges
 import app.absentmotion.editor.pasteStyleOnChosen
 import app.absentmotion.editor.removeAudioOfChosen
 import app.absentmotion.editor.selectedCuts
+import app.absentmotion.editor.split
 import app.absentmotion.model.canAnimate
+import app.absentmotion.model.canSplitAt
 import app.absentmotion.model.cutBetween
 import app.absentmotion.platform.LocalContext
 import app.absentmotion.platform.Toast
@@ -122,6 +124,7 @@ internal fun DeskMulti(state: EditorState, modifier: Modifier) {
             Toast.makeText(context, context.resources.getQuantityString(R.plurals.structure_audio_removed, n, n.toString()), Toast.LENGTH_SHORT).show()
         },
         MultiTile(ChromeIcons.Transition, R.string.transition_title, cuts.isNotEmpty(), noTransition, R.string.transition_add_between) { state.playing = false; transition = cuts },
+        MultiTile(PanelIcons.Split, R.string.timeline_split, layers.any { state.scene.canSplitAt(it, state.frame) }) { state.split() },
         MultiTile(if (end) ChromeIcons.SkipForward else ChromeIcons.SkipBack, if (end) R.string.structure_move_ends else R.string.structure_move_starts, some) { state.moveClipEdges(end, false) },
         MultiTile(SelectionIcons.Align[0], R.string.structure_align_starts, layers.size > 1, needsTwo) { state.alignClipTimes(0) },
         MultiTile(SelectionIcons.DistributeHorizontal, R.string.structure_distribute_starts, layers.size > 2, needsThree) { state.alignClipTimes(1) },

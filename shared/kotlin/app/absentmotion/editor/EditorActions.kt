@@ -118,9 +118,19 @@ fun EditorState.trimEnd() {
 }
 
 fun EditorState.split() {
-    val next = selected?.let { scene.withSplit(scene.pinnedPath(it).withPinnedClock(), frame, Layer.newId()) } ?: return
+    val next = scene.withSplits(chosenLayers.map { it.id }, frame, sampleMs) ?: return
     edit { next }
+    MultiSelect.clear()
     selectedId = null
+}
+
+internal fun Scene.withSplits(ids: List<Long>, frame: Int, sampleMs: Int): Scene? {
+    var split = false
+    val next = ids.fold(this) { acc, id ->
+        val layer = acc.layerAt(id, sampleMs) ?: return@fold acc
+        acc.withSplit(acc.pinnedPath(layer).withPinnedClock(), frame, Layer.newId())?.also { split = true } ?: acc
+    }
+    return next.takeIf { split }
 }
 
 internal fun Scene.navigationStops(layer: Layer?, scope: KeyScope? = null): List<Int> {

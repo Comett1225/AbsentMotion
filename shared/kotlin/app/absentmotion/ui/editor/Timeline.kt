@@ -375,7 +375,7 @@ private fun DesktopTimelineMenu(view: TimelineView) {
             DropdownMenuItem(colors = menuColors, text = { Text(stringResource(R.string.downloader_paste), fontSize = 14.sp) }, enabled = state.canPaste, onClick = { close { state.pasteLayer() } })
             if (id != null) {
                 DropdownMenuItem(colors = menuColors, text = { Text(stringResource(R.string.home_duplicate), fontSize = 14.sp) }, onClick = { close { state.duplicateChosen() } })
-                DropdownMenuItem(colors = menuColors, text = { Text(stringResource(R.string.timeline_split), fontSize = 14.sp) }, enabled = !MultiSelect.active, onClick = { close { state.split() } })
+                DropdownMenuItem(colors = menuColors, text = { Text(stringResource(R.string.timeline_split), fontSize = 14.sp) }, onClick = { close { state.split() } })
                 DropdownMenuItem(colors = menuColors, text = { Text(stringResource(R.string.delete), fontSize = 14.sp) }, onClick = { close { state.deleteChosen() } })
                 if (MultiSelect.active && MultiSelect.ids.size > 1) DropdownMenuItem(colors = menuColors, text = { Text(stringResource(R.string.structure_group), fontSize = 14.sp) }, onClick = { close { state.groupLayers(MultiSelect.ids) } })
                 if (layer?.isPlainGroup == true && !MultiSelect.active) {
@@ -549,9 +549,26 @@ internal object TimelineMath {
             acc.update(layer.id) { acc.movedClip(layer, movedStart(acc, layer, acc.firstShownFrame(layer.startTime) + shift)) }
         }
     }
+
+    fun edgeMs(layer: Layer, start: Boolean): Float = (if (start) layer.startTime else layer.endTime + 1).toFloat()
+
+    fun trimmedEdge(from: Scene, base: Layer, start: Boolean, wantedMs: Float): EdgeTrim {
+        val frame = nearestFrame(wantedMs, from.fps)
+        val edge = if (start) frame.coerceIn(0, from.lastShownFrame(base.endTime).coerceAtLeast(0)) else (frame - 1).coerceAtLeast(from.firstShownFrame(base.startTime)) + 1
+        val time = if (start) from.frameStart(edge) else from.frameEnd(edge - 1)
+        val trimmed = if (start) from.trimmedClip(base, time, base.endTime) else from.trimmedClip(base, base.startTime, time)
+        return EdgeTrim(trimmed, edge, time, if (start) trimmed.startTime > time else trimmed.endTime < time)
+    }
+
+    fun trimmedEdges(from: Scene, grabbed: Layer, others: List<Layer>, start: Boolean, wantedMs: Float): List<EdgeTrim> {
+        val anchor = edgeMs(grabbed, start)
+        return (listOf(grabbed) + others).map { trimmedEdge(from, it, start, wantedMs + (edgeMs(it, start) - anchor)) }
+    }
 }
 
 internal data class MoveTarget(val frame: Int, val snap: Int?)
+
+internal class EdgeTrim(val layer: Layer, val edge: Int, val time: Int, val limited: Boolean)
 
 private data class StripWindow(val rows: IntRange, val fromMs: Float, val toMs: Float)
 
@@ -629,7 +646,8 @@ private class TimelineView(val state: EditorState, density: Density, private val
     private var edgeMs = 0f
     private var trimBase: Layer? = null
     private var trimScene: Scene? = null
-    var limitEdge by mutableStateOf<Boolean?>(null)
+    private var trimGroup: List<Layer> = emptyList()
+    var limits by mutableStateOf<Map<Long, Boolean>>(emptyMap())
         private set
     var onTick: () -> Unit = {}
     var snapAt by mutableStateOf<Int?>(null)
@@ -964,6 +982,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
         val left = time.x(layer.startTime.toFloat())
         val right = time.x(layer.endTime + 1f)
         val selected = layer.id == state.selectedId
+        val gripped = selected || !PlatformFeatures.desktop && layer.id in MultiSelect.ids
         val key = if ((selected || PlatformFeatures.desktop) && at.x in left..right) keyNear(layer, at.x, time) else null
         val zone = edgeZone(left, right)
         val keyX = if (PlatformFeatures.desktop && key != null) time.x(state.scene.frameStart(key).toFloat()) else null
@@ -975,9 +994,9 @@ private class TimelineView(val state: EditorState, density: Density, private val
             PlatformFeatures.desktop && at.x - left in -zone..startReach -> Hit.Grip(layer.id, start = true)
             PlatformFeatures.desktop && right - at.x in -zone..endReach -> Hit.Grip(layer.id, start = false)
             key != null -> Hit.Key(layer.id, key)
-            !PlatformFeatures.desktop && selected && at.x in left - GripZone.px..left -> Hit.Grip(layer.id, start = true)
-            !PlatformFeatures.desktop && selected && at.x in right..right + GripZone.px -> Hit.Grip(layer.id, start = false)
-            !PlatformFeatures.desktop && !selected && at.x >= size.width - HandleZone.px -> Hit.Handle(layer.id)
+            !PlatformFeatures.desktop && gripped && at.x in left - GripZone.px..left -> Hit.Grip(layer.id, start = true)
+            !PlatformFeatures.desktop && gripped && at.x in right..right + GripZone.px -> Hit.Grip(layer.id, start = false)
+            !PlatformFeatures.desktop && !gripped && at.x >= size.width - HandleZone.px -> Hit.Handle(layer.id)
             at.x in left..right -> Hit.Bar(layer.id)
             else -> Hit.Row(layer.id)
         }
@@ -1043,7 +1062,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
 
     private fun dropTrim(key: String) {
         val base = trimBase ?: return
-        if (state.scene.layer(base.id)?.node == base.node) state.cancelGesture(key)
+        if ((listOf(base) + trimGroup).all { state.scene.layer(it.id)?.node == it.node }) state.cancelGesture(key)
     }
 
     private fun dropKey(commit: Boolean) {
@@ -1103,8 +1122,9 @@ private class TimelineView(val state: EditorState, density: Density, private val
                 dragId = hit.id
                 trimBase = layer
                 trimScene = state.scene
+                trimGroup = if (MultiSelect.active && hit.id in MultiSelect.ids) layers.filter { it.id in MultiSelect.ids && it.id != hit.id } else emptyList()
                 edgeMs = (if (hit.start) layer?.startTime else layer?.endTime?.plus(1))?.toFloat() ?: 0f
-                snapTargets = TimelineMath.snapTargets(state.scene, hit.id, state.frame)
+                snapTargets = TimelineMath.snapTargets(state.scene, trimGroup.map { it.id }.toSet() + hit.id, state.frame)
                 if (hit.start) Drag.TrimStart else Drag.TrimEnd
             }
             hit is Hit.Handle -> {
@@ -1135,7 +1155,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
 
     fun endDrag(drag: Drag?, velocity: Velocity, lifted: Boolean = true) {
         autoStop()
-        limitEdge = null
+        limits = emptyMap()
         snapAt = null
         if (drag == Drag.Lift) drop()
         if (drag == Drag.Lift) dropMove(lifted)
@@ -1208,21 +1228,19 @@ private class TimelineView(val state: EditorState, density: Density, private val
 
     private fun trimBy(dx: Float, start: Boolean) {
         edgeMs += dx / timeScale().pxPerMs
-        val scene = state.scene
-        val layer = layers.firstOrNull { it.id == dragId } ?: return
+        val shown = state.scene
+        if (shown.layer(dragId) == null) return
         val base = trimBase ?: return
         val from = trimScene ?: return
         val snap = snapNear(edgeMs)
-        val frame = snap ?: TimelineMath.nearestFrame(edgeMs, fps)
-        val id = dragId
-        val edge = if (start) frame.coerceIn(0, scene.lastShownFrame(layer.endTime).coerceAtLeast(0)) else (frame - 1).coerceAtLeast(scene.firstShownFrame(layer.startTime)) + 1
-        val time = if (start) scene.frameStart(edge) else scene.frameEnd(edge - 1)
-        val trimmed = if (start) from.trimmedClip(base, time, base.endTime) else from.trimmedClip(base, base.startTime, time)
-        if (time != (if (start) layer.startTime else layer.endTime)) state.edit(if (start) "trim-start" else "trim-end") { it.withClip(id, trimmed, from) }
-        val hit = if (start) trimmed.startTime > time else trimmed.endTime < time
-        if (hit && limitEdge == null) onTick()
-        limitEdge = start.takeIf { hit }
-        showSnap(snap.takeUnless { hit }, edge)
+        val bases = listOf(base) + trimGroup
+        val trims = TimelineMath.trimmedEdges(from, base, trimGroup, start, snap?.let { TimelineMath.frameTimeMs(it, fps) } ?: edgeMs)
+        val changed = bases.indices.filter { i -> shown.layer(bases[i].id)?.let { trims[i].time != if (start) it.startTime else it.endTime } == true }
+        if (changed.isNotEmpty()) state.edit(if (start) "trim-start" else "trim-end") { s -> changed.fold(s) { acc, i -> acc.withClip(bases[i].id, trims[i].layer, from) } }
+        val hits = bases.indices.filter { trims[it].limited }.associate { bases[it].id to start }
+        if (hits.isNotEmpty() && limits.isEmpty()) onTick()
+        limits = hits
+        showSnap(snap.takeUnless { trims[0].limited }, trims[0].edge)
     }
 
     private var autoX: Float? = null
@@ -1697,7 +1715,7 @@ private fun DrawScope.drawTimeline(view: TimelineView, measurer: TextMeasurer, s
     val stripe = TimelineMath.frameTimeMs(2 * step, fps) * time.pxPerMs
     fun paint(row: Int, layer: Layer) {
         val rowTime = view.timeFor(layer.id, time)
-        drawRow(layer, layer.id == state.selectedId, view.shownTop(row, layer.id), rowTime, stripe, measurer, styles, if (layer.hidden) eyeOff else eye, outline, state.scene, state.frame, pictures[layer.id], view.keyFrames(layer), appear, view.keyFrame.takeIf { layer.id == view.keyId }, view.limitEdge.takeIf { layer.id == state.selectedId }, view.headerWidth, layer.id == view.hoveredId, view.hoveredKey?.takeIf { it.first == layer.id }?.second)
+        drawRow(layer, layer.id == state.selectedId, view.shownTop(row, layer.id), rowTime, stripe, measurer, styles, if (layer.hidden) eyeOff else eye, outline, state.scene, state.frame, pictures[layer.id], view.keyFrames(layer), appear, view.keyFrame.takeIf { layer.id == view.keyId }, view.limits[layer.id], view.headerWidth, layer.id == view.hoveredId, view.hoveredKey?.takeIf { it.first == layer.id }?.second)
         layer.mediaFill?.takeIf { it.video }?.let { proxies[it.uri] }?.let { done ->
             drawProxyProgress(rowTime.x(layer.startTime.toFloat()), rowTime.x(layer.endTime + 1f), view.shownTop(row, layer.id), done)
         }
@@ -1909,7 +1927,7 @@ private fun DrawScope.drawRow(
         drawDeskClipFrame(left, right, barTop, barBottom, headerWidth, chosen, hovered, limit)
         drawDeskHeader(layer, chosen, hovered, top, headerWidth, eye, measurer, styles)
     } else {
-        if (selected) {
+        if (selected || layer.id in MultiSelect.ids) {
             drawGrip(outline, left, barTop, barBottom, start = true, appear, limit == true)
             drawGrip(outline, right, barTop, barBottom, start = false, appear, limit == false)
         } else {

@@ -56,7 +56,7 @@ fun FrameWindowScope.DeskMenus(app: DeskAppState) {
             Item("Copy Layer", enabled = editor?.selectedId != null) { editor?.copySelected() }
             Item("Paste Layer", enabled = editor != null) { editor?.pasteLayer() }
             Item("Duplicate", enabled = editor?.selectedId != null || MultiSelect.active) { editor?.let { if (MultiSelect.active) it.duplicateChosen() else it.duplicateSelected() } }
-            Item("Split at Playhead", enabled = editor?.selectedId != null) { editor?.split() }
+            Item("Split at Playhead", enabled = editor?.selectedId != null || MultiSelect.active) { editor?.split() }
             Item("Delete", enabled = editor?.selectedId != null || MultiSelect.active) { editor?.let { if (MultiSelect.active) it.deleteChosen() else it.deleteSelected() } }
         }
         Menu("View") {
