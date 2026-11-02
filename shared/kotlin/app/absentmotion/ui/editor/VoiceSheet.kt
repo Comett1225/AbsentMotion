@@ -130,7 +130,7 @@ internal fun VoiceSheet(state: EditorState, onClose: () -> Unit) {
                         val note = when {
                             message.isNotEmpty() -> message
                             voices == null -> stringResource(R.string.voice_loading)
-                            all.isEmpty() -> stringResource(R.string.voice_none_offline)
+                            all.isEmpty() -> stringResource(speech.noVoices)
                             job != null -> stringResource(R.string.voice_making)
                             else -> ""
                         }

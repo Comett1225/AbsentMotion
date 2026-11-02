@@ -223,11 +223,12 @@ internal fun readPreviewPixel(surface: Any?, x: Float, y: Float, complete: (Int?
 internal fun captionDownloadDescription(context: Context, name: String, bytes: Long) =
     context.getString(app.absentmotion.R.string.platform_caption_download, name, app.absentmotion.export.formatBytes(bytes))
 
-class Speech(context: Context) {
+class Speech(private val context: Context) {
+    val noVoices: Int get() = app.absentmotion.desk.DeskSpeech.noVoices
     suspend fun voices(): List<app.absentmotion.ui.editor.SpeechVoice> = app.absentmotion.desk.DeskSpeech.voices()
     fun preview(text: String, voice: app.absentmotion.ui.editor.SpeechVoice, rate: Float, pitch: Float) = app.absentmotion.desk.DeskSpeech.preview(text, voice, rate, pitch)
-    suspend fun toFile(text: String, voice: app.absentmotion.ui.editor.SpeechVoice, rate: Float, pitch: Float): Uri = app.absentmotion.desk.DeskSpeech.toFile(text, voice, rate, pitch)
-    fun close() {}
+    suspend fun toFile(text: String, voice: app.absentmotion.ui.editor.SpeechVoice, rate: Float, pitch: Float): Uri = app.absentmotion.desk.DeskSpeech.toFile(text, voice, rate, pitch, app.absentmotion.ai.aiFile(context, "wav"))
+    fun close() = app.absentmotion.desk.DeskSpeech.stop()
     companion object { val MAX_CHARS = 4000 }
 }
 
