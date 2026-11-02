@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor.panels
 
+import app.absentmotion.ui.editor.deskVerticalScroll
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.runtime.collectAsState
 import app.absentmotion.ui.editor.DeskTip
@@ -137,7 +138,7 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
                 val reorder = rememberReorder(state, scroll, top = 6.5.dp + (AiMarkRowHeight + AiMarkRowGap) * marks.size)
                 val id = layer.id
                 val effects = layer.effects
-                Column(Modifier.fillMaxSize().verticalScroll(scroll)) {
+                Column(Modifier.fillMaxSize().deskVerticalScroll(scroll)) {
                     for (mark in marks) AiMarkRow(state, mark)
                     key(reorder.generation) {
                         effects.forEachIndexed { i, effect ->
@@ -158,7 +159,7 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
             } else {
                 Column(Modifier.fillMaxSize().padding(6.5.dp).clip(RowShape).background(Am.Field)) {
                     EffectHeader(state, index, instance, definition)
-                    Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState())) {
+                    Column(Modifier.weight(1f).fillMaxWidth().deskVerticalScroll()) {
                         if (definition != null) EffectSettings(state, layer, instance, definition, active, { active = it; pin = null })
                         else Text(instance["id"] ?: "", Modifier.padding(12.dp).dimmed(), color = Am.OnDark, fontSize = 12.sp)
                         if (puppet) PuppetSection(state, layer, index, instance, pin, adding, { pin = it; if (it != null) active = null }) { adding = it }
@@ -179,7 +180,7 @@ private fun CopyEffectsDialog(names: List<String>, onDismiss: () -> Unit, onCopy
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.effects_copy_effects)) },
         text = {
-            Column(Modifier.heightIn(max = 280.dp).verticalScroll(rememberScrollState())) {
+            Column(Modifier.heightIn(max = 280.dp).deskVerticalScroll()) {
                 names.forEachIndexed { i, name ->
                     val on = i in ticked
                     Row(Modifier.fillMaxWidth().height(44.dp).toggleable(on, role = Role.Checkbox) { ticked = if (on) ticked - i else ticked + i }, verticalAlignment = Alignment.CenterVertically) {
@@ -215,7 +216,7 @@ private fun EffectHeader(state: EditorState, index: Int, effect: XmlNode, defini
                     val catalog by state.engine.effects.collectAsState()
                     val context = LocalContext.current
                     val presetFavourites = remember { PresetFavouriteStore.get(context) }
-                    Column(Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState())) {
+                    Column(Modifier.heightIn(max = 360.dp).deskVerticalScroll()) {
                         definition.presets.forEach { preset ->
                             Row(Modifier.fillMaxWidth().height(52.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Row(Modifier.weight(1f).fillMaxHeight().clickable {

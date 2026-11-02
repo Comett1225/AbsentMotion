@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -42,16 +43,19 @@ import app.absentmotion.editor.changeSettings
 import app.absentmotion.editor.setElementOption
 import app.absentmotion.editor.toggleHidden
 import app.absentmotion.model.Layer
+import app.absentmotion.ui.home.handCursor
+import app.absentmotion.ui.home.hoverFill
 import app.absentmotion.ui.theme.Am
 
 @Composable
 internal fun DeskProject(state: EditorState, modifier: Modifier = Modifier) {
     val layers = remember(state.scene) { state.scene.layers.asReversed() }
-    LazyColumn(modifier.padding(horizontal = 12.dp), contentPadding = PaddingValues(bottom = 12.dp)) {
+    val list = rememberLazyListState()
+    LazyColumn(modifier.deskScrollbar(list).padding(horizontal = 12.dp), list, contentPadding = PaddingValues(bottom = 12.dp)) {
         item(key = "settings") { DeskSettings(state) }
         item(key = "layers-title") { DeskHeading(stringResource(R.string.desk_layers), Modifier.padding(top = 16.dp, bottom = 4.dp)) }
         items(layers, key = { it.id }) { layer ->
-            Row(Modifier.fillMaxWidth().height(36.dp).clip(RoundedCornerShape(6.dp)).clickable { state.selectedId = layer.id; state.panel = EditorPanel.Tools }.padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.fillMaxWidth().height(36.dp).clip(RoundedCornerShape(6.dp)).hoverFill(6.dp, Am.Field).handCursor().clickable { state.selectedId = layer.id; state.panel = EditorPanel.Tools }.padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Icon(deskLayerIcon(layer), null, Modifier.size(18.dp), tint = Am.OnDarkDim)
                 Text(layer.label, Modifier.weight(1f).padding(horizontal = 8.dp), color = if (layer.hidden) Am.OnDarkDim else Am.OnDark, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 val label = stringResource(if (layer.hidden) R.string.a11y_show_layer else R.string.a11y_hide_layer)
@@ -126,7 +130,7 @@ internal fun DeskSettings(state: EditorState, modifier: Modifier = Modifier, hea
                 DeskSelect(stringResource(shown.second), RetimingOptions.map { stringResource(it.second) }) { state.setElementOption("retime", RetimingOptions[it].first) }
             }
         }
-        Row(Modifier.fillMaxWidth().padding(top = 4.dp).height(36.dp).clip(RoundedCornerShape(6.dp)).background(Am.Field).clickable { state.historyOpen = true }.padding(start = 10.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.fillMaxWidth().padding(top = 4.dp).height(36.dp).clip(RoundedCornerShape(6.dp)).background(Am.Field).hoverFill(6.dp, Color.White.copy(alpha = .08f)).handCursor().clickable { state.historyOpen = true }.padding(start = 10.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(R.string.earlier_versions), Modifier.weight(1f), color = Am.OnDark, fontSize = 13.sp, maxLines = 1)
             Icon(ChromeIcons.ChevronRight, null, Modifier.size(20.dp), tint = Am.OnDarkDim)
         }
@@ -143,7 +147,7 @@ private fun DeskSetting(label: String, content: @Composable () -> Unit) {
 
 @Composable
 private fun DeskChip(label: String, selected: Boolean, modifier: Modifier, onClick: () -> Unit) {
-    Box(modifier.height(32.dp).clip(RoundedCornerShape(6.dp)).background(if (selected) Am.Accent else Am.Field).clickable(onClick = onClick), Alignment.Center) {
+    Box(modifier.height(32.dp).clip(RoundedCornerShape(6.dp)).background(if (selected) Am.Accent else Am.Field).hoverFill(6.dp, Color.White.copy(alpha = .08f)).handCursor().clickable(onClick = onClick), Alignment.Center) {
         Text(label, color = if (selected) Am.OnAccent else Am.OnDark, fontSize = 12.sp, maxLines = 1)
     }
 }
@@ -152,7 +156,7 @@ private fun DeskChip(label: String, selected: Boolean, modifier: Modifier, onCli
 private fun DeskSwatch(color: Color, transparent: Boolean, selected: Boolean, description: String, picker: Boolean = false, onClick: () -> Unit) {
     app.absentmotion.platform.Hint(description) {
         Box(Modifier.size(24.dp).clip(CircleShape).background(if (transparent) Color(0xFFCCCCCC) else color)
-            .border(if (selected) 2.dp else 1.dp, if (selected) Am.Accent else Color(0x40808080), CircleShape).clickable(onClick = onClick), Alignment.Center) {
+            .border(if (selected) 2.dp else 1.dp, if (selected) Am.Accent else Color(0x40808080), CircleShape).handCursor().clickable(onClick = onClick), Alignment.Center) {
             if (transparent) Text("/", color = Color(0xFFE44D4D), fontSize = 14.sp)
             if (picker) Icon(ChromeIcons.Pencil, null, Modifier.size(12.dp), tint = if (color.red * 0.3f + color.green * 0.6f + color.blue * 0.1f > 0.55f) Color.Black else Color.White)
         }
@@ -164,7 +168,7 @@ private fun DeskSelect(value: String, options: List<String>, pick: (Int) -> Unit
     var open by remember { mutableStateOf(false) }
     val focus = LocalFocusManager.current
     Box {
-        Row(Modifier.height(32.dp).clip(RoundedCornerShape(6.dp)).background(Am.Field).clickable { focus.clearFocus(); open = true }.padding(start = 10.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.height(32.dp).clip(RoundedCornerShape(6.dp)).background(Am.Field).hoverFill(6.dp, Color.White.copy(alpha = .08f)).handCursor().clickable { focus.clearFocus(); open = true }.padding(start = 10.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(value, color = Am.OnDark, fontSize = 13.sp, maxLines = 1)
             Icon(ChromeIcons.ChevronDown, null, Modifier.padding(start = 4.dp).size(20.dp), tint = Am.OnDarkDim)
         }

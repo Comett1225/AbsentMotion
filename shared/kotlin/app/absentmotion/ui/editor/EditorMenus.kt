@@ -169,7 +169,7 @@ internal fun MenuRow(
             if (icon != null) Box(Modifier.size(40.dp), Alignment.Center) { Icon(icon, null, Modifier.size(24.dp), tint = Am.OnDark) }
             Column(Modifier.weight(1f).padding(start = 14.dp), verticalArrangement = Arrangement.Center) {
                 Text(text, color = Am.OnDark, fontSize = if (app.absentmotion.platform.PlatformFeatures.desktop) 14.sp else 15.sp, lineHeight = if (subText == null) 20.sp else 19.5.sp, maxLines = 1)
-                if (subText != null) Text(subText, color = Am.OnDark, fontSize = 10.sp, lineHeight = 20.5.sp, maxLines = 1)
+                if (subText != null) Text(subText, color = Am.OnDark, fontSize = deskSp(10f), lineHeight = 20.5.sp, maxLines = 1)
             }
             if (trailing != null) Icon(trailing, null, Modifier.padding(end = 7.dp).size(24.dp), tint = Am.OnDark)
             if (busy) CircularProgressIndicator(Modifier.padding(end = 14.dp).size(18.dp), color = Am.Accent, strokeWidth = 2.dp)
@@ -543,7 +543,7 @@ private fun AspectRow(selected: String, onPick: (Aspect) -> Unit, onCustom: () -
     Row(Modifier.padding(start = 22.dp).height(56.dp), verticalAlignment = Alignment.CenterVertically) {
         Aspects.forEach { a ->
             AspectButton(a.boxW, a.boxH, a.key == selected, onClick = { onPick(a) }) {
-                Text(a.key, color = if (a.key == selected) Am.OnAccent else Am.Navy, fontSize = 10.sp, maxLines = 1)
+                Text(a.key, color = if (a.key == selected) Am.OnAccent else Am.Navy, fontSize = deskSp(10f), maxLines = 1)
             }
         }
         val custom = selected == CUSTOM

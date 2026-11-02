@@ -27,6 +27,7 @@ import app.absentmotion.editor.EditorState
 import app.absentmotion.media.cachedMediaThumbnail
 import app.absentmotion.media.mediaThumbnail
 import app.absentmotion.platform.LocalContext
+import app.absentmotion.ui.home.hoverFill
 import app.absentmotion.ui.theme.Am
 import kotlinx.coroutines.launch
 
@@ -36,6 +37,7 @@ internal fun DeskMedia(state: EditorState, library: AddLibrary) {
     val scope = LocalEditorScope.current
     var query by remember { mutableStateOf("") }
     val files = remember(library.media, query) { library.media.filter { it.name.contains(query, true) || it.album.contains(query, true) } }
+    val shared = remember(library.media) { library.media.groupingBy { it.name }.eachCount().filterValues { it > 1 }.keys }
     Column(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxWidth().padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -52,7 +54,7 @@ internal fun DeskMedia(state: EditorState, library: AddLibrary) {
                 DeskTile(state, file.name, {
                     bitmap?.let { Image(it.asImageBitmap(), null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop) }
                         ?: Icon(ChromeIcons.MediaTab, null, Modifier.size(40.dp), tint = Am.OnDarkDim)
-                }, { app.absentmotion.platform.revealDeskFile(file.uri) }, add = add)
+                }, { app.absentmotion.platform.revealDeskFile(file.uri) }, detail = file.album.takeIf { file.name in shared && it.isNotBlank() }, add = add)
             }
         }
     }
@@ -67,6 +69,9 @@ internal fun DeskAudio(state: EditorState, library: AddLibrary) {
     val preview = remember { SoundPreview(context) }
     DisposableEffect(preview) { onDispose { preview.stop() } }
     val files = remember(library.audio, query) { library.audio.filter { it.title.contains(query, true) || it.name.contains(query, true) } }
+    val shared = remember(library.audio) {
+        library.audio.groupBy { it.title.ifBlank { it.name } }.filterValues { it.size > 1 }.mapValues { (_, group) -> group.map { it.name.substringAfterLast('.', "").uppercase() }.distinct().size > 1 }
+    }
     Column(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxWidth().padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -93,7 +98,7 @@ internal fun DeskAudio(state: EditorState, library: AddLibrary) {
                             }
                         }
                     }
-                }, { app.absentmotion.platform.revealDeskFile(android.net.Uri.parse(file.uri)) }, add = add)
+                }, { app.absentmotion.platform.revealDeskFile(android.net.Uri.parse(file.uri)) }, detail = shared[label]?.let { byExtension -> (if (byExtension) file.name.substringAfterLast('.', "").uppercase() else file.folder.substringAfterLast('/')).ifBlank { null } }, add = add)
             }
         }
     }
@@ -102,7 +107,7 @@ internal fun DeskAudio(state: EditorState, library: AddLibrary) {
 
 @Composable
 private fun DeskFileAction(label: String, modifier: Modifier, action: () -> Unit) {
-    Box(modifier.height(36.dp).clip(RoundedCornerShape(6.dp)).background(Am.Field).pointerHoverIcon(PointerIcon.Hand).clickable(onClick = action), Alignment.Center) {
+    Box(modifier.height(36.dp).clip(RoundedCornerShape(6.dp)).background(Am.Field).hoverFill(6.dp, androidx.compose.ui.graphics.Color.White.copy(alpha = .08f)).pointerHoverIcon(PointerIcon.Hand).clickable(onClick = action), Alignment.Center) {
         Text(label, color = Am.OnDark, fontSize = 12.sp, maxLines = 1)
     }
 }

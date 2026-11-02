@@ -18,6 +18,7 @@ import androidx.compose.ui.layout.ContentScale
 import app.absentmotion.platform.BitmapFactory
 import app.absentmotion.platform.asImageBitmap
 import app.absentmotion.ui.editor.PanelIcons
+import app.absentmotion.ui.editor.deskVerticalScroll
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 import app.absentmotion.ai.AiSmooth
@@ -1298,13 +1299,22 @@ private fun DeskExport(
                     Box(Modifier.width(1.dp).fillMaxHeight().background(Line))
                     Box(Modifier.weight(1f).fillMaxHeight()) {
                         when (phase) {
-                            Phase.Idle -> ScrollArea(Modifier.fillMaxSize(), Am.SheetBg, PaddingValues(20.dp), 16.dp) {
+                            Phase.Idle -> Column(Modifier.fillMaxSize().deskVerticalScroll(color = Navy).padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                                 FileNameField(exportName, kind)
                                 Column(verticalArrangement = Arrangement.spacedBy(FieldGap)) {
-                                    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                        kinds.forEach { k ->
-                                            val silent = k == ExportKind.Audio && !hasAudio
-                                            KindChip(k.icon(), stringResource(k.title()), kind == k, !silent) { if (silent) explain(NoSound) else onKind(k) }
+                                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        kinds.chunked(2).forEach { pair ->
+                                            Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(8.dp)) {
+                                                pair.forEach { k ->
+                                                    val silent = k == ExportKind.Audio && !hasAudio
+                                                    Box(Modifier.weight(1f)) {
+                                                        app.absentmotion.ui.editor.DeskTip(if (silent) stringResource(R.string.export_no_sound_short) else "") {
+                                                            KindChip(k.icon(), stringResource(k.title()), kind == k, !silent, Modifier.fillMaxWidth()) { if (silent) explain(NoSound) else onKind(k) }
+                                                        }
+                                                    }
+                                                }
+                                                if (pair.size == 1) Spacer(Modifier.weight(1f))
+                                            }
                                         }
                                     }
                                     optionNote(kind, scene, s)?.let { Hint(it.text()) }
@@ -1422,15 +1432,15 @@ private fun DeskButton(label: String, primary: Boolean, onClick: () -> Unit, ena
 }
 
 @Composable
-private fun KindChip(icon: ImageVector?, label: String, selected: Boolean, enabled: Boolean, onClick: () -> Unit) {
+private fun KindChip(icon: ImageVector?, label: String, selected: Boolean, enabled: Boolean, modifier: Modifier, onClick: () -> Unit) {
     val fill = animatedColor(if (selected) Navy else Am.Card)
     val ink = animatedColor(if (selected) Am.OnNavy else Navy)
     Row(
-        Modifier.height(34.dp).alpha(if (enabled) 1f else Dimmed).clip(RoundedCornerShape(17.dp)).background(fill).deskPress(17.dp).clickable(onClick = onClick).padding(horizontal = 12.dp),
+        modifier.height(36.dp).alpha(if (enabled) 1f else Dimmed).clip(RoundedCornerShape(18.dp)).background(fill).deskPress(18.dp).clickable(onClick = onClick).padding(horizontal = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (icon != null) Icon(icon, null, Modifier.size(18.dp), tint = ink) else Text(stringResource(R.string.gif), color = ink, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-        Text(label, Modifier.padding(start = 6.dp), color = ink, fontSize = 13.sp, fontWeight = FontWeight.Medium, maxLines = 1)
+        if (icon != null) Icon(icon, null, Modifier.size(18.dp), tint = ink) else Text(stringResource(R.string.gif), color = ink, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        Text(label, Modifier.padding(start = 8.dp).weight(1f), color = ink, fontSize = 13.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 

@@ -7,6 +7,17 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.ui.text.style.TextOverflow
+import app.absentmotion.platform.PlatformFeatures
+import app.absentmotion.ui.editor.ChromeIcons
+import app.absentmotion.ui.editor.DeskIcon
+import app.absentmotion.ui.editor.SearchField
+import app.absentmotion.ui.editor.deskScrollbar
+import app.absentmotion.ui.editor.deskShortcut
+import app.absentmotion.ui.editor.deskVerticalScroll
+import app.absentmotion.ui.home.handCursor
+import app.absentmotion.ui.home.hoverFill
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -145,10 +156,19 @@ fun EffectBrowser(state: EditorState) {
     }
     val audioName = stringResource(R.string.effects_category_audio)
     val voiceName = stringResource(R.string.layer_tool_voice_filters)
+    val stepping = (category != null && !audio) || detail != null || searching || fromAudio
+    val heading = detail?.name ?: category?.let { key -> when (key) { "audio" -> audioName; "voice" -> voiceName; else -> catalog.categories.firstOrNull { it.first == key }?.second } } ?: stringResource(R.string.effectbrowser_title)
     Column(Modifier.fillMaxSize().background(BrowserBg).systemBarsPadding()) {
         helpPage?.let { page -> HelpScreen(page) { helpPage = null } }
-        Row(Modifier.fillMaxWidth().height(44.dp).background(BrowserBg), verticalAlignment = Alignment.CenterVertically) {
-            val stepping = (category != null && !audio) || detail != null || searching || fromAudio
+        if (PlatformFeatures.desktop) Row(Modifier.fillMaxWidth().height(52.dp).padding(start = 8.dp, end = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+            if (stepping) DeskIcon(ChromeIcons.Back, stringResource(R.string.topbar_back), action = ::back)
+            Text(if (searching) stringResource(R.string.effectbrowser_title) else heading, Modifier.weight(1f).padding(start = if (stepping) 4.dp else 12.dp, end = 12.dp), color = Am.OnDark, fontSize = 15.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            if (!audio) SearchField(query, {
+                query = it
+                if (it.isNotEmpty() && !searching) { state.effectDetail = null; detail = null; searching = true } else if (it.isEmpty() && searching) searching = false
+            }, Modifier.width(260.dp).height(36.dp), hint = stringResource(R.string.home_search), background = Am.Panel)
+            DeskIcon(ChromeIcons.Close, deskShortcut(R.string.action_close, "Esc")) { close() }
+        } else Row(Modifier.fillMaxWidth().height(44.dp).background(BrowserBg), verticalAlignment = Alignment.CenterVertically) {
             BrowserButton(if (stepping) PanelIcons.Back else EffectIcons.Close, stringResource(if (stepping) R.string.topbar_back else R.string.action_close), ::back)
             if (searching) {
                 val focus = remember { FocusRequester() }
@@ -156,8 +176,7 @@ fun EffectBrowser(state: EditorState) {
                 BasicTextField(query, { query = it }, Modifier.weight(1f).padding(8.dp).focusRequester(focus), singleLine = true,
                     textStyle = TextStyle(color = Am.OnDark, fontSize = 17.sp, textDirection = androidx.compose.ui.text.style.TextDirection.Content), cursorBrush = SolidColor(Am.Accent))
             }
-            else Text(detail?.name ?: category?.let { key -> when (key) { "audio" -> audioName; "voice" -> voiceName; else -> catalog.categories.firstOrNull { it.first == key }?.second } } ?: stringResource(R.string.effectbrowser_title),
-                Modifier.weight(1f), color = Am.OnDark, fontSize = 17.sp, textAlign = TextAlign.Center, maxLines = 1)
+            else Text(heading, Modifier.weight(1f), color = Am.OnDark, fontSize = 17.sp, textAlign = TextAlign.Center, maxLines = 1)
             if (audio) Spacer(Modifier.size(44.dp))
             else BrowserButton(EffectIcons.Search, stringResource(R.string.home_search), { state.effectDetail = null; detail = null; searching = true })
         }
@@ -168,7 +187,7 @@ fun EffectBrowser(state: EditorState) {
             }
         } else if (detail != null) {
             val effect = detail!!
-            Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp)) {
+            Column(Modifier.fillMaxSize().deskVerticalScroll().padding(16.dp)) {
                 Thumbnail(catalog, effect.thumbnail, Modifier.align(Alignment.CenterHorizontally).size(160.dp))
                 Text(effect.description, Modifier.padding(top = 16.dp, bottom = 4.dp), color = Am.OnDark, fontSize = 14.sp)
                 Row(Modifier.fillMaxWidth().height(48.dp).clickable { helpPage = "effects/${effect.key}.html" }.padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -193,7 +212,8 @@ fun EffectBrowser(state: EditorState) {
             }
         } else if (!searching && (category == "audio" || category == "voice")) {
             val effects = layer?.audioEffects.orEmpty()
-            LazyVerticalGrid(GridCells.Fixed(3), Modifier.fillMaxSize(), contentPadding = PaddingValues(10.dp)) {
+            val audioGrid = rememberLazyGridState()
+            LazyVerticalGrid(if (PlatformFeatures.desktop) GridCells.Adaptive(120.dp) else GridCells.Fixed(3), Modifier.fillMaxSize().deskScrollbar(audioGrid), audioGrid, contentPadding = PaddingValues(if (PlatformFeatures.desktop) 16.dp else 10.dp)) {
                 if (category == "audio") {
                     item(key = "voice-category") { AudioTile(voiceName, 2, true) { fromAudio = true; category = "voice" } }
                     itemsIndexed(AudioOrder) { i, kind ->
@@ -209,13 +229,16 @@ fun EffectBrowser(state: EditorState) {
             val byPreset = if (audio || !searching) emptyList() else catalog.definitions.filter { d -> d !in byName && query.isNotBlank() && d.presets.any { matchesSearch(query, it.name) } }
             val results = if (audio) emptyList() else if (searching) byName + byPreset else catalog.listed(category).sortedBy { it.name.lowercase() }
             val actions = if (app.absentmotion.platform.PlatformFeatures.ai && (searching || category == "ai")) AiAction.entries.filter { it.offered && (!audio || it == AiAction.Noise) && matchesSearch(query, stringResource(it.title)) } else emptyList()
-            LazyVerticalGrid(GridCells.Fixed(3), Modifier.fillMaxSize(), contentPadding = PaddingValues(10.dp)) {
+            val resultGrid = rememberLazyGridState()
+            LazyVerticalGrid(if (PlatformFeatures.desktop) GridCells.Adaptive(120.dp) else GridCells.Fixed(3), Modifier.fillMaxSize().deskScrollbar(resultGrid), resultGrid, contentPadding = PaddingValues(if (PlatformFeatures.desktop) 16.dp else 10.dp)) {
                 if (app.absentmotion.platform.PlatformFeatures.ai && hasSound && (category == "ai" || searching && matchesSearch(query, context.getString(R.string.auto_captions)))) {
                     item(key = "ai-captions") { AudioTile(stringResource(R.string.auto_captions), 5, true) { state.playing = false; captionClip = layer.id } }
                 }
                 items(actions, key = { "ai-${it.name}" }) { action -> AiTile(action, state.selected, ai) }
                 items(results, key = { it.id }) { effect -> EffectTile(catalog, effect, 100f, { if (effect in byPreset) detail = effect else pick(effect) }, { detail = effect }, effect.id in favourites) }
             }
+        } else if (PlatformFeatures.desktop) {
+            DeskEffectsHome(catalog, recent, favourites, presetFavourites, favPage, { favPage = it }, hasSound, audioName, ::pick, { effect, preset -> if (effect.available) add(effect, preset) else detail = effect }, { detail = it }, { category = it })
         } else {
             Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
                 val recommended = listOf("absent.chromakey", "absent.blur", "absent.glow").mapNotNull(catalog::find)
@@ -305,19 +328,77 @@ private fun BrowserButton(icon: ImageVector, description: String, onClick: () ->
     }
 }
 
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+@Composable
+private fun DeskEffectsHome(
+    catalog: EffectCatalog, recent: List<String>, favourites: Set<String>, presetFavourites: app.absentmotion.effects.PresetFavourites, favPage: Boolean, onFavPage: (Boolean) -> Unit,
+    hasSound: Boolean, audioName: String, pick: (EffectDefinition) -> Unit, addPreset: (EffectDefinition, EffectPreset) -> Unit, detail: (EffectDefinition) -> Unit, open: (String) -> Unit,
+) {
+    val recommended = remember(catalog) { listOf("absent.chromakey", "absent.blur", "absent.glow").mapNotNull(catalog::find) }
+    val shown: List<Pair<EffectDefinition, EffectPreset?>> = if (favPage) presetFavourites.resolve(catalog.definitions).map { it.first to it.second } + favourites.mapNotNull(catalog::find).map { it to null }
+        else recent.mapNotNull(catalog::find).distinct().take(12).map { it to null }
+    val listed = catalog.categories.let { all -> if (hasSound) all.filter { it.first != "ai" } + ("audio" to audioName) + all.filter { it.first == "ai" } else all }
+    Column(Modifier.fillMaxSize().deskVerticalScroll().padding(start = 20.dp, end = 20.dp, top = 4.dp, bottom = 20.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(stringResource(R.string.desk_recommended), color = Am.OnDarkDim, fontSize = 12.sp, fontWeight = FontWeight.Medium)
+            Row(Modifier.clip(RoundedCornerShape(8.dp)).background(RecommendedBg).padding(8.dp), Arrangement.spacedBy(8.dp)) {
+                recommended.forEach { effect -> EffectTile(catalog, effect, 112f, { pick(effect) }, { detail(effect) }, effect.id in favourites) }
+            }
+        }
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                DeskTab(stringResource(R.string.effectbrowser_recent), !favPage) { onFavPage(false) }
+                DeskTab(stringResource(R.string.effectbrowser_favorite), favPage) { onFavPage(true) }
+            }
+            if (shown.isEmpty()) Text(stringResource(if (favPage) R.string.effectbrowser_favorite_empty else R.string.effectbrowser_recent_empty), Modifier.padding(vertical = 12.dp), color = Am.OnDarkDim, fontSize = 13.sp)
+            else FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                shown.forEach { (effect, preset) ->
+                    EffectTile(catalog, effect, 96f, { if (preset == null) pick(effect) else addPreset(effect, preset) }, { detail(effect) }, preset != null || effect.id in favourites, preset)
+                }
+            }
+        }
+        BoxWithConstraints(Modifier.fillMaxWidth()) {
+            val columns = (maxWidth / 220.dp).toInt().coerceIn(2, 6)
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                listed.chunked(columns).forEach { row ->
+                    Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(8.dp)) {
+                        row.forEach { (key, name) ->
+                            Box(Modifier.weight(1f).height(72.dp).clip(RoundedCornerShape(8.dp)).hoverFill(8.dp, Color.White.copy(alpha = .12f)).handCursor().clickable { open(key) }, Alignment.Center) {
+                                if (key == "ai") AiBackdrop(Modifier.fillMaxSize())
+                                else if (key == "audio") AudioBackdrop(Modifier.fillMaxSize())
+                                else Thumbnail(catalog, catalog.listed(key).firstOrNull()?.thumbnail, Modifier.fillMaxSize(), ContentScale.Crop)
+                                Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.55f)))
+                                Text(name, Modifier.padding(horizontal = 8.dp), color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, maxLines = 1)
+                            }
+                        }
+                        repeat(columns - row.size) { Spacer(Modifier.weight(1f)) }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DeskTab(label: String, selected: Boolean, onClick: () -> Unit) {
+    Box(Modifier.height(30.dp).clip(RoundedCornerShape(15.dp)).background(if (selected) Am.Accent.copy(alpha = .2f) else Color.Transparent).hoverFill(15.dp, Am.Field).handCursor().clickable(onClick = onClick).padding(horizontal = 14.dp), Alignment.Center) {
+        Text(label, color = if (selected) Am.Accent else Am.OnDarkDim, fontSize = 13.sp, fontWeight = FontWeight.Medium, maxLines = 1)
+    }
+}
+
 @Composable
 private fun EffectTile(catalog: EffectCatalog, effect: EffectDefinition, width: Float, onClick: () -> Unit, onLongClick: () -> Unit, favourite: Boolean, preset: EffectPreset? = null) {
     val press = remember { MutableInteractionSource() }
-    Column(Modifier.width(width.dp).pressScale(press, TilePress).alpha(if (effect.available) 1f else 0.35f)
+    Column(Modifier.width(width.dp).pressScale(press, TilePress).alpha(if (effect.available) 1f else 0.35f).clip(RoundedCornerShape(6.dp)).hoverFill(6.dp, Am.Field).handCursor()
         .combinedClickable(press, LocalIndication.current, onClick = onClick, onLongClick = onLongClick).padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Box {
             Thumbnail(catalog, preset?.let(effect::thumbnail) ?: effect.thumbnail, Modifier.size((width - 7).dp).clip(RoundedCornerShape(5.dp)))
             if (favourite) Icon(PanelIcons.Star, null, Modifier.align(Alignment.TopEnd).size(14.dp), tint = Am.Accent)
             if (preset == null && catalog.isNew(effect)) Text(stringResource(R.string.t_new), Modifier.align(Alignment.TopStart).padding(3.dp).clip(RoundedCornerShape(3.dp)).background(Am.Accent)
-                .padding(horizontal = 3.dp), color = Color.White, fontSize = 7.sp, lineHeight = 9.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                .padding(horizontal = 3.dp), color = Color.White, fontSize = if (PlatformFeatures.desktop) 12.sp else 7.sp, lineHeight = if (PlatformFeatures.desktop) 14.sp else 9.sp, fontWeight = FontWeight.Bold, maxLines = 1)
         }
-        Text(preset?.name ?: effect.name, Modifier.fillMaxWidth().padding(top = 4.dp), color = Am.OnDark, fontSize = if (width > 100) 10.sp else 8.sp,
-            lineHeight = 9.sp, textAlign = TextAlign.Center, maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+        Text(preset?.name ?: effect.name, Modifier.fillMaxWidth().padding(top = 4.dp), color = Am.OnDark, fontSize = if (PlatformFeatures.desktop) 12.sp else if (width > 100) 10.sp else 8.sp,
+            lineHeight = if (PlatformFeatures.desktop) 14.sp else 9.sp, textAlign = TextAlign.Center, maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
     }
 }
 

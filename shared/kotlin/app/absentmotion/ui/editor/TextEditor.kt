@@ -229,7 +229,7 @@ private fun FontStrip(library: FontLibrary, current: String, modifier: Modifier,
                         .border(if (active) 1.dp else 0.dp, if (active) Am.Accent else Color.Transparent, RoundedCornerShape(5.dp))
                         .tutorialGuard().clickable { onPick(name) }.padding(horizontal = 2.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                         FontPreview(library, name, "Abc", Modifier.fillMaxWidth().height(35.dp))
-                        Text(FontName.parse(name).label, color = if (active) Am.Accent else Am.OnDark, fontSize = 9.sp, lineHeight = 10.sp, maxLines = 2,
+                        Text(FontName.parse(name).label, color = if (active) Am.Accent else Am.OnDark, fontSize = deskSp(9f), lineHeight = 10.sp, maxLines = 2,
                             overflow = androidx.compose.ui.text.style.TextOverflow.MiddleEllipsis, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
                     }
                 }

@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor.panels
 
+import app.absentmotion.ui.editor.deskSp
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -169,7 +170,7 @@ private fun PositionTab(state: EditorState, layer: Layer) {
 @Composable
 private fun ValueCell(text: String, color: Color, modifier: Modifier, label: String? = null, onClick: () -> Unit) {
     Box(modifier.fillMaxHeight().clickable(onClick = onClick).semantics(mergeDescendants = true) { if (label != null) contentDescription = "$label, $text" }, contentAlignment = Alignment.Center) {
-        Text(text, color = color, fontSize = 10.5.sp, maxLines = 1, softWrap = false)
+        Text(text, color = color, fontSize = deskSp(10.5f), maxLines = 1, softWrap = false)
     }
 }
 

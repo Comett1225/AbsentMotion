@@ -60,11 +60,11 @@ internal fun PreviewModePanel(state: EditorState, modifier: Modifier = Modifier)
         ModeCell(cell, cameraToggle, { state.cameraMode = !state.cameraMode }, stringResource(R.string.camerapanel_tab_camera_view)) { CameraIcon(state.cameraMode, cameraToggle) }
         val quality = state.settings.previewQuality
         ModeCell(cell, true, { state.settings.previewQuality = PreviewQuality.entries[(quality.ordinal + 1) % PreviewQuality.entries.size] }) {
-            Text(stringResource(quality.label), color = if (quality == PreviewQuality.Full) Color.White else Am.Accent, fontSize = 10.sp, maxLines = 1)
+            Text(stringResource(quality.label), color = if (quality == PreviewQuality.Full) Color.White else Am.Accent, fontSize = deskSp(10f), maxLines = 1)
         }
         val fullBlur = state.settings.fullMotionBlur
         ModeCell(cell, true, { state.settings.fullMotionBlur = !fullBlur }) {
-            Text(stringResource(if (fullBlur) R.string.preview_full_blur else R.string.preview_fast_blur), color = if (fullBlur) Am.Accent else Color.White, fontSize = 10.sp,
+            Text(stringResource(if (fullBlur) R.string.preview_full_blur else R.string.preview_fast_blur), color = if (fullBlur) Am.Accent else Color.White, fontSize = deskSp(10f),
                 lineHeight = 11.sp, maxLines = 2, textAlign = TextAlign.Center)
         }
         PreRenderCell(state, cell)
@@ -90,7 +90,7 @@ private fun ZoomBlock(state: EditorState) {
             } }
         }
         Box(Modifier.height(20.dp).fillMaxWidth(), Alignment.Center) {
-            Text("${(state.canvasZoom * 100).toInt()}%", color = Color.White, fontSize = 10.sp, textAlign = TextAlign.Center, maxLines = 1)
+            Text("${(state.canvasZoom * 100).toInt()}%", color = Color.White, fontSize = deskSp(10f), textAlign = TextAlign.Center, maxLines = 1)
         }
         Box(Modifier.weight(1f).fillMaxWidth().semantics { contentDescription = zoomOut }.clickable { state.zoomStep(false) }, Alignment.Center) {
             Canvas(Modifier.size(8.dp)) { units(8f) { drawLine(Color.White, Offset(7.2f, 4f), Offset(0.8f, 4f), 1.2f, StrokeCap.Round) } }

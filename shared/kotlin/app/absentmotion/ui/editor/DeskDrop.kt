@@ -11,4 +11,10 @@ object DeskDrop {
     var item by mutableStateOf<DropItem?>(null)
     var at by mutableStateOf(Offset.Unspecified)
     var frameAt: (Offset) -> Int? = { null }
+
+    fun clear() {
+        item = null
+        DeskGhost.picture = null
+        at = Offset.Unspecified
+    }
 }

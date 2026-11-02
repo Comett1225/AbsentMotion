@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -51,6 +53,8 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import app.absentmotion.platform.LocalContext
@@ -136,7 +140,28 @@ fun PresetScreen(state: EditorState) {
         }
     }
 
+    val applyChosen: () -> Unit = {
+        if (current != null) {
+            if (targets.isEmpty()) state.applyPreset(current) else current.layer?.let { preset ->
+                state.edit { it.applyPresetToLayers(targets, preset, current.id) }
+            }
+            state.presetsOpen = false
+            val message = if (targets.isEmpty()) context.getString(R.string.preset_applied)
+                else state.scene.layers.count { it.id in targets }.let { context.resources.getQuantityString(R.plurals.multi_applied_count, it, it.toString()) }
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
+    }
+    val desk = app.absentmotion.platform.PlatformFeatures.desktop
     Column(Modifier.fillMaxSize().background(Am.TopBar).systemBarsPadding()) {
+        if (desk) Row(Modifier.fillMaxWidth().height(52.dp).padding(start = 16.dp, end = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(stringResource(R.string.try_a_preset), Modifier.weight(1f), color = Am.OnDark, fontSize = 15.sp, fontWeight = FontWeight.Medium, maxLines = 1)
+            Box(
+                Modifier.padding(end = 6.dp).height(32.dp).clip(RoundedCornerShape(8.dp)).background(if (current == null) Am.Field else Am.Accent)
+                    .then(if (current == null) Modifier else Modifier.pointerHoverIcon(PointerIcon.Hand).clickable(onClick = applyChosen)).padding(horizontal = 16.dp),
+                Alignment.Center,
+            ) { Text(stringResource(R.string.apply), color = if (current == null) Am.OnDarkDim else Am.OnAccent, fontSize = 13.sp, fontWeight = FontWeight.Medium, maxLines = 1) }
+            DeskIcon(ChromeIcons.Close, deskShortcut(R.string.action_close, "Esc")) { state.presetsOpen = false }
+        } else {
         Spacer(Modifier.height(16.dp))
         Box(Modifier.fillMaxWidth().height(48.dp)) {
             Box(Modifier.size(48.dp).padding(start = 4.dp).clickable { state.presetsOpen = false }, Alignment.Center) {
@@ -144,22 +169,15 @@ fun PresetScreen(state: EditorState) {
             }
             Text(stringResource(R.string.try_a_preset), Modifier.align(Alignment.Center), color = Am.OnDark, fontSize = 22.sp, fontWeight = FontWeight.Bold, maxLines = 1)
             Box(
-                Modifier.align(Alignment.CenterEnd).padding(end = if (app.absentmotion.platform.PlatformFeatures.desktop) 16.dp else 0.dp).height(48.dp).width(52.dp).alpha(if (current == null) DimAlpha else 1f)
-                    .then(if (current == null) Modifier else Modifier.clickable {
-                        if (targets.isEmpty()) state.applyPreset(current) else current.layer?.let { preset ->
-                            state.edit { it.applyPresetToLayers(targets, preset, current.id) }
-                        }
-                        state.presetsOpen = false
-                        val message = if (targets.isEmpty()) context.getString(R.string.preset_applied)
-                            else state.scene.layers.count { it.id in targets }.let { context.resources.getQuantityString(R.plurals.multi_applied_count, it, it.toString()) }
-                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                    }),
+                Modifier.align(Alignment.CenterEnd).height(48.dp).width(52.dp).alpha(if (current == null) DimAlpha else 1f)
+                    .then(if (current == null) Modifier else Modifier.clickable(onClick = applyChosen)),
                 Alignment.Center,
             ) { Text(stringResource(R.string.apply), color = Am.OnDark, fontSize = 18.sp, maxLines = 1) }
         }
         Spacer(Modifier.height(16.dp))
+        }
         Box(
-            Modifier.padding(horizontal = 16.dp).fillMaxWidth().height(352.dp).clip(RowShape).background(Am.PreviewBg)
+            Modifier.padding(horizontal = 16.dp).fillMaxWidth().then(if (desk) Modifier.weight(1f) else Modifier.height(352.dp)).clip(RowShape).background(Am.PreviewBg)
                 .onSizeChanged { box = it }.clickable { playing = !playing },
         ) {
             app.absentmotion.platform.SceneSurface(state.engine, 1, box, Modifier.fillMaxSize())
@@ -173,7 +191,8 @@ fun PresetScreen(state: EditorState) {
             Modifier.padding(horizontal = 16.dp).fillMaxWidth().height(80.dp),
         ) { playing = false; pos = (it * length).roundToInt() }
         Spacer(Modifier.height(16.dp))
-        LazyColumn(Modifier.padding(horizontal = 16.dp).fillMaxWidth().weight(1f)) {
+        val presetList = rememberLazyListState()
+        LazyColumn(Modifier.padding(horizontal = 16.dp).fillMaxWidth().then(if (desk) Modifier.heightIn(min = 120.dp, max = 204.dp).deskScrollbar(presetList) else Modifier.weight(1f)), presetList) {
             if (loaded?.isEmpty() == true) item {
                 Column(Modifier.fillMaxWidth().padding(top = 24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(stringResource(R.string.no_presets_saved_yet), color = Am.OnDark, fontSize = 20.sp, fontWeight = FontWeight.Bold)

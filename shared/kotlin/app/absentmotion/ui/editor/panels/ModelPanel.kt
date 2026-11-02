@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor.panels
 
+import app.absentmotion.ui.editor.deskVerticalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -30,7 +31,7 @@ private val ModelParams = listOf(
 internal fun ModelPanel(state: EditorState, layer: Layer, modifier: Modifier = Modifier) {
     var active by remember { mutableStateOf(ModelParams[0].first) }
     SideEffect { state.keyTarget = KeyTarget(PropRef.shape(active.id), active.default) }
-    Column(modifier.verticalScroll(rememberScrollState())) {
+    Column(modifier.deskVerticalScroll()) {
         for ((plain, label) in ModelParams) {
             val param = plain.copy(label = stringResource(label))
             EffectNumbers(state, param, layer.propText(param.id) ?: param.default, true, active.id == param.id, { active = plain }) { text, gesture ->

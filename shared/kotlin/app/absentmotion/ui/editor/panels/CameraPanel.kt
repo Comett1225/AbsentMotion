@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor.panels
 
+import app.absentmotion.ui.editor.deskSp
 import app.absentmotion.model.finiteFloat
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Canvas
@@ -234,7 +235,7 @@ internal fun CameraSizeTab(state: EditorState, layer: Layer) {
                 Caption(heightLabel, Modifier.width(177.px).fillMaxHeight())
             }
             Text(stringResource(R.string.camera_frame_caption, formatFixed(cameraZoomOf(fov, size), 1), formatFixed(fov, 1) + "º"),
-                Modifier.padding(top = 8.px), color = PanelCaption, fontSize = 11.sp, maxLines = 1, softWrap = false)
+                Modifier.padding(top = 8.px), color = PanelCaption, fontSize = deskSp(11f), maxLines = 1, softWrap = false)
         }
         RulerSpinner(
             Am.Accent,
@@ -270,7 +271,7 @@ private fun NumberRow(
     Row(Modifier.fillMaxWidth().height(RowHeight).padding(horizontal = 8.dp).alpha(if (enabled) 1f else 0.35f), verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.width(96.dp)) {
             Text(label, color = Am.OnDark, fontSize = 14.sp, lineHeight = 16.sp, maxLines = 1, softWrap = false)
-            if (note != null) Text(note, color = Am.OnDarkDim, fontSize = 10.sp, lineHeight = 12.sp, maxLines = 1, softWrap = false)
+            if (note != null) Text(note, color = Am.OnDarkDim, fontSize = deskSp(10f), lineHeight = 12.sp, maxLines = 1, softWrap = false)
         }
         NumberBox(text, if (active) Am.Accent else Am.OnDark, Modifier.width(BoxWidth).height(32.dp), onClick = if (enabled) onTap else null)
         Box(Modifier.weight(1f).fillMaxHeight().padding(start = 8.dp)) {

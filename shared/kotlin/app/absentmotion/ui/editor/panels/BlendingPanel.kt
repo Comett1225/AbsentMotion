@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor.panels
 
+import app.absentmotion.ui.editor.deskVerticalScroll
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -79,7 +80,7 @@ internal fun BlendingPanel(state: EditorState, layer: Layer, modifier: Modifier 
             contentAlignment = Alignment.Center,
         ) { Text("${Math.round(opacity * 100)}%", color = Am.OnDark, fontSize = 15.5.sp, maxLines = 1, softWrap = false) }
         Column(
-            Modifier.padding(top = 145.px).fillMaxSize().verticalScroll(rememberScrollState()).padding(start = 18.px, end = 18.px, bottom = 18.px),
+            Modifier.padding(top = 145.px).fillMaxSize().deskVerticalScroll().padding(start = 18.px, end = 18.px, bottom = 18.px),
             verticalArrangement = Arrangement.spacedBy(18.px),
         ) {
             Categories.forEach { (name, modes) ->

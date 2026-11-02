@@ -1,5 +1,7 @@
 package app.absentmotion.ui.editor.panels
 
+import app.absentmotion.ui.editor.deskSp
+import app.absentmotion.ui.editor.deskVerticalScroll
 import app.absentmotion.model.path
 import app.absentmotion.model.finiteFloat
 import androidx.compose.animation.AnimatedVisibility
@@ -212,7 +214,7 @@ private fun ColourRow(argb: Int, active: Boolean, select: () -> Unit, open: () -
         PropertyLabel(stringResource(R.string.color), active, true, Modifier.width(75.dp).fillMaxHeight(), select)
         Spacer(Modifier.weight(1f))
         Text("${(argb shr 16) and 255} ${(argb shr 8) and 255} ${argb and 255}", Modifier.clickable { select(); open() },
-            color = Am.Caption, fontSize = 9.sp, maxLines = 1, softWrap = false)
+            color = Am.Caption, fontSize = deskSp(9f), maxLines = 1, softWrap = false)
         ColourSwatch(argb, 69.px, Modifier.padding(start = 23.px, end = 29.px)) { select(); open() }
     }
 }
@@ -336,7 +338,7 @@ private fun EndPicker(state: EditorState, layer: Layer) {
                         .clickable { state.editSelected { it.withStrokeAttr(if (which == 0) "start" else "end", style) } },
                     contentAlignment = Alignment.Center,
                 ) {
-                    if (style == "none") Text(stringResource(R.string.none), color = if (style == current) Am.Accent else Am.OnDark, fontSize = 11.sp) else EndGlyph(style, if (style == current) Am.Accent else Am.OnDark)
+                    if (style == "none") Text(stringResource(R.string.none), color = if (style == current) Am.Accent else Am.OnDark, fontSize = deskSp(11f)) else EndGlyph(style, if (style == current) Am.Accent else Am.OnDark)
                 }
             }
         }
@@ -352,7 +354,7 @@ private fun BorderTab(state: EditorState, layer: Layer) {
     val scroll = rememberScrollState()
     val reorder = rememberReorder(state, scroll, top = 18.px, pitch = 122.px)
     val reorderLabel = stringResource(R.string.effects_reorder)
-    Column(Modifier.fillMaxSize().verticalScroll(scroll).padding(start = 18.px, end = 18.px, top = 18.px)) {
+    Column(Modifier.fillMaxSize().deskVerticalScroll(scroll).padding(start = 18.px, end = 18.px, top = 18.px)) {
         val opened = openBorder.takeIf { it in borders.indices } ?: -1
         key(reorder.generation) {
             borders.forEach { b ->
@@ -436,7 +438,7 @@ private fun ShadowTab(state: EditorState, layer: Layer) {
     val on = s.present && s.enabled
     Column(Modifier.fillMaxSize()) {
         TitleRow(stringResource(R.string.shadow_title), on, null, {}) { checked -> state.editSelected { it.withShadowEnabled(checked) } }
-        Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).then(if (on) Modifier else Modifier.dimmed())) {
+        Column(Modifier.fillMaxSize().deskVerticalScroll().then(if (on) Modifier else Modifier.dimmed())) {
             fun select(i: Int) = { shadowField = i }
             ColourRow(s.color, shadowField == 0, select(0)) { if (on) editColour(ShadowColour, StyleColors.Black) }
             EffectNumbers(state, sizeParam("4"), "${s.size}", on, shadowField == 1, select(1)) { text, g -> state.setRow(ShadowRefs[1], text, g) }

@@ -4,10 +4,14 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,6 +26,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.isSecondaryPressed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -70,17 +76,19 @@ private val Sections = listOf(
 
 @Composable
 internal fun DeskLibraryRail(selected: Int, expanded: Boolean, modifier: Modifier, select: (Int) -> Unit) {
-    Column(modifier.background(Am.Panel).verticalScroll(rememberScrollState()).padding(vertical = 4.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(modifier.background(Am.Panel).deskVerticalScroll().padding(vertical = 4.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Sections.forEachIndexed { index, section ->
             val title = stringResource(section.title)
             val active = expanded && selected == index
             val tint = if (active) Am.Accent else Am.OnDark
             Hint(title) {
-                Column(Modifier.width(48.dp).height(50.dp).clip(RoundedCornerShape(8.dp)).background(if (active) Am.Accent.copy(alpha = .16f) else androidx.compose.ui.graphics.Color.Transparent)
-                    .clickable { select(index) }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                val source = remember { MutableInteractionSource() }
+                val hovered by source.collectIsHoveredAsState()
+                Column(Modifier.width(56.dp).height(54.dp).clip(RoundedCornerShape(8.dp)).background(if (active) Am.Accent.copy(alpha = .16f) else if (hovered) Am.Field else androidx.compose.ui.graphics.Color.Transparent)
+                    .hoverable(source).pointerHoverIcon(PointerIcon.Hand).clickable { select(index) }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                     Icon(section.icon, null, Modifier.size(22.dp), tint = tint)
-                    Text(stringResource(section.rail), Modifier.fillMaxWidth().padding(top = 2.dp), color = if (active) Am.Accent else Am.OnDarkDim, fontSize = 11.sp,
-                        lineHeight = 13.sp, maxLines = 1, overflow = TextOverflow.Clip, textAlign = TextAlign.Center)
+                    Text(stringResource(section.rail), Modifier.fillMaxWidth().padding(top = 3.dp), color = if (active) Am.Accent else Am.OnDarkDim, fontSize = 12.sp,
+                        lineHeight = 14.sp, maxLines = 1, overflow = TextOverflow.Clip, textAlign = TextAlign.Center)
                 }
             }
         }
@@ -110,9 +118,9 @@ internal fun DeskLibrary(state: EditorState, library: AddLibrary, tab: Int, modi
                 }
                 4 -> DeskObjects(state)
                 5 -> DeskTemplates(state)
-                else -> DeskGrid(Modifier.fillMaxSize()) {
-                    item { DeskIconTile(state, stringResource(R.string.add_quick_freehand_brush), ChromeIcons.Freehand) { state.startFreehand() } }
-                    item { DeskIconTile(state, stringResource(R.string.add_quick_pen_tool), ChromeIcons.VectorDrawing) { state.startVectorDrawing() } }
+                else -> Column(Modifier.fillMaxSize().padding(horizontal = 12.dp, vertical = 4.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    DeskToolRow(ChromeIcons.Freehand, stringResource(R.string.add_quick_freehand_brush), stringResource(R.string.desk_draw_freehand_hint)) { state.startFreehand() }
+                    DeskToolRow(ChromeIcons.VectorDrawing, stringResource(R.string.add_quick_pen_tool), stringResource(R.string.desk_draw_pen_hint)) { state.startVectorDrawing() }
                 }
             }
         }
@@ -122,20 +130,45 @@ internal fun DeskLibrary(state: EditorState, library: AddLibrary, tab: Int, modi
 
 @Composable
 internal fun DeskGrid(modifier: Modifier, content: LazyGridScope.() -> Unit) {
-    LazyVerticalGrid(GridCells.Adaptive(80.dp), modifier, contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 12.dp),
+    val grid = rememberLazyGridState()
+    LazyVerticalGrid(GridCells.Adaptive(80.dp), modifier.deskScrollbar(grid), grid, contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp), content = content)
 }
 
 @Composable
-internal fun DeskTile(state: EditorState, label: String, picture: @Composable () -> Unit, reveal: (() -> Unit)? = null, direct: Boolean = true, add: () -> Unit) {
-    val tile = Modifier.fillMaxWidth().aspectRatio(1f).clip(RoundedCornerShape(8.dp)).background(Am.Field)
+internal fun DeskTile(state: EditorState, label: String, picture: @Composable () -> Unit, reveal: (() -> Unit)? = null, direct: Boolean = true, detail: String? = null, add: () -> Unit) {
+    val source = remember { MutableInteractionSource() }
+    val hovered by source.collectIsHoveredAsState()
     val body: @Composable () -> Unit = {
-        Column(tile.then(if (direct) Modifier.deskDrag(state, label, add, picture) else Modifier).clickable(onClick = add).padding(6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Box(Modifier.weight(1f).fillMaxWidth().clip(RoundedCornerShape(4.dp)), Alignment.Center) { picture() }
-            Text(label, Modifier.fillMaxWidth().padding(top = 4.dp), color = Am.OnDark, fontSize = 12.sp, lineHeight = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center)
+        Column(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(if (hovered) Am.Button else Am.Field).hoverable(source).pointerHoverIcon(PointerIcon.Hand)
+                .then(if (direct) Modifier.deskDrag(state, label, add, picture) else Modifier).clickable(onClick = add).padding(6.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Box(Modifier.fillMaxWidth().aspectRatio(1f).clip(RoundedCornerShape(4.dp)), Alignment.Center) { picture() }
+            Column(Modifier.fillMaxWidth().height(32.dp).padding(top = 4.dp), Arrangement.Center) {
+                Text(label, Modifier.fillMaxWidth(), color = Am.OnDark, fontSize = 12.sp, lineHeight = 14.sp, maxLines = if (detail == null) 2 else 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center)
+                if (detail != null) Text(detail, Modifier.fillMaxWidth(), color = Am.OnDarkDim, fontSize = 12.sp, lineHeight = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center)
+            }
         }
     }
-    DeskTip(label) { if (direct) DeskContext(add, reveal) { body() } else body() }
+    DeskTip(if (detail != null) "$label · $detail" else label) { if (direct) DeskContext(add, reveal) { body() } else body() }
+}
+
+@Composable
+internal fun DeskToolRow(icon: ImageVector, title: String, description: String, add: () -> Unit) {
+    val source = remember { MutableInteractionSource() }
+    val hovered by source.collectIsHoveredAsState()
+    Row(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(if (hovered) Am.Button else Am.Field).hoverable(source).pointerHoverIcon(PointerIcon.Hand).clickable(onClick = add).padding(10.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(Modifier.size(44.dp).clip(RoundedCornerShape(6.dp)).background(Am.Panel), Alignment.Center) { Icon(icon, null, Modifier.size(26.dp), tint = Am.OnDark) }
+        Column(Modifier.weight(1f)) {
+            Text(title, color = Am.OnDark, fontSize = 13.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(description, Modifier.padding(top = 2.dp), color = Am.OnDarkDim, fontSize = 12.sp, lineHeight = 15.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+        }
+    }
 }
 
 @Composable
@@ -148,13 +181,12 @@ internal fun Modifier.deskDrag(state: EditorState, label: String, add: () -> Uni
     var origin by remember { mutableStateOf(Offset.Zero) }
     val latest by rememberUpdatedState(add)
     val latestPicture by rememberUpdatedState(picture)
+    val live = remember { BooleanArray(1) }
+    DisposableEffect(Unit) { onDispose { if (live[0]) DeskDrop.clear() } }
     return onGloballyPositioned { origin = it.positionInWindow() }.pointerInput(state, label) {
-        detectDragGestures(onDragStart = { DeskDrop.item = DropItem(label) { latest() }; DeskGhost.picture = latestPicture; DeskDrop.at = origin + it },
-            onDragCancel = { DeskDrop.item = null; DeskGhost.picture = null; DeskDrop.at = Offset.Unspecified }, onDragEnd = {
-                finishDeskDrop(state, DeskDrop.at) { latest() }
-                DeskDrop.item = null
-                DeskGhost.picture = null
-                DeskDrop.at = Offset.Unspecified
+        detectDragGestures(onDragStart = { live[0] = true; DeskDrop.item = DropItem(label) { latest() }; DeskGhost.picture = latestPicture; DeskDrop.at = origin + it },
+            onDragCancel = { live[0] = false; DeskDrop.clear() }, onDragEnd = {
+                try { finishDeskDrop(state, DeskDrop.at) { latest() } } finally { live[0] = false; DeskDrop.clear() }
             }) { change, _ -> DeskDrop.at = origin + change.position; change.consume() }
     }
 }
@@ -255,9 +287,15 @@ private fun DeskTemplates(state: EditorState) {
     val context = LocalContext.current
     val saved by produceState<List<SavedTemplate>?>(null) { value = withContext(Dispatchers.IO) { TemplateStore(context).list() } }
     val list = saved ?: return
-    if (list.isEmpty()) Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(stringResource(R.string.templates_nothing_here), color = Am.OnDark, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-        Text(stringResource(R.string.templates_nothing_here_hint), color = Am.OnDarkDim, fontSize = 13.sp)
+    if (list.isEmpty()) Column(Modifier.fillMaxSize().padding(horizontal = 24.dp), Arrangement.spacedBy(8.dp, Alignment.CenterVertically), Alignment.CenterHorizontally) {
+        Icon(ChromeIcons.TemplateTab, null, Modifier.size(40.dp), tint = Am.OnDarkDim)
+        Text(stringResource(R.string.desk_templates_empty), color = Am.OnDark, fontSize = 14.sp, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center)
+        Text(stringResource(R.string.desk_templates_empty_hint), color = Am.OnDarkDim, fontSize = 13.sp, lineHeight = 18.sp, textAlign = TextAlign.Center)
+        Spacer(Modifier.height(4.dp))
+        Box(
+            Modifier.height(36.dp).clip(RoundedCornerShape(8.dp)).background(Am.Accent).pointerHoverIcon(PointerIcon.Hand).clickable { state.playing = false; state.exportOpen = true }.padding(horizontal = 16.dp),
+            Alignment.Center,
+        ) { Text(stringResource(R.string.desk_templates_export), color = Am.OnAccent, fontSize = 13.sp, fontWeight = FontWeight.Medium, maxLines = 1) }
     } else DeskGrid(Modifier.fillMaxSize()) {
         items(list, key = { it.id }) { t ->
             val bitmap = rememberFileBitmap(t.thumbnail, t.modified)

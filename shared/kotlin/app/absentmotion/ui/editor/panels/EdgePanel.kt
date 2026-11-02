@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor.panels
 
+import app.absentmotion.ui.editor.deskVerticalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -44,7 +45,7 @@ internal fun EdgePanel(state: EditorState, layer: Layer, modifier: Modifier = Mo
     val edge = layer.cutoutEdge ?: return
     val id = layer.id
     fun set(next: MatteEdge, key: Any? = "cutout-edge") = state.edit(key) { scene -> scene.update(id) { it.withCutoutEdge(next) } }
-    Column(modifier.verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 8.dp)) {
+    Column(modifier.deskVerticalScroll().padding(horizontal = 16.dp, vertical = 8.dp)) {
         EdgeSlider(stringResource(R.string.cutout_softness), edge.softness, 0..MatteEdge.MAX_SOFTNESS, state::endGesture) { set(edge.copy(softness = it)) }
         EdgeSlider(stringResource(R.string.cutout_grow_shrink), edge.grow, -MatteEdge.MAX_GROW..MatteEdge.MAX_GROW, state::endGesture) { set(edge.copy(grow = it)) }
         Row(Modifier.padding(top = 4.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {

@@ -68,6 +68,11 @@ private val Skipped = setOf("head", "header", "nav", "figure", "script", "style"
 private fun entities(text: String): String = text.replace("&nbsp;", " ").replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">").replace("&quot;", "\"")
     .replace("&#39;", "'").replace("&rarr;", "→").replace("&larr;", "←").replace("&middot;", "·").replace("&hellip;", "…").replace("&ndash;", "–").replace("&mdash;", "—")
 
+internal fun helpTarget(page: String, target: String): String? {
+    val folder = page.substringBeforeLast('/', "")
+    return runCatching { URI(if (folder.isEmpty()) "/" else "/$folder/").resolve(URI.create(target.replace(" ", "%20"))).path.removePrefix("/") }.getOrNull()
+}
+
 internal fun helpBlocks(html: String, link: SpanStyle, open: (String) -> Unit): List<HelpBlock> {
     val out = ArrayList<HelpBlock>()
     var skip = 0
@@ -114,7 +119,12 @@ internal fun helpBlocks(html: String, link: SpanStyle, open: (String) -> Unit): 
             if (name == skipName) skip += if (closing) -1 else 1
             continue
         }
-        if (!closing && name in Skipped || !closing && name == "details" && "toc" in attrs) { skip = 1; skipName = name; continue }
+        if (!closing && name in Skipped || !closing && name == "details" && "toc" in attrs) {
+            if (before.isNotBlank() || started) text(before)
+            skip = 1
+            skipName = name
+            continue
+        }
         if (before.isNotBlank() || started) text(before)
         when (name) {
             "h1", "h2", "h3", "p", "li", "td", "th" -> if (closing) { flush(); if (name == "li") marker = "" } else {
@@ -163,7 +173,7 @@ internal fun DeskHelpPage() {
     val open: (String) -> Unit = { target ->
         if (target.startsWith("http")) runCatching { links.openUri(target) }
         else {
-            val resolved = runCatching { URI("/" + page.substringBeforeLast('/', "")).resolve(URI.create(target.replace(" ", "%20"))).path.removePrefix("/") }.getOrNull()
+            val resolved = helpTarget(page, target)
             val path = if (target.startsWith("#")) page else resolved ?: target
             anchor = target.substringAfter('#', "").ifEmpty { null }
             if (path.substringBefore('#') != page) history += path.substringBefore('#')

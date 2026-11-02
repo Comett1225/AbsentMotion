@@ -114,7 +114,7 @@ private fun ObjectTile(label: String, icon: ImageVector, modifier: Modifier, ena
         Icon(icon, null, Modifier.align(Alignment.TopCenter).padding(top = 14.dp).size(24.dp), tint = Am.OnDark)
         Text(
             label, Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(40.dp).padding(start = 3.dp, end = 3.dp, bottom = 4.dp).wrapContentHeight(Alignment.CenterVertically),
-            color = Am.OnDark, fontSize = 11.sp, lineHeight = 13.sp, maxLines = 2, textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            color = Am.OnDark, fontSize = deskSp(11f), lineHeight = 13.sp, maxLines = 2, textAlign = androidx.compose.ui.text.style.TextAlign.Center,
         )
     }
 }
@@ -348,7 +348,7 @@ private val AlignNames = listOf(
     R.string.structure_align_top, R.string.structure_align_middle, R.string.structure_align_bottom,
 )
 
-private val PasteLabels = mapOf(
+internal val PasteLabels = mapOf(
     StylePart.ColorFill to R.string.structure_paste_fill_color, StylePart.BorderShadow to R.string.structure_paste_border_shadow,
     StylePart.Blending to R.string.structure_paste_blending,
 )
@@ -392,11 +392,11 @@ internal fun MultiTopBar(state: EditorState, modifier: Modifier) {
     }
 }
 
-private fun styleToast(context: Context, n: Int) {
+internal fun styleToast(context: Context, n: Int) {
     Toast.makeText(context, context.resources.getQuantityString(R.plurals.structure_style_pasted, n, n.toString()), Toast.LENGTH_SHORT).show()
 }
 
-private fun pasteEffectsOnSelection(state: EditorState, context: Context) {
+internal fun pasteEffectsOnSelection(state: EditorState, context: Context) {
     val (pasted, skipped) = state.pasteEffectsOnChosen()
     val resources = context.resources
     val count = EffectClipboard.effects.size

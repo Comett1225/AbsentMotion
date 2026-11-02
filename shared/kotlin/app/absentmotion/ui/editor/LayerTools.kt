@@ -156,7 +156,7 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
         dismissButton = { androidx.compose.material3.TextButton({ state.ungroupAsk = false }) { Text(stringResource(R.string.cancel), color = Am.Accent) } },
         containerColor = Am.Field,
     )
-    Column(modifier.background(Am.Panel).verticalScroll(rememberScrollState()).padding(start = 62.px, top = 42.px, end = 62.px)) {
+    Column(modifier.background(Am.Panel).deskVerticalScroll().padding(start = 62.px, top = 42.px, end = 62.px)) {
         Row(Modifier.fillMaxWidth().height(107.px)) {
             SmallTool(PanelIcons.Speed, stringResource(R.string.a11y_speed), Modifier.width(183.px), ToolShape, enabled = state.selected?.mediaFill?.video == true || state.selected?.kind == "audio") { state.panel = EditorPanel.Speed }
             Spacer(Modifier.width(17.px))
@@ -418,7 +418,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
             }
         }
         Box(Modifier.weight(1f).fillMaxHeight().tutorialGuard().background(if (move) Am.PanelInset else Am.Panel)) {
-            if (panel == EditorPanel.BorderShadow) BorderShadowTabs(Modifier.align(Alignment.CenterEnd).width(168.px).fillMaxHeight().background(Am.Panel))
+            if (panel == EditorPanel.BorderShadow) BorderShadowTabs(Modifier.align(if (app.absentmotion.platform.PlatformFeatures.desktop) Alignment.TopEnd else Alignment.CenterEnd).width(168.px).then(if (app.absentmotion.platform.PlatformFeatures.desktop) Modifier.height(PanelHeight) else Modifier.fillMaxHeight()).background(Am.Panel))
             when (panel) {
                 EditorPanel.MoveTransform -> Swap(tab, Modifier.fillMaxSize().tutorialTarget("pad"), rise = 0.dp) { MoveTransformPanel(state, layer, tab, turn, Modifier.fillMaxSize()) }
                 EditorPanel.ColorFill -> ColorFillPanel(state, layer, Modifier.fillMaxSize())
@@ -435,7 +435,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
             if (move) Box(Modifier.align(Alignment.CenterEnd).width(2.px).fillMaxHeight().background(PanelDark))
         }
         if (move) {
-            Column(Modifier.width(168.px).fillMaxHeight().tutorialGuard()) {
+            Column(Modifier.width(168.px).then(if (app.absentmotion.platform.PlatformFeatures.desktop) Modifier.height(PanelHeight) else Modifier.fillMaxHeight()).tutorialGuard()) {
                 val names = listOf(R.string.a11y_tab_move, R.string.a11y_tab_rotate, R.string.panel_size, R.string.a11y_tab_tilt, R.string.a11y_tab_skew, R.string.a11y_tab_pivot)
                 val icons = listOf(PanelIcons.TabMove, PanelIcons.TabRotate, PanelIcons.TabSize, PanelIcons.TabTilt, PanelIcons.TabSkew, PanelIcons.TabPivot)
                 transformTabs(state.settings.basicTransform).forEach { i ->
@@ -453,8 +453,9 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
                             PanelIcon(icon, tint, size = 17.dp)
                             Text(
                                 stringResource(names[i]), Modifier.fillMaxWidth().padding(horizontal = 2.dp), color = animatedColor(tint), maxLines = 1, softWrap = false,
-                                textAlign = androidx.compose.ui.text.style.TextAlign.Center, lineHeight = 9.sp,
-                                autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(6.sp, 9.sp, 0.5.sp),
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center, lineHeight = if (app.absentmotion.platform.PlatformFeatures.desktop) 14.sp else 9.sp,
+                                fontSize = if (app.absentmotion.platform.PlatformFeatures.desktop) 12.sp else androidx.compose.ui.unit.TextUnit.Unspecified,
+                                autoSize = if (app.absentmotion.platform.PlatformFeatures.desktop) null else androidx.compose.foundation.text.TextAutoSize.StepBased(6.sp, 9.sp, 0.5.sp),
                             )
                         }
                     }

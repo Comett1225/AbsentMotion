@@ -1,5 +1,7 @@
 package app.absentmotion.ui.editor.panels
 
+import app.absentmotion.ui.editor.deskSp
+import app.absentmotion.ui.editor.deskVerticalScroll
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -159,7 +161,7 @@ internal fun EffectNumbers(state: EditorState, param: EffectParam, raw: String, 
         Column(Modifier.padding(horizontal = 2.dp, vertical = 4.dp).fillMaxHeight(), Arrangement.spacedBy(2.dp)) {
             values.forEachIndexed { i, value ->
                 Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
-                    Text(if (i == 0) "X:" else "Y:", Modifier.padding(end = 5.dp), color = Am.Caption, fontSize = 10.sp)
+                    Text(if (i == 0) "X:" else "Y:", Modifier.padding(end = 5.dp), color = Am.Caption, fontSize = deskSp(10f))
                     ValueBox(formatFixed(value * factor, decimals), i == component, active && i == component, Modifier.width(55.dp).fillMaxHeight(), 5.5f, enabled) { tap(i) }
                 }
             }
@@ -264,7 +266,7 @@ private fun EffectPalette(param: EffectParam, raw: String, enabled: Boolean, tar
                 PaletteButton(stringResource(R.string.effect_palette_presets), enabled) { menu = true }
                 Presence(menu) {
                     MenuPopup(DropOrRise, { menu = false }) {
-                        Column(Modifier.heightIn(max = 320.dp).verticalScroll(rememberScrollState())) {
+                        Column(Modifier.heightIn(max = 320.dp).deskVerticalScroll()) {
                             Palettes.presets.forEach { p -> PalettePresetRow(p, p == preset) { set(Palettes.format(p.colors)); menu = false } }
                         }
                     }
@@ -359,7 +361,7 @@ private fun EffectColor(state: EditorState, param: EffectParam, raw: String, ena
                     next.forEachIndexed { i, value -> out = out or (value.roundToInt().coerceIn(0,255) shl intArrayOf(16,8,0,24)[i]) }
                     set(formatColor(out))
                 }
-            }, color = Am.OnDark, fontSize = 10.sp, textAlign = TextAlign.Center)
+            }, color = Am.OnDark, fontSize = deskSp(10f), textAlign = TextAlign.Center)
         }
         Presence(expanded) { MenuPopup(DropOrRise, { expanded = false }) {
             val swatches = listOf(0xFF4444,0xF4B446,0xFAE965,0x1ED91E,0x17E1E1,0x3D4CF5,0xDD44DD,0xFFFFFF,0xBEBEBE,0x888888,0x444444,0x000000,0x5EB7D9,0x98C99C)

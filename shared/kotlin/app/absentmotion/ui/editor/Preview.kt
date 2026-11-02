@@ -439,7 +439,7 @@ private fun SwipeHint(label: String, modifier: Modifier) {
             }
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(stringResource(R.string.drag_to_adjust), color = Color.White, fontSize = 11.sp, lineHeight = 14.sp, maxLines = 1)
+            Text(stringResource(R.string.drag_to_adjust), color = Color.White, fontSize = deskSp(11f), lineHeight = 14.sp, maxLines = 1)
             Text(label, color = Am.Accent, fontSize = 15.sp, lineHeight = 19.sp, fontWeight = FontWeight.Bold, maxLines = 1)
         }
     }
