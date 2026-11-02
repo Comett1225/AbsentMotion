@@ -64,8 +64,8 @@ fun main(args: Array<String>) {
             onDispose { runCatching { platform?.setQuitHandler(null) } }
         }
         Window(onCloseRequest = quit, title = "AbsentMotion", state = state,
-            onPreviewKeyEvent = { DeskKeys.released(it); it.type == KeyEventType.KeyDown && it.key == Key.Escape && DeskBack.back() },
-            onKeyEvent = { app.absentmotion.desk.DeskGlobalKeys.handle(desk, it) || DeskKeys.handle(desk, it) }) {
+            onPreviewKeyEvent = { it.type == KeyEventType.KeyDown && it.key == Key.Escape && DeskBack.back() || DeskKeys.handle(desk, it) },
+            onKeyEvent = { app.absentmotion.desk.DeskGlobalKeys.handle(desk, it) }) {
             DeskFiles.window = window
             remember(window) { window.minimumSize = java.awt.Dimension(800, 560) }
             if (DesktopPlatform.mac) remember(window) {

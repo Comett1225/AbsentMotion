@@ -40,6 +40,8 @@ import app.absentmotion.media.videoDeclaration
 import app.absentmotion.model.Layer
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.exifOrientation
+import app.absentmotion.platform.PlatformFeatures
+import app.absentmotion.platform.compressVideoOnDesktop
 import app.absentmotion.platform.intOr
 import app.absentmotion.platform.shareExport
 import app.absentmotion.platform.webpFormat
@@ -113,13 +115,13 @@ suspend fun compressVideo(context: Context, picked: PickedMedia, job: VideoJob, 
     val durationUs = picked.source.durationUs
     var finished = false
     try {
-        val encoded = job.audioKbps > 0 && !job.copyAudio
+        val encoded = job.audioKbps > 0 && !job.copyAudio && !PlatformFeatures.desktop
         if (encoded) encodeSound(app, uri, durationUs, job.audioKbps, sound) { progress(it * 0.1f, false) }
         val soundFrom = if (job.audioKbps <= 0) null else if (encoded) Uri.fromFile(sound).toString() else uri
         val start = if (encoded) 0.1f else 0f
         var current = encodable(job)
         for (attempt in 0..3) {
-            runVideo(app, uri, current, picked.rotation, soundFrom, out) { progress(start + (1 - start) * it, attempt > 0) }
+            runVideo(app, uri, current, picked.rotation, soundFrom, out, durationUs) { progress(start + (1 - start) * it, attempt > 0) }
             val got = out.length()
             if (current.limitBytes <= 0 || got <= current.limitBytes) { finished = true; return@withContext Compressed(out, "video/mp4", true) }
             val next = smallerBitrate(current, durationUs, got)
@@ -133,7 +135,8 @@ suspend fun compressVideo(context: Context, picked: PickedMedia, job: VideoJob, 
     }
 }
 
-private suspend fun runVideo(context: Context, uri: String, job: VideoJob, rotation: Int, soundFrom: String?, out: File, progress: (Float) -> Unit) {
+private suspend fun runVideo(context: Context, uri: String, job: VideoJob, rotation: Int, soundFrom: String?, out: File, durationUs: Long, progress: (Float) -> Unit) {
+    if (PlatformFeatures.desktop) return compressVideoOnDesktop(uri, job, soundFrom != null, durationUs, out, progress)
     val work = currentCoroutineContext().job
     val sound = soundFrom?.let { AudioCopy(context, it) }
     try {
@@ -153,6 +156,7 @@ private fun avcEncodes(width: Int, height: Int, fps: Int): Boolean = MediaCodecL
 }
 
 private fun encodable(job: VideoJob): VideoJob {
+    if (PlatformFeatures.desktop) return job
     if (avcEncodes(job.width, job.height, job.fps)) return job
     for (side in listOf(2160, 1440, 1080, 720, 480)) {
         val (w, h) = scaledToShort(job.width, job.height, side)

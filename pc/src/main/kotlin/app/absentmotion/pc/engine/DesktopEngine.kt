@@ -16,7 +16,7 @@ import java.net.URI
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-class DesktopEngine(val assets: File, private val repo: File?) : AutoCloseable {
+class DesktopEngine(val assets: File, private val repo: File?, private val bundledEmoji: Boolean = true) : AutoCloseable {
     private val handle = DesktopNative.create()
     val definitions: List<EffectDefinition>
     val loadErrors = linkedMapOf<String, String>()
@@ -64,6 +64,8 @@ class DesktopEngine(val assets: File, private val repo: File?) : AutoCloseable {
         listOfNotNull(file.takeIf { it.isAbsolute }, base?.resolve(uri), repo?.resolve(uri)).firstOrNull { it.isFile }
     }.getOrNull()
 
+    private val emojis = app.absentmotion.fonts.emojiPaths(bundledEmoji).let { (a, b) -> (a ?: assets.resolve("emoji/NotoColorEmoji.ttf").absolutePath) to (b ?: assets.resolve("emoji/NotoColorEmojiFlags.ttf").absolutePath) }
+
     private fun prepare(node: XmlNode): XmlNode {
         val children = node.children.map(::prepare)
         if (node.name != "text") return node.copy(children = children)
@@ -84,8 +86,7 @@ class DesktopEngine(val assets: File, private val repo: File?) : AutoCloseable {
             .with("_fontWeight", "$weight").with("_fontItalic", "$italic")
             .with("_letterSpacing", "${layer.textSpacing("letterspacing", 0f)}")
             .with("_lineSpacing", "${layer.textSpacing("linespacing", 1f)}")
-            .with("_emoji", assets.resolve("emoji/NotoColorEmoji.ttf").absolutePath)
-            .with("_emojiFlags", assets.resolve("emoji/NotoColorEmojiFlags.ttf").absolutePath)
+            .with("_emoji", emojis.first).with("_emojiFlags", emojis.second)
     }
 
     fun render(time: Int, width: Int, height: Int): BufferedImage {

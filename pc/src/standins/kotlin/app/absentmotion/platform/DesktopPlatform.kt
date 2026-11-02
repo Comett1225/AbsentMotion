@@ -167,7 +167,7 @@ internal const val MAX_SHARED_PICTURES = 500
 fun shareExport(context: Context, result: app.absentmotion.export.ExportResult) = DeskFiles.reveal(result.uris)
 
 @Composable
-fun ExportMediaPreview(kind: app.absentmotion.export.ExportKind, uris: List<Uri>, large: Boolean = false, onTap: (() -> Unit)? = null) = app.absentmotion.ui.export.DeskExportPreview(kind, uris)
+fun ExportMediaPreview(kind: app.absentmotion.export.ExportKind, uris: List<Uri>, large: Boolean = false, onTap: (() -> Unit)? = null) = app.absentmotion.ui.export.DeskExportPreview(kind, uris, large, onTap)
 
 fun effectsMessageOnHome() = false
 
@@ -175,7 +175,7 @@ object PlatformFeatures {
     const val desktop = true
     const val ai = false
     const val camera = false
-    const val tools = false
+    const val tools = true
     const val userFiles = true
     const val linkFolders = true
 }

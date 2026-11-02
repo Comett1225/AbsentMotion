@@ -192,6 +192,8 @@ fun ExportMediaPreview(kind: app.absentmotion.export.ExportKind, uris: List<Uri>
 
 fun effectsMessageOnHome() = false
 
+suspend fun compressVideoOnDesktop(uri: String, job: app.absentmotion.tools.VideoJob, audio: Boolean, durationUs: Long, out: java.io.File, progress: (Float) -> Unit) = Unit
+
 object PlatformFeatures {
     const val desktop = false
     const val ai = true

@@ -3,6 +3,7 @@ package app.absentmotion.ui.export
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import app.absentmotion.R
 import app.absentmotion.desk.DeskMedia
 import app.absentmotion.export.ExportKind
+import app.absentmotion.ui.home.handCursor
 import app.absentmotion.ui.theme.Am
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
@@ -48,13 +50,19 @@ import java.io.File
 private const val PreviewSide = 720
 
 @Composable
-internal fun DeskExportPreview(kind: ExportKind, uris: List<Uri>) {
-    when (kind) {
-        ExportKind.Video, ExportKind.Gif -> MoviePreview(uris.first())
-        ExportKind.Frame, ExportKind.FrameAs -> PicturePreview(uris.first())
-        ExportKind.Sequence -> SequencePreview(uris)
-        ExportKind.Package, ExportKind.Xml, ExportKind.Audio -> FilePreview(uris.first())
+internal fun DeskExportPreview(kind: ExportKind, uris: List<Uri>, large: Boolean = false, onTap: (() -> Unit)? = null) {
+    var full by remember { mutableStateOf(false) }
+    val viewable = kind != ExportKind.Package && kind != ExportKind.Xml && kind != ExportKind.Audio
+    val open = if (!viewable || large) null else onTap ?: { full = true }
+    Box(Modifier.fillMaxSize().then(if (open != null) Modifier.handCursor().clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = open) else Modifier)) {
+        when (kind) {
+            ExportKind.Video, ExportKind.Gif -> MoviePreview(uris.first(), !full)
+            ExportKind.Frame, ExportKind.FrameAs -> PicturePreview(uris.first())
+            ExportKind.Sequence -> SequencePreview(uris)
+            ExportKind.Package, ExportKind.Xml, ExportKind.Audio -> FilePreview(uris.first())
+        }
     }
+    if (full) DeskMediaViewer(kind, uris) { full = false }
 }
 
 @Composable
@@ -83,14 +91,13 @@ private fun SequencePreview(uris: List<Uri>) {
 }
 
 @Composable
-private fun MoviePreview(uri: Uri) {
+private fun MoviePreview(uri: Uri, active: Boolean) {
     var frame by remember { mutableStateOf<ImageBitmap?>(null) }
-    var playing by remember { mutableStateOf(true) }
-    LaunchedEffect(uri, playing) {
-        val file = uri.toFile()?.takeIf { playing } ?: return@LaunchedEffect
+    LaunchedEffect(uri, active) {
+        val file = uri.toFile()?.takeIf { active } ?: return@LaunchedEffect
         withContext(Dispatchers.IO) { play(file) { frame = it; isActive } }
     }
-    Box(Modifier.fillMaxSize().clickable { playing = !playing }) {
+    Box(Modifier.fillMaxSize()) {
         frame?.let { Image(it, null, Modifier.fillMaxSize(), contentScale = ContentScale.Fit) }
     }
 }

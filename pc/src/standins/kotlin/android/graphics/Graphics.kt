@@ -168,3 +168,21 @@ object Color {
     @JvmStatic fun HSVToColor(hsv: FloatArray): Int = HSVToColor(255, hsv)
     @JvmStatic fun HSVToColor(a: Int, hsv: FloatArray): Int = (java.awt.Color.HSBtoRGB(hsv[0] / 360f, hsv[1], hsv[2]) and 0xffffff) or (a shl 24)
 }
+
+class Paint
+
+class Canvas(private val bitmap: Bitmap) {
+    fun drawColor(color: Int) {
+        val g = bitmap.image.createGraphics()
+        g.composite = java.awt.AlphaComposite.Src
+        g.color = java.awt.Color(color, true)
+        g.fillRect(0, 0, bitmap.width, bitmap.height)
+        g.dispose()
+    }
+
+    fun drawBitmap(source: Bitmap, left: Float, top: Float, paint: Paint?) {
+        val g = bitmap.image.createGraphics()
+        g.drawImage(source.image, left.toInt(), top.toInt(), null)
+        g.dispose()
+    }
+}
