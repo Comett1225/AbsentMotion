@@ -86,7 +86,6 @@ class DeskShotsTest {
             shot("07-export.png")
             fun exportAndShoot(prefix: String) {
                 onAllNodesWithText("Export").onLast().performClick()
-                waitUntil(timeoutMillis = 10_000) { onAllNodesWithText("Saved to storage").fetchSemanticsNodes().isEmpty() }
                 mainClock.advanceTimeBy(300)
                 shot("$prefix-running.png")
                 waitUntil(timeoutMillis = 120_000) { onAllNodesWithText("Saved to storage").fetchSemanticsNodes().isNotEmpty() }

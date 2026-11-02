@@ -66,6 +66,7 @@ fun main(args: Array<String>) {
             onPreviewKeyEvent = { DeskKeys.released(it); it.type == KeyEventType.KeyDown && it.key == Key.Escape && DeskBack.back() },
             onKeyEvent = { app.absentmotion.desk.DeskGlobalKeys.handle(desk, it) || DeskKeys.handle(desk, it) }) {
             DeskFiles.window = window
+            remember(window) { window.minimumSize = java.awt.Dimension(800, 560) }
             if (DesktopPlatform.mac) remember(window) {
                 window.rootPane.putClientProperty("apple.awt.fullWindowContent", true)
                 window.rootPane.putClientProperty("apple.awt.transparentTitleBar", true)
