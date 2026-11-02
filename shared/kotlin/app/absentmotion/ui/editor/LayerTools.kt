@@ -318,7 +318,7 @@ private val ScreenshotTool = Tool(R.string.layer_tool_screenshot, PanelIcons.Scr
 @Composable
 private fun SmallTool(icon: ImageVector, description: String, modifier: Modifier, shape: RoundedCornerShape, enabled: Boolean = true, iconSize: Dp = 24.dp, onClick: () -> Unit = {}) {
     val press = remember { MutableInteractionSource() }
-    val hovered by press.collectIsHoveredAsState()
+    val hovered = if (app.absentmotion.platform.PlatformFeatures.desktop) press.collectIsHoveredAsState().value else false
     Box(
         modifier.tutorialGuard().fillMaxHeight().pressScale(press, TilePress).then(if (enabled) Modifier else Modifier.dimmed()).clip(shape)
             .background(if (app.absentmotion.platform.PlatformFeatures.desktop && hovered) Am.Field else Am.Button)
@@ -333,7 +333,7 @@ private fun SmallTool(icon: ImageVector, description: String, modifier: Modifier
 @Composable
 private fun ToolButton(tool: Tool, modifier: Modifier, enabled: Boolean = true, active: Boolean = false, onLongClick: (() -> Unit)? = null, menu: (@Composable () -> Unit)? = null, onClick: () -> Unit = {}) {
     val press = remember { MutableInteractionSource() }
-    val hovered by press.collectIsHoveredAsState()
+    val hovered = if (app.absentmotion.platform.PlatformFeatures.desktop) press.collectIsHoveredAsState().value else false
     Box(
         modifier.tutorialGuard().fillMaxHeight().pressScale(press, TilePress).then(if (enabled) Modifier else Modifier.dimmed()).clip(ToolShape)
             .background(if (app.absentmotion.platform.PlatformFeatures.desktop && hovered) Am.Field else Am.Button)

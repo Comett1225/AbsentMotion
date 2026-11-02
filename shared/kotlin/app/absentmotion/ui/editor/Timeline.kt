@@ -179,6 +179,7 @@ private val PillHeight = 16.7.dp
 private val PillNotch = 5.dp
 
 private val ReadoutHalfWidth = PillWidth / 2 + 12.dp
+private val PillInset = 2.dp
 private val ReadoutTop = PillTop + PillHeight / 2 - 24.dp
 
 private val BookmarkColor get() = Am.Bookmark
@@ -907,7 +908,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
     fun hitAt(at: Offset): Hit {
         if (at.y < rulerH) {
             if (PlatformFeatures.desktop && at.x < headerWidth) return Hit.Corner
-            val centre = timeScale().originX + PlayheadWidth.px / 2
+            val centre = (timeScale().originX + PlayheadWidth.px / 2).let { if (PlatformFeatures.desktop) maxOf(it, headerWidth + PillInset.px + PillWidth.px / 2) else it }
             return if (at.y >= ReadoutTop.px && abs(at.x - centre) <= ReadoutHalfWidth.px) Hit.Readout else Hit.Ruler
         }
         val layer = layerAt(rowAt(at.y)) ?: return Hit.Empty
@@ -1608,7 +1609,7 @@ private fun DrawScope.drawTimeline(view: TimelineView, measurer: TextMeasurer, e
     val onBookmark = marks.any { state.scene.frameAt(it) == state.frame }
     if (desktop) {
         clipRect(left = view.headerWidth) { for (ms in marks) drawBookmark(time.x(ms.toFloat()), outline) }
-        if (time.originX in view.headerWidth..size.width) drawPlayhead(time.originX, TimelineMath.timecode(state.frame, fps), measurer, outline, onBookmark)
+        if (time.originX in view.headerWidth..size.width) drawPlayhead(time.originX, TimelineMath.timecode(state.frame, fps), measurer, outline, onBookmark, view.headerWidth + PillInset.toPx())
     } else {
         for (ms in marks) drawBookmark(time.x(ms.toFloat()), outline)
         drawPlayhead(time.originX, TimelineMath.timecode(state.frame, fps), measurer, outline, onBookmark)
@@ -1957,7 +1958,7 @@ private fun DrawScope.drawHeader(top: Float, eye: Painter, tag: LabelColour?, ch
     }
 }
 
-private fun DrawScope.drawPlayhead(originX: Float, timecode: String, measurer: TextMeasurer, outline: Path, onBookmark: Boolean) {
+private fun DrawScope.drawPlayhead(originX: Float, timecode: String, measurer: TextMeasurer, outline: Path, onBookmark: Boolean, minLeft: Float = Float.NEGATIVE_INFINITY) {
     val width = PlayheadWidth.toPx()
     drawRect(if (onBookmark) BookmarkColor else Am.OnDark, Offset(originX, 0f), Size(width, size.height))
     if (onBookmark) {
@@ -1970,7 +1971,7 @@ private fun DrawScope.drawPlayhead(originX: Float, timecode: String, measurer: T
         drawPath(outline, BookmarkColor)
     }
 
-    val left = originX + (width - PillWidth.toPx()) / 2
+    val left = maxOf(minLeft, originX + (width - PillWidth.toPx()) / 2)
     val right = left + PillWidth.toPx()
     val top = PillTop.toPx()
     val bottom = top + PillHeight.toPx()

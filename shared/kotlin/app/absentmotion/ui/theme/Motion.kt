@@ -242,8 +242,8 @@ class PressIndication(private val tint: Color, private val hover: Boolean = fals
 
     private class PressNode(private val source: InteractionSource, private val tint: Color, private val hover: Boolean) : Modifier.Node(), DrawModifierNode {
         private val level = Animatable(0f)
-        private val glow = Animatable(0f)
-        private val hovers = mutableListOf<HoverInteraction.Enter>()
+        private val glow = if (hover) Animatable(0f) else null
+        private val hovers = if (hover) mutableListOf<HoverInteraction.Enter>() else null
 
         override fun onAttach() {
             coroutineScope.launch {
@@ -254,7 +254,7 @@ class PressIndication(private val tint: Color, private val hover: Boolean = fals
                         is PressInteraction.Release -> presses.remove(i.press)
                         is PressInteraction.Cancel -> presses.remove(i.press)
                         is HoverInteraction.Enter -> {
-                            if (hover) {
+                            if (hovers != null && glow != null) {
                                 hovers.add(i)
                                 HoverTargets.count++
                                 launch { glow.animateTo(1f, tween(80)) }
@@ -262,7 +262,7 @@ class PressIndication(private val tint: Color, private val hover: Boolean = fals
                             return@collect
                         }
                         is HoverInteraction.Exit -> {
-                            if (hover && hovers.remove(i.enter)) {
+                            if (hovers != null && glow != null && hovers.remove(i.enter)) {
                                 HoverTargets.count--
                                 if (hovers.isEmpty()) launch { glow.animateTo(0f, tween(120)) }
                             }
@@ -276,14 +276,17 @@ class PressIndication(private val tint: Color, private val hover: Boolean = fals
         }
 
         override fun onDetach() {
+            if (hovers == null) return
             HoverTargets.count -= hovers.size
             hovers.clear()
         }
 
         override fun ContentDrawScope.draw() {
             drawContent()
-            val g = glow.value
-            if (g > 0f) drawRect(tint, alpha = g * 0.7f)
+            if (glow != null) {
+                val g = glow.value
+                if (g > 0f) drawRect(tint, alpha = g * 0.7f)
+            }
             val l = level.value
             if (l > 0f) drawRect(tint, alpha = l)
         }

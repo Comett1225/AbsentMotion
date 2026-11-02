@@ -72,7 +72,7 @@ fun SceneSurface(engine: app.absentmotion.engine.EngineThread, divisor: Int, siz
     }
     val frame = engine.frame
     Box(modifier) {
-        if (frame != null) Image(frame, null, androidx.compose.ui.Modifier.matchParentSize(), contentScale = ContentScale.FillBounds)
+        if (frame != null) Image(frame, null, androidx.compose.ui.Modifier.matchParentSize(), contentScale = ContentScale.Fit)
     }
 }
 

@@ -229,7 +229,7 @@ private fun SquareDialog(style: HistoryStyle, wanted: Float, onDismiss: () -> Un
             val width = VersionPanel.width(maxWidth.value, wanted)
             val height = VersionPanel.height(maxHeight.value)
             val shape = if (app.absentmotion.platform.PlatformFeatures.desktop) androidx.compose.foundation.shape.RoundedCornerShape(14.dp) else androidx.compose.ui.graphics.RectangleShape
-            Column(Modifier.width(width.dp).heightIn(max = height.dp).clip(shape).background(style.surface).border(1.dp, style.edge, shape).pointerInput(Unit) { detectTapGestures { } }) {
+            Column(Modifier.width(width.dp).heightIn(max = height.dp).then(if (app.absentmotion.platform.PlatformFeatures.desktop) Modifier.clip(shape) else Modifier).background(style.surface).border(1.dp, style.edge, shape).pointerInput(Unit) { detectTapGestures { } }) {
                 content(width)
             }
         }
