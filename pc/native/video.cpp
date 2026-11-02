@@ -245,7 +245,7 @@ struct Video {
         return software(context, f.get());
     }
 
-    int show(jlong desktop, const std::string& uri, int64_t t, bool exact) {
+    int show(jlong desktop, const std::string& uri, int64_t t, bool exact, int64_t layer = 0) {
         FramePtr pick;
         int64_t pickUs = INT64_MIN;
         bool gone = false;
@@ -269,7 +269,7 @@ struct Video {
                 shownUs = pickUs;
             } else gone = true;
         }
-        if (shown) DesktopInstall(desktop, uri, shown);
+        if (shown) { if (layer) DesktopInstallLayer(desktop, uri, layer, shown); else DesktopInstall(desktop, uri, shown); }
         if (pickUs != INT64_MIN && shownUs == pickUs) return 1;
         return gone ? -1 : 0;
     }
@@ -337,6 +337,9 @@ JNIEXPORT jdoubleArray JNICALL JNI(videoInfo)(JNIEnv* e, jobject, jlong v) {
 }
 JNIEXPORT jint JNICALL JNI(videoFrame)(JNIEnv* e, jobject, jlong h, jlong v, jstring uri, jlong timeUs, jboolean exact) {
     return video(v)->show(h, DesktopString(e, uri), timeUs, exact == JNI_TRUE);
+}
+JNIEXPORT jint JNICALL JNI(videoFrameLayer)(JNIEnv* e, jobject, jlong h, jlong v, jstring uri, jlong layer, jlong timeUs, jboolean exact) {
+    return video(v)->show(h, DesktopString(e, uri), timeUs, exact == JNI_TRUE, layer);
 }
 JNIEXPORT void JNICALL JNI(videoClose)(JNIEnv*, jobject, jlong v) { delete video(v); }
 }

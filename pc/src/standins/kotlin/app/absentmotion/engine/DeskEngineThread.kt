@@ -24,6 +24,9 @@ import app.absentmotion.export.Smoothing
 import app.absentmotion.model.VideoTiming
 import app.absentmotion.model.fontNames
 import app.absentmotion.model.imageUris
+import app.absentmotion.model.modelUris
+import app.absentmotion.model.layerTracks
+import app.absentmotion.media.loadModel
 import app.absentmotion.model.videoTimeUs
 import app.absentmotion.pc.engine.FfmpegVideoSource
 import app.absentmotion.pc.engine.NativeVideoSource
@@ -92,6 +95,8 @@ class EngineThread(private val background: Int, private val context: Context? = 
     @Volatile private var mediaJob: Job? = null
     private var mediaKey: Any? = null
     private val videos = HashMap<String, AutoCloseable>()
+    private val mosh = context?.let { DeskMosh(it) }
+    private val loadedModels = HashMap<String, Pair<String, Int>>()
     private var loadedPictures: Set<String> = emptySet()
     private var view: PreviewView? = null
     private var viewSerial = 0L
@@ -155,7 +160,7 @@ class EngineThread(private val background: Int, private val context: Context? = 
         val previous = mediaScene
         mediaScene = next
         audio?.setScene(next)
-        val key = listOf(next.node.imageUris(), next.media, videoUris(next))
+        val key = listOf(next.node.imageUris(), next.node.modelUris(), next.media, videoUris(next))
         if (previous == null || key != mediaKey) {
             mediaKey = key
             mediaJob?.cancel()
@@ -164,7 +169,7 @@ class EngineThread(private val background: Int, private val context: Context? = 
         requestRender()
     }
 
-    private fun videoUris(scene: Scene): Set<String> = scene.layers.mapNotNull { it.node["fillVideo"] }.toSet() +
+    private fun videoUris(scene: Scene): Set<String> = scene.layerTracks().mapNotNull { it.layer.node["fillVideo"] }.toSet() +
         scene.media.filter { (it.node["type"] ?: "").startsWith("video/") }.map { it.uri }
 
     private fun file(uri: String): File? = runCatching { android.net.Uri.parse(uri).toFile() ?: File(uri) }.getOrNull()?.takeIf { it.isFile }
@@ -172,12 +177,28 @@ class EngineThread(private val background: Int, private val context: Context? = 
     private suspend fun loadMedia(scene: Scene) {
         val pictures = scene.node.imageUris()
         val clips = videoUris(scene)
+        val models = scene.node.modelUris()
         withContext(dispatcher) {
             val native = engine()
             pictures.forEach { uri -> file(uri)?.let { native.setPictureFile(uri, it.absolutePath) } }
             (loadedPictures - pictures).forEach { native.setPicture(it, null) }
             loadedPictures = pictures
-            (videos.keys - clips).forEach { videos.remove(it)?.close() }
+            (loadedModels.keys - models).forEach { uri ->
+                val count = loadedModels.remove(uri)?.second ?: 0
+                repeat(count) { native.setPicture("$uri#$it", null) }
+                native.setModel(uri, null)
+            }
+            (videos.keys - clips).forEach { uri -> videos.remove(uri)?.close(); mosh?.drop(uri); native.dropVideo(uri) }
+        }
+        for (uri in models) {
+            val source = file(uri) ?: continue
+            val version = "${source.length()}:${source.lastModified()}"
+            if (loadedModels[uri]?.first == version) continue
+            val resolver = context?.contentResolver ?: continue
+            val (mesh, textures) = loadModel(resolver, uri, 8192) ?: continue
+            try {
+                if (setModel(uri, mesh, textures)) loadedModels[uri] = version to textures.size
+            } finally { textures.forEach { it?.recycle() } }
         }
         for (uri in clips) {
             if (videos.containsKey(uri)) continue
@@ -203,19 +224,18 @@ class EngineThread(private val background: Int, private val context: Context? = 
 
     fun setPlaying(value: Boolean) { playing = value }
 
-    internal suspend fun setVideoPicture(uri: String, buffer: HardwareBuffer, layerId: Long, opaque: Boolean = true, standard: Int = 0, range: Int = 0, crop: Rect? = null): Boolean = false
-    internal suspend fun setVideoFrame(uri: String, buffer: HardwareBuffer, layerId: Long, pts: Long, standard: Int = 0, range: Int = 0, crop: Rect? = null): Boolean = false
-    internal suspend fun interpolateVideo(uri: String, layerId: Long, frames: LongArray, t: Float, mode: Int, soft: Boolean, blur: Float, params: FloatArray, made: Bitmap? = null): Boolean = false
-    internal suspend fun moshStart(uri: String, layerId: Long, pts: LongArray, mosh: FloatArray, flow: FloatArray, exact: Boolean): Int = 0
-    internal suspend fun moshFrame(uri: String, buffer: HardwareBuffer, layerId: Long, step: Int, last: Boolean, exact: Boolean, standard: Int = 0, range: Int = 0, crop: Rect? = null): Boolean = false
-
     suspend fun maxPictureSize(): Int = withContext(dispatcher) { if (closed) 1 else engine().maxPictureSize }
 
     suspend fun setPicture(uri: String, bitmap: Bitmap?, layerId: Long = 0): Boolean = withContext(dispatcher) {
         !closed && engine().setPicture(uri, bitmap, layerId).also { requestRender() }
     }
 
-    suspend fun setModel(uri: String, mesh: Mesh?, textures: List<Bitmap?>): Boolean = false
+    suspend fun setModel(uri: String, mesh: Mesh?, textures: List<Bitmap?>): Boolean = withContext(dispatcher) {
+        if (closed) return@withContext false
+        val native = engine()
+        textures.forEachIndexed { index, bitmap -> native.setPicture("$uri#$index", bitmap) }
+        native.setModel(uri, mesh).also { if (mesh != null) pictureRevision.update { it + 1 }; requestRender() }
+    }
 
     suspend fun setPicture(uri: String, buffer: HardwareBuffer, layerId: Long = 0, opaque: Boolean = true): Boolean = false
 
@@ -249,14 +269,18 @@ class EngineThread(private val background: Int, private val context: Context? = 
     private fun syncVideo(scene: Scene?, timeMs: Int, exact: Boolean = true): Boolean {
         scene ?: return true
         var current = true
-        for (layer in scene.layers) {
+        engine().clearLayerFrames()
+        for (track in scene.layerTracks()) {
+            val layer = track.layer
             val uri = layer.node["fillVideo"] ?: continue
-            if (timeMs < layer.startTime || timeMs > layer.endTime) continue
-            val at = layer.videoTimeUs(timeMs, scene, VideoTiming(layer)).coerceAtLeast(0)
+            val mapped = track.timeAt(timeMs.toDouble(), true) ?: continue
+            val localTime = mapped.ms.toInt()
+            val at = layer.videoTimeUs(localTime, track.scene, VideoTiming(layer)).coerceAtLeast(0)
             when (val source = videos[uri]) {
-                is NativeVideoSource -> if (engine().showVideo(uri, source, at, exact) == 0) current = false
-                is VideoSource -> source.frame(at / 1000)?.let { engine().setFrame(uri, it.width, it.height, it.rgba) }
+                is NativeVideoSource -> if (engine().showVideoLayer(uri, layer.id, source, at, exact) == 0) current = false
+                is VideoSource -> source.frame(at / 1000)?.let { engine().setLayerFrame(uri, layer.id, it.width, it.height, it.rgba) }
             }
+            mosh?.apply(track.scene, layer, localTime, engine())
         }
         return current
     }
@@ -376,7 +400,7 @@ class EngineThread(private val background: Int, private val context: Context? = 
 
     suspend fun <T> exportSession(xml: String, smoothing: Smoothing = Smoothing(), fps: Int = 0, block: suspend ExportSession.() -> T): T =
         withDocument(xml, 0) { document ->
-            val interpolation = if (smoothing.method == app.absentmotion.export.FrameInterpolation.Ai) DeskInterpolation.open(checkNotNull(context), smoothing, fps) else null
+            val interpolation = if (smoothing.active) DeskInterpolation.open(checkNotNull(context), smoothing, fps) else null
             try { ExportSession(document, interpolation).block() } finally { interpolation?.close() }
         }
 
@@ -411,7 +435,7 @@ class EngineThread(private val background: Int, private val context: Context? = 
         audio?.close()
         mediaJob?.cancel()
         executor.execute {
-            try { videos.values.forEach { it.close() }; videos.clear() }
+            try { videos.values.forEach { it.close() }; videos.clear(); mosh?.close() }
             finally { engine?.close(); engine = null; executor.shutdown() }
         }
     }

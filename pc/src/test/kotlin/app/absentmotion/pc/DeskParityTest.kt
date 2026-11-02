@@ -329,8 +329,8 @@ class DeskParityTest {
             writer.output = out
             writer.prepareWriteSequence(null)
             for (i in 0 until 4) {
-                val image = BufferedImage(64, 48, BufferedImage.TYPE_INT_RGB)
-                for (x in 0 until 64) for (y in 0 until 48) image.setRGB(x, y, if ((x / 8 + y / 8 + i) % 2 == 0) 0xFF3300 else 0x0033FF)
+                val image = BufferedImage(64, 48, BufferedImage.TYPE_INT_ARGB)
+                for (x in 0 until 64) for (y in 0 until 48) image.setRGB(x, y, if ((x / 8 + y / 8 + i) % 2 == 0) 0xffff3300.toInt() else 0)
                 val meta = writer.getDefaultImageMetadata(ImageTypeSpecifier.createFromRenderedImage(image), null)
                 val format = meta.nativeMetadataFormatName
                 val root = meta.getAsTree(format) as IIOMetadataNode
@@ -353,7 +353,7 @@ class DeskParityTest {
         val before = state.scene.layers.size
         val outcome = runCatching { runBlocking { state.addPicked(android.content.Desk.context, android.net.Uri.fromFile(file)) } }
         assertTrue("gif import threw " + outcome.exceptionOrNull(), outcome.isSuccess)
-        assertTrue(state.scene.layers.size >= before)
+        assertTrue(state.scene.layers.size > before)
         runBlocking { app.closeEditor() }
         app.engine.close()
     }

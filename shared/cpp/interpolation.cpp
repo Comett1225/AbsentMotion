@@ -1,6 +1,8 @@
 #include "interpolation.h"
 
+#ifndef AM_DESKTOP
 #include <android/log.h>
+#endif
 
 #include <algorithm>
 #include <chrono>
@@ -22,7 +24,11 @@
 #include "include/gpu/ganesh/GrDirectContext.h"
 #include "include/gpu/ganesh/SkSurfaceGanesh.h"
 
+#ifdef AM_DESKTOP
+#define LOGE(...) ((void)0)
+#else
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "AMInterp", __VA_ARGS__)
+#endif
 
 namespace am {
 namespace {
@@ -268,7 +274,11 @@ public:
         paint.setBlendMode(SkBlendMode::kSrc);
         target->getCanvas()->drawPaint(paint);
         fPasses++;
+#ifdef AM_DESKTOP
+        return target->makeImageSnapshot();
+#else
         return fContext.ganesh ? target->makeImageSnapshot() : SkSurfaces::AsImage(target);
+#endif
     }
 
     bool submit() {
@@ -278,12 +288,16 @@ public:
             fFailed = fContext.ganesh->abandoned();
             return !fFailed;
         }
+#ifdef AM_DESKTOP
+        return false;
+#else
         auto recording = fContext.recorder->snap();
         if (!recording || !fContext.graphite->insertRecording({recording.get()}) ||
             !fContext.graphite->submit(skgpu::graphite::SyncToCpu::kYes)) {
             fFailed = true;
         }
         return !fFailed;
+#endif
     }
 
     bool failed() const { return fFailed; }
@@ -291,8 +305,12 @@ public:
 
 private:
     sk_sp<SkSurface> surface(const SkImageInfo& info) {
+#ifdef AM_DESKTOP
+        return fContext.ganesh ? SkSurfaces::RenderTarget(fContext.ganesh, skgpu::Budgeted::kYes, info) : nullptr;
+#else
         return fContext.ganesh ? SkSurfaces::RenderTarget(fContext.ganesh, skgpu::Budgeted::kYes, info)
                                : SkSurfaces::RenderTarget(fContext.recorder, info);
+#endif
     }
 
     GpuContext fContext;
@@ -332,7 +350,11 @@ sk_sp<SkImage> EstimateFlow(const GpuContext& context, const sk_sp<SkImage>& a,
     const Effects& fx = Shaders();
     if (!fx.ok() || !a || !b) return nullptr;
     if (context.ganesh) context.ganesh->flushAndSubmit(GrSyncCpu::kYes);
+#ifndef AM_DESKTOP
     else context.graphite->submit(skgpu::graphite::SyncToCpu::kYes);
+#else
+    else return nullptr;
+#endif
     const auto start = Clock::now();
     Gpu gpu(context);
     const auto pyramid = Pyramid(gpu, fx, a, b, std::max(params.divisor, 1), std::max(params.levels, 1));

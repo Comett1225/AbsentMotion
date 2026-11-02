@@ -69,6 +69,14 @@ class DeskAiPortsTest {
                 assertTrue(video.fps >= 9.0)
                 assertTrue(video.durationUs >= 700_000)
                 assertTrue(DeskMedia.frame(result.file, 600, 64) != null)
+                fun pixels(at: Long): IntArray {
+                    val image = DeskMedia.frame(result.file, at, 64)!!
+                    return image.getRGB(0, 0, image.width, image.height, null, 0, image.width)
+                }
+                val before = pixels(0)
+                val middle = pixels(100)
+                val after = pixels(200)
+                assertTrue(!middle.contentEquals(before) && !middle.contentEquals(after))
             } finally { result.file.delete() }
         }
     }

@@ -26,11 +26,24 @@ class NativeEngine(backend: Backend = Backend.GANESH) : AutoCloseable {
         return DesktopNative.setPixels(handle, uri, bitmap.width, bitmap.height, px)
     }
 
+    fun setModel(uri: String, mesh: app.absentmotion.media.Mesh?): Boolean = DesktopNative.setModel(uri, mesh?.positions, mesh?.normals, mesh?.uvs, mesh?.colors, mesh?.triangles, mesh?.slots, mesh?.twoSided == true)
+
     fun setPictureFile(uri: String, path: String): Boolean = DesktopNative.setPicture(handle, uri, path)
 
     fun setFrame(uri: String, width: Int, height: Int, rgba: ByteArray): Boolean = DesktopNative.setFrame(handle, uri, width, height, rgba)
 
+    fun clearLayerFrames() = DesktopNative.clearLayerFrames(handle)
+    fun dropVideo(uri: String) = DesktopNative.dropVideo(handle, uri)
+    fun setLayerFrame(uri: String, layer: Long, width: Int, height: Int, rgba: ByteArray) = DesktopNative.setLayerFrame(handle, uri, layer, width, height, rgba)
+    fun interpolate(uri: String, layer: Long, width: Int, height: Int, first: ByteArray, second: ByteArray, before: ByteArray?, after: ByteArray?, made: ByteArray?,
+        t: Float, mode: Int, blur: Float, parameters: FloatArray) = DesktopNative.interpolate(handle, uri, layer, width, height, first, second, before, after, made, t, mode, blur, parameters)
+
+    fun moshStart(uri: String, layer: Long, stamps: LongArray, params: FloatArray) = DesktopNative.moshStart(handle, uri, layer, stamps, params)
+    fun moshFrame(uri: String, layer: Long, step: Int, width: Int, height: Int, rgba: ByteArray) = DesktopNative.moshFrame(handle, uri, layer, step, width, height, rgba)
+
     fun showVideo(uri: String, source: app.absentmotion.pc.engine.NativeVideoSource, timeUs: Long, exact: Boolean): Int = source.show(handle, uri, timeUs, exact)
+
+    fun showVideoLayer(uri: String, layer: Long, source: app.absentmotion.pc.engine.NativeVideoSource, timeUs: Long, exact: Boolean): Int = source.showLayer(handle, uri, layer, timeUs, exact)
 
     fun setCameraView(on: Boolean) = DesktopNative.setCameraView(handle, on)
     fun setAccurateBlur(on: Boolean) = DesktopNative.setAccurateBlur(handle, on)

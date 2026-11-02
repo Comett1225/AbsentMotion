@@ -208,10 +208,10 @@
       "name": "3D model layer options",
       "where": "panels/ModelPanel.kt",
       "android": "works",
-      "macos": "missing",
-      "windows": "missing",
-      "linux": "missing",
-      "note": "DeskEngineThread.setModel returns false and the desktop JNI has no model upload, so models never draw (add.model3d)"
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "Model meshes and textures are loaded into the desktop renderer."
     },
     {
       "id": "tool.keyframes",
@@ -525,10 +525,10 @@
       "name": "Import 3D model (OBJ, GLB, glTF)",
       "where": "StructureUi.kt importModel",
       "android": "works",
-      "macos": "partial",
-      "windows": "partial",
-      "linux": "partial",
-      "note": "import and layer work; rendering is missing (tool.model_layer)"
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "OBJ, GLB and glTF models use the desktop model renderer."
     },
     {
       "id": "add.template",
@@ -545,10 +545,10 @@
       "name": "Import animated GIF",
       "where": "MediaTab.kt addGif, media/GifVideo.kt",
       "android": "works",
-      "macos": "missing",
-      "windows": "missing",
-      "linux": "missing",
-      "note": "verified: gifVideo needs android.media.MediaCodecList, which does not exist at runtime on desktop (NoClassDefFoundError); the import now shows the failed toast instead of killing the editor scope; convert with ffmpeg instead"
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "FFmpeg converts animated GIFs to video with a separate transparency matte."
     },
     {
       "id": "add.device_camera",
@@ -659,10 +659,10 @@
       "name": "Track motion of a video clip",
       "where": "TrackEditor.kt, editor/TrackActions.kt, media/MotionTracker.kt",
       "android": "works",
-      "macos": "missing",
-      "windows": "missing",
-      "linux": "missing",
-      "note": "reachable from the layer menu; the tracker JNI (tracker_jni.cpp) and FrameReader (MediaCodec) are not in the desktop build"
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "The native tracker reads decoded desktop video frames."
     },
     {
       "id": "preview.prerender",
@@ -859,10 +859,10 @@
       "name": "Frame smoothing (blend, flow, AI) and video motion blur on export",
       "where": "ExportScreen.kt, ExportOptions.kt Smoothing",
       "android": "works",
-      "macos": "missing",
-      "windows": "missing",
-      "linux": "missing",
-      "note": "the controls are shown, but DeskEngineThread.exportSession ignores the Smoothing argument"
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "Desktop export uses shared blend, flow and motion blur, with RIFE for AI interpolation."
     },
     {
       "id": "export.result_viewer",
@@ -1209,20 +1209,20 @@
       "name": "Datamosh effect",
       "where": "shared/assets/effects/datamosh.json, media/VideoLibrary mosh",
       "android": "works",
-      "macos": "missing",
-      "windows": "missing",
-      "linux": "missing",
-      "note": "DeskEngineThread.moshStart and moshFrame are stubs; interpolation.cpp is not in the desktop library"
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "Desktop video frames use the shared optical-flow datamosh renderer."
     },
     {
       "id": "fx.slowmo_smoothing",
       "name": "Smooth slow motion of video clips in preview (blend or flow)",
       "where": "media/VideoLibrary interpolateVideo",
       "android": "works",
-      "macos": "missing",
-      "windows": "missing",
-      "linux": "missing",
-      "note": "interpolateVideo is a stub on desktop; clips show the nearest frame"
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "Smooth Clip renders blend or flow frames for desktop preview."
     },
     {
       "id": "fx.blur_and_particles",
