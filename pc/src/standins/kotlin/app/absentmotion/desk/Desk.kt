@@ -74,12 +74,6 @@ object DeskFiles {
     }
 }
 
-object DeskSpeech {
-    suspend fun voices(): List<app.absentmotion.ui.editor.SpeechVoice> = emptyList()
-    fun preview(text: String, voice: app.absentmotion.ui.editor.SpeechVoice, rate: Float, pitch: Float) {}
-    suspend fun toFile(text: String, voice: app.absentmotion.ui.editor.SpeechVoice, rate: Float, pitch: Float): Uri = throw UnsupportedOperationException("Text to speech is not available on this computer yet")
-}
-
 object DeskScale {
     const val MIN = 80
     const val MAX = 150

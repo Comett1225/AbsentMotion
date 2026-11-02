@@ -263,6 +263,7 @@ class Speech(context: Context) {
     private val ready = kotlinx.coroutines.CompletableDeferred<Boolean>()
     private val tts = android.speech.tts.TextToSpeech(this.context) { ready.complete(it == android.speech.tts.TextToSpeech.SUCCESS) }
     private val pending = java.util.concurrent.ConcurrentHashMap<String, kotlinx.coroutines.CompletableDeferred<Boolean>>()
+    val noVoices = R.string.voice_none_offline
 
     init {
         tts.setOnUtteranceProgressListener(object : android.speech.tts.UtteranceProgressListener() {
