@@ -187,10 +187,10 @@ private fun EffectDetail(state: EditorState, index: Int, fx: AudioFx, close: () 
                 Text(stringResource(kind.label), Modifier.padding(start = 6.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
             }
             Box(Modifier.size(36.dp).clickable { state.editSelected { it.updateAudioEffect(index) { e -> e.reset() } } }, Alignment.Center) {
-                Icon(ChromeIcons.Undo, stringResource(R.string.audiofx_reset), Modifier.size(22.dp), tint = Am.OnDark)
+                DeskTip(stringResource(R.string.audiofx_reset)) { Icon(ChromeIcons.Undo, stringResource(R.string.audiofx_reset), Modifier.size(22.dp), tint = Am.OnDark) }
             }
             Box(Modifier.size(36.dp).clickable { close(); state.editSelected { it.withAudioEffects(it.audioEffects.filterIndexed { i, _ -> i != index }) } }, Alignment.Center) {
-                Icon(ChromeIcons.Trash, stringResource(R.string.delete), Modifier.size(22.dp), tint = Am.OnDark)
+                DeskTip(stringResource(R.string.delete)) { Icon(ChromeIcons.Trash, stringResource(R.string.delete), Modifier.size(22.dp), tint = Am.OnDark) }
             }
         }
         Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState())) {

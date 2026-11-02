@@ -140,11 +140,11 @@ fun PresetScreen(state: EditorState) {
         Spacer(Modifier.height(16.dp))
         Box(Modifier.fillMaxWidth().height(48.dp)) {
             Box(Modifier.size(48.dp).padding(start = 4.dp).clickable { state.presetsOpen = false }, Alignment.Center) {
-                Icon(ChromeIcons.Back, stringResource(R.string.preset_back), Modifier.size(24.dp), tint = Am.OnDark)
+                DeskTip(stringResource(R.string.preset_back)) { Icon(ChromeIcons.Back, stringResource(R.string.preset_back), Modifier.size(24.dp), tint = Am.OnDark) }
             }
             Text(stringResource(R.string.try_a_preset), Modifier.align(Alignment.Center), color = Am.OnDark, fontSize = 22.sp, fontWeight = FontWeight.Bold, maxLines = 1)
             Box(
-                Modifier.align(Alignment.CenterEnd).height(48.dp).width(52.dp).alpha(if (current == null) DimAlpha else 1f)
+                Modifier.align(Alignment.CenterEnd).padding(end = if (app.absentmotion.platform.PlatformFeatures.desktop) 16.dp else 0.dp).height(48.dp).width(52.dp).alpha(if (current == null) DimAlpha else 1f)
                     .then(if (current == null) Modifier else Modifier.clickable {
                         if (targets.isEmpty()) state.applyPreset(current) else current.layer?.let { preset ->
                             state.edit { it.applyPresetToLayers(targets, preset, current.id) }
@@ -195,7 +195,7 @@ fun PresetScreen(state: EditorState) {
                         maxLines = 1, overflow = TextOverflow.Ellipsis,
                     )
                     Box(Modifier.size(48.dp).clickable { menuFor = preset.id }, Alignment.Center) {
-                        Icon(PanelIcons.More, stringResource(R.string.preset_more), Modifier.size(24.dp), tint = Am.OnDark)
+                        DeskTip(stringResource(R.string.preset_more)) { Icon(PanelIcons.More, stringResource(R.string.preset_more), Modifier.size(24.dp), tint = Am.OnDark) }
                         Presence(menuFor == preset.id) {
                             MenuPopup(DropOrRise, { menuFor = null }) {
                                 MenuRow(stringResource(R.string.rename)) { menuFor = null; renaming = preset }

@@ -279,3 +279,5 @@ internal class StorageAccess {
 internal fun rememberStorageAccess(): StorageAccess = remember { StorageAccess() }
 
 internal fun deviceSounds(context: Context): List<app.absentmotion.audio.DeviceAudio> = app.absentmotion.desk.DeskSounds.list(context)
+
+fun revealDeskFile(uri: android.net.Uri) { app.absentmotion.desk.DeskFiles.reveal(listOf(uri)) }

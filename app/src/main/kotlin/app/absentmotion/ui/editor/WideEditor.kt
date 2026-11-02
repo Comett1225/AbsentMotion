@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor
 
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.sizeIn
@@ -40,6 +42,7 @@ import app.absentmotion.ui.tutorial.tutorialGuard
 import app.absentmotion.ui.tutorial.tutorialTarget
 
 val LocalWide = compositionLocalOf { false }
+internal val LocalDeskEditor = compositionLocalOf { false }
 
 fun isTablet(smallestWidthDp: Int): Boolean = smallestWidthDp >= 600
 
@@ -95,7 +98,12 @@ private fun SidePanels(state: EditorState, addLibrary: AddLibrary, textEdit: Boo
 }
 
 @Composable
-fun PhoneScreen(fillWidth: Dp = 0.dp, content: @Composable () -> Unit) {
+fun PhoneScreen(fillWidth: Dp = 0.dp, onDismiss: () -> Unit = {}, title: String? = null, sheet: Boolean = false, onConfirm: (() -> Unit)? = null, content: @Composable () -> Unit) {
+    if (app.absentmotion.platform.PlatformFeatures.desktop && LocalDeskEditor.current) {
+        if (sheet) DeskSheetHost(onDismiss, content)
+        else DeskDialog(title, if (fillWidth == Dp.Infinity) Dp.Infinity else if (fillWidth > 0.dp) fillWidth else 480.dp, onDismiss, height = if (fillWidth == Dp.Infinity) Dp.Infinity else null, onConfirm = onConfirm, outside = fillWidth != Dp.Infinity, content = content)
+        return
+    }
     if (!LocalWide.current) {
         content()
         return

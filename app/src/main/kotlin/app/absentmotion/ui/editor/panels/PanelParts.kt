@@ -69,7 +69,8 @@ internal fun formatPlain(value: Float): String =
 
 @Composable
 internal fun PanelIcon(icon: ImageVector, tint: Color, modifier: Modifier = Modifier, size: Dp = 24.dp, description: String? = null) {
-    Icon(icon, description, modifier.size(size), tint = animatedColor(tint))
+    if (description.isNullOrEmpty()) Icon(icon, description, modifier.size(size), tint = animatedColor(tint))
+    else app.absentmotion.ui.editor.DeskTip(description) { Icon(icon, description, modifier.size(size), tint = animatedColor(tint)) }
 }
 
 @Composable

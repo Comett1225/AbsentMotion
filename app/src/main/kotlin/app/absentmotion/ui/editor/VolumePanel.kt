@@ -96,7 +96,7 @@ private fun VolumeMain(state: EditorState, layer: Layer, modifier: Modifier, ope
                 Text(if (count == 0) stringResource(R.string.volume_audio_effects) else stringResource(R.string.volume_audio_effects_count, count.toString()), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
             }
             Box(Modifier.width(183.px).fillMaxHeight().clickable { state.volumeOpen = false }, Alignment.Center) {
-                Icon(AudioIcons.Speaker, volumeLabel, Modifier.size(32.dp), tint = VolumeGreen)
+                DeskTip(volumeLabel) { Icon(AudioIcons.Speaker, volumeLabel, Modifier.size(32.dp), tint = VolumeGreen) }
                 Canvas(Modifier.align(Alignment.BottomStart).padding(start = 14.px, bottom = 14.px).size(4.dp)) {
                     drawPath(Path().apply { moveTo(0f, 0f); lineTo(0f, size.height); lineTo(size.width, size.height); close() }, Am.OnDark.copy(alpha = 0.3f))
                 }

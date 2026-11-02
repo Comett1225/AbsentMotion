@@ -324,7 +324,7 @@ private fun EffectTile(catalog: EffectCatalog, effect: EffectDefinition, width: 
 @Composable
 internal fun PresetStar(favourite: Boolean, onToggle: () -> Unit) {
     Box(Modifier.size(48.dp).toggleable(favourite, role = Role.Checkbox) { onToggle() }, contentAlignment = Alignment.Center) {
-        Icon(PanelIcons.Star, stringResource(R.string.effectbrowser_favorite_preset), Modifier.size(24.dp), tint = if (favourite) Am.Accent else Am.OnDark)
+        app.absentmotion.ui.editor.DeskTip(stringResource(R.string.effectbrowser_favorite_preset)) { Icon(PanelIcons.Star, stringResource(R.string.effectbrowser_favorite_preset), Modifier.size(24.dp), tint = if (favourite) Am.Accent else Am.OnDark) }
     }
 }
 

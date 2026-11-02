@@ -122,7 +122,8 @@ internal fun TransitionButton(state: EditorState, modifier: Modifier, compact: B
         var drag by remember { mutableFloatStateOf(0f) }
         val hide = stringResource(R.string.transition_hide)
         val press = remember { MutableInteractionSource() }
-        Box(modifier.size(if (compact) 46.dp else 73.dp).tutorialGuard()
+        val desk = app.absentmotion.platform.PlatformFeatures.desktop
+        Box(modifier.size(if (desk) 36.dp else if (compact) 46.dp else 73.dp).tutorialGuard()
             .semantics { customActions = listOf(CustomAccessibilityAction(hide) { state.transitionButtonDismissed = true; true }) }
             .pointerInput(state) {
                 detectHorizontalDragGestures(
@@ -133,10 +134,10 @@ internal fun TransitionButton(state: EditorState, modifier: Modifier, compact: B
             .graphicsLayer { translationX = if (fromEnd) drag.coerceAtLeast(0f) else drag.coerceAtMost(0f) }
             .clickable(interactionSource = press, indication = null) { open = cut.first.id to cut.second.id }, contentAlignment = Alignment.Center) {
             Box(
-                Modifier.size(if (compact) 38.dp else 47.dp).pressScale(press).shadow(4.dp, CircleShape).background(Am.Panel, CircleShape).border(1.8.dp, Am.OnDark, CircleShape),
+                Modifier.size(if (desk) 30.dp else if (compact) 38.dp else 47.dp).pressScale(press).shadow(if (desk) 0.dp else 4.dp, CircleShape).background(Am.Panel, CircleShape).border(if (desk) 1.2.dp else 1.8.dp, Am.OnDark, CircleShape),
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(ChromeIcons.Transition, stringResource(R.string.transition_title), Modifier.size(if (compact) 18.dp else 22.dp), tint = Am.OnDark)
+                Icon(ChromeIcons.Transition, stringResource(R.string.transition_title), Modifier.size(if (desk) 16.dp else if (compact) 18.dp else 22.dp), tint = Am.OnDark)
             }
         }
     }
@@ -151,12 +152,12 @@ internal fun AnimateButton(state: EditorState, modifier: Modifier) {
     Presence(shown) {
         val press = remember { MutableInteractionSource() }
         Box(
-            modifier.offset { IntOffset(-clear.value.roundToPx(), 0) }.padding(12.dp).presence(scaleFrom = 0.6f).size(48.dp).tutorialTarget("animate").tutorialGuard().pressScale(press)
-                .shadow(4.dp, CircleShape).background(Am.Panel, CircleShape).border(1.8.dp, Am.Accent, CircleShape)
+            (if (app.absentmotion.platform.PlatformFeatures.desktop) modifier.presence(scaleFrom = 0.6f).size(30.dp) else modifier.offset { IntOffset(-clear.value.roundToPx(), 0) }.padding(12.dp).presence(scaleFrom = 0.6f).size(48.dp)).tutorialTarget("animate").tutorialGuard().pressScale(press)
+                .shadow(if (app.absentmotion.platform.PlatformFeatures.desktop) 0.dp else 4.dp, CircleShape).background(Am.Panel, CircleShape).border(if (app.absentmotion.platform.PlatformFeatures.desktop) 1.2.dp else 1.8.dp, Am.Accent, CircleShape)
                 .clickable(press, null) { state.selectedId?.let { state.playing = false; open = it } },
             contentAlignment = Alignment.Center,
         ) {
-            Icon(PanelIcons.Animate, stringResource(R.string.a11y_animate), Modifier.size(24.dp), tint = Am.Accent)
+            Icon(PanelIcons.Animate, stringResource(R.string.a11y_animate), Modifier.size(if (app.absentmotion.platform.PlatformFeatures.desktop) 18.dp else 24.dp), tint = Am.Accent)
         }
     }
     open?.let { AnimationSheet(state, it) { open = null } }
@@ -241,8 +242,8 @@ internal fun AnimationSheet(state: EditorState, ids: Set<Long>, onClose: () -> U
 @Composable
 internal fun MotionSheet(title: String, onClose: () -> Unit, content: @Composable () -> Unit) {
     Dialog(onClose, sheetDialogProperties()) {
-        PhoneScreen {
-            Box(Modifier.fillMaxSize().clickable(interactionSource = null, indication = null, onClick = onClose).systemBarsPadding(), Alignment.BottomCenter) {
+        PhoneScreen(onDismiss = onClose, sheet = true) {
+            Box(Modifier.fillMaxSize().clickable(interactionSource = null, indication = null, onClick = onClose).systemBarsPadding(), if (app.absentmotion.platform.PlatformFeatures.desktop) Alignment.Center else Alignment.BottomCenter) {
                 Column(Modifier.fillMaxWidth().clip(SheetShape).background(Am.Panel).clickable(interactionSource = null, indication = null) {}.padding(horizontal = 16.dp)) {
                     Row(Modifier.fillMaxWidth().height(48.dp), verticalAlignment = Alignment.CenterVertically) {
                         Text(title, Modifier.weight(1f), color = Am.OnDark, fontSize = 17.sp, fontWeight = FontWeight.Bold)

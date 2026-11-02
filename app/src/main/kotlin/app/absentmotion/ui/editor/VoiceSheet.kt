@@ -100,8 +100,8 @@ internal fun VoiceSheet(state: EditorState, onClose: () -> Unit) {
     fun dismiss() { job?.cancel() ?: onClose() }
 
     Dialog(::dismiss, sheetDialogProperties()) {
-        PhoneScreen {
-            Box(Modifier.fillMaxSize().clickable(interactionSource = null, indication = null) { dismiss() }.systemBarsPadding().imePadding(), Alignment.BottomCenter) {
+        PhoneScreen(onDismiss = ::dismiss, sheet = true) {
+            Box(Modifier.fillMaxSize().clickable(interactionSource = null, indication = null) { dismiss() }.systemBarsPadding().imePadding(), if (app.absentmotion.platform.PlatformFeatures.desktop) Alignment.Center else Alignment.BottomCenter) {
                 Column(Modifier.fillMaxWidth().clip(SheetShape).background(Am.Panel).clickable(interactionSource = null, indication = null) {}.padding(horizontal = 16.dp)) {
                     Row(Modifier.fillMaxWidth().height(48.dp), verticalAlignment = Alignment.CenterVertically) {
                         Text(stringResource(R.string.text_to_speech), Modifier.weight(1f), color = Am.OnDark, fontSize = 17.sp, fontWeight = FontWeight.Bold)

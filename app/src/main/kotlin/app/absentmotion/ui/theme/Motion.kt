@@ -10,6 +10,7 @@ import androidx.compose.animation.core.rememberTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.IndicationNodeFactory
+import androidx.compose.foundation.interaction.HoverInteraction
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -25,7 +26,9 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -228,13 +231,19 @@ private fun ContentDrawScope.recordInto(layer: GraphicsLayer) {
     drawLayer(layer)
 }
 
-class PressIndication(private val tint: Color) : IndicationNodeFactory {
-    override fun create(interactionSource: InteractionSource): DelegatableNode = PressNode(interactionSource, tint)
-    override fun equals(other: Any?) = other is PressIndication && other.tint == tint
-    override fun hashCode() = tint.hashCode()
+internal object HoverTargets {
+    var count by mutableIntStateOf(0)
+}
 
-    private class PressNode(private val source: InteractionSource, private val tint: Color) : Modifier.Node(), DrawModifierNode {
+class PressIndication(private val tint: Color, private val hover: Boolean = false) : IndicationNodeFactory {
+    override fun create(interactionSource: InteractionSource): DelegatableNode = PressNode(interactionSource, tint, hover)
+    override fun equals(other: Any?) = other is PressIndication && other.tint == tint && other.hover == hover
+    override fun hashCode() = tint.hashCode() * 31 + hover.hashCode()
+
+    private class PressNode(private val source: InteractionSource, private val tint: Color, private val hover: Boolean) : Modifier.Node(), DrawModifierNode {
         private val level = Animatable(0f)
+        private val glow = Animatable(0f)
+        private val hovers = mutableListOf<HoverInteraction.Enter>()
 
         override fun onAttach() {
             coroutineScope.launch {
@@ -244,6 +253,21 @@ class PressIndication(private val tint: Color) : IndicationNodeFactory {
                         is PressInteraction.Press -> presses.add(i)
                         is PressInteraction.Release -> presses.remove(i.press)
                         is PressInteraction.Cancel -> presses.remove(i.press)
+                        is HoverInteraction.Enter -> {
+                            if (hover) {
+                                hovers.add(i)
+                                HoverTargets.count++
+                                launch { glow.animateTo(1f, tween(80)) }
+                            }
+                            return@collect
+                        }
+                        is HoverInteraction.Exit -> {
+                            if (hover && hovers.remove(i.enter)) {
+                                HoverTargets.count--
+                                if (hovers.isEmpty()) launch { glow.animateTo(0f, tween(120)) }
+                            }
+                            return@collect
+                        }
                         else -> return@collect
                     }
                     launch { if (presses.isEmpty()) level.animateTo(0f, Motion.exit()) else level.animateTo(1f, tween(60)) }
@@ -251,8 +275,15 @@ class PressIndication(private val tint: Color) : IndicationNodeFactory {
             }
         }
 
+        override fun onDetach() {
+            HoverTargets.count -= hovers.size
+            hovers.clear()
+        }
+
         override fun ContentDrawScope.draw() {
             drawContent()
+            val g = glow.value
+            if (g > 0f) drawRect(tint, alpha = g * 0.7f)
             val l = level.value
             if (l > 0f) drawRect(tint, alpha = l)
         }
