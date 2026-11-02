@@ -386,7 +386,7 @@ internal fun AiEnhanceDialog(tools: AiTools, scene: Scene, onQuickSharpen: () ->
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
                 Column(Modifier.selectableGroup(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    for (mode in EnhanceMode.entries) {
+                    for (mode in EnhanceMode.entries.filter { it != EnhanceMode.Faces || app.absentmotion.platform.PlatformFeatures.aiFaces }) {
                         val on = mode == options.mode
                         Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp)).background(if (on) Am.FieldHi else Am.PanelInset)
                             .selectable(on, role = Role.RadioButton) { tools.enhance = options.copy(mode = mode) }.padding(10.dp)) {

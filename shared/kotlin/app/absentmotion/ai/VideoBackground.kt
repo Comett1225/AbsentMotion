@@ -347,6 +347,7 @@ internal class VideoMatte(val media: AiMedia, val frameWidth: Int, val frameHeig
 
 internal object VideoBackground {
     suspend fun run(context: Context, layer: Layer, media: MediaDeclaration, side: Int, keep: List<Tap>, progress: AiProgress): VideoMatte {
+        if (app.absentmotion.platform.PlatformFeatures.desktop) return app.absentmotion.platform.desktopVideoMatte(context, layer, media, side, keep, progress)
         val fill = checkNotNull(layer.mediaFill?.takeIf { it.video }) { AppText.get(R.string.ai_select_video_layer) }
         check(media.width > 0 && media.height > 0) { AppText.get(R.string.ai_video_no_size) }
         val seconds = layer.matteSeconds(media)

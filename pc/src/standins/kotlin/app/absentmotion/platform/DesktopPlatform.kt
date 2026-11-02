@@ -173,7 +173,8 @@ fun effectsMessageOnHome() = false
 
 object PlatformFeatures {
     const val desktop = true
-    const val ai = false
+    const val ai = true
+    val aiFaces = app.absentmotion.desk.DeskOs.mac
     const val camera = false
     const val tools = true
     const val userFiles = true
@@ -205,7 +206,7 @@ fun linkMediaFolder() { app.absentmotion.desk.DeskLibrary.chooseFolder()?.let { 
 
 internal const val CAPTION_MODEL_NAME = "ggml-base-q5_1.bin"
 internal const val CAPTION_MODEL_BYTES = 59_707_625L
-internal fun loadCaptionLibrary() { throw UnsupportedOperationException("Auto captions are not available on this computer yet") }
+internal fun loadCaptionLibrary() { app.absentmotion.pc.engine.DesktopNative.hashCode() }
 internal fun fastCaptionCpu(cpuinfo: String): Boolean = false
 
 internal fun captionTextHeight(fonts: app.absentmotion.fonts.FontLibrary, text: String, font: String, size: Float, wrap: Int): Float {
@@ -287,3 +288,19 @@ internal fun rememberStorageAccess(): StorageAccess = remember { StorageAccess()
 internal fun deviceSounds(context: Context): List<app.absentmotion.audio.DeviceAudio> = app.absentmotion.desk.DeskSounds.list(context)
 
 fun revealDeskFile(uri: android.net.Uri) { app.absentmotion.desk.DeskFiles.reveal(listOf(uri)) }
+
+internal fun loadNoiseLibrary() { app.absentmotion.pc.engine.DesktopNative.hashCode() }
+
+internal suspend fun desktopReverse(context: android.content.Context, layer: app.absentmotion.model.Layer, media: app.absentmotion.model.MediaDeclaration, progress: app.absentmotion.ai.AiProgress): app.absentmotion.ai.ReversedClip = app.absentmotion.ai.desktopReverse(context, layer, media, progress)
+
+internal suspend fun desktopVideoMatte(context: android.content.Context, layer: app.absentmotion.model.Layer, media: app.absentmotion.model.MediaDeclaration, side: Int, keep: List<app.absentmotion.ai.Tap>, progress: app.absentmotion.ai.AiProgress): app.absentmotion.ai.VideoMatte = app.absentmotion.ai.desktopVideoMatte(context, layer, media, side, keep, progress)
+
+internal fun loadAiLibrary() { app.absentmotion.pc.engine.DesktopNative.hashCode() }
+
+internal suspend fun desktopRewriteVideo(context: android.content.Context, job: app.absentmotion.ai.VideoJob, progress: app.absentmotion.ai.AiProgress, work: app.absentmotion.ai.FrameWork): app.absentmotion.ai.AiMedia = app.absentmotion.ai.desktopRewriteVideo(context, job, progress, work)
+
+internal suspend fun desktopClipSmooth(context: android.content.Context, layer: app.absentmotion.model.Layer, media: app.absentmotion.model.MediaDeclaration, fps: Int, smoothing: app.absentmotion.export.Smoothing, progress: app.absentmotion.ai.AiProgress): app.absentmotion.ai.AiMedia = app.absentmotion.ai.desktopClipSmooth(context, layer, media, fps, smoothing, progress)
+
+internal fun desktopFaces(argb: IntArray, width: Int, height: Int, turn: Int): List<app.absentmotion.ai.FaceBox> = app.absentmotion.ai.desktopFaces(argb, width, height, turn)
+
+internal fun desktopCutout(handle: Long, bitmap: android.graphics.Bitmap, size: Int): Int = app.absentmotion.ai.DeskAiNative.cutout(handle, bitmap, size)

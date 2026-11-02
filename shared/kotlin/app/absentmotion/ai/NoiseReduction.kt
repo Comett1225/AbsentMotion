@@ -19,7 +19,7 @@ import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
 internal object NoiseReduction {
-    init { System.loadLibrary("amengine") }
+    init { app.absentmotion.platform.loadNoiseLibrary() }
     private external fun nativeCreate(): Long
     private external fun nativeProcess(handle: Long, pcm: FloatArray): FloatArray
     private external fun nativeDestroy(handle: Long)

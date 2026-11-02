@@ -220,6 +220,7 @@ internal fun interface FrameWork {
 }
 
 internal suspend fun rewriteVideo(context: Context, job: VideoJob, progress: AiProgress, work: FrameWork): AiMedia {
+    if (app.absentmotion.platform.PlatformFeatures.desktop) return app.absentmotion.platform.desktopRewriteVideo(context, job, progress, work)
     val fill = checkNotNull(job.layer.mediaFill?.takeIf { it.video }) { AppText.get(R.string.ai_select_video_layer) }
     val media = job.media
     check(media.width > 0 && media.height > 0) { AppText.get(R.string.ai_video_no_size) }

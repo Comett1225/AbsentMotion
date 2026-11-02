@@ -150,6 +150,7 @@ private fun LongArray.atOrAfter(us: Long): Int = binarySearch(us).let { if (it >
 
 internal object ClipReverse {
     suspend fun run(context: Context, layer: Layer, media: MediaDeclaration, progress: AiProgress): ReversedClip {
+        if (app.absentmotion.platform.PlatformFeatures.desktop) return app.absentmotion.platform.desktopReverse(context, layer, media, progress)
         val uri = checkNotNull(layer.mediaFill?.takeIf { it.video }) { AppText.get(R.string.ai_select_video_layer) }.uri
         progress(0f, reverseStatus(null))
         val job = currentCoroutineContext().job

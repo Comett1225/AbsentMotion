@@ -247,6 +247,7 @@ internal fun smoothingOf(option: String?): Smoothing? {
 internal object ClipSmooth {
     suspend fun run(context: Context, engine: EngineThread, layer: Layer, media: MediaDeclaration, projectFps: Int, smoothing: Smoothing,
                     progress: AiProgress): AiMedia {
+        if (app.absentmotion.platform.PlatformFeatures.desktop) return app.absentmotion.platform.desktopClipSmooth(context, layer, media, projectFps, smoothing, progress)
         val fill = checkNotNull(layer.mediaFill?.takeIf { it.video }) { AppText.get(R.string.ai_select_video_layer) }
         val plan = checkNotNull(smoothPlan(layer, media, projectFps, smoothing)) { AppText.get(R.string.smooth_nothing) }
         check(plan.seconds <= MAX_MATTE_SECONDS && plan.frames <= MAX_SMOOTH_FRAMES) { AppText.get(R.string.ai_clip_too_long, (MAX_MATTE_SECONDS / 60).toString()) }
