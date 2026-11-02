@@ -107,6 +107,7 @@ compose.desktop {
             packageName = "AbsentMotion"
             packageVersion = "5.0.0"
             jvmArgs += listOf("-XX:+UseZGC", "-XX:+ZGenerational", "-XX:MaxRAMPercentage=60", "-Dapple.awt.application.name=AbsentMotion")
+            if (isMac) jvmArgs += "-XX:SharedArchiveFile=\$APPDIR/app.jsa"
             macOS { bundleID = "app.absentmotion.desktop"; iconFile.set(file("../macos/AbsentMotion.icns")) }
             windows { menuGroup = "AbsentMotion"; upgradeUuid = "5b0e7a52-3c1f-4d8e-9a6b-2f4c8d1e7a30" }
             linux { packageName = "absentmotion" }
@@ -161,3 +162,22 @@ tasks.test {
 }
 
 tasks.named<Jar>("jar") { from(runtimeStandins.output) }
+
+val appCds = tasks.register("appCds") {
+    onlyIf { isMac }
+    doLast {
+        val app = layout.buildDirectory.dir("compose/binaries/main/app/AbsentMotion.app").get().asFile
+        val launcher = app.resolve("Contents/MacOS/AbsentMotion")
+        val archive = app.resolve("Contents/app/app.jsa")
+        val list = layout.buildDirectory.file("cds/classes.lst").get().asFile.apply { parentFile.mkdirs(); delete() }
+        archive.delete()
+        fun launch(options: String, vararg args: String) = ProcessBuilder(launcher.path, *args).apply { environment()["JAVA_TOOL_OPTIONS"] = options }
+            .redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.DISCARD).start().waitFor()
+        launch("-XX:DumpLoadedClassList=${list.path}", "--warmup")
+        if (list.length() > 0) launch("-Xshare:dump -XX:SharedClassListFile=${list.path} -XX:SharedArchiveFile=${archive.path}")
+        logger.lifecycle(if (archive.isFile) "appCds: ${archive.length() / 1_000_000} MB, ${list.readLines().size} classes" else "appCds: no archive (the app starts without it)")
+    }
+}
+tasks.matching { it.name == "createDistributable" }.configureEach { finalizedBy(appCds) }
+tasks.matching { it.name == "packageDmg" }.configureEach { dependsOn(appCds) }
+

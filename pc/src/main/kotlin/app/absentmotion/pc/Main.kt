@@ -28,6 +28,7 @@ import kotlin.math.roundToInt
 
 fun main(args: Array<String>) {
     when (args.firstOrNull()) {
+        "--warmup" -> { warmup(); return }
         "--scene-check" -> { sceneCheck(); return }
         "--render-check" -> { renderCheck(); return }
         "--render" -> {
