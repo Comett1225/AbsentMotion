@@ -27,6 +27,22 @@ object DeskOs {
         }.map(::File).firstOrNull { it.isFile }
     }
 
+    internal fun openCommand(mac: Boolean, windows: Boolean, path: String): List<String> = when {
+        mac -> listOf("open", path)
+        windows -> listOf("cmd", "/c", "start", "", path)
+        else -> listOf("xdg-open", path)
+    }
+
+    internal fun cameraSettingsCommand(mac: Boolean, windows: Boolean): List<String>? = when {
+        mac -> listOf("open", "x-apple.systempreferences:com.apple.preference.security?Privacy_Camera")
+        windows -> listOf("cmd", "/c", "start", "", "ms-settings:privacy-webcam")
+        else -> null
+    }
+
+    fun openCameraSettings() { cameraSettingsCommand(mac, windows)?.let { command -> runCatching { ProcessBuilder(command).start() } } }
+
+    fun open(file: File): Boolean = runCatching { ProcessBuilder(openCommand(mac, windows, file.absolutePath)).start(); true }.getOrDefault(false)
+
     fun reveal(file: File) {
         runCatching {
             when {

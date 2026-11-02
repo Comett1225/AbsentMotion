@@ -44,6 +44,7 @@ internal fun DeskMedia(state: EditorState, library: AddLibrary) {
                 DeskFileAction(stringResource(R.string.sounds_from_files), Modifier.weight(1f)) { MediaPicks.openFiles() }
                 DeskFileAction(app.absentmotion.platform.linkFolderLabel(), Modifier.weight(1f)) { app.absentmotion.platform.linkMediaFolder() }
             }
+            if (app.absentmotion.platform.PlatformFeatures.camera) DeskFileAction(stringResource(R.string.camera), Modifier.fillMaxWidth()) { state.playing = false; state.cameraOpen = true }
             SearchField(query, { query = it }, Modifier.fillMaxWidth().height(36.dp), hint = stringResource(R.string.mediatab_search_hint))
         }
         if (files.isEmpty() && query.isEmpty()) Text(stringResource(R.string.desk_media_empty), Modifier.padding(12.dp), color = Am.OnDarkDim, fontSize = 13.sp)
@@ -67,6 +68,7 @@ internal fun DeskAudio(state: EditorState, library: AddLibrary) {
     val scope = LocalEditorScope.current
     var query by remember { mutableStateOf("") }
     var speaking by remember { mutableStateOf(false) }
+    var browsing by remember { mutableStateOf(false) }
     val preview = remember { SoundPreview(context) }
     DisposableEffect(preview) { onDispose { preview.stop() } }
     val files = remember(library.audio, query) { library.audio.filter { it.title.contains(query, true) || it.name.contains(query, true) } }
@@ -79,7 +81,10 @@ internal fun DeskAudio(state: EditorState, library: AddLibrary) {
                 DeskFileAction(stringResource(R.string.sounds_from_files), Modifier.weight(1f)) { MediaPicks.openSounds() }
                 DeskFileAction(app.absentmotion.platform.linkFolderLabel(), Modifier.weight(1f)) { app.absentmotion.platform.linkMediaFolder() }
             }
-            DeskFileAction(stringResource(R.string.text_to_speech), Modifier.fillMaxWidth()) { speaking = true }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                DeskFileAction(stringResource(R.string.view_all), Modifier.weight(1f)) { browsing = true }
+                DeskFileAction(stringResource(R.string.text_to_speech), Modifier.weight(1f)) { speaking = true }
+            }
             SearchField(query, { query = it }, Modifier.fillMaxWidth().height(36.dp), hint = stringResource(R.string.audiotab_search_hint))
         }
         if (files.isEmpty() && query.isEmpty()) Text(stringResource(R.string.sounds_empty), Modifier.padding(12.dp), color = Am.OnDarkDim, fontSize = 13.sp)
@@ -105,6 +110,11 @@ internal fun DeskAudio(state: EditorState, library: AddLibrary) {
         }
     }
     if (speaking) VoiceSheet(state) { speaking = false }
+    if (browsing) DeskSoundBrowser(
+        state, library.audio, preview,
+        onAdd = { file -> if (!state.addingMedia) scope.launch { state.addingMedia = true; try { state.addPicked(context, android.net.Uri.parse(file.uri)) } finally { state.addingMedia = false } } },
+        onReveal = { file -> app.absentmotion.platform.revealDeskFile(android.net.Uri.parse(file.uri)) },
+    ) { browsing = false }
 }
 
 @Composable

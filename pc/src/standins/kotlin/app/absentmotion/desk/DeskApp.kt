@@ -50,7 +50,11 @@ import app.absentmotion.editor.ElementNav
 import app.absentmotion.editor.MultiSelect
 import app.absentmotion.editor.PreviewCache
 import app.absentmotion.engine.EngineThread
+import app.absentmotion.fonts.FontName
+import app.absentmotion.model.fontNames
 import app.absentmotion.i18n.Ltr
+import app.absentmotion.export.DeskExports
+import app.absentmotion.export.ExportRun
 import app.absentmotion.library.AppSettings
 import app.absentmotion.library.CrashLogs
 import app.absentmotion.library.MediaKeeper
@@ -76,6 +80,10 @@ import app.absentmotion.ui.editor.MediaPicks
 import app.absentmotion.ui.editor.wideEditor
 import app.absentmotion.ui.export.ExportScreen
 import app.absentmotion.ui.home.DeskButton
+import app.absentmotion.ui.onboarding.DeskOnboarding
+import app.absentmotion.ui.onboarding.FirstRun
+import app.absentmotion.ui.tutorial.Tutorial
+import app.absentmotion.ui.tutorial.TutorialHost
 import app.absentmotion.ui.home.DeskHome
 import app.absentmotion.ui.home.DeskModal
 import app.absentmotion.ui.home.DeskMessage
@@ -121,7 +129,15 @@ class DeskAppState {
     var settingsOpen by mutableStateOf(false)
     var settingsPage by mutableStateOf(SettingsPage.Editor)
     var newProjectTick by mutableIntStateOf(0)
+    var saveFailed by mutableStateOf(false)
+    var fontOffer by mutableStateOf<Pair<EditorState, List<String>>?>(null)
+    var afterClose: (() -> Unit)? = null
+    var hidden by mutableStateOf(false)
+    var quitAsk by mutableStateOf(false)
+    var quitNow: (() -> Unit)? = null
     var job: Job? = null
+    private var closeAnyway = false
+    private val fontsDeclined = HashSet<String>()
     private val closeLock = Mutex()
     private val background = MainScope()
     val migration by lazy { EffectMigration.read(context) }
@@ -221,22 +237,54 @@ class DeskAppState {
     suspend fun openNow(id: String): EditorState? {
         val scene = load(id) ?: return null
         val saver = ProjectSaver(id, store, recovery, failed = { javax.swing.SwingUtilities.invokeLater { toast(R.string.home_save_project_failed) } })
-        return EditorState(id, scene, store, engine, settings, saver).also { editor = it }
+        return EditorState(id, scene, store, engine, settings, saver).also { editor = it; offerFonts(it) }
     }
+
+    private fun offerFonts(state: EditorState) {
+        val library = engine.fonts ?: return
+        if (System.getProperty("am.fontOffer") == "off" || state.projectId in fontsDeclined) return
+        background.launch {
+            val missing = withContext(Dispatchers.IO) { state.project.fontNames().filter { FontName.parse(it).source == "googlefonts" && library.localFile(it) == null } }
+            if (missing.isNotEmpty() && editor === state) fontOffer = state to missing
+        }
+    }
+
+    fun declineFonts(state: EditorState) {
+        fontsDeclined += state.projectId
+        fontOffer = null
+    }
+
+    fun downloadFonts(names: List<String>) {
+        fontOffer = null
+        val library = engine.fonts ?: return
+        background.launch {
+            if (names.count { library.resolve(it, download = true) == null } > 0) toast(R.string.font_load_failed_body)
+        }
+    }
+
+    fun closeAnyway() { saveFailed = false; closeAnyway = true; closeSoon() }
+
+    fun retryClose() { saveFailed = false; closeSoon() }
 
     suspend fun closeEditor() {
-        closeLock.withLock { closeNow() }
+        val closed = closeLock.withLock { closeNow() }
+        if (closed) afterClose?.let { afterClose = null; it() }
     }
 
-    private suspend fun closeNow() {
-        val state = editor ?: return
+    private suspend fun closeNow(): Boolean {
+        val state = editor ?: return true
         state.playing = false
         PreviewCache.remove()
         state.endGesture()
         state.leaveGroups()
         val scene = state.scene
+        withContext(Dispatchers.IO) { runCatching { state.saver.flush().get() } }
+        if (state.saver.failing && !closeAnyway) {
+            saveFailed = true
+            return false
+        }
+        closeAnyway = false
         try {
-            withContext(Dispatchers.IO) { runCatching { state.saver.flush().get() } }
             state.saver.snapshot(scene.toXml())
             engine.audio?.release()
             saveThumbnail(scene, state.timeMs, state.projectId)
@@ -245,16 +293,67 @@ class DeskAppState {
             editor = null
             projectsChanged++
         }
+        return true
     }
 
     fun closeSoon() { background.launch { closeEditor() } }
 
-    suspend fun shutdown(timeoutMs: Long = 4000) {
-        val closing = background.launch { closeEditor() }
-        withTimeoutOrNull(timeoutMs) { closing.join() }
+    fun requestQuit() {
+        if (ExportRun.running) { hidden = false; quitAsk = true; return }
+        background.launch { if (shutdown()) quitNow?.invoke() else afterClose = quitNow }
     }
 
-    suspend fun importFiles(uris: List<Uri>) {
+    fun keepExporting() {
+        quitAsk = false
+        background.launch {
+            exportingFromList = null
+            if (shutdown()) hidden = true
+        }
+    }
+
+    fun stopAndQuit() {
+        quitAsk = false
+        background.launch {
+            ExportRun.cancel()
+            withTimeoutOrNull(5000) { while (ExportRun.running) delay(50) }
+            if (shutdown()) quitNow?.invoke() else afterClose = quitNow
+        }
+    }
+
+    suspend fun shutdown(timeoutMs: Long = 4000): Boolean {
+        val closing = background.launch { closeEditor() }
+        withTimeoutOrNull(timeoutMs) { closing.join() }
+        return !saveFailed
+    }
+
+    fun queueMedia(uris: List<Uri>) {
+        val sounds = uris.filter { android.content.Desk.mime(it.toString())?.startsWith("audio/") == true }
+        val pictures = uris - sounds.toSet()
+        if (pictures.isNotEmpty()) MediaPicks.addPictures(pictures)
+        if (sounds.isNotEmpty()) MediaPicks.addSounds(sounds)
+    }
+
+    suspend fun openFiles(files: List<File>) {
+        DeskLibrary.remember(files)
+        val projects = files.filter(DeskOpen::isProject)
+        val media = files - projects.toSet()
+        if (projects.isNotEmpty()) {
+            val reports = importFiles(projects.map(Uri::fromFile))
+            val single = reports.singleOrNull()?.takeIf { !it.template }
+            if (single != null && editor == null) { imported = emptyList(); openNow(single.id) }
+        }
+        if (media.isEmpty()) return
+        val uris = media.map(Uri::fromFile)
+        if (editor != null) return queueMedia(uris)
+        val title = media.first().nameWithoutExtension.ifBlank { context.getString(R.string.home_new_project) }
+        val id = try { withContext(Dispatchers.IO) { store.create(Scene.create(title, 1920, 1080, 30, 0xFF000000.toInt())) } }
+        catch (e: java.io.IOException) { toast(R.string.home_create_project_failed); return }
+        projectsChanged++
+        queueMedia(uris)
+        openNow(id)
+    }
+
+    suspend fun importFiles(uris: List<Uri>): List<ImportReport> {
         val reports = ArrayList<ImportReport>()
         opening = true
         try {
@@ -274,6 +373,7 @@ class DeskAppState {
             saveThumbnail(scene, scene.totalTime / 2, report.id)
         }
         projectsChanged++
+        return reports
     }
 
     suspend fun projectFromTemplate(scene: Scene) {
@@ -316,15 +416,20 @@ private fun DeskContent(app: DeskAppState, scale: Float) {
     }
     LaunchedEffect(Unit) {
         withContext(Dispatchers.IO) { runCatching { ShapeCatalog.load(app.context) } }
+        fun picked() = DeskFiles.chooseFiles(media = true, multiple = true).map(Uri::fromFile).also { Tutorial.pickerClosed(it.isNotEmpty()) }.takeIf { it.isNotEmpty() }
         MediaPicks.install(app,
-            { DeskFiles.chooseFiles(media = true, multiple = true).map(Uri::fromFile).takeIf { it.isNotEmpty() }?.let { MediaPicks.addPictures(it) } },
-            { DeskFiles.chooseFiles(media = true, multiple = true).map(Uri::fromFile).takeIf { it.isNotEmpty() }?.let { MediaPicks.addPictures(it) } },
-            { DeskFiles.chooseFiles(media = true, multiple = true).map(Uri::fromFile).takeIf { it.isNotEmpty() }?.let { MediaPicks.addSounds(it) } },
+            { picked()?.let { MediaPicks.addPictures(it) } },
+            { picked()?.let { MediaPicks.addPictures(it) } },
+            { picked()?.let { MediaPicks.addSounds(it) } },
         ) { app.editor?.projectId }
     }
     LaunchedEffect(Unit) { if (app.settings.autoUpdateCheck) Updates.atStart(app.context, app.settings) }
     LaunchedEffect(Unit) { app.startup() }
     LaunchedEffect(Unit) { app.maintain() }
+    LaunchedEffect(DeskOpen.arrived.intValue) {
+        val files = DeskOpen.take()
+        if (files.isNotEmpty()) app.openFiles(files)
+    }
     LaunchedEffect(app.editor) {
         val state = app.editor ?: return@LaunchedEffect
         while (true) {
@@ -333,6 +438,7 @@ private fun DeskContent(app: DeskAppState, scale: Float) {
         }
     }
     val open = app.editor
+    var firstRun by remember { mutableStateOf(FirstRun.of(app.settings, System.getProperty("am.onboarding"))) }
     val density = LocalDensity.current
     val homePress = remember(Am.PressHome) { PressIndication(Am.PressHome) }
     val editorPress = remember(Am.PressEditor) { PressIndication(Am.PressEditor) }
@@ -351,7 +457,10 @@ private fun DeskContent(app: DeskAppState, scale: Float) {
             LocalIndication provides if (open == null) homePress else editorPress,
             LocalWide provides wideEditor(config.smallestScreenWidthDp, config.screenWidthDp),
         ) {
-            if (open == null) {
+            val first = firstRun
+            if (open == null && first != null) {
+                DeskOnboarding(app.settings, first) { firstRun = null; Tutorial.firstRunFinished(app.settings) }
+            } else if (open == null) {
                 Box(Modifier.fillMaxSize()) {
                     DeskHome(
                         app.store, app.settings, onOpen = { id -> run { app.openNow(id) } }, onExport = { id -> run { app.exportingFromList = app.load(id) } },
@@ -382,8 +491,17 @@ private fun DeskContent(app: DeskAppState, scale: Float) {
             }
             if (app.settingsOpen) DeskSettings(app.settings, app.settingsPage, onClose = { app.settingsOpen = false }, onRestored = { app.projectsChanged++ })
             app.recovered?.takeIf { open == null }?.let { offer -> DeskRecovery(offer, { scope.launch { app.answerRecovery(offer, it) } }) { app.recovered = null } }
-            UpdateDialog()
+            TutorialHost(
+                open, app.store, app.settings,
+                homeFree = open == null && first == null && !app.opening && app.editingTemplate == null && app.exportingFromList == null && app.recovered == null && app.imported.isEmpty() && !app.settingsOpen && Updates.answer == null,
+                onOpen = { id -> run { app.openNow(id) } }, onCloseEditor = { scope.launch { app.closeEditor() } }, onChanged = { app.projectsChanged++ },
+            )
+            app.fontOffer?.takeIf { it.first === open }?.let { (state, names) -> DeskFontOffer(names, { app.downloadFonts(names) }) { app.declineFonts(state) } }
+            if (app.saveFailed && open != null) DeskSaveFailed(app)
+            if (app.quitAsk) DeskQuitAsk(app)
+            UpdateDialog(app::requestQuit)
             ToastHost(Modifier.align(Alignment.BottomCenter))
+            if (open?.exportOpen != true && app.exportingFromList == null) DeskExportPill(Modifier.align(Alignment.BottomEnd).padding(end = 20.dp, bottom = 20.dp))
         }
     }
     if (DeskModals.open > 0 && titleBar > 0.dp) Box(Modifier.fillMaxWidth().height(titleBar).background(Color.Black.copy(alpha = DeskModals.ScrimAlpha * DeskModals.fade)))
@@ -415,10 +533,7 @@ private class DeskDrop(private val app: DeskAppState, private val run: (suspend 
         DeskLibrary.remember(files)
         val uris = files.map(Uri::fromFile)
         if (app.editor == null) { run { app.importFiles(uris) }; return true }
-        val sounds = uris.filter { android.content.Desk.mime(it.toString())?.startsWith("audio/") == true }
-        val pictures = uris - sounds.toSet()
-        if (pictures.isNotEmpty()) MediaPicks.addPictures(pictures)
-        if (sounds.isNotEmpty()) MediaPicks.addSounds(sounds)
+        app.queueMedia(uris)
         return true
     }
 }

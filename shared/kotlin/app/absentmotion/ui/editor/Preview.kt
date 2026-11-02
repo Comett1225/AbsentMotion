@@ -48,6 +48,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.pointer.PointerId
+import androidx.compose.ui.input.pointer.isAltPressed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChanged
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -208,8 +209,15 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
         onDispose { if (Build.VERSION.SDK_INT >= 29) view.systemGestureExclusionRects = emptyList() }
     }
 
-    val wheelView = if (!app.absentmotion.platform.PlatformFeatures.desktop || fixedView) Modifier else app.absentmotion.platform.wheel { delta, at, zoom ->
-        if (zoom) {
+    var wheelEnd by remember { mutableStateOf<kotlinx.coroutines.Job?>(null) }
+    val wheelView = if (!app.absentmotion.platform.PlatformFeatures.desktop || fixedView) Modifier else app.absentmotion.platform.previewWheel { delta, at, zoom, alt, shift ->
+        if (alt && !zoom && state.selectedId != null && !state.playing) {
+            val amount = if (delta.y != 0f) delta.y else delta.x
+            if (shift) state.editSelected(key = WHEEL_KEY) { it.withRotation(it.rotation + wheelTurn(amount)) }
+            else wheelScaleLayer(state, at, wheelFactor(amount), plane, scale, Offset(dx, dy))
+            wheelEnd?.cancel()
+            wheelEnd = scope.launch { delay(WHEEL_IDLE_MS); state.endGesture() }
+        } else if (zoom || alt) {
             val next = (state.canvasZoom * kotlin.math.exp(-delta.y * 0.1f)).coerceIn(0.01f, 64f)
             val about = (at - Offset(dx, dy)) / scale - Offset(state.scene.width / 2f, state.scene.height / 2f)
             state.canvasPan = pinchedPan(state.canvasPan, about, next / state.canvasZoom)
@@ -298,6 +306,11 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                             state.editSelected("text-wrap") { startLayer.withResizedTextWrap(width) }
                         } else if (moved && startLayer != null && handle >= 0 && startQuad != null) {
                             val pivot = startLayer.pivot.let { onScreen(Pt(it[0], it[1])) } ?: ((startQuad[0] + startQuad[2]) / 2f)
+                            if (app.absentmotion.platform.PlatformFeatures.desktop && event.keyboardModifiers.isAltPressed) {
+                                val turn = handleTurn(down.position - pivot, position - pivot)
+                                state.editSelected(key = "preview-handle") { it.withRotation(startLayer.rotation + turn) }
+                                continue
+                            }
                             val scaled = handleScale(handle, startQuad, pivot, position + handleGrab, startLayer.scale, 8.dp.toPx()) ?: continue
                             state.editSelected(key = "preview-handle") { it.withTransform("scale", scaled[0], scaled[1]) }
                         } else if (moved && adjusting != null) {
@@ -478,6 +491,29 @@ internal fun handleScale(handle: Int, corners: List<Offset>, pivot: Offset, now:
     if (abs(along) < reach) return null
     val factor = (((now - pivot).x * axis.x + (now - pivot).y * axis.y) / length / along).coerceAtLeast(0.01f)
     return if (handle % 2 == 0) floatArrayOf(start[0], start[1] * factor) else floatArrayOf(start[0] * factor, start[1])
+}
+
+internal const val WHEEL_KEY = "preview-wheel"
+internal const val WHEEL_IDLE_MS = 500L
+
+internal fun wheelFactor(amount: Float): Float = kotlin.math.exp(-amount * 0.06f).coerceIn(0.5f, 2f)
+
+internal fun wheelTurn(amount: Float): Float = (-amount * 5f).coerceIn(-45f, 45f)
+
+internal fun handleTurn(from: Offset, to: Offset): Float {
+    if (from.getDistance() < 1f || to.getDistance() < 1f) return 0f
+    var turn = Math.toDegrees((kotlin.math.atan2(-to.y, to.x) - kotlin.math.atan2(-from.y, from.x)).toDouble()).toFloat()
+    if (turn > 180f) turn -= 360f else if (turn < -180f) turn += 360f
+    return turn
+}
+
+private fun wheelScaleLayer(state: EditorState, at: Offset, factor: Float, plane: FloatArray?, scale: Float, offset: Offset) {
+    val planeView = plane?.let { v -> Matrix().apply { setValues(v) } }
+    val about = ((at - offset) / scale).let { Pt(it.x, it.y) }.let { planeView?.inverseMap(it) ?: it }
+    state.editSelected(key = WHEEL_KEY) { layer ->
+        state.scene.withWorldLocation(layer, state.sampleMs) { x, y -> about.x + (x - about.x) * factor to about.y + (y - about.y) * factor }
+            .withTransform("scale", layer.scale[0] * factor, layer.scale[1] * factor)
+    }
 }
 
 internal fun pinchedPan(pan: Offset, about: Offset, factor: Float): Offset = pan / factor + about * (1 / factor - 1)

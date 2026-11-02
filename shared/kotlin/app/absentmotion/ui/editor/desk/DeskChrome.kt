@@ -116,6 +116,8 @@ internal fun DeskDialog(title: String?, width: Dp, onDismiss: () -> Unit, height
 private val mac = System.getProperty("os.name").orEmpty().lowercase().contains("mac")
 
 internal val DeskMod = if (mac) "⌘" else "Ctrl+"
+internal val DeskAlt = if (mac) "⌥" else "Alt+"
+internal val DeskShift = if (mac) "⇧" else "Shift+"
 internal val DeskRedoKeys = if (mac) "⇧⌘Z" else "Ctrl+Shift+Z"
 
 internal fun deskSp(phone: Float): TextUnit = if (PlatformFeatures.desktop && phone < 12f) 12.sp else phone.sp

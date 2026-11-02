@@ -14,7 +14,9 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.isAltPressed
 import androidx.compose.ui.input.pointer.isCtrlPressed
+import androidx.compose.ui.input.pointer.isShiftPressed
 import androidx.compose.ui.input.pointer.isMetaPressed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.pointerHoverIcon
@@ -138,6 +140,23 @@ fun wheel(onScroll: (delta: androidx.compose.ui.geometry.Offset, at: androidx.co
         }
     }
 
+fun previewWheel(onScroll: (delta: androidx.compose.ui.geometry.Offset, at: androidx.compose.ui.geometry.Offset, zoom: Boolean, alt: Boolean, shift: Boolean) -> Unit): Modifier =
+    Modifier.composed {
+        val latest by rememberUpdatedState(onScroll)
+        Modifier.pointerInput(Unit) {
+            awaitPointerEventScope {
+                while (true) {
+                    val event = awaitPointerEvent()
+                    if (event.type != PointerEventType.Scroll) continue
+                    val change = event.changes.firstOrNull() ?: continue
+                    val keys = event.keyboardModifiers
+                    latest(change.scrollDelta, change.position, keys.isCtrlPressed || keys.isMetaPressed, keys.isAltPressed, keys.isShiftPressed)
+                    change.consume()
+                }
+            }
+        }
+    }
+
 fun makeBitmap(width: Int, height: Int): Bitmap = Bitmap.createBitmap(width, height)
 fun recycleBitmap(bitmap: Bitmap) = bitmap.recycle()
 
@@ -171,11 +190,17 @@ fun ExportMediaPreview(kind: app.absentmotion.export.ExportKind, uris: List<Uri>
 
 fun effectsMessageOnHome() = false
 
+fun exportScope(own: kotlinx.coroutines.CoroutineScope): kotlinx.coroutines.CoroutineScope = app.absentmotion.export.DeskExports.scope
+
+fun exportEngine(engine: app.absentmotion.engine.EngineThread): app.absentmotion.engine.EngineThread = app.absentmotion.export.DeskExports.engine()
+
+fun exportDone(result: app.absentmotion.export.ExportResult) = app.absentmotion.export.DeskExports.saved(result)
+
 object PlatformFeatures {
     const val desktop = true
     const val ai = true
     val aiFaces = app.absentmotion.desk.DeskOs.mac
-    const val camera = false
+    const val camera = true
     const val tools = true
     const val userFiles = true
     const val linkFolders = true

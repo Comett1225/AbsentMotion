@@ -73,6 +73,7 @@ enum class SettingsPage(val title: Int, val icon: () -> ImageVector) {
     Updates(R.string.desk_updates, { HomeIcons.Download }),
     Language(R.string.settings_language, { DeskIcons.Globe }),
     Help(R.string.settings_help, { ExportIcons.Help }),
+    Tutorial(R.string.desk_tutorial_page, { ChromeIcons.Play }),
     About(R.string.settings_about, { ExportIcons.Info }),
     Crash(R.string.crash_logs, { DeskIcons.Warning }),
 }
@@ -111,6 +112,7 @@ internal fun DeskSettings(settings: AppSettings, initial: SettingsPage, onClose:
             Box(Modifier.weight(1f).fillMaxHeight()) {
                 when (page) {
                     SettingsPage.Help -> DeskHelpPage()
+                    SettingsPage.Tutorial -> DeskTutorialPage(settings, onClose)
                     SettingsPage.About -> DeskAbout()
                     SettingsPage.Crash -> DeskCrashLogs()
                     SettingsPage.Language -> DeskLanguages()
@@ -184,6 +186,21 @@ internal fun DeskLanguages() {
                     if (on) Icon(PanelIcons.Check, null, Modifier.size(22.dp), tint = Am.Navy)
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun DeskTutorialPage(settings: AppSettings, onClose: () -> Unit) {
+    val running = settings.tutorialStep != null
+    Column(Modifier.fillMaxSize().deskVerticalScroll(color = Am.Navy).padding(24.dp)) {
+        Text(stringResource(R.string.desk_tutorial_page), color = Am.Navy, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.desk_tutorial_page_note), Modifier.padding(top = 6.dp, bottom = 16.dp), color = Am.HomeMid, fontSize = 13.sp)
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            if (running) {
+                DeskButton(stringResource(R.string.tutorial_settings_continue), { onClose(); app.absentmotion.ui.tutorial.Tutorial.start(resume = true) }, primary = true)
+                DeskButton(stringResource(R.string.tutorial_settings_restart), { onClose(); app.absentmotion.ui.tutorial.Tutorial.start(resume = false) })
+            } else DeskButton(stringResource(R.string.tutorial_settings_start), { onClose(); app.absentmotion.ui.tutorial.Tutorial.start(resume = false) }, primary = true)
         }
     }
 }

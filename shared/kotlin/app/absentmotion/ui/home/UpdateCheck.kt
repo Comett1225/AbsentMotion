@@ -137,17 +137,40 @@ internal fun apkFlavours(flavour: String) = if (flavour == "play") listOf("play"
 internal fun apkName(version: String, flavour: String) = "AbsentMotion-$version-${when (flavour) { "compat" -> "compatible"; "compat32" -> "compatible-32bit"; else -> flavour }}.apk"
 
 private fun apkOf(release: JSONObject, tag: String, version: String, flavour: String, source: UpdateSource): ApkAsset? {
-    if (flavour !in setOf("foss", "play", "compat", "compat32") || !SAFE_VERSION.matches(version) || tag.trim() !in setOf("v$version", "V$version")) return null
+    if (flavour !in setOf("foss", "play", "compat", "compat32", "desktop") || !SAFE_VERSION.matches(version) || tag.trim() !in setOf("v$version", "V$version")) return null
     val assets = release.optJSONArray("assets") ?: return null
     val list = (0 until assets.length()).mapNotNull { assets.optJSONObject(it) }
     fun linkOf(file: String) = list.firstOrNull { it.optString("name") == file }?.takeIf { it.optString("browser_download_url").equals(source.asset(tag.trim(), file), ignoreCase = true) }
-    val (name, asset) = apkFlavours(flavour).firstNotNullOfOrNull { f -> apkName(version, f).let { n -> linkOf(n)?.let { n to it } } } ?: return null
+    val (name, asset) = (if (flavour == "desktop") installerName(list.map { it.optString("name") }, version)?.let { n -> linkOf(n)?.let { n to it } }
+        else apkFlavours(flavour).firstNotNullOfOrNull { f -> apkName(version, f).let { n -> linkOf(n)?.let { n to it } } }) ?: return null
     val size = asset.optLong("size", -1L).takeIf { it in 1..MAX_APK_BYTES } ?: return null
     val sums = linkOf(SUMS)?.let { source.asset(tag.trim(), SUMS) }
     return ApkAsset(name, source.asset(tag.trim(), name), size, parseDigest(asset.optString("digest")), sums)
 }
 
 private const val SUMS = "SHA256SUMS.txt"
+
+private val ARM_TAGS = listOf("arm64", "aarch64")
+private val INTEL_TAGS = listOf("x64", "x86_64", "amd64", "intel")
+
+internal fun installerExtensions(os: String): List<String> = when {
+    os.startsWith("mac", ignoreCase = true) -> listOf(".dmg")
+    os.startsWith("windows", ignoreCase = true) -> listOf(".msi", ".exe")
+    else -> listOf(".deb", ".rpm", ".appimage")
+}
+
+internal fun installerExtension(name: String): String? = listOf(".dmg", ".msi", ".exe", ".deb", ".rpm", ".appimage").firstOrNull { name.endsWith(it, ignoreCase = true) }
+
+internal fun installerName(names: List<String>, version: String, os: String = System.getProperty("os.name").orEmpty(), arch: String = System.getProperty("os.arch").orEmpty()): String? {
+    val own = installerExtensions(os)
+    val wanted = if (arch.contains("aarch64", ignoreCase = true) || arch.contains("arm", ignoreCase = true)) ARM_TAGS else INTEL_TAGS
+    val others = (ARM_TAGS + INTEL_TAGS) - wanted.toSet()
+    val candidates = names.filter { n -> n.startsWith("absentmotion", ignoreCase = true) && version in n && own.any { n.endsWith(it, ignoreCase = true) } && others.none { n.contains(it, ignoreCase = true) } }
+    return own.firstNotNullOfOrNull { ext ->
+        val list = candidates.filter { it.endsWith(ext, ignoreCase = true) }
+        list.firstOrNull { c -> wanted.any { c.contains(it, ignoreCase = true) } } ?: list.firstOrNull()
+    }
+}
 
 internal fun isNewer(latest: String, current: String): Boolean? {
     val a = Version.parse(latest) ?: return null

@@ -136,6 +136,8 @@ fun wheel(onScroll: (delta: androidx.compose.ui.geometry.Offset, at: androidx.co
         }
     }
 
+fun previewWheel(onScroll: (delta: androidx.compose.ui.geometry.Offset, at: androidx.compose.ui.geometry.Offset, zoom: Boolean, alt: Boolean, shift: Boolean) -> Unit): androidx.compose.ui.Modifier = androidx.compose.ui.Modifier
+
 fun makeBitmap(width: Int, height: Int): Bitmap = android.graphics.Bitmap.createBitmap(width, height, android.graphics.Bitmap.Config.ARGB_8888)
 fun recycleBitmap(bitmap: Bitmap) = bitmap.recycle()
 fun encodeRgba(pixels: ByteArray, width: Int, height: Int, settings: app.absentmotion.export.ExportSettings, reuse: Bitmap?, out: java.io.OutputStream) {
@@ -191,6 +193,12 @@ fun shareExport(context: Context, result: app.absentmotion.export.ExportResult) 
 fun ExportMediaPreview(kind: app.absentmotion.export.ExportKind, uris: List<Uri>, large: Boolean = false, onTap: (() -> Unit)? = null) = app.absentmotion.ui.export.ExportMediaPreview(kind, uris, large, onTap)
 
 fun effectsMessageOnHome() = false
+
+fun exportScope(own: kotlinx.coroutines.CoroutineScope): kotlinx.coroutines.CoroutineScope = own
+
+fun exportEngine(engine: app.absentmotion.engine.EngineThread): app.absentmotion.engine.EngineThread = engine
+
+fun exportDone(result: app.absentmotion.export.ExportResult) {}
 
 suspend fun compressVideoOnDesktop(uri: String, job: app.absentmotion.tools.VideoJob, audio: Boolean, durationUs: Long, out: java.io.File, progress: (Float) -> Unit) = Unit
 

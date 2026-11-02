@@ -71,7 +71,7 @@ class TourStep(
     val gesture: Boolean = false,
 )
 
-class Tour(val steps: List<TourStep> = TourSteps.all, startAt: String? = null) {
+class Tour(val steps: List<TourStep> = TourSteps.current, startAt: String? = null) {
     var index: Int = steps.indexOfFirst { it.id == startAt }.coerceAtLeast(0)
         private set
     @StringRes var note: Int? = null
@@ -185,6 +185,8 @@ class Tour(val steps: List<TourStep> = TourSteps.all, startAt: String? = null) {
 }
 
 object TourSteps {
+    val current: List<TourStep> get() = if (app.absentmotion.platform.PlatformFeatures.desktop) DeskTourSteps.all else all
+
     private fun pick(now: TourFacts, adding: List<String>): List<String> = when {
         now.adding -> adding
         now.selected != null -> listOf("back")

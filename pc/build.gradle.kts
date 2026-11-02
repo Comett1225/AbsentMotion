@@ -110,9 +110,28 @@ compose.desktop {
             packageVersion = "5.0.0"
             jvmArgs += listOf("-XX:+UseZGC", "-XX:+ZGenerational", "-XX:MaxRAMPercentage=60", "-Dapple.awt.application.name=AbsentMotion")
             if (isMac) jvmArgs += "-XX:SharedArchiveFile=\$APPDIR/app.jsa"
-            macOS { bundleID = "app.absentmotion.desktop"; iconFile.set(file("../macos/AbsentMotion.icns")) }
-            windows { menuGroup = "AbsentMotion"; upgradeUuid = "5b0e7a52-3c1f-4d8e-9a6b-2f4c8d1e7a30" }
-            linux { packageName = "absentmotion" }
+            macOS {
+                bundleID = "app.absentmotion.desktop"
+                iconFile.set(file("../macos/AbsentMotion.icns"))
+                infoPlist {
+                    extraKeysRawXml = "<key>NSCameraUsageDescription</key><string>AbsentMotion uses the camera to take photos and record videos for your project.</string><key>NSMicrophoneUsageDescription</key><string>AbsentMotion uses the microphone to record sound with your videos.</string>"
+                }
+                fileAssociation("application/x-absentmotion-project", "absproj", "AbsentMotion project")
+                fileAssociation("application/x-absentmotion-project", "amproj", "AbsentMotion project")
+                fileAssociation("text/xml", "xml", "AbsentMotion scene")
+            }
+            windows {
+                menuGroup = "AbsentMotion"
+                upgradeUuid = "5b0e7a52-3c1f-4d8e-9a6b-2f4c8d1e7a30"
+                fileAssociation("application/x-absentmotion-project", "absproj", "AbsentMotion project")
+                fileAssociation("application/x-absentmotion-project", "amproj", "AbsentMotion project")
+            }
+            linux {
+                packageName = "absentmotion"
+                fileAssociation("application/x-absentmotion-project", "absproj", "AbsentMotion project")
+                fileAssociation("application/x-absentmotion-project", "amproj", "AbsentMotion project")
+                fileAssociation("text/xml", "xml", "AbsentMotion scene")
+            }
             appResourcesRootDir.set(project.layout.buildDirectory.dir("app-resources"))
         }
     }
@@ -157,6 +176,8 @@ val sceneCheck = tasks.register<JavaExec>("sceneCheck") {
 
 tasks.test {
     systemProperty("user.home", layout.buildDirectory.dir("test-home").get().asFile.absolutePath)
+    systemProperty("am.onboarding", "done")
+    systemProperty("am.fontOffer", "off")
     systemProperty("am.data", layout.buildDirectory.dir("test-data").get().asFile.absolutePath)
     dependsOn(nativeBuild)
     inputs.file(layout.buildDirectory.file("native/$nativeName"))

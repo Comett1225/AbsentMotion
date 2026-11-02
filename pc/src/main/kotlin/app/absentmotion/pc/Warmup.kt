@@ -23,7 +23,7 @@ fun warmup() {
     System.setProperty("am.data", dir.resolve("data").path)
     System.setProperty("am.exports", dir.resolve("exports").path)
     application {
-        val desk = remember { DeskAppState() }
+        val desk = remember { DeskAppState().also { it.settings.onboarding = app.absentmotion.ui.onboarding.ONBOARDING_DONE } }
         Window(onCloseRequest = ::exitApplication, title = "AbsentMotion", state = rememberWindowState(width = 1280.dp, height = 800.dp)) {
             DeskApp(desk)
             LaunchedEffect(Unit) {

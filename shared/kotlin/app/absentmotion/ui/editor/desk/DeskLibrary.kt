@@ -58,6 +58,7 @@ import app.absentmotion.platform.asImageBitmap
 import app.absentmotion.ui.home.EmbedRequest
 import app.absentmotion.ui.home.rememberFileBitmap
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.tutorial.tutorialTarget
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -76,7 +77,7 @@ private val Sections = listOf(
 
 @Composable
 internal fun DeskLibraryRail(selected: Int, expanded: Boolean, modifier: Modifier, select: (Int) -> Unit) {
-    Column(modifier.background(Am.Panel).deskVerticalScroll().padding(vertical = 4.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(modifier.background(Am.Panel).tutorialTarget("lib_rail").deskVerticalScroll().padding(vertical = 4.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Sections.forEachIndexed { index, section ->
             val title = stringResource(section.title)
             val active = expanded && selected == index
@@ -84,7 +85,7 @@ internal fun DeskLibraryRail(selected: Int, expanded: Boolean, modifier: Modifie
             Hint(title) {
                 val source = remember { MutableInteractionSource() }
                 val hovered by source.collectIsHoveredAsState()
-                Column(Modifier.width(56.dp).height(54.dp).clip(RoundedCornerShape(8.dp)).background(if (active) Am.Accent.copy(alpha = .16f) else if (hovered) Am.Field else androidx.compose.ui.graphics.Color.Transparent)
+                Column(Modifier.width(56.dp).height(54.dp).tutorialTarget(when (index) { 0 -> "lib_tab_media"; 1 -> "lib_tab_audio"; 3 -> "lib_tab_text"; else -> null }).clip(RoundedCornerShape(8.dp)).background(if (active) Am.Accent.copy(alpha = .16f) else if (hovered) Am.Field else androidx.compose.ui.graphics.Color.Transparent)
                     .hoverable(source).pointerHoverIcon(PointerIcon.Hand).clickable { select(index) }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                     Icon(section.icon, null, Modifier.size(22.dp), tint = tint)
                     Text(stringResource(section.rail), Modifier.fillMaxWidth().padding(top = 3.dp), color = if (active) Am.Accent else Am.OnDarkDim, fontSize = 12.sp,
@@ -103,7 +104,7 @@ internal fun DeskLibrary(state: EditorState, library: AddLibrary, tab: Int, modi
             Text(stringResource(Sections[tab].title), Modifier.weight(1f), color = Am.OnDark, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
             DeskIcon(ChromeIcons.Close, deskShortcut(R.string.action_close, "${DeskMod}1"), action = close)
         }
-        Box(Modifier.weight(1f).fillMaxWidth()) {
+        Box(Modifier.weight(1f).fillMaxWidth().tutorialTarget(when (tab) { 0 -> "lib_media"; 1 -> "lib_audio"; 3 -> "lib_text"; else -> null })) {
             when (tab) {
                 0 -> DeskMedia(state, library)
                 1 -> DeskAudio(state, library)

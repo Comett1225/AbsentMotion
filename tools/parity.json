@@ -443,12 +443,12 @@
     {
       "id": "add.audio",
       "name": "Add sounds with preview",
-      "where": "AudioTab.kt, desk/DeskMedia.kt",
+      "where": "AudioTab.kt, desk/DeskMedia.kt, desk/DeskSoundBrowser.kt",
       "android": "works",
-      "macos": "partial",
-      "windows": "partial",
-      "linux": "partial",
-      "note": "flat searchable list; the phone View all browser with Songs, Albums, Artists, Folders and sort is missing"
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "View all browser in a desktop dialog: Songs, Albums, Artists and Folders (list of groups left, sounds right), sort, search, double-click or + adds, right-click shows the file"
     },
     {
       "id": "add.tts",
@@ -553,16 +553,12 @@
     {
       "id": "add.device_camera",
       "name": "Take a photo or video with the device camera",
-      "where": "ui/camera/CameraScreen.kt, MediaTab.kt",
+      "where": "ui/camera/CameraScreen.kt, DeskCamera.kt, DeskCameraSource.kt",
       "android": "works",
-      "macos": "missing",
-      "windows": "missing",
-      "linux": "missing",
-      "note": "PlatformFeatures.camera is false; DeskCamera closes at once (webcam capture not built)",
-      "gate": "camera",
-      "files": [
-        "shared/kotlin/app/absentmotion/ui/editor/MediaTab.kt"
-      ]
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "Webcam dialog with live preview, photo and video through ffmpeg (avfoundation, dshow, v4l2), device and microphone pickers; tested with the ffmpeg test source and parsed device lists, not with a real webcam; the system asks for camera permission only when the dialog opens"
     },
     {
       "id": "add.drag_to_timeline",
@@ -597,12 +593,12 @@
     {
       "id": "preview.pinch_gestures",
       "name": "Two-finger move, scale and rotate of the selected layer",
-      "where": "Preview.kt",
+      "where": "Preview.kt, LayerTools.kt, DesktopPlatform.kt previewWheel",
       "android": "works",
-      "macos": "partial",
-      "windows": "partial",
-      "linux": "partial",
-      "note": "no mouse equivalent of the two-finger scale/rotate; handles and the Transform tab cover it"
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "Alt+scroll scales the selected layer around the cursor, Shift+Alt+scroll rotates it, Alt+drag a handle rotates; one undo step per scroll gesture; shortcuts are in the Size and Rotate tab tooltips; Compose delivers no trackpad pinch or rotate events, so there is no pinch itself"
     },
     {
       "id": "preview.canvas_zoom_pan",
@@ -897,12 +893,12 @@
     {
       "id": "export.background_service",
       "name": "Keep exporting in the background with a notification",
-      "where": "export/ExportService.kt",
+      "where": "export/ExportService.kt, ExportScreen.kt, desk/DeskExportUi.kt, export/DeskExportRun.kt",
       "android": "works",
-      "macos": "missing",
-      "windows": "missing",
-      "linux": "missing",
-      "note": "export runs inside the window and stops when it closes; no tray or notification"
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "The export runs on its own engine in an app-level scope, so it survives closing the editor; Keep working button, progress pill, Dock/taskbar progress, finished notification, quitting asks and can keep exporting in a small progress window"
     },
     {
       "id": "export.save_template",
@@ -997,12 +993,12 @@
     {
       "id": "home.open_with",
       "name": "Open a file from the OS (Open with, share)",
-      "where": "android ImportActivity.kt, pc Main.kt",
+      "where": "android ImportActivity.kt, pc Main.kt, desk/DeskOpen.kt",
       "android": "works",
-      "macos": "missing",
-      "windows": "missing",
-      "linux": "missing",
-      "note": "argv and the macOS open-file event are ignored; use File > Import or drag and drop"
+      "macos": "partial",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "Command-line files, the macOS open-file event and a one-instance socket on Windows and Linux feed one queue (project files import and open, media files open in the open project or a new one); .absproj/.amproj/.xml associations are in the packaging config; the Finder double-click and the associations need a packaged-app test"
     },
     {
       "id": "home.settings",
@@ -1079,50 +1075,50 @@
       "name": "Update check and install",
       "where": "UpdateCheck.kt, DeskUpdater.kt",
       "android": "works",
-      "macos": "partial",
-      "windows": "partial",
-      "linux": "partial",
-      "note": "checks the release feed and opens the download page; no in-app install or signature check"
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "Downloads the .dmg, .msi or .deb of the release feed for this system, checks it against SHA256SUMS.txt (a mismatch is deleted), then opens it and offers to quit; never installs on its own; expects release assets named AbsentMotion-<version>... with the system's extension"
     },
     {
       "id": "home.onboarding",
       "name": "First-run welcome and permissions",
-      "where": "ui/onboarding/Onboarding.kt, PhoneCheck.kt",
+      "where": "ui/onboarding/Onboarding.kt, DeskOnboarding.kt",
       "android": "works",
-      "macos": "missing",
-      "windows": "missing",
-      "linux": "missing",
-      "note": "DeskApp never shows Onboarding"
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "Desktop-sized welcome: language list, then the update check choice; the phone speed check is not needed"
     },
     {
       "id": "home.tutorial",
       "name": "Guided tour and tutorial rows",
-      "where": "ui/tutorial/*, SettingsDrawer.kt TutorialRows",
+      "where": "ui/tutorial/*, TourDesktop.kt, DeskSettings.kt",
       "android": "works",
-      "macos": "missing",
-      "windows": "missing",
-      "linux": "missing",
-      "note": "TutorialHost is not mounted on desktop and the settings page has no tutorial rows"
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "The guided tour runs on the desktop workspace with its own steps (library dock, inspector, timeline, ruler); Tutorial page in Settings starts, continues and restarts it"
     },
     {
       "id": "home.missing_fonts",
       "name": "Offer to download missing Google fonts when opening a project",
-      "where": "MainActivity offerFonts",
+      "where": "DeskApp.kt offerFonts",
       "android": "works",
-      "macos": "missing",
-      "windows": "missing",
-      "linux": "missing",
-      "note": "DeskApp does not check project fonts at open"
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "DeskApp offers to download missing Google fonts when a project opens, once per project and session"
     },
     {
       "id": "home.save_failed",
       "name": "Warn when the project cannot be saved on close",
-      "where": "MainActivity closeEditor",
+      "where": "DeskApp.kt closeEditor",
       "android": "works",
-      "macos": "partial",
-      "windows": "partial",
-      "linux": "partial",
-      "note": "DeskAppState.closeNow closes anyway and shows a toast"
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "Closing a project or quitting with unsaved changes asks Try Again or Close Without Saving; quitting waits for the answer"
     },
     {
       "id": "set.theme",

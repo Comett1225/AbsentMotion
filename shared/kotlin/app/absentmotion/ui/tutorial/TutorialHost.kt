@@ -317,7 +317,7 @@ private fun TourRunner(tour: Tour, editor: EditorState, settings: AppSettings, o
     val holes = (marks + allowed).distinct()
     val cardHole = if (view.step.union) marks.reduceOrNull { a, b -> Area(minOf(a.left, b.left), minOf(a.top, b.top), maxOf(a.right, b.right), maxOf(a.bottom, b.bottom)) } else marks.firstOrNull()
     val passBack = view.free || view.allowed.any { it == "back" || it.startsWith("add_") }
-    BackHandler(enabled = !passBack, onBack = onExit)
+    BackHandler(enabled = !passBack && !app.absentmotion.platform.PlatformFeatures.desktop, onBack = onExit)
     Box(Modifier.fillMaxSize().onGloballyPositioned { c -> c.positionInWindow().let { frame = Area(it.x, it.y, it.x + c.size.width, it.y + c.size.height) } }) {
         if (!view.free) InputGate(frame, blocked)
         Spotlight(
@@ -336,6 +336,7 @@ private fun areaOf(r: androidx.compose.ui.geometry.Rect) = Area(r.left, r.top, r
 
 @Composable
 private fun rememberReducedMotion(): Boolean {
+    if (app.absentmotion.platform.PlatformFeatures.desktop) return false
     val resolver = LocalContext.current.contentResolver
     var reduced by remember(resolver) { mutableStateOf(motionIsOff(resolver)) }
     DisposableEffect(resolver) {
