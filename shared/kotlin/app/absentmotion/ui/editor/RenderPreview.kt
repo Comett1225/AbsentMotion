@@ -90,14 +90,15 @@ internal fun PreRenderCell(state: EditorState, modifier: Modifier) {
         PreviewCache.PreRender.Outdated -> stringResource(R.string.preview_cache_state_outdated)
         else -> null
     }
+    val removeCopy = {
+        if (status == PreviewCache.PreRender.Ready) {
+            PreviewCache.remove()
+            Toast.makeText(context, app.absentmotion.i18n.AppText.get(R.string.preview_cache_removed), Toast.LENGTH_SHORT).show()
+        }
+    }
     Box(
-        modifier.fillMaxWidth().testTag(RENDER_PREVIEW_TAG).semantics { contentDescription = label; if (described != null) stateDescription = described }.combinedClickable(
-            onLongClick = {
-                if (status == PreviewCache.PreRender.Ready) {
-                    PreviewCache.remove()
-                    Toast.makeText(context, app.absentmotion.i18n.AppText.get(R.string.preview_cache_removed), Toast.LENGTH_SHORT).show()
-                }
-            },
+        modifier.fillMaxWidth().testTag(RENDER_PREVIEW_TAG).semantics { contentDescription = label; if (described != null) stateDescription = described }.rightClick(removeCopy).combinedClickable(
+            onLongClick = removeCopy,
             onClick = {
                 when (status) {
                     PreviewCache.PreRender.Rendering -> PreviewCache.cancel()

@@ -57,7 +57,8 @@ publish|if [ -f tools/publish_forbidden.txt ]; then sh tools/publish_check.sh; e
 ui-contract|python3 tools/ui_contract_check.py|update the contract or the UI
 remaining-contract|python3 tools/remaining_contract_check.py|update the contract or the code
 tool-regressions|python3 tools/bug_regression_check.py|the tool scripts regressed
-tier|python3 tools/compat/tier_check.py|gate the feature with Tier.has or Tier.choice (shared/kotlin/app/absentmotion/Tier.kt)"
+tier|python3 tools/compat/tier_check.py|gate the feature with Tier.has or Tier.choice (shared/kotlin/app/absentmotion/Tier.kt)
+parity|python3 tools/parity_check.py|list the desktop gap in tools/parity.json, or build the feature for the desktop"
 
 printf '== Native audio effects and text animation: host build and tests\n'
 sh tools/audio_dsp.sh --lib >"$dir/audio-dsp.log" 2>&1 || { tail -n 15 "$dir/audio-dsp.log" >&2; fail "the audio DSP host tests"; }

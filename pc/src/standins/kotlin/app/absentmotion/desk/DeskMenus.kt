@@ -54,6 +54,7 @@ fun FrameWindowScope.DeskMenus(app: DeskAppState) {
             Item("Undo", enabled = editor?.canUndo == true) { editor?.undo() }
             Item("Redo", enabled = editor?.canRedo == true) { editor?.redo() }
             Separator()
+            Item("Cut Layer", enabled = editor?.chosenLayers?.isNotEmpty() == true) { editor?.let { it.copySelected(); if (MultiSelect.active) it.deleteChosen() else it.deleteSelected() } }
             Item("Copy Layer", enabled = editor?.chosenLayers?.isNotEmpty() == true) { editor?.copySelected() }
             Item("Paste Layer", enabled = editor != null) { editor?.pasteLayer() }
             Item("Duplicate", enabled = editor?.selectedId != null || MultiSelect.active) { editor?.let { if (MultiSelect.active) it.duplicateChosen() else it.duplicateSelected() } }

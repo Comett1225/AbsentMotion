@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,9 +39,14 @@ import app.absentmotion.R
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.EffectClipboard
 import app.absentmotion.editor.StylePart
+import app.absentmotion.editor.MultiSelect
 import app.absentmotion.editor.alignClipTimes
+import app.absentmotion.editor.alignSelection
 import app.absentmotion.editor.chosenLayers
 import app.absentmotion.editor.copiedLayerForStyle
+import app.absentmotion.editor.deleteChosen
+import app.absentmotion.editor.distributeSelection
+import app.absentmotion.editor.groupLayers
 import app.absentmotion.editor.moveClipEdges
 import app.absentmotion.editor.pasteStyleOnChosen
 import app.absentmotion.editor.removeAudioOfChosen
@@ -52,9 +58,11 @@ import app.absentmotion.model.cutBetween
 import app.absentmotion.platform.LocalContext
 import app.absentmotion.platform.Toast
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.theme.Presence
+import kotlinx.coroutines.launch
 
 @Composable
-internal fun DeskToolTile(icon: ImageVector, label: String, modifier: Modifier = Modifier, enabled: Boolean = true, tip: String? = null, onClick: () -> Unit) {
+internal fun DeskToolTile(icon: ImageVector, label: String, modifier: Modifier = Modifier, enabled: Boolean = true, tip: String? = null, extra: @Composable () -> Unit = {}, onClick: () -> Unit) {
     val source = remember { MutableInteractionSource() }
     val hovered by source.collectIsHoveredAsState()
     Box(modifier) {
@@ -69,15 +77,23 @@ internal fun DeskToolTile(icon: ImageVector, label: String, modifier: Modifier =
                 Text(label, Modifier.fillMaxWidth().padding(top = 4.dp), color = Am.OnDarkDim, fontSize = 12.sp, lineHeight = 14.sp, maxLines = 2, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center)
             }
         }
+        extra()
     }
 }
 
-private class MultiTile(val icon: ImageVector, val label: Int, val enabled: Boolean = true, val reason: String? = null, val tip: Int? = null, val action: () -> Unit)
+private class MultiTile(val icon: ImageVector, val label: Int, val enabled: Boolean = true, val reason: String? = null, val tip: Int? = null, val parent: Boolean = false, val action: () -> Unit)
+
+private val AlignLabels = listOf(
+    R.string.structure_align_left, R.string.structure_align_centre, R.string.structure_align_right,
+    R.string.structure_align_top, R.string.structure_align_middle, R.string.structure_align_bottom,
+)
 
 @Composable
 internal fun DeskMulti(state: EditorState, modifier: Modifier) {
     val layers = state.chosenLayers
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var parentMenu by remember { mutableStateOf(false) }
     val cut = layers.takeIf { it.size == 2 }?.let { state.scene.cutBetween(it[0].id, it[1].id) }
     val cuts = if (layers.size == 2) listOfNotNull(cut?.let { it.first.id to it.second.id }) else state.scene.selectedCuts(layers.map { it.id }.toSet())
     var transition by remember { mutableStateOf<List<Pair<Long, Long>>?>(null) }
@@ -100,7 +116,18 @@ internal fun DeskMulti(state: EditorState, modifier: Modifier) {
         else -> R.string.transition_needs_order
     })
     fun paste(parts: Set<StylePart>) = styleToast(context, state.pasteStyleOnChosen(parts))
+    val chosen = MultiSelect.ids
     val tiles = listOf(
+        MultiTile(SelectionIcons.Group, R.string.structure_group, chosen.isNotEmpty()) { state.groupLayers(chosen) },
+        MultiTile(SelectionIcons.Mask, R.string.structure_group_mask, chosen.size > 1, needsTwo) { state.groupLayers(chosen, "mask") },
+        MultiTile(SelectionIcons.Exclude, R.string.structure_group_exclude, chosen.size > 1, needsTwo) { state.groupLayers(chosen, "exclude") },
+        MultiTile(PanelIcons.Link, R.string.structure_link_parent, chosen.isNotEmpty(), parent = true) { parentMenu = true },
+        MultiTile(ChromeIcons.Trash, R.string.structure_delete_selected, chosen.isNotEmpty()) { state.deleteChosen() },
+    ) + SelectionIcons.Align.mapIndexed { edge, icon ->
+        MultiTile(icon, AlignLabels[edge], chosen.isNotEmpty()) { scope.launch { state.alignSelection(edge) } }
+    } + listOf(
+        MultiTile(SelectionIcons.DistributeVertical, R.string.structure_distribute_vertical, chosen.size > 2, needsThree) { scope.launch { state.distributeSelection(false) } },
+        MultiTile(SelectionIcons.DistributeHorizontal, R.string.structure_distribute_horizontal, chosen.size > 2, needsThree) { scope.launch { state.distributeSelection(true) } },
         MultiTile(PanelIcons.Effects, R.string.effects_add_to_all, some) {
             state.playing = false
             state.effectCategory = null
@@ -135,7 +162,9 @@ internal fun DeskMulti(state: EditorState, modifier: Modifier) {
             Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(8.dp)) {
                 pair.forEach { tile ->
                     val label = stringResource(tile.label)
-                    DeskToolTile(tile.icon, label, Modifier.weight(1f), tile.enabled, if (!tile.enabled) tile.reason ?: label else tile.tip?.let { stringResource(it) } ?: label, tile.action)
+                    DeskToolTile(tile.icon, label, Modifier.weight(1f), tile.enabled, if (!tile.enabled) tile.reason ?: label else tile.tip?.let { stringResource(it) } ?: label, {
+                        if (tile.parent) Presence(parentMenu) { MultiParentMenu(state, below = true) { parentMenu = false } }
+                    }, tile.action)
                 }
                 if (pair.size == 1) Spacer(Modifier.weight(1f))
             }

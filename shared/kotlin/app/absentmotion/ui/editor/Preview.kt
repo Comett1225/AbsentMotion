@@ -208,7 +208,19 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
         onDispose { if (Build.VERSION.SDK_INT >= 29) view.systemGestureExclusionRects = emptyList() }
     }
 
-    Box(modifier.background(Am.PreviewBg).onSizeChanged { size = it }.onGloballyPositioned { origin = it.positionInRoot() }) {
+    val wheelView = if (!app.absentmotion.platform.PlatformFeatures.desktop || fixedView) Modifier else app.absentmotion.platform.wheel { delta, at, zoom ->
+        if (zoom) {
+            val next = (state.canvasZoom * kotlin.math.exp(-delta.y * 0.1f)).coerceIn(0.01f, 64f)
+            val about = (at - Offset(dx, dy)) / scale - Offset(state.scene.width / 2f, state.scene.height / 2f)
+            state.canvasPan = pinchedPan(state.canvasPan, about, next / state.canvasZoom)
+            state.canvasZoom = next
+            state.zoomShown++
+        } else {
+            state.canvasPan -= delta * (40f / scale)
+            state.zoomShown++
+        }
+    }
+    Box(modifier.background(Am.PreviewBg).onSizeChanged { size = it }.onGloballyPositioned { origin = it.positionInRoot() }.then(wheelView)) {
         app.absentmotion.platform.SceneSurface(state.engine, divisor, size, Modifier.fillMaxSize()) { state.previewSurface = it }
         CachedFrame(state, cacheUsable, live, dx, dy, scene.width * scale, scene.height * scale)
         Box(
@@ -296,7 +308,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                         } else if (moved && cropFrom != null && startQuad != null && cropGrab >= 0 && fingers == 1) {
                             val d = boxFraction(startQuad, position) - boxFraction(startQuad, down.position)
                             state.setCrop(if (cropGrab == CROP_INSIDE) cropFrom.moved(d.x, d.y) else cropFrom.dragged(cropGrab, d.x, d.y, cropLock), "crop-drag")
-                        } else if (moved && canvasGesture && event.changes.size > 1) {
+                        } else if (moved && canvasGesture && (event.changes.size > 1 || app.absentmotion.platform.PlatformFeatures.desktop)) {
                             val move = (pan + held) / currentScale
                             held = Offset.Zero
                             val next = (state.canvasZoom * zoom).coerceIn(0.01f, 64f)

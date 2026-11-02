@@ -259,6 +259,8 @@ private fun DeskTransport(state: EditorState, modifier: Modifier) {
                     }
                 }
                 if (steps) DeskIcon(ChromeIcons.Plus, stringResource(R.string.a11y_zoom_in), size = 32.dp) { state.zoomStep(true) }
+                var copyMenu by remember { mutableStateOf(false) }
+                Box { DeskIcon(ChromeIcons.CopyPaste, stringResource(R.string.play_copy_paste), size = 32.dp) { copyMenu = true }; Presence(copyMenu) { CopyPasteMenu(state, below = true) { copyMenu = false } } }
                 DeskIcon(ChromeIcons.PreviewMode, stringResource(R.string.play_preview_mode), active = state.previewPanelOpen, size = 32.dp) { state.previewPanelOpen = !state.previewPanelOpen }
             }
         }
@@ -268,17 +270,20 @@ private fun DeskTransport(state: EditorState, modifier: Modifier) {
 @Composable
 private fun DeskInspector(state: EditorState, library: AddLibrary, modifier: Modifier, close: () -> Unit) {
     var menu by remember { mutableStateOf(false) }
+    var parentMenu by remember { mutableStateOf(false) }
     val textUi = remember { TextEditUi() }
     val layer = state.selected
     Column(modifier.background(Am.Panel)) {
         Row(Modifier.fillMaxWidth().height(44.dp).padding(start = 8.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             if (state.selectedId != null && state.panel == EditorPanel.EditText) DeskIcon(ChromeIcons.Back, stringResource(R.string.topbar_back)) { state.stepBack() }
             else if (layer != null && !MultiSelect.active) Icon(deskLayerIcon(layer), null, Modifier.padding(start = 4.dp).size(20.dp), tint = Am.OnDarkDim)
-            Text(
+            if (layer != null && !MultiSelect.active) key(layer.id) { DeskNameField(layer.label, Modifier.weight(1f).padding(horizontal = 2.dp)) { state.renameLayer(layer.id, it) } }
+            else Text(
                 if (MultiSelect.active) pluralStringResource(R.plurals.structure_layers_selected, MultiSelect.ids.size, MultiSelect.ids.size.toString()) else layer?.label ?: stringResource(R.string.desk_inspector),
                 Modifier.weight(1f).padding(horizontal = 8.dp), color = Am.OnDark, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis,
             )
             if (state.selectedId != null && !MultiSelect.active) {
+                Box { DeskParentButton { parentMenu = true }; Presence(parentMenu) { ParentMenu(state, below = true) { parentMenu = false } } }
                 DeskIcon(ChromeIcons.Duplicate, deskShortcut(R.string.effects_duplicate, "${DeskMod}D")) { state.duplicateSelected() }
                 DeskIcon(ChromeIcons.Trash, deskShortcut(R.string.topbar_delete_layer, "Delete")) { state.deleteSelected() }
                 Box { DeskIcon(ChromeIcons.More, stringResource(R.string.topbar_layer_menu)) { menu = true }; if (menu) LayerMenu(state) { menu = false } }

@@ -46,11 +46,19 @@ import androidx.compose.ui.unit.sp
 import app.absentmotion.R
 import app.absentmotion.compat.EffectMigration
 import app.absentmotion.editor.EditorState
+import app.absentmotion.editor.ElementNav
 import app.absentmotion.editor.MultiSelect
 import app.absentmotion.editor.PreviewCache
 import app.absentmotion.engine.EngineThread
 import app.absentmotion.i18n.Ltr
 import app.absentmotion.library.AppSettings
+import app.absentmotion.library.CrashLogs
+import app.absentmotion.library.MediaKeeper
+import app.absentmotion.library.RecoveryHandler
+import app.absentmotion.library.RecoveryOffer
+import app.absentmotion.library.sweepStaleTemps
+import app.absentmotion.library.sweepStorageDaily
+import app.absentmotion.ui.home.autoBackupIfDue
 import app.absentmotion.library.DiskThread
 import app.absentmotion.library.ImportReport
 import app.absentmotion.library.Importer
@@ -67,7 +75,9 @@ import app.absentmotion.ui.editor.LocalWide
 import app.absentmotion.ui.editor.MediaPicks
 import app.absentmotion.ui.editor.wideEditor
 import app.absentmotion.ui.export.ExportScreen
+import app.absentmotion.ui.home.DeskButton
 import app.absentmotion.ui.home.DeskHome
+import app.absentmotion.ui.home.DeskModal
 import app.absentmotion.ui.home.DeskMessage
 import app.absentmotion.ui.home.DeskSettings
 import app.absentmotion.ui.home.SettingsPage
@@ -107,6 +117,7 @@ class DeskAppState {
     var importFailed by mutableStateOf<String?>(null)
     var historyFor by mutableStateOf<Triple<String, String, Boolean>?>(null)
     var projectsChanged by mutableIntStateOf(0)
+    var recovered by mutableStateOf<RecoveryOffer?>(null)
     var settingsOpen by mutableStateOf(false)
     var settingsPage by mutableStateOf(SettingsPage.Editor)
     var newProjectTick by mutableIntStateOf(0)
@@ -116,6 +127,70 @@ class DeskAppState {
     val migration by lazy { EffectMigration.read(context) }
 
     fun openSettings(page: SettingsPage = SettingsPage.Editor) { settingsPage = page; settingsOpen = true }
+
+    suspend fun startup() {
+        RecoveryHandler.install(recovery) { editor?.let { it.projectId to it.project.toXml() } }
+        runCatching { CrashLogs.install(context) }
+        ElementNav.open = { id ->
+            editor?.let { it.playing = false; it.endGesture(); it.saver.snapshot(it.project.toXml()) }
+            MultiSelect.clear()
+            background.launch { openNow(id) }
+        }
+        recovered = withContext(DiskThread.dispatcher) { runCatching { recovery.pending(store) }.getOrNull() }
+    }
+
+    suspend fun answerRecovery(offer: RecoveryOffer, restore: Boolean) {
+        recovered = null
+        val done = withContext(DiskThread.dispatcher) { runCatching { if (restore) recovery.restore(store, offer) else recovery.discard(store, offer) }.isSuccess }
+        projectsChanged++
+        when {
+            !done -> toast(R.string.home_restore_edits_failed)
+            restore -> openNow(offer.id)
+            else -> recovered = withContext(DiskThread.dispatcher) { runCatching { recovery.pending(store) }.getOrNull() }
+        }
+    }
+
+    suspend fun maintainNow() {
+        autoBackupIfDue(context, settings)
+        sweepStorageDaily(context)
+        withContext(Dispatchers.IO) { runCatching { sweepStaleTemps(context.filesDir, context.cacheDir) } }
+    }
+
+    suspend fun maintain() {
+        delay(15_000)
+        while (editor != null || opening || editingTemplate != null || exportingFromList != null) delay(30_000)
+        maintainNow()
+    }
+
+    suspend fun collectMedia(id: String) {
+        if (opening) return
+        opening = true
+        val result = try {
+            withContext(Dispatchers.IO) {
+                runCatching {
+                    store.load(id)?.let { scene ->
+                        MediaKeeper(store, { uri -> context.contentResolver.openInputStream(Uri.parse(uri)) }).collect(id, MediaRelink.relink(context, scene)).also {
+                            if (it.copied > 0) {
+                                store.text(id)?.let { old -> store.versions.snapshot(id, old) }
+                                store.save(id, it.scene)
+                            }
+                        }
+                    }
+                }.getOrNull()
+            }
+        } finally { opening = false }
+        projectsChanged++
+        val message = when {
+            result == null -> context.getString(R.string.home_collect_unreadable_project)
+            result.copied == 0 && result.unreadable == 0 && !result.noSpace -> context.getString(R.string.home_collect_already_kept)
+            else -> listOfNotNull(
+                result.copied.takeIf { it > 0 }?.let { context.resources.getQuantityString(R.plurals.home_collect_copied, it, it.toString()) },
+                result.unreadable.takeIf { it > 0 }?.let { context.resources.getQuantityString(R.plurals.home_collect_could_not_read, it, it.toString()) },
+                context.getString(R.string.home_collect_storage_full).takeIf { result.noSpace },
+            ).joinToString(" ")
+        }
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+    }
 
     private fun toast(id: Int) = Toast.makeText(context, context.getString(id), Toast.LENGTH_LONG).show()
 
@@ -248,6 +323,8 @@ private fun DeskContent(app: DeskAppState, scale: Float) {
         ) { app.editor?.projectId }
     }
     LaunchedEffect(Unit) { if (app.settings.autoUpdateCheck) Updates.atStart(app.context, app.settings) }
+    LaunchedEffect(Unit) { app.startup() }
+    LaunchedEffect(Unit) { app.maintain() }
     LaunchedEffect(app.editor) {
         val state = app.editor ?: return@LaunchedEffect
         while (true) {
@@ -281,7 +358,7 @@ private fun DeskContent(app: DeskAppState, scale: Float) {
                         imported = app.imported, onImportShown = { app.imported = emptyList() }, onImportFiles = { uris -> run { app.importFiles(uris) } },
                         onTemplate = { id -> app.editingTemplate = id }, onTemplateProject = { scene -> run { app.projectFromTemplate(scene) } },
                         onHistory = { app.historyFor = Triple(it.id, it.title, it.damaged) }, onSettings = { app.openSettings() }, changes = app.projectsChanged,
-                        newTick = app.newProjectTick,
+                        newTick = app.newProjectTick, onCollect = { id -> scope.launch { app.collectMedia(id) } },
                     )
                     app.editingTemplate?.let { id ->
                         TemplateEditor(id, app.engine, app.settings, onClose = { app.editingTemplate = null }, onContinue = { scene -> run { app.projectFromTemplate(scene) } })
@@ -304,11 +381,27 @@ private fun DeskContent(app: DeskAppState, scale: Float) {
                 VersionHistory(app.store, id, title, app.engine, onRestore = { v -> scope.launch { app.restoreVersion(id, v) } }) { app.historyFor = null }
             }
             if (app.settingsOpen) DeskSettings(app.settings, app.settingsPage, onClose = { app.settingsOpen = false }, onRestored = { app.projectsChanged++ })
+            app.recovered?.takeIf { open == null }?.let { offer -> DeskRecovery(offer, { scope.launch { app.answerRecovery(offer, it) } }) { app.recovered = null } }
             UpdateDialog()
             ToastHost(Modifier.align(Alignment.BottomCenter))
         }
     }
     if (DeskModals.open > 0 && titleBar > 0.dp) Box(Modifier.fillMaxWidth().height(titleBar).background(Color.Black.copy(alpha = DeskModals.ScrimAlpha * DeskModals.fade)))
+    }
+}
+
+@Composable
+private fun DeskRecovery(offer: RecoveryOffer, answer: (restore: Boolean) -> Unit, later: () -> Unit) {
+    DeskModal(later, 480.dp, dismissOnScrim = false) {
+        Text(stringResource(R.string.absentmotion_closed_unexpectedly), Modifier.fillMaxWidth().padding(start = 24.dp, end = 24.dp, top = 24.dp), color = Am.Navy, fontSize = 18.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+        Text(
+            stringResource(R.string.safety_recovery_body, offer.title.ifBlank { stringResource(R.string.recovery_your_project) }),
+            Modifier.fillMaxWidth().padding(start = 24.dp, end = 24.dp, top = 12.dp, bottom = 8.dp), color = Am.HomeInk, fontSize = 14.sp, lineHeight = 20.sp,
+        )
+        androidx.compose.foundation.layout.Row(Modifier.fillMaxWidth().padding(20.dp), androidx.compose.foundation.layout.Arrangement.spacedBy(10.dp, Alignment.End)) {
+            DeskButton(stringResource(R.string.discard), { answer(false) })
+            DeskButton(stringResource(R.string.restore), { answer(true) }, primary = true, minWidth = 92.dp)
+        }
     }
 }
 
