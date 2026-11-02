@@ -60,7 +60,7 @@ fun DoneScreen(kind: ExportKind, result: ExportResult, onClose: () -> Unit, onSh
 }
 
 @StringRes
-private fun shareLabel(kind: ExportKind) = when (kind) {
+internal fun shareLabel(kind: ExportKind) = when (kind) {
     ExportKind.Video -> R.string.export_share_video
     ExportKind.Gif -> R.string.export_share_gif
     ExportKind.Sequence -> R.string.export_share_sequence

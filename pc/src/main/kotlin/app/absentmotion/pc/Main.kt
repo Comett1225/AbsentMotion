@@ -53,7 +53,7 @@ fun main(args: Array<String>) {
         val desk = remember { DeskAppState() }
         Window(onCloseRequest = { exitApplication() }, title = "AbsentMotion", state = state,
             onPreviewKeyEvent = { it.type == KeyEventType.KeyDown && it.key == Key.Escape && DeskBack.back() },
-            onKeyEvent = { app.absentmotion.desk.DeskKeys.handle(desk, it) }) {
+            onKeyEvent = { app.absentmotion.desk.DeskGlobalKeys.handle(desk, it) || app.absentmotion.desk.DeskKeys.handle(desk, it) }) {
             DeskFiles.window = window
             if (DesktopPlatform.mac) remember(window) {
                 window.rootPane.putClientProperty("apple.awt.fullWindowContent", true)

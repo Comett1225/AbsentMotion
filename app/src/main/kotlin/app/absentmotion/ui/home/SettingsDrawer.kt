@@ -103,6 +103,7 @@ private val DividerColor get() = Am.HomeLine
 private val ListLineColor get() = Am.NavyLine
 private val ChosenRow get() = Am.NavyHi
 internal val CardGap = 10.dp
+private const val DESK = app.absentmotion.platform.PlatformFeatures.desktop
 
 @Composable
 fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.DrawerState, onRestored: () -> Unit = {}) {
@@ -120,46 +121,9 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
                 stringResource(R.string.settings), Modifier.fillMaxWidth().heightIn(min = 50.dp).wrapContentHeight(Alignment.CenterVertically).padding(start = 11.dp),
                 color = Am.HomeInk, fontSize = 18.sp, fontWeight = FontWeight.Bold,
             )
-            Category(R.string.settings_group_editor, HomeIcons.Pencil) {
-                ThemeRow(settings)
-                DurationRow(settings)
-                SwitchRow(stringResource(R.string.settings_vibration), settings.vibration, enabled = true) { settings.vibration = it }
-                SwitchRow(stringResource(R.string.settings_transition_in_preview), settings.transitionInPreview, enabled = true) { settings.transitionInPreview = it }
-                Divider(10.dp)
-                ChoicesBlock(R.string.settings_emoji) {
-                    Choices(listOf(R.string.settings_emoji_system, R.string.settings_emoji_android), if (settings.androidEmoji) 1 else 0) { settings.androidEmoji = it == 1 }
-                }
-            }
-            Category(R.string.settings_group_playback, HomeIcons.ProjectsTabOff) {
-                ChoicesBlock(R.string.preview_quality) {
-                    Choices(PreviewQuality.entries.map { it.label }, settings.previewQuality.ordinal) { settings.previewQuality = PreviewQuality.entries[it] }
-                }
-                Divider(10.dp)
-                ChoicesBlock(R.string.settings_graphics) {
-                    Choices(listOf(R.string.settings_graphics_auto, R.string.settings_graphics_opengl), if (settings.openGl) 1 else 0) { settings.openGl = it == 1 }
-                    Spacer(Modifier.height(8.dp))
-                    val now = stringResource(R.string.settings_graphics_note, if (app.absentmotion.Tier.openGl) "OpenGL" else "Vulkan")
-                    Text(if (settings.openGl) now else now + " " + stringResource(R.string.settings_graphics_hint), Modifier.padding(horizontal = 10.dp),
-                        color = Am.HomeMid, fontSize = 12.sp, lineHeight = 16.sp)
-                }
-                Divider(10.dp)
-                ChoicesBlock(R.string.playback_resampling) {
-                    Choices(listOf(R.string.settings_level_low, R.string.settings_level_high, R.string.settings_level_ultra), settings.audioResampling) { settings.audioResampling = it }
-                }
-                Divider(10.dp)
-                SwitchRow(stringResource(R.string.settings_preview_copies), settings.previewCopies, enabled = true) { settings.previewCopies = it }
-                PreviewCopiesRow()
-            }
-            Category(R.string.settings_group_projects, HomeIcons.Folder) {
-                SwitchRow(stringResource(R.string.settings_open_xml), settings.xmlUpload, enabled = true) { settings.xmlUpload = it }
-                SwitchRow(stringResource(R.string.settings_keep_media_copies), settings.keepMediaCopies, enabled = true) { settings.keepMediaCopies = it }
-                if (settings.demoModeShown) SwitchRow(stringResource(R.string.settings_demo_mode), settings.demoMode, enabled = true) { settings.demoMode = it; demoNote = it }
-                CaptionModelRow()
-                CutoutRows()
-                AiModelRows()
-                DownloaderRow()
-                AiGpuRow()
-            }
+            Category(R.string.settings_group_editor, HomeIcons.Pencil) { EditorSettings(settings) }
+            Category(R.string.settings_group_playback, HomeIcons.ProjectsTabOff) { PlaybackSettings(settings) }
+            Category(R.string.settings_group_projects, HomeIcons.Folder) { ProjectsSettings(settings) { demoNote = it } }
             Category(R.string.settings_group_backup, ChromeIcons.SavePreset) {
                 BackupRows(settings, onRestored)
             }
@@ -198,6 +162,54 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
 }
 
 @Composable
+internal fun EditorSettings(settings: AppSettings) {
+    ThemeRow(settings)
+    DurationRow(settings)
+    if (!DESK) SwitchRow(stringResource(R.string.settings_vibration), settings.vibration, enabled = true) { settings.vibration = it }
+    SwitchRow(stringResource(R.string.settings_transition_in_preview), settings.transitionInPreview, enabled = true) { settings.transitionInPreview = it }
+    Divider(10.dp)
+    ChoicesBlock(R.string.settings_emoji) {
+        Choices(listOf(R.string.settings_emoji_system, R.string.settings_emoji_android), if (settings.androidEmoji) 1 else 0) { settings.androidEmoji = it == 1 }
+    }
+}
+
+@Composable
+internal fun PlaybackSettings(settings: AppSettings) {
+    ChoicesBlock(R.string.preview_quality) {
+        Choices(PreviewQuality.entries.map { it.label }, settings.previewQuality.ordinal) { settings.previewQuality = PreviewQuality.entries[it] }
+    }
+    Divider(10.dp)
+    if (!DESK) {
+        val now = stringResource(R.string.settings_graphics_note, if (app.absentmotion.Tier.openGl) "OpenGL" else "Vulkan")
+        ChoicesBlock(R.string.settings_graphics, note = {
+            Text(if (settings.openGl) now else now + " " + stringResource(R.string.settings_graphics_hint), Modifier.padding(horizontal = 10.dp),
+                color = Am.HomeMid, fontSize = 12.sp, lineHeight = 16.sp)
+        }) {
+            Choices(listOf(R.string.settings_graphics_auto, R.string.settings_graphics_opengl), if (settings.openGl) 1 else 0) { settings.openGl = it == 1 }
+        }
+        Divider(10.dp)
+    }
+    ChoicesBlock(R.string.playback_resampling) {
+        Choices(listOf(R.string.settings_level_low, R.string.settings_level_high, R.string.settings_level_ultra), settings.audioResampling) { settings.audioResampling = it }
+    }
+    Divider(10.dp)
+    SwitchRow(stringResource(R.string.settings_preview_copies), settings.previewCopies, enabled = true) { settings.previewCopies = it }
+    PreviewCopiesRow()
+}
+
+@Composable
+internal fun ProjectsSettings(settings: AppSettings, onDemoMode: (Boolean) -> Unit) {
+    if (!DESK) SwitchRow(stringResource(R.string.settings_open_xml), settings.xmlUpload, enabled = true) { settings.xmlUpload = it }
+    SwitchRow(stringResource(R.string.settings_keep_media_copies), settings.keepMediaCopies, enabled = true) { settings.keepMediaCopies = it }
+    if (settings.demoModeShown) SwitchRow(stringResource(R.string.settings_demo_mode), settings.demoMode, enabled = true) { settings.demoMode = it; onDemoMode(it) }
+    CaptionModelRow()
+    CutoutRows()
+    AiModelRows()
+    DownloaderRow()
+    AiGpuRow()
+}
+
+@Composable
 private fun Category(@StringRes name: Int, icon: ImageVector, content: @Composable () -> Unit) {
     var open by rememberSaveable { mutableStateOf(false) }
     val turn by animateFloatAsState(if (open) 180f else 0f, Motion.enter())
@@ -228,11 +240,28 @@ private fun Category(@StringRes name: Int, icon: ImageVector, content: @Composab
 }
 
 @Composable
-private fun ChoicesBlock(@StringRes label: Int, choices: @Composable () -> Unit) {
+private fun ChoicesBlock(@StringRes label: Int, note: (@Composable () -> Unit)? = null, choices: @Composable () -> Unit) {
+    if (DESK) {
+        androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxWidth()) {
+            if (maxWidth < 560.dp) Column(Modifier.fillMaxWidth().padding(horizontal = 5.dp, vertical = 8.dp)) {
+                Text(stringResource(label), Modifier.padding(start = 10.dp, bottom = 8.dp), color = Am.HomeInk, fontSize = 14.sp, lineHeight = 18.sp)
+                choices()
+            } else Row(Modifier.fillMaxWidth().padding(horizontal = 5.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(label), Modifier.weight(1f).padding(start = 10.dp), color = Am.HomeInk, fontSize = 14.sp, lineHeight = 18.sp)
+                Box(Modifier.width(320.dp)) { choices() }
+            }
+        }
+        if (note != null) Box(Modifier.padding(start = 5.dp, end = 5.dp, bottom = 8.dp)) { note() }
+        return
+    }
     Spacer(Modifier.height(10.dp))
     Text(stringResource(label), Modifier.padding(start = 10.dp), color = Am.HomeMid, fontSize = 13.sp, lineHeight = 18.sp)
     Spacer(Modifier.height(10.dp))
     choices()
+    if (note != null) {
+        Spacer(Modifier.height(8.dp))
+        note()
+    }
     Spacer(Modifier.height(10.dp))
 }
 
@@ -399,27 +428,32 @@ private fun AiGpuRow() {
 }
 
 @Composable
-private fun Divider(inset: androidx.compose.ui.unit.Dp) {
+internal fun Divider(inset: androidx.compose.ui.unit.Dp) {
     Box(Modifier.padding(horizontal = inset).fillMaxWidth().height(1.dp).background(DividerColor))
 }
 
 @Composable
 private fun UpdateRows(settings: AppSettings, onCrashLogs: () -> Unit) {
-    val context = LocalContext.current
     Column(Modifier.padding(horizontal = 6.dp).fillMaxWidth().clip(PanelShape).background(PanelColor)) {
         ActionRow(stringResource(R.string.crash_logs), onClick = onCrashLogs)
         Divider(10.dp)
-        SwitchRow(stringResource(R.string.update_check_on_open), settings.autoUpdateCheck, enabled = true) { settings.chooseUpdates(it) }
-        Divider(10.dp)
-        ActionRow(stringResource(R.string.update_check_now), busy = Updates.checking) { Updates.check(context, settings, manual = true) }
-        val version = app.absentmotion.platform.appVersion().trim()
-        if (version.isNotEmpty()) {
-            val spoken = stringResource(R.string.about_version, version)
-            Text(
-                "V $version", Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp, bottom = 8.dp).semantics { contentDescription = spoken },
-                color = Am.HomeMid, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
-            )
-        }
+        UpdateSettings(settings)
+    }
+}
+
+@Composable
+internal fun UpdateSettings(settings: AppSettings) {
+    val context = LocalContext.current
+    SwitchRow(stringResource(R.string.update_check_on_open), settings.autoUpdateCheck, enabled = true) { settings.chooseUpdates(it) }
+    Divider(10.dp)
+    ActionRow(stringResource(R.string.update_check_now), busy = Updates.checking) { Updates.check(context, settings, manual = true) }
+    val version = app.absentmotion.platform.appVersion().trim()
+    if (version.isNotEmpty()) {
+        val spoken = stringResource(R.string.about_version, version)
+        Text(
+            "V $version", Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp, bottom = 8.dp).semantics { contentDescription = spoken },
+            color = Am.HomeMid, fontSize = if (DESK) 13.sp else 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
@@ -433,11 +467,11 @@ internal fun LinkRow(label: String, value: String? = null, onClick: () -> Unit) 
 @Composable
 internal fun ActionRow(label: String, value: String? = null, chevron: Boolean = true, busy: Boolean = false, onClick: () -> Unit) {
     Row(
-        Modifier.fillMaxWidth().heightIn(min = 44.dp).clickable(onClick = onClick).padding(start = 15.dp, end = if (chevron) 7.dp else 15.dp, top = 4.dp, bottom = 4.dp),
+        Modifier.fillMaxWidth().heightIn(min = 44.dp).deskPress().clickable(onClick = onClick).padding(start = 15.dp, end = if (chevron) 7.dp else 15.dp, top = 4.dp, bottom = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(label, Modifier.weight(1f), color = Am.HomeInk, fontSize = 13.sp)
-        if (value != null) Text(value, color = Am.HomeMid, fontSize = 13.sp, maxLines = 1)
+        Text(label, Modifier.weight(1f), color = Am.HomeInk, fontSize = if (DESK) 14.sp else 13.sp)
+        if (value != null) Text(value, color = Am.HomeMid, fontSize = if (DESK) 14.sp else 13.sp, maxLines = 1)
         if (busy) Box(Modifier.size(24.dp), contentAlignment = Alignment.Center) {
             CircularProgressIndicator(Modifier.size(16.dp), color = Am.HomeMid, strokeWidth = 2.dp)
         } else if (chevron) Icon(HomeIcons.ChevronRight, null, Modifier.size(24.dp), tint = Am.HomeMid)
@@ -447,11 +481,11 @@ internal fun ActionRow(label: String, value: String? = null, chevron: Boolean = 
 @Composable
 internal fun SwitchRow(label: String, checked: Boolean, enabled: Boolean, onChange: (Boolean) -> Unit) {
     Row(
-        Modifier.fillMaxWidth().heightIn(min = 44.dp).alpha(if (enabled) 1f else 0.35f)
+        Modifier.fillMaxWidth().heightIn(min = 44.dp).alpha(if (enabled) 1f else 0.35f).deskPress()
             .toggleable(value = checked, enabled = enabled, role = androidx.compose.ui.semantics.Role.Switch, onValueChange = onChange).padding(horizontal = 15.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(label, Modifier.weight(1f), color = Am.HomeInk, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        Text(label, Modifier.weight(1f), color = Am.HomeInk, fontSize = if (DESK) 14.sp else 12.sp, fontWeight = if (DESK) FontWeight.Normal else FontWeight.Bold)
         ThinSwitch(checked, Modifier.clearAndSetSemantics {}, enabled = enabled, offTrack = Am.SwitchOff, onTrack = Am.HomeAccent.copy(alpha = 0.5f), onThumb = Am.HomeAccent, onChange = onChange)
     }
 }
@@ -465,10 +499,10 @@ private fun DurationRow(settings: AppSettings) {
     var open by remember { mutableStateOf(false) }
     val shape = RoundedCornerShape(10.dp)
     Row(Modifier.fillMaxWidth().heightIn(min = 44.dp).padding(horizontal = 15.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(stringResource(R.string.new_layer_length), Modifier.weight(1f), color = Am.HomeInk, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-        Box(Modifier.size(90.dp, 37.dp)) {
+        Text(stringResource(R.string.new_layer_length), Modifier.weight(1f), color = Am.HomeInk, fontSize = if (DESK) 14.sp else 12.sp, fontWeight = if (DESK) FontWeight.Normal else FontWeight.Bold)
+        Box(Modifier.size(90.dp, if (DESK) 34.dp else 37.dp)) {
             Row(
-                Modifier.fillMaxSize().clip(shape).background(Am.Card).clickable { open = true }.padding(start = 10.dp, end = 4.dp),
+                Modifier.fillMaxSize().clip(shape).background(Am.Card).deskPress(10.dp).clickable { open = true }.padding(start = 10.dp, end = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text("${settings.defaultLayerDuration}s", Modifier.weight(1f), color = Am.Navy, fontSize = 16.sp)
@@ -513,10 +547,10 @@ private fun ThemeRow(settings: AppSettings) {
         }
     }
     Row(Modifier.fillMaxWidth().heightIn(min = 44.dp).padding(horizontal = 15.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(stringResource(R.string.theme), Modifier.weight(1f), color = Am.HomeInk, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-        Box(Modifier.size(150.dp, 37.dp)) {
+        Text(stringResource(R.string.theme), Modifier.weight(1f), color = Am.HomeInk, fontSize = if (DESK) 14.sp else 12.sp, fontWeight = if (DESK) FontWeight.Normal else FontWeight.Bold)
+        Box(Modifier.size(if (DESK) 190.dp else 150.dp, if (DESK) 34.dp else 37.dp)) {
             Row(
-                Modifier.fillMaxSize().clip(shape).background(Am.Card).clickable { open = true }.padding(start = 10.dp, end = 4.dp),
+                Modifier.fillMaxSize().clip(shape).background(Am.Card).deskPress(10.dp).clickable { open = true }.padding(start = 10.dp, end = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(settings.themeLabel.text(), Modifier.weight(1f), color = Am.Navy, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -534,7 +568,7 @@ private fun ThemeRow(settings: AppSettings) {
 @Composable
 private fun ThemeItem(label: String, chosen: Boolean, onClick: () -> Unit) {
     Box(
-        Modifier.fillMaxWidth().heightIn(min = 40.dp).background(if (chosen) ChosenRow else Color.Transparent).clickable(onClick = onClick).padding(horizontal = 14.dp),
+        Modifier.fillMaxWidth().heightIn(min = 40.dp).background(if (chosen) ChosenRow else Color.Transparent).deskPress().clickable(onClick = onClick).padding(horizontal = 14.dp),
         contentAlignment = Alignment.CenterStart,
     ) { Text(label, color = Am.OnNavy, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis) }
 }
@@ -549,22 +583,22 @@ private fun readThemeText(context: Context, uri: Uri): String {
 @Composable
 private fun OptionRow(label: String, selected: Boolean, onClick: () -> Unit) {
     Row(
-        Modifier.fillMaxWidth().heightIn(min = 44.dp).selectable(selected, role = androidx.compose.ui.semantics.Role.RadioButton, onClick = onClick).padding(horizontal = 10.dp),
+        Modifier.fillMaxWidth().heightIn(min = 44.dp).deskPress().selectable(selected, role = androidx.compose.ui.semantics.Role.RadioButton, onClick = onClick).padding(horizontal = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         RadioButton(selected, null, colors = RadioButtonDefaults.colors(selectedColor = Am.HomeAccent, unselectedColor = Am.HomeMid))
-        Text(label, Modifier.padding(start = 6.dp), color = Am.HomeInk, fontSize = 13.sp)
+        Text(label, Modifier.padding(start = 6.dp), color = Am.HomeInk, fontSize = if (DESK) 14.sp else 13.sp)
     }
 }
 
 @Composable
 private fun Choices(labels: List<Int>, chosen: Int, onPick: (Int) -> Unit) {
     val shape = RoundedCornerShape(6.dp)
-    Row(Modifier.padding(horizontal = 10.dp).fillMaxWidth().height(38.dp).background(Am.Card, shape).padding(3.dp)) {
+    Row(Modifier.padding(horizontal = 10.dp).fillMaxWidth().height(if (DESK) 34.dp else 38.dp).background(Am.Card, shape).padding(3.dp)) {
         for ((index, label) in labels.withIndex()) {
             val selected = index == chosen
             Box(
-                Modifier.weight(1f).fillMaxHeight().background(if (selected) Am.Navy else Color.Transparent, shape).clickable { onPick(index) },
+                Modifier.weight(1f).fillMaxHeight().background(if (selected) Am.Navy else Color.Transparent, shape).then(if (selected) Modifier else Modifier.deskPress(6.dp)).clickable { onPick(index) },
                 contentAlignment = Alignment.Center,
             ) {
                 Text(stringResource(label).uppercase(java.util.Locale.getDefault()), Modifier.padding(horizontal = 2.dp), color = if (selected) Am.OnNavyAccent else Am.Navy,

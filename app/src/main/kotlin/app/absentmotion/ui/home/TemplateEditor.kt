@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
@@ -268,7 +269,8 @@ fun TemplateEditor(templateId: String, engine: EngineThread, settings: AppSettin
     }
     fun timecode(ms: Int) = TimelineMath.timecode((ms * template.fps / 1000f).roundToInt(), template.fps)
 
-    Column(Modifier.fillMaxSize().background(Am.TopBar).systemBarsPadding().pointerInput(Unit) {}) {
+    Box(Modifier.fillMaxSize().background(Am.TopBar).systemBarsPadding().pointerInput(Unit) {}, Alignment.TopCenter) {
+    Column(Modifier.then(if (app.absentmotion.platform.PlatformFeatures.desktop) Modifier.widthIn(max = 1280.dp) else Modifier).fillMaxSize()) {
         Spacer(Modifier.height(16.dp))
         val clip = trimming
         if (clip == null) {
@@ -347,6 +349,7 @@ fun TemplateEditor(templateId: String, engine: EngineThread, settings: AppSettin
             Spacer(Modifier.height(166.dp))
         }
     }
+    }
 
     if (asking == 1) Ask(
         stringResource(R.string.template_leave_title), stringResource(R.string.template_leave_body),
@@ -366,11 +369,12 @@ fun TemplateEditor(templateId: String, engine: EngineThread, settings: AppSettin
 
 @Composable
 private fun TopBar(title: String, icon: ImageVector, description: String, action: String, onBack: () -> Unit, onAction: () -> Unit) {
+    val desk = app.absentmotion.platform.PlatformFeatures.desktop
     Box(Modifier.fillMaxWidth().height(48.dp)) {
-        Box(Modifier.size(48.dp).clickable(onClick = onBack), Alignment.Center) { Icon(icon, description, Modifier.size(24.dp), tint = Am.OnDark) }
-        Text(title, Modifier.align(Alignment.Center), color = Am.OnDark, fontSize = 22.sp, fontWeight = FontWeight.Bold, maxLines = 1)
-        Box(Modifier.align(Alignment.CenterEnd).height(48.dp).clickable(onClick = onAction).padding(horizontal = 16.dp), Alignment.Center) {
-            Text(action, color = Am.Accent, fontSize = 18.sp, maxLines = 1)
+        Box(Modifier.size(48.dp).deskPress(8.dp).clickable(onClick = onBack), Alignment.Center) { Icon(icon, description, Modifier.size(24.dp), tint = Am.OnDark) }
+        Text(title, Modifier.align(Alignment.Center), color = Am.OnDark, fontSize = if (desk) 18.sp else 22.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+        Box(Modifier.align(Alignment.CenterEnd).height(48.dp).deskPress(8.dp).clickable(onClick = onAction).padding(horizontal = 16.dp), Alignment.Center) {
+            Text(action, color = Am.Accent, fontSize = if (desk) 15.sp else 18.sp, fontWeight = if (desk) FontWeight.Medium else null, maxLines = 1)
         }
     }
 }
@@ -408,7 +412,7 @@ private fun Track(progress: Float, lit: Pair<Float, Float>?, modifier: Modifier,
 @Composable
 private fun SlotCell(picture: ImageBitmap?, selected: Boolean, mode: MediaFillMode, onTap: () -> Unit, onScale: () -> Unit) {
     Box(
-        Modifier.size(96.dp).clip(Rounded).background(Color.Black).then(if (selected) Modifier.border(2.dp, Am.Accent, Rounded) else Modifier).clickable(onClick = onTap),
+        Modifier.size(96.dp).clip(Rounded).background(Color.Black).then(if (selected) Modifier.border(2.dp, Am.Accent, Rounded) else Modifier).handCursor().clickable(onClick = onTap),
     ) {
         picture?.let { Image(it, null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop) }
         if (selected) Box(Modifier.align(Alignment.Center).size(40.dp).clip(CircleShape).background(Color(0x99000000)), Alignment.Center) {

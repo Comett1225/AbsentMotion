@@ -1,6 +1,23 @@
 package app.absentmotion.ui.export
 
 import androidx.annotation.StringRes
+import app.absentmotion.ui.home.DeskModals
+import app.absentmotion.ui.home.deskPress
+import app.absentmotion.export.verificationLine
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.focusable
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.layout.ContentScale
+import app.absentmotion.platform.BitmapFactory
+import app.absentmotion.platform.asImageBitmap
+import app.absentmotion.ui.editor.PanelIcons
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 import app.absentmotion.ai.AiSmooth
@@ -205,6 +222,7 @@ private val Line get() = Am.HomeLine
 private val Scrim get() = Am.Scrim
 private val Alert get() = Am.HomeAccent
 
+private const val DESK = app.absentmotion.platform.PlatformFeatures.desktop
 private val GroupGap = 18.dp
 private val FieldGap = 6.dp
 private const val Dimmed = 0.38f
@@ -501,7 +519,12 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
     val naming: @Composable (ExportKind) -> Unit = { FileNameField(exportName, it) }
     val bar: @Composable () -> Unit = { ExportBar(enabled = phase == Phase.Idle, blocked = blocked, onClick = ::start) }
 
-    Box(Modifier.fillMaxSize().background(Am.SheetBg).pointerInput(Unit) {}.enterFade(12.dp)) {
+    if (DESK) DeskExport(
+        scene, frame, fromProjectList, engine, kinds, kind, { kind = it }, hasAudio, settings, check, hasEncoder, explain, { help = true }, exportName,
+        warning, support is Support.SlowSoftwareOnly, better?.let { suggestionLabel(video, it) }, ::useBetter, { acknowledged = warning },
+        free, estimate, timeMs, storage, blocked, asTemplate, { asTemplate = it }, { templateInfo = true }, { packageInfo = true },
+        phase, progress, heat.level, note, { (phase as? Phase.Running)?.job?.cancel() }, { phase = Phase.Idle }, { (phase as? Phase.Done)?.let { share(context, it) } }, ::start, onClose,
+    ) else Box(Modifier.fillMaxSize().background(Am.SheetBg).pointerInput(Unit) {}.enterFade(12.dp)) {
         Column(Modifier.align(Alignment.TopCenter).widthIn(max = SheetMaxWidth).fillMaxSize()) {
             TitleBar(stringResource(R.string.export_title), ExportIcons.Close, stringResource(R.string.cancel), onClose)
             info()
@@ -821,38 +844,11 @@ private fun VideoPage(
     warning: UiText?, slow: Boolean, use: UiText?, onUse: () -> Unit, onContinue: () -> Unit,
     onChange: (ExportSettings) -> Unit, onReason: (UiText) -> Unit, onAudio: () -> Unit, onHelp: () -> Unit, onBack: () -> Unit,
 ) {
-    val rates = (VideoFrameRates + scene.fps).distinct().sorted()
-    val (w, h) = exportSize(scene, s.shortSide, even = true)
     PageFrame(stringResource(R.string.export_kind_video), onBack) {
         info()
         ScrollArea(Modifier.weight(1f).fillMaxWidth(), Am.SheetBg, PaddingValues(start = 15.dp, end = 15.dp, top = 16.dp, bottom = 20.dp), GroupGap) {
             naming()
-            Field(stringResource(R.string.export_resolution_heading)) {
-                Box(Modifier.clip(RoundedCornerShape(4.dp)).background(Am.Card)) { ResolutionDropdown(s.shortSide, resolutionChoices(s, check), onReason) { onChange(s.copy(shortSide = it)) } }
-            }
-            Field(stringResource(R.string.export_format)) { Segments(containerChoices(s, check), s.container, { it.label }, onReason) { onChange(withContainer(s, it, check)) } }
-            Field(stringResource(R.string.export_codec)) { Segments(codecChoices(s, check), s.codec, { it.shortName }, onReason) { onChange(s.copy(codec = it)) } }
-            Field(stringResource(R.string.export_frame_rate), "${s.fps}fps") {
-                ExportSlider(rates.indexOf(s.fps).coerceAtLeast(0).toFloat() / (rates.size - 1)) { onChange(s.copy(fps = rates[(it * (rates.size - 1)).roundToInt()])) }
-                Ends("${rates.first()}fps", "${rates.last()}fps")
-            }
-            Field(stringResource(R.string.export_interpolation), onHelp = onHelp) {
-                Segments(FrameInterpolation.entries.map { if (it == FrameInterpolation.Ai) app.absentmotion.Tier.choice(it, app.absentmotion.Feature.AiSmooth) else Choice(it) }, s.interpolation, { stringResource(it.label) }, onReason) { onChange(s.copy(interpolation = it)) }
-                Segments(levelChoices(s), s.interpolationLevel, { stringResource(it.label) }, onReason) { onChange(s.copy(interpolationLevel = it)) }
-                Hint(stringResource(R.string.export_interpolation_hint))
-                AiSmoothHint(scene, s, w, h)
-            }
-            Field(stringResource(R.string.export_motion_blur), onHelp = onHelp) {
-                Segments(MotionBlur.entries.map { Choice(it) }, s.motionBlur, { stringResource(it.label) }, onReason) { onChange(s.copy(motionBlur = it)) }
-                Hint(stringResource(R.string.export_motion_blur_hint))
-            }
-            Field(stringResource(R.string.export_quality), "%.1f Mbps".format(Locale.ROOT, videoBitrate(w, h, s) / 1e6)) {
-                ExportSlider(s.quality) { onChange(s.copy(quality = it)) }
-                Ends(stringResource(R.string.export_quality_low), stringResource(R.string.export_quality_high))
-            }
-            Field(stringResource(R.string.export_kind_audio)) {
-                NavRow(audioSummary(s.audio).text(), if (hasAudio) null else stringResource(R.string.export_no_sound_yet), onAudio)
-            }
+            VideoFields(scene, s, hasAudio, check, onChange, onReason, onHelp) { NavRow(audioSummary(s.audio).text(), if (hasAudio) null else stringResource(R.string.export_no_sound_yet), onAudio) }
         }
         if (warning != null) WarningCard(stringResource(if (slow) R.string.export_slow_title else R.string.onboarding_check_unsupported), warning.text(), use?.text(), onUse, if (slow) onContinue else null)
         bar()
@@ -860,24 +856,62 @@ private fun VideoPage(
 }
 
 @Composable
+private fun VideoFields(
+    scene: Scene, s: ExportSettings, hasAudio: Boolean, check: (ExportSettings) -> Support,
+    onChange: (ExportSettings) -> Unit, onReason: (UiText) -> Unit, onHelp: () -> Unit, audio: @Composable () -> Unit,
+) {
+    val rates = (VideoFrameRates + scene.fps).distinct().sorted()
+    val (w, h) = exportSize(scene, s.shortSide, even = true)
+    Field(stringResource(R.string.export_resolution_heading)) {
+        Box(Modifier.clip(RoundedCornerShape(4.dp)).background(Am.Card)) { ResolutionDropdown(s.shortSide, resolutionChoices(s, check), onReason) { onChange(s.copy(shortSide = it)) } }
+    }
+    Field(stringResource(R.string.export_format)) { Segments(containerChoices(s, check), s.container, { it.label }, onReason) { onChange(withContainer(s, it, check)) } }
+    Field(stringResource(R.string.export_codec)) { Segments(codecChoices(s, check), s.codec, { it.shortName }, onReason) { onChange(s.copy(codec = it)) } }
+    Field(stringResource(R.string.export_frame_rate), "${s.fps}fps") {
+        ExportSlider(rates.indexOf(s.fps).coerceAtLeast(0).toFloat() / (rates.size - 1)) { onChange(s.copy(fps = rates[(it * (rates.size - 1)).roundToInt()])) }
+        Ends("${rates.first()}fps", "${rates.last()}fps")
+    }
+    Field(stringResource(R.string.export_interpolation), onHelp = onHelp) {
+        Segments(FrameInterpolation.entries.map { if (it == FrameInterpolation.Ai) app.absentmotion.Tier.choice(it, app.absentmotion.Feature.AiSmooth) else Choice(it) }, s.interpolation, { stringResource(it.label) }, onReason) { onChange(s.copy(interpolation = it)) }
+        Segments(levelChoices(s), s.interpolationLevel, { stringResource(it.label) }, onReason) { onChange(s.copy(interpolationLevel = it)) }
+        Hint(stringResource(R.string.export_interpolation_hint))
+        AiSmoothHint(scene, s, w, h)
+    }
+    Field(stringResource(R.string.export_motion_blur), onHelp = onHelp) {
+        Segments(MotionBlur.entries.map { Choice(it) }, s.motionBlur, { stringResource(it.label) }, onReason) { onChange(s.copy(motionBlur = it)) }
+        Hint(stringResource(R.string.export_motion_blur_hint))
+    }
+    Field(stringResource(R.string.export_quality), "%.1f Mbps".format(Locale.ROOT, videoBitrate(w, h, s) / 1e6)) {
+        ExportSlider(s.quality) { onChange(s.copy(quality = it)) }
+        Ends(stringResource(R.string.export_quality_low), stringResource(R.string.export_quality_high))
+    }
+    Field(stringResource(R.string.export_kind_audio)) { audio() }
+}
+
+@Composable
 private fun AudioSettingsPage(
     s: ExportSettings, hasAudio: Boolean, hasEncoder: (String) -> Boolean,
     onChange: (ExportSettings) -> Unit, onReason: (UiText) -> Unit, onBack: () -> Unit,
 ) {
-    val a = s.audio
     PageFrame(stringResource(R.string.export_kind_audio), onBack) {
         ScrollArea(Modifier.weight(1f).fillMaxWidth(), Am.SheetBg, PaddingValues(start = 15.dp, end = 15.dp, top = 16.dp, bottom = 20.dp), GroupGap) {
-            Hint(if (hasAudio) audioHint(s).text() else stringResource(R.string.export_audio_hint_silent))
-            Field(stringResource(R.string.export_codec)) { Segments(audioCodecChoices(s.container, hasEncoder), a.codec, { it.label }, onReason) { onChange(s.copy(audio = a.copy(codec = it))) } }
-            Field(stringResource(R.string.export_bit_rate), "${a.bitrateKbps} kbps") {
-                Segments(bitrateChoices(null), a.bitrateKbps, { "$it" }, onReason) { onChange(s.copy(audio = a.copy(bitrateKbps = it))) }
-            }
-            Field(stringResource(R.string.export_sample_rate)) {
-                Segments(sampleRateChoices(if (a.codec == AudioCodec.Opus) AudioCodec.Opus.label else null), a.effectiveRate, { khz(it) }, onReason) { onChange(s.copy(audio = a.copy(sampleRate = it))) }
-            }
-            Field(stringResource(R.string.export_channels)) { Segments(listOf(Choice(2), Choice(1)), a.channels, { channelsLabel(it).text() }, onReason) { onChange(s.copy(audio = a.copy(channels = it))) } }
+            AudioFields(s, hasAudio, hasEncoder, onChange, onReason)
         }
     }
+}
+
+@Composable
+private fun AudioFields(s: ExportSettings, hasAudio: Boolean, hasEncoder: (String) -> Boolean, onChange: (ExportSettings) -> Unit, onReason: (UiText) -> Unit) {
+    val a = s.audio
+    Hint(if (hasAudio) audioHint(s).text() else stringResource(R.string.export_audio_hint_silent))
+    Field(stringResource(R.string.export_codec)) { Segments(audioCodecChoices(s.container, hasEncoder), a.codec, { it.label }, onReason) { onChange(s.copy(audio = a.copy(codec = it))) } }
+    Field(stringResource(R.string.export_bit_rate), "${a.bitrateKbps} kbps") {
+        Segments(bitrateChoices(null), a.bitrateKbps, { "$it" }, onReason) { onChange(s.copy(audio = a.copy(bitrateKbps = it))) }
+    }
+    Field(stringResource(R.string.export_sample_rate)) {
+        Segments(sampleRateChoices(if (a.codec == AudioCodec.Opus) AudioCodec.Opus.label else null), a.effectiveRate, { khz(it) }, onReason) { onChange(s.copy(audio = a.copy(sampleRate = it))) }
+    }
+    Field(stringResource(R.string.export_channels)) { Segments(listOf(Choice(2), Choice(1)), a.channels, { channelsLabel(it).text() }, onReason) { onChange(s.copy(audio = a.copy(channels = it))) } }
 }
 
 @Composable
@@ -885,27 +919,32 @@ private fun AudioOnlyPage(
     s: ExportSettings, hasEncoder: (String) -> Boolean, info: @Composable () -> Unit, bar: @Composable () -> Unit,
     onChange: (ExportSettings) -> Unit, onReason: (UiText) -> Unit, onBack: () -> Unit,
 ) {
-    val a = s.audio
-    val f = s.audioFormat
     PageFrame(stringResource(R.string.export_kind_audio_only), onBack) {
         info()
         ScrollArea(Modifier.weight(1f).fillMaxWidth(), Am.SheetBg, PaddingValues(start = 15.dp, end = 15.dp, top = 16.dp, bottom = 20.dp), GroupGap) {
-            Field(stringResource(R.string.export_format)) {
-                audioFormatChoices(hasEncoder).chunked(3).forEach { row ->
-                    Segments(row, f, { stringResource(it.label) }, onReason) { onChange(s.copy(audioFormat = it)) }
-                }
-            }
-            Field(stringResource(R.string.export_bit_rate), if (f.lossless) stringResource(R.string.export_lossless) else "${a.bitrateKbps} kbps") {
-                Segments(bitrateChoices(f), if (f.lossless) -1 else a.bitrateKbps, { "$it" }, onReason) { onChange(s.copy(audio = a.copy(bitrateKbps = it))) }
-            }
-            Field(stringResource(R.string.export_sample_rate)) {
-                Segments(sampleRateChoices(if (f == AudioFormat.Ogg) txt(f.label) else null), audioRate(s), { khz(it) }, onReason) { onChange(s.copy(audio = a.copy(sampleRate = it))) }
-            }
-            Field(stringResource(R.string.export_channels)) { Segments(listOf(Choice(2), Choice(1)), a.channels, { channelsLabel(it).text() }, onReason) { onChange(s.copy(audio = a.copy(channels = it))) } }
-            Hint(stringResource(R.string.export_audio_only_hint))
+            AudioOnlyFields(s, hasEncoder, onChange, onReason)
         }
         bar()
     }
+}
+
+@Composable
+private fun AudioOnlyFields(s: ExportSettings, hasEncoder: (String) -> Boolean, onChange: (ExportSettings) -> Unit, onReason: (UiText) -> Unit) {
+    val a = s.audio
+    val f = s.audioFormat
+    Field(stringResource(R.string.export_format)) {
+        audioFormatChoices(hasEncoder).chunked(3).forEach { row ->
+            Segments(row, f, { stringResource(it.label) }, onReason) { onChange(s.copy(audioFormat = it)) }
+        }
+    }
+    Field(stringResource(R.string.export_bit_rate), if (f.lossless) stringResource(R.string.export_lossless) else "${a.bitrateKbps} kbps") {
+        Segments(bitrateChoices(f), if (f.lossless) -1 else a.bitrateKbps, { "$it" }, onReason) { onChange(s.copy(audio = a.copy(bitrateKbps = it))) }
+    }
+    Field(stringResource(R.string.export_sample_rate)) {
+        Segments(sampleRateChoices(if (f == AudioFormat.Ogg) txt(f.label) else null), audioRate(s), { khz(it) }, onReason) { onChange(s.copy(audio = a.copy(sampleRate = it))) }
+    }
+    Field(stringResource(R.string.export_channels)) { Segments(listOf(Choice(2), Choice(1)), a.channels, { channelsLabel(it).text() }, onReason) { onChange(s.copy(audio = a.copy(channels = it))) } }
+    Hint(stringResource(R.string.export_audio_only_hint))
 }
 
 @Composable
@@ -931,13 +970,13 @@ private fun Field(
     val dim = if (reason == null) 1f else Dimmed
     val reasonText = reason?.text()
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(FieldGap)) {
-        Row(Modifier.fillMaxWidth().height(28.dp).alpha(dim), verticalAlignment = Alignment.CenterVertically) {
-            Text(title, color = Navy, fontSize = 17.sp, maxLines = 1)
+        Row(Modifier.fillMaxWidth().height(if (DESK) 24.dp else 28.dp).alpha(dim), verticalAlignment = Alignment.CenterVertically) {
+            Text(title, color = Navy, fontSize = if (DESK) 14.sp else 17.sp, fontWeight = if (DESK) FontWeight.Medium else null, maxLines = 1)
             if (onHelp != null) Box(Modifier.size(32.dp).clickable(onClick = onHelp), contentAlignment = Alignment.Center) {
                 Icon(ExportIcons.Help, stringResource(R.string.export_what_is, title), Modifier.size(20.dp), tint = ValueGrey)
             }
             Spacer(Modifier.weight(1f))
-            if (value != null) Text(value, color = ValueGrey, fontSize = 14.sp, maxLines = 1, style = Mixed)
+            if (value != null) Text(value, color = ValueGrey, fontSize = if (DESK) 13.sp else 14.sp, maxLines = 1, style = Mixed)
         }
         Box {
             Column(Modifier.fillMaxWidth().alpha(dim), verticalArrangement = Arrangement.spacedBy(FieldGap), content = content)
@@ -956,7 +995,7 @@ private fun FileNameField(name: ExportName, kind: ExportKind, options: Boolean =
             value = if (random) stringResource(R.string.export_filename_generated) else name.value,
             onValueChange = { name.value = it.take(160) },
             readOnly = random, singleLine = true,
-            textStyle = Mixed.copy(color = Navy, fontSize = 16.sp),
+            textStyle = Mixed.copy(color = Navy, fontSize = if (DESK) 14.sp else 16.sp),
             cursorBrush = SolidColor(Navy),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = { keyboard?.hide() }),
@@ -1006,14 +1045,14 @@ private fun audioHint(s: ExportSettings): UiText =
 
 @Composable
 private fun <T> Segments(options: List<Choice<T>>, selected: T, label: @Composable (T) -> String, onReason: (UiText) -> Unit, onPick: (T) -> Unit) {
-    val size = if (options.size > 4) 13.sp else 15.sp
-    Row(Modifier.fillMaxWidth().height(42.dp).clip(RoundedCornerShape(4.dp)).background(Am.Card).padding(3.dp)) {
+    val size = if (DESK) 13.sp else if (options.size > 4) 13.sp else 15.sp
+    Row(Modifier.fillMaxWidth().height(if (DESK) 36.dp else 42.dp).clip(RoundedCornerShape(4.dp)).background(Am.Card).padding(3.dp)) {
         options.forEach { c ->
             val on = c.value == selected
             val fill = animatedColor(if (on) Navy else Am.Card)
             val text = animatedColor(if (on) Am.OnNavyAccent else Navy)
             Box(
-                Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(4.dp)).background(fill).clickable { c.reason?.let(onReason) ?: onPick(c.value) },
+                Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(4.dp)).background(fill).deskPress(4.dp).clickable { c.reason?.let(onReason) ?: onPick(c.value) },
                 contentAlignment = Alignment.Center,
             ) {
                 Row(Modifier.alpha(if (c.enabled) 1f else Dimmed), verticalAlignment = Alignment.CenterVertically) {
@@ -1119,8 +1158,8 @@ private fun Chips(label: String, value: String? = null, reason: UiText? = null, 
 private fun Chip(label: String, selected: Boolean, enabled: Boolean = true, onClick: () -> Unit) {
     val fill = animatedColor(if (selected) Navy else Am.SheetBg)
     val text = animatedColor(if (selected) Am.OnNavyAccent else Navy)
-    Box(Modifier.height(34.dp).alpha(if (enabled) 1f else Dimmed).clip(RoundedCornerShape(17.dp)).background(fill).clickable(onClick = onClick).padding(horizontal = 14.dp), contentAlignment = Alignment.Center) {
-        Text(label, color = text, fontSize = 15.sp, maxLines = 1, style = Mixed)
+    Box(Modifier.height(if (DESK) 30.dp else 34.dp).alpha(if (enabled) 1f else Dimmed).clip(RoundedCornerShape(17.dp)).background(fill).deskPress(17.dp).clickable(onClick = onClick).padding(horizontal = 14.dp), contentAlignment = Alignment.Center) {
+        Text(label, color = text, fontSize = if (DESK) 13.sp else 15.sp, maxLines = 1, style = Mixed)
     }
 }
 
@@ -1194,4 +1233,216 @@ private fun rememberNotifyAsk(): NotifyAsk {
 
 private fun share(context: app.absentmotion.platform.Context, done: Phase.Done) {
     app.absentmotion.platform.shareExport(context, done.result)
+}
+
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun DeskExport(
+    scene: Scene, frame: Int, fromList: Boolean, engine: EngineThread,
+    kinds: List<ExportKind>, kind: ExportKind, onKind: (ExportKind) -> Unit, hasAudio: Boolean,
+    settings: MutableMap<ExportKind, ExportSettings>, check: (ExportSettings) -> Support, hasEncoder: (String) -> Boolean,
+    explain: (UiText) -> Unit, onHelp: () -> Unit, exportName: ExportName,
+    warning: UiText?, slow: Boolean, use: UiText?, onUse: () -> Unit, onContinue: () -> Unit,
+    free: Long, estimate: Long, timeMs: Long?, storage: StorageStatus, blocked: UiText?,
+    asTemplate: Boolean, onTemplate: (Boolean) -> Unit, onTemplateInfo: () -> Unit, onPackageInfo: () -> Unit,
+    phase: Phase, progress: Float, heat: ThermalLevel, note: UiText?, onCancel: () -> Unit, onDone: () -> Unit, onShare: () -> Unit,
+    onStart: () -> Unit, onClose: () -> Unit,
+) {
+    val focus = remember { FocusRequester() }
+    LaunchedEffect(Unit) { runCatching { focus.requestFocus() } }
+    DisposableEffect(Unit) {
+        DeskModals.open++
+        DeskModals.fade = 1f
+        onDispose { DeskModals.open--; if (DeskModals.open == 0) DeskModals.fade = 0f }
+    }
+    val idle = phase is Phase.Idle
+    val s = settings.getValue(kind)
+    val onChange: (ExportSettings) -> Unit = { settings[kind] = it }
+    val onReason = explain
+    Box(
+        Modifier.fillMaxSize().background(Color.Black.copy(alpha = DeskModals.ScrimAlpha)).pointerInput(Unit) { detectTapGestures { if (idle) onClose() } }
+            .focusRequester(focus).focusable()
+            .onPreviewKeyEvent {
+                if (it.type != KeyEventType.KeyDown || it.key != Key.Enter && it.key != Key.NumPadEnter) false
+                else when (phase) { Phase.Idle -> { onStart(); true }; is Phase.Done -> { onDone(); true }; else -> false }
+            },
+        Alignment.Center,
+    ) {
+        BoxWithConstraints(Modifier.fillMaxSize().padding(24.dp), Alignment.Center) {
+            val width = minOf(maxWidth, 980.dp)
+            val height = minOf(maxHeight, 660.dp)
+            Column(Modifier.size(width, height).shadow(24.dp, RoundedCornerShape(16.dp)).clip(RoundedCornerShape(16.dp)).background(Am.SheetBg).pointerInput(Unit) { detectTapGestures { } }) {
+                Row(Modifier.fillMaxWidth().height(56.dp).background(Am.Card).padding(start = 20.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(stringResource(R.string.export_title), color = Navy, fontSize = 18.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                    Text(scene.title, Modifier.weight(1f).padding(start = 12.dp), color = NoteGrey, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Box(Modifier.size(40.dp).clip(RoundedCornerShape(10.dp)).deskPress(10.dp).clickable(enabled = idle, onClick = onClose), Alignment.Center) {
+                        Icon(ExportIcons.Close, stringResource(R.string.cancel), Modifier.size(22.dp), tint = Navy)
+                    }
+                }
+                Divider()
+                Row(Modifier.weight(1f).fillMaxWidth()) {
+                    val side = (width * 0.4f).coerceIn(280.dp, 420.dp)
+                    Column(Modifier.width(side).fillMaxHeight().padding(20.dp)) {
+                        Box(Modifier.weight(1f).fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Am.PreviewBg)) {
+                            val done = phase as? Phase.Done
+                            if (done != null) app.absentmotion.platform.ExportMediaPreview(done.kind, done.result.uris)
+                            else DeskStill(scene, if (fromList) scene.totalTime / 2 else scene.frameStart(frame), engine, Modifier.fillMaxSize())
+                        }
+                        Spacer(Modifier.height(12.dp))
+                        Text("${scene.width} x ${scene.height}  \u00B7  ${((scene.totalTime + 500) / 1000).let { "%d:%02d".format(Locale.ROOT, it / 60, it % 60) }}  \u00B7  ${scene.fps}fps", color = NoteGrey, fontSize = 13.sp, maxLines = 1)
+                    }
+                    Box(Modifier.width(1.dp).fillMaxHeight().background(Line))
+                    Box(Modifier.weight(1f).fillMaxHeight()) {
+                        when (phase) {
+                            Phase.Idle -> ScrollArea(Modifier.fillMaxSize(), Am.SheetBg, PaddingValues(20.dp), 16.dp) {
+                                FileNameField(exportName, kind)
+                                Column(verticalArrangement = Arrangement.spacedBy(FieldGap)) {
+                                    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        kinds.forEach { k ->
+                                            val silent = k == ExportKind.Audio && !hasAudio
+                                            KindChip(k.icon(), stringResource(k.title()), kind == k, !silent) { if (silent) explain(NoSound) else onKind(k) }
+                                        }
+                                    }
+                                    optionNote(kind, scene, s)?.let { Hint(it.text()) }
+                                }
+                                when (kind) {
+                                    ExportKind.Video -> {
+                                        VideoFields(scene, s, hasAudio, check, onChange, onReason, onHelp) {
+                                            var open by remember { mutableStateOf(false) }
+                                            Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                                                NavRow(audioSummary(s.audio).text(), if (hasAudio) null else stringResource(R.string.export_no_sound_yet)) { open = !open }
+                                                if (open) AudioFields(s, hasAudio, hasEncoder, onChange, onReason)
+                                            }
+                                        }
+                                        if (warning != null) Column(Modifier.clip(RoundedCornerShape(8.dp))) {
+                                            WarningCard(stringResource(if (slow) R.string.export_slow_title else R.string.onboarding_check_unsupported), warning.text(), use?.text(), onUse, if (slow) onContinue else null)
+                                        }
+                                    }
+                                    ExportKind.Audio -> AudioOnlyFields(s, hasEncoder, onChange, onReason)
+                                    ExportKind.Package -> Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(Am.Card).deskPress(8.dp).clickable(onClick = onPackageInfo).padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(ExportIcons.Info, null, Modifier.size(20.dp), tint = Am.HomeDim)
+                                        Text(stringResource(R.string.one_absproj_package_with_the_project), Modifier.padding(start = 10.dp), color = Navy, fontSize = 13.sp, lineHeight = 18.sp)
+                                    }
+                                    ExportKind.FrameAs, ExportKind.Sequence, ExportKind.Gif -> OptionsPage(kind, scene, s, onReason, onHelp, onChange)
+                                    else -> Unit
+                                }
+                            }
+                            is Phase.Running -> Column(Modifier.fillMaxSize().padding(32.dp), Arrangement.Center, Alignment.CenterHorizontally) {
+                                val percent = (progress * 100).toInt().coerceIn(0, 100)
+                                val now by produceState(System.nanoTime(), phase) { while (true) { value = System.nanoTime(); delay(250) } }
+                                val left = exportSecondsLeft((now - phase.startNs) / 1e9, progress, phase.plannedMs)
+                                Text(stringResource(runningTitle(phase.kind)), color = Navy, fontSize = 20.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                                Spacer(Modifier.height(20.dp))
+                                Box(Modifier.widthIn(max = 420.dp).fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)).background(Navy.copy(alpha = 0.12f))) {
+                                    Box(Modifier.fillMaxWidth(progress.coerceIn(0f, 1f)).fillMaxHeight().background(Am.Accent))
+                                }
+                                Row(Modifier.widthIn(max = 420.dp).fillMaxWidth().padding(top = 8.dp)) {
+                                    Text("$percent%", Modifier.weight(1f), color = Navy, fontSize = 14.sp)
+                                    Text(left?.let { "%d:%02d".format(Locale.ROOT, it / 60, it % 60) } ?: "", color = NoteGrey, fontSize = 14.sp)
+                                }
+                                Box(Modifier.widthIn(max = 420.dp).fillMaxWidth().height(72.dp).padding(top = 14.dp), Alignment.TopCenter) {
+                                    exportHeatText(heat)?.let { Text(it.text(), color = Alert, fontSize = 15.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, maxLines = 3) }
+                                        ?: note?.let { Text(it.text(), color = NoteGrey, fontSize = 14.sp, lineHeight = 19.sp, textAlign = TextAlign.Center, maxLines = 3) }
+                                }
+                                DeskButton(stringResource(R.string.cancel), false, onCancel)
+                            }
+                            is Phase.Done -> Column(Modifier.fillMaxSize().padding(32.dp), Arrangement.Center, Alignment.CenterHorizontally) {
+                                Box(Modifier.size(56.dp).clip(RoundedCornerShape(28.dp)).background(Navy), Alignment.Center) {
+                                    Icon(PanelIcons.Check, null, Modifier.size(30.dp), tint = Am.OnNavy)
+                                }
+                                Spacer(Modifier.height(16.dp))
+                                Text(stringResource(R.string.saved_to_storage), color = Navy, fontSize = 20.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                                Text(phase.result.where, Modifier.padding(top = 6.dp), color = NoteGrey, fontSize = 13.sp, lineHeight = 18.sp, textAlign = TextAlign.Center)
+                                phase.result.verification?.takeUnless { it.ok }?.let { v ->
+                                    Text(verificationLine(v, still = phase.kind == ExportKind.Frame || phase.kind == ExportKind.FrameAs).text(), Modifier.padding(top = 6.dp), color = Alert, fontSize = 13.sp, textAlign = TextAlign.Center, maxLines = 3)
+                                }
+                                phase.result.verification?.takeIf { it.ok && it.unchecked }?.let {
+                                    Text(stringResource(R.string.export_checked_unavailable), Modifier.padding(top = 6.dp), color = NoteGrey, fontSize = 13.sp, textAlign = TextAlign.Center, maxLines = 3)
+                                }
+                                Spacer(Modifier.height(24.dp))
+                                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                                    DeskButton(stringResource(shareLabel(phase.kind)), false, onShare)
+                                    DeskButton(stringResource(R.string.ok), true, onDone)
+                                }
+                            }
+                        }
+                    }
+                }
+                Divider()
+                Row(Modifier.fillMaxWidth().height(68.dp).background(Am.Card).padding(horizontal = 20.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+                    val space = when (storage) {
+                        StorageStatus.Enough -> null
+                        is StorageStatus.Low -> stringResource(R.string.export_space_low)
+                        is StorageStatus.NotEnough -> stringResource(R.string.export_space_not_enough)
+                    }
+                    DeskStat(stringResource(R.string.export_available_space), formatBytes(free), space)
+                    DeskStat(stringResource(R.string.export_estimated_size), if (estimate < 0) stringResource(R.string.export_calculating) else formatBytes(estimate), null)
+                    DeskStat(stringResource(R.string.export_estimated_time), timeMs?.let { timeLabel(it).text() } ?: stringResource(if (estimate < 0) R.string.export_calculating else R.string.export_time_unknown), null)
+                    Spacer(Modifier.weight(1f))
+                    Row(Modifier.clip(RoundedCornerShape(8.dp)).deskPress(8.dp).clickable { onTemplate(!asTemplate) }.padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Text(stringResource(R.string.also_keep_a_copy_as_a), color = Navy, fontSize = 13.sp, maxLines = 1)
+                        Box(Modifier.size(32.dp).clickable(onClick = onTemplateInfo), Alignment.Center) { Icon(ExportIcons.Info, stringResource(R.string.export_info), Modifier.size(18.dp), tint = Am.HomeDim) }
+                        Switch(
+                            asTemplate, onTemplate,
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = Am.HomeAccent, checkedTrackColor = Am.HomeAccent.copy(alpha = 0.5f), checkedBorderColor = Color.Transparent,
+                                uncheckedThumbColor = Am.Thumb, uncheckedTrackColor = Am.SwitchOff, uncheckedBorderColor = Color.Transparent,
+                            ),
+                        )
+                    }
+                    Column(horizontalAlignment = Alignment.End) {
+                        if (blocked != null) Text(blocked.text(), Modifier.widthIn(max = 220.dp), color = Alert, fontSize = 12.sp, lineHeight = 15.sp, maxLines = 2, textAlign = TextAlign.End)
+                        DeskButton(stringResource(R.string.export), true, onStart, enabled = idle)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DeskStat(label: String, value: String, warn: String?) {
+    Column {
+        Text(label, color = NoteGrey, fontSize = 12.sp, maxLines = 1)
+        Text(value + (warn?.let { " \u00B7 $it" } ?: ""), color = if (warn != null) Alert else Navy, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1, style = Mixed)
+    }
+}
+
+@Composable
+private fun DeskButton(label: String, primary: Boolean, onClick: () -> Unit, enabled: Boolean = true) {
+    Box(
+        Modifier.height(40.dp).widthIn(min = 120.dp).alpha(if (enabled) 1f else 0.5f).clip(RoundedCornerShape(10.dp)).background(if (primary) Am.Accent else Am.Card)
+            .deskPress(10.dp).clickable(enabled = enabled, onClick = onClick).padding(horizontal = 18.dp),
+        Alignment.Center,
+    ) { Text(label, color = if (primary) Am.OnAccent else Navy, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1) }
+}
+
+@Composable
+private fun KindChip(icon: ImageVector?, label: String, selected: Boolean, enabled: Boolean, onClick: () -> Unit) {
+    val fill = animatedColor(if (selected) Navy else Am.Card)
+    val ink = animatedColor(if (selected) Am.OnNavy else Navy)
+    Row(
+        Modifier.height(34.dp).alpha(if (enabled) 1f else Dimmed).clip(RoundedCornerShape(17.dp)).background(fill).deskPress(17.dp).clickable(onClick = onClick).padding(horizontal = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (icon != null) Icon(icon, null, Modifier.size(18.dp), tint = ink) else Text(stringResource(R.string.gif), color = ink, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+        Text(label, Modifier.padding(start = 6.dp), color = ink, fontSize = 13.sp, fontWeight = FontWeight.Medium, maxLines = 1)
+    }
+}
+
+@Composable
+private fun DeskStill(scene: Scene, time: Int, engine: EngineThread, modifier: Modifier) {
+    val context = LocalContext.current
+    val picture by produceState<ImageBitmap?>(null, scene, time) {
+        val long = maxOf(scene.width, scene.height, 1)
+        val file = java.io.File(context.cacheDir, "export-preview-${System.nanoTime()}.png")
+        val made = try {
+            engine.stillPng(scene.toXml(), time, (900 * scene.width / long).coerceAtLeast(1), (900 * scene.height / long).coerceAtLeast(1), file)
+        } catch (e: CancellationException) { file.delete(); throw e } catch (e: Exception) { false }
+        value = if (made) withContext(Dispatchers.IO) { BitmapFactory.decodeFile(file.path)?.asImageBitmap().also { file.delete() } } else null
+    }
+    Box(modifier, Alignment.Center) {
+        picture?.let { Image(it, null, Modifier.fillMaxSize().padding(12.dp), contentScale = ContentScale.Fit) }
+    }
 }

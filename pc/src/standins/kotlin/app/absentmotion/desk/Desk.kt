@@ -4,7 +4,16 @@ import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isCtrlPressed
+import androidx.compose.ui.input.key.isMetaPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import java.io.File
@@ -73,4 +82,39 @@ object DeskSpeech {
     suspend fun voices(): List<app.absentmotion.ui.editor.SpeechVoice> = emptyList()
     fun preview(text: String, voice: app.absentmotion.ui.editor.SpeechVoice, rate: Float, pitch: Float) {}
     suspend fun toFile(text: String, voice: app.absentmotion.ui.editor.SpeechVoice, rate: Float, pitch: Float): Uri = throw UnsupportedOperationException("Text to speech is not available on this computer yet")
+}
+
+object DeskScale {
+    const val MIN = 80
+    const val MAX = 150
+    private val prefs get() = android.content.SharedPreferences.named("desk")
+    var percent by mutableIntStateOf(prefs.getInt("uiScale", 100).coerceIn(MIN, MAX))
+        private set
+
+    fun set(value: Int) {
+        percent = value.coerceIn(MIN, MAX)
+        prefs.edit().putInt("uiScale", percent).apply()
+    }
+
+    fun zoomIn() = set(percent + 10)
+    fun zoomOut() = set(percent - 10)
+    fun reset() = set(100)
+}
+
+object DeskGlobalKeys {
+    private val mac = System.getProperty("os.name").lowercase().contains("mac")
+
+    fun handle(app: DeskAppState, event: KeyEvent): Boolean {
+        if (event.type != KeyEventType.KeyDown) return false
+        if (!(if (mac) event.isMetaPressed else event.isCtrlPressed)) return false
+        when (event.key) {
+            Key.Equals, Key.Plus, Key.NumPadAdd -> DeskScale.zoomIn()
+            Key.Minus, Key.NumPadSubtract -> DeskScale.zoomOut()
+            Key.Zero, Key.NumPad0 -> DeskScale.reset()
+            Key.Comma -> app.openSettings()
+            Key.N -> if (app.editor == null) app.newProjectTick++ else return false
+            else -> return false
+        }
+        return true
+    }
 }

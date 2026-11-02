@@ -90,34 +90,34 @@ private val ListColor get() = Am.Navy
 private val ListLine get() = Am.NavyLine
 private val FieldShape = RoundedCornerShape(10.dp)
 private val SheetWidth = 384.dp
-private const val MIN_SIDE = 32
-private const val MAX_SIDE = 4096
+internal const val MIN_SIDE = 32
+internal const val MAX_SIDE = 4096
 
-private val Resolutions = listOf(
+internal val Resolutions = listOf(
     2160 to "2160p (4k)", 1440 to "1440p (QHD)", 1080 to "1080p (FHD)", 720 to "720p (HD)",
     540 to "540p (SD)", 360 to "360p", 270 to "270p", 180 to "180p",
 )
-private val FrameRates = listOf(12, 15, 18, 20, 24, 25, 30, 48, 50, 60)
+internal val FrameRates = listOf(12, 15, 18, 20, 24, 25, 30, 48, 50, 60)
 
-private class BackgroundChoice(@StringRes val name: Int, val argb: Int)
+internal class BackgroundChoice(@StringRes val name: Int, val argb: Int)
 
-private val Backgrounds = listOf(
+internal val Backgrounds = listOf(
     BackgroundChoice(R.string.newproject_bg_black, 0xFF000000.toInt()), BackgroundChoice(R.string.newproject_bg_white, 0xFFFFFFFF.toInt()),
     BackgroundChoice(R.string.newproject_bg_light_grey, 0xFFD8D8D8.toInt()), BackgroundChoice(R.string.newproject_bg_green, 0xFF00B140.toInt()),
     BackgroundChoice(R.string.newproject_bg_blue, 0xFF0047BB.toInt()), BackgroundChoice(R.string.newproject_bg_transparent, 0x00000000),
 )
 
-private class AspectDef(val key: String, val w: Int, val h: Int, val boxW: Dp, val boxH: Dp)
+internal class AspectDef(val key: String, val w: Int, val h: Int, val boxW: Dp, val boxH: Dp)
 
-private val Aspects = listOf(
+internal val Aspects = listOf(
     AspectDef("16:9", 16, 9, 55.dp, 31.dp), AspectDef("9:16", 9, 16, 31.dp, 55.dp),
     AspectDef("4:5", 4, 5, 31.dp, 39.dp), AspectDef("1:1", 1, 1, 31.dp, 31.dp),
     AspectDef("4:3", 4, 3, 41.dp, 31.dp),
 )
 
-private const val CUSTOM = "custom"
+internal const val CUSTOM = "custom"
 
-private class Form(saved: NewProjectChoice, val titles: List<String>, val names: DefaultNames, initialElement: Boolean) {
+internal class Form(saved: NewProjectChoice, val titles: List<String>, val names: DefaultNames, initialElement: Boolean) {
     var element by mutableStateOf(initialElement)
     var name by mutableStateOf(names.of(initialElement, titles))
     var aspect by mutableStateOf(saved.aspect)
@@ -173,9 +173,9 @@ private class Form(saved: NewProjectChoice, val titles: List<String>, val names:
     }
 }
 
-private fun side(text: String) = text.toIntOrNull()?.coerceIn(MIN_SIDE, MAX_SIDE) ?: MIN_SIDE
+internal fun side(text: String) = text.toIntOrNull()?.coerceIn(MIN_SIDE, MAX_SIDE) ?: MIN_SIDE
 
-private class DefaultNames(private val context: Context) {
+internal class DefaultNames(private val context: Context) {
     private val numbered = context.getString(R.string.newproject_default_project, "\u0000").split('\u0000', limit = 2)
     private val pattern = Regex(Regex.escape(numbered[0]) + """(\d+)""" + Regex.escape(numbered.getOrElse(1) { "" }))
 

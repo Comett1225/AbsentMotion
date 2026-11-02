@@ -17,6 +17,7 @@ import app.absentmotion.editor.duplicateSelected
 import app.absentmotion.editor.pasteLayer
 import app.absentmotion.editor.split
 import app.absentmotion.ui.editor.MediaPicks
+import app.absentmotion.ui.home.SettingsPage
 import app.absentmotion.platform.linkMediaFolder
 import kotlinx.coroutines.launch
 
@@ -28,6 +29,9 @@ fun FrameWindowScope.DeskMenus(app: DeskAppState) {
     val editor = app.editor
     MenuBar {
         Menu("File") {
+            Item("New Project…", enabled = editor == null, shortcut = key(Key.N)) { app.newProjectTick++ }
+            Item("Settings…", shortcut = key(Key.Comma)) { app.openSettings() }
+            Separator()
             Item("Import Media…", enabled = editor != null) {
                 val files = DeskFiles.chooseFiles(media = true, multiple = true).map(Uri::fromFile)
                 val sounds = files.filter { android.content.Desk.mime(it.toString())?.startsWith("audio/") == true }
@@ -55,10 +59,20 @@ fun FrameWindowScope.DeskMenus(app: DeskAppState) {
             Item("Split at Playhead", enabled = editor?.selectedId != null) { editor?.split() }
             Item("Delete", enabled = editor?.selectedId != null || MultiSelect.active) { editor?.let { if (MultiSelect.active) it.deleteChosen() else it.deleteSelected() } }
         }
+        Menu("View") {
+            Item("Zoom In", enabled = DeskScale.percent < DeskScale.MAX, shortcut = key(Key.Equals)) { DeskScale.zoomIn() }
+            Item("Zoom Out", enabled = DeskScale.percent > DeskScale.MIN, shortcut = key(Key.Minus)) { DeskScale.zoomOut() }
+            Item("Actual Size", enabled = DeskScale.percent != 100, shortcut = key(Key.Zero)) { DeskScale.reset() }
+        }
         Menu("Playback") {
             Item(if (editor?.playing == true) "Pause" else "Play", enabled = editor != null) { editor?.let { it.playing = !it.playing } }
             Item("Go to Start", enabled = editor != null) { editor?.let { it.playing = false; it.frame = 0 } }
             Item("Go to End", enabled = editor != null) { editor?.let { it.playing = false; it.frame = it.scene.lastFrame } }
+        }
+        Menu("Help") {
+            Item("AbsentMotion Help") { app.openSettings(SettingsPage.Help) }
+            Item("About AbsentMotion") { app.openSettings(SettingsPage.About) }
+            Item("Crash Logs") { app.openSettings(SettingsPage.Crash) }
         }
     }
 }

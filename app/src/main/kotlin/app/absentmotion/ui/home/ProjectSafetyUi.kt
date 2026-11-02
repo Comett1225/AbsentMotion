@@ -4,6 +4,7 @@ import app.absentmotion.export.formatBytes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -227,7 +228,8 @@ private fun SquareDialog(style: HistoryStyle, wanted: Float, onDismiss: () -> Un
         BoxWithConstraints(Modifier.fillMaxWidth().pointerInput(Unit) { detectTapGestures { dismiss() } }, contentAlignment = Alignment.Center) {
             val width = VersionPanel.width(maxWidth.value, wanted)
             val height = VersionPanel.height(maxHeight.value)
-            Column(Modifier.width(width.dp).heightIn(max = height.dp).background(style.surface).border(1.dp, style.edge).pointerInput(Unit) { detectTapGestures { } }) {
+            val shape = if (app.absentmotion.platform.PlatformFeatures.desktop) androidx.compose.foundation.shape.RoundedCornerShape(14.dp) else androidx.compose.ui.graphics.RectangleShape
+            Column(Modifier.width(width.dp).heightIn(max = height.dp).clip(shape).background(style.surface).border(1.dp, style.edge, shape).pointerInput(Unit) { detectTapGestures { } }) {
                 content(width)
             }
         }
@@ -259,7 +261,7 @@ private fun Rule(style: HistoryStyle) {
 private fun SquareButton(label: String, fill: Color?, ink: Color, edge: Color?, modifier: Modifier, onClick: () -> Unit) {
     Box(
         modifier.heightIn(min = 48.dp).then(if (fill != null) Modifier.background(fill) else Modifier).then(if (edge != null) Modifier.border(1.dp, edge) else Modifier)
-            .clickable(role = Role.Button, onClick = onClick).padding(horizontal = 14.dp, vertical = 10.dp),
+            .deskPress().clickable(role = Role.Button, onClick = onClick).padding(horizontal = 14.dp, vertical = 10.dp),
         contentAlignment = Alignment.Center,
     ) {
         Text(label, color = ink, fontSize = 15.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center)

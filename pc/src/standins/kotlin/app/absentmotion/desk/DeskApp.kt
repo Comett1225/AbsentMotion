@@ -12,6 +12,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.ui.graphics.Color
+import app.absentmotion.ui.home.DeskModals
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -62,8 +66,13 @@ import app.absentmotion.ui.editor.LocalWide
 import app.absentmotion.ui.editor.MediaPicks
 import app.absentmotion.ui.editor.wideEditor
 import app.absentmotion.ui.export.ExportScreen
-import app.absentmotion.ui.home.HomeScreen
+import app.absentmotion.ui.home.DeskHome
+import app.absentmotion.ui.home.DeskMessage
+import app.absentmotion.ui.home.DeskSettings
+import app.absentmotion.ui.home.SettingsPage
+import app.absentmotion.ui.home.UpdateDialog
 import app.absentmotion.ui.home.OpeningOverlay
+import app.absentmotion.ui.home.Updates
 import app.absentmotion.ui.home.OpenFailedDialog
 import app.absentmotion.ui.home.TemplateEditor
 import app.absentmotion.ui.home.VersionHistory
@@ -93,9 +102,14 @@ class DeskAppState {
     var importFailed by mutableStateOf<String?>(null)
     var historyFor by mutableStateOf<Triple<String, String, Boolean>?>(null)
     var projectsChanged by mutableIntStateOf(0)
+    var settingsOpen by mutableStateOf(false)
+    var settingsPage by mutableStateOf(SettingsPage.Editor)
+    var newProjectTick by mutableIntStateOf(0)
     var job: Job? = null
     private var closing = false
     val migration by lazy { EffectMigration.read(context) }
+
+    fun openSettings(page: SettingsPage = SettingsPage.Editor) { settingsPage = page; settingsOpen = true }
 
     private fun toast(id: Int) = Toast.makeText(context, context.getString(id), Toast.LENGTH_LONG).show()
 
@@ -194,9 +208,16 @@ class DeskAppState {
     }
 }
 
-@OptIn(androidx.compose.ui.ExperimentalComposeUiApi::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun DeskApp(app: DeskAppState) {
+    val base = LocalDensity.current
+    val scale = DeskScale.percent / 100f
+    CompositionLocalProvider(LocalDensity provides Density(base.density * scale, base.fontScale)) { DeskContent(app, scale) }
+}
+
+@OptIn(androidx.compose.ui.ExperimentalComposeUiApi::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
+@Composable
+private fun DeskContent(app: DeskAppState, scale: Float) {
     val scope = rememberCoroutineScope()
     fun run(block: suspend () -> Unit) {
         if (app.opening) return
@@ -210,6 +231,7 @@ fun DeskApp(app: DeskAppState) {
             { DeskFiles.chooseFiles(media = true, multiple = true).map(Uri::fromFile).takeIf { it.isNotEmpty() }?.let { MediaPicks.addSounds(it) } },
         ) { app.editor?.projectId }
     }
+    LaunchedEffect(Unit) { if (app.settings.autoUpdateCheck) Updates.atStart(app.context, app.settings) }
     LaunchedEffect(app.editor) {
         val state = app.editor ?: return@LaunchedEffect
         while (true) {
@@ -222,8 +244,9 @@ fun DeskApp(app: DeskAppState) {
     val homePress = remember(Am.PressHome) { PressIndication(Am.PressHome) }
     val editorPress = remember(Am.PressEditor) { PressIndication(Am.PressEditor) }
     val drop = remember(app) { DeskDrop(app) { block -> run(block) } }
-    val titleBar = if (System.getProperty("os.name").lowercase().contains("mac")) 28.dp else 0.dp
-    BoxWithConstraints(Modifier.fillMaxSize().background(if (open == null) Am.HomeBg else Am.TopBar).padding(top = titleBar).dragAndDropTarget(shouldStartDragAndDrop = { true }, target = drop)) {
+    val titleBar = if (System.getProperty("os.name").lowercase().contains("mac")) (28f / scale).dp else 0.dp
+    Box(Modifier.fillMaxSize().background(if (open == null && app.editingTemplate == null) Am.HomeBg else Am.TopBar)) {
+    BoxWithConstraints(Modifier.fillMaxSize().padding(top = titleBar).dragAndDropTarget(shouldStartDragAndDrop = { true }, target = drop)) {
         val config = remember(maxWidth, maxHeight) {
             android.content.res.Configuration().apply {
                 screenWidthDp = maxWidth.value.toInt(); screenHeightDp = maxHeight.value.toInt()
@@ -237,11 +260,12 @@ fun DeskApp(app: DeskAppState) {
         ) {
             if (open == null) {
                 Box(Modifier.fillMaxSize()) {
-                    HomeScreen(
+                    DeskHome(
                         app.store, app.settings, onOpen = { id -> run { app.openNow(id) } }, onExport = { id -> run { app.exportingFromList = app.load(id) } },
-                        imported = app.imported, onImportShown = { app.imported = emptyList() }, onImportFile = { uri -> run { app.importFiles(listOf(uri)) } },
+                        imported = app.imported, onImportShown = { app.imported = emptyList() }, onImportFiles = { uris -> run { app.importFiles(uris) } },
                         onTemplate = { id -> app.editingTemplate = id }, onTemplateProject = { scene -> run { app.projectFromTemplate(scene) } },
-                        onHistory = { app.historyFor = Triple(it.id, it.title, it.damaged) }, onCollect = {}, changes = app.projectsChanged,
+                        onHistory = { app.historyFor = Triple(it.id, it.title, it.damaged) }, onSettings = { app.openSettings() }, changes = app.projectsChanged,
+                        newTick = app.newProjectTick,
                     )
                     app.editingTemplate?.let { id ->
                         TemplateEditor(id, app.engine, app.settings, onClose = { app.editingTemplate = null }, onContinue = { scene -> run { app.projectFromTemplate(scene) } })
@@ -258,14 +282,17 @@ fun DeskApp(app: DeskAppState) {
             }
             if (app.opening) OpeningOverlay { app.job?.cancel() }
             app.openFailed?.let { id -> OpenFailedDialog({ app.openFailed = null; app.historyFor = Triple(id, "", false) }, null) { app.openFailed = null } }
-            app.importFailed?.let { reason -> AlertDialog(onDismissRequest = { app.importFailed = null }, text = { Text(stringResource(R.string.home_import_failed, reason), color = Am.Navy) },
-                confirmButton = { TextButton({ app.importFailed = null }) { Text(stringResource(R.string.ok), color = Am.Navy) } }, containerColor = Am.Card) }
+            app.importFailed?.let { reason -> DeskMessage(stringResource(R.string.home_import_failed, reason)) { app.importFailed = null } }
             if (open?.historyOpen == true) VersionHistory(app.store, open.projectId, open.project.title, app.engine, onRestore = { v -> scope.launch { app.restoreVersion(open.projectId, v) } }, editor = true) { open.historyOpen = false }
             app.historyFor?.let { (id, title, _) ->
                 VersionHistory(app.store, id, title, app.engine, onRestore = { v -> scope.launch { app.restoreVersion(id, v) } }) { app.historyFor = null }
             }
+            if (app.settingsOpen) DeskSettings(app.settings, app.settingsPage, onClose = { app.settingsOpen = false }, onRestored = { app.projectsChanged++ })
+            UpdateDialog()
             ToastHost(Modifier.align(Alignment.BottomCenter))
         }
+    }
+    if (DeskModals.open > 0 && titleBar > 0.dp) Box(Modifier.fillMaxWidth().height(titleBar).background(Color.Black.copy(alpha = DeskModals.ScrimAlpha * DeskModals.fade)))
     }
 }
 

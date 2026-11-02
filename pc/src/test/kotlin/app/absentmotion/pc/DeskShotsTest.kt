@@ -32,10 +32,10 @@ class DeskShotsTest {
         runSkikoComposeUiTest(size = Size(1600f, 1000f)) {
             val app = DeskAppState()
             val shots = File("build/desk-shots").also { it.mkdirs() }
-            fun shot(name: String) { waitForIdle(); ImageIO.write(onRoot().captureToImage().toAwtImage(), "png", shots.resolve(name)) }
+            fun shot(name: String) { waitForIdle(); ImageIO.write(onAllNodes(isRoot()).onFirst().captureToImage().toAwtImage(), "png", shots.resolve(name)) }
             setContent { DeskApp(app) }
             shot("01-home-empty.png")
-            onNodeWithText("New project", substring = false).performClick()
+            onAllNodesWithText("New project", substring = false).onFirst().performClick()
             mainClock.advanceTimeBy(1500)
             shot("01b-new-project.png")
             DeskBackPress()
