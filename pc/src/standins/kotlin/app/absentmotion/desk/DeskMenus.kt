@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun FrameWindowScope.DeskMenus(app: DeskAppState) {
     val scope = rememberCoroutineScope()
-    val mac = System.getProperty("os.name").lowercase().contains("mac")
+    val mac = DeskOs.mac
     fun key(k: Key, shift: Boolean = false) = KeyShortcut(k, meta = mac, ctrl = !mac, shift = shift)
     val editor = app.editor
     MenuBar {

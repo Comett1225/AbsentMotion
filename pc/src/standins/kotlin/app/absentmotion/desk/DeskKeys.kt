@@ -23,7 +23,7 @@ import app.absentmotion.editor.pasteLayer
 import app.absentmotion.editor.split
 
 object DeskKeys {
-    private val mac = System.getProperty("os.name").lowercase().contains("mac")
+    private val mac = DeskOs.mac
 
     fun handle(app: DeskAppState, event: KeyEvent): Boolean {
         if (event.type != KeyEventType.KeyDown) return false

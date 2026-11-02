@@ -50,9 +50,10 @@ val generateBuildConfig = tasks.register("generateBuildConfig") {
     val out = layout.buildDirectory.file("generated/strings/app/absentmotion/BuildConfig.kt")
     val version = rootDir.resolve("../version.properties").takeIf { it.isFile }?.readLines()?.associate { it.substringBefore('=').trim() to it.substringAfter('=', "").trim() }.orEmpty()
     inputs.property("version", version.toString())
+    inputs.property("versionName", findProperty("amVersionName")?.toString() ?: "5.0.0 pre")
     outputs.file(out)
     doLast {
-        out.get().asFile.apply { parentFile.mkdirs(); writeText("package app.absentmotion\n\nobject BuildConfig {\n    const val APPLICATION_ID = \"app.absentmotion\"\n    const val FLAVOR = \"desktop\"\n    const val DEBUG = false\n    const val COMPATIBLE = false\n    const val VERSION_NAME = \"${version["versionName"] ?: "5.0.0"}\"\n    const val VERSION_CODE = ${version["versionCode"] ?: "500"}\n}\n") }
+        out.get().asFile.apply { parentFile.mkdirs(); writeText("package app.absentmotion\n\nobject BuildConfig {\n    const val APPLICATION_ID = \"app.absentmotion\"\n    const val FLAVOR = \"desktop\"\n    const val DEBUG = false\n    const val COMPATIBLE = false\n    const val VERSION_NAME = \"${findProperty("amVersionName") ?: "5.0.0 pre"}\"\n    const val VERSION_CODE = ${version["versionCode"] ?: "500"}\n}\n") }
     }
 }
 tasks.matching { it.name == "compileKotlin" }.configureEach { dependsOn(generateBuildConfig) }

@@ -16,4 +16,16 @@ object DeskOs {
     val nativeName = when { mac -> "libamdesktop.dylib"; windows -> "amdesktop.dll"; else -> "libamdesktop.so" }
     val revealLabel = when { mac -> "Show in Finder"; windows -> "Show in Explorer"; else -> "Show in Folder" }
     val videosFolder = if (mac) "Movies" else "Videos"
+    val commandKey = if (mac) "⌘" else "Ctrl+"
+    val titleBarDp = if (mac) 28f else 0f
+
+    fun reveal(file: File) {
+        runCatching {
+            when {
+                mac -> ProcessBuilder("open", "-R", file.absolutePath).start()
+                windows -> ProcessBuilder("explorer.exe", "/select,", file.absolutePath).start()
+                else -> java.awt.Desktop.getDesktop().open(file.parentFile)
+            }
+        }
+    }
 }

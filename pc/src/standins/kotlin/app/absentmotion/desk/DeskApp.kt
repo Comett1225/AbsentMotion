@@ -244,7 +244,7 @@ private fun DeskContent(app: DeskAppState, scale: Float) {
     val homePress = remember(Am.PressHome) { PressIndication(Am.PressHome) }
     val editorPress = remember(Am.PressEditor) { PressIndication(Am.PressEditor) }
     val drop = remember(app) { DeskDrop(app) { block -> run(block) } }
-    val titleBar = if (System.getProperty("os.name").lowercase().contains("mac")) (28f / scale).dp else 0.dp
+    val titleBar = (DeskOs.titleBarDp / scale).dp
     Box(Modifier.fillMaxSize().background(if (open == null && app.editingTemplate == null) Am.HomeBg else Am.TopBar)) {
     BoxWithConstraints(Modifier.fillMaxSize().padding(top = titleBar).dragAndDropTarget(shouldStartDragAndDrop = { true }, target = drop)) {
         val config = remember(maxWidth, maxHeight) {

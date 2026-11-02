@@ -63,10 +63,7 @@ object DeskFiles {
 
     fun reveal(uris: List<Uri>) {
         val file = uris.firstOrNull()?.toFile() ?: return
-        runCatching {
-            if (System.getProperty("os.name").lowercase().contains("mac")) ProcessBuilder("open", "-R", file.absolutePath).start()
-            else java.awt.Desktop.getDesktop().open(file.parentFile)
-        }
+        DeskOs.reveal(file)
     }
 
     suspend fun thumbnail(uri: String, video: Boolean, size: Int): ImageBitmap? = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
@@ -102,7 +99,7 @@ object DeskScale {
 }
 
 object DeskGlobalKeys {
-    private val mac = System.getProperty("os.name").lowercase().contains("mac")
+    private val mac = DeskOs.mac
 
     fun handle(app: DeskAppState, event: KeyEvent): Boolean {
         if (event.type != KeyEventType.KeyDown) return false

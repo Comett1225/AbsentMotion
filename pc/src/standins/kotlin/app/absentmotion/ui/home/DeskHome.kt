@@ -112,7 +112,7 @@ private val CardMin = 240.dp
 private val TileGap = 16.dp
 private val GridPad = 24.dp
 
-internal fun deskKey(letter: String): String = (if (System.getProperty("os.name").lowercase().contains("mac")) "⌘" else "Ctrl+") + letter
+internal fun deskKey(letter: String): String = app.absentmotion.desk.DeskOs.commandKey + letter
 
 internal enum class DeskSection { Projects, Assets, Templates }
 
