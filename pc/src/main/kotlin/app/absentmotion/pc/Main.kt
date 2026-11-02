@@ -30,6 +30,7 @@ import javax.imageio.ImageIO
 import kotlin.math.roundToInt
 
 fun main(args: Array<String>) {
+    System.setProperty("apple.awt.application.appearance", "system")
     when (args.firstOrNull()) {
         "--warmup" -> { warmup(); return }
         "--scene-check" -> { sceneCheck(); return }

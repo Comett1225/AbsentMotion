@@ -87,6 +87,7 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.isPrimaryPressed
 import androidx.compose.ui.input.pointer.isSecondaryPressed
+import androidx.compose.ui.input.pointer.isTertiaryPressed
 import androidx.compose.ui.input.pointer.isAltPressed
 import androidx.compose.ui.input.pointer.isCtrlPressed
 import androidx.compose.ui.input.pointer.isMetaPressed
@@ -182,6 +183,7 @@ private val PillNotch = 5.dp
 
 private val ReadoutHalfWidth = PillWidth / 2 + 12.dp
 private val PillInset = 2.dp
+private const val SelectedRowShade = 0.16f
 private val ReadoutTop = PillTop + PillHeight / 2 - 24.dp
 
 private val BookmarkColor get() = Am.Bookmark
@@ -1321,6 +1323,10 @@ private class TimelineView(val state: EditorState, density: Density, private val
         liftUpdate()
     }
 
+    fun grabScroll(dy: Float) {
+        scrollBy(dy)
+    }
+
     fun liftScroll(dy: Float) {
         scrollBy(dy)
         liftUpdate()
@@ -1412,6 +1418,7 @@ private suspend fun PointerInputScope.desktopTimelineGestures(view: TimelineView
         var previous = Offset.Zero
         var lastClickId: Long? = null
         var lastClickTime = 0L
+        var grab: Offset? = null
         while (true) {
             val event = awaitPointerEvent()
             val change = event.changes.firstOrNull() ?: continue
@@ -1428,6 +1435,22 @@ private suspend fun PointerInputScope.desktopTimelineGestures(view: TimelineView
                 PointerEventType.Exit -> if (down == null) view.hover(null)
                 PointerEventType.Enter, PointerEventType.Move -> if (down == null) view.hover(at)
                 else -> Unit
+            }
+            if (grab != null) {
+                if (event.buttons.isTertiaryPressed) {
+                    val last = grab
+                    view.pan(last.x - at.x)
+                    view.grabScroll(at.y - last.y)
+                    grab = at
+                } else grab = null
+                change.consume()
+                continue
+            }
+            if (event.type == PointerEventType.Press && event.buttons.isTertiaryPressed && down == null) {
+                view.stopMotion()
+                grab = at
+                change.consume()
+                continue
             }
             if (event.type == PointerEventType.Press && (event.buttons.isSecondaryPressed || MacOs && modifiers.isCtrlPressed) && down == null) {
                 val id = view.clipId(view.hitAt(at))
@@ -1812,6 +1835,7 @@ private fun DrawScope.drawRow(
     val right = time.x(layer.endTime + 1f)
 
     if (layer.kind == "camera" && layer.id == scene.defaultCameraId) drawRect(CameraBar.copy(alpha = 0.1f), Offset(0f, top), Size(size.width, RowHeight.toPx()))
+    if (PlatformFeatures.desktop && (selected || layer.id in MultiSelect.ids)) drawRect(Color.Black, Offset(headerWidth, top), Size(size.width - headerWidth, RowHeight.toPx()), alpha = SelectedRowShade)
     if (layer.kind == "audio") drawAudioBar(outline, layer, left, right, barTop, barBottom, time.pxPerMs)
     else drawBar(outline, left, right, barTop, barBottom, stripe, picture, layer.startTime, time.pxPerMs, layer.kind == "text", layer.kind == "camera")
     layer.labelColour?.let { drawTagCorner(outline, left, barTop, (barBottom - barTop) / 2, Color(it.start)) }

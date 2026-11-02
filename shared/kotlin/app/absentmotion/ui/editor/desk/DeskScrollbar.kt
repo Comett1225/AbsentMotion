@@ -119,7 +119,7 @@ private fun Modifier.bar(state: ScrollableState, color: Color, range: (Float) ->
         }
     }.drawWithContent {
         drawContent()
-        val r = measure(size.height.toFloat()) ?: return@drawWithContent
+        val r = measure(size.height) ?: return@drawWithContent
         val viewport = size.height
         val track = (viewport - Inset.toPx() * 2).coerceAtLeast(1f)
         val length = (viewport / r.total * track).coerceIn(MinThumb.toPx().coerceAtMost(track), track)

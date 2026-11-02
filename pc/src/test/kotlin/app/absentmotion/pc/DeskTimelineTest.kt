@@ -275,6 +275,26 @@ class DeskTimelineTest {
         app.engine.close()
     }
 
+    @Test fun middleButtonDragPans() {
+        System.setProperty("am.data", File("build/timeline-grab-data").absolutePath)
+        val app = DeskAppState()
+        val id = app.store.create(Scene.parse(File("../testdata/scenes/styles.xml").readText()))
+        val state = runBlocking { app.openNow(id)!! }
+        runSkikoComposeUiTest(size = Size(1280f, 300f)) {
+            setContent {
+                CompositionLocalProvider(LocalWide provides true) {
+                    Box(Modifier.fillMaxSize().background(Am.TimelineBg)) { Timeline(state, Modifier.fillMaxSize()) }
+                }
+            }
+            runOnIdle { state.timelineZoom = 1000f }
+            val before = DeskDrop.frameAt(Offset(600f, 100f))!!
+            onRoot().performMouseInput { moveTo(Offset(700f, 100f)); press(MouseButton.Tertiary); moveTo(Offset(400f, 100f)); release(MouseButton.Tertiary) }
+            runOnIdle { assertTrue(DeskDrop.frameAt(Offset(600f, 100f))!! > before) }
+            runOnIdle { assertEquals(0, state.frame) }
+        }
+        app.engine.close()
+    }
+
     @Test fun keyframeMovesImmediately() {
         System.setProperty("am.data", File("build/timeline-keyframe-data").absolutePath)
         val app = DeskAppState()
