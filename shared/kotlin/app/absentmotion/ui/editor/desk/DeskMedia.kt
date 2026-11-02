@@ -54,7 +54,8 @@ internal fun DeskMedia(state: EditorState, library: AddLibrary) {
                 DeskTile(state, file.name, {
                     bitmap?.let { Image(it.asImageBitmap(), null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop) }
                         ?: Icon(ChromeIcons.MediaTab, null, Modifier.size(40.dp), tint = Am.OnDarkDim)
-                }, { app.absentmotion.platform.revealDeskFile(file.uri) }, detail = file.album.takeIf { file.name in shared && it.isNotBlank() }, add = add)
+                }, { app.absentmotion.platform.revealDeskFile(file.uri) }, detail = file.album.takeIf { file.name in shared && it.isNotBlank() },
+                    remove = deskRemove(state, file.uri.toString(), library, audio = false) { unlink -> app.absentmotion.platform.removeFromLibrary(file.uri, unlink) }, add = add)
             }
         }
     }
@@ -98,7 +99,8 @@ internal fun DeskAudio(state: EditorState, library: AddLibrary) {
                             }
                         }
                     }
-                }, { app.absentmotion.platform.revealDeskFile(android.net.Uri.parse(file.uri)) }, detail = shared[label]?.let { byExtension -> (if (byExtension) file.name.substringAfterLast('.', "").uppercase() else file.folder.substringAfterLast('/')).ifBlank { null } }, add = add)
+                }, { app.absentmotion.platform.revealDeskFile(android.net.Uri.parse(file.uri)) }, detail = shared[label]?.let { byExtension -> (if (byExtension) file.name.substringAfterLast('.', "").uppercase() else file.folder.substringAfterLast('/')).ifBlank { null } },
+                    remove = deskRemove(state, file.uri, library, audio = true) { unlink -> app.absentmotion.platform.removeFromLibrary(android.net.Uri.parse(file.uri), unlink) }, add = add)
             }
         }
     }
@@ -109,5 +111,16 @@ internal fun DeskAudio(state: EditorState, library: AddLibrary) {
 private fun DeskFileAction(label: String, modifier: Modifier, action: () -> Unit) {
     Box(modifier.height(36.dp).clip(RoundedCornerShape(6.dp)).background(Am.Field).hoverFill(6.dp, androidx.compose.ui.graphics.Color.White.copy(alpha = .08f)).pointerHoverIcon(PointerIcon.Hand).clickable(onClick = action), Alignment.Center) {
         Text(label, color = Am.OnDark, fontSize = 12.sp, maxLines = 1)
+    }
+}
+
+@Composable
+private fun deskRemove(state: EditorState, uri: String, library: AddLibrary, audio: Boolean, run: (Boolean) -> Unit): DeskRemove? {
+    if (!app.absentmotion.platform.PlatformFeatures.desktop) return null
+    val folder = remember(uri, library.mediaRevision, library.audioRevision) { app.absentmotion.platform.libraryFolderName(android.net.Uri.parse(uri)) }
+    val inUse = state.scene.media(uri) != null
+    return DeskRemove(inUse, folder) { unlink ->
+        run(unlink)
+        if (audio) library.audioRevision++ else library.mediaRevision++
     }
 }

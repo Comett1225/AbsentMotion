@@ -205,7 +205,7 @@ private val ThumbSize = 16.dp
 private const val HIDDEN_ALPHA = 0.55f
 
 private val BarInset = 2.5.dp
-private val BarRadius = 2.dp
+private val BarRadius = if (PlatformFeatures.desktop) 4.dp else 2.dp
 private val BarShadowHeight = 2.dp
 private val LabelInset = 14.dp
 private const val MAX_LABEL_PX = 16_000
@@ -706,13 +706,15 @@ private class TimelineView(val state: EditorState, density: Density, private val
     fun frameAtWindow(point: Offset): Int? {
         val local = coordinates?.takeIf { it.isAttached }?.windowToLocal(point) ?: return null
         if (local.x < headerWidth || local.x >= size.width || local.y < rulerH || local.y >= rowsBottom) return null
-        return TimelineMath.nearestFrame(timeScale().time(local.x), fps).coerceIn(0, state.scene.lastFrame)
+        return TimelineMath.nearestFrame(timeScale().time(local.x), fps).coerceAtLeast(0)
     }
 
     private val maxZoom: Float get() = fps * 40f
 
-    private val minZoom: Float
+    private val fitZoom: Float
         get() = ((size.width - headerWidth).coerceAtLeast(1f) / scale * 1000f / TimelineMath.frameTimeMs(state.scene.lastFrame + 1, fps).coerceAtLeast(1f)).coerceAtMost(maxZoom)
+
+    private val minZoom: Float get() = fitZoom / 2f
 
     private val endMs: Float
         get() = max(TimelineMath.frameTimeMs(state.scene.lastFrame + 1, fps), (layers.maxOfOrNull { it.endTime + 1 } ?: 0).toFloat())
@@ -723,11 +725,12 @@ private class TimelineView(val state: EditorState, density: Density, private val
 
     val rowsEnd: Float get() = rowsBottom
     val maxScroll: Float get() = TimelineMath.maxScroll(layers.size, rowH, rulerH, rowsBottom)
-    val panSpan: Float get() = (visibleMs / endMs.coerceAtLeast(1f)).coerceIn(0f, 1f)
-    val panFraction: Float get() = (endMs - visibleMs).let { if (it > 0f) viewStartMs / it else 0f }.coerceIn(0f, 1f)
+    private val panMax: Float get() = (endMs - visibleMs / 2f).coerceAtLeast(0f)
+    val panSpan: Float get() = (visibleMs / (panMax + visibleMs).coerceAtLeast(1f)).coerceIn(0f, 1f)
+    val panFraction: Float get() = if (panMax > 0f) viewStartMs / panMax else 0f
 
     private fun setViewStart(value: Float) {
-        viewStartMs = value.coerceIn(0f, (endMs - visibleMs).coerceAtLeast(0f))
+        viewStartMs = value.coerceIn(0f, panMax)
     }
 
     fun refit() {
@@ -765,7 +768,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
     }
 
     fun fit() {
-        state.timelineZoom = minZoom
+        state.timelineZoom = fitZoom
         followFit = true
         viewStartMs = 0f
     }
@@ -1120,7 +1123,10 @@ private class TimelineView(val state: EditorState, density: Density, private val
         when (drag) {
             Drag.Scrub -> { state.transitionButtonDismissed = false; scrubBy(delta.x) }
             Drag.Scroll -> scrollBy(delta.y)
-            Drag.TrimStart, Drag.TrimEnd -> trimBy(delta.x, start = drag == Drag.TrimStart)
+            Drag.TrimStart, Drag.TrimEnd -> {
+                trimBy(delta.x, start = drag == Drag.TrimStart)
+                if (PlatformFeatures.desktop) autoEdge(at.x, drag == Drag.TrimStart)
+            }
             Drag.Reorder -> reorderTo(at.y)
             Drag.Key -> keyBy(delta.x)
             Drag.Pinch, Drag.Spent, Drag.Lift, Drag.Select -> Unit
@@ -1128,6 +1134,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
     }
 
     fun endDrag(drag: Drag?, velocity: Velocity, lifted: Boolean = true) {
+        autoStop()
         limitEdge = null
         snapAt = null
         if (drag == Drag.Lift) drop()
@@ -1160,7 +1167,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
             val at = anchor.coerceIn(headerWidth, max(size.width.toFloat(), headerWidth))
             val before = timeScale().time(at)
             state.timelineZoom = (dpPerSecond * factor).coerceIn(minZoom, maxZoom)
-            followFit = state.timelineZoom <= minZoom
+            followFit = state.timelineZoom >= fitZoom * 0.999f
             setViewStart(before - (at - headerWidth) / timeScale().pxPerMs)
         } else state.timelineZoom = (dpPerSecond * factor).coerceIn(MIN_ZOOM, MAX_ZOOM)
     }
@@ -1218,7 +1225,53 @@ private class TimelineView(val state: EditorState, density: Density, private val
         showSnap(snap.takeUnless { hit }, edge)
     }
 
+    private var autoX: Float? = null
+    private var autoTrim: Boolean? = null
+    private var autoJob: Job? = null
+    private var panBias = 0f
+
+    private fun autoEdge(x: Float, trimStart: Boolean?) {
+        autoX = x
+        autoTrim = trimStart
+        if (autoJob?.isActive != true) autoJob = scope.launch { autoLoop() }
+    }
+
+    private fun autoStop() {
+        autoX = null
+        panBias = 0f
+    }
+
+    private suspend fun autoLoop() {
+        var last = withFrameNanos { it }
+        while (true) {
+            val now = withFrameNanos { it }
+            val step = min((now - last) / 1e9f, 0.05f)
+            last = now
+            val x = autoX ?: break
+            val zone = 48.dp.px
+            val over = when {
+                x > size.width - zone -> (x - (size.width - zone)) / zone
+                x < headerWidth + zone -> -(headerWidth + zone - x) / zone
+                else -> 0f
+            }.coerceIn(-1.5f, 1.5f)
+            if (over == 0f) continue
+            val before = viewStartMs
+            pan(over * 700.dp.px * step)
+            val moved = viewStartMs - before
+            if (moved == 0f) continue
+            val trim = autoTrim
+            if (trim != null) {
+                edgeMs += moved
+                trimBy(0f, trim)
+            } else {
+                panBias += moved
+                moveApply()
+            }
+        }
+    }
+
     private fun moveBegin(id: Long): Boolean {
+        panBias = 0f
         val layer = state.scene.layer(id) ?: return false
         moveLayer = layer
         moveGroup = if (MultiSelect.active && id in MultiSelect.ids) state.scene.layers.filter { it.id in MultiSelect.ids && it.id != id } else emptyList()
@@ -1237,7 +1290,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
         state.playing = false
         val scene = state.scene
         val pxPerMs = timeScale().pxPerMs
-        val wanted = original.startTime + moveDx / pxPerMs
+        val wanted = original.startTime + moveDx / pxPerMs + panBias
         val spanFrames = scene.lastShownFrame(original.endTime) + 1 - scene.firstShownFrame(original.startTime)
         val spanMs = (original.endTime + 1 - original.startTime).toFloat()
         val found = TimelineMath.moveTarget(wanted, spanMs, spanFrames, if (PlatformFeatures.desktop && snapDisabled) emptySet() else snapTargets, fps, SnapZone.px / pxPerMs)
@@ -1318,6 +1371,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
             if (moveArmed) {
                 moveDx = at.x - liftStartX
                 moveApply()
+                if (PlatformFeatures.desktop) autoEdge(at.x, null)
             }
         }
         liftUpdate()
@@ -1723,13 +1777,12 @@ private fun DrawScope.drawDeskRuler(view: TimelineView, time: TimeScale, measure
     val headerWidth = view.headerWidth
     val rulerH = view.rulerH
     val fps = view.fps
-    val lastFrame = view.state.scene.lastFrame
     drawRect(Am.Panel, Offset.Zero, Size(headerWidth, size.height))
     drawRect(Am.Line, Offset(headerWidth, rulerH - 1.dp.toPx()), Size(size.width - headerWidth, 1.dp.toPx()))
     if (view.layers.isEmpty()) return
     val steps = view.rulerSteps()
     val first = floor(time.time(headerWidth) * fps / 1000f).toInt().coerceAtLeast(0) / steps.minor * steps.minor
-    val last = min(lastFrame + 1, ceil(time.time(size.width) * fps / 1000f).toInt())
+    val last = ceil(time.time(size.width) * fps / 1000f).toInt()
     val width = TickWidth.toPx()
     clipRect(left = headerWidth) {
         var frame = first
@@ -1787,9 +1840,17 @@ private fun DrawScope.drawBookmark(x: Float, outline: Path) {
     val half = BookmarkLineWidth.toPx() / 2
     drawRect(colour, Offset(x - half, 0f), Size(2 * half, RulerHeight.toPx()))
     outline.rewind()
-    outline.moveTo(x + half, BookmarkFlagTop.toPx())
-    outline.lineTo(x + half, BookmarkFlagBottom.toPx())
-    outline.lineTo(x + half - BookmarkFlagSide.toPx(), BookmarkFlagBottom.toPx())
+    if (PlatformFeatures.desktop) {
+        val side = 7.dp.toPx()
+        val bottom = 11.dp.toPx()
+        outline.moveTo(x + half, 1.dp.toPx())
+        outline.lineTo(x + half, bottom)
+        outline.quadraticTo(x + half - side * 0.85f, bottom, x + half - side, 1.dp.toPx())
+    } else {
+        outline.moveTo(x + half, BookmarkFlagTop.toPx())
+        outline.lineTo(x + half, BookmarkFlagBottom.toPx())
+        outline.lineTo(x + half - BookmarkFlagSide.toPx(), BookmarkFlagBottom.toPx())
+    }
     outline.close()
     drawPath(outline, colour)
 }
@@ -2037,9 +2098,18 @@ private fun DrawScope.drawPlayhead(originX: Float, timecode: String, measurer: T
     if (onBookmark) {
         val centre = originX + width / 2
         outline.rewind()
-        outline.moveTo(centre, 0f)
-        outline.lineTo(centre + BookmarkPeakHalf.toPx(), BookmarkFlagBottom.toPx())
-        outline.lineTo(centre - BookmarkPeakHalf.toPx(), BookmarkFlagBottom.toPx())
+        if (PlatformFeatures.desktop) {
+            val peak = 5.dp.toPx()
+            val tip = 11.dp.toPx()
+            outline.moveTo(centre - peak, 0f)
+            outline.lineTo(centre + peak, 0f)
+            outline.quadraticTo(centre + peak, tip * 0.65f, centre, tip)
+            outline.quadraticTo(centre - peak, tip * 0.65f, centre - peak, 0f)
+        } else {
+            outline.moveTo(centre, 0f)
+            outline.lineTo(centre + BookmarkPeakHalf.toPx(), BookmarkFlagBottom.toPx())
+            outline.lineTo(centre - BookmarkPeakHalf.toPx(), BookmarkFlagBottom.toPx())
+        }
         outline.close()
         drawPath(outline, BookmarkColor)
     }
@@ -2049,7 +2119,7 @@ private fun DrawScope.drawPlayhead(originX: Float, timecode: String, measurer: T
     val top = PillTop.toPx()
     val bottom = top + PillHeight.toPx()
     val notch = PillNotch.toPx()
-    val round = 1.dp.toPx()
+    val round = (if (PlatformFeatures.desktop) 4.dp else 1.dp).toPx()
     outline.rewind()
     outline.moveTo(left + notch, top)
     outline.lineTo(right - round, top)

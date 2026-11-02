@@ -64,6 +64,39 @@ class DeskWorkspaceTest {
         return Offset((r.left.value + r.right.value) / 2, (r.top.value + r.bottom.value) / 2)
     }
 
+    @Test fun removeMediaFromLibrary() {
+        val data = File("build/remove-media-data").also { it.deleteRecursively(); it.mkdirs() }
+        System.setProperty("am.data", data.absolutePath)
+        DeskLibrary.folders.forEach { DeskLibrary.unlink(it) }
+        val folder = File("build/remove-media-files/Holiday").also { it.deleteRecursively(); File("../testdata/media").canonicalFile.copyRecursively(it) }.canonicalFile
+        DeskLibrary.link(folder)
+        val shots = File("build/ui-shots/editor").also { it.mkdirs() }
+        runSkikoComposeUiTest(size = Size(1280f, 800f)) {
+            val app = DeskAppState()
+            setContent { DeskApp(app) }
+            open(app, "styles")
+            val editor = app.editor!!
+            val layers = editor.scene.layers.size
+            if (onAllNodesWithText("Search", substring = true).fetchSemanticsNodes().isEmpty()) rail("Media")
+            waitUntil(timeoutMillis = 20_000) { onAllNodesWithText("test-image.jpg", substring = true).fetchSemanticsNodes().isNotEmpty() }
+            onAllNodesWithText("test-image.jpg", substring = true).onFirst().performMouseInput { rightClick() }
+            mainClock.advanceTimeBy(250)
+            onNodeWithText("Unlink folder Holiday").assertExists()
+            shot(shots, "media-menu")
+            onNodeWithText("Remove from media").performClick()
+            waitUntil(timeoutMillis = 20_000) { onAllNodesWithText("test-image.jpg", substring = true).fetchSemanticsNodes().isEmpty() }
+            assertTrue(folder.resolve("test-image.jpg").isFile)
+            assertEquals(layers, editor.scene.layers.size)
+            onAllNodesWithText("test-alpha.png", substring = true).onFirst().assertExists()
+            shot(shots, "media-removed")
+            mainClock.advanceTimeBy(300)
+            runBlocking { app.closeEditor() }
+        }
+        DeskLibrary.link(folder)
+        assertTrue(DeskLibrary.files(setOf("jpg")).any { it.name == "test-image.jpg" })
+        DeskLibrary.unlink(folder)
+    }
+
     @Test fun workspace() {
         val data = File("build/workspace-test-data").also { it.deleteRecursively(); it.mkdirs() }
         System.setProperty("am.data", data.absolutePath)

@@ -19,6 +19,7 @@ import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.MultiSelect
 import app.absentmotion.editor.deselectLayer
 import app.absentmotion.editor.chosenLayers
+import app.absentmotion.ui.editor.DeskDrop
 import app.absentmotion.ui.editor.DeskTimelineControls
 import app.absentmotion.ui.editor.TimelineMath
 import app.absentmotion.editor.copySelected
@@ -109,6 +110,7 @@ object DeskKeys {
             event.key == Key.MoveEnd -> { state.playing = false; state.frame = last }
             command && event.key == Key.Z && !shift -> if (state.canUndo) state.undo()
             command && (event.key == Key.Z && shift || event.key == Key.Y) -> if (state.canRedo) state.redo()
+            (event.key == Key.Delete || event.key == Key.Backspace) && !command && DeskDrop.removeHovered != null -> { if (first) DeskDrop.removeHovered?.invoke() }
             (event.key == Key.Delete || event.key == Key.Backspace) && !command -> if (MultiSelect.active || state.selectedId != null) { if (first) { if (MultiSelect.active) state.deleteChosen() else state.deleteSelected() } } else return false
             command && event.key == Key.D -> if (MultiSelect.active || state.selectedId != null) { if (first) { if (MultiSelect.active) state.duplicateChosen() else state.duplicateSelected() } } else return false
             command && event.key == Key.C -> if (state.chosenLayers.isNotEmpty()) { if (first) state.copySelected() } else return false
