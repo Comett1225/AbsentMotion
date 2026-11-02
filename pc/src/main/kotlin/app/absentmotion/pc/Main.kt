@@ -2,6 +2,8 @@ package app.absentmotion.pc
 
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowPosition
 import java.awt.event.ComponentAdapter
@@ -17,6 +19,7 @@ import app.absentmotion.desk.DeskApp
 import app.absentmotion.desk.DeskAppState
 import app.absentmotion.desk.DeskBack
 import app.absentmotion.desk.DeskFiles
+import app.absentmotion.desk.DeskKeys
 import app.absentmotion.desk.DeskMenus
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
@@ -52,9 +55,16 @@ fun main(args: Array<String>) {
         val y = prefs.getInt("windowY", (size.height - height) / 2).coerceIn(0, (size.height - 100).coerceAtLeast(0))
         val state = rememberWindowState(position = WindowPosition(x.dp, y.dp), width = width.dp, height = height.dp)
         val desk = remember { DeskAppState() }
-        Window(onCloseRequest = { exitApplication() }, title = "AbsentMotion", state = state,
-            onPreviewKeyEvent = { it.type == KeyEventType.KeyDown && it.key == Key.Escape && DeskBack.back() },
-            onKeyEvent = { app.absentmotion.desk.DeskGlobalKeys.handle(desk, it) || app.absentmotion.desk.DeskKeys.handle(desk, it) }) {
+        val scope = rememberCoroutineScope()
+        val quit: () -> Unit = { scope.launch { desk.shutdown(); exitApplication() } }
+        DisposableEffect(Unit) {
+            val platform = runCatching { java.awt.Desktop.getDesktop().takeIf { java.awt.Desktop.isDesktopSupported() && it.isSupported(java.awt.Desktop.Action.APP_QUIT_HANDLER) } }.getOrNull()
+            platform?.setQuitHandler { _, response -> scope.launch { desk.shutdown(); response.performQuit() } }
+            onDispose { runCatching { platform?.setQuitHandler(null) } }
+        }
+        Window(onCloseRequest = quit, title = "AbsentMotion", state = state,
+            onPreviewKeyEvent = { DeskKeys.released(it); it.type == KeyEventType.KeyDown && it.key == Key.Escape && DeskBack.back() },
+            onKeyEvent = { app.absentmotion.desk.DeskGlobalKeys.handle(desk, it) || DeskKeys.handle(desk, it) }) {
             DeskFiles.window = window
             if (DesktopPlatform.mac) remember(window) {
                 window.rootPane.putClientProperty("apple.awt.fullWindowContent", true)

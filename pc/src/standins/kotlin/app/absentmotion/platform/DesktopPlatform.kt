@@ -180,6 +180,8 @@ object PlatformFeatures {
     const val linkFolders = true
 }
 
+fun textFieldFocused(): Boolean = app.absentmotion.desk.DeskTyping.active > 0
+
 fun Modifier.resizeCursor(horizontal: Boolean = true): Modifier =
     pointerHoverIcon(androidx.compose.ui.input.pointer.PointerIcon(java.awt.Cursor(if (horizontal) java.awt.Cursor.E_RESIZE_CURSOR else java.awt.Cursor.N_RESIZE_CURSOR)))
 

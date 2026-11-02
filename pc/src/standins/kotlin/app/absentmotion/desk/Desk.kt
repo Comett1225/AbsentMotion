@@ -10,12 +10,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.isCtrlPressed
-import androidx.compose.ui.input.key.isMetaPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap
+import app.absentmotion.ui.home.DeskModals
 import java.io.File
 
 object DeskInfo {
@@ -99,17 +98,15 @@ object DeskScale {
 }
 
 object DeskGlobalKeys {
-    private val mac = DeskOs.mac
-
     fun handle(app: DeskAppState, event: KeyEvent): Boolean {
         if (event.type != KeyEventType.KeyDown) return false
-        if (!(if (mac) event.isMetaPressed else event.isCtrlPressed)) return false
+        if (!DeskKeys.isCommand(event)) return false
         when (event.key) {
             Key.Equals, Key.Plus, Key.NumPadAdd -> DeskScale.zoomIn()
             Key.Minus, Key.NumPadSubtract -> DeskScale.zoomOut()
             Key.Zero, Key.NumPad0 -> DeskScale.reset()
             Key.Comma -> app.openSettings()
-            Key.N -> if (app.editor == null) app.newProjectTick++ else return false
+            Key.N -> if (app.editor == null && DeskModals.open == 0) app.newProjectTick++ else return false
             else -> return false
         }
         return true
