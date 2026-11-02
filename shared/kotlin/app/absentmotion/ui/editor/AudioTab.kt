@@ -291,21 +291,21 @@ private fun SoundLibrary(
     }
 }
 
-private val SortLabels = mapOf(SoundSort.Name to R.string.sounds_sort_name, SoundSort.Added to R.string.sounds_sort_added, SoundSort.Length to R.string.sounds_sort_length)
+internal val SortLabels = mapOf(SoundSort.Name to R.string.sounds_sort_name, SoundSort.Added to R.string.sounds_sort_added, SoundSort.Length to R.string.sounds_sort_length)
 
-private val GroupLabels = mapOf(
+internal val GroupLabels = mapOf(
     SoundGroup.Songs to R.string.sounds_tab_songs, SoundGroup.Albums to R.string.sounds_tab_albums,
     SoundGroup.Artists to R.string.sounds_tab_artists, SoundGroup.Folders to R.string.sounds_tab_folders,
 )
 
-private fun orderLabel(sort: SoundSort, descending: Boolean): Int = when (sort) {
+internal fun orderLabel(sort: SoundSort, descending: Boolean): Int = when (sort) {
     SoundSort.Name -> if (descending) R.string.sounds_order_za else R.string.sounds_order_az
     SoundSort.Added -> if (descending) R.string.sounds_order_newest else R.string.sounds_order_oldest
     SoundSort.Length -> if (descending) R.string.sounds_order_longest else R.string.sounds_order_shortest
 }
 
 @Composable
-private fun shelfLabel(shelf: SoundShelf, group: SoundGroup): String = shelf.label.ifEmpty {
+internal fun shelfLabel(shelf: SoundShelf, group: SoundGroup): String = shelf.label.ifEmpty {
     stringResource(when (group) { SoundGroup.Artists -> R.string.sounds_unknown_artist; SoundGroup.Folders -> R.string.sounds_unknown_folder; else -> R.string.sounds_unknown_album })
 }
 
@@ -346,7 +346,7 @@ private fun SoundRow(file: DeviceAudio, preview: SoundPreview, busy: Boolean, on
     }
 }
 
-private fun duration(ms: Long): String {
+internal fun duration(ms: Long): String {
     val s = ms / 1000
     return if (s >= 3600) "%d:%02d:%02d".format(java.util.Locale.ROOT, s / 3600, s / 60 % 60, s % 60) else "%02d:%02d".format(java.util.Locale.ROOT, s / 60, s % 60)
 }

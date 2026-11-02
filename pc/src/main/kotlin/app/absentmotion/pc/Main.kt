@@ -1,6 +1,8 @@
 package app.absentmotion.pc
 
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
@@ -19,6 +21,13 @@ import app.absentmotion.desk.DeskApp
 import app.absentmotion.desk.DeskAppState
 import app.absentmotion.desk.DeskBack
 import app.absentmotion.desk.DeskFiles
+import app.absentmotion.desk.DeskExportMini
+import app.absentmotion.desk.DeskInstance
+import app.absentmotion.desk.DeskOpen
+import app.absentmotion.desk.DeskOs
+import app.absentmotion.desk.DeskTaskbar
+import app.absentmotion.export.DeskExports
+import app.absentmotion.export.ExportRun
 import app.absentmotion.desk.DeskKeys
 import app.absentmotion.desk.DeskMenus
 import androidx.compose.ui.input.key.Key
@@ -47,6 +56,11 @@ fun main(args: Array<String>) {
             return
         }
     }
+    val files = DeskOpen.fromArguments(args)
+    if (!DeskOs.mac && files.isNotEmpty() && DeskInstance.forward(files)) return
+    DeskOpen.offer(files)
+    DeskOpen.listenForFiles()
+    DeskInstance.serve { DeskOpen.offer(it) }
     application {
         val size = java.awt.Toolkit.getDefaultToolkit().screenSize
         val prefs = remember { Preferences.userNodeForPackage(DesktopPlatform::class.java) }
@@ -57,13 +71,23 @@ fun main(args: Array<String>) {
         val state = rememberWindowState(position = WindowPosition(x.dp, y.dp), width = width.dp, height = height.dp)
         val desk = remember { DeskAppState() }
         val scope = rememberCoroutineScope()
-        val quit: () -> Unit = { scope.launch { desk.shutdown(); exitApplication() } }
+        remember { desk.quitNow = ::exitApplication }
         DisposableEffect(Unit) {
             val platform = runCatching { java.awt.Desktop.getDesktop().takeIf { java.awt.Desktop.isDesktopSupported() && it.isSupported(java.awt.Desktop.Action.APP_QUIT_HANDLER) } }.getOrNull()
-            platform?.setQuitHandler { _, response -> scope.launch { desk.shutdown(); response.performQuit() } }
-            onDispose { runCatching { platform?.setQuitHandler(null) } }
+            platform?.setQuitHandler { _, response ->
+                if (ExportRun.running) { response.cancelQuit(); desk.requestQuit() }
+                else scope.launch { if (desk.shutdown()) response.performQuit() else { response.cancelQuit(); desk.afterClose = desk.quitNow } }
+            }
+            val reopen = object : java.awt.desktop.AppReopenedListener { override fun appReopened(e: java.awt.desktop.AppReopenedEvent) { desk.hidden = false } }
+            val events = runCatching { java.awt.Desktop.getDesktop().takeIf { java.awt.Desktop.isDesktopSupported() && it.isSupported(java.awt.Desktop.Action.APP_EVENT_REOPENED) } }.getOrNull()
+            events?.addAppEventListener(reopen)
+            onDispose { runCatching { platform?.setQuitHandler(null) }; runCatching { events?.removeAppEventListener(reopen) } }
         }
-        Window(onCloseRequest = quit, title = "AbsentMotion", state = state,
+        LaunchedEffect(DeskExports.running, (DeskExports.fraction * 100).toInt()) { DeskTaskbar.progress(if (DeskExports.running) (DeskExports.fraction * 100).toInt() else null) }
+        if (desk.hidden) Window(onCloseRequest = desk::requestQuit, title = "AbsentMotion", state = rememberWindowState(position = WindowPosition(Alignment.Center), width = 460.dp, height = 220.dp), resizable = false) {
+            DeskExportMini(desk)
+        }
+        Window(onCloseRequest = desk::requestQuit, visible = !desk.hidden, title = "AbsentMotion", state = state,
             onPreviewKeyEvent = { it.type == KeyEventType.KeyDown && it.key == Key.Escape && DeskBack.back() || DeskKeys.handle(desk, it) },
             onKeyEvent = { app.absentmotion.desk.DeskGlobalKeys.handle(desk, it) }) {
             DeskFiles.window = window

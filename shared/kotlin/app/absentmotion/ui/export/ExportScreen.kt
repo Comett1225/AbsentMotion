@@ -378,7 +378,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
     app.absentmotion.platform.ExportBars(dark = false, running = phase is Phase.Running)
     BackHandler {
         when (phase) {
-            is Phase.Running -> (phase as? Phase.Running)?.job?.cancel()
+            is Phase.Running -> if (DESK) onClose() else (phase as? Phase.Running)?.job?.cancel()
             is Phase.Done -> phase = Phase.Idle
             Phase.Idle -> when {
                 audioPage -> audioPage = false
@@ -397,6 +397,10 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
 
     fun start(ignoreMissing: Boolean = false, aiReady: Boolean = false) {
         if (phase !is Phase.Idle || checking || !storageAccess.ready { start(ignoreMissing, aiReady) }) return
+        if (DESK && ExportRun.running) {
+            failure = Failure(R.string.export_failed_title, txt(R.string.desk_export_busy))
+            return
+        }
         if ((kind == ExportKind.Video || kind == ExportKind.Audio) && report == null && !reportTried) {
             reportTried = true
             checking = true
@@ -449,7 +453,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
         note = null
         val background = chosen in BackgroundKinds
         Log.i("AMExport", "start ${chosen.name.lowercase()} estimated ${timeMs ?: -1} ms, drawing ${drawMs ?: -1.0} ms per frame")
-        val job = scope.launch {
+        val job = app.absentmotion.platform.exportScope(scope).launch {
             var outcome: Boolean? = null
             try {
                 var exported = scene
@@ -480,8 +484,9 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
                 }
                 if (aiLevel != null && !AiSmooth.installed(context, aiLevel)) AiSmooth.download(context, aiLevel) { progress = it }
                 val began = System.nanoTime()
-                val result = exporter.export(chosen, exported, s, frame, name, { note = it }) { progress = it; ExportRun.progress = it }
+                val result = (if (background) Exporter(context, app.absentmotion.platform.exportEngine(engine), MediaStoreExport(context)) else exporter).export(chosen, exported, s, frame, name, { note = it }) { progress = it; ExportRun.progress = it }
                 outcome = true
+                if (background) app.absentmotion.platform.exportDone(result)
                 phase = Phase.Done(chosen, result)
                 timeKey(chosen)?.let { key -> modelled?.let { sizes.record(key, it, (System.nanoTime() - began) / 1_000_000) } }
                 ExportSizes.key(chosen, s)?.let { key ->
@@ -1358,7 +1363,11 @@ private fun DeskExport(
                                     exportHeatText(heat)?.let { Text(it.text(), color = Alert, fontSize = 15.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, maxLines = 3) }
                                         ?: note?.let { Text(it.text(), color = NoteGrey, fontSize = 14.sp, lineHeight = 19.sp, textAlign = TextAlign.Center, maxLines = 3) }
                                 }
-                                DeskButton(stringResource(R.string.cancel), false, onCancel)
+                                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                                    DeskButton(stringResource(R.string.cancel), false, onCancel)
+                                    if (phase.kind in BackgroundKinds) DeskButton(stringResource(R.string.desk_export_hide), true, onClose)
+                                }
+                                if (phase.kind in BackgroundKinds) Text(stringResource(R.string.desk_export_hide_note), Modifier.widthIn(max = 420.dp).padding(top = 14.dp), color = NoteGrey, fontSize = 12.sp, lineHeight = 16.sp, textAlign = TextAlign.Center)
                             }
                             is Phase.Done -> Column(Modifier.fillMaxSize().padding(32.dp), Arrangement.Center, Alignment.CenterHorizontally) {
                                 Box(Modifier.size(56.dp).clip(RoundedCornerShape(28.dp)).background(Navy), Alignment.Center) {

@@ -397,7 +397,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
     val target = if (named) known else state.keyTarget
     Row(modifier.tutorialGuard(any = true).background(Am.Panel)) {
         Column(Modifier.width(168.px).heightIn(max = PanelHeight).fillMaxHeight()) {
-            FrameButton(PanelIcons.Back, stringResource(R.string.topbar_back), Modifier.weight(1f).fillMaxWidth()) { state.stepBack() }
+            FrameButton(PanelIcons.Back, stringResource(R.string.topbar_back), Modifier.weight(1f).fillMaxWidth().tutorialTarget(if (app.absentmotion.platform.PlatformFeatures.desktop) "back" else null)) { state.stepBack() }
             if (target == null) {
                 FrameButton(PanelIcons.Keyframe, stringResource(R.string.a11y_add_keyframe), Modifier.weight(1f).fillMaxWidth().dimmed(), enabled = false)
                 FrameButton(PanelIcons.Easing, stringResource(R.string.a11y_easing), Modifier.weight(1f).fillMaxWidth().dimmed(), enabled = false)
@@ -441,7 +441,12 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
                 transformTabs(state.settings.basicTransform).forEach { i ->
                     val icon = icons[i]
                     val usable = i <= SIZE_TAB || selected.kind != "camera"
-                    Box(
+                    val tip = if (!app.absentmotion.platform.PlatformFeatures.desktop) "" else when (i) {
+                        SIZE_TAB -> deskShortcut(R.string.panel_size, "${DeskAlt}${stringResource(R.string.desk_scroll_key)}")
+                        ROTATE_TAB -> deskShortcut(R.string.a11y_tab_rotate, "${DeskShift}${DeskAlt}${stringResource(R.string.desk_scroll_key)}")
+                        else -> ""
+                    }
+                    DeskTip(tip) { Box(
                         Modifier.weight(1f).fillMaxWidth().then(if (usable) Modifier.clickable(role = androidx.compose.ui.semantics.Role.Tab) { tab = i } else Modifier.dimmed())
                             .semantics(mergeDescendants = true) { this.selected = tab == i }.padding(start = 10.px, end = 11.px, top = 5.px, bottom = 5.px),
                     ) {
@@ -458,7 +463,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
                                 autoSize = if (app.absentmotion.platform.PlatformFeatures.desktop) null else androidx.compose.foundation.text.TextAutoSize.StepBased(6.sp, 9.sp, 0.5.sp),
                             )
                         }
-                    }
+                    } }
                 }
             }
         }

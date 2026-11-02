@@ -49,6 +49,8 @@ import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.PressIndication
 import app.absentmotion.ui.theme.Presence
 import app.absentmotion.ui.theme.Swap
+import app.absentmotion.ui.tutorial.tutorialGuard
+import app.absentmotion.ui.tutorial.tutorialTarget
 
 private const val RailWidth = 56
 private const val InspectorRail = 44
@@ -130,12 +132,12 @@ private fun DeskWorkspaceBody(state: EditorState, onExit: () -> Unit, library: A
                     DeskDivider(true) { delta -> libraryWidth = (libraryNow + delta).coerceIn(LibraryMin, LibraryMax) }
                 } else DeskDivider(true, null)
                 Column(Modifier.weight(1f).fillMaxHeight()) {
-                    Box(Modifier.fillMaxWidth().weight(1f).onGloballyPositioned { val p = it.positionInWindow(); previewBounds = Rect(p, androidx.compose.ui.geometry.Size(it.size.width.toFloat(), it.size.height.toFloat())) }) {
+                    Box(Modifier.fillMaxWidth().weight(1f).tutorialTarget("preview").onGloballyPositioned { val p = it.positionInWindow(); previewBounds = Rect(p, androidx.compose.ui.geometry.Size(it.size.width.toFloat(), it.size.height.toFloat())) }) {
                         Preview(state, Modifier.fillMaxSize())
                         Presence(state.previewPanelOpen) { PreviewModePanel(state, Modifier.align(Alignment.CenterEnd)) }
                         HistoryNotes(state, Modifier.align(Alignment.BottomCenter))
                     }
-                    DeskTransport(state, Modifier.fillMaxWidth().height(40.dp))
+                    DeskTransport(state, Modifier.fillMaxWidth().height(40.dp).tutorialTarget("playbar").tutorialGuard(any = true))
                 }
                 if (inspectorShown) {
                     DeskDivider(true) { delta -> inspectorWidth = (inspectorNow - delta).coerceIn(InspectorMin, InspectorMax) }
@@ -146,7 +148,7 @@ private fun DeskWorkspaceBody(state: EditorState, onExit: () -> Unit, library: A
                 }
             }
             DeskDivider(false) { delta -> timelineFraction = (timelineFraction - with(density) { delta.dp.toPx() } / heightPx).coerceIn(.1f, .6f) }
-            Timeline(state, Modifier.fillMaxWidth().height(timelineHeight))
+            Timeline(state, Modifier.fillMaxWidth().height(timelineHeight).tutorialTarget("timeline"))
         }
         app.absentmotion.platform.BackHandler(!both && (soloLibrary || soloInspector)) { if (soloInspector) soloInspector = false else soloLibrary = false }
         DeskDropGhost { rootOrigin }
@@ -217,11 +219,11 @@ private fun DeskTopBar(state: EditorState, onExit: () -> Unit, onSettings: () ->
             }
             Text("${state.scene.width} × ${state.scene.height} · ${state.scene.fps} fps", Modifier.padding(start = 12.dp), color = Am.OnDarkDim, fontSize = 12.sp, maxLines = 1, softWrap = false)
         }
-        DeskIcon(ChromeIcons.Undo, deskShortcut(R.string.play_undo, "${DeskMod}Z"), state.canUndo) { state.undo() }
-        DeskIcon(ChromeIcons.Redo, deskShortcut(R.string.play_redo, DeskRedoKeys), state.canRedo) { state.redo() }
-        DeskIcon(ChromeIcons.Gear, stringResource(R.string.topbar_project_settings), action = onSettings)
+        Box(Modifier.tutorialTarget("undo")) { DeskIcon(ChromeIcons.Undo, deskShortcut(R.string.play_undo, "${DeskMod}Z"), state.canUndo) { state.undo() } }
+        Box(Modifier.tutorialTarget("redo")) { DeskIcon(ChromeIcons.Redo, deskShortcut(R.string.play_redo, DeskRedoKeys), state.canRedo) { state.redo() } }
+        Box(Modifier.tutorialTarget("gear")) { DeskIcon(ChromeIcons.Gear, stringResource(R.string.topbar_project_settings), action = onSettings) }
         Hint(deskShortcut(R.string.desk_export, "${DeskMod}E")) {
-            Box(Modifier.padding(start = 8.dp, end = 2.dp).height(32.dp).clip(RoundedCornerShape(8.dp)).background(Am.Accent).clickable { state.playing = false; state.exportOpen = true }.padding(horizontal = 16.dp), Alignment.Center) {
+            Box(Modifier.padding(start = 8.dp, end = 2.dp).height(32.dp).tutorialTarget("export").clip(RoundedCornerShape(8.dp)).background(Am.Accent).clickable { state.playing = false; state.exportOpen = true }.padding(horizontal = 16.dp), Alignment.Center) {
                 Text(stringResource(R.string.desk_export), color = Am.OnAccent, fontSize = 13.sp, fontWeight = FontWeight.Medium)
             }
         }
@@ -273,9 +275,9 @@ private fun DeskInspector(state: EditorState, library: AddLibrary, modifier: Mod
     var parentMenu by remember { mutableStateOf(false) }
     val textUi = remember { TextEditUi() }
     val layer = state.selected
-    Column(modifier.background(Am.Panel)) {
+    Column(modifier.background(Am.Panel).tutorialTarget("inspector")) {
         Row(Modifier.fillMaxWidth().height(44.dp).padding(start = 8.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-            if (state.selectedId != null && state.panel == EditorPanel.EditText) DeskIcon(ChromeIcons.Back, stringResource(R.string.topbar_back)) { state.stepBack() }
+            if (state.selectedId != null && state.panel == EditorPanel.EditText) Box(Modifier.tutorialTarget("back")) { DeskIcon(ChromeIcons.Back, stringResource(R.string.topbar_back)) { state.stepBack() } }
             else if (layer != null && !MultiSelect.active) Icon(deskLayerIcon(layer), null, Modifier.padding(start = 4.dp).size(20.dp), tint = Am.OnDarkDim)
             if (layer != null && !MultiSelect.active) key(layer.id) { DeskNameField(layer.label, Modifier.weight(1f).padding(horizontal = 2.dp)) { state.renameLayer(layer.id, it) } }
             else Text(
@@ -302,7 +304,7 @@ private fun DeskInspector(state: EditorState, library: AddLibrary, modifier: Mod
 
 @Composable
 private fun DeskLayerArea(state: EditorState, modifier: Modifier) {
-    Box(modifier) {
+    Box(modifier.tutorialTarget(if (state.panel == EditorPanel.Tools) "tools" else "panel")) {
         Swap(
             when {
                 state.volumeOpen && state.panel == EditorPanel.Tools -> "volume" to state.easingOpen
