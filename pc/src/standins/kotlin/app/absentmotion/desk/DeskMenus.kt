@@ -10,6 +10,7 @@ import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.MenuBar
 import app.absentmotion.editor.MultiSelect
 import app.absentmotion.editor.copySelected
+import app.absentmotion.editor.chosenLayers
 import app.absentmotion.editor.deleteChosen
 import app.absentmotion.editor.deleteSelected
 import app.absentmotion.editor.duplicateChosen
@@ -53,7 +54,7 @@ fun FrameWindowScope.DeskMenus(app: DeskAppState) {
             Item("Undo", enabled = editor?.canUndo == true) { editor?.undo() }
             Item("Redo", enabled = editor?.canRedo == true) { editor?.redo() }
             Separator()
-            Item("Copy Layer", enabled = editor?.selectedId != null) { editor?.copySelected() }
+            Item("Copy Layer", enabled = editor?.chosenLayers?.isNotEmpty() == true) { editor?.copySelected() }
             Item("Paste Layer", enabled = editor != null) { editor?.pasteLayer() }
             Item("Duplicate", enabled = editor?.selectedId != null || MultiSelect.active) { editor?.let { if (MultiSelect.active) it.duplicateChosen() else it.duplicateSelected() } }
             Item("Split at Playhead", enabled = editor?.selectedId != null || MultiSelect.active) { editor?.split() }
