@@ -1,6 +1,11 @@
 {
   "version": 1,
-  "statuses": ["works", "missing", "partial", "untested"],
+  "statuses": [
+    "works",
+    "missing",
+    "partial",
+    "untested"
+  ],
   "platforms": {
     "android": "reference build",
     "macos": "built and used every day; desktop UI tests run here",
@@ -8,165 +13,1455 @@
     "linux": "not built or tested yet (needs a Linux Skia build)"
   },
   "features": [
-    {"id": "tool.speed", "name": "Speed panel: retime buttons, speed ruler, curve editor, presets, freeze frame", "where": "LayerTools.kt, panels/SpeedPanel.kt, SpeedCurvePanel.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "The Smooth clip and Reverse chips inside it are AI (ai.smooth_clip, ai.reverse) and are not hidden by PlatformFeatures.ai"},
-    {"id": "tool.trim_split", "name": "Trim start, Split, Trim end, Move to playhead tiles", "where": "LayerTools.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "tool.volume", "name": "Volume panel with audio effects", "where": "VolumePanel.kt, AudioEffectsPanel.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "audio effects run in the shared native FX chain (amdesktop); Reduce Noise is ai.noise"},
-    {"id": "tool.fill", "name": "Fill colour, gradient, full colour picker, eyedropper", "where": "panels/ColorFillPanel.kt, GradientPanel.kt, FullColorPicker.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "tool.border_shadow", "name": "Border and shadow panel", "where": "panels/BorderShadowPanel.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "tool.blending", "name": "Opacity and blend modes", "where": "panels/BlendingPanel.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "tool.transform", "name": "Transform panel: move, rotate, size, tilt, skew, pivot, keypad, Basic/Advanced controls", "where": "panels/MoveTransformPanel.kt, LayerTools.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "long-press on the tile is right-click on desktop; the number keypad takes the keyboard"},
-    {"id": "tool.shape_options", "name": "Shape options panel", "where": "panels/EditShapePanel.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "tool.edit_text", "name": "Edit text with font browser, on-canvas wrap handle", "where": "TextEditor.kt, FontBrowser.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "embedded in the inspector on desktop"},
-    {"id": "tool.edit_points", "name": "Edit points (path point editor)", "where": "PointEditor.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "tool.edit_drawing", "name": "Edit drawing (brush, pen, eraser, fill, shape keyframes)", "where": "DrawingEditor.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "opened as a full-window dialog; mouse has constant pressure (no stylus pressure)"},
-    {"id": "tool.group", "name": "Edit group, Ungroup, group breadcrumbs", "where": "LayerTools.kt, EditorMenus.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "tool.asset_props", "name": "Asset properties, Open original of a linked asset", "where": "ElementUi.kt, editor/ElementActions.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "DeskAppState.startup now sets ElementNav.open (it was never set before, so Open original was disabled)"},
-    {"id": "tool.cutout_edge", "name": "Cut-out edge panel", "where": "panels/EdgePanel.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "shown only for layers carrying a cut-out mark (imported from a phone project); creating one is ai.bg_removal"},
-    {"id": "tool.presets", "name": "Presets browser", "where": "PresetScreen.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "browsing and applying work; saving a preset is menu.copy_paste"},
-    {"id": "tool.effects", "name": "Effects panel and effect browser", "where": "panels/EffectsPanel.kt, effects/EffectBrowser.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "Datamosh needs fx.datamosh; the AI category is ai.effects_category"},
-    {"id": "tool.crop", "name": "Crop panel and overlay", "where": "panels/CropPanel.kt, CropOverlay.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "tool.screenshot", "name": "Screenshot of a video frame into the project", "where": "editor/FrameScreenshot.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "saves to the pictures folder through DeskExportStore"},
-    {"id": "tool.camera_layer", "name": "3D camera layer: options, camera moves, camera view", "where": "panels/CameraPanel.kt, MotionSheets.kt, PreviewMode.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "tool.model_layer", "name": "3D model layer options", "where": "panels/ModelPanel.kt", "android": "works", "macos": "missing", "windows": "missing", "linux": "missing", "note": "DeskEngineThread.setModel returns false and the desktop JNI has no model upload, so models never draw (add.model3d)"},
-    {"id": "tool.keyframes", "name": "Keyframes and easing panel", "where": "panels/EasingPanel.kt, LayerTools.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "tool.animate", "name": "Animation sheet, Animate button, transitions between clips", "where": "MotionSheets.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "tool.history_notes", "name": "Undo and redo notes", "where": "HistoryNotes.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "ai.effects_category", "name": "AI effects category in the effect browser", "where": "effects/EffectBrowser.kt, effects/AiBrowser.kt, effects/EffectCatalog.kt", "android": "works", "macos": "missing", "windows": "missing", "linux": "missing", "note": "hidden: PlatformFeatures.ai is false on desktop", "gate": "ai", "files": ["shared/kotlin/app/absentmotion/effects/EffectCatalog.kt", "shared/kotlin/app/absentmotion/ui/editor/effects/EffectBrowser.kt"]},
-    {"id": "ai.layer_tiles", "name": "AI tools, Auto captions and Reverse tiles on a layer", "where": "LayerTools.kt", "android": "works", "macos": "missing", "windows": "missing", "linux": "missing", "note": "hidden: PlatformFeatures.ai is false on desktop", "gate": "ai", "files": ["shared/kotlin/app/absentmotion/ui/editor/LayerTools.kt"]},
-    {"id": "ai.bg_removal", "name": "Remove background (image and video), cut-out quality", "where": "ai/BackgroundRemoval, ai/AiTools.kt, ai/BestCutout.kt", "android": "works", "macos": "missing", "windows": "missing", "linux": "missing", "note": "DeskBackgroundRemoval throws ModelNotReady; AVAILABLE is false", "standins": ["pc/src/standins/kotlin/app/absentmotion/ai/DeskBackgroundRemoval.kt"]},
-    {"id": "ai.captions", "name": "Auto captions (Whisper)", "where": "CaptionsSheet.kt, ai/Captions.kt", "android": "works", "macos": "missing", "windows": "missing", "linux": "missing", "note": "loadCaptionLibrary throws; the Add > Text > Captions tile is NOT gated, so it opens a sheet that fails on Generate", "standins": ["pc/src/standins/kotlin/app/absentmotion/platform/DesktopPlatform.kt"]},
-    {"id": "ai.reverse", "name": "Reverse clip", "where": "ai/ClipReverse.kt, panels/SpeedPanel.kt", "android": "works", "macos": "missing", "windows": "missing", "linux": "missing", "note": "Speed panel chip is shown on desktop; the action needs MediaCodec (not available)"},
-    {"id": "ai.smooth_clip", "name": "AI Smooth clip", "where": "ai/ClipSmooth.kt, ai/AiSmooth.kt, panels/SpeedPanel.kt", "android": "works", "macos": "missing", "windows": "missing", "linux": "missing", "note": "Speed panel chip and the speed-curve toggle are shown on desktop; needs ncnn model and MediaCodec"},
-    {"id": "ai.enhance", "name": "AI Enhance (upscale)", "where": "ai/AiEnhance.kt", "android": "works", "macos": "missing", "windows": "missing", "linux": "missing", "note": "needs ncnn libabsent_ai; not built for desktop"},
-    {"id": "ai.noise", "name": "Reduce noise (audio)", "where": "ai/NoiseReduction.kt", "android": "works", "macos": "missing", "windows": "missing", "linux": "missing", "note": "denoise_jni.cpp and rnnoise are not in the desktop native library"},
-    {"id": "ai.models_settings", "name": "AI model download, delete and GPU settings", "where": "SettingsDrawer.kt", "android": "works", "macos": "missing", "windows": "missing", "linux": "missing", "note": "rows appear only when a model exists, so nothing shows on desktop"},
-    {"id": "menu.layer", "name": "Layer menu: save to assets, flip, crop, fit/fill/stretch, clipping mask, convert to outline, extract audio, mark beats, media info, label colour", "where": "EditorMenus.kt LayerMenu", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "inspector header ⋮ button"},
-    {"id": "menu.copy_paste", "name": "Copy/Paste menu: select all, duplicate, save preset, copy, paste, paste style, set intro and outro", "where": "EditorMenus.kt CopyPasteMenu, desk/DeskWorkspace.kt DeskTransport", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "PlayBar is not used on desktop, so the transport bar has its own Copy and paste button; Cut is Cmd/Ctrl+X and the Edit menu"},
-    {"id": "menu.parent", "name": "Link layer to a parent", "where": "StructureUi.kt ParentMenu, desk/DeskWorkspace.kt DeskInspector", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "parent button in the inspector header (it was missing: EditorTopBar is not used on desktop)"},
-    {"id": "menu.multi", "name": "Multi-select actions: group, mask/exclude group, link parent, delete, align, distribute, effects to all, paste style, align times", "where": "StructureUi.kt MultiTopBar, MultiBar, desk/DeskMulti.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "inspector tiles; group, mask, exclude, link parent, delete, align and distribute tiles were missing (only the bottom-bar actions existed)"},
-    {"id": "menu.project_settings", "name": "Project settings: aspect, resolution, frame rate, background, versions, precompose, retiming", "where": "EditorMenus.kt, desk/DeskProject.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "menu.rename", "name": "Rename project and layer", "where": "EditorTopBar.kt NameField, desk/DeskChrome.kt DeskNameField", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "name fields in the inspector (the project had no rename at all on desktop); the timeline right-click Rename also works"},
-    {"id": "menu.transform_more", "name": "Transform tab menu: reset one, reset all, Basic/Advanced", "where": "EditorMenus.kt TransformMenu", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "menu.version_history", "name": "Earlier versions (version history)", "where": "ProjectSafetyUi.kt VersionHistory", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "add.shapes", "name": "Add shape", "where": "AddPopup.kt, desk/DeskLibrary.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "add.media", "name": "Add photos and videos", "where": "MediaTab.kt, desk/DeskMedia.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "lists linked folders and picked files instead of the phone gallery; drag to timeline works"},
-    {"id": "add.audio", "name": "Add sounds with preview", "where": "AudioTab.kt, desk/DeskMedia.kt", "android": "works", "macos": "partial", "windows": "partial", "linux": "partial", "note": "flat searchable list; the phone View all browser with Songs, Albums, Artists, Folders and sort is missing"},
-    {"id": "add.tts", "name": "Text to speech", "where": "VoiceSheet.kt, platform Speech", "android": "works", "macos": "missing", "windows": "missing", "linux": "missing", "note": "being built by another helper (DeskSpeech has no voices and toFile throws)", "standins": ["pc/src/standins/kotlin/app/absentmotion/desk/Desk.kt"]},
-    {"id": "add.text", "name": "Add text", "where": "AddPopup.kt QuickBar", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "add.captions", "name": "Add captions entry", "where": "AddPopup.kt QuickBar, CaptionsSheet.kt", "android": "works", "macos": "missing", "windows": "missing", "linux": "missing", "note": "same as ai.captions; the tile is visible on desktop"},
-    {"id": "add.freehand", "name": "Freehand brush and Pen tool", "where": "AddPopup.kt QuickBar, DrawingEditor.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "add.objects", "name": "Camera, Null, Empty group", "where": "StructureUi.kt ObjectPage", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "add.asset_project", "name": "Add an asset project", "where": "StructureUi.kt ElementPicker", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "add.svg", "name": "Import SVG", "where": "StructureUi.kt importSvgFile", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "add.model3d", "name": "Import 3D model (OBJ, GLB, glTF)", "where": "StructureUi.kt importModel", "android": "works", "macos": "partial", "windows": "partial", "linux": "partial", "note": "import and layer work; rendering is missing (tool.model_layer)"},
-    {"id": "add.template", "name": "Add a saved template", "where": "AddPopup.kt, desk/DeskEmbed.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "add.gif", "name": "Import animated GIF", "where": "MediaTab.kt addGif, media/GifVideo.kt", "android": "works", "macos": "missing", "windows": "missing", "linux": "missing", "note": "verified: gifVideo needs android.media.MediaCodecList, which does not exist at runtime on desktop (NoClassDefFoundError); the import now shows the failed toast instead of killing the editor scope; convert with ffmpeg instead"},
-    {"id": "add.device_camera", "name": "Take a photo or video with the device camera", "where": "ui/camera/CameraScreen.kt, MediaTab.kt", "android": "works", "macos": "missing", "windows": "missing", "linux": "missing", "note": "PlatformFeatures.camera is false; DeskCamera closes at once (webcam capture not built)", "gate": "camera", "files": ["shared/kotlin/app/absentmotion/ui/editor/MediaTab.kt"]},
-    {"id": "add.drag_to_timeline", "name": "Drag a library tile to the timeline or preview", "where": "desk/DeskLibrary.kt, DeskDrop.kt", "android": "missing", "macos": "works", "windows": "untested", "linux": "untested", "note": "desktop only by design (phone taps to add)"},
-    {"id": "add.link_folder", "name": "Link a media folder", "where": "desk/DeskMedia.kt, DeskLibrary", "android": "missing", "macos": "works", "windows": "untested", "linux": "untested", "note": "desktop only by design (phone reads the gallery)"},
-    {"id": "preview.select_move", "name": "Tap to select, drag to move, corner and edge handles to scale", "where": "Preview.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "preview.pinch_gestures", "name": "Two-finger move, scale and rotate of the selected layer", "where": "Preview.kt", "android": "works", "macos": "partial", "windows": "partial", "linux": "partial", "note": "no mouse equivalent of the two-finger scale/rotate; handles and the Transform tab cover it"},
-    {"id": "preview.canvas_zoom_pan", "name": "Pinch/drag to zoom and pan the canvas, double two-finger tap to reset", "where": "Preview.kt, PreviewMode.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "Ctrl/Cmd+wheel zooms at the cursor, wheel pans, dragging empty canvas pans; before this it needed two touch pointers"},
-    {"id": "preview.mode_panel", "name": "Preview modes: pixel, grid, solo, camera view, quality, motion blur, pre-render", "where": "PreviewMode.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "preview.crop_overlay", "name": "Crop overlay with drag handles and aspect lock", "where": "CropOverlay.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "preview.point_editors", "name": "Pivot, path point, puppet pin and gradient handle editors", "where": "PointEditor.kt, GradientHandles.kt, panels/PathPins.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "preview.eyedropper", "name": "Eyedropper loupe", "where": "panels/FullColorPicker.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "reads the preview through readPreviewPixel"},
-    {"id": "preview.motion_tracking", "name": "Track motion of a video clip", "where": "TrackEditor.kt, editor/TrackActions.kt, media/MotionTracker.kt", "android": "works", "macos": "missing", "windows": "missing", "linux": "missing", "note": "reachable from the layer menu; the tracker JNI (tracker_jni.cpp) and FrameReader (MediaCodec) are not in the desktop build"},
-    {"id": "preview.prerender", "name": "Pre-render the preview", "where": "RenderPreview.kt, editor/PreviewCache.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "preview.text_box", "name": "Text box width handle on the canvas", "where": "Preview.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "tl.clips", "name": "Move, trim, stretch clips; multi-select; rubber-band select", "where": "Timeline.kt desktopTimelineGestures", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "tl.layers", "name": "Reorder layers, hide, rename, group rows, label colours", "where": "Timeline.kt, Reorder.kt, RowDrag.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "tl.keyframes", "name": "Keyframe diamonds, drag and select", "where": "Timeline.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "tl.zoom_scroll", "name": "Timeline zoom, pan, fit, scrub", "where": "Timeline.kt, desk/DeskTimelineControls.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "tl.bookmarks", "name": "Bookmarks", "where": "Timeline.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "tl.context_menu", "name": "Timeline right-click menu: cut, copy, paste, duplicate, split, delete, group, hide, rename, forward, backward, bookmark, select all", "where": "Timeline.kt DesktopTimelineMenu", "android": "missing", "macos": "works", "windows": "untested", "linux": "untested", "note": "desktop replacement for the phone long-press and bottom bars"},
-    {"id": "tl.thumbnails", "name": "Video strips and waveforms on clips", "where": "Timeline.kt, VideoThumbnails.kt, AudioTimeline.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "tl.snapping", "name": "Snap to playhead, clip edges and bookmarks", "where": "Timeline.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "hold Alt to disable on desktop"},
-    {"id": "tl.transitions", "name": "Transition between two clips", "where": "MotionSheets.kt TransitionButton", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "editor.autosave", "name": "Autosave, undo and redo that survive closing, version snapshots", "where": "library/SaveQueue.kt, ProjectVersions.kt, editor/EditorState.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "ProjectSaver writes on every edit; a crash restore is home.recovery"},
-    {"id": "dk.drop_files", "name": "Drop media or project files from the file manager into the window", "where": "desk/DeskApp.kt DeskDrop", "android": "missing", "macos": "works", "windows": "untested", "linux": "untested", "note": "desktop only by design"},
-    {"id": "export.video", "name": "Video export: H.264, H.265, AV1, VP9, APV in MP4, MOV, WebM, MKV", "where": "ui/export/ExportScreen.kt, STANDINS DeskVideoExport", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "encoded by ffmpeg; hardware encoders are picked per OS (VideoToolbox, NVENC/QSV/AMF/MF); APV needs liboapv in the ffmpeg build"},
-    {"id": "export.gif", "name": "GIF export", "where": "ExportScreen.kt, GifWriter.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "export.frame", "name": "Single frame export (PNG, JPEG, WebP, lossless WebP, BMP)", "where": "ExportScreen.kt, ImageEncode.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "export.sequence", "name": "Image sequence export", "where": "ExportScreen.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "export.audio", "name": "Audio-only export (WAV 16/24, FLAC, M4A, OGG, MP3)", "where": "ExportScreen.kt, DeskAudioExport.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "export.package", "name": "Project package and XML export", "where": "ExportScreen.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "export.smoothing", "name": "Frame smoothing (blend, flow, AI) and video motion blur on export", "where": "ExportScreen.kt, ExportOptions.kt Smoothing", "android": "works", "macos": "missing", "windows": "missing", "linux": "missing", "note": "the controls are shown, but DeskEngineThread.exportSession ignores the Smoothing argument"},
-    {"id": "export.result_viewer", "name": "Play the exported file in the app", "where": "ui/export/ExportPreview.kt, DeskMediaViewer.kt, DeskExportPreview.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "DeskUxTest.exportViewer covers it"},
-    {"id": "export.from_list", "name": "Export from the project list", "where": "HomeScreen.kt, ExportScreen.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "export.share", "name": "Share the result", "where": "platform shareExport", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "reveals the file in the file manager instead of an OS share sheet"},
-    {"id": "export.background_service", "name": "Keep exporting in the background with a notification", "where": "export/ExportService.kt", "android": "works", "macos": "missing", "windows": "missing", "linux": "missing", "note": "export runs inside the window and stops when it closes; no tray or notification"},
-    {"id": "export.save_template", "name": "Save the project as a template", "where": "ExportScreen.kt, TemplateStore.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "home.projects", "name": "Project list: cards, thumbnails, search, sort", "where": "HomeScreen.kt, desk Home", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "home.assets", "name": "Assets tab (reusable asset projects)", "where": "HomeScreen.kt, desk Home", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "home.templates", "name": "Templates and presets tab with rename and delete", "where": "TemplatesTab.kt, DeskHome.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "home.tools_compress", "name": "Tools tab: Compress video", "where": "ToolsTab.kt, CompressScreen.kt, tools/Compressor.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "DeskCompress runs ffmpeg"},
-    {"id": "home.tools_downloader", "name": "Tools tab: Video downloader (YouTube, TikTok, Instagram)", "where": "ToolsTab.kt, tools/VideoDownloader.kt, PyEngine.kt", "android": "works", "macos": "missing", "windows": "missing", "linux": "missing", "note": "hidden on desktop; needs a bundled yt-dlp instead of the Android Python bundle"},
-    {"id": "home.new_project", "name": "New project and new asset sheet", "where": "NewProjectSheet.kt, DeskNewProject.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "home.project_menu", "name": "Project menu: export, duplicate, collect media, version history, delete", "where": "HomeScreen.kt ProjectCard, DeskHome.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "Collect media was missing on desktop; DeskAppState.collectMedia copies linked files into the project"},
-    {"id": "home.import", "name": "Import project files (.amproj, XML, ZIP, templates), drag and drop", "where": "Importer.kt, DeskApp.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "home.open_with", "name": "Open a file from the OS (Open with, share)", "where": "android ImportActivity.kt, pc Main.kt", "android": "works", "macos": "missing", "windows": "missing", "linux": "missing", "note": "argv and the macOS open-file event are ignored; use File > Import or drag and drop"},
-    {"id": "home.settings", "name": "Settings: editor, playback, projects, backup, updates", "where": "SettingsDrawer.kt, DeskSettings.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "home.language", "name": "Language (16 languages)", "where": "DeskSettings.kt DeskLanguages", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "a restart is needed on desktop"},
-    {"id": "home.help", "name": "Help pages", "where": "HelpScreen.kt, DeskHelpPage.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "home.about", "name": "About and licences", "where": "AboutScreen.kt, DeskPages.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "home.crash_logs", "name": "Crash logs page", "where": "CrashLogsUi.kt, library/CrashLogs.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "CrashLogs.install now runs at start (it never did, so the page was always empty); the 'closed unexpectedly' notice for a crash is not shown"},
-    {"id": "home.recovery", "name": "Restore unsaved edits after a crash", "where": "ProjectSafetyUi.kt ClosedDialog, library/Recovery.kt, desk/DeskApp.kt DeskRecovery", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "DeskAppState.startup installs RecoveryHandler and offers Recovery.pending (ProjectSaver wrote recovery files but nothing asked for them)"},
-    {"id": "home.backup", "name": "Back up and restore all projects, weekly backup", "where": "BackupUi.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "DeskAppState.maintain now runs the weekly backup and the storage sweeps (only MainActivity ran them, so the Weekly backup switch did nothing on desktop)"},
-    {"id": "home.updates", "name": "Update check and install", "where": "UpdateCheck.kt, DeskUpdater.kt", "android": "works", "macos": "partial", "windows": "partial", "linux": "partial", "note": "checks the release feed and opens the download page; no in-app install or signature check"},
-    {"id": "home.onboarding", "name": "First-run welcome and permissions", "where": "ui/onboarding/Onboarding.kt, PhoneCheck.kt", "android": "works", "macos": "missing", "windows": "missing", "linux": "missing", "note": "DeskApp never shows Onboarding"},
-    {"id": "home.tutorial", "name": "Guided tour and tutorial rows", "where": "ui/tutorial/*, SettingsDrawer.kt TutorialRows", "android": "works", "macos": "missing", "windows": "missing", "linux": "missing", "note": "TutorialHost is not mounted on desktop and the settings page has no tutorial rows"},
-    {"id": "home.missing_fonts", "name": "Offer to download missing Google fonts when opening a project", "where": "MainActivity offerFonts", "android": "works", "macos": "missing", "windows": "missing", "linux": "missing", "note": "DeskApp does not check project fonts at open"},
-    {"id": "home.save_failed", "name": "Warn when the project cannot be saved on close", "where": "MainActivity closeEditor", "android": "works", "macos": "partial", "windows": "partial", "linux": "partial", "note": "DeskAppState.closeNow closes anyway and shows a toast"},
-    {"id": "set.theme", "name": "Custom theme file", "where": "SettingsDrawer.kt ThemeRow", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "set.layer_length", "name": "New layer length", "where": "SettingsDrawer.kt DurationRow", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "set.transition_preview", "name": "Transition button placement", "where": "SettingsDrawer.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "set.emoji", "name": "Emoji style (system or bundled Noto)", "where": "SettingsDrawer.kt, fonts/", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "macOS draws Apple Color Emoji (DeskEmojiTest); Windows and Linux rely on the system emoji font or the bundled one"},
-    {"id": "set.preview_quality", "name": "Preview quality, audio resampling, preview copies", "where": "SettingsDrawer.kt PlaybackSettings", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "set.keep_media", "name": "Keep copies of media in the project", "where": "SettingsDrawer.kt ProjectsSettings", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": ""},
-    {"id": "set.vibration", "name": "Vibration", "where": "SettingsDrawer.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "not applicable: hidden on desktop by design"},
-    {"id": "set.graphics", "name": "Graphics API choice (OpenGL)", "where": "SettingsDrawer.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "not applicable: hidden on desktop (Metal on macOS, Vulkan on Windows and Linux)"},
-    {"id": "fx.datamosh", "name": "Datamosh effect", "where": "shared/assets/effects/datamosh.json, media/VideoLibrary mosh", "android": "works", "macos": "missing", "windows": "missing", "linux": "missing", "note": "DeskEngineThread.moshStart and moshFrame are stubs; interpolation.cpp is not in the desktop library"},
-    {"id": "fx.slowmo_smoothing", "name": "Smooth slow motion of video clips in preview (blend or flow)", "where": "media/VideoLibrary interpolateVideo", "android": "works", "macos": "missing", "windows": "missing", "linux": "missing", "note": "interpolateVideo is a stub on desktop; clips show the nearest frame"},
-    {"id": "fx.blur_and_particles", "name": "Native effects: blur, glow, particles, 3D pieces, warp, text animation", "where": "effects/, shared/cpp", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "all compiled into the desktop library except interpolation and model upload"},
-    {"id": "plat.audio_playback", "name": "Audio playback with effects and sync clock", "where": "STANDINS audio/DeskAudioEngine.kt, DeskOutput.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "macOS reads the CoreAudio output latency; Windows and Linux use the Java mixer latency (untested)"},
-    {"id": "plat.video_decode", "name": "Video decode for preview", "where": "pc/native video.cpp, VideoSource.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "macOS VideoToolbox; Windows D3D11 hardware decode and copy; Linux VA-API (not built); ffmpeg software fallback everywhere"},
-    {"id": "plat.gpu", "name": "GPU rendering of the preview", "where": "pc/native gpu.h", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "Metal on macOS; Vulkan on Windows and Linux; Linux not built yet"},
-    {"id": "plat.native_build", "name": "Native engine builds (Skia engine, JNI glue, libav)", "where": "pc/native, macos/, windows/, linux/", "android": "works", "macos": "works", "windows": "works", "linux": "missing", "note": "Linux scripts (linux/build.sh, linux.cmake) exist but were never run; they need a Linux Skia build (tools/build_skia.sh)"},
-    {"id": "plat.installer", "name": "Installable app: macOS bundle, Windows installer, Linux package", "where": "pc/build.gradle.kts createDistributable, macos/build.sh, windows/build.ps1", "android": "works", "macos": "works", "windows": "untested", "linux": "missing", "note": "the macOS bundle is codesigned by macos/build.sh; the Windows installer still needs a test on the PC's own screen; there is no Linux package yet"},
-    {"id": "plat.menu_bar", "name": "Menu bar with shortcuts", "where": "desk/DeskMenus.kt", "android": "missing", "macos": "works", "windows": "untested", "linux": "untested", "note": "native menu bar on macOS; an in-window menu bar on Windows and Linux (untested there)"},
-    {"id": "plat.file_dialogs", "name": "Open and save dialogs, reveal in file manager", "where": "desk/Desk.kt DeskFiles, DeskOs", "android": "missing", "macos": "works", "windows": "untested", "linux": "untested", "note": "java.awt.FileDialog everywhere; reveal uses open -R, explorer /select, xdg-open"},
-    {"id": "plat.keyboard", "name": "Keyboard shortcuts (Cmd or Ctrl)", "where": "desk/DeskKeys.kt", "android": "missing", "macos": "works", "windows": "untested", "linux": "untested", "note": "Cmd on macOS, Ctrl on Windows and Linux; AltGr is ignored on Windows; Cut (X) was added"},
-    {"id": "plat.right_click", "name": "Right-click for phone long-press actions: Transform controls, effect details, delete imported font, remove pre-render", "where": "LayerTools.kt, effects/EffectBrowser.kt, FontBrowser.kt, RenderPreview.kt, desk/DeskChrome.kt rightClick", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "effect details, font delete and pre-render remove only answered to a held click before"},
-    {"id": "plat.system_fonts", "name": "System fonts in the font browser", "where": "fonts/, desk fonts", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "untested outside macOS"},
-    {"id": "plat.android_codec_api", "name": "Android MediaCodec export and decode classes", "where": "STANDINS DeskVideoExport.kt, DeskEngineThread.kt, android/media/MediaExtractor.kt", "android": "works", "macos": "works", "windows": "untested", "linux": "untested", "note": "not applicable: desktop exports and decodes through ffmpeg and libav; the stubs throw if an Android-only path is entered by mistake", "standins": ["pc/src/standins/kotlin/app/absentmotion/export/DeskVideoExport.kt", "pc/src/standins/kotlin/app/absentmotion/engine/DeskEngineThread.kt", "pc/src/standins/kotlin/android/media/MediaExtractor.kt"]}
+    {
+      "id": "tool.speed",
+      "name": "Speed panel: retime buttons, speed ruler, curve editor, presets, freeze frame",
+      "where": "LayerTools.kt, panels/SpeedPanel.kt, SpeedCurvePanel.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "The Smooth clip and Reverse chips inside it are AI (ai.smooth_clip, ai.reverse) and are not hidden by PlatformFeatures.ai"
+    },
+    {
+      "id": "tool.trim_split",
+      "name": "Trim start, Split, Trim end, Move to playhead tiles",
+      "where": "LayerTools.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "tool.volume",
+      "name": "Volume panel with audio effects",
+      "where": "VolumePanel.kt, AudioEffectsPanel.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "audio effects run in the shared native FX chain (amdesktop); Reduce Noise is ai.noise"
+    },
+    {
+      "id": "tool.fill",
+      "name": "Fill colour, gradient, full colour picker, eyedropper",
+      "where": "panels/ColorFillPanel.kt, GradientPanel.kt, FullColorPicker.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "tool.border_shadow",
+      "name": "Border and shadow panel",
+      "where": "panels/BorderShadowPanel.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "tool.blending",
+      "name": "Opacity and blend modes",
+      "where": "panels/BlendingPanel.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "tool.transform",
+      "name": "Transform panel: move, rotate, size, tilt, skew, pivot, keypad, Basic/Advanced controls",
+      "where": "panels/MoveTransformPanel.kt, LayerTools.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "long-press on the tile is right-click on desktop; the number keypad takes the keyboard"
+    },
+    {
+      "id": "tool.shape_options",
+      "name": "Shape options panel",
+      "where": "panels/EditShapePanel.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "tool.edit_text",
+      "name": "Edit text with font browser, on-canvas wrap handle",
+      "where": "TextEditor.kt, FontBrowser.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "embedded in the inspector on desktop"
+    },
+    {
+      "id": "tool.edit_points",
+      "name": "Edit points (path point editor)",
+      "where": "PointEditor.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "tool.edit_drawing",
+      "name": "Edit drawing (brush, pen, eraser, fill, shape keyframes)",
+      "where": "DrawingEditor.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "opened as a full-window dialog; mouse has constant pressure (no stylus pressure)"
+    },
+    {
+      "id": "tool.group",
+      "name": "Edit group, Ungroup, group breadcrumbs",
+      "where": "LayerTools.kt, EditorMenus.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "tool.asset_props",
+      "name": "Asset properties, Open original of a linked asset",
+      "where": "ElementUi.kt, editor/ElementActions.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "DeskAppState.startup now sets ElementNav.open (it was never set before, so Open original was disabled)"
+    },
+    {
+      "id": "tool.cutout_edge",
+      "name": "Cut-out edge panel",
+      "where": "panels/EdgePanel.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "shown only for layers carrying a cut-out mark (imported from a phone project); creating one is ai.bg_removal"
+    },
+    {
+      "id": "tool.presets",
+      "name": "Presets browser",
+      "where": "PresetScreen.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "browsing and applying work; saving a preset is menu.copy_paste"
+    },
+    {
+      "id": "tool.effects",
+      "name": "Effects panel and effect browser",
+      "where": "panels/EffectsPanel.kt, effects/EffectBrowser.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "Datamosh needs fx.datamosh; the AI category is ai.effects_category"
+    },
+    {
+      "id": "tool.crop",
+      "name": "Crop panel and overlay",
+      "where": "panels/CropPanel.kt, CropOverlay.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "tool.screenshot",
+      "name": "Screenshot of a video frame into the project",
+      "where": "editor/FrameScreenshot.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "saves to the pictures folder through DeskExportStore"
+    },
+    {
+      "id": "tool.camera_layer",
+      "name": "3D camera layer: options, camera moves, camera view",
+      "where": "panels/CameraPanel.kt, MotionSheets.kt, PreviewMode.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "tool.model_layer",
+      "name": "3D model layer options",
+      "where": "panels/ModelPanel.kt",
+      "android": "works",
+      "macos": "missing",
+      "windows": "missing",
+      "linux": "missing",
+      "note": "DeskEngineThread.setModel returns false and the desktop JNI has no model upload, so models never draw (add.model3d)"
+    },
+    {
+      "id": "tool.keyframes",
+      "name": "Keyframes and easing panel",
+      "where": "panels/EasingPanel.kt, LayerTools.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "tool.animate",
+      "name": "Animation sheet, Animate button, transitions between clips",
+      "where": "MotionSheets.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "tool.history_notes",
+      "name": "Undo and redo notes",
+      "where": "HistoryNotes.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "ai.effects_category",
+      "name": "AI effects category in the effect browser",
+      "where": "effects/EffectBrowser.kt, effects/AiBrowser.kt, effects/EffectCatalog.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "enabled on desktop (PlatformFeatures.ai is true); Mac tested",
+      "files": [
+        "shared/kotlin/app/absentmotion/effects/EffectCatalog.kt",
+        "shared/kotlin/app/absentmotion/ui/editor/effects/EffectBrowser.kt"
+      ]
+    },
+    {
+      "id": "ai.layer_tiles",
+      "name": "AI tools, Auto captions and Reverse tiles on a layer",
+      "where": "LayerTools.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "Background, Captions, Reverse, Smooth, Enhance and Noise tiles show on desktop; Mac tested",
+      "files": [
+        "shared/kotlin/app/absentmotion/ui/editor/LayerTools.kt"
+      ]
+    },
+    {
+      "id": "ai.bg_removal",
+      "name": "Remove background (image and video), cut-out quality",
+      "where": "ai/BackgroundRemoval, ai/AiTools.kt, ai/BestCutout.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "absent_bg model built into the desktop library; photo and video cut-out tested on Mac (DeskAiTest, DeskAiPortsTest)"
+    },
+    {
+      "id": "ai.captions",
+      "name": "Auto captions (Whisper)",
+      "where": "CaptionsSheet.kt, ai/Captions.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "whisper.cpp built into the desktop library; model downloaded on first use with consent; Mac tested"
+    },
+    {
+      "id": "ai.reverse",
+      "name": "Reverse clip",
+      "where": "ai/ClipReverse.kt, panels/SpeedPanel.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "desktop path through ffmpeg (DeskReverse); Mac tested with and without sound"
+    },
+    {
+      "id": "ai.smooth_clip",
+      "name": "AI Smooth clip",
+      "where": "ai/ClipSmooth.kt, ai/AiSmooth.kt, panels/SpeedPanel.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "ncnn + RIFE on the CPU in the desktop library; Mac tested at all three levels"
+    },
+    {
+      "id": "ai.enhance",
+      "name": "AI Enhance (upscale)",
+      "where": "ai/AiEnhance.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "partial",
+      "linux": "partial",
+      "note": "ncnn on the CPU; face enhancement uses macOS Vision, so Faces is hidden on Windows and Linux"
+    },
+    {
+      "id": "ai.noise",
+      "name": "Reduce noise (audio)",
+      "where": "ai/NoiseReduction.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "rnnoise built into the desktop library; Mac tested"
+    },
+    {
+      "id": "ai.models_settings",
+      "name": "AI model download, delete and GPU settings",
+      "where": "SettingsDrawer.kt",
+      "android": "works",
+      "macos": "untested",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "model rows appear once a model is downloaded; not checked by a test yet"
+    },
+    {
+      "id": "menu.layer",
+      "name": "Layer menu: save to assets, flip, crop, fit/fill/stretch, clipping mask, convert to outline, extract audio, mark beats, media info, label colour",
+      "where": "EditorMenus.kt LayerMenu",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "inspector header ⋮ button"
+    },
+    {
+      "id": "menu.copy_paste",
+      "name": "Copy/Paste menu: select all, duplicate, save preset, copy, paste, paste style, set intro and outro",
+      "where": "EditorMenus.kt CopyPasteMenu, desk/DeskWorkspace.kt DeskTransport",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "PlayBar is not used on desktop, so the transport bar has its own Copy and paste button; Cut is Cmd/Ctrl+X and the Edit menu"
+    },
+    {
+      "id": "menu.parent",
+      "name": "Link layer to a parent",
+      "where": "StructureUi.kt ParentMenu, desk/DeskWorkspace.kt DeskInspector",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "parent button in the inspector header (it was missing: EditorTopBar is not used on desktop)"
+    },
+    {
+      "id": "menu.multi",
+      "name": "Multi-select actions: group, mask/exclude group, link parent, delete, align, distribute, effects to all, paste style, align times",
+      "where": "StructureUi.kt MultiTopBar, MultiBar, desk/DeskMulti.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "inspector tiles; group, mask, exclude, link parent, delete, align and distribute tiles were missing (only the bottom-bar actions existed)"
+    },
+    {
+      "id": "menu.project_settings",
+      "name": "Project settings: aspect, resolution, frame rate, background, versions, precompose, retiming",
+      "where": "EditorMenus.kt, desk/DeskProject.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "menu.rename",
+      "name": "Rename project and layer",
+      "where": "EditorTopBar.kt NameField, desk/DeskChrome.kt DeskNameField",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "name fields in the inspector (the project had no rename at all on desktop); the timeline right-click Rename also works"
+    },
+    {
+      "id": "menu.transform_more",
+      "name": "Transform tab menu: reset one, reset all, Basic/Advanced",
+      "where": "EditorMenus.kt TransformMenu",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "menu.version_history",
+      "name": "Earlier versions (version history)",
+      "where": "ProjectSafetyUi.kt VersionHistory",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "add.shapes",
+      "name": "Add shape",
+      "where": "AddPopup.kt, desk/DeskLibrary.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "add.media",
+      "name": "Add photos and videos",
+      "where": "MediaTab.kt, desk/DeskMedia.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "lists linked folders and picked files instead of the phone gallery; drag to timeline works"
+    },
+    {
+      "id": "add.audio",
+      "name": "Add sounds with preview",
+      "where": "AudioTab.kt, desk/DeskMedia.kt",
+      "android": "works",
+      "macos": "partial",
+      "windows": "partial",
+      "linux": "partial",
+      "note": "flat searchable list; the phone View all browser with Songs, Albums, Artists, Folders and sort is missing"
+    },
+    {
+      "id": "add.tts",
+      "name": "Text to speech",
+      "where": "VoiceSheet.kt, platform Speech",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "macOS say, Windows SAPI through PowerShell, Linux espeak-ng; Mac tested (DeskSpeechTest)"
+    },
+    {
+      "id": "add.text",
+      "name": "Add text",
+      "where": "AddPopup.kt QuickBar",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "add.captions",
+      "name": "Add captions entry",
+      "where": "AddPopup.kt QuickBar, CaptionsSheet.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "same as ai.captions"
+    },
+    {
+      "id": "add.freehand",
+      "name": "Freehand brush and Pen tool",
+      "where": "AddPopup.kt QuickBar, DrawingEditor.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "add.objects",
+      "name": "Camera, Null, Empty group",
+      "where": "StructureUi.kt ObjectPage",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "add.asset_project",
+      "name": "Add an asset project",
+      "where": "StructureUi.kt ElementPicker",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "add.svg",
+      "name": "Import SVG",
+      "where": "StructureUi.kt importSvgFile",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "add.model3d",
+      "name": "Import 3D model (OBJ, GLB, glTF)",
+      "where": "StructureUi.kt importModel",
+      "android": "works",
+      "macos": "partial",
+      "windows": "partial",
+      "linux": "partial",
+      "note": "import and layer work; rendering is missing (tool.model_layer)"
+    },
+    {
+      "id": "add.template",
+      "name": "Add a saved template",
+      "where": "AddPopup.kt, desk/DeskEmbed.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "add.gif",
+      "name": "Import animated GIF",
+      "where": "MediaTab.kt addGif, media/GifVideo.kt",
+      "android": "works",
+      "macos": "missing",
+      "windows": "missing",
+      "linux": "missing",
+      "note": "verified: gifVideo needs android.media.MediaCodecList, which does not exist at runtime on desktop (NoClassDefFoundError); the import now shows the failed toast instead of killing the editor scope; convert with ffmpeg instead"
+    },
+    {
+      "id": "add.device_camera",
+      "name": "Take a photo or video with the device camera",
+      "where": "ui/camera/CameraScreen.kt, MediaTab.kt",
+      "android": "works",
+      "macos": "missing",
+      "windows": "missing",
+      "linux": "missing",
+      "note": "PlatformFeatures.camera is false; DeskCamera closes at once (webcam capture not built)",
+      "gate": "camera",
+      "files": [
+        "shared/kotlin/app/absentmotion/ui/editor/MediaTab.kt"
+      ]
+    },
+    {
+      "id": "add.drag_to_timeline",
+      "name": "Drag a library tile to the timeline or preview",
+      "where": "desk/DeskLibrary.kt, DeskDrop.kt",
+      "android": "missing",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "desktop only by design (phone taps to add)"
+    },
+    {
+      "id": "add.link_folder",
+      "name": "Link a media folder",
+      "where": "desk/DeskMedia.kt, DeskLibrary",
+      "android": "missing",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "desktop only by design (phone reads the gallery)"
+    },
+    {
+      "id": "preview.select_move",
+      "name": "Tap to select, drag to move, corner and edge handles to scale",
+      "where": "Preview.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "preview.pinch_gestures",
+      "name": "Two-finger move, scale and rotate of the selected layer",
+      "where": "Preview.kt",
+      "android": "works",
+      "macos": "partial",
+      "windows": "partial",
+      "linux": "partial",
+      "note": "no mouse equivalent of the two-finger scale/rotate; handles and the Transform tab cover it"
+    },
+    {
+      "id": "preview.canvas_zoom_pan",
+      "name": "Pinch/drag to zoom and pan the canvas, double two-finger tap to reset",
+      "where": "Preview.kt, PreviewMode.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "Ctrl/Cmd+wheel zooms at the cursor, wheel pans, dragging empty canvas pans; before this it needed two touch pointers"
+    },
+    {
+      "id": "preview.mode_panel",
+      "name": "Preview modes: pixel, grid, solo, camera view, quality, motion blur, pre-render",
+      "where": "PreviewMode.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "preview.crop_overlay",
+      "name": "Crop overlay with drag handles and aspect lock",
+      "where": "CropOverlay.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "preview.point_editors",
+      "name": "Pivot, path point, puppet pin and gradient handle editors",
+      "where": "PointEditor.kt, GradientHandles.kt, panels/PathPins.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "preview.eyedropper",
+      "name": "Eyedropper loupe",
+      "where": "panels/FullColorPicker.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "reads the preview through readPreviewPixel"
+    },
+    {
+      "id": "preview.motion_tracking",
+      "name": "Track motion of a video clip",
+      "where": "TrackEditor.kt, editor/TrackActions.kt, media/MotionTracker.kt",
+      "android": "works",
+      "macos": "missing",
+      "windows": "missing",
+      "linux": "missing",
+      "note": "reachable from the layer menu; the tracker JNI (tracker_jni.cpp) and FrameReader (MediaCodec) are not in the desktop build"
+    },
+    {
+      "id": "preview.prerender",
+      "name": "Pre-render the preview",
+      "where": "RenderPreview.kt, editor/PreviewCache.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "preview.text_box",
+      "name": "Text box width handle on the canvas",
+      "where": "Preview.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "tl.clips",
+      "name": "Move, trim, stretch clips; multi-select; rubber-band select",
+      "where": "Timeline.kt desktopTimelineGestures",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "tl.layers",
+      "name": "Reorder layers, hide, rename, group rows, label colours",
+      "where": "Timeline.kt, Reorder.kt, RowDrag.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "tl.keyframes",
+      "name": "Keyframe diamonds, drag and select",
+      "where": "Timeline.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "tl.zoom_scroll",
+      "name": "Timeline zoom, pan, fit, scrub",
+      "where": "Timeline.kt, desk/DeskTimelineControls.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "tl.bookmarks",
+      "name": "Bookmarks",
+      "where": "Timeline.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "tl.context_menu",
+      "name": "Timeline right-click menu: cut, copy, paste, duplicate, split, delete, group, hide, rename, forward, backward, bookmark, select all",
+      "where": "Timeline.kt DesktopTimelineMenu",
+      "android": "missing",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "desktop replacement for the phone long-press and bottom bars"
+    },
+    {
+      "id": "tl.thumbnails",
+      "name": "Video strips and waveforms on clips",
+      "where": "Timeline.kt, VideoThumbnails.kt, AudioTimeline.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "tl.snapping",
+      "name": "Snap to playhead, clip edges and bookmarks",
+      "where": "Timeline.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "hold Alt to disable on desktop"
+    },
+    {
+      "id": "tl.transitions",
+      "name": "Transition between two clips",
+      "where": "MotionSheets.kt TransitionButton",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "editor.autosave",
+      "name": "Autosave, undo and redo that survive closing, version snapshots",
+      "where": "library/SaveQueue.kt, ProjectVersions.kt, editor/EditorState.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "ProjectSaver writes on every edit; a crash restore is home.recovery"
+    },
+    {
+      "id": "dk.drop_files",
+      "name": "Drop media or project files from the file manager into the window",
+      "where": "desk/DeskApp.kt DeskDrop",
+      "android": "missing",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "desktop only by design"
+    },
+    {
+      "id": "export.video",
+      "name": "Video export: H.264, H.265, AV1, VP9, APV in MP4, MOV, WebM, MKV",
+      "where": "ui/export/ExportScreen.kt, STANDINS DeskVideoExport",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "encoded by ffmpeg; hardware encoders are picked per OS (VideoToolbox, NVENC/QSV/AMF/MF); APV needs liboapv in the ffmpeg build"
+    },
+    {
+      "id": "export.gif",
+      "name": "GIF export",
+      "where": "ExportScreen.kt, GifWriter.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "export.frame",
+      "name": "Single frame export (PNG, JPEG, WebP, lossless WebP, BMP)",
+      "where": "ExportScreen.kt, ImageEncode.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "export.sequence",
+      "name": "Image sequence export",
+      "where": "ExportScreen.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "export.audio",
+      "name": "Audio-only export (WAV 16/24, FLAC, M4A, OGG, MP3)",
+      "where": "ExportScreen.kt, DeskAudioExport.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "export.package",
+      "name": "Project package and XML export",
+      "where": "ExportScreen.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "export.smoothing",
+      "name": "Frame smoothing (blend, flow, AI) and video motion blur on export",
+      "where": "ExportScreen.kt, ExportOptions.kt Smoothing",
+      "android": "works",
+      "macos": "missing",
+      "windows": "missing",
+      "linux": "missing",
+      "note": "the controls are shown, but DeskEngineThread.exportSession ignores the Smoothing argument"
+    },
+    {
+      "id": "export.result_viewer",
+      "name": "Play the exported file in the app",
+      "where": "ui/export/ExportPreview.kt, DeskMediaViewer.kt, DeskExportPreview.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "DeskUxTest.exportViewer covers it"
+    },
+    {
+      "id": "export.from_list",
+      "name": "Export from the project list",
+      "where": "HomeScreen.kt, ExportScreen.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "export.share",
+      "name": "Share the result",
+      "where": "platform shareExport",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "reveals the file in the file manager instead of an OS share sheet"
+    },
+    {
+      "id": "export.background_service",
+      "name": "Keep exporting in the background with a notification",
+      "where": "export/ExportService.kt",
+      "android": "works",
+      "macos": "missing",
+      "windows": "missing",
+      "linux": "missing",
+      "note": "export runs inside the window and stops when it closes; no tray or notification"
+    },
+    {
+      "id": "export.save_template",
+      "name": "Save the project as a template",
+      "where": "ExportScreen.kt, TemplateStore.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "home.projects",
+      "name": "Project list: cards, thumbnails, search, sort",
+      "where": "HomeScreen.kt, desk Home",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "home.assets",
+      "name": "Assets tab (reusable asset projects)",
+      "where": "HomeScreen.kt, desk Home",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "home.templates",
+      "name": "Templates and presets tab with rename and delete",
+      "where": "TemplatesTab.kt, DeskHome.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "home.tools_compress",
+      "name": "Tools tab: Compress video",
+      "where": "ToolsTab.kt, CompressScreen.kt, tools/Compressor.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "DeskCompress runs ffmpeg"
+    },
+    {
+      "id": "home.tools_downloader",
+      "name": "Tools tab: Video downloader (YouTube, TikTok, Instagram)",
+      "where": "ToolsTab.kt, tools/VideoDownloader.kt, PyEngine.kt",
+      "android": "works",
+      "macos": "missing",
+      "windows": "missing",
+      "linux": "missing",
+      "note": "hidden on desktop; needs a bundled yt-dlp instead of the Android Python bundle"
+    },
+    {
+      "id": "home.new_project",
+      "name": "New project and new asset sheet",
+      "where": "NewProjectSheet.kt, DeskNewProject.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "home.project_menu",
+      "name": "Project menu: export, duplicate, collect media, version history, delete",
+      "where": "HomeScreen.kt ProjectCard, DeskHome.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "Collect media was missing on desktop; DeskAppState.collectMedia copies linked files into the project"
+    },
+    {
+      "id": "home.import",
+      "name": "Import project files (.amproj, XML, ZIP, templates), drag and drop",
+      "where": "Importer.kt, DeskApp.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "home.open_with",
+      "name": "Open a file from the OS (Open with, share)",
+      "where": "android ImportActivity.kt, pc Main.kt",
+      "android": "works",
+      "macos": "missing",
+      "windows": "missing",
+      "linux": "missing",
+      "note": "argv and the macOS open-file event are ignored; use File > Import or drag and drop"
+    },
+    {
+      "id": "home.settings",
+      "name": "Settings: editor, playback, projects, backup, updates",
+      "where": "SettingsDrawer.kt, DeskSettings.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "home.language",
+      "name": "Language (16 languages)",
+      "where": "DeskSettings.kt DeskLanguages",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "a restart is needed on desktop"
+    },
+    {
+      "id": "home.help",
+      "name": "Help pages",
+      "where": "HelpScreen.kt, DeskHelpPage.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "home.about",
+      "name": "About and licences",
+      "where": "AboutScreen.kt, DeskPages.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "home.crash_logs",
+      "name": "Crash logs page",
+      "where": "CrashLogsUi.kt, library/CrashLogs.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "CrashLogs.install now runs at start (it never did, so the page was always empty); the 'closed unexpectedly' notice for a crash is not shown"
+    },
+    {
+      "id": "home.recovery",
+      "name": "Restore unsaved edits after a crash",
+      "where": "ProjectSafetyUi.kt ClosedDialog, library/Recovery.kt, desk/DeskApp.kt DeskRecovery",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "DeskAppState.startup installs RecoveryHandler and offers Recovery.pending (ProjectSaver wrote recovery files but nothing asked for them)"
+    },
+    {
+      "id": "home.backup",
+      "name": "Back up and restore all projects, weekly backup",
+      "where": "BackupUi.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "DeskAppState.maintain now runs the weekly backup and the storage sweeps (only MainActivity ran them, so the Weekly backup switch did nothing on desktop)"
+    },
+    {
+      "id": "home.updates",
+      "name": "Update check and install",
+      "where": "UpdateCheck.kt, DeskUpdater.kt",
+      "android": "works",
+      "macos": "partial",
+      "windows": "partial",
+      "linux": "partial",
+      "note": "checks the release feed and opens the download page; no in-app install or signature check"
+    },
+    {
+      "id": "home.onboarding",
+      "name": "First-run welcome and permissions",
+      "where": "ui/onboarding/Onboarding.kt, PhoneCheck.kt",
+      "android": "works",
+      "macos": "missing",
+      "windows": "missing",
+      "linux": "missing",
+      "note": "DeskApp never shows Onboarding"
+    },
+    {
+      "id": "home.tutorial",
+      "name": "Guided tour and tutorial rows",
+      "where": "ui/tutorial/*, SettingsDrawer.kt TutorialRows",
+      "android": "works",
+      "macos": "missing",
+      "windows": "missing",
+      "linux": "missing",
+      "note": "TutorialHost is not mounted on desktop and the settings page has no tutorial rows"
+    },
+    {
+      "id": "home.missing_fonts",
+      "name": "Offer to download missing Google fonts when opening a project",
+      "where": "MainActivity offerFonts",
+      "android": "works",
+      "macos": "missing",
+      "windows": "missing",
+      "linux": "missing",
+      "note": "DeskApp does not check project fonts at open"
+    },
+    {
+      "id": "home.save_failed",
+      "name": "Warn when the project cannot be saved on close",
+      "where": "MainActivity closeEditor",
+      "android": "works",
+      "macos": "partial",
+      "windows": "partial",
+      "linux": "partial",
+      "note": "DeskAppState.closeNow closes anyway and shows a toast"
+    },
+    {
+      "id": "set.theme",
+      "name": "Custom theme file",
+      "where": "SettingsDrawer.kt ThemeRow",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "set.layer_length",
+      "name": "New layer length",
+      "where": "SettingsDrawer.kt DurationRow",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "set.transition_preview",
+      "name": "Transition button placement",
+      "where": "SettingsDrawer.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "set.emoji",
+      "name": "Emoji style (system or bundled Noto)",
+      "where": "SettingsDrawer.kt, fonts/",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "macOS draws Apple Color Emoji (DeskEmojiTest); Windows and Linux rely on the system emoji font or the bundled one"
+    },
+    {
+      "id": "set.preview_quality",
+      "name": "Preview quality, audio resampling, preview copies",
+      "where": "SettingsDrawer.kt PlaybackSettings",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "set.keep_media",
+      "name": "Keep copies of media in the project",
+      "where": "SettingsDrawer.kt ProjectsSettings",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
+      "id": "set.vibration",
+      "name": "Vibration",
+      "where": "SettingsDrawer.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "not applicable: hidden on desktop by design"
+    },
+    {
+      "id": "set.graphics",
+      "name": "Graphics API choice (OpenGL)",
+      "where": "SettingsDrawer.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "not applicable: hidden on desktop (Metal on macOS, Vulkan on Windows and Linux)"
+    },
+    {
+      "id": "fx.datamosh",
+      "name": "Datamosh effect",
+      "where": "shared/assets/effects/datamosh.json, media/VideoLibrary mosh",
+      "android": "works",
+      "macos": "missing",
+      "windows": "missing",
+      "linux": "missing",
+      "note": "DeskEngineThread.moshStart and moshFrame are stubs; interpolation.cpp is not in the desktop library"
+    },
+    {
+      "id": "fx.slowmo_smoothing",
+      "name": "Smooth slow motion of video clips in preview (blend or flow)",
+      "where": "media/VideoLibrary interpolateVideo",
+      "android": "works",
+      "macos": "missing",
+      "windows": "missing",
+      "linux": "missing",
+      "note": "interpolateVideo is a stub on desktop; clips show the nearest frame"
+    },
+    {
+      "id": "fx.blur_and_particles",
+      "name": "Native effects: blur, glow, particles, 3D pieces, warp, text animation",
+      "where": "effects/, shared/cpp",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "all compiled into the desktop library except interpolation and model upload"
+    },
+    {
+      "id": "plat.audio_playback",
+      "name": "Audio playback with effects and sync clock",
+      "where": "STANDINS audio/DeskAudioEngine.kt, DeskOutput.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "macOS reads the CoreAudio output latency; Windows and Linux use the Java mixer latency (untested)"
+    },
+    {
+      "id": "plat.video_decode",
+      "name": "Video decode for preview",
+      "where": "pc/native video.cpp, VideoSource.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "macOS VideoToolbox; Windows D3D11 hardware decode and copy; Linux VA-API (not built); ffmpeg software fallback everywhere"
+    },
+    {
+      "id": "plat.gpu",
+      "name": "GPU rendering of the preview",
+      "where": "pc/native gpu.h",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "Metal on macOS; Vulkan on Windows and Linux; Linux not built yet"
+    },
+    {
+      "id": "plat.native_build",
+      "name": "Native engine builds (Skia engine, JNI glue, libav)",
+      "where": "pc/native, macos/, windows/, linux/",
+      "android": "works",
+      "macos": "works",
+      "windows": "works",
+      "linux": "missing",
+      "note": "Linux scripts (linux/build.sh, linux.cmake) exist but were never run; they need a Linux Skia build (tools/build_skia.sh)"
+    },
+    {
+      "id": "plat.installer",
+      "name": "Installable app: macOS bundle, Windows installer, Linux package",
+      "where": "pc/build.gradle.kts createDistributable, macos/build.sh, windows/build.ps1",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "missing",
+      "note": "the macOS bundle is codesigned by macos/build.sh; the Windows installer still needs a test on the PC's own screen; there is no Linux package yet"
+    },
+    {
+      "id": "plat.menu_bar",
+      "name": "Menu bar with shortcuts",
+      "where": "desk/DeskMenus.kt",
+      "android": "missing",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "native menu bar on macOS; an in-window menu bar on Windows and Linux (untested there)"
+    },
+    {
+      "id": "plat.file_dialogs",
+      "name": "Open and save dialogs, reveal in file manager",
+      "where": "desk/Desk.kt DeskFiles, DeskOs",
+      "android": "missing",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "java.awt.FileDialog everywhere; reveal uses open -R, explorer /select, xdg-open"
+    },
+    {
+      "id": "plat.keyboard",
+      "name": "Keyboard shortcuts (Cmd or Ctrl)",
+      "where": "desk/DeskKeys.kt",
+      "android": "missing",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "Cmd on macOS, Ctrl on Windows and Linux; AltGr is ignored on Windows; Cut (X) was added"
+    },
+    {
+      "id": "plat.right_click",
+      "name": "Right-click for phone long-press actions: Transform controls, effect details, delete imported font, remove pre-render",
+      "where": "LayerTools.kt, effects/EffectBrowser.kt, FontBrowser.kt, RenderPreview.kt, desk/DeskChrome.kt rightClick",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "effect details, font delete and pre-render remove only answered to a held click before"
+    },
+    {
+      "id": "plat.system_fonts",
+      "name": "System fonts in the font browser",
+      "where": "fonts/, desk fonts",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "untested outside macOS"
+    },
+    {
+      "id": "plat.android_codec_api",
+      "name": "Android MediaCodec export and decode classes",
+      "where": "STANDINS DeskVideoExport.kt, DeskEngineThread.kt, android/media/MediaExtractor.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "not applicable: desktop exports and decodes through ffmpeg and libav; the stubs throw if an Android-only path is entered by mistake",
+      "standins": [
+        "pc/src/standins/kotlin/app/absentmotion/export/DeskVideoExport.kt",
+        "pc/src/standins/kotlin/app/absentmotion/engine/DeskEngineThread.kt",
+        "pc/src/standins/kotlin/android/media/MediaExtractor.kt"
+      ]
+    }
   ],
   "android_only": {
-    "app/absentmotion/MainActivity.kt": {"desktop": "pc/src/standins/kotlin/app/absentmotion/desk/DeskApp.kt", "reason": "app shell; the desktop shell is DeskApp plus pc/src/main Main.kt (features missing there: home.recovery, home.onboarding, home.tutorial, home.missing_fonts)"},
-    "app/absentmotion/ImportActivity.kt": {"desktop": null, "feature": "home.open_with", "reason": "Android share and VIEW intent entry; desktop imports with File > Import Project and drag and drop"},
-    "app/absentmotion/audio/AudioEngine.kt": {"desktop": "pc/src/standins/kotlin/app/absentmotion/audio/DeskAudioEngine.kt", "reason": "AudioTrack engine"},
-    "app/absentmotion/audio/PcmDecoder.kt": {"desktop": "pc/src/standins/kotlin/app/absentmotion/audio/DeskPcmDecoder.kt", "reason": "MediaCodec audio decode"},
-    "app/absentmotion/engine/EngineThread.kt": {"desktop": "pc/src/standins/kotlin/app/absentmotion/engine/DeskEngineThread.kt", "reason": "engine thread; stubs listed in fx.datamosh, fx.slowmo_smoothing, tool.model_layer, export.smoothing"},
-    "app/absentmotion/engine/NativeEngine.kt": {"desktop": "pc/src/standins/kotlin/app/absentmotion/engine/DeskNativeEngine.kt", "reason": "JNI wrapper"},
-    "app/absentmotion/export/AudioExport.kt": {"desktop": "pc/src/standins/kotlin/app/absentmotion/export/DeskAudioExport.kt", "reason": "audio encoders"},
-    "app/absentmotion/export/ExportService.kt": {"desktop": "pc/src/standins/kotlin/app/absentmotion/export/DeskExportRun.kt", "feature": "export.background_service", "reason": "foreground service; desktop runs the export in the window"},
-    "app/absentmotion/export/ExportStore.kt": {"desktop": "pc/src/standins/kotlin/app/absentmotion/export/DeskExportStore.kt", "reason": "MediaStore saving"},
-    "app/absentmotion/export/ExportVerify.kt": {"desktop": "pc/src/standins/kotlin/app/absentmotion/export/DeskExportVerify.kt", "reason": "output check"},
-    "app/absentmotion/export/VideoExport.kt": {"desktop": "pc/src/standins/kotlin/app/absentmotion/export/DeskVideoExport.kt", "reason": "MediaCodec video export"},
-    "app/absentmotion/fonts/TextLayout.kt": {"desktop": "pc/src/standins/kotlin/app/absentmotion/fonts/DeskTextLayout.kt", "reason": "text measuring"},
-    "app/absentmotion/i18n/AppLanguage.kt": {"desktop": "pc/src/standins/kotlin/app/absentmotion/i18n/I18n.kt", "reason": "language list"},
-    "app/absentmotion/i18n/UiText.kt": {"desktop": "pc/src/standins/kotlin/app/absentmotion/i18n/I18n.kt", "reason": "UiText"},
-    "app/absentmotion/media/VideoLibrary.kt": {"desktop": "pc/src/main/kotlin/app/absentmotion/pc/engine/VideoSource.kt", "feature": "fx.slowmo_smoothing", "reason": "MediaCodec video decode, proxies, smoothing and datamosh frames"},
-    "app/absentmotion/platform/AndroidPlatform.kt": {"desktop": "pc/src/standins/kotlin/app/absentmotion/platform/DesktopPlatform.kt", "reason": "the platform seam"},
-    "app/absentmotion/platform/OldAndroid.kt": {"desktop": null, "reason": "workarounds for old Android versions"},
-    "app/absentmotion/platform/StorageAccess.kt": {"desktop": "pc/src/standins/kotlin/app/absentmotion/platform/DesktopPlatform.kt", "reason": "storage permission prompt; always granted on desktop"},
-    "app/absentmotion/ui/camera/CameraScreen.kt": {"desktop": "pc/src/standins/kotlin/app/absentmotion/ui/camera/DeskCamera.kt", "feature": "add.device_camera", "reason": "CameraX capture"},
-    "app/absentmotion/ui/editor/panels/EffectRuler.kt": {"desktop": "pc/src/standins/kotlin/app/absentmotion/ui/editor/panels/DeskEffectRuler.kt", "reason": "touch ruler with haptics"},
-    "app/absentmotion/ui/home/HelpScreen.kt": {"desktop": "pc/src/standins/kotlin/app/absentmotion/ui/home/DeskHelpPage.kt", "reason": "WebView help"},
-    "app/absentmotion/ui/home/UnsupportedPhone.kt": {"desktop": null, "reason": "screen for phones whose GPU cannot run the engine"},
-    "app/absentmotion/ui/home/UpdateDialog.kt": {"desktop": "pc/src/standins/kotlin/app/absentmotion/ui/home/DeskUpdater.kt", "feature": "home.updates", "reason": "update prompt"},
-    "app/absentmotion/ui/home/UpdateVerify.kt": {"desktop": null, "feature": "home.updates", "reason": "APK signature check; the desktop only opens the release page"},
-    "app/absentmotion/ui/home/Updater.kt": {"desktop": "pc/src/standins/kotlin/app/absentmotion/ui/home/DeskUpdater.kt", "feature": "home.updates", "reason": "in-app APK install"},
-    "app/absentmotion/ui/tutorial/Grip.kt": {"desktop": "pc/src/standins/kotlin/app/absentmotion/ui/tutorial/DeskGrip.kt", "feature": "home.tutorial", "reason": "touch grip detector of the tutorial"}
+    "app/absentmotion/MainActivity.kt": {
+      "desktop": "pc/src/standins/kotlin/app/absentmotion/desk/DeskApp.kt",
+      "reason": "app shell; the desktop shell is DeskApp plus pc/src/main Main.kt (features missing there: home.recovery, home.onboarding, home.tutorial, home.missing_fonts)"
+    },
+    "app/absentmotion/ImportActivity.kt": {
+      "desktop": null,
+      "feature": "home.open_with",
+      "reason": "Android share and VIEW intent entry; desktop imports with File > Import Project and drag and drop"
+    },
+    "app/absentmotion/audio/AudioEngine.kt": {
+      "desktop": "pc/src/standins/kotlin/app/absentmotion/audio/DeskAudioEngine.kt",
+      "reason": "AudioTrack engine"
+    },
+    "app/absentmotion/audio/PcmDecoder.kt": {
+      "desktop": "pc/src/standins/kotlin/app/absentmotion/audio/DeskPcmDecoder.kt",
+      "reason": "MediaCodec audio decode"
+    },
+    "app/absentmotion/engine/EngineThread.kt": {
+      "desktop": "pc/src/standins/kotlin/app/absentmotion/engine/DeskEngineThread.kt",
+      "reason": "engine thread; stubs listed in fx.datamosh, fx.slowmo_smoothing, tool.model_layer, export.smoothing"
+    },
+    "app/absentmotion/engine/NativeEngine.kt": {
+      "desktop": "pc/src/standins/kotlin/app/absentmotion/engine/DeskNativeEngine.kt",
+      "reason": "JNI wrapper"
+    },
+    "app/absentmotion/export/AudioExport.kt": {
+      "desktop": "pc/src/standins/kotlin/app/absentmotion/export/DeskAudioExport.kt",
+      "reason": "audio encoders"
+    },
+    "app/absentmotion/export/ExportService.kt": {
+      "desktop": "pc/src/standins/kotlin/app/absentmotion/export/DeskExportRun.kt",
+      "feature": "export.background_service",
+      "reason": "foreground service; desktop runs the export in the window"
+    },
+    "app/absentmotion/export/ExportStore.kt": {
+      "desktop": "pc/src/standins/kotlin/app/absentmotion/export/DeskExportStore.kt",
+      "reason": "MediaStore saving"
+    },
+    "app/absentmotion/export/ExportVerify.kt": {
+      "desktop": "pc/src/standins/kotlin/app/absentmotion/export/DeskExportVerify.kt",
+      "reason": "output check"
+    },
+    "app/absentmotion/export/VideoExport.kt": {
+      "desktop": "pc/src/standins/kotlin/app/absentmotion/export/DeskVideoExport.kt",
+      "reason": "MediaCodec video export"
+    },
+    "app/absentmotion/fonts/TextLayout.kt": {
+      "desktop": "pc/src/standins/kotlin/app/absentmotion/fonts/DeskTextLayout.kt",
+      "reason": "text measuring"
+    },
+    "app/absentmotion/i18n/AppLanguage.kt": {
+      "desktop": "pc/src/standins/kotlin/app/absentmotion/i18n/I18n.kt",
+      "reason": "language list"
+    },
+    "app/absentmotion/i18n/UiText.kt": {
+      "desktop": "pc/src/standins/kotlin/app/absentmotion/i18n/I18n.kt",
+      "reason": "UiText"
+    },
+    "app/absentmotion/media/VideoLibrary.kt": {
+      "desktop": "pc/src/main/kotlin/app/absentmotion/pc/engine/VideoSource.kt",
+      "feature": "fx.slowmo_smoothing",
+      "reason": "MediaCodec video decode, proxies, smoothing and datamosh frames"
+    },
+    "app/absentmotion/platform/AndroidPlatform.kt": {
+      "desktop": "pc/src/standins/kotlin/app/absentmotion/platform/DesktopPlatform.kt",
+      "reason": "the platform seam"
+    },
+    "app/absentmotion/platform/OldAndroid.kt": {
+      "desktop": null,
+      "reason": "workarounds for old Android versions"
+    },
+    "app/absentmotion/platform/StorageAccess.kt": {
+      "desktop": "pc/src/standins/kotlin/app/absentmotion/platform/DesktopPlatform.kt",
+      "reason": "storage permission prompt; always granted on desktop"
+    },
+    "app/absentmotion/ui/camera/CameraScreen.kt": {
+      "desktop": "pc/src/standins/kotlin/app/absentmotion/ui/camera/DeskCamera.kt",
+      "feature": "add.device_camera",
+      "reason": "CameraX capture"
+    },
+    "app/absentmotion/ui/editor/panels/EffectRuler.kt": {
+      "desktop": "pc/src/standins/kotlin/app/absentmotion/ui/editor/panels/DeskEffectRuler.kt",
+      "reason": "touch ruler with haptics"
+    },
+    "app/absentmotion/ui/home/HelpScreen.kt": {
+      "desktop": "pc/src/standins/kotlin/app/absentmotion/ui/home/DeskHelpPage.kt",
+      "reason": "WebView help"
+    },
+    "app/absentmotion/ui/home/UnsupportedPhone.kt": {
+      "desktop": null,
+      "reason": "screen for phones whose GPU cannot run the engine"
+    },
+    "app/absentmotion/ui/home/UpdateDialog.kt": {
+      "desktop": "pc/src/standins/kotlin/app/absentmotion/ui/home/DeskUpdater.kt",
+      "feature": "home.updates",
+      "reason": "update prompt"
+    },
+    "app/absentmotion/ui/home/UpdateVerify.kt": {
+      "desktop": null,
+      "feature": "home.updates",
+      "reason": "APK signature check; the desktop only opens the release page"
+    },
+    "app/absentmotion/ui/home/Updater.kt": {
+      "desktop": "pc/src/standins/kotlin/app/absentmotion/ui/home/DeskUpdater.kt",
+      "feature": "home.updates",
+      "reason": "in-app APK install"
+    },
+    "app/absentmotion/ui/tutorial/Grip.kt": {
+      "desktop": "pc/src/standins/kotlin/app/absentmotion/ui/tutorial/DeskGrip.kt",
+      "feature": "home.tutorial",
+      "reason": "touch grip detector of the tutorial"
+    }
   }
 }
