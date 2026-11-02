@@ -108,6 +108,8 @@ private suspend fun EditorState.addGif(context: Context, uri: Uri): Boolean {
         return fail(R.string.import_gif_too_large)
     } catch (_: Exception) {
         return fail(R.string.import_gif_failed)
+    } catch (_: LinkageError) {
+        return fail(R.string.import_gif_failed)
     }
     if (gif == null) { preparing.cancel(); return false }
     val media = keepCopy(context, gif.media)

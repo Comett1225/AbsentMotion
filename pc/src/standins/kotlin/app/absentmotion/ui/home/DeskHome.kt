@@ -135,6 +135,7 @@ internal fun DeskHome(
     onSettings: () -> Unit,
     changes: Int,
     newTick: Int,
+    onCollect: ((String) -> Unit)? = null,
 ) {
     var projects by remember { mutableStateOf<List<ProjectInfo>>(emptyList()) }
     var loaded by remember { mutableStateOf(false) }
@@ -192,7 +193,7 @@ internal fun DeskHome(
                             shown, loaded, section == DeskSection.Assets, query, settings, version, selected, { selected = it },
                             onOpen = { info -> if (info.damaged) onHistory(info) else onOpen(info.id) },
                             onExport = onExport, onDuplicate = duplicate, onHistory = onHistory, onDelete = { deleting = it },
-                            onNew = newProject, onImport = import,
+                            onNew = newProject, onImport = import, onCollect = onCollect,
                         )
                     }
                 }
@@ -268,7 +269,7 @@ private fun ProjectsPane(
     shown: List<ProjectInfo>, loaded: Boolean, assets: Boolean, query: String, settings: AppSettings, version: Int,
     selected: String?, onSelect: (String?) -> Unit,
     onOpen: (ProjectInfo) -> Unit, onExport: (String) -> Unit, onDuplicate: (String) -> Unit, onHistory: (ProjectInfo) -> Unit, onDelete: (ProjectInfo) -> Unit,
-    onNew: () -> Unit, onImport: () -> Unit,
+    onNew: () -> Unit, onImport: () -> Unit, onCollect: ((String) -> Unit)?,
 ) {
     val byName = settings.sortBy == "name"
     val locale = androidx.compose.ui.platform.LocalConfiguration.current.locales[0]
@@ -370,6 +371,7 @@ private fun ProjectsPane(
                                         DeskMenuItem(stringResource(R.string.open), { close(); onOpen(info) }, HomeIcons.ProjectsTabOff, hint = "↵")
                                         DeskMenuItem(stringResource(R.string.export), { close(); onExport(info.id) }, HomeIcons.Export)
                                         DeskMenuItem(stringResource(if (info.isElement) R.string.home_duplicate_asset else R.string.home_duplicate), { close(); onDuplicate(info.id) }, HomeIcons.Duplicate)
+                                        if (onCollect != null) DeskMenuItem(stringResource(R.string.home_collect_media), { close(); onCollect(info.id) }, HomeIcons.Folder)
                                     }
                                     DeskMenuItem(stringResource(R.string.version_history), { close(); onHistory(info) }, ChromeIcons.Undo)
                                     DeskMenuDivider()

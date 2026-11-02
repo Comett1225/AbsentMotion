@@ -5,6 +5,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.clickable
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,7 +18,19 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusTarget
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.isCtrlPressed
+import androidx.compose.ui.input.pointer.isSecondaryPressed
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
+import app.absentmotion.ui.home.handCursor
+import app.absentmotion.ui.home.hoverFill
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
@@ -127,4 +143,52 @@ internal fun DeskSheetHost(onDismiss: () -> Unit, content: @Composable () -> Uni
 @Composable
 internal fun DeskTip(text: String, content: @Composable () -> Unit) {
     if (PlatformFeatures.desktop && text.isNotEmpty()) app.absentmotion.platform.Hint(text, content) else content()
+}
+
+@Composable
+internal fun DeskNameField(value: String, modifier: Modifier = Modifier, onCommit: (String) -> Unit) {
+    var text by remember(value) { mutableStateOf(value) }
+    var focused by remember { mutableStateOf(false) }
+    val focus = LocalFocusManager.current
+    fun commit() {
+        val name = typedName(text, value)
+        text = name ?: value
+        if (name != null) onCommit(name)
+    }
+    val commitNow by rememberUpdatedState(::commit)
+    DisposableEffect(Unit) { onDispose { commitNow() } }
+    BasicTextField(
+        text, { text = it },
+        modifier.height(32.dp).clip(RoundedCornerShape(6.dp)).background(if (focused) Am.Field else Color.Transparent).hoverFill(6.dp, Am.Field).pointerHoverIcon(PointerIcon.Text)
+            .onFocusChanged { if (focused && !it.isFocused) commit(); focused = it.isFocused }
+            .onKeyEvent {
+                if (it.type == KeyEventType.KeyDown && (it.key == Key.Enter || it.key == Key.NumPadEnter)) { focus.clearFocus(); true } else false
+            },
+        textStyle = TextStyle(color = Am.OnDark, fontSize = 14.sp, fontWeight = FontWeight.Medium),
+        singleLine = true, cursorBrush = SolidColor(Am.Accent),
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done), keyboardActions = KeyboardActions(onDone = { focus.clearFocus() }),
+        decorationBox = { inner -> Box(Modifier.fillMaxSize().padding(horizontal = 6.dp), Alignment.CenterStart) { inner() } },
+    )
+}
+
+@Composable
+internal fun DeskParentButton(onClick: () -> Unit) {
+    val label = stringResource(R.string.structure_link_parent)
+    app.absentmotion.platform.Hint(label) {
+        Box(Modifier.size(40.dp, 42.dp).clip(RoundedCornerShape(6.dp)).hoverFill(6.dp, Am.Field).handCursor().semantics { contentDescription = label }.clickable(onClick = onClick), Alignment.Center) {
+            LayerParentIcon(back = Am.Panel)
+        }
+    }
+}
+
+internal fun Modifier.rightClick(action: () -> Unit): Modifier = if (!PlatformFeatures.desktop) this else pointerInput(action) {
+    awaitPointerEventScope {
+        while (true) {
+            val event = awaitPointerEvent(PointerEventPass.Initial)
+            if (event.type == PointerEventType.Press && (event.buttons.isSecondaryPressed || mac && event.keyboardModifiers.isCtrlPressed)) {
+                action()
+                event.changes.forEach { it.consume() }
+            }
+        }
+    }
 }

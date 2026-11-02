@@ -64,6 +64,7 @@ import app.absentmotion.effects.EffectCatalog
 import app.absentmotion.effects.EffectDefinition
 import app.absentmotion.effects.EffectPreset
 import app.absentmotion.effects.PresetFavouriteStore
+import app.absentmotion.ui.editor.rightClick
 import app.absentmotion.model.addEffect
 import app.absentmotion.model.effects
 import app.absentmotion.ui.editor.CaptionsSheet
@@ -390,7 +391,7 @@ private fun DeskTab(label: String, selected: Boolean, onClick: () -> Unit) {
 private fun EffectTile(catalog: EffectCatalog, effect: EffectDefinition, width: Float, onClick: () -> Unit, onLongClick: () -> Unit, favourite: Boolean, preset: EffectPreset? = null) {
     val press = remember { MutableInteractionSource() }
     Column(Modifier.width(width.dp).pressScale(press, TilePress).alpha(if (effect.available) 1f else 0.35f).clip(RoundedCornerShape(6.dp)).hoverFill(6.dp, Am.Field).handCursor()
-        .combinedClickable(press, LocalIndication.current, onClick = onClick, onLongClick = onLongClick).padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        .rightClick(onLongClick).combinedClickable(press, LocalIndication.current, onClick = onClick, onLongClick = onLongClick).padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Box {
             Thumbnail(catalog, preset?.let(effect::thumbnail) ?: effect.thumbnail, Modifier.size((width - 7).dp).clip(RoundedCornerShape(5.dp)))
             if (favourite) Icon(PanelIcons.Star, null, Modifier.align(Alignment.TopEnd).size(14.dp), tint = Am.Accent)

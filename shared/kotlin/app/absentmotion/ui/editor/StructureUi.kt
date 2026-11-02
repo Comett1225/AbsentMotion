@@ -421,11 +421,11 @@ private fun SelectionButton(icon: ImageVector, description: String, modifier: Mo
 }
 
 @Composable
-internal fun ChoiceList(items: List<String>, onDismiss: () -> Unit, onPick: (Int) -> Unit) {
+internal fun ChoiceList(items: List<String>, onDismiss: () -> Unit, below: Boolean = false, onPick: (Int) -> Unit) {
     val start = if (LocalLayoutDirection.current == LayoutDirection.Rtl) 1f else 0f
-    Popup(ChoicePosition, onDismiss, PopupProperties(focusable = true)) {
+    Popup(if (below) DropOrRise else ChoicePosition, onDismiss, PopupProperties(focusable = true)) {
         Column(
-            Modifier.presence(scaleFrom = 0.92f, origin = TransformOrigin(start, 1f)).width(220.dp).heightIn(max = 280.dp).clip(ItemShape).background(Am.PanelInset)
+            Modifier.presence(scaleFrom = 0.92f, origin = if (below) TransformOrigin(1f, 0f) else TransformOrigin(start, 1f)).width(220.dp).heightIn(max = 280.dp).clip(ItemShape).background(Am.PanelInset)
                 .verticalScroll(rememberScrollState()),
         ) {
             items.forEachIndexed { i, label ->
@@ -438,22 +438,22 @@ internal fun ChoiceList(items: List<String>, onDismiss: () -> Unit, onPick: (Int
 }
 
 @Composable
-internal fun ParentMenu(state: EditorState, onDismiss: () -> Unit) {
+internal fun ParentMenu(state: EditorState, below: Boolean = false, onDismiss: () -> Unit) {
     val layer = state.selected ?: return
     val others = state.scene.layers.filter { it.id != layer.id }.reversed()
     val current = layer.node["parent"]?.toLongOrNull()
     ChoiceList(
-        listOf(stringResource(R.string.none)) + others.map { (if (it.id == current) "> " else "") + it.shownName() }, onDismiss,
+        listOf(stringResource(R.string.none)) + others.map { (if (it.id == current) "> " else "") + it.shownName() }, onDismiss, below,
     ) { i -> state.setParent(if (i == 0) null else others[i - 1].id) }
 }
 
 @Composable
-internal fun MultiParentMenu(state: EditorState, onDismiss: () -> Unit) {
+internal fun MultiParentMenu(state: EditorState, below: Boolean = false, onDismiss: () -> Unit) {
     val context = LocalContext.current
     val skippedText = stringResource(R.string.structure_link_parent_skipped)
     val ids = MultiSelect.ids
     val others = state.scene.layers.filter { it.id !in ids }.reversed()
-    ChoiceList(listOf(stringResource(R.string.none)) + others.map { it.shownName() }, onDismiss) { i ->
+    ChoiceList(listOf(stringResource(R.string.none)) + others.map { it.shownName() }, onDismiss, below) { i ->
         val skipped = state.setParentOfChosen(if (i == 0) null else others[i - 1].id)
         if (skipped > 0) Toast.makeText(context, skippedText, Toast.LENGTH_LONG).show()
     }

@@ -127,7 +127,7 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
                     val needsDownload by produceState(false, entry.name.xml, downloads) {
                         value = !entry.bundled && entry.category != 100 && withContext(Dispatchers.IO) { library.localFile(entry.name.xml) == null }
                     }
-                    Box(Modifier.fillMaxWidth().height(100.dp).border(.5.dp, BrowserLine).combinedClickable(onLongClick = { if (entry.category == 100) deleting = entry }) { choose(entry.name.xml) }) {
+                    Box(Modifier.fillMaxWidth().height(100.dp).border(.5.dp, BrowserLine).rightClick { if (entry.category == 100) deleting = entry }.combinedClickable(onLongClick = { if (entry.category == 100) deleting = entry }) { choose(entry.name.xml) }) {
                         FontPreview(library, entry.name.xml, "Abcdefg", Modifier.align(Alignment.TopCenter).padding(top = 13.dp, start = 10.dp, end = 10.dp).fillMaxWidth().height(46.dp))
                         Text(entry.name.label, Modifier.align(Alignment.BottomCenter).padding(start = 10.dp, end = 25.dp, bottom = 13.dp),
                             color = Am.OnDark, fontSize = 12.sp, maxLines = 2, textAlign = androidx.compose.ui.text.style.TextAlign.Center)

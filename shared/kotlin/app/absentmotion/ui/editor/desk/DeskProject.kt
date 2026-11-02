@@ -40,6 +40,7 @@ import app.absentmotion.editor.EditorPanel
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.FullColor
 import app.absentmotion.editor.changeSettings
+import app.absentmotion.editor.rename
 import app.absentmotion.editor.setElementOption
 import app.absentmotion.editor.toggleHidden
 import app.absentmotion.model.Layer
@@ -52,6 +53,12 @@ internal fun DeskProject(state: EditorState, modifier: Modifier = Modifier) {
     val layers = remember(state.scene) { state.scene.layers.asReversed() }
     val list = rememberLazyListState()
     LazyColumn(modifier.deskScrollbar(list).padding(horizontal = 12.dp), list, contentPadding = PaddingValues(bottom = 12.dp)) {
+        item(key = "name") {
+            Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(R.string.desk_name), color = Am.OnDarkDim, fontSize = 13.sp, maxLines = 1)
+                DeskNameField(state.scene.title, Modifier.weight(1f)) { state.rename(it) }
+            }
+        }
         item(key = "settings") { DeskSettings(state) }
         item(key = "layers-title") { DeskHeading(stringResource(R.string.desk_layers), Modifier.padding(top = 16.dp, bottom = 4.dp)) }
         items(layers, key = { it.id }) { layer ->

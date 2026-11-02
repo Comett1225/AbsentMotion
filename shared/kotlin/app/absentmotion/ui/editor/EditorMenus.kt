@@ -295,9 +295,10 @@ internal fun TransformControlsMenu(state: EditorState, onDone: (Boolean?) -> Uni
 }
 
 @Composable
-internal fun CopyPasteMenu(state: EditorState, onDismiss: () -> Unit) {
+internal fun CopyPasteMenu(state: EditorState, below: Boolean = false, onDismiss: () -> Unit) {
     val drop = with(LocalDensity.current) { 33.dp.roundToPx() }
-    val position = remember(drop) { RightEdge { it.top + drop } }
+    val phone = remember(drop) { RightEdge { it.top + drop } }
+    val position = if (below) DropOrRise else phone
     val layer = state.selected
     val count = state.chosenLayers.size
     var styleOpen by remember { mutableStateOf(false) }
