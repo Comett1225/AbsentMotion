@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor.panels
 
+import app.absentmotion.ui.editor.deskSp
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import app.absentmotion.R
@@ -230,7 +231,7 @@ private fun Graph(state: EditorState, easing: Easing, overshoot: Boolean, modifi
         Row(Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(98.px), verticalAlignment = Alignment.CenterVertically) {
             StretchButton(state, -1)
             Box(Modifier.weight(1f), Alignment.Center) {
-                Text(stringResource(EasingCatalog.presetOf(easing).label), color = CaptionColour, fontSize = 9.sp, maxLines = 1, softWrap = false)
+                Text(stringResource(EasingCatalog.presetOf(easing).label), color = CaptionColour, fontSize = deskSp(9f), maxLines = 1, softWrap = false)
             }
             StretchButton(state, 1)
         }

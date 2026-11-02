@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor.panels
 
+import app.absentmotion.ui.editor.deskSp
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -118,7 +119,7 @@ internal fun CurvePresets(state: EditorState, layer: Layer, modifier: Modifier, 
                 CurveTile(stringResource(preset.label), preset.curve, chosen) { if (chosen) edit(preset.curve) else state.applySpeedCurve(preset.curve) }
             }
         }
-        Text(stringResource(R.string.speed_curve_edit_hint), Modifier.padding(horizontal = 15.dp), color = PanelCaption, fontSize = 11.sp, maxLines = 2)
+        Text(stringResource(R.string.speed_curve_edit_hint), Modifier.padding(horizontal = 15.dp), color = PanelCaption, fontSize = deskSp(11f), maxLines = 2)
     }
 }
 
@@ -215,7 +216,7 @@ private fun CurveGraph(
     val haptic = rememberHaptic(state)
     val outline = remember(points) { points.outline() }
     val measurer = rememberTextMeasurer(cacheSize = 4)
-    val labelStyle = TextStyle(color = PanelCaption, fontSize = 9.sp)
+    val labelStyle = TextStyle(color = PanelCaption, fontSize = deskSp(9f))
     val ink = Am.OnDark
     val accent = Am.Accent
     val guide = PanelCaption

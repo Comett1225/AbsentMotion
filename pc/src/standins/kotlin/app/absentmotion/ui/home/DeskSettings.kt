@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
@@ -45,6 +46,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.R
@@ -57,6 +59,9 @@ import app.absentmotion.platform.appVersion
 import app.absentmotion.ui.editor.ChromeIcons
 import app.absentmotion.ui.editor.PanelIcons
 import app.absentmotion.ui.export.ExportIcons
+import app.absentmotion.ui.editor.SizedBox
+import app.absentmotion.ui.editor.deskScrollbar
+import app.absentmotion.ui.editor.deskVerticalScroll
 import app.absentmotion.ui.theme.Am
 import java.util.Locale
 
@@ -87,13 +92,14 @@ internal fun DeskSettings(settings: AppSettings, initial: SettingsPage, onClose:
     val links = LocalUriHandler.current
     DeskModal(onClose, 900.dp, height = 660.dp) {
         DeskDialogHeader(stringResource(R.string.settings), onClose)
-        BoxWithConstraints(Modifier.weight(1f).fillMaxWidth()) {
-        val side = if (maxWidth < 720.dp) 176.dp else 236.dp
+        SizedBox(Modifier.weight(1f).fillMaxWidth()) { maxWidth, _ ->
+        val side = if (maxWidth < 720.dp) 224.dp else 236.dp
+        val narrow = maxWidth < 720.dp
         Row(Modifier.fillMaxSize()) {
-            Column(Modifier.width(side).fillMaxHeight().background(Am.HomeBg).verticalScroll(rememberScrollState()).padding(12.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Column(Modifier.width(side).fillMaxHeight().background(Am.HomeBg).deskVerticalScroll(color = Am.Navy).padding(12.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 for (entry in SettingsPage.entries) {
                     if (entry == SettingsPage.Language) Spacer(Modifier.height(10.dp))
-                    SideItem(stringResource(entry.title), entry.icon(), page == entry) { page = entry }
+                    SideItem(stringResource(entry.title), entry.icon(), page == entry, narrow) { page = entry }
                 }
                 Spacer(Modifier.height(16.dp))
                 SideLink(stringResource(R.string.settings_report_issue)) { runCatching { links.openUri(REPORT_FORM) } }
@@ -108,7 +114,7 @@ internal fun DeskSettings(settings: AppSettings, initial: SettingsPage, onClose:
                     SettingsPage.About -> DeskAbout()
                     SettingsPage.Crash -> DeskCrashLogs()
                     SettingsPage.Language -> DeskLanguages()
-                    else -> Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp)) {
+                    else -> Column(Modifier.fillMaxSize().deskVerticalScroll(color = Am.Navy).padding(24.dp)) {
                         Text(stringResource(page.title), color = Am.Navy, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                         Spacer(Modifier.height(16.dp))
                         Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Am.HomePanel).padding(vertical = 6.dp)) {
@@ -129,7 +135,7 @@ internal fun DeskSettings(settings: AppSettings, initial: SettingsPage, onClose:
 }
 
 @Composable
-private fun SideItem(label: String, icon: ImageVector, selected: Boolean, onClick: () -> Unit) {
+private fun SideItem(label: String, icon: ImageVector, selected: Boolean, narrow: Boolean, onClick: () -> Unit) {
     val shape = RoundedCornerShape(10.dp)
     Row(
         Modifier.fillMaxWidth().heightIn(min = 40.dp).clip(shape).background(if (selected) Am.Navy else Color.Transparent).then(if (selected) Modifier else Modifier.deskPress(10.dp))
@@ -137,7 +143,7 @@ private fun SideItem(label: String, icon: ImageVector, selected: Boolean, onClic
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(icon, null, Modifier.size(20.dp), tint = if (selected) Am.OnNavy else Am.HomeMid)
-        Text(label, Modifier.padding(start = 12.dp), color = if (selected) Am.OnNavy else Am.HomeInk, fontSize = 14.sp, lineHeight = 17.sp, fontWeight = FontWeight.Medium, maxLines = 2)
+        Text(label, Modifier.padding(start = 10.dp), color = if (selected) Am.OnNavy else Am.HomeInk, fontSize = if (narrow) 13.sp else 14.sp, lineHeight = 17.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
@@ -161,7 +167,8 @@ internal fun DeskLanguages() {
             stringResource(if (chosen != top) R.string.desk_language_restart else R.string.desk_language_note), Modifier.padding(start = 24.dp, end = 24.dp, top = 6.dp, bottom = 12.dp),
             color = if (chosen != top) Am.HomeAccent else Am.HomeMid, fontSize = 13.sp,
         )
-        LazyColumn(Modifier.weight(1f).fillMaxWidth().selectableGroup(), contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 24.dp, end = 24.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        val languageList = rememberLazyListState()
+        LazyColumn(Modifier.weight(1f).fillMaxWidth().deskScrollbar(languageList, Am.Navy).selectableGroup(), state = languageList, contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 24.dp, end = 24.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             items(AppLanguage.entries, key = { it.tag }) { language ->
                 val on = language == chosen
                 val local = remember(language) { Locale.forLanguageTag(language.tag).getDisplayName(ui).replaceFirstChar { it.titlecase(ui) } }

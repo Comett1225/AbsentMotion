@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor.panels
 
+import app.absentmotion.ui.editor.deskSp
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -130,7 +131,7 @@ internal fun CropPanel(state: EditorState, modifier: Modifier) {
                                 .semantics(mergeDescendants = true) { contentDescription = "$label $value" }.clickable { keypad(i) },
                             Arrangement.Center, Alignment.CenterHorizontally,
                         ) {
-                            Text(label, color = PanelCaption, fontSize = 11.sp, maxLines = 1)
+                            Text(label, color = PanelCaption, fontSize = deskSp(11f), maxLines = 1)
                             Text(value, color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
                         }
                     }

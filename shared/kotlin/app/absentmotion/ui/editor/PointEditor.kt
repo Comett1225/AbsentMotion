@@ -285,7 +285,7 @@ private fun LockButton(label: String, on: Boolean, visible: Boolean, enabled: Bo
             .background(if (on) Am.FieldHi else Color.Transparent).clickable(enabled = visible && enabled, onClick = onClick),
         Alignment.Center,
     ) {
-        Text(label, color = animatedColor(if (on) Am.Accent else Guide), fontSize = 11.sp, maxLines = 1)
+        Text(label, color = animatedColor(if (on) Am.Accent else Guide), fontSize = deskSp(11f), maxLines = 1)
     }
 }
 
@@ -316,7 +316,7 @@ private fun PointList(state: EditorState, mode: PointMode, contour: Contour?, mo
                         .selectable(here && mode.handle == Handle.Main, role = Role.RadioButton) { mode.point = i; mode.handle = Handle.Main }
                         .semantics { contentDescription = pointName },
                     Alignment.Center,
-                ) { Text(number, color = if (here && mode.handle == Handle.Main) Am.OnAccent else Am.OnDark, fontSize = 11.sp, maxLines = 1) }
+                ) { Text(number, color = if (here && mode.handle == Handle.Main) Am.OnAccent else Am.OnDark, fontSize = deskSp(11f), maxLines = 1) }
                 HandleChip(k.outHandle != null, here && mode.handle == Handle.Out, stringResource(R.string.a11y_point_handle_out, number)) { mode.point = i; mode.handle = Handle.Out }
             }
             if (i < knots.lastIndex || contour?.closed == true || contour?.endsAt(i) == true) {

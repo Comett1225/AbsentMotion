@@ -1,5 +1,7 @@
 package app.absentmotion.ui.editor.panels
 
+import app.absentmotion.ui.editor.deskSp
+import app.absentmotion.ui.editor.deskVerticalScroll
 import app.absentmotion.platform.LocalContext
 import app.absentmotion.platform.rememberMediaPicker
 import androidx.compose.foundation.Canvas
@@ -221,7 +223,7 @@ private fun PaletteView(state: EditorState, argb: Int, onColor: ((Int, key: Stri
                 PanelIcon(PanelIcons.AddColor, Am.OnDark.copy(alpha = 0.35f), size = 26.dp)
             }
         }
-        Box(Modifier.offset(47.px, 81.px).size(591.px, 270.px).verticalScroll(rememberScrollState())) {
+        Box(Modifier.offset(47.px, 81.px).size(591.px, 270.px).deskVerticalScroll()) {
             Box(Modifier.size(591.px, (rows * 84 + 8).px)) {
                 swatches.forEachIndexed { i, swatch ->
                     Box(
@@ -285,7 +287,7 @@ private fun MiniPicker(hsva: Hsva, onChange: ((Hsva) -> Hsva) -> Unit, onEnd: ()
         Canvas(Modifier.fillMaxSize()) { drawPicker(hsva, colour) }
         Box(Modifier.offset((RING_X - DISC_RADIUS).px, (RING_Y - DISC_RADIUS).px).size((DISC_RADIUS * 2).px), contentAlignment = Alignment.Center) {
             Text(
-                colourText(argb, "\n"), color = textOn(argb), fontSize = 11.sp, lineHeight = 13.sp,
+                colourText(argb, "\n"), color = textOn(argb), fontSize = deskSp(11f), lineHeight = 13.sp,
                 textAlign = TextAlign.Center,
             )
         }

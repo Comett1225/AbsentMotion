@@ -126,7 +126,7 @@ private fun ElementCard(info: ProjectInfo, onClick: () -> Unit) {
         thumbnail?.let { Image(it, null, Modifier.fillMaxSize(), contentScale = ContentScale.Fit) }
         Text(
             info.title, Modifier.align(Alignment.BottomStart).fillMaxWidth().background(Color.Black.copy(alpha = 0.27f)).padding(horizontal = 3.dp),
-            color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.MiddleEllipsis,
+            color = Color.White, fontSize = deskSp(10f), fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.MiddleEllipsis,
         )
     }
 }

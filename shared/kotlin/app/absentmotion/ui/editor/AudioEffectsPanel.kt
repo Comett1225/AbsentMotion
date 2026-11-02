@@ -117,7 +117,7 @@ private fun EffectList(state: EditorState, effects: List<AudioFx>, open: (Int) -
     val marks = state.selected?.aiMarks.orEmpty()
     val reorder = rememberReorder(state, scroll, top = RowHeight + 13.dp + (AiMarkRowHeight + AiMarkRowGap) * marks.size)
     val id = state.selectedId
-    Column(Modifier.fillMaxSize().verticalScroll(scroll)) {
+    Column(Modifier.fillMaxSize().deskVerticalScroll(scroll)) {
         Row(Modifier.padding(start = 6.5.dp, end = 6.5.dp, top = 6.5.dp).fillMaxWidth().height(RowHeight).horizontalScroll(rememberScrollState()),
             Arrangement.spacedBy(6.dp), Alignment.CenterVertically) {
             for (preset in AudioPresets) {
@@ -193,7 +193,7 @@ private fun EffectDetail(state: EditorState, index: Int, fx: AudioFx, close: () 
                 DeskTip(stringResource(R.string.delete)) { Icon(ChromeIcons.Trash, stringResource(R.string.delete), Modifier.size(22.dp), tint = Am.OnDark) }
             }
         }
-        Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState())) {
+        Column(Modifier.weight(1f).fillMaxWidth().deskVerticalScroll()) {
             ParamSlider(state, stringResource(R.string.audiofx_mix), fx.mix, 0f, 1f, false, percent(fx.mix), { it * 100 }, { it / 100 }, "%") { v ->
                 state.editSelected("audiofx-$index-mix") { it.updateAudioEffect(index) { e -> e.withMix(v) } }
             }

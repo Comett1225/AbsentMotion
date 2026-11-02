@@ -1,5 +1,7 @@
 package app.absentmotion.ui.editor.panels
 
+import app.absentmotion.ui.editor.deskSp
+import app.absentmotion.ui.editor.deskVerticalScroll
 import app.absentmotion.model.finiteFloat
 import app.absentmotion.R
 import androidx.compose.ui.res.stringResource
@@ -62,7 +64,7 @@ internal fun EditShapePanel(state: EditorState, layer: Layer, modifier: Modifier
     var activeRow by remember(layer.id) { mutableIntStateOf(0) }
     val activeParam = params.getOrNull(activeRow)?.takeIf { it.kind != Kind.Toggle }
     SideEffect { state.keyTarget = activeParam?.let { KeyTarget(PropRef.shape(it.prop), layer.propText(it.prop) ?: it.default, it.kind.type) } }
-    Column(modifier.verticalScroll(rememberScrollState())) {
+    Column(modifier.deskVerticalScroll()) {
         params.forEachIndexed { i, param ->
             val edit = ShapeEdit(state, layer, param, stringResource(param.label))
             val activate = { activeRow = i }
@@ -120,7 +122,7 @@ private fun LabelTile(edit: ShapeEdit, active: Boolean, topPad: Dp, onActivate: 
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            edit.label, Modifier.padding(horizontal = 1.dp), color = if (active) Am.Accent else Am.OnDark, fontSize = 10.5.sp,
+            edit.label, Modifier.padding(horizontal = 1.dp), color = if (active) Am.Accent else Am.OnDark, fontSize = deskSp(10.5f),
             lineHeight = 13.sp, maxLines = 1, softWrap = false, textAlign = TextAlign.Center,
         )
     }
@@ -179,7 +181,7 @@ private fun PairRow(edit: ShapeEdit, active: Boolean, onActivate: () -> Unit) {
         Column(Modifier.width(37.px).padding(top = 19.px), Arrangement.spacedBy(6.px)) {
             for (label in listOf("X:", "Y:")) {
                 Box(Modifier.height(57.px), contentAlignment = Alignment.CenterStart) {
-                    Text(label, color = AxisLabel, fontSize = 10.sp, maxLines = 1, softWrap = false)
+                    Text(label, color = AxisLabel, fontSize = deskSp(10f), maxLines = 1, softWrap = false)
                 }
             }
         }

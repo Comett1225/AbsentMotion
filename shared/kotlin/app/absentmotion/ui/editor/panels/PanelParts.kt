@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor.panels
 
+import app.absentmotion.ui.editor.deskSp
 import androidx.compose.animation.core.AnimationState
 import androidx.compose.animation.core.animateDecay
 import androidx.compose.animation.splineBasedDecay
@@ -93,7 +94,7 @@ internal fun NumberBox(
 @Composable
 internal fun Caption(text: String, modifier: Modifier = Modifier) {
     Box(modifier, contentAlignment = Alignment.Center) {
-        Text(text, color = PanelCaption, fontSize = 6.sp, maxLines = 1, softWrap = false)
+        Text(text, color = PanelCaption, fontSize = deskSp(6f), maxLines = 1, softWrap = false)
     }
 }
 

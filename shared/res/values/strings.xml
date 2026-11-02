@@ -2081,4 +2081,14 @@
     <string name="desk_language_restart">Restart AbsentMotion to use the new language.</string>
     <string name="desk_help_contents">Contents</string>
     <string name="desk_help_browser">Open in browser</string>
+    <string name="desk_style_not_copied">Copy a layer first to paste its style</string>
+    <string name="desk_no_video_sound">None of the selected layers is a video with sound</string>
+    <string name="desk_needs_two_layers">Select at least two layers</string>
+    <string name="desk_needs_three_layers">Select at least three layers</string>
+    <string name="desk_draw_freehand_hint">Paint freehand strokes with a brush.</string>
+    <string name="desk_draw_pen_hint">Draw editable shapes with points and curves.</string>
+    <string name="desk_templates_empty">No templates yet</string>
+    <string name="desk_templates_empty_hint">Switch on \"Also keep a copy as a Template\" when you export a project and it appears here.</string>
+    <string name="desk_templates_export">Export a project</string>
+    <string name="desk_recommended">Recommended</string>
 </resources>

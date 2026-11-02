@@ -42,12 +42,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.R
 import app.absentmotion.library.AppSettings
 import app.absentmotion.library.ProjectStore
 import app.absentmotion.platform.LocalContext
+import app.absentmotion.ui.editor.deskVerticalScroll
 import app.absentmotion.ui.theme.Am
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -85,7 +87,7 @@ internal fun DeskNewProject(
     }
     DeskModal(onClose, 560.dp, onEnter = create) {
         DeskDialogHeader(stringResource(if (form.element) R.string.desk_new_asset else R.string.home_new_project), onClose)
-        Column(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()).padding(horizontal = 24.dp, vertical = 20.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
+        Column(Modifier.weight(1f, fill = false).deskVerticalScroll(color = Am.Navy).padding(horizontal = 24.dp, vertical = 20.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
             TypeToggle(form)
             NameRow(form)
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -184,9 +186,9 @@ private fun AspectTile(a: AspectDef?, selected: Boolean, onClick: () -> Unit) {
 @Composable
 private fun FormRow(label: String, detail: String?, field: @Composable () -> Unit) {
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Column(Modifier.width(150.dp)) {
+        Column(Modifier.width(184.dp).padding(end = 16.dp)) {
             Text(label, color = Am.HomeInk, fontSize = 14.sp)
-            if (detail != null) Text(detail, color = Am.HomeDim, fontSize = 12.sp, maxLines = 1)
+            if (detail != null) Text(detail, color = Am.HomeDim, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
         Box(Modifier.weight(1f)) { field() }
     }

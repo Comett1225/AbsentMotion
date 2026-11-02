@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor.effects
 
+import app.absentmotion.ui.editor.deskSp
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
@@ -55,6 +56,6 @@ internal fun AudioTile(label: String, seed: Int, enabled: Boolean, onClick: () -
     Column(Modifier.width(100.dp).pressScale(press, TilePress).alpha(if (enabled) 1f else 0.35f)
         .clickable(press, LocalIndication.current, enabled = enabled, onClick = onClick).padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         AudioBackdrop(Modifier.size(93.dp).clip(RoundedCornerShape(5.dp)), seed)
-        Text(label, Modifier.fillMaxWidth().padding(top = 4.dp), color = Am.OnDark, fontSize = 10.sp, lineHeight = 11.sp, textAlign = TextAlign.Center, maxLines = 2)
+        Text(label, Modifier.fillMaxWidth().padding(top = 4.dp), color = Am.OnDark, fontSize = deskSp(10f), lineHeight = 11.sp, textAlign = TextAlign.Center, maxLines = 2)
     }
 }

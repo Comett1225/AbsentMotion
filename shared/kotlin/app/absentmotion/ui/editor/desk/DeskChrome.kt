@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -14,6 +15,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
@@ -28,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -35,7 +38,9 @@ import app.absentmotion.R
 import app.absentmotion.platform.BackHandler
 import app.absentmotion.platform.PlatformFeatures
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.home.DeskModals
 import app.absentmotion.ui.theme.HoverTargets
+import app.absentmotion.ui.theme.Motion
 
 @Composable
 internal fun Modifier.deskCursor(): Modifier =
@@ -47,6 +52,28 @@ internal fun DeskCursorHost(modifier: Modifier, alignment: Alignment = Alignment
 }
 
 @Composable
+internal fun SizedBox(modifier: Modifier = Modifier, alignment: Alignment = Alignment.TopStart, content: @Composable BoxScope.(maxWidth: Dp, maxHeight: Dp) -> Unit) {
+    var size by remember { mutableStateOf(androidx.compose.ui.unit.IntSize.Zero) }
+    val density = androidx.compose.ui.platform.LocalDensity.current
+    Box(modifier.onSizeChanged { size = it }, alignment) {
+        if (size.width > 0) content(with(density) { size.width.toDp() }, with(density) { size.height.toDp() })
+    }
+}
+
+@Composable
+private fun modalFade(): Float {
+    DisposableEffect(Unit) {
+        DeskModals.open++
+        onDispose { DeskModals.open--; if (DeskModals.open == 0) DeskModals.fade = 0f }
+    }
+    var shown by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { shown = true }
+    val fade by animateFloatAsState(if (shown) 1f else 0f, Motion.fast(), label = "scrim")
+    SideEffect { DeskModals.fade = fade }
+    return fade
+}
+
+@Composable
 internal fun DeskDialog(title: String?, width: Dp, onDismiss: () -> Unit, height: Dp? = null, onConfirm: (() -> Unit)? = null, outside: Boolean = true, content: @Composable () -> Unit) {
     val focus = LocalFocusManager.current
     val requester = remember { FocusRequester() }
@@ -54,7 +81,8 @@ internal fun DeskDialog(title: String?, width: Dp, onDismiss: () -> Unit, height
     BackHandler { close() }
     DisposableEffect(Unit) { onDispose { focus.clearFocus() } }
     LaunchedEffect(Unit) { requester.requestFocus() }
-    DeskCursorHost(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.6f)).pointerInput(outside) { detectTapGestures { if (outside) close() } }.padding(24.dp), Alignment.Center) {
+    val fade = modalFade()
+    DeskCursorHost(Modifier.fillMaxSize().background(Color.Black.copy(alpha = DeskModals.ScrimAlpha * fade)).pointerInput(outside) { detectTapGestures { if (outside) close() } }.padding(24.dp), Alignment.Center) {
         val card = Modifier.widthIn(max = width).fillMaxWidth().let { if (height == Dp.Infinity) it.fillMaxHeight() else if (height != null) it.height(height) else it.heightIn(max = 720.dp) }
         Column(card.shadow(24.dp, RoundedCornerShape(12.dp)).clip(RoundedCornerShape(12.dp)).background(Am.Panel).pointerInput(Unit) { detectTapGestures { } }
             .onKeyEvent {
@@ -74,6 +102,8 @@ private val mac = System.getProperty("os.name").orEmpty().lowercase().contains("
 internal val DeskMod = if (mac) "⌘" else "Ctrl+"
 internal val DeskRedoKeys = if (mac) "⇧⌘Z" else "Ctrl+Shift+Z"
 
+internal fun deskSp(phone: Float): TextUnit = if (PlatformFeatures.desktop && phone < 12f) 12.sp else phone.sp
+
 @Composable
 internal fun deskShortcut(label: Int, keys: String): String = stringResource(R.string.desk_shortcut_hint, stringResource(label), keys)
 
@@ -88,7 +118,8 @@ internal fun DeskSheetHost(onDismiss: () -> Unit, content: @Composable () -> Uni
     fun close() { focus.clearFocus(); onDismiss() }
     BackHandler { close() }
     DisposableEffect(Unit) { onDispose { focus.clearFocus() } }
-    DeskCursorHost(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.6f)).pointerInput(Unit) { detectTapGestures { close() } }.padding(24.dp), Alignment.Center) {
+    val fade = modalFade()
+    DeskCursorHost(Modifier.fillMaxSize().background(Color.Black.copy(alpha = DeskModals.ScrimAlpha * fade)).pointerInput(Unit) { detectTapGestures { close() } }.padding(24.dp), Alignment.Center) {
         Box(Modifier.widthIn(max = 560.dp).fillMaxWidth().fillMaxHeight()) { CompositionLocalProvider(LocalWide provides false) { content() } }
     }
 }

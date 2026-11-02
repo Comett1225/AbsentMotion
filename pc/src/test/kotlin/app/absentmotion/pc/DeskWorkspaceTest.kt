@@ -1,6 +1,7 @@
 package app.absentmotion.pc
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.toAwtImage
 import androidx.compose.ui.input.key.Key
@@ -9,6 +10,7 @@ import androidx.compose.ui.unit.Density
 import app.absentmotion.desk.DeskApp
 import app.absentmotion.desk.DeskBack
 import app.absentmotion.desk.DeskLibrary
+import app.absentmotion.desk.DeskScale
 import app.absentmotion.desk.DeskAppState
 import app.absentmotion.editor.EditorPanel
 import app.absentmotion.editor.FullColor
@@ -16,14 +18,21 @@ import app.absentmotion.editor.MultiSelect
 import app.absentmotion.model.Scene
 import app.absentmotion.ui.editor.DeskDrop
 import app.absentmotion.ui.editor.DeskPreviewBounds
+import app.absentmotion.ui.home.DeskModals
 import app.absentmotion.ui.theme.HoverTargets
 import java.io.File
 import javax.imageio.ImageIO
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 @OptIn(ExperimentalTestApi::class)
 class DeskWorkspaceTest {
+    private val tier = app.absentmotion.Tier.openGl
+
     private fun ComposeUiTest.shot(dir: File, name: String) {
         waitForIdle()
         ImageIO.write(onAllNodes(isRoot()).onFirst().captureToImage().toAwtImage(), "png", dir.resolve("$name.png"))
@@ -46,6 +55,10 @@ class DeskWorkspaceTest {
         mainClock.advanceTimeBy(200)
     }
 
+    private val modifier = if (System.getProperty("os.name").lowercase().contains("mac")) Key.MetaLeft else Key.CtrlLeft
+
+    private fun previewWidthDp(density: Float = 1f) = DeskPreviewBounds.bounds.width / density
+
     private fun androidx.compose.ui.test.SemanticsNodeInteraction.centre(): Offset {
         val r = getUnclippedBoundsInRoot()
         return Offset((r.left.value + r.right.value) / 2, (r.top.value + r.bottom.value) / 2)
@@ -56,6 +69,7 @@ class DeskWorkspaceTest {
         System.setProperty("am.data", data.absolutePath)
         val media = File("../testdata/media").canonicalFile
         DeskLibrary.link(media)
+        DeskLibrary.link(File("build/workspace-test-media/Holiday").also { it.deleteRecursively(); media.copyRecursively(it) }.canonicalFile)
         val shots = File("build/ui-shots/editor").also { it.mkdirs() }
         for ((width, height) in listOf(1024 to 700, 1280 to 800, 1728 to 1080, 2560 to 1440)) {
             runSkikoComposeUiTest(size = Size(width.toFloat(), height.toFloat())) {
@@ -76,6 +90,11 @@ class DeskWorkspaceTest {
                     onAllNodesWithText("Circle", substring = false).filter(hasClickAction()).assertCountEquals(0)
                     rail("Media")
                 }
+                runOnIdle { MultiSelect.ids = editor.scene.layers.take(3).map { it.id }.toSet(); MultiSelect.active = true }
+                mainClock.advanceTimeBy(500)
+                shot(shots, "${width}x${height}-multi")
+                runOnIdle { MultiSelect.clear() }
+                mainClock.advanceTimeBy(200)
                 runOnIdle { editor.selectedId = editor.scene.layers.last().id }
                 mainClock.advanceTimeBy(500)
                 shot(shots, "${width}x${height}-selected")
@@ -84,8 +103,12 @@ class DeskWorkspaceTest {
                 shot(shots, "${width}x${height}-panel")
                 runOnIdle { editor.panel = EditorPanel.Tools; editor.effectBrowserOpen = true }
                 mainClock.advanceTimeBy(500)
+                runOnIdle { assertTrue(DeskModals.open > 0) }
                 shot(shots, "${width}x${height}-effects")
-                runOnIdle { editor.effectBrowserOpen = false; editor.fullColor = FullColor(0xff336699.toInt()) { _, _ -> } }
+                runOnIdle { editor.effectBrowserOpen = false }
+                mainClock.advanceTimeBy(300)
+                runOnIdle { assertEquals(0, DeskModals.open) }
+                runOnIdle { editor.fullColor = FullColor(0xff336699.toInt()) { _, _ -> } }
                 mainClock.advanceTimeBy(500)
                 shot(shots, "${width}x${height}-colour")
                 runOnIdle { editor.fullColor = null; editor.presetsOpen = true }
@@ -95,6 +118,8 @@ class DeskWorkspaceTest {
                 mainClock.advanceTimeBy(300)
                 for (section in listOf("Audio", "Text", "Objects", "Template", "Draw", "Media")) {
                     rail(section)
+                    if (section == "Audio") runCatching { waitUntil(timeoutMillis = 10_000) { onAllNodesWithText("test-audio", substring = true).fetchSemanticsNodes().size >= 2 } }
+                    runOnIdle { assertTrue("preview ${DeskPreviewBounds.bounds.width} in $section at $width", previewWidthDp() >= 319f) }
                     shot(shots, "${width}x${height}-" + section.lowercase())
                 }
                 rail("Shape")
@@ -130,6 +155,15 @@ class DeskWorkspaceTest {
         runOnIdle { check(editor.scene.layers.size == before + 1); editor.undo(); check(editor.scene.layers.size == before) }
         val start = circle.centre()
         val preview = DeskPreviewBounds.bounds
+        circle.performMouseInput { moveTo(center); press(); moveBy(Offset(30f, 40f)) }
+        runOnIdle { assertNotNull(DeskDrop.item) }
+        onRoot().performKeyInput { keyDown(modifier); pressKey(Key.One); keyUp(modifier) }
+        mainClock.advanceTimeBy(300)
+        runOnIdle { assertNull(DeskDrop.item); assertTrue(!DeskDrop.at.isSpecified) }
+        onAllNodes(isRoot()).onFirst().performMouseInput { release() }
+        rail("Shape")
+        mainClock.advanceTimeBy(300)
+        onAllNodesWithText("Circle", substring = false).filter(hasClickAction()).onFirst().assertExists()
         runOnIdle { DeskDrop.frameAt = { null } }
         drag(start, preview.center)
         runOnIdle { check(editor.scene.layers.size == before + 1); editor.undo(); check(editor.scene.layers.size == before) }
@@ -146,6 +180,14 @@ class DeskWorkspaceTest {
         }
         runOnIdle { editor.selectedId = null }
         mainClock.advanceTimeBy(300)
+        DeskScale.set(150)
+        mainClock.advanceTimeBy(600)
+        waitForIdle()
+        runOnIdle { assertTrue(DeskPreviewBounds.bounds.width / 1.5f >= 319f) }
+        shot(shots, "1280x800-zoom-150")
+        DeskScale.set(100)
+        mainClock.advanceTimeBy(600)
+        waitForIdle()
         onNodeWithText("1:1", substring = false).performClick()
         runOnIdle { check(editor.scene.width == editor.scene.height); editor.undo() }
         mainClock.advanceTimeBy(300)
@@ -212,7 +254,22 @@ class DeskWorkspaceTest {
                 shot(shots, "$name-selected")
                 if (width < 1100) {
                     rail("Shape")
+                    runOnIdle { assertTrue(previewWidthDp(scale.toFloat()) >= 319f) }
                     shot(shots, "$name-library")
+                    if (width < 1000) {
+                        DeskBack.back()
+                        mainClock.advanceTimeBy(300)
+                        onAllNodesWithText("Circle", substring = false).assertCountEquals(0)
+                        runOnIdle { assertNotNull(app.editor!!.selectedId) }
+                        rail("Shape")
+                        DeskBack.back()
+                        mainClock.advanceTimeBy(300)
+                        onAllNodesWithText("Circle", substring = false).assertCountEquals(0)
+                        runOnIdle { assertNotNull(app.editor!!.selectedId) }
+                        DeskBack.back()
+                        mainClock.advanceTimeBy(300)
+                        runOnIdle { assertNull(app.editor!!.selectedId) }
+                    }
                 }
                 runBlocking { app.closeEditor() }
             }

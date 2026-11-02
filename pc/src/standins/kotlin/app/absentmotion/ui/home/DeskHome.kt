@@ -46,6 +46,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -96,6 +97,7 @@ import app.absentmotion.platform.asImageBitmap
 import app.absentmotion.ui.editor.ChromeIcons
 import app.absentmotion.ui.editor.NoMatches
 import app.absentmotion.ui.editor.SearchField
+import app.absentmotion.ui.editor.SizedBox
 import app.absentmotion.ui.editor.TextIcons
 import app.absentmotion.ui.editor.debounced
 import app.absentmotion.ui.editor.matchesSearch
@@ -109,6 +111,7 @@ import java.util.Locale
 
 private val ContentMax = 1920.dp
 private val CardMin = 240.dp
+private val CardMax = 400.dp
 private val TileGap = 16.dp
 private val GridPad = 24.dp
 
@@ -214,29 +217,30 @@ internal fun DeskHome(
 private fun DeskHeader(
     section: DeskSection, onSection: (DeskSection) -> Unit, search: String, onSearch: (String) -> Unit, templates: Boolean,
     onNew: () -> Unit, onImport: () -> Unit, onSettings: () -> Unit,
-) = BoxWithConstraints(Modifier.fillMaxWidth()) {
+) = SizedBox(Modifier.fillMaxWidth()) { maxWidth, _ ->
     val compact = maxWidth < 1180.dp
-    val logo = maxWidth >= 860.dp
-    val fixed = if (!compact) 900.dp else if (logo) 770.dp else 600.dp
-    val searchWidth = (maxWidth - fixed).coerceIn(110.dp, 300.dp)
+    val iconNew = maxWidth < 900.dp
+    val tight = maxWidth < 780.dp
+    val fixed = if (tight) 570.dp else 510.dp + (if (compact) 72.dp else 216.dp) + (if (iconNew) 36.dp else 150.dp) + 32.dp
+    val searchWidth = (maxWidth - fixed).coerceIn(if (tight) 110.dp else 140.dp, 300.dp)
     Box(Modifier.fillMaxWidth(), Alignment.TopCenter) {
-        Row(Modifier.widthIn(max = ContentMax).fillMaxWidth().height(68.dp).padding(horizontal = GridPad), Arrangement.spacedBy(8.dp), Alignment.CenterVertically) {
-            if (logo) {
-                Text("AbsentMotion", color = Am.Navy, fontSize = 20.sp, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
-                Spacer(Modifier.width(if (compact) 8.dp else 20.dp))
-            }
-            DeskTab(stringResource(R.string.home_tab_projects), section == DeskSection.Projects) { onSection(DeskSection.Projects) }
-            DeskTab(stringResource(R.string.home_tab_assets), section == DeskSection.Assets) { onSection(DeskSection.Assets) }
-            DeskTab(stringResource(R.string.home_tab_templates), section == DeskSection.Templates) { onSection(DeskSection.Templates) }
+        Row(Modifier.widthIn(max = ContentMax).fillMaxWidth().height(68.dp).padding(horizontal = if (tight) 16.dp else GridPad), Arrangement.spacedBy(if (tight) 6.dp else 8.dp), Alignment.CenterVertically) {
+            Text("AbsentMotion", color = Am.Navy, fontSize = if (tight) 18.sp else 20.sp, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
+            Spacer(Modifier.width(if (compact) 4.dp else 12.dp))
+            DeskTab(stringResource(R.string.home_tab_projects), section == DeskSection.Projects, tight) { onSection(DeskSection.Projects) }
+            DeskTab(stringResource(R.string.home_tab_assets), section == DeskSection.Assets, tight) { onSection(DeskSection.Assets) }
+            DeskTab(stringResource(R.string.home_tab_templates), section == DeskSection.Templates, tight) { onSection(DeskSection.Templates) }
             Spacer(Modifier.weight(1f))
             SearchField(
                 search, onSearch, Modifier.width(searchWidth).height(36.dp),
-                hint = stringResource(if (templates) R.string.home_search_templates_hint else R.string.home_search_hint), background = Am.Card, content = Am.Navy, faint = Am.HomeDim,
+                hint = stringResource(if (searchWidth < 210.dp) R.string.home_search else if (templates) R.string.home_search_templates_hint else R.string.home_search_hint),
+                background = Am.Card, content = Am.Navy, faint = Am.HomeDim,
             )
             if (compact) DeskIconButton(HomeIcons.Upload, stringResource(R.string.desk_import), onImport)
             else DeskButton(stringResource(R.string.desk_import), onImport, icon = HomeIcons.Upload)
             Hint("${stringResource(R.string.home_new_project)} (${deskKey("N")})") {
-                DeskButton(stringResource(R.string.home_new_project), onNew, primary = true, icon = HomeIcons.Plus)
+                if (iconNew) DeskIconButton(HomeIcons.Plus, stringResource(R.string.home_new_project), onNew, tooltip = null, tint = Am.OnAccent, modifier = Modifier.background(Am.Accent, RoundedCornerShape(10.dp)))
+                else DeskButton(stringResource(R.string.home_new_project), onNew, primary = true, icon = HomeIcons.Plus)
             }
             Hint("${stringResource(R.string.settings)} (${deskKey(",")})") {
                 if (compact) DeskIconButton(ChromeIcons.Gear, stringResource(R.string.settings), onSettings, tooltip = null)
@@ -247,11 +251,11 @@ private fun DeskHeader(
 }
 
 @Composable
-private fun DeskTab(label: String, selected: Boolean, onClick: () -> Unit) {
+private fun DeskTab(label: String, selected: Boolean, tight: Boolean = false, onClick: () -> Unit) {
     val shape = RoundedCornerShape(18.dp)
     val fill by animateColorAsState(if (selected) Am.Navy else Color.Transparent, label = "tab")
     Box(
-        Modifier.height(36.dp).clip(shape).background(fill).then(if (selected) Modifier else Modifier.deskPress(18.dp)).clickable(onClick = onClick).padding(horizontal = 16.dp),
+        Modifier.height(36.dp).clip(shape).background(fill).then(if (selected) Modifier else Modifier.deskPress(18.dp)).clickable(onClick = onClick).padding(horizontal = if (tight) 8.dp else 16.dp),
         Alignment.Center,
     ) { Text(label, color = animatedColor(if (selected) Am.OnNavy else Am.HomeMid), fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1) }
 }
@@ -273,19 +277,31 @@ private fun ProjectsPane(
     val focus = remember { FocusRequester() }
     val ids = remember(cards) { cards.map { it.id }.toSet() }
 
+    var columns by remember { mutableIntStateOf(1) }
+
     fun move(dx: Int, dy: Int) {
         val current = selected
         if (current == null || current !in ids) { onSelect(cards.firstOrNull()?.id); return }
+        val index = cards.indexOfFirst { it.id == current }
         if (dy == 0) {
-            val index = cards.indexOfFirst { it.id == current } + dx
-            cards.getOrNull(index)?.let { onSelect(it.id) }
+            cards.getOrNull(index + dx)?.let { onSelect(it.id) }
             return
         }
         val items = grid.layoutInfo.visibleItemsInfo
-        val me = items.firstOrNull { it.key == current } ?: return
-        val above = items.filter { it.key in ids && (if (dy < 0) it.offset.y < me.offset.y else it.offset.y > me.offset.y) }
-        val rowY = (if (dy < 0) above.maxOfOrNull { it.offset.y } else above.minOfOrNull { it.offset.y }) ?: return
-        above.filter { it.offset.y == rowY }.minByOrNull { kotlin.math.abs(it.offset.x - me.offset.x) }?.let { onSelect(it.key as String) }
+        val me = items.firstOrNull { it.key == current }
+        val above = if (me == null) emptyList() else items.filter { it.key in ids && (if (dy < 0) it.offset.y < me.offset.y else it.offset.y > me.offset.y) }
+        val rowY = (if (dy < 0) above.maxOfOrNull { it.offset.y } else above.minOfOrNull { it.offset.y })
+        val near = if (me == null || rowY == null) null else above.filter { it.offset.y == rowY }.minByOrNull { kotlin.math.abs(it.offset.x - me.offset.x) }
+        if (near != null) { onSelect(near.key as String); return }
+        val step = columns.coerceAtLeast(1)
+        val target = index + dy * step
+        val last = cards.lastIndex
+        val picked = when {
+            target in 0..last -> target
+            dy > 0 && index / step < last / step -> last
+            else -> null
+        }
+        picked?.let { onSelect(cards[it].id) }
     }
     LaunchedEffect(selected) {
         val id = selected ?: return@LaunchedEffect
@@ -310,8 +326,12 @@ private fun ProjectsPane(
             }
         },
     ) {
-        if (shown.isNotEmpty()) BoxWithConstraints(Modifier.fillMaxSize()) {
-            val columns = (((maxWidth - GridPad * 2 + TileGap) / (CardMin + TileGap)).toInt()).coerceAtLeast(1)
+        if (shown.isNotEmpty()) SizedBox(Modifier.fillMaxSize()) { maxWidth, _ ->
+            val room = maxWidth - GridPad * 2 + TileGap
+            val most = (room / (CardMin + TileGap)).toInt().coerceAtLeast(1)
+            val fewest = kotlin.math.ceil(room / (CardMax + TileGap)).toInt().coerceIn(1, most)
+            val across = cards.size.coerceIn(fewest, most)
+            SideEffect { columns = across }
             Column(Modifier.fillMaxSize()) {
                 Row(Modifier.fillMaxWidth().height(48.dp).padding(horizontal = GridPad), verticalAlignment = Alignment.CenterVertically) {
                     Text(stringResource(if (assets) R.string.home_tab_assets else R.string.home_your_projects), color = Am.Navy, fontSize = 20.sp, fontWeight = FontWeight.Bold, maxLines = 1)
@@ -324,7 +344,7 @@ private fun ProjectsPane(
                     )
                 }
                 LazyVerticalGrid(
-                    GridCells.Fixed(columns), Modifier.fillMaxSize(), grid,
+                    GridCells.Fixed(across), Modifier.fillMaxSize(), grid,
                     contentPadding = PaddingValues(start = GridPad, end = GridPad, top = 8.dp, bottom = 32.dp),
                     horizontalArrangement = Arrangement.spacedBy(TileGap), verticalArrangement = Arrangement.spacedBy(TileGap),
                 ) {
@@ -408,7 +428,7 @@ internal fun DeskCard(
                 badge, Modifier.align(Alignment.BottomStart).padding(8.dp).background(Am.Navy, RoundedCornerShape(5.dp)).padding(horizontal = 6.dp, vertical = 2.dp),
                 color = Am.OnNavy, fontSize = 12.sp, fontWeight = FontWeight.Medium, maxLines = 1,
             )
-            Box(Modifier.align(Alignment.TopEnd).padding(8.dp).alpha(if (hovered || selected || buttonMenu) 1f else 0f)) {
+            if (hovered || selected || buttonMenu) Box(Modifier.align(Alignment.TopEnd).padding(8.dp)) {
                 Box(
                     Modifier.size(30.dp).background(Am.Card.copy(alpha = 0.92f), CircleShape).clip(CircleShape).deskPress(15.dp).clickable { onSelect(); buttonMenu = true },
                     Alignment.Center,

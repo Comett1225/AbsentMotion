@@ -11,6 +11,7 @@ import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.drag
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,6 +30,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -53,6 +55,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -61,7 +64,9 @@ import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.FullColor
 import app.absentmotion.editor.KeypadField
 import app.absentmotion.editor.KeypadRequest
+import app.absentmotion.platform.PlatformFeatures
 import app.absentmotion.ui.editor.PanelIcons
+import app.absentmotion.ui.editor.deskVerticalScroll
 import app.absentmotion.ui.editor.ValueKeypad
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Swap
@@ -115,8 +120,10 @@ internal fun FullColorPicker(state: EditorState, request: FullColor, modifier: M
                     PanelIcon(PanelIcons.Check, Am.OnDark, size = 27.dp, description = stringResource(R.string.done))
                 }
             }
-            Box(Modifier.weight(1f).fillMaxWidth(), Alignment.Center) {
-                if (tab == 0) Wheel(hsva, request.start, argb, ::setHsva, end, ::enterHex) { save(state, argb) }
+            BoxWithConstraints(Modifier.weight(1f).fillMaxWidth().padding(vertical = if (PlatformFeatures.desktop) 12.dp else 0.dp), Alignment.Center) {
+                val base = LocalDensity.current
+                val fit = if (PlatformFeatures.desktop) minOf(1f, maxHeight / WHEEL.px, maxWidth / WHEEL.px).coerceAtLeast(.4f) else 1f
+                if (tab == 0) CompositionLocalProvider(LocalDensity provides Density(base.density * fit, base.fontScale)) { Wheel(hsva, request.start, argb, ::setHsva, end, ::enterHex) { save(state, argb) } }
                 else Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     ColourCard(request.start, argb, 394.px, 197.px) { save(state, argb) }
                     Spacer(Modifier.height(14.px))
@@ -147,8 +154,9 @@ internal fun FullColorPicker(state: EditorState, request: FullColor, modifier: M
                     PanelIcon(PanelIcons.Opacity, Idle, size = 19.dp)
                 }
             }
-            Box(Modifier.fillMaxWidth().height(315.px).background(GridBg)) {
-                Column(Modifier.offset(211.px, 5.px).size(658.px, 304.px).verticalScroll(rememberScrollState()).padding(5.px, 11.px), Arrangement.spacedBy(11.px)) {
+            val gridGap = if (PlatformFeatures.desktop) 16.dp else 0.dp
+            Box(Modifier.fillMaxWidth().height(315.px + gridGap).background(GridBg)) {
+                Column(Modifier.offset(211.px, 5.px + gridGap / 2).size(658.px, 304.px).deskVerticalScroll().padding(5.px, 11.px), Arrangement.spacedBy(11.px)) {
                     (FixedSwatches + saved).chunked(7).forEach { row ->
                         Row(Modifier.height(84.px), Arrangement.spacedBy(10.px)) {
                             row.forEach { swatch ->

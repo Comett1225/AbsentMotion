@@ -27,6 +27,8 @@ import javax.imageio.ImageIO
 
 @OptIn(ExperimentalTestApi::class)
 class DeskHomeTest {
+    private val tier = app.absentmotion.Tier.openGl
+
     private val sizes = listOf(1024 to 700, 1280 to 800, 1728 to 1080, 2560 to 1440)
     private val repo = File("..").canonicalFile
     private val shots = File("build/ui-shots/home").also { it.mkdirs() }
@@ -164,6 +166,11 @@ class DeskHomeTest {
             runOnIdle { app.exportingFromList = scene }
             settle(1500)
             shot("$w-12-export")
+            if (w == 1280) {
+                onNodeWithText("Audio Only").performMouseInput { moveTo(center) }
+                settle(900)
+                shot("$w-12b-export-disabled-hint", park = false)
+            }
             runOnIdle { app.exportingFromList = null }
             settle(200)
             if (w == 1280 || w == 2560) {
@@ -243,13 +250,47 @@ class DeskHomeTest {
         }
     }
 
+    @Test fun arrowNavigation() {
+        prepare()
+        DeskScale.set(100)
+        val names = listOf("styles.xml", "media.xml", "text.xml", "shapes.xml", "easing.xml", "audit.xml")
+        session(1280, 420) { app ->
+            names.forEach { app.store.create(scene(it)) }
+            app.settings.sortBy = "name"
+            runOnIdle { app.projectsChanged++ }
+            settle(1200)
+            val titles = app.store.list().map { it.title }.sortedBy { it.lowercase() }
+            assertEquals(6, titles.size)
+            onAllNodesWithText(titles[0]).onFirst().performClick()
+            settle(400)
+            shot("1280-23-arrow-start")
+            val columns = 4
+            onAllNodes(isRoot()).onFirst().performKeyInput { pressKey(Key.DirectionDown) }
+            settle(600)
+            shot("1280-23-arrow-down")
+            onAllNodes(isRoot()).onFirst().performKeyInput { pressKey(Key.Enter) }
+            waitUntil(timeoutMillis = 30_000) { app.editor != null }
+            assertEquals(titles[columns], app.editor!!.project.title)
+            runBlocking { app.closeEditor() }
+            settle(1200)
+            onAllNodes(isRoot()).onFirst().performKeyInput { pressKey(Key.DirectionUp) }
+            settle(600)
+            onAllNodes(isRoot()).onFirst().performKeyInput { pressKey(Key.Enter) }
+            waitUntil(timeoutMillis = 30_000) { app.editor != null }
+            assertEquals(titles[0], app.editor!!.project.title)
+            runBlocking { app.closeEditor() }
+            settle(800)
+        }
+    }
+
     @Test fun scaled() {
         prepare()
         val sc = listOf("styles.xml", "media.xml", "text.xml", "shapes.xml").map { scene(it) }
+        val seed = DeskAppState()
+        sc.forEach { scene -> val id = seed.store.create(scene); runBlocking { seed.saveThumbnail(scene, scene.totalTime / 2, id) } }
         for (percent in listOf(80, 150)) {
             DeskScale.set(percent)
             for ((w, h) in sizes.take(3)) session(w, h) { app ->
-                if (app.store.list().isEmpty()) sc.forEach { app.store.create(it) }
                 runOnIdle { app.projectsChanged++ }
                 settle(1200)
                 shot("$w-20-home-scale-$percent")
@@ -257,6 +298,19 @@ class DeskHomeTest {
                 settle(900)
                 shot("$w-21-settings-scale-$percent")
             }
+        }
+        DeskScale.set(100)
+        session(1280, 800) { app ->
+            runOnIdle { app.projectsChanged++ }
+            settle(1200)
+            shot("1280-22-home-before-rescale")
+            DeskScale.set(150)
+            settle(900)
+            shot("1280-22-home-rescaled-150")
+            DeskScale.set(80)
+            settle(900)
+            shot("1280-22-home-rescaled-80")
+            DeskScale.set(100)
         }
         DeskScale.set(100)
     }
