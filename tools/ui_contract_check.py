@@ -63,7 +63,7 @@ class UiContracts(unittest.TestCase):
         self.assertEqual(2, text.count('dirty = true'))
 
     def test_player_is_owned_before_data_source_can_throw(self):
-        text = source('ui/editor/AudioTab.kt').split('private class SoundPreview', 1)[1]
+        text = source('ui/editor/AudioTab.kt').split('class SoundPreview', 1)[1]
         self.assertIn('player = nextPlayer', text)
         self.assertLess(text.index('player = nextPlayer'), text.index('setDataSource(context, Uri.parse(next))'))
         self.assertIn('catch (_: Exception) { stop() }', text)
