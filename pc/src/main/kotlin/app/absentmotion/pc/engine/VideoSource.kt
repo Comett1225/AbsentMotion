@@ -23,6 +23,8 @@ class NativeVideoSource(file: File) : AutoCloseable {
 
     fun show(handle: Long, uri: String, timeUs: Long, exact: Boolean): Int = if (video == 0L) -1 else DesktopNative.videoFrame(handle, video, uri, timeUs, exact)
 
+    fun showLayer(handle: Long, uri: String, layer: Long, timeUs: Long, exact: Boolean): Int = if (video == 0L) -1 else DesktopNative.videoFrameLayer(handle, video, uri, layer, timeUs, exact)
+
     override fun close() {
         if (video != 0L) DesktopNative.videoClose(video)
         video = 0L
@@ -38,6 +40,9 @@ class FfmpegVideoSource(private val file: File, private val ffmpeg: String, ffpr
     private var stream: InputStream? = null
     private var decodedFrame = -1L
     private var bytes: ByteArray
+    private val exactFrames = object : LinkedHashMap<Long, VideoFrame>(4, 0.75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Long, VideoFrame>?) = size > 2
+    }
 
     init {
         val probe = ProcessBuilder(ffprobe, "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height,avg_frame_rate:format=duration", "-of", "json", file.absolutePath).start()
@@ -50,7 +55,7 @@ class FfmpegVideoSource(private val file: File, private val ffmpeg: String, ffpr
         width = maxOf(2, (originalWidth * scale).toInt() / 2 * 2)
         height = maxOf(2, (originalHeight * scale).toInt() / 2 * 2)
         val rate = video.optString("avg_frame_rate", "30/1").split('/')
-        fps = ((rate.getOrNull(0)?.toDoubleOrNull() ?: 30.0) / (rate.getOrNull(1)?.toDoubleOrNull()?.takeIf { it > 0 } ?: 1.0)).coerceIn(1.0, 120.0)
+        fps = ((rate.getOrNull(0)?.toDoubleOrNull() ?: 30.0) / (rate.getOrNull(1)?.toDoubleOrNull()?.takeIf { it > 0 } ?: 1.0)).coerceIn(0.001, 1000.0)
         val duration = (json.optJSONObject("format")?.optString("duration")?.toDoubleOrNull()?.times(1000) ?: 0.0).toLong()
         info = VideoInfo(originalWidth, originalHeight, duration, fps)
         bytes = ByteArray(width * height * 4)
@@ -78,7 +83,20 @@ class FfmpegVideoSource(private val file: File, private val ffmpeg: String, ffpr
         return VideoFrame(width, height, bytes)
     }
 
+    fun frameExact(timeUs: Long): VideoFrame? {
+        exactFrames[timeUs]?.let { return it }
+        val seconds = String.format(java.util.Locale.ROOT, "%.6f", (timeUs - 1).coerceAtLeast(0) / 1_000_000.0)
+        val process = ProcessBuilder(ffmpeg, "-nostdin", "-v", "error", "-ss", seconds, "-noautorotate", "-i", file.absolutePath,
+            "-frames:v", "1", "-an", "-vf", "scale=$width:$height", "-pix_fmt", "rgba", "-f", "rawvideo", "-")
+            .redirectError(ProcessBuilder.Redirect.DISCARD).start()
+        try {
+            val data = process.inputStream.use { it.readNBytes(width * height * 4) }
+            return if (data.size == width * height * 4 && process.waitFor() == 0) VideoFrame(width, height, data).also { exactFrames[timeUs] = it } else null
+        } finally { if (process.isAlive) process.destroyForcibly() }
+    }
+
     override fun close() {
+        exactFrames.clear()
         stream?.close()
         stream = null
         process?.destroyForcibly()

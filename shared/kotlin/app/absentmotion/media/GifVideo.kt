@@ -37,6 +37,7 @@ fun gifEncodeSize(width: Int, height: Int, supported: (Int, Int) -> Boolean): Pa
 fun gifFrameRate(summary: GifSummary): Int = (summary.frames * 1000.0 / summary.durationMs.coerceAtLeast(1)).roundToInt().coerceIn(1, 60)
 
 suspend fun gifVideo(context: Context, uri: Uri): GifVideo? = withContext(Dispatchers.IO) {
+    if (app.absentmotion.platform.PlatformFeatures.desktop) return@withContext app.absentmotion.platform.desktopGifVideo(context, uri)
     val resolver = context.contentResolver
     val job = coroutineContext.job
     fun open() = resolver.openInputStream(uri) ?: throw GifError(GifProblem.Damaged)

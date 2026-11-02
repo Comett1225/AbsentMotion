@@ -397,8 +397,12 @@ internal fun loadAiLibrary() { System.loadLibrary("absent_ai") }
 
 internal suspend fun desktopRewriteVideo(context: android.content.Context, job: app.absentmotion.ai.VideoJob, progress: app.absentmotion.ai.AiProgress, work: app.absentmotion.ai.FrameWork): app.absentmotion.ai.AiMedia = error("Desktop only")
 
-internal suspend fun desktopClipSmooth(context: android.content.Context, layer: app.absentmotion.model.Layer, media: app.absentmotion.model.MediaDeclaration, fps: Int, smoothing: app.absentmotion.export.Smoothing, progress: app.absentmotion.ai.AiProgress): app.absentmotion.ai.AiMedia = error("Desktop only")
+internal suspend fun desktopClipSmooth(context: android.content.Context, engine: app.absentmotion.engine.EngineThread, layer: app.absentmotion.model.Layer, media: app.absentmotion.model.MediaDeclaration, fps: Int, smoothing: app.absentmotion.export.Smoothing, progress: app.absentmotion.ai.AiProgress): app.absentmotion.ai.AiMedia = error("Desktop only")
 
 internal fun desktopFaces(argb: IntArray, width: Int, height: Int, turn: Int): List<app.absentmotion.ai.FaceBox> = error("Desktop only")
 
 internal fun desktopCutout(handle: Long, bitmap: android.graphics.Bitmap, size: Int): Int = error("Desktop only")
+
+internal suspend fun desktopGifVideo(context: Context, uri: Uri): app.absentmotion.media.GifVideo? = null
+
+internal fun desktopFrameReader(context: Context, uri: String): app.absentmotion.media.DesktopFrameInput? = null

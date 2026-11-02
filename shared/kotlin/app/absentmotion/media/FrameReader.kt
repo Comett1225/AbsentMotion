@@ -20,10 +20,18 @@ import java.util.concurrent.TimeUnit
 import kotlin.coroutines.coroutineContext
 import app.absentmotion.library.openableUri
 
+internal interface DesktopFrameInput : Closeable {
+    val timestamps: LongArray
+    val colorStandard: Int
+    val fullRange: Boolean
+    suspend fun read(wanted: List<Long>, consume: suspend (Long, Yuv) -> Unit): Int
+}
+
 internal class FrameReader(context: Context, uri: String) : Closeable {
-    private val extractor = MediaExtractor()
+    private val desktop = app.absentmotion.platform.desktopFrameReader(context, uri)
+    private val extractor by lazy { MediaExtractor() }
     private var codec: MediaCodec? = null
-    private val info = MediaCodec.BufferInfo()
+    private val info by lazy { MediaCodec.BufferInfo() }
     private var queued = false
     private var positioned = false
     private var lastPts = 0L
@@ -34,7 +42,11 @@ internal class FrameReader(context: Context, uri: String) : Closeable {
         private set
 
     init {
-        try {
+        if (desktop != null) {
+            timestamps = desktop.timestamps
+            colorStandard = desktop.colorStandard
+            fullRange = desktop.fullRange
+        } else try {
             extractor.setDataSource(context, Uri.parse(openableUri(uri)), null)
             val track = (0 until extractor.trackCount).first { extractor.getTrackFormat(it).getString(MediaFormat.KEY_MIME)?.startsWith("video/") == true }
             val format = extractor.getTrackFormat(track)
@@ -57,6 +69,7 @@ internal class FrameReader(context: Context, uri: String) : Closeable {
     }
 
     suspend fun read(wanted: List<Long>, consume: suspend (Long, Yuv) -> Unit): Int {
+        desktop?.let { return it.read(wanted, consume) }
         if (wanted.isEmpty()) return 0
         val decoder = checkNotNull(codec) { "The video reader is closed" }
         if (!positioned || wanted.first() <= lastPts || wanted.first() - lastPts > SKIP_US) {
@@ -115,6 +128,7 @@ internal class FrameReader(context: Context, uri: String) : Closeable {
     }
 
     override fun close() {
+        if (desktop != null) { desktop.close(); return }
         runCatching { codec?.stop() }
         runCatching { codec?.release() }
         codec = null

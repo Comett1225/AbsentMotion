@@ -1,8 +1,10 @@
 #include <jni.h>
+#include <algorithm>
 #include <map>
 #include <string>
 #include <vector>
 #include "effects.h"
+#include "interpolation.h"
 #include "scene.h"
 #include "easing.h"
 #include "textanim.h"
@@ -23,16 +25,28 @@
 #include "include/gpu/ganesh/SkSurfaceGanesh.h"
 #include "include/gpu/ganesh/GrDirectContext.h"
 
+struct DesktopMosh {
+    am::MoshParams params;
+    std::vector<int64_t> done;
+    std::vector<int64_t> pts;
+    sk_sp<SkImage> state, previous, motion;
+};
+
 struct Desktop {
     am::Scene scene;
     am::EffectRuntime runtime;
     std::map<std::string, sk_sp<SkImage>> pictures;
+    std::map<std::pair<std::string, int64_t>, sk_sp<SkImage>> layerPictures;
+    std::map<std::pair<std::string, int64_t>, DesktopMosh> mosh;
     std::unique_ptr<DesktopGpu> gpu;
     bool cameraView = true;
     bool accurateBlur = true;
     Desktop() : gpu(CreateDesktopGpu()) {}
+    ~Desktop() { mosh.clear(); layerPictures.clear(); pictures.clear(); }
     am::MediaPictures media() {
-        return [this](const std::string& uri, int64_t) -> sk_sp<SkImage> {
+        return [this](const std::string& uri, int64_t layer) -> sk_sp<SkImage> {
+            auto found = layerPictures.find({uri, layer});
+            if (found != layerPictures.end()) return found->second;
             auto it = pictures.find(uri);
             return it == pictures.end() ? nullptr : it->second;
         };
@@ -108,6 +122,7 @@ static Desktop* ptr(jlong h) { return reinterpret_cast<Desktop*>(h); }
 GrDirectContext* DesktopContext(jlong h) { return ptr(h)->gpu ? ptr(h)->gpu->context() : nullptr; }
 std::string DesktopString(JNIEnv* env, jstring s) { return str(env, s); }
 void DesktopInstall(jlong h, const std::string& uri, sk_sp<SkImage> image) { ptr(h)->pictures[uri] = std::move(image); }
+void DesktopInstallLayer(jlong h, const std::string& uri, int64_t layer, sk_sp<SkImage> image) { ptr(h)->layerPictures[{uri, layer}] = std::move(image); }
 #define JNI(name) Java_app_absentmotion_pc_engine_DesktopNative_##name
 extern "C" {
 JNIEXPORT jlong JNICALL JNI(create)(JNIEnv*, jobject) { return reinterpret_cast<jlong>(new Desktop()); }
@@ -135,6 +150,107 @@ JNIEXPORT jboolean JNICALL JNI(setFrame)(JNIEnv* e, jobject, jlong h, jstring ur
     e->GetByteArrayRegion(bytes, 0, e->GetArrayLength(bytes), (jbyte*)data->writable_data());
     auto info = SkImageInfo::Make(w, height, kRGBA_8888_SkColorType, kUnpremul_SkAlphaType, SkColorSpace::MakeSRGB());
     ptr(h)->pictures[str(e, uri)] = SkImages::RasterFromData(info, data, (size_t)w * 4);
+    return true;
+}
+static sk_sp<SkImage> frameImage(JNIEnv* e, jint w, jint height, jbyteArray bytes) {
+    if (!bytes || w <= 0 || height <= 0 || (int64_t)w * height * 4 != e->GetArrayLength(bytes)) return nullptr;
+    auto data = SkData::MakeUninitialized((size_t)w * height * 4);
+    e->GetByteArrayRegion(bytes, 0, e->GetArrayLength(bytes), (jbyte*)data->writable_data());
+    auto info = SkImageInfo::Make(w, height, kRGBA_8888_SkColorType, kUnpremul_SkAlphaType, SkColorSpace::MakeSRGB());
+    return SkImages::RasterFromData(info, data, (size_t)w * 4);
+}
+JNIEXPORT void JNICALL JNI(clearLayerFrames)(JNIEnv*, jobject, jlong h) { ptr(h)->layerPictures.clear(); }
+JNIEXPORT void JNICALL JNI(dropVideo)(JNIEnv* e, jobject, jlong h, jstring uri) {
+    auto* d = ptr(h);
+    const auto key = str(e, uri);
+    std::erase_if(d->mosh, [&](const auto& item) { return item.first.first == key; });
+    std::erase_if(d->layerPictures, [&](const auto& item) { return item.first.first == key; });
+    d->pictures.erase(key);
+}
+JNIEXPORT jboolean JNICALL JNI(setLayerFrame)(JNIEnv* e, jobject, jlong h, jstring uri, jlong layer, jint w, jint height, jbyteArray data) {
+    auto image = frameImage(e, w, height, data);
+    if (!image) return false;
+    ptr(h)->layerPictures[{str(e, uri), layer}] = std::move(image);
+    return true;
+}
+JNIEXPORT jboolean JNICALL JNI(interpolate)(JNIEnv* e, jobject, jlong h, jstring uri, jlong layer, jint w, jint height,
+                                           jbyteArray first, jbyteArray second, jbyteArray before, jbyteArray after, jbyteArray made,
+                                           jfloat t, jint mode, jfloat blur, jfloatArray parameters) {
+    auto* d = ptr(h);
+    if (!d->gpu || !d->gpu->context()) return false;
+    auto a = frameImage(e, w, height, first), b = frameImage(e, w, height, second);
+    if (!a || !b) return false;
+    am::InterpolationParams params;
+    if (parameters && e->GetArrayLength(parameters) >= 6) {
+        float p[6];
+        e->GetFloatArrayRegion(parameters, 0, 6, p);
+        params = {(int)p[0], (int)p[1], (int)p[2], (int)p[3], p[4], (int)p[5]};
+    }
+    am::GpuContext context{nullptr, nullptr, d->gpu->context()};
+    sk_sp<SkImage> field;
+    if (mode == 2 || blur > 0) {
+        am::FlowStats stats;
+        field = am::EstimateFlow(context, a, b, params, &stats);
+        if (!field) return false;
+    }
+    double ms = 0;
+    auto prior = before ? frameImage(e, w, height, before) : nullptr;
+    auto next = after ? frameImage(e, w, height, after) : nullptr;
+    auto image = mode == 0 ? a : mode == 3 ? frameImage(e, w, height, made) : am::SynthesizeFrame(context, a, b, mode == 2 ? field : nullptr, t, params.divisor, &ms, prior, next);
+    if (image && blur > 0) image = am::MotionBlur(context, image, field, t, blur, params.divisor);
+    if (!image) return false;
+    d->layerPictures[{str(e, uri), layer}] = std::move(image);
+    return true;
+}
+JNIEXPORT jint JNICALL JNI(moshStart)(JNIEnv* e, jobject, jlong h, jstring uri, jlong layer, jlongArray stamps, jfloatArray values) {
+    auto* d = ptr(h);
+    if (!d->gpu || !d->gpu->context() || !stamps || !values || e->GetArrayLength(values) < 5) return -1;
+    const int count = e->GetArrayLength(stamps);
+    if (count <= 0 || count > 61) return -1;
+    std::vector<jlong> input((size_t)count);
+    e->GetLongArrayRegion(stamps, 0, count, input.data());
+    float p[5];
+    e->GetFloatArrayRegion(values, 0, 5, p);
+    am::MoshParams params{p[0], p[1], p[2], p[3], p[4]};
+    const auto key = std::make_pair(str(e, uri), (int64_t)layer);
+    auto& m = d->mosh[key];
+    if (!(m.params == params) || m.done.size() > input.size() || !std::equal(m.done.begin(), m.done.end(), input.begin())) m = DesktopMosh{};
+    m.params = params;
+    m.pts.assign(input.begin(), input.end());
+    if (m.done.size() == m.pts.size() && m.state) d->layerPictures[key] = m.state;
+    return (int)m.done.size();
+}
+JNIEXPORT jboolean JNICALL JNI(moshFrame)(JNIEnv* e, jobject, jlong h, jstring uri, jlong layer, jint step, jint w, jint height, jbyteArray data) {
+    auto* d = ptr(h);
+    const auto key = std::make_pair(str(e, uri), (int64_t)layer);
+    auto found = d->mosh.find(key);
+    if (found == d->mosh.end() || !d->gpu || !d->gpu->context()) return false;
+    auto& m = found->second;
+    if (step < 0 || (size_t)step != m.done.size() || (size_t)step >= m.pts.size()) return false;
+    auto frame = frameImage(e, w, height, data);
+    if (!frame) return false;
+    if (step == 0) {
+        m.state = m.previous = frame;
+        m.motion = nullptr;
+    } else {
+        if (!m.previous || !m.state || frame->dimensions() != m.previous->dimensions()) return false;
+        am::GpuContext context{nullptr, nullptr, d->gpu->context()};
+        sk_sp<SkImage> flow;
+        if (m.pts[step] != m.pts[step - 1]) {
+            am::FlowStats stats;
+            flow = am::EstimateFlow(context, m.previous, frame, m.params.flow, &stats);
+            if (!flow) return false;
+        }
+        sk_sp<SkImage> motion;
+        const float salt = (float)(((uint64_t)layer * 131 + (uint64_t)step * 7919) % 997) + 0.5f;
+        auto state = am::MoshStep(context, m.state, m.motion, frame, flow, m.params, salt, &motion);
+        if (!state) return false;
+        m.state = std::move(state);
+        m.motion = std::move(motion);
+        m.previous = std::move(frame);
+    }
+    m.done.push_back(m.pts[step]);
+    if (m.done.size() == m.pts.size()) d->layerPictures[key] = m.state;
     return true;
 }
 JNIEXPORT jboolean JNICALL JNI(render)(JNIEnv* e, jobject, jlong h, jdouble time, jint w, jint height, jobject buffer) {
@@ -202,6 +318,37 @@ JNIEXPORT jboolean JNICALL JNI(setPixels)(JNIEnv* e, jobject, jlong h, jstring u
     auto info = SkImageInfo::Make(w, height, kBGRA_8888_SkColorType, kUnpremul_SkAlphaType, SkColorSpace::MakeSRGB());
     ptr(h)->pictures[str(e, uri)] = SkImages::RasterFromData(info, data, (size_t)w * 4);
     return true;
+}
+JNIEXPORT jboolean JNICALL JNI(setModel)(JNIEnv* e, jobject, jstring uri, jfloatArray positions, jfloatArray normals,
+                                       jfloatArray uvs, jintArray colors, jintArray triangles, jintArray slots, jboolean twoSided) {
+    const auto key = str(e, uri);
+    if (!positions) { am::SetModel(key, nullptr); return true; }
+    if (!normals || !uvs || !colors || !triangles || !slots) return false;
+    auto floats = [&](jfloatArray a) {
+        std::vector<float> v((size_t)e->GetArrayLength(a));
+        e->GetFloatArrayRegion(a, 0, (jsize)v.size(), v.data());
+        return v;
+    };
+    auto ints = [&](jintArray a) {
+        std::vector<int> v((size_t)e->GetArrayLength(a));
+        e->GetIntArrayRegion(a, 0, (jsize)v.size(), v.data());
+        return v;
+    };
+    auto model = std::make_shared<am::Model>();
+    model->positions = floats(positions);
+    model->normals = floats(normals);
+    model->uvs = floats(uvs);
+    const auto argb = ints(colors);
+    model->colors.assign(argb.begin(), argb.end());
+    model->triangles = ints(triangles);
+    model->slots = ints(slots);
+    model->twoSided = twoSided;
+    const size_t count = model->positions.size() / 3;
+    const bool ok = model->positions.size() == count * 3 && model->normals.size() == count * 3 && model->uvs.size() == count * 2 &&
+        model->colors.size() == count && model->triangles.size() % 3 == 0 && model->slots.size() == model->triangles.size() / 3 &&
+        std::all_of(model->triangles.begin(), model->triangles.end(), [&](int i) { return i >= 0 && (size_t)i < count; });
+    if (ok) am::SetModel(key, std::move(model));
+    return ok;
 }
 JNIEXPORT void JNICALL JNI(dropPicture)(JNIEnv* e, jobject, jlong h, jstring uri) { ptr(h)->pictures.erase(str(e, uri)); }
 JNIEXPORT void JNICALL JNI(setCameraView)(JNIEnv*, jobject, jlong h, jboolean on) { ptr(h)->cameraView = on == JNI_TRUE; }

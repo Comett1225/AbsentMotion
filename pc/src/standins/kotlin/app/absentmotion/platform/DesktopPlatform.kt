@@ -300,8 +300,12 @@ internal fun loadAiLibrary() { app.absentmotion.pc.engine.DesktopNative.hashCode
 
 internal suspend fun desktopRewriteVideo(context: android.content.Context, job: app.absentmotion.ai.VideoJob, progress: app.absentmotion.ai.AiProgress, work: app.absentmotion.ai.FrameWork): app.absentmotion.ai.AiMedia = app.absentmotion.ai.desktopRewriteVideo(context, job, progress, work)
 
-internal suspend fun desktopClipSmooth(context: android.content.Context, layer: app.absentmotion.model.Layer, media: app.absentmotion.model.MediaDeclaration, fps: Int, smoothing: app.absentmotion.export.Smoothing, progress: app.absentmotion.ai.AiProgress): app.absentmotion.ai.AiMedia = app.absentmotion.ai.desktopClipSmooth(context, layer, media, fps, smoothing, progress)
+internal suspend fun desktopClipSmooth(context: android.content.Context, engine: app.absentmotion.engine.EngineThread, layer: app.absentmotion.model.Layer, media: app.absentmotion.model.MediaDeclaration, fps: Int, smoothing: app.absentmotion.export.Smoothing, progress: app.absentmotion.ai.AiProgress): app.absentmotion.ai.AiMedia = app.absentmotion.ai.desktopClipSmooth(context, layer, media, fps, smoothing, engine, progress)
 
 internal fun desktopFaces(argb: IntArray, width: Int, height: Int, turn: Int): List<app.absentmotion.ai.FaceBox> = app.absentmotion.ai.desktopFaces(argb, width, height, turn)
 
 internal fun desktopCutout(handle: Long, bitmap: android.graphics.Bitmap, size: Int): Int = app.absentmotion.ai.DeskAiNative.cutout(handle, bitmap, size)
+
+internal suspend fun desktopGifVideo(context: Context, uri: Uri): app.absentmotion.media.GifVideo? = app.absentmotion.media.convertDesktopGif(context, uri)
+
+internal fun desktopFrameReader(context: Context, uri: String): app.absentmotion.media.DesktopFrameInput = app.absentmotion.media.DeskFrameReader(context, uri)
