@@ -38,6 +38,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
@@ -80,6 +81,10 @@ import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.PressIndication
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -106,7 +111,8 @@ class DeskAppState {
     var settingsPage by mutableStateOf(SettingsPage.Editor)
     var newProjectTick by mutableIntStateOf(0)
     var job: Job? = null
-    private var closing = false
+    private val closeLock = Mutex()
+    private val background = MainScope()
     val migration by lazy { EffectMigration.read(context) }
 
     fun openSettings(page: SettingsPage = SettingsPage.Editor) { settingsPage = page; settingsOpen = true }
@@ -144,9 +150,11 @@ class DeskAppState {
     }
 
     suspend fun closeEditor() {
+        closeLock.withLock { closeNow() }
+    }
+
+    private suspend fun closeNow() {
         val state = editor ?: return
-        if (closing) return
-        closing = true
         state.playing = false
         PreviewCache.remove()
         state.endGesture()
@@ -160,9 +168,15 @@ class DeskAppState {
         } finally {
             MultiSelect.clear()
             editor = null
-            closing = false
             projectsChanged++
         }
+    }
+
+    fun closeSoon() { background.launch { closeEditor() } }
+
+    suspend fun shutdown(timeoutMs: Long = 4000) {
+        val closing = background.launch { closeEditor() }
+        withTimeoutOrNull(timeoutMs) { closing.join() }
     }
 
     suspend fun importFiles(uris: List<Uri>) {
@@ -212,7 +226,9 @@ class DeskAppState {
 fun DeskApp(app: DeskAppState) {
     val base = LocalDensity.current
     val scale = DeskScale.percent / 100f
-    CompositionLocalProvider(LocalDensity provides Density(base.density * scale, base.fontScale)) { DeskContent(app, scale) }
+    val focused = LocalWindowInfo.current.isWindowFocused
+    LaunchedEffect(focused) { if (!focused) DeskKeys.releaseAll() }
+    CompositionLocalProvider(LocalDensity provides Density(base.density * scale, base.fontScale)) { DeskTyping.Track { DeskContent(app, scale) } }
 }
 
 @OptIn(androidx.compose.ui.ExperimentalComposeUiApi::class, androidx.compose.foundation.ExperimentalFoundationApi::class)

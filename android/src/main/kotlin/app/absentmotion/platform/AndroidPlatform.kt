@@ -201,6 +201,8 @@ object PlatformFeatures {
     const val linkFolders = false
 }
 
+fun textFieldFocused(): Boolean = false
+
 fun androidx.compose.ui.Modifier.resizeCursor(horizontal: Boolean = true): androidx.compose.ui.Modifier = this
 
 @androidx.compose.runtime.Composable

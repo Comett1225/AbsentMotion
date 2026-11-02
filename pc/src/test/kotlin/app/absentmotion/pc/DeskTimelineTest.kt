@@ -35,6 +35,7 @@ import app.absentmotion.desk.DeskAppState
 import app.absentmotion.desk.DeskBack
 import app.absentmotion.desk.DeskKeys
 import app.absentmotion.editor.MultiSelect
+import app.absentmotion.editor.deleteSelected
 import app.absentmotion.model.Scene
 import app.absentmotion.ui.editor.DeskDrop
 import app.absentmotion.ui.editor.DeskTimelineControls
@@ -45,6 +46,7 @@ import app.absentmotion.ui.theme.Am
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.After
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -292,6 +294,92 @@ class DeskTimelineTest {
             onRoot().performMouseInput { moveTo(Offset(330f, 57f)); press(); moveTo(Offset(370f, 57f)); release() }
             runOnIdle { assertTrue(state.scene.layer(7006L)!!.keyframeTimes().maxOrNull()!! > before); state.undo(); assertEquals(before, state.scene.layer(7006L)!!.keyframeTimes().maxOrNull()) }
         }
+        app.engine.close()
+    }
+
+    @Test fun keyframesOnClipEdgesCanBeGrabbed() {
+        System.setProperty("am.data", File("build/timeline-edge-data").absolutePath)
+        val app = DeskAppState()
+        val source = Scene.parse(File("../testdata/scenes/styles.xml").readText())
+        val scene = Scene(source.node.copy(children = source.node.children.filter { it["id"] == "7006" }))
+        val id = app.store.create(scene)
+        val state = runBlocking { app.openNow(id)!! }
+        val keys = state.scene.layer(7006L)!!.keyframeTimes()
+        val first = keys.minOrNull()!!
+        val last = keys.maxOrNull()!!
+        runSkikoComposeUiTest(size = Size(1280f, 300f)) {
+            setContent {
+                CompositionLocalProvider(LocalWide provides true) {
+                    Box(Modifier.fillMaxSize().background(Am.TimelineBg)) { Timeline(state, Modifier.fillMaxSize()) }
+                }
+            }
+            runOnIdle { state.timelineZoom = 100f }
+            waitForIdle()
+            fun layer() = state.scene.layer(7006L)!!
+            onRoot().performMouseInput { moveTo(Offset(186f, 57f)); press(); moveTo(Offset(216f, 57f)); release() }
+            runOnIdle {
+                assertTrue("first-frame keyframe moved ${layer().keyframeTimes()}", layer().keyframeTimes().minOrNull()!! > first)
+                assertEquals(0, layer().startTime)
+                state.undo()
+                assertEquals(first, layer().keyframeTimes().minOrNull())
+                state.clearForTest()
+            }
+            onRoot().performMouseInput { moveTo(Offset(181f, 57f)); press(); moveTo(Offset(211f, 57f)); release() }
+            runOnIdle {
+                assertTrue("start edge still trims", layer().startTime > 0)
+                state.undo()
+                state.clearForTest()
+            }
+            onRoot().performMouseInput { moveTo(Offset(475f, 57f)); press(); moveTo(Offset(445f, 57f)); release() }
+            runOnIdle {
+                assertTrue("last-frame keyframe moved ${layer().keyframeTimes()}", layer().keyframeTimes().maxOrNull()!! < last)
+                assertEquals(2999, layer().endTime)
+                state.undo()
+                assertEquals(last, layer().keyframeTimes().maxOrNull())
+                state.clearForTest()
+            }
+            onRoot().performMouseInput { moveTo(Offset(478f, 57f)); press(); moveTo(Offset(448f, 57f)); release() }
+            runOnIdle {
+                assertTrue("end edge still trims", layer().endTime < 2999)
+                state.undo()
+                state.clearForTest()
+            }
+        }
+        app.engine.close()
+    }
+
+    @Test fun shiftClickWithoutAnchorFallsBackToOneLayer() {
+        System.setProperty("am.data", File("build/timeline-anchor-data").absolutePath)
+        val app = DeskAppState()
+        val id = app.store.create(Scene.parse(File("../testdata/scenes/styles.xml").readText()))
+        val state = runBlocking { app.openNow(id)!! }
+        runSkikoComposeUiTest(size = Size(1280f, 500f)) {
+            setContent {
+                CompositionLocalProvider(LocalWide provides true) {
+                    Box(Modifier.fillMaxSize().background(Am.TimelineBg)) { Timeline(state, Modifier.fillMaxSize()) }
+                }
+            }
+            waitForIdle()
+            fun shiftClick(y: Float) = onRoot().performMultiModalInput {
+                key { keyDown(Key.ShiftLeft) }
+                mouse { moveTo(Offset(100f, y)); press(); release() }
+                key { keyUp(Key.ShiftLeft) }
+            }
+            onRoot().performMouseInput { moveTo(Offset(100f, 57f)); press(); release() }
+            runOnIdle { assertEquals(state.scene.layers.last().id, state.selectedId) }
+            shiftClick(57f + 3 * 30f)
+            runOnIdle { assertEquals(4, MultiSelect.ids.size); state.clearForTest() }
+            onRoot().performMouseInput { moveTo(Offset(100f, 57f)); press(); release() }
+            runOnIdle { state.deleteSelected(); assertEquals(null, state.selectedId) }
+            val next = state.scene.layers.last().id
+            shiftClick(57f)
+            runOnIdle {
+                assertEquals(next, state.selectedId)
+                assertFalse(MultiSelect.active)
+                state.clearForTest()
+            }
+        }
+        MultiSelect.clear()
         app.engine.close()
     }
 

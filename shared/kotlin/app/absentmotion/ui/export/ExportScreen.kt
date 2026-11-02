@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.ContentScale
 import app.absentmotion.platform.BitmapFactory
@@ -1257,15 +1257,18 @@ private fun DeskExport(
         onDispose { DeskModals.open--; if (DeskModals.open == 0) DeskModals.fade = 0f }
     }
     val idle = phase is Phase.Idle
+    val idleNow by rememberUpdatedState(idle)
+    val closeNow by rememberUpdatedState(onClose)
     val s = settings.getValue(kind)
     val onChange: (ExportSettings) -> Unit = { settings[kind] = it }
     val onReason = explain
     Box(
-        Modifier.fillMaxSize().background(Color.Black.copy(alpha = DeskModals.ScrimAlpha)).pointerInput(Unit) { detectTapGestures { if (idle) onClose() } }
+        Modifier.fillMaxSize().background(Color.Black.copy(alpha = DeskModals.ScrimAlpha)).pointerInput(Unit) { detectTapGestures { if (idleNow) closeNow() } }
             .focusRequester(focus).focusable()
-            .onPreviewKeyEvent {
+            .onKeyEvent {
                 if (it.type != KeyEventType.KeyDown || it.key != Key.Enter && it.key != Key.NumPadEnter) false
-                else when (phase) { Phase.Idle -> { onStart(); true }; is Phase.Done -> { onDone(); true }; else -> false }
+                else if (app.absentmotion.platform.textFieldFocused()) false
+                else when (phase) { Phase.Idle -> { if (blocked == null) onStart(); true }; is Phase.Done -> { onDone(); true }; else -> false }
             },
         Alignment.Center,
     ) {
@@ -1393,7 +1396,7 @@ private fun DeskExport(
                     }
                     Column(horizontalAlignment = Alignment.End) {
                         if (blocked != null) Text(blocked.text(), Modifier.widthIn(max = 220.dp), color = Alert, fontSize = 12.sp, lineHeight = 15.sp, maxLines = 2, textAlign = TextAlign.End)
-                        DeskButton(stringResource(R.string.export), true, onStart, enabled = idle)
+                        DeskButton(stringResource(R.string.export), true, onStart, enabled = idle && blocked == null)
                     }
                 }
             }
@@ -1437,10 +1440,12 @@ private fun DeskStill(scene: Scene, time: Int, engine: EngineThread, modifier: M
     val picture by produceState<ImageBitmap?>(null, scene, time) {
         val long = maxOf(scene.width, scene.height, 1)
         val file = java.io.File(context.cacheDir, "export-preview-${System.nanoTime()}.png")
-        val made = try {
-            engine.stillPng(scene.toXml(), time, (900 * scene.width / long).coerceAtLeast(1), (900 * scene.height / long).coerceAtLeast(1), file)
-        } catch (e: CancellationException) { file.delete(); throw e } catch (e: Exception) { false }
-        value = if (made) withContext(Dispatchers.IO) { BitmapFactory.decodeFile(file.path)?.asImageBitmap().also { file.delete() } } else null
+        try {
+            val made = try {
+                engine.stillPng(withContext(Dispatchers.IO) { scene.toXml() }, time, (900 * scene.width / long).coerceAtLeast(1), (900 * scene.height / long).coerceAtLeast(1), file)
+            } catch (e: CancellationException) { throw e } catch (e: Exception) { false }
+            value = if (made) withContext(Dispatchers.IO) { BitmapFactory.decodeFile(file.path)?.asImageBitmap() } else null
+        } finally { file.delete() }
     }
     Box(modifier, Alignment.Center) {
         picture?.let { Image(it, null, Modifier.fillMaxSize().padding(12.dp), contentScale = ContentScale.Fit) }

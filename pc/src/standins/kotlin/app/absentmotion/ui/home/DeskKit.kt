@@ -45,7 +45,9 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
@@ -65,6 +67,7 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
 import app.absentmotion.desk.DeskBack
+import app.absentmotion.desk.DeskTyping
 import app.absentmotion.platform.Hint
 import app.absentmotion.ui.editor.panels.ThinSwitch
 import app.absentmotion.ui.theme.Am
@@ -96,10 +99,8 @@ internal fun DeskModal(
         Modifier.fillMaxSize().background(Color.Black.copy(alpha = DeskModals.ScrimAlpha * fade))
             .pointerInput(Unit) { detectTapGestures { if (dismissOnScrim) dismiss() } }
             .focusRequester(focus).focusable()
-            .onPreviewKeyEvent { event ->
-                val action = enter
-                if (action != null && event.type == KeyEventType.KeyDown && (event.key == Key.Enter || event.key == Key.NumPadEnter)) { action(); true } else false
-            },
+            .onPreviewKeyEvent { event -> DeskTyping.active > 0 && confirmOnEnter(event, enter) }
+            .onKeyEvent { event -> confirmOnEnter(event, enter) },
         Alignment.Center,
     ) {
         BoxWithConstraints(Modifier.fillMaxSize().padding(24.dp), Alignment.Center) {
@@ -112,6 +113,12 @@ internal fun DeskModal(
             )
         }
     }
+}
+
+private fun confirmOnEnter(event: KeyEvent, action: (() -> Unit)?): Boolean {
+    if (action == null || event.type != KeyEventType.KeyDown || event.key != Key.Enter && event.key != Key.NumPadEnter) return false
+    action()
+    return true
 }
 
 @Composable
