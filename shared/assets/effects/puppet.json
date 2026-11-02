@@ -14,6 +14,98 @@
    "min": 0.1,
    "max": 4,
    "step": 0.01
+  },
+  {
+   "id": "density",
+   "label": "Triangle Density",
+   "type": "float",
+   "default": 24,
+   "min": 8,
+   "max": 48,
+   "step": 1,
+   "legacyDefault": 0
+  },
+  {
+   "id": "expansion",
+   "label": "Mesh Expansion",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 500,
+   "step": 1,
+   "pixels": true,
+   "legacyDefault": 0
+  },
+  {
+   "id": "sway",
+   "label": "Sway",
+   "type": "switch",
+   "default": false,
+   "legacyDefault": false
+  },
+  {
+   "id": "swayAmount",
+   "label": "Sway Amount",
+   "type": "float",
+   "default": 15,
+   "min": 0,
+   "max": 500,
+   "step": 0.1,
+   "pixels": true,
+   "legacyDefault": 15
+  },
+  {
+   "id": "swaySpeed",
+   "label": "Sway Speed",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 10,
+   "step": 0.01,
+   "unit": "Hz",
+   "legacyDefault": 1
+  },
+  {
+   "id": "swayDirection",
+   "label": "Sway Direction",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Angle",
+    "Random"
+   ],
+   "legacyDefault": 0
+  },
+  {
+   "id": "swayAngle",
+   "label": "Sway Angle",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.1,
+   "legacyDefault": 0
+  },
+  {
+   "id": "swaySeed",
+   "label": "Sway Seed",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1000,
+   "step": 1,
+   "legacyDefault": 0
+  },
+  {
+   "id": "swayPins",
+   "label": "Sway Pins",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "All",
+    "Selected"
+   ],
+   "legacyDefault": 0
   }
  ]
 }

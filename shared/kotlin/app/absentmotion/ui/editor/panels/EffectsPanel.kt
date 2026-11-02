@@ -80,9 +80,15 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
     val usable = instance != null && definition?.available == true
     var pin by remember(layer.id, index) { mutableStateOf<String?>(null) }
     var adding by remember(layer.id, index) { mutableStateOf(false) }
+    var pinField by remember(layer.id, index) { mutableStateOf("position") }
     val puppet = usable && definition.id == PUPPET_ID && instance["hidden"] != "true"
     val pathText = usable && definition.id == TEXT_PATH_ID
-    val pinTarget = if (puppet) pin?.let { name -> instance.effectProperty(name)?.let { KeyTarget(PropRef.effect(index, name), it.valueAt(layer.t) ?: "0,0", "vec2") } } else null
+    val pinTarget = if (puppet) pin?.let { name ->
+        val number = name.removePrefix("pin")
+        val prop = when (pinField) { "rotation" -> "pinRotation$number"; "scale" -> "pinScale$number"; else -> name }
+        val fallback = when (pinField) { "rotation" -> "0"; "scale" -> "1"; else -> "0,0" }
+        KeyTarget(PropRef.effect(index, prop), instance.effectProperty(prop)?.valueAt(layer.t) ?: fallback, if (pinField == "position") "vec2" else "float")
+    } else null
     val target = pinTarget ?: active?.takeIf { usable && definition.shown(it, instance, layer.t) }?.let { KeyTarget(PropRef.effect(index, it.id), it.missingDefault, it.type) }
     val point = active?.takeIf { it.kind == "point" && usable && !pathText }
     val adjust = remember(layer.id, index, point?.id, point?.label) {
@@ -99,7 +105,7 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
     }
     val full = rememberPinsFull()
     val points = when {
-        puppet -> puppetPoints(state, layer, index, instance, pin, adding, { pin = it; if (it != null) active = null }, full)
+        puppet -> puppetPoints(state, layer, index, instance, pin, adding, { pin = it; pinField = "position"; if (it != null) active = null }, full)
         pathText -> textPathPoints(state, layer, index, instance, definition, active) { active = it; pin = null }
         else -> null
     }
@@ -162,7 +168,7 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
                     Column(Modifier.weight(1f).fillMaxWidth().deskVerticalScroll()) {
                         if (definition != null) EffectSettings(state, layer, instance, definition, active, { active = it; pin = null })
                         else Text(instance["id"] ?: "", Modifier.padding(12.dp).dimmed(), color = Am.OnDark, fontSize = 12.sp)
-                        if (puppet) PuppetSection(state, layer, index, instance, pin, adding, { pin = it; if (it != null) active = null }) { adding = it }
+                        if (puppet) PuppetSection(state, layer, index, instance, pin, pinField, { pinField = it }, adding, { pin = it; pinField = "position"; if (it != null) active = null }) { adding = it }
                         if (pathText) TextPathHint(state, layer, instance)
                     }
                 }

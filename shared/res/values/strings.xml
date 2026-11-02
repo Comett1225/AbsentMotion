@@ -2091,4 +2091,13 @@
     <string name="desk_templates_empty_hint">Switch on \"Also keep a copy as a Template\" when you export a project and it appears here.</string>
     <string name="desk_templates_export">Export a project</string>
     <string name="desk_recommended">Recommended</string>
+    <string name="puppet_sway_pin">Sway this pin</string>
+    <string name="puppet_sway_on">On</string>
+    <string name="puppet_sway_off">Off</string>
+    <string name="puppet_bend">Bend</string>
+    <string name="puppet_mode">Pin type</string>
+    <string name="puppet_position">Position</string>
+    <string name="puppet_rotation">Rotation</string>
+    <string name="puppet_scale">Scale</string>
+    <string name="puppet_stiff">Stiff</string>
 </resources>
