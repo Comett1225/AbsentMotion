@@ -38,6 +38,7 @@ import app.absentmotion.editor.MultiSelect
 import app.absentmotion.editor.deleteSelected
 import app.absentmotion.editor.toggleBookmark
 import app.absentmotion.model.Scene
+import app.absentmotion.model.trimmedTo
 import app.absentmotion.ui.editor.DeskDrop
 import app.absentmotion.ui.editor.DeskTimelineControls
 import app.absentmotion.ui.editor.DeskRuler
@@ -446,6 +447,161 @@ class DeskTimelineTest {
             }
         }
         app.engine.close()
+    }
+
+    private fun severalClips(dir: String, body: androidx.compose.ui.test.ComposeUiTest.(DeskAppState, app.absentmotion.editor.EditorState, Triple<Long, Long, Long>) -> Unit) {
+        System.setProperty("am.data", File("build/$dir").absolutePath)
+        val app = DeskAppState()
+        val id = app.store.create(Scene.parse(File("../testdata/scenes/styles.xml").readText()))
+        val state = runBlocking { app.openNow(id)!! }
+        val rows = state.scene.layers.asReversed().map { it.id }
+        val ids = Triple(rows[0], rows[1], rows[2])
+        state.edit { s -> s.update(ids.second) { it.trimmedTo(500, 2499) }.update(ids.third) { it.trimmedTo(2000, 2999) } }
+        runSkikoComposeUiTest(size = Size(1280f, 400f)) {
+            setContent {
+                val focus = remember { FocusRequester() }
+                CompositionLocalProvider(LocalWide provides true) {
+                    Box(Modifier.fillMaxSize().background(Am.TimelineBg).focusRequester(focus).onKeyEvent { DeskKeys.handle(app, it) }.focusable()) { Timeline(state, Modifier.fillMaxSize()) }
+                }
+                LaunchedEffect(Unit) { focus.requestFocus() }
+            }
+            runOnIdle { state.timelineZoom = 100f }
+            waitForIdle()
+            body(app, state, ids)
+        }
+        MultiSelect.clear()
+        app.engine.close()
+    }
+
+    private fun androidx.compose.ui.test.ComposeUiTest.commandClick(at: List<Offset>) {
+        for (point in at) onRoot().performMultiModalInput {
+            key { keyDown(commandKey) }
+            mouse { moveTo(point); press(); release() }
+            key { keyUp(commandKey) }
+        }
+    }
+
+    @Test fun severalSelectedClipsMoveTogether() = severalClips("timeline-multi-move") { _, state, (a, b, c) ->
+        fun start(id: Long) = state.scene.layer(id)!!.startTime
+        commandClick(listOf(Offset(300f, 57f), Offset(300f, 87f)))
+        runOnIdle { assertEquals(setOf(a, b), MultiSelect.ids) }
+        onRoot().performMouseInput { moveTo(Offset(300f, 57f)); press(); moveTo(Offset(330f, 57f)); moveTo(Offset(360f, 57f)); release() }
+        runOnIdle {
+            assertEquals(600, start(a))
+            assertEquals(1100, start(b))
+            assertEquals(2000, start(c))
+            assertEquals(setOf(a, b), MultiSelect.ids)
+            state.undo()
+            assertEquals(0, start(a))
+            assertEquals(500, start(b))
+        }
+        onRoot().performMouseInput { moveTo(Offset(300f, 87f)); press(); moveTo(Offset(330f, 87f)); moveTo(Offset(350f, 87f)); release() }
+        runOnIdle {
+            assertEquals(500, start(a))
+            assertEquals(1000, start(b))
+            state.undo()
+            assertEquals(0, start(a))
+            assertEquals(500, start(b))
+        }
+        onRoot().performMouseInput { moveTo(Offset(300f, 87f)); press(); moveTo(Offset(240f, 87f)); moveTo(Offset(100f, 87f)); release() }
+        runOnIdle {
+            assertEquals(0, start(a))
+            assertEquals(500, start(b))
+        }
+    }
+
+    @Test fun severalSelectedClipsStretchTogether() = severalClips("timeline-multi-stretch") { _, state, (a, b, c) ->
+        fun clip(id: Long) = state.scene.layer(id)!!
+        commandClick(listOf(Offset(300f, 57f), Offset(300f, 87f)))
+        runOnIdle { assertEquals(setOf(a, b), MultiSelect.ids) }
+        onRoot().performMouseInput { moveTo(Offset(480f, 57f)); press(); moveTo(Offset(450f, 57f)); moveTo(Offset(420f, 57f)); release() }
+        runOnIdle {
+            assertEquals(2399, clip(a).endTime)
+            assertEquals(1899, clip(b).endTime)
+            assertEquals(2999, clip(c).endTime)
+            assertEquals(0, clip(a).startTime)
+            assertEquals(500, clip(b).startTime)
+            assertEquals(setOf(a, b), MultiSelect.ids)
+            state.undo()
+            assertEquals(2999, clip(a).endTime)
+            assertEquals(2499, clip(b).endTime)
+        }
+        onRoot().performMouseInput { moveTo(Offset(430f, 87f)); press(); moveTo(Offset(460f, 87f)); moveTo(Offset(480f, 87f)); release() }
+        runOnIdle {
+            assertEquals(3499, clip(a).endTime)
+            assertEquals(2999, clip(b).endTime)
+            assertEquals(3499, state.scene.totalTime)
+            state.undo()
+            assertEquals(2999, clip(a).endTime)
+            assertEquals(2499, clip(b).endTime)
+            assertEquals(2999, state.scene.totalTime)
+        }
+        onRoot().performMouseInput { moveTo(Offset(182f, 57f)); press(); moveTo(Offset(212f, 57f)); moveTo(Offset(242f, 57f)); release() }
+        runOnIdle {
+            assertEquals(600, clip(a).startTime)
+            assertEquals(1100, clip(b).startTime)
+            assertEquals(2999, clip(a).endTime)
+            state.undo()
+            assertEquals(0, clip(a).startTime)
+            assertEquals(500, clip(b).startTime)
+        }
+        onRoot().performMouseInput { moveTo(Offset(232f, 87f)); press(); moveTo(Offset(212f, 87f)); moveTo(Offset(202f, 87f)); release() }
+        runOnIdle {
+            assertEquals(0, clip(a).startTime)
+            assertEquals(200, clip(b).startTime)
+            state.undo()
+            assertEquals(500, clip(b).startTime)
+        }
+        onRoot().performMouseInput { moveTo(Offset(480f, 57f)); press(); moveTo(Offset(300f, 57f)); moveTo(Offset(240f, 57f)); release() }
+        runOnIdle {
+            assertEquals(599, clip(a).endTime)
+            assertTrue("b ${clip(b).endTime}", clip(b).endTime in 500..540)
+            state.undo()
+            assertEquals(2999, clip(a).endTime)
+            assertEquals(2499, clip(b).endTime)
+        }
+        onRoot().performMouseInput { moveTo(Offset(300f, 57f)); press(); release(); moveTo(Offset(430f, 87f)); press(); moveTo(Offset(400f, 87f)); release() }
+        runOnIdle {
+            assertEquals(2999, clip(a).endTime)
+            assertEquals(2199, clip(b).endTime)
+            assertFalse(MultiSelect.active)
+        }
+    }
+
+    @Test fun severalSelectedClipsSplitTogether() = severalClips("timeline-multi-split") { app, state, (a, b, c) ->
+        runOnIdle { state.frame = 30 }
+        val before = state.scene.layers.size
+        commandClick(listOf(Offset(300f, 57f), Offset(300f, 87f), Offset(420f, 117f)))
+        runOnIdle { assertEquals(setOf(a, b, c), MultiSelect.ids) }
+        onRoot().performKeyInput { keyDown(commandKey); keyDown(Key.B); keyUp(Key.B); keyUp(commandKey) }
+        runOnIdle {
+            assertEquals(before + 2, state.scene.layers.size)
+            assertEquals(999, state.scene.layer(a)!!.endTime)
+            assertEquals(999, state.scene.layer(b)!!.endTime)
+            assertEquals(2000, state.scene.layer(c)!!.startTime)
+            assertEquals(2999, state.scene.layer(c)!!.endTime)
+            assertFalse(MultiSelect.active)
+            assertEquals(null, state.selectedId)
+            state.undo()
+            assertEquals(before, state.scene.layers.size)
+            assertEquals(2999, state.scene.layer(a)!!.endTime)
+            assertEquals(2499, state.scene.layer(b)!!.endTime)
+        }
+        commandClick(listOf(Offset(300f, 57f), Offset(300f, 87f)))
+        onRoot().performMouseInput { moveTo(Offset(300f, 57f)); press(MouseButton.Secondary); release(MouseButton.Secondary) }
+        onNodeWithText("Split at playhead").performClick()
+        runOnIdle {
+            assertEquals(before + 2, state.scene.layers.size)
+            state.undo()
+            assertEquals(before, state.scene.layers.size)
+            MultiSelect.clear()
+            state.selectedId = a
+        }
+        onRoot().performKeyInput { keyDown(commandKey); keyDown(Key.B); keyUp(Key.B); keyUp(commandKey) }
+        runOnIdle {
+            assertEquals(before + 1, state.scene.layers.size)
+            assertEquals(2999, state.scene.layers.single { it.startTime == 1000 && it.endTime == 2999 }.endTime)
+        }
     }
 
     @Test fun shiftClickWithoutAnchorFallsBackToOneLayer() {

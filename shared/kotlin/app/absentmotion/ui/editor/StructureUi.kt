@@ -32,6 +32,8 @@ import app.absentmotion.editor.chosenLayers
 import app.absentmotion.editor.deleteChosen
 import app.absentmotion.editor.alignClipTimes
 import app.absentmotion.editor.moveClipEdges
+import app.absentmotion.editor.split
+import app.absentmotion.model.canSplitAt
 import app.absentmotion.model.cutBetween
 import app.absentmotion.model.shownName
 import androidx.compose.runtime.Composable
@@ -294,6 +296,10 @@ internal fun MultiBar(state: EditorState, modifier: Modifier) {
             BarButton(PanelIcons.More, stringResource(R.string.structure_more_actions), Modifier.fillMaxSize(), layers.isNotEmpty()) { moreMenu = true }
             Presence(moreMenu) {
                 MenuPopup(AboveLeft, { moreMenu = false }, TransformOrigin(0f, 1f)) {
+                    MenuRow(stringResource(R.string.timeline_split), layers.any { state.scene.canSplitAt(it, state.frame) }) {
+                        moreMenu = false
+                        state.split()
+                    }
                     MenuRow(stringResource(R.string.multi_animation)) {
                         moreMenu = false
                         state.playing = false

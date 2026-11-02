@@ -123,7 +123,7 @@ object DeskKeys {
             command && event.key == Key.D -> if (MultiSelect.active || state.selectedId != null) { if (first) { if (MultiSelect.active) state.duplicateChosen() else state.duplicateSelected() } } else return false
             command && event.key == Key.C -> if (state.chosenLayers.isNotEmpty()) { if (first) state.copySelected() } else return false
             command && event.key == Key.V -> if (first) state.pasteLayer()
-            command && event.key == Key.B -> if (state.selectedId != null) { if (first) state.split() } else return false
+            command && event.key == Key.B -> if (MultiSelect.active || state.selectedId != null) { if (first) state.split() } else return false
             command && event.key == Key.E -> if (first) { state.playing = false; state.exportOpen = true }
             command && event.key == Key.W -> if (first) app.closeSoon()
             else -> return false

@@ -279,11 +279,11 @@ class UiContracts(unittest.TestCase):
 
     def test_trim_limit_turns_the_grip_red_and_ticks_once_when_allowed(self):
         text = source('ui/editor/Timeline.kt')
-        self.assertIn('val hit = if (start) trimmed.startTime > time else trimmed.endTime < time', text)
-        self.assertIn('if (hit && limitEdge == null) onTick()', text)
+        self.assertIn('return EdgeTrim(trimmed, edge, time, if (start) trimmed.startTime > time else trimmed.endTime < time)', text)
+        self.assertIn('if (hits.isNotEmpty() && limits.isEmpty()) onTick()', text)
         self.assertIn('v.onTick = { if (state.settings.vibration) haptic.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick) }', text)
         self.assertIn('drawPath(outline, if (limit) LimitColor else GripColor, alpha = appear)', text)
-        self.assertIn('limitEdge = null', text.split('fun endDrag(', 1)[1].split('\n    }\n', 1)[0])
+        self.assertIn('limits = emptyMap()', text.split('fun endDrag(', 1)[1].split('\n    }\n', 1)[0])
         self.assertIn('if (shown != null && shown != snapAt) onTick()', text)
         self.assertIn('if (rows > selectRows) onTick()', text)
         self.assertEqual(1, text.count('performHapticFeedback(HapticFeedbackType.SegmentFrequentTick)'))
