@@ -172,7 +172,7 @@ private fun DeskSelect(value: String, options: List<String>, pick: (Int) -> Unit
             Text(value, color = Am.OnDark, fontSize = 13.sp, maxLines = 1)
             Icon(ChromeIcons.ChevronDown, null, Modifier.padding(start = 4.dp).size(20.dp), tint = Am.OnDarkDim)
         }
-        DropdownMenu(open, { open = false }, Modifier.background(Am.Field)) {
+        DropdownMenu(open, { open = false }, Modifier.background(Am.Field), shape = RoundedCornerShape(10.dp)) {
             options.forEachIndexed { index, option -> DropdownMenuItem(text = { Text(option, color = Am.OnDark, fontSize = 13.sp) }, onClick = { open = false; pick(index) }) }
         }
     }

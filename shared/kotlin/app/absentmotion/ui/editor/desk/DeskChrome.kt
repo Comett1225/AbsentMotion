@@ -120,7 +120,7 @@ internal fun DeskSheetHost(onDismiss: () -> Unit, content: @Composable () -> Uni
     DisposableEffect(Unit) { onDispose { focus.clearFocus() } }
     val fade = modalFade()
     DeskCursorHost(Modifier.fillMaxSize().background(Color.Black.copy(alpha = DeskModals.ScrimAlpha * fade)).pointerInput(Unit) { detectTapGestures { close() } }.padding(24.dp), Alignment.Center) {
-        Box(Modifier.widthIn(max = 560.dp).fillMaxWidth().fillMaxHeight()) { CompositionLocalProvider(LocalWide provides false) { content() } }
+        Box(Modifier.widthIn(max = 560.dp).fillMaxWidth().fillMaxHeight().clip(RoundedCornerShape(12.dp))) { CompositionLocalProvider(LocalWide provides false) { content() } }
     }
 }
 

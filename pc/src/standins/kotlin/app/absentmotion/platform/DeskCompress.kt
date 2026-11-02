@@ -1,0 +1,39 @@
+package app.absentmotion.platform
+
+import app.absentmotion.desk.DeskMedia
+import app.absentmotion.export.Codec
+import app.absentmotion.export.DeskEncoders
+import app.absentmotion.export.ExportError
+import app.absentmotion.export.ExportSettings
+import app.absentmotion.R
+import app.absentmotion.i18n.txt
+import app.absentmotion.tools.VideoJob
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.withContext
+import java.io.File
+import kotlin.coroutines.cancellation.CancellationException
+import kotlin.math.min
+
+suspend fun compressVideoOnDesktop(uri: String, job: VideoJob, audio: Boolean, durationUs: Long, out: File, progress: (Float) -> Unit) = withContext(Dispatchers.IO) {
+    val input = android.net.Uri.parse(uri).toFile() ?: throw ExportError(txt(R.string.compress_unreadable))
+    val settings = ExportSettings(min(job.width, job.height), job.fps)
+    val encoder = DeskEncoders.video(Codec.H264).firstOrNull { DeskEncoders.works(it, settings, job.width, job.height) } ?: throw ExportError(txt(R.string.compress_failed, "no video encoder"))
+    val args = DeskEncoders.videoArgs(encoder, settings, job.width, job.height).toMutableList()
+    args[args.indexOf("-b:v") + 1] = "${job.bitrate}"
+    val sound = when { !audio || job.audioKbps <= 0 -> listOf("-an"); job.copyAudio -> listOf("-c:a", "copy"); else -> listOf("-c:a", DeskEncoders.audio(app.absentmotion.export.AudioCodec.Aac).firstOrNull() ?: "aac", "-b:a", "${job.audioKbps}k") }
+    val command = listOf(DeskMedia.ffmpeg, "-y", "-v", "error", "-progress", "pipe:1", "-nostats", "-i", input.path, "-map", "0:v:0") +
+        (if (audio) listOf("-map", "0:a:0?") else emptyList()) + listOf("-vf", "scale=${job.width}:${job.height},fps=${job.fps}") + args + sound + listOf("-movflags", "+faststart", out.path)
+    val context = currentCoroutineContext()
+    val process = ProcessBuilder(command).redirectError(ProcessBuilder.Redirect.DISCARD).start()
+    try {
+        process.inputStream.bufferedReader().forEachLine { line ->
+            if (!context.isActive) throw CancellationException()
+            if (line.startsWith("out_time_us=") && durationUs > 0) line.substringAfter('=').toLongOrNull()?.let { progress((it.toFloat() / durationUs).coerceIn(0f, 1f)) }
+        }
+        if (process.waitFor() != 0) throw ExportError(txt(R.string.compress_failed, "ffmpeg"))
+    } finally {
+        process.destroyForcibly()
+    }
+}

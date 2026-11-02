@@ -19,6 +19,14 @@ object DeskOs {
     val commandKey = if (mac) "⌘" else "Ctrl+"
     val titleBarDp = if (mac) 28f else 0f
 
+    val systemEmoji: File? by lazy {
+        when {
+            mac -> listOf("/System/Library/Fonts/Apple Color Emoji.ttc")
+            windows -> listOf((System.getenv("WINDIR") ?: "C:\\Windows") + "\\Fonts\\seguiemj.ttf")
+            else -> listOf("/usr/share/fonts/truetype/noto/NotoColorEmoji.ttf", "/usr/share/fonts/noto/NotoColorEmoji.ttf", "/usr/share/fonts/google-noto-emoji/NotoColorEmoji.ttf", "/usr/share/fonts/google-noto-color-emoji-fonts/Noto-COLRv1.ttf")
+        }.map(::File).firstOrNull { it.isFile }
+    }
+
     fun reveal(file: File) {
         runCatching {
             when {

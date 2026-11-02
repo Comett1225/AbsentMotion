@@ -86,6 +86,7 @@ import app.absentmotion.library.AppSettings
 import app.absentmotion.library.ProjectStore
 import app.absentmotion.media.mediaDeclaration
 import app.absentmotion.model.Scene
+import app.absentmotion.platform.PlatformFeatures
 import app.absentmotion.platform.DialogStatusBarIcons
 import app.absentmotion.platform.LocalContext
 import app.absentmotion.platform.Toast
@@ -147,17 +148,26 @@ internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSett
             }
         }
     }
-    Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)) {
-        Spacer(Modifier.height(24.dp))
-        ToolCard(HomeIcons.Compress, stringResource(R.string.tools_compress), stringResource(R.string.tools_compress_about)) { compressFrom = null; open = 1 }
-        Spacer(Modifier.height(12.dp))
-        ToolCard(HomeIcons.Download, stringResource(R.string.tools_downloader), stringResource(R.string.tools_downloader_about),
-            engine = engine) {
+    val compressCard: @Composable (Modifier) -> Unit = { m ->
+        ToolCard(HomeIcons.Compress, stringResource(R.string.tools_compress), stringResource(R.string.tools_compress_about), modifier = m) { compressFrom = null; open = 1 }
+    }
+    val downloaderCard: @Composable (Modifier) -> Unit = { m ->
+        ToolCard(HomeIcons.Download, stringResource(R.string.tools_downloader), stringResource(R.string.tools_downloader_about), engine = engine, modifier = m) {
             when {
                 engine is Engine.Getting -> Unit
                 !VideoDownloader.available || VideoDownloader.installed(context) -> open = 2
                 else -> asking = true
             }
+        }
+    }
+    Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = if (PlatformFeatures.desktop) 28.dp else 16.dp)) {
+        Spacer(Modifier.height(24.dp))
+        if (PlatformFeatures.desktop) FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            compressCard(Modifier.width(380.dp))
+        } else {
+            compressCard(Modifier)
+            Spacer(Modifier.height(12.dp))
+            downloaderCard(Modifier)
         }
         Spacer(Modifier.height(28.dp))
         ToolsFooter()
@@ -178,10 +188,10 @@ internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSett
 }
 
 @Composable
-private fun ToolCard(icon: ImageVector, title: String, about: String, engine: Engine? = null, onClick: () -> Unit) {
+private fun ToolCard(icon: ImageVector, title: String, about: String, engine: Engine? = null, modifier: Modifier = Modifier, onClick: () -> Unit) {
     val missing = engine == Engine.Missing || engine is Engine.Getting || engine is Engine.Failed
     Row(
-        Modifier.fillMaxWidth().heightIn(min = 104.dp).clip(RoundedCornerShape(12.dp)).background(Am.Card).clickable(onClick = onClick).padding(16.dp),
+        modifier.fillMaxWidth().heightIn(min = 104.dp).clip(RoundedCornerShape(12.dp)).background(Am.Card).deskPress(12.dp).clickable(onClick = onClick).padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(Modifier.size(56.dp).alpha(if (missing) 0.45f else 1f).background(Am.Navy, CircleShape), contentAlignment = Alignment.Center) {
@@ -644,7 +654,7 @@ private fun QualityRow(check: Check, single: Boolean, options: List<Quality>, ch
             }
             Icon(HomeIcons.ChevronDown, null, Modifier.size(24.dp).alpha(if (usable) 1f else 0f), tint = Am.Navy)
         }
-        DropdownMenu(open, { open = false }, containerColor = Am.Card) {
+        DropdownMenu(open, { open = false }, containerColor = Am.Card, shape = if (app.absentmotion.platform.PlatformFeatures.desktop) androidx.compose.foundation.shape.RoundedCornerShape(10.dp) else androidx.compose.material3.MenuDefaults.shape) {
             options.forEachIndexed { i, option ->
                 DropdownMenuItem(
                     text = { Text(option.label(), color = Am.Navy, fontSize = 16.sp, fontWeight = if (i == choice) FontWeight.Bold else FontWeight.Normal) },

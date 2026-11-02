@@ -77,8 +77,16 @@ object DeskKeys {
         DeskModals.open > 0 || state.exportOpen || state.effectBrowserOpen || state.historyOpen || state.presetsOpen || state.cameraOpen ||
             state.drawing != null || state.fullColor != null || state.keypad != null || state.easingHint || state.ungroupAsk
 
+    var viewer: ((KeyEvent) -> Boolean)? = null
+
     fun handle(app: DeskAppState, event: KeyEvent): Boolean {
-        if (event.type == KeyEventType.KeyUp) { released(event); return false }
+        if (event.type == KeyEventType.KeyDown && viewer?.invoke(event) == true) return true
+        if (event.type == KeyEventType.KeyUp) {
+            released(event)
+            if (viewer != null && event.key == Key.Spacebar) return true
+            val open = app.editor?.let { !modal(it) } == true
+            return open && DeskTyping.active == 0 && event.key == Key.Spacebar && !isCommand(event)
+        }
         if (event.type != KeyEventType.KeyDown) return false
         val first = fresh(event.key)
         val state = app.editor ?: return false

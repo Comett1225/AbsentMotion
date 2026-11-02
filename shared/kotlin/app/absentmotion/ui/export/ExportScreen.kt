@@ -815,7 +815,7 @@ private fun ResolutionDropdown(shortSide: Int, choices: List<Choice<app.absentmo
             Text(resolutionLabel(shortSide), Modifier.weight(1f), color = Navy, fontSize = 16.sp)
             Icon(ExportIcons.ChevronDown, null, Modifier.size(20.dp), tint = Navy)
         }
-        DropdownMenu(open, { open = false }, containerColor = Am.Card) {
+        DropdownMenu(open, { open = false }, containerColor = Am.Card, shape = if (app.absentmotion.platform.PlatformFeatures.desktop) androidx.compose.foundation.shape.RoundedCornerShape(10.dp) else androidx.compose.material3.MenuDefaults.shape) {
             choices.forEach { c ->
                 DropdownMenuItem(
                     text = { Text(c.value.label, Modifier.alpha(if (c.enabled) 1f else Dimmed), color = Navy, fontSize = 17.sp) },

@@ -259,9 +259,11 @@ private fun Rule(style: HistoryStyle) {
 
 @Composable
 private fun SquareButton(label: String, fill: Color?, ink: Color, edge: Color?, modifier: Modifier, onClick: () -> Unit) {
+    val desktop = app.absentmotion.platform.PlatformFeatures.desktop
+    val shape = if (desktop) androidx.compose.foundation.shape.RoundedCornerShape(10.dp) else androidx.compose.ui.graphics.RectangleShape
     Box(
-        modifier.heightIn(min = 48.dp).then(if (fill != null) Modifier.background(fill) else Modifier).then(if (edge != null) Modifier.border(1.dp, edge) else Modifier)
-            .deskPress().clickable(role = Role.Button, onClick = onClick).padding(horizontal = 14.dp, vertical = 10.dp),
+        modifier.heightIn(min = 48.dp).then(if (desktop) Modifier.clip(shape) else Modifier).then(if (fill != null) Modifier.background(fill) else Modifier).then(if (edge != null) Modifier.border(1.dp, edge, shape) else Modifier)
+            .deskPress(if (desktop) 10.dp else 0.dp).clickable(role = Role.Button, onClick = onClick).padding(horizontal = 14.dp, vertical = 10.dp),
         contentAlignment = Alignment.Center,
     ) {
         Text(label, color = ink, fontSize = 15.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center)
@@ -276,7 +278,7 @@ private fun VersionRow(style: HistoryStyle, item: VersionItem, engine: EngineThr
     val stacked = VersionPanel.stacked(panelWidth, LocalDensity.current.fontScale)
     val restore = stringResource(R.string.restore)
     Row(Modifier.fillMaxWidth().semantics(mergeDescendants = true) {}.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-        Box(Modifier.size(thumb.dp).background(style.well).border(1.dp, style.line), Alignment.Center) {
+        Box(Modifier.size(thumb.dp).then(if (app.absentmotion.platform.PlatformFeatures.desktop) Modifier.clip(androidx.compose.foundation.shape.RoundedCornerShape(8.dp)) else Modifier).background(style.well).border(1.dp, style.line, if (app.absentmotion.platform.PlatformFeatures.desktop) androidx.compose.foundation.shape.RoundedCornerShape(8.dp) else androidx.compose.ui.graphics.RectangleShape), Alignment.Center) {
             picture?.let { bitmap ->
                 val ratio = (bitmap.width.toFloat() / bitmap.height.coerceAtLeast(1)).coerceIn(0.2f, 5f)
                 Box(Modifier.then(if (ratio >= 1f) Modifier.fillMaxWidth() else Modifier.fillMaxHeight()).aspectRatio(ratio).checkerboard(4.dp)) {

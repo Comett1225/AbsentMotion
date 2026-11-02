@@ -1,8 +1,6 @@
 package app.absentmotion.ui.home
 
 import android.net.Uri
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -59,6 +57,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -102,7 +104,6 @@ import app.absentmotion.ui.editor.TextIcons
 import app.absentmotion.ui.editor.debounced
 import app.absentmotion.ui.editor.matchesSearch
 import app.absentmotion.ui.theme.Am
-import app.absentmotion.ui.theme.animatedColor
 import app.absentmotion.ui.theme.enterOnce
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -117,7 +118,7 @@ private val GridPad = 24.dp
 
 internal fun deskKey(letter: String): String = app.absentmotion.desk.DeskOs.commandKey + letter
 
-internal enum class DeskSection { Projects, Assets, Templates }
+internal enum class DeskSection { Projects, Assets, Templates, Tools }
 
 @Composable
 internal fun DeskHome(
@@ -186,6 +187,7 @@ internal fun DeskHome(
                 Box(Modifier.widthIn(max = ContentMax).fillMaxSize()) {
                     when (section) {
                         DeskSection.Templates -> DeskTemplates(version, query, onTemplate, onTemplateProject)
+                        DeskSection.Tools -> ToolsTab(Modifier, store, settings) { id -> version++; onOpen(id) }
                         else -> ProjectsPane(
                             shown, loaded, section == DeskSection.Assets, query, settings, version, selected, { selected = it },
                             onOpen = { info -> if (info.damaged) onHistory(info) else onOpen(info.id) },
@@ -221,7 +223,7 @@ private fun DeskHeader(
     val compact = maxWidth < 1180.dp
     val iconNew = maxWidth < 900.dp
     val tight = maxWidth < 780.dp
-    val fixed = if (tight) 570.dp else 510.dp + (if (compact) 72.dp else 216.dp) + (if (iconNew) 36.dp else 150.dp) + 32.dp
+    val fixed = if (tight) 640.dp else 606.dp + (if (compact) 72.dp else 216.dp) + (if (iconNew) 36.dp else 150.dp) + 32.dp
     val searchWidth = (maxWidth - fixed).coerceIn(if (tight) 110.dp else 140.dp, 300.dp)
     Box(Modifier.fillMaxWidth(), Alignment.TopCenter) {
         Row(Modifier.widthIn(max = ContentMax).fillMaxWidth().height(68.dp).padding(horizontal = if (tight) 16.dp else GridPad), Arrangement.spacedBy(if (tight) 6.dp else 8.dp), Alignment.CenterVertically) {
@@ -230,6 +232,7 @@ private fun DeskHeader(
             DeskTab(stringResource(R.string.home_tab_projects), section == DeskSection.Projects, tight) { onSection(DeskSection.Projects) }
             DeskTab(stringResource(R.string.home_tab_assets), section == DeskSection.Assets, tight) { onSection(DeskSection.Assets) }
             DeskTab(stringResource(R.string.home_tab_templates), section == DeskSection.Templates, tight) { onSection(DeskSection.Templates) }
+            DeskTab(stringResource(R.string.home_tab_tools), section == DeskSection.Tools, tight) { onSection(DeskSection.Tools) }
             Spacer(Modifier.weight(1f))
             SearchField(
                 search, onSearch, Modifier.width(searchWidth).height(36.dp),
@@ -253,11 +256,11 @@ private fun DeskHeader(
 @Composable
 private fun DeskTab(label: String, selected: Boolean, tight: Boolean = false, onClick: () -> Unit) {
     val shape = RoundedCornerShape(18.dp)
-    val fill by animateColorAsState(if (selected) Am.Navy else Color.Transparent, label = "tab")
+    val fill = if (selected) Am.Navy else Color.Transparent
     Box(
         Modifier.height(36.dp).clip(shape).background(fill).then(if (selected) Modifier else Modifier.deskPress(18.dp)).clickable(onClick = onClick).padding(horizontal = if (tight) 8.dp else 16.dp),
         Alignment.Center,
-    ) { Text(label, color = animatedColor(if (selected) Am.OnNavy else Am.HomeMid), fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1) }
+    ) { Text(label, color = if (selected) Am.OnNavy else Am.HomeMid, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1) }
 }
 
 @Composable
@@ -406,13 +409,13 @@ internal fun DeskCard(
     val hovered by source.collectIsHoveredAsState()
     var menuAt by remember { mutableStateOf<IntOffset?>(null) }
     var buttonMenu by remember { mutableStateOf(false) }
-    val lift by animateDpAsState(if (hovered || selected) 8.dp else 1.dp, label = "lift")
+    val lift = if (hovered || selected) 8.dp else 1.dp
     val shape = RoundedCornerShape(14.dp)
     val edge = when { selected -> Am.HomeAccent; hovered -> Am.HomeFaint; else -> Am.HomeLine }
     Column(
         modifier.fillMaxWidth().hoverable(source).shadow(lift, shape, ambientColor = Color(0x33000000), spotColor = Color(0x33000000)).clip(shape).background(Am.Card)
             .border(if (selected) 2.dp else 1.dp, edge, shape)
-            .handCursor().onSecondaryPress { menuAt = IntOffset(it.x.toInt(), it.y.toInt()); onSelect() }
+            .handCursor().pointerInput(onSelect) { awaitEachGesture { awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial); onSelect() } }.onSecondaryPress { menuAt = IntOffset(it.x.toInt(), it.y.toInt()); onSelect() }
             .combinedClickable(onDoubleClick = onOpen, onClick = onSelect),
     ) {
         Box(Modifier.fillMaxWidth().aspectRatio(1.6f).background(Am.HomePanel)) {
