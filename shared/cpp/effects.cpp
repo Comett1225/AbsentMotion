@@ -31,6 +31,7 @@
 #include <climits>
 #include <cmath>
 #include <cstring>
+#include <cstdlib>
 #include <memory>
 #include <mutex>
 #include <optional>
@@ -75,7 +76,20 @@ half4 main(float2 xy) {
 
 float Value(const LayerEffect& e, const std::map<std::string, Anim>* defaults, const std::string& name, int i, float t, float fallback);
 
-std::vector<warp::Pin> PuppetPins(const LayerEffect& e, float t) {
+float PuppetNumber(const LayerEffect& e, const std::string& name, float t, float fallback, float low, float high) {
+    const Property* p = e.prop(name.c_str());
+    const float v = p ? p->anim.get(0, t, fallback) : fallback;
+    return std::isfinite(v) ? std::clamp(v, low, high) : fallback;
+}
+
+std::vector<warp::Pin> PuppetPins(const LayerEffect& e, float t, double timeMs) {
+    const bool sway = PuppetNumber(e, "sway", t, 0, 0, 1) >= 0.5f;
+    const float amount = PuppetNumber(e, "swayAmount", t, 15, 0, 500);
+    const float speed = PuppetNumber(e, "swaySpeed", t, 1, 0, 10);
+    const float angle = PuppetNumber(e, "swayAngle", t, 0, -3600, 3600) * 0.01745329252f;
+    const float seed = PuppetNumber(e, "swaySeed", t, 0, 0, 1000);
+    const bool random = PuppetNumber(e, "swayDirection", t, 0, 0, 1) >= 0.5f;
+    const bool selected = PuppetNumber(e, "swayPins", t, 0, 0, 1) >= 0.5f;
     std::vector<warp::Pin> pins;
     for (const Property& p : e.props) {
         if (p.name.size() < 4 || p.name.size() > 12 || p.name.compare(0, 3, "pin") != 0 || p.name[3] == '0' ||
@@ -84,17 +98,32 @@ std::vector<warp::Pin> PuppetPins(const LayerEffect& e, float t) {
         if (!r) continue;
         warp::Pin pin{p.anim.get(0, t, NAN), p.anim.get(1, t, NAN), r->anim.get(0, t, NAN), r->anim.get(1, t, NAN)};
         if (!std::isfinite(pin.x) || !std::isfinite(pin.y) || !std::isfinite(pin.restX) || !std::isfinite(pin.restY)) continue;
+        const std::string number = p.name.substr(3);
+        pin.mode = (int)std::lround(PuppetNumber(e, "pinMode" + number, t, 0, 0, 2));
+        pin.rotation = PuppetNumber(e, "pinRotation" + number, t, 0, -3600, 3600);
+        pin.scale = PuppetNumber(e, "pinScale" + number, t, 1, 0.05f, 10);
+        if (pin.mode == 2) { pin.x = pin.restX; pin.y = pin.restY; }
+        if (pin.mode != 2 && sway && amount > 0 && (!selected || PuppetNumber(e, "swayPin" + number, t, 0, 0, 1) >= 0.5f)) {
+            const unsigned id = (unsigned)std::strtoul(number.c_str(), nullptr, 10);
+            const double phase = std::fmod((std::isfinite(timeMs) ? timeMs : 0.0) * 0.001 * speed, 100000.0) * 6.283185307179586 + id * 2.3999632297 + seed;
+            const double direction = random ? id * 2.3999632297 + seed * 0.6180339887 : angle;
+            const float d = amount * (float)std::sin(phase);
+            pin.x += d * (float)std::cos(direction);
+            pin.y += d * (float)std::sin(direction);
+        }
         pins.push_back(pin);
         if ((int)pins.size() == warp::kMaxPins) break;
     }
     return pins;
 }
 
-bool Bent(const Layer& layer, float t) {
+bool Bent(const Layer& layer, float t, double timeMs) {
     return std::any_of(layer.effects.begin(), layer.effects.end(), [&](const LayerEffect& e) {
         if (e.hidden || e.id != kPuppet) return false;
-        const std::vector<warp::Pin> pins = PuppetPins(e, t);
-        return !pins.empty() && !warp::AtRest(pins);
+        const std::vector<warp::Pin> pins = PuppetPins(e, t, timeMs);
+        return !pins.empty() && (!warp::AtRest(pins) || std::any_of(pins.begin(), pins.end(), [](const warp::Pin& p) {
+            return p.mode == 1 && (std::fabs(p.rotation) > 1e-4f || std::fabs(p.scale - 1) > 1e-4f);
+        }));
     });
 }
 
@@ -130,12 +159,126 @@ float PuppetReach(const warp::Bend& bend, const SkMatrix& fromLocal, const SkMat
     return std::min(fallback, reach + 2 * spread + 2);
 }
 
+sk_sp<SkImage> OnGpu(const sk_sp<SkImage>& image);
+
+const char* const kPuppetMeshShader = R"(
+uniform shader image;
+uniform shader mesh;
+uniform float3x3 toLocal;
+uniform float3x3 fromLocal;
+uniform float4 bounds;
+uniform float4 sourceBounds;
+uniform float2 grid;
+float2 readPoint(float2 at) {
+    float3 rgb = floor(float3(mesh.eval(at + 0.5).rgb) * 255.0 + 0.5);
+    float b = rgb.b;
+    float2 v = float2(rgb.r * 16.0 + floor(b / 16.0), rgb.g * 16.0 + mod(b, 16.0)) / 4095.0;
+    return sourceBounds.xy + v * sourceBounds.zw;
+}
+half4 main(float2 xy) {
+    float3 h = toLocal * float3(xy, 1.0);
+    if (abs(h.z) < 0.000001) return half4(0);
+    float2 v = h.xy / h.z;
+    float2 g = (v - bounds.xy) / bounds.zw * grid;
+    if (g.x < 0.0 || g.y < 0.0 || g.x > grid.x || g.y > grid.y) return half4(0);
+    float2 cell = min(floor(g), grid - 1.0), f = g - cell;
+    float2 a = readPoint(cell), b, c;
+    float2 src;
+    if (f.x + f.y <= 1.0) {
+        b = readPoint(cell + float2(1, 0));
+        c = readPoint(cell + float2(0, 1));
+        src = a + f.x * (b - a) + f.y * (c - a);
+    } else {
+        b = readPoint(cell + float2(1, 0));
+        c = readPoint(cell + float2(0, 1));
+        float2 d = readPoint(cell + float2(1, 1));
+        src = d + (1.0 - f.y) * (b - d) + (1.0 - f.x) * (c - d);
+    }
+    float3 o = fromLocal * float3(src, 1.0);
+    if (abs(o.z) < 0.000001) return half4(0);
+    return image.eval(o.xy / o.z);
+}
+)";
+
+sk_sp<SkImageFilter> PuppetMesh(const std::vector<warp::Pin>& pins, float falloff, int density, float expansion,
+                               const SkRect& area, const SkRect& inside, float reach, const SkMatrix& placed, sk_sp<SkImageFilter> input) {
+    static const sk_sp<SkRuntimeEffect> effect = SkRuntimeEffect::MakeForShader(SkString(kPuppetMeshShader)).effect;
+    if (!effect) return input;
+    const SkMatrix fromLocal = SkMatrix::Translate(-area.left(), -area.top()) * placed;
+    SkMatrix toLocal;
+    if (!fromLocal.invert(&toLocal)) return input;
+    SkRect src = toLocal.mapRect(inside);
+    if (!src.isFinite() || !std::isfinite(src.width()) || !std::isfinite(src.height()) || src.isEmpty()) return input;
+    src.outset(expansion + 4, expansion + 4);
+    SkRect bounds = src;
+    float move = 0;
+    for (const auto& p : pins) {
+        bounds.fLeft = std::min(bounds.fLeft, p.x); bounds.fRight = std::max(bounds.fRight, p.x);
+        bounds.fTop = std::min(bounds.fTop, p.y); bounds.fBottom = std::max(bounds.fBottom, p.y);
+        if (p.mode == 1 && (std::fabs(p.rotation) > 1e-4f || std::fabs(p.scale - 1) > 1e-4f)) {
+            const float angle = p.rotation * 0.01745329252f, c = std::cos(angle), s = std::sin(angle);
+            for (float x : {src.left(), src.right()}) for (float y : {src.top(), src.bottom()}) {
+                const float dx = (x - p.restX) * p.scale, dy = (y - p.restY) * p.scale;
+                const float px = p.x + c * dx - s * dy, py = p.y + s * dx + c * dy;
+                bounds.fLeft = std::min(bounds.fLeft, px); bounds.fRight = std::max(bounds.fRight, px);
+                bounds.fTop = std::min(bounds.fTop, py); bounds.fBottom = std::max(bounds.fBottom, py);
+            }
+        }
+        move = std::max(move, std::hypot(p.x - p.restX, p.y - p.restY));
+    }
+    bounds.outset(move + 4, move + 4);
+    if (!bounds.isFinite() || !std::isfinite(bounds.width()) || !std::isfinite(bounds.height()) || bounds.width() <= 0 || bounds.height() <= 0) return input;
+    const int longest = std::clamp(density, 8, 48);
+    const int nx = std::clamp((int)std::ceil(longest * (bounds.width() / std::max(bounds.width(), bounds.height()))), 4, 48);
+    const int ny = std::clamp((int)std::ceil(longest * (bounds.height() / std::max(bounds.width(), bounds.height()))), 4, 48);
+    const auto angles = warp::MeshAngles(pins);
+    std::array<uint8_t, 49 * 49 * 4> data{};
+    float distance = 0;
+    for (int j = 0; j <= ny; j++) for (int i = 0; i <= nx; i++) {
+        const double x = bounds.left() + bounds.width() * ((double)i / nx), y = bounds.top() + bounds.height() * ((double)j / ny);
+        double sx, sy;
+        warp::MeshSource(pins, angles, falloff, x, y, &sx, &sy);
+        if (!std::isfinite(sx) || !std::isfinite(sy)) return input;
+        const SkPoint a = fromLocal.mapPoint({(float)x, (float)y}), b = fromLocal.mapPoint({(float)sx, (float)sy});
+        if (!a.isFinite() || !b.isFinite()) return input;
+        distance = std::max(distance, (a - b).length());
+        const int u = (int)std::lround(std::clamp((sx - src.left()) / src.width(), 0.0, 1.0) * 4095);
+        const int v = (int)std::lround(std::clamp((sy - src.top()) / src.height(), 0.0, 1.0) * 4095);
+        const int at = (j * (nx + 1) + i) * 4;
+        data[at] = u >> 4; data[at + 1] = v >> 4; data[at + 2] = ((u & 15) << 4) | (v & 15); data[at + 3] = 255;
+    }
+    const SkImageInfo info = SkImageInfo::Make(nx + 1, ny + 1, kRGBA_8888_SkColorType, kOpaque_SkAlphaType);
+    const sk_sp<SkImage> map = OnGpu(SkImages::RasterFromData(info, SkData::MakeWithCopy(data.data(), (size_t)(nx + 1) * (ny + 1) * 4), (nx + 1) * 4));
+    if (!map) return input;
+    const auto columns = [](const SkMatrix& m) { return std::vector<float>{m[0], m[3], m[6], m[1], m[4], m[7], m[2], m[5], m[8]}; };
+    SkRuntimeShaderBuilder b(effect);
+    const auto to = columns(toLocal), from = columns(fromLocal);
+    b.uniform("toLocal").set(to.data(), 9); b.uniform("fromLocal").set(from.data(), 9);
+    b.uniform("bounds") = SkV4{bounds.left(), bounds.top(), bounds.width(), bounds.height()};
+    b.uniform("sourceBounds") = SkV4{src.left(), src.top(), src.width(), src.height()};
+    b.uniform("grid") = SkV2{(float)nx, (float)ny};
+    b.child("mesh") = map->makeShader(SkSamplingOptions(SkFilterMode::kNearest));
+    const SkPoint origin = fromLocal.mapPoint({bounds.left(), bounds.top()});
+    const SkPoint step = fromLocal.mapPoint({bounds.left() + bounds.width() / nx, bounds.top() + bounds.height() / ny});
+    const float pad = origin.isFinite() && step.isFinite() ? 2 * (step - origin).length() + 2 : reach;
+    return SkImageFilters::RuntimeShader(b, std::min(reach, distance + pad), "image", SkImageFilters::Crop(inside, std::move(input)), true);
+}
+
 sk_sp<SkImageFilter> PuppetFilter(const LayerEffect& e, const std::map<std::string, Anim>* defaults, float t, double timeMs, const SkRect& area,
                                   SkMatrix placed, const SkRect& seen, const SkRect& inside, float reach, sk_sp<SkImageFilter> input) {
     static const sk_sp<SkRuntimeEffect> effect = SkRuntimeEffect::MakeForShader(SkString(kPuppetShader)).effect;
-    const std::vector<warp::Pin> pins = PuppetPins(e, t);
-    if (!effect || pins.empty() || warp::AtRest(pins)) return input;
+    const std::vector<warp::Pin> pins = PuppetPins(e, t, timeMs);
+    if (!effect || pins.empty()) return input;
+    const bool special = std::any_of(pins.begin(), pins.end(), [](const warp::Pin& p) { return p.mode != 0; });
+    const bool changed = !warp::AtRest(pins) || std::any_of(pins.begin(), pins.end(), [](const warp::Pin& p) {
+        return p.mode == 1 && (std::fabs(p.rotation) > 1e-4f || std::fabs(p.scale - 1) > 1e-4f);
+    });
+    if (!changed) return input;
     if (e.owner && !EffectOwnerMatrix(e.owner, timeMs, &placed)) return input;
+    const int density = (int)std::lround(PuppetNumber(e, "density", t, 0, 0, 48));
+    const float expansion = PuppetNumber(e, "expansion", t, 0, 0, 500);
+    if (density > 0 || expansion > 0 || special)
+        return PuppetMesh(pins, Value(e, defaults, "falloff", 0, t, 1), density > 0 ? density : 24, expansion, area, inside, reach, placed, std::move(input));
     const warp::Bend bend = warp::Solve(pins, Value(e, defaults, "falloff", 0, t, 1));
     const SkMatrix fromLocal = SkMatrix::Translate(-area.left(), -area.top()) * placed;
     SkMatrix toLocal;
@@ -825,6 +968,10 @@ bool EffectRuntime::steady(const Layer& layer, float from, float to) const {
     const auto still = [&](const Anim& a) { return a.steady(from, to); };
     return std::all_of(layer.effects.begin(), layer.effects.end(), [&](const LayerEffect& e) {
         if (e.hidden) return true;
+        if (e.id == kPuppet) {
+            const Property* sway = e.prop("sway");
+            if (sway && (!still(sway->anim) || sway->anim.get(0, from, 0) >= 0.5f)) return false;
+        }
         const Definition* d = find(e.id);
         if (d && (d->timed || d->below)) return false;
         if (d && !std::all_of(d->defaults.begin(), d->defaults.end(), [&](const auto& k) { return still(k.second); })) return false;
@@ -1167,7 +1314,7 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
         }
     }
     SkRect inside = local;
-    if (lift < 0 && !seesBehind && Bent(layer, t)) {
+    if (lift < 0 && !seesBehind && Bent(layer, t, timeMs)) {
         SkRect measured;
         record(source, &measured);
         const float scale = canvas->getTotalMatrix().getMinScale(), pad = scale > 0 ? 4 / scale : 4;

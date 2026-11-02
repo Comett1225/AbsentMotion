@@ -3,7 +3,7 @@ package app.absentmotion.model
 import kotlin.math.abs
 import kotlin.math.pow
 
-data class PuppetPin(val number: Int, val at: Pt, val rest: Pt) {
+data class PuppetPin(val number: Int, val at: Pt, val rest: Pt, val mode: Int = 0, val rotation: Float = 0f, val scale: Float = 1f) {
     val name: String get() = "pin$number"
     val restName: String get() = "rest$number"
 }
@@ -27,7 +27,9 @@ fun XmlNode.allPuppetPins(t: Float): List<PuppetPin> = children.mapNotNull { p -
     val number = pinNumber(p["name"]) ?: return@mapNotNull null
     val rest = effectProperty("rest$number") ?: return@mapNotNull null
     val at = point(p.valueAt(t)) ?: return@mapNotNull null
-    PuppetPin(number, at, point(rest.valueAt(t)) ?: return@mapNotNull null)
+    PuppetPin(number, at, point(rest.valueAt(t)) ?: return@mapNotNull null,
+        kotlin.math.round(puppetNumber("pinMode$number", t, 0f, 0f, 2f)).toInt(), puppetNumber("pinRotation$number", t, 0f, -3600f, 3600f),
+        puppetNumber("pinScale$number", t, 1f, 0.05f, 10f))
 }
 
 fun XmlNode.puppetPins(t: Float): List<PuppetPin> = allPuppetPins(t).take(MAX_PINS)
@@ -45,7 +47,49 @@ fun XmlNode.withPuppetPinAt(at: Pt, t: Float): XmlNode? =
     if (allPuppetPins(t).size >= MAX_PINS) null else withPuppetPin(at, PuppetBend(puppetPins(t), puppetFalloff(t)).source(at))
 
 fun XmlNode.withoutPuppetPin(number: Int): XmlNode =
-    copy(children = children.filterNot { it.name == "property" && (it["name"] == "pin$number" || it["name"] == "rest$number") })
+    copy(children = children.filterNot { it.name == "property" && it["name"] in setOf("pin$number", "rest$number", "swayPin$number", "pinMode$number", "pinRotation$number", "pinScale$number") })
+
+fun XmlNode.puppetNumber(name: String, t: Float, fallback: Float, low: Float, high: Float): Float {
+    val value = effectProperty(name)?.valueAt(t)
+    return (when (value) { "true" -> 1f; "false" -> 0f; else -> value?.finiteFloat() } ?: fallback).coerceIn(low, high)
+}
+
+fun XmlNode.puppetOffset(pin: PuppetPin, t: Float, timeMs: Int): Pt {
+    if (pin.mode == 2 || puppetNumber("sway", t, 0f, 0f, 1f) < 0.5f) return Pt(0f, 0f)
+    if (puppetNumber("swayPins", t, 0f, 0f, 1f) >= 0.5f && puppetNumber("swayPin${pin.number}", t, 0f, 0f, 1f) < 0.5f) return Pt(0f, 0f)
+    val amount = puppetNumber("swayAmount", t, 15f, 0f, 500f)
+    val speed = puppetNumber("swaySpeed", t, 1f, 0f, 10f)
+    val seed = puppetNumber("swaySeed", t, 0f, 0f, 1000f)
+    val phase = (timeMs * 0.001 * speed % 100000.0) * 6.283185307179586 + pin.number * 2.3999632297 + seed
+    val angle = if (puppetNumber("swayDirection", t, 0f, 0f, 1f) >= 0.5f) pin.number * 2.3999632297 + seed * 0.6180339887
+        else (puppetNumber("swayAngle", t, 0f, -3600f, 3600f) * 0.01745329252f).toDouble()
+    val d = amount * kotlin.math.sin(phase).toFloat()
+    return Pt(d * kotlin.math.cos(angle).toFloat(), d * kotlin.math.sin(angle).toFloat())
+}
+
+fun XmlNode.renderPuppetPins(t: Float, timeMs: Int): List<PuppetPin> = puppetPins(t).map { p ->
+    p.copy(at = if (p.mode == 2) p.rest else p.at + puppetOffset(p, t, timeMs))
+}
+
+fun puppetMeshSource(pins: List<PuppetPin>, falloff: Float, at: Pt): Pt {
+    if (pins.isEmpty()) return at
+    val power = falloff.coerceIn(0.1f, 4f) * 0.5 + 0.75
+    var sx = 0.0; var sy = 0.0; var sum = 0.0
+    for (p in pins) {
+        val dx = (at.x - p.at.x).toDouble(); val dy = (at.y - p.at.y).toDouble(); val r = dx * dx + dy * dy
+        if (r < 1e-12) return p.rest
+        var angle = if (p.mode == 1) -p.rotation * 0.01745329252 else 0.0
+        if (p.mode == 0 && p.at.distanceTo(p.rest) >= 1e-4f) {
+            val q = pins.filter { it !== p && it.rest.distanceTo(p.rest) > 0.01f && it.at.distanceTo(p.at) > 0.01f }.minByOrNull { it.rest.distanceTo(p.rest) }
+            if (q != null) angle = kotlin.math.atan2((q.rest.y - p.rest.y).toDouble(), (q.rest.x - p.rest.x).toDouble()) -
+                kotlin.math.atan2((q.at.y - p.at.y).toDouble(), (q.at.x - p.at.x).toDouble())
+        }
+        val w = 1 / r.pow(power); val c = kotlin.math.cos(angle); val s = kotlin.math.sin(angle)
+        val scale = if (p.mode == 1) 1.0 / p.scale else 1.0
+        sx += w * (p.rest.x + scale * (c * dx - s * dy)); sy += w * (p.rest.y + scale * (s * dx + c * dy)); sum += w
+    }
+    return Pt((sx / sum).toFloat(), (sy / sum).toFloat())
+}
 
 fun XmlNode.puppetFalloff(t: Float): Float = (effectProperty("falloff")?.valueAt(t)?.finiteFloat() ?: 1f).coerceIn(0.1f, 4f)
 

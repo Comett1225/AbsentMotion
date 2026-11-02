@@ -6,6 +6,8 @@ namespace am::warp {
 
 struct Pin {
     float x = 0, y = 0, restX = 0, restY = 0;
+    int mode = 0;
+    float rotation = 0, scale = 1;
 };
 
 struct Spot {
@@ -32,5 +34,7 @@ bool AtRest(const std::vector<Pin>& pins);
 double Power(float falloff);
 Bend Solve(const std::vector<Pin>& pins, float falloff);
 void Source(const Bend& bend, double x, double y, double* sourceX, double* sourceY);
+std::vector<float> MeshAngles(const std::vector<Pin>& pins);
+void MeshSource(const std::vector<Pin>& pins, const std::vector<float>& angles, float falloff, double x, double y, double* sourceX, double* sourceY);
 
 }

@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "scene.h"
+#include "effects.h"
 
 namespace {
 
@@ -53,6 +54,20 @@ int main() {
     am::Anim same;
     same.keys = {Key(0.2f, 1), Key(0.2f, 1), Key(0.6f, 1)};
     Expect(same.steady(0, 1), "duplicate key times");
+
+    am::EffectRuntime effects;
+    am::Layer layer;
+    am::LayerEffect puppet;
+    puppet.id = "absent.puppet";
+    layer.effects.push_back(puppet);
+    Expect(effects.steady(layer, 0, 1), "legacy puppet is steady");
+    am::Property sway;
+    sway.name = "sway";
+    sway.anim.value = {1};
+    layer.effects[0].props.push_back(sway);
+    Expect(!effects.steady(layer, 0, 1), "sway puppet is not steady");
+    layer.effects[0].props[0].anim.value = {0};
+    Expect(effects.steady(layer, 0, 1), "disabled sway is steady");
 
     std::mt19937 rng(41);
     std::uniform_real_distribution<float> unit(-0.3f, 1.3f);

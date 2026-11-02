@@ -179,4 +179,50 @@ void Source(const Bend& bend, double x, double y, double* sourceX, double* sourc
     *sourceY = sy + bend.centerY;
 }
 
+std::vector<float> MeshAngles(const std::vector<Pin>& pins) {
+    std::vector<float> angles(pins.size() * 2, 0);
+    for (size_t i = 0; i < pins.size(); i++) {
+        const Pin& p = pins[i];
+        if (p.mode == 1) { angles[2 * i] = -p.rotation * 0.01745329252f; continue; }
+        if (p.mode == 2 || std::hypot(p.x - p.restX, p.y - p.restY) < 1e-4f) continue;
+        double best = 1e100;
+        for (size_t j = 0; j < pins.size(); j++) {
+            if (i == j) continue;
+            const Pin& q = pins[j];
+            const double rx = q.restX - p.restX, ry = q.restY - p.restY;
+            const double dx = q.x - p.x, dy = q.y - p.y;
+            const double r = rx * rx + ry * ry;
+            if (r < best && r > 1e-4 && dx * dx + dy * dy > 1e-4) {
+                best = r;
+                angles[2 * i] = (float)(std::atan2(ry, rx) - std::atan2(dy, dx));
+            }
+        }
+    }
+    for (size_t i = 0; i < pins.size(); i++) {
+        const float a = angles[2 * i];
+        angles[2 * i] = std::cos(a);
+        angles[2 * i + 1] = std::sin(a);
+    }
+    return angles;
+}
+
+void MeshSource(const std::vector<Pin>& pins, const std::vector<float>& angles, float falloff, double x, double y, double* sourceX, double* sourceY) {
+    if (pins.empty()) { *sourceX = x; *sourceY = y; return; }
+    double sum = 0, sx = 0, sy = 0;
+    const double power = std::clamp(std::isfinite(falloff) ? (double)falloff : 1.0, 0.1, 4.0) * 0.5 + 0.75;
+    for (size_t i = 0; i < pins.size(); i++) {
+        const Pin& p = pins[i];
+        const double dx = x - p.x, dy = y - p.y, r = dx * dx + dy * dy;
+        if (r < 1e-12) { *sourceX = p.restX; *sourceY = p.restY; return; }
+        const double weight = power == 1.25 ? 1 / (r * std::sqrt(std::sqrt(r))) : 1 / std::pow(r, power);
+        const double c = angles[2 * i], s = angles[2 * i + 1];
+        const double scale = p.mode == 1 ? 1.0 / p.scale : 1.0;
+        sx += weight * (p.restX + scale * (c * dx - s * dy));
+        sy += weight * (p.restY + scale * (s * dx + c * dy));
+        sum += weight;
+    }
+    *sourceX = sx / sum;
+    *sourceY = sy / sum;
+}
+
 }

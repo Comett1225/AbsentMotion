@@ -46,10 +46,14 @@ import app.absentmotion.model.formatFloats
 import app.absentmotion.model.puppetFalloff
 import app.absentmotion.model.allPuppetPins
 import app.absentmotion.model.puppetPins
+import app.absentmotion.model.renderPuppetPins
+import app.absentmotion.model.puppetOffset
+import app.absentmotion.model.puppetNumber
+import app.absentmotion.model.puppetMeshSource
+import app.absentmotion.model.withPuppetPin
 import app.absentmotion.model.valueAt
 import app.absentmotion.model.withEffect
 import app.absentmotion.model.withEffectProperty
-import app.absentmotion.model.withPuppetPinAt
 import app.absentmotion.model.withoutPuppetPin
 import app.absentmotion.ui.editor.ChromeIcons
 import app.absentmotion.ui.editor.PanelIcons
@@ -121,27 +125,38 @@ private fun EditorState.movePin(index: Int, pin: PuppetPin, to: Pt, key: Any?) =
 
 internal fun puppetPoints(state: EditorState, layer: Layer, index: Int, instance: XmlNode, pin: String?, adding: Boolean, onPin: (String?) -> Unit,
                           onFull: () -> Unit): LayerPoints {
-    val pins = instance.puppetPins(layer.t)
-    val bend = PuppetBend(pins, instance.puppetFalloff(layer.t))
+    val t = layer.at(state.timeMs, state.scene.fps).t
+    val pins = instance.renderPuppetPins(t, state.timeMs)
+    val mesh = instance.puppetNumber("density", t, 0f, 0f, 48f) > 0 || instance.puppetNumber("expansion", t, 0f, 0f, 500f) > 0 || pins.any { it.mode != 0 }
+    val source: (Pt) -> Pt = if (mesh) { at -> puppetMeshSource(pins, instance.puppetFalloff(t), at) }
+        else PuppetBend(pins, instance.puppetFalloff(t))::source
     val add: ((Pt) -> Unit)? = if (!adding) null else { at ->
         if (instance.allPuppetPins(layer.t).size >= MAX_PINS) onFull()
         else {
             var made: String? = null
+            val rest = source(at)
             state.editSelected { current ->
                 current.withEffect(index) { effect ->
-                    effect.withPuppetPinAt(at, current.t)?.also { made = it.puppetPins(current.t).lastOrNull()?.name } ?: effect
+                    val added = effect.withPuppetPin(at, rest)
+                    val p = added.puppetPins(current.t).last()
+                    made = p.name
+                    val base = at - added.puppetOffset(p, t, state.timeMs)
+                    added.withEffectProperty(p.name, "vec2", formatFloats(floatArrayOf(base.x, base.y)), current.t, current.snap)
                 }
             }
             onPin(made)
         }
     }
-    return LayerPoints(pins.map { it.at }, pins.indexOfFirst { it.name == pin }, pick = { onPin(pins[it].name) }, tap = add, source = bend::source) { i, to ->
-        pins.getOrNull(i)?.let { state.movePin(index, it, to, "puppet-$index-${it.name}") }
+    return LayerPoints(pins.map { it.at }, pins.indexOfFirst { it.name == pin }, pick = { onPin(pins[it].name) }, tap = add, source = source) { i, to ->
+        pins.getOrNull(i)?.takeIf { it.mode != 2 }?.let { p ->
+            val offset = instance.puppetOffset(p, t, state.timeMs)
+            state.movePin(index, p, to - offset, "puppet-$index-${p.name}")
+        }
     }
 }
 
 @Composable
-internal fun PuppetSection(state: EditorState, layer: Layer, index: Int, instance: XmlNode, pin: String?, adding: Boolean, onPin: (String?) -> Unit, onAdding: (Boolean) -> Unit) {
+internal fun PuppetSection(state: EditorState, layer: Layer, index: Int, instance: XmlNode, pin: String?, field: String, onField: (String) -> Unit, adding: Boolean, onPin: (String?) -> Unit, onAdding: (Boolean) -> Unit) {
     val all = instance.allPuppetPins(layer.t)
     val pins = all.take(MAX_PINS)
     Row(Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 6.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -176,6 +191,49 @@ internal fun PuppetSection(state: EditorState, layer: Layer, index: Int, instanc
                 state.editSelected { current -> current.withEffect(index) { it.withoutPuppetPin(p.number) } }
             }, contentAlignment = Alignment.Center) {
                 DeskTip("$label, ${stringResource(R.string.puppet_delete_pin)}") { Icon(ChromeIcons.Trash, "$label, ${stringResource(R.string.puppet_delete_pin)}", Modifier.size(20.dp), tint = Am.OnDark) }
+            }
+        }
+        if (chosen) {
+            val modes = listOf(stringResource(R.string.puppet_position), stringResource(R.string.puppet_bend), stringResource(R.string.puppet_stiff))
+            Row(Modifier.fillMaxWidth().height(44.dp).padding(horizontal = 5.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(R.string.puppet_mode), Modifier.width(75.dp), color = Am.OnDark, fontSize = 12.sp)
+                modes.forEachIndexed { mode, label ->
+                    Box(Modifier.weight(1f).fillMaxHeight().padding(2.dp).clip(PanelShape).background(if (p.mode == mode) PanelDark else Am.Button).clickable {
+                        state.editSelected { current -> current.withEffect(index) {
+                            it.withEffectProperty("pinMode${p.number}", "float", "$mode", current.t, current.snap)
+                        } }
+                        onField("position")
+                    }, contentAlignment = Alignment.Center) {
+                        Text(label, color = if (p.mode == mode) Am.Accent else Am.OnDark, fontSize = 12.sp)
+                    }
+                }
+            }
+            if (p.mode == 1) {
+                val numbers = listOf(
+                    EffectParam("pinRotation${p.number}", stringResource(R.string.puppet_rotation), "angle", "0", -3600f, 3600f, 0.1f),
+                    EffectParam("pinScale${p.number}", stringResource(R.string.puppet_scale), "float", "1", 0.05f, 10f, 0.01f, percent = true),
+                )
+                numbers.forEachIndexed { i, param ->
+                    val name = if (i == 0) "rotation" else "scale"
+                    val raw = instance.effectProperty(param.id)?.valueAt(layer.t) ?: param.default
+                    EffectNumbers(state, param, raw, true, field == name, { onField(name) }) { value, gesture ->
+                        onField(name)
+                        state.editSelected(if (gesture) "puppet-$index-${param.id}" else null) { current ->
+                            current.withEffect(index) { it.withEffectProperty(param.id, "float", value, current.t, current.snap) }
+                        }
+                    }
+                }
+            }
+            val swayName = "swayPin${p.number}"
+            val sway = (instance.effectProperty(swayName)?.valueAt(layer.t)?.finiteFloat() ?: 0f) >= 0.5f
+            Row(Modifier.fillMaxWidth().height(48.dp).toggleable(sway, role = Role.Switch) { enabled ->
+                state.editSelected { current -> current.withEffect(index) {
+                    it.withEffectProperty(swayName, "float", if (enabled) "1" else "0", current.t, current.snap)
+                } }
+            }.padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(R.string.puppet_sway_pin), color = if (sway) Am.Accent else Am.OnDark, fontSize = 13.sp)
+                Spacer(Modifier.weight(1f))
+                Text(stringResource(if (sway) R.string.puppet_sway_on else R.string.puppet_sway_off), color = if (sway) Am.Accent else Am.Caption, fontSize = 13.sp)
             }
         }
     }

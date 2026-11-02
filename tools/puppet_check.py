@@ -123,14 +123,14 @@ class Bench:
         (self.work / "pic.rgba").write_bytes(np.ascontiguousarray(picture, dtype=np.uint8).tobytes())
         (self.work / "effects.txt").write_text('<effect id="absent.puppet"><param name="falloff" value="1.000000"/></effect>\n')
 
-    def render(self, xml, runs=0):
+    def render(self, xml, runs=0, time=0):
         self.count += 1
         d = self.work / f"r{self.count}"
         d.mkdir()
         (d / "scene.xml").write_text(xml)
         h, w = self.picture.shape[:2]
         env = dict(os.environ, RENDER_BENCH_PICTURE=str(self.work / "pic.rgba"), RENDER_BENCH_PICTURE_WIDTH=str(w), RENDER_BENCH_PICTURE_HEIGHT=str(h))
-        r = subprocess.run([str(self.binary), str(self.work / "effects.txt"), str(d / "scene.xml"), "1", str(runs), str(d), "0"],
+        r = subprocess.run([str(self.binary), str(self.work / "effects.txt"), str(d / "scene.xml"), "1", str(runs), str(d), str(time)],
                            capture_output=True, text=True, env=env)
         if r.returncode != 0 or "effect:" in r.stderr or "scene:" in r.stderr:
             raise RuntimeError(r.stderr)
@@ -206,6 +206,103 @@ def run(bench, dots):
             what = "an unmoved pin holds the picture under it" if (x, y) == (rx, ry) else "the picture sits under a dragged pin"
             check(f"{what} at falloff {falloff}", math.hypot(mx - gx, my - gy) < 0.75, f"{math.hypot(mx - gx, my - gy):.2f} px at {x},{y}")
 
+    sway_props = ('<property name="sway" type="switch" value="true"/>'
+                  '<property name="swayAmount" type="float" value="25"/>'
+                  '<property name="swaySpeed" type="float" value="1"/>'
+                  '<property name="swayDirection" type="float" value="1"/>'
+                  '<property name="swaySeed" type="float" value="2"/>')
+    base_fx = effect(arm, 1.0)
+    sway_fx = base_fx.replace('</effect>', sway_props + '</effect>')
+    sway_scene = scene(shape(1, place, half, sway_fx))
+    frame0, _ = bench.render(sway_scene, time=0)
+    frame1, _ = bench.render(sway_scene, time=250)
+    repeat, _ = bench.render(sway_scene, time=250)
+    check("sway changes the image over time", float(np.abs(frame0 - frame1).mean()) > 1)
+    check("sway repeats exactly at the same time", bool(np.array_equal(frame1, repeat)))
+    selected = sway_fx.replace('</effect>', '<property name="swayPins" type="float" value="1"/></effect>')
+    no_selected, _ = bench.render(scene(shape(1, place, half, selected)), time=250)
+    legacy, _ = bench.render(scene(shape(1, place, half, base_fx)), time=250)
+    check("selected sway leaves unchecked pins still", bool(np.array_equal(no_selected, legacy)))
+    selected = selected.replace('</effect>', '<property name="swayPin5" type="float" value="1"/></effect>')
+    one_selected, _ = bench.render(scene(shape(1, place, half, selected)), time=250)
+    check("selected sway moves a checked pin", float(np.abs(one_selected - legacy).mean()) > 0.1)
+
+    def props(fx, values):
+        return fx.replace('</effect>', ''.join(f'<property name="{name}" type="float" value="{value}"/>' for name, value in values.items()) + '</effect>')
+
+    strip = [(-90, 0, -90, 0), (20, -60, 90, 0)]
+    strip_fx = effect(strip, 1.0)
+    legacy_strip, _ = bench.render(scene(shape(1, place, (100, 40), strip_fx)))
+    explicit_legacy, _ = bench.render(scene(shape(1, place, (100, 40), props(strip_fx, {"density": 0, "expansion": 0}))))
+    check("legacy mesh settings preserve the old warp exactly", bool(np.array_equal(legacy_strip, explicit_legacy)))
+    dense_fx = props(strip_fx, {"density": 32})
+    dense, _ = bench.render(scene(shape(1, place, (100, 40), dense_fx)))
+    coarse, _ = bench.render(scene(shape(1, place, (100, 40), props(strip_fx, {"density": 8}))))
+    expanded, _ = bench.render(scene(shape(1, place, (100, 40), props(strip_fx, {"density": 32, "expansion": 80}))))
+    check("a mesh curls a two-pin strip differently from the legacy rigid transform", float(np.abs(dense - legacy_strip).mean()) > 1)
+    check("triangle density changes the interpolated mesh", float(np.abs(dense - coarse).mean()) > 0.05)
+    check("mesh expansion changes the interpolated mesh", float(np.abs(dense - expanded).mean()) > 0.05)
+    clamped, _ = bench.render(scene(shape(1, place, (100, 40), props(strip_fx, {"density": 1000, "expansion": 1000}))))
+    maximum, _ = bench.render(scene(shape(1, place, (100, 40), props(strip_fx, {"density": 48, "expansion": 500}))))
+    check("mesh settings are capped", bool(np.array_equal(clamped, maximum)))
+    held_fx = props(effect([(40, 10, 0, 0), (80, -30, 80, 0)], 1), {"density": 32, "pinMode1": 2})
+    rest_fx = props(effect([(0, 0, 0, 0), (80, -30, 80, 0)], 1), {"density": 32, "pinMode1": 2})
+    held, _ = bench.render(scene(shape(1, place, half, held_fx)))
+    rest, _ = bench.render(scene(shape(1, place, half, rest_fx)))
+    check("a stiff pin stays at its rest position", bool(np.array_equal(held, rest)))
+    bend_fx = props(effect([(0, 0, 0, 0), (80, 0, 80, 0)], 1), {"density": 32, "pinMode2": 1, "pinRotation2": 60})
+    bend, _ = bench.render(scene(shape(1, place, half, bend_fx)))
+    check("a bend pin rotates its area while its centre is still", float(np.abs(bend - plain).mean()) > 1)
+    scaled_fx = props(effect([(0, 0, 0, 0), (80, 0, 80, 0)], 1), {"density": 32, "pinMode2": 1, "pinScale2": 1.5})
+    scaled, _ = bench.render(scene(shape(1, place, half, scaled_fx)))
+    check("a bend pin scales its area while its centre is still", float(np.abs(scaled - plain).mean()) > 1)
+    rotated_one = props(effect([(0, 0, 0, 0)], 1), {"density": 48, "pinMode1": 1, "pinRotation1": 90})
+    rotated_image, _ = bench.render(scene(shape(1, place, (100, 40), rotated_one)))
+    rotated_reference, _ = bench.render(scene(shape(1, Place(160, 160, 90), (100, 40))))
+    compare("a bend rotation draws the whole image beyond its original bounds", rotated_image, rotated_reference, mean_limit=1.5, edge_limit=30)
+    scaled_one = props(effect([(0, 0, 0, 0)], 1), {"density": 48, "pinMode1": 1, "pinScale1": 1.5})
+    scaled_image, _ = bench.render(scene(shape(1, place, (100, 40), scaled_one)))
+    scaled_reference, _ = bench.render(scene(shape(1, Place(160, 160, 0, 1.5), (100, 40))))
+    compare("a bend scale draws the whole image beyond its original bounds", scaled_image, scaled_reference, mean_limit=1.5, edge_limit=55)
+    animated = props(effect([(0, 0, 0, 0), (80, 0, 80, 0)], 1), {"density": 32, "pinMode2": 1}).replace(
+        '</effect>', '<property name="pinRotation2" type="float"><kf t="0" v="0"/><kf t="1" v="60"/></property>'
+                     '<property name="pinScale2" type="float"><kf t="0" v="1"/><kf t="1" v="1.5"/></property></effect>')
+    a0, _ = bench.render(scene(shape(1, place, half, animated)), time=0)
+    a1, _ = bench.render(scene(shape(1, place, half, animated)), time=500)
+    check("bend rotation and scale animate", float(np.abs(a0 - a1).mean()) > 1)
+
+    pin_work = bench.work / "mesh_marks"
+    pin_work.mkdir()
+    pin_bench = Bench(bench.binary, pin_work, marks([(-90, 0), (90, 0)]))
+    marked, _ = pin_bench.render(scene(shape(1, place, (100, 40), props(strip_fx, {"density": 48}))))
+    for x, y in ((70, 160), (180, 100)):
+        light = marked[y - 10:y + 11, x - 10:x + 11, 0]
+        yy, xx = np.mgrid[y - 10:y + 11, x - 10:x + 11]
+        mass = light.sum()
+        distance = math.hypot((light * (xx + 0.5)).sum() / max(mass, 1) - x, (light * (yy + 0.5)).sum() / max(mass, 1) - y)
+        check("the mesh keeps picture marks under position pins", mass > 1000 and distance < 1, f"{distance:.2f} px")
+
+    swaying = props(effect([(-90, 0, -90, 0), (90, 0, 90, 0)], 1),
+                    {"density": 48, "sway": 1, "swayAmount": 25, "swaySpeed": 1, "swayDirection": 1,
+                     "swaySeed": 2, "swayPins": 1, "swayPin1": 1})
+    marked, _ = pin_bench.render(scene(shape(1, place, (100, 40), swaying)), time=250)
+    x, y = 70 + 6.7639, 160 + 3.6464
+    ix, iy = round(x), round(y)
+    light = marked[iy - 10:iy + 11, ix - 10:ix + 11, 0]
+    yy, xx = np.mgrid[iy - 10:iy + 11, ix - 10:ix + 11]
+    mass = light.sum()
+    distance = math.hypot((light * (xx + 0.5)).sum() / max(mass, 1) - x, (light * (yy + 0.5)).sum() / max(mass, 1) - y)
+    check("swayed mesh matches the editor handle position", mass > 1000 and distance < 1, f"{distance:.2f} px")
+
+    mesh_fx = props(effect(arm, 1.0), {"density": 32})
+    normal_mesh, _ = bench.render(scene(shape(1, place, half, mesh_fx)))
+    mesh_place = Place(170, 150, 30, 0.6)
+    turned_mesh, _ = bench.render(scene(shape(1, mesh_place, half, mesh_fx)))
+    yy, xx = np.mgrid[0:SIZE, 0:SIZE].astype(float) + 0.5
+    lx, ly = mesh_place.to_local(xx, yy)
+    px, py = place.to_scene(lx, ly)
+    compare("mesh pins stay attached to a turned and scaled layer", turned_mesh, bilinear(normal_mesh, px, py), mean_limit=1.5, edge_limit=26)
+
     turned = Place(170, 150, 30, 0.6)
     turned_plain, _ = bench.render(scene(shape(1, turned, half)))
     got, _ = bench.render(scene(shape(1, turned, half, effect(arm, 1.0))))
@@ -259,6 +356,9 @@ def run(bench, dots):
     _, small_ms = bench.render(scene(shape(1, Place(200, 300), (30, 30), effect(pins_small, 1.0)), size=big), runs=3)
     _, full_ms = bench.render(scene(shape(1, Place(540, 960), (540, 960), effect([(-500, -900, -500, -900), (500, 900, 520, 880)], 1.0)), size=big), runs=3)
     check("a small bent layer costs far less than a full-frame one", small_ms < full_ms * 0.2, f"{small_ms:.1f} ms vs {full_ms:.1f} ms")
+    _, small_mesh_ms = bench.render(scene(shape(1, Place(200, 300), (30, 30), props(effect(pins_small, 1.0), {"density": 24})), size=big), runs=3)
+    _, full_mesh_ms = bench.render(scene(shape(1, Place(540, 960), (540, 960), props(effect([(-500, -900, -500, -900), (500, 900, 520, 880)], 1.0), {"density": 24})), size=big), runs=3)
+    check("a small meshed layer avoids full-frame work", small_mesh_ms < full_mesh_ms * 0.2, f"{small_mesh_ms:.1f} ms vs {full_mesh_ms:.1f} ms")
 
 
 def main():

@@ -7,12 +7,16 @@ import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.addEffect
 import app.absentmotion.model.allPuppetPins
+import app.absentmotion.model.effectProperty
 import app.absentmotion.model.effects
 import app.absentmotion.model.leansOnBelow
 import app.absentmotion.model.onTextPath
 import app.absentmotion.model.pinnedPath
 import app.absentmotion.model.puppetFalloff
 import app.absentmotion.model.puppetPins
+import app.absentmotion.model.puppetOffset
+import app.absentmotion.model.renderPuppetPins
+import app.absentmotion.model.puppetMeshSource
 import app.absentmotion.model.unwarp
 import app.absentmotion.model.withEffect
 import app.absentmotion.model.withEffectProperty
@@ -47,7 +51,7 @@ class PathAndPuppetTest {
         assertTrue(puppet.native && puppet.category == "distort" && puppet.since == "4.2.0")
         assertTrue(!catalog.isNew(path) && !catalog.isNew(puppet))
         assertEquals(listOf("Arc", "Circle", "Layer Below"), path.params.first { it.id == "shape" }.options)
-        assertEquals("1.000000", puppet.params.single().default)
+        assertEquals("1.000000", puppet.params.first { it.id == "falloff" }.default)
     }
 
     @Test fun textPathShowsOnlyTheSettingsOfTheChosenPath() {
@@ -122,6 +126,8 @@ class PathAndPuppetTest {
         assertTrue(effect.puppetPins(0f).isEmpty())
         effect = effect.withPuppetPin(Pt(10f, 20f), Pt(10f, 20f)).withPuppetPin(Pt(50f, 0f), Pt(40f, 0f))
         assertEquals(listOf(1, 2), effect.puppetPins(0f).map { it.number })
+        val withSway = effect.withEffectProperty("swayPin1", "float", "1", 0f, 0f..0f)
+        assertNull(withSway.withoutPuppetPin(1).effectProperty("swayPin1"))
         effect = effect.withoutPuppetPin(1).withPuppetPin(Pt(0f, 0f), Pt(0f, 0f))
         assertEquals(listOf(2, 1), effect.puppetPins(0f).map { it.number })
         assertEquals(Pt(40f, 0f), effect.puppetPins(0f).first().rest)
@@ -129,6 +135,36 @@ class PathAndPuppetTest {
         val reopened = Scene.parse(sceneOf(shapeNode(id = 1, children = listOf(effect))).toXml()).layer(1)!!.effects.single()
         assertEquals(effect.puppetPins(0f), reopened.puppetPins(0f))
         assertEquals(1f, reopened.puppetFalloff(0f), 0f)
+    }
+
+    @Test fun swayHandlesAndPinModesFollowTheRenderedValues() {
+        var effect = puppet.instance().withPuppetPin(Pt(0f, 0f), Pt(0f, 0f)).withPuppetPin(Pt(70f, 10f), Pt(80f, 0f))
+        effect = effect.withEffectProperty("sway", "bool", "true", 0f, 0f..0f)
+            .withEffectProperty("swayAmount", "float", "25", 0f, 0f..0f)
+            .withEffectProperty("swaySpeed", "float", "1", 0f, 0f..0f)
+            .withEffectProperty("swayDirection", "float", "1", 0f, 0f..0f)
+            .withEffectProperty("swaySeed", "float", "2", 0f, 0f..0f)
+        val base = effect.puppetPins(0f)
+        val at0 = effect.renderPuppetPins(0f, 0)
+        val at250 = effect.renderPuppetPins(0f, 250)
+        assertTrue(at0[0].at.distanceTo(at250[0].at) > 1f)
+        near(Pt(6.7639f, 3.6464f), effect.puppetOffset(base[0], 0f, 250))
+        near(base[0].at, at250[0].at - effect.puppetOffset(base[0], 0f, 250))
+        effect = effect.withEffectProperty("swayPins", "float", "1", 0f, 0f..0f)
+            .withEffectProperty("swayPin2", "float", "1", 0f, 0f..0f)
+            .withEffectProperty("pinMode2", "float", "2", 0f, 0f..0f)
+        near(Pt(0f, 0f), effect.renderPuppetPins(0f, 250)[0].at)
+        near(Pt(80f, 0f), effect.renderPuppetPins(0f, 250)[1].at)
+        effect = effect.withEffectProperty("pinMode2", "float", "1", 0f, 0f..0f)
+            .withEffectProperty("pinRotation2", "float", "45", 0f, 0f..0f)
+            .withEffectProperty("pinScale2", "float", "1.5", 0f, 0f..0f)
+        val p = effect.puppetPins(0f)[1]
+        assertEquals(1, p.mode)
+        assertEquals(45f, p.rotation, 0f)
+        assertEquals(1.5f, p.scale, 0f)
+        near(p.rest, puppetMeshSource(listOf(p), 1f, p.at))
+        val removed = effect.withoutPuppetPin(2)
+        for (name in listOf("pinMode2", "pinRotation2", "pinScale2", "swayPin2")) assertNull(removed.effectProperty(name))
     }
 
     @Test fun pinPositionsAnimateWithKeyframes() {
@@ -140,6 +176,24 @@ class PathAndPuppetTest {
         assertEquals(2, moved.keyframes(ref).size)
         assertEquals(Pt(50f, 0f), effect.puppetPins(0.5f).single().at)
         assertEquals(Pt(0f, 0f), effect.puppetPins(0.5f).single().rest)
+    }
+
+    @Test fun bendRotationAndScaleHaveIndependentKeyframes() {
+        var layer = Layer(shapeNode(id = 1, children = listOf(puppet.instance().withPuppetPin(Pt(0f, 0f), Pt(0f, 0f)))))
+        val rotation = app.absentmotion.model.PropRef.effect(0, "pinRotation1")
+        val scale = app.absentmotion.model.PropRef.effect(0, "pinScale1")
+        layer = layer.at(0, 30).withEffect(0) { it.withEffectProperty("pinRotation1", "float", "0", 0f, 0f..0f)
+            .withEffectProperty("pinScale1", "float", "1", 0f, 0f..0f) }
+        layer = layer.withKeyframeToggled(rotation, "0").withKeyframeToggled(scale, "1")
+        layer = layer.at(2000, 30).let { current -> current.withEffect(0) {
+            it.withEffectProperty("pinRotation1", "float", "90", current.t, current.snap)
+                .withEffectProperty("pinScale1", "float", "2", current.t, current.snap)
+        } }
+        assertEquals(2, layer.keyframes(rotation).size)
+        assertEquals(2, layer.keyframes(scale).size)
+        val pin = layer.effects.single().puppetPins(0.5f).single()
+        assertEquals(45f, pin.rotation, 0.01f)
+        assertEquals(1.5f, pin.scale, 0.01f)
     }
 
     @Test fun theKotlinWarpMatchesTheFixtureTheEngineTestAlsoChecks() {
