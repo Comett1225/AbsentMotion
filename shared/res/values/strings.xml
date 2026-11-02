@@ -2100,4 +2100,8 @@
     <string name="puppet_rotation">Rotation</string>
     <string name="puppet_scale">Scale</string>
     <string name="puppet_stiff">Stiff</string>
+    <string name="desk_remove_media">Remove from media</string>
+    <string name="desk_remove_media_note">The file stays on your computer</string>
+    <string name="desk_remove_media_used">Used in this project, which keeps it</string>
+    <string name="desk_unlink_folder">Unlink folder %1$s</string>
 </resources>

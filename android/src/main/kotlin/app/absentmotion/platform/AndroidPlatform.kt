@@ -210,6 +210,10 @@ fun Hint(text: String, content: @androidx.compose.runtime.Composable () -> Unit)
 
 fun linkFolderLabel(): String = ""
 
+fun libraryFolderName(uri: android.net.Uri): String? = null
+
+fun removeFromLibrary(uri: android.net.Uri, unlinkFolder: Boolean) {}
+
 fun linkMediaFolder() {}
 
 internal const val CAPTION_MODEL_NAME = "ggml-base-q5_1.bin"

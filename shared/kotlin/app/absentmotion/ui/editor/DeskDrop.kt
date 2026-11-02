@@ -10,6 +10,7 @@ class DropItem(val label: String, val add: () -> Unit)
 object DeskDrop {
     var item by mutableStateOf<DropItem?>(null)
     var at by mutableStateOf(Offset.Unspecified)
+    var removeHovered: (() -> Unit)? = null
     var frameAt: (Offset) -> Int? = { null }
 
     fun clear() {

@@ -197,6 +197,10 @@ fun Hint(text: String, content: @Composable () -> Unit) = androidx.compose.found
 
 fun linkFolderLabel(): String = "Link folder"
 
+fun libraryFolderName(uri: android.net.Uri): String? = app.absentmotion.desk.DeskLibrary.folderOf(uri)?.let { it.name.ifEmpty { it.path } }
+
+fun removeFromLibrary(uri: android.net.Uri, unlinkFolder: Boolean) = app.absentmotion.desk.DeskLibrary.hide(uri, unlinkFolder)
+
 fun linkMediaFolder() { app.absentmotion.desk.DeskLibrary.chooseFolder()?.let { app.absentmotion.desk.DeskLibrary.link(it) } }
 
 internal const val CAPTION_MODEL_NAME = "ggml-base-q5_1.bin"

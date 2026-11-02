@@ -36,6 +36,7 @@ import app.absentmotion.desk.DeskBack
 import app.absentmotion.desk.DeskKeys
 import app.absentmotion.editor.MultiSelect
 import app.absentmotion.editor.deleteSelected
+import app.absentmotion.editor.toggleBookmark
 import app.absentmotion.model.Scene
 import app.absentmotion.ui.editor.DeskDrop
 import app.absentmotion.ui.editor.DeskTimelineControls
@@ -118,6 +119,85 @@ class DeskTimelineTest {
             MultiSelect.clear()
             app.engine.close()
         }
+    }
+
+    @Test fun pastTheEnd() {
+        System.setProperty("am.data", File("build/timeline-end-data").absolutePath)
+        val app = DeskAppState()
+        val id = app.store.create(Scene.parse(File("../testdata/scenes/styles.xml").readText()))
+        val state = runBlocking { app.openNow(id)!! }
+        val topId = state.scene.layers.last().id
+        runSkikoComposeUiTest(size = Size(1280f, 400f)) {
+            setContent {
+                CompositionLocalProvider(LocalWide provides true) {
+                    Box(Modifier.fillMaxSize().background(Am.TimelineBg)) { Timeline(state, Modifier.fillMaxSize()) }
+                }
+            }
+            val shots = File("build/ui-shots/timeline").also { it.mkdirs() }
+            val end = state.scene.totalTime
+            runOnIdle { state.timelineZoom = 400f }
+            waitForIdle()
+            val before = onRoot().captureToImage().toAwtImage()
+            onRoot().performMouseInput { moveTo(Offset(700f, 300f)); repeat(40) { scroll(2f, androidx.compose.ui.test.ScrollWheel.Horizontal) } }
+            waitForIdle()
+            val panned = onRoot().captureToImage().toAwtImage()
+            ImageIO.write(panned, "png", shots.resolve("timeline-past-end.png"))
+            assertTrue("right", before.getRGB(1270, 300) != panned.getRGB(1270, 300))
+            assertTrue("mid", before.getRGB(900, 57) != panned.getRGB(900, 57))
+            val lit = (184..1270).count { x -> (2..18).any { y -> (panned.getRGB(x, y) shr 8 and 0xFF) > 110 } }
+            assertTrue("ruler pixels $lit", lit > 20)
+            runOnIdle { DeskTimelineControls.fit?.invoke(); state.timelineZoom = 100f }
+            waitForIdle()
+            onRoot().performMouseInput { moveTo(Offset(230f, 57f)); press(); moveTo(Offset(1000f, 57f)); release() }
+            runOnIdle {
+                assertTrue(state.scene.totalTime > end)
+                assertTrue(state.scene.layer(topId)!!.startTime > end / 2)
+                state.undo()
+                assertEquals(end, state.scene.totalTime)
+                assertEquals(0, state.scene.layer(topId)!!.startTime)
+                state.clearForTest()
+            }
+            waitForIdle()
+            onRoot().performMouseInput { moveTo(Offset(480f, 57f)); press(); moveTo(Offset(900f, 57f)); release() }
+            runOnIdle {
+                assertTrue("end ${state.scene.totalTime}", state.scene.totalTime > end)
+                state.undo()
+                assertEquals(end, state.scene.totalTime)
+            }
+        }
+        MultiSelect.clear()
+        app.engine.close()
+    }
+
+    @Test fun bookmarkShapes() {
+        System.setProperty("am.data", File("build/timeline-mark-data").absolutePath)
+        val app = DeskAppState()
+        val id = app.store.create(Scene.parse(File("../testdata/scenes/styles.xml").readText()))
+        val state = runBlocking { app.openNow(id)!! }
+        runSkikoComposeUiTest(size = Size(1280f, 300f)) {
+            setContent {
+                CompositionLocalProvider(LocalWide provides true) {
+                    Box(Modifier.fillMaxSize().background(Am.TimelineBg)) { Timeline(state, Modifier.fillMaxSize()) }
+                }
+            }
+            runOnIdle { state.timelineZoom = 100f; state.frame = 30; state.toggleBookmark(); state.frame = 60; state.toggleBookmark(); state.frame = 45 }
+            waitForIdle()
+            val shots = File("build/ui-shots/timeline").also { it.mkdirs() }
+            val full = onRoot().captureToImage().toAwtImage()
+            val crop = full.getSubimage(180, 0, 300, 60)
+            val big = java.awt.image.BufferedImage(1200, 240, java.awt.image.BufferedImage.TYPE_INT_ARGB)
+            big.createGraphics().apply { setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR); drawImage(crop, 0, 0, 1200, 240, null); dispose() }
+            ImageIO.write(big, "png", shots.resolve("timeline-bookmarks.png"))
+            runOnIdle { state.frame = 60 }
+            waitForIdle()
+            val full2 = onRoot().captureToImage().toAwtImage()
+            val crop2 = full2.getSubimage(180, 0, 300, 60)
+            val big2 = java.awt.image.BufferedImage(1200, 240, java.awt.image.BufferedImage.TYPE_INT_ARGB)
+            big2.createGraphics().apply { setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR); drawImage(crop2, 0, 0, 1200, 240, null); dispose() }
+            ImageIO.write(big2, "png", shots.resolve("timeline-bookmark-playhead.png"))
+        }
+        MultiSelect.clear()
+        app.engine.close()
     }
 
     @Test fun rulerStepsAndLabels() {

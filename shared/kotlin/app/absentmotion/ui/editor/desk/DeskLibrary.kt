@@ -136,9 +136,16 @@ internal fun DeskGrid(modifier: Modifier, content: LazyGridScope.() -> Unit) {
 }
 
 @Composable
-internal fun DeskTile(state: EditorState, label: String, picture: @Composable () -> Unit, reveal: (() -> Unit)? = null, direct: Boolean = true, detail: String? = null, add: () -> Unit) {
+internal fun DeskTile(state: EditorState, label: String, picture: @Composable () -> Unit, reveal: (() -> Unit)? = null, direct: Boolean = true, detail: String? = null, remove: DeskRemove? = null, add: () -> Unit) {
     val source = remember { MutableInteractionSource() }
     val hovered by source.collectIsHoveredAsState()
+    if (remove != null) {
+        val removeNow = remember { { remove.run(false) } }
+        DisposableEffect(hovered) {
+            if (hovered) DeskDrop.removeHovered = removeNow
+            onDispose { if (DeskDrop.removeHovered === removeNow) DeskDrop.removeHovered = null }
+        }
+    }
     val body: @Composable () -> Unit = {
         Column(
             Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(if (hovered) Am.Button else Am.Field).hoverable(source).pointerHoverIcon(PointerIcon.Hand)
@@ -152,7 +159,7 @@ internal fun DeskTile(state: EditorState, label: String, picture: @Composable ()
             }
         }
     }
-    DeskTip(if (detail != null) "$label · $detail" else label) { if (direct) DeskContext(add, reveal) { body() } else body() }
+    DeskTip(if (detail != null) "$label · $detail" else label) { if (direct) DeskContext(add, reveal, remove) { body() } else body() }
 }
 
 @Composable
@@ -198,8 +205,10 @@ private class AtPointer(private val at: IntOffset) : PopupPositionProvider {
     )
 }
 
+internal class DeskRemove(val inUse: Boolean, val folder: String?, val run: (unlinkFolder: Boolean) -> Unit)
+
 @Composable
-internal fun DeskContext(add: () -> Unit, reveal: (() -> Unit)? = null, content: @Composable () -> Unit) {
+internal fun DeskContext(add: () -> Unit, reveal: (() -> Unit)? = null, remove: DeskRemove? = null, content: @Composable () -> Unit) {
     var at by remember { mutableStateOf<IntOffset?>(null) }
     Box(Modifier.pointerInput(Unit) {
         awaitPointerEventScope {
@@ -218,6 +227,10 @@ internal fun DeskContext(add: () -> Unit, reveal: (() -> Unit)? = null, content:
             MenuPopup(remember(point) { AtPointer(point) }, { at = null }) {
                 MenuRow(stringResource(R.string.desk_add)) { at = null; add() }
                 if (reveal != null) MenuRow(stringResource(R.string.desk_reveal_file)) { at = null; reveal() }
+                if (remove != null) {
+                    MenuRow(stringResource(R.string.desk_remove_media), subText = stringResource(if (remove.inUse) R.string.desk_remove_media_used else R.string.desk_remove_media_note), divider = true) { at = null; remove.run(false) }
+                    if (remove.folder != null) MenuRow(stringResource(R.string.desk_unlink_folder, remove.folder)) { at = null; remove.run(true) }
+                }
             }
         }
     }
