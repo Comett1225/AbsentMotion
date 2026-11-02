@@ -8,6 +8,7 @@ object DesktopNative {
         System.load(DesktopPlatform.nativeLibrary())
     }
 
+    external fun detectFaces(pixels: IntArray, width: Int, height: Int): FloatArray?
     external fun create(): Long
     external fun destroy(handle: Long)
     external fun loadEffect(handle: Long, xml: String): String

@@ -87,6 +87,7 @@ val nativeBuild = tasks.register<Exec>("nativeBuild") {
 tasks.withType<JavaExec>().matching { it.name == "run" }.configureEach {
     dependsOn(nativeBuild)
     systemProperty("am.assets", file("../shared/assets").absolutePath)
+    systemProperty("am.bgmodel", file("../android/src/foss/assets/absent_bg.abg").absolutePath)
     systemProperty("am.native", file("build/native/$nativeName").absolutePath)
     systemProperty("am.repo", file("..").absolutePath)
     systemProperty("skiko.data.path", file("build/skiko").absolutePath)
@@ -121,6 +122,7 @@ val prepareResources = tasks.register<Sync>("prepareResources") {
     dependsOn(nativeBuild)
     into(layout.buildDirectory.dir("app-resources/common"))
     from("../shared/assets") { into("assets") }
+    from("../android/src/foss/assets/absent_bg.abg") { into("assets") }
     from("../shared/res") { into("res"); include("values*/strings.xml") }
     from("build/native/$nativeName")
     if (isWindows) from("build/native/icudtl.dat")
@@ -134,6 +136,7 @@ val renderCheck = tasks.register<JavaExec>("renderCheck") {
     args("--render-check")
     systemProperty("java.awt.headless", "true")
     systemProperty("am.assets", file("../shared/assets").absolutePath)
+    systemProperty("am.bgmodel", file("../android/src/foss/assets/absent_bg.abg").absolutePath)
     systemProperty("am.native", file("build/native/$nativeName").absolutePath)
     systemProperty("am.repo", file("..").absolutePath)
     systemProperty("am.output", file("build").absolutePath)
@@ -146,16 +149,20 @@ val sceneCheck = tasks.register<JavaExec>("sceneCheck") {
     args("--scene-check")
     systemProperty("java.awt.headless", "true")
     systemProperty("am.assets", file("../shared/assets").absolutePath)
+    systemProperty("am.bgmodel", file("../android/src/foss/assets/absent_bg.abg").absolutePath)
     systemProperty("am.native", file("build/native/$nativeName").absolutePath)
     systemProperty("am.repo", file("..").absolutePath)
     systemProperty("am.output", file("build").absolutePath)
 }
 
 tasks.test {
+    systemProperty("user.home", layout.buildDirectory.dir("test-home").get().asFile.absolutePath)
+    systemProperty("am.data", layout.buildDirectory.dir("test-data").get().asFile.absolutePath)
     dependsOn(nativeBuild)
     inputs.file(layout.buildDirectory.file("native/$nativeName"))
     systemProperty("am.native", layout.buildDirectory.file("native/$nativeName").get().asFile.absolutePath)
     systemProperty("am.assets", file("../shared/assets").absolutePath)
+    systemProperty("am.bgmodel", file("../android/src/foss/assets/absent_bg.abg").absolutePath)
     systemProperty("am.repo", file("..").absolutePath)
     systemProperty("skiko.data.path", layout.buildDirectory.dir("skiko").get().asFile.absolutePath)
     systemProperty("java.awt.headless", "true")

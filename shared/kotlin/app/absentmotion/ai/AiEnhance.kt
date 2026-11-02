@@ -121,6 +121,7 @@ private class FaceWork(private val net: AiNet, orientation: Int) : FrameWork {
     }
 
     private suspend fun detect(argb: IntArray, width: Int, height: Int): List<FaceBox> = withContext(Dispatchers.Default) {
+        if (app.absentmotion.platform.PlatformFeatures.desktop) return@withContext app.absentmotion.platform.desktopFaces(argb, width, height, turn)
         val k = min(1f, DETECT_SIDE / max(width, height).toFloat())
         val w = max(2, (width * k).toInt() and 1.inv())
         val h = max(2, (height * k).toInt() and 1.inv())

@@ -7,8 +7,8 @@ endif()
 if(NOT FFMPEG_PREFIX)
     set(FFMPEG_PREFIX /opt/homebrew)
 endif()
-target_sources(amdesktop PRIVATE "${AM_ROOT}/pc/native/video.cpp" "${MAC}/gpu_metal.mm" "${MAC}/video_mac.mm" "${MAC}/audio_mac.cpp")
-set_source_files_properties("${MAC}/gpu_metal.mm" "${MAC}/video_mac.mm" PROPERTIES COMPILE_OPTIONS -fobjc-arc)
+target_sources(amdesktop PRIVATE "${AM_ROOT}/pc/native/video.cpp" "${MAC}/gpu_metal.mm" "${MAC}/video_mac.mm" "${MAC}/audio_mac.cpp" "${MAC}/faces.mm")
+set_source_files_properties("${MAC}/gpu_metal.mm" "${MAC}/video_mac.mm" "${MAC}/faces.mm" PROPERTIES COMPILE_OPTIONS -fobjc-arc)
 target_compile_options(amdesktop PRIVATE -O2 -fno-rtti -fno-exceptions -w)
 target_include_directories(amdesktop PRIVATE "$ENV{JAVA_HOME}/include/darwin" "${FFMPEG_PREFIX}/include")
 target_link_directories(amdesktop PRIVATE "${FFMPEG_PREFIX}/lib")
@@ -17,5 +17,5 @@ foreach(lib skparagraph skshaper skunicode_icu skunicode_core skia pathops skcms
 endforeach()
 target_link_libraries(amdesktop PRIVATE avformat avcodec avutil swscale
     "-framework CoreText" "-framework CoreGraphics" "-framework CoreFoundation" "-framework Foundation" "-framework Metal"
-    "-framework QuartzCore" "-framework ApplicationServices" "-framework CoreAudio" "-framework CoreVideo")
+    "-framework Vision" "-framework QuartzCore" "-framework ApplicationServices" "-framework CoreAudio" "-framework CoreVideo")
 set_target_properties(amdesktop PROPERTIES OUTPUT_NAME amdesktop BUILD_RPATH "@loader_path;${FFMPEG_PREFIX}/lib")

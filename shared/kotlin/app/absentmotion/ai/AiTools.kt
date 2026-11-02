@@ -35,7 +35,13 @@ enum class AiAction(@StringRes val title: Int) {
     Background(R.string.ai_remove_background), Noise(R.string.ai_reduce_noise), Video(R.string.ai_remove_background_video), Smooth(R.string.smooth_clip),
     Enhance(R.string.ai_enhance), Reverse(R.string.speed_reverse);
 
-    val offered: Boolean get() = this == Noise || this == Enhance || this != Smooth && this != Reverse && BackgroundRemoval.AVAILABLE
+    val offered: Boolean get() = when (this) {
+        Noise -> true
+        Enhance -> true
+        Video -> BackgroundRemoval.AVAILABLE
+        Background -> BackgroundRemoval.AVAILABLE
+        Smooth, Reverse -> false
+    }
 
     fun unavailable(layer: Layer?): UiText? = when (this) {
         Background -> if (layer?.mediaFill?.video == false) null else txt(R.string.ai_select_image_layer)

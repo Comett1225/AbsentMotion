@@ -29,7 +29,7 @@ class NativeVideoSource(file: File) : AutoCloseable {
     }
 }
 
-class FfmpegVideoSource(private val file: File, private val ffmpeg: String, ffprobe: String) : VideoSource {
+class FfmpegVideoSource(private val file: File, private val ffmpeg: String, ffprobe: String, maxSide: Int = 1080, maxPixels: Int = Int.MAX_VALUE) : VideoSource {
     override val info: VideoInfo
     private val width: Int
     private val height: Int
@@ -46,7 +46,7 @@ class FfmpegVideoSource(private val file: File, private val ffmpeg: String, ffpr
         val video = json.getJSONArray("streams").getJSONObject(0)
         val originalWidth = video.getInt("width")
         val originalHeight = video.getInt("height")
-        val scale = minOf(1.0, 1080.0 / maxOf(originalWidth, originalHeight))
+        val scale = minOf(1.0, maxSide.toDouble() / maxOf(originalWidth, originalHeight), kotlin.math.sqrt(maxPixels.toDouble() / (originalWidth.toDouble() * originalHeight)))
         width = maxOf(2, (originalWidth * scale).toInt() / 2 * 2)
         height = maxOf(2, (originalHeight * scale).toInt() / 2 * 2)
         val rate = video.optString("avg_frame_rate", "30/1").split('/')

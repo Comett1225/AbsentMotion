@@ -57,7 +57,7 @@ object EngineDebug {
     @Volatile var failCheck: String? = null
 }
 
-class EngineThread(private val background: Int, context: Context? = null, private val preferOpenGl: () -> Boolean = { false }) {
+class EngineThread(private val background: Int, private val context: Context? = null, private val preferOpenGl: () -> Boolean = { false }) {
     private val executor = Executors.newSingleThreadExecutor { Thread(it, "am-engine").apply { isDaemon = true } }
     private val dispatcher = executor.asCoroutineDispatcher()
     private val mediaScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -351,9 +351,9 @@ class EngineThread(private val background: Int, context: Context? = null, privat
         }
     }.getOrElse { if (it is kotlinx.coroutines.CancellationException) throw it; false }
 
-    inner class ExportSession internal constructor(private val document: Scene) {
+    inner class ExportSession internal constructor(private val document: Scene, private val interpolation: DeskInterpolation? = null) {
         suspend fun still(timeMs: Int, width: Int, height: Int): ByteArray? = withContext(dispatcher) {
-            applyFonts(timeMs); syncVideo(document, timeMs); engine().still(timeMs.toDouble(), width, height)
+            applyFonts(timeMs); syncVideo(document, timeMs); interpolation?.apply(document, timeMs, engine()); engine().still(timeMs.toDouble(), width, height)
         }
         suspend fun previewStill(timeMs: Int, width: Int, height: Int, accurateBlur: Boolean): ByteArray? = withContext(dispatcher) {
             applyFonts(timeMs); syncVideo(document, timeMs); engine().previewStill(timeMs.toDouble(), width, height, accurateBlur)
@@ -375,7 +375,10 @@ class EngineThread(private val background: Int, context: Context? = null, privat
     }
 
     suspend fun <T> exportSession(xml: String, smoothing: Smoothing = Smoothing(), fps: Int = 0, block: suspend ExportSession.() -> T): T =
-        withDocument(xml, 0) { document -> ExportSession(document).block() }
+        withDocument(xml, 0) { document ->
+            val interpolation = if (smoothing.method == app.absentmotion.export.FrameInterpolation.Ai) DeskInterpolation.open(checkNotNull(context), smoothing, fps) else null
+            try { ExportSession(document, interpolation).block() } finally { interpolation?.close() }
+        }
 
     suspend fun shapeIcon(xml: String, size: Int, color: Int): Bitmap? {
         awaitMedia()

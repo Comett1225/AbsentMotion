@@ -38,7 +38,7 @@ internal class AiGpu(val api: Int, val type: Int, val fp16: Boolean, val name: S
 internal fun aiUsesGpu(gpu: AiGpu?, choice: Boolean?): Boolean = gpu != null && !gpu.software && (choice ?: gpu.known)
 
 internal object AiNative {
-    val loaded: Boolean by lazy { runCatching { System.loadLibrary("absent_ai") }.isSuccess }
+    val loaded: Boolean by lazy { runCatching { app.absentmotion.platform.loadAiLibrary() }.isSuccess }
     val gpu: AiGpu? by lazy { if (loaded) runCatching { AiGpu.parse(nativeGpu()) }.getOrNull() else null }
 
     external fun nativeGpu(): String?
@@ -74,7 +74,10 @@ internal class AiNet private constructor(private val handle: Long, private val g
         return output
     }
 
-    suspend fun cutout(bitmap: Bitmap, size: Int) = checkResult(blocking { AiNative.nativeCutout(handle, bitmap, size) })
+    suspend fun cutout(bitmap: Bitmap, size: Int) = checkResult(blocking {
+        if (app.absentmotion.platform.PlatformFeatures.desktop) app.absentmotion.platform.desktopCutout(handle, bitmap, size)
+        else AiNative.nativeCutout(handle, bitmap, size)
+    })
 
     private fun checkResult(code: Int) {
         check(code != 1) { AppText.get(R.string.ai_cancelled) }
