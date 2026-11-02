@@ -10,7 +10,7 @@ from pathlib import Path
 from xml.sax.saxutils import quoteattr
 
 ROOT = Path(__file__).resolve().parents[2]
-EFFECTS = ROOT / "app/src/main/assets/effects"
+EFFECTS = ROOT / "shared/assets/effects"
 SIZE, FPS, LENGTH = 1080, 30, 3999
 FRAMES = [0, 1, 15, 30, 45, 60, 75, 90, 105, 119]
 
@@ -119,10 +119,10 @@ def build(source, out):
 
 def head_sources(rev, work):
     dest = work / f"src-{rev}"
-    if not (dest / "app/src/main/cpp").exists():
-        data = subprocess.run(["git", "-C", str(ROOT), "archive", rev, "app/src/main/cpp"], check=True, capture_output=True).stdout
+    if not (dest / "shared/cpp").exists():
+        data = subprocess.run(["git", "-C", str(ROOT), "archive", rev, "shared/cpp"], check=True, capture_output=True).stdout
         tarfile.open(fileobj=io.BytesIO(data)).extractall(dest)
-    return dest / "app/src/main/cpp"
+    return dest / "shared/cpp"
 
 
 def run(binary, effects, scene_file, scale, runs, outdir):
@@ -173,7 +173,7 @@ def main():
     base_bin, cur_bin = work / "base/render_bench", work / "current/render_bench"
     if not args.no_build:
         build(head_sources(args.base, work), work / "base")
-        build(ROOT / "app/src/main/cpp", work / "current")
+        build(ROOT / "shared/cpp", work / "current")
     report = {"base": args.base, "scale": args.scale, "runs": args.runs, "frames": FRAMES, "scenes": {}}
     for name, text in scenes().items():
         if args.only and name not in args.only.split(","):

@@ -11,15 +11,30 @@ if len(sys.argv) > 2 and sys.argv[1] == '--revision':
     REVISION = sys.argv[2]
     del sys.argv[1:3]
 
+LEGACY = (('shared/kotlin/', 'app/src/main/kotlin/'), ('android/src/main/kotlin/', 'app/src/main/kotlin/'), ('shared/res/', 'app/src/main/res/'), ('shared/cpp/', 'app/src/main/cpp/'), ('shared/assets/', 'app/src/main/assets/'), ('android/src/', 'app/src/'))
+
+
+def read(path):
+    if not REVISION:
+        return (ROOT / path).read_text()
+    for new, old in ((path, path),) + LEGACY:
+        if path.startswith(new):
+            result = subprocess.run(['git', 'show', REVISION + ':' + old + path[len(new):]], cwd=ROOT, text=True, capture_output=True)
+            if result.returncode == 0:
+                return result.stdout
+    raise FileNotFoundError(path)
+
+
+def kotlin_path(relative):
+    android = 'android/src/main/kotlin/app/absentmotion/' + relative
+    return android if (ROOT / android).exists() else 'shared/kotlin/app/absentmotion/' + relative
+
+
 def source(relative):
-    path = 'app/src/main/kotlin/app/absentmotion/' + relative
-    if REVISION:
-        return subprocess.check_output(['git', 'show', REVISION + ':' + path], cwd=ROOT, text=True)
-    return (ROOT / path).read_text()
+    return read(kotlin_path(relative))
 
 def english(key):
-    path = 'app/src/main/res/values/strings.xml'
-    text = subprocess.check_output(['git', 'show', REVISION + ':' + path], cwd=ROOT, text=True) if REVISION else (ROOT / path).read_text()
+    text = read('shared/res/values/strings.xml')
     return re.search(r'<string name="' + key + r'"[^>]*>(.*?)</string>', text, re.S).group(1)
 
 class UiContracts(unittest.TestCase):
@@ -155,8 +170,8 @@ class UiContracts(unittest.TestCase):
         self.assertIn('state.playing = false', text)
 
     def test_editor_menus_animate_in_and_out(self):
-        root = ROOT / 'app/src/main/kotlin/app/absentmotion/ui/editor'
-        paths = sorted(str(p.relative_to(ROOT / 'app/src/main/kotlin/app/absentmotion')) for p in root.rglob('*.kt'))
+        root = ROOT / 'shared/kotlin/app/absentmotion/ui/editor'
+        paths = sorted(str(p.relative_to(ROOT / 'shared/kotlin/app/absentmotion')) for p in root.rglob('*.kt'))
         for path in paths:
             self.assertIsNone(re.search(r'if \([^\n]*\) (MenuPopup|ChoiceList|ParentMenu|PasteStyleMenu|OverflowMenu)\(', source(path)), path)
         self.assertIn('Modifier.presence(scaleFrom = 0.92f', source('ui/editor/StructureUi.kt').split('internal fun ChoiceList', 1)[1])
@@ -165,9 +180,9 @@ class UiContracts(unittest.TestCase):
             self.assertIn('Presence(state.previewPanelOpen) { PreviewModePanel(', source(path))
 
     def test_every_editor_haptic_respects_the_vibration_setting(self):
-        root = ROOT / 'app/src/main/kotlin/app/absentmotion/ui/editor'
+        root = ROOT / 'shared/kotlin/app/absentmotion/ui/editor'
         for p in sorted(root.rglob('*.kt')):
-            path = str(p.relative_to(ROOT / 'app/src/main/kotlin/app/absentmotion'))
+            path = str(p.relative_to(ROOT / 'shared/kotlin/app/absentmotion'))
             for line in source(path).splitlines():
                 if 'performHapticFeedback(' in line:
                     self.assertTrue('state.settings.vibration' in line or 'if (vibrate)' in line, path)

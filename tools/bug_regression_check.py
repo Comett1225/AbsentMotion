@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parent.parent
 
 class ToolRegressions(unittest.TestCase):
     def test_font_generator_output_is_publishable_and_checkable(self):
-        catalogue = ROOT / 'app/src/main/kotlin/app/absentmotion/fonts/FontCatalog.kt'
+        catalogue = ROOT / 'shared/kotlin/app/absentmotion/fonts/FontCatalog.kt'
         self.assertIsNone(re.search(r'^\s*(//|/\*|\*)', catalogue.read_text(), re.M))
         result = subprocess.run([sys.executable, str(ROOT / 'tools/gen_fonts.py'), '--check'], capture_output=True, text=True)
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
@@ -65,8 +65,8 @@ class ToolRegressions(unittest.TestCase):
             script.write_text((ROOT / 'tools/touch.sh').read_text())
             (folder / 'tools/env.sh').write_text((ROOT / 'tools/env.sh').read_text())
             (folder / 'tools/Touch.java').write_text('fixture')
-            (folder / 'app/build/touch').mkdir(parents=True)
-            (folder / 'app/build/touch/classes.dex').touch()
+            (folder / 'android/build/touch').mkdir(parents=True)
+            (folder / 'android/build/touch/classes.dex').touch()
             sdk = folder / 'Library/Android/sdk/platform-tools'
             sdk.mkdir(parents=True)
             adb = sdk / 'adb'
@@ -153,8 +153,8 @@ class ToolRegressions(unittest.TestCase):
         function = script[script.index('native_libs() {'):script.index('\n}\n', script.index('native_libs() {')) + 3]
         with tempfile.TemporaryDirectory() as folder:
             folder = Path(folder)
-            lib = folder / 'app/build/intermediates/merged_native_libs/fossRelease/mergeFossReleaseNativeLibs/out/lib/arm64-v8a/libamengine.so'
-            source = folder / 'app/src/main/cpp/engine.cpp'
+            lib = folder / 'android/build/intermediates/merged_native_libs/fossRelease/mergeFossReleaseNativeLibs/out/lib/arm64-v8a/libamengine.so'
+            source = folder / 'shared/cpp/engine.cpp'
             run = lambda: subprocess.run(['sh', '-c', 'fail() { echo "FAILED: $1"; }; ' + function + '\nnative_libs fossRelease mergeFossReleaseNativeLibs; echo "rc=$? libs=$libs skipped=$skipped"'],
                                          cwd=folder, capture_output=True, text=True).stdout
             self.assertIn('rc=1', run())
@@ -166,7 +166,7 @@ class ToolRegressions(unittest.TestCase):
             source.touch()
             os.utime(source, (1000, 1000))
             os.utime(lib, (2000, 2000))
-            self.assertIn('rc=0 libs=app/build/intermediates/merged_native_libs/fossRelease/mergeFossReleaseNativeLibs/out/lib/arm64-v8a', run())
+            self.assertIn('rc=0 libs=android/build/intermediates/merged_native_libs/fossRelease/mergeFossReleaseNativeLibs/out/lib/arm64-v8a', run())
             os.utime(source, (3000, 3000))
             stale = run()
             self.assertIn('FAILED: the fossRelease native libraries are older than the native code', stale)

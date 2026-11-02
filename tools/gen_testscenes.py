@@ -112,7 +112,7 @@ def group_scene(w, h, fps, total, kids, **extra):
 def shapes():
     fps, frames = 30, 90
     end = fend(fps, frames - 1)
-    catalog = [s for s in ET.parse(os.path.join(ROOT, "app/src/main/assets/shapes.xml")).getroot() if s.get("s")]
+    catalog = [s for s in ET.parse(os.path.join(ROOT, "shared/assets/shapes.xml")).getroot() if s.get("s")]
 
     def copy(e):
         return N(e.tag, dict(e.attrib), [copy(c) for c in e])

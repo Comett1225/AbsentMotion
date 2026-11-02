@@ -3,7 +3,7 @@ import argparse, re, sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT = ROOT / "app/src/main/assets/licenses.txt"
+OUT = ROOT / "shared/assets/licenses.txt"
 
 TITLE = "AbsentMotion: licences and notices"
 INTRO = (

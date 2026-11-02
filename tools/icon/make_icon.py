@@ -58,7 +58,7 @@ def write_svg(path):
                  '  <rect width="108" height="108" fill="%s"/>\n  %s\n</svg>\n' % (BG, svg_marks()))
 
 def write_android(root):
-    d = os.path.join(root, "app/src/main/res/drawable")
+    d = os.path.join(root, "android/src/main/res/drawable")
     lines = ['<?xml version="1.0" encoding="utf-8"?>',
              '<vector xmlns:android="http://schemas.android.com/apk/res/android"',
              '    android:width="108dp" android:height="108dp"',

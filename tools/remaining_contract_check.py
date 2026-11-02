@@ -12,18 +12,35 @@ if len(sys.argv) > 2 and sys.argv[1] == '--revision':
     del sys.argv[1:3]
 
 
+LEGACY = (('shared/kotlin/', 'app/src/main/kotlin/'), ('android/src/main/kotlin/', 'app/src/main/kotlin/'), ('shared/res/', 'app/src/main/res/'), ('shared/cpp/', 'app/src/main/cpp/'), ('shared/assets/', 'app/src/main/assets/'), ('android/src/', 'app/src/'))
+
+
+def read(path):
+    if not REVISION:
+        return (ROOT / path).read_text()
+    for new, old in ((path, path),) + LEGACY:
+        if path.startswith(new):
+            result = subprocess.run(['git', 'show', REVISION + ':' + old + path[len(new):]], cwd=ROOT, text=True, capture_output=True)
+            if result.returncode == 0:
+                return result.stdout
+    raise FileNotFoundError(path)
+
+
+def kotlin_path(relative):
+    android = 'android/src/main/kotlin/app/absentmotion/' + relative
+    return android if (ROOT / android).exists() else 'shared/kotlin/app/absentmotion/' + relative
+
+
 def source(path):
-    if REVISION:
-        return subprocess.check_output(['git', 'show', REVISION + ':' + path], cwd=ROOT, text=True)
-    return (ROOT / path).read_text()
+    return read(path)
 
 
 def kotlin(path):
-    return source('app/src/main/kotlin/app/absentmotion/' + path)
+    return source(kotlin_path(path))
 
 
 def english(key):
-    text = source('app/src/main/res/values/strings.xml')
+    text = source('shared/res/values/strings.xml')
     return re.search(r'<string name="' + key + r'"[^>]*>(.*?)</string>', text, re.S).group(1)
 
 
@@ -34,7 +51,7 @@ class RemainingContracts(unittest.TestCase):
         self.assertIn('fun finishWheelScrub() { motion = scope.launch { kotlinx.coroutines.delay(120); settle() } }', text)
 
     def test_test_intents_handle_closed_engines_and_preserve_cancellation(self):
-        text = source('app/src/debug/kotlin/app/absentmotion/TestHooks.kt')
+        text = source('android/src/debug/kotlin/app/absentmotion/TestHooks.kt')
         self.assertIn('if (e.message != "engine closed") throw e', text)
         self.assertIn('catch (e: kotlinx.coroutines.CancellationException)', text)
 
@@ -63,7 +80,7 @@ class RemainingContracts(unittest.TestCase):
         self.assertIn('if (kind != ExportKind.Gif && storageStatus(estimate, free) is StorageStatus.NotEnough)', text)
 
     def test_interpolation_errors_cannot_silently_choose_a_blend_or_plain_frame(self):
-        text = source('app/src/main/cpp/engine.cpp')
+        text = source('shared/cpp/engine.cpp')
         self.assertIn('if (flow && !field)', text)
         self.assertIn('if (!mixed)', text)
         self.assertNotIn('if (mixed) image = std::move(mixed)', text)

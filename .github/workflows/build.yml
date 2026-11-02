@@ -55,21 +55,21 @@ jobs:
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-37.0" "build-tools;37.0.0" "cmake;3.31.6" "ndk;30.0.16248370"
       - name: Prepare the source as F-Droid does
         run: |
-          rm -rf app/src/play third_party/whisper.cpp/models third_party/whisper.cpp/examples third_party/whisper.cpp/bindings third_party/ncnn/examples third_party/ncnn/benchmark third_party/ncnn/python third_party/ncnn/images
-          sed -i -e '/playImplementation/d' app/build.gradle.kts
+          rm -rf android/src/play third_party/whisper.cpp/models third_party/whisper.cpp/examples third_party/whisper.cpp/bindings third_party/ncnn/examples third_party/ncnn/benchmark third_party/ncnn/python third_party/ncnn/images
+          sed -i -e '/playImplementation/d' android/build.gradle.kts
           echo 'org.gradle.java.home=/usr/lib/jvm/java-21-openjdk-amd64' >> gradle.properties
       - name: Build Skia
         run: tools/build_skia.sh
       - name: Build the foss APK
         run: ./gradlew :app:assembleFossRelease --no-daemon
       - name: Check unsigned APK packaging
-        run: python3 tools/apk_check.py --unsigned app/build/outputs/apk/foss/release/*.apk
+        run: python3 tools/apk_check.py --unsigned android/build/outputs/apk/foss/release/*.apk
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: foss-apk
-          path: ${{ inputs.subdir || '.' }}/app/build/outputs/apk/foss/release/*.apk
+          path: ${{ inputs.subdir || '.' }}/android/build/outputs/apk/foss/release/*.apk
       - name: Check the lowest Android version the native libraries need
-        run: python3 tools/api_floor.py app/build/outputs/apk/foss/release/*.apk
+        run: python3 tools/api_floor.py android/build/outputs/apk/foss/release/*.apk
 
   compat-apk:
     if: ${{ !inputs.diagnostic }}
@@ -104,8 +104,8 @@ jobs:
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-37.0" "build-tools;37.0.0" "cmake;3.31.6" "ndk;30.0.16248370"
       - name: Prepare the source as F-Droid does
         run: |
-          rm -rf app/src/play third_party/whisper.cpp/models third_party/whisper.cpp/examples third_party/whisper.cpp/bindings third_party/ncnn/examples third_party/ncnn/benchmark third_party/ncnn/python third_party/ncnn/images
-          sed -i -e '/playImplementation/d' app/build.gradle.kts
+          rm -rf android/src/play third_party/whisper.cpp/models third_party/whisper.cpp/examples third_party/whisper.cpp/bindings third_party/ncnn/examples third_party/ncnn/benchmark third_party/ncnn/python third_party/ncnn/images
+          sed -i -e '/playImplementation/d' android/build.gradle.kts
           echo 'org.gradle.java.home=/usr/lib/jvm/java-21-openjdk-amd64' >> gradle.properties
       - name: Build Skia for Android 8
         run: |
@@ -114,17 +114,17 @@ jobs:
       - name: Build the compat APKs
         run: ./gradlew :app:assembleCompatRelease :app:assembleCompat32Release --no-daemon
       - name: Check unsigned APK packaging
-        run: python3 tools/apk_check.py --unsigned app/build/outputs/apk/compat/release/*.apk app/build/outputs/apk/compat32/release/*.apk
+        run: python3 tools/apk_check.py --unsigned android/build/outputs/apk/compat/release/*.apk android/build/outputs/apk/compat32/release/*.apk
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: compat-apk
           path: |
-            ${{ inputs.subdir || '.' }}/app/build/outputs/apk/compat/release/*.apk
-            ${{ inputs.subdir || '.' }}/app/build/outputs/apk/compat32/release/*.apk
+            ${{ inputs.subdir || '.' }}/android/build/outputs/apk/compat/release/*.apk
+            ${{ inputs.subdir || '.' }}/android/build/outputs/apk/compat32/release/*.apk
       - name: Check that the native libraries load on Android 8
         run: |
-          python3 tools/api_floor.py --min 26 app/build/outputs/apk/compat/release/*.apk
-          python3 tools/api_floor.py --abi armeabi-v7a --min 26 app/build/outputs/apk/compat32/release/*.apk
+          python3 tools/api_floor.py --min 26 android/build/outputs/apk/compat/release/*.apk
+          python3 tools/api_floor.py --abi armeabi-v7a --min 26 android/build/outputs/apk/compat32/release/*.apk
 
   verify:
     runs-on: ubuntu-latest
@@ -207,19 +207,19 @@ jobs:
         run: ./gradlew :app:lintFossDebug :app:lintCompatDebug -q
       - name: Failed unit tests
         if: ${{ !cancelled() }}
-        run: python3 /tmp/test_failures.py app/build/test-results
+        run: python3 /tmp/test_failures.py android/build/test-results
       - name: Repeat the compat unit tests
         if: ${{ !cancelled() && inputs.diagnostic && (steps.compat.outcome == 'success' || steps.compat.outcome == 'failure') }}
         env:
           REPEAT: ${{ inputs.repeat || '0' }}
         run: |
           mkdir -p build/test-repeats
-          cp -r app/build/test-results/testCompatDebugUnitTest build/test-repeats/run-0 2>/dev/null || true
+          cp -r android/build/test-results/testCompatDebugUnitTest build/test-repeats/run-0 2>/dev/null || true
           status=0
           i=1
           while [ "$i" -le "$REPEAT" ]; do
             ./gradlew :app:testCompatDebugUnitTest --rerun -q || status=1
-            cp -r app/build/test-results/testCompatDebugUnitTest "build/test-repeats/run-$i"
+            cp -r android/build/test-results/testCompatDebugUnitTest "build/test-repeats/run-$i"
             python3 /tmp/test_failures.py "build/test-repeats/run-$i" || true
             i=$((i + 1))
           done
@@ -231,7 +231,7 @@ jobs:
           name: test-results
           if-no-files-found: ignore
           path: |
-            app/build/test-results
-            app/build/reports/tests
-            app/build/reports/lint-results-*.xml
+            android/build/test-results
+            android/build/reports/tests
+            android/build/reports/lint-results-*.xml
             build/test-repeats

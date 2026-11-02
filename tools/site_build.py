@@ -13,13 +13,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SITE = ROOT / "site"
-ASSETS = ROOT / "app/src/main/assets"
+ASSETS = ROOT / "shared/assets"
 EFFECTS = ASSETS / "effects"
 OUT = ROOT / "build/site"
 HELP = ASSETS / "help"
 HELP_DATA = SITE / "data/help-translations"
 EFFECT_NAMES = EFFECTS / "i18n"
-LANGUAGES_KT = ROOT / "app/src/main/kotlin/app/absentmotion/i18n/AppLanguage.kt"
+LANGUAGES_KT = ROOT / "android/src/main/kotlin/app/absentmotion/i18n/AppLanguage.kt"
 RTL = {"ar", "fa", "ur"}
 REPO = "https://github.com/Comett1225/AbsentMotion"
 OWNER = REPO.split("/")[3].lower()
@@ -613,7 +613,7 @@ class Site:
     def render_effects(self):
         for n, e in enumerate(self.effects):
             path = "effects/%s.html" % e["id"]
-            where = "app/src/main/assets/effects/%s.json" % e["id"]
+            where = "shared/assets/effects/%s.json" % e["id"]
             extra_path = SITE / "effects" / (e["id"] + ".md")
             extra = ""
             if extra_path.is_file():
@@ -835,7 +835,7 @@ def load_locales(problems):
             continue
         names = EFFECT_NAMES / (tag + ".json")
         if not names.is_file():
-            problems.append("%s: app/src/main/assets/effects/i18n/%s.json is missing" % (where, tag))
+            problems.append("%s: shared/assets/effects/i18n/%s.json is missing" % (where, tag))
             continue
         try:
             data = json.loads(path.read_text(encoding="utf-8"))
@@ -962,7 +962,7 @@ def validate_locale(locale, english):
         out += one_line("%s: chrome label %r" % (where, key), value, key)
         if isinstance(value, str) and Counter(re.findall(r"\{\w+\}", value)) != Counter(re.findall(r"\{\w+\}", key)):
             out.append("%s: chrome label %r must keep the placeholders %s" % (where, key, re.findall(r"\{\w+\}", key)))
-    return out + validate_names(locale, english, "app/src/main/assets/effects/i18n/%s.json" % locale.tag)
+    return out + validate_names(locale, english, "shared/assets/effects/i18n/%s.json" % locale.tag)
 
 
 def validate_names(locale, english, where):
@@ -1068,7 +1068,7 @@ def main():
         have = disk_files(HELP)
         for path in sorted(set(have) | set(app_files)):
             if have.get(path) != app_files.get(path):
-                problems.append("app/src/main/assets/help/%s is out of date: run python3 tools/site_build.py" % path)
+                problems.append("shared/assets/help/%s is out of date: run python3 tools/site_build.py" % path)
         node = shutil.which("node")
         test = ROOT / "tools/site_test.js"
         if node and test.is_file():
@@ -1091,7 +1091,7 @@ def main():
         return 1
     write(site_files, OUT)
     write(app_files, HELP)
-    print("site_build: %d site files in build/site, %d help files in app/src/main/assets/help (%d languages)" % (len(site_files), len(app_files), len({p.split("/")[0] for p in app_files if re.match(r"^[a-z]{2,3}(-[A-Z]{2})?/", p)})))
+    print("site_build: %d site files in build/site, %d help files in shared/assets/help (%d languages)" % (len(site_files), len(app_files), len({p.split("/")[0] for p in app_files if re.match(r"^[a-z]{2,3}(-[A-Z]{2})?/", p)})))
     return 0
 
 

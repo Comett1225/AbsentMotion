@@ -15,7 +15,7 @@ from PIL import Image, ImageChops, ImageDraw, ImageStat
 from sdk import PACKAGE, adb_command
 
 ROOT = Path(__file__).resolve().parents[1]
-PACK = ROOT / "app/src/main/assets/effects"
+PACK = ROOT / "shared/assets/effects"
 SHOWCASE = json.loads((ROOT / "tools/effect_showcase.json").read_text())
 ADB = adb_command()
 PKG = PACKAGE

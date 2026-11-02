@@ -6,7 +6,7 @@ from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-PACK = ROOT / "app/src/main/assets/effects"
+PACK = ROOT / "shared/assets/effects"
 SKIP = {"index.json", "releases.json", "foreign.json"}
 CATEGORIES = {"color", "blur", "distort", "stylize", "noise", "repeat", "key", "move", "beat", "3d", "text", "other"}
 KINDS = {"float", "angle", "point", "color", "switch", "choice", "text"}

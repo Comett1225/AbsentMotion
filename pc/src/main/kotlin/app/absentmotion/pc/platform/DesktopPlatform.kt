@@ -6,11 +6,11 @@ import java.awt.Window
 import java.io.File
 
 object DesktopPlatform {
-    val windows = System.getProperty("os.name").startsWith("Windows", ignoreCase = true)
-    val mac = System.getProperty("os.name").startsWith("Mac", ignoreCase = true)
-    val dataDir: File get() = if (windows) File(System.getenv("APPDATA") ?: System.getProperty("user.home"), "AbsentMotion") else File(System.getProperty("user.home"), "Library/Application Support/AbsentMotion")
+    val windows = app.absentmotion.desk.DeskOs.windows
+    val mac = app.absentmotion.desk.DeskOs.mac
+    val dataDir: File get() = app.absentmotion.desk.DeskOs.dataDir
     fun assets(): File = System.getProperty("am.assets")?.let(::File) ?: File(System.getProperty("compose.application.resources.dir"), "assets")
-    fun nativeLibrary(): String = System.getProperty("am.native") ?: File(System.getProperty("compose.application.resources.dir"), if (windows) "amdesktop.dll" else "libamdesktop.dylib").absolutePath
+    fun nativeLibrary(): String = System.getProperty("am.native") ?: File(System.getProperty("compose.application.resources.dir"), app.absentmotion.desk.DeskOs.nativeName).absolutePath
     fun choose(window: Window, save: Boolean): File? {
         val dialog = FileDialog(window as Frame, if (save) "Save Project" else "Open Project", if (save) FileDialog.SAVE else FileDialog.LOAD)
         dialog.isVisible = true

@@ -2,8 +2,8 @@
 set -eu
 cd "$(dirname "$0")/.."
 . tools/env.sh
-cpp=app/src/main/cpp
-out=app/build/hostpivot
+cpp=shared/cpp
+out=android/build/hostpivot
 skia=third_party/skia
 libs=$skia/out/mac-v2-2-arm64
 if [ ! -f "$libs/libskia.a" ]; then

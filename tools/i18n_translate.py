@@ -187,7 +187,7 @@ def slug(name):
 
 def source_context():
     found = {}
-    for path in sorted(KOTLIN.rglob('*.kt')) + sorted((ROOT / 'app/src').glob('*/kotlin/**/*.kt')):
+    for path in sorted(KOTLIN.rglob('*.kt')) + sorted((ROOT / 'android/src').glob('*/kotlin/**/*.kt')):
         for line in path.read_text(encoding='utf-8').splitlines():
             for m in SOURCE_REF.finditer(line):
                 found.setdefault(m.group(2), (path.stem, line.strip()[:140]))

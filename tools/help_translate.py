@@ -16,7 +16,7 @@ from i18n_extract import FOLDERS
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "site/data/help-translations"
 STATE = ROOT / "tools/help_i18n_source.json"
-RES = ROOT / "app/src/main/res"
+RES = ROOT / "shared/res"
 
 
 PICTURE = re.compile(r"^!\[[^\]]*\]\(img/[^)\s]+\)\s*$", re.M)

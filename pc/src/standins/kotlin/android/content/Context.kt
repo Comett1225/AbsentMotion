@@ -58,15 +58,7 @@ open class Context {
 
 object Desk {
     val dataDir: File by lazy {
-        System.getProperty("am.data")?.let(::File) ?: run {
-            val os = System.getProperty("os.name").lowercase()
-            val home = File(System.getProperty("user.home"))
-            when {
-                os.contains("mac") -> home.resolve("Library/Application Support/AbsentMotion")
-                os.contains("win") -> File(System.getenv("APPDATA") ?: home.path).resolve("AbsentMotion")
-                else -> File(System.getenv("XDG_DATA_HOME") ?: home.resolve(".local/share").path).resolve("absentmotion")
-            }
-        }.also { it.mkdirs() }
+        (System.getProperty("am.data")?.let(::File) ?: app.absentmotion.desk.DeskOs.dataDir).also { it.mkdirs() }
     }
     val context = Context()
 }

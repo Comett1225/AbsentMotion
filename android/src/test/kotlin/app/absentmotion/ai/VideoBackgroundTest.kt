@@ -1,0 +1,257 @@
+package app.absentmotion.ai
+
+import app.absentmotion.videoLayer
+import app.absentmotion.media.Yuv
+import app.absentmotion.model.Layer
+import app.absentmotion.model.MediaDeclaration
+import app.absentmotion.model.Scene
+import app.absentmotion.model.XmlNode
+import app.absentmotion.effects.EffectCatalog
+import app.absentmotion.model.addEffect
+import app.absentmotion.model.copyLayers
+import app.absentmotion.model.withEffect
+import app.absentmotion.model.mapMediaUris
+import app.absentmotion.model.effects
+import org.junit.Assert.assertArrayEquals
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import java.io.File
+import java.nio.ByteBuffer
+
+class VideoBackgroundTest {
+    @Test fun theMatteKeepsTheAspectAndNeverUpscales() {
+        assertEquals(960 to 540, matteSize(1920, 1080, 540))
+        assertEquals(540 to 960, matteSize(1080, 1920, 540))
+        assertEquals(640 to 360, matteSize(640, 360, 720))
+        assertEquals(484 to 360, matteSize(1450, 1080, 360))
+    }
+
+    @Test fun onlyTheFramesTheClipCanShowAreProcessed() {
+        val stamps = LongArray(100) { it * 40_000L }
+        val used = matteStamps(stamps, 1_010, 2_000)
+        assertEquals(1_000_000L, used.first())
+        assertEquals(2_000_000L, used.last())
+        assertEquals(26, used.size)
+        assertEquals(100, matteStamps(stamps, 0, Int.MAX_VALUE).size)
+        val media = MediaDeclaration(XmlNode("media", mapOf("uri" to "v", "duration" to "8000000")))
+        val clip = Layer(XmlNode("shape", mapOf("fillType" to "media", "fillVideo" to "v", "inTime" to "1000")))
+        assertEquals(7.0, clip.matteSeconds(media), 1e-9)
+        assertEquals(2.5, clip.copy(node = clip.node.with("outTime", "3500")).matteSeconds(media), 1e-9)
+    }
+
+    @Test fun stablePixelsAreSmoothedAndMovingEdgesAreKept() {
+        fun bytes(vararg v: Int) = ByteArray(v.size) { v[it].toByte() }
+        val out = smoothMatte(bytes(200, 0, 255), bytes(240, 255, 0), bytes(200, 0, 255))
+        assertEquals(220, out[0].toInt() and 0xFF)
+        assertEquals(128, out[1].toInt() and 0xFF)
+        assertEquals(128, out[2].toInt() and 0xFF)
+        val moving = smoothMatte(bytes(0), bytes(255), bytes(255))
+        assertEquals(255, moving[0].toInt() and 0xFF)
+    }
+
+    @Test fun theSmootherHoldsOneFrameAndKeepsEveryTimestamp() {
+        val smoother = MatteSmoother()
+        val frames = (0 until 5).map { it * 10L to ByteArray(4) { _ -> (it * 10).toByte() } }
+        val out = frames.mapNotNull { (pts, m) -> smoother.push(pts, m) } + listOfNotNull(smoother.flush())
+        assertEquals(frames.map { it.first }, out.map { it.first })
+        assertArrayEquals(ByteArray(4) { 20 }, out[2].second)
+        assertNull(smoother.flush())
+    }
+
+    @Test fun maskValuesUseLimitedRangeLuma() {
+        assertEquals(16, matteLuma(0))
+        assertEquals(235, matteLuma(255))
+        assertEquals(126, matteLuma(128))
+    }
+
+    private fun yuv(width: Int, height: Int, y: Int, u: Int, v: Int): Yuv {
+        val plane = { size: Int, value: Int -> ByteBuffer.wrap(ByteArray(size) { value.toByte() }) }
+        return Yuv(plane(width * height, y), width, 1, plane(width * height / 4, u), plane(width * height / 4, v), width / 2, 1, 0, 0, width, height)
+    }
+
+    @Test fun framesConvertToRgbWithTheirRangeAndStandard() {
+        val grey = yuv(8, 4, 126, 128, 128).argb(4, 2)
+        assertTrue(grey.all { it == grey[0] })
+        assertEquals(128.0, (grey[0] shr 8 and 0xFF).toDouble(), 1.0)
+        val red = yuv(4, 4, 63, 102, 240).argb(2, 2, standard = 1)
+        assertTrue((red[0] shr 16 and 0xFF) > 230 && (red[0] shr 8 and 0xFF) < 25 && (red[0] and 0xFF) < 25)
+        val full = yuv(4, 4, 255, 128, 128).argb(1, 1, fullRange = true)
+        assertEquals(0xFFFFFFFF.toInt(), full[0])
+    }
+
+    private fun video(effects: List<XmlNode> = emptyList()) = videoLayer(
+        500, 2500, inTime = 1000, outTime = 3000, speed = "1.5", uri = "v.mp4", attrs = mapOf("label" to "Clip", "mediaFillMode" to "fill", "s" to ".rect"), children = effects,
+    ).withTransform("location", 300f, 400f, 0f).withTransform("rotation", 90f).withProp("size", "vec2", 100f, 100f)
+
+    @Test fun theMaskSitsAboveTheVideoInsideAMaskedGroup() {
+        val steps = XmlNode("effect", linkedMapOf("id" to "absent.timequant", "hidden" to "false"))
+        val glow = XmlNode("effect", linkedMapOf("id" to "absent.glow", "hidden" to "false"))
+        val background = XmlNode("shape", linkedMapOf("id" to "7", "startTime" to "0", "endTime" to "3000"))
+        val scene = Scene(Scene.create("t", 1080, 1920, 30, 0).node.copy(children = listOf(
+            XmlNode("media", mapOf("uri" to "v.mp4")), background, video(listOf(steps, glow)).node,
+        )))
+        val matte = MediaDeclaration(XmlNode("media", mapOf("uri" to "m.mp4", "type" to "video/mp4")))
+        val out = scene.withVideoMatte(scene.layer(1)!!, matte, 200, 100, 2, 3)!!
+        assertEquals(listOf(7L, 3L), out.layers.map { it.id })
+        assertNotNull(out.media("m.mp4"))
+        val group = out.layer(3)!!
+        assertEquals(500, group.startTime)
+        val inside = group.nested!!.layers
+        assertEquals(listOf(1L, 2L), inside.map { it.id })
+        val mask = inside[1]
+        assertEquals("mask", mask.node["blending"])
+        assertEquals("m.mp4", mask.node["fillVideo"])
+        assertEquals("stretch", mask.node["mediaFillMode"])
+        for (key in listOf("inTime", "outTime", "speed")) assertEquals(inside[0].node[key], mask.node[key])
+        assertEquals(inside[0].startTime, mask.startTime)
+        assertEquals(inside[0].endTime, mask.endTime)
+        assertEquals(listOf(200f, 100f), mask.prop("size")!!.toList())
+        assertEquals(90f, mask.transform("rotation", 0f)[0])
+        assertEquals("0", mask.node.child("gain")!!["value"])
+        assertEquals(listOf("absent.timequant", "absent.lumakey"), mask.effects.map { it["id"] })
+        assertEquals(listOf("absent.timequant", "absent.glow"), inside[0].effects.map { it["id"] })
+    }
+
+    @Test fun animatedSizeMapsEveryKeyToTheFrameArea() {
+        val sized = video().node.copy(children = video().node.children.map {
+            if (it.name == "property" && it["name"] == "size") XmlNode("property", linkedMapOf("name" to "size", "type" to "vec2"), listOf(
+                XmlNode("kf", linkedMapOf("t" to "0.000000", "v" to "100,100")), XmlNode("kf", linkedMapOf("t" to "1.000000", "v" to "50,200")),
+            )) else it
+        })
+        val scene = Scene(Scene.create("t", 1080, 1920, 30, 0).node.copy(children = listOf(sized)))
+        val out = scene.withVideoMatte(scene.layer(1)!!, MediaDeclaration(XmlNode("media", mapOf("uri" to "m.mp4"))), 200, 100, 2, 3)!!
+        val mask = out.layer(3)!!.nested!!.layer(2)!!
+        assertEquals(listOf(200f, 100f), mask.copy(t = 0f).prop("size")!!.toList())
+        assertEquals(listOf(400f, 200f), mask.copy(t = 1f).prop("size")!!.toList())
+    }
+
+    @Test fun layersWithoutAVideoAreRefused() {
+        val image = Layer(XmlNode("shape", linkedMapOf("id" to "1", "fillType" to "media", "fillImage" to "p.png", "s" to ".rect")))
+        val scene = Scene(Scene.create("t", 100, 100, 30, 0).node.copy(children = listOf(image.node)))
+        assertNull(scene.withVideoMatte(image, MediaDeclaration(XmlNode("media", mapOf("uri" to "m.mp4"))), 10, 10, 2, 3))
+    }
+
+    @Test fun aTextWithAVideoFillIsRefusedBeforeAnyFrameIsMatted() {
+        val text = Layer(XmlNode("text", linkedMapOf("id" to "1", "fillType" to "media", "fillVideo" to "v.mp4")))
+        assertNotNull(AiAction.Video.unavailable(text))
+        assertNull(AiAction.Video.unavailable(Layer(XmlNode("shape", linkedMapOf("id" to "2", "fillType" to "media", "fillVideo" to "v.mp4", "s" to ".rect")))))
+    }
+
+    @Test fun theMaskFollowsTheClipAfterLaterEdits() {
+        val scene = Scene(Scene.create("t", 1080, 1920, 30, 0).node.copy(children = listOf(XmlNode("media", mapOf("uri" to "v.mp4")), video().node)))
+        val grouped = scene.withVideoMatte(scene.layer(1)!!, MediaDeclaration(XmlNode("media", mapOf("uri" to "m.mp4"))), 200, 100, 2, 3)!!
+            .update(3) { it.withAiMark(AiKind.Video, null, null) }
+        val shake = XmlNode("effect", linkedMapOf("id" to "absent.randomdisplace", "hidden" to "false"))
+        val colour = XmlNode("effect", linkedMapOf("id" to "absent.sepia", "hidden" to "false"))
+        val inner = grouped.layer(3)!!.nested!!.update(1) { it.addEffect(shake).addEffect(colour).withTransform("location", 10f, 20f, 0f).withTransform("opacity", 0.5f) }
+        val edited = grouped.update(3) { it.copy(node = it.node.withChild("scene", inner.node)) }.withMattesFollowing()
+        val mask = edited.layer(3)!!.nested!!.layer(2)!!
+        assertEquals(listOf("absent.randomdisplace", "absent.lumakey"), mask.effects.map { it["id"] })
+        assertEquals("1", mask.node["noiseId"])
+        assertEquals(listOf(10f, 20f, 0f), mask.transform("location", 0f).toList())
+        assertEquals(1f, mask.transform("opacity", 1f)[0])
+        assertEquals(edited, edited.withMattesFollowing())
+    }
+
+    private fun cutOut(): Scene {
+        val scene = Scene(Scene.create("t", 1080, 1920, 30, 0).node.copy(children = listOf(XmlNode("media", mapOf("uri" to "v.mp4")),
+            video(listOf(XmlNode("effect", linkedMapOf("id" to "absent.timequant", "hidden" to "false")), XmlNode("effect", linkedMapOf("id" to "absent.glow", "hidden" to "false")))).node)))
+        return scene.withVideoMatte(scene.layer(1)!!, MediaDeclaration(XmlNode("media", mapOf("uri" to "m.mp4"))), 200, 100, 2, 3)!!.update(3) { it.withAiMark(AiKind.Video, null, null) }
+    }
+
+    private fun Scene.inside(change: (Scene) -> Scene): Scene = update(3) { it.copy(node = it.node.withChild("scene", change(it.nested!!).node)) }
+
+    private fun Scene.matte(): Layer = layer(3)!!.nested!!.layer(2)!!
+
+    private fun Layer.keyThreshold(): String? = effects.first { it["id"] == "absent.lumakey" }.children.first { it["name"] == "threshold" }["value"]
+
+    private val blur get() = XmlNode("effect", linkedMapOf("id" to "absent.blur", "hidden" to "false"))
+
+    private fun Scene.tunedMask(): Scene = inside { inner ->
+        inner.update(2) { m -> m.withTransform("opacity", 0.4f).addEffect(blur).withEffect(1) { key -> key.copy(children = key.children.map { if (it["name"] == "threshold") it.with("value", "0.2") else it }) } }
+    }
+
+    @Test fun theMasksOwnOpacityEffectsAndKeySettingsSurviveTheSync() {
+        val tuned = cutOut().tunedMask()
+        assertEquals("0.416667", cutOut().matte().keyThreshold())
+        val synced = tuned.withMattesFollowing()
+        assertEquals(tuned, synced)
+        val mask = synced.matte()
+        assertEquals(0.4f, mask.transform("opacity", 1f)[0], 1e-6f)
+        assertEquals("0.2", mask.keyThreshold())
+        assertEquals(listOf("absent.timequant", "absent.lumakey", "absent.blur"), mask.effects.map { it["id"] })
+        assertEquals(synced, synced.withMattesFollowing())
+    }
+
+    @Test fun aChangeToTheClipStillReachesTheMaskWhileItsOwnSettingsStay() {
+        val tuned = cutOut().tunedMask()
+        val shake = XmlNode("effect", linkedMapOf("id" to "absent.randomdisplace", "hidden" to "false"))
+        val moved = tuned.inside { inner -> inner.update(1) { it.addEffect(shake).withTransform("location", 50f, 60f, 0f).withTransform("opacity", 0.9f) } }.withMattesFollowing(tuned)
+        val mask = moved.matte()
+        assertEquals(listOf(50f, 60f, 0f), mask.transform("location", 0f).toList())
+        assertEquals(listOf("absent.timequant", "absent.randomdisplace", "absent.lumakey", "absent.blur"), mask.effects.map { it["id"] })
+        assertEquals(0.4f, mask.transform("opacity", 1f)[0], 1e-6f)
+        assertEquals("0.2", mask.keyThreshold())
+        assertEquals(moved, moved.withMattesFollowing(moved))
+        val unshaken = moved.inside { inner -> inner.update(1) { it.copy(node = it.node.copy(children = it.node.children.filterNot { c -> c["id"] == "absent.randomdisplace" })) } }.withMattesFollowing(moved)
+        assertEquals(listOf("absent.timequant", "absent.lumakey", "absent.blur"), unshaken.matte().effects.map { it["id"] })
+    }
+
+    @Test fun theSyncStaysOutOfTheWayWhileTheClipIsUnchanged() {
+        val grouped = cutOut()
+        val drifted = grouped.inside { inner -> inner.update(2) { it.withTransform("location", 999f, 888f, 0f) } }
+        assertEquals(listOf(999f, 888f, 0f), drifted.matte().transform("location", 0f).toList())
+        assertEquals(drifted, drifted.withMattesFollowing(drifted))
+        val dimmed = drifted.inside { inner -> inner.update(2) { it.withTransform("opacity", 0.5f) } }
+        assertEquals(dimmed, dimmed.withMattesFollowing(drifted))
+        assertEquals(dimmed, dimmed.withMattesFollowing(dimmed))
+        val groupOnly = grouped.update(3) { it.withTransform("opacity", 0.3f) }
+        assertEquals(groupOnly, groupOnly.withMattesFollowing(grouped))
+        assertEquals(listOf(300f, 400f, 0f), drifted.withMattesFollowing().matte().transform("location", 0f).toList())
+        assertEquals(listOf(300f, 400f, 0f), drifted.withMattesFollowing(Scene(Scene.create("t", 1080, 1920, 30, 0).node)).matte().transform("location", 0f).toList())
+    }
+
+    @Test fun theCutOutEdgeTunesOnlyTheMasksKey() {
+        val grouped = cutOut()
+        val group = grouped.layer(3)!!
+        assertEquals(MatteEdge(), group.cutoutEdge)
+        val tuned = grouped.update(3) { it.withCutoutEdge(MatteEdge(4, -3)) }
+        assertEquals(MatteEdge(4, -3), tuned.layer(3)!!.cutoutEdge)
+        val (threshold, softness) = MatteEdge(4, -3).key()
+        val key = tuned.matte().effects.first { it["id"] == "absent.lumakey" }
+        assertEquals(threshold, key.children.first { it["name"] == "threshold" }["value"]!!.toFloat(), 1e-5f)
+        assertEquals(softness, key.children.first { it["name"] == "softness" }["value"]!!.toFloat(), 1e-5f)
+        assertEquals(grouped.matte().effects.map { it["id"] }, tuned.matte().effects.map { it["id"] })
+        assertEquals(grouped.layer(3)!!.nested!!.layer(1), tuned.layer(3)!!.nested!!.layer(1))
+        assertEquals(tuned, tuned.withMattesFollowing(grouped))
+        val moved = tuned.inside { inner -> inner.update(1) { it.withTransform("location", 50f, 60f, 0f) } }.withMattesFollowing(tuned)
+        assertEquals(MatteEdge(4, -3), moved.layer(3)!!.cutoutEdge)
+        assertEquals(MatteEdge(), tuned.update(3) { it.withCutoutEdge(MatteEdge()) }.layer(3)!!.cutoutEdge)
+    }
+
+    @Test fun olderCutOutsAndOtherGroupsHaveNoEdgeTool() {
+        val older = cutOut().inside { inner -> inner.update(2) { it.copy(node = it.node.with("matteEdge", null)) } }
+        assertNull(older.layer(3)!!.cutoutEdge)
+        assertEquals(older, older.update(3) { it.withCutoutEdge(MatteEdge(5, 5)) })
+        val unmarked = cutOut().update(3) { it.withoutAiMark(AiKind.Video) }
+        assertNull(unmarked.layer(3)!!.cutoutEdge)
+        assertNull(video().cutoutEdge)
+    }
+
+    @Test fun everyMotionAndDistortionEffectIsFollowed() {
+        val catalog = EffectCatalog.parse { File("../shared/assets/effects", it).inputStream() }
+        val expected = catalog.definitions.filter { it.category in setOf("move", "distort", "repeat", "3d") }.map { it.id }.toSet() - setOf("absent.timequant", "absent.pulseopacity")
+        assertEquals(expected, MatteFollowedEffects)
+    }
+
+    @Test fun copiesKeepTheMaskNoiseLinkedAndMovedMediaRewritesAiMarks() {
+        val pair = listOf(Layer(XmlNode("shape", linkedMapOf("id" to "1"))), Layer(XmlNode("shape", linkedMapOf("id" to "2", "noiseId" to "1"))))
+        val copied = copyLayers(pair)
+        assertEquals(copied[0].id.toString(), copied[1].node["noiseId"])
+        val marked = Layer(XmlNode("shape", linkedMapOf("id" to "3"), listOf(XmlNode("ai", linkedMapOf("type" to "background", "original" to "a.png", "result" to "b.png")))))
+        assertEquals("x/a.png", marked.node.mapMediaUris { "x/$it" }.child("ai")!!["original"])
+    }
+}

@@ -6,8 +6,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "tools/alight_compat.json"
-FOREIGN = ROOT / "app/src/main/assets/effects/foreign.json"
-EFFECTS = ROOT / "app/src/main/assets/effects"
+FOREIGN = ROOT / "shared/assets/effects/foreign.json"
+EFFECTS = ROOT / "shared/assets/effects"
 PAGE = ROOT / "docs/ALIGHT_COMPATIBILITY.md"
 ISSUE = "https://github.com/Comett1225/AbsentMotion/issues/new?template=import_problem.yml"
 LABELS = {"same": "Same look", "close": "Very close", "similar": "Similar, not identical", "unmeasured": "Converted, not compared yet", "none": "Not converted yet"}

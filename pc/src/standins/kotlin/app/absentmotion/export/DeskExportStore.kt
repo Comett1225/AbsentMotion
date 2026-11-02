@@ -42,13 +42,13 @@ class MediaStoreExport(context: Context) : ExportStore {
     override fun location(where: String): String {
         val first = where.substringBefore('/')
         val local = where.replaceFirst(first, rootFor(first))
-        return if (System.getProperty("os.name").startsWith("Windows")) local else "~/$local"
+        return if (app.absentmotion.desk.DeskOs.windows) local else "~/$local"
     }
 
     override fun delete(uri: Uri) { uri.toFile()?.delete() }
 
     private fun rootFor(mimeOrRoot: String): String = when {
-        mimeOrRoot.startsWith("video/") || mimeOrRoot == Environment.DIRECTORY_MOVIES -> if (System.getProperty("os.name").startsWith("Mac")) Environment.DIRECTORY_MOVIES else "Videos"
+        mimeOrRoot.startsWith("video/") || mimeOrRoot == Environment.DIRECTORY_MOVIES -> app.absentmotion.desk.DeskOs.videosFolder
         mimeOrRoot.startsWith("image/") || mimeOrRoot == Environment.DIRECTORY_PICTURES -> Environment.DIRECTORY_PICTURES
         mimeOrRoot.startsWith("audio/") || mimeOrRoot == Environment.DIRECTORY_MUSIC -> Environment.DIRECTORY_MUSIC
         else -> Environment.DIRECTORY_DOCUMENTS

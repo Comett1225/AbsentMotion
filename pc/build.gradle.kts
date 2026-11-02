@@ -4,21 +4,6 @@ plugins {
     id("org.jetbrains.compose") version "1.10.3"
 }
 
-val phoneOnly = listOf(
-    "app/absentmotion/MainActivity.kt", "app/absentmotion/ImportActivity.kt",
-    "app/absentmotion/ui/camera/CameraScreen.kt",
-    "app/absentmotion/platform/AndroidPlatform.kt", "app/absentmotion/platform/OldAndroid.kt", "app/absentmotion/platform/StorageAccess.kt",
-    "app/absentmotion/engine/EngineThread.kt", "app/absentmotion/engine/NativeEngine.kt",
-    "app/absentmotion/fonts/TextLayout.kt",
-    "app/absentmotion/audio/AudioEngine.kt", "app/absentmotion/audio/PcmDecoder.kt",
-    "app/absentmotion/i18n/AppLanguage.kt", "app/absentmotion/i18n/UiText.kt",
-    "app/absentmotion/ui/home/UpdateDialog.kt", "app/absentmotion/media/VideoLibrary.kt",
-    "app/absentmotion/ui/home/Updater.kt", "app/absentmotion/ui/home/UpdateVerify.kt", "app/absentmotion/ui/home/UnsupportedPhone.kt",
-    "app/absentmotion/export/ExportService.kt", "app/absentmotion/export/VideoExport.kt", "app/absentmotion/export/AudioExport.kt",
-    "app/absentmotion/export/ExportVerify.kt", "app/absentmotion/export/ExportStore.kt", "app/absentmotion/ui/tutorial/Grip.kt",
-    "app/absentmotion/ui/home/HelpScreen.kt", "app/absentmotion/ui/editor/panels/EffectRuler.kt",
-)
-
 val androidJar = (System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT") ?: rootDir.resolve("../local.properties").takeIf { it.isFile }?.readLines()?.firstOrNull { it.startsWith("sdk.dir=") }?.substringAfter("=") ?: "${System.getProperty("user.home")}/Library/Android/sdk")
     .let { sdk -> file(sdk).resolve("platforms").listFiles().orEmpty().filter { it.resolve("android.jar").isFile }.maxByOrNull { it.name }?.resolve("android.jar") }
 
@@ -33,17 +18,15 @@ kotlin {
     jvmToolchain(21)
     sourceSets.main {
         kotlin.srcDir("src/standins/kotlin")
-        kotlin.srcDir("../app/src/main/kotlin")
-        kotlin.srcDir("../app/src/foss/kotlin")
+        kotlin.srcDir("../shared/kotlin")
         kotlin.srcDir(layout.buildDirectory.dir("generated/strings"))
-        kotlin.exclude(phoneOnly)
     }
 }
 
 val runtimeStandins: SourceSet = sourceSets.create("runtimeStandins")
 
 val generateStrings = tasks.register("generateStrings") {
-    val source = file("../app/src/main/res/values/strings.xml")
+    val source = file("../shared/res/values/strings.xml")
     val out = layout.buildDirectory.file("generated/strings/app/absentmotion/R.kt")
     inputs.file(source)
     outputs.file(out)
@@ -87,21 +70,27 @@ dependencies {
     testImplementation("org.jetbrains.compose.ui:ui-test-junit4-desktop:1.10.3")
 }
 
-val isWindows = System.getProperty("os.name").startsWith("Windows", ignoreCase = true)
-val nativeName = if (isWindows) "amdesktop.dll" else "libamdesktop.dylib"
+val os = System.getProperty("os.name").lowercase()
+val isWindows = os.startsWith("windows")
+val isMac = os.startsWith("mac")
+val nativeName = when { isWindows -> "amdesktop.dll"; isMac -> "libamdesktop.dylib"; else -> "libamdesktop.so" }
 
 val nativeBuild = tasks.register<Exec>("nativeBuild") {
-    if (isWindows) commandLine("powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "native/build_win.ps1")
-    else commandLine("sh", "native/build_mac.sh")
+    when {
+        isWindows -> commandLine("powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "../windows/build.ps1")
+        isMac -> commandLine("sh", "../macos/build.sh")
+        else -> commandLine("sh", "../linux/build.sh")
+    }
 }
 
 tasks.withType<JavaExec>().matching { it.name == "run" }.configureEach {
     dependsOn(nativeBuild)
-    systemProperty("am.assets", file("../app/src/main/assets").absolutePath)
+    systemProperty("am.assets", file("../shared/assets").absolutePath)
     systemProperty("am.native", file("build/native/$nativeName").absolutePath)
     systemProperty("am.repo", file("..").absolutePath)
     systemProperty("skiko.data.path", file("build/skiko").absolutePath)
     systemProperty("apple.awt.application.name", "AbsentMotion")
+    jvmArgs("-XX:+UseZGC", "-XX:+ZGenerational", "-XX:MaxRAMPercentage=60")
     System.getenv("AM_DATA")?.let { systemProperty("am.data", it) }
     System.getenv("AM_LOG")?.let { systemProperty("am.log", it) }
 }
@@ -110,10 +99,17 @@ compose.desktop {
     application {
         mainClass = "app.absentmotion.pc.MainKt"
         nativeDistributions {
-            targetFormats(if (isWindows) org.jetbrains.compose.desktop.application.dsl.TargetFormat.Msi else org.jetbrains.compose.desktop.application.dsl.TargetFormat.Dmg)
+            targetFormats(when {
+                isWindows -> org.jetbrains.compose.desktop.application.dsl.TargetFormat.Msi
+                isMac -> org.jetbrains.compose.desktop.application.dsl.TargetFormat.Dmg
+                else -> org.jetbrains.compose.desktop.application.dsl.TargetFormat.Deb
+            })
             packageName = "AbsentMotion"
             packageVersion = "5.0.0"
-            macOS { bundleID = "app.absentmotion.desktop"; iconFile.set(file("icon/AbsentMotion.icns")) }
+            jvmArgs += listOf("-XX:+UseZGC", "-XX:+ZGenerational", "-XX:MaxRAMPercentage=60", "-Dapple.awt.application.name=AbsentMotion")
+            macOS { bundleID = "app.absentmotion.desktop"; iconFile.set(file("../macos/AbsentMotion.icns")) }
+            windows { menuGroup = "AbsentMotion"; upgradeUuid = "5b0e7a52-3c1f-4d8e-9a6b-2f4c8d1e7a30" }
+            linux { packageName = "absentmotion" }
             appResourcesRootDir.set(project.layout.buildDirectory.dir("app-resources"))
         }
     }
@@ -122,8 +118,8 @@ compose.desktop {
 val prepareResources = tasks.register<Sync>("prepareResources") {
     dependsOn(nativeBuild)
     into(layout.buildDirectory.dir("app-resources/common"))
-    from("../app/src/main/assets") { into("assets") }
-    from("../app/src/main/res") { into("res"); include("values*/strings.xml") }
+    from("../shared/assets") { into("assets") }
+    from("../shared/res") { into("res"); include("values*/strings.xml") }
     from("build/native/$nativeName")
     if (isWindows) from("build/native/icudtl.dat")
 }
@@ -135,7 +131,7 @@ val renderCheck = tasks.register<JavaExec>("renderCheck") {
     mainClass = "app.absentmotion.pc.MainKt"
     args("--render-check")
     systemProperty("java.awt.headless", "true")
-    systemProperty("am.assets", file("../app/src/main/assets").absolutePath)
+    systemProperty("am.assets", file("../shared/assets").absolutePath)
     systemProperty("am.native", file("build/native/$nativeName").absolutePath)
     systemProperty("am.repo", file("..").absolutePath)
     systemProperty("am.output", file("build").absolutePath)
@@ -147,7 +143,7 @@ val sceneCheck = tasks.register<JavaExec>("sceneCheck") {
     mainClass = "app.absentmotion.pc.MainKt"
     args("--scene-check")
     systemProperty("java.awt.headless", "true")
-    systemProperty("am.assets", file("../app/src/main/assets").absolutePath)
+    systemProperty("am.assets", file("../shared/assets").absolutePath)
     systemProperty("am.native", file("build/native/$nativeName").absolutePath)
     systemProperty("am.repo", file("..").absolutePath)
     systemProperty("am.output", file("build").absolutePath)
@@ -157,7 +153,7 @@ tasks.test {
     dependsOn(nativeBuild)
     inputs.file(layout.buildDirectory.file("native/$nativeName"))
     systemProperty("am.native", layout.buildDirectory.file("native/$nativeName").get().asFile.absolutePath)
-    systemProperty("am.assets", file("../app/src/main/assets").absolutePath)
+    systemProperty("am.assets", file("../shared/assets").absolutePath)
     systemProperty("am.repo", file("..").absolutePath)
     systemProperty("skiko.data.path", layout.buildDirectory.dir("skiko").get().asFile.absolutePath)
     systemProperty("java.awt.headless", "true")

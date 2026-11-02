@@ -14,3 +14,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "AbsentMotion"
 include(":app")
+project(":app").projectDir = file("android")

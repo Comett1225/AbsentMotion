@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 C_LIKE = {".kt", ".kts", ".java", ".cpp", ".cc", ".c", ".h", ".hpp", ".gradle", ".js", ".css"}
 HASH = {".sh", ".yml"}
-SKIP_DIRS = ("third_party/", "gradlew", "gradle/wrapper/", "app/src/main/assets/licenses.txt")
+SKIP_DIRS = ("third_party/", "gradlew", "gradle/wrapper/", "shared/assets/licenses.txt")
 
 
 def listed(*args):

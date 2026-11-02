@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-KOTLIN = ROOT / "app/src/main/kotlin"
+KOTLIN = ROOT / "shared/kotlin"
 TIER = KOTLIN / "app/absentmotion/Tier.kt"
 ENTRY = re.compile(r"^\s*([A-Z][A-Za-z0-9]*)\(R\.string\.([a-z0-9_]+), inCompatible = (true|false)\),?\s*$", re.M)
 
@@ -21,15 +21,15 @@ def entries(text):
 
 def main():
     features = entries(TIER.read_text())
-    strings = (ROOT / "app/src/main/res/values/strings.xml").read_text()
-    sources = {path: path.read_text() for path in KOTLIN.rglob("*.kt") if path != TIER}
+    strings = (ROOT / "shared/res/values/strings.xml").read_text()
+    sources = {path: path.read_text() for root in (KOTLIN, ROOT / "android/src") for path in root.rglob("*.kt") if path != TIER}
     problems = []
     for name, label, kept in features:
         if f'name="{label}"' not in strings:
             problems.append(f"{name}: string {label} is missing")
         if kept:
             continue
-        users = sorted(str(path.relative_to(KOTLIN)) for path, text in sources.items() if re.search(rf"\bFeature\.{name}\b", text))
+        users = sorted(str(path.relative_to(ROOT)) for path, text in sources.items() if re.search(rf"\bFeature\.{name}\b", text))
         if users:
             print(f"{name}: left out of Compatible, gated in {', '.join(users)}")
         else:

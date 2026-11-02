@@ -122,7 +122,7 @@ together with Skia.
 - Copyright: Copyright (c) 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper; Copyright (c) 2001-2025
   Expat maintainers.
 - URL: https://libexpat.github.io/
-- Used in: the engine library. The engine reads scene files with it (`app/src/main/cpp/xml.cpp`).
+- Used in: the engine library. The engine reads scene files with it (`shared/cpp/xml.cpp`).
 
 #### skcms
 
@@ -302,10 +302,10 @@ can remove the add-on.
 
 ### Background removal model (`foss` build only)
 
-- Version: `app/src/foss/assets/absent_bg.abg` (2,943,735 bytes, SHA-256
+- Version: `android/src/foss/assets/absent_bg.abg` (2,943,735 bytes, SHA-256
   `9bfbfcba996eb0b0b4f5da03d7dcbce704f5b8810101eb92f62b9e6d44465439`), a small segmentation network trained for
   AbsentMotion; weights stored as 8-bit integers and expanded to 32-bit floats on load. Its inference code,
-  `app/src/main/cpp/absent_bg/`, is part of AbsentMotion.
+  `shared/cpp/absent_bg/`, is part of AbsentMotion.
 - Licence: Apache-2.0 ("Original student architectures, training scripts and C++ runtime: Apache License 2.0."),
   subject to the source notices and the CC BY attribution below.
 - Copyright: The AbsentMotion authors.
@@ -421,7 +421,7 @@ JUnit 4.13.2 (Eclipse Public License 1.0), kXML 2 2.3.0 (`net.sf.kxml:kxml2`, a 
 - The free Android build (the `foss` flavour) includes neither library; only the `play` build does.
 - Known risk: 16.0.0-beta1 is a beta release, which Google ships without a service-level or deprecation promise, so a
   later Google Play services update may change or remove it. The version is pinned, the code that uses it is one file
-  (`app/src/play/kotlin/app/absentmotion/ai/BackgroundRemoval.kt`) behind the same interface as the `foss` remover, and
+  (`android/src/play/kotlin/app/absentmotion/ai/BackgroundRemoval.kt`) behind the same interface as the `foss` remover, and
   when the service fails the app says that background removal is not ready instead of crashing.
 
 ---
@@ -515,7 +515,7 @@ The icon sets used in the user interface, and their licences, are listed in `doc
 
 ### Effect thumbnail photos
 
-The effect thumbnails (`app/src/main/assets/effects/thumb/*.webp`, 192 x 192 pixels) are rendered by
+The effect thumbnails (`shared/assets/effects/thumb/*.webp`, 192 x 192 pixels) are rendered by
 `tools/effect_thumbs.py` from the six photographs below, all from Wikimedia Commons. Each author released the photograph
 under CC0 1.0, a public domain dedication (https://creativecommons.org/publicdomain/zero/1.0/), so no credit is required;
 they are listed for the record. The licence of each was checked on 2026-10-19 on the file's Commons page and in its

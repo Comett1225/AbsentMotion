@@ -2,7 +2,7 @@
 import json, os, subprocess, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BUILD = os.path.join(ROOT, "app/build/easing_check")
+BUILD = os.path.join(ROOT, "android/build/easing_check")
 DATA = os.path.join(ROOT, "testdata/behaviour/easing")
 MAIN = r'''
 #include <cstdio>
@@ -18,7 +18,7 @@ def build():
     os.makedirs(BUILD, exist_ok=True)
     main = os.path.join(BUILD, "main.cpp")
     open(main, "w").write(MAIN)
-    src = os.path.join(ROOT, "app/src/main/cpp")
+    src = os.path.join(ROOT, "shared/cpp")
     subprocess.run(["clang++", "-std=c++20", "-O1", "-I", src, main, os.path.join(src, "easing.cpp"), "-o", os.path.join(BUILD, "easing")], check=True)
 
 def ease(e, us):

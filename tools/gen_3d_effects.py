@@ -3,7 +3,7 @@ import json
 import sys
 from pathlib import Path
 
-PACK = Path(__file__).resolve().parents[1] / "app/src/main/assets/effects"
+PACK = Path(__file__).resolve().parents[1] / "shared/assets/effects"
 SINCE = "3.0.0"
 
 

@@ -7,7 +7,7 @@ on:
     paths:
       - 'site/**'
       - 'tools/site_build.py'
-      - 'app/src/main/assets/effects/**'
+      - 'shared/assets/effects/**'
       - 'version.properties'
       - '.github/workflows/pages.yml'
   workflow_dispatch:

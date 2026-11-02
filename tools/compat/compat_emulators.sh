@@ -16,7 +16,7 @@ for arg in "$@"; do
     esac
 done
 [ -n "$apis" ] || apis="28 30 32"
-apk=$(ls -t app/build/outputs/apk/compat/debug/*.apk 2>/dev/null | head -1)
+apk=$(ls -t android/build/outputs/apk/compat/debug/*.apk 2>/dev/null | head -1)
 [ -n "$apk" ] || { echo "compat_emulators.sh: build the debug APK first: ./gradlew :app:assembleCompatDebug" >&2; exit 2; }
 tools="$SDK_ROOT/cmdline-tools/latest/bin"
 serial="emulator-$port"

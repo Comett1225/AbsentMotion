@@ -1,7 +1,7 @@
 # Easing behaviour data
 
 Numbers measured from the other app's keyframe easing, used by `tools/easing_check.py` to check
-`app/src/main/cpp/easing.cpp`. Only the easing strings of the project file are shared with that
+`shared/cpp/easing.cpp`. Only the easing strings of the project file are shared with that
 app; the curve formulas in `easing.cpp` were fitted to these numbers.
 
 - `strings.json`: preset name to easing string, e.g. `"bounce": "bounce 0.3 0.8"`.

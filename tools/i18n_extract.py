@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-MAIN = ROOT / 'app/src/main'
+MAIN = ROOT / 'shared'
 KOTLIN = MAIN / 'kotlin'
 RES = MAIN / 'res'
 EFFECTS = MAIN / 'assets/effects'
@@ -217,7 +217,7 @@ def scan_effects():
 
 
 def kotlin_files(filters):
-    files = sorted(f for f in KOTLIN.rglob('*.kt') if 'i18n' not in f.parts)
+    files = sorted(f for root in (KOTLIN, ROOT / 'android/src/main/kotlin') for f in root.rglob('*.kt') if 'i18n' not in f.parts)
     return [f for f in files if any(s in str(f) for s in filters)] if filters else files
 
 

@@ -5,7 +5,7 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-XML = os.path.join(ROOT, "app/src/main/assets/shapes.xml")
+XML = os.path.join(ROOT, "shared/assets/shapes.xml")
 PARAMETRIC = 19
 SIZE = 200.0
 

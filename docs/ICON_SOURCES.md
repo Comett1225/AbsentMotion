@@ -39,8 +39,8 @@ The launcher icon is an own drawing, made by `tools/icon/make_icon.py` (source o
 
 | File | What | Source | Licence |
 | --- | --- | --- | --- |
-| `app/src/main/res/drawable/ic_launcher_foreground.xml` | adaptive icon mark | own drawing (`tools/icon/make_icon.py`) | Apache-2.0 (own) |
-| `app/src/main/res/drawable/ic_launcher_background.xml` | flat colour #FF5A36 | own | Apache-2.0 (own) |
+| `android/src/main/res/drawable/ic_launcher_foreground.xml` | adaptive icon mark | own drawing (`tools/icon/make_icon.py`) | Apache-2.0 (own) |
+| `android/src/main/res/drawable/ic_launcher_background.xml` | flat colour #FF5A36 | own | Apache-2.0 (own) |
 | `tools/icon/mark.svg` | the mark on its background | own drawing | Apache-2.0 (own) |
 
 ## Icons

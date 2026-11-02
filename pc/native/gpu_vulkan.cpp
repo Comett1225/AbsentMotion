@@ -1,5 +1,15 @@
 #include "gpu.h"
+#ifdef _WIN32
 #include <windows.h>
+static void* OpenVulkan() { return LoadLibraryW(L"vulkan-1.dll"); }
+static void* VulkanSymbol(void* library, const char* name) { return (void*)GetProcAddress((HMODULE)library, name); }
+static void CloseVulkan(void* library) { FreeLibrary((HMODULE)library); }
+#else
+#include <dlfcn.h>
+static void* OpenVulkan() { void* library = dlopen("libvulkan.so.1", RTLD_NOW | RTLD_LOCAL); return library ? library : dlopen("libvulkan.so", RTLD_NOW | RTLD_LOCAL); }
+static void* VulkanSymbol(void* library, const char* name) { return dlsym(library, name); }
+static void CloseVulkan(void* library) { dlclose(library); }
+#endif
 #include <vector>
 #include "include/gpu/ganesh/GrDirectContext.h"
 #include "include/gpu/ganesh/vk/GrVkDirectContext.h"
@@ -9,7 +19,7 @@
 #include "src/gpu/vk/vulkanmemoryallocator/VulkanMemoryAllocatorPriv.h"
 
 struct VulkanGpu : DesktopGpu {
-    HMODULE library = nullptr;
+    void* library = nullptr;
     PFN_vkGetInstanceProcAddr getInstance = nullptr;
     PFN_vkGetDeviceProcAddr getDevice = nullptr;
     VkInstance instance = VK_NULL_HANDLE;
@@ -28,12 +38,12 @@ struct VulkanGpu : DesktopGpu {
             auto destroy = (PFN_vkDestroyInstance)getInstance(instance, "vkDestroyInstance");
             if (destroy) destroy(instance, nullptr);
         }
-        if (library) FreeLibrary(library);
+        if (library) CloseVulkan(library);
     }
     bool init() {
-        library = LoadLibraryW(L"vulkan-1.dll");
+        library = OpenVulkan();
         if (!library) return false;
-        getInstance = (PFN_vkGetInstanceProcAddr)GetProcAddress(library, "vkGetInstanceProcAddr");
+        getInstance = (PFN_vkGetInstanceProcAddr)VulkanSymbol(library, "vkGetInstanceProcAddr");
         if (!getInstance) return false;
         auto createInstance = (PFN_vkCreateInstance)getInstance(nullptr, "vkCreateInstance");
         if (!createInstance) return false;

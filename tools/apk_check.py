@@ -10,7 +10,7 @@ import zipfile
 
 from sdk import sdk_root
 
-UPDATE_SOURCE = Path(__file__).resolve().parent.parent / "app/src/main/kotlin/app/absentmotion/ui/home/UpdateSource.kt"
+UPDATE_SOURCE = Path(__file__).resolve().parent.parent / "shared/kotlin/app/absentmotion/ui/home/UpdateSource.kt"
 
 
 def release_signer(source=UPDATE_SOURCE):

@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-SRC="${1:-$ROOT/app/src/main/cpp}"
+SRC="${1:-$ROOT/shared/cpp}"
 OUT="${2:-$ROOT/build/render_bench/current}"
 EXTRA=""
 grep -q "steady" "$SRC/scene.h" && EXTRA="-DRENDER_BENCH_STEADY"
