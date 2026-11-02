@@ -47,9 +47,16 @@ internal fun distrustVideoThumbnails() = versions.update { it.copy(trusted = fal
 
 internal suspend fun recheckVideoThumbnails(context: Context) {
     val known = versions.value.versions.keys
-    val fresh = withContext(Dispatchers.IO) { known.associateWith { fileVersion(context.contentResolver, Uri.parse(it)) } }
+    val fresh = withContext(Dispatchers.IO) { known.associateWith { thumbnailVersion(context, it) } }
     versions.update { current -> fresh.entries.fold(current) { next, (uri, version) -> next.with(uri, version) }.copy(trusted = true) }
 }
+
+private fun thumbnailVersion(context: Context, uri: String): String? = if (app.absentmotion.platform.PlatformFeatures.desktop) {
+    runCatching {
+        val file = java.io.File(java.net.URI(uri))
+        if (file.isFile) "${file.length()}:${file.lastModified()}" else null
+    }.getOrNull()
+} else fileVersion(context.contentResolver, Uri.parse(uri))
 
 private fun cachedFrames(uri: String, version: String?, tiles: List<Pair<Int, Long>>): List<Pair<Int, ImageBitmap>> =
     if (version == null) emptyList() else cachedTiles(tiles) { thumbnails[FrameKey(uri, version, it)] }
@@ -71,7 +78,7 @@ internal fun videoStripPicture(layer: Layer, scene: Scene, fromMs: Float, toMs: 
     val request = StripRequest(uri, checked.versions[uri], tiles)
     val seed = remember(request, checked.trusted) { cachedFrames(uri, checked.seed(uri), tiles) }
     val shown by produceState(null as Stamped<StripRequest, List<Pair<Int, ImageBitmap>>>?, request) {
-        val version = withContext(Dispatchers.IO) { fileVersion(context.contentResolver, Uri.parse(uri)) }
+        val version = withContext(Dispatchers.IO) { thumbnailVersion(context, uri) }
         if (version != request.version) { versions.update { it.with(uri, version) }; return@produceState }
         val known = cachedFrames(uri, version, tiles)
         value = Stamped(request, known)

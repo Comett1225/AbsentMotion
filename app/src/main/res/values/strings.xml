@@ -2045,4 +2045,9 @@
     <string name="tools_form">the Form</string>
     <string name="effectbrowser_favorite_preset">Favorite preset</string>
     <string name="effectbrowser_favorite_empty">Favorites appear here</string>
+    <string name="timeline_cut">Cut</string>
+    <string name="timeline_split">Split at playhead</string>
+    <string name="timeline_bring_forward">Bring forward</string>
+    <string name="timeline_send_backward">Send backward</string>
+    <string name="timeline_add_bookmark">Add bookmark at playhead</string>
 </resources>
