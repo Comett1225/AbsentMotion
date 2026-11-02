@@ -39,7 +39,7 @@ class DeskSoundShotsTest {
             runSkikoComposeUiTest(size = Size(1600f, 1000f)) {
                 val app = DeskAppState()
                 val shots = File("build/desk-shots").also { it.mkdirs() }
-                fun shot(name: String) { waitForIdle(); ImageIO.write(onRoot().captureToImage().toAwtImage(), "png", shots.resolve(name)) }
+                fun shot(name: String) { waitForIdle(); ImageIO.write(onAllNodes(isRoot()).onFirst().captureToImage().toAwtImage(), "png", shots.resolve(name)) }
                 setContent { DeskApp(app) }
                 val xml = File(repo, "testdata/scenes/media.xml").readText().replace("\"testdata/media/test-audio.m4a\"", "\"" + File(music, "tone-b.m4a").toURI().toString().replace("file:/", "file:///") + "\"")
                     .replace("\"testdata/media/", "\"" + File(repo, "testdata/media").toURI().toString().replace("file:/", "file:///") + "/")

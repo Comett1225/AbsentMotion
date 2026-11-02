@@ -126,7 +126,7 @@ internal fun TextEditor(state: EditorState, ui: TextEditUi = remember { TextEdit
                     Box(Modifier.padding(1.5.dp).width(38.dp).fillMaxHeight().background(TextControl, RoundedCornerShape(2.dp)).tutorialGuard().clickable {
                         val alignments = listOf("left", "center", "right", "justify")
                         state.editSelected { it.withTextAlign(alignments[(alignments.indexOf(it.textAlign) + 1) % alignments.size]) }
-                    }, contentAlignment = Alignment.Center) { Icon(alignIcon, stringResource(R.string.text_alignment), Modifier.size(24.dp), tint = Am.OnDark) }
+                    }, contentAlignment = Alignment.Center) { DeskTip(stringResource(R.string.text_alignment)) { Icon(alignIcon, stringResource(R.string.text_alignment), Modifier.size(24.dp), tint = Am.OnDark) } }
                     Row(Modifier.padding(1.5.dp).weight(1f).fillMaxHeight().background(TextControl).tutorialGuard().clickable { popup = if (popup == "font") "" else "font" },
                         verticalAlignment = Alignment.CenterVertically) {
                         Text(FontName.parse(layer.font).label, Modifier.weight(1f).padding(start = 6.dp), fontSize = 16.sp, fontFamily = rememberFontFamily(library, layer.font),

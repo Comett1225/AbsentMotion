@@ -2050,4 +2050,22 @@
     <string name="timeline_bring_forward">Bring forward</string>
     <string name="timeline_send_backward">Send backward</string>
     <string name="timeline_add_bookmark">Add bookmark at playhead</string>
+    <string name="desk_library">Library</string>
+    <string name="desk_inspector">Inspector</string>
+    <string name="desk_export">Export</string>
+    <string name="desk_draw">Draw</string>
+    <string name="desk_start">Go to start</string>
+    <string name="desk_end">Go to end</string>
+    <string name="desk_previous_frame">Previous frame</string>
+    <string name="desk_next_frame">Next frame</string>
+    <string name="desk_loop">Loop playback</string>
+    <string name="desk_add">Add</string>
+    <string name="desk_reveal_file">Show in file manager</string>
+    <string name="desk_duration">Length</string>
+    <string name="desk_shortcut_hint">%1$s (%2$s)</string>
+    <string name="desk_media_empty">No media found. Add files or link a folder to get started.</string>
+    <string name="desk_custom_size">Custom size</string>
+    <string name="desk_layers">Layers</string>
+    <string name="desk_objects">Objects</string>
+    <string name="desk_fit">Fit to window</string>
 </resources>

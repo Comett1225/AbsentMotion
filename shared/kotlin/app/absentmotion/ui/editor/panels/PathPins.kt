@@ -2,6 +2,7 @@ package app.absentmotion.ui.editor.panels
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import app.absentmotion.ui.editor.DeskTip
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -168,13 +169,13 @@ internal fun PuppetSection(state: EditorState, layer: Layer, index: Int, instanc
             Spacer(Modifier.width(3.dp))
             ValueBox(formatFixed(p.at.y, 1), false, chosen, Modifier.weight(1f).fillMaxHeight(), 5.5f, true) { keypad(1) }
             Box(Modifier.size(48.dp).clickable { state.movePin(index, p, p.rest, null) }, contentAlignment = Alignment.Center) {
-                Icon(ChromeIcons.Undo, "$label, ${stringResource(R.string.puppet_reset_pin)}", Modifier.size(20.dp), tint = Am.OnDark)
+                DeskTip("$label, ${stringResource(R.string.puppet_reset_pin)}") { Icon(ChromeIcons.Undo, "$label, ${stringResource(R.string.puppet_reset_pin)}", Modifier.size(20.dp), tint = Am.OnDark) }
             }
             Box(Modifier.size(48.dp).clickable {
                 if (chosen) onPin(null)
                 state.editSelected { current -> current.withEffect(index) { it.withoutPuppetPin(p.number) } }
             }, contentAlignment = Alignment.Center) {
-                Icon(ChromeIcons.Trash, "$label, ${stringResource(R.string.puppet_delete_pin)}", Modifier.size(20.dp), tint = Am.OnDark)
+                DeskTip("$label, ${stringResource(R.string.puppet_delete_pin)}") { Icon(ChromeIcons.Trash, "$label, ${stringResource(R.string.puppet_delete_pin)}", Modifier.size(20.dp), tint = Am.OnDark) }
             }
         }
     }

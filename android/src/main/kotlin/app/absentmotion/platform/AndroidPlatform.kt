@@ -374,3 +374,5 @@ internal fun deviceSounds(context: Context): List<app.absentmotion.audio.DeviceA
     } catch (_: Exception) { }
     return found
 }
+
+fun revealDeskFile(uri: android.net.Uri) {}

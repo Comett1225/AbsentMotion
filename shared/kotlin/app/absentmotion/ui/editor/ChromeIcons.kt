@@ -6,6 +6,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
@@ -39,6 +40,7 @@ internal fun BarButton(
     enabled: Boolean = true,
     iconSize: DpSize = DpSize(24.dp, 24.dp),
     onLongClick: (() -> Unit)? = null,
+    hint: String? = null,
     onClick: () -> Unit = {},
 ) {
     Box(
@@ -47,7 +49,9 @@ internal fun BarButton(
         ),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(icon, description, Modifier.size(iconSize), tint = Am.OnDark)
+        if (app.absentmotion.platform.PlatformFeatures.desktop && (hint ?: description).isNotEmpty()) {
+            app.absentmotion.platform.Hint(hint ?: description) { Box(Modifier.fillMaxSize(), Alignment.Center) { Icon(icon, description, Modifier.size(iconSize), tint = Am.OnDark) } }
+        } else Icon(icon, description, Modifier.size(iconSize), tint = Am.OnDark)
     }
 }
 
@@ -82,6 +86,7 @@ internal object ChromeIcons {
             "A1.2 1.2 0 0 1 11.2 21.6L5.2 21.6A1.2 1.2 0 0 1 4 20.4L4 15.6A1.2 1.2 0 0 1 5.2 14.4Z", width = 1.2f)
 
     val Plus = icon("Plus", stroke = "M3.95 12L20.05 12M12 3.95L12 20.05", width = 2.5f)
+    val Minus = icon("Minus", stroke = "M3.95 12L20.05 12", width = 2.5f)
 
     val ShapeTab = icon("ShapeTab", stroke = "M8.3 10A0.7 0.7 0 0 1 7.674 8.921L11.4 3A0.7 0.7 0 0 1 12.598 2.957L16.3 8.9A0.7 0.7 0 0 1 15.728 10ZM4 14L9 14A1 1 0 0 1 10 15L10 20A1 1 0 0 1 9 21" +
             "L4 21A1 1 0 0 1 3 20L3 15A1 1 0 0 1 4 14ZM14 17.5A3.5 3.5 0 1 0 21 17.5A3.5 3.5 0 1 0 14 17.5Z")

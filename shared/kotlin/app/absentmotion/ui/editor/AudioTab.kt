@@ -365,7 +365,7 @@ private fun WaveformArt(seed: Int, modifier: Modifier) {
     }
 }
 
-private class SoundPreview(private val context: Context) {
+internal class SoundPreview(private val context: Context) {
     private var player: MediaPlayer? = null
     var uri by mutableStateOf<String?>(null)
         private set

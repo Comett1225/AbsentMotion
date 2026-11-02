@@ -123,6 +123,13 @@ import app.absentmotion.ui.theme.Swap
 import app.absentmotion.ui.theme.TilePress
 import app.absentmotion.ui.theme.fadeBackground
 import app.absentmotion.ui.theme.pressScale
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.isSecondaryPressed
+import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
@@ -259,7 +266,7 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
 private fun TileRows(rows: List<List<Tile>>, columns: Int?) {
     rows.forEachIndexed { i, row ->
         if (i > 0) Spacer(Modifier.height(17.px))
-        Row(Modifier.fillMaxWidth().height(160.px), Arrangement.spacedBy(17.px)) {
+        Row(Modifier.fillMaxWidth().height(if (app.absentmotion.platform.PlatformFeatures.desktop) 68.dp else 160.px), Arrangement.spacedBy(17.px)) {
             for (tile in row) ToolButton(tile.tool, Modifier.weight(1f).tutorialTarget(if (tile.tool === MoveTransform) "tool_transform" else if (tile.tool === Effects) "tool_effects" else null), tile.enabled, tile.active, tile.onLongClick, tile.menu, tile.onClick)
             if (columns != null) repeat(columns - row.size) { Spacer(Modifier.weight(1f)) }
         }
@@ -311,8 +318,11 @@ private val ScreenshotTool = Tool(R.string.layer_tool_screenshot, PanelIcons.Scr
 @Composable
 private fun SmallTool(icon: ImageVector, description: String, modifier: Modifier, shape: RoundedCornerShape, enabled: Boolean = true, iconSize: Dp = 24.dp, onClick: () -> Unit = {}) {
     val press = remember { MutableInteractionSource() }
+    val hovered by press.collectIsHoveredAsState()
     Box(
-        modifier.tutorialGuard().fillMaxHeight().pressScale(press, TilePress).then(if (enabled) Modifier else Modifier.dimmed()).clip(shape).background(Am.Button)
+        modifier.tutorialGuard().fillMaxHeight().pressScale(press, TilePress).then(if (enabled) Modifier else Modifier.dimmed()).clip(shape)
+            .background(if (app.absentmotion.platform.PlatformFeatures.desktop && hovered) Am.Field else Am.Button)
+            .then(if (app.absentmotion.platform.PlatformFeatures.desktop && enabled) Modifier.hoverable(press).pointerHoverIcon(PointerIcon.Hand) else Modifier)
             .then(if (enabled) Modifier.clickable(press, LocalIndication.current, onClick = onClick) else Modifier),
         contentAlignment = Alignment.Center,
     ) {
@@ -323,17 +333,29 @@ private fun SmallTool(icon: ImageVector, description: String, modifier: Modifier
 @Composable
 private fun ToolButton(tool: Tool, modifier: Modifier, enabled: Boolean = true, active: Boolean = false, onLongClick: (() -> Unit)? = null, menu: (@Composable () -> Unit)? = null, onClick: () -> Unit = {}) {
     val press = remember { MutableInteractionSource() }
+    val hovered by press.collectIsHoveredAsState()
     Box(
-        modifier.tutorialGuard().fillMaxHeight().pressScale(press, TilePress).then(if (enabled) Modifier else Modifier.dimmed()).clip(ToolShape).background(Am.Button)
+        modifier.tutorialGuard().fillMaxHeight().pressScale(press, TilePress).then(if (enabled) Modifier else Modifier.dimmed()).clip(ToolShape)
+            .background(if (app.absentmotion.platform.PlatformFeatures.desktop && hovered) Am.Field else Am.Button)
+            .then(if (app.absentmotion.platform.PlatformFeatures.desktop && enabled) Modifier.hoverable(press).pointerHoverIcon(PointerIcon.Hand) else Modifier)
+            .then(if (app.absentmotion.platform.PlatformFeatures.desktop && onLongClick != null) Modifier.pointerInput(onLongClick) {
+                awaitPointerEventScope {
+                    while (true) {
+                        val event = awaitPointerEvent()
+                        if (event.type == PointerEventType.Press && event.buttons.isSecondaryPressed) { onLongClick(); event.changes.forEach { it.consume() } }
+                    }
+                }
+            } else Modifier)
             .then(if (enabled) Modifier.combinedClickable(press, LocalIndication.current, onLongClick = onLongClick, onClick = onClick) else Modifier),
     ) {
         menu?.invoke()
         PanelIcon(tool.icon, if (active) Am.Accent else Am.OnDark, Modifier.align(Alignment.TopCenter).offset(y = (tool.iconY - 12f).dp))
         Text(
-            stringResource(tool.label), Modifier.align(Alignment.TopCenter).offset(y = 32.dp).fillMaxWidth().height(24.dp).padding(horizontal = 4.dp)
+            stringResource(tool.label), Modifier.align(Alignment.TopCenter).offset(y = 32.dp).fillMaxWidth().height(if (app.absentmotion.platform.PlatformFeatures.desktop) 30.dp else 24.dp).padding(horizontal = 4.dp)
                 .wrapContentHeight(Alignment.CenterVertically),
-            color = ToolLabel, lineHeight = 11.5.sp, maxLines = 2, textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-            autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(7.sp, 10.sp, 0.5.sp),
+            color = ToolLabel, fontSize = if (app.absentmotion.platform.PlatformFeatures.desktop) 12.sp else androidx.compose.ui.unit.TextUnit.Unspecified,
+            lineHeight = if (app.absentmotion.platform.PlatformFeatures.desktop) 14.sp else 11.5.sp, maxLines = 2, textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            autoSize = if (app.absentmotion.platform.PlatformFeatures.desktop) null else androidx.compose.foundation.text.TextAutoSize.StepBased(7.sp, 10.sp, 0.5.sp),
         )
     }
 }

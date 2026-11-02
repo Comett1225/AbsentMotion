@@ -59,7 +59,7 @@ internal val LocalEditorScope = staticCompositionLocalOf<CoroutineScope> { error
 @Composable
 fun EditorScreen(state: EditorState, onExit: () -> Unit) {
     val scope = rememberCoroutineScope()
-    CompositionLocalProvider(LocalEditorScope provides scope) {
+    CompositionLocalProvider(LocalEditorScope provides scope, LocalDeskEditor provides app.absentmotion.platform.PlatformFeatures.desktop) {
         Box(Modifier.fillMaxSize().pointerInput(Unit) {
             awaitPointerEventScope {
                 while (true) {
@@ -70,7 +70,7 @@ fun EditorScreen(state: EditorState, onExit: () -> Unit) {
         }) {
             EditorBody(state, onExit)
             val color = remember { arrayOfNulls<FullColor>(1) }.also { if (state.fullColor != null) it[0] = state.fullColor }[0]
-            Presence(state.fullColor != null) { color?.let { PhoneScreen { Box(Modifier.fillMaxSize().presence(rise = 16.dp)) { FullColorPicker(state, it) } } } }
+            Presence(state.fullColor != null) { color?.let { PhoneScreen(onDismiss = { state.endGesture(); state.fullColor = null }, title = stringResource(R.string.color), onConfirm = { state.endGesture(); state.fullColor = null }) { Box(Modifier.fillMaxSize().presence(rise = 16.dp)) { FullColorPicker(state, it) } } } }
             if (state.cameraOpen) EditorCamera(state, scope)
         }
     }
@@ -86,11 +86,11 @@ private fun EditorBody(state: EditorState, onExit: () -> Unit) {
         lifecycle.addObserver(observer)
         onDispose { lifecycle.removeObserver(observer) }
     }
-    if (!wide && state.panel == EditorPanel.EditText && state.selected?.kind == "text") {
+    if (!app.absentmotion.platform.PlatformFeatures.desktop && !wide && state.panel == EditorPanel.EditText && state.selected?.kind == "text") {
         PhoneScreen { TextEditor(state) }
         return
     }
-    if (state.drawing != null) {
+    if (!app.absentmotion.platform.PlatformFeatures.desktop && state.drawing != null) {
         PhoneScreen(fillWidth = Dp.Infinity) { DrawingEditor(state) }
         return
     }
@@ -108,6 +108,10 @@ private fun EditorBody(state: EditorState, onExit: () -> Unit) {
         confirmButton = { TextButton({ state.easingHint = false }) { Text(stringResource(R.string.ok), color = Am.Accent) } },
         containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark,
     )
+    if (app.absentmotion.platform.PlatformFeatures.desktop) {
+        DeskWorkspace(state, onExit, addLibrary)
+        return
+    }
     if (state.effectBrowserOpen) {
         PhoneScreen(fillWidth = 720.dp) { Box(Modifier.fillMaxSize().enterFade()) { app.absentmotion.ui.editor.effects.EffectBrowser(state) } }
         return

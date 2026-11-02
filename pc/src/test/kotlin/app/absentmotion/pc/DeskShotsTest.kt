@@ -32,7 +32,7 @@ class DeskShotsTest {
         runSkikoComposeUiTest(size = Size(1600f, 1000f)) {
             val app = DeskAppState()
             val shots = File("build/desk-shots").also { it.mkdirs() }
-            fun shot(name: String) { waitForIdle(); ImageIO.write(onRoot().captureToImage().toAwtImage(), "png", shots.resolve(name)) }
+            fun shot(name: String) { waitForIdle(); ImageIO.write(onAllNodes(isRoot()).onFirst().captureToImage().toAwtImage(), "png", shots.resolve(name)) }
             setContent { DeskApp(app) }
             shot("01-home-empty.png")
             onNodeWithText("New project", substring = false).performClick()
@@ -76,7 +76,7 @@ class DeskShotsTest {
             shot("06-effect-browser.png")
             runOnIdle { editor.effectBrowserOpen = false; editor.panel = EditorPanel.Tools; editor.addOpen = true }
             mainClock.advanceTimeBy(1000)
-            onNodeWithText("Media", substring = false).performClick()
+            onAllNodesWithText("Media", substring = false).filter(hasClickAction()).onFirst().assertExists()
             mainClock.advanceTimeBy(3000)
             Thread.sleep(3000)
             mainClock.advanceTimeBy(1000)

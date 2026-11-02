@@ -119,9 +119,10 @@ private fun ObjectTile(label: String, icon: ImageVector, modifier: Modifier, ena
     }
 }
 
+internal class ObjectImport(val reading: Boolean, val svg: () -> Unit, val model: () -> Unit)
+
 @Composable
-internal fun ObjectPage(state: EditorState, modifier: Modifier) {
-    var picking by remember { mutableStateOf(false) }
+internal fun rememberObjectImport(state: EditorState): ObjectImport {
     var reading by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -138,7 +139,14 @@ internal fun ObjectPage(state: EditorState, modifier: Modifier) {
             try { state.importSvgFile(context, uri) } finally { reading = false }
         }
     }
-    Swap(picking, modifier, rise = 0.dp) { if (picking) ElementPicker(state, Modifier.fillMaxSize()) else ObjectTiles(state, reading, { picking = true }, { svg.launch(arrayOf("image/svg+xml")) }) { models.launch(arrayOf("*/*")) } }
+    return ObjectImport(reading, { svg.launch(arrayOf("image/svg+xml")) }) { models.launch(arrayOf("*/*")) }
+}
+
+@Composable
+internal fun ObjectPage(state: EditorState, modifier: Modifier) {
+    var picking by remember { mutableStateOf(false) }
+    val import = rememberObjectImport(state)
+    Swap(picking, modifier, rise = 0.dp) { if (picking) ElementPicker(state, Modifier.fillMaxSize()) else ObjectTiles(state, import.reading, { picking = true }, import.svg, import.model) }
 }
 
 @Composable

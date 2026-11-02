@@ -145,7 +145,7 @@ internal fun MenuPopup(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Popup(position, onDismiss, PopupProperties(focusable = true)) {
-        Column(Modifier.presence(scaleFrom = 0.92f, origin = origin).width(250.dp).clip(MenuShape).background(MenuBg), content = content)
+        Column(Modifier.deskCursor().presence(scaleFrom = 0.92f, origin = origin).width(if (app.absentmotion.platform.PlatformFeatures.desktop) 240.dp else 250.dp).clip(MenuShape).background(MenuBg).then(if (app.absentmotion.platform.PlatformFeatures.desktop) Modifier.border(1.dp, ListLine, MenuShape) else Modifier), content = content)
     }
 }
 
@@ -161,14 +161,14 @@ internal fun MenuRow(
     onClick: () -> Unit = {},
 ) {
     Box(
-        Modifier.fillMaxWidth().height(40.dp)
+        Modifier.fillMaxWidth().height(if (app.absentmotion.platform.PlatformFeatures.desktop && subText == null) 36.dp else 40.dp)
             .then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier)
             .drawBehind { if (divider) drawRect(MenuLine, size = Size(size.width, 1.dp.toPx())) },
     ) {
         Row(Modifier.fillMaxSize().alpha(if (enabled) 1f else DimAlpha), verticalAlignment = Alignment.CenterVertically) {
             if (icon != null) Box(Modifier.size(40.dp), Alignment.Center) { Icon(icon, null, Modifier.size(24.dp), tint = Am.OnDark) }
             Column(Modifier.weight(1f).padding(start = 14.dp), verticalArrangement = Arrangement.Center) {
-                Text(text, color = Am.OnDark, fontSize = 15.sp, lineHeight = if (subText == null) 20.sp else 19.5.sp, maxLines = 1)
+                Text(text, color = Am.OnDark, fontSize = if (app.absentmotion.platform.PlatformFeatures.desktop) 14.sp else 15.sp, lineHeight = if (subText == null) 20.sp else 19.5.sp, maxLines = 1)
                 if (subText != null) Text(subText, color = Am.OnDark, fontSize = 10.sp, lineHeight = 20.5.sp, maxLines = 1)
             }
             if (trailing != null) Icon(trailing, null, Modifier.padding(end = 7.dp).size(24.dp), tint = Am.OnDark)
@@ -388,32 +388,32 @@ private fun LabelSwatch(colour: LabelColour?, chosen: Boolean) {
     }
 }
 
-private const val MIN_SIDE = 32
-private const val MAX_SIDE = 4096
-private const val CUSTOM = "custom"
+internal const val MIN_SIDE = 32
+internal const val MAX_SIDE = 4096
+internal const val CUSTOM = "custom"
 
-private val Resolutions = listOf(
+internal val Resolutions = listOf(
     2160 to "2160p (4k)", 1440 to "1440p (QHD)", 1080 to "1080p (FHD)", 720 to "720p (HD)",
     540 to "540p (SD)", 360 to "360p", 270 to "270p", 180 to "180p",
 )
-private val FrameRates = listOf(12, 15, 18, 20, 24, 25, 30, 48, 50, 60)
+internal val FrameRates = listOf(12, 15, 18, 20, 24, 25, 30, 48, 50, 60)
 
-private class BackgroundChoice(@StringRes val name: Int, val argb: Int)
+internal class BackgroundChoice(@StringRes val name: Int, val argb: Int)
 
-private val Backgrounds = listOf(
+internal val Backgrounds = listOf(
     BackgroundChoice(R.string.menu_bg_black, 0xFF000000.toInt()), BackgroundChoice(R.string.menu_bg_white, 0xFFFFFFFF.toInt()),
     BackgroundChoice(R.string.menu_bg_light_grey, 0xFFD8D8D8.toInt()), BackgroundChoice(R.string.menu_bg_green, 0xFF00B140.toInt()),
     BackgroundChoice(R.string.menu_bg_blue, 0xFF0047BB.toInt()), BackgroundChoice(R.string.menu_bg_transparent, 0x00000000),
 )
 
-private class Aspect(val key: String, val w: Int, val h: Int, val boxW: Dp, val boxH: Dp)
+internal class Aspect(val key: String, val w: Int, val h: Int, val boxW: Dp, val boxH: Dp)
 
-private val Aspects = listOf(
+internal val Aspects = listOf(
     Aspect("16:9", 16, 9, 55.dp, 31.dp), Aspect("9:16", 9, 16, 31.dp, 55.dp), Aspect("4:5", 4, 5, 31.dp, 39.dp),
     Aspect("1:1", 1, 1, 31.dp, 31.dp), Aspect("4:3", 4, 3, 41.dp, 31.dp),
 )
 
-private fun sizeFor(aspect: Aspect, resolution: Int): Pair<Int, Int> {
+internal fun sizeFor(aspect: Aspect, resolution: Int): Pair<Int, Int> {
     val short = minOf(aspect.w, aspect.h)
     val long = maxOf(aspect.w, aspect.h)
     if (short == long) return resolution to resolution
@@ -422,7 +422,7 @@ private fun sizeFor(aspect: Aspect, resolution: Int): Pair<Int, Int> {
     return if (aspect.w >= aspect.h) side to res else res to side
 }
 
-private fun aspectOf(width: Int, height: Int): String =
+internal fun aspectOf(width: Int, height: Int): String =
     Aspects.firstOrNull { sizeFor(it, minOf(width, height)) == width to height }?.key ?: CUSTOM
 
 private class FixedPosition(private val at: IntOffset) : PopupPositionProvider {
