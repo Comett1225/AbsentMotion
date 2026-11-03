@@ -17,6 +17,7 @@ fun copyLayers(
             node["parent"]?.toLongOrNull()?.let { result = result.with("parent", ids[it]?.toString() ?: node["parent"].takeIf { preserveOutsideParents }) }
             result = result.withSiblingRefs(ids::get)
         }
+        if (node.name == "valueLink") node["layer"]?.toLongOrNull()?.let { id -> ids[id]?.let { result = result.with("layer", "$it") } }
         return result.copy(children = node.children.map(::remap))
     }
     val shift = if (startTime == null || layers.isEmpty()) 0 else startTime - layers.minOf { it.startTime }

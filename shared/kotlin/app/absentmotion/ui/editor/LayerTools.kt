@@ -372,7 +372,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
     val selected = state.selected ?: return
     val panel = state.panel
     app.absentmotion.ui.editor.panels.BorderShadowLifetime(state, selected.id, panel)
-    val layer = selected
+    val layer = selected.copy(displayNumbers = linkedNumbers(state, selected, listOf(PropRef.Location, PropRef.Scale, PropRef.Rotation, PropRef.Pivot, PropRef.Opacity, PropRef.Tilt, PropRef.Skew)))
     if (panel == EditorPanel.Effects) {
         app.absentmotion.ui.editor.panels.EffectsPanel(state, modifier)
         return
@@ -409,12 +409,14 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
                 FrameButton(PanelIcons.Keyframe, stringResource(R.string.a11y_add_keyframe), Modifier.weight(1f).fillMaxWidth().dimmed(), enabled = false)
                 FrameButton(PanelIcons.Easing, stringResource(R.string.a11y_easing), Modifier.weight(1f).fillMaxWidth().dimmed(), enabled = false)
             } else {
+                val linked = layer.element(target.ref)?.children?.any { it.name == "valueLink" } == true
                 val onKeyframe = layer.onKeyframe(target.ref)
-                FrameButton(if (onKeyframe) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, stringResource(if (onKeyframe) R.string.a11y_remove_keyframe else R.string.a11y_add_keyframe), Modifier.weight(1f).fillMaxWidth().tutorialTarget("keyframe")) {
+                FrameButton(if (onKeyframe) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, stringResource(if (onKeyframe) R.string.a11y_remove_keyframe else R.string.a11y_add_keyframe), Modifier.weight(1f).fillMaxWidth().tutorialTarget("keyframe"), enabled = !linked) {
                     state.toggleKeyframe()
                 }
-                FrameButton(PanelIcons.Easing, stringResource(R.string.a11y_easing), Modifier.weight(1f).fillMaxWidth().tutorialTarget("easing")) { if (layer.easing(target.ref) != null) state.easingOpen = true else state.easingHint = true }
+                FrameButton(PanelIcons.Easing, stringResource(R.string.a11y_easing), Modifier.weight(1f).fillMaxWidth().tutorialTarget("easing"), enabled = !linked) { if (layer.easing(target.ref) != null) state.easingOpen = true else state.easingHint = true }
             }
+            ValueLinkControl(state, target, Modifier.weight(1f))
             if (move) {
                 Box(Modifier.weight(1f).fillMaxWidth()) {
                     FrameButton(PanelIcons.More, stringResource(R.string.effects_more), Modifier.fillMaxSize()) { menuOpen = true }

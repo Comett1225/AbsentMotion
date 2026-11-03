@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <set>
+#include <unordered_map>
 
 #include "include/core/SkCanvas.h"
 #include "include/core/SkPaint.h"
@@ -17,7 +18,116 @@
 
 namespace am {
 
+struct LinkContext {
+    std::vector<Layer> layers;
+    std::unordered_map<int64_t, size_t> ids;
+};
+
+namespace {
+thread_local const LinkContext* gLinks = nullptr;
+thread_local const Anim* gLinkStack[64];
+thread_local int gLinkComponents[64];
+thread_local int gLinkDepth = 0;
+thread_local bool gLinkCycle = false;
+thread_local int gLinkPlacement = 0;
+thread_local int64_t gLinkPlacementOwner = 0;
+
+bool PlacementLink(const Anim& anim) {
+    if (gLinkPlacement == 0 || anim.linkRole == 18) return true;
+    if (gLinkPlacement == 4) return anim.linkRole == 4 || anim.linkRole == 14;
+    if (gLinkPlacement == 3) return anim.linkRole == 3 || anim.linkRole == 13;
+    if (gLinkPlacement == 1 && anim.linkOwner == gLinkPlacementOwner) return anim.linkRole == 1 || anim.linkRole == 2 || anim.linkRole == 11;
+    return true;
+}
+
+const Anim* LinkAnim(const Layer& l, const ValueLink& link) {
+    if (link.kind == "effect") {
+        if (link.effect < 0 || link.effect >= (int)l.effects.size()) return nullptr;
+        const Property* p = l.effects[link.effect].prop(link.property.c_str());
+        return p ? &p->anim : nullptr;
+    }
+    if (link.kind != "transform") return nullptr;
+    if (link.property == "location") return &l.location;
+    if (link.property == "scale") return &l.scale;
+    if (link.property == "rotation") return &l.rotation;
+    if (link.property == "opacity") return &l.opacity;
+    if (link.property == "pivot") return &l.pivot;
+    if (link.property == "tilt") return &l.tilt;
+    if (link.property == "skew") return &l.skew;
+    return nullptr;
+}
+
+bool LinkedValue(const Anim& anim, int component, float t, float* value) {
+    const LinkContext* context = anim.linkContext ? anim.linkContext.get() : gLinks;
+    if (!context || !std::isfinite(t)) return false;
+    const ValueLink* link = nullptr;
+    for (const auto& l : anim.links) if (l.component == component) { link = &l; break; }
+    if (!link) return false;
+    if (gLinkDepth >= 64) { gLinkCycle = true; return false; }
+    for (int n = 0; n < gLinkDepth; n++) {
+        if (gLinkStack[n] == &anim && gLinkComponents[n] == component) { gLinkCycle = true; return false; }
+    }
+    const auto found = context->ids.find(link->layer);
+    if (found == context->ids.end()) return false;
+    const Layer& source = context->layers[found->second];
+    const Anim* from = LinkAnim(source, *link);
+    if (!from && (link->kind != "effect" || link->effect < 0 || link->effect >= (int)source.effects.size())) return false;
+    const bool root = gLinkDepth == 0;
+    if (root) gLinkCycle = false;
+    const LinkContext* previous = gLinks;
+    const int placement = gLinkPlacement;
+    const int64_t placementOwner = gLinkPlacementOwner;
+    gLinkPlacement = 0;
+    gLinks = context;
+    gLinkStack[gLinkDepth] = &anim;
+    gLinkComponents[gLinkDepth++] = component;
+    const double time = anim.linkStart + (double)t * (anim.linkEnd - anim.linkStart) - link->delay * 1000.0;
+    const float at = source.localTime(time);
+    const float fallback = link->kind == "transform" && (link->property == "scale" || link->property == "opacity") ? 1 : link->fallback;
+    const bool placed = link->kind == "transform" && (link->property == "location" || link->property == "scale" || link->property == "rotation") && (source.parent || FollowsPath(source));
+    float v = from && !placed ? from->get(link->sourceComponent, at, fallback) : fallback;
+    if (link->kind == "transform") {
+        if (link->property == "location" || link->property == "scale" || link->property == "rotation") {
+            Placement p{};
+            if (source.parent || FollowsPath(source)) {
+                gLinkPlacement = FollowsPath(source) ? 0 : link->property == "location" ? 1 : link->property == "scale" ? 3 : 4;
+                gLinkPlacementOwner = source.id;
+                p = EffectivePlacement(context->layers, source, time);
+                gLinkPlacement = 0;
+            } else {
+                p.scale = {1, 1};
+                if (link->property == "location") {
+                    if (source.effect("absent.randomdisplace")) {
+                        p.location = {source.location.get(0, at, 0), source.location.get(1, at, 0)};
+                        p.z = source.location.get(2, at, 0);
+                    }
+                    if (link->sourceComponent == 2) p.z = v;
+                    else if (link->sourceComponent == 1) p.location.fY = v;
+                    else p.location.fX = v;
+                } else if (link->property == "scale") {
+                    p.scale = {v, v};
+                } else p.rotation = v;
+                ApplyMotion(source, time, &p);
+            }
+            if (link->property == "location") v = link->sourceComponent == 2 ? p.z : (link->sourceComponent == 1 ? p.location.fY : p.location.fX);
+            if (link->property == "scale") v = link->sourceComponent == 1 ? p.scale.fY : p.scale.fX;
+            if (link->property == "rotation") v = p.rotation;
+        } else if (link->property == "opacity") {
+            v *= MotionOpacity(source, time);
+        }
+    }
+    --gLinkDepth;
+    gLinks = previous;
+    gLinkPlacement = placement;
+    gLinkPlacementOwner = placementOwner;
+    *value = v * link->multiply + link->add;
+    return !gLinkCycle && std::isfinite(*value);
+}
+}
+
 float Anim::get(int i, float t, float fallback) const {
+    float linked;
+    if (!links.empty() && PlacementLink(*this) && LinkedValue(*this, i, t, &linked)) return linked;
     auto at = [&](const std::vector<float>& v) { return i < (int)v.size() ? v[i] : fallback; };
     if (keys.empty()) return value.empty() ? fallback : at(value);
     if (!std::isfinite(t)) return at(keys.front().v);
@@ -36,7 +146,20 @@ float Anim::get(int i, float t, float fallback) const {
     return at(a.v) + (at(b.v) - at(a.v)) * u;
 }
 
+bool PropertyNumbers(const Layer& layer, int effect, const std::string& name, double timeMs, float values[3]) {
+    ValueLink ref;
+    ref.kind = effect < 0 ? "transform" : "effect";
+    ref.effect = effect;
+    ref.property = name;
+    const Anim* anim = LinkAnim(layer, ref);
+    if (!anim) return false;
+    const float t = layer.localTime(timeMs);
+    for (int i = 0; i < 3; i++) values[i] = anim->get(i, t, name == "scale" || name == "opacity" ? 1 : 0);
+    return true;
+}
+
 bool Anim::steady(float from, float to) const {
+    if (!links.empty()) return false;
     if (keys.empty()) return true;
     if (!std::isfinite(from) || !std::isfinite(to) || from > to) return false;
     const auto same = [](const std::vector<float>& a, const std::vector<float>& b) {
@@ -121,6 +244,27 @@ Anim ParseAnim(const XmlNode* node) {
     Anim a;
     if (!node) return a;
     a.value = ParseValue(node->attr("value"));
+    for (const auto& c : node->children) {
+        if (c->name != "valueLink" || a.links.size() >= 3) continue;
+        ValueLink link;
+        auto number = [&](const char* key, float fallback) {
+            const char* text = c->attr(key);
+            const float v = text ? strtof(text, nullptr) : fallback;
+            return std::isfinite(v) ? v : fallback;
+        };
+        const char* id = c->attr("layer");
+        link.layer = id ? strtoll(id, nullptr, 10) : 0;
+        link.component = (int)std::clamp(number("component", 0), 0.0f, 2.0f);
+        link.sourceComponent = (int)std::clamp(number("sourceComponent", 0), 0.0f, 2.0f);
+        link.effect = (int)std::clamp(number("effect", -1), -1.0f, 10000.0f);
+        link.kind = c->attr("kind") ? c->attr("kind") : "transform";
+        link.property = c->attr("property") ? c->attr("property") : "";
+        link.multiply = std::clamp(number("multiply", 1), -100000.0f, 100000.0f);
+        link.add = std::clamp(number("add", 0), -1000000.0f, 1000000.0f);
+        link.delay = std::clamp(number("delay", 0), -3600.0f, 3600.0f);
+        link.fallback = number("fallback", 0);
+        a.links.push_back(std::move(link));
+    }
     for (const auto& c : node->children) {
         if (c->name != "kf") continue;
         const char* t = c->attr("t");
@@ -254,6 +398,40 @@ std::string StrAttr(const XmlNode& n, const char* key) {
 Anim ParseAnimNode(const XmlNode* node) { return ParseAnim(node); }
 
 namespace {
+
+void LinkAnims(Layer& l, const std::function<void(Anim&)>& visit) {
+    int role = 1;
+    for (Anim* a : {&l.location, &l.pivot, &l.scale, &l.rotation, &l.skew, &l.opacity, &l.tilt}) {
+        a->linkRole = role++;
+        a->linkOwner = l.id;
+        visit(*a);
+    }
+    for (auto& e : l.effects) for (auto& p : e.props) {
+        p.anim.linkRole = e.id == "absent.spin" || e.id == "absent.swing" ? 14 : e.id == "absent.pulsesize" ? 13 : e.id == "absent.timequant" ? 18 : 11;
+        p.anim.linkOwner = l.id;
+        visit(p.anim);
+    }
+    l.steps.linkRole = 18;
+    l.steps.linkOwner = l.id;
+    visit(l.steps);
+}
+
+void BindLinks(std::vector<Layer>& layers) {
+    bool linked = false;
+    for (auto& l : layers) {
+        BindLinks(l.children);
+        LinkAnims(l, [&](Anim& a) {
+            a.linkStart = l.startTime;
+            a.linkEnd = l.endTime;
+            linked |= !a.links.empty();
+        });
+    }
+    if (!linked) return;
+    auto context = std::make_shared<LinkContext>();
+    context->layers = layers;
+    for (size_t i = 0; i < layers.size(); i++) context->ids.emplace(layers[i].id, i);
+    for (auto& l : layers) LinkAnims(l, [&](Anim& a) { if (!a.links.empty()) a.linkContext = context; });
+}
 
 bool ParseLayer(const XmlNode& n, int fps, Layer* out);
 
@@ -402,6 +580,7 @@ bool ParseScene(const std::string& xml, Scene* scene, std::string* error) {
         Layer l;
         if (ParseLayer(*n, next.fps, &l)) next.layers.push_back(std::move(l));
     }
+    BindLinks(next.layers);
     std::sort(next.beats.begin(), next.beats.end());
     next.beats.erase(std::unique(next.beats.begin(), next.beats.end()), next.beats.end());
     *scene = std::move(next);

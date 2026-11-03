@@ -146,6 +146,7 @@ public:
     void trim() override;
     void flushPartial();
     bool layerQuad(int64_t layerId, double timeMs, float xy[8]) override;
+    bool propertyNumbers(int64_t layerId, int effect, const std::string& name, double timeMs, float values[3]) override;
     bool layerMatrix(int64_t layerId, double timeMs, float m[18]) override;
     bool layerBounds(int64_t layerId, double timeMs, float ltrb[4]) override;
     int64_t hitTest(float x, float y, double timeMs) override;
@@ -1257,6 +1258,11 @@ bool EngineImpl::layerQuad(int64_t layerId, double timeMs, float xy[8]) {
         xy[2 * i + 1] = corners[i].fY;
     }
     return true;
+}
+
+bool EngineImpl::propertyNumbers(int64_t layerId, int effect, const std::string& name, double timeMs, float values[3]) {
+    const Layer* layer = fScene.layer(layerId);
+    return layer && PropertyNumbers(*layer, effect, name, timeMs, values);
 }
 
 bool EngineImpl::layerMatrix(int64_t layerId, double timeMs, float m[18]) {

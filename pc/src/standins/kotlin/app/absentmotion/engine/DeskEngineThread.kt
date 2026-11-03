@@ -335,6 +335,7 @@ class EngineThread(private val background: Int, private val context: Context? = 
     }
 
     suspend fun layerQuad(layerId: Long, timeMs: Int): FloatArray? = query(timeMs) { it.layerQuad(layerId, timeMs.toDouble()) }
+    suspend fun propertyNumbers(layerId: Long, effect: Int, name: String, timeMs: Int): FloatArray? = query(timeMs) { it.propertyNumbers(layerId, effect, name, timeMs.toDouble()) }
     suspend fun layerMatrix(layerId: Long, timeMs: Int): FloatArray? = query(timeMs) { it.layerMatrix(layerId, timeMs.toDouble()) }
     suspend fun layerBounds(layerId: Long, timeMs: Int): FloatArray? = query(timeMs) { it.layerBounds(layerId, timeMs.toDouble()) }
     suspend fun layerOutline(layerId: Long, timeMs: Int): String? = query(timeMs) { it.layerOutline(layerId, timeMs.toDouble()) }

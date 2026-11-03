@@ -249,6 +249,19 @@ JNIEXPORT jfloatArray JNICALL JNI_FN(nativeLayerQuad)(JNIEnv* env, jclass, jlong
     return out;
 }
 
+JNIEXPORT jfloatArray JNICALL JNI_FN(nativePropertyNumbers)(JNIEnv* env, jclass, jlong engine, jlong layerId, jint effect, jstring name, jdouble timeMs) {
+    const char* text = env->GetStringUTFChars(name, nullptr);
+    if (!text) return nullptr;
+    float values[3];
+    const bool ok = engineOf(engine)->propertyNumbers(layerId, effect, text, timeMs, values);
+    env->ReleaseStringUTFChars(name, text);
+    if (!ok) return nullptr;
+    jfloatArray out = env->NewFloatArray(3);
+    if (!out) return nullptr;
+    env->SetFloatArrayRegion(out, 0, 3, values);
+    return out;
+}
+
 JNIEXPORT jfloatArray JNICALL JNI_FN(nativeLayerMatrix)(JNIEnv* env, jclass, jlong engine, jlong layerId, jdouble timeMs) {
     float m[18];
     if (!engineOf(engine)->layerMatrix(layerId, timeMs, m)) return nullptr;

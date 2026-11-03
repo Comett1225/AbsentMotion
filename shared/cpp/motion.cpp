@@ -40,7 +40,7 @@ double Integral(const LayerEffect& e, const char* name, const Layer& l, double s
     const Anim* a = Find(e, name);
     if (!a) return fallback * seconds;
     const double length = (l.endTime - l.startTime) / 1000.0;
-    if (a->keys.empty() || !(length > 0)) return a->get(0, 0, fallback) * seconds;
+    if ((a->keys.empty() && a->links.empty()) || !(length > 0)) return a->get(0, 0, fallback) * seconds;
     auto f = [&](double s) { return (double)a->get(0, (float)(s / length), fallback); };
     std::vector<double> marks = {0, seconds};
     const auto mark = [&](double s) { if (s > 0 && s < seconds) marks.push_back(s); };
@@ -164,16 +164,27 @@ void Ranged(const Layer& l, const LayerEffect& e, float t, std::vector<Spot> spo
         std::sort(order.begin(), order.end(), [&](size_t a, size_t b) { return Unit(seed, (int64_t)a) < Unit(seed, (int64_t)b); });
         for (size_t k = 0; k < order.size(); k++) spots[order[k]].u = (float)k / (order.size() - 1);
     }
+    const float delay = std::clamp(Param(e, "copyDelay", t, 0), -60.0f, 60.0f);
+    const float randomX = std::clamp(ParamAt(e, "randomPosition", 0, t, 0), 0.0f, 99999.0f);
+    const float randomY = std::clamp(ParamAt(e, "randomPosition", 1, t, 0), 0.0f, 99999.0f);
+    const float randomTurn = std::clamp(Param(e, "randomRotation", t, 0), 0.0f, 3600.0f);
+    const float randomScale = std::clamp(Param(e, "randomScale", t, 0), 0.0f, 10.0f);
+    const float randomAlpha = std::clamp(Param(e, "randomOpacity", t, 0), 0.0f, 1.0f);
+    const uint64_t seed = SeedOf(l, e, t, 21);
+    if ((delay != 0 || randomX != 0 || randomY != 0 || randomTurn != 0 || randomScale != 0 || randomAlpha != 0) && spots.size() > 256) spots.resize(256);
     for (auto s = spots.rbegin(); s != spots.rend(); ++s) {
         const float x = end - start > 1e-6f ? std::clamp((s->u - start) / (end - start), 0.0f, 1.0f) : (s->u >= start ? 1.0f : 0.0f);
         const float w = Eased(easing, x);
         RepeatCopy c;
         c.outer = s->outer;
-        c.local = SkMatrix::Translate(s->at.fX + shift.fX * w, s->at.fY + shift.fY * w);
-        c.local.preRotate(s->turn + turn * w);
-        const float k = s->size * Lerp(1, scale, w);
+        const int64_t index = (int64_t)(s.base() - spots.begin() - 1);
+        auto random = [&](int channel) { return (float)(Unit(seed, index * 5 + channel) * 2 - 1); };
+        c.shiftMs = -delay * 1000.0 * index;
+        c.local = SkMatrix::Translate(s->at.fX + shift.fX * w + randomX * random(0), s->at.fY + shift.fY * w + randomY * random(1));
+        c.local.preRotate(s->turn + turn * w + randomTurn * random(2));
+        const float k = s->size * Lerp(1, scale, w) * std::max(0.0f, 1 + randomScale * random(3));
         c.local.preScale(k, k);
-        c.alpha = Lerp(1, opacity, w);
+        c.alpha = std::clamp(Lerp(1, opacity, w) + randomAlpha * random(4), 0.0f, 1.0f);
         c.tint = fill;
         c.tinted = fillAmount * w;
         out->push_back(c);
@@ -216,8 +227,8 @@ void Linear(const LayerEffect& e, float t, std::vector<Spot>* spots) {
     }
 }
 
-void Grid(const LayerEffect& e, float t, std::vector<Spot>* spots) {
-    const int n = CountOf(e, t, 5, 150);
+void Grid(const LayerEffect& e, float t, std::vector<Spot>* spots, int most) {
+    const int n = CountOf(e, t, 5, most);
     const SkPoint span = {ParamAt(e, "position", 0, t, 500), ParamAt(e, "position", 1, t, 500)};
     const float stagger = Param(e, "stagger", t, 0);
     const int total = n * n;
@@ -577,6 +588,7 @@ void RepeatCopies(const Layer& l, double timeMs, const RepeatSpace& space, std::
     const double s = Seconds(l, timeMs);
     std::vector<RepeatCopy> result(1);
     bool repeated = false;
+    size_t limit = kMaxCopies;
     for (const LayerEffect& e : l.effects) {
         if (e.hidden) continue;
         if (e.id == "absent.randomdisplace") {
@@ -591,6 +603,8 @@ void RepeatCopies(const Layer& l, double timeMs, const RepeatSpace& space, std::
         }
         if (!RepeatEffect(e.id)) continue;
         repeated = true;
+        for (const char* key : {"copyDelay", "randomRotation", "randomScale", "randomOpacity"}) if (Param(e, key, t, 0) != 0) limit = 256;
+        if (ParamAt(e, "randomPosition", 0, t, 0) != 0 || ParamAt(e, "randomPosition", 1, t, 0) != 0) limit = 256;
         const std::string_view id = std::string_view(e.id).substr(7);
         std::vector<RepeatCopy> made;
         std::vector<Spot> spots;
@@ -598,16 +612,17 @@ void RepeatCopies(const Layer& l, double timeMs, const RepeatSpace& space, std::
         else if (id == "scatterfield") Scatter(l, e, t, space, &made);
         else {
             if (id == "linearrepeat") Linear(e, t, &spots);
-            else if (id == "gridrepeat") Grid(e, t, &spots);
+            else if (id == "gridrepeat") Grid(e, t, &spots, limit == 256 ? 16 : 150);
             else if (id == "radialrepeat") Radial(e, t, &spots);
             else OnPath(e, t, space, &spots);
             Ranged(l, e, t, std::move(spots), &made);
         }
         std::vector<RepeatCopy> next;
-        next.reserve(std::min(kMaxCopies, made.size() * result.size()));
+        next.reserve(std::min(limit, made.size() * result.size()));
         for (const RepeatCopy& m : made) {
+            if (next.size() >= limit) break;
             for (const RepeatCopy& r : result) {
-                if (next.size() >= kMaxCopies) break;
+                if (next.size() >= limit) break;
                 RepeatCopy c = r;
                 c.outer = m.outer * r.outer;
                 c.local = m.local * r.local;

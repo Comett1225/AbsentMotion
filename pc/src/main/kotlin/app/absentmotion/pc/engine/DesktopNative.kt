@@ -33,6 +33,7 @@ object DesktopNative {
     external fun dropPicture(handle: Long, uri: String)
     external fun setCameraView(handle: Long, on: Boolean)
     external fun setAccurateBlur(handle: Long, on: Boolean)
+    external fun propertyNumbers(handle: Long, layerId: Long, effect: Int, name: String, timeMs: Double): FloatArray?
     external fun layerMatrix(handle: Long, id: Long, timeMs: Double): FloatArray?
     external fun layerBounds(handle: Long, id: Long, timeMs: Double): FloatArray?
     external fun layerOutline(handle: Long, id: Long, timeMs: Double): String?

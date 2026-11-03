@@ -32,13 +32,26 @@ struct Keyframe {
     Easing easing;
 };
 
+struct LinkContext;
+
+struct ValueLink {
+    int component = 0, sourceComponent = 0, effect = -1;
+    int64_t layer = 0;
+    std::string kind, property;
+    float multiply = 1, add = 0, delay = 0, fallback = 0;
+};
+
 struct Anim {
     std::vector<float> value;
     std::vector<Keyframe> keys;
     Keyframe lead;
     bool hasLead = false;
+    std::vector<ValueLink> links;
+    std::shared_ptr<const LinkContext> linkContext;
+    int linkStart = 0, linkEnd = 0, linkRole = 0;
+    int64_t linkOwner = 0;
 
-    bool empty() const { return value.empty() && keys.empty(); }
+    bool empty() const { return value.empty() && keys.empty() && links.empty(); }
     float get(int i, float t, float fallback) const;
     bool steady(float from, float to) const;
 };
@@ -259,6 +272,7 @@ struct Scene {
     const Layer* layer(int64_t id) const;
 };
 
+bool PropertyNumbers(const Layer& layer, int effect, const std::string& name, double timeMs, float values[3]);
 bool ParseScene(const std::string& xml, Scene* scene, std::string* error);
 Anim ParseAnimNode(const XmlNode* node);
 void ParseStyle(const XmlNode& node, Layer* layer);

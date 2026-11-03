@@ -73,6 +73,8 @@ class NativeEngine(backend: Backend) : AutoCloseable {
 
     fun layerQuad(layerId: Long, timeMs: Double): FloatArray? = nativeLayerQuad(handle, layerId, timeMs)
 
+    fun propertyNumbers(layerId: Long, effect: Int, name: String, timeMs: Double): FloatArray? = nativePropertyNumbers(handle, layerId, effect, name, timeMs)
+
     fun layerMatrix(layerId: Long, timeMs: Double): FloatArray? = nativeLayerMatrix(handle, layerId, timeMs)
 
     fun layerBounds(layerId: Long, timeMs: Double): FloatArray? = nativeLayerBounds(handle, layerId, timeMs)
@@ -143,6 +145,7 @@ class NativeEngine(backend: Backend) : AutoCloseable {
         @JvmStatic private external fun nativeFastCaptionCpu(): Boolean
         @JvmStatic private external fun nativeLayerBounds(engine: Long, layerId: Long, timeMs: Double): FloatArray?
         @JvmStatic private external fun nativeLayerQuad(engine: Long, layerId: Long, timeMs: Double): FloatArray?
+        @JvmStatic private external fun nativePropertyNumbers(engine: Long, layerId: Long, effect: Int, name: String, timeMs: Double): FloatArray?
         @JvmStatic private external fun nativeLayerMatrix(engine: Long, layerId: Long, timeMs: Double): FloatArray?
         @JvmStatic private external fun nativeLayerOutline(engine: Long, layerId: Long, timeMs: Double): String?
         @JvmStatic private external fun nativeHitTest(engine: Long, x: Float, y: Float, timeMs: Double): Long
