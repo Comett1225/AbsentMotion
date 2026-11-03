@@ -1011,6 +1011,26 @@
       "note": ""
     },
     {
+      "id": "effect.parenting_helper",
+      "name": "Parenting Helper and Scale Assist effects (own versions of Alight Motion's), imported from Alight projects",
+      "where": "motion.cpp ParentTerms/ParentRoll/ApplyMotion, styles.cpp Effective, effects/parenthelper.json, scaleassist.json, foreign.json",
+      "android": "works",
+      "macos": "untested",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "Same engine code on every platform (host renders on the Mac match Alight's measured behaviour); the effect panel was not opened in the desktop app"
+    },
+    {
+      "id": "import.alight_orientation",
+      "name": "Alight Motion 3D orientation (quaternion) and Rotation row converted for the 3D solid effects, static and keyframed",
+      "where": "compat/Orientation.kt, EffectMigration.kt, foreign.json (orientation)",
+      "android": "works",
+      "macos": "untested",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "Pure Kotlin conversion, covered by JVM unit tests; the desktop app was not run on an imported project"
+    },
+    {
       "id": "home.open_with",
       "name": "Open a file from the OS (Open with, share)",
       "where": "android ImportActivity.kt, pc Main.kt, desk/DeskOpen.kt",

@@ -1,0 +1,48 @@
+{
+ "id": "scaleassist",
+ "name": "Scale Assist",
+ "category": "move",
+ "since": "5.0.0",
+ "native": true,
+ "description": "Adds extra scale on top of the layer's own size along X, Y, both, or X with Y the other way. Layers parented to it follow the new size.",
+ "params": [
+  {
+   "id": "axis",
+   "label": "Axis",
+   "type": "choice",
+   "default": 3,
+   "options": [
+    "X",
+    "Y",
+    "X,Y",
+    "X,-Y"
+   ]
+  },
+  {
+   "id": "scale",
+   "label": "Scale",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 100,
+   "step": 0.01,
+   "percent": true
+  },
+  {
+   "id": "damp",
+   "label": "Damping",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 100,
+   "step": 0.01,
+   "percent": true,
+   "when": {
+    "axis": [
+     2,
+     3
+    ]
+   }
+  }
+ ]
+}

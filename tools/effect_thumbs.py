@@ -129,6 +129,17 @@ def layer(id, image, effect="", half=RENDER // 2, keys=None, end=999, shape=".re
             f'<property name="size" type="vec2" value="{hw},{hh}"/>{effect}</shape>')
 
 
+def parented(id, image, effect, half, end):
+    c = RENDER // 2
+    keys = lambda tag, values: f"<{tag}>" + "".join(f'<kf t="{k / (len(values) - 1):.6f}" v="{v}"/>' for k, v in enumerate(values)) + f"</{tag}>"
+    parent = (f'<nullobj id="{id}" label="parent" startTime="0" endTime="{end}"><transform><location value="{c},{c},0"/>'
+              f'{keys("scale", ["1,1", "1.6,1.6", "1,1"])}{keys("rotation", [0, 360])}</transform></nullobj>')
+    child = (f'<shape id="{id + 1}" label="{image}" startTime="0" endTime="{end}" s=".rect" fillType="media" mediaFillMode="fill" '
+             f'fillImage="file://{APP_PATH}/{image}.png" parent="{id}"><transform><location value="{RENDER // 5},0,0"/></transform>'
+             f'<property name="size" type="vec2" value="{half},{half}"/>{effect}</shape>')
+    return parent + child
+
+
 def words(id, content, effect="", end=999):
     c = RENDER // 2
     return (f'<text id="{id}" label="text" startTime="0" endTime="{end}" fillType="color" size="18" wrapWidth="{RENDER - 48}" '
@@ -147,7 +158,7 @@ def sketch(id, effect="", end=999):
 
 
 def backdrops(show):
-    return ["grid"] if show.get("layout") in ("move", "repeat", "text", "drawing") else [show["under"]] if "under" in show else []
+    return ["grid"] if show.get("layout") in ("move", "repeat", "text", "drawing", "parent") else [show["under"]] if "under" in show else []
 
 
 def path_layer(show, end):
@@ -192,6 +203,8 @@ def scene(show, effect, preset=None):
         layers.append(words(2, show["text"], fx, total - 1))
     elif show.get("layout") == "drawing":
         layers.append(sketch(2, fx, total - 1))
+    elif show.get("layout") == "parent":
+        layers.append(parented(2, show["photo"], fx, show.get("half") or RENDER // 8, total - 1))
     else:
         half = show.get("half") or {"move": RENDER // 4, "repeat": RENDER // 12}.get(show.get("layout"), RENDER // 2)
         layers.append(layer(2, show["photo"], fx, half, show.get("keys"), total - 1, show.get("shape", ".rect")))

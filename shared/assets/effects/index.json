@@ -159,6 +159,8 @@
  "offset",
  "rastertransform",
  "movealongpath",
+ "scaleassist",
+ "parenthelper",
  "echo",
  "timequant",
  "shutterblur",
