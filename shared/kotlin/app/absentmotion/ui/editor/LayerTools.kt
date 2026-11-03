@@ -244,7 +244,7 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
                 else if (storage.ready { shoot() }) shoot()
             } else null,
         )
-        if (side) TileRows((rows.flatten() + more).chunked(2), 2)
+        if (side) (rows.flatten() + more).let { tiles -> sideColumns(tiles.size, LocalSideHeight.current).let { TileRows(tiles.chunked(it), it) } }
         else if (more.isEmpty()) TileRows(rows, null)
         else key(state.selectedId) {
             val pager = rememberPagerState { 2 }
@@ -261,6 +261,12 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
     }
     AiProgressDialog(ai)
 }
+
+internal fun sideColumns(count: Int, available: Dp): Int =
+    (2..3).firstOrNull { columns -> SideToolsTop + SideToolsRow * ((count + columns - 1) / columns) <= available } ?: 4
+
+private val SideToolsTop = 57.dp
+private val SideToolsRow = 63.dp
 
 @Composable
 private fun TileRows(rows: List<List<Tile>>, columns: Int?) {

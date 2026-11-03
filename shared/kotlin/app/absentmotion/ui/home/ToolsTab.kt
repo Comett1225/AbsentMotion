@@ -87,6 +87,7 @@ import app.absentmotion.library.ProjectStore
 import app.absentmotion.media.mediaDeclaration
 import app.absentmotion.model.Scene
 import app.absentmotion.platform.PlatformFeatures
+import app.absentmotion.ui.editor.LocalWide
 import app.absentmotion.platform.DialogStatusBarIcons
 import app.absentmotion.platform.LocalContext
 import app.absentmotion.platform.Toast
@@ -164,6 +165,9 @@ internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSett
         Spacer(Modifier.height(24.dp))
         if (PlatformFeatures.desktop) FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             compressCard(Modifier.width(380.dp))
+        } else if (LocalWide.current) FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            compressCard(Modifier.width(360.dp))
+            downloaderCard(Modifier.width(360.dp))
         } else {
             compressCard(Modifier)
             Spacer(Modifier.height(12.dp))

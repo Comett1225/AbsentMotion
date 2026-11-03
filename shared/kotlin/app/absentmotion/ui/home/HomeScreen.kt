@@ -59,6 +59,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithCache
@@ -105,6 +106,7 @@ import app.absentmotion.library.ImportReport
 import app.absentmotion.library.ProjectInfo
 import app.absentmotion.library.ProjectStore
 import app.absentmotion.ui.editor.ChromeIcons
+import app.absentmotion.ui.editor.LocalTablet
 import app.absentmotion.ui.editor.LocalWide
 import app.absentmotion.ui.editor.NoMatches
 import app.absentmotion.ui.editor.SearchField
@@ -177,7 +179,7 @@ fun HomeScreen(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val navInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-    val wide = LocalWide.current
+    val wide = (LocalWide.current || LocalTablet.current) && wideHeaderFits(androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp, LocalDensity.current.fontScale)
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { version++ }
     app.absentmotion.platform.BackHandler(search != null) { search = null }
@@ -202,9 +204,9 @@ fun HomeScreen(
             Column(Modifier.fillMaxSize().statusBarsPadding()) {
                 if (wide) WideHeader(page, tab, { p, t -> page = p; tab = t; if (p == 2) search = null }, onSettings = { scope.launch { drawer.open() } }, onNew = newProject, search, { search = it })
                 else TopBar(onMenu = { scope.launch { drawer.open() } }, search, page, { search = it })
-                val narrow = Modifier.weight(1f).then(if (wide) Modifier.widthIn(max = 760.dp).align(Alignment.CenterHorizontally) else Modifier)
-                if (page == 2) ToolsTab(narrow, store, settings) { id -> version++; onOpen(id) }
-                else if (page == 1) TemplatesTab(version, onTemplate, onTemplateProject, narrow, query) else ProjectsPane(
+                val fill = Modifier.weight(1f)
+                if (page == 2) ToolsTab(fill, store, settings) { id -> version++; onOpen(id) }
+                else if (page == 1) TemplatesTab(version, onTemplate, onTemplateProject, fill, query) else ProjectsPane(
                     Modifier.weight(1f), shown, loaded, tab, { tab = it }, settings, version, onOpen, onExport, query,
                     onUpload = { picker.launch(arrayOf("text/xml", "application/xml", "application/zip", "application/octet-stream")) },
                     onDuplicate = { id -> if (!duplicating) {
@@ -235,6 +237,8 @@ fun HomeScreen(
         }
     }
 }
+
+internal fun wideHeaderFits(widthDp: Int, fontScale: Float): Boolean = widthDp >= 380 + 340 * fontScale.coerceAtLeast(1f)
 
 @Composable
 private fun TopBar(onMenu: () -> Unit, search: String?, page: Int, onSearch: (String?) -> Unit) {

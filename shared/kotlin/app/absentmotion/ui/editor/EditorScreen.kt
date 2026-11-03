@@ -87,7 +87,7 @@ private fun EditorBody(state: EditorState, onExit: () -> Unit) {
         onDispose { lifecycle.removeObserver(observer) }
     }
     if (!app.absentmotion.platform.PlatformFeatures.desktop && !wide && state.panel == EditorPanel.EditText && state.selected?.kind == "text") {
-        PhoneScreen { TextEditor(state) }
+        PhoneScreen(plain = true) { TextEditor(state) }
         return
     }
     if (!app.absentmotion.platform.PlatformFeatures.desktop && state.drawing != null) {

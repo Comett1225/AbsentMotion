@@ -921,6 +921,16 @@
       "note": ""
     },
     {
+      "id": "home.tablet_layout",
+      "name": "Tablet layouts: panels beside the preview in landscape and portrait, grid Home with templates and tools in columns",
+      "where": "WideEditor.kt, EditorScreen.kt, LayerTools.kt, HomeScreen.kt, TemplatesTab.kt, ToolsTab.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "The desktop has its own workspace and Home, so a tablet size does not apply there"
+    },
+    {
       "id": "home.assets",
       "name": "Assets tab (reusable asset projects)",
       "where": "HomeScreen.kt, desk Home",
