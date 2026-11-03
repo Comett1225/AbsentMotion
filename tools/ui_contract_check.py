@@ -44,7 +44,7 @@ class UiContracts(unittest.TestCase):
         self.assertIn('Lifecycle.Event.ON_RESUME', text)
 
     def test_export_probes_missing_media_inside_the_export_job_on_io(self):
-        before, job = source('ui/export/ExportScreen.kt').split('val job = scope.launch {', 1)
+        before, job = source('ui/export/ExportScreen.kt').split('val job = app.absentmotion.platform.exportScope(scope).launch {', 1)
         self.assertNotIn('openAssetFileDescriptor', before)
         self.assertIn('val missing = withContext(Dispatchers.IO) {', job)
         self.assertIn('AudioClip.of(scene).isNotEmpty()', before)
@@ -235,7 +235,7 @@ class UiContracts(unittest.TestCase):
         text = source('ui/editor/Preview.kt')
         guard = 'handleScale(handle, startQuad, pivot, position + handleGrab, startLayer.scale, 8.dp.toPx()) ?: continue'
         self.assertIn(guard, text)
-        self.assertLess(text.index(guard), text.index('state.editSelected(key = "preview-handle")'))
+        self.assertLess(text.index(guard), text.index('state.editSelected(key = "preview-handle") { it.withTransform("scale"'))
         self.assertIn('if (grabbed.getDistance() < reach) return null', text)
         self.assertIn('if (abs(along) < reach) return null', text)
 

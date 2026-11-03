@@ -196,13 +196,22 @@ void RenderPreview(SkCanvas* canvas, int width, int height, const Scene& scene, 
             if (world) DrawWorld(target, *shown, timeMs, pictures, fx);
             else DrawScene(target, *shown, timeMs, pictures, fx);
         };
+        const int divisor = std::max(view.pixelDivisor, 1);
+        const int bufferW = (int)lroundf(width / scale / divisor), bufferH = (int)lroundf(height / scale / divisor);
+        const bool pixelArt = view.pixels && bufferW > 0 && bufferH > 0 && (bufferW < width || bufferH < height);
         if ((scene.bgColor >> 24) != 0xff) {
             const SkRect area = world ? SkRect::MakeIWH(width, height) : SkRect::MakeXYWH(dx, dy, scene.width * scale, scene.height * scale);
+            SkRect covered = area;
+            if (pixelArt && !world) {
+                const float kx = (float)bufferW / width, ky = (float)bufferH / height;
+                const float bx = roundf(dx * kx), by = roundf(dy * ky);
+                covered = SkRect::MakeLTRB(bx / kx, by / ky, (bx + floorf(scene.width * scale * kx)) / kx, (by + floorf(scene.height * scale * ky)) / ky);
+            }
             const float cell = 25.0f * px;
             SkPaint dark;
             dark.setColor(SkColorSetRGB(0xcc, 0xcc, 0xcc));
             canvas->save();
-            canvas->clipRect(area, true);
+            canvas->clipRect(SkRect::Make(covered.roundIn()), false);
             canvas->drawColor(SkColorSetRGB(0xe5, 0xe5, 0xe5));
             const SkRect seen = canvas->getLocalClipBounds();
             const int firstRow = std::max(0, (int)floorf((area.bottom() - seen.bottom()) / cell));
@@ -215,10 +224,8 @@ void RenderPreview(SkCanvas* canvas, int width, int height, const Scene& scene, 
             canvas->restore();
         }
         const LayerEffects& fx = effects;
-        const int divisor = std::max(view.pixelDivisor, 1);
-        const int bufferW = (int)lroundf(width / scale / divisor), bufferH = (int)lroundf(height / scale / divisor);
         sk_sp<SkSurface> buffer;
-        if (view.pixels && bufferW > 0 && bufferH > 0 && (bufferW < width || bufferH < height)) {
+        if (pixelArt) {
             buffer = canvas->makeSurface(canvas->imageInfo().makeWH(bufferW, bufferH));
         }
         if (buffer) {

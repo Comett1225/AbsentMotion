@@ -53,13 +53,13 @@ internal fun DeskProject(state: EditorState, modifier: Modifier = Modifier) {
     val layers = remember(state.scene) { state.scene.layers.asReversed() }
     val list = rememberLazyListState()
     LazyColumn(modifier.deskScrollbar(list).padding(horizontal = 12.dp), list, contentPadding = PaddingValues(bottom = 12.dp)) {
-        item(key = "name") {
+        if (!state.inGroup) item(key = "name") {
             Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text(stringResource(R.string.desk_name), color = Am.OnDarkDim, fontSize = 13.sp, maxLines = 1)
                 DeskNameField(state.scene.title, Modifier.weight(1f)) { state.rename(it) }
             }
         }
-        item(key = "settings") { DeskSettings(state) }
+        if (!state.inGroup) item(key = "settings") { DeskSettings(state) }
         item(key = "layers-title") { DeskHeading(stringResource(R.string.desk_layers), Modifier.padding(top = 16.dp, bottom = 4.dp)) }
         items(layers, key = { it.id }) { layer ->
             Row(Modifier.fillMaxWidth().height(36.dp).clip(RoundedCornerShape(6.dp)).hoverFill(6.dp, Am.Field).handCursor().clickable { state.selectedId = layer.id; state.panel = EditorPanel.Tools }.padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically) {

@@ -1489,6 +1489,7 @@ private suspend fun PointerInputScope.desktopTimelineGestures(view: TimelineView
         var moved = false
         var previous = Offset.Zero
         var lastClickId: Long? = null
+        var lastHeaderId: Long? = null
         var lastClickTime = 0L
         var grab: Offset? = null
         while (true) {
@@ -1590,13 +1591,23 @@ private suspend fun PointerInputScope.desktopTimelineGestures(view: TimelineView
                     is Hit.Bar -> {
                         if (plain && MultiSelect.active) { MultiSelect.clear(); view.state.selectedId = h.id; view.state.panel = EditorPanel.Tools }
                         if (lastClickId == h.id && change.uptimeMillis - lastClickTime <= viewConfiguration.doubleTapTimeoutMillis) {
-                            view.state.selectedId = h.id
-                            MultiSelect.clear()
-                            view.state.panel = if (view.state.scene.layer(h.id)?.kind == "text") EditorPanel.EditText else EditorPanel.Tools
+                            val layer = view.state.scene.layer(h.id)
+                            if (plain && layer?.isPlainGroup == true) view.state.enterGroup(h.id)
+                            else {
+                                view.state.selectedId = h.id
+                                MultiSelect.clear()
+                                view.state.panel = if (layer?.kind == "text") EditorPanel.EditText else EditorPanel.Tools
+                            }
                             lastClickId = null
-                        } else { lastClickId = h.id; lastClickTime = change.uptimeMillis }
+                        } else { lastClickId = h.id; lastHeaderId = null; lastClickTime = change.uptimeMillis }
                     }
-                    is Hit.Header -> if (plain && MultiSelect.active) { MultiSelect.clear(); view.state.selectedId = h.id; view.state.panel = EditorPanel.Tools }
+                    is Hit.Header -> {
+                        if (plain && MultiSelect.active) { MultiSelect.clear(); view.state.selectedId = h.id; view.state.panel = EditorPanel.Tools }
+                        if (lastHeaderId == h.id && change.uptimeMillis - lastClickTime <= viewConfiguration.doubleTapTimeoutMillis) {
+                            if (plain && view.state.scene.layer(h.id)?.isPlainGroup == true) view.state.enterGroup(h.id)
+                            lastHeaderId = null
+                        } else { lastHeaderId = h.id; lastClickId = null; lastClickTime = change.uptimeMillis }
+                    }
                     Hit.Readout -> view.tap(h)
                     Hit.Empty, is Hit.Row -> view.state.clearSelection()
                     else -> Unit

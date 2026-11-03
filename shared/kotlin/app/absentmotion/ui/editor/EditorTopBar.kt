@@ -3,6 +3,8 @@ package app.absentmotion.ui.editor
 import app.absentmotion.ui.tutorial.tutorialTarget
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -41,6 +43,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 import app.absentmotion.editor.MultiSelect
@@ -50,6 +53,9 @@ import app.absentmotion.editor.deleteSelected
 import app.absentmotion.editor.rename
 import app.absentmotion.editor.renameLayer
 import app.absentmotion.editor.stepBack
+import app.absentmotion.platform.PlatformFeatures
+import app.absentmotion.ui.home.handCursor
+import app.absentmotion.ui.home.hoverFill
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Presence
 import app.absentmotion.ui.theme.animatedBackground
@@ -90,25 +96,21 @@ fun EditorTopBar(state: EditorState, onExit: () -> Unit, modifier: Modifier = Mo
         if (inPanel) {
             Text(stringResource(state.panel.title), Modifier.weight(1f).enterFade(), color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
         } else if (crumbs) {
-            val names = state.groupNames
             Row(Modifier.weight(1f).padding(start = 8.dp).enterFade(), verticalAlignment = Alignment.CenterVertically) {
-                Row(
-                    Modifier.weight(1f, fill = false).clip(RoundedCornerShape(6.dp)).background(Am.Field).clickable { act { state.leaveGroups() } }
-                        .padding(horizontal = 6.dp, vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(SelectionIcons.ToProject, stringResource(R.string.group_leave), Modifier.size(16.dp), tint = Am.OnDark)
-                    Spacer(Modifier.width(4.dp))
-                    Text(state.project.title, color = Am.OnDark, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                }
-                names.forEachIndexed { i, name ->
-                    Icon(SelectionIcons.Previous, null, Modifier.padding(horizontal = 4.dp).size(16.dp), tint = Am.OnDarkDim)
-                    val last = i == names.lastIndex
-                    Text(name, (if (last) Modifier else Modifier.clickable { act { state.exitTo(i + 1) } }).weight(1f, fill = false),
-                        color = if (last) Am.OnDark else Am.OnDarkDim, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                }
+                GroupCrumbs(state, 15.sp) { act(it) }
             }
         } else {
+            if (layer != null && state.inGroup) {
+                Row(
+                    Modifier.padding(start = 2.dp).widthIn(max = 104.dp).clip(RoundedCornerShape(6.dp)).background(Am.Field)
+                        .clickable { act { state.exitGroup() } }.padding(horizontal = 6.dp, vertical = 4.dp).enterFade(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(SelectionIcons.Group, stringResource(R.string.group_leave), Modifier.size(16.dp), tint = Am.OnDark)
+                    Spacer(Modifier.width(4.dp))
+                    Text(state.groupNames.lastOrNull().orEmpty(), color = Am.OnDark, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                }
+            }
             key(layer?.id) {
                 val id = layer?.id
                 NameField(layer?.label ?: state.scene.title, Modifier.weight(1f).fillMaxHeight().enterFade()) { name ->
@@ -134,6 +136,30 @@ fun EditorTopBar(state: EditorState, onExit: () -> Unit, modifier: Modifier = Mo
         Presence(settingsOpen) { ProjectSettingsPopup(state) { settingsOpen = false } }
     }
 }
+
+@Composable
+internal fun RowScope.GroupCrumbs(state: EditorState, fontSize: TextUnit, act: (() -> Unit) -> Unit) {
+    val names = state.groupNames
+    Row(
+        Modifier.weight(1f, fill = false).clip(RoundedCornerShape(6.dp)).background(Am.Field).crumbHover(6.dp).clickable { act { state.leaveGroups() } }
+            .padding(horizontal = 6.dp, vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(SelectionIcons.ToProject, stringResource(R.string.group_leave), Modifier.size(16.dp), tint = Am.OnDark)
+        Spacer(Modifier.width(4.dp))
+        Text(state.project.title, color = Am.OnDark, fontSize = fontSize, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    }
+    names.forEachIndexed { i, name ->
+        Icon(SelectionIcons.Previous, null, Modifier.padding(horizontal = 4.dp).size(16.dp), tint = Am.OnDarkDim)
+        val last = i == names.lastIndex
+        Text(name, (if (last) Modifier else Modifier.crumbHover(4.dp).clickable { act { state.exitTo(i + 1) } }).weight(1f, fill = false),
+            color = if (last) Am.OnDark else Am.OnDarkDim, fontSize = fontSize, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    }
+}
+
+@Composable
+private fun Modifier.crumbHover(radius: androidx.compose.ui.unit.Dp): Modifier =
+    if (PlatformFeatures.desktop) clip(RoundedCornerShape(radius)).hoverFill(radius).handCursor() else this
 
 internal fun typedName(typed: String, shown: String): String? = typed.trim().takeIf { typed != shown && it.isNotEmpty() && it != shown }
 

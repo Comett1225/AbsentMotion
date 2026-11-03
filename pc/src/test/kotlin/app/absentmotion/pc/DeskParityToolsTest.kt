@@ -136,7 +136,7 @@ class DeskParityToolsTest {
             assertEquals("AbsentMotion-5.0.0-macos-arm64.dmg", release!!.apk!!.name)
             assertEquals("https://github.com/Comett1225/AbsentMotion/releases/download/v5.0.0/SHA256SUMS.txt", release.apk!!.sums)
         }
-        assertNull(parseRelease(json.replace("https://github.com/Comett1225", "https://example.com/x"), "desktop")?.apk)
+        assertNull(parseRelease(json.replace("https://github.com/", "https://example.com/"), "desktop")?.apk)
     }
 
     @Test fun cameraDevicesAndCommandsAreBuiltForEverySystem() {

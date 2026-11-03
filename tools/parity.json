@@ -125,13 +125,13 @@
     },
     {
       "id": "tool.group",
-      "name": "Edit group, Ungroup, group breadcrumbs",
-      "where": "LayerTools.kt, EditorMenus.kt",
+      "name": "Edit group, Ungroup, group breadcrumbs, leaving a group",
+      "where": "LayerTools.kt, EditorMenus.kt, EditorTopBar.kt (GroupCrumbs), Timeline.kt, desk/DeskWorkspace.kt",
       "android": "works",
       "macos": "works",
       "windows": "untested",
       "linux": "untested",
-      "note": ""
+      "note": "Breadcrumb on phone and PC; phone shows a group pill next to a selected layer; double-click a group clip or row name opens it on PC only"
     },
     {
       "id": "tool.asset_props",

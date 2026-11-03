@@ -212,16 +212,13 @@ private fun DeskTopBar(state: EditorState, onExit: () -> Unit, onSettings: () ->
     Row(modifier.background(Am.TopBar).padding(horizontal = 6.dp), verticalAlignment = Alignment.CenterVertically) {
         DeskIcon(ChromeIcons.Exit, stringResource(R.string.topbar_exit_to_project_list), action = onExit)
         Row(Modifier.weight(1f).padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text(state.project.title, Modifier.weight(1f, fill = false).clip(RoundedCornerShape(4.dp)).clickable(enabled = state.inGroup) { state.leaveGroups() }, color = Am.OnDark, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            state.groupNames.forEachIndexed { index, name ->
-                Text("/", Modifier.padding(horizontal = 6.dp), color = Am.OnDarkDim, fontSize = 14.sp)
-                Text(name, Modifier.weight(1f, fill = false).clip(RoundedCornerShape(4.dp)).clickable(enabled = index < state.groupNames.lastIndex) { state.exitTo(index + 1) }, color = Am.OnDark, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            }
+            if (state.inGroup) GroupCrumbs(state, 14.sp) { it() }
+            else Text(state.project.title, Modifier.weight(1f, fill = false), color = Am.OnDark, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text("${state.scene.width} × ${state.scene.height} · ${state.scene.fps} fps", Modifier.padding(start = 12.dp), color = Am.OnDarkDim, fontSize = 12.sp, maxLines = 1, softWrap = false)
         }
         Box(Modifier.tutorialTarget("undo")) { DeskIcon(ChromeIcons.Undo, deskShortcut(R.string.play_undo, "${DeskMod}Z"), state.canUndo) { state.undo() } }
         Box(Modifier.tutorialTarget("redo")) { DeskIcon(ChromeIcons.Redo, deskShortcut(R.string.play_redo, DeskRedoKeys), state.canRedo) { state.redo() } }
-        Box(Modifier.tutorialTarget("gear")) { DeskIcon(ChromeIcons.Gear, stringResource(R.string.topbar_project_settings), action = onSettings) }
+        Box(Modifier.tutorialTarget("gear")) { DeskIcon(ChromeIcons.Gear, stringResource(R.string.topbar_project_settings), enabled = !state.inGroup, action = onSettings) }
         Hint(deskShortcut(R.string.desk_export, "${DeskMod}E")) {
             Box(Modifier.padding(start = 8.dp, end = 2.dp).height(32.dp).tutorialTarget("export").clip(RoundedCornerShape(8.dp)).background(Am.Accent).clickable { state.playing = false; state.exportOpen = true }.padding(horizontal = 16.dp), Alignment.Center) {
                 Text(stringResource(R.string.desk_export), color = Am.OnAccent, fontSize = 13.sp, fontWeight = FontWeight.Medium)
