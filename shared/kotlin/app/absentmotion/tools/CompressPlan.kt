@@ -62,7 +62,7 @@ fun smallerBitrate(job: VideoJob, durationUs: Long, gotBytes: Long): Int {
     return (job.bitrate * videoWanted / videoGot * 0.95).coerceAtLeast(0.0).toInt()
 }
 
-private fun sound(src: CompressSource, kbps: Int, keepAac: Boolean = false): Pair<Int, Boolean> = when {
+internal fun sound(src: CompressSource, kbps: Int, keepAac: Boolean = false): Pair<Int, Boolean> = when {
     !src.audio || kbps <= 0 -> 0 to false
     src.audioAac && (keepAac || src.audioKbps in 1..kbps) -> (if (src.audioKbps > 0) src.audioKbps else kbps) to true
     else -> kbps to false

@@ -16,14 +16,15 @@ import java.io.File
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.math.min
 
-suspend fun compressVideoOnDesktop(uri: String, job: VideoJob, audio: Boolean, durationUs: Long, out: File, progress: (Float) -> Unit) = withContext(Dispatchers.IO) {
+suspend fun compressVideoOnDesktop(uri: String, job: VideoJob, audio: Boolean, durationUs: Long, out: File, progress: (Float) -> Unit, startUs: Long = 0, endUs: Long = 0) = withContext(Dispatchers.IO) {
     val input = android.net.Uri.parse(uri).toFile() ?: throw ExportError(txt(R.string.compress_unreadable))
     val settings = ExportSettings(min(job.width, job.height), job.fps)
     val encoder = DeskEncoders.video(Codec.H264).firstOrNull { DeskEncoders.works(it, settings, job.width, job.height) } ?: throw ExportError(txt(R.string.compress_failed, "no video encoder"))
     val args = DeskEncoders.videoArgs(encoder, settings, job.width, job.height).toMutableList()
     args[args.indexOf("-b:v") + 1] = "${job.bitrate}"
     val sound = when { !audio || job.audioKbps <= 0 -> listOf("-an"); job.copyAudio -> listOf("-c:a", "copy"); else -> listOf("-c:a", DeskEncoders.audio(app.absentmotion.export.AudioCodec.Aac).firstOrNull() ?: "aac", "-b:a", "${job.audioKbps}k") }
-    val command = listOf(DeskMedia.ffmpeg, "-y", "-v", "error", "-progress", "pipe:1", "-nostats", "-i", input.path, "-map", "0:v:0") +
+    val range = (if (startUs > 0) listOf("-ss", seconds(startUs)) else emptyList()) + listOf("-noautorotate", "-i", input.path) + (if (endUs > startUs) listOf("-t", seconds(endUs - startUs)) else emptyList())
+    val command = listOf(DeskMedia.ffmpeg, "-y", "-v", "error", "-progress", "pipe:1", "-nostats") + range + listOf("-map", "0:v:0") +
         (if (audio) listOf("-map", "0:a:0?") else emptyList()) + listOf("-vf", "scale=${job.width}:${job.height},fps=${job.fps}") + args + sound + listOf("-movflags", "+faststart", out.path)
     val context = currentCoroutineContext()
     val process = ProcessBuilder(command).redirectError(ProcessBuilder.Redirect.DISCARD).start()

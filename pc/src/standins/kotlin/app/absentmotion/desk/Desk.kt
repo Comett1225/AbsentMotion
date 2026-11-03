@@ -43,15 +43,18 @@ object DeskFiles {
     var window: java.awt.Frame? = null
     val mediaExtensions = setOf("mp4", "mov", "m4v", "webm", "mkv", "avi", "png", "jpg", "jpeg", "webp", "gif", "bmp", "heic", "svg", "mp3", "wav", "m4a", "aac", "ogg", "opus", "flac")
 
-    fun chooseFiles(media: Boolean, multiple: Boolean, title: String = if (media) "Choose media" else "Choose a file"): List<File> {
+    val videoExtensions = setOf("mp4", "mov", "m4v", "webm", "mkv", "avi")
+
+    fun chooseFiles(media: Boolean, multiple: Boolean, title: String = if (media) "Choose media" else "Choose a file", videoOnly: Boolean = false): List<File> {
+        System.getProperty("am.pick")?.let { return listOf(File(it)) }
         val dialog = java.awt.FileDialog(window, title, java.awt.FileDialog.LOAD)
         dialog.isMultipleMode = multiple
-        if (media) dialog.setFilenameFilter { _, name -> name.substringAfterLast('.', "").lowercase() in mediaExtensions }
+        if (media) dialog.setFilenameFilter { _, name -> name.substringAfterLast('.', "").lowercase() in (if (videoOnly) videoExtensions else mediaExtensions) }
         dialog.isVisible = true
         return dialog.files.orEmpty().toList().also { DeskLibrary.remember(it) }
     }
 
-    fun chooseOne(media: Boolean): Uri? = chooseFiles(media, false).firstOrNull()?.let(Uri::fromFile)
+    fun chooseOne(media: Boolean, videoOnly: Boolean = false): Uri? = chooseFiles(media, false, videoOnly = videoOnly).firstOrNull()?.let(Uri::fromFile)
 
     fun chooseSave(name: String, title: String = "Save"): File? {
         val dialog = java.awt.FileDialog(window, title, java.awt.FileDialog.SAVE)

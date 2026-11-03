@@ -2,7 +2,7 @@ package app.absentmotion.export
 
 import java.io.OutputStream
 
-class GifWriter(private val out: OutputStream, private val width: Int, private val height: Int) {
+class GifWriter(private val out: OutputStream, private val width: Int, private val height: Int, loop: Boolean = true) {
     private val indices = ByteArray(width * height)
     private val keyToIndex = IntArray(KEYS)
     private var errNow = IntArray((width + 2) * 3)
@@ -17,7 +17,7 @@ class GifWriter(private val out: OutputStream, private val width: Int, private v
         out.write("GIF89a".toByteArray())
         short(width); short(height)
         out.write(0x70); out.write(0); out.write(0)
-        out.write(byteArrayOf(0x21, 0xFF.toByte(), 11) + "NETSCAPE2.0".toByteArray() + byteArrayOf(3, 1, 0, 0, 0))
+        if (loop) out.write(byteArrayOf(0x21, 0xFF.toByte(), 11) + "NETSCAPE2.0".toByteArray() + byteArrayOf(3, 1, 0, 0, 0))
     }
 
     fun frame(rgba: ByteArray, endTimeMs: Long) {

@@ -259,10 +259,12 @@ private fun proxyPlan(visibleWidth: Int, visibleHeight: Int, fps: Int): VideoPla
     }
 }
 
+private const val END_SLACK_US = 500_000L
+
 internal fun transcode(
     context: Context, uri: String, out: File, cancelled: () -> Boolean,
     plan: (visibleWidth: Int, visibleHeight: Int, fps: Int) -> VideoPlan = ::proxyPlan, rotation: Int = 0, sound: AudioCopy? = null,
-    progress: (Float) -> Unit,
+    startUs: Long = 0, endUs: Long = Long.MAX_VALUE, progress: (Float) -> Unit,
 ): Boolean {
     val extractor = MediaExtractor()
     var decoder: MediaCodec? = null
@@ -276,9 +278,11 @@ internal fun transcode(
         extractor.setDataSource(context, Uri.parse(openableUri(uri)), null)
         val (track, format) = videoTrack(extractor)
         extractor.selectTrack(track)
+        if (startUs > 0) extractor.seekTo(startUs, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
         val (visibleWidth, visibleHeight) = visibleSize(format)
         val fps = (if (format.containsKey(MediaFormat.KEY_FRAME_RATE)) format.numberOf(MediaFormat.KEY_FRAME_RATE)?.toFloat() ?: 30f else 30f).roundToInt().coerceIn(1, 120)
         val durationUs = if (format.containsKey(MediaFormat.KEY_DURATION)) format.getLong(MediaFormat.KEY_DURATION) else 0L
+        val spanUs = if (durationUs > 0) min(endUs, durationUs) - startUs else 0L
         val target = plan(visibleWidth, visibleHeight, fps)
         val gapUs = if (target.fps < fps) 1_000_000L / target.fps else 0L
         encoder = target.open()
@@ -332,7 +336,8 @@ internal fun transcode(
             if (!inputDone) {
                 val index = decoder.dequeueInputBuffer(5_000)
                 if (index >= 0) {
-                    val size = extractor.readSampleData(decoder.getInputBuffer(index)!!, 0)
+                    val pastEnd = endUs != Long.MAX_VALUE && extractor.sampleTime > endUs + END_SLACK_US
+                    val size = if (pastEnd) -1 else extractor.readSampleData(decoder.getInputBuffer(index)!!, 0)
                     if (size < 0) { decoder.queueInputBuffer(index, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM); inputDone = true }
                     else { decoder.queueInputBuffer(index, 0, size, extractor.sampleTime, 0); extractor.advance() }
                 }
@@ -342,7 +347,7 @@ internal fun transcode(
             else {
                 heard = System.nanoTime()
                 val pts = info.presentationTimeUs
-                val shown = info.size > 0 && (gapUs == 0L || pts + 2_000 >= nextUs)
+                val shown = info.size > 0 && (startUs <= 0 || pts >= startUs) && pts <= endUs && (gapUs == 0L || pts + 2_000 >= nextUs)
                 if (shown && gapUs > 0) nextUs = if (pts - nextUs > gapUs) pts + gapUs else nextUs + gapUs
                 decodeDone = info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0
                 decoder.releaseOutputBuffer(index, shown)
@@ -350,8 +355,8 @@ internal fun transcode(
                     check(available.tryAcquire(2, TimeUnit.SECONDS)) { "the decoder did not deliver frame $pts" }
                     frames.updateTexImage()
                     frames.getTransformMatrix(matrix)
-                    gl.draw(matrix, pts * 1000)
-                    if (durationUs > 0) progress((pts.toFloat() / durationUs).coerceIn(0f, 0.99f))
+                    gl.draw(matrix, (pts - startUs) * 1000)
+                    if (spanUs > 0) progress(((pts - startUs).toFloat() / spanUs).coerceIn(0f, 0.99f))
                 }
                 if (decodeDone) encoder.signalEndOfInputStream()
             }

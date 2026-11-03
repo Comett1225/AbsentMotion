@@ -151,6 +151,15 @@ internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSett
     val compressCard: @Composable (Modifier) -> Unit = { m ->
         ToolCard(HomeIcons.Compress, stringResource(R.string.tools_compress), stringResource(R.string.tools_compress_about), modifier = m) { compressFrom = null; open = 1 }
     }
+    val trimCard: @Composable (Modifier) -> Unit = { m ->
+        ToolCard(HomeIcons.Trim, stringResource(R.string.tools_trim), stringResource(R.string.tools_trim_about), modifier = m) { open = 3 }
+    }
+    val extractCard: @Composable (Modifier) -> Unit = { m ->
+        ToolCard(HomeIcons.Audio, stringResource(R.string.tools_extract), stringResource(R.string.tools_extract_about), modifier = m) { open = 4 }
+    }
+    val gifCard: @Composable (Modifier) -> Unit = { m ->
+        ToolCard(HomeIcons.Gif, stringResource(R.string.tools_gif), stringResource(R.string.tools_gif_about), modifier = m) { open = 5 }
+    }
     val downloaderCard: @Composable (Modifier) -> Unit = { m ->
         ToolCard(HomeIcons.Download, stringResource(R.string.tools_downloader), stringResource(R.string.tools_downloader_about), engine = engine, modifier = m) {
             when {
@@ -164,8 +173,17 @@ internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSett
         Spacer(Modifier.height(24.dp))
         if (PlatformFeatures.desktop) FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             compressCard(Modifier.width(380.dp))
+            trimCard(Modifier.width(380.dp))
+            extractCard(Modifier.width(380.dp))
+            gifCard(Modifier.width(380.dp))
         } else {
             compressCard(Modifier)
+            Spacer(Modifier.height(12.dp))
+            trimCard(Modifier)
+            Spacer(Modifier.height(12.dp))
+            extractCard(Modifier)
+            Spacer(Modifier.height(12.dp))
+            gifCard(Modifier)
             Spacer(Modifier.height(12.dp))
             downloaderCard(Modifier)
         }
@@ -184,6 +202,9 @@ internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSett
     when (open) {
         1 -> CompressScreen(compressFrom) { open = 0; compressFrom = null }
         2 -> DownloaderScreen(store, settings, onOpen = { id -> open = 0; onOpen(id) }, onCompress = { uri -> compressFrom = uri; open = 1 }) { open = 0 }
+        3 -> TrimScreen { open = 0 }
+        4 -> ExtractAudioScreen { open = 0 }
+        5 -> GifScreen { open = 0 }
     }
 }
 

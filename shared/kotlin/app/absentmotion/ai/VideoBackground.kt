@@ -92,14 +92,16 @@ internal class MatteSmoother {
     }
 }
 
-internal fun Yuv.argb(outWidth: Int, outHeight: Int, standard: Int = 0, fullRange: Boolean = false): IntArray {
+internal fun Yuv.argb(outWidth: Int, outHeight: Int, standard: Int = 0, fullRange: Boolean = false): IntArray =
+    IntArray(outWidth * outHeight).also { argbInto(it, outWidth, outHeight, standard, fullRange) }
+
+internal fun Yuv.argbInto(out: IntArray, outWidth: Int, outHeight: Int, standard: Int = 0, fullRange: Boolean = false) {
     val kr = if (standard == 1) 0.2126f else if (standard == 6) 0.2627f else 0.299f
     val kb = if (standard == 1) 0.0722f else if (standard == 6) 0.0593f else 0.114f
     val kg = 1 - kr - kb
     val ys = if (fullRange) 1f else 255f / 219
     val cs = if (fullRange) 1f else 255f / 224
     val yo = if (fullRange) 0f else 16f
-    val out = IntArray(outWidth * outHeight)
     for (j in 0 until outHeight) {
         val sy = ((j + 0.5f) * height / outHeight).toInt().coerceIn(0, height - 1) + top
         val cy = sy / 2
@@ -115,7 +117,6 @@ internal fun Yuv.argb(outWidth: Int, outHeight: Int, standard: Int = 0, fullRang
             out[j * outWidth + i] = (0xFF shl 24) or (channel(r) shl 16) or (channel(g) shl 8) or channel(b)
         }
     }
-    return out
 }
 
 private fun channel(v: Float): Int = v.roundToInt().coerceIn(0, 255)
