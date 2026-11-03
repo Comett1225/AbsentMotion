@@ -121,9 +121,11 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
     Row(modifier.background(Am.Panel)) {
         Column(Modifier.width(168.px).heightIn(max = PanelHeight).fillMaxHeight()) {
             EffectFrameButton(PanelIcons.Back, stringResource(R.string.topbar_back), Modifier.weight(1f)) { state.stepBack() }
+            val linked = target != null && layer.element(target.ref)?.children?.any { it.name == "valueLink" } == true
             val onKeyframe = target != null && layer.onKeyframe(target.ref)
-            EffectFrameButton(if (onKeyframe) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, stringResource(if (onKeyframe) R.string.a11y_remove_keyframe else R.string.a11y_add_keyframe), Modifier.weight(1f), target != null) { state.toggleKeyframe() }
-            EffectFrameButton(PanelIcons.Easing, stringResource(R.string.a11y_easing), Modifier.weight(1f), target != null) { if (target != null && layer.easing(target.ref) != null) state.easingOpen = true else state.easingHint = true }
+            EffectFrameButton(if (onKeyframe) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, stringResource(if (onKeyframe) R.string.a11y_remove_keyframe else R.string.a11y_add_keyframe), Modifier.weight(1f), target != null && !linked) { state.toggleKeyframe() }
+            EffectFrameButton(PanelIcons.Easing, stringResource(R.string.a11y_easing), Modifier.weight(1f), target != null && !linked) { if (target != null && layer.easing(target.ref) != null) state.easingOpen = true else state.easingHint = true }
+            app.absentmotion.ui.editor.ValueLinkControl(state, target, Modifier.weight(1f))
             Box(Modifier.weight(1f).fillMaxWidth()) {
                 EffectFrameButton(PanelIcons.More, stringResource(R.string.effects_more), Modifier.fillMaxSize(), instance == null) { menu = true }
                 Presence(menu) {

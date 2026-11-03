@@ -60,6 +60,7 @@ class NativeEngine(backend: Backend = Backend.GANESH) : AutoCloseable {
     }
 
     fun layerQuad(layerId: Long, timeMs: Double): FloatArray? = DesktopNative.layerQuad(handle, layerId, timeMs)
+    fun propertyNumbers(layerId: Long, effect: Int, name: String, timeMs: Double): FloatArray? = DesktopNative.propertyNumbers(handle, layerId, effect, name, timeMs)
     fun layerMatrix(layerId: Long, timeMs: Double): FloatArray? = DesktopNative.layerMatrix(handle, layerId, timeMs)
     fun layerBounds(layerId: Long, timeMs: Double): FloatArray? = DesktopNative.layerBounds(handle, layerId, timeMs)
     fun layerOutline(layerId: Long, timeMs: Double): String? = DesktopNative.layerOutline(handle, layerId, timeMs)

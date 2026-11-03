@@ -97,6 +97,7 @@ fun XmlNode.valueAt(t: Float): String? {
 }
 
 fun XmlNode.withValueAt(t: Float, value: String, snap: ClosedFloatingPointRange<Float>): XmlNode {
+    if (children.any { it.name == "valueLink" }) return this
     if (!isKeyframed) return with("value", value)
     val keys = keyframes
     val here = keys.indexOfFirst { it.t in snap }
@@ -106,6 +107,7 @@ fun XmlNode.withValueAt(t: Float, value: String, snap: ClosedFloatingPointRange<
 fun XmlNode.keyframeAt(snap: ClosedFloatingPointRange<Float>): Int = keyframes.indexOfFirst { it.t in snap }
 
 fun XmlNode.withKeyframeToggled(t: Float, snap: ClosedFloatingPointRange<Float>): XmlNode {
+    if (children.any { it.name == "valueLink" }) return this
     val keys = keyframes
     val here = keyframeAt(snap)
     return when {

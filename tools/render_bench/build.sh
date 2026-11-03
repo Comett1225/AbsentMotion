@@ -27,4 +27,8 @@ if [ -n "$EXTRA" ]; then
   clang++ $FLAGS -c "$ROOT/tools/render_bench/steady_test.cpp" -o "$OUT/steady_test.o"
   link "$OUT/steady_test" "$OUT/steady_test.o"
 fi
+if grep -q "struct ValueLink" "$SRC/scene.h"; then
+  clang++ $FLAGS -c "$ROOT/tools/render_bench/link_test.cpp" -o "$OUT/link_test.o"
+  link "$OUT/link_test" "$OUT/link_test.o"
+fi
 echo "built $OUT/render_bench"

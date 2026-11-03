@@ -67,6 +67,7 @@ import kotlinx.coroutines.withContext
 @Composable
 internal fun EffectSettings(state: EditorState, layer: Layer, instance: XmlNode, definition: EffectDefinition,
                             active: EffectParam?, select: (EffectParam) -> Unit) {
+    val displayed = app.absentmotion.ui.editor.linkedNumbers(state, layer, definition.params.map { PropRef.effect(state.effectIndex, it.id) })
     val enabled = definition.available
     if (definition.category != "move" && !(definition.native && definition.category == "repeat") && state.scene.hasChildren(layer)) {
         Row(Modifier.fillMaxWidth().height(38.dp).padding(horizontal = 8.dp).alpha(if (enabled) 1f else 0.35f), verticalAlignment = Alignment.CenterVertically) {
@@ -77,7 +78,7 @@ internal fun EffectSettings(state: EditorState, layer: Layer, instance: XmlNode,
         }
     }
     definition.params.filter { definition.shown(it, instance, layer.t) }.forEach { param ->
-        val raw = instance.effectProperty(param.id)?.valueAt(layer.t) ?: param.missingDefault
+        val raw = displayed[PropRef.effect(state.effectIndex, param.id)]?.take(param.default.split(',').size)?.joinToString(",") ?: instance.effectProperty(param.id)?.valueAt(layer.t) ?: param.missingDefault
         fun set(text: String, gesture: Boolean = false) {
             select(param)
             state.editSelected(if (gesture) "effect-${state.effectIndex}-${param.id}" else null) { current ->

@@ -2160,4 +2160,16 @@
     <string name="desk_camera_no_sound">No sound</string>
     <string name="desk_camera_stop_recording">Stop recording</string>
     <string name="desk_scroll_key">scroll</string>
+    <string name="value_link">Link</string>
+    <string name="link_scale">Scale</string>
+    <string name="link_rotation">Rotation</string>
+    <string name="link_opacity">Opacity</string>
+    <string name="link_anchor">Anchor</string>
+    <string name="link_tilt">Tilt</string>
+    <string name="link_skew">Skew</string>
+    <string name="link_multiply">Multiply</string>
+    <string name="link_add">Add</string>
+    <string name="link_delay">Delay (seconds)</string>
+    <string name="link_cycle">These values depend on each other.</string>
+    <string name="link_unlink">Unlink</string>
 </resources>

@@ -103,7 +103,7 @@ value class Scene(val node: XmlNode) {
         return next.withChildren(next.node.children + unique.node)
     }
 
-    fun remove(id: Long): Scene = withChildren(node.children.filterNot { it.name in LAYER_TAGS && Layer(it).id == id })
+    fun remove(id: Long): Scene = withChildren(node.children.filterNot { it.name in LAYER_TAGS && Layer(it).id == id }.map { it.withoutValueLinks(setOf(id)) })
 
     fun reorder(id: Long, index: Int): Scene = move(id, index).let { moved ->
         if (moved.layer(id)?.node?.get("pathLayer") == null) moved else moved.update(id) { it.copy(node = it.node.with("pathLayer", null)) }
@@ -209,7 +209,7 @@ fun Scene.pinnedPath(layer: Layer): Layer {
 fun Layer.withPinnedClock(): Layer =
     if (nested == null || node["retimeLength"] != null) this else copy(node = node.with("retimeLength", "${endTime - startTime + nestedCut}"))
 
-data class Layer(val node: XmlNode, val t: Float = 0f, val snap: ClosedFloatingPointRange<Float> = t..t) {
+data class Layer(val node: XmlNode, val t: Float = 0f, val snap: ClosedFloatingPointRange<Float> = t..t, val displayNumbers: Map<PropRef, FloatArray> = emptyMap()) {
     val mediaFill: MediaFill? get() {
         if (fillType != "media") return null
         val uri = node["fillImage"] ?: node["fillVideo"] ?: return null
@@ -245,7 +245,7 @@ data class Layer(val node: XmlNode, val t: Float = 0f, val snap: ClosedFloatingP
     val tilt: FloatArray get() = transform("tilt", 0f, 0f)
 
     fun transform(name: String, vararg defaults: Float): FloatArray =
-        floats(node.child("transform")?.child(name)?.valueAt(t), defaults)
+        displayNumbers[PropRef(PropRef.Kind.Transform, name)]?.copyOf(defaults.size) ?: floats(node.child("transform")?.child(name)?.valueAt(t), defaults)
 
     fun propText(name: String): String? = element(PropRef.shape(name))?.valueAt(t)
 
