@@ -75,7 +75,8 @@ class DeskLinkingTest {
                 assertNotNull(state.scene.layer(2)!!.element(PropRef.Rotation)!!.valueLink(0))
             }
             val numbers = runBlocking { app.engine.propertyNumbers(2, -1, "rotation", 1000) }!!
-            assertEquals(73f, numbers[0], .001f)
+            assertEquals(-73f, numbers[0], .001f)
+            assertEquals(73f, state.scene.layer(2)!!.copy(displayNumbers = mapOf(PropRef.Rotation to numbers)).rotation, .001f)
             runBlocking { app.closeEditor() }
             app.engine.close()
         }
