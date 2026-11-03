@@ -38,7 +38,9 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
         val pre: List<Float> = emptyList(),
     )
 
-    class Rule(val to: String, val params: Map<String, List<Conversion?>>, val set: Map<String, String>, val onlyWith: String? = null)
+    class Turn(val quat: String, val spin: String, val to: List<String>)
+
+    class Rule(val to: String, val params: Map<String, List<Conversion?>>, val set: Map<String, String>, val onlyWith: String? = null, val turn: Turn? = null)
 
     data class Result(val scene: Scene, val converted: Map<String, Int>, val dropped: Set<String>) {
         val changed: Boolean get() = converted.isNotEmpty()
@@ -100,10 +102,11 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
         val made = linkedMapOf<String, XmlNode>()
         val others = ArrayList<XmlNode>()
         val gates = rule.params.values.flatten().mapNotNull { it?.gate }.toSet()
+        val turn = rule.turn?.takeIf { t -> t.to.all { id -> own.params.any { it.id == id } } }
         for (child in effect.children) {
             val name = child["name"]
             if (child.name != "property" || name == null) { others += child; continue }
-            if (name in gates) continue
+            if (name in gates || (turn != null && (name == turn.quat || name == turn.spin))) continue
             val conversions = rule.params[name]
             if (conversions == null) {
                 if (keep && own.params.any { it.id == name }) made.putIfAbsent(name, child) else drop(name)
@@ -121,6 +124,14 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
                 } else if (c?.neutral == null || values(child).any { !same(if (split) it.split(',').getOrElse(i) { "" } else it, c.neutral) }) {
                     drop(if (split) "$name (${i + 1})" else name)
                 }
+            }
+        }
+        if (turn != null) {
+            val quat = effect.children.firstOrNull { it.name == "property" && it["name"] == turn.quat }
+            val spin = effect.children.firstOrNull { it.name == "property" && it["name"] == turn.spin }
+            if (quat != null || spin != null) {
+                val base = turn.to.map { id -> rule.set[id]?.toDoubleOrNull() ?: 0.0 }.toDoubleArray()
+                Orientation(quat, spin, base).properties(turn.to).forEach { made[it["name"]!!] = it }
             }
         }
         val fixed = rule.set.filterKeys { it !in made }.mapNotNull { (id, value) ->
@@ -192,6 +203,7 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
                     },
                     set.keys().asSequence().associateWith { set.get(it).let { v -> if (v is Number) formatFloats(floatArrayOf(v.toFloat())) else v.toString() } },
                     rule.optString("onlyWith").takeIf { it.isNotEmpty() },
+                    rule.optJSONObject("orientation")?.let { o -> Turn(o.getString("quat"), o.getString("euler"), o.getJSONArray("to").let { a -> List(a.length()) { a.getString(it) } }) },
                 )
             }
             return EffectMigration(rules, catalog)

@@ -262,10 +262,14 @@ Placement Effective(const std::vector<Layer>& siblings, const Layer& l, double t
         const SkV4 offset = Turn(p.rotation) * p.tilt * SkV4{(own.location.fX + own.pivot.fX - p.pivot.fX) * p.scale.fX,
                                                              (own.location.fY + own.pivot.fY - p.pivot.fY) * p.scale.fY, own.z, 0};
         own.location = p.location + SkVector{offset.x, offset.y} - own.pivot + p.pivot;
-        own.scale = {own.scale.fX * p.scale.fX, own.scale.fY * p.scale.fY};
+        SkPoint followScale;
+        float followRotation;
+        ParentTerms(l, timeMs, p, &followScale, &followRotation);
+        own.scale = {own.scale.fX * followScale.fX, own.scale.fY * followScale.fY};
         if (p.tilt != SkM44()) own.tilt = Turn(-own.rotation) * p.tilt * Turn(own.rotation) * own.tilt;
-        own.rotation += p.rotation;
+        own.rotation += followRotation;
         own.z = p.z + offset.z;
+        ParentRoll(l, timeMs, &own);
     }
     if (!FollowsPath(l)) return own;
     const Layer* source = PathSource(siblings, l);

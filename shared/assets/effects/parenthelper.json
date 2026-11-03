@@ -1,0 +1,89 @@
+{
+ "id": "parenthelper",
+ "name": "Parenting Helper",
+ "category": "move",
+ "since": "5.0.0",
+ "native": true,
+ "description": "Changes how a child layer follows its parent: scale and rotation can follow fully, stay locked or follow by a set amount. Auto Rotate turns the layer as it moves, like a rolling wheel.",
+ "params": [
+  {
+   "id": "scaleMode",
+   "label": "Scale",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Normal",
+    "Locked",
+    "Weighted"
+   ]
+  },
+  {
+   "id": "rotateMode",
+   "label": "Rotation",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Normal",
+    "Locked",
+    "Weighted"
+   ]
+  },
+  {
+   "id": "scaleWeight",
+   "label": "Scale Weight",
+   "type": "float",
+   "default": 1,
+   "min": -10,
+   "max": 10,
+   "step": 0.01,
+   "percent": true,
+   "when": {
+    "scaleMode": [
+     2
+    ]
+   }
+  },
+  {
+   "id": "rotateWeight",
+   "label": "Rotation Weight",
+   "type": "float",
+   "default": 1,
+   "min": -10,
+   "max": 10,
+   "step": 0.01,
+   "percent": true,
+   "when": {
+    "rotateMode": [
+     2
+    ]
+   }
+  },
+  {
+   "id": "autoRotate",
+   "label": "Auto Rotate",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Off",
+    "X Axis",
+    "Y Axis"
+   ]
+  },
+  {
+   "id": "radiusAdjust",
+   "label": "Radius Adjust",
+   "type": "float",
+   "default": 0,
+   "min": -1000,
+   "max": 1000,
+   "step": 0.1,
+   "pixels": true,
+   "when": {
+    "autoRotate": [
+     1,
+     2
+    ]
+   }
+  }
+ ]
+}

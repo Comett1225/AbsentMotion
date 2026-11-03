@@ -7016,18 +7016,6 @@
  "com.alightcreative.effects.box": {
   "to": "box",
   "params": {
-   "rotate": [
-    {
-     "to": "rotX",
-     "scale": -1
-    },
-    {
-     "to": "rotY"
-    },
-    {
-     "to": "rotZ"
-    }
-   ],
    "position": {
     "to": "position",
     "take": 2,
@@ -7138,6 +7126,15 @@
    "height": 0.87,
    "depth": 0.3,
    "smoothing": 0
+  },
+  "orientation": {
+   "quat": "orient",
+   "euler": "rotate",
+   "to": [
+    "rotX",
+    "rotY",
+    "rotZ"
+   ]
   }
  },
  "com.alightcreative.effects.cube": {
@@ -7194,18 +7191,6 @@
  "com.alightcreative.effects.cube2": {
   "to": "cube",
   "params": {
-   "rotate": [
-    {
-     "to": "rotX",
-     "scale": -1
-    },
-    {
-     "to": "rotY"
-    },
-    {
-     "to": "rotZ"
-    }
-   ],
    "position": {
     "to": "position",
     "take": 2,
@@ -7282,23 +7267,20 @@
    "light": 45,
    "edge": 0.28,
    "smoothing": 0
+  },
+  "orientation": {
+   "quat": "orient",
+   "euler": "rotate",
+   "to": [
+    "rotX",
+    "rotY",
+    "rotZ"
+   ]
   }
  },
  "com.alightcreative.effects.cylinder": {
   "to": "cylinder",
   "params": {
-   "rotate": [
-    {
-     "to": "rotX",
-     "scale": -1
-    },
-    {
-     "to": "rotY"
-    },
-    {
-     "to": "rotZ"
-    }
-   ],
    "position": {
     "to": "position",
     "take": 2,
@@ -7402,23 +7384,20 @@
    "radius": 0.58,
    "height": 0.9,
    "smoothing": 0
+  },
+  "orientation": {
+   "quat": "orient",
+   "euler": "rotate",
+   "to": [
+    "rotX",
+    "rotY",
+    "rotZ"
+   ]
   }
  },
  "com.alightcreative.effects.ellipsoid": {
   "to": "ellipsoid",
   "params": {
-   "rotate": [
-    {
-     "to": "rotX",
-     "scale": -1
-    },
-    {
-     "to": "rotY"
-    },
-    {
-     "to": "rotZ"
-    }
-   ],
    "position": {
     "to": "position",
     "take": 2,
@@ -7521,23 +7500,20 @@
    "radius": 0.75,
    "squeezeRatio": 1,
    "flattenRatio": 1
+  },
+  "orientation": {
+   "quat": "orient",
+   "euler": "rotate",
+   "to": [
+    "rotX",
+    "rotY",
+    "rotZ"
+   ]
   }
  },
  "com.alightcreative.effects.heart": {
   "to": "heart",
   "params": {
-   "rotate": [
-    {
-     "to": "rotX",
-     "scale": -1
-    },
-    {
-     "to": "rotY"
-    },
-    {
-     "to": "rotZ"
-    }
-   ],
    "position": {
     "to": "position",
     "take": 2,
@@ -7639,23 +7615,20 @@
    "heartSize": 1.3,
    "smoothing": 0.7,
    "depth": 0.3
+  },
+  "orientation": {
+   "quat": "orient",
+   "euler": "rotate",
+   "to": [
+    "rotX",
+    "rotY",
+    "rotZ"
+   ]
   }
  },
  "com.alightcreative.effects.heart2": {
   "to": "heart",
   "params": {
-   "rotate": [
-    {
-     "to": "rotX",
-     "scale": -1
-    },
-    {
-     "to": "rotY"
-    },
-    {
-     "to": "rotZ"
-    }
-   ],
    "position": {
     "to": "position",
     "take": 2,
@@ -7757,23 +7730,20 @@
    "heartSize": 1.3,
    "smoothing": 0.7,
    "depth": 0.3
+  },
+  "orientation": {
+   "quat": "orient",
+   "euler": "rotate",
+   "to": [
+    "rotX",
+    "rotY",
+    "rotZ"
+   ]
   }
  },
  "com.alightcreative.effects.hexprism": {
   "to": "hexprism",
   "params": {
-   "rotate": [
-    {
-     "to": "rotX",
-     "scale": -1
-    },
-    {
-     "to": "rotY"
-    },
-    {
-     "to": "rotZ"
-    }
-   ],
    "position": {
     "to": "position",
     "take": 2,
@@ -7877,23 +7847,20 @@
    "radius": 0.58,
    "depth": 0.9,
    "smoothing": 0
+  },
+  "orientation": {
+   "quat": "orient",
+   "euler": "rotate",
+   "to": [
+    "rotX",
+    "rotY",
+    "rotZ"
+   ]
   }
  },
  "com.alightcreative.effects.hollowbox": {
   "to": "hollowbox",
   "params": {
-   "rotate": [
-    {
-     "to": "rotX",
-     "scale": -1
-    },
-    {
-     "to": "rotY"
-    },
-    {
-     "to": "rotZ"
-    }
-   ],
    "position": {
     "to": "position",
     "take": 2,
@@ -8068,23 +8035,20 @@
    "depth": 0.29,
    "thickness": 0.0145,
    "smoothing": 0
+  },
+  "orientation": {
+   "quat": "orient",
+   "euler": "rotate",
+   "to": [
+    "rotX",
+    "rotY",
+    "rotZ"
+   ]
   }
  },
  "com.alightcreative.effects.octahedron": {
   "to": "octahedron",
   "params": {
-   "rotate": [
-    {
-     "to": "rotX",
-     "scale": -1
-    },
-    {
-     "to": "rotY"
-    },
-    {
-     "to": "rotZ"
-    }
-   ],
    "position": {
     "to": "position",
     "take": 2,
@@ -8181,23 +8145,20 @@
    "shine": 0.8,
    "light": 45,
    "radius": 0.95
+  },
+  "orientation": {
+   "quat": "orient",
+   "euler": "rotate",
+   "to": [
+    "rotX",
+    "rotY",
+    "rotZ"
+   ]
   }
  },
  "com.alightcreative.effects.pyramid": {
   "to": "pyramid",
   "params": {
-   "rotate": [
-    {
-     "to": "rotX",
-     "scale": -1
-    },
-    {
-     "to": "rotY"
-    },
-    {
-     "to": "rotZ"
-    }
-   ],
    "position": {
     "to": "position",
     "take": 2,
@@ -8298,23 +8259,20 @@
    "light": 45,
    "base": 0.25,
    "height": 0.22
+  },
+  "orientation": {
+   "quat": "orient",
+   "euler": "rotate",
+   "to": [
+    "rotX",
+    "rotY",
+    "rotZ"
+   ]
   }
  },
  "com.alightcreative.effects.extrude": {
   "to": "rasterextrude",
   "params": {
-   "rotate": [
-    {
-     "to": "rotX",
-     "scale": -1
-    },
-    {
-     "to": "rotY"
-    },
-    {
-     "to": "rotZ"
-    }
-   ],
    "position": {
     "to": "position",
     "take": 2,
@@ -8406,23 +8364,20 @@
    "light": 45,
    "depth": 0.03,
    "interior": "#ff3366aa"
+  },
+  "orientation": {
+   "quat": "orient",
+   "euler": "rotate",
+   "to": [
+    "rotX",
+    "rotY",
+    "rotZ"
+   ]
   }
  },
  "com.alightcreative.effects.starpoly": {
   "to": "starpolyhedron",
   "params": {
-   "rotate": [
-    {
-     "to": "rotX",
-     "scale": -1
-    },
-    {
-     "to": "rotY"
-    },
-    {
-     "to": "rotZ"
-    }
-   ],
    "position": {
     "to": "position",
     "take": 2,
@@ -8522,23 +8477,20 @@
    "shine": 0.8,
    "light": 45,
    "radius": 0.3
+  },
+  "orientation": {
+   "quat": "orient",
+   "euler": "rotate",
+   "to": [
+    "rotX",
+    "rotY",
+    "rotZ"
+   ]
   }
  },
  "com.alightcreative.effects.starprism": {
   "to": "starprism",
   "params": {
-   "rotate": [
-    {
-     "to": "rotX",
-     "scale": -1
-    },
-    {
-     "to": "rotY"
-    },
-    {
-     "to": "rotZ"
-    }
-   ],
    "position": {
     "to": "position",
     "take": 2,
@@ -8642,23 +8594,20 @@
    "radius": 0.85,
    "depth": 0.17,
    "points": 5
+  },
+  "orientation": {
+   "quat": "orient",
+   "euler": "rotate",
+   "to": [
+    "rotX",
+    "rotY",
+    "rotZ"
+   ]
   }
  },
  "com.alightcreative.effects.torus": {
   "to": "torus",
   "params": {
-   "rotate": [
-    {
-     "to": "rotX",
-     "scale": -1
-    },
-    {
-     "to": "rotY"
-    },
-    {
-     "to": "rotZ"
-    }
-   ],
    "position": {
     "to": "position",
     "take": 2,
@@ -8753,23 +8702,20 @@
    "light": 45,
    "radius": 0.6,
    "thickness": 0.3
+  },
+  "orientation": {
+   "quat": "orient",
+   "euler": "rotate",
+   "to": [
+    "rotX",
+    "rotY",
+    "rotZ"
+   ]
   }
  },
  "com.alightcreative.effects.plus": {
   "to": "cross",
   "params": {
-   "rotate": [
-    {
-     "to": "rotX",
-     "scale": -1
-    },
-    {
-     "to": "rotY"
-    },
-    {
-     "to": "rotZ"
-    }
-   ],
    "position": {
     "to": "position",
     "take": 2,
@@ -8873,6 +8819,15 @@
    "reach": 0.3,
    "thickness": 0.15,
    "smoothing": 0
+  },
+  "orientation": {
+   "quat": "orient",
+   "euler": "rotate",
+   "to": [
+    "rotX",
+    "rotY",
+    "rotZ"
+   ]
   }
  },
  "com.alightcreative.effects.tunnel": {
@@ -9137,18 +9092,6 @@
  "com.alightcreative.effects.spherize2": {
   "to": "spherize",
   "params": {
-   "rotate": [
-    {
-     "to": "rotX",
-     "scale": -1
-    },
-    {
-     "to": "rotY"
-    },
-    {
-     "to": "rotZ"
-    }
-   ],
    "position": {
     "to": "position",
     "take": 2,
@@ -9238,6 +9181,15 @@
    "radius": 0.78,
    "coverage": 0.7,
    "projection": 0
+  },
+  "orientation": {
+   "quat": "orient",
+   "euler": "rotate",
+   "to": [
+    "rotX",
+    "rotY",
+    "rotZ"
+   ]
   }
  },
  "com.alightcreative.effects.360-reorient-sphere": {
@@ -9330,6 +9282,43 @@
    "pitch": 0,
    "roll": 0,
    "fov": 50
+  }
+ },
+ "com.alightcreative.effects.parenthelper": {
+  "to": "parenthelper",
+  "params": {
+   "scaleMode": {
+    "to": "scaleMode"
+   },
+   "rotateMode": {
+    "to": "rotateMode"
+   },
+   "scaleWeight": {
+    "to": "scaleWeight"
+   },
+   "rotateWeight": {
+    "to": "rotateWeight"
+   },
+   "autoRotate": {
+    "to": "autoRotate"
+   },
+   "radiusAdjust": {
+    "to": "radiusAdjust"
+   }
+  }
+ },
+ "com.alightcreative.effects.scaleassist": {
+  "to": "scaleassist",
+  "params": {
+   "axis": {
+    "to": "axis"
+   },
+   "scale": {
+    "to": "scale"
+   },
+   "damp": {
+    "to": "damp"
+   }
   }
  }
 }

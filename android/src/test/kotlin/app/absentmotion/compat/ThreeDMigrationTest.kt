@@ -67,7 +67,7 @@ class ThreeDMigrationTest {
         assertEquals(1.5f, e.floats("scale")[0], 1e-6f)
         val turned = migrate("""<effect id="com.alightcreative.effects.torus"><property name="rotate" type="vec3" value="10.000000,20.000000,30.000000" />
             <property name="position" type="vec3" value="40.000000,150.000000,600.000000" /></effect>""")
-        assertEquals(listOf(-10f, 20f, 30f), listOf("rotX", "rotY", "rotZ").map { turned.floats(it)[0] })
+        listOf("rotX", "rotY", "rotZ").zip(listOf(34.372f, 19.683f, -26.384f)).forEach { (name, want) -> assertEquals(name, want, turned.floats(name)[0], 0.01f) }
         val at = turned.floats("position")
         assertEquals(40f * 0.275f, at[0], 1e-3f)
         assertEquals(-(150f - 100f) * 0.275f, at[1], 1e-3f)

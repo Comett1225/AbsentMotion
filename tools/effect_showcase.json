@@ -85,6 +85,8 @@
     "solidmatte": {"photo": "colour", "layout": "move", "params": {"screenSpace": true}},
     "smoothedges": {"photo": "colour", "layout": "move", "params": {"blur": 160}},
     "movealongpath": {"photo": "colour", "layout": "move", "path": [".circle", 128], "params": {"progress": [0, 1]}, "animate": 16},
+    "scaleassist": {"photo": "colour", "layout": "move", "params": {"axis": 3, "scale": [1, 1.7, 1]}, "animate": 16},
+    "parenthelper": {"photo": "colour", "layout": "parent", "params": {"scaleMode": 1, "rotateMode": 1}, "animate": 16},
     "echo": {"photo": "colour", "layout": "move", "keys": [[-100, 0], [100, 0], [-100, 0]], "params": {"seconds": 0.25, "count": 3, "alpha": 0.3}, "animate": 16},
     "shutterblur": {"photo": "colour", "layout": "move", "keys": [[-100, 0], [100, 0], [-100, 0]], "params": {"shutter": 360, "samples": 16}, "animate": 16},
     "beatzoom": {"photo": "portrait", "params": {"strength": 0.25}, "animate": 16},

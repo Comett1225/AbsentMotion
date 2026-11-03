@@ -203,6 +203,8 @@ bool ShutterBlurOf(const Layer& layer, double timeMs, ShutterBlur* blur);
 void SetFastShutterBlur(bool fast);
 sk_sp<SkImageFilter> SmearFilter(SkVector moved);
 void ApplyMotion(const Layer& layer, double timeMs, Placement* placement);
+void ParentTerms(const Layer& layer, double timeMs, const Placement& parent, SkPoint* scale, float* rotation);
+void ParentRoll(const Layer& layer, double timeMs, Placement* own);
 float MotionOpacity(const Layer& layer, double timeMs);
 bool EchoOf(const Layer& layer, double timeMs, Echo* echo);
 bool FollowsPath(const Layer& layer);

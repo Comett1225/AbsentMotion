@@ -20,7 +20,8 @@ constexpr double kTau = 6.283185307179586;
 
 const char* const kMotionIds[] = {"absent.autoshake", "absent.randomdisplace", "absent.randomjitter", "absent.oscillate",
                                   "absent.swing", "absent.spin", "absent.pulsesize", "absent.pulseopacity",
-                                  "absent.echo", "absent.videofeedback", "absent.timequant", "absent.shutterblur", "absent.motionblur", "absent.movealongpath"};
+                                  "absent.echo", "absent.videofeedback", "absent.timequant", "absent.shutterblur", "absent.motionblur", "absent.movealongpath",
+                                  "absent.scaleassist", "absent.parenthelper"};
 
 thread_local bool gFastShutter = false;
 
@@ -448,8 +449,57 @@ void ApplyMotion(const Layer& l, double timeMs, Placement* p) {
             const float lo = Param(e, "shrink", t, 0.9f), hi = Param(e, "grow", t, 1.1f);
             const float k = (float)std::max(0.0, (lo + hi) / 2 + (hi - lo) / 2 * w);
             p->scale = {p->scale.fX * k, p->scale.fY * k};
+        } else if (id == "scaleassist") {
+            const float s = Param(e, "scale", t, 1), damp = Param(e, "damp", t, 1);
+            const long axis = std::lround(Param(e, "axis", t, 3));
+            if (axis != 1) p->scale.fX *= s;
+            if (axis == 1) p->scale.fY *= s;
+            else if (axis == 2) p->scale.fY *= s * damp;
+            else if (axis == 3) p->scale.fY *= 1 - damp * (s - 1);
         }
     }
+}
+
+namespace {
+
+const LayerEffect* ParentHelper(const Layer& l) {
+    for (const LayerEffect& e : l.effects) {
+        if (!e.hidden && e.id == "absent.parenthelper") return &e;
+    }
+    return nullptr;
+}
+
+float Pulled(long mode, float weight, float neutral, float parent) {
+    return mode == 1 ? neutral : mode == 2 ? neutral + (parent - neutral) * weight : parent;
+}
+
+}
+
+void ParentTerms(const Layer& l, double timeMs, const Placement& parent, SkPoint* scale, float* rotation) {
+    *scale = parent.scale;
+    *rotation = parent.rotation;
+    const LayerEffect* e = l.effects.empty() || l.placed ? nullptr : ParentHelper(l);
+    if (!e) return;
+    const float t = l.localTime(timeMs);
+    const long scaleMode = std::lround(Param(*e, "scaleMode", t, 0)), rotateMode = std::lround(Param(*e, "rotateMode", t, 0));
+    const float scaleWeight = Param(*e, "scaleWeight", t, 1), rotateWeight = Param(*e, "rotateWeight", t, 1);
+    *scale = {Pulled(scaleMode, scaleWeight, 1, parent.scale.fX), Pulled(scaleMode, scaleWeight, 1, parent.scale.fY)};
+    *rotation = Pulled(rotateMode, rotateWeight, 0, parent.rotation);
+}
+
+void ParentRoll(const Layer& l, double timeMs, Placement* own) {
+    const LayerEffect* e = l.effects.empty() || l.placed ? nullptr : ParentHelper(l);
+    if (!e) return;
+    const float t = l.localTime(timeMs);
+    const long axis = std::lround(Param(*e, "autoRotate", t, 0));
+    if (axis != 1 && axis != 2) return;
+    const SkRect box = ShapePath(l, t).getBounds();
+    const float across = std::fabs(box.width() * own->scale.fX), along = std::fabs(box.height() * own->scale.fY);
+    const bool narrow = across <= along;
+    const float radius = std::min(across, along) / 2 + Param(*e, "radiusAdjust", t, 0) * std::fabs(narrow ? own->scale.fX : own->scale.fY);
+    if (!std::isfinite(radius) || std::fabs(radius) < 1e-3f) return;
+    const float roll = (axis == 1 ? own->location.fX : own->location.fY) / radius * 180 / (float)(kTau / 2);
+    if (std::isfinite(roll)) own->rotation += roll;
 }
 
 float MotionOpacity(const Layer& l, double timeMs) {

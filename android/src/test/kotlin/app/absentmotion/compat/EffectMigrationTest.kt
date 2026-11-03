@@ -398,9 +398,9 @@ class EffectMigrationTest {
         val all = effects(result.scene.node)
         val moves = listOf("autoshake", "movealongpath", "offset", "oscillate", "pulsesize", "randomdisplace", "randomjitter", "swing", "spin",
             "stretchaxis", "pulseopacity")
-        assertEquals(moves.map { "absent.$it" } + listOf("absent.rastertransform", "com.alightcreative.effects.scaleassist"), all.map { it["id"] })
+        assertEquals(moves.map { "absent.$it" } + listOf("absent.rastertransform", "absent.scaleassist"), all.map { it["id"] })
         assertTrue(result.dropped.toString(), result.dropped.isEmpty())
-        assertEquals(moves.size + 1, result.converted.values.sum())
+        assertEquals(moves.size + 2, result.converted.values.sum())
         assertTrue(all.take(moves.size).all { it["hidden"] == "true" && it["locallyApplied"] == "true" })
         fun own(key: String) = all.single { it["id"] == "absent.$key" }
         fun numbers(key: String) = own(key).children.filter { it["type"] == "float" }.associate { it["name"]!! to it["value"]!!.toFloat() }
@@ -422,6 +422,7 @@ class EffectMigrationTest {
         assertEquals(mapOf("scale" to 18.51f, "angle" to 0f), numbers("stretchaxis"))
         assertEquals("false", own("stretchaxis").prop("mask")["value"])
         assertEquals(mapOf("frequency" to 5.98f, "strength" to 1f, "phase" to 0f, "wave" to 0f), numbers("pulseopacity"))
+        assertEquals(mapOf("axis" to 3f, "scale" to 369.99628f, "damp" to 1f), numbers("scaleassist"))
         assertEquals(result.scene.node, migration.migrate(result.scene).scene.node)
     }
 
@@ -429,7 +430,7 @@ class EffectMigrationTest {
         val store = ProjectStore(tmp.newFolder())
         val report = Importer(store, migration = migration, canRun = { catalog.find(it) != null }).import { alightMoves.byteInputStream() }.single()
         val sections = report.sections.toMap()
-        assertEquals(setOf(UiText.plural(R.plurals.library_report_effect_layers, 1, "scaleassist", "1")), sections[txt(R.string.library_report_cannot_run)]!!.toSet())
+        assertNull(sections[txt(R.string.library_report_cannot_run)])
         assertTrue(sections.keys.toString(), sections.keys.all { it in notImported })
         assertNull(sections[txt(R.string.library_report_dropped)])
         assertEquals(13, effects(store.load(report.id)!!.node).size)

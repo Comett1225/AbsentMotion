@@ -8,10 +8,10 @@ Export the project from Alight Motion as XML and open it in AbsentMotion. After 
 
 ## In short
 
-- **63** Alight effects look the same and **29** are very close.
+- **64** Alight effects look the same and **30** are very close.
 - **78** are converted to a similar effect that does not look identical.
 - **53** are converted but have not been compared side by side yet.
-- **49** are not converted yet (mostly very old effect versions, VR and some 3D solids).
+- **47** are not converted yet (mostly very old effect versions, VR and some 3D solids).
 - **Blending modes:** all of Alight's blending modes come across. Multiply and Subtract get their opacity converted so they look the same.
 
 Something imports wrong? [Send the project as an Import problem](https://github.com/Comett1225/AbsentMotion/issues/new?template=import_problem.yml): the XML and a screenshot of the same moment in Alight Motion. That is the fastest way to get it fixed.
@@ -28,7 +28,7 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | clouds2 | Clouds | Same look |
 | Color Temperature | Color Temperature | Same look |
 | Color Tune | Lift Gamma Gain | Same look |
-| Copy Background | Adjustment Layer | Same look |
+| Copy Background | Copy Background | Same look |
 | Count Up/Down | Count Up/Down | Same look |
 | displacemap2 | Displacement Map | Same look |
 | Displacement Map | Displacement Map | Same look |
@@ -64,6 +64,7 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | ridges | Fractal Ridges | Same look |
 | Roughen Edges | Roughen Edges | Same look |
 | Saturation / Vibrance | Hue & Saturation | Same look |
+| Scale Assist | Scale Assist | Same look |
 | Simple Starfield | Simple Starfield | Same look |
 | simplestars | Simple Starfield | Same look |
 | Smooth Edges | Smooth Edges | Same look |
@@ -97,6 +98,7 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Light Glow | Light Glow | Very close |
 | Luma Key | Luma Key | Very close |
 | lumakey2 | Luma Key | Very close |
+| Parenting Helper | Parenting Helper | Very close |
 | Random Displacement | Random Displacement | Very close |
 | Rays | Rays | Very close |
 | Replace Color | Replace Color | Very close |
@@ -276,12 +278,10 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | outlinebad | - | Not converted yet |
 | outlinebasic | - | Not converted yet |
 | Page Curl | - | Not converted yet |
-| Parenting Helper | - | Not converted yet |
 | perlindisplace | - | Not converted yet |
 | rgb-gamma | - | Not converted yet |
 | rgb-mixer | - | Not converted yet |
 | Ring | - | Not converted yet |
-| Scale Assist | - | Not converted yet |
 | Scatter Repeat | - | Not converted yet |
 | shadow | - | Not converted yet |
 | starfield | - | Not converted yet |
