@@ -26,7 +26,7 @@ private fun Scene.visualHeader(): XmlNode = node.copy(
     children = node.children.filter { it.name !in Scene.LAYER_TAGS && it.name != "bookmark" },
 )
 
-private fun Layer.externalDependencies(): Boolean = kind == "camera" || kind == "embedScene" ||
+private fun Layer.externalDependencies(): Boolean = kind == "camera" || kind == "light" || kind == "embedScene" ||
     node["parent"]?.let { it != "0" } == true || node["pathLayer"]?.let { it != "0" } == true || node["clippingMask"] == "true" ||
     node.children.any { it.name == "effect" && it["hidden"] != "true" }
 

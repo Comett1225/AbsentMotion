@@ -194,6 +194,26 @@
       "note": "saves to the pictures folder through DeskExportStore"
     },
     {
+      "id": "tool.depth_order",
+      "name": "Camera depth order with 2D stack separators",
+      "where": "panels/CameraPanel.kt, camera.cpp",
+      "android": "works",
+      "macos": "untested",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "Whole 3D layers sort between 2D layers; individual objects retain their own internal ordering."
+    },
+    {
+      "id": "tool.light_layer",
+      "name": "Light layers for models and 3D pieces",
+      "where": "StructureUi.kt, panels/LightPanel.kt, camera.cpp, model.cpp, pieces3d.cpp",
+      "android": "works",
+      "macos": "untested",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "Up to four active ambient, directional or point lights shade each scene."
+    },
+    {
       "id": "tool.camera_layer",
       "name": "3D camera layer: options, camera moves, camera view",
       "where": "panels/CameraPanel.kt, MotionSheets.kt, PreviewMode.kt",

@@ -113,6 +113,19 @@ class CameraRigTest {
     }
 
     @Test
+    fun depthOrbitTurnsTowardTheSubject() {
+        val old = scene(camera(2)).withCameraMove(2, CameraMove.Orbit, 0, 2000).cam(2)
+        val orbit = scene(camera(2)).withDepthOrder(true).withCameraMove(2, CameraMove.Orbit, 0, 2000).cam(2)
+        assertTrue(old.keys(PropRef.Tilt).isEmpty())
+        val tilt = orbit.keys(PropRef.Tilt)
+        val positions = orbit.keys(PropRef.Location)
+        assertEquals(17, tilt.size)
+        assertEquals(positions.first().v, positions.last().v)
+        assertTrue(tilt.any { kotlin.math.abs(values(it.v)[1]) > 1f })
+        assertTrue(positions.any { kotlin.math.abs(values(it.v)[2] + distance) > 1f })
+    }
+
+    @Test
     fun anotherMoveReplacesTheLastOne() {
         val first = scene(camera(2)).withCameraMove(2, CameraMove.PushIn, 0, 3000)
         val second = first.withCameraMove(2, CameraMove.Pan, 0, 1000, clearToMs = 3000)

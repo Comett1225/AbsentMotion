@@ -251,6 +251,7 @@ private fun DeskObjects(state: EditorState) {
         DeskElementPicker(state)
     } else DeskGrid(Modifier.fillMaxSize()) {
         item { DeskIconTile(state, stringResource(R.string.camera), PanelIcons.Camera) { state.addCamera() } }
+        item { DeskIconTile(state, stringResource(R.string.light_layer), PanelIcons.Brightness) { state.addLight() } }
         item { DeskIconTile(state, stringResource(R.string.structure_null), ChromeIcons.NullObject) { state.addNull() } }
         item { DeskIconTile(state, stringResource(R.string.structure_empty_group), SelectionIcons.Group) { state.addEmptyGroup() } }
         item { DeskIconTile(state, stringResource(R.string.structure_asset_project), ChromeIcons.AssetProject, direct = false) { picking = true } }

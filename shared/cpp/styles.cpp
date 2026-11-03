@@ -622,7 +622,7 @@ std::vector<LayerCopy> CopiesOf(const std::vector<Layer>& siblings, const Layer&
                              std::fabs(box.top() - space.anchor.fY), std::fabs(box.bottom() - space.anchor.fY)}) * 1.415f;
     if (RepeatsAlongPath(l)) {
         const Layer* below = PathSource(siblings, l);
-        if (below && below->kind != "nullobj" && below->kind != "camera") {
+        if (below && below->kind != "nullobj" && below->kind != "camera" && below->kind != "light") {
             const float tb = below->localTime(timeMs);
             space.below = (below->text ? TextGlyphPath(*below, tb, Fps()) : Cropped(*below, tb, ShapePath(*below, tb))).makeTransform(SiblingMatrix(siblings, *below, timeMs));
         }
@@ -1483,7 +1483,7 @@ void DrawShuttered(SkCanvas* canvas, const std::vector<Layer>& siblings, const L
 
 void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& l, double timeMs,
              const MediaPictures& pictures, const Override& ov) {
-    if (!l.activeAt(timeMs) || l.kind == "nullobj" || l.kind == "camera") return;
+    if (!l.activeAt(timeMs) || l.kind == "nullobj" || l.kind == "camera" || l.kind == "light") return;
     if (l.fillType == "media" && !pictures(l.mediaUri, l.id)) return;
     if (!ov.feedback) for (const LayerEffect& e : l.effects) {
         if (e.hidden || e.id != "absent.videofeedback") continue;
@@ -1699,7 +1699,7 @@ bool TextGuideBelow(const Layer& layer, float t, SkPath* path) {
         self = self->sight.layer;
     }
     const Layer* below = PathSource(*list, *self);
-    if (!below || below == self || below->kind == "nullobj" || below->kind == "camera" || below->kind == "audio") return false;
+    if (!below || below == self || below->kind == "nullobj" || below->kind == "camera" || below->kind == "audio" || below->kind == "light") return false;
     const double timeMs = layer.startTime + (double)t * std::max(0, layer.endTime - layer.startTime);
     const float tb = below->localTime(timeMs);
     SkMatrix inverse;
@@ -1769,7 +1769,7 @@ static bool ContainsOne(const std::vector<Layer>& siblings, const Layer& l, doub
 
 static bool Contains(const std::vector<Layer>& siblings, const Layer& l, double timeMs, SkPoint p, int width, int height,
                      const MediaPictures& masks) {
-    if (!l.activeAt(timeMs) || l.kind == "nullobj" || l.kind == "camera") return false;
+    if (!l.activeAt(timeMs) || l.kind == "nullobj" || l.kind == "camera" || l.kind == "light") return false;
     if (!HasRepeat(l)) return ContainsOne(siblings, l, timeMs, p, masks);
     for (const LayerCopy& c : CopiesOf(siblings, l, timeMs, width, height)) {
         SkMatrix inverse;
@@ -1833,7 +1833,7 @@ static bool ContentRect(const Layer& l, double timeMs, const SkMatrix& matrix, S
     float left = INFINITY, top = INFINITY, right = -INFINITY, bottom = -INFINITY;
     SkRect child;
     for (const Layer& c : l.children) {
-        if (innerTime < 0 || !c.activeAt(innerTime) || c.kind == "nullobj" || c.kind == "camera") continue;
+        if (innerTime < 0 || !c.activeAt(innerTime) || c.kind == "nullobj" || c.kind == "camera" || c.kind == "light") continue;
         if (!ContentRect(c, innerTime, SkMatrix::Concat(origin, SiblingMatrix(l.children, c, innerTime)), &child)) continue;
         left = std::min(left, child.fLeft);
         top = std::min(top, child.fTop);
@@ -1871,7 +1871,7 @@ static void FaceForward(std::vector<Layer>* seen) {
 }
 
 static const std::vector<Layer>& SeenProject(const Scene& scene, double timeMs, std::vector<Layer>* storage) {
-    if (!SeeLayers(scene.layers, scene.width, scene.height, true, scene.fps, timeMs, storage)) return scene.layers;
+    if (!SeeLayers(scene.layers, scene.width, scene.height, true, scene.fps, timeMs, scene.depthOrder, storage)) return scene.layers;
     FaceForward(storage);
     return *storage;
 }
@@ -1930,7 +1930,7 @@ void DrawList(SkCanvas* canvas, const std::vector<Layer>& listed, int width, int
               const MediaPictures& pictures) {
     std::vector<Layer> inherited, storage;
     const std::vector<Layer>& source = InheritEffects(listed, &inherited) ? inherited : listed;
-    const bool seen = SeeLayers(source, width, height, top, gScene ? gScene->fps : 30, timeMs, &storage);
+    const bool seen = SeeLayers(source, width, height, top, gScene ? gScene->fps : 30, timeMs, top && gScene && gScene->depthOrder, &storage);
     if (seen) FaceForward(&storage);
     const std::vector<Layer>& layers = seen ? storage : source;
     const std::vector<Layer>* const outer = gEffectList;

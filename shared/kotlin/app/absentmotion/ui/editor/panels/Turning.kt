@@ -98,7 +98,7 @@ internal data class Turn(val effect: Int = -1, private val axes: List<EffectPara
 }
 
 internal fun turnFor(layer: Layer, catalog: EffectCatalog, tab: Int): Turn? {
-    if (tab != ROTATE_TAB && tab != TILT_TAB || layer.kind == "camera") return null
+    if (tab != ROTATE_TAB && tab != TILT_TAB) return null
     val turn = layer.effects.withIndex().firstNotNullOfOrNull { (i, node) ->
         val definition = catalog.find(node["id"] ?: "")?.takeIf { it.available && node["hidden"] != "true" } ?: return@firstNotNullOfOrNull null
         val axes = TURN_AXES.map { id -> definition.params.firstOrNull { it.id == id } ?: return@firstNotNullOfOrNull null }

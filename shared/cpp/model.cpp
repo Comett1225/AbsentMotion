@@ -46,6 +46,8 @@ void DrawModel(SkCanvas* canvas, const Layer& l, double timeMs, float alpha, con
     const SkM44 full = canvas->getLocalToDevice() * p.space * SkM44::Scale(sx, sy, std::sqrt(std::fabs(sx * sy))) *
                        SkM44::Translate(-p.pivot.fX, -p.pivot.fY) * spin * SkM44::Scale(size, size, size);
     const SkM44 turn = p.turn * spin;
+    const SkM44 worldTurn = SkM44::Rotate({0, 0, 1}, p.rotation * kRadians) * p.tilt * spin;
+    const LightSet lights = l.sight.layers ? SceneLights(*l.sight.layers, timeMs) : LightSet{};
     const float mirror = sx * sy < 0 ? -1.0f : 1.0f;
     const float angle = l.value("lightAngle", 0, t, 135) * kRadians;
     const SkV3 light = SkV3{std::cos(angle), -std::sin(angle), -1.2f}.normalize();
@@ -98,8 +100,16 @@ void DrawModel(SkCanvas* canvas, const Layer& l, double timeMs, float alpha, con
                 const float facing = length > 0 ? SkV3{n.x, n.y, n.z}.dot(light) / length * (f->back ? -1.0f : 1.0f) : 0.0f;
                 const float k = std::clamp(ambient + intensity * std::max(facing, 0.0f), 0.0f, 4.0f);
                 const uint32_t c = m.colors[v];
-                auto lit = [&](int shift) { return (U8CPU)std::min(255.0f, ((c >> shift) & 0xff) * k + 0.5f); };
-                colors[out] = SkColorSetARGB(c >> 24, lit(16), lit(8), lit(0));
+                SkV3 illumination{k, k, k};
+                if (lights.count) {
+                    const SkV4 wn = worldTurn.map(m.normals[v * 3], m.normals[v * 3 + 1], m.normals[v * 3 + 2], 0);
+                    const SkV4 wp = worldTurn.map(m.positions[v * 3] * size * sx, m.positions[v * 3 + 1] * size * sy,
+                                                 m.positions[v * 3 + 2] * size * std::sqrt(std::fabs(sx * sy)), 0);
+                    const float side = f->back ? -1.0f : 1.0f;
+                    illumination = Illuminate(lights, {wn.x * side, wn.y * side, wn.z * side}, {wp.x + p.location.x(), wp.y + p.location.y(), wp.z + p.z});
+                }
+                auto lit = [&](int shift, float value) { return (U8CPU)std::min(255.0f, ((c >> shift) & 0xff) * std::clamp(value, 0.0f, 4.0f) + 0.5f); };
+                colors[out] = SkColorSetARGB(c >> 24, lit(16, illumination.x), lit(8, illumination.y), lit(0, illumination.z));
             }
         }
         SkPaint paint;

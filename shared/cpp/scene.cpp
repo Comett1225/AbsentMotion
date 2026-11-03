@@ -299,9 +299,10 @@ void ParseGroup(const XmlNode& scene, int fps, Layer* group) {
 bool ParseLayer(const XmlNode& node, int fps, Layer* out) {
     const XmlNode* n = &node;
     if (n->name != "shape" && n->name != "text" && n->name != "embedScene" && n->name != "nullobj" && n->name != "drawing" && n->name != "camera" &&
-        n->name != "model") return false;
+        n->name != "model" && n->name != "light") return false;
     Layer& l = *out;
     l.kind = n->name;
+    if (l.kind == "light") l.lightType = StrAttr(*n, "type");
     if (l.kind == "text") l.text = ParseText(*n);
     if (l.kind == "embedScene") {
         if (const XmlNode* inner = n->child("scene")) ParseGroup(*inner, fps, &l);
@@ -326,6 +327,7 @@ bool ParseLayer(const XmlNode& node, int fps, Layer* out) {
     l.startTime = IntAttr(*n, "startTime", 0);
     l.endTime = std::max(l.startTime, IntAttr(*n, "endTime", 0));
     l.hidden = StrAttr(*n, "hidden") == "true";
+    l.force3d = StrAttr(*n, "threeD") == "true";
     if (const XmlNode* t = n->child("transform")) {
         l.location = ParseAnim(t->child("location"));
         if (l.endTime > l.startTime) LeadIn(&l.location, 1000.0f / fps / (l.endTime - l.startTime));
@@ -381,6 +383,7 @@ bool ParseScene(const std::string& xml, Scene* scene, std::string* error) {
     next.height = IntAttr(*root, "height", 0);
     next.fps = FpsAttr(*root);
     next.totalTime = IntAttr(*root, "totalTime", 0);
+    next.depthOrder = StrAttr(*root, "depthOrder") == "true";
     const char* bg = root->attr("bgcolor");
     next.bgColor = bg && *bg == '#' ? (uint32_t)strtoul(bg + 1, nullptr, 16) : 0;
     if (next.width <= 0 || next.height <= 0) {

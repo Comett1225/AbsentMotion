@@ -13,7 +13,7 @@ import app.absentmotion.model.withEffect
 
 val Layer.canCrop: Boolean get() = kind !in Uncroppable
 
-private val Uncroppable = setOf("audio", "camera", "nullobj", "model")
+private val Uncroppable = setOf("audio", "camera", "nullobj", "model", "light")
 
 fun EditorState.openCrop() {
     val layer = selected ?: return

@@ -53,7 +53,7 @@ enum class CameraMove(val id: String, @StringRes val label: Int) {
     Handheld("handheld", R.string.camera_move_handheld),
 }
 
-private data class Pose(val x: Float, val y: Float, val z: Float, val turn: Float, val fov: Float)
+private data class Pose(val x: Float, val y: Float, val z: Float, val turn: Float, val fov: Float, val tiltX: Float, val tiltY: Float)
 
 private const val EDGE = 1e-4f
 
@@ -68,16 +68,17 @@ fun Scene.cameraMoveSpan(id: Long, fromMs: Int, ms: Int): Pair<Int, Int>? {
 
 fun Scene.withCameraMove(id: Long, move: CameraMove, fromMs: Int, ms: Int, clearToMs: Int = 0): Scene {
     val (from, to) = cameraMoveSpan(id, fromMs, ms) ?: return this
-    return update(id) { it.withCameraMove(move, from, to, max(to, clearToMs), width, height) }
+    return update(id) { it.withCameraMove(move, from, to, max(to, clearToMs), width, height, depthOrder) }
 }
 
 private fun Layer.poseAt(timeMs: Int): Pose {
     val here = at(timeMs, 1000)
     val at = here.location
-    return Pose(at[0], at[1], at[2], here.transform("rotation", 0f)[0], here.cameraFov)
+    val tilt = here.tilt
+    return Pose(at[0], at[1], at[2], here.transform("rotation", 0f)[0], here.cameraFov, tilt[0], tilt[1])
 }
 
-internal fun Layer.withCameraMove(move: CameraMove, fromMs: Int, toMs: Int, clearToMs: Int, width: Int, height: Int): Layer {
+internal fun Layer.withCameraMove(move: CameraMove, fromMs: Int, toMs: Int, clearToMs: Int, width: Int, height: Int, depthOrder: Boolean = false): Layer {
     val start = poseAt(fromMs)
     val size = max(width, height)
     val distance = (-start.z).takeIf { it > 1f } ?: cameraZoomOf(start.fov, size)
@@ -91,7 +92,11 @@ internal fun Layer.withCameraMove(move: CameraMove, fromMs: Int, toMs: Int, clea
             List(17) { i ->
                 val u = i / 16f
                 val a = 2 * PI.toFloat() * smooth(u)
-                u to if (i % 16 == 0) start else start.copy(x = start.x + r * sin(a), y = start.y - r + r * cos(a))
+                val swing = 0.35f * sin(a)
+                u to if (i % 16 == 0) start else if (depthOrder) start.copy(
+                    x = start.x + distance * sin(swing), z = start.z + distance * (1 - cos(swing)),
+                    tiltY = start.tiltY + Math.toDegrees(swing.toDouble()).toFloat(),
+                ) else start.copy(x = start.x + r * sin(a), y = start.y - r + r * cos(a))
             }
         }
         CameraMove.DollyZoom -> {
@@ -136,6 +141,7 @@ internal fun Layer.withCameraMove(move: CameraMove, fromMs: Int, toMs: Int, clea
     val moves = poses.map { it.second }
     write(PropRef.Location, true) { formatFloats(floatArrayOf(it.x, it.y, it.z)) }
     write(PropRef.Rotation, moves.any { it.turn != start.turn }) { formatFloats(floatArrayOf(it.turn)) }
+    write(PropRef.Tilt, moves.any { it.tiltX != start.tiltX || it.tiltY != start.tiltY }) { formatFloats(floatArrayOf(it.tiltX, it.tiltY)) }
     write(CameraFov, moves.any { it.fov != start.fov }) { formatFloats(floatArrayOf(it.fov)) }
     return layer
 }

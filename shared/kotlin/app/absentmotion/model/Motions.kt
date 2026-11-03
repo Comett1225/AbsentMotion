@@ -164,7 +164,7 @@ const val LOOP_MAX_MS = 4000
 
 private const val EDGE = 1e-4f
 private val Rest = mapOf("opacity" to floatArrayOf(1f), "location" to floatArrayOf(0f, 0f, 0f), "scale" to floatArrayOf(1f, 1f), "rotation" to floatArrayOf(0f))
-private val NotVisual = setOf("audio", "camera", "nullobj")
+private val NotVisual = setOf("audio", "camera", "nullobj", "light")
 
 val Layer.canAnimate: Boolean get() = kind !in NotVisual
 

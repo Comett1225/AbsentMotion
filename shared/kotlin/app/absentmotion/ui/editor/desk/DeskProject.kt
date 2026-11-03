@@ -76,6 +76,7 @@ internal fun deskLayerIcon(layer: Layer) = when {
     layer.kind == "audio" -> ChromeIcons.AudioTab
     layer.kind == "text" -> ChromeIcons.TextTool
     layer.kind == "camera" -> PanelIcons.Camera
+    layer.kind == "light" -> PanelIcons.Brightness
     layer.kind == "drawing" -> ChromeIcons.Freehand
     layer.kind == "embedScene" -> SelectionIcons.Group
     layer.kind == "null" -> ChromeIcons.NullObject

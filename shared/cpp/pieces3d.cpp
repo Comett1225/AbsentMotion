@@ -1,4 +1,5 @@
 #include "pieces3d.h"
+#include "scene.h"
 
 #include "include/core/SkCanvas.h"
 #include "include/core/SkImage.h"
@@ -76,6 +77,13 @@ SkColor shade(SkColor c, float light, float alpha = 1) {
     return SkColorSetARGB((int)(SkColorGetA(c) * std::clamp(alpha, 0.0f, 1.0f)), channel(SkColorGetR(c)), channel(SkColorGetG(c)), channel(SkColorGetB(c)));
 }
 
+SkColor shadeWithLights(SkColor c, float fallback, const LightSet& lights, SkV3 origin, V normal, V position, float alpha = 1) {
+    if (!lights.count) return shade(c, fallback, alpha);
+    const SkV3 lit = Illuminate(lights, {normal.x, normal.y, normal.z}, {origin.x + position.x, origin.y + position.y, origin.z + position.z});
+    const auto channel = [](int value, float intensity) { return (int)std::clamp(std::round(value * intensity), 0.0f, 255.0f); };
+    return SkColorSetARGB((int)(SkColorGetA(c) * std::clamp(alpha, 0.0f, 1.0f)), channel(SkColorGetR(c), lit.x), channel(SkColorGetG(c), lit.y), channel(SkColorGetB(c), lit.z));
+}
+
 SkColor sample(const std::vector<unsigned char>& pixels, int w, int h, float x, float y, const SkRect& r) {
     const int ix = std::clamp((int)((x - r.left()) * w / r.width()), 0, w - 1);
     const int iy = std::clamp((int)((y - r.top()) * h / r.height()), 0, h - 1);
@@ -87,7 +95,7 @@ float lighting(V normal, V light, float intensity, float shading) {
     return std::clamp(1 - shading + shading * (0.25f + intensity * std::max(0.0f, dot(unit(normal), light))), 0.0f, 1.5f);
 }
 
-void scatter(Mesh& mesh, const SkRect& area, const SkM44& orientation, const Setting& v, const std::vector<unsigned char>& pixels, int w, int h) {
+void scatter(Mesh& mesh, const SkRect& area, const SkM44& orientation, const Setting& v, const std::vector<unsigned char>& pixels, int w, int h, const LightSet& lights, SkV3 origin) {
     const int shape = std::clamp((int)std::round(v("shape", 0, 0)), 0, 3);
     const int depth = std::clamp((int)std::round(v("depth", 0, 1)), 1, 16);
     float spacing = std::clamp(v("spacing", 0, 24), 1.0f, 10000.0f);
@@ -132,21 +140,23 @@ void scatter(Mesh& mesh, const SkRect& area, const SkM44& orientation, const Set
                 const V a = map(rot, corners[face[0]]), b = map(rot, corners[face[1]]), c = map(rot, corners[face[2]]);
                 const V n = cross(b - a, c - a);
                 if (n.z >= 0) continue;
-                const SkColor lit = shade(color, lighting(n, light, intensity, shading));
+                const SkColor lit = shadeWithLights(color, lighting(n, light, intensity, shading), lights, origin, n, center);
                 mesh.quad(vert(corners[face[0]],lit), vert(corners[face[1]],lit), vert(corners[face[2]],lit), vert(corners[face[3]],lit));
             }
         } else if (shape == 2) {
-            const SkColor lit = shade(color, lighting(map(rot,{0,0,-1}), light, intensity, shading));
+            const V normal = map(rot,{0,0,-1});
+            const SkColor lit = shadeWithLights(color, lighting(normal, light, intensity, shading), lights, origin, normal, center);
             mesh.quad(vert({-1,-1,0},lit), vert({1,-1,0},lit), vert({1,1,0},lit), vert({-1,1,0},lit));
         } else {
             constexpr int segments = 12;
             const bool sphere = shape == 1;
-            const SkColor mid = shade(color, sphere ? std::min(1.3f, lighting({0,0,-1}, light, intensity, shading) + intensity * shading * 0.3f) : lighting(map(rot,{0,0,-1}), light, intensity, shading));
+            const V normal = sphere ? V{0,0,-1} : map(rot,{0,0,-1});
+            const SkColor mid = shadeWithLights(color, sphere ? std::min(1.3f, lighting({0,0,-1}, light, intensity, shading) + intensity * shading * 0.3f) : lighting(normal, light, intensity, shading), lights, origin, normal, center);
             for (int i = 0; i < segments; i++) {
                 const float a = 2*pi*i/segments, b = 2*pi*(i+1)/segments;
                 const V p{std::cos(a), std::sin(a), 0}, q{std::cos(b), std::sin(b), 0};
-                const SkColor cp = sphere ? shade(color, lighting(unit({p.x,p.y,-0.25f}), light, intensity, shading)) : mid;
-                const SkColor cq = sphere ? shade(color, lighting(unit({q.x,q.y,-0.25f}), light, intensity, shading)) : mid;
+                const SkColor cp = sphere ? shadeWithLights(color, lighting(unit({p.x,p.y,-0.25f}), light, intensity, shading), lights, origin, unit({p.x,p.y,-0.25f}), center + p*size) : mid;
+                const SkColor cq = sphere ? shadeWithLights(color, lighting(unit({q.x,q.y,-0.25f}), light, intensity, shading), lights, origin, unit({q.x,q.y,-0.25f}), center + q*size) : mid;
                 if (sphere) {
                     const V highlight = center + V{light.x, light.y, 0} * (size * 0.32f);
                     mesh.add({highlight,{},mid}, {center + p*size,{},cp}, {center + q*size,{},cq});
@@ -156,7 +166,7 @@ void scatter(Mesh& mesh, const SkRect& area, const SkM44& orientation, const Set
     }
 }
 
-void fracture(Mesh& mesh, const SkRect& area, const SkM44& orientation, const Setting& v, int w, int h) {
+void fracture(Mesh& mesh, const SkRect& area, const SkM44& orientation, const Setting& v, int w, int h, const LightSet& lights, SkV3 lightOrigin) {
     const int count = std::clamp((int)std::round(v("pieces", 0, 40)), 1, 128);
     mesh.triangles.reserve((size_t)count * 16);
     const uint32_t seed = (uint32_t)(int)std::clamp(v("seed", 0, 0), -1000000.0f, 1000000.0f);
@@ -215,14 +225,14 @@ void fracture(Mesh& mesh, const SkRect& area, const SkM44& orientation, const Se
         const auto point = [&](SkPoint p, float z) { return origin + map(rot, {p.x() - center.x(), p.y() - center.y(), z}); };
         const V normal = map(rot, {0, 0, -1});
         const float faceLight = 1 + (lighting(normal.z < 0 ? normal : normal * -1, light, intensity, 0.35f) - 1) * progress;
-        const SkColor face = shade(SK_ColorWHITE, faceLight, fade);
+        const SkColor face = shadeWithLights(SK_ColorWHITE, faceLight, lights, lightOrigin, normal.z < 0 ? normal : normal * -1, origin, fade);
         const auto vertex = [&](SkPoint p, float z, SkColor color) { return Vertex{point(p, z), uv(p), color}; };
         if (thickness > 0 && progress > 0) for (int k = 0; k < n; k++) {
             const SkPoint p = a[k], q = a[(k+1)%n];
             const V edge = map(rot, {q.x()-p.x(), q.y()-p.y(), 0});
             const V side = cross(edge, map(rot, {0,0,1}));
             if (side.z >= 0) continue;
-            const SkColor color = shade(SK_ColorWHITE, lighting(side, light, intensity, 0.8f), fade);
+            const SkColor color = shadeWithLights(SK_ColorWHITE, lighting(side, light, intensity, 0.8f), lights, lightOrigin, side, origin, fade);
             mesh.quad(vertex(p,0,color), vertex(q,0,color), vertex(q,thickness,color), vertex(p,thickness,color));
         }
         for (int k = 1; k + 1 < n; k++) mesh.add(vertex(a[0], 0, face), vertex(a[k], 0, face), vertex(a[k+1], 0, face));
@@ -234,14 +244,14 @@ void fracture(Mesh& mesh, const SkRect& area, const SkM44& orientation, const Se
 bool IsEffect(const std::string& id) { return id == "absent.scatter3d" || id == "absent.fracture3d"; }
 
 void Draw(SkCanvas* canvas, const std::string& id, const SkRect& area, const SkM44& orientation, const Setting& value,
-          const std::vector<unsigned char>& pixels, int width, int height, SkImage* image) {
+          const std::vector<unsigned char>& pixels, int width, int height, SkImage* image, const LightSet& lights, SkV3 origin) {
     if (area.isEmpty() || width <= 0 || height <= 0 || pixels.size() != (size_t)width * height * 4) return;
     const bool textured = id == "absent.fracture3d";
     const float perspective = textured ? 0.5f : std::clamp(value("perspective", 0, 0.5f), 0.0f, 1.0f);
     const float distance = std::max(1.0f, std::min(area.width(), area.height()) * 0.5f * (2 + 40 * std::pow(1.0f - perspective, 3.0f)));
     Mesh mesh{{}, area.center(), distance, textured};
-    if (textured) fracture(mesh, area, orientation, value, width, height);
-    else scatter(mesh, area, orientation, value, pixels, width, height);
+    if (textured) fracture(mesh, area, orientation, value, width, height, lights, origin);
+    else scatter(mesh, area, orientation, value, pixels, width, height, lights, origin);
     mesh.draw(canvas, image);
 }
 

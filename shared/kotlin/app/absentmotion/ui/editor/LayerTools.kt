@@ -90,6 +90,7 @@ import app.absentmotion.editor.trimStart
 import app.absentmotion.ui.editor.panels.BlendingPanel
 import app.absentmotion.ui.editor.panels.BorderShadowPanel
 import app.absentmotion.ui.editor.panels.CameraPanel
+import app.absentmotion.ui.editor.panels.LightPanel
 import app.absentmotion.ui.editor.panels.BorderShadowTabs
 import app.absentmotion.ui.editor.panels.OpacityRef
 import app.absentmotion.ui.editor.panels.borderShadowTarget
@@ -202,6 +203,7 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
                 listOf(Tile(ModelOptions) { state.panel = EditorPanel.Model }, blending),
                 listOf(transform, presets, effects),
             )
+            "light" -> listOf(listOf(Tile(LightOptions) { state.panel = EditorPanel.Light }, transform))
             "nullobj" -> listOf(listOf(transform, presets, effects))
             else -> {
                 val edit = when {
@@ -227,6 +229,9 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
         val saved = stringResource(R.string.screenshot_saved)
         val failed = stringResource(R.string.screenshot_failed)
         val more = listOfNotNull(
+            if (state.scene.depthOrder && kind in setOf("shape", "text", "drawing", "embedScene")) Tile(ThreeDLayer, active = state.selected?.node?.get("threeD") == "true") {
+                state.editSelected { it.copy(node = it.node.with("threeD", if (it.node["threeD"] == "true") null else "true")) }
+            } else null,
             if (state.selected?.canCrop == true) Tile(Crop) { state.openCrop() } else null,
             if (app.absentmotion.platform.PlatformFeatures.ai && state.selected?.mediaFill != null) Tile(AiTools) { openEffectBrowser(state, "ai") } else null,
             if (app.absentmotion.platform.PlatformFeatures.ai && video) Tile(CaptionTools) { state.playing = false; captions = true } else null,
@@ -304,6 +309,8 @@ private val EditDrawing = Tool(R.string.layer_tool_edit_drawing, PanelIcons.Edit
 private val CameraOptions = Tool(R.string.layer_tool_camera_options, PanelIcons.Camera, 19.4f)
 private val CameraMoves = Tool(R.string.camera_moves, PanelIcons.Animate, 19.4f)
 private val ModelOptions = Tool(R.string.layer_tool_model_options, PanelIcons.TabTilt, 19.4f)
+private val LightOptions = Tool(R.string.light_options, PanelIcons.Brightness, 19.4f)
+private val ThreeDLayer = Tool(R.string.three_d_layer, PanelIcons.TabTilt, 19.4f)
 private val Presets = Tool(R.string.presets, PanelIcons.Star, 19.4f)
 private val Effects = Tool(R.string.layer_tool_effects, PanelIcons.Effects, 19.6f)
 private val Crop = Tool(R.string.layer_tool_crop, PanelIcons.Crop, 18.1f)
@@ -381,7 +388,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
     val catalog by state.engine.effects.collectAsState()
     val turn = if (move) turnFor(selected, catalog, tab) else null
     var menuOpen by remember { mutableStateOf(false) }
-    val named = panel != EditorPanel.EditShape && panel != EditorPanel.Camera && panel != EditorPanel.Model && !(move && tab == ROTATE_TAB && turn != null)
+    val named = panel != EditorPanel.EditShape && panel != EditorPanel.Camera && panel != EditorPanel.Model && panel != EditorPanel.Light && !(move && tab == ROTATE_TAB && turn != null)
     val known = if (!named) null else when {
         move -> if (selected.kind == "camera" && tab == SIZE_TAB) KeyTarget(app.absentmotion.model.CameraFov, "60.000000") else TransformTargets[tab]
         panel == EditorPanel.ColorFill && layer.fillType == "color" -> KeyTarget(PropRef.FillColor, formatColor(layer.fillColor))
@@ -428,6 +435,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
                 EditorPanel.Blending -> BlendingPanel(state, layer, Modifier.fillMaxSize())
                 EditorPanel.Camera -> CameraPanel(state, layer, Modifier.fillMaxSize())
                 EditorPanel.Model -> ModelPanel(state, layer, Modifier.fillMaxSize())
+                EditorPanel.Light -> LightPanel(state, layer, Modifier.fillMaxSize())
                 EditorPanel.Edge -> app.absentmotion.ui.editor.panels.EdgePanel(state, layer, Modifier.fillMaxSize())
                 EditorPanel.Tools, EditorPanel.EditText, EditorPanel.Effects, EditorPanel.Crop -> {}
             }
@@ -440,7 +448,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
                 val icons = listOf(PanelIcons.TabMove, PanelIcons.TabRotate, PanelIcons.TabSize, PanelIcons.TabTilt, PanelIcons.TabSkew, PanelIcons.TabPivot)
                 transformTabs(state.settings.basicTransform).forEach { i ->
                     val icon = icons[i]
-                    val usable = i <= SIZE_TAB || selected.kind != "camera"
+                    val usable = i <= SIZE_TAB || selected.kind != "camera" || (i == TILT_TAB && state.scene.depthOrder)
                     val tip = if (!app.absentmotion.platform.PlatformFeatures.desktop) "" else when (i) {
                         SIZE_TAB -> deskShortcut(R.string.panel_size, "${DeskAlt}${stringResource(R.string.desk_scroll_key)}")
                         ROTATE_TAB -> deskShortcut(R.string.a11y_tab_rotate, "${DeskShift}${DeskAlt}${stringResource(R.string.desk_scroll_key)}")

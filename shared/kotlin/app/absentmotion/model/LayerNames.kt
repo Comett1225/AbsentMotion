@@ -8,6 +8,7 @@ import app.absentmotion.i18n.AppText
 fun Layer.nameResource(): Int = when (kind) {
     "nullobj" -> R.string.model_layer_null
     "camera" -> R.string.model_layer_camera
+    "light" -> R.string.light_layer
     "embedScene" -> if (link != null) R.string.model_layer_element else R.string.model_layer_group
     "drawing" -> R.string.model_layer_drawing
     "track" -> R.string.model_layer_track

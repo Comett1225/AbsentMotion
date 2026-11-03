@@ -181,7 +181,7 @@ void RenderPreview(SkCanvas* canvas, int width, int height, const Scene& scene, 
     if (view.solo != 0 && !view.ids.empty()) {
         soloed = scene;
         for (Layer& l : soloed.layers) {
-            if (l.kind == "camera") continue;
+            if (l.kind == "camera" || l.kind == "light") continue;
             const bool picked = std::find(view.ids.begin(), view.ids.end(), l.id) != view.ids.end();
             if (view.solo == 1 && !picked) l.hidden = true;
             if (view.solo == 2 && picked) l.opacity = Anim{{0.5f}};

@@ -2160,4 +2160,13 @@
     <string name="desk_camera_no_sound">No sound</string>
     <string name="desk_camera_stop_recording">Stop recording</string>
     <string name="desk_scroll_key">scroll</string>
+    <string name="depth_order">Depth order</string>
+    <string name="light_layer">Light</string>
+    <string name="light_options">Light options</string>
+    <string name="light_ambient">Ambient</string>
+    <string name="light_directional">Directional</string>
+    <string name="light_point">Point</string>
+    <string name="light_intensity">Intensity</string>
+    <string name="light_falloff">Falloff</string>
+    <string name="three_d_layer">3D layer</string>
 </resources>

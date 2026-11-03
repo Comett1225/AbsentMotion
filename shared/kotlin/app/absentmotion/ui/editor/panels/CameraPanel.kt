@@ -1,6 +1,7 @@
 package app.absentmotion.ui.editor.panels
 
 import app.absentmotion.ui.editor.deskSp
+import app.absentmotion.ui.editor.deskVerticalScroll
 import app.absentmotion.model.finiteFloat
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Canvas
@@ -119,9 +120,10 @@ internal fun CameraPanel(state: EditorState, layer: Layer, modifier: Modifier = 
             }
         }
         Swap(tab, Modifier.fillMaxSize(), rise = 0.dp) {
-            Column(Modifier.fillMaxSize()) {
+            Column(Modifier.fillMaxSize().deskVerticalScroll()) {
                 when (tab) {
                     0 -> {
+                        SwitchRow(stringResource(R.string.depth_order), state.scene.depthOrder) { on -> state.edit { it.withDepthOrder(on) } }
                         val angle = layer.number(Angle)
                         Row(Modifier.fillMaxWidth().height(RowHeight * 2).padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                             ViewCone(angle, perspective, Modifier.weight(1f).fillMaxHeight().padding(start = 8.dp, end = 12.dp, top = 6.dp, bottom = 6.dp))

@@ -7,6 +7,7 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <array>
 
 #include "easing.h"
 #include "frames.h"
@@ -123,6 +124,7 @@ struct Sight {
     const Layer* layer = nullptr;
     const Layer* camera = nullptr;
     int width = 0, height = 0;
+    bool depthOrder = false;
 };
 
 struct Layer {
@@ -132,7 +134,7 @@ struct Layer {
     std::string label, shape, fillType;
     std::string mediaUri, mediaFillMode;
     int startTime = 0, endTime = 0;
-    bool hidden = false, video = false;
+    bool hidden = false, video = false, force3d = false;
     Anim location, pivot, scale, rotation, skew, opacity, fillColor, tilt;
     std::vector<Property> props;
     std::vector<LayerEffect> effects;
@@ -155,6 +157,7 @@ struct Layer {
     bool keyedPoints = false;
     std::vector<FreehandStroke> strokes;
     Camera camera;
+    std::string lightType;
     Anim steps;
     bool placed = false;
     bool projected = false;
@@ -181,6 +184,20 @@ struct Placement {
     float rotation, z;
     SkM44 tilt, space, turn;
 };
+
+struct Light {
+    int type = 0;
+    SkV3 position, direction, color;
+    float intensity = 1, falloff = 0;
+};
+
+struct LightSet {
+    std::array<Light, 4> lights;
+    int count = 0;
+};
+
+LightSet SceneLights(const std::vector<Layer>& layers, double timeMs);
+SkV3 Illuminate(const LightSet& lights, SkV3 normal, SkV3 position);
 
 struct Echo {
     int count = 0;
@@ -233,6 +250,7 @@ void RepeatCopies(const Layer& layer, double timeMs, const RepeatSpace& space, s
 
 struct Scene {
     int width = 0, height = 0, fps = 30, totalTime = 0;
+    bool depthOrder = false;
     uint32_t bgColor = 0;
     std::vector<Layer> layers;
     std::map<std::string, int> mediaOrientation;
@@ -252,7 +270,7 @@ void SetCameraView(bool on);
 SkMatrix PlaneMatrix(const std::vector<Layer>& layers, const Layer& layer, int width, int height, double timeMs);
 bool CameraViewOn();
 bool CameraFrame(const std::vector<Layer>& layers, const Layer& camera, int width, int height, double timeMs, SkPoint corners[4]);
-bool SeeLayers(const std::vector<Layer>& layers, int width, int height, bool top, int fps, double timeMs, std::vector<Layer>* seen);
+bool SeeLayers(const std::vector<Layer>& layers, int width, int height, bool top, int fps, double timeMs, bool depthOrder, std::vector<Layer>* seen);
 bool SeenPlacement(const Layer& layer, double timeMs, Placement* placement);
 SkMatrix WorldMatrix(const Scene& scene, const Layer& layer, double timeMs);
 int64_t TopLayerAt(const Scene& scene, double timeMs, float x, float y, const MediaPictures& masks);

@@ -13,6 +13,7 @@ value class Scene(val node: XmlNode) {
     val fps: Int get() = node["fps"]?.toIntOrNull()?.takeIf { it > 0 } ?: 30
     val bgColor: Int get() = parseColor(node["bgcolor"]) ?: 0
     val totalTime: Int get() = node["totalTime"]?.toIntOrNull() ?: 0
+    val depthOrder: Boolean get() = node["depthOrder"] == "true"
 
     val isElement: Boolean get() = node["type"] == "element"
 
@@ -80,6 +81,7 @@ value class Scene(val node: XmlNode) {
     }
 
     fun withTitle(title: String) = Scene(node.with("title", title))
+    fun withDepthOrder(on: Boolean) = Scene(node.with("depthOrder", on.toString()))
 
     fun withSettings(width: Int, height: Int, fps: Int, bgColor: Int) = Scene(
         node.with("width", "$width").with("height", "$height")
@@ -159,7 +161,7 @@ value class Scene(val node: XmlNode) {
     fun toXml(): String = node.with("modifiedTime", "${System.currentTimeMillis()}").toXml()
 
     companion object {
-        val LAYER_TAGS = setOf("shape", "text", "drawing", "embedScene", "camera", "audio", "nullobj", "model")
+        val LAYER_TAGS = setOf("shape", "text", "drawing", "embedScene", "camera", "audio", "nullobj", "model", "light")
 
         fun parse(xml: String) = Scene(XmlNode.parse(xml))
 
@@ -169,7 +171,7 @@ value class Scene(val node: XmlNode) {
                 linkedMapOf(
                     "title" to title, "width" to "$width", "height" to "$height",
                     "exportWidth" to "$width", "exportHeight" to "$height", "precompose" to "dynamicResolution",
-                    "bgcolor" to formatColor(bgColor), "totalTime" to "0", "fps" to "$fps",
+                    "bgcolor" to formatColor(bgColor), "totalTime" to "0", "fps" to "$fps", "depthOrder" to "true",
                     "amver" to "1002592", "ffver" to "106",
                     "am" to "app.absentmotion", "amplatform" to "android", "retime" to "freeze", "retimeAdaptFPS" to "false",
                 ),

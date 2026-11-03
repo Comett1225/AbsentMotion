@@ -106,6 +106,18 @@ fun EditorState.addCamera() {
     )
 }
 
+fun EditorState.addLight() {
+    val attrs = newLayerAttrs(numbered(AppText.get(R.string.light_layer)))
+    if (scene.totalTime > 0) attrs["endTime"] = "${scene.totalTime}"
+    attrs["type"] = "directional"
+    addAndSelect(XmlNode("light", attrs, listOf(
+        XmlNode("transform", children = listOf(XmlNode("location", mapOf("value" to formatFloats(floatArrayOf(scene.width / 2f, scene.height / 2f, -scene.cameraZoom)))))),
+        XmlNode("property", mapOf("name" to "color", "type" to "color", "value" to "#ffffffff")),
+        XmlNode("property", mapOf("name" to "intensity", "type" to "float", "value" to "1")),
+        XmlNode("property", mapOf("name" to "falloff", "type" to "float", "value" to "1")),
+    )))
+}
+
 private fun Scene.groupNode(attrs: Map<String, String>, children: List<XmlNode>, totalTime: Int): XmlNode = XmlNode(
     "embedScene", attrs, listOf(
         XmlNode("transform", children = listOf(XmlNode("location", mapOf("value" to formatFloats(floatArrayOf(width / 2f, height / 2f, 0f)))))),

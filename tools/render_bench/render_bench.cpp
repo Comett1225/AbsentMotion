@@ -54,6 +54,19 @@ sk_sp<SkImage> SyntheticPicture() {
     return surface->makeImageSnapshot();
 }
 
+void SyntheticModel() {
+    auto model = std::make_shared<am::Model>();
+    model->positions = {-0.5f,-0.5f,-0.5f, 0.5f,-0.5f,-0.5f, 0.5f,0.5f,-0.5f, -0.5f,0.5f,-0.5f,
+                        -0.5f,-0.5f,0.5f, 0.5f,-0.5f,0.5f, 0.5f,0.5f,0.5f, -0.5f,0.5f,0.5f};
+    model->normals = model->positions;
+    model->uvs.resize(16);
+    model->colors.assign(8, 0xffffffff);
+    model->triangles = {0,2,1, 0,3,2, 4,5,6, 4,6,7, 0,1,5, 0,5,4, 3,7,6, 3,6,2, 0,4,7, 0,7,3, 1,2,6, 1,6,5};
+    model->slots.assign(12, -1);
+    model->twoSided = true;
+    am::SetModel("synthetic", std::move(model));
+}
+
 }
 
 int main(int argc, char** argv) {
@@ -72,6 +85,7 @@ int main(int argc, char** argv) {
         }
     }
     am::Scene scene;
+    SyntheticModel();
     std::string error;
     if (!am::ParseScene(ReadFile(argv[2]), &scene, &error)) {
         std::fprintf(stderr, "scene: %s\n", error.c_str());

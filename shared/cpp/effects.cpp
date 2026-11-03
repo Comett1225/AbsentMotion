@@ -1183,7 +1183,12 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
             const auto value = [&](const char* name, int i, float fallback) { return Value(e, d ? &d->defaults : nullptr, name, i, t, fallback); };
             SkPictureRecorder recorder;
             SkCanvas* out = recorder.beginRecording(bounds);
-            pieces3d::Draw(out, e.id, at, Orientation(layer, timeMs), value, pixels, width, height, image.get());
+            const auto& sourceLayers = layer.sight.layers ? *layer.sight.layers : scene.layers;
+            const Layer& original = layer.sight.layer ? *layer.sight.layer : layer;
+            const Placement world = EffectivePlacement(sourceLayers, original, timeMs);
+            const LightSet lights = SceneLights(sourceLayers, timeMs);
+            pieces3d::Draw(out, e.id, at, Orientation(layer, timeMs), value, pixels, width, height, image.get(), lights,
+                           {world.location.x(), world.location.y(), world.z});
             sk_sp<SkPicture> result = recorder.finishRecordingAsPicture();
             current = [result](SkCanvas* c) { c->drawPicture(result); };
             from = k + 1;
