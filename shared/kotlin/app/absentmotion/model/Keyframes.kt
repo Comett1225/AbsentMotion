@@ -96,8 +96,20 @@ fun XmlNode.valueAt(t: Float): String? {
     return blend(a.v, b.v, if (b.e.isNullOrEmpty()) u else NativeEngine.ease(b.e, u))
 }
 
+private val XmlNode.linkedComponents: Set<Int>
+    get() = children.filter { it.name == "valueLink" }.map { it["component"]?.toIntOrNull() ?: 0 }.toSet()
+
+private fun XmlNode.fullyLinked(width: Int): Boolean = linkedComponents.let { it.isNotEmpty() && (width <= 1 || (0 until width).all(it::contains)) }
+
 fun XmlNode.withValueAt(t: Float, value: String, snap: ClosedFloatingPointRange<Float>): XmlNode {
-    if (children.any { it.name == "valueLink" }) return this
+    val linked = linkedComponents
+    if (linked.isNotEmpty()) {
+        val parts = value.split(",")
+        if (fullyLinked(parts.size)) return this
+        val kept = (valueAt(t) ?: this["value"])?.split(",") ?: return this
+        return copy(children = children.filterNot { it.name == "valueLink" }).withValueAt(t, parts.indices.joinToString(",") { i -> if (i in linked) kept.getOrElse(i) { parts[i] } else parts[i] }, snap)
+            .let { it.copy(children = it.children + children.filter { c -> c.name == "valueLink" }) }
+    }
     if (!isKeyframed) return with("value", value)
     val keys = keyframes
     val here = keys.indexOfFirst { it.t in snap }
@@ -107,7 +119,7 @@ fun XmlNode.withValueAt(t: Float, value: String, snap: ClosedFloatingPointRange<
 fun XmlNode.keyframeAt(snap: ClosedFloatingPointRange<Float>): Int = keyframes.indexOfFirst { it.t in snap }
 
 fun XmlNode.withKeyframeToggled(t: Float, snap: ClosedFloatingPointRange<Float>): XmlNode {
-    if (children.any { it.name == "valueLink" }) return this
+    if (fullyLinked((valueAt(t) ?: this["value"])?.split(",")?.size ?: 1)) return this
     val keys = keyframes
     val here = keyframeAt(snap)
     return when {

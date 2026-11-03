@@ -20,6 +20,16 @@ class ValueLinksTest {
         assertEquals(link, Scene.parse(scene.toXml()).layer(2)!!.element(rotation.ref)!!.valueLink(0))
     }
 
+    @Test fun linkingOneAxisLeavesTheOthersEditable() {
+        val linked = scene().withValueLink(2, x, ValueLink(1, rotation))
+        val location = linked.layer(2)!!.element(PropRef.Location)!!
+        val moved = location.withValueAt(1f, "999,333,5", 1f..1f)
+        assertEquals("110,333,5", moved.keyframes.last().v.split(",").joinToString(",") { it.toFloat().toInt().toString() })
+        assertEquals(ValueLink(1, rotation), moved.valueLink(0))
+        val turned = scene().withValueLink(2, rotation, ValueLink(1, x)).layer(2)!!.element(PropRef.Rotation)!!
+        assertSame(turned, turned.withValueAt(0f, "45", 0f..0f))
+    }
+
     @Test fun chainsAndSameLayer() {
         val scene = scene().withValueLink(1, rotation, ValueLink(1, y)).withValueLink(2, rotation, ValueLink(1, rotation, .5f))
         assertEquals(ValueLink(1, rotation, .5f), scene.layer(2)!!.element(rotation.ref)!!.valueLink(0))
@@ -58,10 +68,14 @@ class ValueLinksTest {
         assertEquals(copies[0].id, copies[1].element(rotation.ref)!!.valueLink(0)!!.layer)
     }
 
-    @Test fun retainedKeysCannotBeEditedWhileLinked() {
+    @Test fun retainedKeysKeepTheLinkedAxisWhileOtherAxesChange() {
         val linked = layer(1).withValueLink(x, ValueLink(2, y))
-        assertEquals(linked, linked.withValue(x.ref, "50,60,0"))
-        assertEquals(linked, linked.withKeyframeToggled(x.ref, "0,0,0"))
+        val edited = linked.withValue(x.ref, "50,60,0").element(x.ref)!!
+        assertEquals("10,60,0", edited.keyframes.first().v)
+        assertEquals(ValueLink(2, y), edited.valueLink(0))
+        assertEquals(ValueLink(2, y), linked.withKeyframeToggled(x.ref, "0,0,0").element(x.ref)!!.valueLink(0))
+        val whole = layer(1).withValueLink(rotation, ValueLink(2, y))
+        assertEquals(whole, whole.withValue(rotation.ref, "45"))
     }
 
     @Test fun effectLinksFollowReorderingAndRemoval() {
