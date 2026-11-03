@@ -10,7 +10,8 @@ class RepeatEffectsTest {
     private val catalog = EffectCatalog.parse { File("../shared/assets/effects", it).inputStream() }
     private val repeats = listOf("repeat", "linearrepeat", "radialrepeat", "gridrepeat", "repeatalongpath", "scatterfield")
     private val ranged = listOf("Range Position", "Range Scale", "Range Rotation", "Range Opacity", "Fill Color", "Fill Amount",
-        "Range Start", "Range End", "Range Offset", "Easing", "Random Order", "Seed")
+        "Range Start", "Range End", "Range Offset", "Easing", "Random Order", "Seed",
+        "Delay per copy", "Random Position", "Random Rotation", "Random Scale", "Random Opacity")
 
     private fun effect(key: String) = catalog.find("absent.$key")!!
     private fun param(key: String, id: String) = effect(key).params.first { it.id == id }
