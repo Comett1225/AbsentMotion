@@ -116,11 +116,12 @@ bool LinkedValue(const Anim& anim, int component, float t, float* value) {
             v *= MotionOpacity(source, time);
         }
     }
+    if (link->kind == "transform" && link->property == "rotation") v = -v;
     --gLinkDepth;
     gLinks = previous;
     gLinkPlacement = placement;
     gLinkPlacementOwner = placementOwner;
-    *value = v * link->multiply + link->add;
+    *value = (v * link->multiply + link->add) * (anim.linkRole == 4 ? -1.0f : 1.0f);
     return !gLinkCycle && std::isfinite(*value);
 }
 }
