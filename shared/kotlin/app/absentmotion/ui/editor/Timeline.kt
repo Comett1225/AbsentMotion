@@ -1972,16 +1972,21 @@ private fun DrawScope.drawDeskClipFrame(left: Float, right: Float, top: Float, b
 
 private fun DrawScope.drawDeskHeader(layer: Layer, chosen: Boolean, hovered: Boolean, top: Float, width: Float, eye: Painter, measurer: TextMeasurer, styles: TimelineStyles) {
     val height = RowHeight.toPx()
-    drawRect(Am.Button, Offset(0f, top), Size(width, height))
-    if (chosen) drawRect(Am.Accent.copy(alpha = 0.28f), Offset(0f, top), Size(width, height))
-    else if (hovered) drawRect(Am.Field, Offset(0f, top), Size(width, height))
-    if (chosen) drawRect(Am.Accent, Offset(0f, top), Size(3.dp.toPx(), height))
-    layer.labelColour?.let { drawRect(Color(it.start), Offset(0f, top), Size(3.dp.toPx(), height)) }
-    drawRect(Am.Panel, Offset(0f, top + height - 1.dp.toPx()), Size(width, 1.dp.toPx()))
+    drawRect(Am.TimelineBg, Offset(0f, top), Size(width, height))
+    val pillHeight = height - HeaderInset.toPx() * 2
+    val pillTop = Offset(-pillHeight, top + HeaderInset.toPx())
+    val pill = Size(width - 2.dp.toPx() + pillHeight, pillHeight)
+    val radius = CornerRadius(pillHeight / 2)
+    drawRoundRect(HeaderFill, pillTop, pill, radius)
+    if (chosen) drawRoundRect(Am.Accent.copy(alpha = 0.28f), pillTop, pill, radius)
+    else if (hovered) drawRoundRect(Am.Field, pillTop, pill, radius)
+    drawRoundRect(HeaderEdge, pillTop, pill, radius, style = Stroke(0.5.dp.toPx()))
+    if (chosen) drawRect(Am.Accent, Offset(0f, pillTop.y), Size(3.dp.toPx(), pillHeight))
+    layer.labelColour?.let { drawRect(Color(it.start), Offset(0f, pillTop.y), Size(3.dp.toPx(), pillHeight)) }
     val icon = eye.intrinsicSize
     translate(EyeCentre.toPx() - icon.width / 2, top + (height - icon.height) / 2) { with(eye) { draw(icon) } }
     val left = 56.dp.toPx()
-    val room = (width - left - 8.dp.toPx()).toInt()
+    val room = (width - left - pillHeight / 2 - 4.dp.toPx()).toInt()
     if (room < 1) return
     val text = measurer.measure(layer.shownName(), if (layer.hidden) styles.hiddenHeader else styles.header, TextOverflow.Ellipsis, maxLines = 1, constraints = Constraints(maxWidth = room))
     drawText(text, topLeft = Offset(left, top + (height - text.size.height) / 2))

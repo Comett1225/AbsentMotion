@@ -998,7 +998,7 @@
       "macos": "partial",
       "windows": "untested",
       "linux": "untested",
-      "note": "Command-line files, the macOS open-file event and a one-instance socket on Windows and Linux feed one queue (project files import and open, media files open in the open project or a new one); .absproj/.amproj/.xml associations are in the packaging config; the Finder double-click and the associations need a packaged-app test"
+      "note": "Command-line files, the macOS open-file event and a one-instance socket on Windows and Linux feed one queue (project files import and open, media files open in the open project or a new one). macOS: Finder picks the installed app for .absproj (checked 2026-11-03); the end-to-end test DeskParityRoundTest.filesFromTheSystemOpenOrImport still hangs, so this stays partial"
     },
     {
       "id": "home.settings",

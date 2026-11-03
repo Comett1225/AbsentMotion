@@ -237,6 +237,9 @@ private fun DeskTransport(state: EditorState, modifier: Modifier) {
         val skips = maxWidth >= 440.dp
         val fit = maxWidth >= 400.dp
         val loop = maxWidth >= 380.dp
+        val centre = 32.dp * (3 + (if (skips) 2 else 0) + (if (loop) 1 else 0))
+        val tools = 32.dp * 4 + (if (fit) 48.dp else 0.dp) + (if (steps) 64.dp else 0.dp)
+        val centred = (maxWidth - 16.dp - centre) / 2 >= tools
         Row(Modifier.fillMaxSize().padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
                 Text(TimelineMath.timecode(state.frame, state.scene.fps), color = Am.OnDark, fontSize = 13.sp, style = Tabular, maxLines = 1, softWrap = false)
@@ -248,7 +251,7 @@ private fun DeskTransport(state: EditorState, modifier: Modifier) {
             DeskIcon(DrawingIcons.Next, deskShortcut(R.string.desk_next_frame, "→"), size = 32.dp) { state.playing = false; state.frame = (state.frame + 1).coerceAtMost(state.scene.lastFrame) }
             if (skips) DeskIcon(ChromeIcons.SkipForward, deskShortcut(R.string.desk_end, "End"), size = 32.dp) { state.playing = false; state.frame = state.scene.lastFrame }
             if (loop) DeskIcon(ChromeIcons.PlayRepeat, stringResource(R.string.desk_loop), active = state.settings.loopingPlay, size = 32.dp) { state.settings.loopingPlay = !state.settings.loopingPlay }
-            Row(Modifier.weight(1f), Arrangement.End, Alignment.CenterVertically) {
+            Row(if (centred) Modifier.weight(1f) else Modifier, Arrangement.End, Alignment.CenterVertically) {
                 Box(Modifier.size(32.dp), Alignment.Center) { Hint(stringResource(R.string.a11y_animate)) { AnimateButton(state, Modifier) } }
                 Box(Modifier.size(32.dp), Alignment.Center) { Hint(stringResource(R.string.transition_title)) { TransitionButton(state, Modifier, compact = true) } }
                 if (steps) DeskIcon(ChromeIcons.Minus, stringResource(R.string.a11y_zoom_out), size = 32.dp) { state.zoomStep(false) }
@@ -260,7 +263,7 @@ private fun DeskTransport(state: EditorState, modifier: Modifier) {
                 if (steps) DeskIcon(ChromeIcons.Plus, stringResource(R.string.a11y_zoom_in), size = 32.dp) { state.zoomStep(true) }
                 var copyMenu by remember { mutableStateOf(false) }
                 Box { DeskIcon(ChromeIcons.CopyPaste, stringResource(R.string.play_copy_paste), size = 32.dp) { copyMenu = true }; Presence(copyMenu) { CopyPasteMenu(state, below = true) { copyMenu = false } } }
-                DeskIcon(ChromeIcons.PreviewMode, stringResource(R.string.play_preview_mode), active = state.previewPanelOpen, size = 32.dp) { state.previewPanelOpen = !state.previewPanelOpen }
+                DeskIcon(if (state.previewPanelOpen) ChromeIcons.PreviewModeOpen else ChromeIcons.PreviewMode, stringResource(R.string.play_preview_mode), active = state.previewPanelOpen, size = 32.dp, iconSize = DpSize(20.dp, 30.dp)) { state.previewPanelOpen = !state.previewPanelOpen }
             }
         }
     }

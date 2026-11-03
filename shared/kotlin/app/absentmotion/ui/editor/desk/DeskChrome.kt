@@ -126,8 +126,8 @@ internal fun deskSp(phone: Float): TextUnit = if (PlatformFeatures.desktop && ph
 internal fun deskShortcut(label: Int, keys: String): String = stringResource(R.string.desk_shortcut_hint, stringResource(label), keys)
 
 @Composable
-internal fun DeskIcon(icon: ImageVector, hint: String, enabled: Boolean = true, active: Boolean = false, size: Dp = 36.dp, action: () -> Unit) {
-    BarButton(icon, hint, Modifier.size(size).clip(RoundedCornerShape(6.dp)).background(if (active) Am.Field else Color.Transparent), enabled = enabled, iconSize = DpSize(size - 14.dp, size - 14.dp), hint = hint, onClick = action)
+internal fun DeskIcon(icon: ImageVector, hint: String, enabled: Boolean = true, active: Boolean = false, size: Dp = 36.dp, iconSize: DpSize = DpSize(size - 14.dp, size - 14.dp), action: () -> Unit) {
+    BarButton(icon, hint, Modifier.size(size).clip(RoundedCornerShape(6.dp)).background(if (active) Am.Field else Color.Transparent), enabled = enabled, iconSize = iconSize, hint = hint, onClick = action)
 }
 
 @Composable
