@@ -20,6 +20,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items as gridItems
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -57,6 +60,8 @@ import app.absentmotion.model.Scene
 import app.absentmotion.library.SavedPreset
 import app.absentmotion.library.SavedTemplate
 import app.absentmotion.library.TemplateStore
+import app.absentmotion.ui.editor.LocalTablet
+import app.absentmotion.ui.editor.LocalWide
 import app.absentmotion.ui.editor.NoMatches
 import app.absentmotion.ui.editor.matchesSearch
 import app.absentmotion.ui.theme.Am
@@ -88,6 +93,7 @@ fun TemplatesTab(version: Int, onTemplate: (String) -> Unit, onProject: (Scene) 
     val savedPresets by produceState(emptyList<SavedPreset>(), version, rev) { value = withContext(Dispatchers.IO) { presets.list() } }
     val shownTemplates = remember(savedTemplates, query) { savedTemplates.filter { matchesSearch(query, it.title) } }
     val shownPresets = remember(savedPresets, query) { savedPresets.filter { matchesSearch(query, it.title) } }
+    val wide = LocalWide.current || LocalTablet.current
 
     Column(modifier.fillMaxSize()) {
         Spacer(Modifier.height(24.dp))
@@ -100,15 +106,20 @@ fun TemplatesTab(version: Int, onTemplate: (String) -> Unit, onProject: (Scene) 
             if (sub == 0) {
                 if (savedTemplates.isEmpty()) EmptyText(stringResource(R.string.template_none))
                 else if (shownTemplates.isEmpty()) NoMatches(query, R.string.search_no_templates, Modifier.fillMaxWidth().padding(top = 120.dp), Am.Navy, 17.sp)
-                LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 28.dp)) {
-                    items(shownTemplates, key = { it.id }) { t ->
-                        TemplateCard(
-                            t, menu == t.id, { menu = if (it) t.id else null }, { onTemplate(t.id) },
-                            onProject = { menu = null; onProject(t.scene) },
-                            onRename = { menu = null; renaming = t.id to t.title },
-                            onDelete = { menu = null; confirm = R.string.template_delete_template to { scope.launch { withContext(Dispatchers.IO) { templates.delete(t.id) }; rev++ } } },
-                        )
-                    }
+                val templateCard: @Composable (SavedTemplate) -> Unit = { t ->
+                    TemplateCard(
+                        t, menu == t.id, { menu = if (it) t.id else null }, { onTemplate(t.id) },
+                        onProject = { menu = null; onProject(t.scene) },
+                        onRename = { menu = null; renaming = t.id to t.title },
+                        onDelete = { menu = null; confirm = R.string.template_delete_template to { scope.launch { withContext(Dispatchers.IO) { templates.delete(t.id) }; rev++ } } },
+                    )
+                }
+                if (wide) LazyVerticalGrid(
+                    GridCells.Adaptive(340.dp), Modifier.fillMaxSize(), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 28.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                ) { gridItems(shownTemplates, key = { it.id }) { templateCard(it) } }
+                else LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 28.dp)) {
+                    items(shownTemplates, key = { it.id }) { templateCard(it) }
                 }
             } else {
                 if (savedPresets.isEmpty()) EmptyText(stringResource(R.string.template_no_presets))
@@ -121,17 +132,22 @@ fun TemplatesTab(version: Int, onTemplate: (String) -> Unit, onProject: (Scene) 
                             color = Am.Navy, fontSize = 15.sp,
                         )
                     }
-                    LazyColumn(Modifier.weight(1f).fillMaxWidth(), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 28.dp)) {
-                        items(shownPresets, key = { it.id }) { p ->
-                            Card(Modifier.height(64.dp), onClick = null) {
-                                Text(p.title, Modifier.weight(1f).padding(start = 16.dp), color = Am.Navy, fontSize = 17.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                Menu(
-                                    menu == p.id, { menu = if (it) p.id else null },
-                                    stringResource(R.string.rename) to HomeIcons.Pencil to { menu = null; renaming = p.id to p.title },
-                                    stringResource(R.string.delete) to HomeIcons.Delete to { menu = null; confirm = R.string.template_delete_preset to { scope.launch { withContext(Dispatchers.IO) { presets.delete(p.id) }; rev++ } } },
-                                )
-                            }
+                    val presetCard: @Composable (SavedPreset) -> Unit = { p ->
+                        Card(Modifier.height(64.dp), onClick = null) {
+                            Text(p.title, Modifier.weight(1f).padding(start = 16.dp), color = Am.Navy, fontSize = 17.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Menu(
+                                menu == p.id, { menu = if (it) p.id else null },
+                                stringResource(R.string.rename) to HomeIcons.Pencil to { menu = null; renaming = p.id to p.title },
+                                stringResource(R.string.delete) to HomeIcons.Delete to { menu = null; confirm = R.string.template_delete_preset to { scope.launch { withContext(Dispatchers.IO) { presets.delete(p.id) }; rev++ } } },
+                            )
                         }
+                    }
+                    if (wide) LazyVerticalGrid(
+                        GridCells.Adaptive(340.dp), Modifier.weight(1f).fillMaxWidth(), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 28.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    ) { gridItems(shownPresets, key = { it.id }) { presetCard(it) } }
+                    else LazyColumn(Modifier.weight(1f).fillMaxWidth(), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 28.dp)) {
+                        items(shownPresets, key = { it.id }) { presetCard(it) }
                     }
                 }
             }

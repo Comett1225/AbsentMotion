@@ -42,11 +42,15 @@ import app.absentmotion.ui.tutorial.tutorialGuard
 import app.absentmotion.ui.tutorial.tutorialTarget
 
 val LocalWide = compositionLocalOf { false }
+val LocalTablet = compositionLocalOf { false }
 internal val LocalDeskEditor = compositionLocalOf { false }
+internal val LocalSideHeight = compositionLocalOf { Dp.Infinity }
 
 fun isTablet(smallestWidthDp: Int): Boolean = smallestWidthDp >= 600
 
 fun wideEditor(smallestWidthDp: Int, widthDp: Int): Boolean = isTablet(smallestWidthDp) && widthDp >= 840
+
+fun tabletEditor(smallestWidthDp: Int, widthDp: Int): Boolean = isTablet(smallestWidthDp) && widthDp >= 768
 
 val PhoneWidth = 384.dp
 val PhoneHeight = 832.dp
@@ -58,7 +62,8 @@ private val SideWidth = PhoneWidth
 @Composable
 internal fun WideEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: AddLibrary) {
     BoxWithConstraints(Modifier.fillMaxSize().background(Am.TopBar).systemBarsPadding().displayCutoutPadding()) {
-        val timeline = (maxHeight - 88.dp - 260.dp).coerceIn(140.dp, 320.dp)
+        val portrait = maxHeight > maxWidth
+        val timeline = if (portrait) ((maxHeight - 88.dp) * 0.45f).coerceIn(260.dp, 640.dp) else (maxHeight - 88.dp - 260.dp).coerceIn(140.dp, 320.dp)
         val textEdit = state.panel == EditorPanel.EditText && state.selected?.kind == "text"
         val textUi = remember { TextEditUi() }
         val side = textEdit || (state.selectedId != null && !state.addOpen && !MultiSelect.active)
@@ -91,20 +96,22 @@ internal fun WideEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: 
 
 @Composable
 private fun SidePanels(state: EditorState, addLibrary: AddLibrary, textEdit: Boolean, textUi: TextEditUi, modifier: Modifier) {
-    Box(modifier.width(SideWidth).fillMaxHeight().background(Am.Panel).pointerInput(Unit) {}.tutorialTarget("side_panel")) {
-        if (textEdit) TextEditor(state, textUi, embedded = true)
-        else LowerPanels(state, addLibrary, top = true)
+    BoxWithConstraints(modifier.width(SideWidth).fillMaxHeight().background(Am.Panel).pointerInput(Unit) {}.tutorialTarget("side_panel")) {
+        CompositionLocalProvider(LocalSideHeight provides maxHeight) {
+            if (textEdit) TextEditor(state, textUi, embedded = true)
+            else LowerPanels(state, addLibrary, top = true)
+        }
     }
 }
 
 @Composable
-fun PhoneScreen(fillWidth: Dp = 0.dp, onDismiss: () -> Unit = {}, title: String? = null, sheet: Boolean = false, onConfirm: (() -> Unit)? = null, content: @Composable () -> Unit) {
+fun PhoneScreen(fillWidth: Dp = 0.dp, onDismiss: () -> Unit = {}, title: String? = null, sheet: Boolean = false, onConfirm: (() -> Unit)? = null, plain: Boolean = false, content: @Composable () -> Unit) {
     if (app.absentmotion.platform.PlatformFeatures.desktop && LocalDeskEditor.current) {
         if (sheet) DeskSheetHost(onDismiss, content)
         else DeskDialog(title, if (fillWidth == Dp.Infinity) Dp.Infinity else if (fillWidth > 0.dp) fillWidth else 480.dp, onDismiss, height = if (fillWidth == Dp.Infinity) Dp.Infinity else null, onConfirm = onConfirm, outside = fillWidth != Dp.Infinity, content = content)
         return
     }
-    if (!LocalWide.current) {
+    if (!LocalWide.current && !(LocalTablet.current && !plain)) {
         content()
         return
     }

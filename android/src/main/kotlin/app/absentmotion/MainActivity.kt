@@ -30,7 +30,8 @@ import app.absentmotion.ui.editor.dropVideoThumbnails
 import app.absentmotion.ui.editor.distrustVideoThumbnails
 import app.absentmotion.ui.editor.recheckVideoThumbnails
 import app.absentmotion.ui.editor.isTablet
-import app.absentmotion.ui.editor.wideEditor
+import app.absentmotion.ui.editor.tabletEditor
+import app.absentmotion.ui.editor.LocalTablet
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.runtime.getValue
@@ -247,7 +248,7 @@ class MainActivity : ComponentActivity() {
                     val returning = remember { cameFromEditor }
                     Box(Modifier.fillMaxSize().then(if (returning) Modifier.enterFade() else Modifier)) {
                         val config = LocalConfiguration.current
-                        CompositionLocalProvider(LocalWide provides wideEditor(config.smallestScreenWidthDp, config.screenWidthDp)) {
+                        CompositionLocalProvider(LocalWide provides tabletEditor(config.smallestScreenWidthDp, config.screenWidthDp), LocalTablet provides isTablet(config.smallestScreenWidthDp)) {
                             HomeScreen(
                                 store, settings, onOpen = ::open, onExport = ::exportFromList,
                                 imported = imported, onImportShown = { imported = emptyList() }, onImportFile = { importUris(listOf(it)) },
@@ -267,7 +268,7 @@ class MainActivity : ComponentActivity() {
                         if (embed != null) CompositionLocalProvider(LocalDensity provides dense) { TemplateEditor(embed, engine, settings, onClose = { endEmbed(open) }) { scene -> embedTemplate(open, scene) } }
                         else {
                             val screen = LocalConfiguration.current
-                            CompositionLocalProvider(LocalWide provides wideEditor(screen.smallestScreenWidthDp, screen.screenWidthDp), app.absentmotion.ui.editor.panels.LocalVibration provides settings.vibration, LocalDensity provides dense) {
+                            CompositionLocalProvider(LocalWide provides tabletEditor(screen.smallestScreenWidthDp, screen.screenWidthDp), LocalTablet provides isTablet(screen.smallestScreenWidthDp), app.absentmotion.ui.editor.panels.LocalVibration provides settings.vibration, LocalDensity provides dense) {
                                 key(open) { Ltr { EditorScreen(open, onExit = ::closeEditor) } }
                             }
                         }
