@@ -46,7 +46,7 @@ struct TextLayout {
     std::string content, family, path, align, emoji, flags;
     float size = 54, width = 512, height = 0, padTop = 0, letterSpacing = 0, lineSpacing = 1, lineHeight = 0;
     int weight = 400, index = 0;
-    bool italic = false, imported = false;
+    bool italic = false, imported = false, axes = false;
     sk_sp<FontCollection> fonts;
     std::vector<TextLine> lines;
     std::unique_ptr<Paragraph> paragraph;
@@ -96,7 +96,7 @@ sk_sp<SkTypeface> TextFace(const TextLayout& text, const sk_sp<SkFontMgr>& manag
     const long nanos = (long)info.st_mtim.tv_nsec;
 #endif
     const std::string stamp = found ? std::to_string(info.st_size) + ":" + std::to_string(info.st_ino) + ":" + std::to_string(info.st_mtime) + "." + std::to_string(nanos) : "";
-    const std::string key = text.path + "\n" + std::to_string(text.index) + "\n" + std::to_string(text.weight) + "\n" + (text.imported ? "1" : "0") + "\n" + stamp;
+    const std::string key = text.path + "\n" + std::to_string(text.index) + "\n" + std::to_string(text.weight) + "\n" + (text.imported ? "1" : "0") + (text.axes ? "1" : "0") + "\n" + stamp;
     static std::mutex lock;
     static std::map<std::string, sk_sp<SkTypeface>> faces;
     {
@@ -104,7 +104,7 @@ sk_sp<SkTypeface> TextFace(const TextLayout& text, const sk_sp<SkFontMgr>& manag
         if (auto found = faces.find(key); found != faces.end()) return found->second;
     }
     sk_sp<SkTypeface> face = manager->makeFromFile(text.path.c_str(), text.index);
-    if (face && !text.imported) {
+    if (face && (!text.imported || text.axes)) {
         const int count = face->getVariationDesignParameters({});
         if (count > 0 && count <= 64) {
             std::vector<SkFontParameters::Variation::Axis> axes(count);
@@ -257,6 +257,7 @@ std::shared_ptr<TextLayout> ParseText(const XmlNode& n) {
     text->emoji = attr(n, "_emoji");
     text->flags = attr(n, "_emojiFlags");
     text->imported = attr(n, "font").starts_with("imported?");
+    text->axes = attr(n, "_fontAxes") == "true";
     for (const auto& child : n.children) {
         if (child->name != "effect" || attr(*child, "id") != "com.alightcreative.effects.textspacing" || attr(*child, "hidden") == "true") continue;
         for (const auto& p : child->children) {
@@ -347,7 +348,7 @@ const SkRect& InkBounds(TextLayout& text) {
 }
 namespace {
 const char* const kTextIds[] = {"absent.textprogress", "absent.texttransform", "absent.textrandomizer", "absent.countupdown",
-                                "absent.timecode", "absent.textpath", "absent.textshake", "absent.textblips"};
+                                "absent.timecode", "absent.textpath", "absent.textshake", "absent.textblips", "absent.fontweight"};
 
 struct Piece {
     Paragraph* paragraph;
@@ -775,7 +776,7 @@ bool TextEffect(const std::string& id) {
     return std::any_of(std::begin(kTextIds), std::end(kTextIds), [&](const char* k) { return id == k; });
 }
 bool TextAnimated(const Layer& layer) {
-    return layer.text && std::any_of(layer.effects.begin(), layer.effects.end(), [](const LayerEffect& e) { return !e.hidden && TextEffect(e.id); });
+    return layer.text && std::any_of(layer.effects.begin(), layer.effects.end(), [](const LayerEffect& e) { return !e.hidden && TextEffect(e.id) && e.id != "absent.fontweight"; });
 }
 SkPath TextGlyphPath(const Layer& layer, float t, int fps) {
     auto& text = *layer.text;

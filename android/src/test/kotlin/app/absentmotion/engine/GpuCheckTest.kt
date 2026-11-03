@@ -1,5 +1,7 @@
 package app.absentmotion.engine
 
+import android.app.ApplicationExitInfo
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -30,4 +32,12 @@ class GpuCheckTest {
     @Test fun faintPictureFails() = assertFalse(GpuCheck.matches(picture(100) { x, y -> quad(x, y).map { 230 + it / 10 }.toIntArray() }))
 
     @Test fun upsideDownFails() = assertFalse(GpuCheck.matches(picture(100) { x, y -> quad(x, 63 - y) }))
+
+    @Test fun aCrashWhileStartingSkipsThatBackend() {
+        assertEquals(false, GpuCheck.crashedStarting("41:vk") { ApplicationExitInfo.REASON_CRASH_NATIVE })
+        assertEquals(true, GpuCheck.crashedStarting("41:gl") { ApplicationExitInfo.REASON_ANR })
+        assertEquals(false, GpuCheck.crashedStarting("41:vk") { null })
+        assertEquals(null, GpuCheck.crashedStarting("41:vk") { ApplicationExitInfo.REASON_USER_REQUESTED })
+        assertEquals(null, GpuCheck.crashedStarting("x:vk") { ApplicationExitInfo.REASON_CRASH_NATIVE })
+    }
 }

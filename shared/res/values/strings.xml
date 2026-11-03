@@ -527,7 +527,7 @@
         <item quantity="other">%1$s projects were not restored because their size or frame rate is not valid.</item>
     </plurals>
     <string name="about_version">Version %1$s</string>
-    <string name="about_licence_line">Free and open source, licensed under the Apache License 2.0.</string>
+    <string name="about_licence_line">Free and open source, licensed under the GNU General Public License v3.0.</string>
     <string name="about_independent_note">AbsentMotion is an independent project. It is not affiliated with, endorsed by or sponsored by any other app maker; names of other products belong to their owners.</string>
     <string name="about_compatibility_note">AbsentMotion can open scene XML files and .amproj packages exported from Alight Motion, and it exports scene XML in the same format. It saves its own packages as .absproj.</string>
     <string name="about_loading">Loading…</string>

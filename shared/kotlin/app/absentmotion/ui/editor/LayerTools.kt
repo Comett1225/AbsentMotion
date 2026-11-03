@@ -134,6 +134,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
+import app.absentmotion.editor.markBeatsNote
 
 @Composable
 fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean = false) {
@@ -142,6 +143,7 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
     var moving by remember(state.selectedId) { mutableStateOf(false) }
     var captions by remember(state.selectedId) { mutableStateOf(false) }
     var controls by remember(state.selectedId) { mutableStateOf(false) }
+    var marking by remember(state.selectedId) { mutableStateOf(false) }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val ai = remember(state, context, scope) { app.absentmotion.ai.AiTools(context.applicationContext, state, scope) }
@@ -193,7 +195,12 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
         val blending = Tile(Blending) { state.panel = EditorPanel.Blending }
         val rows = when (kind) {
             "audio" -> listOf(
-                listOfNotNull(presets, Tile(Effects) { openEffectBrowser(state, "audio") }, if (app.absentmotion.platform.PlatformFeatures.ai) Tile(AiTools) { openEffectBrowser(state, "ai") } else null),
+                listOfNotNull(presets, Tile(Effects) { openEffectBrowser(state, "audio") }, Tile(MarkBeats, enabled = !marking) {
+                    marking = true
+                    scope.launch {
+                        try { android.widget.Toast.makeText(context, state.markBeatsNote(context), android.widget.Toast.LENGTH_SHORT).show() } finally { marking = false }
+                    }
+                }, if (app.absentmotion.platform.PlatformFeatures.ai) Tile(AiTools) { openEffectBrowser(state, "ai") } else null),
             )
             "camera" -> listOf(
                 listOf(Tile(CameraOptions) { state.panel = EditorPanel.Camera }, transform, effects),
@@ -322,6 +329,7 @@ private val Effects = Tool(R.string.layer_tool_effects, PanelIcons.Effects, 19.6
 private val Crop = Tool(R.string.layer_tool_crop, PanelIcons.Crop, 18.1f)
 private val CaptionTools = Tool(R.string.auto_captions, ChromeIcons.Captions, 19.4f)
 private val AiTools = Tool(R.string.ai, PanelIcons.Bot, 19.4f)
+private val MarkBeats = Tool(R.string.menu_mark_beats, AudioIcons.Note, 19.4f)
 private const val ToolPageSnapMs = 120
 private val EditGroup = Tool(R.string.layer_tool_edit_group, SelectionIcons.EnterGroup, 18.1f)
 private val CutoutEdge = Tool(R.string.cutout_edge, PanelIcons.TabBorder, 18.1f)

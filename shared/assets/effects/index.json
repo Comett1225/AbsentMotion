@@ -205,6 +205,7 @@
  "texttransform",
  "textrandomizer",
  "textshake",
+ "fontweight",
  "textblips",
  "countupdown",
  "timecode",

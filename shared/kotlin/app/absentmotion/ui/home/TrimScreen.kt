@@ -63,6 +63,12 @@ internal fun TrimScreen(initial: Uri? = null, onClose: () -> Unit) {
             val media = picked ?: return@ToolBar
             work.start { progress -> trimVideo(context, media, job, progress) }
         }
+    }, side = {
+        SectionTitle(stringResource(R.string.tools_trim_how))
+        ChoiceRow(stringResource(R.string.tools_trim_fast), stringResource(R.string.tools_trim_fast_about), fast, !work.running) { work.change { fast = true } }
+        ChoiceRow(stringResource(R.string.tools_trim_exact), stringResource(R.string.tools_trim_exact_about), !fast, !work.running) { work.change { fast = false } }
+        if (picked != null && fast && cuts != null && cuts.size <= 1) BarText(stringResource(R.string.tools_trim_few_cuts), Am.Accent)
+        Spacer(Modifier.height(24.dp))
     }) {
         Spacer(Modifier.height(20.dp))
         PickCard(picked, pick.problem != null, !work.running, R.string.tools_choose_video, pick.problem ?: R.string.compress_unreadable) { pick.launch() }
@@ -72,10 +78,5 @@ internal fun TrimScreen(initial: Uri? = null, onClose: () -> Unit) {
             SectionTitle(stringResource(R.string.tools_part))
             RangePicker(picked.uri, source.durationUs, range, cuts, fast, Long.MAX_VALUE, !work.running && !waiting) { next: TrimRange -> work.change { range = next } }
         }
-        SectionTitle(stringResource(R.string.tools_trim_how))
-        ChoiceRow(stringResource(R.string.tools_trim_fast), stringResource(R.string.tools_trim_fast_about), fast, !work.running) { work.change { fast = true } }
-        ChoiceRow(stringResource(R.string.tools_trim_exact), stringResource(R.string.tools_trim_exact_about), !fast, !work.running) { work.change { fast = false } }
-        if (picked != null && fast && cuts != null && cuts.size <= 1) BarText(stringResource(R.string.tools_trim_few_cuts), Am.Accent)
-        Spacer(Modifier.height(24.dp))
     }
 }

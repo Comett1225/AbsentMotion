@@ -1,0 +1,19 @@
+{
+ "id": "fontweight",
+ "name": "Font Weight",
+ "category": "text",
+ "since": "5.0.0",
+ "native": true,
+ "description": "Sets how thick the letters are, from thin to heavy, and can be animated with keyframes. Works with variable fonts, which hold every weight in one file: Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display and Dancing Script in the font list, or a variable font you import. Fonts with fixed weights keep their own look.",
+ "params": [
+  {
+   "id": "weight",
+   "label": "Weight",
+   "type": "float",
+   "default": 400,
+   "min": 1,
+   "max": 1000,
+   "step": 1
+  }
+ ]
+}

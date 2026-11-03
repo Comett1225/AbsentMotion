@@ -19,6 +19,9 @@ fun Layer.textSpacing(name: String, fallback: Float): Float = node.children
     ?.children?.firstOrNull { it.name == "property" && it["name"] == name }
     ?.valueAt(t)?.finiteFloat() ?: fallback
 
+val Layer.fontWeight: Float? get() = effects.lastOrNull { it["id"] == app.absentmotion.engine.FONT_WEIGHT_EFFECT && it["hidden"] != "true" }
+    ?.let { e -> (e.children.firstOrNull { it.name == "property" && it["name"] == "weight" }?.valueAt(t)?.finiteFloat() ?: 400f).coerceIn(1f, 1000f) }
+
 fun Layer.withResizedTextWrap(width: Int): Layer {
     val offset = when (textAlign) { "center" -> 0f; "right" -> -(width - wrapWidth) / 2f; else -> (width - wrapWidth) / 2f }
     if (offset == 0f) return withWrapWidth(width)

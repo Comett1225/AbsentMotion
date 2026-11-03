@@ -25,6 +25,14 @@ internal fun hasBookmarkNear(sorted: List<Int>, time: Int, tolerance: Double): B
     return next < sorted.size && abs(sorted[next] - time) <= tolerance || next > 0 && abs(sorted[next - 1] - time) <= tolerance
 }
 
+suspend fun EditorState.markBeatsNote(context: Context): String = try {
+    markBeats(context).let { if (it == 0) context.getString(R.string.menu_no_new_beats) else context.resources.getQuantityString(R.plurals.menu_beats_marked, it, it.toString()) }
+} catch (e: kotlinx.coroutines.CancellationException) {
+    throw e
+} catch (e: Exception) {
+    app.absentmotion.i18n.failureText(context.getString(R.string.menu_beats_not_found), e)
+}
+
 suspend fun EditorState.markBeats(context: Context): Int {
     val layer = selectedId?.let(scene::layer)?.takeIf { it.soundUri != null } ?: error(AppText.get(R.string.edit_beats_select_layer))
     val fps = scene.fps

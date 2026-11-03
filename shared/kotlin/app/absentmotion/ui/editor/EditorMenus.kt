@@ -46,7 +46,7 @@ import app.absentmotion.editor.keepCopy
 import app.absentmotion.model.replaceMedia
 import app.absentmotion.audio.soundUri
 import app.absentmotion.editor.canClip
-import app.absentmotion.editor.markBeats
+import app.absentmotion.editor.markBeatsNote
 import app.absentmotion.editor.toggleClippingMask
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
@@ -233,13 +233,7 @@ internal fun LayerMenu(state: EditorState, onDismiss: () -> Unit) {
         if (state.selected?.soundUri != null && !MultiSelect.active) MenuRow(stringResource(R.string.menu_mark_beats), enabled = !marking, busy = marking) {
             marking = true
             scope.launch {
-                val note = try {
-                    state.markBeats(context).let { if (it == 0) context.getString(R.string.menu_no_new_beats) else context.resources.getQuantityString(R.plurals.menu_beats_marked, it, it.toString()) }
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    app.absentmotion.i18n.failureText(context.getString(R.string.menu_beats_not_found), e)
-                }
+                val note = state.markBeatsNote(context)
                 Toast.makeText(context, note, Toast.LENGTH_SHORT).show()
                 onDismiss()
             }

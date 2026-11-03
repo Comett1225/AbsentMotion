@@ -67,6 +67,14 @@ internal fun GifScreen(initial: Uri? = null, onClose: () -> Unit) {
             val plan = job ?: return@ToolBar
             work.start { progress -> makeGif(context, media, plan, progress) }
         }
+    }, side = {
+        Label(stringResource(R.string.compress_size))
+        Chips(GifSides.map { "$it px" }, GifSides.indexOf(choice.side).coerceAtLeast(0), !work.running) { i -> work.change { choice = choice.copy(side = GifSides[i]) } }
+        Label(stringResource(R.string.compress_frame_rate))
+        Chips(GifRates.map { "$it" }, GifRates.indexOf(choice.fps).coerceAtLeast(0), !work.running) { i -> work.change { choice = choice.copy(fps = GifRates[i]) } }
+        Label(stringResource(R.string.tools_gif_loop))
+        Chips(listOf(R.string.tools_gif_forever, R.string.tools_gif_once).map { stringResource(it) }, if (choice.loop) 0 else 1, !work.running) { i -> work.change { choice = choice.copy(loop = i == 0) } }
+        Spacer(Modifier.height(24.dp))
     }) {
         Spacer(Modifier.height(20.dp))
         PickCard(picked, pick.problem != null, !work.running, R.string.tools_choose_video, pick.problem ?: R.string.compress_unreadable) { pick.launch() }
@@ -77,12 +85,5 @@ internal fun GifScreen(initial: Uri? = null, onClose: () -> Unit) {
             RangePicker(picked.uri, source.durationUs, range, null, false, MAX_GIF_US, !work.running) { next: TrimRange -> work.change { range = next } }
             if (source.durationUs > MAX_GIF_US) BarText(stringResource(R.string.tools_gif_limit, (MAX_GIF_US / 1_000_000).toInt()), app.absentmotion.ui.theme.Am.HomeDim)
         }
-        Label(stringResource(R.string.compress_size))
-        Chips(GifSides.map { "$it px" }, GifSides.indexOf(choice.side).coerceAtLeast(0), !work.running) { i -> work.change { choice = choice.copy(side = GifSides[i]) } }
-        Label(stringResource(R.string.compress_frame_rate))
-        Chips(GifRates.map { "$it" }, GifRates.indexOf(choice.fps).coerceAtLeast(0), !work.running) { i -> work.change { choice = choice.copy(fps = GifRates[i]) } }
-        Label(stringResource(R.string.tools_gif_loop))
-        Chips(listOf(R.string.tools_gif_forever, R.string.tools_gif_once).map { stringResource(it) }, if (choice.loop) 0 else 1, !work.running) { i -> work.change { choice = choice.copy(loop = i == 0) } }
-        Spacer(Modifier.height(24.dp))
     }
 }

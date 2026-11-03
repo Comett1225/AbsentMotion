@@ -192,11 +192,7 @@ internal fun CompressScreen(initial: android.net.Uri? = null, onClose: () -> Uni
             },
             onShare = { done -> runCatching { shareCompressed(context, done.result) } },
         )
-    }) {
-        Spacer(Modifier.height(20.dp))
-        PickCard(picked, unreadable, !running) { picker.launch() }
-        val done = step as? Step.Done
-        if (done != null && picked != null) ResultPreview(done.result, picked!!.uri)
+    }, side = {
         SectionTitle(stringResource(R.string.compress_how_small))
         for ((value, title, about) in Levels) {
             ChoiceRow(stringResource(title), stringResource(about), level == value, enabled = !running) { change { level = value } }
@@ -207,6 +203,11 @@ internal fun CompressScreen(initial: android.net.Uri? = null, onClose: () -> Uni
         }
         if (level == CompressLevel.Custom) CustomPanel(source?.video != false, custom, !running) { next -> change { custom = next } }
         Spacer(Modifier.height(24.dp))
+    }) {
+        Spacer(Modifier.height(20.dp))
+        PickCard(picked, unreadable, !running) { picker.launch() }
+        val done = step as? Step.Done
+        if (done != null && picked != null) ResultPreview(done.result, picked!!.uri)
     }
 }
 

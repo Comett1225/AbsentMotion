@@ -54,11 +54,7 @@ internal fun ExtractAudioScreen(initial: Uri? = null, onClose: () -> Unit) {
             val plan = job ?: return@ToolBar
             work.start { progress -> extractAudio(context, media, plan, progress) }
         }
-    }) {
-        Spacer(Modifier.height(20.dp))
-        PickCard(picked, pick.problem != null, !work.running, R.string.tools_choose_video, pick.problem ?: R.string.compress_unreadable) { pick.launch() }
-        val done = work.step as? ToolStep.Done
-        if (done != null) SoundResult(done.result, stringResource(R.string.tools_facts, formatBytes(done.bytes), length))
+    }, side = {
         Label(stringResource(R.string.compress_format))
         Chips(listOf("M4A", "MP3"), if (choice.mp3) 1 else 0, !work.running) { i ->
             work.change { choice = choice.copy(mp3 = i == 1, kbps = if (i == 1 && choice.kbps <= 0) SoundKbps[1] else choice.kbps) }
@@ -69,5 +65,10 @@ internal fun ExtractAudioScreen(initial: Uri? = null, onClose: () -> Unit) {
             kbps.indexOf(choice.kbps).coerceAtLeast(0), !work.running,
         ) { i -> work.change { choice = choice.copy(kbps = kbps[i]) } }
         Spacer(Modifier.height(24.dp))
+    }) {
+        Spacer(Modifier.height(20.dp))
+        PickCard(picked, pick.problem != null, !work.running, R.string.tools_choose_video, pick.problem ?: R.string.compress_unreadable) { pick.launch() }
+        val done = work.step as? ToolStep.Done
+        if (done != null) SoundResult(done.result, stringResource(R.string.tools_facts, formatBytes(done.bytes), length))
     }
 }

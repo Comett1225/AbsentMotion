@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -172,18 +174,9 @@ internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSett
     }
     Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = if (PlatformFeatures.desktop) 28.dp else 16.dp)) {
         Spacer(Modifier.height(24.dp))
-        if (PlatformFeatures.desktop) FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            compressCard(Modifier.width(380.dp))
-            trimCard(Modifier.width(380.dp))
-            extractCard(Modifier.width(380.dp))
-            gifCard(Modifier.width(380.dp))
-        } else if (LocalWide.current) FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            compressCard(Modifier.width(360.dp))
-            trimCard(Modifier.width(360.dp))
-            extractCard(Modifier.width(360.dp))
-            gifCard(Modifier.width(360.dp))
-            downloaderCard(Modifier.width(360.dp))
-        } else {
+        if (PlatformFeatures.desktop) ToolGrid(listOf(compressCard, trimCard, extractCard, gifCard))
+        else if (LocalWide.current) ToolGrid(listOf(compressCard, trimCard, extractCard, gifCard, downloaderCard))
+        else {
             compressCard(Modifier)
             Spacer(Modifier.height(12.dp))
             trimCard(Modifier)
@@ -212,6 +205,19 @@ internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSett
         3 -> TrimScreen { open = 0 }
         4 -> ExtractAudioScreen { open = 0 }
         5 -> GifScreen { open = 0 }
+    }
+}
+
+@Composable
+private fun ToolGrid(cards: List<@Composable (Modifier) -> Unit>) = BoxWithConstraints(Modifier.fillMaxWidth()) {
+    val columns = ((maxWidth + 16.dp) / 336.dp).toInt().coerceIn(1, 3)
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        cards.chunked(columns).forEach { row ->
+            Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                row.forEach { it(Modifier.weight(1f).fillMaxHeight()) }
+                repeat(columns - row.size) { Spacer(Modifier.weight(1f)) }
+            }
+        }
     }
 }
 
@@ -287,7 +293,7 @@ internal fun ToolSheet(
                 }
             }
         }
-        if (bounded) androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxSize().background(Am.SheetBg), contentAlignment = Alignment.Center) {
+        if (bounded || !PlatformFeatures.desktop && (LocalWide.current || app.absentmotion.ui.editor.LocalTablet.current)) androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxSize().background(Am.SheetBg), contentAlignment = Alignment.Center) {
             val twoColumns = side != null && maxWidth >= WideToolSheet && maxWidth > maxHeight
             Box(Modifier.widthIn(max = if (twoColumns) 1040.dp else 560.dp).fillMaxSize()) { body(twoColumns) }
         } else PhoneScreen { body(false) }

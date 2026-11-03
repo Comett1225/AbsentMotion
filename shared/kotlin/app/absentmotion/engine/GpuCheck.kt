@@ -1,17 +1,39 @@
 package app.absentmotion.engine
 
+import android.app.ActivityManager
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Build
+import android.os.Process
 import android.util.Log
 import app.absentmotion.BuildConfig
+import app.absentmotion.ai.gpuDeathBlamed
 
-internal class GpuCheck(context: Context) {
+internal class GpuCheck(private val context: Context) {
     private val prefs = context.getSharedPreferences("gpu_check", Context.MODE_PRIVATE)
 
     private fun key(gl: Boolean) = "${Build.FINGERPRINT}|${BuildConfig.VERSION_CODE}|${if (gl) "gl" else "vk"}"
 
     fun knownBad(gl: Boolean): Boolean = prefs.getString(key(gl), null) == "bad"
+
+    fun recover() {
+        val record = prefs.getString(TRYING, null) ?: return
+        if (record.substringBefore(':').toIntOrNull() == Process.myPid()) return
+        val edit = prefs.edit().remove(TRYING)
+        crashedStarting(record, ::exitReason)?.let { gl ->
+            edit.putString(key(gl), "bad")
+            Log.w("AMEngine", "the app closed while ${if (gl) "OpenGL" else "Vulkan"} was starting, so it is skipped from now on")
+        }
+        edit.commit()
+    }
+
+    fun trying(gl: Boolean) { prefs.edit().putString(TRYING, "${Process.myPid()}:${if (gl) "gl" else "vk"}").commit() }
+
+    fun survived() { if (prefs.contains(TRYING)) prefs.edit().remove(TRYING).apply() }
+
+    private fun exitReason(pid: Int): Int? = if (Build.VERSION.SDK_INT < 30) null else runCatching {
+        context.getSystemService(ActivityManager::class.java).getHistoricalProcessExitReasons(context.packageName, pid, 1).firstOrNull()?.reason
+    }.getOrNull()
 
     fun drawsRight(engine: NativeEngine): Boolean {
         val gl = engine.openGl
@@ -36,6 +58,7 @@ internal class GpuCheck(context: Context) {
     }
 
     companion object {
+        private const val TRYING = "trying"
         private const val URI = "absent-check://quad"
         private const val SIZE = 64
         private const val EMPTY = """<scene title="check" width="$SIZE" height="$SIZE" exportWidth="$SIZE" exportHeight="$SIZE" fps="30" totalTime="1000" bgcolor="#ff000000"></scene>"""
@@ -53,6 +76,11 @@ internal class GpuCheck(context: Context) {
                 }
             }
             return Bitmap.createBitmap(colors, SIZE, SIZE, Bitmap.Config.ARGB_8888)
+        }
+
+        internal fun crashedStarting(record: String, exitReason: (Int) -> Int?): Boolean? {
+            val pid = record.substringBefore(':').toIntOrNull() ?: return null
+            return (record.substringAfter(':') == "gl").takeIf { gpuDeathBlamed(exitReason(pid)) }
         }
 
         internal fun matches(px: ByteArray): Boolean {

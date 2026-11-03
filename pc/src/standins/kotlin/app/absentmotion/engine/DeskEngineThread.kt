@@ -255,11 +255,16 @@ class EngineThread(private val background: Int, private val context: Context? = 
         executor.execute { renderPosted.set(false); renderNow() }
     }
 
+    private var timedText = false
+    private var preparedAt = Int.MIN_VALUE
+
     private fun applyPending(timeMs: Int) {
         val (xml, again) = synchronized(this) { pendingXml.also { pendingXml = null } to fontsDirty.also { fontsDirty = false } }
-        val next = xml?.value ?: shownXml.takeIf { again } ?: return
+        val next = xml?.value ?: shownXml.takeIf { again || timedText && preparedAt != timeMs } ?: return
         try {
             engine().setScene(fonts?.prepareText(next, timeMs) ?: next)
+            if (next !== shownXml) timedText = animatesTextSpacing(next)
+            preparedAt = timeMs
             shownXml = next
         } catch (e: IllegalArgumentException) {
             android.util.Log.e("AMEngine", "scene rejected", e)
@@ -395,7 +400,7 @@ class EngineThread(private val background: Int, private val context: Context? = 
             if (timeMs == textTime) return
             textTime = timeMs
             val xml = document.toXml()
-            if (app.absentmotion.compat.ForeignEffectIds.TEXT_SPACING in xml) engine().setScene(fonts?.prepareText(xml, timeMs) ?: xml)
+            if (animatesTextSpacing(xml)) engine().setScene(fonts?.prepareText(xml, timeMs) ?: xml)
         }
     }
 

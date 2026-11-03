@@ -140,10 +140,10 @@ def parented(id, image, effect, half, end):
     return parent + child
 
 
-def words(id, content, effect="", end=999):
+def words(id, content, effect="", end=999, font="googlefonts?name=Montserrat&amp;weight=700"):
     c = RENDER // 2
     return (f'<text id="{id}" label="text" startTime="0" endTime="{end}" fillType="color" size="18" wrapWidth="{RENDER - 48}" '
-            f'align="center" font="googlefonts?name=Montserrat&amp;weight=700"><transform><location value="{c},{c},0"/></transform>'
+            f'align="center" font="{font}"><transform><location value="{c},{c},0"/></transform>'
             f'<fillColor value="#ffffffff"/><content>{content}</content>{effect}</text>')
 
 
@@ -200,7 +200,7 @@ def scene(show, effect, preset=None):
     if "path" in show:
         layers.append(path_layer(show, total - 1))
     if show.get("layout") == "text":
-        layers.append(words(2, show["text"], fx, total - 1))
+        layers.append(words(2, show["text"], fx, total - 1, *([show["font"]] if "font" in show else [])))
     elif show.get("layout") == "drawing":
         layers.append(sketch(2, fx, total - 1))
     elif show.get("layout") == "parent":

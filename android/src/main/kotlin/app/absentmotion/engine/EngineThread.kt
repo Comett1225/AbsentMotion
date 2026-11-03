@@ -43,7 +43,6 @@ import app.absentmotion.fonts.prepareText
 import app.absentmotion.model.fontNames
 import app.absentmotion.model.font
 import app.absentmotion.model.Scene
-import app.absentmotion.model.matchValues
 import app.absentmotion.model.imageUris
 import java.io.File
 import java.nio.ByteBuffer
@@ -217,19 +216,26 @@ class EngineThread(private val background: Int, context: Context? = null, privat
         startFailure?.let { throw IllegalStateException(it) }
         return try {
             EngineDebug.failStart?.let { throw IllegalStateException(it) }
+            gpuCheck?.recover()
             val glFirst = EngineDebug.forceGl || preferOpenGl() || gpuCheck?.knownBad(gl = false) == true && !gpuCheck.knownBad(gl = true)
             val order = if (glFirst) listOf(NativeEngine.Backend.GL, NativeEngine.Backend.GRAPHITE) else listOf(NativeEngine.Backend.GRAPHITE, NativeEngine.Backend.GL)
+            gpuCheck?.trying(order[0] == NativeEngine.Backend.GL)
             val first = runCatching { NativeEngine(order[0]) }
             (first.getOrNull() ?: run {
                 val failed = first.exceptionOrNull()
                 Log.w("AMEngine", "${order[0]} cannot start, trying ${order[1]}", failed)
                 try {
+                    gpuCheck?.trying(order[1] == NativeEngine.Backend.GL)
                     NativeEngine(order[1])
                 } catch (second: Throwable) {
                     val (vulkan, gl) = if (glFirst) second to failed else failed to second
                     throw IllegalStateException("${vulkan?.message ?: vulkan}; OpenGL: ${gl?.message ?: gl}", second)
                 }
-            }).let(::checked).also { app.absentmotion.Tier.openGl = it.openGl }
+            }).let(::checked).also {
+                app.absentmotion.Tier.openGl = it.openGl
+                gpuCheck?.trying(it.openGl)
+                handler.postDelayed({ if (engine?.failed != true) gpuCheck?.survived() }, SURVIVE_MS)
+            }
         } catch (t: Throwable) {
             val reason = t.message ?: t.toString()
             Log.e("AMEngine", "the engine cannot start", t)
@@ -719,11 +725,7 @@ class EngineThread(private val background: Int, context: Context? = null, privat
 private val instances = java.util.concurrent.atomic.AtomicLong()
 
 private const val GPU_RETRY_MS = 1000L
-
-private val spacingEffects = Regex("<effect\\b[^>]*\"${Regex.escape(app.absentmotion.compat.ForeignEffectIds.TEXT_SPACING)}\"[^>]*?(/>|>.*?</effect>)", RegexOption.DOT_MATCHES_ALL)
-
-internal fun animatesTextSpacing(xml: String): Boolean =
-    xml.contains(app.absentmotion.compat.ForeignEffectIds.TEXT_SPACING) && spacingEffects.matchValues(xml).any { it.contains("<kf") }
+private const val SURVIVE_MS = 8000L
 
 internal class PendingScene {
     private val next = AtomicReference<Lazy<String>?>(null)
