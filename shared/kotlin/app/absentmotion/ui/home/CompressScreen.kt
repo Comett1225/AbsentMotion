@@ -1,5 +1,6 @@
 package app.absentmotion.ui.home
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -254,7 +255,10 @@ private fun ResultPreview(result: Compressed, original: android.net.Uri) {
 }
 
 @Composable
-private fun PickCard(picked: PickedMedia?, unreadable: Boolean, enabled: Boolean, onPick: () -> Unit) {
+internal fun PickCard(
+    picked: PickedMedia?, unreadable: Boolean, enabled: Boolean, @StringRes pick: Int = R.string.compress_pick, @StringRes problem: Int = R.string.compress_unreadable,
+    onPick: () -> Unit,
+) {
     val context = LocalContext.current
     val thumb by produceState<ImageBitmap?>(null, picked?.uri) { value = picked?.let { slotPicture(context, it.uri.toString(), it.source.video) } }
     Row(
@@ -270,9 +274,9 @@ private fun PickCard(picked: PickedMedia?, unreadable: Boolean, enabled: Boolean
         Spacer(Modifier.width(14.dp))
         Column(Modifier.weight(1f)) {
             if (picked == null) {
-                Text(stringResource(R.string.compress_pick), color = Am.Navy, fontSize = 17.sp, fontWeight = FontWeight.Bold, maxLines = 2)
+                Text(stringResource(pick), color = Am.Navy, fontSize = 17.sp, fontWeight = FontWeight.Bold, maxLines = 2)
                 Text(
-                    stringResource(if (unreadable) R.string.compress_unreadable else R.string.compress_pick_note),
+                    stringResource(if (unreadable) problem else R.string.compress_pick_note),
                     color = if (unreadable) Am.Accent else Am.HomeDim, fontSize = 14.sp, lineHeight = 18.sp, maxLines = 2,
                 )
             } else {
@@ -343,7 +347,7 @@ private fun CompressBar(
 }
 
 @Composable
-private fun BarText(text: String, color: androidx.compose.ui.graphics.Color) =
+internal fun BarText(text: String, color: androidx.compose.ui.graphics.Color) =
     Text(text, color = color, fontSize = 14.sp, lineHeight = 18.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
 
 @Composable
@@ -392,17 +396,17 @@ private fun CustomPanel(video: Boolean, custom: CustomChoice, enabled: Boolean, 
 }
 
 @Composable
-private fun Label(text: String) = Text(text, Modifier.padding(top = 16.dp, bottom = 8.dp), color = Am.HomeMid, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+internal fun Label(text: String) = Text(text, Modifier.padding(top = 16.dp, bottom = 8.dp), color = Am.HomeMid, fontSize = 14.sp, fontWeight = FontWeight.Bold)
 
 @Composable
-private fun Chips(options: List<String>, selected: Int, enabled: Boolean, onPick: (Int) -> Unit) {
+internal fun Chips(options: List<String>, selected: Int, enabled: Boolean, onPick: (Int) -> Unit) {
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         options.forEachIndexed { i, option -> ToolChip(option, i == selected, enabled) { onPick(i) } }
     }
 }
 
 @Composable
-private fun ToolChip(text: String, selected: Boolean, enabled: Boolean, onClick: () -> Unit) {
+internal fun ToolChip(text: String, selected: Boolean, enabled: Boolean, onClick: () -> Unit) {
     Box(
         Modifier.height(42.dp).alpha(if (enabled) 1f else 0.5f).clip(RoundedCornerShape(14.dp)).background(animatedColor(if (selected) Am.Navy else Am.Card))
             .clickable(enabled = enabled, onClick = onClick).padding(horizontal = 16.dp),

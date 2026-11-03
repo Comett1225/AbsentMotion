@@ -111,9 +111,9 @@ internal fun webpFormat(lossless: Boolean) = android.graphics.Bitmap.CompressFor
 class MediaPicker(private val launchBlock: () -> Unit) { fun launch() = launchBlock() }
 
 @Composable
-fun rememberMediaPicker(onResult: (Uri?) -> Unit): MediaPicker {
+fun rememberMediaPicker(videoOnly: Boolean = false, onResult: (Uri?) -> Unit): MediaPicker {
     val latest by rememberUpdatedState(onResult)
-    return remember { MediaPicker { latest(DeskFiles.chooseOne(media = true)) } }
+    return remember { MediaPicker { latest(DeskFiles.chooseOne(media = true, videoOnly = videoOnly)) } }
 }
 
 class DocumentPicker(private val launchBlock: () -> Unit) { fun launch() = launchBlock() }

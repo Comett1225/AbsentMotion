@@ -106,13 +106,14 @@ suspend fun slotPicture(context: Context, uri: String, video: Boolean): androidx
 
 class MediaPicker(private val launchBlock: () -> Unit) { fun launch() = launchBlock() }
 @androidx.compose.runtime.Composable
-fun rememberMediaPicker(onResult: (Uri?) -> Unit): MediaPicker {
+fun rememberMediaPicker(videoOnly: Boolean = false, onResult: (Uri?) -> Unit): MediaPicker {
     val context = LocalContext.current
     val launcher = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri != null) runCatching { context.contentResolver.takePersistableUriPermission(uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION) }
         onResult(uri)
     }
-    return MediaPicker { launcher.launch(androidx.activity.result.PickVisualMediaRequest(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageAndVideo)) }
+    val wanted = if (videoOnly) androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.VideoOnly else androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageAndVideo
+    return MediaPicker { launcher.launch(androidx.activity.result.PickVisualMediaRequest(wanted)) }
 }
 class DocumentPicker(private val launchBlock: () -> Unit) { fun launch() = launchBlock() }
 @androidx.compose.runtime.Composable
@@ -200,7 +201,11 @@ fun exportEngine(engine: app.absentmotion.engine.EngineThread): app.absentmotion
 
 fun exportDone(result: app.absentmotion.export.ExportResult) {}
 
-suspend fun compressVideoOnDesktop(uri: String, job: app.absentmotion.tools.VideoJob, audio: Boolean, durationUs: Long, out: java.io.File, progress: (Float) -> Unit) = Unit
+suspend fun compressVideoOnDesktop(uri: String, job: app.absentmotion.tools.VideoJob, audio: Boolean, durationUs: Long, out: java.io.File, progress: (Float) -> Unit, startUs: Long = 0, endUs: Long = 0) = Unit
+
+suspend fun extractAudioOnDesktop(uri: String, job: app.absentmotion.tools.AudioJob, durationUs: Long, out: java.io.File, progress: (Float) -> Unit) = Unit
+
+suspend fun trimCopyOnDesktop(uri: String, startUs: Long, endUs: Long, out: java.io.File, progress: (Float) -> Unit) = Unit
 
 object PlatformFeatures {
     const val desktop = false

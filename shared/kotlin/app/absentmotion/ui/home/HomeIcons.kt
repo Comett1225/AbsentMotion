@@ -54,6 +54,9 @@ internal object HomeIcons {
     val ToolsTabOn = icon("ToolsTabOn", stroke = WRENCH, fill = WRENCH, width = 1.8f)
     val Compress = icon("Compress", stroke = "M15 15L21 21M15 15L15 19.8M15 15L19.8 15M9 19.8L9 15M9 15L4.2 15M9 15L3 21M15 4.2L15 9M15 9L19.8 9M15 9L21 3M9 4.2L9 9M9 9L4.2 9" +
             "M9 9L3 3", width = 1.8f)
+    val Audio = icon("Audio", stroke = "M9 18L9 5L21 3L21 16M3 18A3 3 0 1 0 9 18A3 3 0 1 0 3 18ZM15 16A3 3 0 1 0 21 16A3 3 0 1 0 15 16Z", width = 1.8f)
+    val Gif = icon("Gif", stroke = "M17 2L21 6L17 10M3 11L3 10A4 4 0 0 1 7 6L21 6M7 22L3 18L7 14M21 13L21 14A4 4 0 0 1 17 18L3 18", width = 1.8f)
+    val Trim = icon("Trim", stroke = "M3 6A3 3 0 1 0 9 6A3 3 0 1 0 3 6ZM3 18A3 3 0 1 0 9 18A3 3 0 1 0 3 18ZM20 4L8.12 15.88M14.47 14.48L20 20M8.12 8.12L12 12", width = 1.8f)
     val Download = icon("Download", stroke = "M12 15L12 3M21 15L21 19A2 2 0 0 1 19 21L5 21A2 2 0 0 1 3 19L3 15M7 10L12 15L17 10", width = 1.8f)
     val TemplatesTab = icon("TemplatesTab", stroke ="M4 3L20 3A1 1 0 0 1 21 4L21 9A1 1 0 0 1 20 10L4 10A1 1 0 0 1 3 9L3 4A1 1 0 0 1 4 3ZM4 14L11 14A1 1 0 0 1 12 15L12 20A1 1 0 0 1 11 21L4 21" +
             "A1 1 0 0 1 3 20L3 15A1 1 0 0 1 4 14ZM17 14L20 14A1 1 0 0 1 21 15L21 20A1 1 0 0 1 20 21L17 21A1 1 0 0 1 16 20L16 15A1 1 0 0 1 17 14Z", width = 1.8f)

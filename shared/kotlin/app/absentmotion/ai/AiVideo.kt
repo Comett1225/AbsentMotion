@@ -59,7 +59,7 @@ internal fun writeYuv(argb: IntArray, stride: Int, width: Int, height: Int, imag
 
 internal fun lumaOf(p: Int): Int = ((47 * ((p shr 16) and 0xFF) + 157 * ((p shr 8) and 0xFF) + 16 * (p and 0xFF) + 128) shr 8) + 16
 
-internal class AudioCopy(context: Context, uri: String) : Closeable {
+internal class AudioCopy(context: Context, uri: String, private val fromUs: Long = 0, private val toUs: Long = Long.MAX_VALUE) : Closeable {
     private val extractor = MediaExtractor()
     val format: MediaFormat?
     var track = -1
@@ -72,6 +72,7 @@ internal class AudioCopy(context: Context, uri: String) : Closeable {
         val index = (0 until extractor.trackCount).firstOrNull { extractor.getTrackFormat(it).getString(MediaFormat.KEY_MIME)?.startsWith("audio/") == true }
         format = index?.let(extractor::getTrackFormat)
         index?.let(extractor::selectTrack)
+        if (index != null && fromUs > 0) extractor.seekTo(fromUs, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
         ended = index == null
         buffer = ByteBuffer.allocateDirect(format?.takeIf { it.containsKey(MediaFormat.KEY_MAX_INPUT_SIZE) }?.getInteger(MediaFormat.KEY_MAX_INPUT_SIZE)?.coerceAtLeast(65_536) ?: 1_048_576)
     }
@@ -80,12 +81,14 @@ internal class AudioCopy(context: Context, uri: String) : Closeable {
         while (!ended && track >= 0) {
             if (extractor.sampleTrackIndex < 0) { ended = true; return }
             val time = extractor.sampleTime
-            if (time > pts) return
+            if (time - fromUs > pts) return
             if (time < 0) { extractor.advance(); continue }
+            if (time >= toUs) { ended = true; return }
+            if (time < fromUs) { extractor.advance(); continue }
             buffer.clear()
             val size = extractor.readSampleData(buffer, 0)
             if (size < 0) { ended = true; return }
-            info.set(0, size, time, if (extractor.sampleFlags and MediaExtractor.SAMPLE_FLAG_SYNC != 0) MediaCodec.BUFFER_FLAG_KEY_FRAME else 0)
+            info.set(0, size, time - fromUs, if (extractor.sampleFlags and MediaExtractor.SAMPLE_FLAG_SYNC != 0) MediaCodec.BUFFER_FLAG_KEY_FRAME else 0)
             muxer.writeSampleData(track, buffer, info)
             extractor.advance()
         }

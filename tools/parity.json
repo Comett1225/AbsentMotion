@@ -951,6 +951,36 @@
       "note": "DeskCompress runs ffmpeg"
     },
     {
+      "id": "home.tools_trim",
+      "name": "Tools tab: Trim a video (filmstrip range, Fast copy or Exact re-encode)",
+      "where": "ToolsTab.kt, TrimScreen.kt, ToolRange.kt, tools/MediaTools.kt, TrimCopy.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "Android copies with MediaMuxer and re-encodes with the Compress pipeline; desktop uses ffmpeg (DeskTools, DeskCompress)"
+    },
+    {
+      "id": "home.tools_extract_audio",
+      "name": "Tools tab: Extract Audio (M4A original or AAC, MP3)",
+      "where": "ToolsTab.kt, ExtractAudioScreen.kt, tools/MediaTools.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "Android copies the AAC track or encodes through the audio export (LAME for MP3); desktop uses ffmpeg (DeskTools)"
+    },
+    {
+      "id": "home.tools_gif",
+      "name": "Tools tab: Make a GIF (part of a video, size, frame rate, loop, size estimate)",
+      "where": "ToolsTab.kt, GifScreen.kt, ToolRange.kt, tools/MediaTools.kt, export/GifWriter.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "same code on every platform: the frame reader (MediaCodec or ffmpeg) feeds the GIF export encoder"
+    },
+    {
       "id": "home.tools_downloader",
       "name": "Tools tab: Video downloader (YouTube, TikTok, Instagram)",
       "where": "ToolsTab.kt, tools/VideoDownloader.kt, PyEngine.kt",

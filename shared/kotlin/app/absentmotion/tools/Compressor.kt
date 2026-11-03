@@ -101,8 +101,8 @@ fun clearCompressed(context: Context) {
     runCatching { compressFolder(context).listFiles()?.forEach { it.delete() } }
 }
 
-private fun outputName(picked: PickedMedia, extension: String): String =
-    picked.name.substringBeforeLast('.').ifBlank { "media" }.replace('/', '_') + "-compressed." + extension
+internal fun outputName(picked: PickedMedia, extension: String, tag: String = "compressed"): String =
+    picked.name.substringBeforeLast('.').ifBlank { "media" }.replace('/', '_') + (if (tag.isEmpty()) "" else "-$tag") + "." + extension
 
 fun limitText(bytes: Long): String = if (bytes >= 1_000_000_000L) "${bytes / 1_000_000_000L} GB" else "${bytes / 1_000_000L} MB"
 
@@ -135,16 +135,19 @@ suspend fun compressVideo(context: Context, picked: PickedMedia, job: VideoJob, 
     }
 }
 
-private suspend fun runVideo(context: Context, uri: String, job: VideoJob, rotation: Int, soundFrom: String?, out: File, durationUs: Long, progress: (Float) -> Unit) {
-    if (PlatformFeatures.desktop) return compressVideoOnDesktop(uri, job, soundFrom != null, durationUs, out, progress)
+internal suspend fun runVideo(
+    context: Context, uri: String, job: VideoJob, rotation: Int, soundFrom: String?, out: File, durationUs: Long,
+    fromUs: Long = 0, toUs: Long = Long.MAX_VALUE, soundRanged: Boolean = false, progress: (Float) -> Unit,
+) {
+    if (PlatformFeatures.desktop) return compressVideoOnDesktop(uri, job, soundFrom != null, durationUs, out, progress, fromUs, if (toUs == Long.MAX_VALUE) 0 else toUs)
     val work = currentCoroutineContext().job
-    val sound = soundFrom?.let { AudioCopy(context, it) }
+    val sound = soundFrom?.let { if (soundRanged) AudioCopy(context, it, fromUs, toUs) else AudioCopy(context, it) }
     try {
         val plan = VideoPlan(job.width, job.height, job.fps) {
             openVideoEncoder(ExportSettings(min(job.width, job.height), job.fps), job.width, job.height, false, bitrate = job.bitrate)
         }
         val turn = ((rotation % 360) + 360) % 360 / 90 * 90
-        if (!transcode(context, uri, out, { !work.isActive }, { _, _, _ -> plan }, turn, sound, progress)) throw CancellationException()
+        if (!transcode(context, uri, out, { !work.isActive }, { _, _, _ -> plan }, turn, sound, fromUs, toUs, progress)) throw CancellationException()
     } finally {
         sound?.close()
     }
@@ -155,7 +158,7 @@ private fun avcEncodes(width: Int, height: Int, fps: Int): Boolean = MediaCodecL
         info.getCapabilitiesForType(MediaFormat.MIMETYPE_VIDEO_AVC).videoCapabilities?.areSizeAndRateSupported(width, height, fps.toDouble()) == true
 }
 
-private fun encodable(job: VideoJob): VideoJob {
+internal fun encodable(job: VideoJob): VideoJob {
     if (PlatformFeatures.desktop) return job
     if (avcEncodes(job.width, job.height, job.fps)) return job
     for (side in listOf(2160, 1440, 1080, 720, 480)) {
@@ -167,13 +170,16 @@ private fun encodable(job: VideoJob): VideoJob {
     return job
 }
 
-internal suspend fun encodeSound(context: Context, uri: String, durationUs: Long, kbps: Int, out: File, progress: (Float) -> Unit) {
+internal suspend fun encodeSound(context: Context, uri: String, durationUs: Long, kbps: Int, out: File, mp3: Boolean = false, fromUs: Long = 0, progress: (Float) -> Unit) {
     val ms = (durationUs / 1000).coerceAtLeast(1)
-    val layer = Layer(XmlNode("audio", linkedMapOf("id" to "1", "startTime" to "0", "endTime" to "$ms", "src" to uri, "outTime" to "$ms", "mediaFillMode" to "fill")))
+    val from = fromUs / 1000
+    val layer = Layer(XmlNode("audio", linkedMapOf("id" to "1", "startTime" to "0", "endTime" to "$ms", "src" to uri, "outTime" to "${from + ms}", "mediaFillMode" to "fill").also {
+        if (from > 0) it["inTime"] = "$from"
+    }))
     OfflineMix({ PcmDecoder(context, it) }, listOf(AudioClip(layer, uri)), Resampler.ULTRA).use { mix ->
         RandomAccessFile(out, "rw").use { file ->
             file.setLength(0)
-            exportAudio(ExportSettings(0, 30, audio = AudioSettings(AudioCodec.Aac, kbps), audioFormat = AudioFormat.M4a), durationUs, mix, file.fd, progress)
+            exportAudio(ExportSettings(0, 30, audio = AudioSettings(AudioCodec.Aac, kbps), audioFormat = if (mp3) AudioFormat.Mp3 else AudioFormat.M4a), durationUs, mix, file.fd, progress)
         }
     }
 }
@@ -217,7 +223,7 @@ private fun replaced(old: Bitmap, new: Bitmap): Bitmap {
 
 suspend fun saveToGallery(context: Context, result: Compressed): String = withContext(Dispatchers.IO) {
     MediaStoreExport(context).save(null, result.file.name, result.mime) { out -> result.file.inputStream().use { it.copyTo(out) } }
-    (if (result.video) Environment.DIRECTORY_MOVIES else Environment.DIRECTORY_PICTURES) + "/" + AppFolder
+    (if (result.mime.startsWith("audio/")) Environment.DIRECTORY_MUSIC else if (result.video) Environment.DIRECTORY_MOVIES else Environment.DIRECTORY_PICTURES) + "/" + AppFolder
 }
 
 fun shareCompressed(context: Context, result: Compressed) =
