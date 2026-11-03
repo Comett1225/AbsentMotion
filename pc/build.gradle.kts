@@ -192,21 +192,25 @@ tasks.test {
 
 tasks.named<Jar>("jar") { from(runtimeStandins.output) }
 
-val appCds = tasks.register("appCds") {
+tasks.register("installMac") {
     onlyIf { isMac }
+    dependsOn("createDistributable")
     doLast {
-        val app = layout.buildDirectory.dir("compose/binaries/main/app/AbsentMotion.app").get().asFile
+        val built = layout.buildDirectory.dir("compose/binaries/main/app/AbsentMotion.app").get().asFile
+        val app = File(providers.gradleProperty("installDir").getOrElse("/Applications"), "AbsentMotion.app")
+        if (ProcessHandle.allProcesses().anyMatch { it.info().command().orElse("").startsWith(app.path + "/") }) throw GradleException("Quit AbsentMotion first: ${app.path} is running")
+        fun run(vararg command: String) = check(ProcessBuilder(*command).inheritIO().start().waitFor() == 0) { command.joinToString(" ") }
+        run("rm", "-rf", app.path)
+        run("ditto", built.path, app.path)
         val launcher = app.resolve("Contents/MacOS/AbsentMotion")
         val archive = app.resolve("Contents/app/app.jsa")
         val list = layout.buildDirectory.file("cds/classes.lst").get().asFile.apply { parentFile.mkdirs(); delete() }
-        archive.delete()
-        fun launch(options: String, vararg args: String) = ProcessBuilder(launcher.path, *args).apply { environment()["JAVA_TOOL_OPTIONS"] = options }
+        fun launch(options: String) = ProcessBuilder(launcher.path, "--warmup").apply { environment()["JAVA_TOOL_OPTIONS"] = options }
             .redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.DISCARD).start().waitFor()
-        launch("-XX:DumpLoadedClassList=${list.path}", "--warmup")
+        launch("-XX:DumpLoadedClassList=${list.path}")
         if (list.length() > 0) launch("-Xshare:dump -XX:SharedClassListFile=${list.path} -XX:SharedArchiveFile=${archive.path}")
-        logger.lifecycle(if (archive.isFile) "appCds: ${archive.length() / 1_000_000} MB, ${list.readLines().size} classes" else "appCds: no archive (the app starts without it)")
+        run("codesign", "--force", "--deep", "-s", "-", app.path)
+        logger.lifecycle("installMac: ${app.path}, " + if (archive.isFile) "start-up archive ${archive.length() / 1_000_000} MB" else "no start-up archive")
     }
 }
-tasks.matching { it.name == "createDistributable" }.configureEach { finalizedBy(appCds) }
-tasks.matching { it.name == "packageDmg" }.configureEach { dependsOn(appCds) }
 
