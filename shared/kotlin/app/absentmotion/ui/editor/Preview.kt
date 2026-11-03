@@ -47,8 +47,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.isAltPressed
+import androidx.compose.ui.input.pointer.isTertiaryPressed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChanged
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -228,7 +231,27 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
             state.zoomShown++
         }
     }
-    Box(modifier.background(Am.PreviewBg).onSizeChanged { size = it }.onGloballyPositioned { origin = it.positionInRoot() }.then(wheelView)) {
+    val panScale by rememberUpdatedState(scale)
+    val middlePan = if (!app.absentmotion.platform.PlatformFeatures.desktop || fixedView) Modifier else Modifier.pointerInput(state) {
+        awaitPointerEventScope {
+            var last: Offset? = null
+            while (true) {
+                val event = awaitPointerEvent(PointerEventPass.Initial)
+                val change = event.changes.firstOrNull() ?: continue
+                val from = last
+                if (from == null) {
+                    if (event.type != PointerEventType.Press || !event.buttons.isTertiaryPressed) continue
+                    last = change.position
+                    state.zoomShown++
+                } else if (event.buttons.isTertiaryPressed) {
+                    state.canvasPan += (change.position - from) / panScale
+                    last = change.position
+                } else last = null
+                event.changes.forEach { it.consume() }
+            }
+        }
+    }
+    Box(modifier.background(Am.PreviewBg).onSizeChanged { size = it }.onGloballyPositioned { origin = it.positionInRoot() }.then(wheelView).then(middlePan)) {
         app.absentmotion.platform.SceneSurface(state.engine, divisor, size, Modifier.fillMaxSize()) { state.previewSurface = it }
         CachedFrame(state, cacheUsable, live, dx, dy, scene.width * scale, scene.height * scale)
         Box(

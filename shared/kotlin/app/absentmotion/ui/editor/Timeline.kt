@@ -155,6 +155,7 @@ import app.absentmotion.ui.tutorial.tutorialRegion
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
+import kotlin.math.ln
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
@@ -237,6 +238,7 @@ private const val PUSH_FASTEST_ROWS = 12f
 private const val PUSH_MAX_STEP_S = 0.1f
 
 private const val MIN_ZOOM = 10f
+private const val FAR_OUT_MS = 600_000f
 private const val MAX_ZOOM = 1000f
 
 private val TickColor get() = Am.Line
@@ -732,7 +734,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
     private val fitZoom: Float
         get() = ((size.width - headerWidth).coerceAtLeast(1f) / scale * 1000f / TimelineMath.frameTimeMs(state.scene.lastFrame + 1, fps).coerceAtLeast(1f)).coerceAtMost(maxZoom)
 
-    private val minZoom: Float get() = fitZoom / 2f
+    private val minZoom: Float get() = min(fitZoom / 2f, (size.width - headerWidth).coerceAtLeast(1f) / scale * 1000f / FAR_OUT_MS)
 
     private val endMs: Float
         get() = max(TimelineMath.frameTimeMs(state.scene.lastFrame + 1, fps), (layers.maxOfOrNull { it.endTime + 1 } ?: 0).toFloat())
@@ -1186,7 +1188,8 @@ private class TimelineView(val state: EditorState, density: Density, private val
         if (PlatformFeatures.desktop) {
             val at = anchor.coerceIn(headerWidth, max(size.width.toFloat(), headerWidth))
             val before = timeScale().time(at)
-            state.timelineZoom = (dpPerSecond * factor).coerceIn(minZoom, maxZoom)
+            val far = if (dpPerSecond >= fitZoom) 1f else (ln(dpPerSecond / minZoom) / ln(fitZoom / minZoom)).coerceIn(0f, 1f)
+            state.timelineZoom = (dpPerSecond * factor.pow(0.3f + 0.7f * far)).coerceIn(minZoom, maxZoom)
             followFit = state.timelineZoom >= fitZoom * 0.999f
             setViewStart(before - (at - headerWidth) / timeScale().pxPerMs)
         } else state.timelineZoom = (dpPerSecond * factor).coerceIn(MIN_ZOOM, MAX_ZOOM)
