@@ -10,6 +10,8 @@ from pathlib import Path
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tools/render_bench"))
+from run import effect_xml
 LIBRARY = ROOT / "third_party/skia/out/mac-v2-2-arm64/libskia.a"
 SIZE = 320
 FAILURES = []
@@ -121,7 +123,7 @@ class Bench:
     def __init__(self, binary, work, picture):
         self.binary, self.work, self.picture, self.count = binary, Path(work), picture, 0
         (self.work / "pic.rgba").write_bytes(np.ascontiguousarray(picture, dtype=np.uint8).tobytes())
-        (self.work / "effects.txt").write_text('<effect id="absent.puppet"><param name="falloff" value="1.000000"/></effect>\n')
+        (self.work / "effects.txt").write_text('<effect id="absent.puppet"><param name="falloff" value="1.000000"/></effect>\n' + effect_xml("glow") + "\n")
 
     def render(self, xml, runs=0, time=0):
         self.count += 1
@@ -343,6 +345,11 @@ def run(bench, dots):
     pulled, _ = bench.render(scene(shape(1, Place(160, 300), half, soft + effect([(0, -50, 0, 50)], 1.0))))
     lifted, _ = bench.render(scene(shape(1, Place(160, 200), half, soft)))
     compare("an effect before the pin keeps the part below the canvas", pulled, lifted)
+    glow = '<effect id="absent.glow"><property name="radius" type="float" value="20"/></effect>'
+    for name, before, after in (("a glow after the pin", "", glow), ("a glow before the pin", glow, "")):
+        pulled, _ = bench.render(scene(shape(1, Place(160, 300), half, before + effect([(0, -50, 0, 50)], 1.0) + after)))
+        lifted, _ = bench.render(scene(shape(1, Place(160, 200), half, glow)))
+        compare(f"{name} keeps the part below the canvas", pulled, lifted)
 
     tiny = Place(160, 160, 0, 0.01)
     tiny_pins = [(-9000, -9000, -9000, -9000), (9000, 9000, 9000, 9000), (0, 0, 2000, -3000)]

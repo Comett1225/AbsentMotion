@@ -1234,9 +1234,10 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
         if (pass) pass->picture(recorder.finishRecordingAsPicture(), canvas->getTotalMatrix(), pass->depth);
         return true;
     }
-    const bool seesBehind = lift < 0 && behind(layer);
+    const bool seesBehind = lift < 0 && behind(layer), bent = lift < 0 && Bent(layer, t, timeMs);
+    const float margin = bent ? std::max({(float)scene.width, (float)scene.height, bounds.width(), bounds.height()}) : 0;
     SkRect drawn = SkRect::MakeEmpty();
-    sk_sp<SkImageFilter> content = seesBehind ? record(source, &drawn) : nullptr;
+    sk_sp<SkImageFilter> content = seesBehind ? record(source, &drawn, margin) : nullptr;
     sk_sp<SkImageFilter> under = below && needs(layer, &Definition::below) ? record(below) : nullptr;
     const LayerEffect* adjustment = lift >= 0 ? &layer.effects[lift] : nullptr;
     const Definition* adjustmentType = adjustment ? find(adjustment->id) : nullptr;
@@ -1353,9 +1354,9 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
         }
     }
     SkRect inside = local, layerBounds = bounds;
-    if (lift < 0 && !seesBehind && Bent(layer, t, timeMs)) {
-        SkRect measured;
-        record(source, &measured, std::max({(float)scene.width, (float)scene.height, bounds.width(), bounds.height()}));
+    if (bent) {
+        SkRect measured = drawn;
+        if (!seesBehind) record(source, &measured, margin);
         const float scale = canvas->getTotalMatrix().getMinScale(), pad = scale > 0 ? 4 / scale : 4;
         inside = measured.makeOffset(-at.left(), -at.top()).makeOutset(pad, pad);
         layerBounds.join(inside.makeOffset(at.left(), at.top()));
