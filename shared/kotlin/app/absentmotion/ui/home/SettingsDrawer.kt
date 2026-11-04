@@ -1,5 +1,9 @@
 package app.absentmotion.ui.home
 
+import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.layout.captionBar
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import app.absentmotion.platform.readAtMost
 import app.absentmotion.export.formatBytes
 import androidx.annotation.StringRes
@@ -44,7 +48,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -116,7 +119,7 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
         drawer, Modifier.width(280.dp), drawerShape = RectangleShape, drawerContainerColor = Am.HomeDrawer,
         windowInsets = WindowInsets(0),
     ) {
-        Column(Modifier.fillMaxSize().background(Am.Card).statusBarsPadding().verticalScroll(rememberScrollState()).navigationBarsPadding().padding(bottom = 8.dp)) {
+        Column(Modifier.fillMaxSize().background(Am.Card).windowInsetsPadding(WindowInsets.statusBars.union(WindowInsets.captionBar)).verticalScroll(rememberScrollState()).navigationBarsPadding().padding(bottom = 8.dp)) {
             Text(
                 stringResource(R.string.settings), Modifier.fillMaxWidth().heightIn(min = 50.dp).wrapContentHeight(Alignment.CenterVertically).padding(start = 11.dp),
                 color = Am.HomeInk, fontSize = 18.sp, fontWeight = FontWeight.Bold,

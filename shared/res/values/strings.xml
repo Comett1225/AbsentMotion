@@ -860,7 +860,7 @@
     <string name="platform_voice_name">Voice %1$s</string>
     <string name="platform_error_tts_unavailable">Text to speech is unavailable on this phone</string>
     <string name="platform_error_voice">The voice could not be made</string>
-    <string name="platform_caption_download">Captions are recognized on your phone by a speech model, downloaded once: %1$s, %2$s, from Hugging Face.</string>
+    <string name="platform_caption_download">Captions are recognized on this device by a speech model, downloaded once: %1$s, %2$s, from Hugging Face.</string>
     <string name="add_layer">Add layer</string>
     <string name="add_tab_shape">Shape</string>
     <string name="add_tab_media">Media</string>

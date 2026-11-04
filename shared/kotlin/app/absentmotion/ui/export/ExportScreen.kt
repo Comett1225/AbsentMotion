@@ -1,5 +1,10 @@
 package app.absentmotion.ui.export
 
+import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.layout.captionBar
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.annotation.StringRes
 import app.absentmotion.ui.home.DeskModals
 import app.absentmotion.ui.home.deskPress
@@ -56,7 +61,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
@@ -679,7 +683,7 @@ private fun ExportKind.icon(): ImageVector? = when (this) {
 
 @Composable
 private fun TitleBar(title: String, icon: ImageVector, description: String, onClick: () -> Unit) {
-    Box(Modifier.fillMaxWidth().background(Am.Card).statusBarsPadding().height(49.dp)) {
+    Box(Modifier.fillMaxWidth().background(Am.Card).windowInsetsPadding(WindowInsets.statusBars.union(WindowInsets.captionBar)).height(49.dp)) {
         Box(Modifier.size(44.dp).clickable(onClick = onClick), contentAlignment = Alignment.Center) {
             Icon(icon, description, Modifier.size(24.dp), tint = Navy)
         }

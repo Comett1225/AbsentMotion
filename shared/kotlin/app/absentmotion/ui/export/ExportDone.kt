@@ -29,7 +29,7 @@ import app.absentmotion.R
 @Composable
 fun DoneScreen(kind: ExportKind, result: ExportResult, onClose: () -> Unit, onShare: () -> Unit) {
     app.absentmotion.platform.ExportBars(dark = true, running = false)
-    Column(Modifier.fillMaxSize().presence().enterFade(10.dp).statusBarsPadding().navigationBarsPadding()) {
+    Column(Modifier.fillMaxSize().presence().enterFade(10.dp).windowInsetsPadding(WindowInsets.statusBars.union(WindowInsets.captionBar)).navigationBarsPadding()) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 14.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(stringResource(R.string.saved_to_storage), color = Am.OnNavy, fontSize = 17.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(4.dp))

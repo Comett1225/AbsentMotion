@@ -1,5 +1,9 @@
 package app.absentmotion.ui.home
 
+import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.layout.captionBar
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import app.absentmotion.export.formatBytes
 import app.absentmotion.platform.BitmapFactory
 import app.absentmotion.platform.LocalContext
@@ -28,7 +32,6 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
@@ -201,7 +204,7 @@ fun HomeScreen(
         scrimColor = Color.Black.copy(alpha = 0.94f),
     ) {
         Box(Modifier.fillMaxSize().background(Am.HomeBg)) {
-            Column(Modifier.fillMaxSize().statusBarsPadding()) {
+            Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars.union(WindowInsets.captionBar))) {
                 if (wide) WideHeader(page, tab, { p, t -> page = p; tab = t; if (p == 2) search = null }, onSettings = { scope.launch { drawer.open() } }, onNew = newProject, search, { search = it })
                 else TopBar(onMenu = { scope.launch { drawer.open() } }, search, page, { search = it })
                 val fill = Modifier.weight(1f)
