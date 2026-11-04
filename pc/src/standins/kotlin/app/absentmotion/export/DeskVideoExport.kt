@@ -107,7 +107,7 @@ internal object DeskEncoders {
 
     private val working = java.util.concurrent.ConcurrentHashMap<String, Boolean>()
 
-    fun works(name: String, s: ExportSettings, width: Int, height: Int): Boolean = working.getOrPut("$name ${width}x$height") {
+    fun works(name: String, s: ExportSettings, width: Int, height: Int): Boolean = (name != "av1_amf" || width % 64 == 0 && height % 16 == 0) && working.getOrPut("$name ${width}x$height") {
         runCatching {
             val args = listOf(DeskMedia.ffmpeg, "-v", "error", "-f", "lavfi", "-i", "color=c=black:s=${width}x$height:r=${s.fps}:d=0.2") +
                 videoArgs(name, s, width, height) + listOf("-frames:v", "2", "-f", "null", "-")

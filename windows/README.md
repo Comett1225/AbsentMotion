@@ -8,8 +8,9 @@ Needs Visual Studio Build Tools with clang-cl (C and C++ both go through clang-c
 `out/win-x64`). `build.ps1` copies Skia's `icudtl.dat` next to `amdesktop.dll`; Skia's ICU loader looks there after the
 program folder, so text shaping works in the app, the tests and `gradlew run`.
 
-Set `FFMPEG_DIR` to an FFmpeg shared build with development files (`include`, `lib` and `bin`; the LGPL build
-`win64-lgpl-shared` from BtbN/FFmpeg-Builds is the one the installer is made with). The app then decodes video itself, on
+Set `FFMPEG_DIR` to an FFmpeg shared build with development files (`include`, `lib` and `bin`; the GPL build
+`win64-gpl-shared` from BtbN/FFmpeg-Builds, which has x264, x265, libvpx, dav1d, Opus and SVT-AV1 and nothing nonfree,
+is the one the installer is made with). The app then decodes video itself, on
 the GPU through D3D11 when it can (`../pc/native/video_copy.cpp`), and `build.ps1` copies the FFmpeg DLLs, `ffmpeg.exe`,
 `ffprobe.exe` and FFmpeg's licence next to `amdesktop.dll`. The app loads those DLLs from its own folder before the engine,
 and the installer ships them, so it needs no FFmpeg on `PATH`. Without `FFMPEG_DIR` the engine is built without its decoder

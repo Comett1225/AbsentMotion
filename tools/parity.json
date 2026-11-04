@@ -818,7 +818,7 @@
       "macos": "works",
       "windows": "works",
       "linux": "untested",
-      "note": "encoded by ffmpeg; hardware encoders are picked per OS (VideoToolbox, NVENC/QSV/AMF/MF); APV needs liboapv in the ffmpeg build. Windows: 1080p H.264 MP4 checked in the installed app (h264_amf); the installer ships the LGPL FFmpeg build, which has no libx264 or libx265, so the software fallback there is h264_mf or hevc_mf; AAC uses aac_mf at 192 kbps and below for constant bitrate like Android. macOS release builds bundle a GPL FFmpeg 9.0.2 with libx264, libx265, libvpx, libsvtav1, libopus and libdav1d: H.264 and H.265 use VideoToolbox up to 4096 px per side and libx264/libx265 above that, AV1 uses libsvtav1, VP9 libvpx-vp9 and Opus libopus (DeskExportTest checks H.264 MP4, HEVC MOV, AV1 MKV and VP9 WebM with Opus)"
+      "note": "encoded by ffmpeg; hardware encoders are picked per OS (VideoToolbox, NVENC/QSV/AMF/MF); APV needs liboapv in the ffmpeg build. Windows: the installer ships the GPL FFmpeg build (libx264, libx265, libvpx, libsvtav1, libaom, libopus, libdav1d; nothing nonfree), and hardware encoders are still tried first. Checked 2026-11-04: H.264 MP4 in the installed app (h264_amf); AV1 MP4 (libsvtav1 and av1_amf), VP9 WebM with Opus, H.264 (libx264), HEVC MOV (libx265) and Ogg/Opus through the exporter with the shipped ffmpeg. av1_amf pads frames whose width is not a multiple of 64 or height not a multiple of 16 (720x1280 came out 768x1280), so it is used only for aligned sizes and SVT-AV1 takes the rest. AAC uses aac_mf at 192 kbps and below for constant bitrate like Android. macOS release builds bundle a GPL FFmpeg 9.0.2 with libx264, libx265, libvpx, libsvtav1, libopus and libdav1d: H.264 and H.265 use VideoToolbox up to 4096 px per side and libx264/libx265 above that, AV1 uses libsvtav1, VP9 libvpx-vp9 and Opus libopus (DeskExportTest checks H.264 MP4, HEVC MOV, AV1 MKV and VP9 WebM with Opus)"
     },
     {
       "id": "export.gif",
@@ -1328,7 +1328,7 @@
       "macos": "works",
       "windows": "works",
       "linux": "untested",
-      "note": "macOS VideoToolbox; Windows D3D11 hardware decode and copy; Linux VA-API (not built); ffmpeg software fallback everywhere. Windows: D3D11VA through the LGPL FFmpeg DLLs the installer ships (VideoDecodeTest: hardware decode, seek 14 ms against 164 ms through the ffmpeg pipe); built without FFMPEG_DIR the engine falls back to the ffmpeg program"
+      "note": "macOS VideoToolbox; Windows D3D11 hardware decode and copy; Linux VA-API (not built); ffmpeg software fallback everywhere. Windows: D3D11VA through the GPL FFmpeg DLLs the installer ships (VideoDecodeTest: hardware decode, seek 14 ms against 164 ms through the ffmpeg pipe); built without FFMPEG_DIR the engine falls back to the ffmpeg program"
     },
     {
       "id": "plat.gpu",

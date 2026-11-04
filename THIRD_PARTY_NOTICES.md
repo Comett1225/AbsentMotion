@@ -219,10 +219,14 @@ together with Skia.
 
 Windows:
 
-- Version: n9.0.2, the BtbN FFmpeg-Builds `win64-lgpl-shared-9.0` release of 2026-11-03 (`ffmpeg-n9.0-latest-win64-lgpl-shared-9.0.zip`,
-  SHA-256 `98d509064d806db369e99cedba5cbfeefff09da65b866f50127fa07f0e1802c5`), unchanged, from https://github.com/BtbN/FFmpeg-Builds.
-- Licence: GNU Lesser General Public License, version 3 or later (the build uses `--enable-version3` and no GPL parts). The
-  licence text ships next to the libraries as `ffmpeg-LICENSE.txt`.
+- Version: n9.0.2-45-g1e65c6cd5d-20261103, the BtbN FFmpeg-Builds `win64-gpl-shared-9.0` auto-build of 2026-11-03
+  (`ffmpeg-n9.0-latest-win64-gpl-shared-9.0.zip`, SHA-256 `8dcbbea210aa7f6bbd65bf8b81517b25bd5a22846da57ecf563b9b4807892ca7`),
+  unchanged, from https://github.com/BtbN/FFmpeg-Builds.
+- Licence: GNU General Public License, version 3 or later (the build uses `--enable-gpl --enable-version3` and no
+  `--enable-nonfree`). The GPLv3 text from the package ships next to the libraries as `ffmpeg-LICENSE.txt`.
+- Codec libraries in this build (as reported by the binaries): x264 core 165, x265 4.3, SVT-AV1 4.2, libvpx 1.17.0, dav1d,
+  libopus, libaom 3.15.2, LAME, libvorbis, rav1e, libvmaf, libplacebo, libxml2, fontconfig, FreeType, HarfBuzz, FriBidi,
+  lcms2, GMP, liblzma and zlib, all under licences compatible with GPL-3.0. BtbN's build scripts list the exact sources.
 - Used in: the Windows installer. `amdesktop.dll` links the shared `avformat`, `avcodec`, `avutil`, `swresample` and
   `swscale` DLLs for video decoding (D3D11 hardware decoding when available), and `ffmpeg.exe` and `ffprobe.exe` run export,
   the Tools tab and media probing. The DLLs sit unchanged in the app folder, so they can be replaced with another build.
