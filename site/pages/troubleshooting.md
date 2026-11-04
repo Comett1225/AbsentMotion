@@ -63,6 +63,14 @@ The export keeps running when you switch to another app, and a notification show
 - Large photos and videos are heavy. Use preview copies for video, and shrink very large photos before adding them.
 - Many layers with effects add up. Hide layers you are not working on (tap the eye).
 
+## An update does not install on a Samsung phone
+
+On Samsung phones, **Auto Blocker** can block the update that AbsentMotion downloaded. When it may be the cause, **The update stopped** says: "Samsung's Auto Blocker may be blocking this update." This shows at once when Android reports the install as blocked, or after two failed tries to install the same update.
+
+1. Open the phone's Settings, **Security and privacy**, **Auto Blocker**, and turn it off.
+2. Go back to AbsentMotion and tap **Try Again** to install the update. Your projects stay.
+3. Turn Auto Blocker back on if you want.
+
 ## The text uses the wrong font
 
 The project uses a font that is not on this phone. Open the project and tap **Download** in **Fonts not on this phone**. Fonts need an internet connection once.
@@ -79,7 +87,7 @@ The project uses a font that is not on this phone. Open the project and tap **Do
 
 **Can I open projects from other editors?** Some. See [Projects, backup and import](@projects).
 
-**Is there a computer version?** Yes, from version 5.0, for Mac computers first. The phone app still comes first. See [AbsentMotion on your computer](@requirements#absentmotion-on-your-computer).
+**Is there a computer version?** Yes, from version 5.0, for Mac and Linux computers. Windows comes later. The phone app still comes first. See [AbsentMotion on your computer](@requirements#absentmotion-on-your-computer).
 
 **Which languages are there?** English, Indonesian, Hindi, Portuguese (Brazil), Spanish (Latin America), Spanish (Spain), Filipino, Vietnamese, Thai, Malay, Arabic, Persian, Urdu, Turkish, Russian, Bengali and Japanese. Change it in Settings.
 

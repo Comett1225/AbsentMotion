@@ -2,7 +2,7 @@
 title: Requirements and versions
 group: Start
 order: 2
-summary: Which Android versions and phones AbsentMotion runs on, the difference between the Latest and Compatible versions, and the version for computers.
+summary: Which Android versions, phones and Chromebooks AbsentMotion runs on, the difference between the Latest and Compatible versions, and the version for computers.
 ---
 ## Two versions
 
@@ -29,6 +29,17 @@ Not sure whether your phone works? Type its name in the [phone checker](@phone-c
 
 No account, Google account or internet connection is needed to use the app. Only a few optional features use the internet, and the [Privacy](@privacy) page lists them all.
 
+## Chromebooks
+
+AbsentMotion runs on Chromebooks that can install Android apps.
+
+- Chromebooks with an ARM chip use the same files as phones.
+- Chromebooks with an **Intel or AMD** chip have their own files, built for x86_64: **Latest, Intel or AMD** (`-foss-x86_64.apk`, Android 13 or newer) and **Compatible, Intel or AMD** (`-compatible-x86_64.apk`, Android 9 to 12). They are in the list of all downloads on the [download page](@download) and on the [releases page](@releases).
+- If you installed the phone file on an Intel or AMD Chromebook, install the Intel or AMD file over it. Your projects stay.
+- **Check for Update** in [Settings](@settings) downloads the Intel or AMD file by itself on these Chromebooks.
+- The **Video Downloader** does not work in the Intel or AMD files.
+- On a Chromebook the app opens in a large window.
+
 ## Speed
 
 How fast things go depends on the phone's chip. Playing and editing is smooth on most phones with a mid-range chip or better. Exporting 4K video and the AI tools (captions, background removal for video) take longer on older or cheaper chips; the export screen shows an estimated time before you start, and the first-start check rates your phone as Fast, Good or Basic.
@@ -42,7 +53,10 @@ Phones running Android 16 and 17, and emulators from Android 13. Other phones sh
 From version 5.0 there is also a version for computers. It is the same app as on the phone, with the same effects, projects and export, laid out for a mouse and a keyboard. The phone app still comes first.
 
 - **Mac:** computers with Apple silicon (M1 or newer). Download the Mac file (`.dmg`) from the [releases page](@releases).
-- **Windows** is being tested and comes later. **Linux** comes after that.
+- **Linux:** 64-bit computers with an ARM (`arm64`) or Intel or AMD (`x86_64`) chip, running Ubuntu 22.04, Debian 12 or newer, or another Linux with glibc 2.35 or newer. From the [releases page](@releases), download the `.deb` package, which adds AbsentMotion to the app menu of Ubuntu, Debian and similar systems, or the `.AppImage`, which runs without installing: mark it as executable and open it. Pick the file with `arm64` or `x86_64` in its name.
+- **Windows** is being tested and comes later.
+
+On Linux, AbsentMotion draws with the graphics chip through Vulkan. Without a Vulkan driver (on Ubuntu and Debian, the package `mesa-vulkan-drivers`) it draws with the processor, which is slower, and frame blending, optical-flow and motion-blur smoothing, and Datamosh do not work.
 
 What is different on a computer:
 
@@ -50,7 +64,7 @@ What is different on a computer:
 - Drag files from your file manager into the window, or link a folder so its media shows in the library. Drag a tile from the library onto the timeline or the preview to add it.
 - Drag a layer in the preview to move it and drag a corner to resize it. Hold Alt and scroll to scale it; add Shift to rotate it. Drag with the middle mouse button to move the view of the preview or the timeline.
 - Right-click a clip on the timeline for a menu with cut, copy, paste, duplicate, split, delete, group and more. Double-click a group to open it.
-- Keyboard shortcuts use Cmd on a Mac (Ctrl on Windows): Space plays and pauses, the arrow keys step one frame (ten with Shift), Cmd+Z undoes and Cmd+Shift+Z redoes, Cmd+C, Cmd+X and Cmd+V copy, cut and paste layers, Cmd+D duplicates, Cmd+B splits at the playhead, Delete removes the selected layers and Cmd+E opens the export.
+- Keyboard shortcuts use Cmd on a Mac (Ctrl on Windows and Linux): Space plays and pauses, the arrow keys step one frame (ten with Shift), Cmd+Z undoes and Cmd+Shift+Z redoes, Cmd+C, Cmd+X and Cmd+V copy, cut and paste layers, Cmd+D duplicates, Cmd+B splits at the playhead, Delete removes the selected layers and Cmd+E opens the export.
 - Taking a photo or a video uses the computer's webcam.
 - The Video Downloader is not on the computer yet.
 

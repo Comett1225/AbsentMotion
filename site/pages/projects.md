@@ -37,7 +37,7 @@ Photos, videos and audio you add are, by default, **copied into the project**, s
 
 In [Settings](@settings), group **Backup**:
 
-- **Back up all projects** makes one file, `AbsentMotion-backup-` followed by the date and time, ending in `.absbackup`, in Documents/AbsentMotion. It contains all projects with their version history, templates with their media, presets, imported fonts, AI results and all kept media. It needs free space about the size of the content plus 50 MB. The file stays on the phone even if you uninstall AbsentMotion; copy it to a computer or a cloud service to keep it safe.
+- **Back up all projects** makes one file, `AbsentMotion-backup-` followed by the date and time, ending in `.absbackup`, in Documents/AbsentMotion. It contains all projects with their version history, templates with their media, presets, your color palettes, imported fonts, AI results and all kept media. It needs free space about the size of the content plus 50 MB. The file stays on the phone even if you uninstall AbsentMotion; copy it to a computer or a cloud service to keep it safe.
 - **Weekly automatic backup (projects only)** is off by default. When on, a few seconds after the app opens, if seven days passed since the last backup, it writes `AbsentMotion-weekly-...absbackup` with the projects only (no media) and deletes the previous weekly file. Manual backups are never deleted by the app.
 - **Restore from backup** asks you to pick a backup file. A project that is already here and the same is left alone; a project with the same name but different content is restored as a separate copy. Nothing that exists is overwritten. The restore can be stopped and run again later.
 
@@ -52,17 +52,31 @@ You can open a project file from another app (for example a file manager) with S
 | `.absproj` made by AbsentMotion | A normal project with its media |
 | A project package from another editor (`.amproj`) | Each scene becomes a **template**, and any assets stay assets |
 | A plain scene XML file | A normal project. Media links are not followed for safety, so media shows as missing unless it can be found in the gallery. |
+| An Adobe Animate file (`.fla`) | A normal project: see [Adobe Animate files](#adobe-animate-files) |
 
 Effects that AbsentMotion has are converted. Effects it does not have stay in the file but are not drawn. After an import, a report lists only what did not come over: effects it cannot run, settings that could not be carried over, media not found and fonts not installed. When everything came over, no report is shown. Backup files (`.absbackup`) are restored from Settings, not imported here.
 
 There are limits to protect the phone. For example, a package can have at most 2000 files and 32 projects, be at most 2 GB unpacked, and a scene needs a size of at most 16384 pixels and a frame rate from 1 to 240. The app says which rule a file broke.
+
+### Adobe Animate files
+
+AbsentMotion imports `.fla` files saved by Adobe Animate or Flash CS5 and later. Open one like any other project file: with **Choose file**, Share or Open with. On a computer, use **File**, **Import Project…** or drop the file on the window; there an `.xfl` file works too, as long as the rest of its folder is next to it. On the phone, pack an XFL folder into a ZIP file and import that.
+
+The file becomes one project with the stage size, frame rate and background color of the Animate file, and its scenes play one after another.
+
+- **Comes over:** shapes with solid, two-color gradient and picture fills, and their lines; symbols, each as a group with its own timeline; pictures; classic tweens as keyframes, with their eases; alpha, tint and brightness; mask layers; and MP3 sounds on the main timeline.
+- **Left out:** text fields, ActionScript, filters, blend modes, other color effects, motion guide paths, camera layers, components and compiled clips, videos, bone (IK) poses and library symbols that are not on the stage. A shape tween shows its start shape and a motion tween its first keyframe. Gradients with more than two colors keep two, dashed and other special lines are drawn solid, and eases that cannot be read become straight motion.
+
+After the import, the report lists both, with a count for each: **Imported from the Animate file** and **Not imported (shown without it)**.
+
+Older `.fla` files from Flash CS4 and before use another format. The app then says: "This .fla file was saved by Flash CS4 or older. Only .fla files from Flash CS5 and later can be imported."
 
 ## File formats and where things are
 
 - A project is one XML text file. Media sit beside it in the project's private folder.
 - An `.absproj` is a ZIP: `project.xml`, a `manifest.json` and the media files under `media/`. 3D models keep their files in a folder.
 - An `.absbackup` is a ZIP with every project, preset, template, font and media file.
-- **Private app storage** (removed when you uninstall): projects and their thumbnails, version history, kept media, templates, presets, crash drafts, crash logs, imported fonts, the caption model, preview copies and AI results.
-- **Shared storage** (stays when you uninstall): Movies/AbsentMotion (videos), Pictures/AbsentMotion (GIFs, still frames and image sequences), Music/AbsentMotion (audio exports), Documents/AbsentMotion (`.absproj`, XML and backups) and DCIM/AbsentMotion (photos and videos from the in-app camera).
+- **Private app storage** (removed when you uninstall): projects and their thumbnails, version history, kept media, templates, presets, color palettes, crash drafts, crash logs, imported fonts, the caption model, preview copies and AI results.
+- **Shared storage** (stays when you uninstall): Movies/AbsentMotion (videos), Pictures/AbsentMotion (GIFs, still frames, image sequences and palette pictures), Music/AbsentMotion (audio exports), Documents/AbsentMotion (`.absproj`, XML, backups and palette files) and DCIM/AbsentMotion (photos and videos from the in-app camera).
 
 AbsentMotion does not use the broad "all files" permission: it saves through Android's media storage.

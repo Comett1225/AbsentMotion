@@ -148,7 +148,7 @@ Below the button, **Supported** lists the sites that work, and **Partially suppo
 
 Only download what you have the right to use: the screen repeats this under the button.
 
-The Video Downloader is not in the computer version yet.
+The Video Downloader is not in the computer version yet, nor in the Intel or AMD files for Chromebooks.
 
 ## Importing a project file
 

@@ -61,13 +61,27 @@ Photos, videos and the other visible layers have a **Crop** button on page 2 of 
 
 Tabs at the top: **None**, **Color**, **Gradient**, **Media**.
 
-- **Color.** Fourteen swatches, then your saved colors. The bar at the top shows the color as #RRGGBB and its opacity; the **+** on it saves the current color. Three buttons: **Eyedropper** (touch the preview to sample a color), **Color sliders** and **Full color picker** (a color wheel or HSV and RGB sliders with a hex field).
+- **Color.** The colors of the chosen palette (the **Default** palette has fourteen), then your saved colors. The bar at the top shows the palette's name, which opens your [palettes](#color-palettes), and the color as #RRGGBB with its opacity; the **+** on it saves the current color. Three buttons: **Eyedropper** (touch the preview to sample a color), **Color sliders** and **Full color picker** (a color wheel or HSV and RGB sliders with a hex field).
 - **Gradient.** Pick linear, radial or sweep, then a start and an end color. Two handles on the preview move the gradient. A gradient has exactly two colors.
 - **Media.** Fills the shape or the letters of a text layer with a photo or video. Tapping it opens the picker.
 
 ![Fill & Color: the tabs (1), the color bar (2), the swatches (3) and Eyedropper, Color sliders and Full color picker (4).](img/lt-fill.webp)
 
 Only the color in the Color tab can be keyframed.
+
+### Color palettes
+
+A palette is a set of colors you can use in every project. The color bar in **Fill & Color**, the **Full color picker** and the color popup of an effect setting show the colors of the chosen palette. Tap the palette's name there to open **Palettes**.
+
+- Tap a palette to use it. The pencil opens it to edit.
+- **New** makes a palette with the color you are on. **From picture** makes one from the 8 main colors of a photo; a palette picture exported from AbsentMotion comes back with every color. **From file** reads a palette file: GIMP `.gpl`, Adobe `.ase` or `.act`, `.pal`, or a list of hex colors, like the palettes you can download from Lospec.
+- In an open palette, tap the name to rename it, and **Use** to choose it. Tap a color to select it: **Add** adds the color you are on, **Duplicate** copies the selected color and **Delete** removes it. **Sort** orders the colors by **Hue**, **Lightness** or **Saturation**.
+- **Export** saves the palette as **Picture (PNG)** in Pictures/AbsentMotion, or as **GIMP palette (.gpl)** or **Adobe swatches (.ase)** in Documents/AbsentMotion. **Make a copy** makes a copy you can edit, and **Delete palette** removes it after asking.
+- **Lock** keeps colors from being added, duplicated or deleted until you turn it off.
+
+Eight palettes are built in: **Default**, **Pastel**, **Neon**, **Earth**, **Skin tones**, **Grays**, **PICO-8** and **Game Boy**. They are locked for good: use **Make a copy** to change one. While a built-in palette is chosen, your saved colors show after its own and the **+** saves to them. While one of your own palettes is chosen, the **+** adds the color to that palette, unless it is locked.
+
+On a computer, drop a `.gpl`, `.ase`, `.act` or `.pal` file on the window: it joins your palettes and becomes the chosen one. Your palettes are saved in backups: see [Projects, backup and import](@projects).
 
 ### Frame & Shadow
 

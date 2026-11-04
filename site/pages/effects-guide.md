@@ -31,7 +31,7 @@ Tap an effect in the list to open it. Its header has the effect name, a three-do
 ![An open effect: its header (1) and a setting with its ruler and value (2).](img/effects.webp)
 
 - Each number has a ruler and a value box. Tap the name of a setting to make it the target of the keyframe button. Settings that are positions can be moved by dragging on the preview.
-- A color setting opens a row of quick swatches and a field for the exact color.
+- A color setting opens a row of quick swatches and a field for the exact color. The popup also shows the name and the colors of the chosen palette; tap the name to open your [palettes](@layer-tools#color-palettes).
 - A switch turns an option on or off. A choice opens a list.
 - A palette setting (in Palette Map and Retro Dither) shows all of its colors. **Presets** lists old console and computer palettes such as PICO-8, Game Boy and Commodore 64. **Import** reads a palette file: a picture with up to 256 colors (bigger ones are reduced to 256), Photoshop .ase or .act, GIMP .gpl, .pal, .hex or Paint.NET .txt, like the palettes you can download from Lospec.
 - The dither pattern of Retro Dither (**Dither**) and Palette Map (**Dither Pattern**) opens a sheet with a small sample picture of every pattern, so you can choose by how it looks. The chosen pattern has an orange frame. Swipe the grid up to see the rest.
@@ -89,7 +89,7 @@ These are different from the **Presets** tool of a layer, which keeps your own l
 
 ![The Particles effect: the snow in the preview (1) and its first settings (2).](img/fx-particles.webp)
 
-With **Depth** switched on, particles also fly toward or away from the camera: **Z Speed** moves them in depth, **Z Spread** gives them different starting depths and **Perspective** sets how much smaller far particles look. They then also follow the layer's 3D rotation.
+With **Depth** switched on, particles also fly toward or away from the camera: **Z Speed** moves them in depth, **Z Spread** gives them different starting depths and **Perspective** sets how much smaller far particles look. They then also follow the layer's 3D rotation, and with **Sort** set to **By piece** each particle sorts by depth among the pieces of other 3D layers: see [Camera layers and 3D](@camera-3d).
 
 ### 3D Scatter, 3D Fracture and Video Feedback
 
@@ -97,7 +97,7 @@ With **Depth** switched on, particles also fly toward or away from the camera: *
 
 **3D Fracture** (in 3D) breaks the layer into glass shards. Animate **Progress** from 0 (whole) to 1 (broken); **Impact Point**, **Force**, **Gravity**, **Spin** and **Depth Push** decide how the shards fly.
 
-Both follow the layer's own 3D rotation, its parent's and the camera. Their pieces sit in front of and behind each other. With **Depth order** on, the whole effect also sits in front of or behind other layers by its depth, but its pieces do not slot in between the pieces of other layers. Light layers shade the pieces. See [Camera layers and 3D](@camera-3d).
+Both follow the layer's own 3D rotation, its parent's and the camera, and turn with it when it tilts or orbits. Their pieces sit in front of and behind each other. With **Depth order** on, the whole effect also sits in front of or behind other layers by its depth. With **Sort** set to **By piece**, its pieces also slot in between the pieces of other layers; **Mix pieces with other layers** on the effect card turns this off for one layer. Light layers shade the pieces. See [Camera layers and 3D](@camera-3d).
 
 **Video Feedback** (in Repeat) draws the layer inside itself again and again, like a camera pointed at its own screen. **Zoom**, **Rotation** and **Offset** set each step; with **Use Layer Transform** on, moving, scaling or turning the layer steers the tunnel. **Fade** and **Hue Shift** change each copy, and **Delay** makes the inner copies follow the layer's animation a moment later.
 

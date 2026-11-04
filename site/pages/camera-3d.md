@@ -20,7 +20,7 @@ Select the camera layer. In the preview, drag to pan it and pinch to change the 
 
 Three tabs:
 
-- **Camera View.** The **Depth order** switch (see below), a diagram of the view cone, buttons **Perspective** and **Orthographic**, a **View Angle** (0.1 to 179.9 degrees) and a **Zoom** that follows the angle.
+- **Camera View.** The **Depth order** switch and, while it is on, **Sort** (see below; on a computer it is the last row), a diagram of the view cone, buttons **Perspective** and **Orthographic**, a **View Angle** (0.1 to 179.9 degrees) and a **Zoom** that follows the angle.
 - **Focus Blur.** A switch, then **Focus Distance** (with the focus plane shown as "at Z ..."), **Depth of Field** and **Blur Strength**.
 - **Fog.** A switch, a **Color** and the **Near** and **Far** distances.
 
@@ -42,7 +42,21 @@ With **Depth order** on, the camera decides which layer is in front: a layer tha
 - To let a flat layer take part, select it and tap **3D layer** on page 2 of its tools. The tile is there for shapes, photos, videos, text, drawings and groups while Depth order is on, and it lights up when it is active.
 - A flat layer keeps its place in the timeline and splits the 3D layers into separate stacks: 3D layers above it in the timeline stay in front of it, and 3D layers below it stay behind it.
 - Layers at the same depth keep their timeline order.
-- Each layer is sorted as a whole. Two layers that pass through each other do not cut into each other: the one whose position is nearer to the camera is drawn in front. The faces of a 3D model and the pieces of an effect are sorted among themselves, not between the pieces of other layers.
+- With **Sort** on **By layer**, each layer is sorted as a whole. Two layers that pass through each other do not cut into each other: the one whose position is nearer to the camera is drawn in front. The faces of a 3D model and the pieces of an effect are sorted among themselves, not between the pieces of other layers. **By piece** changes this: see below.
+- When the camera tilts or orbits, **3D Scatter**, **3D Fracture** and the 3D shape effects, such as **Cube** and **Torus**, turn with it like other 3D layers. The light on the pieces of 3D Scatter and 3D Fracture stays the same when the camera rolls or zooms.
+
+### Sort by piece
+
+**Sort**, in **Camera Options**, **Camera View** while Depth order is on, has two choices. **By layer** sorts every 3D layer as a whole. **By piece** sorts the pieces of **3D Scatter** and **3D Fracture**, the faces of 3D models and the particles of **Particles** with **Depth** one by one, together with the other 3D layers in the same stack. Objects that pass through each other then overlap where they should, for example two fractures flying through each other, or a model moving through a cloud of particles. New and older projects start on **By layer**.
+
+**Mix pieces with other layers** is a switch on the **3D Scatter**, **3D Fracture** and **Particles** cards (Particles only with **Depth** on) and in **Model Options**. While Sort is on By piece, it is on for every layer. Turn it off to keep that layer whole: it is then sorted as one item at its own depth. Turning it on also turns on Depth order and By piece for the project, so one switch is enough.
+
+What By piece does not do:
+
+- Pieces that cut through each other are not split. Each piece, face or particle is placed by the depth of its middle, so a piece that cuts through a plane shows fully in front of it or fully behind it.
+- Groups do not mix. Pieces only mix at the top level of a project: a group is sorted as one whole, and nothing inside it mixes. The switch is not shown inside a group.
+- Some layers stay whole and sort as one item: layers with a shadow, a border, a clipping mask, a Repeat, Echo, Motion Blur or True Motion Blur; 3D Scatter and 3D Fracture with an effect after them (other than Move and Text effects); particles and models with other effects; and layers that the camera's Focus Blur blurs or its Fog tints.
+- A flat layer still splits the 3D layers into stacks, as above. Pieces only mix within one stack.
 
 ## Light layers
 

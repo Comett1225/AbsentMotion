@@ -10,7 +10,8 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 
 ### Added
 
-- AbsentMotion on the computer: a desktop version for Macs with Apple silicon. It runs the phone's own editor, effects and export, laid out for a mouse and a keyboard, with a media library, an inspector, a mouse timeline, right-click menus, keyboard shortcuts, files dropped into the window, linked folders, the webcam, export in the background and in-app updates. Windows builds and is being tested; Linux comes later.
+- AbsentMotion on the computer: a desktop version for Macs with Apple silicon and for Linux. It runs the phone's own editor, effects and export, laid out for a mouse and a keyboard, with a media library, an inspector, a mouse timeline, right-click menus, keyboard shortcuts, files dropped into the window, linked folders, the webcam, export in the background and in-app updates. Windows builds and is being tested.
+- Linux: a .deb package and an AppImage, each for arm64 and x86_64. They run on glibc 2.35 or newer (Ubuntu 22.04, Debian 12 and later).
 - Text effects: Text Shake (letters shake on their own as Shake, Jitter, Wave, Circle or Wobble, or only some letters at a time), Text Blips (types the text out with a blip for each letter, eight voices, heard in the preview and the export) and Font Weight (animate the weight of variable fonts, imported ones too).
 - ASCII effect: any layer as text art made of letters and symbols, with six presets.
 - Depth order: with a camera, layers in 3D are drawn by their distance from the camera, and the camera can tilt and orbit around the scene. New projects have it on; older projects keep their look until it is turned on. A 3D layer tile lets flat layers take part.
@@ -24,7 +25,10 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - Puppet Pin: pins curl the picture smoothly, pin types Position, Bend (with rotation and scale) and Stiff, Triangle Density, Mesh Expansion and Sway.
 - Effect presets: a Presets button on an open effect, a picture for every preset, and favourite presets that show first in the Favorite strip.
 - Several selected clips stretch and split together.
-- Colour palettes in every colour picker on the phone and the desktop (Fill & Color, the full picker, frame and shadow, gradients, text, lights, captions and effect colours): make palettes from a picture or from palette files (.gpl, .ase, .pal, .act, .hex), add, duplicate and delete colours, sort them by hue, lightness or saturation, lock a palette, and export it as a PNG strip, .gpl or .ase. Eight built-in palettes stay as they are. On the desktop, a palette file dropped on the window joins the library.
+- Colour palettes in every colour picker on the phone and the desktop (Fill & Color, the full picker, frame and shadow, gradients, text, lights, captions and effect colours): make palettes from a picture (its 8 main colours, or every colour of a palette picture AbsentMotion exported) or from palette files (.gpl, .ase, .pal, .act, .hex), add, duplicate and delete colours, sort them by hue, lightness or saturation, lock a palette, and export it as a PNG strip, .gpl or .ase. Eight built-in palettes are locked; make a copy to change one. Palettes are kept in backups. On the desktop, a palette file dropped on the window joins the library.
+- Real 3D part two: Camera Options > Camera View has Sort, By layer or By piece. By piece sorts the pieces of 3D Scatter and 3D Fracture, the faces of 3D models and particles with Depth one by one among the other 3D layers, so objects that pass through each other overlap where they should. Mix pieces with other layers, on the 3D Scatter, 3D Fracture and Particles cards and in Model Options, keeps one layer whole. Pieces that cut through each other are not split, and groups do not mix with the layers around them.
+- Adobe Animate import: .fla files from Flash CS5 on (and XFL folders on the desktop) open through the normal import, Choose file, Share or Open with. Shapes, symbols as groups, pictures, classic tweens with eases, alpha, tint and brightness, masks and MP3 sounds on the main timeline come over; the import report lists them and what was left out, such as text, ActionScript, shape and motion tweens, filters and camera layers. Older binary .fla files get a message that says so.
+- Chromebooks with Intel or AMD chips have their own x86_64 files, -foss-x86_64.apk and -compatible-x86_64.apk. The in-app update picks the right file, and the download page lists them. The Video Downloader is not in these files.
 
 ### Changed
 
@@ -33,6 +37,7 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - While a gradient is being edited, dragging on the canvas moves the nearest gradient dot instead of the layer.
 - Effect and border card headers are lighter.
 - If the app closes while Vulkan or OpenGL is starting, the next start uses the other one.
+- On Samsung phones, when Auto Blocker may be stopping an update, the update message says so and how to turn it off for the install.
 - The source code has one folder per platform: shared, android, pc, macos, windows and linux.
 
 ### Removed
@@ -42,6 +47,8 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 ### Fixed
 
 - A thin light line could show along the edge of the canvas.
+- 3D Scatter, 3D Fracture and the 3D shape effects such as Cube turn with a tilted or orbiting camera like other 3D layers, and the light on Scatter and Fracture pieces stays the same when the camera rolls or zooms.
+- Puppet Pin keeps the parts it pulls in from outside the canvas, also when the layer has Glow.
 
 ### Licence
 

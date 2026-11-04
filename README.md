@@ -21,7 +21,7 @@
 </p>
 
 AbsentMotion is a free, open-source alternative to CapCut and Alight Motion: a motion graphics, animation and video
-editor for Android phones, with a desktop version for Mac from 5.0. Everything runs on your device and it works without
+editor for Android phones and Chromebooks, with desktop versions for Mac and Linux from 5.0. Everything runs on your device and it works without
 an internet connection. There is no subscription, no account and no advertising, and your projects never leave your device.
 
 <p align="center">
@@ -66,7 +66,7 @@ One-tap transitions between clips and In / Out / Loop animations for any layer, 
 <details>
 <summary><strong>Shapes and drawing</strong></summary>
 
-Parametric shapes, vector paths with point editing and animated (rotoscoping) masks, SVG import, freehand pen, brush, fill and eraser, borders, shadows, gradients and blend modes.
+Parametric shapes, vector paths with point editing and animated (rotoscoping) masks, SVG import, freehand pen, brush, fill and eraser, borders, shadows, gradients and blend modes. **Colour palettes** in every colour picker: make them from a picture or a palette file (.gpl, .ase, .act, .pal or hex), sort and lock them, and export them as PNG, .gpl or .ase.
 
 </details>
 
@@ -87,7 +87,14 @@ Speed ramps with presets and freeze frames, motion tracking, background removal 
 <details>
 <summary><strong>Camera layers</strong></summary>
 
-A 3D camera that works like Alight Motion's, showing the world around the frame, with perspective or orthographic projection, focus blur, fog, motion blur and one-tap Camera Moves (push in, pull out, orbit, pan, dolly zoom, handheld). Layers in 3D sort by their distance from the camera, the camera tilts and orbits around the scene, and Ambient, Directional and Point lights shade 3D models and 3D effects. 3D objects turn with your fingers.
+A 3D camera that works like Alight Motion's, showing the world around the frame, with perspective or orthographic projection, focus blur, fog, motion blur and one-tap Camera Moves (push in, pull out, orbit, pan, dolly zoom, handheld). Layers in 3D sort by their distance from the camera, the camera tilts and orbits around the scene, and Ambient, Directional and Point lights shade 3D models and 3D effects. With **Sort by piece**, the pieces of 3D Scatter and 3D Fracture, the faces of 3D models and 3D particles sort one by one with other layers, so objects pass through each other. 3D objects turn with your fingers.
+
+</details>
+
+<details>
+<summary><strong>Adobe Animate import</strong></summary>
+
+Open `.fla` files from Flash CS5 and later: shapes, symbols, pictures, classic tweens, masks and sounds become layers and keyframes, and a report lists what came over and what was left out.
 
 </details>
 
@@ -120,9 +127,9 @@ MP4, MOV, MKV or WebM video (H.264, HEVC, AV1, VP9 or APV, as the phone supports
 </details>
 
 <details>
-<summary><strong>Tablets and computers</strong></summary>
+<summary><strong>Tablets, Chromebooks and computers</strong></summary>
 
-Layouts for big tablet screens in portrait and landscape, with panels beside the preview. From 5.0 there is a desktop version for Macs with Apple silicon: the same editor, effects and export with a mouse timeline, right-click menus, keyboard shortcuts and drag and drop. Windows and Linux are being tested.
+Layouts for big tablet screens in portrait and landscape, with panels beside the preview. Chromebooks run the Android app, with their own files for Intel and AMD chips. From 5.0 there is a desktop version for Macs with Apple silicon and for Linux (`.deb` and AppImage, arm64 and x86_64): the same editor, effects and export with a mouse timeline, right-click menus, keyboard shortcuts and drag and drop. Windows is being tested.
 
 </details>
 
@@ -147,7 +154,7 @@ AbsentMotion works fully offline and nothing in it depends on the internet. It o
 
 ## Requirements
 
-Android 13 (API level 33) or newer (tested on Android 16 and 17 and on emulators from Android 13), a 64-bit ARM device (`arm64-v8a`), Vulkan 1.1 or OpenGL ES 3.0 (with OpenGL the heaviest AI tools are left out). The Compatible build runs on Android 8 to 12, and its 32-bit file (`armeabi-v7a`) on phones with a 32-bit system from Android 8.
+Android 13 (API level 33) or newer (tested on Android 16 and 17 and on emulators from Android 13), a 64-bit ARM device (`arm64-v8a`), Vulkan 1.1 or OpenGL ES 3.0 (with OpenGL the heaviest AI tools are left out). The Compatible build runs on Android 8 to 12, and its 32-bit file (`armeabi-v7a`) on phones with a 32-bit system from Android 8. Chromebooks with Intel or AMD chips have `x86_64` files of both builds (`-foss-x86_64.apk`, `-compatible-x86_64.apk`, the latter for Android 9 to 12), without the Video Downloader; the in-app update picks the right one.
 
 For Android 8 to 12 there is the **Compatible** build (`-compatible.apk`, tested on Android 11). It is the same app
 without Optical flow High, AI Smooth, AI Enhance and AI background removal 2.0.
@@ -158,7 +165,7 @@ There are two builds: `foss`, which contains no Google libraries at all, and `co
 Not sure about your phone? The [phone checker](https://comett1225.github.io/AbsentMotion/phone-checker.html) tells you
 which build to download.
 
-The desktop version runs on Macs with Apple silicon (`arm64`). Windows builds and is being tested; Linux (`.deb` and AppImage) builds and runs its automatic tests, but has not been tried on a Linux desktop yet.
+The desktop version runs on Macs with Apple silicon (`arm64`) and on Linux (`.deb` and AppImage, `arm64` and `x86_64`) with glibc 2.35 or newer: Ubuntu 22.04, Debian 12 and later. Windows builds and is being tested.
 
 ## Roadmap
 
@@ -193,7 +200,7 @@ Everything in this app is completely free, you will pay for NOTHING. You will ha
 
 ## File compatibility
 
-AbsentMotion can open scene XML files and `.amproj` packages exported from Alight Motion, and it exports scene XML in the same format. Effects that AbsentMotion does not include are kept in the file and are not drawn. AbsentMotion saves its own packages as `.absproj`. AbsentMotion is an independent project. It is not affiliated with, endorsed by or sponsored by Alight Creative, Alight Motion, ByteDance or CapCut. Alight Motion and CapCut are trademarks of their owners. [Alight Motion compatibility](docs/ALIGHT_COMPATIBILITY.md) lists every Alight effect and how it comes across.
+AbsentMotion can open scene XML files and `.amproj` packages exported from Alight Motion, and it exports scene XML in the same format. Effects that AbsentMotion does not include are kept in the file and are not drawn. AbsentMotion saves its own packages as `.absproj`. It also imports Adobe Animate `.fla` files from Flash CS5 and later. AbsentMotion is an independent project. It is not affiliated with, endorsed by or sponsored by Adobe, Alight Creative, Alight Motion, ByteDance or CapCut. Adobe Animate, Alight Motion and CapCut are trademarks of their owners. [Alight Motion compatibility](docs/ALIGHT_COMPATIBILITY.md) lists every Alight effect and how it comes across.
 
 ## Building
 
