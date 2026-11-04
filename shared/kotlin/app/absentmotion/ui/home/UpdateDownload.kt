@@ -29,6 +29,7 @@ internal sealed interface UpdateFailure {
     data object Removed : UpdateFailure { override val message = R.string.update_err_removed }
     data object Interrupted : UpdateFailure { override val message = R.string.update_err_interrupted }
     data object InstallFailed : UpdateFailure { override val message = R.string.update_err_install }
+    data object AutoBlocker : UpdateFailure { override val message = R.string.update_err_auto_blocker }
     data object NoChecksum : UpdateFailure { override val message = R.string.update_err_no_checksum; override val retry = false }
     data object Untrusted : UpdateFailure { override val message = R.string.update_err_untrusted; override val retry = false }
     data object Signature : UpdateFailure { override val message = R.string.update_err_signature; override val retry = false }

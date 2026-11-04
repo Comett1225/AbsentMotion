@@ -254,4 +254,83 @@ class UpdateFlowTest {
             dir.deleteRecursively()
         }
     }
+
+    private val userDeclined = "INSTALL_FAILED_ABORTED: User rejected permissions"
+    private val verifierRefused = "INSTALL_FAILED_VERIFICATION_FAILURE: Install not allowed"
+
+    private fun attempt(tries: InstallTries?, status: Int, message: String? = null, installed: String = "4.1.3", version: String = "4.1.4") =
+        tryEnded(tryStarted(tries, installed, version), status, message)
+
+    @Test fun onlySamsungPhonesAreTold() {
+        assertTrue(isSamsung("samsung") && isSamsung("Samsung") && isSamsung("SAMSUNG"))
+        assertFalse(isSamsung("Google") || isSamsung("Xiaomi") || isSamsung("") || isSamsung(null))
+        val twice = attempt(attempt(null, PackageInstaller.STATUS_FAILURE), PackageInstaller.STATUS_FAILURE)
+        assertTrue(autoBlocker("samsung", twice, PackageInstaller.STATUS_FAILURE, null))
+        for (maker in listOf("Google", "OnePlus", null)) {
+            assertFalse(autoBlocker(maker, twice, PackageInstaller.STATUS_FAILURE, null))
+            assertFalse(autoBlocker(maker, attempt(null, PackageInstaller.STATUS_FAILURE_ABORTED, verifierRefused), PackageInstaller.STATUS_FAILURE_ABORTED, verifierRefused))
+        }
+        val installing = UpdateStep.Installing(release)
+        assertEquals(UpdateStep.NotInstalled(release), reduce(installing, UpdateEvent.Answer(PackageInstaller.STATUS_FAILURE_ABORTED, blocked = false)))
+        assertEquals(UpdateStep.Failed(release, UpdateFailure.InstallFailed), reduce(installing, UpdateEvent.Answer(PackageInstaller.STATUS_FAILURE, blocked = false)))
+        assertEquals(UpdateStep.Failed(release, UpdateFailure.AutoBlocker), reduce(installing, UpdateEvent.Answer(PackageInstaller.STATUS_FAILURE_ABORTED, blocked = true)))
+        assertEquals(UpdateStep.Failed(release, UpdateFailure.AutoBlocker), reduce(installing, UpdateEvent.Answer(PackageInstaller.STATUS_FAILURE, blocked = true)))
+        assertTrue(UpdateFailure.AutoBlocker.retry)
+    }
+
+    @Test fun theAutoBlockerNoteShowsAfterTwoFailedAttempts() {
+        val once = attempt(null, PackageInstaller.STATUS_FAILURE)
+        assertEquals(InstallTries("4.1.3", "4.1.4", failed = 1), once)
+        assertFalse(autoBlocker("samsung", once, PackageInstaller.STATUS_FAILURE, null))
+        val twice = attempt(once, PackageInstaller.STATUS_FAILURE)
+        assertEquals(2, twice!!.failed)
+        assertTrue(autoBlocker("samsung", twice, PackageInstaller.STATUS_FAILURE, null))
+        assertTrue(autoBlocker("samsung", attempt(once, PackageInstaller.STATUS_FAILURE_BLOCKED), PackageInstaller.STATUS_FAILURE_BLOCKED, null))
+        val unanswered = tryStarted(null, "4.1.3", "4.1.4")
+        assertTrue(autoBlocker("samsung", attempt(unanswered, PackageInstaller.STATUS_FAILURE), PackageInstaller.STATUS_FAILURE, null))
+        val refused = attempt(null, PackageInstaller.STATUS_FAILURE_ABORTED, verifierRefused)
+        assertTrue(autoBlocker("samsung", refused, PackageInstaller.STATUS_FAILURE_ABORTED, verifierRefused))
+        val storage = attempt(once, PackageInstaller.STATUS_FAILURE_STORAGE)
+        assertEquals(1, storage!!.failed)
+        assertFalse(autoBlocker("samsung", twice, PackageInstaller.STATUS_FAILURE_STORAGE, null))
+    }
+
+    @Test fun aUserCancelNeverCounts() {
+        var tries: InstallTries? = null
+        repeat(5) { tries = attempt(tries, PackageInstaller.STATUS_FAILURE_ABORTED, userDeclined) }
+        assertEquals(InstallTries("4.1.3", "4.1.4", failed = 0, open = false), tries)
+        assertFalse(autoBlocker("samsung", tries, PackageInstaller.STATUS_FAILURE_ABORTED, userDeclined))
+        assertFalse(autoBlocker("samsung", tries, PackageInstaller.STATUS_FAILURE_ABORTED, null))
+        val cancelledInTheApp = tryStarted(attempt(null, PackageInstaller.STATUS_FAILURE), "4.1.3", "4.1.4").copy(open = false)
+        assertEquals(1, tryStarted(cancelledInTheApp, "4.1.3", "4.1.4").failed)
+        val afterTwo = attempt(attempt(null, PackageInstaller.STATUS_FAILURE), PackageInstaller.STATUS_FAILURE)
+        assertFalse(autoBlocker("samsung", afterTwo, PackageInstaller.STATUS_FAILURE_ABORTED, userDeclined))
+        assertEquals(UpdateStep.NotInstalled(release), reduce(UpdateStep.Installing(release), UpdateEvent.Answer(PackageInstaller.STATUS_FAILURE_ABORTED, autoBlocker("samsung", afterTwo, PackageInstaller.STATUS_FAILURE_ABORTED, userDeclined))))
+    }
+
+    @Test fun theCountStartsAgainAfterAnUpdateOrANewRelease() {
+        val twice = attempt(attempt(null, PackageInstaller.STATUS_FAILURE), PackageInstaller.STATUS_FAILURE)
+        assertNull(tryEnded(tryStarted(twice, "4.1.3", "4.1.4"), PackageInstaller.STATUS_SUCCESS, null))
+        assertEquals(InstallTries("4.1.4", "4.1.5", failed = 0, open = true), tryStarted(twice, "4.1.4", "4.1.5"))
+        assertEquals(InstallTries("4.1.3", "4.1.5", failed = 0, open = true), tryStarted(twice, "4.1.3", "4.1.5"))
+        val stuck = tryStarted(null, "4.1.3", "4.1.4")
+        assertEquals(0, tryStarted(stuck, "4.1.4", "4.1.4").failed)
+        assertFalse(autoBlocker("samsung", attempt(twice, PackageInstaller.STATUS_FAILURE, installed = "4.1.4", version = "4.1.5"), PackageInstaller.STATUS_FAILURE, null))
+    }
+
+    @Test fun attemptsAreKeptInAFile() {
+        val file = File.createTempFile("update-tries", ".txt")
+        try {
+            val tries = InstallTries("4.1.3", "4.1.4-beta.1", failed = 1, open = true)
+            writeTries(file, tries)
+            assertEquals(tries, readTries(file))
+            writeTries(file, null)
+            assertFalse(file.exists())
+            assertNull(readTries(file))
+            file.writeText("broken")
+            assertNull(readTries(file))
+        } finally {
+            file.delete()
+        }
+    }
 }

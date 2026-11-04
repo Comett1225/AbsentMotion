@@ -56,7 +56,7 @@ internal sealed interface UpdateEvent {
     data object NeedsPermission : UpdateEvent
     data class SettingsClosed(val granted: Boolean) : UpdateEvent
     data object Install : UpdateEvent
-    data class Answer(val status: Int) : UpdateEvent
+    data class Answer(val status: Int, val blocked: Boolean = false) : UpdateEvent
     data class Fail(val failure: UpdateFailure) : UpdateEvent
     data object Cancel : UpdateEvent
 }
@@ -78,6 +78,39 @@ internal fun installerFailure(status: Int, size: Long): UpdateFailure? = when (s
     PackageInstaller.STATUS_FAILURE_CONFLICT -> UpdateFailure.Signature
     PackageInstaller.STATUS_FAILURE_INCOMPATIBLE, PackageInstaller.STATUS_FAILURE_INVALID -> UpdateFailure.WrongApp
     else -> UpdateFailure.InstallFailed
+}
+
+internal const val AUTO_BLOCKER_TRIES = 2
+
+internal data class InstallTries(val installed: String, val version: String, val failed: Int = 0, val open: Boolean = false)
+
+internal fun isSamsung(maker: String?) = maker.equals("samsung", ignoreCase = true)
+
+internal fun refused(status: Int, message: String?) =
+    status == PackageInstaller.STATUS_FAILURE_BLOCKED || (status == PackageInstaller.STATUS_FAILURE_ABORTED && message.orEmpty().startsWith("INSTALL_FAILED_VERIFICATION_FAILURE"))
+
+private fun unexplained(status: Int, message: String?) = refused(status, message) || installerFailure(status, 0) == UpdateFailure.InstallFailed
+
+internal fun tryStarted(tries: InstallTries?, installed: String, version: String): InstallTries {
+    val kept = tries?.takeIf { it.installed == installed && it.version == version } ?: InstallTries(installed, version)
+    return kept.copy(failed = kept.failed + if (kept.open) 1 else 0, open = true)
+}
+
+internal fun tryEnded(tries: InstallTries, status: Int, message: String?): InstallTries? = when {
+    status == PackageInstaller.STATUS_SUCCESS -> null
+    refused(status, message) -> tries.copy(failed = maxOf(tries.failed + 1, AUTO_BLOCKER_TRIES), open = false)
+    unexplained(status, message) -> tries.copy(failed = tries.failed + 1, open = false)
+    else -> tries.copy(open = false)
+}
+
+internal fun autoBlocker(maker: String?, tries: InstallTries?, status: Int, message: String?) =
+    isSamsung(maker) && (tries?.failed ?: 0) >= AUTO_BLOCKER_TRIES && unexplained(status, message)
+
+internal fun readTries(file: File): InstallTries? =
+    runCatching { file.readLines() }.getOrNull()?.takeIf { it.size == 4 }?.let { (installed, version, failed, open) -> InstallTries(installed, version, failed.toIntOrNull() ?: 0, open == "1") }
+
+internal fun writeTries(file: File, tries: InstallTries?) {
+    runCatching { if (tries == null) file.delete() else file.writeText(listOf(tries.installed, tries.version, tries.failed, if (tries.open) 1 else 0).joinToString("\n")) }
 }
 
 internal fun reduce(step: UpdateStep, event: UpdateEvent): UpdateStep {
@@ -115,6 +148,7 @@ internal fun reduce(step: UpdateStep, event: UpdateEvent): UpdateStep {
             step !is UpdateStep.Installing -> step
             event.status == PackageInstaller.STATUS_PENDING_USER_ACTION -> step
             event.status == PackageInstaller.STATUS_SUCCESS -> UpdateStep.Idle
+            event.blocked -> UpdateStep.Failed(step.release, UpdateFailure.AutoBlocker)
             event.status == PackageInstaller.STATUS_FAILURE_ABORTED -> UpdateStep.NotInstalled(step.release)
             else -> UpdateStep.Failed(step.release, installerFailure(event.status, step.release.apk?.size?.let(::installSpace) ?: 0) ?: UpdateFailure.InstallFailed)
         }
@@ -172,6 +206,8 @@ internal object Updater {
     }
 
     fun files(context: Context) = updateFiles(context.cacheDir, context.noBackupFilesDir)
+
+    private fun tries(context: Context) = File(context.noBackupFilesDir, "update-tries.txt")
 
     fun reveal(): Boolean {
         if (!busy) return false
@@ -367,7 +403,11 @@ internal object Updater {
         val mine = ++generation
         job = scope.launch {
             try {
-                val id = withContext(Dispatchers.IO) { writeSession(app, files(app).apk, apk.size, apk.sha256 ?: stampSha(files(app))) }
+                val id = withContext(Dispatchers.IO) {
+                    writeSession(app, files(app).apk, apk.size, apk.sha256 ?: stampSha(files(app))).also {
+                        if (isSamsung(Build.MANUFACTURER)) tries(app).let { file -> writeTries(file, tryStarted(readTries(file), Updates.installed(app), release.version)) }
+                    }
+                }
                 if (generation != mine || step !is UpdateStep.Installing) {
                     abandon(app, id)
                     if (session == id) session = -1
@@ -428,8 +468,8 @@ internal object Updater {
         if (id >= 0) runCatching { app.packageManager.packageInstaller.abandonSession(id) }
     }
 
-    fun answer(context: Context, id: Int, status: Int, prompt: Intent?) {
-        Log.i(TAG, "installer answered $status for session $id")
+    fun answer(context: Context, id: Int, status: Int, message: String?, prompt: Intent?) {
+        Log.i(TAG, "installer answered $status ($message) for session $id")
         if (id != session || step !is UpdateStep.Installing) {
             if (status == PackageInstaller.STATUS_PENDING_USER_ACTION) abandon(context, id)
             return
@@ -444,7 +484,10 @@ internal object Updater {
         }
         session = -1
         confirm = null
-        on(UpdateEvent.Answer(status))
+        val file = tries(context)
+        val ended = readTries(file)?.let { tryEnded(it, status, message) }
+        writeTries(file, ended)
+        on(UpdateEvent.Answer(status, autoBlocker(Build.MANUFACTURER, ended, status, message)))
     }
 
     fun confirmShown(context: Context, failed: Boolean) {
@@ -457,6 +500,7 @@ internal object Updater {
 
     fun cancel(context: Context) {
         val wasDownloading = step is UpdateStep.Downloading
+        if (step is UpdateStep.Installing) tries(context).let { file -> readTries(file)?.let { writeTries(file, it.copy(open = false)) } }
         generation++
         job?.cancel()
         http?.abort()
@@ -501,7 +545,7 @@ class UpdateReceiver : BroadcastReceiver() {
         val status = intent.getIntExtra(PackageInstaller.EXTRA_STATUS, PackageInstaller.STATUS_FAILURE)
         val id = intent.getIntExtra(PackageInstaller.EXTRA_SESSION_ID, -1)
         val prompt = if (status == PackageInstaller.STATUS_PENDING_USER_ACTION) promptOf(intent) else null
-        Updater.answer(context.applicationContext, id, status, prompt)
+        Updater.answer(context.applicationContext, id, status, intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE), prompt)
     }
 
     private fun promptOf(intent: Intent): Intent? =

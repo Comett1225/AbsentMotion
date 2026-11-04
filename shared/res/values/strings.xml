@@ -273,6 +273,7 @@
     <string name="update_err_not_newer">The downloaded file is not newer than the installed app, so it was not installed.</string>
     <string name="update_err_file">The update could not be saved on this device.</string>
     <string name="update_err_install">Android could not install the update.</string>
+    <string name="update_err_auto_blocker">Samsung\'s Auto Blocker may be blocking this update. Turn it off in Settings &gt; Security and privacy &gt; Auto Blocker, tap Try Again to update, then turn it back on if you want.</string>
     <string name="update_err_no_installer">This device has no installer that can install the update.</string>
     <string name="update_err_settings">This device cannot open the setting to allow installs. Allow AbsentMotion under Install unknown apps in the system settings.</string>
     <string name="update_err_removed">The downloaded update is no longer available on this device, so nothing was installed. Try again to download it.</string>
