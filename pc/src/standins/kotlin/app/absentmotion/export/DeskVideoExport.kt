@@ -101,6 +101,8 @@ internal object DeskEncoders {
         AudioCodec.Opus -> listOf("libopus", "opus")
     }.filter { it in available }
 
+    fun audioExtra(name: String): List<String> = if (name == "opus") listOf("-strict", "-2") else emptyList()
+
     fun side(name: String): Int = if (hardware(name)) HardwareSide else SoftwareSide
 
     private val working = java.util.concurrent.ConcurrentHashMap<String, Boolean>()
@@ -216,7 +218,7 @@ internal suspend fun exportVideo(
         if (audio != null && pcm != null) writePcm(audio, (scene.totalTime + 1) * 1000L, s.audio.effectiveRate, pcm)
         val sound = if (pcm == null) emptyList() else {
             val coder = DeskEncoders.audio(s.audio.codec, s.audio.bitrateKbps).firstOrNull() ?: throw ExportError(txt(R.string.export_support_no_encoder, s.audio.codec.label))
-            listOf("-map", "1:a", "-c:a", coder, "-b:a", "${s.audio.bitrateKbps}k", "-ar", "${s.audio.effectiveRate}", "-ac", "${s.audio.channels}")
+            listOf("-map", "1:a", "-c:a", coder) + DeskEncoders.audioExtra(coder) + listOf("-b:a", "${s.audio.bitrateKbps}k", "-ar", "${s.audio.effectiveRate}", "-ac", "${s.audio.channels}")
         }
         val inputs = listOf("-f", "rawvideo", "-pix_fmt", "rgba", "-s", "${width}x$height", "-r", "${s.fps}", "-i", "-") +
             (if (pcm == null) emptyList() else listOf("-f", "s16le", "-ar", "${s.audio.effectiveRate}", "-ac", "2", "-i", pcm.path))
