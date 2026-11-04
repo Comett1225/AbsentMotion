@@ -9,6 +9,7 @@
 #include <memory>
 #include <array>
 
+#include "depth.h"
 #include "easing.h"
 #include "frames.h"
 #include "xml.h"
@@ -140,6 +141,7 @@ struct Sight {
     bool depthOrder = false;
     int run = 0;
     float depth = 0;
+    std::vector<depth::Cut> cuts;
 };
 
 struct Layer {
@@ -299,6 +301,8 @@ bool SeeLayers(const std::vector<Layer>& layers, int width, int height, bool top
                bool pieces = false);
 bool SeenPlacement(const Layer& layer, double timeMs, Placement* placement);
 void SeenPieces(const Layer& layer, double timeMs, SkPoint center, const SkM44& orientation, PieceView* view);
+bool SeenFlat(const Layer& layer, double timeMs, depth::Flat* flat);
+void SplitSeen(std::vector<Layer>* seen, double timeMs);
 float DepthPerPixel(const Layer& layer, double timeMs);
 SkMatrix WorldMatrix(const Scene& scene, const Layer& layer, double timeMs);
 int64_t TopLayerAt(const Scene& scene, double timeMs, float x, float y, const MediaPictures& masks);

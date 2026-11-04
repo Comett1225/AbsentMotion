@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cmath>
 #include <cstdio>
 #include <cstring>
 #include <random>
@@ -170,6 +171,45 @@ int main() {
         Expect(!am::SeeLayers({at(1, 0), broken}, 100, 100, true, 30, 0, true, &out), "flat pieces stay flat by layer");
         Expect(am::SeeLayers({at(1, 0), broken}, 100, 100, true, 30, 0, true, &out, true) && out[0].sight.run == 0 && out[1].sight.run == 1,
                "flat pieces join a run by piece");
+    }
+#endif
+#ifdef RENDER_BENCH_SPLIT
+    {
+        const auto cards = [](const char* extra, const char* place) {
+            std::string cam = std::string("<camera id=\"9\" startTime=\"0\" endTime=\"1000\"><transform>") + place + "</transform></camera>";
+            const char* card = "<shape id=\"%d\" startTime=\"0\" endTime=\"1000\" fillType=\"color\" s=\".rect\" threeD=\"true\"><transform><location value=\"160,160,0\"/>"
+                               "<tilt value=\"0,%d\"/></transform><property name=\"size\" type=\"vec2\" value=\"70,55\"/></shape>";
+            char a[400], b[400];
+            std::snprintf(a, sizeof a, card, 1, 40);
+            std::snprintf(b, sizeof b, card, 2, -40);
+            return std::string("<scene width=\"320\" height=\"320\"") + extra + ">" + cam + a + b + "</scene>";
+        };
+        const char* ahead = "<location value=\"160,160,-277.13\"/>";
+        const char* turned = "<location value=\"293.84,88.27,-231.82\"/><tilt value=\"15,30\"/>";
+        const am::MediaPictures none = [](const std::string&, int64_t) { return sk_sp<SkImage>(); };
+        am::Scene x;
+        std::string why;
+        for (const char* mode : {" depthOrder=\"true\"", " depthOrder=\"true\" depthSort=\"piece\""}) {
+            Expect(am::ParseScene(cards(mode, ahead), &x, &why), "crossing scene parses");
+            const int64_t left = am::TopLayerAt(x, 0, 130, 160, none), right = am::TopLayerAt(x, 0, 190, 160, none);
+            Expect(left != right && (left == 1 || left == 2) && (right == 1 || right == 2), "each half of a crossing picks the card in front");
+            Expect(am::TopLayerAt(x, 0, 159, 160, none) == left && am::TopLayerAt(x, 0, 161, 160, none) == right, "the pick changes at the crossing line");
+            Expect(!am::WorldMatrix(x, x.layers[1], 0).isIdentity(), "a split layer keeps its matrix");
+        }
+        Expect(am::ParseScene(cards("", ahead), &x, &why), "flat crossing scene parses");
+        Expect(am::TopLayerAt(x, 0, 130, 160, none) == 2 && am::TopLayerAt(x, 0, 190, 160, none) == 2, "without depth order the top card wins everywhere");
+        Expect(am::ParseScene(cards(" depthOrder=\"true\"", turned), &x, &why), "turned crossing scene parses");
+        std::vector<int64_t> picks;
+        for (float px = 100; px <= 220; px += 4) picks.push_back(am::TopLayerAt(x, 0, px, 160, none));
+        Expect(std::count(picks.begin(), picks.end(), 1) > 2 && std::count(picks.begin(), picks.end(), 2) > 2, "both cards stay pickable under a turned camera");
+        std::vector<am::Layer> list = x.layers, seen;
+        am::SeeLayers(list, 320, 320, true, 30, 0, true, &seen);
+        am::SplitSeen(&seen, 0);
+        Expect(seen.size() > list.size() && std::any_of(seen.begin(), seen.end(), [](const am::Layer& l) { return !l.sight.cuts.empty(); }), "crossing layers are split");
+        list[1].location.value = {160, 160, std::nanf("")};
+        am::SeeLayers(list, 320, 320, true, 30, 0, true, &seen);
+        am::SplitSeen(&seen, 0);
+        Expect(seen.size() <= list.size(), "a broken placement is not split");
     }
 #endif
 

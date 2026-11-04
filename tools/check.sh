@@ -69,6 +69,7 @@ sh tools/particles.sh >"$dir/particles.log" 2>&1 || { tail -n 15 "$dir/particles
 sh tools/warp.sh >"$dir/warp.log" 2>&1 || { tail -n 15 "$dir/warp.log" >&2; fail "the path and puppet warp host tests"; }
 if [ "$(uname -s)" = Darwin ] && [ "$(uname -m)" = arm64 ]; then
     python3 tools/pieces3d_check.py >"$dir/pieces3d.log" 2>&1 || { tail -n 15 "$dir/pieces3d.log" >&2; fail "the 3D pieces host tests"; }
+    python3 tools/crossing_check.py >"$dir/crossing.log" 2>&1 || { tail -n 15 "$dir/crossing.log" >&2; fail "the crossing 3D layers host tests"; }
 fi
 python3 tools/puppet_check.py >"$dir/puppet.log" 2>&1 || { tail -n 15 "$dir/puppet.log" >&2; fail "the Puppet Pin checks against the host engine"; }
 python3 tools/crop_check.py >"$dir/crop.log" 2>&1 || { tail -n 15 "$dir/crop.log" >&2; fail "the Crop checks against the host engine"; }

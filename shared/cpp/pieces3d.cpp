@@ -37,7 +37,7 @@ uint32_t mix(uint32_t x) { x ^= x >> 16; x *= 0x7feb352d; x ^= x >> 15; x *= 0x8
 float random(uint32_t seed, uint32_t n) { return (mix(seed ^ mix(n + 1)) >> 8) * (1.0f / 16777216.0f); }
 
 struct Vertex { V p; SkPoint uv; SkColor color; };
-struct Tri { std::array<SkPoint, 3> p, uv; std::array<SkColor, 3> color; float z; };
+struct Tri { std::array<SkPoint, 3> p, uv; std::array<SkColor, 3> color; float z; std::array<float, 3> zs; };
 
 struct Mesh {
     std::vector<Tri> triangles;
@@ -63,7 +63,7 @@ struct Mesh {
     void add(Vertex a, Vertex b, Vertex c) {
         SkPoint pa, pb, pc;
         if (!project(a.p, &pa) || !project(b.p, &pb) || !project(c.p, &pc)) return;
-        triangles.push_back({{pa, pb, pc}, {a.uv, b.uv, c.uv}, {a.color, b.color, c.color}, depthKey});
+        triangles.push_back({{pa, pb, pc}, {a.uv, b.uv, c.uv}, {a.color, b.color, c.color}, depthKey, {key(a.p), key(b.p), key(c.p)}});
     }
     void quad(Vertex a, Vertex b, Vertex c, Vertex d) { add(a, b, c); add(a, c, d); }
     void draw(SkCanvas* canvas, SkImage* image, depth::Pass* pass) {
@@ -75,7 +75,10 @@ struct Mesh {
             paint.setAntiAlias(true);
             if (textured && image) paint.setShader(image->makeShader(SkTileMode::kClamp, SkTileMode::kClamp, SkSamplingOptions(SkFilterMode::kLinear)));
             const int source = pass->add(canvas->getTotalMatrix(), pass->styled(paint));
-            for (const Tri& t : triangles) pass->triangle(source, t.p.data(), textured ? t.uv.data() : nullptr, t.color.data(), lens ? t.z : pass->at(t.z));
+            for (const Tri& t : triangles) {
+                const float depths[3] = {lens ? t.zs[0] : pass->at(t.zs[0]), lens ? t.zs[1] : pass->at(t.zs[1]), lens ? t.zs[2] : pass->at(t.zs[2])};
+                pass->triangle(source, t.p.data(), textured ? t.uv.data() : nullptr, t.color.data(), lens ? t.z : pass->at(t.z), depths);
+            }
             return;
         }
         SkVertices::Builder builder(SkVertices::kTriangles_VertexMode, (int)triangles.size() * 3, 0,

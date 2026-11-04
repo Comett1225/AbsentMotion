@@ -124,7 +124,9 @@ void DrawModel(SkCanvas* canvas, const Layer& l, double timeMs, float alpha, con
             if (fresh) at->second = pass->add(SkMatrix::I(), pass->styled(paint));
             for (size_t k = 0; k < end - start; k++) {
                 const Face& f = faces[start + k];
-                pass->triangle(at->second, positions + k * 3, uvs ? uvs + k * 3 : nullptr, colors + k * 3, f.depth / 3);
+                const int* corner = &m.triangles[f.index * 3];
+                const float depths[3] = {clip[corner[0]].z, clip[corner[1]].z, clip[corner[2]].z};
+                pass->triangle(at->second, positions + k * 3, uvs ? uvs + k * 3 : nullptr, colors + k * 3, f.depth / 3, depths);
             }
             continue;
         }

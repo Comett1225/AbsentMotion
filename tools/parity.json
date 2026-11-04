@@ -224,6 +224,16 @@
       "note": "Desktop: the Sort row is the last row of Camera View and Mix pieces is the last row of the 3D Scatter, 3D Fracture and Particles (Depth on) cards and of Model options, so no existing desktop control moves. macOS checked by DeskPaletteDepthTest."
     },
     {
+      "id": "tool.depth_crossing",
+      "name": "Depth order: 3D layers that pass through each other, a model or 3D pieces are split along the crossing line",
+      "where": "camera.cpp, depth.cpp, styles.cpp",
+      "android": "works",
+      "macos": "untested",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "Engine only, no new controls. By layer splits flat layers; By piece also splits model faces and 3D pieces. Checked on the host engine by tools/crossing_check.py."
+    },
+    {
       "id": "tool.light_layer",
       "name": "Light layers for models and 3D pieces",
       "where": "StructureUi.kt, panels/LightPanel.kt, camera.cpp, model.cpp, pieces3d.cpp",

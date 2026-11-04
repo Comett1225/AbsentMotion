@@ -103,12 +103,18 @@ bool HasComponent(const Anim& a, size_t component) {
     return std::any_of(a.keys.begin(), a.keys.end(), [&](const Keyframe& k) { return nonzero(k.v); });
 }
 
-bool Spatial(const Layer& l, const Placement& p, double timeMs) {
-    if (l.force3d || p.z != 0 || Solid(l, p) || HasComponent(l.location, 2) || HasComponent(l.tilt, 0) || HasComponent(l.tilt, 1)) return true;
+bool Deep(const Layer& l, double timeMs) {
     return std::any_of(l.effects.begin(), l.effects.end(), [&](const LayerEffect& e) {
         return !e.hidden && ((ParticleEffect(e.id) && e.value("depth", l.localTime(timeMs), 0) >= 0.5f) || e.id == "absent.scatter3d" || e.id == "absent.fracture3d");
     });
 }
+
+bool Spatial(const Layer& l, const Placement& p, double timeMs) {
+    if (l.force3d || p.z != 0 || Solid(l, p) || HasComponent(l.location, 2) || HasComponent(l.tilt, 0) || HasComponent(l.tilt, 1)) return true;
+    return Deep(l, timeMs);
+}
+
+bool Idle(const Layer& l, double timeMs) { return l.kind == "camera" || l.kind == "nullobj" || l.kind == "light" || !l.activeAt(timeMs); }
 
 LayerEffect Effect(const char* id, std::vector<std::pair<const char*, std::vector<float>>> values) {
     LayerEffect e;
@@ -284,6 +290,128 @@ void SeenPieces(const Layer& l, double timeMs, SkPoint center, const SkM44& orie
     const SkPoint seen = Look(v, p).location;
     const SkV4 shift = orientation.map((center.fX - seen.fX) / k, (center.fY - seen.fY) / k, 0, 0);
     view->lens = Lens(v) * SkM44::Translate(anchor.x + shift.x, anchor.y + shift.y, anchor.z + shift.z) * SkM44::Scale(view->unit, view->unit, view->unit);
+}
+
+bool SeenFlat(const Layer& l, double timeMs, depth::Flat* out) {
+    *out = depth::Flat();
+    const Sight& s = l.sight;
+    if (!s.layers || !s.layer) return false;
+    const View v = s.camera ? LayerView(*s.layers, *s.camera, s.width, s.height, timeMs, s.depthOrder) : DefaultView(s.width, s.height);
+    const Seen seen = Look(v, EffectivePlacement(*s.layers, *s.layer, timeMs));
+    out->focal = v.focal;
+    out->orthographic = v.orthographic;
+    out->at = seen.location;
+    out->q = out->nearness(seen.depth);
+    out->valid = seen.location.isFinite() && std::isfinite(out->q);
+    out->cost = std::any_of(l.effects.begin(), l.effects.end(), [](const LayerEffect& e) { return !e.hidden; }) ? 4 : 1;
+    Placement p;
+    if (!out->valid || l.kind == "model" || HasRepeat(l) || Deep(l, timeMs) || !SeenPlacement(l, timeMs, &p)) return out->valid;
+    const float t = l.localTime(timeMs);
+    const SkRect box = ShapePath(l, t).getBounds();
+    if (box.isEmpty() || !box.isFinite()) return true;
+    SkMatrix local;
+    local.setSkew(tanf(l.skew.get(0, t, 0)), tanf(l.skew.get(1, t, 0)));
+    local.preScale(p.scale.fX, p.scale.fY);
+    local.preTranslate(-p.pivot.fX, -p.pivot.fY);
+    SkPoint corners[4];
+    box.toQuad(corners);
+    std::array<SkV4, 8> clip;
+    int n = 0;
+    if (l.projected) {
+        const SkM44 full = p.space * SkM44(local);
+        for (int i = 0; i < 4; i++) {
+            const SkV4 u = full.map(corners[i].fX, corners[i].fY, 0, 1), w = full.map(corners[(i + 1) % 4].fX, corners[(i + 1) % 4].fY, 0, 1);
+            const float du = u.z - kNearest, dw = w.z - kNearest;
+            if (du >= 0) clip[n++] = u;
+            if ((du > 0 && dw < 0) || (du < 0 && dw > 0)) clip[n++] = u + (w - u) * (du / (du - dw));
+        }
+    } else {
+        const SkMatrix m = SkMatrix::Translate(p.location.fX, p.location.fY).preRotate(p.rotation).preConcat(local);
+        for (const SkPoint& c : corners) {
+            const SkPoint at = m.mapPoint(c);
+            clip[n++] = {at.fX, at.fY, seen.depth, 1};
+        }
+    }
+    double q[8];
+    for (int i = 0; i < n; i++) {
+        if (!(clip[i].w > 0)) return true;
+        out->corners[i] = {clip[i].x / clip[i].w, clip[i].y / clip[i].w};
+        q[i] = out->nearness(clip[i].z);
+        if (!out->corners[i].isFinite() || !std::isfinite(q[i])) return true;
+    }
+    int best = 0;
+    double most = 0;
+    for (int i = 1; i + 1 < n; i++) {
+        const SkVector a = out->corners[i] - out->corners[0], b = out->corners[i + 1] - out->corners[0];
+        const double area = std::fabs((double)a.fX * b.fY - (double)a.fY * b.fX);
+        if (area > most) {
+            most = area;
+            best = i;
+        }
+    }
+    if (!(most > 1)) return true;
+    const SkPoint o = out->corners[0], a = out->corners[best], b = out->corners[best + 1];
+    const double x1 = a.fX - o.fX, y1 = a.fY - o.fY, x2 = b.fX - o.fX, y2 = b.fY - o.fY, det = x1 * y2 - y1 * x2;
+    const double e1 = q[best] - q[0], e2 = q[best + 1] - q[0];
+    out->plane[0] = (e1 * y2 - y1 * e2) / det;
+    out->plane[1] = (x1 * e2 - e1 * x2) / det;
+    out->plane[2] = q[0] - out->plane[0] * o.fX - out->plane[1] * o.fY;
+    out->count = n;
+    return true;
+}
+
+void SplitSeen(std::vector<Layer>* seen, double timeMs) {
+    std::vector<Layer>& list = *seen;
+    static thread_local std::vector<size_t> groups, idle;
+    static thread_local depth::Order order;
+    std::vector<Layer> out;
+    size_t copied = 0;
+    const auto after = [&](size_t i) {
+        size_t end = i + 1;
+        while (end < list.size() && list[end].clippingMask) end++;
+        return end;
+    };
+    for (size_t i = 0; i < list.size();) {
+        const int run = list[i].sight.run;
+        if (run == 0 || Idle(list[i], timeMs)) {
+            i = after(i);
+            continue;
+        }
+        groups.clear();
+        idle.clear();
+        size_t j = i;
+        for (; j < list.size() && (list[j].sight.run == run || Idle(list[j], timeMs)); j = after(j)) (Idle(list[j], timeMs) ? idle : groups).push_back(j);
+        const size_t start = i;
+        i = j;
+        if (groups.size() < 2) continue;
+        depth::Begin();
+        bool known = true;
+        for (size_t g : groups) {
+            depth::Flat flat;
+            known = known && SeenFlat(list[g], timeMs, &flat);
+            depth::AddPlane(flat);
+        }
+        if (!known || !depth::Solve(&order)) continue;
+        if (out.empty()) out.reserve(list.size() + order.parts.size());
+        for (; copied < start; copied++) out.push_back(std::move(list[copied]));
+        for (size_t g : idle) {
+            for (size_t k = g; k < after(g); k++) out.push_back(std::move(list[k]));
+        }
+        for (size_t p = 0; p < order.parts.size(); p++) {
+            const depth::Part& part = order.parts[p];
+            const size_t g = groups[part.shape];
+            const bool last = std::none_of(order.parts.begin() + p + 1, order.parts.end(), [&](const depth::Part& o) { return o.shape == part.shape; });
+            for (size_t k = g, end = after(g); k < end; k++) {
+                if (last) out.push_back(std::move(list[k]));
+                else out.push_back(list[k]);
+                out.back().sight.cuts.assign(order.cuts.begin() + part.cut, order.cuts.begin() + part.cut + part.cuts);
+            }
+        }
+        copied = j;
+    }
+    if (copied == 0) return;
+    for (; copied < list.size(); copied++) out.push_back(std::move(list[copied]));
+    list.swap(out);
 }
 
 float DepthPerPixel(const Layer& l, double timeMs) {

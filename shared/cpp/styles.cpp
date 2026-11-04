@@ -1897,6 +1897,7 @@ static void FaceForward(std::vector<Layer>* seen) {
 static const std::vector<Layer>& SeenProject(const Scene& scene, double timeMs, std::vector<Layer>* storage) {
     if (!SeeLayers(scene.layers, scene.width, scene.height, true, scene.fps, timeMs, scene.depthOrder, storage, scene.depthOrder && scene.pieceOrder)) return scene.layers;
     FaceForward(storage);
+    SplitSeen(storage, timeMs);
     return *storage;
 }
 
@@ -1904,7 +1905,7 @@ int64_t TopLayerAt(const Scene& scene, double timeMs, float x, float y, const Me
     std::vector<Layer> storage;
     const std::vector<Layer>& list = SeenProject(scene, timeMs, &storage);
     for (auto it = list.rbegin(); it != list.rend(); ++it) {
-        if (Contains(list, *it, timeMs, {x, y}, scene.width, scene.height, masks)) return it->id;
+        if (depth::Inside(it->sight.cuts, {x, y}) && Contains(list, *it, timeMs, {x, y}, scene.width, scene.height, masks)) return it->id;
     }
     if (CameraViewOn()) return 0;
     for (auto it = scene.layers.rbegin(); it != scene.layers.rend(); ++it) {
@@ -1994,6 +1995,7 @@ void Collect(SkCanvas* canvas, const std::vector<Layer>& layers, const Layer& l,
     pass->perPixel = DepthPerPixel(l, timeMs);
     pass->look = SkPaint();
     SetBlend(&pass->look, l.blending);
+    SeenFlat(l, timeMs, &pass->flat);
     {
         depth::Scope scope(pass);
         DrawContent(canvas, layers, l, timeMs, opacity, false, pictures, nullptr);
@@ -2008,10 +2010,11 @@ void DrawList(SkCanvas* canvas, const std::vector<Layer>& listed, int width, int
     const bool pieces = top && gScene && gScene->depthOrder && gScene->pieceOrder;
     const bool seen = SeeLayers(source, width, height, top, gScene ? gScene->fps : 30, timeMs, top && gScene && gScene->depthOrder, &storage, pieces);
     if (seen) FaceForward(&storage);
+    if (seen && !pieces) SplitSeen(&storage, timeMs);
     const std::vector<Layer>& layers = seen ? storage : source;
     const std::vector<Layer>* const outer = gEffectList;
     gEffectList = &layers;
-    const auto drawStack = [&](size_t i, size_t end) {
+    const auto drawStackOf = [&](size_t i, size_t end) {
         const Layer& base = layers[i];
         if (end == i + 1) {
             DrawOne(canvas, layers, base, timeMs, pictures, Override());
@@ -2044,6 +2047,14 @@ void DrawList(SkCanvas* canvas, const std::vector<Layer>& listed, int width, int
         }
         canvas->restore();
     };
+    const auto drawStack = [&](size_t i, size_t end) {
+        const std::vector<depth::Cut>& cuts = layers[i].sight.cuts;
+        if (cuts.empty()) return drawStackOf(i, end);
+        canvas->save();
+        depth::Clip(canvas, cuts.data(), (int)cuts.size());
+        drawStackOf(i, end);
+        canvas->restore();
+    };
     const auto after = [&](size_t i) {
         size_t end = i + 1;
         while (end < layers.size() && layers[end].clippingMask) end++;
@@ -2069,7 +2080,9 @@ void DrawList(SkCanvas* canvas, const std::vector<Layer>& listed, int width, int
                 Collect(canvas, layers, l, timeMs, pictures, &pass);
                 if (gBreak && EffectsApply(layers, l)) (*gBreak)();
             } else {
-                pass.whole([&drawStack, i, end](SkCanvas*) { drawStack(i, end); }, l.sight.depth);
+                depth::Flat flat;
+                SeenFlat(l, timeMs, &flat);
+                pass.whole([&drawStack, i, end](SkCanvas*) { drawStack(i, end); }, l.sight.depth, flat);
             }
         }
         pass.draw(canvas);
