@@ -166,13 +166,13 @@ The desktop version runs on Macs with Apple silicon (`arm64`). Windows builds an
 
 ### 5.1
 
-- PC support for Windows, Linux and Chromebook/ChromeOS, including Chromebooks with Intel or AMD chips. The Mac version came in 5.0.
-- Possibly an IPA file for sideloading on iPhones and iPads.
-- Real 3D, part two: the faces of 3D models, particles and the pieces of 3D effects sort one by one with the pieces of other layers, so objects that pass through each other overlap correctly. In 5.0 each layer sorts as a whole.
-- Colour palettes for Fill & Color and every colour setting: import a palette from a picture or a palette file, save, edit, sort and export your own, and keep them in a palette library.
 - True frame-by-frame Video Feedback: each copy shows the picture from a moment earlier, so movement leaves trails that swirl into the tunnel, like a camera pointed at its own screen.
 - Time Remap: keyframe which moment of a video clip plays at each point, so a clip can speed up, freeze and play backwards inside one layer, for reverse edits. Requested by users.
-- During 5.1 and after, there won't be many major patches or features; most updates will focus on stability for the PC version and the new iOS file.
+- During 5.1 and after, there won't be many major patches or features; most updates will focus on stability for the PC versions.
+
+### 6.0
+
+- An IPA file for sideloading on iPhones and iPads.
 
 ## Updates to AbsentMotion
 
