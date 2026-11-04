@@ -114,6 +114,30 @@ object Palettes {
         return Triple(pixels, width, height)
     }
 
+    fun fromStrip(argb: IntArray, width: Int, height: Int): List<Int>? {
+        for (cell in intArrayOf(STRIP_CELL, STRIP_CELL / 2)) {
+            val columns = width / cell
+            val rows = height / cell
+            if (width % cell != 0 || height % cell != 0 || columns !in 1..STRIP_COLUMNS || rows < 1 || rows > 1 && columns != STRIP_COLUMNS) continue
+            val colors = ArrayList<Int>()
+            var gap = false
+            val solid = (0 until rows * columns).all { i ->
+                val left = i % columns * cell
+                val top = i / columns * cell
+                val c = argb[top * width + left]
+                val even = (top until top + cell).all { y -> (0 until cell).all { argb[y * width + left + it] == c } }
+                when {
+                    !even -> false
+                    c ushr 24 == 255 && !gap -> colors.add(c and 0xFFFFFF)
+                    c ushr 24 == 0 && i / columns == rows - 1 && i % columns > 0 -> { gap = true; true }
+                    else -> false
+                }
+            }
+            if (solid) return colors
+        }
+        return null
+    }
+
     private fun hexColor(token: String): Int? {
         val digits = token.removePrefix("#")
         if ((digits.length != 6 && digits.length != 8) || !digits.all { it in '0'..'9' || it in 'a'..'f' || it in 'A'..'F' }) return null

@@ -2,6 +2,7 @@ package app.absentmotion.tools
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -161,6 +162,10 @@ class ToolPlansTest {
         assertTrue(times.last() < range.endUs)
         assertEquals(66L, gifFrameEndMs(job, 0))
         assertEquals(2000L, gifFrameEndMs(job, 29))
+        val cut = planGif(aacClip, 0, GifChoice(480, 10, true), TrimRange(0, 1_050_000))
+        assertEquals(11, cut.frames)
+        assertEquals(1000L, gifFrameEndMs(cut, 9))
+        assertEquals(1050L, gifFrameEndMs(cut, 10))
         assertEquals(12, planGif(CompressSource(true, 1L, 640, 360, 12f), 0, GifChoice(480, 24, true), TrimRange(0, 1_000_000)).fps)
         val long = planGif(aacClip, 0, GifChoice(480, 24, true), TrimRange(0, 120_000_000))
         assertEquals(MAX_GIF_US, long.range.lengthUs)
@@ -278,5 +283,25 @@ class ToolPlansTest {
         val sound = CopyWindow(0, Long.MAX_VALUE, 1)
         assertTrue(sound.take(0, false, 4_000_000_000L, true))
         assertFalse(sound.done)
+    }
+
+    @Test
+    fun aCopyWithBFramesKeepsTheFramesTheEndNeeds() {
+        val order = listOf(0L to true, 300_000L to false, 100_000L to false, 200_000L to false, 600_000L to false, 400_000L to false,
+            500_000L to false, 900_000L to false, 700_000L to false, 800_000L to false, 1_200_000L to true, 1_100_000L to false)
+        val last = lastDecodedUs(order.asSequence(), 500_000)
+        assertEquals(500_000L, last)
+        fun copied(window: CopyWindow) = order.filter { (t, sync) -> window.take(0, true, t, sync) }.map { it.first }
+        assertEquals(listOf(0L, 300_000L, 100_000L, 200_000L, 600_000L, 400_000L, 500_000L), copied(CopyWindow(0, 500_000, 1, last)))
+        assertEquals(listOf(0L, 300_000L, 100_000L, 200_000L, 400_000L, 500_000L), copied(CopyWindow(0, 500_000, 1)))
+        assertNull(lastDecodedUs(emptySequence(), 500_000))
+    }
+
+    @Test
+    fun anExactTrimBetweenTwoFramesStartsFromTheFrameOnScreen() {
+        val oneFps = sequenceOf(0L, 2_000_000L, 1_000_000L, 3_000_000L)
+        assertEquals(1_000_000L, app.absentmotion.media.firstShownUs(oneFps, 1_200_000, 1_500_000))
+        assertEquals(1_200_000L, app.absentmotion.media.firstShownUs(oneFps, 1_200_000, 2_100_000))
+        assertEquals(1_200_000L, app.absentmotion.media.firstShownUs(emptySequence(), 1_200_000, 1_500_000))
     }
 }

@@ -80,6 +80,11 @@ fun XmlNode.withoutValueLinks(ids: Set<Long>): XmlNode {
     return if (next == children) this else copy(children = next)
 }
 
+fun XmlNode.withoutAnyValueLinks(): XmlNode {
+    val next = children.filterNot { it.name == "valueLink" }.map { it.withoutAnyValueLinks() }
+    return if (next == children) this else copy(children = next)
+}
+
 fun Scene.withValueLinksFollowing(before: Scene): Scene {
     val oldLayers = before.layers.associateBy { it.id }
     val newLayers = layers.associateBy { it.id }

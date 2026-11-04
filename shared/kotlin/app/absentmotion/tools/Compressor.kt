@@ -58,7 +58,7 @@ import kotlin.math.sqrt
 
 class PickedMedia(val uri: Uri, val name: String, val rotation: Int, val source: CompressSource)
 
-class Compressed(val file: File, val mime: String, val video: Boolean)
+class Compressed(val file: File, val mime: String, val video: Boolean, val frames: Int = 0)
 
 fun memorySide(): Int = sqrt(Runtime.getRuntime().maxMemory() / 24.0).toInt()
 

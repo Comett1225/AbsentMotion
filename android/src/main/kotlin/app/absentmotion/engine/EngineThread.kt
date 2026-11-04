@@ -227,6 +227,7 @@ class EngineThread(private val background: Int, context: Context? = null, privat
             gpuCheck?.recover()
             val order = GpuCheck.startOrder(EngineDebug.forceGl || preferOpenGl(), gpuCheck?.state(gl = true), gpuCheck?.state(gl = false), ::riskyVulkan)
                 .map { if (it) NativeEngine.Backend.GL else NativeEngine.Backend.GRAPHITE }
+            if (order.isEmpty()) throw IllegalStateException(GpuCheck.BOTH_CLOSED)
             gpuCheck?.trying(order[0] == NativeEngine.Backend.GL)
             val first = runCatching { NativeEngine(order[0]) }
             (first.getOrNull() ?: run {

@@ -279,6 +279,7 @@ internal fun transcode(
         val (track, format) = videoTrack(extractor)
         extractor.selectTrack(track)
         if (startUs > 0) extractor.seekTo(startUs, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
+        val firstUs = if (startUs > 0 && endUs != Long.MAX_VALUE) shownFrom(extractor, startUs, endUs) else startUs
         val (visibleWidth, visibleHeight) = visibleSize(format)
         val fps = (if (format.containsKey(MediaFormat.KEY_FRAME_RATE)) format.numberOf(MediaFormat.KEY_FRAME_RATE)?.toFloat() ?: 30f else 30f).roundToInt().coerceIn(1, 120)
         val durationUs = if (format.containsKey(MediaFormat.KEY_DURATION)) format.getLong(MediaFormat.KEY_DURATION) else 0L
@@ -347,7 +348,7 @@ internal fun transcode(
             else {
                 heard = System.nanoTime()
                 val pts = info.presentationTimeUs
-                val shown = info.size > 0 && (startUs <= 0 || pts >= startUs) && pts < endUs && (gapUs == 0L || pts + 2_000 >= nextUs)
+                val shown = info.size > 0 && (startUs <= 0 || pts >= firstUs) && pts < endUs && (gapUs == 0L || pts + 2_000 >= nextUs)
                 if (shown && gapUs > 0) nextUs = if (pts - nextUs > gapUs) pts + gapUs else nextUs + gapUs
                 decodeDone = info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0
                 decoder.releaseOutputBuffer(index, shown)
@@ -355,7 +356,7 @@ internal fun transcode(
                     check(available.tryAcquire(2, TimeUnit.SECONDS)) { "the decoder did not deliver frame $pts" }
                     frames.updateTexImage()
                     frames.getTransformMatrix(matrix)
-                    gl.draw(matrix, (pts - startUs) * 1000)
+                    gl.draw(matrix, (pts - startUs).coerceAtLeast(0) * 1000)
                     if (spanUs > 0) progress(((pts - startUs).toFloat() / spanUs).coerceIn(0f, 0.99f))
                 }
                 if (decodeDone) encoder.signalEndOfInputStream()
@@ -376,6 +377,21 @@ internal fun transcode(
         extractor.release()
         thread.quitSafely()
     }
+}
+
+private fun shownFrom(extractor: MediaExtractor, startUs: Long, endUs: Long): Long {
+    val first = firstShownUs(generateSequence { extractor.sampleTime.takeIf { it >= 0 && it <= endUs + END_SLACK_US }?.also { extractor.advance() } }, startUs, endUs)
+    extractor.seekTo(startUs, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
+    return first
+}
+
+internal fun firstShownUs(samples: Sequence<Long>, startUs: Long, endUs: Long): Long {
+    var before = Long.MIN_VALUE
+    for (t in samples) {
+        if (t in startUs until endUs) return startUs
+        if (t < startUs) before = maxOf(before, t)
+    }
+    return if (before == Long.MIN_VALUE) startUs else before
 }
 
 private class ProxyGl(private val surface: Surface, private val width: Int, private val height: Int) : Closeable {

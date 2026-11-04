@@ -1,16 +1,17 @@
 package app.absentmotion.editor
 
 import app.absentmotion.model.Scene
+import app.absentmotion.model.XmlNode
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class PreviewDependenciesTest {
-    private fun scene(first: String = "", second: String = "", extra: String = "") = Scene.parse(
+    private fun scene(first: String = "", second: String = "", extra: String = "") = Scene(XmlNode.parse(
         "<scene width=\"100\" height=\"100\" fps=\"30\" totalTime=\"5999\" $extra>" +
             "<shape id=\"1\" startTime=\"0\" endTime=\"999\" label=\"A\">$first</shape>" +
-            "<shape id=\"2\" startTime=\"4000\" endTime=\"5999\" label=\"B\">$second</shape></scene>")
+            "<shape id=\"2\" startTime=\"4000\" endTime=\"5999\" label=\"B\">$second</shape></scene>"))
 
     @Test fun aLocalEditRetainsAnUnchangedEarlierSection() {
         val ranges = previewDirtyRanges(scene(), scene(second = "<fillColor value=\"#ff00ff00\"/>"))

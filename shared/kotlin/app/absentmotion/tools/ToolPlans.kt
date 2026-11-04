@@ -76,15 +76,27 @@ fun stepKeyframe(timeUs: Long, keys: LongArray, forward: Boolean): Long {
     return if (forward) keys.getOrNull(if (found >= 0) at + 1 else at) ?: timeUs else keys.getOrNull(at - 1) ?: timeUs
 }
 
-class CopyWindow(private val fromUs: Long, private val toUs: Long, private val tracks: Int) {
+class CopyWindow(private val fromUs: Long, private val toUs: Long, private val tracks: Int, private val lastVideoUs: Long? = null) {
     private val ended = HashSet<Int>()
 
     val done: Boolean get() = ended.size == tracks
 
     fun take(track: Int, video: Boolean, timeUs: Long, sync: Boolean): Boolean {
         if (timeUs > toUs && (!video || sync || timeUs > toUs + VIDEO_TAIL_US)) ended += track
-        return timeUs >= fromUs - KEY_SLACK_US && timeUs <= toUs && track !in ended
+        if (track in ended || timeUs < fromUs - KEY_SLACK_US) return false
+        if (!video || lastVideoUs == null || lastVideoUs < fromUs - KEY_SLACK_US) return timeUs <= toUs
+        if (timeUs == lastVideoUs) ended += track
+        return true
     }
+}
+
+fun lastDecodedUs(samples: Sequence<Pair<Long, Boolean>>, toUs: Long): Long? {
+    var last: Long? = null
+    for ((timeUs, sync) in samples) {
+        if (timeUs > toUs && (sync || timeUs > toUs + VIDEO_TAIL_US)) break
+        if (timeUs <= toUs) last = timeUs
+    }
+    return last
 }
 
 data class TrimJob(val range: TrimRange, val copy: Boolean)
@@ -136,7 +148,7 @@ fun planGif(src: CompressSource, turn: Int, choice: GifChoice, range: TrimRange)
 
 fun gifFrameTimes(job: GifJob): LongArray = LongArray(job.frames) { job.range.startUs + it * 1_000_000L / job.fps }
 
-fun gifFrameEndMs(job: GifJob, index: Int): Long = (index + 1) * 1000L / job.fps
+fun gifFrameEndMs(job: GifJob, index: Int): Long = min((index + 1) * 1000L / job.fps, job.range.lengthUs / 1000)
 
 fun estimateGif(job: GifJob): Long = (job.width.toLong() * job.height * job.frames * GifBytesPerPixel).toLong() + 800
 

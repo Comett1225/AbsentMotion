@@ -1,6 +1,9 @@
 package app.absentmotion.engine
 
 import android.app.ApplicationExitInfo
+import app.absentmotion.R
+import app.absentmotion.ui.home.engineProblemText
+import app.absentmotion.ui.home.openGlAlsoFailed
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -77,6 +80,15 @@ class GpuCheckTest {
         assertEquals(listOf(false), GpuCheck.startOrder(false, crashed, "bad", risky))
         assertEquals(listOf(false, true), GpuCheck.startOrder(false, "bad", "bad", risky))
         assertEquals(listOf(true, false), GpuCheck.startOrder(true, "bad", "ok", risky))
+    }
+
+    @Test fun whenBothBackendsClosedTheAppNoneIsStartedAndTheUnsupportedScreenExplains() {
+        val crashed = GpuCheck.CRASHED
+        val risky = { error("not asked") }
+        assertEquals(emptyList<Boolean>(), GpuCheck.startOrder(false, crashed, crashed, risky))
+        assertEquals(emptyList<Boolean>(), GpuCheck.startOrder(true, crashed, crashed, risky))
+        assertEquals(R.string.unsupported_unknown, engineProblemText(GpuCheck.BOTH_CLOSED))
+        assertTrue(openGlAlsoFailed(GpuCheck.BOTH_CLOSED))
     }
 
     @Test fun aBrokenRecordIsIgnored() {

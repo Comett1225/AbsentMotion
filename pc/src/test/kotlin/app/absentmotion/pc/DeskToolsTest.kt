@@ -152,6 +152,7 @@ class DeskToolsTest {
         val made = makeGif(context, picked, job) { seen += it }
         assertEquals("image/gif", made.mime)
         assertEquals("test-video.gif", made.file.name)
+        assertEquals(75, made.frames)
         assertTrue(seen.isNotEmpty() && seen.last() <= 0.99f && seen.zipWithNext().all { it.first <= it.second })
         val reader = ImageIO.getImageReadersByFormatName("gif").next()
         ImageIO.createImageInputStream(made.file).use { input ->
@@ -238,6 +239,18 @@ class DeskToolsTest {
         val exactSide = probe(exact.file).stream("video")!!
         assertEquals(1280 to 720, exactSide.getInt("width") to exactSide.getInt("height"))
         assertTrue("rotation kept after re-encode: ${exactSide.optJSONArray("side_data_list")}", exactSide.optJSONArray("side_data_list").toString().contains("90"))
+    }
+
+    @Test fun anExactTrimBetweenTwoFramesKeepsOne() = runBlocking {
+        prepare("onefps")
+        val context = android.content.Desk.context
+        val slow = File("build/tools-one-fps.mp4").also { it.delete() }
+        assertEquals(0, ProcessBuilder(DeskMedia.ffmpeg, "-v", "error", "-y", "-f", "lavfi", "-i", "testsrc2=size=320x240:rate=1", "-f", "lavfi", "-i", "sine=frequency=440",
+            "-t", "5", "-pix_fmt", "yuv420p", slow.path).start().waitFor())
+        val picked = readPicked(context, Uri.fromFile(slow))!!
+        val made = trimVideo(context, picked, planTrim(TrimRange(1_200_000, 1_500_000), LongArray(0), false)) {}
+        assertEquals(1, counted(made.file))
+        assertEquals(0.3, probe(made.file).stream("audio")!!.getString("duration").toDouble(), 0.05)
     }
 
     @Test fun gifCancelStopsAndLeavesNothing() = runBlocking {

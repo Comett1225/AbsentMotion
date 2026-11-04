@@ -47,7 +47,7 @@ internal suspend fun copyRange(
         if (fromUs > 0) extractor.seekTo(fromUs, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
         val data = ByteBuffer.allocateDirect(buffer)
         val info = MediaCodec.BufferInfo()
-        val window = CopyWindow(fromUs, toUs, tracks.size)
+        val window = CopyWindow(fromUs, toUs, tracks.size, if (video >= 0) lastVideoUs(context, uri, video, toUs) else null)
         var written = 0
         while (true) {
             currentCoroutineContext().ensureActive()
@@ -75,5 +75,19 @@ internal suspend fun copyRange(
         if (started) runCatching { muxer?.stop() }
         runCatching { muxer?.release() }
         extractor.release()
+    }
+}
+
+private fun lastVideoUs(context: Context, uri: String, track: Int, toUs: Long): Long? {
+    val scan = MediaExtractor()
+    try {
+        scan.setDataSource(context, Uri.parse(openableUri(uri)), null)
+        scan.selectTrack(track)
+        scan.seekTo(toUs, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
+        return lastDecodedUs(generateSequence {
+            (scan.sampleTime to (scan.sampleFlags and MediaExtractor.SAMPLE_FLAG_SYNC != 0)).takeIf { it.first >= 0 }?.also { scan.advance() }
+        }, toUs)
+    } finally {
+        scan.release()
     }
 }

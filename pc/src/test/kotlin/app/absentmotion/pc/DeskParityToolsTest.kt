@@ -33,6 +33,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -200,6 +201,20 @@ class DeskParityToolsTest {
             val facts = DeskMedia.probe(video)
             assertTrue("probe $facts", (facts["duration"]?.toLong() ?: 0L) in 1000L..6000L && facts["width"] == "1280" && facts["audio"] == "1")
             waitFor("the preview after recording") { camera.phase == CameraPhase.Live }
+            camera.close()
+        } finally { System.clearProperty("am.fakeCamera") }
+    }
+
+    @Test fun aRecordingThatCannotStartShowsTheCameraError() {
+        System.setProperty("am.fakeCamera", "true")
+        try {
+            val blocked = File("build/camera-blocked").apply { writeText("not a folder") }
+            val camera = DeskCameraController(DeskMedia.ffmpeg, blocked, CoroutineScope(Dispatchers.Default))
+            camera.open()
+            waitFor("the live preview") { camera.phase == CameraPhase.Live }
+            camera.startRecording()
+            waitFor("the camera error") { camera.phase == CameraPhase.Failed }
+            assertFalse(camera.recording)
             camera.close()
         } finally { System.clearProperty("am.fakeCamera") }
     }

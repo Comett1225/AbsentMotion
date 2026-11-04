@@ -14,10 +14,21 @@ class ValueLinksTest {
     )))))
     private fun scene() = Scene.create("Links", 512, 512, 30, 0).add(layer(1)).add(layer(2)).add(layer(3))
 
-    @Test fun multiplyAddDelayAreSaved() {
+    @Test fun multiplyAddDelayAreKept() {
         val link = ValueLink(1, x, 2f, 3f, .5f)
         val scene = scene().withValueLink(2, rotation, link)
-        assertEquals(link, Scene.parse(scene.toXml()).layer(2)!!.element(rotation.ref)!!.valueLink(0))
+        assertEquals(link, scene.layer(2)!!.element(rotation.ref)!!.valueLink(0))
+    }
+
+    @Test fun anOldProjectLosesItsLinksOnLoadAndKeepsItsOwnValues() {
+        val before = scene()
+        val linked = before.withValueLink(2, rotation, ValueLink(1, x, 2f)).withValueLink(2, x, ValueLink(3, y))
+            .update(3) { it.copy(node = it.node.copy(children = listOf(XmlNode("scene", children = listOf(layer(4).withValueLink(rotation, ValueLink(1, x)).node))))) }
+        val loaded = Scene.parse(linked.toXml())
+        assertFalse(loaded.toXml().contains("valueLink"))
+        assertEquals(before.layer(2)!!.node, loaded.layer(2)!!.node)
+        val keyed = loaded.layer(2)!!.element(rotation.ref)!!.withKeyframeToggled(0f, 0f..0f)
+        assertEquals(listOf(Keyframe(0f, "7")), keyed.keyframes)
     }
 
     @Test fun linkingOneAxisLeavesTheOthersEditable() {
@@ -59,10 +70,8 @@ class ValueLinksTest {
         assertEquals(2, next.layer(2)!!.keyframes(x.ref).size)
     }
 
-    @Test fun xmlRoundTripAndCopyRemap() {
+    @Test fun copiesRemapTheirLinks() {
         val scene = scene().withValueLink(2, rotation, ValueLink(1, x, -2f, 20f, .25f))
-        val loaded = Scene.parse(scene.toXml())
-        assertEquals(scene.layer(2)!!.element(rotation.ref), loaded.layer(2)!!.element(rotation.ref))
         var id = 10L
         val copies = copyLayers(scene.layers, newId = { id++ })
         assertEquals(copies[0].id, copies[1].element(rotation.ref)!!.valueLink(0)!!.layer)

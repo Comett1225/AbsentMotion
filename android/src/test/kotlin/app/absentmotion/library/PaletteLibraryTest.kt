@@ -1,6 +1,8 @@
 package app.absentmotion.library
 
 import app.absentmotion.effects.Palettes
+import app.absentmotion.ui.editor.panels.canKeep
+import app.absentmotion.ui.editor.panels.swatches
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -49,6 +51,36 @@ class PaletteLibraryTest {
         assertEquals(colors[17] or (0xFF shl 24), pixels[5 * width + 1 * 4 + 2])
         assertEquals(0, pixels[7 * width + 63])
         assertEquals(Triple(4, 4, 1), Palettes.strip(listOf(0xff0000), cell = 4).let { Triple(it.second, it.third, it.first.distinct().size) })
+    }
+
+    @Test fun anExportedStripIsReadBackExactly() {
+        val many = List(512) { it * 0x7f7f }
+        for (colors in listOf(List(20) { it * 0x0a0b0c }, List(16) { 0x102030 * (it % 3) }, listOf(0xff0000, 0x00ff00, 0x0000ff), many)) {
+            val (pixels, width, height) = Palettes.strip(colors)
+            assertEquals(colors, Palettes.fromStrip(pixels, width, height))
+        }
+        val (full, width, height) = Palettes.strip(many)
+        val half = IntArray(width / 2 * height / 2) { i -> full[(i / (width / 2)) * 2 * width + (i % (width / 2)) * 2] }
+        assertEquals(many, Palettes.fromStrip(half, width / 2, height / 2))
+        assertNull(Palettes.fromStrip(IntArray(1024 * 64) { (0xFF shl 24) or (it * 977) }, 1024, 64))
+        val quarters = intArrayOf(0xffe5484d.toInt(), 0xff30a46c.toInt(), 0xff3e63dd.toInt(), 0xfff5d90a.toInt())
+        assertNull(Palettes.fromStrip(IntArray(128 * 128) { i -> quarters[(i / 128 / 64) * 2 + (i % 128) / 64] }, 128, 128))
+    }
+
+    @Test fun builtInPalettesKeepColoursInSavedColours() {
+        val library = PaletteLibrary(File(folder.root, PaletteLibrary.FILE))
+        val saved = listOf(0x123456)
+        library.choose("builtin.pastel")
+        assertTrue(library.canKeep(0x654321, saved))
+        assertFalse(library.canKeep(0x123456, saved))
+        assertFalse(library.canKeep(library.chosen.colors.first(), saved))
+        assertEquals(library.chosen.colors + saved, library.swatches(saved))
+        val mine = library.create("Mine", listOf(0x111111))
+        library.choose(mine.id)
+        assertEquals(listOf(0x111111), library.swatches(saved))
+        assertTrue(library.canKeep(0x654321, saved))
+        library.put(mine.locking(true))
+        assertFalse(library.canKeep(0x654321, saved))
     }
 
     @Test fun sortsByHueLightnessAndSaturation() {

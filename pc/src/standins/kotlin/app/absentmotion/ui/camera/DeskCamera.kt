@@ -115,8 +115,8 @@ class DeskCameraController(private val ffmpeg: String, private val folder: File,
         if (record == null) { phase = CameraPhase.Starting; frame = null; latest = null }
         try {
             val input = CameraInput(chosen, if (record != null) audio else null)
-            session = DeskCameraSession(DeskCameraSource.command(ffmpeg, input, record, encoder), { bytes -> if (generation == mine) show(bytes) }) { code, log ->
-                if (generation == mine && session?.stopping != true) scope.launch { fail(code, log, record != null) }
+            session = DeskCameraSession(DeskCameraSource.command(ffmpeg, input, record, encoder), { bytes -> if (generation == mine) show(bytes) }) { _, log ->
+                if (generation == mine && session?.stopping != true) scope.launch { fail(log, record != null) }
             }
         } catch (e: java.io.IOException) {
             problem = e.message.orEmpty()
@@ -129,14 +129,14 @@ class DeskCameraController(private val ffmpeg: String, private val folder: File,
         runCatching { org.jetbrains.skia.Image.makeFromEncoded(bytes).toComposeImageBitmap() }.getOrNull()?.let { frame = it; phase = CameraPhase.Live }
     }
 
-    private suspend fun fail(code: Int, log: String, wasRecording: Boolean) {
+    private fun fail(log: String, wasRecording: Boolean) {
         problem = log
         if (wasRecording) {
             recording = false
             target?.delete()
             target = null
-            if (phase == CameraPhase.Live) begin(null) else phase = CameraPhase.Failed
-        } else phase = CameraPhase.Failed
+        }
+        phase = CameraPhase.Failed
     }
 
     fun retry() { scope.launch { begin(null) } }

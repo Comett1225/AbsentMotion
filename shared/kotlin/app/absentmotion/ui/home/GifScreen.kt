@@ -60,7 +60,7 @@ internal fun GifScreen(initial: Uri? = null, onClose: () -> Unit) {
     ToolSheet(stringResource(R.string.tools_gif), back, bottom = {
         ToolBar(
             work, hint, bytes != null && bytes >= GIF_BIG_BYTES,
-            (work.step as? ToolStep.Done)?.let { stringResource(R.string.tools_done_gif, formatBytes(it.bytes), job?.frames ?: 0) }.orEmpty(),
+            (work.step as? ToolStep.Done)?.let { stringResource(R.string.tools_done_gif, formatBytes(it.bytes), it.result.frames) }.orEmpty(),
             R.string.tools_making_gif, stringResource(R.string.tools_gif_start), HomeIcons.Gif, picked != null && job != null,
         ) {
             val media = picked ?: return@ToolBar

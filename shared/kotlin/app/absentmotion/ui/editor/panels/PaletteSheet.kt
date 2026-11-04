@@ -78,16 +78,16 @@ internal fun rememberPaletteLibrary(): PaletteLibrary {
     return remember { PaletteLibrary.at(context.filesDir) }
 }
 
-internal fun PaletteLibrary.swatches(saved: List<Int>): List<Int> = chosen.let { if (it.id == PaletteLibrary.DEFAULT) it.colors + saved else it.colors }
+internal fun PaletteLibrary.swatches(saved: List<Int>): List<Int> = chosen.let { if (it.builtIn) it.colors + saved else it.colors }
 
 internal fun PaletteLibrary.canKeep(rgb: Int, saved: List<Int>): Boolean = chosen.let {
-    if (it.id == PaletteLibrary.DEFAULT) rgb !in it.colors + saved else it.open && rgb !in it.colors
+    if (it.builtIn) rgb !in it.colors + saved else it.open && rgb !in it.colors
 }
 
 internal fun PaletteLibrary.keep(rgb: Int, settings: AppSettings) {
     val saved = settings.savedColours
     if (!canKeep(rgb, saved)) return
-    if (chosenId == PaletteLibrary.DEFAULT) settings.savedColours = saved + rgb else put(chosen.added(rgb))
+    if (chosen.builtIn) settings.savedColours = saved + rgb else put(chosen.added(rgb))
 }
 
 @Composable

@@ -358,10 +358,11 @@ internal fun pictureColors(bytes: ByteArray, limit: Int = Palettes.MAX_PICTURE_C
     var sample = 1
     while (bounds.outWidth.toLong() / sample * (bounds.outHeight / sample) > MaxPalettePixels) sample *= 2
     val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, BitmapFactory.Options().apply { inSampleSize = sample }) ?: return null
-    val pixels = IntArray(bitmap.width * bitmap.height)
-    bitmap.getPixels(pixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
+    val (width, height) = bitmap.width to bitmap.height
+    val pixels = IntArray(width * height)
+    bitmap.getPixels(pixels, 0, width, 0, 0, width, height)
     bitmap.recycle()
-    return Palettes.fromPixels(pixels, limit).takeIf { it.isNotEmpty() }
+    return (Palettes.fromStrip(pixels, width, height) ?: Palettes.fromPixels(pixels, limit)).takeIf { it.isNotEmpty() }
 }
 
 @Composable

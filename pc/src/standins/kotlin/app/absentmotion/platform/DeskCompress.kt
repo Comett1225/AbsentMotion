@@ -23,9 +23,12 @@ suspend fun compressVideoOnDesktop(uri: String, job: VideoJob, audio: Boolean, d
     val args = DeskEncoders.videoArgs(encoder, settings, job.width, job.height).toMutableList()
     args[args.indexOf("-b:v") + 1] = "${job.bitrate}"
     val sound = when { !audio || job.audioKbps <= 0 -> listOf("-an"); job.copyAudio -> listOf("-c:a", "copy"); else -> listOf("-c:a", DeskEncoders.audio(app.absentmotion.export.AudioCodec.Aac, job.audioKbps).firstOrNull() ?: "aac", "-b:a", "${job.audioKbps}k") }
-    val range = (if (startUs > 0) listOf("-ss", seconds(startUs)) else emptyList()) + listOf("-noautorotate", "-i", input.path) + (if (endUs > startUs) listOf("-t", seconds(endUs - startUs)) else emptyList())
+    val shownUs = if (startUs > 0 && endUs > startUs) shownFrom(input, startUs, endUs) else startUs
+    val late = audio && shownUs < startUs
+    val range = (if (startUs > 0) listOf("-ss", seconds(shownUs)) else emptyList()) + listOf("-noautorotate", "-i", input.path) +
+        (if (late) listOf("-ss", seconds(startUs), "-i", input.path) else emptyList()) + (if (endUs > startUs) listOf("-t", seconds(endUs - startUs)) else emptyList())
     val command = listOf(DeskMedia.ffmpeg, "-y", "-v", "error", "-progress", "pipe:1", "-nostats") + range + listOf("-map", "0:v:0") +
-        (if (audio) listOf("-map", "0:a:0?") else emptyList()) + listOf("-vf", "scale=${job.width}:${job.height},fps=${job.fps}") + args + sound + listOf("-movflags", "+faststart", out.path)
+        (if (audio) listOf("-map", if (late) "1:a:0?" else "0:a:0?") else emptyList()) + listOf("-vf", "scale=${job.width}:${job.height},fps=${job.fps}") + args + sound + listOf("-movflags", "+faststart", out.path)
     val context = currentCoroutineContext()
     val process = ProcessBuilder(command).redirectError(ProcessBuilder.Redirect.DISCARD).start()
     try {
@@ -39,3 +42,11 @@ suspend fun compressVideoOnDesktop(uri: String, job: VideoJob, audio: Boolean, d
         process.waitFor(5, java.util.concurrent.TimeUnit.SECONDS)
     }
 }
+
+private fun shownFrom(input: File, startUs: Long, endUs: Long): Long = runCatching {
+    val process = ProcessBuilder(DeskMedia.ffprobe, "-v", "error", "-select_streams", "v:0", "-read_intervals", "${seconds(startUs)}%${seconds(endUs)}",
+        "-show_entries", "packet=pts_time", "-of", "csv=p=0", input.path).redirectError(ProcessBuilder.Redirect.DISCARD).start()
+    val times = process.inputStream.bufferedReader().readLines().mapNotNull { line -> line.trim().trimEnd(',').toDoubleOrNull()?.let { Math.round(it * 1_000_000) } }
+    process.waitFor()
+    app.absentmotion.media.firstShownUs(times.asSequence(), startUs, endUs)
+}.getOrDefault(startUs)

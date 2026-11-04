@@ -205,11 +205,7 @@ internal suspend fun exportVideo(
     val (width, height) = exportSize(scene, s.shortSide, even = true)
     val frames = frameCount(scene, s.fps)
     EncoderTrouble.last = null
-    val names = DeskEncoders.video(s.codec).filter { it !in EncoderTrouble.bad && !(ExportDebug.refuseHardware && DeskEncoders.hardware(it)) }
-    val encoder = withContext(Dispatchers.IO) { names.firstOrNull { DeskEncoders.works(it, s, width, height) } }
-        ?: throw ExportError(txt(R.string.export_error_cannot_encode, s.codec.label, "${width}x$height"))
-    if (!DeskEncoders.hardware(encoder) && DeskEncoders.video(s.codec).any(DeskEncoders::hardware)) note(txt(R.string.export_note_software))
-    EncoderTrouble.last = encoder
+    val names = DeskEncoders.video(s.codec).filter { it !in EncoderTrouble.bad && !(ExportDebug.refuseHardware && DeskEncoders.hardware(it)) }.toMutableList()
     val result = exportTemp(s.container.ext)
     val log = exportTemp("log")
     val pcm = audio?.let { exportTemp("pcm") }
@@ -229,49 +225,72 @@ internal suspend fun exportVideo(
             Container.WebM -> listOf("-f", "webm")
             Container.Mkv -> listOf("-f", "matroska")
         }
-        Log.i("AMExport", "encoding ${width}x$height at ${s.fps} fps with $encoder")
-        val running = Ffmpeg(inputs + listOf("-map", "0:v", "-vf", "scale=out_color_matrix=bt709:out_range=tv") +
-            DeskEncoders.videoArgs(encoder, s, width, height) + tag + sound + format + listOf("-y", result.path), log).also { ffmpeg = it }
-        val queue = ArrayBlockingQueue<ByteArray>(3)
-        val end = ByteArray(0)
-        val failure = AtomicReference<Throwable>()
-        val written = AtomicInteger()
-        val writer = thread(name = "am-export-write") {
-            try {
-                val stdin = running.process.outputStream.buffered(1 shl 20)
-                while (true) {
-                    val pixels = queue.take()
-                    if (pixels === end) break
-                    stdin.write(ImageEncode.flatten(pixels, BackgroundBlack, pixels))
-                    written.incrementAndGet()
+        var trouble: Throwable? = null
+        while (true) {
+            val encoder = withContext(Dispatchers.IO) { names.firstOrNull { DeskEncoders.works(it, s, width, height) } }
+                ?: throw trouble ?: ExportError(txt(R.string.export_error_cannot_encode, s.codec.label, "${width}x$height"))
+            names.subList(0, names.indexOf(encoder) + 1).clear()
+            if (!DeskEncoders.hardware(encoder) && DeskEncoders.video(s.codec).any(DeskEncoders::hardware)) note(txt(R.string.export_note_software))
+            EncoderTrouble.last = encoder
+            Log.i("AMExport", "encoding ${width}x$height at ${s.fps} fps with $encoder")
+            val running = Ffmpeg(inputs + listOf("-map", "0:v", "-vf", "scale=out_color_matrix=bt709:out_range=tv") +
+                DeskEncoders.videoArgs(encoder, s, width, height) + tag + sound + format + listOf("-y", result.path), log).also { ffmpeg = it }
+            val queue = ArrayBlockingQueue<ByteArray>(3)
+            val end = ByteArray(0)
+            val failure = AtomicReference<Throwable>()
+            val written = AtomicInteger()
+            val writer = thread(name = "am-export-write") {
+                try {
+                    val stdin = running.process.outputStream.buffered(1 shl 20)
+                    while (true) {
+                        val pixels = queue.take()
+                        if (pixels === end) break
+                        stdin.write(ImageEncode.flatten(pixels, BackgroundBlack, pixels))
+                        written.incrementAndGet()
+                    }
+                    stdin.flush()
+                } catch (t: Throwable) {
+                    failure.compareAndSet(null, t)
+                    queue.clear()
                 }
-                stdin.flush()
+            }
+            val ok = try {
+                try {
+                    engine.exportSession(xml, s.smoothing, s.fps) {
+                        for (k in 0 until frames) {
+                            currentCoroutineContext().ensureActive()
+                            failure.get()?.let { throw ExportError(txt(R.string.library_text_value, running.problem()), it) }
+                            val pixels = still(frameTimeMs(scene, s.fps, k), width, height) ?: throw ExportError(txt(R.string.export_error_draw_frame, k.toString()))
+                            runInterruptible(Dispatchers.IO) { while (failure.get() == null && !queue.offer(pixels, 50, java.util.concurrent.TimeUnit.MILLISECONDS)) Unit }
+                            progress((k + 1f) / frames * 0.98f)
+                            if (k % 30 == 0) ensureStorage()
+                            pauseMs().takeIf { it > 0 }?.let { delay(it) }
+                        }
+                    }
+                    runInterruptible(Dispatchers.IO) { while (failure.get() == null && !queue.offer(end, 50, java.util.concurrent.TimeUnit.MILLISECONDS)) Unit }
+                    runInterruptible(Dispatchers.IO) { writer.join() }
+                } finally {
+                    if (writer.isAlive) { running.kill(); queue.clear(); queue.offer(end); writer.join() }
+                }
+                withContext(Dispatchers.IO) { running.finish() }
             } catch (t: Throwable) {
-                failure.compareAndSet(null, t)
-                queue.clear()
+                if (t is kotlinx.coroutines.CancellationException || failure.get() == null) throw t
+                false
             }
-        }
-        try {
-            engine.exportSession(xml, s.smoothing, s.fps) {
-                for (k in 0 until frames) {
-                    currentCoroutineContext().ensureActive()
-                    failure.get()?.let { throw ExportError(txt(R.string.library_text_value, running.problem()), it) }
-                    val pixels = still(frameTimeMs(scene, s.fps, k), width, height) ?: throw ExportError(txt(R.string.export_error_draw_frame, k.toString()))
-                    runInterruptible(Dispatchers.IO) { while (failure.get() == null && !queue.offer(pixels, 50, java.util.concurrent.TimeUnit.MILLISECONDS)) Unit }
-                    progress((k + 1f) / frames * 0.98f)
-                    if (k % 30 == 0) ensureStorage()
-                    pauseMs().takeIf { it > 0 }?.let { delay(it) }
-                }
+            val problem = failure.get()?.let { ExportError(txt(R.string.library_text_value, running.problem()), it) }
+                ?: if (!ok) ExportError(txt(R.string.library_text_value, running.problem())) else null
+            if (problem != null && result.length() == 0L && names.isNotEmpty()) {
+                Log.w("AMExport", "$encoder failed at start, trying the next encoder", problem)
+                running.kill()
+                EncoderTrouble.blameLast()
+                note(txt(R.string.export_note_retry))
+                trouble = problem
+                continue
             }
-            runInterruptible(Dispatchers.IO) { while (failure.get() == null && !queue.offer(end, 50, java.util.concurrent.TimeUnit.MILLISECONDS)) Unit }
-            runInterruptible(Dispatchers.IO) { writer.join() }
-        } finally {
-            if (writer.isAlive) { running.kill(); queue.clear(); queue.offer(end); writer.join() }
+            if (problem != null) throw problem
+            Log.i("AMExport", "${written.get()} frames written by $encoder")
+            break
         }
-        val ok = withContext(Dispatchers.IO) { running.finish() }
-        failure.get()?.let { throw ExportError(txt(R.string.library_text_value, running.problem()), it) }
-        if (!ok) throw ExportError(txt(R.string.library_text_value, running.problem()))
-        Log.i("AMExport", "${written.get()} frames written by $encoder")
         withContext(Dispatchers.IO) { copyInto(result, out) }
     } finally {
         withContext(NonCancellable + Dispatchers.IO) {

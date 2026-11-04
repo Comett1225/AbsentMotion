@@ -74,14 +74,14 @@ object DeskInstance {
     }
 
     fun serve(onFiles: (List<File>) -> Unit) {
-        if (DeskOs.mac) return
+        if (DeskOs.mac || forward(emptyList())) return
         runCatching {
             val socket = ServerSocket(0, 8, InetAddress.getLoopbackAddress())
             val token = java.util.UUID.randomUUID().toString()
             file.parentFile.mkdirs()
             file.writeText("${socket.localPort}\n$token\n")
             runCatching { file.setReadable(false, false); file.setReadable(true, true); file.setWritable(false, false); file.setWritable(true, true) }
-            file.deleteOnExit()
+            Runtime.getRuntime().addShutdownHook(Thread { runCatching { if (file.readLines().getOrNull(1) == token) file.delete() } })
             server = socket
             Thread({
                 while (!socket.isClosed) {

@@ -110,7 +110,7 @@ suspend fun makeGif(context: Context, picked: PickedMedia, job: GifJob, progress
     val out = File(compressFolder(app).apply { mkdirs() }, outputName(picked, "gif", ""))
     var finished = false
     try {
-        FrameReader(app, picked.uri.toString()).use { reader ->
+        val made = FrameReader(app, picked.uri.toString()).use { reader ->
             val stamps = reader.timestamps
             if (stamps.isEmpty()) throw ExportError(txt(R.string.compress_unreadable))
             val times = gifFrameTimes(job).also { t -> for (i in t.indices) t[i] = min(t[i], stamps.last()) }
@@ -131,9 +131,10 @@ suspend fun makeGif(context: Context, picked: PickedMedia, job: GifJob, progress
                 if (written == 0) throw ExportError(txt(R.string.tools_nothing_made))
                 writer.finish()
             }
+            written
         }
         finished = true
-        Compressed(out, "image/gif", false)
+        Compressed(out, "image/gif", false, made)
     } finally {
         if (!finished) out.delete()
     }

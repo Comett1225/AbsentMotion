@@ -126,7 +126,10 @@ internal class GpuCheck(private val context: Context) {
 
         private fun bad(state: String?) = state == "bad" || state == CRASHED
 
+        internal const val BOTH_CLOSED = "Vulkan closed the app while starting; OpenGL: closed the app while starting"
+
         internal fun startOrder(preferGl: Boolean, gl: String?, vk: String?, risky: () -> Boolean): List<Boolean> {
+            if (gl == CRASHED && vk == CRASHED) return emptyList()
             val glFirst = gl != CRASHED && (preferGl || vk == CRASHED || !bad(gl) && (bad(vk) || risky()))
             return if ((if (glFirst) vk else gl) == CRASHED) listOf(glFirst) else listOf(glFirst, !glFirst)
         }
