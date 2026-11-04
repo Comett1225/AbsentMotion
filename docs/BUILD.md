@@ -12,7 +12,7 @@ The repository has one folder per platform: `shared/` (the Kotlin UI, the C++ en
 `windows/` and `linux/` (what only that system uses). Each folder has a short README.
 
 The Android app (`android/`) builds to APKs for `arm64-v8a` in two flavours, `foss` and `compat`, plus `compat32`, the Compatible build for
-32-bit ARM (`armeabi-v7a`) (section 6). The
+32-bit ARM (`armeabi-v7a`), and `foss` and `compat` once more for `x86_64` (Chromebooks with Intel or AMD chips) (section 6). The
 maintainer builds it on macOS (Apple silicon).
 
 The build scripts support macOS and Linux with the Android NDK. CI builds the unsigned `foss` APK on Debian. Windows hosts are not supported.
@@ -93,6 +93,8 @@ What the script does, in order:
 `tools/skia-args.gn` into `third_party/skia/out/android-arm64-compat/` (about 180 MB), which the `compat` flavour links. The symbols it uses
 only need Android 8, which `tools/compat/compat_check.sh` checks with `tools/api_floor.py --min 26`. `tools/build_skia.sh compat32` builds it for
 32-bit ARM (`target_cpu = "arm"`, `ndk_api = 26`) into `third_party/skia/out/android-arm-compat/`, which the `compat32` flavour links.
+`tools/build_skia.sh x64` and `tools/build_skia.sh compat-x64` build the same two for `target_cpu = "x64"` into `out/android-x64/` and
+`out/android-x64-compat/` (about 180 MB each), which the x86_64 builds link.
 
 **Output:** `third_party/skia/out/android-arm64/` holds the static libraries the Android engine links
 (`libskia.a`, `libpathops.a`, `libskparagraph.a`, `libskshaper.a`, `libskunicode_core.a`, `libskunicode_icu.a` and the
@@ -112,6 +114,8 @@ is another commit.
 ./gradlew :app:assembleFossRelease   # release APK of the free flavour
 ./gradlew :app:assembleCompatDebug   # the Compatible build for Android 8 to 12 (needs tools/build_skia.sh compat first)
 ./gradlew :app:assembleCompat32Release   # the Compatible build for 32-bit ARM phones (needs tools/build_skia.sh compat32 first)
+./gradlew -PamAbi=x86_64 :app:assembleFossRelease   # foss for x86_64 Chromebooks (needs tools/build_skia.sh x64 first)
+./gradlew -PamAbi=x86_64 :app:assembleCompatRelease   # compat for x86_64 Chromebooks on Android 9 to 12 (needs tools/build_skia.sh compat-x64 first)
 ```
 
 Gradle runs CMake for you (`externalNativeBuild`): it builds the engine (`libamengine.so`), the speech library
@@ -119,10 +123,18 @@ Gradle runs CMake for you (`externalNativeBuild`): it builds the engine (`libame
 with the layer in `third_party/rife_warp`) and RNNoise (from `third_party/rnnoise`), for `arm64-v8a` (`armeabi-v7a` in `compat32`).
 Skia from section 5 must be in place first.
 
+`-PamAbi=x86_64` builds `foss` and `compat` for `x86_64` instead of `arm64-v8a` (the only two values; `compat32` stays 32-bit ARM). Each APK
+holds one ABI, so the phone APK does not grow; the x86_64 APK has the same app id, version, variant and signing key, so either one updates
+the other. CMake picks `out/android-x64` (or `out/android-x64-compat`) by `ANDROID_ABI`. On x86_64 the engine's NEON paths (`absent_bg`) fall back to
+plain C++, `libwhisper_jni.so` uses the x86_64 baseline (SSE4.2) and `libwhisper_jni_fast.so` is built with AVX2, FMA and F16C and is only
+loaded when the CPU has them (`nativeFastCaptionCpu`); ncnn picks its SSE, AVX, FMA and AVX-512 code at run time (its int8 and bf16 variants are off, as on ARM). The Video Downloader stays
+off on x86_64 because its Python bundle is aarch64 only. The emulators on Apple silicon cannot run x86_64: check the APK with
+`tools/apk_check.py` and `tools/api_floor.py --abi x86_64`, and test it on an x86_64 machine (a ChromeOS or x86_64 Android emulator on a PC).
+
 Outputs: `android/build/outputs/apk/<flavour>/<type>/app-<flavour>-<type>.apk`, for example `android/build/outputs/apk/foss/debug/app-foss-debug.apk`. The foss and Compatible flavours add their own offline background remover (`android/src/foss`).
 
 - **Requirements of the app:** Android 13 (API 33) or newer (`minSdk = 33`, tested on Android 16 and 17 and on emulators from Android 13), `targetSdk = 37`,
-  a 64-bit ARM device, Vulkan 1.1 or OpenGL ES 3.0 (`tools/api_floor.py` lists the Android version the native libraries need).
+  a 64-bit ARM device (or x86_64 with the x86_64 APK), Vulkan 1.1 or OpenGL ES 3.0 (`tools/api_floor.py` lists the Android version the native libraries need).
 - **Release signing:** `assembleFossRelease`, `assembleCompatRelease` and `assembleCompat32Release` sign with the key named in a git-ignored `signing.properties` in the project root
   (`storeFile`, `storePassword`, `keyAlias`, `keyPassword`); without that file the release APK is left unsigned (`app-<flavour>-release-unsigned.apk`),
   and you sign it yourself with `apksigner`. Debug builds (`assembleFossDebug`) are signed with the debug key for your own phone. Make a release key with
@@ -163,7 +175,7 @@ Outputs: `android/build/outputs/apk/<flavour>/<type>/app-<flavour>-<type>.apk`, 
   `AM_PACKAGE=<app id>` points the device tools at a debug copy installed under another app id (an `applicationIdSuffix`), so a
   device that has the real app can be tested without touching it.
 
-The signing helper uses each APK's manifest minimum Android version and build-tools 37.0.0. `python3 tools/apk_check.py <apk> [<apk> ...]` checks signatures at every supported API through 37, resource-table and native-library packaging, ELF alignment (16 KB pages on arm64, 4 KB on 32-bit ARM), and matching app IDs, versions and certificates across the supplied APKs. Use `--unsigned` for unsigned CI output and `--libraries <folder>` to check only the 16 KB alignment of built `.so` files. Signed APKs must carry the release certificate pinned as `RELEASE_SIGNER` in `UpdateSource.kt`, the key the in-app updater accepts. This validates packaging; installation and runtime testing on emulators and real devices remain necessary.
+The signing helper uses each APK's manifest minimum Android version and build-tools 37.0.0. `python3 tools/apk_check.py <apk> [<apk> ...]` checks signatures at every supported API through 37, resource-table and native-library packaging, ELF alignment (16 KB pages on arm64 and x86_64, 4 KB on 32-bit ARM), and matching app IDs, versions and certificates across the supplied APKs. Use `--unsigned` for unsigned CI output and `--libraries <folder>` to check only the 16 KB alignment of built `.so` files. Signed APKs must carry the release certificate pinned as `RELEASE_SIGNER` in `UpdateSource.kt`, the key the in-app updater accepts. This validates packaging; installation and runtime testing on emulators and real devices remain necessary.
 
 ## 7. Checking a change, and releases
 
@@ -175,6 +187,10 @@ runs `tools/check.sh`, and builds the release APKs of every flavour (signed as d
 - `build/release/AbsentMotion-<version>-foss.apk` (the `foss` flavour; 4.x Play installs update to this file, see below)
 - `build/release/AbsentMotion-<version>-compatible.apk` (the `compat` flavour, Android 8 to 12)
 - `build/release/AbsentMotion-<version>-compatible-32bit.apk` (the `compat32` flavour, phones with a 32-bit system, Android 8 or newer)
+- `build/release/AbsentMotion-<version>-foss-x86_64.apk` and `-compatible-x86_64.apk` (the same two for `x86_64`: Chromebooks with Intel or AMD chips)
+
+The in-app updater picks the file by flavour and, for `foss` and `compat`, adds `-x86_64` when the device's first ABI (`Build.SUPPORTED_ABIS`)
+is `x86_64`; a release without that file only links to the release page.
 
 The `play` flavour (background removal through Google Play services) was last built for 4.4 and was removed in 5.0. A
 4.3 or 4.4 Play install that finds no `-play.apk` in a release takes the `-foss.apk` instead, and its updater accepts it
@@ -186,7 +202,8 @@ install the `-foss.apk` by hand.
 
 `.github/workflows/build.yml` builds the unsigned `foss` release APK in a Debian trixie container on pull requests,
 manual runs and version tags. It installs JDK 21 and the pinned Android SDK, NDK and CMake, builds Skia from source,
-and uploads the `foss-apk` artifact; a second job builds the compat Skia for 64-bit and 32-bit ARM and the unsigned `compat` and `compat32` APKs (`compat-apk` artifact).
+and uploads the `foss-apk` artifact; a second job builds the compat Skia for 64-bit and 32-bit ARM and the unsigned `compat` and `compat32` APKs (`compat-apk` artifact),
+and a third builds both x86_64 Skias and the unsigned x86_64 `foss` and `compat` APKs (`x86_64-apk` artifact).
 
 Two builds of the same commit must produce byte-identical unsigned APKs. Compare the downloaded artifacts with
 `cmp first.apk second.apk` before a release. Keep the Gradle wrapper, Android plugin, Kotlin, NDK, Skia and native

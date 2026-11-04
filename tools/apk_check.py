@@ -27,15 +27,15 @@ def run(*args):
     return result.stdout
 
 
-ELF_KINDS = {1: ("armeabi-v7a", 40, 4096), 2: ("arm64-v8a", 183, 16384)}
+ELF_KINDS = {(1, 40): ("armeabi-v7a", 4096), (2, 183): ("arm64-v8a", 16384), (2, 62): ("x86_64", 16384)}
 
 
 def elf_alignment(data, name):
-    kind = ELF_KINDS.get(data[4]) if len(data) >= 52 and data[:4] == b"\x7fELF" and data[5] == 1 else None
-    if not kind or struct.unpack_from("<H", data, 18)[0] != kind[1]:
-        raise ValueError(f"{name}: expected an arm64 or 32-bit ARM ELF library")
-    abi, _, page = kind
-    wide = abi == "arm64-v8a"
+    kind = ELF_KINDS.get((data[4], struct.unpack_from("<H", data, 18)[0])) if len(data) >= 52 and data[:4] == b"\x7fELF" and data[5] == 1 else None
+    if not kind:
+        raise ValueError(f"{name}: expected an arm64, x86_64 or 32-bit ARM ELF library")
+    abi, page = kind
+    wide = data[4] == 2
     offset = struct.unpack_from("<Q" if wide else "<I", data, 32 if wide else 28)[0]
     size, count = struct.unpack_from("<HH", data, 54 if wide else 42)
     if size < (56 if wide else 32) or not count or offset + size * count > len(data):
@@ -151,7 +151,7 @@ def main():
     parser.add_argument("--max-api", type=int, default=37)
     parser.add_argument("--signer", help="expected signing certificate SHA-256 (default: RELEASE_SIGNER in UpdateSource.kt)")
     parser.add_argument("--any-signer", action="store_true", help="accept any single signing certificate, for test keys")
-    parser.add_argument("--libraries", action="store_true", help="only check that native libraries are aligned for their memory pages: 16 KB on arm64, 4 KB on 32-bit ARM")
+    parser.add_argument("--libraries", action="store_true", help="only check that native libraries are aligned for their memory pages: 16 KB on arm64 and x86_64, 4 KB on 32-bit ARM")
     args = parser.parse_args()
     if args.libraries:
         try:

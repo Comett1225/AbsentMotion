@@ -6,6 +6,8 @@ plugins {
 }
 
 val appVersion = Properties().apply { rootProject.file("version.properties").inputStream().use { load(it) } }
+val appAbi = providers.gradleProperty("amAbi").getOrElse("arm64-v8a")
+require(appAbi in setOf("arm64-v8a", "x86_64")) { "amAbi must be arm64-v8a or x86_64, not $appAbi" }
 
 android {
     namespace = "app.absentmotion"
@@ -80,13 +82,13 @@ android {
         create("foss") {
             dimension = "distribution"
             manifestPlaceholders["variant"] = "foss"
-            ndk { abiFilters += "arm64-v8a" }
+            ndk { abiFilters += appAbi }
         }
         create("compat") {
             dimension = "distribution"
             manifestPlaceholders["variant"] = "compat"
             minSdk = 26
-            ndk { abiFilters += "arm64-v8a" }
+            ndk { abiFilters += appAbi }
             buildConfigField("boolean", "COMPATIBLE", "true")
             externalNativeBuild { cmake { arguments += "-DAM_COMPAT=ON" } }
         }

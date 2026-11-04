@@ -165,6 +165,25 @@ class UpdateCheckTest {
         assertEquals("AbsentMotion-4.1.4-compatible-32bit.apk", apk("v4.1.4", "4.1.4", "1000", "compat32")?.name)
     }
 
+    @Test fun anX86DeviceTakesTheX86Apk() {
+        assertEquals("AbsentMotion-5.0.0-foss-x86_64.apk", apkName("5.0.0", "foss", "x86_64"))
+        assertEquals("AbsentMotion-5.0.0-compatible-x86_64.apk", apkName("5.0.0", "compat", "x86_64"))
+        assertEquals("AbsentMotion-5.0.0-compatible-32bit.apk", apkName("5.0.0", "compat32", "x86_64"))
+        assertEquals("AbsentMotion-5.0.0-foss.apk", apkName("5.0.0", "foss", "arm64-v8a"))
+        assertEquals("AbsentMotion-5.0.0-foss.apk", apkName("5.0.0", "foss"))
+        val tag = "v5.0.0"
+        fun asset(name: String) = """{"name":"$name","size":1000,"browser_download_url":"$HOME_PAGE/releases/download/$tag/$name"}"""
+        fun release(vararg names: String) = """{"tag_name":"$tag","html_url":"$HOME_PAGE/releases/tag/$tag","assets":[${names.joinToString(",") { asset(it) }}]}"""
+        val both = release("AbsentMotion-5.0.0-foss.apk", "AbsentMotion-5.0.0-foss-x86_64.apk", "AbsentMotion-5.0.0-compatible.apk", "AbsentMotion-5.0.0-compatible-x86_64.apk")
+        assertEquals("AbsentMotion-5.0.0-foss-x86_64.apk", parseRelease(both, "foss", abi = "x86_64")?.apk?.name)
+        assertEquals("AbsentMotion-5.0.0-compatible-x86_64.apk", parseRelease(both, "compat", abi = "x86_64")?.apk?.name)
+        assertEquals("AbsentMotion-5.0.0-foss.apk", parseRelease(both, "foss", abi = "arm64-v8a")?.apk?.name)
+        assertEquals("AbsentMotion-5.0.0-foss-x86_64.apk", parseReleases("[$both]", "foss", abi = "x86_64")?.apk?.name)
+        val armOnly = parseRelease(release("AbsentMotion-5.0.0-foss.apk"), "foss", abi = "x86_64")
+        assertEquals("5.0.0", armOnly?.version)
+        assertNull(armOnly?.apk)
+    }
+
     @Test fun aMeteredConnectionIsMentionedOnlyForDownloadsInTheApp() {
         val apk = ApkAsset("AbsentMotion-9.9.9-foss.apk", "$HOME_PAGE/releases/download/v9.9.9/AbsentMotion-9.9.9-foss.apk", 10, "a".repeat(64), null)
         val release = Release("9.9.9", "$HOME_PAGE/releases/tag/v9.9.9", apk)

@@ -1,6 +1,7 @@
 package app.absentmotion.ui.home
 
 import app.absentmotion.platform.readAtMost
+import android.os.Build
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -111,36 +112,39 @@ internal fun warnMetered(answer: UpdateAnswer.Available, metered: Boolean?) = me
 internal fun offerFor(answer: UpdateAnswer, inApp: Boolean): UpdateAnswer =
     if (answer is UpdateAnswer.Available && answer.release.apk != null && !inApp) UpdateAnswer.Available(answer.release.copy(apk = null), external = true) else answer
 
-internal fun parseRelease(json: String, flavour: String = app.absentmotion.BuildConfig.FLAVOR, source: UpdateSource = GitHubSource): Release? =
-    runCatching { JSONObject(json) }.getOrNull()?.let { releaseOf(it, flavour, source) }
+internal fun parseRelease(json: String, flavour: String = app.absentmotion.BuildConfig.FLAVOR, source: UpdateSource = GitHubSource, abi: String? = deviceAbi()): Release? =
+    runCatching { JSONObject(json) }.getOrNull()?.let { releaseOf(it, flavour, source, abi) }
 
-internal fun parseReleases(json: String, flavour: String = app.absentmotion.BuildConfig.FLAVOR, source: UpdateSource = GitHubSource): Release? {
+internal fun parseReleases(json: String, flavour: String = app.absentmotion.BuildConfig.FLAVOR, source: UpdateSource = GitHubSource, abi: String? = deviceAbi()): Release? {
     val list = runCatching { JSONArray(json) }.getOrNull() ?: return null
     return (0 until list.length()).mapNotNull { list.optJSONObject(it) }
         .filterNot { it.optBoolean("draft") || it.optBoolean("prerelease") }
-        .mapNotNull { releaseOf(it, flavour, source) }
+        .mapNotNull { releaseOf(it, flavour, source, abi) }
         .maxWithOrNull(compareBy<Release> { Version.parse(it.version) })
 }
 
-private fun releaseOf(release: JSONObject, flavour: String, source: UpdateSource): Release? {
+private fun releaseOf(release: JSONObject, flavour: String, source: UpdateSource, abi: String?): Release? {
     val tag = release.optString("tag_name").trim()
     if (Version.parse(tag) == null) return null
     val page = release.optString("html_url").takeIf { it.startsWith("$HOME_PAGE/", ignoreCase = true) } ?: "$HOME_PAGE/releases/latest"
     val version = tag.removePrefix("v").removePrefix("V")
-    return Release(version, page, apkOf(release, tag, version, flavour, source))
+    return Release(version, page, apkOf(release, tag, version, flavour, source, abi))
 }
 
 private val SAFE_VERSION = Regex("^[0-9]+(\\.[0-9]+)*(-[0-9A-Za-z.]+)?$")
 
-internal fun apkName(version: String, flavour: String) = "AbsentMotion-$version-${when (flavour) { "compat" -> "compatible"; "compat32" -> "compatible-32bit"; else -> flavour }}.apk"
+internal fun deviceAbi(): String? = Build.SUPPORTED_ABIS.orEmpty().firstOrNull()
 
-private fun apkOf(release: JSONObject, tag: String, version: String, flavour: String, source: UpdateSource): ApkAsset? {
+internal fun apkName(version: String, flavour: String, abi: String? = null) =
+    "AbsentMotion-$version-${when (flavour) { "compat" -> "compatible"; "compat32" -> "compatible-32bit"; else -> flavour }}${if (abi == "x86_64" && flavour != "compat32") "-x86_64" else ""}.apk"
+
+private fun apkOf(release: JSONObject, tag: String, version: String, flavour: String, source: UpdateSource, abi: String?): ApkAsset? {
     if (flavour !in setOf("foss", "compat", "compat32", "desktop") || !SAFE_VERSION.matches(version) || tag.trim() !in setOf("v$version", "V$version")) return null
     val assets = release.optJSONArray("assets") ?: return null
     val list = (0 until assets.length()).mapNotNull { assets.optJSONObject(it) }
     fun linkOf(file: String) = list.firstOrNull { it.optString("name") == file }?.takeIf { it.optString("browser_download_url").equals(source.asset(tag.trim(), file), ignoreCase = true) }
     val (name, asset) = (if (flavour == "desktop") installerName(list.map { it.optString("name") }, version)?.let { n -> linkOf(n)?.let { n to it } }
-        else apkName(version, flavour).let { n -> linkOf(n)?.let { n to it } }) ?: return null
+        else apkName(version, flavour, abi).let { n -> linkOf(n)?.let { n to it } }) ?: return null
     val size = asset.optLong("size", -1L).takeIf { it in 1..MAX_APK_BYTES } ?: return null
     val sums = linkOf(SUMS)?.let { source.asset(tag.trim(), SUMS) }
     return ApkAsset(name, source.asset(tag.trim(), name), size, parseDigest(asset.optString("digest")), sums)

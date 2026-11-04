@@ -318,7 +318,7 @@
       "macos": "works",
       "windows": "untested",
       "linux": "untested",
-      "note": "whisper.cpp built into the desktop library; model downloaded on first use with consent; Mac tested"
+      "note": "whisper.cpp built into the desktop library; model downloaded on first use with consent; Mac tested; the x86_64 Android APK loads the AVX2 caption library only on CPUs with AVX2, FMA and F16C"
     },
     {
       "id": "ai.reverse",
@@ -1028,7 +1028,7 @@
       "macos": "missing",
       "windows": "missing",
       "linux": "missing",
-      "note": "hidden on desktop; needs a bundled yt-dlp instead of the Android Python bundle"
+      "note": "hidden on desktop; needs a bundled yt-dlp instead of the Android Python bundle; also hidden in the x86_64 Android APK (ChromeOS), whose Python bundle would be the x86_64-linux-android build"
     },
     {
       "id": "home.new_project",
@@ -1168,7 +1168,7 @@
       "macos": "works",
       "windows": "untested",
       "linux": "untested",
-      "note": "Downloads the .dmg, .msi or .deb of the release feed for this system, checks it against SHA256SUMS.txt (a mismatch is deleted), then opens it and offers to quit; never installs on its own; expects release assets named AbsentMotion-<version>... with the system's extension"
+      "note": "Downloads the .dmg, .msi or .deb of the release feed for this system, checks it against SHA256SUMS.txt (a mismatch is deleted), then opens it and offers to quit; never installs on its own; expects release assets named AbsentMotion-<version>... with the system's extension; Android takes AbsentMotion-<version>-<flavour>.apk, with -x86_64 before .apk when Build.SUPPORTED_ABIS starts with x86_64 (ChromeOS on Intel or AMD)"
     },
     {
       "id": "home.onboarding",

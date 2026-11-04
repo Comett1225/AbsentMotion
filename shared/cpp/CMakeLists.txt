@@ -11,16 +11,17 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(SKIA_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../third_party/skia)
-if(AM_COMPAT AND ANDROID_ABI STREQUAL "armeabi-v7a")
-    set(SKIA_OUT ${SKIA_DIR}/out/android-arm-compat)
-    add_compile_definitions(__ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__)
-    add_compile_options(-Werror=unguarded-availability)
-elseif(AM_COMPAT)
-    set(SKIA_OUT ${SKIA_DIR}/out/android-arm64-compat)
-    add_compile_definitions(__ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__)
-    add_compile_options(-Werror=unguarded-availability)
+if(ANDROID_ABI STREQUAL "armeabi-v7a")
+    set(SKIA_OUT ${SKIA_DIR}/out/android-arm)
+elseif(ANDROID_ABI STREQUAL "x86_64")
+    set(SKIA_OUT ${SKIA_DIR}/out/android-x64)
 else()
     set(SKIA_OUT ${SKIA_DIR}/out/android-arm64)
+endif()
+if(AM_COMPAT)
+    set(SKIA_OUT ${SKIA_OUT}-compat)
+    add_compile_definitions(__ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__)
+    add_compile_options(-Werror=unguarded-availability)
 endif()
 
 set(RNNOISE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../third_party/rnnoise)
@@ -51,6 +52,9 @@ target_compile_definitions(amengine PRIVATE
 target_compile_options(amengine PRIVATE -O2 -fno-rtti -fno-exceptions -fvisibility=hidden -Wall)
 
 set(SKIA_LIBS skparagraph skshaper skunicode_core skunicode_icu skia pathops skcms freetype2 harfbuzz icu png jpeg webp wuffs zlib expat cpu-features)
+if(ANDROID_ABI STREQUAL "x86_64")
+    list(APPEND SKIA_LIBS webp_sse41)
+endif()
 list(TRANSFORM SKIA_LIBS PREPEND ${SKIA_OUT}/lib)
 list(TRANSFORM SKIA_LIBS APPEND .a)
 target_link_libraries(amengine PRIVATE
@@ -104,6 +108,9 @@ foreach(property INCLUDE_DIRECTORIES COMPILE_DEFINITIONS COMPILE_OPTIONS COMPILE
         set_target_properties(ggml-cpu-fast PROPERTIES ${property} "${value}")
     endif()
 endforeach()
+if(ANDROID_ABI STREQUAL "x86_64")
+    target_compile_options(ggml-cpu-fast PRIVATE -mavx -mavx2 -mfma -mf16c)
+endif()
 get_directory_property(GGML_CPU_DIR_DEFINITIONS DIRECTORY ${GGML_CPU_DIR} COMPILE_DEFINITIONS)
 target_compile_definitions(ggml-cpu-fast PRIVATE ${GGML_CPU_DIR_DEFINITIONS})
 add_library(whisper_jni_fast SHARED whisper_jni.cpp)
@@ -121,7 +128,8 @@ foreach(option NCNN_VULKAN NCNN_SIMPLEVK NCNN_DISABLE_RTTI NCNN_DISABLE_EXCEPTIO
 endforeach()
 foreach(option NCNN_SHARED_LIB NCNN_INSTALL_SDK NCNN_BUILD_TOOLS NCNN_BUILD_EXAMPLES NCNN_BUILD_BENCHMARK NCNN_BUILD_TESTS NCNN_PYTHON
                NCNN_C_API NCNN_PLATFORM_API NCNN_INT8 NCNN_BF16 NCNN_WEIGHT_QUANT NCNN_PIXEL_DRAWING NCNN_PIXEL_AFFINE NCNN_PIXEL_ROTATE
-               NCNN_ARM82 NCNN_ARM82DOT NCNN_ARM82FP16FML NCNN_ARM84BF16 NCNN_ARM84I8MM NCNN_ARM86SVE NCNN_ARM86SVE2 NCNN_ARM86SVEBF16 NCNN_ARM86SVEI8MM NCNN_ARM86SVEF32MM)
+               NCNN_ARM82 NCNN_ARM82DOT NCNN_ARM82FP16FML NCNN_ARM84BF16 NCNN_ARM84I8MM NCNN_ARM86SVE NCNN_ARM86SVE2 NCNN_ARM86SVEBF16 NCNN_ARM86SVEI8MM NCNN_ARM86SVEF32MM
+               NCNN_XOP NCNN_FMA4 NCNN_AVXVNNI NCNN_AVXVNNIINT8 NCNN_AVXVNNIINT16 NCNN_AVXNECONVERT NCNN_AVX512VNNI NCNN_AVX512BF16 NCNN_AVX512FP16)
     set(${option} OFF CACHE BOOL "" FORCE)
 endforeach()
 set(NCNN_LAYERS input split concat convolution convolutiondepthwise deconvolution crop padding pooling interp memorydata pixelshuffle

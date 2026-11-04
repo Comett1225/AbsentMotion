@@ -124,6 +124,60 @@ jobs:
           python3 tools/api_floor.py --min 26 android/build/outputs/apk/compat/release/*.apk
           python3 tools/api_floor.py --abi armeabi-v7a --min 26 android/build/outputs/apk/compat32/release/*.apk
 
+  x86_64-apk:
+    if: ${{ !inputs.diagnostic }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 170
+    container: debian:trixie
+    defaults:
+      run:
+        working-directory: ${{ inputs.subdir || '.' }}
+    env:
+      DEBIAN_FRONTEND: noninteractive
+      ANDROID_HOME: /opt/android-sdk
+      ANDROID_NDK: /opt/android-sdk/ndk/30.0.16248370
+    steps:
+      - name: Install packages
+        working-directory: /
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends git ca-certificates curl unzip xz-utils python3 build-essential clang lld ninja-build openjdk-21-jdk-headless
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          submodules: recursive
+          path: ${{ inputs.subdir || '.' }}
+      - name: Install the Android SDK
+        run: |
+          mkdir -p "$ANDROID_HOME/cmdline-tools"
+          curl -fsSL -o /tmp/cmdline-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+          echo '2d2d50857e4eb553af5a6dc3ad507a17adf43d115264b1afc116f95c92e5e258  /tmp/cmdline-tools.zip' | sha256sum -c -
+          unzip -q /tmp/cmdline-tools.zip -d /tmp/cmdline-tools
+          mv /tmp/cmdline-tools/cmdline-tools "$ANDROID_HOME/cmdline-tools/latest"
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-37.0" "build-tools;37.0.0" "cmake;3.31.6" "ndk;30.0.16248370"
+      - name: Prepare the source as F-Droid does
+        run: |
+          rm -rf third_party/whisper.cpp/models third_party/whisper.cpp/examples third_party/whisper.cpp/bindings third_party/ncnn/examples third_party/ncnn/benchmark third_party/ncnn/python third_party/ncnn/images
+          echo 'org.gradle.java.home=/usr/lib/jvm/java-21-openjdk-amd64' >> gradle.properties
+      - name: Build Skia for x86_64
+        run: |
+          tools/build_skia.sh x64
+          tools/build_skia.sh compat-x64
+      - name: Build the x86_64 APKs
+        run: ./gradlew -PamAbi=x86_64 :app:assembleFossRelease :app:assembleCompatRelease --no-daemon
+      - name: Check unsigned APK packaging
+        run: python3 tools/apk_check.py --unsigned android/build/outputs/apk/foss/release/*.apk android/build/outputs/apk/compat/release/*.apk
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: x86_64-apk
+          path: |
+            ${{ inputs.subdir || '.' }}/android/build/outputs/apk/foss/release/*.apk
+            ${{ inputs.subdir || '.' }}/android/build/outputs/apk/compat/release/*.apk
+      - name: Check the lowest Android version the native libraries need
+        run: |
+          python3 tools/api_floor.py --abi x86_64 android/build/outputs/apk/foss/release/*.apk
+          python3 tools/api_floor.py --abi x86_64 --min 26 android/build/outputs/apk/compat/release/*.apk
+
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 60

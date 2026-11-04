@@ -264,6 +264,12 @@ class ToolRegressions(unittest.TestCase):
             struct.pack_into('<I', narrow, 52, 1)
             struct.pack_into('<I', narrow, 80, 4096)
             self.assertEqual(('armeabi-v7a', 4096), module.elf_alignment(narrow, 'narrow.so'))
+            intel = bytearray(library)
+            struct.pack_into('<H', intel, 18, 62)
+            self.assertEqual(('x86_64', 16384), module.elf_alignment(intel, 'intel.so'))
+            struct.pack_into('<H', intel, 18, 3)
+            with self.assertRaisesRegex(ValueError, 'expected an arm64'):
+                module.elf_alignment(intel, 'i386.so')
             for names, error in [(['lib/armeabi-v7a/libfixture.so'], None), (['lib/arm64-v8a/libfixture.so'], 'unexpected native ABI'), (['lib/armeabi-v7a/libfixture.so', 'lib/arm64-v8a/libother.so'], 'one native ABI')]:
                 with self.subTest(names=names):
                     with zipfile.ZipFile(path, 'w') as archive:

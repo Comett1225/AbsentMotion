@@ -1,7 +1,9 @@
 #include <android/hardware_buffer_jni.h>
 #include <android/bitmap.h>
 #include <android/native_window_jni.h>
+#if defined(__aarch64__)
 #include <asm/hwcap.h>
+#endif
 #include <jni.h>
 #include <sys/auxv.h>
 #include <vulkan/vulkan.h>
@@ -226,6 +228,8 @@ JNIEXPORT jboolean JNICALL JNI_FN(nativeFastCaptionCpu)(JNIEnv*, jclass) {
 #if defined(__aarch64__)
     const unsigned long need = HWCAP_ASIMDDP | HWCAP_ASIMDHP | HWCAP_FPHP | HWCAP_ATOMICS | HWCAP_ASIMDRDM | HWCAP_CRC32;
     return (getauxval(AT_HWCAP) & need) == need;
+#elif defined(__x86_64__)
+    return __builtin_cpu_supports("avx2") && __builtin_cpu_supports("fma") && __builtin_cpu_supports("f16c");
 #else
     return false;
 #endif
