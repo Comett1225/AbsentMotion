@@ -76,16 +76,17 @@ val isWindows = os.startsWith("windows")
 val isMac = os.startsWith("mac")
 val nativeName = when { isWindows -> "amdesktop.dll"; isMac -> "libamdesktop.dylib"; else -> "libamdesktop.so" }
 val target = providers.gradleProperty("target").orNull
-if (target != null && !(isMac && target == "macos-x64")) throw GradleException("-Ptarget=$target cannot be built on this system")
-val macX64 = target == "macos-x64"
-if (macX64 && System.getProperty("os.arch") != "x86_64") throw GradleException("-Ptarget=macos-x64 needs Gradle on an x86_64 JDK (arch -x86_64, JAVA_HOME = an x64 JDK 21)")
-val nativeDir = if (macX64) "native-x64" else "native"
-val bundledTools = if (macX64) listOf("ffmpeg", "ffprobe").associate { "am.$it" to file("build/$nativeDir/$it").absolutePath } else emptyMap()
+val macArch = target?.removePrefix("macos-")
+val jdkArch = mapOf("x64" to "x86_64", "arm64" to "aarch64")
+if (target != null && !(isMac && macArch in jdkArch)) throw GradleException("-Ptarget=$target cannot be built on this system")
+if (macArch != null && System.getProperty("os.arch") != jdkArch[macArch]) throw GradleException("-Ptarget=$target needs Gradle on a ${jdkArch[macArch]} JDK 21 (JAVA_HOME; for x64 also arch -x86_64)")
+val nativeDir = macArch?.let { "native-$it" } ?: "native"
+val bundledTools = if (macArch != null) listOf("ffmpeg", "ffprobe").associate { "am.$it" to file("build/$nativeDir/$it").absolutePath } else emptyMap()
 
 val nativeBuild = tasks.register<Exec>("nativeBuild") {
     when {
         isWindows -> commandLine("powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "../windows/build.ps1")
-        isMac -> commandLine(listOfNotNull("sh", "../macos/build.sh", "x64".takeIf { macX64 }))
+        isMac -> commandLine(listOfNotNull("sh", "../macos/build.sh", macArch))
         else -> commandLine("sh", "../linux/build.sh")
     }
 }
@@ -117,7 +118,7 @@ compose.desktop {
             packageVersion = "5.0.0"
             jvmArgs += listOf("-XX:+UseZGC", "-XX:+ZGenerational", "-XX:MaxRAMPercentage=60", "-Dapple.awt.application.name=AbsentMotion")
             if (isMac) jvmArgs += "-XX:SharedArchiveFile=\$APPDIR/app.jsa"
-            if (macX64) jvmArgs += listOf("ffmpeg", "ffprobe").map { "-Dam.$it=\$APPDIR/resources/$it" }
+            if (macArch != null) jvmArgs += listOf("ffmpeg", "ffprobe").map { "-Dam.$it=\$APPDIR/resources/$it" }
             macOS {
                 bundleID = "app.absentmotion.desktop"
                 iconFile.set(file("../macos/AbsentMotion.icns"))
@@ -158,11 +159,12 @@ val prepareResources = tasks.register<Sync>("prepareResources") {
     from("../android/src/foss/assets/absent_bg.abg") { into("assets") }
     from("../shared/res") { into("res"); include("values*/strings.xml") }
     from("build/$nativeDir/$nativeName")
-    if (macX64) from("build/$nativeDir") { exclude(nativeName) }
+    if (macArch != null) from("build/$nativeDir") { exclude(nativeName) }
     if (isWindows) from("build/native") { include("icudtl.dat", "av*.dll", "sw*.dll", "ffmpeg.exe", "ffprobe.exe", "ffmpeg-LICENSE.txt") }
 }
 tasks.matching { it.name == "createDistributable" || it.name.startsWith("prepareAppResources") }.configureEach { dependsOn(prepareResources) }
-if (macX64) tasks.matching { it.name == "createDistributable" }.configureEach {
+tasks.matching { it.name == "createRuntimeImage" }.configureEach { inputs.property("javaHome", System.getProperty("java.home")) }
+if (macArch != null) tasks.matching { it.name == "createDistributable" }.configureEach {
     doLast {
         val app = layout.buildDirectory.dir("compose/binaries/main/app/AbsentMotion.app").get().asFile
         listOf("ffmpeg", "ffprobe").forEach { check(app.resolve("Contents/app/resources/$it").setExecutable(true, false)) }

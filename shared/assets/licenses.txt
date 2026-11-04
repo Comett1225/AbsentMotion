@@ -715,7 +715,7 @@ This list was written by hand on 2026-10-18 from the build files and the vendore
 
 Contents
 
-1. Engine libraries (C and C++): Skia and the libraries it links, whisper.cpp and ggml, RNNoise, ncnn, glslang, the RIFE warp layer, LAME, and the video downloader add-on (CPython and yt-dlp, downloaded at run time)
+1. Engine libraries (C and C++): Skia and the libraries it links, whisper.cpp and ggml, RNNoise, ncnn, glslang, the RIFE warp layer, LAME, FFmpeg (Windows and macOS desktop apps only), and the video downloader add-on (CPython and yt-dlp, downloaded at run time)
 2. Machine learning models: OpenAI Whisper weights, RIFE and Real-ESRGAN weights and the AI background removal 2.0 model (all downloaded at run time), the built-in background removal model
 3. Kotlin and Compose libraries
 4. Fonts, icons and effect thumbnails
@@ -903,6 +903,26 @@ LAME
 - Copyright: Copyright (c) 1999-2017 Mike Cheng, Mark Taylor, Robert Hegemann, Takehiro Tominaga, Gabriel Bouvigne, Alexander Leidinger, Naoki Shibata, Albert L. Faber and the other LAME authors named in the source file headers.
 - URL: https://lame.sourceforge.io/
 - Used in: MP3 audio export. LAME is built as its own shared library, libmp3lame.so, and loaded through a small separate library, liblame_jni.so, so it can be replaced with another build of LAME.
+
+FFmpeg (Windows and macOS desktop apps only)
+--------------------------------------------
+
+- Copyright: Copyright (c) 2000-2026 the FFmpeg developers.
+- URL: https://ffmpeg.org/
+- The Android app does not use FFmpeg.
+
+Windows:
+
+- Version: n9.0.2, the BtbN FFmpeg-Builds win64-lgpl-shared-9.0 release of 2026-11-03 (ffmpeg-n9.0-latest-win64-lgpl-shared-9.0.zip, SHA-256 98d509064d806db369e99cedba5cbfeefff09da65b866f50127fa07f0e1802c5), unchanged, from https://github.com/BtbN/FFmpeg-Builds.
+- Licence: GNU Lesser General Public License, version 3 or later (the build uses --enable-version3 and no GPL parts). The licence text ships next to the libraries as ffmpeg-LICENSE.txt.
+- Used in: the Windows installer. amdesktop.dll links the shared avformat, avcodec, avutil, swresample and swscale DLLs for video decoding (D3D11 hardware decoding when available), and ffmpeg.exe and ffprobe.exe run export, the Tools tab and media probing. The DLLs sit unchanged in the app folder, so they can be replaced with another build.
+
+macOS (Apple silicon and Intel):
+
+- Version: 9.0.2, built for arm64 and x86_64 (minimum macOS 11) from the unchanged release source https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz (SHA-256 8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e, signed with the FFmpeg release signing key).
+- Configure options: --enable-shared --disable-static --install-name-dir=@rpath --disable-doc --disable-debug --disable-ffplay --disable-sdl2 --disable-xlib --disable-libxcb --disable-sndio --enable-videotoolbox --enable-audiotoolbox --enable-avfoundation --enable-libmp3lame (the Intel build adds --disable-x86asm). No --enable-gpl, --enable-version3 or --enable-nonfree.
+- Licence: GNU Lesser General Public License, version 2.1 or later. The licence text ships next to the libraries as ffmpeg-LICENSE.txt. LAME (above) is linked into libavcodec for MP3 export.
+- Used in: the macOS apps. libamdesktop.dylib links the shared avformat, avcodec, avutil and swscale libraries for video decoding (VideoToolbox when available), and ffmpeg and ffprobe run export, the Tools tab, the camera and media probing. They sit in AbsentMotion.app/Contents/app/resources, so they can be replaced with another build.
 
 Video downloader add-on (downloaded on request, not part of the app)
 --------------------------------------------------------------------
