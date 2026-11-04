@@ -525,6 +525,7 @@ bool ParseLayer(const XmlNode& node, int fps, Layer* out) {
     l.endTime = std::max(l.startTime, IntAttr(*n, "endTime", 0));
     l.hidden = StrAttr(*n, "hidden") == "true";
     l.force3d = StrAttr(*n, "threeD") == "true";
+    l.mixPieces = StrAttr(*n, "mixPieces") != "false";
     if (const XmlNode* t = n->child("transform")) {
         l.location = ParseAnim(t->child("location"));
         if (l.endTime > l.startTime) LeadIn(&l.location, 1000.0f / fps / (l.endTime - l.startTime));
@@ -581,6 +582,7 @@ bool ParseScene(const std::string& xml, Scene* scene, std::string* error) {
     next.fps = FpsAttr(*root);
     next.totalTime = IntAttr(*root, "totalTime", 0);
     next.depthOrder = StrAttr(*root, "depthOrder") == "true";
+    next.pieceOrder = StrAttr(*root, "depthSort") == "piece";
     const char* bg = root->attr("bgcolor");
     next.bgColor = bg && *bg == '#' ? (uint32_t)strtoul(bg + 1, nullptr, 16) : 0;
     if (next.width <= 0 || next.height <= 0) {

@@ -1,4 +1,5 @@
 #include "pieces3d.h"
+#include "depth.h"
 #include "scene.h"
 
 #include "include/core/SkCanvas.h"
@@ -53,9 +54,18 @@ struct Mesh {
         triangles.push_back({{pa, pb, pc}, {a.uv, b.uv, c.uv}, {a.color, b.color, c.color}, depthKey});
     }
     void quad(Vertex a, Vertex b, Vertex c, Vertex d) { add(a, b, c); add(a, c, d); }
-    void draw(SkCanvas* canvas, SkImage* image) {
+    void draw(SkCanvas* canvas, SkImage* image, depth::Pass* pass) {
         if (triangles.empty()) return;
         std::stable_sort(triangles.begin(), triangles.end(), [](const Tri& a, const Tri& b) { return a.z > b.z; });
+        if (pass) {
+            SkPaint paint;
+            paint.setColor(SK_ColorWHITE);
+            paint.setAntiAlias(true);
+            if (textured && image) paint.setShader(image->makeShader(SkTileMode::kClamp, SkTileMode::kClamp, SkSamplingOptions(SkFilterMode::kLinear)));
+            const int source = pass->add(canvas->getTotalMatrix(), pass->styled(paint));
+            for (const Tri& t : triangles) pass->triangle(source, t.p.data(), textured ? t.uv.data() : nullptr, t.color.data(), pass->at(t.z));
+            return;
+        }
         SkVertices::Builder builder(SkVertices::kTriangles_VertexMode, (int)triangles.size() * 3, 0,
                                     SkVertices::kHasColors_BuilderFlag | (textured ? SkVertices::kHasTexCoords_BuilderFlag : 0));
         int i = 0;
@@ -244,7 +254,8 @@ void fracture(Mesh& mesh, const SkRect& area, const SkM44& orientation, const Se
 bool IsEffect(const std::string& id) { return id == "absent.scatter3d" || id == "absent.fracture3d"; }
 
 void Draw(SkCanvas* canvas, const std::string& id, const SkRect& area, const SkM44& orientation, const Setting& value,
-          const std::vector<unsigned char>& pixels, int width, int height, SkImage* image, const LightSet& lights, SkV3 origin) {
+          const std::vector<unsigned char>& pixels, int width, int height, SkImage* image, const LightSet& lights, SkV3 origin,
+          depth::Pass* pass) {
     if (area.isEmpty() || width <= 0 || height <= 0 || pixels.size() != (size_t)width * height * 4) return;
     const bool textured = id == "absent.fracture3d";
     const float perspective = textured ? 0.5f : std::clamp(value("perspective", 0, 0.5f), 0.0f, 1.0f);
@@ -252,7 +263,7 @@ void Draw(SkCanvas* canvas, const std::string& id, const SkRect& area, const SkM
     Mesh mesh{{}, area.center(), distance, textured};
     if (textured) fracture(mesh, area, orientation, value, width, height, lights, origin);
     else scatter(mesh, area, orientation, value, pixels, width, height, lights, origin);
-    mesh.draw(canvas, image);
+    mesh.draw(canvas, image, pass);
 }
 
 }

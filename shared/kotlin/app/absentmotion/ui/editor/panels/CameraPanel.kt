@@ -124,6 +124,14 @@ internal fun CameraPanel(state: EditorState, layer: Layer, modifier: Modifier = 
                 when (tab) {
                     0 -> {
                         SwitchRow(stringResource(R.string.depth_order), state.scene.depthOrder) { on -> state.edit { it.withDepthOrder(on) } }
+                        if (!app.absentmotion.platform.PlatformFeatures.desktop && state.scene.depthOrder) {
+                            Row(Modifier.fillMaxWidth().height(RowHeight).padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Text(stringResource(R.string.depth_sort), Modifier.weight(1f), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
+                                Choice(stringResource(R.string.depth_sort_layer), !state.scene.pieceOrder, Modifier.width(96.dp)) { state.edit { it.withPieceOrder(false) } }
+                                Spacer(Modifier.width(6.dp))
+                                Choice(stringResource(R.string.depth_sort_piece), state.scene.pieceOrder, Modifier.width(96.dp)) { state.edit { it.withPieceOrder(true) } }
+                            }
+                        }
                         val angle = layer.number(Angle)
                         Row(Modifier.fillMaxWidth().height(RowHeight * 2).padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                             ViewCone(angle, perspective, Modifier.weight(1f).fillMaxHeight().padding(start = 8.dp, end = 12.dp, top = 6.dp, bottom = 6.dp))

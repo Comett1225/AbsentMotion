@@ -33,8 +33,10 @@
 #include "include/effects/SkImageFilters.h"
 #include "include/effects/SkRuntimeEffect.h"
 #include "include/pathops/SkPathOps.h"
+#include "depth.h"
 #include "drawing.h"
 #include "particles.h"
+#include "pieces3d.h"
 #include "scene.h"
 #include "text.h"
 
@@ -1113,6 +1115,7 @@ void DrawParticles(SkCanvas* canvas, const std::vector<Layer>& siblings, const L
     std::vector<SkRSXform> xforms;
     std::vector<SkRect> cells;
     std::vector<SkColor> colors;
+    std::vector<float> depths;
     xforms.reserve(list.size());
     cells.reserve(list.size());
     colors.reserve(list.size());
@@ -1126,6 +1129,7 @@ void DrawParticles(SkCanvas* canvas, const std::vector<Layer>& siblings, const L
         xforms.push_back(SkRSXform::MakeFromRadians(scale, p.angle, p.x, p.y, sprite.anchor.fX, sprite.anchor.fY));
         cells.push_back(cell);
         colors.push_back(SkColor4f{1 + (p.r - 1) * tint, 1 + (p.g - 1) * tint, 1 + (p.b - 1) * tint, std::clamp(p.alpha, 0.0f, 1.0f)}.toSkColor());
+        depths.push_back(p.z);
     }
     if (xforms.empty()) return;
     const int blend = std::clamp((int)std::lround(Setting(e, "blend", t, 0)), 0, 2);
@@ -1133,6 +1137,13 @@ void DrawParticles(SkCanvas* canvas, const std::vector<Layer>& siblings, const L
     paint.setAlphaf(std::clamp(alpha, 0.0f, 1.0f));
     paint.setBlendMode(blend == 1 ? SkBlendMode::kPlus : blend == 2 ? SkBlendMode::kScreen : SkBlendMode::kSrcOver);
     const SkSamplingOptions sampling = layered ? SkSamplingOptions(SkFilterMode::kLinear) : SkSamplingOptions(SkFilterMode::kLinear, SkMipmapMode::kLinear);
+    if (depth::Pass* pass = depth::Active(); pass && pass->target == &l) {
+        const int source = pass->add(canvas->getTotalMatrix(), blend == 0 ? pass->styled(paint) : paint);
+        pass->sources[source].sprite = sprite.image;
+        pass->sources[source].sampling = sampling;
+        for (size_t i = 0; i < xforms.size(); i++) pass->sprite(source, xforms[i], cells[i], colors[i], pass->at(depths[i]));
+        return;
+    }
     canvas->drawAtlas(sprite.image.get(), xforms, cells, colors, SkBlendMode::kModulate, sampling, &cull, &paint);
 }
 
@@ -1217,13 +1228,22 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
     };
     auto body = [&](SkCanvas* canvas) {
         if (!emits) return own(canvas);
+        depth::Pass* const collector = depth::Active() && depth::Active()->target == &l ? depth::Active() : nullptr;
+        const auto mine = [&](SkCanvas* canvas) {
+            if (!collector) return own(canvas);
+            SkPictureRecorder recorder;
+            SkCanvas* c = recorder.beginRecording(SkRect::MakeLTRB(-1e6f, -1e6f, 1e6f, 1e6f));
+            c->setMatrix(canvas->getLocalToDevice());
+            own(c);
+            collector->picture(recorder.finishRecordingAsPicture(), SkMatrix::I(), collector->depth);
+        };
         const auto pass = [&](bool behind) {
             for (const LayerEffect& e : l.effects) {
                 if (Emits(e) && (order(e) == 1) == behind) DrawParticles(canvas, siblings, l, e, timeMs, t, m, path, alpha, pictures);
             }
         };
         pass(true);
-        if (!alone) own(canvas);
+        if (!alone) mine(canvas);
         pass(false);
     };
     auto picture = [&](SkCanvas* canvas) {
@@ -1875,7 +1895,7 @@ static void FaceForward(std::vector<Layer>* seen) {
 }
 
 static const std::vector<Layer>& SeenProject(const Scene& scene, double timeMs, std::vector<Layer>* storage) {
-    if (!SeeLayers(scene.layers, scene.width, scene.height, true, scene.fps, timeMs, scene.depthOrder, storage)) return scene.layers;
+    if (!SeeLayers(scene.layers, scene.width, scene.height, true, scene.fps, timeMs, scene.depthOrder, storage, scene.depthOrder && scene.pieceOrder)) return scene.layers;
     FaceForward(storage);
     return *storage;
 }
@@ -1930,26 +1950,75 @@ bool InheritEffects(const std::vector<Layer>& layers, std::vector<Layer>* out) {
     return true;
 }
 
+bool Mixable(const std::vector<Layer>& layers, const Layer& l, double timeMs) {
+    if (!l.mixPieces || l.kind == "embedScene" || ShadowOn(l) || HasRepeat(l)) return false;
+    if (std::any_of(l.borders.begin(), l.borders.end(), [](const Edge& e) { return e.enabled; })) return false;
+    Echo echo;
+    ShutterBlur shutter;
+    if (EchoOf(l, timeMs, &echo) || ShutterBlurOf(l, timeMs, &shutter)) return false;
+    const bool effects = EffectsApply(layers, l);
+    if (effects && (gEffects->lifted(l) || gEffects->behind(l) || (gEffects->spills && gEffects->spills(l)))) return false;
+    const float t = l.localTime(timeMs);
+    int last = -1;
+    bool emits = false, deep = false, tinted = false;
+    for (size_t k = 0; k < l.effects.size(); k++) {
+        const LayerEffect& e = l.effects[k];
+        if (e.hidden) continue;
+        if (e.id == "absent.videofeedback") return false;
+        if (pieces3d::IsEffect(e.id)) last = (int)k;
+        if (Emits(e)) {
+            emits = true;
+            deep = deep || Setting(e, "depth", t, 0) >= 0.5f;
+            tinted = tinted || std::lround(Setting(e, "blend", t, 0)) != 0;
+        }
+    }
+    if (last >= 0) {
+        for (size_t k = (size_t)last + 1; k < l.effects.size(); k++) {
+            const LayerEffect& e = l.effects[k];
+            if (!e.hidden && !MotionEffect(e.id) && !TextEffect(e.id) && !DrawingEffect(e.id)) return false;
+        }
+        return !emits;
+    }
+    if (effects) return false;
+    if (emits) return deep && (IsNormal(l.blending) || !tinted);
+    return l.kind == "model";
+}
+
+void Collect(SkCanvas* canvas, const std::vector<Layer>& layers, const Layer& l, double timeMs, const MediaPictures& pictures, depth::Pass* pass) {
+    if (!l.activeAt(timeMs)) return;
+    const float t = l.localTime(timeMs);
+    const float opacity = std::clamp(l.opacity.get(0, t, 1) * MotionOpacity(l, timeMs), 0.0f, 1.0f);
+    if (!(opacity > 0) || (l.fillType == "media" && !pictures(l.mediaUri, l.id))) return;
+    pass->target = &l;
+    pass->depth = l.sight.depth;
+    pass->perPixel = DepthPerPixel(l, timeMs);
+    pass->look = SkPaint();
+    SetBlend(&pass->look, l.blending);
+    {
+        depth::Scope scope(pass);
+        DrawContent(canvas, layers, l, timeMs, opacity, false, pictures, nullptr);
+    }
+    pass->target = nullptr;
+}
+
 void DrawList(SkCanvas* canvas, const std::vector<Layer>& listed, int width, int height, bool top, double timeMs,
               const MediaPictures& pictures) {
     std::vector<Layer> inherited, storage;
     const std::vector<Layer>& source = InheritEffects(listed, &inherited) ? inherited : listed;
-    const bool seen = SeeLayers(source, width, height, top, gScene ? gScene->fps : 30, timeMs, top && gScene && gScene->depthOrder, &storage);
+    const bool pieces = top && gScene && gScene->depthOrder && gScene->pieceOrder;
+    const bool seen = SeeLayers(source, width, height, top, gScene ? gScene->fps : 30, timeMs, top && gScene && gScene->depthOrder, &storage, pieces);
     if (seen) FaceForward(&storage);
     const std::vector<Layer>& layers = seen ? storage : source;
     const std::vector<Layer>* const outer = gEffectList;
     gEffectList = &layers;
-    for (size_t i = 0; i < layers.size(); i++) {
+    const auto drawStack = [&](size_t i, size_t end) {
         const Layer& base = layers[i];
-        if (base.clippingMask && i > 0) continue;
-        size_t end = i + 1;
-        while (end < layers.size() && layers[end].clippingMask) end++;
         if (end == i + 1) {
             DrawOne(canvas, layers, base, timeMs, pictures, Override());
             if (top && gBreak && EffectsApply(layers, base)) (*gBreak)();
-            continue;
+            return;
         }
-        if (!base.activeAt(timeMs)) continue;
+        if (!base.activeAt(timeMs)) return;
         const float t = base.localTime(timeMs);
         SkPaint stack;
         stack.setAlphaf(std::clamp(base.opacity.get(0, t, 1) * MotionOpacity(base, timeMs), 0.0f, 1.0f));
@@ -1974,6 +2043,36 @@ void DrawList(SkCanvas* canvas, const std::vector<Layer>& listed, int width, int
             canvas->restore();
         }
         canvas->restore();
+    };
+    const auto after = [&](size_t i) {
+        size_t end = i + 1;
+        while (end < layers.size() && layers[end].clippingMask) end++;
+        return end;
+    };
+    const bool mixing = seen && pieces;
+    for (size_t i = 0; i < layers.size();) {
+        if (!mixing || layers[i].sight.run == 0) {
+            const size_t end = after(i);
+            drawStack(i, end);
+            i = end;
+            continue;
+        }
+        depth::Pass pass;
+        const int run = layers[i].sight.run;
+        for (size_t end; i < layers.size(); i = end) {
+            const Layer& l = layers[i];
+            const bool idle = l.kind == "camera" || l.kind == "nullobj" || l.kind == "light";
+            if (!idle && l.sight.run != run) break;
+            end = after(i);
+            if (idle) continue;
+            if (end == i + 1 && Mixable(layers, l, timeMs)) {
+                Collect(canvas, layers, l, timeMs, pictures, &pass);
+                if (gBreak && EffectsApply(layers, l)) (*gBreak)();
+            } else {
+                pass.whole([&drawStack, i, end](SkCanvas*) { drawStack(i, end); }, l.sight.depth);
+            }
+        }
+        pass.draw(canvas);
     }
     gEffectList = outer;
 }

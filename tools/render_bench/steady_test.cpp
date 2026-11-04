@@ -119,6 +119,41 @@ int main() {
     lamp.hidden = true;
     Expect(am::SceneLights({lamp}, 0).count == 0, "hidden light ignored");
 #endif
+#ifdef RENDER_BENCH_PIECES
+    {
+        am::Scene sorted;
+        std::string why;
+        Expect(am::ParseScene("<scene width=\"100\" height=\"100\" depthOrder=\"true\"/>", &sorted, &why) && !sorted.pieceOrder, "old scene sorts by layer");
+        Expect(am::ParseScene("<scene width=\"100\" height=\"100\" depthOrder=\"true\" depthSort=\"piece\"><shape id=\"1\" endTime=\"10\"/>"
+                              "<shape id=\"2\" endTime=\"10\" mixPieces=\"false\"/></scene>", &sorted, &why) && sorted.pieceOrder,
+               "scene sorts by piece");
+        Expect(sorted.layers.size() == 2 && sorted.layers[0].mixPieces && !sorted.layers[1].mixPieces, "layer mixes unless turned off");
+        auto at = [](int id, float z) {
+            am::Layer l;
+            l.id = id;
+            l.kind = "shape";
+            l.endTime = 1000;
+            l.location.value = {50, 50, z};
+            return l;
+        };
+        am::Layer eye = at(9, -1000);
+        eye.kind = "camera";
+        std::vector<am::Layer> list = {eye, at(1, 100), at(2, 300), at(3, 0), at(4, 100)}, out;
+        am::SeeLayers(list, 100, 100, true, 30, 0, true, &out);
+        std::vector<int> runs;
+        for (const auto& l : out) runs.push_back(l.sight.run);
+        Expect(out.size() == 5 && out[1].id == 2 && out[2].id == 1 && runs == std::vector<int>({0, 1, 1, 0, 2}), "2D layers split depth runs");
+        Expect(std::fabs(out[1].sight.depth - 1300) < 0.01f && am::DepthPerPixel(out[1], 0) > 0, "seen depth is kept");
+        Expect(!am::SeeLayers({at(1, 0), at(2, 0)}, 100, 100, true, 30, 0, true, &out, true), "flat layers stay on the flat path");
+        am::Layer broken = at(5, 0);
+        am::LayerEffect shards;
+        shards.id = "absent.fracture3d";
+        broken.effects.push_back(shards);
+        Expect(!am::SeeLayers({at(1, 0), broken}, 100, 100, true, 30, 0, true, &out), "flat pieces stay flat by layer");
+        Expect(am::SeeLayers({at(1, 0), broken}, 100, 100, true, 30, 0, true, &out, true) && out[0].sight.run == 0 && out[1].sight.run == 1,
+               "flat pieces join a run by piece");
+    }
+#endif
 
     am::Anim flat;
     flat.value = {3};

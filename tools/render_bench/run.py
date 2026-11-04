@@ -60,9 +60,9 @@ def shape(i, x, y, *, w=220, h=160, s=".roundrect", media=False, color="#ffd04a6
             f'<property name="cornerRadius" type="float" value="18"/>{extra}{"".join(effects)}</shape>')
 
 
-def scene(layers, title):
+def scene(layers, title, extra=""):
     return (f'<?xml version="1.0" encoding="UTF-8"?><scene title="{title}" width="{SIZE}" height="{SIZE}" bgcolor="#ff101418" '
-            f'totalTime="{LENGTH}" fps="{FPS}">' + "".join(layers) + "</scene>")
+            f'totalTime="{LENGTH}" fps="{FPS}"{extra}>' + "".join(layers) + "</scene>")
 
 
 def grid(n):
@@ -105,6 +105,16 @@ def scenes():
     out["shutter_echo"] = scene([shape(70, 300, 300, media=True, effects=[fx("tiles", zoom=2), fx("shutterblur", samples=12)]),
                                  shape(71, 760, 300, effects=[fx("glow", radius=50), fx("echo", count=3, seconds=0.3), blur]),
                                  shape(72, 540, 760, media=True, start=500, end=2500, effects=[fx("huesaturation"), blur])], "shutter")
+    camera = f'<camera id="80" label="c" startTime="0" endTime="{LENGTH}"><transform>{anim("location", "540,540,-935.3")}</transform></camera>'
+    fracture = shape(81, 540, 540, w=260, h=200, media=True, s=".rect", location=anim("location", keys=[(0, "420,540,-200"), (1, "660,540,250")]),
+                     effects=['<effect id="absent.fracture3d"><property name="progress" type="float"><kf t="0" v="0.05"/><kf t="1" v="0.7"/></property>'
+                              '<property name="pieces" type="float" value="128"/><property name="depthPush" type="float" value="400"/>'
+                              '<property name="force" type="float" value="120"/></effect>'])
+    scatter = shape(82, 540, 540, w=150, h=100, color="#ff4ad0ff", s=".rect", tilt="10,25", effects=[fx("scatter3d", spacing=20, scatter=60, spin=90)])
+    ball = (f'<model id="83" label="m" startTime="0" endTime="{LENGTH}" src="sphere"><transform>'
+            + anim("location", keys=[(0, "700,500,300"), (1, "380,580,-250")]) + '</transform><property name="size" type="float" value="380"/></model>')
+    out["pieces_whole"] = scene([camera, fracture, scatter, ball], "pieces", ' depthOrder="true"')
+    out["pieces_mix"] = scene([camera, fracture, scatter, ball], "pieces", ' depthOrder="true" depthSort="piece"')
     return out
 
 

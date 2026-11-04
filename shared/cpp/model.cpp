@@ -7,6 +7,7 @@
 #include "include/core/SkPaint.h"
 #include "include/core/SkShader.h"
 #include "include/core/SkVertices.h"
+#include "depth.h"
 #include "scene.h"
 
 namespace am {
@@ -79,6 +80,8 @@ void DrawModel(SkCanvas* canvas, const Layer& l, double timeMs, float alpha, con
         return at->second.get();
     };
 
+    depth::Pass* const pass = depth::Active() && depth::Active()->target == &l ? depth::Active() : nullptr;
+    std::map<SkImage*, int> sources;
     canvas->save();
     canvas->resetMatrix();
     for (size_t start = 0, end; start < faces.size(); start = end) {
@@ -115,6 +118,15 @@ void DrawModel(SkCanvas* canvas, const Layer& l, double timeMs, float alpha, con
         SkPaint paint;
         paint.setColor4f({1, 1, 1, std::clamp(alpha, 0.0f, 1.0f)});
         if (image) paint.setShader(image->makeShader(SkTileMode::kRepeat, SkTileMode::kRepeat, SkSamplingOptions(SkFilterMode::kLinear)));
+        if (pass) {
+            auto [at, fresh] = sources.try_emplace(image);
+            if (fresh) at->second = pass->add(SkMatrix::I(), pass->styled(paint));
+            for (size_t k = 0; k < end - start; k++) {
+                const Face& f = faces[start + k];
+                pass->triangle(at->second, positions + k * 3, uvs ? uvs + k * 3 : nullptr, colors + k * 3, f.depth / 3);
+            }
+            continue;
+        }
         canvas->drawVertices(builder.detach(), SkBlendMode::kModulate, paint);
     }
     canvas->restore();

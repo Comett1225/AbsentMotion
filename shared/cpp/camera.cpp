@@ -250,13 +250,22 @@ bool SeenPlacement(const Layer& l, double timeMs, Placement* out) {
     return true;
 }
 
-bool SeeLayers(const std::vector<Layer>& layers, int width, int height, bool top, int fps, double timeMs, bool depthOrder, std::vector<Layer>* seen) {
+float DepthPerPixel(const Layer& l, double timeMs) {
+    const Sight& s = l.sight;
+    if (!s.layers || !s.layer) return 0;
+    const View v = s.camera ? LayerView(*s.layers, *s.camera, s.width, s.height, timeMs, s.depthOrder) : DefaultView(s.width, s.height);
+    const float depth = Look(v, EffectivePlacement(*s.layers, *s.layer, timeMs)).depth;
+    return (v.orthographic ? std::max(-v.eyeZ, kNearest) : std::max(depth, kNearest)) / v.focal;
+}
+
+bool SeeLayers(const std::vector<Layer>& layers, int width, int height, bool top, int fps, double timeMs, bool depthOrder, std::vector<Layer>* seen,
+               bool pieces) {
     const Layer* camera = top && gCameraView ? ActiveCamera(layers, timeMs) : nullptr;
     if (!camera) {
         bool flat = true;
         for (const Layer& l : layers) {
             const Placement p = EffectivePlacement(layers, l, timeMs);
-            flat = flat && p.z == 0 && !Solid(l, p);
+            flat = flat && p.z == 0 && !Solid(l, p) && !(pieces && Spatial(l, p, timeMs));
         }
         if (flat) return false;
     }
@@ -285,10 +294,11 @@ bool SeeLayers(const std::vector<Layer>& layers, int width, int height, bool top
             copy.projected = Solid(l, p) || (camera && now.tilt != SkM44() && Spatial(l, p, timeMs));
             if (camera) AddCameraEffects(*camera, timeMs, d, Look(before, EffectivePlacement(layers, l, beforeMs)).location, s.location, &copy);
         }
+        copy.sight.depth = d;
         copies.push_back(std::move(copy));
         depth.push_back(d);
         dropped.push_back(drop);
-        if (depthOrder && camera) spatial.push_back(Spatial(l, p, timeMs));
+        if (depthOrder) spatial.push_back(Spatial(l, p, timeMs));
     }
 
     std::vector<size_t> starts;
@@ -298,6 +308,10 @@ bool SeeLayers(const std::vector<Layer>& layers, int width, int height, bool top
     std::vector<size_t> order(starts.size());
     std::iota(order.begin(), order.end(), 0);
     const auto farther = [&](size_t a, size_t b) { return depth[starts[a]] > depth[starts[b]]; };
+    const auto mark = [&](size_t k, int run) {
+        const size_t end = k + 1 < starts.size() ? starts[k + 1] : copies.size();
+        for (size_t i = starts[k]; i < end; i++) copies[i].sight.run = run;
+    };
     if (!depthOrder || !camera) {
         std::stable_sort(order.begin(), order.end(), farther);
     } else {
@@ -326,6 +340,21 @@ bool SeeLayers(const std::vector<Layer>& layers, int width, int height, bool top
             else flush();
         }
         flush();
+    }
+    if (depthOrder) {
+        int run = 0;
+        bool open = false;
+        for (size_t k : order) {
+            const Layer& layer = layers[starts[k]];
+            if (layer.kind == "camera" || layer.kind == "nullobj" || layer.kind == "light") continue;
+            if (!spatial[starts[k]]) {
+                open = false;
+                continue;
+            }
+            if (!open) run++;
+            open = true;
+            mark(k, run);
+        }
     }
     seen->clear();
     for (size_t k : order) {

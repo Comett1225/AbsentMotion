@@ -1,4 +1,5 @@
 #include "effects.h"
+#include "depth.h"
 
 #include "particles.h"
 #include "pieces3d.h"
@@ -1154,7 +1155,11 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
     };
     if (lift < 0 && std::any_of(layer.effects.begin(), layer.effects.end(), [](const LayerEffect& e) { return !e.hidden && pieces3d::IsEffect(e.id); })) {
         std::function<void(SkCanvas*)> current = source;
-        int from = 0;
+        int from = 0, last = -1;
+        depth::Pass* const pass = depth::Active() && depth::Active()->target == &layer ? depth::Active() : nullptr;
+        for (int k = 0; k < (int)layer.effects.size(); k++) {
+            if (!layer.effects[k].hidden && pieces3d::IsEffect(layer.effects[k].id)) last = k;
+        }
         for (int k = 0; k < (int)layer.effects.size(); k++) {
             const LayerEffect& e = layer.effects[k];
             if (e.hidden || !pieces3d::IsEffect(e.id)) continue;
@@ -1199,17 +1204,25 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
                 if (!image) return false;
             }
             const auto value = [&](const char* name, int i, float fallback) { return Value(e, d ? &d->defaults : nullptr, name, i, t, fallback); };
+            const bool handing = pass && k == last;
             SkPictureRecorder recorder;
-            SkCanvas* out = recorder.beginRecording(bounds);
+            SkCanvas* out = handing ? canvas : recorder.beginRecording(bounds);
             const auto& sourceLayers = layer.sight.layers ? *layer.sight.layers : scene.layers;
             const Layer& original = layer.sight.layer ? *layer.sight.layer : layer;
             const Placement world = EffectivePlacement(sourceLayers, original, timeMs);
             const LightSet lights = SceneLights(sourceLayers, timeMs);
             pieces3d::Draw(out, e.id, at, Orientation(layer, timeMs), value, pixels, width, height, image.get(), lights,
-                           {world.location.x(), world.location.y(), world.z});
+                           {world.location.x(), world.location.y(), world.z}, handing ? pass : nullptr);
+            if (handing) return true;
             sk_sp<SkPicture> result = recorder.finishRecordingAsPicture();
             current = [result](SkCanvas* c) { c->drawPicture(result); };
             from = k + 1;
+        }
+        if (pass) {
+            SkPictureRecorder recorder;
+            current(recorder.beginRecording(bounds));
+            pass->picture(recorder.finishRecordingAsPicture(), canvas->getTotalMatrix(), pass->depth);
+            return true;
         }
         SkPaint paint;
         paint.setImageFilter(chain(scene, layer, timeMs, at, bounds, local, placed, nullptr, nullptr, -1, from));

@@ -2193,6 +2193,10 @@
     <string name="desk_camera_stop_recording">Stop recording</string>
     <string name="desk_scroll_key">scroll</string>
     <string name="depth_order">Depth order</string>
+    <string name="depth_sort">Sort</string>
+    <string name="depth_sort_layer">By layer</string>
+    <string name="depth_sort_piece">By piece</string>
+    <string name="mix_pieces">Mix pieces with other layers</string>
     <string name="light_layer">Light</string>
     <string name="light_options">Light options</string>
     <string name="light_ambient">Ambient</string>

@@ -214,6 +214,16 @@
       "note": "Whole 3D layers sort between 2D layers; individual objects retain their own internal ordering."
     },
     {
+      "id": "tool.depth_pieces",
+      "name": "Depth order by piece: 3D Scatter and Fracture pieces, model faces and 3D particles mix with other layers",
+      "where": "panels/CameraPanel.kt, panels/EffectSettings.kt, panels/ModelPanel.kt, depth.cpp, styles.cpp",
+      "android": "works",
+      "macos": "partial",
+      "windows": "partial",
+      "linux": "untested",
+      "note": "Phone first by the owner's choice: the desktop engine draws projects that sort by piece exactly like the phone, but the desktop has no controls to turn it on yet."
+    },
+    {
       "id": "tool.light_layer",
       "name": "Light layers for models and 3D pieces",
       "where": "StructureUi.kt, panels/LightPanel.kt, camera.cpp, model.cpp, pieces3d.cpp",

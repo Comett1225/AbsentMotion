@@ -14,6 +14,7 @@ value class Scene(val node: XmlNode) {
     val bgColor: Int get() = parseColor(node["bgcolor"]) ?: 0
     val totalTime: Int get() = node["totalTime"]?.toIntOrNull() ?: 0
     val depthOrder: Boolean get() = node["depthOrder"] == "true"
+    val pieceOrder: Boolean get() = node["depthSort"] == "piece"
 
     val isElement: Boolean get() = node["type"] == "element"
 
@@ -82,6 +83,10 @@ value class Scene(val node: XmlNode) {
 
     fun withTitle(title: String) = Scene(node.with("title", title))
     fun withDepthOrder(on: Boolean) = Scene(node.with("depthOrder", on.toString()))
+    fun withPieceOrder(on: Boolean) = Scene(node.with("depthSort", if (on) "piece" else null))
+    fun mixing(layer: Layer): Boolean = depthOrder && pieceOrder && layer.mixesPieces
+    fun withMixing(id: Long, on: Boolean): Scene =
+        (if (on) withDepthOrder(true).withPieceOrder(true) else this).update(id) { it.withMixPieces(on) }
 
     fun withSettings(width: Int, height: Int, fps: Int, bgColor: Int) = Scene(
         node.with("width", "$width").with("height", "$height")
@@ -232,6 +237,8 @@ data class Layer(val node: XmlNode, val t: Float = 0f, val snap: ClosedFloatingP
     val startTime: Int get() = node["startTime"]?.toIntOrNull() ?: 0
     val endTime: Int get() = maxOf(startTime, node["endTime"]?.toIntOrNull() ?: 0)
     val hidden: Boolean get() = node["hidden"] == "true"
+    val mixesPieces: Boolean get() = node["mixPieces"] != "false"
+    fun withMixPieces(on: Boolean) = copy(node = node.with("mixPieces", if (on) null else "false"))
     val fillType: String get() = node["fillType"] ?: "none"
     val fillColor: Int get() = parseColor(element(PropRef.FillColor)?.valueAt(t)) ?: 0xFFFFFFFF.toInt()
 

@@ -77,6 +77,7 @@ internal fun EffectSettings(state: EditorState, layer: Layer, instance: XmlNode,
             }
         }
     }
+    if (definition.key in PieceEffects && (definition.key != "particles" || instance.effectProperty("depth")?.valueAt(layer.t) == "true")) MixPiecesRow(state, layer, enabled)
     definition.params.filter { definition.shown(it, instance, layer.t) }.forEach { param ->
         val raw = displayed[PropRef.effect(state.effectIndex, param.id)]?.take(param.default.split(',').size)?.joinToString(",") ?: instance.effectProperty(param.id)?.valueAt(layer.t) ?: param.missingDefault
         fun set(text: String, gesture: Boolean = false) {
@@ -101,6 +102,17 @@ internal fun EffectSettings(state: EditorState, layer: Layer, instance: XmlNode,
                 EffectNumbers(state, shown, within, enabled, active == param, { select(param) }, { text, gesture -> set(text, gesture) })
             }
         }
+    }
+}
+
+private val PieceEffects = setOf("scatter3d", "fracture3d", "particles")
+
+@Composable
+internal fun MixPiecesRow(state: EditorState, layer: Layer, enabled: Boolean = true) {
+    if (app.absentmotion.platform.PlatformFeatures.desktop || state.inGroup) return
+    Row(Modifier.fillMaxWidth().height(38.dp).padding(horizontal = 8.dp).alpha(if (enabled) 1f else 0.35f), verticalAlignment = Alignment.CenterVertically) {
+        Text(stringResource(R.string.mix_pieces), Modifier.weight(1f), color = Am.OnDark, fontSize = 14.sp)
+        PanelSwitch(state.scene.mixing(layer)) { on -> if (enabled) state.edit { it.withMixing(layer.id, on) } }
     }
 }
 

@@ -1,4 +1,5 @@
 #include <chrono>
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
@@ -65,6 +66,23 @@ void SyntheticModel() {
     model->slots.assign(12, -1);
     model->twoSided = true;
     am::SetModel("synthetic", std::move(model));
+    auto sphere = std::make_shared<am::Model>();
+    const int rings = 9, segments = 10;
+    for (int r = 0; r <= rings; r++) for (int k = 0; k <= segments; k++) {
+        const float a = 3.14159265f * r / rings, b = 6.2831853f * k / segments;
+        const float x = std::sin(a) * std::cos(b), y = std::cos(a), z = std::sin(a) * std::sin(b);
+        sphere->positions.insert(sphere->positions.end(), {x * 0.5f, y * 0.5f, z * 0.5f});
+        sphere->normals.insert(sphere->normals.end(), {x, y, z});
+        sphere->uvs.insert(sphere->uvs.end(), {(float)k / segments, (float)r / rings});
+        sphere->colors.push_back(0xff80c0ff);
+    }
+    for (int r = 0; r < rings; r++) for (int k = 0; k < segments; k++) {
+        const int a = r * (segments + 1) + k, b = a + segments + 1;
+        if (r > 0) sphere->triangles.insert(sphere->triangles.end(), {a, a + 1, b});
+        if (r + 1 < rings) sphere->triangles.insert(sphere->triangles.end(), {a + 1, b + 1, b});
+    }
+    sphere->slots.assign(sphere->triangles.size() / 3, -1);
+    am::SetModel("sphere", std::move(sphere));
 }
 
 }
