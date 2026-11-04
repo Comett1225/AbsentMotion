@@ -128,7 +128,7 @@ class UiContracts(unittest.TestCase):
 
     def test_settings_scroll_to_the_last_control(self):
         text = source('ui/home/SettingsDrawer.kt')
-        self.assertIn('.statusBarsPadding().verticalScroll(rememberScrollState())', text)
+        self.assertIn('.windowInsetsPadding(WindowInsets.statusBars.union(WindowInsets.captionBar)).verticalScroll(rememberScrollState())', text)
 
     def test_theme_provider_io_leaves_the_main_thread(self):
         text = source('ui/home/SettingsDrawer.kt')
