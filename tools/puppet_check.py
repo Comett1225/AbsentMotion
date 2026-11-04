@@ -336,6 +336,10 @@ def run(bench, dots):
     got, _ = bench.render(scene(shape(1, small, small_half, effect(far, 1.0), inner=stroke)))
     compare("a small layer bent far outside its box, stroke included, is drawn whole", got, expected(small_plain, small, far, 1.0))
 
+    pulled, _ = bench.render(scene(shape(1, Place(160, 300), half, effect([(0, -50, 0, 50)], 1.0))))
+    lifted, _ = bench.render(scene(shape(1, Place(160, 200), half)))
+    compare("a pin pulls the part of the picture below the canvas into view", pulled, lifted)
+
     tiny = Place(160, 160, 0, 0.01)
     tiny_pins = [(-9000, -9000, -9000, -9000), (9000, 9000, 9000, 9000), (0, 0, 2000, -3000)]
     tiny_plain, _ = bench.render(scene(shape(1, tiny, (10000, 10000))))

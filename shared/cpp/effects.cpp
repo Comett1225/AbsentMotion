@@ -1336,12 +1336,13 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
             return true;
         }
     }
-    SkRect inside = local;
+    SkRect inside = local, layerBounds = bounds;
     if (lift < 0 && !seesBehind && Bent(layer, t, timeMs)) {
         SkRect measured;
-        record(source, &measured);
+        record(source, &measured, std::max({(float)scene.width, (float)scene.height, bounds.width(), bounds.height()}));
         const float scale = canvas->getTotalMatrix().getMinScale(), pad = scale > 0 ? 4 / scale : 4;
         inside = measured.makeOffset(-at.left(), -at.top()).makeOutset(pad, pad);
+        layerBounds.join(inside.makeOffset(at.left(), at.top()));
     }
     sk_sp<SkImageFilter> filter = this->chain(scene, layer, timeMs, at, bounds, inside, placed, std::move(content), std::move(under));
     if (!filter && lift < 0) return false;
@@ -1374,7 +1375,7 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
     SkPaint paint;
     paint.setImageFilter(std::move(filter));
     if (lift < 0) {
-        canvas->saveLayer(&bounds, &paint);
+        canvas->saveLayer(&layerBounds, &paint);
         source(canvas);
         canvas->restore();
         return true;
