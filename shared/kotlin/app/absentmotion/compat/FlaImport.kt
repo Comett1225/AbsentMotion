@@ -277,7 +277,7 @@ private class FlaReader(private val files: Map<String, String>, private val maxL
 
     private fun endMs(frame: Int): Int = ms(frame) - 1
 
-    private fun parse(path: String): XmlNode? = files[path]?.let { runCatching { XmlNode.parse(it.removePrefix("﻿"), XmlNode.IMPORT_NODES) }.getOrNull() }
+    private fun parse(path: String): XmlNode? = files[path]?.let { runCatching { XmlNode.parse(it.removePrefix("\uFEFF"), XmlNode.IMPORT_NODES) }.getOrNull() }
 
     fun read(): FlaScene {
         val doc = parse("DOMDocument.xml") ?: throw IllegalArgumentException("DOMDocument.xml")

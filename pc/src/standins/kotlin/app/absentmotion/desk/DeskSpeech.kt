@@ -106,7 +106,7 @@ internal object SpeechCommands {
             listOf("-ar", "$SAMPLE_RATE", "-ac", "1", "-c:a", "pcm_s16le", "-f", "wav", out.path)
 
     fun parse(kind: SpeechKind, output: String): List<SpeechVoice> {
-        val lines = output.trimStart('﻿').lines().map { it.trim() }.filter { it.isNotEmpty() }
+        val lines = output.trimStart('\uFEFF').lines().map { it.trim() }.filter { it.isNotEmpty() }
         val found = when (kind) {
             SpeechKind.Say -> lines.mapNotNull { line ->
                 macLine.find(line)?.destructured?.let { (name, code) -> SpeechVoice(name, name.replace(macQualifier, "").ifEmpty { name }, language(code, name)) }

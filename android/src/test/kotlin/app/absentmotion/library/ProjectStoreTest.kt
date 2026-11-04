@@ -281,7 +281,7 @@ class ProjectStoreTest {
 
     @Test fun xmlStartingWithABomImports() {
         val store = ProjectStore(tmp.newFolder())
-        val xml = "﻿" + scene().node.toXml()
+        val xml = "\uFEFF" + scene().node.toXml()
         val report = Importer(store).import { ByteArrayInputStream(xml.toByteArray()) }.single()
         assertEquals(100, store.load(report.id)!!.width)
     }
