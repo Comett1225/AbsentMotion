@@ -7,6 +7,7 @@ import app.absentmotion.ai.aiFile
 import app.absentmotion.desk.DeskMedia
 import app.absentmotion.export.Codec
 import app.absentmotion.export.DeskEncoders
+import app.absentmotion.export.ExportSettings
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.fpsText
@@ -26,7 +27,7 @@ internal suspend fun convertDesktopGif(context: Context, uri: Uri): GifVideo? {
     val matte = File(colour.parentFile, colour.nameWithoutExtension + "-mask.mp4").takeIf { summary.transparent }
     val files = listOfNotNull(colour, matte)
     val encoder = if ("libx264" in DeskEncoders.available) listOf("-c:v", "libx264")
-        else DeskEncoders.video(Codec.H264).firstOrNull()?.let { listOf("-c:v", it, "-b:v", "20M") } ?: listOf("-c:v", "libx264")
+        else DeskEncoders.video(Codec.H264).firstOrNull { DeskEncoders.works(it, ExportSettings(minOf(width, height), 30), width, height) }?.let { listOf("-c:v", it, "-b:v", "20M") } ?: listOf("-c:v", "libx264")
     var success = false
     try {
         suspend fun encode(file: File, mask: Boolean) {

@@ -119,6 +119,15 @@ class PaletteLibraryTest {
         assertEquals(emptyList<ColourPalette>(), PaletteLibrary(file).user)
     }
 
+    @Test fun anUnreadableFileIsKeptAsideNotOverwritten() {
+        val file = File(folder.root, PaletteLibrary.FILE)
+        file.writeText("{\"palettes\": [")
+        val library = PaletteLibrary(file)
+        library.create("Fresh", listOf(0x123456))
+        assertEquals("{\"palettes\": [", File(file.path + ".unreadable").readText())
+        assertEquals(listOf("Fresh"), PaletteLibrary(file).user.map { it.name })
+    }
+
     @Test fun mergeKeepsLocalPalettesAndIgnoresBadEntries() {
         val library = PaletteLibrary(File(folder.newFolder("a"), PaletteLibrary.FILE))
         val mine = library.create("Mine", listOf(0x010203))

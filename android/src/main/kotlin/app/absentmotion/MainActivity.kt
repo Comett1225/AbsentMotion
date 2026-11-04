@@ -120,6 +120,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var templates: TemplateStore
     internal val engine by lazy { EngineThread(background = Am.PreviewBg.toArgb(), context = applicationContext) { settings.openGl } }
     internal var editor by mutableStateOf<EditorState?>(null)
+    private var crashSaver: RecoveryHandler? = null
         private set
     private var closingEditor = false
     private var cameFromEditor = false
@@ -161,7 +162,7 @@ class MainActivity : ComponentActivity() {
         templates = TemplateStore(this)
         recovery = Recovery(File(filesDir, "recovery"))
         CrashLogs.install(this)
-        RecoveryHandler.install(recovery) { editor?.let { it.projectId to it.project.toXml() } }
+        crashSaver = RecoveryHandler.install(recovery) { editor?.let { it.projectId to it.project.toXml() } }
         val reopen = savedInstanceState?.getString(OPEN_PROJECT)
         lifecycleScope.launch {
             val (offer, crash) = withContext(DiskThread.dispatcher) { runCatching { recovery.pending(store) }.getOrNull() to runCatching { CrashLogs.collect(applicationContext) }.getOrNull() }
@@ -664,7 +665,7 @@ class MainActivity : ComponentActivity() {
         if (app.absentmotion.editor.ElementNav.open === elementNav) app.absentmotion.editor.ElementNav.open = null
         elementNav = null
         MediaPicks.release(this)
-        RecoveryHandler.install(recovery) { null }
+        crashSaver?.current = { null }
         engine.close()
     }
 

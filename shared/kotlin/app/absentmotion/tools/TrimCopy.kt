@@ -40,7 +40,7 @@ internal suspend fun copyRange(
             if (format.containsKey(MediaFormat.KEY_MAX_INPUT_SIZE)) buffer = maxOf(buffer, format.getInteger(MediaFormat.KEY_MAX_INPUT_SIZE))
             if (isVideo) video = i else audio = i
         }
-        if (tracks.isEmpty()) throw ExportError(txt(R.string.tools_no_sound))
+        if (tracks.isEmpty()) throw ExportError(txt(if (withVideo) R.string.compress_unreadable else R.string.tools_no_sound))
         if (withVideo && rotation != 0) muxer.setOrientationHint(((rotation % 360) + 360) % 360 / 90 * 90)
         muxer.start()
         started = true
@@ -69,6 +69,8 @@ internal suspend fun copyRange(
             if (!extractor.advance()) break
         }
         if (written == 0) throw ExportError(txt(R.string.tools_nothing_made))
+        started = false
+        muxer.stop()
     } finally {
         if (started) runCatching { muxer?.stop() }
         runCatching { muxer?.release() }

@@ -66,6 +66,19 @@ class GpuCheckTest {
         assertEquals(GpuCheck.Judged(false, null), GpuCheck.judge("45:vk", ApplicationExitInfo.REASON_ANR, "vk"))
     }
 
+    @Test fun aBackendThatClosedTheAppIsNeverTheFallback() {
+        val crashed = GpuCheck.CRASHED
+        val risky = { error("not asked") }
+        assertEquals(listOf(false, true), GpuCheck.startOrder(false, null, null) { false })
+        assertEquals(listOf(true, false), GpuCheck.startOrder(false, null, null) { true })
+        assertEquals(listOf(true), GpuCheck.startOrder(false, "bad", crashed, risky))
+        assertEquals(listOf(true), GpuCheck.startOrder(false, null, crashed, risky))
+        assertEquals(listOf(false), GpuCheck.startOrder(true, crashed, null, risky))
+        assertEquals(listOf(false), GpuCheck.startOrder(false, crashed, "bad", risky))
+        assertEquals(listOf(false, true), GpuCheck.startOrder(false, "bad", "bad", risky))
+        assertEquals(listOf(true, false), GpuCheck.startOrder(true, "bad", "ok", risky))
+    }
+
     @Test fun aBrokenRecordIsIgnored() {
         listOf("x:vk", "41", "41:", "").forEach { assertEquals(it, GpuCheck.Judged(null, null), GpuCheck.judge(it, ApplicationExitInfo.REASON_CRASH_NATIVE, null)) }
     }

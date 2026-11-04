@@ -74,7 +74,7 @@ object VideoDownloader {
 
     val downloadBytes: Long get() = python.bytes + ENGINE_ESTIMATE
 
-    val available: Boolean get() = Process.is64Bit() && Build.SUPPORTED_64_BIT_ABIS.contains("arm64-v8a")
+    val available: Boolean get() = Process.is64Bit() && Build.SUPPORTED_64_BIT_ABIS.firstOrNull() == "arm64-v8a"
 
     private fun folder(context: Context) = File(context.filesDir, "downloader")
     private fun home(context: Context) = File(folder(context), "python")

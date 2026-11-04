@@ -175,7 +175,7 @@ internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSett
     Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = if (PlatformFeatures.desktop) 28.dp else 16.dp)) {
         Spacer(Modifier.height(24.dp))
         if (PlatformFeatures.desktop) ToolGrid(listOf(compressCard, trimCard, extractCard, gifCard))
-        else if (LocalWide.current) ToolGrid(listOf(compressCard, trimCard, extractCard, gifCard, downloaderCard))
+        else if (LocalWide.current || app.absentmotion.ui.editor.LocalTablet.current) ToolGrid(listOf(compressCard, trimCard, extractCard, gifCard, downloaderCard))
         else {
             compressCard(Modifier)
             Spacer(Modifier.height(12.dp))

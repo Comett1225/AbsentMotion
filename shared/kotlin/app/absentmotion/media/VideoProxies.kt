@@ -347,7 +347,7 @@ internal fun transcode(
             else {
                 heard = System.nanoTime()
                 val pts = info.presentationTimeUs
-                val shown = info.size > 0 && (startUs <= 0 || pts >= startUs) && pts <= endUs && (gapUs == 0L || pts + 2_000 >= nextUs)
+                val shown = info.size > 0 && (startUs <= 0 || pts >= startUs) && pts < endUs && (gapUs == 0L || pts + 2_000 >= nextUs)
                 if (shown && gapUs > 0) nextUs = if (pts - nextUs > gapUs) pts + gapUs else nextUs + gapUs
                 decodeDone = info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0
                 decoder.releaseOutputBuffer(index, shown)

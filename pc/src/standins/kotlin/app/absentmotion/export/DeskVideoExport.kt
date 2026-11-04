@@ -112,7 +112,7 @@ internal object DeskEncoders {
             val args = listOf(DeskMedia.ffmpeg, "-v", "error", "-f", "lavfi", "-i", "color=c=black:s=${width}x$height:r=${s.fps}:d=0.2") +
                 videoArgs(name, s, width, height) + listOf("-frames:v", "2", "-f", "null", "-")
             val process = ProcessBuilder(args).redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.DISCARD).start()
-            process.waitFor(20, java.util.concurrent.TimeUnit.SECONDS) && process.exitValue() == 0
+            try { process.waitFor(20, java.util.concurrent.TimeUnit.SECONDS) && process.exitValue() == 0 } finally { process.destroyForcibly() }
         }.getOrDefault(false)
     }
 

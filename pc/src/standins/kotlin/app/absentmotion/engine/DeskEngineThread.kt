@@ -259,6 +259,7 @@ class EngineThread(private val background: Int, private val context: Context? = 
     private var preparedAt = Int.MIN_VALUE
 
     private fun applyPending(timeMs: Int) {
+        if (closed || capturing) return
         val (xml, again) = synchronized(this) { pendingXml.also { pendingXml = null } to fontsDirty.also { fontsDirty = false } }
         val next = xml?.value ?: shownXml.takeIf { again || timedText && preparedAt != timeMs } ?: return
         try {

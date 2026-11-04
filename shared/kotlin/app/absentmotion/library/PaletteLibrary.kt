@@ -91,7 +91,7 @@ class PaletteLibrary(private val file: File) {
         if (file.exists()) runCatching { parse(file.readText()) }.getOrNull()?.let { (found, chosen) ->
             user = found
             chosenId = chosen?.takeIf { id -> get(id) != null } ?: DEFAULT
-        }
+        } ?: file.renameTo(File(file.path + ".unreadable"))
     }
 
     val all get() = BuiltInPalettes.take(1) + user + BuiltInPalettes.drop(1)

@@ -203,7 +203,7 @@ class EngineThread(private val background: Int, context: Context? = null, privat
 
     private fun checked(engine: NativeEngine): NativeEngine {
         val check = gpuCheck ?: return engine
-        if (check.drawsRight(engine)) return engine
+        if (check.drawsRight(engine) || check.knownBad(gl = !engine.openGl)) return engine
         check.trying(gl = !engine.openGl)
         val other = runCatching { NativeEngine(if (engine.openGl) NativeEngine.Backend.GRAPHITE else NativeEngine.Backend.GL) }.getOrNull() ?: return engine
         if (!check.drawsRight(other)) {
@@ -225,18 +225,19 @@ class EngineThread(private val background: Int, context: Context? = null, privat
         return try {
             EngineDebug.failStart?.let { throw IllegalStateException(it) }
             gpuCheck?.recover()
-            val glFirst = EngineDebug.forceGl || preferOpenGl() || gpuCheck?.knownBad(gl = true) != true && (gpuCheck?.knownBad(gl = false) == true || riskyVulkan())
-            val order = if (glFirst) listOf(NativeEngine.Backend.GL, NativeEngine.Backend.GRAPHITE) else listOf(NativeEngine.Backend.GRAPHITE, NativeEngine.Backend.GL)
+            val order = GpuCheck.startOrder(EngineDebug.forceGl || preferOpenGl(), gpuCheck?.state(gl = true), gpuCheck?.state(gl = false), ::riskyVulkan)
+                .map { if (it) NativeEngine.Backend.GL else NativeEngine.Backend.GRAPHITE }
             gpuCheck?.trying(order[0] == NativeEngine.Backend.GL)
             val first = runCatching { NativeEngine(order[0]) }
             (first.getOrNull() ?: run {
                 val failed = first.exceptionOrNull()
-                Log.w("AMEngine", "${order[0]} cannot start, trying ${order[1]}", failed)
+                Log.w("AMEngine", "${order[0]} cannot start, trying ${order.getOrNull(1)}", failed)
                 try {
-                    gpuCheck?.trying(order[1] == NativeEngine.Backend.GL)
-                    NativeEngine(order[1])
+                    val next = checkNotNull(order.getOrNull(1)) { "skipped because it closed the app while starting" }
+                    gpuCheck?.trying(next == NativeEngine.Backend.GL)
+                    NativeEngine(next)
                 } catch (second: Throwable) {
-                    val (vulkan, gl) = if (glFirst) second to failed else failed to second
+                    val (vulkan, gl) = if (order[0] == NativeEngine.Backend.GL) second to failed else failed to second
                     throw IllegalStateException("${vulkan?.message ?: vulkan}; OpenGL: ${gl?.message ?: gl}", second)
                 }
             }).let(::checked).also {
@@ -267,6 +268,7 @@ class EngineThread(private val background: Int, context: Context? = null, privat
                 attachedOnce = true
                 gpuCheck?.trying(engine().openGl)
                 watchedFrames = 0
+                handler.postDelayed({ if (watchedFrames > 0 && engine?.failed != true) { watchedFrames = -1; gpuCheck?.survived() } }, SURVIVE_MS)
             }
             target = engine().attach(surface, forEncoder = false)
             this.surface = surface

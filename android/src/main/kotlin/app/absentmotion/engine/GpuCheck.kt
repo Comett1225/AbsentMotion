@@ -36,7 +36,9 @@ internal class GpuCheck(private val context: Context) {
 
     private fun key(gl: Boolean) = "${Build.FINGERPRINT}|${BuildConfig.VERSION_CODE}|${name(gl)}"
 
-    fun knownBad(gl: Boolean): Boolean = prefs.getString(key(gl), null) == "bad"
+    fun state(gl: Boolean): String? = prefs.getString(key(gl), null)
+
+    fun knownBad(gl: Boolean): Boolean = bad(state(gl))
 
     fun recover() {
         val record = prefs.getString(TRYING, null) ?: return
@@ -46,7 +48,7 @@ internal class GpuCheck(private val context: Context) {
         val edit = prefs.edit().remove(TRYING)
         if (strike == null) edit.remove(STRIKE) else edit.putString(STRIKE, strike)
         badGl?.let { gl ->
-            edit.putString(key(gl), "bad")
+            edit.putString(key(gl), CRASHED)
             Log.w("AMEngine", "the app closed while ${if (gl) "OpenGL" else "Vulkan"} was starting, so it is skipped from now on")
         }
         edit.commit()
@@ -58,7 +60,7 @@ internal class GpuCheck(private val context: Context) {
     }
 
     @Synchronized fun survived() {
-        if (backend == null && !prefs.contains(TRYING)) return
+        if (backend == null) return
         backend = null
         prefs.edit().remove(TRYING).remove(STRIKE).apply()
     }
@@ -105,8 +107,9 @@ internal class GpuCheck(private val context: Context) {
     internal data class Judged(val badGl: Boolean?, val strike: String?)
 
     companion object {
-        private const val TRYING = "trying"
-        private const val STRIKE = "strike"
+        private val TRYING = "trying.${BuildConfig.VERSION_CODE}"
+        private val STRIKE = "strike.${BuildConfig.VERSION_CODE}"
+        internal const val CRASHED = "crashed"
         private const val AWAY = "~"
         private val crashHandler = java.util.concurrent.atomic.AtomicBoolean()
 
@@ -119,6 +122,13 @@ internal class GpuCheck(private val context: Context) {
                 runCatching { if (prefs.getString(TRYING, null)?.substringBefore(':') == "${Process.myPid()}") prefs.edit().remove(TRYING).commit() }
                 previous?.uncaughtException(thread, error)
             }
+        }
+
+        private fun bad(state: String?) = state == "bad" || state == CRASHED
+
+        internal fun startOrder(preferGl: Boolean, gl: String?, vk: String?, risky: () -> Boolean): List<Boolean> {
+            val glFirst = gl != CRASHED && (preferGl || vk == CRASHED || !bad(gl) && (bad(vk) || risky()))
+            return if ((if (glFirst) vk else gl) == CRASHED) listOf(glFirst) else listOf(glFirst, !glFirst)
         }
 
         internal fun judge(record: String, reason: Int?, strike: String?): Judged {

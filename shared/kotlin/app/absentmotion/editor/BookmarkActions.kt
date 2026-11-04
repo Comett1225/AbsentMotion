@@ -36,6 +36,7 @@ suspend fun EditorState.markBeatsNote(context: Context): String = try {
 suspend fun EditorState.markBeats(context: Context): Int {
     val layer = selectedId?.let(scene::layer)?.takeIf { it.soundUri != null } ?: error(AppText.get(R.string.edit_beats_select_layer))
     val fps = scene.fps
+    val path = groupPath
     val alone = Scene(scene.node.copy(children = scene.node.children.filter { it.name !in Scene.LAYER_TAGS } +
         layer.node.with("hidden", null).let { it.copy(children = it.children.filterNot { c -> c.name == "gain" }) }))
     val mix = withContext(Dispatchers.IO) { OfflineMix.of(context, alone, Resampler.HIGH) } ?: error(AppText.get(R.string.edit_beats_no_sound))
@@ -49,6 +50,7 @@ suspend fun EditorState.markBeats(context: Context): Int {
     val first = scene.frameAt(layer.startTime)
     val last = scene.frameAt(layer.endTime)
     val frames = beats.map { (((layer.startTime + it) * fps / 1000.0).roundToInt()) }.filter { it in first..last }.distinct()
+    if (groupPath != path) return 0
     var added = 0
     edit { s ->
         val existing = s.bookmarks
