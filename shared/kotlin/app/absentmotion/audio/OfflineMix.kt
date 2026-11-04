@@ -122,11 +122,12 @@ internal class OfflineMix(
         fun audible(context: Context, scene: Scene): List<AudioClip> = AudioClip.of(scene).filter { hasSoundTrack(context, it.uri) }
 
         fun hasSoundTrack(context: Context, uri: String): Boolean {
+            val openable = runCatching { openableUri(uri) }.getOrNull() ?: return false
             val parsed = android.net.Uri.parse(uri)
             return soundTracks.getOrPut(uri + "\n" + app.absentmotion.media.fileVersion(context.contentResolver, parsed)) {
                 val extractor = android.media.MediaExtractor()
                 try {
-                    extractor.setDataSource(context.applicationContext, android.net.Uri.parse(openableUri(uri)), null)
+                    extractor.setDataSource(context.applicationContext, android.net.Uri.parse(openable), null)
                     (0 until extractor.trackCount).any { extractor.getTrackFormat(it).getString(android.media.MediaFormat.KEY_MIME)?.startsWith("audio/") == true }
                 } catch (e: Exception) { true } finally { extractor.release() }
             }

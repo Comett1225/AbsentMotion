@@ -368,7 +368,7 @@
       "macos": "works",
       "windows": "untested",
       "linux": "untested",
-      "note": "inspector header \u22ee button"
+      "note": "inspector header ⋮ button"
     },
     {
       "id": "menu.copy_paste",
@@ -1558,6 +1558,10 @@
       "desktop": "pc/src/standins/kotlin/app/absentmotion/ui/tutorial/DeskGrip.kt",
       "feature": "home.tutorial",
       "reason": "touch grip detector of the tutorial"
+    },
+    "app/absentmotion/engine/GpuCheck.kt": {
+      "desktop": null,
+      "reason": "chooses Vulkan or OpenGL on phones and survives driver crashes at start-up; the desktop engine has one GPU back end per system (Metal, Vulkan) with a CPU fallback"
     }
   }
 }

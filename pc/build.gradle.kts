@@ -75,11 +75,17 @@ val os = System.getProperty("os.name").lowercase()
 val isWindows = os.startsWith("windows")
 val isMac = os.startsWith("mac")
 val nativeName = when { isWindows -> "amdesktop.dll"; isMac -> "libamdesktop.dylib"; else -> "libamdesktop.so" }
+val target = providers.gradleProperty("target").orNull
+if (target != null && !(isMac && target == "macos-x64")) throw GradleException("-Ptarget=$target cannot be built on this system")
+val macX64 = target == "macos-x64"
+if (macX64 && System.getProperty("os.arch") != "x86_64") throw GradleException("-Ptarget=macos-x64 needs Gradle on an x86_64 JDK (arch -x86_64, JAVA_HOME = an x64 JDK 21)")
+val nativeDir = if (macX64) "native-x64" else "native"
+val bundledTools = if (macX64) listOf("ffmpeg", "ffprobe").associate { "am.$it" to file("build/$nativeDir/$it").absolutePath } else emptyMap()
 
 val nativeBuild = tasks.register<Exec>("nativeBuild") {
     when {
         isWindows -> commandLine("powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "../windows/build.ps1")
-        isMac -> commandLine("sh", "../macos/build.sh")
+        isMac -> commandLine(listOfNotNull("sh", "../macos/build.sh", "x64".takeIf { macX64 }))
         else -> commandLine("sh", "../linux/build.sh")
     }
 }
@@ -88,7 +94,8 @@ tasks.withType<JavaExec>().matching { it.name == "run" }.configureEach {
     dependsOn(nativeBuild)
     systemProperty("am.assets", file("../shared/assets").absolutePath)
     systemProperty("am.bgmodel", file("../android/src/foss/assets/absent_bg.abg").absolutePath)
-    systemProperty("am.native", file("build/native/$nativeName").absolutePath)
+    systemProperty("am.native", file("build/$nativeDir/$nativeName").absolutePath)
+    systemProperties(bundledTools)
     systemProperty("am.repo", file("..").absolutePath)
     systemProperty("skiko.data.path", file("build/skiko").absolutePath)
     systemProperty("apple.awt.application.name", "AbsentMotion")
@@ -110,6 +117,7 @@ compose.desktop {
             packageVersion = "5.0.0"
             jvmArgs += listOf("-XX:+UseZGC", "-XX:+ZGenerational", "-XX:MaxRAMPercentage=60", "-Dapple.awt.application.name=AbsentMotion")
             if (isMac) jvmArgs += "-XX:SharedArchiveFile=\$APPDIR/app.jsa"
+            if (macX64) jvmArgs += listOf("ffmpeg", "ffprobe").map { "-Dam.$it=\$APPDIR/resources/$it" }
             macOS {
                 bundleID = "app.absentmotion.desktop"
                 iconFile.set(file("../macos/AbsentMotion.icns"))
@@ -149,10 +157,18 @@ val prepareResources = tasks.register<Sync>("prepareResources") {
     from("../shared/assets") { into("assets") }
     from("../android/src/foss/assets/absent_bg.abg") { into("assets") }
     from("../shared/res") { into("res"); include("values*/strings.xml") }
-    from("build/native/$nativeName")
+    from("build/$nativeDir/$nativeName")
+    if (macX64) from("build/$nativeDir") { exclude(nativeName) }
     if (isWindows) from("build/native") { include("icudtl.dat", "av*.dll", "sw*.dll", "ffmpeg.exe", "ffprobe.exe", "ffmpeg-LICENSE.txt") }
 }
 tasks.matching { it.name == "createDistributable" || it.name.startsWith("prepareAppResources") }.configureEach { dependsOn(prepareResources) }
+if (macX64) tasks.matching { it.name == "createDistributable" }.configureEach {
+    doLast {
+        val app = layout.buildDirectory.dir("compose/binaries/main/app/AbsentMotion.app").get().asFile
+        listOf("ffmpeg", "ffprobe").forEach { check(app.resolve("Contents/app/resources/$it").setExecutable(true, false)) }
+        check(ProcessBuilder("codesign", "--force", "--deep", "-s", "-", app.path).inheritIO().start().waitFor() == 0)
+    }
+}
 
 val renderCheck = tasks.register<JavaExec>("renderCheck") {
     dependsOn(nativeBuild, tasks.named("classes"))
@@ -162,7 +178,8 @@ val renderCheck = tasks.register<JavaExec>("renderCheck") {
     systemProperty("java.awt.headless", "true")
     systemProperty("am.assets", file("../shared/assets").absolutePath)
     systemProperty("am.bgmodel", file("../android/src/foss/assets/absent_bg.abg").absolutePath)
-    systemProperty("am.native", file("build/native/$nativeName").absolutePath)
+    systemProperty("am.native", file("build/$nativeDir/$nativeName").absolutePath)
+    systemProperties(bundledTools)
     systemProperty("am.repo", file("..").absolutePath)
     systemProperty("am.output", file("build").absolutePath)
 }
@@ -175,7 +192,8 @@ val sceneCheck = tasks.register<JavaExec>("sceneCheck") {
     systemProperty("java.awt.headless", "true")
     systemProperty("am.assets", file("../shared/assets").absolutePath)
     systemProperty("am.bgmodel", file("../android/src/foss/assets/absent_bg.abg").absolutePath)
-    systemProperty("am.native", file("build/native/$nativeName").absolutePath)
+    systemProperty("am.native", file("build/$nativeDir/$nativeName").absolutePath)
+    systemProperties(bundledTools)
     systemProperty("am.repo", file("..").absolutePath)
     systemProperty("am.output", file("build").absolutePath)
 }
@@ -186,8 +204,9 @@ tasks.test {
     systemProperty("am.fontOffer", "off")
     systemProperty("am.data", layout.buildDirectory.dir("test-data").get().asFile.absolutePath)
     dependsOn(nativeBuild)
-    inputs.file(layout.buildDirectory.file("native/$nativeName"))
-    systemProperty("am.native", layout.buildDirectory.file("native/$nativeName").get().asFile.absolutePath)
+    inputs.file(layout.buildDirectory.file("$nativeDir/$nativeName"))
+    systemProperty("am.native", layout.buildDirectory.file("$nativeDir/$nativeName").get().asFile.absolutePath)
+    systemProperties(bundledTools)
     systemProperty("am.assets", file("../shared/assets").absolutePath)
     systemProperty("am.bgmodel", file("../android/src/foss/assets/absent_bg.abg").absolutePath)
     systemProperty("am.repo", file("..").absolutePath)
