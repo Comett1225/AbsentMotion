@@ -29,6 +29,7 @@ private suspend fun runFfmpeg(args: List<String>, spanUs: Long, progress: (Float
         if (process.waitFor() != 0) throw ExportError(txt(R.string.tools_engine_stopped))
     } finally {
         process.destroyForcibly()
+        process.waitFor(5, java.util.concurrent.TimeUnit.SECONDS)
     }
 }
 
@@ -37,7 +38,7 @@ suspend fun extractAudioOnDesktop(uri: String, job: AudioJob, durationUs: Long, 
     val coder = when {
         job.copy -> listOf("-c:a", "copy")
         job.mp3 -> listOf("-c:a", "libmp3lame".takeIf { it in DeskEncoders.available } ?: throw ExportError(txt(R.string.export_support_no_encoder, "MP3")), "-b:a", "${job.kbps}k")
-        else -> listOf("-c:a", DeskEncoders.audio(AudioCodec.Aac).firstOrNull() ?: "aac", "-b:a", "${job.kbps}k")
+        else -> listOf("-c:a", DeskEncoders.audio(AudioCodec.Aac, job.kbps).firstOrNull() ?: "aac", "-b:a", "${job.kbps}k")
     }
     runFfmpeg(listOf("-i", input.path, "-vn", "-map", "0:a:0") + coder + (if (job.mp3) emptyList() else listOf("-movflags", "+faststart")) + out.path, durationUs, progress)
 }

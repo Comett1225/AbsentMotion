@@ -120,7 +120,13 @@ compose.desktop {
                 fileAssociation("application/x-absentmotion-project", "amproj", "AbsentMotion project")
                 fileAssociation("text/xml", "xml", "AbsentMotion scene")
             }
+            if (isWindows) vendor = "AbsentMotion"
             windows {
+                iconFile.set(file("../windows/AbsentMotion.ico"))
+                perUserInstall = true
+                dirChooser = true
+                menu = true
+                shortcut = true
                 menuGroup = "AbsentMotion"
                 upgradeUuid = "5b0e7a52-3c1f-4d8e-9a6b-2f4c8d1e7a30"
                 fileAssociation("application/x-absentmotion-project", "absproj", "AbsentMotion project")
@@ -144,7 +150,7 @@ val prepareResources = tasks.register<Sync>("prepareResources") {
     from("../android/src/foss/assets/absent_bg.abg") { into("assets") }
     from("../shared/res") { into("res"); include("values*/strings.xml") }
     from("build/native/$nativeName")
-    if (isWindows) from("build/native/icudtl.dat")
+    if (isWindows) from("build/native") { include("icudtl.dat", "av*.dll", "sw*.dll", "ffmpeg.exe", "ffprobe.exe", "ffmpeg-LICENSE.txt") }
 }
 tasks.matching { it.name == "createDistributable" || it.name.startsWith("prepareAppResources") }.configureEach { dependsOn(prepareResources) }
 

@@ -25,7 +25,7 @@ internal suspend fun exportAudio(s: ExportSettings, totalUs: Long, mix: AudioMix
         AudioFormat.Wav16 -> listOf("-c:a", "pcm_s16le", "-f", "wav")
         AudioFormat.Wav24 -> listOf("-c:a", "pcm_s24le", "-f", "wav")
         AudioFormat.Flac -> listOf("-c:a", coder("flac", "FLAC"), "-compression_level", "5", "-f", "flac")
-        AudioFormat.M4a -> listOf("-c:a", DeskEncoders.audio(AudioCodec.Aac).firstOrNull() ?: coder("aac", AudioCodec.Aac.label)) + bitrate + listOf("-f", "ipod")
+        AudioFormat.M4a -> listOf("-c:a", DeskEncoders.audio(AudioCodec.Aac, s.audio.bitrateKbps).firstOrNull() ?: coder("aac", AudioCodec.Aac.label)) + bitrate + listOf("-f", "ipod")
         AudioFormat.Ogg -> listOf("-c:a", DeskEncoders.audio(AudioCodec.Opus).firstOrNull() ?: coder("libopus", AudioCodec.Opus.label)) + bitrate + listOf("-f", "ogg")
         AudioFormat.Mp3 -> listOf("-c:a", coder("libmp3lame", "MP3")) + bitrate + listOf("-f", "mp3")
     }

@@ -5,7 +5,11 @@ import java.nio.ByteBuffer
 
 object DesktopNative {
     init {
-        System.load(DesktopPlatform.nativeLibrary())
+        val library = java.io.File(DesktopPlatform.nativeLibrary())
+        if (DesktopPlatform.windows) listOf("avutil-", "swresample-", "swscale-", "avcodec-", "avformat-").forEach { prefix ->
+            library.parentFile?.listFiles { f -> f.name.startsWith(prefix) && f.name.endsWith(".dll") }?.firstOrNull()?.let { System.load(it.absolutePath) }
+        }
+        System.load(library.absolutePath)
     }
 
     external fun detectFaces(pixels: IntArray, width: Int, height: Int): FloatArray?

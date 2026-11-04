@@ -15,7 +15,7 @@ dependency is added, removed or upgraded, update this file in the same change.
 
 **Contents**
 
-1. Engine libraries (C and C++): Skia and the libraries it links, whisper.cpp and ggml, RNNoise, ncnn, glslang, the RIFE warp layer, LAME, and the video downloader add-on (CPython and yt-dlp, downloaded at run time)
+1. Engine libraries (C and C++): Skia and the libraries it links, whisper.cpp and ggml, RNNoise, ncnn, glslang, the RIFE warp layer, LAME, FFmpeg (Windows desktop app only), and the video downloader add-on (CPython and yt-dlp, downloaded at run time)
 2. Machine learning models: OpenAI Whisper weights, RIFE and Real-ESRGAN weights and the AI background removal 2.0 model (all downloaded at run time), the built-in background removal model
 3. Kotlin and Compose libraries
 4. Fonts, icons and effect thumbnails
@@ -209,6 +209,19 @@ together with Skia.
 - URL: https://lame.sourceforge.io/
 - Used in: MP3 audio export. LAME is built as its own shared library, `libmp3lame.so`, and loaded through a small
   separate library, `liblame_jni.so`, so it can be replaced with another build of LAME.
+
+### FFmpeg (Windows desktop app only)
+
+- Version: n9.0.2, the BtbN FFmpeg-Builds `win64-lgpl-shared-9.0` release of 2026-11-03 (`ffmpeg-n9.0-latest-win64-lgpl-shared-9.0.zip`,
+  SHA-256 `98d509064d806db369e99cedba5cbfeefff09da65b866f50127fa07f0e1802c5`), unchanged.
+- Licence: GNU Lesser General Public License, version 3 or later (the build uses `--enable-version3` and no GPL parts). The
+  licence text ships next to the libraries as `ffmpeg-LICENSE.txt`.
+- Copyright: Copyright (c) 2000-2026 the FFmpeg developers.
+- URL: https://ffmpeg.org/ and https://github.com/BtbN/FFmpeg-Builds
+- Used in: the Windows installer only. `amdesktop.dll` links the shared `avformat`, `avcodec`, `avutil`, `swresample` and
+  `swscale` DLLs for video decoding (D3D11 hardware decoding when available), and `ffmpeg.exe` and `ffprobe.exe` run export,
+  the Tools tab and media probing. The DLLs sit unchanged in the app folder, so they can be replaced with another build.
+  The Android app and the macOS build do not ship FFmpeg.
 
 ### Video downloader add-on (downloaded on request, not part of the app)
 

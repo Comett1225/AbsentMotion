@@ -22,7 +22,7 @@ suspend fun compressVideoOnDesktop(uri: String, job: VideoJob, audio: Boolean, d
     val encoder = DeskEncoders.video(Codec.H264).firstOrNull { DeskEncoders.works(it, settings, job.width, job.height) } ?: throw ExportError(txt(R.string.compress_failed, "no video encoder"))
     val args = DeskEncoders.videoArgs(encoder, settings, job.width, job.height).toMutableList()
     args[args.indexOf("-b:v") + 1] = "${job.bitrate}"
-    val sound = when { !audio || job.audioKbps <= 0 -> listOf("-an"); job.copyAudio -> listOf("-c:a", "copy"); else -> listOf("-c:a", DeskEncoders.audio(app.absentmotion.export.AudioCodec.Aac).firstOrNull() ?: "aac", "-b:a", "${job.audioKbps}k") }
+    val sound = when { !audio || job.audioKbps <= 0 -> listOf("-an"); job.copyAudio -> listOf("-c:a", "copy"); else -> listOf("-c:a", DeskEncoders.audio(app.absentmotion.export.AudioCodec.Aac, job.audioKbps).firstOrNull() ?: "aac", "-b:a", "${job.audioKbps}k") }
     val range = (if (startUs > 0) listOf("-ss", seconds(startUs)) else emptyList()) + listOf("-noautorotate", "-i", input.path) + (if (endUs > startUs) listOf("-t", seconds(endUs - startUs)) else emptyList())
     val command = listOf(DeskMedia.ffmpeg, "-y", "-v", "error", "-progress", "pipe:1", "-nostats") + range + listOf("-map", "0:v:0") +
         (if (audio) listOf("-map", "0:a:0?") else emptyList()) + listOf("-vf", "scale=${job.width}:${job.height},fps=${job.fps}") + args + sound + listOf("-movflags", "+faststart", out.path)
@@ -36,5 +36,6 @@ suspend fun compressVideoOnDesktop(uri: String, job: VideoJob, audio: Boolean, d
         if (process.waitFor() != 0) throw ExportError(txt(R.string.compress_failed, "ffmpeg"))
     } finally {
         process.destroyForcibly()
+        process.waitFor(5, java.util.concurrent.TimeUnit.SECONDS)
     }
 }

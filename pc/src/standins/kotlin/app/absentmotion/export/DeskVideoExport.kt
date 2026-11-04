@@ -96,8 +96,8 @@ internal object DeskEncoders {
         Codec.Apv -> listOf("liboapv")
     }.filter { it in available }
 
-    fun audio(codec: AudioCodec): List<String> = when (codec) {
-        AudioCodec.Aac -> listOf("aac_at", "aac")
+    fun audio(codec: AudioCodec, kbps: Int = 0): List<String> = when (codec) {
+        AudioCodec.Aac -> listOfNotNull("aac_at", "aac_mf".takeIf { kbps in 1..192 }, "aac")
         AudioCodec.Opus -> listOf("libopus", "opus")
     }.filter { it in available }
 
@@ -215,7 +215,7 @@ internal suspend fun exportVideo(
     try {
         if (audio != null && pcm != null) writePcm(audio, (scene.totalTime + 1) * 1000L, s.audio.effectiveRate, pcm)
         val sound = if (pcm == null) emptyList() else {
-            val coder = DeskEncoders.audio(s.audio.codec).firstOrNull() ?: throw ExportError(txt(R.string.export_support_no_encoder, s.audio.codec.label))
+            val coder = DeskEncoders.audio(s.audio.codec, s.audio.bitrateKbps).firstOrNull() ?: throw ExportError(txt(R.string.export_support_no_encoder, s.audio.codec.label))
             listOf("-map", "1:a", "-c:a", coder, "-b:a", "${s.audio.bitrateKbps}k", "-ar", "${s.audio.effectiveRate}", "-ac", "${s.audio.channels}")
         }
         val inputs = listOf("-f", "rawvideo", "-pix_fmt", "rgba", "-s", "${width}x$height", "-r", "${s.fps}", "-i", "-") +

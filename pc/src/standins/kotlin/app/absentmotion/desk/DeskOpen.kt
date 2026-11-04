@@ -67,7 +67,7 @@ object DeskInstance {
                     val client = runCatching { socket.accept() }.getOrNull() ?: break
                     runCatching {
                         client.soTimeout = 1500
-                        val lines = client.getInputStream().bufferedReader().readLines()
+                        val lines = client.getInputStream().bufferedReader().lineSequence().toList()
                         if (lines.firstOrNull() == token) {
                             onFiles(lines.drop(1).filter { it.isNotBlank() }.map(::File))
                             client.getOutputStream().write("ok\n".toByteArray())

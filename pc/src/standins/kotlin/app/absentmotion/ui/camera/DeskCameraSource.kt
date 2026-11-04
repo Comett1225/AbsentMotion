@@ -70,7 +70,7 @@ object DeskCameraSource {
     fun linuxDevices(sysfs: File = File("/sys/class/video4linux"), dev: File = File("/dev")): CameraDevices {
         val nodes = sysfs.listFiles { f -> f.name.startsWith("video") }.orEmpty().sortedBy { it.name.removePrefix("video").toIntOrNull() ?: Int.MAX_VALUE }
         val video = nodes.filter { node -> runCatching { node.resolve("index").readText().trim() == "0" }.getOrDefault(true) }.map { node ->
-            CameraDevice(File(dev, node.name).path, runCatching { node.resolve("name").readText().trim() }.getOrNull()?.takeIf { it.isNotEmpty() } ?: node.name)
+            CameraDevice(File(dev, node.name).invariantSeparatorsPath,runCatching { node.resolve("name").readText().trim() }.getOrNull()?.takeIf { it.isNotEmpty() } ?: node.name)
         }
         return CameraDevices(video, if (video.isEmpty()) emptyList() else listOf(CameraDevice("default", "Default microphone")))
     }

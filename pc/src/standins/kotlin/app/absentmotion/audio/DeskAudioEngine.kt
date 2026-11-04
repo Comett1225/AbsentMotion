@@ -194,7 +194,7 @@ class AudioEngine(context: Context) {
 
     private companion object {
         const val BLOCK = 512
-        const val PRIME = 2
+        val PRIME = if (app.absentmotion.desk.DeskOs.windows) 3 else 2
         const val FADE = 256
         const val AHEAD_MS = 1500.0
         const val BEHIND_MS = 300.0

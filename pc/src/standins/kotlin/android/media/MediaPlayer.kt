@@ -6,6 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import app.absentmotion.audio.DeskOutput
 import app.absentmotion.desk.DeskMedia
+import app.absentmotion.desk.DeskOs
 import app.absentmotion.desk.DeskProbe
 import java.io.File
 import javax.sound.sampled.AudioFormat
@@ -26,6 +27,7 @@ open class MediaPlayer {
     @Volatile private var released = false
     @Volatile private var runner: Runner? = null
     @Volatile private var positionMs = 0L
+    @Volatile private var warm: Playback? = null
 
     var isLooping = false
 
@@ -49,10 +51,11 @@ open class MediaPlayer {
         val source = file ?: throw IllegalStateException("No data source")
         Thread({
             val found = runCatching { DeskProbe.of(source) }.getOrNull()?.takeIf { it.streams.isNotEmpty() }
+            val ready = if (DeskOs.windows && found?.audio != null) runCatching { Playback.open(source, 0) }.getOrNull() else null
             main.post {
-                if (released) return@post
+                if (released) { ready?.close(); return@post }
                 if (found == null) { if (failed?.onError(this, MEDIA_ERROR_UNKNOWN, 0) != true) completed?.onCompletion(this) }
-                else { probe = found; prepared?.onPrepared(this) }
+                else { probe = found; warm?.close(); warm = ready; prepared?.onPrepared(this) }
             }
         }, "am-media-player").apply { isDaemon = true }.start()
     }
@@ -61,7 +64,8 @@ open class MediaPlayer {
         val p = probe ?: throw IllegalStateException("Not prepared")
         if (isPlaying) return
         if (duration in 0..positionMs) positionMs = 0
-        runner = Runner(file!!, p, positionMs).also { it.start() }
+        val ready = warm?.also { warm = null }?.takeIf { positionMs == 0L || run { it.close(); false } }
+        runner = Runner(file!!, p, positionMs, ready).also { it.start() }
     }
 
     fun pause() { positionMs = halt() }
@@ -76,11 +80,13 @@ open class MediaPlayer {
         if (playing) start()
     }
 
-    fun reset() { halt(); positionMs = 0; probe = null; file = null }
+    fun reset() { halt(); warm?.close(); warm = null; positionMs = 0; probe = null; file = null }
 
     fun release() {
         released = true
         halt()
+        warm?.close()
+        warm = null
     }
 
     private fun halt(): Long {
@@ -96,7 +102,23 @@ open class MediaPlayer {
         if (isLooping) start() else completed?.onCompletion(this)
     }
 
-    private inner class Runner(private val source: File, private val probe: DeskProbe, private val fromMs: Long) : Thread("am-media-player") {
+    private class Playback(val process: Process, val line: SourceDataLine) {
+        fun close() { process.destroy(); runCatching { line.close() } }
+
+        companion object {
+            fun open(source: File, fromMs: Long): Playback {
+                val rate = DeskOutput.nativeRate
+                val command = listOf(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-ss", "%.3f".format(java.util.Locale.ROOT, fromMs / 1000.0), "-i", source.path,
+                    "-map", "0:a:0", "-vn", "-ar", "$rate", "-ac", "2", "-f", "s16le", "-")
+                val started = ProcessBuilder(command).redirectError(ProcessBuilder.Redirect.DISCARD).start()
+                val format = AudioFormat(rate.toFloat(), 16, 2, true, false)
+                val line = runCatching { AudioSystem.getSourceDataLine(format).apply { open(format, rate * 100 / 1000 * 4) } }.getOrElse { started.destroy(); throw it }
+                return Playback(started, line)
+            }
+        }
+    }
+
+    private inner class Runner(private val source: File, private val probe: DeskProbe, private val fromMs: Long, private val ready: Playback? = null) : Thread("am-media-player") {
         @Volatile var done = false
         @Volatile private var line: SourceDataLine? = null
         @Volatile private var process: Process? = null
@@ -122,6 +144,7 @@ open class MediaPlayer {
             try {
                 began = System.nanoTime()
                 if (probe.audio == null) {
+                    ready?.close()
                     while (!done && positionMs() < probe.durationUs / 1000) sleep(10)
                 } else play()
             } catch (_: InterruptedException) {
@@ -134,13 +157,11 @@ open class MediaPlayer {
         }
 
         private fun play() {
-            val command = listOf(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-ss", "%.3f".format(java.util.Locale.ROOT, fromMs / 1000.0), "-i", source.path,
-                "-map", "0:a:0", "-vn", "-ar", "$rate", "-ac", "2", "-f", "s16le", "-")
-            val started = ProcessBuilder(command).redirectError(ProcessBuilder.Redirect.DISCARD).start()
+            val playback = ready ?: Playback.open(source, fromMs)
+            val started = playback.process
             process = started
             val input = started.inputStream.buffered(1 shl 16)
-            val format = AudioFormat(rate.toFloat(), 16, 2, true, false)
-            val out = AudioSystem.getSourceDataLine(format).apply { open(format, rate * 100 / 1000 * 4) }
+            val out = playback.line
             line = out
             val buf = ByteArray(4096)
             while (!done) {
