@@ -9,7 +9,7 @@ for arg in "$@"; do
     case "$arg" in
         --quick) mode=quick ;;
         --full) mode=full ;;
-        *) echo "usage: tools/check.sh [--quick|--full]   (quick: one flavour; full: all flavours, lint, API floor)" >&2; exit 2 ;;
+        *) echo "usage: tools/check.sh [--quick|--full]   (quick: one flavour, desktop compile; full: all flavours, lint, API floor, desktop tests)" >&2; exit 2 ;;
     esac
 done
 failed=0
@@ -111,6 +111,14 @@ else
         python3 tools/apk_check.py --libraries "$libs" >"$dir/page-size-compat32.log" 2>&1 || { cat "$dir/page-size-compat32.log" >&2; fail "a 32-bit compat native library is not aligned for its memory pages"; }
         cat "$dir/page-size-compat32.log"
     fi
+fi
+
+if [ "$mode" = quick ]; then
+    printf '\n== Desktop: compile\n'
+    (cd pc && ./gradlew compileKotlin compileTestKotlin -q) >"$dir/desktop.log" 2>&1 || { grep -E '^e: |error:' "$dir/desktop.log" | head -40 >&2; fail "desktop compile (full output: $dir/desktop.log)"; }
+else
+    printf '\n== Desktop: compile and tests\n'
+    (cd pc && ./gradlew test -q) >"$dir/desktop.log" 2>&1 || { grep -E '^e: |error:|FAILED|Test.*>' "$dir/desktop.log" | head -40 >&2; fail "desktop compile or tests (full output: $dir/desktop.log)"; }
 fi
 
 wait
