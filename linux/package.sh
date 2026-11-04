@@ -19,7 +19,11 @@ DEB="$(ls "$BINARIES"/deb/*.deb)"
 dpkg-deb -R "$DEB" "$WORK/deb"
 sed -i -e "s/^Depends:.*/Depends: $DEPENDS\nRecommends: $RECOMMENDS/" "$WORK/deb/DEBIAN/control"
 sed -i -e 's|^xdg-[a-z-]* .*|& \|\| true|' "$WORK/deb/DEBIAN/postinst" "$WORK/deb/DEBIAN/prerm"
-sed -i -e 's|^Exec=.*|& %F|' "$WORK"/deb/opt/absentmotion/lib/*.desktop
+DESKTOP="$(basename "$WORK"/deb/opt/absentmotion/lib/*.desktop)"
+MENU="/usr/share/applications/$DESKTOP"
+sed -i -e "/^xdg-desktop-menu install /a [ -e $MENU ] || { install -D -m 644 /opt/absentmotion/lib/$DESKTOP $MENU \&\& { update-desktop-database -q /usr/share/applications || true; }; }" "$WORK/deb/DEBIAN/postinst"
+sed -i -e "/^xdg-desktop-menu uninstall /a rm -f $MENU" "$WORK/deb/DEBIAN/prerm"
+sed -i -e 's|^Exec=.*|& %F|' -e 's|^MimeType=.*|MimeType=application/x-absentmotion-project;|' "$WORK"/deb/opt/absentmotion/lib/*.desktop
 sed -i -e '/<mime-type type="text\/xml">/,/<\/mime-type>/d' "$WORK"/deb/opt/absentmotion/lib/*-MimeInfo.xml
 chmod 755 "$WORK/deb/opt/absentmotion/lib/app/resources/ffmpeg" "$WORK/deb/opt/absentmotion/lib/app/resources/ffprobe"
 dpkg-deb --root-owner-group -Zxz -b "$WORK/deb" "$OUT/AbsentMotion-$VERSION-linux-$ARCH.deb"
