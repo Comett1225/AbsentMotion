@@ -383,15 +383,17 @@ private fun EffectColor(state: EditorState, param: EffectParam, raw: String, ena
                 }
             }, color = Am.OnDark, fontSize = deskSp(10f), textAlign = TextAlign.Center)
         }
-        Presence(expanded) { MenuPopup(DropOrRise, { expanded = false }) {
+        val rose = remember(param.id) { mutableStateOf(false) }
+        val side = remember(rose) { app.absentmotion.ui.editor.DropOrRiseSide(rose) }
+        Presence(expanded) { MenuPopup(side, { expanded = false }) {
             val swatches = listOf(0xFF4444,0xF4B446,0xFAE965,0x1ED91E,0x17E1E1,0x3D4CF5,0xDD44DD,0xFFFFFF,0xBEBEBE,0x888888,0x444444,0x000000,0x5EB7D9,0x98C99C)
             @Composable fun Swatches(colours: List<Int>) = colours.chunked(7).forEach { row -> Row(Modifier.fillMaxWidth().height(32.dp).padding(3.dp), Arrangement.spacedBy(2.dp)) {
                 row.forEach { rgb -> Box(Modifier.width(30.dp).fillMaxHeight().background(Color(rgb or 0xFF000000.toInt())).clickable(enabled = enabled) { set(formatColor(rgb or 0xFF000000.toInt())); expanded = false }) }
             } }
-            Swatches(swatches)
             val palettes = rememberPaletteLibrary()
-            PaletteChip(palettes.chosen, Am.OnDark, Modifier.fillMaxWidth().height(36.dp).padding(3.dp)) { expanded = false; library = true }
-            Column(Modifier.heightIn(max = 160.dp).deskVerticalScroll()) { Swatches(palettes.swatches(state.settings.savedColours)) }
+            val chip = @Composable { PaletteChip(palettes.chosen, Am.OnDark, Modifier.fillMaxWidth().height(36.dp).padding(3.dp)) { expanded = false; library = true } }
+            val own = @Composable { Column(Modifier.heightIn(max = 160.dp).deskVerticalScroll()) { Swatches(palettes.swatches(state.settings.savedColours)) } }
+            if (rose.value) { own(); chip(); Swatches(swatches) } else { Swatches(swatches); chip(); own() }
         } }
     }
 }

@@ -250,6 +250,15 @@ internal object DropOrRise : PopupPositionProvider {
     )
 }
 
+internal class DropOrRiseSide(private val rose: androidx.compose.runtime.MutableState<Boolean>) : PopupPositionProvider {
+    override fun calculatePosition(anchorBounds: IntRect, windowSize: IntSize, layoutDirection: LayoutDirection, popupContentSize: IntSize): IntOffset {
+        val drop = anchorBounds.bottom + popupContentSize.height <= windowSize.height
+        if (rose.value == drop) rose.value = !drop
+        return IntOffset((anchorBounds.right - popupContentSize.width).coerceAtLeast(0),
+            if (drop) anchorBounds.bottom else (anchorBounds.top - popupContentSize.height).coerceAtLeast(0))
+    }
+}
+
 internal object AboveLeft : PopupPositionProvider {
     override fun calculatePosition(anchorBounds: IntRect, windowSize: IntSize, layoutDirection: LayoutDirection, popupContentSize: IntSize) =
         IntOffset(0, anchorBounds.top - popupContentSize.height)
