@@ -169,6 +169,7 @@ val prepareResources = tasks.register<Sync>("prepareResources") {
     if (isWindows) from("build/native") { include("icudtl.dat", "av*.dll", "sw*.dll", "ffmpeg.exe", "ffprobe.exe", "ffmpeg-LICENSE.txt") }
 }
 tasks.matching { it.name == "createDistributable" || it.name.startsWith("prepareAppResources") }.configureEach { dependsOn(prepareResources) }
+tasks.matching { Regex("create(Release)?Distributable|package(Release)?(Dmg|Msi|Deb|Exe|Pkg|Rpm)").matches(it.name) }.configureEach { outputs.upToDateWhen { false } }
 tasks.matching { it.name == "createRuntimeImage" }.configureEach { inputs.property("javaHome", System.getProperty("java.home")) }
 if (macArch != null) tasks.matching { it.name == "createDistributable" }.configureEach {
     doLast {
@@ -217,6 +218,7 @@ tasks.test {
     systemProperty("user.home", layout.buildDirectory.dir("test-home").get().asFile.absolutePath)
     systemProperty("am.onboarding", "done")
     systemProperty("am.fontOffer", "off")
+    systemProperty("am.shell", "off")
     systemProperty("am.data", layout.buildDirectory.dir("test-data").get().asFile.absolutePath)
     dependsOn(nativeBuild)
     inputs.file(layout.buildDirectory.file("$nativeDir/$nativeName"))

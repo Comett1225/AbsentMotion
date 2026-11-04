@@ -30,10 +30,11 @@ object DeskOs {
         }.map(::File).firstOrNull { it.isFile }
     }
 
-    private fun userFolder(name: String): String? = if (!linux) null else runCatching {
+    private val shell = System.getProperty("am.shell") != "off"
+    private fun userFolder(name: String): String? = if (!linux || System.getenv("HOME")?.let { File(it) != home } == true) null else runCatching {
         val process = ProcessBuilder("xdg-user-dir", name).redirectError(ProcessBuilder.Redirect.DISCARD).start()
         val dir = File(process.inputStream.bufferedReader().readText().trim())
-        if (process.waitFor() != 0 || !dir.isAbsolute || dir == home || dir.path == System.getenv("HOME")) null else if (dir.startsWith(home)) dir.relativeTo(home).path else dir.path
+        if (process.waitFor() != 0 || !dir.isAbsolute || dir == home) null else if (dir.startsWith(home)) dir.relativeTo(home).path else dir.path
     }.getOrNull()
 
     internal fun showItemsCommand(file: File): List<String> = listOf("dbus-send", "--session", "--print-reply", "--reply-timeout=5000", "--dest=org.freedesktop.FileManager1",
@@ -53,10 +54,10 @@ object DeskOs {
 
     fun openCameraSettings() { cameraSettingsCommand(mac, windows)?.let { command -> runCatching { ProcessBuilder(command).start() } } }
 
-    fun open(file: File): Boolean = runCatching { ProcessBuilder(openCommand(mac, windows, file.absolutePath)).start(); true }.getOrDefault(false)
+    fun open(file: File): Boolean = !shell || runCatching { ProcessBuilder(openCommand(mac, windows, file.absolutePath)).start(); true }.getOrDefault(false)
 
     fun reveal(file: File) {
-        runCatching {
+        if (shell) runCatching {
             when {
                 mac -> ProcessBuilder("open", "-R", file.absolutePath).start()
                 windows -> ProcessBuilder("explorer.exe", "/select,", file.absolutePath).start()

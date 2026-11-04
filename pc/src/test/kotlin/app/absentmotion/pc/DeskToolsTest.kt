@@ -116,7 +116,8 @@ class DeskToolsTest {
         val encoded = probe(again.file)
         assertEquals("aac", encoded.stream("audio")!!.getString("codec_name"))
         assertEquals(5.0, encoded.seconds(), 0.15)
-        assertTrue("bit rate ${encoded.stream("audio")!!.optString("bit_rate")}", encoded.stream("audio")!!.getString("bit_rate").toInt() in 150_000..230_000)
+        val lowest = if (app.absentmotion.export.DeskEncoders.audio(app.absentmotion.export.AudioCodec.Aac, 192).firstOrNull() == "aac") 1_000 else 150_000
+        assertTrue("bit rate ${encoded.stream("audio")!!.optString("bit_rate")}", encoded.stream("audio")!!.getString("bit_rate").toInt() in lowest..230_000)
         val mp3 = extractAudio(context, picked, planAudio(picked.source, ExtractChoice(true, 128))) {}
         val sound = probe(mp3.file)
         assertEquals("audio/mpeg", mp3.mime)

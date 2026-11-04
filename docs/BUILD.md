@@ -250,8 +250,8 @@ The native library links libstdc++ statically and `linux/native/glibc_compat.c` 
 `fmod` and `arc4random` that Ubuntu 24.04's headers pick to older glibc symbols, so the build needs only glibc 2.35 (Ubuntu
 22.04, Debian 12 or newer). `linux/package.sh` writes `pc/build/linux-release/AbsentMotion-<version>-linux-<arm64|x86_64>.deb`
 and `.AppImage` (`linux/README.md` lists what it changes in the Compose `.deb`). The `.deb` installs to `/opt/absentmotion`
-with a menu entry and the `.absproj` file type. Compose sometimes keeps an old `createDistributable` and `.deb` after only the
-native library changed; delete `pc/build/compose/binaries` before packaging a release.
+with a menu entry and the `.absproj` file type. The packaging tasks always run again, because Compose does not notice
+when only the native library changed.
 
 Tests: run them as a normal user (as root the read-only-folder test cannot make saving fail) with `pc/build` on a file system
 that honours folder permissions (a Docker Desktop bind mount does not; a `tmpfs` mount on `pc/build/save-failed-data` does).
