@@ -8,7 +8,7 @@ case "$(uname -m)" in
     *) echo "linux/package.sh: unsupported machine $(uname -m)" >&2; exit 1 ;;
 esac
 DEPENDS="libc6 (>= 2.35), libstdc++6, libgcc-s1, libasound2, libfontconfig1, libfreetype6, libgl1, libx11-6, libxext6, libxi6, libxrender1, libxtst6, zlib1g, xdg-utils"
-RECOMMENDS="libvulkan1, libva2, libva-drm2, libva-x11-2, libdrm2, xdg-user-dirs"
+RECOMMENDS="libvulkan1, libva2, libva-drm2, libva-x11-2, libdrm2, xdg-user-dirs, fonts-noto-cjk"
 BINARIES="$ROOT/pc/build/compose/binaries/main"
 OUT="$ROOT/pc/build/linux-release"
 WORK="$ROOT/pc/build/linux-package"

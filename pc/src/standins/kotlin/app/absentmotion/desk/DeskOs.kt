@@ -33,7 +33,7 @@ object DeskOs {
     private fun userFolder(name: String): String? = if (!linux) null else runCatching {
         val process = ProcessBuilder("xdg-user-dir", name).redirectError(ProcessBuilder.Redirect.DISCARD).start()
         val dir = File(process.inputStream.bufferedReader().readText().trim())
-        if (process.waitFor() != 0 || !dir.isAbsolute || dir == home) null else if (dir.startsWith(home)) dir.relativeTo(home).path else dir.path
+        if (process.waitFor() != 0 || !dir.isAbsolute || dir == home || dir.path == System.getenv("HOME")) null else if (dir.startsWith(home)) dir.relativeTo(home).path else dir.path
     }.getOrNull()
 
     internal fun showItemsCommand(file: File): List<String> = listOf("dbus-send", "--session", "--print-reply", "--reply-timeout=5000", "--dest=org.freedesktop.FileManager1",

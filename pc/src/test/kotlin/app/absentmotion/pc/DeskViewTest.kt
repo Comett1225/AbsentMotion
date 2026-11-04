@@ -72,4 +72,31 @@ class DeskViewTest {
             }
         }
     }
+
+    @Test fun middleDragOverASelectedLayerOnlyMovesThePreview() {
+        System.setProperty("am.data", File("build/view-test-pan-selected").also { it.deleteRecursively(); it.mkdirs() }.absolutePath)
+        runSkikoComposeUiTest(size = Size(1280f, 800f)) {
+            val app = DeskAppState()
+            open(app)
+            val editor = app.editor!!
+            fun saved() = editor.scene.toXml().replace(Regex("modifiedTime=\"\\d+\""), "")
+            runOnIdle { editor.selectedId = editor.scene.layers.first { it.label == "Circle" }.id }
+            mainClock.advanceTimeBy(300)
+            val bounds = DeskPreviewBounds.bounds
+            val start = Offset((bounds.left + bounds.right) / 2, (bounds.top + bounds.bottom) / 2)
+            val panBefore = editor.canvasPan
+            val sceneBefore = saved()
+            onRoot().performMouseInput {
+                moveTo(start); press(MouseButton.Tertiary)
+                moveTo(start + Offset(40f, 20f)); moveTo(start + Offset(80f, 40f))
+                release(MouseButton.Tertiary)
+            }
+            mainClock.advanceTimeBy(300)
+            runOnIdle {
+                val moved = editor.canvasPan - panBefore
+                assertTrue("pan moved $moved", moved.x > 0f && moved.y > 0f)
+                assertEquals(sceneBefore, saved())
+            }
+        }
+    }
 }

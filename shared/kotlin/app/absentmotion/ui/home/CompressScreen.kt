@@ -338,7 +338,7 @@ private fun CompressBar(
             when (step) {
                 is Step.Running -> BigButton(stringResource(R.string.cancel), Modifier.weight(1f), primary = false, onClick = onCancel)
                 is Step.Done -> {
-                    BigButton(stringResource(if (step.saved) R.string.compress_saved else R.string.compress_save), Modifier.weight(1f).fillMaxHeight(), HomeIcons.Download, enabled = !step.saved) { onSave(step) }
+                    BigButton(stringResource(if (step.saved) R.string.compress_saved else if (app.absentmotion.platform.PlatformFeatures.desktop) R.string.tools_save else R.string.compress_save), Modifier.weight(1f).fillMaxHeight(), HomeIcons.Download, enabled = !step.saved) { onSave(step) }
                     BigButton(stringResource(R.string.compress_share), Modifier.weight(1f).fillMaxHeight(), ExportIcons.Share, primary = false) { onShare(step) }
                 }
                 else -> BigButton(stringResource(R.string.compress_start), Modifier.weight(1f), HomeIcons.Compress, enabled = picked != null && estimate != null, onClick = onStart)
