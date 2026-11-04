@@ -1,3 +1,4 @@
+import math
 import subprocess
 import sys
 from pathlib import Path
@@ -110,6 +111,85 @@ def mixing():
     assert share(blues(render('cloud_piece', CAMERA + plane + cloud, (900,), PIECE)[0]), overlap) > 0.2, 'by piece, far particles go behind the plane'
 
 
+def eye(tilt=(0, 0), roll=0, distance=277.13, target=(160, 160, 0)):
+    tx, ty = (math.radians(a) for a in tilt)
+    back = (-math.sin(ty) * math.cos(tx) * distance, math.sin(tx) * distance, math.cos(ty) * math.cos(tx) * distance)
+    where = ','.join('%.4f' % (t - b) for t, b in zip(target, back))
+    return ('<camera id="9" startTime="0" endTime="1000"><transform><location value="' + where + '"/><tilt value="%g,%g"/>' % tilt
+            + '<rotation value="%g"/></transform></camera>' % roll)
+
+
+def seen(tilt=(0, 0), roll=0, distance=277.13, point=(160, 160, 0), target=(160, 160, 0)):
+    tx, ty, r = math.radians(tilt[0]), math.radians(tilt[1]), math.radians(-roll)
+    back = (-math.sin(ty) * math.cos(tx) * distance, math.sin(tx) * distance, math.cos(ty) * math.cos(tx) * distance)
+    x, y, z = (p - t + b for p, t, b in zip(point, target, back))
+    x, y = x * math.cos(r) - y * math.sin(r), x * math.sin(r) + y * math.cos(r)
+    x, z = x * math.cos(ty) + z * math.sin(ty), -x * math.sin(ty) + z * math.cos(ty)
+    y, z = y * math.cos(tx) - z * math.sin(tx), y * math.sin(tx) + z * math.cos(tx)
+    return 160 + 277.13 * x / z, 160 + 277.13 * y / z
+
+
+def colour(frame, at):
+    x, y = (int(round(v)) for v in at)
+    return [sorted(frame[((y + dy) * 320 + x + dx) * 4 + c] for dx in (-1, 0, 1) for dy in (-1, 0, 1))[4] for c in range(3)]
+
+
+def layer(i, color, effect='', location='160,160,0', tilt='', extra=''):
+    return ('<shape id="' + str(i) + '" label="p" startTime="0" endTime="1000" fillType="color" s=".rect"' + extra
+            + '><transform><location value="' + location + '"/>' + tilt + '</transform><fillColor value="' + color + '"/>'
+            + '<property name="size" type="vec2" value="55,45"/>' + effect + '</shape>')
+
+
+def lamp(kind, location='160,160,-200', tilt='0,0', falloff=0):
+    return ('<light id="7" type="' + kind + '" startTime="0" endTime="1000"><transform><location value="' + location + '"/><tilt value="' + tilt
+            + '"/></transform><property name="intensity" type="float" value="1"/><property name="falloff" type="float" value="' + str(falloff) + '"/></light>')
+
+
+def iou(a, b):
+    return len(a & b) / max(1, len(a | b))
+
+
+def turning():
+    still = dict(progress=0.5, force=0, gravity=0, spin=0, depthPush=0, thickness=0)
+    flat = dict(shape=2, size=1, scatter=0, spin=0, depth=1, spacing=6)
+    for name, tilt in (('tilted', (12, -10)), ('orbit', (20, 40))):
+        cam = eye(tilt)
+        beside = layer(2, BLUE, location='60,60,40', extra=' threeD="true"')
+        plane = render('plane_' + name, cam + beside + layer(1, RED, extra=' threeD="true"'), extra=DEPTH)[0]
+        for kind, effect in (('fracture', fx('fracture3d', progress=0, pieces=60)), ('scatter', fx('scatter3d', **flat))):
+            got = render(kind + '_' + name, cam + beside + layer(1, RED, effect), extra=DEPTH)[0]
+            overlap = iou(reds(got), reds(plane))
+            assert overlap > 0.98, '%s pieces must turn with a 3D plane under a %s camera (%.3f)' % (kind, name, overlap)
+            assert blues(got) == blues(plane), 'the plane beside the %s must not change' % kind
+    cam = eye((0, 40))
+    wall = layer(2, BLUE, extra=' threeD="true"')
+    pieces = cam + layer(1, RED, fx('fracture3d', progress=0, pieces=60))
+    overlap = reds(render('tilt_alone', pieces, extra=PIECE)[0]) & blues(render('tilt_wall', cam + wall, extra=PIECE)[0])
+    mixed = reds(render('tilt_mix', pieces + wall, extra=PIECE)[0])
+    middle = sorted(i % 320 for i in overlap)[len(overlap) // 2]
+    near = {i for i in overlap if i % 320 > middle + 15}
+    far = {i for i in overlap if i % 320 < middle - 15}
+    assert share(mixed, near) > 0.9 and share(mixed, far) < 0.1, 'by piece, the half of a tilted plane nearer the turned camera is in front of the wall'
+    white = '#ffffffff'
+    turned = layer(1, white, fx('fracture3d', **still, pieces=30, intensity=0.5), tilt='<tilt value="35,-25"/>')
+    squares = layer(1, white, fx('scatter3d', **flat), tilt='<tilt value="35,-25"/>')
+    sun = lamp('directional', tilt='-10,-30')
+    point = (175, 150, 0)
+    for what, body in (('fracture, own light', turned), ('fracture, light layer', sun + turned), ('scatter, light layer', sun + squares)):
+        base = colour(render('roll0', eye() + body, extra=DEPTH)[0], seen(point=point))
+        for roll in (50, -120):
+            got = colour(render('roll', eye(roll=roll) + body, extra=DEPTH)[0], seen(roll=roll, point=point))
+            assert max(abs(a - b) for a, b in zip(base, got)) <= 3, '%s: rolling the camera %d must not change the shading %s %s' % (what, roll, base, got)
+        got = colour(render('orbit', eye((20, 40)) + body, extra=DEPTH)[0], seen((20, 40), point=point))
+        assert max(abs(a - b) for a, b in zip(base, got)) <= 3, '%s: orbiting the camera must not change the shading %s %s' % (what, base, got)
+    near = lamp('point', '200,120,-60', falloff=60) + layer(1, white, fx('fracture3d', **still, pieces=30))
+    point = (190, 140, 0)
+    base = colour(render('zoom0', eye() + near, extra=DEPTH)[0], seen(point=point))
+    for distance in (180, 400):
+        got = colour(render('zoom', eye(distance=distance) + near, extra=DEPTH)[0], seen(distance=distance, point=point))
+        assert max(abs(a - b) for a, b in zip(base, got)) <= 3, 'zooming the camera to %d must not change point-light shading %s %s' % (distance, base, got)
+
+
 def main():
     WORK.mkdir(parents=True, exist_ok=True)
     subprocess.run(['sh', str(ROOT / 'tools/render_bench/build.sh')], check=True, stdout=subprocess.DEVNULL)
@@ -149,6 +229,7 @@ def main():
     words = render('text', text)[0]
     assert different(words, render('empty', '')[0]) > 100, 'text must produce visible shards'
     mixing()
+    turning()
     print('pieces3d_check: passed')
 
 

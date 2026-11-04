@@ -211,6 +211,13 @@ struct LightSet {
     int count = 0;
 };
 
+struct PieceView {
+    SkV3 origin;
+    float unit = 1;
+    SkM44 turn, lens;
+    bool tilted = false;
+};
+
 LightSet SceneLights(const std::vector<Layer>& layers, double timeMs);
 SkV3 Illuminate(const LightSet& lights, SkV3 normal, SkV3 position);
 
@@ -291,6 +298,7 @@ bool CameraFrame(const std::vector<Layer>& layers, const Layer& camera, int widt
 bool SeeLayers(const std::vector<Layer>& layers, int width, int height, bool top, int fps, double timeMs, bool depthOrder, std::vector<Layer>* seen,
                bool pieces = false);
 bool SeenPlacement(const Layer& layer, double timeMs, Placement* placement);
+void SeenPieces(const Layer& layer, double timeMs, SkPoint center, const SkM44& orientation, PieceView* view);
 float DepthPerPixel(const Layer& layer, double timeMs);
 SkMatrix WorldMatrix(const Scene& scene, const Layer& layer, double timeMs);
 int64_t TopLayerAt(const Scene& scene, double timeMs, float x, float y, const MediaPictures& masks);

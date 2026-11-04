@@ -44,13 +44,25 @@ struct Mesh {
     SkPoint center;
     float distance;
     bool textured;
+    const SkM44* lens = nullptr;
     float depthKey = 0;
 
+    float key(V p) const { return lens ? lens->map(p.x, p.y, p.z, 1).z : p.z; }
+    bool project(V p, SkPoint* out) const {
+        if (lens) {
+            const SkV4 h = lens->map(p.x, p.y, p.z, 1);
+            if (!(h.z >= 1 && h.w > 0)) return false;
+            *out = {h.x / h.w, h.y / h.w};
+        } else {
+            if (p.z <= -distance * 0.95f) return false;
+            const float s = distance / (distance + p.z);
+            *out = {center.x() + p.x * s, center.y() + p.y * s};
+        }
+        return out->isFinite();
+    }
     void add(Vertex a, Vertex b, Vertex c) {
-        if (a.p.z <= -distance * 0.95f || b.p.z <= -distance * 0.95f || c.p.z <= -distance * 0.95f) return;
-        const auto project = [&](V p) { const float s = distance / (distance + p.z); return SkPoint{center.x() + p.x * s, center.y() + p.y * s}; };
-        const SkPoint pa = project(a.p), pb = project(b.p), pc = project(c.p);
-        if (!pa.isFinite() || !pb.isFinite() || !pc.isFinite()) return;
+        SkPoint pa, pb, pc;
+        if (!project(a.p, &pa) || !project(b.p, &pb) || !project(c.p, &pc)) return;
         triangles.push_back({{pa, pb, pc}, {a.uv, b.uv, c.uv}, {a.color, b.color, c.color}, depthKey});
     }
     void quad(Vertex a, Vertex b, Vertex c, Vertex d) { add(a, b, c); add(a, c, d); }
@@ -63,7 +75,7 @@ struct Mesh {
             paint.setAntiAlias(true);
             if (textured && image) paint.setShader(image->makeShader(SkTileMode::kClamp, SkTileMode::kClamp, SkSamplingOptions(SkFilterMode::kLinear)));
             const int source = pass->add(canvas->getTotalMatrix(), pass->styled(paint));
-            for (const Tri& t : triangles) pass->triangle(source, t.p.data(), textured ? t.uv.data() : nullptr, t.color.data(), pass->at(t.z));
+            for (const Tri& t : triangles) pass->triangle(source, t.p.data(), textured ? t.uv.data() : nullptr, t.color.data(), lens ? t.z : pass->at(t.z));
             return;
         }
         SkVertices::Builder builder(SkVertices::kTriangles_VertexMode, (int)triangles.size() * 3, 0,
@@ -87,9 +99,11 @@ SkColor shade(SkColor c, float light, float alpha = 1) {
     return SkColorSetARGB((int)(SkColorGetA(c) * std::clamp(alpha, 0.0f, 1.0f)), channel(SkColorGetR(c)), channel(SkColorGetG(c)), channel(SkColorGetB(c)));
 }
 
-SkColor shadeWithLights(SkColor c, float fallback, const LightSet& lights, SkV3 origin, V normal, V position, float alpha = 1) {
+SkColor shadeWithLights(SkColor c, float fallback, const LightSet& lights, const PieceView& view, V normal, V position, float alpha = 1) {
     if (!lights.count) return shade(c, fallback, alpha);
-    const SkV3 lit = Illuminate(lights, {normal.x, normal.y, normal.z}, {origin.x + position.x, origin.y + position.y, origin.z + position.z});
+    const bool turned = view.turn != SkM44();
+    const V n = turned ? map(view.turn, normal) : normal, at = turned ? map(view.turn, position * view.unit) : position * view.unit;
+    const SkV3 lit = Illuminate(lights, {n.x, n.y, n.z}, {view.origin.x + at.x, view.origin.y + at.y, view.origin.z + at.z});
     const auto channel = [](int value, float intensity) { return (int)std::clamp(std::round(value * intensity), 0.0f, 255.0f); };
     return SkColorSetARGB((int)(SkColorGetA(c) * std::clamp(alpha, 0.0f, 1.0f)), channel(SkColorGetR(c), lit.x), channel(SkColorGetG(c), lit.y), channel(SkColorGetB(c), lit.z));
 }
@@ -101,11 +115,13 @@ SkColor sample(const std::vector<unsigned char>& pixels, int w, int h, float x, 
     return SkColorSetARGB(p[3], p[0], p[1], p[2]);
 }
 
+V aim(const PieceView& view, V light) { return view.turn == SkM44() ? light : unit(map(view.turn.transpose(), light)); }
+
 float lighting(V normal, V light, float intensity, float shading) {
     return std::clamp(1 - shading + shading * (0.25f + intensity * std::max(0.0f, dot(unit(normal), light))), 0.0f, 1.5f);
 }
 
-void scatter(Mesh& mesh, const SkRect& area, const SkM44& orientation, const Setting& v, const std::vector<unsigned char>& pixels, int w, int h, const LightSet& lights, SkV3 origin) {
+void scatter(Mesh& mesh, const SkRect& area, const SkM44& orientation, const Setting& v, const std::vector<unsigned char>& pixels, int w, int h, const LightSet& lights, const PieceView& view) {
     const int shape = std::clamp((int)std::round(v("shape", 0, 0)), 0, 3);
     const int depth = std::clamp((int)std::round(v("depth", 0, 1)), 1, 16);
     float spacing = std::clamp(v("spacing", 0, 24), 1.0f, 10000.0f);
@@ -127,7 +143,7 @@ void scatter(Mesh& mesh, const SkRect& area, const SkM44& orientation, const Set
     const uint32_t seed = (uint32_t)(int)std::clamp(v("seed", 0, 0), -1000000.0f, 1000000.0f);
     const SkM44 grid = orientation * turn(v("rotX", 0, 0), v("rotY", 0, 0), v("rotZ", 0, 0));
     const float angle = v("light", 0, 135) * pi / 180;
-    const V light = unit({std::cos(angle), -std::sin(angle), -std::clamp(v("lightHeight", 0, 1), 0.0f, 4.0f)});
+    const V light = aim(view, unit({std::cos(angle), -std::sin(angle), -std::clamp(v("lightHeight", 0, 1), 0.0f, 4.0f)}));
     const float intensity = std::clamp(v("intensity", 0, 1), 0.0f, 2.0f), shading = std::clamp(v("shading", 0, 0.6f), 0.0f, 1.0f);
     const int faces[6][4] = {{0,3,2,1},{4,5,6,7},{0,4,7,3},{1,2,6,5},{0,1,5,4},{3,7,6,2}};
     const V corners[8] = {{-1,-1,-1},{1,-1,-1},{1,1,-1},{-1,1,-1},{-1,-1,1},{1,-1,1},{1,1,1},{-1,1,1}};
@@ -142,7 +158,7 @@ void scatter(Mesh& mesh, const SkRect& area, const SkM44& orientation, const Set
         pos = map(tw, pos);
         pos = pos + V{random(seed,index*6)-0.5f, random(seed,index*6+1)-0.5f, random(seed,index*6+2)-0.5f} * (scatter * 2);
         const V center = map(grid, pos);
-        mesh.depthKey = center.z;
+        mesh.depthKey = mesh.key(center);
         const SkM44 rot = grid * tw * turn((random(seed,index*6+3)-0.5f)*2*spin, (random(seed,index*6+4)-0.5f)*2*spin, (random(seed,index*6+5)-0.5f)*2*spin);
         const auto vert = [&](V p, SkColor c) { return Vertex{center + map(rot, p * size), {}, c}; };
         if (shape == 0) {
@@ -150,23 +166,23 @@ void scatter(Mesh& mesh, const SkRect& area, const SkM44& orientation, const Set
                 const V a = map(rot, corners[face[0]]), b = map(rot, corners[face[1]]), c = map(rot, corners[face[2]]);
                 const V n = cross(b - a, c - a);
                 if (n.z >= 0) continue;
-                const SkColor lit = shadeWithLights(color, lighting(n, light, intensity, shading), lights, origin, n, center);
+                const SkColor lit = shadeWithLights(color, lighting(n, light, intensity, shading), lights, view, n, center);
                 mesh.quad(vert(corners[face[0]],lit), vert(corners[face[1]],lit), vert(corners[face[2]],lit), vert(corners[face[3]],lit));
             }
         } else if (shape == 2) {
             const V normal = map(rot,{0,0,-1});
-            const SkColor lit = shadeWithLights(color, lighting(normal, light, intensity, shading), lights, origin, normal, center);
+            const SkColor lit = shadeWithLights(color, lighting(normal, light, intensity, shading), lights, view, normal, center);
             mesh.quad(vert({-1,-1,0},lit), vert({1,-1,0},lit), vert({1,1,0},lit), vert({-1,1,0},lit));
         } else {
             constexpr int segments = 12;
             const bool sphere = shape == 1;
             const V normal = sphere ? V{0,0,-1} : map(rot,{0,0,-1});
-            const SkColor mid = shadeWithLights(color, sphere ? std::min(1.3f, lighting({0,0,-1}, light, intensity, shading) + intensity * shading * 0.3f) : lighting(normal, light, intensity, shading), lights, origin, normal, center);
+            const SkColor mid = shadeWithLights(color, sphere ? std::min(1.3f, lighting({0,0,-1}, light, intensity, shading) + intensity * shading * 0.3f) : lighting(normal, light, intensity, shading), lights, view, normal, center);
             for (int i = 0; i < segments; i++) {
                 const float a = 2*pi*i/segments, b = 2*pi*(i+1)/segments;
                 const V p{std::cos(a), std::sin(a), 0}, q{std::cos(b), std::sin(b), 0};
-                const SkColor cp = sphere ? shadeWithLights(color, lighting(unit({p.x,p.y,-0.25f}), light, intensity, shading), lights, origin, unit({p.x,p.y,-0.25f}), center + p*size) : mid;
-                const SkColor cq = sphere ? shadeWithLights(color, lighting(unit({q.x,q.y,-0.25f}), light, intensity, shading), lights, origin, unit({q.x,q.y,-0.25f}), center + q*size) : mid;
+                const SkColor cp = sphere ? shadeWithLights(color, lighting(unit({p.x,p.y,-0.25f}), light, intensity, shading), lights, view, unit({p.x,p.y,-0.25f}), center + p*size) : mid;
+                const SkColor cq = sphere ? shadeWithLights(color, lighting(unit({q.x,q.y,-0.25f}), light, intensity, shading), lights, view, unit({q.x,q.y,-0.25f}), center + q*size) : mid;
                 if (sphere) {
                     const V highlight = center + V{light.x, light.y, 0} * (size * 0.32f);
                     mesh.add({highlight,{},mid}, {center + p*size,{},cp}, {center + q*size,{},cq});
@@ -176,7 +192,7 @@ void scatter(Mesh& mesh, const SkRect& area, const SkM44& orientation, const Set
     }
 }
 
-void fracture(Mesh& mesh, const SkRect& area, const SkM44& orientation, const Setting& v, int w, int h, const LightSet& lights, SkV3 lightOrigin) {
+void fracture(Mesh& mesh, const SkRect& area, const SkM44& orientation, const Setting& v, int w, int h, const LightSet& lights, const PieceView& view) {
     const int count = std::clamp((int)std::round(v("pieces", 0, 40)), 1, 128);
     mesh.triangles.reserve((size_t)count * 16);
     const uint32_t seed = (uint32_t)(int)std::clamp(v("seed", 0, 0), -1000000.0f, 1000000.0f);
@@ -190,7 +206,7 @@ void fracture(Mesh& mesh, const SkRect& area, const SkM44& orientation, const Se
     const float thickness = std::clamp(v("thickness", 0, 4), 0.0f, 100.0f);
     const float fade = 1 - std::clamp(v("fade", 0, 1), 0.0f, 1.0f) * std::clamp((progress - 0.7f) / 0.3f, 0.0f, 1.0f);
     const float angle = v("light", 0, 135) * pi / 180;
-    const V light = unit({std::cos(angle), -std::sin(angle), -1.2f});
+    const V light = aim(view, unit({std::cos(angle), -std::sin(angle), -1.2f}));
     const float intensity = std::clamp(v("intensity", 0, 1), 0.0f, 2.0f);
     const SkPoint impact{area.centerX() + v("impact", 0, 0), area.centerY() + v("impact", 1, 0)};
     std::array<SkPoint, 128> sites;
@@ -231,18 +247,18 @@ void fracture(Mesh& mesh, const SkRect& area, const SkM44& orientation, const Se
                                                (random(seed,2001+i*3)-0.5f)*2*spin*progress,
                                                (random(seed,2002+i*3)-0.5f)*2*spin*progress);
         const V origin = map(orientation, V{center.x() - area.centerX(), center.y() - area.centerY(), 0} + move);
-        mesh.depthKey = origin.z;
+        mesh.depthKey = mesh.key(origin);
         const auto point = [&](SkPoint p, float z) { return origin + map(rot, {p.x() - center.x(), p.y() - center.y(), z}); };
         const V normal = map(rot, {0, 0, -1});
         const float faceLight = 1 + (lighting(normal.z < 0 ? normal : normal * -1, light, intensity, 0.35f) - 1) * progress;
-        const SkColor face = shadeWithLights(SK_ColorWHITE, faceLight, lights, lightOrigin, normal.z < 0 ? normal : normal * -1, origin, fade);
+        const SkColor face = shadeWithLights(SK_ColorWHITE, faceLight, lights, view, normal.z < 0 ? normal : normal * -1, origin, fade);
         const auto vertex = [&](SkPoint p, float z, SkColor color) { return Vertex{point(p, z), uv(p), color}; };
         if (thickness > 0 && progress > 0) for (int k = 0; k < n; k++) {
             const SkPoint p = a[k], q = a[(k+1)%n];
             const V edge = map(rot, {q.x()-p.x(), q.y()-p.y(), 0});
             const V side = cross(edge, map(rot, {0,0,1}));
             if (side.z >= 0) continue;
-            const SkColor color = shadeWithLights(SK_ColorWHITE, lighting(side, light, intensity, 0.8f), lights, lightOrigin, side, origin, fade);
+            const SkColor color = shadeWithLights(SK_ColorWHITE, lighting(side, light, intensity, 0.8f), lights, view, side, origin, fade);
             mesh.quad(vertex(p,0,color), vertex(q,0,color), vertex(q,thickness,color), vertex(p,thickness,color));
         }
         for (int k = 1; k + 1 < n; k++) mesh.add(vertex(a[0], 0, face), vertex(a[k], 0, face), vertex(a[k+1], 0, face));
@@ -254,15 +270,15 @@ void fracture(Mesh& mesh, const SkRect& area, const SkM44& orientation, const Se
 bool IsEffect(const std::string& id) { return id == "absent.scatter3d" || id == "absent.fracture3d"; }
 
 void Draw(SkCanvas* canvas, const std::string& id, const SkRect& area, const SkM44& orientation, const Setting& value,
-          const std::vector<unsigned char>& pixels, int width, int height, SkImage* image, const LightSet& lights, SkV3 origin,
+          const std::vector<unsigned char>& pixels, int width, int height, SkImage* image, const LightSet& lights, const PieceView& view,
           depth::Pass* pass) {
     if (area.isEmpty() || width <= 0 || height <= 0 || pixels.size() != (size_t)width * height * 4) return;
     const bool textured = id == "absent.fracture3d";
     const float perspective = textured ? 0.5f : std::clamp(value("perspective", 0, 0.5f), 0.0f, 1.0f);
     const float distance = std::max(1.0f, std::min(area.width(), area.height()) * 0.5f * (2 + 40 * std::pow(1.0f - perspective, 3.0f)));
-    Mesh mesh{{}, area.center(), distance, textured};
-    if (textured) fracture(mesh, area, orientation, value, width, height, lights, origin);
-    else scatter(mesh, area, orientation, value, pixels, width, height, lights, origin);
+    Mesh mesh{{}, area.center(), distance, textured, view.tilted ? &view.lens : nullptr};
+    if (textured) fracture(mesh, area, orientation, value, width, height, lights, view);
+    else scatter(mesh, area, orientation, value, pixels, width, height, lights, view);
     mesh.draw(canvas, image, pass);
 }
 

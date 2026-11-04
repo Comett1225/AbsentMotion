@@ -485,9 +485,12 @@ sk_sp<SkImageFilter> GlowFilter(const std::function<float(const char*, int, floa
 
 SkM44 Orientation(const Layer& layer, double timeMs) {
     Placement p;
-    if (!layer.sight.layers || !SeenPlacement(layer, timeMs, &p) || p.tilt == SkM44()) return SkM44();
+    if (!layer.sight.layers || !SeenPlacement(layer, timeMs, &p)) return SkM44();
+    const SkM44 camera = layer.projected ? SkM44() : p.turn;
+    if (p.tilt == SkM44()) return camera;
     const float r = p.rotation * 3.14159265f / 180;
-    return SkM44::Rotate({0, 0, 1}, r) * p.tilt * SkM44::Rotate({0, 0, 1}, -r);
+    const SkM44 own = SkM44::Rotate({0, 0, 1}, r) * p.tilt * SkM44::Rotate({0, 0, 1}, -r);
+    return camera == SkM44() ? own : camera * own;
 }
 
 std::vector<float> columns3(const SkM44& m) {
@@ -1211,8 +1214,11 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
             const Layer& original = layer.sight.layer ? *layer.sight.layer : layer;
             const Placement world = EffectivePlacement(sourceLayers, original, timeMs);
             const LightSet lights = SceneLights(sourceLayers, timeMs);
-            pieces3d::Draw(out, e.id, at, Orientation(layer, timeMs), value, pixels, width, height, image.get(), lights,
-                           {world.location.x(), world.location.y(), world.z}, handing ? pass : nullptr);
+            const SkM44 orientation = Orientation(layer, timeMs);
+            PieceView view;
+            view.origin = {world.location.x(), world.location.y(), world.z};
+            SeenPieces(layer, timeMs, at.center(), orientation, &view);
+            pieces3d::Draw(out, e.id, at, orientation, value, pixels, width, height, image.get(), lights, view, handing ? pass : nullptr);
             if (handing) return true;
             sk_sp<SkPicture> result = recorder.finishRecordingAsPicture();
             current = [result](SkCanvas* c) { c->drawPicture(result); };

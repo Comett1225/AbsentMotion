@@ -82,14 +82,17 @@ Seen Look(const View& v, const Placement& p) {
     return s;
 }
 
+SkM44 Lens(const View& v) {
+    const float mx = v.middle.fX, my = v.middle.fY, f = v.focal, c = std::max(-v.eyeZ, kNearest);
+    return v.orthographic ? SkM44(f, 0, 0, mx * c, 0, f, 0, my * c, 0, 0, 1, 0, 0, 0, 0, c)
+                          : SkM44(f, 0, mx, 0, 0, f, my, 0, 0, 0, 1, 0, 0, 0, 1, 0);
+}
+
 SkM44 Space(const View& v, const Placement& p) {
-    const float r = 3.14159265f / 180, mx = v.middle.fX, my = v.middle.fY, f = v.focal;
+    const float r = 3.14159265f / 180;
     const SkM44 world = SkM44::Translate(p.location.fX, p.location.fY, p.z) * SkM44::Rotate({0, 0, 1}, p.rotation * r) * p.tilt;
     const SkM44 eye = v.tilt * SkM44::Rotate({0, 0, 1}, -v.rotation * r) * SkM44::Translate(-v.eye.fX, -v.eye.fY, -v.eyeZ);
-    const float c = std::max(-v.eyeZ, kNearest);
-    const SkM44 lens = v.orthographic ? SkM44(f, 0, 0, mx * c, 0, f, 0, my * c, 0, 0, 1, 0, 0, 0, 0, c)
-                                      : SkM44(f, 0, mx, 0, 0, f, my, 0, 0, 0, 1, 0, 0, 0, 1, 0);
-    return lens * eye * world;
+    return Lens(v) * eye * world;
 }
 
 bool Solid(const Layer& l, const Placement& p) { return p.tilt != SkM44() || l.kind == "model"; }
@@ -255,6 +258,7 @@ bool SeenPlacement(const Layer& l, double timeMs, Placement* out) {
             p.turn = v.tilt * SkM44::Rotate({0, 0, 1}, (p.rotation - v.rotation) * 3.14159265f / 180) * p.tilt;
         } else {
             const Seen seen = Look(v, p);
+            if (v.tilt != SkM44() && Spatial(l, p, timeMs)) p.turn = v.tilt;
             p.location = seen.location;
             p.scale = seen.scale;
             p.rotation = seen.rotation;
@@ -263,6 +267,23 @@ bool SeenPlacement(const Layer& l, double timeMs, Placement* out) {
     }
     *out = p;
     return true;
+}
+
+void SeenPieces(const Layer& l, double timeMs, SkPoint center, const SkM44& orientation, PieceView* view) {
+    const Sight& s = l.sight;
+    if (!s.layers || !s.layer || !s.camera || l.projected || l.kind == "camera") return;
+    const View v = LayerView(*s.layers, *s.camera, s.width, s.height, timeMs, s.depthOrder);
+    const Placement p = EffectivePlacement(*s.layers, *s.layer, timeMs);
+    const SkM44 turn = v.tilt * SkM44::Rotate({0, 0, 1}, -v.rotation * 3.14159265f / 180);
+    const SkV4 anchor = turn.map(p.location.fX - v.eye.fX, p.location.fY - v.eye.fY, p.z - v.eyeZ, 0);
+    const float k = v.focal / (v.orthographic ? std::max(-v.eyeZ, kNearest) : std::max(anchor.z, kNearest));
+    view->unit = 1 / k;
+    view->turn = turn.transpose();
+    view->tilted = v.tilt != SkM44();
+    if (!view->tilted) return;
+    const SkPoint seen = Look(v, p).location;
+    const SkV4 shift = orientation.map((center.fX - seen.fX) / k, (center.fY - seen.fY) / k, 0, 0);
+    view->lens = Lens(v) * SkM44::Translate(anchor.x + shift.x, anchor.y + shift.y, anchor.z + shift.z) * SkM44::Scale(view->unit, view->unit, view->unit);
 }
 
 float DepthPerPixel(const Layer& l, double timeMs) {
