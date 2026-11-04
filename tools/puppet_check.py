@@ -339,6 +339,10 @@ def run(bench, dots):
     pulled, _ = bench.render(scene(shape(1, Place(160, 300), half, effect([(0, -50, 0, 50)], 1.0))))
     lifted, _ = bench.render(scene(shape(1, Place(160, 200), half)))
     compare("a pin pulls the part of the picture below the canvas into view", pulled, lifted)
+    soft = '<effect id="absent.blur"><property name="strength" type="float" value="0.5"/></effect>'
+    pulled, _ = bench.render(scene(shape(1, Place(160, 300), half, soft + effect([(0, -50, 0, 50)], 1.0))))
+    lifted, _ = bench.render(scene(shape(1, Place(160, 200), half, soft)))
+    compare("an effect before the pin keeps the part below the canvas", pulled, lifted)
 
     tiny = Place(160, 160, 0, 0.01)
     tiny_pins = [(-9000, -9000, -9000, -9000), (9000, 9000, 9000, 9000), (0, 0, 2000, -3000)]

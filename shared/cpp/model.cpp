@@ -68,7 +68,8 @@ void DrawModel(SkCanvas* canvas, const Layer& l, double timeMs, float alpha, con
         if (!(pa.isFinite() && pb.isFinite() && pc.isFinite())) continue;
         const bool back = ((pb - pa).cross(pc - pa)) * mirror >= 0;
         if (back && !m.twoSided) continue;
-        faces.push_back({clip[a].z + clip[b].z + clip[c].z, k / 3, back});
+        const float depth = clip[a].z + clip[b].z + clip[c].z;
+        if (std::isfinite(depth)) faces.push_back({depth, k / 3, back});
     }
     std::sort(faces.begin(), faces.end(), [](const Face& x, const Face& y) { return x.depth > y.depth; });
 

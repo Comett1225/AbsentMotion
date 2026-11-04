@@ -1218,17 +1218,14 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
             current = [result](SkCanvas* c) { c->drawPicture(result); };
             from = k + 1;
         }
-        if (pass) {
-            SkPictureRecorder recorder;
-            current(recorder.beginRecording(bounds));
-            pass->picture(recorder.finishRecordingAsPicture(), canvas->getTotalMatrix(), pass->depth);
-            return true;
-        }
+        SkPictureRecorder recorder;
+        SkCanvas* out = pass ? recorder.beginRecording(bounds) : canvas;
         SkPaint paint;
         paint.setImageFilter(chain(scene, layer, timeMs, at, bounds, local, placed, nullptr, nullptr, -1, from));
-        canvas->saveLayer(&bounds, &paint);
-        current(canvas);
-        canvas->restore();
+        out->saveLayer(&bounds, &paint);
+        current(out);
+        out->restore();
+        if (pass) pass->picture(recorder.finishRecordingAsPicture(), canvas->getTotalMatrix(), pass->depth);
         return true;
     }
     const bool seesBehind = lift < 0 && behind(layer);
@@ -1357,7 +1354,7 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
         inside = measured.makeOffset(-at.left(), -at.top()).makeOutset(pad, pad);
         layerBounds.join(inside.makeOffset(at.left(), at.top()));
     }
-    sk_sp<SkImageFilter> filter = this->chain(scene, layer, timeMs, at, bounds, inside, placed, std::move(content), std::move(under));
+    sk_sp<SkImageFilter> filter = this->chain(scene, layer, timeMs, at, layerBounds, inside, placed, std::move(content), std::move(under));
     if (!filter && lift < 0) return false;
     if (seesBehind) {
         float reach = 0;

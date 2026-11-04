@@ -160,10 +160,25 @@ void AddCameraEffects(const Layer& camera, double timeMs, float depth, SkPoint b
 
 }
 
-SkMatrix PlaneMatrix(const std::vector<Layer>& layers, const Layer& layer, int width, int height, double timeMs) {
+SkMatrix PlaneMatrix(const std::vector<Layer>& layers, const Layer& layer, int width, int height, double timeMs, bool depthOrder) {
     const Layer* camera = gCameraView ? ActiveCamera(layers, timeMs) : nullptr;
-    const View v = camera ? LayerView(layers, *camera, width, height, timeMs) : DefaultView(width, height);
-    const float depth = EffectivePlacement(layers, layer, timeMs).z - v.eyeZ;
+    const View v = camera ? LayerView(layers, *camera, width, height, timeMs, depthOrder) : DefaultView(width, height);
+    const Placement p = EffectivePlacement(layers, layer, timeMs);
+    if (v.tilt != SkM44()) {
+        Placement plane{};
+        plane.z = p.z;
+        const SkM44 m = Space(v, plane);
+        const float x = p.location.x(), y = p.location.y();
+        const float u = m.rc(0, 0) * x + m.rc(0, 1) * y + m.rc(0, 3), w = m.rc(3, 0) * x + m.rc(3, 1) * y + m.rc(3, 3);
+        const float s = m.rc(1, 0) * x + m.rc(1, 1) * y + m.rc(1, 3);
+        if (w > 0) {
+            const float a = (m.rc(0, 0) * w - u * m.rc(3, 0)) / (w * w), b = (m.rc(0, 1) * w - u * m.rc(3, 1)) / (w * w);
+            const float c = (m.rc(1, 0) * w - s * m.rc(3, 0)) / (w * w), d = (m.rc(1, 1) * w - s * m.rc(3, 1)) / (w * w);
+            const SkMatrix local = SkMatrix::MakeAll(a, b, u / w - a * x - b * y, c, d, s / w - c * x - d * y, 0, 0, 1);
+            if (local.isFinite() && local.invert(nullptr)) return local;
+        }
+    }
+    const float depth = p.z - v.eyeZ;
     const float k = v.focal / (v.orthographic ? std::max(-v.eyeZ, kNearest) : std::max(depth, kNearest));
     return SkMatrix::Translate(v.middle.fX, v.middle.fY).preRotate(-v.rotation).preScale(k, k).preTranslate(-v.eye.fX, -v.eye.fY);
 }
@@ -325,9 +340,9 @@ bool SeeLayers(const std::vector<Layer>& layers, int width, int height, bool top
             for (size_t slot : slots) sorted.push_back(order[slot]);
             std::sort(sorted.begin(), sorted.end(), [&](size_t a, size_t b) {
                 const float da = depth[starts[a]], db = depth[starts[b]];
-                if (std::isfinite(da) != std::isfinite(db)) return std::isfinite(da);
-                if (da > db) return true;
-                if (db > da) return false;
+                const bool fa = std::isfinite(da), fb = std::isfinite(db);
+                if (fa != fb) return fa;
+                if (fa && da != db) return da > db;
                 return a < b;
             });
             for (size_t i = 0; i < slots.size(); i++) order[slots[i]] = sorted[i];

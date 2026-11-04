@@ -1270,7 +1270,7 @@ bool EngineImpl::layerMatrix(int64_t layerId, double timeMs, float m[18]) {
     const Layer* layer = fScene.layer(layerId);
     if (!layer) return false;
     WorldMatrix(fScene, *layer, timeMs).get9(m);
-    PlaneMatrix(fScene.layers, *layer, fScene.width, fScene.height, timeMs).get9(m + 9);
+    PlaneMatrix(fScene.layers, *layer, fScene.width, fScene.height, timeMs, fScene.depthOrder).get9(m + 9);
     return true;
 }
 

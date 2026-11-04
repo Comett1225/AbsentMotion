@@ -366,7 +366,7 @@ JNIEXPORT jfloatArray JNICALL JNI(layerMatrix)(JNIEnv* e, jobject, jlong h, jlon
     if (!layer) return nullptr;
     float m[18];
     am::WorldMatrix(d->scene, *layer, t).get9(m);
-    am::PlaneMatrix(d->scene.layers, *layer, d->scene.width, d->scene.height, t).get9(m + 9);
+    am::PlaneMatrix(d->scene.layers, *layer, d->scene.width, d->scene.height, t, d->scene.depthOrder).get9(m + 9);
     return floats(e, m, 18);
 }
 JNIEXPORT jfloatArray JNICALL JNI(layerBounds)(JNIEnv* e, jobject, jlong h, jlong id, jdouble t) {

@@ -76,6 +76,8 @@ def share(part, whole):
 def mixing():
     alone = render('lone_layer', CAMERA + plate(1, RED, shards(1)), extra=DEPTH)[0]
     assert alone == render('lone_piece', CAMERA + plate(1, RED, shards(1)), extra=PIECE)[0], 'a lone fracture must look the same by piece'
+    unbroken = CAMERA + plate(1, RED, fx('invert') + fx('fracture3d', progress=0))
+    assert render('unbroken_layer', unbroken, extra=DEPTH)[0] == render('unbroken_piece', unbroken, extra=PIECE)[0], 'an unbroken fracture keeps the effects before it by piece'
     flat = CAMERA + plate(1, RED) + plate(2, BLUE, z=150, extra=' threeD="true"')
     assert render('flat_layer', flat, extra=DEPTH)[0] == render('flat_piece', flat, extra=PIECE)[0], 'whole layers must not change by piece'
     pair = CAMERA + plate(1, RED, shards(1)) + plate(2, BLUE, shards(2))

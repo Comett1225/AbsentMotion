@@ -118,6 +118,24 @@ int main() {
     Expect(std::fabs(animated.x - 1) < 0.001f, "animated light intensity");
     lamp.hidden = true;
     Expect(am::SceneLights({lamp}, 0).count == 0, "hidden light ignored");
+    {
+        am::Layer tilted = camera;
+        tilted.tilt.value = {20, 35};
+        am::Layer near = spatial(11, 0);
+        near.location.value = {60, 40, 0};
+        am::Layer moved = near;
+        moved.location.value = {63, 42, 0};
+        const std::vector<am::Layer> before = {tilted, near}, after = {tilted, moved};
+        std::vector<am::Layer> seenBefore, seenAfter;
+        am::SeeLayers(before, 100, 100, true, 30, 0, true, &seenBefore);
+        am::SeeLayers(after, 100, 100, true, 30, 0, true, &seenAfter);
+        am::Placement from{}, to{};
+        const auto find = [](const std::vector<am::Layer>& list) { return *std::find_if(list.begin(), list.end(), [](const am::Layer& l) { return l.id == 11; }); };
+        const bool placed = am::SeenPlacement(find(seenBefore), 0, &from) && am::SeenPlacement(find(seenAfter), 0, &to);
+        const SkVector want = to.location - from.location;
+        const SkVector got = am::PlaneMatrix(before, near, 100, 100, 0, true).mapVector(3, 2);
+        Expect(placed && want.length() > 0.1f && (got - want).length() < 0.02f * want.length(), "drag plane follows camera tilt");
+    }
 #endif
 #ifdef RENDER_BENCH_PIECES
     {
