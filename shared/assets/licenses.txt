@@ -925,7 +925,7 @@ macOS (Apple silicon and Intel):
 - Licence: GNU General Public License, version 2 or later (--enable-gpl, which x264 and x265 need; AbsentMotion 5.0 and later uses it under version 3, see LICENSE). FFmpeg's COPYING.GPLv2 ships next to the libraries as ffmpeg-LICENSE.txt; the same terms are in appendix A.22 (the Classpath Exception there applies only to OpenJDK). LAME (above) and the codec libraries below are linked statically into libavcodec.
 - Used in: the macOS apps. libamdesktop.dylib links the shared avformat, avcodec, avutil and swscale libraries for video decoding (VideoToolbox when available), and ffmpeg and ffprobe run export, the Tools tab, the camera and media probing. They sit in AbsentMotion.app/Contents/app/resources, so they can be replaced with another build.
 
-The codec libraries in the macOS FFmpeg are built for arm64 and x86_64 (minimum macOS 11) as static libraries from the unchanged sources below; the SHA-256 sums match the ones Homebrew pins for the same versions.
+The codec libraries in the macOS FFmpeg are built for arm64 and x86_64 (minimum macOS 11) as static libraries from the unchanged sources below; the SHA-256 sums of x265, libvpx, Opus and SVT-AV1 match the ones Homebrew pins for the same versions, dav1d matches VideoLAN's published sum and signature, and x264 is the named commit of its stable branch.
 
 x264
 ----

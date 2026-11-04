@@ -250,7 +250,8 @@ macOS (Apple silicon and Intel):
   probing. They sit in `AbsentMotion.app/Contents/app/resources`, so they can be replaced with another build.
 
 The codec libraries in the macOS FFmpeg are built for arm64 and x86_64 (minimum macOS 11) as static libraries from the
-unchanged sources below; the SHA-256 sums match the ones Homebrew pins for the same versions.
+unchanged sources below; the SHA-256 sums of x265, libvpx, Opus and SVT-AV1 match the ones Homebrew pins for the same
+versions, dav1d matches VideoLAN's published sum and signature, and x264 is the named commit of its `stable` branch.
 
 #### x264
 
