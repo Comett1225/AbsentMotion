@@ -45,7 +45,7 @@ Shapes, text, images, video, audio, freehand drawings, groups, reusable elements
 <details>
 <summary><strong>Keyframes with easing</strong></summary>
 
-Any value (position, size, rotation, 3D tilt, skew, opacity, colour, shape and effect parameters) can be keyframed. Easing is a cubic Bezier, bounce, elastic, cyclic, random or stepped curve, edited with handles on a graph. A value can also be linked to a value of another layer, with Multiply, Add and Delay.
+Any value (position, size, rotation, 3D tilt, skew, opacity, colour, shape and effect parameters) can be keyframed. Easing is a cubic Bezier, bounce, elastic, cyclic, random or stepped curve, edited with handles on a graph.
 
 </details>
 

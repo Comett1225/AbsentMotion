@@ -31,7 +31,7 @@ The table lists page 1. Page 2 holds **Crop** for every layer you can see except
 
 ## Every panel
 
-Most panels share a narrow column on the left with these buttons: **Back**, **Add keyframe** or **Remove keyframe**, **Easing**, **Link** and, in Transform and Effects only, **More**. A gray keyframe button means the setting cannot be animated. **Link** makes the selected number follow a number of another layer; it works for the numbers in Transform, Opacity and effects. See [Keyframes and easing](@keyframes).
+Most panels share a narrow column on the left with these buttons: **Back**, **Add keyframe** or **Remove keyframe**, **Easing** and, in Transform and Effects only, **More**. A gray keyframe button means the setting cannot be animated. See [Keyframes and easing](@keyframes).
 
 Tap any number box to open the number pad. The first tap selects the whole value, so typing replaces it. A tick applies it; tapping outside closes the pad. Rulers (a strip with ticks and a center needle) change a number when you drag sideways.
 

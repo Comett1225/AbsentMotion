@@ -15,7 +15,6 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - ASCII effect: any layer as text art made of letters and symbols, with six presets.
 - Depth order: with a camera, layers in 3D are drawn by their distance from the camera, and the camera can tilt and orbit around the scene. New projects have it on; older projects keep their look until it is turned on. A 3D layer tile lets flat layers take part.
 - Light layers: Ambient, Directional and Point lights with colour, intensity and falloff, up to four at once, shade 3D models, 3D Scatter and 3D Fracture.
-- Link a value to a value of another layer, with Multiply, Add and Delay, from the new Link button in the Transform, Opacity and effect panels.
 - Linear Repeat, Radial Repeat, Grid Repeat and Repeat Along Path: Delay per copy, and Random Position, Rotation, Scale and Opacity for each copy.
 - Parenting Helper and Scale Assist effects (Move). Alight Motion projects that use them, or the 3D orientation of a layer, now import.
 - Groups: Edit Group opens a group, the top bar shows where you are and leads back, and Ungroup in the layer menu puts the layers back.

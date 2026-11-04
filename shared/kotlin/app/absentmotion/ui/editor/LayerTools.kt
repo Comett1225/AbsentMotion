@@ -430,7 +430,6 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
                 }
                 FrameButton(PanelIcons.Easing, stringResource(R.string.a11y_easing), Modifier.weight(1f).fillMaxWidth().tutorialTarget("easing"), enabled = !linked) { if (layer.easing(target.ref) != null) state.easingOpen = true else state.easingHint = true }
             }
-            ValueLinkControl(state, target, Modifier.weight(1f))
             if (move) {
                 Box(Modifier.weight(1f).fillMaxWidth()) {
                     FrameButton(PanelIcons.More, stringResource(R.string.effects_more), Modifier.fillMaxSize()) { menuOpen = true }

@@ -1446,16 +1446,6 @@
       ]
     },
     {
-      "id": "tool.value_links",
-      "name": "Link numeric values between layers",
-      "where": "ValueLinkUi.kt, LinkActions.kt, ValueLinks.kt, scene.cpp",
-      "android": "works",
-      "macos": "works",
-      "windows": "untested",
-      "linux": "untested",
-      "note": "Shared picker tested at phone and desktop sizes; renderer evaluates Multiply, Add, Delay, chains, parenting and motion effects. Unlink and source deletion preserve keys and undo. Standard Gradle runs are blocked by the build sandbox."
-    },
-    {
       "id": "fx.repeat_variation",
       "name": "Repeat delay and random variation",
       "where": "motion.cpp, linearrepeat.json, radialrepeat.json, gridrepeat.json, repeatalongpath.json",

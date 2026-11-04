@@ -2,7 +2,7 @@
 title: Keyframes and easing
 group: Create
 order: 1
-summary: Animate any value over time, move and retime keyframes, shape the motion with easing curves and link one value to another.
+summary: Animate any value over time, move and retime keyframes, shape the motion with easing curves.
 ---
 A **keyframe** stores the value of one property at one moment. Between two keyframes the app calculates the values in between, which makes the animation. Almost every value can be animated: position, size, rotation, tilt, skew, opacity, colors, stroke, border and shadow settings, shape parameters, camera and model settings, volume, and the settings of effects.
 
@@ -55,23 +55,6 @@ Tap **Easing** (the curve button) in a panel. A graph opens for the segment that
 
 - **Reverse the curve** mirrors the curve (not available for Linear).
 - **More** has **Copy Curve** and **Paste Curve** (paste to the current segment), **Apply Curve to All Keyframes**, and **Enable Overshoot** or **Disable Overshoot** (Cubic Bezier only). Overshoot widens the graph so the handles can go past the start and end values, which makes the motion swing past its target and come back.
-
-## Link a value to another layer
-
-A number can follow a number of another layer instead of having its own keyframes. For example, a wheel can turn as a car layer moves, or a shadow layer can copy a title's movement half a second later.
-
-1. Select the layer and open **Transform**, **Opacity** or an effect. Pick the value: a tab of Transform, or the name of a setting in an effect.
-2. Tap **Link** in the left column.
-3. If the value has several parts, such as Move with X, Y and Z, pick the part at the top of the window.
-4. Pick the layer to follow, then its value: **Position**, **Scale**, **Rotation**, **Opacity**, **Anchor** (the pivot), **Tilt**, **Skew** or a number of one of its effects.
-5. Set **Multiply**, **Add** and **Delay (seconds)**, and tap **Apply**.
-
-The linked value is the other value times Multiply, plus Add, as it was Delay seconds earlier. Multiply 2 makes it change twice as much, a negative Multiply makes it go the other way, and Delay 0.5 makes it follow half a second later.
-
-- While a value is linked, the **Link** button shows the other layer's name, and the keyframe and Easing buttons are gray. Tap **Link** again to change the link, or **Unlink** to remove it. Keyframes the value had before come back when you unlink it.
-- Each part links on its own: with X linked, Y and Z can still be moved and animated.
-- A link that would go round in a circle is refused with "These values depend on each other."
-- Deleting the other layer removes the link.
 
 ## Ready-made animation
 

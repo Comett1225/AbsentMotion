@@ -125,7 +125,6 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
             val onKeyframe = target != null && layer.onKeyframe(target.ref)
             EffectFrameButton(if (onKeyframe) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, stringResource(if (onKeyframe) R.string.a11y_remove_keyframe else R.string.a11y_add_keyframe), Modifier.weight(1f), target != null && !linked) { state.toggleKeyframe() }
             EffectFrameButton(PanelIcons.Easing, stringResource(R.string.a11y_easing), Modifier.weight(1f), target != null && !linked) { if (target != null && layer.easing(target.ref) != null) state.easingOpen = true else state.easingHint = true }
-            app.absentmotion.ui.editor.ValueLinkControl(state, target, Modifier.weight(1f))
             Box(Modifier.weight(1f).fillMaxWidth()) {
                 EffectFrameButton(PanelIcons.More, stringResource(R.string.effects_more), Modifier.fillMaxSize(), instance == null) { menu = true }
                 Presence(menu) {
