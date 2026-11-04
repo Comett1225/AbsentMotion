@@ -98,10 +98,10 @@ internal fun FullColorPicker(state: EditorState, request: FullColor, modifier: M
     var keypad by remember { mutableStateOf<KeypadRequest?>(null) }
     val hsva = held?.takeIf { it.toArgb() == argb } ?: Hsva.from(argb)
     val saved = state.settings.savedColours
-    val palettes = if (PlatformFeatures.desktop) null else rememberPaletteLibrary()
+    val palettes = rememberPaletteLibrary()
     var library by remember { mutableStateOf(false) }
     if (library) PaletteSheet(argb) { library = false }
-    fun keepColour() { if (palettes != null) palettes.keep(argb and 0xFFFFFF, state.settings) else save(state, argb) }
+    fun keepColour() = palettes.keep(argb and 0xFFFFFF, state.settings)
     val close = { state.endGesture(); state.fullColor = null }
     BackHandler(onBack = close)
 
@@ -160,9 +160,9 @@ internal fun FullColorPicker(state: EditorState, request: FullColor, modifier: M
             }
             val gridGap = if (PlatformFeatures.desktop) 16.dp else 0.dp
             Box(Modifier.fillMaxWidth().height(315.px + gridGap).background(GridBg)) {
-                if (palettes != null) PaletteChip(palettes.chosen, Am.OnDark, Modifier.offset(12.px, 16.px).size(190.px, 150.px), stacked = true) { library = true }
+                PaletteChip(palettes.chosen, Am.OnDark, Modifier.offset(12.px, 16.px + gridGap / 2).size(190.px, 150.px), stacked = true) { library = true }
                 Column(Modifier.offset(211.px, 5.px + gridGap / 2).size(658.px, 304.px).deskVerticalScroll().padding(5.px, 11.px), Arrangement.spacedBy(11.px)) {
-                    (palettes?.swatches(saved) ?: (FixedSwatches + saved)).chunked(7).forEach { row ->
+                    palettes.swatches(saved).chunked(7).forEach { row ->
                         Row(Modifier.height(84.px), Arrangement.spacedBy(10.px)) {
                             row.forEach { swatch ->
                                 Box(
@@ -177,11 +177,6 @@ internal fun FullColorPicker(state: EditorState, request: FullColor, modifier: M
         }
         Swap(keypad, Modifier.fillMaxSize(), rise = 0.dp) { keypad?.let { ValueKeypad(it, { keypad = null }, Modifier.fillMaxSize()) } }
     }
-}
-
-private fun save(state: EditorState, argb: Int) {
-    val rgb = argb and 0xFFFFFF
-    if (rgb !in FixedSwatches + state.settings.savedColours) state.settings.savedColours += rgb
 }
 
 private fun alphaTrack(colour: Color) = listOf(colour.copy(alpha = 0f), colour)

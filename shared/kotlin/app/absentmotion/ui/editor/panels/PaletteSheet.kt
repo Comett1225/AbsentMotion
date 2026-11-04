@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -66,6 +65,7 @@ import app.absentmotion.ui.editor.DropOrRise
 import app.absentmotion.ui.editor.MenuPopup
 import app.absentmotion.ui.editor.MenuRow
 import app.absentmotion.ui.editor.MotionSheet
+import app.absentmotion.ui.editor.deskVerticalScroll
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Presence
 import kotlinx.coroutines.Dispatchers
@@ -121,7 +121,8 @@ internal fun readPaletteFile(context: Context, uri: Uri, picture: Boolean): Pair
 
 internal fun exportPalette(context: Context, name: String, colors: List<Int>, kind: PaletteExport): String {
     val file = name.replace(Regex("[\\\\/:*?\"<>|\\p{Cntrl}]"), "_").trim().ifEmpty { "palette" } + "." + kind.extension
-    MediaStoreExport(context).save(null, file, kind.mime) { out ->
+    val store = MediaStoreExport(context)
+    store.save(null, file, kind.mime) { out ->
         when (kind) {
             PaletteExport.Png -> {
                 val (pixels, width, height) = Palettes.strip(colors)
@@ -132,7 +133,7 @@ internal fun exportPalette(context: Context, name: String, colors: List<Int>, ki
             PaletteExport.Ase -> out.write(Palettes.ase(colors))
         }
     }
-    return (if (kind == PaletteExport.Png) Environment.DIRECTORY_PICTURES else Environment.DIRECTORY_DOCUMENTS) + "/" + AppFolder
+    return store.location((if (kind == PaletteExport.Png) Environment.DIRECTORY_PICTURES else Environment.DIRECTORY_DOCUMENTS) + "/" + AppFolder)
 }
 
 @Composable
@@ -161,7 +162,7 @@ internal fun PaletteSheet(current: Int?, onClose: () -> Unit) {
                 SheetChip(stringResource(R.string.palette_from_picture)) { picture.launch() }
                 SheetChip(stringResource(R.string.palette_from_file)) { file.launch() }
             }
-            Column(Modifier.fillMaxWidth().heightIn(max = 380.dp).verticalScroll(rememberScrollState())) {
+            Column(Modifier.fillMaxWidth().heightIn(max = 380.dp).deskVerticalScroll()) {
                 library.all.forEach { p ->
                     PaletteRow(p, p.id == library.chosenId, { library.choose(p.id); onClose() }) { editing = p.id }
                 }
@@ -220,7 +221,7 @@ private fun PaletteEditor(library: PaletteLibrary, palette: ColourPalette, curre
     }
     Spacer(Modifier.height(6.dp))
     if (palette.colors.isEmpty()) Text(stringResource(R.string.palette_empty), Modifier.fillMaxWidth().padding(vertical = 18.dp), color = Am.OnDarkDim, fontSize = 13.sp, textAlign = TextAlign.Center)
-    else Column(Modifier.fillMaxWidth().heightIn(max = 172.dp).verticalScroll(rememberScrollState()), Arrangement.spacedBy(4.dp)) {
+    else Column(Modifier.fillMaxWidth().heightIn(max = 172.dp).deskVerticalScroll(), Arrangement.spacedBy(4.dp)) {
         palette.colors.chunked(SwatchColumns).forEachIndexed { row, colours ->
             Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(4.dp)) {
                 colours.forEachIndexed { column, rgb ->

@@ -109,6 +109,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
+private val PaletteFiles = setOf("gpl", "ase", "act", "pal")
+
 class DeskAppState {
     val context = Desk.context
     val store = ProjectStore(context)
@@ -326,6 +328,12 @@ class DeskAppState {
         return !saveFailed
     }
 
+    fun takePalettes(files: List<File>): List<File> = files.filterNot { file ->
+        val colors = if (file.extension.lowercase() in PaletteFiles && file.length() <= app.absentmotion.ui.editor.panels.MaxPaletteBytes) runCatching { app.absentmotion.effects.Palettes.fromFile(file.name, file.readBytes()) }.getOrNull() else null
+        if (colors != null) app.absentmotion.library.PaletteLibrary.at(context.filesDir).let { it.choose(it.create(file.nameWithoutExtension, colors).id) }
+        colors != null
+    }
+
     fun queueMedia(uris: List<Uri>) {
         val sounds = uris.filter { android.content.Desk.mime(it.toString())?.startsWith("audio/") == true }
         val pictures = uris - sounds.toSet()
@@ -528,8 +536,10 @@ private class DeskDrop(private val app: DeskAppState, private val run: (suspend 
     override fun onDrop(event: androidx.compose.ui.draganddrop.DragAndDropEvent): Boolean {
         val transfer = event.awtTransferable
         if (!transfer.isDataFlavorSupported(java.awt.datatransfer.DataFlavor.javaFileListFlavor)) return false
-        val files = (runCatching { transfer.getTransferData(java.awt.datatransfer.DataFlavor.javaFileListFlavor) as List<*> }.getOrNull() ?: return false).filterIsInstance<java.io.File>().filter { it.isFile }
-        if (files.isEmpty()) return false
+        val dropped = (runCatching { transfer.getTransferData(java.awt.datatransfer.DataFlavor.javaFileListFlavor) as List<*> }.getOrNull() ?: return false).filterIsInstance<java.io.File>().filter { it.isFile }
+        if (dropped.isEmpty()) return false
+        val files = app.takePalettes(dropped)
+        if (files.isEmpty()) return true
         DeskLibrary.remember(files)
         val uris = files.map(Uri::fromFile)
         if (app.editor == null) { run { app.importFiles(uris) }; return true }

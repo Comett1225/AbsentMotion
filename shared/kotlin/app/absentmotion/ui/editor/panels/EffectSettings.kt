@@ -77,7 +77,8 @@ internal fun EffectSettings(state: EditorState, layer: Layer, instance: XmlNode,
             }
         }
     }
-    if (definition.key in PieceEffects && (definition.key != "particles" || instance.effectProperty("depth")?.valueAt(layer.t) == "true")) MixPiecesRow(state, layer, enabled)
+    val mix = definition.key in PieceEffects && (definition.key != "particles" || instance.effectProperty("depth")?.valueAt(layer.t) == "true")
+    if (mix && !app.absentmotion.platform.PlatformFeatures.desktop) MixPiecesRow(state, layer, enabled)
     definition.params.filter { definition.shown(it, instance, layer.t) }.forEach { param ->
         val raw = displayed[PropRef.effect(state.effectIndex, param.id)]?.take(param.default.split(',').size)?.joinToString(",") ?: instance.effectProperty(param.id)?.valueAt(layer.t) ?: param.missingDefault
         fun set(text: String, gesture: Boolean = false) {
@@ -103,13 +104,14 @@ internal fun EffectSettings(state: EditorState, layer: Layer, instance: XmlNode,
             }
         }
     }
+    if (mix && app.absentmotion.platform.PlatformFeatures.desktop) MixPiecesRow(state, layer, enabled)
 }
 
 private val PieceEffects = setOf("scatter3d", "fracture3d", "particles")
 
 @Composable
 internal fun MixPiecesRow(state: EditorState, layer: Layer, enabled: Boolean = true) {
-    if (app.absentmotion.platform.PlatformFeatures.desktop || state.inGroup) return
+    if (state.inGroup) return
     Row(Modifier.fillMaxWidth().height(38.dp).padding(horizontal = 8.dp).alpha(if (enabled) 1f else 0.35f), verticalAlignment = Alignment.CenterVertically) {
         Text(stringResource(R.string.mix_pieces), Modifier.weight(1f), color = Am.OnDark, fontSize = 14.sp)
         PanelSwitch(state.scene.mixing(layer)) { on -> if (enabled) state.edit { it.withMixing(layer.id, on) } }
@@ -244,7 +246,7 @@ private fun EffectText(param: EffectParam, raw: String, enabled: Boolean, end: (
     }
 }
 
-private const val MaxPaletteBytes = 16 shl 20
+internal const val MaxPaletteBytes = 16 shl 20
 private const val MaxPalettePixels = 2_000_000
 private const val MaxSwatchRows = 12
 
@@ -387,11 +389,9 @@ private fun EffectColor(state: EditorState, param: EffectParam, raw: String, ena
                 row.forEach { rgb -> Box(Modifier.width(30.dp).fillMaxHeight().background(Color(rgb or 0xFF000000.toInt())).clickable(enabled = enabled) { set(formatColor(rgb or 0xFF000000.toInt())); expanded = false }) }
             } }
             Swatches(swatches)
-            if (!app.absentmotion.platform.PlatformFeatures.desktop) {
-                val palettes = rememberPaletteLibrary()
-                PaletteChip(palettes.chosen, Am.OnDark, Modifier.fillMaxWidth().height(36.dp).padding(3.dp)) { expanded = false; library = true }
-                Column(Modifier.heightIn(max = 160.dp).verticalScroll(rememberScrollState())) { Swatches(palettes.swatches(state.settings.savedColours)) }
-            }
+            val palettes = rememberPaletteLibrary()
+            PaletteChip(palettes.chosen, Am.OnDark, Modifier.fillMaxWidth().height(36.dp).padding(3.dp)) { expanded = false; library = true }
+            Column(Modifier.heightIn(max = 160.dp).deskVerticalScroll()) { Swatches(palettes.swatches(state.settings.savedColours)) }
         } }
     }
 }

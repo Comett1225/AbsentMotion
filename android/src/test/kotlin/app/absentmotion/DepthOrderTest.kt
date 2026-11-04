@@ -8,6 +8,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class DepthOrderTest {
+    private fun Scene.stable() = node.with("modifiedTime", null).toXml()
+
     @Test
     fun defaultsAndRoundTrip() {
         val old = Scene.parse("<scene width=\"100\" height=\"100\"/>")
@@ -23,7 +25,7 @@ class DepthOrderTest {
         assertFalse(old.pieceOrder)
         assertTrue(old.layers[0].mixesPieces)
         assertFalse(old.mixing(old.layers[0]))
-        assertEquals(old.toXml(), Scene.parse(old.toXml()).toXml())
+        assertEquals(old.stable(), Scene.parse(old.toXml()).stable())
         assertFalse(Scene.create("test", 100, 100, 30, 0).pieceOrder)
     }
 
@@ -36,7 +38,7 @@ class DepthOrderTest {
         assertTrue(on.layers.all { on.mixing(it) })
         val back = Scene.parse(on.withPieceOrder(false).toXml())
         assertNull(back.node["depthSort"])
-        assertEquals(old.toXml(), back.toXml())
+        assertEquals(old.stable(), back.stable())
     }
 
     @Test

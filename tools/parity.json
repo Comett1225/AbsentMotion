@@ -56,12 +56,12 @@
     {
       "id": "tool.palettes",
       "name": "Colour palette library in every colour picker: import from a picture or palette file, edit, sort, lock, export PNG/.gpl/.ase",
-      "where": "panels/PaletteSheet.kt, ColorFillPanel.kt, FullColorPicker.kt, EffectSettings.kt, library/PaletteLibrary.kt",
+      "where": "panels/PaletteSheet.kt, ColorFillPanel.kt, FullColorPicker.kt, EffectSettings.kt, library/PaletteLibrary.kt, desk/DeskApp.kt",
       "android": "works",
-      "macos": "missing",
-      "windows": "missing",
-      "linux": "missing",
-      "note": "not yet on desktop: phone first by the owner's choice; behind !PlatformFeatures.desktop, so the desktop keeps the old swatches"
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "Desktop: same entries as the phone (Fill & Color bar, full colour picker, effect colour popup); files come through the desktop file dialog and exports go to Documents or Pictures/AbsentMotion. A .gpl, .ase, .act or .pal file dropped on the window is added to the library and chosen. macOS checked by DeskPaletteDepthTest."
     },
     {
       "id": "tool.border_shadow",
@@ -218,10 +218,10 @@
       "name": "Depth order by piece: 3D Scatter and Fracture pieces, model faces and 3D particles mix with other layers",
       "where": "panels/CameraPanel.kt, panels/EffectSettings.kt, panels/ModelPanel.kt, depth.cpp, styles.cpp",
       "android": "works",
-      "macos": "partial",
-      "windows": "partial",
+      "macos": "works",
+      "windows": "untested",
       "linux": "untested",
-      "note": "Phone first by the owner's choice: the desktop engine draws projects that sort by piece exactly like the phone, but the desktop has no controls to turn it on yet."
+      "note": "Desktop: the Sort row is the last row of Camera View and Mix pieces is the last row of the 3D Scatter, 3D Fracture and Particles (Depth on) cards and of Model options, so no existing desktop control moves. macOS checked by DeskPaletteDepthTest."
     },
     {
       "id": "tool.light_layer",

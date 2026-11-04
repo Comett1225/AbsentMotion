@@ -24,7 +24,7 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - Puppet Pin: pins curl the picture smoothly, pin types Position, Bend (with rotation and scale) and Stiff, Triangle Density, Mesh Expansion and Sway.
 - Effect presets: a Presets button on an open effect, a picture for every preset, and favourite presets that show first in the Favorite strip.
 - Several selected clips stretch and split together.
-- Colour palettes in every colour picker on the phone (Fill & Color, the full picker, frame and shadow, gradients, text, lights, captions and effect colours): make palettes from a picture or from palette files (.gpl, .ase, .pal, .act, .hex), add, duplicate and delete colours, sort them by hue, lightness or saturation, lock a palette, and export it as a PNG strip, .gpl or .ase. Eight built-in palettes stay as they are.
+- Colour palettes in every colour picker on the phone and the desktop (Fill & Color, the full picker, frame and shadow, gradients, text, lights, captions and effect colours): make palettes from a picture or from palette files (.gpl, .ase, .pal, .act, .hex), add, duplicate and delete colours, sort them by hue, lightness or saturation, lock a palette, and export it as a PNG strip, .gpl or .ase. Eight built-in palettes stay as they are. On the desktop, a palette file dropped on the window joins the library.
 
 ### Changed
 

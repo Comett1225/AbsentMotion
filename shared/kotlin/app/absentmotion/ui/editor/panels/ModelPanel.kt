@@ -32,7 +32,7 @@ internal fun ModelPanel(state: EditorState, layer: Layer, modifier: Modifier = M
     var active by remember { mutableStateOf(ModelParams[0].first) }
     SideEffect { state.keyTarget = KeyTarget(PropRef.shape(active.id), active.default) }
     Column(modifier.deskVerticalScroll()) {
-        MixPiecesRow(state, layer)
+        if (!app.absentmotion.platform.PlatformFeatures.desktop) MixPiecesRow(state, layer)
         for ((plain, label) in ModelParams) {
             val param = plain.copy(label = stringResource(label))
             EffectNumbers(state, param, layer.propText(param.id) ?: param.default, true, active.id == param.id, { active = plain }) { text, gesture ->
@@ -40,5 +40,6 @@ internal fun ModelPanel(state: EditorState, layer: Layer, modifier: Modifier = M
                 state.editSelected(if (gesture) "model-${param.id}" else null) { it.withProp(param.id, "float", text) }
             }
         }
+        if (app.absentmotion.platform.PlatformFeatures.desktop) MixPiecesRow(state, layer)
     }
 }
