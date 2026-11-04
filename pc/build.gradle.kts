@@ -74,6 +74,7 @@ dependencies {
 val os = System.getProperty("os.name").lowercase()
 val isWindows = os.startsWith("windows")
 val isMac = os.startsWith("mac")
+val isLinux = !isWindows && !isMac
 val nativeName = when { isWindows -> "amdesktop.dll"; isMac -> "libamdesktop.dylib"; else -> "libamdesktop.so" }
 val target = providers.gradleProperty("target").orNull
 val macArch = target?.removePrefix("macos-")
@@ -129,7 +130,7 @@ compose.desktop {
                 fileAssociation("application/x-absentmotion-project", "amproj", "AbsentMotion project")
                 fileAssociation("text/xml", "xml", "AbsentMotion scene")
             }
-            if (isWindows) vendor = "AbsentMotion"
+            if (!isMac) vendor = "AbsentMotion"
             windows {
                 iconFile.set(file("../windows/AbsentMotion.ico"))
                 perUserInstall = true
@@ -143,6 +144,11 @@ compose.desktop {
             }
             linux {
                 packageName = "absentmotion"
+                iconFile.set(file("../linux/AbsentMotion.png"))
+                shortcut = true
+                menuGroup = "AudioVideo;Video"
+                appCategory = "video"
+                debMaintainer = "noreply@absentmotion.invalid"
                 fileAssociation("application/x-absentmotion-project", "absproj", "AbsentMotion project")
                 fileAssociation("application/x-absentmotion-project", "amproj", "AbsentMotion project")
                 fileAssociation("text/xml", "xml", "AbsentMotion scene")
@@ -159,7 +165,7 @@ val prepareResources = tasks.register<Sync>("prepareResources") {
     from("../android/src/foss/assets/absent_bg.abg") { into("assets") }
     from("../shared/res") { into("res"); include("values*/strings.xml") }
     from("build/$nativeDir/$nativeName")
-    if (macArch != null) from("build/$nativeDir") { exclude(nativeName) }
+    if (macArch != null || isLinux) from("build/$nativeDir") { exclude(nativeName) }
     if (isWindows) from("build/native") { include("icudtl.dat", "av*.dll", "sw*.dll", "ffmpeg.exe", "ffprobe.exe", "ffmpeg-LICENSE.txt") }
 }
 tasks.matching { it.name == "createDistributable" || it.name.startsWith("prepareAppResources") }.configureEach { dependsOn(prepareResources) }
@@ -169,6 +175,13 @@ if (macArch != null) tasks.matching { it.name == "createDistributable" }.configu
         val app = layout.buildDirectory.dir("compose/binaries/main/app/AbsentMotion.app").get().asFile
         listOf("ffmpeg", "ffprobe").forEach { check(app.resolve("Contents/app/resources/$it").setExecutable(true, false)) }
         check(ProcessBuilder("codesign", "--force", "--deep", "-s", "-", app.path).inheritIO().start().waitFor() == 0)
+    }
+}
+
+if (isLinux) tasks.matching { it.name == "createDistributable" }.configureEach {
+    doLast {
+        listOf("ffmpeg", "ffprobe").map { layout.buildDirectory.file("compose/binaries/main/app/AbsentMotion/lib/app/resources/$it").get().asFile }
+            .filter { it.isFile }.forEach { check(it.setExecutable(true, false)) }
     }
 }
 

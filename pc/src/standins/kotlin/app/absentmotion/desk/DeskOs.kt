@@ -15,7 +15,10 @@ object DeskOs {
     }
     val nativeName = when { mac -> "libamdesktop.dylib"; windows -> "amdesktop.dll"; else -> "libamdesktop.so" }
     val revealLabel = when { mac -> "Show in Finder"; windows -> "Show in Explorer"; else -> "Show in Folder" }
-    val videosFolder = if (mac) "Movies" else "Videos"
+    val videosFolder by lazy { if (mac) "Movies" else userFolder("VIDEOS") ?: "Videos" }
+    val picturesFolder by lazy { userFolder("PICTURES") ?: "Pictures" }
+    val musicFolder by lazy { userFolder("MUSIC") ?: "Music" }
+    val documentsFolder by lazy { userFolder("DOCUMENTS") ?: "Documents" }
     val commandKey = if (mac) "⌘" else "Ctrl+"
     val titleBarDp = if (mac) 28f else 0f
 
@@ -26,6 +29,15 @@ object DeskOs {
             else -> listOf("/usr/share/fonts/truetype/noto/NotoColorEmoji.ttf", "/usr/share/fonts/noto/NotoColorEmoji.ttf", "/usr/share/fonts/google-noto-emoji/NotoColorEmoji.ttf", "/usr/share/fonts/google-noto-color-emoji-fonts/Noto-COLRv1.ttf")
         }.map(::File).firstOrNull { it.isFile }
     }
+
+    private fun userFolder(name: String): String? = if (!linux) null else runCatching {
+        val process = ProcessBuilder("xdg-user-dir", name).redirectError(ProcessBuilder.Redirect.DISCARD).start()
+        val dir = File(process.inputStream.bufferedReader().readText().trim())
+        if (process.waitFor() != 0 || !dir.isAbsolute || dir == home) null else if (dir.startsWith(home)) dir.relativeTo(home).path else dir.path
+    }.getOrNull()
+
+    internal fun showItemsCommand(file: File): List<String> = listOf("dbus-send", "--session", "--print-reply", "--reply-timeout=5000", "--dest=org.freedesktop.FileManager1",
+        "--type=method_call", "/org/freedesktop/FileManager1", "org.freedesktop.FileManager1.ShowItems", "array:string:" + file.toPath().toUri().toString().replace(",", "%2C"), "string:")
 
     internal fun openCommand(mac: Boolean, windows: Boolean, path: String): List<String> = when {
         mac -> listOf("open", path)
@@ -48,7 +60,10 @@ object DeskOs {
             when {
                 mac -> ProcessBuilder("open", "-R", file.absolutePath).start()
                 windows -> ProcessBuilder("explorer.exe", "/select,", file.absolutePath).start()
-                else -> java.awt.Desktop.getDesktop().open(file.parentFile)
+                else -> kotlin.concurrent.thread(isDaemon = true) {
+                    val shown = runCatching { ProcessBuilder(showItemsCommand(file)).redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.DISCARD).start().waitFor() == 0 }.getOrDefault(false)
+                    if (!shown) open(file.parentFile)
+                }
             }
         }
     }

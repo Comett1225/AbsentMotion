@@ -64,6 +64,8 @@ object DeskLibrary {
     }
 
     fun chooseFolder(): File? {
+        if (DeskOs.linux) return javax.swing.JFileChooser().apply { dialogTitle = "Link a media folder"; fileSelectionMode = javax.swing.JFileChooser.DIRECTORIES_ONLY }
+            .takeIf { it.showOpenDialog(DeskFiles.window) == javax.swing.JFileChooser.APPROVE_OPTION }?.selectedFile?.takeIf { it.isDirectory }
         System.setProperty("apple.awt.fileDialogForDirectories", "true")
         try {
             val dialog = java.awt.FileDialog(DeskFiles.window, "Link a media folder", java.awt.FileDialog.LOAD)

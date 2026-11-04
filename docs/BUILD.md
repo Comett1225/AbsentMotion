@@ -216,7 +216,7 @@ the smoke, memory-pressure, engine, device export, audio export, export and spee
 report outside the repository; `status`, `create`, `boot`, `run`, `stop` and `clean` manage a matrix of arm64 emulators (Android 9,
 13, 14, 16, a tablet and Android 17 with 16 KB memory pages). `create` stops when less than 15 GB would stay free. RNNoise is still vendored and its upstream commit is not recorded.
 
-## 9. Desktop app (macOS now; Windows and Linux in progress)
+## 9. Desktop app (macOS and Windows; Linux built, desktop use untested)
 
 The desktop app compiles `shared/kotlin` with Compose Multiplatform (JDK 21) in its own Gradle build in `pc/`. The native
 library comes from `pc/native/CMakeLists.txt` plus the part for the running system (`macos/native/macos.cmake`,
@@ -227,4 +227,37 @@ or `linux/build.sh` for it. It needs Skia built for that system (section 5) and 
     ./gradlew run                    # start the app
     ./gradlew test                   # desktop tests
     ./gradlew createDistributable    # AbsentMotion.app / the Windows or Linux app folder
+
+**Linux.** `linux/Dockerfile` is the build machine: Ubuntu 24.04 with Temurin 21.0.13, clang 18, CMake, Ninja, patchelf,
+`dpkg-deb`, Xvfb, Mesa's software Vulkan driver (so the tests also run the Vulkan path) and appimagetool 1.9.1 with the AppImage
+type 2 runtime; every download is checked against its SHA-256. Use it on a Mac with Docker (arm64 natively; x64 with
+`--platform linux/amd64`, much slower) or run the same steps on an Ubuntu 24.04 machine. Without the Android SDK, point
+`AM_ANDROID_API` at the `android-api.jar` that `./gradlew -p pc androidApiJar` makes where the SDK is installed. FFmpeg is the
+BtbN `linux64-gpl-shared-9.0` or `linuxarm64-gpl-shared-9.0` build (`THIRD_PARTY_NOTICES.md` has the file names and SHA-256),
+unpacked:
+
+    docker build -t am-linux linux
+    docker run --rm -v "$PWD:/src" -w /src -e AM_ANDROID_API=/src/<android-api.jar> am-linux sh -c '
+        linux/skia.sh &&
+        FFMPEG_PREFIX=/src/<ffmpeg> ./gradlew -p pc test createDistributable packageDeb &&
+        linux/package.sh 5.0.0-pre'
+
+`linux/skia.sh` builds Skia with `linux/skia-args.gn` (Ganesh and Vulkan, no OpenGL, fontconfig, Skia's own FreeType) into
+`third_party/skia/out/linux-arm64` or `out/linux-x64` (about 175 MB; about 25 minutes in Docker on an Apple-silicon Mac).
+It needs the pinned Skia source with its dependencies and the patch, as `tools/build_skia.sh` leaves `third_party/skia` (or
+any such checkout through `SKIA_DIR`; the source can be read-only when `SKIA_OUT` points elsewhere).
+The native library links libstdc++ statically and `linux/native/glibc_compat.c` maps the C23 `strtol` and `scanf` names,
+`fmod` and `arc4random` that Ubuntu 24.04's headers pick to older glibc symbols, so the build needs only glibc 2.35 (Ubuntu
+22.04, Debian 12 or newer). `linux/package.sh` writes `pc/build/linux-release/AbsentMotion-<version>-linux-<arm64|x86_64>.deb`
+and `.AppImage` (`linux/README.md` lists what it changes in the Compose `.deb`). The `.deb` installs to `/opt/absentmotion`
+with a menu entry and the `.absproj` file type. Compose sometimes keeps an old `createDistributable` and `.deb` after only the
+native library changed; delete `pc/build/compose/binaries` before packaging a release.
+
+Tests: run them as a normal user (as root the read-only-folder test cannot make saving fail) with `pc/build` on a file system
+that honours folder permissions (a Docker Desktop bind mount does not; a `tmpfs` mount on `pc/build/save-failed-data` does).
+`DeskParityRoundTest.filesFromTheSystemOpenOrImport` hangs headless on Linux; leave it out by passing `--tests` for every other
+class and method. Without any Vulkan driver the engine draws on the CPU, and frame blending, optical-flow smoothing, motion
+blur smoothing and Datamosh fail (they need a GPU), so install `mesa-vulkan-drivers` for the tests. Two sound tests need a
+real sound card and one AAC test expects the bit rate of the macOS and Windows encoders; FFmpeg's own `aac` encoder, the
+only one on Linux, writes far fewer bits for the quiet test clip.
 

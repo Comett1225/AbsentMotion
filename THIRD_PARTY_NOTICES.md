@@ -16,7 +16,7 @@ dependency is added, removed or upgraded, update this file in the same change.
 
 **Contents**
 
-1. Engine libraries (C and C++): Skia and the libraries it links, whisper.cpp and ggml, RNNoise, ncnn, glslang, the RIFE warp layer, LAME, FFmpeg (Windows and macOS desktop apps only) with the codec libraries of the macOS build (x264, x265, libvpx, dav1d, Opus, SVT-AV1), and the video downloader add-on (CPython and yt-dlp, downloaded at run time)
+1. Engine libraries (C and C++): Skia and the libraries it links, whisper.cpp and ggml, RNNoise, ncnn, glslang, the RIFE warp layer, LAME, FFmpeg (desktop apps only) with the codec libraries of the macOS build (x264, x265, libvpx, dav1d, Opus, SVT-AV1), the AppImage runtime (Linux AppImage only), and the video downloader add-on (CPython and yt-dlp, downloaded at run time)
 2. Machine learning models: OpenAI Whisper weights, RIFE and Real-ESRGAN weights and the AI background removal 2.0 model (all downloaded at run time), the built-in background removal model
 3. Kotlin and Compose libraries, including those bundled in the desktop apps (OpenJDK, Compose Desktop, Skiko, kotlinx)
 4. Fonts, icons and effect thumbnails
@@ -211,7 +211,7 @@ together with Skia.
 - Used in: MP3 audio export. LAME is built as its own shared library, `libmp3lame.so`, and loaded through a small
   separate library, `liblame_jni.so`, so it can be replaced with another build of LAME.
 
-### FFmpeg (Windows and macOS desktop apps only)
+### FFmpeg (desktop apps only)
 
 - Copyright: Copyright (c) 2000-2026 the FFmpeg developers.
 - URL: https://ffmpeg.org/
@@ -230,6 +230,26 @@ Windows:
 - Used in: the Windows installer. `amdesktop.dll` links the shared `avformat`, `avcodec`, `avutil`, `swresample` and
   `swscale` DLLs for video decoding (D3D11 hardware decoding when available), and `ffmpeg.exe` and `ffprobe.exe` run export,
   the Tools tab and media probing. The DLLs sit unchanged in the app folder, so they can be replaced with another build.
+
+Linux (x86_64 and arm64):
+
+- Version: n9.0.2-47-gb204e94e90-20261104, the BtbN FFmpeg-Builds `linux64-gpl-shared-9.0` and `linuxarm64-gpl-shared-9.0`
+  auto-builds of 2026-11-04 (release `autobuild-2026-11-04-12-51`: `ffmpeg-n9.0.2-47-gb204e94e90-linux64-gpl-shared-9.0.tar.xz`,
+  SHA-256 `04c177a65ad62ef84c512e90ac66dcc278bdf6da114d50a8a77de793fb3f5434`, and
+  `ffmpeg-n9.0.2-47-gb204e94e90-linuxarm64-gpl-shared-9.0.tar.xz`, SHA-256
+  `57ad908a337b5ebdf3f293c267a4e5c3e62042c553c56acec0dded442338726e`; both match BtbN's `checksums.sha256`), from
+  https://github.com/BtbN/FFmpeg-Builds. The only change is the run path: `linux/build.sh` sets it to `$ORIGIN` with
+  `patchelf`, so the programs and libraries find each other in one folder.
+- Licence: GNU General Public License, version 3 or later (the build uses `--enable-gpl --enable-version3` and no
+  `--enable-nonfree`). The GPLv3 text from the package ships next to the libraries as `ffmpeg-LICENSE.txt`.
+- Codec libraries in this build (from its configure line): x264, x265, SVT-AV1, libaom, rav1e, dav1d, libvpx, Opus,
+  Vorbis, LAME, Theora, OpenH264, Kvazaar, VVenC, libvmaf, libplacebo, libass, FreeType, HarfBuzz, FriBidi, fontconfig,
+  libxml2, lcms2, GMP, OpenSSL, liblzma, zlib and others, linked statically into the libraries, all under licences compatible
+  with GPL-3.0. BtbN's build scripts list the exact sources.
+- Used in: the Linux packages (`.deb` and AppImage). `libamdesktop.so` links the shared `avformat`, `avcodec`, `avutil` and
+  `swscale` libraries (and `swresample` through them) for video decoding (VA-API when available), and `ffmpeg` and `ffprobe`
+  run export, the Tools tab and media probing. They sit in the app's `lib/app/resources` folder
+  (`/opt/absentmotion/lib/app/resources` for the `.deb`), so they can be replaced with another build.
 
 macOS (Apple silicon and Intel):
 
@@ -308,6 +328,18 @@ versions, dav1d matches VideoLAN's published sum and signature, and x264 is the 
 - Copyright: Copyright (c) 2021, Alliance for Open Media.
 - URL: https://gitlab.com/AOMediaCodec/SVT-AV1
 - Used in: AV1 export (`libsvtav1`).
+
+### AppImage runtime (Linux AppImage only)
+
+- Version: the `continuous` build of 2026-10-19 from https://github.com/AppImage/type2-runtime (`runtime-x86_64`, SHA-256
+  `617aa77314d57c8b8e4fae9c3f0b35af7b30d5529cb69e98f64f92510ed98a46`, and `runtime-aarch64`, SHA-256
+  `9a72a744d221576c9347ec074243acc5c3c7568896b12714e0e82e9f0bf47900`), put in front of the app by appimagetool 1.9.1.
+- Licence: MIT (Copyright (c) 2004-23 probonopd). The runtime is one static program that also contains musl libc (MIT),
+  libfuse (GNU Lesser General Public License, version 2.1), squashfuse (BSD-2-Clause), zstd (BSD-3-Clause) and zlib (zlib
+  licence), as its `LICENSE` file states with links to each text.
+- URL: https://github.com/AppImage/type2-runtime
+- Used in: the AppImage only. It mounts the app stored inside the AppImage file and starts it; it is not part of the app
+  and can be swapped by unpacking the AppImage (`--appimage-extract`) and packing it again with another runtime.
 
 ### Video downloader add-on (downloaded on request, not part of the app)
 
@@ -498,24 +530,24 @@ inspected for a `META-INF/NOTICE` file.
 - URL: https://github.com/JetBrains/java-annotations
 - Used in: the app.
 
-### Desktop app (macOS and Windows)
+### Desktop app (macOS, Windows and Linux)
 
 The desktop apps (`pc/`) bundle the Java runtime and the jars below in the app folder (`AbsentMotion.app/Contents/app` on
-macOS, the install folder's `app` folder on Windows). Versions are the ones the macOS arm64 build of 2026-11-04 resolved
-(`./gradlew -p pc dependencies --configuration runtimeClasspath` and the jars in the built app); the Intel Mac and Windows
-builds use the same versions with their own Skiko native jar. Skia and FFmpeg are listed in section 1.
+macOS, the install folder's `app` folder on Windows, `lib/app` on Linux). Versions are the ones the macOS arm64 build of 2026-11-04 resolved
+(`./gradlew -p pc dependencies --configuration runtimeClasspath` and the jars in the built app); the Intel Mac, Windows
+and Linux builds use the same versions with their own Skiko native jar. Skia and FFmpeg are listed in section 1.
 
 #### Java runtime (OpenJDK 21)
 
 - Version: OpenJDK 21, trimmed by `jlink` to the modules `java.base`, `java.datatransfer`, `java.desktop`, `java.logging`,
   `java.prefs`, `java.xml` and `jdk.crypto.ec`. The macOS release apps (Apple silicon and Intel) ship the JetBrains Runtime
-  21.0.11 (an OpenJDK 21 build); the Windows installer ships Eclipse Temurin 21.0.13; local developer builds may use another
+  21.0.11 (an OpenJDK 21 build); the Windows installer and the Linux packages ship Eclipse Temurin 21.0.13; local developer builds may use another
   OpenJDK 21. The JetBrains Runtime API jar below is a separate client library.
 - Licence: GNU General Public License, version 2, with the Classpath Exception (text in appendix A.22). Files of the
   runtime that carry a different licence are listed next.
 - Copyright: Copyright (c) Oracle and/or its affiliates and the OpenJDK contributors.
 - URL: https://openjdk.org/
-- Used in: runs the app. The runtime sits unchanged in `AbsentMotion.app/Contents/runtime` (macOS) and `runtime` (Windows),
+- Used in: runs the app. The runtime sits unchanged in `AbsentMotion.app/Contents/runtime` (macOS), `runtime` (Windows) and `lib/runtime` (Linux),
   so it can be replaced with another build of OpenJDK 21. Its own `legal` folder there holds the licence files per module
   (`LICENSE`, `ADDITIONAL_LICENSE_INFO`, `ASSEMBLY_EXCEPTION`) and the full texts of the parts below.
 

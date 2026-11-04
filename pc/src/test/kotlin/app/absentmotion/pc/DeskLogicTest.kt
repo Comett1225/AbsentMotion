@@ -119,6 +119,12 @@ class DeskLogicTest {
         assertFalse(DeskKeys.altGr(windows = true, ctrl = true, alt = false))
     }
 
+    @Test fun linuxShowsTheFileThroughTheFileManager() {
+        val command = DeskOs.showItemsCommand(File("/tmp/a b,c.mp4"))
+        assertEquals("org.freedesktop.FileManager1.ShowItems", command[command.size - 3])
+        assertTrue(command[command.size - 2].startsWith("array:string:file:///") && command[command.size - 2].endsWith("/tmp/a%20b%2Cc.mp4"))
+    }
+
     @Test fun heldKeysActOnce() {
         val s = session("repeat")
         try {

@@ -25,8 +25,10 @@
 #include "include/ports/SkFontMgr_mac_ct.h"
 #elif defined(_WIN32)
 #include "include/ports/SkTypeface_win.h"
-#else
+#elif defined(__ANDROID__)
 #include "include/ports/SkFontMgr_android.h"
+#else
+#include "include/ports/SkFontMgr_fontconfig.h"
 #endif
 #include "include/ports/SkFontScanner_FreeType.h"
 #include "modules/skparagraph/include/ParagraphBuilder.h"
@@ -66,8 +68,10 @@ sk_sp<SkFontMgr> systemFonts() {
     static auto manager = SkFontMgr_New_CoreText(nullptr);
 #elif defined(_WIN32)
     static auto manager = SkFontMgr_New_DirectWrite();
-#else
+#elif defined(__ANDROID__)
     static auto manager = SkFontMgr_New_Android(nullptr, SkFontScanner_Make_FreeType());
+#else
+    static auto manager = SkFontMgr_New_FontConfig(nullptr, SkFontScanner_Make_FreeType());
 #endif
     return manager;
 }

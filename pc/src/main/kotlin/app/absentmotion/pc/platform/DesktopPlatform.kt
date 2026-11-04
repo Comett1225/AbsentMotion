@@ -23,7 +23,7 @@ object DesktopPlatform {
         return dialog.files.toList()
     }
     fun executable(name: String): String = System.getProperty("am.$name") ?: System.getenv("AM_${name.uppercase()}")
-        ?: (if (windows) listOfNotNull(System.getProperty("compose.application.resources.dir"), System.getProperty("jpackage.app-path")?.let { File(it).parent }).map { File(it, "$name.exe") } else listOf(File("/opt/homebrew/bin/$name"), File("/usr/local/bin/$name"))).firstOrNull { it.isFile && it.canExecute() }?.absolutePath ?: name
+        ?: (if (windows) listOfNotNull(System.getProperty("compose.application.resources.dir"), System.getProperty("jpackage.app-path")?.let { File(it).parent }).map { File(it, "$name.exe") } else listOfNotNull(System.getProperty("compose.application.resources.dir")?.let { File(it, name) }) + listOf(File("/opt/homebrew/bin/$name"), File("/usr/local/bin/$name"))).firstOrNull { it.isFile && it.canExecute() }?.absolutePath ?: name
     fun title(window: Window, file: File?) {
         if (mac) (window as? javax.swing.JFrame)?.rootPane?.putClientProperty("Window.documentFile", file)
         (window as? Frame)?.title = file?.nameWithoutExtension?.let { "$it - AbsentMotion" } ?: "AbsentMotion"

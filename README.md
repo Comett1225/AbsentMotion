@@ -122,7 +122,7 @@ MP4, MOV, MKV or WebM video (H.264, HEVC, AV1, VP9 or APV, as the phone supports
 <details>
 <summary><strong>Tablets and computers</strong></summary>
 
-Layouts for big tablet screens in portrait and landscape, with panels beside the preview. From 5.0 there is a desktop version for Macs with Apple silicon: the same editor, effects and export with a mouse timeline, right-click menus, keyboard shortcuts and drag and drop. Windows is being tested and Linux comes later.
+Layouts for big tablet screens in portrait and landscape, with panels beside the preview. From 5.0 there is a desktop version for Macs with Apple silicon: the same editor, effects and export with a mouse timeline, right-click menus, keyboard shortcuts and drag and drop. Windows and Linux are being tested.
 
 </details>
 
@@ -158,7 +158,7 @@ There are two builds: `foss`, which contains no Google libraries at all, and `co
 Not sure about your phone? The [phone checker](https://comett1225.github.io/AbsentMotion/phone-checker.html) tells you
 which build to download.
 
-The desktop version runs on Macs with Apple silicon (`arm64`). Windows builds and is being tested; Linux is not built yet.
+The desktop version runs on Macs with Apple silicon (`arm64`). Windows builds and is being tested; Linux (`.deb` and AppImage) builds and runs its automatic tests, but has not been tried on a Linux desktop yet.
 
 ## Roadmap
 

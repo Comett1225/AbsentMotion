@@ -10,7 +10,7 @@
     "android": "reference build",
     "macos": "built and used every day; desktop UI tests run here",
     "windows": "builds and the desktop UI tests pass on the Windows PC; per-feature use is untested unless noted",
-    "linux": "not built or tested yet (needs a Linux Skia build)"
+    "linux": "arm64 built in Docker on the Mac (Ubuntu 24.04); the desktop tests run there headless (Vulkan through Mesa's software driver) and the .deb and AppImage were installed and run in clean Ubuntu 24.04 and Debian 12 containers; not tried on a Linux desktop yet; x64 is built in WSL on the Windows PC"
   },
   "features": [
     {
@@ -837,8 +837,8 @@
       "android": "works",
       "macos": "works",
       "windows": "works",
-      "linux": "untested",
-      "note": "encoded by ffmpeg; hardware encoders are picked per OS (VideoToolbox, NVENC/QSV/AMF/MF); APV needs liboapv in the ffmpeg build. Windows: the installer ships the GPL FFmpeg build (libx264, libx265, libvpx, libsvtav1, libaom, libopus, libdav1d; nothing nonfree), and hardware encoders are still tried first. Checked 2026-11-04: H.264 MP4 in the installed app (h264_amf); AV1 MP4 (libsvtav1 and av1_amf), VP9 WebM with Opus, H.264 (libx264), HEVC MOV (libx265) and Ogg/Opus through the exporter with the shipped ffmpeg. av1_amf pads frames whose width is not a multiple of 64 or height not a multiple of 16 (720x1280 came out 768x1280), so it is used only for aligned sizes and SVT-AV1 takes the rest. AAC uses aac_mf at 192 kbps and below for constant bitrate like Android. macOS release builds bundle a GPL FFmpeg 9.0.2 with libx264, libx265, libvpx, libsvtav1, libopus and libdav1d: H.264 and H.265 use VideoToolbox up to 4096 px per side and libx264/libx265 above that, AV1 uses libsvtav1, VP9 libvpx-vp9 and Opus libopus (DeskExportTest checks H.264 MP4, HEVC MOV, AV1 MKV and VP9 WebM with Opus)"
+      "linux": "works",
+      "note": "encoded by ffmpeg; hardware encoders are picked per OS (VideoToolbox, NVENC/QSV/AMF/MF); APV needs liboapv in the ffmpeg build. Windows: the installer ships the GPL FFmpeg build (libx264, libx265, libvpx, libsvtav1, libaom, libopus, libdav1d; nothing nonfree), and hardware encoders are still tried first. Checked 2026-11-04: H.264 MP4 in the installed app (h264_amf); AV1 MP4 (libsvtav1 and av1_amf), VP9 WebM with Opus, H.264 (libx264), HEVC MOV (libx265) and Ogg/Opus through the exporter with the shipped ffmpeg. av1_amf pads frames whose width is not a multiple of 64 or height not a multiple of 16 (720x1280 came out 768x1280), so it is used only for aligned sizes and SVT-AV1 takes the rest. AAC uses aac_mf at 192 kbps and below for constant bitrate like Android. macOS release builds bundle a GPL FFmpeg 9.0.2 with libx264, libx265, libvpx, libsvtav1, libopus and libdav1d: H.264 and H.265 use VideoToolbox up to 4096 px per side and libx264/libx265 above that, AV1 uses libsvtav1, VP9 libvpx-vp9 and Opus libopus (DeskExportTest checks H.264 MP4, HEVC MOV, AV1 MKV and VP9 WebM with Opus) Linux: DeskExportTest (H.264, HEVC, AV1, VP9 with sound) passes in Docker; an MP4 exported in clean Ubuntu 24.04 and Debian 12 containers checked with the bundled ffprobe"
     },
     {
       "id": "export.gif",
@@ -847,8 +847,8 @@
       "android": "works",
       "macos": "works",
       "windows": "untested",
-      "linux": "untested",
-      "note": ""
+      "linux": "works",
+      "note": "Linux: GIF export checked by DeskExportTest in Docker"
     },
     {
       "id": "export.frame",
@@ -1007,8 +1007,8 @@
       "android": "works",
       "macos": "works",
       "windows": "works",
-      "linux": "untested",
-      "note": "Android copies with MediaMuxer and re-encodes with the Compress pipeline; desktop uses ffmpeg (DeskTools, DeskCompress). Windows: checked in the installed app; cancelling waits for ffmpeg to exit so the partial file can be deleted"
+      "linux": "works",
+      "note": "Android copies with MediaMuxer and re-encodes with the Compress pipeline; desktop uses ffmpeg (DeskTools, DeskCompress). Windows: checked in the installed app; cancelling waits for ffmpeg to exit so the partial file can be deleted Linux: the trim tests of DeskToolsTest pass in Docker"
     },
     {
       "id": "home.tools_extract_audio",
@@ -1017,8 +1017,8 @@
       "android": "works",
       "macos": "works",
       "windows": "works",
-      "linux": "untested",
-      "note": "Android copies the AAC track or encodes through the audio export (LAME for MP3); desktop uses ffmpeg (DeskTools). Windows: checked in the installed app"
+      "linux": "partial",
+      "note": "Android copies the AAC track or encodes through the audio export (LAME for MP3); desktop uses ffmpeg (DeskTools). Windows: checked in the installed app Linux: the only AAC encoder is FFmpeg's own aac, which writes about 14 kbit/s instead of 192 on the quiet test clip (DeskToolsTest checks the bit rate); M4A copy and MP3 work"
     },
     {
       "id": "home.tools_gif",
@@ -1027,8 +1027,8 @@
       "android": "works",
       "macos": "works",
       "windows": "works",
-      "linux": "untested",
-      "note": "same code on every platform: the frame reader (MediaCodec or ffmpeg) feeds the GIF export encoder. Windows: checked in the installed app"
+      "linux": "works",
+      "note": "same code on every platform: the frame reader (MediaCodec or ffmpeg) feeds the GIF export encoder. Windows: checked in the installed app Linux: the GIF tests of DeskToolsTest pass in Docker"
     },
     {
       "id": "home.tools_downloader",
@@ -1108,7 +1108,7 @@
       "macos": "partial",
       "windows": "partial",
       "linux": "untested",
-      "note": "Command-line files, the macOS open-file event and a one-instance socket on Windows and Linux feed one queue (project files import and open, media files open in the open project or a new one). macOS: Finder picks the installed app for .absproj (checked 2026-11-03); the end-to-end test DeskParityRoundTest.filesFromTheSystemOpenOrImport still hangs, so this stays partial. Windows: opening a file from the command line works, and the one-instance socket now answers (before 2026-11-04 readLines() closed the socket, so a second instance never forwarded); opening from Explorer through the installer's file association is untested"
+      "note": "Command-line files, the macOS open-file event and a one-instance socket on Windows and Linux feed one queue (project files import and open, media files open in the open project or a new one). macOS: Finder picks the installed app for .absproj (checked 2026-11-03); the end-to-end test DeskParityRoundTest.filesFromTheSystemOpenOrImport still hangs, so this stays partial. Windows: opening a file from the command line works, and the one-instance socket now answers (before 2026-11-04 readLines() closed the socket, so a second instance never forwarded); opening from Explorer through the installer's file association is untested Linux: the .deb's menu entry passes files (%F) and registers .absproj; under Xvfb a second start handed a scene to the running app, which opened it; DeskParityRoundTest.filesFromTheSystemOpenOrImport hangs headless on Linux"
     },
     {
       "id": "home.settings",
@@ -1348,7 +1348,7 @@
       "macos": "works",
       "windows": "untested",
       "linux": "untested",
-      "note": "macOS reads the CoreAudio output latency; Windows and Linux use the Java mixer latency. Windows: Java Sound over DirectSound; the engine primes three blocks there (with two, the DirectSound clock ran about 0.5% slow); DeskAudioTest clock and mix checks pass (about 140 ppm, under 1.5 ms jitter); not yet checked by ear"
+      "note": "macOS reads the CoreAudio output latency; Windows and Linux use the Java mixer latency. Windows: Java Sound over DirectSound; the engine primes three blocks there (with two, the DirectSound clock ran about 0.5% slow); DeskAudioTest clock and mix checks pass (about 140 ppm, under 1.5 ms jitter); not yet checked by ear Linux: needs a real sound device; in Docker with a PulseAudio null sink the output clock is right, but the mix check (28.9 dB, needs 50) and the sound preview position fail, so check on a desktop"
     },
     {
       "id": "plat.video_decode",
@@ -1357,8 +1357,8 @@
       "android": "works",
       "macos": "works",
       "windows": "works",
-      "linux": "untested",
-      "note": "macOS VideoToolbox; Windows D3D11 hardware decode and copy; Linux VA-API (not built); ffmpeg software fallback everywhere. Windows: D3D11VA through the GPL FFmpeg DLLs the installer ships (VideoDecodeTest: hardware decode, seek 14 ms against 164 ms through the ffmpeg pipe); built without FFMPEG_DIR the engine falls back to the ffmpeg program"
+      "linux": "works",
+      "note": "macOS VideoToolbox; Windows D3D11 hardware decode and copy; Linux: software decoding through the bundled libav checked (VideoDecodeTest, clean containers); VA-API untested (no GPU in Docker) and skipped when libva, libva-drm, libva-x11, libdrm or libX11 is missing, because BtbN's FFmpeg loads them lazily and would abort ffmpeg software fallback everywhere. Windows: D3D11VA through the GPL FFmpeg DLLs the installer ships (VideoDecodeTest: hardware decode, seek 14 ms against 164 ms through the ffmpeg pipe); built without FFMPEG_DIR the engine falls back to the ffmpeg program"
     },
     {
       "id": "plat.gpu",
@@ -1368,7 +1368,7 @@
       "macos": "works",
       "windows": "works",
       "linux": "untested",
-      "note": "Metal on macOS; Vulkan on Windows and Linux; Linux not built yet. Windows: Vulkan on an AMD Radeon 780M; the Compose UI itself draws through Skiko's Direct3D 12"
+      "note": "Metal on macOS; Vulkan on Windows and Linux; Linux: the Vulkan path runs on Mesa's software driver (llvmpipe) in Docker and the desktop tests pass on it; real GPUs untested; with no Vulkan driver the CPU fallback draws, but frame blending, optical-flow and motion blur smoothing and Datamosh fail because they need a GPU Windows: Vulkan on an AMD Radeon 780M; the Compose UI itself draws through Skiko's Direct3D 12"
     },
     {
       "id": "plat.native_build",
@@ -1377,8 +1377,8 @@
       "android": "works",
       "macos": "works",
       "windows": "works",
-      "linux": "missing",
-      "note": "Linux scripts (linux/build.sh, linux.cmake) exist but were never run; they need a Linux Skia build (tools/build_skia.sh)"
+      "linux": "works",
+      "note": "Linux: built in Docker (Ubuntu 24.04, arm64) with linux/skia.sh, linux/build.sh and linux.cmake; runs on glibc 2.35 and newer (checked on Debian 12)"
     },
     {
       "id": "plat.installer",
@@ -1387,8 +1387,8 @@
       "android": "works",
       "macos": "works",
       "windows": "works",
-      "linux": "missing",
-      "note": "the macOS bundle is codesigned by macos/build.sh; there is no Linux package yet. Windows: packageMsi makes a per-user MSI (no administrator prompt) with Start menu and desktop shortcuts and a folder choice; it installs silently with msiexec /qn and the app runs; the FFmpeg DLLs, ffmpeg.exe, ffprobe.exe and icudtl.dat ship in app/resources"
+      "linux": "works",
+      "note": "the macOS bundle is codesigned by macos/build.sh; Linux: linux/package.sh makes the .deb (/opt/absentmotion, menu entry, .absproj file type) and an AppImage; both installed or run in clean Ubuntu 24.04 and Debian 12 containers, and the window opened under Xvfb; not tried on a Linux desktop, and the AppImage was run unpacked (no FUSE in Docker) Windows: packageMsi makes a per-user MSI (no administrator prompt) with Start menu and desktop shortcuts and a folder choice; it installs silently with msiexec /qn and the app runs; the FFmpeg DLLs, ffmpeg.exe, ffprobe.exe and icudtl.dat ship in app/resources"
     },
     {
       "id": "plat.menu_bar",
@@ -1408,7 +1408,7 @@
       "macos": "works",
       "windows": "works",
       "linux": "untested",
-      "note": "java.awt.FileDialog everywhere; reveal uses open -R, explorer /select, xdg-open. Windows: the media picker works; AWT shows the older Explorer-style dialog, which opens in the program's working folder"
+      "note": "java.awt.FileDialog everywhere; reveal uses open -R, explorer /select, xdg-open. Windows: the media picker works; AWT shows the older Explorer-style dialog, which opens in the program's working folder Linux: AWT FileDialog (the GTK dialog when GTK 3 is installed); Link a media folder uses a Swing folder chooser, because FileDialog cannot pick folders there; Show in Folder asks the file manager over D-Bus (org.freedesktop.FileManager1.ShowItems) and opens the folder when that fails; exports go to the folders xdg-user-dir names (checked with a localised Videos folder in Docker); none of it tried on a desktop"
     },
     {
       "id": "plat.keyboard",
@@ -1438,7 +1438,7 @@
       "macos": "works",
       "windows": "untested",
       "linux": "untested",
-      "note": "untested outside macOS"
+      "note": "untested outside macOS Linux: fallback fonts for Arabic and Hebrew come from fontconfig (checked in renders); CJK needs a CJK font installed"
     },
     {
       "id": "plat.android_codec_api",
