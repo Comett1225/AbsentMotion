@@ -71,6 +71,7 @@ struct Video {
     int64_t want = 0, cover = INT64_MAX, last = INT64_MIN;
     bool asked = false, ended = false, quit = false;
     std::thread worker;
+    bool hardware = false;
     int64_t shownUs = INT64_MIN;
     sk_sp<SkImage> shown;
 
@@ -87,6 +88,44 @@ struct Video {
         avcodec_free_context(&codec);
         avformat_close_input(&format);
         av_packet_free(&packet);
+    }
+
+    bool configure(const AVCodec* decoder, AVBufferRef* device) {
+        codec = avcodec_alloc_context3(decoder);
+        if (!codec || avcodec_parameters_to_context(codec, stream->codecpar) < 0) return false;
+        codec->pkt_timebase = stream->time_base;
+        if (device) {
+            const auto type = ((AVHWDeviceContext*)device->data)->type;
+            for (int i = 0; const AVCodecHWConfig* config = avcodec_get_hw_config(decoder, i); ++i) {
+                if ((config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX) && config->device_type == type) {
+                    codec->hw_device_ctx = av_buffer_ref(device);
+                    codec->opaque = (void*)(intptr_t)config->pix_fmt;
+                    codec->get_format = PickFormat;
+                    codec->thread_count = 1;
+                    hardware = true;
+                    break;
+                }
+            }
+        }
+        if (!hardware) codec->thread_count = 0;
+        return avcodec_open2(codec, decoder, nullptr) >= 0;
+    }
+
+    bool probe() {
+        if (std::getenv("AM_VIDEO_AV1_REFUSE")) return false;
+        FramePtr frame(av_frame_alloc());
+        bool got = false;
+        for (int sent = 0; !got && sent < 64;) {
+            if (av_read_frame(format, packet) < 0) break;
+            if (packet->stream_index == stream->index) {
+                ++sent;
+                if (avcodec_send_packet(codec, packet) < 0) { av_packet_unref(packet); break; }
+                got = avcodec_receive_frame(codec, frame.get()) >= 0 && frame->hw_frames_ctx;
+            }
+            av_packet_unref(packet);
+        }
+        if (got) seek(0);
+        return got;
     }
 
     int64_t toUs(int64_t pts) const { return av_rescale_q(pts - origin, stream->time_base, AV_TIME_BASE_Q); }
@@ -285,27 +324,15 @@ std::unique_ptr<Video> Open(const std::string& path) {
     v->stream = v->format->streams[index];
     const bool audio = av_find_best_stream(v->format, AVMEDIA_TYPE_AUDIO, -1, -1, nullptr, 0) >= 0;
     for (unsigned i = 0; i < v->format->nb_streams; ++i) if ((int)i != index) v->format->streams[i]->discard = AVDISCARD_ALL;
-    v->codec = avcodec_alloc_context3(decoder);
-    if (!v->codec || avcodec_parameters_to_context(v->codec, v->stream->codecpar) < 0) return nullptr;
-    v->codec->pkt_timebase = v->stream->time_base;
-    bool hardware = false;
-    AVBufferRef* device = std::getenv("AM_VIDEO_SOFTWARE") ? nullptr : VideoHwDevice();
-    if (device) {
-        const auto type = ((AVHWDeviceContext*)device->data)->type;
-        for (int i = 0; const AVCodecHWConfig* config = avcodec_get_hw_config(decoder, i); ++i) {
-            if ((config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX) && config->device_type == type) {
-                v->codec->hw_device_ctx = av_buffer_ref(device);
-                v->codec->opaque = (void*)(intptr_t)config->pix_fmt;
-                v->codec->get_format = PickFormat;
-                v->codec->thread_count = 1;
-                hardware = true;
-                break;
-            }
-        }
-    }
-    if (!hardware) v->codec->thread_count = 0;
-    if (avcodec_open2(v->codec, decoder, nullptr) < 0) return nullptr;
     v->origin = v->stream->start_time != AV_NOPTS_VALUE ? v->stream->start_time : 0;
+    AVBufferRef* device = std::getenv("AM_VIDEO_SOFTWARE") ? nullptr : VideoHwDevice();
+    const AVCodec* native = device && decoder->id == AV_CODEC_ID_AV1 && std::string(decoder->name) != "av1" ? avcodec_find_decoder_by_name("av1") : nullptr;
+    if (native && !(v->configure(native, device) && v->hardware && v->probe())) {
+        avcodec_free_context(&v->codec);
+        v->hardware = false;
+        device = nullptr;
+    }
+    if (!v->codec && !v->configure(decoder, device)) return nullptr;
     const AVCodecParameters* par = v->stream->codecpar;
     int orientation = 0;
     if (const AVPacketSideData* side = av_packet_side_data_get(par->coded_side_data, par->nb_coded_side_data, AV_PKT_DATA_DISPLAYMATRIX)) {
@@ -316,7 +343,7 @@ std::unique_ptr<Video> Open(const std::string& path) {
                                                                    : std::max<int64_t>(v->format->duration, 0);
     AVRational rate = v->stream->avg_frame_rate.num > 0 && v->stream->avg_frame_rate.den > 0 ? v->stream->avg_frame_rate : v->stream->r_frame_rate;
     const double fps = rate.num > 0 && rate.den > 0 ? av_q2d(rate) : 30.0;
-    const double values[7] = {(double)par->width, (double)par->height, (double)duration, fps, (double)orientation, audio ? 1.0 : 0.0, hardware ? 1.0 : 0.0};
+    const double values[7] = {(double)par->width, (double)par->height, (double)duration, fps, (double)orientation, audio ? 1.0 : 0.0, v->hardware ? 1.0 : 0.0};
     std::copy(values, values + 7, v->info);
     Video* raw = v.get();
     v->worker = std::thread([raw] { raw->run(); });

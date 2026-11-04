@@ -17,7 +17,7 @@ import org.junit.Assert.assertTrue
 class VideoDecodeTest {
     private val out = File("build/video-check").also { it.mkdirs() }
 
-    private fun sceneXml(file: File, w: Int, h: Int) = """<?xml version='1.0' encoding='UTF-8' ?>
+    internal fun sceneXml(file: File, w: Int, h: Int) = """<?xml version='1.0' encoding='UTF-8' ?>
 <scene title="Video" width="$w" height="$h" bgcolor="#ff000000" totalTime="4999" fps="30">
   <media uri="${file.absolutePath}" type="video/mp4" orientation="0" duration="5000000" width="$w" height="$h" />
   <shape id="1" startTime="0" endTime="4999" fillType="media" fillVideo="${file.absolutePath}" outTime="5000" mediaFillMode="fill" s=".rect">
@@ -47,7 +47,7 @@ class VideoDecodeTest {
         }
     }
 
-    private fun psnr(handle: Long, w: Int, h: Int, timeMs: Double, file: File, k: Int, png: String): Double {
+    internal fun psnr(handle: Long, w: Int, h: Int, timeMs: Double, file: File, k: Int, png: String): Double {
         val rgba = DesktopNative.still(handle, timeMs, w, h, true)!!
         val ours = BufferedImage(w, h, BufferedImage.TYPE_INT_RGB)
         ours.setRGB(0, 0, w, h, IntArray(w * h) { i -> ((rgba[i * 4].toInt() and 255) shl 16) or ((rgba[i * 4 + 1].toInt() and 255) shl 8) or (rgba[i * 4 + 2].toInt() and 255) }, 0, w)
@@ -80,7 +80,7 @@ class VideoDecodeTest {
         }
     }
 
-    private fun frameUs(k: Int) = (k * 1_000_000L + 29) / 30 + 1000
+    internal fun frameUs(k: Int) = (k * 1_000_000L + 29) / 30 + 1000
 
     private fun bench(file: File, label: String) {
         val probe = NativeVideoSource(file)
@@ -195,5 +195,102 @@ class VideoDecodeTest {
         val file = File("../testdata/test4k_hevc.mp4")
         assumeTrue(file.isFile)
         bench(file, "4k-hevc")
+    }
+
+    private val av1Dir = out.resolve("av1")
+
+    private fun av1Clip(name: String, size: String, format: String): File {
+        val file = av1Dir.resolve("$name.mp4")
+        if (!file.isFile) {
+            av1Dir.mkdirs()
+            val args = listOf(DeskMedia.ffmpeg, "-v", "error", "-y", "-f", "lavfi", "-i", "testsrc2=size=$size:rate=30:duration=4", "-pix_fmt", format, "-c:v", "libsvtav1", "-preset", "10", "-g", "30", file.path)
+            check(ProcessBuilder(args).redirectErrorStream(true).start().also { it.inputStream.readBytes() }.waitFor() == 0)
+        }
+        return file
+    }
+
+    fun av1Probe(file: File): Pair<Boolean, Double> {
+        val source = NativeVideoSource(file)
+        val (w, h) = source.info.width to source.info.height
+        val handle = DesktopNative.create()
+        try {
+            DesktopNative.setScene(handle, sceneXml(file, w, h))
+            assertEquals(1, source.show(handle, file.absolutePath, frameUs(15), true))
+            return source.hardware to psnr(handle, w, h, 15 * 1000.0 / 30, file, 15, "${file.nameWithoutExtension}.png")
+        } finally {
+            source.close()
+            DesktopNative.destroy(handle)
+        }
+    }
+
+    fun av1Speed(file: File): Pair<Boolean, Double> {
+        val source = NativeVideoSource(file)
+        val (w, h) = source.info.width to source.info.height
+        val handle = DesktopNative.create()
+        try {
+            DesktopNative.setScene(handle, sceneXml(file, w, h))
+            assertEquals(1, source.show(handle, file.absolutePath, 0, true))
+            val start = System.nanoTime()
+            for (k in 1 until 120) assertEquals(1, source.show(handle, file.absolutePath, frameUs(k), true))
+            return source.hardware to 119 / (ms(start) / 1000)
+        } finally {
+            source.close()
+            DesktopNative.destroy(handle)
+        }
+    }
+
+    private fun av1Child(mode: String, file: File, env: Map<String, String>): String {
+        val java = File(System.getProperty("java.home"), "bin/java").path
+        val builder = ProcessBuilder(java, "-cp", System.getProperty("java.class.path"), "-Dam.native=${System.getProperty("am.native")}", "-Dam.ffmpeg=${DeskMedia.ffmpeg}", "-Dam.ffprobe=${DeskMedia.ffprobe}",
+            "-Djava.awt.headless=true", "-Dskiko.renderApi=SOFTWARE", "-Dskiko.data.path=${System.getProperty("skiko.data.path")}", "-Dam.assets=${System.getProperty("am.assets")}", "app.absentmotion.pc.Av1Child", mode, file.absolutePath)
+        builder.environment().putAll(env)
+        val process = builder.redirectErrorStream(true).start()
+        val text = process.inputStream.bufferedReader().readText()
+        assertEquals(text, 0, process.waitFor())
+        return text.lines().last { it.startsWith("RESULT ") }.removePrefix("RESULT ")
+    }
+
+    private fun av1Hardware(): Boolean {
+        if (System.getProperty("os.name") != "Mac OS X") return false
+        val brand = ProcessBuilder("sysctl", "-n", "machdep.cpu.brand_string").start().inputStream.bufferedReader().readText()
+        return Regex("Apple M(\\d+)").find(brand)?.groupValues?.get(1)?.toInt()?.let { it >= 3 } == true
+    }
+
+    @Test fun av1UsesHardware() {
+        assumeTrue(av1Hardware())
+        for ((name, size, format) in listOf(Triple("av1-1080p8", "1920x1080", "yuv420p"), Triple("av1-1080p10", "1920x1080", "yuv420p10le"))) {
+            val (hardware, psnr) = av1Probe(av1Clip(name, size, format))
+            println("[av1] $name hardware=$hardware PSNR vs libdav1d ffmpeg = %.2f dB".format(psnr))
+            assertTrue("$name did not use the hardware decoder", hardware)
+            assertTrue("$name colours differ (PSNR $psnr)", psnr > 35)
+        }
+    }
+
+    @Test fun av1FallsBackToSoftware() {
+        for ((name, size, format) in listOf(Triple("av1-1080p8", "1920x1080", "yuv420p"), Triple("av1-1080p10", "1920x1080", "yuv420p10le"))) {
+            val (hardware, psnr) = av1Child("psnr", av1Clip(name, size, format), mapOf("AM_VIDEO_AV1_REFUSE" to "1")).split(' ').let { it[0].toBoolean() to it[1].toDouble() }
+            println("[av1] $name forced fallback hardware=$hardware PSNR = %.2f dB".format(psnr))
+            assertTrue(!hardware)
+            assertTrue("$name fallback colours differ (PSNR $psnr)", psnr > 35)
+        }
+    }
+
+    @Test fun av1Speed4k() {
+        assumeTrue(av1Hardware())
+        val file = av1Clip("av1-4k8", "3840x2160", "yuv420p")
+        val (hw, hwFps) = av1Child("speed", file, mapOf()).split(' ').let { it[0].toBoolean() to it[1].toDouble() }
+        val (sw, swFps) = av1Child("speed", file, mapOf("AM_VIDEO_SOFTWARE" to "1")).split(' ').let { it[0].toBoolean() to it[1].toDouble() }
+        println("[av1] 4k8 hardware=$hw %.1f fps, software=$sw %.1f fps".format(hwFps, swFps))
+        assertTrue(hw && !sw)
+    }
+}
+
+object Av1Child {
+    @JvmStatic fun main(args: Array<String>) {
+        val test = VideoDecodeTest()
+        val file = File(args[1])
+        val (hardware, value) = if (args[0] == "speed") test.av1Speed(file) else test.av1Probe(file)
+        println("RESULT $hardware $value")
+        kotlin.system.exitProcess(0)
     }
 }
