@@ -1,17 +1,21 @@
 package app.absentmotion
 
 import app.absentmotion.editor.canToggleClosed
+import app.absentmotion.editor.dragged
 import app.absentmotion.model.Contour
+import app.absentmotion.model.Handle
 import app.absentmotion.model.Knot
 import app.absentmotion.model.Layer
 import app.absentmotion.model.Pt
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.contours
+import app.absentmotion.model.hit
 import app.absentmotion.model.parseSvgPath
 import app.absentmotion.model.signedArea
 import app.absentmotion.model.toSvg
 import app.absentmotion.model.withContours
 import app.absentmotion.model.withHoles
+import app.absentmotion.model.withPointMoved
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -156,5 +160,35 @@ class VectorPathsTest {
         val values = listOf(0f, -0f, 1f, -1f, 100f, 0.5f, -0.03125f, 0.03125f, 0.00005f, -0.00004f, 1234.5678f, 99999.99f, 1e-6f) +
             List(200_000) { (random.nextFloat() - 0.5f) * listOf(1f, 10f, 1000f, 100000f)[it % 4] }
         for (v in values) assertEquals("$v", old(v), app.absentmotion.model.num(v))
+    }
+
+    private val house = parseSvgPath("M -2.99 -94.57 C -1 -96.41 1 -96.41 2.99 -94.57 L 98.73 -6.5 C 100.73 -4.66 100.37 -3.74 97.66 -3.74 L 81.38 -3.74 L 81.38 95.95 L 20.35 95.95 L 20.35 28.81 L -20.35 28.81 L -20.35 95.95 L -81.38 95.95 L -81.38 -3.74 L -97.66 -3.74 C -100.37 -3.74 -100.73 -4.66 -98.73 -6.5 Z").single()
+
+    @Test fun movingTheFirstPointOfAClosedPathCarriesItsOutHandleAndTheClosingSegment() {
+        val moved = house.withPointMoved(0, Pt(200f, 380f))
+        val d = moved.toSvg()
+        assertTrue(d, d.startsWith("M 197.01 285.43C 199 283.59, 1 -96.41, 2.99 -94.57L 98.73 -6.5"))
+        assertTrue(d, d.endsWith("C -100.37 -3.74, -100.73 -4.66, -98.73 -6.5L 197.01 285.43Z"))
+        assertEquals(house.knots.drop(1), moved.knots.drop(1))
+        assertEquals(d, parseSvgPath(d).single().toSvg())
+    }
+
+    @Test fun aHandleHiddenUnderItsPointDoesNotStealTheTouch() {
+        val roof = listOf(house)
+        assertEquals(Triple(0, 0, Handle.Main), roof.hit(Pt(-2.99f, -94.57f), 24f, 0 to 0))
+        assertEquals(Triple(0, 0, Handle.Main), roof.hit(Pt(-1f, -96.41f), 24f, 0 to 0))
+        val apart = listOf(Contour(listOf(Knot(Pt(0f, 0f), outHandle = Pt(30f, 0f)), Knot(Pt(100f, 0f))), closed = false))
+        assertEquals(Triple(0, 0, Handle.Out), apart.hit(Pt(28f, 0f), 24f, 0 to 0))
+    }
+
+    @Test fun aDragMovesThePointOneToOneOnScreenInPlainAndMirroredViews() {
+        fun check(toScene: (Pt) -> Pt, toLayer: (Pt) -> Pt) {
+            val start = Pt(-2.99f, -94.57f)
+            val shown = (toScene(start.dragged(Pt(30f, -12f), 0.5f, toScene, toLayer)) - toScene(start)) * 0.5f
+            assertEquals(30f, shown.x, 1e-3f)
+            assertEquals(-12f, shown.y, 1e-3f)
+        }
+        check({ Pt(540f + 2f * it.x, 540f + 2f * it.y) }, { Pt((it.x - 540f) / 2f, (it.y - 540f) / 2f) })
+        check({ Pt(540f - it.x, 540f + it.y) }, { Pt(540f - it.x, it.y - 540f) })
     }
 }

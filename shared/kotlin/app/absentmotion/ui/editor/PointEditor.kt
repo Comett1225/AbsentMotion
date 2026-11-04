@@ -42,6 +42,7 @@ import app.absentmotion.editor.PointMode
 import app.absentmotion.editor.at
 import app.absentmotion.editor.canToggleClosed
 import app.absentmotion.editor.deletePoint
+import app.absentmotion.editor.dragged
 import app.absentmotion.editor.endsAt
 import app.absentmotion.editor.gotoContour
 import app.absentmotion.editor.leaveDrawing
@@ -111,7 +112,7 @@ internal fun PointOverlay(state: EditorState, mode: PointMode, modifier: Modifie
                         val change = awaitPointerEvent().changes.firstOrNull { it.id == down.id } ?: break
                         if (!change.pressed) break
                         if (!moved && (change.position - down.position).getDistance() > viewConfiguration.touchSlop) moved = true
-                        if (moved) state.moveSelectedTo(mode, start + (m.inverseMap(scene(change.position)) - m.inverseMap(scene(down.position))))
+                        if (moved) state.moveSelectedTo(mode, start.dragged((change.position - down.position).let { Pt(it.x, it.y) }, s, m::map, m::inverseMap))
                         change.consume()
                     }
                     if (moved) state.endGesture()
@@ -267,7 +268,7 @@ private fun Trackpad(state: EditorState, mode: PointMode, contour: Contour?, mod
 
 private fun swipe(state: EditorState, mode: PointMode, delta: Offset, width: Float) {
     val m = mode.screenMatrix(state.scene, state.timeMs) ?: return
-    fun moved(from: Pt) = m.inverseMap(m.map(from) + Pt(delta.x / mode.previewScale, delta.y / mode.previewScale))
+    fun moved(from: Pt) = from.dragged(Pt(delta.x, delta.y), mode.previewScale, m::map, m::inverseMap)
     val contour = state.pointContours(mode).getOrNull(mode.contour) ?: return
     if (mode.handle == Handle.Add) {
         if (contour.endsAt(mode.point)) mode.ghost = moved(mode.ghost ?: contour.knots.lastOrNull()?.p ?: Pt(0f, 0f))

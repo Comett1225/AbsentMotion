@@ -76,6 +76,7 @@ fun List<Contour>.hit(at: Pt, radius: Float, selected: Pair<Int, Int>?): Triple<
                 if (showsHandles) { k.inHandle?.let { add(it to Handle.In) }; k.outHandle?.let { add(it to Handle.Out) } }
             }
             for ((position, handle) in candidates) {
+                if (handle != Handle.Main && position.distanceTo(k.p) < radius * 0.25f) continue
                 val d = position.distanceTo(at) - if (handle == Handle.Main) 0f else radius * 0.25f
                 if (d < bestDistance) { bestDistance = d; best = Triple(c, i, handle) }
             }

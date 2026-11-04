@@ -49,6 +49,9 @@ fun Knot.at(handle: Handle): Pt? = when (handle) {
     else -> p
 }
 
+fun Pt.dragged(screenDelta: Pt, previewScale: Float, toScene: (Pt) -> Pt, toLayer: (Pt) -> Pt): Pt =
+    toLayer(toScene(this) + screenDelta * (1f / previewScale))
+
 fun EditorState.moveSelectedTo(mode: PointMode, to: Pt, key: Any? = "point-drag") {
     if (mode.handle == Handle.Add) return
     change(mode, key) { list ->
