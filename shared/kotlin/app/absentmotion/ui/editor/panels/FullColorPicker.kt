@@ -98,6 +98,10 @@ internal fun FullColorPicker(state: EditorState, request: FullColor, modifier: M
     var keypad by remember { mutableStateOf<KeypadRequest?>(null) }
     val hsva = held?.takeIf { it.toArgb() == argb } ?: Hsva.from(argb)
     val saved = state.settings.savedColours
+    val palettes = if (PlatformFeatures.desktop) null else rememberPaletteLibrary()
+    var library by remember { mutableStateOf(false) }
+    if (library) PaletteSheet(argb) { library = false }
+    fun keepColour() { if (palettes != null) palettes.keep(argb and 0xFFFFFF, state.settings) else save(state, argb) }
     val close = { state.endGesture(); state.fullColor = null }
     BackHandler(onBack = close)
 
@@ -123,9 +127,9 @@ internal fun FullColorPicker(state: EditorState, request: FullColor, modifier: M
             BoxWithConstraints(Modifier.weight(1f).fillMaxWidth().padding(vertical = if (PlatformFeatures.desktop) 12.dp else 0.dp), Alignment.Center) {
                 val base = LocalDensity.current
                 val fit = if (PlatformFeatures.desktop) minOf(1f, maxHeight / WHEEL.px, maxWidth / WHEEL.px).coerceAtLeast(.4f) else 1f
-                if (tab == 0) CompositionLocalProvider(LocalDensity provides Density(base.density * fit, base.fontScale)) { Wheel(hsva, request.start, argb, ::setHsva, end, ::enterHex) { save(state, argb) } }
+                if (tab == 0) CompositionLocalProvider(LocalDensity provides Density(base.density * fit, base.fontScale)) { Wheel(hsva, request.start, argb, ::setHsva, end, ::enterHex, ::keepColour) }
                 else Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    ColourCard(request.start, argb, 394.px, 197.px) { save(state, argb) }
+                    ColourCard(request.start, argb, 394.px, 197.px, ::keepColour)
                     Spacer(Modifier.height(14.px))
                     HexText(argb, ::enterHex)
                 }
@@ -156,8 +160,9 @@ internal fun FullColorPicker(state: EditorState, request: FullColor, modifier: M
             }
             val gridGap = if (PlatformFeatures.desktop) 16.dp else 0.dp
             Box(Modifier.fillMaxWidth().height(315.px + gridGap).background(GridBg)) {
+                if (palettes != null) PaletteChip(palettes.chosen, Am.OnDark, Modifier.offset(12.px, 16.px).size(190.px, 150.px), stacked = true) { library = true }
                 Column(Modifier.offset(211.px, 5.px + gridGap / 2).size(658.px, 304.px).deskVerticalScroll().padding(5.px, 11.px), Arrangement.spacedBy(11.px)) {
-                    (FixedSwatches + saved).chunked(7).forEach { row ->
+                    (palettes?.swatches(saved) ?: (FixedSwatches + saved)).chunked(7).forEach { row ->
                         Row(Modifier.height(84.px), Arrangement.spacedBy(10.px)) {
                             row.forEach { swatch ->
                                 Box(

@@ -1,5 +1,8 @@
 package app.absentmotion.effects
 
+import java.io.ByteArrayOutputStream
+import java.io.DataOutputStream
+import java.util.Locale
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
@@ -7,9 +10,12 @@ data class PalettePreset(val name: String, val colors: List<Int>)
 
 object Palettes {
     const val MAX_COLORS = 512
-    private const val MAX_PICTURE_COLORS = 256
+    const val MAX_PICTURE_COLORS = 256
+    const val MAIN_COLORS = 8
     private const val MAX_TEXT_BYTES = 1 shl 21
     private const val SAMPLE = 1 shl 16
+    private const val STRIP_COLUMNS = 16
+    private const val STRIP_CELL = 64
 
     private fun hex(text: String) = text.split(' ').map { it.toInt(16) }
 
@@ -54,7 +60,7 @@ object Palettes {
         null
     }
 
-    fun fromPixels(argb: IntArray): List<Int> {
+    fun fromPixels(argb: IntArray, limit: Int = MAX_PICTURE_COLORS): List<Int> {
         val seen = LinkedHashSet<Int>()
         var last = -1
         for (p in argb) {
@@ -63,9 +69,49 @@ object Palettes {
             if (rgb == last) continue
             last = rgb
             seen.add(rgb)
-            if (seen.size > MAX_PICTURE_COLORS) return reduce(argb)
+            if (seen.size > limit) return reduce(argb, limit)
         }
         return seen.toList()
+    }
+
+    fun gpl(name: String, colors: List<Int>): String = buildString {
+        append("GIMP Palette\nName: ").append(name.replace(Regex("[\\r\\n]"), " ")).append("\nColumns: ").append(colors.size.coerceIn(1, STRIP_COLUMNS)).append("\n#\n")
+        for (c in colors) append(String.format(Locale.US, "%3d %3d %3d\t#%06x\n", c shr 16 and 255, c shr 8 and 255, c and 255, c and 0xFFFFFF))
+    }
+
+    fun ase(colors: List<Int>): ByteArray {
+        val out = ByteArrayOutputStream()
+        DataOutputStream(out).apply {
+            writeBytes("ASEF")
+            writeShort(1)
+            writeShort(0)
+            writeInt(colors.size)
+            for (c in colors) {
+                val label = String.format(Locale.US, "#%06x", c and 0xFFFFFF)
+                writeShort(1)
+                writeInt(2 + 2 * (label.length + 1) + 4 + 12 + 2)
+                writeShort(label.length + 1)
+                writeChars(label)
+                writeShort(0)
+                writeBytes("RGB ")
+                for (shift in intArrayOf(16, 8, 0)) writeFloat((c shr shift and 255) / 255f)
+                writeShort(2)
+            }
+        }
+        return out.toByteArray()
+    }
+
+    fun strip(colors: List<Int>, cell: Int = STRIP_CELL): Triple<IntArray, Int, Int> {
+        val columns = colors.size.coerceIn(1, STRIP_COLUMNS)
+        val width = columns * cell
+        val height = maxOf(1, (colors.size + columns - 1) / columns) * cell
+        val pixels = IntArray(width * height)
+        colors.forEachIndexed { i, c ->
+            val left = i % columns * cell
+            val top = i / columns * cell
+            for (y in top until top + cell) java.util.Arrays.fill(pixels, y * width + left, y * width + left + cell, c or (0xFF shl 24))
+        }
+        return Triple(pixels, width, height)
     }
 
     private fun hexColor(token: String): Int? {
@@ -215,7 +261,7 @@ object Palettes {
         else -> v
     }
 
-    private fun reduce(argb: IntArray): List<Int> {
+    private fun reduce(argb: IntArray, limit: Int): List<Int> {
         val opaque = argb.count { it ushr 24 >= 128 }
         val stride = maxOf(1, opaque / SAMPLE) or 1
         val c = IntArray(opaque / stride + 1)
@@ -224,7 +270,7 @@ object Palettes {
         for (p in argb) if (p ushr 24 >= 128 && seen++ % stride == 0) c[size++] = p and 0xFFFFFF
         if (size == 0) return emptyList()
         val boxes = arrayListOf(box(c, 0, size))
-        while (boxes.size < MAX_PICTURE_COLORS) {
+        while (boxes.size < limit) {
             val big = boxes.maxByOrNull { (it.to - it.from).toLong() * it.spread }?.takeIf { it.spread > 0 } ?: break
             boxes.remove(big)
             for (i in big.from until big.to) c[i] = swap(c[i], big.channel)

@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -64,6 +66,7 @@ import app.absentmotion.model.Layer
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.gradient
 import app.absentmotion.model.withGradient
+import app.absentmotion.platform.PlatformFeatures
 import app.absentmotion.ui.editor.PanelIcons
 import app.absentmotion.ui.theme.Am
 import java.util.Locale
@@ -139,10 +142,7 @@ private fun RowScope.FillTab(icon: ImageVector, description: String, active: Boo
     }
 }
 
-internal val FixedSwatches = listOf(
-    0xE5484D, 0xF08A24, 0xF5D90A, 0x30A46C, 0x12A594, 0x3E63DD, 0x8E4EC6,
-    0xFFFFFF, 0xC9CCD1, 0x8B8F97, 0x4A4D55, 0x000000, 0xE93D82, 0x7CE2FE,
-)
+internal val FixedSwatches = app.absentmotion.library.BuiltInPalettes.first().colors
 
 private val IconGrey get() = Am.Caption
 
@@ -211,15 +211,21 @@ private fun MiniPickerIcon(active: Boolean) {
 @Composable
 private fun PaletteView(state: EditorState, argb: Int, onColor: ((Int, key: String?) -> Unit)?) {
     val saved = state.settings.savedColours
-    val swatches = FixedSwatches + saved
+    val palettes = if (PlatformFeatures.desktop) null else rememberPaletteLibrary()
+    val swatches = palettes?.swatches(saved) ?: (FixedSwatches + saved)
     val rgb = argb and 0xFFFFFF
     val rows = (swatches.size + 6) / 7
+    var library by remember { mutableStateOf(false) }
+    if (library) PaletteSheet(argb) { library = false }
     Box(Modifier.size(676.px, 359.px)) {
-        Box(Modifier.size(676.px, 73.px).background(Color(argb or 0xFF000000.toInt())), contentAlignment = Alignment.Center) {
+        if (palettes == null) Box(Modifier.size(676.px, 73.px).background(Color(argb or 0xFF000000.toInt())), contentAlignment = Alignment.Center) {
+            Text(colourText(argb), color = textOn(argb), fontSize = 15.sp, maxLines = 1, softWrap = false)
+        } else Row(Modifier.size(676.px, 73.px).background(Color(argb or 0xFF000000.toInt())).padding(start = 8.px, end = 81.px), Arrangement.SpaceBetween, Alignment.CenterVertically) {
+            PaletteChip(palettes.chosen, textOn(argb), Modifier.weight(1f, fill = false).padding(end = 12.px).height(55.px)) { library = true }
             Text(colourText(argb), color = textOn(argb), fontSize = 15.sp, maxLines = 1, softWrap = false)
         }
-        if (rgb !in swatches) {
-            Box(Modifier.offset(603.px, 0.dp).size(73.px).clickable { state.settings.savedColours = saved + rgb }, contentAlignment = Alignment.Center) {
+        if (palettes?.canKeep(rgb, saved) ?: (rgb !in swatches)) {
+            Box(Modifier.offset(603.px, 0.dp).size(73.px).clickable { if (palettes != null) palettes.keep(rgb, state.settings) else state.settings.savedColours = saved + rgb }, contentAlignment = Alignment.Center) {
                 PanelIcon(PanelIcons.AddColor, Am.OnDark.copy(alpha = 0.35f), size = 26.dp)
             }
         }

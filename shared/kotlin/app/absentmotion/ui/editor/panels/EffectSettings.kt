@@ -293,7 +293,7 @@ private fun PalettePresetRow(preset: PalettePreset, chosen: Boolean, onClick: ()
 }
 
 @Composable
-private fun PaletteStrip(colors: List<Int>, modifier: Modifier) {
+internal fun PaletteStrip(colors: List<Int>, modifier: Modifier) {
     Canvas(modifier) {
         colors.forEachIndexed { i, rgb ->
             val left = (size.width * i / colors.size).roundToInt()
@@ -326,15 +326,18 @@ private fun PaletteSwatches(colors: List<Int>, modifier: Modifier) {
     }
 }
 
-private fun readPalette(context: Context, uri: Uri): List<Int>? = runCatching {
+internal fun paletteSource(context: Context, uri: Uri): Pair<String, ByteArray>? = runCatching {
     val resolver = context.contentResolver
     val name = resolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c -> if (c.moveToFirst()) c.getString(0) else null }
         ?: uri.lastPathSegment.orEmpty()
-    val bytes = resolver.openInputStream(uri)?.use { it.readAtMost(MaxPaletteBytes + 1) }?.takeIf { it.size <= MaxPaletteBytes }
-    bytes?.let { Palettes.fromFile(name, it) ?: pictureColors(it) }
+    resolver.openInputStream(uri)?.use { it.readAtMost(MaxPaletteBytes + 1) }?.takeIf { it.size <= MaxPaletteBytes }?.let { name to it }
 }.getOrNull()
 
-private fun pictureColors(bytes: ByteArray): List<Int>? {
+private fun readPalette(context: Context, uri: Uri): List<Int>? = runCatching {
+    paletteSource(context, uri)?.let { (name, bytes) -> Palettes.fromFile(name, bytes) ?: pictureColors(bytes) }
+}.getOrNull()
+
+internal fun pictureColors(bytes: ByteArray, limit: Int = Palettes.MAX_PICTURE_COLORS): List<Int>? {
     val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
     BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bounds)
     if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null
@@ -344,13 +347,15 @@ private fun pictureColors(bytes: ByteArray): List<Int>? {
     val pixels = IntArray(bitmap.width * bitmap.height)
     bitmap.getPixels(pixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
     bitmap.recycle()
-    return Palettes.fromPixels(pixels).takeIf { it.isNotEmpty() }
+    return Palettes.fromPixels(pixels, limit).takeIf { it.isNotEmpty() }
 }
 
 @Composable
 private fun EffectColor(state: EditorState, param: EffectParam, raw: String, enabled: Boolean, active: Boolean, select: () -> Unit, set: (String) -> Unit) {
     val color = parseColor(raw) ?: 0xFFFFFFFF.toInt()
     var expanded by remember(param.id) { mutableStateOf(false) }
+    var library by remember(param.id) { mutableStateOf(false) }
+    if (library) PaletteSheet(color) { library = false }
     Column {
         Row(Modifier.fillMaxWidth().height(38.dp).padding(3.dp).alpha(if (enabled) 1f else 0.35f), verticalAlignment = Alignment.CenterVertically) {
             PropertyLabel(param.label, active, enabled, Modifier.width(75.dp).fillMaxHeight(), select)
@@ -366,9 +371,15 @@ private fun EffectColor(state: EditorState, param: EffectParam, raw: String, ena
         }
         Presence(expanded) { MenuPopup(DropOrRise, { expanded = false }) {
             val swatches = listOf(0xFF4444,0xF4B446,0xFAE965,0x1ED91E,0x17E1E1,0x3D4CF5,0xDD44DD,0xFFFFFF,0xBEBEBE,0x888888,0x444444,0x000000,0x5EB7D9,0x98C99C)
-            swatches.chunked(7).forEach { row -> Row(Modifier.fillMaxWidth().height(32.dp).padding(3.dp), Arrangement.spacedBy(2.dp)) {
+            @Composable fun Swatches(colours: List<Int>) = colours.chunked(7).forEach { row -> Row(Modifier.fillMaxWidth().height(32.dp).padding(3.dp), Arrangement.spacedBy(2.dp)) {
                 row.forEach { rgb -> Box(Modifier.width(30.dp).fillMaxHeight().background(Color(rgb or 0xFF000000.toInt())).clickable(enabled = enabled) { set(formatColor(rgb or 0xFF000000.toInt())); expanded = false }) }
             } }
+            Swatches(swatches)
+            if (!app.absentmotion.platform.PlatformFeatures.desktop) {
+                val palettes = rememberPaletteLibrary()
+                PaletteChip(palettes.chosen, Am.OnDark, Modifier.fillMaxWidth().height(36.dp).padding(3.dp)) { expanded = false; library = true }
+                Column(Modifier.heightIn(max = 160.dp).verticalScroll(rememberScrollState())) { Swatches(palettes.swatches(state.settings.savedColours)) }
+            }
         } }
     }
 }

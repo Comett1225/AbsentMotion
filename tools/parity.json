@@ -54,6 +54,16 @@
       "note": ""
     },
     {
+      "id": "tool.palettes",
+      "name": "Colour palette library in every colour picker: import from a picture or palette file, edit, sort, lock, export PNG/.gpl/.ase",
+      "where": "panels/PaletteSheet.kt, ColorFillPanel.kt, FullColorPicker.kt, EffectSettings.kt, library/PaletteLibrary.kt",
+      "android": "works",
+      "macos": "missing",
+      "windows": "missing",
+      "linux": "missing",
+      "note": "not yet on desktop: phone first by the owner's choice; behind !PlatformFeatures.desktop, so the desktop keeps the old swatches"
+    },
+    {
       "id": "tool.border_shadow",
       "name": "Border and shadow panel",
       "where": "panels/BorderShadowPanel.kt",

@@ -36,7 +36,8 @@ object Backup {
         val (scenes, rest) = projects.partition { (name, _) -> name.count { it == '/' } == 1 && name.endsWith(".xml") }
         val templates = under("templates").filter { (name, _) -> includeMedia || name.split('/').getOrNull(2) != "media" }
         val media = if (includeMedia) under("media") + under("fonts/imported") + (ai?.let { under(it, "ai/") } ?: emptyList()) else emptyList()
-        return scenes + rest + under("presets") + templates + media
+        val palettes = File(root, PaletteLibrary.FILE).takeIf { it.isFile }?.let { listOf(PaletteLibrary.FILE to it) }.orEmpty()
+        return scenes + rest + under("presets") + palettes + templates + media
     }
 
     fun write(root: File, out: OutputStream, includeMedia: Boolean, ai: File? = null, progress: (done: Long, total: Long) -> Unit = { _, _ -> }) =
@@ -189,6 +190,10 @@ object Backup {
                         continue
                     }
                     if (waiting.isNotEmpty()) settle()
+                    if (parts.size == 1 && parts[0] == PaletteLibrary.FILE) {
+                        PaletteLibrary.at(root).merge(readText(body))
+                        continue
+                    }
                     fun known(id: String) = id.takeIf { ProjectId.matches(it) && it !in rejected }
                     val target = when {
                         parts.size == 2 && parts[0] == "projects" && parts[1].endsWith(".png") ->
