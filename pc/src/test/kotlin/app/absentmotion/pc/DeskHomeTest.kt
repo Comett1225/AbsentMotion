@@ -201,6 +201,14 @@ class DeskHomeTest {
             runBlocking { app.closeEditor() }
             settle(1200)
             assertNull(app.editor)
+            for (gap in listOf(330L, 10L)) {
+                onAllNodesWithText("Text").onFirst().performMouseInput { click(); advanceEventTime(gap); click() }
+                waitUntil(timeoutMillis = 30_000) { app.editor != null }
+                assertNotNull(app.editor)
+                runBlocking { app.closeEditor() }
+                settle(1200)
+                assertNull(app.editor)
+            }
             onAllNodesWithText("Media").onFirst().performMouseInput { moveTo(center) }
             settle()
             shot("1280-16-card-hover", park = false)

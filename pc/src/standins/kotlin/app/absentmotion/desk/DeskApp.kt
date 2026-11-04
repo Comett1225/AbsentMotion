@@ -38,6 +38,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalViewConfiguration
+import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Density
@@ -416,7 +418,17 @@ fun DeskApp(app: DeskAppState) {
     val scale = DeskScale.percent / 100f
     val focused = LocalWindowInfo.current.isWindowFocused
     LaunchedEffect(focused) { if (!focused) DeskKeys.releaseAll() }
-    CompositionLocalProvider(LocalDensity provides Density(base.density * scale, base.fontScale)) { DeskTyping.Track { DeskContent(app, scale) } }
+    val clicks = LocalViewConfiguration.current
+    val system = remember(clicks) { systemClicks(clicks) }
+    CompositionLocalProvider(LocalDensity provides Density(base.density * scale, base.fontScale), LocalViewConfiguration provides system) { DeskTyping.Track { DeskContent(app, scale) } }
+}
+
+internal fun systemClicks(base: ViewConfiguration): ViewConfiguration {
+    val interval = runCatching { java.awt.Toolkit.getDefaultToolkit().getDesktopProperty("awt.multiClickInterval") as? Int }.getOrNull() ?: 500
+    return object : ViewConfiguration by base {
+        override val doubleTapTimeoutMillis = interval.toLong().coerceAtLeast(base.doubleTapTimeoutMillis)
+        override val doubleTapMinTimeMillis = 0L
+    }
 }
 
 @OptIn(androidx.compose.ui.ExperimentalComposeUiApi::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
