@@ -129,9 +129,9 @@
       "where": "LayerTools.kt, EditorMenus.kt, EditorTopBar.kt (GroupCrumbs), Timeline.kt, desk/DeskWorkspace.kt",
       "android": "works",
       "macos": "works",
-      "windows": "untested",
+      "windows": "works",
       "linux": "untested",
-      "note": "Breadcrumb on phone and PC; phone shows a group pill next to a selected layer; double-click a group clip or row name opens it on PC only"
+      "note": "Breadcrumb on phone and PC; phone shows a group pill next to a selected layer; double-click a group clip or row name opens it on PC only. Windows (installed app, 2026-11-04): Group from the context menu, double-click the group clip to enter, breadcrumb to leave"
     },
     {
       "id": "tool.asset_props",
@@ -626,9 +626,9 @@
       "where": "Preview.kt, PreviewMode.kt",
       "android": "works",
       "macos": "works",
-      "windows": "untested",
+      "windows": "works",
       "linux": "untested",
-      "note": "Ctrl/Cmd+wheel zooms at the cursor, wheel pans, dragging empty canvas pans; before this it needed two touch pointers"
+      "note": "Ctrl/Cmd+wheel zooms at the cursor, wheel pans, dragging empty canvas pans; before this it needed two touch pointers. Windows: zoom buttons and middle-button drag pan checked in the installed app"
     },
     {
       "id": "preview.mode_panel",
@@ -816,9 +816,9 @@
       "where": "ui/export/ExportScreen.kt, STANDINS DeskVideoExport",
       "android": "works",
       "macos": "works",
-      "windows": "untested",
+      "windows": "works",
       "linux": "untested",
-      "note": "encoded by ffmpeg; hardware encoders are picked per OS (VideoToolbox, NVENC/QSV/AMF/MF); APV needs liboapv in the ffmpeg build"
+      "note": "encoded by ffmpeg; hardware encoders are picked per OS (VideoToolbox, NVENC/QSV/AMF/MF); APV needs liboapv in the ffmpeg build. Windows: 1080p H.264 MP4 checked in the installed app (h264_amf); the installer ships the LGPL FFmpeg build, which has no libx264 or libx265, so the software fallback there is h264_mf or hevc_mf; AAC uses aac_mf at 192 kbps and below for constant bitrate like Android"
     },
     {
       "id": "export.gif",
@@ -976,9 +976,9 @@
       "where": "ToolsTab.kt, CompressScreen.kt, tools/Compressor.kt",
       "android": "works",
       "macos": "works",
-      "windows": "untested",
+      "windows": "works",
       "linux": "untested",
-      "note": "DeskCompress runs ffmpeg"
+      "note": "DeskCompress runs ffmpeg. Windows: checked in the installed app"
     },
     {
       "id": "home.tools_trim",
@@ -986,9 +986,9 @@
       "where": "ToolsTab.kt, TrimScreen.kt, ToolRange.kt, tools/MediaTools.kt, TrimCopy.kt",
       "android": "works",
       "macos": "works",
-      "windows": "untested",
+      "windows": "works",
       "linux": "untested",
-      "note": "Android copies with MediaMuxer and re-encodes with the Compress pipeline; desktop uses ffmpeg (DeskTools, DeskCompress)"
+      "note": "Android copies with MediaMuxer and re-encodes with the Compress pipeline; desktop uses ffmpeg (DeskTools, DeskCompress). Windows: checked in the installed app; cancelling waits for ffmpeg to exit so the partial file can be deleted"
     },
     {
       "id": "home.tools_extract_audio",
@@ -996,9 +996,9 @@
       "where": "ToolsTab.kt, ExtractAudioScreen.kt, tools/MediaTools.kt",
       "android": "works",
       "macos": "works",
-      "windows": "untested",
+      "windows": "works",
       "linux": "untested",
-      "note": "Android copies the AAC track or encodes through the audio export (LAME for MP3); desktop uses ffmpeg (DeskTools)"
+      "note": "Android copies the AAC track or encodes through the audio export (LAME for MP3); desktop uses ffmpeg (DeskTools). Windows: checked in the installed app"
     },
     {
       "id": "home.tools_gif",
@@ -1006,9 +1006,9 @@
       "where": "ToolsTab.kt, GifScreen.kt, ToolRange.kt, tools/MediaTools.kt, export/GifWriter.kt",
       "android": "works",
       "macos": "works",
-      "windows": "untested",
+      "windows": "works",
       "linux": "untested",
-      "note": "same code on every platform: the frame reader (MediaCodec or ffmpeg) feeds the GIF export encoder"
+      "note": "same code on every platform: the frame reader (MediaCodec or ffmpeg) feeds the GIF export encoder. Windows: checked in the installed app"
     },
     {
       "id": "home.tools_downloader",
@@ -1076,9 +1076,9 @@
       "where": "android ImportActivity.kt, pc Main.kt, desk/DeskOpen.kt",
       "android": "works",
       "macos": "partial",
-      "windows": "untested",
+      "windows": "partial",
       "linux": "untested",
-      "note": "Command-line files, the macOS open-file event and a one-instance socket on Windows and Linux feed one queue (project files import and open, media files open in the open project or a new one). macOS: Finder picks the installed app for .absproj (checked 2026-11-03); the end-to-end test DeskParityRoundTest.filesFromTheSystemOpenOrImport still hangs, so this stays partial"
+      "note": "Command-line files, the macOS open-file event and a one-instance socket on Windows and Linux feed one queue (project files import and open, media files open in the open project or a new one). macOS: Finder picks the installed app for .absproj (checked 2026-11-03); the end-to-end test DeskParityRoundTest.filesFromTheSystemOpenOrImport still hangs, so this stays partial. Windows: opening a file from the command line works, and the one-instance socket now answers (before 2026-11-04 readLines() closed the socket, so a second instance never forwarded); opening from Explorer through the installer's file association is untested"
     },
     {
       "id": "home.settings",
@@ -1166,9 +1166,9 @@
       "where": "ui/onboarding/Onboarding.kt, DeskOnboarding.kt",
       "android": "works",
       "macos": "works",
-      "windows": "untested",
+      "windows": "works",
       "linux": "untested",
-      "note": "Desktop-sized welcome: language list, then the update check choice; the phone speed check is not needed"
+      "note": "Desktop-sized welcome: language list, then the update check choice; the phone speed check is not needed. Windows: checked in the installed app"
     },
     {
       "id": "home.tutorial",
@@ -1318,7 +1318,7 @@
       "macos": "works",
       "windows": "untested",
       "linux": "untested",
-      "note": "macOS reads the CoreAudio output latency; Windows and Linux use the Java mixer latency (untested)"
+      "note": "macOS reads the CoreAudio output latency; Windows and Linux use the Java mixer latency. Windows: Java Sound over DirectSound; the engine primes three blocks there (with two, the DirectSound clock ran about 0.5% slow); DeskAudioTest clock and mix checks pass (about 140 ppm, under 1.5 ms jitter); not yet checked by ear"
     },
     {
       "id": "plat.video_decode",
@@ -1326,9 +1326,9 @@
       "where": "pc/native video.cpp, VideoSource.kt",
       "android": "works",
       "macos": "works",
-      "windows": "untested",
+      "windows": "works",
       "linux": "untested",
-      "note": "macOS VideoToolbox; Windows D3D11 hardware decode and copy; Linux VA-API (not built); ffmpeg software fallback everywhere"
+      "note": "macOS VideoToolbox; Windows D3D11 hardware decode and copy; Linux VA-API (not built); ffmpeg software fallback everywhere. Windows: D3D11VA through the LGPL FFmpeg DLLs the installer ships (VideoDecodeTest: hardware decode, seek 14 ms against 164 ms through the ffmpeg pipe); built without FFMPEG_DIR the engine falls back to the ffmpeg program"
     },
     {
       "id": "plat.gpu",
@@ -1336,9 +1336,9 @@
       "where": "pc/native gpu.h",
       "android": "works",
       "macos": "works",
-      "windows": "untested",
+      "windows": "works",
       "linux": "untested",
-      "note": "Metal on macOS; Vulkan on Windows and Linux; Linux not built yet"
+      "note": "Metal on macOS; Vulkan on Windows and Linux; Linux not built yet. Windows: Vulkan on an AMD Radeon 780M; the Compose UI itself draws through Skiko's Direct3D 12"
     },
     {
       "id": "plat.native_build",
@@ -1356,9 +1356,9 @@
       "where": "pc/build.gradle.kts createDistributable, macos/build.sh, windows/build.ps1",
       "android": "works",
       "macos": "works",
-      "windows": "untested",
+      "windows": "works",
       "linux": "missing",
-      "note": "the macOS bundle is codesigned by macos/build.sh; the Windows installer still needs a test on the PC's own screen; there is no Linux package yet"
+      "note": "the macOS bundle is codesigned by macos/build.sh; there is no Linux package yet. Windows: packageMsi makes a per-user MSI (no administrator prompt) with Start menu and desktop shortcuts and a folder choice; it installs silently with msiexec /qn and the app runs; the FFmpeg DLLs, ffmpeg.exe, ffprobe.exe and icudtl.dat ship in app/resources"
     },
     {
       "id": "plat.menu_bar",
@@ -1376,9 +1376,9 @@
       "where": "desk/Desk.kt DeskFiles, DeskOs",
       "android": "missing",
       "macos": "works",
-      "windows": "untested",
+      "windows": "works",
       "linux": "untested",
-      "note": "java.awt.FileDialog everywhere; reveal uses open -R, explorer /select, xdg-open"
+      "note": "java.awt.FileDialog everywhere; reveal uses open -R, explorer /select, xdg-open. Windows: the media picker works; AWT shows the older Explorer-style dialog, which opens in the program's working folder"
     },
     {
       "id": "plat.keyboard",

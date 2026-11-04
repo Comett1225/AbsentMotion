@@ -154,7 +154,7 @@ class DeskParityRoundTest {
         prepare("save-failed")
         session(1280, 800) { app ->
             val editor = openEditor(app, "styles.xml")
-            val folders = app.context.filesDir.walkTopDown().filter { it.isDirectory }.toList()
+            val folders = app.context.filesDir.walkTopDown().filter { it.isDirectory || DeskOs.windows }.toList()
             folders.forEach { it.setWritable(false) }
             try {
                 runOnIdle { editor.renameLayer(editor.scene.layers.first().id, "Renamed") }
@@ -174,6 +174,7 @@ class DeskParityRoundTest {
                 assertFalse(app.saveFailed)
             } finally {
                 folders.forEach { it.setWritable(true) }
+                if (DeskOs.windows) File(app.context.filesDir, "recovery").deleteRecursively()
             }
         }
     }

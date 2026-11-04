@@ -169,8 +169,9 @@ class DeskParityToolsTest {
         assertEquals(listOf("-f", "v4l2", "-i", "0", "-f", "pulse", "-i", "1"), CameraInput(camera, mic, mac = false, windows = false).args())
         assertEquals("1:a", CameraInput(camera, mic, mac = false, windows = false).audioMap)
         assertEquals("0:a", CameraInput(camera, mic, mac = true, windows = false).audioMap)
-        val command = DeskCameraSource.command("ffmpeg", CameraInput(camera, mic, mac = true, windows = false), File("/tmp/x.mp4"), DeskCameraSource.videoEncoder(setOf("libx264"), mac = true, windows = false))
-        assertTrue(command.containsAll(listOf("pipe:1", "libx264", "aac", "/tmp/x.mp4", "0:a")))
+        val target = File("/tmp/x.mp4")
+        val command = DeskCameraSource.command("ffmpeg", CameraInput(camera, mic, mac = true, windows = false), target, DeskCameraSource.videoEncoder(setOf("libx264"), mac = true, windows = false))
+        assertTrue(command.containsAll(listOf("pipe:1", "libx264", "aac", target.path, "0:a")))
         assertEquals(listOf("mpeg4"), DeskCameraSource.videoEncoder(emptySet()).filter { it == "mpeg4" })
         val frames = ArrayList<Int>()
         val splitter = JpegSplitter { frames += it.size }

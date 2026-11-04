@@ -29,7 +29,7 @@ def rel(path):
 
 def load(errors):
     try:
-        return json.loads(PARITY.read_text())
+        return json.loads(PARITY.read_text(encoding="utf-8"))
     except (OSError, ValueError) as problem:
         errors.append(f"tools/parity.json cannot be read: {problem}")
         return None
@@ -72,7 +72,7 @@ def check_features(document, errors):
 
 
 def desktop_flags():
-    return dict(FLAG.findall((ROOT / DESKTOP_PLATFORM).read_text().split("object PlatformFeatures", 1)[1].split("}", 1)[0]))
+    return dict(FLAG.findall((ROOT / DESKTOP_PLATFORM).read_text(encoding="utf-8").split("object PlatformFeatures", 1)[1].split("}", 1)[0]))
 
 
 def check_gates(by_id, errors):
@@ -90,7 +90,7 @@ def check_gates(by_id, errors):
         for name in entry.get("files", []):
             listed.setdefault(gate, set()).add(name)
     for path in kotlin(SHARED_KOTLIN):
-        for flag in sorted(set(GATE.findall(path.read_text())) & off):
+        for flag in sorted(set(GATE.findall(path.read_text(encoding="utf-8"))) & off):
             if rel(path) not in listed.get(flag, set()):
                 errors.append(f"{rel(path)} uses PlatformFeatures.{flag}, which is false on desktop: add a feature with \"gate\": \"{flag}\" and this file in \"files\" to tools/parity.json")
 
@@ -98,11 +98,11 @@ def check_gates(by_id, errors):
 def check_standins(by_id, errors, notes):
     listed = {name for entry in by_id.values() for name in entry.get("standins", [])}
     for path in kotlin(STANDINS):
-        if THROWS.search(path.read_text()) and rel(path) not in listed:
+        if THROWS.search(path.read_text(encoding="utf-8")) and rel(path) not in listed:
             errors.append(f"{rel(path)} has a desktop stand-in that is not available: list it in \"standins\" of a feature in tools/parity.json")
     for entry in by_id.values():
         for name in entry.get("standins", []):
-            if (ROOT / name).is_file() and not THROWS.search((ROOT / name).read_text()):
+            if (ROOT / name).is_file() and not THROWS.search((ROOT / name).read_text(encoding="utf-8")):
                 notes.append(f"{entry['id']}: {name} no longer has a not-available stand-in, so its status may be out of date")
 
 

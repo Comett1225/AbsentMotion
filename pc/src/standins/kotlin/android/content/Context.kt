@@ -57,9 +57,7 @@ open class Context {
 }
 
 object Desk {
-    val dataDir: File by lazy {
-        (System.getProperty("am.data")?.let(::File) ?: app.absentmotion.desk.DeskOs.dataDir).also { it.mkdirs() }
-    }
+    val dataDir: File get() = (System.getProperty("am.data")?.let(::File) ?: app.absentmotion.desk.DeskOs.dataDir).also { it.mkdirs() }
     val context = Context()
 }
 
@@ -162,6 +160,6 @@ class SharedPreferences private constructor(private val file: File) {
 
     companion object {
         private val open = HashMap<String, SharedPreferences>()
-        fun named(name: String): SharedPreferences = synchronized(open) { open.getOrPut(name) { SharedPreferences(Desk.dataDir.resolve("prefs/$name.properties")) } }
+        fun named(name: String): SharedPreferences = Desk.dataDir.resolve("prefs/$name.properties").let { file -> synchronized(open) { open.getOrPut(file.path) { SharedPreferences(file) } } }
     }
 }

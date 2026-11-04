@@ -106,9 +106,9 @@ class DeskExportTest {
             kotlinx.coroutines.delay(1500)
             cancelled.cancel()
             val stopped = runCatching { cancelled.await() }.exceptionOrNull()
-            report.append("cancel: ${stopped?.javaClass?.simpleName}, left: ${out.resolve("home/Movies/AbsentMotion").list()?.filter { it.startsWith("cancelled") || it.endsWith(".part") }}\n")
+            report.append("cancel: ${stopped?.javaClass?.simpleName}, left: ${out.resolve("home/${app.absentmotion.desk.DeskOs.videosFolder}/AbsentMotion").list()?.filter { it.startsWith("cancelled") || it.endsWith(".part") }}\n")
             assertTrue("cancel gave $stopped", stopped is kotlinx.coroutines.CancellationException)
-            assertTrue(out.resolve("home/Movies/AbsentMotion").list()!!.none { it.startsWith("cancelled") || it.endsWith(".part") })
+            assertTrue(out.resolve("home/${app.absentmotion.desk.DeskOs.videosFolder}/AbsentMotion").list()!!.none { it.startsWith("cancelled") || it.endsWith(".part") })
             val pack = export(ExportKind.Package, media, ExportSettings(360, 30), "media-package")
             java.util.zip.ZipFile(pack.file()).use { zip -> report.append("  package entries: ${zip.entries().toList().map { it.name }}\n"); assertNotNull(zip.getEntry("project.xml")) }
         } finally {

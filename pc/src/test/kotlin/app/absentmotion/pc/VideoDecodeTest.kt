@@ -26,7 +26,9 @@ class VideoDecodeTest {
   </shape>
 </scene>"""
 
-    private fun rssMb(): Long = ProcessBuilder("ps", "-o", "rss=", "-p", "${ProcessHandle.current().pid()}").start().inputStream.bufferedReader().readText().trim().toLong() / 1024
+    private fun rssMb(): Long = if (app.absentmotion.desk.DeskOs.windows)
+        ProcessBuilder("powershell", "-NoProfile", "-Command", "(Get-Process -Id ${ProcessHandle.current().pid()}).WorkingSet64").start().inputStream.bufferedReader().readText().trim().toLong() / 1_048_576
+    else ProcessBuilder("ps", "-o", "rss=", "-p", "${ProcessHandle.current().pid()}").start().inputStream.bufferedReader().readText().trim().toLong() / 1024
 
     private fun ms(start: Long) = (System.nanoTime() - start) / 1e6
 
