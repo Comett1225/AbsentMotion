@@ -28,6 +28,7 @@ thread_local const LinkContext* gLinks = nullptr;
 thread_local const Anim* gLinkStack[64];
 thread_local int gLinkComponents[64];
 thread_local int gLinkDepth = 0;
+thread_local uint8_t gLinkSeen[256];
 thread_local bool gLinkCycle = false;
 thread_local int gLinkPlacement = 0;
 thread_local int64_t gLinkPlacementOwner = 0;
@@ -40,38 +41,51 @@ bool PlacementLink(const Anim& anim) {
     return true;
 }
 
-const Anim* LinkAnim(const Layer& l, const ValueLink& link) {
-    if (link.kind == "effect") {
-        if (link.effect < 0 || link.effect >= (int)l.effects.size()) return nullptr;
-        const Property* p = l.effects[link.effect].prop(link.property.c_str());
-        return p ? &p->anim : nullptr;
-    }
-    if (link.kind != "transform") return nullptr;
-    if (link.property == "location") return &l.location;
-    if (link.property == "scale") return &l.scale;
-    if (link.property == "rotation") return &l.rotation;
-    if (link.property == "opacity") return &l.opacity;
-    if (link.property == "pivot") return &l.pivot;
-    if (link.property == "tilt") return &l.tilt;
-    if (link.property == "skew") return &l.skew;
-    return nullptr;
+enum LinkSlot { kNoSlot, kLocation, kScale, kRotation, kOpacity, kPivot, kTilt, kSkew, kEffectSlot };
+
+int SlotOf(const std::string& kind, const std::string& property) {
+    if (kind == "effect") return kEffectSlot;
+    if (kind != "transform") return kNoSlot;
+    static const std::pair<const char*, int> names[] = {{"location", kLocation}, {"scale", kScale}, {"rotation", kRotation}, {"opacity", kOpacity},
+                                                        {"pivot", kPivot}, {"tilt", kTilt}, {"skew", kSkew}};
+    for (const auto& [name, slot] : names) if (property == name) return slot;
+    return kNoSlot;
 }
 
-bool LinkedValue(const Anim& anim, int component, float t, float* value) {
+const Anim* LinkAnim(const Layer& l, const ValueLink& link) {
+    switch (link.slot) {
+        case kEffectSlot: {
+            if (link.effect < 0 || link.effect >= (int)l.effects.size()) return nullptr;
+            const Property* p = l.effects[link.effect].prop(link.property.c_str());
+            return p ? &p->anim : nullptr;
+        }
+        case kLocation: return &l.location;
+        case kScale: return &l.scale;
+        case kRotation: return &l.rotation;
+        case kOpacity: return &l.opacity;
+        case kPivot: return &l.pivot;
+        case kTilt: return &l.tilt;
+        case kSkew: return &l.skew;
+        default: return nullptr;
+    }
+}
+
+[[gnu::noinline]] bool LinkedValue(const Anim& anim, int component, float t, float* value) {
     const LinkContext* context = anim.linkContext ? anim.linkContext.get() : gLinks;
     if (!context || !std::isfinite(t)) return false;
     const ValueLink* link = nullptr;
     for (const auto& l : anim.links) if (l.component == component) { link = &l; break; }
     if (!link) return false;
     if (gLinkDepth >= 64) { gLinkCycle = true; return false; }
-    for (int n = 0; n < gLinkDepth; n++) {
+    uint8_t& seen = gLinkSeen[((uintptr_t)&anim >> 3 ^ (uintptr_t)&anim >> 11 ^ (uintptr_t)component) & 255];
+    if (seen) for (int n = 0; n < gLinkDepth; n++) {
         if (gLinkStack[n] == &anim && gLinkComponents[n] == component) { gLinkCycle = true; return false; }
     }
     const auto found = context->ids.find(link->layer);
     if (found == context->ids.end()) return false;
     const Layer& source = context->layers[found->second];
     const Anim* from = LinkAnim(source, *link);
-    if (!from && (link->kind != "effect" || link->effect < 0 || link->effect >= (int)source.effects.size())) return false;
+    if (!from && (link->slot != kEffectSlot || link->effect < 0 || link->effect >= (int)source.effects.size())) return false;
     const bool root = gLinkDepth == 0;
     if (root) gLinkCycle = false;
     const LinkContext* previous = gLinks;
@@ -81,43 +95,45 @@ bool LinkedValue(const Anim& anim, int component, float t, float* value) {
     gLinks = context;
     gLinkStack[gLinkDepth] = &anim;
     gLinkComponents[gLinkDepth++] = component;
+    seen++;
     const double time = anim.linkStart + (double)t * (anim.linkEnd - anim.linkStart) - link->delay * 1000.0;
     const float at = source.localTime(time);
-    const float fallback = link->kind == "transform" && (link->property == "scale" || link->property == "opacity") ? 1 : link->fallback;
-    const bool placed = link->kind == "transform" && (link->property == "location" || link->property == "scale" || link->property == "rotation") && (source.parent || FollowsPath(source));
+    const int slot = link->slot;
+    const float fallback = slot == kScale || slot == kOpacity ? 1 : link->fallback;
+    const bool moves = slot == kLocation || slot == kScale || slot == kRotation;
+    const bool path = moves && FollowsPath(source);
+    const bool placed = moves && (source.parent || path);
     float v = from && !placed ? from->get(link->sourceComponent, at, fallback) : fallback;
-    if (link->kind == "transform") {
-        if (link->property == "location" || link->property == "scale" || link->property == "rotation") {
-            Placement p{};
-            if (source.parent || FollowsPath(source)) {
-                gLinkPlacement = FollowsPath(source) ? 0 : link->property == "location" ? 1 : link->property == "scale" ? 3 : 4;
-                gLinkPlacementOwner = source.id;
-                p = EffectivePlacement(context->layers, source, time);
-                gLinkPlacement = 0;
-            } else {
-                p.scale = {1, 1};
-                if (link->property == "location") {
-                    if (source.effect("absent.randomdisplace")) {
-                        p.location = {source.location.get(0, at, 0), source.location.get(1, at, 0)};
-                        p.z = source.location.get(2, at, 0);
-                    }
-                    if (link->sourceComponent == 2) p.z = v;
-                    else if (link->sourceComponent == 1) p.location.fY = v;
-                    else p.location.fX = v;
-                } else if (link->property == "scale") {
-                    p.scale = {v, v};
-                } else p.rotation = v;
-                ApplyMotion(source, time, &p);
-            }
-            if (link->property == "location") v = link->sourceComponent == 2 ? p.z : (link->sourceComponent == 1 ? p.location.fY : p.location.fX);
-            if (link->property == "scale") v = link->sourceComponent == 1 ? p.scale.fY : p.scale.fX;
-            if (link->property == "rotation") v = p.rotation;
-        } else if (link->property == "opacity") {
-            v *= MotionOpacity(source, time);
+    if (moves) {
+        Placement p{};
+        if (placed) {
+            gLinkPlacement = path ? 0 : slot == kLocation ? 1 : slot == kScale ? 3 : 4;
+            gLinkPlacementOwner = source.id;
+            p = EffectivePlacement(context->layers, source, time);
+            gLinkPlacement = 0;
+        } else {
+            p.scale = {1, 1};
+            if (slot == kLocation) {
+                if (source.effect("absent.randomdisplace")) {
+                    p.location = {source.location.get(0, at, 0), source.location.get(1, at, 0)};
+                    p.z = source.location.get(2, at, 0);
+                }
+                if (link->sourceComponent == 2) p.z = v;
+                else if (link->sourceComponent == 1) p.location.fY = v;
+                else p.location.fX = v;
+            } else if (slot == kScale) {
+                p.scale = {v, v};
+            } else p.rotation = v;
+            ApplyMotion(source, time, &p);
         }
+        if (slot == kLocation) v = link->sourceComponent == 2 ? p.z : (link->sourceComponent == 1 ? p.location.fY : p.location.fX);
+        if (slot == kScale) v = link->sourceComponent == 1 ? p.scale.fY : p.scale.fX;
+        if (slot == kRotation) v = -p.rotation;
+    } else if (slot == kOpacity) {
+        v *= MotionOpacity(source, time);
     }
-    if (link->kind == "transform" && link->property == "rotation") v = -v;
     --gLinkDepth;
+    seen--;
     gLinks = previous;
     gLinkPlacement = placement;
     gLinkPlacementOwner = placementOwner;
@@ -152,6 +168,7 @@ bool PropertyNumbers(const Layer& layer, int effect, const std::string& name, do
     ref.kind = effect < 0 ? "transform" : "effect";
     ref.effect = effect;
     ref.property = name;
+    ref.slot = SlotOf(ref.kind, ref.property);
     const Anim* anim = LinkAnim(layer, ref);
     if (!anim) return false;
     const float t = layer.localTime(timeMs);
@@ -260,6 +277,7 @@ Anim ParseAnim(const XmlNode* node) {
         link.effect = (int)std::clamp(number("effect", -1), -1.0f, 10000.0f);
         link.kind = c->attr("kind") ? c->attr("kind") : "transform";
         link.property = c->attr("property") ? c->attr("property") : "";
+        link.slot = SlotOf(link.kind, link.property);
         link.multiply = std::clamp(number("multiply", 1), -100000.0f, 100000.0f);
         link.add = std::clamp(number("add", 0), -1000000.0f, 1000000.0f);
         link.delay = std::clamp(number("delay", 0), -3600.0f, 3600.0f);

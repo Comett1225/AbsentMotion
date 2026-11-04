@@ -96,34 +96,59 @@ sk_sp<SkTypeface> TextFace(const TextLayout& text, const sk_sp<SkFontMgr>& manag
     const long nanos = (long)info.st_mtim.tv_nsec;
 #endif
     const std::string stamp = found ? std::to_string(info.st_size) + ":" + std::to_string(info.st_ino) + ":" + std::to_string(info.st_mtime) + "." + std::to_string(nanos) : "";
-    const std::string key = text.path + "\n" + std::to_string(text.index) + "\n" + std::to_string(text.weight) + "\n" + (text.imported ? "1" : "0") + (text.axes ? "1" : "0") + "\n" + stamp;
+    struct Cached {
+        sk_sp<SkTypeface> face;
+        std::vector<SkFontParameters::Variation::Axis> axes;
+        bool weighted = false;
+        uint64_t used = 0;
+    };
     static std::mutex lock;
-    static std::map<std::string, sk_sp<SkTypeface>> faces;
-    {
+    static std::map<std::string, Cached> faces;
+    static uint64_t clock = 0;
+    const auto find = [&](const std::string& key, Cached* out) {
         std::lock_guard<std::mutex> hold(lock);
-        if (auto found = faces.find(key); found != faces.end()) return found->second;
-    }
-    sk_sp<SkTypeface> face = manager->makeFromFile(text.path.c_str(), text.index);
-    if (face && (!text.imported || text.axes)) {
-        const int count = face->getVariationDesignParameters({});
-        if (count > 0 && count <= 64) {
-            std::vector<SkFontParameters::Variation::Axis> axes(count);
-            face->getVariationDesignParameters(axes);
-            std::vector<SkFontArguments::VariationPosition::Coordinate> coordinates;
-            for (const auto& axis : axes) {
-                const float value = axis.tag == SkSetFourByteTag('w', 'g', 'h', 't') ? text.weight : axis.def;
-                coordinates.push_back({axis.tag, std::clamp(value, axis.min, axis.max)});
-            }
-            SkFontArguments arguments;
-            arguments.setVariationDesignPosition({coordinates.data(), (int)coordinates.size()});
-            if (auto instance = face->makeClone(arguments)) face = instance;
+        auto found = faces.find(key);
+        if (found == faces.end()) return false;
+        found->second.used = ++clock;
+        *out = found->second;
+        return true;
+    };
+    const auto keep = [&](const std::string& key, Cached entry) {
+        std::lock_guard<std::mutex> hold(lock);
+        if (faces.size() >= 64 && !faces.count(key)) {
+            faces.erase(std::min_element(faces.begin(), faces.end(), [](const auto& a, const auto& b) { return a.second.used < b.second.used; }));
         }
+        entry.used = ++clock;
+        faces[key] = std::move(entry);
+    };
+    const std::string file = text.path + "\n" + std::to_string(text.index) + "\n" + stamp;
+    Cached base;
+    if (!find(file, &base)) {
+        base.face = manager->makeFromFile(text.path.c_str(), text.index);
+        if (!base.face) return nullptr;
+        const int count = base.face->getVariationDesignParameters({});
+        if (count > 0 && count <= 64) {
+            base.axes.resize(count);
+            base.face->getVariationDesignParameters(base.axes);
+            base.weighted = std::any_of(base.axes.begin(), base.axes.end(), [](const auto& a) { return a.tag == SkSetFourByteTag('w', 'g', 'h', 't'); });
+        }
+        keep(file, base);
     }
-    if (!face) return face;
-    std::lock_guard<std::mutex> hold(lock);
-    if (faces.size() >= 64) faces.clear();
-    faces[key] = face;
-    return face;
+    if (base.axes.empty() || (text.imported && !text.axes)) return base.face;
+    const std::string key = file + "\n" + (base.weighted ? std::to_string(text.weight) : "-");
+    Cached made;
+    if (find(key, &made)) return made.face;
+    std::vector<SkFontArguments::VariationPosition::Coordinate> coordinates;
+    for (const auto& axis : base.axes) {
+        const float value = axis.tag == SkSetFourByteTag('w', 'g', 'h', 't') ? text.weight : axis.def;
+        coordinates.push_back({axis.tag, std::clamp(value, axis.min, axis.max)});
+    }
+    SkFontArguments arguments;
+    arguments.setVariationDesignPosition({coordinates.data(), (int)coordinates.size()});
+    made.face = base.face->makeClone(arguments);
+    if (!made.face) made.face = base.face;
+    keep(key, made);
+    return made.face;
 }
 class EmojiFonts : public TypefaceFontProvider {
 public:

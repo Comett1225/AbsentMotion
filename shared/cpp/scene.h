@@ -35,7 +35,7 @@ struct Keyframe {
 struct LinkContext;
 
 struct ValueLink {
-    int component = 0, sourceComponent = 0, effect = -1;
+    int component = 0, sourceComponent = 0, effect = -1, slot = 0;
     int64_t layer = 0;
     std::string kind, property;
     float multiply = 1, add = 0, delay = 0, fallback = 0;

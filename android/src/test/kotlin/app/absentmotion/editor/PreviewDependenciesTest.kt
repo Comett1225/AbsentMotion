@@ -51,6 +51,9 @@ class PreviewDependenciesTest {
         assertEquals(listOf(0..before.lastFrame), previewDirtyRanges(before, Scene.parse(before.node.toXml().replace("width=\"100\"", "width=\"200\""))))
         val temporal = scene(first = "<effect id=\"absent.echo\"/>")
         assertEquals(listOf(0..temporal.lastFrame), previewDirtyRanges(temporal, scene(first = "<effect id=\"absent.echo\"/>", second = "<fillColor value=\"#ff00ff00\"/>")))
+        val link = "<transform><rotation value=\"0\"><valueLink layer=\"1\" kind=\"transform\" property=\"rotation\"/></rotation></transform>"
+        val linked = scene(second = link)
+        assertEquals(listOf(0..linked.lastFrame), previewDirtyRanges(linked, scene(first = "<transform><rotation value=\"90\"/></transform>", second = link)))
     }
 
     @Test fun preparationIsBoundedPrioritisesThePlayheadAndDoesNotDuplicate() {

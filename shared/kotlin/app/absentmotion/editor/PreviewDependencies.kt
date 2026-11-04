@@ -28,7 +28,9 @@ private fun Scene.visualHeader(): XmlNode = node.copy(
 
 private fun Layer.externalDependencies(): Boolean = kind == "camera" || kind == "light" || kind == "embedScene" ||
     node["parent"]?.let { it != "0" } == true || node["pathLayer"]?.let { it != "0" } == true || node["clippingMask"] == "true" ||
-    node.children.any { it.name == "effect" && it["hidden"] != "true" }
+    node.children.any { it.name == "effect" && it["hidden"] != "true" } || node.linksValues()
+
+private fun XmlNode.linksValues(): Boolean = children.any { it.name == "valueLink" || it.linksValues() }
 
 private fun XmlNode.followsBeats(): Boolean = children.any { c ->
     c.name == "effect" && c["hidden"] != "true" && (c["id"] == "absent.particles" || c["id"]?.startsWith("absent.beat") == true) || c.followsBeats()

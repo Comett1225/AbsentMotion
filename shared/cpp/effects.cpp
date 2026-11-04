@@ -997,6 +997,16 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
     sk_sp<SkImageFilter> f = std::move(content);
     bool any = false;
     const size_t end = before >= 0 ? std::min((size_t)before, layer.effects.size()) : layer.effects.size();
+    const auto pointwiseAfter = [&](size_t from) {
+        for (size_t j = from; j < end; j++) {
+            const LayerEffect& next = layer.effects[j];
+            if (next.hidden || next.id == kLift || (layer.video && next.id == "absent.datamosh")) continue;
+            if (next.id == kPuppet || BuiltIn(next.id)) return false;
+            const Definition* d = find(next.id);
+            if (d && d->shader && (!d->pointwise || d->blurred)) return false;
+        }
+        return true;
+    };
     for (size_t k = from >= 0 ? (size_t)from : before >= 0 ? 0 : (size_t)(liftAt(layer) + 1); k < end; k++) {
         const LayerEffect& e = layer.effects[k];
         at = k;
@@ -1008,7 +1018,15 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
             if (!f) continue;
         } else if (BuiltIn(e.id)) {
             const auto value = [&](const char* name, int i, float fallback) { return Value(e, defaults, name, i, t, fallback); };
-            f = e.id == "absent.glow" ? GlowFilter(value, f, withBackdrop) : BuiltInFilter(e.id, value, f);
+            if (e.id == "absent.glow") {
+                const bool first = withBackdrop && !any;
+                const float extent = GlowExtent(value);
+                const SkRect lit = (first ? f->computeFastBounds(bounds) : bounds).makeOutset(extent, extent);
+                f = GlowFilter(value, f, withBackdrop);
+                if (first && !lit.contains(bounds) && pointwiseAfter(k + 1)) f = SkImageFilters::Crop(lit, f);
+            } else {
+                f = BuiltInFilter(e.id, value, f);
+            }
         } else if (d && d->shader) {
             SkRuntimeShaderBuilder b(d->shader);
             const std::shared_ptr<const Palette> colors = d->palette ? this->palette(e, d, t) : nullptr;
