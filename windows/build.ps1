@@ -11,7 +11,7 @@ cmd /c "`"$vcvars`" >nul && set" | ForEach-Object {
 }
 $clang = Join-Path $env:ProgramFiles 'LLVM/bin/clang-cl.exe'
 $root = Split-Path -Parent $PSScriptRoot
-cmake -S "$root/pc/native" -B "$root/pc/build/native-win" -G Ninja "-DCMAKE_C_COMPILER=$clang" "-DCMAKE_CXX_COMPILER=$clang" -DCMAKE_BUILD_TYPE=Release
+cmake -S "$root/pc/native" -B "$root/pc/build/native-win" -G Ninja "-DCMAKE_C_COMPILER=$clang" "-DCMAKE_CXX_COMPILER=$clang" -DCMAKE_BUILD_TYPE=Release "-DFFMPEG_DIR=$env:FFMPEG_DIR"
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 cmake --build "$root/pc/build/native-win" --parallel 6
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

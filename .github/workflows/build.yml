@@ -164,7 +164,9 @@ jobs:
           tools/build_skia.sh x64
           tools/build_skia.sh compat-x64
       - name: Build the x86_64 APKs
-        run: ./gradlew -PamAbi=x86_64 :app:assembleFossRelease :app:assembleCompatRelease --no-daemon
+        run: |
+          ./gradlew -PamAbi=x86_64 :app:assembleFossRelease :app:assembleCompatRelease --no-daemon
+          for apk in android/build/outputs/apk/foss/release/*.apk android/build/outputs/apk/compat/release/*.apk; do mv "$apk" "${apk%-release*}-x86_64-release${apk##*-release}"; done
       - name: Check unsigned APK packaging
         run: python3 tools/apk_check.py --unsigned android/build/outputs/apk/foss/release/*.apk android/build/outputs/apk/compat/release/*.apk
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

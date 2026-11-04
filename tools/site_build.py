@@ -522,7 +522,8 @@ class Site:
     def download_links(self):
         v = self.version
         base = "%s/releases/download/v%s/AbsentMotion-%s-" % (REPO, v, v)
-        return {"foss": base + "foss.apk", "compatible": base + "compatible.apk", "compatible32": base + "compatible-32bit.apk", "sums": "%s/releases/download/v%s/SHA256SUMS.txt" % (REPO, v)}
+        return {"foss": base + "foss.apk", "compatible": base + "compatible.apk", "compatible32": base + "compatible-32bit.apk",
+                "foss_x86": base + "foss-x86_64.apk", "compatible_x86": base + "compatible-x86_64.apk", "sums": "%s/releases/download/v%s/SHA256SUMS.txt" % (REPO, v)}
 
     def download_top(self, page, depth):
         return (
@@ -556,8 +557,16 @@ class Site:
         if released < (4, 3, 0):
             return item + ('<li><span id="dl-compatible32" class="btn alt" aria-disabled="true">Compatible 32-bit</span><div><strong>Phones with a 32-bit system.</strong> '
                            'Coming with the next update.</div></li>')
-        return item + ('<li><a id="dl-compatible32" class="btn alt" href="%s">Compatible 32-bit</a><div><strong>Phones with a 32-bit system</strong>, often sold as Android Go edition, '
-                       'Android 8 or newer. The Compatible version built for 32-bit ARM. <code>AbsentMotion-%s-compatible-32bit.apk</code></div></li>') % (self.download_links()["compatible32"], v)
+        item += ('<li><a id="dl-compatible32" class="btn alt" href="%s">Compatible 32-bit</a><div><strong>Phones with a 32-bit system</strong>, often sold as Android Go edition, '
+                 'Android 8 or newer. The Compatible version built for 32-bit ARM. <code>AbsentMotion-%s-compatible-32bit.apk</code></div></li>') % (self.download_links()["compatible32"], v)
+        if released < (5, 0, 0):
+            return item + ('<li><span id="dl-x86" class="btn alt" aria-disabled="true">Intel or AMD</span><div><strong>Chromebooks with Intel or AMD chips.</strong> '
+                           'Coming with the next update.</div></li>')
+        links = self.download_links()
+        return item + ('<li><a id="dl-foss-x86" class="btn alt" href="%s">Latest, Intel or AMD</a><div><strong>Chromebooks with Intel or AMD chips</strong>, Android 13 or newer. '
+                       'The Latest version built for x86_64. <code>AbsentMotion-%s-foss-x86_64.apk</code></div></li>'
+                       '<li><a id="dl-compatible-x86" class="btn alt" href="%s">Compatible, Intel or AMD</a><div><strong>Chromebooks with Intel or AMD chips</strong> on Android 9 to 12. '
+                       'The Compatible version built for x86_64. <code>AbsentMotion-%s-compatible-x86_64.apk</code></div></li>') % (links["foss_x86"], v, links["compatible_x86"], v)
 
     def checker_box(self):
         return (

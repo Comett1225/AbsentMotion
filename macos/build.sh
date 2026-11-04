@@ -8,13 +8,12 @@ case "$ARCH" in
         CPU="$ARCH"; [ "$ARCH" = x64 ] && CPU=x86_64
         OUT="$ROOT/pc/build/native-$ARCH"; BUILD="$ROOT/pc/build/native-mac-$ARCH"
         FFMPEG="${FFMPEG_PREFIX:?set FFMPEG_PREFIX to an $CPU FFmpeg build}"
-        set -- -DCMAKE_OSX_ARCHITECTURES=$CPU -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DAM_ARCH=$ARCH -DFFMPEG_PREFIX="$FFMPEG" \
-            "-DCMAKE_C_FLAGS=-ffile-prefix-map=$ROOT/=" "-DCMAKE_CXX_FLAGS=-ffile-prefix-map=$ROOT/=" "-DCMAKE_OBJCXX_FLAGS=-ffile-prefix-map=$ROOT/=" ;;
+        set -- -DCMAKE_OSX_ARCHITECTURES=$CPU -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DAM_ARCH=$ARCH "-DFFMPEG_PREFIX=$FFMPEG" ;;
     *) echo "usage: macos/build.sh [arm64|x64]" >&2; exit 2 ;;
 esac
 cmake -S "$ROOT/pc/native" -B "$BUILD" -G Ninja -DCMAKE_BUILD_TYPE=None "$@" >/dev/null
 cmake --build "$BUILD" --parallel 8
-otool -L "$OUT/libamdesktop.dylib" | awk '/\/lib(avformat|avcodec|avutil|swscale|swresample)\./ {print $1}' | while read -r lib; do
+otool -L "$OUT/libamdesktop.dylib" | sed -n -E 's#^[[:space:]]*(.*/lib(avformat|avcodec|avutil|swscale|swresample)\..*) \(compatibility version.*#\1#p' | while IFS= read -r lib; do
     install_name_tool -change "$lib" "@rpath/$(basename "$lib")" "$OUT/libamdesktop.dylib"
 done
 if [ -n "$ARCH" ]; then
