@@ -28,7 +28,8 @@ native_libs() {
             libamengine.so)
                 newer=$(find shared/cpp third_party/rnnoise -type f ! -name ai_jni.cpp ! -name whisper_jni.cpp ! -name lame_jni.cpp -newer "$library" 2>/dev/null | head -n 1)
                 ;;
-            libabsent_ai.so) sources="shared/cpp/ai_jni.cpp third_party/rife_warp third_party/ncnn/src third_party/ncnn/glslang" ;;
+            libabsent_ai.so) sources="shared/cpp/ai_jni.cpp shared/cpp/cutout.cpp shared/cpp/cutout.h third_party/rife_warp third_party/ncnn/src third_party/ncnn/glslang" ;;
+            libampy.so) sources="shared/cpp/py_bridge.c" ;;
             libwhisper_jni.so|libwhisper_jni_fast.so) sources="shared/cpp/whisper_jni.cpp third_party/whisper.cpp/src third_party/whisper.cpp/include third_party/whisper.cpp/ggml" ;;
             liblame_jni.so) sources="shared/cpp/lame_jni.cpp third_party/lame/include" ;;
             libmp3lame.so) sources="third_party/lame" ;;

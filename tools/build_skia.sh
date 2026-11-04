@@ -53,7 +53,8 @@ for p in "$ROOT"/tools/skia-patches/*.patch; do
     fi
 done
 
-GN="$("$ROOT/tools/build_gn.sh" | tail -n 1)"
+GN="$("$ROOT/tools/build_gn.sh")"
+GN="$(printf '%s\n' "$GN" | tail -n 1)"
 mkdir -p "$OUT"
 { echo "ndk = \"$NDK\""; sed -e "${API:+s/^ndk_api = .*/ndk_api = $API/}" -e "${CPU:+s/^target_cpu = .*/target_cpu = \"$CPU\"/}" "$ROOT/tools/skia-args.gn"; } > "$OUT/args.gn"
 "$GN" gen "$OUT"

@@ -34,14 +34,14 @@ printf '\n== Android: release APKs (the standard build and the Compatible builds
 [ -f third_party/skia/out/android-x64/libskia.a ] || sh tools/build_skia.sh x64
 [ -f third_party/skia/out/android-x64-compat/libskia.a ] || sh tools/build_skia.sh compat-x64
 out=build/release/AbsentMotion-$version
-./gradlew :app:assembleFossRelease :app:assembleCompatRelease :app:assembleCompat32Release -q
 mkdir -p build/release
-mv android/build/outputs/apk/foss/release/app-foss-release.apk "$out-foss.apk"
-mv android/build/outputs/apk/compat/release/app-compat-release.apk "$out-compatible.apk"
-mv android/build/outputs/apk/compat32/release/app-compat32-release.apk "$out-compatible-32bit.apk"
 ./gradlew -PamAbi=x86_64 :app:assembleFossRelease :app:assembleCompatRelease -q
 mv android/build/outputs/apk/foss/release/app-foss-release.apk "$out-foss-x86_64.apk"
 mv android/build/outputs/apk/compat/release/app-compat-release.apk "$out-compatible-x86_64.apk"
+./gradlew :app:assembleFossRelease :app:assembleCompatRelease :app:assembleCompat32Release -q
+mv android/build/outputs/apk/foss/release/app-foss-release.apk "$out-foss.apk"
+mv android/build/outputs/apk/compat/release/app-compat-release.apk "$out-compatible.apk"
+mv android/build/outputs/apk/compat32/release/app-compat32-release.apk "$out-compatible-32bit.apk"
 python3 tools/api_floor.py "$out-compatible.apk" --min 26
 python3 tools/api_floor.py "$out-compatible-32bit.apk" --abi armeabi-v7a --min 26
 python3 tools/api_floor.py "$out-foss-x86_64.apk" --abi x86_64
