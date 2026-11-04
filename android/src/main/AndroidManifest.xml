@@ -80,6 +80,8 @@
                 <data android:pathPattern=".*\\..*\\.absproj" />
                 <data android:pathPattern=".*\\.amproj" />
                 <data android:pathPattern=".*\\..*\\.amproj" />
+                <data android:pathPattern=".*\\.fla" />
+                <data android:pathPattern=".*\\..*\\.fla" />
                 <data android:pathPattern=".*\\.xml" />
                 <data android:pathPattern=".*\\..*\\.xml" />
             </intent-filter>

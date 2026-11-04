@@ -9,6 +9,10 @@ import app.absentmotion.i18n.txt
 import app.absentmotion.platform.Context
 import app.absentmotion.platform.Uri
 import app.absentmotion.compat.EffectMigration
+import app.absentmotion.compat.FlaPart
+import app.absentmotion.compat.flaPicture
+import app.absentmotion.compat.flaSound
+import app.absentmotion.compat.readFla
 import app.absentmotion.effects.EffectCatalog
 import app.absentmotion.fonts.FontImportError
 import app.absentmotion.fonts.FontLibrary
@@ -64,10 +68,12 @@ class Importer(
 ) {
     fun import(open: () -> InputStream?): List<ImportReport> = try {
         fun stream() = open() ?: throw ImportFailed(txt(R.string.library_err_no_data))
-        val head = stream().use { it.readAtMost(2) }
-        if (head.size == 2 && head[0] == 'P'.code.toByte() && head[1] == 'K'.code.toByte()) fromPackage(::stream)
+        val head = stream().use { it.readAtMost(4) }
+        if (head.size >= 2 && head[0] == 'P'.code.toByte() && head[1] == 'K'.code.toByte()) fromPackage(::stream)
+        else if (head.contentEquals(byteArrayOf(0xD0.toByte(), 0xCF.toByte(), 0x11, 0xE0.toByte()))) throw ImportFailed(txt(R.string.fla_err_old))
         else {
             val text = stream().use { readText(it, MaxXml) }.removePrefix("\uFEFF")
+            if (text.startsWith("PROXY-CS5")) throw ImportFailed(txt(R.string.fla_err_xfl_alone))
             if (!text.trimStart().startsWith("<")) throw ImportFailed(txt(R.string.library_err_unsupported_type))
             listOf(add(store.newId(), check(text), emptyMap()))
         }
@@ -109,7 +115,10 @@ class Importer(
                     }
                 }
             }
-            if (sigs == null && links == null) throw ImportFailed(txt(R.string.library_err_missing_manifest))
+            if (sigs == null && links == null) {
+                if (files.any { leaf(it) == "DOMDocument.xml" }) return fromFla(open, files)
+                throw ImportFailed(txt(R.string.library_err_missing_manifest))
+            }
             val declaredProject = projectEntry?.let { find(it, files) ?: throw ImportFailed(txt(R.string.library_err_package_project_missing)) }
             val mediaEntries = (links.orEmpty().values + sigs.orEmpty().values).mapNotNull { find(it, files) }.toSet()
             eachEntry(open, limits) { name, input ->
@@ -178,13 +187,76 @@ class Importer(
         }
     }
 
+    private fun fromFla(open: () -> InputStream, files: Set<String>): List<ImportReport> {
+        val root = files.filter { leaf(it) == "DOMDocument.xml" }.minBy { path -> path.count { it == '/' } }.removeSuffix("DOMDocument.xml")
+        val texts = HashMap<String, String>()
+        var size = 0
+        eachEntry(open, limits) { name, input ->
+            val path = name.takeIf { it.startsWith(root) }?.removePrefix(root) ?: return@eachEntry
+            if (path == "DOMDocument.xml" || path.startsWith("LIBRARY/") && path.endsWith(".xml", ignoreCase = true)) {
+                val text = readText(input, MaxXml)
+                size += text.length
+                if (size > limits.sceneText) throw ImportFailed(txt(R.string.library_err_project_files_large))
+                texts[path] = text
+            }
+        }
+        val fla = try { readFla(texts) } catch (e: IllegalArgumentException) { throw ImportFailed(txt(R.string.library_err_malformed_xml, e.message.toString())) }
+        checkScene(fla.root)?.let { throw ImportFailed(it) }
+        val title = files.lastOrNull { it.startsWith(root) && '/' !in it.removePrefix(root) && it.endsWith(".xfl", ignoreCase = true) }?.removePrefix(root)?.dropLast(4).orEmpty()
+        val records = fla.root.children.filter { it.name == "media" }.associateBy { it["uri"] }
+        val wanted = fla.media.entries.groupBy({ root + it.value }, { it.key })
+        val counts = LinkedHashMap(fla.counts)
+        val id = store.newId()
+        val dir = store.mediaDir(id)
+        val marker = File(dir, ImportMarker)
+        val written = ArrayList<File>()
+        val moved = HashMap<String, String>()
+        try {
+            marker.parentFile?.mkdirs()
+            marker.createNewFile()
+            var left = limits.unpacked
+            val names = HashSet<String>()
+            eachEntry(open, limits) { name, input ->
+                val uris = wanted[name] ?: return@eachEntry
+                val sound = records[uris.first()]?.get("type")?.startsWith("audio/") == true
+                val bytes = input.readAtMost(MaxFlaMedia + 1).takeIf { it.size <= MaxFlaMedia }
+                val decoded = bytes?.let { if (sound) flaSound(it) else flaPicture(it) }
+                if (decoded == null) {
+                    val part = if (sound) FlaPart.UnreadSounds else FlaPart.UnreadPictures
+                    counts[part] = (counts[part] ?: 0) + 1
+                    return@eachEntry
+                }
+                left -= decoded.first.size
+                if (left < 0) throw ImportFailed(txt(R.string.library_err_package_large, (limits.unpacked shr 20).toString()))
+                val stem = (records[uris.first()]?.get("filename") ?: "media").substringBeforeLast('.').replace(Regex("[^\\p{L}\\p{N} ._-]"), "_").take(80).ifBlank { "media" }
+                val file = File(dir, (sequenceOf("$stem.${decoded.second}") + generateSequence(2) { it + 1 }.map { "$stem-$it.${decoded.second}" }).first { names.add(it) })
+                written += file
+                file.outputStream().use { it.write(decoded.first); it.fd.sync() }
+                uris.forEach { moved[it] = file.toURI().toString() }
+            }
+            val parts = counts.filterValues { it > 0 }.entries
+            val sections = listOf(true, false).map { kept ->
+                txt(if (kept) R.string.fla_report_imported else R.string.fla_report_skipped) to parts.filter { it.key.imported == kept }.map { txt(it.key.label, it.value.toString()) }
+            }.filter { it.second.isNotEmpty() }
+            val report = add(id, fla.root.with("title", title), moved, sections)
+            marker.delete()
+            dir.delete()
+            return listOf(report)
+        } catch (t: Throwable) {
+            written.forEach { it.delete() }
+            marker.delete()
+            dir.delete()
+            throw t
+        }
+    }
+
     private fun check(text: String): XmlNode {
         val root = try { XmlNode.parse(text.removePrefix("\uFEFF"), XmlNode.IMPORT_NODES) } catch (e: Exception) { throw ImportFailed(txt(R.string.library_err_malformed_xml, e.message.toString())) }
         checkScene(root)?.let { throw ImportFailed(it) }
         return root
     }
 
-    private fun add(id: String, root: XmlNode, moved: Map<String, String>): ImportReport {
+    private fun add(id: String, root: XmlNode, moved: Map<String, String>, sections: List<Pair<UiText, List<UiText>>> = emptyList()): ImportReport {
         try {
             var scene = relink(Scene(uniqueLayerIds(root.mapMediaUris { moved[it] ?: access.imported(it) })))
             val migrated = migration?.migrate(scene)
@@ -193,7 +265,7 @@ class Importer(
             val missing = scene.node.mediaUris().filterNot { access.allows(it) && exists(it) }
             for (uri in missing) scene = scene.withMedia(MediaDeclaration(XmlNode("media", mapOf("uri" to uri))))
             scene = Scene(scene.node.copy(children = scene.node.children.map { if (it.name == "media" && it["uri"] in missing) it.with("missing", "true") else it }))
-            val result = ImportReport(id, scene.title, scene.node["type"] == "element", report(scene, missing, migrated))
+            val result = ImportReport(id, scene.title, scene.node["type"] == "element", sections + report(scene, missing, migrated))
             store.save(id, scene)
             return result
         } catch (t: Throwable) {
@@ -222,6 +294,7 @@ class Importer(
 
     companion object {
         private const val MaxXml = 16 shl 20
+        private const val MaxFlaMedia = 256 shl 20
         private const val MaxSide = 16384
         private const val MaxFps = 240
         private const val MaxHours = 24

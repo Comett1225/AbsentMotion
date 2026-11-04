@@ -368,8 +368,13 @@ class DeskAppState {
             withContext(Dispatchers.IO) {
                 val importer = Importer.forApp(context, store)
                 for (uri in uris) try {
-                    reports += importer.import { context.contentResolver.openInputStream(uri) }.map {
-                        if (!it.template) it else templates.adopt(store, it.id, engine)?.let { id -> it.copy(id = id) } ?: it.copy(template = false)
+                    val xfl = DeskOpen.xflZip(uri)
+                    try {
+                        reports += importer.import { xfl?.inputStream() ?: context.contentResolver.openInputStream(uri) }.map {
+                            if (!it.template) it else templates.adopt(store, it.id, engine)?.let { id -> it.copy(id = id) } ?: it.copy(template = false)
+                        }
+                    } finally {
+                        xfl?.delete()
                     }
                 } catch (e: kotlinx.coroutines.CancellationException) { throw e }
                 catch (e: Exception) { importFailed = e.message ?: context.getString(R.string.library_err_unsupported_type) }

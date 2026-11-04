@@ -1071,6 +1071,16 @@
       "note": ""
     },
     {
+      "id": "import.fla",
+      "name": "Import Adobe Animate files (.fla from CS5 on, or the XFL folder): shapes, symbols, pictures, classic tweens, masks, sounds, with a report of what was skipped",
+      "where": "compat/FlaImport.kt, Importer.kt fromFla, DeskOpen.kt xflZip",
+      "android": "works",
+      "macos": "untested",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "Same Kotlin importer on every platform; the desktop also takes an .xfl file by packing its folder. Checked with JVM tests and 36 real files rendered by the host engine; the desktop app was not run on an imported file"
+    },
+    {
       "id": "effect.parenting_helper",
       "name": "Parenting Helper and Scale Assist effects (own versions of Alight Motion's), imported from Alight projects",
       "where": "motion.cpp ParentTerms/ParentRoll/ApplyMotion, styles.cpp Effective, effects/parenthelper.json, scaleassist.json, foreign.json",

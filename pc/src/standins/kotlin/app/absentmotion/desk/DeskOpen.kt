@@ -8,7 +8,7 @@ import java.net.Socket
 import java.util.concurrent.ConcurrentLinkedQueue
 
 object DeskOpen {
-    val projectExtensions = setOf("absproj", "amproj", "xml")
+    val projectExtensions = setOf("absproj", "amproj", "xml", "fla", "xfl")
     val arrived = mutableIntStateOf(0)
     private val queue = ConcurrentLinkedQueue<File>()
 
@@ -22,6 +22,27 @@ object DeskOpen {
     fun take(): List<File> = generateSequence { queue.poll() }.toList()
 
     fun isProject(file: File) = file.extension.lowercase() in projectExtensions
+
+    fun xflZip(uri: android.net.Uri): File? {
+        val file = uri.toFile()?.takeIf { it.extension.equals("xfl", ignoreCase = true) && it.isFile } ?: return null
+        val folder = file.absoluteFile.parentFile?.toPath() ?: return null
+        val zip = File.createTempFile("am-xfl", ".zip")
+        try {
+            java.util.zip.ZipOutputStream(zip.outputStream().buffered()).use { out ->
+                java.nio.file.Files.walk(folder).use { paths ->
+                    paths.filter { java.nio.file.Files.isRegularFile(it, java.nio.file.LinkOption.NOFOLLOW_LINKS) }.limit(4000).forEach { path ->
+                        out.putNextEntry(java.util.zip.ZipEntry(folder.relativize(path).joinToString("/")))
+                        java.nio.file.Files.copy(path, out)
+                        out.closeEntry()
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            zip.delete()
+            throw e
+        }
+        return zip
+    }
 
     fun fromArguments(args: Array<String>): List<File> = args.filter { !it.startsWith("--") && it.isNotBlank() }.map(::File)
 

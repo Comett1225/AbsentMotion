@@ -588,6 +588,16 @@ Third-party parts of the runtime, with the file in the `legal` folder that holds
 JUnit 4.13.2 (Eclipse Public License 1.0) is used by the unit tests only and is not part of any build output. In the
 Android build kXML 2 2.3.0 and org.json 20240303 are also test-only; the desktop apps bundle them (see above).
 
+### Adobe Animate file format references (no code included)
+
+The importer for Adobe Animate `.fla` and XFL files (`compat/FlaImport.kt`) was written for AbsentMotion from published
+descriptions of the format. No code from these projects is in AbsentMotion; they are named because their descriptions were read:
+
+- xfl2svg, Copyright (c) 2021 PluieElectrique, MIT licence, https://github.com/PluieElectrique/xfl2svg (the shape edge
+  format and how edges join into filled shapes).
+- JPEXS Free Flash Decompiler, Copyright (C) 2010-2026 JPEXS, GNU LGPL 3.0 or later,
+  https://github.com/jindrapetrik/jpexs-decompiler (the layout of the `bin/*.dat` picture files).
+
 ---
 
 ## 4. Fonts, icons and effect thumbnails
