@@ -110,6 +110,8 @@ class NativeEngine(backend: Backend) : AutoCloseable {
 
         fun fastCaptionCpu(): Boolean = nativeFastCaptionCpu()
 
+        fun vulkanDevice(): String? = nativeVulkanDevice()
+
         @JvmStatic private external fun nativeCreate(backend: Int): Long
         @JvmStatic private external fun nativeDestroy(engine: Long)
         @JvmStatic private external fun nativeInfo(engine: Long): String
@@ -143,6 +145,7 @@ class NativeEngine(backend: Backend) : AutoCloseable {
         @JvmStatic private external fun nativeEase(easing: String, us: FloatArray): FloatArray
         @JvmStatic private external fun nativeBlipTimes(text: ByteArray, speed: Float, pause: Float, every: Int): FloatArray
         @JvmStatic private external fun nativeFastCaptionCpu(): Boolean
+        @JvmStatic private external fun nativeVulkanDevice(): String?
         @JvmStatic private external fun nativeLayerBounds(engine: Long, layerId: Long, timeMs: Double): FloatArray?
         @JvmStatic private external fun nativeLayerQuad(engine: Long, layerId: Long, timeMs: Double): FloatArray?
         @JvmStatic private external fun nativePropertyNumbers(engine: Long, layerId: Long, effect: Int, name: String, timeMs: Double): FloatArray?

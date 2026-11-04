@@ -28,4 +28,4 @@ AbsentMotion can open scene XML files and .amproj packages exported from Alight 
 <li>This build contains no Google libraries. Background removal uses its own offline model.</li>
 </ul>
 
-AbsentMotion is released under the Apache License 2.0. The source code and the list of third-party software are in the project repository.
+AbsentMotion is released under the GNU General Public License v3.0 (GPL-3.0). The source code and the list of third-party software are in the project repository.

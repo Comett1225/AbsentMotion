@@ -19,7 +19,7 @@ MATRIX = [
     {"name": "AbsentMatrix28", "image": "system-images;android-28;google_apis;arm64-v8a", "device": "pixel_4", "flavour": "compat", "port": 5600, "ram": 2048,
      "why": "Compatible floor, Android 9 with 2 GB of memory: legacy signature, installer and storage APIs"},
     {"name": "AbsentMatrix33", "image": "system-images;android-33;google_apis;arm64-v8a", "device": "pixel_6", "flavour": "foss", "port": 5602,
-     "why": "foss and play floor, Android 13"},
+     "why": "foss floor, Android 13"},
     {"name": "AbsentMatrix34", "image": "system-images;android-34;google_apis;arm64-v8a", "device": "pixel_6", "flavour": "foss", "port": 5604,
      "why": "Android 14: typed intent extras, foreground service types, partial media access"},
     {"name": "AbsentMatrix36", "image": "system-images;android-36;google_apis;arm64-v8a", "device": "pixel_7", "flavour": "foss", "port": 5606,

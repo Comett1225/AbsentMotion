@@ -10,11 +10,74 @@
   "move": "移動",
   "new": "新着",
   "noise": "ノイズ",
+  "other": "その他",
   "repeat": "繰り返し",
   "stylize": "スタイライズ",
   "text": "テキスト"
  },
  "effects": {
+  "ascii": {
+   "description": "レイヤーを文字や記号で描いたテキストアートに変換します。明るい部分ほど密度の高い文字になります。「サイズ」でレイヤー上の1文字の幅を決めるので、文字はレイヤーと一緒に動き、回転し、拡大縮小します。「色」は画像本来の色を残すか、1色にします。「輪郭線」は | - / \\ の文字で輪郭を描きます。",
+   "name": "ASCII",
+   "params": {
+    "background": {
+     "label": "背景色"
+    },
+    "backgroundMode": {
+     "label": "背景",
+     "options": [
+      "なし",
+      "色"
+     ]
+    },
+    "brightness": {
+     "label": "明るさ"
+    },
+    "cell": {
+     "label": "サイズ"
+    },
+    "characters": {
+     "label": "カスタム"
+    },
+    "charset": {
+     "label": "文字",
+     "options": [
+      "詳細",
+      "シンプル",
+      "ブロック",
+      "バイナリ",
+      "カスタム"
+     ]
+    },
+    "colorMode": {
+     "label": "色",
+     "options": [
+      "元の色",
+      "単色"
+     ]
+    },
+    "contrast": {
+     "label": "コントラスト"
+    },
+    "edges": {
+     "label": "輪郭線"
+    },
+    "invert": {
+     "label": "反転"
+    },
+    "textColor": {
+     "label": "テキストの色"
+    }
+   },
+   "presets": {
+    "amber-monitor": "アンバーモニター",
+    "binary-rain": "バイナリレイン",
+    "blocks": "ブロック",
+    "line-art": "線画",
+    "newspaper": "新聞",
+    "terminal": "ターミナル"
+   }
+  },
   "autoshake": {
    "description": "設定した範囲内でレイヤーを時間経過に沿ってランダムに動かします。",
    "name": "オートシェイク",
@@ -50,8 +113,8 @@
    }
   },
   "backdrop": {
-   "description": "レイヤーの下に描画された内容をコピーし、後続のエフェクトで変更できるようにします。レイヤーにマスクすると、コピーはレイヤーの不透明な部分だけに限定されます。ミックスでレイヤーの塗りを戻します。エフェクトを外側に広げると、ストレッチなどの後続エフェクトでコピーをレイヤーの端の外まで広げられます。",
-   "name": "調整レイヤー",
+   "description": "調整レイヤーとして、レイヤーの下に描画された内容をコピーし、後続のエフェクトがそのコピーを変更できるようにします。「レイヤーにマスク」はコピーをレイヤーの不透明な部分に限定します。「ミックス」はレイヤーの塗りを戻します。「エフェクトを外側に広げる」を使うと、ストレッチなどの後続エフェクトがコピーをレイヤーの端の外まで広げられます。",
+   "name": "背景をコピー",
    "params": {
     "mask": {
      "label": "レイヤーにマスク"
@@ -1819,6 +1882,15 @@
     }
    }
   },
+  "fontweight": {
+   "description": "文字の太さを細字から太字まで設定でき、キーフレームでアニメーションさせることもできます。1つのファイルにすべての太さを含むバリアブルフォントに対応しています。フォント一覧のRaleway、Quicksand、Comfortaa、Lora、Bitter、Orbitron、Playfair Display、Dancing Script、またはインポートしたバリアブルフォントが使えます。太さが固定されたフォントは元の見た目のままです。",
+   "name": "フォントの太さ",
+   "params": {
+    "weight": {
+     "label": "太さ"
+    }
+   }
+  },
   "fourcolor": {
    "description": "レイヤー上に、4点（レイヤー中心からのピクセル位置）の色をブレンドして重ねます。",
    "name": "4色グラデーション",
@@ -2220,6 +2292,9 @@
    "description": "レイヤーのコピーをグリッド状に複数生成します。",
    "name": "グリッドリピート",
    "params": {
+    "copyDelay": {
+     "label": "コピーごとの遅延"
+    },
     "count": {
      "label": "カウント"
     },
@@ -2241,8 +2316,20 @@
     "position": {
      "label": "位置"
     },
+    "randomOpacity": {
+     "label": "ランダム不透明度"
+    },
     "randomOrder": {
      "label": "ランダム順"
+    },
+    "randomPosition": {
+     "label": "ランダム位置"
+    },
+    "randomRotation": {
+     "label": "ランダム回転"
+    },
+    "randomScale": {
+     "label": "ランダムスケール"
     },
     "rangeEnd": {
      "label": "範囲終了"
@@ -2871,6 +2958,9 @@
    "description": "レイヤーの複製を線上に並べて動的に生成します。",
    "name": "リニアリピート",
    "params": {
+    "copyDelay": {
+     "label": "コピーごとの遅延"
+    },
     "count": {
      "label": "数"
     },
@@ -2892,8 +2982,20 @@
     "position": {
      "label": "位置"
     },
+    "randomOpacity": {
+     "label": "ランダム不透明度"
+    },
     "randomOrder": {
      "label": "ランダム順"
+    },
+    "randomPosition": {
+     "label": "ランダム位置"
+    },
+    "randomRotation": {
+     "label": "ランダム回転"
+    },
+    "randomScale": {
+     "label": "ランダムスケール"
     },
     "rangeEnd": {
      "label": "範囲の終了"
@@ -3500,6 +3602,45 @@
     }
    }
   },
+  "parenthelper": {
+   "description": "子レイヤーが親レイヤーに従う方法を変更します。スケールと回転は、完全に従う、固定する、指定した割合で従う、から選べます。「自動回転」は、転がる車輪のように、動きに合わせてレイヤーを回転させます。",
+   "name": "ペアレントヘルパー",
+   "params": {
+    "autoRotate": {
+     "label": "自動回転",
+     "options": [
+      "オフ",
+      "X軸",
+      "Y軸"
+     ]
+    },
+    "radiusAdjust": {
+     "label": "半径の調整"
+    },
+    "rotateMode": {
+     "label": "回転",
+     "options": [
+      "通常",
+      "固定",
+      "割合指定"
+     ]
+    },
+    "rotateWeight": {
+     "label": "回転の割合"
+    },
+    "scaleMode": {
+     "label": "スケール",
+     "options": [
+      "通常",
+      "固定",
+      "割合指定"
+     ]
+    },
+    "scaleWeight": {
+     "label": "スケールの割合"
+    }
+   }
+  },
   "particles": {
    "description": "レイヤーからパーティクルを飛ばします。雪、火花、紙吹雪、泡、塵、ハート、星、花びら、またはレイヤー自身の小さなコピーを、重力・風・渦で動かせます。プリセットから始めて、エミッターや量、力を調整してください。拍に合わせて飛ばす場合は、先に音楽を選択してメニューから拍をマークしてください。",
    "name": "パーティクル",
@@ -3940,8 +4081,43 @@
    "description": "レイヤーをパペットのように曲げます。ピンを置いてドラッグやアニメーションを行うと、画像がピンに滑らかに追従します。",
    "name": "パペットピン",
    "params": {
+    "density": {
+     "label": "三角形の密度"
+    },
+    "expansion": {
+     "label": "メッシュの拡張"
+    },
     "falloff": {
      "label": "減衰"
+    },
+    "sway": {
+     "label": "揺れ"
+    },
+    "swayAmount": {
+     "label": "揺れの量"
+    },
+    "swayAngle": {
+     "label": "揺れの角度"
+    },
+    "swayDirection": {
+     "label": "揺れの方向",
+     "options": [
+      "角度",
+      "ランダム"
+     ]
+    },
+    "swayPins": {
+     "label": "揺らすピン",
+     "options": [
+      "すべて",
+      "選択中"
+     ]
+    },
+    "swaySeed": {
+     "label": "揺れのシード"
+    },
+    "swaySpeed": {
+     "label": "揺れの速度"
     }
    }
   },
@@ -4027,6 +4203,9 @@
     "angle": {
      "label": "角度"
     },
+    "copyDelay": {
+     "label": "コピーごとの遅延"
+    },
     "count": {
      "label": "個数"
     },
@@ -4051,8 +4230,20 @@
     "radius": {
      "label": "半径"
     },
+    "randomOpacity": {
+     "label": "ランダム不透明度"
+    },
     "randomOrder": {
      "label": "ランダム順"
+    },
+    "randomPosition": {
+     "label": "ランダム位置"
+    },
+    "randomRotation": {
+     "label": "ランダム回転"
+    },
+    "randomScale": {
+     "label": "ランダムスケール"
     },
     "rangeEnd": {
      "label": "範囲の終了"
@@ -4328,6 +4519,9 @@
    "description": "直下のレイヤーの輪郭パスに沿って、レイヤーの複数のコピーを動的に生成します。",
    "name": "パスに沿ってリピート",
    "params": {
+    "copyDelay": {
+     "label": "コピーごとの遅延"
+    },
     "count": {
      "label": "コピー数"
     },
@@ -4352,8 +4546,20 @@
     "phase": {
      "label": "フェーズ"
     },
+    "randomOpacity": {
+     "label": "ランダム不透明度"
+    },
     "randomOrder": {
      "label": "ランダム順"
+    },
+    "randomPosition": {
+     "label": "ランダム位置"
+    },
+    "randomRotation": {
+     "label": "ランダム回転"
+    },
+    "randomScale": {
+     "label": "ランダムスケール"
     },
     "rangeEnd": {
      "label": "範囲終了"
@@ -4567,6 +4773,27 @@
     },
     "seed": {
      "label": "シード"
+    }
+   }
+  },
+  "scaleassist": {
+   "description": "レイヤー自身のサイズに加えて、X、Y、その両方、またはXとYを逆方向にスケールを追加します。このレイヤーを親にしているレイヤーも新しいサイズに従います。",
+   "name": "スケールアシスト",
+   "params": {
+    "axis": {
+     "label": "軸",
+     "options": [
+      "X",
+      "Y",
+      "X,Y",
+      "X,-Y"
+     ]
+    },
+    "damp": {
+     "label": "ダンピング"
+    },
+    "scale": {
+     "label": "スケール"
     }
    }
   },
@@ -5425,6 +5652,59 @@
     }
    }
   },
+  "textblips": {
+   "description": "テキストを1文字ずつ入力していき、1文字ごとに短いブリップ音が鳴ります。ゲームでキャラクターが話しているような効果です。「声」を選んでから、ピッチ、文字が入力される速さ、句読点の後の間を設定します。スペースと句読点では音が鳴りません。",
+   "name": "テキストブリップ",
+   "params": {
+    "delay": {
+     "label": "遅延"
+    },
+    "every": {
+     "label": "ブリップ間隔"
+    },
+    "pause": {
+     "label": "句読点の間"
+    },
+    "pitch": {
+     "label": "ピッチ"
+    },
+    "reveal": {
+     "label": "タイプ表示"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "speed": {
+     "label": "速度"
+    },
+    "variation": {
+     "label": "ピッチのばらつき"
+    },
+    "voice": {
+     "label": "声",
+     "options": [
+      "クラシック",
+      "ソフト",
+      "低め",
+      "高め",
+      "ロボット",
+      "キュッ",
+      "タイプライター",
+      "チップチューン"
+     ]
+    },
+    "volume": {
+     "label": "音量"
+    }
+   },
+   "presets": {
+    "fast-talker": "早口",
+    "hero": "ヒーロー",
+    "monster": "モンスター",
+    "robot": "ロボット",
+    "typewriter": "タイプライター"
+   }
+  },
   "textpath": {
    "description": "テキストを円弧、円、またはすぐ下のレイヤーの輪郭に沿って1文字ずつ配置します。シェイピング、フォント、絵文字はそのまま保たれます。",
    "name": "パスに沿ったテキスト",
@@ -5590,6 +5870,72 @@
    },
    "presets": {
     "scramble": "スクランブル"
+   }
+  },
+  "textshake": {
+   "description": "文字を1つずつ個別に揺らし、ゲームの緊張したセリフのような動きにします。「シェイク」は位置の間をゆらゆらと漂い、「ジッター」は一定間隔ごとに新しい位置へジャンプし、「ウェーブ」は文字を上下に揺らし、「サークル」は小さな円を描くように動かし、「ウォブル」は前後に傾けます。「揺れる文字」を下げると一部の文字だけが揺れ、しばらくごとにランダムに選び直されます。",
+   "name": "テキストシェイク",
+   "params": {
+    "amount": {
+     "label": "量"
+    },
+    "cycles": {
+     "label": "速度"
+    },
+    "end": {
+     "label": "終了"
+    },
+    "every": {
+     "label": "文字の入れ替え間隔"
+    },
+    "letters": {
+     "label": "揺れる文字"
+    },
+    "rotation": {
+     "label": "回転"
+    },
+    "seed": {
+     "label": "シード"
+    },
+    "speed": {
+     "label": "速度"
+    },
+    "spread": {
+     "label": "広がり"
+    },
+    "start": {
+     "label": "開始"
+    },
+    "style": {
+     "label": "スタイル",
+     "options": [
+      "シェイク",
+      "ジッター",
+      "ウェーブ",
+      "サークル",
+      "ウォブル"
+     ]
+    },
+    "tilt": {
+     "label": "傾き"
+    },
+    "unit": {
+     "label": "単位",
+     "options": [
+      "文字",
+      "単語",
+      "行"
+     ]
+    }
+   },
+   "presets": {
+    "dizzy": "めまい",
+    "floaty": "ふわふわ",
+    "nervous": "緊張",
+    "scared": "怯え",
+    "uneasy": "不安",
+    "wavy": "波打ち",
+    "wobbly": "ぐらぐら"
    }
   },
   "texttransform": {

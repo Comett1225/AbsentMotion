@@ -11,7 +11,7 @@ The repository has one folder per platform: `shared/` (the Kotlin UI, the C++ en
 `android/` (the Android app, Gradle module `:app`), `pc/` (the desktop layer shared by every desktop system), and `macos/`,
 `windows/` and `linux/` (what only that system uses). Each folder has a short README.
 
-The Android app (`android/`) builds to APKs for `arm64-v8a` in three flavours, `play`, `foss` and `compat`, plus `compat32`, the Compatible build for
+The Android app (`android/`) builds to APKs for `arm64-v8a` in two flavours, `foss` and `compat`, plus `compat32`, the Compatible build for
 32-bit ARM (`armeabi-v7a`) (section 6). The
 maintainer builds it on macOS (Apple silicon).
 
@@ -108,9 +108,8 @@ is another commit.
 ## 6. Android app
 
 ```
-./gradlew :app:assemblePlayDebug     # debug APK, play flavour (background removal through Google Play services)
 ./gradlew :app:assembleFossDebug     # debug APK, free flavour: no Google libraries at all (what F-Droid builds)
-./gradlew :app:assemblePlayRelease   # release APKs: assembleFossRelease for the free flavour
+./gradlew :app:assembleFossRelease   # release APK of the free flavour
 ./gradlew :app:assembleCompatDebug   # the Compatible build for Android 8 to 12 (needs tools/build_skia.sh compat first)
 ./gradlew :app:assembleCompat32Release   # the Compatible build for 32-bit ARM phones (needs tools/build_skia.sh compat32 first)
 ```
@@ -120,11 +119,11 @@ Gradle runs CMake for you (`externalNativeBuild`): it builds the engine (`libame
 with the layer in `third_party/rife_warp`) and RNNoise (from `third_party/rnnoise`), for `arm64-v8a` (`armeabi-v7a` in `compat32`).
 Skia from section 5 must be in place first.
 
-Outputs: `android/build/outputs/apk/<flavour>/<type>/app-<flavour>-<type>.apk`, for example `android/build/outputs/apk/play/debug/app-play-debug.apk`. The foss flavour adds its own offline background remover (`android/src/foss`); the play flavour uses Google ML Kit through Google Play services (`android/src/play`).
+Outputs: `android/build/outputs/apk/<flavour>/<type>/app-<flavour>-<type>.apk`, for example `android/build/outputs/apk/foss/debug/app-foss-debug.apk`. The foss and Compatible flavours add their own offline background remover (`android/src/foss`).
 
 - **Requirements of the app:** Android 13 (API 33) or newer (`minSdk = 33`, tested on Android 16 and 17 and on emulators from Android 13), `targetSdk = 37`,
   a 64-bit ARM device, Vulkan 1.1 or OpenGL ES 3.0 (`tools/api_floor.py` lists the Android version the native libraries need).
-- **Release signing:** `assemblePlayRelease` and `assembleFossRelease` sign with the key named in a git-ignored `signing.properties` in the project root
+- **Release signing:** `assembleFossRelease`, `assembleCompatRelease` and `assembleCompat32Release` sign with the key named in a git-ignored `signing.properties` in the project root
   (`storeFile`, `storePassword`, `keyAlias`, `keyPassword`); without that file the release APK is left unsigned (`app-<flavour>-release-unsigned.apk`),
   and you sign it yourself with `apksigner`. Debug builds (`assembleFossDebug`) are signed with the debug key for your own phone. Make a release key with
   `keytool -genkeypair -v -keystore release.jks -alias absentmotion -keyalg RSA -keysize 4096 -validity 10000` and never
@@ -173,17 +172,21 @@ The signing helper uses each APK's manifest minimum Android version and build-to
 `tools/release.sh [patch|minor|major]` bumps `version.properties` (with no argument it keeps the current version),
 runs `tools/check.sh`, and builds the release APKs of every flavour (signed as described in section 6). Results:
 
-- `build/release/AbsentMotion-<version>-play.apk` (the `play` flavour, last made for 4.x: from 5.0 the in-app updater moves Play installs to the `foss` file)
-- `build/release/AbsentMotion-<version>-foss.apk` (the `foss` flavour)
+- `build/release/AbsentMotion-<version>-foss.apk` (the `foss` flavour; 4.x Play installs update to this file, see below)
 - `build/release/AbsentMotion-<version>-compatible.apk` (the `compat` flavour, Android 8 to 12)
 - `build/release/AbsentMotion-<version>-compatible-32bit.apk` (the `compat32` flavour, phones with a 32-bit system, Android 8 or newer)
+
+The `play` flavour (background removal through Google Play services) was last built for 4.4 and was removed in 5.0. A
+4.3 or 4.4 Play install that finds no `-play.apk` in a release takes the `-foss.apk` instead, and its updater accepts it
+because it carries the variant `foss` and the same signing key. So a release must never carry a `-play.apk` again, and its
+`-foss.apk` must be signed with the release key. Older Play installs (4.2 and earlier) are sent to the release page and
+install the `-foss.apk` by hand.
 
 ## 8. CI and reproducible builds
 
 `.github/workflows/build.yml` builds the unsigned `foss` release APK in a Debian trixie container on pull requests,
 manual runs and version tags. It installs JDK 21 and the pinned Android SDK, NDK and CMake, builds Skia from source,
-and uploads the `foss-apk` artifact; a second job builds the compat Skia for 64-bit and 32-bit ARM and the unsigned `compat` and `compat32` APKs (`compat-apk` artifact). The workflow
-removes the Play sources and dependencies before building.
+and uploads the `foss-apk` artifact; a second job builds the compat Skia for 64-bit and 32-bit ARM and the unsigned `compat` and `compat32` APKs (`compat-apk` artifact).
 
 Two builds of the same commit must produce byte-identical unsigned APKs. Compare the downloaded artifacts with
 `cmp first.apk second.apk` before a release. Keep the Gradle wrapper, Android plugin, Kotlin, NDK, Skia and native

@@ -68,11 +68,6 @@ The dialog also shows the first frame of the clip. **Keep everything** is the de
 - The app needs free storage for the mask video and warns if there is not enough.
 - The result is a group called "name cut out" holding the original clip and a mask layer. To undo it, delete or ungroup the group; this tool has no restore button. Select the group and tap **Cut-out Edge** to change the **Softness** and **Grow / Shrink** of the edge while you watch the preview; **Reset** goes back to the edge as it was made.
 
-### Which build?
-
-- The **standard build** (`-foss.apk`, recommended) has its own small offline model inside the app (about 3 MB). Nothing is downloaded and no Google libraries are used.
-- The **Play-services build** (`-play.apk`) uses Google Play services. Google Play services downloads its own model the first time (so you need an internet connection once) and may send diagnostics to Google under Google's own policy. If the model is not ready, the app says "The background removal model is not ready yet. Connect to the internet and retry shortly; first use needs Google Play services."
-
 ## Reduce Noise
 
 Select a sound clip and tap **AI** in the tool grid (or **Reduce Noise** in the AI category). Choose what the noise is:
@@ -124,8 +119,7 @@ Each level has its own model, downloaded once (about 11 MB) after the app has sh
 | Item | When | Size | From |
 |---|---|---|---|
 | Speech model for captions | After you confirm the download | about 60 MB Standard, or 82 MB Higher precision | Hugging Face |
-| Background removal model, standard build | Never: it is inside the app | about 3 MB | |
-| Background removal model, Play-services build | First use | Not shown by the app | Google Play services |
+| Background removal model | Never: it is inside the app | about 3 MB | |
 | Noise reduction | Never: it is inside the app | | |
 | AI Enhance models | The first time you use Enhance, after you tap Download and start | about 2.4 MB (cartoon 1.3 MB, film grain 2.4 MB more) | this project's GitHub releases |
 | AI background removal 2.0 | The first time you remove a background with AI background removal 2.0 | about 62 MB | this project's GitHub releases |

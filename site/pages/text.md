@@ -2,7 +2,7 @@
 title: Text and fonts
 group: Create
 order: 3
-summary: Add and style text, choose from 150 fonts, fill letters with a picture, animate text and make captions.
+summary: Add and style text, choose from 150 fonts, fill letters with a picture, animate text, give it a talking sound and make captions.
 ---
 ## Add text
 
@@ -59,10 +59,15 @@ The effects of the **Text** category animate text letter by letter.
 - **Text Progress** reveals the text by character, word or line (typewriter and fade in by word are presets).
 - **Text Transform** moves, rotates, scales and fades each letter in turn (presets: Wave and Spin Cascade).
 - **Text Randomizer** scrambles letters before they settle (preset: Scramble).
+- **Text Shake** shakes each letter on its own, like nervous dialogue in a game: **Shake**, **Jitter**, **Wave**, **Circle** or **Wobble**. Lower **Letters Shaking** to shake only some letters, picked again every few moments (presets: Nervous, Scared, Uneasy, Floaty, Wavy, Dizzy, Wobbly).
+- **Text Blips** types the text out and plays a short blip for each letter, like a character talking in a game. Pick one of eight voices, its pitch and how fast it types; spaces and punctuation stay silent, with a short pause after punctuation. The blips play in the preview and in the export (presets: Hero, Monster, Robot, Fast Talker, Typewriter).
+- **Font Weight** makes the letters thinner or bolder and can be animated. It works with variable fonts: Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display and Dancing Script, or a variable font you import.
 - **Count Up/Down** and **Timecode** turn text into a counter or a clock.
 - **Text Along Path** sets the text along an arc, a circle or the shape just beneath it; animate **Position** to make it run along the path.
 
 See [Using effects](@effects-guide) for how to add them, and the [effects library](@effects) for every setting.
+
+**ASCII**, in the Stylize effects, works the other way round: it turns any layer, such as a video, into text art made of letters and symbols.
 
 ## Captions
 

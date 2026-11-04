@@ -33,11 +33,40 @@ class GpuCheckTest {
 
     @Test fun upsideDownFails() = assertFalse(GpuCheck.matches(picture(100) { x, y -> quad(x, 63 - y) }))
 
-    @Test fun aCrashWhileStartingSkipsThatBackend() {
-        assertEquals(false, GpuCheck.crashedStarting("41:vk") { ApplicationExitInfo.REASON_CRASH_NATIVE })
-        assertEquals(true, GpuCheck.crashedStarting("41:gl") { ApplicationExitInfo.REASON_ANR })
-        assertEquals(false, GpuCheck.crashedStarting("41:vk") { null })
-        assertEquals(null, GpuCheck.crashedStarting("41:vk") { ApplicationExitInfo.REASON_USER_REQUESTED })
-        assertEquals(null, GpuCheck.crashedStarting("x:vk") { ApplicationExitInfo.REASON_CRASH_NATIVE })
+    @Test fun oldMaliAndPowerVrStartWithOpenGl() {
+        listOf("5045\tMali-G52 MC2", "5045\tMali-G51", "5045\tMali-G31 MP2", "5045\tMali-T880 MP12",
+            "4112\tPowerVR Rogue GE8320", "4112\tPowerVR B-Series BXM-8-256").forEach { assertTrue(it, GpuCheck.vulkanRisky(it)) }
+        listOf("5045\tMali-G57 MC2", "5045\tMali-G510", "5045\tMali-G310", "5045\tMali-G76 MP10", "5045\tMali-G715-Immortalis MC11",
+            "4112\tPowerVR D-Series DXT-48-1536", "20803\tAdreno (TM) 740", "6880\tSwiftShader Device (Subzero)",
+            "garbage", null).forEach { assertFalse("$it", GpuCheck.vulkanRisky(it)) }
+    }
+
+    @Test fun aNativeCrashWhileStartingSkipsThatBackend() {
+        assertEquals(GpuCheck.Judged(false, null), GpuCheck.judge("41:vk", ApplicationExitInfo.REASON_CRASH_NATIVE, null))
+        assertEquals(GpuCheck.Judged(true, null), GpuCheck.judge("41:gl", ApplicationExitInfo.REASON_CRASH_NATIVE, "gl"))
+    }
+
+    @Test fun otherKnownDeathsAreNotBlamed() {
+        listOf(ApplicationExitInfo.REASON_CRASH, ApplicationExitInfo.REASON_OTHER, ApplicationExitInfo.REASON_USER_REQUESTED,
+            ApplicationExitInfo.REASON_PACKAGE_UPDATED, ApplicationExitInfo.REASON_LOW_MEMORY, ApplicationExitInfo.REASON_SIGNALED).forEach {
+            assertEquals("$it", GpuCheck.Judged(null, null), GpuCheck.judge("41:vk", it, "vk"))
+        }
+    }
+
+    @Test fun anAwayDeathIsNeverBlamed() {
+        assertEquals(GpuCheck.Judged(null, null), GpuCheck.judge("41:vk~", ApplicationExitInfo.REASON_CRASH_NATIVE, "vk"))
+        assertEquals(GpuCheck.Judged(null, null), GpuCheck.judge("41:vk~", null, "vk"))
+    }
+
+    @Test fun anUnexplainedDeathIsBlamedTheSecondTimeInARow() {
+        assertEquals(GpuCheck.Judged(null, "vk"), GpuCheck.judge("41:vk", null, null))
+        assertEquals(GpuCheck.Judged(false, null), GpuCheck.judge("42:vk", null, "vk"))
+        assertEquals(GpuCheck.Judged(null, "gl"), GpuCheck.judge("43:gl", null, "vk"))
+        assertEquals(GpuCheck.Judged(null, "vk"), GpuCheck.judge("44:vk", ApplicationExitInfo.REASON_ANR, null))
+        assertEquals(GpuCheck.Judged(false, null), GpuCheck.judge("45:vk", ApplicationExitInfo.REASON_ANR, "vk"))
+    }
+
+    @Test fun aBrokenRecordIsIgnored() {
+        listOf("x:vk", "41", "41:", "").forEach { assertEquals(it, GpuCheck.Judged(null, null), GpuCheck.judge(it, ApplicationExitInfo.REASON_CRASH_NATIVE, null)) }
     }
 }

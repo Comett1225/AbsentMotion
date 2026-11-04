@@ -284,17 +284,6 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.string.ai_model_not_ready_play` appears to be unused"
-        errorLine1="    &lt;string name=&quot;ai_model_not_ready_play&quot;>The background removal model is not ready yet. Connect to the internet and retry shortly; first use needs Google Play services.&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="../shared/res/values/strings.xml"
-            line="1158"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
         message="The resource `R.string.ai_checking_model` appears to be unused"
         errorLine1="    &lt;string name=&quot;ai_checking_model&quot;>Checking background removal model…&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">

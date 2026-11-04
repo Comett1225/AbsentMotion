@@ -10,11 +10,74 @@
   "move": "Gerak",
   "new": "Baharu",
   "noise": "Hingar",
+  "other": "Lain-lain",
   "repeat": "Ulangan",
   "stylize": "Gaya",
   "text": "Teks"
  },
  "effects": {
+  "ascii": {
+   "description": "Menukar lapisan menjadi seni teks yang dibuat daripada huruf dan simbol: bahagian yang lebih cerah mendapat aksara yang lebih penuh. Saiz menetapkan lebar setiap aksara pada lapisan, jadi aksara bergerak, berputar dan berskala bersamanya. Warna mengekalkan warna asal imej atau menggunakan satu warna, dan Garis Tepi melukis garis luar dengan aksara | - / dan \\.",
+   "name": "ASCII",
+   "params": {
+    "background": {
+     "label": "Warna Latar Belakang"
+    },
+    "backgroundMode": {
+     "label": "Latar Belakang",
+     "options": [
+      "Tiada",
+      "Warna"
+     ]
+    },
+    "brightness": {
+     "label": "Kecerahan"
+    },
+    "cell": {
+     "label": "Saiz"
+    },
+    "characters": {
+     "label": "Tersuai"
+    },
+    "charset": {
+     "label": "Aksara",
+     "options": [
+      "Terperinci",
+      "Ringkas",
+      "Blok",
+      "Binari",
+      "Tersuai"
+     ]
+    },
+    "colorMode": {
+     "label": "Warna",
+     "options": [
+      "Asal",
+      "Warna Tunggal"
+     ]
+    },
+    "contrast": {
+     "label": "Kontras"
+    },
+    "edges": {
+     "label": "Garis Tepi"
+    },
+    "invert": {
+     "label": "Songsang"
+    },
+    "textColor": {
+     "label": "Warna Teks"
+    }
+   },
+   "presets": {
+    "amber-monitor": "Monitor Amber",
+    "binary-rain": "Hujan Binari",
+    "blocks": "Blok",
+    "line-art": "Seni Garis",
+    "newspaper": "Surat Khabar",
+    "terminal": "Terminal"
+   }
+  },
   "autoshake": {
    "description": "Menggerakkan lapisan secara rawak mengikut masa dalam had yang ditetapkan.",
    "name": "Gegar Automatik",
@@ -50,8 +113,8 @@
    }
   },
   "backdrop": {
-   "description": "Menyalin apa yang dilukis di bawah lapisan supaya kesan seterusnya boleh mengubahnya. Topeng Ke Lapisan mengehadkan salinan kepada bahagian legap lapisan. Campur membawa isi lapisan kembali. Kesan Menjangkau Keluar membolehkan kesan seterusnya, seperti Regangan, membawa salinan melepasi tepi lapisan.",
-   "name": "Lapisan Pelarasan",
+   "description": "Lapisan pelarasan: menyalin apa yang dilukis di bawah lapisan supaya kesan selepasnya mengubah salinan itu. Topeng ke lapisan mengehadkan salinan kepada bahagian legap lapisan. Campur membawa isi lapisan kembali. Kesan Menjangkau Keluar membolehkan kesan seterusnya, seperti Regangan, membawa salinan melepasi tepi lapisan.",
+   "name": "Salin Latar Belakang",
    "params": {
     "mask": {
      "label": "Topeng ke lapisan"
@@ -1819,6 +1882,15 @@
     }
    }
   },
+  "fontweight": {
+   "description": "Menetapkan ketebalan huruf, daripada nipis hingga tebal, dan boleh dianimasikan dengan bingkai kunci. Berfungsi dengan fon boleh ubah, iaitu fon yang menyimpan semua ketebalan dalam satu fail: Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display dan Dancing Script dalam senarai fon, atau fon boleh ubah yang anda import. Fon dengan ketebalan tetap mengekalkan rupanya sendiri.",
+   "name": "Ketebalan Fon",
+   "params": {
+    "weight": {
+     "label": "Ketebalan"
+    }
+   }
+  },
   "fourcolor": {
    "description": "Mencampurkan empat warna yang diletakkan pada empat titik (dalam piksel dari pusat lapisan) di atas lapisan.",
    "name": "Kecerunan Empat Warna",
@@ -2220,6 +2292,9 @@
    "description": "Menjana berbilang salinan lapisan secara dinamik, disusun dalam grid.",
    "name": "Ulangan Grid",
    "params": {
+    "copyDelay": {
+     "label": "Lengahan Setiap Salinan"
+    },
     "count": {
      "label": "Bilangan"
     },
@@ -2241,8 +2316,20 @@
     "position": {
      "label": "Kedudukan"
     },
+    "randomOpacity": {
+     "label": "Kelegapan Rawak"
+    },
     "randomOrder": {
      "label": "Susunan Rawak"
+    },
+    "randomPosition": {
+     "label": "Kedudukan Rawak"
+    },
+    "randomRotation": {
+     "label": "Putaran Rawak"
+    },
+    "randomScale": {
+     "label": "Skala Rawak"
     },
     "rangeEnd": {
      "label": "Tamat Julat"
@@ -2871,6 +2958,9 @@
    "description": "Menjana berbilang salinan lapisan secara dinamik, disusun sepanjang satu garis.",
    "name": "Ulangan Linear",
    "params": {
+    "copyDelay": {
+     "label": "Lengahan Setiap Salinan"
+    },
     "count": {
      "label": "Bilangan"
     },
@@ -2892,8 +2982,20 @@
     "position": {
      "label": "Kedudukan"
     },
+    "randomOpacity": {
+     "label": "Kelegapan Rawak"
+    },
     "randomOrder": {
      "label": "Susunan Rawak"
+    },
+    "randomPosition": {
+     "label": "Kedudukan Rawak"
+    },
+    "randomRotation": {
+     "label": "Putaran Rawak"
+    },
+    "randomScale": {
+     "label": "Skala Rawak"
     },
     "rangeEnd": {
      "label": "Tamat Julat"
@@ -3500,6 +3602,45 @@
     }
    }
   },
+  "parenthelper": {
+   "description": "Mengubah cara lapisan anak mengikuti induknya: skala dan putaran boleh mengikut sepenuhnya, kekal terkunci atau mengikut dengan kadar tertentu. Putar Automatik memutarkan lapisan semasa ia bergerak, seperti roda yang bergolek.",
+   "name": "Pembantu Induk",
+   "params": {
+    "autoRotate": {
+     "label": "Putar Automatik",
+     "options": [
+      "Mati",
+      "Paksi X",
+      "Paksi Y"
+     ]
+    },
+    "radiusAdjust": {
+     "label": "Pelarasan Jejari"
+    },
+    "rotateMode": {
+     "label": "Putaran",
+     "options": [
+      "Biasa",
+      "Dikunci",
+      "Berwajaran"
+     ]
+    },
+    "rotateWeight": {
+     "label": "Wajaran Putaran"
+    },
+    "scaleMode": {
+     "label": "Skala",
+     "options": [
+      "Biasa",
+      "Dikunci",
+      "Berwajaran"
+     ]
+    },
+    "scaleWeight": {
+     "label": "Wajaran Skala"
+    }
+   }
+  },
   "particles": {
    "description": "Melepaskan zarah terbang keluar dari lapisan: salji, percikan, konfeti, gelembung, habuk, hati, bintang, kelopak atau salinan kecil lapisan itu sendiri, digerakkan oleh graviti, angin dan pusaran. Mulakan dengan pratetap, kemudian ubah pemancar, jumlah dan daya. Mod Pada rentak melepaskan letusan pada setiap rentak: pilih muzik anda, buka menunya dan ketik Tandakan rentak dahulu.",
    "name": "Zarah",
@@ -3940,8 +4081,43 @@
    "description": "Melenturkan lapisan seperti boneka: letakkan pin padanya, kemudian seret atau animasikan pin dan gambar mengikutnya dengan lancar.",
    "name": "Pin Boneka",
    "params": {
+    "density": {
+     "label": "Ketumpatan Segitiga"
+    },
+    "expansion": {
+     "label": "Pengembangan Mesh"
+    },
     "falloff": {
      "label": "Susutan"
+    },
+    "sway": {
+     "label": "Ayun"
+    },
+    "swayAmount": {
+     "label": "Amaun Ayunan"
+    },
+    "swayAngle": {
+     "label": "Sudut Ayunan"
+    },
+    "swayDirection": {
+     "label": "Arah Ayunan",
+     "options": [
+      "Sudut",
+      "Rawak"
+     ]
+    },
+    "swayPins": {
+     "label": "Pin Diayun",
+     "options": [
+      "Semua",
+      "Dipilih"
+     ]
+    },
+    "swaySeed": {
+     "label": "Benih Ayunan"
+    },
+    "swaySpeed": {
+     "label": "Kelajuan Ayunan"
     }
    }
   },
@@ -4027,6 +4203,9 @@
     "angle": {
      "label": "Sudut"
     },
+    "copyDelay": {
+     "label": "Lengahan setiap salinan"
+    },
     "count": {
      "label": "Bilangan"
     },
@@ -4051,8 +4230,20 @@
     "radius": {
      "label": "Jejari"
     },
+    "randomOpacity": {
+     "label": "Kelegapan rawak"
+    },
     "randomOrder": {
      "label": "Susunan rawak"
+    },
+    "randomPosition": {
+     "label": "Kedudukan rawak"
+    },
+    "randomRotation": {
+     "label": "Putaran rawak"
+    },
+    "randomScale": {
+     "label": "Skala rawak"
     },
     "rangeEnd": {
      "label": "Tamat julat"
@@ -4328,6 +4519,9 @@
    "description": "Menjana berbilang salinan lapisan secara dinamik di sepanjang laluan garis luar lapisan yang tepat di bawahnya.",
    "name": "Ulang Sepanjang Laluan",
    "params": {
+    "copyDelay": {
+     "label": "Lengahan Setiap Salinan"
+    },
     "count": {
      "label": "Bilangan"
     },
@@ -4352,8 +4546,20 @@
     "phase": {
      "label": "Fasa"
     },
+    "randomOpacity": {
+     "label": "Kelegapan Rawak"
+    },
     "randomOrder": {
      "label": "Susunan Rawak"
+    },
+    "randomPosition": {
+     "label": "Kedudukan Rawak"
+    },
+    "randomRotation": {
+     "label": "Putaran Rawak"
+    },
+    "randomScale": {
+     "label": "Skala Rawak"
     },
     "rangeEnd": {
      "label": "Tamat Julat"
@@ -4567,6 +4773,27 @@
     },
     "seed": {
      "label": "Benih"
+    }
+   }
+  },
+  "scaleassist": {
+   "description": "Menambah skala tambahan pada saiz lapisan itu sendiri sepanjang X, Y, kedua-duanya, atau X dengan Y secara bertentangan. Lapisan yang berinduk kepadanya mengikut saiz baharu.",
+   "name": "Bantuan Skala",
+   "params": {
+    "axis": {
+     "label": "Paksi",
+     "options": [
+      "X",
+      "Y",
+      "X,Y",
+      "X,-Y"
+     ]
+    },
+    "damp": {
+     "label": "Pelembapan"
+    },
+    "scale": {
+     "label": "Skala"
     }
    }
   },
@@ -5425,6 +5652,59 @@
     }
    }
   },
+  "textblips": {
+   "description": "Menaip teks huruf demi huruf dengan bip pendek bagi setiap huruf, seperti watak yang bercakap dalam permainan. Pilih Suara, kemudian tetapkan Nada, kelajuan huruf ditaip dan berapa lama berhenti selepas tanda baca. Ruang kosong dan tanda baca kekal senyap.",
+   "name": "Bip Teks",
+   "params": {
+    "delay": {
+     "label": "Lengahan"
+    },
+    "every": {
+     "label": "Bip Setiap"
+    },
+    "pause": {
+     "label": "Jeda Tanda Baca"
+    },
+    "pitch": {
+     "label": "Nada"
+    },
+    "reveal": {
+     "label": "Taip Berperingkat"
+    },
+    "seed": {
+     "label": "Benih"
+    },
+    "speed": {
+     "label": "Kelajuan"
+    },
+    "variation": {
+     "label": "Variasi Nada"
+    },
+    "voice": {
+     "label": "Suara",
+     "options": [
+      "Klasik",
+      "Lembut",
+      "Garau",
+      "Tinggi",
+      "Robot",
+      "Cicit",
+      "Mesin Taip",
+      "Chiptune"
+     ]
+    },
+    "volume": {
+     "label": "Kelantangan"
+    }
+   },
+   "presets": {
+    "fast-talker": "Cakap Laju",
+    "hero": "Wira",
+    "monster": "Raksasa",
+    "robot": "Robot",
+    "typewriter": "Mesin Taip"
+   }
+  },
   "textpath": {
    "description": "Meletakkan teks di sepanjang lengkok, bulatan atau garis luar lapisan betul-betul di bawahnya, huruf demi huruf, dengan bentuk huruf, fon dan emoji teks dikekalkan.",
    "name": "Teks Ikut Laluan",
@@ -5590,6 +5870,72 @@
    },
    "presets": {
     "scramble": "Kacau"
+   }
+  },
+  "textshake": {
+   "description": "Menggegarkan setiap huruf secara berasingan, seperti dialog yang gementar dalam permainan. Gegar beralih antara tempat, Jitter melompat ke tempat baharu pada setiap langkah, Gelombang menggerakkan huruf naik turun, Bulatan menggerakkannya dalam gelung kecil dan Goyang mencondongkannya ke kiri dan kanan. Kurangkan Huruf Bergegar untuk menggegarkan sebahagian huruf sahaja, dipilih secara rawak semula setiap beberapa ketika.",
+   "name": "Gegar Teks",
+   "params": {
+    "amount": {
+     "label": "Amaun"
+    },
+    "cycles": {
+     "label": "Kelajuan"
+    },
+    "end": {
+     "label": "Tamat"
+    },
+    "every": {
+     "label": "Huruf Baharu Setiap"
+    },
+    "letters": {
+     "label": "Huruf Bergegar"
+    },
+    "rotation": {
+     "label": "Putaran"
+    },
+    "seed": {
+     "label": "Benih"
+    },
+    "speed": {
+     "label": "Kelajuan"
+    },
+    "spread": {
+     "label": "Sebaran"
+    },
+    "start": {
+     "label": "Mula"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Gegar",
+      "Jitter",
+      "Gelombang",
+      "Bulatan",
+      "Goyang"
+     ]
+    },
+    "tilt": {
+     "label": "Condong"
+    },
+    "unit": {
+     "label": "Berdasarkan",
+     "options": [
+      "Aksara",
+      "Perkataan",
+      "Baris"
+     ]
+    }
+   },
+   "presets": {
+    "dizzy": "Pening",
+    "floaty": "Terapung",
+    "nervous": "Gugup",
+    "scared": "Takut",
+    "uneasy": "Resah",
+    "wavy": "Beralun",
+    "wobbly": "Goyah"
    }
   },
   "texttransform": {

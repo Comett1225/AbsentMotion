@@ -36,7 +36,6 @@ body:
     attributes:
       label: Build
       options:
-        - play
         - foss
         - compatible
         - Not sure

@@ -10,11 +10,74 @@
   "move": "Hareket",
   "new": "Yeni",
   "noise": "Gürültü",
+  "other": "Diğer",
   "repeat": "Tekrar",
   "stylize": "Stil",
   "text": "Metin"
  },
  "effects": {
+  "ascii": {
+   "description": "Katmanı harf ve sembollerden oluşan metin sanatına dönüştürür: parlak bölgeler daha dolu karakterler alır. Boyut, her karakterin katmanda ne kadar geniş olacağını belirler; böylece karakterler katmanla birlikte hareket eder, döner ve ölçeklenir. Renk, görüntünün kendi renklerini korur ya da tek bir renk kullanır; Kenar çizgileri ise anahatları | - / ve \\ karakterleriyle çizer.",
+   "name": "ASCII",
+   "params": {
+    "background": {
+     "label": "Arka plan rengi"
+    },
+    "backgroundMode": {
+     "label": "Arka plan",
+     "options": [
+      "Yok",
+      "Renk"
+     ]
+    },
+    "brightness": {
+     "label": "Parlaklık"
+    },
+    "cell": {
+     "label": "Boyut"
+    },
+    "characters": {
+     "label": "Özel"
+    },
+    "charset": {
+     "label": "Karakterler",
+     "options": [
+      "Ayrıntılı",
+      "Basit",
+      "Bloklar",
+      "İkili",
+      "Özel"
+     ]
+    },
+    "colorMode": {
+     "label": "Renk",
+     "options": [
+      "Orijinal",
+      "Tek renk"
+     ]
+    },
+    "contrast": {
+     "label": "Kontrast"
+    },
+    "edges": {
+     "label": "Kenar çizgileri"
+    },
+    "invert": {
+     "label": "Ters çevir"
+    },
+    "textColor": {
+     "label": "Metin rengi"
+    }
+   },
+   "presets": {
+    "amber-monitor": "Kehribar monitör",
+    "binary-rain": "İkili yağmur",
+    "blocks": "Bloklar",
+    "line-art": "Çizgi sanatı",
+    "newspaper": "Gazete",
+    "terminal": "Terminal"
+   }
+  },
   "autoshake": {
    "description": "Katmanı belirlenen sınırlar içinde zamanla rastgele hareket ettirir.",
    "name": "Otomatik Sarsıntı",
@@ -50,8 +113,8 @@
    }
   },
   "backdrop": {
-   "description": "Katmanın altında çizilenleri kopyalar, böylece sonraki efektler bunları değiştirebilir. Katmana Maskele, kopyayı katmanın opak kısımlarıyla sınırlar. Karışım, katman dolgusunu geri getirir. Efektler Dışarı Taşsın, Uzat gibi sonraki efektlerin kopyayı katmanın kenarlarının dışına taşımasını sağlar.",
-   "name": "Ayar Katmanı",
+   "description": "Bir ayar katmanı: katmanın altında çizilenleri kopyalar, böylece sonraki efektler bu kopyayı değiştirir. Katmana maskele, kopyayı katmanın opak kısımlarıyla sınırlar. Karışım, katmanın dolgusunu geri getirir. Efektler Dışarı Taşsın, Esnetme gibi sonraki efektlerin kopyayı katmanın kenarlarının ötesine taşımasını sağlar.",
+   "name": "Arka planı kopyala",
    "params": {
     "mask": {
      "label": "Katmana maskele"
@@ -1819,6 +1882,15 @@
     }
    }
   },
+  "fontweight": {
+   "description": "Harflerin kalınlığını inceden ağıra doğru ayarlar ve anahtar karelerle canlandırılabilir. Her kalınlığı tek dosyada tutan değişken yazı tipleriyle çalışır: yazı tipi listesindeki Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display ve Dancing Script ya da içe aktardığınız bir değişken yazı tipi. Sabit kalınlıklı yazı tipleri kendi görünümünü korur.",
+   "name": "Yazı tipi kalınlığı",
+   "params": {
+    "weight": {
+     "label": "Kalınlık"
+    }
+   }
+  },
   "fourcolor": {
    "description": "Katmanın merkezinden piksel cinsinden dört noktaya yerleştirilen dört rengi katmanın üzerine karıştırır.",
    "name": "Dört Renkli Gradyan",
@@ -2220,6 +2292,9 @@
    "description": "Katmanın birden çok kopyasını ızgara düzeninde dinamik olarak oluşturur.",
    "name": "Izgara Tekrarı",
    "params": {
+    "copyDelay": {
+     "label": "Kopya başına gecikme"
+    },
     "count": {
      "label": "Adet"
     },
@@ -2241,8 +2316,20 @@
     "position": {
      "label": "Konum"
     },
+    "randomOpacity": {
+     "label": "Rastgele opaklık"
+    },
     "randomOrder": {
      "label": "Rastgele Sıra"
+    },
+    "randomPosition": {
+     "label": "Rastgele konum"
+    },
+    "randomRotation": {
+     "label": "Rastgele döndürme"
+    },
+    "randomScale": {
+     "label": "Rastgele ölçek"
     },
     "rangeEnd": {
      "label": "Aralık Sonu"
@@ -2871,6 +2958,9 @@
    "description": "Katmanın birden fazla kopyasını bir çizgi boyunca dinamik olarak oluşturur.",
    "name": "Doğrusal Tekrar",
    "params": {
+    "copyDelay": {
+     "label": "Kopya başına gecikme"
+    },
     "count": {
      "label": "Adet"
     },
@@ -2892,8 +2982,20 @@
     "position": {
      "label": "Konum"
     },
+    "randomOpacity": {
+     "label": "Rastgele opaklık"
+    },
     "randomOrder": {
      "label": "Rastgele sıra"
+    },
+    "randomPosition": {
+     "label": "Rastgele konum"
+    },
+    "randomRotation": {
+     "label": "Rastgele döndürme"
+    },
+    "randomScale": {
+     "label": "Rastgele ölçek"
     },
     "rangeEnd": {
      "label": "Aralık sonu"
@@ -3500,6 +3602,45 @@
     }
    }
   },
+  "parenthelper": {
+   "description": "Alt katmanın ebeveynini nasıl izlediğini değiştirir: ölçek ve döndürme tamamen izleyebilir, kilitli kalabilir ya da belirli bir oranda izleyebilir. Otomatik döndürme, katmanı hareket ettikçe yuvarlanan bir tekerlek gibi döndürür.",
+   "name": "Ebeveyn yardımcısı",
+   "params": {
+    "autoRotate": {
+     "label": "Otomatik döndürme",
+     "options": [
+      "Kapalı",
+      "X ekseni",
+      "Y ekseni"
+     ]
+    },
+    "radiusAdjust": {
+     "label": "Yarıçap ayarı"
+    },
+    "rotateMode": {
+     "label": "Döndürme",
+     "options": [
+      "Normal",
+      "Kilitli",
+      "Ağırlıklı"
+     ]
+    },
+    "rotateWeight": {
+     "label": "Döndürme ağırlığı"
+    },
+    "scaleMode": {
+     "label": "Ölçek",
+     "options": [
+      "Normal",
+      "Kilitli",
+      "Ağırlıklı"
+     ]
+    },
+    "scaleWeight": {
+     "label": "Ölçek ağırlığı"
+    }
+   }
+  },
   "particles": {
    "description": "Katmandan parçacık saçar: kar, kıvılcım, konfeti, baloncuk, toz, kalp, yıldız, taç yaprağı ya da katmanın küçük kopyaları; yerçekimi, rüzgar ve girdap ile hareket eder. Bir ön ayarla başla, ardından yayıcıyı, miktarı ve kuvvetleri değiştir. Vuruşlarda her vuruşta bir patlama gönderir: müziğini seç, menüsünü aç ve önce Vuruşları işaretle'ye dokun.",
    "name": "Parçacıklar",
@@ -3940,8 +4081,43 @@
    "description": "Katmanı bir kukla gibi büker: üzerine pinler koyun, sonra pinleri sürükleyin veya canlandırın, görüntü onları yumuşakça izler.",
    "name": "Kukla Pini",
    "params": {
+    "density": {
+     "label": "Üçgen yoğunluğu"
+    },
+    "expansion": {
+     "label": "Ağ genişlemesi"
+    },
     "falloff": {
      "label": "Azalma"
+    },
+    "sway": {
+     "label": "Sallanma"
+    },
+    "swayAmount": {
+     "label": "Sallanma miktarı"
+    },
+    "swayAngle": {
+     "label": "Sallanma açısı"
+    },
+    "swayDirection": {
+     "label": "Sallanma yönü",
+     "options": [
+      "Açı",
+      "Rastgele"
+     ]
+    },
+    "swayPins": {
+     "label": "Sallanan pinler",
+     "options": [
+      "Tümü",
+      "Seçili"
+     ]
+    },
+    "swaySeed": {
+     "label": "Sallanma tohumu"
+    },
+    "swaySpeed": {
+     "label": "Sallanma hızı"
     }
    }
   },
@@ -4027,6 +4203,9 @@
     "angle": {
      "label": "Açı"
     },
+    "copyDelay": {
+     "label": "Kopya başına gecikme"
+    },
     "count": {
      "label": "Adet"
     },
@@ -4051,8 +4230,20 @@
     "radius": {
      "label": "Yarıçap"
     },
+    "randomOpacity": {
+     "label": "Rastgele opaklık"
+    },
     "randomOrder": {
      "label": "Rastgele sıra"
+    },
+    "randomPosition": {
+     "label": "Rastgele konum"
+    },
+    "randomRotation": {
+     "label": "Rastgele döndürme"
+    },
+    "randomScale": {
+     "label": "Rastgele ölçek"
     },
     "rangeEnd": {
      "label": "Aralık sonu"
@@ -4328,6 +4519,9 @@
    "description": "Hemen altındaki katmanın dış çizgi yolu boyunca katmanın birden çok kopyasını dinamik olarak oluşturur.",
    "name": "Yol boyunca yinele",
    "params": {
+    "copyDelay": {
+     "label": "Kopya başına gecikme"
+    },
     "count": {
      "label": "Adet"
     },
@@ -4352,8 +4546,20 @@
     "phase": {
      "label": "Faz"
     },
+    "randomOpacity": {
+     "label": "Rastgele opaklık"
+    },
     "randomOrder": {
      "label": "Rastgele sıra"
+    },
+    "randomPosition": {
+     "label": "Rastgele konum"
+    },
+    "randomRotation": {
+     "label": "Rastgele döndürme"
+    },
+    "randomScale": {
+     "label": "Rastgele ölçek"
     },
     "rangeEnd": {
      "label": "Aralık bitişi"
@@ -4567,6 +4773,27 @@
     },
     "seed": {
      "label": "Tohum"
+    }
+   }
+  },
+  "scaleassist": {
+   "description": "Katmanın kendi boyutunun üstüne X, Y, her ikisi ya da X ile ters yönde Y boyunca ek ölçek ekler. Ebeveyni bu olan katmanlar yeni boyutu izler.",
+   "name": "Ölçek yardımcısı",
+   "params": {
+    "axis": {
+     "label": "Eksen",
+     "options": [
+      "X",
+      "Y",
+      "X,Y",
+      "X,-Y"
+     ]
+    },
+    "damp": {
+     "label": "Sönümleme"
+    },
+    "scale": {
+     "label": "Ölçek"
     }
    }
   },
@@ -5425,6 +5652,59 @@
     }
    }
   },
+  "textblips": {
+   "description": "Metni harf harf yazar ve her harf için kısa bir bip sesi çıkarır; oyundaki konuşan bir karakter gibi. Bir Ses seçin, sonra Perdesini, harflerin yazılma hızını ve noktalama işaretlerinden sonra ne kadar duraklanacağını ayarlayın. Boşluklar ve noktalama işaretleri sessiz kalır.",
+   "name": "Metin bip sesleri",
+   "params": {
+    "delay": {
+     "label": "Gecikme"
+    },
+    "every": {
+     "label": "Bip aralığı"
+    },
+    "pause": {
+     "label": "Noktalama duraklaması"
+    },
+    "pitch": {
+     "label": "Perde"
+    },
+    "reveal": {
+     "label": "Yazarak göster"
+    },
+    "seed": {
+     "label": "Tohum"
+    },
+    "speed": {
+     "label": "Hız"
+    },
+    "variation": {
+     "label": "Perde değişimi"
+    },
+    "voice": {
+     "label": "Ses",
+     "options": [
+      "Klasik",
+      "Yumuşak",
+      "Derin",
+      "Tiz",
+      "Robot",
+      "Gıcırtı",
+      "Daktilo",
+      "Chiptune"
+     ]
+    },
+    "volume": {
+     "label": "Ses düzeyi"
+    }
+   },
+   "presets": {
+    "fast-talker": "Hızlı konuşan",
+    "hero": "Kahraman",
+    "monster": "Canavar",
+    "robot": "Robot",
+    "typewriter": "Daktilo"
+   }
+  },
   "textpath": {
    "description": "Metni bir yay, bir daire veya hemen altındaki katmanın dış çizgisi boyunca harf harf yerleştirir; metnin harf biçimleri, yazı tipleri ve emojileri korunur.",
    "name": "Yol Boyunca Metin",
@@ -5590,6 +5870,72 @@
    },
    "presets": {
     "scramble": "Karıştırma"
+   }
+  },
+  "textshake": {
+   "description": "Her harfi ayrı ayrı sarsar; oyundaki gergin bir diyalog gibi. Sarsıntı harfleri noktalar arasında kaydırır, Titreme her adımda yeni bir noktaya atlar, Dalga harfleri aşağı yukarı sallar, Daire onları küçük döngülerle gezdirir, Yalpalama ise ileri geri yatırır. Yalnızca bazı harfleri sarsmak için Sarsılan harfler değerini düşürün; harfler birkaç anda bir yeniden rastgele seçilir.",
+   "name": "Metin sarsıntısı",
+   "params": {
+    "amount": {
+     "label": "Miktar"
+    },
+    "cycles": {
+     "label": "Hız"
+    },
+    "end": {
+     "label": "Bitiş"
+    },
+    "every": {
+     "label": "Harfleri yenileme aralığı"
+    },
+    "letters": {
+     "label": "Sarsılan harfler"
+    },
+    "rotation": {
+     "label": "Döndürme"
+    },
+    "seed": {
+     "label": "Tohum"
+    },
+    "speed": {
+     "label": "Hız"
+    },
+    "spread": {
+     "label": "Yayılım"
+    },
+    "start": {
+     "label": "Başlangıç"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Sarsıntı",
+      "Titreme",
+      "Dalga",
+      "Daire",
+      "Yalpalama"
+     ]
+    },
+    "tilt": {
+     "label": "Eğ"
+    },
+    "unit": {
+     "label": "Şuna göre",
+     "options": [
+      "Karakter",
+      "Kelime",
+      "Satır"
+     ]
+    }
+   },
+   "presets": {
+    "dizzy": "Sersem",
+    "floaty": "Süzülen",
+    "nervous": "Gergin",
+    "scared": "Korkmuş",
+    "uneasy": "Tedirgin",
+    "wavy": "Dalgalı",
+    "wobbly": "Sallantılı"
    }
   },
   "texttransform": {

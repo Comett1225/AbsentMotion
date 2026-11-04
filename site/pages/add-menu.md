@@ -2,11 +2,11 @@
 title: The Add menu
 group: Interface
 order: 5
-summary: How to add shapes, photos, video, sound, text, drawings, cameras, 3D models and more.
+summary: How to add shapes, photos, video, sound, text, drawings, cameras, lights, 3D models and more.
 ---
 The round **+** button at the bottom right of the timeline area opens the Add menu. It only shows when nothing is selected; selecting a layer replaces it with the tool grid.
 
-New layers start at the playhead and last as long as the **New Layer Length** setting (2 seconds by default). Photos and shapes use that length; videos and sounds use their own length. A camera layer lasts the whole project.
+New layers start at the playhead and last as long as the **New Layer Length** setting (2 seconds by default). Photos and shapes use that length; videos and sounds use their own length. Camera and light layers last the whole project.
 
 The menu has five tabs along the top (**Shape**, **Media**, **Audio**, **Object / Asset** and **Template**) and four quick buttons on the right. The X closes it.
 
@@ -52,9 +52,10 @@ Music and sounds stored on your phone. The first time, the app asks for permissi
 
 ## Object / Asset
 
-Six tiles for other kinds of layers.
+Seven tiles for other kinds of layers.
 
 - **Camera** adds a camera layer that lasts the whole project. See [Camera layers and 3D](@camera-3d).
+- **Light** adds a light that shades 3D models and the pieces of 3D effects. See [Camera layers and 3D](@camera-3d).
 - **Null** adds an invisible helper layer. Use it as a parent for other layers or as a target for motion tracking.
 - **Empty Group** adds an empty group.
 - **Asset / Project** lists your saved assets, then your other projects. Tap one to insert it as a group at the playhead. An asset stays linked to its source; a project is inserted as an independent copy. See [Assets, templates and presets](@assets-templates).

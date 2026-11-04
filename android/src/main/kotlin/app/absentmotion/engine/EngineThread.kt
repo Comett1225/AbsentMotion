@@ -198,10 +198,13 @@ class EngineThread(private val background: Int, context: Context? = null, privat
     }
 
     @Volatile private var startFailure: String? = null
+    private var attachedOnce = false
+    private var watchedFrames = -1
 
     private fun checked(engine: NativeEngine): NativeEngine {
         val check = gpuCheck ?: return engine
         if (check.drawsRight(engine)) return engine
+        check.trying(gl = !engine.openGl)
         val other = runCatching { NativeEngine(if (engine.openGl) NativeEngine.Backend.GRAPHITE else NativeEngine.Backend.GL) }.getOrNull() ?: return engine
         if (!check.drawsRight(other)) {
             other.close()
@@ -212,12 +215,17 @@ class EngineThread(private val background: Int, context: Context? = null, privat
         return other
     }
 
+    private fun riskyVulkan(): Boolean {
+        gpuCheck?.trying(gl = false)
+        return GpuCheck.vulkanRisky(NativeEngine.vulkanDevice()).also { if (it) Log.w("AMEngine", "this GPU starts with OpenGL") }
+    }
+
     private fun startEngine(): NativeEngine {
         startFailure?.let { throw IllegalStateException(it) }
         return try {
             EngineDebug.failStart?.let { throw IllegalStateException(it) }
             gpuCheck?.recover()
-            val glFirst = EngineDebug.forceGl || preferOpenGl() || gpuCheck?.knownBad(gl = false) == true && !gpuCheck.knownBad(gl = true)
+            val glFirst = EngineDebug.forceGl || preferOpenGl() || gpuCheck?.knownBad(gl = true) != true && (gpuCheck?.knownBad(gl = false) == true || riskyVulkan())
             val order = if (glFirst) listOf(NativeEngine.Backend.GL, NativeEngine.Backend.GRAPHITE) else listOf(NativeEngine.Backend.GRAPHITE, NativeEngine.Backend.GL)
             gpuCheck?.trying(order[0] == NativeEngine.Backend.GL)
             val first = runCatching { NativeEngine(order[0]) }
@@ -234,7 +242,7 @@ class EngineThread(private val background: Int, context: Context? = null, privat
             }).let(::checked).also {
                 app.absentmotion.Tier.openGl = it.openGl
                 gpuCheck?.trying(it.openGl)
-                handler.postDelayed({ if (engine?.failed != true) gpuCheck?.survived() }, SURVIVE_MS)
+                handler.postDelayed({ if (engine?.failed != true && watchedFrames < 0) gpuCheck?.survived() }, SURVIVE_MS)
             }
         } catch (t: Throwable) {
             val reason = t.message ?: t.toString()
@@ -255,6 +263,11 @@ class EngineThread(private val background: Int, context: Context? = null, privat
             target = 0L
             this.surface = null
             if (previous != 0L) engine().detach(previous)
+            if (!attachedOnce) {
+                attachedOnce = true
+                gpuCheck?.trying(engine().openGl)
+                watchedFrames = 0
+            }
             target = engine().attach(surface, forEncoder = false)
             this.surface = surface
             mediaScene?.let { videos?.update(it, requestedView?.timeMs ?: 0, playing) }
@@ -470,6 +483,9 @@ class EngineThread(private val background: Int, context: Context? = null, privat
                 val started = System.nanoTime()
                 if (target != 0L && native.renderScene(target, v.timeMs.toDouble(), v.scale, v.dx, v.dy, background, v.selectedId, v.handles, v) != 0) {
                     Log.e("AMEngine", "preview rendering failed")
+                } else if (watchedFrames >= 0 && ++watchedFrames >= GOOD_FRAMES) {
+                    watchedFrames = -1
+                    gpuCheck?.survived()
                 }
                 if (RenderStats.recording) RenderStats.add((System.nanoTime() - started) / 1e6, v.timeMs)
                 renders++
@@ -713,7 +729,7 @@ class EngineThread(private val background: Int, context: Context? = null, privat
                         if (previous != 0L) engine?.detach(previous)
                     } finally {
                         try { engine?.close() }
-                        finally { engine = null; thread.quitSafely() }
+                        finally { engine = null; gpuCheck?.close(); thread.quitSafely() }
                     }
                 }
                 mediaScope.cancel()
@@ -726,6 +742,7 @@ private val instances = java.util.concurrent.atomic.AtomicLong()
 
 private const val GPU_RETRY_MS = 1000L
 private const val SURVIVE_MS = 8000L
+private const val GOOD_FRAMES = 3
 
 internal class PendingScene {
     private val next = AtomicReference<Lazy<String>?>(null)

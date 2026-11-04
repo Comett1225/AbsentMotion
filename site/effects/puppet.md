@@ -1,6 +1,9 @@
 Puppet Pin bends a layer with pins. Turn on **Add Pins** and tap the layer wherever it should bend, up to 32 pins. Then turn Add Pins off and drag a pin on the preview, or tap its X or Y value in the list to type a position. The picture under a pin you drag goes with it, pins you do not move hold the picture where it is, and a new pin on a layer that is already bent leaves the picture as it is.
 
 - **Falloff** sets how the bend spreads: higher values keep it close to the pins you move, lower values spread it smoothly over the layer.
+- Tap a pin's name to choose its **Pin type**. **Position** pins move the picture and curl it smoothly. **Bend** pins also have a **Rotation** and a **Scale** that turn and grow the picture around them. **Stiff** pins hold their part of the picture in shape and cannot be dragged.
+- **Triangle Density** sets how fine the mesh that bends the picture is, and **Mesh Expansion** makes the mesh reach past the layer's edges.
+- **Sway** makes the pins swing by themselves: **Sway Amount**, **Sway Speed**, a **Sway Direction** (an **Angle** or **Random**) and a **Sway Seed**. **Sway Pins** swings all pins, or only the **Selected** ones, the pins whose **Sway this pin** is on.
 - To animate a pin, tap its name in the list and use the keyframe button as for any setting. See [Keyframes and easing](@keyframes).
 - The arrow next to a pin moves it back to where its part of the picture started, which takes away that pin's bend. The bin deletes the pin and its keyframes.
 - **Apply to Children** bends the child layers too, as if they were part of this layer's picture.

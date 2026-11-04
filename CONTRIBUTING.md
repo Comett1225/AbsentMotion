@@ -17,12 +17,12 @@ New third-party code or data needs a compatible licence and an entry in `THIRD_P
 
 ## Building and checking
 
-Setup is in [`docs/BUILD.md`](docs/BUILD.md). Run `tools/check.sh` before a pull request: it compiles both flavours and runs
+Setup is in [`docs/BUILD.md`](docs/BUILD.md). Run `tools/check.sh` before a pull request: it compiles every flavour and runs
 the unit tests. `tools/release.sh [patch|minor|major]` builds the release APKs.
 
 ## Code
 
-- The app is in `shared/kotlin`; flavour-specific files are in `android/src/play` and `android/src/foss` (`foss` must not use Google
+- The app is in `shared/kotlin`; flavour-specific files are in `android/src/foss` and `android/src/compat` (no flavour may use Google
   libraries). Panels go in `LayerPanel`, tools in `LayerTools`, layer actions in `editor/...Actions.kt`.
 - Kotlin follows the official style. C++ (`shared/cpp`) is C++20 without RTTI, in `namespace am`.
 - The source has no code comments; put an explanation in `docs/` or in the pull request.

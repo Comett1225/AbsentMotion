@@ -1,13 +1,14 @@
 # Third-party notices
 
-AbsentMotion is licensed under the Apache License 2.0 (see `LICENSE` and `NOTICE`). It contains, links against,
+AbsentMotion 5.0 and later is licensed under the GNU General Public License, version 3 (see `LICENSE` and `NOTICE`);
+4.x and earlier versions stay under the Apache License 2.0. It contains, links against,
 bundles or downloads the third-party software listed below. Each entry names the component, the version the build used
 on 2026-10-18 (AbsentMotion 2.1.0), its licence, its copyright line, where to find it and where AbsentMotion uses it. Copyright lines are
 copied from the licence files that ship with the vendored or checked-out sources; where AbsentMotion has no such
 file the entry says "see upstream" instead of guessing.
 
 Full licence texts for the C and C++ libraries are in the appendix at the end of this file. The Apache License 2.0 text
-that applies to the Apache-2.0 components is the file `LICENSE` in the root of the repository.
+that applies to the Apache-2.0 components is in appendix A.21.
 
 This list was written by hand on 2026-10-18 from the build files and the vendored sources. It is not generated. When a
 dependency is added, removed or upgraded, update this file in the same change.
@@ -15,11 +16,10 @@ dependency is added, removed or upgraded, update this file in the same change.
 **Contents**
 
 1. Engine libraries (C and C++): Skia and the libraries it links, whisper.cpp and ggml, RNNoise, ncnn, glslang, the RIFE warp layer, LAME, and the video downloader add-on (CPython and yt-dlp, downloaded at run time)
-2. Machine learning models: OpenAI Whisper weights, RIFE and Real-ESRGAN weights and the AI background removal 2.0 model (all downloaded at run time), background removal model (`foss` build)
+2. Machine learning models: OpenAI Whisper weights, RIFE and Real-ESRGAN weights and the AI background removal 2.0 model (all downloaded at run time), the built-in background removal model
 3. Kotlin and Compose libraries
-4. Google Play services (proprietary)
-5. Fonts, icons and effect thumbnails
-6. Appendix: licence texts
+4. Fonts, icons and effect thumbnails
+5. Appendix: licence texts
 
 ---
 
@@ -102,7 +102,7 @@ together with Skia.
 #### Wuffs
 
 - Version: the `wuffs-mirror-release-c` revision `e3f919ccfe3ef542cfc983a82146070258fb57f8` pinned by Skia's `DEPS`.
-- Licence: Apache License 2.0 (the text is `LICENSE` in the root of this repository).
+- Licence: Apache License 2.0 (text in appendix A.21).
 - Copyright: see upstream. The licence file in the vendored copy has the unfilled Apache appendix boilerplate.
 - URL: https://github.com/google/wuffs
 - Used in: the engine library (image decoding through Skia).
@@ -135,7 +135,7 @@ together with Skia.
 #### cpu-features
 
 - Version: the copy in the Android NDK r30 (`sources/android/cpufeatures`).
-- Licence: Apache License 2.0 (the text is `LICENSE` in the root of this repository).
+- Licence: Apache License 2.0 (text in appendix A.21).
 - Copyright: see upstream (the Android NDK `NOTICE` file).
 - URL: https://developer.android.com/ndk
 - Used in: the engine library (CPU feature detection for Skia's libwebp and zlib).
@@ -294,13 +294,12 @@ can remove the add-on.
 - Version: `absent-cutout.bin` with `absent-cutout-768.param` and `absent-cutout-1024.param` (ncnn, fp16), published as
   assets of this repository's `ai-models-3` release (the fourth training round, used from AbsentMotion 4.4; earlier
   versions download the previous round from `ai-models-2`).
-- Licence: Apache-2.0, including the pretrained weights it contains. The Apache-2.0 text is `LICENSE` in the root of
-  this repository.
+- Licence: Apache-2.0, including the pretrained weights it contains. The Apache-2.0 text is in appendix A.21.
 - Copyright: The AbsentMotion authors.
-- Used in: "Remove Background" on images when AI background removal 2.0 is chosen (Latest version, `foss` and `play`
-  builds). Downloaded once after that choice, checked against its SHA-256, and removable in Settings.
+- Used in: "Remove Background" on images when AI background removal 2.0 is chosen (Latest version). Downloaded once
+  after that choice, checked against its SHA-256, and removable in Settings.
 
-### Background removal model (`foss` build only)
+### Background removal model (built in)
 
 - Version: `android/src/foss/assets/absent_bg.abg` (2,943,735 bytes, SHA-256
   `9bfbfcba996eb0b0b4f5da03d7dcbce704f5b8810101eb92f62b9e6d44465439`), a small segmentation network trained for
@@ -309,13 +308,12 @@ can remove the add-on.
 - Licence: Apache-2.0 ("Original student architectures, training scripts and C++ runtime: Apache License 2.0."),
   subject to the source notices and the CC BY attribution below.
 - Copyright: The AbsentMotion authors.
-- Used in: "Remove Background" on images and videos in the `foss` build. It runs on the device and nothing is downloaded. The
-  `play` build uses ML Kit instead (section 4) and does not contain this file.
+- Used in: "Remove Background" on images and videos. It runs on the device and nothing is downloaded.
 - Pretrained encoder: `timm/mobilenetv3_large_100.ra_in1k`, revision `96f46a1c52932f27492dff66c72378eb99b443a7`,
   Apache-2.0, by Ross Wightman and timm contributors (https://huggingface.co/timm/mobilenetv3_large_100.ra_in1k,
   https://github.com/huggingface/pytorch-image-models); MobileNetV3: Howard et al., "Searching for MobileNetV3"
   (https://arxiv.org/abs/1905.02244). ImageNet-pretrained encoder only; classifier discarded; no ImageNet images
-  fetched. The Apache-2.0 text is `LICENSE` in the root of this repository.
+  fetched. The Apache-2.0 text is in appendix A.21.
 - Training pictures: 18,615 photographs under Creative Commons Attribution licences (18,559 CC BY 2.0,
   https://creativecommons.org/licenses/by/2.0/, and 56 CC BY 4.0, https://creativecommons.org/licenses/by/4.0/); only
   explicit CC BY records were accepted, and each licence was checked at the source before use. 8,391 come from the
@@ -337,9 +335,9 @@ can remove the add-on.
 
 ## 3. Kotlin and Compose libraries
 
-Versions are the ones the build resolved on 2026-10-18. The Apache-2.0 text is `LICENSE` in the root of this
-repository. For all Apache-2.0 entries below the copyright holders are named in the projects' own repositories ("see
-upstream"). The artifacts were not inspected for a `META-INF/NOTICE` file.
+Versions are the ones the build resolved on 2026-10-18. The Apache-2.0 text is in appendix A.21. For all Apache-2.0
+entries below the copyright holders are named in the projects' own repositories ("see upstream"). The artifacts were not
+inspected for a `META-INF/NOTICE` file.
 
 ### AndroidX Compose, Activity Compose and Material 3
 
@@ -408,25 +406,7 @@ JUnit 4.13.2 (Eclipse Public License 1.0), kXML 2 2.3.0 (`net.sf.kxml:kxml2`, a 
 
 ---
 
-## 4. Google Play services (proprietary)
-
-- Components: ML Kit subject segmentation through Google Play services
-  (`com.google.android.gms:play-services-mlkit-subject-segmentation:16.0.0-beta1`, used for "Remove Background" on
-  images and video frames).
-- Licence: proprietary (Google APIs Terms of Service and the ML Kit terms). These libraries are **not** open source.
-  The segmentation model is fetched by Google Play services, not by AbsentMotion.
-- Copyright: Google LLC.
-- Used in: the Android app. Intended to be confined to a Google Play build flavour, with a flavour without them for
-  distribution channels that accept only free software.
-- The free Android build (the `foss` flavour) includes neither library; only the `play` build does.
-- Known risk: 16.0.0-beta1 is a beta release, which Google ships without a service-level or deprecation promise, so a
-  later Google Play services update may change or remove it. The version is pinned, the code that uses it is one file
-  (`android/src/play/kotlin/app/absentmotion/ai/BackgroundRemoval.kt`) behind the same interface as the `foss` remover, and
-  when the service fails the app says that background removal is not ready instead of crashing.
-
----
-
-## 5. Fonts, icons and effect thumbnails
+## 4. Fonts, icons and effect thumbnails
 
 ### Noto Color Emoji
 
@@ -454,7 +434,7 @@ instances, and every font was cut down to the Latin, Cyrillic and Vietnamese let
 the writing system of that font, with `tools/gen_fonts.py` and fontTools. The 15 families whose copyright holders reserve
 the font name (Abril Fatface, Alfa Slab One, Bitter, Comfortaa, DM Serif Display, Dancing Script, Kaushan Script, Lobster, Lora, Orbitron, Playfair Display, Press Start 2P, Quicksand, Raleway, Righteous) are included exactly as published, because the SIL Open Font License
 does not allow a modified version to keep a reserved name. The licence text of the SIL Open Font License 1.1 is in
-appendix A.13; the Apache License 2.0 text is the file `LICENSE`.
+appendix A.13; the Apache License 2.0 text is in appendix A.21.
 
 | What | Source | Licence | File |
 |---|---|---|---|
@@ -549,7 +529,7 @@ two screenshots.
 
 ---
 
-## 6. Appendix: licence texts
+## 5. Appendix: licence texts
 
 The texts below are copied unchanged from the files that ship with the sources named in each entry.
 
@@ -3690,4 +3670,211 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+~~~~
+
+### A.21 Apache License 2.0
+
+~~~~text
+
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+   1. Definitions.
+
+      "License" shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
+
+      "Licensor" shall mean the copyright owner or entity authorized by
+      the copyright owner that is granting the License.
+
+      "Legal Entity" shall mean the union of the acting entity and all
+      other entities that control, are controlled by, or are under common
+      control with that entity. For the purposes of this definition,
+      "control" means (i) the power, direct or indirect, to cause the
+      direction or management of such entity, whether by contract or
+      otherwise, or (ii) ownership of fifty percent (50%) or more of the
+      outstanding shares, or (iii) beneficial ownership of such entity.
+
+      "You" (or "Your") shall mean an individual or Legal Entity
+      exercising permissions granted by this License.
+
+      "Source" form shall mean the preferred form for making modifications,
+      including but not limited to software source code, documentation
+      source, and configuration files.
+
+      "Object" form shall mean any form resulting from mechanical
+      transformation or translation of a Source form, including but
+      not limited to compiled object code, generated documentation,
+      and conversions to other media types.
+
+      "Work" shall mean the work of authorship, whether in Source or
+      Object form, made available under the License, as indicated by a
+      copyright notice that is included in or attached to the work
+      (an example is provided in the Appendix below).
+
+      "Derivative Works" shall mean any work, whether in Source or Object
+      form, that is based on (or derived from) the Work and for which the
+      editorial revisions, annotations, elaborations, or other modifications
+      represent, as a whole, an original work of authorship. For the purposes
+      of this License, Derivative Works shall not include works that remain
+      separable from, or merely link (or bind by name) to the interfaces of,
+      the Work and Derivative Works thereof.
+
+      "Contribution" shall mean any work of authorship, including
+      the original version of the Work and any modifications or additions
+      to that Work or Derivative Works thereof, that is intentionally
+      submitted to Licensor for inclusion in the Work by the copyright owner
+      or by an individual or Legal Entity authorized to submit on behalf of
+      the copyright owner. For the purposes of this definition, "submitted"
+      means any form of electronic, verbal, or written communication sent
+      to the Licensor or its representatives, including but not limited to
+      communication on electronic mailing lists, source code control systems,
+      and issue tracking systems that are managed by, or on behalf of, the
+      Licensor for the purpose of discussing and improving the Work, but
+      excluding communication that is conspicuously marked or otherwise
+      designated in writing by the copyright owner as "Not a Contribution."
+
+      "Contributor" shall mean Licensor and any individual or Legal Entity
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
+
+   2. Grant of Copyright License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      copyright license to reproduce, prepare Derivative Works of,
+      publicly display, publicly perform, sublicense, and distribute the
+      Work and such Derivative Works in Source or Object form.
+
+   3. Grant of Patent License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      (except as stated in this section) patent license to make, have made,
+      use, offer to sell, sell, import, and otherwise transfer the Work,
+      where such license applies only to those patent claims licensable
+      by such Contributor that are necessarily infringed by their
+      Contribution(s) alone or by combination of their Contribution(s)
+      with the Work to which such Contribution(s) was submitted. If You
+      institute patent litigation against any entity (including a
+      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      or a Contribution incorporated within the Work constitutes direct
+      or contributory patent infringement, then any patent licenses
+      granted to You under this License for that Work shall terminate
+      as of the date such litigation is filed.
+
+   4. Redistribution. You may reproduce and distribute copies of the
+      Work or Derivative Works thereof in any medium, with or without
+      modifications, and in Source or Object form, provided that You
+      meet the following conditions:
+
+      (a) You must give any other recipients of the Work or
+          Derivative Works a copy of this License; and
+
+      (b) You must cause any modified files to carry prominent notices
+          stating that You changed the files; and
+
+      (c) You must retain, in the Source form of any Derivative Works
+          that You distribute, all copyright, patent, trademark, and
+          attribution notices from the Source form of the Work,
+          excluding those notices that do not pertain to any part of
+          the Derivative Works; and
+
+      (d) If the Work includes a "NOTICE" text file as part of its
+          distribution, then any Derivative Works that You distribute must
+          include a readable copy of the attribution notices contained
+          within such NOTICE file, excluding those notices that do not
+          pertain to any part of the Derivative Works, in at least one
+          of the following places: within a NOTICE text file distributed
+          as part of the Derivative Works; within the Source form or
+          documentation, if provided along with the Derivative Works; or,
+          within a display generated by the Derivative Works, if and
+          wherever such third-party notices normally appear. The contents
+          of the NOTICE file are for informational purposes only and
+          do not modify the License. You may add Your own attribution
+          notices within Derivative Works that You distribute, alongside
+          or as an addendum to the NOTICE text from the Work, provided
+          that such additional attribution notices cannot be construed
+          as modifying the License.
+
+      You may add Your own copyright statement to Your modifications and
+      may provide additional or different license terms and conditions
+      for use, reproduction, or distribution of Your modifications, or
+      for any such Derivative Works as a whole, provided Your use,
+      reproduction, and distribution of the Work otherwise complies with
+      the conditions stated in this License.
+
+   5. Submission of Contributions. Unless You explicitly state otherwise,
+      any Contribution intentionally submitted for inclusion in the Work
+      by You to the Licensor shall be under the terms and conditions of
+      this License, without any additional terms or conditions.
+      Notwithstanding the above, nothing herein shall supersede or modify
+      the terms of any separate license agreement you may have executed
+      with Licensor regarding such Contributions.
+
+   6. Trademarks. This License does not grant permission to use the trade
+      names, trademarks, service marks, or product names of the Licensor,
+      except as required for reasonable and customary use in describing the
+      origin of the Work and reproducing the content of the NOTICE file.
+
+   7. Disclaimer of Warranty. Unless required by applicable law or
+      agreed to in writing, Licensor provides the Work (and each
+      Contributor provides its Contributions) on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied, including, without limitation, any warranties or conditions
+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+      PARTICULAR PURPOSE. You are solely responsible for determining the
+      appropriateness of using or redistributing the Work and assume any
+      risks associated with Your exercise of permissions under this License.
+
+   8. Limitation of Liability. In no event and under no legal theory,
+      whether in tort (including negligence), contract, or otherwise,
+      unless required by applicable law (such as deliberate and grossly
+      negligent acts) or agreed to in writing, shall any Contributor be
+      liable to You for damages, including any direct, indirect, special,
+      incidental, or consequential damages of any character arising as a
+      result of this License or out of the use or inability to use the
+      Work (including but not limited to damages for loss of goodwill,
+      work stoppage, computer failure or malfunction, or any and all
+      other commercial damages or losses), even if such Contributor
+      has been advised of the possibility of such damages.
+
+   9. Accepting Warranty or Additional Liability. While redistributing
+      the Work or Derivative Works thereof, You may choose to offer,
+      and charge a fee for, acceptance of support, warranty, indemnity,
+      or other liability obligations and/or rights consistent with this
+      License. However, in accepting such obligations, You may act only
+      on Your own behalf and on Your sole responsibility, not on behalf
+      of any other Contributor, and only if You agree to indemnify,
+      defend, and hold each Contributor harmless for any liability
+      incurred by, or claims asserted against, such Contributor by reason
+      of your accepting any such warranty or additional liability.
+
+   END OF TERMS AND CONDITIONS
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "[]"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright [yyyy] [name of copyright owner]
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
 ~~~~

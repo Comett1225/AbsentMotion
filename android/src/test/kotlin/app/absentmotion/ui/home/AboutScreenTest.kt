@@ -11,7 +11,7 @@ class AboutScreenTest {
     @Test fun assetHoldsTheLicenceAndTheThirdPartyNotices() {
         val text = asset
         assertTrue("licenses.txt is empty", text.isNotBlank())
-        for (word in listOf("Apache License", "Skia", "whisper.cpp", "Lucide")) assertTrue("licenses.txt lacks \"$word\"", word in text)
+        for (word in listOf("GNU GENERAL PUBLIC LICENSE", "Version 3, 29 June 2007", "Apache License", "Skia", "whisper.cpp", "Lucide")) assertTrue("licenses.txt lacks \"$word\"", word in text)
     }
 
     @Test fun pageShowsEveryWordOfTheAssetOnceAndNoItemIsHuge() {

@@ -34,15 +34,8 @@ The app asks for the internet permission for these things only:
 - **Video Downloader.** Only if you use Tools > Video Downloader: the first time, the app downloads its add-on (about 25 MB): Python from `python.org` and yt-dlp from GitHub (`github.com`, served from `objects.githubusercontent.com` or `release-assets.githubusercontent.com`). While the add-on is installed, it asks GitHub at most once a day whether there is a newer yt-dlp and downloads it if there is. When you paste a link, the add-on contacts that website (for example YouTube, Instagram or TikTok) to read the video's details and download the parts you choose, the same as a web browser would; the files are saved on the device.
 - **Update check.** While "Check for a new version each time the app opens" is on (the app asks you once, on its first screens or at the first start after an update, and the switch is also in Settings), and when you tap Check for Update, the app makes one normal HTTPS request to GitHub (`api.github.com`) to read the latest version number; nothing else is sent, and GitHub sees your IP address, as for any web request. Only if a newer version is shown and you tap Download update, the app downloads that version's app file (about 60 MB) from the GitHub release (`github.com`, which serves it from `release-assets.githubusercontent.com` or `objects.githubusercontent.com`), and for older releases its `SHA256SUMS.txt`; it is installed only after you confirm it in Android's installer.
 
-Apart from the Google Play build described below, nothing else is sent anywhere. Text to speech uses the voices already installed on your device and works offline.
-
-## The Google Play build
-
-The `play` build published on the GitHub releases page removes backgrounds with Google ML Kit, through Google Play services.
-The removal itself runs on the device, but Google Play services (not AbsentMotion) downloads the model when it is first needed
-or earlier, and may send diagnostics to Google (such as device information, performance figures and error codes) under Google's
-own policy. The build without Google libraries (`foss`) is not affected: its own offline model is part of the app, so
-nothing is downloaded or sent for background removal.
+Nothing else is sent anywhere. Background removal uses an offline model that is part of the app, so nothing is downloaded or
+sent for it. Text to speech uses the voices already installed on your device and works offline.
 
 ## Children
 

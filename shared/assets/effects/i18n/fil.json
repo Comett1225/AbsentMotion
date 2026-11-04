@@ -10,11 +10,74 @@
   "move": "Galaw",
   "new": "Bago",
   "noise": "Ingay",
+  "other": "Iba pa",
   "repeat": "Pag-uulit",
   "stylize": "I-istilo",
   "text": "Teksto"
  },
  "effects": {
+  "ascii": {
+   "description": "Ginagawang text art ang layer, gawa sa mga letra at simbolo: mas buong character ang inilalagay sa mas maliliwanag na bahagi. Itinatakda ng Laki kung gaano kalapad ang bawat character sa layer, kaya gumagalaw, umiikot at nagsi-scale ang mga character kasama nito. Pinapanatili ng Kulay ang sariling kulay ng larawan o gumagamit ng isang kulay lang, at gumuguhit ang Mga linya ng gilid ng mga outline gamit ang mga character na | - / at \\.",
+   "name": "ASCII",
+   "params": {
+    "background": {
+     "label": "Kulay ng background"
+    },
+    "backgroundMode": {
+     "label": "Background",
+     "options": [
+      "Wala",
+      "Kulay"
+     ]
+    },
+    "brightness": {
+     "label": "Liwanag"
+    },
+    "cell": {
+     "label": "Laki"
+    },
+    "characters": {
+     "label": "Custom"
+    },
+    "charset": {
+     "label": "Mga character",
+     "options": [
+      "Detalyado",
+      "Simple",
+      "Mga block",
+      "Binary",
+      "Custom"
+     ]
+    },
+    "colorMode": {
+     "label": "Kulay",
+     "options": [
+      "Orihinal",
+      "Isang kulay"
+     ]
+    },
+    "contrast": {
+     "label": "Kontrast"
+    },
+    "edges": {
+     "label": "Mga linya ng gilid"
+    },
+    "invert": {
+     "label": "I-invert"
+    },
+    "textColor": {
+     "label": "Kulay ng teksto"
+    }
+   },
+   "presets": {
+    "amber-monitor": "Amber Monitor",
+    "binary-rain": "Ulan ng Binary",
+    "blocks": "Mga block",
+    "line-art": "Line Art",
+    "newspaper": "Diyaryo",
+    "terminal": "Terminal"
+   }
+  },
   "autoshake": {
    "description": "Random na ginagalaw ang layer sa paglipas ng oras sa loob ng itinakdang limit.",
    "name": "Auto-yanig",
@@ -50,8 +113,8 @@
    }
   },
   "backdrop": {
-   "description": "Kinokopya ang iginuhit sa ilalim ng layer para mabago ito ng mga susunod na epekto. Nililimitahan ng Mask To Layer ang kopya sa opaque na bahagi ng layer. Ibinabalik ng Mix ang fill ng layer. Pinapayagan ng 'Umaabot sa labas ang mga epekto' ang mga susunod na epekto, gaya ng Stretch, na dalhin ang kopya lampas sa gilid ng layer.",
-   "name": "Adjustment layer",
+   "description": "Isang adjustment layer: kinokopya ang iginuguhit sa ilalim ng layer para ang mga epektong kasunod nito ang magbago sa kopyang iyon. Nililimitahan ng Mask sa layer ang kopya sa mga opaque na bahagi ng layer. Ibinabalik ng Halo ang fill ng layer. Pinapayagan ng Umaabot sa labas ang mga epekto ang mga susunod na epekto, gaya ng Stretch, na dalhin ang kopya lampas sa gilid ng layer.",
+   "name": "Kopyahin ang Background",
    "params": {
     "mask": {
      "label": "Mask sa layer"
@@ -1819,6 +1882,15 @@
     }
    }
   },
+  "fontweight": {
+   "description": "Itinatakda kung gaano kakapal ang mga letra, mula manipis hanggang makapal, at puwedeng i-animate gamit ang mga keyframe. Gumagana sa mga variable font, na nasa iisang file ang lahat ng bigat: Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display at Dancing Script sa listahan ng font, o isang variable font na ii-import mo. Pinapanatili ng mga font na may nakapirming bigat ang sarili nilang hitsura.",
+   "name": "Bigat ng Font",
+   "params": {
+    "weight": {
+     "label": "Bigat"
+    }
+   }
+  },
   "fourcolor": {
    "description": "Hinahalo ang apat na kulay na inilagay sa apat na punto (sa pixel mula sa gitna ng layer) sa ibabaw ng layer.",
    "name": "Gradient na apat na kulay",
@@ -2220,6 +2292,9 @@
    "description": "Gumagawa ng maraming kopya ng layer nang dynamic, na nakaayos sa grid.",
    "name": "Grid Repeat",
    "params": {
+    "copyDelay": {
+     "label": "Antala kada kopya"
+    },
     "count": {
      "label": "Bilang"
     },
@@ -2241,8 +2316,20 @@
     "position": {
      "label": "Posisyon"
     },
+    "randomOpacity": {
+     "label": "Random na opacity"
+    },
     "randomOrder": {
      "label": "Random na Order"
+    },
+    "randomPosition": {
+     "label": "Random na posisyon"
+    },
+    "randomRotation": {
+     "label": "Random na rotation"
+    },
+    "randomScale": {
+     "label": "Random na scale"
     },
     "rangeEnd": {
      "label": "Wakas ng Range"
@@ -2871,6 +2958,9 @@
    "description": "Awtomatikong gumagawa ng maraming kopya ng layer, na nakaayos sa isang linya.",
    "name": "Linear Repeat",
    "params": {
+    "copyDelay": {
+     "label": "Antala kada kopya"
+    },
     "count": {
      "label": "Bilang"
     },
@@ -2892,8 +2982,20 @@
     "position": {
      "label": "Posisyon"
     },
+    "randomOpacity": {
+     "label": "Random na opacity"
+    },
     "randomOrder": {
      "label": "Random na order"
+    },
+    "randomPosition": {
+     "label": "Random na posisyon"
+    },
+    "randomRotation": {
+     "label": "Random na rotation"
+    },
+    "randomScale": {
+     "label": "Random na scale"
     },
     "rangeEnd": {
      "label": "Dulo ng range"
@@ -3500,6 +3602,45 @@
     }
    }
   },
+  "parenthelper": {
+   "description": "Binabago kung paano sinusunod ng child layer ang parent nito: puwedeng ganap na sundan ang scale at rotation, manatiling naka-lock, o sumunod ayon sa takdang dami. Pinapaikot ng Auto Rotate ang layer habang gumagalaw ito, parang gumugulong na gulong.",
+   "name": "Parenting Helper",
+   "params": {
+    "autoRotate": {
+     "label": "Auto Rotate",
+     "options": [
+      "Naka-off",
+      "X axis",
+      "Y axis"
+     ]
+    },
+    "radiusAdjust": {
+     "label": "Pag-adjust ng radius"
+    },
+    "rotateMode": {
+     "label": "Rotation",
+     "options": [
+      "Normal",
+      "Naka-lock",
+      "May timbang"
+     ]
+    },
+    "rotateWeight": {
+     "label": "Timbang ng rotation"
+    },
+    "scaleMode": {
+     "label": "Scale",
+     "options": [
+      "Normal",
+      "Naka-lock",
+      "May timbang"
+     ]
+    },
+    "scaleWeight": {
+     "label": "Timbang ng scale"
+    }
+   }
+  },
   "particles": {
    "description": "Nagpapasabog ng mga particle mula sa layer: niyebe, kislap, confetti, bula, alikabok, puso, bituin, talulot o maliliit na kopya ng layer mismo, na ginagalaw ng gravity, hangin at swirl. Magsimula sa preset, pagkatapos palitan ang emitter, dami at forces. Sa Beats, nagpapadala ng burst sa bawat beat: piliin ang musika, buksan ang menu nito at i-tap muna ang Markahan ang Beats.",
    "name": "Mga particle",
@@ -3940,8 +4081,43 @@
    "description": "Binabaluktot ang layer na parang puppet: maglagay ng mga pin dito, tapos i-drag o i-animate ang mga pin at susundan sila ng larawan nang maayos.",
    "name": "Puppet Pin",
    "params": {
+    "density": {
+     "label": "Density ng triangle"
+    },
+    "expansion": {
+     "label": "Pagpapalawak ng mesh"
+    },
     "falloff": {
      "label": "Falloff"
+    },
+    "sway": {
+     "label": "Sway"
+    },
+    "swayAmount": {
+     "label": "Dami ng sway"
+    },
+    "swayAngle": {
+     "label": "Anggulo ng sway"
+    },
+    "swayDirection": {
+     "label": "Direksyon ng sway",
+     "options": [
+      "Anggulo",
+      "Random"
+     ]
+    },
+    "swayPins": {
+     "label": "Mga pin na may sway",
+     "options": [
+      "Lahat",
+      "Napili"
+     ]
+    },
+    "swaySeed": {
+     "label": "Seed ng sway"
+    },
+    "swaySpeed": {
+     "label": "Bilis ng sway"
     }
    }
   },
@@ -4027,6 +4203,9 @@
     "angle": {
      "label": "Anggulo"
     },
+    "copyDelay": {
+     "label": "Antala kada kopya"
+    },
     "count": {
      "label": "Bilang"
     },
@@ -4051,8 +4230,20 @@
     "radius": {
      "label": "Radius"
     },
+    "randomOpacity": {
+     "label": "Random na opacity"
+    },
     "randomOrder": {
      "label": "Random na Order"
+    },
+    "randomPosition": {
+     "label": "Random na posisyon"
+    },
+    "randomRotation": {
+     "label": "Random na rotation"
+    },
+    "randomScale": {
+     "label": "Random na scale"
     },
     "rangeEnd": {
      "label": "Wakas ng Range"
@@ -4328,6 +4519,9 @@
    "description": "Awtomatikong gumagawa ng maraming kopya ng layer sa tabas ng layer na nasa ilalim mismo nito.",
    "name": "Ulitin sa Landas",
    "params": {
+    "copyDelay": {
+     "label": "Antala kada kopya"
+    },
     "count": {
      "label": "Bilang"
     },
@@ -4352,8 +4546,20 @@
     "phase": {
      "label": "Phase"
     },
+    "randomOpacity": {
+     "label": "Random na opacity"
+    },
     "randomOrder": {
      "label": "Random na Ayos"
+    },
+    "randomPosition": {
+     "label": "Random na posisyon"
+    },
+    "randomRotation": {
+     "label": "Random na rotation"
+    },
+    "randomScale": {
+     "label": "Random na scale"
     },
     "rangeEnd": {
      "label": "Wakas ng Range"
@@ -4567,6 +4773,27 @@
     },
     "seed": {
      "label": "Seed"
+    }
+   }
+  },
+  "scaleassist": {
+   "description": "Nagdadagdag ng extra scale sa ibabaw ng sariling laki ng layer sa X, Y, pareho, o X na baliktad ang Y. Sumusunod sa bagong laki ang mga layer na naka-parent dito.",
+   "name": "Scale Assist",
+   "params": {
+    "axis": {
+     "label": "Axis",
+     "options": [
+      "X",
+      "Y",
+      "X,Y",
+      "X,-Y"
+     ]
+    },
+    "damp": {
+     "label": "Damping"
+    },
+    "scale": {
+     "label": "Scale"
     }
    }
   },
@@ -5425,6 +5652,59 @@
     }
    }
   },
+  "textblips": {
+   "description": "Tina-type ang teksto nang isa-isang letra na may maikling blip sa bawat letra, parang karakter na nagsasalita sa laro. Pumili ng Boses, tapos itakda ang Pitch nito, kung gaano kabilis mag-type ang mga letra at gaano katagal ang paghinto pagkatapos ng bantas. Tahimik ang mga espasyo at bantas.",
+   "name": "Mga Blip ng Teksto",
+   "params": {
+    "delay": {
+     "label": "Antala"
+    },
+    "every": {
+     "label": "Blip bawat"
+    },
+    "pause": {
+     "label": "Paghinto sa bantas"
+    },
+    "pitch": {
+     "label": "Pitch"
+    },
+    "reveal": {
+     "label": "Pag-type nang isa-isa"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "speed": {
+     "label": "Bilis"
+    },
+    "variation": {
+     "label": "Pagbabago ng pitch"
+    },
+    "voice": {
+     "label": "Boses",
+     "options": [
+      "Classic",
+      "Malambot",
+      "Malalim",
+      "Mataas",
+      "Robot",
+      "Squeak",
+      "Typewriter",
+      "Chiptune"
+     ]
+    },
+    "volume": {
+     "label": "Volume"
+    }
+   },
+   "presets": {
+    "fast-talker": "Mabilis Magsalita",
+    "hero": "Bayani",
+    "monster": "Halimaw",
+    "robot": "Robot",
+    "typewriter": "Typewriter"
+   }
+  },
   "textpath": {
    "description": "Inilalagay ang teksto sa kahabaan ng arko, bilog, o outline ng layer na nasa ilalim mismo nito, titik por titik, habang napapanatili ang hugis ng mga titik, font, at emoji ng teksto.",
    "name": "Teksto sa Path",
@@ -5590,6 +5870,72 @@
    },
    "presets": {
     "scramble": "Guluhin"
+   }
+  },
+  "textshake": {
+   "description": "Niyayanig ang bawat letra nang kanya-kanya, parang kabadong usapan sa laro. Ang Yanig ay lumilipat-lipat sa mga puwesto, ang Panginginig ay tumatalon sa bagong puwesto sa bawat hakbang, ang Alon ay pataas-pababa ang mga letra, ang Bilog ay gumagalaw sa maliliit na ikot at ang Indayog ay pakaliwa't pakanan ang tagilid. Babaan ang Mga letrang yayanig para ilang letra lang ang yumanig, na random na pinipili ulit bawat ilang sandali.",
+   "name": "Yanig ng Teksto",
+   "params": {
+    "amount": {
+     "label": "Dami"
+    },
+    "cycles": {
+     "label": "Bilis"
+    },
+    "end": {
+     "label": "Wakas"
+    },
+    "every": {
+     "label": "Bagong letra bawat"
+    },
+    "letters": {
+     "label": "Mga letrang yayanig"
+    },
+    "rotation": {
+     "label": "Rotation"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "speed": {
+     "label": "Bilis"
+    },
+    "spread": {
+     "label": "Kalat"
+    },
+    "start": {
+     "label": "Simula"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Yanig",
+      "Panginginig",
+      "Alon",
+      "Bilog",
+      "Indayog"
+     ]
+    },
+    "tilt": {
+     "label": "Tilt"
+    },
+    "unit": {
+     "label": "Batay sa",
+     "options": [
+      "Character",
+      "Salita",
+      "Linya"
+     ]
+    }
+   },
+   "presets": {
+    "dizzy": "Nahihilo",
+    "floaty": "Lutang",
+    "nervous": "Kabado",
+    "scared": "Takot",
+    "uneasy": "Balisa",
+    "wavy": "Maalon",
+    "wobbly": "Pasuray-suray"
    }
   },
   "texttransform": {

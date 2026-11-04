@@ -6,6 +6,47 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [5.0.0] - Unreleased
+
+### Added
+
+- AbsentMotion on the computer: a desktop version for Macs with Apple silicon. It runs the phone's own editor, effects and export, laid out for a mouse and a keyboard, with a media library, an inspector, a mouse timeline, right-click menus, keyboard shortcuts, files dropped into the window, linked folders, the webcam, export in the background and in-app updates. Windows builds and is being tested; Linux comes later.
+- Text effects: Text Shake (letters shake on their own as Shake, Jitter, Wave, Circle or Wobble, or only some letters at a time), Text Blips (types the text out with a blip for each letter, eight voices, heard in the preview and the export) and Font Weight (animate the weight of variable fonts, imported ones too).
+- ASCII effect: any layer as text art made of letters and symbols, with six presets.
+- Depth order: with a camera, layers in 3D are drawn by their distance from the camera, and the camera can tilt and orbit around the scene. New projects have it on; older projects keep their look until it is turned on. A 3D layer tile lets flat layers take part.
+- Light layers: Ambient, Directional and Point lights with colour, intensity and falloff, up to four at once, shade 3D models, 3D Scatter and 3D Fracture.
+- Link a value to a value of another layer, with Multiply, Add and Delay, from the new Link button in the Transform, Opacity and effect panels.
+- Linear Repeat, Radial Repeat, Grid Repeat and Repeat Along Path: Delay per copy, and Random Position, Rotation, Scale and Opacity for each copy.
+- Parenting Helper and Scale Assist effects (Move). Alight Motion projects that use them, or the 3D orientation of a layer, now import.
+- Groups: Edit Group opens a group, the top bar shows where you are and leads back, and Ungroup in the layer menu puts the layers back.
+- Tools tab: Trim (Fast without re-encoding, or Exact), Extract Audio (M4A or MP3) and Make a GIF (up to 30 seconds, three sizes, three frame rates, loop or play once).
+- Tablet layouts for big screens in portrait and landscape: panels beside the preview, a taller timeline, grids on the home screen and tool screens in two columns.
+- Audio layers have a Mark Beats tile.
+- Puppet Pin: pins curl the picture smoothly, pin types Position, Bend (with rotation and scale) and Stiff, Triangle Density, Mesh Expansion and Sway.
+- Effect presets: a Presets button on an open effect, a picture for every preset, and favourite presets that show first in the Favorite strip.
+- Several selected clips stretch and split together.
+
+### Changed
+
+- Adjustment Layer is now called Copy Background and sits in a new Other category. Projects that use it keep working, and searching for "adjustment layer" still finds it.
+- Effect presets left the grid of the effects library; searching a preset's name finds its effect. The New category lists the effects of 5.x.
+- While a gradient is being edited, dragging on the canvas moves the nearest gradient dot instead of the layer.
+- Effect and border card headers are lighter.
+- If the app closes while Vulkan or OpenGL is starting, the next start uses the other one.
+- The source code has one folder per platform: shared, android, pc, macos, windows and linux.
+
+### Removed
+
+- The Play build. Play installs move to the foss build when they update, and keep their projects and settings.
+
+### Fixed
+
+- A thin light line could show along the edge of the canvas.
+
+### Licence
+
+- 5.0 and every later version are released under GPL-3.0. 4.4 and earlier stay under Apache-2.0.
+
 ## [4.4.1] - 2026-11-01
 
 ### Added

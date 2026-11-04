@@ -396,7 +396,7 @@ instances, and every font was cut down to the Latin, Cyrillic and Vietnamese let
 the writing system of that font, with `tools/gen_fonts.py` and fontTools. The %(published_count)d families whose copyright holders reserve
 the font name (%(published)s) are included exactly as published, because the SIL Open Font License
 does not allow a modified version to keep a reserved name. The licence text of the SIL Open Font License 1.1 is in
-appendix A.13; the Apache License 2.0 text is the file `LICENSE`.
+appendix A.13; the Apache License 2.0 text is in appendix A.21.
 
 %(table)s
 

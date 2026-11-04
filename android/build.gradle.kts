@@ -77,11 +77,6 @@ android {
 
     flavorDimensions += "distribution"
     productFlavors {
-        create("play") {
-            dimension = "distribution"
-            manifestPlaceholders["variant"] = "play"
-            ndk { abiFilters += "arm64-v8a" }
-        }
         create("foss") {
             dimension = "distribution"
             manifestPlaceholders["variant"] = "foss"
@@ -147,7 +142,6 @@ dependencies {
     implementation("androidx.exifinterface:exifinterface:1.4.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
-    "playImplementation"("com.google.android.gms:play-services-mlkit-subject-segmentation:16.0.0-beta1")
     testImplementation("junit:junit:4.13.2")
     testImplementation("net.sf.kxml:kxml2:2.3.0")
     testImplementation("org.json:json:20260814")

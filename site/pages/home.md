@@ -2,9 +2,9 @@
 title: The home screen
 group: Interface
 order: 1
-summary: Your projects, assets and templates, the Compress and Video Downloader tools, and the buttons around them.
+summary: Your projects, assets and templates, the tools in the Tools tab (Compress, Trim, Extract Audio, Make a GIF and Video Downloader) and the buttons around them.
 ---
-The home screen is the first thing you see after the first start. It lists your projects and has the buttons for creating one, searching and changing settings.
+The home screen is the first thing you see after the first start. It lists your projects and has the buttons for creating one, searching and changing settings. On a tablet with a wide enough screen, the top bar becomes a wide header and projects and templates show as a grid, in portrait and in landscape.
 
 ![The home screen: menu (1), search (2), Projects and Assets (3), a project card (4), the card menu button (5) and New project (6).](img/home-screen.webp)
 
@@ -62,7 +62,7 @@ The **Templates** page has two chips, **My Templates** and **My Presets**. They 
 
 ## Tools
 
-The **Tools** page has two cards that work on files, outside any project: **Compress** and **Video Downloader**. Tap a card to open it.
+The **Tools** page has five cards that work on files, outside any project: **Compress**, **Trim**, **Extract Audio**, **Make a GIF** and **Video Downloader**. Tap a card to open it. On a tablet the cards sit side by side, and a tool opens full screen; held sideways, its settings sit in a second column next to the file.
 
 ![The Tools page: Compress (1) and Video Downloader (2), and the Tools button of the bottom bar (3).](img/tools-tab.webp)
 
@@ -93,6 +93,41 @@ When it is done, the line above the buttons shows the old and the new size and h
 
 ![The full-screen view of the result: After and Before (1), the close button (2) and the video (3).](img/compress-full.webp)
 
+### Trim
+
+**Trim** keeps the part of a video you choose and saves it as a new MP4 video. Your original is never changed.
+
+1. Tap **Choose a video**.
+2. Under **Part to keep**, drag the two ends on the strip of pictures. The big picture above shows the frame at the end you are moving. **Start** and **End** have arrows that move that end a little earlier or later, and **Length** shows how long the part is.
+3. Under **How?** choose **Fast** (the default: no re-encoding, so it is quick and keeps the quality; the start snaps to the nearest cut point of the video) or **Exact** (cuts exactly where you choose, but takes longer). With Fast, the Start arrows jump from one cut point to the next.
+4. The line above the button gives the size to expect. Tap **Trim**.
+
+If a video has hardly any cut points, Fast can only start at the beginning, and the screen says so: choose Exact to start anywhere.
+
+### Extract Audio
+
+**Extract Audio** saves the sound of a video as an audio file.
+
+1. Tap **Choose a video**. A video without sound says "This video has no sound."
+2. **Format**: **M4A** (the default) or **MP3**.
+3. **Quality**: **Small**, **Good** or **Best**. For an M4A there is also **Original**, which copies the sound as it is, with no loss, when the video's sound allows it. The app then picks it for you.
+4. The line above the button gives the size to expect and the length. Tap **Extract**.
+
+To take the sound out of a video inside a project instead, use **Extract Audio** in the layer menu: see [Audio](@audio).
+
+### Make a GIF
+
+**Make a GIF** turns part of a video into an animated GIF.
+
+1. Tap **Choose a video**.
+2. Under **Part to keep**, choose the part as in Trim. A GIF can be up to 30 seconds long.
+3. **Size** is the long side of the GIF: 320, 480 (the default) or 720 px. **Frame rate**: 10, 15 (the default) or 24. **Loop**: **Forever** (the default) or **Once**.
+4. The line above the button gives the size to expect and the number of frames, measured on a few sample frames. If the GIF will be over 25 MB it says "This GIF will be big. Try a smaller size or a shorter part." Tap **Make GIF**.
+
+### The result of Trim, Extract Audio and Make a GIF
+
+A bar shows the progress, and **Cancel** stops it. When it is done, the line above the buttons shows the size of the new file, and **Result** shows it (a sound shows its name). Tap **Save** to keep it, or **Share** to send it to another app. Videos go to Movies/AbsentMotion, GIFs to Pictures/AbsentMotion and sounds to Music/AbsentMotion. If something goes wrong, the line says what happened, for example "This is too big for this phone. Try a smaller size or a shorter part."
+
 ### Video Downloader
 
 The **Video Downloader** saves a video from a link to your phone. It needs a free add-on, a one-time download that the screen shows the size of (about 25 MB). The add-on brings the open source tools Python and yt-dlp, and you can remove it again in [Settings](@settings) with **Delete Video downloader add-on**. It works on phones with a 64-bit processor.
@@ -112,6 +147,8 @@ The **Video Downloader** saves a video from a link to your phone. It needs a fre
 Below the button, **Supported** lists the sites that work, and **Partially supported** the ones that work with limits. Tap a name there to read the limit, for example that Instagram stories and private posts need a signed-in account, so they cannot be downloaded. A link that cannot be downloaded shows the reason: a private or removed video, a post that needs a signed-in account, a playlist, a site that blocked the download or no connection.
 
 Only download what you have the right to use: the screen repeats this under the button.
+
+The Video Downloader is not in the computer version yet.
 
 ## Importing a project file
 

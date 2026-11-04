@@ -5,6 +5,7 @@
 <p>Settings, <strong>Crash logs</strong> shows what happened in one sentence for each crash. <strong>Copy</strong> copies it so you can send it with a bug report on <a href="https://github.com/Comett1225/AbsentMotion/issues">GitHub</a>. Nothing is sent automatically.</p>
 <h2 id="this-phone-cannot-run-the-editor">This phone cannot run the editor</h2>
 <p>AbsentMotion draws the preview and the export with the graphics chip through Vulkan 1.1 or, when the phone does not have it, through OpenGL ES 3.0. If neither starts, the app shows <strong>This phone cannot run the editor</strong> with the Android version and the graphics chip instead of closing. Your projects, settings, backups and crash logs still open. <strong>Copy details</strong> copies the facts so you can add them to a bug report on <a href="https://github.com/Comett1225/AbsentMotion/issues">GitHub</a>. See <a href="requirements.html">Requirements and versions</a>. If the editor opens but the preview or exports look wrong, choose <strong>OpenGL</strong> in <strong>Settings</strong>, <strong>Graphics</strong>.</p>
+<p>If AbsentMotion closes by itself while the graphics are starting, it remembers this. With <strong>Graphics</strong> on <strong>Automatic</strong>, the next start uses the other one, for example OpenGL instead of Vulkan, so the app opens again. This is kept for this version of the app on this phone.</p>
 <h2 id="missing-media">Missing media</h2>
 <p>A layer is empty, or export says <strong>Media Missing</strong>: a photo, video or audio file the project used is no longer on the phone.</p>
 <ul><li>Select the layer, open <strong>Media Info</strong> in the layer menu and tap <strong>Swap media file</strong> to pick the file again.</li><li>Use <strong>Collect media into project</strong> in the project card's menu while the files are still there, so the project keeps its own copies.</li><li>Keep <strong>Keep a copy of imported media in the project</strong> switched on in Settings.</li></ul>
@@ -19,12 +20,12 @@
 <h2 id="the-text-uses-the-wrong-font">The text uses the wrong font</h2>
 <p>The project uses a font that is not on this phone. Open the project and tap <strong>Download</strong> in <strong>Fonts not on this phone</strong>. Fonts need an internet connection once.</p>
 <h2 id="questions">Questions</h2>
-<p><strong>Is it really free?</strong> Yes. There is no subscription, no account, no watermark and no advertising. It is open source under the Apache License 2.0.</p>
+<p><strong>Is it really free?</strong> Yes. There is no subscription, no account, no watermark and no advertising. It is open source under the GNU General Public License v3.0.</p>
 <p><strong>Does it need the internet?</strong> No. Only optional things use it: downloading a Google Font, downloading the caption model once, and the optional update check. See <a href="privacy.html">Privacy</a>.</p>
 <p><strong>Where are my projects?</strong> In the app's private storage, with every media file you added. Back them up from Settings. Exports are in Movies, Pictures, Music and Documents under AbsentMotion.</p>
 <p><strong>Can I move a project to another phone?</strong> Yes: export a <strong>Project Bundle</strong>, copy the <code>.absproj</code> file to the other phone and open it there.</p>
 <p><strong>Can I open projects from other editors?</strong> Some. See <a href="projects.html">Projects, backup and import</a>.</p>
-<p><strong>Is there a computer version?</strong> No. AbsentMotion is made for Android phones.</p>
+<p><strong>Is there a computer version?</strong> Yes, from version 5.0, for Mac computers first. The phone app still comes first. See <a href="requirements.html#absentmotion-on-your-computer">AbsentMotion on your computer</a>.</p>
 <p><strong>Which languages are there?</strong> English, Indonesian, Hindi, Portuguese (Brazil), Spanish (Latin America), Spanish (Spain), Filipino, Vietnamese, Thai, Malay, Arabic, Persian, Urdu, Turkish, Russian, Bengali and Japanese. Change it in Settings.</p>
 <p><strong>How do I report a problem or ask for a feature?</strong> Open an issue on <a href="https://github.com/Comett1225/AbsentMotion/issues">GitHub</a>. Please do not include private information in it.</p>
 <p><strong>Where is the source code?</strong> On the <a href="https://github.com/Comett1225/AbsentMotion">project page on GitHub</a>.</p><nav class="pager" aria-label="Next and previous page"><a rel="prev" href="projects.html">&larr; Projects, backup and import</a><a rel="next" href="privacy.html">Privacy and license &rarr;</a></nav></main></div></body></html>

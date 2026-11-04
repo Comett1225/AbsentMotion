@@ -20,6 +20,8 @@ Settings, **Crash logs** shows what happened in one sentence for each crash. **C
 
 AbsentMotion draws the preview and the export with the graphics chip through Vulkan 1.1 or, when the phone does not have it, through OpenGL ES 3.0. If neither starts, the app shows **This phone cannot run the editor** with the Android version and the graphics chip instead of closing. Your projects, settings, backups and crash logs still open. **Copy details** copies the facts so you can add them to a bug report on [GitHub](@issues). See [Requirements and versions](@requirements). If the editor opens but the preview or exports look wrong, choose **OpenGL** in **Settings**, **Graphics**.
 
+If AbsentMotion closes by itself while the graphics are starting, it remembers this. With **Graphics** on **Automatic**, the next start uses the other one, for example OpenGL instead of Vulkan, so the app opens again. This is kept for this version of the app on this phone.
+
 ## Missing media
 
 A layer is empty, or export says **Media Missing**: a photo, video or audio file the project used is no longer on the phone.
@@ -67,7 +69,7 @@ The project uses a font that is not on this phone. Open the project and tap **Do
 
 ## Questions
 
-**Is it really free?** Yes. There is no subscription, no account, no watermark and no advertising. It is open source under the Apache License 2.0.
+**Is it really free?** Yes. There is no subscription, no account, no watermark and no advertising. It is open source under the GNU General Public License v3.0.
 
 **Does it need the internet?** No. Only optional things use it: downloading a Google Font, downloading the caption model once, and the optional update check. See [Privacy](@privacy).
 
@@ -77,7 +79,7 @@ The project uses a font that is not on this phone. Open the project and tap **Do
 
 **Can I open projects from other editors?** Some. See [Projects, backup and import](@projects).
 
-**Is there a computer version?** No. AbsentMotion is made for Android phones.
+**Is there a computer version?** Yes, from version 5.0, for Mac computers first. The phone app still comes first. See [AbsentMotion on your computer](@requirements#absentmotion-on-your-computer).
 
 **Which languages are there?** English, Indonesian, Hindi, Portuguese (Brazil), Spanish (Latin America), Spanish (Spain), Filipino, Vietnamese, Thai, Malay, Arabic, Persian, Urdu, Turkish, Russian, Bengali and Japanese. Change it in Settings.
 

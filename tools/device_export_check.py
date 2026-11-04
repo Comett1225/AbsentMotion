@@ -87,8 +87,6 @@ def main():
         if 'AMDevice: failed' in log or time.monotonic() >= deadline:
             sys.exit('runtime device checks failed: ' + log[-2000:])
         time.sleep(0.3)
-    if '--play' in sys.argv and any('input EXIF ' + str(tag) not in log for tag in [2, 5]):
-        sys.exit('the play-flavour background-removal checks did not run')
     print(log.strip(), flush=True)
 
 

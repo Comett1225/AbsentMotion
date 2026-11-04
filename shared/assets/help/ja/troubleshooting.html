@@ -5,6 +5,7 @@
 <p>設定の<strong>クラッシュログ</strong>には、クラッシュごとに何が起きたかが1文で表示されます。<strong>コピー</strong>でコピーできるので、<a href="https://github.com/Comett1225/AbsentMotion/issues">GitHub</a>の不具合報告に添えて送れます。自動で送信されることはありません。</p>
 <h2 id="this-phone-cannot-run-the-editor">この端末ではエディターを実行できません</h2>
 <p>AbsentMotionは、グラフィックスチップを使ってVulkan 1.1でプレビューと書き出しを描画します。Vulkan 1.1がない端末ではOpenGL ES 3.0を使います。どちらも起動しない場合、アプリは終了せずに、Androidのバージョンとグラフィックスチップを添えて<strong>この端末ではエディターを実行できません</strong>と表示します。プロジェクト、設定、バックアップ、クラッシュログは引き続き開けます。<strong>詳細をコピー</strong>で情報をコピーできるので、<a href="https://github.com/Comett1225/AbsentMotion/issues">GitHub</a>の不具合報告に追加できます。<a href="requirements.html">動作要件とバージョン</a>を参照してください。エディターは開くのにプレビューや書き出しがおかしい場合は、<strong>設定</strong>の<strong>グラフィックス</strong>で<strong>OpenGL</strong>を選んでください。</p>
+<p>グラフィックスの起動中にAbsentMotionが勝手に終了した場合、そのことが記憶されます。<strong>グラフィックス</strong>が<strong>自動</strong>になっていると、次回の起動ではもう一方が使われます。たとえばVulkanの代わりにOpenGLが使われるので、アプリがまた開けるようになります。この記録は、このスマートフォンでのこのバージョンのアプリに対して保持されます。</p>
 <h2 id="missing-media">メディアが見つかりません</h2>
 <p>レイヤーが空になっている、または書き出し時に<strong>メディアが見つかりません</strong>と表示される場合、プロジェクトで使っていた写真、動画、音声ファイルが端末上にありません。</p>
 <ul><li>レイヤーを選択し、レイヤーメニューの<strong>メディア情報</strong>を開いて<strong>メディアファイルを差し替え</strong>をタップし、ファイルを選び直します。</li><li>ファイルがまだあるうちに、プロジェクトカードのメニューで<strong>メディアをプロジェクトにまとめる</strong>を使うと、プロジェクトが独自のコピーを保持します。</li><li>設定で<strong>読み込んだメディアのコピーをプロジェクトに保存</strong>をオンにしておきます。</li></ul>
@@ -19,12 +20,12 @@
 <h2 id="the-text-uses-the-wrong-font">テキストのフォントが正しくない</h2>
 <p>プロジェクトで、この端末にないフォントを使っています。プロジェクトを開き、<strong>この端末にないフォント</strong>で<strong>ダウンロード</strong>をタップしてください。フォントのダウンロードには一度だけインターネット接続が必要です。</p>
 <h2 id="questions">よくある質問</h2>
-<p><strong>本当に無料ですか？</strong> はい。サブスクリプション、アカウント、ウォーターマーク、広告はありません。Apache License 2.0のオープンソースです。</p>
+<p><strong>本当に無料ですか？</strong> はい。サブスクリプション、アカウント、ウォーターマーク、広告はありません。GNU General Public License v3.0のオープンソースです。</p>
 <p><strong>インターネットは必要ですか？</strong> いいえ。使うのは任意の機能だけです：Google Fontのダウンロード、キャプションモデルの一度だけのダウンロード、任意のアップデート確認です。<a href="privacy.html">プライバシー</a>を参照してください。</p>
 <p><strong>プロジェクトはどこにありますか？</strong> アプリのプライベートストレージ内に、追加したすべてのメディアファイルと一緒にあります。設定からバックアップできます。書き出したファイルは、Movies、Pictures、Music、DocumentsのAbsentMotionフォルダーにあります。</p>
 <p><strong>プロジェクトを別の端末に移動できますか？</strong> はい。<strong>プロジェクトバンドル</strong>を書き出し、<code>.absproj</code>ファイルを別の端末にコピーして、そこで開きます。</p>
 <p><strong>他のエディターのプロジェクトを開けますか？</strong> 一部は開けます。<a href="projects.html">プロジェクト、バックアップ、インポート</a>を参照してください。</p>
-<p><strong>パソコン版はありますか？</strong> いいえ。AbsentMotionはAndroidスマートフォン向けです。</p>
+<p><strong>パソコン版はありますか？</strong> はい、バージョン5.0から、まずMacパソコン向けにあります。優先されるのは、今もスマートフォン版です。<a href="requirements.html#absentmotion-on-your-computer">パソコンでのAbsentMotion</a>をご覧ください。</p>
 <p><strong>対応言語は？</strong> 英語、インドネシア語、ヒンディー語、ポルトガル語（ブラジル）、スペイン語（中南米）、スペイン語（スペイン）、フィリピン語、ベトナム語、タイ語、マレー語、アラビア語、ペルシア語、ウルドゥー語、トルコ語、ロシア語、ベンガル語、日本語です。設定で変更できます。</p>
 <p><strong>問題を報告したり、機能をリクエストしたりするには？</strong> <a href="https://github.com/Comett1225/AbsentMotion/issues">GitHub</a>でIssueを開いてください。個人情報は含めないでください。</p>
 <p><strong>ソースコードはどこにありますか？</strong> <a href="https://github.com/Comett1225/AbsentMotion">GitHubのプロジェクトページ</a>にあります。</p><nav class="pager" aria-label="前後のページ"><a rel="prev" href="projects.html">&larr; プロジェクト・バックアップ・読み込み</a><a rel="next" href="privacy.html">プライバシーとライセンス &rarr;</a></nav></main></div></body></html>

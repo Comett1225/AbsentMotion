@@ -27,11 +27,7 @@ The app asks for the internet permission for these things only:
 - **Video Downloader.** Only if you use Tools > Video Downloader: the first time, the app downloads its add-on (about 25 MB): Python from `python.org` and yt-dlp from GitHub (`github.com`, served from `objects.githubusercontent.com` or `release-assets.githubusercontent.com`). While the add-on is installed, it asks GitHub at most once a day whether there is a newer yt-dlp and downloads it if there is. When you paste a link, the add-on contacts that website (for example YouTube, Instagram or TikTok) to read the video's details and download the parts you choose, the same as a web browser would; the files are saved on the device.
 - **Update check.** If you allow it (the app asks once; the switch is in Settings), the app makes one normal HTTPS request to GitHub each time it opens, to read the latest version number. Nothing else is sent. GitHub sees your IP address, as for any web request.
 
-Apart from the Play-services build described below, nothing else is sent anywhere. Text to speech uses the voices already on the phone and works offline.
-
-## The Play-services build
-
-The build with Google Play services (`-play.apk`) removes backgrounds with Google ML Kit. The removal itself runs on the phone, but Google Play services downloads the model when it is first needed and may send diagnostics to Google, such as device information, performance figures and error codes, under Google's own policy. The standard build (`-foss.apk`) has no Google libraries: its own offline model is part of the app, so nothing is downloaded or sent for background removal.
+Nothing else is sent anywhere. Text to speech uses the voices already on the phone and works offline.
 
 ## Children
 
@@ -39,7 +35,7 @@ The app is not directed at children and collects nothing from anyone.
 
 ## License and source
 
-AbsentMotion is free and open source, released under the [Apache License 2.0](@license-file). Its source code is on the [project page on GitHub](@repo). The third-party software it uses (Skia, whisper.cpp, RNNoise, LAME, AndroidX Compose and others) and their licenses are listed in [THIRD_PARTY_NOTICES.md](@notices-file) and in the app: Settings, About, **Open source licenses**.
+AbsentMotion is free and open source, released under the [GNU General Public License v3.0](@license-file). Its source code is on the [project page on GitHub](@repo). The third-party software it uses (Skia, whisper.cpp, RNNoise, LAME, AndroidX Compose and others) and their licenses are listed in [THIRD_PARTY_NOTICES.md](@notices-file) and in the app: Settings, About, **Open source licenses**.
 
 AbsentMotion is an independent project. It is not affiliated with, endorsed by or sponsored by any other app maker; names of other products belong to their owners.
 

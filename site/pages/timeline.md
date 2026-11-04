@@ -10,7 +10,7 @@ The timeline is the area under the play bar. Each layer is a row with a bar show
 
 - The **playhead** is a fixed vertical line in the middle. The content scrolls underneath it. The time pill on the ruler shows minutes, seconds and frames.
 - **Ruler.** Tall ticks mark each second and shorter ones the half seconds and frames, depending on how far you have zoomed in.
-- **Rows.** One row per layer, with the front layer on top. At the left, the eye shows or hides the layer (a hidden layer is not drawn and its sound is silent) and a tiny picture identifies it.
+- **Rows.** One row per layer, with the front layer on top. Inside an open group (see **Edit Group** in [Shapes, drawing and masks](@shapes)) only the layers of that group are listed. At the left, the eye shows or hides the layer (a hidden layer is not drawn and its sound is silent) and a tiny picture identifies it.
 - **Bar colors.** Ordinary layers are teal with diagonal stripes, text layers are amber, camera layers are crimson and audio layers are violet with a waveform. Photos and videos show a strip of pictures. The layer name is written on the bar.
 - **Label colors.** The layer menu can mark a layer with one of eleven label colors, shown as a small colored corner on the bar.
 - **Keyframe diamonds.** Small diamonds on a bar are keyframes. They are bigger on the selected layer. While a property or effect is open, only its keyframes show. See [Keyframes and easing](@keyframes).
@@ -27,7 +27,7 @@ The timeline is the area under the play bar. Each layer is a row with a bar show
 | Move the playhead | Drag left or right anywhere. The movement continues for a moment when you let go and ends on a whole frame. |
 | Scroll the layers | Drag up or down. |
 | Zoom the timeline | Pinch with two fingers. |
-| Trim a layer | Select it, then drag the round grip at the end you want to move. |
+| Trim a layer | Select it, then drag the round grip at the end you want to move. With several clips selected, dragging one grip moves that end of all of them. |
 | Move a layer in time | Press and hold its bar until it lifts, then drag. |
 | Change the layer order | Press and hold the empty part of a row (not the bar), then drag up or down. You can also drag the three lines at the right end of an unselected row. |
 | Move a keyframe | Press and hold its diamond on the selected layer, then drag sideways. |
@@ -44,7 +44,7 @@ Trims, clip moves and keyframe moves snap to the playhead, bookmarks, the start 
 
 ## Bookmarks
 
-Tap the time pill on the ruler to add a bookmark at the current frame. It shows as a pink flag. Tap the pill again at the same spot to remove it. Bookmarks work as stops for the skip buttons and as snap points. **Mark Beats** in the layer menu adds bookmarks on the beats of a song: see [Audio](@audio).
+Tap the time pill on the ruler to add a bookmark at the current frame. It shows as a pink flag. Tap the pill again at the same spot to remove it. Bookmarks work as stops for the skip buttons and as snap points. **Mark Beats** (a tile of an audio layer, and an entry in the layer menu) adds bookmarks on the beats of a song: see [Audio](@audio).
 
 ## The tools under a selected layer
 

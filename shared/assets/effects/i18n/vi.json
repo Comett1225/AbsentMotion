@@ -10,11 +10,74 @@
   "move": "Di chuyển",
   "new": "Mới",
   "noise": "Nhiễu",
+  "other": "Khác",
   "repeat": "Lặp lại",
   "stylize": "Cách điệu",
   "text": "Văn bản"
  },
  "effects": {
+  "ascii": {
+   "description": "Biến lớp thành tranh chữ làm từ chữ cái và ký hiệu: phần càng sáng thì ký tự càng đậm đặc. Kích thước đặt độ rộng của mỗi ký tự trên lớp, nên các ký tự di chuyển, xoay và đổi tỷ lệ cùng lớp. Màu giữ nguyên màu gốc của ảnh hoặc dùng một màu duy nhất, còn Đường cạnh vẽ đường viền bằng các ký tự | - / và \\.",
+   "name": "ASCII",
+   "params": {
+    "background": {
+     "label": "Màu nền"
+    },
+    "backgroundMode": {
+     "label": "Nền",
+     "options": [
+      "Không có",
+      "Màu"
+     ]
+    },
+    "brightness": {
+     "label": "Độ sáng"
+    },
+    "cell": {
+     "label": "Kích thước"
+    },
+    "characters": {
+     "label": "Tùy chỉnh"
+    },
+    "charset": {
+     "label": "Ký tự",
+     "options": [
+      "Chi tiết",
+      "Đơn giản",
+      "Khối",
+      "Nhị phân",
+      "Tùy chỉnh"
+     ]
+    },
+    "colorMode": {
+     "label": "Màu",
+     "options": [
+      "Gốc",
+      "Một màu"
+     ]
+    },
+    "contrast": {
+     "label": "Độ tương phản"
+    },
+    "edges": {
+     "label": "Đường cạnh"
+    },
+    "invert": {
+     "label": "Đảo ngược"
+    },
+    "textColor": {
+     "label": "Màu chữ"
+    }
+   },
+   "presets": {
+    "amber-monitor": "Màn hình hổ phách",
+    "binary-rain": "Mưa nhị phân",
+    "blocks": "Khối",
+    "line-art": "Tranh nét",
+    "newspaper": "Báo giấy",
+    "terminal": "Terminal"
+   }
+  },
   "autoshake": {
    "description": "Di chuyển lớp ngẫu nhiên theo thời gian trong giới hạn đã đặt.",
    "name": "Tự rung",
@@ -50,8 +113,8 @@
    }
   },
   "backdrop": {
-   "description": "Sao chép nội dung được vẽ bên dưới lớp để các hiệu ứng sau có thể thay đổi nó; Mặt nạ vào lớp giới hạn bản sao trong phần mờ đục của lớp, Trộn đưa phần tô của lớp trở lại, còn Hiệu ứng lan ra ngoài cho phép các hiệu ứng sau như Giãn kéo bản sao vượt qua rìa lớp.",
-   "name": "Lớp điều chỉnh",
+   "description": "Là lớp điều chỉnh: sao chép những gì được vẽ bên dưới lớp để các hiệu ứng đặt sau nó thay đổi bản sao đó. Mặt nạ theo lớp giới hạn bản sao trong phần mờ đục của lớp. Trộn đưa phần tô của lớp trở lại. Hiệu ứng lan ra ngoài cho phép các hiệu ứng đặt sau, như Kéo giãn đoạn, đưa bản sao vượt qua rìa lớp.",
+   "name": "Sao chép nền",
    "params": {
     "mask": {
      "label": "Mặt nạ theo lớp"
@@ -1819,6 +1882,15 @@
     }
    }
   },
+  "fontweight": {
+   "description": "Đặt độ dày của chữ, từ mảnh đến đậm, và có thể tạo chuyển động bằng keyframe. Dùng được với phông chữ biến thiên, loại chứa mọi độ đậm trong một tệp: Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display và Dancing Script trong danh sách phông chữ, hoặc một phông chữ biến thiên do bạn nhập vào. Phông chữ có độ đậm cố định vẫn giữ nguyên diện mạo của chúng.",
+   "name": "Độ đậm phông chữ",
+   "params": {
+    "weight": {
+     "label": "Độ đậm"
+    }
+   }
+  },
   "fourcolor": {
    "description": "Hòa trộn bốn màu đặt tại bốn điểm (tính bằng pixel từ tâm lớp) lên lớp.",
    "name": "Chuyển màu bốn màu",
@@ -2220,6 +2292,9 @@
    "description": "Tự động tạo nhiều bản sao của lớp và sắp xếp thành dạng lưới.",
    "name": "Lặp lưới",
    "params": {
+    "copyDelay": {
+     "label": "Độ trễ mỗi bản sao"
+    },
     "count": {
      "label": "Số lượng"
     },
@@ -2241,8 +2316,20 @@
     "position": {
      "label": "Vị trí"
     },
+    "randomOpacity": {
+     "label": "Độ mờ ngẫu nhiên"
+    },
     "randomOrder": {
      "label": "Thứ tự ngẫu nhiên"
+    },
+    "randomPosition": {
+     "label": "Vị trí ngẫu nhiên"
+    },
+    "randomRotation": {
+     "label": "Xoay ngẫu nhiên"
+    },
+    "randomScale": {
+     "label": "Tỷ lệ ngẫu nhiên"
     },
     "rangeEnd": {
      "label": "Kết thúc dải"
@@ -2871,6 +2958,9 @@
    "description": "Tự động tạo nhiều bản sao của lớp, xếp dọc theo một đường thẳng.",
    "name": "Lặp tuyến tính",
    "params": {
+    "copyDelay": {
+     "label": "Độ trễ mỗi bản sao"
+    },
     "count": {
      "label": "Số lượng"
     },
@@ -2892,8 +2982,20 @@
     "position": {
      "label": "Vị trí"
     },
+    "randomOpacity": {
+     "label": "Độ mờ ngẫu nhiên"
+    },
     "randomOrder": {
      "label": "Thứ tự ngẫu nhiên"
+    },
+    "randomPosition": {
+     "label": "Vị trí ngẫu nhiên"
+    },
+    "randomRotation": {
+     "label": "Xoay ngẫu nhiên"
+    },
+    "randomScale": {
+     "label": "Tỷ lệ ngẫu nhiên"
     },
     "rangeEnd": {
      "label": "Kết thúc dải"
@@ -3500,6 +3602,45 @@
     }
    }
   },
+  "parenthelper": {
+   "description": "Thay đổi cách lớp con đi theo lớp cha: tỷ lệ và độ xoay có thể đi theo hoàn toàn, bị khóa hoặc đi theo một mức đã đặt. Tự xoay làm lớp xoay khi di chuyển, như bánh xe đang lăn.",
+   "name": "Hỗ trợ lớp cha",
+   "params": {
+    "autoRotate": {
+     "label": "Tự xoay",
+     "options": [
+      "Tắt",
+      "Trục X",
+      "Trục Y"
+     ]
+    },
+    "radiusAdjust": {
+     "label": "Điều chỉnh bán kính"
+    },
+    "rotateMode": {
+     "label": "Xoay",
+     "options": [
+      "Bình thường",
+      "Khóa",
+      "Theo trọng số"
+     ]
+    },
+    "rotateWeight": {
+     "label": "Trọng số xoay"
+    },
+    "scaleMode": {
+     "label": "Tỷ lệ",
+     "options": [
+      "Bình thường",
+      "Khóa",
+      "Theo trọng số"
+     ]
+    },
+    "scaleWeight": {
+     "label": "Trọng số tỷ lệ"
+    }
+   }
+  },
   "particles": {
    "description": "Bắn các hạt bay ra khỏi lớp: tuyết, tia lửa, pháo giấy, bong bóng, bụi, trái tim, ngôi sao, cánh hoa hoặc bản sao nhỏ của chính lớp, chịu tác động của trọng lực, gió và xoáy. Bắt đầu từ preset, rồi thay đổi bộ phát, số lượng và các lực. Chế độ Theo nhịp sẽ bắn một loạt ở mỗi nhịp: chọn nhạc của bạn, mở menu của nhạc và nhấn Đánh dấu nhịp trước.",
    "name": "Hạt",
@@ -3940,8 +4081,43 @@
    "description": "Uốn lớp như một con rối: đặt ghim lên lớp, rồi kéo hoặc tạo hoạt ảnh cho ghim và hình ảnh sẽ đi theo một cách mượt mà.",
    "name": "Ghim rối",
    "params": {
+    "density": {
+     "label": "Mật độ tam giác"
+    },
+    "expansion": {
+     "label": "Mở rộng lưới"
+    },
     "falloff": {
      "label": "Độ suy giảm"
+    },
+    "sway": {
+     "label": "Đung đưa"
+    },
+    "swayAmount": {
+     "label": "Mức đung đưa"
+    },
+    "swayAngle": {
+     "label": "Góc đung đưa"
+    },
+    "swayDirection": {
+     "label": "Hướng đung đưa",
+     "options": [
+      "Góc",
+      "Ngẫu nhiên"
+     ]
+    },
+    "swayPins": {
+     "label": "Ghim đung đưa",
+     "options": [
+      "Tất cả",
+      "Đã chọn"
+     ]
+    },
+    "swaySeed": {
+     "label": "Hạt giống đung đưa"
+    },
+    "swaySpeed": {
+     "label": "Tốc độ đung đưa"
     }
    }
   },
@@ -4027,6 +4203,9 @@
     "angle": {
      "label": "Góc"
     },
+    "copyDelay": {
+     "label": "Độ trễ mỗi bản sao"
+    },
     "count": {
      "label": "Số lượng"
     },
@@ -4051,8 +4230,20 @@
     "radius": {
      "label": "Bán kính"
     },
+    "randomOpacity": {
+     "label": "Độ mờ ngẫu nhiên"
+    },
     "randomOrder": {
      "label": "Thứ tự ngẫu nhiên"
+    },
+    "randomPosition": {
+     "label": "Vị trí ngẫu nhiên"
+    },
+    "randomRotation": {
+     "label": "Xoay ngẫu nhiên"
+    },
+    "randomScale": {
+     "label": "Tỷ lệ ngẫu nhiên"
     },
     "rangeEnd": {
      "label": "Kết thúc dải"
@@ -4328,6 +4519,9 @@
    "description": "Tự động tạo nhiều bản sao của lớp dọc theo đường viền của lớp ngay bên dưới.",
    "name": "Lặp dọc theo đường dẫn",
    "params": {
+    "copyDelay": {
+     "label": "Độ trễ mỗi bản sao"
+    },
     "count": {
      "label": "Số lượng"
     },
@@ -4352,8 +4546,20 @@
     "phase": {
      "label": "Pha"
     },
+    "randomOpacity": {
+     "label": "Độ mờ ngẫu nhiên"
+    },
     "randomOrder": {
      "label": "Thứ tự ngẫu nhiên"
+    },
+    "randomPosition": {
+     "label": "Vị trí ngẫu nhiên"
+    },
+    "randomRotation": {
+     "label": "Xoay ngẫu nhiên"
+    },
+    "randomScale": {
+     "label": "Tỷ lệ ngẫu nhiên"
     },
     "rangeEnd": {
      "label": "Kết thúc phạm vi"
@@ -4567,6 +4773,27 @@
     },
     "seed": {
      "label": "Hạt giống"
+    }
+   }
+  },
+  "scaleassist": {
+   "description": "Thêm tỷ lệ phụ lên kích thước riêng của lớp theo X, Y, cả hai, hoặc X cùng Y ngược chiều. Các lớp con gắn với nó sẽ đi theo kích thước mới.",
+   "name": "Hỗ trợ tỷ lệ",
+   "params": {
+    "axis": {
+     "label": "Trục",
+     "options": [
+      "X",
+      "Y",
+      "X,Y",
+      "X,-Y"
+     ]
+    },
+    "damp": {
+     "label": "Giảm chấn"
+    },
+    "scale": {
+     "label": "Tỷ lệ"
     }
    }
   },
@@ -5425,6 +5652,59 @@
     }
    }
   },
+  "textblips": {
+   "description": "Gõ văn bản ra từng chữ một kèm tiếng bíp ngắn cho mỗi chữ, như nhân vật đang nói trong game. Chọn Giọng, rồi đặt Cao độ, tốc độ gõ chữ và thời gian dừng sau dấu câu. Dấu cách và dấu câu không phát tiếng.",
+   "name": "Tiếng bíp chữ",
+   "params": {
+    "delay": {
+     "label": "Độ trễ"
+    },
+    "every": {
+     "label": "Bíp mỗi"
+    },
+    "pause": {
+     "label": "Dừng ở dấu câu"
+    },
+    "pitch": {
+     "label": "Cao độ"
+    },
+    "reveal": {
+     "label": "Gõ ra từng chữ"
+    },
+    "seed": {
+     "label": "Hạt giống"
+    },
+    "speed": {
+     "label": "Tốc độ"
+    },
+    "variation": {
+     "label": "Biến thiên cao độ"
+    },
+    "voice": {
+     "label": "Giọng",
+     "options": [
+      "Cổ điển",
+      "Mềm",
+      "Trầm",
+      "Cao",
+      "Robot",
+      "Chít chít",
+      "Máy đánh chữ",
+      "Chiptune"
+     ]
+    },
+    "volume": {
+     "label": "Âm lượng"
+    }
+   },
+   "presets": {
+    "fast-talker": "Nói nhanh",
+    "hero": "Hero",
+    "monster": "Quái vật",
+    "robot": "Robot",
+    "typewriter": "Máy đánh chữ"
+   }
+  },
   "textpath": {
    "description": "Đặt chữ dọc theo một cung, một đường tròn hoặc đường viền của lớp ngay bên dưới, từng chữ một, vẫn giữ nguyên hình dạng chữ, phông chữ và emoji của văn bản.",
    "name": "Chữ theo đường",
@@ -5590,6 +5870,72 @@
    },
    "presets": {
     "scramble": "Xáo trộn"
+   }
+  },
+  "textshake": {
+   "description": "Làm từng chữ rung riêng, như lời thoại hồi hộp trong game. Rung trôi nhẹ giữa các vị trí, Giật nhảy sang vị trí mới ở mỗi bước, Sóng nhấp nhô các chữ lên xuống, Vòng tròn di chuyển chúng theo vòng nhỏ và Lắc lư nghiêng chúng qua lại. Giảm Số chữ rung để chỉ rung một số chữ, được chọn ngẫu nhiên lại sau mỗi khoảng ngắn.",
+   "name": "Rung chữ",
+   "params": {
+    "amount": {
+     "label": "Mức"
+    },
+    "cycles": {
+     "label": "Tốc độ"
+    },
+    "end": {
+     "label": "Kết thúc"
+    },
+    "every": {
+     "label": "Chọn chữ mới sau mỗi"
+    },
+    "letters": {
+     "label": "Số chữ rung"
+    },
+    "rotation": {
+     "label": "Xoay"
+    },
+    "seed": {
+     "label": "Hạt giống"
+    },
+    "speed": {
+     "label": "Tốc độ"
+    },
+    "spread": {
+     "label": "Độ lan"
+    },
+    "start": {
+     "label": "Bắt đầu"
+    },
+    "style": {
+     "label": "Kiểu",
+     "options": [
+      "Rung",
+      "Giật",
+      "Sóng",
+      "Vòng tròn",
+      "Lắc lư"
+     ]
+    },
+    "tilt": {
+     "label": "Nghiêng"
+    },
+    "unit": {
+     "label": "Dựa trên",
+     "options": [
+      "Ký tự",
+      "Từ",
+      "Dòng"
+     ]
+    }
+   },
+   "presets": {
+    "dizzy": "Chóng mặt",
+    "floaty": "Lơ lửng",
+    "nervous": "Hồi hộp",
+    "scared": "Sợ hãi",
+    "uneasy": "Bất an",
+    "wavy": "Lượn sóng",
+    "wobbly": "Lảo đảo"
    }
   },
   "texttransform": {

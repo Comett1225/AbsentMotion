@@ -10,11 +10,74 @@
   "move": "Movimento",
   "new": "Novos",
   "noise": "Ruído",
+  "other": "Outros",
   "repeat": "Repetição",
   "stylize": "Estilizar",
   "text": "Texto"
  },
  "effects": {
+  "ascii": {
+   "description": "Transforma a camada em arte de texto feita de letras e símbolos: as partes mais claras recebem caracteres mais densos. Tamanho define a largura de cada caractere na camada, então os caracteres se movem, giram e mudam de escala junto com ela. Cor mantém as cores originais da imagem ou usa uma só, e Linhas de borda desenha contornos com os caracteres | - / e \\.",
+   "name": "ASCII",
+   "params": {
+    "background": {
+     "label": "Cor do fundo"
+    },
+    "backgroundMode": {
+     "label": "Fundo",
+     "options": [
+      "Nenhum",
+      "Cor"
+     ]
+    },
+    "brightness": {
+     "label": "Brilho"
+    },
+    "cell": {
+     "label": "Tamanho"
+    },
+    "characters": {
+     "label": "Personalizado"
+    },
+    "charset": {
+     "label": "Caracteres",
+     "options": [
+      "Detalhado",
+      "Simples",
+      "Blocos",
+      "Binário",
+      "Personalizado"
+     ]
+    },
+    "colorMode": {
+     "label": "Cor",
+     "options": [
+      "Original",
+      "Cor única"
+     ]
+    },
+    "contrast": {
+     "label": "Contraste"
+    },
+    "edges": {
+     "label": "Linhas de borda"
+    },
+    "invert": {
+     "label": "Inverter"
+    },
+    "textColor": {
+     "label": "Cor do texto"
+    }
+   },
+   "presets": {
+    "amber-monitor": "Monitor âmbar",
+    "binary-rain": "Chuva binária",
+    "blocks": "Blocos",
+    "line-art": "Arte de linhas",
+    "newspaper": "Jornal",
+    "terminal": "Terminal"
+   }
+  },
   "autoshake": {
    "description": "Move a camada aleatoriamente ao longo do tempo dentro dos limites definidos.",
    "name": "Tremor automático",
@@ -50,8 +113,8 @@
    }
   },
   "backdrop": {
-   "description": "Copia o que é desenhado abaixo da camada para que efeitos posteriores possam alterá-lo. Máscara na camada limita a cópia às partes opacas da camada. Misturar traz de volta o preenchimento da camada. Efeitos se estendem para fora permite que efeitos seguintes, como Esticar, levem a cópia além das bordas da camada.",
-   "name": "Camada de ajuste",
+   "description": "Uma camada de ajuste: copia o que está desenhado abaixo da camada para que os efeitos seguintes alterem essa cópia. Máscara para a camada limita a cópia às partes opacas da camada. Mistura traz de volta o preenchimento da camada. Efeitos se estendem para fora permite que efeitos posteriores, como Esticar, levem a cópia além das bordas da camada.",
+   "name": "Copiar fundo",
    "params": {
     "mask": {
      "label": "Máscara para a camada"
@@ -1819,6 +1882,15 @@
     }
    }
   },
+  "fontweight": {
+   "description": "Define a espessura das letras, de fina a pesada, e pode ser animada com quadros-chave. Funciona com fontes variáveis, que guardam todos os pesos em um só arquivo: Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display e Dancing Script na lista de fontes, ou uma fonte variável que você importar. Fontes com pesos fixos mantêm o próprio visual.",
+   "name": "Peso da fonte",
+   "params": {
+    "weight": {
+     "label": "Peso"
+    }
+   }
+  },
   "fourcolor": {
    "description": "Mistura quatro cores posicionadas em quatro pontos (em pixels a partir do centro da camada) sobre a camada.",
    "name": "Gradiente de quatro cores",
@@ -2220,6 +2292,9 @@
    "description": "Gera várias cópias da camada dinamicamente, organizadas em grade.",
    "name": "Repetição em grade",
    "params": {
+    "copyDelay": {
+     "label": "Atraso por cópia"
+    },
     "count": {
      "label": "Quantidade"
     },
@@ -2241,8 +2316,20 @@
     "position": {
      "label": "Posição"
     },
+    "randomOpacity": {
+     "label": "Opacidade aleatória"
+    },
     "randomOrder": {
      "label": "Ordem aleatória"
+    },
+    "randomPosition": {
+     "label": "Posição aleatória"
+    },
+    "randomRotation": {
+     "label": "Rotação aleatória"
+    },
+    "randomScale": {
+     "label": "Escala aleatória"
     },
     "rangeEnd": {
      "label": "Fim do intervalo"
@@ -2871,6 +2958,9 @@
    "description": "Gera dinamicamente várias cópias da camada, alinhadas ao longo de uma linha.",
    "name": "Repetição linear",
    "params": {
+    "copyDelay": {
+     "label": "Atraso por cópia"
+    },
     "count": {
      "label": "Quantidade"
     },
@@ -2892,8 +2982,20 @@
     "position": {
      "label": "Posição"
     },
+    "randomOpacity": {
+     "label": "Opacidade aleatória"
+    },
     "randomOrder": {
      "label": "Ordem aleatória"
+    },
+    "randomPosition": {
+     "label": "Posição aleatória"
+    },
+    "randomRotation": {
+     "label": "Rotação aleatória"
+    },
+    "randomScale": {
+     "label": "Escala aleatória"
     },
     "rangeEnd": {
      "label": "Fim do intervalo"
@@ -3500,6 +3602,45 @@
     }
    }
   },
+  "parenthelper": {
+   "description": "Muda como uma camada filha segue sua camada pai: a escala e a rotação podem seguir totalmente, ficar bloqueadas ou seguir por uma quantidade definida. Rotação automática gira a camada enquanto ela se move, como uma roda rolando.",
+   "name": "Assistente de vínculo",
+   "params": {
+    "autoRotate": {
+     "label": "Rotação automática",
+     "options": [
+      "Desligada",
+      "Eixo X",
+      "Eixo Y"
+     ]
+    },
+    "radiusAdjust": {
+     "label": "Ajuste do raio"
+    },
+    "rotateMode": {
+     "label": "Rotação",
+     "options": [
+      "Normal",
+      "Bloqueada",
+      "Ponderada"
+     ]
+    },
+    "rotateWeight": {
+     "label": "Peso da rotação"
+    },
+    "scaleMode": {
+     "label": "Escala",
+     "options": [
+      "Normal",
+      "Bloqueada",
+      "Ponderada"
+     ]
+    },
+    "scaleWeight": {
+     "label": "Peso da escala"
+    }
+   }
+  },
   "particles": {
    "description": "Lança partículas para fora da camada: neve, faíscas, confete, bolhas, poeira, corações, estrelas, pétalas ou pequenas cópias da própria camada, movidas por gravidade, vento e turbilhão. Comece por uma predefinição e ajuste o emissor, a quantidade e as forças. Em Batidas, dispara uma rajada a cada batida: selecione sua música, abra o menu dela e toque em Marcar batidas primeiro.",
    "name": "Partículas",
@@ -3940,8 +4081,43 @@
    "description": "Dobra a camada como uma marionete: coloque pinos nela e depois arraste ou anime os pinos, e a imagem os acompanha suavemente.",
    "name": "Pino de marionete",
    "params": {
+    "density": {
+     "label": "Densidade de triângulos"
+    },
+    "expansion": {
+     "label": "Expansão da malha"
+    },
     "falloff": {
      "label": "Atenuação"
+    },
+    "sway": {
+     "label": "Balanço"
+    },
+    "swayAmount": {
+     "label": "Quantidade do balanço"
+    },
+    "swayAngle": {
+     "label": "Ângulo do balanço"
+    },
+    "swayDirection": {
+     "label": "Direção do balanço",
+     "options": [
+      "Ângulo",
+      "Aleatória"
+     ]
+    },
+    "swayPins": {
+     "label": "Pinos com balanço",
+     "options": [
+      "Todos",
+      "Selecionados"
+     ]
+    },
+    "swaySeed": {
+     "label": "Semente do balanço"
+    },
+    "swaySpeed": {
+     "label": "Velocidade do balanço"
     }
    }
   },
@@ -4027,6 +4203,9 @@
     "angle": {
      "label": "Ângulo"
     },
+    "copyDelay": {
+     "label": "Atraso por cópia"
+    },
     "count": {
      "label": "Quantidade"
     },
@@ -4051,8 +4230,20 @@
     "radius": {
      "label": "Raio"
     },
+    "randomOpacity": {
+     "label": "Opacidade aleatória"
+    },
     "randomOrder": {
      "label": "Ordem aleatória"
+    },
+    "randomPosition": {
+     "label": "Posição aleatória"
+    },
+    "randomRotation": {
+     "label": "Rotação aleatória"
+    },
+    "randomScale": {
+     "label": "Escala aleatória"
     },
     "rangeEnd": {
      "label": "Fim do intervalo"
@@ -4328,6 +4519,9 @@
    "description": "Gera dinamicamente várias cópias da camada ao longo do contorno da camada logo abaixo.",
    "name": "Repetir ao longo do caminho",
    "params": {
+    "copyDelay": {
+     "label": "Atraso por cópia"
+    },
     "count": {
      "label": "Quantidade"
     },
@@ -4352,8 +4546,20 @@
     "phase": {
      "label": "Fase"
     },
+    "randomOpacity": {
+     "label": "Opacidade aleatória"
+    },
     "randomOrder": {
      "label": "Ordem aleatória"
+    },
+    "randomPosition": {
+     "label": "Posição aleatória"
+    },
+    "randomRotation": {
+     "label": "Rotação aleatória"
+    },
+    "randomScale": {
+     "label": "Escala aleatória"
     },
     "rangeEnd": {
      "label": "Fim do intervalo"
@@ -4567,6 +4773,27 @@
     },
     "seed": {
      "label": "Semente"
+    }
+   }
+  },
+  "scaleassist": {
+   "description": "Adiciona escala extra além do tamanho da própria camada no eixo X, no Y, em ambos, ou em X com Y no sentido oposto. As camadas vinculadas a ela seguem o novo tamanho.",
+   "name": "Assistente de escala",
+   "params": {
+    "axis": {
+     "label": "Eixo",
+     "options": [
+      "X",
+      "Y",
+      "X,Y",
+      "X,-Y"
+     ]
+    },
+    "damp": {
+     "label": "Amortecimento"
+    },
+    "scale": {
+     "label": "Escala"
     }
    }
   },
@@ -5425,6 +5652,59 @@
     }
    }
   },
+  "textblips": {
+   "description": "Digita o texto letra por letra com um bipe curto para cada letra, como um personagem falando em um jogo. Escolha uma Voz e depois ajuste o Tom, a velocidade da digitação e a pausa depois da pontuação. Espaços e pontuação ficam em silêncio.",
+   "name": "Bipes de texto",
+   "params": {
+    "delay": {
+     "label": "Atraso"
+    },
+    "every": {
+     "label": "Bipe a cada"
+    },
+    "pause": {
+     "label": "Pausa na pontuação"
+    },
+    "pitch": {
+     "label": "Tom"
+    },
+    "reveal": {
+     "label": "Digitar texto"
+    },
+    "seed": {
+     "label": "Semente"
+    },
+    "speed": {
+     "label": "Velocidade"
+    },
+    "variation": {
+     "label": "Variação de tom"
+    },
+    "voice": {
+     "label": "Voz",
+     "options": [
+      "Clássica",
+      "Suave",
+      "Grave",
+      "Aguda",
+      "Robô",
+      "Chiado",
+      "Máquina de escrever",
+      "Chiptune"
+     ]
+    },
+    "volume": {
+     "label": "Volume"
+    }
+   },
+   "presets": {
+    "fast-talker": "Fala rápida",
+    "hero": "Herói",
+    "monster": "Monstro",
+    "robot": "Robô",
+    "typewriter": "Máquina de escrever"
+   }
+  },
   "textpath": {
    "description": "Coloca o texto ao longo de um arco, de um círculo ou do contorno da camada logo abaixo, letra por letra, mantendo a forma das letras, as fontes e os emojis do texto.",
    "name": "Texto ao longo do caminho",
@@ -5590,6 +5870,72 @@
    },
    "presets": {
     "scramble": "Embaralhar"
+   }
+  },
+  "textshake": {
+   "description": "Sacode cada letra por conta própria, como um diálogo nervoso em um jogo. Tremor desliza entre posições, Vibração salta para uma nova posição a cada passo, Onda balança as letras para cima e para baixo, Círculo as move em pequenos laços e Oscilar as inclina de um lado para o outro. Diminua Letras tremendo para sacudir só algumas letras, escolhidas ao acaso de novo a cada poucos instantes.",
+   "name": "Tremor de texto",
+   "params": {
+    "amount": {
+     "label": "Quantidade"
+    },
+    "cycles": {
+     "label": "Velocidade"
+    },
+    "end": {
+     "label": "Fim"
+    },
+    "every": {
+     "label": "Novas letras a cada"
+    },
+    "letters": {
+     "label": "Letras tremendo"
+    },
+    "rotation": {
+     "label": "Rotação"
+    },
+    "seed": {
+     "label": "Semente"
+    },
+    "speed": {
+     "label": "Velocidade"
+    },
+    "spread": {
+     "label": "Dispersão"
+    },
+    "start": {
+     "label": "Início"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Tremor",
+      "Vibração",
+      "Onda",
+      "Círculo",
+      "Oscilar"
+     ]
+    },
+    "tilt": {
+     "label": "Inclinação"
+    },
+    "unit": {
+     "label": "Baseado em",
+     "options": [
+      "Caractere",
+      "Palavra",
+      "Linha"
+     ]
+    }
+   },
+   "presets": {
+    "dizzy": "Tonto",
+    "floaty": "Flutuante",
+    "nervous": "Nervoso",
+    "scared": "Assustado",
+    "uneasy": "Inquieto",
+    "wavy": "Ondulado",
+    "wobbly": "Bambo"
    }
   },
   "texttransform": {

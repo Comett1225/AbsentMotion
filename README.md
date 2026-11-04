@@ -7,7 +7,7 @@
 <p align="center">
   <a href="https://github.com/Comett1225/AbsentMotion/releases/latest"><img alt="Latest version" src="https://img.shields.io/github/v/release/Comett1225/AbsentMotion?label=latest%20version&style=for-the-badge&color=f07850"></a>
   <a href="https://github.com/Comett1225/AbsentMotion/releases"><img alt="Downloads" src="https://img.shields.io/github/downloads/Comett1225/AbsentMotion/total?label=downloads&style=for-the-badge&color=2b2b33"></a>
-  <a href="LICENSE"><img alt="Licence: Apache 2.0" src="https://img.shields.io/badge/licence-Apache%202.0-2b2b33?style=for-the-badge"></a>
+  <a href="LICENSE"><img alt="Licence: GPL-3.0" src="https://img.shields.io/badge/licence-GPL--3.0-2b2b33?style=for-the-badge"></a>
   <a href="#requirements"><img alt="Android 8 and newer" src="https://img.shields.io/badge/Android-8%2B-3DDC84?style=for-the-badge&logo=android&logoColor=white"></a>
 </p>
 <p align="center">
@@ -21,8 +21,8 @@
 </p>
 
 AbsentMotion is a free, open-source alternative to CapCut and Alight Motion: a motion graphics, animation and video
-editor for Android phones. Everything runs on your phone and it works without an internet connection. There is no
-subscription, no account and no advertising, and your projects never leave your device.
+editor for Android phones, with a desktop version for Mac from 5.0. Everything runs on your device and it works without
+an internet connection. There is no subscription, no account and no advertising, and your projects never leave your device.
 
 <p align="center">
   <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" alt="The editor: a photo with a title on the timeline, keyframes shown as diamonds" width="280">
@@ -38,21 +38,21 @@ subscription, no account and no advertising, and your projects never leave your 
 <details>
 <summary><strong>Layers and a timeline</strong></summary>
 
-Shapes, text, images, video, audio, freehand drawings, groups, reusable elements, 3D models and null objects, with trimming, splitting, moving clips by holding them, parenting, clipping masks, label colours, bookmarks, slide-to-select and frame-accurate snapping.
+Shapes, text, images, video, audio, freehand drawings, groups, reusable elements, 3D models, lights and null objects, with trimming, splitting, moving and stretching several clips at once, parenting, groups you can open and ungroup, clipping masks, label colours, bookmarks, slide-to-select and frame-accurate snapping.
 
 </details>
 
 <details>
 <summary><strong>Keyframes with easing</strong></summary>
 
-Any value (position, size, rotation, 3D tilt, skew, opacity, colour, shape and effect parameters) can be keyframed. Easing is a cubic Bezier, bounce, elastic, cyclic, random or stepped curve, edited with handles on a graph.
+Any value (position, size, rotation, 3D tilt, skew, opacity, colour, shape and effect parameters) can be keyframed. Easing is a cubic Bezier, bounce, elastic, cyclic, random or stepped curve, edited with handles on a graph. A value can also be linked to a value of another layer, with Multiply, Add and Delay.
 
 </details>
 
 <details>
-<summary><strong>207 effects</strong></summary>
+<summary><strong>213 effects</strong></summary>
 
-Colour, blur, distort, stylize, noise, keying, Move (Auto-Shake, Oscillate, Swing, Spin, Random Displacement, Random Jitter, Pulse, Echo, Offset, Move Along Path, true motion blur), Repeat (linear, radial, grid, along a path, scatter), 3D objects (cube, sphere, torus, prisms, raster extrude and more), Text (typewriter reveal, per-letter transforms, scramble, count up, timecode), VHS, Datamosh, Glass, Displacement Map and many more, with animated previews and a "New" category. [Check out all the effects](https://comett1225.github.io/AbsentMotion/effects/index.html).
+Colour, blur, distort, stylize, noise, keying, Move (Auto-Shake, Oscillate, Swing, Spin, Random Displacement, Random Jitter, Pulse, Echo, Offset, Move Along Path, true motion blur, Parenting Helper, Scale Assist), Repeat (linear, radial, grid, along a path, scatter, with a delay and random variation per copy), 3D objects (cube, sphere, torus, prisms, raster extrude and more), Text (typewriter reveal, per-letter transforms, shaking letters, talking blips, font weight, scramble, count up, timecode), ASCII art, Copy Background (an adjustment layer), VHS, Datamosh, Glass, Displacement Map and many more, with animated previews, presets and a "New" category. [Check out all the effects](https://comett1225.github.io/AbsentMotion/effects/index.html).
 
 </details>
 
@@ -73,7 +73,7 @@ Parametric shapes, vector paths with point editing and animated (rotoscoping) ma
 <details>
 <summary><strong>Text</strong></summary>
 
-Text layers with spacing and alignment, 50 fonts built in and 100 more to download from Google Fonts.
+Text layers with spacing and alignment, 50 fonts built in and 100 more to download from Google Fonts. Letters can shake on their own, type out with a blip for each letter like game dialogue, and change weight with variable fonts.
 
 </details>
 
@@ -87,7 +87,7 @@ Speed ramps with presets and freeze frames, motion tracking, background removal 
 <details>
 <summary><strong>Camera layers</strong></summary>
 
-A 3D camera that works like Alight Motion's, showing the world around the frame, with perspective or orthographic projection, depth ordering, focus blur, fog, motion blur and one-tap Camera Moves (push in, pull out, orbit, pan, dolly zoom, handheld). 3D objects turn with your fingers.
+A 3D camera that works like Alight Motion's, showing the world around the frame, with perspective or orthographic projection, focus blur, fog, motion blur and one-tap Camera Moves (push in, pull out, orbit, pan, dolly zoom, handheld). Layers in 3D sort by their distance from the camera, the camera tilts and orbits around the scene, and Ambient, Directional and Point lights shade 3D models and 3D effects. 3D objects turn with your fingers.
 
 </details>
 
@@ -113,9 +113,16 @@ MP4, MOV, MKV or WebM video (H.264, HEVC, AV1, VP9 or APV, as the phone supports
 </details>
 
 <details>
-<summary><strong>Tools: Compress and Video Downloader</strong></summary>
+<summary><strong>Tools: Compress, Trim, Extract Audio, Make a GIF and Video Downloader</strong></summary>
 
-**Compress** makes videos and pictures smaller (Low, Medium, High, Custom, or a Discord size), shows the size before and after, and lets you watch the result before saving. **Video Downloader** saves videos, sounds and pictures from links (YouTube, Instagram, TikTok and more) straight to your gallery or into a project.
+**Compress** makes videos and pictures smaller (Low, Medium, High, Custom, or a Discord size), shows the size before and after, and lets you watch the result before saving. **Trim** cuts a video fast without re-encoding, or exactly. **Extract Audio** saves the sound of a video as M4A or MP3. **Make a GIF** turns up to 30 seconds of a video into a GIF. **Video Downloader** saves videos, sounds and pictures from links (YouTube, Instagram, TikTok and more) straight to your gallery or into a project.
+
+</details>
+
+<details>
+<summary><strong>Tablets and computers</strong></summary>
+
+Layouts for big tablet screens in portrait and landscape, with panels beside the preview. From 5.0 there is a desktop version for Macs with Apple silicon: the same editor, effects and export with a mouse timeline, right-click menus, keyboard shortcuts and drag and drop. Windows is being tested and Linux comes later.
 
 </details>
 
@@ -145,30 +152,27 @@ Android 13 (API level 33) or newer (tested on Android 16 and 17 and on emulators
 For Android 8 to 12 there is the **Compatible** build (`-compatible.apk`, tested on Android 11). It is the same app
 without Optical flow High, AI Smooth, AI Enhance and AI background removal 2.0.
 
-There are three builds: `play`, which has background removal through Google Play services, `foss` (for F-Droid),
-which contains no Google libraries at all, and `compat`, the Compatible build of `foss`.
+There are two builds: `foss`, which contains no Google libraries at all, and `compat`, the Compatible build of `foss`
+(with a 32-bit file). The `play` build ended with 4.4; Play installs move to `foss` when they update.
 
 Not sure about your phone? The [phone checker](https://comett1225.github.io/AbsentMotion/phone-checker.html) tells you
 which build to download.
+
+The desktop version runs on Macs with Apple silicon (`arm64`). Windows builds and is being tested; Linux is not built yet.
 
 ## Roadmap
 
 [Go here for the full roadmap.](https://comett1225.github.io/AbsentMotion/roadmap.html)
 
-### 5.0
+### 5.1
 
-- PC support for Windows, Linux, macOS and Chromebook/ChromeOS, including Chromebooks with Intel or AMD chips.
+- PC support for Windows, Linux and Chromebook/ChromeOS, including Chromebooks with Intel or AMD chips. The Mac version came in 5.0.
 - Possibly an IPA file for sideloading on iPhones and iPads.
-- Better tablet use: layouts made for big screens, in portrait and landscape.
-- More tools in the Tools tab.
-- An ASCII effect: turn any video or picture into text art made of letters and symbols.
-- More effects for text, such as letters that shake on their own and typing with a short sound for each letter.
-- No more Play build. Phones with the Play build move to the FOSS build automatically when they update to 5.0; projects and settings stay.
-- Real 3D: layers, particles and the pieces of 3D effects sit in front of and behind each other in depth, with a camera, lights and 3D models.
-- Motion graphics tools: different offsets for each repeated copy, and linking one value to another.
-- More from Alight Motion projects: Parenting Helper, Scale Assist and 3D orientation.
-- A new licence: 5.0 and every later version are released under GPL-3.0. 4.4 and earlier stay under Apache-2.0.
-- During 5.0 and after, there won't be many major patches or features; most updates will focus on stability for the PC version and the new iOS file.
+- Real 3D, part two: the faces of 3D models, particles and the pieces of 3D effects sort one by one with the pieces of other layers, so objects that pass through each other overlap correctly. In 5.0 each layer sorts as a whole.
+- Colour palettes for Fill & Color and every colour setting: import a palette from a picture or a palette file, save, edit, sort and export your own, and keep them in a palette library.
+- True frame-by-frame Video Feedback: each copy shows the picture from a moment earlier, so movement leaves trails that swirl into the tunnel, like a camera pointed at its own screen.
+- Time Remap: keyframe which moment of a video clip plays at each point, so a clip can speed up, freeze and play backwards inside one layer, for reverse edits. Requested by users.
+- During 5.1 and after, there won't be many major patches or features; most updates will focus on stability for the PC version and the new iOS file.
 
 ## Updates to AbsentMotion
 
@@ -193,8 +197,10 @@ AbsentMotion can open scene XML files and `.amproj` packages exported from Aligh
 
 ## Building
 
-The app is built with Gradle (`app/`) and has a C++ engine on top of Skia, which is built from source. See
-[`docs/BUILD.md`](docs/BUILD.md).
+The code has one folder per platform: `shared/` (the code every platform runs: the Kotlin and Compose UI, the C++ engine on top
+of Skia, effects and texts), `android/` (the phone app, built with Gradle from the root), `pc/` (the desktop app, built with
+`cd pc && ./gradlew createDistributable`), and `macos/`, `windows/` and `linux/` for each desktop system. Skia is built from
+source. See [`docs/BUILD.md`](docs/BUILD.md).
 
 ## Contributing and security
 
@@ -208,6 +214,7 @@ ideas, including the Particles effect planned for 4.4.
 
 ## Licence
 
-AbsentMotion is released under the [Apache License 2.0](LICENSE). See [`NOTICE`](NOTICE) and
+AbsentMotion 5.0 and later is released under the [GNU General Public License v3.0](LICENSE) (GPL-3.0). Version 4.x and
+earlier stay under the Apache License 2.0. See [`NOTICE`](NOTICE) and
 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) for the third-party software it uses (Skia, whisper.cpp, RNNoise,
 AndroidX Compose and others) and their licences.

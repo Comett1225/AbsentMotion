@@ -7,7 +7,7 @@ OUT = ROOT / "shared/assets/licenses.txt"
 
 TITLE = "AbsentMotion: licences and notices"
 INTRO = (
-    "AbsentMotion is free and open source, licensed under the Apache License, Version 2.0 (the first part below). "
+    "AbsentMotion is free and open source, licensed under the GNU General Public License, version 3 (the first part below). "
     "It includes and uses third-party software and icons under their own licences, which follow. "
     "This page is generated from the files LICENSE, NOTICE, THIRD_PARTY_NOTICES.md and docs/ICON_SOURCES.md of the source code, "
     "https://github.com/Comett1225/AbsentMotion."
@@ -111,7 +111,7 @@ def markdown_to_text(md, skip_h1=False):
 def build():
     read = lambda name: (ROOT / name).read_text(encoding="utf-8").replace("\r\n", "\n").strip("\n").split("\n")
     lines = heading(1, TITLE) + ["", INTRO, ""]
-    lines += heading(1, "Apache License 2.0") + [""] + read("LICENSE") + [""]
+    lines += heading(1, "GNU General Public License 3.0") + [""] + read("LICENSE") + [""]
     lines += heading(1, "Project notice") + [""] + read("NOTICE") + [""]
     for title, name in (("Third-party notices", "THIRD_PARTY_NOTICES.md"), ("Icon sources", "docs/ICON_SOURCES.md")):
         lines += heading(1, title) + [""] + markdown_to_text("\n".join(read(name)), skip_h1=True) + [""]

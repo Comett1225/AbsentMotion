@@ -442,7 +442,7 @@ class Site:
         if sidebar and site:
             side = '<input type="checkbox" id="menu" class="menu-box" aria-label="Show the page list"><label for="menu" class="menu-btn">Pages</label><nav class="side" aria-label="Pages">%s</nav>' % self.sidebar(current, depth)
         foot = (
-            '<footer><p>AbsentMotion is free and open source under the Apache License 2.0. <a href="%s" rel="noopener">Source code</a> &middot; '
+            '<footer><p>AbsentMotion is free and open source under the GNU General Public License v3.0. <a href="%s" rel="noopener">Source code</a> &middot; '
             '<a href="%s" rel="noopener">Privacy</a> &middot; <a href="%s" rel="noopener">Report a problem</a> &middot; '
             '<a href="%s" rel="noopener">Bug report form</a> &middot; <a href="%s" rel="noopener">Feature request form</a></p></footer>'
             % (REPO, SHORT["privacy-file"], SHORT["issues"], SHORT["report-form"], SHORT["feature-form"])) if site else ""
@@ -522,7 +522,7 @@ class Site:
     def download_links(self):
         v = self.version
         base = "%s/releases/download/v%s/AbsentMotion-%s-" % (REPO, v, v)
-        return {"foss": base + "foss.apk", "play": base + "play.apk", "compatible": base + "compatible.apk", "compatible32": base + "compatible-32bit.apk", "sums": "%s/releases/download/v%s/SHA256SUMS.txt" % (REPO, v)}
+        return {"foss": base + "foss.apk", "compatible": base + "compatible.apk", "compatible32": base + "compatible-32bit.apk", "sums": "%s/releases/download/v%s/SHA256SUMS.txt" % (REPO, v)}
 
     def download_top(self, page, depth):
         return (
@@ -540,12 +540,10 @@ class Site:
             '<section id="all"><h2>All downloads <span class="ver">version %s</span></h2><ul class="dl">'
             '<li><a id="dl-foss" class="btn" href="%s">Latest</a><div><strong>Android 13 or newer. Recommended.</strong> Every feature. '
             'Background removal uses its own offline model; this file contains no Google libraries. <code>AbsentMotion-%s-foss.apk</code></div></li>'
-            '<li><a id="dl-play" class="btn alt" href="%s">Latest (Play services)</a><div><strong>Android 13 or newer.</strong> The same app, but background removal uses Google Play services, '
-            'which downloads its own model and may send diagnostics to Google. <code>AbsentMotion-%s-play.apk</code></div></li>'
             '%s</ul>'
             '<p class="small"><a id="dl-sums" href="%s">SHA256SUMS.txt</a> has the checksum of every file. <a href="%s" rel="noopener">All releases and older versions</a> &middot; '
             '<a href="%s" rel="noopener">Source code</a></p></section>'
-        ) % (v, links["foss"], v, links["play"], v, self.compatible_item(), links["sums"], SHORT["releases"], REPO)
+        ) % (v, links["foss"], v, self.compatible_item(), links["sums"], SHORT["releases"], REPO)
 
     def compatible_item(self):
         v = self.version

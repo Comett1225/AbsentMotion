@@ -4,7 +4,7 @@ group: Create
 order: 2
 summary: Add, stack, reorder, hide, copy and animate effects, and find the right one in the effects library.
 ---
-An effect changes how a layer looks or moves: a blur, a glow, a color change, a shake. A layer can have as many effects as you like. AbsentMotion has {{effect_count}} effects in eleven categories. The [effects library](@effects) on this website lists every effect with all of its settings.
+An effect changes how a layer looks or moves: a blur, a glow, a color change, a shake. A layer can have as many effects as you like. AbsentMotion has {{effect_count}} effects in twelve categories. The [effects library](@effects) on this website lists every effect with all of its settings.
 
 ## Add an effect
 
@@ -19,7 +19,7 @@ To read about an effect first, press and hold its tile. A page opens with an ani
 
 - The top has a search box ("Search") that matches names first, then descriptions, and also finds AI tools and presets.
 - A strip of recommended effects (Chroma Key, Blur and Glow), a grid of your **Recent** or **Favorite** effects (switch with the two small icons), then the categories.
-- **Categories:** Color, Blur, Distort, Stylize, Noise, Repeat, Key, Move, Beat, 3D and Text. A **New** category appears for effects added in the latest versions. An **Audio** category appears for layers that have sound, and **AI** holds the AI tools.
+- **Categories:** Color, Blur, Distort, Stylize, Noise, Repeat, Key, Move, Beat, 3D, Text and Other. A **New** category lists the effects added in the newest big version (5.x). An **Audio** category appears for layers that have sound, and **AI** holds the AI tools.
 - An effect that cannot run on your phone is grayed out.
 
 ![The Effects Library: search (1), the recommended effects (2), recent and favorite effects (3) and the categories (4).](img/fx-library.webp)
@@ -60,20 +60,26 @@ Every number, color and position in an effect can have keyframes. Open the effec
 
 ## Presets inside effects
 
-Four text effects and Particles come with ready-made presets: Text Progress (Typewriter, Fade In by Word, Slide Up by Letter, Pop In), Text Transform (Wave, Spin Cascade), Text Randomizer (Scramble), Count Up/Down (Count Up) and Particles (Snow, Sparks, Confetti, Bubbles, Dust, Hearts, Twinkle, Petals, Layer Fountain, Beat Confetti). Press and hold the effect in the library and choose the preset under **PRESET**.
+Eight effects come with ready-made presets: Text Progress (Typewriter, Fade In by Word, Slide Up by Letter, Pop In), Text Transform (Wave, Spin Cascade), Text Randomizer (Scramble), Count Up/Down (Count Up), Text Shake (Nervous, Scared, Uneasy, Floaty, Wavy, Dizzy, Wobbly), Text Blips (Hero, Monster, Robot, Fast Talker, Typewriter), ASCII (Terminal, Binary Rain, Amber Monitor, Newspaper, Blocks, Line Art) and Particles (Snow, Sparks, Confetti, Bubbles, Dust, Hearts, Twinkle, Petals, Layer Fountain, Beat Confetti).
+
+- On an open effect, tap **Presets** in its header. A list shows each preset with a small picture; tap one to use it.
+- In the library, press and hold the effect: its page lists the presets under **PRESET**, with pictures.
+- The star next to a preset marks it as a favorite. Favorite presets come first in the library's **Favorite** strip.
+- Searching for a preset's name finds its effect.
 
 These are different from the **Presets** tool of a layer, which keeps your own looks: see [Assets, templates and presets](@assets-templates).
 
 ## Special kinds of effects
 
-- **Move** effects (Auto-Shake, Oscillate, Swing, Spin, Random Displacement, Random Jitter, Pulse, Echo, Offset, Move Along Path, True Motion Blur) animate a layer by themselves.
-- **Repeat** effects make copies in a line, a circle, a grid, along a path or scattered.
+- **Move** effects (Auto-Shake, Oscillate, Swing, Spin, Random Displacement, Random Jitter, Pulse, Echo, Offset, Move Along Path, True Motion Blur) animate a layer by themselves. **Parenting Helper** and **Scale Assist** are also here: see below.
+- **Repeat** effects make copies in a line, a circle, a grid, along a path or scattered. See **Repeat: delay and random per copy** below.
 - **3D** effects turn a layer into a cube, sphere, torus and other solids. The Rotate tab then controls the effect's rotation.
-- **Beat** effects (Beat Blur, Beat Flash, Beat Glitch, Beat Glow, Beat Pulse, Beat RGB Split, Beat Rotate, Beat Shake and Beat Zoom) hit on every beat of the music. Select the music clip and tap **Mark Beats** in its layer menu first; without beat marks they follow the **BPM** setting. See [Audio](@audio).
+- **Beat** effects (Beat Blur, Beat Flash, Beat Glitch, Beat Glow, Beat Pulse, Beat RGB Split, Beat Rotate, Beat Shake and Beat Zoom) hit on every beat of the music. Select the music clip and tap **Mark Beats** in its tools or its layer menu first; without beat marks they follow the **BPM** setting. See [Audio](@audio).
 - **Key** effects (Chroma Key, Luma Key) remove a color or the dark and bright parts of a layer, for example a green screen.
-- **Text** effects (Text Progress, Text Transform, Text Randomizer, Count Up/Down, Timecode) animate text letter by letter. See [Text and fonts](@text).
+- **Text** effects (Text Progress, Text Transform, Text Randomizer, Text Shake, Text Blips, Font Weight, Count Up/Down, Timecode, Text Along Path) animate text letter by letter. See [Text and fonts](@text).
 - **Audio** effects work on sound: see [Audio](@audio).
 - **AI** tools (Remove Background, Reduce Noise) run on the phone: see [AI tools](@ai-tools).
+- **Other** holds **Copy Background**, the adjustment layer: see below.
 
 **Crop**, a Key effect, cuts the edges off a layer. Layers also have a **Crop** button, on page 2 of the tool grid, that shows the crop on the canvas: see [Layer tools](@layer-tools).
 
@@ -91,9 +97,30 @@ With **Depth** switched on, particles also fly toward or away from the camera: *
 
 **3D Fracture** (in 3D) breaks the layer into glass shards. Animate **Progress** from 0 (whole) to 1 (broken); **Impact Point**, **Force**, **Gravity**, **Spin** and **Depth Push** decide how the shards fly.
 
-Both follow the layer's own 3D rotation, its parent's and the camera. Their pieces sit in front of and behind each other, but not in front of or behind other layers (that comes with real 3D in 5.0).
+Both follow the layer's own 3D rotation, its parent's and the camera. Their pieces sit in front of and behind each other. With **Depth order** on, the whole effect also sits in front of or behind other layers by its depth, but its pieces do not slot in between the pieces of other layers. Light layers shade the pieces. See [Camera layers and 3D](@camera-3d).
 
 **Video Feedback** (in Repeat) draws the layer inside itself again and again, like a camera pointed at its own screen. **Zoom**, **Rotation** and **Offset** set each step; with **Use Layer Transform** on, moving, scaling or turning the layer steers the tunnel. **Fade** and **Hue Shift** change each copy, and **Delay** makes the inner copies follow the layer's animation a moment later.
+
+### Copy Background
+
+**Copy Background** (in Other) turns a layer into an adjustment layer. It copies everything drawn below the layer, and the effects you add after it change that copy, so one set of effects changes all of the layers below at once. Put the layer above the ones you want to change. **Mask To Layer** keeps the change inside the layer's own shape, **Mix** brings the layer's own fill back and **Effects Reach Outside** lets later effects carry the copy past the layer's edges. It used to be called Adjustment Layer, and searching for "adjustment layer" still finds it. Projects that use it keep working.
+
+### ASCII
+
+**ASCII** (in Stylize) turns any layer into text art made of letters and symbols. **Size** is measured on the layer, so the characters move, turn and scale with it. Pick the **Characters** (or type your own), keep the picture's colors or use one color, and add **Edge Lines** for outlines. See [ASCII](@effect/ascii).
+
+### Repeat: delay and random per copy
+
+**Linear Repeat**, **Radial Repeat**, **Grid Repeat** and **Repeat Along Path** have five settings that make each copy different:
+
+- **Delay per copy** (-60 to 60 seconds) plays each copy's animation that much later than the copy before it, so a movement ripples through the copies. A negative value plays them earlier. It only shows when the layer is animated, for example with keyframes or a Move effect.
+- **Random Position**, **Random Rotation**, **Random Scale** and **Random Opacity** move, turn, scale and fade each copy by a random amount, up to the value you set. **Seed** picks another random pattern.
+
+When any of these five is used, a repeat makes at most 256 copies.
+
+### Parenting Helper and Scale Assist
+
+Both are in Move. **Parenting Helper** changes how a child layer follows its parent: its scale and rotation can follow fully, stay **Locked** or follow by a **Weight** you set, and **Auto Rotate** turns the layer as it moves, like a rolling wheel. **Scale Assist** adds extra scale along X, Y, both, or X with Y the other way (a squash and stretch), and the layer's children follow the new size. See [Parenting Helper](@effect/parenthelper) and [Scale Assist](@effect/scaleassist).
 
 ## Tips
 

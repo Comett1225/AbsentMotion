@@ -207,7 +207,6 @@
         heading = "AbsentMotion " + version + " should work on your phone";
         kids.push(el("p", { text: seen + " The Latest version needs Android 13 or newer, and it should run on it." }));
         actions.push(el("a", { "class": "btn big", href: link("dl-foss") }, ["Download for your phone", el("span", { "class": "sub", text: "Latest, Android 13 or newer, " + version })]));
-        kids.push(el("p", { "class": "small" }, ["Prefer Google Play services for background removal? ", el("a", { href: link("dl-play"), text: "Download the Play-services build" }), ". The two files have the same features; the first has no Google libraries and removes backgrounds with its own offline model."]));
         if (verdictInfo && verdictInfo.ai) kids.push(el("p", { "class": "small", text: verdictInfo.ai }));
         break;
       case "compatible":

@@ -4,6 +4,7 @@
 #include <asm/hwcap.h>
 #include <jni.h>
 #include <sys/auxv.h>
+#include <vulkan/vulkan.h>
 
 #include <algorithm>
 #include <string>
@@ -36,6 +37,23 @@ JNIEXPORT jlong JNICALL JNI_FN(nativeCreate)(JNIEnv* env, jclass, jint backend) 
         return 0;
     }
     return reinterpret_cast<jlong>(engine.release());
+}
+
+JNIEXPORT jstring JNICALL JNI_FN(nativeVulkanDevice)(JNIEnv* env, jclass) {
+    VkInstanceCreateInfo ici = {VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO};
+    VkInstance instance = VK_NULL_HANDLE;
+    if (vkCreateInstance(&ici, nullptr, &instance) != VK_SUCCESS) return nullptr;
+    uint32_t n = 1;
+    VkPhysicalDevice device = VK_NULL_HANDLE;
+    const VkResult r = vkEnumeratePhysicalDevices(instance, &n, &device);
+    std::string line;
+    if ((r == VK_SUCCESS || r == VK_INCOMPLETE) && n > 0) {
+        VkPhysicalDeviceProperties props;
+        vkGetPhysicalDeviceProperties(device, &props);
+        line = std::to_string(props.vendorID) + "\t" + props.deviceName;
+    }
+    vkDestroyInstance(instance, nullptr);
+    return line.empty() ? nullptr : env->NewStringUTF(line.c_str());
 }
 
 JNIEXPORT void JNICALL JNI_FN(nativeDestroy)(JNIEnv*, jclass, jlong engine) {

@@ -55,8 +55,7 @@ jobs:
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-37.0" "build-tools;37.0.0" "cmake;3.31.6" "ndk;30.0.16248370"
       - name: Prepare the source as F-Droid does
         run: |
-          rm -rf android/src/play third_party/whisper.cpp/models third_party/whisper.cpp/examples third_party/whisper.cpp/bindings third_party/ncnn/examples third_party/ncnn/benchmark third_party/ncnn/python third_party/ncnn/images
-          sed -i -e '/playImplementation/d' android/build.gradle.kts
+          rm -rf third_party/whisper.cpp/models third_party/whisper.cpp/examples third_party/whisper.cpp/bindings third_party/ncnn/examples third_party/ncnn/benchmark third_party/ncnn/python third_party/ncnn/images
           echo 'org.gradle.java.home=/usr/lib/jvm/java-21-openjdk-amd64' >> gradle.properties
       - name: Build Skia
         run: tools/build_skia.sh
@@ -104,8 +103,7 @@ jobs:
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-37.0" "build-tools;37.0.0" "cmake;3.31.6" "ndk;30.0.16248370"
       - name: Prepare the source as F-Droid does
         run: |
-          rm -rf android/src/play third_party/whisper.cpp/models third_party/whisper.cpp/examples third_party/whisper.cpp/bindings third_party/ncnn/examples third_party/ncnn/benchmark third_party/ncnn/python third_party/ncnn/images
-          sed -i -e '/playImplementation/d' android/build.gradle.kts
+          rm -rf third_party/whisper.cpp/models third_party/whisper.cpp/examples third_party/whisper.cpp/bindings third_party/ncnn/examples third_party/ncnn/benchmark third_party/ncnn/python third_party/ncnn/images
           echo 'org.gradle.java.home=/usr/lib/jvm/java-21-openjdk-amd64' >> gradle.properties
       - name: Build Skia for Android 8
         run: |

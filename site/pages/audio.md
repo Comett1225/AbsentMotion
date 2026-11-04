@@ -12,10 +12,11 @@ AbsentMotion has no built-in music or sound library: you use the audio files on 
 - **Text to Speech** (same tab): see below.
 - The sound of a **video clip** plays with the clip. **Extract Audio** in the layer menu splits it out into its own audio layer.
 - Videos recorded with the in-app camera have the sound of the microphone, if you allowed it.
+- The **Text Blips** effect gives a text layer a short blip for each letter it types: see [Text and fonts](@text).
 
 An audio layer is named after the file and starts at the playhead. The project's length always follows the end of the last layer, so a long sound makes the project and the export longer.
 
-On the timeline an audio layer is a violet bar with its waveform. The tools are **Speed**, trim and split, **Volume**, **Presets**, **Effects** and **AI**. Voice filters are inside **Effects**. **AI** contains **Reduce Noise** and **Auto captions** for the selected clip.
+On the timeline an audio layer is a violet bar with its waveform. The tools are **Speed**, trim and split, **Volume**, **Presets**, **Effects**, **Mark Beats** and **AI**. Voice filters are inside **Effects**. **AI** contains **Reduce Noise** and **Auto captions** for the selected clip.
 
 ![An audio layer on the timeline and its tools: Presets, Effects and AI (1).](img/audio-tools.webp)
 
@@ -67,7 +68,7 @@ The **AI** tool for audio clips reduces background noise on the phone: see [AI t
 
 ## Mark Beats
 
-**Mark Beats** is in the layer menu of a clip with sound. It listens to that clip alone and adds a bookmark on every beat it finds (the tempo can be between 60 and 180 beats per minute and the beats must follow a steady grid). Then cut your video on the bookmarks: they are snap points on the timeline. The **Beat** effects (Beat Zoom, Beat Shake, Beat Flash and the others) and **Particles** set to **On Beats** move on these bookmarks; without bookmarks they follow their BPM setting. It says "N beats marked", "No new beats found" or "Beats could not be found".
+**Mark Beats** is a tile in the tools of an audio layer, and an entry in the layer menu of any clip with sound. It listens to that clip alone and adds a bookmark on every beat it finds (the tempo can be between 60 and 180 beats per minute and the beats must follow a steady grid). Then cut your video on the bookmarks: they are snap points on the timeline. The **Beat** effects (Beat Zoom, Beat Shake, Beat Flash and the others) and **Particles** set to **On Beats** move on these bookmarks; without bookmarks they follow their BPM setting. It says "N beats marked", "No new beats found" or "Beats could not be found".
 
 ## Text to Speech
 
@@ -80,4 +81,4 @@ The **AI** tool for audio clips reduces background noise on the phone: see [AI t
 
 ## Sound in your export
 
-The mix of every audible clip (with volume, keyframes, speed and effects) is rendered when you export a video, and you can also export only the sound: see [Export](@export). Hidden layers are silent. If a file's sound cannot be read, the app tells you after the export and that clip is silent.
+The mix of every audible clip (with volume, keyframes, speed and effects) is rendered when you export a video, and you can also export only the sound: see [Export](@export). To save the sound of a video file without opening a project, use **Extract Audio** in the Tools tab: see [The home screen](@home). Hidden layers are silent. If a file's sound cannot be read, the app tells you after the export and that clip is silent.

@@ -4,13 +4,13 @@ group: Interface
 order: 3
 summary: The top bar, the preview, the play bar and how the pieces fit together.
 ---
-The editor has four parts, from top to bottom: the **top bar**, the **preview**, the **play bar** and the **timeline** with its tools. On a wide tablet held sideways the preview keeps the whole width, and the tools of a selected clip open in a narrow column on the right edge.
+The editor has four parts, from top to bottom: the **top bar**, the **preview**, the **play bar** and the **timeline** with its tools. Tablets get their own layout: see **On a tablet** below.
 
 ![The four parts of the editor: the top bar (1), the preview (2), the play bar (3) and the timeline with its tools (4).](img/editor.webp)
 
 Changes are saved automatically a moment after each edit. A version of the project is also kept every two minutes while you edit (see [Projects, backup and import](@projects)). The top layer in the timeline is the front layer, and new layers are added at the front.
 
-The Back button of the phone steps back one level at a time: it closes the preview strip, clears a multi-selection, closes the easing graph, leaves an open effect, leaves a panel, deselects the layer and only then leaves the editor.
+The Back button of the phone steps back one level at a time: it closes the preview strip, clears a multi-selection, closes the easing graph, leaves an open effect, leaves a panel, deselects the layer, leaves an open group and only then leaves the editor.
 
 ## The top bar
 
@@ -34,6 +34,8 @@ What the top bar shows depends on what is selected.
 ![The top bar with a layer selected: Back (1), the layer name (2), the parent button (3), Delete layer (4) and Layer menu (5).](img/editor-top-bar.webp)
 
 **A panel open.** The top bar shows a back arrow and the panel's name, such as Transform, Fill & Color or Effects.
+
+**Inside a group.** After **Edit Group**, the top bar shows the path instead of the project name: the project name, then the name of each open group. Tap the project name to go back to the whole project, or a group's name to go back to that group. With a layer selected, a small pill with the group's name next to the layer name leaves the group. The gear is hidden inside a group. See [Shapes, drawing and masks](@shapes).
 
 ### Project settings
 
@@ -97,6 +99,16 @@ The thin line under the bar is a live level meter while the project plays: green
 ## Multi-select
 
 Press and hold the eye or the name area of a layer's row and then slide up or down to select several rows at once; afterwards a tap toggles rows. The top bar changes color and shows group, effects, delete and alignment buttons, and a bar appears at the bottom with clip-timing commands. They are all described in [Layer menus and multi-select](@layer-menus).
+
+## On a tablet
+
+A tablet uses a wider layout whenever its screen is wide enough, in portrait and in landscape (most 10 and 11 inch tablets both ways, smaller ones when held sideways).
+
+- The panels and the tools of a selected layer open in a column beside the preview, so they never cover the timeline.
+- The timeline gets the whole width under the preview. In portrait it takes the lower part of the screen, so many more layers fit.
+- The tools fit on one page, in two to four columns.
+
+On a smaller tablet held upright the editor looks like the phone's, and sheets such as the color picker, presets, About and Help open as a card in the middle instead of filling the screen. The home screen also gets a grid of projects and templates and puts the tools side by side: see [The home screen](@home).
 
 ## Next
 

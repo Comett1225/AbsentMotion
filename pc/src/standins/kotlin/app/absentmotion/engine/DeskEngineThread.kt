@@ -366,7 +366,7 @@ class EngineThread(private val background: Int, private val context: Context? = 
             block(document)
         } finally {
             withContext(NonCancellable + dispatcher) {
-                try { shown?.let { engine().setScene(fonts?.prepareText(it, view?.timeMs ?: 0) ?: it) } }
+                try { shown?.let { val at = view?.timeMs ?: 0; engine().setScene(fonts?.prepareText(it, at) ?: it); preparedAt = at } }
                 finally { capturing = false }
             }
             mediaScene?.let { loadMedia(it) }
