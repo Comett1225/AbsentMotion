@@ -709,13 +709,13 @@ THIRD-PARTY NOTICES
 
 AbsentMotion 5.0 and later is licensed under the GNU General Public License, version 3 (see LICENSE and NOTICE); 4.x and earlier versions stay under the Apache License 2.0. It contains, links against, bundles or downloads the third-party software listed below. Each entry names the component, the version the build used on 2026-10-18 (AbsentMotion 2.1.0), its licence, its copyright line, where to find it and where AbsentMotion uses it. Copyright lines are copied from the licence files that ship with the vendored or checked-out sources; where AbsentMotion has no such file the entry says "see upstream" instead of guessing.
 
-Full licence texts for the C and C++ libraries are in the appendix at the end of this file. The Apache License 2.0 text that applies to the Apache-2.0 components is in appendix A.21; the GPL-2.0 with Classpath Exception text for the Java runtime is in A.22.
+Full licence texts for the C and C++ libraries are in the appendix at the end of this file. The Apache License 2.0 text that applies to the Apache-2.0 components is in appendix A.21; the GPL-2.0 with Classpath Exception text for the Java runtime is in A.22, which also holds the GPL-2.0 terms for FFmpeg, x264 and x265 in the macOS apps.
 
 This list was written by hand on 2026-10-18 from the build files and the vendored sources. It is not generated. When a dependency is added, removed or upgraded, update this file in the same change.
 
 Contents
 
-1. Engine libraries (C and C++): Skia and the libraries it links, whisper.cpp and ggml, RNNoise, ncnn, glslang, the RIFE warp layer, LAME, FFmpeg (Windows and macOS desktop apps only), and the video downloader add-on (CPython and yt-dlp, downloaded at run time)
+1. Engine libraries (C and C++): Skia and the libraries it links, whisper.cpp and ggml, RNNoise, ncnn, glslang, the RIFE warp layer, LAME, FFmpeg (Windows and macOS desktop apps only) with the codec libraries of the macOS build (x264, x265, libvpx, dav1d, Opus, SVT-AV1), and the video downloader add-on (CPython and yt-dlp, downloaded at run time)
 2. Machine learning models: OpenAI Whisper weights, RIFE and Real-ESRGAN weights and the AI background removal 2.0 model (all downloaded at run time), the built-in background removal model
 3. Kotlin and Compose libraries, including those bundled in the desktop apps (OpenJDK, Compose Desktop, Skiko, kotlinx)
 4. Fonts, icons and effect thumbnails
@@ -920,9 +920,65 @@ Windows:
 macOS (Apple silicon and Intel):
 
 - Version: 9.0.2, built for arm64 and x86_64 (minimum macOS 11) from the unchanged release source https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz (SHA-256 8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e, signed with the FFmpeg release signing key).
-- Configure options: --enable-shared --disable-static --install-name-dir=@rpath --disable-doc --disable-debug --disable-ffplay --disable-sdl2 --disable-xlib --disable-libxcb --disable-sndio --enable-videotoolbox --enable-audiotoolbox --enable-avfoundation --enable-libmp3lame (the Intel build adds --disable-x86asm). No --enable-gpl, --enable-version3 or --enable-nonfree.
-- Licence: GNU Lesser General Public License, version 2.1 or later. The licence text ships next to the libraries as ffmpeg-LICENSE.txt. LAME (above) is linked into libavcodec for MP3 export.
+- Configure options: --enable-shared --disable-static --install-name-dir=@rpath --disable-doc --disable-debug --disable-ffplay --disable-sdl2 --disable-xlib --disable-libxcb --disable-sndio --enable-videotoolbox --enable-audiotoolbox --enable-avfoundation --enable-gpl --enable-libmp3lame --enable-libx264 --enable-libx265 --enable-libvpx --enable-libdav1d --enable-libopus --enable-libsvtav1 (plus --pkg-config-flags=--static and the compiler and path options; the Intel build assembles FFmpeg's x86 code with NASM). No --enable-version3 or --enable-nonfree.
+- Licence: GNU General Public License, version 2 or later (--enable-gpl, which x264 and x265 need; AbsentMotion 5.0 and later uses it under version 3, see LICENSE). FFmpeg's COPYING.GPLv2 ships next to the libraries as ffmpeg-LICENSE.txt; the same terms are in appendix A.22 (the Classpath Exception there applies only to OpenJDK). LAME (above) and the codec libraries below are linked statically into libavcodec.
 - Used in: the macOS apps. libamdesktop.dylib links the shared avformat, avcodec, avutil and swscale libraries for video decoding (VideoToolbox when available), and ffmpeg and ffprobe run export, the Tools tab, the camera and media probing. They sit in AbsentMotion.app/Contents/app/resources, so they can be replaced with another build.
+
+The codec libraries in the macOS FFmpeg are built for arm64 and x86_64 (minimum macOS 11) as static libraries from the unchanged sources below; the SHA-256 sums match the ones Homebrew pins for the same versions.
+
+x264
+----
+
+- Version: r3222, commit b35605ace3ddf7c1a5d67a2eb553f034aef41d55 (head of the stable branch; x264 publishes no release archives), from https://code.videolan.org/videolan/x264.git.
+- Licence: GNU General Public License, version 2 or later (text in appendix A.22, without the Classpath Exception).
+- Copyright: Copyright (C) 2003-2025 x264 project.
+- URL: https://www.videolan.org/developers/x264.html
+- Used in: H.264 software encoding (libx264), for sizes above VideoToolbox's 4096 px and when VideoToolbox fails.
+
+x265
+----
+
+- Version: 4.3, x265_4.3.tar.gz from https://github.com/Multicorewareinc/x265/releases (SHA-256 83c53e4c8bbb8f1e33ed59e10a7d621d1d7801ca853910c3eb41f038b8ffb121), 8-bit build.
+- Licence: GNU General Public License, version 2 or later (text in appendix A.22, without the Classpath Exception). x265 is also offered under a commercial licence; AbsentMotion uses it under the GPL.
+- Copyright: Copyright (C) 2013-2020 MulticoreWare, Inc.
+- URL: https://github.com/Multicorewareinc/x265
+- Used in: HEVC software encoding (libx265), for sizes above VideoToolbox's 4096 px and when VideoToolbox fails.
+
+libvpx
+------
+
+- Version: 1.17.0, the v1.17.0 tag archive from https://github.com/webmproject/libvpx (SHA-256 1020f184046187baa2985dbde38e0691f49c44088bca7a1842b0236c6081dc0a).
+- Licence: BSD-3-Clause, with the WebM Project's additional patent grant (texts in appendix A.23).
+- Copyright: Copyright (c) 2010, The WebM Project authors.
+- URL: https://chromium.googlesource.com/webm/libvpx
+- Used in: VP9 export (libvpx-vp9) and VP8 encoding.
+
+dav1d
+-----
+
+- Version: 1.5.4, dav1d-1.5.4.tar.xz from https://downloads.videolan.org/pub/videolan/dav1d/1.5.4/ (SHA-256 686616b7c69eb88d44459391ab25cac13b6647a3b288835c5784e71c1514a5c5, signed with the VideoLAN release signing key).
+- Licence: BSD-2-Clause (text in appendix A.24).
+- Copyright: Copyright © 2018-2025, VideoLAN and dav1d authors.
+- URL: https://code.videolan.org/videolan/dav1d
+- Used in: AV1 decoding (libdav1d), so AV1 videos open on Macs without an AV1 hardware decoder (M1, M2 and Intel).
+
+Opus
+----
+
+- Version: 1.6.1, opus-1.6.1.tar.gz from https://downloads.xiph.org/releases/opus/ (SHA-256 6ffcb593207be92584df15b32466ed64bbec99109f007c82205f0194572411a1, the same as Xiph's SHA256SUMS.txt).
+- Licence: BSD-3-Clause (text in appendix A.25).
+- Copyright: Copyright 2001-2023 Xiph.Org, Skype Limited, Octasic, Jean-Marc Valin, Timothy B. Terriberry, CSIRO, Gregory Maxwell, Mark Borgerding, Erik de Castro Lopo, Mozilla, Amazon.
+- URL: https://opus-codec.org/
+- Used in: Opus audio in WebM, MKV and OGG export (libopus).
+
+SVT-AV1
+-------
+
+- Version: 4.3.0, the v4.3.0 tag archive SVT-AV1-v4.3.0.tar.bz2 from https://gitlab.com/AOMediaCodec/SVT-AV1 (SHA-256 9223ce06e6172ad41357ed23b3b00f036e03794b86b0e20ea9ccb3f648b8955d).
+- Licence: BSD-3-Clause-Clear and the Alliance for Open Media Patent License 1.0 (texts in appendix A.26).
+- Copyright: Copyright (c) 2021, Alliance for Open Media.
+- URL: https://gitlab.com/AOMediaCodec/SVT-AV1
+- Used in: AV1 export (libsvtav1).
 
 Video downloader add-on (downloaded on request, not part of the app)
 --------------------------------------------------------------------
@@ -3542,6 +3598,139 @@ Linking this OpenJDK Code statically or dynamically with other code is making a 
 As a special exception, Oracle gives you permission to link this OpenJDK Code with certain code licensed by Oracle as indicated at https://openjdk.org/legal/exception-modules-2007-05-08.html ("Designated Exception Modules") to produce an executable, regardless of the license terms of the Designated Exception Modules, and to copy and distribute the resulting executable under GPL2, provided that the Designated Exception Modules continue to be governed by the licenses under which they were offered by Oracle.
 
 As such, it allows licensees and sublicensees of Oracle's GPL2 OpenJDK Code to build an executable that includes those portions of necessary code that Oracle could not provide under GPL2 (or that Oracle has provided under GPL2 with the Classpath exception).  If you modify or add to the OpenJDK code, that new GPL2 code may still be combined with Designated Exception Modules if the new code is made subject to this exception by its copyright holder.
+
+
+### A.23 libvpx (BSD-3-Clause and the WebM patent grant)
+
+From `LICENSE` and `PATENTS` of libvpx 1.17.0.
+
+Copyright (c) 2010, The WebM Project authors. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+- Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+- Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+- Neither the name of Google, nor the WebM Project, nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+Additional IP Rights Grant (Patents)
+
+"These implementations" means the copyrightable works that implement the WebM codecs distributed by Google as part of the WebM Project.
+
+Google hereby grants to you a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable (except as stated in this section) patent license to make, have made, use, offer to sell, sell, import, transfer, and otherwise run, modify and propagate the contents of these implementations of WebM, where such license applies only to those patent claims, both currently owned by Google and acquired in the future, licensable by Google that are necessarily infringed by these implementations of WebM. This grant does not include claims that would be infringed only as a consequence of further modification of these implementations. If you or your agent or exclusive licensee institute or order or agree to the institution of patent litigation or any other patent enforcement activity against any entity (including a cross-claim or counterclaim in a lawsuit) alleging that any of these implementations of WebM or any code incorporated within any of these implementations of WebM constitute direct or contributory patent infringement, or inducement of patent infringement, then any patent rights granted to you under this License for these implementations of WebM shall terminate as of the date such litigation is filed.
+
+
+### A.24 dav1d (BSD-2-Clause)
+
+From `COPYING` of dav1d 1.5.4.
+
+Copyright © 2018-2025, VideoLAN and dav1d authors All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+### A.25 Opus (BSD-3-Clause)
+
+From `COPYING` of Opus 1.6.1.
+
+Copyright 2001-2023 Xiph.Org, Skype Limited, Octasic, Jean-Marc Valin, Timothy B. Terriberry, CSIRO, Gregory Maxwell, Mark Borgerding, Erik de Castro Lopo, Mozilla, Amazon
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+- Redistributions of source code must retain the above copyright
+
+notice, this list of conditions and the following disclaimer.
+
+- Redistributions in binary form must reproduce the above copyright
+
+notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+- Neither the name of Internet Society, IETF or IETF Trust, nor the
+
+names of specific contributors, may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Opus is subject to the royalty-free patent licenses which are specified at:
+
+Xiph.Org Foundation: https://datatracker.ietf.org/ipr/1524/
+
+Microsoft Corporation: https://datatracker.ietf.org/ipr/1914/
+
+Broadcom Corporation: https://datatracker.ietf.org/ipr/1526/
+
+
+### A.26 SVT-AV1 (BSD-3-Clause-Clear and the Alliance for Open Media Patent License 1.0)
+
+From `LICENSE.md` and `PATENTS.md` of SVT-AV1 4.3.0.
+
+BSD 3-Clause Clear License The Clear BSD License
+
+Copyright (c) 2021, Alliance for Open Media
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the limitations in the disclaimer below) provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+3. Neither the name of the Alliance for Open Media nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+Alliance for Open Media Patent License 1.0
+
+1. License Terms.
+
+Patent License. Subject to the terms and conditions of this License, each Licensor, on behalf of itself and successors in interest and assigns, grants Licensee a non-sublicensable, perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable (except as expressly stated in this License) patent license to its Necessary Claims to make, use, sell, offer for sale, import or distribute any Implementation.
+
+Conditions.
+
+*Availability.* As a condition to the grant of rights to Licensee to make, sell, offer for sale, import or distribute an Implementation under Section 1.1, Licensee must make its Necessary Claims available under this License, and must reproduce this License with any Implementation as follows:
+
+a. For distribution in source code, by including this License in the root directory of the source code with its Implementation.
+
+b. For distribution in any other form (including binary, object form, and/or hardware description code (e.g., HDL, RTL, Gate Level Netlist, GDSII, etc.)), by including this License in the documentation, legal notices, and/or other written materials provided with the Implementation.
+
+*Additional Conditions.* This license is directly from Licensor to Licensee.  Licensee acknowledges as a condition of benefiting from it that no rights from Licensor are received from suppliers, distributors, or otherwise in connection with this License.
+
+Defensive Termination. If any Licensee, its Affiliates, or its agents initiates patent litigation or files, maintains, or voluntarily participates in a lawsuit against another entity or any person asserting that any Implementation infringes Necessary Claims, any patent licenses granted under this License directly to the Licensee are immediately terminated as of the date of the initiation of action unless 1) that suit was in response to a corresponding suit regarding an Implementation first brought against an initiating entity, or 2) that suit was brought to enforce the terms of this License (including intervention in a third-party action by a Licensee).
+
+Disclaimers. The Reference Implementation and Specification are provided "AS IS" and without warranty. The entire risk as to implementing or otherwise using the Reference Implementation or Specification is assumed by the implementer and user. Licensor expressly disclaims any warranties (express, implied, or otherwise), including implied warranties of merchantability, non-infringement, fitness for a particular purpose, or title, related to the material. IN NO EVENT WILL LICENSOR BE LIABLE TO ANY OTHER PARTY FOR LOST PROFITS OR ANY FORM OF INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES OF ANY CHARACTER FROM ANY CAUSES OF ACTION OF ANY KIND WITH RESPECT TO THIS LICENSE, WHETHER BASED ON BREACH OF CONTRACT, TORT (INCLUDING NEGLIGENCE), OR OTHERWISE, AND WHETHER OR NOT THE OTHER PARTRY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+2. Definitions.
+
+Affiliate.  "Affiliate" means an entity that directly or indirectly Controls, is Controlled by, or is under common Control of that party.
+
+Control. "Control" means direct or indirect control of more than 50% of the voting power to elect directors of that corporation, or for any other entity, the power to direct management of such entity.
+
+Decoder.  "Decoder" means any decoder that conforms fully with all non-optional portions of the Specification.
+
+Encoder.  "Encoder" means any encoder that produces a bitstream that can be decoded by a Decoder only to the extent it produces such a bitstream.
+
+Final Deliverable.  "Final Deliverable" means the final version of a deliverable approved by the Alliance for Open Media as a Final Deliverable.
+
+Implementation.  "Implementation" means any implementation, including the Reference Implementation, that is an Encoder and/or a Decoder. An Implementation also includes components of an Implementation only to the extent they are used as part of an Implementation.
+
+License. "License" means this license.
+
+Licensee. "Licensee" means any person or entity who exercises patent rights granted under this License.
+
+Licensor.  "Licensor" means (i) any Licensee that makes, sells, offers for sale, imports or distributes any Implementation, or (ii) a person or entity that has a licensing obligation to the Implementation as a result of its membership and/or participation in the Alliance for Open Media working group that developed the Specification.
+
+Necessary Claims.  "Necessary Claims" means all claims of patents or patent applications, (a) that currently or at any time in the future, are owned or controlled by the Licensor, and (b) (i) would be an Essential Claim as defined by the W3C Policy as of February 5, 2004 (https://www.w3.org/Consortium/Patent-Policy-20040205/#def-essential) as if the Specification was a W3C Recommendation; or (ii) are infringed by the Reference Implementation.
+
+Reference Implementation. "Reference Implementation" means an Encoder and/or Decoder released by the Alliance for Open Media as a Final Deliverable.
+
+Specification. "Specification" means the specification designated by the Alliance for Open Media as a Final Deliverable for which this License was issued.
 
 ICON SOURCES
 ============

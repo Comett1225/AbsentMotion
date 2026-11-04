@@ -815,10 +815,10 @@
       "name": "Video export: H.264, H.265, AV1, VP9, APV in MP4, MOV, WebM, MKV",
       "where": "ui/export/ExportScreen.kt, STANDINS DeskVideoExport",
       "android": "works",
-      "macos": "partial",
+      "macos": "works",
       "windows": "works",
       "linux": "untested",
-      "note": "encoded by ffmpeg; hardware encoders are picked per OS (VideoToolbox, NVENC/QSV/AMF/MF); APV needs liboapv in the ffmpeg build. Windows: 1080p H.264 MP4 checked in the installed app (h264_amf); the installer ships the LGPL FFmpeg build, which has no libx264 or libx265, so the software fallback there is h264_mf or hevc_mf; AAC uses aac_mf at 192 kbps and below for constant bitrate like Android. macOS release builds bundle an LGPL FFmpeg 9.0.2 without libx264, libx265, libvpx or an AV1 encoder: H.264 and H.265 go through VideoToolbox (4096 px per side at most), AV1 and VP9 export are not available there yet (the Homebrew developer build has them); Opus audio in MKV/WebM uses the native opus encoder with -strict -2"
+      "note": "encoded by ffmpeg; hardware encoders are picked per OS (VideoToolbox, NVENC/QSV/AMF/MF); APV needs liboapv in the ffmpeg build. Windows: 1080p H.264 MP4 checked in the installed app (h264_amf); the installer ships the LGPL FFmpeg build, which has no libx264 or libx265, so the software fallback there is h264_mf or hevc_mf; AAC uses aac_mf at 192 kbps and below for constant bitrate like Android. macOS release builds bundle a GPL FFmpeg 9.0.2 with libx264, libx265, libvpx, libsvtav1, libopus and libdav1d: H.264 and H.265 use VideoToolbox up to 4096 px per side and libx264/libx265 above that, AV1 uses libsvtav1, VP9 libvpx-vp9 and Opus libopus (DeskExportTest checks H.264 MP4, HEVC MOV, AV1 MKV and VP9 WebM with Opus)"
     },
     {
       "id": "export.gif",
@@ -858,7 +858,7 @@
       "macos": "works",
       "windows": "untested",
       "linux": "untested",
-      "note": "OGG uses libopus when the FFmpeg build has it, otherwise the native opus encoder with -strict -2 (macOS and Windows release builds)"
+      "note": "OGG uses libopus when the FFmpeg build has it, otherwise the native opus encoder with -strict -2 (Windows release build)"
     },
     {
       "id": "export.package",
