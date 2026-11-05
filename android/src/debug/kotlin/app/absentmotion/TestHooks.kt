@@ -408,8 +408,13 @@ internal object TestHooks {
                 model.bin to files.first { it.name.endsWith(".bin") },
             )
             model.dir(activity).mkdirs()
-            for ((name, file) in picks) file.copyTo(model.file(activity, name), overwrite = true)
-            model.verify(activity)
+            val stamps = activity.getSharedPreferences("ai_models", android.content.Context.MODE_PRIVATE).edit()
+            for ((name, file) in picks) {
+                val target = model.file(activity, name)
+                file.copyTo(target, overwrite = true)
+                stamps.putString(target.path, "${target.length()}:${target.lastModified()}")
+            }
+            stamps.apply()
             Log.i("AMTest", "hqinstall ok ${model.dir(activity)} installed=${model.installed(activity)}")
         } catch (e: Throwable) {
             Log.e("AMTest", "hqinstall failed", e)

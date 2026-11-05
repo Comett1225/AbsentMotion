@@ -133,7 +133,7 @@ foreach(option NCNN_SHARED_LIB NCNN_INSTALL_SDK NCNN_BUILD_TOOLS NCNN_BUILD_EXAM
     set(${option} OFF CACHE BOOL "" FORCE)
 endforeach()
 set(NCNN_LAYERS input split concat convolution convolutiondepthwise deconvolution crop padding pooling interp memorydata pixelshuffle
-    relu prelu sigmoid slice eltwise binaryop packing cast gemm reshape flatten noop innerproduct)
+    relu prelu sigmoid slice eltwise binaryop packing cast gemm reshape flatten noop innerproduct layernorm multiheadattention permute softmax)
 file(STRINGS ${NCNN_DIR}/src/CMakeLists.txt NCNN_LAYER_LINES REGEX "^ncnn_add_layer\\(")
 foreach(line ${NCNN_LAYER_LINES})
     string(REGEX REPLACE "^ncnn_add_layer\\(([A-Za-z0-9]+).*" "\\1" layer "${line}")
