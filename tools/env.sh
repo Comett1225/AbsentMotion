@@ -1,3 +1,13 @@
+am_jbr21() { [ -x "$1/bin/java" ] && grep -q '^JAVA_VERSION="21' "$1/release" 2>/dev/null && grep -q '^IMPLEMENTOR="JetBrains' "$1/release" 2>/dev/null; }
+if [ -z "${JAVA_HOME:-}" ] || ! am_jbr21 "$JAVA_HOME"; then
+    for root in "$HOME/Library/Java/JavaVirtualMachines" /Library/Java/JavaVirtualMachines "$HOME/.jdks" /usr/lib/jvm /opt; do
+        for name in $(ls "$root" 2>/dev/null); do
+            for candidate in "$root/$name/Contents/Home" "$root/$name"; do
+                if am_jbr21 "$candidate"; then export JAVA_HOME="$candidate"; break 3; fi
+            done
+        done
+    done
+fi
 if [ -z "${JAVA_HOME:-}" ]; then
     for candidate in "$(/usr/libexec/java_home -v 21 2>/dev/null)" \
         /opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \

@@ -1,10 +1,14 @@
 package app.absentmotion.ui.editor
 
+import androidx.compose.animation.core.animate
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
-import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.drag
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.hoverable
@@ -25,8 +29,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalDensity
@@ -38,6 +45,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
 import app.absentmotion.R
+import kotlinx.coroutines.launch
 import app.absentmotion.editor.*
 import app.absentmotion.platform.Hint
 import app.absentmotion.platform.LocalContext
@@ -60,6 +68,30 @@ private const val LibraryMax = 440f
 private const val InspectorMin = 384f
 private const val InspectorMax = 560f
 private val MinPreview = 320.dp
+private const val TimelineMinDp = 180f
+
+internal object DeskDividerMath {
+    const val Reach = 12f
+
+    fun band(over: Float): Float = Reach * over / (over + Reach * 3f)
+
+    fun stretch(raw: Float, min: Float, max: Float): Float = when {
+        raw > max -> band(raw - max)
+        raw < min -> -band(min - raw)
+        else -> 0f
+    }
+
+    fun limit(raw: Float, min: Float, max: Float): Float = raw.coerceIn(min, max.coerceAtLeast(min))
+}
+
+private class DividerDrag(val value: () -> Float, val min: () -> Float, val max: () -> Float, val grows: Int, val bounce: MutableFloatState, val set: (Float) -> Unit)
+
+private fun Modifier.rubber(bounce: MutableFloatState, horizontal: Boolean, anchor: Float): Modifier = graphicsLayer {
+    val extent = if (horizontal) size.width else size.height
+    val scale = if (extent > 0f) 1f + bounce.floatValue * density / extent else 1f
+    transformOrigin = if (horizontal) TransformOrigin(anchor, .5f) else TransformOrigin(.5f, anchor)
+    if (horizontal) scaleX = scale else scaleY = scale
+}
 
 @Composable
 internal fun DeskWorkspace(state: EditorState, onExit: () -> Unit, library: AddLibrary) {
@@ -76,13 +108,17 @@ private fun DeskWorkspaceBody(state: EditorState, onExit: () -> Unit, library: A
     var libraryWidth by remember { mutableFloatStateOf(prefs.getFloat("libraryWidth", 300f).coerceIn(LibraryMin, LibraryMax)) }
     var inspectorWidth by remember { mutableFloatStateOf(prefs.getFloat("inspectorWidth", 400f).coerceIn(InspectorMin, InspectorMax)) }
     var timelineFraction by remember { mutableFloatStateOf(prefs.getFloat("timelineFraction", .34f).coerceIn(.1f, .6f)) }
+    val libraryBounce = remember { mutableFloatStateOf(0f) }
+    val inspectorBounce = remember { mutableFloatStateOf(0f) }
+    val timelineBounce = remember { mutableFloatStateOf(0f) }
     var libraryOpen by remember { mutableStateOf(prefs.getBoolean("libraryOpen", true)) }
     var inspectorOpen by remember { mutableStateOf(prefs.getBoolean("inspectorOpen", true)) }
     var soloLibrary by remember { mutableStateOf(false) }
     var soloInspector by remember { mutableStateOf(false) }
     var spacious by remember { mutableStateOf(true) }
     var libraryTab by remember { mutableIntStateOf(0) }
-    var settings by remember { mutableStateOf(false) }
+    var settings by DeskGear::open
+    DisposableEffect(Unit) { onDispose { DeskGear.open = false } }
     var previewBounds by remember { mutableStateOf(Rect.Zero) }
     var rootOrigin by remember { mutableStateOf(Offset.Zero) }
     val density = LocalDensity.current
@@ -108,7 +144,6 @@ private fun DeskWorkspaceBody(state: EditorState, onExit: () -> Unit, library: A
             }
         } else false
     }.focusRequester(focusRequester).focusable()) { maxWidth, maxHeight ->
-        val heightPx = with(density) { maxHeight.roundToPx() }
         val both = (maxWidth - RailWidth.dp - 2 * DividerWidth.dp - MinPreview).value >= LibraryMin + InspectorMin
         SideEffect { spacious = both }
         val libraryShown = if (both) libraryOpen else soloLibrary
@@ -120,7 +155,6 @@ private fun DeskWorkspaceBody(state: EditorState, onExit: () -> Unit, library: A
         val closeInspector = { if (both) inspectorOpen = false else soloInspector = false }
         val timelineHeight = (maxHeight * timelineFraction).coerceIn(180.dp, maxHeight * .6f)
         Column(Modifier.fillMaxSize()) {
-            DeskTopBar(state, onExit, { settings = true }, Modifier.fillMaxWidth().height(44.dp))
             Row(Modifier.fillMaxWidth().weight(1f)) {
                 DeskLibraryRail(libraryTab, libraryShown, Modifier.width(RailWidth.dp).fillMaxHeight()) { index ->
                     val next = !(libraryShown && libraryTab == index)
@@ -128,8 +162,8 @@ private fun DeskWorkspaceBody(state: EditorState, onExit: () -> Unit, library: A
                     if (both) libraryOpen = next else { soloLibrary = next; if (next) soloInspector = false }
                 }
                 if (libraryShown) {
-                    DeskLibrary(state, library, libraryTab, Modifier.width(libraryNow.dp).fillMaxHeight(), closeLibrary)
-                    DeskDivider(true) { delta -> libraryWidth = (libraryNow + delta).coerceIn(LibraryMin, LibraryMax) }
+                    DeskLibrary(state, library, libraryTab, Modifier.width(libraryNow.dp).fillMaxHeight().rubber(libraryBounce, true, 0f), closeLibrary)
+                    DeskDivider(true, DividerDrag({ libraryNow }, { LibraryMin }, { minOf(LibraryMax, room - inspectorNow) }, 1, libraryBounce) { libraryWidth = it })
                 } else DeskDivider(true, null)
                 Column(Modifier.weight(1f).fillMaxHeight()) {
                     Box(Modifier.fillMaxWidth().weight(1f).tutorialTarget("preview").onGloballyPositioned { val p = it.positionInWindow(); previewBounds = Rect(p, androidx.compose.ui.geometry.Size(it.size.width.toFloat(), it.size.height.toFloat())) }) {
@@ -140,21 +174,19 @@ private fun DeskWorkspaceBody(state: EditorState, onExit: () -> Unit, library: A
                     DeskTransport(state, Modifier.fillMaxWidth().height(40.dp).tutorialTarget("playbar").tutorialGuard(any = true))
                 }
                 if (inspectorShown) {
-                    DeskDivider(true) { delta -> inspectorWidth = (inspectorNow - delta).coerceIn(InspectorMin, InspectorMax) }
-                    DeskInspector(state, library, Modifier.width(inspectorNow.dp).fillMaxHeight(), closeInspector)
+                    DeskDivider(true, DividerDrag({ inspectorNow }, { InspectorMin }, { minOf(InspectorMax, room - libraryNow) }, -1, inspectorBounce) { inspectorWidth = it })
+                    DeskInspector(state, library, Modifier.width(inspectorNow.dp).fillMaxHeight().rubber(inspectorBounce, true, 1f), closeInspector) { settings = true }
                 } else {
                     DeskDivider(true, null)
                     DeskInspectorRail { if (both) inspectorOpen = true else { soloInspector = true; soloLibrary = false } }
                 }
             }
-            DeskDivider(false) { delta -> timelineFraction = (timelineFraction - with(density) { delta.dp.toPx() } / heightPx).coerceIn(.1f, .6f) }
-            Timeline(state, Modifier.fillMaxWidth().height(timelineHeight).tutorialTarget("timeline"))
+            DeskDivider(false, DividerDrag({ timelineHeight.value }, { TimelineMinDp }, { maxHeight.value * .6f }, -1, timelineBounce) { timelineFraction = (it / maxHeight.value).coerceIn(.1f, .6f) })
+            Timeline(state, Modifier.fillMaxWidth().height(timelineHeight).rubber(timelineBounce, false, 1f).tutorialTarget("timeline"))
         }
         app.absentmotion.platform.BackHandler(!both && (soloLibrary || soloInspector)) { if (soloInspector) soloInspector = false else soloLibrary = false }
         DeskDropGhost { rootOrigin }
-        if (settings) DeskDialog(stringResource(R.string.topbar_project_settings), 440.dp, { settings = false }, onConfirm = { settings = false }) {
-            Column(Modifier.deskVerticalScroll().padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) { DeskSettings(state, heading = false) }
-        }
+        if (settings) DeskProject(state) { settings = false }
         if (state.effectBrowserOpen) DeskDialog(null, 1200.dp, { state.effectBrowserOpen = false }, height = 960.dp) { app.absentmotion.ui.editor.effects.EffectBrowser(state) }
         if (state.presetsOpen) DeskDialog(null, 800.dp, { state.presetsOpen = false }, height = 880.dp) { PresetScreen(state) }
         if (state.drawing != null) PhoneScreen(Dp.Infinity, onDismiss = { state.stepBack(); focus.clearFocus() }) { DrawingEditor(state) }
@@ -180,20 +212,45 @@ private fun DeskDropGhost(origin: () -> Offset) {
 internal object DeskPreviewBounds { var bounds = Rect.Zero }
 
 @Composable
-private fun DeskDivider(horizontal: Boolean, onDelta: ((Float) -> Unit)?) {
+private fun DeskDivider(horizontal: Boolean, drag: DividerDrag?) {
     val density = LocalDensity.current
     val source = remember { MutableInteractionSource() }
     val hovered by source.collectIsHoveredAsState()
     var dragged by remember { mutableStateOf(false) }
-    val base = if (horizontal) Modifier.width(7.dp).fillMaxHeight() else Modifier.height(7.dp).fillMaxWidth()
-    val interactive = if (onDelta == null) Modifier else Modifier.hoverable(source).resizeCursor(horizontal).pointerInput(horizontal) {
-        detectDragGestures(onDragStart = { dragged = true }, onDragEnd = { dragged = false }, onDragCancel = { dragged = false }) { change, amount ->
-            change.consume()
-            onDelta(with(density) { (if (horizontal) amount.x else amount.y).toDp().value })
+    val scope = rememberCoroutineScope()
+    val latest by rememberUpdatedState(drag)
+    val box = remember { arrayOfNulls<LayoutCoordinates>(1) }
+    val base = (if (horizontal) Modifier.width(7.dp).fillMaxHeight() else Modifier.height(7.dp).fillMaxWidth()).graphicsLayer {
+        val shift = (drag?.let { it.grows * it.bounce.floatValue } ?: 0f) * this.density
+        if (horizontal) translationX = shift else translationY = shift
+    }
+    val interactive = if (drag == null) Modifier else Modifier.hoverable(source).resizeCursor(horizontal).onGloballyPositioned { box[0] = it }.pointerInput(horizontal) {
+        val run = arrayOfNulls<kotlinx.coroutines.Job>(1)
+        fun along(at: Offset): Float = box[0]?.localToRoot(at)?.let { if (horizontal) it.x else it.y } ?: 0f
+        awaitEachGesture {
+            val down = awaitFirstDown(requireUnconsumed = false)
+            val first = latest ?: return@awaitEachGesture
+            run[0]?.cancel()
+            val origin = along(down.position)
+            val start = first.value()
+            dragged = true
+            drag(down.id) { change ->
+                change.consume()
+                val d = latest ?: return@drag
+                val raw = start + d.grows * (along(change.position) - origin) / density.density
+                val lo = d.min()
+                val hi = d.max().coerceAtLeast(lo)
+                d.set(DeskDividerMath.limit(raw, lo, hi))
+                d.bounce.floatValue = DeskDividerMath.stretch(raw, lo, hi)
+            }
+            dragged = false
+            val d = latest ?: return@awaitEachGesture
+            val from = d.bounce.floatValue
+            run[0] = scope.launch { animate(from, 0f, animationSpec = spring(dampingRatio = 0.45f, stiffness = 380f)) { v, _ -> d.bounce.floatValue = v } }
         }
     }
     Box(base.background(Am.TopBar).then(interactive), Alignment.Center) {
-        val line = Modifier.background(if (onDelta != null && (hovered || dragged)) Am.Accent else Am.Line)
+        val line = Modifier.background(if (drag != null && (hovered || dragged)) Am.Accent else Am.Line)
         Box(if (horizontal) line.width(if (hovered) 2.dp else 1.dp).fillMaxHeight() else line.height(if (hovered) 2.dp else 1.dp).fillMaxWidth())
     }
 }
@@ -207,22 +264,23 @@ private fun DeskInspectorRail(open: () -> Unit) {
     }
 }
 
+internal object DeskGear { var open by mutableStateOf(false) }
+
 @Composable
-private fun DeskTopBar(state: EditorState, onExit: () -> Unit, onSettings: () -> Unit, modifier: Modifier) {
-    Row(modifier.background(Am.TopBar).padding(horizontal = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-        DeskIcon(ChromeIcons.Exit, stringResource(R.string.topbar_exit_to_project_list), action = onExit)
-        Row(Modifier.weight(1f).padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            if (state.inGroup) GroupCrumbs(state, 14.sp) { it() }
-            else Text(state.project.title, Modifier.weight(1f, fill = false), color = Am.OnDark, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text("${state.scene.width} × ${state.scene.height} · ${state.scene.fps} fps", Modifier.padding(start = 12.dp), color = Am.OnDarkDim, fontSize = 12.sp, maxLines = 1, softWrap = false)
-        }
-        Box(Modifier.tutorialTarget("undo")) { DeskIcon(ChromeIcons.Undo, deskShortcut(R.string.play_undo, "${DeskMod}Z"), state.canUndo) { state.undo() } }
-        Box(Modifier.tutorialTarget("redo")) { DeskIcon(ChromeIcons.Redo, deskShortcut(R.string.play_redo, DeskRedoKeys), state.canRedo) { state.redo() } }
-        Box(Modifier.tutorialTarget("gear")) { DeskIcon(ChromeIcons.Gear, stringResource(R.string.topbar_project_settings), enabled = !state.inGroup, action = onSettings) }
-        Hint(deskShortcut(R.string.desk_export, "${DeskMod}E")) {
-            Box(Modifier.padding(start = 8.dp, end = 2.dp).height(32.dp).tutorialTarget("export").clip(RoundedCornerShape(8.dp)).background(Am.Accent).clickable { state.playing = false; state.exportOpen = true }.padding(horizontal = 16.dp), Alignment.Center) {
-                Text(stringResource(R.string.desk_export), color = Am.OnAccent, fontSize = 13.sp, fontWeight = FontWeight.Medium)
-            }
+internal fun RowScope.DeskTopBar(state: EditorState, onExit: () -> Unit, menu: @Composable () -> Unit) {
+    DeskIcon(ChromeIcons.Exit, stringResource(R.string.topbar_exit_to_project_list), action = onExit)
+    menu()
+    Row(Modifier.weight(1f).padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+        if (state.inGroup) GroupCrumbs(state, 14.sp) { it() }
+        else Text(state.project.title, Modifier.weight(1f, fill = false), color = Am.OnDark, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text("${state.scene.width} × ${state.scene.height} · ${state.scene.fps} fps", Modifier.padding(start = 12.dp), color = Am.OnDarkDim, fontSize = 12.sp, maxLines = 1, softWrap = false)
+    }
+    Box(Modifier.tutorialTarget("undo")) { DeskIcon(ChromeIcons.Undo, deskShortcut(R.string.play_undo, "${DeskMod}Z"), state.canUndo) { state.undo() } }
+    Box(Modifier.tutorialTarget("redo")) { DeskIcon(ChromeIcons.Redo, deskShortcut(R.string.play_redo, DeskRedoKeys), state.canRedo) { state.redo() } }
+    Box(Modifier.tutorialTarget("gear")) { DeskIcon(ChromeIcons.Gear, stringResource(R.string.topbar_project_settings)) { DeskGear.open = true } }
+    Hint(deskShortcut(R.string.desk_export, "${DeskMod}E")) {
+        Box(Modifier.padding(start = 8.dp, end = 2.dp).height(32.dp).tutorialTarget("export").clip(RoundedCornerShape(8.dp)).background(Am.Accent).clickable { state.playing = false; state.exportOpen = true }.padding(horizontal = 16.dp), Alignment.Center) {
+            Text(stringResource(R.string.desk_export), color = Am.OnAccent, fontSize = 13.sp, fontWeight = FontWeight.Medium)
         }
     }
 }
@@ -270,7 +328,7 @@ private fun DeskTransport(state: EditorState, modifier: Modifier) {
 }
 
 @Composable
-private fun DeskInspector(state: EditorState, library: AddLibrary, modifier: Modifier, close: () -> Unit) {
+private fun DeskInspector(state: EditorState, library: AddLibrary, modifier: Modifier, close: () -> Unit, onSettings: () -> Unit) {
     var menu by remember { mutableStateOf(false) }
     var parentMenu by remember { mutableStateOf(false) }
     val textUi = remember { TextEditUi() }
@@ -294,7 +352,7 @@ private fun DeskInspector(state: EditorState, library: AddLibrary, modifier: Mod
         }
         when {
             MultiSelect.active -> DeskMulti(state, Modifier.weight(1f).fillMaxWidth())
-            state.selectedId == null -> DeskProject(state, Modifier.weight(1f).fillMaxWidth())
+            state.selectedId == null -> Mixer(state, onSettings, Modifier.weight(1f).fillMaxWidth())
             state.panel == EditorPanel.EditText && state.selected?.kind == "text" -> TextEditor(state, textUi, embedded = true)
             else -> DeskLayerArea(state, Modifier.weight(1f).fillMaxWidth())
         }

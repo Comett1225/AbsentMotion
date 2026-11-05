@@ -14,6 +14,7 @@ object DesktopNative {
 
     external fun detectFaces(pixels: IntArray, width: Int, height: Int): FloatArray?
     external fun create(): Long
+    external fun gpuState(): Int
     external fun destroy(handle: Long)
     external fun loadEffect(handle: Long, xml: String): String
     external fun setScene(handle: Long, xml: String): String?
@@ -32,6 +33,7 @@ object DesktopNative {
     external fun renderPreview(handle: Long, timeMs: Double, width: Int, height: Int, address: Long, rowBytes: Long, scale: Float, dx: Float, dy: Float, background: Int,
         selectedId: Long, handles: Int, pixels: Boolean, pixelDivisor: Int, gridSpacing: Float, solo: Int, soloIds: LongArray?, guides: FloatArray, refPx: Float): Boolean
     external fun still(handle: Long, timeMs: Double, width: Int, height: Int, accurate: Boolean): ByteArray?
+    external fun stillInto(handle: Long, timeMs: Double, width: Int, height: Int, out: ByteArray): Boolean
     external fun setPixels(handle: Long, uri: String, width: Int, height: Int, argb: IntArray): Boolean
     external fun setModel(uri: String, positions: FloatArray?, normals: FloatArray?, uvs: FloatArray?, colors: IntArray?, triangles: IntArray?, slots: IntArray?, twoSided: Boolean): Boolean
     external fun dropPicture(handle: Long, uri: String)
@@ -50,4 +52,5 @@ object DesktopNative {
     external fun videoFrameLayer(handle: Long, video: Long, uri: String, layer: Long, timeUs: Long, exact: Boolean): Int
     external fun videoClose(video: Long)
     external fun blipTimes(text: String, speed: Float, pause: Float, every: Int): FloatArray
+    external fun pickFiles(owner: Long, mode: Int, multiple: Boolean, title: String, name: String, filters: Array<String>): Array<String>?
 }

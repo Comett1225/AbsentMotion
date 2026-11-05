@@ -54,6 +54,8 @@ object ExportAudio {
 
 internal const val PrimingKey = "absentmotion-priming-frames"
 
+private const val FrameBuffers = 4
+
 internal suspend fun <T> holdingVideo(hold: () -> Job?, release: () -> Job?, block: suspend () -> T): T {
     val held = hold()
     try {
@@ -89,12 +91,22 @@ internal object DeskEncoders {
     fun hardware(name: String): Boolean = !name.startsWith("lib") && name !in setOf("aac", "opus", "flac")
 
     fun video(codec: Codec): List<String> = when (codec) {
-        Codec.H264 -> listOf("h264_videotoolbox", "h264_nvenc", "h264_qsv", "h264_amf", "h264_mf", "libx264")
-        Codec.Hevc -> listOf("hevc_videotoolbox", "hevc_nvenc", "hevc_qsv", "hevc_amf", "hevc_mf", "libx265")
-        Codec.Av1 -> listOf("av1_nvenc", "av1_qsv", "av1_amf", "libsvtav1", "libaom-av1")
+        Codec.H264 -> listOf("h264_videotoolbox", "h264_nvenc", "h264_qsv", "h264_amf", "h264_mf", "h264_vaapi", "libx264")
+        Codec.Hevc -> listOf("hevc_videotoolbox", "hevc_nvenc", "hevc_qsv", "hevc_amf", "hevc_mf", "hevc_vaapi", "libx265")
+        Codec.Av1 -> listOf("av1_nvenc", "av1_qsv", "av1_amf", "av1_vaapi", "libsvtav1", "libaom-av1")
         Codec.Vp9 -> listOf("vp9_qsv", "libvpx-vp9")
         Codec.Apv -> listOf("liboapv")
-    }.filter { it in available }
+    }.filter { it in available && (!vaapi(it) || renderNode != null) }
+
+    private fun vaapi(name: String) = name.endsWith("_vaapi")
+
+    private val renderNode: String? by lazy {
+        System.getenv("AM_VAAPI_DEVICE") ?: File("/dev/dri").listFiles { f -> f.name.startsWith("renderD") }?.map { it.path }?.minOrNull()
+    }
+
+    fun device(name: String): List<String> = if (vaapi(name)) listOf("-init_hw_device", "vaapi=am:$renderNode", "-filter_hw_device", "am") else emptyList()
+
+    fun filter(name: String): List<String> = listOf("-vf", "scale=out_color_matrix=bt709:out_range=tv" + if (vaapi(name)) ",format=nv12,hwupload" else "")
 
     fun audio(codec: AudioCodec, kbps: Int = 0): List<String> = when (codec) {
         AudioCodec.Aac -> listOfNotNull("aac_at", "aac_mf".takeIf { kbps in 1..192 }, "aac")
@@ -109,8 +121,8 @@ internal object DeskEncoders {
 
     fun works(name: String, s: ExportSettings, width: Int, height: Int): Boolean = (name != "av1_amf" || width % 64 == 0 && height % 16 == 0) && working.getOrPut("$name ${width}x$height") {
         runCatching {
-            val args = listOf(DeskMedia.ffmpeg, "-v", "error", "-f", "lavfi", "-i", "color=c=black:s=${width}x$height:r=${s.fps}:d=0.2") +
-                videoArgs(name, s, width, height) + listOf("-frames:v", "2", "-f", "null", "-")
+            val args = listOf(DeskMedia.ffmpeg, "-v", "error") + device(name) + listOf("-f", "lavfi", "-i", "color=c=black:s=${width}x$height:r=${s.fps}:d=0.2") +
+                filter(name) + videoArgs(name, s, width, height) + listOf("-frames:v", "2", "-f", "null", "-")
             val process = ProcessBuilder(args).redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.DISCARD).start()
             try { process.waitFor(20, java.util.concurrent.TimeUnit.SECONDS) && process.exitValue() == 0 } finally { process.destroyForcibly() }
         }.getOrDefault(false)
@@ -128,8 +140,8 @@ internal object DeskEncoders {
             name.endsWith("_nvenc") -> listOf("-preset", "p4")
             else -> emptyList()
         }
-        return listOf("-c:v", name) + tuned + listOf("-b:v", "$bitrate", "-g", "${s.fps}", "-pix_fmt", "yuv420p",
-            "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709", "-color_range", "tv")
+        return listOf("-c:v", name) + tuned + listOf("-b:v", "$bitrate", "-g", "${s.fps}") + (if (vaapi(name)) emptyList() else listOf("-pix_fmt", "yuv420p")) +
+            listOf("-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709", "-color_range", "tv")
     }
 
     private val seeded = AtomicBoolean()
@@ -155,8 +167,11 @@ internal object DeskEncoders {
 }
 
 internal class Ffmpeg(args: List<String>, private val log: File) {
-    val process: Process = ProcessBuilder(listOf(DeskMedia.ffmpeg, "-hide_banner", "-v", "error") + args)
-        .redirectError(log).redirectOutput(ProcessBuilder.Redirect.DISCARD).start()
+    val process: Process = try {
+        ProcessBuilder(listOf(DeskMedia.ffmpeg, "-hide_banner", "-v", "error") + args).redirectError(log).redirectOutput(ProcessBuilder.Redirect.DISCARD).start()
+    } catch (e: java.io.IOException) {
+        throw ExportError(txt(R.string.desk_export_no_ffmpeg), e)
+    }
 
     fun finish(): Boolean {
         runCatching { process.outputStream.close() }
@@ -204,6 +219,7 @@ internal suspend fun exportVideo(
 ) {
     val (width, height) = exportSize(scene, s.shortSide, even = true)
     val frames = frameCount(scene, s.fps)
+    if (DeskEncoders.available.isEmpty()) throw ExportError(txt(R.string.desk_export_no_ffmpeg))
     EncoderTrouble.last = null
     val names = DeskEncoders.video(s.codec).filter { it !in EncoderTrouble.bad && !(ExportDebug.refuseHardware && DeskEncoders.hardware(it)) }.toMutableList()
     val result = exportTemp(s.container.ext)
@@ -216,7 +232,7 @@ internal suspend fun exportVideo(
             val coder = DeskEncoders.audio(s.audio.codec, s.audio.bitrateKbps).firstOrNull() ?: throw ExportError(txt(R.string.export_support_no_encoder, s.audio.codec.label))
             listOf("-map", "1:a", "-c:a", coder) + DeskEncoders.audioExtra(coder) + listOf("-b:a", "${s.audio.bitrateKbps}k", "-ar", "${s.audio.effectiveRate}", "-ac", "${s.audio.channels}")
         }
-        val inputs = listOf("-f", "rawvideo", "-pix_fmt", "rgba", "-s", "${width}x$height", "-r", "${s.fps}", "-i", "-") +
+        val inputs = listOf("-f", "rawvideo", "-pix_fmt", "rgb0", "-s", "${width}x$height", "-r", "${s.fps}", "-i", "-") +
             (if (pcm == null) emptyList() else listOf("-f", "s16le", "-ar", "${s.audio.effectiveRate}", "-ac", "2", "-i", pcm.path))
         val tag = if (s.codec == Codec.Hevc && (s.container == Container.Mp4 || s.container == Container.Mov)) listOf("-tag:v", "hvc1") else emptyList()
         val format = when (s.container) {
@@ -228,24 +244,30 @@ internal suspend fun exportVideo(
         var trouble: Throwable? = null
         while (true) {
             val encoder = withContext(Dispatchers.IO) { names.firstOrNull { DeskEncoders.works(it, s, width, height) } }
-                ?: throw trouble ?: ExportError(txt(R.string.export_error_cannot_encode, s.codec.label, "${width}x$height"))
+                ?: throw trouble ?: ExportError(txt(R.string.desk_export_no_encoder, s.codec.label, "${width}x$height"))
             names.subList(0, names.indexOf(encoder) + 1).clear()
-            if (!DeskEncoders.hardware(encoder) && DeskEncoders.video(s.codec).any(DeskEncoders::hardware)) note(txt(R.string.export_note_software))
+            if (!DeskEncoders.hardware(encoder) && DeskEncoders.video(s.codec).any(DeskEncoders::hardware)) note(txt(R.string.desk_export_note_software))
             EncoderTrouble.last = encoder
             Log.i("AMExport", "encoding ${width}x$height at ${s.fps} fps with $encoder")
-            val running = Ffmpeg(inputs + listOf("-map", "0:v", "-vf", "scale=out_color_matrix=bt709:out_range=tv") +
+            val running = Ffmpeg(DeskEncoders.device(encoder) + inputs + listOf("-map", "0:v") + DeskEncoders.filter(encoder) +
                 DeskEncoders.videoArgs(encoder, s, width, height) + tag + sound + format + listOf("-y", result.path), log).also { ffmpeg = it }
-            val queue = ArrayBlockingQueue<ByteArray>(3)
+            val queue = ArrayBlockingQueue<ByteArray>(FrameBuffers)
+            val free = ArrayBlockingQueue<ByteArray>(FrameBuffers)
             val end = ByteArray(0)
             val failure = AtomicReference<Throwable>()
             val written = AtomicInteger()
+            fun <T : Any> waitFor(step: () -> T?): T? {
+                while (failure.get() == null) step()?.let { return it }
+                return null
+            }
             val writer = thread(name = "am-export-write") {
                 try {
-                    val stdin = running.process.outputStream.buffered(1 shl 20)
+                    val stdin = running.process.outputStream
                     while (true) {
                         val pixels = queue.take()
                         if (pixels === end) break
-                        stdin.write(ImageEncode.flatten(pixels, BackgroundBlack, pixels))
+                        stdin.write(pixels)
+                        free.offer(pixels)
                         written.incrementAndGet()
                     }
                     stdin.flush()
@@ -256,12 +278,14 @@ internal suspend fun exportVideo(
             }
             val ok = try {
                 try {
+                    repeat(FrameBuffers) { free.add(ByteArray(width * height * 4)) }
                     engine.exportSession(xml, s.smoothing, s.fps) {
                         for (k in 0 until frames) {
                             currentCoroutineContext().ensureActive()
                             failure.get()?.let { throw ExportError(txt(R.string.library_text_value, running.problem()), it) }
-                            val pixels = still(frameTimeMs(scene, s.fps, k), width, height) ?: throw ExportError(txt(R.string.export_error_draw_frame, k.toString()))
-                            runInterruptible(Dispatchers.IO) { while (failure.get() == null && !queue.offer(pixels, 50, java.util.concurrent.TimeUnit.MILLISECONDS)) Unit }
+                            val pixels = runInterruptible(Dispatchers.IO) { waitFor { free.poll(50, java.util.concurrent.TimeUnit.MILLISECONDS) } } ?: continue
+                            if (!stillInto(frameTimeMs(scene, s.fps, k), width, height, pixels)) throw ExportError(txt(R.string.export_error_draw_frame, k.toString()))
+                            runInterruptible(Dispatchers.IO) { waitFor { pixels.takeIf { queue.offer(it, 50, java.util.concurrent.TimeUnit.MILLISECONDS) } } }
                             progress((k + 1f) / frames * 0.98f)
                             if (k % 30 == 0) ensureStorage()
                             pauseMs().takeIf { it > 0 }?.let { delay(it) }

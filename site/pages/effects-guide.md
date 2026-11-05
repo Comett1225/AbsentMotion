@@ -47,7 +47,7 @@ If the layer is a parent of other layers, a switch **Apply to Children** appears
 
 ## The effect list
 
-- The order matters: effects at the top are applied first. Drag the grip (**Reorder**) of a row to change the order.
+- The order matters: effects at the top are applied first. Hold the grip (**Reorder**) of a row and drag it to change the order. A short tap on the grip opens the effect, like a tap anywhere else on the row.
 - The eye (**Visibility**) hides an effect without deleting it.
 - Swipe a row to the left to delete that effect. Undo brings it back.
 - **More** in the left column has **Copy Effects** (you tick which ones) and **Paste Effect** or **Paste Effects**, which adds the copied effects at the end of the list of the selected layer.

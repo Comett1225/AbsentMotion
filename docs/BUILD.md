@@ -248,10 +248,30 @@ It needs the pinned Skia source with its dependencies and the patch, as `tools/b
 any such checkout through `SKIA_DIR`; the source can be read-only when `SKIA_OUT` points elsewhere).
 The native library links libstdc++ statically and `linux/native/glibc_compat.c` maps the C23 `strtol` and `scanf` names,
 `fmod` and `arc4random` that Ubuntu 24.04's headers pick to older glibc symbols, so the build needs only glibc 2.35 (Ubuntu
-22.04, Debian 12 or newer). `linux/package.sh` writes `pc/build/linux-release/AbsentMotion-<version>-linux-<arm64|x86_64>.deb`
-and `.AppImage` (`linux/README.md` lists what it changes in the Compose `.deb`). The `.deb` installs to `/opt/absentmotion`
+22.04, Debian 12 or newer). `linux/package.sh` writes `pc/build/linux-release/AbsentMotion-<version>-linux-<arm64|x86_64>.deb`,
+`.AppImage` and `.tar.gz` (`linux/README.md` lists what it changes in the Compose `.deb` and what the start script
+`linux/start.sh` and the per-user `linux/install.sh` in the `.tar.gz` do). The `.deb` installs to `/opt/absentmotion`
 with a menu entry and the `.absproj` file type. The packaging tasks always run again, because Compose does not notice
-when only the native library changed.
+when only the native library changed. `linux/distro_check.sh` (needs Docker) installs the `.tar.gz` on seven distributions
+and checks that it renders, exports and starts there.
+
+**Start-up class archive (Windows and Linux).** The Java runtime that Compose links in has no class-data-sharing archive,
+so `createDistributable` makes one: it runs the app's launcher once with `_JAVA_OPTIONS=-Xshare:dump`, which writes
+`classes_nocoops.jsa` (the name the JVM looks for with ZGC) next to the runtime's `libjvm`/`jvm.dll`; the log line
+`start-up archive: ...` shows its size. On top of that the app's own classes go into a per-user archive the JVM writes when
+the app quits the first time (`-XX:+AutoCreateSharedArchive`): on Windows `app-<key>.jsa` in the install folder (the
+launcher's `.cfg` names it; the key changes with the jar files, and the app deletes older ones), on Linux in
+`~/.cache/absentmotion` through `linux/start.sh`. A JDK 21 dynamic archive is only made when none exists and is not
+rebuilt when it no longer matches, which is why the file name carries the key. The Mac keeps its own archive from
+`installMac`.
+
+**Timing tests.** `AM_TIMING=1 ./gradlew test --tests app.absentmotion.pc.ExportTimingTest` exports a 10-second 1080x1920
+scene (a video, a picture and four effects) and prints frames per second for each stage (engine drawing and read-back,
+pipe to FFmpeg, colour conversion, the hardware and the software encoder, the whole export) and the export screen's time
+estimate; `AM_TIMING_SECONDS` shortens the scene and `AM_SOFTWARE_RENDER=1` draws on the CPU. `AM_TIMING=1 ./gradlew test
+--tests app.absentmotion.pc.FirstProjectTimingTest` opens two new projects from the home screen and prints the time to the
+editor's first frame (`AM_TIMING_PRELOAD=off` turns the background start-up preload off, `AM_TIMING_IDLE_MS` sets how long
+the home screen waits first). Without `AM_TIMING` both are skipped.
 
 Tests: run them as a normal user (as root the read-only-folder test cannot make saving fail) with `pc/build` on a file system
 that honours folder permissions (a Docker Desktop bind mount does not; a `tmpfs` mount on `pc/build/save-failed-data` does).

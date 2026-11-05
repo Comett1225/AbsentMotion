@@ -25,6 +25,7 @@ fun warmup() {
     application {
         val desk = remember { DeskAppState().also { it.settings.onboarding = app.absentmotion.ui.onboarding.ONBOARDING_DONE } }
         Window(onCloseRequest = ::exitApplication, title = "AbsentMotion", state = rememberWindowState(width = 1280.dp, height = 800.dp)) {
+            remember(window) { app.absentmotion.desk.DeskWindow.decorate(window) }
             DeskApp(desk)
             LaunchedEffect(Unit) {
                 delay(1500)

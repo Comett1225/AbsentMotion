@@ -3,6 +3,7 @@ package app.absentmotion.export
 import android.hardware.HardwareBuffer
 import app.absentmotion.engine.EngineThread
 import app.absentmotion.model.Scene
+import app.absentmotion.platform.PlatformFeatures
 import java.io.OutputStream
 import kotlin.math.roundToLong
 import kotlinx.coroutines.Dispatchers
@@ -39,13 +40,16 @@ internal fun gifTimeMs(frames: Int, sample: GifSample, renderMs: Long?): Long {
 
 internal fun drawSamples(frames: Int, interpolation: FrameInterpolation): List<Int> {
     val last = (frames - 1).coerceAtLeast(0)
-    val picks = if (interpolation == FrameInterpolation.Off) listOf(0, 0, frames / 3, frames * 2 / 3)
+    val picks = if (interpolation == FrameInterpolation.Off && !PlatformFeatures.desktop) listOf(0, 0, frames / 3, frames * 2 / 3)
         else listOf(0, 1, frames / 3, frames / 3 + 1, frames * 2 / 3, frames * 2 / 3 + 1)
     return picks.map { it.coerceIn(0, last) }
 }
 
-internal fun drawingMs(times: List<Double>, interpolation: FrameInterpolation): Double =
-    if (interpolation == FrameInterpolation.Off) times.drop(1).sorted()[1] else times.drop(2).average()
+internal fun drawingMs(times: List<Double>, interpolation: FrameInterpolation): Double = when {
+    PlatformFeatures.desktop -> times.filterIndexed { i, _ -> i % 2 == 1 }.sorted()[1]
+    interpolation == FrameInterpolation.Off -> times.drop(1).sorted()[1]
+    else -> times.drop(2).average()
+}
 
 internal suspend fun measureVideoDraw(engine: EngineThread, scene: Scene, settings: ExportSettings): Double {
     val (width, height) = exportSize(scene, settings.shortSide, even = true)

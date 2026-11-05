@@ -7,6 +7,17 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
+import app.absentmotion.library.SavedSize
+import app.absentmotion.library.SavedSizes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -51,6 +62,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -97,7 +109,7 @@ internal val Resolutions = listOf(
     2160 to "2160p (4k)", 1440 to "1440p (QHD)", 1080 to "1080p (FHD)", 720 to "720p (HD)",
     540 to "540p (SD)", 360 to "360p", 270 to "270p", 180 to "180p",
 )
-internal val FrameRates = listOf(12, 15, 18, 20, 24, 25, 30, 48, 50, 60)
+internal val FrameRates = listOf(12, 15, 18, 20, 24, 25, 30, 48, 50, 60, 90, 120)
 
 internal class BackgroundChoice(@StringRes val name: Int, val argb: Int)
 
@@ -153,6 +165,12 @@ internal class Form(saved: NewProjectChoice, val titles: List<String>, val names
         if (linked) customH.toIntOrNull()?.let { customW = (it * ratio).roundToInt().coerceIn(MIN_SIDE, MAX_SIDE).toString() }
     }
 
+    fun pick(w: Int, h: Int) {
+        customW = w.toString()
+        customH = h.toString()
+        if (linked) ratio = w.toFloat() / h
+    }
+
     fun toggleLink() {
         linked = !linked
         if (linked) ratio = side(customW).toFloat() / side(customH)
@@ -206,7 +224,7 @@ fun NewProjectSheet(
         BoxWithConstraints(Modifier.align(Alignment.BottomCenter).widthIn(max = 480.dp).presence(slide = 1f, fade = false)) {
             val density = LocalDensity.current
             CompositionLocalProvider(LocalDensity provides Density(density.density * minOf(1f, maxWidth / SheetWidth), density.fontScale)) {
-                SheetBody(form, onClose, onCreate = create@{
+                SheetBody(form, settings, onClose, onCreate = create@{
                     if (creating) return@create
                     creating = true
                     settings.newProject = form.choice()
@@ -232,7 +250,7 @@ fun NewProjectSheet(
 }
 
 @Composable
-private fun SheetBody(form: Form, onClose: () -> Unit, onCreate: () -> Unit) {
+private fun SheetBody(form: Form, settings: AppSettings, onClose: () -> Unit, onCreate: () -> Unit) {
     Column(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp)).background(Am.SheetBg)
             .windowInsetsPadding(WindowInsets.navigationBars.union(WindowInsets.ime)).verticalScroll(rememberScrollState()),
@@ -245,6 +263,9 @@ private fun SheetBody(form: Form, onClose: () -> Unit, onCreate: () -> Unit) {
         AspectRow(form)
         Spacer(Modifier.height(16.dp))
         SizeRow(form)
+        AnimatedVisibility(form.aspect == CUSTOM, enter = expandVertically() + fadeIn(), exit = shrinkVertically() + fadeOut()) {
+            SavedSizeStrip(form, settings)
+        }
         Spacer(Modifier.height(16.dp))
         FormRow(stringResource(R.string.newproject_frame_rate)) { FrameRateField(form) }
         Spacer(Modifier.height(16.dp))
@@ -472,5 +493,73 @@ private fun NumberField(value: String, onChange: (String) -> Unit, onLeave: () -
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         cursorBrush = SolidColor(Am.Navy),
         decorationBox = { inner -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { inner() } },
+    )
+}
+
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+@Composable
+private fun SavedSizeStrip(form: Form, settings: AppSettings) {
+    var naming by remember { mutableStateOf<Pair<SavedSize?, String>?>(null) }
+    Row(
+        Modifier.padding(top = 12.dp).fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 32.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Box(
+            Modifier.height(44.dp).clip(FieldShape).border(1.dp, Am.Navy, FieldShape).clickable {
+                form.commitSides()
+                val (w, h) = form.size
+                naming = null to "$w × $h"
+            }.padding(horizontal = 14.dp),
+            contentAlignment = Alignment.Center,
+        ) { Text(stringResource(R.string.newproject_save_size_chip), color = Am.Navy, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1) }
+        settings.savedSizes.forEach { size ->
+            var menu by remember { mutableStateOf(false) }
+            Box {
+                Column(
+                    Modifier.height(44.dp).clip(FieldShape).background(Am.Card)
+                        .combinedClickable(onLongClick = { menu = true }) { form.pick(size.width, size.height) }.padding(horizontal = 14.dp),
+                    verticalArrangement = Arrangement.Center,
+                ) {
+                    Text(size.name, Modifier.widthIn(max = 150.dp), color = Am.HomeInk, fontSize = 14.sp, lineHeight = 16.sp, maxLines = 1)
+                    Text(size.label, color = DimText, fontSize = 11.sp, lineHeight = 13.sp, maxLines = 1)
+                }
+                RefMenu(menu, { menu = false }, ListColor, FieldShape, Modifier.width(180.dp)) {
+                    PickRow(stringResource(R.string.rename), divider = true) { menu = false; naming = size to size.name }
+                    PickRow(stringResource(R.string.delete), divider = false) { menu = false; settings.savedSizes = SavedSizes.without(settings.savedSizes, size) }
+                }
+            }
+        }
+    }
+    naming?.let { (target, initial) ->
+        SizeNameDialog(stringResource(if (target == null) R.string.newproject_save_size_title else R.string.rename), initial, dark = false, onDismiss = { naming = null }) { name ->
+            naming = null
+            settings.savedSizes = if (target == null) {
+                val (w, h) = form.size
+                SavedSizes.with(settings.savedSizes, name, w, h)
+            } else SavedSizes.renamed(settings.savedSizes, target, name)
+        }
+    }
+}
+
+@Composable
+internal fun SizeNameDialog(title: String, initial: String, dark: Boolean, onDismiss: () -> Unit, onDone: (String) -> Unit) {
+    var text by remember { mutableStateOf(androidx.compose.ui.text.input.TextFieldValue(initial, androidx.compose.ui.text.TextRange(0, initial.length))) }
+    val focus = remember { androidx.compose.ui.focus.FocusRequester() }
+    androidx.compose.runtime.LaunchedEffect(Unit) { runCatching { focus.requestFocus() } }
+    val ink = if (dark) Am.OnDark else Am.Navy
+    val accent = if (dark) Am.Accent else Am.Navy
+    AlertDialog(
+        onDismissRequest = onDismiss, title = { Text(title, color = ink) },
+        text = {
+            BasicTextField(
+                text, { text = it.copy(text = it.text.take(SavedSizes.MAX_NAME)) }, Modifier.fillMaxWidth().focusRequester(focus).clip(RoundedCornerShape(6.dp)).background(if (dark) Am.Panel else Am.HomeBg).padding(12.dp),
+                textStyle = TextStyle(color = ink, fontSize = 16.sp), singleLine = true, cursorBrush = SolidColor(accent),
+                keyboardOptions = KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Done),
+                keyboardActions = androidx.compose.foundation.text.KeyboardActions(onDone = { onDone(text.text) }),
+            )
+        },
+        confirmButton = { TextButton({ onDone(text.text) }) { Text(stringResource(R.string.done), color = accent) } },
+        dismissButton = { TextButton(onDismiss) { Text(stringResource(R.string.cancel), color = accent) } },
+        containerColor = if (dark) Am.Field else Am.Card,
     )
 }

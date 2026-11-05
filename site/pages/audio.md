@@ -30,6 +30,10 @@ The first button of the panel, **Audio Effects**, opens the effects of the clip.
 
 The sound of a clip follows its speed (see [Photos, video and speed](@media)). Sources with more than two channels are mixed down to stereo.
 
+## Mixer
+
+On a tablet in a wide layout, and on a computer, the mixer shows up when no layer is selected (on a tablet only when there is room next to the preview). Every layer that makes sound gets a strip with its name, a volume fader, a level meter and the value. Drag the fader to change the volume (one drag is one undo step); double-tap it (double-click on a computer) to go back to 100%. **M** mutes the layer and **S** (Solo) plays only the soloed layers while you listen; Solo is not saved and does not change the export. The **Master** strip shows the level of the whole project. The gear at the top opens the project settings.
+
 ## Audio effects
 
 For a sound clip, **Effects** opens the effects library already on the **Audio** category. For a video clip, an **Audio** category sits in the normal library. Inside the volume panel, the **Audio Effects** button opens the list. In the list:

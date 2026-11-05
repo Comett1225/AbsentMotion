@@ -21,7 +21,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import app.absentmotion.editor.EditorPanel
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,6 +62,9 @@ val PanelHeight = 200.dp
 
 private val SideWidth = PhoneWidth
 
+internal fun mixerFits(width: Dp, height: Dp, sceneWidth: Int, sceneHeight: Int): Boolean =
+    height > 0.dp && width >= SideWidth * 2 && (width - SideWidth).value * sceneHeight >= height.value * sceneWidth
+
 @Composable
 internal fun WideEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: AddLibrary) {
     BoxWithConstraints(Modifier.fillMaxSize().background(Am.TopBar).systemBarsPadding().displayCutoutPadding()) {
@@ -67,7 +73,9 @@ internal fun WideEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: 
         val textEdit = state.panel == EditorPanel.EditText && state.selected?.kind == "text"
         val textUi = remember { TextEditUi() }
         val side = textEdit || (state.selectedId != null && !state.addOpen && !MultiSelect.active)
-        val reserve = if (side) SideWidth else 0.dp
+        val mixer = !side && state.selectedId == null && !state.addOpen && !MultiSelect.active && mixerFits(maxWidth, maxHeight - 88.dp - timeline, state.scene.width, state.scene.height)
+        val reserve = if (side || mixer) SideWidth else 0.dp
+        var settingsOpen by remember { mutableStateOf(false) }
         Column(Modifier.fillMaxSize()) {
             EditorTopBar(state, onExit, Modifier.fillMaxWidth().height(42.dp).enterFade().tutorialGuard(any = true))
             Box(Modifier.fillMaxWidth().weight(1f)) {
@@ -79,6 +87,7 @@ internal fun WideEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: 
                     HistoryNotes(state, Modifier.align(Alignment.BottomCenter))
                 }
                 if (side) SidePanels(state, addLibrary, textEdit, textUi, Modifier.align(Alignment.CenterEnd))
+                else if (mixer) Mixer(state, { settingsOpen = true }, Modifier.align(Alignment.CenterEnd).width(SideWidth).fillMaxHeight().pointerInput(Unit) {})
             }
             Box(Modifier.fillMaxWidth().height(46.dp).background(Am.TimelineBg)) {
                 PlayBar(state, Modifier.align(Alignment.Center).widthIn(max = 560.dp).fillMaxSize().tutorialTarget("playbar").tutorialGuard(any = true))
@@ -90,6 +99,7 @@ internal fun WideEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: 
                 if (!side) LowerPanels(state, addLibrary, transitionHere = false)
             }
         }
+        Presence(settingsOpen) { ProjectSettingsPopup(state) { settingsOpen = false } }
         if (textEdit && textUi.browser) PhoneScreen { Box(Modifier.fillMaxSize().enterFade(rise = 12.dp)) { TextFontBrowser(state, textUi) } }
     }
 }

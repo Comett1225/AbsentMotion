@@ -71,11 +71,11 @@ class DeskGroupTest {
                 editor.selectedId = null
             }
             mainClock.advanceTimeBy(300)
-            onAllNodesWithText("Project settings", substring = false).assertCountEquals(1)
+            onAllNodesWithText("Sound", substring = false).assertCountEquals(1)
             onRoot().performMouseInput { doubleClick(Offset(700f, 596f)) }
             mainClock.advanceTimeBy(400)
             runOnIdle { assertTrue(editor.inGroup) }
-            onAllNodesWithText("Project settings", substring = false).assertCountEquals(0)
+            onAllNodesWithText("Sound", substring = false).assertCountEquals(0)
             onAllNodesWithText("Trip", substring = false).filter(hasClickAction()).assertCountEquals(1)
 
             runOnIdle {

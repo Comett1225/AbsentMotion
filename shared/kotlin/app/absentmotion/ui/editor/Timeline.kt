@@ -132,6 +132,7 @@ import app.absentmotion.editor.pasteLayer
 import app.absentmotion.editor.canPaste
 import app.absentmotion.editor.split
 import app.absentmotion.editor.groupLayers
+import app.absentmotion.editor.chosenLayers
 import app.absentmotion.editor.isPlainGroup
 import app.absentmotion.editor.askUngroup
 import app.absentmotion.editor.EditorPanel
@@ -205,6 +206,7 @@ private val EyeCentre = 17.dp
 private val ThumbLeft = 36.dp
 private val ThumbSize = 16.dp
 private val ClipTrim = 8.dp
+private val DeskClipTrim = 12.dp
 private const val HIDDEN_ALPHA = 0.55f
 
 private val BarInset = 2.5.dp
@@ -364,6 +366,8 @@ private fun TimelineSurface(view: TimelineView, modifier: Modifier, content: @Co
 
 @Composable
 private fun DesktopTimelineMenu(view: TimelineView) {
+    var stretch by remember { mutableStateOf<Set<Long>?>(null) }
+    stretch?.let { StretchSheet(view.state, it) { stretch = null } }
     val at = view.menuAt ?: return
     val state = view.state
     val id = view.menuId
@@ -382,6 +386,7 @@ private fun DesktopTimelineMenu(view: TimelineView) {
                 DropdownMenuItem(colors = menuColors, text = { Text(stringResource(R.string.timeline_split), fontSize = 14.sp) }, onClick = { close { state.split() } })
                 DropdownMenuItem(colors = menuColors, text = { Text(stringResource(R.string.delete), fontSize = 14.sp) }, onClick = { close { state.deleteChosen() } })
                 if (MultiSelect.active && MultiSelect.ids.size > 1) DropdownMenuItem(colors = menuColors, text = { Text(stringResource(R.string.structure_group), fontSize = 14.sp) }, onClick = { close { state.groupLayers(MultiSelect.ids) } })
+                if (MultiSelect.active && MultiSelect.ids.size > 1) DropdownMenuItem(colors = menuColors, text = { Text(stringResource(R.string.multi_stretch_timing), fontSize = 14.sp) }, enabled = state.chosenLayers.any { it.endTime > it.startTime }, onClick = { close { state.playing = false; stretch = MultiSelect.ids } })
                 if (layer?.isPlainGroup == true && !MultiSelect.active) {
                     DropdownMenuItem(colors = menuColors, text = { Text(stringResource(R.string.layer_tool_edit_group), fontSize = 14.sp) }, onClick = { close { state.enterGroup(id) } })
                     DropdownMenuItem(colors = menuColors, text = { Text(stringResource(R.string.layer_tool_ungroup), fontSize = 14.sp) }, onClick = { close { state.askUngroup() } })
@@ -1941,7 +1946,7 @@ private fun DrawScope.drawRow(
     if (PlatformFeatures.desktop) {
         val chosen = selected || layer.id in MultiSelect.ids
         drawDeskClipFrame(left, right, barTop, barBottom, headerWidth, chosen, hovered, limit)
-        drawDeskHeader(layer, chosen, hovered, top, headerWidth, eye, measurer, styles)
+        drawDeskHeader(layer, chosen, hovered, top, headerWidth, eye, measurer, styles, layer.node["clippingMask"] == "true")
     } else {
         if (selected || layer.id in MultiSelect.ids) {
             drawGrip(outline, left, barTop, barBottom, start = true, appear, limit == true)
@@ -1972,12 +1977,14 @@ private fun DrawScope.drawDeskClipFrame(left: Float, right: Float, top: Float, b
     }
 }
 
-private fun DrawScope.drawDeskHeader(layer: Layer, chosen: Boolean, hovered: Boolean, top: Float, width: Float, eye: Painter, measurer: TextMeasurer, styles: TimelineStyles) {
+private fun DrawScope.drawDeskHeader(layer: Layer, chosen: Boolean, hovered: Boolean, top: Float, width: Float, eye: Painter, measurer: TextMeasurer, styles: TimelineStyles, clipped: Boolean = false) {
     val height = RowHeight.toPx()
     drawRect(Am.TimelineBg, Offset(0f, top), Size(width, height))
     val pillHeight = height - HeaderInset.toPx() * 2
     val pillTop = Offset(-pillHeight, top + HeaderInset.toPx())
-    val pill = Size(width - 2.dp.toPx() + pillHeight, pillHeight)
+    val trim = if (clipped) DeskClipTrim.toPx() else 0f
+    val pill = Size(width - 2.dp.toPx() - trim + pillHeight, pillHeight)
+    if (clipped) drawClipHook(width - 2.dp.toPx() - trim + 1.dp.toPx(), top + height / 2)
     val radius = CornerRadius(pillHeight / 2)
     drawRoundRect(HeaderFill, pillTop, pill, radius)
     if (chosen) drawRoundRect(Am.Accent.copy(alpha = 0.28f), pillTop, pill, radius)
@@ -1988,7 +1995,7 @@ private fun DrawScope.drawDeskHeader(layer: Layer, chosen: Boolean, hovered: Boo
     val icon = eye.intrinsicSize
     translate(EyeCentre.toPx() - icon.width / 2, top + (height - icon.height) / 2) { with(eye) { draw(icon) } }
     val left = 56.dp.toPx()
-    val room = (width - left - pillHeight / 2 - 4.dp.toPx()).toInt()
+    val room = (width - trim - left - pillHeight / 2 - 4.dp.toPx()).toInt()
     if (room < 1) return
     val text = measurer.measure(layer.shownName(), if (layer.hidden) styles.hiddenHeader else styles.header, TextOverflow.Ellipsis, maxLines = 1, constraints = Constraints(maxWidth = room))
     drawText(text, topLeft = Offset(left, top + (height - text.size.height) / 2))

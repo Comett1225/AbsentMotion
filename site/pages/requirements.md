@@ -53,7 +53,7 @@ Phones running Android 16 and 17, and emulators from Android 13. Other phones sh
 From version 5.0 there is also a version for computers. It is the same app as on the phone, with the same effects, projects and export, laid out for a mouse and a keyboard. The phone app still comes first.
 
 - **Mac:** computers with Apple silicon (M1 or newer). Download the Mac file (`.dmg`) from the [releases page](@releases).
-- **Linux:** 64-bit computers with an ARM (`arm64`) or Intel or AMD (`x86_64`) chip, running Ubuntu 22.04, Debian 12 or newer, or another Linux with glibc 2.35 or newer. From the [releases page](@releases), download the `.deb` package, which adds AbsentMotion to the app menu of Ubuntu, Debian and similar systems, or the `.AppImage`, which runs without installing: mark it as executable and open it. Pick the file with `arm64` or `x86_64` in its name.
+- **Linux:** 64-bit computers with an ARM (`arm64`) or Intel or AMD (`x86_64`) chip, running Ubuntu 22.04, Debian 12 or newer, or another Linux with glibc 2.35 or newer. From the [releases page](@releases), download the `.deb` package, which adds AbsentMotion to the app menu of Ubuntu, Debian and similar systems, the `.AppImage`, which runs without installing: mark it as executable and open it, or the `.tar.gz`, which installs for your user on any distribution (Arch, Fedora, openSUSE and others): unpack it and run `install.sh`. Pick the file with `arm64` or `x86_64` in its name. The [README](@repo) has step-by-step install notes for each kind of Linux.
 - **Windows** is being tested and comes later.
 
 On Linux, AbsentMotion draws with the graphics chip through Vulkan. Without a Vulkan driver (on Ubuntu and Debian, the package `mesa-vulkan-drivers`) it draws with the processor, which is slower, and frame blending, optical-flow and motion-blur smoothing, and Datamosh do not work.
@@ -64,7 +64,11 @@ What is different on a computer:
 - Drag files from your file manager into the window, or link a folder so its media shows in the library. Drag a tile from the library onto the timeline or the preview to add it.
 - Drag a layer in the preview to move it and drag a corner to resize it. Hold Alt and scroll to scale it; add Shift to rotate it. Drag with the middle mouse button to move the view of the preview or the timeline.
 - Right-click a clip on the timeline for a menu with cut, copy, paste, duplicate, split, delete, group and more. Double-click a group to open it.
-- Keyboard shortcuts use Cmd on a Mac (Ctrl on Windows and Linux): Space plays and pauses, the arrow keys step one frame (ten with Shift), Cmd+Z undoes and Cmd+Shift+Z redoes, Cmd+C, Cmd+X and Cmd+V copy, cut and paste layers, Cmd+D duplicates, Cmd+B splits at the playhead, Delete removes the selected layers and Cmd+E opens the export.
+- Keyboard shortcuts use Cmd on a Mac (Ctrl on Windows and Linux): Space plays and pauses, the arrow keys step one frame (ten with Shift), Cmd+Z undoes and Cmd+Shift+Z redoes, Cmd+C, Cmd+X and Cmd+V copy, cut and paste layers, Cmd+D duplicates, Cmd+B splits at the playhead, Option+Left and Option+Right (Alt on Windows and Linux) jump to the previous or next bookmark and then to the start or end, the comma and period keys nudge the selected clips by one frame (ten with Shift), Delete removes the selected layers and Cmd+E opens the export.
+- The bar at the top is part of the app, with the system's own window buttons (on the left on a Mac, on the right on Windows and Linux). The **☰** button next to the exit button opens the File, Edit, View, Playback and Help menus. If the bar causes trouble, **Settings** > **Editor** > **Use system title bar** brings back the normal one.
+- Each project shows only the media you picked or linked in it. Right-click a folder in the library and choose **Pin to all projects** to see it in every project. A search lists the folder first and then the matching files in it.
+- With nothing selected, the inspector shows the **Mixer**: a volume fader, Mute, Solo and a level meter for every layer that makes sound.
+- The **?** on an effect opens its help in a small window inside the app; close it with the X or Esc.
 - Taking a photo or a video uses the computer's webcam.
 - The Video Downloader is not on the computer yet.
 

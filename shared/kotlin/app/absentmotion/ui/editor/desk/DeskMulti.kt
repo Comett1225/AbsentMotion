@@ -100,6 +100,8 @@ internal fun DeskMulti(state: EditorState, modifier: Modifier) {
     var animation by remember { mutableStateOf<Set<Long>?>(null) }
     transition?.let { TransitionSheet(state, it) { transition = null } }
     animation?.let { AnimationSheet(state, it) { animation = null } }
+    var stretch by remember { mutableStateOf<Set<Long>?>(null) }
+    stretch?.let { StretchSheet(state, it) { stretch = null } }
     val some = layers.isNotEmpty()
     val end = some && state.timeMs >= layers.maxOf { it.endTime }
     val copied = EffectClipboard.effects.isNotEmpty()
@@ -141,6 +143,7 @@ internal fun DeskMulti(state: EditorState, modifier: Modifier) {
             if (layers.any { it.canAnimate }) animation = ids
             else Toast.makeText(context, context.resources.getQuantityString(R.plurals.multi_applied_count, 0, "0"), Toast.LENGTH_SHORT).show()
         },
+        MultiTile(PanelIcons.Speed, R.string.multi_stretch_timing, layers.any { it.endTime > it.startTime }) { state.playing = false; stretch = layers.map { it.id }.toSet() },
         MultiTile(PanelIcons.Star, R.string.multi_presets, some) { state.playing = false; state.presetsOpen = true },
         MultiTile(PanelIcons.PaintBucket, R.string.structure_paste_fill_color, some && style, if (style) null else noStyle) { paste(setOf(StylePart.ColorFill)) },
         MultiTile(PanelIcons.BorderShadow, R.string.structure_paste_border_shadow, some && style, if (style) null else noStyle) { paste(setOf(StylePart.BorderShadow)) },

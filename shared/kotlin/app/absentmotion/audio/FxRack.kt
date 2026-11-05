@@ -88,6 +88,8 @@ internal class SafeLimiter(rate: Int, releaseMs: Double = 100.0) : ClipFx {
 }
 
 internal class FxRack(private val rate: Int, private val make: FxMaker = NativeFx::chain) : Closeable {
+    var live: LiveMix? = null
+
     private class Slot(val fx: ClipFx?) {
         var values: FloatArray? = null
         var tail = 0
@@ -103,7 +105,7 @@ internal class FxRack(private val rate: Int, private val make: FxMaker = NativeF
     private val quietFrames = rate * QUIET_S
 
     fun target(clip: AudioClip, out: FloatArray, frames: Int): FloatArray {
-        if (clip.fx == null) return out
+        if (clip.fx == null && live == null) return out
         if (scratch.size < 2 * frames) scratch = FloatArray(2 * frames)
         java.util.Arrays.fill(scratch, 0, 2 * frames, 0f)
         return scratch
@@ -117,14 +119,15 @@ internal class FxRack(private val rate: Int, private val make: FxMaker = NativeF
             slots.remove(clip.id)
             slot = null
         }
-        if (spec == null) return
+        if (spec == null) { add(clip, out, frames); return }
         if (slot == null) {
-            if (!rendered) return
+            if (!rendered) { live?.put(clip.id, 0f); return }
             slot = Slot(make(spec, rate)).also { slots[clip.id] = it }
         } else if (slot.tail <= 0) {
             if (!rendered) {
                 slot.fx?.close()
                 slots.remove(clip.id)
+                live?.put(clip.id, 0f)
                 return
             }
             slot.fx?.reset()
@@ -151,7 +154,19 @@ internal class FxRack(private val rate: Int, private val make: FxMaker = NativeF
             slot.quiet = if (peak < QUIET_LEVEL) slot.quiet + frames else 0
             if (slot.quiet >= quietFrames) slot.tail = 0
         }
-        for (i in 0 until 2 * frames) out[i] += scratch[i]
+        if (live != null) add(clip, out, frames) else for (i in 0 until 2 * frames) out[i] += scratch[i]
+    }
+
+    private fun add(clip: AudioClip, out: FloatArray, frames: Int) {
+        val live = live ?: return
+        if (live.silenced(clip.id)) { live.put(clip.id, 0f); return }
+        var peak = 0f
+        for (i in 0 until 2 * frames) {
+            val v = scratch[i]
+            out[i] += v
+            if (abs(v) > peak) peak = abs(v)
+        }
+        live.put(clip.id, peak)
     }
 
     fun sweep() {
@@ -161,6 +176,7 @@ internal class FxRack(private val rate: Int, private val make: FxMaker = NativeF
             if (slot.seen != generation) { slot.fx?.close(); it.remove() }
         }
         generation++
+        live?.next()
     }
 
     fun reset() {

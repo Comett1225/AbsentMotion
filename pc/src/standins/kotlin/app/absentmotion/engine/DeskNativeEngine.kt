@@ -66,6 +66,7 @@ class NativeEngine(backend: Backend = Backend.GANESH) : AutoCloseable {
     fun layerOutline(layerId: Long, timeMs: Double): String? = DesktopNative.layerOutline(handle, layerId, timeMs)
     fun hitTest(x: Float, y: Float, timeMs: Double): Long = DesktopNative.hitTest(handle, x, y, timeMs)
     fun still(timeMs: Double, width: Int, height: Int): ByteArray? = DesktopNative.still(handle, timeMs, width, height, true)
+    fun stillInto(timeMs: Double, width: Int, height: Int, out: ByteArray): Boolean = DesktopNative.stillInto(handle, timeMs, width, height, out)
     fun previewStill(timeMs: Double, width: Int, height: Int, accurateBlur: Boolean): ByteArray? = DesktopNative.still(handle, timeMs, width, height, accurateBlur)
     fun shapeIcon(xml: String, size: Int, color: Int): ByteArray? = DesktopNative.shapeIcon(handle, xml, size, color)
 

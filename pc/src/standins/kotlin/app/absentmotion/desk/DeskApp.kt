@@ -35,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
@@ -76,6 +77,7 @@ import app.absentmotion.library.Recovery
 import app.absentmotion.library.TemplateStore
 import app.absentmotion.model.Scene
 import app.absentmotion.model.ShapeCatalog
+import app.absentmotion.ui.editor.DeskTopBar
 import app.absentmotion.ui.editor.EditorScreen
 import app.absentmotion.ui.editor.LocalWide
 import app.absentmotion.ui.editor.MediaPicks
@@ -241,7 +243,7 @@ class DeskAppState {
     suspend fun openNow(id: String): EditorState? {
         val scene = load(id) ?: return null
         val saver = ProjectSaver(id, store, recovery, failed = { javax.swing.SwingUtilities.invokeLater { toast(R.string.home_save_project_failed) } })
-        return EditorState(id, scene, store, engine, settings, saver).also { editor = it; offerFonts(it) }
+        return EditorState(id, scene, store, engine, settings, saver).also { DeskLibrary.open(id, it.scene.media.map { m -> m.uri }); editor = it; offerFonts(it) }
     }
 
     private fun offerFonts(state: EditorState) {
@@ -294,6 +296,7 @@ class DeskAppState {
             saveThumbnail(scene, state.timeMs, state.projectId)
         } finally {
             MultiSelect.clear()
+            DeskLibrary.close()
             editor = null
             projectsChanged++
         }
@@ -450,6 +453,7 @@ private fun DeskContent(app: DeskAppState, scale: Float) {
     }
     LaunchedEffect(Unit) { if (app.settings.autoUpdateCheck) Updates.atStart(app.context, app.settings) }
     LaunchedEffect(Unit) { app.startup() }
+    LaunchedEffect(Unit) { DeskPreload.run(app) }
     LaunchedEffect(Unit) { app.maintain() }
     LaunchedEffect(DeskOpen.arrived.intValue) {
         val files = DeskOpen.take()
@@ -468,9 +472,20 @@ private fun DeskContent(app: DeskAppState, scale: Float) {
     val homePress = remember(Am.PressHome) { PressIndication(Am.PressHome) }
     val editorPress = remember(Am.PressEditor) { PressIndication(Am.PressEditor) }
     val drop = remember(app) { DeskDrop(app) { block -> run(block) } }
-    val titleBar = (DeskOs.titleBarDp / scale).dp
-    Box(Modifier.fillMaxSize().background(if (open == null && app.editingTemplate == null) Am.HomeBg else Am.TopBar)) {
-    BoxWithConstraints(Modifier.fillMaxSize().padding(top = titleBar).dragAndDropTarget(shouldStartDragAndDrop = { true }, target = drop)) {
+    val titleBar = (DeskWindow.chrome.strip / scale).dp
+    val barColor = if (open == null && app.editingTemplate == null) Am.HomeBg else Am.TopBar
+    Box(Modifier.fillMaxSize().background(barColor)) {
+    Column(Modifier.fillMaxSize().padding(top = titleBar)) {
+    CompositionLocalProvider(LocalIndication provides if (open == null) homePress else editorPress) {
+        DeskWindowBar(app, barColor) { menu ->
+            if (open != null) DeskTopBar(open, { scope.launch { app.closeEditor() } }, menu)
+            else {
+                menu()
+                Text("AbsentMotion", Modifier.padding(start = 8.dp), color = if (barColor.luminance() > .5f) Am.Navy else Am.OnDark, fontSize = 15.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold, maxLines = 1, softWrap = false)
+            }
+        }
+    }
+    BoxWithConstraints(Modifier.fillMaxWidth().weight(1f).dragAndDropTarget(shouldStartDragAndDrop = { true }, target = drop)) {
         val config = remember(maxWidth, maxHeight) {
             android.content.res.Configuration().apply {
                 screenWidthDp = maxWidth.value.toInt(); screenHeightDp = maxHeight.value.toInt()
@@ -528,6 +543,7 @@ private fun DeskContent(app: DeskAppState, scale: Float) {
             ToastHost(Modifier.align(Alignment.BottomCenter))
             if (open?.exportOpen != true && app.exportingFromList == null) DeskExportPill(Modifier.align(Alignment.BottomEnd).padding(end = 20.dp, bottom = 20.dp))
         }
+    }
     }
     if (DeskModals.open > 0 && titleBar > 0.dp) Box(Modifier.fillMaxWidth().height(titleBar).background(Color.Black.copy(alpha = DeskModals.ScrimAlpha * DeskModals.fade)))
     }

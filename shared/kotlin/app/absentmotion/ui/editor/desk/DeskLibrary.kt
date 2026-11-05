@@ -130,8 +130,10 @@ internal fun DeskLibrary(state: EditorState, library: AddLibrary, tab: Int, modi
 }
 
 @Composable
-internal fun DeskGrid(modifier: Modifier, content: LazyGridScope.() -> Unit) {
+internal fun DeskGrid(modifier: Modifier, top: Any? = null, content: LazyGridScope.() -> Unit) {
     val grid = rememberLazyGridState()
+    var shownTop by remember { mutableStateOf(top) }
+    LaunchedEffect(top) { if (top != shownTop) { shownTop = top; grid.scrollToItem(0) } }
     LazyVerticalGrid(GridCells.Adaptive(80.dp), modifier.deskScrollbar(grid), grid, contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp), content = content)
 }
@@ -209,7 +211,7 @@ private class AtPointer(private val at: IntOffset) : PopupPositionProvider {
 internal class DeskRemove(val inUse: Boolean, val folder: String?, val run: (unlinkFolder: Boolean) -> Unit)
 
 @Composable
-internal fun DeskContext(add: () -> Unit, reveal: (() -> Unit)? = null, remove: DeskRemove? = null, content: @Composable () -> Unit) {
+internal fun DeskContext(add: () -> Unit, reveal: (() -> Unit)? = null, remove: DeskRemove? = null, menu: (@Composable (close: () -> Unit) -> Unit)? = null, content: @Composable () -> Unit) {
     var at by remember { mutableStateOf<IntOffset?>(null) }
     Box(Modifier.pointerInput(Unit) {
         awaitPointerEventScope {
@@ -226,11 +228,13 @@ internal fun DeskContext(add: () -> Unit, reveal: (() -> Unit)? = null, remove: 
         content()
         at?.let { point ->
             MenuPopup(remember(point) { AtPointer(point) }, { at = null }) {
+                if (menu != null) menu { at = null } else {
                 MenuRow(stringResource(R.string.desk_add)) { at = null; add() }
                 if (reveal != null) MenuRow(stringResource(R.string.desk_reveal_file)) { at = null; reveal() }
                 if (remove != null) {
                     MenuRow(stringResource(R.string.desk_remove_media), subText = stringResource(if (remove.inUse) R.string.desk_remove_media_used else R.string.desk_remove_media_note), divider = true) { at = null; remove.run(false) }
                     if (remove.folder != null) MenuRow(stringResource(R.string.desk_unlink_folder, remove.folder)) { at = null; remove.run(true) }
+                }
                 }
             }
         }

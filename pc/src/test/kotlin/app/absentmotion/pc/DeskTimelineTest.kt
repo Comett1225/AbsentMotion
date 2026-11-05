@@ -303,9 +303,9 @@ class DeskTimelineTest {
                 }
                 LaunchedEffect(Unit) { focus.requestFocus() }
             }
-            onRoot().performKeyInput { keyDown(Key.AltLeft); keyDown(Key.DirectionRight); keyUp(Key.DirectionRight); keyUp(Key.AltLeft) }
+            onRoot().performKeyInput { keyDown(Key.Period); keyUp(Key.Period) }
             runOnIdle { assertEquals(1, state.scene.firstShownFrame(state.scene.layer(layer.id)!!.startTime)); state.undo(); assertEquals(0, state.scene.firstShownFrame(state.scene.layer(layer.id)!!.startTime)) }
-            onRoot().performKeyInput { keyDown(Key.ShiftLeft); keyDown(Key.AltLeft); keyDown(Key.DirectionRight); keyUp(Key.DirectionRight); keyUp(Key.AltLeft); keyUp(Key.ShiftLeft) }
+            onRoot().performKeyInput { keyDown(Key.ShiftLeft); keyDown(Key.Period); keyUp(Key.Period); keyUp(Key.ShiftLeft) }
             runOnIdle { assertEquals(10, state.scene.firstShownFrame(state.scene.layer(layer.id)!!.startTime)); state.undo() }
             val command = if (System.getProperty("os.name").lowercase().contains("mac")) Key.MetaLeft else Key.CtrlLeft
             onRoot().performKeyInput { keyDown(command); keyDown(Key.A); keyUp(Key.A); keyUp(command) }

@@ -445,12 +445,15 @@ private fun EnhanceSwitch(label: String, on: Boolean, onChange: (Boolean) -> Uni
 internal fun AiProgressDialog(tools: AiTools) {
     if (tools.message.isEmpty()) return
     val action = tools.running
+    var reporting by remember { mutableStateOf(false) }
+    if (reporting) app.absentmotion.ui.home.ReportDialog(tools.message) { reporting = false }
     AlertDialog(onDismissRequest = { if (action == null) tools.dismiss() },
         properties = androidx.compose.ui.window.DialogProperties(dismissOnClickOutside = action == null),
         title = { Text((action ?: tools.last)?.let { stringResource(it.title) } ?: stringResource(R.string.ai), color = Am.OnDark) },
         text = {
             Column(if (action != null) Modifier.keepScreenOn() else Modifier) {
                 Text(tools.message, color = Am.OnDark, fontSize = 14.sp)
+                if (action == null && tools.retry != null) TextButton({ reporting = true }) { Text(stringResource(R.string.report_button), color = Am.Accent) }
                 if (action != null) {
                     Spacer(Modifier.height(16.dp))
                     LinearProgressIndicator(progress = { tools.progress }, Modifier.fillMaxWidth(), color = Am.Accent)

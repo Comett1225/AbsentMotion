@@ -4,6 +4,13 @@ import app.absentmotion.ui.editor.deskVerticalScroll
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.runtime.collectAsState
 import app.absentmotion.ui.editor.DeskTip
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.rememberUpdatedState
+import app.absentmotion.ui.editor.DeskDrop
+import app.absentmotion.platform.PlatformFeatures
 import app.absentmotion.ui.editor.effects.Thumbnail
 import app.absentmotion.ui.tutorial.tutorialGuard
 
@@ -228,7 +235,7 @@ private fun EffectHeader(state: EditorState, index: Int, effect: XmlNode, defini
     var menu by remember { mutableStateOf(false) }
     var help by remember { mutableStateOf(false) }
     var presets by remember { mutableStateOf(false) }
-    Row(Modifier.fillMaxWidth().height(37.dp).background(Am.CardHeader).clickable { state.effectIndex = -1 }.padding(start = 3.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.fillMaxWidth().height(37.dp).background(Am.CardHeader).deleteWhenHovered { state.editSelected { it.removeEffect(index) }; state.effectIndex = -1 }.clickable { state.effectIndex = -1 }.padding(start = 3.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
         Icon(EffectIcons.Expanded, null, Modifier.padding(start = 8.dp).size(18.dp).alpha(0.9f), tint = Am.OnDark)
         Text(definition?.name ?: effect["id"]?.substringAfterLast('.') ?: "", Modifier.weight(1f).padding(start = 6.dp, end = 4.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
         if (definition != null && definition.presets.isNotEmpty()) Box {
@@ -332,6 +339,7 @@ private fun EffectListRow(state: EditorState, reorder: Reorder, index: Int, coun
             layout(placeable.width, (placeable.height * (1f - shrink)).roundToInt()) { placeable.place(0, 0) }
         }
         .padding(start = 6.5.dp, end = 6.5.dp, top = 6.5.dp).fillMaxWidth().height(37.dp).graphicsLayer { shape = RowShape; clip = offset > 0f }
+        .deleteWhenHovered { if (!deleting) { state.editSelected { it.removeEffect(index) }; state.effectIndex = -1 } }
         .effectSwipe(reorder.held < 0 && !deleting, ::accept, ::drag, ::release)) {
         if (open) Box(Modifier.matchParentSize().background(DeleteRed), contentAlignment = Alignment.CenterEnd) {
             Icon(ChromeIcons.Trash, null, Modifier.padding(end = 12.dp).size(22.dp), tint = Color.White)
@@ -348,12 +356,28 @@ private fun EffectListRow(state: EditorState, reorder: Reorder, index: Int, coun
                     state.editSelected { it.withEffect(index) { node -> node.with("hidden", if (visible) "true" else null) } }
                 }, tint = Am.OnDark)
             }
-            Icon(EffectIcons.Grip, stringResource(R.string.effects_reorder), Modifier.width(32.dp).fillMaxHeight().reorderGrip(reorder, index, count, move), tint = Am.OnDark)
+            Box(Modifier.width(36.dp).fillMaxHeight().clickable { state.effectIndex = index }.reorderGrip(reorder, index, count, move), Alignment.Center) {
+                Icon(EffectIcons.Grip, stringResource(R.string.effects_reorder), Modifier.size(20.dp), tint = Am.OnDark)
+            }
         }
     }
 }
 
 private val DeleteRed = Color(0xFFD93A3A)
+
+@Composable
+private fun Modifier.deleteWhenHovered(remove: () -> Unit): Modifier {
+    if (!PlatformFeatures.desktop) return this
+    val source = remember { MutableInteractionSource() }
+    val hovered by source.collectIsHoveredAsState()
+    val latest by rememberUpdatedState(remove)
+    val hook = remember { { latest() } }
+    DisposableEffect(hovered) {
+        if (hovered) DeskDrop.removeHovered = hook
+        onDispose { if (DeskDrop.removeHovered === hook) DeskDrop.removeHovered = null }
+    }
+    return hoverable(source)
+}
 
 @Composable
 private fun EffectFrameButton(icon: ImageVector, description: String, modifier: Modifier, enabled: Boolean = true, onClick: () -> Unit) {

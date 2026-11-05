@@ -122,3 +122,5 @@ body.app .wrap{padding:.6rem 1rem 2.5rem}
 body.app .top{position:static;padding:.5rem 1rem}
 body.app h1{font-size:1.7rem}
 .btn[aria-disabled="true"]{opacity:.45;pointer-events:none;cursor:default}
+@media (min-width:900px){body.app .wrap{display:block;max-width:66rem;padding:.8rem 2rem 3rem}body.app main{max-width:none}body.app main>p,body.app main>ul,body.app main>ol,body.app main>blockquote,body.app main>.callout{max-width:46rem}body.app main>p:has(+figure),body.app main>p:has(+img){clear:none}body.app figure{float:right;clear:right;width:24rem;max-width:42%;margin:.4rem 0 1rem 2rem}body.app figure img{max-width:100%}body.app main>h2,body.app main>h3,body.app main>.table-wrap,body.app main>.pager{clear:both}body.app .table-wrap{overflow-x:visible}body.app table.params{width:100%;font-size:1rem}body.app .fx-thumb{float:right;margin:.4rem 0 1rem 2rem}body.app .fx-list{columns:3 12rem}}
+@media (min-width:1500px){body.app .wrap{max-width:74rem}body.app main>p,body.app main>ul,body.app main>ol{max-width:50rem}body.app figure{width:28rem}}

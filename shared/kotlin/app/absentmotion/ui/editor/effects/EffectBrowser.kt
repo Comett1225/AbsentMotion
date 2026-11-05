@@ -4,6 +4,7 @@ import app.absentmotion.editor.addEffectToChosen
 import app.absentmotion.platform.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -85,6 +86,13 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isCtrlPressed
+import androidx.compose.ui.input.key.isShiftPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.util.VelocityTracker
@@ -209,7 +217,25 @@ fun EffectBrowser(state: EditorState) {
         slid = listOf(null, false, next)
         sliding[0] = scope.launch { animate(-way * EffectSwipe.SLIDE_DP * density.density, 0f, animationSpec = Motion.enter()) { v, _ -> shift = v } }
     }
-    Column(Modifier.fillMaxSize().background(BrowserBg).systemBarsPadding()) {
+    val rootFocus = remember { FocusRequester() }
+    if (PlatformFeatures.desktop) LaunchedEffect(Unit) { rootFocus.requestFocus() }
+    fun keyPage(pull: Float, rtl: Boolean): Boolean {
+        val to = EffectSwipe.page(pageAt(), listed.size, pull, rtl) ?: return false
+        val next = listed[to].first
+        category = next
+        slid = listOf(null, false, next)
+        return true
+    }
+    fun browserKey(event: androidx.compose.ui.input.key.KeyEvent): Boolean {
+        if (event.type != KeyEventType.KeyDown || query.isNotEmpty()) return false
+        return when {
+            event.key == Key.Tab && event.isCtrlPressed -> keyPage(if (event.isShiftPressed) 1f else -1f, false)
+            event.key == Key.DirectionRight && !event.isCtrlPressed -> keyPage(-1f, rtl)
+            event.key == Key.DirectionLeft && !event.isCtrlPressed -> keyPage(1f, rtl)
+            else -> false
+        }
+    }
+    Column(Modifier.fillMaxSize().background(BrowserBg).systemBarsPadding().then(if (PlatformFeatures.desktop) Modifier.focusRequester(rootFocus).onKeyEvent(::browserKey).focusable() else Modifier)) {
         helpPage?.let { page -> HelpScreen(page) { helpPage = null } }
         if (PlatformFeatures.desktop) Row(Modifier.fillMaxWidth().height(52.dp).padding(start = 8.dp, end = 6.dp), verticalAlignment = Alignment.CenterVertically) {
             if (stepping) DeskIcon(ChromeIcons.Back, stringResource(R.string.topbar_back), action = ::back)

@@ -1,6 +1,17 @@
 package app.absentmotion.ui.home
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.foundation.layout.widthIn
+import app.absentmotion.library.SavedSize
+import app.absentmotion.library.SavedSizes
+import app.absentmotion.platform.Hint
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -98,12 +109,17 @@ internal fun DeskNewProject(
                 }
             }
             val (w, h) = form.size
+            Column {
             FormRow(stringResource(R.string.newproject_resolution), "${stringResource(R.string.newproject_canvas_size)}: $w × $h") {
                 if (form.aspect == CUSTOM) CustomSize(form)
                 else DeskDropdown(
                     Resolutions.firstOrNull { it.first == form.resolution }?.second ?: "${form.resolution}p", Resolutions, { it.second }, Resolutions.firstOrNull { it.first == form.resolution },
                     { form.resolution = it.first }, Modifier.fillMaxWidth(),
                 )
+            }
+            AnimatedVisibility(form.aspect == CUSTOM, enter = expandVertically() + fadeIn(), exit = shrinkVertically() + fadeOut()) {
+                Box(Modifier.padding(top = 10.dp)) { DeskSavedSizes(form, settings) }
+            }
             }
             FormRow(stringResource(R.string.newproject_frame_rate), null) {
                 DeskDropdown("${form.fps} fps", FrameRates, { "$it fps" }, form.fps, { form.fps = it }, Modifier.fillMaxWidth())
@@ -220,4 +236,71 @@ private fun NumberField(value: String, onChange: (String) -> Unit, onLeave: () -
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), cursorBrush = SolidColor(Am.Navy),
         decorationBox = { inner -> Box(Modifier.fillMaxWidth().height(36.dp), Alignment.Center) { inner() } },
     )
+}
+
+@Composable
+private fun DeskSavedSizes(form: Form, settings: AppSettings) {
+    var naming by remember { mutableStateOf<Pair<SavedSize?, String>?>(null) }
+    val shape = RoundedCornerShape(10.dp)
+    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), Arrangement.spacedBy(8.dp)) {
+        Hint(stringResource(R.string.newproject_save_size_title)) {
+            Box(
+                Modifier.height(40.dp).clip(shape).border(1.dp, Am.Navy, shape).deskPress(10.dp).clickable {
+                    form.commitSides()
+                    val (w, h) = form.size
+                    naming = null to "$w × $h"
+                }.padding(horizontal = 14.dp),
+                Alignment.Center,
+            ) { Text(stringResource(R.string.newproject_save_size_chip), color = Am.Navy, fontSize = 13.sp, fontWeight = FontWeight.Medium, maxLines = 1) }
+        }
+        settings.savedSizes.forEach { size ->
+            var menuAt by remember { mutableStateOf<IntOffset?>(null) }
+            Hint("${size.name}  ${size.label}") {
+                Column(
+                    Modifier.height(40.dp).clip(shape).background(Am.HomeBg).border(1.dp, Am.HomeLine, shape).deskPress(10.dp)
+                        .onSecondaryPress { menuAt = IntOffset(it.x.toInt(), it.y.toInt()) }.clickable { form.pick(size.width, size.height) }.padding(horizontal = 12.dp),
+                    Arrangement.Center,
+                ) {
+                    Text(size.name, Modifier.widthIn(max = 160.dp), color = Am.HomeInk, fontSize = 13.sp, lineHeight = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(size.label, color = Am.HomeDim, fontSize = 11.sp, lineHeight = 13.sp, maxLines = 1)
+                }
+            }
+            menuAt?.let { at ->
+                DeskPopupMenu(AtPosition(at), { menuAt = null }, 160.dp) {
+                    DeskMenuItem(stringResource(R.string.rename), { menuAt = null; naming = size to size.name }, HomeIcons.Pencil)
+                    DeskMenuDivider()
+                    DeskMenuItem(stringResource(R.string.delete), { menuAt = null; settings.savedSizes = SavedSizes.without(settings.savedSizes, size) }, HomeIcons.Delete, danger = true)
+                }
+            }
+        }
+    }
+    naming?.let { (target, initial) ->
+        DeskSizeName(stringResource(if (target == null) R.string.newproject_save_size_title else R.string.rename), initial, { naming = null }) { name ->
+            naming = null
+            settings.savedSizes = if (target == null) {
+                val (w, h) = form.size
+                SavedSizes.with(settings.savedSizes, name, w, h)
+            } else SavedSizes.renamed(settings.savedSizes, target, name)
+        }
+    }
+}
+
+@Composable
+private fun DeskSizeName(title: String, initial: String, onDismiss: () -> Unit, onDone: (String) -> Unit) {
+    var text by remember { mutableStateOf(TextFieldValue(initial, TextRange(0, initial.length))) }
+    val done = { onDone(text.text) }
+    val focus = remember { FocusRequester() }
+    LaunchedEffect(Unit) { runCatching { focus.requestFocus() } }
+    DeskModal(onDismiss, 440.dp, onEnter = done) {
+        Text(title, Modifier.padding(start = 24.dp, end = 24.dp, top = 22.dp), color = Am.Navy, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        BasicTextField(
+            text, { text = it.copy(text = it.text.take(SavedSizes.MAX_NAME)) }, Modifier.padding(horizontal = 24.dp, vertical = 16.dp).fillMaxWidth().focusRequester(focus).clip(RoundedCornerShape(10.dp)).background(Am.HomeBg)
+                .border(1.dp, Am.HomeLine, RoundedCornerShape(10.dp)).padding(horizontal = 12.dp, vertical = 10.dp),
+            textStyle = TextStyle(color = Am.Navy, fontSize = 14.sp), singleLine = true, cursorBrush = SolidColor(Am.Navy),
+        )
+        Row(Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, bottom = 20.dp), Arrangement.spacedBy(10.dp, Alignment.End)) {
+            DeskButton(stringResource(R.string.cancel), onDismiss, minWidth = 92.dp)
+            DeskButton(stringResource(R.string.done), done, primary = true, minWidth = 92.dp)
+        }
+    }
 }

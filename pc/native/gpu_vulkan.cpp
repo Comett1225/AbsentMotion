@@ -65,10 +65,14 @@ struct VulkanGpu : DesktopGpu {
         if (enumerate(instance, &count, devices.data()) != VK_SUCCESS) return false;
         VkPhysicalDevice physical = VK_NULL_HANDLE;
         uint32_t family = UINT32_MAX;
+        int best = 4;
         for (auto candidate : devices) {
             VkPhysicalDeviceProperties props{};
             properties(candidate, &props);
             if (props.apiVersion < VK_API_VERSION_1_1) continue;
+            const int rank = props.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU ? 0 : props.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU ? 1
+                : props.deviceType == VK_PHYSICAL_DEVICE_TYPE_CPU ? 3 : 2;
+            if (rank >= best) continue;
             uint32_t n = 0;
             queues(candidate, &n, nullptr);
             std::vector<VkQueueFamilyProperties> families(n);
@@ -77,10 +81,10 @@ struct VulkanGpu : DesktopGpu {
                 if (families[i].queueCount && (families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)) {
                     physical = candidate;
                     family = i;
+                    best = rank;
                     break;
                 }
             }
-            if (physical) break;
         }
         if (!physical) return false;
         float priority = 1;

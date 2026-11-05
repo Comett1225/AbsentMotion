@@ -47,21 +47,17 @@ object DeskFiles {
 
     fun chooseFiles(media: Boolean, multiple: Boolean, title: String = if (media) "Choose media" else "Choose a file", videoOnly: Boolean = false): List<File> {
         System.getProperty("am.pick")?.let { return listOf(File(it)) }
-        val dialog = java.awt.FileDialog(window, title, java.awt.FileDialog.LOAD)
-        dialog.isMultipleMode = multiple
-        if (media) dialog.setFilenameFilter { _, name -> name.substringAfterLast('.', "").lowercase() in (if (videoOnly) videoExtensions else mediaExtensions) }
-        dialog.isVisible = true
-        return dialog.files.orEmpty().toList().also { DeskLibrary.remember(it) }
+        val filters = when {
+            !media -> emptyList()
+            videoOnly -> listOf(DeskPicker.Filter(Strings.byName("export_kind_video") ?: "Video", videoExtensions))
+            else -> listOf(DeskPicker.Filter(Strings.byName("add_tab_media") ?: "Media", mediaExtensions))
+        }
+        return DeskPicker.openFiles(title, filters, multiple).also { DeskLibrary.remember(it) }
     }
 
     fun chooseOne(media: Boolean, videoOnly: Boolean = false): Uri? = chooseFiles(media, false, videoOnly = videoOnly).firstOrNull()?.let(Uri::fromFile)
 
-    fun chooseSave(name: String, title: String = "Save"): File? {
-        val dialog = java.awt.FileDialog(window, title, java.awt.FileDialog.SAVE)
-        dialog.file = name
-        dialog.isVisible = true
-        return dialog.files.orEmpty().firstOrNull()
-    }
+    fun chooseSave(name: String, title: String = "Save"): File? = DeskPicker.saveFile(title, name)
 
     fun reveal(uris: List<Uri>) {
         val file = uris.firstOrNull()?.toFile() ?: return
@@ -104,6 +100,7 @@ object DeskGlobalKeys {
             Key.Zero, Key.NumPad0 -> DeskScale.reset()
             Key.Comma -> app.openSettings()
             Key.N -> if (app.editor == null && DeskModals.open == 0) app.newProjectTick++ else return false
+            Key.Q -> if (!DeskOs.mac) app.requestQuit() else return false
             else -> return false
         }
         return true

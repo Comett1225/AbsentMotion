@@ -121,7 +121,12 @@ internal fun DeskSettings(settings: AppSettings, initial: SettingsPage, onClose:
                         Spacer(Modifier.height(16.dp))
                         Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Am.HomePanel).padding(vertical = 6.dp)) {
                             when (page) {
-                                SettingsPage.Editor -> EditorSettings(settings)
+                                SettingsPage.Editor -> {
+                                    EditorSettings(settings)
+                                    var systemBar by remember { mutableStateOf(app.absentmotion.desk.DeskWindow.systemBarChosen) }
+                                    SwitchRow(stringResource(R.string.desk_system_title_bar), systemBar, enabled = true) { systemBar = it; app.absentmotion.desk.DeskWindow.systemBarChosen = it }
+                                    Text(stringResource(R.string.desk_system_title_bar_note), Modifier.padding(start = 15.dp, end = 15.dp, bottom = 8.dp), color = Am.HomeMid, fontSize = 12.sp, lineHeight = 16.sp)
+                                }
                                 SettingsPage.Playback -> PlaybackSettings(settings)
                                 SettingsPage.Projects -> ProjectsSettings(settings) {}
                                 SettingsPage.Backup -> BackupRows(settings, onRestored)

@@ -7,6 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowPosition
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
@@ -26,6 +27,7 @@ import app.absentmotion.desk.DeskInstance
 import app.absentmotion.desk.DeskOpen
 import app.absentmotion.desk.DeskOs
 import app.absentmotion.desk.DeskTaskbar
+import app.absentmotion.desk.DeskWindow
 import app.absentmotion.export.DeskExports
 import app.absentmotion.export.ExportRun
 import app.absentmotion.desk.DeskKeys
@@ -62,13 +64,16 @@ fun main(args: Array<String>) {
     DeskOpen.listenForFiles()
     DeskInstance.serve { DeskOpen.offer(it) }
     application {
-        val size = java.awt.Toolkit.getDefaultToolkit().screenSize
         val prefs = remember { Preferences.userNodeForPackage(DesktopPlatform::class.java) }
-        val width = prefs.getInt("windowWidth", (size.width * 0.9).toInt()).coerceIn(640, size.width)
-        val height = prefs.getInt("windowHeight", (size.height * 0.9).toInt()).coerceIn(480, size.height)
-        val x = prefs.getInt("windowX", (size.width - width) / 2).coerceIn(0, (size.width - 100).coerceAtLeast(0))
-        val y = prefs.getInt("windowY", (size.height - height) / 2).coerceIn(0, (size.height - 100).coerceAtLeast(0))
-        val state = rememberWindowState(position = WindowPosition(x.dp, y.dp), width = width.dp, height = height.dp)
+        val placed = remember {
+            val saved = if (prefs.getInt("windowWidth", 0) > 0) java.awt.Rectangle(prefs.getInt("windowX", 0), prefs.getInt("windowY", 0), prefs.getInt("windowWidth", 0), prefs.getInt("windowHeight", 0)) else null
+            val (screens, primary) = DeskWindow.screens()
+            DeskWindow.place(saved, screens, primary, 800, 560)
+        }
+        val state = rememberWindowState(
+            placement = if (prefs.getBoolean("windowMaximized", false)) WindowPlacement.Maximized else WindowPlacement.Floating,
+            position = WindowPosition(placed.x.dp, placed.y.dp), width = placed.width.dp, height = placed.height.dp,
+        )
         val desk = remember { DeskAppState() }
         val scope = rememberCoroutineScope()
         remember { desk.quitNow = ::exitApplication }
@@ -85,6 +90,7 @@ fun main(args: Array<String>) {
         }
         LaunchedEffect(DeskExports.running, (DeskExports.fraction * 100).toInt()) { DeskTaskbar.progress(if (DeskExports.running) (DeskExports.fraction * 100).toInt() else null) }
         if (desk.hidden) Window(onCloseRequest = desk::requestQuit, title = "AbsentMotion", state = rememberWindowState(position = WindowPosition(Alignment.Center), width = 460.dp, height = 220.dp), resizable = false) {
+            remember(window) { DeskWindow.secondary(window) }
             DeskExportMini(desk)
         }
         Window(onCloseRequest = desk::requestQuit, visible = !desk.hidden, title = "AbsentMotion", state = state,
@@ -92,12 +98,8 @@ fun main(args: Array<String>) {
             onKeyEvent = { app.absentmotion.desk.DeskGlobalKeys.handle(desk, it) }) {
             DeskFiles.window = window
             remember(window) { window.minimumSize = java.awt.Dimension(800, 560) }
-            if (DesktopPlatform.mac) remember(window) {
-                window.rootPane.putClientProperty("apple.awt.fullWindowContent", true)
-                window.rootPane.putClientProperty("apple.awt.transparentTitleBar", true)
-                window.rootPane.putClientProperty("apple.awt.windowTitleVisible", false)
-            }
-            DeskMenus(desk)
+            remember(window) { DeskWindow.attach(window) }
+            if (DeskOs.mac) DeskMenus(desk)
             DisposableEffect(window) {
                 val listener = object : ComponentAdapter() {
                     private fun save() {
@@ -108,8 +110,10 @@ fun main(args: Array<String>) {
                     override fun componentMoved(e: ComponentEvent) = save()
                     override fun componentResized(e: ComponentEvent) = save()
                 }
+                val maximized = java.awt.event.WindowStateListener { prefs.putBoolean("windowMaximized", it.newState and java.awt.Frame.MAXIMIZED_BOTH == java.awt.Frame.MAXIMIZED_BOTH) }
                 window.addComponentListener(listener)
-                onDispose { window.removeComponentListener(listener) }
+                window.addWindowStateListener(maximized)
+                onDispose { window.removeComponentListener(listener); window.removeWindowStateListener(maximized) }
             }
             DeskApp(desk)
         }

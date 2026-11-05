@@ -232,6 +232,20 @@ fun removeFromLibrary(uri: android.net.Uri, unlinkFolder: Boolean) {}
 
 fun linkMediaFolder() {}
 
+fun libraryFilePath(uri: android.net.Uri): String = uri.path.orEmpty()
+
+fun libraryFolders(): List<String> = emptyList()
+
+fun pinnedLibraryFolders(): Set<String> = emptySet()
+
+fun pinLibraryFolder(path: String, pin: Boolean) {}
+
+fun unlinkLibraryFolder(path: String) {}
+
+fun revealLibraryFolder(path: String) {}
+
+fun revealFolderLabel(): String = ""
+
 internal const val CAPTION_MODEL_NAME = "ggml-base-q5_1.bin"
 internal const val CAPTION_MODEL_BYTES = 59_707_625L
 internal fun loadCaptionLibrary() {

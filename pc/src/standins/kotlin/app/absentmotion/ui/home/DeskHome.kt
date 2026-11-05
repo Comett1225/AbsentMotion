@@ -224,12 +224,10 @@ private fun DeskHeader(
     val compact = maxWidth < 1180.dp
     val iconNew = maxWidth < 900.dp
     val tight = maxWidth < 780.dp
-    val fixed = if (tight) 640.dp else 606.dp + (if (compact) 72.dp else 216.dp) + (if (iconNew) 36.dp else 150.dp) + 32.dp
+    val fixed = if (tight) 510.dp else 456.dp + (if (compact) 72.dp else 216.dp) + (if (iconNew) 36.dp else 150.dp) + 32.dp
     val searchWidth = (maxWidth - fixed).coerceIn(if (tight) 110.dp else 140.dp, 300.dp)
     Box(Modifier.fillMaxWidth(), Alignment.TopCenter) {
         Row(Modifier.widthIn(max = ContentMax).fillMaxWidth().height(68.dp).padding(horizontal = if (tight) 16.dp else GridPad), Arrangement.spacedBy(if (tight) 6.dp else 8.dp), Alignment.CenterVertically) {
-            Text("AbsentMotion", color = Am.Navy, fontSize = if (tight) 18.sp else 20.sp, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
-            Spacer(Modifier.width(if (compact) 4.dp else 12.dp))
             DeskTab(stringResource(R.string.home_tab_projects), section == DeskSection.Projects, tight) { onSection(DeskSection.Projects) }
             DeskTab(stringResource(R.string.home_tab_assets), section == DeskSection.Assets, tight) { onSection(DeskSection.Assets) }
             DeskTab(stringResource(R.string.home_tab_templates), section == DeskSection.Templates, tight) { onSection(DeskSection.Templates) }

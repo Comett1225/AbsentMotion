@@ -200,6 +200,7 @@ import app.absentmotion.export.withContainer
 import app.absentmotion.platform.rememberStorageAccess
 import app.absentmotion.model.Scene
 import app.absentmotion.ui.editor.ChromeIcons
+import app.absentmotion.ui.home.ReportDialog
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Motion
 import app.absentmotion.ui.theme.Presence
@@ -631,7 +632,9 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
             containerColor = Am.Card,
         )
     }
+    var reporting by remember { mutableStateOf(false) }
     failure?.let { f ->
+        if (reporting) ReportDialog(stringResource(f.title) + "\n" + f.text.text()) { reporting = false }
         AlertDialog(
             onDismissRequest = { failure = null },
             title = { Text(stringResource(f.title), color = Navy) },
@@ -639,6 +642,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
                 Column(Modifier.verticalScroll(rememberScrollState())) {
                     Text(f.text.text(), color = Navy)
                     if (f.hint) OutdatedHint(outdated, Modifier.padding(top = 8.dp))
+                    if (f.hint) TextButton({ reporting = true }) { Text(stringResource(R.string.report_button), color = Navy) }
                 }
             },
             confirmButton = { TextButton({ failure = null; f.proceed?.invoke() }) { Text(f.action?.text() ?: stringResource(R.string.ok), color = Navy) } },

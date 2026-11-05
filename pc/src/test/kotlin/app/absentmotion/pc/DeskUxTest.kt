@@ -56,6 +56,7 @@ class DeskUxTest {
 
     @Test fun spaceAlwaysTogglesPlayback() {
         prepare("space")
+        DeskLibrary.close()
         DeskLibrary.link(File("../testdata/media").canonicalFile)
         runSkikoComposeUiTest(size = Size(1728f, 1080f)) {
             val app = DeskAppState()

@@ -158,7 +158,7 @@ class DeskWorkspaceTest {
                 rail("Shape")
                 shot(shots, "${width}x${height}-shapes")
                 runOnIdle { editor.selectedId = null }
-                onNodeWithContentDescription("Project settings").performClick()
+                onAllNodesWithContentDescription("Project settings").onFirst().performClick()
                 mainClock.advanceTimeBy(300)
                 shot(shots, "${width}x${height}-settings")
                 DeskBack.back()
@@ -221,11 +221,14 @@ class DeskWorkspaceTest {
         DeskScale.set(100)
         mainClock.advanceTimeBy(600)
         waitForIdle()
+        onAllNodesWithContentDescription("Project settings").onFirst().performClick()
+        mainClock.advanceTimeBy(300)
         onNodeWithText("1:1", substring = false).performClick()
         runOnIdle { check(editor.scene.width == editor.scene.height); editor.undo() }
+        DeskBack.back()
         mainClock.advanceTimeBy(300)
         val layers = editor.scene.layers.size
-        onAllNodesWithContentDescription("Hide layer").onFirst().performClick()
+        onAllNodes(SemanticsMatcher("can hide") { node -> node.config.getOrElse(androidx.compose.ui.semantics.SemanticsActions.CustomActions) { emptyList() }.any { it.label == "Hide layer" } }).onFirst().performCustomAccessibilityActionWithLabel("Hide layer")
         runOnIdle { check(editor.scene.layers.size == layers); check(editor.scene.layers.any { it.hidden }); editor.undo() }
         runOnIdle { editor.selectedId = editor.scene.layers.last().id }
         mainClock.advanceTimeBy(300)

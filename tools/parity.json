@@ -44,6 +44,16 @@
       "note": "audio effects run in the shared native FX chain (amdesktop); Reduce Noise is ai.noise"
     },
     {
+      "id": "tool.mixer",
+      "name": "Mixer: a strip per sound layer with fader, Mute, Solo and live level meter, plus a Master meter and the project summary with a settings gear",
+      "where": "Mixer.kt, WideEditor.kt, desk/DeskWorkspace.kt DeskInspector, audio/LiveMix.kt, audio/FxRack.kt, AudioEngine.kt (android), DeskAudioEngine.kt (pc)",
+      "android": "untested",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "desktop: the Inspector when nothing is selected; Android: tablets in the wide layout when the side panel space is free and the canvas keeps its size; phones in portrait have no mixer by design; not yet tried on a tablet"
+    },
+    {
       "id": "tool.fill",
       "name": "Fill colour, gradient, full colour picker, eyedropper",
       "where": "panels/ColorFillPanel.kt, GradientPanel.kt, FullColorPicker.kt",
@@ -448,7 +458,7 @@
       "macos": "works",
       "windows": "untested",
       "linux": "untested",
-      "note": "name fields in the inspector (the project had no rename at all on desktop); the timeline right-click Rename also works"
+      "note": "layer name field in the inspector header, project name in the project settings dialog (gear); the timeline right-click Rename also works"
     },
     {
       "id": "menu.transform_more",
@@ -631,6 +641,16 @@
       "note": "desktop only by design (phone reads the gallery)"
     },
     {
+      "id": "add.pin_folder",
+      "name": "Per-project media, pinned folders, folder tiles and folder-first search",
+      "where": "desk/DeskMedia.kt, desk/DeskFolders.kt, desk/DeskFolderIcon.kt, DeskLibrary.kt (pc)",
+      "android": "missing",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "desktop only by design (the phone reads the gallery, so there is nothing to pin)"
+    },
+    {
       "id": "preview.select_move",
       "name": "Tap to select, drag to move, corner and edge handles to scale",
       "where": "Preview.kt",
@@ -779,6 +799,26 @@
       "windows": "untested",
       "linux": "untested",
       "note": ""
+    },
+    {
+      "id": "tl.bookmark_jump",
+      "name": "Alt+Left / Alt+Right jump to the previous or next bookmark, then the start or end; comma and period nudge clips",
+      "where": "desk/DeskKeys.kt, desk/DeskJump.kt (pc)",
+      "android": "missing",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "keyboard shortcut, desktop only by design"
+    },
+    {
+      "id": "desk.mobile_ports_r51",
+      "name": "Desktop: Stretch Timing for several clips (inspector tile and right-click), clipping hook on timeline rows, group Re-timing, Delete on a hovered effect, arrow keys and Ctrl+Tab between effect categories, rubber-band panel dividers",
+      "where": "desk/DeskMulti.kt, Timeline.kt, desk/DeskProject.kt, panels/EffectsPanel.kt, effects/EffectBrowser.kt, desk/DeskWorkspace.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "phone keeps its swipes and sheets; the dividers are desktop only"
     },
     {
       "id": "tl.context_menu",
@@ -1171,6 +1211,16 @@
       "note": "CrashLogs.install now runs at start (it never did, so the page was always empty); the 'closed unexpectedly' notice for a crash is not shown"
     },
     {
+      "id": "home.copy_and_report",
+      "name": "Copy and Report button on crash and error screens (copies scrubbed details, opens GitHub issues, Discord, bug report form; links read from the README, cached)",
+      "where": "ReportSheet.kt, CrashLogsUi.kt, DeskPages.kt, ProjectSafetyUi.kt, ExportScreen.kt, AiBrowser.kt, ToolKit.kt, CompressScreen.kt, UnsupportedPhone.kt",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": ""
+    },
+    {
       "id": "home.recovery",
       "name": "Restore unsaved edits after a crash",
       "where": "ProjectSafetyUi.kt ClosedDialog, library/Recovery.kt, desk/DeskApp.kt DeskRecovery",
@@ -1403,22 +1453,32 @@
     {
       "id": "plat.menu_bar",
       "name": "Menu bar with shortcuts",
-      "where": "desk/DeskMenus.kt",
+      "where": "desk/DeskMenus.kt, desk/DeskTitleBar.kt (deskMenus, burger menu)",
       "android": "missing",
       "macos": "works",
       "windows": "untested",
       "linux": "untested",
-      "note": "native menu bar on macOS; an in-window menu bar on Windows and Linux (untested there)"
+      "note": "one menu model (File, Edit, View, Playback, Help) shown as the native menu bar on macOS and as the burger menu in the window bar on every desktop; Playback has Previous and Next Bookmark (Alt+Left and Alt+Right); burger menu checked by DeskWindowTest on macOS"
+    },
+    {
+      "id": "plat.window_bar",
+      "name": "Integrated window title bar, window icon, window restore on the right monitor",
+      "where": "desk/DeskTitleBar.kt, pc Main.kt, ui/home/DeskSettings.kt",
+      "android": "missing",
+      "macos": "untested",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "JetBrains Runtime custom title bar: traffic lights on macOS, system buttons on Windows, drawn buttons on Linux when the runtime supports it; system title bar plus the same app bar with plain OpenJDK or the Use system title bar setting; the Android app has no window; layout checked by DeskWindowTest screenshots, real windows not tried yet"
     },
     {
       "id": "plat.file_dialogs",
       "name": "Open and save dialogs, reveal in file manager",
-      "where": "desk/Desk.kt DeskFiles, DeskOs",
+      "where": "desk/DeskPicker.kt, desk/Desk.kt DeskFiles, DeskOs, windows/native/file_dialog_win.cpp, linux/native/file_dialog_linux.cpp",
       "android": "missing",
       "macos": "works",
-      "windows": "works",
+      "windows": "untested",
       "linux": "untested",
-      "note": "java.awt.FileDialog everywhere; reveal uses open -R, explorer /select, xdg-open. Windows: the media picker works; AWT shows the older Explorer-style dialog, which opens in the program's working folder Linux: AWT FileDialog (the GTK dialog when GTK 3 is installed); Link a media folder uses a Swing folder chooser, because FileDialog cannot pick folders there; Show in Folder asks the file manager over D-Bus (org.freedesktop.FileManager1.ShowItems) and opens the folder when that fails; exports go to the folders xdg-user-dir names (checked with a localised Videos folder in Docker); none of it tried on a desktop"
+      "note": "One entry point, DeskPicker. macOS: FileDialog (NSOpenPanel/NSSavePanel). Windows: the Common Item Dialog (IFileOpenDialog/IFileSaveDialog, folders with FOS_PICKFOLDERS, owned by the app window), FileDialog or a Swing folder chooser if COM fails. Linux: the XDG Desktop Portal FileChooser over D-Bus (libdbus loaded at run time), then kdialog on KDE or zenity, then a Swing chooser. Reveal uses open -R, explorer /select, and on Linux org.freedesktop.FileManager1.ShowItems with xdg-open as fallback; exports go to the folders xdg-user-dir names. The new Windows and Linux dialogs are compiled and unit-tested on the Mac only, not yet run on Windows or a Linux desktop"
     },
     {
       "id": "plat.keyboard",
@@ -1474,6 +1534,16 @@
       "windows": "untested",
       "linux": "untested",
       "note": "Shared effect controls and renderer; deterministic seed, zero legacy defaults, 256 copies when new controls are active. Host renders checked at three times for all four repeats."
+    },
+    {
+      "id": "home.saved_sizes",
+      "name": "Saved custom project sizes (New Project strip, project settings menu)",
+      "where": "NewProjectSheet.kt SavedSizeStrip, DeskNewProject.kt DeskSavedSizes, EditorMenus.kt SavedSizesButton, DeskProject.kt DeskSavedSizes, AppSettings.kt SavedSizes",
+      "android": "untested",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "Phone: long-press a chip for Rename or Delete. PC: right-click"
     }
   ],
   "android_only": {

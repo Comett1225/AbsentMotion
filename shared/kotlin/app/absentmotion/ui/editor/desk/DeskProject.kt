@@ -4,9 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -36,38 +33,25 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.R
-import app.absentmotion.editor.EditorPanel
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.FullColor
 import app.absentmotion.editor.changeSettings
 import app.absentmotion.editor.rename
 import app.absentmotion.editor.setElementOption
-import app.absentmotion.editor.toggleHidden
 import app.absentmotion.model.Layer
 import app.absentmotion.ui.home.handCursor
 import app.absentmotion.ui.home.hoverFill
 import app.absentmotion.ui.theme.Am
 
 @Composable
-internal fun DeskProject(state: EditorState, modifier: Modifier = Modifier) {
-    val layers = remember(state.scene) { state.scene.layers.asReversed() }
-    val list = rememberLazyListState()
-    LazyColumn(modifier.deskScrollbar(list).padding(horizontal = 12.dp), list, contentPadding = PaddingValues(bottom = 12.dp)) {
-        if (!state.inGroup) item(key = "name") {
-            Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+internal fun DeskProject(state: EditorState, onDismiss: () -> Unit) {
+    DeskDialog(stringResource(R.string.topbar_project_settings), 440.dp, onDismiss, onConfirm = onDismiss) {
+        Column(Modifier.deskVerticalScroll().padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
+            if (!state.inGroup) Row(Modifier.fillMaxWidth().padding(bottom = 4.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text(stringResource(R.string.desk_name), color = Am.OnDarkDim, fontSize = 13.sp, maxLines = 1)
                 DeskNameField(state.scene.title, Modifier.weight(1f)) { state.rename(it) }
             }
-        }
-        if (!state.inGroup) item(key = "settings") { DeskSettings(state) }
-        item(key = "layers-title") { DeskHeading(stringResource(R.string.desk_layers), Modifier.padding(top = 16.dp, bottom = 4.dp)) }
-        items(layers, key = { it.id }) { layer ->
-            Row(Modifier.fillMaxWidth().height(36.dp).clip(RoundedCornerShape(6.dp)).hoverFill(6.dp, Am.Field).handCursor().clickable { state.selectedId = layer.id; state.panel = EditorPanel.Tools }.padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                Icon(deskLayerIcon(layer), null, Modifier.size(18.dp), tint = Am.OnDarkDim)
-                Text(layer.label, Modifier.weight(1f).padding(horizontal = 8.dp), color = if (layer.hidden) Am.OnDarkDim else Am.OnDark, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                val label = stringResource(if (layer.hidden) R.string.a11y_show_layer else R.string.a11y_hide_layer)
-                BarButton(if (layer.hidden) TimelineIcons.EyeOff else TimelineIcons.Eye, label, Modifier.size(32.dp), iconSize = androidx.compose.ui.unit.DpSize(18.dp, 18.dp)) { state.toggleHidden(layer.id) }
-            }
+            DeskSettings(state, heading = false)
         }
     }
 }
@@ -92,6 +76,16 @@ internal fun DeskHeading(text: String, modifier: Modifier = Modifier) {
 @Composable
 internal fun DeskSettings(state: EditorState, modifier: Modifier = Modifier, heading: Boolean = true) {
     val scene = state.scene
+    if (state.inGroup) {
+        val options = listOf("off" to R.string.group_retime_off) + RetimingOptions
+        Column(modifier.fillMaxWidth()) {
+            DeskSetting(stringResource(R.string.menu_retiming)) {
+                val shown = options.firstOrNull { it.first == scene.retime } ?: options[0]
+                DeskSelect(stringResource(shown.second), options.map { stringResource(it.second) }) { state.setElementOption("retime", options[it].first) }
+            }
+        }
+        return
+    }
     val focus = LocalFocusManager.current
     val derived = aspectOf(scene.width, scene.height)
     var custom by remember { mutableStateOf(derived == CUSTOM) }
@@ -110,6 +104,7 @@ internal fun DeskSettings(state: EditorState, modifier: Modifier = Modifier, hea
                 DeskNumber(scene.width, Modifier.width(64.dp)) { change(width = it) }
                 Text("×", color = Am.OnDarkDim, fontSize = 13.sp)
                 DeskNumber(scene.height, Modifier.width(64.dp)) { change(height = it) }
+                DeskSavedSizes(state.settings, scene.width, scene.height) { w, h -> change(width = w, height = h) }
             } else {
                 val ratio = Aspects.first { it.key == aspect }
                 DeskSelect("${resolution}p", Resolutions.map { it.second }) { resize(ratio, Resolutions[it].first) }
@@ -182,6 +177,33 @@ private fun DeskSelect(value: String, options: List<String>, pick: (Int) -> Unit
         }
         DropdownMenu(open, { open = false }, Modifier.background(Am.Field), shape = RoundedCornerShape(10.dp)) {
             options.forEachIndexed { index, option -> DropdownMenuItem(text = { Text(option, color = Am.OnDark, fontSize = 13.sp) }, onClick = { open = false; pick(index) }) }
+        }
+    }
+}
+
+@Composable
+private fun DeskSavedSizes(settings: app.absentmotion.library.AppSettings, width: Int, height: Int, onPick: (Int, Int) -> Unit) {
+    var open by remember { mutableStateOf(false) }
+    var naming by remember { mutableStateOf(false) }
+    val focus = LocalFocusManager.current
+    val saved = settings.savedSizes
+    Box {
+        app.absentmotion.platform.Hint(stringResource(R.string.newproject_saved_sizes)) {
+            Box(Modifier.size(32.dp).clip(RoundedCornerShape(6.dp)).background(Am.Field).hoverFill(6.dp, Color.White.copy(alpha = .08f)).handCursor().clickable { focus.clearFocus(); open = true }, Alignment.Center) {
+                Icon(ChromeIcons.SavePreset, stringResource(R.string.newproject_saved_sizes), Modifier.size(18.dp), tint = Am.OnDarkDim)
+            }
+        }
+        DropdownMenu(open, { open = false }, Modifier.background(Am.Field), shape = RoundedCornerShape(10.dp)) {
+            DropdownMenuItem(text = { Text(stringResource(R.string.newproject_save_size_title), color = Am.Accent, fontSize = 13.sp) }, onClick = { open = false; naming = true })
+            saved.forEach { size ->
+                DropdownMenuItem(text = { Text("${size.name}  ${size.label}", color = Am.OnDark, fontSize = 13.sp) }, onClick = { open = false; onPick(size.width, size.height) })
+            }
+        }
+    }
+    if (naming) {
+        app.absentmotion.ui.home.SizeNameDialog(stringResource(R.string.newproject_save_size_title), "$width × $height", dark = true, onDismiss = { naming = false }) { name ->
+            naming = false
+            settings.savedSizes = app.absentmotion.library.SavedSizes.with(settings.savedSizes, name, width, height)
         }
     }
 }

@@ -1,5 +1,7 @@
 #include <jni.h>
 #include <algorithm>
+#include <atomic>
+#include <cstdlib>
 #include <map>
 #include <string>
 #include <vector>
@@ -32,6 +34,8 @@ struct DesktopMosh {
     sk_sp<SkImage> state, previous, motion;
 };
 
+static std::atomic<int> DesktopGpuState{-1};
+
 struct Desktop {
     am::Scene scene;
     am::EffectRuntime runtime;
@@ -41,7 +45,8 @@ struct Desktop {
     std::unique_ptr<DesktopGpu> gpu;
     bool cameraView = true;
     bool accurateBlur = true;
-    Desktop() : gpu(CreateDesktopGpu()) {}
+    std::vector<uint8_t> frameBytes;
+    Desktop() : gpu(std::getenv("AM_SOFTWARE_RENDER") ? nullptr : CreateDesktopGpu()) { DesktopGpuState = gpu && gpu->context() ? 1 : 0; }
     ~Desktop() { mosh.clear(); layerPictures.clear(); pictures.clear(); }
     am::MediaPictures media() {
         return [this](const std::string& uri, int64_t layer) -> sk_sp<SkImage> {
@@ -126,6 +131,7 @@ void DesktopInstallLayer(jlong h, const std::string& uri, int64_t layer, sk_sp<S
 #define JNI(name) Java_app_absentmotion_pc_engine_DesktopNative_##name
 extern "C" {
 JNIEXPORT jlong JNICALL JNI(create)(JNIEnv*, jobject) { return reinterpret_cast<jlong>(new Desktop()); }
+JNIEXPORT jint JNICALL JNI(gpuState)(JNIEnv*, jobject) { return DesktopGpuState.load(); }
 JNIEXPORT void JNICALL JNI(destroy)(JNIEnv*, jobject, jlong h) { delete ptr(h); }
 JNIEXPORT jstring JNICALL JNI(loadEffect)(JNIEnv* e, jobject, jlong h, jstring xml) {
     return e->NewStringUTF(ptr(h)->runtime.load(str(e, xml)).c_str());
@@ -310,6 +316,18 @@ JNIEXPORT jbyteArray JNICALL JNI(still)(JNIEnv* e, jobject, jlong h, jdouble tim
         am::SetFastShutterBlur(false);
     }, &rgba);
     return ok ? bytes(e, rgba) : nullptr;
+}
+JNIEXPORT jboolean JNICALL JNI(stillInto)(JNIEnv* e, jobject, jlong h, jdouble time, jint w, jint height, jbyteArray out) {
+    Desktop* d = ptr(h);
+    if (d->scene.width <= 0 || d->scene.height <= 0 || w <= 0 || height <= 0 || (int64_t)e->GetArrayLength(out) < (int64_t)w * height * 4) return false;
+    am::SetCameraView(true);
+    const am::LayerEffects fx = d->effects();
+    const bool ok = d->offscreen(w, height, true, [&](SkCanvas* c) {
+        c->scale((float)w / d->scene.width, (float)height / d->scene.height);
+        am::DrawScene(c, d->scene, time, d->media(), &fx);
+    }, &d->frameBytes);
+    if (ok) e->SetByteArrayRegion(out, 0, (jsize)d->frameBytes.size(), (const jbyte*)d->frameBytes.data());
+    return ok;
 }
 JNIEXPORT jboolean JNICALL JNI(setPixels)(JNIEnv* e, jobject, jlong h, jstring uri, jint w, jint height, jintArray argb) {
     if (w <= 0 || height <= 0 || (int64_t)w * height != e->GetArrayLength(argb)) return false;

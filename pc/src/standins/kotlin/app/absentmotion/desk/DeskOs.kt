@@ -20,7 +20,39 @@ object DeskOs {
     val musicFolder by lazy { userFolder("MUSIC") ?: "Music" }
     val documentsFolder by lazy { userFolder("DOCUMENTS") ?: "Documents" }
     val commandKey = if (mac) "⌘" else "Ctrl+"
-    val titleBarDp = if (mac) 28f else 0f
+    val windowButtons: Pair<List<WindowButton>, Boolean> by lazy {
+        val config = File(System.getenv("XDG_CONFIG_HOME") ?: home.resolve(".config").path)
+        val kde = System.getenv("XDG_CURRENT_DESKTOP").orEmpty().contains("KDE", ignoreCase = true)
+        if (!linux || !shell) buttonLayout(null)
+        else if (kde) {
+            val text = runCatching { config.resolve("kwinrc").readText() }.getOrDefault("")
+            fun key(name: String) = Regex("(?m)^$name=(.*)$").find(text)?.groupValues?.get(1)?.trim()
+            kdeButtonLayout(key("ButtonsOnLeft") ?: "MS", key("ButtonsOnRight") ?: "HIAX")
+        } else buttonLayout(runCatching {
+            val process = ProcessBuilder("gsettings", "get", "org.gnome.desktop.wm.preferences", "button-layout").redirectError(ProcessBuilder.Redirect.DISCARD).start()
+            val text = process.inputStream.bufferedReader().readText()
+            if (process.waitFor(3, java.util.concurrent.TimeUnit.SECONDS) && process.exitValue() == 0) text else null
+        }.getOrNull())
+    }
+
+    private val defaultButtons = listOf(WindowButton.Minimize, WindowButton.Maximize, WindowButton.Close)
+
+    internal fun buttonLayout(gnome: String?): Pair<List<WindowButton>, Boolean> {
+        val sides = gnome?.trim()?.trim('\'', '"')?.split(':') ?: return defaultButtons to false
+        fun parse(part: String) = part.split(',').mapNotNull { when (it.trim()) { "minimize" -> WindowButton.Minimize; "maximize" -> WindowButton.Maximize; "close" -> WindowButton.Close; else -> null } }
+        return pick(parse(sides[0]), parse(sides.getOrElse(1) { "" }))
+    }
+
+    internal fun kdeButtonLayout(left: String, right: String): Pair<List<WindowButton>, Boolean> {
+        fun parse(part: String) = part.mapNotNull { when (it) { 'I' -> WindowButton.Minimize; 'A' -> WindowButton.Maximize; 'X' -> WindowButton.Close; else -> null } }
+        return pick(parse(left), parse(right))
+    }
+
+    private fun pick(left: List<WindowButton>, right: List<WindowButton>): Pair<List<WindowButton>, Boolean> = when {
+        WindowButton.Close in left || right.isEmpty() && left.isNotEmpty() -> left to true
+        right.isNotEmpty() -> right to false
+        else -> defaultButtons to false
+    }
 
     val systemEmoji: File? by lazy {
         when {

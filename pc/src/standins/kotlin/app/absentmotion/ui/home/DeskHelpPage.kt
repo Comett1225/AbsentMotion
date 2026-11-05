@@ -1,6 +1,8 @@
 package app.absentmotion.ui.home
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,6 +10,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -28,6 +31,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toComposeImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -55,7 +61,9 @@ import java.net.URI
 
 internal sealed interface HelpBlock {
     class Heading(val level: Int, val text: AnnotatedString, val id: String?) : HelpBlock
-    class Para(val text: AnnotatedString) : HelpBlock
+    class Para(val text: AnnotatedString, val note: Boolean = false) : HelpBlock
+    class Caption(val text: AnnotatedString) : HelpBlock
+    class Picture(val src: String, val alt: String, val width: Int, val height: Int) : HelpBlock
     class Item(val text: AnnotatedString, val marker: String) : HelpBlock
     class Row(val cells: List<AnnotatedString>, val head: Boolean) : HelpBlock
 }
@@ -63,7 +71,11 @@ internal sealed interface HelpBlock {
 private val Tag = Regex("<(/?)([a-zA-Z0-9]+)([^>]*)>")
 private val Href = Regex("href=\"([^\"]*)\"")
 private val IdAttr = Regex("id=\"([^\"]*)\"")
-private val Skipped = setOf("head", "header", "nav", "figure", "script", "style", "svg")
+private val SrcAttr = Regex("src=\"([^\"]*)\"")
+private val AltAttr = Regex("alt=\"([^\"]*)\"")
+private val WidthAttr = Regex("width=\"(\\d+)\"")
+private val HeightAttr = Regex("height=\"(\\d+)\"")
+private val Skipped = setOf("head", "header", "nav", "script", "style", "svg")
 
 private fun entities(text: String): String = text.replace("&nbsp;", " ").replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">").replace("&quot;", "\"")
     .replace("&#39;", "'").replace("&rarr;", "→").replace("&larr;", "←").replace("&middot;", "·").replace("&hellip;", "…").replace("&ndash;", "–").replace("&mdash;", "—")
@@ -87,6 +99,8 @@ internal fun helpBlocks(html: String, link: SpanStyle, open: (String) -> Unit): 
     val lists = ArrayList<Pair<Boolean, Int>>()
     val styles = ArrayList<Int>()
     var links = 0
+    var inFigure = false
+    val divs = ArrayList<Boolean>()
     fun text(t: String) {
         val clean = entities(t).replace(Regex("\\s+"), " ")
         if (!started && clean.isBlank()) return
@@ -101,7 +115,8 @@ internal fun helpBlocks(html: String, link: SpanStyle, open: (String) -> Unit): 
             "h1", "h2", "h3" -> out += HelpBlock.Heading(kind.drop(1).toInt(), trimmed, id)
             "li" -> out += HelpBlock.Item(trimmed, marker)
             "td", "th" -> row += trimmed
-            else -> out += HelpBlock.Para(trimmed)
+            "figcaption" -> out += HelpBlock.Caption(trimmed)
+            else -> out += HelpBlock.Para(trimmed, divs.any { it })
         }
         buffer = AnnotatedString.Builder()
         started = false
@@ -127,7 +142,17 @@ internal fun helpBlocks(html: String, link: SpanStyle, open: (String) -> Unit): 
         }
         if (before.isNotBlank() || started) text(before)
         when (name) {
-            "h1", "h2", "h3", "p", "li", "td", "th" -> if (closing) { flush(); if (name == "li") marker = "" } else {
+            "figure" -> { flush(); inFigure = !closing }
+            "div" -> if (closing) { if (divs.isNotEmpty()) divs.removeAt(divs.lastIndex) } else divs += "callout" in attrs
+            "img" -> if (inFigure || "fx-thumb" in attrs) {
+                flush()
+                val src = SrcAttr.find(attrs)?.groupValues?.get(1)
+                if (src != null) out += HelpBlock.Picture(
+                    src, entities(AltAttr.find(attrs)?.groupValues?.get(1).orEmpty()),
+                    WidthAttr.find(attrs)?.groupValues?.get(1)?.toIntOrNull() ?: 0, HeightAttr.find(attrs)?.groupValues?.get(1)?.toIntOrNull() ?: 0,
+                )
+            }
+            "h1", "h2", "h3", "p", "li", "td", "th", "figcaption" -> if (closing) { flush(); if (name == "li") marker = ""; if (name == "figcaption") kind = "p" } else {
                 flush()
                 kind = name
                 id = IdAttr.find(attrs)?.groupValues?.get(1)
@@ -142,7 +167,7 @@ internal fun helpBlocks(html: String, link: SpanStyle, open: (String) -> Unit): 
             "ul", "ol" -> if (closing) { flush(); if (lists.isNotEmpty()) lists.removeAt(lists.lastIndex) } else { flush(); lists += (name == "ol") to 0 }
             "strong", "b" -> if (closing) { if (styles.isNotEmpty()) { buffer.pop(); styles.removeAt(styles.lastIndex) } } else { buffer.pushStyle(SpanStyle(fontWeight = FontWeight.Bold)); styles += 1 }
             "em", "i" -> if (closing) { if (styles.isNotEmpty()) { buffer.pop(); styles.removeAt(styles.lastIndex) } } else { buffer.pushStyle(SpanStyle(fontStyle = FontStyle.Italic)); styles += 1 }
-            "code" -> if (closing) { if (styles.isNotEmpty()) { buffer.pop(); styles.removeAt(styles.lastIndex) } } else { buffer.pushStyle(SpanStyle(fontFamily = FontFamily.Monospace, background = Am.HomePanel)); styles += 1 }
+            "code", "kbd" -> if (closing) { if (styles.isNotEmpty()) { buffer.pop(); styles.removeAt(styles.lastIndex) } } else { buffer.pushStyle(SpanStyle(fontFamily = FontFamily.Monospace, background = Am.HomePanel)); styles += 1 }
             "span" -> if (!closing && kind == "li" && started) { buffer.append("\n"); buffer.pushStyle(SpanStyle(color = Am.HomeMid, fontSize = 13.sp)); styles += 1 } else if (closing && styles.isNotEmpty() && kind == "li") { buffer.pop(); styles.removeAt(styles.lastIndex) }
             "a" -> if (closing) { if (links > 0) { buffer.pop(); links-- } } else {
                 val target = Href.find(attrs)?.groupValues?.get(1)
@@ -156,14 +181,31 @@ internal fun helpBlocks(html: String, link: SpanStyle, open: (String) -> Unit): 
 }
 
 @Composable
-internal fun DeskHelpPage() {
+internal fun DeskHelpPage() = DeskHelpReader("index.html", null, {})
+
+@Composable
+private fun HelpPicture(file: File?, block: HelpBlock.Picture) {
+    val bitmap by produceState<androidx.compose.ui.graphics.ImageBitmap?>(null, file) {
+        value = file?.let { f -> withContext(Dispatchers.IO) { runCatching { org.jetbrains.skia.Image.makeFromEncoded(f.readBytes()).toComposeImageBitmap() }.getOrNull() } }
+    }
+    val ratio = if (block.width > 0 && block.height > 0) block.width.toFloat() / block.height else 1.5f
+    val wide = if (block.width > 0) minOf(block.width, 560).dp else 560.dp
+    val shape = RoundedCornerShape(12.dp)
+    Box(Modifier.width(wide).aspectRatio(ratio).clip(shape).background(Am.HomePanel).border(1.dp, Am.HomeLine, shape)) {
+        bitmap?.let { Image(it, block.alt, Modifier.fillMaxSize(), contentScale = ContentScale.Fit) }
+    }
+}
+
+@Composable
+internal fun DeskHelpReader(start: String, onTitle: ((String) -> Unit)?, onClose: () -> Unit) {
     val context = LocalContext.current
     val links = LocalUriHandler.current
     val tag = remember { currentLanguage(context).tag }
-    val history = remember { mutableStateListOf("index.html") }
+    val history = remember { mutableStateListOf(start) }
     var anchor by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(start) { if (history.last() != start) { history.clear(); history += start } }
     val page = history.last()
-    DeskBack.Handler(history.size > 1) { history.removeAt(history.lastIndex) }
+    DeskBack.Handler(onTitle == null && history.size > 1) { history.removeAt(history.lastIndex) }
     val root = remember { android.content.AssetManager.root().resolve("help") }
     fun fileFor(path: String): File? {
         val clean = path.substringBefore('#')
@@ -191,12 +233,20 @@ internal fun DeskHelpPage() {
         list.scrollToItem(index ?: 0)
         anchor = null
     }
-    Column(Modifier.fillMaxSize()) {
-        Row(Modifier.fillMaxWidth().height(64.dp).padding(start = if (history.size > 1) 12.dp else 24.dp, end = 24.dp), verticalAlignment = Alignment.CenterVertically) {
+    val helpName = stringResource(R.string.settings_help)
+    val title = (blocks?.firstOrNull { it is HelpBlock.Heading && it.level == 1 } as? HelpBlock.Heading)?.text?.text ?: helpName
+    LaunchedEffect(title) { onTitle?.invoke(title) }
+    val pageFile = fileFor(page)
+    val assetRoot = remember { android.content.AssetManager.root().canonicalFile }
+    fun imageFile(src: String): File? = pageFile?.parentFile?.resolve(src)?.canonicalFile?.takeIf { it.isFile && it.path.startsWith(assetRoot.path) }
+    val windowed = onTitle != null
+    Column(Modifier.fillMaxSize().then(if (windowed) Modifier.background(Am.HomeBg) else Modifier)) {
+        Row(Modifier.fillMaxWidth().height(if (windowed) 56.dp else 64.dp).padding(start = if (history.size > 1) 12.dp else 24.dp, end = if (windowed) 12.dp else 24.dp), verticalAlignment = Alignment.CenterVertically) {
             if (history.size > 1) DeskIconButton(app.absentmotion.ui.export.ExportIcons.Back, stringResource(R.string.home_back), { history.removeAt(history.lastIndex) }, tooltip = null)
-            Text(stringResource(R.string.settings_help), Modifier.padding(start = if (history.size > 1) 4.dp else 0.dp).weight(1f), color = Am.Navy, fontSize = 20.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+            Text(if (windowed) title else helpName, Modifier.padding(start = if (history.size > 1) 4.dp else 0.dp).weight(1f), color = Am.Navy, fontSize = 20.sp, fontWeight = FontWeight.Bold, maxLines = 1)
             if (history.size > 1) DeskButton(stringResource(R.string.desk_help_contents), { history.clear(); history += "index.html" })
             DeskButton(stringResource(R.string.desk_help_browser), { fileFor(page)?.let { f -> runCatching { java.awt.Desktop.getDesktop().browse(f.toURI()) } } }, Modifier.padding(start = 8.dp))
+            if (windowed) DeskIconButton(app.absentmotion.ui.home.HomeIcons.Close, stringResource(R.string.action_close), onClose, Modifier.padding(start = 8.dp), tooltip = "Esc")
         }
         val shown = blocks
         if (shown == null) Box(Modifier.weight(1f).fillMaxWidth(), Alignment.Center) { Text(stringResource(R.string.about_loading), color = Am.HomeMid, fontSize = 14.sp) }
@@ -208,7 +258,13 @@ internal fun DeskHelpPage() {
                             block.text, Modifier.padding(top = if (block.level == 1) 0.dp else 14.dp), color = Am.Navy, fontWeight = FontWeight.Bold,
                             fontSize = when (block.level) { 1 -> 24.sp; 2 -> 18.sp; else -> 15.sp },
                         )
-                        is HelpBlock.Para -> Text(block.text, color = Am.HomeInk, fontSize = 14.sp, lineHeight = 21.sp)
+                        is HelpBlock.Para -> Text(
+                            block.text,
+                            if (block.note) Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(Am.HomePanel).padding(horizontal = 12.dp, vertical = 8.dp) else Modifier,
+                            color = Am.HomeInk, fontSize = 14.sp, lineHeight = 21.sp,
+                        )
+                        is HelpBlock.Caption -> Text(block.text, color = Am.HomeMid, fontSize = 12.sp, lineHeight = 17.sp)
+                        is HelpBlock.Picture -> HelpPicture(imageFile(block.src), block)
                         is HelpBlock.Item -> Row(Modifier.padding(start = 8.dp)) {
                             Text(block.marker, Modifier.width(24.dp), color = Am.HomeMid, fontSize = 14.sp, lineHeight = 21.sp)
                             Text(block.text, Modifier.weight(1f), color = Am.HomeInk, fontSize = 14.sp, lineHeight = 21.sp)
@@ -217,7 +273,7 @@ internal fun DeskHelpPage() {
                             Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp)).background(if (block.head) Am.HomePanel else Am.HomeBg).padding(horizontal = 10.dp, vertical = 7.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
-                            block.cells.forEach { Text(it, Modifier.weight(1f), color = Am.HomeInk, fontSize = 13.sp, lineHeight = 18.sp, fontWeight = if (block.head) FontWeight.Bold else FontWeight.Normal) }
+                            block.cells.forEachIndexed { n, cell -> Text(cell, Modifier.weight(if (n == 0) 1.3f else 1f), color = Am.HomeInk, fontSize = 13.sp, lineHeight = 18.sp, fontWeight = if (block.head) FontWeight.Bold else FontWeight.Normal) }
                         }
                     }
                 }

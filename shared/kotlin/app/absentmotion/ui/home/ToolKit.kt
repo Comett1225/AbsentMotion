@@ -191,6 +191,12 @@ internal fun ToolBar(
                     BigButton(stringResource(if (step.saved) R.string.compress_saved else R.string.tools_save), Modifier.weight(1f).fillMaxHeight(), HomeIcons.Download, enabled = !step.saved) { work.save(step) }
                     BigButton(stringResource(R.string.compress_share), Modifier.weight(1f).fillMaxHeight(), ExportIcons.Share, primary = false) { work.share(step) }
                 }
+                is ToolStep.Failed -> {
+                    var reporting by remember { mutableStateOf(false) }
+                    if (reporting) ReportDialog(stringResource(R.string.tools_failed, step.message)) { reporting = false }
+                    BigButton(startLabel, Modifier.weight(1f), startIcon, enabled = canStart, onClick = onStart)
+                    BigButton(stringResource(R.string.report_button), Modifier.weight(1f), primary = false) { reporting = true }
+                }
                 else -> BigButton(startLabel, Modifier.weight(1f), startIcon, enabled = canStart, onClick = onStart)
             }
         }

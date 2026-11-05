@@ -29,6 +29,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -104,6 +107,9 @@ fun UnsupportedPhone(problem: String, onClose: () -> Unit) {
     val links = LocalUriHandler.current
     val version = appVersion()
     val facts by produceState<PhoneFacts?>(null) { value = withContext(Dispatchers.IO) { phoneFacts(context) } }
+    var reporting by remember { mutableStateOf(false) }
+    val shownFacts = facts
+    if (reporting && shownFacts != null) ReportDialog(engineProblemDetails(version, shownFacts, problem)) { reporting = false }
     BackHandler(onBack = onClose)
     Box(Modifier.fillMaxSize().background(Am.HomeBg).pointerInput(Unit) {}, contentAlignment = Alignment.TopCenter) {
         Column(
@@ -131,6 +137,7 @@ fun UnsupportedPhone(problem: String, onClose: () -> Unit) {
                     context.getSystemService(ClipboardManager::class.java)?.setPrimaryClip(ClipData.newPlainText("AbsentMotion", engineProblemDetails(version, shown, problem)))
                     Toast.makeText(context, context.getString(R.string.unsupported_copied), Toast.LENGTH_SHORT).show()
                 }
+                Action(stringResource(R.string.report_button), filled = false) { if (facts != null) reporting = true }
                 Action(stringResource(R.string.action_close), filled = true, onClick = onClose)
             }
         }

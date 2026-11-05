@@ -134,12 +134,20 @@ private fun CrashDetails(log: CrashEntry, onBack: () -> Unit) {
             Text(time, color = Am.HomeMid, fontSize = 13.sp)
             Text(sentence, Modifier.padding(top = 2.dp), color = Am.Navy, fontSize = 17.sp, lineHeight = 23.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(12.dp))
-            Box(
-                Modifier.height(40.dp).clip(RoundedCornerShape(14.dp)).background(Am.Navy).clickable {
-                    context.getSystemService(ClipboardManager::class.java)?.setPrimaryClip(ClipData.newPlainText("AbsentMotion", "$time\n$sentence\n\n$detail"))
-                }.padding(horizontal = 18.dp),
-                contentAlignment = Alignment.Center,
-            ) { Text(stringResource(R.string.crash_copy), color = Am.OnNavy, fontSize = 15.sp, fontWeight = FontWeight.Medium) }
+            var reporting by remember { mutableStateOf(false) }
+            if (reporting) CrashReportDialog(log) { reporting = false }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Box(
+                    Modifier.height(40.dp).clip(RoundedCornerShape(14.dp)).background(Am.Navy).clickable {
+                        context.getSystemService(ClipboardManager::class.java)?.setPrimaryClip(ClipData.newPlainText("AbsentMotion", "$time\n$sentence\n\n$detail"))
+                    }.padding(horizontal = 18.dp),
+                    contentAlignment = Alignment.Center,
+                ) { Text(stringResource(R.string.crash_copy), color = Am.OnNavy, fontSize = 15.sp, fontWeight = FontWeight.Medium) }
+                Box(
+                    Modifier.height(40.dp).clip(RoundedCornerShape(14.dp)).background(Am.Accent).clickable { reporting = true }.padding(horizontal = 18.dp),
+                    contentAlignment = Alignment.Center,
+                ) { Text(stringResource(R.string.report_button), color = Am.OnAccent, fontSize = 15.sp, fontWeight = FontWeight.Medium) }
+            }
             Spacer(Modifier.height(14.dp))
             SelectionContainer {
                 Text(detail, color = Am.HomeInk, fontSize = 11.sp, lineHeight = 15.sp, fontFamily = FontFamily.Monospace)

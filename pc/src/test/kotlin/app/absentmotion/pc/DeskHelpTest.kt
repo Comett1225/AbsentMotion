@@ -15,11 +15,29 @@ class DeskHelpTest {
         assertEquals("index.html", helpTarget("ar/editing.html", "../index.html"))
     }
 
-    @Test fun textBeforeASkippedTagIsKept() {
-        val blocks = helpBlocks("<p>Before <figure><img src=\"a.png\"></figure>after</p><h2>Next</h2>", SpanStyle(), {})
-        val paragraph = blocks.filterIsInstance<HelpBlock.Para>().first()
-        assertEquals("Before after", paragraph.text.text.trim())
+    @Test fun textAroundAFigureIsKept() {
+        val blocks = helpBlocks("<p>Before <figure><img src=\"a.png\" width=\"720\" height=\"572\" alt=\"Alt &amp; text\"><figcaption>Cap</figcaption></figure>after</p><h2>Next</h2>", SpanStyle(), {})
+        assertEquals(listOf("Before", "after"), blocks.filterIsInstance<HelpBlock.Para>().map { it.text.text.trim() })
+        val picture = blocks.filterIsInstance<HelpBlock.Picture>().single()
+        assertEquals("a.png", picture.src)
+        assertEquals("Alt & text", picture.alt)
+        assertEquals(720, picture.width)
+        assertEquals("Cap", blocks.filterIsInstance<HelpBlock.Caption>().single().text.text)
         assertEquals(1, blocks.filterIsInstance<HelpBlock.Heading>().size)
+    }
+
+    @Test fun loosePicturesAreSkippedButThumbnailsKept() {
+        val blocks = helpBlocks("<ul><li><a href=\"x.html\"><img src=\"s.webp\"> Name</a></li></ul><img class=\"fx-thumb\" src=\"t.webp\" width=\"192\" height=\"192\" alt=\"\">", SpanStyle(), {})
+        assertEquals(listOf("t.webp"), blocks.filterIsInstance<HelpBlock.Picture>().map { it.src })
+    }
+
+    @Test fun tablesBecomeRowsAndCalloutsNotes() {
+        val html = "<div class=\"callout tip\"><p>Careful</p></div><p>Plain</p><div class=\"table-wrap\"><table><thead><tr><th>Setting</th><th>Default</th></tr></thead><tbody><tr><td><strong>Strength</strong></td><td>10</td></tr></tbody></table></div>"
+        val blocks = helpBlocks(html, SpanStyle(), {})
+        assertEquals(listOf(true, false), blocks.filterIsInstance<HelpBlock.Para>().map { it.note })
+        val rows = blocks.filterIsInstance<HelpBlock.Row>()
+        assertEquals(listOf(true, false), rows.map { it.head })
+        assertEquals(listOf("Strength", "10"), rows[1].cells.map { it.text })
     }
 
     @Test fun textBeforeATocAndHeaderIsKept() {

@@ -400,7 +400,7 @@ internal val Resolutions = listOf(
     2160 to "2160p (4k)", 1440 to "1440p (QHD)", 1080 to "1080p (FHD)", 720 to "720p (HD)",
     540 to "540p (SD)", 360 to "360p", 270 to "270p", 180 to "180p",
 )
-internal val FrameRates = listOf(12, 15, 18, 20, 24, 25, 30, 48, 50, 60)
+internal val FrameRates = app.absentmotion.ui.home.FrameRates
 
 internal class BackgroundChoice(@StringRes val name: Int, val argb: Int)
 
@@ -488,7 +488,9 @@ private fun SettingsPanel(state: EditorState, onDismiss: () -> Unit, modifier: M
         Spacer(Modifier.height(10.dp))
         SettingRow(stringResource(if (scene.isElement) R.string.menu_asset_resolution else R.string.menu_resolution)) {
             if (aspect == CUSTOM) {
-                CustomSize(scene.width, scene.height) { w, h -> change(width = w, height = h) }
+                CustomSize(scene.width, scene.height, { w, h -> change(width = w, height = h) }) {
+                    SavedSizesButton(state.settings, scene.width, scene.height) { w, h -> change(width = w, height = h) }
+                }
             } else {
                 val ratio = Aspects.first { it.key == aspect }
                 Dropdown("${resolution}p") { close ->
@@ -680,7 +682,7 @@ private fun Modifier.checkerboard(cell: Dp): Modifier = drawWithCache {
 }
 
 @Composable
-private fun CustomSize(width: Int, height: Int, onChange: (Int, Int) -> Unit) {
+private fun CustomSize(width: Int, height: Int, onChange: (Int, Int) -> Unit, trailing: @Composable () -> Unit) {
     var w by remember(width) { mutableStateOf(width.toString()) }
     var h by remember(height) { mutableStateOf(height.toString()) }
     var dirty by remember { mutableStateOf(false) }
@@ -698,6 +700,39 @@ private fun CustomSize(width: Int, height: Int, onChange: (Int, Int) -> Unit) {
         SizeField(w, { w = it.filter(Char::isDigit).take(4); dirty = true }, { commit() }, Modifier.weight(1f))
         Text("x", Modifier.padding(horizontal = 8.dp), color = Am.OnDark, fontSize = 15.sp)
         SizeField(h, { h = it.filter(Char::isDigit).take(4); dirty = true }, { commit() }, Modifier.weight(1f))
+        trailing()
+    }
+}
+
+@Composable
+private fun SavedSizesButton(settings: app.absentmotion.library.AppSettings, width: Int, height: Int, onPick: (Int, Int) -> Unit) {
+    var open by remember { mutableStateOf(false) }
+    var naming by remember { mutableStateOf(false) }
+    val focus = LocalFocusManager.current
+    val saved = settings.savedSizes
+    Box(Modifier.padding(start = 6.dp).fillMaxHeight().width(37.dp)) {
+        Box(Modifier.fillMaxSize().clip(FieldShape).background(Am.Card).clickable { focus.clearFocus(); open = true }, Alignment.Center) {
+            Icon(ChromeIcons.SavePreset, stringResource(R.string.newproject_saved_sizes), Modifier.size(22.dp), tint = Am.Navy)
+        }
+        Presence(open) {
+            Popup(DropdownPosition, { open = false }, PopupProperties(focusable = true)) {
+                Column(
+                    Modifier.presence(scaleFrom = 0.94f, origin = TransformOrigin(1f, 0f)).width(240.dp).heightIn(max = 330.dp).clip(FieldShape).background(MenuBg)
+                        .verticalScroll(rememberScrollState()),
+                ) {
+                    PickRow(stringResource(R.string.newproject_save_size_title), divider = saved.isNotEmpty()) { open = false; naming = true }
+                    saved.forEachIndexed { i, size ->
+                        PickRow("${size.name}  ${size.label}", divider = i < saved.lastIndex) { open = false; onPick(size.width, size.height) }
+                    }
+                }
+            }
+        }
+    }
+    if (naming) {
+        app.absentmotion.ui.home.SizeNameDialog(stringResource(R.string.newproject_save_size_title), "$width × $height", dark = true, onDismiss = { naming = false }) { name ->
+            naming = false
+            settings.savedSizes = app.absentmotion.library.SavedSizes.with(settings.savedSizes, name, width, height)
+        }
     }
 }
 

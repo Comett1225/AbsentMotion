@@ -165,7 +165,66 @@ There are two builds: `foss`, which contains no Google libraries at all, and `co
 Not sure about your phone? The [phone checker](https://comett1225.github.io/AbsentMotion/phone-checker.html) tells you
 which build to download.
 
-The desktop version runs on Macs with Apple silicon (`arm64`) and on Linux (`.deb` and AppImage, `arm64` and `x86_64`) with glibc 2.35 or newer: Ubuntu 22.04, Debian 12 and later. Windows builds and is being tested.
+The desktop version runs on Macs with Apple silicon (`arm64`) and on Linux (`.deb`, AppImage and `.tar.gz`, `arm64` and `x86_64`) with glibc 2.35 or newer: Ubuntu 22.04, Debian 12 and later. Windows builds and is being tested.
+
+## Install on Linux
+
+Every release has three Linux files, for `x86_64` and `arm64`. They need glibc 2.35 or newer: Ubuntu 22.04, Debian 12,
+Linux Mint 21, Fedora 36 or newer, and current Arch, Manjaro, EndeavourOS and openSUSE Tumbleweed. Pick one:
+
+**AppImage** (any distribution, nothing to install):
+
+    chmod +x AbsentMotion-*-linux-x86_64.AppImage
+    ./AbsentMotion-*-linux-x86_64.AppImage
+
+AppImages need FUSE 2. On Ubuntu 22.04 and Debian install it with `sudo apt install libfuse2` (Ubuntu 24.04 and later:
+`libfuse2t64`). Without FUSE, start it with `./AbsentMotion-*.AppImage --appimage-extract-and-run`.
+
+**`.deb`** (Ubuntu, Debian, Linux Mint, Pop!_OS, Zorin OS):
+
+    sudo apt install ./AbsentMotion-*-linux-x86_64.deb
+
+It adds AbsentMotion to the app menu. Remove it with `sudo apt remove absentmotion`.
+
+**`.tar.gz`** (Arch, Manjaro, EndeavourOS, Fedora, openSUSE and any other distribution). It installs for your user only,
+without root:
+
+    tar -xzf AbsentMotion-*-linux-x86_64.tar.gz
+    ./AbsentMotion/install.sh
+
+This copies the app to `~/.local/opt/absentmotion` and adds a menu entry, the icon, the `.absproj` file type and the
+command `absentmotion` (in `~/.local/bin`). Remove it with `~/.local/opt/absentmotion/install.sh --uninstall`; your projects
+stay. To update, unpack the new version and run its `install.sh` again.
+
+Almost every desktop already has the libraries AbsentMotion needs. If it does not start, install them:
+
+- Arch, Manjaro, EndeavourOS: `sudo pacman -S --needed alsa-lib fontconfig freetype2 libglvnd libx11 libxext libxi libxrender libxtst zlib`
+- Fedora: `sudo dnf install alsa-lib fontconfig freetype libglvnd-glx libX11 libXext libXi libXrender libXtst zlib`
+- openSUSE: `sudo zypper install libasound2 fontconfig libfreetype6 libGL1 libX11-6 libXext6 libXi6 libXrender1 libXtst6 libz1`
+- Debian, Ubuntu, Mint: `sudo apt install libasound2 libfontconfig1 libfreetype6 libgl1 libx11-6 libxext6 libxi6 libxrender1 libxtst6 zlib1g`
+
+Optional, for speed: a Vulkan driver for your graphics card (Mesa's, or NVIDIA's own driver) makes previews and exports
+faster; without one AbsentMotion draws on the processor. A VA-API driver (Intel: `intel-media-driver`, AMD: Mesa's VA-API
+driver) lets it decode and export video on the graphics card. Sound plays through ALSA, PulseAudio or PipeWire.
+
+On another chip or an older system, build it from source ([`docs/BUILD.md`](docs/BUILD.md), section 9).
+
+**If something goes wrong**
+
+- *The window is blank or grey on Wayland.* AbsentMotion runs through XWayland, which GNOME, KDE Plasma and most Wayland
+  desktops start by themselves; install `xwayland` if yours does not. On tiling window managers (sway, Hyprland, i3) the
+  menu entry and the `absentmotion` command already set `_JAVA_AWT_WM_NONREPARENTING=1`; set it yourself if you start
+  `bin/AbsentMotion` directly.
+- *Everything is too small or too big.* AbsentMotion follows `GDK_SCALE` and your desktop's `Xft.dpi` font setting. To pick
+  a size yourself: `JAVA_TOOL_OPTIONS=-Dsun.java2d.uiScale=1.5 absentmotion`.
+- *Previews are slow, or AbsentMotion says the graphics card could not be used.* Install or update the Vulkan driver
+  (`vulkaninfo --summary` shows whether one works). If the graphics driver crashes the app, start it with
+  `AM_SOFTWARE_RENDER=1 absentmotion` to draw on the processor.
+- *Exports say they use the software encoder.* Install the VA-API driver; `vainfo` should list `VAEntrypointEncSlice`. With
+  two graphics cards, choose one with `AM_VAAPI_DEVICE=/dev/dri/renderD129 absentmotion`.
+- *Open and save dialogs do not appear.* They use the desktop portal (`xdg-desktop-portal` with the GNOME, KDE or GTK
+  part), or `zenity` or `kdialog`. Install one of them.
+- *No sound.* Without a sound device, playback is silent; exports still contain the sound.
 
 ## Roadmap
 

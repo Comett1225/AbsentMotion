@@ -334,6 +334,8 @@ internal fun ClosedDialog(
     crash: CrashEntry?, recoveryTitle: String?, outdated: Outdated?, onRestore: () -> Unit, onDiscard: () -> Unit, onClose: () -> Unit,
 ) {
     val recovering = recoveryTitle != null
+    var reporting by remember { mutableStateOf(false) }
+    if (reporting && crash != null) CrashReportDialog(crash) { reporting = false }
     AlertDialog(
         onDismissRequest = { if (!recovering) onClose() },
         title = { Text(stringResource(R.string.absentmotion_closed_unexpectedly), color = Am.Navy) },
@@ -345,6 +347,7 @@ internal fun ClosedDialog(
                     stringResource(R.string.safety_recovery_body, recoveryTitle.ifBlank { stringResource(R.string.recovery_your_project) }),
                     Modifier.padding(top = if (crash != null) 12.dp else 0.dp), color = Am.Navy,
                 )
+                if (crash != null) TextButton({ reporting = true }) { Text(stringResource(R.string.report_button), color = Am.Navy) }
             }
         },
         dismissButton = if (!recovering) null else {
@@ -363,6 +366,8 @@ internal fun closedText(time: Long, now: Long = System.currentTimeMillis()): UiT
 
 @Composable
 internal fun OpenFailedDialog(onHistory: (() -> Unit)?, outdated: Outdated?, onDismiss: () -> Unit) {
+    var reporting by remember { mutableStateOf(false) }
+    if (reporting) ReportDialog(stringResource(R.string.report_open_failed)) { reporting = false }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.could_not_open_this_project), color = Am.Navy) },
@@ -370,6 +375,7 @@ internal fun OpenFailedDialog(onHistory: (() -> Unit)?, outdated: Outdated?, onD
             Column {
                 Text(stringResource(if (onHistory != null) R.string.safety_open_failed_with_history else R.string.the_project_file_is_missing_or), color = Am.Navy)
                 OutdatedHint(outdated, Modifier.padding(top = 8.dp))
+                TextButton({ reporting = true }) { Text(stringResource(R.string.report_button), color = Am.Navy) }
             }
         },
         dismissButton = onHistory?.let { { TextButton(it) { Text(stringResource(R.string.version_history), color = Am.Navy) } } },

@@ -65,6 +65,7 @@ dependencies {
     implementation("org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose:2.9.6")
     implementation("org.json:json:20250517")
     implementation("net.sf.kxml:kxml2:2.3.0")
+    implementation("org.jetbrains.runtime:jbr-api:1.5.0")
     if (androidJar != null || System.getenv("AM_ANDROID_API") != null) compileOnly(androidApi)
     runtimeOnly(runtimeStandins.output)
     testImplementation("junit:junit:4.13.2")
@@ -179,6 +180,29 @@ if (macArch != null) tasks.matching { it.name == "createDistributable" }.configu
     }
 }
 
+if (!isMac) tasks.matching { it.name == "createDistributable" }.configureEach {
+    doLast {
+        val image = layout.buildDirectory.dir("compose/binaries/main/app/AbsentMotion").get().asFile
+        fun archives() = image.walk().filter { it.name.startsWith("classes") && it.extension == "jsa" }.toList()
+        archives().forEach { it.setWritable(true); it.delete() }
+        val launcher = image.resolve(if (isWindows) "AbsentMotion.exe" else "bin/AbsentMotion")
+        val exit = ProcessBuilder(launcher.path).apply { environment()["_JAVA_OPTIONS"] = "-Xshare:dump" }
+            .redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.DISCARD).start().waitFor()
+        val base = archives().firstOrNull()
+        logger.lifecycle("start-up archive: " + (base?.let { "${it.relativeTo(image)}, ${it.length() / 1_000_000} MB" } ?: "not made (launcher exit $exit)"))
+        if (isWindows && base != null) {
+            val jars = image.resolve("app").listFiles { f -> f.extension == "jar" }.orEmpty().sortedBy { it.name }
+            val key = jars.joinToString("\n") { "${it.name} ${it.length()} ${it.lastModified()}" }.hashCode().toUInt().toString(16)
+            val archive = "\$APPDIR\\app-$key.jsa"
+            val cfg = image.resolve("app/AbsentMotion.cfg")
+            val text = cfg.readText()
+            val section = checkNotNull(Regex("\\[JavaOptions](\\r?\\n)").find(text)) { "no [JavaOptions] in ${cfg.path}" }
+            val lines = listOf("-XX:SharedArchiveFile=$archive", "-XX:+AutoCreateSharedArchive", "-Dam.cdsArchive=$archive").joinToString("") { "java-options=$it${section.groupValues[1]}" }
+            cfg.writeText(text.substring(0, section.range.last + 1) + lines + text.substring(section.range.last + 1))
+        }
+    }
+}
+
 if (isLinux) tasks.matching { it.name == "createDistributable" }.configureEach {
     doLast {
         listOf("ffmpeg", "ffprobe").map { layout.buildDirectory.file("compose/binaries/main/app/AbsentMotion/lib/app/resources/$it").get().asFile }
@@ -218,6 +242,7 @@ tasks.test {
     systemProperty("user.home", layout.buildDirectory.dir("test-home").get().asFile.absolutePath)
     systemProperty("am.onboarding", "done")
     systemProperty("am.fontOffer", "off")
+    systemProperty("am.preload", "off")
     systemProperty("am.shell", "off")
     systemProperty("am.data", layout.buildDirectory.dir("test-data").get().asFile.absolutePath)
     dependsOn(nativeBuild)
@@ -233,6 +258,7 @@ tasks.test {
 }
 
 tasks.named<Jar>("jar") { from(runtimeStandins.output) }
+tasks.processResources { from("../windows/AbsentMotion.ico") }
 
 tasks.register("installMac") {
     onlyIf { isMac }

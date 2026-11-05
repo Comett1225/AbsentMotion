@@ -229,6 +229,20 @@ fun removeFromLibrary(uri: android.net.Uri, unlinkFolder: Boolean) = app.absentm
 
 fun linkMediaFolder() { app.absentmotion.desk.DeskLibrary.chooseFolder()?.let { app.absentmotion.desk.DeskLibrary.link(it) } }
 
+fun libraryFilePath(uri: android.net.Uri): String = uri.toFile()?.path.orEmpty()
+
+fun libraryFolders(): List<String> = app.absentmotion.desk.DeskLibrary.folders.map { it.path }
+
+fun pinnedLibraryFolders(): Set<String> = app.absentmotion.desk.DeskLibrary.pinned.map { it.path }.toSet()
+
+fun pinLibraryFolder(path: String, pin: Boolean) = app.absentmotion.desk.DeskLibrary.pin(java.io.File(path), pin)
+
+fun unlinkLibraryFolder(path: String) = app.absentmotion.desk.DeskLibrary.unlink(java.io.File(path))
+
+fun revealLibraryFolder(path: String) { app.absentmotion.desk.DeskOs.reveal(java.io.File(path)) }
+
+fun revealFolderLabel(): String = app.absentmotion.desk.DeskOs.revealLabel
+
 internal const val CAPTION_MODEL_NAME = "ggml-base-q5_1.bin"
 internal const val CAPTION_MODEL_BYTES = 59_707_625L
 internal fun loadCaptionLibrary() { app.absentmotion.pc.engine.DesktopNative.hashCode() }

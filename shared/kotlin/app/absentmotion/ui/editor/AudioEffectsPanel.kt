@@ -173,7 +173,9 @@ private fun EffectRow(state: EditorState, reorder: Reorder, index: Int, fx: Audi
         Icon(if (fx.bypass) EffectIcons.EyeOff else EffectIcons.Eye, stringResource(if (fx.bypass) R.string.audiofx_turn_on else R.string.audiofx_bypass), Modifier.width(36.dp).fillMaxHeight().clickable {
             state.editSelected { it.updateAudioEffect(index) { e -> e.withBypass(!e.bypass) } }
         }, tint = Am.OnDark)
-        Icon(EffectIcons.Grip, stringResource(R.string.audiofx_reorder), Modifier.width(32.dp).fillMaxHeight().reorderGrip(reorder, index, count, move), tint = Am.OnDark)
+        Box(Modifier.width(36.dp).fillMaxHeight().clickable(enabled = known, onClick = open).reorderGrip(reorder, index, count, move), Alignment.Center) {
+            Icon(EffectIcons.Grip, stringResource(R.string.audiofx_reorder), Modifier.size(20.dp), tint = Am.OnDark)
+        }
     }
 }
 

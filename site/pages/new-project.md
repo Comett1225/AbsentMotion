@@ -36,11 +36,13 @@ The long side follows the shape. A 16:9 project at 1080p is 1920 x 1080, a 4:5 p
 
 With **Custom aspect ratio**, the list becomes two number fields for width and height, with a round **Link** button between them. When Link is on, changing one side keeps the shape the two fields had when you turned Link on. Each side can be from 32 to 4096 pixels; the app corrects the value when you leave the field.
 
+To keep a size for later, tap **+ Save size** under the fields and give it a name (for example "Banner"). Saved sizes appear as buttons next to it; tap one to fill in its width and height. Long-press a saved size (right-click on a computer) to rename or delete it. In the editor, the project settings offer the same saved sizes when you choose a custom ratio.
+
 A larger canvas looks sharper but needs more memory and takes longer to export. 1080p is a good choice for most projects. You can change the resolution later in the editor's project settings, which does not rescale your layers.
 
 ## Frame rate
 
-Choose 12, 15, 18, 20, 24, 25, 30, 48, 50 or 60 frames per second. The default is 60. Use 24 or 30 for a film look and smaller files, and 60 for smooth fast motion. This sets how often the editor and the export draw a picture. Video clips keep their own frame rate; see the frame interpolation option on the [Export](@export) page.
+Choose 12, 15, 18, 20, 24, 25, 30, 48, 50, 60, 90 or 120 frames per second. The default is 60. Use 24 or 30 for a film look and smaller files, and 60 for smooth fast motion. 90 and 120 are for very smooth motion on high-refresh screens; not every phone can export a video that fast, and the Export screen tells you when yours cannot. This sets how often the editor and the export draw a picture. Video clips keep their own frame rate; see the frame interpolation option on the [Export](@export) page.
 
 ## Background
 

@@ -187,9 +187,14 @@ private fun CrashDetails(log: CrashEntry, onBack: () -> Unit) {
     val detail by produceState("", log.file) { value = withContext(Dispatchers.IO) { CrashLogs.text(log) } }
     val sentence = stringResource(log.reason.sentence)
     val time = versionLabel(log.time).text()
+    var reporting by remember { mutableStateOf(false) }
+    if (reporting) CrashReportDialog(log) { reporting = false }
     Column(Modifier.fillMaxSize()) {
         PageHeader(stringResource(R.string.crash_logs), onBack) {
-            DeskButton(stringResource(R.string.crash_copy), { clipboard.setText(AnnotatedString("$time\n$sentence\n\n$detail")) }, primary = true)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                DeskButton(stringResource(R.string.crash_copy), { clipboard.setText(AnnotatedString("$time\n$sentence\n\n$detail")) })
+                DeskButton(stringResource(R.string.report_button), { reporting = true }, primary = true)
+            }
         }
         Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 24.dp, end = 24.dp, bottom = 24.dp)) {
             Text(time, color = Am.HomeMid, fontSize = 13.sp)

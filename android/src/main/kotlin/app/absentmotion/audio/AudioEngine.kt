@@ -35,8 +35,9 @@ class AudioEngine(context: Context) {
 
     @Volatile var log = false
 
-    @Volatile var level = 0f
-        private set
+    val mix = LiveMix()
+
+    val level: Float get() = mix.master
 
     @Volatile private var shownFrame = -1
     @Volatile private var shownMs = 0
@@ -56,7 +57,7 @@ class AudioEngine(context: Context) {
     private fun interrupt() {
         interrupted = true
         session?.halt()
-        level = 0f
+        mix.master = 0f
     }
 
     private fun listen(on: Boolean) {
@@ -97,7 +98,7 @@ class AudioEngine(context: Context) {
     fun stop() {
         session?.halt()
         listen(false)
-        level = 0f
+        mix.master = 0f
         main.removeCallbacks(releaseIdle)
         main.postDelayed(releaseIdle, IDLE_MS)
     }
@@ -110,7 +111,7 @@ class AudioEngine(context: Context) {
         releasing = true
         session?.halt()
         listen(false)
-        level = 0f
+        mix.master = 0f
         main.removeCallbacks(releaseIdle)
         closeStreams()
     }
@@ -130,7 +131,7 @@ class AudioEngine(context: Context) {
         @Volatile var stopRequested = false
         val rate = AudioTrack.getNativeOutputSampleRate(AudioManager.STREAM_MUSIC).takeIf { it > 0 } ?: 48_000
         val clock = AudioClock(startMs, rate)
-        private val rack = FxRack(rate)
+        private val rack = FxRack(rate).also { it.live = mix }
         private val limiter = SafeLimiter(rate)
 
         fun halt() {
@@ -199,7 +200,7 @@ class AudioEngine(context: Context) {
             } finally {
                 runCatching { track?.release() }
                 rack.close()
-                level = 0f
+                mix.master = 0f
                 if (releasing) closeStreams()
             }
         }
@@ -233,7 +234,7 @@ class AudioEngine(context: Context) {
         private fun mixBlock(out: FloatArray, t0: Double) {
             mixStreams(clips, out, BLOCK, t0, rate, quality, rack, ::stream)
             limiter.process(out, BLOCK)
-            level = limiter.peak
+            mix.master = limiter.peak
         }
     }
 

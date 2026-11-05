@@ -105,8 +105,10 @@ object DeskKeys {
             if (delta != 0) state.edit { TimelineMath.movedClips(it, firstLayer, layers.drop(1), frame) }
         }
         when {
-            event.isAltPressed && event.key == Key.DirectionLeft && !command -> nudge(if (shift) -10 else -1)
-            event.isAltPressed && event.key == Key.DirectionRight && !command -> nudge(if (shift) 10 else 1)
+            event.isAltPressed && event.key == Key.DirectionLeft && !command -> DeskJump.previous(state)
+            event.isAltPressed && event.key == Key.DirectionRight && !command -> DeskJump.next(state)
+            event.key == Key.Comma && !command && !event.isAltPressed -> nudge(if (shift) -10 else -1)
+            event.key == Key.Period && !command && !event.isAltPressed -> nudge(if (shift) 10 else 1)
             command && event.key == Key.A -> if (first) { state.deselectLayer(); MultiSelect.ids = state.scene.layers.map { it.id }.toSet(); MultiSelect.active = MultiSelect.ids.isNotEmpty() }
             !command && shift && event.key == Key.Z -> DeskTimelineControls.fit?.let { if (first) it() } ?: return false
             !command && (event.key == Key.Plus || event.key == Key.Equals || event.key == Key.NumPadAdd) -> DeskTimelineControls.zoom?.invoke(1.25f) ?: return false

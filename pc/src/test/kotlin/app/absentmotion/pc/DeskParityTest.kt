@@ -21,6 +21,7 @@ import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isRoot
+import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onLast
@@ -147,12 +148,16 @@ class DeskParityTest {
             setContent { DeskApp(app) }
             open(app, "styles")
             val editor = app.editor!!
+            onAllNodesWithContentDescription("Project settings").onFirst().performClick()
+            mainClock.advanceTimeBy(500)
             val name = onAllNodes(hasSetTextAction() and hasText("Styles")).onFirst()
             name.performClick()
             name.performTextReplacement("Renamed project")
             onAllNodes(isRoot()).onFirst().performKeyInput { pressKey(Key.Enter) }
             waitForIdle()
             runOnIdle { assertEquals("Renamed project", editor.scene.title) }
+            onAllNodes(isRoot()).onFirst().performKeyInput { pressKey(Key.Escape) }
+            mainClock.advanceTimeBy(500)
             runOnIdle { editor.selectedId = editor.scene.layers.last().id }
             mainClock.advanceTimeBy(500)
             val layer = onAllNodes(hasSetTextAction() and hasText(editor.selected!!.label)).onFirst()

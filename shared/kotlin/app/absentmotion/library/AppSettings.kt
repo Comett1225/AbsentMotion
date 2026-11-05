@@ -8,6 +8,8 @@ import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Palette
 import app.absentmotion.ui.theme.Themes
 import androidx.annotation.StringRes
+import org.json.JSONArray
+import org.json.JSONObject
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -181,6 +183,12 @@ class AppSettings(private val context: Context) {
         theme = Themes.CUSTOM
     }
 
+    private var savedSizesState by mutableStateOf(SavedSizes.decode(prefs.getString("savedSizes", null)))
+
+    var savedSizes: List<SavedSize>
+        get() = savedSizesState
+        set(value) { savedSizesState = value; prefs.edit().putString("savedSizes", SavedSizes.encode(value)).apply() }
+
     var savedColours: List<Int>
         get() = savedColoursState
         set(value) { savedColoursState = value; prefs.edit().putString("savedColours", value.joinToString(",")).apply() }
@@ -242,3 +250,38 @@ data class NewProjectChoice(
     val fps: Int,
     val background: Int,
 )
+
+data class SavedSize(val name: String, val width: Int, val height: Int) {
+    val label get() = "$width × $height"
+}
+
+object SavedSizes {
+    const val MAX = 20
+    const val MAX_NAME = 40
+
+    fun with(list: List<SavedSize>, name: String, width: Int, height: Int): List<SavedSize> {
+        val clean = name.trim().take(MAX_NAME).ifEmpty { "$width × $height" }
+        return (listOf(SavedSize(clean, width, height)) + list.filterNot { it.width == width && it.height == height }).take(MAX)
+    }
+
+    fun renamed(list: List<SavedSize>, size: SavedSize, name: String): List<SavedSize> {
+        val clean = name.trim().take(MAX_NAME).ifEmpty { return list }
+        return list.map { if (it == size) it.copy(name = clean) else it }
+    }
+
+    fun without(list: List<SavedSize>, size: SavedSize): List<SavedSize> = list.filterNot { it == size }
+
+    fun encode(list: List<SavedSize>): String = JSONArray().also { array ->
+        list.forEach { array.put(JSONObject().put("n", it.name).put("w", it.width).put("h", it.height)) }
+    }.toString()
+
+    fun decode(text: String?): List<SavedSize> = runCatching {
+        val array = JSONArray(text ?: return emptyList())
+        (0 until array.length()).mapNotNull { i ->
+            val o = array.getJSONObject(i)
+            val w = o.getInt("w")
+            val h = o.getInt("h")
+            if (w in 1..8192 && h in 1..8192) SavedSize(o.getString("n"), w, h) else null
+        }.take(MAX)
+    }.getOrDefault(emptyList())
+}

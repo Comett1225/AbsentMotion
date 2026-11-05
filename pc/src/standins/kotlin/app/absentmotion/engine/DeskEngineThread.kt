@@ -386,6 +386,9 @@ class EngineThread(private val background: Int, private val context: Context? = 
         suspend fun still(timeMs: Int, width: Int, height: Int): ByteArray? = withContext(dispatcher) {
             applyFonts(timeMs); syncVideo(document, timeMs); interpolation?.apply(document, timeMs, engine()); engine().still(timeMs.toDouble(), width, height)
         }
+        suspend fun stillInto(timeMs: Int, width: Int, height: Int, out: ByteArray): Boolean = withContext(dispatcher) {
+            applyFonts(timeMs); syncVideo(document, timeMs); interpolation?.apply(document, timeMs, engine()); engine().stillInto(timeMs.toDouble(), width, height, out)
+        }
         suspend fun previewStill(timeMs: Int, width: Int, height: Int, accurateBlur: Boolean): ByteArray? = withContext(dispatcher) {
             applyFonts(timeMs); syncVideo(document, timeMs); engine().previewStill(timeMs.toDouble(), width, height, accurateBlur)
         }

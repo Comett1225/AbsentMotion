@@ -24,8 +24,9 @@ class AudioEngine(context: Context) {
 
     @Volatile var log = false
 
-    @Volatile var level = 0f
-        private set
+    val mix = LiveMix()
+
+    val level: Float get() = mix.master
 
     @Volatile private var shownFrame = -1
     @Volatile private var shownMs = 0
@@ -60,7 +61,7 @@ class AudioEngine(context: Context) {
 
     fun stop() {
         session?.halt()
-        level = 0f
+        mix.master = 0f
         main.removeCallbacks(releaseIdle)
         main.postDelayed(releaseIdle, IDLE_MS)
     }
@@ -72,7 +73,7 @@ class AudioEngine(context: Context) {
     fun release() {
         releasing = true
         session?.halt()
-        level = 0f
+        mix.master = 0f
         main.removeCallbacks(releaseIdle)
         closeStreams()
         closeOutput()
@@ -95,7 +96,7 @@ class AudioEngine(context: Context) {
         @Volatile var stopRequested = false
         val rate = DeskOutput.nativeRate
         val clock = DeskClock(startMs, rate)
-        private val rack = FxRack(rate)
+        private val rack = FxRack(rate).also { it.live = mix }
         private val limiter = SafeLimiter(rate)
 
         init { priority = MAX_PRIORITY; isDaemon = true }
@@ -143,7 +144,7 @@ class AudioEngine(context: Context) {
                 while (!stopRequested) sleep(20)
             } finally {
                 rack.close()
-                level = 0f
+                mix.master = 0f
                 if (releasing) closeStreams()
             }
         }
@@ -168,7 +169,7 @@ class AudioEngine(context: Context) {
         private fun mixBlock(out: FloatArray, t0: Double) {
             mixStreams(clips, out, BLOCK, t0, rate, quality, rack, ::stream)
             limiter.process(out, BLOCK)
-            level = limiter.peak
+            mix.master = limiter.peak
         }
     }
 

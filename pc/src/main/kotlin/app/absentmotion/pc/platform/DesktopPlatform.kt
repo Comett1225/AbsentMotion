@@ -1,6 +1,5 @@
 package app.absentmotion.pc.platform
 
-import java.awt.FileDialog
 import java.awt.Frame
 import java.awt.Window
 import java.io.File
@@ -11,17 +10,6 @@ object DesktopPlatform {
     val dataDir: File get() = app.absentmotion.desk.DeskOs.dataDir
     fun assets(): File = System.getProperty("am.assets")?.let(::File) ?: File(System.getProperty("compose.application.resources.dir"), "assets")
     fun nativeLibrary(): String = System.getProperty("am.native") ?: File(System.getProperty("compose.application.resources.dir"), app.absentmotion.desk.DeskOs.nativeName).absolutePath
-    fun choose(window: Window, save: Boolean): File? {
-        val dialog = FileDialog(window as Frame, if (save) "Save Project" else "Open Project", if (save) FileDialog.SAVE else FileDialog.LOAD)
-        dialog.isVisible = true
-        return dialog.file?.let { File(dialog.directory, it) }
-    }
-    fun chooseMedia(window: Window): List<File> {
-        val dialog = FileDialog(window as Frame, "Import Media", FileDialog.LOAD)
-        dialog.isMultipleMode = true
-        dialog.isVisible = true
-        return dialog.files.toList()
-    }
     fun executable(name: String): String = System.getProperty("am.$name") ?: System.getenv("AM_${name.uppercase()}")
         ?: (if (windows) listOfNotNull(System.getProperty("compose.application.resources.dir"), System.getProperty("jpackage.app-path")?.let { File(it).parent }).map { File(it, "$name.exe") } else listOfNotNull(System.getProperty("compose.application.resources.dir")?.let { File(it, name) }) + listOf(File("/opt/homebrew/bin/$name"), File("/usr/local/bin/$name"))).firstOrNull { it.isFile && it.canExecute() }?.absolutePath ?: name
     fun title(window: Window, file: File?) {
