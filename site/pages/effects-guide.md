@@ -21,8 +21,11 @@ To read about an effect first, press and hold its tile. A page opens with an ani
 - A strip of recommended effects (Chroma Key, Blur and Glow), a grid of your **Recent** or **Favorite** effects (switch with the two small icons), then the categories.
 - **Categories:** Color, Blur, Distort, Stylize, Noise, Repeat, Key, Move, Beat, 3D, Text and Other. A **New** category lists the effects added in the newest big version (5.x). An **Audio** category appears for layers that have sound, and **AI** holds the AI tools.
 - An effect that cannot run on your phone is grayed out.
+- Inside a category, swipe left for the next category and right for the previous one.
 
 ![The Effects Library: search (1), the recommended effects (2), recent and favorite effects (3) and the categories (4).](img/fx-library.webp)
+
+![Inside a category (1), swipe left or right (2) to go to the next or previous category.](img/fx-category-swipe.webp)
 
 ## Settings of an effect
 
@@ -46,9 +49,12 @@ If the layer is a parent of other layers, a switch **Apply to Children** appears
 
 - The order matters: effects at the top are applied first. Drag the grip (**Reorder**) of a row to change the order.
 - The eye (**Visibility**) hides an effect without deleting it.
+- Swipe a row to the left to delete that effect. Undo brings it back.
 - **More** in the left column has **Copy Effects** (you tick which ones) and **Paste Effect** or **Paste Effects**, which adds the copied effects at the end of the list of the selected layer.
 
 ![The effect list: Reorder (1), Visibility (2), More (3) and Add Effect (4).](img/fx-list.webp)
+
+![Swiping an effect to the left (1) shows the bin (2); let go to delete it.](img/fx-swipe-delete.webp)
 
 ### Effects on many layers at once
 

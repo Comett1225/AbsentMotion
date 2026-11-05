@@ -3772,6 +3772,7 @@
  "fxpreset:texttransform:wave": "Wave",
  "gif": "GIF",
  "group_leave": "Leave group",
+ "group_retime_off": "Off",
  "history_add_layer": "Add layer",
  "history_add_layers": "Add layers",
  "history_add_named": "Add “%1$s”",
@@ -4091,6 +4092,10 @@
  },
  "multi_no_cut": "No cuts between selected layers",
  "multi_presets": "Apply preset",
+ "multi_stretch_longer": "Longer",
+ "multi_stretch_note": "Clips, animations and videos all stretch together. Videos play slower or faster to fit.",
+ "multi_stretch_shorter": "Shorter",
+ "multi_stretch_timing": "Stretch Timing",
  "multi_transition_count": {
   "one": "%1$s cut",
   "other": "%1$s cuts"

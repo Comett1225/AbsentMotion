@@ -945,6 +945,7 @@
     <string name="element_retime_loop">Döngü</string>
     <string name="element_retime_repeat_stretch">Tekrarla ve uzat</string>
     <string name="element_retime_blank">Boş</string>
+    <string name="group_retime_off">Kapalı</string>
     <string name="element_saved_to_my_assets">Varlıklarıma kaydedildi</string>
     <string name="element_save_failed">Varlıklarıma kaydedilemedi. Biraz depolama alanı boşaltın.</string>
     <string name="element_search_hint">Varlık ve proje ara</string>
@@ -2058,6 +2059,10 @@
     <string name="caption_custom_color">Özel</string>
     <string name="multi_animation">Tümünü canlandır</string>
     <string name="multi_presets">Ön ayarı uygula</string>
+    <string name="multi_stretch_timing">Zamanlamayı uzat</string>
+    <string name="multi_stretch_shorter">Daha kısa</string>
+    <string name="multi_stretch_longer">Daha uzun</string>
+    <string name="multi_stretch_note">Klipler, animasyonlar ve videolar birlikte uzar. Videolar sığmak için daha yavaş ya da daha hızlı oynatılır.</string>
     <string name="multi_no_cut">Seçili katmanlar arasında kesme yok</string>
     <plurals name="multi_applied_count">
         <item quantity="one">%1$s katmana uygulandı</item>

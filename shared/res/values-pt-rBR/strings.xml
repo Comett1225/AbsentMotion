@@ -956,6 +956,7 @@
     <string name="element_retime_loop">Repetir</string>
     <string name="element_retime_repeat_stretch">Repetir e esticar</string>
     <string name="element_retime_blank">Vazio</string>
+    <string name="group_retime_off">Desligado</string>
     <string name="element_saved_to_my_assets">Salvo em Meus recursos</string>
     <string name="element_save_failed">Não foi possível salvar em Meus recursos. Libere espaço de armazenamento.</string>
     <string name="element_search_hint">Buscar recursos e projetos</string>
@@ -2085,6 +2086,10 @@
     <string name="caption_custom_color">Personalizado</string>
     <string name="multi_animation">Animar tudo</string>
     <string name="multi_presets">Aplicar predefinição</string>
+    <string name="multi_stretch_timing">Esticar tempo</string>
+    <string name="multi_stretch_shorter">Mais curto</string>
+    <string name="multi_stretch_longer">Mais longo</string>
+    <string name="multi_stretch_note">Clipes, animações e vídeos esticam juntos. Os vídeos tocam mais devagar ou mais rápido para caber.</string>
     <string name="multi_no_cut">Não há cortes entre as camadas selecionadas</string>
     <plurals name="multi_applied_count">
         <item quantity="one">Aplicado a %1$s camada</item>

@@ -956,6 +956,7 @@
     <string name="element_retime_loop">Bucle</string>
     <string name="element_retime_repeat_stretch">Repetir y estirar</string>
     <string name="element_retime_blank">Vacío</string>
+    <string name="group_retime_off">Desactivado</string>
     <string name="element_saved_to_my_assets">Guardado en Mis recursos</string>
     <string name="element_save_failed">No se pudo guardar en Mis recursos. Libera espacio de almacenamiento.</string>
     <string name="element_search_hint">Buscar recursos y proyectos</string>
@@ -2085,6 +2086,10 @@
     <string name="caption_custom_color">Personalizado</string>
     <string name="multi_animation">Animar todo</string>
     <string name="multi_presets">Aplicar preajuste</string>
+    <string name="multi_stretch_timing">Estirar tiempo</string>
+    <string name="multi_stretch_shorter">Más corto</string>
+    <string name="multi_stretch_longer">Más largo</string>
+    <string name="multi_stretch_note">Los clips, las animaciones y los vídeos se estiran juntos. Los vídeos se reproducen más despacio o más rápido para ajustarse.</string>
     <string name="multi_no_cut">No hay cortes entre las capas seleccionadas</string>
     <plurals name="multi_applied_count">
         <item quantity="one">Aplicado a %1$s capa</item>

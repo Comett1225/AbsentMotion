@@ -945,6 +945,7 @@
     <string name="element_retime_loop">লুপ</string>
     <string name="element_retime_repeat_stretch">রিপিট ও স্ট্রেচ</string>
     <string name="element_retime_blank">খালি</string>
+    <string name="group_retime_off">বন্ধ</string>
     <string name="element_saved_to_my_assets">আমার অ্যাসেটস-এ সেভ হয়েছে</string>
     <string name="element_save_failed">আমার অ্যাসেটস-এ সেভ করা যায়নি। কিছু স্টোরেজ খালি করুন।</string>
     <string name="element_search_hint">অ্যাসেট ও প্রজেক্ট খুঁজুন</string>
@@ -2058,6 +2059,10 @@
     <string name="caption_custom_color">কাস্টম</string>
     <string name="multi_animation">সব অ্যানিমেট করুন</string>
     <string name="multi_presets">প্রিসেট প্রয়োগ করুন</string>
+    <string name="multi_stretch_timing">টাইমিং স্ট্রেচ করুন</string>
+    <string name="multi_stretch_shorter">আরও ছোট</string>
+    <string name="multi_stretch_longer">আরও লম্বা</string>
+    <string name="multi_stretch_note">ক্লিপ, অ্যানিমেশন ও ভিডিও সব একসাথে স্ট্রেচ হয়। মানিয়ে নিতে ভিডিও ধীরে বা দ্রুত চলে।</string>
     <string name="multi_no_cut">নির্বাচিত লেয়ারগুলির মধ্যে কোনো কাট নেই</string>
     <plurals name="multi_applied_count">
         <item quantity="one">%1$sটি লেয়ারে প্রয়োগ করা হয়েছে</item>

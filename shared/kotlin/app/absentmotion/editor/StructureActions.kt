@@ -5,8 +5,16 @@ import app.absentmotion.i18n.AppText
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import app.absentmotion.model.Animations
+import app.absentmotion.model.FASTEST_SPEED
+import app.absentmotion.model.MotionRecord
 import app.absentmotion.model.MotionSlot
+import app.absentmotion.model.SLOWEST_SPEED
 import app.absentmotion.model.TransitionKind
+import app.absentmotion.model.VideoTiming
+import app.absentmotion.model.finiteDouble
+import app.absentmotion.model.motion
+import app.absentmotion.model.retimedVideo
 import app.absentmotion.model.canAnimate
 import app.absentmotion.model.cutBetween
 import app.absentmotion.model.withAnimation
@@ -31,6 +39,7 @@ import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.roundToInt
 import kotlin.math.tan
 import kotlin.math.sin
 
@@ -513,3 +522,54 @@ internal fun Scene.animateLayers(ids: Set<Long>, slot: MotionSlot, motionId: Str
 
 internal fun Scene.transitionCuts(cuts: List<Pair<Long, Long>>, kind: TransitionKind?, ms: Int): Scene =
     cuts.fold(this) { scene, (a, b) -> scene.withTransition(a, b, kind, ms).scene }
+
+internal fun Scene.stretchedTiming(ids: Set<Long>, percent: Int): Scene {
+    val chosen = layers.filter { it.id in ids && it.endTime > it.startTime }.sortedBy { it.startTime }
+    if (chosen.isEmpty() || percent == 100) return this
+    val k = percent / 100.0
+    val anchor = chosen.first().startTime
+    fun frameOf(ms: Int) = ((anchor + (ms - anchor) * k) * fps / 1000).roundToInt()
+    fun scaled(v: Int) = (v * k).roundToInt()
+    val frames = chosen.associateTo(HashMap()) { l -> frameOf(l.startTime).let { s -> l.id to (s to maxOf(frameOf(l.endTime + 1), s + 1)) } }
+    for (a in chosen) {
+        val b = a.motion(MotionSlot.Out)?.takeIf { it.transition }?.partner?.takeIf { it in frames && cutBetween(a.id, it) != null } ?: continue
+        val (aStart, aEnd) = frames.getValue(a.id)
+        val (bStart, bEnd) = frames.getValue(b)
+        val start = maxOf(bStart, aStart + 1)
+        frames[b] = start to maxOf(bEnd, aEnd + 1, start + 1)
+    }
+    return chosen.fold(this) { scene, chosenLayer -> scene.update(chosenLayer.id) { l ->
+        val (s, e) = frames.getValue(l.id)
+        val start = frameStart(s)
+        var end = frameStart(e) - 1
+        val media = l.kind == "audio" || l.mediaFill?.video == true
+        if (media && l.node.child("speedMap")?.isKeyframed != true) {
+            val timing = VideoTiming(l)
+            val span = timing.mediaMs((l.endTime - l.startTime).toDouble()) - timing.mediaMs(0.0)
+            end = start + (end - start).toDouble().coerceIn(span / FASTEST_SPEED, span / SLOWEST_SPEED).roundToInt()
+        }
+        var n = if (media) l.retimedVideo(start, end).node else l.node.with("startTime", "$start").with("endTime", "$end")
+        val method = l.nested?.retime
+        val pinned = n["retimeLength"]?.toIntOrNull()
+        if (method != null && pinned != null) n = n.with("retimeLength", "${scaled(pinned)}")
+        if (method == "off" || method?.endsWith("stretch") == true || method != null && pinned != null) {
+            n["inTime"]?.toIntOrNull()?.let { n = n.with("inTime", "${scaled(it)}") }
+        }
+        if (method == "off") {
+            fun slower(v: String?) = v?.finiteDouble()?.let { formatFloats(floatArrayOf((it / k).toFloat())) } ?: v
+            val map = n.child("speedMap")
+            n = if (map == null) n.with("speed", slower(n["speed"] ?: "1"))
+                else n.withChild("speedMap", map.with("value", slower(map["value"])).let { m -> m.copy(children = m.children.map { if (it.name == "kf") it.with("v", slower(it["v"])) else it }) })
+        }
+        for (slot in MotionSlot.entries) {
+            val record = MotionRecord.parse(n[slot.attr]) ?: continue
+            val ms = scaled(record.ms).coerceAtLeast(1)
+            n = n.with(slot.attr, record.copy(ms = ms, extend = scaled(record.extend), shift = scaled(record.shift)).toString())
+            val fx = if (slot == MotionSlot.Loop) Animations.loop(record.id, ms, height.toFloat()) else null
+            if (fx != null) n = n.copy(children = n.children.map { c ->
+                if (c.name != "effect" || c["gen"] != slot.xml) c else c.copy(children = c.children.map { p -> fx.fixed[p["name"]]?.let { p.with("value", it) } ?: p })
+            })
+        }
+        l.copy(node = n)
+    } }
+}

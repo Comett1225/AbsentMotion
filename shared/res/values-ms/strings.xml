@@ -934,6 +934,7 @@
     <string name="element_retime_loop">Gelung</string>
     <string name="element_retime_repeat_stretch">Ulang &amp; Regang</string>
     <string name="element_retime_blank">Kosong</string>
+    <string name="group_retime_off">Mati</string>
     <string name="element_saved_to_my_assets">Disimpan ke Aset Saya</string>
     <string name="element_save_failed">Tidak dapat menyimpan ke Aset Saya. Kosongkan sedikit ruang storan.</string>
     <string name="element_search_hint">Cari aset dan projek</string>
@@ -2031,6 +2032,10 @@
     <string name="caption_custom_color">Tersuai</string>
     <string name="multi_animation">Animasikan semua</string>
     <string name="multi_presets">Gunakan pratetap</string>
+    <string name="multi_stretch_timing">Regang masa</string>
+    <string name="multi_stretch_shorter">Lebih pendek</string>
+    <string name="multi_stretch_longer">Lebih panjang</string>
+    <string name="multi_stretch_note">Klip, animasi dan video semuanya diregang bersama. Video dimainkan lebih perlahan atau lebih laju supaya muat.</string>
     <string name="multi_no_cut">Tiada potongan antara lapisan yang dipilih</string>
     <plurals name="multi_applied_count">
         <item quantity="other">Digunakan pada %1$s lapisan</item>

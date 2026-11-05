@@ -945,6 +945,7 @@
     <string name="element_retime_loop">حلقه</string>
     <string name="element_retime_repeat_stretch">تکرار و کشش</string>
     <string name="element_retime_blank">خالی</string>
+    <string name="group_retime_off">خاموش</string>
     <string name="element_saved_to_my_assets">در دارایی‌های من ذخیره شد</string>
     <string name="element_save_failed">ذخیره در دارایی‌های من ممکن نشد. کمی فضا آزاد کنید.</string>
     <string name="element_search_hint">جستجوی دارایی‌ها و پروژه‌ها</string>
@@ -2058,6 +2059,10 @@
     <string name="caption_custom_color">سفارشی</string>
     <string name="multi_animation">متحرک‌سازی همه</string>
     <string name="multi_presets">اعمال پیش‌تنظیم</string>
+    <string name="multi_stretch_timing">کشش زمان‌بندی</string>
+    <string name="multi_stretch_shorter">کوتاه‌تر</string>
+    <string name="multi_stretch_longer">بلندتر</string>
+    <string name="multi_stretch_note">کلیپ‌ها، انیمیشن‌ها و ویدیوها همه با هم کشیده می‌شوند. ویدیوها کندتر یا تندتر پخش می‌شوند تا جا شوند.</string>
     <string name="multi_no_cut">بین لایه‌های انتخاب‌شده برشی وجود ندارد</string>
     <plurals name="multi_applied_count">
         <item quantity="one">روی %1$s لایه اعمال شد</item>

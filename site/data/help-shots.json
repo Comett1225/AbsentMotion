@@ -6137,6 +6137,131 @@
     2337
    ],
    "phase": 2
+  },
+  {
+   "id": "lm-stretch",
+   "page": "layer-menus",
+   "section": "Selecting several layers",
+   "block": 5,
+   "alt": {
+    "en": "Stretch Timing (1) in the More actions menu opens a sheet where you pick how long the clips become (2) and tap Apply (3).",
+    "id": "Regangkan waktu (1) di menu Tindakan lainnya membuka lembar tempat Anda memilih panjang baru klip (2), lalu ketuk Terapkan (3).",
+    "hi": "अधिक क्रियाएं मेन्यू में टाइमिंग स्ट्रेच करें (1) एक शीट खोलता है, जहाँ आप चुनते हैं कि क्लिप कितनी लंबी हों (2), फिर लागू करें (3) पर टैप करें।",
+    "pt-BR": "Esticar tempo (1) no menu Mais ações abre um painel onde você escolhe o novo comprimento dos clipes (2) e toca em Aplicar (3).",
+    "es": "Estirar tiempo (1) en el menú Más acciones abre un panel donde eliges cuánto durarán los clips (2) y tocas Aplicar (3).",
+    "fil": "Binubuksan ng I-stretch ang timing (1) sa menu na Higit pang aksyon ang isang sheet kung saan pipiliin mo kung gaano kahaba ang mga clip (2) at ita-tap ang Ilapat (3).",
+    "vi": "Kéo giãn thời gian (1) trong menu Thao tác khác mở một bảng để bạn chọn độ dài mới của các clip (2) rồi nhấn Áp dụng (3).",
+    "th": "ยืดเวลา (1) ในเมนู ตัวเลือกเพิ่มเติม จะเปิดหน้าต่างให้คุณเลือกความยาวใหม่ของคลิป (2) แล้วแตะ ใช้ (3)",
+    "ms": "Regang masa (1) dalam menu Tindakan lain membuka helaian untuk anda memilih panjang baharu klip (2) dan ketik Guna (3).",
+    "ar": "يفتح تمديد التوقيت (1) في قائمة مزيد من الإجراءات لوحة تختار فيها الطول الجديد للمقاطع (2) ثم تضغط على تطبيق (3).",
+    "fa": "کشش زمان‌بندی (1) در منوی اقدامات بیشتر صفحه‌ای باز می‌کند که در آن طول تازهٔ کلیپ‌ها را انتخاب می‌کنید (2) و روی اعمال (3) می‌زنید.",
+    "tr": "Diğer işlemler menüsündeki Zamanlamayı uzat (1), kliplerin ne kadar uzun olacağını seçtiğiniz (2) bir sayfa açar; ardından Uygula'ya (3) dokunun.",
+    "ru": "Растянуть по времени (1) в меню Ещё действия открывает панель, где вы выбираете новую длину клипов (2) и нажимаете Применить (3).",
+    "bn": "আরও অ্যাকশন মেনুর টাইমিং স্ট্রেচ করুন (1) একটি শিট খোলে, যেখানে ক্লিপগুলো কত লম্বা হবে তা বেছে নিয়ে (2) প্রয়োগ করুন (3) ট্যাপ করুন।",
+    "es-ES": "Estirar tiempo (1) en el menú Más acciones abre un panel donde eliges cuánto durarán los clips (2) y tocas Aplicar (3).",
+    "ur": "مزید ایکشنز مینو میں ٹائمنگ اسٹریچ کریں (1) ایک شیٹ کھولتا ہے جہاں آپ چنتے ہیں کہ کلپس کتنے لمبے ہوں (2) اور پھر لاگو کریں (3) پر ٹیپ کرتے ہیں۔",
+    "ja": "その他の操作メニューのタイミングをストレッチ(1)でシートが開き、クリップの長さを選んで(2)、適用(3)をタップします。"
+   }
+  },
+  {
+   "id": "sh-clip-marker",
+   "page": "shapes",
+   "section": "Masks and clipping",
+   "block": 1,
+   "alt": {
+    "en": "A clipped layer: its arrow (1) points down to the layer it is clipped to (2).",
+    "id": "Lapisan yang dikliping: panahnya (1) menunjuk ke bawah, ke lapisan tempat ia dikliping (2).",
+    "hi": "क्लिप की गई लेयर: उसका तीर (1) नीचे उस लेयर की ओर इशारा करता है जिससे वह क्लिप है (2)।",
+    "pt-BR": "Uma camada recortada: a seta dela (1) aponta para baixo, para a camada à qual está recortada (2).",
+    "es": "Una capa recortada: su flecha (1) apunta hacia abajo, a la capa a la que está recortada (2).",
+    "fil": "Isang naka-clip na layer: nakaturo pababa ang arrow nito (1) sa layer kung saan ito naka-clip (2).",
+    "vi": "Một lớp được cắt theo lớp khác: mũi tên của nó (1) chỉ xuống lớp mà nó được cắt theo (2).",
+    "th": "เลเยอร์ที่ถูกตัด: ลูกศร (1) ชี้ลงไปยังเลเยอร์ที่ใช้ตัด (2)",
+    "ms": "Lapisan yang diklip: anak panahnya (1) menghala ke bawah, ke lapisan tempat ia diklip (2).",
+    "ar": "طبقة خاضعة لقناع قص: يشير سهمها (1) إلى الأسفل نحو الطبقة التي تُقص عليها (2).",
+    "fa": "لایهٔ برش‌خورده: فلش آن (1) رو به پایین به لایه‌ای اشاره می‌کند که به آن برش خورده است (2).",
+    "tr": "Kırpılmış bir katman: oku (1) aşağıya, katmanın kırpıldığı katmanı (2) gösterir.",
+    "ru": "Обтравленный слой: его стрелка (1) указывает вниз на слой, по которому он обрезан (2).",
+    "bn": "একটি ক্লিপ করা লেয়ার: এর তীর (1) নিচের দিকে সেই লেয়ারটিকে দেখায় যার সঙ্গে এটি ক্লিপ করা (2)।",
+    "es-ES": "Una capa recortada: su flecha (1) apunta hacia abajo, a la capa con la que está recortada (2).",
+    "ur": "کلپ کی گئی لیئر: اس کا تیر (1) نیچے اس لیئر کی طرف اشارہ کرتا ہے جس سے وہ کلپ ہے (2)۔",
+    "ja": "クリップされたレイヤー：矢印(1)がクリップ先のレイヤー(2)を下向きに指します。"
+   }
+  },
+  {
+   "id": "sh-group-retiming",
+   "page": "shapes",
+   "section": "Re-timing a group",
+   "block": 3,
+   "alt": {
+    "en": "Inside a group: the gear (1) opens the group settings with Re-timing (2).",
+    "id": "Di dalam grup: roda gigi (1) membuka pengaturan grup yang berisi Pengaturan waktu (2).",
+    "hi": "ग्रुप के अंदर: गियर (1) ग्रुप की सेटिंग्स खोलता है, जिनमें री-टाइमिंग (2) है।",
+    "pt-BR": "Dentro de um grupo: a engrenagem (1) abre as configurações do grupo com Reajuste de tempo (2).",
+    "es": "Dentro de un grupo: el engranaje (1) abre los ajustes del grupo con Retemporización (2).",
+    "fil": "Sa loob ng grupo: binubuksan ng gear (1) ang mga setting ng grupo na may Re-timing (2).",
+    "vi": "Bên trong nhóm: bánh răng (1) mở cài đặt nhóm có Đổi thời gian (2).",
+    "th": "ภายในกลุ่ม: ไอคอนเฟือง (1) เปิดการตั้งค่ากลุ่มที่มี ปรับเวลาใหม่ (2)",
+    "ms": "Di dalam kumpulan: gear (1) membuka tetapan kumpulan dengan Pemasaan Semula (2).",
+    "ar": "داخل مجموعة: يفتح الترس (1) إعدادات المجموعة وفيها إعادة التوقيت (2).",
+    "fa": "داخل گروه: چرخ‌دنده (1) تنظیمات گروه را با زمان‌بندی مجدد (2) باز می‌کند.",
+    "tr": "Bir grubun içinde: dişli (1), Yeniden zamanlama (2) ayarının bulunduğu grup ayarlarını açar.",
+    "ru": "Внутри группы: шестерёнка (1) открывает настройки группы с параметром Ретайминг (2).",
+    "bn": "একটি গ্রুপের ভিতরে: গিয়ার (1) গ্রুপের সেটিংস খোলে, যেখানে রিটাইমিং (2) আছে।",
+    "es-ES": "Dentro de un grupo: el engranaje (1) abre los ajustes del grupo con Retemporización (2).",
+    "ur": "گروپ کے اندر: گیئر (1) گروپ کی سیٹنگز کھولتا ہے جن میں ری ٹائمنگ (2) ہے۔",
+    "ja": "グループ内：歯車(1)でグループの設定が開き、リタイミング(2)があります。"
+   }
+  },
+  {
+   "id": "fx-category-swipe",
+   "page": "effects-guide",
+   "section": "The Effects Library",
+   "block": 1,
+   "alt": {
+    "en": "Inside a category (1), swipe left or right (2) to go to the next or previous category.",
+    "id": "Di dalam sebuah kategori (1), usap ke kiri atau ke kanan (2) untuk pindah ke kategori berikutnya atau sebelumnya.",
+    "hi": "किसी श्रेणी के अंदर (1), अगली या पिछली श्रेणी पर जाने के लिए बाएँ या दाएँ स्वाइप करें (2)।",
+    "pt-BR": "Dentro de uma categoria (1), deslize para a esquerda ou para a direita (2) para ir à próxima categoria ou à anterior.",
+    "es": "Dentro de una categoría (1), desliza a la izquierda o a la derecha (2) para pasar a la categoría siguiente o a la anterior.",
+    "fil": "Sa loob ng isang kategorya (1), mag-swipe pakaliwa o pakanan (2) para pumunta sa susunod o naunang kategorya.",
+    "vi": "Trong một danh mục (1), vuốt sang trái hoặc sang phải (2) để sang danh mục tiếp theo hoặc về danh mục trước.",
+    "th": "ในหมวดหมู่ (1) ปัดไปทางซ้ายหรือขวา (2) เพื่อไปหมวดหมู่ถัดไปหรือก่อนหน้า",
+    "ms": "Di dalam sesuatu kategori (1), leret ke kiri atau ke kanan (2) untuk pergi ke kategori seterusnya atau sebelumnya.",
+    "ar": "داخل الفئة (1)، اسحب إلى اليمين أو اليسار (2) للانتقال إلى الفئة التالية أو السابقة.",
+    "fa": "داخل یک دسته (1)، انگشت را به راست یا چپ بکشید (2) تا به دستهٔ بعدی یا قبلی بروید.",
+    "tr": "Bir kategorinin içinde (1), sonraki veya önceki kategoriye geçmek için sola veya sağa kaydırın (2).",
+    "ru": "Внутри категории (1) проведите влево или вправо (2), чтобы перейти к следующей или предыдущей категории.",
+    "bn": "একটি ক্যাটাগরির ভিতরে (1), পরের বা আগের ক্যাটাগরিতে যেতে বাঁয়ে বা ডানে সোয়াইপ করুন (2)।",
+    "es-ES": "Dentro de una categoría (1), desliza a la izquierda o a la derecha (2) para ir a la categoría siguiente o a la anterior.",
+    "ur": "کسی کیٹیگری کے اندر (1)، اگلی یا پچھلی کیٹیگری پر جانے کے لیے دائیں یا بائیں سوائپ کریں (2)۔",
+    "ja": "カテゴリ内(1)で左または右にスワイプする(2)と、次または前のカテゴリに移ります。"
+   }
+  },
+  {
+   "id": "fx-swipe-delete",
+   "page": "effects-guide",
+   "section": "The effect list",
+   "block": 1,
+   "alt": {
+    "en": "Swiping an effect to the left (1) shows the bin (2); let go to delete it.",
+    "id": "Mengusap efek ke kiri (1) menampilkan tempat sampah (2); lepaskan jari untuk menghapusnya.",
+    "hi": "किसी इफ़ेक्ट को बाएँ स्वाइप करने (1) पर ट्रैश कैन (2) दिखता है; डिलीट करने के लिए उंगली छोड़ दें।",
+    "pt-BR": "Deslizar um efeito para a esquerda (1) mostra a lixeira (2); solte para apagá-lo.",
+    "es": "Al deslizar un efecto a la izquierda (1) aparece el bote de basura (2); suelta para eliminarlo.",
+    "fil": "Kapag ini-swipe pakaliwa ang isang epekto (1), lalabas ang trash can (2); bitawan para burahin ito.",
+    "vi": "Vuốt một hiệu ứng sang trái (1) sẽ hiện thùng rác (2); thả tay để xóa nó.",
+    "th": "ปัดเอฟเฟกต์ไปทางซ้าย (1) จะแสดงถังขยะ (2) ปล่อยนิ้วเพื่อลบ",
+    "ms": "Meleret kesan ke kiri (1) menunjukkan tong sampah (2); lepaskan untuk memadamnya.",
+    "ar": "سحب تأثير إلى اليمين (1) يُظهر سلة المهملات (2)؛ اترك إصبعك لحذفه.",
+    "fa": "کشیدن یک افکت به راست (1) سطل زباله (2) را نشان می‌دهد؛ انگشت را رها کنید تا حذف شود.",
+    "tr": "Bir efekti sola kaydırmak (1) çöp kutusunu (2) gösterir; silmek için parmağınızı bırakın.",
+    "ru": "Если провести по эффекту влево (1), появится корзина (2); отпустите палец, чтобы удалить его.",
+    "bn": "কোনো ইফেক্ট বাঁয়ে সোয়াইপ করলে (1) ট্র্যাশ ক্যান (2) দেখা যায়; মুছতে আঙুল ছেড়ে দিন।",
+    "es-ES": "Al deslizar un efecto hacia la izquierda (1) aparece la papelera (2); suelta para eliminarlo.",
+    "ur": "کسی ایفیکٹ کو دائیں سوائپ کرنے (1) پر کوڑے دان کا آئیکن (2) دکھتا ہے؛ حذف کرنے کے لیے انگلی چھوڑ دیں۔",
+    "ja": "エフェクトを左にスワイプする(1)とゴミ箱(2)が表示され、指を離すと削除されます。"
+   }
   }
  ]
 }

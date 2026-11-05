@@ -934,6 +934,7 @@
     <string name="element_retime_loop">Lặp</string>
     <string name="element_retime_repeat_stretch">Lặp và kéo giãn</string>
     <string name="element_retime_blank">Trống</string>
+    <string name="group_retime_off">Tắt</string>
     <string name="element_saved_to_my_assets">Đã lưu vào Tài nguyên của tôi</string>
     <string name="element_save_failed">Không thể lưu vào Tài nguyên của tôi. Hãy giải phóng dung lượng lưu trữ.</string>
     <string name="element_search_hint">Tìm kiếm tài nguyên và dự án</string>
@@ -2031,6 +2032,10 @@
     <string name="caption_custom_color">Tùy chỉnh</string>
     <string name="multi_animation">Tạo chuyển động cho tất cả</string>
     <string name="multi_presets">Áp dụng cài đặt sẵn</string>
+    <string name="multi_stretch_timing">Kéo giãn thời gian</string>
+    <string name="multi_stretch_shorter">Ngắn hơn</string>
+    <string name="multi_stretch_longer">Dài hơn</string>
+    <string name="multi_stretch_note">Clip, hoạt ảnh và video đều được kéo giãn cùng nhau. Video phát chậm hơn hoặc nhanh hơn cho vừa.</string>
     <string name="multi_no_cut">Không có điểm cắt giữa các lớp đã chọn</string>
     <plurals name="multi_applied_count">
         <item quantity="other">Đã áp dụng cho %1$s lớp</item>

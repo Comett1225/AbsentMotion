@@ -967,6 +967,7 @@
     <string name="element_retime_loop">Зациклить</string>
     <string name="element_retime_repeat_stretch">Повтор и растяжение</string>
     <string name="element_retime_blank">Пусто</string>
+    <string name="group_retime_off">Выкл.</string>
     <string name="element_saved_to_my_assets">Сохранено в «Мои ресурсы»</string>
     <string name="element_save_failed">Не удалось сохранить в «Мои ресурсы». Освободите место в хранилище.</string>
     <string name="element_search_hint">Поиск ресурсов и проектов</string>
@@ -2112,6 +2113,10 @@
     <string name="caption_custom_color">Свой цвет</string>
     <string name="multi_animation">Анимировать все</string>
     <string name="multi_presets">Применить пресет</string>
+    <string name="multi_stretch_timing">Растянуть по времени</string>
+    <string name="multi_stretch_shorter">Короче</string>
+    <string name="multi_stretch_longer">Длиннее</string>
+    <string name="multi_stretch_note">Клипы, анимации и видео растягиваются вместе. Видео воспроизводится медленнее или быстрее, чтобы уложиться.</string>
     <string name="multi_no_cut">Между выбранными слоями нет склеек</string>
     <plurals name="multi_applied_count">
         <item quantity="one">Применено к %1$s слою</item>

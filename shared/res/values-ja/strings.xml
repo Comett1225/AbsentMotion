@@ -934,6 +934,7 @@
     <string name="element_retime_loop">ループ</string>
     <string name="element_retime_repeat_stretch">繰り返しとストレッチ</string>
     <string name="element_retime_blank">空白</string>
+    <string name="group_retime_off">オフ</string>
     <string name="element_saved_to_my_assets">マイアセットに保存しました</string>
     <string name="element_save_failed">マイアセットに保存できませんでした。ストレージの空き容量を確保してください。</string>
     <string name="element_search_hint">アセットとプロジェクトを検索</string>
@@ -2031,6 +2032,10 @@
     <string name="caption_custom_color">カスタム</string>
     <string name="multi_animation">すべてをアニメーション</string>
     <string name="multi_presets">プリセットを適用</string>
+    <string name="multi_stretch_timing">タイミングをストレッチ</string>
+    <string name="multi_stretch_shorter">短く</string>
+    <string name="multi_stretch_longer">長く</string>
+    <string name="multi_stretch_note">クリップ、アニメーション、動画がすべて一緒にストレッチされます。動画は長さに合わせて遅く、または速く再生されます。</string>
     <string name="multi_no_cut">選択したレイヤー間にカットがありません</string>
     <plurals name="multi_applied_count">
         <item quantity="other">%1$s個のレイヤーに適用しました</item>

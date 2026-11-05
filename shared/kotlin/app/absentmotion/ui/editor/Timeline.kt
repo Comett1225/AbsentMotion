@@ -66,6 +66,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
@@ -203,6 +204,7 @@ private val EyeZone = 36.dp
 private val EyeCentre = 17.dp
 private val ThumbLeft = 36.dp
 private val ThumbSize = 16.dp
+private val ClipTrim = 8.dp
 private const val HIDDEN_ALPHA = 0.55f
 
 private val BarInset = 2.5.dp
@@ -1724,7 +1726,7 @@ private fun DrawScope.drawTimeline(view: TimelineView, measurer: TextMeasurer, s
     if (desktop) drawDeskRuler(view, time, measurer, styles)
     else {
         if (view.layers.isNotEmpty()) drawRuler(time, fps, state.scene.lastFrame, step)
-        if (view.layers.isNotEmpty() && state.scene.isElement) drawRetimeMarks(state.scene, time)
+        if (view.layers.isNotEmpty() && (state.scene.isElement || state.inGroup)) drawRetimeMarks(state.scene, time)
     }
     val stripe = TimelineMath.frameTimeMs(2 * step, fps) * time.pxPerMs
     fun paint(row: Int, layer: Layer) {
@@ -1830,7 +1832,7 @@ private fun DrawScope.drawDeskRuler(view: TimelineView, time: TimeScale, measure
             }
             frame += steps.minor
         }
-        if (view.state.scene.isElement) drawRetimeMarks(view.state.scene, time)
+        if (view.state.scene.isElement || view.state.inGroup) drawRetimeMarks(view.state.scene, time)
     }
 }
 
@@ -1947,7 +1949,7 @@ private fun DrawScope.drawRow(
         } else {
             drawGrabLines(Offset(size.width - HandleInset.toPx(), centre))
         }
-        drawHeader(top, eye, layer.labelColour, layer.id in MultiSelect.ids)
+        drawHeader(top, eye, layer.labelColour, layer.id in MultiSelect.ids, layer.node["clippingMask"] == "true")
     }
 }
 
@@ -2102,10 +2104,12 @@ private fun DrawScope.drawGrabLines(centre: Offset) {
     }
 }
 
-private fun DrawScope.drawHeader(top: Float, eye: Painter, tag: LabelColour?, checked: Boolean) {
+private fun DrawScope.drawHeader(top: Float, eye: Painter, tag: LabelColour?, checked: Boolean, clipped: Boolean = false) {
     val height = (RowHeight - HeaderInset * 2).toPx()
     val topLeft = Offset(-height, top + HeaderInset.toPx())
-    val pill = Size(HeaderWidth.toPx() + height, height)
+    val trim = if (clipped) ClipTrim.toPx() else 0f
+    val pill = Size(HeaderWidth.toPx() + height - trim, height)
+    if (clipped) drawClipHook(HeaderWidth.toPx() - trim + 1.dp.toPx(), top + RowHeight.toPx() / 2)
     val radius = CornerRadius(height / 2)
     drawRoundRect(if (checked) Am.Accent else HeaderFill, topLeft, pill, radius)
     drawRoundRect(HeaderEdge, topLeft, pill, radius, style = Stroke(0.5.dp.toPx()))
@@ -2127,6 +2131,24 @@ private fun DrawScope.drawHeader(top: Float, eye: Painter, tag: LabelColour?, ch
     translate(EyeCentre.toPx() - icon.width / 2, top + (RowHeight.toPx() - icon.height) / 2) {
         with(eye) { draw(icon) }
     }
+}
+
+private fun DrawScope.drawClipHook(x: Float, y: Float) {
+    val bend = 3.dp.toPx()
+    val end = x + 8.dp.toPx()
+    val tip = y + 11.dp.toPx()
+    val head = 3.dp.toPx()
+    val hook = Path().apply {
+        moveTo(x, y)
+        lineTo(end - bend, y)
+        quadraticTo(end, y, end, y + bend)
+        lineTo(end, tip)
+        moveTo(end - head, tip - head)
+        lineTo(end, tip)
+        lineTo(end + head, tip - head)
+    }
+    drawPath(hook, Color.Black.copy(alpha = 0.45f), style = Stroke(3.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round))
+    drawPath(hook, Am.OnDark, style = Stroke(1.6.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round))
 }
 
 private fun DrawScope.drawPlayhead(originX: Float, timecode: String, measurer: TextMeasurer, styles: TimelineStyles, outline: Path, onBookmark: Boolean, minLeft: Float = Float.NEGATIVE_INFINITY) {

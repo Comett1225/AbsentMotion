@@ -19,6 +19,12 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - Linear Repeat, Radial Repeat, Grid Repeat and Repeat Along Path: Delay per copy, and Random Position, Rotation, Scale and Opacity for each copy.
 - Parenting Helper and Scale Assist effects (Move). Alight Motion projects that use them, or the 3D orientation of a layer, now import.
 - Groups: Edit Group opens a group, the top bar shows where you are and leads back, and Ungroup in the layer menu puts the layers back.
+- Group Re-timing: the gear of an open group has Re-timing (Off, Freeze, Stretch, Loop, Repeat & Stretch, Blank), and the copy and paste menu sets its intro and outro flags.
+- Stretch Timing (More actions of a multi-selection) makes the selected clips longer or shorter together; their animations stretch with them and videos play slower or faster to fit.
+- A clipped layer shows a small hooked arrow in the timeline that points down to the layer it is clipped to.
+- Swipe an effect in a layer's effect list to the left to delete it, and swipe left or right inside an effect category for the next or previous category.
+- Deep Glow, HSL and Drop Shadow effects.
+- Alight Motion presets keep more effect settings when they are imported: Light Glow Blend, Soft Glow outside glow, Chroma Key Defringe, Long Shadow Solidity, Electric Edges Strength, Fractal Warp Intensity, Offset, Parallax and Screen Space, Gradient Map Saturation, Edge Glow Strength and Tint, and Smooth Bevel. Edge Glow, Fractal Warp, Chroma Key, Soft Glow and Electric Edges look closer to Alight Motion after import.
 - Tools tab: Trim (Fast without re-encoding, or Exact), Extract Audio (M4A or MP3) and Make a GIF (up to 30 seconds, three sizes, three frame rates, loop or play once).
 - Tablet layouts for big screens in portrait and landscape: panels beside the preview, a taller timeline, grids on the home screen and tool screens in two columns.
 - Audio layers have a Mark Beats tile.

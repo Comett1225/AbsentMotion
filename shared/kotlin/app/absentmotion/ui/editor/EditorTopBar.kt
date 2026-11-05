@@ -119,7 +119,7 @@ fun EditorTopBar(state: EditorState, onExit: () -> Unit, modifier: Modifier = Mo
             }
         }
         if (layer == null) {
-            if (!state.inGroup) BarButton(ChromeIcons.Gear, stringResource(R.string.topbar_project_settings), cell.enterFade().tutorialTarget("gear")) { act { settingsOpen = true } }
+            BarButton(ChromeIcons.Gear, stringResource(R.string.topbar_project_settings), cell.enterFade().tutorialTarget("gear")) { act { settingsOpen = true } }
             BarButton(ChromeIcons.Share, stringResource(R.string.topbar_export_share), cell.enterFade().tutorialTarget("export")) { act { state.playing = false; state.exportOpen = true } }
         } else if (!inPanel) {
             Spacer(Modifier.width(5.dp))

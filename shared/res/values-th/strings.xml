@@ -934,6 +934,7 @@
     <string name="element_retime_loop">วนซ้ำ</string>
     <string name="element_retime_repeat_stretch">ทำซ้ำและยืด</string>
     <string name="element_retime_blank">ว่าง</string>
+    <string name="group_retime_off">ปิด</string>
     <string name="element_saved_to_my_assets">บันทึกไปยังแอสเซทของฉันแล้ว</string>
     <string name="element_save_failed">ไม่สามารถบันทึกไปยังแอสเซทของฉันได้ โปรดเพิ่มพื้นที่ว่าง</string>
     <string name="element_search_hint">ค้นหาแอสเซทและโปรเจกต์</string>
@@ -2031,6 +2032,10 @@
     <string name="caption_custom_color">กำหนดเอง</string>
     <string name="multi_animation">สร้างภาพเคลื่อนไหวทั้งหมด</string>
     <string name="multi_presets">ใช้ค่าที่ตั้งไว้</string>
+    <string name="multi_stretch_timing">ยืดเวลา</string>
+    <string name="multi_stretch_shorter">สั้นลง</string>
+    <string name="multi_stretch_longer">ยาวขึ้น</string>
+    <string name="multi_stretch_note">คลิป แอนิเมชัน และวิดีโอจะยืดไปพร้อมกันทั้งหมด วิดีโอจะเล่นช้าลงหรือเร็วขึ้นให้พอดี</string>
     <string name="multi_no_cut">ไม่มีจุดตัดระหว่างเลเยอร์ที่เลือก</string>
     <plurals name="multi_applied_count">
         <item quantity="other">ใช้กับ %1$s เลเยอร์แล้ว</item>

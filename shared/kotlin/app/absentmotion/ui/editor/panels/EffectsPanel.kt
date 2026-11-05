@@ -62,6 +62,22 @@ import app.absentmotion.ui.theme.Presence
 import app.absentmotion.ui.theme.Swap
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
+import androidx.compose.animation.core.animate
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
+import app.absentmotion.ui.editor.effects.EffectSwipe
+import app.absentmotion.ui.editor.effects.effectSwipe
+import app.absentmotion.ui.editor.rememberHaptic
+import app.absentmotion.ui.theme.Motion
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 @Composable
 internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
@@ -275,21 +291,69 @@ private fun EffectHeader(state: EditorState, index: Int, effect: XmlNode, defini
 @Composable
 private fun EffectListRow(state: EditorState, reorder: Reorder, index: Int, count: Int, effect: XmlNode, definition: EffectDefinition?, move: (Int, Int) -> Unit) {
     val visible = effect["hidden"] != "true"
-    Row(Modifier.reorderSlot(reorder, index).padding(start = 6.5.dp, end = 6.5.dp, top = 6.5.dp).fillMaxWidth().height(37.dp).reorderLift(reorder, index, 5.dp)
-        .clip(RowShape).background(Am.Field), verticalAlignment = Alignment.CenterVertically) {
-        Row(Modifier.weight(1f).fillMaxHeight().alpha(if (definition?.available == true && effect["locallyApplied"] != "true") 1f else 0.35f)
-            .clickable { state.effectIndex = index }.padding(start = 11.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(EffectIcons.Expand, null, Modifier.size(18.dp).alpha(0.3f), tint = Am.OnDark)
-            Text(definition?.name ?: effect["id"]?.substringAfterLast('.') ?: "", Modifier.padding(start = 6.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
+    val scope = rememberCoroutineScope()
+    val tick = rememberHaptic(state)
+    val fling = EffectSwipe.FLING_DP * LocalDensity.current.density
+    val toStart = if (LocalLayoutDirection.current == LayoutDirection.Rtl) 1 else -1
+    var offset by remember { mutableFloatStateOf(0f) }
+    var shrink by remember { mutableFloatStateOf(0f) }
+    var deleting by remember { mutableStateOf(false) }
+    val back = remember { arrayOfNulls<Job>(1) }
+    val open by remember { derivedStateOf { offset > 0f } }
+    fun accept(way: Int): Boolean {
+        if (way != toStart) return false
+        back[0]?.cancel()
+        return true
+    }
+    fun drag(dx: Float, width: Float) {
+        val was = offset >= width * EffectSwipe.DELETE_SHARE
+        offset = (offset + dx * toStart).coerceAtLeast(0f)
+        if (!was && offset >= width * EffectSwipe.DELETE_SHARE) tick(HapticFeedbackType.GestureThresholdActivate)
+    }
+    fun release(velocity: Float?, width: Float) {
+        if (velocity == null || !EffectSwipe.commits(offset, width, velocity * toStart, EffectSwipe.DELETE_SHARE, fling)) {
+            back[0] = scope.launch { animate(offset, 0f, animationSpec = spring()) { v, _ -> offset = v } }
+            return
         }
-        DeskTip(stringResource(R.string.effects_visibility)) {
-            Icon(if (visible) EffectIcons.Eye else EffectIcons.EyeOff, stringResource(R.string.effects_visibility), Modifier.width(36.dp).clickable {
-                state.editSelected { it.withEffect(index) { node -> node.with("hidden", if (visible) "true" else null) } }
-            }, tint = Am.OnDark)
+        deleting = true
+        scope.launch {
+            animate(offset, width, animationSpec = tween(Motion.FastMs, easing = Motion.EaseIn)) { v, _ -> offset = v }
+            animate(0f, 1f, animationSpec = tween(Motion.FastMs, easing = Motion.EaseOut)) { v, _ -> shrink = v }
+            state.editSelected { it.removeEffect(index) }
+            state.effectIndex = -1
+            offset = 0f
+            shrink = 0f
+            deleting = false
         }
-        Icon(EffectIcons.Grip, stringResource(R.string.effects_reorder), Modifier.width(32.dp).fillMaxHeight().reorderGrip(reorder, index, count, move), tint = Am.OnDark)
+    }
+    Box(Modifier.reorderSlot(reorder, index).graphicsLayer { clip = shrink > 0f }
+        .layout { measurable, constraints ->
+            val placeable = measurable.measure(constraints)
+            layout(placeable.width, (placeable.height * (1f - shrink)).roundToInt()) { placeable.place(0, 0) }
+        }
+        .padding(start = 6.5.dp, end = 6.5.dp, top = 6.5.dp).fillMaxWidth().height(37.dp).graphicsLayer { shape = RowShape; clip = offset > 0f }
+        .effectSwipe(reorder.held < 0 && !deleting, ::accept, ::drag, ::release)) {
+        if (open) Box(Modifier.matchParentSize().background(DeleteRed), contentAlignment = Alignment.CenterEnd) {
+            Icon(ChromeIcons.Trash, null, Modifier.padding(end = 12.dp).size(22.dp), tint = Color.White)
+        }
+        Row(Modifier.fillMaxSize().graphicsLayer { translationX = offset * toStart }.reorderLift(reorder, index, 5.dp)
+            .clip(RowShape).background(Am.Field), verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.weight(1f).fillMaxHeight().alpha(if (definition?.available == true && effect["locallyApplied"] != "true") 1f else 0.35f)
+                .clickable { state.effectIndex = index }.padding(start = 11.dp), verticalAlignment = Alignment.CenterVertically) {
+                Icon(EffectIcons.Expand, null, Modifier.size(18.dp).alpha(0.3f), tint = Am.OnDark)
+                Text(definition?.name ?: effect["id"]?.substringAfterLast('.') ?: "", Modifier.padding(start = 6.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
+            }
+            DeskTip(stringResource(R.string.effects_visibility)) {
+                Icon(if (visible) EffectIcons.Eye else EffectIcons.EyeOff, stringResource(R.string.effects_visibility), Modifier.width(36.dp).clickable {
+                    state.editSelected { it.withEffect(index) { node -> node.with("hidden", if (visible) "true" else null) } }
+                }, tint = Am.OnDark)
+            }
+            Icon(EffectIcons.Grip, stringResource(R.string.effects_reorder), Modifier.width(32.dp).fillMaxHeight().reorderGrip(reorder, index, count, move), tint = Am.OnDark)
+        }
     }
 }
+
+private val DeleteRed = Color(0xFFD93A3A)
 
 @Composable
 private fun EffectFrameButton(icon: ImageVector, description: String, modifier: Modifier, enabled: Boolean = true, onClick: () -> Unit) {

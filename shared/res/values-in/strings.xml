@@ -934,6 +934,7 @@
     <string name="element_retime_loop">Loop</string>
     <string name="element_retime_repeat_stretch">Ulang &amp; Regangkan</string>
     <string name="element_retime_blank">Kosong</string>
+    <string name="group_retime_off">Nonaktif</string>
     <string name="element_saved_to_my_assets">Disimpan ke Aset Saya</string>
     <string name="element_save_failed">Gagal menyimpan ke Aset Saya. Kosongkan sebagian ruang penyimpanan.</string>
     <string name="element_search_hint">Cari aset dan proyek</string>
@@ -2031,6 +2032,10 @@
     <string name="caption_custom_color">Kustom</string>
     <string name="multi_animation">Animasikan semua</string>
     <string name="multi_presets">Terapkan preset</string>
+    <string name="multi_stretch_timing">Regangkan waktu</string>
+    <string name="multi_stretch_shorter">Lebih pendek</string>
+    <string name="multi_stretch_longer">Lebih panjang</string>
+    <string name="multi_stretch_note">Klip, animasi, dan video meregang bersama. Video diputar lebih lambat atau lebih cepat agar pas.</string>
     <string name="multi_no_cut">Tidak ada potongan di antara lapisan yang dipilih</string>
     <plurals name="multi_applied_count">
         <item quantity="other">Diterapkan ke %1$s lapisan</item>

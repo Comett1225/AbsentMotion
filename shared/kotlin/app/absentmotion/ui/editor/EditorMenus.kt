@@ -345,7 +345,7 @@ internal fun CopyPasteMenu(state: EditorState, below: Boolean = false, onDismiss
             onDismiss()
         }
         MenuRow(stringResource(R.string.menu_paste_style), enabled = layer != null && state.canPaste, icon = ChromeIcons.PasteStyle, trailing = ChromeIcons.ChevronRight) { styleOpen = true }
-        if (state.scene.isElement) {
+        if (state.scene.isElement || state.inGroup) {
             MenuRow(stringResource(R.string.menu_set_intro_end), divider = true) { state.markIntroEnd(); onDismiss() }
             MenuRow(stringResource(R.string.menu_set_outro_start)) { state.markOutroStart(); onDismiss() }
         }
@@ -450,6 +450,10 @@ internal fun ProjectSettingsPopup(state: EditorState, onDismiss: () -> Unit) {
 
 @Composable
 private fun SettingsPanel(state: EditorState, onDismiss: () -> Unit, modifier: Modifier) {
+    if (state.inGroup) {
+        GroupSettingsPanel(state, onDismiss, modifier)
+        return
+    }
     val scene = state.scene
     val focus = LocalFocusManager.current
     val derived = aspectOf(scene.width, scene.height)
@@ -536,6 +540,27 @@ private fun SettingsPanel(state: EditorState, onDismiss: () -> Unit, modifier: M
                     RetimingOptions.forEachIndexed { i, (value, label) ->
                         PickRow(stringResource(label), divider = i < RetimingOptions.lastIndex) { state.setElementOption("retime", value); close() }
                     }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun GroupSettingsPanel(state: EditorState, onDismiss: () -> Unit, modifier: Modifier) {
+    val scene = state.scene
+    val options = listOf("off" to R.string.group_retime_off) + RetimingOptions
+    Column(
+        modifier.fillMaxWidth().height(97.dp).clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)).background(MenuBg)
+            .pointerInput(Unit) { detectTapGestures { } },
+    ) {
+        Box(Modifier.size(40.dp).clickable(onClick = onDismiss), Alignment.Center) {
+            Icon(ChromeIcons.Close, stringResource(R.string.action_close), Modifier.size(24.dp), tint = Am.OnDark)
+        }
+        SettingRow(stringResource(R.string.menu_retiming)) {
+            Dropdown(stringResource(options.firstOrNull { it.first == scene.retime }?.second ?: options[0].second)) { close ->
+                options.forEachIndexed { i, (value, label) ->
+                    PickRow(stringResource(label), divider = i < options.lastIndex) { state.setElementOption("retime", value); close() }
                 }
             }
         }

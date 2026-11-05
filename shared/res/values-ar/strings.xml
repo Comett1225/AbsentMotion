@@ -989,6 +989,7 @@
     <string name="element_retime_loop">تكرار</string>
     <string name="element_retime_repeat_stretch">تكرار وتمديد</string>
     <string name="element_retime_blank">فارغ</string>
+    <string name="group_retime_off">إيقاف</string>
     <string name="element_saved_to_my_assets">تم الحفظ في أصولي</string>
     <string name="element_save_failed">تعذّر الحفظ في أصولي. حرّر بعض مساحة التخزين.</string>
     <string name="element_search_hint">البحث في الأصول والمشاريع</string>
@@ -2166,6 +2167,10 @@
     <string name="caption_custom_color">مخصص</string>
     <string name="multi_animation">تحريك الكل</string>
     <string name="multi_presets">تطبيق إعداد مسبق</string>
+    <string name="multi_stretch_timing">تمديد التوقيت</string>
+    <string name="multi_stretch_shorter">أقصر</string>
+    <string name="multi_stretch_longer">أطول</string>
+    <string name="multi_stretch_note">تتمدد المقاطع والحركات ومقاطع الفيديو كلها معًا. تُشغَّل مقاطع الفيديو أبطأ أو أسرع لتتناسب مع المدة.</string>
     <string name="multi_no_cut">لا توجد نقاط قطع بين الطبقات المحددة</string>
     <plurals name="multi_applied_count">
         <item quantity="zero">طُبّق على %1$s طبقة</item>

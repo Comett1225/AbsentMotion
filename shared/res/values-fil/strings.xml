@@ -945,6 +945,7 @@
     <string name="element_retime_loop">I-loop</string>
     <string name="element_retime_repeat_stretch">Ulitin at i-stretch</string>
     <string name="element_retime_blank">Blangko</string>
+    <string name="group_retime_off">Naka-off</string>
     <string name="element_saved_to_my_assets">Nai-save sa Aking mga Asset</string>
     <string name="element_save_failed">Hindi ma-save sa Aking mga Asset. Magbakante ng storage.</string>
     <string name="element_search_hint">Maghanap ng mga asset at proyekto</string>
@@ -2058,6 +2059,10 @@
     <string name="caption_custom_color">Custom</string>
     <string name="multi_animation">I-animate lahat</string>
     <string name="multi_presets">Ilapat ang preset</string>
+    <string name="multi_stretch_timing">I-stretch ang timing</string>
+    <string name="multi_stretch_shorter">Mas maikli</string>
+    <string name="multi_stretch_longer">Mas mahaba</string>
+    <string name="multi_stretch_note">Sabay-sabay na nai-stretch ang mga clip, animation at bidyo. Bumabagal o bumibilis ang mga bidyo para magkasya.</string>
     <string name="multi_no_cut">Walang cut sa pagitan ng mga napiling layer</string>
     <plurals name="multi_applied_count">
         <item quantity="one">Inilapat sa %1$s layer</item>

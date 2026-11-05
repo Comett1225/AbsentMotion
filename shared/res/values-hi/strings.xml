@@ -945,6 +945,7 @@
     <string name="element_retime_loop">लूप</string>
     <string name="element_retime_repeat_stretch">रिपीट और स्ट्रेच</string>
     <string name="element_retime_blank">खाली</string>
+    <string name="group_retime_off">बंद</string>
     <string name="element_saved_to_my_assets">मेरे एसेट में सेव हो गया</string>
     <string name="element_save_failed">मेरे एसेट में सेव नहीं हो सका। थोड़ी स्टोरेज खाली करें।</string>
     <string name="element_search_hint">एसेट और प्रोजेक्ट खोजें</string>
@@ -2058,6 +2059,10 @@
     <string name="caption_custom_color">कस्टम</string>
     <string name="multi_animation">सभी को एनिमेट करें</string>
     <string name="multi_presets">प्रीसेट लागू करें</string>
+    <string name="multi_stretch_timing">टाइमिंग स्ट्रेच करें</string>
+    <string name="multi_stretch_shorter">छोटा</string>
+    <string name="multi_stretch_longer">लंबा</string>
+    <string name="multi_stretch_note">क्लिप, एनिमेशन और वीडियो सब एक साथ स्ट्रेच होते हैं। फ़िट होने के लिए वीडियो धीमे या तेज़ चलते हैं।</string>
     <string name="multi_no_cut">चुनी गई लेयर के बीच कोई कट नहीं है</string>
     <plurals name="multi_applied_count">
         <item quantity="one">%1$s लेयर पर लागू किया गया</item>

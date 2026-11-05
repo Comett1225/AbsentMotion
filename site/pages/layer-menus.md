@@ -53,7 +53,7 @@ The top bar changes color and shows:
 A second bar at the bottom of the screen works on timing:
 
 - **Effects** opens a small menu. **Add an effect to all** opens the Effects Library and adds the effect you pick to every selected visual clip. **Paste All Effects** pastes the effects you copied in a layer's Effects panel onto every selected visual clip; it is grayed until you have copied some. Sound, camera and null layers are skipped, and a message tells you how many.
-- **More actions** (three dots) opens a second menu. **Split at playhead** cuts every selected clip that the playhead is on in two, in one step. **Animate all** opens the In, Out and Loop animations and gives the one you pick to every selected visual layer. **Apply preset** opens your saved presets and applies the one you pick to every selected layer. Both are one step for Undo, and a message tells you how many layers got it. **Paste Fill & Color**, **Paste Frame & Shadow**, **Paste Opacity & Blend Mode** and **Paste Style** put the look of the last copied layer onto every selected layer; they are grayed until you have used **Copy Layer**. **Remove audio from all** sets the volume of every selected video to zero.
+- **More actions** (three dots) opens a second menu. **Split at playhead** cuts every selected clip that the playhead is on in two, in one step. **Stretch Timing** makes every selected clip longer or shorter together: pick a percentage (150% makes them one and a half times as long) and tap **Apply**. Their animations stretch with them and videos play slower or faster to fit; the earliest selected clip keeps its start. **Animate all** opens the In, Out and Loop animations and gives the one you pick to every selected visual layer. **Apply preset** opens your saved presets and applies the one you pick to every selected layer. Both are one step for Undo, and a message tells you how many layers got it. **Paste Fill & Color**, **Paste Frame & Shadow**, **Paste Opacity & Blend Mode** and **Paste Style** put the look of the last copied layer onto every selected layer; they are grayed until you have used **Copy Layer**. **Remove audio from all** sets the volume of every selected video to zero.
 - **Move clip starts to playhead** or **Move clip ends to playhead**
 - **Add a transition between the two clips** (two visual clips that overlap or touch). With more than two clips selected, the transition you pick goes on every cut between them, which is handy for auto captions that sit back to back. See [Transitions and animations](@animations).
 - **Align clip starts**, **Align clip ends** and **Distribute clip starts** (three or more).
@@ -63,6 +63,8 @@ A second bar at the bottom of the screen works on timing:
 ![The Effects button of the bottom bar (1) opens a menu with Add an effect to all and Paste All Effects (2).](img/lm-multi-effects.webp)
 
 ![The More actions button of the bottom bar (1) opens a menu with the paste commands and Remove audio from all (2).](img/lm-multi-more.webp)
+
+![Stretch Timing (1) in the More actions menu opens a sheet where you pick how long the clips become (2) and tap Apply (3).](img/lm-stretch.webp)
 
 On the timeline, every selected clip shows its trim grips. Dragging the grip of one of them moves the same end of every selected clip; each clip stops at its own limit, and the whole drag is one step for Undo.
 

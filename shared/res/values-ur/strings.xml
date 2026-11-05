@@ -945,6 +945,7 @@
     <string name="element_retime_loop">لوپ</string>
     <string name="element_retime_repeat_stretch">ریپیٹ اور اسٹریچ</string>
     <string name="element_retime_blank">خالی</string>
+    <string name="group_retime_off">بند</string>
     <string name="element_saved_to_my_assets">میرے ایسیٹس میں محفوظ ہو گیا</string>
     <string name="element_save_failed">میرے ایسیٹس میں محفوظ نہیں ہو سکا۔ کچھ اسٹوریج خالی کریں۔</string>
     <string name="element_search_hint">ایسیٹس اور پروجیکٹس تلاش کریں</string>
@@ -2058,6 +2059,10 @@
     <string name="caption_custom_color">حسب ضرورت</string>
     <string name="multi_animation">سب کو متحرک کریں</string>
     <string name="multi_presets">پری سیٹ لگائیں</string>
+    <string name="multi_stretch_timing">ٹائمنگ اسٹریچ کریں</string>
+    <string name="multi_stretch_shorter">چھوٹا</string>
+    <string name="multi_stretch_longer">لمبا</string>
+    <string name="multi_stretch_note">کلپس، اینیمیشنز اور ویڈیوز سب ایک ساتھ اسٹریچ ہوتے ہیں۔ فٹ ہونے کے لیے ویڈیوز آہستہ یا تیز چلتی ہیں۔</string>
     <string name="multi_no_cut">منتخب لیئرز کے درمیان کوئی کٹ نہیں</string>
     <plurals name="multi_applied_count">
         <item quantity="one">%1$s لیئر پر لاگو کیا گیا</item>

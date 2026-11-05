@@ -80,6 +80,23 @@ import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
+import androidx.compose.animation.core.animate
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.util.VelocityTracker
+import androidx.compose.ui.input.pointer.util.addPointerInputChange
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.onPlaced
+import androidx.compose.ui.layout.findRootCoordinates
+import app.absentmotion.ui.theme.Motion
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlin.math.abs
+import kotlin.math.sign
 
 @Composable
 fun EffectBrowser(state: EditorState) {
@@ -159,6 +176,39 @@ fun EffectBrowser(state: EditorState) {
     val voiceName = stringResource(R.string.layer_tool_voice_filters)
     val stepping = (category != null && !audio) || detail != null || searching || fromAudio
     val heading = detail?.name ?: category?.let { key -> when (key) { "audio" -> audioName; "voice" -> voiceName; else -> catalog.categories.firstOrNull { it.first == key }?.second } } ?: stringResource(R.string.effectbrowser_title)
+    val listed = catalog.categories.let { all -> if (hasSound) all.filter { it.first != "ai" } + ("audio" to audioName) + all.filter { it.first == "ai" } else all }
+    val page = listOf(detail?.id, searching, category)
+    fun pageAt() = if (audio || searching || detail != null) -1 else listed.indexOfFirst { it.first == category }
+    val at = pageAt()
+    val rtl = androidx.compose.ui.platform.LocalLayoutDirection.current == androidx.compose.ui.unit.LayoutDirection.Rtl
+    val density = androidx.compose.ui.platform.LocalDensity.current
+    var shift by remember { mutableFloatStateOf(0f) }
+    var slid by remember { mutableStateOf<Any?>(null) }
+    val pull = remember { floatArrayOf(0f) }
+    val sliding = remember { arrayOfNulls<Job>(1) }
+    LaunchedEffect(page) { if (page != slid) slid = null }
+    val slide = Modifier.graphicsLayer { translationX = shift }
+    fun swipeStart(way: Int): Boolean {
+        sliding[0]?.cancel()
+        pull[0] = 0f
+        return true
+    }
+    fun swipeDrag(dx: Float, width: Float) {
+        pull[0] += dx
+        shift = pull[0] * if (EffectSwipe.page(pageAt(), listed.size, pull[0], rtl) != null) 0.25f else 0.08f
+    }
+    fun swipeEnd(velocity: Float?, width: Float) {
+        val to = EffectSwipe.page(pageAt(), listed.size, pull[0], rtl)
+        val way = sign(pull[0])
+        if (to == null || velocity == null || !EffectSwipe.commits(abs(pull[0]), width, velocity * way, EffectSwipe.PAGE_SHARE, EffectSwipe.FLING_DP * density.density)) {
+            sliding[0] = scope.launch { animate(shift, 0f, animationSpec = spring()) { v, _ -> shift = v } }
+            return
+        }
+        val next = listed[to].first
+        category = next
+        slid = listOf(null, false, next)
+        sliding[0] = scope.launch { animate(-way * EffectSwipe.SLIDE_DP * density.density, 0f, animationSpec = Motion.enter()) { v, _ -> shift = v } }
+    }
     Column(Modifier.fillMaxSize().background(BrowserBg).systemBarsPadding()) {
         helpPage?.let { page -> HelpScreen(page) { helpPage = null } }
         if (PlatformFeatures.desktop) Row(Modifier.fillMaxWidth().height(52.dp).padding(start = 8.dp, end = 6.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -181,9 +231,9 @@ fun EffectBrowser(state: EditorState) {
             if (audio) Spacer(Modifier.size(44.dp))
             else BrowserButton(EffectIcons.Search, stringResource(R.string.home_search), { state.effectDetail = null; detail = null; searching = true })
         }
-        Swap(listOf(detail?.id, searching, category), Modifier.fillMaxSize()) {
+        Swap(page, Modifier.fillMaxSize().effectSwipe(at >= 0, ::swipeStart, ::swipeDrag, ::swipeEnd), rise = if (slid == page) 0.dp else 8.dp) {
         if (catalog.message != null && !audio && (app.absentmotion.platform.effectsMessageOnHome() || (category != null && category != "ai" && category != "audio" && category != "voice" && !searching))) {
-            Box(Modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
+            Box(Modifier.fillMaxSize().then(slide).padding(24.dp), contentAlignment = Alignment.Center) {
                 Text(catalog.message!!, color = Am.OnDark, fontSize = 14.sp, textAlign = TextAlign.Center)
             }
         } else if (detail != null) {
@@ -214,7 +264,7 @@ fun EffectBrowser(state: EditorState) {
         } else if (!searching && (category == "audio" || category == "voice")) {
             val effects = layer?.audioEffects.orEmpty()
             val audioGrid = rememberLazyGridState()
-            LazyVerticalGrid(if (PlatformFeatures.desktop) GridCells.Adaptive(120.dp) else GridCells.Fixed(3), Modifier.fillMaxSize().deskScrollbar(audioGrid), audioGrid, contentPadding = PaddingValues(if (PlatformFeatures.desktop) 16.dp else 10.dp)) {
+            LazyVerticalGrid(if (PlatformFeatures.desktop) GridCells.Adaptive(120.dp) else GridCells.Fixed(3), Modifier.fillMaxSize().then(slide).deskScrollbar(audioGrid), audioGrid, contentPadding = PaddingValues(if (PlatformFeatures.desktop) 16.dp else 10.dp)) {
                 if (category == "audio") {
                     item(key = "voice-category") { AudioTile(voiceName, 2, true) { fromAudio = true; category = "voice" } }
                     itemsIndexed(AudioOrder) { i, kind ->
@@ -230,8 +280,8 @@ fun EffectBrowser(state: EditorState) {
             val byPreset = if (audio || !searching) emptyList() else catalog.definitions.filter { d -> d !in byName && query.isNotBlank() && d.presets.any { matchesSearch(query, it.name) } }
             val results = if (audio) emptyList() else if (searching) byName + byPreset else catalog.listed(category).sortedBy { it.name.lowercase() }
             val actions = if (app.absentmotion.platform.PlatformFeatures.ai && (searching || category == "ai")) AiAction.entries.filter { it.offered && (!audio || it == AiAction.Noise) && matchesSearch(query, stringResource(it.title)) } else emptyList()
-            val resultGrid = rememberLazyGridState()
-            LazyVerticalGrid(if (PlatformFeatures.desktop) GridCells.Adaptive(120.dp) else GridCells.Fixed(3), Modifier.fillMaxSize().deskScrollbar(resultGrid), resultGrid, contentPadding = PaddingValues(if (PlatformFeatures.desktop) 16.dp else 10.dp)) {
+            val resultGrid = key(category) { rememberLazyGridState() }
+            LazyVerticalGrid(if (PlatformFeatures.desktop) GridCells.Adaptive(120.dp) else GridCells.Fixed(3), Modifier.fillMaxSize().then(slide).deskScrollbar(resultGrid), resultGrid, contentPadding = PaddingValues(if (PlatformFeatures.desktop) 16.dp else 10.dp)) {
                 if (app.absentmotion.platform.PlatformFeatures.ai && hasSound && (category == "ai" || searching && matchesSearch(query, context.getString(R.string.auto_captions)))) {
                     item(key = "ai-captions") { AudioTile(stringResource(R.string.auto_captions), 5, true) { state.playing = false; captionClip = layer.id } }
                 }
@@ -286,7 +336,6 @@ fun EffectBrowser(state: EditorState) {
                         }
                     }
                 }
-                val listed = catalog.categories.let { all -> if (hasSound) all.filter { it.first != "ai" } + ("audio" to audioName) + all.filter { it.first == "ai" } else all }
                 listed.chunked(2).forEach { row ->
                     Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(1.5.dp)) {
                         row.forEach { (key, name) ->
@@ -413,4 +462,66 @@ internal fun PresetStar(favourite: Boolean, onToggle: () -> Unit) {
 @Composable
 internal fun Thumbnail(catalog: EffectCatalog, path: String?, modifier: Modifier, scale: ContentScale = ContentScale.Fit) {
     Box(modifier.background(RecommendedBg)) { app.absentmotion.platform.EffectPicture(catalog, path, scale) }
+}
+
+internal object EffectSwipe {
+    const val EDGE_DP = 24f
+    const val FLING_DP = 800f
+    const val SLIDE_DP = 40f
+    const val DELETE_SHARE = 0.4f
+    const val PAGE_SHARE = 0.25f
+
+    fun direction(dx: Float, dy: Float, slop: Float): Int? = when {
+        dx * dx + dy * dy <= slop * slop -> null
+        abs(dx) > abs(dy) -> if (dx < 0f) -1 else 1
+        else -> 0
+    }
+
+    fun fromEdge(x: Float, width: Float, edge: Float): Boolean = x < edge || x > width - edge
+
+    fun commits(travel: Float, width: Float, velocity: Float, share: Float, fling: Float): Boolean =
+        velocity >= fling || (travel >= width * share && velocity > -fling)
+
+    fun page(at: Int, count: Int, pull: Float, rtl: Boolean): Int? {
+        if (at < 0 || pull == 0f) return null
+        return (at + if ((pull < 0f) != rtl) 1 else -1).takeIf { it in 0 until count }
+    }
+}
+
+@Composable
+internal fun Modifier.effectSwipe(enabled: Boolean, accept: (Int) -> Boolean, drag: (Float, Float) -> Unit, end: (Float?, Float) -> Unit): Modifier {
+    if (PlatformFeatures.desktop) return this
+    val on by rememberUpdatedState(enabled)
+    val begin by rememberUpdatedState(accept)
+    val move by rememberUpdatedState(drag)
+    val finish by rememberUpdatedState(end)
+    val place = remember { arrayOfNulls<LayoutCoordinates>(1) }
+    return onPlaced { place[0] = it }.pointerInput(Unit) {
+        awaitEachGesture {
+            val down = awaitFirstDown(requireUnconsumed = false)
+            val at = place[0]?.takeIf { it.isAttached } ?: return@awaitEachGesture
+            if (!on || EffectSwipe.fromEdge(at.localToRoot(down.position).x, at.findRootCoordinates().size.width.toFloat(), EffectSwipe.EDGE_DP.dp.toPx())) return@awaitEachGesture
+            var change = down
+            var way: Int? = null
+            while (way == null) {
+                change = awaitPointerEvent().changes.firstOrNull { it.id == down.id } ?: return@awaitEachGesture
+                if (!change.pressed || change.isConsumed) return@awaitEachGesture
+                way = EffectSwipe.direction(change.position.x - down.position.x, change.position.y - down.position.y, viewConfiguration.touchSlop)
+            }
+            if (way == 0 || !begin(way)) return@awaitEachGesture
+            change.consume()
+            val width = size.width.toFloat()
+            val tracker = VelocityTracker().apply { addPointerInputChange(change) }
+            while (true) {
+                val next = awaitPointerEvent(PointerEventPass.Initial).changes.firstOrNull { it.id == down.id }
+                if (next == null || (!next.pressed && next.isConsumed)) { finish(null, width); return@awaitEachGesture }
+                tracker.addPointerInputChange(next)
+                val dx = next.position.x - next.previousPosition.x
+                next.consume()
+                if (!next.pressed) break
+                move(dx, width)
+            }
+            finish(tracker.calculateVelocity().x, width)
+        }
+    }
 }

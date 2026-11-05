@@ -266,8 +266,10 @@ internal fun MultiBar(state: EditorState, modifier: Modifier) {
     val cuts = if (layers.size == 2) listOfNotNull(cut?.let { it.first.id to it.second.id }) else state.scene.selectedCuts(layers.map { it.id }.toSet())
     var transition by remember { mutableStateOf<List<Pair<Long, Long>>?>(null) }
     var animation by remember { mutableStateOf<Set<Long>?>(null) }
+    var stretch by remember { mutableStateOf<Set<Long>?>(null) }
     transition?.let { TransitionSheet(state, it) { transition = null } }
     animation?.let { AnimationSheet(state, it) { animation = null } }
+    stretch?.let { StretchSheet(state, it) { stretch = null } }
     Row(modifier.padding(6.dp).clip(RoundedCornerShape(3.dp)).background(Am.PanelInset), verticalAlignment = Alignment.CenterVertically) {
         val end = layers.isNotEmpty() && state.timeMs >= layers.maxOf { it.endTime }
         val context = LocalContext.current
@@ -301,6 +303,11 @@ internal fun MultiBar(state: EditorState, modifier: Modifier) {
                     MenuRow(stringResource(R.string.timeline_split), layers.any { state.scene.canSplitAt(it, state.frame) }) {
                         moreMenu = false
                         state.split()
+                    }
+                    MenuRow(stringResource(R.string.multi_stretch_timing), layers.any { it.endTime > it.startTime }) {
+                        moreMenu = false
+                        state.playing = false
+                        stretch = layers.map { it.id }.toSet()
                     }
                     MenuRow(stringResource(R.string.multi_animation)) {
                         moreMenu = false
