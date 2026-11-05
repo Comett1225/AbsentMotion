@@ -113,7 +113,7 @@
    }
   },
   "backdrop": {
-   "description": "Bir ayar katmanı: katmanın altında çizilenleri kopyalar, böylece sonraki efektler bu kopyayı değiştirir. Katmana maskele, kopyayı katmanın opak kısımlarıyla sınırlar. Karışım, katmanın dolgusunu geri getirir. Efektler Dışarı Taşsın, Esnetme gibi sonraki efektlerin kopyayı katmanın kenarlarının ötesine taşımasını sağlar.",
+   "description": "Eski adı Ayar Katmanı. Bir ayar katmanı: katmanın altında çizilenleri kopyalar, böylece sonraki efektler bu kopyayı değiştirir. Katmana maskele, kopyayı katmanın opak kısımlarıyla sınırlar. Karışım, katmanın dolgusunu geri getirir. Efektler Dışarı Taşsın, Esnetme gibi sonraki efektlerin kopyayı katmanın kenarlarının ötesine taşımasını sağlar.",
    "name": "Arka planı kopyala",
    "params": {
     "mask": {

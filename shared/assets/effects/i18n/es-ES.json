@@ -113,7 +113,7 @@
    }
   },
   "backdrop": {
-   "description": "Una capa de ajuste: copia lo que se dibuja debajo de la capa para que los efectos posteriores cambien esa copia. Enmascarar a la capa limita la copia a las partes opacas de la capa. Mezcla devuelve el relleno de la capa. Efectos fuera de los límites permite que los efectos posteriores, como Estirar, lleven la copia más allá de los bordes de la capa.",
+   "description": "Antes se llamaba Capa de ajuste. Una capa de ajuste: copia lo que se dibuja debajo de la capa para que los efectos posteriores cambien esa copia. Enmascarar a la capa limita la copia a las partes opacas de la capa. Mezcla devuelve el relleno de la capa. Efectos fuera de los límites permite que los efectos posteriores, como Estirar, lleven la copia más allá de los bordes de la capa.",
    "name": "Copiar fondo",
    "params": {
     "mask": {

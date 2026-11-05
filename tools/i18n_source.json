@@ -1167,7 +1167,7 @@
  "fx:autoshake:seed:label": "Seed",
  "fx:autoshake:slack:label": "Slack",
  "fx:autoshake:zshake:label": "Z Shake",
- "fx:backdrop:description": "An adjustment layer: copies what is drawn beneath the layer so the effects after it change that copy. Mask To Layer limits the copy to the opaque parts of the layer. Mix brings the layer fill back. Effects Reach Outside lets later effects, such as Stretch, carry the copy past the layer's edges.",
+ "fx:backdrop:description": "Used to be called Adjustment Layer. Copies what is drawn beneath the layer so the effects after it change that copy. Mask To Layer limits the copy to the opaque parts of the layer. Mix brings the layer fill back. Effects Reach Outside lets later effects, such as Stretch, carry the copy past the layer's edges.",
  "fx:backdrop:mask:label": "Mask To Layer",
  "fx:backdrop:mix:label": "Mix",
  "fx:backdrop:name": "Copy Background",

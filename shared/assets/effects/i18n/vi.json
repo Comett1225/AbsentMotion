@@ -113,7 +113,7 @@
    }
   },
   "backdrop": {
-   "description": "Là lớp điều chỉnh: sao chép những gì được vẽ bên dưới lớp để các hiệu ứng đặt sau nó thay đổi bản sao đó. Mặt nạ theo lớp giới hạn bản sao trong phần mờ đục của lớp. Trộn đưa phần tô của lớp trở lại. Hiệu ứng lan ra ngoài cho phép các hiệu ứng đặt sau, như Kéo giãn đoạn, đưa bản sao vượt qua rìa lớp.",
+   "description": "Trước đây có tên là Lớp điều chỉnh. Là lớp điều chỉnh: sao chép những gì được vẽ bên dưới lớp để các hiệu ứng đặt sau nó thay đổi bản sao đó. Mặt nạ theo lớp giới hạn bản sao trong phần mờ đục của lớp. Trộn đưa phần tô của lớp trở lại. Hiệu ứng lan ra ngoài cho phép các hiệu ứng đặt sau, như Kéo giãn đoạn, đưa bản sao vượt qua rìa lớp.",
    "name": "Sao chép nền",
    "params": {
     "mask": {

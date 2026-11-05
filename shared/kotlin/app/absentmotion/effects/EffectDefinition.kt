@@ -88,6 +88,7 @@ data class EffectDefinition(
     val status: String = "ok",
     val since: String? = null,
     val presets: List<EffectPreset> = emptyList(),
+    val page: String = key,
 ) {
     val available: Boolean get() = status == "ok"
     val thumbnail: String get() = "thumb/$key.webp"
@@ -147,7 +148,8 @@ data class EffectDefinition(
             val presets = json.optJSONArray("presets") ?: JSONArray()
             return EffectDefinition("absent.$key", key, json.optString("name", key), category, json.optString("description"),
                 parsed, if (native) null else sksl, native, since = json.optString("since").takeIf { it.isNotBlank() },
-                presets = List(presets.length()) { preset(key, parsed, presets.getJSONObject(it)) })
+                presets = List(presets.length()) { preset(key, parsed, presets.getJSONObject(it)) },
+                page = json.optString("name", key).lowercase(Locale.US).replace(Regex("[^a-z0-9]"), ""))
         }
 
         private fun preset(key: String, params: List<EffectParam>, json: JSONObject): EffectPreset {

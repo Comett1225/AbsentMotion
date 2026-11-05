@@ -113,7 +113,7 @@
    }
   },
   "backdrop": {
-   "description": "Lapisan penyesuaian: menyalin apa yang digambar di bawah lapisan agar efek setelahnya mengubah salinan itu. Masker ke Lapisan membatasi salinan pada bagian buram lapisan. Campuran mengembalikan isi lapisan. Efek Menjangkau Keluar memungkinkan efek berikutnya, seperti Regangkan, membawa salinan melewati tepi lapisan.",
+   "description": "Dulu bernama Lapisan Penyesuaian. Lapisan penyesuaian: menyalin apa yang digambar di bawah lapisan agar efek setelahnya mengubah salinan itu. Masker ke Lapisan membatasi salinan pada bagian buram lapisan. Campuran mengembalikan isi lapisan. Efek Menjangkau Keluar memungkinkan efek berikutnya, seperti Regangkan, membawa salinan melewati tepi lapisan.",
    "name": "Salin Latar Belakang",
    "params": {
     "mask": {

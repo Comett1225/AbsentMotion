@@ -113,7 +113,7 @@
    }
   },
   "backdrop": {
-   "description": "Uma camada de ajuste: copia o que está desenhado abaixo da camada para que os efeitos seguintes alterem essa cópia. Máscara para a camada limita a cópia às partes opacas da camada. Mistura traz de volta o preenchimento da camada. Efeitos se estendem para fora permite que efeitos posteriores, como Esticar, levem a cópia além das bordas da camada.",
+   "description": "Antes se chamava Camada de ajuste. Uma camada de ajuste: copia o que está desenhado abaixo da camada para que os efeitos seguintes alterem essa cópia. Máscara para a camada limita a cópia às partes opacas da camada. Mistura traz de volta o preenchimento da camada. Efeitos se estendem para fora permite que efeitos posteriores, como Esticar, levem a cópia além das bordas da camada.",
    "name": "Copiar fundo",
    "params": {
     "mask": {

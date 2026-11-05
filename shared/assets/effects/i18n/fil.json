@@ -113,7 +113,7 @@
    }
   },
   "backdrop": {
-   "description": "Isang adjustment layer: kinokopya ang iginuguhit sa ilalim ng layer para ang mga epektong kasunod nito ang magbago sa kopyang iyon. Nililimitahan ng Mask sa layer ang kopya sa mga opaque na bahagi ng layer. Ibinabalik ng Halo ang fill ng layer. Pinapayagan ng Umaabot sa labas ang mga epekto ang mga susunod na epekto, gaya ng Stretch, na dalhin ang kopya lampas sa gilid ng layer.",
+   "description": "Dati itong tinatawag na Adjustment layer. Isang adjustment layer: kinokopya ang iginuguhit sa ilalim ng layer para ang mga epektong kasunod nito ang magbago sa kopyang iyon. Nililimitahan ng Mask sa layer ang kopya sa mga opaque na bahagi ng layer. Ibinabalik ng Halo ang fill ng layer. Pinapayagan ng Umaabot sa labas ang mga epekto ang mga susunod na epekto, gaya ng Stretch, na dalhin ang kopya lampas sa gilid ng layer.",
    "name": "Kopyahin ang Background",
    "params": {
     "mask": {

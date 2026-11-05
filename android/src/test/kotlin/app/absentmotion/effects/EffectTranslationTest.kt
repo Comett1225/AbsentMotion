@@ -13,6 +13,15 @@ class EffectTranslationTest {
     private val english = EffectCatalog.parse { File(pack, it).inputStream() }
     private fun shape(c: EffectCatalog) = c.definitions.map { d -> Triple(d.id, d.category, d.params.map { Triple(it.id, it.default, it.options.size) }) }
 
+    @Test fun helpPagesAreNamedAfterTheEnglishName() {
+        val hindi = english.translated(JSONObject(File(pack, "i18n/hi.json").readText()))
+        val backdrop = english.definitions.first { it.key == "backdrop" }
+        assertEquals("copybackground", backdrop.page)
+        assertEquals("copybackground", hindi.definitions.first { it.key == "backdrop" }.page)
+        val missing = english.definitions.filter { !File("../shared/assets/help/effects/${it.page}.html").isFile }.map { it.key }
+        assertTrue("no help page for $missing", missing.isEmpty())
+    }
+
     @Test fun everyLanguageTranslatesEveryEffectText() {
         for (language in AppLanguage.entries - AppLanguage.English) {
             val file = File(pack, "i18n/${language.tag}.json")

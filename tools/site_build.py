@@ -224,7 +224,7 @@ class Site:
         if key in self.pages:
             return base + self.out_path(key)
         if key.startswith("effect/") and key[7:] in self.by_effect:
-            return base + "effects/" + key[7:] + ".html"
+            return base + "effects/" + self.by_effect[key[7:]]["page"] + ".html"
         return None
 
     def thumb(self, name, depth):
@@ -611,15 +611,15 @@ class Site:
                 text = escape((e["name"] + " " + e["description"]).lower())
                 if site:
                     out.append('<li data-text="%s"><a href="%s.html"><img src="%s" width="96" height="96" alt="" loading="lazy"><span>%s</span></a></li>' % (
-                        text, e["id"], "thumb/" + e["id"] + ".webp", escape(e["name"])))
+                        text, e["page"], "thumb/" + e["id"] + ".webp", escape(e["name"])))
                 else:
-                    out.append('<li><a href="%s.html">%s</a></li>' % (e["id"], escape(e["name"])))
+                    out.append('<li><a href="%s.html">%s</a></li>' % (e["page"], escape(e["name"])))
             out.append("</ul></section>")
         return "".join(out)
 
     def render_effects(self):
         for n, e in enumerate(self.effects):
-            path = "effects/%s.html" % e["id"]
+            path = "effects/%s.html" % e["page"]
             where = "shared/assets/effects/%s.json" % e["id"]
             extra_path = SITE / "effects" / (e["id"] + ".md")
             extra = ""
@@ -646,8 +646,8 @@ class Site:
                 body.append("</ul>")
             same = [x for x in self.effects if x["category"] == e["category"]]
             i = same.index(e)
-            prev = '<a rel="prev" href="%s.html">%s %s</a>' % (same[i - 1]["id"], self.back(), escape(same[i - 1]["name"])) if i else "<span></span>"
-            nxt = '<a rel="next" href="%s.html">%s %s</a>' % (same[i + 1]["id"], escape(same[i + 1]["name"]), self.forward()) if i + 1 < len(same) else "<span></span>"
+            prev = '<a rel="prev" href="%s.html">%s %s</a>' % (same[i - 1]["page"], self.back(), escape(same[i - 1]["name"])) if i else "<span></span>"
+            nxt = '<a rel="next" href="%s.html">%s %s</a>' % (same[i + 1]["page"], escape(same[i + 1]["name"]), self.forward()) if i + 1 < len(same) else "<span></span>"
             body.append('<nav class="pager" aria-label="%s">%s%s</nav>' % (self.t("More {category} effects", category=category), prev, nxt))
             self.add(path, self.shell(path, e["name"] + (" | AbsentMotion" if self.locale else " effect | AbsentMotion"), e["description"], "".join(body), "effects", "effect"))
             if not e["description"]:
@@ -734,6 +734,7 @@ def load_effects():
             continue
         out.append({k: data.get(k) for k in ("id", "name", "category", "description", "params", "presets", "since")})
         out[-1]["params"] = data.get("params", [])
+        out[-1]["page"] = re.sub(r"[^a-z0-9]", "", data["name"].lower())
     return out
 
 

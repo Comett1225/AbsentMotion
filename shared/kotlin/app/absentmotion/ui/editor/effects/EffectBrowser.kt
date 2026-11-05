@@ -191,7 +191,7 @@ fun EffectBrowser(state: EditorState) {
             Column(Modifier.fillMaxSize().deskVerticalScroll().padding(16.dp)) {
                 Thumbnail(catalog, effect.thumbnail, Modifier.align(Alignment.CenterHorizontally).size(160.dp))
                 Text(effect.description, Modifier.padding(top = 16.dp, bottom = 4.dp), color = Am.OnDark, fontSize = 14.sp)
-                Row(Modifier.fillMaxWidth().height(48.dp).clickable { helpPage = "effects/${effect.key}.html" }.padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                Row(Modifier.fillMaxWidth().height(48.dp).clickable { helpPage = "effects/${effect.page}.html" }.padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                     Icon(ExportIcons.Help, null, Modifier.size(22.dp), tint = Am.OnDark)
                     Text(stringResource(R.string.effect_help), Modifier.padding(start = 12.dp), color = Am.OnDark, fontSize = 15.sp)
                 }

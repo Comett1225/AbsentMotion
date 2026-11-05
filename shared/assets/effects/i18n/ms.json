@@ -113,7 +113,7 @@
    }
   },
   "backdrop": {
-   "description": "Lapisan pelarasan: menyalin apa yang dilukis di bawah lapisan supaya kesan selepasnya mengubah salinan itu. Topeng ke lapisan mengehadkan salinan kepada bahagian legap lapisan. Campur membawa isi lapisan kembali. Kesan Menjangkau Keluar membolehkan kesan seterusnya, seperti Regangan, membawa salinan melepasi tepi lapisan.",
+   "description": "Dahulu dikenali sebagai Lapisan Pelarasan. Lapisan pelarasan: menyalin apa yang dilukis di bawah lapisan supaya kesan selepasnya mengubah salinan itu. Topeng ke lapisan mengehadkan salinan kepada bahagian legap lapisan. Campur membawa isi lapisan kembali. Kesan Menjangkau Keluar membolehkan kesan seterusnya, seperti Regangan, membawa salinan melepasi tepi lapisan.",
    "name": "Salin Latar Belakang",
    "params": {
     "mask": {

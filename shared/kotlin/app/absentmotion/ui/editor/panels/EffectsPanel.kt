@@ -269,7 +269,7 @@ private fun EffectHeader(state: EditorState, index: Int, effect: XmlNode, defini
             DeskTip(stringResource(R.string.delete)) { Icon(ChromeIcons.Trash, stringResource(R.string.delete), Modifier.size(22.dp), tint = Am.OnDark) }
         }
     }
-    if (help && definition != null) HelpScreen("effects/${definition.key}.html") { help = false }
+    if (help && definition != null) HelpScreen("effects/${definition.page}.html") { help = false }
 }
 
 @Composable
