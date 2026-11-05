@@ -862,7 +862,8 @@ std::string EffectRuntime::load(const std::string& xml) {
         }
         if (!result.effect->findChild("image")) return "shader error: no 'uniform shader image'";
         d.brightPass = result.effect->findChild("bright") != nullptr;
-        d.blurred = d.brightPass || result.effect->findChild("blurred") != nullptr;
+        d.plainBlur = result.effect->findChild("blurred") != nullptr;
+        d.blurred = d.brightPass || d.plainBlur;
         d.backdrop = result.effect->findChild("backdrop") != nullptr;
         d.below = result.effect->findChild("below") != nullptr;
         d.pointwise = Pointwise(sksl);
@@ -1105,16 +1106,21 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
             std::vector<sk_sp<SkImageFilter>> inputs = {f};
             if (d->blurred) {
                 const float sigma = std::max(Value(e, defaults, "blur", 0, t, 0), 0.0f) / 3;
-                sk_sp<SkImageFilter> source = f;
+                auto blurOf = [&](sk_sp<SkImageFilter> source) {
+                    return sigma > 0 ? SkImageFilters::Blur(sigma, sigma, SkTileMode::kDecal, source) : source;
+                };
                 if (d->brightPass) {
                     const float cut = Value(e, defaults, "threshold", 0, t, 0);
                     const float luma[5] = {0.2126f, 0.7152f, 0.0722f, 0.0f, -cut};
                     const float rows[20] = {luma[0], luma[1], luma[2], luma[3], luma[4], luma[0], luma[1], luma[2], luma[3], luma[4],
                                             luma[0], luma[1], luma[2], luma[3], luma[4], 0, 0, 0, 1, 0};
-                    source = SkImageFilters::ColorFilter(SkColorFilters::Matrix(rows), f);
+                    names.push_back("bright");
+                    inputs.push_back(blurOf(SkImageFilters::ColorFilter(SkColorFilters::Matrix(rows), f)));
                 }
-                names.push_back(d->brightPass ? "bright" : "blurred");
-                inputs.push_back(sigma > 0 ? SkImageFilters::Blur(sigma, sigma, SkTileMode::kDecal, source) : source);
+                if (d->plainBlur) {
+                    names.push_back("blurred");
+                    inputs.push_back(blurOf(f));
+                }
             }
             if (d->backdrop) {
                 names.push_back("backdrop");

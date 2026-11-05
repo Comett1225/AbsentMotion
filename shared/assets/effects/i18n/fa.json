@@ -744,6 +744,9 @@
    "description": "یک رنگ را حذف می‌کند، مثل پرده سبز.",
    "name": "کروما کی",
    "params": {
+    "defringe": {
+     "label": "پاک‌سازی لبه‌ها"
+    },
     "invert": {
      "label": "معکوس"
     },
@@ -1292,6 +1295,57 @@
     }
    }
   },
+  "deepglow": {
+   "description": "درخششی پرمایه و روشن که تا دوردست پخش می‌شود: هسته‌ای داغ نزدیک لایه که به‌نرمی در مهی گسترده و نرم محو می‌شود.",
+   "name": "درخشش عمیق",
+   "params": {
+    "blur": {
+     "label": "شعاع"
+    },
+    "falloff": {
+     "label": "میرایی"
+    },
+    "high": {
+     "label": "آستانه بالا"
+    },
+    "hue": {
+     "label": "جابه‌جایی هیو"
+    },
+    "intensity": {
+     "label": "شدت"
+    },
+    "limit": {
+     "label": "آستانه"
+    },
+    "low": {
+     "label": "آستانه پایین"
+    },
+    "opacity": {
+     "label": "شفافیت درخشش"
+    },
+    "original": {
+     "label": "شفافیت اصلی"
+    },
+    "outside": {
+     "label": "درخشش بیرونی"
+    },
+    "saturation": {
+     "label": "اشباع"
+    },
+    "softness": {
+     "label": "نرمی آستانه"
+    },
+    "tint": {
+     "label": "رنگ ته‌رنگ"
+    },
+    "tintAmount": {
+     "label": "ته‌رنگ"
+    },
+    "vibrance": {
+     "label": "ویبرانس"
+    }
+   }
+  },
   "denoise": {
    "description": "نویز تصویر را با فیلتر دوجانبه حفظ‌کننده لبه پاک می‌کند؛ فیلتری که پیکسل‌های نزدیک را فقط وقتی رنگ‌هایشان مشابه است میانگین می‌گیرد.",
    "name": "نویززدایی",
@@ -1443,6 +1497,27 @@
     }
    }
   },
+  "dropshadow": {
+   "description": "سایه‌ای نرم از شکل لایه پشت آن می‌کشد که با افست X و افست Y جابه‌جا می‌شود.",
+   "name": "سایه افتاده",
+   "params": {
+    "blur": {
+     "label": "نرمی"
+    },
+    "color": {
+     "label": "رنگ"
+    },
+    "opacity": {
+     "label": "شفافیت"
+    },
+    "x": {
+     "label": "افست X"
+    },
+    "y": {
+     "label": "افست Y"
+    }
+   }
+  },
   "duotone": {
    "description": "نقشه گرادیان دورنگ را بر اساس روشنایی، همراه با کنترل کنتراست و مقدار اعمال می‌کند.",
    "name": "دورنگ",
@@ -1502,17 +1577,35 @@
     "blur": {
      "label": "بلور"
     },
+    "brightness": {
+     "label": "روشنایی"
+    },
     "color": {
      "label": "رنگ"
     },
+    "edges": {
+     "label": "شدت لبه‌ها"
+    },
+    "gamma": {
+     "label": "گاما"
+    },
     "invert": {
      "label": "معکوس"
+    },
+    "own": {
+     "label": "رنگ تصویر"
     },
     "spread": {
      "label": "گسترش"
     },
     "threshold": {
      "label": "آستانه"
+    },
+    "tint": {
+     "label": "ته‌رنگ"
+    },
+    "tintColor": {
+     "label": "رنگ ته‌رنگ"
     }
    }
   },
@@ -1576,6 +1669,9 @@
     },
     "seed": {
      "label": "دانه"
+    },
+    "strength": {
+     "label": "شدت"
     },
     "thickness": {
      "label": "ضخامت"
@@ -1993,8 +2089,20 @@
     "evolution": {
      "label": "تحول"
     },
+    "intensity": {
+     "label": "شدت"
+    },
+    "offset": {
+     "label": "افست"
+    },
+    "parallax": {
+     "label": "پارالاکس"
+    },
     "scale": {
      "label": "مقیاس"
+    },
+    "screenSpace": {
+     "label": "فضای صفحه"
     },
     "seed": {
      "label": "دانه"
@@ -2198,6 +2306,9 @@
     },
     "reverse": {
      "label": "معکوس"
+    },
+    "saturation": {
+     "label": "اشباع"
     },
     "scaleBrightness": {
      "label": "مقیاس روشنایی"
@@ -2717,6 +2828,111 @@
     }
    }
   },
+  "hsl": {
+   "description": "هیو، اشباع و روشنی رنگ را برای هر محدوده‌ی رنگی جداگانه (قرمز، نارنجی، سبز و غیره) تغییر می‌دهد و به رنگ‌های دیگر دست نمی‌زند.",
+   "name": "HSL",
+   "params": {
+    "blend": {
+     "label": "ترکیب",
+     "options": [
+      "عادی",
+      "ضرب",
+      "صفحه"
+     ]
+    },
+    "blueHue": {
+     "label": "هیو"
+    },
+    "blueLightness": {
+     "label": "روشنی رنگ"
+    },
+    "blueSaturation": {
+     "label": "اشباع"
+    },
+    "brightness": {
+     "label": "روشنایی"
+    },
+    "cyanHue": {
+     "label": "هیو"
+    },
+    "cyanLightness": {
+     "label": "روشنی رنگ"
+    },
+    "cyanSaturation": {
+     "label": "اشباع"
+    },
+    "greenHue": {
+     "label": "هیو"
+    },
+    "greenLightness": {
+     "label": "روشنی رنگ"
+    },
+    "greenSaturation": {
+     "label": "اشباع"
+    },
+    "magentaHue": {
+     "label": "هیو"
+    },
+    "magentaLightness": {
+     "label": "روشنی رنگ"
+    },
+    "magentaSaturation": {
+     "label": "اشباع"
+    },
+    "opacity": {
+     "label": "شفافیت"
+    },
+    "orangeHue": {
+     "label": "هیو"
+    },
+    "orangeLightness": {
+     "label": "روشنی رنگ"
+    },
+    "orangeSaturation": {
+     "label": "اشباع"
+    },
+    "purpleHue": {
+     "label": "هیو"
+    },
+    "purpleLightness": {
+     "label": "روشنی رنگ"
+    },
+    "purpleSaturation": {
+     "label": "اشباع"
+    },
+    "range": {
+     "label": "رنگ",
+     "options": [
+      "قرمز",
+      "نارنجی",
+      "زرد",
+      "سبز",
+      "فیروزه‌ای",
+      "آبی",
+      "بنفش",
+      "سرخابی"
+     ]
+    },
+    "redHue": {
+     "label": "هیو"
+    },
+    "redLightness": {
+     "label": "روشنی رنگ"
+    },
+    "redSaturation": {
+     "label": "اشباع"
+    },
+    "yellowHue": {
+     "label": "هیو"
+    },
+    "yellowLightness": {
+     "label": "روشنی رنگ"
+    },
+    "yellowSaturation": {
+     "label": "اشباع"
+    }
+   }
+  },
   "huesaturation": {
    "description": "رنگ‌ها را دور چرخه رنگ می‌چرخاند و آن‌ها را قوی‌تر یا ضعیف‌تر می‌کند؛ ویبرانس رنگ‌های کدر را بیشتر تقویت می‌کند.",
    "name": "هیو و اشباع",
@@ -2907,6 +3123,9 @@
    "description": "درخشی رنگی حول بخش‌هایی از تصویر که از یک آستانه روشن‌ترند اضافه می‌کند.",
    "name": "درخشش نور",
    "params": {
+    "blend": {
+     "label": "ترکیب"
+    },
     "blur": {
      "label": "اندازه"
     },
@@ -3097,6 +3316,9 @@
     },
     "reach": {
      "label": "طول"
+    },
+    "solidity": {
+     "label": "چگالی"
     }
    }
   },
@@ -5117,6 +5339,9 @@
     },
     "opacity": {
      "label": "شفافیت"
+    },
+    "outside": {
+     "label": "درخشش بیرونی"
     }
    }
   },

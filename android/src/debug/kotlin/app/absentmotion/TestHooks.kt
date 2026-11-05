@@ -278,7 +278,12 @@ internal object TestHooks {
             }
         }
         val path = intent.getStringExtra("xml") ?: return
-        val parsed = runCatching { Scene.parse(File(path).readText()) }.getOrElse { Log.e("AMTest", "cannot read $path", it); return }
+        val raw = runCatching { Scene.parse(File(path).readText()) }.getOrElse { Log.e("AMTest", "cannot read $path", it); return }
+        val parsed = if (!intent.getBooleanExtra("migrate", false)) raw else {
+            val result = app.absentmotion.compat.EffectMigration.read(activity, app.absentmotion.effects.EffectCatalog.read(activity)).migrate(raw)
+            Log.i("AMTest", "migrated ${result.converted} dropped ${result.dropped}")
+            result.scene
+        }
         val id = "test-" + File(path).nameWithoutExtension
         activity.store.save(id, parsed)
         scope.launch {

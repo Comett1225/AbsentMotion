@@ -38,6 +38,15 @@
    "default": "#ffffe0a0"
   },
   {
+   "id": "blend",
+   "label": "Blend",
+   "type": "float",
+   "default": 1.0,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
    "id": "opacity",
    "label": "Opacity",
    "type": "float",
@@ -47,5 +56,5 @@
    "step": 0.01
   }
  ],
- "sksl": "uniform shader image;\nuniform shader bright;\nuniform float2 size;\nuniform float time;\nuniform float blur;\nuniform float threshold;\nuniform float intensity;\nlayout(color) uniform half4 color;\nuniform float opacity;\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    half4 g = bright.eval(coord);\n    float glow = clamp(float(g.r) * intensity * clamp(opacity, 0.0, 1.0) * 4.41, 0.0, 1.0);\n    float3 add = glow * float3(color.rgb) * float(color.a);\n    float a = float(c.a) + glow * float(color.a) * (1.0 - float(c.a));\n    float3 rgb = float3(c.rgb) + add - float3(c.rgb) * add;\n    return half4(half3(clamp(rgb, 0.0, a)), half(a));\n}"
+ "sksl": "uniform shader image;\nuniform shader bright;\nuniform shader blurred;\nuniform float2 size;\nuniform float time;\nuniform float blur;\nuniform float threshold;\nuniform float intensity;\nlayout(color) uniform half4 color;\nuniform float opacity;\nuniform float blend;\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    half4 g = bright.eval(coord);\n    float glow = clamp(float(g.r) * intensity * clamp(opacity, 0.0, 1.0) * 4.41, 0.0, 1.0);\n    float3 tint = float3(color.rgb);\n    if (blend < 1.0) {\n        half4 s = blurred.eval(coord);\n        float3 own = s.a > 0.0 ? float3(s.rgb) / float(s.a) : float3(1.0);\n        own = own / max(max(own.r, max(own.g, own.b)), 0.0001);\n        tint = mix(own, tint, clamp(blend, 0.0, 1.0));\n    }\n    float3 add = glow * tint * float(color.a);\n    float a = float(c.a) + glow * float(color.a) * (1.0 - float(c.a));\n    float3 rgb = float3(c.rgb) + add - float3(c.rgb) * add;\n    return half4(half3(clamp(rgb, 0.0, a)), half(a));\n}"
 }

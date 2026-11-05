@@ -37,6 +37,7 @@ private:
         sk_sp<SkRuntimeEffect> shader;
         bool blurred = false;
         bool brightPass = false;
+        bool plainBlur = false;
         bool backdrop = false;
         bool below = false;
         bool pointwise = false;

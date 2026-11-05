@@ -744,6 +744,9 @@
    "description": "Elimina un color, como un fondo verde.",
    "name": "Croma",
    "params": {
+    "defringe": {
+     "label": "Eliminar halos"
+    },
     "invert": {
      "label": "Invertir"
     },
@@ -1292,6 +1295,57 @@
     }
    }
   },
+  "deepglow": {
+   "description": "Un resplandor intenso y brillante que llega lejos: un núcleo caliente junto a la capa que se desvanece suavemente en una bruma amplia y difusa.",
+   "name": "Resplandor profundo",
+   "params": {
+    "blur": {
+     "label": "Radio"
+    },
+    "falloff": {
+     "label": "Atenuación"
+    },
+    "high": {
+     "label": "Umbral alto"
+    },
+    "hue": {
+     "label": "Cambio de tono"
+    },
+    "intensity": {
+     "label": "Intensidad"
+    },
+    "limit": {
+     "label": "Umbral"
+    },
+    "low": {
+     "label": "Umbral bajo"
+    },
+    "opacity": {
+     "label": "Opacidad del brillo"
+    },
+    "original": {
+     "label": "Opacidad original"
+    },
+    "outside": {
+     "label": "Brillo exterior"
+    },
+    "saturation": {
+     "label": "Saturación"
+    },
+    "softness": {
+     "label": "Suavidad del umbral"
+    },
+    "tint": {
+     "label": "Color de tinte"
+    },
+    "tintAmount": {
+     "label": "Tinte"
+    },
+    "vibrance": {
+     "label": "Vibrancia"
+    }
+   }
+  },
   "denoise": {
    "description": "Elimina el ruido de la imagen con un filtro bilateral que preserva los bordes y promedia píxeles cercanos solo cuando sus colores son similares.",
    "name": "Reducción de ruido",
@@ -1443,6 +1497,27 @@
     }
    }
   },
+  "dropshadow": {
+   "description": "Dibuja una sombra suave de la forma de la capa detrás de ella, movida con Desplazamiento X y Desplazamiento Y.",
+   "name": "Sombra paralela",
+   "params": {
+    "blur": {
+     "label": "Suavidad"
+    },
+    "color": {
+     "label": "Color"
+    },
+    "opacity": {
+     "label": "Opacidad"
+    },
+    "x": {
+     "label": "Desplazamiento X"
+    },
+    "y": {
+     "label": "Desplazamiento Y"
+    }
+   }
+  },
   "duotone": {
    "description": "Aplica un mapa de degradado de dos colores según la luminancia, con controles de contraste y cantidad.",
    "name": "Dúotono",
@@ -1502,17 +1577,35 @@
     "blur": {
      "label": "Desenfoque"
     },
+    "brightness": {
+     "label": "Brillo"
+    },
     "color": {
      "label": "Color"
     },
+    "edges": {
+     "label": "Intensidad de bordes"
+    },
+    "gamma": {
+     "label": "Gamma"
+    },
     "invert": {
      "label": "Invertir"
+    },
+    "own": {
+     "label": "Color de la imagen"
     },
     "spread": {
      "label": "Expansión"
     },
     "threshold": {
      "label": "Umbral"
+    },
+    "tint": {
+     "label": "Tinte"
+    },
+    "tintColor": {
+     "label": "Color de tinte"
     }
    }
   },
@@ -1576,6 +1669,9 @@
     },
     "seed": {
      "label": "Semilla"
+    },
+    "strength": {
+     "label": "Intensidad"
     },
     "thickness": {
      "label": "Grosor"
@@ -1993,8 +2089,20 @@
     "evolution": {
      "label": "Evolución"
     },
+    "intensity": {
+     "label": "Fuerza"
+    },
+    "offset": {
+     "label": "Desplazamiento"
+    },
+    "parallax": {
+     "label": "Paralaje"
+    },
     "scale": {
      "label": "Escala"
+    },
+    "screenSpace": {
+     "label": "Espacio de pantalla"
     },
     "seed": {
      "label": "Semilla"
@@ -2198,6 +2306,9 @@
     },
     "reverse": {
      "label": "Invertir"
+    },
+    "saturation": {
+     "label": "Saturación"
     },
     "scaleBrightness": {
      "label": "Escalar brillo"
@@ -2717,6 +2828,111 @@
     }
    }
   },
+  "hsl": {
+   "description": "Cambia el matiz, la saturación y la luminosidad de un rango de color a la vez (rojos, naranjas, verdes, etc.) sin tocar los demás colores.",
+   "name": "HSL",
+   "params": {
+    "blend": {
+     "label": "Fusión",
+     "options": [
+      "Normal",
+      "Multiplicar",
+      "Trama"
+     ]
+    },
+    "blueHue": {
+     "label": "Matiz"
+    },
+    "blueLightness": {
+     "label": "Luminosidad"
+    },
+    "blueSaturation": {
+     "label": "Saturación"
+    },
+    "brightness": {
+     "label": "Brillo"
+    },
+    "cyanHue": {
+     "label": "Matiz"
+    },
+    "cyanLightness": {
+     "label": "Luminosidad"
+    },
+    "cyanSaturation": {
+     "label": "Saturación"
+    },
+    "greenHue": {
+     "label": "Matiz"
+    },
+    "greenLightness": {
+     "label": "Luminosidad"
+    },
+    "greenSaturation": {
+     "label": "Saturación"
+    },
+    "magentaHue": {
+     "label": "Matiz"
+    },
+    "magentaLightness": {
+     "label": "Luminosidad"
+    },
+    "magentaSaturation": {
+     "label": "Saturación"
+    },
+    "opacity": {
+     "label": "Opacidad"
+    },
+    "orangeHue": {
+     "label": "Matiz"
+    },
+    "orangeLightness": {
+     "label": "Luminosidad"
+    },
+    "orangeSaturation": {
+     "label": "Saturación"
+    },
+    "purpleHue": {
+     "label": "Matiz"
+    },
+    "purpleLightness": {
+     "label": "Luminosidad"
+    },
+    "purpleSaturation": {
+     "label": "Saturación"
+    },
+    "range": {
+     "label": "Color",
+     "options": [
+      "Rojo",
+      "Naranja",
+      "Amarillo",
+      "Verde",
+      "Cian",
+      "Azul",
+      "Morado",
+      "Magenta"
+     ]
+    },
+    "redHue": {
+     "label": "Matiz"
+    },
+    "redLightness": {
+     "label": "Luminosidad"
+    },
+    "redSaturation": {
+     "label": "Saturación"
+    },
+    "yellowHue": {
+     "label": "Matiz"
+    },
+    "yellowLightness": {
+     "label": "Luminosidad"
+    },
+    "yellowSaturation": {
+     "label": "Saturación"
+    }
+   }
+  },
   "huesaturation": {
    "description": "Gira los colores alrededor del círculo cromático y los hace más fuertes o más débiles; la vibrancia refuerza más los colores apagados.",
    "name": "Tono y saturación",
@@ -2907,6 +3123,9 @@
    "description": "Añade un resplandor de color alrededor de las partes de la imagen más brillantes que un umbral.",
    "name": "Resplandor de luz",
    "params": {
+    "blend": {
+     "label": "Fusión"
+    },
     "blur": {
      "label": "Tamaño"
     },
@@ -3097,6 +3316,9 @@
     },
     "reach": {
      "label": "Longitud"
+    },
+    "solidity": {
+     "label": "Solidez"
     }
    }
   },
@@ -5117,6 +5339,9 @@
     },
     "opacity": {
      "label": "Opacidad"
+    },
+    "outside": {
+     "label": "Brillo exterior"
     }
    }
   },

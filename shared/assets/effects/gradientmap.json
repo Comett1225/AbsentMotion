@@ -53,6 +53,15 @@
    "default": false
   },
   {
+   "id": "saturation",
+   "label": "Saturation",
+   "type": "float",
+   "default": 1.0,
+   "min": 0,
+   "max": 2,
+   "step": 0.01
+  },
+  {
    "id": "opacity",
    "label": "Opacity",
    "type": "float",
@@ -62,5 +71,5 @@
    "step": 0.01
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nlayout(color) uniform half4 color1;\nlayout(color) uniform half4 color2;\nlayout(color) uniform half4 color3;\nuniform float repeat;\nuniform float phase;\nuniform float reverse;\nuniform float scaleBrightness;\nuniform float opacity;\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    if (c.a <= 0.0) return c;\n    float3 base = float3(c.rgb) / float(c.a);\n    float w = luma(base) * repeat + phase;\n    float u = 1.0 - abs(fract(w * 0.5) * 2.0 - 1.0);\n    if (reverse > 0.5) u = 1.0 - u;\n    float4 g = u < 0.5 ? mix(float4(color1), float4(color2), u * 2.0) : mix(float4(color2), float4(color3), u * 2.0 - 1.0);\n    float3 mapped = scaleBrightness > 0.5 ? g.rgb * luma(base) : g.rgb;\n    float3 rgb = mix(base, mapped, clamp(opacity, 0.0, 1.0) * g.a);\n    return half4(half3(clamp(rgb, 0.0, 1.0)) * c.a, c.a);\n}"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nlayout(color) uniform half4 color1;\nlayout(color) uniform half4 color2;\nlayout(color) uniform half4 color3;\nuniform float repeat;\nuniform float phase;\nuniform float reverse;\nuniform float scaleBrightness;\nuniform float opacity;\nuniform float saturation;\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    if (c.a <= 0.0) return c;\n    float3 base = float3(c.rgb) / float(c.a);\n    float w = luma(base) * repeat + phase;\n    float u = 1.0 - abs(fract(w * 0.5) * 2.0 - 1.0);\n    if (reverse > 0.5) u = 1.0 - u;\n    float4 g = u < 0.5 ? mix(float4(color1), float4(color2), u * 2.0) : mix(float4(color2), float4(color3), u * 2.0 - 1.0);\n    float3 mapped = scaleBrightness > 0.5 ? g.rgb * luma(base) : g.rgb;\n    float grey = luma(mapped);\n    mapped = clamp(grey + (mapped - grey) * (0.5 + 0.5 * max(saturation, 0.0)), 0.0, 1.0);\n    float3 rgb = mix(base, mapped, clamp(opacity, 0.0, 1.0) * g.a);\n    return half4(half3(clamp(rgb, 0.0, 1.0)) * c.a, c.a);\n}"
 }

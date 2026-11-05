@@ -744,6 +744,9 @@
    "description": "グリーンスクリーンなど、1色を除去します。",
    "name": "クロマキー",
    "params": {
+    "defringe": {
+     "label": "フリンジ除去"
+    },
     "invert": {
      "label": "反転"
     },
@@ -1292,6 +1295,57 @@
     }
    }
   },
+  "deepglow": {
+   "description": "遠くまで広がる明るく濃いグローです。レイヤー付近の強い芯から、広く柔らかなもやへなめらかに薄れていきます。",
+   "name": "ディープグロー",
+   "params": {
+    "blur": {
+     "label": "半径"
+    },
+    "falloff": {
+     "label": "減衰"
+    },
+    "high": {
+     "label": "上限しきい値"
+    },
+    "hue": {
+     "label": "色相シフト"
+    },
+    "intensity": {
+     "label": "強度"
+    },
+    "limit": {
+     "label": "しきい値"
+    },
+    "low": {
+     "label": "下限しきい値"
+    },
+    "opacity": {
+     "label": "グローの不透明度"
+    },
+    "original": {
+     "label": "元の不透明度"
+    },
+    "outside": {
+     "label": "外側のグロー"
+    },
+    "saturation": {
+     "label": "彩度"
+    },
+    "softness": {
+     "label": "しきい値の柔らかさ"
+    },
+    "tint": {
+     "label": "ティントの色"
+    },
+    "tintAmount": {
+     "label": "ティント"
+    },
+    "vibrance": {
+     "label": "バイブランス"
+    }
+   }
+  },
   "denoise": {
    "description": "色が近いピクセルだけを平均するエッジ保持バイラテラルフィルタで、画像のノイズを除去します。",
    "name": "ノイズ除去",
@@ -1443,6 +1497,27 @@
     }
    }
   },
+  "dropshadow": {
+   "description": "レイヤーの形の柔らかな影を背後に描き、オフセットXとオフセットYで位置をずらします。",
+   "name": "ドロップシャドウ",
+   "params": {
+    "blur": {
+     "label": "ぼかし"
+    },
+    "color": {
+     "label": "色"
+    },
+    "opacity": {
+     "label": "不透明度"
+    },
+    "x": {
+     "label": "オフセットX"
+    },
+    "y": {
+     "label": "オフセットY"
+    }
+   }
+  },
   "duotone": {
    "description": "輝度に基づく2色のグラデーションマップを適用します。コントラストと量で調整できます。",
    "name": "デュオトーン",
@@ -1502,17 +1577,35 @@
     "blur": {
      "label": "ぼかし"
     },
+    "brightness": {
+     "label": "明るさ"
+    },
     "color": {
      "label": "色"
     },
+    "edges": {
+     "label": "エッジの強さ"
+    },
+    "gamma": {
+     "label": "ガンマ"
+    },
     "invert": {
      "label": "反転"
+    },
+    "own": {
+     "label": "画像の色"
     },
     "spread": {
      "label": "広がり"
     },
     "threshold": {
      "label": "しきい値"
+    },
+    "tint": {
+     "label": "ティント"
+    },
+    "tintColor": {
+     "label": "ティントの色"
     }
    }
   },
@@ -1576,6 +1669,9 @@
     },
     "seed": {
      "label": "シード"
+    },
+    "strength": {
+     "label": "強さ"
     },
     "thickness": {
      "label": "太さ"
@@ -1993,8 +2089,20 @@
     "evolution": {
      "label": "変化"
     },
+    "intensity": {
+     "label": "強度"
+    },
+    "offset": {
+     "label": "オフセット"
+    },
+    "parallax": {
+     "label": "視差"
+    },
     "scale": {
      "label": "スケール"
+    },
+    "screenSpace": {
+     "label": "スクリーン空間"
     },
     "seed": {
      "label": "シード"
@@ -2198,6 +2306,9 @@
     },
     "reverse": {
      "label": "反転"
+    },
+    "saturation": {
+     "label": "彩度"
     },
     "scaleBrightness": {
      "label": "明るさスケール"
@@ -2717,6 +2828,111 @@
     }
    }
   },
+  "hsl": {
+   "description": "赤、オレンジ、緑などの色域ごとに色相・彩度・明度を変更し、ほかの色はそのままにします。",
+   "name": "HSL",
+   "params": {
+    "blend": {
+     "label": "ブレンド",
+     "options": [
+      "通常",
+      "乗算",
+      "スクリーン"
+     ]
+    },
+    "blueHue": {
+     "label": "色相"
+    },
+    "blueLightness": {
+     "label": "明度"
+    },
+    "blueSaturation": {
+     "label": "彩度"
+    },
+    "brightness": {
+     "label": "明るさ"
+    },
+    "cyanHue": {
+     "label": "色相"
+    },
+    "cyanLightness": {
+     "label": "明度"
+    },
+    "cyanSaturation": {
+     "label": "彩度"
+    },
+    "greenHue": {
+     "label": "色相"
+    },
+    "greenLightness": {
+     "label": "明度"
+    },
+    "greenSaturation": {
+     "label": "彩度"
+    },
+    "magentaHue": {
+     "label": "色相"
+    },
+    "magentaLightness": {
+     "label": "明度"
+    },
+    "magentaSaturation": {
+     "label": "彩度"
+    },
+    "opacity": {
+     "label": "不透明度"
+    },
+    "orangeHue": {
+     "label": "色相"
+    },
+    "orangeLightness": {
+     "label": "明度"
+    },
+    "orangeSaturation": {
+     "label": "彩度"
+    },
+    "purpleHue": {
+     "label": "色相"
+    },
+    "purpleLightness": {
+     "label": "明度"
+    },
+    "purpleSaturation": {
+     "label": "彩度"
+    },
+    "range": {
+     "label": "色",
+     "options": [
+      "赤",
+      "オレンジ",
+      "黄",
+      "緑",
+      "シアン",
+      "青",
+      "紫",
+      "マゼンタ"
+     ]
+    },
+    "redHue": {
+     "label": "色相"
+    },
+    "redLightness": {
+     "label": "明度"
+    },
+    "redSaturation": {
+     "label": "彩度"
+    },
+    "yellowHue": {
+     "label": "色相"
+    },
+    "yellowLightness": {
+     "label": "明度"
+    },
+    "yellowSaturation": {
+     "label": "彩度"
+    }
+   }
+  },
   "huesaturation": {
    "description": "色相環上で色を回転させ、鮮やかさを強めたり弱めたりします。バイブランスは淡い色ほど大きく強調します。",
    "name": "色相と彩度",
@@ -2907,6 +3123,9 @@
    "description": "しきい値より明るい部分の周囲に色付きのグローを加えます。",
    "name": "ライトグロー",
    "params": {
+    "blend": {
+     "label": "ブレンド"
+    },
     "blur": {
      "label": "サイズ"
     },
@@ -3097,6 +3316,9 @@
     },
     "reach": {
      "label": "長さ"
+    },
+    "solidity": {
+     "label": "密度"
     }
    }
   },
@@ -5117,6 +5339,9 @@
     },
     "opacity": {
      "label": "不透明度"
+    },
+    "outside": {
+     "label": "外側のグロー"
     }
    }
   },

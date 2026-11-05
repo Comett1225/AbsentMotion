@@ -744,6 +744,9 @@
    "description": "Loại bỏ một màu, chẳng hạn phông xanh.",
    "name": "Chroma Key",
    "params": {
+    "defringe": {
+     "label": "Khử viền màu"
+    },
     "invert": {
      "label": "Đảo ngược"
     },
@@ -1292,6 +1295,57 @@
     }
    }
   },
+  "deepglow": {
+   "description": "Quầng sáng rực, đậm và lan xa: lõi sáng mạnh sát lớp, mờ dần mượt mà thành làn sương rộng và mềm.",
+   "name": "Phát sáng sâu",
+   "params": {
+    "blur": {
+     "label": "Bán kính"
+    },
+    "falloff": {
+     "label": "Độ suy giảm"
+    },
+    "high": {
+     "label": "Ngưỡng trên"
+    },
+    "hue": {
+     "label": "Dịch sắc độ"
+    },
+    "intensity": {
+     "label": "Cường độ"
+    },
+    "limit": {
+     "label": "Ngưỡng"
+    },
+    "low": {
+     "label": "Ngưỡng dưới"
+    },
+    "opacity": {
+     "label": "Độ mờ phát sáng"
+    },
+    "original": {
+     "label": "Độ mờ gốc"
+    },
+    "outside": {
+     "label": "Phát sáng bên ngoài"
+    },
+    "saturation": {
+     "label": "Độ bão hòa"
+    },
+    "softness": {
+     "label": "Độ mềm ngưỡng"
+    },
+    "tint": {
+     "label": "Màu phủ"
+    },
+    "tintAmount": {
+     "label": "Độ phủ màu"
+    },
+    "vibrance": {
+     "label": "Độ sống động"
+    }
+   }
+  },
   "denoise": {
    "description": "Loại bỏ nhiễu hình ảnh bằng bộ lọc song phương giữ cạnh, chỉ lấy trung bình các pixel gần nhau khi màu của chúng giống nhau.",
    "name": "Khử nhiễu",
@@ -1443,6 +1497,27 @@
     }
    }
   },
+  "dropshadow": {
+   "description": "Vẽ bóng mềm theo hình dạng của lớp ở phía sau nó, dịch chuyển bằng Độ lệch X và Độ lệch Y.",
+   "name": "Bóng đổ",
+   "params": {
+    "blur": {
+     "label": "Độ mềm"
+    },
+    "color": {
+     "label": "Màu"
+    },
+    "opacity": {
+     "label": "Độ mờ"
+    },
+    "x": {
+     "label": "Độ lệch X"
+    },
+    "y": {
+     "label": "Độ lệch Y"
+    }
+   }
+  },
   "duotone": {
    "description": "Áp dụng bản đồ chuyển màu hai màu dựa trên độ sáng, với điều khiển độ tương phản và mức độ.",
    "name": "Hai tông",
@@ -1502,17 +1577,35 @@
     "blur": {
      "label": "Làm mờ"
     },
+    "brightness": {
+     "label": "Độ sáng"
+    },
     "color": {
      "label": "Màu"
     },
+    "edges": {
+     "label": "Cường độ cạnh"
+    },
+    "gamma": {
+     "label": "Gamma"
+    },
     "invert": {
      "label": "Đảo ngược"
+    },
+    "own": {
+     "label": "Màu hình ảnh"
     },
     "spread": {
      "label": "Độ lan"
     },
     "threshold": {
      "label": "Ngưỡng"
+    },
+    "tint": {
+     "label": "Độ phủ màu"
+    },
+    "tintColor": {
+     "label": "Màu phủ"
     }
    }
   },
@@ -1576,6 +1669,9 @@
     },
     "seed": {
      "label": "Hạt giống"
+    },
+    "strength": {
+     "label": "Độ mạnh"
     },
     "thickness": {
      "label": "Độ dày"
@@ -1993,8 +2089,20 @@
     "evolution": {
      "label": "Tiến triển"
     },
+    "intensity": {
+     "label": "Độ mạnh"
+    },
+    "offset": {
+     "label": "Độ lệch"
+    },
+    "parallax": {
+     "label": "Thị sai"
+    },
     "scale": {
      "label": "Tỷ lệ"
+    },
+    "screenSpace": {
+     "label": "Không gian màn hình"
     },
     "seed": {
      "label": "Hạt ngẫu nhiên"
@@ -2198,6 +2306,9 @@
     },
     "reverse": {
      "label": "Đảo ngược"
+    },
+    "saturation": {
+     "label": "Độ bão hòa"
     },
     "scaleBrightness": {
      "label": "Nhân độ sáng"
@@ -2717,6 +2828,111 @@
     }
    }
   },
+  "hsl": {
+   "description": "Thay đổi sắc độ, độ bão hòa và độ sáng màu của từng dải màu (đỏ, cam, lục, v.v.) mà không ảnh hưởng đến các màu khác.",
+   "name": "HSL",
+   "params": {
+    "blend": {
+     "label": "Hòa trộn",
+     "options": [
+      "Thường",
+      "Nhân",
+      "Màn hình"
+     ]
+    },
+    "blueHue": {
+     "label": "Sắc độ"
+    },
+    "blueLightness": {
+     "label": "Độ sáng màu"
+    },
+    "blueSaturation": {
+     "label": "Độ bão hòa"
+    },
+    "brightness": {
+     "label": "Độ sáng"
+    },
+    "cyanHue": {
+     "label": "Sắc độ"
+    },
+    "cyanLightness": {
+     "label": "Độ sáng màu"
+    },
+    "cyanSaturation": {
+     "label": "Độ bão hòa"
+    },
+    "greenHue": {
+     "label": "Sắc độ"
+    },
+    "greenLightness": {
+     "label": "Độ sáng màu"
+    },
+    "greenSaturation": {
+     "label": "Độ bão hòa"
+    },
+    "magentaHue": {
+     "label": "Sắc độ"
+    },
+    "magentaLightness": {
+     "label": "Độ sáng màu"
+    },
+    "magentaSaturation": {
+     "label": "Độ bão hòa"
+    },
+    "opacity": {
+     "label": "Độ mờ"
+    },
+    "orangeHue": {
+     "label": "Sắc độ"
+    },
+    "orangeLightness": {
+     "label": "Độ sáng màu"
+    },
+    "orangeSaturation": {
+     "label": "Độ bão hòa"
+    },
+    "purpleHue": {
+     "label": "Sắc độ"
+    },
+    "purpleLightness": {
+     "label": "Độ sáng màu"
+    },
+    "purpleSaturation": {
+     "label": "Độ bão hòa"
+    },
+    "range": {
+     "label": "Màu",
+     "options": [
+      "Đỏ",
+      "Cam",
+      "Vàng",
+      "Lục",
+      "Lục lam",
+      "Lam",
+      "Tím",
+      "Đỏ tía"
+     ]
+    },
+    "redHue": {
+     "label": "Sắc độ"
+    },
+    "redLightness": {
+     "label": "Độ sáng màu"
+    },
+    "redSaturation": {
+     "label": "Độ bão hòa"
+    },
+    "yellowHue": {
+     "label": "Sắc độ"
+    },
+    "yellowLightness": {
+     "label": "Độ sáng màu"
+    },
+    "yellowSaturation": {
+     "label": "Độ bão hòa"
+    }
+   }
+  },
   "huesaturation": {
    "description": "Xoay màu quanh vòng màu và làm màu mạnh hơn hoặc yếu đi; độ rực tăng mạnh nhất ở các màu kém tươi.",
    "name": "Sắc độ & độ bão hòa",
@@ -2907,6 +3123,9 @@
    "description": "Thêm quầng sáng màu quanh những phần của hình ảnh sáng hơn ngưỡng.",
    "name": "Quầng sáng",
    "params": {
+    "blend": {
+     "label": "Hòa trộn"
+    },
     "blur": {
      "label": "Kích thước"
     },
@@ -3097,6 +3316,9 @@
     },
     "reach": {
      "label": "Độ dài"
+    },
+    "solidity": {
+     "label": "Độ đặc"
     }
    }
   },
@@ -5117,6 +5339,9 @@
     },
     "opacity": {
      "label": "Độ mờ"
+    },
+    "outside": {
+     "label": "Phát sáng bên ngoài"
     }
    }
   },

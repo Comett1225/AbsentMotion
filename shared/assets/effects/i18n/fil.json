@@ -744,6 +744,9 @@
    "description": "Tinatanggal ang isang kulay, tulad ng green screen.",
    "name": "Chroma key",
    "params": {
+    "defringe": {
+     "label": "Linisin ang gilid"
+    },
     "invert": {
      "label": "I-invert"
     },
@@ -1292,6 +1295,57 @@
     }
    }
   },
+  "deepglow": {
+   "description": "Malakas at maliwanag na glow na kumakalat nang malayo: mainit na core malapit sa layer na unti-unting nagiging malawak at malambot na hamog.",
+   "name": "Malalim na Glow",
+   "params": {
+    "blur": {
+     "label": "Radius"
+    },
+    "falloff": {
+     "label": "Falloff"
+    },
+    "high": {
+     "label": "Mataas na threshold"
+    },
+    "hue": {
+     "label": "Pagbabago ng hue"
+    },
+    "intensity": {
+     "label": "Tindi"
+    },
+    "limit": {
+     "label": "Threshold"
+    },
+    "low": {
+     "label": "Mababang threshold"
+    },
+    "opacity": {
+     "label": "Opacity ng glow"
+    },
+    "original": {
+     "label": "Orihinal na opacity"
+    },
+    "outside": {
+     "label": "Glow sa labas"
+    },
+    "saturation": {
+     "label": "Saturation"
+    },
+    "softness": {
+     "label": "Lambot ng threshold"
+    },
+    "tint": {
+     "label": "Kulay ng tint"
+    },
+    "tintAmount": {
+     "label": "Tint"
+    },
+    "vibrance": {
+     "label": "Vibrance"
+    }
+   }
+  },
   "denoise": {
    "description": "Tinatanggal ang noise ng larawan gamit ang edge-preserving bilateral filter na nag-a-average ng malapit na pixel kapag magkatulad ang kanilang kulay.",
    "name": "Bawas ingay",
@@ -1443,6 +1497,27 @@
     }
    }
   },
+  "dropshadow": {
+   "description": "Gumuguhit ng malambot na anino ng hugis ng layer sa likod nito, na inililipat ng Offset X at Offset Y.",
+   "name": "Drop Shadow",
+   "params": {
+    "blur": {
+     "label": "Lambot"
+    },
+    "color": {
+     "label": "Kulay"
+    },
+    "opacity": {
+     "label": "Opacity"
+    },
+    "x": {
+     "label": "Offset X"
+    },
+    "y": {
+     "label": "Offset Y"
+    }
+   }
+  },
   "duotone": {
    "description": "Naglalapat ng gradient map na may dalawang kulay batay sa liwanag, may kontrol sa kontrast at dami.",
    "name": "Dalawang tono",
@@ -1502,17 +1577,35 @@
     "blur": {
      "label": "Blur"
     },
+    "brightness": {
+     "label": "Liwanag"
+    },
     "color": {
      "label": "Kulay"
     },
+    "edges": {
+     "label": "Lakas ng gilid"
+    },
+    "gamma": {
+     "label": "Gamma"
+    },
     "invert": {
      "label": "I-invert"
+    },
+    "own": {
+     "label": "Kulay ng larawan"
     },
     "spread": {
      "label": "Spread"
     },
     "threshold": {
      "label": "Threshold"
+    },
+    "tint": {
+     "label": "Tint"
+    },
+    "tintColor": {
+     "label": "Kulay ng tint"
     }
    }
   },
@@ -1576,6 +1669,9 @@
     },
     "seed": {
      "label": "Seed"
+    },
+    "strength": {
+     "label": "Lakas"
     },
     "thickness": {
      "label": "Kapal"
@@ -1993,8 +2089,20 @@
     "evolution": {
      "label": "Evolution"
     },
+    "intensity": {
+     "label": "Tindi"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "parallax": {
+     "label": "Parallax"
+    },
     "scale": {
      "label": "Scale"
+    },
+    "screenSpace": {
+     "label": "Screen space"
     },
     "seed": {
      "label": "Seed"
@@ -2198,6 +2306,9 @@
     },
     "reverse": {
      "label": "Baliktarin"
+    },
+    "saturation": {
+     "label": "Saturation"
     },
     "scaleBrightness": {
      "label": "I-scale ang liwanag"
@@ -2717,6 +2828,111 @@
     }
    }
   },
+  "hsl": {
+   "description": "Isa-isang binabago ang hue, saturation at lightness ng bawat hanay ng kulay (pula, kahel, berde at iba pa) nang hindi ginagalaw ang ibang kulay.",
+   "name": "HSL",
+   "params": {
+    "blend": {
+     "label": "Blend",
+     "options": [
+      "Normal",
+      "Multiply",
+      "Screen"
+     ]
+    },
+    "blueHue": {
+     "label": "Hue"
+    },
+    "blueLightness": {
+     "label": "Lightness"
+    },
+    "blueSaturation": {
+     "label": "Saturation"
+    },
+    "brightness": {
+     "label": "Liwanag"
+    },
+    "cyanHue": {
+     "label": "Hue"
+    },
+    "cyanLightness": {
+     "label": "Lightness"
+    },
+    "cyanSaturation": {
+     "label": "Saturation"
+    },
+    "greenHue": {
+     "label": "Hue"
+    },
+    "greenLightness": {
+     "label": "Lightness"
+    },
+    "greenSaturation": {
+     "label": "Saturation"
+    },
+    "magentaHue": {
+     "label": "Hue"
+    },
+    "magentaLightness": {
+     "label": "Lightness"
+    },
+    "magentaSaturation": {
+     "label": "Saturation"
+    },
+    "opacity": {
+     "label": "Opacity"
+    },
+    "orangeHue": {
+     "label": "Hue"
+    },
+    "orangeLightness": {
+     "label": "Lightness"
+    },
+    "orangeSaturation": {
+     "label": "Saturation"
+    },
+    "purpleHue": {
+     "label": "Hue"
+    },
+    "purpleLightness": {
+     "label": "Lightness"
+    },
+    "purpleSaturation": {
+     "label": "Saturation"
+    },
+    "range": {
+     "label": "Kulay",
+     "options": [
+      "Pula",
+      "Kahel",
+      "Dilaw",
+      "Berde",
+      "Cyan",
+      "Asul",
+      "Lila",
+      "Magenta"
+     ]
+    },
+    "redHue": {
+     "label": "Hue"
+    },
+    "redLightness": {
+     "label": "Lightness"
+    },
+    "redSaturation": {
+     "label": "Saturation"
+    },
+    "yellowHue": {
+     "label": "Hue"
+    },
+    "yellowLightness": {
+     "label": "Lightness"
+    },
+    "yellowSaturation": {
+     "label": "Saturation"
+    }
+   }
+  },
   "huesaturation": {
    "description": "Iniikot ang mga kulay sa color wheel at ginagawang mas malakas o mahina; pinapalakas ng vibrance ang pinakamaputlang kulay.",
    "name": "Hue at Saturation",
@@ -2907,6 +3123,9 @@
    "description": "Nagdadagdag ng kulay na glow sa mga bahagi ng larawan na mas maliwanag kaysa sa threshold.",
    "name": "Glow ng ilaw",
    "params": {
+    "blend": {
+     "label": "Blend"
+    },
     "blur": {
      "label": "Laki"
     },
@@ -3097,6 +3316,9 @@
     },
     "reach": {
      "label": "Haba"
+    },
+    "solidity": {
+     "label": "Solidity"
     }
    }
   },
@@ -5117,6 +5339,9 @@
     },
     "opacity": {
      "label": "Opacity"
+    },
+    "outside": {
+     "label": "Glow sa labas"
     }
    }
   },

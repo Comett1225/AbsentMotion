@@ -12,6 +12,7 @@
   },
   "effects": {
     "huesaturation": {"photo": "colour", "params": {"hue": 120, "saturation": 1.3}, "split": 0.4},
+    "hsl": {"photo": "colour", "params": {"redSaturation": -100, "orangeSaturation": -100, "yellowSaturation": -100, "greenHue": 100, "greenSaturation": 100, "blueHue": -100, "blueSaturation": 100, "purpleSaturation": -100, "magentaSaturation": -100}, "split": 0.4},
     "brightnesscontrast": {"photo": "landscape", "params": {"brightness": 0.05, "contrast": 0.45}, "split": 0.4},
     "solid": {"photo": "portrait", "params": {"amount": 0.55}},
     "backdrop": {"photo": "colour", "under": "landscape", "split": 0.4},
@@ -46,6 +47,7 @@
     "glow": {"photo": "flower", "half": 120, "shape": ".circle", "params": {"radius": 40, "alpha": 0.7}},
     "lightglow": {"photo": "sunset", "params": {"blur": 24, "threshold": 0.55}},
     "softglow": {"photo": "flower", "params": {"blur": 12}, "split": 0.4},
+    "deepglow": {"photo": "flower", "params": {"blur": 60, "intensity": 1.5}, "split": 0.4},
     "edgedetect": {"photo": "landscape", "params": {"strength": 1.5}},
     "emboss": {"photo": "detail", "params": {"strength": 2}},
     "halftone": {"photo": "portrait", "params": {"cell": 8}},
@@ -155,6 +157,7 @@
     "mosaic": {"photo": "colour", "params": {"count": 9}},
     "pixeltiles": {"photo": "colour", "params": {"tile": 12, "original": true}},
     "longshadow": {"photo": "colour", "layout": "move", "params": {"reach": 200, "alpha": 0.8, "fade": 0.3}},
+    "dropshadow": {"photo": "colour", "layout": "move", "params": {"x": 40, "y": 40, "blur": 30, "opacity": 0.8}},
     "radialshadow": {"photo": "colour", "layout": "move", "params": {"light": [-0.7, -0.7], "reach": 0.8, "alpha": 0.8}},
     "linearstreaks": {"photo": "colour", "layout": "move", "params": {"angle": 30, "reach": 120}},
     "spinblur": {"photo": "colour", "params": {"sweep": 20}},

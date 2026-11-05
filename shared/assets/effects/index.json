@@ -1,5 +1,6 @@
 [
  "huesaturation",
+ "hsl",
  "brightnesscontrast",
  "solid",
  "backdrop",
@@ -74,6 +75,7 @@
  "glow",
  "lightglow",
  "softglow",
+ "deepglow",
  "innerglow",
  "edgeglow",
  "contourlines",
@@ -93,6 +95,7 @@
  "ascii",
  "lensflare",
  "longshadow",
+ "dropshadow",
  "radialshadow",
  "pixelate",
  "mosaic",

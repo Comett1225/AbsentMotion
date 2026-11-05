@@ -48,7 +48,16 @@
    "max": 1,
    "step": 0.001,
    "percent": true
+  },
+  {
+   "id": "solidity",
+   "label": "Solidity",
+   "type": "float",
+   "default": 1.0,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float angle;\nuniform float reach;\nlayout(color) uniform half4 color;\nuniform float alpha;\nuniform float fade;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    float a = radians(angle);\n    float2 d = float2(cos(a), sin(a)) * reach;\n    float shade = 0.0;\n    for (int i = 1; i <= 64; i++) {\n        float t = float(i) / 64.0;\n        float hit = float(image.eval(coord - d * t).a) * (1.0 - fade * t);\n        shade = max(shade, hit);\n    }\n    float sa = shade * clamp(alpha, 0.0, 1.0) * float(color.a);\n    half4 s = half4(half3(color.rgb) * half(sa), half(sa));\n    return src + s * (1.0 - src.a);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float angle;\nuniform float reach;\nlayout(color) uniform half4 color;\nuniform float alpha;\nuniform float fade;\nuniform float solidity;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    float a = radians(angle);\n    float2 d = float2(cos(a), sin(a)) * reach;\n    float shade = 0.0;\n    for (int i = 1; i <= 64; i++) {\n        float t = float(i) / 64.0;\n        float hit = float(image.eval(coord - d * t).a) * (1.0 - fade * t) * (1.0 - pow(1.0 - clamp(solidity, 0.0, 1.0), 1.35 + 4.15 * (1.0 - t)));\n        shade = max(shade, hit);\n    }\n    float sa = shade * clamp(alpha, 0.0, 1.0) * float(color.a);\n    half4 s = half4(half3(color.rgb) * half(sa), half(sa));\n    return src + s * (1.0 - src.a);\n}\n"
 }

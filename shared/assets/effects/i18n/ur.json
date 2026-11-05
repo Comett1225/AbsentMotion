@@ -744,6 +744,9 @@
    "description": "ایک رنگ ہٹاتا ہے، جیسے گرین اسکرین۔",
    "name": "کرومیا کی",
    "params": {
+    "defringe": {
+     "label": "کنارے صاف کریں"
+    },
     "invert": {
      "label": "انورٹ"
     },
@@ -1292,6 +1295,57 @@
     }
    }
   },
+  "deepglow": {
+   "description": "دور تک پھیلنے والا گہرا، روشن گلو: لیئر کے قریب تیز مرکز جو آہستہ آہستہ چوڑی، نرم دھند میں مدھم ہو جاتا ہے۔",
+   "name": "ڈیپ گلو",
+   "params": {
+    "blur": {
+     "label": "ریڈیس"
+    },
+    "falloff": {
+     "label": "فال آف"
+    },
+    "high": {
+     "label": "اوپری تھریشولڈ"
+    },
+    "hue": {
+     "label": "ہیو شفٹ"
+    },
+    "intensity": {
+     "label": "شدت"
+    },
+    "limit": {
+     "label": "تھریشولڈ"
+    },
+    "low": {
+     "label": "نچلا تھریشولڈ"
+    },
+    "opacity": {
+     "label": "گلو اوپیسٹی"
+    },
+    "original": {
+     "label": "اصل اوپیسٹی"
+    },
+    "outside": {
+     "label": "بیرونی گلو"
+    },
+    "saturation": {
+     "label": "سیچوریشن"
+    },
+    "softness": {
+     "label": "تھریشولڈ کی نرمی"
+    },
+    "tint": {
+     "label": "ٹنٹ رنگ"
+    },
+    "tintAmount": {
+     "label": "ٹنٹ"
+    },
+    "vibrance": {
+     "label": "وائبرنس"
+    }
+   }
+  },
   "denoise": {
    "description": "تصویر کا نوائز دور کرتا ہے، ایج محفوظ رکھنے والے بائی لیٹرل فلٹر سے جو قریبی پکسلز کو صرف اسی وقت ملاتا ہے جب ان کے رنگ ملتے جلتے ہوں۔",
    "name": "ڈینائز",
@@ -1443,6 +1497,27 @@
     }
    }
   },
+  "dropshadow": {
+   "description": "لیئر کی شکل کا نرم شیڈو اس کے پیچھے بناتا ہے، جسے آفسیٹ X اور آفسیٹ Y سے سرکایا جاتا ہے۔",
+   "name": "ڈراپ شیڈو",
+   "params": {
+    "blur": {
+     "label": "نرمی"
+    },
+    "color": {
+     "label": "رنگ"
+    },
+    "opacity": {
+     "label": "اوپیسٹی"
+    },
+    "x": {
+     "label": "آفسیٹ X"
+    },
+    "y": {
+     "label": "آفسیٹ Y"
+    }
+   }
+  },
   "duotone": {
    "description": "لوما نینس کی بنیاد پر دو رنگوں کا گریڈینٹ میپ لگاتا ہے، کنٹراسٹ اور مقدار کنٹرولز کے ساتھ۔",
    "name": "ڈیوٹون",
@@ -1502,17 +1577,35 @@
     "blur": {
      "label": "بلر"
     },
+    "brightness": {
+     "label": "برائٹنس"
+    },
     "color": {
      "label": "رنگ"
     },
+    "edges": {
+     "label": "کنارے کی شدت"
+    },
+    "gamma": {
+     "label": "گاما"
+    },
     "invert": {
      "label": "اِنورٹ"
+    },
+    "own": {
+     "label": "تصویر کا رنگ"
     },
     "spread": {
      "label": "پھیلاؤ"
     },
     "threshold": {
      "label": "تھریشولڈ"
+    },
+    "tint": {
+     "label": "ٹنٹ"
+    },
+    "tintColor": {
+     "label": "ٹنٹ رنگ"
     }
    }
   },
@@ -1576,6 +1669,9 @@
     },
     "seed": {
      "label": "سیڈ"
+    },
+    "strength": {
+     "label": "شدت"
     },
     "thickness": {
      "label": "موٹائی"
@@ -1993,8 +2089,20 @@
     "evolution": {
      "label": "ایوولوشن"
     },
+    "intensity": {
+     "label": "شدت"
+    },
+    "offset": {
+     "label": "آفسیٹ"
+    },
+    "parallax": {
+     "label": "پیرالیکس"
+    },
     "scale": {
      "label": "اسکیل"
+    },
+    "screenSpace": {
+     "label": "اسکرین اسپیس"
     },
     "seed": {
      "label": "سیڈ"
@@ -2198,6 +2306,9 @@
     },
     "reverse": {
      "label": "ریورس"
+    },
+    "saturation": {
+     "label": "سیچوریشن"
     },
     "scaleBrightness": {
      "label": "اسکیل برائٹنس"
@@ -2717,6 +2828,111 @@
     }
    }
   },
+  "hsl": {
+   "description": "ایک وقت میں ایک رنگ رینج (سرخ، نارنجی، سبز وغیرہ) کا ہیو، سیچوریشن اور لائٹنس بدلتا ہے اور باقی رنگوں کو نہیں چھیڑتا۔",
+   "name": "HSL",
+   "params": {
+    "blend": {
+     "label": "بلینڈ",
+     "options": [
+      "نارمل",
+      "ملٹی پلائی",
+      "اسکرین"
+     ]
+    },
+    "blueHue": {
+     "label": "ہیو"
+    },
+    "blueLightness": {
+     "label": "لائٹنس"
+    },
+    "blueSaturation": {
+     "label": "سیچوریشن"
+    },
+    "brightness": {
+     "label": "برائٹنس"
+    },
+    "cyanHue": {
+     "label": "ہیو"
+    },
+    "cyanLightness": {
+     "label": "لائٹنس"
+    },
+    "cyanSaturation": {
+     "label": "سیچوریشن"
+    },
+    "greenHue": {
+     "label": "ہیو"
+    },
+    "greenLightness": {
+     "label": "لائٹنس"
+    },
+    "greenSaturation": {
+     "label": "سیچوریشن"
+    },
+    "magentaHue": {
+     "label": "ہیو"
+    },
+    "magentaLightness": {
+     "label": "لائٹنس"
+    },
+    "magentaSaturation": {
+     "label": "سیچوریشن"
+    },
+    "opacity": {
+     "label": "اوپیسٹی"
+    },
+    "orangeHue": {
+     "label": "ہیو"
+    },
+    "orangeLightness": {
+     "label": "لائٹنس"
+    },
+    "orangeSaturation": {
+     "label": "سیچوریشن"
+    },
+    "purpleHue": {
+     "label": "ہیو"
+    },
+    "purpleLightness": {
+     "label": "لائٹنس"
+    },
+    "purpleSaturation": {
+     "label": "سیچوریشن"
+    },
+    "range": {
+     "label": "رنگ",
+     "options": [
+      "سرخ",
+      "نارنجی",
+      "پیلا",
+      "سبز",
+      "سیان",
+      "نیلا",
+      "جامنی",
+      "میجنٹا"
+     ]
+    },
+    "redHue": {
+     "label": "ہیو"
+    },
+    "redLightness": {
+     "label": "لائٹنس"
+    },
+    "redSaturation": {
+     "label": "سیچوریشن"
+    },
+    "yellowHue": {
+     "label": "ہیو"
+    },
+    "yellowLightness": {
+     "label": "لائٹنس"
+    },
+    "yellowSaturation": {
+     "label": "سیچوریشن"
+    }
+   }
+  },
   "huesaturation": {
    "description": "رنگوں کو رنگ چکر میں گھماتا ہے اور انہیں زیادہ یا کم مضبوط بناتا ہے؛ وائبرنس مدھم رنگوں کو سب سے زیادہ نکھارتا ہے۔",
    "name": "ہیو اور سیچوریشن",
@@ -2907,6 +3123,9 @@
    "description": "تصویر کے ان حصوں کے گرد رنگین گلو شامل کرتا ہے جو تھریشولڈ سے زیادہ روشن ہوں۔",
    "name": "لائٹ گلو",
    "params": {
+    "blend": {
+     "label": "بلینڈ"
+    },
     "blur": {
      "label": "سائز"
     },
@@ -3097,6 +3316,9 @@
     },
     "reach": {
      "label": "لمبائی"
+    },
+    "solidity": {
+     "label": "ٹھوس پن"
     }
    }
   },
@@ -5117,6 +5339,9 @@
     },
     "opacity": {
      "label": "اوپیسٹی"
+    },
+    "outside": {
+     "label": "بیرونی گلو"
     }
    }
   },

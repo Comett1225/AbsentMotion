@@ -744,6 +744,9 @@
    "description": "يزيل لونًا واحدًا، مثل الشاشة الخضراء.",
    "name": "مفتاح الكروما",
    "params": {
+    "defringe": {
+     "label": "تنظيف الحواف"
+    },
     "invert": {
      "label": "عكس"
     },
@@ -1292,6 +1295,57 @@
     }
    }
   },
+  "deepglow": {
+   "description": "توهج غني وساطع ينتشر بعيدًا: نواة متقدة قرب الطبقة تتلاشى بسلاسة في ضباب واسع وناعم.",
+   "name": "توهج عميق",
+   "params": {
+    "blur": {
+     "label": "نصف القطر"
+    },
+    "falloff": {
+     "label": "التلاشي"
+    },
+    "high": {
+     "label": "العتبة العليا"
+    },
+    "hue": {
+     "label": "إزاحة درجة اللون"
+    },
+    "intensity": {
+     "label": "الشدة"
+    },
+    "limit": {
+     "label": "العتبة"
+    },
+    "low": {
+     "label": "العتبة الدنيا"
+    },
+    "opacity": {
+     "label": "عتامة التوهج"
+    },
+    "original": {
+     "label": "العتامة الأصلية"
+    },
+    "outside": {
+     "label": "التوهج الخارجي"
+    },
+    "saturation": {
+     "label": "التشبع"
+    },
+    "softness": {
+     "label": "نعومة العتبة"
+    },
+    "tint": {
+     "label": "لون الصبغة"
+    },
+    "tintAmount": {
+     "label": "صبغة"
+    },
+    "vibrance": {
+     "label": "الحيوية"
+    }
+   }
+  },
   "denoise": {
    "description": "يزيل تشويش الصورة بمرشح ثنائي يحافظ على الحواف ويجري متوسطًا للبكسلات القريبة فقط عندما تكون ألوانها متشابهة.",
    "name": "إزالة التشويش",
@@ -1443,6 +1497,27 @@
     }
    }
   },
+  "dropshadow": {
+   "description": "يرسم ظلًا ناعمًا لشكل الطبقة خلفها، ويُحرَّك بالإزاحة X والإزاحة Y.",
+   "name": "ظل ساقط",
+   "params": {
+    "blur": {
+     "label": "النعومة"
+    },
+    "color": {
+     "label": "اللون"
+    },
+    "opacity": {
+     "label": "العتامة"
+    },
+    "x": {
+     "label": "الإزاحة X"
+    },
+    "y": {
+     "label": "الإزاحة Y"
+    }
+   }
+  },
   "duotone": {
    "description": "يطبّق خريطة تدرج بلونين بناءً على الإضاءة مع التحكم في التباين والمقدار.",
    "name": "ثنائي اللون",
@@ -1502,17 +1577,35 @@
     "blur": {
      "label": "تمويه"
     },
+    "brightness": {
+     "label": "السطوع"
+    },
     "color": {
      "label": "لون"
     },
+    "edges": {
+     "label": "قوة الحواف"
+    },
+    "gamma": {
+     "label": "جاما"
+    },
     "invert": {
      "label": "عكس"
+    },
+    "own": {
+     "label": "لون الصورة"
     },
     "spread": {
      "label": "انتشار"
     },
     "threshold": {
      "label": "عتبة"
+    },
+    "tint": {
+     "label": "صبغة"
+    },
+    "tintColor": {
+     "label": "لون الصبغة"
     }
    }
   },
@@ -1576,6 +1669,9 @@
     },
     "seed": {
      "label": "بذرة"
+    },
+    "strength": {
+     "label": "القوة"
     },
     "thickness": {
      "label": "السماكة"
@@ -1993,8 +2089,20 @@
     "evolution": {
      "label": "التطور"
     },
+    "intensity": {
+     "label": "الشدة"
+    },
+    "offset": {
+     "label": "الإزاحة"
+    },
+    "parallax": {
+     "label": "اختلاف المنظر"
+    },
     "scale": {
      "label": "المقياس"
+    },
+    "screenSpace": {
+     "label": "مساحة الشاشة"
     },
     "seed": {
      "label": "البذرة"
@@ -2198,6 +2306,9 @@
     },
     "reverse": {
      "label": "عكس"
+    },
+    "saturation": {
+     "label": "التشبع"
     },
     "scaleBrightness": {
      "label": "مضاعف السطوع"
@@ -2717,6 +2828,111 @@
     }
    }
   },
+  "hsl": {
+   "description": "يغيّر درجة اللون والتشبع والإضاءة لنطاق لوني واحد في كل مرة (الأحمر والبرتقالي والأخضر وغيرها) ويترك بقية الألوان كما هي.",
+   "name": "HSL",
+   "params": {
+    "blend": {
+     "label": "دمج",
+     "options": [
+      "عادي",
+      "ضرب",
+      "شاشة"
+     ]
+    },
+    "blueHue": {
+     "label": "درجة اللون"
+    },
+    "blueLightness": {
+     "label": "الإضاءة"
+    },
+    "blueSaturation": {
+     "label": "التشبع"
+    },
+    "brightness": {
+     "label": "السطوع"
+    },
+    "cyanHue": {
+     "label": "درجة اللون"
+    },
+    "cyanLightness": {
+     "label": "الإضاءة"
+    },
+    "cyanSaturation": {
+     "label": "التشبع"
+    },
+    "greenHue": {
+     "label": "درجة اللون"
+    },
+    "greenLightness": {
+     "label": "الإضاءة"
+    },
+    "greenSaturation": {
+     "label": "التشبع"
+    },
+    "magentaHue": {
+     "label": "درجة اللون"
+    },
+    "magentaLightness": {
+     "label": "الإضاءة"
+    },
+    "magentaSaturation": {
+     "label": "التشبع"
+    },
+    "opacity": {
+     "label": "العتامة"
+    },
+    "orangeHue": {
+     "label": "درجة اللون"
+    },
+    "orangeLightness": {
+     "label": "الإضاءة"
+    },
+    "orangeSaturation": {
+     "label": "التشبع"
+    },
+    "purpleHue": {
+     "label": "درجة اللون"
+    },
+    "purpleLightness": {
+     "label": "الإضاءة"
+    },
+    "purpleSaturation": {
+     "label": "التشبع"
+    },
+    "range": {
+     "label": "اللون",
+     "options": [
+      "أحمر",
+      "برتقالي",
+      "أصفر",
+      "أخضر",
+      "سماوي",
+      "أزرق",
+      "بنفسجي",
+      "أرجواني"
+     ]
+    },
+    "redHue": {
+     "label": "درجة اللون"
+    },
+    "redLightness": {
+     "label": "الإضاءة"
+    },
+    "redSaturation": {
+     "label": "التشبع"
+    },
+    "yellowHue": {
+     "label": "درجة اللون"
+    },
+    "yellowLightness": {
+     "label": "الإضاءة"
+    },
+    "yellowSaturation": {
+     "label": "التشبع"
+    }
+   }
+  },
   "huesaturation": {
    "description": "يلف الألوان حول عجلة الألوان ويجعلها أقوى أو أضعف؛ تعزز الحيوية الألوان الباهتة أكثر من غيرها.",
    "name": "درجة اللون والتشبع",
@@ -2907,6 +3123,9 @@
    "description": "يضيف توهجًا ملونًا حول أجزاء الصورة الأكثر سطوعًا من حد معين.",
    "name": "توهج الضوء",
    "params": {
+    "blend": {
+     "label": "دمج"
+    },
     "blur": {
      "label": "الحجم"
     },
@@ -3097,6 +3316,9 @@
     },
     "reach": {
      "label": "طول"
+    },
+    "solidity": {
+     "label": "الكثافة"
     }
    }
   },
@@ -5117,6 +5339,9 @@
     },
     "opacity": {
      "label": "العتامة"
+    },
+    "outside": {
+     "label": "التوهج الخارجي"
     }
    }
   },

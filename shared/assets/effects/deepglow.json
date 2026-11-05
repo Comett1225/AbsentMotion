@@ -1,0 +1,158 @@
+{
+ "id": "deepglow",
+ "name": "Deep Glow",
+ "category": "stylize",
+ "since": "5.0.0",
+ "description": "A rich, bright glow that spreads far: a hot core near the layer that fades smoothly into a wide, soft haze.",
+ "params": [
+  {
+   "id": "blur",
+   "label": "Radius",
+   "type": "float",
+   "default": 60,
+   "min": 0,
+   "max": 500,
+   "step": 0.1
+  },
+  {
+   "id": "intensity",
+   "label": "Intensity",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 10,
+   "step": 0.01
+  },
+  {
+   "id": "falloff",
+   "label": "Falloff",
+   "type": "float",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "opacity",
+   "label": "Glow Opacity",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true
+  },
+  {
+   "id": "original",
+   "label": "Original Opacity",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true
+  },
+  {
+   "id": "outside",
+   "label": "Outside Glow",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true
+  },
+  {
+   "id": "saturation",
+   "label": "Saturation",
+   "type": "float",
+   "default": 0,
+   "min": -1,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "vibrance",
+   "label": "Vibrance",
+   "type": "float",
+   "default": 0,
+   "min": -1,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "hue",
+   "label": "Hue Shift",
+   "type": "angle",
+   "default": 0,
+   "min": -360,
+   "max": 360,
+   "step": 1
+  },
+  {
+   "id": "tint",
+   "label": "Tint Color",
+   "type": "color",
+   "default": "#ffff8a3d"
+  },
+  {
+   "id": "tintAmount",
+   "label": "Tint",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true
+  },
+  {
+   "id": "limit",
+   "label": "Threshold",
+   "type": "switch",
+   "default": false
+  },
+  {
+   "id": "low",
+   "label": "Threshold Low",
+   "type": "float",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "when": {
+    "limit": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "high",
+   "label": "Threshold High",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "when": {
+    "limit": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "softness",
+   "label": "Threshold Softness",
+   "type": "float",
+   "default": 0.1,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "when": {
+    "limit": [
+     1
+    ]
+   }
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform shader blurred;\nuniform float2 size;\nuniform float time;\nuniform float blur;\nuniform float intensity;\nuniform float falloff;\nuniform float opacity;\nuniform float original;\nuniform float outside;\nuniform float saturation;\nuniform float vibrance;\nuniform float hue;\nlayout(color) uniform half4 tint;\nuniform float tintAmount;\nuniform float limit;\nuniform float low;\nuniform float high;\nuniform float softness;\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\nfloat4 pick(float2 p) {\n    float4 g = float4(blurred.eval(p));\n    if (limit > 0.5) {\n        float l = g.a > 0.0 ? luma(g.rgb / g.a) : 0.0;\n        float f = max(softness, 0.001);\n        g *= smoothstep(low - f, low, l) * (1.0 - smoothstep(high, high + f, l));\n    }\n    return g;\n}\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    float reach = max(blur, 0.0) * 2.5;\n    float span = mix(2.5, 0.3, clamp(falloff, 0.0, 1.0));\n    float3 sum = pick(coord).rgb * 16.0;\n    float total = 16.0;\n    float2 d = float2(1.0, 0.0);\n    for (int i = 0; i < 48; i++) {\n        float u = sqrt((float(i) + 0.5) / 48.0);\n        float w = exp(-2.5 * u / span);\n        sum += w * pick(coord + d * u * reach).rgb;\n        total += w;\n        d = float2(d.x * -0.7373688 - d.y * 0.6754903, d.x * 0.6754903 + d.y * -0.7373688);\n    }\n    float3 g = sum / total;\n    float turn = radians(hue);\n    float3 k = float3(0.57735);\n    g = max(g * cos(turn) + cross(k, g) * sin(turn) + k * dot(k, g) * (1.0 - cos(turn)), 0.0);\n    float top = max(g.r, max(g.g, g.b));\n    float chroma = top > 0.0 ? (top - min(g.r, min(g.g, g.b))) / top : 0.0;\n    float y = luma(g);\n    g = max(float3(y) + (g - float3(y)) * (1.0 + saturation) * (1.0 + vibrance * (1.0 - chroma)), 0.0);\n    g = mix(g, luma(g) * float3(tint.rgb), clamp(tintAmount, 0.0, 1.0) * float(tint.a));\n    float3 light = (1.0 - exp(-g * max(intensity, 0.0) * 4.0)) * clamp(opacity, 0.0, 1.0);\n    light *= mix(clamp(outside, 0.0, 1.0), 1.0, float(c.a));\n    float4 base = float4(c) * clamp(original, 0.0, 1.0);\n    float a = base.a + (1.0 - base.a) * max(light.r, max(light.g, light.b));\n    float3 rgb = base.rgb + light - base.rgb * light;\n    return half4(half3(clamp(rgb, 0.0, a)), half(a));\n}"
+}

@@ -744,6 +744,9 @@
    "description": "Yeşil perde gibi tek bir rengi kaldırır.",
    "name": "Kroma Anahtarı",
    "params": {
+    "defringe": {
+     "label": "Kenarları temizle"
+    },
     "invert": {
      "label": "Ters çevir"
     },
@@ -1292,6 +1295,57 @@
     }
    }
   },
+  "deepglow": {
+   "description": "Uzağa yayılan zengin ve parlak bir parıltı: katmanın yanındaki sıcak çekirdek, akıcı biçimde geniş ve yumuşak bir pusa dönüşür.",
+   "name": "Derin Parıltı",
+   "params": {
+    "blur": {
+     "label": "Yarıçap"
+    },
+    "falloff": {
+     "label": "Azalma"
+    },
+    "high": {
+     "label": "Üst eşik"
+    },
+    "hue": {
+     "label": "Ton kayması"
+    },
+    "intensity": {
+     "label": "Yoğunluk"
+    },
+    "limit": {
+     "label": "Eşik"
+    },
+    "low": {
+     "label": "Alt eşik"
+    },
+    "opacity": {
+     "label": "Parıltı opaklığı"
+    },
+    "original": {
+     "label": "Orijinal opaklık"
+    },
+    "outside": {
+     "label": "Dış parıltı"
+    },
+    "saturation": {
+     "label": "Doygunluk"
+    },
+    "softness": {
+     "label": "Eşik yumuşaklığı"
+    },
+    "tint": {
+     "label": "Ton rengi"
+    },
+    "tintAmount": {
+     "label": "Ton"
+    },
+    "vibrance": {
+     "label": "Canlılık"
+    }
+   }
+  },
   "denoise": {
    "description": "Kenarları koruyan ve yakındaki pikselleri yalnızca renkleri benzer olduğunda ortalamasını alan iki taraflı filtreyle görüntü gürültüsünü kaldırır.",
    "name": "Gürültü Azaltma",
@@ -1443,6 +1497,27 @@
     }
    }
   },
+  "dropshadow": {
+   "description": "Katmanın şeklinin yumuşak bir gölgesini arkasına çizer; Ofset X ve Ofset Y ile kaydırılır.",
+   "name": "Alt gölge",
+   "params": {
+    "blur": {
+     "label": "Yumuşaklık"
+    },
+    "color": {
+     "label": "Renk"
+    },
+    "opacity": {
+     "label": "Opaklık"
+    },
+    "x": {
+     "label": "Ofset X"
+    },
+    "y": {
+     "label": "Ofset Y"
+    }
+   }
+  },
   "duotone": {
    "description": "Parlaklığa göre iki renkli bir gradyan haritası uygular; kontrast ve miktar ayarlanabilir.",
    "name": "İki Ton",
@@ -1502,17 +1577,35 @@
     "blur": {
      "label": "Bulanıklık"
     },
+    "brightness": {
+     "label": "Parlaklık"
+    },
     "color": {
      "label": "Renk"
     },
+    "edges": {
+     "label": "Kenar gücü"
+    },
+    "gamma": {
+     "label": "Gama"
+    },
     "invert": {
      "label": "Ters çevir"
+    },
+    "own": {
+     "label": "Görsel rengi"
     },
     "spread": {
      "label": "Yayılma"
     },
     "threshold": {
      "label": "Eşik"
+    },
+    "tint": {
+     "label": "Ton"
+    },
+    "tintColor": {
+     "label": "Ton rengi"
     }
    }
   },
@@ -1576,6 +1669,9 @@
     },
     "seed": {
      "label": "Tohum"
+    },
+    "strength": {
+     "label": "Güç"
     },
     "thickness": {
      "label": "Kalınlık"
@@ -1993,8 +2089,20 @@
     "evolution": {
      "label": "Evrim"
     },
+    "intensity": {
+     "label": "Yoğunluk"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "parallax": {
+     "label": "Paralaks"
+    },
     "scale": {
      "label": "Ölçek"
+    },
+    "screenSpace": {
+     "label": "Ekran alanı"
     },
     "seed": {
      "label": "Tohum"
@@ -2198,6 +2306,9 @@
     },
     "reverse": {
      "label": "Ters Çevir"
+    },
+    "saturation": {
+     "label": "Doygunluk"
     },
     "scaleBrightness": {
      "label": "Parlaklığı Ölçekle"
@@ -2717,6 +2828,111 @@
     }
    }
   },
+  "hsl": {
+   "description": "Her seferinde tek bir renk aralığının (kırmızılar, turuncular, yeşiller vb.) tonunu, doygunluğunu ve açıklığını değiştirir, diğer renklere dokunmaz.",
+   "name": "HSL",
+   "params": {
+    "blend": {
+     "label": "Karışım",
+     "options": [
+      "Normal",
+      "Çarpma",
+      "Ekran"
+     ]
+    },
+    "blueHue": {
+     "label": "Ton"
+    },
+    "blueLightness": {
+     "label": "Açıklık"
+    },
+    "blueSaturation": {
+     "label": "Doygunluk"
+    },
+    "brightness": {
+     "label": "Parlaklık"
+    },
+    "cyanHue": {
+     "label": "Ton"
+    },
+    "cyanLightness": {
+     "label": "Açıklık"
+    },
+    "cyanSaturation": {
+     "label": "Doygunluk"
+    },
+    "greenHue": {
+     "label": "Ton"
+    },
+    "greenLightness": {
+     "label": "Açıklık"
+    },
+    "greenSaturation": {
+     "label": "Doygunluk"
+    },
+    "magentaHue": {
+     "label": "Ton"
+    },
+    "magentaLightness": {
+     "label": "Açıklık"
+    },
+    "magentaSaturation": {
+     "label": "Doygunluk"
+    },
+    "opacity": {
+     "label": "Opaklık"
+    },
+    "orangeHue": {
+     "label": "Ton"
+    },
+    "orangeLightness": {
+     "label": "Açıklık"
+    },
+    "orangeSaturation": {
+     "label": "Doygunluk"
+    },
+    "purpleHue": {
+     "label": "Ton"
+    },
+    "purpleLightness": {
+     "label": "Açıklık"
+    },
+    "purpleSaturation": {
+     "label": "Doygunluk"
+    },
+    "range": {
+     "label": "Renk",
+     "options": [
+      "Kırmızı",
+      "Turuncu",
+      "Sarı",
+      "Yeşil",
+      "Camgöbeği",
+      "Mavi",
+      "Mor",
+      "Macenta"
+     ]
+    },
+    "redHue": {
+     "label": "Ton"
+    },
+    "redLightness": {
+     "label": "Açıklık"
+    },
+    "redSaturation": {
+     "label": "Doygunluk"
+    },
+    "yellowHue": {
+     "label": "Ton"
+    },
+    "yellowLightness": {
+     "label": "Açıklık"
+    },
+    "yellowSaturation": {
+     "label": "Doygunluk"
+    }
+   }
+  },
   "huesaturation": {
    "description": "Renkleri renk tekerleği etrafında döndürür ve daha güçlü veya zayıf yapar; canlılık en çok soluk renkleri güçlendirir.",
    "name": "Ton ve Doygunluk",
@@ -2907,6 +3123,9 @@
    "description": "Görselin eşikten daha parlak kısımlarının çevresine renkli bir parlama ekler.",
    "name": "Işık Parıltısı",
    "params": {
+    "blend": {
+     "label": "Karışım"
+    },
     "blur": {
      "label": "Boyut"
     },
@@ -3097,6 +3316,9 @@
     },
     "reach": {
      "label": "Uzunluk"
+    },
+    "solidity": {
+     "label": "Doluluk"
     }
    }
   },
@@ -5117,6 +5339,9 @@
     },
     "opacity": {
      "label": "Opaklık"
+    },
+    "outside": {
+     "label": "Dış parıltı"
     }
    }
   },

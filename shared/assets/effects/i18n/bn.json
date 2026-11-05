@@ -744,6 +744,9 @@
    "description": "একটি কালার সরিয়ে দেয়, যেমন গ্রিন স্ক্রিন।",
    "name": "ক্রোমা কী",
    "params": {
+    "defringe": {
+     "label": "ডিফ্রিঞ্জ"
+    },
     "invert": {
      "label": "ইনভার্ট"
     },
@@ -1292,6 +1295,57 @@
     }
    }
   },
+  "deepglow": {
+   "description": "দূর পর্যন্ত ছড়িয়ে পড়া গাঢ়, উজ্জ্বল গ্লো: লেয়ারের কাছে তীব্র কোর, যা ধীরে ধীরে চওড়া, নরম কুয়াশায় মিলিয়ে যায়।",
+   "name": "ডিপ গ্লো",
+   "params": {
+    "blur": {
+     "label": "রেডিয়াস"
+    },
+    "falloff": {
+     "label": "ফলঅফ"
+    },
+    "high": {
+     "label": "হাই থ্রেশহোল্ড"
+    },
+    "hue": {
+     "label": "হিউ শিফট"
+    },
+    "intensity": {
+     "label": "ইনটেনসিটি"
+    },
+    "limit": {
+     "label": "থ্রেশহোল্ড"
+    },
+    "low": {
+     "label": "লো থ্রেশহোল্ড"
+    },
+    "opacity": {
+     "label": "গ্লো অপাসিটি"
+    },
+    "original": {
+     "label": "মূল অপাসিটি"
+    },
+    "outside": {
+     "label": "বাইরের গ্লো"
+    },
+    "saturation": {
+     "label": "স্যাচুরেশন"
+    },
+    "softness": {
+     "label": "থ্রেশহোল্ড সফটনেস"
+    },
+    "tint": {
+     "label": "টিন্ট কালার"
+    },
+    "tintAmount": {
+     "label": "টিন্ট"
+    },
+    "vibrance": {
+     "label": "ভাইব্রেন্স"
+    }
+   }
+  },
   "denoise": {
    "description": "প্রান্ত রক্ষা করে এমন বাইল্যাটারাল ফিল্টার দিয়ে ইমেজের নয়েজ সরায়, যা কেবল কাছাকাছি পিক্সেলের কালার মিললে সেগুলো গড় করে।",
    "name": "ডিনয়েজ",
@@ -1443,6 +1497,27 @@
     }
    }
   },
+  "dropshadow": {
+   "description": "লেয়ারের আকৃতির একটি নরম শ্যাডো পেছনে আঁকে, যা অফসেট X ও অফসেট Y দিয়ে সরানো যায়।",
+   "name": "ড্রপ শ্যাডো",
+   "params": {
+    "blur": {
+     "label": "সফটনেস"
+    },
+    "color": {
+     "label": "কালার"
+    },
+    "opacity": {
+     "label": "অপাসিটি"
+    },
+    "x": {
+     "label": "অফসেট X"
+    },
+    "y": {
+     "label": "অফসেট Y"
+    }
+   }
+  },
   "duotone": {
    "description": "লুমিন্যান্সের ভিত্তিতে দুই রঙের গ্রেডিয়েন্ট ম্যাপ প্রয়োগ করে, সাথে কনট্রাস্ট ও অ্যামাউন্ট নিয়ন্ত্রণ।",
    "name": "ডুওটোন",
@@ -1502,17 +1577,35 @@
     "blur": {
      "label": "ব্লার"
     },
+    "brightness": {
+     "label": "ব্রাইটনেস"
+    },
     "color": {
      "label": "কালার"
     },
+    "edges": {
+     "label": "এজ স্ট্রেংথ"
+    },
+    "gamma": {
+     "label": "গামা"
+    },
     "invert": {
      "label": "ইনভার্ট"
+    },
+    "own": {
+     "label": "ইমেজ কালার"
     },
     "spread": {
      "label": "স্প্রেড"
     },
     "threshold": {
      "label": "থ্রেশহোল্ড"
+    },
+    "tint": {
+     "label": "টিন্ট"
+    },
+    "tintColor": {
+     "label": "টিন্ট কালার"
     }
    }
   },
@@ -1576,6 +1669,9 @@
     },
     "seed": {
      "label": "সিড"
+    },
+    "strength": {
+     "label": "স্ট্রেংথ"
     },
     "thickness": {
      "label": "থিকনেস"
@@ -1993,8 +2089,20 @@
     "evolution": {
      "label": "ইভোলিউশন"
     },
+    "intensity": {
+     "label": "ইনটেনসিটি"
+    },
+    "offset": {
+     "label": "অফসেট"
+    },
+    "parallax": {
+     "label": "প্যারালাক্স"
+    },
     "scale": {
      "label": "স্কেল"
+    },
+    "screenSpace": {
+     "label": "স্ক্রিন স্পেস"
     },
     "seed": {
      "label": "সিড"
@@ -2198,6 +2306,9 @@
     },
     "reverse": {
      "label": "রিভার্স"
+    },
+    "saturation": {
+     "label": "স্যাচুরেশন"
     },
     "scaleBrightness": {
      "label": "স্কেল ব্রাইটনেস"
@@ -2717,6 +2828,111 @@
     }
    }
   },
+  "hsl": {
+   "description": "একবারে একটি কালার রেঞ্জের (লাল, কমলা, সবুজ ইত্যাদি) হিউ, স্যাচুরেশন ও লাইটনেস বদলায় এবং বাকি কালার অপরিবর্তিত রাখে।",
+   "name": "HSL",
+   "params": {
+    "blend": {
+     "label": "ব্লেন্ড",
+     "options": [
+      "নরমাল",
+      "মাল্টিপ্লাই",
+      "স্ক্রিন"
+     ]
+    },
+    "blueHue": {
+     "label": "হিউ"
+    },
+    "blueLightness": {
+     "label": "লাইটনেস"
+    },
+    "blueSaturation": {
+     "label": "স্যাচুরেশন"
+    },
+    "brightness": {
+     "label": "ব্রাইটনেস"
+    },
+    "cyanHue": {
+     "label": "হিউ"
+    },
+    "cyanLightness": {
+     "label": "লাইটনেস"
+    },
+    "cyanSaturation": {
+     "label": "স্যাচুরেশন"
+    },
+    "greenHue": {
+     "label": "হিউ"
+    },
+    "greenLightness": {
+     "label": "লাইটনেস"
+    },
+    "greenSaturation": {
+     "label": "স্যাচুরেশন"
+    },
+    "magentaHue": {
+     "label": "হিউ"
+    },
+    "magentaLightness": {
+     "label": "লাইটনেস"
+    },
+    "magentaSaturation": {
+     "label": "স্যাচুরেশন"
+    },
+    "opacity": {
+     "label": "অপাসিটি"
+    },
+    "orangeHue": {
+     "label": "হিউ"
+    },
+    "orangeLightness": {
+     "label": "লাইটনেস"
+    },
+    "orangeSaturation": {
+     "label": "স্যাচুরেশন"
+    },
+    "purpleHue": {
+     "label": "হিউ"
+    },
+    "purpleLightness": {
+     "label": "লাইটনেস"
+    },
+    "purpleSaturation": {
+     "label": "স্যাচুরেশন"
+    },
+    "range": {
+     "label": "কালার",
+     "options": [
+      "লাল",
+      "কমলা",
+      "হলুদ",
+      "সবুজ",
+      "সায়ান",
+      "নীল",
+      "বেগুনি",
+      "ম্যাজেন্টা"
+     ]
+    },
+    "redHue": {
+     "label": "হিউ"
+    },
+    "redLightness": {
+     "label": "লাইটনেস"
+    },
+    "redSaturation": {
+     "label": "স্যাচুরেশন"
+    },
+    "yellowHue": {
+     "label": "হিউ"
+    },
+    "yellowLightness": {
+     "label": "লাইটনেস"
+    },
+    "yellowSaturation": {
+     "label": "স্যাচুরেশন"
+    }
+   }
+  },
   "huesaturation": {
    "description": "কালার হুইলের চারপাশে কালার ঘোরায় এবং সেগুলোকে আরও প্রখর বা মৃদু করে; ভাইব্রেন্স ম্লান কালারগুলোকে সবচেয়ে বেশি প্রাণবন্ত করে।",
    "name": "হিউ ও স্যাচুরেশন",
@@ -2907,6 +3123,9 @@
    "description": "ছবির যে অংশ থ্রেশহোল্ডের চেয়ে উজ্জ্বল, তার চারপাশে রঙিন গ্লো যোগ করে।",
    "name": "লাইট গ্লো",
    "params": {
+    "blend": {
+     "label": "ব্লেন্ড"
+    },
     "blur": {
      "label": "সাইজ"
     },
@@ -3097,6 +3316,9 @@
     },
     "reach": {
      "label": "দৈর্ঘ্য"
+    },
+    "solidity": {
+     "label": "সলিডিটি"
     }
    }
   },
@@ -5117,6 +5339,9 @@
     },
     "opacity": {
      "label": "অপাসিটি"
+    },
+    "outside": {
+     "label": "বাইরের গ্লো"
     }
    }
   },

@@ -744,6 +744,9 @@
    "description": "एक कलर हटाता है, जैसे ग्रीन स्क्रीन।",
    "name": "क्रोमा की",
    "params": {
+    "defringe": {
+     "label": "डीफ़्रिंज"
+    },
     "invert": {
      "label": "इनवर्ट"
     },
@@ -1292,6 +1295,57 @@
     }
    }
   },
+  "deepglow": {
+   "description": "दूर तक फैलने वाला गहरा, चमकीला ग्लो: लेयर के पास तेज़ कोर, जो धीरे-धीरे चौड़ी, सॉफ़्ट धुंध में फीका पड़ता है।",
+   "name": "डीप ग्लो",
+   "params": {
+    "blur": {
+     "label": "रेडियस"
+    },
+    "falloff": {
+     "label": "फ़ॉलऑफ़"
+    },
+    "high": {
+     "label": "हाई थ्रेशोल्ड"
+    },
+    "hue": {
+     "label": "ह्यू शिफ़्ट"
+    },
+    "intensity": {
+     "label": "इंटेंसिटी"
+    },
+    "limit": {
+     "label": "थ्रेशोल्ड"
+    },
+    "low": {
+     "label": "लो थ्रेशोल्ड"
+    },
+    "opacity": {
+     "label": "ग्लो ओपेसिटी"
+    },
+    "original": {
+     "label": "ओरिजिनल ओपेसिटी"
+    },
+    "outside": {
+     "label": "बाहरी ग्लो"
+    },
+    "saturation": {
+     "label": "सैचुरेशन"
+    },
+    "softness": {
+     "label": "थ्रेशोल्ड सॉफ़्टनेस"
+    },
+    "tint": {
+     "label": "टिंट कलर"
+    },
+    "tintAmount": {
+     "label": "टिंट"
+    },
+    "vibrance": {
+     "label": "वाइब्रेंस"
+    }
+   }
+  },
   "denoise": {
    "description": "इमेज नॉइज़ को एज-प्रिज़र्विंग बाइलेटरल फ़िल्टर से हटाता है, जो पास के पिक्सल को तभी औसत करता है जब उनके कलर मिलते-जुलते हों।",
    "name": "डीनॉइज़",
@@ -1443,6 +1497,27 @@
     }
    }
   },
+  "dropshadow": {
+   "description": "लेयर के आकार की सॉफ़्ट शैडो उसके पीछे बनाता है, जिसे ऑफ़सेट X और ऑफ़सेट Y से खिसकाया जाता है।",
+   "name": "ड्रॉप शैडो",
+   "params": {
+    "blur": {
+     "label": "सॉफ़्टनेस"
+    },
+    "color": {
+     "label": "कलर"
+    },
+    "opacity": {
+     "label": "ओपेसिटी"
+    },
+    "x": {
+     "label": "ऑफ़सेट X"
+    },
+    "y": {
+     "label": "ऑफ़सेट Y"
+    }
+   }
+  },
   "duotone": {
    "description": "ल्यूमिनेंस के आधार पर कंट्रास्ट और मात्रा नियंत्रण के साथ दो-रंग ग्रेडिएंट मैप लगाता है।",
    "name": "ड्यूटोन",
@@ -1502,17 +1577,35 @@
     "blur": {
      "label": "ब्लर"
     },
+    "brightness": {
+     "label": "ब्राइटनेस"
+    },
     "color": {
      "label": "कलर"
     },
+    "edges": {
+     "label": "एज स्ट्रेंथ"
+    },
+    "gamma": {
+     "label": "गामा"
+    },
     "invert": {
      "label": "इनवर्ट"
+    },
+    "own": {
+     "label": "इमेज कलर"
     },
     "spread": {
      "label": "स्प्रेड"
     },
     "threshold": {
      "label": "थ्रेशोल्ड"
+    },
+    "tint": {
+     "label": "टिंट"
+    },
+    "tintColor": {
+     "label": "टिंट कलर"
     }
    }
   },
@@ -1576,6 +1669,9 @@
     },
     "seed": {
      "label": "सीड"
+    },
+    "strength": {
+     "label": "स्ट्रेंथ"
     },
     "thickness": {
      "label": "मोटाई"
@@ -1993,8 +2089,20 @@
     "evolution": {
      "label": "इवोल्यूशन"
     },
+    "intensity": {
+     "label": "इंटेंसिटी"
+    },
+    "offset": {
+     "label": "ऑफ़सेट"
+    },
+    "parallax": {
+     "label": "पैरालैक्स"
+    },
     "scale": {
      "label": "स्केल"
+    },
+    "screenSpace": {
+     "label": "स्क्रीन स्पेस"
     },
     "seed": {
      "label": "सीड"
@@ -2198,6 +2306,9 @@
     },
     "reverse": {
      "label": "रिवर्स"
+    },
+    "saturation": {
+     "label": "सैचुरेशन"
     },
     "scaleBrightness": {
      "label": "स्केल ब्राइटनेस"
@@ -2717,6 +2828,111 @@
     }
    }
   },
+  "hsl": {
+   "description": "एक बार में एक कलर रेंज (लाल, नारंगी, हरा वगैरह) का ह्यू, सैचुरेशन और लाइटनेस बदलता है और बाकी कलर वैसे ही रहते हैं।",
+   "name": "HSL",
+   "params": {
+    "blend": {
+     "label": "ब्लेंड",
+     "options": [
+      "नॉर्मल",
+      "मल्टीप्लाय",
+      "स्क्रीन"
+     ]
+    },
+    "blueHue": {
+     "label": "ह्यू"
+    },
+    "blueLightness": {
+     "label": "लाइटनेस"
+    },
+    "blueSaturation": {
+     "label": "सैचुरेशन"
+    },
+    "brightness": {
+     "label": "ब्राइटनेस"
+    },
+    "cyanHue": {
+     "label": "ह्यू"
+    },
+    "cyanLightness": {
+     "label": "लाइटनेस"
+    },
+    "cyanSaturation": {
+     "label": "सैचुरेशन"
+    },
+    "greenHue": {
+     "label": "ह्यू"
+    },
+    "greenLightness": {
+     "label": "लाइटनेस"
+    },
+    "greenSaturation": {
+     "label": "सैचुरेशन"
+    },
+    "magentaHue": {
+     "label": "ह्यू"
+    },
+    "magentaLightness": {
+     "label": "लाइटनेस"
+    },
+    "magentaSaturation": {
+     "label": "सैचुरेशन"
+    },
+    "opacity": {
+     "label": "ओपेसिटी"
+    },
+    "orangeHue": {
+     "label": "ह्यू"
+    },
+    "orangeLightness": {
+     "label": "लाइटनेस"
+    },
+    "orangeSaturation": {
+     "label": "सैचुरेशन"
+    },
+    "purpleHue": {
+     "label": "ह्यू"
+    },
+    "purpleLightness": {
+     "label": "लाइटनेस"
+    },
+    "purpleSaturation": {
+     "label": "सैचुरेशन"
+    },
+    "range": {
+     "label": "कलर",
+     "options": [
+      "लाल",
+      "नारंगी",
+      "पीला",
+      "हरा",
+      "सियान",
+      "नीला",
+      "बैंगनी",
+      "मैजेंटा"
+     ]
+    },
+    "redHue": {
+     "label": "ह्यू"
+    },
+    "redLightness": {
+     "label": "लाइटनेस"
+    },
+    "redSaturation": {
+     "label": "सैचुरेशन"
+    },
+    "yellowHue": {
+     "label": "ह्यू"
+    },
+    "yellowLightness": {
+     "label": "लाइटनेस"
+    },
+    "yellowSaturation": {
+     "label": "सैचुरेशन"
+    }
+   }
+  },
   "huesaturation": {
    "description": "कलर व्हील पर कलरों को घुमाता है और उन्हें तेज़ या हल्का करता है; वाइब्रेंस फीके कलरों को सबसे ज़्यादा तेज़ करता है।",
    "name": "ह्यू और सैचुरेशन",
@@ -2907,6 +3123,9 @@
    "description": "तस्वीर के उन हिस्सों के आसपास रंगीन ग्लो जोड़ता है जो थ्रेशोल्ड से ज़्यादा चमकीले हैं।",
    "name": "लाइट ग्लो",
    "params": {
+    "blend": {
+     "label": "ब्लेंड"
+    },
     "blur": {
      "label": "साइज़"
     },
@@ -3097,6 +3316,9 @@
     },
     "reach": {
      "label": "लंबाई"
+    },
+    "solidity": {
+     "label": "सॉलिडिटी"
     }
    }
   },
@@ -5117,6 +5339,9 @@
     },
     "opacity": {
      "label": "ओपेसिटी"
+    },
+    "outside": {
+     "label": "बाहरी ग्लो"
     }
    }
   },

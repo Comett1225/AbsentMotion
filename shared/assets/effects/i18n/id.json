@@ -744,6 +744,9 @@
    "description": "Menghapus satu warna, seperti layar hijau.",
    "name": "Chroma Key",
    "params": {
+    "defringe": {
+     "label": "Bersihkan Tepi"
+    },
     "invert": {
      "label": "Inversi"
     },
@@ -1292,6 +1295,57 @@
     }
    }
   },
+  "deepglow": {
+   "description": "Cahaya terang dan pekat yang menyebar jauh: inti panas di dekat lapisan yang memudar halus menjadi kabut lembut yang luas.",
+   "name": "Cahaya Pekat",
+   "params": {
+    "blur": {
+     "label": "Radius"
+    },
+    "falloff": {
+     "label": "Peluruhan"
+    },
+    "high": {
+     "label": "Ambang Atas"
+    },
+    "hue": {
+     "label": "Pergeseran Hue"
+    },
+    "intensity": {
+     "label": "Intensitas"
+    },
+    "limit": {
+     "label": "Ambang"
+    },
+    "low": {
+     "label": "Ambang Bawah"
+    },
+    "opacity": {
+     "label": "Opasitas Cahaya"
+    },
+    "original": {
+     "label": "Opasitas Asli"
+    },
+    "outside": {
+     "label": "Cahaya Luar"
+    },
+    "saturation": {
+     "label": "Saturasi"
+    },
+    "softness": {
+     "label": "Kelembutan Ambang"
+    },
+    "tint": {
+     "label": "Warna Tint"
+    },
+    "tintAmount": {
+     "label": "Tint"
+    },
+    "vibrance": {
+     "label": "Vibrance"
+    }
+   }
+  },
   "denoise": {
    "description": "Menghilangkan noise gambar dengan filter bilateral yang mempertahankan tepi dan hanya merata-ratakan piksel di sekitarnya jika warnanya mirip.",
    "name": "Penghilang Noise",
@@ -1443,6 +1497,27 @@
     }
    }
   },
+  "dropshadow": {
+   "description": "Menggambar bayangan lembut dari bentuk lapisan di belakangnya, digeser dengan Offset X dan Offset Y.",
+   "name": "Bayangan Jatuh",
+   "params": {
+    "blur": {
+     "label": "Kelembutan"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "opacity": {
+     "label": "Opasitas"
+    },
+    "x": {
+     "label": "Offset X"
+    },
+    "y": {
+     "label": "Offset Y"
+    }
+   }
+  },
   "duotone": {
    "description": "Menerapkan peta gradien dua warna berdasarkan luminansi dengan kontrol kontras dan intensitas.",
    "name": "Duotone",
@@ -1502,17 +1577,35 @@
     "blur": {
      "label": "Blur"
     },
+    "brightness": {
+     "label": "Kecerahan"
+    },
     "color": {
      "label": "Warna"
     },
+    "edges": {
+     "label": "Kekuatan Tepi"
+    },
+    "gamma": {
+     "label": "Gamma"
+    },
     "invert": {
      "label": "Invers"
+    },
+    "own": {
+     "label": "Warna Gambar"
     },
     "spread": {
      "label": "Sebaran"
     },
     "threshold": {
      "label": "Ambang"
+    },
+    "tint": {
+     "label": "Tint"
+    },
+    "tintColor": {
+     "label": "Warna Tint"
     }
    }
   },
@@ -1576,6 +1669,9 @@
     },
     "seed": {
      "label": "Seed"
+    },
+    "strength": {
+     "label": "Kekuatan"
     },
     "thickness": {
      "label": "Ketebalan"
@@ -1993,8 +2089,20 @@
     "evolution": {
      "label": "Evolusi"
     },
+    "intensity": {
+     "label": "Intensitas"
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "parallax": {
+     "label": "Paralaks"
+    },
     "scale": {
      "label": "Skala"
+    },
+    "screenSpace": {
+     "label": "Ruang Layar"
     },
     "seed": {
      "label": "Seed"
@@ -2198,6 +2306,9 @@
     },
     "reverse": {
      "label": "Terbalik"
+    },
+    "saturation": {
+     "label": "Saturasi"
     },
     "scaleBrightness": {
      "label": "Skala kecerahan"
@@ -2717,6 +2828,111 @@
     }
    }
   },
+  "hsl": {
+   "description": "Mengubah hue, saturasi, dan luminans per rentang warna (merah, oranye, hijau, dan seterusnya) tanpa mengubah warna lainnya.",
+   "name": "HSL",
+   "params": {
+    "blend": {
+     "label": "Blending",
+     "options": [
+      "Normal",
+      "Multiply",
+      "Screen"
+     ]
+    },
+    "blueHue": {
+     "label": "Hue"
+    },
+    "blueLightness": {
+     "label": "Luminans"
+    },
+    "blueSaturation": {
+     "label": "Saturasi"
+    },
+    "brightness": {
+     "label": "Kecerahan"
+    },
+    "cyanHue": {
+     "label": "Hue"
+    },
+    "cyanLightness": {
+     "label": "Luminans"
+    },
+    "cyanSaturation": {
+     "label": "Saturasi"
+    },
+    "greenHue": {
+     "label": "Hue"
+    },
+    "greenLightness": {
+     "label": "Luminans"
+    },
+    "greenSaturation": {
+     "label": "Saturasi"
+    },
+    "magentaHue": {
+     "label": "Hue"
+    },
+    "magentaLightness": {
+     "label": "Luminans"
+    },
+    "magentaSaturation": {
+     "label": "Saturasi"
+    },
+    "opacity": {
+     "label": "Opasitas"
+    },
+    "orangeHue": {
+     "label": "Hue"
+    },
+    "orangeLightness": {
+     "label": "Luminans"
+    },
+    "orangeSaturation": {
+     "label": "Saturasi"
+    },
+    "purpleHue": {
+     "label": "Hue"
+    },
+    "purpleLightness": {
+     "label": "Luminans"
+    },
+    "purpleSaturation": {
+     "label": "Saturasi"
+    },
+    "range": {
+     "label": "Warna",
+     "options": [
+      "Merah",
+      "Oranye",
+      "Kuning",
+      "Hijau",
+      "Sian",
+      "Biru",
+      "Ungu",
+      "Magenta"
+     ]
+    },
+    "redHue": {
+     "label": "Hue"
+    },
+    "redLightness": {
+     "label": "Luminans"
+    },
+    "redSaturation": {
+     "label": "Saturasi"
+    },
+    "yellowHue": {
+     "label": "Hue"
+    },
+    "yellowLightness": {
+     "label": "Luminans"
+    },
+    "yellowSaturation": {
+     "label": "Saturasi"
+    }
+   }
+  },
   "huesaturation": {
    "description": "Memutar warna di roda warna dan membuatnya lebih kuat atau lemah; vibrance paling menguatkan warna yang kusam.",
    "name": "Hue & saturasi",
@@ -2907,6 +3123,9 @@
    "description": "Menambahkan cahaya berwarna di sekitar bagian gambar yang lebih terang dari ambang batas.",
    "name": "Pendar cahaya",
    "params": {
+    "blend": {
+     "label": "Blending"
+    },
     "blur": {
      "label": "Ukuran"
     },
@@ -3097,6 +3316,9 @@
     },
     "reach": {
      "label": "Panjang"
+    },
+    "solidity": {
+     "label": "Kepadatan"
     }
    }
   },
@@ -5117,6 +5339,9 @@
     },
     "opacity": {
      "label": "Opasitas"
+    },
+    "outside": {
+     "label": "Cahaya Luar"
     }
    }
   },

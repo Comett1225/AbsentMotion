@@ -744,6 +744,9 @@
    "description": "Membuang satu warna, contohnya skrin hijau.",
    "name": "Kunci Kroma",
    "params": {
+    "defringe": {
+     "label": "Bersihkan Tepi"
+    },
     "invert": {
      "label": "Songsang"
     },
@@ -1292,6 +1295,57 @@
     }
    }
   },
+  "deepglow": {
+   "description": "Cahaya terang dan pekat yang tersebar jauh: teras panas berhampiran lapisan yang pudar dengan lancar menjadi kabus lembut yang luas.",
+   "name": "Cahaya Pekat",
+   "params": {
+    "blur": {
+     "label": "Jejari"
+    },
+    "falloff": {
+     "label": "Susutan"
+    },
+    "high": {
+     "label": "Ambang Atas"
+    },
+    "hue": {
+     "label": "Anjakan Rona"
+    },
+    "intensity": {
+     "label": "Keamatan"
+    },
+    "limit": {
+     "label": "Ambang"
+    },
+    "low": {
+     "label": "Ambang Bawah"
+    },
+    "opacity": {
+     "label": "Kelegapan Cahaya"
+    },
+    "original": {
+     "label": "Kelegapan Asal"
+    },
+    "outside": {
+     "label": "Cahaya Luar"
+    },
+    "saturation": {
+     "label": "Ketepuan"
+    },
+    "softness": {
+     "label": "Kelembutan Ambang"
+    },
+    "tint": {
+     "label": "Warna Tona"
+    },
+    "tintAmount": {
+     "label": "Tona"
+    },
+    "vibrance": {
+     "label": "Kesegaran"
+    }
+   }
+  },
   "denoise": {
    "description": "Membuang hingar imej dengan penapis dwisisi yang mengekalkan tepi, yang memuratakan piksel berdekatan hanya apabila warnanya serupa.",
    "name": "Hilangkan Hingar",
@@ -1443,6 +1497,27 @@
     }
    }
   },
+  "dropshadow": {
+   "description": "Melukis bayang lembut bentuk lapisan di belakangnya, dianjak oleh Ofset X dan Ofset Y.",
+   "name": "Bayang Jatuh",
+   "params": {
+    "blur": {
+     "label": "Kelembutan"
+    },
+    "color": {
+     "label": "Warna"
+    },
+    "opacity": {
+     "label": "Kelegapan"
+    },
+    "x": {
+     "label": "Ofset X"
+    },
+    "y": {
+     "label": "Ofset Y"
+    }
+   }
+  },
   "duotone": {
    "description": "Guna peta kecerunan dua warna berdasarkan kecerahan, dengan kawalan kontras dan jumlah.",
    "name": "Duoton",
@@ -1502,17 +1577,35 @@
     "blur": {
      "label": "Kabur"
     },
+    "brightness": {
+     "label": "Kecerahan"
+    },
     "color": {
      "label": "Warna"
     },
+    "edges": {
+     "label": "Kekuatan Tepi"
+    },
+    "gamma": {
+     "label": "Gama"
+    },
     "invert": {
      "label": "Songsang"
+    },
+    "own": {
+     "label": "Warna Imej"
     },
     "spread": {
      "label": "Sebaran"
     },
     "threshold": {
      "label": "Ambang"
+    },
+    "tint": {
+     "label": "Tona"
+    },
+    "tintColor": {
+     "label": "Warna Tona"
     }
    }
   },
@@ -1576,6 +1669,9 @@
     },
     "seed": {
      "label": "Benih"
+    },
+    "strength": {
+     "label": "Kekuatan"
     },
     "thickness": {
      "label": "Ketebalan"
@@ -1993,8 +2089,20 @@
     "evolution": {
      "label": "Evolusi"
     },
+    "intensity": {
+     "label": "Keamatan"
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "parallax": {
+     "label": "Paralaks"
+    },
     "scale": {
      "label": "Skala"
+    },
+    "screenSpace": {
+     "label": "Ruang Skrin"
     },
     "seed": {
      "label": "Benih"
@@ -2198,6 +2306,9 @@
     },
     "reverse": {
      "label": "Songsang"
+    },
+    "saturation": {
+     "label": "Ketepuan"
     },
     "scaleBrightness": {
      "label": "Skala Kecerahan"
@@ -2717,6 +2828,111 @@
     }
    }
   },
+  "hsl": {
+   "description": "Mengubah rona, ketepuan dan luminans satu julat warna pada satu masa (merah, oren, hijau dan sebagainya) tanpa menjejaskan warna lain.",
+   "name": "HSL",
+   "params": {
+    "blend": {
+     "label": "Campuran",
+     "options": [
+      "Normal",
+      "Darab",
+      "Skrin"
+     ]
+    },
+    "blueHue": {
+     "label": "Rona"
+    },
+    "blueLightness": {
+     "label": "Luminans"
+    },
+    "blueSaturation": {
+     "label": "Ketepuan"
+    },
+    "brightness": {
+     "label": "Kecerahan"
+    },
+    "cyanHue": {
+     "label": "Rona"
+    },
+    "cyanLightness": {
+     "label": "Luminans"
+    },
+    "cyanSaturation": {
+     "label": "Ketepuan"
+    },
+    "greenHue": {
+     "label": "Rona"
+    },
+    "greenLightness": {
+     "label": "Luminans"
+    },
+    "greenSaturation": {
+     "label": "Ketepuan"
+    },
+    "magentaHue": {
+     "label": "Rona"
+    },
+    "magentaLightness": {
+     "label": "Luminans"
+    },
+    "magentaSaturation": {
+     "label": "Ketepuan"
+    },
+    "opacity": {
+     "label": "Kelegapan"
+    },
+    "orangeHue": {
+     "label": "Rona"
+    },
+    "orangeLightness": {
+     "label": "Luminans"
+    },
+    "orangeSaturation": {
+     "label": "Ketepuan"
+    },
+    "purpleHue": {
+     "label": "Rona"
+    },
+    "purpleLightness": {
+     "label": "Luminans"
+    },
+    "purpleSaturation": {
+     "label": "Ketepuan"
+    },
+    "range": {
+     "label": "Warna",
+     "options": [
+      "Merah",
+      "Oren",
+      "Kuning",
+      "Hijau",
+      "Sian",
+      "Biru",
+      "Ungu",
+      "Magenta"
+     ]
+    },
+    "redHue": {
+     "label": "Rona"
+    },
+    "redLightness": {
+     "label": "Luminans"
+    },
+    "redSaturation": {
+     "label": "Ketepuan"
+    },
+    "yellowHue": {
+     "label": "Rona"
+    },
+    "yellowLightness": {
+     "label": "Luminans"
+    },
+    "yellowSaturation": {
+     "label": "Ketepuan"
+    }
+   }
+  },
   "huesaturation": {
    "description": "Memusingkan warna di sekeliling roda warna dan menjadikannya lebih kuat atau lemah; kecergasan menguatkan warna kusam paling banyak.",
    "name": "Rona & Ketepuan",
@@ -2907,6 +3123,9 @@
    "description": "Menambah cahaya berwarna di sekeliling bahagian gambar yang lebih terang daripada ambang.",
    "name": "Sinaran Cahaya",
    "params": {
+    "blend": {
+     "label": "Campuran"
+    },
     "blur": {
      "label": "Saiz"
     },
@@ -3097,6 +3316,9 @@
     },
     "reach": {
      "label": "Panjang"
+    },
+    "solidity": {
+     "label": "Kepadatan"
     }
    }
   },
@@ -5117,6 +5339,9 @@
     },
     "opacity": {
      "label": "Kelegapan"
+    },
+    "outside": {
+     "label": "Cahaya Luar"
     }
    }
   },
