@@ -1902,6 +1902,7 @@
     <string name="preview_full_blur">Blur\nPenuh</string>
     <string name="preview_fast_blur">Blur\nCepat</string>
     <string name="settings_preview_copies">Gunakan salinan pratinjau untuk video besar</string>
+    <string name="settings_background_preview">Pra-render pratinjau saat diam</string>
     <string name="settings_clear_preview_copies">Hapus salinan pratinjau</string>
     <string name="settings_clear_preview_title">Hapus salinan pratinjau?</string>
     <string name="settings_clear_preview_text">Salinan pratinjau dibuat ulang saat proyek membutuhkannya.</string>

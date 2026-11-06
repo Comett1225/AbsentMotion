@@ -90,6 +90,8 @@ class EngineThread(private val background: Int, private val context: Context? = 
     private var engine: NativeEngine? = null
     private var shownXml: String? = null
     private var pendingXml: Lazy<String>? = null
+    private var pendingScene: Scene? = null
+    private var shownScene: Scene? = null
     private var fontsDirty = false
     @Volatile private var mediaScene: Scene? = null
     @Volatile private var mediaJob: Job? = null
@@ -152,7 +154,7 @@ class EngineThread(private val background: Int, private val context: Context? = 
     fun setScene(next: Scene, xml: String) = setScene(next, lazyOf(xml))
 
     fun setScene(next: Scene, xml: Lazy<String> = lazy { next.toXml() }) {
-        synchronized(this) { pendingXml = xml }
+        synchronized(this) { pendingXml = xml; pendingScene = next }
         fonts?.let { library ->
             val names = next.fontNames()
             mediaScope.launch { names.forEach { library.resolve(it) } }
@@ -261,13 +263,15 @@ class EngineThread(private val background: Int, private val context: Context? = 
 
     private fun applyPending(timeMs: Int) {
         if (closed || capturing) return
-        val (xml, again) = synchronized(this) { pendingXml.also { pendingXml = null } to fontsDirty.also { fontsDirty = false } }
+        val (xml, again, parsed) = synchronized(this) { Triple(pendingXml.also { pendingXml = null }, fontsDirty.also { fontsDirty = false }, pendingScene) }
         val next = xml?.value ?: shownXml.takeIf { again || timedText && preparedAt != timeMs } ?: return
+        val scene = if (xml != null) parsed else shownScene
         try {
-            engine().setScene(fonts?.prepareText(next, timeMs) ?: next)
+            engine().setScene(fonts?.prepareText(next, timeMs, scene) ?: next)
             if (next !== shownXml) timedText = animatesTextSpacing(next)
             preparedAt = timeMs
             shownXml = next
+            shownScene = scene
         } catch (e: IllegalArgumentException) {
             android.util.Log.e("AMEngine", "scene rejected", e)
         }
@@ -277,6 +281,7 @@ class EngineThread(private val background: Int, private val context: Context? = 
         scene ?: return true
         var current = true
         engine().clearLayerFrames()
+        val late = ArrayList<Triple<String, Long, Pair<NativeVideoSource, Long>>>()
         for (track in scene.layerTracks()) {
             val layer = track.layer
             val uri = layer.node["fillVideo"] ?: continue
@@ -284,10 +289,15 @@ class EngineThread(private val background: Int, private val context: Context? = 
             val localTime = mapped.ms.toInt()
             val at = layer.videoTimeUs(localTime, track.scene, VideoTiming(layer)).coerceAtLeast(0)
             when (val source = videos[uri]) {
-                is NativeVideoSource -> if (engine().showVideoLayer(uri, layer.id, source, at, exact) == 0) current = false
+                is NativeVideoSource -> if (engine().showVideoLayer(uri, layer.id, source, at, exact, if (exact) 15000 else 0) == 0) { if (exact) current = false else late += Triple(uri, layer.id, source to at) }
                 is VideoSource -> source.frame(at / 1000)?.let { engine().setLayerFrame(uri, layer.id, it.width, it.height, it.rgba) }
             }
             mosh?.apply(track.scene, layer, localTime, engine())
+        }
+        val until = System.nanoTime() + LIVE_VIDEO_WAIT_MS * 1_000_000L
+        for ((uri, id, pick) in late) {
+            val left = ((until - System.nanoTime()) / 1_000_000L).toInt().coerceAtLeast(0)
+            if (engine().showVideoLayer(uri, id, pick.first, pick.second, false, left) == 0) current = false
         }
         return current
     }
@@ -306,6 +316,7 @@ class EngineThread(private val background: Int, private val context: Context? = 
             native.setAccurateBlur(v.accurateBlur)
             val target = targets[nextTarget]?.takeIf { it.width == w && it.height == h } ?: org.jetbrains.skia.Bitmap().also {
                 it.allocPixels(org.jetbrains.skia.ImageInfo(w, h, org.jetbrains.skia.ColorType.BGRA_8888, org.jetbrains.skia.ColorAlphaType.PREMUL, org.jetbrains.skia.ColorSpace.sRGB))
+                it.setImmutable()
                 targets[nextTarget]?.let { old -> javax.swing.SwingUtilities.invokeLater { old.close() } }
                 targets[nextTarget] = it
             }
@@ -454,3 +465,5 @@ class EngineThread(private val background: Int, private val context: Context? = 
 
 private val instances = AtomicLong()
 
+
+private const val LIVE_VIDEO_WAIT_MS = 12

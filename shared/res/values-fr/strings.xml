@@ -1950,6 +1950,7 @@
     <string name="preview_full_blur">Flou\ncomplet</string>
     <string name="preview_fast_blur">Flou\nrapide</string>
     <string name="settings_preview_copies">Utiliser des copies d’aperçu des vidéos volumineuses</string>
+    <string name="settings_background_preview">Précalculer l’aperçu pendant les pauses</string>
     <string name="settings_clear_preview_copies">Effacer les copies d’aperçu</string>
     <string name="settings_clear_preview_title">Effacer les copies d’aperçu ?</string>
     <string name="settings_clear_preview_text">Les copies d’aperçu sont recréées lorsqu’un projet en a besoin.</string>

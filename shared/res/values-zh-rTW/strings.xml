@@ -1902,6 +1902,7 @@
     <string name="preview_full_blur">完整\n模糊</string>
     <string name="preview_fast_blur">快速\n模糊</string>
     <string name="settings_preview_copies">使用大型影片的預覽副本</string>
+    <string name="settings_background_preview">閒置時預先算圖預覽</string>
     <string name="settings_clear_preview_copies">清除預覽副本</string>
     <string name="settings_clear_preview_title">要清除預覽副本嗎？</string>
     <string name="settings_clear_preview_text">專案需要時會重新建立預覽副本。</string>

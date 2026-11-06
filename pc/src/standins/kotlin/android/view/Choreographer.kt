@@ -5,7 +5,7 @@ class Choreographer private constructor() {
     private val pending = LinkedHashSet<FrameCallback>()
     fun postFrameCallback(callback: FrameCallback) {
         val first = synchronized(pending) { pending.isEmpty().also { pending += callback } }
-        if (first) javax.swing.Timer(16) { run() }.apply { isRepeats = false; start() }
+        if (first) javax.swing.SwingUtilities.invokeLater { run() }
     }
     fun postFrameCallbackDelayed(callback: FrameCallback, delay: Long) { javax.swing.Timer(delay.toInt().coerceAtLeast(1)) { postFrameCallback(callback) }.apply { isRepeats = false; start() } }
     fun removeFrameCallback(callback: FrameCallback) { synchronized(pending) { pending -= callback } }

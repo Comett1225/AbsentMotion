@@ -138,6 +138,7 @@ import app.absentmotion.editor.askUngroup
 import app.absentmotion.editor.EditorPanel
 import app.absentmotion.editor.MultiSelect
 import app.absentmotion.editor.EditorState
+import app.absentmotion.editor.PreviewCache
 import app.absentmotion.editor.toggleBookmark
 import app.absentmotion.editor.toggleHidden
 import app.absentmotion.editor.deselectLayer
@@ -246,6 +247,8 @@ private const val FAR_OUT_MS = 600_000f
 private const val MAX_ZOOM = 1000f
 
 private val TickColor get() = Am.Line
+private val CacheBarColor = Color(0xFF45C46A)
+private val CacheBarHeight = 3.dp
 private val RulerMajor get() = Am.Inactive
 private val RulerMinor get() = Am.Inactive.copy(alpha = 0.7f)
 private val RetimeMarkColor get() = Am.Gold.copy(alpha = 0.67f)
@@ -1741,6 +1744,7 @@ private fun DrawScope.drawTimeline(view: TimelineView, measurer: TextMeasurer, s
         if (view.layers.isNotEmpty()) drawRuler(time, fps, state.scene.lastFrame, step)
         if (view.layers.isNotEmpty() && (state.scene.isElement || state.inGroup)) drawRetimeMarks(state.scene, time)
     }
+    if (view.layers.isNotEmpty() && !state.inGroup) drawCacheBar(state, time, fps, if (desktop) view.headerWidth else 0f, view.rulerH)
     val stripe = TimelineMath.frameTimeMs(2 * step, fps) * time.pxPerMs
     fun paint(row: Int, layer: Layer) {
         val rowTime = view.timeFor(layer.id, time)
@@ -1900,6 +1904,23 @@ private fun DrawScope.drawBookmark(x: Float, outline: Path) {
     }
     outline.close()
     drawPath(outline, colour)
+}
+
+private fun DrawScope.drawCacheBar(state: EditorState, time: TimeScale, fps: Int, left: Float, rulerH: Float) {
+    PreviewCache.revision
+    if (PreviewCache.key?.let { it.projectId == state.projectId && it.scene.node === state.scene.node } != true) return
+    val runs = PreviewCache.runs()
+    if (runs.isEmpty()) return
+    val height = CacheBarHeight.toPx()
+    val top = rulerH - height - 1.dp.toPx()
+    clipRect(left = left) {
+        for (run in runs) {
+            val start = time.x(TimelineMath.frameTimeMs(run.first, fps))
+            val end = time.x(TimelineMath.frameTimeMs(run.last + 1, fps))
+            if (end < left || start > size.width) continue
+            drawRect(CacheBarColor, Offset(start, top), Size(end - start, height))
+        }
+    }
 }
 
 private fun DrawScope.drawRuler(time: TimeScale, fps: Int, lastFrame: Int, tickFrames: Int) {

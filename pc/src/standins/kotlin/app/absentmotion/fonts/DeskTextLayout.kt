@@ -2,8 +2,8 @@ package app.absentmotion.fonts
 
 import app.absentmotion.model.*
 
-fun FontLibrary.prepareText(xml: String, timeMs: Int = 0): String {
-    val scene = Scene.parse(xml)
+fun FontLibrary.prepareText(xml: String, timeMs: Int = 0, parsed: Scene? = null): String {
+    val scene = parsed ?: Scene.parse(xml)
     if (!hasText(scene.node)) return xml
     return prepareText(scene.node, scene.fps, timeMs).toXml()
 }

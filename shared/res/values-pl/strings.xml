@@ -1974,6 +1974,7 @@
     <string name="preview_full_blur">Pełne\nrozmycie</string>
     <string name="preview_fast_blur">Szybkie\nrozmycie</string>
     <string name="settings_preview_copies">Używaj kopii podglądu dużych plików wideo</string>
+    <string name="settings_background_preview">Renderuj wstępnie podgląd w czasie bezczynności</string>
     <string name="settings_clear_preview_copies">Wyczyść kopie podglądu</string>
     <string name="settings_clear_preview_title">Wyczyścić kopie podglądu?</string>
     <string name="settings_clear_preview_text">Kopie podglądu zostaną utworzone ponownie, gdy projekt będzie ich potrzebował.</string>

@@ -1902,6 +1902,7 @@
     <string name="preview_full_blur">전체\n블러</string>
     <string name="preview_fast_blur">빠른\n블러</string>
     <string name="settings_preview_copies">큰 동영상에 미리보기 복사본 사용</string>
+    <string name="settings_background_preview">쉬는 동안 미리보기 사전 렌더링</string>
     <string name="settings_clear_preview_copies">미리보기 복사본 삭제</string>
     <string name="settings_clear_preview_title">미리보기 복사본을 삭제할까요?</string>
     <string name="settings_clear_preview_text">프로젝트에서 필요할 때 미리보기 복사본이 다시 생성됩니다.</string>

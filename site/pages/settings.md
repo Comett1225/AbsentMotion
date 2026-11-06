@@ -35,6 +35,7 @@ The color names are the editor and home screen colors: TopBar, PreviewBg, Timeli
 - **Playback Resampling.** **LOW**, **HIGH** or **ULTRA** (default Ultra): the quality of the sound resampling, when the editor plays and when the sound is mixed for an export.
 - **Use preview copies of large videos.** On by default. For videos bigger than 1920 x 1080, or with few keyframes, the app makes a small, light copy in the background and uses it for the preview. Exports always use the original file. The copies are kept in a cache of up to 2 GB.
 - **Clear preview copies** deletes them. The row shows the space they use.
+- **Pre-render the preview while idle.** On by default. When you pause for a moment, the app renders the frames around the playhead in the background until the memory set aside for it is full. A thin green line at the bottom of the time ruler marks the frames that are ready, and they play smoothly. A change throws away only the frames it affects. Turn it off to save battery or memory.
 
 ## Projects and media
 

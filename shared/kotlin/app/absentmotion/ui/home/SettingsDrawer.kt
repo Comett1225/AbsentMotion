@@ -182,6 +182,8 @@ internal fun PlaybackSettings(settings: AppSettings) {
         Choices(PreviewQuality.entries.map { it.label }, settings.previewQuality.ordinal) { settings.previewQuality = PreviewQuality.entries[it] }
     }
     Divider(10.dp)
+    SwitchRow(stringResource(R.string.settings_background_preview), settings.backgroundPreview, enabled = true) { settings.backgroundPreview = it }
+    Divider(10.dp)
     if (!DESK) {
         val now = stringResource(R.string.settings_graphics_note, if (app.absentmotion.Tier.openGl) "OpenGL" else "Vulkan")
         ChoicesBlock(R.string.settings_graphics, note = {

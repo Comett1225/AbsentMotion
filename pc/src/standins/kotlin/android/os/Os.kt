@@ -21,7 +21,7 @@ object SystemClock {
     @JvmStatic fun sleep(ms: Long) = Thread.sleep(ms)
 }
 
-class Looper private constructor(val main: Boolean) {
+class Looper private constructor(val main: Boolean, internal val worker: java.util.concurrent.ScheduledExecutorService? = null) {
     companion object {
         private val mainLooper = Looper(true)
         private val other = Looper(false)
@@ -29,19 +29,21 @@ class Looper private constructor(val main: Boolean) {
         @JvmStatic fun myLooper(): Looper? = if (javax.swing.SwingUtilities.isEventDispatchThread()) mainLooper else other
         @JvmStatic fun prepare() {}
         @JvmStatic fun loop() {}
+        internal fun worker(name: String) = Looper(false, java.util.concurrent.Executors.newSingleThreadScheduledExecutor { Thread(it, name).apply { isDaemon = true } })
     }
     val thread: Thread? get() = null
-    fun quitSafely() {}
-    fun quit() {}
+    fun quitSafely() { worker?.shutdown() }
+    fun quit() { worker?.shutdownNow() }
 }
 
 open class Handler(private val looper: Looper = Looper.getMainLooper()) {
-    private val timer by lazy { java.util.concurrent.Executors.newSingleThreadScheduledExecutor { Thread(it, "handler").apply { isDaemon = true } } }
+    private val timer by lazy { looper.worker ?: java.util.concurrent.Executors.newSingleThreadScheduledExecutor { Thread(it, "handler").apply { isDaemon = true } } }
     private val pending = java.util.concurrent.ConcurrentHashMap<Runnable, MutableList<java.util.concurrent.Future<*>>>()
     private fun run(r: Runnable) { if (looper.main) javax.swing.SwingUtilities.invokeLater(r) else r.run() }
     fun post(r: Runnable): Boolean = postDelayed(r, 0)
     fun postDelayed(r: Runnable, delay: Long): Boolean {
-        val f = timer.schedule({ pending[r]?.removeIf { it.isDone }; run(r) }, delay.coerceAtLeast(0), java.util.concurrent.TimeUnit.MILLISECONDS)
+        val f = try { timer.schedule({ pending[r]?.removeIf { it.isDone }; run(r) }, delay.coerceAtLeast(0), java.util.concurrent.TimeUnit.MILLISECONDS) }
+            catch (_: java.util.concurrent.RejectedExecutionException) { return false }
         pending.getOrPut(r) { java.util.Collections.synchronizedList(mutableListOf()) }.add(f)
         return true
     }
@@ -51,10 +53,9 @@ open class Handler(private val looper: Looper = Looper.getMainLooper()) {
 }
 
 class HandlerThread(name: String) : Thread(name) {
-    private val l = Looper.myLooper()
-    val looper: Looper get() = Looper.getMainLooper()
-    fun quitSafely(): Boolean = true
-    fun quit(): Boolean = true
+    val looper: Looper = Looper.worker(name)
+    fun quitSafely(): Boolean = true.also { looper.quitSafely() }
+    fun quit(): Boolean = true.also { looper.quit() }
 }
 
 object Process {

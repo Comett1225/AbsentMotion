@@ -1902,6 +1902,7 @@
     <string name="preview_full_blur">Nhòe\nđầy đủ</string>
     <string name="preview_fast_blur">Nhòe\nnhanh</string>
     <string name="settings_preview_copies">Dùng bản xem trước cho video lớn</string>
+    <string name="settings_background_preview">Kết xuất trước bản xem trước khi rảnh</string>
     <string name="settings_clear_preview_copies">Xóa bản xem trước</string>
     <string name="settings_clear_preview_title">Xóa các bản sao xem trước?</string>
     <string name="settings_clear_preview_text">Bản sao xem trước được tạo lại khi dự án cần đến.</string>

@@ -2022,6 +2022,7 @@
     <string name="preview_full_blur">ضبابية\nكاملة</string>
     <string name="preview_fast_blur">ضبابية\nسريعة</string>
     <string name="settings_preview_copies">استخدام نسخ معاينة للفيديوهات الكبيرة</string>
+    <string name="settings_background_preview">تصيير المعاينة مسبقًا أثناء الخمول</string>
     <string name="settings_clear_preview_copies">مسح نسخ المعاينة</string>
     <string name="settings_clear_preview_title">هل تريد مسح نسخ المعاينة؟</string>
     <string name="settings_clear_preview_text">تُعاد إنشاء نسخ المعاينة عندما يحتاج إليها المشروع.</string>

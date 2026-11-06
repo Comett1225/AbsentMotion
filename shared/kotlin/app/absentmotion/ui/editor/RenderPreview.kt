@@ -40,7 +40,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -153,7 +152,7 @@ internal fun CachedFrame(state: EditorState, usable: Boolean, live: LiveHandoff,
         if (shown.frame != frame) return@Canvas
         drawRect(background)
         drawImage(
-            shown.bitmap.asImageBitmap(), dstOffset = IntOffset(left.roundToInt(), top.roundToInt()),
+            shown.image, dstOffset = IntOffset(left.roundToInt(), top.roundToInt()),
             dstSize = IntSize(width.roundToInt().coerceAtLeast(1), height.roundToInt().coerceAtLeast(1)), filterQuality = FilterQuality.Low,
         )
     }
@@ -233,7 +232,10 @@ private fun AutomaticPreview(state: EditorState) {
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val resources by state.engine.mediaRevision.collectAsState()
     val thermal = remember(context) { app.absentmotion.export.ThermalMonitor.of(context) }
-    LaunchedEffect(state, lifecycle, resources) {
+    val enabled = state.settings.backgroundPreview
+    LaunchedEffect(enabled) { if (!enabled && PreviewCache.automatic) PreviewCache.clear() }
+    LaunchedEffect(state, lifecycle, resources, enabled) {
+        if (!enabled) return@LaunchedEffect
         lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
             thermal.start()
             try {
@@ -244,7 +246,7 @@ private fun AutomaticPreview(state: EditorState) {
                             (state.cameraMode || state.scene.layers.none { it.kind == "camera" }), PreviewCache.fit, PreviewCache.checkerCell)
                 }.collectLatest { request ->
                     if (!request.eligible) return@collectLatest
-                    delay(250)
+                    delay(PreviewCache.idleMs)
                     while (!PreviewCache.idle()) delay(80)
                     fun current() = lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED) && PreviewCache.idle() && !thermal.hot &&
                         !state.playing && !state.exportOpen && state.scene == request.key.scene && state.frame == request.frame &&

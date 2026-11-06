@@ -1902,6 +1902,7 @@
     <string name="preview_full_blur">เบลอ\nเต็ม</string>
     <string name="preview_fast_blur">เบลอ\nเร็ว</string>
     <string name="settings_preview_copies">ใช้ไฟล์ตัวอย่างสำหรับวิดีโอขนาดใหญ่</string>
+    <string name="settings_background_preview">เรนเดอร์ตัวอย่างล่วงหน้าขณะไม่ได้ใช้งาน</string>
     <string name="settings_clear_preview_copies">ล้างไฟล์ตัวอย่าง</string>
     <string name="settings_clear_preview_title">ล้างสำเนาตัวอย่างหรือไม่?</string>
     <string name="settings_clear_preview_text">สำเนาตัวอย่างจะถูกสร้างใหม่เมื่อโปรเจกต์ต้องการ</string>

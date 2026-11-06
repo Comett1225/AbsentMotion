@@ -1926,6 +1926,7 @@
     <string name="preview_full_blur">ফুল\nব্লার</string>
     <string name="preview_fast_blur">ফাস্ট\nব্লার</string>
     <string name="settings_preview_copies">বড় ভিডিওর প্রিভিউ কপি ব্যবহার করুন</string>
+    <string name="settings_background_preview">থেমে থাকলে প্রিভিউ প্রি-রেন্ডার করুন</string>
     <string name="settings_clear_preview_copies">প্রিভিউ কপি মুছুন</string>
     <string name="settings_clear_preview_title">প্রিভিউ কপি মুছবেন?</string>
     <string name="settings_clear_preview_text">প্রজেক্টের প্রয়োজন হলে প্রিভিউ কপি আবার তৈরি হয়।</string>

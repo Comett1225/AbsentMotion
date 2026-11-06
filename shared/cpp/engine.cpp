@@ -1490,7 +1490,7 @@ int EngineImpl::frame(Target* target, int64_t presentTimeNs, bool sync,
         {
             SkAutoCanvasRestore restore(surface->getCanvas(), true);
             const bool grabbing = fEffects.grabs(fScene.layers);
-            sk_sp<SkSurface> layer = target->encoder || grabbing ? SkSurfaces::RenderTarget(fRecorder.get(), surface->imageInfo()) : nullptr;
+            sk_sp<SkSurface> layer = target->encoder || grabbing || fAccurateBlur ? SkSurfaces::RenderTarget(fRecorder.get(), surface->imageInfo()) : nullptr;
             if (layer) {
                 const std::function<void()> flush = [this] { this->flushPartial(); };
                 SetLayerBreak(&flush);

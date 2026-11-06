@@ -1,6 +1,5 @@
 package app.absentmotion.platform
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -13,6 +12,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.toComposeImageBitmap
+import androidx.compose.ui.graphics.asComposeImageBitmap
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.isAltPressed
 import androidx.compose.ui.input.pointer.isCtrlPressed
@@ -23,8 +23,9 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.draw.drawBehind
 import app.absentmotion.desk.DeskFiles
 import app.absentmotion.fonts.composeFamily
 import java.io.ByteArrayOutputStream
@@ -72,10 +73,14 @@ fun SceneSurface(engine: app.absentmotion.engine.EngineThread, divisor: Int, siz
         engine.attachDesktop(divisor, size)
         onDispose { engine.detach() }
     }
-    val frame = engine.frame
-    Box(modifier) {
-        if (frame != null) Image(frame, null, androidx.compose.ui.Modifier.matchParentSize(), contentScale = ContentScale.Fit)
-    }
+    Box(modifier.drawBehind {
+        val frame = engine.frame ?: return@drawBehind
+        val box = this.size
+        val s = minOf(box.width / frame.width, box.height / frame.height)
+        val w = Math.round(frame.width * s)
+        val h = Math.round(frame.height * s)
+        drawImage(frame, dstOffset = IntOffset(Math.round((box.width - w) / 2), Math.round((box.height - h) / 2)), dstSize = IntSize(w, h))
+    })
 }
 
 fun fontFamily(library: app.absentmotion.fonts.FontLibrary, name: String) = library.composeFamily(name)
@@ -348,3 +353,8 @@ internal fun desktopCutout(handle: Long, bitmap: android.graphics.Bitmap, size: 
 internal suspend fun desktopGifVideo(context: Context, uri: Uri): app.absentmotion.media.GifVideo? = app.absentmotion.media.convertDesktopGif(context, uri)
 
 internal fun desktopFrameReader(context: Context, uri: String): app.absentmotion.media.DesktopFrameInput = app.absentmotion.media.DeskFrameReader(context, uri)
+
+fun rawFrameImage(rgba: ByteArray, width: Int, height: Int): ImageBitmap = org.jetbrains.skia.Bitmap().apply {
+    installPixels(org.jetbrains.skia.ImageInfo(width, height, org.jetbrains.skia.ColorType.RGBA_8888, org.jetbrains.skia.ColorAlphaType.PREMUL), rgba, width * 4)
+    setImmutable()
+}.asComposeImageBitmap()

@@ -1902,6 +1902,7 @@
     <string name="preview_full_blur">Kabur\nPenuh</string>
     <string name="preview_fast_blur">Kabur\nPantas</string>
     <string name="settings_preview_copies">Guna salinan pratonton untuk video besar</string>
+    <string name="settings_background_preview">Pra-render pratonton semasa rehat</string>
     <string name="settings_clear_preview_copies">Kosongkan salinan pratonton</string>
     <string name="settings_clear_preview_title">Kosongkan salinan pratonton?</string>
     <string name="settings_clear_preview_text">Salinan pratonton dibina semula apabila projek memerlukannya.</string>

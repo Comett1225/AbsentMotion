@@ -50,21 +50,35 @@ class PreviewDependenciesTest {
     @Test fun dimensionsResourcesAndUnknownDependenciesInvalidateConservatively() {
         val before = scene()
         assertEquals(listOf(0..before.lastFrame), previewDirtyRanges(before, Scene.parse(before.node.toXml().replace("width=\"100\"", "width=\"200\""))))
+        val camera = Scene.parse(before.node.toXml().replace("</scene>", "<camera id=\"7\" startTime=\"0\" endTime=\"5999\"/></scene>"))
+        assertEquals(listOf(0..camera.lastFrame), previewDirtyRanges(camera, Scene.parse(camera.node.toXml().replace("<camera id=\"7\" ", "<camera id=\"7\" zoom=\"2\" "))))
+    }
+
+    @Test fun anEffectOnlyDirtiesItsOwnLayerButLinksParentsAndPathsReachTheirUsers() {
         val temporal = scene(first = "<effect id=\"absent.echo\"/>")
-        assertEquals(listOf(0..temporal.lastFrame), previewDirtyRanges(temporal, scene(first = "<effect id=\"absent.echo\"/>", second = "<fillColor value=\"#ff00ff00\"/>")))
+        val echoed = previewDirtyRanges(temporal, scene(first = "<effect id=\"absent.echo\"/>", second = "<fillColor value=\"#ff00ff00\"/>"))
+        assertTrue(echoed.any { 150 in it })
+        assertFalse(echoed.any { 10 in it })
         val link = "<transform><rotation value=\"0\"><valueLink layer=\"1\" kind=\"transform\" property=\"rotation\"/></rotation></transform>"
-        val linked = scene(second = link)
-        assertEquals(listOf(0..linked.lastFrame), previewDirtyRanges(linked, scene(first = "<transform><rotation value=\"90\"/></transform>", second = link)))
+        val linked = previewDirtyRanges(scene(second = link), scene(first = "<transform><rotation value=\"90\"/></transform>", second = link))
+        assertTrue(linked.any { 10 in it } && linked.any { 150 in it })
+        assertFalse(linked.any { 60 in it })
+        fun family(fill: String) = Scene(XmlNode.parse("<scene width=\"100\" height=\"100\" fps=\"30\" totalTime=\"5999\">" +
+            "<nullobj id=\"1\" startTime=\"0\" endTime=\"999\">$fill</nullobj><shape id=\"2\" startTime=\"4000\" endTime=\"5999\" parent=\"1\"/></scene>"))
+        val moved = previewDirtyRanges(family(""), family("<transform><rotation value=\"45\"/></transform>"))
+        assertTrue(moved.any { 150 in it })
+        assertFalse(moved.any { 60 in it })
     }
 
     @Test fun preparationIsBoundedPrioritisesThePlayheadAndDoesNotDuplicate() {
-        val order = previewOrder(900, 100, 30)
-        assertEquals(100, order.first())
-        assertEquals(listOf(100, 101, 99, 102, 98), order.take(5))
+        val order = previewOrder(900, 100)
+        assertEquals(listOf(101, 102, 99, 103, 104, 98), order.take(6))
         assertEquals(order.size, order.toSet().size)
-        assertEquals(41, order.size)
-        assertTrue(previewOrder(3, 0, 60).all { it in 0..3 })
-        assertEquals(listOf(0), previewOrder(0, -50, 0))
+        assertEquals(900, order.size)
+        assertFalse(100 in order)
+        assertEquals(listOf(898, 899, 896, 895, 894), previewOrder(899, 897).take(5))
+        assertEquals(listOf(1, 2, 3), previewOrder(3, 0))
+        assertTrue(previewOrder(0, -50).isEmpty())
     }
 
     @Test fun sparseFramesAreIndependentAndEvictionIsBounded() {
@@ -73,7 +87,8 @@ class PreviewDependenciesTest {
         assertTrue(store.put(100, ByteArray(4)))
         assertFalse(11 in store)
         assertFalse(store.put(30, ByteArray(4)))
-        assertTrue(store.evictFarthest(12))
+        assertFalse(store.evictFarther(12, 200))
+        assertTrue(store.evictFarther(12, 30))
         assertTrue(10 in store)
         assertFalse(100 in store)
         assertTrue(store.put(30, ByteArray(4)))
@@ -85,5 +100,16 @@ class PreviewDependenciesTest {
         assertFalse(10 in store)
         assertEquals(null, store[10])
         assertFalse(store.put(10, byteArrayOf(1)))
+    }
+
+    @Test fun framesBehindThePlayheadCountDoubleWhenEvictingAndRunsAreContiguous() {
+        val store = FrameStore(0, 12)
+        assertTrue(store.put(40, ByteArray(4)))
+        assertTrue(store.put(55, ByteArray(4)))
+        assertTrue(store.put(56, ByteArray(4)))
+        assertEquals(listOf(40..40, 55..56), store.runs())
+        assertTrue(store.evictFarther(50, 51))
+        assertFalse(40 in store)
+        assertTrue(56 in store)
     }
 }

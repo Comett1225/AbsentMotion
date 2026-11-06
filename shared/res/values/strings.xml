@@ -1952,6 +1952,7 @@
     <string name="preview_full_blur">Full\nBlur</string>
     <string name="preview_fast_blur">Fast\nBlur</string>
     <string name="settings_preview_copies">Use preview copies of large videos</string>
+    <string name="settings_background_preview">Pre-render the preview while idle</string>
     <string name="settings_clear_preview_copies">Clear preview copies</string>
     <string name="settings_clear_preview_title">Clear preview copies?</string>
     <string name="settings_clear_preview_text">Preview copies are rebuilt when a project needs them.</string>

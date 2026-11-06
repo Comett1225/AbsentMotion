@@ -1902,6 +1902,7 @@
     <string name="preview_full_blur">フル\nブラー</string>
     <string name="preview_fast_blur">高速\nブラー</string>
     <string name="settings_preview_copies">大きな動画にはプレビュー用コピーを使用</string>
+    <string name="settings_background_preview">操作していない間にプレビューを事前レンダリング</string>
     <string name="settings_clear_preview_copies">プレビュー用コピーを削除</string>
     <string name="settings_clear_preview_title">プレビュー用コピーを削除しますか？</string>
     <string name="settings_clear_preview_text">プレビュー用コピーは、プロジェクトで必要になったときに再作成されます。</string>

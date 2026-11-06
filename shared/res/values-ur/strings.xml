@@ -1926,6 +1926,7 @@
     <string name="preview_full_blur">مکمل\nبلر</string>
     <string name="preview_fast_blur">فاسٹ\nبلر</string>
     <string name="settings_preview_copies">بڑی ویڈیوز کی پری ویو کاپیاں استعمال کریں</string>
+    <string name="settings_background_preview">رکنے پر پری ویو پری رینڈر کریں</string>
     <string name="settings_clear_preview_copies">پری ویو کاپیاں صاف کریں</string>
     <string name="settings_clear_preview_title">پری ویو کاپیاں صاف کریں؟</string>
     <string name="settings_clear_preview_text">جب کسی پروجیکٹ کو ضرورت ہو تو پری ویو کاپیاں دوبارہ بن جاتی ہیں۔</string>

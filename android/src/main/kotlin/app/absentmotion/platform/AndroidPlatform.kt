@@ -433,3 +433,6 @@ internal fun desktopCutout(handle: Long, bitmap: android.graphics.Bitmap, size: 
 internal suspend fun desktopGifVideo(context: Context, uri: Uri): app.absentmotion.media.GifVideo? = null
 
 internal fun desktopFrameReader(context: Context, uri: String): app.absentmotion.media.DesktopFrameInput? = null
+
+fun rawFrameImage(rgba: ByteArray, width: Int, height: Int): androidx.compose.ui.graphics.ImageBitmap =
+    android.graphics.Bitmap.createBitmap(width, height, android.graphics.Bitmap.Config.ARGB_8888).apply { copyPixelsFromBuffer(java.nio.ByteBuffer.wrap(rgba)) }.androidImageBitmap()

@@ -23,7 +23,7 @@ class NativeVideoSource(file: File) : AutoCloseable {
 
     fun show(handle: Long, uri: String, timeUs: Long, exact: Boolean): Int = if (video == 0L) -1 else DesktopNative.videoFrame(handle, video, uri, timeUs, exact)
 
-    fun showLayer(handle: Long, uri: String, layer: Long, timeUs: Long, exact: Boolean): Int = if (video == 0L) -1 else DesktopNative.videoFrameLayer(handle, video, uri, layer, timeUs, exact)
+    fun showLayer(handle: Long, uri: String, layer: Long, timeUs: Long, exact: Boolean, waitMs: Int = if (exact) 15000 else 30): Int = if (video == 0L) -1 else DesktopNative.videoFrameLayer(handle, video, uri, layer, timeUs, waitMs)
 
     override fun close() {
         if (video != 0L) DesktopNative.videoClose(video)

@@ -4,15 +4,15 @@ import app.absentmotion.model.Layer
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
 
-internal fun previewOrder(last: Int, playhead: Int, fps: Int): List<Int> {
-    val at = playhead.coerceIn(0, last.coerceAtLeast(0))
-    val ahead = fps.coerceIn(1, 120)
-    val behind = ahead / 3
+internal fun previewOrder(last: Int, playhead: Int): List<Int> {
+    val end = last.coerceAtLeast(0)
+    val at = playhead.coerceIn(0, end)
     return buildList {
-        add(at)
-        for (offset in 1..ahead) {
-            if (at + offset <= last) add(at + offset)
-            if (offset <= behind && at - offset >= 0) add(at - offset)
+        var ahead = at + 1
+        var behind = at - 1
+        while (ahead <= end || behind >= 0) {
+            repeat(2) { if (ahead <= end) add(ahead++) }
+            if (behind >= 0) add(behind--)
         }
     }
 }
@@ -26,11 +26,18 @@ private fun Scene.visualHeader(): XmlNode = node.copy(
     children = node.children.filter { it.name !in Scene.LAYER_TAGS && it.name != "bookmark" },
 )
 
-private fun Layer.externalDependencies(): Boolean = kind == "camera" || kind == "light" || kind == "embedScene" ||
-    node["parent"]?.let { it != "0" } == true || node["pathLayer"]?.let { it != "0" } == true || node["clippingMask"] == "true" ||
-    node.children.any { it.name == "effect" && it["hidden"] != "true" } || node.linksValues()
+private fun Layer.drivesEverything(): Boolean = kind == "camera" || kind == "light"
 
-private fun XmlNode.linksValues(): Boolean = children.any { it.name == "valueLink" || it.linksValues() }
+private fun XmlNode.references(): Set<String> = buildSet {
+    fun walk(node: XmlNode) {
+        for (key in listOf("parent", "pathLayer")) node[key]?.takeIf { it != "0" }?.let(::add)
+        if (node.name == "valueLink") node["layer"]?.let(::add)
+        node.children.forEach(::walk)
+    }
+    walk(this@references)
+}
+
+private fun XmlNode.innerIds(): List<String> = children.flatMap { c -> listOfNotNull(c["id"]?.takeIf { c.name in Scene.LAYER_TAGS }) + c.innerIds() }
 
 private fun XmlNode.followsBeats(): Boolean = children.any { c ->
     c.name == "effect" && c["hidden"] != "true" && (c["id"] == "absent.particles" || c["id"]?.startsWith("absent.beat") == true) || c.followsBeats()
@@ -43,18 +50,21 @@ internal fun previewDirtyRanges(before: Scene, after: Scene): List<IntRange> {
     val old = before.visualLayers()
     val next = after.visualLayers()
     if (old.map { it.node.visual() } == next.map { it.node.visual() }) return emptyList()
-    if ((old + next).any { it.externalDependencies() }) return whole
     val oldIds = old.map { it.id }
     val newIds = next.map { it.id }
     if (oldIds.filter { it in newIds } != newIds.filter { it in oldIds }) return whole
-    val previous = old.associateBy { it.id }
-    val current = next.associateBy { it.id }
-    return (previous.keys + current.keys).flatMap { id ->
-        val a = previous[id]
-        val b = current[id]
-        if (a?.node?.visual() == b?.node?.visual()) emptyList()
-        else listOfNotNull(a, b).map { layer ->
-            before.frameAt(layer.startTime).coerceAtLeast(0)..maxOf(before.frameAt(layer.endTime), 0)
+    val previous = old.associateBy { it.id.toString() }
+    val current = next.associateBy { it.id.toString() }
+    val users = HashMap<String, MutableSet<String>>()
+    for (layer in old + next) for (ref in layer.node.references()) users.getOrPut(ref) { mutableSetOf() } += layer.id.toString()
+    val dirty = (previous.keys + current.keys).filter { previous[it]?.node?.visual() != current[it]?.node?.visual() }.toMutableSet()
+    val queue = ArrayDeque(dirty.flatMap { id -> listOf(id) + listOfNotNull(previous[id], current[id]).flatMap { it.node.innerIds() } })
+    while (queue.isNotEmpty()) users[queue.removeFirst()]?.forEach { if (dirty.add(it)) queue.addLast(it) }
+    if (dirty.any { id -> listOfNotNull(previous[id], current[id]).any { it.drivesEverything() } }) return whole
+    val last = maxOf(before.lastFrame, after.lastFrame)
+    return dirty.flatMap { id ->
+        listOfNotNull(previous[id]?.let { before to it }, current[id]?.let { after to it }).map { (scene, layer) ->
+            (scene.frameAt(layer.startTime) - 1).coerceIn(0, last)..(scene.frameAt(layer.endTime) + 1).coerceIn(0, last)
         }
     }
 }

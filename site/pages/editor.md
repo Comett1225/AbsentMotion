@@ -75,7 +75,7 @@ The last button of the play bar (**Preview mode**) opens a narrow strip at the r
 
 ![The preview strip: Pixel preview (1), Grid (2), Solo the selected layers (3), Camera View (4), the preview quality (5), the blur mode (6) and zoom (7).](img/editor-preview-strip.webp)
 
-**Pre-render**, between **Fast Blur** and **Zoom**, renders the project ahead from the playhead to the end (or as much as fits in memory and storage), so a heavy project plays smoothly. A note at the top of the preview shows the progress with a **Cancel** button. While playback uses the pre-rendered frames, a small **Pre-rendered** label shows at the top right of the preview. Any change to the project makes the pre-render out of date: the **Pre-render** button in the strip changes color and a note offers **Pre-render again**. When it is ready, tap **Pre-render** to see the time it covers, or press and hold it to remove it.
+**Pre-render**, between **Fast Blur** and **Zoom**, renders the project ahead from the playhead to the end (or as much as fits in memory and storage), so a heavy project plays smoothly. A note at the top of the preview shows the progress with a **Cancel** button. While playback uses the pre-rendered frames, a small **Pre-rendered** label shows at the top right of the preview. Any change to the project makes the pre-render out of date: the **Pre-render** button in the strip changes color and a note offers **Pre-render again**. When it is ready, tap **Pre-render** to see the time it covers, or press and hold it to remove it. Even without **Pre-render**, the app prepares frames around the playhead whenever you pause (see [Settings](@settings)); a thin green line at the bottom of the time ruler marks them.
 
 ### Other things on the preview
 

@@ -1950,6 +1950,7 @@
     <string name="preview_full_blur">Sfocatura\ncompleta</string>
     <string name="preview_fast_blur">Sfocatura\nrapida</string>
     <string name="settings_preview_copies">Usa copie di anteprima per i video grandi</string>
+    <string name="settings_background_preview">Pre-rendering dell’anteprima a riposo</string>
     <string name="settings_clear_preview_copies">Elimina copie di anteprima</string>
     <string name="settings_clear_preview_title">Eliminare le copie di anteprima?</string>
     <string name="settings_clear_preview_text">Le copie di anteprima vengono ricreate quando un progetto ne ha bisogno.</string>

@@ -47,6 +47,7 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - Linux: a .tar.gz with an install script for any distribution.
 - Effects library: swipe left or right on the Recent and Favorite grid to switch, or press and hold the two small icons and slide your thumb.
 - Seven new languages: Korean, Chinese (Traditional), Chinese (Simplified), French, German, Italian and Polish, with the help pages and picture captions in each. Phones set to Chinese for Taiwan, Hong Kong or Macau get Traditional Chinese.
+- The preview renders ahead while you pause, starting at the playhead and growing outward, and a thin green line at the bottom of the time ruler shows the frames that are ready. Settings has a switch to turn it off.
 
 ### Changed
 
@@ -63,6 +64,8 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - Electric Edges from Alight Motion: Thickness widens the edge into a glowing band and a keyframed Seed crackles on every frame, as in Alight Motion. Projects saved before 5.0 keep their look.
 - Desktop file and folder pickers use the system's current dialogs on Windows and Linux.
 - Help on tablets opens in a wide panel with the pictures beside the text, instead of a phone-sized card.
+- A change to one layer now throws away only the prepared preview frames of that layer and of the layers parented or linked to it, instead of all of them.
+- Desktop: editing and scrubbing respond sooner, with less waiting on each step and on video frames.
 
 ### Removed
 
@@ -76,6 +79,8 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - On computers set to a language with decimal commas, projects could show layers in the wrong place.
 - A damaged frame near the end of a video no longer freezes the rest of the clip.
 - Two layers using the same video play and export smoothly.
+- The background preview no longer stops for good when a project is still loading.
+- Full motion blur in the preview no longer risks freezing weaker tablets.
 
 ### Licence
 

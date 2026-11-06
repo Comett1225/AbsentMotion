@@ -1926,6 +1926,7 @@
     <string name="preview_full_blur">Buong\nBlur</string>
     <string name="preview_fast_blur">Mabilis\nBlur</string>
     <string name="settings_preview_copies">Gamitin ang preview copies ng malalaking bidyo</string>
+    <string name="settings_background_preview">I-pre-render ang preview habang nakatigil</string>
     <string name="settings_clear_preview_copies">Burahin ang preview copies</string>
     <string name="settings_clear_preview_title">I-clear ang mga kopya ng preview?</string>
     <string name="settings_clear_preview_text">Muling binubuo ang mga kopya ng preview kapag kailangan ng proyekto.</string>

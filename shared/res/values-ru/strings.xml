@@ -1974,6 +1974,7 @@
     <string name="preview_full_blur">Полное\nразмытие</string>
     <string name="preview_fast_blur">Быстрое\nразмытие</string>
     <string name="settings_preview_copies">Использовать копии больших видео для предпросмотра</string>
+    <string name="settings_background_preview">Предрендер предпросмотра в простое</string>
     <string name="settings_clear_preview_copies">Очистить копии предпросмотра</string>
     <string name="settings_clear_preview_title">Очистить копии для предпросмотра?</string>
     <string name="settings_clear_preview_text">Копии для предпросмотра создаются заново, когда проекту они нужны.</string>

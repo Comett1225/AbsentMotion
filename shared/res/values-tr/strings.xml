@@ -1926,6 +1926,7 @@
     <string name="preview_full_blur">Tam\nBulanık</string>
     <string name="preview_fast_blur">Hızlı\nBulanık</string>
     <string name="settings_preview_copies">Büyük videolar için önizleme kopyaları kullan</string>
+    <string name="settings_background_preview">Boştayken önizlemeyi önceden işle</string>
     <string name="settings_clear_preview_copies">Önizleme kopyalarını temizle</string>
     <string name="settings_clear_preview_title">Önizleme kopyaları temizlensin mi?</string>
     <string name="settings_clear_preview_text">Önizleme kopyaları bir proje ihtiyaç duyduğunda yeniden oluşturulur.</string>

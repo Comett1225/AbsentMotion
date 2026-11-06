@@ -49,7 +49,7 @@ object DesktopNative {
     external fun videoOpen(path: String): Long
     external fun videoInfo(video: Long): DoubleArray
     external fun videoFrame(handle: Long, video: Long, uri: String, timeUs: Long, exact: Boolean): Int
-    external fun videoFrameLayer(handle: Long, video: Long, uri: String, layer: Long, timeUs: Long, exact: Boolean): Int
+    external fun videoFrameLayer(handle: Long, video: Long, uri: String, layer: Long, timeUs: Long, waitMs: Int): Int
     external fun videoClose(video: Long)
     external fun blipTimes(text: String, speed: Float, pause: Float, every: Int): FloatArray
     external fun pickFiles(owner: Long, mode: Int, multiple: Boolean, title: String, name: String, filters: Array<String>): Array<String>?

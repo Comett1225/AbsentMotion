@@ -1950,6 +1950,7 @@
     <string name="preview_full_blur">Desfoque\ncompleto</string>
     <string name="preview_fast_blur">Desfoque\nrápido</string>
     <string name="settings_preview_copies">Usar cópias de pré-visualização de vídeos grandes</string>
+    <string name="settings_background_preview">Pré-renderizar a pré-visualização em repouso</string>
     <string name="settings_clear_preview_copies">Limpar cópias de pré-visualização</string>
     <string name="settings_clear_preview_title">Limpar as cópias de pré-visualização?</string>
     <string name="settings_clear_preview_text">As cópias de pré-visualização são recriadas quando um projeto precisa delas.</string>

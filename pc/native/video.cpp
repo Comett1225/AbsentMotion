@@ -322,7 +322,7 @@ struct Video {
         return best;
     }
 
-    int show(jlong desktop, const std::string& uri, int64_t t, bool exact, int64_t layer = 0) {
+    int show(jlong desktop, const std::string& uri, int64_t t, int waitMs, int64_t layer = 0) {
         FramePtr pick;
         int64_t pickUs = INT64_MIN;
         bool gone = false;
@@ -331,7 +331,7 @@ struct Video {
             want = t;
             asked = true;
             wake.notify_one();
-            const auto wait = exact ? std::chrono::milliseconds(15000) : std::chrono::milliseconds(30);
+            const auto wait = std::chrono::milliseconds(std::max(waitMs, 0));
             ready.wait_for(hold, wait, [&] { return servable(t) || hopeless(t); });
             if (servable(t)) {
                 const Decoded& d = chosen(t);
@@ -406,10 +406,10 @@ JNIEXPORT jdoubleArray JNICALL JNI(videoInfo)(JNIEnv* e, jobject, jlong v) {
     return result;
 }
 JNIEXPORT jint JNICALL JNI(videoFrame)(JNIEnv* e, jobject, jlong h, jlong v, jstring uri, jlong timeUs, jboolean exact) {
-    return video(v)->route(timeUs, 0)->show(h, DesktopString(e, uri), timeUs, exact == JNI_TRUE);
+    return video(v)->route(timeUs, 0)->show(h, DesktopString(e, uri), timeUs, exact == JNI_TRUE ? 15000 : 30);
 }
-JNIEXPORT jint JNICALL JNI(videoFrameLayer)(JNIEnv* e, jobject, jlong h, jlong v, jstring uri, jlong layer, jlong timeUs, jboolean exact) {
-    return video(v)->route(timeUs, layer)->show(h, DesktopString(e, uri), timeUs, exact == JNI_TRUE, layer);
+JNIEXPORT jint JNICALL JNI(videoFrameLayer)(JNIEnv* e, jobject, jlong h, jlong v, jstring uri, jlong layer, jlong timeUs, jint waitMs) {
+    return video(v)->route(timeUs, layer)->show(h, DesktopString(e, uri), timeUs, waitMs, layer);
 }
 JNIEXPORT void JNICALL JNI(videoClose)(JNIEnv*, jobject, jlong v) { delete video(v); }
 }
