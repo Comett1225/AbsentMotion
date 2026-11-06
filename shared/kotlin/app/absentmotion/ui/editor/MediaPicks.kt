@@ -45,6 +45,8 @@ internal object MediaPicks {
 
     fun openSounds() { target = currentProject(); launchSounds() }
 
+    fun forgetTarget() { target = null }
+
     private val pictures = mutableStateListOf<Pair<Uri, Long>>()
     private val sounds = mutableStateListOf<Pair<Uri, Long>>()
 

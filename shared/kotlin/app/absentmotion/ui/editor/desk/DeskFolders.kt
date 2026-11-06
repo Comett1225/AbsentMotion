@@ -40,9 +40,10 @@ internal fun <T> groupByFolder(items: List<T>, query: String, roots: List<File>,
         .map { FolderGroup(it, groups[it].orEmpty()) }
 }
 
-internal fun shortFolderPath(folder: File): String {
+internal fun shortFolderPath(folder: File): String = folder.parentFile?.path?.let(::homeShortPath) ?: ""
+
+internal fun homeShortPath(path: String): String {
     val home = System.getProperty("user.home").orEmpty()
-    val path = folder.parentFile?.path ?: return ""
     return if (home.isNotEmpty() && (path == home || path.startsWith(home + File.separator))) "~" + path.removePrefix(home) else path
 }
 
@@ -110,7 +111,7 @@ private fun DeskFolderTile(path: String, pinned: Boolean, open: () -> Unit, unli
     val source = remember { MutableInteractionSource() }
     val hovered by source.collectIsHoveredAsState()
     val name = remember(path) { File(path).name.ifEmpty { path } }
-    DeskTip(path) {
+    DeskTip(homeShortPath(path)) {
         DeskContext({}, menu = { close ->
             MenuRow(stringResource(if (pinned) R.string.desk_unpin_folder else R.string.desk_pin_folder)) { close(); app.absentmotion.platform.pinLibraryFolder(path, !pinned) }
             MenuRow(stringResource(R.string.desk_unlink_folder_plain)) { close(); unlink() }

@@ -24,6 +24,11 @@ private class NestedClock(private val layer: Layer, hostFps: Int) {
     private val room = outroStart - intro
     private val span = outro - intro
 
+    fun hostTime(inner: Double): Double {
+        if (method == "off") return origin + inner / speed
+        return origin + inner
+    }
+
     fun at(at: Double, quantize: Boolean): SceneTime {
         val local = (if (quantize) layer.steppedMs(at) else at) - origin
         if (method == "off") return SceneTime(local * speed, speed)
@@ -50,6 +55,9 @@ private class NestedClock(private val layer: Layer, hostFps: Int) {
 
 internal fun Layer.nestedTime(at: Double, hostFps: Int, quantize: Boolean = true): SceneTime =
     if (nested == null) SceneTime(at) else NestedClock(this, hostFps).at(at, quantize)
+
+internal fun Layer.nestedHostTime(inner: Double, hostFps: Int): Double =
+    if (nested == null) inner else NestedClock(this, hostFps).hostTime(inner)
 
 internal class LayerTrack(val layer: Layer, val scene: Scene, val parents: List<Pair<Layer, Int>>) {
     private val clocks = parents.map { (parent, fps) -> NestedClock(parent, fps) }

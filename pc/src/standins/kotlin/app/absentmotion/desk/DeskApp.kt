@@ -145,6 +145,7 @@ class DeskAppState {
     private var closeAnyway = false
     private val fontsDeclined = HashSet<String>()
     private val closeLock = Mutex()
+    private val openLock = Mutex()
     private val background = MainScope()
     val migration by lazy { EffectMigration.read(context) }
 
@@ -329,8 +330,8 @@ class DeskAppState {
 
     suspend fun shutdown(timeoutMs: Long = 4000): Boolean {
         val closing = background.launch { closeEditor() }
-        withTimeoutOrNull(timeoutMs) { closing.join() }
-        return !saveFailed
+        val finished = withTimeoutOrNull(timeoutMs) { closing.join(); true } ?: false
+        return finished && !saveFailed
     }
 
     fun takePalettes(files: List<File>): List<File> = files.filterNot { file ->
@@ -340,11 +341,14 @@ class DeskAppState {
     }
 
     fun queueMedia(uris: List<Uri>) {
+        MediaPicks.forgetTarget()
         val sounds = uris.filter { android.content.Desk.mime(it.toString())?.startsWith("audio/") == true }
         val pictures = uris - sounds.toSet()
         if (pictures.isNotEmpty()) MediaPicks.addPictures(pictures)
         if (sounds.isNotEmpty()) MediaPicks.addSounds(sounds)
     }
+
+    fun openLater(files: List<File>) { background.launch { openLock.withLock { openFiles(files) } } }
 
     suspend fun openFiles(files: List<File>) {
         DeskLibrary.remember(files)
@@ -457,7 +461,7 @@ private fun DeskContent(app: DeskAppState, scale: Float) {
     LaunchedEffect(Unit) { app.maintain() }
     LaunchedEffect(DeskOpen.arrived.intValue) {
         val files = DeskOpen.take()
-        if (files.isNotEmpty()) app.openFiles(files)
+        if (files.isNotEmpty()) app.openLater(files)
     }
     LaunchedEffect(app.editor) {
         val state = app.editor ?: return@LaunchedEffect

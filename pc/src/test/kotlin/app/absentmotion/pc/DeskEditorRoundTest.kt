@@ -22,6 +22,10 @@ import app.absentmotion.desk.DeskKeys
 import app.absentmotion.editor.MultiSelect
 import app.absentmotion.model.Scene
 import app.absentmotion.ui.editor.DeskDividerMath
+import app.absentmotion.ui.editor.DeskDrop
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.type
 import app.absentmotion.ui.editor.DeskPreviewBounds
 import app.absentmotion.ui.editor.LocalWide
 import app.absentmotion.ui.editor.Timeline
@@ -106,6 +110,38 @@ class DeskEditorRoundTest {
         }
         MultiSelect.clear()
         app.engine.close()
+    }
+
+    @Test fun browserKeysReachTheOpenLibraryAndAltSpaceLeavesPlayback() {
+        System.setProperty("am.data", File("build/editor-round-browser-keys").absolutePath)
+        val app = DeskAppState()
+        val id = app.store.create(Scene.parse(File("../testdata/scenes/styles.xml").readText()))
+        val state = runBlocking { app.openNow(id)!! }
+        val seen = mutableListOf<Key>()
+        DeskDrop.browserKey = { event: androidx.compose.ui.input.key.KeyEvent -> if (event.type == KeyEventType.KeyDown && event.key == Key.DirectionRight) { seen += event.key; true } else false }
+        try {
+            runSkikoComposeUiTest(size = Size(800f, 300f)) {
+                setContent {
+                    val focus = remember { FocusRequester() }
+                    CompositionLocalProvider(LocalWide provides true) {
+                        Box(Modifier.fillMaxSize().focusRequester(focus).onKeyEvent { DeskKeys.handle(app, it) }.focusable()) { Timeline(state, Modifier.fillMaxSize()) }
+                    }
+                    LaunchedEffect(Unit) { focus.requestFocus() }
+                }
+                val before = state.frame
+                onRoot().performKeyInput { pressKey(Key.DirectionRight) }
+                runOnIdle { assertEquals(listOf(Key.DirectionRight), seen); assertEquals(before, state.frame) }
+                state.playing = false
+                onRoot().performKeyInput { keyDown(Key.AltLeft); pressKey(Key.Spacebar); keyUp(Key.AltLeft) }
+                runOnIdle { assertTrue(!state.playing) }
+                onRoot().performKeyInput { pressKey(Key.Spacebar) }
+                runOnIdle { assertTrue(state.playing) }
+            }
+        } finally {
+            DeskDrop.browserKey = null
+            MultiSelect.clear()
+            app.engine.close()
+        }
     }
 
     private fun ComposeUiTest.open(app: DeskAppState) {

@@ -19,7 +19,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 fun warmup() {
-    val dir = File(System.getProperty("java.io.tmpdir"), "absentmotion-warmup").also { it.deleteRecursively(); it.mkdirs() }
+    val dir = java.nio.file.Files.createTempDirectory("absentmotion-warmup").toFile()
     System.setProperty("am.data", dir.resolve("data").path)
     System.setProperty("am.exports", dir.resolve("exports").path)
     application {

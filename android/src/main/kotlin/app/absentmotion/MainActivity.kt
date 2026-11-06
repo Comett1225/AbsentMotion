@@ -572,6 +572,7 @@ class MainActivity : ComponentActivity() {
         historyFor = null
         openJob = lifecycleScope.launch {
             val failure = try {
+                if (state != null) withContext(Dispatchers.IO) { runCatching { state.saver.flush().get() } }
                 withContext(DiskThread.dispatcher) {
                     runCatching { store.restore(id, version) }.onFailure { Log.e("AMStore", "cannot restore a version of $id", it) }.exceptionOrNull()
                 }

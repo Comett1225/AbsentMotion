@@ -41,6 +41,9 @@ class ExportNameTest {
         assertEquals("My project", name.next(ExportKind.Frame))
         name.value = " /A: clip? "
         assertEquals("A clip", name.next(ExportKind.Frame))
+        name.value = "Walk A & B (take 2)!"
+        assertEquals("Walk A & B (take 2)!", name.next(ExportKind.Frame))
+        assertEquals("Walk A & B", safeName("Walk A & B?"))
         name.value = "x".repeat(300)
         assertEquals(120, name.next(ExportKind.Frame).length)
         name.value = "অ".repeat(160)

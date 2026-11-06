@@ -1216,7 +1216,7 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
             const bool handing = pass && k == last;
             SkPictureRecorder recorder;
             SkCanvas* out = handing ? canvas : recorder.beginRecording(bounds);
-            const auto& sourceLayers = layer.sight.layers ? *layer.sight.layers : scene.layers;
+            const auto& sourceLayers = layer.sight.layers ? *layer.sight.layers : EffectSiblings() ? *EffectSiblings() : scene.layers;
             const Layer& original = layer.sight.layer ? *layer.sight.layer : layer;
             const Placement world = EffectivePlacement(sourceLayers, original, timeMs);
             const LightSet lights = SceneLights(sourceLayers, timeMs);

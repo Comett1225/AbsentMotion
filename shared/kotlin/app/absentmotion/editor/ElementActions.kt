@@ -60,11 +60,11 @@ internal fun Layer.flattensIntoAsset(): Boolean = nested?.let { inner -> inner.r
 internal fun Scene.elementNodes(layer: Layer, bounds: FloatArray?): List<XmlNode> {
     val group = layer.nested?.takeIf { layer.flattensIntoAsset() }
     if (group == null) {
-        val shifted = (rebased(layer, null) ?: layer).node.with("startTime", "0").with("endTime", "${layer.endTime - layer.startTime}")
+        val shifted = (flattened(layer) ?: layer).node.with("startTime", "0").with("endTime", "${layer.endTime - layer.startTime}")
         return listOf(if (bounds == null) shifted else shifted.mapTransform("location") { v -> v[0] -= bounds[0]; v[1] -= bounds[1] })
     }
     val box = Layer(layer.node)
-    val flat = group.layers.fold(group) { acc, l -> if (l.node["parent"] == null) acc else acc.update(l.id) { acc.rebased(it, null) ?: it } }
+    val flat = group.layers.fold(group) { acc, l -> if (l.node["parent"] == null) acc else acc.update(l.id) { acc.flattened(it) ?: it } }
     val speed = (box.node.child("speedMap")?.get("value") ?: box.node["speed"])?.toFloatOrNull()?.takeIf { it > 0 && it.isFinite() } ?: 1f
     fun hostMs(innerMs: Int) = (box.startTime + innerMs / speed).roundToInt().coerceIn(box.startTime, box.endTime)
     val outer = chain(box)

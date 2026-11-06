@@ -1212,6 +1212,10 @@
     <string name="mixer_solo">Solo</string>
     <string name="mixer_mute_short">M</string>
     <string name="mixer_solo_short">S</string>
+    <string name="meter_left_short">L</string>
+    <string name="meter_right_short">R</string>
+    <string name="meter_mono">Mono</string>
+    <string name="meter_master">Aras master</string>
     <string name="mixer_empty">Tiada bunyi dalam projek ini</string>
     <string name="mixer_empty_hint">Tambah muzik, bunyi atau video dengan bunyi untuk memaparkannya di sini.</string>
     <string name="blend_cat_normal">Biasa</string>

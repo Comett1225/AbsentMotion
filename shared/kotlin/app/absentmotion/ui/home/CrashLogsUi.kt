@@ -139,7 +139,7 @@ private fun CrashDetails(log: CrashEntry, onBack: () -> Unit) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Box(
                     Modifier.height(40.dp).clip(RoundedCornerShape(14.dp)).background(Am.Navy).clickable {
-                        context.getSystemService(ClipboardManager::class.java)?.setPrimaryClip(ClipData.newPlainText("AbsentMotion", "$time\n$sentence\n\n$detail"))
+                        context.getSystemService(ClipboardManager::class.java)?.setPrimaryClip(ClipData.newPlainText("AbsentMotion", scrubReport("$time\n$sentence\n\n$detail")))
                     }.padding(horizontal = 18.dp),
                     contentAlignment = Alignment.Center,
                 ) { Text(stringResource(R.string.crash_copy), color = Am.OnNavy, fontSize = 15.sp, fontWeight = FontWeight.Medium) }

@@ -3,7 +3,7 @@ HERE="$(dirname "$(readlink -f "$0")")"
 OPTIONS=""
 CACHE="${XDG_CACHE_HOME:-${HOME:+$HOME/.cache}}/absentmotion"
 case "${APPIMAGE:-}:$CACHE" in
-    ?*:* | :/absentmotion | *[[:space:]]*) ;;
+    ?*:* | :/absentmotion | *[[:space:]]* | *\'* | *\"* | *\\*) ;;
     *)
         KEY="$(stat -c '%n %s %Y' "$(dirname "$HERE")"/lib/app/*.jar 2>/dev/null | cksum | cut -d ' ' -f 1)"
         if [ -n "$KEY" ] && mkdir -p "$CACHE" 2>/dev/null && [ -w "$CACHE" ]; then

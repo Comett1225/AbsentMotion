@@ -32,7 +32,9 @@ The sound of a clip follows its speed (see [Photos, video and speed](@media)). S
 
 ## Mixer
 
-On a tablet in a wide layout, and on a computer, the mixer shows up when no layer is selected (on a tablet only when there is room next to the preview). Every layer that makes sound gets a strip with its name, a volume fader, a level meter and the value. Drag the fader to change the volume (one drag is one undo step); double-tap it (double-click on a computer) to go back to 100%. **M** mutes the layer and **S** (Solo) plays only the soloed layers while you listen; Solo is not saved and does not change the export. The **Master** strip shows the level of the whole project. The gear at the top opens the project settings.
+On a computer, the mixer shows up in the inspector when no layer is selected. Every layer that makes sound gets a strip with its name, a volume fader, a level meter and the value. A stereo layer has two bars, **L** (left) and **R** (right); a mono layer has one bar marked **Mono** (the app learns which it is when the layer first plays). Drag the fader to change the volume (one drag is one undo step); double-click it to go back to 100%. **M** mutes the layer and **S** (Solo) plays only the soloed layers while you listen; Solo is not saved and does not change the export. The **Master** strip shows the left and right level of the whole project and the louder of the two in dB. The gear at the top opens the project settings.
+
+On a phone, the thin line under the play bar is the level meter while the project plays: the left half grows out from the middle with the left channel and the right half with the right channel, and a side turns red when it clips. A tablet has the same line and, while the project plays, a slim master meter on the left side of the preview: an **L** and an **R** bar with the level of the whole project in dB under them.
 
 ## Audio effects
 

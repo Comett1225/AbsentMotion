@@ -1212,6 +1212,10 @@
     <string name="mixer_solo">Solo</string>
     <string name="mixer_mute_short">M</string>
     <string name="mixer_solo_short">S</string>
+    <string name="meter_left_short">L</string>
+    <string name="meter_right_short">R</string>
+    <string name="meter_mono">Mono</string>
+    <string name="meter_master">Mức tổng</string>
     <string name="mixer_empty">Dự án này không có âm thanh</string>
     <string name="mixer_empty_hint">Thêm nhạc, âm thanh hoặc video có âm thanh để hiển thị ở đây.</string>
     <string name="blend_cat_normal">Thường</string>

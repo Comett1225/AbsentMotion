@@ -59,10 +59,10 @@ fun main(args: Array<String>) {
         }
     }
     val files = DeskOpen.fromArguments(args)
-    if (!DeskOs.mac && files.isNotEmpty() && DeskInstance.forward(files)) return
+    if (!DeskOs.mac && DeskInstance.forward(files)) return
     DeskOpen.offer(files)
     DeskOpen.listenForFiles()
-    DeskInstance.serve { DeskOpen.offer(it) }
+    DeskInstance.serve { DeskOpen.offer(it); DeskOpen.raise() }
     application {
         val prefs = remember { Preferences.userNodeForPackage(DesktopPlatform::class.java) }
         val placed = remember {

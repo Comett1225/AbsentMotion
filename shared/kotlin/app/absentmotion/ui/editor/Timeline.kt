@@ -920,7 +920,15 @@ private class TimelineView(val state: EditorState, density: Density, private val
 
     private fun scopeOf(layer: Layer): KeyScope? = if (layer.id == state.selectedId) state.keyScope else null
 
+    private var keyFramesFps = 0
+
     fun keyFrames(layer: Layer): List<Int> {
+        val fps = state.scene.fps
+        if (keyFramesFps != fps || keyFrames.size > state.scene.layers.size * 4 + 16) {
+            keyFrames.clear()
+            keyFrameNodes.clear()
+            keyFramesFps = fps
+        }
         val scope = scopeOf(layer)
         val key = layer.id to scope
         val cached = keyFrames[key]
@@ -2140,12 +2148,15 @@ private fun DrawScope.drawHeader(top: Float, eye: Painter, tag: LabelColour?, ch
     }
 }
 
+private val hookPath = Path()
+
 private fun DrawScope.drawClipHook(x: Float, y: Float) {
     val bend = 3.dp.toPx()
     val end = x + 8.dp.toPx()
     val tip = y + 11.dp.toPx()
     val head = 3.dp.toPx()
-    val hook = Path().apply {
+    val hook = hookPath.apply {
+        rewind()
         moveTo(x, y)
         lineTo(end - bend, y)
         quadraticTo(end, y, end, y + bend)

@@ -4,6 +4,7 @@ import app.absentmotion.model.Easing
 import app.absentmotion.model.Layer
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
+import app.absentmotion.model.isKeyframed
 import app.absentmotion.model.keyframes
 import app.absentmotion.sceneOf
 import app.absentmotion.shapeNode
@@ -275,5 +276,20 @@ class PivotEngineTest {
             }
         }
         points(s).zip(points(out)).forEach { (a, b) -> assertEquals(a, b, 0.02f) }
+    }
+
+    @Test fun linkingAndUnlinkingATiltedOrFlatParentKeepsTheChildOnScreenAtThePlayheadWithoutKeys() {
+        for (tilt in listOf("0,0", "30,0", "-20,35")) {
+            val s = sceneOf(
+                layer(1, prop("location", 0f to "200,200,0", 1f to "260,180,40"), prop("tilt", 0f to tilt), prop("rotation", 0f to "20", 1f to "50"), prop("scale", 0f to "1.4,0.8"), prop("pivot", 0f to "6,-4,0")),
+                layer(2, prop("location", 0f to "120,260,0"), prop("rotation", 0f to "-15"), prop("tilt", 0f to "10,0"), prop("pivot", 0f to "3,5,0")),
+            )
+            val linked = s.update(2) { s.rebased(it, 1, 500)!! }
+            val unlinked = linked.update(2) { linked.rebased(it, null, 700)!! }
+            assertEquals("1", linked.layer(2)!!.node["parent"])
+            assertStays(s, linked, listOf(2), listOf(500), 0.05f)
+            assertStays(linked, unlinked, listOf(2), listOf(700), 0.05f)
+            for (out in listOf(linked, unlinked)) assertTrue(out.layer(2)!!.node.child("transform")!!.children.none { it.isKeyframed })
+        }
     }
 }

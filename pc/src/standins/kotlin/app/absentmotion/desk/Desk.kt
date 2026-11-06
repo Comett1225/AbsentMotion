@@ -45,7 +45,7 @@ object DeskFiles {
 
     val videoExtensions = setOf("mp4", "mov", "m4v", "webm", "mkv", "avi")
 
-    fun chooseFiles(media: Boolean, multiple: Boolean, title: String = if (media) "Choose media" else "Choose a file", videoOnly: Boolean = false): List<File> {
+    fun chooseFiles(media: Boolean, multiple: Boolean, videoOnly: Boolean = false, title: String = when { videoOnly -> "Choose a video"; media -> "Choose media"; else -> "Choose a file" }): List<File> {
         System.getProperty("am.pick")?.let { return listOf(File(it)) }
         val filters = when {
             !media -> emptyList()

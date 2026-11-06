@@ -278,10 +278,12 @@ object SavedSizes {
     fun decode(text: String?): List<SavedSize> = runCatching {
         val array = JSONArray(text ?: return emptyList())
         (0 until array.length()).mapNotNull { i ->
-            val o = array.getJSONObject(i)
-            val w = o.getInt("w")
-            val h = o.getInt("h")
-            if (w in 1..8192 && h in 1..8192) SavedSize(o.getString("n"), w, h) else null
+            runCatching {
+                val o = array.getJSONObject(i)
+                val w = o.getInt("w")
+                val h = o.getInt("h")
+                if (w in 1..8192 && h in 1..8192) SavedSize(o.getString("n"), w, h) else null
+            }.getOrNull()
         }.take(MAX)
     }.getOrDefault(emptyList())
 }

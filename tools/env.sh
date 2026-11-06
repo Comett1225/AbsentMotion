@@ -1,12 +1,19 @@
 am_jbr21() { [ -x "$1/bin/java" ] && grep -q '^JAVA_VERSION="21' "$1/release" 2>/dev/null && grep -q '^IMPLEMENTOR="JetBrains' "$1/release" 2>/dev/null; }
-if [ -z "${JAVA_HOME:-}" ] || ! am_jbr21 "$JAVA_HOME"; then
+am_find_jbr21() {
+    [ -n "${ZSH_VERSION:-}" ] && setopt local_options null_glob
     for root in "$HOME/Library/Java/JavaVirtualMachines" /Library/Java/JavaVirtualMachines "$HOME/.jdks" /usr/lib/jvm /opt; do
-        for name in $(ls "$root" 2>/dev/null); do
-            for candidate in "$root/$name/Contents/Home" "$root/$name"; do
-                if am_jbr21 "$candidate"; then export JAVA_HOME="$candidate"; break 3; fi
+        [ -d "$root" ] || continue
+        for dir in "$root"/*; do
+            [ -d "$dir" ] || continue
+            for candidate in "$dir/Contents/Home" "$dir"; do
+                if am_jbr21 "$candidate"; then export JAVA_HOME="$candidate"; return 0; fi
             done
         done
     done
+    return 1
+}
+if [ -z "${JAVA_HOME:-}" ] || ! am_jbr21 "$JAVA_HOME"; then
+    am_find_jbr21 || true
 fi
 if [ -z "${JAVA_HOME:-}" ]; then
     for candidate in "$(/usr/libexec/java_home -v 21 2>/dev/null)" \

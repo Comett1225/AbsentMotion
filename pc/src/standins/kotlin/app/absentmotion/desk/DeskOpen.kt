@@ -19,6 +19,10 @@ object DeskOpen {
         javax.swing.SwingUtilities.invokeLater { arrived.intValue++ }
     }
 
+    fun raise() = javax.swing.SwingUtilities.invokeLater {
+        DeskFiles.window?.let { if (it.extendedState and java.awt.Frame.ICONIFIED != 0) it.extendedState = it.extendedState and java.awt.Frame.ICONIFIED.inv(); it.toFront() }
+    }
+
     fun take(): List<File> = generateSequence { queue.poll() }.toList()
 
     fun isProject(file: File) = file.extension.lowercase() in projectExtensions
@@ -53,7 +57,7 @@ object DeskOpen {
 }
 
 object DeskInstance {
-    private val file get() = DeskOs.dataDir.resolve("instance")
+    private val file get() = (System.getProperty("am.data")?.let(::File) ?: DeskOs.dataDir).resolve("instance")
     private var server: ServerSocket? = null
 
     fun forward(files: List<File>): Boolean {

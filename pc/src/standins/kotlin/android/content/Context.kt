@@ -87,7 +87,7 @@ object ContentResolver {
     fun openOutputStream(uri: Uri, mode: String = "w"): OutputStream? = file(uri)?.let { it.parentFile?.mkdirs(); java.io.FileOutputStream(it, mode.contains("a")) }
     fun getType(uri: Uri): String? = file(uri)?.let { java.net.URLConnection.guessContentTypeFromName(it.name) ?: Desk.mime(it.name) }
     fun delete(uri: Uri, where: String?, args: Array<String>?): Int = if (file(uri)?.delete() == true) 1 else 0
-    fun query(uri: Uri, projection: Array<String>?, selection: String?, args: Array<String>?, sort: String?): android.database.Cursor? = app.absentmotion.desk.DeskGallery.query(uri, projection) ?: fileQuery(uri, projection)
+    fun query(uri: Uri, projection: Array<String>?, selection: String?, args: Array<String>?, sort: String?): android.database.Cursor? = app.absentmotion.desk.DeskGallery.query(uri, projection, selection, args) ?: fileQuery(uri, projection)
     private fun fileQuery(uri: Uri, projection: Array<String>?): android.database.Cursor? {
         val f = file(uri)?.takeIf { it.isFile } ?: return null
         val columns = projection ?: arrayOf("_display_name", "_size")
@@ -153,7 +153,12 @@ class SharedPreferences private constructor(private val file: File) {
         fun commit(): Boolean = synchronized(props) {
             if (clear) props.clear()
             puts.forEach { (k, v) -> if (v == null) props.remove(k) else props.setProperty(k, v) }
-            runCatching { file.parentFile.mkdirs(); file.outputStream().use { props.store(it, null) } }.isSuccess
+            runCatching {
+                file.parentFile.mkdirs()
+                val temp = File(file.parentFile, file.name + ".tmp")
+                temp.outputStream().use { props.store(it, null) }
+                java.nio.file.Files.move(temp.toPath(), file.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING, java.nio.file.StandardCopyOption.ATOMIC_MOVE)
+            }.isSuccess
         }
         fun apply() { commit() }
     }

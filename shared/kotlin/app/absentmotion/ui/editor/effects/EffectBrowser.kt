@@ -235,6 +235,12 @@ fun EffectBrowser(state: EditorState) {
             else -> false
         }
     }
+    val latestKey by rememberUpdatedState<(androidx.compose.ui.input.key.KeyEvent) -> Boolean> { browserKey(it) }
+    if (PlatformFeatures.desktop) DisposableEffect(Unit) {
+        val hook: (androidx.compose.ui.input.key.KeyEvent) -> Boolean = { latestKey(it) }
+        app.absentmotion.ui.editor.DeskDrop.browserKey = hook
+        onDispose { if (app.absentmotion.ui.editor.DeskDrop.browserKey === hook) app.absentmotion.ui.editor.DeskDrop.browserKey = null }
+    }
     Column(Modifier.fillMaxSize().background(BrowserBg).systemBarsPadding().then(if (PlatformFeatures.desktop) Modifier.focusRequester(rootFocus).onKeyEvent(::browserKey).focusable() else Modifier)) {
         helpPage?.let { page -> HelpScreen(page) { helpPage = null } }
         if (PlatformFeatures.desktop) Row(Modifier.fillMaxWidth().height(52.dp).padding(start = 8.dp, end = 6.dp), verticalAlignment = Alignment.CenterVertically) {

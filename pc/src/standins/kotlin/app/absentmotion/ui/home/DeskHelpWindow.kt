@@ -40,9 +40,15 @@ fun HelpScreen(page: String = "index.html", onClose: () -> Unit) {
     val height = remember { prefs.getInt("helpHeight", 820).coerceIn(320, 3000) }
     val x = remember { prefs.getInt("helpX", Int.MIN_VALUE) }
     val y = remember { prefs.getInt("helpY", Int.MIN_VALUE) }
+    val placed = remember {
+        val (screens, primary) = app.absentmotion.desk.DeskWindow.screens()
+        val saved = if (x != Int.MIN_VALUE && y != Int.MIN_VALUE && visibleOnAScreen(x, y, width)) java.awt.Rectangle(x, y, width, height) else null
+        saved?.let { app.absentmotion.desk.DeskWindow.place(it, screens, primary, 420, 320) }
+            ?: java.awt.Rectangle(0, 0, width.coerceAtMost(primary.width), height.coerceAtMost(primary.height))
+    }
     val state = rememberDialogState(
-        position = if (x != Int.MIN_VALUE && y != Int.MIN_VALUE && visibleOnAScreen(x, y, width)) WindowPosition(x.dp, y.dp) else WindowPosition(androidx.compose.ui.Alignment.Center),
-        width = width.dp, height = height.dp,
+        position = if (x != Int.MIN_VALUE && y != Int.MIN_VALUE && visibleOnAScreen(x, y, width)) WindowPosition(placed.x.dp, placed.y.dp) else WindowPosition(androidx.compose.ui.Alignment.Center),
+        width = placed.width.dp, height = placed.height.dp,
     )
     val clean = page.substringBefore('#').takeIf { !it.startsWith("/") && !it.contains("..") } ?: "index.html"
     var title by remember { mutableStateOf("") }

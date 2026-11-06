@@ -94,7 +94,7 @@ Seven buttons, left to right.
 
 ![The play bar: Undo (1), Redo (2), Skip back (3), Play (4), Skip forward (5), Copy and paste (6) and Preview mode (7).](img/editor-play-bar.webp)
 
-The thin line under the bar is a live level meter while the project plays: green, then yellow, then red as the sound gets louder. The whole line flashes red if the sound clips.
+The thin line under the bar is a live level meter while the project plays: the left half shows the left channel and the right half the right channel, green, then yellow, then red as the sound gets louder. A half flashes red if its side clips.
 
 ## Multi-select
 

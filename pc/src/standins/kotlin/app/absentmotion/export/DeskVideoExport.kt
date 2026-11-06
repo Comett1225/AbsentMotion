@@ -56,6 +56,8 @@ internal const val PrimingKey = "absentmotion-priming-frames"
 
 private const val FrameBuffers = 4
 
+internal fun frameBufferCount(width: Int, height: Int): Int = ((192L shl 20) / (width.toLong() * height * 4)).toInt().coerceIn(2, FrameBuffers)
+
 internal suspend fun <T> holdingVideo(hold: () -> Job?, release: () -> Job?, block: suspend () -> T): T {
     val held = hold()
     try {
@@ -119,7 +121,7 @@ internal object DeskEncoders {
 
     private val working = java.util.concurrent.ConcurrentHashMap<String, Boolean>()
 
-    fun works(name: String, s: ExportSettings, width: Int, height: Int): Boolean = (name != "av1_amf" || width % 64 == 0 && height % 16 == 0) && working.getOrPut("$name ${width}x$height") {
+    fun works(name: String, s: ExportSettings, width: Int, height: Int): Boolean = (name != "av1_amf" || width % 64 == 0 && height % 16 == 0) && working.getOrPut("$name ${width}x$height ${s.fps} ${s.codec} ${videoBitrate(width, height, s)}") {
         runCatching {
             val args = listOf(DeskMedia.ffmpeg, "-v", "error") + device(name) + listOf("-f", "lavfi", "-i", "color=c=black:s=${width}x$height:r=${s.fps}:d=0.2") +
                 filter(name) + videoArgs(name, s, width, height) + listOf("-frames:v", "2", "-f", "null", "-")
@@ -188,7 +190,11 @@ internal fun copyInto(file: File, out: FileDescriptor) {
         val target = FileOutputStream(out).channel
         var done = 0L
         val size = input.size()
-        while (done < size) done += input.transferTo(done, size - done, target)
+        while (done < size) {
+            val moved = input.transferTo(done, size - done, target)
+            if (moved <= 0L) throw java.io.IOException("copy stalled")
+            done += moved
+        }
         target.force(false)
     }
 }
@@ -251,8 +257,9 @@ internal suspend fun exportVideo(
             Log.i("AMExport", "encoding ${width}x$height at ${s.fps} fps with $encoder")
             val running = Ffmpeg(DeskEncoders.device(encoder) + inputs + listOf("-map", "0:v") + DeskEncoders.filter(encoder) +
                 DeskEncoders.videoArgs(encoder, s, width, height) + tag + sound + format + listOf("-y", result.path), log).also { ffmpeg = it }
-            val queue = ArrayBlockingQueue<ByteArray>(FrameBuffers)
-            val free = ArrayBlockingQueue<ByteArray>(FrameBuffers)
+            val buffers = frameBufferCount(width, height)
+            val queue = ArrayBlockingQueue<ByteArray>(buffers)
+            val free = ArrayBlockingQueue<ByteArray>(buffers)
             val end = ByteArray(0)
             val failure = AtomicReference<Throwable>()
             val written = AtomicInteger()
@@ -278,7 +285,7 @@ internal suspend fun exportVideo(
             }
             val ok = try {
                 try {
-                    repeat(FrameBuffers) { free.add(ByteArray(width * height * 4)) }
+                    repeat(buffers) { free.add(ByteArray(width * height * 4)) }
                     engine.exportSession(xml, s.smoothing, s.fps) {
                         for (k in 0 until frames) {
                             currentCoroutineContext().ensureActive()
@@ -296,7 +303,7 @@ internal suspend fun exportVideo(
                 } finally {
                     if (writer.isAlive) { running.kill(); queue.clear(); queue.offer(end); writer.join() }
                 }
-                withContext(Dispatchers.IO) { running.finish() }
+                runInterruptible(Dispatchers.IO) { running.finish() }
             } catch (t: Throwable) {
                 if (t is kotlinx.coroutines.CancellationException || failure.get() == null) throw t
                 false

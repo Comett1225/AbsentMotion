@@ -15,6 +15,7 @@
 #include "xml.h"
 #include "text.h"
 #include "drawing.h"
+#include "numbers.h"
 
 namespace am {
 
@@ -414,7 +415,10 @@ std::string StrAttr(const XmlNode& n, const char* key) {
 
 }
 
-Anim ParseAnimNode(const XmlNode* node) { return ParseAnim(node); }
+Anim ParseAnimNode(const XmlNode* node) {
+    CNumbers();
+    return ParseAnim(node);
+}
 
 namespace {
 
@@ -570,6 +574,7 @@ bool ParseLayer(const XmlNode& node, int fps, Layer* out) {
 }
 
 bool ParseScene(const std::string& xml, Scene* scene, std::string* error) {
+    CNumbers();
     auto root = ParseXml(xml, error);
     if (!root) return false;
     if (root->name != "scene") {

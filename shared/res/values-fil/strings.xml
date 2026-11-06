@@ -1229,6 +1229,10 @@
     <string name="mixer_solo">Solo</string>
     <string name="mixer_mute_short">M</string>
     <string name="mixer_solo_short">S</string>
+    <string name="meter_left_short">L</string>
+    <string name="meter_right_short">R</string>
+    <string name="meter_mono">Mono</string>
+    <string name="meter_master">Antas ng master</string>
     <string name="mixer_empty">Walang tunog sa proyektong ito</string>
     <string name="mixer_empty_hint">Magdagdag ng musika, tunog o bidyong may tunog para lumabas ito rito.</string>
     <string name="blend_cat_normal">Normal</string>

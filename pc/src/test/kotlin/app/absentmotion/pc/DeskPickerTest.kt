@@ -25,10 +25,10 @@ class DeskPickerTest {
     }
 
     @Test fun filterStrings() {
-        assertEquals("*.[mM][pP]4", DeskPicker.glob("mp4"))
-        assertEquals("*.[mM]4[vV]", DeskPicker.glob("m4v"))
+        assertEquals("*.mp4;*.MP4", DeskPicker.glob("mp4", ";"))
+        assertEquals("*.m4v *.M4V", DeskPicker.glob("m4v", " "))
         assertArrayEquals(arrayOf("Media", "*.mp4;*.mov"), DeskPicker.windowsFilters(listOf(media)))
-        assertArrayEquals(arrayOf("Media", "*.[mM][pP]4;*.[mM][oO][vV]"), DeskPicker.linuxFilters(listOf(media)))
+        assertArrayEquals(arrayOf("Media", "*.mp4;*.MP4;*.mov;*.MOV"), DeskPicker.linuxFilters(listOf(media)))
         assertArrayEquals(emptyArray<String>(), DeskPicker.windowsFilters(emptyList()))
     }
 
@@ -46,7 +46,7 @@ class DeskPickerTest {
         val home = "/home/u"
         assertEquals(listOf("zenity", "--file-selection", "--title=Link a media folder", "--directory"),
             DeskPicker.toolCommand("zenity", DeskPicker.FOLDER, false, "Link a media folder", "", listOf(media), home))
-        assertEquals(listOf("zenity", "--file-selection", "--title=Choose media", "--multiple", "--separator=\n", "--file-filter=Media | *.[mM][pP]4 *.[mM][oO][vV]"),
+        assertEquals(listOf("zenity", "--file-selection", "--title=Choose media", "--multiple", "--separator=\n", "--file-filter=Media | *.mp4 *.MP4 *.mov *.MOV"),
             DeskPicker.toolCommand("zenity", DeskPicker.OPEN, true, "Choose media", "", listOf(media), home))
         assertEquals(listOf("zenity", "--file-selection", "--title=Save", "--save", "--filename=/home/u/a.mp4"),
             DeskPicker.toolCommand("zenity", DeskPicker.SAVE, false, "Save", "a.mp4", emptyList(), home))
@@ -55,7 +55,7 @@ class DeskPickerTest {
         assertEquals(listOf("kdialog", "--title", "Link a media folder", "--getexistingdirectory", home),
             DeskPicker.toolCommand("kdialog", DeskPicker.FOLDER, false, "Link a media folder", "", emptyList(), home))
         val open = DeskPicker.toolCommand("kdialog", DeskPicker.OPEN, true, "Choose media", "", listOf(media), home)
-        assertEquals(listOf("kdialog", "--title", "Choose media", "--getopenfilename", home, "*.[mM][pP]4 *.[mM][oO][vV]|Media", "--multiple", "--separate-output"), open)
+        assertEquals(listOf("kdialog", "--title", "Choose media", "--getopenfilename", home, "*.mp4 *.MP4 *.mov *.MOV|Media", "--multiple", "--separate-output"), open)
         assertTrue(DeskPicker.toolCommand("kdialog", DeskPicker.OPEN, false, "Choose a file", "", emptyList(), home).none { it.startsWith("--multiple") || it.contains('|') })
     }
 }

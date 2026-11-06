@@ -113,7 +113,7 @@ internal fun DeskDialog(title: String?, width: Dp, onDismiss: () -> Unit, height
     }
 }
 
-private val mac = System.getProperty("os.name").orEmpty().lowercase().contains("mac")
+internal val mac = System.getProperty("os.name").orEmpty().lowercase().contains("mac")
 
 internal val DeskMod = if (mac) "⌘" else "Ctrl+"
 internal val DeskAlt = if (mac) "⌥" else "Alt+"

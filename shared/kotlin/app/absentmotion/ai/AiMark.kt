@@ -72,7 +72,15 @@ internal val Layer.backgroundMark: AiMark? get() = aiMarks.firstOrNull { it.kind
 internal fun Layer.shiftedMedia(by: Int): Layer {
     val fill = mediaFill
     if (by == 0 || fill == null) return this
-    val moved = node.with("inTime", "${(fill.inTime.toLong() + by).coerceAtLeast(0)}")
+    val inTime = (fill.inTime.toLong() + by).coerceAtLeast(0)
+    val moved = node.with("inTime", "$inTime").let { n ->
+        val delta = (inTime - fill.inTime) * 1_000_000.0
+        val map = n.child("speedMap")
+        if (map == null || delta == 0.0) n
+        else n.withChild("speedMap", map.copy(children = map.children.map { k ->
+            k["t"]?.toDoubleOrNull()?.takeIf { k.name == "kf" && it.isFinite() }?.let { k.with("t", String.format(java.util.Locale.US, "%.6f", it + delta)) } ?: k
+        }))
+    }
     return copy(node = if (fill.outTime == Int.MAX_VALUE) moved else moved.with("outTime", "${(fill.outTime.toLong() + by).coerceIn(0L, Int.MAX_VALUE - 1L)}"))
 }
 

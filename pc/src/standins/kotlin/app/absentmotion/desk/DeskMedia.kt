@@ -31,7 +31,7 @@ object DeskMedia {
     }.getOrDefault(emptyMap())
 
     fun frame(file: File, timeMs: Long, maxSide: Int): BufferedImage? = runCatching {
-        val process = ProcessBuilder(ffmpeg, "-v", "error", "-ss", "%.3f".format(timeMs / 1000.0), "-i", file.path, "-frames:v", "1",
+        val process = ProcessBuilder(ffmpeg, "-v", "error", "-ss", "%.3f".format(java.util.Locale.ROOT, timeMs / 1000.0), "-i", file.path, "-frames:v", "1",
             "-vf", "scale='min($maxSide,iw)':'min($maxSide,ih)':force_original_aspect_ratio=decrease", "-f", "image2pipe", "-vcodec", "png", "-")
             .redirectError(ProcessBuilder.Redirect.DISCARD).start()
         val bytes = process.inputStream.readBytes()

@@ -147,7 +147,7 @@ class DeskWindowTest {
             setContent { labels = deskMenus(app, kotlinx.coroutines.MainScope()).associate { m -> m.label to m.children.orEmpty().map { (if (it.enabled) "" else "-") + it.label + (it.keys?.let { k -> " " + shortcutText(k, false) } ?: "") } } }
             waitForIdle()
             assertEquals(listOf("File", "Edit", "View", "Playback", "Help"), labels.keys.toList())
-            assertEquals(listOf("New Project… Ctrl+N", "Settings… Ctrl+,", "", "-Import Media…", "Import Project…", "Link Media Folder…", "", "-Export… Ctrl+E", "-Close Project Ctrl+W"), labels["File"])
+            assertEquals(listOf("New Project… Ctrl+N", "Settings… Ctrl+,", "", "-Import Media…", "Import Project…", "Link Media Folder…", "", "-Export… Ctrl+E", "-Close Project Ctrl+W") + if (DeskOs.mac) emptyList() else listOf("", "Quit Ctrl+Q"), labels["File"])
             assertEquals(listOf("-Play", "-Go to Start", "-Go to End", "", "-Previous Bookmark Alt+←", "-Next Bookmark Alt+→"), labels["Playback"])
             assertEquals(listOf("Zoom In Ctrl+=", "Zoom Out Ctrl+-", "-Actual Size Ctrl+0"), labels["View"])
             assertEquals(9, labels["Edit"]!!.size)

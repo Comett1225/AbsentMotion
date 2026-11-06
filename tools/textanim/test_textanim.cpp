@@ -1,6 +1,7 @@
 #include "frames.h"
 #include "textanim.h"
 
+#include <clocale>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
@@ -121,6 +122,9 @@ int main() {
         check(CountNumbers("no numbers here", 5, 2, -1, 1) == "no numbers here", "text without numbers stays");
         check(CountNumbers("1.23456789", 0, 1, -1, 0) == "1.23456789", "as typed preserves more than six decimals");
         check(CountNumbers("7", 0.6, 1, 0, 0) == "8", "rounds to the decimals asked for");
+        const bool comma = setlocale(LC_ALL, "de_DE.UTF-8") || setlocale(LC_ALL, "fr_FR.UTF-8");
+        check(!comma || CountNumbers("$1,250.50 now", 10, 1, -1, 1) == "$1,260.50 now", "a comma locale set later does not change counted numbers");
+        setlocale(LC_ALL, "C");
         check(CountNumbers(std::string(400, '9'), 0, 0, -1, 0) == "0", "overflowing input multiplied by zero stays numeric");
         check(CountNumbers("١ 100", 5, 1, -1, 0) == "١ 105", "other scripts pass through");
     }

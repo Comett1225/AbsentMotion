@@ -19,7 +19,7 @@ class ExportName(private val projectTitle: String) {
     private fun clean(value: String): String = buildString {
         var bytes = 0
         for (c in value) {
-            if (!c.isLetterOrDigit() && c !in "_-.+, ") continue
+            if (!c.isLetterOrDigit() && c !in SafeNameChars) continue
             val size = when { c.code < 0x80 -> 1; c.code < 0x800 -> 2; else -> 3 }
             if (bytes + size > 180 || length == 120) break
             append(c)

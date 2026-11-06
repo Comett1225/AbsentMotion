@@ -15,18 +15,25 @@ object DeskGallery {
 
     private fun scan(video: Boolean): List<File> = DeskLibrary.files(if (video) videos else images)
 
-    fun idOf(file: File): Long = (file.absolutePath.hashCode().toLong() and 0x7fffffffL).also { ids[it] = file }
+    private val byPath = ConcurrentHashMap<String, Long>()
+
+    fun idOf(file: File): Long = byPath.computeIfAbsent(file.absolutePath) { path ->
+        var id = path.hashCode().toLong() and 0x7fffffffL
+        while (ids.putIfAbsent(id, file) != null) id = (id + 1) and 0x7fffffffL
+        id
+    }
 
     fun fileOf(id: Long): File? = ids[id]
 
     private fun duration(file: File): Long = durations.getOrPut("${file.path}:${file.lastModified()}") { DeskMedia.probe(file)["duration"]?.toLongOrNull() ?: 0L }
 
-    fun query(uri: Uri, projection: Array<String>?): Cursor? {
+    fun query(uri: Uri, projection: Array<String>?, selection: String? = null, args: Array<String>? = null): Cursor? {
         val text = uri.toString()
         val video = text.startsWith("content://media/external/video")
         if (!video && !text.startsWith("content://media/external/images")) return null
         val columns = projection ?: arrayOf("_id", "_display_name", "bucket_id", "bucket_display_name", "date_added", "date_modified", "mime_type")
-        val files = scan(video).sortedByDescending { it.lastModified() }
+        val byNameAndSize = selection != null && args?.size == 2 && "_display_name" in selection && "_size" in selection
+        val files = scan(video).filter { !byNameAndSize || it.name == args!![0] && it.length().toString() == args[1] }.sortedByDescending { it.lastModified() }
         val rows = files.map { f ->
             Array<Any?>(columns.size) { i ->
                 when (columns[i]) {

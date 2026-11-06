@@ -1229,6 +1229,10 @@
     <string name="mixer_solo">सोलो</string>
     <string name="mixer_mute_short">M</string>
     <string name="mixer_solo_short">S</string>
+    <string name="meter_left_short">L</string>
+    <string name="meter_right_short">R</string>
+    <string name="meter_mono">मोनो</string>
+    <string name="meter_master">मास्टर लेवल</string>
     <string name="mixer_empty">इस प्रोजेक्ट में कोई आवाज़ नहीं है</string>
     <string name="mixer_empty_hint">संगीत, आवाज़ या आवाज़ वाला वीडियो जोड़ें, तो वह यहाँ दिखेगा।</string>
     <string name="blend_cat_normal">नॉर्मल</string>

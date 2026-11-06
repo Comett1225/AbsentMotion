@@ -14,6 +14,7 @@ class AudioEngine(context: Context) {
     @Volatile private var clips: List<AudioClip> = emptyList()
     private val streams = HashMap<Long, LayerStream>()
     private val sounds = java.util.concurrent.ConcurrentHashMap<String, Boolean>()
+    private val versions = java.util.concurrent.ConcurrentHashMap<String, Long>()
     private val output = DeskOutput()
     @Volatile private var session: Session? = null
     @Volatile private var closed = false
@@ -44,7 +45,11 @@ class AudioEngine(context: Context) {
         if (closed) return
         val next = AudioClip.of(scene)
         clips = next
-        for (clip in next) if (sounds.putIfAbsent(clip.uri, true) == null) probe.execute { sounds[clip.uri] = OfflineMix.hasSoundTrack(context, clip.uri) }
+        for (clip in next) {
+            sounds.putIfAbsent(clip.uri, true)
+            val version = runCatching { android.net.Uri.parse(clip.uri).toFile()?.let { it.lastModified() * 31 + it.length() } }.getOrNull() ?: 0L
+            if (versions.put(clip.uri, version) != version) probe.execute { sounds[clip.uri] = OfflineMix.hasSoundTrack(context, clip.uri) }
+        }
     }
 
     fun play(startMs: Double): Boolean {
@@ -61,7 +66,7 @@ class AudioEngine(context: Context) {
 
     fun stop() {
         session?.halt()
-        mix.master = 0f
+        mix.master(0f, 0f)
         main.removeCallbacks(releaseIdle)
         main.postDelayed(releaseIdle, IDLE_MS)
     }
@@ -73,7 +78,7 @@ class AudioEngine(context: Context) {
     fun release() {
         releasing = true
         session?.halt()
-        mix.master = 0f
+        mix.master(0f, 0f)
         main.removeCallbacks(releaseIdle)
         closeStreams()
         closeOutput()
@@ -110,8 +115,10 @@ class AudioEngine(context: Context) {
             previous?.join()
             previous = null
             try {
+                if (stopRequested) return
                 keepStreams(startMs)
                 output.open()
+                if (stopRequested) return
                 clock.latencyNs = DeskOutput.latencyNs()
                 preroll()
                 val out = FloatArray(BLOCK * 2)
@@ -130,7 +137,7 @@ class AudioEngine(context: Context) {
                     mixBlock(out, t0)
                     output.write(out, BLOCK)
                     clock.observe(output.position(), System.nanoTime())
-                    if (log) Log.i("AMAudio", "block projectMs=%.3f playheadFrame=%d playheadMs=%d clockMs=%.3f".format(t0, shownFrame, shownMs, clock.positionMs() ?: -1.0))
+                    if (log) Log.i("AMAudio", "block projectMs=%.3f playheadFrame=%d playheadMs=%d clockMs=%.3f".format(java.util.Locale.ROOT, t0, shownFrame, shownMs, clock.positionMs() ?: -1.0))
                     written += BLOCK
                 }
                 mixBlock(out, startMs + written * 1000.0 / rate)
@@ -144,8 +151,8 @@ class AudioEngine(context: Context) {
                 while (!stopRequested) sleep(20)
             } finally {
                 rack.close()
-                mix.master = 0f
-                if (releasing) closeStreams()
+                mix.master(0f, 0f)
+                if (releasing) { closeStreams(); closeOutput() }
             }
         }
 
@@ -169,7 +176,7 @@ class AudioEngine(context: Context) {
         private fun mixBlock(out: FloatArray, t0: Double) {
             mixStreams(clips, out, BLOCK, t0, rate, quality, rack, ::stream)
             limiter.process(out, BLOCK)
-            mix.master = limiter.peak
+            mix.master(limiter.left, limiter.right)
         }
     }
 
@@ -224,7 +231,7 @@ internal fun mixStreams(
             if (!span.inMedia) { source.restart(); continue }
             if (source.mix(dst, span.from, span.to, span.pos, span.step, span.g0, span.g1, quality, span.clipMs0, dt, span.lengthMs)) rendered = true
         }
-        rack.finish(clip, out, frames, rendered)
+        rack.finish(clip, out, frames, rendered, stream(clip)?.channels ?: 0)
     }
     rack.sweep()
 }

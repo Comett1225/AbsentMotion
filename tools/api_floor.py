@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import argparse
+import atexit
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -69,6 +71,7 @@ def main():
     arch = ARCH[args.abi]
     limit = args.min or int(next(line.split("=")[1] for line in (ROOT / "android/build.gradle.kts").read_text().splitlines() if line.strip().startswith("minSdk")))
     work = Path(tempfile.mkdtemp(prefix="api-floor-"))
+    atexit.register(shutil.rmtree, work, True)
     target = Path(args.target)
     if target.suffix in (".apk", ".zip"):
         with zipfile.ZipFile(target) as z:

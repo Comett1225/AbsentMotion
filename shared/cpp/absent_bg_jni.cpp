@@ -5,16 +5,24 @@
 #include <string>
 #include "absent_bg/absent_bg.h"
 
+#ifdef AM_DESKTOP
+std::string DesktopString(JNIEnv* env, jstring s);
+#endif
+
 static void throwJava(JNIEnv* env, const char* type, const char* message) {
     env->ThrowNew(env->FindClass(type), message);
 }
 
 extern "C" JNIEXPORT jlong JNICALL
 Java_app_absentmotion_ai_BackgroundRemoval_nativeLoad(JNIEnv* env, jobject, jstring path) {
+#ifdef AM_DESKTOP
+    std::string file = DesktopString(env, path);
+#else
     const char* chars = env->GetStringUTFChars(path, nullptr);
     if (!chars) return 0;
     std::string file(chars);
     env->ReleaseStringUTFChars(path, chars);
+#endif
     try {
         return reinterpret_cast<intptr_t>(new absent::Model(file));
     } catch (const std::bad_alloc&) {

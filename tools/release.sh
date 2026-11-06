@@ -26,8 +26,6 @@ fi
 version=$(sed -n 's/^versionName=//p' version.properties)
 echo "AbsentMotion $version (versionCode $(sed -n 's/^versionCode=//p' version.properties))"
 
-tools/check.sh
-
 printf '\n== Android: release APKs (the standard build and the Compatible builds for Android 8 to 12, 64-bit and 32-bit, for ARM and for x86_64)\n'
 [ -f third_party/skia/out/android-arm64-compat/libskia.a ] || sh tools/build_skia.sh compat
 [ -f third_party/skia/out/android-arm-compat/libskia.a ] || sh tools/build_skia.sh compat32
@@ -42,6 +40,9 @@ mv android/build/outputs/apk/compat/release/app-compat-release.apk "$out-compati
 mv android/build/outputs/apk/foss/release/app-foss-release.apk "$out-foss.apk"
 mv android/build/outputs/apk/compat/release/app-compat-release.apk "$out-compatible.apk"
 mv android/build/outputs/apk/compat32/release/app-compat32-release.apk "$out-compatible-32bit.apk"
+
+printf '\n== Full check against the release builds\n'
+tools/check.sh
 python3 tools/api_floor.py "$out-compatible.apk" --min 26
 python3 tools/api_floor.py "$out-compatible-32bit.apk" --abi armeabi-v7a --min 26
 python3 tools/api_floor.py "$out-foss-x86_64.apk" --abi x86_64

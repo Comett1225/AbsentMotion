@@ -150,4 +150,15 @@ class AiMarkTest {
         val still = scene.layer(2)!!
         assertEquals(still.node, still.shiftedMedia(500).node)
     }
+
+    @Test fun shiftingMediaTimeMovesTheSpeedKeysWithIt() {
+        val map = app.absentmotion.model.XmlNode("speedMap", children = listOf(
+            app.absentmotion.model.XmlNode("kf", linkedMapOf("t" to "2000000000.000000", "v" to "0.5")),
+            app.absentmotion.model.XmlNode("kf", linkedMapOf("t" to "4000000000.000000", "v" to "2")),
+        ))
+        val clip = video(inTime = 2000, outTime = 4000).let { it.copy(node = it.node.withChild("speedMap", map)) }
+        val times = { l: Layer -> l.node.child("speedMap")!!.children.map { it["t"]!!.toDouble() } }
+        assertEquals(listOf(0.0, 2_000_000_000.0), times(clip.shiftedMedia(-2000)))
+        assertEquals(times(clip), times(clip.shiftedMedia(-2000).shiftedMedia(2000)))
+    }
 }

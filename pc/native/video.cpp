@@ -8,6 +8,7 @@
 #include <memory>
 #include <mutex>
 #include <thread>
+#include <vector>
 #include "include/core/SkColorSpace.h"
 #include "include/core/SkData.h"
 #include "include/core/SkYUVAPixmaps.h"
@@ -33,6 +34,9 @@ struct Decoded {
     FramePtr frame;
     int64_t us;
 };
+
+struct Video;
+std::unique_ptr<Video> Open(const std::string& path);
 
 bool UnspecifiedHd(const AVFrame* f) { return f->colorspace == AVCOL_SPC_UNSPECIFIED && f->height >= 720; }
 
@@ -74,6 +78,10 @@ struct Video {
     bool hardware = false;
     int64_t shownUs = INT64_MIN;
     sk_sp<SkImage> shown;
+    std::string path;
+    std::vector<std::unique_ptr<Video>> lanes;
+    uint64_t used = 0, turns = 0;
+    int64_t owner = INT64_MIN;
 
     ~Video() {
         {
@@ -167,9 +175,13 @@ struct Video {
     }
 
     int decode(AVFrame* out, int64_t target) {
-        for (;;) {
+        for (int failed = 0;;) {
             int r = avcodec_receive_frame(codec, out);
-            if (r != AVERROR(EAGAIN)) return r;
+            if (r >= 0 || r == AVERROR_EOF) return r;
+            if (r != AVERROR(EAGAIN)) {
+                if (++failed > 64) return r;
+                continue;
+            }
             r = av_read_frame(format, packet);
             if (r < 0) {
                 if (avcodec_send_packet(codec, nullptr) < 0) return AVERROR_EOF;
@@ -284,6 +296,32 @@ struct Video {
         return software(context, f.get());
     }
 
+    Video* route(int64_t t, int64_t layer) {
+        Video* best = nullptr;
+        int64_t gap = INT64_MAX;
+        for (size_t i = 0; i <= lanes.size(); ++i) {
+            Video* v = i ? lanes[i - 1].get() : this;
+            std::lock_guard<std::mutex> hold(v->lock);
+            if (v->asked && v->mustSeek(t)) continue;
+            const int64_t d = v->asked ? std::max<int64_t>(t - v->last, 0) : INT64_MAX - 1;
+            if (d < gap) gap = d, best = v;
+        }
+        for (size_t i = 0; !best && i <= lanes.size(); ++i) {
+            Video* v = i ? lanes[i - 1].get() : this;
+            if (v->owner == layer) best = v;
+        }
+        if (!best && lanes.size() < 2) {
+            if (auto made = Open(path)) best = lanes.emplace_back(std::move(made)).get();
+        }
+        if (!best) {
+            best = this;
+            for (auto& v : lanes) if (v->used < best->used) best = v.get();
+        }
+        best->used = ++turns;
+        best->owner = layer;
+        return best;
+    }
+
     int show(jlong desktop, const std::string& uri, int64_t t, bool exact, int64_t layer = 0) {
         FramePtr pick;
         int64_t pickUs = INT64_MIN;
@@ -332,7 +370,11 @@ std::unique_ptr<Video> Open(const std::string& path) {
         v->hardware = false;
         device = nullptr;
     }
-    if (!v->codec && !v->configure(decoder, device)) return nullptr;
+    if (!v->codec && !(v->configure(decoder, device) && (!v->hardware || v->probe()))) {
+        avcodec_free_context(&v->codec);
+        v->hardware = false;
+        if (!v->configure(decoder, nullptr)) return nullptr;
+    }
     const AVCodecParameters* par = v->stream->codecpar;
     int orientation = 0;
     if (const AVPacketSideData* side = av_packet_side_data_get(par->coded_side_data, par->nb_coded_side_data, AV_PKT_DATA_DISPLAYMATRIX)) {
@@ -345,6 +387,7 @@ std::unique_ptr<Video> Open(const std::string& path) {
     const double fps = rate.num > 0 && rate.den > 0 ? av_q2d(rate) : 30.0;
     const double values[7] = {(double)par->width, (double)par->height, (double)duration, fps, (double)orientation, audio ? 1.0 : 0.0, v->hardware ? 1.0 : 0.0};
     std::copy(values, values + 7, v->info);
+    v->path = path;
     Video* raw = v.get();
     v->worker = std::thread([raw] { raw->run(); });
     return v;
@@ -363,10 +406,10 @@ JNIEXPORT jdoubleArray JNICALL JNI(videoInfo)(JNIEnv* e, jobject, jlong v) {
     return result;
 }
 JNIEXPORT jint JNICALL JNI(videoFrame)(JNIEnv* e, jobject, jlong h, jlong v, jstring uri, jlong timeUs, jboolean exact) {
-    return video(v)->show(h, DesktopString(e, uri), timeUs, exact == JNI_TRUE);
+    return video(v)->route(timeUs, 0)->show(h, DesktopString(e, uri), timeUs, exact == JNI_TRUE);
 }
 JNIEXPORT jint JNICALL JNI(videoFrameLayer)(JNIEnv* e, jobject, jlong h, jlong v, jstring uri, jlong layer, jlong timeUs, jboolean exact) {
-    return video(v)->show(h, DesktopString(e, uri), timeUs, exact == JNI_TRUE, layer);
+    return video(v)->route(timeUs, layer)->show(h, DesktopString(e, uri), timeUs, exact == JNI_TRUE, layer);
 }
 JNIEXPORT void JNICALL JNI(videoClose)(JNIEnv*, jobject, jlong v) { delete video(v); }
 }

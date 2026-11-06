@@ -35,4 +35,14 @@ class NestedSceneTimeTest {
         val blank = group.copy(node = group.node.withChild("scene", nested.node.with("retime", "blank")))
         assertEquals(-1.0, blank.nestedTime(4500.0, 60).ms, 0.0)
     }
+
+    @Test fun hostTimeInvertsTheGroupsOwnClock() {
+        val group = scene.layers.single()
+        val cut = group.copy(node = group.node.with("inTime", "500"))
+        assertEquals(1000.0, cut.nestedTime(2500.0, 60, quantize = false).ms, 0.0)
+        assertEquals(2500.0, cut.nestedHostTime(1000.0, 60), 0.0)
+        val half = cut.copy(node = cut.node.with("speed", "0.5"))
+        assertEquals(500.0, half.nestedTime(2500.0, 60, quantize = false).ms, 0.0)
+        assertEquals(2500.0, half.nestedHostTime(500.0, 60), 0.0)
+    }
 }

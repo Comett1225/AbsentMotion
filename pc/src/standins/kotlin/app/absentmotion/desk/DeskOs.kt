@@ -11,7 +11,7 @@ object DeskOs {
     val dataDir: File get() = when {
         mac -> home.resolve("Library/Application Support/AbsentMotion")
         windows -> File(System.getenv("APPDATA") ?: home.path).resolve("AbsentMotion")
-        else -> File(System.getenv("XDG_DATA_HOME") ?: home.resolve(".local/share").path).resolve("absentmotion")
+        else -> File(System.getenv("XDG_DATA_HOME")?.takeIf { it.isNotBlank() } ?: home.resolve(".local/share").path).resolve("absentmotion")
     }
     val nativeName = when { mac -> "libamdesktop.dylib"; windows -> "amdesktop.dll"; else -> "libamdesktop.so" }
     val revealLabel = when { mac -> "Show in Finder"; windows -> "Show in Explorer"; else -> "Show in Folder" }
@@ -21,7 +21,7 @@ object DeskOs {
     val documentsFolder by lazy { userFolder("DOCUMENTS") ?: "Documents" }
     val commandKey = if (mac) "⌘" else "Ctrl+"
     val windowButtons: Pair<List<WindowButton>, Boolean> by lazy {
-        val config = File(System.getenv("XDG_CONFIG_HOME") ?: home.resolve(".config").path)
+        val config = File(System.getenv("XDG_CONFIG_HOME")?.takeIf { it.isNotBlank() } ?: home.resolve(".config").path)
         val kde = System.getenv("XDG_CURRENT_DESKTOP").orEmpty().contains("KDE", ignoreCase = true)
         if (!linux || !shell) buttonLayout(null)
         else if (kde) {
@@ -30,8 +30,7 @@ object DeskOs {
             kdeButtonLayout(key("ButtonsOnLeft") ?: "MS", key("ButtonsOnRight") ?: "HIAX")
         } else buttonLayout(runCatching {
             val process = ProcessBuilder("gsettings", "get", "org.gnome.desktop.wm.preferences", "button-layout").redirectError(ProcessBuilder.Redirect.DISCARD).start()
-            val text = process.inputStream.bufferedReader().readText()
-            if (process.waitFor(3, java.util.concurrent.TimeUnit.SECONDS) && process.exitValue() == 0) text else null
+            if (process.waitFor(3, java.util.concurrent.TimeUnit.SECONDS) && process.exitValue() == 0) process.inputStream.bufferedReader().readText() else { process.destroyForcibly(); null }
         }.getOrNull())
     }
 
@@ -74,7 +73,7 @@ object DeskOs {
 
     internal fun openCommand(mac: Boolean, windows: Boolean, path: String): List<String> = when {
         mac -> listOf("open", path)
-        windows -> listOf("cmd", "/c", "start", "", path)
+        windows -> listOf("rundll32", "url.dll,FileProtocolHandler", path)
         else -> listOf("xdg-open", path)
     }
 

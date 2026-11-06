@@ -62,25 +62,31 @@ internal class SafeLimiter(rate: Int, releaseMs: Double = 100.0) : ClipFx {
     private val release = exp(-1.0 / (releaseMs * 0.001 * rate)).toFloat()
     private var gain = 1f
 
-    var peak = 0f
+    var left = 0f
         private set
+    var right = 0f
+        private set
+    val peak: Float get() = maxOf(left, right)
 
     override fun fits(spec: FxSpec) = false
     override fun set(values: FloatArray) {}
 
     override fun process(buf: FloatArray, frames: Int) {
-        var top = 0f
+        var topLeft = 0f
+        var topRight = 0f
         for (k in 0 until frames) {
             val l = buf[2 * k]
             val r = buf[2 * k + 1]
+            if (abs(l) > topLeft) topLeft = abs(l)
+            if (abs(r) > topRight) topRight = abs(r)
             val p = maxOf(abs(l), abs(r))
-            if (p > top) top = p
             val want = if (p > ceiling) ceiling / p else 1f
             gain = if (want < gain) want else want + (gain - want) * release
             buf[2 * k] = (l * gain).coerceIn(-ceiling, ceiling)
             buf[2 * k + 1] = (r * gain).coerceIn(-ceiling, ceiling)
         }
-        peak = top
+        left = topLeft
+        right = topRight
     }
 
     override fun reset() { gain = 1f }
@@ -111,7 +117,7 @@ internal class FxRack(private val rate: Int, private val make: FxMaker = NativeF
         return scratch
     }
 
-    fun finish(clip: AudioClip, out: FloatArray, frames: Int, rendered: Boolean) {
+    fun finish(clip: AudioClip, out: FloatArray, frames: Int, rendered: Boolean, channels: Int = 0) {
         val spec = clip.fx
         var slot = slots[clip.id]
         if (slot != null && (spec == null || slot.fx?.fits(spec) == false)) {
@@ -119,15 +125,15 @@ internal class FxRack(private val rate: Int, private val make: FxMaker = NativeF
             slots.remove(clip.id)
             slot = null
         }
-        if (spec == null) { add(clip, out, frames); return }
+        if (spec == null) { add(clip, out, frames, channels); return }
         if (slot == null) {
-            if (!rendered) { live?.put(clip.id, 0f); return }
+            if (!rendered) { live?.put(clip.id, 0f, 0f, channels); return }
             slot = Slot(make(spec, rate)).also { slots[clip.id] = it }
         } else if (slot.tail <= 0) {
             if (!rendered) {
                 slot.fx?.close()
                 slots.remove(clip.id)
-                live?.put(clip.id, 0f)
+                live?.put(clip.id, 0f, 0f, channels)
                 return
             }
             slot.fx?.reset()
@@ -154,19 +160,23 @@ internal class FxRack(private val rate: Int, private val make: FxMaker = NativeF
             slot.quiet = if (peak < QUIET_LEVEL) slot.quiet + frames else 0
             if (slot.quiet >= quietFrames) slot.tail = 0
         }
-        if (live != null) add(clip, out, frames) else for (i in 0 until 2 * frames) out[i] += scratch[i]
+        if (live != null) add(clip, out, frames, channels) else for (i in 0 until 2 * frames) out[i] += scratch[i]
     }
 
-    private fun add(clip: AudioClip, out: FloatArray, frames: Int) {
+    private fun add(clip: AudioClip, out: FloatArray, frames: Int, channels: Int) {
         val live = live ?: return
-        if (live.silenced(clip.id)) { live.put(clip.id, 0f); return }
-        var peak = 0f
-        for (i in 0 until 2 * frames) {
-            val v = scratch[i]
-            out[i] += v
-            if (abs(v) > peak) peak = abs(v)
+        if (live.silenced(clip.id)) { live.put(clip.id, 0f, 0f, channels); return }
+        var left = 0f
+        var right = 0f
+        for (k in 0 until frames) {
+            val l = scratch[2 * k]
+            val r = scratch[2 * k + 1]
+            out[2 * k] += l
+            out[2 * k + 1] += r
+            if (abs(l) > left) left = abs(l)
+            if (abs(r) > right) right = abs(r)
         }
-        live.put(clip.id, peak)
+        live.put(clip.id, left, right, channels)
     }
 
     fun sweep() {

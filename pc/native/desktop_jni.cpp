@@ -1,6 +1,7 @@
 #include <jni.h>
 #include <algorithm>
 #include <atomic>
+#include <clocale>
 #include <cstdlib>
 #include <map>
 #include <string>
@@ -63,7 +64,11 @@ struct Desktop {
         fx.spills = [this](const am::Layer& l) { return runtime.spills(l); };
         fx.behind = [this](const am::Layer& l) { return runtime.behind(l); };
         fx.steady = [this](const am::Layer& l, float a, float b) { return runtime.steady(l, a, b); };
-        fx.draw = [this](SkCanvas* c, const am::Scene& s, const am::Layer& l, double t, const SkRect& r, const SkMatrix& m, const std::function<void(SkCanvas*)>& src, const std::function<void(SkCanvas*)>& below) { return runtime.draw(c, s, l, t, r, m, src, below); };
+        fx.draw = [this](SkCanvas* c, const am::Scene& s, const am::Layer& l, double t, const SkRect& r, const SkMatrix& m, const std::function<void(SkCanvas*)>& src, const std::function<void(SkCanvas*)>& below) {
+            return runtime.draw(c, s, l, t, r, m, src, below, [this](int w, int h, const std::function<void(SkCanvas*)>& paint, std::vector<uint8_t>* rgba) {
+                return offscreen(w, h, false, paint, rgba);
+            });
+        };
         return fx;
     }
     sk_sp<SkSurface> surface(const SkImageInfo& info) {
@@ -130,6 +135,10 @@ void DesktopInstall(jlong h, const std::string& uri, sk_sp<SkImage> image) { ptr
 void DesktopInstallLayer(jlong h, const std::string& uri, int64_t layer, sk_sp<SkImage> image) { ptr(h)->layerPictures[{uri, layer}] = std::move(image); }
 #define JNI(name) Java_app_absentmotion_pc_engine_DesktopNative_##name
 extern "C" {
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM*, void*) {
+    setlocale(LC_NUMERIC, "C");
+    return JNI_VERSION_1_8;
+}
 JNIEXPORT jlong JNICALL JNI(create)(JNIEnv*, jobject) { return reinterpret_cast<jlong>(new Desktop()); }
 JNIEXPORT jint JNICALL JNI(gpuState)(JNIEnv*, jobject) { return DesktopGpuState.load(); }
 JNIEXPORT void JNICALL JNI(destroy)(JNIEnv*, jobject, jlong h) { delete ptr(h); }
@@ -416,8 +425,14 @@ JNIEXPORT jbyteArray JNICALL JNI(shapeIcon)(JNIEnv* e, jobject, jlong h, jstring
     const am::Layer& layer = scene.layers.front();
     const SkPath path = am::ShapePath(layer, 0);
     const SkPath stroke = am::StrokePath(layer, path, 0);
+    SkMatrix orientation = SkMatrix::I();
+    if (layer.fillType == "media") {
+        auto info = d->scene.mediaOrientation.find(layer.mediaUri);
+        if (info != d->scene.mediaOrientation.end()) orientation.setRotate(info->second);
+    }
     SkRect bounds = layer.fillType == "none" ? stroke.getBounds() : path.getBounds();
     if (layer.fillType != "none" && !stroke.isEmpty()) bounds.join(stroke.getBounds());
+    bounds = orientation.mapRect(bounds);
     if (bounds.isEmpty()) return nullptr;
     std::vector<uint8_t> rgba;
     const bool ok = d->offscreen(size, size, true, [&](SkCanvas* canvas) {
@@ -425,9 +440,11 @@ JNIEXPORT jbyteArray JNICALL JNI(shapeIcon)(JNIEnv* e, jobject, jlong h, jstring
         canvas->translate(size / 2.0f, size / 2.0f);
         canvas->scale(scale, scale);
         canvas->translate(-bounds.centerX(), -bounds.centerY());
+        canvas->concat(orientation);
         SkPaint paint;
         paint.setAntiAlias(true);
         paint.setColor((SkColor)color);
+        if (layer.fillType == "media" && !d->media()(layer.mediaUri, layer.id)) return;
         if (layer.fillType == "media") am::DrawMedia(canvas, layer, path, 1, d->media());
         else if (layer.text && layer.fillType != "none") am::DrawText(canvas, layer, 0, paint);
         else if (layer.fillType != "none") canvas->drawPath(path, paint);
@@ -444,6 +461,7 @@ JNIEXPORT jlong JNICALL JNI(hitTest)(JNIEnv*, jobject, jlong h, jfloat x, jfloat
 JNIEXPORT jfloatArray JNICALL JNI(layerQuad)(JNIEnv* e, jobject, jlong h, jlong id, jdouble t) {
     Desktop* d = ptr(h);
     const am::SceneScope scope(d->scene);
+    am::SetCameraView(d->cameraView);
     const auto* layer = d->scene.layer(id);
     if (!layer || !layer->activeAt(t)) return nullptr;
     SkPoint p[4];

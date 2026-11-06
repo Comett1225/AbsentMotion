@@ -77,7 +77,6 @@ import app.absentmotion.editor.split
 import app.absentmotion.platform.Hint
 import app.absentmotion.platform.linkMediaFolder
 import app.absentmotion.ui.editor.ChromeIcons
-import app.absentmotion.ui.editor.MediaPicks
 import app.absentmotion.ui.editor.TextIcons
 import app.absentmotion.ui.home.BelowAnchor
 import app.absentmotion.ui.home.DeskModals
@@ -341,9 +340,7 @@ fun deskMenus(app: DeskAppState, scope: kotlinx.coroutines.CoroutineScope): List
             separator,
             DeskMenuItem("Import Media…", editor != null) {
                 val files = DeskFiles.chooseFiles(media = true, multiple = true).map(Uri::fromFile)
-                val sounds = files.filter { android.content.Desk.mime(it.toString())?.startsWith("audio/") == true }
-                if ((files - sounds.toSet()).isNotEmpty()) MediaPicks.addPictures(files - sounds.toSet())
-                if (sounds.isNotEmpty()) MediaPicks.addSounds(sounds)
+                app.queueMedia(files)
             },
             DeskMenuItem("Import Project…", editor == null) {
                 val files = DeskFiles.chooseFiles(media = false, multiple = true).map(Uri::fromFile)

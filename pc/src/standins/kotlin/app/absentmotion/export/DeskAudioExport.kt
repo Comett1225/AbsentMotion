@@ -3,9 +3,12 @@ package app.absentmotion.export
 import app.absentmotion.R
 import app.absentmotion.i18n.txt
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.withContext
 import java.io.FileDescriptor
 import java.nio.ByteBuffer
@@ -33,6 +36,7 @@ internal suspend fun exportAudio(s: ExportSettings, totalUs: Long, mix: AudioMix
     val result = exportTemp(s.audioFormat.ext)
     val log = exportTemp("log")
     val ffmpeg = Ffmpeg(listOf("-f", if (floats) "f32le" else "s16le", "-ar", "$rate", "-ac", "2", "-i", "-", "-ar", "$rate", "-ac", "$channels") + encode + listOf("-y", result.path), log)
+    val watcher = launch { try { awaitCancellation() } finally { ffmpeg.kill() } }
     try {
         val stdin = ffmpeg.process.outputStream.buffered(1 shl 16)
         var frame = 0L
@@ -54,9 +58,10 @@ internal suspend fun exportAudio(s: ExportSettings, totalUs: Long, mix: AudioMix
         } catch (e: java.io.IOException) {
             throw ExportError(txt(R.string.library_text_value, ffmpeg.problem()), e)
         }
-        if (!ffmpeg.finish()) throw ExportError(txt(R.string.library_text_value, ffmpeg.problem()))
+        if (!runInterruptible { ffmpeg.finish() }) throw ExportError(txt(R.string.library_text_value, ffmpeg.problem()))
         copyInto(result, out)
     } finally {
+        watcher.cancel()
         withContext(NonCancellable) { ffmpeg.kill(); result.delete(); log.delete() }
     }
     progress(1f)

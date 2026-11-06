@@ -3,6 +3,9 @@
 #include <cmath>
 #include <cstring>
 #include <fstream>
+#ifdef _WIN32
+#include <filesystem>
+#endif
 #include <limits>
 #include <stdexcept>
 #if defined(__aarch64__)
@@ -37,7 +40,11 @@ static float read_float(std::ifstream& f) {
     return v;
 }
 Model::Model(const std::string& path):impl(new Impl) {
+#ifdef _WIN32
+    std::ifstream f(std::filesystem::path(std::u8string(path.begin(),path.end())),std::ios::binary);
+#else
     std::ifstream f(path,std::ios::binary);
+#endif
     char magic[4];f.read(magic,4);
     if(!f||std::memcmp(magic,"ABG1",4)!=0) throw std::runtime_error("Invalid ABG1 model");
     auto ver=read_u32(f);impl->size=read_u32(f);auto count=read_u32(f),dt=read_u32(f);

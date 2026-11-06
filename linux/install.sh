@@ -36,7 +36,7 @@ if [ ! -x "$SOURCE/bin/AbsentMotion" ]; then
     exit 1
 fi
 case "$TARGET" in
-    *[\"\`\$\\]*)
+    *[\"\`\$\\%]*)
         echo "Your home folder path has a character a menu entry cannot hold. Start AbsentMotion with $SOURCE/bin/absentmotion.sh instead." >&2
         exit 1
         ;;

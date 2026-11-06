@@ -61,7 +61,8 @@ internal data class ReportLinks(val issues: String, val discord: String, val for
 
         fun refresh(context: Context): ReportLinks {
             val now = stored(context)
-            if (!context.getSharedPreferences("settings", Context.MODE_PRIVATE).getBoolean("checkUpdates", true)) return now
+            val settings = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+            if (!settings.getBoolean("checkUpdates", true) || !settings.getBoolean("updatesAsked", false)) return now
             val readme = try {
                 TrustedHttp(ReadmeSource, 5_000, 5_000).get(ReadmeSource.releases, mapOf("Accept" to "application/vnd.github.raw")) { connection ->
                     if (connection.responseCode != HttpURLConnection.HTTP_OK) null else connection.inputStream.use { it.readAtMost(1 shl 20) }.decodeToString()

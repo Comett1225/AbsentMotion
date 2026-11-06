@@ -41,9 +41,11 @@ grep -v '^comment_check:' "$tmp/comments" | while read -r l; do problem "$l"; do
 if git rev-parse --git-dir >/dev/null 2>&1 && git rev-parse HEAD >/dev/null 2>&1; then
     echo "-- authors, committers, tags and messages in the history"
     git log --all --format='%an <%ae>%n%cn <%ce>%n%s%n%b' > "$tmp/history"
+    git for-each-ref refs/tags --format='%(refname)%0a%(taggername) %(taggeremail)%0a%(contents)' >> "$tmp/history"
     printf '%s\n' "$tmp/history" | python3 tools/publish_scan.py "$words" tools/publish_allowed.txt "history " > "$tmp/scan" || problem "the history scanner failed"
     while read -r l; do problem "${l#PROBLEM: }"; done < "$tmp/scan"
     git log --all --format='%an <%ae>' | sort -u | sed 's/^/  author: /'
+    git for-each-ref refs/tags --format='%(taggername) %(taggeremail)' | sort -u | sed 's/^/  tagger: /'
 fi
 
 while [ $# -gt 0 ]; do

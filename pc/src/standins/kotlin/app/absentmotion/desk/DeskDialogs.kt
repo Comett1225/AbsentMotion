@@ -29,7 +29,7 @@ internal fun DeskAsk(title: String?, body: String, width: androidx.compose.ui.un
 
 @Composable
 internal fun DeskSaveFailed(app: DeskAppState) {
-    DeskAsk(null, stringResource(R.string.desk_close_save_failed), onClose = { app.saveFailed = false }, onEnter = app::retryClose) {
+    DeskAsk(null, stringResource(R.string.desk_close_save_failed), onClose = { app.saveFailed = false; app.afterClose = null }, onEnter = app::retryClose) {
         DeskButton(stringResource(R.string.home_save_failed_leave), app::closeAnyway)
         DeskButton(stringResource(R.string.home_save_failed_retry), app::retryClose, primary = true)
     }

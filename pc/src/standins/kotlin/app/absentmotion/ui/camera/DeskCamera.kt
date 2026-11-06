@@ -220,7 +220,7 @@ fun CameraScreen(aspect: Float, onClose: () -> Unit, onCaptured: (Uri, Boolean) 
                 }
                 if (camera.recording) Row(Modifier.align(Alignment.TopStart).padding(12.dp).clip(RoundedCornerShape(14.dp)).background(Color(0x99000000)).padding(horizontal = 10.dp, vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
                     Box(Modifier.size(9.dp).clip(CircleShape).background(Color(0xFFFF3B30)))
-                    Text("%02d:%02d".format(seconds / 60, seconds % 60), Modifier.padding(start = 7.dp), color = Color.White, fontSize = 13.sp)
+                    Text("%02d:%02d".format(java.util.Locale.ROOT, seconds / 60, seconds % 60), Modifier.padding(start = 7.dp), color = Color.White, fontSize = 13.sp)
                 }
             }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {

@@ -1212,6 +1212,10 @@
     <string name="mixer_solo">โซโล</string>
     <string name="mixer_mute_short">M</string>
     <string name="mixer_solo_short">S</string>
+    <string name="meter_left_short">L</string>
+    <string name="meter_right_short">R</string>
+    <string name="meter_mono">โมโน</string>
+    <string name="meter_master">ระดับเสียงหลัก</string>
     <string name="mixer_empty">โปรเจกต์นี้ไม่มีเสียง</string>
     <string name="mixer_empty_hint">เพิ่มเพลง เสียง หรือวิดีโอที่มีเสียงเพื่อให้แสดงที่นี่</string>
     <string name="blend_cat_normal">ปกติ</string>

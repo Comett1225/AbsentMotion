@@ -47,11 +47,18 @@ internal object NoiseReduction {
                             if (source.rumbleHz > 0) rumble = Rumble(rate, source.rumbleHz)
                         }
                         check(rate > 0 && rate == chunk.rate) { AppText.get(R.string.ai_sample_rate_changed) }
-                        for (i in 0 until chunk.frames) {
+                        val at = (chunk.ptsUs * rate + 500_000L) / 1_000_000L
+                        val gap = at - frames
+                        if (gap > 64 && gap <= rate * 600L) {
+                            for (i in 0 until gap) pcm.writeFloat(rumble?.next(0f) ?: 0f)
+                            frames += gap
+                        }
+                        val skip = (frames - at).coerceIn(0L, chunk.frames.toLong()).toInt()
+                        for (i in skip until chunk.frames) {
                             val sample = (chunk.pcm[2 * i].toInt() + chunk.pcm[2 * i + 1].toInt()) / 65536f
                             pcm.writeFloat(rumble?.next(sample) ?: sample)
                         }
-                        frames += chunk.frames
+                        frames += chunk.frames - skip
                         check(frames * 2 <= 0xFFFFFFFFL - 36) { AppText.get(R.string.ai_recording_too_large) }
                         val percent = if (decoder.durationUs > 0) ((chunk.ptsUs * 30 / decoder.durationUs).toInt()).coerceIn(0, 30) else 0
                         if (percent != reported) { progress(percent / 100f, AppText.get(R.string.ai_decoding_audio)); reported = percent }

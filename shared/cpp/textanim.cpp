@@ -1,4 +1,5 @@
 #include "textanim.h"
+#include "numbers.h"
 
 #include <algorithm>
 #include <cctype>
@@ -192,6 +193,7 @@ float RangeWeight(int shape, int index, int count, float start, float end) {
 }
 
 std::string CountNumbers(const std::string& text, double add, double multiply, int decimals, int separator) {
+    CNumbers();
     const char point = separator == 2 ? ',' : '.';
     const auto group = [&](char c) { return separator == 2 ? c == '.' : c == ',' || (separator == 3 && c == ' '); };
     std::string out;

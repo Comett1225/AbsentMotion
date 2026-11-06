@@ -342,6 +342,7 @@ void DrawScene(SkCanvas* canvas, const Scene& scene, double timeMs, const MediaP
                const LayerEffects* effects = nullptr);
 void SetLayerEffects(const LayerEffects* effects, const Scene* scene, bool world = false);
 int ProjectFps();
+const std::vector<Layer>* EffectSiblings();
 class SceneScope {
 public:
     explicit SceneScope(const Scene& scene);

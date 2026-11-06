@@ -121,6 +121,9 @@ fun TutorialHost(
 
     suspend fun begin(resume: Boolean) {
         val saved = settings.tutorialProject?.takeIf { resume && withContext(Dispatchers.IO) { store.exists(it) } }
+        if (!resume) settings.tutorialProject?.takeIf { it != current?.projectId }?.let { old ->
+            withContext(Dispatchers.IO) { runCatching { store.delete(old, context.getExternalFilesDir(null)?.resolve("ai")) } }
+        }
         val id = saved ?: try {
             withContext(Dispatchers.IO) { store.create(Scene.create(app.absentmotion.i18n.AppText.get(R.string.tutorial_project_name), SIDE, SIDE, FPS, BLACK)) }
         } catch (e: java.io.IOException) {

@@ -57,7 +57,7 @@ class AudioEngine(context: Context) {
     private fun interrupt() {
         interrupted = true
         session?.halt()
-        mix.master = 0f
+        mix.master(0f, 0f)
     }
 
     private fun listen(on: Boolean) {
@@ -98,7 +98,7 @@ class AudioEngine(context: Context) {
     fun stop() {
         session?.halt()
         listen(false)
-        mix.master = 0f
+        mix.master(0f, 0f)
         main.removeCallbacks(releaseIdle)
         main.postDelayed(releaseIdle, IDLE_MS)
     }
@@ -111,7 +111,7 @@ class AudioEngine(context: Context) {
         releasing = true
         session?.halt()
         listen(false)
-        mix.master = 0f
+        mix.master(0f, 0f)
         main.removeCallbacks(releaseIdle)
         closeStreams()
     }
@@ -200,7 +200,7 @@ class AudioEngine(context: Context) {
             } finally {
                 runCatching { track?.release() }
                 rack.close()
-                mix.master = 0f
+                mix.master(0f, 0f)
                 if (releasing) closeStreams()
             }
         }
@@ -234,7 +234,7 @@ class AudioEngine(context: Context) {
         private fun mixBlock(out: FloatArray, t0: Double) {
             mixStreams(clips, out, BLOCK, t0, rate, quality, rack, ::stream)
             limiter.process(out, BLOCK)
-            mix.master = limiter.peak
+            mix.master(limiter.left, limiter.right)
         }
     }
 
@@ -288,7 +288,7 @@ internal fun mixStreams(
             if (!span.inMedia) { source.restart(); continue }
             if (source.mix(dst, span.from, span.to, span.pos, span.step, span.g0, span.g1, quality, span.clipMs0, dt, span.lengthMs)) rendered = true
         }
-        rack.finish(clip, out, frames, rendered)
+        rack.finish(clip, out, frames, rendered, stream(clip)?.channels ?: 0)
     }
     rack.sweep()
 }

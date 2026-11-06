@@ -47,5 +47,6 @@ class SavedSizesTest {
         assertEquals(list, SavedSizes.decode(SavedSizes.encode(list)))
         assertEquals(emptyList<SavedSize>(), SavedSizes.decode("not json"))
         assertEquals(emptyList<SavedSize>(), SavedSizes.decode(null))
+        assertEquals(listOf(SavedSize("ok", 100, 200)), SavedSizes.decode("[{\"w\":1},{\"n\":\"ok\",\"w\":100,\"h\":200}]"))
     }
 }

@@ -36,6 +36,8 @@ import app.absentmotion.model.withBlend
 import app.absentmotion.ai.trimmedClip
 import app.absentmotion.ai.withClip
 import kotlin.math.abs
+import kotlin.math.asin
+import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.min
@@ -149,21 +151,21 @@ fun EditorState.addEmptyGroup() {
 fun EditorState.groupLayers(ids: Set<Long>, blend: String? = null) {
     val id = Layer.newId()
     val label = numbered(AppText.get(R.string.model_layer_group))
-    edit { it.grouped(ids, blend, id, label) }
+    edit { it.grouped(ids, blend, id, label, sampleMs) }
     if (scene.layer(id) == null) return
     MultiSelect.clear()
     selectedId = id
     panel = EditorPanel.Tools
 }
 
-internal fun Scene.grouped(ids: Set<Long>, blend: String?, id: Long, label: String): Scene {
+internal fun Scene.grouped(ids: Set<Long>, blend: String?, id: Long, label: String, atMs: Int? = null): Scene {
     val list = layers
     val inside = list.filter { it.id in ids && it.kind != "camera" }.map { it.id }.toSet()
     if (inside.isEmpty()) return this
     val stranded = list.indices.filter { i -> list[i].id in inside && list.isMask(i) && list[(i - 1 downTo 0).first { !list.isMask(it) }].id !in inside }
         .map { list[it].id }.toSet()
     val flat = layers.filter { it.id in inside && it.node["parent"]?.toLongOrNull().let { p -> p != null && p !in inside } }
-        .fold(unparentChildrenOf(inside)) { acc, layer -> acc.update(layer.id) { acc.rebased(it, null) ?: it } }
+        .fold(unparentChildrenOf(inside, atMs)) { acc, layer -> acc.update(layer.id) { acc.rebased(it, null, atMs ?: it.startTime) ?: it } }
     val members = flat.layers.filter { it.id in inside }
     val start = members.minOf { it.startTime }
     val end = members.maxOf { it.endTime }
@@ -218,24 +220,52 @@ private fun ownPlace(layer: Layer, timeMs: Int, fps: Int): Place {
     return Place(loc[0], loc[1], piv[0], piv[1], scale[0], scale[1], at.transform("rotation", 0f)[0], loc[2])
 }
 
-private fun compose(p: Place, q: Place?): Place {
-    if (q == null) return p
-    val vx = (p.x + p.px - q.px) * q.sx
-    val vy = (p.y + p.py - q.py) * q.sy
-    val a = Math.toRadians(q.rot.toDouble())
-    val rx = (vx * cos(a) - vy * sin(a)).toFloat()
-    val ry = (vx * sin(a) + vy * cos(a)).toFloat()
-    return Place(q.x + rx - p.px + q.px, q.y + ry - p.py + q.py, p.px, p.py, p.sx * q.sx, p.sy * q.sy, p.rot + q.rot, p.z + q.z)
+private val SAME = doubleArrayOf(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
+
+private fun spin(axis: Int, degrees: Double): DoubleArray {
+    val r = Math.toRadians(degrees)
+    val c = cos(r)
+    val s = sin(r)
+    return when (axis) {
+        0 -> doubleArrayOf(1.0, 0.0, 0.0, 0.0, c, -s, 0.0, s, c)
+        1 -> doubleArrayOf(c, 0.0, s, 0.0, 1.0, 0.0, -s, 0.0, c)
+        else -> doubleArrayOf(c, -s, 0.0, s, c, 0.0, 0.0, 0.0, 1.0)
+    }
 }
 
-internal fun decompose(w: Place, q: Place): Place? {
-    if (q.sx == 0f || q.sy == 0f) return null
-    val a = Math.toRadians(-q.rot.toDouble())
-    val dx = w.x - q.x + w.px - q.px
-    val dy = w.y - q.y + w.py - q.py
-    val vx = (dx * cos(a) - dy * sin(a)).toFloat() / q.sx
-    val vy = (dx * sin(a) + dy * cos(a)).toFloat() / q.sy
-    return Place(vx - w.px + q.px, vy - w.py + q.py, w.px, w.py, w.sx / q.sx, w.sy / q.sy, w.rot - q.rot, w.z - q.z)
+private fun mul(a: DoubleArray, b: DoubleArray) = DoubleArray(9) { i -> (0..2).sumOf { k -> a[i / 3 * 3 + k] * b[k * 3 + i % 3] } }
+
+private fun DoubleArray.on(x: Double, y: Double, z: Double) = DoubleArray(3) { i -> this[3 * i] * x + this[3 * i + 1] * y + this[3 * i + 2] * z }
+
+private fun DoubleArray.inverse() = DoubleArray(9) { this[it % 3 * 3 + it / 3] }
+
+private fun turnOf(rot: Float, tilt: FloatArray) = mul(spin(2, rot.toDouble()), mul(spin(1, -tilt[1].toDouble()), spin(0, -tilt[0].toDouble())))
+
+private class Pose(val place: Place, val turn: DoubleArray)
+
+private fun lifted(p: Place, q: Pose?): Place {
+    val o = q?.place ?: return p
+    val v = q.turn.on(((p.x + p.px - o.px) * o.sx).toDouble(), ((p.y + p.py - o.py) * o.sy).toDouble(), p.z.toDouble())
+    return Place((o.x + v[0] - p.px + o.px).toFloat(), (o.y + v[1] - p.py + o.py).toFloat(), p.px, p.py, p.sx * o.sx, p.sy * o.sy, p.rot + o.rot, (o.z + v[2]).toFloat())
+}
+
+private fun lowered(w: Place, q: Pose?): Place? {
+    val o = q?.place ?: return w
+    if (o.sx == 0f || o.sy == 0f) return null
+    val v = q.turn.inverse().on((w.x - o.x + w.px - o.px).toDouble(), (w.y - o.y + w.py - o.py).toDouble(), (w.z - o.z).toDouble())
+    return Place((v[0] / o.sx - w.px + o.px).toFloat(), (v[1] / o.sy - w.py + o.py).toFloat(), w.px, w.py, w.sx / o.sx, w.sy / o.sy, w.rot - o.rot, v[2].toFloat())
+}
+
+private fun compose(p: Place, q: Place?): Place = lifted(p, q?.let { Pose(it, spin(2, it.rot.toDouble())) })
+
+internal fun decompose(w: Place, q: Place): Place? = lowered(w, Pose(q, spin(2, q.rot.toDouble())))
+
+private fun euler(m: DoubleArray, near: Float): Pair<Float, FloatArray> {
+    val locked = abs(m[6]) > 1 - 1e-9
+    val b = asin((-m[6]).coerceIn(-1.0, 1.0))
+    val a = Math.toDegrees(if (locked) atan2(-m[1], m[4]) else atan2(m[3], m[0]))
+    val c = if (locked) 0.0 else atan2(m[7], m[8])
+    return (a + 360 * Math.round((near - a) / 360)).toFloat() to floatArrayOf((-Math.toDegrees(c)).toFloat(), (-Math.toDegrees(b)).toFloat())
 }
 
 private fun Scene.parentOf(layer: Layer): Layer? =
@@ -244,6 +274,13 @@ private fun Scene.parentOf(layer: Layer): Layer? =
 internal fun Scene.place(layer: Layer, timeMs: Int, depth: Int = 0): Place =
     compose(ownPlace(layer, timeMs, fps), parentOf(layer)?.takeIf { depth <= 16 }?.let { place(it, timeMs, depth + 1) })
 
+private fun Scene.pose(layer: Layer, timeMs: Int, depth: Int = 0): Pose {
+    val own = ownPlace(layer, timeMs, fps)
+    val turn = turnOf(own.rot, layer.at(timeMs, fps).tilt)
+    val parent = parentOf(layer)?.takeIf { depth <= 16 }?.let { pose(it, timeMs, depth + 1) } ?: return Pose(own, turn)
+    return Pose(lifted(own, parent), mul(parent.turn, turn))
+}
+
 internal fun Scene.chain(layer: Layer?): List<Layer> = generateSequence(layer) { parentOf(it) }.take(17).toList()
 
 internal fun Layer.moves(): Boolean = PLACED.any { node.child("transform")?.child(it)?.isKeyframed == true }
@@ -251,24 +288,34 @@ internal fun Layer.moves(): Boolean = PLACED.any { node.child("transform")?.chil
 private fun XmlNode.withMoved(name: String, element: XmlNode): XmlNode =
     withChild("transform", (child("transform") ?: XmlNode("transform")).withChild(name, element))
 
+private fun XmlNode.shifted(name: String, by: FloatArray): XmlNode {
+    val element = child("transform")?.child(name) ?: XmlNode(name)
+    fun moved(text: String?) = formatFloats(floats(text, FloatArray(by.size)).copyOf(by.size).also { v -> for (i in by.indices) v[i] += by[i] })
+    return withMoved(name, if (element.isKeyframed) element.withKeyframes(element.keyframes.map { it.copy(v = moved(it.v)) }) else element.with("value", moved(element["value"])))
+}
+
+private fun Layer.converted(own: Place, convert: (Place) -> Place?): Layer? {
+    val transform = node.child("transform")
+    var out = node
+    for (name in MOVED) {
+        val element = transform?.child(name) ?: XmlNode(name)
+        val keys = element.keyframes
+        out = out.withMoved(name, if (keys.isEmpty()) {
+            element.copy(children = element.children.filterNot { it.name == "kf" }).with("value", formatFloats((convert(own) ?: return null).part(name)))
+        } else {
+            val defaults = own.part(name).let { d -> if (name == "scale") floatArrayOf(1f, 1f) else FloatArray(d.size) }
+            element.withKeyframes(keys.map { k -> k.copy(v = formatFloats((convert(own.withPart(name, floats(k.v, defaults))) ?: return null).part(name))) })
+        })
+    }
+    return copy(node = out)
+}
+
 internal fun Layer.rebaked(changing: Boolean, outerTimes: List<Int>, fps: Int, convert: (Place, Int) -> Place?): Layer? {
     val transform = node.child("transform")
     fun element(name: String) = transform?.child(name) ?: XmlNode(name)
     fun plain(name: String, v: FloatArray) = element(name).copy(children = element(name).children.filterNot { it.name == "kf" }).with("value", formatFloats(v))
     var out = node
-    if (!changing && transform?.child("pivot")?.isKeyframed != true) {
-        val own = ownPlace(this, startTime, fps)
-        for (name in MOVED) {
-            val keys = element(name).keyframes
-            out = out.withMoved(name, if (keys.isEmpty()) plain(name, (convert(own, startTime) ?: return null).part(name)) else {
-                val defaults = own.part(name).let { d -> if (name == "scale") floatArrayOf(1f, 1f) else FloatArray(d.size) }
-                element(name).withKeyframes(keys.map { k ->
-                    k.copy(v = formatFloats((convert(own.withPart(name, floats(k.v, defaults)), startTime) ?: return null).part(name)))
-                })
-            })
-        }
-        return copy(node = out)
-    }
+    if (!changing && transform?.child("pivot")?.isKeyframed != true) return converted(ownPlace(this, startTime, fps)) { convert(it, startTime) }
     val length = (endTime - startTime).coerceAtLeast(1)
     val marks = (listOf(startTime, endTime) + keyframeTimes() + outerTimes).filter { it in startTime..endTime }.toSortedSet().toList()
     val frames = generateSequence(((startTime.toLong() * fps) / 1000).toInt()) { it + 1 }
@@ -322,15 +369,27 @@ internal fun Layer.rebaked(changing: Boolean, outerTimes: List<Int>, fps: Int, c
     return copy(node = out)
 }
 
-internal fun Scene.rebased(layer: Layer, parentId: Long?): Layer? {
+internal fun Scene.rebased(layer: Layer, parentId: Long?, atMs: Int = layer.startTime): Layer? {
+    val base = Layer(layer.node)
+    val ms = atMs.coerceIn(base.startTime, base.endTime)
+    val from = parentOf(base)?.let { pose(it, ms) }
+    val to = parentId?.let { id -> layers.firstOrNull { it.id == id } }?.let { pose(it, ms) }
+    val own = ownPlace(base, ms, fps)
+    val tilt = base.at(ms, fps).tilt
+    val world = lowered(lifted(own, from), to) ?: return null
+    val turn = mul((to?.turn ?: SAME).inverse(), from?.turn ?: SAME)
+    val flat = abs(turn[2]) + abs(turn[5]) + abs(turn[6]) + abs(turn[7]) < 1e-9
+    val (rot, tilted) = if (flat) world.rot to tilt else euler(mul(turn, turnOf(own.rot, tilt)), world.rot)
+    val moved = base.converted(own) { p -> lowered(lifted(p, from), to)?.copy(rot = p.rot + rot - own.rot) } ?: return null
+    val node = if (tilted.contentEquals(tilt)) moved.node else moved.node.shifted("tilt", floatArrayOf(tilted[0] - tilt[0], tilted[1] - tilt[1]))
+    return Layer(node.with("parent", parentId?.toString()))
+}
+
+internal fun Scene.flattened(layer: Layer): Layer? {
     val old = parentOf(layer)
-    val new = parentId?.let { id -> layers.firstOrNull { it.id == id } }
-    val outer = chain(old) + chain(new)
-    val moved = Layer(layer.node).rebaked(outer.any { it.moves() }, outer.flatMap { it.keyframeTimes() }, fps) { own, ms ->
-        val world = compose(own, old?.let { place(it, ms) })
-        if (new == null) world else decompose(world, place(new, ms))
-    } ?: return null
-    return moved.copy(node = moved.node.with("parent", parentId?.toString()))
+    val outer = chain(old)
+    val moved = Layer(layer.node).rebaked(outer.any { it.moves() }, outer.flatMap { it.keyframeTimes() }, fps) { own, ms -> compose(own, old?.let { place(it, ms) }) } ?: return null
+    return moved.copy(node = moved.node.with("parent", null))
 }
 
 internal fun Scene.withWorldLocation(layer: Layer, timeMs: Int, change: (x: Float, y: Float) -> Pair<Float, Float>): Layer {
@@ -341,9 +400,9 @@ internal fun Scene.withWorldLocation(layer: Layer, timeMs: Int, change: (x: Floa
     return layer.withTransform("location", local.x, local.y, layer.location[2])
 }
 
-internal fun Scene.unparentChildrenOf(ids: Set<Long>): Scene =
+internal fun Scene.unparentChildrenOf(ids: Set<Long>, atMs: Int? = null): Scene =
     layers.filter { it.id !in ids && it.node["parent"]?.toLongOrNull() in ids }
-        .fold(this) { acc, child -> acc.update(child.id) { acc.rebased(it, null) ?: it } }
+        .fold(this) { acc, child -> acc.update(child.id) { acc.rebased(it, null, atMs ?: it.startTime) ?: it } }
 
 fun EditorState.setParent(parentId: Long?) {
     val layer = selected ?: return
@@ -356,11 +415,11 @@ fun EditorState.setParent(parentId: Long?) {
         if (walk == layer.id) return
         walk = scene.layer(walk)?.node?.get("parent")?.toLongOrNull()
     }
-    val next = scene.rebased(layer, parentId) ?: return
+    val next = scene.rebased(layer, parentId, sampleMs) ?: return
     editSelected { next }
 }
 
-internal fun Scene.parented(ids: Collection<Long>, parentId: Long?): Pair<Scene, Int> {
+internal fun Scene.parented(ids: Collection<Long>, parentId: Long?, atMs: Int? = null): Pair<Scene, Int> {
     var skipped = 0
     val chosen = ids.filter { it != parentId }.mapNotNull { layer(it) }.sortedBy { chain(it).size }
     val next = chosen.fold(this) { acc, picked ->
@@ -370,14 +429,14 @@ internal fun Scene.parented(ids: Collection<Long>, parentId: Long?): Pair<Scene,
             skipped++
             return@fold acc
         }
-        val moved = acc.rebased(layer, parentId) ?: return@fold acc
+        val moved = acc.rebased(layer, parentId, atMs ?: layer.startTime) ?: return@fold acc
         acc.update(layer.id) { moved }
     }
     return next to skipped
 }
 
 fun EditorState.setParentOfChosen(parentId: Long?): Int {
-    val (next, skipped) = scene.parented(MultiSelect.ids, parentId)
+    val (next, skipped) = scene.parented(MultiSelect.ids, parentId, sampleMs)
     if (next.node !== scene.node) edit { next }
     return skipped
 }

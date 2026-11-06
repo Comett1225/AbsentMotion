@@ -38,6 +38,7 @@ private val timings = HashMap<Long, Pair<XmlNode, VideoTiming>>()
 internal fun timingOf(layer: Layer): VideoTiming {
     val cached = timings[layer.id]
     if (cached != null && cached.first === layer.node) return cached.second
+    if (timings.size > 512) timings.clear()
     return VideoTiming(layer).also { timings[layer.id] = layer.node to it }
 }
 

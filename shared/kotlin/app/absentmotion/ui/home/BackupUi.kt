@@ -129,7 +129,7 @@ internal fun BackupRows(settings: AppSettings, onRestored: () -> Unit) {
     }
 }
 
-internal fun isWeeklyBackupName(name: String?) = name != null && name.startsWith(WEEKLY_PREFIX) && name.contains("." + Backup.EXTENSION)
+internal fun isWeeklyBackupName(name: String?) = name != null && name.startsWith(WEEKLY_PREFIX) && name.endsWith("." + Backup.EXTENSION)
 
 private fun displayName(context: Context, uri: Uri): String? =
     context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { if (it.moveToFirst()) it.getString(0) else null }

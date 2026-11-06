@@ -85,9 +85,10 @@ object DeskKeys {
             released(event)
             if (viewer != null && event.key == Key.Spacebar) return true
             val open = app.editor?.let { !modal(it) } == true
-            return open && DeskTyping.active == 0 && event.key == Key.Spacebar && !isCommand(event)
+            return open && DeskTyping.active == 0 && event.key == Key.Spacebar && !isCommand(event) && !event.isAltPressed
         }
         if (event.type != KeyEventType.KeyDown) return false
+        if (DeskTyping.active == 0 && DeskDrop.browserKey?.invoke(event) == true) return true
         val first = fresh(event.key)
         val state = app.editor ?: return false
         if (modal(state) || altGr(windows, event.isCtrlPressed, event.isAltPressed)) return false
@@ -113,7 +114,7 @@ object DeskKeys {
             !command && shift && event.key == Key.Z -> DeskTimelineControls.fit?.let { if (first) it() } ?: return false
             !command && (event.key == Key.Plus || event.key == Key.Equals || event.key == Key.NumPadAdd) -> DeskTimelineControls.zoom?.invoke(1.25f) ?: return false
             !command && (event.key == Key.Minus || event.key == Key.NumPadSubtract) -> DeskTimelineControls.zoom?.invoke(0.8f) ?: return false
-            event.key == Key.Spacebar && !command -> if (first) state.playing = !state.playing
+            event.key == Key.Spacebar && !command && !event.isAltPressed -> if (first) state.playing = !state.playing
             event.key == Key.DirectionLeft && !command -> step(if (shift) -10 else -1)
             event.key == Key.DirectionRight && !command -> step(if (shift) 10 else 1)
             event.key == Key.MoveHome -> { state.playing = false; state.frame = 0 }

@@ -101,17 +101,17 @@ object DeskPicker {
         chooser.choosableFileFilters.getOrNull(1)?.let { chooser.fileFilter = it }
         val answer = if (mode == SAVE) chooser.showSaveDialog(DeskFiles.window) else chooser.showOpenDialog(DeskFiles.window)
         if (answer != JFileChooser.APPROVE_OPTION) return emptyList()
-        return if (multiple) chooser.selectedFiles.toList() else listOfNotNull(chooser.selectedFile)
+        return if (multiple) chooser.selectedFiles.toList().ifEmpty { listOfNotNull(chooser.selectedFile) } else listOfNotNull(chooser.selectedFile)
     }
 
     internal fun windowsFilters(filters: List<Filter>): Array<String> =
         filters.flatMap { filter -> listOf(filter.name, filter.extensions.joinToString(";") { "*.$it" }) }.toTypedArray()
 
-    internal fun glob(extension: String): String =
-        "*." + extension.map { c -> if (c.lowercaseChar() != c.uppercaseChar()) "[${c.lowercaseChar()}${c.uppercaseChar()}]" else "$c" }.joinToString("")
+    internal fun glob(extension: String, separator: String): String =
+        listOf(extension.lowercase(), extension.uppercase()).distinct().joinToString(separator) { "*.$it" }
 
     internal fun linuxFilters(filters: List<Filter>): Array<String> =
-        filters.flatMap { filter -> listOf(filter.name, filter.extensions.joinToString(";") { glob(it) }) }.toTypedArray()
+        filters.flatMap { filter -> listOf(filter.name, filter.extensions.joinToString(";") { glob(it, ";") }) }.toTypedArray()
 
     internal fun linuxTool(desktop: String?, kdialog: Boolean, zenity: Boolean): String? {
         val kde = desktop.orEmpty().split(':').any { it.equals("KDE", ignoreCase = true) }
@@ -128,17 +128,17 @@ object DeskPicker {
             add("kdialog"); add("--title"); add(title)
             when (mode) {
                 FOLDER -> { add("--getexistingdirectory"); add(home) }
-                SAVE -> { add("--getsavefilename"); add(File(home, name).path) }
+                SAVE -> { add("--getsavefilename"); add(home.trimEnd('/') + "/" + name) }
                 else -> { add("--getopenfilename"); add(home) }
             }
-            if (mode != FOLDER && filters.isNotEmpty()) add(filters.joinToString("\n") { filter -> filter.extensions.joinToString(" ") { glob(it) } + "|" + filter.name })
+            if (mode != FOLDER && filters.isNotEmpty()) add(filters.joinToString("\n") { filter -> filter.extensions.joinToString(" ") { glob(it, " ") } + "|" + filter.name })
             if (mode == OPEN && multiple) { add("--multiple"); add("--separate-output") }
         } else buildList {
             add("zenity"); add("--file-selection"); add("--title=$title")
             if (mode == FOLDER) add("--directory")
-            if (mode == SAVE) { add("--save"); add("--filename=" + File(home, name).path) }
+            if (mode == SAVE) { add("--save"); add("--filename=" + home.trimEnd('/') + "/" + name) }
             if (mode == OPEN && multiple) { add("--multiple"); add("--separator=\n") }
-            if (mode != FOLDER) filters.forEach { filter -> add("--file-filter=${filter.name} | " + filter.extensions.joinToString(" ") { glob(it) }) }
+            if (mode != FOLDER) filters.forEach { filter -> add("--file-filter=${filter.name} | " + filter.extensions.joinToString(" ") { glob(it, " ") }) }
         }
 
     internal fun fileOf(uri: String): File? {

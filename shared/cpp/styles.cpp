@@ -1688,6 +1688,8 @@ bool EffectOwnerMatrix(int64_t owner, double timeMs, SkMatrix* matrix) {
 
 int ProjectFps() { return Fps(); }
 
+const std::vector<Layer>* EffectSiblings() { return gEffectList; }
+
 SceneScope::SceneScope(const Scene& scene) : fPrevious(gScene) {
     if (!gScene) gScene = &scene;
 }

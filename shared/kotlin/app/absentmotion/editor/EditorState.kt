@@ -21,6 +21,8 @@ import app.absentmotion.model.KeyScope
 import app.absentmotion.model.Layer
 import app.absentmotion.model.PropRef
 import app.absentmotion.model.Scene
+import app.absentmotion.model.nestedHostTime
+import app.absentmotion.model.nestedTime
 import app.absentmotion.model.withValueLinksFollowing
 
 enum class EditorPanel(@StringRes val title: Int) {
@@ -119,11 +121,12 @@ class EditorState(
         endGesture()
         playing = false
         val hostMs = timeMs
+        val hostFps = scene.fps
         MultiSelect.clear()
         selectedId = null
         panel = EditorPanel.Tools
         groupPath = groupPath + id
-        frame = inner.frameAt((hostMs - group.startTime).coerceIn(0, inner.totalTime)).coerceIn(0, maxOf(scene.lastFrame, 0))
+        frame = inner.frameAt(group.nestedTime(hostMs.toDouble(), hostFps, quantize = false).ms.toInt().coerceIn(0, inner.totalTime)).coerceIn(0, maxOf(scene.lastFrame, 0))
         engine.setScene(scene)
     }
 
@@ -137,22 +140,25 @@ class EditorState(
         groupPath = groupPath.dropLast(1)
         val group = scene.layer(id)
         selectedId = group?.id
-        frame = scene.frameAt((group?.startTime ?: 0) + innerMs).coerceIn(0, maxOf(scene.lastFrame, 0))
+        frame = scene.frameAt(group?.nestedHostTime(innerMs.toDouble(), scene.fps)?.toInt() ?: innerMs).coerceIn(0, maxOf(scene.lastFrame, 0))
         engine.setScene(scene)
     }
 
     fun leaveGroups() { while (groupPath.isNotEmpty()) exitGroup() }
+
+    val premuteGain = HashMap<Long, Float>()
 
     var ungroupAsk by mutableStateOf(false)
 
     val exportFrame: Int
         get() {
             if (groupPath.isEmpty()) return frame
-            var ms = timeMs
+            val chain = ArrayList<Pair<Layer, Int>>()
             var inner = root
-            val offsets = groupPath.map { id -> inner.layer(id)!!.also { inner = it.nested ?: inner }.startTime }
-            ms += offsets.sum()
-            return root.frameAt(ms).coerceIn(0, maxOf(root.lastFrame, 0))
+            for (id in groupPath) { val layer = inner.layer(id)!!; chain.add(layer to inner.fps); inner = layer.nested ?: inner }
+            var ms = timeMs.toDouble()
+            for (i in chain.indices.reversed()) ms = chain[i].first.nestedHostTime(ms, chain[i].second)
+            return root.frameAt(ms.toInt()).coerceIn(0, maxOf(root.lastFrame, 0))
         }
 
     private var selection by mutableStateOf<Long?>(null)

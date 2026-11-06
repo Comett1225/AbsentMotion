@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.isCtrlPressed
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.isSecondaryPressed
 import androidx.compose.ui.input.pointer.pointerInput
@@ -217,7 +218,7 @@ internal fun DeskContext(add: () -> Unit, reveal: (() -> Unit)? = null, remove: 
         awaitPointerEventScope {
             while (true) {
                 val event = awaitPointerEvent(PointerEventPass.Initial)
-                if (event.type == PointerEventType.Press && event.buttons.isSecondaryPressed) {
+                if (event.type == PointerEventType.Press && (event.buttons.isSecondaryPressed || mac && event.keyboardModifiers.isCtrlPressed)) {
                     val position = event.changes.first().position
                     at = IntOffset(position.x.toInt(), position.y.toInt())
                     event.changes.forEach { it.consume() }

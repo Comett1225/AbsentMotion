@@ -33,7 +33,7 @@ internal class DeskFrameReader(context: Context, uri: String) : DesktopFrameInpu
         val indices = wanted.map { pts -> timestamps.binarySearch(pts).let { if (it >= 0) it else -it - 1 } }
         if (indices.all { it in timestamps.indices } && indices.zipWithNext().all { (a, b) -> a <= b } && indices.last() - indices.first() <= 96) {
             val seconds = String.format(Locale.ROOT, "%.6f", (timestamps[indices.first()] - 1).coerceAtLeast(0) / 1_000_000.0)
-            val process = ProcessBuilder(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-ss", seconds, "-noautorotate", "-i", file.path,
+            val process = ProcessBuilder(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-ss", seconds, "-noautorotate", "-i", file.path, "-map", "0:v:0",
                 "-frames:v", "${indices.last() - indices.first() + 1}", "-fps_mode", "passthrough", "-pix_fmt", "yuv420p", "-f", "rawvideo", "-")
                 .redirectError(ProcessBuilder.Redirect.DISCARD).start()
             try {
@@ -65,7 +65,7 @@ internal class DeskFrameReader(context: Context, uri: String) : DesktopFrameInpu
         for (pts in wanted) {
             coroutineContext.ensureActive()
             val seconds = String.format(Locale.ROOT, "%.6f", (pts - 1).coerceAtLeast(0) / 1_000_000.0)
-            val process = ProcessBuilder(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-ss", seconds, "-noautorotate", "-i", file.path,
+            val process = ProcessBuilder(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-ss", seconds, "-noautorotate", "-i", file.path, "-map", "0:v:0",
                 "-frames:v", "1", "-pix_fmt", "yuv420p", "-f", "rawvideo", "-")
                 .redirectError(ProcessBuilder.Redirect.DISCARD).start()
             try {

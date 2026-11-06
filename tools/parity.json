@@ -45,13 +45,13 @@
     },
     {
       "id": "tool.mixer",
-      "name": "Mixer: a strip per sound layer with fader, Mute, Solo and live level meter, plus a Master meter and the project summary with a settings gear",
-      "where": "Mixer.kt, WideEditor.kt, desk/DeskWorkspace.kt DeskInspector, audio/LiveMix.kt, audio/FxRack.kt, AudioEngine.kt (android), DeskAudioEngine.kt (pc)",
+      "name": "Mixer and level meters: a strip per sound layer with fader, Mute, Solo and an L/R meter (one Mono bar for mono sources), a Master L/R meter with dB and the project summary with a settings gear; on phones and tablets a stereo level line under the play bar, on tablets also a master meter (L, R, dB) on the left of the preview while playing",
+      "where": "Mixer.kt, MasterMeter.kt, LevelMeter.kt, WideEditor.kt, desk/DeskWorkspace.kt DeskInspector, audio/LiveMix.kt, audio/FxRack.kt, audio/LayerStream.kt, AudioEngine.kt (android), DeskAudioEngine.kt (pc)",
       "android": "untested",
       "macos": "works",
       "windows": "untested",
       "linux": "untested",
-      "note": "desktop: the Inspector when nothing is selected; Android: tablets in the wide layout when the side panel space is free and the canvas keeps its size; phones in portrait have no mixer by design; not yet tried on a tablet"
+      "note": "desktop: the Mixer in the Inspector when nothing is selected stands in for the level line and the left-side meter; Android: phones show the stereo level line only, tablets in the wide layout the line plus the left-side master meter while playing (the tablet Mixer panel was removed on 2026-11-06); mono or stereo is read from the decoder when a layer first plays; not yet tried on a phone or tablet"
     },
     {
       "id": "tool.fill",

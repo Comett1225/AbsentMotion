@@ -203,7 +203,8 @@ class EngineThread(private val background: Int, private val context: Context? = 
         for (uri in clips) {
             if (videos.containsKey(uri)) continue
             val source = file(uri)?.let { f -> runCatching { NativeVideoSource(f) }.getOrNull() ?: runCatching { FfmpegVideoSource(f, DeskMedia.ffmpeg, DeskMedia.ffprobe) }.getOrNull() } ?: continue
-            withContext(dispatcher) { if (closed) source.close() else videos[uri] = source }
+            var handed = false
+            try { withContext(dispatcher) { handed = true; if (closed) source.close() else videos[uri] = source } } finally { if (!handed) source.close() }
         }
         pictureRevision.update { it + 1 }
     }
@@ -305,7 +306,7 @@ class EngineThread(private val background: Int, private val context: Context? = 
             native.setAccurateBlur(v.accurateBlur)
             val target = targets[nextTarget]?.takeIf { it.width == w && it.height == h } ?: org.jetbrains.skia.Bitmap().also {
                 it.allocPixels(org.jetbrains.skia.ImageInfo(w, h, org.jetbrains.skia.ColorType.BGRA_8888, org.jetbrains.skia.ColorAlphaType.PREMUL, org.jetbrains.skia.ColorSpace.sRGB))
-                targets[nextTarget]?.close()
+                targets[nextTarget]?.let { old -> javax.swing.SwingUtilities.invokeLater { old.close() } }
                 targets[nextTarget] = it
             }
             val started = System.nanoTime()

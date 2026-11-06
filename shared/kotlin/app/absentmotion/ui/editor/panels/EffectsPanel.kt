@@ -323,10 +323,11 @@ private fun EffectListRow(state: EditorState, reorder: Reorder, index: Int, coun
             return
         }
         deleting = true
+        val target = effect
         scope.launch {
             animate(offset, width, animationSpec = tween(Motion.FastMs, easing = Motion.EaseIn)) { v, _ -> offset = v }
             animate(0f, 1f, animationSpec = tween(Motion.FastMs, easing = Motion.EaseOut)) { v, _ -> shrink = v }
-            state.editSelected { it.removeEffect(index) }
+            state.editSelected { l -> l.effects.indexOfFirst { it === target }.let { i -> if (i < 0) l else l.removeEffect(i) } }
             state.effectIndex = -1
             offset = 0f
             shrink = 0f

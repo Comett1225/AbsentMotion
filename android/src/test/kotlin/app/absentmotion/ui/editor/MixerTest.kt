@@ -3,7 +3,6 @@ package app.absentmotion.ui.editor
 import androidx.compose.ui.unit.dp
 import app.absentmotion.model.Scene
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -24,12 +23,13 @@ class MixerTest {
         assertTrue(mixerLayers(Scene.parse("""<scene width="100" height="100" fps="30"><text id="1" startTime="0" endTime="9" /></scene>""")).isEmpty())
     }
 
-    @Test fun theTabletMixerOnlyShowsWhenTheCanvasKeepsItsSize() {
-        assertTrue("16:9 on a landscape tablet", mixerFits(1280.dp, 392.dp, 1920, 1080))
-        assertFalse("16:9 on a portrait tablet", mixerFits(800.dp, 656.dp, 1920, 1080))
-        assertTrue("9:16 on a portrait tablet", mixerFits(800.dp, 656.dp, 1080, 1920))
-        assertFalse("square that would shrink", mixerFits(900.dp, 600.dp, 1000, 1000))
-        assertFalse("no room for the preview at all", mixerFits(1280.dp, 0.dp, 1920, 1080))
+    @Test fun theTabletMasterMeterSitsInTheLetterboxOrHugsTheLeftEdge() {
+        assertEquals("16:9 on a landscape tablet: in the side margin", 12f, meterStart(1280.dp, 392.dp, 0.dp, 1920, 1080).value, 0.01f)
+        assertEquals("9:16 on a portrait tablet: in the side margin", 12f, meterStart(800.dp, 656.dp, 0.dp, 1080, 1920).value, 0.01f)
+        assertEquals("16:9 on a portrait tablet: no side margin, so a strip at the edge", 0f, meterStart(800.dp, 656.dp, 0.dp, 1920, 1080).value, 0.01f)
+        assertEquals("a margin too narrow for the strip", 0f, meterStart(820.dp, 450.dp, 0.dp, 1920, 1080).value, 0.01f)
+        assertEquals("a small margin centres the strip in it", 6f, meterStart(860.dp, 450.dp, 0.dp, 1920, 1080).value, 0.05f)
+        assertEquals("the side panel pushes the canvas to the left edge", 0f, meterStart(1280.dp, 600.dp, 384.dp, 1920, 1080).value, 0.01f)
     }
 
     @Test fun theFaderIsLinearLikeTheVolumePanelAndSnapsToWholePercent() {

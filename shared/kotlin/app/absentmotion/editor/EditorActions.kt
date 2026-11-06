@@ -95,7 +95,7 @@ fun EditorState.clearSelection() {
 
 fun EditorState.deleteSelected() {
     val id = selectedId ?: return
-    edit { it.unparentChildrenOf(setOf(id)).remove(id) }
+    edit { it.unparentChildrenOf(setOf(id), sampleMs).remove(id) }
 }
 
 fun EditorState.duplicateSelected() {
@@ -320,7 +320,7 @@ fun EditorState.duplicateChosen() {
 fun EditorState.deleteChosen() {
     val ids = chosenLayers.map { it.id }.toSet()
     if (ids.isEmpty()) return
-    edit { s -> ids.fold(s.unparentChildrenOf(ids)) { acc, id -> acc.remove(id) } }
+    edit { s -> ids.fold(s.unparentChildrenOf(ids, sampleMs)) { acc, id -> acc.remove(id) } }
     MultiSelect.clear()
     deselectLayer()
 }

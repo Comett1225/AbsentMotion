@@ -1,4 +1,5 @@
 #include "drawing.h"
+#include "numbers.h"
 
 #include <algorithm>
 #include <cmath>
@@ -474,6 +475,7 @@ void DrawPointEdit(SkCanvas* canvas, const Layer& layer, const SkMatrix& toTarge
 }
 
 std::string OutlineSvg(const SkPath& path) {
+    CNumbers();
     auto num = [](float v) {
         char b[32];
         snprintf(b, sizeof b, "%.4f", v);

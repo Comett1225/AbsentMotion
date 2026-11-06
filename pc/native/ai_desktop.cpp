@@ -31,6 +31,8 @@
 #include "rife_ops.h"
 #endif
 
+std::string DesktopString(JNIEnv* env, jstring s);
+
 DEFINE_LAYER_CREATOR(Warp)
 
 namespace {
@@ -168,12 +170,10 @@ ModelPath text(JNIEnv *env, jstring value) {
         out.assign(reinterpret_cast<const wchar_t *>(chars), env->GetStringLength(value));
         env->ReleaseStringChars(value, chars);
     }
-#else
-    const char *chars = env->GetStringUTFChars(value, nullptr);
-    ModelPath out = chars ? chars : "";
-    if (chars) env->ReleaseStringUTFChars(value, chars);
-#endif
     return out;
+#else
+    return DesktopString(env, value);
+#endif
 }
 
 inline float channel(uint32_t argb, int shift) { return static_cast<float>((argb >> shift) & 0xFF) * (1 / 255.f); }

@@ -262,5 +262,7 @@ fun formatBytes(bytes: Long): String {
     }
 }
 
+internal const val SafeNameChars = "_-.+, &'()!@"
+
 fun safeName(title: String): String =
-    title.filter { it.isLetterOrDigit() || it in "_-.+, " }.trim().ifEmpty { "Project" }
+    title.filter { it.isLetterOrDigit() || it in SafeNameChars }.trim().ifEmpty { "Project" }

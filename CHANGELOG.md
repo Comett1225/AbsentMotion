@@ -35,6 +35,16 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - Real 3D part two: Camera Options > Camera View has Sort, By layer or By piece. By piece sorts the pieces of 3D Scatter and 3D Fracture, the faces of 3D models and particles with Depth one by one among the other 3D layers, so objects that pass through each other overlap where they should. Mix pieces with other layers, on the 3D Scatter, 3D Fracture and Particles cards and in Model Options, keeps one layer whole. Pieces that cut through each other are not split, and groups do not mix with the layers around them.
 - Adobe Animate import: .fla files from Flash CS5 on (and XFL folders on the desktop) open through the normal import, Choose file, Share or Open with. Shapes, symbols as groups, pictures, classic tweens with eases, alpha, tint and brightness, masks and MP3 sounds on the main timeline come over; the import report lists them and what was left out, such as text, ActionScript, shape and motion tweens, filters and camera layers. Older binary .fla files get a message that says so.
 - Chromebooks with Intel or AMD chips have their own x86_64 files, -foss-x86_64.apk and -compatible-x86_64.apk. The in-app update picks the right file, and the download page lists them. The Video Downloader is not in these files.
+- Desktop window bar in the app's colours with the system's own window buttons, and a menu button with File, Edit, View, Playback and Help.
+- Desktop media belongs to each project; right-click a folder and choose Pin to all projects to see it everywhere. Search lists the folder first.
+- Desktop Mixer: with nothing selected, the Inspector shows a fader, Mute, Solo and left/right (or mono) level meters for every layer with sound.
+- The level line under the play bar shows the left and right channel; tablets also show a master meter on the left while playing.
+- Effect help on the desktop opens in its own window inside the app.
+- 90 and 120 fps projects.
+- Saved custom sizes in New Project and in the project settings.
+- Copy and Report on crash and error screens, with links to GitHub, Discord and the bug report form.
+- Desktop: Alt+Left and Alt+Right jump between bookmarks; comma and period nudge the selected clips.
+- Linux: a .tar.gz with an install script for any distribution.
 
 ### Changed
 
@@ -45,6 +55,9 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - If the app closes while Vulkan or OpenGL is starting, the next start uses the other one.
 - On Samsung phones, when Auto Blocker may be stopping an update, the update message says so and how to turn it off for the install.
 - The source code has one folder per platform: shared, android, pc, macos, windows and linux.
+- Linking a layer to a parent or unlinking it no longer adds keyframes: the layer keeps its own animation and stays where it is at the playhead.
+- A short tap on an effect's reorder grip opens the effect; hold the grip to move it.
+- Desktop file and folder pickers use the system's current dialogs on Windows and Linux.
 
 ### Removed
 
@@ -55,6 +68,9 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - A thin light line could show along the edge of the canvas.
 - 3D Scatter, 3D Fracture and the 3D shape effects such as Cube turn with a tilted or orbiting camera like other 3D layers, and the light on Scatter and Fracture pieces stays the same when the camera rolls or zooms.
 - Puppet Pin keeps the parts it pulls in from outside the canvas, also when the layer has Glow.
+- On computers set to a language with decimal commas, projects could show layers in the wrong place.
+- A damaged frame near the end of a video no longer freezes the rest of the clip.
+- Two layers using the same video play and export smoothly.
 
 ### Licence
 

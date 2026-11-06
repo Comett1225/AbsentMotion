@@ -1297,6 +1297,10 @@
     <string name="mixer_solo">منفرد</string>
     <string name="mixer_mute_short">M</string>
     <string name="mixer_solo_short">S</string>
+    <string name="meter_left_short">L</string>
+    <string name="meter_right_short">R</string>
+    <string name="meter_mono">أحادي</string>
+    <string name="meter_master">المستوى الرئيسي</string>
     <string name="mixer_empty">لا يوجد صوت في هذا المشروع</string>
     <string name="mixer_empty_hint">أضف موسيقى أو صوتًا أو فيديو بصوت ليظهر هنا.</string>
     <string name="blend_cat_normal">عادي</string>

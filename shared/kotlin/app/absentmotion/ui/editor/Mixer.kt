@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
@@ -57,6 +59,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.R
@@ -135,7 +139,7 @@ internal fun Mixer(state: EditorState, onSettings: () -> Unit, modifier: Modifie
     val layers = remember(scene) { mixerLayers(scene) }
     val mix = state.engine.audio?.mix
     val solo = remember { mutableStateListOf<Long>() }
-    val unmuted = remember { HashMap<Long, Float>() }
+    val unmuted = state.premuteGain
     LaunchedEffect(layers) { if (solo.retainAll { id -> layers.any { it.id == id } }) mix?.solo = solo.toLongArray() }
     DisposableEffect(mix) { onDispose { mix?.solo = LongArray(0) } }
     Column(modifier.background(Am.Panel)) {
@@ -199,7 +203,7 @@ private fun LayerStrip(state: EditorState, layer: Layer, mix: LiveMix?, soloed: 
     val volume = stringResource(R.string.volume_volume)
     StripFrame(deskLayerIcon(layer), layer.label, "${(gain * 100).roundToInt()}%", Modifier.width(StripWidth).alpha(if (layer.hidden) 0.5f else 1f), body = {
         Fader(gain, "$volume, ${layer.label}", { value, dragging -> state.setGainOf(id, value, if (dragging) drag else null) }, { state.endGesture() }, Modifier.width(28.dp).fillMaxHeight())
-        MeterSlot(state.playing, mix?.let { m -> { m.level(id) } })
+        if (mix != null) ChannelMeter(state.playing, { mix.left(id) }, { mix.right(id) }, { mix.mono(id) }, Modifier.fillMaxHeight())
     }) {
         StripToggle(stringResource(R.string.mixer_mute_short), stringResource(R.string.mixer_mute), muted, Am.Accent, enabled = !keyed) {
             if (muted) state.setGainOf(id, unmuted.remove(id) ?: 1f)
@@ -211,33 +215,65 @@ private fun LayerStrip(state: EditorState, layer: Layer, mix: LiveMix?, soloed: 
 
 @Composable
 private fun MasterStrip(state: EditorState, mix: LiveMix?) {
-    val meter = remember { MeterBallistics() }
-    val db by remember { derivedStateOf { MeterBallistics.decibels(meter.peak) } }
+    val left = remember { MeterBallistics() }
+    val right = remember { MeterBallistics() }
+    val db by remember { derivedStateOf { MeterBallistics.decibels(maxOf(left.peak, right.peak)) } }
     StripFrame(AudioIcons.Speaker, stringResource(R.string.mixer_master), if (mix == null) "" else db?.let { "$it dB" } ?: "−∞ dB", Modifier.width(64.dp), body = {
-        if (mix != null) Meter(meter, state.playing, { mix.master }, Modifier.width(12.dp).fillMaxHeight())
+        if (mix != null) ChannelMeter(state.playing, { mix.masterLeft }, { mix.masterRight }, { false }, Modifier.fillMaxHeight(), left, right)
     }) {}
 }
 
-@Composable
-private fun MeterSlot(playing: Boolean, read: (() -> Float)?) {
-    if (read == null) return
-    val meter = remember { MeterBallistics() }
-    Meter(meter, playing, read, Modifier.width(8.dp).fillMaxHeight())
-}
+private val BarWidth = 5.dp
+private val BarGap = 2.dp
 
 @Composable
-private fun Meter(meter: MeterBallistics, playing: Boolean, read: () -> Float, modifier: Modifier) {
-    val latest by rememberUpdatedState(read)
+internal fun ChannelMeter(
+    playing: Boolean, left: () -> Float, right: () -> Float, mono: () -> Boolean, modifier: Modifier,
+    l: MeterBallistics = remember { MeterBallistics() }, r: MeterBallistics = remember { MeterBallistics() },
+    bar: Dp = BarWidth, labelSize: TextUnit = 9.sp,
+) {
+    val readLeft by rememberUpdatedState(left)
+    val readRight by rememberUpdatedState(right)
+    val readMono by rememberUpdatedState(mono)
+    var single by remember { mutableStateOf(mono()) }
     LaunchedEffect(playing) {
-        meter.reset()
+        l.reset()
+        r.reset()
+        single = readMono()
         if (!playing) return@LaunchedEffect
         var last = withFrameNanos { it }
         while (true) {
             val now = withFrameNanos { it }
-            meter.step(latest(), ((now - last) / 1e9f).coerceIn(0f, 0.1f))
+            val dt = ((now - last) / 1e9f).coerceIn(0f, 0.1f)
             last = now
+            val one = readMono()
+            single = one
+            val a = readLeft()
+            val b = readRight()
+            if (one) l.step(maxOf(a, b), dt) else { l.step(a, dt); r.step(b, dt) }
         }
     }
+    val label = Am.OnDarkDim
+    Column(modifier.width(bar * 2 + BarGap), horizontalAlignment = Alignment.CenterHorizontally) {
+        Row(Modifier.weight(1f), Arrangement.spacedBy(BarGap)) {
+            if (single) Bar(l, Modifier.width(bar * 2 + BarGap).fillMaxHeight())
+            else {
+                Bar(l, Modifier.width(bar).fillMaxHeight())
+                Bar(r, Modifier.width(bar).fillMaxHeight())
+            }
+        }
+        Row(Modifier.padding(top = 3.dp), Arrangement.spacedBy(BarGap)) {
+            if (single) Text(stringResource(R.string.meter_mono), Modifier.wrapContentWidth(unbounded = true), color = label, fontSize = labelSize, maxLines = 1, softWrap = false)
+            else {
+                Text(stringResource(R.string.meter_left_short), Modifier.width(bar).wrapContentWidth(unbounded = true), color = label, fontSize = labelSize, maxLines = 1, softWrap = false)
+                Text(stringResource(R.string.meter_right_short), Modifier.width(bar).wrapContentWidth(unbounded = true), color = label, fontSize = labelSize, maxLines = 1, softWrap = false)
+            }
+        }
+    }
+}
+
+@Composable
+private fun Bar(meter: MeterBallistics, modifier: Modifier) {
     val well = Am.Deepest
     Spacer(modifier.drawWithCache {
         val ramp = Brush.verticalGradient(0f to MixRed, 0.3f to MixYellow, 1f to MixGreen, startY = 0f, endY = size.height)

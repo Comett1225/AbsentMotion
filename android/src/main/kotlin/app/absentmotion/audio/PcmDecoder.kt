@@ -18,6 +18,7 @@ internal class PcmChunk {
     var frames = 0
     var rate = 0
     var ptsUs = 0L
+    var channels = 2
 }
 
 internal interface PcmSource : Closeable {
@@ -108,6 +109,7 @@ internal class PcmDecoder(context: Context, uri: String) : PcmSource {
     private fun readFormat(format: MediaFormat) {
         chunk.rate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE)
         channels = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT).coerceAtLeast(1)
+        chunk.channels = channels
         float = format.containsKey(MediaFormat.KEY_PCM_ENCODING) &&
             format.getInteger(MediaFormat.KEY_PCM_ENCODING) == AudioFormat.ENCODING_PCM_FLOAT
         mix = if (channels > 2) downmixGains(channels, format.intOr(MediaFormat.KEY_CHANNEL_MASK, 0)) else null

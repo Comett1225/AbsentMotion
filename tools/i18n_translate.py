@@ -204,6 +204,9 @@ def problem(en, value, language):
             return 'expected an object with plural forms'
         if 'other' not in value:
             return 'missing "other" form'
+        missing = [q for q in QUANTITIES[language] if q not in value]
+        if missing:
+            return 'missing plural forms: ' + ', '.join(missing)
         for q, v in value.items():
             if not isinstance(v, str) or not v.strip():
                 return f'empty {q} form'
