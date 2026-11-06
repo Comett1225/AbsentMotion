@@ -1610,7 +1610,7 @@
    }
   },
   "electricedges": {
-   "description": "Menggambar garis luar berkilau yang bergetar seperti listrik saat Seed atau Evolusi dianimasikan, dengan garis kontur opsional di dalamnya.",
+   "description": "Menggambar garis luar berkilau yang berderak di sekeliling layer. Ketebalan melebarkannya menjadi pita bercahaya, setiap nilai Seed memberi pola berbeda sehingga Seed yang dianimasikan berderak di setiap frame, dan Evolusi membuatnya mengalir. Garis kontur opsional di dalamnya.",
    "name": "Tepi Listrik",
    "params": {
     "alpha": {

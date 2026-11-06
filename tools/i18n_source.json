@@ -1749,7 +1749,7 @@
  "fx:electricedges:contourAngle:label": "Contour Angle",
  "fx:electricedges:contours:label": "Render Contours",
  "fx:electricedges:count:label": "Contour Count",
- "fx:electricedges:description": "Draws a crackling, glowing outline around the layer that jitters like electricity when Seed or Evolution is animated, with optional contour lines inside.",
+ "fx:electricedges:description": "Draws a crackling, glowing outline around the layer. Thickness widens it into a glowing band, each Seed value gives a different pattern so an animated Seed crackles on every frame, and Evolution makes it flow. Optional contour lines inside.",
  "fx:electricedges:detail:label": "Detail",
  "fx:electricedges:distortion:label": "Distortion",
  "fx:electricedges:evolution:label": "Evolution",

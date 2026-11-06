@@ -1610,7 +1610,7 @@
    }
   },
   "electricedges": {
-   "description": "Melukis garis luar bercahaya yang berkeretak di sekeliling lapisan dan bergetar seperti elektrik apabila Benih atau Evolusi dianimasikan, dengan garis kontur dalaman pilihan.",
+   "description": "Melukis garis luar bercahaya yang berkeretak di sekeliling lapisan. Ketebalan melebarkannya menjadi jalur bercahaya, setiap nilai Benih memberi corak berbeza jadi Benih yang dianimasikan berkeretak pada setiap bingkai, dan Evolusi membuatnya mengalir. Garis kontur dalaman pilihan.",
    "name": "Tepi Elektrik",
    "params": {
     "alpha": {

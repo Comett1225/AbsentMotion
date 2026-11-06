@@ -67,7 +67,11 @@ import app.absentmotion.ui.editor.effects.EffectIcons
 import app.absentmotion.ui.editor.panels.px
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Presence
-import app.absentmotion.ui.theme.Swap
+import app.absentmotion.ui.editor.panels.CardScope
+import app.absentmotion.ui.editor.panels.CardSwap
+import app.absentmotion.ui.editor.panels.cardAway
+import app.absentmotion.ui.editor.panels.cardBounds
+import androidx.compose.foundation.ScrollState
 import java.util.Locale
 import kotlin.math.ln
 import kotlin.math.pow
@@ -103,22 +107,26 @@ internal fun AudioEffectsPanel(state: EditorState, modifier: Modifier, onBack: (
                 state.editSelected { it.withAudioEffects(emptyList()) }
             }
         }
-        Swap(editing, Modifier.weight(1f).fillMaxHeight(), rise = 0.dp) {
-            if (shown == null) EffectList(state, effects) { editing = it }
-            else EffectDetail(state, editing, shown) { editing = -1 }
+        val listScroll = remember(layer.id) { ScrollState(0) }
+        CardSwap(if (shown == null) -1 else editing, Modifier.weight(1f).fillMaxHeight(), list = { cards ->
+            EffectList(state, effects, cards, listScroll) { editing = it }
+        }) { cards, at ->
+            val current = at == editing && shown != null
+            val kept = remember { arrayOfNulls<AudioFx>(1) }
+            if (current) kept[0] = shown
+            kept[0]?.let { fx -> EffectDetail(state, at, fx, cards) { editing = -1 } }
         }
     }
 }
 
 @Composable
-private fun EffectList(state: EditorState, effects: List<AudioFx>, open: (Int) -> Unit) {
+private fun EffectList(state: EditorState, effects: List<AudioFx>, cards: CardScope, scroll: ScrollState, open: (Int) -> Unit) {
     var adding by remember { mutableStateOf(false) }
-    val scroll = rememberScrollState()
     val marks = state.selected?.aiMarks.orEmpty()
     val reorder = rememberReorder(state, scroll, top = RowHeight + 13.dp + (AiMarkRowHeight + AiMarkRowGap) * marks.size)
     val id = state.selectedId
     Column(Modifier.fillMaxSize().deskVerticalScroll(scroll)) {
-        Row(Modifier.padding(start = 6.5.dp, end = 6.5.dp, top = 6.5.dp).fillMaxWidth().height(RowHeight).horizontalScroll(rememberScrollState()),
+        Row(Modifier.cardAway(cards, -1).padding(start = 6.5.dp, end = 6.5.dp, top = 6.5.dp).fillMaxWidth().height(RowHeight).horizontalScroll(rememberScrollState()),
             Arrangement.spacedBy(6.dp), Alignment.CenterVertically) {
             for (preset in AudioPresets) {
                 val active = preset.effects == effects
@@ -128,15 +136,15 @@ private fun EffectList(state: EditorState, effects: List<AudioFx>, open: (Int) -
                 }
             }
         }
-        for (mark in marks) AiMarkRow(state, mark)
+        for (mark in marks) Box(Modifier.cardAway(cards, -1)) { AiMarkRow(state, mark) }
         key(reorder.generation) {
             effects.forEachIndexed { i, fx ->
-                EffectRow(state, reorder, i, fx, effects.size, { open(i) }) { from, to ->
+                EffectRow(state, reorder, i, fx, effects.size, cards, { open(i) }) { from, to ->
                     if (id != null) state.edit { it.update(id, state.sampleMs) { l -> l.moveAudioEffect(from, to) } }
                 }
             }
         }
-        Box(Modifier.padding(6.5.dp).fillMaxWidth().height(RowHeight)) {
+        Box(Modifier.cardAway(cards, Int.MAX_VALUE).padding(6.5.dp).fillMaxWidth().height(RowHeight)) {
             val room = effects.sumOf { it.kind?.units ?: 0 } < MAX_AUDIO_FX
             Box(Modifier.fillMaxSize().clip(RowShape).background(Am.Button).alpha(if (room) 1f else 0.35f)
                 .clickable(enabled = room) { adding = true }, Alignment.Center) {
@@ -161,9 +169,9 @@ private fun EffectList(state: EditorState, effects: List<AudioFx>, open: (Int) -
 }
 
 @Composable
-private fun EffectRow(state: EditorState, reorder: Reorder, index: Int, fx: AudioFx, count: Int, open: () -> Unit, move: (Int, Int) -> Unit) {
+private fun EffectRow(state: EditorState, reorder: Reorder, index: Int, fx: AudioFx, count: Int, cards: CardScope, open: () -> Unit, move: (Int, Int) -> Unit) {
     val known = fx.kind != null
-    Row(Modifier.reorderSlot(reorder, index).padding(start = 6.5.dp, end = 6.5.dp, top = 6.5.dp).fillMaxWidth().height(RowHeight).reorderLift(reorder, index, 5.dp)
+    Row(Modifier.cardAway(cards, index).reorderSlot(reorder, index).padding(start = 6.5.dp, end = 6.5.dp, top = 6.5.dp).fillMaxWidth().height(RowHeight).cardBounds(cards, "$index:${fx.kind}").reorderLift(reorder, index, 5.dp)
         .clip(RowShape).background(Am.Field), verticalAlignment = Alignment.CenterVertically) {
         Row(Modifier.weight(1f).fillMaxHeight().alpha(if (known && !fx.bypass) 1f else 0.35f).clickable(enabled = known, onClick = open)
             .padding(start = 11.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -180,9 +188,9 @@ private fun EffectRow(state: EditorState, reorder: Reorder, index: Int, fx: Audi
 }
 
 @Composable
-private fun EffectDetail(state: EditorState, index: Int, fx: AudioFx, close: () -> Unit) {
+private fun EffectDetail(state: EditorState, index: Int, fx: AudioFx, cards: CardScope, close: () -> Unit) {
     val kind = fx.kind ?: return
-    Column(Modifier.fillMaxSize().padding(6.5.dp).clip(RowShape).background(Am.Field)) {
+    Column(Modifier.fillMaxSize().padding(6.5.dp).cardBounds(cards, "$index:${fx.kind}").clip(RowShape).background(Am.Field)) {
         Row(Modifier.fillMaxWidth().height(RowHeight).padding(start = 3.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             Row(Modifier.weight(1f).fillMaxHeight().clickable(onClick = close), verticalAlignment = Alignment.CenterVertically) {
                 Icon(EffectIcons.Expanded, null, Modifier.padding(start = 8.dp).size(18.dp).alpha(0.9f), tint = Am.OnDark)

@@ -83,6 +83,8 @@ import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.ui.graphics.graphicsLayer
@@ -189,6 +191,7 @@ fun EffectBrowser(state: EditorState) {
     fun pageAt() = if (audio || searching || detail != null) -1 else listed.indexOfFirst { it.first == category }
     val at = pageAt()
     val rtl = androidx.compose.ui.platform.LocalLayoutDirection.current == androidx.compose.ui.unit.LayoutDirection.Rtl
+    val tick = app.absentmotion.ui.editor.rememberHaptic(state)
     val density = androidx.compose.ui.platform.LocalDensity.current
     var shift by remember { mutableFloatStateOf(0f) }
     var slid by remember { mutableStateOf<Any?>(null) }
@@ -328,10 +331,12 @@ fun EffectBrowser(state: EditorState) {
                 Row(Modifier.fillMaxWidth().height(186.dp).background(RecommendedBg).horizontalScroll(rememberScrollState()).padding(start = 7.5.dp, top = 16.dp), Arrangement.spacedBy(15.dp)) {
                     recommended.forEach { effect -> EffectTile(catalog, effect, 121f, { pick(effect) }, { detail = effect }, effect.id in favourites) }
                 }
-                Box(Modifier.fillMaxWidth().height(210.dp)) {
-                    val shown = if (favPage) presetFavourites.resolve(catalog.definitions).map { it.first to it.second } +
+                Box(Modifier.fillMaxWidth().height(210.dp).pageSwipe(favPage, rtl) { favPage = it }) {
+                    Crossfade(favPage, Modifier.matchParentSize(), animationSpec = tween(Motion.FastMs), label = "pages") { fav ->
+                    Box(Modifier.fillMaxSize()) {
+                    val shown = if (fav) presetFavourites.resolve(catalog.definitions).map { it.first to it.second } +
                         favourites.mapNotNull(catalog::find).map { it to null } else recent.mapNotNull(catalog::find).distinct().take(10).map { it to null }
-                    if (favPage) Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 10.dp, vertical = 5.dp)) {
+                    if (fav) Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 10.dp, vertical = 5.dp)) {
                         shown.chunked(2).forEach { column ->
                             Column(Modifier.width(68.dp)) {
                                 repeat(2) { row ->
@@ -357,16 +362,11 @@ fun EffectBrowser(state: EditorState) {
                             }
                         }
                     }
-                    if (shown.isEmpty()) Text(stringResource(if (favPage) R.string.effectbrowser_favorite_empty else R.string.effectbrowser_recent_empty),
+                    if (shown.isEmpty()) Text(stringResource(if (fav) R.string.effectbrowser_favorite_empty else R.string.effectbrowser_recent_empty),
                         Modifier.align(Alignment.Center).padding(horizontal = 24.dp), color = Am.OnDarkDim, fontSize = 13.sp, textAlign = TextAlign.Center)
-                    Row(Modifier.align(Alignment.BottomCenter)) {
-                        Box(Modifier.size(40.dp, 22.dp).clickable { favPage = false }, Alignment.CenterEnd) {
-                            Icon(EffectIcons.Recent, stringResource(R.string.effectbrowser_recent), Modifier.size(12.dp), tint = if (!favPage) Am.Accent else Am.OnDarkDim)
-                        }
-                        Box(Modifier.size(40.dp, 22.dp).clickable { favPage = true }, Alignment.CenterStart) {
-                            Icon(PanelIcons.Star, stringResource(R.string.effectbrowser_favorite), Modifier.size(12.dp), tint = if (favPage) Am.Accent else Am.OnDarkDim)
-                        }
                     }
+                    }
+                    PageDots(favPage, rtl, tick, Modifier.align(Alignment.BottomCenter)) { favPage = it }
                 }
                 listed.chunked(2).forEach { row ->
                     Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(1.5.dp)) {

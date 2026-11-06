@@ -17,7 +17,7 @@ import app.absentmotion.ui.tutorial.tutorialGuard
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.selection.toggleable
@@ -66,7 +66,6 @@ import app.absentmotion.ui.editor.effects.AiMarkRowHeight
 import app.absentmotion.ui.editor.effects.EffectIcons
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Presence
-import app.absentmotion.ui.theme.Swap
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 import androidx.compose.animation.core.animate
@@ -161,39 +160,45 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
                 }
             }
         }
-        Swap(index, Modifier.weight(1f).fillMaxHeight(), rise = 0.dp) {
-            if (instance == null) {
-                val scroll = rememberScrollState()
-                val marks = layer.aiMarks
-                val reorder = rememberReorder(state, scroll, top = 6.5.dp + (AiMarkRowHeight + AiMarkRowGap) * marks.size)
-                val id = layer.id
-                val effects = layer.effects
-                Column(Modifier.fillMaxSize().deskVerticalScroll(scroll)) {
-                    for (mark in marks) AiMarkRow(state, mark)
-                    key(reorder.generation) {
-                        effects.forEachIndexed { i, effect ->
-                            EffectListRow(state, reorder, i, effects.size, effect, catalog.find(effect["id"] ?: "")) { from, to ->
-                                state.edit { it.update(id, state.sampleMs) { l -> l.moveEffect(from, to) } }
-                            }
-                        }
-                    }
-                    Box(Modifier.padding(6.5.dp).fillMaxWidth().height(37.dp).clip(RowShape).background(Am.Button)
-                        .clickable { state.playing = false; state.effectBrowserOpen = true }, contentAlignment = Alignment.Center) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(EffectIcons.Add, null, Modifier.size(18.dp), tint = Am.OnDark)
-                            Spacer(Modifier.width(6.dp))
-                            Text(stringResource(R.string.add_effect), color = Am.OnDark, fontSize = 14.sp)
+        val listScroll = remember(layer.id) { ScrollState(0) }
+        CardSwap(if (instance == null) -1 else index, Modifier.weight(1f).fillMaxHeight(), list = { cards ->
+            val scroll = listScroll
+            val marks = layer.aiMarks
+            val reorder = rememberReorder(state, scroll, top = 6.5.dp + (AiMarkRowHeight + AiMarkRowGap) * marks.size)
+            val id = layer.id
+            val effects = layer.effects
+            Column(Modifier.fillMaxSize().deskVerticalScroll(scroll)) {
+                for (mark in marks) Box(Modifier.cardAway(cards, -1)) { AiMarkRow(state, mark) }
+                key(reorder.generation) {
+                    effects.forEachIndexed { i, effect ->
+                        EffectListRow(state, reorder, i, effects.size, effect, catalog.find(effect["id"] ?: ""), cards) { from, to ->
+                            state.edit { it.update(id, state.sampleMs) { l -> l.moveEffect(from, to) } }
                         }
                     }
                 }
-            } else {
-                Column(Modifier.fillMaxSize().padding(6.5.dp).clip(RowShape).background(Am.Field)) {
-                    EffectHeader(state, index, instance, definition)
+                Box(Modifier.cardAway(cards, Int.MAX_VALUE).padding(6.5.dp).fillMaxWidth().height(37.dp).clip(RowShape).background(Am.Button)
+                    .clickable { state.playing = false; state.effectBrowserOpen = true }, contentAlignment = Alignment.Center) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(EffectIcons.Add, null, Modifier.size(18.dp), tint = Am.OnDark)
+                        Spacer(Modifier.width(6.dp))
+                        Text(stringResource(R.string.add_effect), color = Am.OnDark, fontSize = 14.sp)
+                    }
+                }
+            }
+        }) { cards, at ->
+            val current = at == index && instance != null
+            val kept = remember { arrayOfNulls<XmlNode>(1) }
+            if (current) kept[0] = instance
+            val shown = kept[0]
+            if (shown != null) {
+                val shownDefinition = if (current) definition else catalog.find(shown["id"] ?: "")
+                Column(Modifier.fillMaxSize().padding(6.5.dp).cardBounds(cards, cardKey(at, shown)).clip(RowShape).background(Am.Field)) {
+                    EffectHeader(state, at, shown, shownDefinition)
                     Column(Modifier.weight(1f).fillMaxWidth().deskVerticalScroll()) {
-                        if (definition != null) EffectSettings(state, layer, instance, definition, active, { active = it; pin = null })
-                        else Text(instance["id"] ?: "", Modifier.padding(12.dp).dimmed(), color = Am.OnDark, fontSize = 12.sp)
-                        if (puppet) PuppetSection(state, layer, index, instance, pin, pinField, { pinField = it }, adding, { pin = it; pinField = "position"; if (it != null) active = null }) { adding = it }
-                        if (pathText) TextPathHint(state, layer, instance)
+                        if (shownDefinition != null) EffectSettings(state, layer, shown, shownDefinition, if (current) active else null, { active = it; pin = null })
+                        else Text(shown["id"] ?: "", Modifier.padding(12.dp).dimmed(), color = Am.OnDark, fontSize = 12.sp)
+                        if (current && puppet) PuppetSection(state, layer, index, shown, pin, pinField, { pinField = it }, adding, { pin = it; pinField = "position"; if (it != null) active = null }) { adding = it }
+                        if (current && pathText) TextPathHint(state, layer, shown)
                     }
                 }
             }
@@ -202,6 +207,8 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
 }
 
 private val RowShape = RoundedCornerShape(5.dp)
+
+private fun cardKey(index: Int, effect: XmlNode): String = "$index:${effect["id"]}"
 
 @Composable
 private fun CopyEffectsDialog(names: List<String>, onDismiss: () -> Unit, onCopy: (Set<Int>) -> Unit) {
@@ -296,7 +303,7 @@ private fun EffectHeader(state: EditorState, index: Int, effect: XmlNode, defini
 }
 
 @Composable
-private fun EffectListRow(state: EditorState, reorder: Reorder, index: Int, count: Int, effect: XmlNode, definition: EffectDefinition?, move: (Int, Int) -> Unit) {
+private fun EffectListRow(state: EditorState, reorder: Reorder, index: Int, count: Int, effect: XmlNode, definition: EffectDefinition?, cards: CardScope, move: (Int, Int) -> Unit) {
     val visible = effect["hidden"] != "true"
     val scope = rememberCoroutineScope()
     val tick = rememberHaptic(state)
@@ -334,12 +341,12 @@ private fun EffectListRow(state: EditorState, reorder: Reorder, index: Int, coun
             deleting = false
         }
     }
-    Box(Modifier.reorderSlot(reorder, index).graphicsLayer { clip = shrink > 0f }
+    Box(Modifier.cardAway(cards, index).reorderSlot(reorder, index).graphicsLayer { clip = shrink > 0f }
         .layout { measurable, constraints ->
             val placeable = measurable.measure(constraints)
             layout(placeable.width, (placeable.height * (1f - shrink)).roundToInt()) { placeable.place(0, 0) }
         }
-        .padding(start = 6.5.dp, end = 6.5.dp, top = 6.5.dp).fillMaxWidth().height(37.dp).graphicsLayer { shape = RowShape; clip = offset > 0f }
+        .padding(start = 6.5.dp, end = 6.5.dp, top = 6.5.dp).fillMaxWidth().height(37.dp).cardBounds(cards, cardKey(index, effect)).graphicsLayer { shape = RowShape; clip = offset > 0f }
         .deleteWhenHovered { if (!deleting) { state.editSelected { it.removeEffect(index) }; state.effectIndex = -1 } }
         .effectSwipe(reorder.held < 0 && !deleting, ::accept, ::drag, ::release)) {
         if (open) Box(Modifier.matchParentSize().background(DeleteRed), contentAlignment = Alignment.CenterEnd) {

@@ -45,6 +45,7 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - Copy and Report on crash and error screens, with links to GitHub, Discord and the bug report form.
 - Desktop: Alt+Left and Alt+Right jump between bookmarks; comma and period nudge the selected clips.
 - Linux: a .tar.gz with an install script for any distribution.
+- Effects library: swipe left or right on the Recent and Favorite grid to switch, or press and hold the two small icons and slide your thumb.
 
 ### Changed
 
@@ -57,6 +58,8 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - The source code has one folder per platform: shared, android, pc, macos, windows and linux.
 - Linking a layer to a parent or unlinking it no longer adds keyframes: the layer keeps its own animation and stays where it is at the playhead.
 - A short tap on an effect's reorder grip opens the effect; hold the grip to move it.
+- Opening an effect card or an audio effect moves it up to the top as it opens, and the other cards slide out of the way; closing it puts it back in its place.
+- Electric Edges from Alight Motion: Thickness widens the edge into a glowing band and a keyframed Seed crackles on every frame, as in Alight Motion. Projects saved before 5.0 keep their look.
 - Desktop file and folder pickers use the system's current dialogs on Windows and Linux.
 
 ### Removed

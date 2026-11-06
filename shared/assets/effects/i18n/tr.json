@@ -1610,7 +1610,7 @@
    }
   },
   "electricedges": {
-   "description": "Katmanın çevresine, Tohum veya Evrim animasyonlandığında elektrik gibi titreyen, parlayan çatlaklı bir kontur çizer; isteğe bağlı olarak iç kontur çizgileri de ekler.",
+   "description": "Katmanın çevresine parlayan, çıtırdayan bir kontur çizer. Kalınlık onu parlayan bir banta genişletir, her Tohum değeri farklı bir desen verir; bu yüzden animasyonlu bir Tohum her karede çıtırdar, Evrim ise onu akıtır. İsteğe bağlı iç kontur çizgileri.",
    "name": "Elektrikli Kenarlar",
    "params": {
     "alpha": {

@@ -323,6 +323,7 @@ float Value(const LayerEffect& e, const std::map<std::string, Anim>* defaults, c
 
 const int kGlowCells = 24;
 const float kGlowReach = 0.345f;
+const float kEdgeSpread = 0.042f;
 
 const char* const kGlowRows = R"(
 uniform shader image;
@@ -1105,7 +1106,9 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
             std::vector<std::string_view> names = {"image"};
             std::vector<sk_sp<SkImageFilter>> inputs = {f};
             if (d->blurred) {
-                const float sigma = std::max(Value(e, defaults, "blur", 0, t, 0), 0.0f) / 3;
+                const float spread = e.id == "absent.electricedges" ? Value(e, defaults, "strength", 0, t, -1) : -1;
+                const float sigma = spread >= 0 ? spread * kEdgeSpread * std::hypot((float)scene.width, (float)scene.height)
+                                                : std::max(Value(e, defaults, "blur", 0, t, 0), 0.0f) / 3;
                 auto blurOf = [&](sk_sp<SkImageFilter> source) {
                     return sigma > 0 ? SkImageFilters::Blur(sigma, sigma, SkTileMode::kDecal, source) : source;
                 };

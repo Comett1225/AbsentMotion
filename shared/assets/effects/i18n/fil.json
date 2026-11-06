@@ -1610,7 +1610,7 @@
    }
   },
   "electricedges": {
-   "description": "Gumuguhit ng pumipintig at kumikinang na outline sa paligid ng layer na nanginginig na parang kuryente kapag na-animate ang Seed o Evolution, na may opsyonal na contour lines sa loob.",
+   "description": "Gumuguhit ng kumikinang at pumipitik na outline sa paligid ng layer. Pinalalapad ito ng Kapal para maging kumikinang na banda, bawat value ng Seed ay nagbibigay ng ibang pattern kaya ang na-animate na Seed ay pumipitik sa bawat frame, at pinadadaloy ito ng Evolution. May opsyonal na contour lines sa loob.",
    "name": "Kuryenteng Gilid",
    "params": {
     "alpha": {

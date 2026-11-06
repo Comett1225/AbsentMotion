@@ -221,7 +221,7 @@
     "bend": {"photo": "colour", "layout": "move", "half": [40, 150], "params": {"amount": [0, 120, 0], "start": 0.1}, "animate": 16},
     "curl": {"photo": "colour", "layout": "move", "half": [150, 30], "params": {"offset": [1.0, 0.3, 1.0], "radius": 1.4}, "animate": 24},
     "puppet": {"photo": "colour", "half": 150, "pins": [[[-110, 110], [-110, 110]], [[110, 110], [110, 110]], [[0, 30], [0, 30]], [[0, -95], [[0, -95], [-55, -80], [0, -95], [55, -80], [0, -95]]]], "animate": 24},
-    "electricedges": {"photo": "colour", "layout": "move", "params": {"blur": 40, "evolution": [0, 60]}, "animate": 16},
+    "electricedges": {"photo": "colour", "layout": "move", "params": {"blur": 40, "evolution": [0, 0.5]}, "animate": 16},
     "contourstrips": {"photo": "portrait", "params": {"count": 24, "height": 2.5, "thickness": 0.4}},
     "ominodiffusion": {"photo": "portrait", "params": {"palette": 7, "steps": 30, "weight": 1.2}},
     "glowscan": {"photo": "landscape", "params": {"position": [0.0, 1.0], "blur": 16}, "animate": 16},

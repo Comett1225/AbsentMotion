@@ -1610,7 +1610,7 @@
    }
   },
   "electricedges": {
-   "description": "Vẽ đường viền phát sáng, nứt tóe quanh lớp, rung lên như điện khi bạn tạo hiệu ứng cho Hạt giống hoặc Tiến hóa, kèm các đường đồng mức tùy chọn bên trong.",
+   "description": "Vẽ đường viền phát sáng, nứt tóe quanh lớp. Độ dày nới nó thành một dải sáng, mỗi giá trị Hạt giống cho một hoa văn khác nên Hạt giống có hoạt ảnh sẽ nứt tóe ở mọi khung hình, còn Tiến hóa làm nó chảy. Các đường đồng mức tùy chọn bên trong.",
    "name": "Cạnh điện",
    "params": {
     "alpha": {

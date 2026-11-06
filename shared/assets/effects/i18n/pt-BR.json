@@ -1610,7 +1610,7 @@
    }
   },
   "electricedges": {
-   "description": "Desenha um contorno brilhante e crepitante ao redor da camada, que treme como eletricidade quando Semente ou Evolução é animada, com linhas de contorno opcionais dentro.",
+   "description": "Desenha um contorno brilhante e crepitante ao redor da camada. Espessura o alarga numa faixa brilhante, cada valor de Semente dá um padrão diferente, então uma Semente animada crepita a cada quadro, e Evolução o faz fluir. Linhas de contorno opcionais dentro.",
    "name": "Bordas elétricas",
    "params": {
     "alpha": {

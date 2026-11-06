@@ -18,7 +18,7 @@ To read about an effect first, press and hold its tile. A page opens with an ani
 ## The Effects Library
 
 - The top has a search box ("Search") that matches names first, then descriptions, and also finds AI tools and presets.
-- A strip of recommended effects (Chroma Key, Blur and Glow), a grid of your **Recent** or **Favorite** effects (switch with the two small icons), then the categories.
+- A strip of recommended effects (Chroma Key, Blur and Glow), a grid of your **Recent** or **Favorite** effects, then the categories. To switch between Recent and Favorite, tap the two small icons, swipe left or right on the grid, or press and hold the icons until the phone vibrates and slide your thumb (right for Favorite, left for Recent).
 - **Categories:** Color, Blur, Distort, Stylize, Noise, Repeat, Key, Move, Beat, 3D, Text and Other. A **New** category lists the effects added in the newest big version (5.x). An **Audio** category appears for layers that have sound, and **AI** holds the AI tools.
 - An effect that cannot run on your phone is grayed out.
 - Inside a category, swipe left for the next category and right for the previous one.

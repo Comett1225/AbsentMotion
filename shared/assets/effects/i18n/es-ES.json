@@ -1610,7 +1610,7 @@
    }
   },
   "electricedges": {
-   "description": "Dibuja un contorno brillante y crepitante alrededor de la capa que tiembla como electricidad al animar Semilla o Evolución, con líneas de contorno opcionales en el interior.",
+   "description": "Dibuja un contorno brillante y crepitante alrededor de la capa. Grosor lo ensancha en una banda luminosa, cada valor de Semilla da un patrón distinto, así que una Semilla animada crepita en cada fotograma, y Evolución lo hace fluir. Líneas de contorno opcionales en el interior.",
    "name": "Bordes eléctricos",
    "params": {
     "alpha": {
