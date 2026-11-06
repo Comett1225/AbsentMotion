@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-CN" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>入门指南 | AbsentMotion</title><meta name="description" content="安装 AbsentMotion，制作第一个项目，为某个对象添加动画，然后将其导出。"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="帮助"><a href="index.html">目录</a><a href="effects/index.html">特效</a></nav></header><div class="wrap"><main id="main"><h1>入门指南</h1><p class="lead">安装 AbsentMotion，制作第一个项目，为某个对象添加动画，然后将其导出。</p><details class="toc"><summary>本页内容</summary><ul><li><a href="#install">安装</a></li><li><a href="#the-first-start">首次启动</a></li><li><a href="#make-your-first-project">制作第一个项目</a></li><li><a href="#animate-something">为对象添加动画</a></li><li><a href="#export">导出</a></li><li><a href="#where-things-are">各项功能位置</a></li></ul></details><h2 id="install">安装</h2>
+<p>AbsentMotion 已安装在这部手机上。本页将带你完成第一个项目。其他页面会介绍每个屏幕。</p>
+<h2 id="the-first-start">首次启动</h2>
+<p>首次打开应用时，它会在主屏幕之前显示两个屏幕。</p>
+<ol><li><strong>选择语言。</strong> 应用共提供 24 种语言：英语、印度尼西亚语、印地语、葡萄牙语（巴西）、西班牙语（拉丁美洲）、西班牙语（西班牙）、菲律宾语、越南语、泰语、马来语、阿拉伯语、波斯语、乌尔都语、土耳其语、俄语、孟加拉语、日语、韩语、繁体中文、简体中文、法语、德语、意大利语和波兰语。若应用提供你手机的语言，则该语言会排在最前面。之后你可以在<a href="settings.html">设置</a>中更改。</li><li><strong>检查本设备的能力。</strong> 快速测试会显示你的手机能导出哪些视频格式和尺寸，以及其速度（快速、良好或基础）。测试只运行一次，耗时几秒，所有数据都保留在手机上。你可以点按“跳过”。同一屏幕还有一个开关，允许应用每次打开时向 GitHub 询问一次最新版本号。它默认开启，且不会发送其他任何内容。</li></ol>
+<p>应用在启动时不会请求任何权限。首次使用需要它们的功能时，才会请求照片、视频、音频、相机和麦克风的访问权限。</p>
+<h2 id="make-your-first-project">制作第一个项目</h2>
+<ol><li>在主屏幕底部点按圆形的 <strong>+</strong> 按钮。这就是 <strong>新建项目</strong>。</li><li>选择一种画面比例（16:9、9:16、4:5、1:1 或 4:3）、一种分辨率（1080p 是个不错的起点）和一种背景。如果不确定，就保持帧率不变。点按 <strong>创建项目</strong>。编辑器会打开一个空项目。详情：<a href="new-project.html">创建项目</a>。</li><li>点按时间轴区域右下角的圆形 <strong>+</strong>，选择要添加的内容：形状、来自 <strong>媒体</strong> 选项卡的照片或视频，或 <strong>文本</strong>。</li><li>在预览上拖动以移动图层。双指捏合可放大或缩小。</li><li>在时间轴上左右拖动可在时间中移动。要移动图层的时间位置，请按住其条形后拖动。要修剪它，请先选中它，然后拖动其两端的圆形把手。</li><li>点按播放按钮观看效果。</li></ol>
+<figure><img src="../assets/img/start-plus.webp" width="720" height="238" alt="在主屏幕上点按圆形的 + 按钮 (1) 即可开始项目。" loading="lazy"><figcaption>在主屏幕上点按圆形的 + 按钮 (1) 即可开始项目。</figcaption></figure>
+<figure><img src="../assets/img/start-add.webp" width="720" height="491" alt="在编辑器中点按圆形的 + 按钮 (1)，即可添加形状、照片或文本。" loading="lazy"><figcaption>在编辑器中点按圆形的 + 按钮 (1)，即可添加形状、照片或文本。</figcaption></figure>
+<p>没有保存按钮。每次更改后片刻，项目就会自动保存。</p>
+<h2 id="animate-something">为对象添加动画</h2>
+<p>AbsentMotion 中的动画由关键帧组成：关键帧会在某一时刻存储一个值（位置、大小或不透明度），应用则会填充关键帧之间的运动。</p>
+<ol><li>在预览或时间轴上点按一个图层。底部会出现一组工具。</li><li>点按 <strong>变换</strong>。此时 <strong>移动</strong> 选项卡已打开。</li><li>将播放头移到动作应开始的位置，然后点按左侧一列中的关键帧按钮（菱形）。</li><li>将播放头移到稍后的时间，并将图层拖到新位置。由于该属性已有关键帧，系统会自动为你创建第二个关键帧。</li><li>点击播放。点按缓动按钮（曲线）可让运动加速、减速或弹跳。参见<a href="keyframes.html">关键帧和缓动</a>。</li></ol>
+<figure><img src="../assets/img/kf-panel.webp" width="720" height="498" alt="在面板中：关键帧按钮 (1)、图层条上的关键帧菱形 (2)、缓动 (3)。" loading="lazy"><figcaption>在面板中：关键帧按钮 (1)、图层条上的关键帧菱形 (2)、缓动 (3)。</figcaption></figure>
+<p>如需快速获得效果，请选中一个图层，然后点按预览右下角圆形的 <strong>添加动画</strong> 按钮，选择入场、出场或循环动画；或打开 <strong>特效</strong>，尝试其中一个“移动”特效。</p>
+<h2 id="export">导出</h2>
+<ol><li>点按顶部栏中的分享图标（名为 <strong>导出并分享</strong>）。</li><li>已选中 <strong>视频</strong> 卡片。点按 <strong>导出</strong>。</li><li>等待进度条完成。在此期间你可以切换到其他应用：通知会显示进度。</li><li>点按 <strong>分享视频</strong>，或在 Movies/AbsentMotion 中找到该文件。</li></ol>
+<figure><img src="../assets/img/start-export.webp" width="720" height="151" alt="点按顶部栏中的分享图标 (1)，然后选择导出。" loading="lazy"><figcaption>点按顶部栏中的分享图标 (1)，然后选择导出。</figcaption></figure>
+<p>所有选项（格式、分辨率、帧率、GIF、仅音频）都在<a href="export.html">导出</a>页面中。</p>
+<h2 id="where-things-are">各项功能位置</h2>
+<div class="table-wrap"><table><thead><tr><th>我想要</th><th>前往</th></tr></thead><tbody><tr><td data-label="我想要">开始一个项目</td><td data-label="前往">主屏幕上的 <strong>+</strong></td></tr><tr><td data-label="我想要">添加图层</td><td data-label="前往">编辑器中的 <strong>+</strong>（未选中任何内容时显示）</td></tr><tr><td data-label="我想要">更改图层</td><td data-label="前往">点按它，然后使用工具网格</td></tr><tr><td data-label="我想要">添加动画</td><td data-label="前往">面板中的关键帧按钮，或 <strong>添加动画</strong> 按钮</td></tr><tr><td data-label="我想要">添加特效</td><td data-label="前往">选中图层，点按 <strong>特效</strong>，再点按 <strong>添加特效</strong></td></tr><tr><td data-label="我想要">撤销</td><td data-label="前往">播放栏的第一个按钮</td></tr><tr><td data-label="我想要">导出</td><td data-label="前往">顶部栏中的分享图标</td></tr><tr><td data-label="我想要">更改设置</td><td data-label="前往">主屏幕左上角的菜单按钮</td></tr></tbody></table></div>
+<h2 id="next">下一步</h2>
+<ul><li><a href="home.html">主屏幕</a>和<a href="editor.html">编辑器屏幕</a>展示了每个按钮。</li><li><a href="effects-guide.html">使用特效</a>介绍了特效库。</li><li><a href="troubleshooting.html">故障排除与问题解答</a>列出了常见问题的解决方法。</li></ul><nav class="pager" aria-label="上一页和下一页"><span></span><a rel="next" href="requirements.html">系统要求与版本 &rarr;</a></nav></main></div></body></html>

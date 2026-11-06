@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-CN" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>项目、备份与导入 | AbsentMotion</title><meta name="description" content="项目如何保存、版本与崩溃恢复、备份、缺失的媒体、导入项目文件，以及文件存放的位置。"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="帮助"><a href="index.html">目录</a><a href="effects/index.html">特效</a></nav></header><div class="wrap"><main id="main"><h1>项目、备份与导入</h1><p class="lead">项目如何保存、版本与崩溃恢复、备份、缺失的媒体、导入项目文件，以及文件存放的位置。</p><details class="toc"><summary>本页内容</summary><ul><li><a href="#saving">保存</a></li><li><a href="#version-history">版本历史</a></li><li><a href="#crash-recovery">崩溃恢复</a></li><li><a href="#a-damaged-project">损坏的项目</a></li><li><a href="#media-files">媒体文件</a></li><li><a href="#backup-and-restore">备份与恢复</a></li><li><a href="#importing-project-files">导入项目文件</a></li><li><a href="#file-formats-and-where-things-are">文件格式和存放位置</a></li></ul></details><h2 id="saving">保存</h2>
+<p>没有保存按钮。每次修改后，编辑器都会稍后把项目写入手机，写入方式不会留下写了一半的文件。拖动操作进行中时，也会写入一份草稿。如果因手机存储已满而保存失败，应用会显示“无法保存项目。请释放一些存储空间。”，并会再次尝试。</p>
+<h2 id="version-history">版本历史</h2>
+<p>应用会保留每个项目的较早版本。在打开项目时、关闭项目时，以及保存后（如果最新版本至少已有两分钟），都会保存一个版本。恢复之前和回答崩溃恢复问题之前，也会保存一个版本。应用保留最新的 20 个版本，以及过去七天中每天的最新版本，并删除更早的版本。</p>
+<p>可以从项目卡片的菜单中打开（<strong>版本历史</strong>），或在编辑器的项目设置中打开（<strong>历史版本</strong>）。每一行都有缩略图、时间（“今天 14:05”“昨天 09:30”）以及 <strong>恢复</strong> 按钮。恢复前会先询问：“项目会恢复到之前的状态 ... 当前状态保存在版本历史中，因此不会丢失任何内容。”</p>
+<figure><img src="../assets/img/projects-versions.webp" width="720" height="1067" alt="版本历史：每个版本都有缩略图、时间和大小 (1)，以及恢复按钮 (2)。" loading="lazy"><figcaption>版本历史：每个版本都有缩略图、时间和大小 (1)，以及恢复按钮 (2)。</figcaption></figure>
+<h2 id="crash-recovery">崩溃恢复</h2>
+<p>如果项目打开时应用意外停止，下次启动时会显示 <strong>AbsentMotion意外关闭</strong>，并用一句话说明原因，例如“导出时内存不足。”。如果有未保存的编辑，它会询问“要恢复 ... 的最后编辑吗？”，并提供 <strong>恢复</strong> 和 <strong>舍弃</strong> 按钮。被舍弃的草稿仍会保留在项目的版本历史中。</p>
+<p>每次崩溃也会记录到 <a href="settings.html">设置</a> 中的 <strong>崩溃日志</strong>：包括时间、一句话原因、应用和 Android 版本、手机型号、你当时在做什么，以及技术细节。只保留最近 20 条。任何内容都不会被发送；你可以复制其中一条，自行发送。</p>
+<h2 id="a-damaged-project">损坏的项目</h2>
+<p>如果项目文件无法读取，它的卡片上会显示 <strong>已损坏，恢复历史版本</strong>。点击它可以恢复较早的版本，或将其删除。</p>
+<h2 id="media-files">媒体文件</h2>
+<p>你添加的照片、视频和音频默认会<strong>复制到项目中</strong>，因此项目不依赖你的相册。如果想节省存储空间，可以在设置中关闭 <strong>将导入的媒体保留一份副本到项目中</strong>。</p>
+<ul><li><strong>将媒体收集到项目</strong>（项目卡片菜单）会把项目仍在读取的、位于其自身文件夹之外的每个文件复制到项目中。它会先尝试查找已丢失的文件。</li><li><strong>缺失的媒体。</strong> 当某个文件不再在手机上时，项目打开时应用会按精确的文件名和大小，在你的照片、视频和音频库中查找它；如果恰好有一个文件匹配，就使用它。要手动修复，请选中图层，在图层菜单中打开 <strong>媒体信息</strong>，然后选择 <strong>替换媒体文件</strong>。如果在缺少文件的情况下导出，应用会发出警告，并将这些图层排除在外。</li></ul>
+<h2 id="backup-and-restore">备份与恢复</h2>
+<p>在 <a href="settings.html">设置</a> 的 <strong>备份</strong> 分组中：</p>
+<ul><li><strong>备份所有项目</strong>会在 Documents/AbsentMotion 中生成一个文件，文件名为 <code>AbsentMotion-backup-</code> 加上日期和时间，以 <code>.absbackup</code> 结尾。它包含所有项目及其版本历史、带媒体的模板、预设、你的颜色调色板、导入的字体、AI 结果以及所有保留的媒体。备份需要的可用空间约为内容大小加 50 MB。即使卸载 AbsentMotion，该文件也会保留在手机上；请将其复制到电脑或云服务中以妥善保存。</li><li><strong>每周自动备份（仅项目）</strong>默认关闭。开启后，应用打开几秒钟后，如果距离上次备份已过去七天，就会写入一个仅包含项目（不含媒体）的 <code>AbsentMotion-weekly-...absbackup</code> 文件，并删除之前的每周备份文件。手动备份永远不会被应用删除。</li><li><strong>从备份恢复</strong>会要求你选择一个备份文件。如果某个项目已存在且内容相同，就保持不动；如果同名但内容不同，则会作为单独的副本恢复。已存在的内容不会被覆盖。恢复可以随时停止，之后再重新运行。</li></ul>
+<figure><img src="../assets/img/projects-backup.webp" width="490" height="763" alt="备份分组：备份所有项目 (1)、从备份恢复 (2)，以及每周自动备份（仅项目）(3)。" loading="lazy"><figcaption>备份分组：备份所有项目 (1)、从备份恢复 (2)，以及每周自动备份（仅项目）(3)。</figcaption></figure>
+<h2 id="importing-project-files">导入项目文件</h2>
+<p>你可以通过“分享”或“打开方式”，从其他应用（例如文件管理器）打开项目文件。若想在主屏幕上显示导入按钮，请开启 <strong>在项目列表中显示导入卡片</strong>：此时 <strong>选择文件</strong> 卡片会出现在你的项目上方。</p>
+<div class="table-wrap"><table><thead><tr><th>文件</th><th>你会得到什么</th></tr></thead><tbody><tr><td data-label="文件">由 AbsentMotion 生成的 <code>.absproj</code></td><td data-label="你会得到什么">一个普通项目，包含其媒体</td></tr><tr><td data-label="文件">其他编辑器的项目包（<code>.amproj</code>）</td><td data-label="你会得到什么">每个场景变成一个<strong>模板</strong>，所有素材保持为素材</td></tr><tr><td data-label="文件">纯场景 XML 文件</td><td data-label="你会得到什么">一个普通项目。出于安全考虑，不会跟随媒体链接，因此除非能在相册中找到，媒体会显示为缺失。</td></tr><tr><td data-label="文件">Adobe Animate 文件（<code>.fla</code>）</td><td data-label="你会得到什么">一个普通项目：参见 <a href="#adobe-animate-files">Adobe Animate 文件</a></td></tr></tbody></table></div>
+<p>AbsentMotion 已有的特效会被转换。它没有的特效会保留在文件中，但不会绘制。导入后，报告只列出未能完整导入的内容：无法运行的特效、无法保留的设置、未找到的媒体以及未安装的字体。如果一切都已导入，则不显示报告。备份文件（<code>.absbackup</code>）从设置中恢复，不在此处导入。</p>
+<p>为保护手机，有一些限制。例如，一个包最多可包含 2000 个文件和 32 个项目，解压后最大为 2 GB；场景的尺寸最大为 16384 像素，帧率范围为 1 到 240。应用会说明文件违反了哪条规则。</p>
+<h3 id="adobe-animate-files">Adobe Animate 文件</h3>
+<p>AbsentMotion 可导入由 Adobe Animate 或 Flash CS5 及更高版本保存的 <code>.fla</code> 文件。打开方式与其他项目文件相同：使用 <strong>选择文件</strong>、分享或“打开方式”。在电脑上，使用 <strong>文件</strong>、<strong>导入项目…</strong>，或将文件拖到窗口上；在那里，<code>.xfl</code> 文件也可以使用，只要其文件夹中的其余内容与它放在一起即可。在手机上，请将 XFL 文件夹压缩为 ZIP 文件，然后导入该 ZIP。</p>
+<p>该文件会成为一个项目，继承 Animate 文件的舞台尺寸、帧率和背景颜色，其场景会依次播放。</p>
+<ul><li><strong>可导入：</strong> 带纯色、双色渐变和图片填充的形状及其线条；元件，每个元件作为带有自身时间轴的组；图片；经典补间（转为关键帧，并保留其缓动）；透明度、色调和亮度；遮罩图层；以及主时间轴上的 MP3 声音。</li><li><strong>未导入：</strong> 文本字段、ActionScript、滤镜、混合模式、其他颜色效果、运动引导路径、相机图层、组件和已编译的影片剪辑、视频、骨骼（IK）姿势，以及未放在舞台上的库元件。形状补间显示其起始形状，运动补间显示其第一个关键帧。超过两种颜色的渐变保留两种，虚线和其他特殊线条以实线绘制，无法识别的缓动会变为直线运动。</li></ul>
+<p>导入后，报告会列出这两类内容，并附上每类的数量：<strong>从Animate文件导入</strong> 和 <strong>未导入（显示时不含这些内容）</strong>。</p>
+<p>由 Flash CS4 及更早版本保存的较旧 <code>.fla</code> 文件使用另一种格式。应用会提示：“此 .fla 文件由 Flash CS4 或更早版本保存。只能导入 Flash CS5 及更高版本保存的 .fla 文件。”</p>
+<h2 id="file-formats-and-where-things-are">文件格式和存放位置</h2>
+<ul><li>项目是一个 XML 文本文件。媒体位于项目的私有文件夹中，与它放在一起。</li><li><code>.absproj</code> 是 ZIP 文件：包含 <code>project.xml</code>、<code>manifest.json</code>，以及 <code>media/</code> 下的媒体文件。3D 模型会将其文件保存在一个文件夹中。</li><li><code>.absbackup</code> 是 ZIP 文件，包含所有项目、预设、模板、字体和媒体文件。</li><li><strong>应用私有存储</strong>（卸载时删除）：项目及其缩略图、版本历史、保留的媒体、模板、预设、颜色调色板、崩溃草稿、崩溃日志、导入的字体、字幕模型、预览副本和 AI 结果。</li><li><strong>共享存储</strong>（卸载后保留）：Movies/AbsentMotion（视频）、Pictures/AbsentMotion（GIF、静态帧、图片序列和调色板图片）、Music/AbsentMotion（音频导出）、Documents/AbsentMotion（<code>.absproj</code>、XML、备份和调色板文件）以及 DCIM/AbsentMotion（应用内相机拍摄的照片和视频）。</li></ul>
+<p>AbsentMotion 不使用宽泛的“所有文件”权限：它通过 Android 的媒体存储来保存文件。</p><nav class="pager" aria-label="上一页和下一页"><a rel="prev" href="export.html">&larr; 导出</a><a rel="next" href="troubleshooting.html">故障排除和常见问题 &rarr;</a></nav></main></div></body></html>

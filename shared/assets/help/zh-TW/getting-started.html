@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-TW" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>開始使用 | AbsentMotion</title><meta name="description" content="安裝 AbsentMotion、製作第一個專案、為某個物件加上動畫，然後匯出。"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="說明"><a href="index.html">目錄</a><a href="effects/index.html">特效</a></nav></header><div class="wrap"><main id="main"><h1>開始使用</h1><p class="lead">安裝 AbsentMotion、製作第一個專案、為某個物件加上動畫，然後匯出。</p><details class="toc"><summary>本頁內容</summary><ul><li><a href="#install">安裝</a></li><li><a href="#the-first-start">首次開啟</a></li><li><a href="#make-your-first-project">製作第一個專案</a></li><li><a href="#animate-something">為物件加上動畫</a></li><li><a href="#export">匯出</a></li><li><a href="#where-things-are">功能位置</a></li></ul></details><h2 id="install">安裝</h2>
+<p>AbsentMotion已安裝在這支手機上。本頁將帶你完成第一個專案。其他頁面則說明每個畫面。</p>
+<h2 id="the-first-start">首次開啟</h2>
+<p>第一次開啟應用程式時，首頁出現之前會先顯示兩個畫面。</p>
+<ol><li><strong>選擇語言。</strong> 應用程式共有24種語言：英文、印尼文、印地文、葡萄牙文（巴西）、西班牙文（拉丁美洲）、西班牙文（西班牙）、菲律賓語、越南文、泰文、馬來文、阿拉伯文、波斯文、烏爾都文、土耳其文、俄文、孟加拉文、日文、韓文、中文（繁體）、中文（簡體）、法文、德文、義大利文和波蘭文。若應用程式支援你手機的語言，該語言會列在最前面。之後你可以在<a href="settings.html">設定</a>中變更。</li><li><strong>檢查此裝置的能力。</strong> 快速測試會顯示你的手機能匯出哪些影片格式與尺寸，以及速度如何（快速、良好或基本）。測試只需執行一次，約幾秒鐘，所有資料都留在手機上。你可以點選「略過」。同一個畫面有一個開關，可讓應用程式在每次開啟時，向GitHub詢問一次最新的版本號碼。此開關預設為開啟，且不會傳送其他任何資料。</li></ol>
+<p>應用程式在開始時不要求任何權限。第一次使用需要照片、影片、音訊、相機與麥克風的功能時，才會要求相關存取權限。</p>
+<h2 id="make-your-first-project">製作第一個專案</h2>
+<ol><li>在首頁底部點選圓形的<strong>+</strong>按鈕。這就是<strong>新增專案</strong>。</li><li>選擇一種比例（16:9、9:16、4:5、1:1 或 4:3）、一種解析度（1080p是不錯的起點）以及一種背景。若不確定，請不要更動影格速率。點選<strong>建立專案</strong>。編輯器會開啟一個空白專案。詳細說明：<a href="new-project.html">建立專案</a>。</li><li>在時間軸區域右下角點選圓形的<strong>+</strong>，然後選擇要新增的項目：形狀、來自<strong>媒體</strong>分頁的照片或影片，或是<strong>文字</strong>。</li><li>在預覽畫面上拖曳即可移動圖層。以雙指捏合可放大或縮小。</li><li>在時間軸上向左或向右拖曳，即可在時間中前後移動。若要在時間上移動圖層，請按住它的色條後拖曳。若要修剪，請先選取它，再拖曳兩端的圓形把手。</li><li>按下播放按鈕即可觀看。</li></ol>
+<figure><img src="../assets/img/start-plus.webp" width="720" height="238" alt="在主畫面點一下圓形的 + 按鈕 (1) 即可開始專案。" loading="lazy"><figcaption>在主畫面點一下圓形的 + 按鈕 (1) 即可開始專案。</figcaption></figure>
+<figure><img src="../assets/img/start-add.webp" width="720" height="491" alt="在編輯器中點一下圓形的 + 按鈕 (1)，即可新增形狀、照片或文字。" loading="lazy"><figcaption>在編輯器中點一下圓形的 + 按鈕 (1)，即可新增形狀、照片或文字。</figcaption></figure>
+<p>沒有「儲存」按鈕。每次變更後，專案都會在片刻之後自動儲存。</p>
+<h2 id="animate-something">為物件加上動畫</h2>
+<p>AbsentMotion的動畫是由關鍵影格組成：關鍵影格會在某個時間點儲存一個數值（位置、大小或不透明度），應用程式則會自動補上關鍵影格之間的移動。</p>
+<ol><li>在預覽或時間軸上點選一個圖層。底部會出現一組工具格。</li><li>點選<strong>變形</strong>。<strong>移動</strong>分頁會開啟。</li><li>將播放頭移到動作應該開始的位置，然後點選左欄的關鍵影格按鈕（菱形）。</li><li>將播放頭移到較晚的時間，再把圖層拖曳到新的位置。由於此屬性已有關鍵影格，系統會自動為你新增第二個關鍵影格。</li><li>播放。點選緩動按鈕（曲線），即可讓動作加速、減速或彈跳。參見<a href="keyframes.html">關鍵影格與緩動</a>。</li></ol>
+<figure><img src="../assets/img/kf-panel.webp" width="720" height="498" alt="在面板中：關鍵影格按鈕 (1)、圖層列上的關鍵影格菱形 (2)、緩動 (3)。" loading="lazy"><figcaption>在面板中：關鍵影格按鈕 (1)、圖層列上的關鍵影格菱形 (2)、緩動 (3)。</figcaption></figure>
+<p>想快速得到結果時，請選取圖層，點選預覽右下角圓形的<strong>製作動畫</strong>按鈕，然後選擇「In」、「Out」或「Loop」動畫；或開啟<strong>特效</strong>，試用其中一個移動特效。</p>
+<h2 id="export">匯出</h2>
+<ol><li>點選頂部列中的分享圖示（名為<strong>匯出與分享</strong>）。</li><li><strong>影片</strong>卡片已被選取。點選<strong>匯出</strong>。</li><li>等待進度列完成。期間你可以切換到其他應用程式：通知會顯示進度。</li><li>點選<strong>分享影片</strong>，或到Movies/AbsentMotion找到檔案。</li></ol>
+<figure><img src="../assets/img/start-export.webp" width="720" height="151" alt="點一下頂端列的分享圖示 (1)，再選擇匯出。" loading="lazy"><figcaption>點一下頂端列的分享圖示 (1)，再選擇匯出。</figcaption></figure>
+<p>所有選項（格式、解析度、影格速率、GIF、僅音訊）都在<a href="export.html">匯出</a>頁面中。</p>
+<h2 id="where-things-are">功能位置</h2>
+<div class="table-wrap"><table><thead><tr><th>我想要做的事</th><th>前往</th></tr></thead><tbody><tr><td data-label="我想要做的事">開始一個專案</td><td data-label="前往">首頁上的 <strong>+</strong></td></tr><tr><td data-label="我想要做的事">新增圖層</td><td data-label="前往">編輯器中的 <strong>+</strong>（未選取任何物件時顯示）</td></tr><tr><td data-label="我想要做的事">變更圖層</td><td data-label="前往">點選它，然後使用工具格</td></tr><tr><td data-label="我想要做的事">製作動畫</td><td data-label="前往">面板中的關鍵影格按鈕，或 <strong>製作動畫</strong> 按鈕</td></tr><tr><td data-label="我想要做的事">新增特效</td><td data-label="前往">選取圖層，點選 <strong>特效</strong>，再點選 <strong>新增特效</strong></td></tr><tr><td data-label="我想要做的事">復原</td><td data-label="前往">播放列的第一個按鈕</td></tr><tr><td data-label="我想要做的事">匯出</td><td data-label="前往">頂部列的分享圖示</td></tr><tr><td data-label="我想要做的事">變更設定</td><td data-label="前往">首頁左上角的選單按鈕</td></tr></tbody></table></div>
+<h2 id="next">下一步</h2>
+<ul><li><a href="home.html">首頁</a>與<a href="editor.html">編輯器畫面</a>列出了所有按鈕。</li><li><a href="effects-guide.html">使用特效</a>說明特效庫。</li><li><a href="troubleshooting.html">疑難排解與常見問題</a>列出常見問題的解答。</li></ul><nav class="pager" aria-label="上一頁與下一頁"><span></span><a rel="next" href="requirements.html">需求與版本 &rarr;</a></nav></main></div></body></html>

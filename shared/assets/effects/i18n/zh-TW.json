@@ -1,0 +1,6881 @@
+{
+ "categories": {
+  "3d": "3D",
+  "ai": "AI",
+  "beat": "節拍",
+  "blur": "模糊",
+  "color": "顏色",
+  "distort": "扭曲",
+  "key": "去背",
+  "move": "移動",
+  "new": "新增",
+  "noise": "雜訊",
+  "other": "其他",
+  "repeat": "重複",
+  "stylize": "風格化",
+  "text": "文字"
+ },
+ "effects": {
+  "ascii": {
+   "description": "將圖層轉為由字母和符號組成的文字藝術，較亮的區域使用較密實的字元。大小決定圖層上每個字元的寬度，因此字元會隨圖層移動、旋轉和縮放。顏色可保留圖片原色或使用單色，邊緣線條則以|、-、/和\\字元繪製輪廓。",
+   "name": "ASCII",
+   "params": {
+    "background": {
+     "label": "背景顏色"
+    },
+    "backgroundMode": {
+     "label": "背景",
+     "options": [
+      "無",
+      "顏色"
+     ]
+    },
+    "brightness": {
+     "label": "亮度"
+    },
+    "cell": {
+     "label": "大小"
+    },
+    "characters": {
+     "label": "自訂"
+    },
+    "charset": {
+     "label": "字元",
+     "options": [
+      "精細",
+      "簡單",
+      "方塊",
+      "二進位",
+      "自訂"
+     ]
+    },
+    "colorMode": {
+     "label": "顏色",
+     "options": [
+      "原始",
+      "單色"
+     ]
+    },
+    "contrast": {
+     "label": "對比"
+    },
+    "edges": {
+     "label": "邊緣線條"
+    },
+    "invert": {
+     "label": "反轉"
+    },
+    "textColor": {
+     "label": "文字顏色"
+    }
+   },
+   "presets": {
+    "amber-monitor": "琥珀色螢幕",
+    "binary-rain": "二進位雨",
+    "blocks": "方塊",
+    "line-art": "線稿",
+    "newspaper": "報紙",
+    "terminal": "終端機"
+   }
+  },
+  "autoshake": {
+   "description": "讓圖層隨時間在設定範圍內隨機移動。",
+   "name": "自動抖動",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "evolution": {
+     "label": "演變"
+    },
+    "frequency": {
+     "label": "頻率"
+    },
+    "magnitude": {
+     "label": "幅度"
+    },
+    "pattern": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
+    },
+    "seed": {
+     "label": "種子"
+    },
+    "slack": {
+     "label": "鬆弛度"
+    },
+    "zshake": {
+     "label": "Z軸抖動"
+    }
+   }
+  },
+  "backdrop": {
+   "description": "原名為調整圖層。複製圖層下方的畫面，讓後續特效作用於該複本。「遮罩至圖層」將複本限制在圖層不透明的部分；「混合」可加回圖層填色。「特效延伸至外部」可讓拉伸等後續特效將複本延伸到圖層邊緣之外。",
+   "name": "複製背景",
+   "params": {
+    "mask": {
+     "label": "遮罩至圖層"
+    },
+    "mix": {
+     "label": "混合"
+    },
+    "spill": {
+     "label": "特效延伸至外部"
+    }
+   }
+  },
+  "beatblur": {
+   "description": "在每個節拍加入縮放模糊，並隨節拍消退。請先選取音樂片段，開啟選單並點選「標記節拍」；若沒有節拍標記，則依BPM設定運作。",
+   "name": "節拍模糊",
+   "params": {
+    "beats": {
+     "label": "節拍",
+     "options": [
+      "每拍",
+      "每2拍",
+      "每4拍"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "衰減"
+    },
+    "offset": {
+     "label": "偏移"
+    },
+    "strength": {
+     "label": "強度"
+    }
+   }
+  },
+  "beatflash": {
+   "description": "在每個節拍以指定顏色閃爍圖層。請先選取音樂片段，開啟選單並點選「標記節拍」；若沒有節拍標記，則依BPM設定運作。",
+   "name": "節拍閃光",
+   "params": {
+    "beats": {
+     "label": "節拍",
+     "options": [
+      "每拍",
+      "每2拍",
+      "每4拍"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "顏色"
+    },
+    "decay": {
+     "label": "衰減"
+    },
+    "offset": {
+     "label": "偏移"
+    },
+    "strength": {
+     "label": "強度"
+    }
+   }
+  },
+  "beatglitch": {
+   "description": "在每個節拍將圖層分成錯位且顏色分離的切片。請先選取音樂片段，開啟選單並點選「標記節拍」；若沒有節拍標記，則依BPM設定運作。",
+   "name": "節拍故障",
+   "params": {
+    "beats": {
+     "label": "節拍",
+     "options": [
+      "每拍",
+      "每2拍",
+      "每4拍"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "衰減"
+    },
+    "offset": {
+     "label": "偏移"
+    },
+    "slices": {
+     "label": "切片"
+    },
+    "strength": {
+     "label": "強度"
+    }
+   }
+  },
+  "beatglow": {
+   "description": "在每個節拍讓圖層的明亮部分發光。請先選取音樂片段，開啟選單並點選「標記節拍」；若沒有節拍標記，則依BPM設定運作。",
+   "name": "節拍發光",
+   "params": {
+    "beats": {
+     "label": "節拍",
+     "options": [
+      "每拍",
+      "每2拍",
+      "每4拍"
+     ]
+    },
+    "blur": {
+     "label": "半徑"
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "顏色"
+    },
+    "decay": {
+     "label": "衰減"
+    },
+    "offset": {
+     "label": "偏移"
+    },
+    "strength": {
+     "label": "強度"
+    },
+    "threshold": {
+     "label": "閾值"
+    }
+   }
+  },
+  "beatpulse": {
+   "description": "在每個節拍提高圖層亮度，如同曝光閃光；負強度則會使其變暗。請先選取音樂片段，開啟選單並點選「標記節拍」；若沒有節拍標記，則依BPM設定運作。",
+   "name": "節拍脈衝",
+   "params": {
+    "beats": {
+     "label": "節拍",
+     "options": [
+      "每拍",
+      "每2拍",
+      "每4拍"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "衰減"
+    },
+    "offset": {
+     "label": "偏移"
+    },
+    "strength": {
+     "label": "強度"
+    }
+   }
+  },
+  "beatrgbsplit": {
+   "description": "在每個節拍分離紅色和藍色色版。請先選取音樂片段，開啟選單並點選「標記節拍」；若沒有節拍標記，則依BPM設定運作。",
+   "name": "節拍RGB分離",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "beats": {
+     "label": "節拍",
+     "options": [
+      "每拍",
+      "每2拍",
+      "每4拍"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "衰減"
+    },
+    "offset": {
+     "label": "偏移"
+    },
+    "strength": {
+     "label": "強度"
+    }
+   }
+  },
+  "beatrotate": {
+   "description": "在每個節拍交替向左、向右傾斜圖層，再擺回原位。請先選取音樂片段，開啟選單並點選「標記節拍」；若沒有節拍標記，則依BPM設定運作。",
+   "name": "節拍旋轉",
+   "params": {
+    "alternate": {
+     "label": "交替"
+    },
+    "beats": {
+     "label": "節拍",
+     "options": [
+      "每拍",
+      "每2拍",
+      "每4拍"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "cover": {
+     "label": "填滿畫面"
+    },
+    "decay": {
+     "label": "衰減"
+    },
+    "offset": {
+     "label": "偏移"
+    },
+    "strength": {
+     "label": "強度"
+    }
+   }
+  },
+  "beatshake": {
+   "description": "在每個節拍以不同方向抖動圖層，並在下一拍前恢復靜止。請先選取音樂片段，開啟選單並點選「標記節拍」；若沒有節拍標記，則依BPM設定運作。",
+   "name": "節拍抖動",
+   "params": {
+    "beats": {
+     "label": "節拍",
+     "options": [
+      "每拍",
+      "每2拍",
+      "每4拍"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "衰減"
+    },
+    "frequency": {
+     "label": "頻率"
+    },
+    "offset": {
+     "label": "偏移"
+    },
+    "strength": {
+     "label": "強度"
+    }
+   }
+  },
+  "beatzoom": {
+   "description": "在每個節拍放大，再緩慢縮回。請先選取音樂片段，開啟選單並點選「標記節拍」；若沒有節拍標記，則依BPM設定運作。",
+   "name": "節拍縮放",
+   "params": {
+    "beats": {
+     "label": "節拍",
+     "options": [
+      "每拍",
+      "每2拍",
+      "每4拍"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "衰減"
+    },
+    "offset": {
+     "label": "偏移"
+    },
+    "strength": {
+     "label": "強度"
+    }
+   }
+  },
+  "bend": {
+   "description": "沿圓弧彎曲圖層；起點一側保持不動，另一側轉至設定的角度，正角度向左彎曲。最適合細長的圖層。",
+   "name": "彎曲",
+   "params": {
+    "amount": {
+     "label": "角度"
+    },
+    "before": {
+     "label": "起點之前",
+     "options": [
+      "凍結",
+      "向同側彎曲",
+      "向反側彎曲"
+     ]
+    },
+    "origin": {
+     "label": "起點",
+     "options": [
+      "左",
+      "右",
+      "上",
+      "下"
+     ]
+    },
+    "start": {
+     "label": "開始"
+    },
+    "tuneHead": {
+     "label": "調整頭部"
+    },
+    "tuneTail": {
+     "label": "調整尾部"
+    }
+   }
+  },
+  "blink": {
+   "description": "每秒開關圖層數次。",
+   "name": "閃爍",
+   "params": {
+    "frequency": {
+     "label": "頻率"
+    }
+   }
+  },
+  "blockdissolve": {
+   "description": "隨機移除圖層上對齊網格的方塊。為強度設定動畫，可逐漸移除更多方塊。",
+   "name": "方塊消散",
+   "params": {
+    "blockSize": {
+     "label": "大小"
+    },
+    "fade": {
+     "label": "淡化"
+    },
+    "offset": {
+     "label": "偏移"
+    },
+    "seed": {
+     "label": "種子"
+    },
+    "strength": {
+     "label": "強度"
+    },
+    "stretch": {
+     "label": "拉伸"
+    }
+   }
+  },
+  "blocknoise": {
+   "description": "在圖層上閃爍隨機雜訊方塊。「色彩增值」會調整現有顏色，「相加」則加入雜訊；「凍結」可固定圖樣。",
+   "name": "方塊雜訊",
+   "params": {
+    "blending": {
+     "label": "混合模式",
+     "options": [
+      "相加",
+      "色彩增值"
+     ]
+    },
+    "blockSize": {
+     "label": "大小"
+    },
+    "extremes": {
+     "label": "極值"
+    },
+    "freeze": {
+     "label": "凍結"
+    },
+    "mono": {
+     "label": "單色"
+    },
+    "offset": {
+     "label": "偏移"
+    },
+    "overshoot": {
+     "label": "超調"
+    },
+    "seed": {
+     "label": "種子"
+    },
+    "strength": {
+     "label": "強度"
+    },
+    "stretch": {
+     "label": "拉伸"
+    }
+   }
+  },
+  "blur": {
+   "description": "平滑均勻的模糊。",
+   "name": "模糊",
+   "params": {
+    "strength": {
+     "label": "強度"
+    }
+   }
+  },
+  "box": {
+   "description": "將圖層包覆在方盒上，可自行選擇寬度、高度和深度。",
+   "name": "方盒",
+   "params": {
+    "depth": {
+     "label": "深度"
+    },
+    "height": {
+     "label": "高度"
+    },
+    "light": {
+     "label": "光線角度"
+    },
+    "perspective": {
+     "label": "透視"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "rotX": {
+     "label": "X軸旋轉"
+    },
+    "rotY": {
+     "label": "Y軸旋轉"
+    },
+    "rotZ": {
+     "label": "Z軸旋轉"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "shading": {
+     "label": "明暗"
+    },
+    "shine": {
+     "label": "光澤"
+    },
+    "smoothing": {
+     "label": "平滑"
+    },
+    "width": {
+     "label": "寬度"
+    }
+   }
+  },
+  "brightnesscontrast": {
+   "description": "調整圖片的亮度和對比。",
+   "name": "亮度與對比",
+   "params": {
+    "brightness": {
+     "label": "亮度"
+    },
+    "contrast": {
+     "label": "對比"
+    },
+    "style": {
+     "label": "樣式",
+     "options": [
+      "各色版",
+      "保留顏色"
+     ]
+    }
+   }
+  },
+  "bulge": {
+   "description": "在指定半徑的圓形範圍內，讓圖層像鏡片般向外膨脹（強度為正），或向中心收縮（強度為負）。半徑依圖層大小而定。",
+   "name": "收縮／膨脹",
+   "params": {
+    "amount": {
+     "label": "強度"
+    },
+    "center": {
+     "label": "中心"
+    },
+    "radius": {
+     "label": "半徑"
+    }
+   }
+  },
+  "bumpmap": {
+   "description": "依圖層亮度模擬凸起表面的光照，呈現保留顏色的浮雕紋理。",
+   "name": "凹凸貼圖",
+   "params": {
+    "ambient": {
+     "label": "環境光"
+    },
+    "angle": {
+     "label": "光線角度"
+    },
+    "height": {
+     "label": "高度"
+    },
+    "light": {
+     "label": "光線顏色"
+    },
+    "shine": {
+     "label": "光澤"
+    }
+   }
+  },
+  "channelremap": {
+   "description": "使用圖層的其他色版重建各顏色色版，產生偽色或將亮度移至透明度。",
+   "name": "色版重新映射（RGB）",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "紅",
+      "綠",
+      "藍",
+      "透明度",
+      "亮度",
+      "零",
+      "最大"
+     ]
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "紅",
+      "綠",
+      "藍",
+      "透明度",
+      "亮度",
+      "零",
+      "最大"
+     ]
+    },
+    "g": {
+     "label": "G",
+     "options": [
+      "紅",
+      "綠",
+      "藍",
+      "透明度",
+      "亮度",
+      "零",
+      "最大"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "紅",
+      "綠",
+      "藍",
+      "透明度",
+      "亮度",
+      "零",
+      "最大"
+     ]
+    }
+   }
+  },
+  "channelremaphsv": {
+   "description": "使用圖層的其他色版重建色相、飽和度、明度和透明度。",
+   "name": "色版重新映射（HSV）",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "色相",
+      "飽和度",
+      "明度",
+      "Alpha",
+      "亮度",
+      "零",
+      "滿"
+     ]
+    },
+    "h": {
+     "label": "H",
+     "options": [
+      "色相",
+      "飽和度",
+      "明度",
+      "透明度",
+      "亮度",
+      "零",
+      "最大"
+     ]
+    },
+    "s": {
+     "label": "S",
+     "options": [
+      "色相",
+      "飽和度",
+      "明度",
+      "透明度",
+      "亮度",
+      "零",
+      "最大"
+     ]
+    },
+    "v": {
+     "label": "V",
+     "options": [
+      "色相",
+      "飽和度",
+      "明度",
+      "Alpha",
+      "亮度",
+      "零",
+      "滿"
+     ]
+    }
+   }
+  },
+  "checker": {
+   "description": "在圖層不透明的部分繪製棋盤格，或將棋盤格鏤空。",
+   "name": "棋盤格",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "color": {
+     "label": "顏色"
+    },
+    "count": {
+     "label": "數量"
+    },
+    "offset": {
+     "label": "偏移"
+    },
+    "punch": {
+     "label": "鏤空"
+    },
+    "screenSpace": {
+     "label": "螢幕空間"
+    },
+    "stretch": {
+     "label": "拉伸"
+    }
+   }
+  },
+  "chromakey": {
+   "description": "移除指定顏色，例如綠幕。",
+   "name": "色度鍵",
+   "params": {
+    "defringe": {
+     "label": "去除色邊"
+    },
+    "invert": {
+     "label": "反轉"
+    },
+    "key": {
+     "label": "鍵控顏色"
+    },
+    "softness": {
+     "label": "柔和度"
+    },
+    "tolerance": {
+     "label": "容差"
+    }
+   }
+  },
+  "chromaticzoomblur": {
+   "description": "從中心點產生縮放模糊，將藍色向內、紅色向外拉開，讓邊緣呈現彩虹色邊。",
+   "name": "色差縮放模糊",
+   "params": {
+    "amount": {
+     "label": "強度"
+    },
+    "center": {
+     "label": "中心"
+    }
+   }
+  },
+  "circularripple": {
+   "description": "從一個點向外擴散圓形漣漪，如同水滴落入水中。",
+   "name": "圓形漣漪",
+   "params": {
+    "center": {
+     "label": "中心"
+    },
+    "feather": {
+     "label": "羽化"
+    },
+    "frequency": {
+     "label": "頻率"
+    },
+    "phase": {
+     "label": "相位"
+    },
+    "radius": {
+     "label": "半徑"
+    },
+    "strength": {
+     "label": "強度"
+    }
+   }
+  },
+  "clouds": {
+   "description": "以柔和的雲朵圖樣覆蓋圖層不透明的部分，也可作為雜訊來源。",
+   "name": "雲朵",
+   "params": {
+    "color1": {
+     "label": "顏色1"
+    },
+    "color2": {
+     "label": "顏色2"
+    },
+    "intensity": {
+     "label": "強度"
+    },
+    "octaves": {
+     "label": "倍頻層數"
+    },
+    "offset": {
+     "label": "偏移"
+    },
+    "parallax": {
+     "label": "視差"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "seed": {
+     "label": "種子"
+    },
+    "stretch": {
+     "label": "拉伸"
+    }
+   }
+  },
+  "cmykhalftone": {
+   "description": "以四個旋轉網版上的青、洋紅、黃、黑網點重新繪製圖層，呈現雜誌印刷效果。",
+   "name": "CMYK半色調網點",
+   "params": {
+    "amount": {
+     "label": "數量"
+    },
+    "angle": {
+     "label": "角度"
+    },
+    "black": {
+     "label": "黑色"
+    },
+    "phase": {
+     "label": "相位"
+    },
+    "strength": {
+     "label": "強度"
+    }
+   }
+  },
+  "colorbalance": {
+   "description": "分別調整暗部、中間調和亮部的顏色（灰色不會改變該範圍）。",
+   "name": "顏色平衡",
+   "params": {
+    "amount": {
+     "label": "數量"
+    },
+    "highlights": {
+     "label": "亮部"
+    },
+    "midtones": {
+     "label": "中間調"
+    },
+    "shadows": {
+     "label": "暗部"
+    }
+   }
+  },
+  "colorize": {
+   "description": "以單一色相為整個圖層著色。「明暗」將圖層亮度映射到該色相；「保留亮度」保留各像素亮度並替換其顏色。",
+   "name": "著色",
+   "params": {
+    "amount": {
+     "label": "數量"
+    },
+    "hue": {
+     "label": "色相"
+    },
+    "style": {
+     "label": "樣式",
+     "options": [
+      "明暗",
+      "保留亮度"
+     ]
+    }
+   }
+  },
+  "colorwheels": {
+   "description": "以色輪分別調整暗部、中間調和亮部的色相、調整量與色階；偏移會改變所有色調。「依亮度」樣式依像素亮度決定各色輪的影響程度。",
+   "name": "暗部、中間調、亮部",
+   "params": {
+    "gainAmount": {
+     "label": "亮部調整量"
+    },
+    "gainHue": {
+     "label": "亮部色相"
+    },
+    "gainLevel": {
+     "label": "亮部色階"
+    },
+    "gammaAmount": {
+     "label": "中間調整量"
+    },
+    "gammaHue": {
+     "label": "中間調色相"
+    },
+    "gammaLevel": {
+     "label": "中間調色階"
+    },
+    "liftAmount": {
+     "label": "暗部調整量"
+    },
+    "liftHue": {
+     "label": "暗部色相"
+    },
+    "liftLevel": {
+     "label": "暗部色階"
+    },
+    "offsetAmount": {
+     "label": "偏移量"
+    },
+    "offsetHue": {
+     "label": "偏移色相"
+    },
+    "offsetLevel": {
+     "label": "偏移色階"
+    },
+    "style": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "依亮度"
+     ]
+    }
+   }
+  },
+  "contourgradient": {
+   "description": "從圖層不透明部分的邊緣向外繪製雙色漸層，形成柔和的彩色光暈。",
+   "name": "輪廓漸層",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blur": {
+     "label": "寬度"
+    },
+    "color1": {
+     "label": "顏色1"
+    },
+    "color2": {
+     "label": "顏色2"
+    },
+    "fade": {
+     "label": "淡化"
+    },
+    "fill": {
+     "label": "填色"
+    }
+   }
+  },
+  "contourlines": {
+   "description": "在圖層不透明部分周圍繪製多層輪廓，可製作貼紙或霓虹外框。",
+   "name": "輪廓線",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blur": {
+     "label": "向外擴展"
+    },
+    "color": {
+     "label": "顏色"
+    },
+    "count": {
+     "label": "數量"
+    },
+    "fill": {
+     "label": "填色"
+    },
+    "phase": {
+     "label": "相位"
+    },
+    "width": {
+     "label": "寬度"
+    }
+   }
+  },
+  "contourstrips": {
+   "description": "繪製堆疊的紙條，高度隨圖層亮度或不透明度變化，呈現山脊般的景觀。",
+   "name": "輪廓條帶",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "color1": {
+     "label": "顏色1"
+    },
+    "color2": {
+     "label": "顏色2"
+    },
+    "count": {
+     "label": "數量"
+    },
+    "edgeColor": {
+     "label": "邊緣顏色"
+    },
+    "height": {
+     "label": "高度"
+    },
+    "invert": {
+     "label": "反轉"
+    },
+    "light": {
+     "label": "光線顏色"
+    },
+    "lightAngle": {
+     "label": "光線角度"
+    },
+    "map": {
+     "label": "高度圖",
+     "options": [
+      "Alpha",
+      "亮度"
+     ]
+    },
+    "mask": {
+     "label": "依圖層遮罩"
+    },
+    "phase": {
+     "label": "相位"
+    },
+    "thickness": {
+     "label": "厚度"
+    }
+   }
+  },
+  "countupdown": {
+   "description": "將文字圖層中的每個數字相乘再相加；把「相乘」的關鍵影格從0%設為100%，即可遞增至輸入的數字。數字周圍的文字不變。",
+   "name": "數字遞增／遞減",
+   "params": {
+    "add": {
+     "label": "相加"
+    },
+    "decimals": {
+     "label": "小數位數",
+     "options": [
+      "依輸入內容",
+      "0",
+      "1",
+      "2",
+      "3"
+     ]
+    },
+    "multiply": {
+     "label": "相乘"
+    },
+    "separator": {
+     "label": "千位分隔",
+     "options": [
+      "1000.5",
+      "1,000.5",
+      "1.000,5",
+      "1 000.5"
+     ]
+    }
+   },
+   "presets": {
+    "count-up": "數字遞增"
+   }
+  },
+  "crop": {
+   "description": "裁切圖層邊緣：「左」、「上」、「右」及「下」設定各邊裁去的圖層寬度或高度，「圓角」調整角落，「羽化」柔化邊緣。圖層位置不變。",
+   "name": "裁切",
+   "params": {
+    "bottom": {
+     "label": "下"
+    },
+    "feather": {
+     "label": "羽化"
+    },
+    "left": {
+     "label": "左"
+    },
+    "radius": {
+     "label": "圓角"
+    },
+    "right": {
+     "label": "右"
+    },
+    "top": {
+     "label": "上"
+    }
+   }
+  },
+  "cross": {
+   "description": "將圖層放在中央交叉的三條桿上。",
+   "name": "三軸十字",
+   "params": {
+    "light": {
+     "label": "光線角度"
+    },
+    "perspective": {
+     "label": "透視"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "reach": {
+     "label": "長度"
+    },
+    "rotX": {
+     "label": "X軸旋轉"
+    },
+    "rotY": {
+     "label": "Y軸旋轉"
+    },
+    "rotZ": {
+     "label": "Z軸旋轉"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "shading": {
+     "label": "明暗"
+    },
+    "shine": {
+     "label": "光澤"
+    },
+    "smoothing": {
+     "label": "平滑度"
+    },
+    "thickness": {
+     "label": "厚度"
+    }
+   }
+  },
+  "cube": {
+   "description": "將圖層包覆在旋轉立方體的各個面上，並加上圓角和光照。",
+   "name": "立方體",
+   "params": {
+    "edge": {
+     "label": "大小"
+    },
+    "light": {
+     "label": "光線角度"
+    },
+    "perspective": {
+     "label": "透視"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "rotX": {
+     "label": "X軸旋轉"
+    },
+    "rotY": {
+     "label": "Y軸旋轉"
+    },
+    "rotZ": {
+     "label": "Z軸旋轉"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "shading": {
+     "label": "明暗"
+    },
+    "shine": {
+     "label": "光澤"
+    },
+    "smoothing": {
+     "label": "平滑度"
+    }
+   }
+  },
+  "curl": {
+   "description": "將圖層一端沿圓形捲起，另一端保持平坦；為偏移加入動畫即可捲起或展開，最適合寬而薄的圖層。",
+   "name": "捲曲",
+   "params": {
+    "curlFrom": {
+     "label": "捲曲起點",
+     "options": [
+      "左",
+      "右"
+     ]
+    },
+    "direction": {
+     "label": "方向",
+     "options": [
+      "上",
+      "下"
+     ]
+    },
+    "offset": {
+     "label": "偏移"
+    },
+    "radius": {
+     "label": "半徑"
+    },
+    "stretch": {
+     "label": "拉伸"
+    }
+   }
+  },
+  "cylinder": {
+   "description": "將圖層包覆在圓柱體側面及兩端圓面上。",
+   "name": "圓柱體",
+   "params": {
+    "height": {
+     "label": "高度"
+    },
+    "light": {
+     "label": "光線角度"
+    },
+    "perspective": {
+     "label": "透視"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "radius": {
+     "label": "半徑"
+    },
+    "rotX": {
+     "label": "X軸旋轉"
+    },
+    "rotY": {
+     "label": "Y軸旋轉"
+    },
+    "rotZ": {
+     "label": "Z軸旋轉"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "shading": {
+     "label": "明暗"
+    },
+    "shine": {
+     "label": "光澤"
+    },
+    "smoothing": {
+     "label": "平滑度"
+    }
+   }
+  },
+  "darkglow": {
+   "description": "將圖層的暗部擴散到亮部，如同由陰影形成的光暈。",
+   "name": "暗光暈",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blend": {
+     "label": "混合"
+    },
+    "blur": {
+     "label": "擴散"
+    },
+    "color": {
+     "label": "顏色"
+    },
+    "threshold": {
+     "label": "閾值"
+    }
+   }
+  },
+  "datamosh": {
+   "description": "在開始與結束時間之間，畫面停止更新並隨後續動作拖曳，如同缺少關鍵影格。時間以圖層起點為準，單位為秒。影片圖層依實際動作產生拖影，其他圖層則以移動方塊產生拖影。",
+   "name": "資料錯亂",
+   "params": {
+    "block": {
+     "label": "方塊大小"
+    },
+    "bloom": {
+     "label": "泛光"
+    },
+    "decay": {
+     "label": "衰減"
+    },
+    "end": {
+     "label": "結束"
+    },
+    "glitch": {
+     "label": "故障"
+    },
+    "intensity": {
+     "label": "強度"
+    },
+    "start": {
+     "label": "開始"
+    }
+   }
+  },
+  "deepglow": {
+   "description": "產生明亮且大範圍擴散的光暈，圖層附近的亮核平滑淡化成寬廣柔和的光霧。",
+   "name": "深度光暈",
+   "params": {
+    "blur": {
+     "label": "半徑"
+    },
+    "falloff": {
+     "label": "衰減"
+    },
+    "high": {
+     "label": "閾值上限"
+    },
+    "hue": {
+     "label": "色相偏移"
+    },
+    "intensity": {
+     "label": "強度"
+    },
+    "limit": {
+     "label": "閾值"
+    },
+    "low": {
+     "label": "閾值下限"
+    },
+    "opacity": {
+     "label": "光暈不透明度"
+    },
+    "original": {
+     "label": "原始不透明度"
+    },
+    "outside": {
+     "label": "外光暈"
+    },
+    "saturation": {
+     "label": "飽和度"
+    },
+    "softness": {
+     "label": "閾值柔和度"
+    },
+    "tint": {
+     "label": "色調顏色"
+    },
+    "tintAmount": {
+     "label": "色調"
+    },
+    "vibrance": {
+     "label": "自然飽和度"
+    }
+   }
+  },
+  "denoise": {
+   "description": "使用保留邊緣的雙邊濾鏡移除圖片雜訊，只對顏色相近的鄰近像素取平均值。",
+   "name": "降噪",
+   "params": {
+    "detail": {
+     "label": "細節"
+    },
+    "radius": {
+     "label": "半徑"
+    },
+    "strength": {
+     "label": "強度"
+    }
+   }
+  },
+  "directionalblur": {
+   "description": "沿指定角度對取樣值取平均，產生動態模糊。",
+   "name": "方向模糊",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "blurLength": {
+     "label": "長度"
+    }
+   }
+  },
+  "displacementmap": {
+   "description": "使用此圖層的顏色置換後方圖層，然後隱藏自身；若將置換圖設為「下方圖層」，則依下方圖層置換此圖層。",
+   "name": "置換圖",
+   "params": {
+    "edges": {
+     "label": "邊緣",
+     "options": [
+      "重複",
+      "鏡射",
+      "透明",
+      "平鋪"
+     ]
+    },
+    "fromCenter": {
+     "label": "從中心"
+    },
+    "invert": {
+     "label": "反轉"
+    },
+    "map": {
+     "label": "置換圖",
+     "options": [
+      "此圖層",
+      "下方圖層"
+     ]
+    },
+    "offset": {
+     "label": "偏移"
+    },
+    "xchannel": {
+     "label": "X",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
+    },
+    "ychannel": {
+     "label": "Y",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
+    }
+   }
+  },
+  "dissolve": {
+   "description": "隨機移除圖層中的像素或方塊。為強度加入動畫可製作溶解轉場；種子決定圖樣，大小決定每個斑點的尺寸。",
+   "name": "溶解",
+   "params": {
+    "grain": {
+     "label": "大小"
+    },
+    "progress": {
+     "label": "強度"
+    },
+    "seed": {
+     "label": "種子"
+    }
+   }
+  },
+  "dots": {
+   "description": "在圖層上繪製隨機且均勻分布的柔和圓點，或僅將圖層用作圓點遮罩。",
+   "name": "圓點",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blend": {
+     "label": "混合模式",
+     "options": [
+      "正常",
+      "相乘",
+      "濾色"
+     ]
+    },
+    "color1": {
+     "label": "顏色1"
+    },
+    "color2": {
+     "label": "顏色2"
+    },
+    "density": {
+     "label": "密度"
+    },
+    "feather": {
+     "label": "羽化"
+    },
+    "fill": {
+     "label": "填色"
+    },
+    "offset": {
+     "label": "偏移"
+    },
+    "phase": {
+     "label": "相位"
+    },
+    "radius": {
+     "label": "半徑"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "seed": {
+     "label": "種子"
+    },
+    "slack": {
+     "label": "鬆弛"
+    }
+   }
+  },
+  "drawingprogress": {
+   "description": "從開始到結束逐筆繪製手繪內容或形狀輪廓。將「結束」的關鍵影格從0%設為100%即可呈現繪製過程。最適合關閉填色並啟用描邊的形狀。",
+   "name": "繪製進度",
+   "params": {
+    "end": {
+     "label": "結束"
+    },
+    "start": {
+     "label": "開始"
+    }
+   }
+  },
+  "dropshadow": {
+   "description": "在圖層後方繪製符合其形狀的柔和陰影，並以X軸偏移及Y軸偏移移動陰影。",
+   "name": "投影",
+   "params": {
+    "blur": {
+     "label": "柔和度"
+    },
+    "color": {
+     "label": "顏色"
+    },
+    "opacity": {
+     "label": "不透明度"
+    },
+    "x": {
+     "label": "X軸偏移"
+    },
+    "y": {
+     "label": "Y軸偏移"
+    }
+   }
+  },
+  "duotone": {
+   "description": "依亮度套用雙色漸層映射，可調整對比及程度。",
+   "name": "雙色調",
+   "params": {
+    "amount": {
+     "label": "數量"
+    },
+    "color1": {
+     "label": "陰影顏色"
+    },
+    "color2": {
+     "label": "亮部顏色"
+    },
+    "contrast": {
+     "label": "對比"
+    }
+   }
+  },
+  "echo": {
+   "description": "依圖層的動畫繪製其稍早狀態的複本。",
+   "name": "關鍵影格迴聲",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "composite": {
+     "label": "合成",
+     "options": [
+      "後方",
+      "上方"
+     ]
+    },
+    "count": {
+     "label": "數量"
+    },
+    "seconds": {
+     "label": "秒"
+    }
+   }
+  },
+  "edgedetect": {
+   "description": "在畫面變化處顯示亮線，其餘部分呈暗色。",
+   "name": "邊緣偵測",
+   "params": {
+    "strength": {
+     "label": "強度"
+    }
+   }
+  },
+  "edgeglow": {
+   "description": "偵測圖層邊緣，在變暗的畫面上產生霓虹般的光暈。",
+   "name": "邊緣光暈",
+   "params": {
+    "blend": {
+     "label": "混合"
+    },
+    "blur": {
+     "label": "模糊"
+    },
+    "brightness": {
+     "label": "亮度"
+    },
+    "color": {
+     "label": "顏色"
+    },
+    "edges": {
+     "label": "邊緣強度"
+    },
+    "gamma": {
+     "label": "伽瑪"
+    },
+    "invert": {
+     "label": "反轉"
+    },
+    "own": {
+     "label": "畫面顏色"
+    },
+    "spread": {
+     "label": "擴散"
+    },
+    "threshold": {
+     "label": "閾值"
+    },
+    "tint": {
+     "label": "色調"
+    },
+    "tintColor": {
+     "label": "色調顏色"
+    }
+   }
+  },
+  "electricedges": {
+   "description": "在圖層周圍繪製閃爍的發光輪廓。厚度可將其加寬為光帶；不同種子值產生不同圖樣，為種子加入動畫可讓每個影格閃爍，演化則讓圖樣流動。也可加入內部輪廓線。",
+   "name": "電光邊緣",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blur": {
+     "label": "距離"
+    },
+    "color": {
+     "label": "顏色"
+    },
+    "contourAngle": {
+     "label": "輪廓角度"
+    },
+    "contours": {
+     "label": "算圖輪廓"
+    },
+    "count": {
+     "label": "輪廓數量"
+    },
+    "detail": {
+     "label": "細節"
+    },
+    "distortion": {
+     "label": "扭曲"
+    },
+    "evolution": {
+     "label": "演化"
+    },
+    "fill": {
+     "label": "填色"
+    },
+    "glow": {
+     "label": "光暈"
+    },
+    "glowColor": {
+     "label": "光暈顏色"
+    },
+    "maskColor": {
+     "label": "遮罩顏色"
+    },
+    "maskEvolution": {
+     "label": "遮罩演化"
+    },
+    "maskScale": {
+     "label": "遮罩縮放"
+    },
+    "maskSeed": {
+     "label": "遮罩種子"
+    },
+    "maskStrength": {
+     "label": "遮罩強度"
+    },
+    "phase": {
+     "label": "輪廓相位"
+    },
+    "seed": {
+     "label": "種子"
+    },
+    "strength": {
+     "label": "強度"
+    },
+    "thickness": {
+     "label": "厚度"
+    }
+   }
+  },
+  "ellipsoid": {
+   "description": "將圖層包覆在可擠壓和壓扁的球體上。",
+   "name": "橢球體",
+   "params": {
+    "flattenRatio": {
+     "label": "壓扁"
+    },
+    "light": {
+     "label": "光線角度"
+    },
+    "perspective": {
+     "label": "透視"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "radius": {
+     "label": "半徑"
+    },
+    "rotX": {
+     "label": "X軸旋轉"
+    },
+    "rotY": {
+     "label": "Y軸旋轉"
+    },
+    "rotZ": {
+     "label": "Z軸旋轉"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "shading": {
+     "label": "明暗"
+    },
+    "shine": {
+     "label": "光澤"
+    },
+    "squeezeRatio": {
+     "label": "擠壓"
+    }
+   }
+  },
+  "emboss": {
+   "description": "沿指定光線角度使用亮度漸層套用浮雕特效。",
+   "name": "浮雕",
+   "params": {
+    "angle": {
+     "label": "光線角度"
+    },
+    "strength": {
+     "label": "強度"
+    }
+   }
+  },
+  "energybeam": {
+   "description": "在兩點之間繪製具有明亮核心與柔和光暈的光束，並可沿長度擺動及延伸。",
+   "name": "能量光束",
+   "params": {
+    "blend": {
+     "label": "混合",
+     "options": [
+      "相加",
+      "濾色",
+      "正常"
+     ]
+    },
+    "color": {
+     "label": "光暈顏色"
+    },
+    "dim": {
+     "label": "調暗背景"
+    },
+    "evolution": {
+     "label": "演化"
+    },
+    "frequency": {
+     "label": "頻率"
+    },
+    "from": {
+     "label": "開始"
+    },
+    "glow": {
+     "label": "光暈"
+    },
+    "halo": {
+     "label": "光環"
+    },
+    "haloColor": {
+     "label": "光環顏色"
+    },
+    "haloWidth": {
+     "label": "光環寬度"
+    },
+    "opacity": {
+     "label": "不透明度"
+    },
+    "progress": {
+     "label": "進度"
+    },
+    "span": {
+     "label": "長度"
+    },
+    "to": {
+     "label": "結束"
+    },
+    "width": {
+     "label": "寬度"
+    },
+    "wiggle": {
+     "label": "擺動"
+    }
+   }
+  },
+  "exposure": {
+   "description": "透過曝光級數、偏移及伽瑪校正模擬攝影曝光。「提亮半透明部分」可讓模糊邊緣等半透明像素的亮度超過白色。",
+   "name": "曝光",
+   "params": {
+    "gamma": {
+     "label": "伽瑪"
+    },
+    "offset": {
+     "label": "偏移"
+    },
+    "soft": {
+     "label": "提亮半透明部分"
+    },
+    "stops": {
+     "label": "曝光級數"
+    }
+   }
+  },
+  "fade": {
+   "description": "依設定的時間，讓圖層在開頭淡入、結尾淡出。",
+   "name": "淡入／淡出",
+   "params": {
+    "fadeIn": {
+     "label": "淡入"
+    },
+    "fadeOut": {
+     "label": "淡出"
+    }
+   }
+  },
+  "feather": {
+   "description": "柔化圖層的Alpha邊緣。「向內」在現有輪廓內淡化；「模糊Alpha」也會將柔化邊緣擴散至輪廓外。",
+   "name": "羽化",
+   "params": {
+    "blur": {
+     "label": "強度"
+    },
+    "mode": {
+     "label": "邊緣",
+     "options": [
+      "向內",
+      "模糊Alpha"
+     ]
+    }
+   }
+  },
+  "fillbehind": {
+   "description": "以模糊放大的圖層複本填滿後方畫面，適合在橫向專案中使用直向影片。",
+   "name": "填滿後方",
+   "params": {
+    "bgAlpha": {
+     "label": "背景Alpha"
+    },
+    "bgOffset": {
+     "label": "背景偏移"
+    },
+    "bgScale": {
+     "label": "背景縮放"
+    },
+    "blur": {
+     "label": "強度"
+    },
+    "brightness": {
+     "label": "亮度"
+    },
+    "edgeColor": {
+     "label": "邊緣顏色"
+    },
+    "edgeStrength": {
+     "label": "邊緣強度"
+    },
+    "feather": {
+     "label": "羽化"
+    },
+    "fgAlpha": {
+     "label": "前景Alpha"
+    },
+    "fgOffset": {
+     "label": "前景偏移"
+    },
+    "fgScale": {
+     "label": "前景縮放"
+    },
+    "gamma": {
+     "label": "伽瑪"
+    },
+    "saturation": {
+     "label": "飽和度"
+    },
+    "scanCount": {
+     "label": "掃描線數量"
+    },
+    "scanStrength": {
+     "label": "掃描線強度"
+    },
+    "tint": {
+     "label": "色調"
+    },
+    "tintColor": {
+     "label": "色調顏色"
+    }
+   }
+  },
+  "filmgrain": {
+   "description": "動態單色底片顆粒，可調整數量、顆粒大小及動畫速度。",
+   "name": "底片顆粒",
+   "params": {
+    "amount": {
+     "label": "數量"
+    },
+    "grainSize": {
+     "label": "顆粒大小"
+    },
+    "speed": {
+     "label": "速度"
+    }
+   }
+  },
+  "flicker": {
+   "description": "隨機閃動圖層的不透明度。",
+   "name": "閃爍",
+   "params": {
+    "intensity": {
+     "label": "強度"
+    },
+    "seed": {
+     "label": "種子"
+    },
+    "speed": {
+     "label": "頻率"
+    },
+    "style": {
+     "label": "模式",
+     "options": [
+      "閃動",
+      "穩定"
+     ]
+    }
+   }
+  },
+  "flip": {
+   "description": "像翻轉卡片一樣在3D空間中翻轉圖層，背面可設為透明、圖片或顏色。",
+   "name": "翻轉圖層",
+   "params": {
+    "axis": {
+     "label": "軸"
+    },
+    "back": {
+     "label": "背面",
+     "options": [
+      "透明",
+      "圖片",
+      "顏色"
+     ]
+    },
+    "backColor": {
+     "label": "背面顏色"
+    },
+    "light": {
+     "label": "光線角度"
+    },
+    "perspective": {
+     "label": "透視"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "rotX": {
+     "label": "X軸旋轉"
+    },
+    "rotY": {
+     "label": "Y軸旋轉"
+    },
+    "rotZ": {
+     "label": "Z軸旋轉"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "shading": {
+     "label": "明暗"
+    },
+    "shine": {
+     "label": "光澤"
+    }
+   }
+  },
+  "fontweight": {
+   "description": "設定文字的粗細，並可使用關鍵影格製作動畫。適用於將所有字重儲存在同一檔案中的可變字型，包括字型清單中的Raleway、Quicksand、Comfortaa、Lora、Bitter、Orbitron、Playfair Display和Dancing Script，或自行匯入的可變字型。固定字重的字型會保持原有外觀。",
+   "name": "字重",
+   "params": {
+    "weight": {
+     "label": "字重"
+    }
+   }
+  },
+  "fourcolor": {
+   "description": "在圖層上混合四個位置的顏色（位置以距圖層中心的像素數表示）。",
+   "name": "四色漸層",
+   "params": {
+    "blend": {
+     "label": "混合",
+     "options": [
+      "正常",
+      "相乘",
+      "濾色",
+      "覆蓋",
+      "柔光",
+      "實光",
+      "相加",
+      "變暗",
+      "變亮",
+      "差異化",
+      "顏色加亮",
+      "顏色加深"
+     ]
+    },
+    "color1": {
+     "label": "顏色1"
+    },
+    "color2": {
+     "label": "顏色2"
+    },
+    "color3": {
+     "label": "顏色3"
+    },
+    "color4": {
+     "label": "顏色4"
+    },
+    "corner": {
+     "label": "角落偏移"
+    },
+    "opacity": {
+     "label": "不透明度"
+    },
+    "point1": {
+     "label": "點1"
+    },
+    "point2": {
+     "label": "點2"
+    },
+    "point3": {
+     "label": "點3"
+    },
+    "point4": {
+     "label": "點4"
+    },
+    "softness": {
+     "label": "柔和度"
+    }
+   }
+  },
+  "fractalridges": {
+   "description": "以尖銳、紊亂的碎形雜訊山脊填滿圖層不透明的部分。",
+   "name": "碎形山脊",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "color1": {
+     "label": "顏色1"
+    },
+    "color2": {
+     "label": "顏色2"
+    },
+    "evolution": {
+     "label": "演化"
+    },
+    "intensity": {
+     "label": "強度"
+    },
+    "octaves": {
+     "label": "倍頻層數"
+    },
+    "offset": {
+     "label": "偏移"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "seed": {
+     "label": "種子"
+    },
+    "stretch": {
+     "label": "拉伸"
+    }
+   }
+  },
+  "fractalwarp": {
+   "description": "使用摺疊的碎形雜訊扭曲圖層，呈現火焰、水流及熱浪效果。",
+   "name": "碎形扭曲",
+   "params": {
+    "complexity": {
+     "label": "複雜度"
+    },
+    "evolution": {
+     "label": "演化"
+    },
+    "intensity": {
+     "label": "強度"
+    },
+    "offset": {
+     "label": "偏移"
+    },
+    "parallax": {
+     "label": "視差"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "screenSpace": {
+     "label": "螢幕空間"
+    },
+    "seed": {
+     "label": "隨機種子"
+    },
+    "strength": {
+     "label": "強度"
+    }
+   }
+  },
+  "fracture3d": {
+   "description": "將圖層打碎成移動的3D碎片。",
+   "name": "3D碎裂",
+   "params": {
+    "depthPush": {
+     "label": "深度推移"
+    },
+    "direction": {
+     "label": "方向"
+    },
+    "fade": {
+     "label": "淡出"
+    },
+    "force": {
+     "label": "力度"
+    },
+    "gravity": {
+     "label": "重力"
+    },
+    "impact": {
+     "label": "撞擊點"
+    },
+    "intensity": {
+     "label": "光線強度"
+    },
+    "light": {
+     "label": "光線方向"
+    },
+    "pieces": {
+     "label": "碎片數"
+    },
+    "progress": {
+     "label": "進度"
+    },
+    "seed": {
+     "label": "隨機種子"
+    },
+    "spin": {
+     "label": "旋轉"
+    },
+    "spread": {
+     "label": "方向擴散"
+    },
+    "thickness": {
+     "label": "厚度"
+    }
+   }
+  },
+  "fringeclean": {
+   "description": "去除圖層遮罩邊緣像素的顏色，讓去背留下的彩色光暈轉為灰色，最多可保留三種指定顏色。",
+   "name": "遮罩邊緣去色",
+   "params": {
+    "blur": {
+     "label": "厚度"
+    },
+    "color1": {
+     "label": "保留顏色1"
+    },
+    "color2": {
+     "label": "保留顏色2"
+    },
+    "color3": {
+     "label": "保留顏色3"
+    },
+    "feather": {
+     "label": "羽化"
+    },
+    "threshold1": {
+     "label": "範圍1"
+    },
+    "threshold2": {
+     "label": "範圍2"
+    },
+    "threshold3": {
+     "label": "範圍3"
+    }
+   }
+  },
+  "glass": {
+   "description": "將圖層形狀變成斜邊玻璃，折射後方圖層並在邊緣產生亮光。",
+   "name": "玻璃",
+   "params": {
+    "angle": {
+     "label": "光線角度"
+    },
+    "blur": {
+     "label": "斜角"
+    },
+    "color": {
+     "label": "顏色"
+    },
+    "highlight": {
+     "label": "亮光"
+    },
+    "refraction": {
+     "label": "折射"
+    },
+    "tint": {
+     "label": "色調"
+    }
+   }
+  },
+  "glitch": {
+   "description": "隨機水平移動區塊並偏移色彩通道，每秒變化數次。",
+   "name": "故障",
+   "params": {
+    "blockHeight": {
+     "label": "區塊高度"
+    },
+    "intensity": {
+     "label": "強度"
+    },
+    "seed": {
+     "label": "隨機種子"
+    }
+   }
+  },
+  "glow": {
+   "description": "在圖層形狀外圍加上單色光暈。調整硬度可讓柔和漸隱變成實心輪廓。",
+   "name": "發光",
+   "params": {
+    "alpha": {
+     "label": "透明度"
+    },
+    "blendMode": {
+     "label": "混合模式",
+     "options": [
+      "正常",
+      "色彩增值",
+      "濾色"
+     ]
+    },
+    "color": {
+     "label": "顏色"
+    },
+    "hardness": {
+     "label": "硬度"
+    },
+    "radius": {
+     "label": "半徑"
+    }
+   }
+  },
+  "glowscan": {
+   "description": "只模糊並照亮圖層中亮度落在指定範圍的部分；為位置加入動畫，讓光暈從陰影掃過亮部。",
+   "name": "發光掃描",
+   "params": {
+    "blur": {
+     "label": "模糊"
+    },
+    "color": {
+     "label": "發光顏色"
+    },
+    "intensity": {
+     "label": "強度"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "show": {
+     "label": "僅顯示範圍"
+    },
+    "softness": {
+     "label": "柔和度"
+    },
+    "width": {
+     "label": "寬度"
+    }
+   }
+  },
+  "gradientmap": {
+   "description": "依亮度以三種顏色重新上色，可調整重複次數和相位。縮放亮度會將結果乘以圖片本身的亮度。",
+   "name": "漸層映射",
+   "params": {
+    "color1": {
+     "label": "陰影"
+    },
+    "color2": {
+     "label": "中間調"
+    },
+    "color3": {
+     "label": "亮部"
+    },
+    "opacity": {
+     "label": "不透明度"
+    },
+    "phase": {
+     "label": "相位"
+    },
+    "repeat": {
+     "label": "重複"
+    },
+    "reverse": {
+     "label": "反轉"
+    },
+    "saturation": {
+     "label": "飽和度"
+    },
+    "scaleBrightness": {
+     "label": "縮放亮度"
+    }
+   }
+  },
+  "gradientoverlay": {
+   "description": "在圖層上疊加雙色漸層，可選擇形狀和混合模式。",
+   "name": "漸層疊加",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "blend": {
+     "label": "混合",
+     "options": [
+      "正常",
+      "色彩增值",
+      "濾色",
+      "覆蓋",
+      "柔光",
+      "強光",
+      "相加",
+      "變暗",
+      "變亮",
+      "差異化",
+      "加亮顏色",
+      "加深顏色"
+     ]
+    },
+    "color1": {
+     "label": "顏色1"
+    },
+    "color2": {
+     "label": "顏色2"
+    },
+    "offset": {
+     "label": "偏移"
+    },
+    "opacity": {
+     "label": "不透明度"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "shape": {
+     "label": "形狀",
+     "options": [
+      "線性",
+      "放射狀",
+      "對稱",
+      "角度"
+     ]
+    },
+    "style": {
+     "label": "長度",
+     "options": [
+      "方框",
+      "橢圓"
+     ]
+    }
+   }
+  },
+  "grid": {
+   "description": "在圖層的不透明部分繪製格線，或從中挖出格線。",
+   "name": "格線",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "color": {
+     "label": "顏色"
+    },
+    "count": {
+     "label": "數量"
+    },
+    "offset": {
+     "label": "偏移"
+    },
+    "punch": {
+     "label": "挖空"
+    },
+    "stretch": {
+     "label": "拉伸"
+    },
+    "width": {
+     "label": "寬度"
+    }
+   }
+  },
+  "gridrepeat": {
+   "description": "動態產生多個圖層副本，排列成網格。",
+   "name": "網格重複",
+   "params": {
+    "copyDelay": {
+     "label": "每個副本的延遲"
+    },
+    "count": {
+     "label": "數量"
+    },
+    "easing": {
+     "label": "緩動",
+     "options": [
+      "線性",
+      "緩入",
+      "緩出",
+      "緩入緩出"
+     ]
+    },
+    "fillAmount": {
+     "label": "填色量"
+    },
+    "fillColor": {
+     "label": "填色顏色"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "randomOpacity": {
+     "label": "隨機不透明度"
+    },
+    "randomOrder": {
+     "label": "隨機順序"
+    },
+    "randomPosition": {
+     "label": "隨機位置"
+    },
+    "randomRotation": {
+     "label": "隨機旋轉"
+    },
+    "randomScale": {
+     "label": "隨機縮放"
+    },
+    "rangeEnd": {
+     "label": "範圍終點"
+    },
+    "rangeOffset": {
+     "label": "範圍偏移"
+    },
+    "rangeOpacity": {
+     "label": "範圍不透明度"
+    },
+    "rangePosition": {
+     "label": "範圍位置"
+    },
+    "rangeRotation": {
+     "label": "範圍旋轉"
+    },
+    "rangeScale": {
+     "label": "範圍縮放"
+    },
+    "rangeStart": {
+     "label": "範圍起點"
+    },
+    "seed": {
+     "label": "隨機種子"
+    },
+    "stagger": {
+     "label": "錯開"
+    }
+   }
+  },
+  "grunge": {
+   "description": "以顆粒、污漬、焦邊和灰塵色調讓圖層呈現斑駁效果。",
+   "name": "仿舊",
+   "params": {
+    "blotches": {
+     "label": "污漬"
+    },
+    "burn": {
+     "label": "焦邊"
+    },
+    "color": {
+     "label": "色調顏色"
+    },
+    "grain": {
+     "label": "顆粒"
+    },
+    "scale": {
+     "label": "污漬大小"
+    },
+    "seed": {
+     "label": "隨機種子"
+    },
+    "strength": {
+     "label": "強度"
+    },
+    "tint": {
+     "label": "色調"
+    }
+   }
+  },
+  "halftone": {
+   "description": "以印刷圓點呈現圖片，暗處的圓點較大。",
+   "name": "半色調",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "cell": {
+     "label": "大小"
+    },
+    "colored": {
+     "label": "彩色圓點"
+    },
+    "ink": {
+     "label": "圓點顏色"
+    },
+    "paper": {
+     "label": "紙張顏色"
+    },
+    "style": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "雙色"
+     ]
+    }
+   }
+  },
+  "halftonelines": {
+   "description": "以印刷線條重繪圖層，暗處線條較粗，亮處較細。",
+   "name": "半色調線條",
+   "params": {
+    "amount": {
+     "label": "數量"
+    },
+    "angle": {
+     "label": "角度"
+    },
+    "color1": {
+     "label": "顏色1"
+    },
+    "color2": {
+     "label": "顏色2"
+    },
+    "phase": {
+     "label": "相位"
+    },
+    "strength": {
+     "label": "強度"
+    }
+   }
+  },
+  "heart": {
+   "description": "將圖層裁切成立體飽滿的愛心。",
+   "name": "愛心",
+   "params": {
+    "depth": {
+     "label": "深度"
+    },
+    "heartSize": {
+     "label": "大小"
+    },
+    "light": {
+     "label": "光線角度"
+    },
+    "perspective": {
+     "label": "透視"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "rotX": {
+     "label": "X軸旋轉"
+    },
+    "rotY": {
+     "label": "Y軸旋轉"
+    },
+    "rotZ": {
+     "label": "Z軸旋轉"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "shading": {
+     "label": "明暗"
+    },
+    "shine": {
+     "label": "光澤"
+    },
+    "smoothing": {
+     "label": "平滑度"
+    }
+   }
+  },
+  "hexagontilerotate": {
+   "description": "將圖層分成六角磚，分別旋轉每塊磚內的圖片。",
+   "name": "六角磚旋轉",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "count": {
+     "label": "數量"
+    },
+    "offset": {
+     "label": "偏移"
+    },
+    "random": {
+     "label": "隨機化"
+    },
+    "rotation": {
+     "label": "旋轉"
+    },
+    "seed": {
+     "label": "隨機種子"
+    }
+   }
+  },
+  "hexagontileshift": {
+   "description": "將圖層分成六角磚，將每塊磚內的圖片隨機移動。",
+   "name": "六角磚位移",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "count": {
+     "label": "數量"
+    },
+    "offset": {
+     "label": "偏移"
+    },
+    "seed": {
+     "label": "隨機種子"
+    },
+    "strength": {
+     "label": "強度"
+    }
+   }
+  },
+  "hexagontiling": {
+   "description": "以六角磚重複平鋪圖層中央，填滿螢幕。",
+   "name": "六角平鋪",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "mirror": {
+     "label": "鏡像"
+    },
+    "scale": {
+     "label": "縮放"
+    }
+   }
+  },
+  "hexgrid": {
+   "description": "在圖層上鋪滿六角網格，以一至三種顏色填滿，並加入柔和邊緣與間距。",
+   "name": "六角陣列",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "blend": {
+     "label": "混合",
+     "options": [
+      "正常",
+      "色彩增值",
+      "濾色",
+      "覆蓋",
+      "柔光",
+      "強光",
+      "相加",
+      "變暗",
+      "變亮",
+      "差異化",
+      "加亮顏色",
+      "加深顏色"
+     ]
+    },
+    "cell": {
+     "label": "大小"
+    },
+    "color1": {
+     "label": "顏色1"
+    },
+    "color2": {
+     "label": "顏色2"
+    },
+    "color3": {
+     "label": "顏色3"
+    },
+    "colors": {
+     "label": "顏色數",
+     "options": [
+      "一種",
+      "兩種",
+      "三種"
+     ]
+    },
+    "feather": {
+     "label": "羽化"
+    },
+    "gap": {
+     "label": "間距"
+    },
+    "offset": {
+     "label": "偏移"
+    },
+    "opacity": {
+     "label": "不透明度"
+    },
+    "stretch": {
+     "label": "拉伸"
+    }
+   }
+  },
+  "hexprism": {
+   "description": "將圖層放在六角柱的正面與背面。",
+   "name": "六角柱",
+   "params": {
+    "depth": {
+     "label": "深度"
+    },
+    "light": {
+     "label": "光線角度"
+    },
+    "perspective": {
+     "label": "透視"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "radius": {
+     "label": "半徑"
+    },
+    "rotX": {
+     "label": "X軸旋轉"
+    },
+    "rotY": {
+     "label": "Y軸旋轉"
+    },
+    "rotZ": {
+     "label": "Z軸旋轉"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "shading": {
+     "label": "明暗"
+    },
+    "shine": {
+     "label": "光澤"
+    },
+    "smoothing": {
+     "label": "平滑度"
+    }
+   }
+  },
+  "highlightshadow": {
+   "description": "依各像素的亮度還原或增強亮部，並提亮或加深陰影。",
+   "name": "亮部與陰影",
+   "params": {
+    "highlights": {
+     "label": "亮部"
+    },
+    "shadows": {
+     "label": "陰影"
+    },
+    "style": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "保留顏色"
+     ]
+    }
+   }
+  },
+  "hollowbox": {
+   "description": "上下開口的方盒：圖層覆蓋外側，內側使用內部顏色。",
+   "name": "中空方盒",
+   "params": {
+    "depth": {
+     "label": "深度"
+    },
+    "height": {
+     "label": "高度"
+    },
+    "interior": {
+     "label": "內部顏色"
+    },
+    "light": {
+     "label": "光線角度"
+    },
+    "perspective": {
+     "label": "透視"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "rotX": {
+     "label": "X軸旋轉"
+    },
+    "rotY": {
+     "label": "Y軸旋轉"
+    },
+    "rotZ": {
+     "label": "Z軸旋轉"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "shading": {
+     "label": "明暗"
+    },
+    "shine": {
+     "label": "光澤"
+    },
+    "smoothing": {
+     "label": "平滑度"
+    },
+    "thickness": {
+     "label": "厚度"
+    },
+    "width": {
+     "label": "寬度"
+    }
+   }
+  },
+  "hsl": {
+   "description": "每次調整一種顏色範圍（如紅色、橙色或綠色）的色相、飽和度和明度，不影響其他顏色。",
+   "name": "HSL",
+   "params": {
+    "blend": {
+     "label": "混合",
+     "options": [
+      "正常",
+      "色彩增值",
+      "濾色"
+     ]
+    },
+    "blueHue": {
+     "label": "色相"
+    },
+    "blueLightness": {
+     "label": "明度"
+    },
+    "blueSaturation": {
+     "label": "飽和度"
+    },
+    "brightness": {
+     "label": "亮度"
+    },
+    "cyanHue": {
+     "label": "色相"
+    },
+    "cyanLightness": {
+     "label": "明度"
+    },
+    "cyanSaturation": {
+     "label": "飽和度"
+    },
+    "greenHue": {
+     "label": "色相"
+    },
+    "greenLightness": {
+     "label": "明度"
+    },
+    "greenSaturation": {
+     "label": "飽和度"
+    },
+    "magentaHue": {
+     "label": "色相"
+    },
+    "magentaLightness": {
+     "label": "明度"
+    },
+    "magentaSaturation": {
+     "label": "飽和度"
+    },
+    "opacity": {
+     "label": "不透明度"
+    },
+    "orangeHue": {
+     "label": "色相"
+    },
+    "orangeLightness": {
+     "label": "明度"
+    },
+    "orangeSaturation": {
+     "label": "飽和度"
+    },
+    "purpleHue": {
+     "label": "色相"
+    },
+    "purpleLightness": {
+     "label": "明度"
+    },
+    "purpleSaturation": {
+     "label": "飽和度"
+    },
+    "range": {
+     "label": "顏色",
+     "options": [
+      "紅色",
+      "橙色",
+      "黃色",
+      "綠色",
+      "青色",
+      "藍色",
+      "紫色",
+      "洋紅色"
+     ]
+    },
+    "redHue": {
+     "label": "色相"
+    },
+    "redLightness": {
+     "label": "明度"
+    },
+    "redSaturation": {
+     "label": "飽和度"
+    },
+    "yellowHue": {
+     "label": "色相"
+    },
+    "yellowLightness": {
+     "label": "明度"
+    },
+    "yellowSaturation": {
+     "label": "飽和度"
+    }
+   }
+  },
+  "huesaturation": {
+   "description": "沿色相環調整顏色並增減飽和度；自然飽和度會優先增強較暗淡的顏色。",
+   "name": "色相與飽和度",
+   "params": {
+    "hue": {
+     "label": "色相"
+    },
+    "lightness": {
+     "label": "明度"
+    },
+    "saturation": {
+     "label": "飽和度"
+    },
+    "style": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "保留亮度"
+     ]
+    },
+    "vibrance": {
+     "label": "自然飽和度"
+    }
+   }
+  },
+  "innerblur": {
+   "description": "模糊圖層內的圖片，並保持輪廓清晰。",
+   "name": "內部模糊",
+   "params": {
+    "blur": {
+     "label": "強度"
+    }
+   }
+  },
+  "innerbulge": {
+   "description": "向外膨脹或向內收縮圖層中央，並保持邊緣位置不變。",
+   "name": "內部收縮／膨脹",
+   "params": {
+    "strength": {
+     "label": "強度"
+    }
+   }
+  },
+  "innerglow": {
+   "description": "沿圖層不透明部分的內側邊緣加入光暈。",
+   "name": "內發光",
+   "params": {
+    "blur": {
+     "label": "大小"
+    },
+    "color": {
+     "label": "顏色"
+    },
+    "intensity": {
+     "label": "強度"
+    }
+   }
+  },
+  "invert": {
+   "description": "反轉圖片的色彩通道，可調整混合量並選擇是否反轉透明度。",
+   "name": "反相",
+   "params": {
+    "amount": {
+     "label": "數量"
+    },
+    "invert_alpha": {
+     "label": "反轉透明度"
+    }
+   }
+  },
+  "iridescence": {
+   "description": "在圖層的不透明部分覆上流動的虹彩光澤，如水面油膜或肥皂泡。",
+   "name": "虹彩",
+   "params": {
+    "alpha": {
+     "label": "透明度"
+    },
+    "blend": {
+     "label": "混合模式",
+     "options": [
+      "正常",
+      "色彩增值",
+      "濾色",
+      "覆蓋",
+      "柔光",
+      "強光",
+      "相加",
+      "變暗",
+      "變亮",
+      "差異化",
+      "加亮顏色",
+      "加深顏色"
+     ]
+    },
+    "evolution": {
+     "label": "演化"
+    },
+    "saturation": {
+     "label": "飽和度"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "seed": {
+     "label": "隨機種子"
+    },
+    "shift": {
+     "label": "色相偏移"
+    }
+   }
+  },
+  "kaleidoscope": {
+   "description": "將鏡像切片繞著中心點排列。",
+   "name": "萬花筒",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "center": {
+     "label": "中心"
+    },
+    "mirror": {
+     "label": "鏡像"
+    },
+    "segments": {
+     "label": "分段數"
+    }
+   }
+  },
+  "lensblur": {
+   "description": "旋轉模糊效果，中心區域保持清晰，越靠近邊緣越模糊。",
+   "name": "鏡頭模糊",
+   "params": {
+    "center": {
+     "label": "中心"
+    },
+    "feather": {
+     "label": "羽化"
+    },
+    "radius": {
+     "label": "半徑"
+    },
+    "sweep": {
+     "label": "角度"
+    }
+   }
+  },
+  "lensflare": {
+   "description": "在圖片上疊加帶有光暈的亮光。",
+   "name": "光斑",
+   "params": {
+    "brightness": {
+     "label": "亮度"
+    },
+    "center": {
+     "label": "中心"
+    },
+    "color": {
+     "label": "顏色"
+    },
+    "radius": {
+     "label": "半徑"
+    }
+   }
+  },
+  "levels": {
+   "description": "透過輸入黑白點、伽瑪值及輸出黑白點調整圖片色階。",
+   "name": "色階",
+   "params": {
+    "gamma": {
+     "label": "伽瑪"
+    },
+    "inBlack": {
+     "label": "輸入黑點"
+    },
+    "inWhite": {
+     "label": "輸入白點"
+    },
+    "outBlack": {
+     "label": "輸出黑點"
+    },
+    "outWhite": {
+     "label": "輸出白點"
+    }
+   }
+  },
+  "lightglow": {
+   "description": "在圖片中亮度超過臨界值的部分周圍加入彩色光暈。",
+   "name": "亮部發光",
+   "params": {
+    "blend": {
+     "label": "混合"
+    },
+    "blur": {
+     "label": "大小"
+    },
+    "color": {
+     "label": "顏色"
+    },
+    "intensity": {
+     "label": "強度"
+    },
+    "opacity": {
+     "label": "不透明度"
+    },
+    "threshold": {
+     "label": "臨界值"
+    }
+   }
+  },
+  "lightning": {
+   "description": "在圖層的兩點之間繪製分岔閃電。",
+   "name": "閃電",
+   "params": {
+    "color": {
+     "label": "顏色"
+    },
+    "evolution": {
+     "label": "演化"
+    },
+    "from": {
+     "label": "起點"
+    },
+    "glow": {
+     "label": "發光"
+    },
+    "jag": {
+     "label": "細節"
+    },
+    "seed": {
+     "label": "隨機種子"
+    },
+    "to": {
+     "label": "終點"
+    },
+    "width": {
+     "label": "寬度"
+    }
+   }
+  },
+  "linearrepeat": {
+   "description": "動態產生多個圖層副本，沿直線排列。",
+   "name": "線性重複",
+   "params": {
+    "copyDelay": {
+     "label": "每個副本的延遲"
+    },
+    "count": {
+     "label": "數量"
+    },
+    "easing": {
+     "label": "緩動",
+     "options": [
+      "線性",
+      "緩入",
+      "緩出",
+      "緩入緩出"
+     ]
+    },
+    "fillAmount": {
+     "label": "填色量"
+    },
+    "fillColor": {
+     "label": "填色顏色"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "randomOpacity": {
+     "label": "隨機不透明度"
+    },
+    "randomOrder": {
+     "label": "隨機順序"
+    },
+    "randomPosition": {
+     "label": "隨機位置"
+    },
+    "randomRotation": {
+     "label": "隨機旋轉"
+    },
+    "randomScale": {
+     "label": "隨機縮放"
+    },
+    "rangeEnd": {
+     "label": "範圍終點"
+    },
+    "rangeOffset": {
+     "label": "範圍偏移"
+    },
+    "rangeOpacity": {
+     "label": "範圍不透明度"
+    },
+    "rangePosition": {
+     "label": "範圍位置"
+    },
+    "rangeRotation": {
+     "label": "範圍旋轉"
+    },
+    "rangeScale": {
+     "label": "範圍縮放"
+    },
+    "rangeStart": {
+     "label": "範圍起點"
+    },
+    "seed": {
+     "label": "隨機種子"
+    }
+   }
+  },
+  "linearstreaks": {
+   "description": "沿指定角度移動圖層副本，並混合重疊處，產生直線光痕。",
+   "name": "線性光痕",
+   "params": {
+    "alpha": {
+     "label": "透明度"
+    },
+    "angle": {
+     "label": "角度"
+    },
+    "bias": {
+     "label": "偏向"
+    },
+    "mode": {
+     "label": "混合",
+     "options": [
+      "變亮",
+      "平均",
+      "變暗"
+     ]
+    },
+    "reach": {
+     "label": "長度"
+    }
+   }
+  },
+  "liquidglass": {
+   "description": "將圖層形狀變成像手機按鈕般透明圓潤的玻璃：後方圖層在邊緣附近折射最明顯，受光側邊緣明亮，另一側則較柔和。磨砂會模糊後方內容，彩虹邊緣則會分離邊緣的顏色。",
+   "name": "液態玻璃",
+   "params": {
+    "angle": {
+     "label": "光線角度"
+    },
+    "blur": {
+     "label": "邊緣"
+    },
+    "color": {
+     "label": "顏色"
+    },
+    "dispersion": {
+     "label": "彩虹邊緣"
+    },
+    "frost": {
+     "label": "磨砂"
+    },
+    "highlight": {
+     "label": "亮光"
+    },
+    "refraction": {
+     "label": "彎曲"
+    },
+    "tint": {
+     "label": "色調"
+    }
+   }
+  },
+  "longshadow": {
+   "description": "從圖層的不透明部分投射平行的長陰影。",
+   "name": "長陰影",
+   "params": {
+    "alpha": {
+     "label": "透明度"
+    },
+    "angle": {
+     "label": "角度"
+    },
+    "color": {
+     "label": "顏色"
+    },
+    "fade": {
+     "label": "淡化"
+    },
+    "reach": {
+     "label": "長度"
+    },
+    "solidity": {
+     "label": "實心度"
+    }
+   }
+  },
+  "lumakey": {
+   "description": "移除圖層的暗部或亮部。",
+   "name": "亮度鍵",
+   "params": {
+    "invert": {
+     "label": "反相"
+    },
+    "softness": {
+     "label": "柔和度"
+    },
+    "threshold": {
+     "label": "臨界值"
+    }
+   }
+  },
+  "lumastamp": {
+   "description": "將圖層變為單色，依各像素亮度調整不透明度，呈現印章或模板效果。",
+   "name": "亮度印章",
+   "params": {
+    "color": {
+     "label": "顏色"
+    },
+    "gamma": {
+     "label": "伽瑪"
+    },
+    "high": {
+     "label": "白點"
+    },
+    "invert": {
+     "label": "反相"
+    },
+    "low": {
+     "label": "黑點"
+    }
+   }
+  },
+  "magnifybackground": {
+   "description": "將圖層變成放大鏡，在其形狀內顯示以中心為基準放大的後方圖層。",
+   "name": "放大背景",
+   "params": {
+    "magnify": {
+     "label": "放大圖層"
+    },
+    "sampling": {
+     "label": "取樣",
+     "options": [
+      "最近鄰",
+      "線性"
+     ]
+    },
+    "scale": {
+     "label": "縮放"
+    }
+   }
+  },
+  "maskblur": {
+   "description": "在圖層形狀範圍內模糊後方圖層；圖層越亮的部分模糊越強，因此可用漸層製作移軸效果。",
+   "name": "遮罩模糊",
+   "params": {
+    "invert": {
+     "label": "反相"
+    },
+    "strength": {
+     "label": "強度"
+    }
+   }
+  },
+  "mattechoker": {
+   "description": "從邊緣向內收縮圖層的不透明部分。",
+   "name": "遮罩收縮",
+   "params": {
+    "amount": {
+     "label": "收縮"
+    },
+    "blur": {
+     "label": "大小"
+    },
+    "invert": {
+     "label": "反相"
+    },
+    "softness": {
+     "label": "柔和度"
+    }
+   }
+  },
+  "mirror": {
+   "description": "以角度和中心點定義鏡像線，映射圖片的一半。",
+   "name": "鏡像",
+   "params": {
+    "alpha": {
+     "label": "透明度"
+    },
+    "angle": {
+     "label": "角度"
+    },
+    "center": {
+     "label": "中心"
+    },
+    "style": {
+     "label": "樣式",
+     "options": [
+      "摺疊",
+      "翻轉"
+     ]
+    }
+   }
+  },
+  "mosaic": {
+   "description": "將圖層分成方塊，並以各方塊的平均顏色填滿。",
+   "name": "馬賽克",
+   "params": {
+    "count": {
+     "label": "數量"
+    },
+    "offset": {
+     "label": "偏移"
+    },
+    "stretch": {
+     "label": "拉伸"
+    }
+   }
+  },
+  "motionblur": {
+   "description": "依圖層關鍵影格及自動震動、擺動等動態特效，沿移動、旋轉和縮放的軌跡產生模糊。調整可縮放模糊程度。除非開啟完整模糊，否則預覽會使用較快的模糊效果。",
+   "name": "動態模糊",
+   "params": {
+    "position": {
+     "label": "位置"
+    },
+    "rotation": {
+     "label": "角度"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "tune": {
+     "label": "調整"
+    }
+   }
+  },
+  "movealongpath": {
+   "description": "將圖層放在正下方圖層輪廓的指定位置。",
+   "name": "沿路徑移動",
+   "params": {
+    "inset": {
+     "label": "內縮／外擴"
+    },
+    "offset": {
+     "label": "偏移"
+    },
+    "orientation": {
+     "label": "方向"
+    },
+    "progress": {
+     "label": "進度"
+    },
+    "rotate": {
+     "label": "自動旋轉"
+    }
+   }
+  },
+  "noise": {
+   "description": "以細微顆粒覆蓋圖層，每個像素一粒，每個影格都會變化。單色會將顆粒變成灰色，極端值讓顆粒全亮或全暗，凍結則讓圖案保持靜止。",
+   "name": "雜訊",
+   "params": {
+    "amount": {
+     "label": "強度"
+    },
+    "extremes": {
+     "label": "極端值"
+    },
+    "freeze": {
+     "label": "凍結"
+    },
+    "mono": {
+     "label": "單色"
+    },
+    "offset": {
+     "label": "偏移"
+    },
+    "overshoot": {
+     "label": "超出"
+    }
+   }
+  },
+  "noisedisplace": {
+   "description": "使用隨時間變化的平滑值雜訊來移動像素。",
+   "name": "雜訊位移",
+   "params": {
+    "amount": {
+     "label": "數量"
+    },
+    "scale": {
+     "label": "雜訊縮放"
+    },
+    "speed": {
+     "label": "動畫速度"
+    }
+   }
+  },
+  "octahedron": {
+   "description": "將圖層放到八面體的八個面上。",
+   "name": "八面體",
+   "params": {
+    "light": {
+     "label": "光線角度"
+    },
+    "perspective": {
+     "label": "透視"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "radius": {
+     "label": "半徑"
+    },
+    "rotX": {
+     "label": "X旋轉"
+    },
+    "rotY": {
+     "label": "Y旋轉"
+    },
+    "rotZ": {
+     "label": "Z旋轉"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "shading": {
+     "label": "陰影效果"
+    },
+    "shine": {
+     "label": "光澤"
+    }
+   }
+  },
+  "offset": {
+   "description": "移動圖層畫面，超出圖層邊界的部分會從另一側繞回。",
+   "name": "位移",
+   "params": {
+    "feather": {
+     "label": "羽化"
+    },
+    "mask": {
+     "label": "遮罩至圖層"
+    },
+    "offset": {
+     "label": "位移"
+    }
+   }
+  },
+  "ominodiffusion": {
+   "description": "以少量色彩重繪圖層，並沿指定方向傳遞捨入誤差，產生隨動作變化的故障抖色效果。",
+   "name": "奧米諾擴散+",
+   "params": {
+    "alpha": {
+     "label": "透明度"
+    },
+    "angle": {
+     "label": "角度"
+    },
+    "blend": {
+     "label": "混合模式",
+     "options": [
+      "正常",
+      "色彩增值",
+      "濾色"
+     ]
+    },
+    "color1": {
+     "label": "顏色1"
+    },
+    "color2": {
+     "label": "顏色2"
+    },
+    "color3": {
+     "label": "顏色3"
+    },
+    "color4": {
+     "label": "顏色4"
+    },
+    "color5": {
+     "label": "顏色5"
+    },
+    "color6": {
+     "label": "顏色6"
+    },
+    "falloff": {
+     "label": "權重衰減"
+    },
+    "palette": {
+     "label": "調色盤",
+     "options": [
+      "黑／白",
+      "RGB色調分離（2階）",
+      "RGB色調分離（3階）",
+      "RGB色調分離（4階）",
+      "灰階（3階）",
+      "灰階（4階）",
+      "CGA綠／紅／黃",
+      "CGA青／洋紅／白",
+      "CGA藍／青／洋紅／白",
+      "增加飽和度並分離色調",
+      "自訂2色",
+      "自訂3色",
+      "自訂4色",
+      "自訂5色",
+      "自訂6色"
+     ]
+    },
+    "steps": {
+     "label": "階數"
+    },
+    "strength": {
+     "label": "強度"
+    },
+    "weight": {
+     "label": "誤差權重"
+    }
+   }
+  },
+  "ominoglass": {
+   "description": "依圖層亮度製作玻璃，折射後方畫面並產生彩虹邊緣，再以鏡頭般的光線照亮表面。",
+   "name": "奧米諾玻璃",
+   "params": {
+    "aberration": {
+     "label": "色差"
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "amount": {
+     "label": "粗糙度"
+    },
+    "blend": {
+     "label": "混合"
+    },
+    "blur": {
+     "label": "斜角"
+    },
+    "color": {
+     "label": "顏色"
+    },
+    "direction": {
+     "label": "方向"
+    },
+    "elevation": {
+     "label": "仰角"
+    },
+    "evolution": {
+     "label": "演變"
+    },
+    "feature": {
+     "label": "細節大小"
+    },
+    "intensity": {
+     "label": "強度"
+    },
+    "light": {
+     "label": "光線顏色"
+    },
+    "refraction": {
+     "label": "折射"
+    },
+    "samples": {
+     "label": "平滑取樣數"
+    },
+    "scale": {
+     "label": "粗糙度縮放"
+    },
+    "seed": {
+     "label": "種子"
+    },
+    "shading": {
+     "label": "陰影效果",
+     "options": [
+      "無",
+      "點光源",
+      "方向光"
+     ]
+    },
+    "shine": {
+     "label": "光澤"
+    },
+    "specularity": {
+     "label": "鏡面反射"
+    },
+    "useLuma": {
+     "label": "使用圖層亮度"
+    }
+   }
+  },
+  "oscillate": {
+   "description": "讓圖層沿指定角度、深度或軌道來回移動。",
+   "name": "擺動",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "direction": {
+     "label": "方向",
+     "options": [
+      "角度",
+      "深度",
+      "軌道"
+     ]
+    },
+    "frequency": {
+     "label": "頻率"
+    },
+    "magnitude": {
+     "label": "幅度"
+    },
+    "phase": {
+     "label": "相位"
+    },
+    "wave": {
+     "label": "波形",
+     "options": [
+      "正弦",
+      "三角"
+     ]
+    }
+   }
+  },
+  "palettemap": {
+   "description": "將每個像素映射到調色盤中最接近的顏色：可自行選取最多8色，或使用預設集或匯入檔案中最多512色的調色盤。抖色圖案混合相鄰顏色以呈現更多色階；透明度可將映射顏色與原圖層混合。",
+   "name": "調色盤映射",
+   "params": {
+    "alpha": {
+     "label": "透明度"
+    },
+    "color1": {
+     "label": "顏色1"
+    },
+    "color2": {
+     "label": "顏色2"
+    },
+    "color3": {
+     "label": "顏色3"
+    },
+    "color4": {
+     "label": "顏色4"
+    },
+    "color5": {
+     "label": "顏色5"
+    },
+    "color6": {
+     "label": "顏色6"
+    },
+    "color7": {
+     "label": "顏色7"
+    },
+    "color8": {
+     "label": "顏色8"
+    },
+    "colors": {
+     "label": "顏色"
+    },
+    "dither": {
+     "label": "抖色"
+    },
+    "palette": {
+     "label": "調色盤"
+    },
+    "pattern": {
+     "label": "抖色圖案",
+     "options": [
+      "無",
+      "雜訊",
+      "棋盤格",
+      "拜耳2x2",
+      "拜耳3x3",
+      "拜耳4x4",
+      "拜耳8x8",
+      "群聚點4x4",
+      "群聚點8x8",
+      "水平線",
+      "垂直線",
+      "斜線",
+      "佛洛伊德－史坦伯格",
+      "偽佛洛伊德－史坦伯格",
+      "精簡席耶拉",
+      "扇形",
+      "蕭－扇形",
+      "賈維斯－朱迪斯－寧克",
+      "史塔基",
+      "伯克斯",
+      "席耶拉",
+      "雙列席耶拉",
+      "阿特金森"
+     ]
+    },
+    "source": {
+     "label": "顏色來源",
+     "options": [
+      "顏色",
+      "調色盤"
+     ]
+    }
+   }
+  },
+  "parenthelper": {
+   "description": "變更子圖層跟隨父圖層的方式：縮放和旋轉可完全跟隨、鎖定或依設定比例跟隨。自動旋轉會讓圖層移動時如車輪般轉動。",
+   "name": "父子關係輔助",
+   "params": {
+    "autoRotate": {
+     "label": "自動旋轉",
+     "options": [
+      "關閉",
+      "X軸",
+      "Y軸"
+     ]
+    },
+    "radiusAdjust": {
+     "label": "半徑調整"
+    },
+    "rotateMode": {
+     "label": "旋轉",
+     "options": [
+      "正常",
+      "鎖定",
+      "加權"
+     ]
+    },
+    "rotateWeight": {
+     "label": "旋轉權重"
+    },
+    "scaleMode": {
+     "label": "縮放",
+     "options": [
+      "正常",
+      "鎖定",
+      "加權"
+     ]
+    },
+    "scaleWeight": {
+     "label": "縮放權重"
+    }
+   }
+  },
+  "particles": {
+   "description": "讓雪花、火花、彩紙、泡泡、灰塵、愛心、星星、花瓣或圖層的小型複本從圖層飛出，並受重力、風力和旋流影響。可從預設集開始，再調整發射器、數量和作用力。「依節拍」會在每個節拍爆發粒子：請先選取音樂，開啟選單並點選「標記節拍」。",
+   "name": "粒子",
+   "params": {
+    "beats": {
+     "label": "節拍",
+     "options": [
+      "每個節拍",
+      "每2個節拍",
+      "每4個節拍"
+     ]
+    },
+    "blend": {
+     "label": "混合",
+     "options": [
+      "正常",
+      "相加",
+      "濾色"
+     ]
+    },
+    "bpm": {
+     "label": "每分鐘節拍數"
+    },
+    "color": {
+     "label": "顏色"
+    },
+    "color2": {
+     "label": "顏色2"
+    },
+    "colorMode": {
+     "label": "顏色模式",
+     "options": [
+      "單色",
+      "隨機混合",
+      "隨生命週期變化"
+     ]
+    },
+    "colorVariation": {
+     "label": "顏色變化"
+    },
+    "count": {
+     "label": "數量"
+    },
+    "depth": {
+     "label": "深度"
+    },
+    "direction": {
+     "label": "方向"
+    },
+    "drag": {
+     "label": "空氣阻力"
+    },
+    "emission": {
+     "label": "發射",
+     "options": [
+      "持續",
+      "爆發",
+      "依節拍"
+     ]
+    },
+    "emitter": {
+     "label": "發射器",
+     "options": [
+      "點",
+      "線",
+      "區域",
+      "輪廓"
+     ]
+    },
+    "emitterSize": {
+     "label": "發射器大小"
+    },
+    "endSize": {
+     "label": "結束大小"
+    },
+    "every": {
+     "label": "重複間隔"
+    },
+    "fadeIn": {
+     "label": "淡入"
+    },
+    "fadeOut": {
+     "label": "淡出"
+    },
+    "gravity": {
+     "label": "重力"
+    },
+    "kind": {
+     "label": "粒子",
+     "options": [
+      "雪花",
+      "火花",
+      "彩紙",
+      "泡泡",
+      "灰塵",
+      "愛心",
+      "星星",
+      "花瓣",
+      "圖層"
+     ]
+    },
+    "layer": {
+     "label": "圖層",
+     "options": [
+      "粒子下方",
+      "粒子上方",
+      "隱藏"
+     ]
+    },
+    "lifeVariation": {
+     "label": "生命週期變化"
+    },
+    "lifetime": {
+     "label": "生命週期"
+    },
+    "more": {
+     "label": "更多設定"
+    },
+    "orientation": {
+     "label": "方向",
+     "options": [
+      "自由",
+      "跟隨動作"
+     ]
+    },
+    "perspective": {
+     "label": "透視"
+    },
+    "position": {
+     "label": "發射器位置"
+    },
+    "prewarm": {
+     "label": "開始時填滿"
+    },
+    "randomRotation": {
+     "label": "隨機旋轉"
+    },
+    "rate": {
+     "label": "速率"
+    },
+    "seed": {
+     "label": "種子"
+    },
+    "size": {
+     "label": "大小"
+    },
+    "sizeVariation": {
+     "label": "大小變化"
+    },
+    "speed": {
+     "label": "速度"
+    },
+    "speedVariation": {
+     "label": "速度變化"
+    },
+    "spin": {
+     "label": "自轉"
+    },
+    "spinVariation": {
+     "label": "自轉變化"
+    },
+    "spread": {
+     "label": "擴散"
+    },
+    "start": {
+     "label": "爆發時間"
+    },
+    "swirl": {
+     "label": "旋流"
+    },
+    "swirlSpeed": {
+     "label": "旋流速度"
+    },
+    "tint": {
+     "label": "色調"
+    },
+    "twinkle": {
+     "label": "閃爍"
+    },
+    "wind": {
+     "label": "風力"
+    },
+    "zSpeed": {
+     "label": "Z軸速度"
+    },
+    "zSpread": {
+     "label": "Z軸擴散"
+    }
+   },
+   "presets": {
+    "beat-confetti": "節拍彩紙",
+    "bubbles": "泡泡",
+    "confetti": "彩紙",
+    "dust": "灰塵",
+    "hearts": "愛心",
+    "layer-fountain": "圖層噴泉",
+    "petals": "花瓣",
+    "snow": "雪花",
+    "sparks": "火花",
+    "twinkle": "閃爍"
+   }
+  },
+  "pixelate": {
+   "description": "以圖層為中心建立網格，將圖層變成單色方塊，每個方塊取用其中心的顏色。啟用「螢幕空間」時則以畫面為中心。拉伸、位移和角度可調整網格，暈影會讓方塊邊緣變暗。",
+   "name": "像素化",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "blockSize": {
+     "label": "大小"
+    },
+    "offset": {
+     "label": "位移"
+    },
+    "screenSpace": {
+     "label": "螢幕空間"
+    },
+    "stretch": {
+     "label": "拉伸"
+    },
+    "vignette": {
+     "label": "暈影"
+    }
+   }
+  },
+  "pixeltiles": {
+   "description": "以像素圖案小方塊組成的網格重建圖層。每個方塊依下方亮度決定圖案的顯示程度，效果如同文字藝術與馬賽克的結合。混亂可用隨機方塊打散網格。",
+   "name": "像素拼貼",
+   "params": {
+    "alpha": {
+     "label": "混合"
+    },
+    "background": {
+     "label": "背景"
+    },
+    "brightness": {
+     "label": "亮度"
+    },
+    "chaos": {
+     "label": "混亂"
+    },
+    "chaosAmount": {
+     "label": "混亂程度"
+    },
+    "chaosSpeed": {
+     "label": "混亂速度"
+    },
+    "contrast": {
+     "label": "對比"
+    },
+    "detail": {
+     "label": "細節"
+    },
+    "flip": {
+     "label": "翻轉像素"
+    },
+    "foreground": {
+     "label": "前景"
+    },
+    "levels": {
+     "label": "色階"
+    },
+    "offset": {
+     "label": "圖案位移"
+    },
+    "original": {
+     "label": "使用原始顏色"
+    },
+    "pattern": {
+     "label": "圖案",
+     "options": [
+      "高細節",
+      "數字與字母",
+      "水平線",
+      "圓點",
+      "垂直線",
+      "斑駁",
+      "圓環",
+      "實心",
+      "左斜",
+      "右斜"
+     ]
+    },
+    "randomPattern": {
+     "label": "隨機圖案"
+    },
+    "scramble": {
+     "label": "打亂方塊"
+    },
+    "seed": {
+     "label": "隨機種子"
+    },
+    "tile": {
+     "label": "方塊大小"
+    },
+    "tone": {
+     "label": "色調來源",
+     "options": [
+      "亮度",
+      "平均",
+      "紅",
+      "綠",
+      "藍"
+     ]
+    },
+    "transparent": {
+     "label": "透明背景"
+    }
+   }
+  },
+  "polar": {
+   "description": "將圖層繞中心彎曲，把直線變成圓形，或將圓形展開成直線。",
+   "name": "極座標",
+   "params": {
+    "amount": {
+     "label": "插值"
+    },
+    "direction": {
+     "label": "類型",
+     "options": [
+      "直角座標轉極座標",
+      "極座標轉直角座標"
+     ]
+    }
+   }
+  },
+  "polardisplacement": {
+   "description": "依此圖層的顏色繞中心點旋轉並拉動後方圖層，然後隱藏此圖層。",
+   "name": "極座標位移映射",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "angleChannel": {
+     "label": "角度來源",
+     "options": [
+      "紅",
+      "綠",
+      "藍",
+      "亮度",
+      "透明度"
+     ]
+    },
+    "center": {
+     "label": "中心"
+    },
+    "distanceChannel": {
+     "label": "距離來源",
+     "options": [
+      "紅",
+      "綠",
+      "藍",
+      "亮度",
+      "透明度"
+     ]
+    },
+    "edges": {
+     "label": "邊緣",
+     "options": [
+      "重複",
+      "鏡像",
+      "透明",
+      "平鋪"
+     ]
+    },
+    "fromCenter": {
+     "label": "從中心"
+    },
+    "invert": {
+     "label": "反轉"
+    },
+    "reach": {
+     "label": "向內／向外"
+    }
+   }
+  },
+  "posterize": {
+   "description": "將各顏色通道分成指定的階數，讓平滑漸層變成色帶。位移可調整色帶邊緣的位置。",
+   "name": "色調分離",
+   "params": {
+    "levels": {
+     "label": "階數"
+    },
+    "offset": {
+     "label": "位移"
+    }
+   }
+  },
+  "pulseopacity": {
+   "description": "依正弦波或三角波反覆淡出及淡入圖層。",
+   "name": "脈衝不透明度",
+   "params": {
+    "frequency": {
+     "label": "頻率"
+    },
+    "phase": {
+     "label": "起始相位"
+    },
+    "strength": {
+     "label": "強度"
+    },
+    "wave": {
+     "label": "波形",
+     "options": [
+      "正弦",
+      "三角"
+     ]
+    }
+   }
+  },
+  "pulsesize": {
+   "description": "依正弦波或三角波反覆放大及縮小圖層。",
+   "name": "脈衝大小",
+   "params": {
+    "frequency": {
+     "label": "頻率"
+    },
+    "grow": {
+     "label": "放大"
+    },
+    "phase": {
+     "label": "起始相位"
+    },
+    "shrink": {
+     "label": "縮小"
+    },
+    "wave": {
+     "label": "波形",
+     "options": [
+      "正弦",
+      "三角"
+     ]
+    }
+   }
+  },
+  "puppet": {
+   "description": "像人偶般彎曲圖層：放置圖釘後拖曳或為圖釘製作動畫，畫面便會平順跟隨。",
+   "name": "人偶圖釘",
+   "params": {
+    "density": {
+     "label": "三角網格密度"
+    },
+    "expansion": {
+     "label": "網格擴張"
+    },
+    "falloff": {
+     "label": "衰減"
+    },
+    "sway": {
+     "label": "搖擺"
+    },
+    "swayAmount": {
+     "label": "搖擺幅度"
+    },
+    "swayAngle": {
+     "label": "搖擺角度"
+    },
+    "swayDirection": {
+     "label": "搖擺方向",
+     "options": [
+      "角度",
+      "隨機"
+     ]
+    },
+    "swayPins": {
+     "label": "搖擺圖釘",
+     "options": [
+      "全部",
+      "已選取"
+     ]
+    },
+    "swaySeed": {
+     "label": "搖擺種子"
+    },
+    "swaySpeed": {
+     "label": "搖擺速度"
+    }
+   }
+  },
+  "pyramid": {
+   "description": "將圖層放到四角錐的各個面上。",
+   "name": "金字塔",
+   "params": {
+    "base": {
+     "label": "底邊"
+    },
+    "height": {
+     "label": "高度"
+    },
+    "light": {
+     "label": "光線角度"
+    },
+    "perspective": {
+     "label": "透視"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "rotX": {
+     "label": "X旋轉"
+    },
+    "rotY": {
+     "label": "Y旋轉"
+    },
+    "rotZ": {
+     "label": "Z旋轉"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "shading": {
+     "label": "陰影效果"
+    },
+    "shine": {
+     "label": "光澤"
+    }
+   }
+  },
+  "radialblur": {
+   "description": "沿中心點向外的射線平均取樣，套用強度可調的放射狀縮放模糊。",
+   "name": "縮放模糊",
+   "params": {
+    "amount": {
+     "label": "強度"
+    },
+    "center": {
+     "label": "中心"
+    }
+   }
+  },
+  "radialrays": {
+   "description": "從指定點在圖層不透明的部分繪製實心放射光線。",
+   "name": "放射光線",
+   "params": {
+    "alpha": {
+     "label": "透明度"
+    },
+    "angle": {
+     "label": "角度"
+    },
+    "center": {
+     "label": "中心"
+    },
+    "color": {
+     "label": "顏色"
+    },
+    "count": {
+     "label": "數量"
+    },
+    "width": {
+     "label": "寬度"
+    }
+   }
+  },
+  "radialrepeat": {
+   "description": "動態產生多個圖層複本，並排列成圓形。",
+   "name": "放射狀重複",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "copyDelay": {
+     "label": "每個複本的延遲"
+    },
+    "count": {
+     "label": "數量"
+    },
+    "easing": {
+     "label": "緩動",
+     "options": [
+      "線性",
+      "緩入",
+      "緩出",
+      "緩入緩出"
+     ]
+    },
+    "fillAmount": {
+     "label": "填色量"
+    },
+    "fillColor": {
+     "label": "填色顏色"
+    },
+    "orientation": {
+     "label": "方向"
+    },
+    "radius": {
+     "label": "半徑"
+    },
+    "randomOpacity": {
+     "label": "隨機不透明度"
+    },
+    "randomOrder": {
+     "label": "隨機順序"
+    },
+    "randomPosition": {
+     "label": "隨機位置"
+    },
+    "randomRotation": {
+     "label": "隨機旋轉"
+    },
+    "randomScale": {
+     "label": "隨機縮放"
+    },
+    "rangeEnd": {
+     "label": "範圍終點"
+    },
+    "rangeOffset": {
+     "label": "範圍位移"
+    },
+    "rangeOpacity": {
+     "label": "範圍不透明度"
+    },
+    "rangePosition": {
+     "label": "範圍位置"
+    },
+    "rangeRotation": {
+     "label": "範圍旋轉"
+    },
+    "rangeScale": {
+     "label": "範圍縮放"
+    },
+    "rangeStart": {
+     "label": "範圍起點"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "seed": {
+     "label": "種子"
+    },
+    "sweep": {
+     "label": "掃掠角度"
+    }
+   }
+  },
+  "radialshadow": {
+   "description": "從圖層不透明的部分投射長陰影，朝遠離光源的方向擴散。",
+   "name": "放射狀陰影",
+   "params": {
+    "alpha": {
+     "label": "透明度"
+    },
+    "color": {
+     "label": "顏色"
+    },
+    "fade": {
+     "label": "淡化"
+    },
+    "light": {
+     "label": "光線"
+    },
+    "reach": {
+     "label": "長度"
+    }
+   }
+  },
+  "radialwipe": {
+   "description": "從起始角度繞中心掃過並隱藏扇形區域，如同時鐘指針。「進度」控制掃過的角度，「數量」沿圓周重複扇形，「雙向」則朝兩側掃過。為進度製作動畫即可建立轉場。",
+   "name": "放射狀擦除",
+   "params": {
+    "center": {
+     "label": "中心"
+    },
+    "count": {
+     "label": "數量"
+    },
+    "direction": {
+     "label": "方向",
+     "options": [
+      "順時針",
+      "逆時針",
+      "雙向"
+     ]
+    },
+    "feather": {
+     "label": "羽化"
+    },
+    "progress": {
+     "label": "進度"
+    },
+    "start": {
+     "label": "起始角度"
+    }
+   }
+  },
+  "randomdisplace": {
+   "description": "讓圖層隨時間平順地隨機移動。種子可選擇不同的移動方式，速度控制移動快慢，演變則會改變移動模式。",
+   "name": "隨機位移",
+   "params": {
+    "evolution": {
+     "label": "演變"
+    },
+    "magnitude": {
+     "label": "幅度"
+    },
+    "scatter": {
+     "label": "散布"
+    },
+    "seed": {
+     "label": "種子"
+    },
+    "speed": {
+     "label": "速度"
+    }
+   }
+  },
+  "randomjitter": {
+   "description": "讓圖層沿指定角度隨機來回跳動。",
+   "name": "隨機抖動",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "frequency": {
+     "label": "頻率"
+    },
+    "magnitude": {
+     "label": "幅度"
+    },
+    "seed": {
+     "label": "種子"
+    },
+    "slack": {
+     "label": "鬆弛度"
+    },
+    "zjitter": {
+     "label": "Z軸抖動"
+    }
+   }
+  },
+  "rasterextrude": {
+   "description": "將圖層畫面擠出成立體方塊，側面採用內部顏色。",
+   "name": "點陣擠出",
+   "params": {
+    "depth": {
+     "label": "深度"
+    },
+    "interior": {
+     "label": "內部顏色"
+    },
+    "light": {
+     "label": "光線角度"
+    },
+    "perspective": {
+     "label": "透視"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "rotX": {
+     "label": "X旋轉"
+    },
+    "rotY": {
+     "label": "Y旋轉"
+    },
+    "rotZ": {
+     "label": "Z旋轉"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "shading": {
+     "label": "陰影效果"
+    },
+    "shine": {
+     "label": "光澤"
+    }
+   }
+  },
+  "rastertransform": {
+   "description": "在上方特效處理後，縮放、旋轉及移動圖層的最終畫面，讓特效結果也能變形。填色可在下方保留部分原圖，遮罩至圖層則將結果限制在原始形狀內。",
+   "name": "點陣變形",
+   "params": {
+    "alpha": {
+     "label": "透明度"
+    },
+    "angle": {
+     "label": "角度"
+    },
+    "fill": {
+     "label": "填色"
+    },
+    "mask": {
+     "label": "遮罩至圖層"
+    },
+    "offset": {
+     "label": "位移"
+    },
+    "sampling": {
+     "label": "取樣",
+     "options": [
+      "最鄰近",
+      "線性"
+     ]
+    },
+    "scale": {
+     "label": "縮放"
+    }
+   }
+  },
+  "rays": {
+   "description": "從圖層的明亮部分發出光線，朝遠離中心點的方向照射。",
+   "name": "光線",
+   "params": {
+    "blend": {
+     "label": "混合"
+    },
+    "center": {
+     "label": "中心"
+    },
+    "color": {
+     "label": "顏色"
+    },
+    "intensity": {
+     "label": "強度"
+    },
+    "reach": {
+     "label": "長度"
+    },
+    "style": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
+    },
+    "threshold": {
+     "label": "閾值"
+    },
+    "thresholdAdd": {
+     "label": "閾值增加"
+    }
+   }
+  },
+  "reorient360": {
+   "description": "在球體內旋轉360°全景圖層，以調平地平線或改變正面方向。",
+   "name": "360°球體重新定向",
+   "params": {
+    "pitch": {
+     "label": "俯仰"
+    },
+    "roll": {
+     "label": "翻滾"
+    },
+    "yaw": {
+     "label": "偏航"
+    }
+   }
+  },
+  "repeat": {
+   "description": "動態產生多個圖層複本。",
+   "name": "重複器",
+   "params": {
+    "alpha": {
+     "label": "透明度"
+    },
+    "angle": {
+     "label": "角度"
+    },
+    "count": {
+     "label": "數量"
+    },
+    "offset": {
+     "label": "位移"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "time": {
+     "label": "時間"
+    }
+   }
+  },
+  "repeatalongpath": {
+   "description": "沿正下方圖層的輪廓路徑，動態產生多個圖層複本。",
+   "name": "沿路徑重複",
+   "params": {
+    "copyDelay": {
+     "label": "每個複本的延遲"
+    },
+    "count": {
+     "label": "數量"
+    },
+    "easing": {
+     "label": "緩動",
+     "options": [
+      "線性",
+      "緩入",
+      "緩出",
+      "緩入緩出"
+     ]
+    },
+    "end": {
+     "label": "終點"
+    },
+    "fillAmount": {
+     "label": "填色量"
+    },
+    "fillColor": {
+     "label": "填色顏色"
+    },
+    "phase": {
+     "label": "相位"
+    },
+    "randomOpacity": {
+     "label": "隨機不透明度"
+    },
+    "randomOrder": {
+     "label": "隨機順序"
+    },
+    "randomPosition": {
+     "label": "隨機位置"
+    },
+    "randomRotation": {
+     "label": "隨機旋轉"
+    },
+    "randomScale": {
+     "label": "隨機縮放"
+    },
+    "rangeEnd": {
+     "label": "範圍終點"
+    },
+    "rangeOffset": {
+     "label": "範圍位移"
+    },
+    "rangeOpacity": {
+     "label": "範圍不透明度"
+    },
+    "rangePosition": {
+     "label": "範圍位置"
+    },
+    "rangeRotation": {
+     "label": "範圍旋轉"
+    },
+    "rangeScale": {
+     "label": "範圍縮放"
+    },
+    "rangeStart": {
+     "label": "範圍起點"
+    },
+    "seed": {
+     "label": "種子"
+    },
+    "start": {
+     "label": "起點"
+    },
+    "tangent": {
+     "label": "切線"
+    }
+   }
+  },
+  "replacecolor": {
+   "description": "以另一種顏色取代指定顏色。透明度控制取代強度；鎖定亮度可保留原始明暗。",
+   "name": "取代顏色",
+   "params": {
+    "alpha": {
+     "label": "透明度"
+    },
+    "choke": {
+     "label": "收縮"
+    },
+    "feather": {
+     "label": "羽化"
+    },
+    "lockLuminance": {
+     "label": "鎖定亮度"
+    },
+    "source": {
+     "label": "取代顏色"
+    },
+    "target": {
+     "label": "新顏色"
+    },
+    "threshold": {
+     "label": "閾值"
+    }
+   }
+  },
+  "retrodither": {
+   "description": "將圖層轉成復古像素圖：每個像素方塊取用調色盤中的顏色，可使用舊遊戲機、電腦或匯入的調色盤，再以抖色圖案混合顏色，模擬更多色階。",
+   "name": "復古抖色",
+   "params": {
+    "alpha": {
+     "label": "混合"
+    },
+    "dither": {
+     "label": "強度"
+    },
+    "palette": {
+     "label": "調色盤"
+    },
+    "pattern": {
+     "label": "抖色",
+     "options": [
+      "無",
+      "雜訊",
+      "棋盤格",
+      "Bayer 2x2",
+      "Bayer 3x3",
+      "Bayer 4x4",
+      "Bayer 8x8",
+      "聚集點4x4",
+      "聚集點8x8",
+      "水平線",
+      "垂直線",
+      "斜線",
+      "Floyd-Steinberg",
+      "偽Floyd-Steinberg",
+      "Sierra精簡版",
+      "Fan",
+      "Shiau-Fan",
+      "Jarvis-Judice-Ninke",
+      "Stucki",
+      "Burkes",
+      "Sierra",
+      "雙列Sierra",
+      "Atkinson"
+     ]
+    },
+    "pixel": {
+     "label": "像素大小"
+    }
+   }
+  },
+  "rgbsplit": {
+   "description": "分離紅、綠、藍色通道：中心通道保持不動，另外兩個通道沿角度向相反方向偏移。亮色會相加偏移的顏色，暗色保留實色，遮罩只保留三者重疊處，明度則依亮度決定邊緣色的不透明度。",
+   "name": "RGB分離",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "center": {
+     "label": "中心",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
+    },
+    "mode": {
+     "label": "模式",
+     "options": [
+      "亮色",
+      "暗色",
+      "遮罩",
+      "明度"
+     ]
+    },
+    "strength": {
+     "label": "強度"
+    }
+   }
+  },
+  "ribbon": {
+   "description": "在圖層不透明的部分繪製寬度變化的扭轉緞帶；為相位製作動畫可讓緞帶流動，也可從圖層中挖空緞帶。",
+   "name": "緞帶",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "color": {
+     "label": "顏色"
+    },
+    "frequency": {
+     "label": "頻率"
+    },
+    "magnitude": {
+     "label": "幅度"
+    },
+    "offset": {
+     "label": "偏移"
+    },
+    "phase": {
+     "label": "相位"
+    },
+    "punch": {
+     "label": "挖空"
+    },
+    "smoothing": {
+     "label": "平滑"
+    },
+    "tint": {
+     "label": "色調"
+    },
+    "tintAmount": {
+     "label": "色調強度"
+    },
+    "width": {
+     "label": "寬度"
+    }
+   }
+  },
+  "ripple": {
+   "description": "從中心向外擴散的同心漣漪，可調整振幅、波長和速度。",
+   "name": "漣漪",
+   "params": {
+    "amplitude": {
+     "label": "振幅"
+    },
+    "center": {
+     "label": "中心"
+    },
+    "speed": {
+     "label": "速度"
+    },
+    "wavelength": {
+     "label": "波長"
+    }
+   }
+  },
+  "roughenedges": {
+   "description": "以雜訊侵蝕不透明區域的邊緣，產生撕裂、磨損或燒焦的輪廓。",
+   "name": "粗糙邊緣",
+   "params": {
+    "blur": {
+     "label": "邊框"
+    },
+    "evolution": {
+     "label": "演變"
+    },
+    "octaves": {
+     "label": "倍頻層數"
+    },
+    "roughness": {
+     "label": "粗糙度"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "seed": {
+     "label": "隨機種子"
+    }
+   }
+  },
+  "scaleassist": {
+   "description": "在圖層原有大小上沿X、Y或雙軸額外縮放，也可讓X與Y反向縮放。以此圖層為父圖層的圖層會跟隨新大小。",
+   "name": "縮放輔助",
+   "params": {
+    "axis": {
+     "label": "軸向",
+     "options": [
+      "X",
+      "Y",
+      "X,Y",
+      "X,-Y"
+     ]
+    },
+    "damp": {
+     "label": "阻尼"
+    },
+    "scale": {
+     "label": "縮放"
+    }
+   }
+  },
+  "scanlines": {
+   "description": "加入水平掃描線，呈現CRT螢幕效果，並可選擇垂直滾動。",
+   "name": "掃描線",
+   "params": {
+    "darkness": {
+     "label": "暗度"
+    },
+    "roll_speed": {
+     "label": "滾動速度"
+    },
+    "spacing": {
+     "label": "線條間距"
+    }
+   }
+  },
+  "scatter3d": {
+   "description": "將圖層變成網格排列的散布3D碎片。",
+   "name": "3D散布",
+   "params": {
+    "axis": {
+     "label": "扭轉軸",
+     "options": [
+      "X",
+      "Y",
+      "Z"
+     ]
+    },
+    "depth": {
+     "label": "網格深度"
+    },
+    "depthSpacing": {
+     "label": "深度間距"
+    },
+    "intensity": {
+     "label": "光源強度"
+    },
+    "light": {
+     "label": "光源方向"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "perspective": {
+     "label": "透視"
+    },
+    "rotX": {
+     "label": "X軸旋轉"
+    },
+    "rotY": {
+     "label": "Y軸旋轉"
+    },
+    "rotZ": {
+     "label": "Z軸旋轉"
+    },
+    "scatter": {
+     "label": "散布"
+    },
+    "seed": {
+     "label": "隨機種子"
+    },
+    "shading": {
+     "label": "明暗"
+    },
+    "shape": {
+     "label": "形狀",
+     "options": [
+      "立方體",
+      "球體",
+      "正方形",
+      "圓形"
+     ]
+    },
+    "size": {
+     "label": "碎片大小"
+    },
+    "spacing": {
+     "label": "網格間距"
+    },
+    "spin": {
+     "label": "散布旋轉"
+    },
+    "twist": {
+     "label": "扭轉角度"
+    }
+   }
+  },
+  "scatterfield": {
+   "description": "隱藏原圖層，將圖層複本散布在無限的3D空間中，並可透過關鍵影格動畫模擬三維移動。",
+   "name": "散布場",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "amount": {
+     "label": "數量"
+    },
+    "angle": {
+     "label": "角度"
+    },
+    "angleVariance": {
+     "label": "角度變化"
+    },
+    "blending": {
+     "label": "混合模式",
+     "options": [
+      "正常",
+      "相加",
+      "濾色",
+      "色彩增值",
+      "變亮",
+      "變暗",
+      "覆蓋",
+      "差異"
+     ]
+    },
+    "color1": {
+     "label": "顏色1"
+    },
+    "color2": {
+     "label": "顏色2"
+    },
+    "color3": {
+     "label": "顏色3"
+    },
+    "coloring": {
+     "label": "著色",
+     "options": [
+      "無",
+      "隨機",
+      "深度"
+     ]
+    },
+    "density": {
+     "label": "密度"
+    },
+    "evolution": {
+     "label": "演變"
+    },
+    "fade": {
+     "label": "淡化"
+    },
+    "interpolateHue": {
+     "label": "色相插值"
+    },
+    "lockLuminance": {
+     "label": "鎖定亮度"
+    },
+    "lockSaturation": {
+     "label": "鎖定飽和度"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "seed": {
+     "label": "隨機種子"
+    },
+    "size": {
+     "label": "大小"
+    },
+    "sizeVariance": {
+     "label": "大小變化"
+    },
+    "slack": {
+     "label": "鬆弛度"
+    },
+    "z": {
+     "label": "Z軸位置"
+    }
+   }
+  },
+  "sepia": {
+   "description": "溫暖的棕褐色調，宛如老照片。",
+   "name": "懷舊棕褐色",
+   "params": {
+    "amount": {
+     "label": "強度"
+    }
+   }
+  },
+  "sharpen": {
+   "description": "使用3x3鄰近像素套用遮色片銳利化，強化細節。",
+   "name": "銳利化",
+   "params": {
+    "amount": {
+     "label": "強度"
+    },
+    "radius": {
+     "label": "半徑"
+    }
+   }
+  },
+  "shutterblur": {
+   "description": "依圖層實際移動、旋轉和縮放的路徑產生模糊，如同攝影機快門。快門角度越大，殘影越長；取樣越多，殘影越平滑。未開啟完整模糊時，預覽會顯示較快速的模糊效果。",
+   "name": "真實動態模糊",
+   "params": {
+    "samples": {
+     "label": "取樣數"
+    },
+    "shutter": {
+     "label": "快門角度"
+    }
+   }
+  },
+  "simplestarfield": {
+   "description": "在圖層不透明的部分散布不同深度的小星星。位置可透過視差移動星空，深度可穿越星空，縮放可拉近或拉遠，大小和羽化可調整星星形狀，數量則控制星星數目。",
+   "name": "簡易星空",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "amount": {
+     "label": "數量"
+    },
+    "blend": {
+     "label": "混合模式",
+     "options": [
+      "正常",
+      "相加",
+      "濾色",
+      "色彩增值"
+     ]
+    },
+    "brightness": {
+     "label": "亮度"
+    },
+    "color": {
+     "label": "顏色"
+    },
+    "depth": {
+     "label": "深度"
+    },
+    "feather": {
+     "label": "羽化"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "starSize": {
+     "label": "大小"
+    }
+   }
+  },
+  "smear": {
+   "description": "將圖層沿一個方向拖出固定長度的殘影，如同快速移動。",
+   "name": "拖影",
+   "params": {
+    "angle": {
+     "label": "方向"
+    },
+    "length": {
+     "label": "長度"
+    }
+   }
+  },
+  "smoothbevel": {
+   "description": "為圖層不透明部分加上圓滑的斜角，並從一側打光。",
+   "name": "平滑斜角",
+   "params": {
+    "angle": {
+     "label": "光源角度"
+    },
+    "blur": {
+     "label": "大小"
+    },
+    "depth": {
+     "label": "深度"
+    },
+    "highlight": {
+     "label": "亮部"
+    },
+    "intensity": {
+     "label": "強度"
+    },
+    "shadow": {
+     "label": "陰影"
+    }
+   }
+  },
+  "smoothedges": {
+   "description": "將圖層不透明部分的邊緣磨圓、平滑，不改變內部顏色。限制於圖層只允許邊緣向內移動。",
+   "name": "平滑邊緣",
+   "params": {
+    "blur": {
+     "label": "強度"
+    },
+    "mask": {
+     "label": "限制於圖層"
+    }
+   }
+  },
+  "softglow": {
+   "description": "以濾色模式疊加柔和模糊的圖片複本，讓亮部產生夢幻光暈。",
+   "name": "柔光暈",
+   "params": {
+    "blend": {
+     "label": "混合"
+    },
+    "blur": {
+     "label": "大小"
+    },
+    "brightness": {
+     "label": "亮度"
+    },
+    "color": {
+     "label": "顏色"
+    },
+    "contrast": {
+     "label": "對比"
+    },
+    "highlights": {
+     "label": "亮部"
+    },
+    "opacity": {
+     "label": "不透明度"
+    },
+    "outside": {
+     "label": "外側光暈"
+    }
+   }
+  },
+  "solid": {
+   "description": "在圖層上覆蓋單一顏色並保留其形狀，可選擇混合模式。",
+   "name": "純色",
+   "params": {
+    "amount": {
+     "label": "Alpha"
+    },
+    "blend": {
+     "label": "混合模式",
+     "options": [
+      "正常",
+      "色彩增值",
+      "濾色",
+      "覆蓋",
+      "柔光",
+      "實光",
+      "相加",
+      "變暗",
+      "變亮",
+      "差異",
+      "加亮顏色",
+      "加深顏色"
+     ]
+    },
+    "color": {
+     "label": "顏色"
+    }
+   }
+  },
+  "solidmatte": {
+   "description": "在圖層後方加入純色，填滿透明部分。挖空只顯示扣除圖層形狀的顏色；螢幕空間則填滿整個畫面，而非圖層範圍。",
+   "name": "純色底",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "color": {
+     "label": "顏色"
+    },
+    "punch": {
+     "label": "挖空"
+    },
+    "screenSpace": {
+     "label": "螢幕空間"
+    }
+   }
+  },
+  "spherize": {
+   "description": "以前方投影或等距長方形紋理將圖層包覆在球面上。",
+   "name": "球面化",
+   "params": {
+    "coverage": {
+     "label": "覆蓋範圍"
+    },
+    "light": {
+     "label": "光源角度"
+    },
+    "perspective": {
+     "label": "透視"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "projection": {
+     "label": "投影",
+     "options": [
+      "前方",
+      "等距長方形"
+     ]
+    },
+    "radius": {
+     "label": "半徑"
+    },
+    "rotX": {
+     "label": "X軸旋轉"
+    },
+    "rotY": {
+     "label": "Y軸旋轉"
+    },
+    "rotZ": {
+     "label": "Z軸旋轉"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "shading": {
+     "label": "明暗"
+    },
+    "shine": {
+     "label": "光澤"
+    }
+   }
+  },
+  "spillclean": {
+   "description": "去除去背後圖層邊緣殘留的綠色或藍色光暈，同時保留像素亮度。",
+   "name": "去除溢色",
+   "params": {
+    "blur": {
+     "label": "邊緣寬度"
+    },
+    "channel": {
+     "label": "溢色",
+     "options": [
+      "自動",
+      "綠色",
+      "藍色"
+     ]
+    },
+    "strength": {
+     "label": "強度"
+    }
+   }
+  },
+  "spin": {
+   "description": "讓圖層以固定速度持續旋轉；小於零時反向旋轉。",
+   "name": "旋轉",
+   "params": {
+    "rpm": {
+     "label": "每分鐘轉數"
+    }
+   }
+  },
+  "spinblur": {
+   "description": "以某點為中心環狀模糊圖層，如同旋轉中的效果。",
+   "name": "旋轉模糊",
+   "params": {
+    "center": {
+     "label": "中心"
+    },
+    "sweep": {
+     "label": "角度"
+    }
+   }
+  },
+  "spinstreaks": {
+   "description": "將圖層複本繞某點旋轉，並混合重疊處，產生弧形光痕。R、G、B、A可分別選擇保留複本的最小值、最大值或平均值，也可不處理該通道。",
+   "name": "旋轉光痕",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "最小",
+      "最大",
+      "平均",
+      "關閉"
+     ]
+    },
+    "alpha": {
+     "label": "Alpha"
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "最小",
+      "最大",
+      "平均",
+      "關閉"
+     ]
+    },
+    "bias": {
+     "label": "偏差"
+    },
+    "center": {
+     "label": "中心"
+    },
+    "g": {
+     "label": "G",
+     "options": [
+      "最小",
+      "最大",
+      "平均",
+      "關閉"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "最小",
+      "最大",
+      "平均",
+      "關閉"
+     ]
+    },
+    "sweep": {
+     "label": "掃掠"
+    }
+   }
+  },
+  "splittone": {
+   "description": "分別為陰影和亮部染上不同色相，同時保留黑白與亮度。陰影階調會彎曲亮度曲線，亮部階調會調整亮部顏色的起始位置。漸層對應樣式僅依像素亮度指定顏色。",
+   "name": "分離色調",
+   "params": {
+    "highlightAmount": {
+     "label": "亮部強度"
+    },
+    "highlightHue": {
+     "label": "亮部色相"
+    },
+    "highlightLevel": {
+     "label": "亮部階調"
+    },
+    "shadowAmount": {
+     "label": "陰影強度"
+    },
+    "shadowHue": {
+     "label": "陰影色相"
+    },
+    "shadowLevel": {
+     "label": "陰影階調"
+    },
+    "style": {
+     "label": "樣式",
+     "options": [
+      "色調",
+      "漸層對應"
+     ]
+    }
+   }
+  },
+  "spotcolor": {
+   "description": "保留圖層中的一種顏色，移除其他顏色的飽和度。",
+   "name": "局部色彩",
+   "params": {
+    "choke": {
+     "label": "收縮"
+    },
+    "color": {
+     "label": "顏色"
+    },
+    "feather": {
+     "label": "羽化"
+    },
+    "saturation": {
+     "label": "飽和度"
+    },
+    "threshold": {
+     "label": "閾值"
+    }
+   }
+  },
+  "squeeze": {
+   "description": "強度為正時向內擠壓圖層中央，為負時向外凸出。舊版可保留舊專案的形狀。",
+   "name": "擠壓",
+   "params": {
+    "amount": {
+     "label": "強度"
+    },
+    "shape": {
+     "label": "形狀",
+     "options": [
+      "擠壓／膨脹",
+      "舊版"
+     ]
+    }
+   }
+  },
+  "star": {
+   "description": "在圖層上繪製一顆發光的星星。",
+   "name": "星星",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blend": {
+     "label": "混合模式",
+     "options": [
+      "正常",
+      "色彩增值",
+      "濾色",
+      "覆蓋",
+      "柔光",
+      "實光",
+      "相加",
+      "變暗",
+      "變亮",
+      "差異",
+      "加亮顏色",
+      "加深顏色"
+     ]
+    },
+    "brightness": {
+     "label": "亮度"
+    },
+    "color": {
+     "label": "顏色"
+    },
+    "points": {
+     "label": "尖角數"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "radius": {
+     "label": "半徑"
+    },
+    "shine": {
+     "label": "光澤"
+    }
+   }
+  },
+  "starfield": {
+   "description": "在圖層不透明的部分填入有深度的星空。偏移可在星空中移動，近處的星星比遠處移動得更遠。",
+   "name": "星空",
+   "params": {
+    "brightness": {
+     "label": "亮度"
+    },
+    "darkMatter": {
+     "label": "暗物質"
+    },
+    "offset": {
+     "label": "偏移"
+    },
+    "scale": {
+     "label": "縮放"
+    }
+   }
+  },
+  "starpolyhedron": {
+   "description": "將圖層套用到由兩個交叉角錐組成的星形上。",
+   "name": "星形多面體",
+   "params": {
+    "light": {
+     "label": "光源角度"
+    },
+    "perspective": {
+     "label": "透視"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "radius": {
+     "label": "半徑"
+    },
+    "rotX": {
+     "label": "X軸旋轉"
+    },
+    "rotY": {
+     "label": "Y軸旋轉"
+    },
+    "rotZ": {
+     "label": "Z軸旋轉"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "shading": {
+     "label": "明暗"
+    },
+    "shine": {
+     "label": "光澤"
+    }
+   }
+  },
+  "starprism": {
+   "description": "將圖層裁成星形並賦予深度。",
+   "name": "星形稜柱",
+   "params": {
+    "depth": {
+     "label": "深度"
+    },
+    "inner": {
+     "label": "內半徑"
+    },
+    "light": {
+     "label": "光源角度"
+    },
+    "perspective": {
+     "label": "透視"
+    },
+    "points": {
+     "label": "尖角數"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "radius": {
+     "label": "半徑"
+    },
+    "rotX": {
+     "label": "X軸旋轉"
+    },
+    "rotY": {
+     "label": "Y軸旋轉"
+    },
+    "rotZ": {
+     "label": "Z軸旋轉"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "shading": {
+     "label": "明暗"
+    },
+    "shine": {
+     "label": "光澤"
+    },
+    "smoothing": {
+     "label": "平滑"
+    }
+   }
+  },
+  "static": {
+   "description": "閃爍的灰色雜訊，如同沒有訊號的電視。",
+   "name": "電視雜訊",
+   "params": {
+    "amount": {
+     "label": "強度"
+    },
+    "grain": {
+     "label": "大小"
+    }
+   }
+  },
+  "stretch": {
+   "description": "沿一條線切開圖層並拉開兩側，將線上的像素拉伸以填滿空隙。",
+   "name": "拉伸區段",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "offset": {
+     "label": "偏移"
+    },
+    "relative": {
+     "label": "以圖層大小為基準"
+    },
+    "spread": {
+     "label": "展開"
+    },
+    "stretch": {
+     "label": "拉伸"
+    }
+   }
+  },
+  "stretchaxis": {
+   "description": "沿任意方向拉伸圖層。",
+   "name": "軸向拉伸",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "mask": {
+     "label": "限制於圖層"
+    },
+    "scale": {
+     "label": "縮放"
+    }
+   }
+  },
+  "stripes": {
+   "description": "在圖層不透明的部分繪製條紋，或從圖層中挖空條紋。",
+   "name": "條紋",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "color": {
+     "label": "顏色"
+    },
+    "count": {
+     "label": "數量"
+    },
+    "phase": {
+     "label": "相位"
+    },
+    "punch": {
+     "label": "挖空"
+    },
+    "screenSpace": {
+     "label": "螢幕空間"
+    },
+    "smoothing": {
+     "label": "平滑"
+    },
+    "width": {
+     "label": "寬度"
+    }
+   }
+  },
+  "stroketaper": {
+   "description": "讓手繪的鋼筆和筆刷筆畫，以及線條和形狀的描邊（邊框與陰影＞描邊）逐漸變細至尖端。從無到起點漸粗，從終點到無漸細。擠壓可讓漸細效果更銳利。",
+   "name": "描邊漸細",
+   "params": {
+    "end": {
+     "label": "終點"
+    },
+    "squeeze": {
+     "label": "擠壓"
+    },
+    "start": {
+     "label": "起點"
+    }
+   }
+  },
+  "swing": {
+   "description": "讓圖層在兩個角度之間來回旋轉。",
+   "name": "擺動",
+   "params": {
+    "angle1": {
+     "label": "角度1"
+    },
+    "angle2": {
+     "label": "角度2"
+    },
+    "frequency": {
+     "label": "頻率"
+    },
+    "phase": {
+     "label": "相位"
+    },
+    "wave": {
+     "label": "波形",
+     "options": [
+      "正弦波",
+      "三角波"
+     ]
+    }
+   }
+  },
+  "temperature": {
+   "description": "以開爾文色溫調整圖片冷暖；6500 K不會改變圖片。",
+   "name": "色溫",
+   "params": {
+    "kelvin": {
+     "label": "色溫"
+    },
+    "strength": {
+     "label": "強度"
+    }
+   }
+  },
+  "textblips": {
+   "description": "逐字顯示文字，並為每個字播放短音效，如同遊戲角色說話。選擇聲音後，可設定音高、打字速度及標點後的停頓時間。空格和標點不會發聲。",
+   "name": "文字音效",
+   "params": {
+    "delay": {
+     "label": "延遲"
+    },
+    "every": {
+     "label": "發聲間隔"
+    },
+    "pause": {
+     "label": "標點停頓"
+    },
+    "pitch": {
+     "label": "音高"
+    },
+    "reveal": {
+     "label": "逐字顯示"
+    },
+    "seed": {
+     "label": "隨機種子"
+    },
+    "speed": {
+     "label": "速度"
+    },
+    "variation": {
+     "label": "音高變化"
+    },
+    "voice": {
+     "label": "聲音",
+     "options": [
+      "經典",
+      "柔和",
+      "低沉",
+      "高音",
+      "機器人",
+      "尖叫聲",
+      "打字機",
+      "晶片音樂"
+     ]
+    },
+    "volume": {
+     "label": "音量"
+    }
+   },
+   "presets": {
+    "fast-talker": "快嘴",
+    "hero": "英雄",
+    "monster": "怪物",
+    "robot": "機器人",
+    "typewriter": "打字機"
+   }
+  },
+  "textpath": {
+   "description": "將文字逐字沿弧線、圓形或正下方圖層的輪廓排列，保留文字的字形、字型和表情符號。",
+   "name": "路徑文字",
+   "params": {
+    "align": {
+     "label": "對齊",
+     "options": [
+      "靠左",
+      "置中",
+      "靠右"
+     ]
+    },
+    "baseline": {
+     "label": "基線偏移"
+    },
+    "center": {
+     "label": "中心"
+    },
+    "control1": {
+     "label": "控制點1"
+    },
+    "control2": {
+     "label": "控制點2"
+    },
+    "end": {
+     "label": "終點"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "radius": {
+     "label": "半徑"
+    },
+    "reverse": {
+     "label": "反轉路徑"
+    },
+    "rotate": {
+     "label": "旋轉文字"
+    },
+    "shape": {
+     "label": "路徑",
+     "options": [
+      "弧線",
+      "圓形",
+      "下方圖層"
+     ]
+    },
+    "start": {
+     "label": "起點"
+    }
+   }
+  },
+  "textprogress": {
+   "description": "依字元、單字或行顯示起點與終點之間的文字，可選擇淡化、滑動、縮放或模糊效果。",
+   "name": "文字進度",
+   "params": {
+    "appearance": {
+     "label": "出現方式",
+     "options": [
+      "彈出",
+      "淡化",
+      "向上滑入",
+      "向下滑入",
+      "向左滑入",
+      "向右滑入",
+      "放大",
+      "縮小",
+      "模糊"
+     ]
+    },
+    "direction": {
+     "label": "方向",
+     "options": [
+      "從起點",
+      "從終點",
+      "從中心",
+      "隨機"
+     ]
+    },
+    "distance": {
+     "label": "距離"
+    },
+    "progress": {
+     "label": "終點"
+    },
+    "seed": {
+     "label": "隨機種子"
+    },
+    "softness": {
+     "label": "柔和度"
+    },
+    "start": {
+     "label": "起點"
+    },
+    "unit": {
+     "label": "依據",
+     "options": [
+      "字元",
+      "單字",
+      "行"
+     ]
+    }
+   },
+   "presets": {
+    "fade-in-by-word": "逐詞淡入",
+    "pop-in": "彈入",
+    "slide-up-by-letter": "逐字向上滑入",
+    "typewriter": "打字機"
+   }
+  },
+  "textrandomizer": {
+   "description": "隨機替換起點與終點之間指定數量的字元。為演變製作動畫或提高速度可變更替換的字元；顯示會讓文字恢復原樣。",
+   "name": "文字隨機化",
+   "params": {
+    "amount": {
+     "label": "數量"
+    },
+    "characters": {
+     "label": "自訂"
+    },
+    "charset": {
+     "label": "字元",
+     "options": [
+      "字母",
+      "大寫字母",
+      "小寫字母",
+      "數字",
+      "字母和數字",
+      "符號",
+      "自訂"
+     ]
+    },
+    "direction": {
+     "label": "方向",
+     "options": [
+      "從起點",
+      "從終點",
+      "從中心",
+      "隨機"
+     ]
+    },
+    "end": {
+     "label": "終點"
+    },
+    "evolution": {
+     "label": "演變"
+    },
+    "keepSpaces": {
+     "label": "保留空格"
+    },
+    "progress": {
+     "label": "顯示"
+    },
+    "seed": {
+     "label": "隨機種子"
+    },
+    "speed": {
+     "label": "速度"
+    },
+    "start": {
+     "label": "起點"
+    }
+   },
+   "presets": {
+    "scramble": "亂碼還原"
+   }
+  },
+  "textshake": {
+   "description": "讓每個字各自抖動，如同遊戲中緊張的對話。抖動會在位置之間漂移，跳動會逐步跳至新位置，波浪讓文字上下起伏，圓形讓文字繞小圈移動，搖晃則讓文字來回傾斜。降低抖動字數可只讓部分文字抖動，並每隔一段時間重新隨機選取。",
+   "name": "文字抖動",
+   "params": {
+    "amount": {
+     "label": "強度"
+    },
+    "cycles": {
+     "label": "速度"
+    },
+    "end": {
+     "label": "終點"
+    },
+    "every": {
+     "label": "每隔多久換字"
+    },
+    "letters": {
+     "label": "抖動字數"
+    },
+    "rotation": {
+     "label": "旋轉"
+    },
+    "seed": {
+     "label": "種子"
+    },
+    "speed": {
+     "label": "速度"
+    },
+    "spread": {
+     "label": "擴散"
+    },
+    "start": {
+     "label": "起點"
+    },
+    "style": {
+     "label": "樣式",
+     "options": [
+      "抖動",
+      "抖動",
+      "波浪",
+      "圓周",
+      "搖晃"
+     ]
+    },
+    "tilt": {
+     "label": "傾斜"
+    },
+    "unit": {
+     "label": "依據",
+     "options": [
+      "字元",
+      "單字",
+      "行"
+     ]
+    }
+   },
+   "presets": {
+    "dizzy": "暈眩",
+    "floaty": "飄浮",
+    "nervous": "緊張",
+    "scared": "驚嚇",
+    "uneasy": "不安",
+    "wavy": "起伏",
+    "wobbly": "搖擺"
+   }
+  },
+  "texttransform": {
+   "description": "在範圍內移動、縮放、旋轉、淡化字母、單字或行並為其上色。錨點決定縮放與旋轉是以各個部分還是圖層中心為基準。用位移移動範圍，讓變化在文字中依序傳遞。",
+   "name": "文字變形",
+   "params": {
+    "anchor": {
+     "label": "錨點",
+     "options": [
+      "各部分",
+      "圖層"
+     ]
+    },
+    "end": {
+     "label": "終點"
+    },
+    "offset": {
+     "label": "位移"
+    },
+    "opacity": {
+     "label": "不透明度"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "randomOrder": {
+     "label": "隨機順序"
+    },
+    "rotation": {
+     "label": "旋轉"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "seed": {
+     "label": "種子"
+    },
+    "shape": {
+     "label": "形狀",
+     "options": [
+      "方形",
+      "漸強",
+      "漸弱",
+      "三角形",
+      "圓形",
+      "平滑"
+     ]
+    },
+    "smoothness": {
+     "label": "平滑度"
+    },
+    "start": {
+     "label": "起點"
+    },
+    "tint": {
+     "label": "染色"
+    },
+    "unit": {
+     "label": "依據",
+     "options": [
+      "字元",
+      "單字",
+      "行"
+     ]
+    }
+   },
+   "presets": {
+    "spin-cascade": "旋轉串接",
+    "wave": "波浪"
+   }
+  },
+  "threshold": {
+   "description": "純黑白，以指定亮度為界分開。",
+   "name": "臨界值",
+   "params": {
+    "blend": {
+     "label": "混合模式",
+     "options": [
+      "正常",
+      "色彩增值",
+      "濾色",
+      "覆蓋",
+      "柔光",
+      "強光",
+      "相加",
+      "變暗",
+      "變亮",
+      "差異化",
+      "加亮顏色",
+      "加深顏色"
+     ]
+    },
+    "invert": {
+     "label": "反相"
+    },
+    "level": {
+     "label": "臨界值"
+    },
+    "softness": {
+     "label": "羽化"
+    }
+   }
+  },
+  "tile": {
+   "description": "將畫面重複排成網格。",
+   "name": "拼貼",
+   "params": {
+    "mirror": {
+     "label": "鏡像"
+    },
+    "offset": {
+     "label": "位移"
+    },
+    "scale": {
+     "label": "縮放"
+    }
+   }
+  },
+  "tilerotate": {
+   "description": "將圖層分成網格拼貼，並讓每個拼貼內的畫面各自旋轉。",
+   "name": "拼貼旋轉",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "count": {
+     "label": "數量"
+    },
+    "offset": {
+     "label": "位移"
+    },
+    "random": {
+     "label": "隨機化"
+    },
+    "rotation": {
+     "label": "旋轉"
+    },
+    "seed": {
+     "label": "種子"
+    },
+    "stretch": {
+     "label": "拉伸"
+    }
+   }
+  },
+  "tiles": {
+   "description": "重複圖層以填滿畫面。提高裁切可得到更小的拼貼，並可搭配鏡像、列位移與旋轉。舊版縮放用於保留舊專案的外觀。",
+   "name": "平鋪",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "mirror": {
+     "label": "鏡像"
+    },
+    "offset": {
+     "label": "位移"
+    },
+    "sizing": {
+     "label": "尺寸方式",
+     "options": [
+      "裁切",
+      "舊版縮放"
+     ]
+    },
+    "vertical": {
+     "label": "垂直位移"
+    },
+    "zoom": {
+     "label": "裁切"
+    }
+   }
+  },
+  "tileshift": {
+   "description": "將圖層分成網格拼貼，並讓每個拼貼內的畫面朝隨機方向滑動。",
+   "name": "拼貼位移",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "count": {
+     "label": "數量"
+    },
+    "offset": {
+     "label": "位移"
+    },
+    "seed": {
+     "label": "種子"
+    },
+    "strength": {
+     "label": "強度"
+    },
+    "stretch": {
+     "label": "拉伸"
+    }
+   }
+  },
+  "timecode": {
+   "description": "將圖層的文字換成跑動的時鐘，顯示圖層或專案的時間。設定起始時間並將速度設為負值，即可倒數計時。",
+   "name": "時間碼",
+   "params": {
+    "format": {
+     "label": "格式",
+     "options": [
+      "HH:MM:SS:FF",
+      "HH:MM:SS",
+      "MM:SS",
+      "MM:SS.hh",
+      "SS.hh",
+      "影格"
+     ]
+    },
+    "offset": {
+     "label": "起始時間"
+    },
+    "source": {
+     "label": "時間",
+     "options": [
+      "圖層",
+      "專案"
+     ]
+    },
+    "speed": {
+     "label": "速度"
+    }
+   }
+  },
+  "timequant": {
+   "description": "讓此圖層以較低的影格速率移動，呈現卡頓或定格動畫的效果。",
+   "name": "影格速率",
+   "params": {
+    "fps": {
+     "label": "每秒影格數"
+    }
+   }
+  },
+  "tint": {
+   "description": "依混合量，將畫面的亮度對應到陰影顏色與亮部顏色之間。",
+   "name": "染色",
+   "params": {
+    "amount": {
+     "label": "強度"
+    },
+    "highlightColor": {
+     "label": "亮部顏色"
+    },
+    "shadowColor": {
+     "label": "陰影顏色"
+    }
+   }
+  },
+  "torus": {
+   "description": "將圖層環繞成一個圓環。",
+   "name": "圓環",
+   "params": {
+    "light": {
+     "label": "光線角度"
+    },
+    "perspective": {
+     "label": "透視"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "radius": {
+     "label": "半徑"
+    },
+    "rotX": {
+     "label": "旋轉 X"
+    },
+    "rotY": {
+     "label": "旋轉 Y"
+    },
+    "rotZ": {
+     "label": "旋轉 Z"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "shading": {
+     "label": "明暗"
+    },
+    "shine": {
+     "label": "光澤"
+    },
+    "thickness": {
+     "label": "粗細"
+    }
+   }
+  },
+  "tunnel": {
+   "description": "用圖層鋪成一條無盡的隧道，並穿梭其中。相位會沿著隧道長度移動紋理。",
+   "name": "隧道",
+   "params": {
+    "fog": {
+     "label": "霧氣"
+    },
+    "fogColor": {
+     "label": "霧氣顏色"
+    },
+    "phase": {
+     "label": "相位"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "repeat": {
+     "label": "重複"
+    },
+    "rotX": {
+     "label": "旋轉 X"
+    },
+    "rotY": {
+     "label": "旋轉 Y"
+    },
+    "rotZ": {
+     "label": "旋轉 Z"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "speed": {
+     "label": "速度"
+    },
+    "twist": {
+     "label": "扭轉"
+    }
+   }
+  },
+  "turbulence": {
+   "description": "以平滑的碎形雜訊填滿圖層的不透明部分，可做出雲、煙或亮度對應圖。",
+   "name": "紊流",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "bias": {
+     "label": "偏移量"
+    },
+    "blend": {
+     "label": "混合模式",
+     "options": [
+      "正常",
+      "色彩增值",
+      "濾色",
+      "覆蓋",
+      "柔光",
+      "強光",
+      "相加",
+      "變暗",
+      "變亮",
+      "差異化",
+      "加亮顏色",
+      "加深顏色"
+     ]
+    },
+    "color1": {
+     "label": "顏色 1"
+    },
+    "color2": {
+     "label": "顏色 2"
+    },
+    "evolution": {
+     "label": "演變"
+    },
+    "intensity": {
+     "label": "強度"
+    },
+    "octaves": {
+     "label": "疊代層數"
+    },
+    "offset": {
+     "label": "位移"
+    },
+    "parallax": {
+     "label": "視差"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "seed": {
+     "label": "種子"
+    },
+    "stretch": {
+     "label": "拉伸"
+    }
+   }
+  },
+  "turbulentdisplace": {
+   "description": "以平滑的碎形雜訊推動圖層，可做出火焰、水波、熱浪扭曲或粗糙自然的邊緣。",
+   "name": "紊流位移",
+   "params": {
+    "bias": {
+     "label": "偏移量"
+    },
+    "direction": {
+     "label": "方向",
+     "options": [
+      "兩者",
+      "水平",
+      "垂直",
+      "放射狀",
+      "扭轉"
+     ]
+    },
+    "evolution": {
+     "label": "演變"
+    },
+    "octaves": {
+     "label": "疊代層數"
+    },
+    "offset": {
+     "label": "位移"
+    },
+    "parallax": {
+     "label": "視差"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "seed": {
+     "label": "種子"
+    },
+    "strength": {
+     "label": "強度"
+    },
+    "stretch": {
+     "label": "拉伸"
+    }
+   }
+  },
+  "twirl": {
+   "description": "像漩渦一樣繞著中心扭轉圖層，中央最強，到半徑處（圖層大小的比例）逐漸消失。強度為負值時反向扭轉。",
+   "name": "漩渦",
+   "params": {
+    "center": {
+     "label": "中心"
+    },
+    "radius": {
+     "label": "半徑"
+    },
+    "strength": {
+     "label": "強度"
+    }
+   }
+  },
+  "unsharpmask": {
+   "description": "將圖層與其模糊複本之間的差異加回去，藉此銳利化。強度決定模糊範圍有多大，數量決定加回多少，臨界值高於 50% 時會忽略細微差異。",
+   "name": "遮色片銳利化",
+   "params": {
+    "amount": {
+     "label": "數量"
+    },
+    "radius": {
+     "label": "強度"
+    },
+    "showMask": {
+     "label": "顯示遮罩"
+    },
+    "threshold": {
+     "label": "臨界值"
+    }
+   }
+  },
+  "vhs": {
+   "description": "呈現老舊錄影帶的樣子：色彩溢出、線條拖影、掃描線、磁帶雜訊與滾動的追蹤條紋。",
+   "name": "VHS",
+   "params": {
+    "chroma": {
+     "label": "色彩溢出"
+    },
+    "headSwitch": {
+     "label": "磁頭切換"
+    },
+    "noise": {
+     "label": "雜訊"
+    },
+    "saturation": {
+     "label": "飽和度"
+    },
+    "scanlines": {
+     "label": "掃描線"
+    },
+    "seed": {
+     "label": "種子"
+    },
+    "smear": {
+     "label": "拖影"
+    },
+    "tracking": {
+     "label": "追蹤"
+    },
+    "wobble": {
+     "label": "晃動"
+    }
+   }
+  },
+  "videofeedback": {
+   "description": "不斷把圖層畫進自己裡面，就像攝影機對著自己的螢幕。移動、縮放或旋轉圖層即可控制隧道的走向。",
+   "name": "影像回授",
+   "params": {
+    "blend": {
+     "label": "混合",
+     "options": [
+      "正常",
+      "相加",
+      "濾色"
+     ]
+    },
+    "center": {
+     "label": "中心"
+    },
+    "copies": {
+     "label": "複本數"
+    },
+    "delay": {
+     "label": "延遲"
+    },
+    "fade": {
+     "label": "淡出"
+    },
+    "hueShift": {
+     "label": "色相偏移"
+    },
+    "offset": {
+     "label": "位移"
+    },
+    "rotation": {
+     "label": "旋轉"
+    },
+    "useLayerTransform": {
+     "label": "使用圖層變形"
+    },
+    "zoom": {
+     "label": "縮放"
+    }
+   }
+  },
+  "viewer360": {
+   "description": "透過可旋轉與縮放的虛擬攝影機，檢視 360° 全景圖層。",
+   "name": "360° 檢視器",
+   "params": {
+    "fov": {
+     "label": "視野"
+    },
+    "pitch": {
+     "label": "俯仰"
+    },
+    "roll": {
+     "label": "翻滾"
+    },
+    "yaw": {
+     "label": "偏航"
+    }
+   }
+  },
+  "vignette": {
+   "description": "讓圖層在圓角形狀外朝邊緣變暗：大小決定形狀，圓度決定有多圓，羽化決定邊緣多柔和，強度決定變暗程度，染色決定帶入多少顏色。挖空則讓邊緣變成透明。",
+   "name": "暈映",
+   "params": {
+    "color": {
+     "label": "顏色"
+    },
+    "extent": {
+     "label": "大小"
+    },
+    "feather": {
+     "label": "羽化"
+    },
+    "punch": {
+     "label": "挖空"
+    },
+    "rounding": {
+     "label": "圓度"
+    },
+    "strength": {
+     "label": "強度"
+    },
+    "style": {
+     "label": "樣式",
+     "options": [
+      "圓角",
+      "柔和橢圓"
+     ]
+    },
+    "tint": {
+     "label": "染色"
+    }
+   }
+  },
+  "voronoicells": {
+   "description": "以隨機點周圍的細胞圖樣填滿圖層的不透明部分。",
+   "name": "沃羅諾伊細胞",
+   "params": {
+    "color1": {
+     "label": "顏色 1"
+    },
+    "color2": {
+     "label": "顏色 2"
+    },
+    "lineColor": {
+     "label": "線條顏色"
+    },
+    "lineWidth": {
+     "label": "線寬"
+    },
+    "phase": {
+     "label": "相位"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "seed": {
+     "label": "種子"
+    }
+   }
+  },
+  "wavewarp": {
+   "description": "以正弦波彎曲圖層：間距決定有幾道波穿過，幅度決定推動多遠，角度決定波的行進方向，扭曲角度決定推動方向。",
+   "name": "波浪扭曲",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "magnitude": {
+     "label": "幅度"
+    },
+    "phase": {
+     "label": "相位"
+    },
+    "spacing": {
+     "label": "間距"
+    },
+    "speed": {
+     "label": "速度"
+    },
+    "warpAngle": {
+     "label": "扭曲角度"
+    }
+   }
+  },
+  "wipe": {
+   "description": "從相對的兩側隱藏圖層。為起點或終點製作動畫，即可做出擦除轉場。",
+   "name": "擦除",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "end": {
+     "label": "終點"
+    },
+    "feather": {
+     "label": "羽化"
+    },
+    "softness": {
+     "label": "柔和度"
+    },
+    "start": {
+     "label": "起點"
+    }
+   }
+  },
+  "zoomstreaks": {
+   "description": "將圖層的複本繞著某個點縮放並保留最亮的像素，做出從該點射出的光束。平均則會變成縮放模糊。R、G、B、A 可逐一選擇複本要保留最低值、最高值或平均值，或不處理該色版。",
+   "name": "縮放光束",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "最小",
+      "最大",
+      "平均",
+      "關閉"
+     ]
+    },
+    "alpha": {
+     "label": "Alpha"
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "最小",
+      "最大",
+      "平均",
+      "關閉"
+     ]
+    },
+    "bias": {
+     "label": "偏移量"
+    },
+    "center": {
+     "label": "中心"
+    },
+    "g": {
+     "label": "G",
+     "options": [
+      "最小",
+      "最大",
+      "平均",
+      "關閉"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "最小",
+      "最大",
+      "平均",
+      "關閉"
+     ]
+    },
+    "strength": {
+     "label": "強度"
+    }
+   }
+  }
+ }
+}

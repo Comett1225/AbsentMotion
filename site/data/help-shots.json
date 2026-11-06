@@ -23,7 +23,14 @@
     "vi": "Màn hình chính: menu (1), tìm kiếm (2), Dự án và Tài nguyên (3), một thẻ dự án (4), nút menu thẻ (5) và Dự án mới (6).",
     "es-ES": "La pantalla de inicio: menú (1), búsqueda (2), Proyectos y Recursos (3), una tarjeta de proyecto (4), el botón de menú de la tarjeta (5) y Nuevo proyecto (6).",
     "ur": "ہوم اسکرین: مینو (1)، تلاش (2)، پروجیکٹس اور ایسیٹس (3)، ایک پروجیکٹ کارڈ (4)، کارڈ مینو بٹن (5) اور نیا پروجیکٹ (6)۔",
-    "ja": "ホーム画面：メニュー(1)、検索(2)、プロジェクトとアセット(3)、プロジェクトカード(4)、カードメニューボタン(5)、新規プロジェクト(6)です。"
+    "ja": "ホーム画面：メニュー(1)、検索(2)、プロジェクトとアセット(3)、プロジェクトカード(4)、カードメニューボタン(5)、新規プロジェクト(6)です。",
+    "ko": "홈 화면: 메뉴 (1), 검색 (2), 프로젝트 및 에셋 (3), 프로젝트 카드 (4), 카드 메뉴 버튼 (5), 새 프로젝트 (6).",
+    "zh-TW": "主畫面：選單 (1)、搜尋 (2)、專案與素材 (3)、專案卡片 (4)、卡片選單按鈕 (5)、新增專案 (6)。",
+    "zh-CN": "主屏幕：菜单 (1)、搜索 (2)、项目和素材 (3)、项目卡片 (4)、卡片菜单按钮 (5)、新建项目 (6)。",
+    "fr": "L’écran d’accueil : menu (1), recherche (2), Projets et Ressources (3), une carte de projet (4), le bouton de menu de la carte (5) et Nouveau projet (6).",
+    "de": "Der Startbildschirm: Menü (1), Suche (2), Projekte und Assets (3), eine Projektkarte (4), die Menüschaltfläche der Karte (5) und Neues Projekt (6).",
+    "it": "La schermata iniziale: menu (1), ricerca (2), Progetti e Risorse (3), una scheda progetto (4), il pulsante del menu della scheda (5) e Nuovo progetto (6).",
+    "pl": "Ekran główny: menu (1), wyszukiwanie (2), Projekty i Zasoby (3), karta projektu (4), przycisk menu karty (5) i Nowy projekt (6)."
    },
    "start": {
     "scene": "demo",
@@ -110,7 +117,14 @@
     "vi": "Nút menu thẻ (1) mở menu thẻ (2): Xuất, Nhân bản, Thu thập phương tiện vào dự án, Lịch sử phiên bản và Xóa.",
     "es-ES": "El botón de menú de la tarjeta (1) abre el menú de la tarjeta (2): Exportar, Duplicar, Recopilar medios en el proyecto, Historial de versiones y Eliminar.",
     "ur": "کارڈ مینو بٹن (1) کارڈ مینو (2) کھولتا ہے: ایکسپورٹ، ڈپلیکیٹ، پروجیکٹ میں میڈیا جمع کریں، ورژن ہسٹری اور حذف کریں۔",
-    "ja": "カードメニューボタン(1)をタップするとカードメニュー(2)が開きます。書き出し、複製、メディアをプロジェクトにまとめる、バージョン履歴、削除があります。"
+    "ja": "カードメニューボタン(1)をタップするとカードメニュー(2)が開きます。書き出し、複製、メディアをプロジェクトにまとめる、バージョン履歴、削除があります。",
+    "ko": "카드 메뉴 버튼 (1)을 누르면 카드 메뉴 (2)가 열립니다: 내보내기, 복제, 미디어를 프로젝트에 모으기, 버전 기록, 삭제.",
+    "zh-TW": "卡片選單按鈕 (1) 會開啟卡片選單 (2)：匯出、複製、將媒體收集至專案、版本紀錄、刪除。",
+    "zh-CN": "卡片菜单按钮 (1) 会打开卡片菜单 (2)：导出、复制、将媒体收集到项目、版本历史、删除。",
+    "fr": "Le bouton de menu de la carte (1) ouvre le menu de la carte (2) : Exporter, Dupliquer, Rassembler les médias dans le projet, Historique des versions et Supprimer.",
+    "de": "Die Menüschaltfläche der Karte (1) öffnet das Kartenmenü (2): Exportieren, Duplizieren, Medien im Projekt sammeln, Versionsverlauf und Löschen.",
+    "it": "Il pulsante del menu della scheda (1) apre il menu della scheda (2): Esporta, Duplica, Raccogli i media nel progetto, Cronologia versioni ed Elimina.",
+    "pl": "Przycisk menu karty (1) otwiera menu karty (2): Eksportuj, Duplikuj, Zbierz multimedia w projekcie, Historia wersji i Usuń."
    },
    "start": "home",
    "steps": [
@@ -173,7 +187,14 @@
     "vi": "Bảng dự án mới: DỰ ÁN hoặc TÀI NGUYÊN (1), tên (2), hình dạng (3), Độ phân giải (4), Tốc độ khung hình (5), Nền (6) và TẠO DỰ ÁN (7).",
     "es-ES": "La hoja de nuevo proyecto: PROYECTO o RECURSO (1), el nombre (2), la forma (3), Resolución (4), Velocidad de fotogramas (5), Fondo (6) y CREAR PROYECTO (7).",
     "ur": "نیا پروجیکٹ شیٹ: پروجیکٹ یا ایسیٹ (1)، نام (2)، شکل (3)، ریزولوشن (4)، فریم ریٹ (5)، بیک گراؤنڈ (6) اور پروجیکٹ بنائیں (7)۔",
-    "ja": "新規プロジェクトシート：プロジェクトまたはアセット(1)、名前(2)、形状(3)、解像度(4)、フレームレート(5)、背景(6)、プロジェクトを作成(7)です。"
+    "ja": "新規プロジェクトシート：プロジェクトまたはアセット(1)、名前(2)、形状(3)、解像度(4)、フレームレート(5)、背景(6)、プロジェクトを作成(7)です。",
+    "ko": "새 프로젝트 시트: 프로젝트 또는 에셋 (1), 이름 (2), 도형 (3), 해상도 (4), 프레임 레이트 (5), 배경 (6), 프로젝트 만들기 (7).",
+    "zh-TW": "新增專案面板：專案或素材 (1)、名稱 (2)、形狀 (3)、解析度 (4)、影格速率 (5)、背景 (6)、建立專案 (7)。",
+    "zh-CN": "新建项目面板：项目或素材 (1)、名称 (2)、形状 (3)、分辨率 (4)、帧率 (5)、背景 (6)、创建项目 (7)。",
+    "fr": "La feuille de nouveau projet : PROJET ou RESSOURCE (1), le nom (2), la forme (3), Résolution (4), Fréquence d’images (5), Arrière-plan (6) et CRÉER UN PROJET (7).",
+    "de": "Das Blatt für neue Projekte: PROJEKT oder ASSET (1), der Name (2), die Form (3), Auflösung (4), Bildrate (5), Hintergrund (6) und Projekt erstellen (7).",
+    "it": "Il foglio del nuovo progetto: PROGETTO o RISORSA (1), il nome (2), la forma (3), Risoluzione (4), Frequenza fotogrammi (5), Sfondo (6) e CREA PROGETTO (7).",
+    "pl": "Arkusz nowego projektu: PROJEKT lub ZASÓB (1), nazwa (2), kształt (3), Rozdzielczość (4), Liczba klatek na sekundę (5), Tło (6) i UTWÓRZ PROJEKT (7)."
    },
    "start": "home",
    "steps": [
@@ -282,7 +303,14 @@
     "vi": "Trên màn hình chính, nhấn vào nút tròn + (1) để bắt đầu một dự án.",
     "es-ES": "En la pantalla de inicio, toca el botón redondo + (1) para iniciar un proyecto.",
     "ur": "ہوم اسکرین پر پروجیکٹ شروع کرنے کے لیے گول + بٹن (1) پر ٹیپ کریں۔",
-    "ja": "ホーム画面で丸い+ボタン(1)をタップしてプロジェクトを開始します。"
+    "ja": "ホーム画面で丸い+ボタン(1)をタップしてプロジェクトを開始します。",
+    "ko": "홈 화면에서 둥근 + 버튼 (1)을 눌러 프로젝트를 시작하세요.",
+    "zh-TW": "在主畫面點一下圓形的 + 按鈕 (1) 即可開始專案。",
+    "zh-CN": "在主屏幕上点按圆形的 + 按钮 (1) 即可开始项目。",
+    "fr": "Sur l’écran d’accueil, touchez le bouton rond + (1) pour démarrer un projet.",
+    "de": "Tippe auf dem Startbildschirm auf die runde Schaltfläche + (1), um ein Projekt zu starten.",
+    "it": "Nella schermata iniziale, tocca il pulsante rotondo + (1) per iniziare un progetto.",
+    "pl": "Na ekranie głównym dotknij okrągłego przycisku + (1), aby rozpocząć projekt."
    },
    "start": "home",
    "highlight": [
@@ -321,7 +349,14 @@
     "vi": "Trong trình chỉnh sửa, nhấn vào nút tròn + (1) để thêm hình dạng, ảnh hoặc văn bản.",
     "es-ES": "En el editor, toca el botón redondo + (1) para añadir una forma, una foto o texto.",
     "ur": "ایڈیٹر میں شکل، تصویر یا ٹیکسٹ شامل کرنے کے لیے گول + بٹن (1) پر ٹیپ کریں۔",
-    "ja": "エディターで丸い+ボタン(1)をタップしてシェイプ、写真、テキストを追加します。"
+    "ja": "エディターで丸い+ボタン(1)をタップしてシェイプ、写真、テキストを追加します。",
+    "ko": "편집기에서 둥근 + 버튼 (1)을 눌러 도형, 사진 또는 텍스트를 추가하세요.",
+    "zh-TW": "在編輯器中點一下圓形的 + 按鈕 (1)，即可新增形狀、照片或文字。",
+    "zh-CN": "在编辑器中点按圆形的 + 按钮 (1)，即可添加形状、照片或文本。",
+    "fr": "Dans l’éditeur, touchez le bouton rond + (1) pour ajouter une forme, une photo ou du texte.",
+    "de": "Tippe im Editor auf die runde Schaltfläche + (1), um eine Form, ein Foto oder Text hinzuzufügen.",
+    "it": "Nell’editor, tocca il pulsante rotondo + (1) per aggiungere una forma, una foto o del testo.",
+    "pl": "W edytorze dotknij okrągłego przycisku + (1), aby dodać kształt, zdjęcie lub tekst."
    },
    "start": {
     "scene": "demo",
@@ -365,7 +400,14 @@
     "vi": "Nhấn vào biểu tượng chia sẻ trên thanh trên cùng (1), rồi nhấn Xuất.",
     "es-ES": "Toca el icono de compartir de la barra superior (1) y luego Exportar.",
     "ur": "ٹاپ بار میں شیئر آئیکن (1) پر ٹیپ کریں، پھر ایکسپورٹ۔",
-    "ja": "トップバーの共有アイコン(1)をタップし、書き出しを選びます。"
+    "ja": "トップバーの共有アイコン(1)をタップし、書き出しを選びます。",
+    "ko": "상단 바의 공유 아이콘 (1)을 누른 다음 내보내기를 선택하세요.",
+    "zh-TW": "點一下頂端列的分享圖示 (1)，再選擇匯出。",
+    "zh-CN": "点按顶部栏中的分享图标 (1)，然后选择导出。",
+    "fr": "Touchez l’icône de partage dans la barre du haut (1), puis Exporter.",
+    "de": "Tippe oben in der Leiste auf das Teilen-Symbol (1) und dann auf Exportieren.",
+    "it": "Tocca l’icona di condivisione nella barra superiore (1), poi Esporta.",
+    "pl": "Dotknij ikony udostępniania na górnym pasku (1), a potem Eksportuj."
    },
    "start": {
     "scene": "demo",
@@ -409,7 +451,14 @@
     "vi": "Bốn phần của trình chỉnh sửa: thanh trên cùng (1), phần xem trước (2), thanh phát (3) và dòng thời gian cùng các công cụ của nó (4).",
     "es-ES": "Las cuatro partes del editor: la barra superior (1), la vista previa (2), la barra de reproducción (3) y la línea de tiempo con sus herramientas (4).",
     "ur": "ایڈیٹر کے چار حصے: ٹاپ بار (1)، پری ویو (2)، پلے بار (3) اور ٹائم لائن مع اس کے ٹولز (4)۔",
-    "ja": "エディターの4つの部分：トップバー(1)、プレビュー(2)、プレイバー(3)、ツール付きのタイムライン(4)です。"
+    "ja": "エディターの4つの部分：トップバー(1)、プレビュー(2)、プレイバー(3)、ツール付きのタイムライン(4)です。",
+    "ko": "편집기의 네 부분: 상단 바 (1), 미리보기 (2), 재생 바 (3), 도구가 있는 타임라인 (4).",
+    "zh-TW": "編輯器的四個部分：頂端列 (1)、預覽 (2)、播放列 (3)，以及附有工具的時間軸 (4)。",
+    "zh-CN": "编辑器的四个部分：顶部栏 (1)、预览 (2)、播放栏 (3)，以及带工具的时间轴 (4)。",
+    "fr": "Les quatre parties de l’éditeur : la barre du haut (1), l’aperçu (2), la barre de lecture (3) et la timeline avec ses outils (4).",
+    "de": "Die vier Teile des Editors: die obere Leiste (1), die Vorschau (2), die Wiedergabeleiste (3) und die Zeitleiste mit ihren Werkzeugen (4).",
+    "it": "Le quattro parti dell’editor: la barra superiore (1), l’anteprima (2), la barra di riproduzione (3) e la timeline con i suoi strumenti (4).",
+    "pl": "Cztery części edytora: górny pasek (1), podgląd (2), pasek odtwarzania (3) i oś czasu z narzędziami (4)."
    },
    "start": {
     "scene": "demo",
@@ -509,7 +558,14 @@
     "vi": "Thanh trên cùng khi một lớp được chọn: Quay lại (1), tên lớp (2), nút lớp cha (3), Xóa lớp (4) và Menu lớp (5).",
     "es-ES": "La barra superior con una capa seleccionada: Atrás (1), el nombre de la capa (2), el botón de elemento principal (3), Eliminar capa (4) y Menú de capa (5).",
     "ur": "ٹاپ بار مع منتخب لیئر: واپس (1)، لیئر کا نام (2)، پیرنٹ بٹن (3)، لیئر حذف کریں (4) اور لیئر مینو (5)۔",
-    "ja": "レイヤーを選択した状態のトップバー：戻る(1)、レイヤー名(2)、親ボタン(3)、レイヤーを削除(4)、レイヤーメニュー(5)です。"
+    "ja": "レイヤーを選択した状態のトップバー：戻る(1)、レイヤー名(2)、親ボタン(3)、レイヤーを削除(4)、レイヤーメニュー(5)です。",
+    "ko": "레이어를 선택했을 때의 상단 바: 뒤로 (1), 레이어 이름 (2), 부모 버튼 (3), 레이어 삭제 (4), 레이어 메뉴 (5).",
+    "zh-TW": "選取圖層時的頂端列：返回 (1)、圖層名稱 (2)、父層按鈕 (3)、刪除圖層 (4)、圖層選單 (5)。",
+    "zh-CN": "选中图层时的顶部栏：返回 (1)、图层名称 (2)、父级按钮 (3)、删除图层 (4)、图层菜单 (5)。",
+    "fr": "La barre du haut avec un calque sélectionné : Retour (1), le nom du calque (2), le bouton parent (3), Supprimer le calque (4) et Menu du calque (5).",
+    "de": "Die obere Leiste bei ausgewählter Ebene: Zurück (1), der Ebenenname (2), die Schaltfläche für die übergeordnete Ebene (3), Ebene löschen (4) und Ebenenmenü (5).",
+    "it": "La barra superiore con un livello selezionato: Indietro (1), il nome del livello (2), il pulsante genitore (3), Elimina livello (4) e Menu livello (5).",
+    "pl": "Górny pasek przy zaznaczonej warstwie: Wstecz (1), nazwa warstwy (2), przycisk warstwy nadrzędnej (3), Usuń warstwę (4) i Menu warstwy (5)."
    },
    "start": {
     "scene": "demo",
@@ -597,7 +653,14 @@
     "vi": "Cài đặt dự án: hình dạng (1), Độ phân giải (2), Tốc độ khung hình (3), Nền (4) và Phiên bản trước (5).",
     "es-ES": "Ajustes del proyecto: la forma (1), Resolución (2), Velocidad de fotogramas (3), Fondo (4) y Versiones anteriores (5).",
     "ur": "پروجیکٹ سیٹنگز: شکل (1)، ریزولوشن (2)، فریم ریٹ (3)، بیک گراؤنڈ (4) اور پرانے ورژنز (5)۔",
-    "ja": "プロジェクト設定：形状(1)、解像度(2)、フレームレート(3)、背景(4)、以前のバージョン(5)です。"
+    "ja": "プロジェクト設定：形状(1)、解像度(2)、フレームレート(3)、背景(4)、以前のバージョン(5)です。",
+    "ko": "프로젝트 설정: 도형 (1), 해상도 (2), 프레임 레이트 (3), 배경 (4), 이전 버전 (5).",
+    "zh-TW": "專案設定：形狀 (1)、解析度 (2)、影格速率 (3)、背景 (4)、先前版本 (5)。",
+    "zh-CN": "项目设置：形状 (1)、分辨率 (2)、帧率 (3)、背景 (4)、历史版本 (5)。",
+    "fr": "Paramètres du projet : la forme (1), Résolution (2), Fréquence d’images (3), Arrière-plan (4) et Versions précédentes (5).",
+    "de": "Projekteinstellungen: die Form (1), Auflösung (2), Bildrate (3), Hintergrund (4) und Frühere Versionen (5).",
+    "it": "Impostazioni progetto: la forma (1), Risoluzione (2), Frequenza fotogrammi (3), Sfondo (4) e Versioni precedenti (5).",
+    "pl": "Ustawienia projektu: kształt (1), Rozdzielczość (2), Liczba klatek na sekundę (3), Tło (4) i Wcześniejsze wersje (5)."
    },
    "start": {
     "scene": "demo",
@@ -697,7 +760,14 @@
     "vi": "Dải xem trước: Xem trước pixel (1), Lưới (2), Chỉ hiển thị các lớp đã chọn (3), Khung nhìn máy ảnh (4), chất lượng xem trước (5), chế độ nhòe (6) và thu phóng (7).",
     "es-ES": "La tira de vista previa: Vista previa de píxeles (1), Cuadrícula (2), Aislar las capas seleccionadas (3), Vista de cámara (4), la calidad de la vista previa (5), el modo de desenfoque (6) y zoom (7).",
     "ur": "پری ویو اسٹرپ: پکسل پری ویو (1)، گرڈ (2)، منتخب لیئرز کو سولو کریں (3)، کیمرہ ویو (4)، پری ویو کوالٹی (5)، بلر موڈ (6) اور زوم (7)۔",
-    "ja": "プレビューストリップ：ピクセルプレビュー(1)、グリッド(2)、選択したレイヤーをソロ表示(3)、カメラビュー(4)、プレビュー品質(5)、ブラーモード(6)、ズーム(7)です。"
+    "ja": "プレビューストリップ：ピクセルプレビュー(1)、グリッド(2)、選択したレイヤーをソロ表示(3)、カメラビュー(4)、プレビュー品質(5)、ブラーモード(6)、ズーム(7)です。",
+    "ko": "미리보기 막대: 픽셀 미리보기 (1), 격자 (2), 선택한 레이어만 표시 (3), 카메라 보기 (4), 미리보기 화질 (5), 블러 모드 (6), 확대/축소 (7).",
+    "zh-TW": "預覽工具列：像素預覽 (1)、格線 (2)、單獨顯示選取的圖層 (3)、攝影機視角 (4)、預覽品質 (5)、模糊模式 (6)、縮放 (7)。",
+    "zh-CN": "预览工具栏：像素预览 (1)、网格 (2)、独奏所选图层 (3)、相机视图 (4)、预览质量 (5)、模糊模式 (6)、缩放 (7)。",
+    "fr": "La bande d’aperçu : Aperçu des pixels (1), Grille (2), Isoler les calques sélectionnés (3), Vue caméra (4), la qualité de l’aperçu (5), le mode de flou (6) et le zoom (7).",
+    "de": "Die Vorschauleiste: Pixelvorschau (1), Raster (2), Ausgewählte Ebenen solo schalten (3), Kameraansicht (4), die Vorschauqualität (5), der Unschärfemodus (6) und der Zoom (7).",
+    "it": "La barra dell’anteprima: Anteprima pixel (1), Griglia (2), Isola i livelli selezionati (3), Vista camera (4), la qualità dell’anteprima (5), la modalità sfocatura (6) e lo zoom (7).",
+    "pl": "Pasek podglądu: Podgląd pikseli (1), Siatka (2), Wyświetl tylko zaznaczone warstwy (3), Widok kamery (4), jakość podglądu (5), tryb rozmycia (6) i powiększenie (7)."
    },
    "start": {
     "scene": "demo",
@@ -829,7 +899,14 @@
     "vi": "Thanh phát: Hoàn tác (1), Làm lại (2), Lùi lại (3), Phát (4), Tiến tới (5), Sao chép và dán (6) và Chế độ xem trước (7).",
     "es-ES": "La barra de reproducción: Deshacer (1), Rehacer (2), Retroceder (3), Reproducir (4), Avanzar (5), Copiar y pegar (6) y Modo de vista previa (7).",
     "ur": "پلے بار: انڈو (1)، ریڈو (2)، پیچھے جائیں (3)، چلائیں (4)، آگے جائیں (5)، کاپی اور پیسٹ (6) اور پری ویو موڈ (7)۔",
-    "ja": "プレイバー：元に戻す(1)、やり直す(2)、前に戻る(3)、再生(4)、先に進む(5)、コピーと貼り付け(6)、プレビューモード(7)です。"
+    "ja": "プレイバー：元に戻す(1)、やり直す(2)、前に戻る(3)、再生(4)、先に進む(5)、コピーと貼り付け(6)、プレビューモード(7)です。",
+    "ko": "재생 바: 실행 취소 (1), 다시 실행 (2), 뒤로 건너뛰기 (3), 재생 (4), 앞으로 건너뛰기 (5), 복사 및 붙여넣기 (6), 미리보기 모드 (7).",
+    "zh-TW": "播放列：復原 (1)、重做 (2)、向後跳轉 (3)、播放 (4)、向前跳轉 (5)、複製與貼上 (6)、預覽模式 (7)。",
+    "zh-CN": "播放栏：撤销 (1)、重做 (2)、向后跳转 (3)、播放 (4)、向前跳转 (5)、复制和粘贴 (6)、预览模式 (7)。",
+    "fr": "La barre de lecture : Annuler (1), Rétablir (2), Reculer (3), Lire (4), Avancer (5), Copier et coller (6) et Mode aperçu (7).",
+    "de": "Die Wiedergabeleiste: Rückgängig (1), Wiederholen (2), Zurückspringen (3), Abspielen (4), Vorwärtsspringen (5), Kopieren und einfügen (6) und Vorschaumodus (7).",
+    "it": "La barra di riproduzione: Annulla (1), Ripeti (2), Vai indietro (3), Riproduci (4), Vai avanti (5), Copia e incolla (6) e Modalità anteprima (7).",
+    "pl": "Pasek odtwarzania: Cofnij (1), Ponów (2), Przeskocz wstecz (3), Odtwórz (4), Przeskocz dalej (5), Kopiuj i wklej (6) i Tryb podglądu (7)."
    },
    "start": {
     "scene": "demo",
@@ -915,7 +992,14 @@
     "vi": "Dòng thời gian: đầu phát và thời gian (1), thước (2), biểu tượng con mắt của một lớp (3), các thanh lớp (4) và một hình thoi keyframe (5).",
     "es-ES": "La línea de tiempo: el cabezal de reproducción y el tiempo (1), la regla (2), el ojo de una capa (3), las barras de capa (4) y un diamante de fotograma clave (5).",
     "ur": "ٹائم لائن: پلے ہیڈ اور وقت (1)، رولر (2)، لیئر کی آنکھ (3)، لیئر بارز (4) اور کی فریم ڈائمنڈ (5)۔",
-    "ja": "タイムライン：再生ヘッドと時間(1)、ルーラー(2)、レイヤーの目(3)、レイヤーバー(4)、キーフレームのダイヤ(5)です。"
+    "ja": "タイムライン：再生ヘッドと時間(1)、ルーラー(2)、レイヤーの目(3)、レイヤーバー(4)、キーフレームのダイヤ(5)です。",
+    "ko": "타임라인: 재생 헤드와 시간 (1), 눈금자 (2), 레이어의 눈 아이콘 (3), 레이어 막대 (4), 키프레임 마름모 (5).",
+    "zh-TW": "時間軸：播放頭與時間 (1)、尺規 (2)、圖層的眼睛圖示 (3)、圖層列 (4)、關鍵影格菱形 (5)。",
+    "zh-CN": "时间轴：播放头和时间 (1)、标尺 (2)、图层的眼睛图标 (3)、图层条 (4)、关键帧菱形 (5)。",
+    "fr": "La timeline : la tête de lecture et le temps (1), la règle (2), l’œil d’un calque (3), les barres de calque (4) et un losange d’image clé (5).",
+    "de": "Die Zeitleiste: der Abspielkopf und die Zeit (1), das Lineal (2), das Auge einer Ebene (3), die Ebenenbalken (4) und eine Keyframe-Raute (5).",
+    "it": "La timeline: l’indicatore di riproduzione e il tempo (1), il righello (2), l’occhio di un livello (3), le barre dei livelli (4) e un rombo di keyframe (5).",
+    "pl": "Oś czasu: głowica odtwarzania i czas (1), linijka (2), oko warstwy (3), paski warstw (4) i romb klatki kluczowej (5)."
    },
    "start": {
     "scene": "demo",
@@ -1019,7 +1103,14 @@
     "vi": "Trong một bảng: nút keyframe (1), một hình thoi keyframe trên thanh lớp (2) và Làm mượt (3).",
     "es-ES": "En un panel: el botón de fotograma clave (1), un diamante de fotograma clave en la barra de capa (2) y Suavizado (3).",
     "ur": "ایک پینل میں: کی فریم بٹن (1)، لیئر بار پر کی فریم ڈائمنڈ (2) اور ایزنگ (3)۔",
-    "ja": "パネル内：キーフレームボタン(1)、レイヤーバー上のキーフレームダイヤ(2)、イージング(3)です。"
+    "ja": "パネル内：キーフレームボタン(1)、レイヤーバー上のキーフレームダイヤ(2)、イージング(3)です。",
+    "ko": "패널에서: 키프레임 버튼 (1), 레이어 막대 위의 키프레임 마름모 (2), 이징 (3).",
+    "zh-TW": "在面板中：關鍵影格按鈕 (1)、圖層列上的關鍵影格菱形 (2)、緩動 (3)。",
+    "zh-CN": "在面板中：关键帧按钮 (1)、图层条上的关键帧菱形 (2)、缓动 (3)。",
+    "fr": "Dans un panneau : le bouton d’image clé (1), un losange d’image clé sur la barre du calque (2) et Lissage (3).",
+    "de": "In einem Bedienfeld: die Keyframe-Schaltfläche (1), eine Keyframe-Raute auf dem Ebenenbalken (2) und Easing (3).",
+    "it": "In un pannello: il pulsante keyframe (1), un rombo di keyframe sulla barra del livello (2) ed Easing (3).",
+    "pl": "W panelu: przycisk klatki kluczowej (1), romb klatki kluczowej na pasku warstwy (2) i Wygładzanie (3)."
    },
    "start": {
     "scene": "demo",
@@ -1093,7 +1184,14 @@
     "vi": "Đồ thị làm mượt: các tay cầm đường cong (1), các đường cong có sẵn (2), các loại đường cong (3), Đảo ngược đường cong (4) và Thêm (5).",
     "es-ES": "El gráfico de suavizado: los tiradores de la curva (1), las curvas predefinidas (2), los tipos de curva (3), Invertir la curva (4) y Más (5).",
     "ur": "ایزنگ گراف: کرو ہینڈلز (1)، تیار کروز (2)، کرو کی اقسام (3)، کرو ریورس کریں (4) اور مزید (5)۔",
-    "ja": "イージンググラフ：カーブハンドル(1)、定型カーブ(2)、カーブの種類(3)、カーブを反転(4)、その他(5)です。"
+    "ja": "イージンググラフ：カーブハンドル(1)、定型カーブ(2)、カーブの種類(3)、カーブを反転(4)、その他(5)です。",
+    "ko": "이징 그래프: 곡선 핸들 (1), 기본 제공 곡선 (2), 곡선 종류 (3), 곡선 반전 (4), 더보기 (5).",
+    "zh-TW": "緩動圖表：曲線控制點 (1)、現成曲線 (2)、曲線類型 (3)、反轉曲線 (4)、更多 (5)。",
+    "zh-CN": "缓动图表：曲线控制柄 (1)、现成曲线 (2)、曲线类型 (3)、反转曲线 (4)、更多 (5)。",
+    "fr": "Le graphique de lissage : les poignées de la courbe (1), les courbes prêtes à l’emploi (2), les types de courbe (3), Inverser la courbe (4) et Plus (5).",
+    "de": "Das Easing-Diagramm: die Kurvengriffe (1), die vorgefertigten Kurven (2), die Kurventypen (3), Kurve umkehren (4) und Mehr (5).",
+    "it": "Il grafico dell’easing: le maniglie della curva (1), le curve già pronte (2), i tipi di curva (3), Inverti la curva (4) e Altro (5).",
+    "pl": "Wykres wygładzania: uchwyty krzywej (1), gotowe krzywe (2), rodzaje krzywych (3), Odwróć krzywą (4) i Więcej (5)."
    },
    "start": {
     "scene": "demo",
@@ -1191,7 +1289,14 @@
     "vi": "Menu Thêm: năm tab (1) và bốn nút nhanh (2).",
     "es-ES": "El menú Añadir: las cinco pestañas (1) y los cuatro botones rápidos (2).",
     "ur": "شامل کریں مینو: پانچ ٹیبز (1) اور چار فوری بٹن (2)۔",
-    "ja": "追加メニュー：5つのタブ(1)、4つのクイックボタン(2)です。"
+    "ja": "追加メニュー：5つのタブ(1)、4つのクイックボタン(2)です。",
+    "ko": "추가 메뉴: 탭 다섯 개 (1)와 빠른 버튼 네 개 (2).",
+    "zh-TW": "新增選單：五個分頁 (1) 與四個快速按鈕 (2)。",
+    "zh-CN": "添加菜单：五个标签页 (1) 和四个快捷按钮 (2)。",
+    "fr": "Le menu Ajouter : les cinq onglets (1) et les quatre boutons rapides (2).",
+    "de": "Das Menü Hinzufügen: die fünf Tabs (1) und die vier Schnellschaltflächen (2).",
+    "it": "Il menu Aggiungi: le cinque schede (1) e i quattro pulsanti rapidi (2).",
+    "pl": "Menu Dodaj: pięć kart (1) i cztery szybkie przyciski (2)."
    },
    "start": {
     "scene": "demo",
@@ -1258,7 +1363,14 @@
     "vi": "Danh sách hiệu ứng: Sắp xếp lại (1), Hiển thị (2), Thêm (3) và Thêm hiệu ứng (4).",
     "es-ES": "La lista de efectos: Reordenar (1), Visibilidad (2), Más (3) y Añadir efecto (4).",
     "ur": "ایفیکٹ لسٹ: ترتیب بدلیں (1)، ویزیبلٹی (2)، مزید (3) اور ایفیکٹ شامل کریں (4)۔",
-    "ja": "エフェクトリスト：並べ替え(1)、表示(2)、その他(3)、エフェクトを追加(4)です。"
+    "ja": "エフェクトリスト：並べ替え(1)、表示(2)、その他(3)、エフェクトを追加(4)です。",
+    "ko": "이펙트 목록: 순서 변경 (1), 표시 여부 (2), 더보기 (3), 이펙트 추가 (4).",
+    "zh-TW": "特效清單：重新排序 (1)、可見度 (2)、更多 (3)、新增特效 (4)。",
+    "zh-CN": "特效列表：调整顺序 (1)、可见性 (2)、更多 (3)、添加特效 (4)。",
+    "fr": "La liste des effets : Réorganiser (1), Visibilité (2), Plus (3) et Ajouter un effet (4).",
+    "de": "Die Effektliste: Reihenfolge ändern (1), Sichtbarkeit (2), Mehr (3) und Effekt hinzufügen (4).",
+    "it": "L’elenco degli effetti: Riordina (1), Visibilità (2), Altro (3) e Aggiungi effetto (4).",
+    "pl": "Lista efektów: Zmień kolejność (1), Widoczność (2), Więcej (3) i Dodaj efekt (4)."
    },
    "start": {
     "scene": "demo",
@@ -1340,7 +1452,14 @@
     "vi": "Một hiệu ứng đang mở: phần đầu của nó (1) và một cài đặt với thước và ô giá trị của nó (2).",
     "es-ES": "Un efecto abierto: su encabezado (1) y un ajuste con su regla y su valor (2).",
     "ur": "کھلا ایفیکٹ: اس کا ہیڈر (1) اور سیٹنگ مع اس کے رولر اور ویلیو (2)۔",
-    "ja": "開いているエフェクト：ヘッダー(1)、ルーラーと値がある設定(2)です。"
+    "ja": "開いているエフェクト：ヘッダー(1)、ルーラーと値がある設定(2)です。",
+    "ko": "열린 이펙트: 머리글 (1)과 눈금자 및 값이 있는 설정 (2).",
+    "zh-TW": "展開的特效：標題列 (1)，以及附有尺規與數值的設定 (2)。",
+    "zh-CN": "展开的特效：标题栏 (1)，以及带标尺和数值的设置项 (2)。",
+    "fr": "Un effet ouvert : son en-tête (1) et un réglage avec sa règle et sa valeur (2).",
+    "de": "Ein geöffneter Effekt: seine Kopfzeile (1) und eine Einstellung mit Lineal und Wert (2).",
+    "it": "Un effetto aperto: la sua intestazione (1) e un’impostazione con il suo righello e il valore (2).",
+    "pl": "Otwarty efekt: jego nagłówek (1) oraz ustawienie z linijką i wartością (2)."
    },
    "start": {
     "scene": "demo",
@@ -1413,7 +1532,14 @@
     "vi": "Trình soạn thảo văn bản: Căn chỉnh (1), phông chữ (2), cỡ chữ (3), màu (4) và Xong (5).",
     "es-ES": "El editor de texto: Alineación (1), la fuente (2), el tamaño (3), el color (4) y Hecho (5).",
     "ur": "ٹیکسٹ ایڈیٹر: الائنمنٹ (1)، فونٹ (2)، سائز (3)، رنگ (4) اور ہو گیا (5)۔",
-    "ja": "テキストエディター：配置(1)、フォント(2)、サイズ(3)、色(4)、完了(5)です。"
+    "ja": "テキストエディター：配置(1)、フォント(2)、サイズ(3)、色(4)、完了(5)です。",
+    "ko": "텍스트 편집기: 정렬 (1), 글꼴 (2), 크기 (3), 색상 (4), 완료 (5).",
+    "zh-TW": "文字編輯器：對齊 (1)、字型 (2)、大小 (3)、顏色 (4)、完成 (5)。",
+    "zh-CN": "文本编辑器：对齐 (1)、字体 (2)、大小 (3)、颜色 (4)、完成 (5)。",
+    "fr": "L’éditeur de texte : Alignement (1), la police (2), la taille (3), la couleur (4) et Terminé (5).",
+    "de": "Der Texteditor: Ausrichtung (1), die Schriftart (2), die Größe (3), die Farbe (4) und Fertig (5).",
+    "it": "L’editor di testo: Allineamento (1), il font (2), la dimensione (3), il colore (4) e Fine (5).",
+    "pl": "Edytor tekstu: Wyrównanie (1), czcionka (2), rozmiar (3), kolor (4) i Gotowe (5)."
    },
    "start": {
     "scene": "demo",
@@ -1505,7 +1631,14 @@
     "vi": "Bảng Biến đổi: các tab (1), bàn di chuột (2) và các ô X, Y và Z (3).",
     "es-ES": "El panel Transformar: las pestañas (1), el panel táctil (2) y las casillas X, Y y Z (3).",
     "ur": "ٹرانسفارم پینل: ٹیبز (1)، ٹریک پیڈ (2) اور X، Y اور Z باکسز (3)۔",
-    "ja": "トランスフォームパネル：タブ(1)、トラックパッド(2)、X、Y、Zのボックス(3)です。"
+    "ja": "トランスフォームパネル：タブ(1)、トラックパッド(2)、X、Y、Zのボックス(3)です。",
+    "ko": "변형 패널: 탭 (1), 트랙패드 (2), X, Y, Z 입력란 (3).",
+    "zh-TW": "變形面板：分頁 (1)、觸控板 (2)、X、Y、Z 輸入框 (3)。",
+    "zh-CN": "变换面板：标签页 (1)、触控板 (2)、X、Y、Z 输入框 (3)。",
+    "fr": "Le panneau Transformation : les onglets (1), le pavé tactile (2) et les cases X, Y et Z (3).",
+    "de": "Das Bedienfeld Transformieren: die Tabs (1), das Trackpad (2) und die Felder X, Y und Z (3).",
+    "it": "Il pannello Trasforma: le schede (1), il trackpad (2) e le caselle X, Y e Z (3).",
+    "pl": "Panel Przekształcenie: karty (1), gładzik (2) oraz pola X, Y i Z (3)."
    },
    "start": {
     "scene": "demo",
@@ -1586,7 +1719,14 @@
     "vi": "Tô & màu: các tab (1), thanh màu (2), các mẫu màu (3) và Ống hút màu, Thanh trượt màu và Bảng chọn màu đầy đủ (4).",
     "es-ES": "Relleno y color: las pestañas (1), la barra de color (2), las muestras (3) y Cuentagotas, Deslizadores de color y Selector de color completo (4).",
     "ur": "فل اور رنگ: ٹیبز (1)، رنگ بار (2)، سواچز (3) اور آئی ڈراپر، رنگ سلائیڈرز اور مکمل رنگ چننے والا (4)۔",
-    "ja": "塗りと色：タブ(1)、カラーバー(2)、スウォッチ(3)、スポイト、カラースライダー、フルカラーピッカー(4)です。"
+    "ja": "塗りと色：タブ(1)、カラーバー(2)、スウォッチ(3)、スポイト、カラースライダー、フルカラーピッカー(4)です。",
+    "ko": "채우기 및 색상: 탭 (1), 색상 막대 (2), 색상 견본 (3), 스포이드, 색상 슬라이더, 전체 색상 선택기 (4).",
+    "zh-TW": "填色與顏色：分頁 (1)、顏色列 (2)、色票 (3)、滴管、顏色滑桿與完整顏色選擇器 (4)。",
+    "zh-CN": "填充和颜色：标签页 (1)、颜色条 (2)、色板 (3)、吸管、颜色滑块和完整取色器 (4)。",
+    "fr": "Remplissage et couleur : les onglets (1), la barre de couleurs (2), les échantillons (3) et Pipette, Curseurs de couleur et Sélecteur de couleur complet (4).",
+    "de": "Füllung & Farbe: die Tabs (1), die Farbleiste (2), die Farbfelder (3) und Pipette, Farbregler und Vollständige Farbauswahl (4).",
+    "it": "Riempimento e colore: le schede (1), la barra dei colori (2), i campioni (3) e Contagocce, Cursori colore e Selettore colore completo (4).",
+    "pl": "Wypełnienie i kolor: karty (1), pasek kolorów (2), próbki (3) oraz Pipeta, Suwaki koloru i Pełny wybór koloru (4)."
    },
    "start": {
     "scene": "demo",
@@ -1678,7 +1818,14 @@
     "vi": "Nút menu lớp (1) mở menu lớp (2).",
     "es-ES": "El botón de menú de capa (1) abre el menú de capa (2).",
     "ur": "لیئر مینو بٹن (1) لیئر مینو (2) کھولتا ہے۔",
-    "ja": "レイヤーメニューボタン(1)をタップするとレイヤーメニュー(2)が開きます。"
+    "ja": "レイヤーメニューボタン(1)をタップするとレイヤーメニュー(2)が開きます。",
+    "ko": "레이어 메뉴 버튼 (1)을 누르면 레이어 메뉴 (2)가 열립니다.",
+    "zh-TW": "圖層選單按鈕 (1) 會開啟圖層選單 (2)。",
+    "zh-CN": "图层菜单按钮 (1) 会打开图层菜单 (2)。",
+    "fr": "Le bouton du menu du calque (1) ouvre le menu du calque (2).",
+    "de": "Die Schaltfläche für das Ebenenmenü (1) öffnet das Ebenenmenü (2).",
+    "it": "Il pulsante del menu livello (1) apre il menu livello (2).",
+    "pl": "Przycisk menu warstwy (1) otwiera menu warstwy (2)."
    },
    "start": {
     "scene": "demo",
@@ -1748,7 +1895,14 @@
     "vi": "Nút sao chép và dán (1) mở menu này (2).",
     "es-ES": "El botón Copiar y pegar (1) abre este menú (2).",
     "ur": "کاپی اور پیسٹ بٹن (1) یہ مینو (2) کھولتا ہے۔",
-    "ja": "コピーと貼り付けボタン(1)をタップするとこのメニュー(2)が開きます。"
+    "ja": "コピーと貼り付けボタン(1)をタップするとこのメニュー(2)が開きます。",
+    "ko": "복사 및 붙여넣기 버튼 (1)을 누르면 이 메뉴 (2)가 열립니다.",
+    "zh-TW": "複製與貼上按鈕 (1) 會開啟這個選單 (2)。",
+    "zh-CN": "复制和粘贴按钮 (1) 会打开此菜单 (2)。",
+    "fr": "Le bouton copier-coller (1) ouvre ce menu (2).",
+    "de": "Die Schaltfläche zum Kopieren und Einfügen (1) öffnet dieses Menü (2).",
+    "it": "Il pulsante copia e incolla (1) apre questo menu (2).",
+    "pl": "Przycisk kopiowania i wklejania (1) otwiera to menu (2)."
    },
    "start": {
     "scene": "demo",
@@ -1818,7 +1972,14 @@
     "vi": "Nút tròn Tạo chuyển động (1) ở góc dưới bên phải của phần xem trước.",
     "es-ES": "El botón redondo Animar (1) en la esquina inferior derecha de la vista previa.",
     "ur": "پری ویو کے نیچے دائیں گول اینیمیٹ بٹن (1)۔",
-    "ja": "プレビューの右下にある丸いアニメーションボタン(1)です。"
+    "ja": "プレビューの右下にある丸いアニメーションボタン(1)です。",
+    "ko": "미리보기 오른쪽 아래의 둥근 애니메이션 적용 버튼 (1).",
+    "zh-TW": "預覽右下角的圓形製作動畫按鈕 (1)。",
+    "zh-CN": "预览右下角的圆形添加动画按钮 (1)。",
+    "fr": "Le bouton rond Animer (1) en bas à droite de l’aperçu.",
+    "de": "Die runde Schaltfläche Animieren (1) unten rechts in der Vorschau.",
+    "it": "Il pulsante rotondo Anima (1) in basso a destra nell’anteprima.",
+    "pl": "Okrągły przycisk Animuj (1) w prawym dolnym rogu podglądu."
    },
    "start": {
     "scene": "demo",
@@ -1870,7 +2031,14 @@
     "vi": "Bảng hoạt ảnh: Vào, Ra và Lặp (1), các hoạt ảnh (2) và Thời lượng (3).",
     "es-ES": "La hoja de animaciones: Entrada, Salida y Bucle (1), las animaciones (2) y Duración (3).",
     "ur": "اینیمیشنز شیٹ: اِن، آؤٹ اور لوپ (1)، اینیمیشنز (2) اور دورانیہ (3)۔",
-    "ja": "アニメーションシート：イン、アウト、ループ(1)、アニメーション(2)、長さ(3)です。"
+    "ja": "アニメーションシート：イン、アウト、ループ(1)、アニメーション(2)、長さ(3)です。",
+    "ko": "애니메이션 시트: 시작, 끝, 반복 (1), 애니메이션 (2), 길이 (3).",
+    "zh-TW": "動畫面板：入場、出場與循環 (1)、動畫 (2)、時長 (3)。",
+    "zh-CN": "动画面板：入场、出场和循环 (1)、动画 (2)、时长 (3)。",
+    "fr": "La feuille des animations : Entrée, Sortie et Boucle (1), les animations (2) et Durée (3).",
+    "de": "Das Animationsblatt: Einblenden, Ausblenden und Schleife (1), die Animationen (2) und Dauer (3).",
+    "it": "Il foglio delle animazioni: Ingresso, Uscita e Loop (1), le animazioni (2) e Durata (3).",
+    "pl": "Arkusz animacji: Wejście, Wyjście i Zapętl (1), animacje (2) i Czas trwania (3)."
    },
    "start": {
     "scene": "demo",
@@ -1951,7 +2119,14 @@
     "vi": "Bảng âm lượng: Hiệu ứng âm thanh (1), thanh trượt âm lượng (2), hộp giá trị của nó (3) và nút keyframe (4).",
     "es-ES": "El panel de volumen: Efectos de audio (1), el deslizador de volumen (2), su valor (3) y el botón de fotograma clave (4).",
     "ur": "والیوم پینل: آڈیو ایفیکٹس (1)، والیوم سلائیڈر (2)، اس کی ویلیو (3) اور کی فریم بٹن (4)۔",
-    "ja": "音量パネル：音声エフェクト(1)、音量スライダー(2)、その値(3)、キーフレームボタン(4)です。"
+    "ja": "音量パネル：音声エフェクト(1)、音量スライダー(2)、その値(3)、キーフレームボタン(4)です。",
+    "ko": "볼륨 패널: 오디오 이펙트 (1), 볼륨 슬라이더 (2), 슬라이더 값 (3), 키프레임 버튼 (4).",
+    "zh-TW": "音量面板：音訊特效 (1)、音量滑桿 (2)、數值 (3)、關鍵影格按鈕 (4)。",
+    "zh-CN": "音量面板：音频特效 (1)、音量滑块 (2)、滑块数值 (3)、关键帧按钮 (4)。",
+    "fr": "Le panneau du volume : Effets audio (1), le curseur de volume (2), sa valeur (3) et le bouton d’image clé (4).",
+    "de": "Das Lautstärke-Bedienfeld: Audioeffekte (1), der Lautstärkeregler (2), sein Wert (3) und die Keyframe-Schaltfläche (4).",
+    "it": "Il pannello del volume: Effetti audio (1), il cursore del volume (2), il suo valore (3) e il pulsante keyframe (4).",
+    "pl": "Panel głośności: Efekty dźwiękowe (1), suwak głośności (2), jego wartość (3) i przycisk klatki kluczowej (4)."
    },
    "start": {
     "scene": "demo",
@@ -2031,7 +2206,14 @@
     "vi": "Hiệu ứng âm thanh: các chip preset (1), Bỏ qua (2) và Sắp xếp lại (3) cho mỗi hiệu ứng, bỏ qua tất cả (4) và Xóa tất cả (5).",
     "es-ES": "Efectos de audio: los botones de preajuste (1), Desactivar (2) y Reordenar (3) para cada efecto, desactivar todo (4) y Eliminar todo (5).",
     "ur": "آڈیو ایفیکٹس: پریسیٹ چپس (1)، ہر ایفیکٹ کے لیے بائی پاس (2) اور ترتیب بدلیں (3)، سب بائی پاس کریں (4) اور سب حذف کریں (5)۔",
-    "ja": "音声エフェクト：プリセットチップ(1)、各エフェクトのバイパス(2)と並べ替え(3)、すべてバイパス(4)、すべて削除(5)です。"
+    "ja": "音声エフェクト：プリセットチップ(1)、各エフェクトのバイパス(2)と並べ替え(3)、すべてバイパス(4)、すべて削除(5)です。",
+    "ko": "오디오 이펙트: 프리셋 칩 (1), 각 이펙트의 바이패스 (2)와 순서 변경 (3), 모두 바이패스 (4), 모두 삭제 (5).",
+    "zh-TW": "音訊特效：預設集標籤 (1)、每個特效的略過 (2) 與重新排序 (3)、全部略過 (4)、全部刪除 (5)。",
+    "zh-CN": "音频特效：预设标签 (1)、每个特效的旁通 (2) 和调整顺序 (3)、全部旁通 (4)、全部删除 (5)。",
+    "fr": "Effets audio : les puces de préréglage (1), Désactiver (2) et Réorganiser (3) pour chaque effet, tout désactiver (4) et Tout supprimer (5).",
+    "de": "Audioeffekte: die Voreinstellungs-Chips (1), Umgehen (2) und Reihenfolge ändern (3) für jeden Effekt, alle umgehen (4) und Alle löschen (5).",
+    "it": "Effetti audio: i chip dei preset (1), Escludi (2) e Riordina (3) per ogni effetto, escludi tutto (4) ed Elimina tutto (5).",
+    "pl": "Efekty dźwiękowe: chipy presetów (1), Pomiń (2) i Zmień kolejność (3) dla każdego efektu, pomiń wszystkie (4) i Usuń wszystko (5)."
    },
    "start": {
     "scene": "demo",
@@ -2138,7 +2320,14 @@
     "vi": "Bảng Phụ đề tự động: Nguồn (1), văn bản mẫu (2), Ngôn ngữ (3), Số từ mỗi phụ đề (4), mô hình giọng nói (5), Giao diện (6) và Tạo (7).",
     "es-ES": "La hoja de Subtítulos automáticos: Origen (1), la muestra (2), Idioma (3), Palabras por subtítulo (4), el modelo de voz (5), Aspecto (6) y Generar (7).",
     "ur": "خودکار کیپشنز شیٹ: سورس (1)، نمونہ (2)، زبان (3)، فی کیپشن الفاظ (4)، اسپیچ ماڈل (5)، ظاہری شکل (6) اور بنائیں (7)۔",
-    "ja": "自動キャプションシート：ソース(1)、サンプル(2)、言語(3)、1キャプションあたりの単語数(4)、音声モデル(5)、外観(6)、生成(7)です。"
+    "ja": "自動キャプションシート：ソース(1)、サンプル(2)、言語(3)、1キャプションあたりの単語数(4)、音声モデル(5)、外観(6)、生成(7)です。",
+    "ko": "자동 자막 시트: 소스 (1), 샘플 (2), 언어 (3), 자막당 단어 수 (4), 음성 모델 (5), 모양 (6), 생성 (7).",
+    "zh-TW": "自動字幕面板：來源 (1)、範例 (2)、語言 (3)、每則字幕的字數 (4)、語音模型 (5)、外觀 (6)、產生 (7)。",
+    "zh-CN": "自动字幕面板：来源 (1)、示例 (2)、语言 (3)、每条字幕的词数 (4)、语音模型 (5)、外观 (6)、生成 (7)。",
+    "fr": "La feuille Sous-titres automatiques : Source (1), l’échantillon (2), Langue (3), Mots par sous-titre (4), le modèle vocal (5), Apparence (6) et Générer (7).",
+    "de": "Das Blatt Automatische Untertitel: Quelle (1), das Beispiel (2), Sprache (3), Wörter pro Untertitel (4), das Sprachmodell (5), Darstellung (6) und Erstellen (7).",
+    "it": "Il foglio Sottotitoli automatici: Origine (1), l’esempio (2), Lingua (3), Parole per sottotitolo (4), il modello vocale (5), Aspetto (6) e Genera (7).",
+    "pl": "Arkusz Automatyczne napisy: Źródło (1), próbka (2), Język (3), Słów na napis (4), model mowy (5), Wygląd (6) i Generuj (7)."
    },
    "start": {
     "scene": "demo",
@@ -2258,7 +2447,14 @@
     "vi": "Màn hình Xuất dự án: các dòng thông tin (1), thẻ Video (2), mũi tên tùy chọn của nó (3), công tắc Mẫu (4) và nút Xuất (5).",
     "es-ES": "La pantalla Exportar proyecto: las líneas de información (1), la tarjeta Vídeo (2), su flecha de opciones (3), el interruptor Plantilla (4) y el botón Exportar (5).",
     "ur": "پروجیکٹ ایکسپورٹ اسکرین: معلوماتی لائنیں (1)، ویڈیو کارڈ (2)، اس کا آپشنز ایرو (3)، ٹیمپلیٹ سوئچ (4) اور ایکسپورٹ بٹن (5)۔",
-    "ja": "プロジェクトを書き出し画面：情報行(1)、動画カード(2)、そのオプションの矢印(3)、テンプレートスイッチ(4)、書き出しボタン(5)です。"
+    "ja": "プロジェクトを書き出し画面：情報行(1)、動画カード(2)、そのオプションの矢印(3)、テンプレートスイッチ(4)、書き出しボタン(5)です。",
+    "ko": "프로젝트 내보내기 화면: 정보 줄 (1), 동영상 카드 (2), 옵션 화살표 (3), 템플릿 스위치 (4), 내보내기 버튼 (5).",
+    "zh-TW": "匯出專案畫面：資訊列 (1)、影片卡片 (2)、選項箭頭 (3)、範本開關 (4)、匯出按鈕 (5)。",
+    "zh-CN": "导出项目界面：信息行 (1)、视频卡片 (2)、选项箭头 (3)、模板开关 (4)、导出按钮 (5)。",
+    "fr": "L’écran Exporter le projet : les lignes d’information (1), la carte Vidéo (2), sa flèche d’options (3), l’interrupteur Modèle (4) et le bouton Exporter (5).",
+    "de": "Der Bildschirm Projekt exportieren: die Infozeilen (1), die Karte Video (2), ihr Optionspfeil (3), der Schalter Vorlage (4) und die Schaltfläche Exportieren (5).",
+    "it": "La schermata Esporta progetto: le righe di informazioni (1), la scheda Video (2), la sua freccia delle opzioni (3), l’interruttore Modello (4) e il pulsante Esporta (5).",
+    "pl": "Ekran Eksportuj projekt: wiersze informacji (1), karta Wideo (2), jej strzałka opcji (3), przełącznik Szablon (4) i przycisk Eksportuj (5)."
    },
    "start": {
     "scene": "demo",
@@ -2353,7 +2549,14 @@
     "vi": "Lịch sử phiên bản: mỗi phiên bản có một hình thu nhỏ, thời gian và kích thước (1), cùng một nút Khôi phục (2).",
     "es-ES": "Historial de versiones: cada versión tiene una miniatura, una hora y un tamaño (1), y un botón Restaurar (2).",
     "ur": "ورژن ہسٹری: ہر ورژن میں تھمب نیل، وقت اور سائز (1) ہوتا ہے، اور بحال کریں بٹن (2)۔",
-    "ja": "バージョン履歴：各バージョンにはサムネイル、時間、サイズ(1)があり、復元ボタン(2)があります。"
+    "ja": "バージョン履歴：各バージョンにはサムネイル、時間、サイズ(1)があり、復元ボタン(2)があります。",
+    "ko": "버전 기록: 각 버전에는 썸네일, 시간, 크기 (1)가 있고, 복원 버튼 (2)이 있습니다.",
+    "zh-TW": "版本紀錄：每個版本都有縮圖、時間與大小 (1)，以及還原按鈕 (2)。",
+    "zh-CN": "版本历史：每个版本都有缩略图、时间和大小 (1)，以及恢复按钮 (2)。",
+    "fr": "Historique des versions : chaque version a une miniature, une heure et une taille (1), ainsi qu’un bouton Restaurer (2).",
+    "de": "Versionsverlauf: Jede Version hat eine Miniaturansicht, eine Uhrzeit und eine Größe (1) sowie eine Schaltfläche Wiederherstellen (2).",
+    "it": "Cronologia versioni: ogni versione ha una miniatura, un orario e una dimensione (1), e un pulsante Ripristina (2).",
+    "pl": "Historia wersji: każda wersja ma miniaturę, godzinę i rozmiar (1) oraz przycisk Przywróć (2)."
    },
    "start": "home",
    "steps": [
@@ -2428,7 +2631,14 @@
     "vi": "Trong menu lớp, chọn Lưu vào Tài nguyên của tôi (1).",
     "es-ES": "En el menú de capa, elige Guardar en Mis recursos (1).",
     "ur": "لیئر مینو میں میرے ایسیٹس میں محفوظ کریں (1) چنیں۔",
-    "ja": "レイヤーメニューでマイアセットに保存(1)を選びます。"
+    "ja": "レイヤーメニューでマイアセットに保存(1)を選びます。",
+    "ko": "레이어 메뉴에서 내 에셋에 저장 (1)을 선택하세요.",
+    "zh-TW": "在圖層選單中選擇儲存至我的素材 (1)。",
+    "zh-CN": "在图层菜单中选择保存到我的素材 (1)。",
+    "fr": "Dans le menu du calque, choisissez Enregistrer dans Mes ressources (1).",
+    "de": "Wähle im Ebenenmenü Unter „Meine Assets“ speichern (1).",
+    "it": "Nel menu livello, scegli Salva in Le mie risorse (1).",
+    "pl": "W menu warstwy wybierz Zapisz w Moich zasobach (1)."
    },
    "start": {
     "scene": "demo",
@@ -2482,7 +2692,14 @@
     "vi": "Trong menu sao chép và dán, chọn Lưu preset (1).",
     "es-ES": "En el menú Copiar y pegar, elige Guardar preajuste (1).",
     "ur": "کاپی اور پیسٹ مینو میں پریسیٹ محفوظ کریں (1) چنیں۔",
-    "ja": "コピーと貼り付けメニューでプリセットを保存(1)を選びます。"
+    "ja": "コピーと貼り付けメニューでプリセットを保存(1)を選びます。",
+    "ko": "복사 및 붙여넣기 메뉴에서 프리셋 저장 (1)을 선택하세요.",
+    "zh-TW": "在複製與貼上選單中選擇儲存預設集 (1)。",
+    "zh-CN": "在复制和粘贴菜单中选择保存预设 (1)。",
+    "fr": "Dans le menu copier-coller, choisissez Enregistrer le préréglage (1).",
+    "de": "Wähle im Menü zum Kopieren und Einfügen Voreinstellung speichern (1).",
+    "it": "Nel menu copia e incolla, scegli Salva preset (1).",
+    "pl": "W menu kopiowania i wklejania wybierz Zapisz preset (1)."
    },
    "start": {
     "scene": "demo",
@@ -2536,7 +2753,14 @@
     "vi": "Ngăn kéo Cài đặt: bốn nhóm (1) và các hàng bên dưới chúng (2).",
     "es-ES": "El panel de Ajustes: los cuatro grupos (1) y las filas que hay debajo (2).",
     "ur": "سیٹنگز ڈراور: چار گروپس (1) اور ان کے نیچے قطاریں (2)۔",
-    "ja": "設定ドロワー：4つのグループ(1)、その下の行(2)です。"
+    "ja": "設定ドロワー：4つのグループ(1)、その下の行(2)です。",
+    "ko": "설정 서랍: 그룹 네 개 (1)와 그 아래의 항목 (2).",
+    "zh-TW": "設定抽屜：四個群組 (1) 與其下的各個項目 (2)。",
+    "zh-CN": "设置抽屉：四个分组 (1) 及其下方的各项 (2)。",
+    "fr": "Le tiroir Paramètres : les quatre groupes (1) et les lignes en dessous (2).",
+    "de": "Die Schublade Einstellungen: die vier Gruppen (1) und die Zeilen darunter (2).",
+    "it": "Il pannello Impostazioni: i quattro gruppi (1) e le righe sotto di essi (2).",
+    "pl": "Szuflada Ustawienia: cztery grupy (1) i wiersze pod nimi (2)."
    },
    "start": "home",
    "steps": [
@@ -2600,7 +2824,14 @@
     "vi": "Nhóm Trình chỉnh sửa: Giao diện (1), Độ dài lớp mới (2), Rung (3), công tắc cho nút chuyển cảnh (4) và Kiểu emoji (5).",
     "es-ES": "El grupo Editor: Tema (1), Duración de las capas nuevas (2), Vibración (3), el interruptor del botón de transición (4) y Estilo de emojis (5).",
     "ur": "ایڈیٹر گروپ: تھیم (1)، نئی لیئر کی لمبائی (2)، وائبریشن (3)، ٹرانزیشن بٹن کا سوئچ (4) اور ایموجی اسٹائل (5)۔",
-    "ja": "エディターグループ：テーマ(1)、新規レイヤーの長さ(2)、振動(3)、トランジションボタンのスイッチ(4)、絵文字スタイル(5)です。"
+    "ja": "エディターグループ：テーマ(1)、新規レイヤーの長さ(2)、振動(3)、トランジションボタンのスイッチ(4)、絵文字スタイル(5)です。",
+    "ko": "편집기 그룹: 테마 (1), 새 레이어 길이 (2), 진동 (3), 전환 버튼 스위치 (4), 이모지 스타일 (5).",
+    "zh-TW": "編輯器群組：主題 (1)、新圖層時長 (2)、震動 (3)、轉場按鈕的開關 (4)、表情符號樣式 (5)。",
+    "zh-CN": "编辑器分组：主题 (1)、新图层时长 (2)、振动 (3)、转场按钮的开关 (4)、表情符号样式 (5)。",
+    "fr": "Le groupe Éditeur : Thème (1), Durée des nouveaux calques (2), Vibration (3), l’interrupteur du bouton de transition (4) et Style des émojis (5).",
+    "de": "Die Gruppe Editor: Design (1), Länge neuer Ebenen (2), Vibration (3), der Schalter für die Übergangsschaltfläche (4) und Emoji-Stil (5).",
+    "it": "Il gruppo Editor: Tema (1), Durata dei nuovi livelli (2), Vibrazione (3), l’interruttore del pulsante di transizione (4) e Stile emoji (5).",
+    "pl": "Grupa Edytor: Motyw (1), Długość nowej warstwy (2), Wibracje (3), przełącznik przycisku przejścia (4) i Styl emoji (5)."
    },
    "start": "home",
    "steps": [
@@ -2768,7 +2999,14 @@
     "vi": "Khi nhiều lớp được chọn: thanh trên cùng (1), các lớp có dấu tích (2) và thanh dưới cùng với các lệnh thời gian (3).",
     "es-ES": "Varias capas seleccionadas: la barra superior (1), las capas marcadas (2) y la barra inferior con los comandos de tiempo (3).",
     "ur": "کئی لیئرز منتخب: ٹاپ بار (1)، چیک شدہ لیئرز (2) اور نچلا بار مع ٹائمنگ کمانڈز (3)۔",
-    "ja": "複数のレイヤーを選択した状態：トップバー(1)、チェックされたレイヤー(2)、タイミングコマンド付きの下部バー(3)です。"
+    "ja": "複数のレイヤーを選択した状態：トップバー(1)、チェックされたレイヤー(2)、タイミングコマンド付きの下部バー(3)です。",
+    "ko": "레이어 여러 개를 선택했을 때: 상단 바 (1), 체크한 레이어 (2), 타이밍 명령이 있는 하단 바 (3).",
+    "zh-TW": "選取多個圖層時：頂端列 (1)、已勾選的圖層 (2)、附有時間指令的底部列 (3)。",
+    "zh-CN": "选中多个图层时：顶部栏 (1)、已勾选的图层 (2)、带时间指令的底部栏 (3)。",
+    "fr": "Plusieurs calques sélectionnés : la barre du haut (1), les calques cochés (2) et la barre du bas avec les commandes de durée (3).",
+    "de": "Mehrere Ebenen ausgewählt: die obere Leiste (1), die markierten Ebenen (2) und die untere Leiste mit den Zeitbefehlen (3).",
+    "it": "Più livelli selezionati: la barra superiore (1), i livelli spuntati (2) e la barra inferiore con i comandi di tempo (3).",
+    "pl": "Zaznaczono kilka warstw: górny pasek (1), zaznaczone warstwy (2) i dolny pasek z poleceniami czasu (3)."
    }
   },
   {
@@ -2849,7 +3087,14 @@
     "vi": "Tab Phương tiện: Xem tất cả (1), danh sách album (2), Máy ảnh (3) và Tìm kiếm (4).",
     "es-ES": "La pestaña Medios: Ver todo (1), la lista de álbumes (2), Cámara (3) y Buscar (4).",
     "ur": "میڈیا ٹیب: سب دیکھیں (1)، البم لسٹ (2)، کیمرہ (3) اور تلاش (4)۔",
-    "ja": "メディアタブ：すべて表示(1)、アルバムリスト(2)、カメラ(3)、検索(4)です。"
+    "ja": "メディアタブ：すべて表示(1)、アルバムリスト(2)、カメラ(3)、検索(4)です。",
+    "ko": "미디어 탭: 모두 보기 (1), 앨범 목록 (2), 카메라 (3), 검색 (4).",
+    "zh-TW": "媒體分頁：查看全部 (1)、相簿清單 (2)、攝影機 (3)、搜尋 (4)。",
+    "zh-CN": "媒体标签页：查看全部 (1)、相册列表 (2)、相机 (3)、搜索 (4)。",
+    "fr": "L’onglet Médias : Tout voir (1), la liste des albums (2), Caméra (3) et Rechercher (4).",
+    "de": "Der Tab Medien: Alle anzeigen (1), die Albumliste (2), Kamera (3) und Suchen (4).",
+    "it": "La scheda Media: Mostra tutto (1), l’elenco degli album (2), Camera (3) e Cerca (4).",
+    "pl": "Karta Multimedia: Zobacz wszystkie (1), lista albumów (2), Kamera (3) i Szukaj (4)."
    }
   },
   {
@@ -2908,7 +3153,14 @@
     "vi": "Tab Đối tượng / Tài nguyên: Máy ảnh, Rỗng, Nhóm rỗng, Tài nguyên / Dự án, Nhập SVG và Mô hình 3D (1).",
     "es-ES": "La pestaña Objeto / recurso: Cámara, Nulo, Grupo vacío, Recurso / Proyecto, Importar SVG y Modelo 3D (1).",
     "ur": "آبجیکٹ / ایسیٹ ٹیب: کیمرہ، نل، خالی گروپ، ایسیٹ / پروجیکٹ، SVG درآمد کریں اور 3D ماڈل (1)۔",
-    "ja": "オブジェクト／アセットタブ：カメラ、ヌル、空のグループ、アセット/プロジェクト、SVGを読み込み、3Dモデル(1)です。"
+    "ja": "オブジェクト／アセットタブ：カメラ、ヌル、空のグループ、アセット/プロジェクト、SVGを読み込み、3Dモデル(1)です。",
+    "ko": "오브젝트 / 에셋 탭: 카메라, 널 오브젝트, 빈 그룹, 에셋 / 프로젝트, SVG 가져오기, 3D 모델 (1).",
+    "zh-TW": "物件／素材分頁：攝影機、空物件、空群組、素材／專案、匯入SVG與3D模型 (1)。",
+    "zh-CN": "对象／素材标签页：相机、空对象、空组、素材／项目、导入SVG和3D模型 (1)。",
+    "fr": "L’onglet Objet / Ressource : Caméra, Objet nul, Groupe vide, Ressource / Projet, Importer un SVG et Modèle 3D (1).",
+    "de": "Der Tab Objekt / Asset: Kamera, Nullobjekt, Leere Gruppe, Asset / Projekt, SVG importieren und 3D-Modell (1).",
+    "it": "La scheda Oggetto / Risorsa: Camera, Oggetto nullo, Gruppo vuoto, Risorsa / Progetto, Importa SVG e Modello 3D (1).",
+    "pl": "Karta Obiekt / zasób: Kamera, Obiekt zerowy, Pusta grupa, Zasób / projekt, Importuj SVG i Model 3D (1)."
    }
   },
   {
@@ -2978,7 +3230,14 @@
     "vi": "Menu lớp của một video: Vừa khung vẽ, Lấp đầy khung vẽ và Kéo giãn vừa khung vẽ (1), cùng Thông tin phương tiện (2).",
     "es-ES": "El menú de capa de un vídeo: Ajustar al lienzo, Rellenar el lienzo y Estirar al lienzo (1), e Información de medios (2).",
     "ur": "ویڈیو کا لیئر مینو: کینوس میں فٹ کریں، کینوس بھریں اور کینوس تک اسٹریچ کریں (1)، اور میڈیا معلومات (2)۔",
-    "ja": "動画のレイヤーメニュー：キャンバスに合わせる、キャンバスを埋める、キャンバスに引き伸ばす(1)、メディア情報(2)です。"
+    "ja": "動画のレイヤーメニュー：キャンバスに合わせる、キャンバスを埋める、キャンバスに引き伸ばす(1)、メディア情報(2)です。",
+    "ko": "동영상의 레이어 메뉴: 캔버스에 맞추기, 캔버스 채우기, 캔버스에 맞게 늘리기 (1), 미디어 정보 (2).",
+    "zh-TW": "影片的圖層選單：符合畫布大小、填滿畫布與拉伸至畫布大小 (1)，以及媒體資訊 (2)。",
+    "zh-CN": "视频的图层菜单：适应画布、填满画布和拉伸至画布 (1)，以及媒体信息 (2)。",
+    "fr": "Le menu du calque d’une vidéo : Adapter au canevas, Remplir le canevas et Étirer au canevas (1), et Infos sur le média (2).",
+    "de": "Das Ebenenmenü eines Videos: An Leinwand anpassen, Leinwand füllen und Auf Leinwand strecken (1) sowie Medieninfo (2).",
+    "it": "Il menu livello di un video: Adatta alla tela, Riempi la tela ed Estendi alla tela (1), e Info media (2).",
+    "pl": "Menu warstwy wideo: Dopasuj do obszaru roboczego, Wypełnij obszar roboczy i Rozciągnij do obszaru roboczego (1) oraz Informacje o multimediach (2)."
    }
   },
   {
@@ -3103,7 +3362,14 @@
     "vi": "Trình chỉnh sửa điểm: Mở đường (1), Làm điểm nhọn (2), Xóa điểm (3), bàn di chuột (4), các mũi tên đường viền (5) và danh sách điểm (6).",
     "es-ES": "El editor de puntos: Abrir el trazado (1), Convertir el punto en angular (2), Eliminar punto (3), el panel táctil (4), las flechas del contorno (5) y la lista de puntos (6).",
     "ur": "پوائنٹ ایڈیٹر: پاتھ کھولیں (1)، پوائنٹ کو شارپ بنائیں (2)، پوائنٹ حذف کریں (3)، ٹریک پیڈ (4)، کنٹور ایروز (5) اور پوائنٹس کی فہرست (6)۔",
-    "ja": "ポイントエディター：パスを開く(1)、ポイントを角にする(2)、ポイントを削除(3)、トラックパッド(4)、輪郭の矢印(5)、ポイントのリスト(6)です。"
+    "ja": "ポイントエディター：パスを開く(1)、ポイントを角にする(2)、ポイントを削除(3)、トラックパッド(4)、輪郭の矢印(5)、ポイントのリスト(6)です。",
+    "ko": "포인트 편집기: 패스 열기 (1), 포인트를 뾰족하게 변경 (2), 포인트 삭제 (3), 트랙패드 (4), 윤곽 화살표 (5), 포인트 목록 (6).",
+    "zh-TW": "節點編輯器：開放路徑 (1)、設為尖角節點 (2)、刪除節點 (3)、觸控板 (4)、輪廓箭頭 (5)、節點清單 (6)。",
+    "zh-CN": "点编辑器：打开路径 (1)、将点设为尖角点 (2)、删除点 (3)、触控板 (4)、轮廓箭头 (5)、点列表 (6)。",
+    "fr": "L’éditeur de points : Ouvrir le tracé (1), Rendre le point anguleux (2), Supprimer le point (3), le pavé tactile (4), les flèches de contour (5) et la liste des points (6).",
+    "de": "Der Punkteditor: Pfad öffnen (1), Punkt zuspitzen (2), Punkt löschen (3), das Trackpad (4), die Konturpfeile (5) und die Punkteliste (6).",
+    "it": "L’editor dei punti: Apri il tracciato (1), Rendi il punto angolare (2), Elimina punto (3), il trackpad (4), le frecce del contorno (5) e l’elenco dei punti (6).",
+    "pl": "Edytor punktów: Otwórz ścieżkę (1), Wyostrz punkt (2), Usuń punkt (3), gładzik (4), strzałki konturu (5) i lista punktów (6)."
    }
   },
   {
@@ -3213,7 +3479,14 @@
     "vi": "Trình chỉnh sửa bản vẽ: bốn công cụ (1), thanh trượt kích thước (2) và bộ chọn màu (3).",
     "es-ES": "El editor de dibujo: las cuatro herramientas (1), el deslizador de tamaño (2) y el selector de color (3).",
     "ur": "ڈرائنگ ایڈیٹر: چار ٹولز (1)، سائز سلائیڈر (2) اور رنگ چننے والا (3)۔",
-    "ja": "描画エディター：4つのツール(1)、サイズスライダー(2)、カラーピッカー(3)です。"
+    "ja": "描画エディター：4つのツール(1)、サイズスライダー(2)、カラーピッカー(3)です。",
+    "ko": "그리기 편집기: 도구 네 개 (1), 크기 슬라이더 (2), 색상 선택기 (3).",
+    "zh-TW": "繪圖編輯器：四種工具 (1)、大小滑桿 (2)、顏色選擇器 (3)。",
+    "zh-CN": "绘图编辑器：四种工具 (1)、大小滑块 (2)、取色器 (3)。",
+    "fr": "L’éditeur de dessin : les quatre outils (1), le curseur de taille (2) et le sélecteur de couleur (3).",
+    "de": "Der Zeicheneditor: die vier Werkzeuge (1), der Größenregler (2) und die Farbauswahl (3).",
+    "it": "L’editor di disegno: i quattro strumenti (1), il cursore della dimensione (2) e il selettore colore (3).",
+    "pl": "Edytor rysowania: cztery narzędzia (1), suwak rozmiaru (2) i wybór koloru (3)."
    }
   },
   {
@@ -3311,7 +3584,14 @@
     "vi": "Tùy chọn máy ảnh: các tab (1), hình nón nhìn (2), Phối cảnh và Trực giao (3), Góc nhìn và Thu phóng (4).",
     "es-ES": "Opciones de cámara: las pestañas (1), el cono de visión (2), Perspectiva y Ortográfica (3), Ángulo de visión y Zoom (4).",
     "ur": "کیمرہ آپشنز: ٹیبز (1)، ویو کون (2)، پرسپیکٹیو اور آرتھوگرافک (3)، ویو اینگل اور زوم (4)۔",
-    "ja": "カメラオプション：タブ(1)、ビューコーン(2)、パースペクティブと正投影(3)、画角とズーム(4)です。"
+    "ja": "カメラオプション：タブ(1)、ビューコーン(2)、パースペクティブと正投影(3)、画角とズーム(4)です。",
+    "ko": "카메라 옵션: 탭 (1), 시야 원뿔 (2), 원근과 직교 (3), 화각과 줌 (4).",
+    "zh-TW": "攝影機選項：分頁 (1)、視錐 (2)、透視與正交 (3)、視角與縮放 (4)。",
+    "zh-CN": "相机选项：标签页 (1)、视锥 (2)、透视和正交 (3)、视角和缩放 (4)。",
+    "fr": "Options de caméra : les onglets (1), le cône de vue (2), Perspective et Orthographique (3), Angle de vue et Zoom (4).",
+    "de": "Kameraoptionen: die Tabs (1), der Sichtkegel (2), Perspektive und Orthografisch (3), Blickwinkel und Zoom (4).",
+    "it": "Opzioni camera: le schede (1), il cono di visuale (2), Prospettiva e Ortografica (3), Angolo di visuale e Zoom (4).",
+    "pl": "Opcje kamery: karty (1), stożek widzenia (2), Perspektywa i Rzut ortograficzny (3), Kąt widzenia i Powiększenie (4)."
    }
   },
   {
@@ -3387,7 +3667,14 @@
     "vi": "Chuyển động máy ảnh: sáu chuyển động (1) và Thời lượng (2).",
     "es-ES": "Movimientos de cámara: los seis movimientos (1) y Duración (2).",
     "ur": "کیمرہ مووز: چھ مووز (1) اور دورانیہ (2)۔",
-    "ja": "カメラモーション：6つのモーション(1)、長さ(2)です。"
+    "ja": "カメラモーション：6つのモーション(1)、長さ(2)です。",
+    "ko": "카메라 움직임: 여섯 가지 움직임 (1)과 길이 (2).",
+    "zh-TW": "攝影機運動：六種運動 (1) 與時長 (2)。",
+    "zh-CN": "相机运镜：六种运镜 (1) 和时长 (2)。",
+    "fr": "Mouvements de caméra : les six mouvements (1) et Durée (2).",
+    "de": "Kamerabewegungen: die sechs Bewegungen (1) und Dauer (2).",
+    "it": "Movimenti camera: i sei movimenti (1) e Durata (2).",
+    "pl": "Ruchy kamery: sześć ruchów (1) i Czas trwania (2)."
    }
   },
   {
@@ -3412,7 +3699,14 @@
     "vi": "Nút Chuyển cảnh (1) nằm phía trên nút Thêm lớp (2), khi đầu phát ở chỗ cắt giữa hai clip.",
     "es-ES": "El botón Transición (1) encima del botón Añadir capa (2), con el cabezal de reproducción en el corte entre dos clips.",
     "ur": "ٹرانزیشن بٹن (1) جو لیئر شامل کریں بٹن (2) کے اوپر ہے، جہاں پلے ہیڈ دو کلپس کے درمیان کٹ پر ہے۔",
-    "ja": "ボタン トランジション(1)は、ボタン レイヤーを追加(2)の上にあります。再生ヘッドが2つのクリップのつなぎ目にあるときです。"
+    "ja": "ボタン トランジション(1)は、ボタン レイヤーを追加(2)の上にあります。再生ヘッドが2つのクリップのつなぎ目にあるときです。",
+    "ko": "재생 헤드가 두 클립 사이의 편집점에 있을 때 레이어 추가 버튼 (2) 위에 나타나는 전환 버튼 (1).",
+    "zh-TW": "當播放頭位於兩個片段之間的剪接點時，轉場按鈕 (1) 會出現在新增圖層按鈕 (2) 的上方。",
+    "zh-CN": "当播放头位于两个片段之间的剪辑点时，转场按钮 (1) 会出现在添加图层按钮 (2) 上方。",
+    "fr": "Le bouton Transition (1) au-dessus du bouton Ajouter un calque (2), quand la tête de lecture est sur la coupe entre deux clips.",
+    "de": "Die Schaltfläche Übergang (1) über der Schaltfläche Ebene hinzufügen (2), wenn der Abspielkopf am Schnitt zwischen zwei Clips steht.",
+    "it": "Il pulsante Transizione (1) sopra il pulsante Aggiungi livello (2), quando l’indicatore di riproduzione è sul taglio tra due clip.",
+    "pl": "Przycisk Przejście (1) nad przyciskiem Dodaj warstwę (2), gdy głowica odtwarzania jest na cięciu między dwoma klipami."
    },
    "start": {
     "scene": "clips",
@@ -3522,7 +3816,14 @@
     "vi": "Bảng chuyển cảnh: hai clip (1), các chuyển cảnh (2) và Thời lượng (3).",
     "es-ES": "La hoja de transición: los dos clips (1), las transiciones (2) y Duración (3).",
     "ur": "ٹرانزیشن شیٹ: دو کلپس (1)، ٹرانزیشنز (2) اور دورانیہ (3)۔",
-    "ja": "トランジションシート：2つのクリップ(1)、トランジション(2)、長さ(3)です。"
+    "ja": "トランジションシート：2つのクリップ(1)、トランジション(2)、長さ(3)です。",
+    "ko": "전환 시트: 두 클립 (1), 전환 효과 (2), 길이 (3).",
+    "zh-TW": "轉場面板：兩個片段 (1)、轉場效果 (2)、時長 (3)。",
+    "zh-CN": "转场面板：两个片段 (1)、转场效果 (2)、时长 (3)。",
+    "fr": "La feuille de transition : les deux clips (1), les transitions (2) et Durée (3).",
+    "de": "Das Übergangsblatt: die beiden Clips (1), die Übergänge (2) und Dauer (3).",
+    "it": "Il foglio delle transizioni: le due clip (1), le transizioni (2) e Durata (3).",
+    "pl": "Arkusz przejścia: dwa klipy (1), przejścia (2) i Czas trwania (3)."
    }
   },
   {
@@ -3649,7 +3950,14 @@
     "vi": "Theo dõi chuyển động: ô vuông trên chi tiết (1), Theo dõi (2), Hướng (3), Áp dụng cho (4) và nút theo dõi (5).",
     "es-ES": "Seguimiento de movimiento: la casilla del detalle (1), Seguimiento (2), Dirección (3), Aplicar a (4) y el botón de seguimiento (5).",
     "ur": "موشن ٹریک: ڈیٹیل پر باکس (1)، ٹریک (2)، سمت (3)، لاگو کریں (4) اور ٹریک بٹن (5)۔",
-    "ja": "モーショントラッキング：ディテール上のボックス(1)、トラック(2)、方向(3)、適用先(4)、トラックボタン(5)です。"
+    "ja": "モーショントラッキング：ディテール上のボックス(1)、トラック(2)、方向(3)、適用先(4)、トラックボタン(5)です。",
+    "ko": "모션 트래킹: 대상에 맞춘 상자 (1), 트랙 (2), 방향 (3), 적용 대상 (4), 트랙 버튼 (5).",
+    "zh-TW": "動態追蹤：框住細節的方框 (1)、追蹤 (2)、方向 (3)、套用至 (4)、追蹤按鈕 (5)。",
+    "zh-CN": "运动跟踪：框住细节的方框 (1)、跟踪 (2)、方向 (3)、应用于 (4)、跟踪按钮 (5)。",
+    "fr": "Suivi de mouvement : le cadre sur le détail (1), Suivre (2), Direction (3), Appliquer à (4) et le bouton de suivi (5).",
+    "de": "Bewegung verfolgen: der Rahmen auf dem Detail (1), Verfolgen (2), Richtung (3), Anwenden auf (4) und die Verfolgen-Schaltfläche (5).",
+    "it": "Traccia movimento: il riquadro sul dettaglio (1), Traccia (2), Direzione (3), Applica a (4) e il pulsante di tracciamento (5).",
+    "pl": "Śledzenie ruchu: ramka na szczególe (1), Śledź (2), Kierunek (3), Zastosuj do (4) i przycisk śledzenia (5)."
    }
   },
   {
@@ -3727,7 +4035,14 @@
     "vi": "Nhóm Sao lưu: Sao lưu tất cả dự án (1), Khôi phục từ bản sao lưu (2) và Tự động sao lưu hàng tuần (chỉ dự án) (3).",
     "es-ES": "El grupo Copia de seguridad: Copia todos los proyectos (1), Restaurar desde copia de seguridad (2) y Copia de seguridad automática semanal (solo proyectos) (3).",
     "ur": "بیک اپ گروپ: تمام پروجیکٹس کا بیک اپ بنائیں (1)، بیک اپ سے بحال کریں (2) اور ہفتہ وار خودکار بیک اپ (صرف پروجیکٹس) (3)۔",
-    "ja": "バックアップグループ：すべてのプロジェクトをバックアップ(1)、バックアップから復元(2)、週1回の自動バックアップ（プロジェクトのみ）(3)です。"
+    "ja": "バックアップグループ：すべてのプロジェクトをバックアップ(1)、バックアップから復元(2)、週1回の自動バックアップ（プロジェクトのみ）(3)です。",
+    "ko": "백업 그룹: 모든 프로젝트 백업 (1), 백업에서 복원 (2), 매주 자동 백업(프로젝트만) (3).",
+    "zh-TW": "備份群組：備份所有專案 (1)、從備份還原 (2)，以及每週自動備份（僅限專案）(3)。",
+    "zh-CN": "备份分组：备份所有项目 (1)、从备份恢复 (2)，以及每周自动备份（仅项目）(3)。",
+    "fr": "Le groupe Sauvegarde : Sauvegarder tous les projets (1), Restaurer une sauvegarde (2) et la sauvegarde automatique hebdomadaire (projets uniquement) (3).",
+    "de": "Die Gruppe Sicherung: Alle Projekte sichern (1), Aus Sicherung wiederherstellen (2) und wöchentliche automatische Sicherung (nur Projekte) (3).",
+    "it": "Il gruppo Backup: Esegui il backup di tutti i progetti (1), Ripristina da backup (2) e il backup automatico settimanale (solo progetti) (3).",
+    "pl": "Grupa Kopia zapasowa: Utwórz kopię zapasową wszystkich projektów (1), Przywróć z kopii zapasowej (2) i cotygodniowa automatyczna kopia zapasowa (tylko projekty) (3)."
    }
   },
   {
@@ -3814,7 +4129,14 @@
     "vi": "Tùy chọn video: Độ phân giải xuất (1), Định dạng (2) và Codec (3).",
     "es-ES": "Opciones de vídeo: Resolución de exportación (1), Formato (2) y Códec (3).",
     "ur": "ویڈیو آپشنز: ایکسپورٹ ریزولوشن (1)، فارمیٹ (2) اور کوڈیک (3)۔",
-    "ja": "動画オプション：書き出し解像度(1)、形式(2)、コーデック(3)です。"
+    "ja": "動画オプション：書き出し解像度(1)、形式(2)、コーデック(3)です。",
+    "ko": "동영상 옵션: 내보내기 해상도 (1), 형식 (2), 코덱 (3).",
+    "zh-TW": "影片選項：匯出解析度 (1)、格式 (2)、編碼格式 (3)。",
+    "zh-CN": "视频选项：导出分辨率 (1)、格式 (2)、编码格式 (3)。",
+    "fr": "Options vidéo : Résolution d’exportation (1), Format (2) et Codec (3).",
+    "de": "Videooptionen: Exportauflösung (1), Format (2) und Codec (3).",
+    "it": "Opzioni video: Risoluzione di esportazione (1), Formato (2) e Codec (3).",
+    "pl": "Opcje wideo: Rozdzielczość eksportu (1), Format (2) i Kodek (3)."
    }
   },
   {
@@ -3916,7 +4238,14 @@
     "vi": "Các tùy chọn video khác: Nhòe chuyển động (1), Chất lượng (2) và Âm thanh (3).",
     "es-ES": "Más opciones de vídeo: Desenfoque de movimiento (1), Calidad (2) y Audio (3).",
     "ur": "مزید ویڈیو آپشنز: موشن بلر (1)، کوالٹی (2) اور آڈیو (3)۔",
-    "ja": "その他の動画オプション：モーションブラー(1)、品質(2)、音声(3)です。"
+    "ja": "その他の動画オプション：モーションブラー(1)、品質(2)、音声(3)です。",
+    "ko": "더 많은 동영상 옵션: 모션 블러 (1), 화질 (2), 오디오 (3).",
+    "zh-TW": "更多影片選項：動態模糊 (1)、品質 (2)、音訊 (3)。",
+    "zh-CN": "更多视频选项：运动模糊 (1)、质量 (2)、音频 (3)。",
+    "fr": "Autres options vidéo : Flou de mouvement (1), Qualité (2) et Audio (3).",
+    "de": "Weitere Videooptionen: Bewegungsunschärfe (1), Qualität (2) und Audio (3).",
+    "it": "Altre opzioni video: Sfocatura di movimento (1), Qualità (2) e Audio (3).",
+    "pl": "Więcej opcji wideo: Rozmycie ruchu (1), Jakość (2) i Dźwięk (3)."
    }
   },
   {
@@ -3987,7 +4316,14 @@
     "vi": "Thẻ Xuất chậm (1) với nút Vẫn tiếp tục (2).",
     "es-ES": "La tarjeta Exportación lenta (1) con su botón Continuar de todos modos (2).",
     "ur": "سست ایکسپورٹ کارڈ (1) مع اس کے پھر بھی جاری رکھیں بٹن (2)۔",
-    "ja": "書き出しが遅いですというカード(1)およびこのまま続行ボタン(2)です。"
+    "ja": "書き出しが遅いですというカード(1)およびこのまま続行ボタン(2)です。",
+    "ko": "느린 내보내기 카드 (1)와 계속 진행 버튼 (2).",
+    "zh-TW": "匯出速度慢卡片 (1) 與其仍要繼續按鈕 (2)。",
+    "zh-CN": "导出缓慢卡片 (1) 及其仍要继续按钮 (2)。",
+    "fr": "La carte Export lent (1) avec son bouton Continuer quand même (2).",
+    "de": "Die Karte Langsamer Export (1) mit ihrer Schaltfläche Trotzdem fortfahren (2).",
+    "it": "La scheda Esportazione lenta (1) con il suo pulsante Continua comunque (2).",
+    "pl": "Karta Powolny eksport (1) z przyciskiem Kontynuuj mimo to (2)."
    }
   },
   {
@@ -4012,7 +4348,14 @@
     "vi": "Lưới công cụ của lớp được chọn: các nút nhỏ (1), các nút công cụ lớn (2) và các chấm trang (3).",
     "es-ES": "La cuadrícula de herramientas de una capa seleccionada: los botones pequeños (1), los botones grandes de herramientas (2) y los puntos de página (3).",
     "ur": "منتخب لیئر کا ٹول گرڈ: چھوٹے بٹن (1)، بڑے ٹول بٹن (2) اور صفحے کے نقطے (3)۔",
-    "ja": "選択したレイヤーのツールグリッド：小さいボタン(1)、大きいツールボタン(2)、ページドット(3)です。"
+    "ja": "選択したレイヤーのツールグリッド：小さいボタン(1)、大きいツールボタン(2)、ページドット(3)です。",
+    "ko": "선택한 레이어의 도구 격자: 작은 버튼 (1), 큰 도구 버튼 (2), 페이지 점 (3).",
+    "zh-TW": "所選圖層的工具格：小按鈕 (1)、大型工具按鈕 (2)、頁面圓點 (3)。",
+    "zh-CN": "所选图层的工具网格：小按钮 (1)、大工具按钮 (2)、页面圆点 (3)。",
+    "fr": "La grille d’outils d’un calque sélectionné : les petits boutons (1), les grands boutons d’outils (2) et les points de page (3).",
+    "de": "Das Werkzeugraster einer ausgewählten Ebene: die kleinen Schaltflächen (1), die großen Werkzeugschaltflächen (2) und die Seitenpunkte (3).",
+    "it": "La griglia degli strumenti di un livello selezionato: i pulsanti piccoli (1), i pulsanti grandi degli strumenti (2) e i punti delle pagine (3).",
+    "pl": "Siatka narzędzi zaznaczonej warstwy: małe przyciski (1), duże przyciski narzędzi (2) i kropki stron (3)."
    },
    "start": {
     "scene": "demo",
@@ -4091,7 +4434,14 @@
     "vi": "Trang thứ hai của lưới công cụ video: Cắt khung (1), AI (2), Phụ đề tự động (3) và Đảo ngược (4).",
     "es-ES": "La segunda página de la cuadrícula de herramientas de un vídeo: Recortar (1), AI (2), Subtítulos automáticos (3), Invertir (4).",
     "ur": "ویڈیو کے ٹول گرڈ کا دوسرا صفحہ: کروپ (1)، AI (2)، خودکار کیپشنز (3)، ریورس (4)۔",
-    "ja": "動画のツールグリッドの2ページ目：クロップ(1)、AI(2)、自動キャプション(3)、逆再生(4)です。"
+    "ja": "動画のツールグリッドの2ページ目：クロップ(1)、AI(2)、自動キャプション(3)、逆再生(4)です。",
+    "ko": "동영상 도구 격자의 두 번째 페이지: 자르기 (1), AI (2), 자동 자막 (3), 역방향 (4).",
+    "zh-TW": "影片工具格的第二頁：裁切 (1)、AI (2)、自動字幕 (3)、倒放 (4)。",
+    "zh-CN": "视频工具网格的第二页：裁剪 (1)、AI (2)、自动字幕 (3)、倒放 (4)。",
+    "fr": "La deuxième page de la grille d’outils d’une vidéo : Recadrer (1), IA (2), Sous-titres automatiques (3) et Inverser (4).",
+    "de": "Die zweite Seite des Werkzeugrasters eines Videos: Zuschneiden (1), KI (2), Automatische Untertitel (3) und Umkehren (4).",
+    "it": "La seconda pagina della griglia degli strumenti di un video: Ritaglia (1), IA (2), Sottotitoli automatici (3) e Inverti (4).",
+    "pl": "Druga strona siatki narzędzi wideo: Kadruj (1), AI (2), Automatyczne napisy (3) i Odwróć (4)."
    },
    "start": {
     "scene": "video",
@@ -4170,7 +4520,14 @@
     "vi": "Bảng Cắt khung: khung cắt trên hình (1), các nút tỷ lệ (2), bốn cạnh (3) và Đặt lại cùng Xong (4).",
     "es-ES": "El panel Recortar: el marco de recorte sobre la imagen (1), los botones de relación de aspecto (2), los cuatro lados (3) y los botones Restablecer y Hecho (4).",
     "ur": "کروپ پینل: تصویر پر کراپ فریم (1)، تناسب کے بٹن (2)، چاروں اطراف (3)، ری سیٹ اور ہو گیا (4)۔",
-    "ja": "パネル クロップ：画像上のクロップ枠(1)、縦横比ボタン(2)、4つの辺(3)、リセット、完了(4)です。"
+    "ja": "パネル クロップ：画像上のクロップ枠(1)、縦横比ボタン(2)、4つの辺(3)、リセット、完了(4)です。",
+    "ko": "자르기 패널: 사진 위의 자르기 프레임 (1), 비율 버튼 (2), 네 변 (3), 초기화 및 완료 (4).",
+    "zh-TW": "裁切面板：圖片上的裁切框 (1)、比例按鈕 (2)、四個邊 (3)、重設與完成 (4)。",
+    "zh-CN": "裁剪面板：图片上的裁剪框 (1)、比例按钮 (2)、四条边 (3)、重置和完成 (4)。",
+    "fr": "Le panneau Recadrer : le cadre de recadrage sur l’image (1), les boutons de format (2), les quatre côtés (3) et Réinitialiser et Terminé (4).",
+    "de": "Das Bedienfeld Zuschneiden: der Zuschneiderahmen auf dem Bild (1), die Seitenverhältnis-Schaltflächen (2), die vier Seiten (3) sowie Zurücksetzen und Fertig (4).",
+    "it": "Il pannello Ritaglia: la cornice di ritaglio sull’immagine (1), i pulsanti delle proporzioni (2), i quattro lati (3) e Ripristina e Fine (4).",
+    "pl": "Panel Kadruj: ramka kadrowania na obrazie (1), przyciski proporcji (2), cztery boki (3) oraz Resetuj i Gotowe (4)."
    },
    "start": {
     "scene": "demo",
@@ -4272,7 +4629,14 @@
     "vi": "Hàng đầu của lưới công cụ: năm nút nhỏ (1).",
     "es-ES": "La primera fila de la cuadrícula de herramientas: los cinco botones pequeños (1).",
     "ur": "ٹول گرڈ کی پہلی قطار: پانچ چھوٹے بٹن (1)۔",
-    "ja": "ツールグリッドの1行目：5つの小さいボタン(1)です。"
+    "ja": "ツールグリッドの1行目：5つの小さいボタン(1)です。",
+    "ko": "도구 격자의 첫 번째 줄: 작은 버튼 다섯 개 (1).",
+    "zh-TW": "工具格的第一列：五個小按鈕 (1)。",
+    "zh-CN": "工具网格的第一行：五个小按钮 (1)。",
+    "fr": "La première ligne de la grille d’outils : les cinq petits boutons (1).",
+    "de": "Die erste Reihe des Werkzeugrasters: die fünf kleinen Schaltflächen (1).",
+    "it": "La prima riga della griglia degli strumenti: i cinque pulsanti piccoli (1).",
+    "pl": "Pierwszy rząd siatki narzędzi: pięć małych przycisków (1)."
    },
    "start": {
     "scene": "video",
@@ -4329,7 +4693,14 @@
     "vi": "Bảng Ánh xạ thời gian, tab Thường: các tab (1), các nút đặt điểm bắt đầu hoặc kết thúc (2), thước với tốc độ (3) và Làm mượt, Đảo ngược cùng Đóng băng khung hình (4).",
     "es-ES": "El panel Remapeo de tiempo, pestaña Normal: las pestañas (1), los botones para fijar el inicio o el final (2), la regla con la velocidad (3) y los botones Suavizar, Invertir, Congelar fotograma (4).",
     "ur": "ٹائم ریمپنگ پینل، نارمل ٹیب: ٹیبز (1)، آغاز یا اختتام مقرر کرنے والے بٹن (2)، رفتار کے ساتھ رولر (3)، بٹن اسموتھ، ریورس، فریز فریم (4)۔",
-    "ja": "パネル タイムリマッピング、タブ 通常：タブ(1)、開始または終了を設定するボタン(2)、速度のルーラー(3)、スムーズ、逆再生、フリーズフレーム(4)です。"
+    "ja": "パネル タイムリマッピング、タブ 通常：タブ(1)、開始または終了を設定するボタン(2)、速度のルーラー(3)、スムーズ、逆再生、フリーズフレーム(4)です。",
+    "ko": "시간 재매핑 패널의 일반 탭: 탭 (1), 시작 또는 끝을 설정하는 버튼 (2), 속도가 표시된 눈금자 (3), 부드럽게, 역방향, 프레임 고정 (4).",
+    "zh-TW": "時間重映射面板的正常分頁：分頁 (1)、設定起點或終點的按鈕 (2)、顯示速度的尺規 (3)，以及流暢化、倒放與定格 (4)。",
+    "zh-CN": "时间重映射面板的正常标签页：标签页 (1)、设置起点或终点的按钮 (2)、显示速度的标尺 (3)，以及流畅处理、倒放和定格 (4)。",
+    "fr": "Le panneau Remappage temporel, onglet Normal : les onglets (1), les boutons qui définissent le début ou la fin (2), la règle avec la vitesse (3) et Fluidifier, Inverser et Arrêt sur image (4).",
+    "de": "Das Bedienfeld Zeitsteuerung, Tab Normal: die Tabs (1), die Schaltflächen, die den Anfang oder das Ende festlegen (2), das Lineal mit der Geschwindigkeit (3) sowie Glätten, Umkehren und Standbild (4).",
+    "it": "Il pannello Rimappatura temporale, scheda Normale: le schede (1), i pulsanti che impostano l’inizio o la fine (2), il righello con la velocità (3) e Rendi fluido, Inverti e Blocca fotogramma (4).",
+    "pl": "Panel Zmiana tempa, karta Zwykły: karty (1), przyciski ustawiające początek lub koniec (2), linijka z prędkością (3) oraz Wygładź, Odwróć i Zatrzymaj klatkę (4)."
    },
    "start": {
     "scene": "video",
@@ -4440,7 +4811,14 @@
     "vi": "Tab Đường cong: các tab (1), các ô đường cong (2) và gợi ý bên dưới (3).",
     "es-ES": "La pestaña Curva: las pestañas (1), las fichas de curvas (2) y la pista de debajo (3).",
     "ur": "کرو ٹیب: ٹیبز (1)، کرو کی ٹائلیں (2) اور ان کے نیچے ہدایت (3)۔",
-    "ja": "タブ カーブ：タブ(1)、カーブのタイル(2)、その下のヒント(3)です。"
+    "ja": "タブ カーブ：タブ(1)、カーブのタイル(2)、その下のヒント(3)です。",
+    "ko": "곡선 탭: 탭 (1), 곡선 타일 (2), 그 아래의 안내 (3).",
+    "zh-TW": "曲線分頁：分頁 (1)、曲線磚 (2)、其下的提示 (3)。",
+    "zh-CN": "曲线标签页：标签页 (1)、曲线图块 (2)、其下的提示 (3)。",
+    "fr": "L’onglet Courbe : les onglets (1), les vignettes de courbe (2) et l’indication en dessous (3).",
+    "de": "Der Tab Kurve: die Tabs (1), die Kurvenkacheln (2) und der Hinweis darunter (3).",
+    "it": "La scheda Curva: le schede (1), i riquadri delle curve (2) e il suggerimento sotto di essi (3).",
+    "pl": "Karta Krzywa: karty (1), kafelki krzywych (2) i podpowiedź pod nimi (3)."
    },
    "start": {
     "scene": "video",
@@ -4528,7 +4906,14 @@
     "vi": "Trình chỉnh sửa đường cong tốc độ: thanh trên cùng với tên, độ dài và Đặt lại (1), đường cong (2) và tốc độ, Thêm điểm cùng Làm mượt (3).",
     "es-ES": "El editor de la curva de velocidad: la barra superior con el nombre, la duración y el botón Restablecer (1), la curva (2) y la velocidad con los botones Añadir punto, Suavizar (3).",
     "ur": "رفتار کے کرو کا ایڈیٹر: نام، لمبائی اور ری سیٹ کے ساتھ ٹاپ بار (1)، کرو (2)، رفتار اور بٹن پوائنٹ شامل کریں، اسموتھ (3)۔",
-    "ja": "速度カーブエディター：名前、長さ、リセットを含むトップバー(1)、カーブ(2)、速度、ポイントを追加、スムーズ(3)です。"
+    "ja": "速度カーブエディター：名前、長さ、リセットを含むトップバー(1)、カーブ(2)、速度、ポイントを追加、スムーズ(3)です。",
+    "ko": "속도 곡선 편집기: 이름, 길이, 초기화가 있는 상단 바 (1), 곡선 (2), 속도, 포인트 추가, 부드럽게 (3).",
+    "zh-TW": "速度曲線編輯器：含名稱、長度與重設的頂端列 (1)、曲線 (2)、速度、新增節點與流暢化 (3)。",
+    "zh-CN": "速度曲线编辑器：含名称、长度和重置的顶部栏 (1)、曲线 (2)、速度、添加点和流畅处理 (3)。",
+    "fr": "L’éditeur de courbe de vitesse : la barre du haut avec le nom, la durée et Réinitialiser (1), la courbe (2) et la vitesse, Ajouter un point et Fluidifier (3).",
+    "de": "Der Geschwindigkeitskurven-Editor: die obere Leiste mit dem Namen, der Länge und Zurücksetzen (1), die Kurve (2) sowie die Geschwindigkeit, Punkt hinzufügen und Glätten (3).",
+    "it": "L’editor della curva di velocità: la barra superiore con il nome, la durata e Ripristina (1), la curva (2) e la velocità, Aggiungi punto e Rendi fluido (3).",
+    "pl": "Edytor krzywej prędkości: górny pasek z nazwą, długością i Resetuj (1), krzywa (2) oraz prędkość, Dodaj punkt i Wygładź (3)."
    },
    "start": {
     "scene": "video",
@@ -4622,7 +5007,14 @@
     "vi": "Đang đảo ngược video: hộp hiện thời gian còn lại và Hủy (1).",
     "es-ES": "Invirtiendo el vídeo: el cuadro con el tiempo restante y el botón Cancelar (1).",
     "ur": "ریورس جاری ہے: باقی وقت کا باکس اور منسوخ کریں (1)۔",
-    "ja": "逆再生の処理中：残り時間と、キャンセルを表示するボックス(1)です。"
+    "ja": "逆再生の処理中：残り時間と、キャンセルを表示するボックス(1)です。",
+    "ko": "역방향 처리 중: 남은 시간과 취소가 있는 상자 (1).",
+    "zh-TW": "倒放處理中：顯示剩餘時間與取消的方框 (1)。",
+    "zh-CN": "倒放处理中：显示剩余时间和取消的方框 (1)。",
+    "fr": "Inverser en cours : la boîte avec le temps restant et Annuler (1).",
+    "de": "Umkehren in Arbeit: das Feld mit der verbleibenden Zeit und Abbrechen (1).",
+    "it": "Inverti al lavoro: il riquadro con il tempo rimasto e Annulla (1).",
+    "pl": "Odwracanie w toku: ramka z pozostałym czasem i Anuluj (1)."
    },
    "start": {
     "scene": "long",
@@ -4691,7 +5083,14 @@
     "vi": "Bảng Làm mượt: phương pháp và mức độ (1), Nhòe chuyển động (2) và Bắt đầu (3).",
     "es-ES": "La hoja Suavizar: el método y el nivel (1), la opción Desenfoque de movimiento (2) y el botón Inicio (3).",
     "ur": "اسموتھ شیٹ: طریقہ اور درجہ (1)، موشن بلر (2)، شروع (3)۔",
-    "ja": "シート スムーズ：方法とレベル(1)、モーションブラー(2)、開始(3)です。"
+    "ja": "シート スムーズ：方法とレベル(1)、モーションブラー(2)、開始(3)です。",
+    "ko": "부드럽게 시트: 방식과 강도 (1), 모션 블러 (2), 시작 (3).",
+    "zh-TW": "流暢化面板：方法與強度 (1)、動態模糊 (2)、開始 (3)。",
+    "zh-CN": "流畅处理面板：方法和强度 (1)、运动模糊 (2)、开始 (3)。",
+    "fr": "La feuille Fluidifier : la méthode et le niveau (1), Flou de mouvement (2) et Démarrer (3).",
+    "de": "Das Blatt Glätten: die Methode und die Stufe (1), Bewegungsunschärfe (2) und Starten (3).",
+    "it": "Il foglio Rendi fluido: il metodo e il livello (1), Sfocatura di movimento (2) e Avvia (3).",
+    "pl": "Arkusz Wygładź: metoda i poziom (1), Rozmycie ruchu (2) i Rozpocznij (3)."
    },
    "start": {
     "scene": "video",
@@ -4798,7 +5197,14 @@
     "vi": "Trang Công cụ: Nén (1) và Tải video (2), cùng nút Công cụ của thanh dưới cùng (3).",
     "es-ES": "La página de herramientas: Comprimir (1), Descargador de vídeo (2) y el botón Herramientas de la barra inferior (3).",
     "ur": "ٹولز کا صفحہ: کمپریس (1)، ویڈیو ڈاؤن لوڈر (2) اور نچلے بار کا ٹولز بٹن (3)۔",
-    "ja": "ツールページ：圧縮(1)、動画ダウンローダー(2)、下部バーのボタン ツール(3)です。"
+    "ja": "ツールページ：圧縮(1)、動画ダウンローダー(2)、下部バーのボタン ツール(3)です。",
+    "ko": "도구 페이지: 압축 (1)과 동영상 다운로더 (2), 하단 바의 도구 버튼 (3).",
+    "zh-TW": "工具頁面：壓縮 (1) 與影片下載器 (2)，以及底部列的工具按鈕 (3)。",
+    "zh-CN": "工具页面：压缩 (1) 和视频下载器 (2)，以及底部栏的工具按钮 (3)。",
+    "fr": "La page Outils : Compresser (1) et Téléchargeur de vidéos (2), et le bouton Outils de la barre du bas (3).",
+    "de": "Die Seite Werkzeuge: Komprimieren (1) und Video-Downloader (2) sowie die Schaltfläche Werkzeuge in der unteren Leiste (3).",
+    "it": "La pagina Strumenti: Comprimi (1) e Scarica video (2), e il pulsante Strumenti della barra inferiore (3).",
+    "pl": "Strona Narzędzia: Kompresuj (1) i Pobieranie wideo (2) oraz przycisk Narzędzia na dolnym pasku (3)."
    },
    "start": "home",
    "steps": [
@@ -4882,7 +5288,14 @@
     "vi": "Nén khi đã chọn video: tệp (1), các lựa chọn dưới Nén nhỏ đến đâu? (2) và dung lượng dự kiến, cùng nút Nén (3).",
     "es-ES": "La pantalla de compresión con un vídeo elegido: el archivo (1), las opciones debajo de la pregunta ¿Cuánto quieres reducirlo? (2) y el tamaño esperado, con el botón Comprimir (3).",
     "ur": "ویڈیو منتخب کرنے کے بعد کمپریس: فائل (1)، کتنا چھوٹا؟ کے نیچے انتخابات (2)، متوقع سائز اور کمپریس بٹن (3)۔",
-    "ja": "動画を選択した圧縮画面：ファイル(1)、選択肢 どれくらい小さくしますか？(2)、予想サイズとボタン 圧縮(3)です。"
+    "ja": "動画を選択した圧縮画面：ファイル(1)、選択肢 どれくらい小さくしますか？(2)、予想サイズとボタン 圧縮(3)です。",
+    "ko": "동영상을 선택한 압축 화면: 파일 (1), 압축 정도 아래의 선택지 (2), 예상 크기와 압축 버튼 (3).",
+    "zh-TW": "已選擇影片的壓縮畫面：檔案 (1)、壓縮程度下方的選項 (2)，以及預估大小與壓縮按鈕 (3)。",
+    "zh-CN": "已选择视频的压缩界面：文件 (1)、压缩程度下方的选项 (2)，以及预计大小和压缩按钮 (3)。",
+    "fr": "Compresser avec une vidéo choisie : le fichier (1), les choix sous Quel niveau de compression ? (2) et la taille attendue, avec le bouton Compresser (3).",
+    "de": "Komprimieren mit ausgewähltem Video: die Datei (1), die Optionen unter Wie stark komprimieren? (2) und die erwartete Größe mit der Schaltfläche Komprimieren (3).",
+    "it": "Comprimi con un video scelto: il file (1), le opzioni sotto Quanto comprimere? (2) e la dimensione prevista, con il pulsante Comprimi (3).",
+    "pl": "Kompresuj z wybranym wideo: plik (1), opcje pod Jak mocno skompresować? (2) oraz oczekiwany rozmiar z przyciskiem Kompresuj (3)."
    },
    "start": "home",
    "steps": [
@@ -4980,7 +5393,14 @@
     "vi": "Kết quả nén: Sau và Trước (1), phần xem trước với nút Toàn màn hình (2), các dung lượng (3), và Lưu vào thư viện cùng Chia sẻ (4).",
     "es-ES": "El resultado de la compresión: Después y Antes (1), la vista previa con su botón Pantalla completa (2), los tamaños (3) y los botones Guardar en la galería y Compartir (4).",
     "ur": "کمپریس کا نتیجہ: بعد اور پہلے (1)، فل اسکرین بٹن کے ساتھ پریویو (2)، سائز (3)، گیلری میں محفوظ کریں اور شیئر کریں (4)۔",
-    "ja": "圧縮の結果：圧縮後、圧縮前(1)、プレビューとボタン 全画面(2)、サイズ(3)、ギャラリーに保存、共有(4)です。"
+    "ja": "圧縮の結果：圧縮後、圧縮前(1)、プレビューとボタン 全画面(2)、サイズ(3)、ギャラリーに保存、共有(4)です。",
+    "ko": "압축 결과: 압축 후와 압축 전 (1), 전체 화면 버튼이 있는 미리보기 (2), 크기 (3), 갤러리에 저장과 공유 (4).",
+    "zh-TW": "壓縮的結果：壓縮後與壓縮前 (1)、附有全螢幕按鈕的預覽 (2)、檔案大小 (3)，以及儲存至相簿與分享 (4)。",
+    "zh-CN": "压缩结果：压缩后和压缩前 (1)、带全屏按钮的预览 (2)、文件大小 (3)，以及保存到相册和分享 (4)。",
+    "fr": "Le résultat de Compresser : Après et Avant (1), l’aperçu avec son bouton Plein écran (2), les tailles (3), ainsi que Enregistrer dans la galerie et Partager (4).",
+    "de": "Das Ergebnis von Komprimieren: Danach und Davor (1), die Vorschau mit ihrer Schaltfläche Vollbild (2), die Größen (3) sowie In Galerie speichern und Teilen (4).",
+    "it": "Il risultato di Comprimi: Dopo e Prima (1), l’anteprima con il suo pulsante Schermo intero (2), le dimensioni (3), e Salva nella galleria e Condividi (4).",
+    "pl": "Wynik kompresji: Po i Przed (1), podgląd z przyciskiem Pełny ekran (2), rozmiary (3) oraz Zapisz w galerii i Udostępnij (4)."
    },
    "start": "home",
    "steps": [
@@ -5112,7 +5532,14 @@
     "vi": "Chế độ toàn màn hình của kết quả: Sau và Trước (1), nút đóng (2) và video (3).",
     "es-ES": "La vista a pantalla completa del resultado: Después y Antes (1), el botón de cerrar (2) y el vídeo (3).",
     "ur": "نتیجے کا فل اسکرین منظر: بعد اور پہلے (1)، بند کرنے کا بٹن (2)، ویڈیو (3)۔",
-    "ja": "結果の全画面表示：圧縮後、圧縮前(1)、閉じるボタン(2)、動画(3)です。"
+    "ja": "結果の全画面表示：圧縮後、圧縮前(1)、閉じるボタン(2)、動画(3)です。",
+    "ko": "결과의 전체 화면 보기: 압축 후와 압축 전 (1), 닫기 버튼 (2), 동영상 (3).",
+    "zh-TW": "結果的全螢幕檢視：壓縮後與壓縮前 (1)、關閉按鈕 (2)、影片 (3)。",
+    "zh-CN": "结果的全屏视图：压缩后和压缩前 (1)、关闭按钮 (2)、视频 (3)。",
+    "fr": "La vue plein écran du résultat : Après et Avant (1), le bouton de fermeture (2) et la vidéo (3).",
+    "de": "Die Vollbildansicht des Ergebnisses: Danach und Davor (1), die Schließen-Schaltfläche (2) und das Video (3).",
+    "it": "La vista a schermo intero del risultato: Dopo e Prima (1), il pulsante di chiusura (2) e il video (3).",
+    "pl": "Widok wyniku na pełnym ekranie: Po i Przed (1), przycisk zamykania (2) i wideo (3)."
    },
    "start": "home",
    "steps": [
@@ -5241,7 +5668,14 @@
     "vi": "Tải video trước khi cài tiện ích bổ sung: thẻ yêu cầu cài đặt (1).",
     "es-ES": "La pantalla Descargador de vídeo antes de instalar el complemento: la tarjeta que lo solicita (1).",
     "ur": "ایڈ آن انسٹال ہونے سے پہلے ویڈیو ڈاؤن لوڈر: ایڈ آن مانگنے والا کارڈ (1)۔",
-    "ja": "アドオンをインストールする前の画面 動画ダウンローダー：アドオンを求めるカード(1)です。"
+    "ja": "アドオンをインストールする前の画面 動画ダウンローダー：アドオンを求めるカード(1)です。",
+    "ko": "애드온을 설치하기 전의 동영상 다운로더: 설치를 요청하는 카드 (1).",
+    "zh-TW": "尚未安裝附加元件時的影片下載器：要求安裝的卡片 (1)。",
+    "zh-CN": "尚未安装插件时的视频下载器：要求安装的卡片 (1)。",
+    "fr": "Le Téléchargeur de vidéos avant l’installation du module : la carte qui le demande (1).",
+    "de": "Der Video-Downloader vor der Installation des Add-ons: die Karte, die danach fragt (1).",
+    "it": "Scarica video prima dell’installazione del componente aggiuntivo: la scheda che lo richiede (1).",
+    "pl": "Pobieranie wideo przed zainstalowaniem dodatku: karta z prośbą o jego instalację (1)."
    },
    "start": "home",
    "steps": [
@@ -5326,7 +5760,14 @@
     "vi": "Một liên kết đã kiểm tra: ô liên kết (1), tiêu đề và hình của video (2), nội dung cần lưu (3), chất lượng (4) và Tải xuống (5).",
     "es-ES": "Un enlace verificado: el campo del enlace (1), el título y la imagen del vídeo (2), qué guardar (3), la calidad (4) y el botón Descargar (5).",
     "ur": "جانچا ہوا لنک: لنک کا خانہ (1)، ویڈیو کا عنوان اور تصویر (2)، کیا محفوظ کرنا ہے (3)، کوالٹی (4)، ڈاؤن لوڈ (5)۔",
-    "ja": "確認済みのリンク：リンク欄(1)、動画のタイトルと画像(2)、保存する内容(3)、画質(4)、ダウンロード(5)です。"
+    "ja": "確認済みのリンク：リンク欄(1)、動画のタイトルと画像(2)、保存する内容(3)、画質(4)、ダウンロード(5)です。",
+    "ko": "확인된 링크: 링크 입력란 (1), 동영상의 제목과 사진 (2), 저장할 항목 (3), 화질 (4), 다운로드 (5).",
+    "zh-TW": "已檢查的連結：連結欄位 (1)、影片的標題與圖片 (2)、要儲存的內容 (3)、畫質 (4)、下載 (5)。",
+    "zh-CN": "已检查的链接：链接输入框 (1)、视频的标题和图片 (2)、要保存的内容 (3)、画质 (4)、下载 (5)。",
+    "fr": "Un lien vérifié : le champ du lien (1), le titre et l’image de la vidéo (2), ce qu’il faut enregistrer (3), la qualité (4) et Télécharger (5).",
+    "de": "Ein geprüfter Link: das Linkfeld (1), der Titel und das Bild des Videos (2), was gespeichert werden soll (3), die Qualität (4) und Herunterladen (5).",
+    "it": "Un link controllato: il campo del link (1), il titolo e l’immagine del video (2), cosa salvare (3), la qualità (4) e Scarica (5).",
+    "pl": "Sprawdzony link: pole linku (1), tytuł i obraz wideo (2), co zapisać (3), jakość (4) i Pobierz (5)."
    },
    "start": "home",
    "steps": [
@@ -5462,7 +5903,14 @@
     "vi": "Sau khi tải xuống: nơi tệp được lưu (1), và Dự án mới cùng Nén (2).",
     "es-ES": "Tras la descarga: el lugar donde se guardó el archivo (1) y los botones Nuevo proyecto y Comprimir (2).",
     "ur": "ڈاؤن لوڈ کے بعد: فائل محفوظ ہونے کی جگہ (1)، بٹن نیا پروجیکٹ اور کمپریس (2)۔",
-    "ja": "ダウンロード後：ファイルの保存先(1)、新規プロジェクト、圧縮(2)です。"
+    "ja": "ダウンロード後：ファイルの保存先(1)、新規プロジェクト、圧縮(2)です。",
+    "ko": "다운로드 후: 파일이 저장된 위치 (1), 새 프로젝트와 압축 (2).",
+    "zh-TW": "下載完成後：檔案的儲存位置 (1)，以及新增專案與壓縮 (2)。",
+    "zh-CN": "下载完成后：文件的保存位置 (1)，以及新建项目和压缩 (2)。",
+    "fr": "Après le téléchargement : l’endroit où le fichier a été enregistré (1), et Nouveau projet et Compresser (2).",
+    "de": "Nach dem Download: der Ort, an dem die Datei gespeichert wurde (1), sowie Neues Projekt und Komprimieren (2).",
+    "it": "Dopo il download: il posto in cui è stato salvato il file (1), e Nuovo progetto e Comprimi (2).",
+    "pl": "Po pobraniu: miejsce zapisania pliku (1) oraz Nowy projekt i Kompresuj (2)."
    },
    "start": "home",
    "steps": [
@@ -5579,7 +6027,14 @@
     "vi": "Danh sách chuyển cảnh đã cuộn đến cuối, với các chuyển cảnh mới Phát sáng (1), Xoáy (2), Điểm ảnh (3) và Tan nhiễu (4).",
     "es-ES": "La lista de transiciones desplazada al final, con las transiciones más nuevas: Brillo (1), Remolino (2), Pixelar (3) y Disolución de ruido (4).",
     "ur": "ٹرانزیشنز کی فہرست آخر تک اسکرول کی ہوئی، نئی ٹرانزیشنز کے ساتھ: گلو (1)، سوئرل (2)، پکسیلیٹ (3)، نائز ڈسولوز (4)۔",
-    "ja": "末尾までスクロールしたトランジションのリスト：新しいトランジション グロー(1)、渦巻き(2)、ピクセレート(3)、ノイズディゾルブ(4)です。"
+    "ja": "末尾までスクロールしたトランジションのリスト：新しいトランジション グロー(1)、渦巻き(2)、ピクセレート(3)、ノイズディゾルブ(4)です。",
+    "ko": "끝까지 스크롤한 전환 목록과 새 전환 효과 글로우 (1), 소용돌이 (2), 픽셀화 (3), 노이즈 디졸브 (4).",
+    "zh-TW": "捲到底的轉場清單，以及較新的轉場效果：光暈 (1)、旋渦 (2)、像素化 (3)、雜訊溶接 (4)。",
+    "zh-CN": "滚动到末尾的转场列表，以及较新的转场效果：发光 (1)、旋涡 (2)、像素化 (3)、噪点溶解 (4)。",
+    "fr": "La liste des transitions défilée jusqu’à la fin, avec les transitions plus récentes Lueur (1), Tourbillon (2), Pixellisation (3) et Fondu bruité (4).",
+    "de": "Die ans Ende gescrollte Übergangsliste mit den neueren Übergängen Leuchten (1), Wirbel (2), Verpixeln (3) und Rauschblende (4).",
+    "it": "L’elenco delle transizioni scorso fino alla fine, con le transizioni più recenti Bagliore (1), Vortice (2), Effetto pixel (3) e Dissolvenza con disturbo (4).",
+    "pl": "Lista przejść przewinięta do końca, z nowszymi przejściami Poświata (1), Wir (2), Pikselizacja (3) i Rozpuszczanie szumem (4)."
    },
    "start": {
     "scene": "clips",
@@ -5693,7 +6148,14 @@
     "vi": "Nút Hiệu ứng của thanh dưới cùng (1) mở một menu có Thêm hiệu ứng cho tất cả và Dán tất cả hiệu ứng (2).",
     "es-ES": "El botón Efectos de la barra inferior (1) abre un menú con Añadir un efecto a todas y Pegar todos los efectos (2).",
     "ur": "نچلے بار کا ایفیکٹس بٹن (1) ایک مینو کھولتا ہے جس میں سب میں ایفیکٹ شامل کریں اور تمام ایفیکٹس پیسٹ کریں ہیں (2)۔",
-    "ja": "下部バーのボタン エフェクト(1)でメニューが開き、すべてにエフェクトを追加、すべてのエフェクトを貼り付け(2)があります。"
+    "ja": "下部バーのボタン エフェクト(1)でメニューが開き、すべてにエフェクトを追加、すべてのエフェクトを貼り付け(2)があります。",
+    "ko": "하단 바의 이펙트 버튼 (1)을 누르면 이펙트 추가와 모든 이펙트 붙여넣기가 있는 메뉴 (2)가 열립니다.",
+    "zh-TW": "底部列的特效按鈕 (1) 會開啟選單，內有新增特效與貼上所有特效 (2)。",
+    "zh-CN": "底部栏的特效按钮 (1) 会打开菜单，其中有添加特效和粘贴所有特效 (2)。",
+    "fr": "Le bouton Effets de la barre du bas (1) ouvre un menu avec Ajouter un effet à tous et Coller tous les effets (2).",
+    "de": "Die Schaltfläche Effekte in der unteren Leiste (1) öffnet ein Menü mit Effekt hinzufügen für alle und Alle Effekte einfügen (2).",
+    "it": "Il pulsante Effetti della barra inferiore (1) apre un menu con Aggiungi un effetto a tutti e Incolla tutti gli effetti (2).",
+    "pl": "Przycisk Efekty na dolnym pasku (1) otwiera menu z opcjami Dodaj efekt do wszystkich i Wklej wszystkie efekty (2)."
    },
    "start": {
     "scene": "demo",
@@ -5778,7 +6240,14 @@
     "vi": "Nút Thao tác khác của thanh dưới cùng (1) mở một menu có các lệnh dán và Gỡ âm thanh khỏi tất cả (2).",
     "es-ES": "El botón Más acciones de la barra inferior (1) abre un menú con los comandos de pegado y la opción Quitar el audio a todas (2).",
     "ur": "نچلے بار کا مزید ایکشنز بٹن (1) ایک مینو کھولتا ہے جس میں پیسٹ کمانڈز اور سب سے آڈیو ہٹائیں ہیں (2)۔",
-    "ja": "下部バーのボタン その他の操作(1)でメニューが開き、貼り付けコマンド、すべてから音声を削除(2)があります。"
+    "ja": "下部バーのボタン その他の操作(1)でメニューが開き、貼り付けコマンド、すべてから音声を削除(2)があります。",
+    "ko": "하단 바의 더 많은 작업 버튼 (1)을 누르면 붙여넣기 명령과 모두에서 오디오 제거가 있는 메뉴 (2)가 열립니다.",
+    "zh-TW": "底部列的更多操作按鈕 (1) 會開啟選單，內有貼上指令與移除全部音訊 (2)。",
+    "zh-CN": "底部栏的更多操作按钮 (1) 会打开菜单，其中有粘贴指令和移除全部音频 (2)。",
+    "fr": "Le bouton Plus d’actions de la barre du bas (1) ouvre un menu avec les commandes de collage et Retirer l’audio de tous (2).",
+    "de": "Die Schaltfläche Weitere Aktionen in der unteren Leiste (1) öffnet ein Menü mit den Einfügebefehlen und Audio aus allen entfernen (2).",
+    "it": "Il pulsante Altre azioni della barra inferiore (1) apre un menu con i comandi di incolla e Rimuovi audio da tutti (2).",
+    "pl": "Przycisk Więcej działań na dolnym pasku (1) otwiera menu z poleceniami wklejania i Usuń dźwięk ze wszystkich (2)."
    },
    "start": {
     "scene": "demo",
@@ -5857,7 +6326,14 @@
     "vi": "Thư viện hiệu ứng: tìm kiếm (1), hiệu ứng đề xuất (2), hiệu ứng gần đây và yêu thích (3) và các danh mục (4).",
     "es-ES": "La biblioteca de efectos: la búsqueda (1), los efectos recomendados (2), los efectos recientes y favoritos (3) y las categorías (4).",
     "ur": "ایفیکٹس لائبریری: سرچ (1)، تجویز کردہ ایفیکٹس (2)، حالیہ اور پسندیدہ ایفیکٹس (3)، کیٹیگریز (4)۔",
-    "ja": "エフェクトライブラリ：検索(1)、おすすめのエフェクト(2)、最近使ったエフェクトとお気に入り(3)、カテゴリ(4)です。"
+    "ja": "エフェクトライブラリ：検索(1)、おすすめのエフェクト(2)、最近使ったエフェクトとお気に入り(3)、カテゴリ(4)です。",
+    "ko": "이펙트 라이브러리: 검색 (1), 추천 이펙트 (2), 최근 및 즐겨찾는 이펙트 (3), 카테고리 (4).",
+    "zh-TW": "特效庫：搜尋 (1)、推薦特效 (2)、最近使用與我的最愛特效 (3)、類別 (4)。",
+    "zh-CN": "特效库：搜索 (1)、推荐特效 (2)、最近使用和收藏的特效 (3)、分类 (4)。",
+    "fr": "La Bibliothèque d’effets : la recherche (1), les effets recommandés (2), les effets récents et favoris (3) et les catégories (4).",
+    "de": "Die Effektbibliothek: die Suche (1), die empfohlenen Effekte (2), zuletzt verwendete und favorisierte Effekte (3) und die Kategorien (4).",
+    "it": "La Libreria effetti: la ricerca (1), gli effetti consigliati (2), gli effetti recenti e preferiti (3) e le categorie (4).",
+    "pl": "Biblioteka efektów: wyszukiwanie (1), polecane efekty (2), ostatnie i ulubione efekty (3) oraz kategorie (4)."
    },
    "start": {
     "scene": "demo",
@@ -5949,7 +6425,14 @@
     "vi": "Bộ chọn Dither: mỗi mẫu có một hình mẫu nhỏ (1).",
     "es-ES": "El selector Tramado: cada patrón tiene una pequeña imagen de muestra (1).",
     "ur": "ڈدرنگ سلیکٹر: ہر پیٹرن کی ایک چھوٹی نمونہ تصویر ہے (1)۔",
-    "ja": "ピッカー ディザ：パターンごとの小さなサンプル画像(1)です。"
+    "ja": "ピッカー ディザ：パターンごとの小さなサンプル画像(1)です。",
+    "ko": "디더 선택기: 모든 패턴에 작은 샘플 이미지 (1)가 있습니다.",
+    "zh-TW": "抖色選擇器：每種圖樣都有一張小範例圖 (1)。",
+    "zh-CN": "抖动选择器：每种图案都有一张小示例图 (1)。",
+    "fr": "Le sélecteur de tramage : chaque motif a une petite image d’exemple (1).",
+    "de": "Die Dither-Auswahl: Jedes Muster hat ein kleines Beispielbild (1).",
+    "it": "Il selettore del dithering: ogni motivo ha una piccola immagine di esempio (1).",
+    "pl": "Wybór ditheringu: każdy wzór ma małe zdjęcie próbki (1)."
    },
    "start": {
     "scene": "demo",
@@ -6023,7 +6506,14 @@
     "vi": "Hiệu ứng hạt: tuyết trong phần xem trước (1) và các cài đặt đầu tiên của nó (2).",
     "es-ES": "El efecto Partículas: la nieve en la vista previa (1) y sus primeras opciones (2).",
     "ur": "پارٹیکلز ایفیکٹ: پریویو میں برف (1) اور اس کی پہلی سیٹنگز (2)۔",
-    "ja": "パーティクルエフェクト：プレビューの雪(1)、最初の設定(2)です。"
+    "ja": "パーティクルエフェクト：プレビューの雪(1)、最初の設定(2)です。",
+    "ko": "파티클 이펙트: 미리보기의 눈 (1)과 첫 번째 설정 (2).",
+    "zh-TW": "粒子特效：預覽中的雪花 (1) 與前幾項設定 (2)。",
+    "zh-CN": "粒子特效：预览中的雪花 (1) 和前几项设置 (2)。",
+    "fr": "L’effet Particules : la neige dans l’aperçu (1) et ses premiers réglages (2).",
+    "de": "Der Effekt Partikel: der Schnee in der Vorschau (1) und seine ersten Einstellungen (2).",
+    "it": "L’effetto Particelle: la neve nell’anteprima (1) e le sue prime impostazioni (2).",
+    "pl": "Efekt Cząsteczki: śnieg w podglądzie (1) i jego pierwsze ustawienia (2)."
    },
    "start": {
     "scene": "demo",
@@ -6103,7 +6593,14 @@
     "vi": "Một lớp âm thanh trên dòng thời gian và các công cụ của nó: Preset, Hiệu ứng và AI (1).",
     "es-ES": "Una capa de audio en la línea de tiempo y sus herramientas: los botones Preajustes, Efectos, AI (1).",
     "ur": "ٹائم لائن پر ایک آڈیو لیئر اور اس کے ٹولز: پریسیٹس، ایفیکٹس، AI (1)۔",
-    "ja": "タイムライン上のオーディオレイヤーとそのツール：プリセット、エフェクト、AI(1)です。"
+    "ja": "タイムライン上のオーディオレイヤーとそのツール：プリセット、エフェクト、AI(1)です。",
+    "ko": "타임라인의 오디오 레이어와 도구: 프리셋, 이펙트, AI (1).",
+    "zh-TW": "時間軸上的音訊圖層與其工具：預設集、特效與 AI (1)。",
+    "zh-CN": "时间轴上的音频图层及其工具：预设、特效和 AI (1)。",
+    "fr": "Un calque audio sur la timeline et ses outils : Préréglages, Effets et IA (1).",
+    "de": "Eine Audioebene auf der Zeitleiste und ihre Werkzeuge: Voreinstellungen, Effekte und KI (1).",
+    "it": "Un livello audio sulla timeline e i suoi strumenti: Preset, Effetti e IA (1).",
+    "pl": "Warstwa dźwiękowa na osi czasu i jej narzędzia: Presety, Efekty i AI (1)."
    },
    "start": {
     "scene": "demo",
@@ -6160,7 +6657,14 @@
     "bn": "আরও অ্যাকশন মেনুর টাইমিং স্ট্রেচ করুন (1) একটি শিট খোলে, যেখানে ক্লিপগুলো কত লম্বা হবে তা বেছে নিয়ে (2) প্রয়োগ করুন (3) ট্যাপ করুন।",
     "es-ES": "Estirar tiempo (1) en el menú Más acciones abre un panel donde eliges cuánto durarán los clips (2) y tocas Aplicar (3).",
     "ur": "مزید ایکشنز مینو میں ٹائمنگ اسٹریچ کریں (1) ایک شیٹ کھولتا ہے جہاں آپ چنتے ہیں کہ کلپس کتنے لمبے ہوں (2) اور پھر لاگو کریں (3) پر ٹیپ کرتے ہیں۔",
-    "ja": "その他の操作メニューのタイミングをストレッチ(1)でシートが開き、クリップの長さを選んで(2)、適用(3)をタップします。"
+    "ja": "その他の操作メニューのタイミングをストレッチ(1)でシートが開き、クリップの長さを選んで(2)、適用(3)をタップします。",
+    "ko": "더 많은 작업 메뉴의 타이밍 늘이기 (1)를 누르면 클립 길이를 선택하는 시트 (2)가 열리고, 적용 (3)을 누르세요.",
+    "zh-TW": "更多操作選單中的伸縮時間 (1) 會開啟面板，讓你選擇片段變成多長 (2)，再點一下套用 (3)。",
+    "zh-CN": "更多操作菜单中的拉伸时长 (1) 会打开面板，你可以选择片段变成多长 (2)，然后点按应用 (3)。",
+    "fr": "Étirer la durée (1) dans le menu Plus d’actions ouvre une feuille où vous choisissez la durée des clips (2), puis touchez Appliquer (3).",
+    "de": "Zeit strecken (1) im Menü Weitere Aktionen öffnet ein Blatt, in dem du wählst, wie lang die Clips werden (2), und dann auf Anwenden tippst (3).",
+    "it": "Ridimensiona durata (1) nel menu Altre azioni apre un foglio in cui scegli quanto diventano lunghe le clip (2) e tocchi Applica (3).",
+    "pl": "Rozciągnij czas (1) w menu Więcej działań otwiera arkusz, w którym wybierasz, jak długie mają być klipy (2), i dotykasz Zastosuj (3)."
    }
   },
   {
@@ -6185,7 +6689,14 @@
     "bn": "একটি ক্লিপ করা লেয়ার: এর তীর (1) নিচের দিকে সেই লেয়ারটিকে দেখায় যার সঙ্গে এটি ক্লিপ করা (2)।",
     "es-ES": "Una capa recortada: su flecha (1) apunta hacia abajo, a la capa con la que está recortada (2).",
     "ur": "کلپ کی گئی لیئر: اس کا تیر (1) نیچے اس لیئر کی طرف اشارہ کرتا ہے جس سے وہ کلپ ہے (2)۔",
-    "ja": "クリップされたレイヤー：矢印(1)がクリップ先のレイヤー(2)を下向きに指します。"
+    "ja": "クリップされたレイヤー：矢印(1)がクリップ先のレイヤー(2)を下向きに指します。",
+    "ko": "클리핑된 레이어: 화살표 (1)가 클리핑 대상 레이어 (2)를 아래로 가리킵니다.",
+    "zh-TW": "被剪裁的圖層：它的箭頭 (1) 向下指向所剪裁的圖層 (2)。",
+    "zh-CN": "被剪裁的图层：它的箭头 (1) 向下指向所剪裁到的图层 (2)。",
+    "fr": "Un calque écrêté : sa flèche (1) pointe vers le bas, vers le calque auquel il est écrêté (2).",
+    "de": "Eine beschnittene Ebene: Ihr Pfeil (1) zeigt nach unten auf die Ebene, an der sie beschnitten wird (2).",
+    "it": "Un livello ritagliato: la sua freccia (1) punta verso il basso, al livello a cui è ritagliato (2).",
+    "pl": "Warstwa z maską przycinającą: jej strzałka (1) wskazuje w dół na warstwę, do której jest przycięta (2)."
    }
   },
   {
@@ -6210,7 +6721,14 @@
     "bn": "একটি গ্রুপের ভিতরে: গিয়ার (1) গ্রুপের সেটিংস খোলে, যেখানে রিটাইমিং (2) আছে।",
     "es-ES": "Dentro de un grupo: el engranaje (1) abre los ajustes del grupo con Retemporización (2).",
     "ur": "گروپ کے اندر: گیئر (1) گروپ کی سیٹنگز کھولتا ہے جن میں ری ٹائمنگ (2) ہے۔",
-    "ja": "グループ内：歯車(1)でグループの設定が開き、リタイミング(2)があります。"
+    "ja": "グループ内：歯車(1)でグループの設定が開き、リタイミング(2)があります。",
+    "ko": "그룹 안쪽: 톱니바퀴 (1)를 누르면 시간 재조정 (2)이 있는 그룹 설정이 열립니다.",
+    "zh-TW": "群組內側：齒輪 (1) 會開啟群組設定，其中有重新計時 (2)。",
+    "zh-CN": "组内部：齿轮 (1) 会打开组设置，其中有时间重映射 (2)。",
+    "fr": "À l’intérieur d’un groupe : l’engrenage (1) ouvre les paramètres du groupe avec Modification du temps (2).",
+    "de": "Innen in einer Gruppe: Das Zahnrad (1) öffnet die Gruppeneinstellungen mit Zeit ändern (2).",
+    "it": "All’interno di un gruppo: l’ingranaggio (1) apre le impostazioni del gruppo con Modifica tempi (2).",
+    "pl": "Wewnątrz grupy: koło zębate (1) otwiera ustawienia grupy z opcją Zmiana czasu (2)."
    }
   },
   {
@@ -6235,7 +6753,14 @@
     "bn": "একটি ক্যাটাগরির ভিতরে (1), পরের বা আগের ক্যাটাগরিতে যেতে বাঁয়ে বা ডানে সোয়াইপ করুন (2)।",
     "es-ES": "Dentro de una categoría (1), desliza a la izquierda o a la derecha (2) para ir a la categoría siguiente o a la anterior.",
     "ur": "کسی کیٹیگری کے اندر (1)، اگلی یا پچھلی کیٹیگری پر جانے کے لیے دائیں یا بائیں سوائپ کریں (2)۔",
-    "ja": "カテゴリ内(1)で左または右にスワイプする(2)と、次または前のカテゴリに移ります。"
+    "ja": "カテゴリ内(1)で左または右にスワイプする(2)と、次または前のカテゴリに移ります。",
+    "ko": "카테고리 안쪽 (1)에서 왼쪽이나 오른쪽으로 스와이프 (2)하면 다음 또는 이전 카테고리로 이동합니다.",
+    "zh-TW": "在類別內側 (1) 向左或向右滑動 (2)，即可前往下一個或上一個類別。",
+    "zh-CN": "在分类内部 (1) 向左或向右滑动 (2)，即可前往下一个或上一个分类。",
+    "fr": "À l’intérieur d’une catégorie (1), balayez vers la gauche ou la droite (2) pour passer à la catégorie suivante ou précédente.",
+    "de": "Wische in einer Kategorie (1) nach links oder rechts (2), um zur nächsten oder vorherigen Kategorie zu wechseln.",
+    "it": "All’interno di una categoria (1), scorri a sinistra o a destra (2) per passare alla categoria successiva o precedente.",
+    "pl": "Wewnątrz kategorii (1) przesuń palcem w lewo lub w prawo (2), aby przejść do następnej lub poprzedniej kategorii."
    }
   },
   {
@@ -6260,7 +6785,14 @@
     "bn": "কোনো ইফেক্ট বাঁয়ে সোয়াইপ করলে (1) ট্র্যাশ ক্যান (2) দেখা যায়; মুছতে আঙুল ছেড়ে দিন।",
     "es-ES": "Al deslizar un efecto hacia la izquierda (1) aparece la papelera (2); suelta para eliminarlo.",
     "ur": "کسی ایفیکٹ کو دائیں سوائپ کرنے (1) پر کوڑے دان کا آئیکن (2) دکھتا ہے؛ حذف کرنے کے لیے انگلی چھوڑ دیں۔",
-    "ja": "エフェクトを左にスワイプする(1)とゴミ箱(2)が表示され、指を離すと削除されます。"
+    "ja": "エフェクトを左にスワイプする(1)とゴミ箱(2)が表示され、指を離すと削除されます。",
+    "ko": "이펙트를 왼쪽으로 스와이프 (1)하면 휴지통 (2)이 나타나고, 손을 떼면 삭제됩니다.",
+    "zh-TW": "將特效向左滑動 (1) 會出現垃圾桶 (2)，放開即可刪除。",
+    "zh-CN": "将特效向左滑动 (1) 会出现垃圾桶 (2)，松开即可删除。",
+    "fr": "Balayer un effet vers la gauche (1) fait apparaître la corbeille (2) ; relâchez pour le supprimer.",
+    "de": "Wenn du einen Effekt nach links wischst (1), erscheint der Papierkorb (2); lass los, um ihn zu löschen.",
+    "it": "Scorrendo un effetto verso sinistra (1) appare il cestino (2); rilascia per eliminarlo.",
+    "pl": "Przesunięcie efektu w lewo (1) pokazuje kosz (2); puść, aby go usunąć."
    }
   }
  ]

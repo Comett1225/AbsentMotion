@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-TW" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>形狀、繪圖與遮罩 | AbsentMotion</title><meta name="description" content="形狀、鋼筆工具、手繪繪圖、SVG 匯入、剪裁遮罩、群組、父圖層，以及動畫形狀遮罩。"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="說明"><a href="index.html">目錄</a><a href="effects/index.html">特效</a></nav></header><div class="wrap"><main id="main"><h1>形狀、繪圖與遮罩</h1><p class="lead">形狀、鋼筆工具、手繪繪圖、SVG 匯入、剪裁遮罩、群組、父圖層，以及動畫形狀遮罩。</p><details class="toc"><summary>本頁內容</summary><ul><li><a href="#shapes">形狀</a></li><li><a href="#the-pen-tool-and-edit-points">鋼筆工具與編輯節點</a></li><li><a href="#freehand-drawing">手繪繪圖</a></li><li><a href="#svg-files">SVG 檔案</a></li><li><a href="#masks-and-clipping">遮罩與剪裁</a></li><li><a href="#groups-and-parents">群組與父圖層</a></li></ul></details><h2 id="shapes">形狀</h2>
+<p>從<a href="add-menu.html">新增選單</a>的 <strong>形狀</strong> 頁籤新增現成的形狀。形狀分為兩種。</p>
+<ul><li><strong>參數化形狀</strong>（圓形、矩形、星形、多邊形等）使用 <strong>形狀選項</strong> 進行編輯：大小、半徑、節點數量等。這些設定可以製作動畫。</li><li><strong>路徑形狀</strong>（愛心、雲朵、齒輪等）使用 <strong>編輯節點</strong> 進行編輯。</li></ul>
+<p>顏色與外框使用 <strong>填色與顏色</strong> 和 <strong>邊框與陰影</strong> 設定。請參閱<a href="layer-tools.html">圖層工具</a>。</p>
+<h2 id="the-pen-tool-and-edit-points">鋼筆工具與編輯節點</h2>
+<p>新增選單中的 <strong>鋼筆工具</strong> 會建立新的形狀圖層，並開啟節點編輯器。工具格中的 <strong>編輯節點</strong> 則會為現有的路徑形狀開啟它。在預覽中點選即可放置節點；按住並拖曳可拉出曲線控點。虛影節點會顯示下一個節點將落在的位置。若未繪製任何內容就離開，會刪除新建立的圖層。</p>
+<p>在編輯器底部：</p>
+<ul><li><strong>封閉路徑</strong>或<strong>開放路徑</strong>（需要兩個或更多節點）。</li><li><strong>設為曲線節點</strong>或<strong>設為尖角節點</strong>。</li><li><strong>新增節點</strong>與<strong>刪除節點</strong>。</li><li>一個可移動所選節點的觸控板（「拖曳以移動節點」）；當您編輯平滑節點的控點時，<strong>角度</strong>與<strong>距離</strong>切換鈕會鎖定其角度或長度。</li><li>使用箭頭的<strong>輪廓</strong>可在形狀的各個獨立子路徑之間移動。</li><li>右側為節點清單，節點之間有小的「+」格，用於插入節點。</li></ul>
+<figure><img src="../assets/img/shapes-points.webp" width="720" height="1131" alt="節點編輯器：開放路徑 (1)、設為尖角節點 (2)、刪除節點 (3)、觸控板 (4)、輪廓箭頭 (5)、節點清單 (6)。" loading="lazy"><figcaption>節點編輯器：開放路徑 (1)、設為尖角節點 (2)、刪除節點 (3)、觸控板 (4)、輪廓箭頭 (5)、節點清單 (6)。</figcaption></figure>
+<p>頂端有 <strong>復原</strong>、<strong>重做</strong> 與 <strong>返回</strong>。</p>
+<h3 id="animated-shapes-shape-keyframes">動畫形狀（形狀關鍵影格）</h3>
+<p>在節點編輯器中，時間列上有 <strong>上一個形狀關鍵影格</strong>、<strong>下一個形狀關鍵影格</strong>、<strong>新增形狀關鍵影格</strong> 與 <strong>移除形狀關鍵影格</strong>。形狀關鍵影格會儲存播放頭所在時間點的整個形狀。移到另一個時間點、變更節點，再新增一個關鍵影格，形狀就會在兩者之間產生動畫。先前的關鍵影格會以淡淡的虛線輪廓顯示，幫助您對齊。這就是製作描圖動畫遮罩的方法：沿著影片中某物的輪廓描繪，並隨著影片移動而調整。</p>
+<h2 id="freehand-drawing">手繪繪圖</h2>
+<p>新增選單中的 <strong>手繪筆刷</strong> 會建立繪圖圖層，並開啟繪圖編輯器。</p>
+<ul><li><strong>鋼筆</strong>繪製均勻的線條，<strong>筆刷</strong>會依壓力改變線寬，<strong>填色</strong>會將您繪製的封閉圈轉為填色形狀，而<strong>橡皮擦</strong>則會移除部分內容。</li><li>大小滑桿（1 到 300），以及附有色相條與不透明度條的顏色選擇器。</li><li>頂端有 <strong>復原</strong> 與 <strong>重做</strong>。每一筆在您抬起手指時都會被保留。</li><li>工具、大小與顏色會被記住。若未繪製任何內容就離開，會刪除新建立的圖層。</li></ul>
+<figure><img src="../assets/img/shapes-draw.webp" width="720" height="1077" alt="繪圖編輯器：四種工具 (1)、大小滑桿 (2)、顏色選擇器 (3)。" loading="lazy"><figcaption>繪圖編輯器：四種工具 (1)、大小滑桿 (2)、顏色選擇器 (3)。</figcaption></figure>
+<p>繪圖本身沒有關鍵影格。若要為繪圖製作動畫，請使用如「繪圖進度」之類的特效；請參閱<a href="effects/index.html">特效庫</a>。</p>
+<h2 id="svg-files">SVG 檔案</h2>
+<p>新增選單中的 <strong>匯入SVG</strong> 會將向量圖轉換為形狀。保留的內容請參閱<a href="add-menu.html">新增選單</a>。</p>
+<h2 id="masks-and-clipping">遮罩與剪裁</h2>
+<ul><li><strong>建立剪裁遮罩</strong>（圖層選單）會將圖層裁剪為其正下方圖層的形狀。<strong>釋放剪裁遮罩</strong>會將其復原。在時間軸中，被剪裁的圖層會在其列的末端顯示一個小型彎鉤箭頭，指向其被剪裁所依附的圖層。</li><li><strong>群組並遮罩</strong>與<strong>群組並排除</strong>（多選）會將圖層群組，並將最上層圖層的混合模式設為遮罩或排除。您也可以在任何圖層的<strong>不透明度</strong>中，將混合模式設為<strong>遮罩</strong>或<strong>排除</strong>。<strong>遮罩</strong>只會保留該圖層所在位置的下方內容；<strong>排除</strong>則會將其切除。</li><li>動畫遮罩來自形狀關鍵影格（見上文）。</li><li>相片與影片的<strong>移除背景</strong>請參閱 <a href="ai-tools.html">AI 工具</a>。</li></ul>
+<figure><img src="../assets/img/sh-clip-marker.webp" width="720" height="320" alt="被剪裁的圖層：它的箭頭 (1) 向下指向所剪裁的圖層 (2)。" loading="lazy"><figcaption>被剪裁的圖層：它的箭頭 (1) 向下指向所剪裁的圖層 (2)。</figcaption></figure>
+<h2 id="groups-and-parents">群組與父圖層</h2>
+<ul><li><strong>群組</strong>（多選）會將圖層放入一個群組圖層。您可以將群組整體移動、縮放、淡入淡出，並為其新增特效。請參閱<a href="layer-menus.html">圖層選單與多選</a>。</li><li><strong>父圖層</strong>（頂端列的父圖層按鈕）可讓一個圖層跟隨另一個圖層，而無需群組。移動類特效<strong>父層輔助</strong>與<strong>縮放輔助</strong>會改變子圖層跟隨父圖層的方式：請參閱<a href="effects-guide.html">使用特效</a>。</li><li><strong>空物件</strong>圖層（新增 &gt; 物件／素材）是不可見的。將它設為其他圖層的父圖層，即可一起移動它們，或讓<a href="tracking.html">動態追蹤</a>來移動它。</li></ul>
+<h3 id="edit-a-group">編輯群組</h3>
+<p>選取群組，然後在其工具中點選 <strong>編輯群組</strong> 以開啟。在群組內，時間軸與預覽只會顯示該群組的圖層，您可以像編輯其他圖層一樣變更它們。您也可以在群組中再開啟另一個群組。</p>
+<ul><li>頂端列會顯示您目前所在的位置：專案名稱，接著是每個已開啟群組的名稱。點選專案名稱即可回到整個專案，點選群組名稱則可回到該群組。</li><li>選取圖層時，圖層名稱旁會出現一個顯示群組名稱的小膠囊。點選它即可離開群組。</li><li>未選取任何項目時，手機的返回鍵會離開您目前所在的群組。</li><li>齒輪圖示會開啟您目前所在群組的設定。其中只有一項設定，即<strong>重新計時</strong>：請見下文。</li></ul>
+<p>已連結至素材的群組則會改為以<strong>素材屬性</strong>開啟：若要變更其圖層，請先開啟原始素材，或使用<strong>解除素材連結</strong>（請參閱<a href="assets-templates.html">素材、範本與預設集</a>）。由<strong>移除背景（影片）</strong>製作的影片去背無法開啟。</p>
+<h3 id="re-timing-a-group">重新計時群組</h3>
+<p><strong>重新計時</strong>決定當群組片段比其內部圖層更長或更短時，要播放什麼。開啟群組（<strong>編輯群組</strong>），點選齒輪，然後選擇：</p>
+<ul><li><strong>關閉</strong>（預設）：圖層以各自的速度播放，並在結束處停止。</li><li><strong>凍結</strong>：中段的最後一個影格會停留在畫面上。</li><li><strong>拉伸</strong>：圖層會放慢或加快，以填滿群組片段。</li><li><strong>循環</strong>：圖層會從頭開始重新播放。</li><li><strong>重複並拉伸</strong>：圖層會重複整數次，並稍微拉伸，以精確填滿片段。</li><li><strong>空白</strong>：圖層結束後不會顯示任何內容。</li></ul>
+<p>在群組內，拷貝與貼上選單中也有<strong>設定片頭結束點</strong>與<strong>設定片尾起點</strong>。它們會在標尺上放置金色旗標：片頭結束點之前與片尾起點之後的部分會保持其實際速度，而中間部分則會被拉伸、循環或凍結。</p>
+<figure><img src="../assets/img/sh-group-retiming.webp" width="720" height="1489" alt="群組內側：齒輪 (1) 會開啟群組設定，其中有重新計時 (2)。" loading="lazy"><figcaption>群組內側：齒輪 (1) 會開啟群組設定，其中有重新計時 (2)。</figcaption></figure>
+<h3 id="ungroup">取消群組</h3>
+<p>群組圖層選單中的<strong>取消群組</strong>會將其圖層放回專案中，並恢復它們在時間與畫面上原本的位置。若群組本身具有特效、速度、不透明度或混合設定，應用程式會在取消群組前警告這些設定將被移除。使用<strong>復原</strong>即可還原群組。</p><nav class="pager" aria-label="上一頁與下一頁"><a rel="prev" href="text.html">&larr; 文字與字型</a><a rel="next" href="media.html">照片、影片與速度 &rarr;</a></nav></main></div></body></html>

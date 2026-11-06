@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="zh-TW" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>動態追蹤 | AbsentMotion</title><meta name="description" content="讓標題、貼紙或形狀跟隨影片中移動的物體。"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="說明"><a href="index.html">目錄</a><a href="effects/index.html">特效</a></nav></header><div class="wrap"><main id="main"><h1>動態追蹤</h1><p class="lead">讓標題、貼紙或形狀跟隨影片中移動的物體。</p><details class="toc"><summary>本頁內容</summary><ul><li><a href="#how-to-track">如何追蹤</a></li><li><a href="#when-tracking-stops">追蹤停止時</a></li><li><a href="#tips">小技巧</a></li></ul></details><p>動態追蹤會追蹤影片中的某個細節，例如招牌的一角或一張臉，並寫入位置關鍵影格，讓你可以套用到其他圖層。追蹤在你的手機上執行。</p>
+<h2 id="how-to-track">如何追蹤</h2>
+<ol><li>選取一個<strong>影片圖層</strong>。將播放頭移到細節清楚可見的影格。</li><li>開啟圖層選單（三個點），然後點選<strong>動態追蹤</strong>。如果播放頭在片段之外，它會跳到第一個影格。</li><li>影片上會出現一個方框。將它拖到清晰且會持續可見的細節上，例如角落或紋理。若要追蹤旋轉與縮放，請使用兩個方框，放在同一個物體上相距較遠的兩個細節。</li><li>選擇要追蹤的項目以及套用的位置（見下方）。</li><li>點選<strong>追蹤</strong>。進度列會顯示「追蹤中... 40%」。點選<strong>取消</strong>即可停止；已追蹤的影格會保留其關鍵影格。</li><li>完成後，應用程式會顯示「已追蹤 N 個影格。關鍵影格位於...」。點選<strong>完成</strong>。</li></ol>
+<figure><img src="../assets/img/track-panel.webp" width="720" height="1131" alt="動態追蹤：框住細節的方框 (1)、追蹤 (2)、方向 (3)、套用至 (4)、追蹤按鈕 (5)。" loading="lazy"><figcaption>動態追蹤：框住細節的方框 (1)、追蹤 (2)、方向 (3)、套用至 (4)、追蹤按鈕 (5)。</figcaption></figure>
+<h3 id="the-options">選項</h3>
+<div class="table-wrap"><table><thead><tr><th>選項</th><th>選擇</th></tr></thead><tbody><tr><td data-label="選項"><strong>追蹤</strong></td><td data-label="選擇"><strong>位置</strong>（一個方框），或 <strong>位置、旋轉與縮放</strong>（兩個方框）</td></tr><tr><td data-label="選項"><strong>方向</strong></td><td data-label="選擇"><strong>向前</strong>（預設值）從播放頭追蹤到片段結尾，<strong>向後</strong>從播放頭追蹤到開頭，<strong>整個片段</strong>則兩個方向都追蹤</td></tr><tr><td data-label="選項"><strong>套用至</strong></td><td data-label="選擇"><strong>新增空物件</strong>（一個新的隱形圖層，名為 Track 1，長度與片段相同）或現有圖層</td></tr></tbody></table></div>
+<p>目標會取得位置關鍵影格；在兩個方框模式下，也會取得旋轉與縮放關鍵影格。</p>
+<h3 id="use-the-result">使用結果</h3>
+<p>最有彈性的方式是<strong>新增空物件</strong>：接著，使用上方列的<strong>父圖層</strong>按鈕（見<a href="editor.html">編輯器畫面</a>），讓你的標題、貼紙或形狀成為空物件的子圖層。之後它就會跟隨影片移動。你也可以在<strong>套用至</strong>中選擇標題圖層本身。</p>
+<h2 id="when-tracking-stops">追蹤停止時</h2>
+<p>如果細節遺失，執行會停止並顯示訊息：「追蹤已在第 N 個影格遺失。請將點移回同一個特徵上，然後點選「繼續」。」將方框移回同一個細節上，點選<strong>繼續</strong>，追蹤就會從該處接著進行。如果該位置的細節不足，請把方框移到更清晰的角落或紋理上。</p>
+<h2 id="tips">小技巧</h2>
+<ul><li>選擇對比強烈、會持續留在畫面中、且形狀不會改變的物體。</li><li>放置方框前，先將播放頭移到最清楚的影格，然後選擇<strong>整個片段</strong>，即可從該處向兩個方向追蹤。</li><li>之後你可以像編輯其他關鍵影格一樣編輯它們：見<a href="keyframes.html">關鍵影格與緩動</a>。</li></ul><nav class="pager" aria-label="上一頁與下一頁"><a rel="prev" href="camera-3d.html">&larr; 攝影機圖層與 3D</a><a rel="next" href="animations.html">轉場與動畫 &rarr;</a></nav></main></div></body></html>

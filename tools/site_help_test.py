@@ -195,7 +195,7 @@ class HelpLocaleTest(unittest.TestCase):
     def test_supported_tags_match_the_app(self):
         tags = sb.supported_tags()
         self.assertEqual(tags[0], "en")
-        self.assertEqual(len(tags), 17)
+        self.assertEqual(len(tags), 24)
         self.assertTrue({"ar", "fa"} <= set(tags))
         self.assertEqual(sb.RTL, {"ar", "fa", "ur"})
 

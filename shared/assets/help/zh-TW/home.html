@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-TW" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>首頁 | AbsentMotion</title><meta name="description" content="你的專案、素材與範本、工具頁籤中的工具（壓縮、修剪、擷取音訊、製作GIF與影片下載器），以及它們周圍的按鈕。"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="說明"><a href="index.html">目錄</a><a href="effects/index.html">特效</a></nav></header><div class="wrap"><main id="main"><h1>首頁</h1><p class="lead">你的專案、素材與範本、工具頁籤中的工具（壓縮、修剪、擷取音訊、製作GIF與影片下載器），以及它們周圍的按鈕。</p><details class="toc"><summary>本頁內容</summary><ul><li><a href="#the-top-bar">頂部列</a></li><li><a href="#the-bottom-bar">底部列</a></li><li><a href="#projects-and-assets">專案與素材</a></li><li><a href="#search">搜尋</a></li><li><a href="#sorting">排序</a></li><li><a href="#templates">範本</a></li><li><a href="#tools">工具</a></li><li><a href="#importing-a-project-file">匯入專案檔</a></li><li><a href="#when-something-is-wrong">發生問題時</a></li></ul></details><p>首頁是首次啟動後你第一個看到的畫面。它會列出你的專案，並提供建立專案、搜尋與變更設定的按鈕。在螢幕夠寬的平板電腦上，頂部列會變成寬版標題列，專案與範本會以格狀顯示，直向與橫向都是如此。</p>
+<figure><img src="../assets/img/home-screen.webp" width="720" height="1487" alt="主畫面：選單 (1)、搜尋 (2)、專案與素材 (3)、專案卡片 (4)、卡片選單按鈕 (5)、新增專案 (6)。" loading="lazy"><figcaption>主畫面：選單 (1)、搜尋 (2)、專案與素材 (3)、專案卡片 (4)、卡片選單按鈕 (5)、新增專案 (6)。</figcaption></figure>
+<h2 id="the-top-bar">頂部列</h2>
+<ul><li><strong>選單按鈕</strong>（左上角，三條線）。會開啟<a href="settings.html">設定</a>抽屜。</li><li>中間的 <strong>AbsentMotion</strong>。</li><li><strong>搜尋</strong>（右側的放大鏡）。會開啟搜尋欄位。搜尋時，同一位置會顯示一個 X 來關閉它，返回鍵也能關閉它。</li></ul>
+<h2 id="the-bottom-bar">底部列</h2>
+<ul><li><strong>專案</strong>、<strong>範本</strong>和<strong>工具</strong>可在首頁的三個頁面之間切換。</li><li>位於它們中間的圓形 <strong>+</strong> 按鈕會建立新專案：參見<a href="new-project.html">建立專案</a>。</li></ul>
+<h2 id="projects-and-assets">專案與素材</h2>
+<p>專案頁面頂部有兩個標籤：<strong>專案</strong>與<strong>素材</strong>。</p>
+<ul><li><strong>專案</strong>是你的影片與動畫。點選卡片即可在編輯器中開啟它。</li><li><strong>素材</strong>是你從專案儲存的可重複使用元件，或使用新專案面板中的 <strong>素材</strong> 選項建立的元件。你可以在編輯器中把它們加入其他專案。參見<a href="assets-templates.html">素材、範本與預設集</a>。</li></ul>
+<p>專案與素材的儲存方式相同，只是在清單中分開列出。</p>
+<h3 id="what-a-card-shows">卡片顯示的內容</h3>
+<p>每張卡片都有一張縮圖，角落會顯示專案長度；卡片上還有名稱，以及兩行資訊：長寬比（例如16:9）與解析度（例如1080p），然後是檔案大小與影格速率。檔案大小指的是專案檔本身的大小，不包含專案所使用的照片、影片與音訊，因此一個含有數小時影片的專案，仍可能只顯示幾 KB。</p>
+<p>縮圖是你關閉編輯器時所拍下的靜態畫面，位置為播放頭所在處。從未在編輯器中開啟過的專案，可能會顯示空白縮圖。</p>
+<h3 id="the-card-menu">卡片選單</h3>
+<p>卡片上的三點按鈕（名為<strong>更多</strong>）包含以下項目。</p>
+<ul><li><strong>匯出</strong>會直接從清單開啟匯出畫面。「目前影格」選項會使用第一個影格。這也是唯一提供 <strong>XML</strong> 匯出的地方。參見<a href="export.html">匯出</a>。</li><li><strong>複製</strong>（素材則為<strong>複製素材</strong>）會建立一份名為「名稱 Copy」的副本，連同其媒體一起複製。</li><li><strong>將媒體收集至專案</strong>會把專案使用、位於其資料夾之外的每個檔案複製進專案中，因此它不再依賴你的相簿。參見<a href="projects.html">專案、備份與匯入</a>。</li><li><strong>版本紀錄</strong>會顯示專案的舊版本，並讓你還原到其中一個版本。</li><li><strong>刪除</strong>（素材則為<strong>刪除素材</strong>）會要求確認，然後刪除該專案、它的各個版本，以及沒有其他專案使用的媒體副本。沒有垃圾桶：被刪除的專案無法復原，如果不確定，請先做好備份。</li></ul>
+<figure><img src="../assets/img/home-card-menu.webp" width="720" height="667" alt="卡片選單按鈕 (1) 會開啟卡片選單 (2)：匯出、複製、將媒體收集至專案、版本紀錄、刪除。" loading="lazy"><figcaption>卡片選單按鈕 (1) 會開啟卡片選單 (2)：匯出、複製、將媒體收集至專案、版本紀錄、刪除。</figcaption></figure>
+<p>若專案檔案損毀，卡片會顯示<strong>已損毀，請還原版本</strong>，取代原本的資訊。點選它即可還原較早的版本，或將其刪除。</p>
+<h2 id="search">搜尋</h2>
+<p>同一個搜尋框適用於整個首頁。在專案頁面中，它會搜尋專案與素材的名稱（「搜尋專案與素材」）；在範本頁面中，它會搜尋範本與預設集。搜尋時會忽略大小寫與重音符號，你輸入的每個字都必須出現在名稱中，順序不限。</p>
+<h2 id="sorting">排序</h2>
+<p>在專案與素材清單中，標題列會顯示<strong>依日期排序</strong>或<strong>依名稱排序</strong>。點選即可切換。依日期排序會將最新的項目放在最前面，並依日期標題分組；依名稱排序則是由 A 到 Z。應用程式會記住你的選擇。</p>
+<h2 id="templates">範本</h2>
+<p><strong>範本</strong>頁面有兩個標籤：<strong>我的範本</strong>與<strong>我的預設集</strong>。它們的說明請見<a href="assets-templates.html">素材、範本與預設集</a>。</p>
+<h2 id="tools">工具</h2>
+<p><strong>工具</strong>頁面有五張卡片，都是用來處理檔案的，與任何專案無關：<strong>壓縮</strong>、<strong>修剪</strong>、<strong>擷取音訊</strong>、<strong>製作GIF</strong>和<strong>影片下載器</strong>。點選卡片即可開啟。在平板電腦上，卡片會並排顯示，而工具會以全螢幕開啟；橫向持握時，它的設定會顯示在檔案旁的第二欄。</p>
+<figure><img src="../assets/img/tools-tab.webp" width="720" height="1487" alt="工具頁面：壓縮 (1) 與影片下載器 (2)，以及底部列的工具按鈕 (3)。" loading="lazy"><figcaption>工具頁面：壓縮 (1) 與影片下載器 (2)，以及底部列的工具按鈕 (3)。</figcaption></figure>
+<h3 id="compress">壓縮</h3>
+<p><strong>壓縮</strong>會為影片或圖片製作一份較小的副本，例如用來在聊天中傳送。原始檔案永遠不會被更改。</p>
+<ol><li>點選<strong>選擇影片或圖片</strong>，然後在相片選擇器中選取檔案。<strong>變更</strong>會改選另一個檔案。</li><li>在<strong>壓縮程度</strong>下方，選擇<strong>低</strong>（明顯較小，外觀幾乎相同）、<strong>中等</strong>（預設：小到足以用於聊天與社群應用程式）、<strong>高</strong>（盡可能小，且看起來仍然不錯）、<strong>Discord</strong>或<strong>自訂</strong>。<strong>Discord</strong>會配合 Discord 的上傳上限，並會詢問你的方案：<strong>自由</strong>（20 MB）、<strong>Nitro Basic</strong>（50 MB）或 <strong>Nitro</strong>（1 GB）。</li><li>按鈕上方的那一行會顯示預計的大小，例如「約12 MB（目前為80 MB）」。若檔案已經夠小，或長度太長而無法符合大小上限，它也會說明。</li><li>點選<strong>壓縮</strong>。進度列會顯示進度，點選<strong>取消</strong>即可停止。工作期間螢幕會保持亮起。</li></ol>
+<figure><img src="../assets/img/compress-choose.webp" width="720" height="1487" alt="已選擇影片的壓縮畫面：檔案 (1)、壓縮程度下方的選項 (2)，以及預估大小與壓縮按鈕 (3)。" loading="lazy"><figcaption>已選擇影片的壓縮畫面：檔案 (1)、壓縮程度下方的選項 (2)，以及預估大小與壓縮按鈕 (3)。</figcaption></figure>
+<p><strong>自訂</strong>可讓你自行選擇所有設定：</p>
+<div class="table-wrap"><table><thead><tr><th>設定</th><th>選項</th></tr></thead><tbody><tr><td data-label="設定"><strong>大小</strong></td><td data-label="選項">影片：<strong>原始</strong>、1080p、720p 或 480p。圖片：<strong>原始</strong>、2048、1280 或 800 px</td></tr><tr><td data-label="設定"><strong>品質</strong></td><td data-label="選項"><strong>最佳</strong>、<strong>良好</strong>、<strong>小</strong>或<strong>最小</strong>；或是<strong>指定檔案大小</strong>，然後輸入以 MB 為單位的大小</td></tr><tr><td data-label="設定"><strong>影格速率</strong></td><td data-label="選項">僅影片：<strong>原始</strong>、60、30 或 24</td></tr><tr><td data-label="設定"><strong>聲音</strong></td><td data-label="選項">僅影片：<strong>關閉</strong>、<strong>小</strong>、<strong>良好</strong>或<strong>最佳</strong></td></tr><tr><td data-label="設定"><strong>格式</strong></td><td data-label="選項">僅圖片：<strong>JPEG</strong>或<strong>WebP</strong></td></tr></tbody></table></div>
+<p>完成後，按鈕上方那一行會顯示原本與新的大小，以及檔案縮小了多少，例如「17MB → 5.5MB（縮小66%）」。若檔案沒有變小，它會直接說明，並建議保留原始檔案。在<strong>結果</strong>下方，<strong>壓縮後</strong>與<strong>壓縮前</strong>標籤可以切換預覽，顯示新檔案或原始檔案；預覽右上角的按鈕會開啟<strong>全螢幕</strong>檢視，其中同樣有這兩個標籤。點選<strong>儲存至相簿</strong>即可保留新檔案（影片會存到Movies/AbsentMotion，圖片會存到Pictures/AbsentMotion），或點選<strong>分享</strong>將它傳送到其他應用程式。</p>
+<figure><img src="../assets/img/compress-result.webp" width="720" height="1487" alt="壓縮的結果：壓縮後與壓縮前 (1)、附有全螢幕按鈕的預覽 (2)、檔案大小 (3)，以及儲存至相簿與分享 (4)。" loading="lazy"><figcaption>壓縮的結果：壓縮後與壓縮前 (1)、附有全螢幕按鈕的預覽 (2)、檔案大小 (3)，以及儲存至相簿與分享 (4)。</figcaption></figure>
+<figure><img src="../assets/img/compress-full.webp" width="720" height="1487" alt="結果的全螢幕檢視：壓縮後與壓縮前 (1)、關閉按鈕 (2)、影片 (3)。" loading="lazy"><figcaption>結果的全螢幕檢視：壓縮後與壓縮前 (1)、關閉按鈕 (2)、影片 (3)。</figcaption></figure>
+<h3 id="trim">修剪</h3>
+<p><strong>修剪</strong>會保留你所選的影片部分，並將它儲存為新的 MP4 影片。原始檔案永遠不會被更改。</p>
+<ol><li>點選<strong>選擇影片</strong>。</li><li>在<strong>保留的片段</strong>下方，拖曳影格條上的兩端。上方的大圖會顯示你正在移動的那一端所在的影格。<strong>開始</strong>與<strong>終點</strong>旁各有箭頭，可讓該端稍微提前或延後，而<strong>時長</strong>會顯示所保留片段的長度。</li><li>在<strong>修剪方式</strong>下方，選擇<strong>快速</strong>（預設：不重新編碼，因此很快，也能保留畫質；開始點會對齊到影片最近的切點）或<strong>精確</strong>（會在你選擇的位置精確切割，但耗時較長）。使用快速時，開始的箭頭會從一個切點跳到下一個切點。</li><li>按鈕上方那一行會顯示預計的大小。點選<strong>修剪</strong>。</li></ol>
+<p>如果影片幾乎沒有切點，快速只能從開頭開始，畫面也會說明這一點：選擇精確即可從任何位置開始。</p>
+<h3 id="extract-audio">擷取音訊</h3>
+<p><strong>擷取音訊</strong>會把影片的聲音儲存為音訊檔案。</p>
+<ol><li>點選<strong>選擇影片</strong>。沒有聲音的影片會顯示「此影片沒有聲音。」</li><li><strong>格式</strong>：<strong>M4A</strong>（預設）或 <strong>MP3</strong>。</li><li><strong>品質</strong>：<strong>小</strong>、<strong>良好</strong>或<strong>最佳</strong>。若是 M4A，還有<strong>原始</strong>選項，在影片的聲音允許的情況下，它會不經任何損失地原樣複製聲音。應用程式會替你自動選擇它。</li><li>按鈕上方那一行會顯示預計的大小與長度。點選<strong>擷取</strong>。</li></ol>
+<p>若要改為取出專案內某個影片的聲音，請使用圖層選單中的<strong>擷取音訊</strong>：參見<a href="audio.html">音訊</a>。</p>
+<h3 id="make-a-gif">製作GIF</h3>
+<p><strong>製作GIF</strong>會將影片的一部分轉為動態 GIF。</p>
+<ol><li>點選<strong>選擇影片</strong>。</li><li>在<strong>保留的片段</strong>下方，依照修剪的方式選擇片段。GIF 最長可達30秒。</li><li><strong>大小</strong>是 GIF 的長邊：320、480（預設）或 720 px。<strong>影格速率</strong>：10、15（預設）或 24。<strong>循環</strong>：<strong>無限循環</strong>（預設）或<strong>一次</strong>。</li><li>按鈕上方那一行會顯示預計的大小與影格數，這是以幾個樣本影格測得的。若 GIF 會超過25 MB，它會顯示「此 GIF 會很大。請嘗試較小的大小或較短的片段。」點選<strong>製作GIF</strong>。</li></ol>
+<h3 id="the-result-of-trim-extract-audio-and-make-a-gif">修剪、擷取音訊與製作GIF的結果</h3>
+<p>進度列會顯示進度，點選<strong>取消</strong>即可停止。完成後，按鈕上方那一行會顯示新檔案的大小，<strong>結果</strong>會顯示該檔案（聲音會顯示其名稱）。點選<strong>儲存</strong>即可保留它，或點選<strong>分享</strong>將它傳送到其他應用程式。影片會存到Movies/AbsentMotion，GIF 會存到Pictures/AbsentMotion，聲音則存到Music/AbsentMotion。若發生錯誤，該行會說明原因，例如「此檔案對這支手機來說太大。請嘗試較小的大小或較短的片段。」</p>
+<h3 id="video-downloader">影片下載器</h3>
+<p><strong>影片下載器</strong>可將連結中的影片儲存到你的手機。它需要一個免費的附加元件，這是一次性的下載，畫面會顯示其大小（約25 MB）。此附加元件包含開放原始碼工具 Python 與 yt-dlp，你之後可以在<a href="settings.html">設定</a>中以<strong>刪除影片下載器附加元件</strong>將它移除。它適用於具備64位元處理器的手機。</p>
+<figure><img src="../assets/img/downloader-addon.webp" width="720" height="1487" alt="尚未安裝附加元件時的影片下載器：要求安裝的卡片 (1)。" loading="lazy"><figcaption>尚未安裝附加元件時的影片下載器：要求安裝的卡片 (1)。</figcaption></figure>
+<ol><li>第一次使用時，在寫著「下載需要附加元件」的卡片上點選<strong>取得附加元件</strong>。</li><li>在其他應用程式中複製影片的連結，然後點選<strong>貼上</strong>（或直接在欄位中輸入連結；X 會清除它）。應用程式會檢查連結，並顯示影片的標題、一張小圖，以及它的類型，例如「YouTube · 影片 · 10:35」。</li><li>在<strong>儲存內容</strong>下方，選擇<strong>影片和音訊</strong>、<strong>僅影片</strong>或<strong>僅音訊</strong>。</li><li>在<strong>品質</strong>下方，選擇該影片提供的其中一種畫質。每個選項都會顯示其大小，例如「1080p60 · 約255MB」。只含圖片的貼文沒有可選的項目：其圖片會以原樣儲存。</li><li>點選<strong>下載</strong>。完成後，訊息會說明檔案的位置，例如「已儲存至Movies/AbsentMotion」，並出現兩個按鈕：<strong>新增專案</strong>會開啟一個含有該影片的新專案，<strong>壓縮</strong>則會以該檔案開啟壓縮工具。</li></ol>
+<figure><img src="../assets/img/downloader-link.webp" width="720" height="1487" alt="已檢查的連結：連結欄位 (1)、影片的標題與圖片 (2)、要儲存的內容 (3)、畫質 (4)、下載 (5)。" loading="lazy"><figcaption>已檢查的連結：連結欄位 (1)、影片的標題與圖片 (2)、要儲存的內容 (3)、畫質 (4)、下載 (5)。</figcaption></figure>
+<figure><img src="../assets/img/downloader-saved.webp" width="720" height="1487" alt="下載完成後：檔案的儲存位置 (1)，以及新增專案與壓縮 (2)。" loading="lazy"><figcaption>下載完成後：檔案的儲存位置 (1)，以及新增專案與壓縮 (2)。</figcaption></figure>
+<p>按鈕下方的<strong>支援</strong>會列出可正常使用的網站，<strong>部分支援</strong>則列出有限制的網站。點選其中的名稱即可閱讀其限制，例如 Instagram 的限時動態與私人貼文需要登入帳號，因此無法下載。無法下載的連結會顯示原因：影片為私人或已被移除、貼文需要登入帳號、清單式播放、網站封鎖了下載，或是無法連線。</p>
+<p>請只下載你有權使用的內容：按鈕下方的畫面也會再次提醒這一點。</p>
+<p>影片下載器尚未提供電腦版，也不提供給 Chromebook 的 Intel 或 AMD 版本。</p>
+<h2 id="importing-a-project-file">匯入專案檔</h2>
+<p>預設情況下，首頁沒有匯入按鈕。你可以從其他應用程式（檔案管理員、訊息）使用<strong>分享</strong>或<strong>開啟方式</strong>來開啟專案檔，應用程式會接收它。若你希望有按鈕，請在設定中開啟<strong>在專案清單中顯示匯入卡片</strong>；之後專案清單頂部就會出現一張附有<strong>選擇檔案</strong>的卡片。參見<a href="projects.html">專案、備份與匯入</a>。</p>
+<h2 id="when-something-is-wrong">發生問題時</h2>
+<ul><li>若應用程式意外關閉，下次啟動時會顯示<strong>AbsentMotion意外關閉</strong>，並附上原因；若有尚未儲存的編輯，還會提供還原的選項。</li><li>當機記錄位於設定中的<strong>當機記錄</strong>。</li><li>若版本過舊，應用程式可以告訴你有較新的版本：參見<a href="settings.html">設定</a>。</li></ul><nav class="pager" aria-label="上一頁與下一頁"><a rel="prev" href="compatible.html">&larr; 相容版本</a><a rel="next" href="new-project.html">建立專案 &rarr;</a></nav></main></div></body></html>

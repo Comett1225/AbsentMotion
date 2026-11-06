@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="zh-TW" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>新增選單 | AbsentMotion</title><meta name="description" content="如何新增形狀、照片、影片、音效、文字、繪圖、攝影機、燈光、3D 模型等內容。"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="說明"><a href="index.html">目錄</a><a href="effects/index.html">特效</a></nav></header><div class="wrap"><main id="main"><h1>新增選單</h1><p class="lead">如何新增形狀、照片、影片、音效、文字、繪圖、攝影機、燈光、3D 模型等內容。</p><details class="toc"><summary>本頁內容</summary><ul><li><a href="#quick-buttons">快速按鈕</a></li><li><a href="#shape">形狀</a></li><li><a href="#media">媒體</a></li><li><a href="#audio">音訊</a></li><li><a href="#object-asset">物件／素材</a></li><li><a href="#template">範本</a></li></ul></details><p>時間軸區域右下角的圓形 <strong>+</strong> 按鈕會開啟「新增」選單。只有在未選取任何內容時才會顯示；選取圖層後，它會被工具格線取代。</p>
+<p>新圖層會從播放頭位置開始，長度與 <strong>新圖層時長</strong> 設定相同（預設為 2 秒）。照片和形狀使用這個長度；影片和音效則使用各自的長度。攝影機和燈光圖層會持續整個專案。</p>
+<p>選單頂端有五個分頁（<strong>形狀</strong>、<strong>媒體</strong>、<strong>音訊</strong>、<strong>物件／素材</strong> 和 <strong>範本</strong>），右側有四個快速按鈕。按下 X 即可關閉選單。</p>
+<figure><img src="../assets/img/add-shape.webp" width="720" height="451" alt="新增選單：五個分頁 (1) 與四個快速按鈕 (2)。" loading="lazy"><figcaption>新增選單：五個分頁 (1) 與四個快速按鈕 (2)。</figcaption></figure>
+<h2 id="quick-buttons">快速按鈕</h2>
+<ul><li><strong>手繪筆刷</strong>會建立繪圖圖層，並開啟繪圖編輯器。請參閱 <a href="shapes.html">形狀、繪圖與遮罩</a>。</li><li><strong>鋼筆工具</strong>會建立形狀圖層，並開啟節點編輯器，讓你逐點繪製形狀。</li><li><strong>文字</strong>會新增文字圖層，並立即開啟文字編輯器。請參閱 <a href="text.html">文字與字型</a>。</li><li><strong>字幕</strong>會開啟「自動字幕」面板。請參閱 <a href="ai-tools.html">AI 工具</a>。</li></ul>
+<h2 id="shape">形狀</h2>
+<p>共有 54 種現成形狀，每列六個，分頁排列，可左右滑動切換。點一下即可在畫布中央新增形狀，並自動套用隨機的好看顏色。</p>
+<p>其中 19 種是參數化形狀，請使用 <strong>形狀選項</strong> 編輯：圓形、圓角矩形、加號、弧形、三角形、標註框、扇形、多邊形、多葉形、箭頭、四邊形、月亮、矩形、星形、直線、寬線條、不規則五邊形、印章和水滴形。其餘 35 種以節點繪製，請使用 <strong>編輯節點</strong> 編輯：愛心、雲朵、閃電、勾號、叉號、圓環、對話框、盾牌、房屋、書籤、旗子、新月與星形、太陽、葉子、爆裂印章、六角形外框、星形外框、V 形符號、雙向箭頭、彎曲箭頭、平行四邊形、梯形、票券、標籤、皇冠、眼睛、雨傘、音符、水滴對、鑰匙、定位針、圓角播放鈕、暫停、錄製和齒輪。</p>
+<h2 id="media">媒體</h2>
+<p>你的照片和影片會依新到舊排列，以格狀顯示。點一下即可新增，並自動縮放以符合畫布。</p>
+<ul><li><strong>查看全部</strong>會開啟 Android 內建的照片選擇器，不需要任何權限。</li><li><strong>從檔案選取</strong>是格狀清單的第一個格子，會開啟 Android 檔案選擇器，讓你從任何資料夾選取照片或影片。同樣不需要權限。</li><li>頂端的相簿清單可篩選格狀內容（預設為<strong>全部</strong>）。</li><li><strong>攝影機</strong>會開啟應用程式內建的攝影機。攝影機控制項請參閱 <a href="new-project.html">建立專案</a>。</li><li><strong>搜尋</strong>可搜尋格狀內容（「搜尋照片和影片」）。</li><li>圖庫中的 SVG 檔案也會顯示在這裡。</li></ul>
+<figure><img src="../assets/img/add-media.webp" width="720" height="451" alt="媒體分頁：查看全部 (1)、相簿清單 (2)、攝影機 (3)、搜尋 (4)。" loading="lazy"><figcaption>媒體分頁：查看全部 (1)、相簿清單 (2)、攝影機 (3)、搜尋 (4)。</figcaption></figure>
+<p>第一次使用時，Android 會要求你授權查看照片和影片。在 Android 14 及更新版本上，你可以只允許存取你選取的項目。預設情況下，應用程式會在專案內保留已新增媒體的複本，因此即使之後刪除原始檔案，專案仍可正常運作。</p>
+<h2 id="audio">音訊</h2>
+<p>儲存在手機上的音樂和音效。第一次使用時，應用程式會要求讀取音訊檔案的權限。</p>
+<ul><li><strong>查看全部</strong>會開啟音訊檔案的選擇器。</li><li><strong>從檔案選取</strong>會開啟 Android 檔案選擇器，讓你從任何資料夾選取音訊檔案。不需要權限。</li><li><strong>文字轉語音</strong>會將輸入的文字轉換為語音：請參閱 <a href="audio.html">音訊</a>。</li><li>點一下音效格即可試聽，再點一次即可停止。點一下格子底部的 <strong>+</strong> 列，即可將音效加入專案的播放頭位置。</li><li><strong>搜尋音樂和音效</strong>會比對標題、檔案名稱、專輯和演出者。</li></ul>
+<h2 id="object-asset">物件／素材</h2>
+<p>七個格子，用於其他類型的圖層。</p>
+<ul><li><strong>攝影機</strong>會新增攝影機圖層，持續整個專案。請參閱 <a href="camera-3d.html">攝影機圖層與 3D</a>。</li><li><strong>燈光</strong>會新增一盞燈，為 3D 模型和 3D 特效的各部分提供陰影。請參閱 <a href="camera-3d.html">攝影機圖層與 3D</a>。</li><li><strong>空物件</strong>會新增一個看不見的輔助圖層。可將它作為其他圖層的父層，或作為動態追蹤的目標。</li><li><strong>空群組</strong>會新增一個空的群組。</li><li><strong>素材／專案</strong>會列出你已儲存的素材，然後列出你的其他專案。點一下即可在播放頭位置以群組形式插入。素材會保持與來源的連結；專案則會以獨立副本插入。請參閱 <a href="assets-templates.html">素材、範本與預設集</a>。</li><li><strong>匯入SVG</strong>會開啟檔案選擇器，選取 <code>.svg</code> 檔案（最大 16 MB）。單一形狀會成為形狀圖層；多個形狀則會成為群組。若有無法匯入的內容，會顯示訊息列出：文字、圖片、嵌入內容、動畫、剪裁路徑、遮罩、濾鏡、標記、虛線或漸層描邊，以及圖樣填色。漸層只會保留第一個和最後一個顏色。</li><li><strong>3D 模型</strong>會開啟檔案選擇器，可選取 <code>.obj</code>、<code>.glb</code> 和 <code>.gltf</code> 檔案。如果模型有材質和圖片檔案，也一併選取。檔案總大小最多 256 MB；超過 50,000 個三角面的模型會以簡化形式顯示。</li></ul>
+<figure><img src="../assets/img/add-object.webp" width="720" height="451" alt="物件／素材分頁：攝影機、空物件、空群組、素材／專案、匯入SVG與3D模型 (1)。" loading="lazy"><figcaption>物件／素材分頁：攝影機、空物件、空群組、素材／專案、匯入SVG與3D模型 (1)。</figcaption></figure>
+<h2 id="template">範本</h2>
+<p><strong>查看全部</strong>會顯示已儲存範本的全螢幕格狀清單，下方每個範本也各有一個格子。點一下範本即可開啟畫面，換入你自己的媒體。如果還沒有範本，頁面會顯示「這裡沒有內容。儲存為範本的專案會顯示在這裡。」請參閱 <a href="assets-templates.html">素材、範本與預設集</a>。</p><nav class="pager" aria-label="上一頁與下一頁"><a rel="prev" href="timeline.html">&larr; 時間軸</a><a rel="next" href="layer-tools.html">圖層工具 &rarr;</a></nav></main></div></body></html>

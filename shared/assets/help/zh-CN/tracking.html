@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="zh-CN" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>运动跟踪 | AbsentMotion</title><meta name="description" content="让标题、贴纸或形状跟随视频中移动的物体。"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="帮助"><a href="index.html">目录</a><a href="effects/index.html">特效</a></nav></header><div class="wrap"><main id="main"><h1>运动跟踪</h1><p class="lead">让标题、贴纸或形状跟随视频中移动的物体。</p><details class="toc"><summary>本页内容</summary><ul><li><a href="#how-to-track">如何跟踪</a></li><li><a href="#when-tracking-stops">跟踪停止时</a></li><li><a href="#tips">提示</a></li></ul></details><p>运动跟踪会跟踪视频中的某个细节，例如招牌的一角或一张脸，并写入位置关键帧，之后可以交给另一个图层使用。它在你的手机上运行。</p>
+<h2 id="how-to-track">如何跟踪</h2>
+<ol><li>选择一个<strong>视频图层</strong>。将播放头移到该细节清晰可见的一帧上。</li><li>打开图层菜单（三个点），点按<strong>运动跟踪</strong>。如果播放头在片段之外，它会跳到第一帧。</li><li>视频上会出现一个方框。将它拖到一个清晰、始终可见的细节上，例如一个角或一处纹理。若要跟踪旋转和缩放，请使用两个方框，分别放在同一物体上相距较远的两个细节上。</li><li>选择要跟踪的内容以及应用位置（见下文）。</li><li>点按<strong>跟踪</strong>。进度条会显示"正在跟踪... 40%"。点按<strong>取消</strong>可停止；已跟踪的帧会保留其关键帧。</li><li>完成后，应用会显示"已跟踪 N 帧。关键帧位于..."。点按<strong>完成</strong>。</li></ol>
+<figure><img src="../assets/img/track-panel.webp" width="720" height="1131" alt="运动跟踪：框住细节的方框 (1)、跟踪 (2)、方向 (3)、应用于 (4)、跟踪按钮 (5)。" loading="lazy"><figcaption>运动跟踪：框住细节的方框 (1)、跟踪 (2)、方向 (3)、应用于 (4)、跟踪按钮 (5)。</figcaption></figure>
+<h3 id="the-options">选项</h3>
+<div class="table-wrap"><table><thead><tr><th>选项</th><th>可选项</th></tr></thead><tbody><tr><td data-label="选项"><strong>跟踪</strong></td><td data-label="可选项"><strong>位置</strong>（一个方框），或 <strong>位置、旋转和缩放</strong>（两个方框）</td></tr><tr><td data-label="选项"><strong>方向</strong></td><td data-label="可选项"><strong>向前</strong>（默认）从播放头跟踪到片段结尾，<strong>向后</strong>从播放头跟踪到片段开头，<strong>整个片段</strong>则两个方向都跟踪</td></tr><tr><td data-label="选项"><strong>应用于</strong></td><td data-label="可选项"><strong>新建空对象</strong>（一个新的隐形图层，名为"跟踪 1"，时长与片段相同）或某个现有图层</td></tr></tbody></table></div>
+<p>目标图层会获得位置关键帧；在双方框模式下，还会获得旋转和缩放关键帧。</p>
+<h3 id="use-the-result">使用结果</h3>
+<p>最灵活的方式是<strong>新建空对象</strong>：然后使用顶部栏中的<strong>父级</strong>按钮，将标题、贴纸或形状设为该空对象的子图层（参见<a href="editor.html">编辑器界面</a>）。此后它会跟随视频移动。你也可以在<strong>应用于</strong>中直接选择标题图层本身。</p>
+<h2 id="when-tracking-stops">跟踪停止时</h2>
+<p>如果细节丢失，跟踪会停止，并显示提示："跟踪在第 N 帧丢失。请将点移回同一特征，然后点按继续。"将方框移回同一细节，点按<strong>继续</strong>，跟踪便会从该处继续。如果该处细节太少，请将方框移到更清晰的角或纹理上。</p>
+<h2 id="tips">提示</h2>
+<ul><li>选择对比度较强、始终在画面内且形状不变的物体。</li><li>在放置方框之前，将播放头移到最清晰的一帧，然后选择<strong>整个片段</strong>，即可从该帧向两个方向跟踪。</li><li>之后你可以像编辑其他关键帧一样修改它们：参见<a href="keyframes.html">关键帧和缓动</a>。</li></ul><nav class="pager" aria-label="上一页和下一页"><a rel="prev" href="camera-3d.html">&larr; 相机图层与3D</a><a rel="next" href="animations.html">转场和动画 &rarr;</a></nav></main></div></body></html>

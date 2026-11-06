@@ -141,9 +141,9 @@ Automatic version history, crash recovery, crash logs that say in one sentence w
 </details>
 
 <details>
-<summary><strong>17 languages</strong></summary>
+<summary><strong>24 languages</strong></summary>
 
-English, Indonesian, Hindi, Portuguese (Brazil), Spanish (Latin America), Spanish (Spain), Filipino, Vietnamese, Thai, Malay, Arabic, Persian, Urdu, Turkish, Russian, Bengali and Japanese, chosen on first start.
+English, Indonesian, Hindi, Portuguese (Brazil), Spanish (Latin America), Spanish (Spain), Filipino, Vietnamese, Thai, Malay, Arabic, Persian, Urdu, Turkish, Russian, Bengali, Japanese, Korean, Chinese (Traditional), Chinese (Simplified), French, German, Italian and Polish, chosen on first start.
 
 </details>
 

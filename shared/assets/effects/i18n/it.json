@@ -1,0 +1,6881 @@
+{
+ "categories": {
+  "3d": "3D",
+  "ai": "AI",
+  "beat": "Ritmo",
+  "blur": "Sfocatura",
+  "color": "Colore",
+  "distort": "Distorsione",
+  "key": "Chiave",
+  "move": "Movimento",
+  "new": "Novità",
+  "noise": "Rumore",
+  "other": "Altro",
+  "repeat": "Ripetizione",
+  "stylize": "Stile",
+  "text": "Testo"
+ },
+ "effects": {
+  "ascii": {
+   "description": "Trasforma il livello in un'immagine di testo composta da lettere e simboli: le parti più luminose usano caratteri più pieni. Dimensione imposta la larghezza di ogni carattere sul livello, così i caratteri si spostano, ruotano e ridimensionano con esso. Colore mantiene i colori originali o ne usa uno solo; Linee dei bordi disegna i contorni con i caratteri | - / e \\.",
+   "name": "ASCII",
+   "params": {
+    "background": {
+     "label": "Colore sfondo"
+    },
+    "backgroundMode": {
+     "label": "Sfondo",
+     "options": [
+      "Nessuno",
+      "Colore"
+     ]
+    },
+    "brightness": {
+     "label": "Luminosità"
+    },
+    "cell": {
+     "label": "Dimensione"
+    },
+    "characters": {
+     "label": "Personalizzato"
+    },
+    "charset": {
+     "label": "Caratteri",
+     "options": [
+      "Dettagliato",
+      "Semplice",
+      "Blocchi",
+      "Binario",
+      "Personalizzato"
+     ]
+    },
+    "colorMode": {
+     "label": "Colore",
+     "options": [
+      "Originale",
+      "Colore unico"
+     ]
+    },
+    "contrast": {
+     "label": "Contrasto"
+    },
+    "edges": {
+     "label": "Linee dei bordi"
+    },
+    "invert": {
+     "label": "Inverti"
+    },
+    "textColor": {
+     "label": "Colore testo"
+    }
+   },
+   "presets": {
+    "amber-monitor": "Monitor ambra",
+    "binary-rain": "Pioggia binaria",
+    "blocks": "Blocchi",
+    "line-art": "Disegno lineare",
+    "newspaper": "Giornale",
+    "terminal": "Terminale"
+   }
+  },
+  "autoshake": {
+   "description": "Sposta il livello in modo casuale nel tempo entro i limiti impostati.",
+   "name": "Oscillazione automatica",
+   "params": {
+    "angle": {
+     "label": "Angolo"
+    },
+    "evolution": {
+     "label": "Evoluzione"
+    },
+    "frequency": {
+     "label": "Frequenza"
+    },
+    "magnitude": {
+     "label": "Ampiezza"
+    },
+    "pattern": {
+     "label": "Motivo",
+     "options": [
+      "Classico",
+      "Standard"
+     ]
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "slack": {
+     "label": "Elasticità"
+    },
+    "zshake": {
+     "label": "Oscillazione Z"
+    }
+   }
+  },
+  "backdrop": {
+   "description": "Prima si chiamava Livello di regolazione. Copia ciò che viene disegnato sotto il livello, così gli effetti successivi modificano la copia. Maschera al livello limita la copia alle parti opache del livello. Miscela ripristina il riempimento del livello. Effetti oltre i bordi permette agli effetti successivi, come Allungamento, di portare la copia oltre i bordi del livello.",
+   "name": "Copia sfondo",
+   "params": {
+    "mask": {
+     "label": "Maschera al livello"
+    },
+    "mix": {
+     "label": "Miscela"
+    },
+    "spill": {
+     "label": "Effetti oltre i bordi"
+    }
+   }
+  },
+  "beatblur": {
+   "description": "A ogni battito applica una sfocatura zoom che svanisce con il battito. Seleziona la clip musicale, apri il suo menu e tocca prima Segna battiti; senza indicatori di battito usa l’impostazione BPM.",
+   "name": "Sfocatura a ritmo",
+   "params": {
+    "beats": {
+     "label": "Battiti",
+     "options": [
+      "Ogni battito",
+      "Ogni 2 battiti",
+      "Ogni 4 battiti"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Decadimento"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "strength": {
+     "label": "Intensità"
+    }
+   }
+  },
+  "beatflash": {
+   "description": "A ogni battito illumina il livello con un lampo di colore. Seleziona la clip musicale, apri il suo menu e tocca prima Segna battiti; senza indicatori di battito usa l’impostazione BPM.",
+   "name": "Lampo a ritmo",
+   "params": {
+    "beats": {
+     "label": "Battiti",
+     "options": [
+      "Ogni battito",
+      "Ogni 2 battiti",
+      "Ogni 4 battiti"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Colore"
+    },
+    "decay": {
+     "label": "Decadimento"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "strength": {
+     "label": "Intensità"
+    }
+   }
+  },
+  "beatglitch": {
+   "description": "A ogni battito divide il livello in fette spostate con colori separati. Seleziona la clip musicale, apri il suo menu e tocca prima Segna battiti; senza indicatori di battito usa l’impostazione BPM.",
+   "name": "Glitch a ritmo",
+   "params": {
+    "beats": {
+     "label": "Battiti",
+     "options": [
+      "Ogni battito",
+      "Ogni 2 battiti",
+      "Ogni 4 battiti"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Decadimento"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "slices": {
+     "label": "Fette"
+    },
+    "strength": {
+     "label": "Intensità"
+    }
+   }
+  },
+  "beatglow": {
+   "description": "A ogni battito fa brillare le parti luminose del livello. Seleziona la clip musicale, apri il suo menu e tocca prima Segna battiti; senza indicatori di battito usa l’impostazione BPM.",
+   "name": "Bagliore a ritmo",
+   "params": {
+    "beats": {
+     "label": "Battiti",
+     "options": [
+      "Ogni battito",
+      "Ogni 2 battiti",
+      "Ogni 4 battiti"
+     ]
+    },
+    "blur": {
+     "label": "Raggio"
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Colore"
+    },
+    "decay": {
+     "label": "Decadimento"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "strength": {
+     "label": "Intensità"
+    },
+    "threshold": {
+     "label": "Soglia"
+    }
+   }
+  },
+  "beatpulse": {
+   "description": "A ogni battito illumina il livello come un lampo di esposizione; un’intensità negativa lo scurisce. Seleziona la clip musicale, apri il suo menu e tocca prima Segna battiti; senza indicatori di battito usa l’impostazione BPM.",
+   "name": "Pulsazione a ritmo",
+   "params": {
+    "beats": {
+     "label": "Battiti",
+     "options": [
+      "Ogni battito",
+      "Ogni 2 battiti",
+      "Ogni 4 battiti"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Decadimento"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "strength": {
+     "label": "Intensità"
+    }
+   }
+  },
+  "beatrgbsplit": {
+   "description": "A ogni battito separa i canali rosso e blu. Seleziona la clip musicale, apri il suo menu e tocca prima Segna battiti; senza indicatori di battito usa l’impostazione BPM.",
+   "name": "Separazione RGB a ritmo",
+   "params": {
+    "angle": {
+     "label": "Angolo"
+    },
+    "beats": {
+     "label": "Battiti",
+     "options": [
+      "Ogni battito",
+      "Ogni 2 battiti",
+      "Ogni 4 battiti"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Decadimento"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "strength": {
+     "label": "Intensità"
+    }
+   }
+  },
+  "beatrotate": {
+   "description": "A ogni battito inclina il livello alternativamente a sinistra e a destra, poi lo riporta indietro. Seleziona la clip musicale, apri il suo menu e tocca prima Segna battiti; senza indicatori di battito usa l’impostazione BPM.",
+   "name": "Rotazione a ritmo",
+   "params": {
+    "alternate": {
+     "label": "Alterna"
+    },
+    "beats": {
+     "label": "Battiti",
+     "options": [
+      "Ogni battito",
+      "Ogni 2 battiti",
+      "Ogni 4 battiti"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "cover": {
+     "label": "Riempi fotogramma"
+    },
+    "decay": {
+     "label": "Decadimento"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "strength": {
+     "label": "Intensità"
+    }
+   }
+  },
+  "beatshake": {
+   "description": "A ogni battito scuote il livello in una nuova direzione e lo stabilizza prima del successivo. Seleziona la clip musicale, apri il suo menu e tocca prima Segna battiti; senza indicatori di battito usa l’impostazione BPM.",
+   "name": "Oscillazione a ritmo",
+   "params": {
+    "beats": {
+     "label": "Battiti",
+     "options": [
+      "Ogni battito",
+      "Ogni 2 battiti",
+      "Ogni 4 battiti"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Decadimento"
+    },
+    "frequency": {
+     "label": "Frequenza"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "strength": {
+     "label": "Intensità"
+    }
+   }
+  },
+  "beatzoom": {
+   "description": "A ogni battito ingrandisce e poi torna gradualmente alla dimensione iniziale. Seleziona la clip musicale, apri il suo menu e tocca prima Segna battiti; senza indicatori di battito usa l’impostazione BPM.",
+   "name": "Zoom a ritmo",
+   "params": {
+    "beats": {
+     "label": "Battiti",
+     "options": [
+      "Ogni battito",
+      "Ogni 2 battiti",
+      "Ogni 4 battiti"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Decadimento"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "strength": {
+     "label": "Intensità"
+    }
+   }
+  },
+  "bend": {
+   "description": "Piega il livello lungo un arco circolare; il lato Origine resta fermo e il lato opposto ruota dell’angolo impostato, verso sinistra se positivo. Ideale per livelli lunghi e sottili.",
+   "name": "Piega",
+   "params": {
+    "amount": {
+     "label": "Angolo"
+    },
+    "before": {
+     "label": "Prima dell’inizio",
+     "options": [
+      "Blocca",
+      "Piega sullo stesso lato",
+      "Piega sul lato opposto"
+     ]
+    },
+    "origin": {
+     "label": "Origine",
+     "options": [
+      "Sinistra",
+      "Destra",
+      "Alto",
+      "Basso"
+     ]
+    },
+    "start": {
+     "label": "Inizio"
+    },
+    "tuneHead": {
+     "label": "Regola inizio"
+    },
+    "tuneTail": {
+     "label": "Regola fine"
+    }
+   }
+  },
+  "blink": {
+   "description": "Attiva e disattiva il livello più volte al secondo.",
+   "name": "Lampeggio",
+   "params": {
+    "frequency": {
+     "label": "Frequenza"
+    }
+   }
+  },
+  "blockdissolve": {
+   "description": "Rimuove dal livello blocchi casuali allineati a una griglia. Anima Intensità per rimuovere sempre più blocchi.",
+   "name": "Dissolvenza a blocchi",
+   "params": {
+    "blockSize": {
+     "label": "Dimensione"
+    },
+    "fade": {
+     "label": "Dissolvenza"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "strength": {
+     "label": "Intensità"
+    },
+    "stretch": {
+     "label": "Allungamento"
+    }
+   }
+  },
+  "blocknoise": {
+   "description": "Fa lampeggiare blocchi casuali di disturbo sul livello. Moltiplica modula i colori esistenti; Aggiungi vi aggiunge disturbo. Blocca mantiene fermo il motivo.",
+   "name": "Disturbo a blocchi",
+   "params": {
+    "blending": {
+     "label": "Metodo di fusione",
+     "options": [
+      "Aggiungi",
+      "Moltiplica"
+     ]
+    },
+    "blockSize": {
+     "label": "Dimensione"
+    },
+    "extremes": {
+     "label": "Estremi"
+    },
+    "freeze": {
+     "label": "Blocca"
+    },
+    "mono": {
+     "label": "Monocromatico"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "overshoot": {
+     "label": "Superamento"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "strength": {
+     "label": "Intensità"
+    },
+    "stretch": {
+     "label": "Allungamento"
+    }
+   }
+  },
+  "blur": {
+   "description": "Una sfocatura morbida e uniforme.",
+   "name": "Sfocatura",
+   "params": {
+    "strength": {
+     "label": "Intensità"
+    }
+   }
+  },
+  "box": {
+   "description": "Avvolge il livello su una scatola di cui scegli larghezza, altezza e profondità.",
+   "name": "Scatola",
+   "params": {
+    "depth": {
+     "label": "Profondità"
+    },
+    "height": {
+     "label": "Altezza"
+    },
+    "light": {
+     "label": "Angolo luce"
+    },
+    "perspective": {
+     "label": "Prospettiva"
+    },
+    "position": {
+     "label": "Posizione"
+    },
+    "rotX": {
+     "label": "Rotazione X"
+    },
+    "rotY": {
+     "label": "Rotazione Y"
+    },
+    "rotZ": {
+     "label": "Rotazione Z"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "shading": {
+     "label": "Ombreggiatura"
+    },
+    "shine": {
+     "label": "Brillantezza"
+    },
+    "smoothing": {
+     "label": "Smussatura"
+    },
+    "width": {
+     "label": "Larghezza"
+    }
+   }
+  },
+  "brightnesscontrast": {
+   "description": "Regola luminosità e contrasto dell’immagine.",
+   "name": "Luminosità e contrasto",
+   "params": {
+    "brightness": {
+     "label": "Luminosità"
+    },
+    "contrast": {
+     "label": "Contrasto"
+    },
+    "style": {
+     "label": "Stile",
+     "options": [
+      "Per canale",
+      "Mantieni colore"
+     ]
+    }
+   }
+  },
+  "bulge": {
+   "description": "Gonfia il livello come una lente (Intensità positiva) o lo contrae verso il Centro (negativa) entro un cerchio il cui Raggio è una frazione della dimensione del livello.",
+   "name": "Contrazione e rigonfiamento",
+   "params": {
+    "amount": {
+     "label": "Intensità"
+    },
+    "center": {
+     "label": "Centro"
+    },
+    "radius": {
+     "label": "Raggio"
+    }
+   }
+  },
+  "bumpmap": {
+   "description": "Illumina il livello come se la sua luminosità fosse una superficie in rilievo, creando una texture che conserva i colori.",
+   "name": "Mappa rilievo",
+   "params": {
+    "ambient": {
+     "label": "Ambientale"
+    },
+    "angle": {
+     "label": "Angolo luce"
+    },
+    "height": {
+     "label": "Altezza"
+    },
+    "light": {
+     "label": "Colore luce"
+    },
+    "shine": {
+     "label": "Brillantezza"
+    }
+   }
+  },
+  "channelremap": {
+   "description": "Ricostruisce ogni canale colore da un altro canale del livello, per creare falsi colori o trasferire la luminanza nell’alfa.",
+   "name": "Rimappatura canali (RGB)",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Rosso",
+      "Verde",
+      "Blu",
+      "Alfa",
+      "Luminanza",
+      "Zero",
+      "Massimo"
+     ]
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "Rosso",
+      "Verde",
+      "Blu",
+      "Alfa",
+      "Luminanza",
+      "Zero",
+      "Massimo"
+     ]
+    },
+    "g": {
+     "label": "G",
+     "options": [
+      "Rosso",
+      "Verde",
+      "Blu",
+      "Alfa",
+      "Luminanza",
+      "Zero",
+      "Massimo"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "Rosso",
+      "Verde",
+      "Blu",
+      "Alfa",
+      "Luminanza",
+      "Zero",
+      "Massimo"
+     ]
+    }
+   }
+  },
+  "channelremaphsv": {
+   "description": "Ricostruisce tonalità, saturazione, valore e alfa dagli altri canali del livello.",
+   "name": "Rimappatura canali (HSV)",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Tonalità",
+      "Saturazione",
+      "Valore",
+      "Alfa",
+      "Luminanza",
+      "Zero",
+      "Massimo"
+     ]
+    },
+    "h": {
+     "label": "H",
+     "options": [
+      "Tonalità",
+      "Saturazione",
+      "Valore",
+      "Alfa",
+      "Luminanza",
+      "Zero",
+      "Massimo"
+     ]
+    },
+    "s": {
+     "label": "S",
+     "options": [
+      "Tonalità",
+      "Saturazione",
+      "Valore",
+      "Alfa",
+      "Luminanza",
+      "Zero",
+      "Massimo"
+     ]
+    },
+    "v": {
+     "label": "V",
+     "options": [
+      "Tonalità",
+      "Saturazione",
+      "Valore",
+      "Alfa",
+      "Luminanza",
+      "Zero",
+      "Massimo"
+     ]
+    }
+   }
+  },
+  "checker": {
+   "description": "Disegna una scacchiera sulle parti opache del livello oppure ne ritaglia le caselle.",
+   "name": "Scacchiera",
+   "params": {
+    "angle": {
+     "label": "Angolo"
+    },
+    "color": {
+     "label": "Colore"
+    },
+    "count": {
+     "label": "Numero"
+    },
+    "offset": {
+     "label": "Spostamento"
+    },
+    "punch": {
+     "label": "Ritaglia"
+    },
+    "screenSpace": {
+     "label": "Spazio schermo"
+    },
+    "stretch": {
+     "label": "Allungamento"
+    }
+   }
+  },
+  "chromakey": {
+   "description": "Rimuove un colore, ad esempio quello di uno sfondo verde.",
+   "name": "Chroma key",
+   "params": {
+    "defringe": {
+     "label": "Elimina aloni"
+    },
+    "invert": {
+     "label": "Inverti"
+    },
+    "key": {
+     "label": "Colore da rimuovere"
+    },
+    "softness": {
+     "label": "Morbidezza"
+    },
+    "tolerance": {
+     "label": "Tolleranza"
+    }
+   }
+  },
+  "chromaticzoomblur": {
+   "description": "Crea una sfocatura zoom dal centro, spostando il blu verso l'interno e il rosso verso l'esterno per creare aloni iridescenti sui bordi.",
+   "name": "Sfocatura zoom cromatica",
+   "params": {
+    "amount": {
+     "label": "Intensità"
+    },
+    "center": {
+     "label": "Centro"
+    }
+   }
+  },
+  "circularripple": {
+   "description": "Crea increspature circolari da un punto, come una goccia nell'acqua.",
+   "name": "Increspatura circolare",
+   "params": {
+    "center": {
+     "label": "Centro"
+    },
+    "feather": {
+     "label": "Sfumatura bordi"
+    },
+    "frequency": {
+     "label": "Frequenza"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "radius": {
+     "label": "Raggio"
+    },
+    "strength": {
+     "label": "Intensità"
+    }
+   }
+  },
+  "clouds": {
+   "description": "Copre le parti opache del livello con nuvole morbide, utilizzabili anche come sorgente di rumore.",
+   "name": "Nuvole",
+   "params": {
+    "color1": {
+     "label": "Colore 1"
+    },
+    "color2": {
+     "label": "Colore 2"
+    },
+    "intensity": {
+     "label": "Intensità"
+    },
+    "octaves": {
+     "label": "Ottave"
+    },
+    "offset": {
+     "label": "Spostamento"
+    },
+    "parallax": {
+     "label": "Parallasse"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "stretch": {
+     "label": "Allungamento"
+    }
+   }
+  },
+  "cmykhalftone": {
+   "description": "Ricrea il livello come una stampa da rivista, con punti ciano, magenta, gialli e neri su quattro retini ruotati.",
+   "name": "Retino CMYK",
+   "params": {
+    "amount": {
+     "label": "Quantità"
+    },
+    "angle": {
+     "label": "Angolo"
+    },
+    "black": {
+     "label": "Nero"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "strength": {
+     "label": "Intensità"
+    }
+   }
+  },
+  "colorbalance": {
+   "description": "Sposta ombre, mezzitoni e luci verso i rispettivi colori; il grigio lascia invariata la gamma.",
+   "name": "Bilanciamento colore",
+   "params": {
+    "amount": {
+     "label": "Quantità"
+    },
+    "highlights": {
+     "label": "Luci"
+    },
+    "midtones": {
+     "label": "Mezzitoni"
+    },
+    "shadows": {
+     "label": "Ombre"
+    }
+   }
+  },
+  "colorize": {
+   "description": "Colora tutto il livello con una tonalità. Luci e ombre applica la luminosità del livello alla tonalità; Mantieni luminosità conserva la luminosità di ogni pixel e ne sostituisce il colore.",
+   "name": "Colora",
+   "params": {
+    "amount": {
+     "label": "Quantità"
+    },
+    "hue": {
+     "label": "Tonalità"
+    },
+    "style": {
+     "label": "Stile",
+     "options": [
+      "Luci e ombre",
+      "Mantieni luminosità"
+     ]
+    }
+   }
+  },
+  "colorwheels": {
+   "description": "Ruote colore per ombre, mezzitoni e luci, ciascuna con tonalità, intensità e livello. Spostamento modifica tutti i toni. Lo stile Per luminosità dosa ogni ruota in base alla luminosità del pixel.",
+   "name": "Ombre, gamma e guadagno",
+   "params": {
+    "gainAmount": {
+     "label": "Quantità guadagno"
+    },
+    "gainHue": {
+     "label": "Tonalità guadagno"
+    },
+    "gainLevel": {
+     "label": "Livello guadagno"
+    },
+    "gammaAmount": {
+     "label": "Quantità gamma"
+    },
+    "gammaHue": {
+     "label": "Tonalità gamma"
+    },
+    "gammaLevel": {
+     "label": "Livello gamma"
+    },
+    "liftAmount": {
+     "label": "Quantità ombre"
+    },
+    "liftHue": {
+     "label": "Tonalità ombre"
+    },
+    "liftLevel": {
+     "label": "Livello ombre"
+    },
+    "offsetAmount": {
+     "label": "Quantità spostamento"
+    },
+    "offsetHue": {
+     "label": "Tonalità spostamento"
+    },
+    "offsetLevel": {
+     "label": "Livello spostamento"
+    },
+    "style": {
+     "label": "Stile",
+     "options": [
+      "Classico",
+      "Per luminosità"
+     ]
+    }
+   }
+  },
+  "contourgradient": {
+   "description": "Applica una sfumatura a due colori verso l'esterno dei bordi opachi del livello, come un alone morbido.",
+   "name": "Sfumatura contorno",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blur": {
+     "label": "Larghezza"
+    },
+    "color1": {
+     "label": "Colore 1"
+    },
+    "color2": {
+     "label": "Colore 2"
+    },
+    "fade": {
+     "label": "Dissolvenza"
+    },
+    "fill": {
+     "label": "Riempimento"
+    }
+   }
+  },
+  "contourlines": {
+   "description": "Disegna anelli intorno alle parti opache del livello, per contorni sovrapposti da adesivo o al neon.",
+   "name": "Linee di contorno",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blur": {
+     "label": "Espansione"
+    },
+    "color": {
+     "label": "Colore"
+    },
+    "count": {
+     "label": "Numero"
+    },
+    "fill": {
+     "label": "Riempimento"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "width": {
+     "label": "Larghezza"
+    }
+   }
+  },
+  "contourstrips": {
+   "description": "Disegna strisce di carta sovrapposte la cui altezza segue la luminosità o l'opacità del livello, come un paesaggio a creste.",
+   "name": "Strisce di contorno",
+   "params": {
+    "angle": {
+     "label": "Angolo"
+    },
+    "color1": {
+     "label": "Colore 1"
+    },
+    "color2": {
+     "label": "Colore 2"
+    },
+    "count": {
+     "label": "Numero"
+    },
+    "edgeColor": {
+     "label": "Colore bordo"
+    },
+    "height": {
+     "label": "Altezza"
+    },
+    "invert": {
+     "label": "Inverti"
+    },
+    "light": {
+     "label": "Colore luce"
+    },
+    "lightAngle": {
+     "label": "Angolo luce"
+    },
+    "map": {
+     "label": "Mappa altezza",
+     "options": [
+      "Alfa",
+      "Luminanza"
+     ]
+    },
+    "mask": {
+     "label": "Maschera sul livello"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "thickness": {
+     "label": "Spessore"
+    }
+   }
+  },
+  "countupdown": {
+   "description": "Modifica ogni numero in un livello di testo moltiplicandolo e aggiungendo un valore. Animando Moltiplica con keyframe da 0% a 100%, il conteggio arriva al numero inserito. Le parole restano invariate.",
+   "name": "Conteggio crescente/decrescente",
+   "params": {
+    "add": {
+     "label": "Aggiungi"
+    },
+    "decimals": {
+     "label": "Cifre decimali",
+     "options": [
+      "Come inserito",
+      "0",
+      "1",
+      "2",
+      "3"
+     ]
+    },
+    "multiply": {
+     "label": "Moltiplica"
+    },
+    "separator": {
+     "label": "Migliaia",
+     "options": [
+      "1000.5",
+      "1,000.5",
+      "1.000,5",
+      "1 000.5"
+     ]
+    }
+   },
+   "presets": {
+    "count-up": "Conteggio crescente"
+   }
+  },
+  "crop": {
+   "description": "Ritaglia i bordi del livello: Sinistra, Alto, Destra e Basso indicano quanto tagliare su ogni lato rispetto alle dimensioni del livello. Arrotondamento smussa gli angoli e Sfumatura bordi ammorbidisce i bordi. Il livello resta nella sua posizione.",
+   "name": "Ritaglia",
+   "params": {
+    "bottom": {
+     "label": "Basso"
+    },
+    "feather": {
+     "label": "Sfumatura bordi"
+    },
+    "left": {
+     "label": "Sinistra"
+    },
+    "radius": {
+     "label": "Arrotondamento"
+    },
+    "right": {
+     "label": "Destra"
+    },
+    "top": {
+     "label": "Alto"
+    }
+   }
+  },
+  "cross": {
+   "description": "Applica il livello a tre barre che si incrociano al centro.",
+   "name": "Croce a tre assi",
+   "params": {
+    "light": {
+     "label": "Angolo luce"
+    },
+    "perspective": {
+     "label": "Prospettiva"
+    },
+    "position": {
+     "label": "Posizione"
+    },
+    "reach": {
+     "label": "Lunghezza"
+    },
+    "rotX": {
+     "label": "Rotazione X"
+    },
+    "rotY": {
+     "label": "Rotazione Y"
+    },
+    "rotZ": {
+     "label": "Rotazione Z"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "shading": {
+     "label": "Ombreggiatura"
+    },
+    "shine": {
+     "label": "Lucentezza"
+    },
+    "smoothing": {
+     "label": "Uniformità"
+    },
+    "thickness": {
+     "label": "Spessore"
+    }
+   }
+  },
+  "cube": {
+   "description": "Avvolge il livello su ogni faccia di un cubo rotante, con bordi arrotondati e illuminazione.",
+   "name": "Cubo",
+   "params": {
+    "edge": {
+     "label": "Dimensione"
+    },
+    "light": {
+     "label": "Angolo luce"
+    },
+    "perspective": {
+     "label": "Prospettiva"
+    },
+    "position": {
+     "label": "Posizione"
+    },
+    "rotX": {
+     "label": "Rotazione X"
+    },
+    "rotY": {
+     "label": "Rotazione Y"
+    },
+    "rotZ": {
+     "label": "Rotazione Z"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "shading": {
+     "label": "Ombreggiatura"
+    },
+    "shine": {
+     "label": "Lucentezza"
+    },
+    "smoothing": {
+     "label": "Uniformità"
+    }
+   }
+  },
+  "curl": {
+   "description": "Arrotola un'estremità del livello lasciando piatta l'altra; anima Spostamento per arrotolarlo o srotolarlo. Ideale per livelli larghi e sottili.",
+   "name": "Arrotola",
+   "params": {
+    "curlFrom": {
+     "label": "Arrotola da",
+     "options": [
+      "Sinistra",
+      "Destra"
+     ]
+    },
+    "direction": {
+     "label": "Direzione",
+     "options": [
+      "Su",
+      "Giù"
+     ]
+    },
+    "offset": {
+     "label": "Spostamento"
+    },
+    "radius": {
+     "label": "Raggio"
+    },
+    "stretch": {
+     "label": "Allungamento"
+    }
+   }
+  },
+  "cylinder": {
+   "description": "Avvolge il livello attorno a un cilindro e sulle sue basi circolari.",
+   "name": "Cilindro",
+   "params": {
+    "height": {
+     "label": "Altezza"
+    },
+    "light": {
+     "label": "Angolo luce"
+    },
+    "perspective": {
+     "label": "Prospettiva"
+    },
+    "position": {
+     "label": "Posizione"
+    },
+    "radius": {
+     "label": "Raggio"
+    },
+    "rotX": {
+     "label": "Rotazione X"
+    },
+    "rotY": {
+     "label": "Rotazione Y"
+    },
+    "rotZ": {
+     "label": "Rotazione Z"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "shading": {
+     "label": "Ombreggiatura"
+    },
+    "shine": {
+     "label": "Lucentezza"
+    },
+    "smoothing": {
+     "label": "Uniformità"
+    }
+   }
+  },
+  "darkglow": {
+   "description": "Espande le parti scure del livello su quelle luminose, come un bagliore d'ombra.",
+   "name": "Bagliore scuro",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blend": {
+     "label": "Fusione"
+    },
+    "blur": {
+     "label": "Diffusione"
+    },
+    "color": {
+     "label": "Colore"
+    },
+    "threshold": {
+     "label": "Soglia"
+    }
+   }
+  },
+  "datamosh": {
+   "description": "Tra i tempi di inizio e fine, espressi in secondi dall'inizio del livello, l'immagine smette di aggiornarsi e viene trascinata dal movimento successivo, come se mancasse un fotogramma chiave. I livelli video si deformano secondo il loro movimento reale, gli altri tramite blocchi mobili.",
+   "name": "Datamosh",
+   "params": {
+    "block": {
+     "label": "Dimensione blocchi"
+    },
+    "bloom": {
+     "label": "Bagliore diffuso"
+    },
+    "decay": {
+     "label": "Decadimento"
+    },
+    "end": {
+     "label": "Fine"
+    },
+    "glitch": {
+     "label": "Distorsione digitale"
+    },
+    "intensity": {
+     "label": "Intensità"
+    },
+    "start": {
+     "label": "Inizio"
+    }
+   }
+  },
+  "deepglow": {
+   "description": "Un bagliore intenso che si espande lontano, con un nucleo luminoso vicino al livello che sfuma in un alone ampio e morbido.",
+   "name": "Bagliore intenso",
+   "params": {
+    "blur": {
+     "label": "Raggio"
+    },
+    "falloff": {
+     "label": "Attenuazione"
+    },
+    "high": {
+     "label": "Soglia alta"
+    },
+    "hue": {
+     "label": "Variazione tonalità"
+    },
+    "intensity": {
+     "label": "Intensità"
+    },
+    "limit": {
+     "label": "Soglia"
+    },
+    "low": {
+     "label": "Soglia bassa"
+    },
+    "opacity": {
+     "label": "Opacità bagliore"
+    },
+    "original": {
+     "label": "Opacità originale"
+    },
+    "outside": {
+     "label": "Bagliore esterno"
+    },
+    "saturation": {
+     "label": "Saturazione"
+    },
+    "softness": {
+     "label": "Morbidezza soglia"
+    },
+    "tint": {
+     "label": "Colore tinta"
+    },
+    "tintAmount": {
+     "label": "Tinta"
+    },
+    "vibrance": {
+     "label": "Vividezza"
+    }
+   }
+  },
+  "denoise": {
+   "description": "Riduce il rumore dell'immagine con un filtro bilaterale che preserva i bordi e calcola la media dei pixel vicini solo se hanno colori simili.",
+   "name": "Riduci rumore",
+   "params": {
+    "detail": {
+     "label": "Dettaglio"
+    },
+    "radius": {
+     "label": "Raggio"
+    },
+    "strength": {
+     "label": "Intensità"
+    }
+   }
+  },
+  "directionalblur": {
+   "description": "Crea una sfocatura di movimento calcolando la media di campioni lungo una direzione.",
+   "name": "Sfocatura direzionale",
+   "params": {
+    "angle": {
+     "label": "Angolo"
+    },
+    "blurLength": {
+     "label": "Lunghezza"
+    }
+   }
+  },
+  "displacementmap": {
+   "description": "Usa i colori del livello per spostare quelli sottostanti, poi si nasconde; con Mappa impostata su Livello sottostante, sposta questo livello usando quello sottostante.",
+   "name": "Mappa di spostamento",
+   "params": {
+    "edges": {
+     "label": "Bordi",
+     "options": [
+      "Ripeti",
+      "Specchia",
+      "Trasparente",
+      "Affianca"
+     ]
+    },
+    "fromCenter": {
+     "label": "Dal centro"
+    },
+    "invert": {
+     "label": "Inverti"
+    },
+    "map": {
+     "label": "Mappa",
+     "options": [
+      "Questo livello",
+      "Livello sottostante"
+     ]
+    },
+    "offset": {
+     "label": "Spostamento"
+    },
+    "xchannel": {
+     "label": "X",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
+    },
+    "ychannel": {
+     "label": "Y",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
+    }
+   }
+  },
+  "dissolve": {
+   "description": "Rimuove pixel o blocchi casuali dal livello. Anima Intensità per una transizione in dissolvenza; Seme sceglie il motivo e Dimensione regola ogni puntino.",
+   "name": "Dissolvi",
+   "params": {
+    "grain": {
+     "label": "Dimensione"
+    },
+    "progress": {
+     "label": "Intensità"
+    },
+    "seed": {
+     "label": "Seme"
+    }
+   }
+  },
+  "dots": {
+   "description": "Disegna sul livello punti morbidi distribuiti casualmente e in modo uniforme, oppure usa il livello solo come maschera per i punti.",
+   "name": "Punti",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blend": {
+     "label": "Metodo di fusione",
+     "options": [
+      "Normale",
+      "Moltiplica",
+      "Scolora"
+     ]
+    },
+    "color1": {
+     "label": "Colore 1"
+    },
+    "color2": {
+     "label": "Colore 2"
+    },
+    "density": {
+     "label": "Densità"
+    },
+    "feather": {
+     "label": "Sfumatura bordi"
+    },
+    "fill": {
+     "label": "Riempimento"
+    },
+    "offset": {
+     "label": "Spostamento"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "radius": {
+     "label": "Raggio"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "slack": {
+     "label": "Allentamento"
+    }
+   }
+  },
+  "drawingprogress": {
+   "description": "Traccia un disegno a mano libera o il contorno di una forma, dall'inizio alla fine. Anima Fine con keyframe da 0% a 100% per vedere il disegno prendere forma. Funziona meglio sulle forme senza riempimento e con contorno.",
+   "name": "Avanzamento disegno",
+   "params": {
+    "end": {
+     "label": "Fine"
+    },
+    "start": {
+     "label": "Inizio"
+    }
+   }
+  },
+  "dropshadow": {
+   "description": "Disegna dietro il livello un'ombra morbida della sua forma, regolabile con Spostamento X e Spostamento Y.",
+   "name": "Ombra esterna",
+   "params": {
+    "blur": {
+     "label": "Morbidezza"
+    },
+    "color": {
+     "label": "Colore"
+    },
+    "opacity": {
+     "label": "Opacità"
+    },
+    "x": {
+     "label": "Spostamento X"
+    },
+    "y": {
+     "label": "Spostamento Y"
+    }
+   }
+  },
+  "duotone": {
+   "description": "Applica una mappa sfumatura a due colori basata sulla luminanza, con controlli di contrasto e quantità.",
+   "name": "Due tonalità",
+   "params": {
+    "amount": {
+     "label": "Quantità"
+    },
+    "color1": {
+     "label": "Colore ombre"
+    },
+    "color2": {
+     "label": "Colore luci"
+    },
+    "contrast": {
+     "label": "Contrasto"
+    }
+   }
+  },
+  "echo": {
+   "description": "Disegna copie del livello com'era poco prima, seguendone l'animazione.",
+   "name": "Eco keyframe",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "composite": {
+     "label": "Composizione",
+     "options": [
+      "Dietro",
+      "Sopra"
+     ]
+    },
+    "count": {
+     "label": "Numero"
+    },
+    "seconds": {
+     "label": "Secondi"
+    }
+   }
+  },
+  "edgedetect": {
+   "description": "Crea linee luminose dove l'immagine cambia e lascia scuro il resto.",
+   "name": "Rileva bordi",
+   "params": {
+    "strength": {
+     "label": "Intensità"
+    }
+   }
+  },
+  "edgeglow": {
+   "description": "Rileva i bordi del livello e li illumina come neon su un'immagine scurita.",
+   "name": "Bagliore bordi",
+   "params": {
+    "blend": {
+     "label": "Fusione"
+    },
+    "blur": {
+     "label": "Sfocatura"
+    },
+    "brightness": {
+     "label": "Luminosità"
+    },
+    "color": {
+     "label": "Colore"
+    },
+    "edges": {
+     "label": "Intensità bordi"
+    },
+    "gamma": {
+     "label": "Gamma"
+    },
+    "invert": {
+     "label": "Inverti"
+    },
+    "own": {
+     "label": "Colore immagine"
+    },
+    "spread": {
+     "label": "Diffusione"
+    },
+    "threshold": {
+     "label": "Soglia"
+    },
+    "tint": {
+     "label": "Tinta"
+    },
+    "tintColor": {
+     "label": "Colore tinta"
+    }
+   }
+  },
+  "electricedges": {
+   "description": "Disegna un contorno luminoso e scintillante attorno al livello. Spessore lo allarga in una fascia luminosa; ogni valore di Seme crea un motivo diverso, quindi animandolo si ottengono scintille a ogni fotogramma. Evoluzione crea movimento. Puoi aggiungere linee di contorno interne.",
+   "name": "Bordi elettrici",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blur": {
+     "label": "Distanza"
+    },
+    "color": {
+     "label": "Colore"
+    },
+    "contourAngle": {
+     "label": "Angolo contorni"
+    },
+    "contours": {
+     "label": "Mostra contorni"
+    },
+    "count": {
+     "label": "Numero contorni"
+    },
+    "detail": {
+     "label": "Dettaglio"
+    },
+    "distortion": {
+     "label": "Distorsione"
+    },
+    "evolution": {
+     "label": "Evoluzione"
+    },
+    "fill": {
+     "label": "Riempimento"
+    },
+    "glow": {
+     "label": "Bagliore"
+    },
+    "glowColor": {
+     "label": "Colore bagliore"
+    },
+    "maskColor": {
+     "label": "Colore maschera"
+    },
+    "maskEvolution": {
+     "label": "Evoluzione maschera"
+    },
+    "maskScale": {
+     "label": "Scala maschera"
+    },
+    "maskSeed": {
+     "label": "Seme maschera"
+    },
+    "maskStrength": {
+     "label": "Intensità maschera"
+    },
+    "phase": {
+     "label": "Fase contorni"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "strength": {
+     "label": "Intensità"
+    },
+    "thickness": {
+     "label": "Spessore"
+    }
+   }
+  },
+  "ellipsoid": {
+   "description": "Avvolge il livello attorno a una sfera che puoi comprimere e appiattire.",
+   "name": "Ellissoide",
+   "params": {
+    "flattenRatio": {
+     "label": "Appiattimento"
+    },
+    "light": {
+     "label": "Angolo luce"
+    },
+    "perspective": {
+     "label": "Prospettiva"
+    },
+    "position": {
+     "label": "Posizione"
+    },
+    "radius": {
+     "label": "Raggio"
+    },
+    "rotX": {
+     "label": "Rotazione X"
+    },
+    "rotY": {
+     "label": "Rotazione Y"
+    },
+    "rotZ": {
+     "label": "Rotazione Z"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "shading": {
+     "label": "Ombreggiatura"
+    },
+    "shine": {
+     "label": "Lucentezza"
+    },
+    "squeezeRatio": {
+     "label": "Compressione"
+    }
+   }
+  },
+  "emboss": {
+   "description": "Applica un effetto rilievo usando le variazioni di luminanza lungo l'angolo di luce specificato.",
+   "name": "Rilievo",
+   "params": {
+    "angle": {
+     "label": "Angolo luce"
+    },
+    "strength": {
+     "label": "Intensità"
+    }
+   }
+  },
+  "energybeam": {
+   "description": "Disegna tra due punti un raggio luminoso con un nucleo brillante e un alone morbido, che può oscillare e crescere in lunghezza.",
+   "name": "Raggio di energia",
+   "params": {
+    "blend": {
+     "label": "Fusione",
+     "options": [
+      "Aggiungi",
+      "Scolora",
+      "Normale"
+     ]
+    },
+    "color": {
+     "label": "Colore bagliore"
+    },
+    "dim": {
+     "label": "Scurisci sfondo"
+    },
+    "evolution": {
+     "label": "Evoluzione"
+    },
+    "frequency": {
+     "label": "Frequenza"
+    },
+    "from": {
+     "label": "Inizio"
+    },
+    "glow": {
+     "label": "Bagliore"
+    },
+    "halo": {
+     "label": "Alone"
+    },
+    "haloColor": {
+     "label": "Colore alone"
+    },
+    "haloWidth": {
+     "label": "Larghezza alone"
+    },
+    "opacity": {
+     "label": "Opacità"
+    },
+    "progress": {
+     "label": "Avanzamento"
+    },
+    "span": {
+     "label": "Lunghezza"
+    },
+    "to": {
+     "label": "Fine"
+    },
+    "width": {
+     "label": "Larghezza"
+    },
+    "wiggle": {
+     "label": "Oscillazione"
+    }
+   }
+  },
+  "exposure": {
+   "description": "Simula l'esposizione fotografica con stop, spostamento e correzione gamma. Schiarisci parti trasparenti permette ai pixel parzialmente trasparenti, come un bordo sfocato, di superare il bianco in luminosità.",
+   "name": "Esposizione",
+   "params": {
+    "gamma": {
+     "label": "Gamma"
+    },
+    "offset": {
+     "label": "Spostamento"
+    },
+    "soft": {
+     "label": "Schiarisci parti trasparenti"
+    },
+    "stops": {
+     "label": "Stop"
+    }
+   }
+  },
+  "fade": {
+   "description": "Applica una dissolvenza all'inizio e alla fine del livello, per le durate impostate.",
+   "name": "Dissolvenza in entrata/uscita",
+   "params": {
+    "fadeIn": {
+     "label": "Entrata"
+    },
+    "fadeOut": {
+     "label": "Uscita"
+    }
+   }
+  },
+  "feather": {
+   "description": "Ammorbidisce i bordi alfa del livello. Verso l'interno sfuma entro il contorno esistente; Sfoca alfa estende il bordo ammorbidito anche all'esterno.",
+   "name": "Sfumatura bordi",
+   "params": {
+    "blur": {
+     "label": "Intensità"
+    },
+    "mode": {
+     "label": "Bordi",
+     "options": [
+      "Verso l'interno",
+      "Sfoca alfa"
+     ]
+    }
+   }
+  },
+  "fillbehind": {
+   "description": "Riempie il fotogramma dietro il livello con una sua copia ingrandita e sfocata, utile per un video verticale in un progetto orizzontale.",
+   "name": "Riempimento sfondo",
+   "params": {
+    "bgAlpha": {
+     "label": "Alfa sfondo"
+    },
+    "bgOffset": {
+     "label": "Spostamento sfondo"
+    },
+    "bgScale": {
+     "label": "Scala sfondo"
+    },
+    "blur": {
+     "label": "Intensità"
+    },
+    "brightness": {
+     "label": "Luminosità"
+    },
+    "edgeColor": {
+     "label": "Colore bordo"
+    },
+    "edgeStrength": {
+     "label": "Intensità bordi"
+    },
+    "feather": {
+     "label": "Sfumatura bordi"
+    },
+    "fgAlpha": {
+     "label": "Alfa primo piano"
+    },
+    "fgOffset": {
+     "label": "Spostamento primo piano"
+    },
+    "fgScale": {
+     "label": "Scala primo piano"
+    },
+    "gamma": {
+     "label": "Gamma"
+    },
+    "saturation": {
+     "label": "Saturazione"
+    },
+    "scanCount": {
+     "label": "Numero linee di scansione"
+    },
+    "scanStrength": {
+     "label": "Intensità linee di scansione"
+    },
+    "tint": {
+     "label": "Tinta"
+    },
+    "tintColor": {
+     "label": "Colore tinta"
+    }
+   }
+  },
+  "filmgrain": {
+   "description": "Grana monocromatica animata, con quantità, dimensione e velocità regolabili.",
+   "name": "Grana pellicola",
+   "params": {
+    "amount": {
+     "label": "Quantità"
+    },
+    "grainSize": {
+     "label": "Dimensione grana"
+    },
+    "speed": {
+     "label": "Velocità"
+    }
+   }
+  },
+  "flicker": {
+   "description": "Fa variare casualmente l'opacità del livello.",
+   "name": "Sfarfallio",
+   "params": {
+    "intensity": {
+     "label": "Intensità"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "speed": {
+     "label": "Frequenza"
+    },
+    "style": {
+     "label": "Modalità",
+     "options": [
+      "Lampeggio",
+      "Costante"
+     ]
+    }
+   }
+  },
+  "flip": {
+   "description": "Ruota il livello come una carta in 3D, con il retro trasparente, con un'immagine o un colore.",
+   "name": "Capovolgi livello",
+   "params": {
+    "axis": {
+     "label": "Asse"
+    },
+    "back": {
+     "label": "Retro",
+     "options": [
+      "Trasparente",
+      "Immagine",
+      "Colore"
+     ]
+    },
+    "backColor": {
+     "label": "Colore retro"
+    },
+    "light": {
+     "label": "Angolo luce"
+    },
+    "perspective": {
+     "label": "Prospettiva"
+    },
+    "position": {
+     "label": "Posizione"
+    },
+    "rotX": {
+     "label": "Rotazione X"
+    },
+    "rotY": {
+     "label": "Rotazione Y"
+    },
+    "rotZ": {
+     "label": "Rotazione Z"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "shading": {
+     "label": "Ombreggiatura"
+    },
+    "shine": {
+     "label": "Lucentezza"
+    }
+   }
+  },
+  "fontweight": {
+   "description": "Regola lo spessore delle lettere, da sottile a marcato, e può essere animato con keyframe. Funziona con i font variabili, che contengono tutti gli spessori in un file: Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display e Dancing Script nell'elenco, oppure un font variabile importato. I font a spessore fisso mantengono il proprio aspetto.",
+   "name": "Spessore font",
+   "params": {
+    "weight": {
+     "label": "Spessore"
+    }
+   }
+  },
+  "fourcolor": {
+   "description": "Fonde sul livello quattro colori posizionati in quattro punti, espressi in pixel dal centro del livello.",
+   "name": "Sfumatura a quattro colori",
+   "params": {
+    "blend": {
+     "label": "Fusione",
+     "options": [
+      "Normale",
+      "Moltiplica",
+      "Scolora",
+      "Sovrapponi",
+      "Luce soffusa",
+      "Luce intensa",
+      "Aggiungi",
+      "Scurisci",
+      "Schiarisci",
+      "Differenza",
+      "Scherma colore",
+      "Brucia colore"
+     ]
+    },
+    "color1": {
+     "label": "Colore 1"
+    },
+    "color2": {
+     "label": "Colore 2"
+    },
+    "color3": {
+     "label": "Colore 3"
+    },
+    "color4": {
+     "label": "Colore 4"
+    },
+    "corner": {
+     "label": "Spostamento angoli"
+    },
+    "opacity": {
+     "label": "Opacità"
+    },
+    "point1": {
+     "label": "Punto 1"
+    },
+    "point2": {
+     "label": "Punto 2"
+    },
+    "point3": {
+     "label": "Punto 3"
+    },
+    "point4": {
+     "label": "Punto 4"
+    },
+    "softness": {
+     "label": "Morbidezza"
+    }
+   }
+  },
+  "fractalridges": {
+   "description": "Riempie le parti opache del livello con creste nette e turbolente di rumore frattale.",
+   "name": "Creste frattali",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "color1": {
+     "label": "Colore 1"
+    },
+    "color2": {
+     "label": "Colore 2"
+    },
+    "evolution": {
+     "label": "Evoluzione"
+    },
+    "intensity": {
+     "label": "Intensità"
+    },
+    "octaves": {
+     "label": "Ottave"
+    },
+    "offset": {
+     "label": "Spostamento"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "stretch": {
+     "label": "Allungamento"
+    }
+   }
+  },
+  "fractalwarp": {
+   "description": "Deforma il livello con rumore frattale ripiegato, per effetti di fuoco, acqua e tremolio del calore.",
+   "name": "Deformazione frattale",
+   "params": {
+    "complexity": {
+     "label": "Complessità"
+    },
+    "evolution": {
+     "label": "Evoluzione"
+    },
+    "intensity": {
+     "label": "Intensità"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "parallax": {
+     "label": "Parallasse"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "screenSpace": {
+     "label": "Spazio schermo"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "strength": {
+     "label": "Intensità"
+    }
+   }
+  },
+  "fracture3d": {
+   "description": "Frammenta il livello in schegge 3D in movimento.",
+   "name": "Frattura 3D",
+   "params": {
+    "depthPush": {
+     "label": "Spinta in profondità"
+    },
+    "direction": {
+     "label": "Direzione"
+    },
+    "fade": {
+     "label": "Dissolvenza in uscita"
+    },
+    "force": {
+     "label": "Forza"
+    },
+    "gravity": {
+     "label": "Gravità"
+    },
+    "impact": {
+     "label": "Punto d'impatto"
+    },
+    "intensity": {
+     "label": "Intensità luce"
+    },
+    "light": {
+     "label": "Direzione luce"
+    },
+    "pieces": {
+     "label": "Pezzi"
+    },
+    "progress": {
+     "label": "Avanzamento"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "spin": {
+     "label": "Rotazione"
+    },
+    "spread": {
+     "label": "Dispersione direzionale"
+    },
+    "thickness": {
+     "label": "Spessore"
+    }
+   }
+  },
+  "fringeclean": {
+   "description": "Rimuove il colore dai pixel lungo il bordo della maschera del livello, attenuando fino al grigio gli aloni lasciati dalla trasparenza e mantenendo invariati fino a tre colori protetti.",
+   "name": "Alone della maschera",
+   "params": {
+    "blur": {
+     "label": "Spessore"
+    },
+    "color1": {
+     "label": "Mantieni colore 1"
+    },
+    "color2": {
+     "label": "Mantieni colore 2"
+    },
+    "color3": {
+     "label": "Mantieni colore 3"
+    },
+    "feather": {
+     "label": "Sfumatura bordo"
+    },
+    "threshold1": {
+     "label": "Intervallo 1"
+    },
+    "threshold2": {
+     "label": "Intervallo 2"
+    },
+    "threshold3": {
+     "label": "Intervallo 3"
+    }
+   }
+  },
+  "glass": {
+   "description": "Trasforma la forma del livello in vetro smussato che rifrange i livelli retrostanti, con un riflesso lungo il bordo.",
+   "name": "Vetro",
+   "params": {
+    "angle": {
+     "label": "Angolo luce"
+    },
+    "blur": {
+     "label": "Smusso"
+    },
+    "color": {
+     "label": "Colore"
+    },
+    "highlight": {
+     "label": "Riflesso"
+    },
+    "refraction": {
+     "label": "Rifrazione"
+    },
+    "tint": {
+     "label": "Tinta"
+    }
+   }
+  },
+  "glitch": {
+   "description": "Sposta casualmente blocchi orizzontali e canali di colore, con variazioni alcune volte al secondo.",
+   "name": "Glitch",
+   "params": {
+    "blockHeight": {
+     "label": "Altezza blocco"
+    },
+    "intensity": {
+     "label": "Intensità"
+    },
+    "seed": {
+     "label": "Seme"
+    }
+   }
+  },
+  "glow": {
+   "description": "Crea un alone di un solo colore attorno alla forma del livello. La durezza lo trasforma da una sfumatura morbida a un contorno pieno.",
+   "name": "Bagliore",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blendMode": {
+     "label": "Metodo di fusione",
+     "options": [
+      "Normale",
+      "Moltiplica",
+      "Scolora"
+     ]
+    },
+    "color": {
+     "label": "Colore"
+    },
+    "hardness": {
+     "label": "Durezza"
+    },
+    "radius": {
+     "label": "Raggio"
+    }
+   }
+  },
+  "glowscan": {
+   "description": "Sfoca e illumina solo le parti del livello la cui luminosità rientra in una fascia; anima Posizione per spostare il bagliore dalle ombre alle luci.",
+   "name": "Scansione bagliore",
+   "params": {
+    "blur": {
+     "label": "Sfocatura"
+    },
+    "color": {
+     "label": "Colore bagliore"
+    },
+    "intensity": {
+     "label": "Intensità"
+    },
+    "position": {
+     "label": "Posizione"
+    },
+    "show": {
+     "label": "Mostra solo fascia"
+    },
+    "softness": {
+     "label": "Morbidezza"
+    },
+    "width": {
+     "label": "Larghezza"
+    }
+   }
+  },
+  "gradientmap": {
+   "description": "Ricolora l'immagine in base alla luminosità usando tre colori, con ripetizioni e una fase. Scala luminosità moltiplica il risultato per la luminosità originale dell'immagine.",
+   "name": "Mappa sfumatura",
+   "params": {
+    "color1": {
+     "label": "Ombre"
+    },
+    "color2": {
+     "label": "Mezzitoni"
+    },
+    "color3": {
+     "label": "Luci"
+    },
+    "opacity": {
+     "label": "Opacità"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "repeat": {
+     "label": "Ripeti"
+    },
+    "reverse": {
+     "label": "Inverti"
+    },
+    "saturation": {
+     "label": "Saturazione"
+    },
+    "scaleBrightness": {
+     "label": "Scala luminosità"
+    }
+   }
+  },
+  "gradientoverlay": {
+   "description": "Sovrappone al livello una sfumatura a due colori, con forme e metodi di fusione a scelta.",
+   "name": "Sovrapposizione sfumatura",
+   "params": {
+    "angle": {
+     "label": "Angolo"
+    },
+    "blend": {
+     "label": "Fusione",
+     "options": [
+      "Normale",
+      "Moltiplica",
+      "Scolora",
+      "Sovrapponi",
+      "Luce soffusa",
+      "Luce intensa",
+      "Aggiungi",
+      "Scurisci",
+      "Schiarisci",
+      "Differenza",
+      "Scherma colore",
+      "Brucia colore"
+     ]
+    },
+    "color1": {
+     "label": "Colore 1"
+    },
+    "color2": {
+     "label": "Colore 2"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "opacity": {
+     "label": "Opacità"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "shape": {
+     "label": "Forma",
+     "options": [
+      "Lineare",
+      "Radiale",
+      "Riflessa",
+      "Angolo"
+     ]
+    },
+    "style": {
+     "label": "Lunghezza",
+     "options": [
+      "Riquadro",
+      "Ovale"
+     ]
+    }
+   }
+  },
+  "grid": {
+   "description": "Disegna una griglia sulle parti opache del livello oppure la ritaglia da esse.",
+   "name": "Griglia",
+   "params": {
+    "angle": {
+     "label": "Angolo"
+    },
+    "color": {
+     "label": "Colore"
+    },
+    "count": {
+     "label": "Numero"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "punch": {
+     "label": "Ritaglia"
+    },
+    "stretch": {
+     "label": "Allungamento"
+    },
+    "width": {
+     "label": "Larghezza"
+    }
+   }
+  },
+  "gridrepeat": {
+   "description": "Genera più copie del livello, disposte dinamicamente in una griglia.",
+   "name": "Ripetizione a griglia",
+   "params": {
+    "copyDelay": {
+     "label": "Ritardo per copia"
+    },
+    "count": {
+     "label": "Numero"
+    },
+    "easing": {
+     "label": "Easing",
+     "options": [
+      "Lineare",
+      "Accelerazione",
+      "Decelerazione",
+      "Accelerazione e decelerazione"
+     ]
+    },
+    "fillAmount": {
+     "label": "Quantità riempimento"
+    },
+    "fillColor": {
+     "label": "Colore riempimento"
+    },
+    "position": {
+     "label": "Posizione"
+    },
+    "randomOpacity": {
+     "label": "Opacità casuale"
+    },
+    "randomOrder": {
+     "label": "Ordine casuale"
+    },
+    "randomPosition": {
+     "label": "Posizione casuale"
+    },
+    "randomRotation": {
+     "label": "Rotazione casuale"
+    },
+    "randomScale": {
+     "label": "Scala casuale"
+    },
+    "rangeEnd": {
+     "label": "Fine intervallo"
+    },
+    "rangeOffset": {
+     "label": "Scostamento intervallo"
+    },
+    "rangeOpacity": {
+     "label": "Opacità intervallo"
+    },
+    "rangePosition": {
+     "label": "Posizione intervallo"
+    },
+    "rangeRotation": {
+     "label": "Rotazione intervallo"
+    },
+    "rangeScale": {
+     "label": "Scala intervallo"
+    },
+    "rangeStart": {
+     "label": "Inizio intervallo"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "stagger": {
+     "label": "Sfalsamento"
+    }
+   }
+  },
+  "grunge": {
+   "description": "Invecchia il livello con grana, macchie di sporco, bordi bruciati e una tinta polverosa.",
+   "name": "Usura",
+   "params": {
+    "blotches": {
+     "label": "Sporco"
+    },
+    "burn": {
+     "label": "Bordi bruciati"
+    },
+    "color": {
+     "label": "Colore tinta"
+    },
+    "grain": {
+     "label": "Grana"
+    },
+    "scale": {
+     "label": "Dimensione sporco"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "strength": {
+     "label": "Intensità"
+    },
+    "tint": {
+     "label": "Tinta"
+    }
+   }
+  },
+  "halftone": {
+   "description": "Punti di stampa che si ingrandiscono nelle zone scure dell'immagine.",
+   "name": "Mezzatinta",
+   "params": {
+    "angle": {
+     "label": "Angolo"
+    },
+    "cell": {
+     "label": "Dimensione"
+    },
+    "colored": {
+     "label": "Punti colorati"
+    },
+    "ink": {
+     "label": "Colore punti"
+    },
+    "paper": {
+     "label": "Colore carta"
+    },
+    "style": {
+     "label": "Stile",
+     "options": [
+      "Classico",
+      "Due colori"
+     ]
+    }
+   }
+  },
+  "halftonelines": {
+   "description": "Ridisegna il livello con linee di stampa più spesse nelle aree scure e più sottili in quelle chiare.",
+   "name": "Linee mezzatinta",
+   "params": {
+    "amount": {
+     "label": "Quantità"
+    },
+    "angle": {
+     "label": "Angolo"
+    },
+    "color1": {
+     "label": "Colore 1"
+    },
+    "color2": {
+     "label": "Colore 2"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "strength": {
+     "label": "Intensità"
+    }
+   }
+  },
+  "heart": {
+   "description": "Ritaglia il livello a forma di cuore bombato.",
+   "name": "Cuore",
+   "params": {
+    "depth": {
+     "label": "Profondità"
+    },
+    "heartSize": {
+     "label": "Dimensione"
+    },
+    "light": {
+     "label": "Angolo luce"
+    },
+    "perspective": {
+     "label": "Prospettiva"
+    },
+    "position": {
+     "label": "Posizione"
+    },
+    "rotX": {
+     "label": "Rotazione X"
+    },
+    "rotY": {
+     "label": "Rotazione Y"
+    },
+    "rotZ": {
+     "label": "Rotazione Z"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "shading": {
+     "label": "Ombreggiatura"
+    },
+    "shine": {
+     "label": "Lucentezza"
+    },
+    "smoothing": {
+     "label": "Smussatura"
+    }
+   }
+  },
+  "hexagontilerotate": {
+   "description": "Divide il livello in tessere esagonali e ruota l'immagine all'interno di ciascuna indipendentemente.",
+   "name": "Rotazione tessere esagonali",
+   "params": {
+    "angle": {
+     "label": "Angolo"
+    },
+    "count": {
+     "label": "Numero"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "random": {
+     "label": "Rendi casuale"
+    },
+    "rotation": {
+     "label": "Rotazione"
+    },
+    "seed": {
+     "label": "Seme"
+    }
+   }
+  },
+  "hexagontileshift": {
+   "description": "Divide il livello in tessere esagonali e sposta l'immagine all'interno di ciascuna in una direzione casuale.",
+   "name": "Spostamento tessere esagonali",
+   "params": {
+    "angle": {
+     "label": "Angolo"
+    },
+    "count": {
+     "label": "Numero"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "strength": {
+     "label": "Intensità"
+    }
+   }
+  },
+  "hexagontiling": {
+   "description": "Ripete il centro del livello in tessere esagonali che riempiono lo schermo.",
+   "name": "Tessere esagonali",
+   "params": {
+    "angle": {
+     "label": "Angolo"
+    },
+    "mirror": {
+     "label": "Specchio"
+    },
+    "scale": {
+     "label": "Scala"
+    }
+   }
+  },
+  "hexgrid": {
+   "description": "Copre il livello con una trama di esagoni riempiti con uno o tre colori, con bordi morbidi e spazi tra loro.",
+   "name": "Griglia esagonale",
+   "params": {
+    "angle": {
+     "label": "Angolo"
+    },
+    "blend": {
+     "label": "Fusione",
+     "options": [
+      "Normale",
+      "Moltiplica",
+      "Scolora",
+      "Sovrapponi",
+      "Luce soffusa",
+      "Luce intensa",
+      "Aggiungi",
+      "Scurisci",
+      "Schiarisci",
+      "Differenza",
+      "Scherma colore",
+      "Brucia colore"
+     ]
+    },
+    "cell": {
+     "label": "Dimensione"
+    },
+    "color1": {
+     "label": "Colore 1"
+    },
+    "color2": {
+     "label": "Colore 2"
+    },
+    "color3": {
+     "label": "Colore 3"
+    },
+    "colors": {
+     "label": "Colori",
+     "options": [
+      "Uno",
+      "Due",
+      "Tre"
+     ]
+    },
+    "feather": {
+     "label": "Sfumatura bordo"
+    },
+    "gap": {
+     "label": "Spazio"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "opacity": {
+     "label": "Opacità"
+    },
+    "stretch": {
+     "label": "Allungamento"
+    }
+   }
+  },
+  "hexprism": {
+   "description": "Applica il livello alla parte anteriore e posteriore di un prisma a sei lati.",
+   "name": "Prisma esagonale",
+   "params": {
+    "depth": {
+     "label": "Profondità"
+    },
+    "light": {
+     "label": "Angolo luce"
+    },
+    "perspective": {
+     "label": "Prospettiva"
+    },
+    "position": {
+     "label": "Posizione"
+    },
+    "radius": {
+     "label": "Raggio"
+    },
+    "rotX": {
+     "label": "Rotazione X"
+    },
+    "rotY": {
+     "label": "Rotazione Y"
+    },
+    "rotZ": {
+     "label": "Rotazione Z"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "shading": {
+     "label": "Ombreggiatura"
+    },
+    "shine": {
+     "label": "Lucentezza"
+    },
+    "smoothing": {
+     "label": "Smussatura"
+    }
+   }
+  },
+  "highlightshadow": {
+   "description": "Recupera o intensifica le luci e schiarisce o approfondisce le ombre in base alla luminosità di ogni pixel.",
+   "name": "Luci e ombre",
+   "params": {
+    "highlights": {
+     "label": "Luci"
+    },
+    "shadows": {
+     "label": "Ombre"
+    },
+    "style": {
+     "label": "Stile",
+     "options": [
+      "Classico",
+      "Mantieni colore"
+     ]
+    }
+   }
+  },
+  "hollowbox": {
+   "description": "Una scatola aperta sopra e sotto: il livello ne copre l'esterno e l'interno assume il colore scelto.",
+   "name": "Scatola cava",
+   "params": {
+    "depth": {
+     "label": "Profondità"
+    },
+    "height": {
+     "label": "Altezza"
+    },
+    "interior": {
+     "label": "Colore interno"
+    },
+    "light": {
+     "label": "Angolo luce"
+    },
+    "perspective": {
+     "label": "Prospettiva"
+    },
+    "position": {
+     "label": "Posizione"
+    },
+    "rotX": {
+     "label": "Rotazione X"
+    },
+    "rotY": {
+     "label": "Rotazione Y"
+    },
+    "rotZ": {
+     "label": "Rotazione Z"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "shading": {
+     "label": "Ombreggiatura"
+    },
+    "shine": {
+     "label": "Lucentezza"
+    },
+    "smoothing": {
+     "label": "Smussatura"
+    },
+    "thickness": {
+     "label": "Spessore"
+    },
+    "width": {
+     "label": "Larghezza"
+    }
+   }
+  },
+  "hsl": {
+   "description": "Modifica tonalità, saturazione e luminosità di un intervallo di colori alla volta (rossi, arancioni, verdi e così via), lasciando invariati gli altri.",
+   "name": "HSL",
+   "params": {
+    "blend": {
+     "label": "Fusione",
+     "options": [
+      "Normale",
+      "Moltiplica",
+      "Scolora"
+     ]
+    },
+    "blueHue": {
+     "label": "Tonalità"
+    },
+    "blueLightness": {
+     "label": "Luminosità"
+    },
+    "blueSaturation": {
+     "label": "Saturazione"
+    },
+    "brightness": {
+     "label": "Luminosità"
+    },
+    "cyanHue": {
+     "label": "Tonalità"
+    },
+    "cyanLightness": {
+     "label": "Luminosità"
+    },
+    "cyanSaturation": {
+     "label": "Saturazione"
+    },
+    "greenHue": {
+     "label": "Tonalità"
+    },
+    "greenLightness": {
+     "label": "Luminosità"
+    },
+    "greenSaturation": {
+     "label": "Saturazione"
+    },
+    "magentaHue": {
+     "label": "Tonalità"
+    },
+    "magentaLightness": {
+     "label": "Luminosità"
+    },
+    "magentaSaturation": {
+     "label": "Saturazione"
+    },
+    "opacity": {
+     "label": "Opacità"
+    },
+    "orangeHue": {
+     "label": "Tonalità"
+    },
+    "orangeLightness": {
+     "label": "Luminosità"
+    },
+    "orangeSaturation": {
+     "label": "Saturazione"
+    },
+    "purpleHue": {
+     "label": "Tonalità"
+    },
+    "purpleLightness": {
+     "label": "Luminosità"
+    },
+    "purpleSaturation": {
+     "label": "Saturazione"
+    },
+    "range": {
+     "label": "Colore",
+     "options": [
+      "Rosso",
+      "Arancione",
+      "Giallo",
+      "Verde",
+      "Ciano",
+      "Blu",
+      "Viola",
+      "Magenta"
+     ]
+    },
+    "redHue": {
+     "label": "Tonalità"
+    },
+    "redLightness": {
+     "label": "Luminosità"
+    },
+    "redSaturation": {
+     "label": "Saturazione"
+    },
+    "yellowHue": {
+     "label": "Tonalità"
+    },
+    "yellowLightness": {
+     "label": "Luminosità"
+    },
+    "yellowSaturation": {
+     "label": "Saturazione"
+    }
+   }
+  },
+  "huesaturation": {
+   "description": "Sposta i colori sulla ruota cromatica e ne aumenta o riduce l'intensità; la vividezza intensifica soprattutto i colori meno saturi.",
+   "name": "Tonalità e saturazione",
+   "params": {
+    "hue": {
+     "label": "Tonalità"
+    },
+    "lightness": {
+     "label": "Luminosità"
+    },
+    "saturation": {
+     "label": "Saturazione"
+    },
+    "style": {
+     "label": "Stile",
+     "options": [
+      "Classico",
+      "Mantieni luminosità"
+     ]
+    },
+    "vibrance": {
+     "label": "Vividezza"
+    }
+   }
+  },
+  "innerblur": {
+   "description": "Sfoca l'immagine all'interno del livello mantenendone nitido il contorno.",
+   "name": "Sfocatura interna",
+   "params": {
+    "blur": {
+     "label": "Intensità"
+    }
+   }
+  },
+  "innerbulge": {
+   "description": "Gonfia o contrae il centro del livello mantenendo fermi i bordi.",
+   "name": "Contrazione/rigonfiamento interno",
+   "params": {
+    "strength": {
+     "label": "Intensità"
+    }
+   }
+  },
+  "innerglow": {
+   "description": "Aggiunge un bagliore lungo i bordi interni delle parti opache del livello.",
+   "name": "Bagliore interno",
+   "params": {
+    "blur": {
+     "label": "Dimensione"
+    },
+    "color": {
+     "label": "Colore"
+    },
+    "intensity": {
+     "label": "Intensità"
+    }
+   }
+  },
+  "invert": {
+   "description": "Inverte i canali di colore dell'immagine con una quantità di fusione regolabile e l'inversione opzionale dell'alfa.",
+   "name": "Inverti",
+   "params": {
+    "amount": {
+     "label": "Quantità"
+    },
+    "invert_alpha": {
+     "label": "Inverti alfa"
+    }
+   }
+  },
+  "iridescence": {
+   "description": "Copre le parti opache del livello con riflessi arcobaleno in movimento, come olio sull'acqua o una bolla di sapone.",
+   "name": "Iridescenza",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blend": {
+     "label": "Metodo di fusione",
+     "options": [
+      "Normale",
+      "Moltiplica",
+      "Scolora",
+      "Sovrapponi",
+      "Luce soffusa",
+      "Luce intensa",
+      "Aggiungi",
+      "Scurisci",
+      "Schiarisci",
+      "Differenza",
+      "Scherma colore",
+      "Brucia colore"
+     ]
+    },
+    "evolution": {
+     "label": "Evoluzione"
+    },
+    "saturation": {
+     "label": "Saturazione"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "shift": {
+     "label": "Spostamento tonalità"
+    }
+   }
+  },
+  "kaleidoscope": {
+   "description": "Spicchi specchiati attorno a un punto.",
+   "name": "Caleidoscopio",
+   "params": {
+    "angle": {
+     "label": "Angolo"
+    },
+    "center": {
+     "label": "Centro"
+    },
+    "mirror": {
+     "label": "Specchio"
+    },
+    "segments": {
+     "label": "Segmenti"
+    }
+   }
+  },
+  "lensblur": {
+   "description": "Una sfocatura rotante che lascia nitida un'area intorno al centro e aumenta verso i bordi.",
+   "name": "Sfocatura lente",
+   "params": {
+    "center": {
+     "label": "Centro"
+    },
+    "feather": {
+     "label": "Sfumatura bordo"
+    },
+    "radius": {
+     "label": "Raggio"
+    },
+    "sweep": {
+     "label": "Angolo"
+    }
+   }
+  },
+  "lensflare": {
+   "description": "Una luce intensa con un alone, sovrapposta all'immagine.",
+   "name": "Riflesso luminoso",
+   "params": {
+    "brightness": {
+     "label": "Luminosità"
+    },
+    "center": {
+     "label": "Centro"
+    },
+    "color": {
+     "label": "Colore"
+    },
+    "radius": {
+     "label": "Raggio"
+    }
+   }
+  },
+  "levels": {
+   "description": "Regola i livelli dell'immagine con punti di nero e bianco in ingresso, gamma e punti di nero e bianco in uscita.",
+   "name": "Livelli",
+   "params": {
+    "gamma": {
+     "label": "Gamma"
+    },
+    "inBlack": {
+     "label": "Nero in ingresso"
+    },
+    "inWhite": {
+     "label": "Bianco in ingresso"
+    },
+    "outBlack": {
+     "label": "Nero in uscita"
+    },
+    "outWhite": {
+     "label": "Bianco in uscita"
+    }
+   }
+  },
+  "lightglow": {
+   "description": "Aggiunge un bagliore colorato attorno alle parti dell'immagine più luminose di una soglia.",
+   "name": "Bagliore luminoso",
+   "params": {
+    "blend": {
+     "label": "Fusione"
+    },
+    "blur": {
+     "label": "Dimensione"
+    },
+    "color": {
+     "label": "Colore"
+    },
+    "intensity": {
+     "label": "Intensità"
+    },
+    "opacity": {
+     "label": "Opacità"
+    },
+    "threshold": {
+     "label": "Soglia"
+    }
+   }
+  },
+  "lightning": {
+   "description": "Disegna un fulmine ramificato tra due punti del livello.",
+   "name": "Fulmine",
+   "params": {
+    "color": {
+     "label": "Colore"
+    },
+    "evolution": {
+     "label": "Evoluzione"
+    },
+    "from": {
+     "label": "Inizio"
+    },
+    "glow": {
+     "label": "Bagliore"
+    },
+    "jag": {
+     "label": "Dettaglio"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "to": {
+     "label": "Fine"
+    },
+    "width": {
+     "label": "Larghezza"
+    }
+   }
+  },
+  "linearrepeat": {
+   "description": "Genera più copie del livello, disposte dinamicamente lungo una linea.",
+   "name": "Ripetizione lineare",
+   "params": {
+    "copyDelay": {
+     "label": "Ritardo per copia"
+    },
+    "count": {
+     "label": "Numero"
+    },
+    "easing": {
+     "label": "Easing",
+     "options": [
+      "Lineare",
+      "Accelerazione",
+      "Decelerazione",
+      "Accelerazione e decelerazione"
+     ]
+    },
+    "fillAmount": {
+     "label": "Quantità riempimento"
+    },
+    "fillColor": {
+     "label": "Colore riempimento"
+    },
+    "position": {
+     "label": "Posizione"
+    },
+    "randomOpacity": {
+     "label": "Opacità casuale"
+    },
+    "randomOrder": {
+     "label": "Ordine casuale"
+    },
+    "randomPosition": {
+     "label": "Posizione casuale"
+    },
+    "randomRotation": {
+     "label": "Rotazione casuale"
+    },
+    "randomScale": {
+     "label": "Scala casuale"
+    },
+    "rangeEnd": {
+     "label": "Fine intervallo"
+    },
+    "rangeOffset": {
+     "label": "Scostamento intervallo"
+    },
+    "rangeOpacity": {
+     "label": "Opacità intervallo"
+    },
+    "rangePosition": {
+     "label": "Posizione intervallo"
+    },
+    "rangeRotation": {
+     "label": "Rotazione intervallo"
+    },
+    "rangeScale": {
+     "label": "Scala intervallo"
+    },
+    "rangeStart": {
+     "label": "Inizio intervallo"
+    },
+    "seed": {
+     "label": "Seme"
+    }
+   }
+  },
+  "linearstreaks": {
+   "description": "Crea scie dritte spostando copie del livello lungo un angolo e fondendole dove si sovrappongono.",
+   "name": "Scie lineari",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Angolo"
+    },
+    "bias": {
+     "label": "Bilanciamento"
+    },
+    "mode": {
+     "label": "Fusione",
+     "options": [
+      "Schiarisci",
+      "Media",
+      "Scurisci"
+     ]
+    },
+    "reach": {
+     "label": "Lunghezza"
+    }
+   }
+  },
+  "liquidglass": {
+   "description": "Trasforma la forma del livello in vetro trasparente e arrotondato, come il pulsante di un telefono: i livelli retrostanti si deformano soprattutto vicino al bordo, luminoso sul lato illuminato e più tenue su quello opposto. Vetro satinato sfoca lo sfondo e Bordo arcobaleno separa i colori sul bordo.",
+   "name": "Vetro liquido",
+   "params": {
+    "angle": {
+     "label": "Angolo luce"
+    },
+    "blur": {
+     "label": "Bordo"
+    },
+    "color": {
+     "label": "Colore"
+    },
+    "dispersion": {
+     "label": "Bordo arcobaleno"
+    },
+    "frost": {
+     "label": "Vetro satinato"
+    },
+    "highlight": {
+     "label": "Riflesso"
+    },
+    "refraction": {
+     "label": "Deformazione"
+    },
+    "tint": {
+     "label": "Tinta"
+    }
+   }
+  },
+  "longshadow": {
+   "description": "Proietta ombre lunghe e parallele dalle parti opache del livello.",
+   "name": "Ombra lunga",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Angolo"
+    },
+    "color": {
+     "label": "Colore"
+    },
+    "fade": {
+     "label": "Dissolvenza"
+    },
+    "reach": {
+     "label": "Lunghezza"
+    },
+    "solidity": {
+     "label": "Compattezza"
+    }
+   }
+  },
+  "lumakey": {
+   "description": "Rimuove le parti scure del livello (o quelle chiare).",
+   "name": "Chiave luminanza",
+   "params": {
+    "invert": {
+     "label": "Inverti"
+    },
+    "softness": {
+     "label": "Morbidezza"
+    },
+    "threshold": {
+     "label": "Soglia"
+    }
+   }
+  },
+  "lumastamp": {
+   "description": "Trasforma il livello in un colore uniforme la cui opacità segue la luminosità di ogni pixel, come un timbro o uno stencil.",
+   "name": "Timbro luminanza",
+   "params": {
+    "color": {
+     "label": "Colore"
+    },
+    "gamma": {
+     "label": "Gamma"
+    },
+    "high": {
+     "label": "Punto di bianco"
+    },
+    "invert": {
+     "label": "Inverti"
+    },
+    "low": {
+     "label": "Punto di nero"
+    }
+   }
+  },
+  "magnifybackground": {
+   "description": "Trasforma il livello in una lente: la sua forma mostra i livelli retrostanti ingranditi attorno al centro.",
+   "name": "Ingrandisci sfondo",
+   "params": {
+    "magnify": {
+     "label": "Ingrandisci livello"
+    },
+    "sampling": {
+     "label": "Campionamento",
+     "options": [
+      "Più vicino",
+      "Lineare"
+     ]
+    },
+    "scale": {
+     "label": "Scala"
+    }
+   }
+  },
+  "maskblur": {
+   "description": "Sfoca i livelli retrostanti all'interno della forma di questo livello; le parti più luminose sfocano di più, quindi una sfumatura crea un effetto miniatura.",
+   "name": "Sfocatura maschera",
+   "params": {
+    "invert": {
+     "label": "Inverti"
+    },
+    "strength": {
+     "label": "Intensità"
+    }
+   }
+  },
+  "mattechoker": {
+   "description": "Riduce le parti opache del livello erodendone i bordi.",
+   "name": "Contrazione maschera",
+   "params": {
+    "amount": {
+     "label": "Contrazione"
+    },
+    "blur": {
+     "label": "Dimensione"
+    },
+    "invert": {
+     "label": "Inverti"
+    },
+    "softness": {
+     "label": "Morbidezza"
+    }
+   }
+  },
+  "mirror": {
+   "description": "Riflette metà dell'immagine rispetto a una linea speculare definita da un angolo e un punto centrale.",
+   "name": "Specchio",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Angolo"
+    },
+    "center": {
+     "label": "Centro"
+    },
+    "style": {
+     "label": "Stile",
+     "options": [
+      "Piega",
+      "Ribalta"
+     ]
+    }
+   }
+  },
+  "mosaic": {
+   "description": "Divide il livello in quadrati e riempie ciascuno con il proprio colore medio.",
+   "name": "Mosaico",
+   "params": {
+    "count": {
+     "label": "Numero"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "stretch": {
+     "label": "Allungamento"
+    }
+   }
+  },
+  "motionblur": {
+   "description": "Sfoca il livello lungo il suo movimento, la rotazione e il ridimensionamento, in base ai keyframe e agli effetti di movimento come Scuotimento automatico e Oscillazione. Regolazione modifica l'intensità della sfocatura. L'anteprima usa una sfocatura più rapida, salvo quando è attiva Sfocatura completa.",
+   "name": "Sfocatura di movimento",
+   "params": {
+    "position": {
+     "label": "Posizione"
+    },
+    "rotation": {
+     "label": "Angolo"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "tune": {
+     "label": "Regolazione"
+    }
+   }
+  },
+  "movealongpath": {
+   "description": "Posiziona il livello lungo il contorno del livello immediatamente sottostante.",
+   "name": "Sposta lungo tracciato",
+   "params": {
+    "inset": {
+     "label": "Verso l'interno/esterno"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "orientation": {
+     "label": "Orientamento"
+    },
+    "progress": {
+     "label": "Avanzamento"
+    },
+    "rotate": {
+     "label": "Ruota automaticamente"
+    }
+   }
+  },
+  "noise": {
+   "description": "Copre il livello con una grana fine, un granello per pixel, che cambia a ogni fotogramma. Monocromatico rende la grana grigia, Estremi rende ogni granello del tutto chiaro o scuro e Blocca mantiene fermo il motivo.",
+   "name": "Disturbo",
+   "params": {
+    "amount": {
+     "label": "Intensità"
+    },
+    "extremes": {
+     "label": "Estremi"
+    },
+    "freeze": {
+     "label": "Blocca"
+    },
+    "mono": {
+     "label": "Monocromatico"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "overshoot": {
+     "label": "Superamento"
+    }
+   }
+  },
+  "noisedisplace": {
+   "description": "Sposta i pixel usando un disturbo uniforme che si anima nel tempo.",
+   "name": "Spostamento con disturbo",
+   "params": {
+    "amount": {
+     "label": "Quantità"
+    },
+    "scale": {
+     "label": "Scala disturbo"
+    },
+    "speed": {
+     "label": "Velocità animazione"
+    }
+   }
+  },
+  "octahedron": {
+   "description": "Applica il livello alle otto facce di un ottaedro.",
+   "name": "Ottaedro",
+   "params": {
+    "light": {
+     "label": "Angolo della luce"
+    },
+    "perspective": {
+     "label": "Prospettiva"
+    },
+    "position": {
+     "label": "Posizione"
+    },
+    "radius": {
+     "label": "Raggio"
+    },
+    "rotX": {
+     "label": "Rotazione X"
+    },
+    "rotY": {
+     "label": "Rotazione Y"
+    },
+    "rotZ": {
+     "label": "Rotazione Z"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "shading": {
+     "label": "Ombreggiatura"
+    },
+    "shine": {
+     "label": "Lucentezza"
+    }
+   }
+  },
+  "offset": {
+   "description": "Sposta l’immagine del livello facendola riapparire sul bordo opposto.",
+   "name": "Scostamento",
+   "params": {
+    "feather": {
+     "label": "Sfumatura"
+    },
+    "mask": {
+     "label": "Maschera sul livello"
+    },
+    "offset": {
+     "label": "Scostamento"
+    }
+   }
+  },
+  "ominodiffusion": {
+   "description": "Ridisegna il livello con una palette ridotta e propaga l’errore di arrotondamento in una direzione, creando un dithering dall’aspetto glitch che prende vita in movimento.",
+   "name": "Diffusione Omino+",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Angolo"
+    },
+    "blend": {
+     "label": "Metodo di fusione",
+     "options": [
+      "Normale",
+      "Moltiplica",
+      "Scolora"
+     ]
+    },
+    "color1": {
+     "label": "Colore 1"
+    },
+    "color2": {
+     "label": "Colore 2"
+    },
+    "color3": {
+     "label": "Colore 3"
+    },
+    "color4": {
+     "label": "Colore 4"
+    },
+    "color5": {
+     "label": "Colore 5"
+    },
+    "color6": {
+     "label": "Colore 6"
+    },
+    "falloff": {
+     "label": "Attenuazione del peso"
+    },
+    "palette": {
+     "label": "Palette",
+     "options": [
+      "Bianco e nero",
+      "Posterizzazione RGB (2 livelli)",
+      "Posterizzazione RGB (3 livelli)",
+      "Posterizzazione RGB (4 livelli)",
+      "Grigio (3 livelli)",
+      "Grigio (4 livelli)",
+      "CGA verde/rosso/giallo",
+      "CGA ciano/magenta/bianco",
+      "CGA blu/ciano/magenta/bianco",
+      "Satura e posterizza",
+      "2 colori personalizzati",
+      "3 colori personalizzati",
+      "4 colori personalizzati",
+      "5 colori personalizzati",
+      "6 colori personalizzati"
+     ]
+    },
+    "steps": {
+     "label": "Passaggi"
+    },
+    "strength": {
+     "label": "Intensità"
+    },
+    "weight": {
+     "label": "Peso dell’errore"
+    }
+   }
+  },
+  "ominoglass": {
+   "description": "Crea un vetro dalla luminosità del livello: rifrange ciò che sta dietro con aloni iridescenti e illumina la superficie come una lente.",
+   "name": "Vetro Omino",
+   "params": {
+    "aberration": {
+     "label": "Aberrazione cromatica"
+    },
+    "ambient": {
+     "label": "Luce ambientale"
+    },
+    "amount": {
+     "label": "Rugosità"
+    },
+    "blend": {
+     "label": "Fusione"
+    },
+    "blur": {
+     "label": "Smusso"
+    },
+    "color": {
+     "label": "Colore"
+    },
+    "direction": {
+     "label": "Direzione"
+    },
+    "elevation": {
+     "label": "Elevazione"
+    },
+    "evolution": {
+     "label": "Evoluzione"
+    },
+    "feature": {
+     "label": "Dimensione dei dettagli"
+    },
+    "intensity": {
+     "label": "Intensità"
+    },
+    "light": {
+     "label": "Colore della luce"
+    },
+    "refraction": {
+     "label": "Rifrazione"
+    },
+    "samples": {
+     "label": "Campioni di smussamento"
+    },
+    "scale": {
+     "label": "Scala rugosità"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "shading": {
+     "label": "Ombreggiatura",
+     "options": [
+      "Nessuna",
+      "Luce puntiforme",
+      "Luce direzionale"
+     ]
+    },
+    "shine": {
+     "label": "Lucentezza"
+    },
+    "specularity": {
+     "label": "Riflesso speculare"
+    },
+    "useLuma": {
+     "label": "Usa luminanza del livello"
+    }
+   }
+  },
+  "oscillate": {
+   "description": "Sposta il livello avanti e indietro lungo un angolo, in profondità o su un’orbita.",
+   "name": "Oscillazione",
+   "params": {
+    "angle": {
+     "label": "Angolo"
+    },
+    "direction": {
+     "label": "Direzione",
+     "options": [
+      "Angolo",
+      "Profondità",
+      "Orbita"
+     ]
+    },
+    "frequency": {
+     "label": "Frequenza"
+    },
+    "magnitude": {
+     "label": "Ampiezza"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "wave": {
+     "label": "Onda",
+     "options": [
+      "Sinusoidale",
+      "Triangolare"
+     ]
+    }
+   }
+  },
+  "palettemap": {
+   "description": "Associa ogni pixel al colore più vicino di una palette: scegli fino a otto colori oppure usa una palette fino a 512 colori da un preset o da un file importato. I motivi di dithering mescolano colori vicini per mostrare più tonalità. Alfa fonde i colori risultanti con il livello originale.",
+   "name": "Mappa palette",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "color1": {
+     "label": "Colore 1"
+    },
+    "color2": {
+     "label": "Colore 2"
+    },
+    "color3": {
+     "label": "Colore 3"
+    },
+    "color4": {
+     "label": "Colore 4"
+    },
+    "color5": {
+     "label": "Colore 5"
+    },
+    "color6": {
+     "label": "Colore 6"
+    },
+    "color7": {
+     "label": "Colore 7"
+    },
+    "color8": {
+     "label": "Colore 8"
+    },
+    "colors": {
+     "label": "Colori"
+    },
+    "dither": {
+     "label": "Dithering"
+    },
+    "palette": {
+     "label": "Palette"
+    },
+    "pattern": {
+     "label": "Motivo dithering",
+     "options": [
+      "Nessuna",
+      "Rumore",
+      "Scacchiera",
+      "Bayer 2x2",
+      "Bayer 3x3",
+      "Bayer 4x4",
+      "Bayer 8x8",
+      "Punti raggruppati 4x4",
+      "Punti raggruppati 8x8",
+      "Linee orizzontali",
+      "Linee verticali",
+      "Linee diagonali",
+      "Floyd-Steinberg",
+      "Falso Floyd-Steinberg",
+      "Sierra Lite",
+      "Fan",
+      "Shiau-Fan",
+      "Jarvis-Judice-Ninke",
+      "Stucki",
+      "Burkes",
+      "Sierra",
+      "Sierra a due righe",
+      "Atkinson"
+     ]
+    },
+    "source": {
+     "label": "Colori da",
+     "options": [
+      "Colori",
+      "Palette"
+     ]
+    }
+   }
+  },
+  "parenthelper": {
+   "description": "Modifica il modo in cui un livello figlio segue il livello genitore: scala e rotazione possono seguirlo completamente, restare bloccate o seguirlo in misura variabile. La rotazione automatica fa ruotare il livello mentre si muove, come una ruota.",
+   "name": "Assistente gerarchia",
+   "params": {
+    "autoRotate": {
+     "label": "Rotazione automatica",
+     "options": [
+      "Disattivato",
+      "Asse X",
+      "Asse Y"
+     ]
+    },
+    "radiusAdjust": {
+     "label": "Regolazione raggio"
+    },
+    "rotateMode": {
+     "label": "Rotazione",
+     "options": [
+      "Normale",
+      "Bloccato",
+      "Ponderato"
+     ]
+    },
+    "rotateWeight": {
+     "label": "Peso rotazione"
+    },
+    "scaleMode": {
+     "label": "Scala",
+     "options": [
+      "Normale",
+      "Bloccato",
+      "Ponderato"
+     ]
+    },
+    "scaleWeight": {
+     "label": "Peso scala"
+    }
+   }
+  },
+  "particles": {
+   "description": "Fa volare particelle dal livello: neve, scintille, coriandoli, bolle, polvere, cuori, stelle, petali o piccole copie del livello stesso, mosse da gravità, vento e vortici. Parti da un preset, poi modifica l’emettitore, la quantità e le forze. A tempo emette una raffica a ogni battito: seleziona la musica, apri il suo menu e tocca prima Segna battiti.",
+   "name": "Particelle",
+   "params": {
+    "beats": {
+     "label": "Battiti",
+     "options": [
+      "Ogni battito",
+      "Ogni 2 battiti",
+      "Ogni 4 battiti"
+     ]
+    },
+    "blend": {
+     "label": "Fusione",
+     "options": [
+      "Normale",
+      "Aggiungi",
+      "Scolora"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Colore"
+    },
+    "color2": {
+     "label": "Colore 2"
+    },
+    "colorMode": {
+     "label": "Modalità colore",
+     "options": [
+      "Colore singolo",
+      "Mix casuale",
+      "Nel tempo"
+     ]
+    },
+    "colorVariation": {
+     "label": "Variazione colore"
+    },
+    "count": {
+     "label": "Numero"
+    },
+    "depth": {
+     "label": "Profondità"
+    },
+    "direction": {
+     "label": "Direzione"
+    },
+    "drag": {
+     "label": "Resistenza dell’aria"
+    },
+    "emission": {
+     "label": "Emissione",
+     "options": [
+      "Continua",
+      "Raffica",
+      "A tempo"
+     ]
+    },
+    "emitter": {
+     "label": "Emettitore",
+     "options": [
+      "Punto",
+      "Linea",
+      "Area",
+      "Contorno"
+     ]
+    },
+    "emitterSize": {
+     "label": "Dimensione emettitore"
+    },
+    "endSize": {
+     "label": "Dimensione finale"
+    },
+    "every": {
+     "label": "Ripeti ogni"
+    },
+    "fadeIn": {
+     "label": "Dissolvenza in entrata"
+    },
+    "fadeOut": {
+     "label": "Dissolvenza in uscita"
+    },
+    "gravity": {
+     "label": "Gravità"
+    },
+    "kind": {
+     "label": "Particella",
+     "options": [
+      "Neve",
+      "Scintille",
+      "Coriandoli",
+      "Bolle",
+      "Polvere",
+      "Cuori",
+      "Stelle",
+      "Petali",
+      "Livello"
+     ]
+    },
+    "layer": {
+     "label": "Livello",
+     "options": [
+      "Sotto le particelle",
+      "Sopra le particelle",
+      "Nascosto"
+     ]
+    },
+    "lifeVariation": {
+     "label": "Variazione durata"
+    },
+    "lifetime": {
+     "label": "Durata"
+    },
+    "more": {
+     "label": "Altre impostazioni"
+    },
+    "orientation": {
+     "label": "Orientamento",
+     "options": [
+      "Libero",
+      "Segui movimento"
+     ]
+    },
+    "perspective": {
+     "label": "Prospettiva"
+    },
+    "position": {
+     "label": "Posizione emettitore"
+    },
+    "prewarm": {
+     "label": "Inizia pieno"
+    },
+    "randomRotation": {
+     "label": "Rotazione casuale"
+    },
+    "rate": {
+     "label": "Frequenza"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "size": {
+     "label": "Dimensione"
+    },
+    "sizeVariation": {
+     "label": "Variazione dimensione"
+    },
+    "speed": {
+     "label": "Velocità"
+    },
+    "speedVariation": {
+     "label": "Variazione velocità"
+    },
+    "spin": {
+     "label": "Rotazione"
+    },
+    "spinVariation": {
+     "label": "Variazione rotazione"
+    },
+    "spread": {
+     "label": "Dispersione"
+    },
+    "start": {
+     "label": "Tempo raffica"
+    },
+    "swirl": {
+     "label": "Vortice"
+    },
+    "swirlSpeed": {
+     "label": "Velocità vortice"
+    },
+    "tint": {
+     "label": "Tinta"
+    },
+    "twinkle": {
+     "label": "Scintillio"
+    },
+    "wind": {
+     "label": "Vento"
+    },
+    "zSpeed": {
+     "label": "Velocità Z"
+    },
+    "zSpread": {
+     "label": "Dispersione Z"
+    }
+   },
+   "presets": {
+    "beat-confetti": "Coriandoli a tempo",
+    "bubbles": "Bolle",
+    "confetti": "Coriandoli",
+    "dust": "Polvere",
+    "hearts": "Cuori",
+    "layer-fountain": "Fontana di livelli",
+    "petals": "Petali",
+    "snow": "Neve",
+    "sparks": "Scintille",
+    "twinkle": "Scintillio"
+   }
+  },
+  "pixelate": {
+   "description": "Trasforma il livello in blocchi di un solo colore, preso dal centro di ciascun blocco, su una griglia centrata sul livello (o sul fotogramma con Spazio schermo). Allungamento, Scostamento e Angolo modificano la griglia; Vignettatura scurisce i bordi di ogni blocco.",
+   "name": "Effetto pixel",
+   "params": {
+    "angle": {
+     "label": "Angolo"
+    },
+    "blockSize": {
+     "label": "Dimensione"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "screenSpace": {
+     "label": "Spazio schermo"
+    },
+    "stretch": {
+     "label": "Allungamento"
+    },
+    "vignette": {
+     "label": "Vignettatura"
+    }
+   }
+  },
+  "pixeltiles": {
+   "description": "Ricrea il livello con una griglia di piccole tessere a motivi pixel. Ogni tessera disegna il motivo in base alla luminosità sottostante, come un misto di arte ASCII e mosaico. Caos interrompe la griglia con tessere casuali.",
+   "name": "Tessere pixel",
+   "params": {
+    "alpha": {
+     "label": "Miscela"
+    },
+    "background": {
+     "label": "Sfondo"
+    },
+    "brightness": {
+     "label": "Luminosità"
+    },
+    "chaos": {
+     "label": "Caos"
+    },
+    "chaosAmount": {
+     "label": "Quantità caos"
+    },
+    "chaosSpeed": {
+     "label": "Velocità caos"
+    },
+    "contrast": {
+     "label": "Contrasto"
+    },
+    "detail": {
+     "label": "Dettaglio"
+    },
+    "flip": {
+     "label": "Rifletti pixel"
+    },
+    "foreground": {
+     "label": "Primo piano"
+    },
+    "levels": {
+     "label": "Tonalità"
+    },
+    "offset": {
+     "label": "Scostamento motivo"
+    },
+    "original": {
+     "label": "Usa colore originale"
+    },
+    "pattern": {
+     "label": "Motivo",
+     "options": [
+      "Dettaglio elevato",
+      "Numeri e lettere",
+      "Linee orizzontali",
+      "Punti",
+      "Linee verticali",
+      "Grunge",
+      "Anelli",
+      "Tinta unita",
+      "Diagonale sinistra",
+      "Diagonale destra"
+     ]
+    },
+    "randomPattern": {
+     "label": "Motivi casuali"
+    },
+    "scramble": {
+     "label": "Mescola tessere"
+    },
+    "seed": {
+     "label": "Seme casuale"
+    },
+    "tile": {
+     "label": "Dimensione tessera"
+    },
+    "tone": {
+     "label": "Tono da",
+     "options": [
+      "Luminanza",
+      "Media",
+      "Rosso",
+      "Verde",
+      "Blu"
+     ]
+    },
+    "transparent": {
+     "label": "Sfondo trasparente"
+    }
+   }
+  },
+  "polar": {
+   "description": "Piega il livello attorno al suo centro trasformando le linee rette in cerchi, o svolge i cerchi in linee rette.",
+   "name": "Coordinate polari",
+   "params": {
+    "amount": {
+     "label": "Interpolazione"
+    },
+    "direction": {
+     "label": "Tipo",
+     "options": [
+      "Da rettangolare a polare",
+      "Da polare a rettangolare"
+     ]
+    }
+   }
+  },
+  "polardisplacement": {
+   "description": "Ruota e sposta i livelli sottostanti attorno a un punto centrale usando i colori del livello, quindi lo nasconde.",
+   "name": "Mappa spostamento polare",
+   "params": {
+    "angle": {
+     "label": "Angolo"
+    },
+    "angleChannel": {
+     "label": "Angolo da",
+     "options": [
+      "R",
+      "G",
+      "B",
+      "Luminanza",
+      "Alfa"
+     ]
+    },
+    "center": {
+     "label": "Centro"
+    },
+    "distanceChannel": {
+     "label": "Distanza da",
+     "options": [
+      "R",
+      "G",
+      "B",
+      "Luminanza",
+      "Alfa"
+     ]
+    },
+    "edges": {
+     "label": "Bordi",
+     "options": [
+      "Ripeti",
+      "Specchio",
+      "Trasparente",
+      "Tessera"
+     ]
+    },
+    "fromCenter": {
+     "label": "Dal centro"
+    },
+    "invert": {
+     "label": "Inverti"
+    },
+    "reach": {
+     "label": "Verso l’interno/esterno"
+    }
+   }
+  },
+  "posterize": {
+   "description": "Divide ogni canale colore in un numero di passaggi uniformi, trasformando le sfumature in bande. Scostamento sposta i bordi delle bande.",
+   "name": "Posterizza",
+   "params": {
+    "levels": {
+     "label": "Passaggi"
+    },
+    "offset": {
+     "label": "Scostamento"
+    }
+   }
+  },
+  "pulseopacity": {
+   "description": "Fa apparire e scomparire ripetutamente il livello seguendo un’onda sinusoidale o triangolare.",
+   "name": "Pulsazione opacità",
+   "params": {
+    "frequency": {
+     "label": "Frequenza"
+    },
+    "phase": {
+     "label": "Fase iniziale"
+    },
+    "strength": {
+     "label": "Intensità"
+    },
+    "wave": {
+     "label": "Onda",
+     "options": [
+      "Sinusoidale",
+      "Triangolare"
+     ]
+    }
+   }
+  },
+  "pulsesize": {
+   "description": "Ingrandisce e riduce ripetutamente il livello seguendo un’onda sinusoidale o triangolare.",
+   "name": "Pulsazione dimensione",
+   "params": {
+    "frequency": {
+     "label": "Frequenza"
+    },
+    "grow": {
+     "label": "Ingrandisci"
+    },
+    "phase": {
+     "label": "Fase iniziale"
+    },
+    "shrink": {
+     "label": "Riduci"
+    },
+    "wave": {
+     "label": "Onda",
+     "options": [
+      "Sinusoidale",
+      "Triangolare"
+     ]
+    }
+   }
+  },
+  "puppet": {
+   "description": "Deforma il livello come una marionetta: aggiungi dei perni, poi trascinali o animali e l’immagine li seguirà fluidamente.",
+   "name": "Perni marionetta",
+   "params": {
+    "density": {
+     "label": "Densità triangoli"
+    },
+    "expansion": {
+     "label": "Espansione maglia"
+    },
+    "falloff": {
+     "label": "Attenuazione"
+    },
+    "sway": {
+     "label": "Oscillazione"
+    },
+    "swayAmount": {
+     "label": "Ampiezza oscillazione"
+    },
+    "swayAngle": {
+     "label": "Angolo oscillazione"
+    },
+    "swayDirection": {
+     "label": "Direzione oscillazione",
+     "options": [
+      "Angolo",
+      "Casuale"
+     ]
+    },
+    "swayPins": {
+     "label": "Perni oscillanti",
+     "options": [
+      "Tutti",
+      "Selezionati"
+     ]
+    },
+    "swaySeed": {
+     "label": "Seme oscillazione"
+    },
+    "swaySpeed": {
+     "label": "Velocità oscillazione"
+    }
+   }
+  },
+  "pyramid": {
+   "description": "Applica il livello alle facce di una piramide a base quadrata.",
+   "name": "Piramide",
+   "params": {
+    "base": {
+     "label": "Base"
+    },
+    "height": {
+     "label": "Altezza"
+    },
+    "light": {
+     "label": "Angolo della luce"
+    },
+    "perspective": {
+     "label": "Prospettiva"
+    },
+    "position": {
+     "label": "Posizione"
+    },
+    "rotX": {
+     "label": "Rotazione X"
+    },
+    "rotY": {
+     "label": "Rotazione Y"
+    },
+    "rotZ": {
+     "label": "Rotazione Z"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "shading": {
+     "label": "Ombreggiatura"
+    },
+    "shine": {
+     "label": "Lucentezza"
+    }
+   }
+  },
+  "radialblur": {
+   "description": "Applica una sfocatura zoom radiale con intensità regolabile, calcolando la media dei campioni lungo i raggi da un punto centrale.",
+   "name": "Sfocatura zoom",
+   "params": {
+    "amount": {
+     "label": "Intensità"
+    },
+    "center": {
+     "label": "Centro"
+    }
+   }
+  },
+  "radialrays": {
+   "description": "Disegna raggi pieni da un punto sulle parti opache del livello.",
+   "name": "Raggi radiali",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Angolo"
+    },
+    "center": {
+     "label": "Centro"
+    },
+    "color": {
+     "label": "Colore"
+    },
+    "count": {
+     "label": "Numero"
+    },
+    "width": {
+     "label": "Larghezza"
+    }
+   }
+  },
+  "radialrepeat": {
+   "description": "Genera dinamicamente più copie del livello disposte in cerchio.",
+   "name": "Ripetizione radiale",
+   "params": {
+    "angle": {
+     "label": "Angolo"
+    },
+    "copyDelay": {
+     "label": "Ritardo per copia"
+    },
+    "count": {
+     "label": "Numero"
+    },
+    "easing": {
+     "label": "Easing",
+     "options": [
+      "Lineare",
+      "Accelerazione",
+      "Decelerazione",
+      "Accelerazione e decelerazione"
+     ]
+    },
+    "fillAmount": {
+     "label": "Quantità riempimento"
+    },
+    "fillColor": {
+     "label": "Colore riempimento"
+    },
+    "orientation": {
+     "label": "Orientamento"
+    },
+    "radius": {
+     "label": "Raggio"
+    },
+    "randomOpacity": {
+     "label": "Opacità casuale"
+    },
+    "randomOrder": {
+     "label": "Ordine casuale"
+    },
+    "randomPosition": {
+     "label": "Posizione casuale"
+    },
+    "randomRotation": {
+     "label": "Rotazione casuale"
+    },
+    "randomScale": {
+     "label": "Scala casuale"
+    },
+    "rangeEnd": {
+     "label": "Fine intervallo"
+    },
+    "rangeOffset": {
+     "label": "Scostamento intervallo"
+    },
+    "rangeOpacity": {
+     "label": "Opacità intervallo"
+    },
+    "rangePosition": {
+     "label": "Posizione intervallo"
+    },
+    "rangeRotation": {
+     "label": "Rotazione intervallo"
+    },
+    "rangeScale": {
+     "label": "Scala intervallo"
+    },
+    "rangeStart": {
+     "label": "Inizio intervallo"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "sweep": {
+     "label": "Arco"
+    }
+   }
+  },
+  "radialshadow": {
+   "description": "Proietta lunghe ombre dalle parti opache del livello, allontanandole da un punto luce.",
+   "name": "Ombra radiale",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "color": {
+     "label": "Colore"
+    },
+    "fade": {
+     "label": "Dissolvenza"
+    },
+    "light": {
+     "label": "Luce"
+    },
+    "reach": {
+     "label": "Lunghezza"
+    }
+   }
+  },
+  "radialwipe": {
+   "description": "Nasconde uno spicchio del livello attorno al Centro partendo dall’Angolo iniziale, come una lancetta. Avanzamento determina l’angolo percorso, Numero ripete lo spicchio nel cerchio ed Entrambe procede nei due sensi. Anima Avanzamento per creare una transizione.",
+   "name": "Tendina radiale",
+   "params": {
+    "center": {
+     "label": "Centro"
+    },
+    "count": {
+     "label": "Numero"
+    },
+    "direction": {
+     "label": "Direzione",
+     "options": [
+      "Senso orario",
+      "Senso antiorario",
+      "Entrambe"
+     ]
+    },
+    "feather": {
+     "label": "Sfumatura"
+    },
+    "progress": {
+     "label": "Avanzamento"
+    },
+    "start": {
+     "label": "Angolo iniziale"
+    }
+   }
+  },
+  "randomdisplace": {
+   "description": "Sposta automaticamente il livello in modo fluido e casuale nel tempo. Seme sceglie un movimento diverso, Velocità ne regola la rapidità ed Evoluzione modifica il motivo.",
+   "name": "Spostamento casuale",
+   "params": {
+    "evolution": {
+     "label": "Evoluzione"
+    },
+    "magnitude": {
+     "label": "Ampiezza"
+    },
+    "scatter": {
+     "label": "Dispersione"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "speed": {
+     "label": "Velocità"
+    }
+   }
+  },
+  "randomjitter": {
+   "description": "Fa muovere il livello avanti e indietro casualmente lungo un angolo.",
+   "name": "Tremolio casuale",
+   "params": {
+    "angle": {
+     "label": "Angolo"
+    },
+    "frequency": {
+     "label": "Frequenza"
+    },
+    "magnitude": {
+     "label": "Ampiezza"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "slack": {
+     "label": "Tolleranza"
+    },
+    "zjitter": {
+     "label": "Tremolio Z"
+    }
+   }
+  },
+  "rasterextrude": {
+   "description": "Estrude l’immagine del livello in un blocco solido; i lati assumono il colore interno.",
+   "name": "Estrusione raster",
+   "params": {
+    "depth": {
+     "label": "Profondità"
+    },
+    "interior": {
+     "label": "Colore interno"
+    },
+    "light": {
+     "label": "Angolo della luce"
+    },
+    "perspective": {
+     "label": "Prospettiva"
+    },
+    "position": {
+     "label": "Posizione"
+    },
+    "rotX": {
+     "label": "Rotazione X"
+    },
+    "rotY": {
+     "label": "Rotazione Y"
+    },
+    "rotZ": {
+     "label": "Rotazione Z"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "shading": {
+     "label": "Ombreggiatura"
+    },
+    "shine": {
+     "label": "Lucentezza"
+    }
+   }
+  },
+  "rastertransform": {
+   "description": "Ridimensiona, ruota e sposta l’immagine finale del livello dopo gli effetti precedenti, trasformando anche il loro risultato. Riempimento conserva parte dell’originale sotto il risultato e Maschera sul livello mantiene il risultato nella forma originale.",
+   "name": "Trasformazione raster",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Angolo"
+    },
+    "fill": {
+     "label": "Riempimento"
+    },
+    "mask": {
+     "label": "Maschera sul livello"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "sampling": {
+     "label": "Campionamento",
+     "options": [
+      "Più vicino",
+      "Lineare"
+     ]
+    },
+    "scale": {
+     "label": "Scala"
+    }
+   }
+  },
+  "rays": {
+   "description": "Proietta raggi di luce dalle parti luminose del livello, allontanandoli da un punto centrale.",
+   "name": "Raggi",
+   "params": {
+    "blend": {
+     "label": "Fusione"
+    },
+    "center": {
+     "label": "Centro"
+    },
+    "color": {
+     "label": "Colore"
+    },
+    "intensity": {
+     "label": "Intensità"
+    },
+    "reach": {
+     "label": "Lunghezza"
+    },
+    "style": {
+     "label": "Stile",
+     "options": [
+      "Classico",
+      "Standard"
+     ]
+    },
+    "threshold": {
+     "label": "Soglia"
+    },
+    "thresholdAdd": {
+     "label": "Aggiunta soglia"
+    }
+   }
+  },
+  "reorient360": {
+   "description": "Ruota un livello panoramico a 360° nella sua sfera per livellare l’orizzonte o cambiare la direzione frontale.",
+   "name": "Riorienta sfera 360°",
+   "params": {
+    "pitch": {
+     "label": "Beccheggio"
+    },
+    "roll": {
+     "label": "Rollio"
+    },
+    "yaw": {
+     "label": "Imbardata"
+    }
+   }
+  },
+  "repeat": {
+   "description": "Genera dinamicamente più copie del livello.",
+   "name": "Ripetitore",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Angolo"
+    },
+    "count": {
+     "label": "Numero"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "time": {
+     "label": "Tempo"
+    }
+   }
+  },
+  "repeatalongpath": {
+   "description": "Genera dinamicamente più copie del livello lungo il tracciato del livello immediatamente sottostante.",
+   "name": "Ripetizione lungo tracciato",
+   "params": {
+    "copyDelay": {
+     "label": "Ritardo per copia"
+    },
+    "count": {
+     "label": "Numero"
+    },
+    "easing": {
+     "label": "Easing",
+     "options": [
+      "Lineare",
+      "Accelerazione",
+      "Decelerazione",
+      "Accelerazione e decelerazione"
+     ]
+    },
+    "end": {
+     "label": "Fine"
+    },
+    "fillAmount": {
+     "label": "Quantità riempimento"
+    },
+    "fillColor": {
+     "label": "Colore riempimento"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "randomOpacity": {
+     "label": "Opacità casuale"
+    },
+    "randomOrder": {
+     "label": "Ordine casuale"
+    },
+    "randomPosition": {
+     "label": "Posizione casuale"
+    },
+    "randomRotation": {
+     "label": "Rotazione casuale"
+    },
+    "randomScale": {
+     "label": "Scala casuale"
+    },
+    "rangeEnd": {
+     "label": "Fine intervallo"
+    },
+    "rangeOffset": {
+     "label": "Scostamento intervallo"
+    },
+    "rangeOpacity": {
+     "label": "Opacità intervallo"
+    },
+    "rangePosition": {
+     "label": "Posizione intervallo"
+    },
+    "rangeRotation": {
+     "label": "Rotazione intervallo"
+    },
+    "rangeScale": {
+     "label": "Scala intervallo"
+    },
+    "rangeStart": {
+     "label": "Inizio intervallo"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "start": {
+     "label": "Inizio"
+    },
+    "tangent": {
+     "label": "Tangente"
+    }
+   }
+  },
+  "replacecolor": {
+   "description": "Sostituisce un colore con un altro. Alfa controlla l’intensità della sostituzione; Blocca luminanza conserva luci e ombre dell’originale.",
+   "name": "Sostituisci colore",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "choke": {
+     "label": "Contrazione"
+    },
+    "feather": {
+     "label": "Sfumatura"
+    },
+    "lockLuminance": {
+     "label": "Blocca luminanza"
+    },
+    "source": {
+     "label": "Sostituisci colore"
+    },
+    "target": {
+     "label": "Nuovo colore"
+    },
+    "threshold": {
+     "label": "Soglia"
+    }
+   }
+  },
+  "retrodither": {
+   "description": "Trasforma il livello in grafica pixel retrò: ogni blocco prende un colore da una palette, ad esempio di una vecchia console o di un computer oppure importata, e un motivo di dithering mescola i colori per simulare più tonalità.",
+   "name": "Dithering retrò",
+   "params": {
+    "alpha": {
+     "label": "Miscela"
+    },
+    "dither": {
+     "label": "Intensità"
+    },
+    "palette": {
+     "label": "Palette"
+    },
+    "pattern": {
+     "label": "Dithering",
+     "options": [
+      "Nessuno",
+      "Rumore",
+      "Scacchiera",
+      "Bayer 2x2",
+      "Bayer 3x3",
+      "Bayer 4x4",
+      "Bayer 8x8",
+      "Punti a gruppi 4x4",
+      "Punti a gruppi 8x8",
+      "Linee orizzontali",
+      "Linee verticali",
+      "Linee diagonali",
+      "Floyd-Steinberg",
+      "Floyd-Steinberg falso",
+      "Sierra Lite",
+      "Fan",
+      "Shiau-Fan",
+      "Jarvis-Judice-Ninke",
+      "Stucki",
+      "Burkes",
+      "Sierra",
+      "Sierra a due righe",
+      "Atkinson"
+     ]
+    },
+    "pixel": {
+     "label": "Dimensione pixel"
+    }
+   }
+  },
+  "rgbsplit": {
+   "description": "Separa i canali rosso, verde e blu: il canale Centro resta fermo e gli altri due si spostano in direzioni opposte lungo l'angolo. Chiaro somma i colori spostati, Scuro li mantiene pieni, Maschera tiene solo dove tutti e tre si sovrappongono e Luma rende le frange tanto opache quanto sono luminose.",
+   "name": "Separazione RGB",
+   "params": {
+    "angle": {
+     "label": "Angolo"
+    },
+    "center": {
+     "label": "Centro",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
+    },
+    "mode": {
+     "label": "Modalità",
+     "options": [
+      "Chiaro",
+      "Scuro",
+      "Maschera",
+      "Luma"
+     ]
+    },
+    "strength": {
+     "label": "Intensità"
+    }
+   }
+  },
+  "ribbon": {
+   "description": "Disegna un nastro attorcigliato di larghezza variabile sulle parti opache del livello; anima la fase per farlo scorrere, oppure ritaglialo dal livello.",
+   "name": "Nastro",
+   "params": {
+    "angle": {
+     "label": "Angolo"
+    },
+    "color": {
+     "label": "Colore"
+    },
+    "frequency": {
+     "label": "Frequenza"
+    },
+    "magnitude": {
+     "label": "Ampiezza"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "punch": {
+     "label": "Ritaglia"
+    },
+    "smoothing": {
+     "label": "Levigatura"
+    },
+    "tint": {
+     "label": "Tinta"
+    },
+    "tintAmount": {
+     "label": "Quantità tinta"
+    },
+    "width": {
+     "label": "Larghezza"
+    }
+   }
+  },
+  "ripple": {
+   "description": "Onde concentriche che si irradiano da un punto centrale, con ampiezza, lunghezza d'onda e velocità regolabili.",
+   "name": "Increspatura",
+   "params": {
+    "amplitude": {
+     "label": "Ampiezza"
+    },
+    "center": {
+     "label": "Centro"
+    },
+    "speed": {
+     "label": "Velocità"
+    },
+    "wavelength": {
+     "label": "Lunghezza d'onda"
+    }
+   }
+  },
+  "roughenedges": {
+   "description": "Erode i bordi delle parti opache con il rumore, per un contorno strappato, consumato o bruciato.",
+   "name": "Bordi irregolari",
+   "params": {
+    "blur": {
+     "label": "Bordo"
+    },
+    "evolution": {
+     "label": "Evoluzione"
+    },
+    "octaves": {
+     "label": "Ottave"
+    },
+    "roughness": {
+     "label": "Ruvidità"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "seed": {
+     "label": "Seme"
+    }
+   }
+  },
+  "scaleassist": {
+   "description": "Aggiunge una scala extra alle dimensioni del livello lungo X, Y, entrambi, oppure X con Y in senso opposto. I livelli collegati come figli seguono la nuova dimensione.",
+   "name": "Assistente di scala",
+   "params": {
+    "axis": {
+     "label": "Asse",
+     "options": [
+      "X",
+      "Y",
+      "X,Y",
+      "X,-Y"
+     ]
+    },
+    "damp": {
+     "label": "Smorzamento"
+    },
+    "scale": {
+     "label": "Scala"
+    }
+   }
+  },
+  "scanlines": {
+   "description": "Aggiunge linee di scansione orizzontali per un effetto monitor CRT, con scorrimento verticale facoltativo.",
+   "name": "Linee di scansione",
+   "params": {
+    "darkness": {
+     "label": "Oscurità"
+    },
+    "roll_speed": {
+     "label": "Velocità di scorrimento"
+    },
+    "spacing": {
+     "label": "Spaziatura linee"
+    }
+   }
+  },
+  "scatter3d": {
+   "description": "Trasforma il livello in una griglia di pezzi 3D dispersi.",
+   "name": "Dispersione 3D",
+   "params": {
+    "axis": {
+     "label": "Asse di torsione",
+     "options": [
+      "X",
+      "Y",
+      "Z"
+     ]
+    },
+    "depth": {
+     "label": "Profondità griglia"
+    },
+    "depthSpacing": {
+     "label": "Spaziatura profondità"
+    },
+    "intensity": {
+     "label": "Intensità luce"
+    },
+    "light": {
+     "label": "Direzione luce"
+    },
+    "lightHeight": {
+     "label": "Altezza luce"
+    },
+    "perspective": {
+     "label": "Prospettiva"
+    },
+    "rotX": {
+     "label": "Rotazione X"
+    },
+    "rotY": {
+     "label": "Rotazione Y"
+    },
+    "rotZ": {
+     "label": "Rotazione Z"
+    },
+    "scatter": {
+     "label": "Dispersione"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "shading": {
+     "label": "Ombreggiatura"
+    },
+    "shape": {
+     "label": "Forma",
+     "options": [
+      "Cubo",
+      "Sfera",
+      "Quadrato",
+      "Cerchio"
+     ]
+    },
+    "size": {
+     "label": "Dimensione pezzi"
+    },
+    "spacing": {
+     "label": "Spaziatura griglia"
+    },
+    "spin": {
+     "label": "Rotazione dispersione"
+    },
+    "twist": {
+     "label": "Angolo di torsione"
+    }
+   }
+  },
+  "scatterfield": {
+   "description": "Disperde copie del livello in un campo 3D infinito nascondendo il livello originale, e permette un movimento simulato nel campo in tre dimensioni tramite animazione con keyframe.",
+   "name": "Campo di dispersione",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "amount": {
+     "label": "Quantità"
+    },
+    "angle": {
+     "label": "Angolo"
+    },
+    "angleVariance": {
+     "label": "Variazione angolo"
+    },
+    "blending": {
+     "label": "Metodo di fusione",
+     "options": [
+      "Normale",
+      "Somma",
+      "Scherma",
+      "Moltiplica",
+      "Schiarisci",
+      "Scurisci",
+      "Sovrapponi",
+      "Differenza"
+     ]
+    },
+    "color1": {
+     "label": "Colore 1"
+    },
+    "color2": {
+     "label": "Colore 2"
+    },
+    "color3": {
+     "label": "Colore 3"
+    },
+    "coloring": {
+     "label": "Colorazione",
+     "options": [
+      "Nessuna",
+      "Casuale",
+      "Profondità"
+     ]
+    },
+    "density": {
+     "label": "Densità"
+    },
+    "evolution": {
+     "label": "Evoluzione"
+    },
+    "fade": {
+     "label": "Dissolvenza"
+    },
+    "interpolateHue": {
+     "label": "Interpola tonalità"
+    },
+    "lockLuminance": {
+     "label": "Blocca luminanza"
+    },
+    "lockSaturation": {
+     "label": "Blocca saturazione"
+    },
+    "position": {
+     "label": "Posizione"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "size": {
+     "label": "Dimensione"
+    },
+    "sizeVariance": {
+     "label": "Variazione dimensione"
+    },
+    "slack": {
+     "label": "Margine"
+    },
+    "z": {
+     "label": "Posizione Z"
+    }
+   }
+  },
+  "sepia": {
+   "description": "Toni caldi di marrone, come una vecchia fotografia.",
+   "name": "Seppia",
+   "params": {
+    "amount": {
+     "label": "Quantità"
+    }
+   }
+  },
+  "sharpen": {
+   "description": "Applica una maschera di contrasto su un intorno 3x3 per esaltare i dettagli fini.",
+   "name": "Nitidezza",
+   "params": {
+    "amount": {
+     "label": "Intensità"
+    },
+    "radius": {
+     "label": "Raggio"
+    }
+   }
+  },
+  "shutterblur": {
+   "description": "Sfoca il livello lungo il percorso in cui si muove, ruota e cresce davvero, come l'otturatore di una fotocamera. Un angolo di otturazione più ampio dà scie più lunghe e più campioni le rendono più morbide. L'anteprima mostra una sfocatura più veloce a meno che la sfocatura completa non sia attiva.",
+   "name": "Sfocatura di movimento reale",
+   "params": {
+    "samples": {
+     "label": "Campioni"
+    },
+    "shutter": {
+     "label": "Angolo di otturazione"
+    }
+   }
+  },
+  "simplestarfield": {
+   "description": "Disperde piccole stelle a diversi livelli di profondità sulle parti opache del livello. Posizione sposta il campo con parallasse, Profondità lo attraversa, Scala lo ingrandisce, Dimensione e Sfumatura modellano ogni stella e Quantità stabilisce quante sono.",
+   "name": "Campo stellare semplice",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "amount": {
+     "label": "Quantità"
+    },
+    "blend": {
+     "label": "Metodo di fusione",
+     "options": [
+      "Normale",
+      "Somma",
+      "Scherma",
+      "Moltiplica"
+     ]
+    },
+    "brightness": {
+     "label": "Luminosità"
+    },
+    "color": {
+     "label": "Colore"
+    },
+    "depth": {
+     "label": "Profondità"
+    },
+    "feather": {
+     "label": "Sfumatura"
+    },
+    "position": {
+     "label": "Posizione"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "starSize": {
+     "label": "Dimensione"
+    }
+   }
+  },
+  "smear": {
+   "description": "Sbava il livello in una direzione per una lunghezza fissa, come se si muovesse velocemente.",
+   "name": "Sbavatura",
+   "params": {
+    "angle": {
+     "label": "Direzione"
+    },
+    "length": {
+     "label": "Lunghezza"
+    }
+   }
+  },
+  "smoothbevel": {
+   "description": "Dona alle parti opache del livello uno smusso morbido e arrotondato illuminato da un lato.",
+   "name": "Smussatura morbida",
+   "params": {
+    "angle": {
+     "label": "Angolo luce"
+    },
+    "blur": {
+     "label": "Dimensione"
+    },
+    "depth": {
+     "label": "Profondità"
+    },
+    "highlight": {
+     "label": "Luce"
+    },
+    "intensity": {
+     "label": "Intensità"
+    },
+    "shadow": {
+     "label": "Ombra"
+    }
+   }
+  },
+  "smoothedges": {
+   "description": "Arrotonda e ammorbidisce i bordi delle parti opache del livello senza cambiare i colori all'interno. Maschera sul livello permette ai bordi di spostarsi solo verso l'interno.",
+   "name": "Bordi morbidi",
+   "params": {
+    "blur": {
+     "label": "Intensità"
+    },
+    "mask": {
+     "label": "Maschera sul livello"
+    }
+   }
+  },
+  "softglow": {
+   "description": "Sovrappone in scherma una copia sfocata e morbida dell'immagine per un bagliore sognante, soprattutto dalle luci.",
+   "name": "Bagliore soft",
+   "params": {
+    "blend": {
+     "label": "Fusione"
+    },
+    "blur": {
+     "label": "Dimensione"
+    },
+    "brightness": {
+     "label": "Luminosità"
+    },
+    "color": {
+     "label": "Colore"
+    },
+    "contrast": {
+     "label": "Contrasto"
+    },
+    "highlights": {
+     "label": "Luci"
+    },
+    "opacity": {
+     "label": "Opacità"
+    },
+    "outside": {
+     "label": "Bagliore esterno"
+    }
+   }
+  },
+  "solid": {
+   "description": "Stende un solo colore sul livello, mantenendone la forma, con una scelta di metodi di fusione.",
+   "name": "Colore pieno",
+   "params": {
+    "amount": {
+     "label": "Alfa"
+    },
+    "blend": {
+     "label": "Metodo di fusione",
+     "options": [
+      "Normale",
+      "Moltiplica",
+      "Scherma",
+      "Sovrapponi",
+      "Luce soffusa",
+      "Luce intensa",
+      "Somma",
+      "Scurisci",
+      "Schiarisci",
+      "Differenza",
+      "Colore scherma",
+      "Colore brucia"
+     ]
+    },
+    "color": {
+     "label": "Colore"
+    }
+   }
+  },
+  "solidmatte": {
+   "description": "Mette un colore pieno dietro il livello, riempiendo le parti trasparenti. Ritaglia mostra solo il colore con la forma del livello ritagliata, e Spazio schermo riempie l'intero schermo invece del riquadro del livello.",
+   "name": "Matte pieno",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "color": {
+     "label": "Colore"
+    },
+    "punch": {
+     "label": "Ritaglia"
+    },
+    "screenSpace": {
+     "label": "Spazio schermo"
+    }
+   }
+  },
+  "spherize": {
+   "description": "Avvolge il livello su una sfera usando una proiezione frontale o una texture equirettangolare.",
+   "name": "Sferizza",
+   "params": {
+    "coverage": {
+     "label": "Copertura"
+    },
+    "light": {
+     "label": "Angolo luce"
+    },
+    "perspective": {
+     "label": "Prospettiva"
+    },
+    "position": {
+     "label": "Posizione"
+    },
+    "projection": {
+     "label": "Proiezione",
+     "options": [
+      "Frontale",
+      "Equirettangolare"
+     ]
+    },
+    "radius": {
+     "label": "Raggio"
+    },
+    "rotX": {
+     "label": "Rotazione X"
+    },
+    "rotY": {
+     "label": "Rotazione Y"
+    },
+    "rotZ": {
+     "label": "Rotazione Z"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "shading": {
+     "label": "Ombreggiatura"
+    },
+    "shine": {
+     "label": "Lucentezza"
+    }
+   }
+  },
+  "spillclean": {
+   "description": "Rimuove il bagliore verde o blu che uno sfondo chroma key lascia vicino ai bordi del livello, mantenendo la luminosità dei pixel.",
+   "name": "Pulizia riflessi chroma key",
+   "params": {
+    "blur": {
+     "label": "Larghezza bordo"
+    },
+    "channel": {
+     "label": "Colore del riflesso",
+     "options": [
+      "Auto",
+      "Verde",
+      "Blu"
+     ]
+    },
+    "strength": {
+     "label": "Intensità"
+    }
+   }
+  },
+  "spin": {
+   "description": "Fa girare il livello senza sosta a velocità costante; sotto zero gira nell'altro senso.",
+   "name": "Rotazione continua",
+   "params": {
+    "rpm": {
+     "label": "Giri/min"
+    }
+   }
+  },
+  "spinblur": {
+   "description": "Sfoca il livello in cerchi attorno a un punto, come se girasse.",
+   "name": "Sfocatura rotatoria",
+   "params": {
+    "center": {
+     "label": "Centro"
+    },
+    "sweep": {
+     "label": "Angolo"
+    }
+   }
+  },
+  "spinstreaks": {
+   "description": "Crea scie ad arco ruotando copie del livello attorno a un punto e fondendole dove si sovrappongono. R, G, B e A scelgono per ogni canale se le copie mantengono il valore minimo, massimo o medio, oppure lasciano il canale intatto.",
+   "name": "Scie rotatorie",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Min",
+      "Max",
+      "Media",
+      "No"
+     ]
+    },
+    "alpha": {
+     "label": "Alfa"
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "Min",
+      "Max",
+      "Media",
+      "No"
+     ]
+    },
+    "bias": {
+     "label": "Bias"
+    },
+    "center": {
+     "label": "Centro"
+    },
+    "g": {
+     "label": "G",
+     "options": [
+      "Min",
+      "Max",
+      "Media",
+      "No"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "Min",
+      "Max",
+      "Media",
+      "No"
+     ]
+    },
+    "sweep": {
+     "label": "Ampiezza"
+    }
+   }
+  },
+  "splittone": {
+   "description": "Tinge le ombre verso una tonalità e le luci verso un'altra, mantenendo nero, bianco e luminosità. Livello ombre curva la luminosità e Livello luci sposta il punto da cui inizia il colore delle luci. Lo stile Mappa sfumatura assegna a ogni pixel un colore in base alla sola luminosità.",
+   "name": "Viraggio parziale",
+   "params": {
+    "highlightAmount": {
+     "label": "Quantità luci"
+    },
+    "highlightHue": {
+     "label": "Tonalità luci"
+    },
+    "highlightLevel": {
+     "label": "Livello luci"
+    },
+    "shadowAmount": {
+     "label": "Quantità ombre"
+    },
+    "shadowHue": {
+     "label": "Tonalità ombre"
+    },
+    "shadowLevel": {
+     "label": "Livello ombre"
+    },
+    "style": {
+     "label": "Stile",
+     "options": [
+      "Tinta",
+      "Mappa sfumatura"
+     ]
+    }
+   }
+  },
+  "spotcolor": {
+   "description": "Mantiene un colore e toglie la saturazione a tutti gli altri colori del livello.",
+   "name": "Colore isolato",
+   "params": {
+    "choke": {
+     "label": "Restringimento"
+    },
+    "color": {
+     "label": "Colore"
+    },
+    "feather": {
+     "label": "Sfumatura"
+    },
+    "saturation": {
+     "label": "Saturazione"
+    },
+    "threshold": {
+     "label": "Soglia"
+    }
+   }
+  },
+  "squeeze": {
+   "description": "Stringe il centro del livello verso l'interno con intensità positiva e lo gonfia verso l'esterno con intensità negativa. Legacy mantiene la forma dei progetti più vecchi.",
+   "name": "Strizzatura",
+   "params": {
+    "amount": {
+     "label": "Intensità"
+    },
+    "shape": {
+     "label": "Forma",
+     "options": [
+      "Stringi/Gonfia",
+      "Legacy"
+     ]
+    }
+   }
+  },
+  "star": {
+   "description": "Disegna una stella luminosa sul livello.",
+   "name": "Stella",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blend": {
+     "label": "Metodo di fusione",
+     "options": [
+      "Normale",
+      "Moltiplica",
+      "Scherma",
+      "Sovrapponi",
+      "Luce soffusa",
+      "Luce intensa",
+      "Somma",
+      "Scurisci",
+      "Schiarisci",
+      "Differenza",
+      "Colore scherma",
+      "Colore brucia"
+     ]
+    },
+    "brightness": {
+     "label": "Luminosità"
+    },
+    "color": {
+     "label": "Colore"
+    },
+    "points": {
+     "label": "Punte"
+    },
+    "position": {
+     "label": "Posizione"
+    },
+    "radius": {
+     "label": "Raggio"
+    },
+    "shine": {
+     "label": "Lucentezza"
+    }
+   }
+  },
+  "starfield": {
+   "description": "Riempie le parti opache del livello con un campo profondo di stelle. Scostamento si muove nel campo, con le stelle vicine che si spostano più di quelle lontane.",
+   "name": "Campo stellare",
+   "params": {
+    "brightness": {
+     "label": "Luminosità"
+    },
+    "darkMatter": {
+     "label": "Materia oscura"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "scale": {
+     "label": "Scala"
+    }
+   }
+  },
+  "starpolyhedron": {
+   "description": "Mette il livello su una stella formata da due piramidi incrociate.",
+   "name": "Poliedro stellato",
+   "params": {
+    "light": {
+     "label": "Angolo luce"
+    },
+    "perspective": {
+     "label": "Prospettiva"
+    },
+    "position": {
+     "label": "Posizione"
+    },
+    "radius": {
+     "label": "Raggio"
+    },
+    "rotX": {
+     "label": "Rotazione X"
+    },
+    "rotY": {
+     "label": "Rotazione Y"
+    },
+    "rotZ": {
+     "label": "Rotazione Z"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "shading": {
+     "label": "Ombreggiatura"
+    },
+    "shine": {
+     "label": "Lucentezza"
+    }
+   }
+  },
+  "starprism": {
+   "description": "Ritaglia il livello a forma di stella e gli dà profondità.",
+   "name": "Prisma stellato",
+   "params": {
+    "depth": {
+     "label": "Profondità"
+    },
+    "inner": {
+     "label": "Raggio interno"
+    },
+    "light": {
+     "label": "Angolo luce"
+    },
+    "perspective": {
+     "label": "Prospettiva"
+    },
+    "points": {
+     "label": "Punte"
+    },
+    "position": {
+     "label": "Posizione"
+    },
+    "radius": {
+     "label": "Raggio"
+    },
+    "rotX": {
+     "label": "Rotazione X"
+    },
+    "rotY": {
+     "label": "Rotazione Y"
+    },
+    "rotZ": {
+     "label": "Rotazione Z"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "shading": {
+     "label": "Ombreggiatura"
+    },
+    "shine": {
+     "label": "Lucentezza"
+    },
+    "smoothing": {
+     "label": "Levigatura"
+    }
+   }
+  },
+  "static": {
+   "description": "Rumore grigio tremolante, come una televisione senza segnale.",
+   "name": "Disturbo TV",
+   "params": {
+    "amount": {
+     "label": "Quantità"
+    },
+    "grain": {
+     "label": "Dimensione"
+    }
+   }
+  },
+  "stretch": {
+   "description": "Taglia il livello lungo una linea e allontana le due metà, stirando i pixel della linea nello spazio vuoto.",
+   "name": "Stira segmento",
+   "params": {
+    "angle": {
+     "label": "Angolo"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "relative": {
+     "label": "Misura in dimensione livello"
+    },
+    "spread": {
+     "label": "Apertura"
+    },
+    "stretch": {
+     "label": "Stiramento"
+    }
+   }
+  },
+  "stretchaxis": {
+   "description": "Stira il livello in qualsiasi direzione.",
+   "name": "Stira lungo asse",
+   "params": {
+    "angle": {
+     "label": "Angolo"
+    },
+    "mask": {
+     "label": "Maschera sul livello"
+    },
+    "scale": {
+     "label": "Scala"
+    }
+   }
+  },
+  "stripes": {
+   "description": "Disegna un motivo a strisce sulle parti opache del livello, oppure ritaglia le strisce dal livello.",
+   "name": "Strisce",
+   "params": {
+    "angle": {
+     "label": "Angolo"
+    },
+    "color": {
+     "label": "Colore"
+    },
+    "count": {
+     "label": "Numero"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "punch": {
+     "label": "Ritaglia"
+    },
+    "screenSpace": {
+     "label": "Spazio schermo"
+    },
+    "smoothing": {
+     "label": "Levigatura"
+    },
+    "width": {
+     "label": "Larghezza"
+    }
+   }
+  },
+  "stroketaper": {
+   "description": "Assottiglia i contorni fino a una punta: i tratti di penna e pennello di un disegno a mano libera e il contorno di linee e forme (Cornice e ombra > Contorno). Da zero fino all'inizio, e dalla fine fino a zero. Strizzatura rende la rastremazione più netta.",
+   "name": "Contorno rastremato",
+   "params": {
+    "end": {
+     "label": "Fine"
+    },
+    "squeeze": {
+     "label": "Strizzatura"
+    },
+    "start": {
+     "label": "Inizio"
+    }
+   }
+  },
+  "swing": {
+   "description": "Ruota il livello avanti e indietro tra due angoli.",
+   "name": "Oscillazione",
+   "params": {
+    "angle1": {
+     "label": "Angolo 1"
+    },
+    "angle2": {
+     "label": "Angolo 2"
+    },
+    "frequency": {
+     "label": "Frequenza"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "wave": {
+     "label": "Onda",
+     "options": [
+      "Sinusoidale",
+      "Triangolare"
+     ]
+    }
+   }
+  },
+  "temperature": {
+   "description": "Scalda o raffredda l'immagine come una luce di una data temperatura colore in kelvin; 6500 K la lascia invariata.",
+   "name": "Temperatura colore",
+   "params": {
+    "kelvin": {
+     "label": "Temperatura"
+    },
+    "strength": {
+     "label": "Intensità"
+    }
+   }
+  },
+  "textblips": {
+   "description": "Digita il testo lettera per lettera con un breve bip per ogni lettera, come un personaggio che parla in un gioco. Scegli una voce, poi imposta l'intonazione, la velocità di digitazione e la durata della pausa dopo la punteggiatura. Spazi e punteggiatura restano muti.",
+   "name": "Bip del testo",
+   "params": {
+    "delay": {
+     "label": "Ritardo"
+    },
+    "every": {
+     "label": "Bip ogni"
+    },
+    "pause": {
+     "label": "Pausa punteggiatura"
+    },
+    "pitch": {
+     "label": "Intonazione"
+    },
+    "reveal": {
+     "label": "Digitazione"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "speed": {
+     "label": "Velocità"
+    },
+    "variation": {
+     "label": "Variazione intonazione"
+    },
+    "voice": {
+     "label": "Voce",
+     "options": [
+      "Classica",
+      "Morbida",
+      "Profonda",
+      "Acuta",
+      "Robot",
+      "Squittio",
+      "Macchina da scrivere",
+      "Chiptune"
+     ]
+    },
+    "volume": {
+     "label": "Volume"
+    }
+   },
+   "presets": {
+    "fast-talker": "Parlantina",
+    "hero": "Eroe",
+    "monster": "Mostro",
+    "robot": "Robot",
+    "typewriter": "Macchina da scrivere"
+   }
+  },
+  "textpath": {
+   "description": "Dispone il testo lungo un arco, un cerchio o il contorno del livello subito sotto, lettera per lettera, mantenendo la composizione, i font e le emoji del testo.",
+   "name": "Testo su tracciato",
+   "params": {
+    "align": {
+     "label": "Allineamento",
+     "options": [
+      "Sinistra",
+      "Centro",
+      "Destra"
+     ]
+    },
+    "baseline": {
+     "label": "Spostamento linea di base"
+    },
+    "center": {
+     "label": "Centro"
+    },
+    "control1": {
+     "label": "Controllo 1"
+    },
+    "control2": {
+     "label": "Controllo 2"
+    },
+    "end": {
+     "label": "Fine"
+    },
+    "position": {
+     "label": "Posizione"
+    },
+    "radius": {
+     "label": "Raggio"
+    },
+    "reverse": {
+     "label": "Inverti tracciato"
+    },
+    "rotate": {
+     "label": "Ruota lettere"
+    },
+    "shape": {
+     "label": "Tracciato",
+     "options": [
+      "Arco",
+      "Cerchio",
+      "Livello sotto"
+     ]
+    },
+    "start": {
+     "label": "Inizio"
+    }
+   }
+  },
+  "textprogress": {
+   "description": "Mostra il testo tra inizio e fine, per carattere, parola o riga, con dissolvenze, scorrimenti, ridimensionamenti o sfocature facoltativi.",
+   "name": "Avanzamento testo",
+   "params": {
+    "appearance": {
+     "label": "Appare come",
+     "options": [
+      "Comparsa",
+      "Dissolvenza",
+      "Scorri su",
+      "Scorri giù",
+      "Scorri a sinistra",
+      "Scorri a destra",
+      "Ingrandisci",
+      "Riduci",
+      "Sfocatura"
+     ]
+    },
+    "direction": {
+     "label": "Direzione",
+     "options": [
+      "Dall'inizio",
+      "Dalla fine",
+      "Dal centro",
+      "Casuale"
+     ]
+    },
+    "distance": {
+     "label": "Distanza"
+    },
+    "progress": {
+     "label": "Fine"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "softness": {
+     "label": "Morbidezza"
+    },
+    "start": {
+     "label": "Inizio"
+    },
+    "unit": {
+     "label": "In base a",
+     "options": [
+      "Carattere",
+      "Parola",
+      "Riga"
+     ]
+    }
+   },
+   "presets": {
+    "fade-in-by-word": "Dissolvenza per parola",
+    "pop-in": "Comparsa a scatto",
+    "slide-up-by-letter": "Scorri su per lettera",
+    "typewriter": "Macchina da scrivere"
+   }
+  },
+  "textrandomizer": {
+   "description": "Sostituisce a caso una quantità di caratteri tra inizio e fine. Anima l'evoluzione o aumenta la velocità per cambiare le sostituzioni; Rivela le riporta al testo originale.",
+   "name": "Testo casuale",
+   "params": {
+    "amount": {
+     "label": "Quantità"
+    },
+    "characters": {
+     "label": "Personalizzati"
+    },
+    "charset": {
+     "label": "Caratteri",
+     "options": [
+      "Lettere",
+      "Maiuscole",
+      "Minuscole",
+      "Numeri",
+      "Lettere e numeri",
+      "Simboli",
+      "Personalizzati"
+     ]
+    },
+    "direction": {
+     "label": "Direzione",
+     "options": [
+      "Dall'inizio",
+      "Dalla fine",
+      "Dal centro",
+      "Casuale"
+     ]
+    },
+    "end": {
+     "label": "Fine"
+    },
+    "evolution": {
+     "label": "Evoluzione"
+    },
+    "keepSpaces": {
+     "label": "Mantieni spazi"
+    },
+    "progress": {
+     "label": "Rivela"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "speed": {
+     "label": "Velocità"
+    },
+    "start": {
+     "label": "Inizio"
+    }
+   },
+   "presets": {
+    "scramble": "Rimescola"
+   }
+  },
+  "textshake": {
+   "description": "Scuote ogni lettera per conto suo, come un dialogo nervoso in un gioco. Scuoti si sposta tra i punti, Vibra salta in un nuovo punto a ogni passo, Onda fa ondeggiare le lettere su e giù, Cerchio le muove in piccoli anelli e Oscilla le inclina avanti e indietro. Abbassa Lettere che tremano per scuotere solo alcune lettere, scelte di nuovo a caso ogni pochi istanti.",
+   "name": "Tremolio del testo",
+   "params": {
+    "amount": {
+     "label": "Quantità"
+    },
+    "cycles": {
+     "label": "Velocità"
+    },
+    "end": {
+     "label": "Fine"
+    },
+    "every": {
+     "label": "Nuove lettere ogni"
+    },
+    "letters": {
+     "label": "Lettere che tremano"
+    },
+    "rotation": {
+     "label": "Rotazione"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "speed": {
+     "label": "Velocità"
+    },
+    "spread": {
+     "label": "Dispersione"
+    },
+    "start": {
+     "label": "Inizio"
+    },
+    "style": {
+     "label": "Stile",
+     "options": [
+      "Scuoti",
+      "Vibra",
+      "Onda",
+      "Cerchio",
+      "Oscilla"
+     ]
+    },
+    "tilt": {
+     "label": "Inclinazione"
+    },
+    "unit": {
+     "label": "In base a",
+     "options": [
+      "Carattere",
+      "Parola",
+      "Riga"
+     ]
+    }
+   },
+   "presets": {
+    "dizzy": "Stordito",
+    "floaty": "Fluttuante",
+    "nervous": "Nervoso",
+    "scared": "Spaventato",
+    "uneasy": "Inquieto",
+    "wavy": "Ondulato",
+    "wobbly": "Traballante"
+   }
+  },
+  "texttransform": {
+   "description": "Sposta, ridimensiona, ruota, dissolve e tinge lettere, parole o righe all'interno di un intervallo. Ancoraggio stabilisce se scala e rotazione usano ogni componente o il centro del livello. Sposta l'intervallo con Scostamento per far viaggiare la modifica lungo il testo.",
+   "name": "Trasformazione testo",
+   "params": {
+    "anchor": {
+     "label": "Ancoraggio",
+     "options": [
+      "Componente",
+      "Livello"
+     ]
+    },
+    "end": {
+     "label": "Fine"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "opacity": {
+     "label": "Opacità"
+    },
+    "position": {
+     "label": "Posizione"
+    },
+    "randomOrder": {
+     "label": "Ordine casuale"
+    },
+    "rotation": {
+     "label": "Rotazione"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "shape": {
+     "label": "Forma",
+     "options": [
+      "Quadra",
+      "Rampa in salita",
+      "Rampa in discesa",
+      "Triangolare",
+      "Arrotondata",
+      "Morbida"
+     ]
+    },
+    "smoothness": {
+     "label": "Morbidezza"
+    },
+    "start": {
+     "label": "Inizio"
+    },
+    "tint": {
+     "label": "Tinta"
+    },
+    "unit": {
+     "label": "In base a",
+     "options": [
+      "Carattere",
+      "Parola",
+      "Riga"
+     ]
+    }
+   },
+   "presets": {
+    "spin-cascade": "Cascata rotante",
+    "wave": "Onda"
+   }
+  },
+  "threshold": {
+   "description": "Bianco e nero puro, divisi a una certa luminosità.",
+   "name": "Soglia",
+   "params": {
+    "blend": {
+     "label": "Metodo di fusione",
+     "options": [
+      "Normale",
+      "Moltiplica",
+      "Scherma",
+      "Sovrapponi",
+      "Luce soffusa",
+      "Luce intensa",
+      "Somma",
+      "Scurisci",
+      "Schiarisci",
+      "Differenza",
+      "Colore scherma",
+      "Colore brucia"
+     ]
+    },
+    "invert": {
+     "label": "Inverti"
+    },
+    "level": {
+     "label": "Soglia"
+    },
+    "softness": {
+     "label": "Sfumatura"
+    }
+   }
+  },
+  "tile": {
+   "description": "Ripete l'immagine in una griglia.",
+   "name": "Mosaico",
+   "params": {
+    "mirror": {
+     "label": "Specchia"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "scale": {
+     "label": "Scala"
+    }
+   }
+  },
+  "tilerotate": {
+   "description": "Divide il livello in una griglia di tasselli e ruota l'immagine all'interno di ognuno in modo indipendente.",
+   "name": "Rotazione tasselli",
+   "params": {
+    "angle": {
+     "label": "Angolo"
+    },
+    "count": {
+     "label": "Numero"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "random": {
+     "label": "Casualità"
+    },
+    "rotation": {
+     "label": "Rotazione"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "stretch": {
+     "label": "Stiramento"
+    }
+   }
+  },
+  "tiles": {
+   "description": "Ripete il livello per riempire lo schermo. Aumenta Ritaglio per ottenere tasselli più piccoli, con specchiatura, scostamento delle righe e rotazione facoltativi. Scala legacy mantiene i progetti più vecchi.",
+   "name": "Tasselli",
+   "params": {
+    "angle": {
+     "label": "Angolo"
+    },
+    "mirror": {
+     "label": "Specchia"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "sizing": {
+     "label": "Dimensionamento",
+     "options": [
+      "Ritaglio",
+      "Scala legacy"
+     ]
+    },
+    "vertical": {
+     "label": "Scostamento verticale"
+    },
+    "zoom": {
+     "label": "Ritaglio"
+    }
+   }
+  },
+  "tileshift": {
+   "description": "Divide il livello in una griglia di tasselli e fa scorrere l'immagine all'interno di ognuno in una direzione casuale.",
+   "name": "Spostamento tasselli",
+   "params": {
+    "angle": {
+     "label": "Angolo"
+    },
+    "count": {
+     "label": "Numero"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "strength": {
+     "label": "Intensità"
+    },
+    "stretch": {
+     "label": "Stiramento"
+    }
+   }
+  },
+  "timecode": {
+   "description": "Sostituisce il testo di un livello con un orologio in corsa del tempo del livello o del progetto. Parti da e una velocità negativa creano un conto alla rovescia.",
+   "name": "Timecode",
+   "params": {
+    "format": {
+     "label": "Formato",
+     "options": [
+      "HH:MM:SS:FF",
+      "HH:MM:SS",
+      "MM:SS",
+      "MM:SS.hh",
+      "SS.hh",
+      "Fotogrammi"
+     ]
+    },
+    "offset": {
+     "label": "Parti da"
+    },
+    "source": {
+     "label": "Tempo",
+     "options": [
+      "Livello",
+      "Progetto"
+     ]
+    },
+    "speed": {
+     "label": "Velocità"
+    }
+   }
+  },
+  "timequant": {
+   "description": "Fa muovere questo livello a una frequenza fotogrammi più bassa, come un filmato a scatti o in stop motion.",
+   "name": "Frequenza fotogrammi",
+   "params": {
+    "fps": {
+     "label": "Fotogrammi/s"
+    }
+   }
+  },
+  "tint": {
+   "description": "Mappa la luminanza dell'immagine tra un colore per le ombre e un colore per le luci, con una quantità di fusione.",
+   "name": "Tinta",
+   "params": {
+    "amount": {
+     "label": "Quantità"
+    },
+    "highlightColor": {
+     "label": "Colore luci"
+    },
+    "shadowColor": {
+     "label": "Colore ombre"
+    }
+   }
+  },
+  "torus": {
+   "description": "Avvolge il livello attorno a un anello.",
+   "name": "Toro",
+   "params": {
+    "light": {
+     "label": "Angolo luce"
+    },
+    "perspective": {
+     "label": "Prospettiva"
+    },
+    "position": {
+     "label": "Posizione"
+    },
+    "radius": {
+     "label": "Raggio"
+    },
+    "rotX": {
+     "label": "Rotazione X"
+    },
+    "rotY": {
+     "label": "Rotazione Y"
+    },
+    "rotZ": {
+     "label": "Rotazione Z"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "shading": {
+     "label": "Ombreggiatura"
+    },
+    "shine": {
+     "label": "Lucentezza"
+    },
+    "thickness": {
+     "label": "Spessore"
+    }
+   }
+  },
+  "tunnel": {
+   "description": "Riveste un tunnel infinito con il livello e lo attraversa in volo. Fase sposta la texture lungo la sua lunghezza.",
+   "name": "Tunnel",
+   "params": {
+    "fog": {
+     "label": "Nebbia"
+    },
+    "fogColor": {
+     "label": "Colore nebbia"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "position": {
+     "label": "Posizione"
+    },
+    "repeat": {
+     "label": "Ripetizione"
+    },
+    "rotX": {
+     "label": "Rotazione X"
+    },
+    "rotY": {
+     "label": "Rotazione Y"
+    },
+    "rotZ": {
+     "label": "Rotazione Z"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "speed": {
+     "label": "Velocità"
+    },
+    "twist": {
+     "label": "Torsione"
+    }
+   }
+  },
+  "turbulence": {
+   "description": "Riempie le parti opache del livello con un rumore frattale morbido, per nuvole, fumo o una mappa di luminosità.",
+   "name": "Turbolenza",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "bias": {
+     "label": "Bias"
+    },
+    "blend": {
+     "label": "Metodo di fusione",
+     "options": [
+      "Normale",
+      "Moltiplica",
+      "Scherma",
+      "Sovrapponi",
+      "Luce soffusa",
+      "Luce intensa",
+      "Somma",
+      "Scurisci",
+      "Schiarisci",
+      "Differenza",
+      "Colore scherma",
+      "Colore brucia"
+     ]
+    },
+    "color1": {
+     "label": "Colore 1"
+    },
+    "color2": {
+     "label": "Colore 2"
+    },
+    "evolution": {
+     "label": "Evoluzione"
+    },
+    "intensity": {
+     "label": "Intensità"
+    },
+    "octaves": {
+     "label": "Ottave"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "parallax": {
+     "label": "Parallasse"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "stretch": {
+     "label": "Stiramento"
+    }
+   }
+  },
+  "turbulentdisplace": {
+   "description": "Sposta il livello con un rumore frattale morbido, per fuoco, acqua, aria rovente o bordi naturali irregolari.",
+   "name": "Spostamento turbolento",
+   "params": {
+    "bias": {
+     "label": "Bias"
+    },
+    "direction": {
+     "label": "Direzione",
+     "options": [
+      "Entrambe",
+      "Orizzontale",
+      "Verticale",
+      "Radiale",
+      "Torsione"
+     ]
+    },
+    "evolution": {
+     "label": "Evoluzione"
+    },
+    "octaves": {
+     "label": "Ottave"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "parallax": {
+     "label": "Parallasse"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "strength": {
+     "label": "Intensità"
+    },
+    "stretch": {
+     "label": "Stiramento"
+    }
+   }
+  },
+  "twirl": {
+   "description": "Attorciglia il livello attorno al centro come un mulinello, con effetto massimo al centro e sempre più debole fino al raggio (una parte della dimensione del livello). Un'intensità negativa lo attorciglia nell'altro senso.",
+   "name": "Vortice",
+   "params": {
+    "center": {
+     "label": "Centro"
+    },
+    "radius": {
+     "label": "Raggio"
+    },
+    "strength": {
+     "label": "Intensità"
+    }
+   }
+  },
+  "unsharpmask": {
+   "description": "Aumenta la nitidezza riaggiungendo la differenza tra il livello e una sua copia sfocata. Intensità stabilisce l'ampiezza della sfocatura, Quantità quanto viene riaggiunto, e una soglia sopra il 50% ignora le piccole differenze.",
+   "name": "Maschera di contrasto",
+   "params": {
+    "amount": {
+     "label": "Quantità"
+    },
+    "radius": {
+     "label": "Intensità"
+    },
+    "showMask": {
+     "label": "Mostra maschera"
+    },
+    "threshold": {
+     "label": "Soglia"
+    }
+   }
+  },
+  "vhs": {
+   "description": "Ricorda una vecchia videocassetta: sbavatura dei colori, righe sbavate, linee di scansione, rumore del nastro e bande di tracking che scorrono.",
+   "name": "VHS",
+   "params": {
+    "chroma": {
+     "label": "Sbavatura colori"
+    },
+    "headSwitch": {
+     "label": "Cambio testina"
+    },
+    "noise": {
+     "label": "Rumore"
+    },
+    "saturation": {
+     "label": "Saturazione"
+    },
+    "scanlines": {
+     "label": "Linee di scansione"
+    },
+    "seed": {
+     "label": "Seme"
+    },
+    "smear": {
+     "label": "Sbavatura"
+    },
+    "tracking": {
+     "label": "Tracking"
+    },
+    "wobble": {
+     "label": "Ondulazione"
+    }
+   }
+  },
+  "videofeedback": {
+   "description": "Disegna il livello dentro sé stesso più e più volte, come una telecamera puntata sul proprio schermo. Sposta, ridimensiona o ruota il livello per guidare il tunnel.",
+   "name": "Feedback video",
+   "params": {
+    "blend": {
+     "label": "Fusione",
+     "options": [
+      "Normale",
+      "Somma",
+      "Scherma"
+     ]
+    },
+    "center": {
+     "label": "Centro"
+    },
+    "copies": {
+     "label": "Copie"
+    },
+    "delay": {
+     "label": "Ritardo"
+    },
+    "fade": {
+     "label": "Dissolvenza"
+    },
+    "hueShift": {
+     "label": "Cambio tonalità"
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "rotation": {
+     "label": "Rotazione"
+    },
+    "useLayerTransform": {
+     "label": "Usa trasformazione livello"
+    },
+    "zoom": {
+     "label": "Zoom"
+    }
+   }
+  },
+  "viewer360": {
+   "description": "Mostra un livello panoramico a 360° attraverso una camera virtuale che puoi ruotare e ingrandire.",
+   "name": "Visualizzatore 360°",
+   "params": {
+    "fov": {
+     "label": "Campo visivo"
+    },
+    "pitch": {
+     "label": "Beccheggio"
+    },
+    "roll": {
+     "label": "Rollio"
+    },
+    "yaw": {
+     "label": "Imbardata"
+    }
+   }
+  },
+  "vignette": {
+   "description": "Scurisce il livello verso i bordi, fuori da una forma arrotondata: Dimensione stabilisce la forma, Arrotondamento quanto è tonda, Sfumatura quanto è morbido il suo bordo, Intensità quanto scurisce e Tinta quanto assume il colore. Ritaglia rende invece trasparenti i bordi.",
+   "name": "Vignettatura",
+   "params": {
+    "color": {
+     "label": "Colore"
+    },
+    "extent": {
+     "label": "Dimensione"
+    },
+    "feather": {
+     "label": "Sfumatura"
+    },
+    "punch": {
+     "label": "Ritaglia"
+    },
+    "rounding": {
+     "label": "Arrotondamento"
+    },
+    "strength": {
+     "label": "Intensità"
+    },
+    "style": {
+     "label": "Stile",
+     "options": [
+      "Arrotondata",
+      "Ovale morbido"
+     ]
+    },
+    "tint": {
+     "label": "Tinta"
+    }
+   }
+  },
+  "voronoicells": {
+   "description": "Riempie le parti opache del livello con un motivo di celle attorno a punti posizionati a caso.",
+   "name": "Celle di Voronoi",
+   "params": {
+    "color1": {
+     "label": "Colore 1"
+    },
+    "color2": {
+     "label": "Colore 2"
+    },
+    "lineColor": {
+     "label": "Colore linea"
+    },
+    "lineWidth": {
+     "label": "Spessore linea"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "scale": {
+     "label": "Scala"
+    },
+    "seed": {
+     "label": "Seme"
+    }
+   }
+  },
+  "wavewarp": {
+   "description": "Piega il livello con un'onda sinusoidale: Spaziatura stabilisce quante onde lo attraversano, Ampiezza quanto spingono, Angolo la direzione in cui corrono le onde e Angolo distorsione la direzione in cui spingono.",
+   "name": "Distorsione a onda",
+   "params": {
+    "angle": {
+     "label": "Angolo"
+    },
+    "magnitude": {
+     "label": "Ampiezza"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "spacing": {
+     "label": "Spaziatura"
+    },
+    "speed": {
+     "label": "Velocità"
+    },
+    "warpAngle": {
+     "label": "Angolo distorsione"
+    }
+   }
+  },
+  "wipe": {
+   "description": "Nasconde il livello da due lati opposti. Anima Inizio o Fine per una transizione a tendina.",
+   "name": "Tendina",
+   "params": {
+    "angle": {
+     "label": "Angolo"
+    },
+    "end": {
+     "label": "Fine"
+    },
+    "feather": {
+     "label": "Sfumatura"
+    },
+    "softness": {
+     "label": "Morbidezza"
+    },
+    "start": {
+     "label": "Inizio"
+    }
+   }
+  },
+  "zoomstreaks": {
+   "description": "Crea scie che partono da un punto ridimensionando copie del livello attorno a esso e mantenendo i pixel più luminosi. Media dà una sfocatura di zoom. R, G, B e A scelgono per ogni canale se le copie mantengono il valore minimo, massimo o medio, oppure lasciano il canale intatto.",
+   "name": "Scie di zoom",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Min",
+      "Max",
+      "Media",
+      "No"
+     ]
+    },
+    "alpha": {
+     "label": "Alfa"
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "Min",
+      "Max",
+      "Media",
+      "No"
+     ]
+    },
+    "bias": {
+     "label": "Bias"
+    },
+    "center": {
+     "label": "Centro"
+    },
+    "g": {
+     "label": "G",
+     "options": [
+      "Min",
+      "Max",
+      "Media",
+      "No"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "Min",
+      "Max",
+      "Media",
+      "No"
+     ]
+    },
+    "strength": {
+     "label": "Intensità"
+    }
+   }
+  }
+ }
+}

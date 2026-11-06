@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-TW" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>專案、備份與匯入 | AbsentMotion</title><meta name="description" content="專案的儲存方式、版本與當機復原、備份、遺失的媒體、匯入專案檔案，以及檔案的存放位置。"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="說明"><a href="index.html">目錄</a><a href="effects/index.html">特效</a></nav></header><div class="wrap"><main id="main"><h1>專案、備份與匯入</h1><p class="lead">專案的儲存方式、版本與當機復原、備份、遺失的媒體、匯入專案檔案，以及檔案的存放位置。</p><details class="toc"><summary>本頁內容</summary><ul><li><a href="#saving">儲存</a></li><li><a href="#version-history">版本紀錄</a></li><li><a href="#crash-recovery">當機復原</a></li><li><a href="#a-damaged-project">損毀的專案</a></li><li><a href="#media-files">媒體檔案</a></li><li><a href="#backup-and-restore">備份與還原</a></li><li><a href="#importing-project-files">匯入專案檔案</a></li><li><a href="#file-formats-and-where-things-are">檔案格式與檔案存放位置</a></li></ul></details><h2 id="saving">儲存</h2>
+<p>沒有「儲存」按鈕。每次變更後，編輯器會稍後將專案寫入手機，而且寫入方式不會留下寫到一半的檔案。拖曳進行中時，也會寫入草稿。如果因為手機空間已滿而儲存失敗，應用程式會顯示「無法儲存專案。請釋出一些儲存空間。」並再次嘗試。</p>
+<h2 id="version-history">版本紀錄</h2>
+<p>應用程式會保留每個專案的先前版本。在您開啟專案時、關閉專案時，以及儲存後（若最新版本至少已超過兩分鐘），都會儲存一個版本。在還原之前，以及在您回答當機復原問題之前，它也會儲存一個版本。應用程式會保留最新的 20 個版本，以及過去七天中每一天的最新版本，並刪除較舊的版本。</p>
+<p>從專案卡片的選單（<strong>版本紀錄</strong>）或編輯器的專案設定（<strong>先前版本</strong>）開啟。每一列都有縮圖、時間（「今天 14:05」、「昨天 09:30」）和 <strong>還原</strong>。還原前會先詢問：「專案會回到先前的狀態……目前的狀態會保留在版本紀錄中，因此不會遺失任何內容。」</p>
+<figure><img src="../assets/img/projects-versions.webp" width="720" height="1067" alt="版本紀錄：每個版本都有縮圖、時間與大小 (1)，以及還原按鈕 (2)。" loading="lazy"><figcaption>版本紀錄：每個版本都有縮圖、時間與大小 (1)，以及還原按鈕 (2)。</figcaption></figure>
+<h2 id="crash-recovery">當機復原</h2>
+<p>如果應用程式在專案開啟時意外停止，下次啟動時會顯示 <strong>AbsentMotion意外關閉</strong>，並以一句話說明原因，例如「匯出時記憶體不足。」如果有尚未儲存的編輯內容，它會詢問「要還原……的最後編輯內容嗎？」，並提供 <strong>還原</strong> 和 <strong>捨棄</strong> 按鈕。被捨棄的草稿仍會保留在專案的版本紀錄中。</p>
+<p>每次當機也會記錄到<a href="settings.html">設定</a>中的 <strong>當機記錄</strong>：包括時間、一句話的原因、應用程式與 Android 版本、手機型號、當時正在進行的操作，以及技術細節。會保留最近 20 筆。這些記錄絕不會傳送到任何地方；您可以複製其中一筆，自行傳送。</p>
+<h2 id="a-damaged-project">損毀的專案</h2>
+<p>如果專案檔案無法讀取，其卡片會顯示 <strong>已損毀，請還原版本</strong>。點選它即可還原較早的版本，或將其刪除。</p>
+<h2 id="media-files">媒體檔案</h2>
+<p>您新增的相片、影片與音訊預設會<strong>複製到專案中</strong>，因此專案不會依賴您的相簿。如果想節省儲存空間，可以在設定中關閉 <strong>將匯入的媒體保留副本於專案中</strong>。</p>
+<ul><li><strong>將媒體收集至專案</strong>（專案卡片選單）會將專案仍會從其自身資料夾以外讀取的每個檔案，複製到專案中。它會先嘗試尋找遺失的檔案。</li><li><strong>遺失的媒體。</strong> 當檔案不再位於手機上時，專案開啟時，應用程式會依據檔案的完整名稱與大小，在您的相片、影片與音訊媒體庫中尋找它；若恰好只有一個檔案符合，就會使用該檔案。若要手動修正，請選取圖層，在圖層選單中開啟 <strong>媒體資訊</strong>，然後選擇 <strong>替換媒體檔案</strong>。如果您在有遺失檔案的情況下匯出，應用程式會發出警告，並排除那些圖層。</li></ul>
+<h2 id="backup-and-restore">備份與還原</h2>
+<p>在<a href="settings.html">設定</a>的 <strong>備份</strong> 群組中：</p>
+<ul><li><strong>備份所有專案</strong>會在 Documents/AbsentMotion 中建立一個檔案，檔名為 <code>AbsentMotion-backup-</code> 加上日期與時間，並以 <code>.absbackup</code> 結尾。檔案內容包含所有專案及其版本紀錄、範本及其媒體、預設集、您的調色盤、匯入的字型、AI 結果，以及所有已保留的媒體。備份需要的可用空間約為內容大小再加 50 MB。即使您解除安裝 AbsentMotion，此檔案仍會留在手機上；為確保安全，請將它複製到電腦或雲端服務。</li><li><strong>每週自動備份（僅限專案）</strong>預設為關閉。開啟後，若距離上次備份已過七天，應用程式會在開啟後數秒寫入 <code>AbsentMotion-weekly-...absbackup</code>，此檔案只包含專案（不含媒體），並刪除先前的每週備份檔。應用程式絕不會刪除手動備份。</li><li><strong>從備份還原</strong>會要求您選擇一個備份檔。已存在且內容相同的專案會保持不變；名稱相同但內容不同的專案，會以另一份副本還原。不會覆寫任何現有內容。還原可以中止，並於稍後重新執行。</li></ul>
+<figure><img src="../assets/img/projects-backup.webp" width="490" height="763" alt="備份群組：備份所有專案 (1)、從備份還原 (2)，以及每週自動備份（僅限專案）(3)。" loading="lazy"><figcaption>備份群組：備份所有專案 (1)、從備份還原 (2)，以及每週自動備份（僅限專案）(3)。</figcaption></figure>
+<h2 id="importing-project-files">匯入專案檔案</h2>
+<p>您可以透過「分享」或「開啟方式」，從其他應用程式（例如檔案管理員）開啟專案檔案。若要在首頁顯示匯入按鈕，請開啟 <strong>在專案清單中顯示匯入卡片</strong>：此時 <strong>選擇檔案</strong> 卡片會出現在您的專案上方。</p>
+<div class="table-wrap"><table><thead><tr><th>檔案</th><th>您會得到什麼</th></tr></thead><tbody><tr><td data-label="檔案"><code>.absproj</code>（由 AbsentMotion 建立）</td><td data-label="您會得到什麼">一般專案，含其媒體</td></tr><tr><td data-label="檔案">其他編輯器的專案套件（<code>.amproj</code>）</td><td data-label="您會得到什麼">每個場景會變成一個<strong>範本</strong>，而任何素材仍維持為素材</td></tr><tr><td data-label="檔案">一般場景 XML 檔案</td><td data-label="您會得到什麼">一般專案。基於安全考量，不會追蹤媒體連結，因此除非能在相簿中找到，否則媒體會顯示為遺失。</td></tr><tr><td data-label="檔案">Adobe Animate 檔案（<code>.fla</code>）</td><td data-label="您會得到什麼">一般專案：請參閱 <a href="#adobe-animate-files">Adobe Animate 檔案</a></td></tr></tbody></table></div>
+<p>AbsentMotion 已有的特效會被轉換。它沒有的特效會保留在檔案中，但不會繪製。匯入後，報告只會列出未能成功匯入的項目：無法執行的特效、無法帶入的設定、找不到的媒體，以及未安裝的字型。若全部成功匯入，就不會顯示報告。備份檔（<code>.absbackup</code>）是從設定還原，而不是在此匯入。</p>
+<p>為保護手機，系統設有限制。例如，一個套件最多可包含 2000 個檔案與 32 個專案，解壓縮後最大為 2 GB；場景的尺寸最大為 16384 像素，影格速率需介於 1 到 240 之間。應用程式會告知檔案違反了哪一項規則。</p>
+<h3 id="adobe-animate-files">Adobe Animate 檔案</h3>
+<p>AbsentMotion 可匯入由 Adobe Animate 或 Flash CS5 及更新版本儲存的 <code>.fla</code> 檔案。開啟方式與其他專案檔案相同：使用 <strong>選擇檔案</strong>、分享或開啟方式。在電腦上，請使用 <strong>檔案</strong> &gt; <strong>匯入專案…</strong>，或將檔案拖放到視窗上；在這裡，<code>.xfl</code> 檔案也可以使用，只要其資料夾中的其他內容仍在它旁邊。在手機上，請將 XFL 資料夾壓縮為 ZIP 檔案，然後匯入該檔案。</p>
+<p>此檔案會成為一個專案，沿用 Animate 檔案的舞台尺寸、影格速率與背景顏色，其場景會依序播放。</p>
+<ul><li><strong>可匯入：</strong> 具有純色、雙色漸層與圖片填色的形狀及其線條；元件，每個元件會成為一個具有自己時間軸的群組；圖片；經典補間，會轉為關鍵影格並保留其緩動；透明度、色調與亮度；遮罩圖層；以及主時間軸上的 MP3 音效。</li><li><strong>未匯入：</strong> 文字欄位、ActionScript、濾鏡、混合模式、其他色彩特效、運動引導線、攝影機圖層、元件與已編譯的片段、影片、骨骼（IK）姿勢，以及庫中但不在舞台上的元件。形狀補間會顯示其起始形狀，動態補間則顯示其第一個關鍵影格。超過兩種顏色的漸層會保留兩種顏色，虛線及其他特殊線條會以實線繪製，無法讀取的緩動則會轉為直線運動。</li></ul>
+<p>匯入後，報告會同時列出這兩類內容，並附上各自的數量：<strong>從Animate檔案匯入</strong> 與 <strong>未匯入（顯示時不含此內容）</strong>。</p>
+<p>Flash CS4 及更早版本的 <code>.fla</code> 檔案使用另一種格式。此時應用程式會顯示：「此 .fla 檔案是由 Flash CS4 或更舊版本儲存。只能匯入由 Flash CS5 及更新版本儲存的 .fla 檔案。」</p>
+<h2 id="file-formats-and-where-things-are">檔案格式與檔案存放位置</h2>
+<ul><li>專案是一個 XML 文字檔。媒體則存放在專案的私人資料夾中，與它並排。</li><li><code>.absproj</code> 是一個 ZIP 檔：內含 <code>project.xml</code>、<code>manifest.json</code>，以及 <code>media/</code> 下的媒體檔案。3D 模型會將其檔案保存在一個資料夾中。</li><li><code>.absbackup</code> 是一個 ZIP 檔，包含所有專案、預設集、範本、字型與媒體檔案。</li><li><strong>應用程式私人儲存空間</strong>（解除安裝時會一併移除）：專案及其縮圖、版本紀錄、已保留的媒體、範本、預設集、調色盤、當機草稿、當機記錄、匯入的字型、字幕模型、預覽副本與 AI 結果。</li><li><strong>共用儲存空間</strong>（解除安裝後仍會保留）：Movies/AbsentMotion（影片）、Pictures/AbsentMotion（GIF、靜態影格、圖片序列與調色盤圖片）、Music/AbsentMotion（音訊匯出）、Documents/AbsentMotion（<code>.absproj</code>、XML、備份與調色盤檔案），以及 DCIM/AbsentMotion（來自應用程式內建相機的相片與影片）。</li></ul>
+<p>AbsentMotion 不使用範圍廣泛的「所有檔案」權限：它會透過 Android 的媒體儲存空間儲存檔案。</p><nav class="pager" aria-label="上一頁與下一頁"><a rel="prev" href="export.html">&larr; 匯出</a><a rel="next" href="troubleshooting.html">疑難排解與問題 &rarr;</a></nav></main></div></body></html>

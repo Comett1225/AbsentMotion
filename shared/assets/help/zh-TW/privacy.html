@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="zh-TW" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>隱私權與授權 | AbsentMotion</title><meta name="description" content="本應用程式會保存哪些資料、會傳送哪些資料，以及它採用的授權條款。"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="說明"><a href="index.html">目錄</a><a href="effects/index.html">特效</a></nav></header><div class="wrap"><main id="main"><h1>隱私權與授權</h1><p class="lead">本應用程式會保存哪些資料、會傳送哪些資料，以及它採用的授權條款。</p><details class="toc"><summary>本頁內容</summary><ul><li><a href="#your-projects-and-media">您的專案與媒體</a></li><li><a href="#when-the-app-uses-the-internet">應用程式何時會使用網路</a></li><li><a href="#children">兒童</a></li><li><a href="#license-and-source">授權與原始碼</a></li><li><a href="#questions">問題</a></li></ul></details><p>AbsentMotion 不會收集、儲存或分享個人資料。沒有帳號、沒有廣告、沒有分析工具，也沒有追蹤。本頁為隱私權政策的摘要；完整內容請見原始碼中的 <a href="https://github.com/Comett1225/AbsentMotion/blob/main/PRIVACY.md">PRIVACY.md</a> 檔案。</p>
+<h2 id="your-projects-and-media">您的專案與媒體</h2>
+<p>專案、匯入的圖片、影片與音訊，以及您匯出的所有內容，都只會留在您的手機上。相片、影片與音訊權限只是讓應用程式在手機上顯示您的媒體庫，並使用您選取的檔案。不會上傳任何內容。</p>
+<p>相機與麥克風權限只會在應用程式內建的相機開啟時使用。錄製的內容會儲存在手機上。備份會寫入手機上的 Documents/AbsentMotion，並且只留在手機中。</p>
+<p>匯出進行時，應用程式會在通知中顯示進度，因此切換到其他應用程式時，匯出仍會繼續。在 Android 13 及更新版本上，首次匯出時會要求通知權限；如果您拒絕，匯出功能仍然相同。</p>
+<p>如果應用程式意外關閉，它會在自己的儲存空間中保留當機記錄：發生時間、一句話的原因、應用程式與 Android 版本、手機型號、您當時正在做的事，以及技術錯誤訊息。只保留最近 20 筆，這些記錄不會包含在手機備份中，而且絕不會傳送到任何地方。您可以在設定中閱讀、複製或刪除它們。</p>
+<h2 id="when-the-app-uses-the-internet">應用程式何時會使用網路</h2>
+<p>應用程式只會在以下情況要求網路權限：</p>
+<ul><li><strong>字型。</strong> 當您選擇其中一種可下載的字型時，應用程式會從 Google Fonts 下載該字型。與任何網頁請求一樣，Google 會收到該字型的請求以及您的 IP 位址。</li><li><strong>自動字幕。</strong> 首次產生字幕時，應用程式會告知語音模型的大小（約 57 MB），並從 Hugging Face 下載。語音辨識在手機上執行。</li><li><strong>AI增強與AI平滑。</strong> 第一次使用其中一項功能時，應用程式會告知所需模型的大小（約 1 到 11 MB），並從 GitHub 下載。AI 運算本身在手機上執行。</li><li><strong>AI背景移除2.0。</strong> 只有在您選擇使用 AI 背景移除 2.0 來移除背景時，應用程式才會從 GitHub 下載其模型一次（約 62 MB）。去背運算本身在手機上執行。</li><li><strong>影片下載器。</strong> 只有在您使用「工具 &gt; 影片下載器」時才會：首次使用時，應用程式會下載其附加元件（約 25 MB）：Python 來自 <code>python.org</code>，yt-dlp 來自 GitHub（<code>github.com</code>，由 <code>objects.githubusercontent.com</code> 或 <code>release-assets.githubusercontent.com</code> 提供）。附加元件安裝後，它每天最多會向 GitHub 詢問一次是否有較新的 yt-dlp，若有則下載。當您貼上連結時，附加元件會連線到該網站（例如 YouTube、Instagram 或 TikTok），讀取影片資訊並下載您選擇的部分，其方式與網頁瀏覽器相同；檔案會儲存在裝置上。</li><li><strong>檢查更新。</strong> 若您允許（應用程式只會詢問一次；開關位於設定中），應用程式每次開啟時都會向 GitHub 發出一次一般的 HTTPS 請求，以讀取最新版本號碼。不會傳送其他任何內容。與任何網頁請求一樣，GitHub 會看到您的 IP 位址。</li></ul>
+<p>除此之外，不會傳送任何內容。文字轉語音會使用手機上已有的語音，並可離線運作。</p>
+<h2 id="children">兒童</h2>
+<p>本應用程式並非針對兒童設計，也不會向任何人收集資料。</p>
+<h2 id="license-and-source">授權與原始碼</h2>
+<p>AbsentMotion 是免費的開放原始碼軟體，以 <a href="https://github.com/Comett1225/AbsentMotion/blob/main/LICENSE">GNU 通用公眾授權條款第 3 版</a>釋出。其原始碼位於 <a href="https://github.com/Comett1225/AbsentMotion">GitHub 上的專案頁面</a>。本應用程式使用的第三方軟體（Skia、whisper.cpp、RNNoise、LAME、AndroidX Compose 等）及其授權條款，列於 <a href="https://github.com/Comett1225/AbsentMotion/blob/main/THIRD_PARTY_NOTICES.md">THIRD_PARTY_NOTICES.md</a> 中，也可在應用程式的設定、關於、<strong>開放原始碼授權</strong>中查看。</p>
+<p>AbsentMotion 是獨立專案，與其他應用程式開發者沒有關聯，也未獲得其認可或贊助；其他產品的名稱屬於各自的擁有者。</p>
+<h2 id="questions">問題</h2>
+<p>請透過儲存庫的<a href="https://github.com/Comett1225/AbsentMotion/issues">議題頁面</a>提問。</p><nav class="pager" aria-label="上一頁與下一頁"><a rel="prev" href="troubleshooting.html">&larr; 疑難排解與問題</a><span></span></nav></main></div></body></html>

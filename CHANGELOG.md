@@ -46,6 +46,7 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - Desktop: Alt+Left and Alt+Right jump between bookmarks; comma and period nudge the selected clips.
 - Linux: a .tar.gz with an install script for any distribution.
 - Effects library: swipe left or right on the Recent and Favorite grid to switch, or press and hold the two small icons and slide your thumb.
+- Seven new languages: Korean, Chinese (Traditional), Chinese (Simplified), French, German, Italian and Polish, with the help pages and picture captions in each. Phones set to Chinese for Taiwan, Hong Kong or Macau get Traditional Chinese.
 
 ### Changed
 
@@ -61,6 +62,7 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - Opening an effect card or an audio effect moves it up to the top as it opens, and the other cards slide out of the way; closing it puts it back in its place.
 - Electric Edges from Alight Motion: Thickness widens the edge into a glowing band and a keyframed Seed crackles on every frame, as in Alight Motion. Projects saved before 5.0 keep their look.
 - Desktop file and folder pickers use the system's current dialogs on Windows and Linux.
+- Help on tablets opens in a wide panel with the pictures beside the text, instead of a phone-sized card.
 
 ### Removed
 

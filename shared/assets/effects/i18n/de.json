@@ -1,0 +1,6881 @@
+{
+ "categories": {
+  "3d": "3D",
+  "ai": "KI",
+  "beat": "Beat",
+  "blur": "Unschärfe",
+  "color": "Farbe",
+  "distort": "Verzerren",
+  "key": "Key",
+  "move": "Bewegung",
+  "new": "Neu",
+  "noise": "Rauschen",
+  "other": "Sonstige",
+  "repeat": "Wiederholen",
+  "stylize": "Stilisieren",
+  "text": "Text"
+ },
+ "effects": {
+  "ascii": {
+   "description": "Wandelt die Ebene in Textkunst aus Buchstaben und Symbolen um: Hellere Bereiche erhalten dichtere Zeichen. „Größe“ legt die Breite der Zeichen auf der Ebene fest, sodass sie sich mit ihr bewegen, drehen und skalieren. „Farbe“ behält die Bildfarben bei oder verwendet eine einzelne Farbe. „Kantenlinien“ zeichnet Konturen mit den Zeichen | - / und \\.",
+   "name": "ASCII",
+   "params": {
+    "background": {
+     "label": "Hintergrundfarbe"
+    },
+    "backgroundMode": {
+     "label": "Hintergrund",
+     "options": [
+      "Keine",
+      "Farbe"
+     ]
+    },
+    "brightness": {
+     "label": "Helligkeit"
+    },
+    "cell": {
+     "label": "Größe"
+    },
+    "characters": {
+     "label": "Benutzerdefiniert"
+    },
+    "charset": {
+     "label": "Zeichen",
+     "options": [
+      "Detailliert",
+      "Einfach",
+      "Blöcke",
+      "Binär",
+      "Benutzerdefiniert"
+     ]
+    },
+    "colorMode": {
+     "label": "Farbe",
+     "options": [
+      "Original",
+      "Einfarbig"
+     ]
+    },
+    "contrast": {
+     "label": "Kontrast"
+    },
+    "edges": {
+     "label": "Kantenlinien"
+    },
+    "invert": {
+     "label": "Umkehren"
+    },
+    "textColor": {
+     "label": "Textfarbe"
+    }
+   },
+   "presets": {
+    "amber-monitor": "Bernsteinmonitor",
+    "binary-rain": "Binärregen",
+    "blocks": "Blöcke",
+    "line-art": "Strichzeichnung",
+    "newspaper": "Zeitung",
+    "terminal": "Terminal"
+   }
+  },
+  "autoshake": {
+   "description": "Bewegt die Ebene im Laufe der Zeit zufällig innerhalb der festgelegten Grenzen.",
+   "name": "Automatisches Wackeln",
+   "params": {
+    "angle": {
+     "label": "Winkel"
+    },
+    "evolution": {
+     "label": "Entwicklung"
+    },
+    "frequency": {
+     "label": "Frequenz"
+    },
+    "magnitude": {
+     "label": "Stärke"
+    },
+    "pattern": {
+     "label": "Muster",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
+    },
+    "seed": {
+     "label": "Zufallswert"
+    },
+    "slack": {
+     "label": "Spiel"
+    },
+    "zshake": {
+     "label": "Z-Wackeln"
+    }
+   }
+  },
+  "backdrop": {
+   "description": "Hieß früher „Einstellungsebene“. Kopiert den Inhalt unter der Ebene, damit nachfolgende Effekte diese Kopie verändern. „Auf Ebene maskieren“ begrenzt die Kopie auf die deckenden Bereiche der Ebene. „Mischen“ blendet die Ebenenfüllung wieder ein. „Effekte über Rand hinaus“ erlaubt nachfolgenden Effekten wie „Strecken“, die Kopie über die Ebenenränder hinaus zu erweitern.",
+   "name": "Hintergrund kopieren",
+   "params": {
+    "mask": {
+     "label": "Auf Ebene maskieren"
+    },
+    "mix": {
+     "label": "Mischen"
+    },
+    "spill": {
+     "label": "Effekte über Rand hinaus"
+    }
+   }
+  },
+  "beatblur": {
+   "description": "Erzeugt bei jedem Beat eine Zoom-Unschärfe, die mit dem Beat abklingt. Wähle zuerst deinen Musikclip, öffne sein Menü und tippe auf „Beats markieren“. Ohne Beat-Markierungen gilt die BPM-Einstellung.",
+   "name": "Beat-Unschärfe",
+   "params": {
+    "beats": {
+     "label": "Beats",
+     "options": [
+      "Jeder Beat",
+      "Jeder 2. Beat",
+      "Jeder 4. Beat"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Abklingen"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "strength": {
+     "label": "Stärke"
+    }
+   }
+  },
+  "beatflash": {
+   "description": "Lässt die Ebene bei jedem Beat in einer Farbe aufblitzen. Wähle zuerst deinen Musikclip, öffne sein Menü und tippe auf „Beats markieren“. Ohne Beat-Markierungen gilt die BPM-Einstellung.",
+   "name": "Beat-Blitz",
+   "params": {
+    "beats": {
+     "label": "Beats",
+     "options": [
+      "Jeder Beat",
+      "Jeder 2. Beat",
+      "Jeder 4. Beat"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Farbe"
+    },
+    "decay": {
+     "label": "Abklingen"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "strength": {
+     "label": "Stärke"
+    }
+   }
+  },
+  "beatglitch": {
+   "description": "Zerlegt die Ebene bei jedem Beat in verschobene Streifen mit getrennten Farben. Wähle zuerst deinen Musikclip, öffne sein Menü und tippe auf „Beats markieren“. Ohne Beat-Markierungen gilt die BPM-Einstellung.",
+   "name": "Beat-Störung",
+   "params": {
+    "beats": {
+     "label": "Beats",
+     "options": [
+      "Jeder Beat",
+      "Jeder 2. Beat",
+      "Jeder 4. Beat"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Abklingen"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "slices": {
+     "label": "Streifen"
+    },
+    "strength": {
+     "label": "Stärke"
+    }
+   }
+  },
+  "beatglow": {
+   "description": "Lässt die hellen Bereiche der Ebene bei jedem Beat leuchten. Wähle zuerst deinen Musikclip, öffne sein Menü und tippe auf „Beats markieren“. Ohne Beat-Markierungen gilt die BPM-Einstellung.",
+   "name": "Beat-Leuchten",
+   "params": {
+    "beats": {
+     "label": "Beats",
+     "options": [
+      "Jeder Beat",
+      "Jeder 2. Beat",
+      "Jeder 4. Beat"
+     ]
+    },
+    "blur": {
+     "label": "Radius"
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Farbe"
+    },
+    "decay": {
+     "label": "Abklingen"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "strength": {
+     "label": "Stärke"
+    },
+    "threshold": {
+     "label": "Schwellenwert"
+    }
+   }
+  },
+  "beatpulse": {
+   "description": "Hellt die Ebene bei jedem Beat wie ein Belichtungsblitz auf; eine negative Stärke dunkelt sie ab. Wähle zuerst deinen Musikclip, öffne sein Menü und tippe auf „Beats markieren“. Ohne Beat-Markierungen gilt die BPM-Einstellung.",
+   "name": "Beat-Puls",
+   "params": {
+    "beats": {
+     "label": "Beats",
+     "options": [
+      "Jeder Beat",
+      "Jeder 2. Beat",
+      "Jeder 4. Beat"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Abklingen"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "strength": {
+     "label": "Stärke"
+    }
+   }
+  },
+  "beatrgbsplit": {
+   "description": "Zieht bei jedem Beat den roten und blauen Kanal auseinander. Wähle zuerst deinen Musikclip, öffne sein Menü und tippe auf „Beats markieren“. Ohne Beat-Markierungen gilt die BPM-Einstellung.",
+   "name": "Beat-RGB-Trennung",
+   "params": {
+    "angle": {
+     "label": "Winkel"
+    },
+    "beats": {
+     "label": "Beats",
+     "options": [
+      "Jeder Beat",
+      "Jeder 2. Beat",
+      "Jeder 4. Beat"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Abklingen"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "strength": {
+     "label": "Stärke"
+    }
+   }
+  },
+  "beatrotate": {
+   "description": "Neigt die Ebene bei jedem Beat abwechselnd nach links und rechts und schwingt zurück. Wähle zuerst deinen Musikclip, öffne sein Menü und tippe auf „Beats markieren“. Ohne Beat-Markierungen gilt die BPM-Einstellung.",
+   "name": "Beat-Drehung",
+   "params": {
+    "alternate": {
+     "label": "Abwechseln"
+    },
+    "beats": {
+     "label": "Beats",
+     "options": [
+      "Jeder Beat",
+      "Jeder 2. Beat",
+      "Jeder 4. Beat"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "cover": {
+     "label": "Bild ausfüllen"
+    },
+    "decay": {
+     "label": "Abklingen"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "strength": {
+     "label": "Stärke"
+    }
+   }
+  },
+  "beatshake": {
+   "description": "Schüttelt die Ebene bei jedem Beat in eine neue Richtung und beruhigt sie vor dem nächsten. Wähle zuerst deinen Musikclip, öffne sein Menü und tippe auf „Beats markieren“. Ohne Beat-Markierungen gilt die BPM-Einstellung.",
+   "name": "Beat-Wackeln",
+   "params": {
+    "beats": {
+     "label": "Beats",
+     "options": [
+      "Jeder Beat",
+      "Jeder 2. Beat",
+      "Jeder 4. Beat"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Abklingen"
+    },
+    "frequency": {
+     "label": "Frequenz"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "strength": {
+     "label": "Stärke"
+    }
+   }
+  },
+  "beatzoom": {
+   "description": "Zoomt bei jedem Beat hinein und anschließend sanft wieder heraus. Wähle zuerst deinen Musikclip, öffne sein Menü und tippe auf „Beats markieren“. Ohne Beat-Markierungen gilt die BPM-Einstellung.",
+   "name": "Beat-Zoom",
+   "params": {
+    "beats": {
+     "label": "Beats",
+     "options": [
+      "Jeder Beat",
+      "Jeder 2. Beat",
+      "Jeder 4. Beat"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Abklingen"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "strength": {
+     "label": "Stärke"
+    }
+   }
+  },
+  "bend": {
+   "description": "Biegt die Ebene entlang eines Kreisbogens. Die Ursprungsseite bleibt stehen, während sich die andere Seite um den eingestellten Winkel dreht; ein positiver Winkel dreht nach links. Am besten für lange, schmale Ebenen.",
+   "name": "Biegen",
+   "params": {
+    "amount": {
+     "label": "Winkel"
+    },
+    "before": {
+     "label": "Vor dem Anfang",
+     "options": [
+      "Einfrieren",
+      "Zur selben Seite biegen",
+      "Zur Gegenseite biegen"
+     ]
+    },
+    "origin": {
+     "label": "Ursprung",
+     "options": [
+      "Links",
+      "Rechts",
+      "Oben",
+      "Unten"
+     ]
+    },
+    "start": {
+     "label": "Anfang"
+    },
+    "tuneHead": {
+     "label": "Anfang anpassen"
+    },
+    "tuneTail": {
+     "label": "Ende anpassen"
+    }
+   }
+  },
+  "blink": {
+   "description": "Schaltet die Ebene mehrmals pro Sekunde ein und aus.",
+   "name": "Blinken",
+   "params": {
+    "frequency": {
+     "label": "Frequenz"
+    }
+   }
+  },
+  "blockdissolve": {
+   "description": "Entfernt zufällige, am Raster ausgerichtete Blöcke aus der Ebene. Animiere die Stärke, um immer mehr Blöcke zu entfernen.",
+   "name": "Blockauflösung",
+   "params": {
+    "blockSize": {
+     "label": "Größe"
+    },
+    "fade": {
+     "label": "Ausblenden"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "seed": {
+     "label": "Zufallswert"
+    },
+    "strength": {
+     "label": "Stärke"
+    },
+    "stretch": {
+     "label": "Strecken"
+    }
+   }
+  },
+  "blocknoise": {
+   "description": "Lässt zufällige Rauschblöcke über der Ebene flackern. „Multiplizieren“ verändert die vorhandenen Farben; „Addieren“ fügt ihnen Rauschen hinzu. „Einfrieren“ hält das Muster an.",
+   "name": "Blockrauschen",
+   "params": {
+    "blending": {
+     "label": "Mischmodus",
+     "options": [
+      "Addieren",
+      "Multiplizieren"
+     ]
+    },
+    "blockSize": {
+     "label": "Größe"
+    },
+    "extremes": {
+     "label": "Extreme"
+    },
+    "freeze": {
+     "label": "Einfrieren"
+    },
+    "mono": {
+     "label": "Monochrom"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "overshoot": {
+     "label": "Überschwingen"
+    },
+    "seed": {
+     "label": "Zufallswert"
+    },
+    "strength": {
+     "label": "Stärke"
+    },
+    "stretch": {
+     "label": "Strecken"
+    }
+   }
+  },
+  "blur": {
+   "description": "Eine weiche, gleichmäßige Unschärfe.",
+   "name": "Unschärfe",
+   "params": {
+    "strength": {
+     "label": "Stärke"
+    }
+   }
+  },
+  "box": {
+   "description": "Legt die Ebene um einen Quader, dessen Breite, Höhe und Tiefe du bestimmst.",
+   "name": "Quader",
+   "params": {
+    "depth": {
+     "label": "Tiefe"
+    },
+    "height": {
+     "label": "Höhe"
+    },
+    "light": {
+     "label": "Lichtwinkel"
+    },
+    "perspective": {
+     "label": "Perspektive"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "rotX": {
+     "label": "Drehung X"
+    },
+    "rotY": {
+     "label": "Drehung Y"
+    },
+    "rotZ": {
+     "label": "Drehung Z"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "shading": {
+     "label": "Schattierung"
+    },
+    "shine": {
+     "label": "Glanz"
+    },
+    "smoothing": {
+     "label": "Glättung"
+    },
+    "width": {
+     "label": "Breite"
+    }
+   }
+  },
+  "brightnesscontrast": {
+   "description": "Passt Helligkeit und Kontrast des Bildes an.",
+   "name": "Helligkeit und Kontrast",
+   "params": {
+    "brightness": {
+     "label": "Helligkeit"
+    },
+    "contrast": {
+     "label": "Kontrast"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Pro Kanal",
+      "Farbe beibehalten"
+     ]
+    }
+   }
+  },
+  "bulge": {
+   "description": "Wölbt die Ebene innerhalb eines Kreises wie eine Linse nach außen (positive Stärke) oder zieht sie zur Mitte hin zusammen (negative Stärke). Der Radius ist ein Anteil der Ebenengröße.",
+   "name": "Zusammenziehen/Aufwölben",
+   "params": {
+    "amount": {
+     "label": "Stärke"
+    },
+    "center": {
+     "label": "Mitte"
+    },
+    "radius": {
+     "label": "Radius"
+    }
+   }
+  },
+  "bumpmap": {
+   "description": "Beleuchtet die Ebene, als wäre ihre Helligkeit eine erhabene Oberfläche, und erzeugt so eine geprägte Struktur unter Beibehaltung der Farben.",
+   "name": "Reliefkarte",
+   "params": {
+    "ambient": {
+     "label": "Umgebungslicht"
+    },
+    "angle": {
+     "label": "Lichtwinkel"
+    },
+    "height": {
+     "label": "Höhe"
+    },
+    "light": {
+     "label": "Lichtfarbe"
+    },
+    "shine": {
+     "label": "Glanz"
+    }
+   }
+  },
+  "channelremap": {
+   "description": "Erstellt jeden Farbkanal aus einem anderen Kanal der Ebene, etwa für Falschfarben oder um Luminanz nach Alpha zu übertragen.",
+   "name": "Kanalzuordnung (RGB)",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Rot",
+      "Grün",
+      "Blau",
+      "Alpha",
+      "Luminanz",
+      "Null",
+      "Voll"
+     ]
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "Rot",
+      "Grün",
+      "Blau",
+      "Alpha",
+      "Luminanz",
+      "Null",
+      "Voll"
+     ]
+    },
+    "g": {
+     "label": "G",
+     "options": [
+      "Rot",
+      "Grün",
+      "Blau",
+      "Alpha",
+      "Luminanz",
+      "Null",
+      "Voll"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "Rot",
+      "Grün",
+      "Blau",
+      "Alpha",
+      "Luminanz",
+      "Null",
+      "Voll"
+     ]
+    }
+   }
+  },
+  "channelremaphsv": {
+   "description": "Erstellt Farbton, Sättigung, Wert und Alpha aus anderen Kanälen der Ebene.",
+   "name": "Kanalzuordnung (HSV)",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Farbton",
+      "Sättigung",
+      "Hellwert",
+      "Alpha",
+      "Luminanz",
+      "Null",
+      "Voll"
+     ]
+    },
+    "h": {
+     "label": "H",
+     "options": [
+      "Farbton",
+      "Sättigung",
+      "Wert",
+      "Alpha",
+      "Luminanz",
+      "Null",
+      "Voll"
+     ]
+    },
+    "s": {
+     "label": "S",
+     "options": [
+      "Farbton",
+      "Sättigung",
+      "Wert",
+      "Alpha",
+      "Luminanz",
+      "Null",
+      "Voll"
+     ]
+    },
+    "v": {
+     "label": "V",
+     "options": [
+      "Farbton",
+      "Sättigung",
+      "Hellwert",
+      "Alpha",
+      "Luminanz",
+      "Null",
+      "Voll"
+     ]
+    }
+   }
+  },
+  "checker": {
+   "description": "Legt ein Schachbrettmuster über die deckenden Bereiche der Ebene oder stanzt die Felder aus.",
+   "name": "Schachbrett",
+   "params": {
+    "angle": {
+     "label": "Winkel"
+    },
+    "color": {
+     "label": "Farbe"
+    },
+    "count": {
+     "label": "Anzahl"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "punch": {
+     "label": "Ausstanzen"
+    },
+    "screenSpace": {
+     "label": "Bildschirmraum"
+    },
+    "stretch": {
+     "label": "Streckung"
+    }
+   }
+  },
+  "chromakey": {
+   "description": "Entfernt eine Farbe, zum Beispiel einen Greenscreen.",
+   "name": "Chroma Key",
+   "params": {
+    "defringe": {
+     "label": "Farbsäume entfernen"
+    },
+    "invert": {
+     "label": "Umkehren"
+    },
+    "key": {
+     "label": "Schlüsselfarbe"
+    },
+    "softness": {
+     "label": "Weichheit"
+    },
+    "tolerance": {
+     "label": "Toleranz"
+    }
+   }
+  },
+  "chromaticzoomblur": {
+   "description": "Erzeugt eine Zoomunschärfe von einem Mittelpunkt aus, die Blau nach innen und Rot nach außen zieht und so Regenbogensäume an Kanten bildet.",
+   "name": "Chromatische Zoomunschärfe",
+   "params": {
+    "amount": {
+     "label": "Stärke"
+    },
+    "center": {
+     "label": "Mittelpunkt"
+    }
+   }
+  },
+  "circularripple": {
+   "description": "Lässt von einem Punkt Kreiswellen ausgehen, wie bei einem Tropfen im Wasser.",
+   "name": "Kreiswellen",
+   "params": {
+    "center": {
+     "label": "Mittelpunkt"
+    },
+    "feather": {
+     "label": "Weiche Kante"
+    },
+    "frequency": {
+     "label": "Frequenz"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "strength": {
+     "label": "Stärke"
+    }
+   }
+  },
+  "clouds": {
+   "description": "Bedeckt die deckenden Bereiche der Ebene mit einem weichen Wolkenmuster, das sich auch als Rauschquelle eignet.",
+   "name": "Wolken",
+   "params": {
+    "color1": {
+     "label": "Farbe 1"
+    },
+    "color2": {
+     "label": "Farbe 2"
+    },
+    "intensity": {
+     "label": "Intensität"
+    },
+    "octaves": {
+     "label": "Oktaven"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "parallax": {
+     "label": "Parallaxe"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "seed": {
+     "label": "Startwert"
+    },
+    "stretch": {
+     "label": "Streckung"
+    }
+   }
+  },
+  "cmykhalftone": {
+   "description": "Stellt die Ebene wie einen Zeitschriftendruck dar: mit cyanfarbenen, magentafarbenen, gelben und schwarzen Punkten auf vier gedrehten Rastern.",
+   "name": "CMYK-Rasterpunkte",
+   "params": {
+    "amount": {
+     "label": "Anteil"
+    },
+    "angle": {
+     "label": "Winkel"
+    },
+    "black": {
+     "label": "Schwarz"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "strength": {
+     "label": "Stärke"
+    }
+   }
+  },
+  "colorbalance": {
+   "description": "Verschiebt Schatten, Mitteltöne und Lichter zu ihren jeweiligen Farben; Grau lässt den Bereich unverändert.",
+   "name": "Farbbalance",
+   "params": {
+    "amount": {
+     "label": "Anteil"
+    },
+    "highlights": {
+     "label": "Lichter"
+    },
+    "midtones": {
+     "label": "Mitteltöne"
+    },
+    "shadows": {
+     "label": "Schatten"
+    }
+   }
+  },
+  "colorize": {
+   "description": "Färbt die gesamte Ebene mit einem Farbton. „Licht und Schatten“ überträgt die Helligkeit der Ebene auf den Farbton; „Helligkeit beibehalten“ erhält die Helligkeit jedes Pixels und ersetzt dessen Farbe durch den Farbton.",
+   "name": "Einfärben",
+   "params": {
+    "amount": {
+     "label": "Anteil"
+    },
+    "hue": {
+     "label": "Farbton"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Licht und Schatten",
+      "Helligkeit beibehalten"
+     ]
+    }
+   }
+  },
+  "colorwheels": {
+   "description": "Farbräder für Schatten (Lift), Mitteltöne (Gamma) und Lichter (Gain) mit Farbton, Stärke und Pegel. Versatz verschiebt alle Tonwerte. Der Stil „Nach Helligkeit“ gewichtet jedes Farbrad nach der Helligkeit des Pixels.",
+   "name": "Lift Gamma Gain",
+   "params": {
+    "gainAmount": {
+     "label": "Gain-Anteil"
+    },
+    "gainHue": {
+     "label": "Gain-Farbton"
+    },
+    "gainLevel": {
+     "label": "Gain-Pegel"
+    },
+    "gammaAmount": {
+     "label": "Gamma-Anteil"
+    },
+    "gammaHue": {
+     "label": "Gamma-Farbton"
+    },
+    "gammaLevel": {
+     "label": "Gamma-Pegel"
+    },
+    "liftAmount": {
+     "label": "Lift-Anteil"
+    },
+    "liftHue": {
+     "label": "Lift-Farbton"
+    },
+    "liftLevel": {
+     "label": "Lift-Pegel"
+    },
+    "offsetAmount": {
+     "label": "Versatz-Anteil"
+    },
+    "offsetHue": {
+     "label": "Versatz-Farbton"
+    },
+    "offsetLevel": {
+     "label": "Versatz-Pegel"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Nach Helligkeit"
+     ]
+    }
+   }
+  },
+  "contourgradient": {
+   "description": "Zeichnet einen zweifarbigen Verlauf von den Kanten der deckenden Ebenenbereiche nach außen, wie einen weichen farbigen Lichtschein.",
+   "name": "Konturverlauf",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blur": {
+     "label": "Breite"
+    },
+    "color1": {
+     "label": "Farbe 1"
+    },
+    "color2": {
+     "label": "Farbe 2"
+    },
+    "fade": {
+     "label": "Ausblenden"
+    },
+    "fill": {
+     "label": "Füllung"
+    }
+   }
+  },
+  "contourlines": {
+   "description": "Zeichnet Konturringe um die deckenden Bereiche der Ebene, etwa für gestapelte Sticker- oder Neonumrisse.",
+   "name": "Konturlinien",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blur": {
+     "label": "Ausdehnung"
+    },
+    "color": {
+     "label": "Farbe"
+    },
+    "count": {
+     "label": "Anzahl"
+    },
+    "fill": {
+     "label": "Füllung"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "width": {
+     "label": "Breite"
+    }
+   }
+  },
+  "contourstrips": {
+   "description": "Zeichnet gestapelte Papierstreifen, deren Höhe der Helligkeit oder Deckkraft der Ebene folgt, wie eine Landschaft aus Höhenlinien.",
+   "name": "Konturstreifen",
+   "params": {
+    "angle": {
+     "label": "Winkel"
+    },
+    "color1": {
+     "label": "Farbe 1"
+    },
+    "color2": {
+     "label": "Farbe 2"
+    },
+    "count": {
+     "label": "Anzahl"
+    },
+    "edgeColor": {
+     "label": "Kantenfarbe"
+    },
+    "height": {
+     "label": "Höhe"
+    },
+    "invert": {
+     "label": "Umkehren"
+    },
+    "light": {
+     "label": "Lichtfarbe"
+    },
+    "lightAngle": {
+     "label": "Lichtwinkel"
+    },
+    "map": {
+     "label": "Höhenkarte",
+     "options": [
+      "Alpha",
+      "Luminanz"
+     ]
+    },
+    "mask": {
+     "label": "Auf Ebene maskieren"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "thickness": {
+     "label": "Dicke"
+    }
+   }
+  },
+  "countupdown": {
+   "description": "Verändert jede Zahl einer Textebene durch Multiplikation und Addition. Animierst du „Multiplizieren“ mit Keyframes von 0% bis 100%, wird bis zur eingegebenen Zahl hochgezählt. Wörter um die Zahlen bleiben unverändert.",
+   "name": "Hoch-/runterzählen",
+   "params": {
+    "add": {
+     "label": "Addieren"
+    },
+    "decimals": {
+     "label": "Dezimalstellen",
+     "options": [
+      "Wie eingegeben",
+      "0",
+      "1",
+      "2",
+      "3"
+     ]
+    },
+    "multiply": {
+     "label": "Multiplizieren"
+    },
+    "separator": {
+     "label": "Tausendertrennzeichen",
+     "options": [
+      "1000.5",
+      "1,000.5",
+      "1.000,5",
+      "1 000.5"
+     ]
+    }
+   },
+   "presets": {
+    "count-up": "Hochzählen"
+   }
+  },
+  "crop": {
+   "description": "Schneidet die Ränder der Ebene ab: Links, Oben, Rechts und Unten bestimmen, wie viel von der Breite oder Höhe jeweils entfernt wird. Rundung rundet die Ecken, Weiche Kante glättet die Ränder. Die Ebene bleibt an ihrem Platz.",
+   "name": "Zuschneiden",
+   "params": {
+    "bottom": {
+     "label": "Unten"
+    },
+    "feather": {
+     "label": "Weiche Kante"
+    },
+    "left": {
+     "label": "Links"
+    },
+    "radius": {
+     "label": "Rundung"
+    },
+    "right": {
+     "label": "Rechts"
+    },
+    "top": {
+     "label": "Oben"
+    }
+   }
+  },
+  "cross": {
+   "description": "Legt die Ebene auf drei Balken, die sich in der Mitte kreuzen.",
+   "name": "Dreiachsenkreuz",
+   "params": {
+    "light": {
+     "label": "Lichtwinkel"
+    },
+    "perspective": {
+     "label": "Perspektive"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "reach": {
+     "label": "Länge"
+    },
+    "rotX": {
+     "label": "Drehung X"
+    },
+    "rotY": {
+     "label": "Drehung Y"
+    },
+    "rotZ": {
+     "label": "Drehung Z"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "shading": {
+     "label": "Schattierung"
+    },
+    "shine": {
+     "label": "Glanz"
+    },
+    "smoothing": {
+     "label": "Glättung"
+    },
+    "thickness": {
+     "label": "Dicke"
+    }
+   }
+  },
+  "cube": {
+   "description": "Legt die Ebene auf alle Seiten eines rotierenden Würfels mit abgerundeten Kanten und Beleuchtung.",
+   "name": "Würfel",
+   "params": {
+    "edge": {
+     "label": "Größe"
+    },
+    "light": {
+     "label": "Lichtwinkel"
+    },
+    "perspective": {
+     "label": "Perspektive"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "rotX": {
+     "label": "Drehung X"
+    },
+    "rotY": {
+     "label": "Drehung Y"
+    },
+    "rotZ": {
+     "label": "Drehung Z"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "shading": {
+     "label": "Schattierung"
+    },
+    "shine": {
+     "label": "Glanz"
+    },
+    "smoothing": {
+     "label": "Glättung"
+    }
+   }
+  },
+  "curl": {
+   "description": "Rollt ein Ende der Ebene kreisförmig ein, während das andere flach bleibt. Animier den Versatz zum Ein- und Ausrollen. Eignet sich am besten für breite, schmale Ebenen.",
+   "name": "Einrollen",
+   "params": {
+    "curlFrom": {
+     "label": "Einrollen von",
+     "options": [
+      "Links",
+      "Rechts"
+     ]
+    },
+    "direction": {
+     "label": "Richtung",
+     "options": [
+      "Nach oben",
+      "Nach unten"
+     ]
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "stretch": {
+     "label": "Streckung"
+    }
+   }
+  },
+  "cylinder": {
+   "description": "Legt die Ebene um einen Zylinder und auf seine runden Stirnflächen.",
+   "name": "Zylinder",
+   "params": {
+    "height": {
+     "label": "Höhe"
+    },
+    "light": {
+     "label": "Lichtwinkel"
+    },
+    "perspective": {
+     "label": "Perspektive"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "rotX": {
+     "label": "Drehung X"
+    },
+    "rotY": {
+     "label": "Drehung Y"
+    },
+    "rotZ": {
+     "label": "Drehung Z"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "shading": {
+     "label": "Schattierung"
+    },
+    "shine": {
+     "label": "Glanz"
+    },
+    "smoothing": {
+     "label": "Glättung"
+    }
+   }
+  },
+  "darkglow": {
+   "description": "Breitet die dunklen Bereiche der Ebene über die hellen aus, wie ein Leuchten aus Schatten.",
+   "name": "Dunkles Leuchten",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blend": {
+     "label": "Mischmodus"
+    },
+    "blur": {
+     "label": "Streuung"
+    },
+    "color": {
+     "label": "Farbe"
+    },
+    "threshold": {
+     "label": "Schwellenwert"
+    }
+   }
+  },
+  "datamosh": {
+   "description": "Zwischen Start und Ende, gemessen in Sekunden ab Ebenenbeginn, wird das Bild nicht mehr aktualisiert und von der folgenden Bewegung mitgezogen, als würde ein Schlüsselbild fehlen. Videoebenen werden durch ihre tatsächliche Bewegung verzerrt, andere Ebenen durch bewegte Blöcke.",
+   "name": "Datamosh",
+   "params": {
+    "block": {
+     "label": "Blockgröße"
+    },
+    "bloom": {
+     "label": "Überstrahlen"
+    },
+    "decay": {
+     "label": "Abklingen"
+    },
+    "end": {
+     "label": "Ende"
+    },
+    "glitch": {
+     "label": "Bildstörung"
+    },
+    "intensity": {
+     "label": "Intensität"
+    },
+    "start": {
+     "label": "Start"
+    }
+   }
+  },
+  "deepglow": {
+   "description": "Ein intensives, helles Leuchten, das sich weit ausbreitet: Ein heller Kern nahe der Ebene geht sanft in einen weiten, weichen Schimmer über.",
+   "name": "Weites Leuchten",
+   "params": {
+    "blur": {
+     "label": "Radius"
+    },
+    "falloff": {
+     "label": "Abfall"
+    },
+    "high": {
+     "label": "Oberer Schwellenwert"
+    },
+    "hue": {
+     "label": "Farbtonverschiebung"
+    },
+    "intensity": {
+     "label": "Intensität"
+    },
+    "limit": {
+     "label": "Schwellenwert"
+    },
+    "low": {
+     "label": "Unterer Schwellenwert"
+    },
+    "opacity": {
+     "label": "Deckkraft des Leuchtens"
+    },
+    "original": {
+     "label": "Deckkraft des Originals"
+    },
+    "outside": {
+     "label": "Äußeres Leuchten"
+    },
+    "saturation": {
+     "label": "Sättigung"
+    },
+    "softness": {
+     "label": "Schwellenwert-Weichheit"
+    },
+    "tint": {
+     "label": "Tönungsfarbe"
+    },
+    "tintAmount": {
+     "label": "Tönung"
+    },
+    "vibrance": {
+     "label": "Dynamik"
+    }
+   }
+  },
+  "denoise": {
+   "description": "Entfernt Bildrauschen mit einem kantenerhaltenden bilateralen Filter, der benachbarte Pixel nur bei ähnlichen Farben mittelt.",
+   "name": "Entrauschen",
+   "params": {
+    "detail": {
+     "label": "Detail"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "strength": {
+     "label": "Stärke"
+    }
+   }
+  },
+  "directionalblur": {
+   "description": "Erzeugt Bewegungsunschärfe durch Mittelung von Bildpunkten entlang eines Richtungswinkels.",
+   "name": "Gerichtete Unschärfe",
+   "params": {
+    "angle": {
+     "label": "Winkel"
+    },
+    "blurLength": {
+     "label": "Länge"
+    }
+   }
+  },
+  "displacementmap": {
+   "description": "Verschiebt anhand ihrer Farben die dahinterliegenden Ebenen und blendet sich dann aus. Bei „Darunterliegende Ebene“ als Karte wird diese Ebene anhand der darunterliegenden verschoben.",
+   "name": "Versetzungskarte",
+   "params": {
+    "edges": {
+     "label": "Kanten",
+     "options": [
+      "Wiederholen",
+      "Spiegeln",
+      "Transparent",
+      "Kacheln"
+     ]
+    },
+    "fromCenter": {
+     "label": "Von der Mitte"
+    },
+    "invert": {
+     "label": "Umkehren"
+    },
+    "map": {
+     "label": "Karte",
+     "options": [
+      "Diese Ebene",
+      "Darunterliegende Ebene"
+     ]
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "xchannel": {
+     "label": "X",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
+    },
+    "ychannel": {
+     "label": "Y",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
+    }
+   }
+  },
+  "dissolve": {
+   "description": "Entfernt zufällige Pixel oder Blöcke aus der Ebene. Animier die Stärke für einen Auflöseübergang; Startwert wählt das Muster und Größe bestimmt die Größe der einzelnen Punkte.",
+   "name": "Auflösen",
+   "params": {
+    "grain": {
+     "label": "Größe"
+    },
+    "progress": {
+     "label": "Stärke"
+    },
+    "seed": {
+     "label": "Startwert"
+    }
+   }
+  },
+  "dots": {
+   "description": "Zeichnet ein zufälliges, gleichmäßiges Muster weicher Punkte über die Ebene oder verwendet die Ebene nur als Maske für die Punkte.",
+   "name": "Punkte",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blend": {
+     "label": "Mischmodus",
+     "options": [
+      "Normal",
+      "Multiplizieren",
+      "Negativ multiplizieren"
+     ]
+    },
+    "color1": {
+     "label": "Farbe 1"
+    },
+    "color2": {
+     "label": "Farbe 2"
+    },
+    "density": {
+     "label": "Dichte"
+    },
+    "feather": {
+     "label": "Weiche Kante"
+    },
+    "fill": {
+     "label": "Füllung"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "seed": {
+     "label": "Startwert"
+    },
+    "slack": {
+     "label": "Spielraum"
+    }
+   }
+  },
+  "drawingprogress": {
+   "description": "Zeichnet eine Freihandzeichnung Strich für Strich oder den Umriss einer Form von Anfang bis Ende. Animier „Ende“ mit Keyframes von 0% bis 100%, um das Zeichnen zu zeigen. Funktioniert am besten bei Formen mit Kontur und ohne Füllung.",
+   "name": "Zeichenfortschritt",
+   "params": {
+    "end": {
+     "label": "Ende"
+    },
+    "start": {
+     "label": "Start"
+    }
+   }
+  },
+  "dropshadow": {
+   "description": "Zeichnet hinter der Ebenenform einen weichen Schatten, der mit Versatz X und Versatz Y verschoben wird.",
+   "name": "Schlagschatten",
+   "params": {
+    "blur": {
+     "label": "Weichheit"
+    },
+    "color": {
+     "label": "Farbe"
+    },
+    "opacity": {
+     "label": "Deckkraft"
+    },
+    "x": {
+     "label": "Versatz X"
+    },
+    "y": {
+     "label": "Versatz Y"
+    }
+   }
+  },
+  "duotone": {
+   "description": "Wendet eine zweifarbige Verlaufskarte auf Basis der Luminanz an, mit Reglern für Kontrast und Anteil.",
+   "name": "Duoton",
+   "params": {
+    "amount": {
+     "label": "Anteil"
+    },
+    "color1": {
+     "label": "Schattenfarbe"
+    },
+    "color2": {
+     "label": "Lichterfarbe"
+    },
+    "contrast": {
+     "label": "Kontrast"
+    }
+   }
+  },
+  "echo": {
+   "description": "Zeichnet Kopien früherer Zustände der Ebene entlang ihrer Animation.",
+   "name": "Keyframe-Echo",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "composite": {
+     "label": "Zusammensetzen",
+     "options": [
+      "Dahinter",
+      "Darüber"
+     ]
+    },
+    "count": {
+     "label": "Anzahl"
+    },
+    "seconds": {
+     "label": "Sekunden"
+    }
+   }
+  },
+  "edgedetect": {
+   "description": "Zeigt helle Linien an Bildübergängen und dunkle Bereiche an allen anderen Stellen.",
+   "name": "Kantenerkennung",
+   "params": {
+    "strength": {
+     "label": "Stärke"
+    }
+   }
+  },
+  "edgeglow": {
+   "description": "Erkennt die Kanten der Ebene und lässt sie wie Neon über einem abgedunkelten Bild leuchten.",
+   "name": "Kantenleuchten",
+   "params": {
+    "blend": {
+     "label": "Mischmodus"
+    },
+    "blur": {
+     "label": "Unschärfe"
+    },
+    "brightness": {
+     "label": "Helligkeit"
+    },
+    "color": {
+     "label": "Farbe"
+    },
+    "edges": {
+     "label": "Kantenstärke"
+    },
+    "gamma": {
+     "label": "Gamma"
+    },
+    "invert": {
+     "label": "Umkehren"
+    },
+    "own": {
+     "label": "Bildfarbe"
+    },
+    "spread": {
+     "label": "Ausbreitung"
+    },
+    "threshold": {
+     "label": "Schwellenwert"
+    },
+    "tint": {
+     "label": "Tönung"
+    },
+    "tintColor": {
+     "label": "Tönungsfarbe"
+    }
+   }
+  },
+  "electricedges": {
+   "description": "Zeichnet einen knisternden, leuchtenden Umriss um die Ebene. Dicke verbreitert ihn zu einem leuchtenden Band, jeder Startwert erzeugt ein anderes Muster und ein animierter Startwert lässt es in jedem Bild knistern. Evolution lässt es fließen. Optional mit inneren Konturlinien.",
+   "name": "Elektrische Kanten",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blur": {
+     "label": "Abstand"
+    },
+    "color": {
+     "label": "Farbe"
+    },
+    "contourAngle": {
+     "label": "Konturwinkel"
+    },
+    "contours": {
+     "label": "Konturen rendern"
+    },
+    "count": {
+     "label": "Konturanzahl"
+    },
+    "detail": {
+     "label": "Detail"
+    },
+    "distortion": {
+     "label": "Verzerrung"
+    },
+    "evolution": {
+     "label": "Evolution"
+    },
+    "fill": {
+     "label": "Füllung"
+    },
+    "glow": {
+     "label": "Leuchten"
+    },
+    "glowColor": {
+     "label": "Leuchtfarbe"
+    },
+    "maskColor": {
+     "label": "Maskenfarbe"
+    },
+    "maskEvolution": {
+     "label": "Maskenentwicklung"
+    },
+    "maskScale": {
+     "label": "Maskenskalierung"
+    },
+    "maskSeed": {
+     "label": "Maskenstartwert"
+    },
+    "maskStrength": {
+     "label": "Maskenstärke"
+    },
+    "phase": {
+     "label": "Konturphase"
+    },
+    "seed": {
+     "label": "Startwert"
+    },
+    "strength": {
+     "label": "Stärke"
+    },
+    "thickness": {
+     "label": "Dicke"
+    }
+   }
+  },
+  "ellipsoid": {
+   "description": "Legt die Ebene um eine Kugel, die du stauchen und abflachen kannst.",
+   "name": "Ellipsoid",
+   "params": {
+    "flattenRatio": {
+     "label": "Abflachen"
+    },
+    "light": {
+     "label": "Lichtwinkel"
+    },
+    "perspective": {
+     "label": "Perspektive"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "rotX": {
+     "label": "Drehung X"
+    },
+    "rotY": {
+     "label": "Drehung Y"
+    },
+    "rotZ": {
+     "label": "Drehung Z"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "shading": {
+     "label": "Schattierung"
+    },
+    "shine": {
+     "label": "Glanz"
+    },
+    "squeezeRatio": {
+     "label": "Stauchen"
+    }
+   }
+  },
+  "emboss": {
+   "description": "Wendet einen Prägeeffekt anhand von Luminanzverläufen entlang eines festgelegten Lichtwinkels an.",
+   "name": "Prägen",
+   "params": {
+    "angle": {
+     "label": "Lichtwinkel"
+    },
+    "strength": {
+     "label": "Stärke"
+    }
+   }
+  },
+  "energybeam": {
+   "description": "Zeichnet zwischen zwei Punkten einen leuchtenden Strahl mit hellem Kern und weichem Lichtschein, der sich schlängeln und in die Länge wachsen kann.",
+   "name": "Energiestrahl",
+   "params": {
+    "blend": {
+     "label": "Mischmodus",
+     "options": [
+      "Addieren",
+      "Negativ multiplizieren",
+      "Normal"
+     ]
+    },
+    "color": {
+     "label": "Leuchtfarbe"
+    },
+    "dim": {
+     "label": "Hintergrund abdunkeln"
+    },
+    "evolution": {
+     "label": "Evolution"
+    },
+    "frequency": {
+     "label": "Frequenz"
+    },
+    "from": {
+     "label": "Start"
+    },
+    "glow": {
+     "label": "Leuchten"
+    },
+    "halo": {
+     "label": "Lichtschein"
+    },
+    "haloColor": {
+     "label": "Lichtscheinfarbe"
+    },
+    "haloWidth": {
+     "label": "Lichtscheinbreite"
+    },
+    "opacity": {
+     "label": "Deckkraft"
+    },
+    "progress": {
+     "label": "Fortschritt"
+    },
+    "span": {
+     "label": "Länge"
+    },
+    "to": {
+     "label": "Ende"
+    },
+    "width": {
+     "label": "Breite"
+    },
+    "wiggle": {
+     "label": "Wackeln"
+    }
+   }
+  },
+  "exposure": {
+   "description": "Simuliert fotografische Belichtung mit Blendenstufen, Versatz und Gammakorrektur. „Transparente Bereiche aufhellen“ lässt halbtransparente Pixel, etwa an einer unscharfen Kante, über Weiß hinaus aufhellen.",
+   "name": "Belichtung",
+   "params": {
+    "gamma": {
+     "label": "Gamma"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "soft": {
+     "label": "Transparente Bereiche aufhellen"
+    },
+    "stops": {
+     "label": "Blendenstufen"
+    }
+   }
+  },
+  "fade": {
+   "description": "Blendet die Ebene zu Beginn ein und am Ende wieder aus, jeweils über die eingestellte Dauer.",
+   "name": "Ein-/Ausblenden",
+   "params": {
+    "fadeIn": {
+     "label": "Ein"
+    },
+    "fadeOut": {
+     "label": "Aus"
+    }
+   }
+  },
+  "feather": {
+   "description": "Macht die Alphakanten der Ebene weich. „Nach innen“ blendet innerhalb des bestehenden Umrisses aus; „Alpha weichzeichnen“ breitet die weiche Kante auch nach außen aus.",
+   "name": "Weiche Kante",
+   "params": {
+    "blur": {
+     "label": "Stärke"
+    },
+    "mode": {
+     "label": "Kanten",
+     "options": [
+      "Nach innen",
+      "Alpha weichzeichnen"
+     ]
+    }
+   }
+  },
+  "fillbehind": {
+   "description": "Füllt das Bild hinter der Ebene mit einer vergrößerten, unscharfen Kopie von ihr, ideal für ein Hochformatvideo in einem Querformatprojekt.",
+   "name": "Hintergrund füllen",
+   "params": {
+    "bgAlpha": {
+     "label": "Hintergrund-Alpha"
+    },
+    "bgOffset": {
+     "label": "Hintergrundversatz"
+    },
+    "bgScale": {
+     "label": "Hintergrundskalierung"
+    },
+    "blur": {
+     "label": "Stärke"
+    },
+    "brightness": {
+     "label": "Helligkeit"
+    },
+    "edgeColor": {
+     "label": "Kantenfarbe"
+    },
+    "edgeStrength": {
+     "label": "Kantenstärke"
+    },
+    "feather": {
+     "label": "Weiche Kante"
+    },
+    "fgAlpha": {
+     "label": "Vordergrund-Alpha"
+    },
+    "fgOffset": {
+     "label": "Vordergrundversatz"
+    },
+    "fgScale": {
+     "label": "Vordergrundskalierung"
+    },
+    "gamma": {
+     "label": "Gamma"
+    },
+    "saturation": {
+     "label": "Sättigung"
+    },
+    "scanCount": {
+     "label": "Scanlinien-Anzahl"
+    },
+    "scanStrength": {
+     "label": "Scanlinien-Stärke"
+    },
+    "tint": {
+     "label": "Tönung"
+    },
+    "tintColor": {
+     "label": "Tönungsfarbe"
+    }
+   }
+  },
+  "filmgrain": {
+   "description": "Animiertes monochromes Filmkorn mit einstellbarem Anteil, Korngröße und Animationsgeschwindigkeit.",
+   "name": "Filmkorn",
+   "params": {
+    "amount": {
+     "label": "Anteil"
+    },
+    "grainSize": {
+     "label": "Korngröße"
+    },
+    "speed": {
+     "label": "Geschwindigkeit"
+    }
+   }
+  },
+  "flicker": {
+   "description": "Lässt die Deckkraft der Ebene zufällig flackern.",
+   "name": "Flackern",
+   "params": {
+    "intensity": {
+     "label": "Stärke"
+    },
+    "seed": {
+     "label": "Startwert"
+    },
+    "speed": {
+     "label": "Frequenz"
+    },
+    "style": {
+     "label": "Modus",
+     "options": [
+      "Blinken",
+      "Gleichmäßig"
+     ]
+    }
+   }
+  },
+  "flip": {
+   "description": "Dreht die Ebene wie eine Karte in 3D, deren Rückseite transparent, ein Bild oder eine Farbe ist.",
+   "name": "Ebene umdrehen",
+   "params": {
+    "axis": {
+     "label": "Achse"
+    },
+    "back": {
+     "label": "Rückseite",
+     "options": [
+      "Transparent",
+      "Bild",
+      "Farbe"
+     ]
+    },
+    "backColor": {
+     "label": "Rückseitenfarbe"
+    },
+    "light": {
+     "label": "Lichtwinkel"
+    },
+    "perspective": {
+     "label": "Perspektive"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "rotX": {
+     "label": "Drehung X"
+    },
+    "rotY": {
+     "label": "Drehung Y"
+    },
+    "rotZ": {
+     "label": "Drehung Z"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "shading": {
+     "label": "Schattierung"
+    },
+    "shine": {
+     "label": "Glanz"
+    }
+   }
+  },
+  "fontweight": {
+   "description": "Bestimmt die Strichstärke der Buchstaben von dünn bis fett und lässt sich mit Keyframes animieren. Funktioniert mit variablen Schriftarten, die alle Stärken in einer Datei enthalten: Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display und Dancing Script aus der Schriftartenliste oder einer importierten variablen Schriftart. Schriftarten mit festen Stärken behalten ihr Aussehen.",
+   "name": "Schriftstärke",
+   "params": {
+    "weight": {
+     "label": "Stärke"
+    }
+   }
+  },
+  "fourcolor": {
+   "description": "Mischt vier Farben an vier Punkten über die Ebene; ihre Position wird in Pixeln von der Ebenenmitte aus angegeben.",
+   "name": "Vierfarbverlauf",
+   "params": {
+    "blend": {
+     "label": "Mischmodus",
+     "options": [
+      "Normal",
+      "Multiplizieren",
+      "Negativ multiplizieren",
+      "Ineinanderkopieren",
+      "Weiches Licht",
+      "Hartes Licht",
+      "Addieren",
+      "Abdunkeln",
+      "Aufhellen",
+      "Differenz",
+      "Farbig abwedeln",
+      "Farbig nachbelichten"
+     ]
+    },
+    "color1": {
+     "label": "Farbe 1"
+    },
+    "color2": {
+     "label": "Farbe 2"
+    },
+    "color3": {
+     "label": "Farbe 3"
+    },
+    "color4": {
+     "label": "Farbe 4"
+    },
+    "corner": {
+     "label": "Eckversätze"
+    },
+    "opacity": {
+     "label": "Deckkraft"
+    },
+    "point1": {
+     "label": "Punkt 1"
+    },
+    "point2": {
+     "label": "Punkt 2"
+    },
+    "point3": {
+     "label": "Punkt 3"
+    },
+    "point4": {
+     "label": "Punkt 4"
+    },
+    "softness": {
+     "label": "Weichheit"
+    }
+   }
+  },
+  "fractalridges": {
+   "description": "Füllt die deckenden Bereiche der Ebene mit scharfen, turbulenten Graten aus fraktalem Rauschen.",
+   "name": "Fraktale Grate",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "color1": {
+     "label": "Farbe 1"
+    },
+    "color2": {
+     "label": "Farbe 2"
+    },
+    "evolution": {
+     "label": "Evolution"
+    },
+    "intensity": {
+     "label": "Intensität"
+    },
+    "octaves": {
+     "label": "Oktaven"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "seed": {
+     "label": "Startwert"
+    },
+    "stretch": {
+     "label": "Streckung"
+    }
+   }
+  },
+  "fractalwarp": {
+   "description": "Verformt die Ebene mit gefaltetem fraktalem Rauschen für Feuer, Wasser und Hitzeflimmern.",
+   "name": "Fraktale Verformung",
+   "params": {
+    "complexity": {
+     "label": "Komplexität"
+    },
+    "evolution": {
+     "label": "Evolution"
+    },
+    "intensity": {
+     "label": "Intensität"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "parallax": {
+     "label": "Parallaxe"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "screenSpace": {
+     "label": "Bildschirmraum"
+    },
+    "seed": {
+     "label": "Zufallswert"
+    },
+    "strength": {
+     "label": "Stärke"
+    }
+   }
+  },
+  "fracture3d": {
+   "description": "Zerbricht die Ebene in bewegte 3D-Scherben.",
+   "name": "3D-Zerbrechen",
+   "params": {
+    "depthPush": {
+     "label": "Tiefenverschiebung"
+    },
+    "direction": {
+     "label": "Richtung"
+    },
+    "fade": {
+     "label": "Ausblenden"
+    },
+    "force": {
+     "label": "Kraft"
+    },
+    "gravity": {
+     "label": "Schwerkraft"
+    },
+    "impact": {
+     "label": "Aufprallpunkt"
+    },
+    "intensity": {
+     "label": "Lichtintensität"
+    },
+    "light": {
+     "label": "Lichtrichtung"
+    },
+    "pieces": {
+     "label": "Teile"
+    },
+    "progress": {
+     "label": "Fortschritt"
+    },
+    "seed": {
+     "label": "Zufallswert"
+    },
+    "spin": {
+     "label": "Drehung"
+    },
+    "spread": {
+     "label": "Richtungsstreuung"
+    },
+    "thickness": {
+     "label": "Dicke"
+    }
+   }
+  },
+  "fringeclean": {
+   "description": "Entzieht den Pixeln am Maskenrand die Farbe, sodass Farbsäume vom Keying grau werden, während bis zu drei geschützte Farben erhalten bleiben.",
+   "name": "Maskenrand",
+   "params": {
+    "blur": {
+     "label": "Dicke"
+    },
+    "color1": {
+     "label": "Farbe 1 erhalten"
+    },
+    "color2": {
+     "label": "Farbe 2 erhalten"
+    },
+    "color3": {
+     "label": "Farbe 3 erhalten"
+    },
+    "feather": {
+     "label": "Weiche Kante"
+    },
+    "threshold1": {
+     "label": "Bereich 1"
+    },
+    "threshold2": {
+     "label": "Bereich 2"
+    },
+    "threshold3": {
+     "label": "Bereich 3"
+    }
+   }
+  },
+  "glass": {
+   "description": "Verwandelt die Form der Ebene in abgeschrägtes Glas, das die Ebenen dahinter bricht und am Rand glänzt.",
+   "name": "Glas",
+   "params": {
+    "angle": {
+     "label": "Lichtwinkel"
+    },
+    "blur": {
+     "label": "Abschrägung"
+    },
+    "color": {
+     "label": "Farbe"
+    },
+    "highlight": {
+     "label": "Glanzlicht"
+    },
+    "refraction": {
+     "label": "Lichtbrechung"
+    },
+    "tint": {
+     "label": "Tönung"
+    }
+   }
+  },
+  "glitch": {
+   "description": "Verschiebt Blöcke horizontal und Farbkanäle zufällig, wobei sich das Muster mehrmals pro Sekunde ändert.",
+   "name": "Glitch",
+   "params": {
+    "blockHeight": {
+     "label": "Blockhöhe"
+    },
+    "intensity": {
+     "label": "Intensität"
+    },
+    "seed": {
+     "label": "Zufallswert"
+    }
+   }
+  },
+  "glow": {
+   "description": "Erzeugt einen einfarbigen Lichtschein um die Form der Ebene. Mit Härte wird aus dem weichen Verlauf eine feste Kontur.",
+   "name": "Leuchten",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blendMode": {
+     "label": "Mischmodus",
+     "options": [
+      "Normal",
+      "Multiplizieren",
+      "Negativ multiplizieren"
+     ]
+    },
+    "color": {
+     "label": "Farbe"
+    },
+    "hardness": {
+     "label": "Härte"
+    },
+    "radius": {
+     "label": "Radius"
+    }
+   }
+  },
+  "glowscan": {
+   "description": "Macht nur Ebenenbereiche innerhalb eines Helligkeitsbereichs weich und lässt sie leuchten; animiere Position, um das Leuchten von den Schatten zu den Lichtern zu bewegen.",
+   "name": "Leuchtscan",
+   "params": {
+    "blur": {
+     "label": "Weichzeichnen"
+    },
+    "color": {
+     "label": "Leuchtfarbe"
+    },
+    "intensity": {
+     "label": "Intensität"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "show": {
+     "label": "Nur Bereich anzeigen"
+    },
+    "softness": {
+     "label": "Weichheit"
+    },
+    "width": {
+     "label": "Breite"
+    }
+   }
+  },
+  "gradientmap": {
+   "description": "Färbt das Bild anhand seiner Helligkeit mit drei Farben, Wiederholungen und einer Phase um. Helligkeit skalieren multipliziert das Ergebnis mit der Helligkeit des Bildes.",
+   "name": "Verlaufsumsetzung",
+   "params": {
+    "color1": {
+     "label": "Schatten"
+    },
+    "color2": {
+     "label": "Mitteltöne"
+    },
+    "color3": {
+     "label": "Lichter"
+    },
+    "opacity": {
+     "label": "Deckkraft"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "repeat": {
+     "label": "Wiederholen"
+    },
+    "reverse": {
+     "label": "Umkehren"
+    },
+    "saturation": {
+     "label": "Sättigung"
+    },
+    "scaleBrightness": {
+     "label": "Helligkeit skalieren"
+    }
+   }
+  },
+  "gradientoverlay": {
+   "description": "Legt einen zweifarbigen Verlauf mit wählbarer Form und Mischmodus über die Ebene.",
+   "name": "Verlaufsüberlagerung",
+   "params": {
+    "angle": {
+     "label": "Winkel"
+    },
+    "blend": {
+     "label": "Mischmodus",
+     "options": [
+      "Normal",
+      "Multiplizieren",
+      "Negativ multiplizieren",
+      "Überlagern",
+      "Weiches Licht",
+      "Hartes Licht",
+      "Addieren",
+      "Abdunkeln",
+      "Aufhellen",
+      "Differenz",
+      "Farbig abwedeln",
+      "Farbig nachbelichten"
+     ]
+    },
+    "color1": {
+     "label": "Farbe 1"
+    },
+    "color2": {
+     "label": "Farbe 2"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "opacity": {
+     "label": "Deckkraft"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "shape": {
+     "label": "Form",
+     "options": [
+      "Linear",
+      "Radial",
+      "Gespiegelt",
+      "Winkel"
+     ]
+    },
+    "style": {
+     "label": "Länge",
+     "options": [
+      "Rechteck",
+      "Oval"
+     ]
+    }
+   }
+  },
+  "grid": {
+   "description": "Zeichnet Rasterlinien über die deckenden Teile der Ebene oder schneidet sie daraus aus.",
+   "name": "Raster",
+   "params": {
+    "angle": {
+     "label": "Winkel"
+    },
+    "color": {
+     "label": "Farbe"
+    },
+    "count": {
+     "label": "Anzahl"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "punch": {
+     "label": "Ausschneiden"
+    },
+    "stretch": {
+     "label": "Streckung"
+    },
+    "width": {
+     "label": "Breite"
+    }
+   }
+  },
+  "gridrepeat": {
+   "description": "Erzeugt dynamisch mehrere Kopien der Ebene und ordnet sie in einem Raster an.",
+   "name": "Rasterwiederholung",
+   "params": {
+    "copyDelay": {
+     "label": "Verzögerung pro Kopie"
+    },
+    "count": {
+     "label": "Anzahl"
+    },
+    "easing": {
+     "label": "Easing",
+     "options": [
+      "Linear",
+      "Langsam beginnen",
+      "Langsam enden",
+      "Langsam beginnen und enden"
+     ]
+    },
+    "fillAmount": {
+     "label": "Füllstärke"
+    },
+    "fillColor": {
+     "label": "Füllfarbe"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "randomOpacity": {
+     "label": "Zufällige Deckkraft"
+    },
+    "randomOrder": {
+     "label": "Zufällige Reihenfolge"
+    },
+    "randomPosition": {
+     "label": "Zufällige Position"
+    },
+    "randomRotation": {
+     "label": "Zufällige Drehung"
+    },
+    "randomScale": {
+     "label": "Zufällige Skalierung"
+    },
+    "rangeEnd": {
+     "label": "Bereichsende"
+    },
+    "rangeOffset": {
+     "label": "Bereichsversatz"
+    },
+    "rangeOpacity": {
+     "label": "Bereichsdeckkraft"
+    },
+    "rangePosition": {
+     "label": "Bereichsposition"
+    },
+    "rangeRotation": {
+     "label": "Bereichsdrehung"
+    },
+    "rangeScale": {
+     "label": "Bereichsskalierung"
+    },
+    "rangeStart": {
+     "label": "Bereichsanfang"
+    },
+    "seed": {
+     "label": "Zufallswert"
+    },
+    "stagger": {
+     "label": "Versatz"
+    }
+   }
+  },
+  "grunge": {
+   "description": "Verleiht der Ebene mit Körnung, Schmutzflecken, verbrannten Rändern und staubiger Tönung einen abgenutzten Look.",
+   "name": "Grunge",
+   "params": {
+    "blotches": {
+     "label": "Schmutz"
+    },
+    "burn": {
+     "label": "Verbrannte Ränder"
+    },
+    "color": {
+     "label": "Tönungsfarbe"
+    },
+    "grain": {
+     "label": "Körnung"
+    },
+    "scale": {
+     "label": "Schmutzgröße"
+    },
+    "seed": {
+     "label": "Zufallswert"
+    },
+    "strength": {
+     "label": "Stärke"
+    },
+    "tint": {
+     "label": "Tönung"
+    }
+   }
+  },
+  "halftone": {
+   "description": "Erzeugt Druckpunkte, die in dunklen Bildbereichen größer werden.",
+   "name": "Halbton",
+   "params": {
+    "angle": {
+     "label": "Winkel"
+    },
+    "cell": {
+     "label": "Größe"
+    },
+    "colored": {
+     "label": "Farbpunkte"
+    },
+    "ink": {
+     "label": "Punktfarbe"
+    },
+    "paper": {
+     "label": "Papierfarbe"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Zweifarbig"
+     ]
+    }
+   }
+  },
+  "halftonelines": {
+   "description": "Stellt die Ebene als gedruckte Linien dar, die in dunklen Bereichen dicker und in hellen dünner sind.",
+   "name": "Halbtonlinien",
+   "params": {
+    "amount": {
+     "label": "Stärke"
+    },
+    "angle": {
+     "label": "Winkel"
+    },
+    "color1": {
+     "label": "Farbe 1"
+    },
+    "color2": {
+     "label": "Farbe 2"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "strength": {
+     "label": "Stärke"
+    }
+   }
+  },
+  "heart": {
+   "description": "Schneidet die Ebene zu einem gewölbten Herz zu.",
+   "name": "Herz",
+   "params": {
+    "depth": {
+     "label": "Tiefe"
+    },
+    "heartSize": {
+     "label": "Größe"
+    },
+    "light": {
+     "label": "Lichtwinkel"
+    },
+    "perspective": {
+     "label": "Perspektive"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "rotX": {
+     "label": "Drehung X"
+    },
+    "rotY": {
+     "label": "Drehung Y"
+    },
+    "rotZ": {
+     "label": "Drehung Z"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "shading": {
+     "label": "Schattierung"
+    },
+    "shine": {
+     "label": "Glanz"
+    },
+    "smoothing": {
+     "label": "Glättung"
+    }
+   }
+  },
+  "hexagontilerotate": {
+   "description": "Teilt die Ebene in sechseckige Kacheln und dreht das Bild in jeder Kachel einzeln.",
+   "name": "Sechseckkacheln drehen",
+   "params": {
+    "angle": {
+     "label": "Winkel"
+    },
+    "count": {
+     "label": "Anzahl"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "random": {
+     "label": "Zufällig"
+    },
+    "rotation": {
+     "label": "Drehung"
+    },
+    "seed": {
+     "label": "Zufallswert"
+    }
+   }
+  },
+  "hexagontileshift": {
+   "description": "Teilt die Ebene in sechseckige Kacheln und verschiebt das Bild in jeder Kachel in eine zufällige Richtung.",
+   "name": "Sechseckkacheln verschieben",
+   "params": {
+    "angle": {
+     "label": "Winkel"
+    },
+    "count": {
+     "label": "Anzahl"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "seed": {
+     "label": "Zufallswert"
+    },
+    "strength": {
+     "label": "Stärke"
+    }
+   }
+  },
+  "hexagontiling": {
+   "description": "Wiederholt die Mitte der Ebene in sechseckigen Kacheln, die den Bildschirm füllen.",
+   "name": "Sechseckkacheln",
+   "params": {
+    "angle": {
+     "label": "Winkel"
+    },
+    "mirror": {
+     "label": "Spiegeln"
+    },
+    "scale": {
+     "label": "Skalierung"
+    }
+   }
+  },
+  "hexgrid": {
+   "description": "Bedeckt die Ebene mit einem Raster aus Sechsecken in bis zu drei Farben, mit weichen Kanten und Abständen dazwischen.",
+   "name": "Sechseckraster",
+   "params": {
+    "angle": {
+     "label": "Winkel"
+    },
+    "blend": {
+     "label": "Mischmodus",
+     "options": [
+      "Normal",
+      "Multiplizieren",
+      "Negativ multiplizieren",
+      "Überlagern",
+      "Weiches Licht",
+      "Hartes Licht",
+      "Addieren",
+      "Abdunkeln",
+      "Aufhellen",
+      "Differenz",
+      "Farbig abwedeln",
+      "Farbig nachbelichten"
+     ]
+    },
+    "cell": {
+     "label": "Größe"
+    },
+    "color1": {
+     "label": "Farbe 1"
+    },
+    "color2": {
+     "label": "Farbe 2"
+    },
+    "color3": {
+     "label": "Farbe 3"
+    },
+    "colors": {
+     "label": "Farben",
+     "options": [
+      "Eins",
+      "Zwei",
+      "Drei"
+     ]
+    },
+    "feather": {
+     "label": "Weiche Kante"
+    },
+    "gap": {
+     "label": "Abstand"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "opacity": {
+     "label": "Deckkraft"
+    },
+    "stretch": {
+     "label": "Streckung"
+    }
+   }
+  },
+  "hexprism": {
+   "description": "Legt die Ebene auf die Vorder- und Rückseite eines sechsseitigen Prismas.",
+   "name": "Sechseckprisma",
+   "params": {
+    "depth": {
+     "label": "Tiefe"
+    },
+    "light": {
+     "label": "Lichtwinkel"
+    },
+    "perspective": {
+     "label": "Perspektive"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "rotX": {
+     "label": "Drehung X"
+    },
+    "rotY": {
+     "label": "Drehung Y"
+    },
+    "rotZ": {
+     "label": "Drehung Z"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "shading": {
+     "label": "Schattierung"
+    },
+    "shine": {
+     "label": "Glanz"
+    },
+    "smoothing": {
+     "label": "Glättung"
+    }
+   }
+  },
+  "highlightshadow": {
+   "description": "Stellt helle Lichter wieder her oder verstärkt sie und hellt dunkle Schatten auf oder vertieft sie, abhängig von der Helligkeit jedes Pixels.",
+   "name": "Lichter und Schatten",
+   "params": {
+    "highlights": {
+     "label": "Lichter"
+    },
+    "shadows": {
+     "label": "Schatten"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Farbe erhalten"
+     ]
+    }
+   }
+  },
+  "hollowbox": {
+   "description": "Ein oben und unten offener Kasten: Die Ebene bedeckt die Außenseite, innen erscheint die Innenfarbe.",
+   "name": "Hohler Kasten",
+   "params": {
+    "depth": {
+     "label": "Tiefe"
+    },
+    "height": {
+     "label": "Höhe"
+    },
+    "interior": {
+     "label": "Innenfarbe"
+    },
+    "light": {
+     "label": "Lichtwinkel"
+    },
+    "perspective": {
+     "label": "Perspektive"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "rotX": {
+     "label": "Drehung X"
+    },
+    "rotY": {
+     "label": "Drehung Y"
+    },
+    "rotZ": {
+     "label": "Drehung Z"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "shading": {
+     "label": "Schattierung"
+    },
+    "shine": {
+     "label": "Glanz"
+    },
+    "smoothing": {
+     "label": "Glättung"
+    },
+    "thickness": {
+     "label": "Dicke"
+    },
+    "width": {
+     "label": "Breite"
+    }
+   }
+  },
+  "hsl": {
+   "description": "Ändert Farbton, Sättigung und Helligkeit jeweils eines Farbbereichs, etwa Rot, Orange oder Grün, und lässt die anderen Farben unverändert.",
+   "name": "HSL",
+   "params": {
+    "blend": {
+     "label": "Mischmodus",
+     "options": [
+      "Normal",
+      "Multiplizieren",
+      "Negativ multiplizieren"
+     ]
+    },
+    "blueHue": {
+     "label": "Farbton"
+    },
+    "blueLightness": {
+     "label": "Helligkeit"
+    },
+    "blueSaturation": {
+     "label": "Sättigung"
+    },
+    "brightness": {
+     "label": "Helligkeit"
+    },
+    "cyanHue": {
+     "label": "Farbton"
+    },
+    "cyanLightness": {
+     "label": "Helligkeit"
+    },
+    "cyanSaturation": {
+     "label": "Sättigung"
+    },
+    "greenHue": {
+     "label": "Farbton"
+    },
+    "greenLightness": {
+     "label": "Helligkeit"
+    },
+    "greenSaturation": {
+     "label": "Sättigung"
+    },
+    "magentaHue": {
+     "label": "Farbton"
+    },
+    "magentaLightness": {
+     "label": "Helligkeit"
+    },
+    "magentaSaturation": {
+     "label": "Sättigung"
+    },
+    "opacity": {
+     "label": "Deckkraft"
+    },
+    "orangeHue": {
+     "label": "Farbton"
+    },
+    "orangeLightness": {
+     "label": "Helligkeit"
+    },
+    "orangeSaturation": {
+     "label": "Sättigung"
+    },
+    "purpleHue": {
+     "label": "Farbton"
+    },
+    "purpleLightness": {
+     "label": "Helligkeit"
+    },
+    "purpleSaturation": {
+     "label": "Sättigung"
+    },
+    "range": {
+     "label": "Farbe",
+     "options": [
+      "Rot",
+      "Orange",
+      "Gelb",
+      "Grün",
+      "Cyan",
+      "Blau",
+      "Violett",
+      "Magenta"
+     ]
+    },
+    "redHue": {
+     "label": "Farbton"
+    },
+    "redLightness": {
+     "label": "Helligkeit"
+    },
+    "redSaturation": {
+     "label": "Sättigung"
+    },
+    "yellowHue": {
+     "label": "Farbton"
+    },
+    "yellowLightness": {
+     "label": "Helligkeit"
+    },
+    "yellowSaturation": {
+     "label": "Sättigung"
+    }
+   }
+  },
+  "huesaturation": {
+   "description": "Verschiebt Farben im Farbkreis und verstärkt oder schwächt sie ab; Dynamik verstärkt vor allem blasse Farben.",
+   "name": "Farbton und Sättigung",
+   "params": {
+    "hue": {
+     "label": "Farbton"
+    },
+    "lightness": {
+     "label": "Helligkeit"
+    },
+    "saturation": {
+     "label": "Sättigung"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Helligkeit erhalten"
+     ]
+    },
+    "vibrance": {
+     "label": "Dynamik"
+    }
+   }
+  },
+  "innerblur": {
+   "description": "Zeichnet das Bild innerhalb der Ebene weich und hält die Kontur scharf.",
+   "name": "Innere Weichzeichnung",
+   "params": {
+    "blur": {
+     "label": "Stärke"
+    }
+   }
+  },
+  "innerbulge": {
+   "description": "Wölbt die Mitte der Ebene nach außen oder zieht sie nach innen, während ihre Ränder an Ort und Stelle bleiben.",
+   "name": "Innen zusammenziehen/wölben",
+   "params": {
+    "strength": {
+     "label": "Stärke"
+    }
+   }
+  },
+  "innerglow": {
+   "description": "Fügt den Innenkanten der deckenden Teile der Ebene ein Leuchten hinzu.",
+   "name": "Inneres Leuchten",
+   "params": {
+    "blur": {
+     "label": "Größe"
+    },
+    "color": {
+     "label": "Farbe"
+    },
+    "intensity": {
+     "label": "Intensität"
+    }
+   }
+  },
+  "invert": {
+   "description": "Invertiert die Farbkanäle des Bildes mit einstellbarer Stärke und optionaler Alpha-Invertierung.",
+   "name": "Invertieren",
+   "params": {
+    "amount": {
+     "label": "Stärke"
+    },
+    "invert_alpha": {
+     "label": "Alpha invertieren"
+    }
+   }
+  },
+  "iridescence": {
+   "description": "Bedeckt die deckenden Teile der Ebene mit fließendem Regenbogenglanz wie Öl auf Wasser oder einer Seifenblase.",
+   "name": "Schillern",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blend": {
+     "label": "Mischmodus",
+     "options": [
+      "Normal",
+      "Multiplizieren",
+      "Negativ multiplizieren",
+      "Überlagern",
+      "Weiches Licht",
+      "Hartes Licht",
+      "Addieren",
+      "Abdunkeln",
+      "Aufhellen",
+      "Differenz",
+      "Farbig abwedeln",
+      "Farbig nachbelichten"
+     ]
+    },
+    "evolution": {
+     "label": "Evolution"
+    },
+    "saturation": {
+     "label": "Sättigung"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "seed": {
+     "label": "Zufallswert"
+    },
+    "shift": {
+     "label": "Farbtonverschiebung"
+    }
+   }
+  },
+  "kaleidoscope": {
+   "description": "Spiegelt Segmente um einen Mittelpunkt.",
+   "name": "Kaleidoskop",
+   "params": {
+    "angle": {
+     "label": "Winkel"
+    },
+    "center": {
+     "label": "Mittelpunkt"
+    },
+    "mirror": {
+     "label": "Spiegeln"
+    },
+    "segments": {
+     "label": "Segmente"
+    }
+   }
+  },
+  "lensblur": {
+   "description": "Eine kreisende Unschärfe, die um die Mitte einen scharfen Bereich lässt und zum Rand hin zunimmt.",
+   "name": "Linsenunschärfe",
+   "params": {
+    "center": {
+     "label": "Mittelpunkt"
+    },
+    "feather": {
+     "label": "Weiche Kante"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "sweep": {
+     "label": "Winkel"
+    }
+   }
+  },
+  "lensflare": {
+   "description": "Legt ein helles Licht mit Lichtschein über das Bild.",
+   "name": "Lichtreflex",
+   "params": {
+    "brightness": {
+     "label": "Helligkeit"
+    },
+    "center": {
+     "label": "Mittelpunkt"
+    },
+    "color": {
+     "label": "Farbe"
+    },
+    "radius": {
+     "label": "Radius"
+    }
+   }
+  },
+  "levels": {
+   "description": "Passt die Tonwerte des Bildes über Schwarz- und Weißpunkt für Ein- und Ausgabe sowie Gamma an.",
+   "name": "Tonwerte",
+   "params": {
+    "gamma": {
+     "label": "Gamma"
+    },
+    "inBlack": {
+     "label": "Eingabe Schwarz"
+    },
+    "inWhite": {
+     "label": "Eingabe Weiß"
+    },
+    "outBlack": {
+     "label": "Ausgabe Schwarz"
+    },
+    "outWhite": {
+     "label": "Ausgabe Weiß"
+    }
+   }
+  },
+  "lightglow": {
+   "description": "Fügt Bildbereichen oberhalb eines Helligkeitsschwellenwerts ein farbiges Leuchten hinzu.",
+   "name": "Lichtschein",
+   "params": {
+    "blend": {
+     "label": "Mischmodus"
+    },
+    "blur": {
+     "label": "Größe"
+    },
+    "color": {
+     "label": "Farbe"
+    },
+    "intensity": {
+     "label": "Intensität"
+    },
+    "opacity": {
+     "label": "Deckkraft"
+    },
+    "threshold": {
+     "label": "Schwellenwert"
+    }
+   }
+  },
+  "lightning": {
+   "description": "Zeichnet einen verzweigten Blitz zwischen zwei Punkten auf der Ebene.",
+   "name": "Blitz",
+   "params": {
+    "color": {
+     "label": "Farbe"
+    },
+    "evolution": {
+     "label": "Evolution"
+    },
+    "from": {
+     "label": "Start"
+    },
+    "glow": {
+     "label": "Leuchten"
+    },
+    "jag": {
+     "label": "Detail"
+    },
+    "seed": {
+     "label": "Zufallswert"
+    },
+    "to": {
+     "label": "Ende"
+    },
+    "width": {
+     "label": "Breite"
+    }
+   }
+  },
+  "linearrepeat": {
+   "description": "Erzeugt dynamisch mehrere Kopien der Ebene und ordnet sie entlang einer Linie an.",
+   "name": "Lineare Wiederholung",
+   "params": {
+    "copyDelay": {
+     "label": "Verzögerung pro Kopie"
+    },
+    "count": {
+     "label": "Anzahl"
+    },
+    "easing": {
+     "label": "Easing",
+     "options": [
+      "Linear",
+      "Langsam beginnen",
+      "Langsam enden",
+      "Langsam beginnen und enden"
+     ]
+    },
+    "fillAmount": {
+     "label": "Füllstärke"
+    },
+    "fillColor": {
+     "label": "Füllfarbe"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "randomOpacity": {
+     "label": "Zufällige Deckkraft"
+    },
+    "randomOrder": {
+     "label": "Zufällige Reihenfolge"
+    },
+    "randomPosition": {
+     "label": "Zufällige Position"
+    },
+    "randomRotation": {
+     "label": "Zufällige Drehung"
+    },
+    "randomScale": {
+     "label": "Zufällige Skalierung"
+    },
+    "rangeEnd": {
+     "label": "Bereichsende"
+    },
+    "rangeOffset": {
+     "label": "Bereichsversatz"
+    },
+    "rangeOpacity": {
+     "label": "Bereichsdeckkraft"
+    },
+    "rangePosition": {
+     "label": "Bereichsposition"
+    },
+    "rangeRotation": {
+     "label": "Bereichsdrehung"
+    },
+    "rangeScale": {
+     "label": "Bereichsskalierung"
+    },
+    "rangeStart": {
+     "label": "Bereichsanfang"
+    },
+    "seed": {
+     "label": "Zufallswert"
+    }
+   }
+  },
+  "linearstreaks": {
+   "description": "Erzeugt gerade Streifen, indem Kopien der Ebene entlang eines Winkels verschoben und an Überlappungen gemischt werden.",
+   "name": "Lineare Streifen",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "angle": {
+     "label": "Winkel"
+    },
+    "bias": {
+     "label": "Gewichtung"
+    },
+    "mode": {
+     "label": "Mischmodus",
+     "options": [
+      "Aufhellen",
+      "Durchschnitt",
+      "Abdunkeln"
+     ]
+    },
+    "reach": {
+     "label": "Länge"
+    }
+   }
+  },
+  "liquidglass": {
+   "description": "Verwandelt die Form der Ebene in klares, abgerundetes Glas wie eine Handytaste: Die Ebenen dahinter werden nahe dem Rand am stärksten gebrochen, mit einer hellen Kante auf der beleuchteten Seite und einer weicheren gegenüber. Mattglas zeichnet den Hintergrund weich, Regenbogenkante spaltet die Farben am Rand auf.",
+   "name": "Flüssiges Glas",
+   "params": {
+    "angle": {
+     "label": "Lichtwinkel"
+    },
+    "blur": {
+     "label": "Kante"
+    },
+    "color": {
+     "label": "Farbe"
+    },
+    "dispersion": {
+     "label": "Regenbogenkante"
+    },
+    "frost": {
+     "label": "Mattglas"
+    },
+    "highlight": {
+     "label": "Glanzlicht"
+    },
+    "refraction": {
+     "label": "Brechung"
+    },
+    "tint": {
+     "label": "Tönung"
+    }
+   }
+  },
+  "longshadow": {
+   "description": "Wirft lange, parallele Schatten von den deckenden Teilen der Ebene.",
+   "name": "Langer Schatten",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "angle": {
+     "label": "Winkel"
+    },
+    "color": {
+     "label": "Farbe"
+    },
+    "fade": {
+     "label": "Ausblenden"
+    },
+    "reach": {
+     "label": "Länge"
+    },
+    "solidity": {
+     "label": "Deckung"
+    }
+   }
+  },
+  "lumakey": {
+   "description": "Entfernt die dunklen oder hellen Teile der Ebene.",
+   "name": "Luma Key",
+   "params": {
+    "invert": {
+     "label": "Invertieren"
+    },
+    "softness": {
+     "label": "Weichheit"
+    },
+    "threshold": {
+     "label": "Schwellenwert"
+    }
+   }
+  },
+  "lumastamp": {
+   "description": "Verwandelt die Ebene in eine Volltonfarbe, deren Deckkraft der Helligkeit jedes Pixels folgt, wie bei einem Stempel oder einer Schablone.",
+   "name": "Luma-Stempel",
+   "params": {
+    "color": {
+     "label": "Farbe"
+    },
+    "gamma": {
+     "label": "Gamma"
+    },
+    "high": {
+     "label": "Weißpunkt"
+    },
+    "invert": {
+     "label": "Invertieren"
+    },
+    "low": {
+     "label": "Schwarzpunkt"
+    }
+   }
+  },
+  "magnifybackground": {
+   "description": "Macht die Ebene zur Lupe: Ihre Form zeigt die Ebenen dahinter um ihren Mittelpunkt vergrößert an.",
+   "name": "Hintergrund vergrößern",
+   "params": {
+    "magnify": {
+     "label": "Ebene vergrößern"
+    },
+    "sampling": {
+     "label": "Abtastung",
+     "options": [
+      "Nächster Nachbar",
+      "Linear"
+     ]
+    },
+    "scale": {
+     "label": "Skalierung"
+    }
+   }
+  },
+  "maskblur": {
+   "description": "Zeichnet die Ebenen dahinter innerhalb ihrer Form weich; hellere Teile der Ebene zeichnen stärker weich, sodass ein Verlauf einen Tilt-Shift-Effekt erzeugt.",
+   "name": "Maskenweichzeichnung",
+   "params": {
+    "invert": {
+     "label": "Invertieren"
+    },
+    "strength": {
+     "label": "Stärke"
+    }
+   }
+  },
+  "mattechoker": {
+   "description": "Verkleinert die deckenden Teile der Ebene von ihren Rändern aus.",
+   "name": "Maske verkleinern",
+   "params": {
+    "amount": {
+     "label": "Verkleinerung"
+    },
+    "blur": {
+     "label": "Größe"
+    },
+    "invert": {
+     "label": "Invertieren"
+    },
+    "softness": {
+     "label": "Weichheit"
+    }
+   }
+  },
+  "mirror": {
+   "description": "Spiegelt eine Bildhälfte an einer durch Winkel und Mittelpunkt definierten Achse.",
+   "name": "Spiegeln",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "angle": {
+     "label": "Winkel"
+    },
+    "center": {
+     "label": "Mittelpunkt"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Falten",
+      "Umklappen"
+     ]
+    }
+   }
+  },
+  "mosaic": {
+   "description": "Teilt die Ebene in Quadrate und füllt jedes mit seiner Durchschnittsfarbe.",
+   "name": "Mosaik",
+   "params": {
+    "count": {
+     "label": "Anzahl"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "stretch": {
+     "label": "Streckung"
+    }
+   }
+  },
+  "motionblur": {
+   "description": "Zeichnet die Ebene entlang ihrer Bewegung, Drehung und Skalierung weich, anhand ihrer Keyframes und Bewegungseffekte wie automatischem Schütteln und Oszillieren. Stärke skaliert die Unschärfe. Die Vorschau zeigt eine schnellere Weichzeichnung, sofern Volle Weichzeichnung nicht aktiviert ist.",
+   "name": "Bewegungsunschärfe",
+   "params": {
+    "position": {
+     "label": "Position"
+    },
+    "rotation": {
+     "label": "Winkel"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "tune": {
+     "label": "Stärke"
+    }
+   }
+  },
+  "movealongpath": {
+   "description": "Platziert die Ebene auf der Kontur der Ebene direkt darunter.",
+   "name": "Entlang Pfad bewegen",
+   "params": {
+    "inset": {
+     "label": "Nach innen/außen"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "orientation": {
+     "label": "Ausrichtung"
+    },
+    "progress": {
+     "label": "Fortschritt"
+    },
+    "rotate": {
+     "label": "Automatisch drehen"
+    }
+   }
+  },
+  "noise": {
+   "description": "Bedeckt die Ebene mit feiner Körnung, einem Korn pro Pixel, die sich mit jedem Bild ändert. Monochrom färbt die Körnung grau, Extreme macht jedes Korn ganz hell oder dunkel und Einfrieren hält das Muster an.",
+   "name": "Rauschen",
+   "params": {
+    "amount": {
+     "label": "Stärke"
+    },
+    "extremes": {
+     "label": "Extreme"
+    },
+    "freeze": {
+     "label": "Einfrieren"
+    },
+    "mono": {
+     "label": "Monochrom"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "overshoot": {
+     "label": "Überschwingen"
+    }
+   }
+  },
+  "noisedisplace": {
+   "description": "Verschiebt Pixel mit weichem Werterauschen, das sich über die Zeit verändert.",
+   "name": "Rauschverschiebung",
+   "params": {
+    "amount": {
+     "label": "Stärke"
+    },
+    "scale": {
+     "label": "Rauschskalierung"
+    },
+    "speed": {
+     "label": "Animationsgeschwindigkeit"
+    }
+   }
+  },
+  "octahedron": {
+   "description": "Legt die Ebene auf die acht Flächen eines Oktaeders.",
+   "name": "Oktaeder",
+   "params": {
+    "light": {
+     "label": "Lichtwinkel"
+    },
+    "perspective": {
+     "label": "Perspektive"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "rotX": {
+     "label": "Rotation X"
+    },
+    "rotY": {
+     "label": "Rotation Y"
+    },
+    "rotZ": {
+     "label": "Rotation Z"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "shading": {
+     "label": "Schattierung"
+    },
+    "shine": {
+     "label": "Glanz"
+    }
+   }
+  },
+  "offset": {
+   "description": "Verschiebt das Bild der Ebene und setzt es an den Rändern gegenüberliegend fort.",
+   "name": "Versatz",
+   "params": {
+    "feather": {
+     "label": "Weiche Kante"
+    },
+    "mask": {
+     "label": "Auf Ebene maskieren"
+    },
+    "offset": {
+     "label": "Versatz"
+    }
+   }
+  },
+  "ominodiffusion": {
+   "description": "Zeichnet die Ebene mit einer kleinen Palette neu und verschiebt den Rundungsfehler in eine Richtung. So entsteht ein gerasterter Glitch-Look, der in Bewegung lebendig wird.",
+   "name": "Omino Diffusion+",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "angle": {
+     "label": "Winkel"
+    },
+    "blend": {
+     "label": "Mischmodus",
+     "options": [
+      "Normal",
+      "Multiplizieren",
+      "Negativ multiplizieren"
+     ]
+    },
+    "color1": {
+     "label": "Farbe 1"
+    },
+    "color2": {
+     "label": "Farbe 2"
+    },
+    "color3": {
+     "label": "Farbe 3"
+    },
+    "color4": {
+     "label": "Farbe 4"
+    },
+    "color5": {
+     "label": "Farbe 5"
+    },
+    "color6": {
+     "label": "Farbe 6"
+    },
+    "falloff": {
+     "label": "Gewichtungsabnahme"
+    },
+    "palette": {
+     "label": "Palette",
+     "options": [
+      "Schwarz/Weiß",
+      "RGB-Tontrennung (2 Stufen)",
+      "RGB-Tontrennung (3 Stufen)",
+      "RGB-Tontrennung (4 Stufen)",
+      "Grau (3 Stufen)",
+      "Grau (4 Stufen)",
+      "CGA Grün/Rot/Gelb",
+      "CGA Cyan/Magenta/Weiß",
+      "CGA Blau/Cyan/Magenta/Weiß",
+      "Sättigen und Tontrennung",
+      "Eigene 2 Farben",
+      "Eigene 3 Farben",
+      "Eigene 4 Farben",
+      "Eigene 5 Farben",
+      "Eigene 6 Farben"
+     ]
+    },
+    "steps": {
+     "label": "Stufen"
+    },
+    "strength": {
+     "label": "Stärke"
+    },
+    "weight": {
+     "label": "Fehlergewichtung"
+    }
+   }
+  },
+  "ominoglass": {
+   "description": "Erzeugt Glas aus der Helligkeit der Ebene: Es bricht den Hintergrund mit Regenbogenrändern und beleuchtet die Oberfläche wie eine Linse.",
+   "name": "Omino Glas",
+   "params": {
+    "aberration": {
+     "label": "Chromatische Aberration"
+    },
+    "ambient": {
+     "label": "Umgebungslicht"
+    },
+    "amount": {
+     "label": "Rauheit"
+    },
+    "blend": {
+     "label": "Überblendung"
+    },
+    "blur": {
+     "label": "Abschrägung"
+    },
+    "color": {
+     "label": "Farbe"
+    },
+    "direction": {
+     "label": "Richtung"
+    },
+    "elevation": {
+     "label": "Höhenwinkel"
+    },
+    "evolution": {
+     "label": "Entwicklung"
+    },
+    "feature": {
+     "label": "Strukturgröße"
+    },
+    "intensity": {
+     "label": "Intensität"
+    },
+    "light": {
+     "label": "Lichtfarbe"
+    },
+    "refraction": {
+     "label": "Lichtbrechung"
+    },
+    "samples": {
+     "label": "Glättungs-Samples"
+    },
+    "scale": {
+     "label": "Rauheitsskalierung"
+    },
+    "seed": {
+     "label": "Zufallswert"
+    },
+    "shading": {
+     "label": "Schattierung",
+     "options": [
+      "Keine",
+      "Punktlicht",
+      "Gerichtetes Licht"
+     ]
+    },
+    "shine": {
+     "label": "Glanz"
+    },
+    "specularity": {
+     "label": "Spiegelglanz"
+    },
+    "useLuma": {
+     "label": "Luminanz der Ebene verwenden"
+    }
+   }
+  },
+  "oscillate": {
+   "description": "Bewegt die Ebene entlang eines Winkels oder in der Tiefe hin und her oder auf einer Kreisbahn.",
+   "name": "Oszillieren",
+   "params": {
+    "angle": {
+     "label": "Winkel"
+    },
+    "direction": {
+     "label": "Richtung",
+     "options": [
+      "Winkel",
+      "Tiefe",
+      "Kreisbahn"
+     ]
+    },
+    "frequency": {
+     "label": "Frequenz"
+    },
+    "magnitude": {
+     "label": "Auslenkung"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "wave": {
+     "label": "Welle",
+     "options": [
+      "Sinus",
+      "Dreieck"
+     ]
+    }
+   }
+  },
+  "palettemap": {
+   "description": "Ordnet jedem Pixel die nächste Farbe einer Palette zu: bis zu acht selbst gewählte Farben oder eine Palette mit bis zu 512 Farben aus einer Voreinstellung oder importierten Datei. Rastermuster mischen benachbarte Palettenfarben für mehr Farbtöne. Alpha überblendet die zugeordneten Farben mit der ursprünglichen Ebene.",
+   "name": "Palettenzuordnung",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "color1": {
+     "label": "Farbe 1"
+    },
+    "color2": {
+     "label": "Farbe 2"
+    },
+    "color3": {
+     "label": "Farbe 3"
+    },
+    "color4": {
+     "label": "Farbe 4"
+    },
+    "color5": {
+     "label": "Farbe 5"
+    },
+    "color6": {
+     "label": "Farbe 6"
+    },
+    "color7": {
+     "label": "Farbe 7"
+    },
+    "color8": {
+     "label": "Farbe 8"
+    },
+    "colors": {
+     "label": "Farben"
+    },
+    "dither": {
+     "label": "Rasterung"
+    },
+    "palette": {
+     "label": "Palette"
+    },
+    "pattern": {
+     "label": "Rastermuster",
+     "options": [
+      "Keine",
+      "Rauschen",
+      "Schachbrett",
+      "Bayer 2x2",
+      "Bayer 3x3",
+      "Bayer 4x4",
+      "Bayer 8x8",
+      "Punktcluster 4x4",
+      "Punktcluster 8x8",
+      "Horizontale Linien",
+      "Vertikale Linien",
+      "Diagonale Linien",
+      "Floyd-Steinberg",
+      "Falsches Floyd-Steinberg",
+      "Sierra Lite",
+      "Fan",
+      "Shiau-Fan",
+      "Jarvis-Judice-Ninke",
+      "Stucki",
+      "Burkes",
+      "Sierra",
+      "Zweizeiliges Sierra",
+      "Atkinson"
+     ]
+    },
+    "source": {
+     "label": "Farben aus",
+     "options": [
+      "Farben",
+      "Palette"
+     ]
+    }
+   }
+  },
+  "parenthelper": {
+   "description": "Ändert, wie eine untergeordnete Ebene ihrer übergeordneten Ebene folgt: Skalierung und Rotation können vollständig, gar nicht oder anteilig folgen. Automatisch drehen dreht die Ebene bei Bewegung wie ein rollendes Rad.",
+   "name": "Verknüpfungshilfe",
+   "params": {
+    "autoRotate": {
+     "label": "Automatisch drehen",
+     "options": [
+      "Aus",
+      "X-Achse",
+      "Y-Achse"
+     ]
+    },
+    "radiusAdjust": {
+     "label": "Radiusanpassung"
+    },
+    "rotateMode": {
+     "label": "Rotation",
+     "options": [
+      "Normal",
+      "Gesperrt",
+      "Gewichtet"
+     ]
+    },
+    "rotateWeight": {
+     "label": "Rotationsgewichtung"
+    },
+    "scaleMode": {
+     "label": "Skalierung",
+     "options": [
+      "Normal",
+      "Gesperrt",
+      "Gewichtet"
+     ]
+    },
+    "scaleWeight": {
+     "label": "Skalierungsgewichtung"
+    }
+   }
+  },
+  "particles": {
+   "description": "Lässt Partikel aus der Ebene fliegen: Schnee, Funken, Konfetti, Blasen, Staub, Herzen, Sterne, Blütenblätter oder kleine Kopien der Ebene, bewegt durch Schwerkraft, Wind und Wirbel. Beginne mit einer Voreinstellung und ändere dann Emitter, Menge und Kräfte. Bei Beats erzeugt bei jedem Beat einen Ausstoß: Wähle zuerst deine Musik, öffne ihr Menü und tippe auf Beats markieren.",
+   "name": "Partikel",
+   "params": {
+    "beats": {
+     "label": "Beats",
+     "options": [
+      "Jeder Beat",
+      "Jeder 2. Beat",
+      "Jeder 4. Beat"
+     ]
+    },
+    "blend": {
+     "label": "Überblendung",
+     "options": [
+      "Normal",
+      "Addieren",
+      "Negativ multiplizieren"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Farbe"
+    },
+    "color2": {
+     "label": "Farbe 2"
+    },
+    "colorMode": {
+     "label": "Farbmodus",
+     "options": [
+      "Einzelfarbe",
+      "Zufällige Mischung",
+      "Über Lebensdauer"
+     ]
+    },
+    "colorVariation": {
+     "label": "Farbabweichung"
+    },
+    "count": {
+     "label": "Anzahl"
+    },
+    "depth": {
+     "label": "Tiefe"
+    },
+    "direction": {
+     "label": "Richtung"
+    },
+    "drag": {
+     "label": "Luftwiderstand"
+    },
+    "emission": {
+     "label": "Emission",
+     "options": [
+      "Kontinuierlich",
+      "Ausstoß",
+      "Bei Beats"
+     ]
+    },
+    "emitter": {
+     "label": "Emitter",
+     "options": [
+      "Punkt",
+      "Linie",
+      "Fläche",
+      "Umriss"
+     ]
+    },
+    "emitterSize": {
+     "label": "Emittergröße"
+    },
+    "endSize": {
+     "label": "Endgröße"
+    },
+    "every": {
+     "label": "Wiederholen alle"
+    },
+    "fadeIn": {
+     "label": "Einblenden"
+    },
+    "fadeOut": {
+     "label": "Ausblenden"
+    },
+    "gravity": {
+     "label": "Schwerkraft"
+    },
+    "kind": {
+     "label": "Partikel",
+     "options": [
+      "Schnee",
+      "Funken",
+      "Konfetti",
+      "Blasen",
+      "Staub",
+      "Herzen",
+      "Sterne",
+      "Blütenblätter",
+      "Ebene"
+     ]
+    },
+    "layer": {
+     "label": "Ebene",
+     "options": [
+      "Unter Partikeln",
+      "Über Partikeln",
+      "Ausgeblendet"
+     ]
+    },
+    "lifeVariation": {
+     "label": "Lebensdauerabweichung"
+    },
+    "lifetime": {
+     "label": "Lebensdauer"
+    },
+    "more": {
+     "label": "Weitere Einstellungen"
+    },
+    "orientation": {
+     "label": "Ausrichtung",
+     "options": [
+      "Frei",
+      "Bewegung folgen"
+     ]
+    },
+    "perspective": {
+     "label": "Perspektive"
+    },
+    "position": {
+     "label": "Emitterposition"
+    },
+    "prewarm": {
+     "label": "Voll starten"
+    },
+    "randomRotation": {
+     "label": "Zufällige Rotation"
+    },
+    "rate": {
+     "label": "Rate"
+    },
+    "seed": {
+     "label": "Zufallswert"
+    },
+    "size": {
+     "label": "Größe"
+    },
+    "sizeVariation": {
+     "label": "Größenabweichung"
+    },
+    "speed": {
+     "label": "Geschwindigkeit"
+    },
+    "speedVariation": {
+     "label": "Geschwindigkeitsabweichung"
+    },
+    "spin": {
+     "label": "Drehung"
+    },
+    "spinVariation": {
+     "label": "Drehungsabweichung"
+    },
+    "spread": {
+     "label": "Streuung"
+    },
+    "start": {
+     "label": "Ausstoßzeit"
+    },
+    "swirl": {
+     "label": "Wirbel"
+    },
+    "swirlSpeed": {
+     "label": "Wirbelgeschwindigkeit"
+    },
+    "tint": {
+     "label": "Färbung"
+    },
+    "twinkle": {
+     "label": "Funkeln"
+    },
+    "wind": {
+     "label": "Wind"
+    },
+    "zSpeed": {
+     "label": "Z-Geschwindigkeit"
+    },
+    "zSpread": {
+     "label": "Z-Streuung"
+    }
+   },
+   "presets": {
+    "beat-confetti": "Beat-Konfetti",
+    "bubbles": "Blasen",
+    "confetti": "Konfetti",
+    "dust": "Staub",
+    "hearts": "Herzen",
+    "layer-fountain": "Ebenenfontäne",
+    "petals": "Blütenblätter",
+    "snow": "Schnee",
+    "sparks": "Funken",
+    "twinkle": "Funkeln"
+   }
+  },
+  "pixelate": {
+   "description": "Wandelt die Ebene in einfarbige Blöcke um, deren Farbe aus der Blockmitte stammt. Das Raster liegt mittig auf der Ebene oder mit Bildschirmraum auf dem Bild. Streckung, Versatz und Winkel formen das Raster; Vignette verdunkelt die Blockränder.",
+   "name": "Verpixeln",
+   "params": {
+    "angle": {
+     "label": "Winkel"
+    },
+    "blockSize": {
+     "label": "Größe"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "screenSpace": {
+     "label": "Bildschirmraum"
+    },
+    "stretch": {
+     "label": "Streckung"
+    },
+    "vignette": {
+     "label": "Vignette"
+    }
+   }
+  },
+  "pixeltiles": {
+   "description": "Setzt die Ebene aus kleinen Kacheln mit Pixelmustern zusammen. Die Helligkeit darunter bestimmt, wie viel des Musters jede Kachel zeigt – ähnlich einer Mischung aus ASCII-Kunst und Mosaik. Chaos durchbricht das Raster mit zufälligen Kacheln.",
+   "name": "Pixelkacheln",
+   "params": {
+    "alpha": {
+     "label": "Mischung"
+    },
+    "background": {
+     "label": "Hintergrund"
+    },
+    "brightness": {
+     "label": "Helligkeit"
+    },
+    "chaos": {
+     "label": "Chaos"
+    },
+    "chaosAmount": {
+     "label": "Chaosstärke"
+    },
+    "chaosSpeed": {
+     "label": "Chaosgeschwindigkeit"
+    },
+    "contrast": {
+     "label": "Kontrast"
+    },
+    "detail": {
+     "label": "Detail"
+    },
+    "flip": {
+     "label": "Pixel spiegeln"
+    },
+    "foreground": {
+     "label": "Vordergrund"
+    },
+    "levels": {
+     "label": "Farbtöne"
+    },
+    "offset": {
+     "label": "Musterversatz"
+    },
+    "original": {
+     "label": "Originalfarbe verwenden"
+    },
+    "pattern": {
+     "label": "Muster",
+     "options": [
+      "Hohe Detailstufe",
+      "Zahlen und Buchstaben",
+      "Horizontale Linien",
+      "Punkte",
+      "Vertikale Linien",
+      "Grunge",
+      "Ringe",
+      "Vollflächig",
+      "Diagonal links",
+      "Diagonal rechts"
+     ]
+    },
+    "randomPattern": {
+     "label": "Zufällige Muster"
+    },
+    "scramble": {
+     "label": "Kacheln mischen"
+    },
+    "seed": {
+     "label": "Zufallswert"
+    },
+    "tile": {
+     "label": "Kachelgröße"
+    },
+    "tone": {
+     "label": "Tonwert aus",
+     "options": [
+      "Luminanz",
+      "Durchschnitt",
+      "Rot",
+      "Grün",
+      "Blau"
+     ]
+    },
+    "transparent": {
+     "label": "Transparenter Hintergrund"
+    }
+   }
+  },
+  "polar": {
+   "description": "Biegt die Ebene um ihre Mitte und verwandelt gerade Linien in Kreise oder rollt Kreise zu geraden Linien ab.",
+   "name": "Polarkoordinaten",
+   "params": {
+    "amount": {
+     "label": "Interpolation"
+    },
+    "direction": {
+     "label": "Typ",
+     "options": [
+      "Rechteckig zu polar",
+      "Polar zu rechteckig"
+     ]
+    }
+   }
+  },
+  "polardisplacement": {
+   "description": "Dreht und verschiebt die Ebenen dahinter anhand der Farben dieser Ebene um einen Mittelpunkt und blendet sie anschließend aus.",
+   "name": "Polare Verschiebungsmap",
+   "params": {
+    "angle": {
+     "label": "Winkel"
+    },
+    "angleChannel": {
+     "label": "Winkel aus",
+     "options": [
+      "R",
+      "G",
+      "B",
+      "Luminanz",
+      "Alpha"
+     ]
+    },
+    "center": {
+     "label": "Mitte"
+    },
+    "distanceChannel": {
+     "label": "Abstand aus",
+     "options": [
+      "R",
+      "G",
+      "B",
+      "Luminanz",
+      "Alpha"
+     ]
+    },
+    "edges": {
+     "label": "Ränder",
+     "options": [
+      "Wiederholen",
+      "Spiegeln",
+      "Transparent",
+      "Kacheln"
+     ]
+    },
+    "fromCenter": {
+     "label": "Von der Mitte"
+    },
+    "invert": {
+     "label": "Umkehren"
+    },
+    "reach": {
+     "label": "Nach innen/außen"
+    }
+   }
+  },
+  "posterize": {
+   "description": "Teilt jeden Farbkanal in gleichmäßige Stufen, sodass weiche Verläufe zu Streifen werden. Versatz verschiebt die Streifengrenzen.",
+   "name": "Tontrennung",
+   "params": {
+    "levels": {
+     "label": "Stufen"
+    },
+    "offset": {
+     "label": "Versatz"
+    }
+   }
+  },
+  "pulseopacity": {
+   "description": "Blendet die Ebene wiederholt nach einer Sinus- oder Dreieckswelle aus und ein.",
+   "name": "Deckkraft pulsieren",
+   "params": {
+    "frequency": {
+     "label": "Frequenz"
+    },
+    "phase": {
+     "label": "Startphase"
+    },
+    "strength": {
+     "label": "Stärke"
+    },
+    "wave": {
+     "label": "Welle",
+     "options": [
+      "Sinus",
+      "Dreieck"
+     ]
+    }
+   }
+  },
+  "pulsesize": {
+   "description": "Vergrößert und verkleinert die Ebene wiederholt nach einer Sinus- oder Dreieckswelle.",
+   "name": "Größe pulsieren",
+   "params": {
+    "frequency": {
+     "label": "Frequenz"
+    },
+    "grow": {
+     "label": "Vergrößern"
+    },
+    "phase": {
+     "label": "Startphase"
+    },
+    "shrink": {
+     "label": "Verkleinern"
+    },
+    "wave": {
+     "label": "Welle",
+     "options": [
+      "Sinus",
+      "Dreieck"
+     ]
+    }
+   }
+  },
+  "puppet": {
+   "description": "Verformt die Ebene wie eine Marionette: Setze Pins und ziehe oder animiere sie; das Bild folgt ihnen fließend.",
+   "name": "Marionetten-Pin",
+   "params": {
+    "density": {
+     "label": "Dreiecksdichte"
+    },
+    "expansion": {
+     "label": "Gittererweiterung"
+    },
+    "falloff": {
+     "label": "Abnahme"
+    },
+    "sway": {
+     "label": "Schwingen"
+    },
+    "swayAmount": {
+     "label": "Schwingungsstärke"
+    },
+    "swayAngle": {
+     "label": "Schwingungswinkel"
+    },
+    "swayDirection": {
+     "label": "Schwingungsrichtung",
+     "options": [
+      "Winkel",
+      "Zufällig"
+     ]
+    },
+    "swayPins": {
+     "label": "Schwingende Pins",
+     "options": [
+      "Alle",
+      "Ausgewählte"
+     ]
+    },
+    "swaySeed": {
+     "label": "Schwingungs-Zufallswert"
+    },
+    "swaySpeed": {
+     "label": "Schwingungsgeschwindigkeit"
+    }
+   }
+  },
+  "pyramid": {
+   "description": "Legt die Ebene auf die Flächen einer quadratischen Pyramide.",
+   "name": "Pyramide",
+   "params": {
+    "base": {
+     "label": "Grundfläche"
+    },
+    "height": {
+     "label": "Höhe"
+    },
+    "light": {
+     "label": "Lichtwinkel"
+    },
+    "perspective": {
+     "label": "Perspektive"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "rotX": {
+     "label": "Rotation X"
+    },
+    "rotY": {
+     "label": "Rotation Y"
+    },
+    "rotZ": {
+     "label": "Rotation Z"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "shading": {
+     "label": "Schattierung"
+    },
+    "shine": {
+     "label": "Glanz"
+    }
+   }
+  },
+  "radialblur": {
+   "description": "Erzeugt eine radiale Zoom-Unschärfe durch Mittelung von Abtastwerten entlang von Strahlen aus einem Mittelpunkt; die Stärke ist einstellbar.",
+   "name": "Zoom-Unschärfe",
+   "params": {
+    "amount": {
+     "label": "Stärke"
+    },
+    "center": {
+     "label": "Mitte"
+    }
+   }
+  },
+  "radialrays": {
+   "description": "Zeichnet deckende Sonnenstrahlen von einem Punkt über die undurchsichtigen Bereiche der Ebene.",
+   "name": "Radiale Strahlen",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "angle": {
+     "label": "Winkel"
+    },
+    "center": {
+     "label": "Mitte"
+    },
+    "color": {
+     "label": "Farbe"
+    },
+    "count": {
+     "label": "Anzahl"
+    },
+    "width": {
+     "label": "Breite"
+    }
+   }
+  },
+  "radialrepeat": {
+   "description": "Erzeugt dynamisch mehrere kreisförmig angeordnete Kopien der Ebene.",
+   "name": "Radialer Wiederholer",
+   "params": {
+    "angle": {
+     "label": "Winkel"
+    },
+    "copyDelay": {
+     "label": "Verzögerung pro Kopie"
+    },
+    "count": {
+     "label": "Anzahl"
+    },
+    "easing": {
+     "label": "Easing",
+     "options": [
+      "Linear",
+      "Langsam beginnen",
+      "Langsam enden",
+      "Langsam beginnen und enden"
+     ]
+    },
+    "fillAmount": {
+     "label": "Füllstärke"
+    },
+    "fillColor": {
+     "label": "Füllfarbe"
+    },
+    "orientation": {
+     "label": "Ausrichtung"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "randomOpacity": {
+     "label": "Zufällige Deckkraft"
+    },
+    "randomOrder": {
+     "label": "Zufällige Reihenfolge"
+    },
+    "randomPosition": {
+     "label": "Zufällige Position"
+    },
+    "randomRotation": {
+     "label": "Zufällige Rotation"
+    },
+    "randomScale": {
+     "label": "Zufällige Skalierung"
+    },
+    "rangeEnd": {
+     "label": "Bereichsende"
+    },
+    "rangeOffset": {
+     "label": "Bereichsversatz"
+    },
+    "rangeOpacity": {
+     "label": "Bereichsdeckkraft"
+    },
+    "rangePosition": {
+     "label": "Bereichsposition"
+    },
+    "rangeRotation": {
+     "label": "Bereichsrotation"
+    },
+    "rangeScale": {
+     "label": "Bereichsskalierung"
+    },
+    "rangeStart": {
+     "label": "Bereichsanfang"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "seed": {
+     "label": "Zufallswert"
+    },
+    "sweep": {
+     "label": "Bogenwinkel"
+    }
+   }
+  },
+  "radialshadow": {
+   "description": "Wirft lange Schatten von den undurchsichtigen Bereichen der Ebene, die sich von einem Lichtpunkt ausbreiten.",
+   "name": "Radialer Schatten",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "color": {
+     "label": "Farbe"
+    },
+    "fade": {
+     "label": "Ausblenden"
+    },
+    "light": {
+     "label": "Licht"
+    },
+    "reach": {
+     "label": "Länge"
+    }
+   }
+  },
+  "radialwipe": {
+   "description": "Blendet einen keilförmigen Teil der Ebene vom Startwinkel aus um die Mitte aus, wie ein Uhrzeiger. Fortschritt bestimmt den überstrichenen Winkel, Anzahl wiederholt den Keil im Kreis und Beide bewegt ihn in beide Richtungen. Animiere Fortschritt für einen Übergang.",
+   "name": "Radiale Wischblende",
+   "params": {
+    "center": {
+     "label": "Mitte"
+    },
+    "count": {
+     "label": "Anzahl"
+    },
+    "direction": {
+     "label": "Richtung",
+     "options": [
+      "Im Uhrzeigersinn",
+      "Gegen den Uhrzeigersinn",
+      "Beide"
+     ]
+    },
+    "feather": {
+     "label": "Weiche Kante"
+    },
+    "progress": {
+     "label": "Fortschritt"
+    },
+    "start": {
+     "label": "Startwinkel"
+    }
+   }
+  },
+  "randomdisplace": {
+   "description": "Bewegt die Ebene automatisch fließend und zufällig. Zufallswert wählt eine andere Bewegung, Geschwindigkeit bestimmt das Tempo und Entwicklung verschiebt das Muster.",
+   "name": "Zufällige Verschiebung",
+   "params": {
+    "evolution": {
+     "label": "Entwicklung"
+    },
+    "magnitude": {
+     "label": "Auslenkung"
+    },
+    "scatter": {
+     "label": "Streuung"
+    },
+    "seed": {
+     "label": "Zufallswert"
+    },
+    "speed": {
+     "label": "Geschwindigkeit"
+    }
+   }
+  },
+  "randomjitter": {
+   "description": "Lässt die Ebene entlang eines Winkels zufällig hin und her springen.",
+   "name": "Zufälliges Zittern",
+   "params": {
+    "angle": {
+     "label": "Winkel"
+    },
+    "frequency": {
+     "label": "Frequenz"
+    },
+    "magnitude": {
+     "label": "Auslenkung"
+    },
+    "seed": {
+     "label": "Zufallswert"
+    },
+    "slack": {
+     "label": "Spielraum"
+    },
+    "zjitter": {
+     "label": "Z-Zittern"
+    }
+   }
+  },
+  "rasterextrude": {
+   "description": "Extrudiert das Bild der Ebene zu einem festen Block; die Seiten erhalten die Innenfarbe.",
+   "name": "Raster extrudieren",
+   "params": {
+    "depth": {
+     "label": "Tiefe"
+    },
+    "interior": {
+     "label": "Innenfarbe"
+    },
+    "light": {
+     "label": "Lichtwinkel"
+    },
+    "perspective": {
+     "label": "Perspektive"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "rotX": {
+     "label": "Rotation X"
+    },
+    "rotY": {
+     "label": "Rotation Y"
+    },
+    "rotZ": {
+     "label": "Rotation Z"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "shading": {
+     "label": "Schattierung"
+    },
+    "shine": {
+     "label": "Glanz"
+    }
+   }
+  },
+  "rastertransform": {
+   "description": "Skaliert, dreht und verschiebt das fertige Bild der Ebene nach den darüberliegenden Effekten, sodass auch deren Ergebnis transformiert wird. Füllung erhält einen Teil des Originals darunter; Auf Ebene maskieren begrenzt das Ergebnis auf die ursprüngliche Form.",
+   "name": "Raster transformieren",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "angle": {
+     "label": "Winkel"
+    },
+    "fill": {
+     "label": "Füllung"
+    },
+    "mask": {
+     "label": "Auf Ebene maskieren"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "sampling": {
+     "label": "Abtastung",
+     "options": [
+      "Nächster Nachbar",
+      "Linear"
+     ]
+    },
+    "scale": {
+     "label": "Skalierung"
+    }
+   }
+  },
+  "rays": {
+   "description": "Lässt Lichtstrahlen von den hellen Bereichen der Ebene nach außen von einem Mittelpunkt weg strahlen.",
+   "name": "Strahlen",
+   "params": {
+    "blend": {
+     "label": "Überblendung"
+    },
+    "center": {
+     "label": "Mitte"
+    },
+    "color": {
+     "label": "Farbe"
+    },
+    "intensity": {
+     "label": "Intensität"
+    },
+    "reach": {
+     "label": "Länge"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
+    },
+    "threshold": {
+     "label": "Schwellenwert"
+    },
+    "thresholdAdd": {
+     "label": "Schwellenwert erhöhen"
+    }
+   }
+  },
+  "reorient360": {
+   "description": "Dreht eine 360°-Panoramaebene in ihrer Kugel, um den Horizont auszurichten oder die Blickrichtung zu ändern.",
+   "name": "360°-Kugel ausrichten",
+   "params": {
+    "pitch": {
+     "label": "Nicken"
+    },
+    "roll": {
+     "label": "Rollen"
+    },
+    "yaw": {
+     "label": "Gieren"
+    }
+   }
+  },
+  "repeat": {
+   "description": "Erzeugt dynamisch mehrere Kopien der Ebene.",
+   "name": "Wiederholer",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "angle": {
+     "label": "Winkel"
+    },
+    "count": {
+     "label": "Anzahl"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "time": {
+     "label": "Zeit"
+    }
+   }
+  },
+  "repeatalongpath": {
+   "description": "Erzeugt dynamisch mehrere Kopien der Ebene entlang des Umrisses der direkt darunterliegenden Ebene.",
+   "name": "Wiederholer entlang Pfad",
+   "params": {
+    "copyDelay": {
+     "label": "Verzögerung pro Kopie"
+    },
+    "count": {
+     "label": "Anzahl"
+    },
+    "easing": {
+     "label": "Easing",
+     "options": [
+      "Linear",
+      "Langsam beginnen",
+      "Langsam enden",
+      "Langsam beginnen und enden"
+     ]
+    },
+    "end": {
+     "label": "Ende"
+    },
+    "fillAmount": {
+     "label": "Füllstärke"
+    },
+    "fillColor": {
+     "label": "Füllfarbe"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "randomOpacity": {
+     "label": "Zufällige Deckkraft"
+    },
+    "randomOrder": {
+     "label": "Zufällige Reihenfolge"
+    },
+    "randomPosition": {
+     "label": "Zufällige Position"
+    },
+    "randomRotation": {
+     "label": "Zufällige Rotation"
+    },
+    "randomScale": {
+     "label": "Zufällige Skalierung"
+    },
+    "rangeEnd": {
+     "label": "Bereichsende"
+    },
+    "rangeOffset": {
+     "label": "Bereichsversatz"
+    },
+    "rangeOpacity": {
+     "label": "Bereichsdeckkraft"
+    },
+    "rangePosition": {
+     "label": "Bereichsposition"
+    },
+    "rangeRotation": {
+     "label": "Bereichsrotation"
+    },
+    "rangeScale": {
+     "label": "Bereichsskalierung"
+    },
+    "rangeStart": {
+     "label": "Bereichsanfang"
+    },
+    "seed": {
+     "label": "Zufallswert"
+    },
+    "start": {
+     "label": "Anfang"
+    },
+    "tangent": {
+     "label": "Tangente"
+    }
+   }
+  },
+  "replacecolor": {
+   "description": "Ersetzt eine Farbe durch eine andere. Alpha steuert die Stärke der Ersetzung; Luminanz sperren erhält Licht und Schatten des Originals.",
+   "name": "Farbe ersetzen",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "choke": {
+     "label": "Verengen"
+    },
+    "feather": {
+     "label": "Weiche Kante"
+    },
+    "lockLuminance": {
+     "label": "Luminanz sperren"
+    },
+    "source": {
+     "label": "Farbe ersetzen"
+    },
+    "target": {
+     "label": "Neue Farbe"
+    },
+    "threshold": {
+     "label": "Schwellenwert"
+    }
+   }
+  },
+  "retrodither": {
+   "description": "Verwandelt die Ebene in Retro-Pixelgrafik: Jeder Pixelblock erhält eine Farbe aus einer Palette, etwa einer alten Konsolen- oder Computerpalette oder einer importierten Palette. Ein Rastermuster mischt die Farben, um weitere Farbtöne vorzutäuschen.",
+   "name": "Retro-Rasterung",
+   "params": {
+    "alpha": {
+     "label": "Mix"
+    },
+    "dither": {
+     "label": "Stärke"
+    },
+    "palette": {
+     "label": "Palette"
+    },
+    "pattern": {
+     "label": "Dithering",
+     "options": [
+      "Keins",
+      "Rauschen",
+      "Schachbrett",
+      "Bayer 2x2",
+      "Bayer 3x3",
+      "Bayer 4x4",
+      "Bayer 8x8",
+      "Punktraster 4x4",
+      "Punktraster 8x8",
+      "Horizontale Linien",
+      "Vertikale Linien",
+      "Diagonale Linien",
+      "Floyd-Steinberg",
+      "Falsches Floyd-Steinberg",
+      "Sierra Lite",
+      "Fan",
+      "Shiau-Fan",
+      "Jarvis-Judice-Ninke",
+      "Stucki",
+      "Burkes",
+      "Sierra",
+      "Sierra Zweizeilig",
+      "Atkinson"
+     ]
+    },
+    "pixel": {
+     "label": "Pixelgröße"
+    }
+   }
+  },
+  "rgbsplit": {
+   "description": "Teilt die Kanäle Rot, Grün und Blau: Der Mittelkanal bleibt stehen, die anderen beiden verschieben sich entlang des Winkels in entgegengesetzte Richtungen. Hell addiert die verschobenen Farben, Dunkel lässt sie deckend, Maske behält nur den Bereich, in dem alle drei überlappen, und Luma macht die Ränder so deckend, wie sie hell sind.",
+   "name": "RGB-Split",
+   "params": {
+    "angle": {
+     "label": "Winkel"
+    },
+    "center": {
+     "label": "Mitte",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
+    },
+    "mode": {
+     "label": "Modus",
+     "options": [
+      "Hell",
+      "Dunkel",
+      "Maske",
+      "Luma"
+     ]
+    },
+    "strength": {
+     "label": "Stärke"
+    }
+   }
+  },
+  "ribbon": {
+   "description": "Zeichnet ein verdrehtes Band mit wechselnder Breite über die deckenden Bereiche der Ebene; animiere die Phase, damit es fließt, oder stanze es aus der Ebene aus.",
+   "name": "Band",
+   "params": {
+    "angle": {
+     "label": "Winkel"
+    },
+    "color": {
+     "label": "Farbe"
+    },
+    "frequency": {
+     "label": "Frequenz"
+    },
+    "magnitude": {
+     "label": "Ausmaß"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "punch": {
+     "label": "Ausstanzen"
+    },
+    "smoothing": {
+     "label": "Glättung"
+    },
+    "tint": {
+     "label": "Tönung"
+    },
+    "tintAmount": {
+     "label": "Tönungsstärke"
+    },
+    "width": {
+     "label": "Breite"
+    }
+   }
+  },
+  "ripple": {
+   "description": "Konzentrische Wellen, die sich von einem Mittelpunkt ausbreiten, mit einstellbarer Amplitude, Wellenlänge und Geschwindigkeit.",
+   "name": "Wellen",
+   "params": {
+    "amplitude": {
+     "label": "Amplitude"
+    },
+    "center": {
+     "label": "Mitte"
+    },
+    "speed": {
+     "label": "Geschwindigkeit"
+    },
+    "wavelength": {
+     "label": "Wellenlänge"
+    }
+   }
+  },
+  "roughenedges": {
+   "description": "Frisst mit Rauschen in die Kanten der deckenden Bereiche, für einen zerrissenen, abgenutzten oder verbrannten Rand.",
+   "name": "Kanten aufrauen",
+   "params": {
+    "blur": {
+     "label": "Rahmen"
+    },
+    "evolution": {
+     "label": "Evolution"
+    },
+    "octaves": {
+     "label": "Oktaven"
+    },
+    "roughness": {
+     "label": "Rauheit"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "seed": {
+     "label": "Seed"
+    }
+   }
+  },
+  "scaleassist": {
+   "description": "Fügt zusätzlich zur eigenen Größe der Ebene eine Skalierung hinzu: entlang X, Y, beider Achsen oder X mit gegenläufigem Y. Untergeordnete Ebenen folgen der neuen Größe.",
+   "name": "Skalierungshilfe",
+   "params": {
+    "axis": {
+     "label": "Achse",
+     "options": [
+      "X",
+      "Y",
+      "X,Y",
+      "X,-Y"
+     ]
+    },
+    "damp": {
+     "label": "Dämpfung"
+    },
+    "scale": {
+     "label": "Skalierung"
+    }
+   }
+  },
+  "scanlines": {
+   "description": "Fügt horizontale Scanlines für einen CRT-Monitor-Effekt hinzu, optional mit vertikalem Durchlaufen.",
+   "name": "Scanlines",
+   "params": {
+    "darkness": {
+     "label": "Dunkelheit"
+    },
+    "roll_speed": {
+     "label": "Laufgeschwindigkeit"
+    },
+    "spacing": {
+     "label": "Zeilenabstand"
+    }
+   }
+  },
+  "scatter3d": {
+   "description": "Verwandelt die Ebene in ein Raster verstreuter 3D-Teile.",
+   "name": "3D-Streuung",
+   "params": {
+    "axis": {
+     "label": "Verdrehachse",
+     "options": [
+      "X",
+      "Y",
+      "Z"
+     ]
+    },
+    "depth": {
+     "label": "Rastertiefe"
+    },
+    "depthSpacing": {
+     "label": "Tiefenabstand"
+    },
+    "intensity": {
+     "label": "Lichtintensität"
+    },
+    "light": {
+     "label": "Lichtrichtung"
+    },
+    "lightHeight": {
+     "label": "Lichthöhe"
+    },
+    "perspective": {
+     "label": "Perspektive"
+    },
+    "rotX": {
+     "label": "Rotation X"
+    },
+    "rotY": {
+     "label": "Rotation Y"
+    },
+    "rotZ": {
+     "label": "Rotation Z"
+    },
+    "scatter": {
+     "label": "Streuung"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "shading": {
+     "label": "Schattierung"
+    },
+    "shape": {
+     "label": "Form",
+     "options": [
+      "Würfel",
+      "Kugel",
+      "Quadrat",
+      "Kreis"
+     ]
+    },
+    "size": {
+     "label": "Teilegröße"
+    },
+    "spacing": {
+     "label": "Rasterabstand"
+    },
+    "spin": {
+     "label": "Streuungsrotation"
+    },
+    "twist": {
+     "label": "Verdrehwinkel"
+    }
+   }
+  },
+  "scatterfield": {
+   "description": "Streut Kopien der Ebene in einem unendlichen 3D-Feld und blendet die Originalebene aus. Per Keyframe-Animation lässt sich eine Bewegung im Feld in drei Dimensionen simulieren.",
+   "name": "Streufeld",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "amount": {
+     "label": "Menge"
+    },
+    "angle": {
+     "label": "Winkel"
+    },
+    "angleVariance": {
+     "label": "Winkelvarianz"
+    },
+    "blending": {
+     "label": "Mischmodus",
+     "options": [
+      "Normal",
+      "Addieren",
+      "Negativ multiplizieren",
+      "Multiplizieren",
+      "Aufhellen",
+      "Abdunkeln",
+      "Überlagern",
+      "Differenz"
+     ]
+    },
+    "color1": {
+     "label": "Farbe 1"
+    },
+    "color2": {
+     "label": "Farbe 2"
+    },
+    "color3": {
+     "label": "Farbe 3"
+    },
+    "coloring": {
+     "label": "Einfärbung",
+     "options": [
+      "Keine",
+      "Zufällig",
+      "Tiefe"
+     ]
+    },
+    "density": {
+     "label": "Dichte"
+    },
+    "evolution": {
+     "label": "Evolution"
+    },
+    "fade": {
+     "label": "Ausblenden"
+    },
+    "interpolateHue": {
+     "label": "Farbton interpolieren"
+    },
+    "lockLuminance": {
+     "label": "Luminanz sperren"
+    },
+    "lockSaturation": {
+     "label": "Sättigung sperren"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "size": {
+     "label": "Größe"
+    },
+    "sizeVariance": {
+     "label": "Größenvarianz"
+    },
+    "slack": {
+     "label": "Spielraum"
+    },
+    "z": {
+     "label": "Position Z"
+    }
+   }
+  },
+  "sepia": {
+   "description": "Warme Brauntöne wie bei einem alten Foto.",
+   "name": "Sepia",
+   "params": {
+    "amount": {
+     "label": "Menge"
+    }
+   }
+  },
+  "sharpen": {
+   "description": "Wendet eine Unscharfmaskierung mit einer 3x3-Nachbarschaft an, um feine Details zu betonen.",
+   "name": "Schärfen",
+   "params": {
+    "amount": {
+     "label": "Stärke"
+    },
+    "radius": {
+     "label": "Radius"
+    }
+   }
+  },
+  "shutterblur": {
+   "description": "Verwischt die Ebene entlang ihrer tatsächlichen Bewegung, Drehung und Vergrößerung, wie ein Kameraverschluss. Ein größerer Verschlusswinkel erzeugt längere Spuren, mehr Samples machen sie weicher. Die Vorschau zeigt eine schnellere Unschärfe, solange „Volle Unschärfe“ nicht aktiviert ist.",
+   "name": "Echte Bewegungsunschärfe",
+   "params": {
+    "samples": {
+     "label": "Samples"
+    },
+    "shutter": {
+     "label": "Verschlusswinkel"
+    }
+   }
+  },
+  "simplestarfield": {
+   "description": "Streut kleine Sterne in Tiefenschichten über die deckenden Bereiche der Ebene. Position bewegt das Feld mit Parallaxe, Tiefe fliegt hindurch, Skalierung zoomt hinein, Größe und Weichzeichnung formen jeden Stern, und Menge legt fest, wie viele es sind.",
+   "name": "Einfaches Sternenfeld",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "amount": {
+     "label": "Menge"
+    },
+    "blend": {
+     "label": "Mischmodus",
+     "options": [
+      "Normal",
+      "Addieren",
+      "Negativ multiplizieren",
+      "Multiplizieren"
+     ]
+    },
+    "brightness": {
+     "label": "Helligkeit"
+    },
+    "color": {
+     "label": "Farbe"
+    },
+    "depth": {
+     "label": "Tiefe"
+    },
+    "feather": {
+     "label": "Weichzeichnung"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "starSize": {
+     "label": "Größe"
+    }
+   }
+  },
+  "smear": {
+   "description": "Verschmiert die Ebene in eine Richtung um eine feste Länge, als würde sie sich schnell bewegen.",
+   "name": "Verschmieren",
+   "params": {
+    "angle": {
+     "label": "Richtung"
+    },
+    "length": {
+     "label": "Länge"
+    }
+   }
+  },
+  "smoothbevel": {
+   "description": "Gibt den deckenden Bereichen der Ebene eine weiche, abgerundete Abschrägung, die von einer Seite beleuchtet wird.",
+   "name": "Weiche Abschrägung",
+   "params": {
+    "angle": {
+     "label": "Lichtwinkel"
+    },
+    "blur": {
+     "label": "Größe"
+    },
+    "depth": {
+     "label": "Tiefe"
+    },
+    "highlight": {
+     "label": "Glanzlicht"
+    },
+    "intensity": {
+     "label": "Intensität"
+    },
+    "shadow": {
+     "label": "Schatten"
+    }
+   }
+  },
+  "smoothedges": {
+   "description": "Rundet und glättet die Kanten der deckenden Bereiche der Ebene, ohne die Farben im Inneren zu ändern. „Auf Ebene maskieren“ lässt die Kanten nur nach innen wandern.",
+   "name": "Kanten glätten",
+   "params": {
+    "blur": {
+     "label": "Stärke"
+    },
+    "mask": {
+     "label": "Auf Ebene maskieren"
+    }
+   }
+  },
+  "softglow": {
+   "description": "Legt eine weiche, unscharfe Kopie des Bildes per Negativ-Multiplikation darüber, für ein verträumtes Leuchten, hauptsächlich aus den Lichtern.",
+   "name": "Weiches Leuchten",
+   "params": {
+    "blend": {
+     "label": "Mischung"
+    },
+    "blur": {
+     "label": "Größe"
+    },
+    "brightness": {
+     "label": "Helligkeit"
+    },
+    "color": {
+     "label": "Farbe"
+    },
+    "contrast": {
+     "label": "Kontrast"
+    },
+    "highlights": {
+     "label": "Lichter"
+    },
+    "opacity": {
+     "label": "Deckkraft"
+    },
+    "outside": {
+     "label": "Äußeres Leuchten"
+    }
+   }
+  },
+  "solid": {
+   "description": "Legt eine Farbe über die Ebene und behält dabei ihre Form, mit Auswahl an Mischmodi.",
+   "name": "Volltonfarbe",
+   "params": {
+    "amount": {
+     "label": "Alpha"
+    },
+    "blend": {
+     "label": "Mischmodus",
+     "options": [
+      "Normal",
+      "Multiplizieren",
+      "Negativ multiplizieren",
+      "Überlagern",
+      "Weiches Licht",
+      "Hartes Licht",
+      "Addieren",
+      "Abdunkeln",
+      "Aufhellen",
+      "Differenz",
+      "Farbig abwedeln",
+      "Farbig nachbelichten"
+     ]
+    },
+    "color": {
+     "label": "Farbe"
+    }
+   }
+  },
+  "solidmatte": {
+   "description": "Legt eine einfarbige Fläche hinter die Ebene und füllt ihre transparenten Bereiche. „Ausstanzen“ zeigt nur die Farbe mit der ausgeschnittenen Form der Ebene, und „Bildschirmraum“ füllt den ganzen Bildschirm statt nur den Rahmen der Ebene.",
+   "name": "Vollton-Matte",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "color": {
+     "label": "Farbe"
+    },
+    "punch": {
+     "label": "Ausstanzen"
+    },
+    "screenSpace": {
+     "label": "Bildschirmraum"
+    }
+   }
+  },
+  "spherize": {
+   "description": "Wickelt die Ebene mit einer Frontprojektion oder einer äquirektangulären Textur auf eine Kugel.",
+   "name": "Kugelung",
+   "params": {
+    "coverage": {
+     "label": "Abdeckung"
+    },
+    "light": {
+     "label": "Lichtwinkel"
+    },
+    "perspective": {
+     "label": "Perspektive"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "projection": {
+     "label": "Projektion",
+     "options": [
+      "Frontal",
+      "Äquirektangulär"
+     ]
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "rotX": {
+     "label": "Rotation X"
+    },
+    "rotY": {
+     "label": "Rotation Y"
+    },
+    "rotZ": {
+     "label": "Rotation Z"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "shading": {
+     "label": "Schattierung"
+    },
+    "shine": {
+     "label": "Glanz"
+    }
+   }
+  },
+  "spillclean": {
+   "description": "Entfernt das grüne oder blaue Leuchten, das ein ausgestanzter Hintergrund an den Rändern der Ebene hinterlässt, und erhält dabei die Helligkeit der Pixel.",
+   "name": "Key-Spill-Bereinigung",
+   "params": {
+    "blur": {
+     "label": "Kantenbreite"
+    },
+    "channel": {
+     "label": "Spill-Farbe",
+     "options": [
+      "Auto",
+      "Grün",
+      "Blau"
+     ]
+    },
+    "strength": {
+     "label": "Stärke"
+    }
+   }
+  },
+  "spin": {
+   "description": "Dreht die Ebene mit gleichmäßiger Geschwindigkeit immer weiter; unter null dreht sie sich in die andere Richtung.",
+   "name": "Drehen",
+   "params": {
+    "rpm": {
+     "label": "U/min"
+    }
+   }
+  },
+  "spinblur": {
+   "description": "Verwischt die Ebene kreisförmig um einen Punkt, als würde sie sich drehen.",
+   "name": "Drehunschärfe",
+   "params": {
+    "center": {
+     "label": "Mitte"
+    },
+    "sweep": {
+     "label": "Winkel"
+    }
+   }
+  },
+  "spinstreaks": {
+   "description": "Erzeugt bogenförmige Streifen, indem Kopien der Ebene um einen Punkt gedreht und dort gemischt werden, wo sie sich überlappen. R, G, B und A legen pro Kanal fest, ob die Kopien den niedrigsten, höchsten oder durchschnittlichen Wert behalten oder der Kanal unberührt bleibt.",
+   "name": "Drehstreifen",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Min",
+      "Max",
+      "Durchschn.",
+      "Aus"
+     ]
+    },
+    "alpha": {
+     "label": "Alpha"
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "Min",
+      "Max",
+      "Durchschn.",
+      "Aus"
+     ]
+    },
+    "bias": {
+     "label": "Gewichtung"
+    },
+    "center": {
+     "label": "Mitte"
+    },
+    "g": {
+     "label": "G",
+     "options": [
+      "Min",
+      "Max",
+      "Durchschn.",
+      "Aus"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "Min",
+      "Max",
+      "Durchschn.",
+      "Aus"
+     ]
+    },
+    "sweep": {
+     "label": "Schwenkwinkel"
+    }
+   }
+  },
+  "splittone": {
+   "description": "Tönt die Schatten in einen Farbton und die Lichter in einen anderen, wobei Schwarz, Weiß und Helligkeit erhalten bleiben. Schattenpegel verbiegt die Helligkeitskurve, und Lichterpegel verschiebt, wo die Lichterfarbe beginnt. Der Stil „Verlaufsumsetzung“ gibt jedem Pixel allein anhand seiner Helligkeit eine Farbe.",
+   "name": "Split-Toning",
+   "params": {
+    "highlightAmount": {
+     "label": "Lichterstärke"
+    },
+    "highlightHue": {
+     "label": "Lichterfarbton"
+    },
+    "highlightLevel": {
+     "label": "Lichterpegel"
+    },
+    "shadowAmount": {
+     "label": "Schattenstärke"
+    },
+    "shadowHue": {
+     "label": "Schattenfarbton"
+    },
+    "shadowLevel": {
+     "label": "Schattenpegel"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Tönung",
+      "Verlaufsumsetzung"
+     ]
+    }
+   }
+  },
+  "spotcolor": {
+   "description": "Behält eine Farbe und nimmt allen anderen Farben der Ebene die Sättigung.",
+   "name": "Einzelfarbe",
+   "params": {
+    "choke": {
+     "label": "Verengung"
+    },
+    "color": {
+     "label": "Farbe"
+    },
+    "feather": {
+     "label": "Weichzeichnung"
+    },
+    "saturation": {
+     "label": "Sättigung"
+    },
+    "threshold": {
+     "label": "Schwellenwert"
+    }
+   }
+  },
+  "squeeze": {
+   "description": "Zieht die Mitte der Ebene bei positiver Stärke nach innen zusammen und wölbt sie bei negativer Stärke nach außen. „Alt“ erhält die Form älterer Projekte.",
+   "name": "Quetschen",
+   "params": {
+    "amount": {
+     "label": "Stärke"
+    },
+    "shape": {
+     "label": "Form",
+     "options": [
+      "Einziehen/Wölben",
+      "Alt"
+     ]
+    }
+   }
+  },
+  "star": {
+   "description": "Zeichnet einen leuchtenden Stern auf die Ebene.",
+   "name": "Stern",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blend": {
+     "label": "Mischmodus",
+     "options": [
+      "Normal",
+      "Multiplizieren",
+      "Negativ multiplizieren",
+      "Überlagern",
+      "Weiches Licht",
+      "Hartes Licht",
+      "Addieren",
+      "Abdunkeln",
+      "Aufhellen",
+      "Differenz",
+      "Farbig abwedeln",
+      "Farbig nachbelichten"
+     ]
+    },
+    "brightness": {
+     "label": "Helligkeit"
+    },
+    "color": {
+     "label": "Farbe"
+    },
+    "points": {
+     "label": "Zacken"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "shine": {
+     "label": "Glanz"
+    }
+   }
+  },
+  "starfield": {
+   "description": "Füllt die deckenden Bereiche der Ebene mit einem tiefen Sternenfeld. Versatz bewegt sich durch das Feld, wobei sich nahe Sterne weiter bewegen als ferne.",
+   "name": "Sternenfeld",
+   "params": {
+    "brightness": {
+     "label": "Helligkeit"
+    },
+    "darkMatter": {
+     "label": "Dunkle Materie"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "scale": {
+     "label": "Skalierung"
+    }
+   }
+  },
+  "starpolyhedron": {
+   "description": "Setzt die Ebene auf einen Stern aus zwei gekreuzten Pyramiden.",
+   "name": "Sternpolyeder",
+   "params": {
+    "light": {
+     "label": "Lichtwinkel"
+    },
+    "perspective": {
+     "label": "Perspektive"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "rotX": {
+     "label": "Rotation X"
+    },
+    "rotY": {
+     "label": "Rotation Y"
+    },
+    "rotZ": {
+     "label": "Rotation Z"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "shading": {
+     "label": "Schattierung"
+    },
+    "shine": {
+     "label": "Glanz"
+    }
+   }
+  },
+  "starprism": {
+   "description": "Schneidet die Ebene zu einem Stern aus und verleiht ihr Tiefe.",
+   "name": "Sternprisma",
+   "params": {
+    "depth": {
+     "label": "Tiefe"
+    },
+    "inner": {
+     "label": "Innenradius"
+    },
+    "light": {
+     "label": "Lichtwinkel"
+    },
+    "perspective": {
+     "label": "Perspektive"
+    },
+    "points": {
+     "label": "Zacken"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "rotX": {
+     "label": "Rotation X"
+    },
+    "rotY": {
+     "label": "Rotation Y"
+    },
+    "rotZ": {
+     "label": "Rotation Z"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "shading": {
+     "label": "Schattierung"
+    },
+    "shine": {
+     "label": "Glanz"
+    },
+    "smoothing": {
+     "label": "Glättung"
+    }
+   }
+  },
+  "static": {
+   "description": "Flackerndes graues Rauschen wie bei einem Fernseher ohne Signal.",
+   "name": "Rauschen",
+   "params": {
+    "amount": {
+     "label": "Menge"
+    },
+    "grain": {
+     "label": "Größe"
+    }
+   }
+  },
+  "stretch": {
+   "description": "Schneidet die Ebene entlang einer Linie auf und zieht die beiden Hälften auseinander, wobei die Pixel auf der Linie in die Lücke gedehnt werden.",
+   "name": "Segment strecken",
+   "params": {
+    "angle": {
+     "label": "Winkel"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "relative": {
+     "label": "In Ebenengröße messen"
+    },
+    "spread": {
+     "label": "Streuung"
+    },
+    "stretch": {
+     "label": "Dehnung"
+    }
+   }
+  },
+  "stretchaxis": {
+   "description": "Streckt die Ebene in eine beliebige Richtung.",
+   "name": "Achse strecken",
+   "params": {
+    "angle": {
+     "label": "Winkel"
+    },
+    "mask": {
+     "label": "Auf Ebene maskieren"
+    },
+    "scale": {
+     "label": "Skalierung"
+    }
+   }
+  },
+  "stripes": {
+   "description": "Zeichnet ein Streifenmuster über die deckenden Bereiche der Ebene oder stanzt die Streifen aus ihr aus.",
+   "name": "Streifen",
+   "params": {
+    "angle": {
+     "label": "Winkel"
+    },
+    "color": {
+     "label": "Farbe"
+    },
+    "count": {
+     "label": "Anzahl"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "punch": {
+     "label": "Ausstanzen"
+    },
+    "screenSpace": {
+     "label": "Bildschirmraum"
+    },
+    "smoothing": {
+     "label": "Glättung"
+    },
+    "width": {
+     "label": "Breite"
+    }
+   }
+  },
+  "stroketaper": {
+   "description": "Lässt Konturen spitz auslaufen: die Stift- und Pinselstriche einer Freihandzeichnung sowie die Kontur von Linien und Formen (Rahmen & Schatten > Kontur). Von null bis zum Start und vom Ende bis auf null. „Verengung“ macht die Zuspitzung schärfer.",
+   "name": "Kontur zuspitzen",
+   "params": {
+    "end": {
+     "label": "Ende"
+    },
+    "squeeze": {
+     "label": "Verengung"
+    },
+    "start": {
+     "label": "Start"
+    }
+   }
+  },
+  "swing": {
+   "description": "Dreht die Ebene zwischen zwei Winkeln hin und her.",
+   "name": "Schwingen",
+   "params": {
+    "angle1": {
+     "label": "Winkel 1"
+    },
+    "angle2": {
+     "label": "Winkel 2"
+    },
+    "frequency": {
+     "label": "Frequenz"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "wave": {
+     "label": "Welle",
+     "options": [
+      "Sinus",
+      "Dreieck"
+     ]
+    }
+   }
+  },
+  "temperature": {
+   "description": "Wärmt oder kühlt das Bild wie Licht einer bestimmten Farbtemperatur in Kelvin; bei 6500 K bleibt es unverändert.",
+   "name": "Farbtemperatur",
+   "params": {
+    "kelvin": {
+     "label": "Temperatur"
+    },
+    "strength": {
+     "label": "Stärke"
+    }
+   }
+  },
+  "textblips": {
+   "description": "Tippt den Text Buchstabe für Buchstabe mit einem kurzen Blip pro Buchstabe, wie eine sprechende Spielfigur. Wähle eine Stimme und stelle dann Tonhöhe, Tippgeschwindigkeit und die Pause nach Satzzeichen ein. Leerzeichen und Satzzeichen bleiben stumm.",
+   "name": "Text-Blips",
+   "params": {
+    "delay": {
+     "label": "Verzögerung"
+    },
+    "every": {
+     "label": "Blip alle"
+    },
+    "pause": {
+     "label": "Satzzeichenpause"
+    },
+    "pitch": {
+     "label": "Tonhöhe"
+    },
+    "reveal": {
+     "label": "Eintippen"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "speed": {
+     "label": "Geschwindigkeit"
+    },
+    "variation": {
+     "label": "Tonhöhenvariation"
+    },
+    "voice": {
+     "label": "Stimme",
+     "options": [
+      "Klassisch",
+      "Weich",
+      "Tief",
+      "Hoch",
+      "Roboter",
+      "Quieken",
+      "Schreibmaschine",
+      "Chiptune"
+     ]
+    },
+    "volume": {
+     "label": "Lautstärke"
+    }
+   },
+   "presets": {
+    "fast-talker": "Schnellsprecher",
+    "hero": "Held",
+    "monster": "Monster",
+    "robot": "Roboter",
+    "typewriter": "Schreibmaschine"
+   }
+  },
+  "textpath": {
+   "description": "Setzt den Text Buchstabe für Buchstabe entlang eines Bogens, eines Kreises oder der Kontur der Ebene direkt darunter, wobei Satz, Schriftarten und Emojis des Textes erhalten bleiben.",
+   "name": "Text entlang Pfad",
+   "params": {
+    "align": {
+     "label": "Ausrichtung",
+     "options": [
+      "Links",
+      "Mitte",
+      "Rechts"
+     ]
+    },
+    "baseline": {
+     "label": "Grundlinienversatz"
+    },
+    "center": {
+     "label": "Mitte"
+    },
+    "control1": {
+     "label": "Kontrollpunkt 1"
+    },
+    "control2": {
+     "label": "Kontrollpunkt 2"
+    },
+    "end": {
+     "label": "Ende"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "reverse": {
+     "label": "Pfad umkehren"
+    },
+    "rotate": {
+     "label": "Buchstaben drehen"
+    },
+    "shape": {
+     "label": "Pfad",
+     "options": [
+      "Bogen",
+      "Kreis",
+      "Ebene darunter"
+     ]
+    },
+    "start": {
+     "label": "Start"
+    }
+   }
+  },
+  "textprogress": {
+   "description": "Zeigt den Text zwischen Start und Ende, nach Zeichen, Wort oder Zeile, optional mit Ein-/Ausblenden, Gleiten, Skalieren oder Unschärfe.",
+   "name": "Textfortschritt",
+   "params": {
+    "appearance": {
+     "label": "Erscheinen als",
+     "options": [
+      "Aufpoppen",
+      "Einblenden",
+      "Nach oben gleiten",
+      "Nach unten gleiten",
+      "Nach links gleiten",
+      "Nach rechts gleiten",
+      "Wachsen",
+      "Schrumpfen",
+      "Unschärfe"
+     ]
+    },
+    "direction": {
+     "label": "Richtung",
+     "options": [
+      "Vom Start",
+      "Vom Ende",
+      "Von der Mitte",
+      "Zufällig"
+     ]
+    },
+    "distance": {
+     "label": "Abstand"
+    },
+    "progress": {
+     "label": "Ende"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "softness": {
+     "label": "Weichheit"
+    },
+    "start": {
+     "label": "Start"
+    },
+    "unit": {
+     "label": "Basierend auf",
+     "options": [
+      "Zeichen",
+      "Wort",
+      "Zeile"
+     ]
+    }
+   },
+   "presets": {
+    "fade-in-by-word": "Wortweise einblenden",
+    "pop-in": "Aufpoppen",
+    "slide-up-by-letter": "Buchstabenweise nach oben gleiten",
+    "typewriter": "Schreibmaschine"
+   }
+  },
+  "textrandomizer": {
+   "description": "Ersetzt zufällig eine bestimmte Menge der Zeichen zwischen Start und Ende. Animiere die Evolution oder erhöhe die Geschwindigkeit, um die Ersetzungen zu ändern; „Enthüllen“ setzt sie wieder auf den ursprünglichen Text zurück.",
+   "name": "Text-Randomizer",
+   "params": {
+    "amount": {
+     "label": "Menge"
+    },
+    "characters": {
+     "label": "Benutzerdefiniert"
+    },
+    "charset": {
+     "label": "Zeichen",
+     "options": [
+      "Buchstaben",
+      "Großbuchstaben",
+      "Kleinbuchstaben",
+      "Zahlen",
+      "Buchstaben und Zahlen",
+      "Symbole",
+      "Benutzerdefiniert"
+     ]
+    },
+    "direction": {
+     "label": "Richtung",
+     "options": [
+      "Vom Start",
+      "Vom Ende",
+      "Von der Mitte",
+      "Zufällig"
+     ]
+    },
+    "end": {
+     "label": "Ende"
+    },
+    "evolution": {
+     "label": "Evolution"
+    },
+    "keepSpaces": {
+     "label": "Leerzeichen behalten"
+    },
+    "progress": {
+     "label": "Enthüllen"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "speed": {
+     "label": "Geschwindigkeit"
+    },
+    "start": {
+     "label": "Start"
+    }
+   },
+   "presets": {
+    "scramble": "Durcheinander"
+   }
+  },
+  "textshake": {
+   "description": "Lässt jeden Buchstaben einzeln wackeln, wie nervöser Dialog in einem Spiel. „Zittern“ driftet zwischen Stellen, „Ruckeln“ springt bei jedem Schritt an eine neue Stelle, „Welle“ lässt die Buchstaben auf und ab wippen, „Kreis“ bewegt sie in kleinen Schleifen und „Taumeln“ kippt sie hin und her. Senke „Wackelnde Buchstaben“, damit nur einige Buchstaben wackeln, die alle paar Augenblicke neu zufällig gewählt werden.",
+   "name": "Text-Wackeln",
+   "params": {
+    "amount": {
+     "label": "Menge"
+    },
+    "cycles": {
+     "label": "Geschwindigkeit"
+    },
+    "end": {
+     "label": "Ende"
+    },
+    "every": {
+     "label": "Neue Buchstaben alle"
+    },
+    "letters": {
+     "label": "Wackelnde Buchstaben"
+    },
+    "rotation": {
+     "label": "Rotation"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "speed": {
+     "label": "Geschwindigkeit"
+    },
+    "spread": {
+     "label": "Streuung"
+    },
+    "start": {
+     "label": "Start"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Zittern",
+      "Ruckeln",
+      "Welle",
+      "Kreis",
+      "Taumeln"
+     ]
+    },
+    "tilt": {
+     "label": "Neigung"
+    },
+    "unit": {
+     "label": "Basierend auf",
+     "options": [
+      "Zeichen",
+      "Wort",
+      "Zeile"
+     ]
+    }
+   },
+   "presets": {
+    "dizzy": "Schwindelig",
+    "floaty": "Schwebend",
+    "nervous": "Nervös",
+    "scared": "Verängstigt",
+    "uneasy": "Unruhig",
+    "wavy": "Wellig",
+    "wobbly": "Wackelig"
+   }
+  },
+  "texttransform": {
+   "description": "Bewegt, skaliert, dreht, blendet aus und tönt Buchstaben, Wörter oder Zeilen innerhalb eines Bereichs. Anker legt fest, ob Skalierung und Rotation von jeder Komponente oder von der Mitte der Ebene ausgehen. Verschiebe den Bereich mit „Versatz“, damit die Änderung durch den Text wandert.",
+   "name": "Text transformieren",
+   "params": {
+    "anchor": {
+     "label": "Anker",
+     "options": [
+      "Komponente",
+      "Ebene"
+     ]
+    },
+    "end": {
+     "label": "Ende"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "opacity": {
+     "label": "Deckkraft"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "randomOrder": {
+     "label": "Zufällige Reihenfolge"
+    },
+    "rotation": {
+     "label": "Rotation"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "shape": {
+     "label": "Form",
+     "options": [
+      "Rechteck",
+      "Anstieg",
+      "Abfall",
+      "Dreieck",
+      "Rund",
+      "Weich"
+     ]
+    },
+    "smoothness": {
+     "label": "Glätte"
+    },
+    "start": {
+     "label": "Start"
+    },
+    "tint": {
+     "label": "Tönung"
+    },
+    "unit": {
+     "label": "Basierend auf",
+     "options": [
+      "Zeichen",
+      "Wort",
+      "Zeile"
+     ]
+    }
+   },
+   "presets": {
+    "spin-cascade": "Dreh-Kaskade",
+    "wave": "Welle"
+   }
+  },
+  "threshold": {
+   "description": "Reines Schwarz und Weiß, getrennt bei einer bestimmten Helligkeit.",
+   "name": "Schwellenwert",
+   "params": {
+    "blend": {
+     "label": "Mischmodus",
+     "options": [
+      "Normal",
+      "Multiplizieren",
+      "Negativ multiplizieren",
+      "Überlagern",
+      "Weiches Licht",
+      "Hartes Licht",
+      "Addieren",
+      "Abdunkeln",
+      "Aufhellen",
+      "Differenz",
+      "Farbig abwedeln",
+      "Farbig nachbelichten"
+     ]
+    },
+    "invert": {
+     "label": "Invertieren"
+    },
+    "level": {
+     "label": "Schwellenwert"
+    },
+    "softness": {
+     "label": "Weichzeichnung"
+    }
+   }
+  },
+  "tile": {
+   "description": "Wiederholt das Bild in einem Raster.",
+   "name": "Kacheln",
+   "params": {
+    "mirror": {
+     "label": "Spiegeln"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "scale": {
+     "label": "Skalierung"
+    }
+   }
+  },
+  "tilerotate": {
+   "description": "Teilt die Ebene in ein Raster aus Kacheln und dreht das Bild in jeder Kachel einzeln.",
+   "name": "Kacheln drehen",
+   "params": {
+    "angle": {
+     "label": "Winkel"
+    },
+    "count": {
+     "label": "Anzahl"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "random": {
+     "label": "Zufallswerte"
+    },
+    "rotation": {
+     "label": "Rotation"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "stretch": {
+     "label": "Dehnung"
+    }
+   }
+  },
+  "tiles": {
+   "description": "Wiederholt die Ebene, bis sie den Bildschirm füllt. Erhöhe „Zuschnitt“ für kleinere Kacheln, optional mit Spiegelung, Zeilenversatz und Rotation. „Alte Skalierung“ erhält ältere Projekte.",
+   "name": "Kachelung",
+   "params": {
+    "angle": {
+     "label": "Winkel"
+    },
+    "mirror": {
+     "label": "Spiegeln"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "sizing": {
+     "label": "Größenanpassung",
+     "options": [
+      "Zuschnitt",
+      "Alte Skalierung"
+     ]
+    },
+    "vertical": {
+     "label": "Vertikal versetzen"
+    },
+    "zoom": {
+     "label": "Zuschnitt"
+    }
+   }
+  },
+  "tileshift": {
+   "description": "Teilt die Ebene in ein Raster aus Kacheln und verschiebt das Bild in jeder Kachel in eine zufällige Richtung.",
+   "name": "Kacheln verschieben",
+   "params": {
+    "angle": {
+     "label": "Winkel"
+    },
+    "count": {
+     "label": "Anzahl"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "strength": {
+     "label": "Stärke"
+    },
+    "stretch": {
+     "label": "Dehnung"
+    }
+   }
+  },
+  "timecode": {
+   "description": "Ersetzt den Text einer Ebene durch eine laufende Uhr mit der Zeit der Ebene oder des Projekts. „Starten bei“ und eine negative Geschwindigkeit ergeben einen Countdown.",
+   "name": "Timecode",
+   "params": {
+    "format": {
+     "label": "Format",
+     "options": [
+      "HH:MM:SS:FF",
+      "HH:MM:SS",
+      "MM:SS",
+      "MM:SS.hh",
+      "SS.hh",
+      "Frames"
+     ]
+    },
+    "offset": {
+     "label": "Starten bei"
+    },
+    "source": {
+     "label": "Zeit",
+     "options": [
+      "Ebene",
+      "Projekt"
+     ]
+    },
+    "speed": {
+     "label": "Geschwindigkeit"
+    }
+   }
+  },
+  "timequant": {
+   "description": "Lässt diese Ebene sich mit einer niedrigeren Bildrate bewegen, wie ruckeliges Material oder Stop-Motion.",
+   "name": "Bildrate",
+   "params": {
+    "fps": {
+     "label": "Bilder/Sek."
+    }
+   }
+  },
+  "tint": {
+   "description": "Bildet die Luminanz des Bildes zwischen einer Schattenfarbe und einer Lichterfarbe ab, mit einstellbarer Mischung.",
+   "name": "Tönung",
+   "params": {
+    "amount": {
+     "label": "Menge"
+    },
+    "highlightColor": {
+     "label": "Lichterfarbe"
+    },
+    "shadowColor": {
+     "label": "Schattenfarbe"
+    }
+   }
+  },
+  "torus": {
+   "description": "Wickelt die Ebene um einen Ring.",
+   "name": "Torus",
+   "params": {
+    "light": {
+     "label": "Lichtwinkel"
+    },
+    "perspective": {
+     "label": "Perspektive"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "rotX": {
+     "label": "Rotation X"
+    },
+    "rotY": {
+     "label": "Rotation Y"
+    },
+    "rotZ": {
+     "label": "Rotation Z"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "shading": {
+     "label": "Schattierung"
+    },
+    "shine": {
+     "label": "Glanz"
+    },
+    "thickness": {
+     "label": "Dicke"
+    }
+   }
+  },
+  "tunnel": {
+   "description": "Kleidet einen endlosen Tunnel mit der Ebene aus und fliegt hindurch. Phase verschiebt die Textur entlang seiner Länge.",
+   "name": "Tunnel",
+   "params": {
+    "fog": {
+     "label": "Nebel"
+    },
+    "fogColor": {
+     "label": "Nebelfarbe"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "repeat": {
+     "label": "Wiederholung"
+    },
+    "rotX": {
+     "label": "Rotation X"
+    },
+    "rotY": {
+     "label": "Rotation Y"
+    },
+    "rotZ": {
+     "label": "Rotation Z"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "speed": {
+     "label": "Geschwindigkeit"
+    },
+    "twist": {
+     "label": "Verdrehung"
+    }
+   }
+  },
+  "turbulence": {
+   "description": "Füllt die deckenden Bereiche der Ebene mit weichem fraktalem Rauschen, für Wolken, Rauch oder eine Helligkeitskarte.",
+   "name": "Turbulenz",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "bias": {
+     "label": "Gewichtung"
+    },
+    "blend": {
+     "label": "Mischmodus",
+     "options": [
+      "Normal",
+      "Multiplizieren",
+      "Negativ multiplizieren",
+      "Überlagern",
+      "Weiches Licht",
+      "Hartes Licht",
+      "Addieren",
+      "Abdunkeln",
+      "Aufhellen",
+      "Differenz",
+      "Farbig abwedeln",
+      "Farbig nachbelichten"
+     ]
+    },
+    "color1": {
+     "label": "Farbe 1"
+    },
+    "color2": {
+     "label": "Farbe 2"
+    },
+    "evolution": {
+     "label": "Evolution"
+    },
+    "intensity": {
+     "label": "Intensität"
+    },
+    "octaves": {
+     "label": "Oktaven"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "parallax": {
+     "label": "Parallaxe"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "stretch": {
+     "label": "Dehnung"
+    }
+   }
+  },
+  "turbulentdisplace": {
+   "description": "Schiebt die Ebene mit weichem fraktalem Rauschen herum, für Feuer, Wasser, Hitzeflimmern oder raue natürliche Kanten.",
+   "name": "Turbulente Verschiebung",
+   "params": {
+    "bias": {
+     "label": "Gewichtung"
+    },
+    "direction": {
+     "label": "Richtung",
+     "options": [
+      "Beide",
+      "Horizontal",
+      "Vertikal",
+      "Radial",
+      "Verdrehung"
+     ]
+    },
+    "evolution": {
+     "label": "Evolution"
+    },
+    "octaves": {
+     "label": "Oktaven"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "parallax": {
+     "label": "Parallaxe"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "strength": {
+     "label": "Stärke"
+    },
+    "stretch": {
+     "label": "Dehnung"
+    }
+   }
+  },
+  "twirl": {
+   "description": "Verdreht die Ebene um die Mitte wie einen Wirbel, in der Mitte am stärksten und mit Ausblenden bis zum Radius (ein Anteil der Ebenengröße). Negative Stärke verdreht in die andere Richtung.",
+   "name": "Strudel",
+   "params": {
+    "center": {
+     "label": "Mitte"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "strength": {
+     "label": "Stärke"
+    }
+   }
+  },
+  "unsharpmask": {
+   "description": "Schärft, indem der Unterschied zwischen der Ebene und einer unscharfen Kopie wieder hinzugefügt wird. Stärke legt fest, wie breit die Unschärfe ist, Menge, wie viel hinzugefügt wird, und ein Schwellenwert über 50 % lässt kleine Unterschiede unberührt.",
+   "name": "Unscharf maskieren",
+   "params": {
+    "amount": {
+     "label": "Menge"
+    },
+    "radius": {
+     "label": "Stärke"
+    },
+    "showMask": {
+     "label": "Maske anzeigen"
+    },
+    "threshold": {
+     "label": "Schwellenwert"
+    }
+   }
+  },
+  "vhs": {
+   "description": "Sieht aus wie ein altes Videoband: Farbverlauf an den Rändern, verschmierte Zeilen, Scanlines, Bandrauschen und durchlaufende Tracking-Streifen.",
+   "name": "VHS",
+   "params": {
+    "chroma": {
+     "label": "Farbbluten"
+    },
+    "headSwitch": {
+     "label": "Kopfumschaltung"
+    },
+    "noise": {
+     "label": "Rauschen"
+    },
+    "saturation": {
+     "label": "Sättigung"
+    },
+    "scanlines": {
+     "label": "Scanlines"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "smear": {
+     "label": "Verschmieren"
+    },
+    "tracking": {
+     "label": "Tracking"
+    },
+    "wobble": {
+     "label": "Wackeln"
+    }
+   }
+  },
+  "videofeedback": {
+   "description": "Zeichnet die Ebene immer wieder in sich selbst, wie eine Kamera, die auf ihren eigenen Bildschirm gerichtet ist. Bewege, skaliere oder drehe die Ebene, um den Tunnel zu steuern.",
+   "name": "Videofeedback",
+   "params": {
+    "blend": {
+     "label": "Mischung",
+     "options": [
+      "Normal",
+      "Addieren",
+      "Negativ multiplizieren"
+     ]
+    },
+    "center": {
+     "label": "Mitte"
+    },
+    "copies": {
+     "label": "Kopien"
+    },
+    "delay": {
+     "label": "Verzögerung"
+    },
+    "fade": {
+     "label": "Ausblenden"
+    },
+    "hueShift": {
+     "label": "Farbtonverschiebung"
+    },
+    "offset": {
+     "label": "Versatz"
+    },
+    "rotation": {
+     "label": "Rotation"
+    },
+    "useLayerTransform": {
+     "label": "Ebenentransformation verwenden"
+    },
+    "zoom": {
+     "label": "Zoom"
+    }
+   }
+  },
+  "viewer360": {
+   "description": "Zeigt eine 360°-Panoramaebene durch eine virtuelle Kamera, die du drehen und zoomen kannst.",
+   "name": "360°-Viewer",
+   "params": {
+    "fov": {
+     "label": "Sichtfeld"
+    },
+    "pitch": {
+     "label": "Nicken"
+    },
+    "roll": {
+     "label": "Rollen"
+    },
+    "yaw": {
+     "label": "Gieren"
+    }
+   }
+  },
+  "vignette": {
+   "description": "Dunkelt die Ebene zu den Rändern hin außerhalb einer abgerundeten Form ab: Größe legt die Form fest, Rundung wie rund sie ist, Weichzeichnung wie weich ihr Rand ist, Stärke wie dunkel es wird und Tönung wie stark die Farbe übernommen wird. „Ausstanzen“ macht die Ränder stattdessen transparent.",
+   "name": "Vignette",
+   "params": {
+    "color": {
+     "label": "Farbe"
+    },
+    "extent": {
+     "label": "Größe"
+    },
+    "feather": {
+     "label": "Weichzeichnung"
+    },
+    "punch": {
+     "label": "Ausstanzen"
+    },
+    "rounding": {
+     "label": "Rundung"
+    },
+    "strength": {
+     "label": "Stärke"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Abgerundet",
+      "Weiches Oval"
+     ]
+    },
+    "tint": {
+     "label": "Tönung"
+    }
+   }
+  },
+  "voronoicells": {
+   "description": "Füllt die deckenden Bereiche der Ebene mit einem Zellenmuster um zufällig platzierte Punkte.",
+   "name": "Voronoi-Zellen",
+   "params": {
+    "color1": {
+     "label": "Farbe 1"
+    },
+    "color2": {
+     "label": "Farbe 2"
+    },
+    "lineColor": {
+     "label": "Linienfarbe"
+    },
+    "lineWidth": {
+     "label": "Linienbreite"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "seed": {
+     "label": "Seed"
+    }
+   }
+  },
+  "wavewarp": {
+   "description": "Verbiegt die Ebene mit einer Sinuswelle: Abstand legt fest, wie viele Wellen sie durchlaufen, Ausmaß, wie weit sie schieben, Winkel, in welche Richtung die Wellen laufen, und Verzerrungswinkel, in welche Richtung sie schieben.",
+   "name": "Wellenverzerrung",
+   "params": {
+    "angle": {
+     "label": "Winkel"
+    },
+    "magnitude": {
+     "label": "Ausmaß"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "spacing": {
+     "label": "Abstand"
+    },
+    "speed": {
+     "label": "Geschwindigkeit"
+    },
+    "warpAngle": {
+     "label": "Verzerrungswinkel"
+    }
+   }
+  },
+  "wipe": {
+   "description": "Blendet die Ebene von zwei gegenüberliegenden Seiten aus. Animiere Start oder Ende für einen Wischübergang.",
+   "name": "Wischblende",
+   "params": {
+    "angle": {
+     "label": "Winkel"
+    },
+    "end": {
+     "label": "Ende"
+    },
+    "feather": {
+     "label": "Weichzeichnung"
+    },
+    "softness": {
+     "label": "Weichheit"
+    },
+    "start": {
+     "label": "Start"
+    }
+   }
+  },
+  "zoomstreaks": {
+   "description": "Erzeugt Streifen, die von einem Punkt ausgehen, indem Kopien der Ebene darum herum skaliert und die hellsten Pixel behalten werden. „Durchschn.“ ergibt eine Zoom-Unschärfe. R, G, B und A legen pro Kanal fest, ob die Kopien den niedrigsten, höchsten oder durchschnittlichen Wert behalten oder der Kanal unberührt bleibt.",
+   "name": "Zoomstreifen",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Min",
+      "Max",
+      "Durchschn.",
+      "Aus"
+     ]
+    },
+    "alpha": {
+     "label": "Alpha"
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "Min",
+      "Max",
+      "Durchschn.",
+      "Aus"
+     ]
+    },
+    "bias": {
+     "label": "Gewichtung"
+    },
+    "center": {
+     "label": "Mitte"
+    },
+    "g": {
+     "label": "G",
+     "options": [
+      "Min",
+      "Max",
+      "Durchschn.",
+      "Aus"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "Min",
+      "Max",
+      "Durchschn.",
+      "Aus"
+     ]
+    },
+    "strength": {
+     "label": "Stärke"
+    }
+   }
+  }
+ }
+}

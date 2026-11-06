@@ -284,7 +284,7 @@ private fun LanguageList(top: AppLanguage, chosen: AppLanguage, modifier: Modifi
 @Composable
 private fun LanguageRow(language: AppLanguage, chosen: Boolean, ui: Locale, onClick: () -> Unit) {
     val shape = RoundedCornerShape(12.dp)
-    val local = remember(language, ui) { Locale.forLanguageTag(language.tag).getDisplayName(ui).replaceFirstChar { it.titlecase(ui) } }
+    val local = remember(language, ui) { Locale.forLanguageTag(when (language.tag) { "zh-TW" -> "zh-Hant"; "zh-CN" -> "zh-Hans"; else -> language.tag }).getDisplayName(ui).replaceFirstChar { it.titlecase(ui) } }
     Row(
         Modifier.fillMaxWidth().heightIn(min = 62.dp).clip(shape).background(Am.Card)
             .border(2.dp, if (chosen) Am.Navy else Color.Transparent, shape)

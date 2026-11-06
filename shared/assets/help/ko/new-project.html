@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="ko" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>프로젝트 만들기 | AbsentMotion</title><meta name="description" content="새 프로젝트 시트의 모든 설정입니다."><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="도움말"><a href="index.html">목차</a><a href="effects/index.html">이펙트</a></nav></header><div class="wrap"><main id="main"><h1>프로젝트 만들기</h1><p class="lead">새 프로젝트 시트의 모든 설정입니다.</p><details class="toc"><summary>이 페이지</summary><ul><li><a href="#project-or-asset">프로젝트 또는 에셋</a></li><li><a href="#name">이름</a></li><li><a href="#shape-of-the-picture-aspect-ratio">화면 모양 (화면 비율)</a></li><li><a href="#resolution">해상도</a></li><li><a href="#frame-rate">프레임 레이트</a></li><li><a href="#background">배경</a></li><li><a href="#buttons-at-the-bottom">아래쪽 버튼</a></li></ul></details><p>홈 화면 아래의 둥근 <strong>+</strong>를 누르세요. 시트가 아래에서 올라옵니다. 지난번에 쓴 값(모양, 해상도, 프레임 레이트, 배경)으로 열리며, 이름은 항상 새로 만들어집니다. 아무것도 만들지 않고 닫으려면 뒤로를 누르세요.</p>
+<figure><img src="../assets/img/new-sheet.webp" width="720" height="853" alt="새 프로젝트 시트: 프로젝트 또는 에셋 (1), 이름 (2), 도형 (3), 해상도 (4), 프레임 레이트 (5), 배경 (6), 프로젝트 만들기 (7)." loading="lazy"><figcaption>새 프로젝트 시트: 프로젝트 또는 에셋 (1), 이름 (2), 도형 (3), 해상도 (4), 프레임 레이트 (5), 배경 (6), 프로젝트 만들기 (7).</figcaption></figure>
+<h2 id="project-or-asset">프로젝트 또는 에셋</h2>
+<p>상단의 스위치에는 두 가지 선택지가 있습니다. <strong>프로젝트</strong>(기본값)와 <strong>에셋</strong>. 에셋은 배경이 투명한 재사용 가능한 조각입니다. 그래서 배경 설정이 투명으로 고정됩니다. <a href="assets-templates.html">에셋, 템플릿, 프리셋</a>을 참고하세요.</p>
+<h2 id="name">이름</h2>
+<p>이름은 "새 프로젝트 1", "새 프로젝트 2"처럼 시작합니다(에셋은 "새 에셋"으로 시작합니다). 입력란의 X를 누르면 지워집니다. 빈 이름은 기본 이름으로 대체됩니다.</p>
+<h2 id="shape-of-the-picture-aspect-ratio">화면 모양 (화면 비율)</h2>
+<p><strong>16:9</strong>, <strong>9:16</strong>, <strong>4:5</strong>, <strong>1:1</strong>, <strong>4:3</strong> 버튼과 <strong>사용자 지정 화면 비율</strong>용 연필 버튼이 있습니다. 기본값은 1:1입니다. 휴대전화 동영상에는 9:16을, 가로 동영상에는 16:9를 고르세요.</p>
+<h2 id="resolution">해상도</h2>
+<p><strong>해상도</strong> 줄에는 캔버스 크기(예: 1920 x 1080)가 표시됩니다. 다섯 가지 모양에서는 짧은 변을 기준으로 한 목록입니다:</p>
+<div class="table-wrap"><table><thead><tr><th>선택지</th><th>짧은 변</th></tr></thead><tbody><tr><td data-label="선택지">2160p (4k)</td><td data-label="짧은 변">2160</td></tr><tr><td data-label="선택지">1440p (QHD)</td><td data-label="짧은 변">1440</td></tr><tr><td data-label="선택지">1080p (FHD), 기본값</td><td data-label="짧은 변">1080</td></tr><tr><td data-label="선택지">720p (HD)</td><td data-label="짧은 변">720</td></tr><tr><td data-label="선택지">540p (SD), 360p, 270p, 180p</td><td data-label="짧은 변">이름에 적힌 대로</td></tr></tbody></table></div>
+<p>긴 변은 모양에 따라 정해집니다. 16:9 프로젝트를 1080p로 하면 1920 x 1080이고, 4:5 프로젝트는 1080 x 1350, 4:3 프로젝트는 1440 x 1080입니다.</p>
+<p><strong>사용자 지정 화면 비율</strong>을 고르면 목록이 가로와 세로 숫자 입력란 두 개로 바뀌고, 그 사이에 둥근 <strong>연결</strong> 버튼이 있습니다. 연결을 켜 두면 한쪽 변을 바꿔도, 연결을 켰을 때 두 입력란이 가졌던 비율이 유지됩니다. 각 변은 32에서 4096 픽셀 사이여야 하며, 입력란을 벗어나면 앱이 값을 보정합니다.</p>
+<p>나중에 쓰려고 크기를 저장하려면 입력란 아래의 <strong>+ 크기 저장</strong>을 누르고 이름(예: "배너")을 붙이세요. 저장한 크기는 옆에 버튼으로 나타나며, 하나를 누르면 가로와 세로가 채워집니다. 저장한 크기를 길게 누르면(컴퓨터에서는 마우스 오른쪽 클릭) 이름을 바꾸거나 삭제할 수 있습니다. 편집기의 프로젝트 설정에서 사용자 지정 비율을 고르면 같은 저장 크기가 나타납니다.</p>
+<p>캔버스가 크면 더 선명하지만 메모리가 더 필요하고 내보내기 시간도 더 걸립니다. 대부분의 프로젝트에는 1080p가 좋습니다. 해상도는 나중에 편집기의 프로젝트 설정에서 바꿀 수 있으며, 이때 레이어 크기는 다시 조정되지 않습니다.</p>
+<h2 id="frame-rate">프레임 레이트</h2>
+<p>초당 12, 15, 18, 20, 24, 25, 30, 48, 50, 60, 90 또는 120 프레임 중에서 고를 수 있습니다. 기본값은 60입니다. 영화 같은 느낌과 더 작은 파일을 원하면 24 또는 30을, 빠른 움직임을 부드럽게 하려면 60을 고르세요. 90과 120은 고주사율 화면에서 매우 부드러운 움직임을 위한 것입니다. 모든 휴대전화가 그렇게 빠른 동영상을 내보낼 수 있는 것은 아니며, 내보내기 화면이 내보낼 수 없는 경우를 알려 줍니다. 이 값은 편집기와 내보내기가 화면을 그리는 빈도를 정합니다. 동영상 클립은 자체 프레임 레이트를 유지하며, <a href="export.html">내보내기</a> 페이지의 프레임 보간 옵션을 참고하세요.</p>
+<h2 id="background">배경</h2>
+<p>레이어 뒤의 색입니다. <strong>블랙</strong>, <strong>흰색</strong>, <strong>밝은 회색</strong>, <strong>초록</strong>, <strong>파랑</strong> 또는 <strong>투명</strong>(체크무늬로 표시)입니다. 새로 설치하면 투명으로 시작합니다. 내보낸 동영상의 투명한 영역은 검은색으로 나옵니다. GIF와 이미지 내보내기에서는 투명한 영역을 무엇으로 채울지 고를 수 있으며, PNG는 투명도를 그대로 유지합니다.</p>
+<h2 id="buttons-at-the-bottom">아래쪽 버튼</h2>
+<ul><li><strong>프로젝트 만들기</strong>(에셋은 <strong>에셋 만들기</strong>)는 프로젝트를 만들고 편집기를 엽니다.</li><li>그 아래의 X는 시트를 닫습니다.</li></ul>
+<p>저장 공간이 부족하면 앱이 이를 알려 주고 프로젝트를 만들지 않습니다.</p><nav class="pager" aria-label="다음 및 이전 페이지"><a rel="prev" href="home.html">&larr; 홈 화면</a><a rel="next" href="editor.html">편집기 화면 &rarr;</a></nav></main></div></body></html>

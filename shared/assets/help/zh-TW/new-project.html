@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-TW" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>建立專案 | AbsentMotion</title><meta name="description" content="新增專案面板中的每個設定。"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="說明"><a href="index.html">目錄</a><a href="effects/index.html">特效</a></nav></header><div class="wrap"><main id="main"><h1>建立專案</h1><p class="lead">新增專案面板中的每個設定。</p><details class="toc"><summary>本頁內容</summary><ul><li><a href="#project-or-asset">專案或素材</a></li><li><a href="#name">名稱</a></li><li><a href="#shape-of-the-picture-aspect-ratio">畫面形狀（長寬比）</a></li><li><a href="#resolution">解析度</a></li><li><a href="#frame-rate">影格速率</a></li><li><a href="#background">背景</a></li><li><a href="#buttons-at-the-bottom">底部按鈕</a></li></ul></details><p>點選首頁底部的圓形 <strong>+</strong>。面板會從底部滑出。它會以你上次使用的數值開啟（形狀、解析度、影格速率與背景；名稱則一律是新的）。點選「返回」即可關閉它，不會建立任何內容。</p>
+<figure><img src="../assets/img/new-sheet.webp" width="720" height="853" alt="新增專案面板：專案或素材 (1)、名稱 (2)、形狀 (3)、解析度 (4)、影格速率 (5)、背景 (6)、建立專案 (7)。" loading="lazy"><figcaption>新增專案面板：專案或素材 (1)、名稱 (2)、形狀 (3)、解析度 (4)、影格速率 (5)、背景 (6)、建立專案 (7)。</figcaption></figure>
+<h2 id="project-or-asset">專案或素材</h2>
+<p>頂部的切換有兩個選項：<strong>專案</strong>（預設）與<strong>素材</strong>。素材是具有透明背景的可重複使用元件：其背景設定會鎖定為透明。參見<a href="assets-templates.html">素材、範本與預設集</a>。</p>
+<h2 id="name">名稱</h2>
+<p>名稱一開始為「新專案 1」、「新專案 2」，依此類推（素材則一開始為「新素材」）。點選欄位中的 X 即可清除它。空白的名稱會退回預設值。</p>
+<h2 id="shape-of-the-picture-aspect-ratio">畫面形狀（長寬比）</h2>
+<p>提供 <strong>16:9</strong>、<strong>9:16</strong>、<strong>4:5</strong>、<strong>1:1</strong> 與 <strong>4:3</strong> 按鈕，以及一個用來設定<strong>自訂長寬比</strong>的鉛筆按鈕。預設為 1:1。手機直式影片請選 9:16，橫向影片請選 16:9。</p>
+<h2 id="resolution">解析度</h2>
+<p><strong>解析度</strong>列會顯示畫布尺寸，例如 1920 x 1080。對於五種形狀，它是一份短邊的清單：</p>
+<div class="table-wrap"><table><thead><tr><th>選項</th><th>短邊</th></tr></thead><tbody><tr><td data-label="選項">2160p (4k)</td><td data-label="短邊">2160</td></tr><tr><td data-label="選項">1440p (QHD)</td><td data-label="短邊">1440</td></tr><tr><td data-label="選項">1080p (FHD)，預設</td><td data-label="短邊">1080</td></tr><tr><td data-label="選項">720p (HD)</td><td data-label="短邊">720</td></tr><tr><td data-label="選項">540p (SD)、360p、270p、180p</td><td data-label="短邊">依所列名稱</td></tr></tbody></table></div>
+<p>長邊依形狀而定。1080p 的 16:9 專案為 1920 x 1080，4:5 專案為 1080 x 1350，4:3 專案則為 1440 x 1080。</p>
+<p>使用<strong>自訂長寬比</strong>時，清單會變成兩個數字欄位，分別為寬度與高度，中間有一個圓形的<strong>連結</strong>按鈕。連結開啟時，變更其中一邊會保持你開啟連結時兩個欄位所具有的比例。每一邊可介於 32 至 4096 像素之間；離開欄位時，應用程式會修正數值。</p>
+<p>若要保留一個尺寸供日後使用，請點選欄位下方的 <strong>＋儲存大小</strong>，並為它取一個名稱（例如「Banner」）。已儲存的尺寸會以按鈕形式出現在旁邊；點選其中一個即可填入其寬度與高度。長按已儲存的尺寸（在電腦上則為按右鍵）即可重新命名或刪除它。在編輯器中，當你選擇自訂比例時，專案設定也會提供相同的已儲存尺寸。</p>
+<p>較大的畫布看起來較清晰，但需要更多記憶體，匯出也較久。1080p 適用於大多數專案。之後你可以在編輯器的專案設定中變更解析度，且這不會縮放你的圖層。</p>
+<h2 id="frame-rate">影格速率</h2>
+<p>可選擇每秒 12、15、18、20、24、25、30、48、50、60、90 或 120 個影格。預設為 60。想要電影般的質感與較小的檔案，請使用 24 或 30；想要快速動作的流暢感，請使用 60。90 與 120 適用於高更新率螢幕上的極致流暢動作；並非每支手機都能匯出這麼快的影片，匯出畫面會告訴你你的手機是否做不到。這會設定編輯器與匯出繪製畫面的頻率。影片片段會保留它們自己的影格速率；請參見<a href="export.html">匯出</a>頁面中的影格插補選項。</p>
+<h2 id="background">背景</h2>
+<p>圖層後方的顏色：<strong>黑色</strong>、<strong>白色</strong>、<strong>淺灰色</strong>、<strong>綠色</strong>、<strong>藍色</strong>或<strong>透明</strong>（以棋盤格顯示）。全新安裝時預設為<strong>透明</strong>。匯出影片的透明區域會變成黑色；GIF 與圖片匯出可以選擇透明區域要變成什麼，PNG 則會保留透明。</p>
+<h2 id="buttons-at-the-bottom">底部按鈕</h2>
+<ul><li><strong>建立專案</strong>（素材則為<strong>建立素材</strong>）會建立專案，並在編輯器中開啟它。</li><li>其下方的 X 會關閉面板。</li></ul>
+<p>若儲存空間不足，應用程式會說明並且不建立專案。</p><nav class="pager" aria-label="上一頁與下一頁"><a rel="prev" href="home.html">&larr; 首頁</a><a rel="next" href="editor.html">編輯器畫面 &rarr;</a></nav></main></div></body></html>

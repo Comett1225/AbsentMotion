@@ -17,15 +17,24 @@ from i18n_extract import EFFECTS, FOLDERS, KOTLIN, PLACEHOLDER, RES, ROOT, SEVER
 
 LANGUAGES = {'id': 'Indonesian', 'hi': 'Hindi', 'pt-BR': 'Brazilian Portuguese', 'es': 'Latin American Spanish', 'fil': 'Filipino (Tagalog)',
              'vi': 'Vietnamese', 'th': 'Thai', 'ms': 'Malay (Malaysia)', 'ar': 'Arabic (Modern Standard)', 'fa': 'Persian (Farsi, Iran)', 'tr': 'Turkish', 'ru': 'Russian', 'bn': 'Bengali (Bangla)',
-             'es-ES': 'Spanish (Spain)', 'ur': 'Urdu (Pakistan)', 'ja': 'Japanese'}
+             'es-ES': 'Spanish (Spain)', 'ur': 'Urdu (Pakistan)', 'ja': 'Japanese', 'ko': 'Korean', 'zh-TW': 'Traditional Chinese (Taiwan)',
+             'zh-CN': 'Simplified Chinese (China)', 'fr': 'French', 'de': 'German', 'it': 'Italian', 'pl': 'Polish'}
 QUANTITIES = {'id': ['other'], 'vi': ['other'], 'th': ['other'], 'ms': ['other'], 'hi': ['one', 'other'], 'pt-BR': ['one', 'many', 'other'],
               'es': ['one', 'many', 'other'], 'fil': ['one', 'other'], 'tr': ['one', 'other'], 'ru': ['one', 'few', 'many', 'other'],
               'ar': ['zero', 'one', 'two', 'few', 'many', 'other'], 'fa': ['one', 'other'], 'bn': ['one', 'other'],
-              'es-ES': ['one', 'many', 'other'], 'ur': ['one', 'other'], 'ja': ['other']}
+              'es-ES': ['one', 'many', 'other'], 'ur': ['one', 'other'], 'ja': ['other'], 'ko': ['other'], 'zh-TW': ['other'],
+              'zh-CN': ['other'], 'fr': ['one', 'many', 'other'], 'de': ['one', 'other'], 'it': ['one', 'many', 'other'], 'pl': ['one', 'few', 'many', 'other']}
 STATE = ROOT / 'tools/i18n_source.json'
 GLOSSARY = ROOT / 'tools/i18n_glossary.json'
 NOTES = ROOT / 'tools/i18n_notes.json'
-RULES = {'bn': 'Write in standard Bengali (Bangla) with the Bengali script, as used in Bangladesh and India. Keep the Latin digits, units, version numbers and placeholders as in the English. Write the count placeholder in every plural form, including "one" (it also covers 0), unless the English text has none.',
+RULES = {'ko': 'Write natural Korean for an app interface: short noun labels, polite 합니다/하세요 style in messages and help, Hangul for common editing terms as Korean editing apps use them (레이어, 키프레임, 이펙트, 프리셋, 내보내기). Keep the Latin digits and placeholders as in the English.',
+         'zh-TW': 'Write Traditional Chinese as used in Taiwan (繁體中文), with Taiwan terms (影片, 圖層, 匯出, 專案, 設定, 檔案), full-width punctuation in sentences, no spaces between Chinese and Latin text unless the English has a placeholder there. Keep the Latin digits and placeholders as in the English.',
+         'zh-CN': 'Write Simplified Chinese as used in mainland China (简体中文), with mainland terms (视频, 图层, 导出, 项目, 设置, 文件), full-width punctuation in sentences, no spaces between Chinese and Latin text unless the English has a placeholder there. Keep the Latin digits and placeholders as in the English.',
+         'fr': 'Write natural French for an app interface, addressing the user as "vous". Use French typography: a non-breaking space before : ; ! ? and inside « ». Write the count placeholder in every plural form, including "one" (it also covers 0), and give "many" the same wording as "other" (it covers millions).',
+         'de': 'Write natural German for a creative app, addressing the user as "du" (lowercase), with German UI terms where apps use them (Ebene, Keyframe, Effekt, Exportieren, Vorlage). Keep labels short.',
+         'it': 'Write natural Italian for an app interface, addressing the user as "tu", with Italian UI terms where apps use them (livello, keyframe, effetto, esporta, modello). Give "many" the same wording as "other" (it covers millions).',
+         'pl': 'Write natural Polish for an app interface, addressing the user informally (ty) in imperatives (Dotknij, Wybierz), with Polish UI terms where apps use them (warstwa, klatka kluczowa, efekt, eksportuj, szablon). Write the count placeholder in every plural form except "one", and use the right case for few (2-4) and many (5+).',
+'bn': 'Write in standard Bengali (Bangla) with the Bengali script, as used in Bangladesh and India. Keep the Latin digits, units, version numbers and placeholders as in the English. Write the count placeholder in every plural form, including "one" (it also covers 0), unless the English text has none.',
          'fa': 'Write in standard Iranian Persian (Farsi) with the Persian letters, not Arabic ones (use ی and ک, not ي and ك), and use ZWNJ (the half space) where Persian spelling needs it. Keep the Latin digits and placeholders as in the English. Write the count placeholder in every plural form, including "one" (it also covers 0), unless the English text has none.',
          'ru': 'Write the count placeholder in every plural form, including "one" (it also covers 21, 31, 101 ...), unless the English text has none.',
          'hi': 'Write the count placeholder in every plural form, including "one" (it also covers 0), unless the English text has none.',

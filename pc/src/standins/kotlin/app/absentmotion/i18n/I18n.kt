@@ -62,7 +62,14 @@ enum class AppLanguage(val tag: String, val nativeName: String) {
     Turkish("tr", "Türkçe"),
     Russian("ru", "Русский"),
     Bengali("bn", "বাংলা"),
-    Japanese("ja", "日本語");
+    Japanese("ja", "日本語"),
+    Korean("ko", "한국어"),
+    ChineseTraditional("zh-TW", "繁體中文"),
+    ChineseSimplified("zh-CN", "简体中文"),
+    French("fr", "Français"),
+    German("de", "Deutsch"),
+    Italian("it", "Italiano"),
+    Polish("pl", "Polski");
 
     val language: String get() = tag.substringBefore('-')
     val region: String? get() = tag.substringAfter('-', "").ifEmpty { null }
@@ -72,6 +79,7 @@ enum class AppLanguage(val tag: String, val nativeName: String) {
             val parts = tag.trim().replace('_', '-').split('-')
             val language = canonical(parts[0].lowercase())
             val region = parts.drop(1).firstOrNull { it.length == 2 && it.all(Char::isLetter) }?.uppercase()
+                .let { if (language == "zh") chineseRegion(parts.drop(1).firstOrNull { it.length == 4 }, it) else it }
             entries.firstOrNull { it.language == language && it.region != null && it.region == region }
                 ?: entries.firstOrNull { it.language == language && it.region == null }
                 ?: entries.firstOrNull { it.language == language }
@@ -80,6 +88,9 @@ enum class AppLanguage(val tag: String, val nativeName: String) {
         fun preselect(phoneTags: List<String>): AppLanguage = match(phoneTags) ?: English
 
         fun suggestedOrder(top: AppLanguage): List<AppLanguage> = listOf(top) + entries.filter { it != top }
+
+        private fun chineseRegion(script: String?, region: String?) =
+            if (script?.lowercase() == "hant" || (script == null && region in setOf("TW", "HK", "MO"))) "TW" else "CN"
 
         private fun canonical(language: String) = when (language) {
             "in" -> "id"

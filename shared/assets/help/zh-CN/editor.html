@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>编辑器界面 | AbsentMotion</title><meta name="description" content="顶部栏、预览、播放栏，以及它们如何协同工作。"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="帮助"><a href="index.html">目录</a><a href="effects/index.html">特效</a></nav></header><div class="wrap"><main id="main"><h1>编辑器界面</h1><p class="lead">顶部栏、预览、播放栏，以及它们如何协同工作。</p><details class="toc"><summary>本页内容</summary><ul><li><a href="#the-top-bar">顶部栏</a></li><li><a href="#the-preview">预览</a></li><li><a href="#the-play-bar">播放栏</a></li><li><a href="#multi-select">多选</a></li><li><a href="#on-a-tablet">在平板上</a></li></ul></details><p>编辑器从上到下分为四个部分：<strong>顶部栏</strong>、<strong>预览</strong>、<strong>播放栏</strong>，以及带有工具的<strong>时间轴</strong>。平板有自己的布局：见下方的<strong>在平板上</strong>。</p>
+<figure><img src="../assets/img/editor.webp" width="720" height="1486" alt="编辑器的四个部分：顶部栏 (1)、预览 (2)、播放栏 (3)，以及带工具的时间轴 (4)。" loading="lazy"><figcaption>编辑器的四个部分：顶部栏 (1)、预览 (2)、播放栏 (3)，以及带工具的时间轴 (4)。</figcaption></figure>
+<p>每次编辑后，更改会在片刻后自动保存。编辑时，项目还会每两分钟保留一个版本（参见<a href="projects.html">项目、备份和导入</a>）。时间轴中最上方的图层是最前面的图层，新图层会添加在最前面。</p>
+<p>手机的返回按钮会逐级后退：它会依次关闭预览条、清除多选、关闭缓动曲线图、退出已打开的特效、退出面板、取消选中图层、退出已打开的组，最后才会离开编辑器。</p>
+<h2 id="the-top-bar">顶部栏</h2>
+<p>顶部栏显示的内容取决于当前的选中状态。</p>
+<p><strong>未选中任何内容</strong></p>
+<ul><li>左侧的 <strong>返回项目列表</strong>。</li><li><strong>项目名称</strong>。点按即可重命名项目。</li><li><strong>项目设置</strong>（齿轮图标）：见下文。</li><li><strong>导出并分享</strong>（分享图标）：会打开<a href="export.html">导出</a>屏幕。</li></ul>
+<p><strong>已选中图层</strong></p>
+<ul><li><strong>返回</strong> 会取消选中图层。</li><li><strong>图层名称</strong>。点按即可重命名；它也是时间轴条上的标签。</li><li><strong>父级</strong>按钮（一个虚线方框、一个实心方框和一个小圆点）。它会列出“无”以及其他所有图层。选择某个图层作为父级后，所选图层在移动、旋转或缩放时会跟随它，并且在你设置父级时保持其在屏幕上的位置不变。</li><li><strong>删除图层</strong>（垃圾桶图标）会立即删除，不会有任何询问。撤销即可将其恢复。该图层的子图层会被解除关联。</li><li><strong>图层菜单</strong>（三个点）：参见<a href="layer-menus.html">图层菜单和多选</a>。</li></ul>
+<figure><img src="../assets/img/editor-top-bar.webp" width="720" height="184" alt="选中图层时的顶部栏：返回 (1)、图层名称 (2)、父级按钮 (3)、删除图层 (4)、图层菜单 (5)。" loading="lazy"><figcaption>选中图层时的顶部栏：返回 (1)、图层名称 (2)、父级按钮 (3)、删除图层 (4)、图层菜单 (5)。</figcaption></figure>
+<p><strong>面板已打开。</strong> 顶部栏会显示一个返回箭头和面板名称，例如 变换、填充和颜色 或 特效。</p>
+<p><strong>在组内。</strong> 点按 <strong>编辑组</strong> 后，顶部栏会显示路径而非项目名称：先是项目名称，然后是每个已打开组的名称。点按项目名称可返回整个项目，点按某个组的名称则可返回该组。选中图层时，图层名称旁会出现一个带有组名的小标签，点按它即可退出组。组内会隐藏齿轮图标。参见<a href="shapes.html">形状、绘图和蒙版</a>。</p>
+<h3 id="project-settings">项目设置</h3>
+<p>点按齿轮会打开一个面板，其中的选项与新建项目面板相同：画面比例（16:9、9:16、4:5、1:1、4:3 或自定义比例）、<strong>分辨率</strong>、<strong>帧率</strong> 和 <strong>背景</strong>。更改这些设置只会改变画布；你的图层不会被重新缩放。此更改可以撤销。<strong>版本历史</strong> 一行中有一个 <strong>历史版本</strong> 按钮。</p>
+<figure><img src="../assets/img/editor-project-settings.webp" width="720" height="540" alt="项目设置：形状 (1)、分辨率 (2)、帧率 (3)、背景 (4)、历史版本 (5)。" loading="lazy"><figcaption>项目设置：形状 (1)、分辨率 (2)、帧率 (3)、背景 (4)、历史版本 (5)。</figcaption></figure>
+<p>对于素材项目，该面板还包含 <strong>预合成</strong> 和 <strong>时间重映射</strong>：参见<a href="assets-templates.html">素材、模板和预设</a>。</p>
+<h2 id="the-preview">预览</h2>
+<p>预览显示画布。透明背景会显示为棋盘格。</p>
+<ul><li><strong>选择。</strong> 点按图层即可选中它（手指下方最上层的图层）。点按空白画布即可取消选中。</li><li><strong>移动。</strong> 在预览的任何位置拖动即可移动所选图层，而不仅限于图层本身。</li><li><strong>缩放。</strong> 所选图层带有白色轮廓和八个圆形控点。拖动角点可等比缩放图层；拖动边可沿该方向拉伸。用两根手指捏合也可以缩放。控点围绕锚点（<strong>变换</strong> 中的 <strong>锚点</strong>）进行缩放，锚点保持不动。</li><li><strong>旋转。</strong> 普通图层没有旋转控点，也不能用双指旋转。请使用 <strong>变换</strong> 中的 <strong>旋转</strong>（参见<a href="layer-tools.html">图层工具</a>）。</li><li><strong>相机图层。</strong> 拖动可平移相机，捏合可更改相机的视角。</li><li><strong>文本。</strong> 在文本编辑器中，文本框侧边的控点可更改换行宽度。</li><li><strong>参考线。</strong> 在 <strong>变换</strong> 中移动图层时，当它与画布中心或另一个图层对齐，会出现细红线。</li></ul>
+<h3 id="zoom-and-pan-the-canvas">缩放和平移画布</h3>
+<p>未选中任何内容时，双指可平移和缩放画布（范围从 1 % 到 6400 %）。选中图层后，点按预览左上角的小放大镜即可开启平移缩放模式；此时双指可缩放画布，单指仍可移动图层。双指双击可恢复为 100 %，再次双击则返回先前的视图。</p>
+<h3 id="the-preview-strip">预览条</h3>
+<p>播放栏的最后一个按钮（<strong>预览模式</strong>）会在预览右侧边缘打开一个窄条，其中的按钮从上到下依次为：</p>
+<ol><li><strong>像素预览</strong> 会显示边缘清晰的项目像素，放大时很有用。</li><li><strong>网格</strong> 会叠加一个网格，每 40 个项目像素一格。</li><li><strong>独奏所选图层</strong> 会隐藏所有其他图层。再次点按会以半透明绘制其他图层，第三次点按则关闭该功能。</li><li><strong>相机视图</strong> 会通过相机图层观看（仅当项目中有相机图层时可用）。</li><li><strong>完整</strong>、<strong>二分之一</strong> 或 <strong>四分之一</strong>：预览画质。数值越低，在较慢的手机上越快，且不会改变你的导出结果。它与<a href="settings.html">设置</a>中的 <strong>预览画质</strong> 是同一个设置。</li><li><strong>快速模糊</strong> 或 <strong>完整模糊</strong>：运动模糊特效的预览方式。快速为近似效果；完整则精确但较慢。导出始终使用精确效果。</li><li><strong>缩放</strong>：加号和减号按钮以及当前百分比。</li></ol>
+<figure><img src="../assets/img/editor-preview-strip.webp" width="720" height="920" alt="预览工具栏：像素预览 (1)、网格 (2)、独奏所选图层 (3)、相机视图 (4)、预览质量 (5)、模糊模式 (6)、缩放 (7)。" loading="lazy"><figcaption>预览工具栏：像素预览 (1)、网格 (2)、独奏所选图层 (3)、相机视图 (4)、预览质量 (5)、模糊模式 (6)、缩放 (7)。</figcaption></figure>
+<p>位于 <strong>快速模糊</strong> 和 <strong>缩放</strong> 之间的 <strong>预渲染</strong>，会从播放头位置开始一直渲染到项目结尾（或尽可能多地渲染，直到内存和存储空间用完），因此较重的项目也能流畅播放。预览顶部会显示渲染进度，并附带一个 <strong>取消</strong> 按钮。播放使用预渲染的帧时，预览右上角会显示一个小的 <strong>已预渲染</strong> 标签。对项目的任何更改都会使预渲染过时：条中的 <strong>预渲染</strong> 按钮会改变颜色，并出现 <strong>重新预渲染</strong> 提示。预渲染完成后，点按 <strong>预渲染</strong> 可查看其覆盖的时长，长按则可将其删除。</p>
+<h3 id="other-things-on-the-preview">预览中的其他内容</h3>
+<ul><li>选中视觉图层时，右下角的圆形 <strong>添加动画</strong> 按钮会出现：它会打开入场、出场和循环动画。参见<a href="animations.html">转场和动画</a>。</li><li>底部的撤销／重做提示会显示上一次撤销或重做的内容。</li></ul>
+<h2 id="the-play-bar">播放栏</h2>
+<p>从左到右共七个按钮。</p>
+<ol><li><strong>撤销</strong> 和 2. <strong>重做</strong>。应用最多保留 200 步。一次完整的拖动或滑块调整计为一步。每次撤销或重做都会显示一条简短提示，例如“已撤销：移动”。</li><li><strong>向后跳转</strong> 和 5. <strong>向前跳转</strong> 会跳到上一个或下一个停靠点。未选中任何内容时，停靠点为项目的开头和结尾；选中图层时，停靠点为该图层的开头、结尾及其关键帧。书签始终是停靠点。</li><li><strong>播放</strong> / <strong>暂停</strong>。在停止状态下长按播放，可开启或关闭循环播放。从结尾开始播放时，会从头重新开始。</li><li><strong>复制和粘贴</strong> 会打开一个菜单，用于复制、粘贴和保存预设：参见<a href="layer-menus.html">图层菜单和多选</a>。</li><li><strong>预览模式</strong> 会打开预览条。</li></ol>
+<figure><img src="../assets/img/editor-play-bar.webp" width="720" height="138" alt="播放栏：撤销 (1)、重做 (2)、向后跳转 (3)、播放 (4)、向前跳转 (5)、复制和粘贴 (6)、预览模式 (7)。" loading="lazy"><figcaption>播放栏：撤销 (1)、重做 (2)、向后跳转 (3)、播放 (4)、向前跳转 (5)、复制和粘贴 (6)、预览模式 (7)。</figcaption></figure>
+<p>播放栏下方的细线是项目播放时的实时电平表：左半部分显示左声道，右半部分显示右声道，随着声音变大依次由绿色变为黄色再变为红色。如果某一侧削波，该半部分会闪烁红色。</p>
+<h2 id="multi-select">多选</h2>
+<p>在某个图层行的眼睛或名称区域按住，然后上下滑动，即可一次选中多行；之后轻点即可切换各行的选中状态。顶部栏会变色，并显示组合、特效、删除和对齐按钮，底部会出现一个带有片段时间设置命令的栏。这些都在<a href="layer-menus.html">图层菜单和多选</a>中有详细说明。</p>
+<h2 id="on-a-tablet">在平板上</h2>
+<p>只要平板屏幕足够宽，就会使用更宽的布局，无论竖屏还是横屏（大多数 10 英寸和 11 英寸的平板两种方向都会使用，较小的平板横放时使用）。</p>
+<ul><li>选中图层后，面板和工具会在预览旁边的一列中打开，因此它们永远不会遮住时间轴。</li><li>时间轴会占据预览下方的整个宽度。竖屏时，它会占据屏幕的下半部分，因此可以容纳更多图层。</li><li>工具会以两到四列排列，并放在同一页上。</li></ul>
+<p>在竖直握持的较小平板上，编辑器看起来与手机相同，而且取色器、预设、关于和帮助等面板会以卡片形式在屏幕中央打开，而不是占满整个屏幕。主屏幕也会显示项目和模板的网格，并将工具并排放置：参见<a href="home.html">主屏幕</a>。</p>
+<h2 id="next">下一步</h2>
+<ul><li><a href="timeline.html">时间轴</a></li><li><a href="add-menu.html">添加菜单</a></li><li><a href="layer-tools.html">图层工具</a></li></ul><nav class="pager" aria-label="上一页和下一页"><a rel="prev" href="new-project.html">&larr; 创建项目</a><a rel="next" href="timeline.html">时间轴 &rarr;</a></nav></main></div></body></html>

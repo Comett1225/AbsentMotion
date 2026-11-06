@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-TW" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>圖層工具 | AbsentMotion</title><meta name="description" content="選取圖層時出現的工具格，以及其後的每個面板。"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="說明"><a href="index.html">目錄</a><a href="effects/index.html">特效</a></nav></header><div class="wrap"><main id="main"><h1>圖層工具</h1><p class="lead">選取圖層時出現的工具格，以及其後的每個面板。</p><p>點選一個圖層，底部會開啟一組工具格。第一列有五個小按鈕（速度、修剪與分割、音量），說明見<a href="timeline.html">時間軸</a>。無法在播放頭所在位置使用的修剪或延伸按鈕，根本不會顯示。在它們下方是大型按鈕，其組合會依圖層類型而不同。</p>
+<p>大型按鈕分為兩頁。在工具格上左右滑動即可切換頁面；其下方的兩個點會顯示你目前位於哪一頁。只有一頁的圖層不會顯示這些點。在大型平板電腦上，工具會排列在預覽旁的欄位中，全部位於同一頁，以兩到四欄排列，以便容納。</p>
+<figure><img src="../assets/img/lt-grid.webp" width="720" height="572" alt="所選圖層的工具格：小按鈕 (1)、大型工具按鈕 (2)、頁面圓點 (3)。" loading="lazy"><figcaption>所選圖層的工具格：小按鈕 (1)、大型工具按鈕 (2)、頁面圓點 (3)。</figcaption></figure>
+<div class="table-wrap"><table><thead><tr><th>圖層</th><th>工具</th></tr></thead><tbody><tr><td data-label="圖層">形狀、照片、影片</td><td data-label="工具">填色與顏色、邊框與陰影、不透明度、變形、形狀選項、預設集、特效</td></tr><tr><td data-label="圖層">路徑形狀（筆、SVG、多種形狀）</td><td data-label="工具">同上，但以<strong>編輯節點</strong>取代形狀選項</td></tr><tr><td data-label="圖層">文字</td><td data-label="工具">同上，但以<strong>編輯文字</strong>取代形狀選項</td></tr><tr><td data-label="圖層">繪圖</td><td data-label="工具">同上，但以<strong>編輯繪圖</strong>取代形狀選項</td></tr><tr><td data-label="圖層">群組</td><td data-label="工具">填色與顏色、邊框與陰影、不透明度、變形、<strong>編輯群組</strong>、預設集、特效。連結至素材的群組會以<strong>素材屬性</strong>取代編輯群組；由<strong>移除背景（影片）</strong>製作的影片去背片段則以<strong>去背邊緣</strong>取代</td></tr><tr><td data-label="圖層">空物件</td><td data-label="工具">變形、預設集、特效</td></tr><tr><td data-label="圖層">攝影機</td><td data-label="工具">攝影機選項、變形、特效、預設集、攝影機運動</td></tr><tr><td data-label="圖層">3D模型</td><td data-label="工具">模型選項、不透明度、變形、預設集、特效</td></tr><tr><td data-label="圖層">燈光</td><td data-label="工具">燈光選項、變形</td></tr><tr><td data-label="圖層">音訊</td><td data-label="工具">預設集、特效（包括語音濾鏡）、<strong>標記節拍</strong>、AI（降噪與自動字幕）</td></tr></tbody></table></div>
+<p>照片與影片是以圖片填滿的矩形，因此與形狀使用相同的工具。</p>
+<p>表格列出的是第一頁。第二頁提供<strong>裁切</strong>，適用於除3D模型外所有可見的圖層：形狀、文字、繪圖、群組、照片與影片。影片片段在那裡另有四個按鈕：<strong>AI</strong>、<strong>自動字幕</strong>、<strong>倒放</strong>與<strong>截圖</strong>；照片那裡也有 <strong>AI</strong>。在專案開啟<strong>深度順序</strong>時，第二頁的開頭還會為形狀、照片、影片、文字、繪圖與群組加上<strong>3D圖層</strong>：參見<a href="camera-3d.html">攝影機圖層與3D</a>。音訊、攝影機、燈光、空物件與3D模型圖層只有單一頁。</p>
+<figure><img src="../assets/img/lt-grid-2.webp" width="720" height="572" alt="影片工具格的第二頁：裁切 (1)、AI (2)、自動字幕 (3)、倒放 (4)。" loading="lazy"><figcaption>影片工具格的第二頁：裁切 (1)、AI (2)、自動字幕 (3)、倒放 (4)。</figcaption></figure>
+<h2 id="every-panel">每個面板</h2>
+<p>大多數面板左側都有一欄窄欄，其中有這些按鈕：<strong>返回</strong>、<strong>新增關鍵影格</strong>或<strong>移除關鍵影格</strong>、<strong>緩動</strong>，以及僅在變形與特效中才有的<strong>更多</strong>。呈灰色的關鍵影格按鈕表示該設定無法加上動畫。參見<a href="keyframes.html">關鍵影格與緩動</a>。</p>
+<p>點選任何數字框即可開啟數字鍵盤。第一次點選會選取整個數值，因此輸入時會直接取代它。按下勾號會套用；點選外部則會關閉鍵盤。標尺（一條帶有刻度與中央指針的長條）在左右拖曳時會變更數字。</p>
+<h3 id="transform">變形</h3>
+<p>右側的標籤：<strong>移動</strong>、<strong>旋轉</strong>、<strong>大小</strong>、<strong>傾斜</strong>、<strong>歪斜</strong>、<strong>錨點</strong>。對攝影機而言，只有移動、旋轉與大小可用；在深度順序開啟時，傾斜也可用；其他標籤呈灰色。在工具格中長按<strong>變形</strong>，或開啟<strong>更多</strong>，即可在<strong>基本控制</strong>（移動、旋轉、大小與歪斜，為預設）與<strong>進階控制</strong>（全部六個標籤）之間切換。</p>
+<ul><li><strong>移動。</strong> 一個觸控板（「拖曳此處以移動圖層」）以及 X 與 Y 數字框。點選 <strong>Z</strong> 即可沿深度軸移動圖層。當圖層與畫布或其他圖層對齊時，會顯示細紅色的參考線。</li><li><strong>旋轉。</strong> 一個旋鈕：拖曳旋鈕即可旋轉，或點選角度數字以輸入。當圖層以3D傾斜時，此標籤會變成3D觸控板：單指傾斜，雙指扭轉。</li><li><strong>大小。</strong> 寬度與高度數字框，以及一個<strong>連結</strong>按鈕（預設開啟），用來保持比例。對攝影機而言，此標籤會改變視角。連結設定會記住每個圖層，並隨專案一起儲存；標尺在輕撥後會持續滑動。</li><li><strong>傾斜。</strong> 以度數為單位的 <strong>X軸旋轉</strong> 與 <strong>Y軸旋轉</strong>，用於3D傾斜。參見<a href="camera-3d.html">攝影機圖層與3D</a>。</li><li><strong>歪斜。</strong> 以度數為單位的 <strong>X軸傾斜</strong> 與 <strong>Y軸傾斜</strong>。</li><li><strong>錨點。</strong> 圖層旋轉與縮放所依據的點，以距離圖層中心的像素為單位。輸入 <strong>X</strong> 與 <strong>Y</strong>、拖曳觸控板、點選九個方格之一（代表角落、邊緣或中央），或拖曳畫布上的標記。圖層及其子圖層會留在原處。</li><li><strong>更多</strong>中有<strong>重設位置</strong>、<strong>重設旋轉</strong>、<strong>重設縮放</strong>、<strong>重設3D旋轉</strong>、<strong>重設傾斜</strong>、<strong>重設錨點</strong>，以及<strong>重設變形</strong>（全部六項）。</li></ul>
+<figure><img src="../assets/img/lt-transform.webp" width="720" height="572" alt="變形面板：分頁 (1)、觸控板 (2)、X、Y、Z 輸入框 (3)。" loading="lazy"><figcaption>變形面板：分頁 (1)、觸控板 (2)、X、Y、Z 輸入框 (3)。</figcaption></figure>
+<p>移動即位置，X、Y 與 Z 會一起加上動畫。旋轉、大小、傾斜、歪斜與錨點各自有自己的關鍵影格；寬度與高度共用大小的關鍵影格。</p>
+<h3 id="crop">裁切</h3>
+<p>照片、影片與其他可見圖層，在工具格的第二頁都有<strong>裁切</strong>按鈕。它會將即將被裁掉的部分調暗，並顯示一個附有八個把手的框：拖曳角落或邊緣即可裁切，拖曳框內則可移動它。雙指仍可縮放畫布。<strong>自由</strong>、<strong>1:1</strong>、<strong>4:5</strong>、<strong>3:4</strong>、<strong>16:9</strong>與<strong>9:16</strong>會套用該比例下最大的置中裁切，並在拖曳時保持該比例。點選某一邊即可輸入其數值；<strong>重設</strong>會移除裁切，<strong>完成</strong>則會關閉面板。關鍵影格按鈕會同時為四邊加上關鍵影格。裁切本身就是<strong>裁切</strong>特效，因此你也可以在<strong>特效</strong>中變更它，並調整<strong>圓角</strong>與<strong>羽化</strong>；圖層則留在原處。</p>
+<figure><img src="../assets/img/lt-crop.webp" width="720" height="1487" alt="裁切面板：圖片上的裁切框 (1)、比例按鈕 (2)、四個邊 (3)、重設與完成 (4)。" loading="lazy"><figcaption>裁切面板：圖片上的裁切框 (1)、比例按鈕 (2)、四個邊 (3)、重設與完成 (4)。</figcaption></figure>
+<h3 id="fill-color">填色與顏色</h3>
+<p>頂部的標籤：<strong>無</strong>、<strong>顏色</strong>、<strong>漸層</strong>、<strong>媒體</strong>。</p>
+<ul><li><strong>顏色。</strong> 所選調色盤的顏色（<strong>預設</strong>調色盤有十四種），之後是你儲存的顏色。頂部的列會顯示調色盤名稱，點選它即可開啟你的<a href="#color-palettes">調色盤</a>；並以 #RRGGBB 格式顯示顏色及其不透明度；列上的 <strong>+</strong> 會儲存目前的顏色。共有三個按鈕：<strong>滴管</strong>（觸碰預覽即可取樣顏色）、<strong>顏色滑桿</strong>，以及<strong>完整顏色選擇器</strong>（色輪，或附有十六進位欄位的 HSV 與 RGB 滑桿）。</li><li><strong>漸層。</strong> 選擇線性、放射或掃描，然後選擇起始與結束顏色。預覽上的兩個把手可以移動漸層。漸層只有兩種顏色。</li><li><strong>媒體。</strong> 以照片或影片填滿形狀，或文字圖層的文字。點選它會開啟選擇器。</li></ul>
+<figure><img src="../assets/img/lt-fill.webp" width="720" height="572" alt="填色與顏色：分頁 (1)、顏色列 (2)、色票 (3)、滴管、顏色滑桿與完整顏色選擇器 (4)。" loading="lazy"><figcaption>填色與顏色：分頁 (1)、顏色列 (2)、色票 (3)、滴管、顏色滑桿與完整顏色選擇器 (4)。</figcaption></figure>
+<p>只有「顏色」標籤中的顏色可以加上關鍵影格。</p>
+<h3 id="color-palettes">調色盤</h3>
+<p>調色盤是一組可在每個專案中使用的顏色。<strong>填色與顏色</strong>中的顏色列、<strong>完整顏色選擇器</strong>，以及特效設定的顏色彈出視窗，都會顯示所選調色盤的顏色。在那裡點選調色盤的名稱，即可開啟<strong>調色盤</strong>。</p>
+<ul><li>點選調色盤即可使用它。鉛筆圖示會開啟它以進行編輯。</li><li><strong>新增</strong>會以你目前使用的顏色建立一個調色盤。<strong>從圖片</strong>會從照片的8種主要顏色建立一個調色盤；從AbsentMotion匯出的調色盤圖片，則會帶回所有顏色。<strong>從檔案</strong>會讀取調色盤檔案：GIMP <code>.gpl</code>、Adobe <code>.ase</code>或 <code>.act</code>、<code>.pal</code>，或是一列十六進位顏色，例如你可以從Lospec下載的調色盤。</li><li>在開啟的調色盤中，點選名稱即可重新命名，點選<strong>使用</strong>即可選取它。點選一個顏色即可選取它：<strong>新增</strong>會加入你目前使用的顏色，<strong>複製</strong>會複製所選的顏色，<strong>刪除</strong>則會移除它。<strong>排序</strong>會依<strong>色相</strong>、<strong>明度</strong>或<strong>飽和度</strong>排列顏色。</li><li><strong>匯出</strong>會將調色盤儲存為 Pictures/AbsentMotion 中的 <strong>圖片（PNG）</strong>，或 Documents/AbsentMotion 中的 <strong>GIMP調色盤（.gpl）</strong>或 <strong>Adobe色票（.ase）</strong>。<strong>建立副本</strong>會建立一份可編輯的副本，而<strong>刪除調色盤</strong>會在詢問後將它移除。</li><li><strong>鎖定</strong>會阻止新增、複製或刪除顏色，直到你將它關閉為止。</li></ul>
+<p>內建八種調色盤：<strong>預設</strong>、<strong>粉彩</strong>、<strong>霓虹</strong>、<strong>大地色</strong>、<strong>膚色</strong>、<strong>灰階</strong>、<strong>PICO-8</strong>與<strong>Game Boy</strong>。它們永久鎖定：若要修改其中一個，請使用<strong>建立副本</strong>。選取內建調色盤時，你儲存的顏色會排在它自己的顏色之後，而<strong>+</strong>會儲存到那裡。選取你自己的調色盤時，<strong>+</strong>會將顏色加入該調色盤，除非它已被鎖定。</p>
+<p>在電腦上，將 <code>.gpl</code>、<code>.ase</code>、<code>.act</code> 或 <code>.pal</code> 檔案拖放到視窗上，它就會加入你的調色盤，並成為所選的調色盤。你的調色盤會保存在備份中：參見<a href="projects.html">專案、備份與匯入</a>。</p>
+<h3 id="frame-shadow">邊框與陰影</h3>
+<p>三個標籤：<strong>描邊</strong>、<strong>邊框</strong>與<strong>陰影</strong>。</p>
+<ul><li><strong>描邊</strong>是形狀的輪廓。它有一個開關、顏色、大小、線端與轉角樣式，以及開放線段兩端各自的樣式（箭頭、圓形、菱形等）。</li><li><strong>邊框</strong>可讓你疊加任意數量的邊框。每個邊框都有大小、顏色與位置（<strong>內側</strong>、<strong>置中</strong>、<strong>外側</strong>）。拖曳把手即可變更它們的順序。<strong>新增邊框</strong>會加入一個。</li><li><strong>陰影</strong>有一個開關、<strong>顏色</strong>、<strong>大小</strong>、<strong>透明度</strong>與<strong>位置</strong>（X 與 Y）。</li></ul>
+<h3 id="opacity">不透明度</h3>
+<p><strong>不透明度</strong>滑桿附有百分比數字框，另有 28 種混合模式，分為七組：正常；變暗（正片疊底、變暗、較深的顏色、加深顏色、線性加深）；變亮（濾色、變亮、較淺的顏色、減淡顏色、線性減淡）；對比（覆蓋、柔光、強光、柔和覆蓋、亮光、線性光、點光）；差異（差值、排除、減去、除）；顏色（色相、飽和度、顏色、亮度）；以及遮罩（遮罩、排除）。點選一組即可展開，點選一種模式即可套用。<strong>遮罩</strong>會讓下方內容只保留在此圖層範圍內；<strong>排除</strong>則會移除此圖層範圍內的下方內容。</p>
+<h3 id="shape-options">形狀選項</h3>
+<p>定義形狀的設定，每列一項，附有標尺與數值框。例如：圓形有<strong>大小</strong>；圓角矩形有大小與圓角半徑；多邊形有邊數、半徑與角度；星形有頂點數、外半徑、內半徑與角度；箭頭有起點、終點、尾端寬度、頭部寬度與頭部長度。被選取的那一列，就是關鍵影格按鈕會加上動畫的那一列。照片與影片在這裡使用的是大小。</p>
+<h3 id="edit-points-edit-drawing-edit-text">編輯節點、編輯繪圖、編輯文字</h3>
+<p>它們會開啟全螢幕編輯器：參見<a href="shapes.html">形狀、繪圖與遮罩</a>與<a href="text.html">文字與字型</a>。</p>
+<h3 id="edit-group">編輯群組</h3>
+<p>開啟群組，使時間軸與預覽只顯示其中的圖層，讓你可以加以變更。參見<a href="shapes.html">形狀、繪圖與遮罩</a>。</p>
+<h3 id="camera-options-light-options-and-model-options">攝影機選項、燈光選項與模型選項</h3>
+<p>參見<a href="camera-3d.html">攝影機圖層與3D</a>。</p>
+<h3 id="mark-beats">標記節拍</h3>
+<p>在音訊圖層上，<strong>標記節拍</strong>會在聲音的每一拍加入一個書籤。它與圖層選單中的<strong>標記節拍</strong>作用相同：參見<a href="audio.html">音訊</a>。</p>
+<h3 id="volume">音量</h3>
+<p>用於聲音與影片。參見<a href="audio.html">音訊</a>。</p>
+<h3 id="ai-auto-captions-reverse-and-screenshot">AI、自動字幕、倒放與截圖</h3>
+<p>這四個按鈕位於影片片段工具格的第二頁（GIF 也算影片）。<strong>AI</strong>會開啟特效庫中的 AI 類別；照片的第二頁也有它（用於移除背景），而音訊圖層則在其唯一的一頁上有同樣的按鈕。<strong>自動字幕</strong>只會為這個片段製作字幕：參見<a href="ai-tools.html">AI工具</a>。<strong>倒放</strong>會讓片段倒著播放：參見<a href="media.html">媒體</a>。</p>
+<p><strong>截圖</strong>會將播放頭下方片段的影格，以片段本身的完整尺寸儲存為圖片。它是原始的素材畫面：特效、裁切、邊框與圖層的位置都不會包含在內，但修剪、速度變更與倒放都會被保留。圖片會存入手機相簿（Pictures/AbsentMotion），並以新圖層的形式加入專案，位於片段上方。若你在10秒內刪除該新圖層，圖片也會從相簿中移除。播放頭必須位於該片段上。</p>
+<h3 id="effects-and-presets">特效與預設集</h3>
+<p>參見<a href="effects-guide.html">使用特效</a>與<a href="assets-templates.html">素材、範本與預設集</a>。</p><nav class="pager" aria-label="上一頁與下一頁"><a rel="prev" href="add-menu.html">&larr; 新增選單</a><a rel="next" href="layer-menus.html">圖層選單與多選 &rarr;</a></nav></main></div></body></html>

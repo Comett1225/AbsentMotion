@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>形状、绘制和蒙版 | AbsentMotion</title><meta name="description" content="形状、钢笔工具、自由绘制、SVG 导入、剪贴蒙版、编组、父级以及带动画的形状蒙版。"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="帮助"><a href="index.html">目录</a><a href="effects/index.html">特效</a></nav></header><div class="wrap"><main id="main"><h1>形状、绘制和蒙版</h1><p class="lead">形状、钢笔工具、自由绘制、SVG 导入、剪贴蒙版、编组、父级以及带动画的形状蒙版。</p><details class="toc"><summary>本页内容</summary><ul><li><a href="#shapes">形状</a></li><li><a href="#the-pen-tool-and-edit-points">钢笔工具和编辑点</a></li><li><a href="#freehand-drawing">自由绘制</a></li><li><a href="#svg-files">SVG 文件</a></li><li><a href="#masks-and-clipping">蒙版和剪贴</a></li><li><a href="#groups-and-parents">组和父级</a></li></ul></details><h2 id="shapes">形状</h2>
+<p>在 <a href="add-menu.html">添加菜单</a> 的 <strong>形状</strong> 选项卡中可以添加现成的形状。形状分为两类。</p>
+<ul><li><strong>参数化形状</strong>（圆形、矩形、星形、多边形等）通过 <strong>形状选项</strong> 编辑：尺寸、半径、顶点数量等。这些设置都可以设置动画。</li><li><strong>路径形状</strong>（心形、云朵、齿轮等）通过 <strong>编辑点</strong> 编辑。</li></ul>
+<p>颜色和轮廓通过 <strong>填充和颜色</strong> 与 <strong>边框和阴影</strong> 设置。参见 <a href="layer-tools.html">图层工具</a>。</p>
+<h2 id="the-pen-tool-and-edit-points">钢笔工具和编辑点</h2>
+<p>添加菜单中的 <strong>钢笔工具</strong> 会创建一个新的形状图层，并打开点编辑器。工具网格中的 <strong>编辑点</strong> 会为现有路径形状打开它。在预览中，点按可放置一个点；按住并拖动可拉出曲线控制柄。一个虚影点会显示下一个点将落在的位置。如果未绘制任何内容就离开，新图层会被删除。</p>
+<p>编辑器底部有：</p>
+<ul><li><strong>闭合路径</strong>或<strong>打开路径</strong>（需要两个或更多点）。</li><li><strong>将点设为曲线点</strong>或<strong>将点设为尖角点</strong>。</li><li><strong>添加点</strong>和<strong>删除点</strong>。</li><li>一个用于移动所选点的触控板（“拖动以移动点”）；当你编辑平滑点的控制柄时，<strong>角度</strong>和<strong>距离</strong>开关可锁定其角度或长度。</li><li>带箭头的<strong>轮廓</strong>可在形状的各个独立子路径之间切换。</li><li>右侧是点的列表，点与点之间有小的“+”单元格，用于插入点。</li></ul>
+<figure><img src="../assets/img/shapes-points.webp" width="720" height="1131" alt="点编辑器：打开路径 (1)、将点设为尖角点 (2)、删除点 (3)、触控板 (4)、轮廓箭头 (5)、点列表 (6)。" loading="lazy"><figcaption>点编辑器：打开路径 (1)、将点设为尖角点 (2)、删除点 (3)、触控板 (4)、轮廓箭头 (5)、点列表 (6)。</figcaption></figure>
+<p>顶部有 <strong>撤销</strong>、<strong>重做</strong> 和 <strong>返回</strong>。</p>
+<h3 id="animated-shapes-shape-keyframes">带动画的形状（形状关键帧）</h3>
+<p>在点编辑器中，时间条上有 <strong>上一个形状关键帧</strong>、<strong>下一个形状关键帧</strong>、<strong>添加形状关键帧</strong> 和 <strong>移除形状关键帧</strong>。形状关键帧会记录播放头所在时间的整个形状。移动到另一个时间，修改点，再添加一个关键帧，形状就会在它们之间产生动画。上一个关键帧会以淡色虚线轮廓显示，帮助你对齐。这就是制作逐帧描摹动画蒙版的方法：沿视频中的物体描出轮廓，并随着物体移动而调整轮廓。</p>
+<h2 id="freehand-drawing">自由绘制</h2>
+<p>添加菜单中的 <strong>自由画笔</strong> 会创建一个绘制图层，并打开绘制编辑器。</p>
+<ul><li><strong>钢笔</strong>绘制均匀的线条，<strong>画笔</strong>根据压力改变线宽，<strong>填充</strong>将你绘制的闭合环变为填充形状，<strong>橡皮擦</strong>擦除部分内容。</li><li>一个大小滑块（1 到 300），以及带有色相条和不透明度条的颜色选择器。</li><li>顶部有 <strong>撤销</strong> 和 <strong>重做</strong>。每一笔在抬起手指时都会保留下来。</li><li>工具、大小和颜色会被记住。如果未绘制任何内容就离开，新图层会被删除。</li></ul>
+<figure><img src="../assets/img/shapes-draw.webp" width="720" height="1077" alt="绘图编辑器：四种工具 (1)、大小滑块 (2)、取色器 (3)。" loading="lazy"><figcaption>绘图编辑器：四种工具 (1)、大小滑块 (2)、取色器 (3)。</figcaption></figure>
+<p>绘图没有关键帧。要为绘图制作动画，请使用“绘制进度”等特效；参见 <a href="effects/index.html">特效库</a>。</p>
+<h2 id="svg-files">SVG 文件</h2>
+<p>添加菜单中的 <strong>导入 SVG</strong> 会将矢量图转换为形状。保留的内容参见 <a href="add-menu.html">添加菜单</a>。</p>
+<h2 id="masks-and-clipping">蒙版和剪贴</h2>
+<ul><li><strong>创建剪贴蒙版</strong>（图层菜单）会将一个图层裁剪为其正下方图层的形状。<strong>释放剪贴蒙版</strong>可撤销此操作。在时间轴上，被剪贴的图层在其行末尾会显示一个小的弯钩箭头，指向它所被剪贴到的图层。</li><li><strong>编组并蒙版</strong>和<strong>编组并排除</strong>（多选）会将图层编组，并将顶层图层的混合模式设为“蒙版”或“排除”。你也可以在<strong>不透明度</strong>中为任何图层设置混合模式“蒙版”或“排除”。<strong>蒙版</strong>只保留该图层所在位置下方的内容；<strong>排除</strong>则将其裁去。</li><li>带动画的蒙版来自形状关键帧（见上文）。</li><li>照片和视频的 <strong>移除背景</strong> 在 <a href="ai-tools.html">AI 工具</a> 中说明。</li></ul>
+<figure><img src="../assets/img/sh-clip-marker.webp" width="720" height="320" alt="被剪裁的图层：它的箭头 (1) 向下指向所剪裁到的图层 (2)。" loading="lazy"><figcaption>被剪裁的图层：它的箭头 (1) 向下指向所剪裁到的图层 (2)。</figcaption></figure>
+<h2 id="groups-and-parents">组和父级</h2>
+<ul><li><strong>编组</strong>（多选）会把图层放入一个组图层。之后可以将组作为一个整体移动、缩放、淡入淡出并添加特效。参见 <a href="layer-menus.html">图层菜单和多选</a>。</li><li><strong>父级</strong>（顶栏中的父级按钮）可让一个图层跟随另一个图层，而无需编组。移动特效 <strong>父级助手</strong> 和 <strong>缩放辅助</strong> 会改变子图层跟随父图层的方式：参见 <a href="effects-guide.html">使用特效</a>。</li><li><strong>空对象</strong>图层（添加 &gt; 对象 / 素材）不可见。将它设为其他图层的父级，即可让它们一起移动，或让 <a href="tracking.html">运动跟踪</a> 来移动它。</li></ul>
+<h3 id="edit-a-group">编辑组</h3>
+<p>选择一个组，然后点按其工具中的 <strong>编辑组</strong> 即可打开它。进入后，时间轴和预览只显示该组的图层，你可以像编辑其他图层一样编辑它们。组中也可以再打开组。</p>
+<ul><li>顶栏会显示你当前所在的位置：项目名称，然后是每个已打开组的名称。点按项目名称可返回整个项目，点按某个组的名称可返回该组。</li><li>选中一个图层时，图层名称旁会显示一个带有组名称的小标签。点按它即可离开该组。</li><li>未选中任何内容时，手机的返回按钮会离开你当前所在的组。</li><li>齿轮图标会打开你所在组的设置。其中只有一个设置，即 <strong>时间重映射</strong>：见下文。</li></ul>
+<p>链接到素材的组会改为打开 <strong>素材属性</strong>：要修改其中的图层，请先打开原始素材，或先使用 <strong>取消关联素材</strong>（参见 <a href="assets-templates.html">素材、模板和预设</a>）。由 <strong>移除背景（视频）</strong> 制作的视频抠像无法打开。</p>
+<h3 id="re-timing-a-group">组的时间重映射</h3>
+<p><strong>时间重映射</strong>决定组片段比其中的图层更长或更短时播放什么内容。打开组（<strong>编辑组</strong>），点按齿轮，然后选择：</p>
+<ul><li><strong>关闭</strong>（默认）：图层按各自的速度播放，并在结束处停止。</li><li><strong>定格</strong>：中间部分的最后一帧保持在屏幕上。</li><li><strong>拉伸</strong>：图层放慢或加快，以填满组片段。</li><li><strong>循环</strong>：图层从头再次播放。</li><li><strong>重复并拉伸</strong>：图层整数次重复播放，并略微拉伸以精确填满片段。</li><li><strong>空白</strong>：图层结束后不显示任何内容。</li></ul>
+<p>在组内，复制和粘贴菜单中还有 <strong>设置片头结束位置</strong> 和 <strong>设置片尾开始位置</strong>。它们会在标尺上放置金色旗标：片头结束位置之前和片尾开始位置之后的部分保持其真实速度，中间部分则被拉伸、循环或定格。</p>
+<figure><img src="../assets/img/sh-group-retiming.webp" width="720" height="1489" alt="组内部：齿轮 (1) 会打开组设置，其中有时间重映射 (2)。" loading="lazy"><figcaption>组内部：齿轮 (1) 会打开组设置，其中有时间重映射 (2)。</figcaption></figure>
+<h3 id="ungroup">取消编组</h3>
+<p>组的图层菜单中的 <strong>取消编组</strong> 会将其图层放回项目中，恢复它们原来的时间和屏幕位置。如果组本身有特效、速度、不透明度或混合模式，应用会在取消编组前提示这些设置将被移除。撤销即可恢复组。</p><nav class="pager" aria-label="上一页和下一页"><a rel="prev" href="text.html">&larr; 文本和字体</a><a rel="next" href="media.html">照片、视频和速度 &rarr;</a></nav></main></div></body></html>

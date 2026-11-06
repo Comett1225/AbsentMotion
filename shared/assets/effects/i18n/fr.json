@@ -1,0 +1,6881 @@
+{
+ "categories": {
+  "3d": "3D",
+  "ai": "AI",
+  "beat": "Rythme",
+  "blur": "Flou",
+  "color": "Couleur",
+  "distort": "Distorsion",
+  "key": "Incrustation",
+  "move": "Mouvement",
+  "new": "Nouveau",
+  "noise": "Bruit",
+  "other": "Autre",
+  "repeat": "Répétition",
+  "stylize": "Stylisation",
+  "text": "Texte"
+ },
+ "effects": {
+  "ascii": {
+   "description": "Transforme le calque en dessin composé de lettres et de symboles : les zones claires utilisent des caractères plus denses. Taille définit la largeur de chaque caractère sur le calque, afin qu’ils se déplacent, pivotent et changent d’échelle avec lui. Couleur conserve les couleurs de l’image ou utilise une couleur unique, et Lignes de contour dessine les contours avec les caractères | - / et \\.",
+   "name": "ASCII",
+   "params": {
+    "background": {
+     "label": "Couleur d’arrière-plan"
+    },
+    "backgroundMode": {
+     "label": "Arrière-plan",
+     "options": [
+      "Aucun",
+      "Couleur"
+     ]
+    },
+    "brightness": {
+     "label": "Luminosité"
+    },
+    "cell": {
+     "label": "Taille"
+    },
+    "characters": {
+     "label": "Personnalisé"
+    },
+    "charset": {
+     "label": "Caractères",
+     "options": [
+      "Détaillé",
+      "Simple",
+      "Blocs",
+      "Binaire",
+      "Personnalisé"
+     ]
+    },
+    "colorMode": {
+     "label": "Couleur",
+     "options": [
+      "Original",
+      "Couleur unique"
+     ]
+    },
+    "contrast": {
+     "label": "Contraste"
+    },
+    "edges": {
+     "label": "Lignes de contour"
+    },
+    "invert": {
+     "label": "Inverser"
+    },
+    "textColor": {
+     "label": "Couleur du texte"
+    }
+   },
+   "presets": {
+    "amber-monitor": "Écran ambre",
+    "binary-rain": "Pluie binaire",
+    "blocks": "Blocs",
+    "line-art": "Dessin au trait",
+    "newspaper": "Journal",
+    "terminal": "Terminal"
+   }
+  },
+  "autoshake": {
+   "description": "Déplace le calque aléatoirement dans le temps, dans les limites définies.",
+   "name": "Secousse automatique",
+   "params": {
+    "angle": {
+     "label": "Angle"
+    },
+    "evolution": {
+     "label": "Évolution"
+    },
+    "frequency": {
+     "label": "Fréquence"
+    },
+    "magnitude": {
+     "label": "Amplitude"
+    },
+    "pattern": {
+     "label": "Motif",
+     "options": [
+      "Classique",
+      "Standard"
+     ]
+    },
+    "seed": {
+     "label": "Graine"
+    },
+    "slack": {
+     "label": "Souplesse"
+    },
+    "zshake": {
+     "label": "Secousse Z"
+    }
+   }
+  },
+  "backdrop": {
+   "description": "Anciennement appelé Calque de réglage. Copie ce qui est dessiné sous le calque afin que les effets suivants modifient cette copie. Masquer selon le calque limite la copie aux parties opaques du calque. Mélange rétablit le remplissage du calque. Effets hors du calque permet aux effets suivants, comme Étirement, de prolonger la copie au-delà des bords du calque.",
+   "name": "Copier l’arrière-plan",
+   "params": {
+    "mask": {
+     "label": "Masquer selon le calque"
+    },
+    "mix": {
+     "label": "Mélange"
+    },
+    "spill": {
+     "label": "Effets hors du calque"
+    }
+   }
+  },
+  "beatblur": {
+   "description": "Applique un flou de zoom à chaque temps, qui s’estompe ensuite. Sélectionnez votre clip musical, ouvrez son menu et appuyez d’abord sur Marquer les temps ; sans repères de temps, l’effet suit le réglage BPM.",
+   "name": "Flou au rythme",
+   "params": {
+    "beats": {
+     "label": "Temps",
+     "options": [
+      "À chaque temps",
+      "Tous les 2 temps",
+      "Tous les 4 temps"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Atténuation"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "strength": {
+     "label": "Intensité"
+    }
+   }
+  },
+  "beatflash": {
+   "description": "Fait clignoter le calque dans une couleur à chaque temps. Sélectionnez votre clip musical, ouvrez son menu et appuyez d’abord sur Marquer les temps ; sans repères de temps, l’effet suit le réglage BPM.",
+   "name": "Flash au rythme",
+   "params": {
+    "beats": {
+     "label": "Temps",
+     "options": [
+      "À chaque temps",
+      "Tous les 2 temps",
+      "Tous les 4 temps"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Couleur"
+    },
+    "decay": {
+     "label": "Atténuation"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "strength": {
+     "label": "Intensité"
+    }
+   }
+  },
+  "beatglitch": {
+   "description": "Découpe le calque en tranches décalées aux couleurs séparées à chaque temps. Sélectionnez votre clip musical, ouvrez son menu et appuyez d’abord sur Marquer les temps ; sans repères de temps, l’effet suit le réglage BPM.",
+   "name": "Glitch au rythme",
+   "params": {
+    "beats": {
+     "label": "Temps",
+     "options": [
+      "À chaque temps",
+      "Tous les 2 temps",
+      "Tous les 4 temps"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Atténuation"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "slices": {
+     "label": "Tranches"
+    },
+    "strength": {
+     "label": "Intensité"
+    }
+   }
+  },
+  "beatglow": {
+   "description": "Fait briller les zones claires du calque à chaque temps. Sélectionnez votre clip musical, ouvrez son menu et appuyez d’abord sur Marquer les temps ; sans repères de temps, l’effet suit le réglage BPM.",
+   "name": "Lueur au rythme",
+   "params": {
+    "beats": {
+     "label": "Temps",
+     "options": [
+      "À chaque temps",
+      "Tous les 2 temps",
+      "Tous les 4 temps"
+     ]
+    },
+    "blur": {
+     "label": "Rayon"
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Couleur"
+    },
+    "decay": {
+     "label": "Atténuation"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "strength": {
+     "label": "Intensité"
+    },
+    "threshold": {
+     "label": "Seuil"
+    }
+   }
+  },
+  "beatpulse": {
+   "description": "Éclaircit le calque à chaque temps comme un flash d’exposition ; une intensité négative l’assombrit. Sélectionnez votre clip musical, ouvrez son menu et appuyez d’abord sur Marquer les temps ; sans repères de temps, l’effet suit le réglage BPM.",
+   "name": "Pulsation au rythme",
+   "params": {
+    "beats": {
+     "label": "Temps",
+     "options": [
+      "À chaque temps",
+      "Tous les 2 temps",
+      "Tous les 4 temps"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Atténuation"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "strength": {
+     "label": "Intensité"
+    }
+   }
+  },
+  "beatrgbsplit": {
+   "description": "Écarte les canaux rouge et bleu à chaque temps. Sélectionnez votre clip musical, ouvrez son menu et appuyez d’abord sur Marquer les temps ; sans repères de temps, l’effet suit le réglage BPM.",
+   "name": "Séparation RGB au rythme",
+   "params": {
+    "angle": {
+     "label": "Angle"
+    },
+    "beats": {
+     "label": "Temps",
+     "options": [
+      "À chaque temps",
+      "Tous les 2 temps",
+      "Tous les 4 temps"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Atténuation"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "strength": {
+     "label": "Intensité"
+    }
+   }
+  },
+  "beatrotate": {
+   "description": "Incline le calque alternativement à gauche et à droite à chaque temps, puis le ramène en place. Sélectionnez votre clip musical, ouvrez son menu et appuyez d’abord sur Marquer les temps ; sans repères de temps, l’effet suit le réglage BPM.",
+   "name": "Rotation au rythme",
+   "params": {
+    "alternate": {
+     "label": "Alterner"
+    },
+    "beats": {
+     "label": "Temps",
+     "options": [
+      "À chaque temps",
+      "Tous les 2 temps",
+      "Tous les 4 temps"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "cover": {
+     "label": "Remplir l’image"
+    },
+    "decay": {
+     "label": "Atténuation"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "strength": {
+     "label": "Intensité"
+    }
+   }
+  },
+  "beatshake": {
+   "description": "Secoue le calque dans une nouvelle direction à chaque temps, puis l’immobilise avant le suivant. Sélectionnez votre clip musical, ouvrez son menu et appuyez d’abord sur Marquer les temps ; sans repères de temps, l’effet suit le réglage BPM.",
+   "name": "Secousse au rythme",
+   "params": {
+    "beats": {
+     "label": "Temps",
+     "options": [
+      "À chaque temps",
+      "Tous les 2 temps",
+      "Tous les 4 temps"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Atténuation"
+    },
+    "frequency": {
+     "label": "Fréquence"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "strength": {
+     "label": "Intensité"
+    }
+   }
+  },
+  "beatzoom": {
+   "description": "Zoome à chaque temps puis revient progressivement en arrière. Sélectionnez votre clip musical, ouvrez son menu et appuyez d’abord sur Marquer les temps ; sans repères de temps, l’effet suit le réglage BPM.",
+   "name": "Zoom au rythme",
+   "params": {
+    "beats": {
+     "label": "Temps",
+     "options": [
+      "À chaque temps",
+      "Tous les 2 temps",
+      "Tous les 4 temps"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Atténuation"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "strength": {
+     "label": "Intensité"
+    }
+   }
+  },
+  "bend": {
+   "description": "Courbe le calque en arc de cercle ; le côté Origine reste fixe et le côté opposé pivote selon l’angle défini, un angle positif allant vers la gauche. Idéal pour les calques longs et fins.",
+   "name": "Courbure",
+   "params": {
+    "amount": {
+     "label": "Angle"
+    },
+    "before": {
+     "label": "Avant le début",
+     "options": [
+      "Figer",
+      "Courber du même côté",
+      "Courber du côté opposé"
+     ]
+    },
+    "origin": {
+     "label": "Origine",
+     "options": [
+      "Gauche",
+      "Droite",
+      "Haut",
+      "Bas"
+     ]
+    },
+    "start": {
+     "label": "Début"
+    },
+    "tuneHead": {
+     "label": "Ajuster le début"
+    },
+    "tuneTail": {
+     "label": "Ajuster la fin"
+    }
+   }
+  },
+  "blink": {
+   "description": "Affiche et masque le calque plusieurs fois par seconde.",
+   "name": "Clignotement",
+   "params": {
+    "frequency": {
+     "label": "Fréquence"
+    }
+   }
+  },
+  "blockdissolve": {
+   "description": "Supprime des blocs aléatoires alignés sur une grille du calque. Animez Intensité pour supprimer de plus en plus de blocs.",
+   "name": "Dissolution en blocs",
+   "params": {
+    "blockSize": {
+     "label": "Taille"
+    },
+    "fade": {
+     "label": "Fondu"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "seed": {
+     "label": "Graine"
+    },
+    "strength": {
+     "label": "Intensité"
+    },
+    "stretch": {
+     "label": "Étirement"
+    }
+   }
+  },
+  "blocknoise": {
+   "description": "Fait clignoter des blocs de bruit aléatoires sur le calque. Multiplier module les couleurs existantes ; Addition y ajoute du bruit. Figer immobilise le motif.",
+   "name": "Bruit en blocs",
+   "params": {
+    "blending": {
+     "label": "Mode de fusion",
+     "options": [
+      "Addition",
+      "Multiplier"
+     ]
+    },
+    "blockSize": {
+     "label": "Taille"
+    },
+    "extremes": {
+     "label": "Extrêmes"
+    },
+    "freeze": {
+     "label": "Figer"
+    },
+    "mono": {
+     "label": "Monochrome"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "overshoot": {
+     "label": "Dépassement"
+    },
+    "seed": {
+     "label": "Graine"
+    },
+    "strength": {
+     "label": "Intensité"
+    },
+    "stretch": {
+     "label": "Étirement"
+    }
+   }
+  },
+  "blur": {
+   "description": "Un flou doux et uniforme.",
+   "name": "Flou",
+   "params": {
+    "strength": {
+     "label": "Intensité"
+    }
+   }
+  },
+  "box": {
+   "description": "Enveloppe le calque autour d’une boîte dont vous choisissez la largeur, la hauteur et la profondeur.",
+   "name": "Boîte",
+   "params": {
+    "depth": {
+     "label": "Profondeur"
+    },
+    "height": {
+     "label": "Hauteur"
+    },
+    "light": {
+     "label": "Angle de lumière"
+    },
+    "perspective": {
+     "label": "Perspective"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "rotX": {
+     "label": "Rotation X"
+    },
+    "rotY": {
+     "label": "Rotation Y"
+    },
+    "rotZ": {
+     "label": "Rotation Z"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "shading": {
+     "label": "Ombrage"
+    },
+    "shine": {
+     "label": "Brillance"
+    },
+    "smoothing": {
+     "label": "Lissage"
+    },
+    "width": {
+     "label": "Largeur"
+    }
+   }
+  },
+  "brightnesscontrast": {
+   "description": "Ajuste la luminosité et le contraste de l’image.",
+   "name": "Luminosité et contraste",
+   "params": {
+    "brightness": {
+     "label": "Luminosité"
+    },
+    "contrast": {
+     "label": "Contraste"
+    },
+    "style": {
+     "label": "Style",
+     "options": [
+      "Par canal",
+      "Conserver la couleur"
+     ]
+    }
+   }
+  },
+  "bulge": {
+   "description": "Bombe le calque comme une lentille (intensité positive) ou le pince vers le centre (négative), dans un cercle dont le rayon est une fraction de la taille du calque.",
+   "name": "Pincement et bombement",
+   "params": {
+    "amount": {
+     "label": "Intensité"
+    },
+    "center": {
+     "label": "Centre"
+    },
+    "radius": {
+     "label": "Rayon"
+    }
+   }
+  },
+  "bumpmap": {
+   "description": "Éclaire le calque comme si sa luminosité formait une surface en relief, pour un aspect texturé qui conserve les couleurs.",
+   "name": "Relief",
+   "params": {
+    "ambient": {
+     "label": "Ambiant"
+    },
+    "angle": {
+     "label": "Angle de lumière"
+    },
+    "height": {
+     "label": "Hauteur"
+    },
+    "light": {
+     "label": "Couleur de la lumière"
+    },
+    "shine": {
+     "label": "Brillance"
+    }
+   }
+  },
+  "channelremap": {
+   "description": "Reconstruit chaque canal de couleur à partir d’un autre canal du calque, pour créer de fausses couleurs ou transférer la luminance dans le canal alpha.",
+   "name": "Réaffectation des canaux (RGB)",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Rouge",
+      "Vert",
+      "Bleu",
+      "Alpha",
+      "Luminance",
+      "Zéro",
+      "Maximum"
+     ]
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "Rouge",
+      "Vert",
+      "Bleu",
+      "Alpha",
+      "Luminance",
+      "Zéro",
+      "Maximum"
+     ]
+    },
+    "g": {
+     "label": "G",
+     "options": [
+      "Rouge",
+      "Vert",
+      "Bleu",
+      "Alpha",
+      "Luminance",
+      "Zéro",
+      "Maximum"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "Rouge",
+      "Vert",
+      "Bleu",
+      "Alpha",
+      "Luminance",
+      "Zéro",
+      "Maximum"
+     ]
+    }
+   }
+  },
+  "channelremaphsv": {
+   "description": "Reconstruit la teinte, la saturation, la valeur et l’alpha à partir d’autres canaux du calque.",
+   "name": "Réaffectation des canaux (HSV)",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Teinte",
+      "Saturation",
+      "Valeur",
+      "Alpha",
+      "Luminance",
+      "Zéro",
+      "Maximum"
+     ]
+    },
+    "h": {
+     "label": "H",
+     "options": [
+      "Teinte",
+      "Saturation",
+      "Valeur",
+      "Alpha",
+      "Luminance",
+      "Zéro",
+      "Maximum"
+     ]
+    },
+    "s": {
+     "label": "S",
+     "options": [
+      "Teinte",
+      "Saturation",
+      "Valeur",
+      "Alpha",
+      "Luminance",
+      "Zéro",
+      "Maximum"
+     ]
+    },
+    "v": {
+     "label": "V",
+     "options": [
+      "Teinte",
+      "Saturation",
+      "Valeur",
+      "Alpha",
+      "Luminance",
+      "Zéro",
+      "Maximum"
+     ]
+    }
+   }
+  },
+  "checker": {
+   "description": "Dessine un damier sur les parties opaques du calque ou découpe les cases dans celui-ci.",
+   "name": "Damier",
+   "params": {
+    "angle": {
+     "label": "Angle"
+    },
+    "color": {
+     "label": "Couleur"
+    },
+    "count": {
+     "label": "Nombre"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "punch": {
+     "label": "Évider"
+    },
+    "screenSpace": {
+     "label": "Espace écran"
+    },
+    "stretch": {
+     "label": "Étirement"
+    }
+   }
+  },
+  "chromakey": {
+   "description": "Supprime une couleur, par exemple celle d’un fond vert.",
+   "name": "Chroma key",
+   "params": {
+    "defringe": {
+     "label": "Supprimer les franges"
+    },
+    "invert": {
+     "label": "Inverser"
+    },
+    "key": {
+     "label": "Couleur à supprimer"
+    },
+    "softness": {
+     "label": "Douceur"
+    },
+    "tolerance": {
+     "label": "Tolérance"
+    }
+   }
+  },
+  "chromaticzoomblur": {
+   "description": "Crée un flou de zoom depuis un point central, en attirant le bleu vers l’intérieur et le rouge vers l’extérieur pour former des franges arc-en-ciel sur les bords.",
+   "name": "Flou de zoom chromatique",
+   "params": {
+    "amount": {
+     "label": "Intensité"
+    },
+    "center": {
+     "label": "Centre"
+    }
+   }
+  },
+  "circularripple": {
+   "description": "Crée des ondulations circulaires à partir d’un point, comme une goutte tombant dans l’eau.",
+   "name": "Ondulation circulaire",
+   "params": {
+    "center": {
+     "label": "Centre"
+    },
+    "feather": {
+     "label": "Contour progressif"
+    },
+    "frequency": {
+     "label": "Fréquence"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "radius": {
+     "label": "Rayon"
+    },
+    "strength": {
+     "label": "Intensité"
+    }
+   }
+  },
+  "clouds": {
+   "description": "Recouvre les parties opaques du calque d’un doux motif de nuages, qui peut aussi servir de source de bruit.",
+   "name": "Nuages",
+   "params": {
+    "color1": {
+     "label": "Couleur 1"
+    },
+    "color2": {
+     "label": "Couleur 2"
+    },
+    "intensity": {
+     "label": "Intensité"
+    },
+    "octaves": {
+     "label": "Octaves"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "parallax": {
+     "label": "Parallaxe"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "seed": {
+     "label": "Graine"
+    },
+    "stretch": {
+     "label": "Étirement"
+    }
+   }
+  },
+  "cmykhalftone": {
+   "description": "Redessine le calque comme une impression de magazine : des points cyan, magenta, jaunes et noirs sur quatre trames inclinées.",
+   "name": "Trame de points CMJN",
+   "params": {
+    "amount": {
+     "label": "Quantité"
+    },
+    "angle": {
+     "label": "Angle"
+    },
+    "black": {
+     "label": "Noir"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "strength": {
+     "label": "Intensité"
+    }
+   }
+  },
+  "colorbalance": {
+   "description": "Modifie les couleurs des ombres, des tons moyens et des hautes lumières séparément (le gris laisse la plage inchangée).",
+   "name": "Balance des couleurs",
+   "params": {
+    "amount": {
+     "label": "Quantité"
+    },
+    "highlights": {
+     "label": "Hautes lumières"
+    },
+    "midtones": {
+     "label": "Tons moyens"
+    },
+    "shadows": {
+     "label": "Ombres"
+    }
+   }
+  },
+  "colorize": {
+   "description": "Teinte tout le calque d’une seule couleur. Ombre et lumière applique la luminosité du calque à la teinte ; Conserver la luminosité préserve celle de chaque pixel et remplace sa couleur par la teinte choisie.",
+   "name": "Coloriser",
+   "params": {
+    "amount": {
+     "label": "Quantité"
+    },
+    "hue": {
+     "label": "Teinte"
+    },
+    "style": {
+     "label": "Style",
+     "options": [
+      "Ombre et lumière",
+      "Conserver la luminosité"
+     ]
+    }
+   }
+  },
+  "colorwheels": {
+   "description": "Roues chromatiques pour les ombres (lift), les tons moyens (gamma) et les hautes lumières (gain) : réglez la teinte, son intensité et son niveau. Le décalage modifie tous les tons. Le style Selon la luminosité pondère chaque roue selon la luminosité du pixel.",
+   "name": "Lift Gamma Gain",
+   "params": {
+    "gainAmount": {
+     "label": "Intensité du gain"
+    },
+    "gainHue": {
+     "label": "Teinte du gain"
+    },
+    "gainLevel": {
+     "label": "Niveau du gain"
+    },
+    "gammaAmount": {
+     "label": "Intensité du gamma"
+    },
+    "gammaHue": {
+     "label": "Teinte du gamma"
+    },
+    "gammaLevel": {
+     "label": "Niveau du gamma"
+    },
+    "liftAmount": {
+     "label": "Intensité des ombres"
+    },
+    "liftHue": {
+     "label": "Teinte des ombres"
+    },
+    "liftLevel": {
+     "label": "Niveau des ombres"
+    },
+    "offsetAmount": {
+     "label": "Intensité du décalage"
+    },
+    "offsetHue": {
+     "label": "Teinte du décalage"
+    },
+    "offsetLevel": {
+     "label": "Niveau du décalage"
+    },
+    "style": {
+     "label": "Style",
+     "options": [
+      "Classique",
+      "Selon la luminosité"
+     ]
+    }
+   }
+  },
+  "contourgradient": {
+   "description": "Applique un dégradé de deux couleurs vers l’extérieur des bords opaques du calque, comme un halo coloré et doux.",
+   "name": "Dégradé de contour",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blur": {
+     "label": "Largeur"
+    },
+    "color1": {
+     "label": "Couleur 1"
+    },
+    "color2": {
+     "label": "Couleur 2"
+    },
+    "fade": {
+     "label": "Fondu"
+    },
+    "fill": {
+     "label": "Remplissage"
+    }
+   }
+  },
+  "contourlines": {
+   "description": "Dessine des contours concentriques autour des parties opaques du calque, pour créer des contours superposés façon autocollant ou néon.",
+   "name": "Lignes de contour",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blur": {
+     "label": "Extension"
+    },
+    "color": {
+     "label": "Couleur"
+    },
+    "count": {
+     "label": "Nombre"
+    },
+    "fill": {
+     "label": "Remplissage"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "width": {
+     "label": "Largeur"
+    }
+   }
+  },
+  "contourstrips": {
+   "description": "Dessine des bandes de papier superposées dont la hauteur suit la luminosité ou l’opacité du calque, comme un paysage de crêtes.",
+   "name": "Bandes de contour",
+   "params": {
+    "angle": {
+     "label": "Angle"
+    },
+    "color1": {
+     "label": "Couleur 1"
+    },
+    "color2": {
+     "label": "Couleur 2"
+    },
+    "count": {
+     "label": "Nombre"
+    },
+    "edgeColor": {
+     "label": "Couleur du bord"
+    },
+    "height": {
+     "label": "Hauteur"
+    },
+    "invert": {
+     "label": "Inverser"
+    },
+    "light": {
+     "label": "Couleur de la lumière"
+    },
+    "lightAngle": {
+     "label": "Angle de la lumière"
+    },
+    "map": {
+     "label": "Carte de hauteur",
+     "options": [
+      "Alpha",
+      "Luminance"
+     ]
+    },
+    "mask": {
+     "label": "Limiter au calque"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "thickness": {
+     "label": "Épaisseur"
+    }
+   }
+  },
+  "countupdown": {
+   "description": "Modifie chaque nombre d’un calque de texte en le multipliant et en y ajoutant une valeur : animez Multiplication de 0 % à 100 % avec des images clés pour compter jusqu’au nombre saisi. Les mots autour des nombres restent inchangés.",
+   "name": "Compte progressif ou régressif",
+   "params": {
+    "add": {
+     "label": "Ajouter"
+    },
+    "decimals": {
+     "label": "Décimales",
+     "options": [
+      "Tel que saisi",
+      "0",
+      "1",
+      "2",
+      "3"
+     ]
+    },
+    "multiply": {
+     "label": "Multiplication"
+    },
+    "separator": {
+     "label": "Milliers",
+     "options": [
+      "1000.5",
+      "1,000.5",
+      "1.000,5",
+      "1 000.5"
+     ]
+    }
+   },
+   "presets": {
+    "count-up": "Compte progressif"
+   }
+  },
+  "crop": {
+   "description": "Découpe les bords du calque : Gauche, Haut, Droite et Bas indiquent la part de sa largeur ou de sa hauteur à retirer de chaque côté. Arrondi arrondit les coins et Contour progressif adoucit les bords. Le calque reste en place.",
+   "name": "Rogner",
+   "params": {
+    "bottom": {
+     "label": "Bas"
+    },
+    "feather": {
+     "label": "Contour progressif"
+    },
+    "left": {
+     "label": "Gauche"
+    },
+    "radius": {
+     "label": "Arrondi"
+    },
+    "right": {
+     "label": "Droite"
+    },
+    "top": {
+     "label": "Haut"
+    }
+   }
+  },
+  "cross": {
+   "description": "Place le calque sur trois barres qui se croisent au centre.",
+   "name": "Croix à trois axes",
+   "params": {
+    "light": {
+     "label": "Angle de la lumière"
+    },
+    "perspective": {
+     "label": "Perspective"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "reach": {
+     "label": "Longueur"
+    },
+    "rotX": {
+     "label": "Rotation X"
+    },
+    "rotY": {
+     "label": "Rotation Y"
+    },
+    "rotZ": {
+     "label": "Rotation Z"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "shading": {
+     "label": "Ombrage"
+    },
+    "shine": {
+     "label": "Brillance"
+    },
+    "smoothing": {
+     "label": "Lissage"
+    },
+    "thickness": {
+     "label": "Épaisseur"
+    }
+   }
+  },
+  "cube": {
+   "description": "Applique le calque sur chaque face d’un cube tournant aux bords arrondis et éclairés.",
+   "name": "Cube",
+   "params": {
+    "edge": {
+     "label": "Taille"
+    },
+    "light": {
+     "label": "Angle de la lumière"
+    },
+    "perspective": {
+     "label": "Perspective"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "rotX": {
+     "label": "Rotation X"
+    },
+    "rotY": {
+     "label": "Rotation Y"
+    },
+    "rotZ": {
+     "label": "Rotation Z"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "shading": {
+     "label": "Ombrage"
+    },
+    "shine": {
+     "label": "Brillance"
+    },
+    "smoothing": {
+     "label": "Lissage"
+    }
+   }
+  },
+  "curl": {
+   "description": "Enroule une extrémité du calque autour d’un cercle tandis que l’autre reste plane ; animez Décalage pour l’enrouler ou le dérouler. Convient aux calques larges et fins.",
+   "name": "Enroulement",
+   "params": {
+    "curlFrom": {
+     "label": "Enrouler depuis",
+     "options": [
+      "Gauche",
+      "Droite"
+     ]
+    },
+    "direction": {
+     "label": "Direction",
+     "options": [
+      "Haut",
+      "Bas"
+     ]
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "radius": {
+     "label": "Rayon"
+    },
+    "stretch": {
+     "label": "Étirement"
+    }
+   }
+  },
+  "cylinder": {
+   "description": "Applique le calque autour d’un cylindre et sur ses extrémités circulaires.",
+   "name": "Cylindre",
+   "params": {
+    "height": {
+     "label": "Hauteur"
+    },
+    "light": {
+     "label": "Angle de la lumière"
+    },
+    "perspective": {
+     "label": "Perspective"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "radius": {
+     "label": "Rayon"
+    },
+    "rotX": {
+     "label": "Rotation X"
+    },
+    "rotY": {
+     "label": "Rotation Y"
+    },
+    "rotZ": {
+     "label": "Rotation Z"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "shading": {
+     "label": "Ombrage"
+    },
+    "shine": {
+     "label": "Brillance"
+    },
+    "smoothing": {
+     "label": "Lissage"
+    }
+   }
+  },
+  "darkglow": {
+   "description": "Étend les parties sombres du calque sur les parties claires, comme une lueur faite d’ombre.",
+   "name": "Lueur sombre",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blend": {
+     "label": "Fusion"
+    },
+    "blur": {
+     "label": "Diffusion"
+    },
+    "color": {
+     "label": "Couleur"
+    },
+    "threshold": {
+     "label": "Seuil"
+    }
+   }
+  },
+  "datamosh": {
+   "description": "Entre les temps de début et de fin, en secondes depuis le début du calque, l’image cesse de se rafraîchir et est entraînée par le mouvement qui suit, comme si une image clé manquait. Les calques vidéo sont étirés selon leur mouvement réel, les autres par des blocs mobiles.",
+   "name": "Datamosh",
+   "params": {
+    "block": {
+     "label": "Taille des blocs"
+    },
+    "bloom": {
+     "label": "Halo lumineux"
+    },
+    "decay": {
+     "label": "Atténuation"
+    },
+    "end": {
+     "label": "Fin"
+    },
+    "glitch": {
+     "label": "Parasites"
+    },
+    "intensity": {
+     "label": "Intensité"
+    },
+    "start": {
+     "label": "Début"
+    }
+   }
+  },
+  "deepglow": {
+   "description": "Une lueur riche et vive qui s’étend loin : un cœur lumineux près du calque s’estompe progressivement en un large halo doux.",
+   "name": "Lueur intense",
+   "params": {
+    "blur": {
+     "label": "Rayon"
+    },
+    "falloff": {
+     "label": "Atténuation"
+    },
+    "high": {
+     "label": "Seuil haut"
+    },
+    "hue": {
+     "label": "Décalage de teinte"
+    },
+    "intensity": {
+     "label": "Intensité"
+    },
+    "limit": {
+     "label": "Seuil"
+    },
+    "low": {
+     "label": "Seuil bas"
+    },
+    "opacity": {
+     "label": "Opacité de la lueur"
+    },
+    "original": {
+     "label": "Opacité d’origine"
+    },
+    "outside": {
+     "label": "Lueur extérieure"
+    },
+    "saturation": {
+     "label": "Saturation"
+    },
+    "softness": {
+     "label": "Douceur du seuil"
+    },
+    "tint": {
+     "label": "Couleur de teinte"
+    },
+    "tintAmount": {
+     "label": "Teinte"
+    },
+    "vibrance": {
+     "label": "Vibrance"
+    }
+   }
+  },
+  "denoise": {
+   "description": "Supprime le bruit de l’image avec un filtre bilatéral qui préserve les contours et ne moyenne les pixels voisins que si leurs couleurs sont proches.",
+   "name": "Réduction du bruit",
+   "params": {
+    "detail": {
+     "label": "Détail"
+    },
+    "radius": {
+     "label": "Rayon"
+    },
+    "strength": {
+     "label": "Intensité"
+    }
+   }
+  },
+  "directionalblur": {
+   "description": "Crée un flou de mouvement en moyennant des échantillons selon un angle donné.",
+   "name": "Flou directionnel",
+   "params": {
+    "angle": {
+     "label": "Angle"
+    },
+    "blurLength": {
+     "label": "Longueur"
+    }
+   }
+  },
+  "displacementmap": {
+   "description": "Utilise les couleurs du calque pour déplacer les calques situés derrière lui, puis se masque ; si la carte est réglée sur Calque inférieur, déplace ce calque selon celui qui se trouve dessous.",
+   "name": "Carte de déplacement",
+   "params": {
+    "edges": {
+     "label": "Bords",
+     "options": [
+      "Répéter",
+      "Miroir",
+      "Transparent",
+      "Mosaïque"
+     ]
+    },
+    "fromCenter": {
+     "label": "Depuis le centre"
+    },
+    "invert": {
+     "label": "Inverser"
+    },
+    "map": {
+     "label": "Carte",
+     "options": [
+      "Ce calque",
+      "Calque inférieur"
+     ]
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "xchannel": {
+     "label": "X",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
+    },
+    "ychannel": {
+     "label": "Y",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
+    }
+   }
+  },
+  "dissolve": {
+   "description": "Supprime des pixels ou des blocs aléatoires du calque. Animez Intensité pour créer une transition en fondu ; Graine choisit le motif et Taille définit la taille de chaque point.",
+   "name": "Dissolution",
+   "params": {
+    "grain": {
+     "label": "Taille"
+    },
+    "progress": {
+     "label": "Intensité"
+    },
+    "seed": {
+     "label": "Graine"
+    }
+   }
+  },
+  "dots": {
+   "description": "Dessine un motif aléatoire mais régulier de points doux sur le calque, ou utilise le calque comme masque pour les points.",
+   "name": "Points",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blend": {
+     "label": "Mode de fusion",
+     "options": [
+      "Normal",
+      "Multiplication",
+      "Superposition"
+     ]
+    },
+    "color1": {
+     "label": "Couleur 1"
+    },
+    "color2": {
+     "label": "Couleur 2"
+    },
+    "density": {
+     "label": "Densité"
+    },
+    "feather": {
+     "label": "Contour progressif"
+    },
+    "fill": {
+     "label": "Remplissage"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "radius": {
+     "label": "Rayon"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "seed": {
+     "label": "Graine"
+    },
+    "slack": {
+     "label": "Relâchement"
+    }
+   }
+  },
+  "drawingprogress": {
+   "description": "Trace un dessin à main levée trait par trait, ou le contour d’une forme, du début à la fin. Animez Fin de 0 % à 100 % avec des images clés pour voir le tracé se dessiner. Convient aux formes sans remplissage et avec un contour.",
+   "name": "Progression du dessin",
+   "params": {
+    "end": {
+     "label": "Fin"
+    },
+    "start": {
+     "label": "Début"
+    }
+   }
+  },
+  "dropshadow": {
+   "description": "Dessine une ombre douce derrière la forme du calque, déplacée par Décalage X et Décalage Y.",
+   "name": "Ombre portée",
+   "params": {
+    "blur": {
+     "label": "Douceur"
+    },
+    "color": {
+     "label": "Couleur"
+    },
+    "opacity": {
+     "label": "Opacité"
+    },
+    "x": {
+     "label": "Décalage X"
+    },
+    "y": {
+     "label": "Décalage Y"
+    }
+   }
+  },
+  "duotone": {
+   "description": "Applique un dégradé de deux couleurs selon la luminance, avec des réglages de contraste et de quantité.",
+   "name": "Bichromie",
+   "params": {
+    "amount": {
+     "label": "Quantité"
+    },
+    "color1": {
+     "label": "Couleur des ombres"
+    },
+    "color2": {
+     "label": "Couleur des hautes lumières"
+    },
+    "contrast": {
+     "label": "Contraste"
+    }
+   }
+  },
+  "echo": {
+   "description": "Dessine des copies du calque tel qu’il était quelques instants auparavant, en suivant son animation.",
+   "name": "Écho d’images clés",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "composite": {
+     "label": "Composition",
+     "options": [
+      "Derrière",
+      "Au-dessus"
+     ]
+    },
+    "count": {
+     "label": "Nombre"
+    },
+    "seconds": {
+     "label": "Secondes"
+    }
+   }
+  },
+  "edgedetect": {
+   "description": "Des lignes claires là où l’image change, sombres ailleurs.",
+   "name": "Détection des contours",
+   "params": {
+    "strength": {
+     "label": "Intensité"
+    }
+   }
+  },
+  "edgeglow": {
+   "description": "Détecte les contours du calque et les fait briller comme du néon sur une image assombrie.",
+   "name": "Lueur des contours",
+   "params": {
+    "blend": {
+     "label": "Fusion"
+    },
+    "blur": {
+     "label": "Flou"
+    },
+    "brightness": {
+     "label": "Luminosité"
+    },
+    "color": {
+     "label": "Couleur"
+    },
+    "edges": {
+     "label": "Intensité des contours"
+    },
+    "gamma": {
+     "label": "Gamma"
+    },
+    "invert": {
+     "label": "Inverser"
+    },
+    "own": {
+     "label": "Couleur de l’image"
+    },
+    "spread": {
+     "label": "Étendue"
+    },
+    "threshold": {
+     "label": "Seuil"
+    },
+    "tint": {
+     "label": "Teinte"
+    },
+    "tintColor": {
+     "label": "Couleur de teinte"
+    }
+   }
+  },
+  "electricedges": {
+   "description": "Dessine un contour lumineux et crépitant autour du calque. Épaisseur l’élargit en une bande lumineuse, chaque valeur de Graine produit un motif différent et son animation crée un crépitement à chaque image, tandis qu’Évolution le fait onduler. Des lignes de contour intérieures sont facultatives.",
+   "name": "Contours électriques",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blur": {
+     "label": "Distance"
+    },
+    "color": {
+     "label": "Couleur"
+    },
+    "contourAngle": {
+     "label": "Angle des contours"
+    },
+    "contours": {
+     "label": "Afficher les contours"
+    },
+    "count": {
+     "label": "Nombre de contours"
+    },
+    "detail": {
+     "label": "Détail"
+    },
+    "distortion": {
+     "label": "Distorsion"
+    },
+    "evolution": {
+     "label": "Évolution"
+    },
+    "fill": {
+     "label": "Remplissage"
+    },
+    "glow": {
+     "label": "Lueur"
+    },
+    "glowColor": {
+     "label": "Couleur de la lueur"
+    },
+    "maskColor": {
+     "label": "Couleur du masque"
+    },
+    "maskEvolution": {
+     "label": "Évolution du masque"
+    },
+    "maskScale": {
+     "label": "Échelle du masque"
+    },
+    "maskSeed": {
+     "label": "Graine du masque"
+    },
+    "maskStrength": {
+     "label": "Intensité du masque"
+    },
+    "phase": {
+     "label": "Phase des contours"
+    },
+    "seed": {
+     "label": "Graine"
+    },
+    "strength": {
+     "label": "Intensité"
+    },
+    "thickness": {
+     "label": "Épaisseur"
+    }
+   }
+  },
+  "ellipsoid": {
+   "description": "Applique le calque autour d’une sphère que vous pouvez comprimer et aplatir.",
+   "name": "Ellipsoïde",
+   "params": {
+    "flattenRatio": {
+     "label": "Aplatissement"
+    },
+    "light": {
+     "label": "Angle de la lumière"
+    },
+    "perspective": {
+     "label": "Perspective"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "radius": {
+     "label": "Rayon"
+    },
+    "rotX": {
+     "label": "Rotation X"
+    },
+    "rotY": {
+     "label": "Rotation Y"
+    },
+    "rotZ": {
+     "label": "Rotation Z"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "shading": {
+     "label": "Ombrage"
+    },
+    "shine": {
+     "label": "Brillance"
+    },
+    "squeezeRatio": {
+     "label": "Compression"
+    }
+   }
+  },
+  "emboss": {
+   "description": "Applique un effet de relief selon les dégradés de luminance et un angle de lumière défini.",
+   "name": "Relief",
+   "params": {
+    "angle": {
+     "label": "Angle de la lumière"
+    },
+    "strength": {
+     "label": "Intensité"
+    }
+   }
+  },
+  "energybeam": {
+   "description": "Dessine entre deux points un faisceau lumineux avec un cœur brillant et un halo doux, qui peut onduler et grandir sur sa longueur.",
+   "name": "Faisceau d’énergie",
+   "params": {
+    "blend": {
+     "label": "Fusion",
+     "options": [
+      "Ajouter",
+      "Superposition",
+      "Normal"
+     ]
+    },
+    "color": {
+     "label": "Couleur de la lueur"
+    },
+    "dim": {
+     "label": "Assombrir l’arrière-plan"
+    },
+    "evolution": {
+     "label": "Évolution"
+    },
+    "frequency": {
+     "label": "Fréquence"
+    },
+    "from": {
+     "label": "Début"
+    },
+    "glow": {
+     "label": "Lueur"
+    },
+    "halo": {
+     "label": "Halo"
+    },
+    "haloColor": {
+     "label": "Couleur du halo"
+    },
+    "haloWidth": {
+     "label": "Largeur du halo"
+    },
+    "opacity": {
+     "label": "Opacité"
+    },
+    "progress": {
+     "label": "Progression"
+    },
+    "span": {
+     "label": "Longueur"
+    },
+    "to": {
+     "label": "Fin"
+    },
+    "width": {
+     "label": "Largeur"
+    },
+    "wiggle": {
+     "label": "Oscillation"
+    }
+   }
+  },
+  "exposure": {
+   "description": "Simule l’exposition photographique avec des valeurs d’exposition, un décalage et une correction gamma. Éclaircir les parties transparentes permet aux pixels partiellement transparents, comme un bord flou, de devenir plus lumineux que le blanc.",
+   "name": "Exposition",
+   "params": {
+    "gamma": {
+     "label": "Gamma"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "soft": {
+     "label": "Éclaircir les parties transparentes"
+    },
+    "stops": {
+     "label": "Valeurs d’exposition"
+    }
+   }
+  },
+  "fade": {
+   "description": "Fait apparaître le calque en fondu au début et disparaître à la fin, selon les durées définies.",
+   "name": "Fondus d’entrée et de sortie",
+   "params": {
+    "fadeIn": {
+     "label": "Entrée"
+    },
+    "fadeOut": {
+     "label": "Sortie"
+    }
+   }
+  },
+  "feather": {
+   "description": "Adoucit les bords alpha du calque. Vers l’intérieur crée un fondu à l’intérieur du contour existant ; Flou alpha étend aussi le bord adouci à l’extérieur.",
+   "name": "Contour progressif",
+   "params": {
+    "blur": {
+     "label": "Intensité"
+    },
+    "mode": {
+     "label": "Bords",
+     "options": [
+      "Vers l’intérieur",
+      "Flou alpha"
+     ]
+    }
+   }
+  },
+  "fillbehind": {
+   "description": "Remplit l’image derrière le calque avec une copie agrandie et floue de celui-ci, une solution courante pour une vidéo verticale dans un projet horizontal.",
+   "name": "Remplir l’arrière-plan",
+   "params": {
+    "bgAlpha": {
+     "label": "Alpha de l’arrière-plan"
+    },
+    "bgOffset": {
+     "label": "Décalage de l’arrière-plan"
+    },
+    "bgScale": {
+     "label": "Échelle de l’arrière-plan"
+    },
+    "blur": {
+     "label": "Intensité"
+    },
+    "brightness": {
+     "label": "Luminosité"
+    },
+    "edgeColor": {
+     "label": "Couleur du bord"
+    },
+    "edgeStrength": {
+     "label": "Intensité des contours"
+    },
+    "feather": {
+     "label": "Contour progressif"
+    },
+    "fgAlpha": {
+     "label": "Alpha du premier plan"
+    },
+    "fgOffset": {
+     "label": "Décalage du premier plan"
+    },
+    "fgScale": {
+     "label": "Échelle du premier plan"
+    },
+    "gamma": {
+     "label": "Gamma"
+    },
+    "saturation": {
+     "label": "Saturation"
+    },
+    "scanCount": {
+     "label": "Nombre de lignes de balayage"
+    },
+    "scanStrength": {
+     "label": "Intensité des lignes de balayage"
+    },
+    "tint": {
+     "label": "Teinte"
+    },
+    "tintColor": {
+     "label": "Couleur de teinte"
+    }
+   }
+  },
+  "filmgrain": {
+   "description": "Grain de pellicule monochrome animé, avec quantité, taille du grain et vitesse d’animation réglables.",
+   "name": "Grain de pellicule",
+   "params": {
+    "amount": {
+     "label": "Quantité"
+    },
+    "grainSize": {
+     "label": "Taille du grain"
+    },
+    "speed": {
+     "label": "Vitesse"
+    }
+   }
+  },
+  "flicker": {
+   "description": "Fait varier l’opacité du calque de façon aléatoire.",
+   "name": "Scintillement",
+   "params": {
+    "intensity": {
+     "label": "Intensité"
+    },
+    "seed": {
+     "label": "Graine"
+    },
+    "speed": {
+     "label": "Fréquence"
+    },
+    "style": {
+     "label": "Mode",
+     "options": [
+      "Clignotement",
+      "Régulier"
+     ]
+    }
+   }
+  },
+  "flip": {
+   "description": "Fait pivoter le calque comme une carte en 3D, avec un dos transparent, une image ou une couleur.",
+   "name": "Retourner le calque",
+   "params": {
+    "axis": {
+     "label": "Axe"
+    },
+    "back": {
+     "label": "Dos",
+     "options": [
+      "Transparent",
+      "Image",
+      "Couleur"
+     ]
+    },
+    "backColor": {
+     "label": "Couleur du dos"
+    },
+    "light": {
+     "label": "Angle de la lumière"
+    },
+    "perspective": {
+     "label": "Perspective"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "rotX": {
+     "label": "Rotation X"
+    },
+    "rotY": {
+     "label": "Rotation Y"
+    },
+    "rotZ": {
+     "label": "Rotation Z"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "shading": {
+     "label": "Ombrage"
+    },
+    "shine": {
+     "label": "Brillance"
+    }
+   }
+  },
+  "fontweight": {
+   "description": "Règle l’épaisseur des lettres, de fine à grasse, et peut être animé avec des images clés. Fonctionne avec les polices variables, qui regroupent toutes les graisses dans un fichier : Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display et Dancing Script dans la liste des polices, ou une police variable importée. Les polices à graisses fixes conservent leur aspect.",
+   "name": "Graisse de police",
+   "params": {
+    "weight": {
+     "label": "Graisse"
+    }
+   }
+  },
+  "fourcolor": {
+   "description": "Mélange quatre couleurs placées en quatre points sur le calque (en pixels depuis son centre).",
+   "name": "Dégradé à quatre couleurs",
+   "params": {
+    "blend": {
+     "label": "Fusion",
+     "options": [
+      "Normal",
+      "Multiplication",
+      "Superposition",
+      "Incrustation",
+      "Lumière tamisée",
+      "Lumière crue",
+      "Ajouter",
+      "Obscurcir",
+      "Éclaircir",
+      "Différence",
+      "Densité couleur -",
+      "Densité couleur +"
+     ]
+    },
+    "color1": {
+     "label": "Couleur 1"
+    },
+    "color2": {
+     "label": "Couleur 2"
+    },
+    "color3": {
+     "label": "Couleur 3"
+    },
+    "color4": {
+     "label": "Couleur 4"
+    },
+    "corner": {
+     "label": "Décalage des coins"
+    },
+    "opacity": {
+     "label": "Opacité"
+    },
+    "point1": {
+     "label": "Point 1"
+    },
+    "point2": {
+     "label": "Point 2"
+    },
+    "point3": {
+     "label": "Point 3"
+    },
+    "point4": {
+     "label": "Point 4"
+    },
+    "softness": {
+     "label": "Douceur"
+    }
+   }
+  },
+  "fractalridges": {
+   "description": "Remplit les parties opaques du calque de crêtes nettes et turbulentes de bruit fractal.",
+   "name": "Crêtes fractales",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "color1": {
+     "label": "Couleur 1"
+    },
+    "color2": {
+     "label": "Couleur 2"
+    },
+    "evolution": {
+     "label": "Évolution"
+    },
+    "intensity": {
+     "label": "Intensité"
+    },
+    "octaves": {
+     "label": "Octaves"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "seed": {
+     "label": "Graine"
+    },
+    "stretch": {
+     "label": "Étirement"
+    }
+   }
+  },
+  "fractalwarp": {
+   "description": "Déforme le calque avec du bruit fractal replié, pour créer du feu, de l’eau ou des ondulations de chaleur.",
+   "name": "Déformation fractale",
+   "params": {
+    "complexity": {
+     "label": "Complexité"
+    },
+    "evolution": {
+     "label": "Évolution"
+    },
+    "intensity": {
+     "label": "Intensité"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "parallax": {
+     "label": "Parallaxe"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "screenSpace": {
+     "label": "Espace écran"
+    },
+    "seed": {
+     "label": "Graine"
+    },
+    "strength": {
+     "label": "Intensité"
+    }
+   }
+  },
+  "fracture3d": {
+   "description": "Brise le calque en éclats 3D animés.",
+   "name": "Fracture 3D",
+   "params": {
+    "depthPush": {
+     "label": "Poussée en profondeur"
+    },
+    "direction": {
+     "label": "Direction"
+    },
+    "fade": {
+     "label": "Fondu de sortie"
+    },
+    "force": {
+     "label": "Force"
+    },
+    "gravity": {
+     "label": "Gravité"
+    },
+    "impact": {
+     "label": "Point d’impact"
+    },
+    "intensity": {
+     "label": "Intensité lumineuse"
+    },
+    "light": {
+     "label": "Direction de la lumière"
+    },
+    "pieces": {
+     "label": "Morceaux"
+    },
+    "progress": {
+     "label": "Progression"
+    },
+    "seed": {
+     "label": "Graine"
+    },
+    "spin": {
+     "label": "Rotation"
+    },
+    "spread": {
+     "label": "Dispersion des directions"
+    },
+    "thickness": {
+     "label": "Épaisseur"
+    }
+   }
+  },
+  "fringeclean": {
+   "description": "Désature les pixels au bord du cache pour griser les halos laissés par une incrustation, tout en préservant jusqu’à trois couleurs.",
+   "name": "Frange du cache",
+   "params": {
+    "blur": {
+     "label": "Épaisseur"
+    },
+    "color1": {
+     "label": "Conserver la couleur 1"
+    },
+    "color2": {
+     "label": "Conserver la couleur 2"
+    },
+    "color3": {
+     "label": "Conserver la couleur 3"
+    },
+    "feather": {
+     "label": "Contour progressif"
+    },
+    "threshold1": {
+     "label": "Plage 1"
+    },
+    "threshold2": {
+     "label": "Plage 2"
+    },
+    "threshold3": {
+     "label": "Plage 3"
+    }
+   }
+  },
+  "glass": {
+   "description": "Transforme la forme du calque en verre biseauté qui déforme les calques derrière lui et illumine son bord.",
+   "name": "Verre",
+   "params": {
+    "angle": {
+     "label": "Angle de la lumière"
+    },
+    "blur": {
+     "label": "Biseau"
+    },
+    "color": {
+     "label": "Couleur"
+    },
+    "highlight": {
+     "label": "Reflet"
+    },
+    "refraction": {
+     "label": "Réfraction"
+    },
+    "tint": {
+     "label": "Teinte"
+    }
+   }
+  },
+  "glitch": {
+   "description": "Déplace aléatoirement des blocs horizontaux et décale les couches de couleur plusieurs fois par seconde.",
+   "name": "Glitch",
+   "params": {
+    "blockHeight": {
+     "label": "Hauteur des blocs"
+    },
+    "intensity": {
+     "label": "Intensité"
+    },
+    "seed": {
+     "label": "Graine"
+    }
+   }
+  },
+  "glow": {
+   "description": "Ajoute un halo uniforme autour de la forme du calque. La dureté transforme son fondu en contour net.",
+   "name": "Lueur",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blendMode": {
+     "label": "Mode de fusion",
+     "options": [
+      "Normal",
+      "Produit",
+      "Superposition"
+     ]
+    },
+    "color": {
+     "label": "Couleur"
+    },
+    "hardness": {
+     "label": "Dureté"
+    },
+    "radius": {
+     "label": "Rayon"
+    }
+   }
+  },
+  "glowscan": {
+   "description": "Floute et éclaire les parties du calque comprises dans une plage de luminosité ; animez Position pour déplacer la lueur des ombres aux hautes lumières.",
+   "name": "Balayage lumineux",
+   "params": {
+    "blur": {
+     "label": "Flou"
+    },
+    "color": {
+     "label": "Couleur de la lueur"
+    },
+    "intensity": {
+     "label": "Intensité"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "show": {
+     "label": "Afficher uniquement la plage"
+    },
+    "softness": {
+     "label": "Adoucissement"
+    },
+    "width": {
+     "label": "Largeur"
+    }
+   }
+  },
+  "gradientmap": {
+   "description": "Recolore l’image selon sa luminosité avec trois couleurs, des répétitions et une phase. Moduler la luminosité multiplie le résultat par la luminosité de l’image.",
+   "name": "Courbe de transfert de dégradé",
+   "params": {
+    "color1": {
+     "label": "Ombres"
+    },
+    "color2": {
+     "label": "Tons moyens"
+    },
+    "color3": {
+     "label": "Hautes lumières"
+    },
+    "opacity": {
+     "label": "Opacité"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "repeat": {
+     "label": "Répétition"
+    },
+    "reverse": {
+     "label": "Inverser"
+    },
+    "saturation": {
+     "label": "Saturation"
+    },
+    "scaleBrightness": {
+     "label": "Moduler la luminosité"
+    }
+   }
+  },
+  "gradientoverlay": {
+   "description": "Superpose un dégradé de deux couleurs au calque, avec plusieurs formes et modes de fusion.",
+   "name": "Incrustation de dégradé",
+   "params": {
+    "angle": {
+     "label": "Angle"
+    },
+    "blend": {
+     "label": "Fusion",
+     "options": [
+      "Normal",
+      "Produit",
+      "Superposition",
+      "Incrustation",
+      "Lumière tamisée",
+      "Lumière crue",
+      "Addition",
+      "Obscurcir",
+      "Éclaircir",
+      "Différence",
+      "Densité couleur -",
+      "Densité couleur +"
+     ]
+    },
+    "color1": {
+     "label": "Couleur 1"
+    },
+    "color2": {
+     "label": "Couleur 2"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "opacity": {
+     "label": "Opacité"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "shape": {
+     "label": "Forme",
+     "options": [
+      "Linéaire",
+      "Radial",
+      "Réfléchi",
+      "Angle"
+     ]
+    },
+    "style": {
+     "label": "Longueur",
+     "options": [
+      "Rectangle",
+      "Ovale"
+     ]
+    }
+   }
+  },
+  "grid": {
+   "description": "Trace une grille sur les parties opaques du calque ou y découpe ses lignes.",
+   "name": "Grille",
+   "params": {
+    "angle": {
+     "label": "Angle"
+    },
+    "color": {
+     "label": "Couleur"
+    },
+    "count": {
+     "label": "Nombre"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "punch": {
+     "label": "Découper"
+    },
+    "stretch": {
+     "label": "Étirement"
+    },
+    "width": {
+     "label": "Largeur"
+    }
+   }
+  },
+  "gridrepeat": {
+   "description": "Génère dynamiquement plusieurs copies du calque disposées en grille.",
+   "name": "Répétition en grille",
+   "params": {
+    "copyDelay": {
+     "label": "Délai par copie"
+    },
+    "count": {
+     "label": "Nombre"
+    },
+    "easing": {
+     "label": "Lissage",
+     "options": [
+      "Linéaire",
+      "Accélération",
+      "Décélération",
+      "Accélération et décélération"
+     ]
+    },
+    "fillAmount": {
+     "label": "Quantité de remplissage"
+    },
+    "fillColor": {
+     "label": "Couleur de remplissage"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "randomOpacity": {
+     "label": "Opacité aléatoire"
+    },
+    "randomOrder": {
+     "label": "Ordre aléatoire"
+    },
+    "randomPosition": {
+     "label": "Position aléatoire"
+    },
+    "randomRotation": {
+     "label": "Rotation aléatoire"
+    },
+    "randomScale": {
+     "label": "Échelle aléatoire"
+    },
+    "rangeEnd": {
+     "label": "Fin de la plage"
+    },
+    "rangeOffset": {
+     "label": "Décalage de la plage"
+    },
+    "rangeOpacity": {
+     "label": "Opacité de la plage"
+    },
+    "rangePosition": {
+     "label": "Position de la plage"
+    },
+    "rangeRotation": {
+     "label": "Rotation de la plage"
+    },
+    "rangeScale": {
+     "label": "Échelle de la plage"
+    },
+    "rangeStart": {
+     "label": "Début de la plage"
+    },
+    "seed": {
+     "label": "Graine"
+    },
+    "stagger": {
+     "label": "Décalage alterné"
+    }
+   }
+  },
+  "grunge": {
+   "description": "Vieillit le calque avec du grain, des taches, des bords brûlés et une teinte poussiéreuse.",
+   "name": "Grunge",
+   "params": {
+    "blotches": {
+     "label": "Salissures"
+    },
+    "burn": {
+     "label": "Bords brûlés"
+    },
+    "color": {
+     "label": "Couleur de teinte"
+    },
+    "grain": {
+     "label": "Grain"
+    },
+    "scale": {
+     "label": "Taille des salissures"
+    },
+    "seed": {
+     "label": "Graine"
+    },
+    "strength": {
+     "label": "Intensité"
+    },
+    "tint": {
+     "label": "Teinte"
+    }
+   }
+  },
+  "halftone": {
+   "description": "Des points imprimés qui grossissent dans les zones sombres de l’image.",
+   "name": "Demi-teinte",
+   "params": {
+    "angle": {
+     "label": "Angle"
+    },
+    "cell": {
+     "label": "Taille"
+    },
+    "colored": {
+     "label": "Points en couleur"
+    },
+    "ink": {
+     "label": "Couleur des points"
+    },
+    "paper": {
+     "label": "Couleur du papier"
+    },
+    "style": {
+     "label": "Style",
+     "options": [
+      "Classique",
+      "Deux couleurs"
+     ]
+    }
+   }
+  },
+  "halftonelines": {
+   "description": "Redessine le calque en lignes imprimées, plus épaisses dans les zones sombres et plus fines dans les zones claires.",
+   "name": "Lignes en demi-teinte",
+   "params": {
+    "amount": {
+     "label": "Quantité"
+    },
+    "angle": {
+     "label": "Angle"
+    },
+    "color1": {
+     "label": "Couleur 1"
+    },
+    "color2": {
+     "label": "Couleur 2"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "strength": {
+     "label": "Intensité"
+    }
+   }
+  },
+  "heart": {
+   "description": "Découpe le calque en forme de cœur bombé.",
+   "name": "Cœur",
+   "params": {
+    "depth": {
+     "label": "Profondeur"
+    },
+    "heartSize": {
+     "label": "Taille"
+    },
+    "light": {
+     "label": "Angle de la lumière"
+    },
+    "perspective": {
+     "label": "Perspective"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "rotX": {
+     "label": "Rotation X"
+    },
+    "rotY": {
+     "label": "Rotation Y"
+    },
+    "rotZ": {
+     "label": "Rotation Z"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "shading": {
+     "label": "Ombrage"
+    },
+    "shine": {
+     "label": "Brillance"
+    },
+    "smoothing": {
+     "label": "Lissage"
+    }
+   }
+  },
+  "hexagontilerotate": {
+   "description": "Divise le calque en tuiles hexagonales et fait pivoter l’image dans chacune séparément.",
+   "name": "Rotation des tuiles hexagonales",
+   "params": {
+    "angle": {
+     "label": "Angle"
+    },
+    "count": {
+     "label": "Nombre"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "random": {
+     "label": "Aléatoire"
+    },
+    "rotation": {
+     "label": "Rotation"
+    },
+    "seed": {
+     "label": "Graine"
+    }
+   }
+  },
+  "hexagontileshift": {
+   "description": "Divise le calque en tuiles hexagonales et décale l’image dans chacune dans une direction aléatoire.",
+   "name": "Décalage des tuiles hexagonales",
+   "params": {
+    "angle": {
+     "label": "Angle"
+    },
+    "count": {
+     "label": "Nombre"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "seed": {
+     "label": "Graine"
+    },
+    "strength": {
+     "label": "Intensité"
+    }
+   }
+  },
+  "hexagontiling": {
+   "description": "Répète le centre du calque en tuiles hexagonales qui remplissent l’écran.",
+   "name": "Pavage hexagonal",
+   "params": {
+    "angle": {
+     "label": "Angle"
+    },
+    "mirror": {
+     "label": "Miroir"
+    },
+    "scale": {
+     "label": "Échelle"
+    }
+   }
+  },
+  "hexgrid": {
+   "description": "Recouvre le calque d’un réseau d’hexagones aux bords adoucis, espacés et remplis d’une à trois couleurs.",
+   "name": "Réseau hexagonal",
+   "params": {
+    "angle": {
+     "label": "Angle"
+    },
+    "blend": {
+     "label": "Fusion",
+     "options": [
+      "Normal",
+      "Produit",
+      "Superposition",
+      "Incrustation",
+      "Lumière tamisée",
+      "Lumière crue",
+      "Addition",
+      "Obscurcir",
+      "Éclaircir",
+      "Différence",
+      "Densité couleur -",
+      "Densité couleur +"
+     ]
+    },
+    "cell": {
+     "label": "Taille"
+    },
+    "color1": {
+     "label": "Couleur 1"
+    },
+    "color2": {
+     "label": "Couleur 2"
+    },
+    "color3": {
+     "label": "Couleur 3"
+    },
+    "colors": {
+     "label": "Couleurs",
+     "options": [
+      "Une",
+      "Deux",
+      "Trois"
+     ]
+    },
+    "feather": {
+     "label": "Contour progressif"
+    },
+    "gap": {
+     "label": "Espacement"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "opacity": {
+     "label": "Opacité"
+    },
+    "stretch": {
+     "label": "Étirement"
+    }
+   }
+  },
+  "hexprism": {
+   "description": "Place le calque sur les faces avant et arrière d’un prisme à six côtés.",
+   "name": "Prisme hexagonal",
+   "params": {
+    "depth": {
+     "label": "Profondeur"
+    },
+    "light": {
+     "label": "Angle de la lumière"
+    },
+    "perspective": {
+     "label": "Perspective"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "radius": {
+     "label": "Rayon"
+    },
+    "rotX": {
+     "label": "Rotation X"
+    },
+    "rotY": {
+     "label": "Rotation Y"
+    },
+    "rotZ": {
+     "label": "Rotation Z"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "shading": {
+     "label": "Ombrage"
+    },
+    "shine": {
+     "label": "Brillance"
+    },
+    "smoothing": {
+     "label": "Lissage"
+    }
+   }
+  },
+  "highlightshadow": {
+   "description": "Récupère ou renforce les hautes lumières et éclaircit ou approfondit les ombres selon la luminosité de chaque pixel.",
+   "name": "Hautes lumières et ombres",
+   "params": {
+    "highlights": {
+     "label": "Hautes lumières"
+    },
+    "shadows": {
+     "label": "Ombres"
+    },
+    "style": {
+     "label": "Style",
+     "options": [
+      "Classique",
+      "Conserver la couleur"
+     ]
+    }
+   }
+  },
+  "hollowbox": {
+   "description": "Une boîte ouverte en haut et en bas : le calque recouvre l’extérieur et l’intérieur prend la couleur choisie.",
+   "name": "Boîte creuse",
+   "params": {
+    "depth": {
+     "label": "Profondeur"
+    },
+    "height": {
+     "label": "Hauteur"
+    },
+    "interior": {
+     "label": "Couleur intérieure"
+    },
+    "light": {
+     "label": "Angle de la lumière"
+    },
+    "perspective": {
+     "label": "Perspective"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "rotX": {
+     "label": "Rotation X"
+    },
+    "rotY": {
+     "label": "Rotation Y"
+    },
+    "rotZ": {
+     "label": "Rotation Z"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "shading": {
+     "label": "Ombrage"
+    },
+    "shine": {
+     "label": "Brillance"
+    },
+    "smoothing": {
+     "label": "Lissage"
+    },
+    "thickness": {
+     "label": "Épaisseur"
+    },
+    "width": {
+     "label": "Largeur"
+    }
+   }
+  },
+  "hsl": {
+   "description": "Modifie la teinte, la saturation et la luminosité d’une plage de couleurs à la fois (rouges, oranges, verts, etc.) sans toucher aux autres.",
+   "name": "HSL",
+   "params": {
+    "blend": {
+     "label": "Fusion",
+     "options": [
+      "Normal",
+      "Produit",
+      "Superposition"
+     ]
+    },
+    "blueHue": {
+     "label": "Teinte"
+    },
+    "blueLightness": {
+     "label": "Luminosité"
+    },
+    "blueSaturation": {
+     "label": "Saturation"
+    },
+    "brightness": {
+     "label": "Luminosité"
+    },
+    "cyanHue": {
+     "label": "Teinte"
+    },
+    "cyanLightness": {
+     "label": "Luminosité"
+    },
+    "cyanSaturation": {
+     "label": "Saturation"
+    },
+    "greenHue": {
+     "label": "Teinte"
+    },
+    "greenLightness": {
+     "label": "Luminosité"
+    },
+    "greenSaturation": {
+     "label": "Saturation"
+    },
+    "magentaHue": {
+     "label": "Teinte"
+    },
+    "magentaLightness": {
+     "label": "Luminosité"
+    },
+    "magentaSaturation": {
+     "label": "Saturation"
+    },
+    "opacity": {
+     "label": "Opacité"
+    },
+    "orangeHue": {
+     "label": "Teinte"
+    },
+    "orangeLightness": {
+     "label": "Luminosité"
+    },
+    "orangeSaturation": {
+     "label": "Saturation"
+    },
+    "purpleHue": {
+     "label": "Teinte"
+    },
+    "purpleLightness": {
+     "label": "Luminosité"
+    },
+    "purpleSaturation": {
+     "label": "Saturation"
+    },
+    "range": {
+     "label": "Couleur",
+     "options": [
+      "Rouge",
+      "Orange",
+      "Jaune",
+      "Vert",
+      "Cyan",
+      "Bleu",
+      "Violet",
+      "Magenta"
+     ]
+    },
+    "redHue": {
+     "label": "Teinte"
+    },
+    "redLightness": {
+     "label": "Luminosité"
+    },
+    "redSaturation": {
+     "label": "Saturation"
+    },
+    "yellowHue": {
+     "label": "Teinte"
+    },
+    "yellowLightness": {
+     "label": "Luminosité"
+    },
+    "yellowSaturation": {
+     "label": "Saturation"
+    }
+   }
+  },
+  "huesaturation": {
+   "description": "Fait tourner les couleurs sur le cercle chromatique et ajuste leur intensité ; la vibrance renforce surtout les couleurs ternes.",
+   "name": "Teinte et saturation",
+   "params": {
+    "hue": {
+     "label": "Teinte"
+    },
+    "lightness": {
+     "label": "Luminosité"
+    },
+    "saturation": {
+     "label": "Saturation"
+    },
+    "style": {
+     "label": "Style",
+     "options": [
+      "Classique",
+      "Conserver la luminosité"
+     ]
+    },
+    "vibrance": {
+     "label": "Vibrance"
+    }
+   }
+  },
+  "innerblur": {
+   "description": "Floute l’image dans le calque tout en gardant son contour net.",
+   "name": "Flou intérieur",
+   "params": {
+    "blur": {
+     "label": "Intensité"
+    }
+   }
+  },
+  "innerbulge": {
+   "description": "Renfle ou pince le centre du calque sans déplacer ses bords.",
+   "name": "Pincement et renflement intérieurs",
+   "params": {
+    "strength": {
+     "label": "Intensité"
+    }
+   }
+  },
+  "innerglow": {
+   "description": "Ajoute une lueur sur les bords intérieurs des parties opaques du calque.",
+   "name": "Lueur interne",
+   "params": {
+    "blur": {
+     "label": "Taille"
+    },
+    "color": {
+     "label": "Couleur"
+    },
+    "intensity": {
+     "label": "Intensité"
+    }
+   }
+  },
+  "invert": {
+   "description": "Inverse les couches de couleur de l’image avec une intensité réglable et une inversion alpha facultative.",
+   "name": "Inverser",
+   "params": {
+    "amount": {
+     "label": "Quantité"
+    },
+    "invert_alpha": {
+     "label": "Inverser alpha"
+    }
+   }
+  },
+  "iridescence": {
+   "description": "Recouvre les parties opaques du calque de reflets irisés mouvants, comme de l’huile sur l’eau ou une bulle de savon.",
+   "name": "Iridescence",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blend": {
+     "label": "Mode de fusion",
+     "options": [
+      "Normal",
+      "Produit",
+      "Superposition",
+      "Incrustation",
+      "Lumière tamisée",
+      "Lumière crue",
+      "Addition",
+      "Obscurcir",
+      "Éclaircir",
+      "Différence",
+      "Densité couleur -",
+      "Densité couleur +"
+     ]
+    },
+    "evolution": {
+     "label": "Évolution"
+    },
+    "saturation": {
+     "label": "Saturation"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "seed": {
+     "label": "Graine"
+    },
+    "shift": {
+     "label": "Décalage de teinte"
+    }
+   }
+  },
+  "kaleidoscope": {
+   "description": "Dispose des segments en miroir autour d’un point.",
+   "name": "Kaléidoscope",
+   "params": {
+    "angle": {
+     "label": "Angle"
+    },
+    "center": {
+     "label": "Centre"
+    },
+    "mirror": {
+     "label": "Miroir"
+    },
+    "segments": {
+     "label": "Segments"
+    }
+   }
+  },
+  "lensblur": {
+   "description": "Un flou tournant qui laisse une zone nette au centre et s’accentue vers les bords.",
+   "name": "Flou de rotation",
+   "params": {
+    "center": {
+     "label": "Centre"
+    },
+    "feather": {
+     "label": "Contour progressif"
+    },
+    "radius": {
+     "label": "Rayon"
+    },
+    "sweep": {
+     "label": "Angle"
+    }
+   }
+  },
+  "lensflare": {
+   "description": "Superpose à l’image une lumière vive entourée d’un halo.",
+   "name": "Éclat lumineux",
+   "params": {
+    "brightness": {
+     "label": "Luminosité"
+    },
+    "center": {
+     "label": "Centre"
+    },
+    "color": {
+     "label": "Couleur"
+    },
+    "radius": {
+     "label": "Rayon"
+    }
+   }
+  },
+  "levels": {
+   "description": "Ajuste les niveaux de l’image avec les points noir et blanc en entrée et en sortie, ainsi que le gamma.",
+   "name": "Niveaux",
+   "params": {
+    "gamma": {
+     "label": "Gamma"
+    },
+    "inBlack": {
+     "label": "Noir en entrée"
+    },
+    "inWhite": {
+     "label": "Blanc en entrée"
+    },
+    "outBlack": {
+     "label": "Noir en sortie"
+    },
+    "outWhite": {
+     "label": "Blanc en sortie"
+    }
+   }
+  },
+  "lightglow": {
+   "description": "Ajoute une lueur colorée autour des parties de l’image dont la luminosité dépasse un seuil.",
+   "name": "Lueur lumineuse",
+   "params": {
+    "blend": {
+     "label": "Fusion"
+    },
+    "blur": {
+     "label": "Taille"
+    },
+    "color": {
+     "label": "Couleur"
+    },
+    "intensity": {
+     "label": "Intensité"
+    },
+    "opacity": {
+     "label": "Opacité"
+    },
+    "threshold": {
+     "label": "Seuil"
+    }
+   }
+  },
+  "lightning": {
+   "description": "Trace un éclair ramifié entre deux points du calque.",
+   "name": "Éclair",
+   "params": {
+    "color": {
+     "label": "Couleur"
+    },
+    "evolution": {
+     "label": "Évolution"
+    },
+    "from": {
+     "label": "Début"
+    },
+    "glow": {
+     "label": "Lueur"
+    },
+    "jag": {
+     "label": "Détail"
+    },
+    "seed": {
+     "label": "Graine"
+    },
+    "to": {
+     "label": "Fin"
+    },
+    "width": {
+     "label": "Largeur"
+    }
+   }
+  },
+  "linearrepeat": {
+   "description": "Génère dynamiquement plusieurs copies du calque disposées sur une ligne.",
+   "name": "Répétition linéaire",
+   "params": {
+    "copyDelay": {
+     "label": "Délai par copie"
+    },
+    "count": {
+     "label": "Nombre"
+    },
+    "easing": {
+     "label": "Lissage",
+     "options": [
+      "Linéaire",
+      "Accélération",
+      "Décélération",
+      "Accélération et décélération"
+     ]
+    },
+    "fillAmount": {
+     "label": "Quantité de remplissage"
+    },
+    "fillColor": {
+     "label": "Couleur de remplissage"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "randomOpacity": {
+     "label": "Opacité aléatoire"
+    },
+    "randomOrder": {
+     "label": "Ordre aléatoire"
+    },
+    "randomPosition": {
+     "label": "Position aléatoire"
+    },
+    "randomRotation": {
+     "label": "Rotation aléatoire"
+    },
+    "randomScale": {
+     "label": "Échelle aléatoire"
+    },
+    "rangeEnd": {
+     "label": "Fin de la plage"
+    },
+    "rangeOffset": {
+     "label": "Décalage de la plage"
+    },
+    "rangeOpacity": {
+     "label": "Opacité de la plage"
+    },
+    "rangePosition": {
+     "label": "Position de la plage"
+    },
+    "rangeRotation": {
+     "label": "Rotation de la plage"
+    },
+    "rangeScale": {
+     "label": "Échelle de la plage"
+    },
+    "rangeStart": {
+     "label": "Début de la plage"
+    },
+    "seed": {
+     "label": "Graine"
+    }
+   }
+  },
+  "linearstreaks": {
+   "description": "Crée des traînées droites en décalant des copies du calque selon un angle et en fusionnant leurs zones de chevauchement.",
+   "name": "Traînées linéaires",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "angle": {
+     "label": "Angle"
+    },
+    "bias": {
+     "label": "Biais"
+    },
+    "mode": {
+     "label": "Fusion",
+     "options": [
+      "Éclaircir",
+      "Moyenne",
+      "Obscurcir"
+     ]
+    },
+    "reach": {
+     "label": "Longueur"
+    }
+   }
+  },
+  "liquidglass": {
+   "description": "Transforme la forme du calque en verre transparent et arrondi, comme un bouton de téléphone : les calques derrière sont surtout déformés près du bord, lumineux du côté éclairé et plus doux à l’opposé. Givre floute l’arrière-plan et Bord irisé sépare les couleurs sur le pourtour.",
+   "name": "Verre liquide",
+   "params": {
+    "angle": {
+     "label": "Angle de la lumière"
+    },
+    "blur": {
+     "label": "Bord"
+    },
+    "color": {
+     "label": "Couleur"
+    },
+    "dispersion": {
+     "label": "Bord irisé"
+    },
+    "frost": {
+     "label": "Givre"
+    },
+    "highlight": {
+     "label": "Reflet"
+    },
+    "refraction": {
+     "label": "Déformation"
+    },
+    "tint": {
+     "label": "Teinte"
+    }
+   }
+  },
+  "longshadow": {
+   "description": "Projette de longues ombres parallèles depuis les parties opaques du calque.",
+   "name": "Ombre longue",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "angle": {
+     "label": "Angle"
+    },
+    "color": {
+     "label": "Couleur"
+    },
+    "fade": {
+     "label": "Fondu"
+    },
+    "reach": {
+     "label": "Longueur"
+    },
+    "solidity": {
+     "label": "Densité"
+    }
+   }
+  },
+  "lumakey": {
+   "description": "Supprime les parties sombres du calque ou les parties claires.",
+   "name": "Incrustation par luminance",
+   "params": {
+    "invert": {
+     "label": "Inverser"
+    },
+    "softness": {
+     "label": "Adoucissement"
+    },
+    "threshold": {
+     "label": "Seuil"
+    }
+   }
+  },
+  "lumastamp": {
+   "description": "Transforme le calque en couleur unie dont l’opacité suit la luminosité de chaque pixel, comme un tampon ou un pochoir.",
+   "name": "Tampon de luminance",
+   "params": {
+    "color": {
+     "label": "Couleur"
+    },
+    "gamma": {
+     "label": "Gamma"
+    },
+    "high": {
+     "label": "Point blanc"
+    },
+    "invert": {
+     "label": "Inverser"
+    },
+    "low": {
+     "label": "Point noir"
+    }
+   }
+  },
+  "magnifybackground": {
+   "description": "Transforme le calque en loupe : sa forme montre les calques derrière lui agrandis autour de son centre.",
+   "name": "Agrandir l’arrière-plan",
+   "params": {
+    "magnify": {
+     "label": "Agrandir le calque"
+    },
+    "sampling": {
+     "label": "Échantillonnage",
+     "options": [
+      "Plus proche",
+      "Linéaire"
+     ]
+    },
+    "scale": {
+     "label": "Échelle"
+    }
+   }
+  },
+  "maskblur": {
+   "description": "Floute les calques situés derrière, dans les limites de sa forme ; les parties claires floutent davantage, ce qui permet un effet de bascule avec un dégradé.",
+   "name": "Flou de masque",
+   "params": {
+    "invert": {
+     "label": "Inverser"
+    },
+    "strength": {
+     "label": "Intensité"
+    }
+   }
+  },
+  "mattechoker": {
+   "description": "Réduit les parties opaques du calque en rognant leurs bords.",
+   "name": "Réduction du cache",
+   "params": {
+    "amount": {
+     "label": "Réduction"
+    },
+    "blur": {
+     "label": "Taille"
+    },
+    "invert": {
+     "label": "Inverser"
+    },
+    "softness": {
+     "label": "Adoucissement"
+    }
+   }
+  },
+  "mirror": {
+   "description": "Reflète une moitié de l’image sur un axe défini par un angle et un point central.",
+   "name": "Miroir",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "angle": {
+     "label": "Angle"
+    },
+    "center": {
+     "label": "Centre"
+    },
+    "style": {
+     "label": "Style",
+     "options": [
+      "Plier",
+      "Retourner"
+     ]
+    }
+   }
+  },
+  "mosaic": {
+   "description": "Divise le calque en carrés et remplit chacun de sa couleur moyenne.",
+   "name": "Mosaïque",
+   "params": {
+    "count": {
+     "label": "Nombre"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "stretch": {
+     "label": "Étirement"
+    }
+   }
+  },
+  "motionblur": {
+   "description": "Floute le calque selon ses déplacements, rotations et changements de taille, à partir de ses images clés et des effets de mouvement comme Tremblement automatique et Oscillation. Réglage ajuste le flou. L’aperçu utilise un flou rapide sauf si Flou complet est activé.",
+   "name": "Flou de mouvement",
+   "params": {
+    "position": {
+     "label": "Position"
+    },
+    "rotation": {
+     "label": "Angle"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "tune": {
+     "label": "Réglage"
+    }
+   }
+  },
+  "movealongpath": {
+   "description": "Place le calque à un point du contour du calque situé juste en dessous.",
+   "name": "Déplacement sur tracé",
+   "params": {
+    "inset": {
+     "label": "Retrait/extension"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "orientation": {
+     "label": "Orientation"
+    },
+    "progress": {
+     "label": "Progression"
+    },
+    "rotate": {
+     "label": "Rotation automatique"
+    }
+   }
+  },
+  "noise": {
+   "description": "Recouvre le calque d’un grain fin, à raison d’un grain par pixel, qui change à chaque image. Monochrome rend le grain gris, Extrêmes le rend entièrement clair ou sombre et Figer immobilise le motif.",
+   "name": "Bruit",
+   "params": {
+    "amount": {
+     "label": "Intensité"
+    },
+    "extremes": {
+     "label": "Extrêmes"
+    },
+    "freeze": {
+     "label": "Figer"
+    },
+    "mono": {
+     "label": "Monochrome"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "overshoot": {
+     "label": "Dépassement"
+    }
+   }
+  },
+  "noisedisplace": {
+   "description": "Déplace les pixels à l’aide d’un bruit de valeur lissé qui évolue dans le temps.",
+   "name": "Déplacement par bruit",
+   "params": {
+    "amount": {
+     "label": "Quantité"
+    },
+    "scale": {
+     "label": "Échelle du bruit"
+    },
+    "speed": {
+     "label": "Vitesse d’animation"
+    }
+   }
+  },
+  "octahedron": {
+   "description": "Place le calque sur les huit faces d’un octaèdre.",
+   "name": "Octaèdre",
+   "params": {
+    "light": {
+     "label": "Angle de lumière"
+    },
+    "perspective": {
+     "label": "Perspective"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "radius": {
+     "label": "Rayon"
+    },
+    "rotX": {
+     "label": "Rotation X"
+    },
+    "rotY": {
+     "label": "Rotation Y"
+    },
+    "rotZ": {
+     "label": "Rotation Z"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "shading": {
+     "label": "Ombrage"
+    },
+    "shine": {
+     "label": "Brillance"
+    }
+   }
+  },
+  "offset": {
+   "description": "Décale l’image du calque en la faisant réapparaître sur les bords opposés de son cadre.",
+   "name": "Décalage",
+   "params": {
+    "feather": {
+     "label": "Contour progressif"
+    },
+    "mask": {
+     "label": "Masquer au calque"
+    },
+    "offset": {
+     "label": "Décalage"
+    }
+   }
+  },
+  "ominodiffusion": {
+   "description": "Redessine le calque avec une palette réduite et propage l’erreur d’arrondi dans une direction, pour un tramage perturbé qui prend vie en mouvement.",
+   "name": "Diffusion Omino+",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "angle": {
+     "label": "Angle"
+    },
+    "blend": {
+     "label": "Mode de fusion",
+     "options": [
+      "Normal",
+      "Produit",
+      "Superposition"
+     ]
+    },
+    "color1": {
+     "label": "Couleur 1"
+    },
+    "color2": {
+     "label": "Couleur 2"
+    },
+    "color3": {
+     "label": "Couleur 3"
+    },
+    "color4": {
+     "label": "Couleur 4"
+    },
+    "color5": {
+     "label": "Couleur 5"
+    },
+    "color6": {
+     "label": "Couleur 6"
+    },
+    "falloff": {
+     "label": "Atténuation du poids"
+    },
+    "palette": {
+     "label": "Palette",
+     "options": [
+      "Noir/blanc",
+      "Postérisation RGB (2 niveaux)",
+      "Postérisation RGB (3 niveaux)",
+      "Postérisation RGB (4 niveaux)",
+      "Gris (3 niveaux)",
+      "Gris (4 niveaux)",
+      "CGA vert/rouge/jaune",
+      "CGA cyan/magenta/blanc",
+      "CGA bleu/cyan/magenta/blanc",
+      "Saturation et postérisation",
+      "2 couleurs personnalisées",
+      "3 couleurs personnalisées",
+      "4 couleurs personnalisées",
+      "5 couleurs personnalisées",
+      "6 couleurs personnalisées"
+     ]
+    },
+    "steps": {
+     "label": "Niveaux"
+    },
+    "strength": {
+     "label": "Intensité"
+    },
+    "weight": {
+     "label": "Poids de l’erreur"
+    }
+   }
+  },
+  "ominoglass": {
+   "description": "Crée du verre à partir de la luminosité du calque : il réfracte l’arrière-plan avec des franges colorées et éclaire la surface comme une lentille.",
+   "name": "Verre Omino",
+   "params": {
+    "aberration": {
+     "label": "Aberration chromatique"
+    },
+    "ambient": {
+     "label": "Ambiance"
+    },
+    "amount": {
+     "label": "Rugosité"
+    },
+    "blend": {
+     "label": "Fusion"
+    },
+    "blur": {
+     "label": "Biseau"
+    },
+    "color": {
+     "label": "Couleur"
+    },
+    "direction": {
+     "label": "Direction"
+    },
+    "elevation": {
+     "label": "Élévation"
+    },
+    "evolution": {
+     "label": "Évolution"
+    },
+    "feature": {
+     "label": "Taille des détails"
+    },
+    "intensity": {
+     "label": "Intensité"
+    },
+    "light": {
+     "label": "Couleur de la lumière"
+    },
+    "refraction": {
+     "label": "Réfraction"
+    },
+    "samples": {
+     "label": "Échantillons de lissage"
+    },
+    "scale": {
+     "label": "Échelle de rugosité"
+    },
+    "seed": {
+     "label": "Graine"
+    },
+    "shading": {
+     "label": "Ombrage",
+     "options": [
+      "Aucun",
+      "Lumière ponctuelle",
+      "Lumière directionnelle"
+     ]
+    },
+    "shine": {
+     "label": "Brillance"
+    },
+    "specularity": {
+     "label": "Spécularité"
+    },
+    "useLuma": {
+     "label": "Utiliser la luminance du calque"
+    }
+   }
+  },
+  "oscillate": {
+   "description": "Déplace le calque en va-et-vient selon un angle, en profondeur ou en orbite.",
+   "name": "Oscillation",
+   "params": {
+    "angle": {
+     "label": "Angle"
+    },
+    "direction": {
+     "label": "Direction",
+     "options": [
+      "Angle",
+      "Profondeur",
+      "Orbite"
+     ]
+    },
+    "frequency": {
+     "label": "Fréquence"
+    },
+    "magnitude": {
+     "label": "Amplitude"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "wave": {
+     "label": "Onde",
+     "options": [
+      "Sinusoïde",
+      "Triangle"
+     ]
+    }
+   }
+  },
+  "palettemap": {
+   "description": "Associe chaque pixel à la couleur la plus proche d’une palette : choisissez jusqu’à huit couleurs ou utilisez une palette de 512 couleurs maximum issue d’un préréglage ou d’un fichier importé. Les motifs de tramage mélangent les couleurs voisines pour créer davantage de nuances. Alpha mélange les couleurs obtenues avec le calque d’origine.",
+   "name": "Correspondance de palette",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "color1": {
+     "label": "Couleur 1"
+    },
+    "color2": {
+     "label": "Couleur 2"
+    },
+    "color3": {
+     "label": "Couleur 3"
+    },
+    "color4": {
+     "label": "Couleur 4"
+    },
+    "color5": {
+     "label": "Couleur 5"
+    },
+    "color6": {
+     "label": "Couleur 6"
+    },
+    "color7": {
+     "label": "Couleur 7"
+    },
+    "color8": {
+     "label": "Couleur 8"
+    },
+    "colors": {
+     "label": "Couleurs"
+    },
+    "dither": {
+     "label": "Tramage"
+    },
+    "palette": {
+     "label": "Palette"
+    },
+    "pattern": {
+     "label": "Motif de tramage",
+     "options": [
+      "Aucun",
+      "Bruit",
+      "Damier",
+      "Bayer 2x2",
+      "Bayer 3x3",
+      "Bayer 4x4",
+      "Bayer 8x8",
+      "Points groupés 4x4",
+      "Points groupés 8x8",
+      "Lignes horizontales",
+      "Lignes verticales",
+      "Lignes diagonales",
+      "Floyd-Steinberg",
+      "Faux Floyd-Steinberg",
+      "Sierra Lite",
+      "Éventail",
+      "Shiau-Fan",
+      "Jarvis-Judice-Ninke",
+      "Stucki",
+      "Burkes",
+      "Sierra",
+      "Sierra à deux lignes",
+      "Atkinson"
+     ]
+    },
+    "source": {
+     "label": "Source des couleurs",
+     "options": [
+      "Couleurs",
+      "Palette"
+     ]
+    }
+   }
+  },
+  "parenthelper": {
+   "description": "Modifie la façon dont un calque enfant suit son parent : l’échelle et la rotation peuvent le suivre entièrement, rester fixes ou le suivre partiellement. La rotation automatique fait tourner le calque pendant son déplacement, comme une roue.",
+   "name": "Assistant de parentage",
+   "params": {
+    "autoRotate": {
+     "label": "Rotation automatique",
+     "options": [
+      "Désactivé",
+      "Axe X",
+      "Axe Y"
+     ]
+    },
+    "radiusAdjust": {
+     "label": "Ajustement du rayon"
+    },
+    "rotateMode": {
+     "label": "Rotation",
+     "options": [
+      "Normal",
+      "Verrouillé",
+      "Pondéré"
+     ]
+    },
+    "rotateWeight": {
+     "label": "Poids de la rotation"
+    },
+    "scaleMode": {
+     "label": "Échelle",
+     "options": [
+      "Normal",
+      "Verrouillé",
+      "Pondéré"
+     ]
+    },
+    "scaleWeight": {
+     "label": "Poids de l’échelle"
+    }
+   }
+  },
+  "particles": {
+   "description": "Projette des particules depuis le calque : neige, étincelles, confettis, bulles, poussière, cœurs, étoiles, pétales ou petites copies du calque, animés par la gravité, le vent et les tourbillons. Choisissez un préréglage, puis modifiez l’émetteur, la quantité et les forces. Sur les temps déclenche une rafale à chaque temps : sélectionnez votre musique, ouvrez son menu et touchez d’abord Marquer les temps.",
+   "name": "Particules",
+   "params": {
+    "beats": {
+     "label": "Temps",
+     "options": [
+      "Chaque temps",
+      "Tous les 2 temps",
+      "Tous les 4 temps"
+     ]
+    },
+    "blend": {
+     "label": "Fusion",
+     "options": [
+      "Normal",
+      "Ajouter",
+      "Superposition"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Couleur"
+    },
+    "color2": {
+     "label": "Couleur 2"
+    },
+    "colorMode": {
+     "label": "Mode de couleur",
+     "options": [
+      "Couleur unique",
+      "Mélange aléatoire",
+      "Sur la durée de vie"
+     ]
+    },
+    "colorVariation": {
+     "label": "Variation de couleur"
+    },
+    "count": {
+     "label": "Nombre"
+    },
+    "depth": {
+     "label": "Profondeur"
+    },
+    "direction": {
+     "label": "Direction"
+    },
+    "drag": {
+     "label": "Résistance de l’air"
+    },
+    "emission": {
+     "label": "Émission",
+     "options": [
+      "Continue",
+      "Rafale",
+      "Sur les temps"
+     ]
+    },
+    "emitter": {
+     "label": "Émetteur",
+     "options": [
+      "Point",
+      "Ligne",
+      "Zone",
+      "Contour"
+     ]
+    },
+    "emitterSize": {
+     "label": "Taille de l’émetteur"
+    },
+    "endSize": {
+     "label": "Taille finale"
+    },
+    "every": {
+     "label": "Répéter tous les"
+    },
+    "fadeIn": {
+     "label": "Apparition progressive"
+    },
+    "fadeOut": {
+     "label": "Disparition progressive"
+    },
+    "gravity": {
+     "label": "Gravité"
+    },
+    "kind": {
+     "label": "Particule",
+     "options": [
+      "Neige",
+      "Étincelles",
+      "Confettis",
+      "Bulles",
+      "Poussière",
+      "Cœurs",
+      "Étoiles",
+      "Pétales",
+      "Calque"
+     ]
+    },
+    "layer": {
+     "label": "Calque",
+     "options": [
+      "Sous les particules",
+      "Sur les particules",
+      "Masqué"
+     ]
+    },
+    "lifeVariation": {
+     "label": "Variation de durée de vie"
+    },
+    "lifetime": {
+     "label": "Durée de vie"
+    },
+    "more": {
+     "label": "Plus de paramètres"
+    },
+    "orientation": {
+     "label": "Orientation",
+     "options": [
+      "Libre",
+      "Suivre le mouvement"
+     ]
+    },
+    "perspective": {
+     "label": "Perspective"
+    },
+    "position": {
+     "label": "Position de l’émetteur"
+    },
+    "prewarm": {
+     "label": "Plein au départ"
+    },
+    "randomRotation": {
+     "label": "Rotation aléatoire"
+    },
+    "rate": {
+     "label": "Cadence"
+    },
+    "seed": {
+     "label": "Graine"
+    },
+    "size": {
+     "label": "Taille"
+    },
+    "sizeVariation": {
+     "label": "Variation de taille"
+    },
+    "speed": {
+     "label": "Vitesse"
+    },
+    "speedVariation": {
+     "label": "Variation de vitesse"
+    },
+    "spin": {
+     "label": "Rotation continue"
+    },
+    "spinVariation": {
+     "label": "Variation de rotation"
+    },
+    "spread": {
+     "label": "Dispersion"
+    },
+    "start": {
+     "label": "Moment de la rafale"
+    },
+    "swirl": {
+     "label": "Tourbillon"
+    },
+    "swirlSpeed": {
+     "label": "Vitesse du tourbillon"
+    },
+    "tint": {
+     "label": "Teinte"
+    },
+    "twinkle": {
+     "label": "Scintillement"
+    },
+    "wind": {
+     "label": "Vent"
+    },
+    "zSpeed": {
+     "label": "Vitesse Z"
+    },
+    "zSpread": {
+     "label": "Dispersion Z"
+    }
+   },
+   "presets": {
+    "beat-confetti": "Confettis au rythme",
+    "bubbles": "Bulles",
+    "confetti": "Confettis",
+    "dust": "Poussière",
+    "hearts": "Cœurs",
+    "layer-fountain": "Fontaine de calques",
+    "petals": "Pétales",
+    "snow": "Neige",
+    "sparks": "Étincelles",
+    "twinkle": "Scintillement"
+   }
+  },
+  "pixelate": {
+   "description": "Transforme le calque en blocs de couleur prélevée au centre de chacun, sur une grille centrée sur le calque ou sur l’image avec Espace écran. Étirement, Décalage et Angle modifient la grille, tandis que Vignettage assombrit les bords de chaque bloc.",
+   "name": "Pixellisation",
+   "params": {
+    "angle": {
+     "label": "Angle"
+    },
+    "blockSize": {
+     "label": "Taille"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "screenSpace": {
+     "label": "Espace écran"
+    },
+    "stretch": {
+     "label": "Étirement"
+    },
+    "vignette": {
+     "label": "Vignettage"
+    }
+   }
+  },
+  "pixeltiles": {
+   "description": "Reconstitue le calque avec une grille de petites tuiles à motifs de pixels. Chaque tuile adapte son motif à la luminosité sous-jacente, entre art ASCII et mosaïque. Chaos perturbe la grille avec des tuiles aléatoires.",
+   "name": "Tuiles de pixels",
+   "params": {
+    "alpha": {
+     "label": "Mélange"
+    },
+    "background": {
+     "label": "Arrière-plan"
+    },
+    "brightness": {
+     "label": "Luminosité"
+    },
+    "chaos": {
+     "label": "Chaos"
+    },
+    "chaosAmount": {
+     "label": "Intensité du chaos"
+    },
+    "chaosSpeed": {
+     "label": "Vitesse du chaos"
+    },
+    "contrast": {
+     "label": "Contraste"
+    },
+    "detail": {
+     "label": "Détail"
+    },
+    "flip": {
+     "label": "Inverser les pixels"
+    },
+    "foreground": {
+     "label": "Premier plan"
+    },
+    "levels": {
+     "label": "Nuances"
+    },
+    "offset": {
+     "label": "Décalage du motif"
+    },
+    "original": {
+     "label": "Utiliser la couleur d’origine"
+    },
+    "pattern": {
+     "label": "Motif",
+     "options": [
+      "Détail élevé",
+      "Chiffres et lettres",
+      "Lignes horizontales",
+      "Points",
+      "Lignes verticales",
+      "Grunge",
+      "Anneaux",
+      "Plein",
+      "Diagonale gauche",
+      "Diagonale droite"
+     ]
+    },
+    "randomPattern": {
+     "label": "Motifs aléatoires"
+    },
+    "scramble": {
+     "label": "Mélanger les tuiles"
+    },
+    "seed": {
+     "label": "Graine aléatoire"
+    },
+    "tile": {
+     "label": "Taille des tuiles"
+    },
+    "tone": {
+     "label": "Source du ton",
+     "options": [
+      "Luminance",
+      "Moyenne",
+      "Rouge",
+      "Vert",
+      "Bleu"
+     ]
+    },
+    "transparent": {
+     "label": "Arrière-plan transparent"
+    }
+   }
+  },
+  "polar": {
+   "description": "Courbe le calque autour de son centre pour transformer les lignes droites en cercles, ou déroule les cercles en lignes droites.",
+   "name": "Coordonnées polaires",
+   "params": {
+    "amount": {
+     "label": "Interpolation"
+    },
+    "direction": {
+     "label": "Type",
+     "options": [
+      "Rectangulaire vers polaire",
+      "Polaire vers rectangulaire"
+     ]
+    }
+   }
+  },
+  "polardisplacement": {
+   "description": "Fait tourner et déplace les calques situés derrière celui-ci autour d’un centre selon ses couleurs, puis masque ce calque.",
+   "name": "Carte de déplacement polaire",
+   "params": {
+    "angle": {
+     "label": "Angle"
+    },
+    "angleChannel": {
+     "label": "Source de l’angle",
+     "options": [
+      "R",
+      "G",
+      "B",
+      "Luminance",
+      "Alpha"
+     ]
+    },
+    "center": {
+     "label": "Centre"
+    },
+    "distanceChannel": {
+     "label": "Source de la distance",
+     "options": [
+      "R",
+      "G",
+      "B",
+      "Luminance",
+      "Alpha"
+     ]
+    },
+    "edges": {
+     "label": "Bords",
+     "options": [
+      "Répétition",
+      "Miroir",
+      "Transparent",
+      "Tuile"
+     ]
+    },
+    "fromCenter": {
+     "label": "Depuis le centre"
+    },
+    "invert": {
+     "label": "Inverser"
+    },
+    "reach": {
+     "label": "Retrait/extension"
+    }
+   }
+  },
+  "posterize": {
+   "description": "Réduit chaque couche de couleur à un nombre de niveaux unis, transformant les dégradés lisses en bandes. Décalage modifie la position des limites des bandes.",
+   "name": "Postérisation",
+   "params": {
+    "levels": {
+     "label": "Niveaux"
+    },
+    "offset": {
+     "label": "Décalage"
+    }
+   }
+  },
+  "pulseopacity": {
+   "description": "Fait disparaître et réapparaître le calque en boucle selon une onde sinusoïdale ou triangulaire.",
+   "name": "Pulsation d’opacité",
+   "params": {
+    "frequency": {
+     "label": "Fréquence"
+    },
+    "phase": {
+     "label": "Phase initiale"
+    },
+    "strength": {
+     "label": "Intensité"
+    },
+    "wave": {
+     "label": "Onde",
+     "options": [
+      "Sinusoïde",
+      "Triangle"
+     ]
+    }
+   }
+  },
+  "pulsesize": {
+   "description": "Agrandit et réduit le calque en boucle selon une onde sinusoïdale ou triangulaire.",
+   "name": "Pulsation de taille",
+   "params": {
+    "frequency": {
+     "label": "Fréquence"
+    },
+    "grow": {
+     "label": "Agrandir"
+    },
+    "phase": {
+     "label": "Phase initiale"
+    },
+    "shrink": {
+     "label": "Réduire"
+    },
+    "wave": {
+     "label": "Onde",
+     "options": [
+      "Sinusoïde",
+      "Triangle"
+     ]
+    }
+   }
+  },
+  "puppet": {
+   "description": "Déforme le calque comme une marionnette : placez des épingles, puis déplacez-les ou animez-les pour que l’image les suive en douceur.",
+   "name": "Épingles de marionnette",
+   "params": {
+    "density": {
+     "label": "Densité des triangles"
+    },
+    "expansion": {
+     "label": "Extension du maillage"
+    },
+    "falloff": {
+     "label": "Atténuation"
+    },
+    "sway": {
+     "label": "Balancement"
+    },
+    "swayAmount": {
+     "label": "Amplitude du balancement"
+    },
+    "swayAngle": {
+     "label": "Angle du balancement"
+    },
+    "swayDirection": {
+     "label": "Direction du balancement",
+     "options": [
+      "Angle",
+      "Aléatoire"
+     ]
+    },
+    "swayPins": {
+     "label": "Épingles à balancer",
+     "options": [
+      "Tout",
+      "Sélectionnées"
+     ]
+    },
+    "swaySeed": {
+     "label": "Graine du balancement"
+    },
+    "swaySpeed": {
+     "label": "Vitesse du balancement"
+    }
+   }
+  },
+  "pyramid": {
+   "description": "Place le calque sur les faces d’une pyramide à base carrée.",
+   "name": "Pyramide",
+   "params": {
+    "base": {
+     "label": "Base"
+    },
+    "height": {
+     "label": "Hauteur"
+    },
+    "light": {
+     "label": "Angle de lumière"
+    },
+    "perspective": {
+     "label": "Perspective"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "rotX": {
+     "label": "Rotation X"
+    },
+    "rotY": {
+     "label": "Rotation Y"
+    },
+    "rotZ": {
+     "label": "Rotation Z"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "shading": {
+     "label": "Ombrage"
+    },
+    "shine": {
+     "label": "Brillance"
+    }
+   }
+  },
+  "radialblur": {
+   "description": "Applique un flou de zoom radial en moyennant les échantillons le long de rayons issus d’un centre, avec une intensité réglable.",
+   "name": "Flou de zoom",
+   "params": {
+    "amount": {
+     "label": "Intensité"
+    },
+    "center": {
+     "label": "Centre"
+    }
+   }
+  },
+  "radialrays": {
+   "description": "Dessine des rayons pleins depuis un point sur les parties opaques du calque.",
+   "name": "Rayons radiaux",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "angle": {
+     "label": "Angle"
+    },
+    "center": {
+     "label": "Centre"
+    },
+    "color": {
+     "label": "Couleur"
+    },
+    "count": {
+     "label": "Nombre"
+    },
+    "width": {
+     "label": "Largeur"
+    }
+   }
+  },
+  "radialrepeat": {
+   "description": "Génère dynamiquement plusieurs copies du calque disposées en cercle.",
+   "name": "Répétition radiale",
+   "params": {
+    "angle": {
+     "label": "Angle"
+    },
+    "copyDelay": {
+     "label": "Délai par copie"
+    },
+    "count": {
+     "label": "Nombre"
+    },
+    "easing": {
+     "label": "Lissage",
+     "options": [
+      "Linéaire",
+      "Lissage en entrée",
+      "Lissage en sortie",
+      "Lissage en entrée et sortie"
+     ]
+    },
+    "fillAmount": {
+     "label": "Quantité de remplissage"
+    },
+    "fillColor": {
+     "label": "Couleur de remplissage"
+    },
+    "orientation": {
+     "label": "Orientation"
+    },
+    "radius": {
+     "label": "Rayon"
+    },
+    "randomOpacity": {
+     "label": "Opacité aléatoire"
+    },
+    "randomOrder": {
+     "label": "Ordre aléatoire"
+    },
+    "randomPosition": {
+     "label": "Position aléatoire"
+    },
+    "randomRotation": {
+     "label": "Rotation aléatoire"
+    },
+    "randomScale": {
+     "label": "Échelle aléatoire"
+    },
+    "rangeEnd": {
+     "label": "Fin de la plage"
+    },
+    "rangeOffset": {
+     "label": "Décalage de la plage"
+    },
+    "rangeOpacity": {
+     "label": "Opacité de la plage"
+    },
+    "rangePosition": {
+     "label": "Position de la plage"
+    },
+    "rangeRotation": {
+     "label": "Rotation de la plage"
+    },
+    "rangeScale": {
+     "label": "Échelle de la plage"
+    },
+    "rangeStart": {
+     "label": "Début de la plage"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "seed": {
+     "label": "Graine"
+    },
+    "sweep": {
+     "label": "Balayage"
+    }
+   }
+  },
+  "radialshadow": {
+   "description": "Projette de longues ombres depuis les parties opaques du calque, en s’éloignant d’un point lumineux.",
+   "name": "Ombre radiale",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "color": {
+     "label": "Couleur"
+    },
+    "fade": {
+     "label": "Fondu"
+    },
+    "light": {
+     "label": "Lumière"
+    },
+    "reach": {
+     "label": "Longueur"
+    }
+   }
+  },
+  "radialwipe": {
+   "description": "Masque un secteur du calque qui balaie le cercle autour du Centre depuis l’Angle de départ, comme une aiguille d’horloge. Progression règle l’angle balayé, Nombre répète le secteur et Les deux balaie dans les deux sens. Animez Progression pour créer une transition.",
+   "name": "Volet radial",
+   "params": {
+    "center": {
+     "label": "Centre"
+    },
+    "count": {
+     "label": "Nombre"
+    },
+    "direction": {
+     "label": "Direction",
+     "options": [
+      "Sens horaire",
+      "Sens antihoraire",
+      "Les deux"
+     ]
+    },
+    "feather": {
+     "label": "Contour progressif"
+    },
+    "progress": {
+     "label": "Progression"
+    },
+    "start": {
+     "label": "Angle de départ"
+    }
+   }
+  },
+  "randomdisplace": {
+   "description": "Déplace automatiquement le calque de façon fluide et aléatoire au fil du temps. Graine choisit un autre mouvement, Vitesse règle sa rapidité et Évolution décale le motif.",
+   "name": "Déplacement aléatoire",
+   "params": {
+    "evolution": {
+     "label": "Évolution"
+    },
+    "magnitude": {
+     "label": "Amplitude"
+    },
+    "scatter": {
+     "label": "Dispersion"
+    },
+    "seed": {
+     "label": "Graine"
+    },
+    "speed": {
+     "label": "Vitesse"
+    }
+   }
+  },
+  "randomjitter": {
+   "description": "Fait sauter le calque aléatoirement en va-et-vient selon un angle.",
+   "name": "Tremblement aléatoire",
+   "params": {
+    "angle": {
+     "label": "Angle"
+    },
+    "frequency": {
+     "label": "Fréquence"
+    },
+    "magnitude": {
+     "label": "Amplitude"
+    },
+    "seed": {
+     "label": "Graine"
+    },
+    "slack": {
+     "label": "Souplesse"
+    },
+    "zjitter": {
+     "label": "Tremblement Z"
+    }
+   }
+  },
+  "rasterextrude": {
+   "description": "Extrude l’image du calque en un bloc solide dont les côtés prennent la couleur intérieure.",
+   "name": "Extrusion matricielle",
+   "params": {
+    "depth": {
+     "label": "Profondeur"
+    },
+    "interior": {
+     "label": "Couleur intérieure"
+    },
+    "light": {
+     "label": "Angle de lumière"
+    },
+    "perspective": {
+     "label": "Perspective"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "rotX": {
+     "label": "Rotation X"
+    },
+    "rotY": {
+     "label": "Rotation Y"
+    },
+    "rotZ": {
+     "label": "Rotation Z"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "shading": {
+     "label": "Ombrage"
+    },
+    "shine": {
+     "label": "Brillance"
+    }
+   }
+  },
+  "rastertransform": {
+   "description": "Redimensionne, fait pivoter et déplace l’image finale du calque après les effets précédents, afin de transformer aussi leur résultat. Remplissage conserve une partie de l’original en dessous et Masquer au calque limite le résultat à la forme d’origine.",
+   "name": "Transformation matricielle",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "angle": {
+     "label": "Angle"
+    },
+    "fill": {
+     "label": "Remplissage"
+    },
+    "mask": {
+     "label": "Masquer au calque"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "sampling": {
+     "label": "Échantillonnage",
+     "options": [
+      "Plus proche",
+      "Linéaire"
+     ]
+    },
+    "scale": {
+     "label": "Échelle"
+    }
+   }
+  },
+  "rays": {
+   "description": "Émet des rayons lumineux depuis les parties claires du calque, en s’éloignant d’un centre.",
+   "name": "Rayons",
+   "params": {
+    "blend": {
+     "label": "Fusion"
+    },
+    "center": {
+     "label": "Centre"
+    },
+    "color": {
+     "label": "Couleur"
+    },
+    "intensity": {
+     "label": "Intensité"
+    },
+    "reach": {
+     "label": "Longueur"
+    },
+    "style": {
+     "label": "Style",
+     "options": [
+      "Classique",
+      "Standard"
+     ]
+    },
+    "threshold": {
+     "label": "Seuil"
+    },
+    "thresholdAdd": {
+     "label": "Ajout au seuil"
+    }
+   }
+  },
+  "reorient360": {
+   "description": "Fait tourner un calque panoramique à 360° dans sa sphère pour redresser l’horizon ou changer la direction de vue.",
+   "name": "Réorientation de sphère 360°",
+   "params": {
+    "pitch": {
+     "label": "Tangage"
+    },
+    "roll": {
+     "label": "Roulis"
+    },
+    "yaw": {
+     "label": "Lacet"
+    }
+   }
+  },
+  "repeat": {
+   "description": "Génère dynamiquement plusieurs copies du calque.",
+   "name": "Répétition",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "angle": {
+     "label": "Angle"
+    },
+    "count": {
+     "label": "Nombre"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "time": {
+     "label": "Temps"
+    }
+   }
+  },
+  "repeatalongpath": {
+   "description": "Génère dynamiquement plusieurs copies du calque le long du tracé du contour du calque situé juste en dessous.",
+   "name": "Répétition sur tracé",
+   "params": {
+    "copyDelay": {
+     "label": "Délai par copie"
+    },
+    "count": {
+     "label": "Nombre"
+    },
+    "easing": {
+     "label": "Lissage",
+     "options": [
+      "Linéaire",
+      "Lissage en entrée",
+      "Lissage en sortie",
+      "Lissage en entrée et sortie"
+     ]
+    },
+    "end": {
+     "label": "Fin"
+    },
+    "fillAmount": {
+     "label": "Quantité de remplissage"
+    },
+    "fillColor": {
+     "label": "Couleur de remplissage"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "randomOpacity": {
+     "label": "Opacité aléatoire"
+    },
+    "randomOrder": {
+     "label": "Ordre aléatoire"
+    },
+    "randomPosition": {
+     "label": "Position aléatoire"
+    },
+    "randomRotation": {
+     "label": "Rotation aléatoire"
+    },
+    "randomScale": {
+     "label": "Échelle aléatoire"
+    },
+    "rangeEnd": {
+     "label": "Fin de la plage"
+    },
+    "rangeOffset": {
+     "label": "Décalage de la plage"
+    },
+    "rangeOpacity": {
+     "label": "Opacité de la plage"
+    },
+    "rangePosition": {
+     "label": "Position de la plage"
+    },
+    "rangeRotation": {
+     "label": "Rotation de la plage"
+    },
+    "rangeScale": {
+     "label": "Échelle de la plage"
+    },
+    "rangeStart": {
+     "label": "Début de la plage"
+    },
+    "seed": {
+     "label": "Graine"
+    },
+    "start": {
+     "label": "Début"
+    },
+    "tangent": {
+     "label": "Tangente"
+    }
+   }
+  },
+  "replacecolor": {
+   "description": "Remplace une couleur par une autre. Alpha règle l’intensité du remplacement ; Verrouiller la luminance conserve les ombres et les lumières d’origine.",
+   "name": "Remplacement de couleur",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "choke": {
+     "label": "Contraction"
+    },
+    "feather": {
+     "label": "Contour progressif"
+    },
+    "lockLuminance": {
+     "label": "Verrouiller la luminance"
+    },
+    "source": {
+     "label": "Remplacement de couleur"
+    },
+    "target": {
+     "label": "Nouvelle couleur"
+    },
+    "threshold": {
+     "label": "Seuil"
+    }
+   }
+  },
+  "retrodither": {
+   "description": "Transforme le calque en graphisme pixellisé rétro : chaque bloc de pixels prend une couleur d’une palette, issue par exemple d’une ancienne console ou d’un ordinateur, ou importée par vous. Un motif de tramage mélange les couleurs pour simuler davantage de nuances.",
+   "name": "Tramage rétro",
+   "params": {
+    "alpha": {
+     "label": "Mélange"
+    },
+    "dither": {
+     "label": "Intensité"
+    },
+    "palette": {
+     "label": "Palette"
+    },
+    "pattern": {
+     "label": "Tramage",
+     "options": [
+      "Aucun",
+      "Bruit",
+      "Damier",
+      "Bayer 2x2",
+      "Bayer 3x3",
+      "Bayer 4x4",
+      "Bayer 8x8",
+      "Points groupés 4x4",
+      "Points groupés 8x8",
+      "Lignes horizontales",
+      "Lignes verticales",
+      "Lignes diagonales",
+      "Floyd-Steinberg",
+      "Faux Floyd-Steinberg",
+      "Sierra Lite",
+      "Fan",
+      "Shiau-Fan",
+      "Jarvis-Judice-Ninke",
+      "Stucki",
+      "Burkes",
+      "Sierra",
+      "Sierra à deux lignes",
+      "Atkinson"
+     ]
+    },
+    "pixel": {
+     "label": "Taille des pixels"
+    }
+   }
+  },
+  "rgbsplit": {
+   "description": "Sépare les canaux rouge, vert et bleu : le canal central reste en place et les deux autres se décalent en sens opposés selon l’angle. Clair additionne les couleurs décalées, Sombre les garde opaques, Masque ne conserve que leur intersection et Luminance rend les franges aussi opaques que lumineuses.",
+   "name": "Séparation RGB",
+   "params": {
+    "angle": {
+     "label": "Angle"
+    },
+    "center": {
+     "label": "Centre",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
+    },
+    "mode": {
+     "label": "Mode",
+     "options": [
+      "Clair",
+      "Sombre",
+      "Masque",
+      "Luminance"
+     ]
+    },
+    "strength": {
+     "label": "Intensité"
+    }
+   }
+  },
+  "ribbon": {
+   "description": "Dessine un ruban torsadé de largeur variable sur les parties opaques du calque ; animez la phase pour le faire défiler ou découpez-le dans le calque.",
+   "name": "Ruban",
+   "params": {
+    "angle": {
+     "label": "Angle"
+    },
+    "color": {
+     "label": "Couleur"
+    },
+    "frequency": {
+     "label": "Fréquence"
+    },
+    "magnitude": {
+     "label": "Amplitude"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "punch": {
+     "label": "Découper"
+    },
+    "smoothing": {
+     "label": "Lissage"
+    },
+    "tint": {
+     "label": "Teinte"
+    },
+    "tintAmount": {
+     "label": "Intensité de la teinte"
+    },
+    "width": {
+     "label": "Largeur"
+    }
+   }
+  },
+  "ripple": {
+   "description": "Ondulations concentriques partant d’un point central, avec amplitude, longueur d’onde et vitesse réglables.",
+   "name": "Ondulation",
+   "params": {
+    "amplitude": {
+     "label": "Amplitude"
+    },
+    "center": {
+     "label": "Centre"
+    },
+    "speed": {
+     "label": "Vitesse"
+    },
+    "wavelength": {
+     "label": "Longueur d’onde"
+    }
+   }
+  },
+  "roughenedges": {
+   "description": "Ronge les bords des parties opaques avec du bruit pour créer un contour déchiré, usé ou brûlé.",
+   "name": "Bords irréguliers",
+   "params": {
+    "blur": {
+     "label": "Bordure"
+    },
+    "evolution": {
+     "label": "Évolution"
+    },
+    "octaves": {
+     "label": "Octaves"
+    },
+    "roughness": {
+     "label": "Rugosité"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "seed": {
+     "label": "Graine"
+    }
+   }
+  },
+  "scaleassist": {
+   "description": "Ajoute une mise à l’échelle à la taille du calque sur X, Y, les deux, ou X et Y en sens inverse. Les calques qui lui sont liés suivent la nouvelle taille.",
+   "name": "Aide à l’échelle",
+   "params": {
+    "axis": {
+     "label": "Axe",
+     "options": [
+      "X",
+      "Y",
+      "X,Y",
+      "X,-Y"
+     ]
+    },
+    "damp": {
+     "label": "Amortissement"
+    },
+    "scale": {
+     "label": "Échelle"
+    }
+   }
+  },
+  "scanlines": {
+   "description": "Ajoute des lignes horizontales pour un effet d’écran cathodique, avec défilement vertical facultatif.",
+   "name": "Lignes de balayage",
+   "params": {
+    "darkness": {
+     "label": "Obscurité"
+    },
+    "roll_speed": {
+     "label": "Vitesse de défilement"
+    },
+    "spacing": {
+     "label": "Espacement des lignes"
+    }
+   }
+  },
+  "scatter3d": {
+   "description": "Transforme le calque en une grille d’éléments 3D dispersés.",
+   "name": "Dispersion 3D",
+   "params": {
+    "axis": {
+     "label": "Axe de torsion",
+     "options": [
+      "X",
+      "Y",
+      "Z"
+     ]
+    },
+    "depth": {
+     "label": "Profondeur de la grille"
+    },
+    "depthSpacing": {
+     "label": "Espacement en profondeur"
+    },
+    "intensity": {
+     "label": "Intensité lumineuse"
+    },
+    "light": {
+     "label": "Direction de la lumière"
+    },
+    "lightHeight": {
+     "label": "Hauteur de la lumière"
+    },
+    "perspective": {
+     "label": "Perspective"
+    },
+    "rotX": {
+     "label": "Rotation X"
+    },
+    "rotY": {
+     "label": "Rotation Y"
+    },
+    "rotZ": {
+     "label": "Rotation Z"
+    },
+    "scatter": {
+     "label": "Dispersion"
+    },
+    "seed": {
+     "label": "Graine"
+    },
+    "shading": {
+     "label": "Ombrage"
+    },
+    "shape": {
+     "label": "Forme",
+     "options": [
+      "Cube",
+      "Sphère",
+      "Carré",
+      "Cercle"
+     ]
+    },
+    "size": {
+     "label": "Taille des éléments"
+    },
+    "spacing": {
+     "label": "Espacement de la grille"
+    },
+    "spin": {
+     "label": "Rotation des éléments"
+    },
+    "twist": {
+     "label": "Angle de torsion"
+    }
+   }
+  },
+  "scatterfield": {
+   "description": "Disperse des copies du calque dans un champ 3D infini en masquant l’original, et permet de simuler un mouvement dans les trois dimensions à l’aide d’images clés.",
+   "name": "Champ de dispersion",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "amount": {
+     "label": "Quantité"
+    },
+    "angle": {
+     "label": "Angle"
+    },
+    "angleVariance": {
+     "label": "Variation d’angle"
+    },
+    "blending": {
+     "label": "Mode de fusion",
+     "options": [
+      "Normal",
+      "Addition",
+      "Superposition",
+      "Produit",
+      "Éclaircir",
+      "Obscurcir",
+      "Incrustation",
+      "Différence"
+     ]
+    },
+    "color1": {
+     "label": "Couleur 1"
+    },
+    "color2": {
+     "label": "Couleur 2"
+    },
+    "color3": {
+     "label": "Couleur 3"
+    },
+    "coloring": {
+     "label": "Coloration",
+     "options": [
+      "Aucun",
+      "Aléatoire",
+      "Profondeur"
+     ]
+    },
+    "density": {
+     "label": "Densité"
+    },
+    "evolution": {
+     "label": "Évolution"
+    },
+    "fade": {
+     "label": "Fondu"
+    },
+    "interpolateHue": {
+     "label": "Interpoler la teinte"
+    },
+    "lockLuminance": {
+     "label": "Verrouiller la luminance"
+    },
+    "lockSaturation": {
+     "label": "Verrouiller la saturation"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "seed": {
+     "label": "Graine"
+    },
+    "size": {
+     "label": "Taille"
+    },
+    "sizeVariance": {
+     "label": "Variation de taille"
+    },
+    "slack": {
+     "label": "Marge"
+    },
+    "z": {
+     "label": "Position Z"
+    }
+   }
+  },
+  "sepia": {
+   "description": "Des tons bruns chauds, comme sur une photo ancienne.",
+   "name": "Sépia",
+   "params": {
+    "amount": {
+     "label": "Quantité"
+    }
+   }
+  },
+  "sharpen": {
+   "description": "Applique un masque de netteté sur un voisinage de 3x3 pixels pour accentuer les détails fins.",
+   "name": "Netteté",
+   "params": {
+    "amount": {
+     "label": "Intensité"
+    },
+    "radius": {
+     "label": "Rayon"
+    }
+   }
+  },
+  "shutterblur": {
+   "description": "Floute le calque selon ses déplacements, rotations et changements de taille réels, comme un obturateur de caméra. Un angle d’obturation plus grand allonge les traînées et davantage d’échantillons les lissent. L’aperçu utilise un flou plus rapide sauf si le flou complet est activé.",
+   "name": "Flou de mouvement réel",
+   "params": {
+    "samples": {
+     "label": "Échantillons"
+    },
+    "shutter": {
+     "label": "Angle d’obturation"
+    }
+   }
+  },
+  "simplestarfield": {
+   "description": "Disperse de petites étoiles à différentes profondeurs sur les parties opaques du calque. Position déplace le champ avec parallaxe, Profondeur le traverse, Échelle zoome, Taille et Contour progressif façonnent les étoiles et Quantité définit leur nombre.",
+   "name": "Champ d’étoiles simple",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "amount": {
+     "label": "Quantité"
+    },
+    "blend": {
+     "label": "Mode de fusion",
+     "options": [
+      "Normal",
+      "Addition",
+      "Superposition",
+      "Produit"
+     ]
+    },
+    "brightness": {
+     "label": "Luminosité"
+    },
+    "color": {
+     "label": "Couleur"
+    },
+    "depth": {
+     "label": "Profondeur"
+    },
+    "feather": {
+     "label": "Contour progressif"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "starSize": {
+     "label": "Taille"
+    }
+   }
+  },
+  "smear": {
+   "description": "Étire le calque dans une direction sur une longueur fixe, comme s’il se déplaçait rapidement.",
+   "name": "Traînée",
+   "params": {
+    "angle": {
+     "label": "Direction"
+    },
+    "length": {
+     "label": "Longueur"
+    }
+   }
+  },
+  "smoothbevel": {
+   "description": "Donne aux parties opaques du calque un biseau lisse et arrondi, éclairé d’un côté.",
+   "name": "Biseau lisse",
+   "params": {
+    "angle": {
+     "label": "Angle de la lumière"
+    },
+    "blur": {
+     "label": "Taille"
+    },
+    "depth": {
+     "label": "Profondeur"
+    },
+    "highlight": {
+     "label": "Haute lumière"
+    },
+    "intensity": {
+     "label": "Intensité"
+    },
+    "shadow": {
+     "label": "Ombre"
+    }
+   }
+  },
+  "smoothedges": {
+   "description": "Arrondit et lisse les bords des parties opaques du calque sans modifier les couleurs intérieures. Limiter au calque ne permet aux bords de se déplacer que vers l’intérieur.",
+   "name": "Lisser les bords",
+   "params": {
+    "blur": {
+     "label": "Intensité"
+    },
+    "mask": {
+     "label": "Limiter au calque"
+    }
+   }
+  },
+  "softglow": {
+   "description": "Superpose une copie douce et floue de l’image pour créer une lueur onirique, principalement issue des hautes lumières.",
+   "name": "Lueur douce",
+   "params": {
+    "blend": {
+     "label": "Fusion"
+    },
+    "blur": {
+     "label": "Taille"
+    },
+    "brightness": {
+     "label": "Luminosité"
+    },
+    "color": {
+     "label": "Couleur"
+    },
+    "contrast": {
+     "label": "Contraste"
+    },
+    "highlights": {
+     "label": "Hautes lumières"
+    },
+    "opacity": {
+     "label": "Opacité"
+    },
+    "outside": {
+     "label": "Lueur externe"
+    }
+   }
+  },
+  "solid": {
+   "description": "Applique une couleur sur le calque en conservant sa forme, avec plusieurs modes de fusion.",
+   "name": "Couleur unie",
+   "params": {
+    "amount": {
+     "label": "Alpha"
+    },
+    "blend": {
+     "label": "Mode de fusion",
+     "options": [
+      "Normal",
+      "Produit",
+      "Superposition",
+      "Incrustation",
+      "Lumière tamisée",
+      "Lumière crue",
+      "Addition",
+      "Obscurcir",
+      "Éclaircir",
+      "Différence",
+      "Densité couleur -",
+      "Densité couleur +"
+     ]
+    },
+    "color": {
+     "label": "Couleur"
+    }
+   }
+  },
+  "solidmatte": {
+   "description": "Place une couleur unie derrière le calque pour remplir ses zones transparentes. Découper affiche uniquement la couleur avec la forme du calque évidée, et Espace écran remplit tout l’écran au lieu des limites du calque.",
+   "name": "Fond uni",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "color": {
+     "label": "Couleur"
+    },
+    "punch": {
+     "label": "Découper"
+    },
+    "screenSpace": {
+     "label": "Espace écran"
+    }
+   }
+  },
+  "spherize": {
+   "description": "Projette le calque sur une sphère à l’aide d’une projection frontale ou d’une texture équirectangulaire.",
+   "name": "Sphérisation",
+   "params": {
+    "coverage": {
+     "label": "Couverture"
+    },
+    "light": {
+     "label": "Angle de la lumière"
+    },
+    "perspective": {
+     "label": "Perspective"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "projection": {
+     "label": "Projection",
+     "options": [
+      "Avant",
+      "Équirectangulaire"
+     ]
+    },
+    "radius": {
+     "label": "Rayon"
+    },
+    "rotX": {
+     "label": "Rotation X"
+    },
+    "rotY": {
+     "label": "Rotation Y"
+    },
+    "rotZ": {
+     "label": "Rotation Z"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "shading": {
+     "label": "Ombrage"
+    },
+    "shine": {
+     "label": "Brillance"
+    }
+   }
+  },
+  "spillclean": {
+   "description": "Supprime la lueur verte ou bleue laissée par un arrière-plan incrusté près des bords du calque, tout en conservant la luminosité des pixels.",
+   "name": "Correction des débordements",
+   "params": {
+    "blur": {
+     "label": "Largeur du bord"
+    },
+    "channel": {
+     "label": "Couleur du débordement",
+     "options": [
+      "Auto",
+      "Vert",
+      "Bleu"
+     ]
+    },
+    "strength": {
+     "label": "Intensité"
+    }
+   }
+  },
+  "spin": {
+   "description": "Fait tourner le calque à vitesse constante ; une valeur négative inverse le sens.",
+   "name": "Rotation continue",
+   "params": {
+    "rpm": {
+     "label": "tr/min"
+    }
+   }
+  },
+  "spinblur": {
+   "description": "Floute le calque en cercles autour d’un point, comme s’il tournait.",
+   "name": "Flou de rotation",
+   "params": {
+    "center": {
+     "label": "Centre"
+    },
+    "sweep": {
+     "label": "Angle"
+    }
+   }
+  },
+  "spinstreaks": {
+   "description": "Crée des traînées en arc en faisant tourner des copies du calque autour d’un point et en fusionnant leurs intersections. R, G, B et A déterminent pour chaque canal si les copies conservent la valeur minimale, maximale ou moyenne, ou si le canal reste inchangé.",
+   "name": "Traînées circulaires",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Min",
+      "Max",
+      "Moy.",
+      "Désactivé"
+     ]
+    },
+    "alpha": {
+     "label": "Alpha"
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "Min",
+      "Max",
+      "Moy.",
+      "Désactivé"
+     ]
+    },
+    "bias": {
+     "label": "Biais"
+    },
+    "center": {
+     "label": "Centre"
+    },
+    "g": {
+     "label": "G",
+     "options": [
+      "Min",
+      "Max",
+      "Moy.",
+      "Désactivé"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "Min",
+      "Max",
+      "Moy.",
+      "Désactivé"
+     ]
+    },
+    "sweep": {
+     "label": "Balayage"
+    }
+   }
+  },
+  "splittone": {
+   "description": "Teinte les ombres et les hautes lumières de couleurs différentes tout en conservant le noir, le blanc et la luminosité. Niveau des ombres infléchit la courbe de luminosité et Niveau des hautes lumières déplace le point de départ de leur couleur. Le style Courbe de transfert de dégradé colore chaque pixel selon sa seule luminosité.",
+   "name": "Virage partiel",
+   "params": {
+    "highlightAmount": {
+     "label": "Intensité des hautes lumières"
+    },
+    "highlightHue": {
+     "label": "Teinte des hautes lumières"
+    },
+    "highlightLevel": {
+     "label": "Niveau des hautes lumières"
+    },
+    "shadowAmount": {
+     "label": "Intensité des ombres"
+    },
+    "shadowHue": {
+     "label": "Teinte des ombres"
+    },
+    "shadowLevel": {
+     "label": "Niveau des ombres"
+    },
+    "style": {
+     "label": "Style",
+     "options": [
+      "Teinte",
+      "Courbe de transfert de dégradé"
+     ]
+    }
+   }
+  },
+  "spotcolor": {
+   "description": "Conserve une couleur et désature toutes les autres couleurs du calque.",
+   "name": "Couleur sélective",
+   "params": {
+    "choke": {
+     "label": "Contraction"
+    },
+    "color": {
+     "label": "Couleur"
+    },
+    "feather": {
+     "label": "Contour progressif"
+    },
+    "saturation": {
+     "label": "Saturation"
+    },
+    "threshold": {
+     "label": "Seuil"
+    }
+   }
+  },
+  "squeeze": {
+   "description": "Pince le centre du calque vers l’intérieur avec une intensité positive et le bombe vers l’extérieur avec une intensité négative. Ancien conserve la forme des projets plus anciens.",
+   "name": "Pincement",
+   "params": {
+    "amount": {
+     "label": "Intensité"
+    },
+    "shape": {
+     "label": "Forme",
+     "options": [
+      "Pincement/Bombement",
+      "Ancien"
+     ]
+    }
+   }
+  },
+  "star": {
+   "description": "Dessine une étoile lumineuse sur le calque.",
+   "name": "Étoile",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blend": {
+     "label": "Mode de fusion",
+     "options": [
+      "Normal",
+      "Produit",
+      "Superposition",
+      "Incrustation",
+      "Lumière tamisée",
+      "Lumière crue",
+      "Addition",
+      "Obscurcir",
+      "Éclaircir",
+      "Différence",
+      "Densité couleur -",
+      "Densité couleur +"
+     ]
+    },
+    "brightness": {
+     "label": "Luminosité"
+    },
+    "color": {
+     "label": "Couleur"
+    },
+    "points": {
+     "label": "Branches"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "radius": {
+     "label": "Rayon"
+    },
+    "shine": {
+     "label": "Brillance"
+    }
+   }
+  },
+  "starfield": {
+   "description": "Remplit les parties opaques du calque d’un champ d’étoiles en profondeur. Décalage déplace le champ, les étoiles proches se déplaçant davantage que les étoiles lointaines.",
+   "name": "Champ d’étoiles",
+   "params": {
+    "brightness": {
+     "label": "Luminosité"
+    },
+    "darkMatter": {
+     "label": "Matière noire"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "scale": {
+     "label": "Échelle"
+    }
+   }
+  },
+  "starpolyhedron": {
+   "description": "Place le calque sur une étoile composée de deux pyramides croisées.",
+   "name": "Polyèdre étoilé",
+   "params": {
+    "light": {
+     "label": "Angle de la lumière"
+    },
+    "perspective": {
+     "label": "Perspective"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "radius": {
+     "label": "Rayon"
+    },
+    "rotX": {
+     "label": "Rotation X"
+    },
+    "rotY": {
+     "label": "Rotation Y"
+    },
+    "rotZ": {
+     "label": "Rotation Z"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "shading": {
+     "label": "Ombrage"
+    },
+    "shine": {
+     "label": "Brillance"
+    }
+   }
+  },
+  "starprism": {
+   "description": "Découpe le calque en étoile et lui donne de la profondeur.",
+   "name": "Prisme étoilé",
+   "params": {
+    "depth": {
+     "label": "Profondeur"
+    },
+    "inner": {
+     "label": "Rayon intérieur"
+    },
+    "light": {
+     "label": "Angle de la lumière"
+    },
+    "perspective": {
+     "label": "Perspective"
+    },
+    "points": {
+     "label": "Branches"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "radius": {
+     "label": "Rayon"
+    },
+    "rotX": {
+     "label": "Rotation X"
+    },
+    "rotY": {
+     "label": "Rotation Y"
+    },
+    "rotZ": {
+     "label": "Rotation Z"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "shading": {
+     "label": "Ombrage"
+    },
+    "shine": {
+     "label": "Brillance"
+    },
+    "smoothing": {
+     "label": "Lissage"
+    }
+   }
+  },
+  "static": {
+   "description": "Bruit gris scintillant, comme sur un téléviseur sans signal.",
+   "name": "Parasites",
+   "params": {
+    "amount": {
+     "label": "Quantité"
+    },
+    "grain": {
+     "label": "Taille"
+    }
+   }
+  },
+  "stretch": {
+   "description": "Coupe le calque le long d’une ligne et écarte les deux moitiés en étirant les pixels de la ligne dans l’espace créé.",
+   "name": "Étirement de segment",
+   "params": {
+    "angle": {
+     "label": "Angle"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "relative": {
+     "label": "Mesurer selon la taille du calque"
+    },
+    "spread": {
+     "label": "Dispersion"
+    },
+    "stretch": {
+     "label": "Étirement"
+    }
+   }
+  },
+  "stretchaxis": {
+   "description": "Étire le calque dans n’importe quelle direction.",
+   "name": "Étirement axial",
+   "params": {
+    "angle": {
+     "label": "Angle"
+    },
+    "mask": {
+     "label": "Limiter au calque"
+    },
+    "scale": {
+     "label": "Échelle"
+    }
+   }
+  },
+  "stripes": {
+   "description": "Dessine des rayures sur les parties opaques du calque ou les découpe dans celui-ci.",
+   "name": "Rayures",
+   "params": {
+    "angle": {
+     "label": "Angle"
+    },
+    "color": {
+     "label": "Couleur"
+    },
+    "count": {
+     "label": "Nombre"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "punch": {
+     "label": "Découper"
+    },
+    "screenSpace": {
+     "label": "Espace écran"
+    },
+    "smoothing": {
+     "label": "Lissage"
+    },
+    "width": {
+     "label": "Largeur"
+    }
+   }
+  },
+  "stroketaper": {
+   "description": "Effile les traits de stylet et de pinceau d’un dessin à main levée, ainsi que le contour des lignes et des formes (Cadre et ombre > Contour). Le trait s’épaissit jusqu’au début puis s’effile à partir de la fin. Pincement accentue l’effilement.",
+   "name": "Effilement du contour",
+   "params": {
+    "end": {
+     "label": "Fin"
+    },
+    "squeeze": {
+     "label": "Pincement"
+    },
+    "start": {
+     "label": "Début"
+    }
+   }
+  },
+  "swing": {
+   "description": "Fait pivoter le calque d’avant en arrière entre deux angles.",
+   "name": "Balancement",
+   "params": {
+    "angle1": {
+     "label": "Angle 1"
+    },
+    "angle2": {
+     "label": "Angle 2"
+    },
+    "frequency": {
+     "label": "Fréquence"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "wave": {
+     "label": "Onde",
+     "options": [
+      "Sinusoïde",
+      "Triangle"
+     ]
+    }
+   }
+  },
+  "temperature": {
+   "description": "Réchauffe ou refroidit l’image comme une lumière dont la température de couleur est exprimée en kelvins ; 6500 K la laisse inchangée.",
+   "name": "Température de couleur",
+   "params": {
+    "kelvin": {
+     "label": "Température"
+    },
+    "strength": {
+     "label": "Intensité"
+    }
+   }
+  },
+  "textblips": {
+   "description": "Affiche le texte lettre par lettre avec un petit bip à chaque lettre, comme un personnage de jeu vidéo. Choisissez une voix, puis réglez sa hauteur, la vitesse de saisie et la pause après la ponctuation. Les espaces et la ponctuation restent silencieux.",
+   "name": "Bips de texte",
+   "params": {
+    "delay": {
+     "label": "Délai"
+    },
+    "every": {
+     "label": "Bip toutes les"
+    },
+    "pause": {
+     "label": "Pause après ponctuation"
+    },
+    "pitch": {
+     "label": "Hauteur"
+    },
+    "reveal": {
+     "label": "Saisie progressive"
+    },
+    "seed": {
+     "label": "Graine"
+    },
+    "speed": {
+     "label": "Vitesse"
+    },
+    "variation": {
+     "label": "Variation de hauteur"
+    },
+    "voice": {
+     "label": "Voix",
+     "options": [
+      "Classique",
+      "Douce",
+      "Grave",
+      "Aiguë",
+      "Robot",
+      "Couinement",
+      "Machine à écrire",
+      "Chiptune"
+     ]
+    },
+    "volume": {
+     "label": "Volume"
+    }
+   },
+   "presets": {
+    "fast-talker": "Débit rapide",
+    "hero": "Héros",
+    "monster": "Monstre",
+    "robot": "Robot",
+    "typewriter": "Machine à écrire"
+   }
+  },
+  "textpath": {
+   "description": "Dispose le texte lettre par lettre sur un arc, un cercle ou le contour du calque juste en dessous, en conservant sa mise en forme, ses polices et ses émojis.",
+   "name": "Texte sur tracé",
+   "params": {
+    "align": {
+     "label": "Alignement",
+     "options": [
+      "Gauche",
+      "Centre",
+      "Droite"
+     ]
+    },
+    "baseline": {
+     "label": "Décalage de ligne de base"
+    },
+    "center": {
+     "label": "Centre"
+    },
+    "control1": {
+     "label": "Contrôle 1"
+    },
+    "control2": {
+     "label": "Contrôle 2"
+    },
+    "end": {
+     "label": "Fin"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "radius": {
+     "label": "Rayon"
+    },
+    "reverse": {
+     "label": "Inverser le tracé"
+    },
+    "rotate": {
+     "label": "Rotation des lettres"
+    },
+    "shape": {
+     "label": "Tracé",
+     "options": [
+      "Arc",
+      "Cercle",
+      "Calque inférieur"
+     ]
+    },
+    "start": {
+     "label": "Début"
+    }
+   }
+  },
+  "textprogress": {
+   "description": "Affiche le texte entre Début et Fin, par caractère, mot ou ligne, avec des fondus, glissements, changements d’échelle ou flous facultatifs.",
+   "name": "Progression du texte",
+   "params": {
+    "appearance": {
+     "label": "Apparition",
+     "options": [
+      "Apparition brusque",
+      "Fondu",
+      "Glissement vers le haut",
+      "Glissement vers le bas",
+      "Glissement vers la gauche",
+      "Glissement vers la droite",
+      "Agrandissement",
+      "Réduction",
+      "Flou"
+     ]
+    },
+    "direction": {
+     "label": "Direction",
+     "options": [
+      "Depuis le début",
+      "Depuis la fin",
+      "Depuis le centre",
+      "Aléatoire"
+     ]
+    },
+    "distance": {
+     "label": "Distance"
+    },
+    "progress": {
+     "label": "Fin"
+    },
+    "seed": {
+     "label": "Graine"
+    },
+    "softness": {
+     "label": "Douceur"
+    },
+    "start": {
+     "label": "Début"
+    },
+    "unit": {
+     "label": "Selon",
+     "options": [
+      "Caractère",
+      "Mot",
+      "Ligne"
+     ]
+    }
+   },
+   "presets": {
+    "fade-in-by-word": "Fondu par mot",
+    "pop-in": "Apparition brusque",
+    "slide-up-by-letter": "Montée par lettre",
+    "typewriter": "Machine à écrire"
+   }
+  },
+  "textrandomizer": {
+   "description": "Remplace aléatoirement une quantité de caractères entre Début et Fin. Animez Évolution ou augmentez la vitesse pour modifier les remplacements ; Révélation rétablit progressivement le texte d’origine.",
+   "name": "Texte aléatoire",
+   "params": {
+    "amount": {
+     "label": "Quantité"
+    },
+    "characters": {
+     "label": "Personnalisé"
+    },
+    "charset": {
+     "label": "Caractères",
+     "options": [
+      "Lettres",
+      "Majuscules",
+      "Minuscules",
+      "Chiffres",
+      "Lettres et chiffres",
+      "Symboles",
+      "Personnalisé"
+     ]
+    },
+    "direction": {
+     "label": "Direction",
+     "options": [
+      "Depuis le début",
+      "Depuis la fin",
+      "Depuis le centre",
+      "Aléatoire"
+     ]
+    },
+    "end": {
+     "label": "Fin"
+    },
+    "evolution": {
+     "label": "Évolution"
+    },
+    "keepSpaces": {
+     "label": "Conserver les espaces"
+    },
+    "progress": {
+     "label": "Révélation"
+    },
+    "seed": {
+     "label": "Graine"
+    },
+    "speed": {
+     "label": "Vitesse"
+    },
+    "start": {
+     "label": "Début"
+    }
+   },
+   "presets": {
+    "scramble": "Mélange"
+   }
+  },
+  "textshake": {
+   "description": "Anime chaque lettre séparément, comme un dialogue nerveux dans un jeu. Tremblement oscille entre plusieurs positions, Saccades saute à une nouvelle position à chaque étape, Onde fait monter et descendre les lettres, Cercle les déplace en petites boucles et Oscillation les incline d’avant en arrière. Réduisez le nombre de lettres animées pour n’en faire trembler que certaines, choisies à nouveau au hasard régulièrement.",
+   "name": "Tremblement du texte",
+   "params": {
+    "amount": {
+     "label": "Intensité"
+    },
+    "cycles": {
+     "label": "Vitesse"
+    },
+    "end": {
+     "label": "Fin"
+    },
+    "every": {
+     "label": "Nouvelles lettres toutes les"
+    },
+    "letters": {
+     "label": "Lettres secouées"
+    },
+    "rotation": {
+     "label": "Rotation"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "speed": {
+     "label": "Vitesse"
+    },
+    "spread": {
+     "label": "Dispersion"
+    },
+    "start": {
+     "label": "Début"
+    },
+    "style": {
+     "label": "Style",
+     "options": [
+      "Tremblement",
+      "Tremblement",
+      "Vague",
+      "Cercle",
+      "Oscillation"
+     ]
+    },
+    "tilt": {
+     "label": "Inclinaison"
+    },
+    "unit": {
+     "label": "Basé sur",
+     "options": [
+      "Caractère",
+      "Mot",
+      "Ligne"
+     ]
+    }
+   },
+   "presets": {
+    "dizzy": "Étourdi",
+    "floaty": "Flottant",
+    "nervous": "Nerveux",
+    "scared": "Effrayé",
+    "uneasy": "Inquiet",
+    "wavy": "Ondulant",
+    "wobbly": "Chancelant"
+   }
+  },
+  "texttransform": {
+   "description": "Déplace, redimensionne, fait pivoter, estompe et teinte les lettres, mots ou lignes dans une plage. L'ancrage définit si la mise à l'échelle et la rotation se font autour de chaque composant ou du centre du calque. Déplacez la plage avec Décalage pour faire parcourir le texte par la modification.",
+   "name": "Transformation de texte",
+   "params": {
+    "anchor": {
+     "label": "Ancrage",
+     "options": [
+      "Composant",
+      "Calque"
+     ]
+    },
+    "end": {
+     "label": "Fin"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "opacity": {
+     "label": "Opacité"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "randomOrder": {
+     "label": "Ordre aléatoire"
+    },
+    "rotation": {
+     "label": "Rotation"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "shape": {
+     "label": "Forme",
+     "options": [
+      "Carré",
+      "Rampe montante",
+      "Rampe descendante",
+      "Triangle",
+      "Arrondi",
+      "Lissé"
+     ]
+    },
+    "smoothness": {
+     "label": "Douceur"
+    },
+    "start": {
+     "label": "Début"
+    },
+    "tint": {
+     "label": "Teinte"
+    },
+    "unit": {
+     "label": "Basé sur",
+     "options": [
+      "Caractère",
+      "Mot",
+      "Ligne"
+     ]
+    }
+   },
+   "presets": {
+    "spin-cascade": "Cascade rotative",
+    "wave": "Vague"
+   }
+  },
+  "threshold": {
+   "description": "Noir et blanc purs, séparés à un niveau de luminosité.",
+   "name": "Seuil",
+   "params": {
+    "blend": {
+     "label": "Mode de fusion",
+     "options": [
+      "Normal",
+      "Produit",
+      "Superposition",
+      "Incrustation",
+      "Lumière tamisée",
+      "Lumière crue",
+      "Addition",
+      "Obscurcir",
+      "Éclaircir",
+      "Différence",
+      "Densité couleur -",
+      "Densité couleur +"
+     ]
+    },
+    "invert": {
+     "label": "Inverser"
+    },
+    "level": {
+     "label": "Seuil"
+    },
+    "softness": {
+     "label": "Adoucissement"
+    }
+   }
+  },
+  "tile": {
+   "description": "Répète l'image en grille.",
+   "name": "Mosaïque",
+   "params": {
+    "mirror": {
+     "label": "Miroir"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "scale": {
+     "label": "Échelle"
+    }
+   }
+  },
+  "tilerotate": {
+   "description": "Divise le calque en une grille de carreaux et fait pivoter l'image de chaque carreau indépendamment.",
+   "name": "Rotation de mosaïque",
+   "params": {
+    "angle": {
+     "label": "Angle"
+    },
+    "count": {
+     "label": "Nombre"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "random": {
+     "label": "Aléatoire"
+    },
+    "rotation": {
+     "label": "Rotation"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "stretch": {
+     "label": "Étirement"
+    }
+   }
+  },
+  "tiles": {
+   "description": "Répète le calque pour remplir l'écran. Augmentez Recadrage pour obtenir de plus petits carreaux, avec miroir, décalage des rangées et rotation en option. Échelle classique conserve le rendu des anciens projets.",
+   "name": "Carreaux",
+   "params": {
+    "angle": {
+     "label": "Angle"
+    },
+    "mirror": {
+     "label": "Miroir"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "sizing": {
+     "label": "Dimensionnement",
+     "options": [
+      "Recadrage",
+      "Échelle classique"
+     ]
+    },
+    "vertical": {
+     "label": "Décalage vertical"
+    },
+    "zoom": {
+     "label": "Recadrage"
+    }
+   }
+  },
+  "tileshift": {
+   "description": "Divise le calque en une grille de carreaux et fait glisser l'image de chaque carreau dans une direction aléatoire.",
+   "name": "Décalage de mosaïque",
+   "params": {
+    "angle": {
+     "label": "Angle"
+    },
+    "count": {
+     "label": "Nombre"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "strength": {
+     "label": "Force"
+    },
+    "stretch": {
+     "label": "Étirement"
+    }
+   }
+  },
+  "timecode": {
+   "description": "Remplace le texte d'un calque par une horloge qui défile, selon le temps du calque ou du projet. Début à et une Vitesse négative créent un compte à rebours.",
+   "name": "Timecode",
+   "params": {
+    "format": {
+     "label": "Format",
+     "options": [
+      "HH:MM:SS:FF",
+      "HH:MM:SS",
+      "MM:SS",
+      "MM:SS.hh",
+      "SS.hh",
+      "Images"
+     ]
+    },
+    "offset": {
+     "label": "Début à"
+    },
+    "source": {
+     "label": "Temps",
+     "options": [
+      "Calque",
+      "Projet"
+     ]
+    },
+    "speed": {
+     "label": "Vitesse"
+    }
+   }
+  },
+  "timequant": {
+   "description": "Fait bouger ce calque à une fréquence d'images plus basse, comme une vidéo saccadée ou de l'animation en volume.",
+   "name": "Fréquence d'images",
+   "params": {
+    "fps": {
+     "label": "Images/s"
+    }
+   }
+  },
+  "tint": {
+   "description": "Répartit la luminance de l'image entre une couleur d'ombre et une couleur de hautes lumières, avec un taux de fusion.",
+   "name": "Teinte",
+   "params": {
+    "amount": {
+     "label": "Intensité"
+    },
+    "highlightColor": {
+     "label": "Couleur des hautes lumières"
+    },
+    "shadowColor": {
+     "label": "Couleur des ombres"
+    }
+   }
+  },
+  "torus": {
+   "description": "Enroule le calque autour d'un anneau.",
+   "name": "Tore",
+   "params": {
+    "light": {
+     "label": "Angle de la lumière"
+    },
+    "perspective": {
+     "label": "Perspective"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "radius": {
+     "label": "Rayon"
+    },
+    "rotX": {
+     "label": "Rotation X"
+    },
+    "rotY": {
+     "label": "Rotation Y"
+    },
+    "rotZ": {
+     "label": "Rotation Z"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "shading": {
+     "label": "Ombrage"
+    },
+    "shine": {
+     "label": "Brillance"
+    },
+    "thickness": {
+     "label": "Épaisseur"
+    }
+   }
+  },
+  "tunnel": {
+   "description": "Tapisse un tunnel sans fin avec le calque et le parcourt en vol. La phase décale la texture sur sa longueur.",
+   "name": "Tunnel",
+   "params": {
+    "fog": {
+     "label": "Brouillard"
+    },
+    "fogColor": {
+     "label": "Couleur du brouillard"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "repeat": {
+     "label": "Répétition"
+    },
+    "rotX": {
+     "label": "Rotation X"
+    },
+    "rotY": {
+     "label": "Rotation Y"
+    },
+    "rotZ": {
+     "label": "Rotation Z"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "speed": {
+     "label": "Vitesse"
+    },
+    "twist": {
+     "label": "Torsion"
+    }
+   }
+  },
+  "turbulence": {
+   "description": "Remplit les parties opaques du calque avec un bruit fractal doux, pour des nuages, de la fumée ou une carte de luminosité.",
+   "name": "Turbulence",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "bias": {
+     "label": "Biais"
+    },
+    "blend": {
+     "label": "Mode de fusion",
+     "options": [
+      "Normal",
+      "Produit",
+      "Superposition",
+      "Incrustation",
+      "Lumière tamisée",
+      "Lumière crue",
+      "Addition",
+      "Obscurcir",
+      "Éclaircir",
+      "Différence",
+      "Densité couleur -",
+      "Densité couleur +"
+     ]
+    },
+    "color1": {
+     "label": "Couleur 1"
+    },
+    "color2": {
+     "label": "Couleur 2"
+    },
+    "evolution": {
+     "label": "Évolution"
+    },
+    "intensity": {
+     "label": "Intensité"
+    },
+    "octaves": {
+     "label": "Octaves"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "parallax": {
+     "label": "Parallaxe"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "stretch": {
+     "label": "Étirement"
+    }
+   }
+  },
+  "turbulentdisplace": {
+   "description": "Pousse le calque avec un bruit fractal doux, pour du feu, de l'eau, un mirage de chaleur ou des bords naturels irréguliers.",
+   "name": "Déplacement turbulent",
+   "params": {
+    "bias": {
+     "label": "Biais"
+    },
+    "direction": {
+     "label": "Direction",
+     "options": [
+      "Les deux",
+      "Horizontale",
+      "Verticale",
+      "Radiale",
+      "Torsion"
+     ]
+    },
+    "evolution": {
+     "label": "Évolution"
+    },
+    "octaves": {
+     "label": "Octaves"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "parallax": {
+     "label": "Parallaxe"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "strength": {
+     "label": "Force"
+    },
+    "stretch": {
+     "label": "Étirement"
+    }
+   }
+  },
+  "twirl": {
+   "description": "Tord le calque autour du centre comme un tourbillon, avec un effet maximal au milieu qui s'estompe jusqu'au rayon (une part de la taille du calque). Une force négative tord dans l'autre sens.",
+   "name": "Tourbillon",
+   "params": {
+    "center": {
+     "label": "Centre"
+    },
+    "radius": {
+     "label": "Rayon"
+    },
+    "strength": {
+     "label": "Force"
+    }
+   }
+  },
+  "unsharpmask": {
+   "description": "Accentue la netteté en rajoutant la différence entre le calque et une copie floutée. La force définit l'étendue du flou, l'intensité la quantité rajoutée, et un seuil supérieur à 50 % ignore les petites différences.",
+   "name": "Masque flou",
+   "params": {
+    "amount": {
+     "label": "Intensité"
+    },
+    "radius": {
+     "label": "Force"
+    },
+    "showMask": {
+     "label": "Afficher le masque"
+    },
+    "threshold": {
+     "label": "Seuil"
+    }
+   }
+  },
+  "vhs": {
+   "description": "Donne l'aspect d'une vieille cassette vidéo : bavure des couleurs, lignes étalées, lignes de balayage, bruit de bande et bandes de suivi défilantes.",
+   "name": "VHS",
+   "params": {
+    "chroma": {
+     "label": "Bavure des couleurs"
+    },
+    "headSwitch": {
+     "label": "Commutation de tête"
+    },
+    "noise": {
+     "label": "Bruit"
+    },
+    "saturation": {
+     "label": "Saturation"
+    },
+    "scanlines": {
+     "label": "Lignes de balayage"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "smear": {
+     "label": "Étalement"
+    },
+    "tracking": {
+     "label": "Suivi"
+    },
+    "wobble": {
+     "label": "Instabilité"
+    }
+   }
+  },
+  "videofeedback": {
+   "description": "Dessine le calque à l'intérieur de lui-même encore et encore, comme une caméra pointée sur son propre écran. Déplacez, redimensionnez ou faites pivoter le calque pour orienter le tunnel.",
+   "name": "Rétroaction vidéo",
+   "params": {
+    "blend": {
+     "label": "Fusion",
+     "options": [
+      "Normal",
+      "Addition",
+      "Superposition"
+     ]
+    },
+    "center": {
+     "label": "Centre"
+    },
+    "copies": {
+     "label": "Copies"
+    },
+    "delay": {
+     "label": "Retard"
+    },
+    "fade": {
+     "label": "Fondu"
+    },
+    "hueShift": {
+     "label": "Décalage de teinte"
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "rotation": {
+     "label": "Rotation"
+    },
+    "useLayerTransform": {
+     "label": "Utiliser la transformation du calque"
+    },
+    "zoom": {
+     "label": "Zoom"
+    }
+   }
+  },
+  "viewer360": {
+   "description": "Affiche un calque panoramique 360° à travers une caméra virtuelle que vous pouvez faire pivoter et zoomer.",
+   "name": "Visionneuse 360°",
+   "params": {
+    "fov": {
+     "label": "Champ de vision"
+    },
+    "pitch": {
+     "label": "Tangage"
+    },
+    "roll": {
+     "label": "Roulis"
+    },
+    "yaw": {
+     "label": "Lacet"
+    }
+   }
+  },
+  "vignette": {
+   "description": "Assombrit le calque vers ses bords, en dehors d'une forme arrondie : la taille définit la forme, l'arrondi sa rondeur, l'adoucissement la douceur de son bord, la force le degré d'obscurcissement et la teinte la part de la couleur appliquée. Découpe rend plutôt les bords transparents.",
+   "name": "Vignettage",
+   "params": {
+    "color": {
+     "label": "Couleur"
+    },
+    "extent": {
+     "label": "Taille"
+    },
+    "feather": {
+     "label": "Adoucissement"
+    },
+    "punch": {
+     "label": "Découpe"
+    },
+    "rounding": {
+     "label": "Arrondi"
+    },
+    "strength": {
+     "label": "Force"
+    },
+    "style": {
+     "label": "Style",
+     "options": [
+      "Arrondi",
+      "Ovale doux"
+     ]
+    },
+    "tint": {
+     "label": "Teinte"
+    }
+   }
+  },
+  "voronoicells": {
+   "description": "Remplit les parties opaques du calque avec un motif de cellules autour de points placés au hasard.",
+   "name": "Cellules de Voronoï",
+   "params": {
+    "color1": {
+     "label": "Couleur 1"
+    },
+    "color2": {
+     "label": "Couleur 2"
+    },
+    "lineColor": {
+     "label": "Couleur du trait"
+    },
+    "lineWidth": {
+     "label": "Épaisseur du trait"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "scale": {
+     "label": "Échelle"
+    },
+    "seed": {
+     "label": "Seed"
+    }
+   }
+  },
+  "wavewarp": {
+   "description": "Courbe le calque avec une onde sinusoïdale : l'espacement définit le nombre d'ondes qui le traversent, l'amplitude leur force de poussée, l'angle la direction des ondes et l'angle de déformation la direction de la poussée.",
+   "name": "Déformation ondulatoire",
+   "params": {
+    "angle": {
+     "label": "Angle"
+    },
+    "magnitude": {
+     "label": "Amplitude"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "spacing": {
+     "label": "Espacement"
+    },
+    "speed": {
+     "label": "Vitesse"
+    },
+    "warpAngle": {
+     "label": "Angle de déformation"
+    }
+   }
+  },
+  "wipe": {
+   "description": "Masque le calque depuis deux côtés opposés. Animez le début ou la fin pour une transition par balayage.",
+   "name": "Balayage",
+   "params": {
+    "angle": {
+     "label": "Angle"
+    },
+    "end": {
+     "label": "Fin"
+    },
+    "feather": {
+     "label": "Adoucissement"
+    },
+    "softness": {
+     "label": "Douceur"
+    },
+    "start": {
+     "label": "Début"
+    }
+   }
+  },
+  "zoomstreaks": {
+   "description": "Crée des traînées qui jaillissent d'un point en redimensionnant des copies du calque autour de lui et en gardant les pixels les plus clairs. Moyenne donne un flou de zoom. R, V, B et A permettent de choisir, canal par canal, si les copies gardent la valeur la plus basse, la plus haute ou la moyenne, ou laissent ce canal intact.",
+   "name": "Traînées de zoom",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Min",
+      "Max",
+      "Moy",
+      "Désactivé"
+     ]
+    },
+    "alpha": {
+     "label": "Alpha"
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "Min",
+      "Max",
+      "Moy",
+      "Désactivé"
+     ]
+    },
+    "bias": {
+     "label": "Biais"
+    },
+    "center": {
+     "label": "Centre"
+    },
+    "g": {
+     "label": "V",
+     "options": [
+      "Min",
+      "Max",
+      "Moy",
+      "Désactivé"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "Min",
+      "Max",
+      "Moy",
+      "Désactivé"
+     ]
+    },
+    "strength": {
+     "label": "Force"
+    }
+   }
+  }
+ }
+}

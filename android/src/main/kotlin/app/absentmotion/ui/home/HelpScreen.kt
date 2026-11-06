@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import app.absentmotion.R
 import app.absentmotion.i18n.AppLanguage
@@ -71,7 +72,7 @@ fun HelpScreen(page: String = "index.html", onClose: () -> Unit) {
         view.loadUrl(helpUrl(tag, helpPage(view.url) ?: page, exists))
     }
     Dialog({ web?.takeIf { it.canGoBack() }?.goBack() ?: onClose() }, sheetDialogProperties()) {
-        PhoneScreen {
+        PhoneScreen(fillWidth = 1000.dp) {
             DialogStatusBarIcons(darkIcons = !dark)
             Column(Modifier.fillMaxSize().background(Am.SheetBg)) {
                 TitleBar(stringResource(R.string.settings_help), HomeIcons.Close, stringResource(R.string.action_close), onClose)

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-TW" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>攝影機圖層與 3D | AbsentMotion</title><meta name="description" content="讓虛擬攝影機穿梭於你的圖層之間、依深度排列圖層、為場景打光，並加入 3D 模型。"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="說明"><a href="index.html">目錄</a><a href="effects/index.html">特效</a></nav></header><div class="wrap"><main id="main"><h1>攝影機圖層與 3D</h1><p class="lead">讓虛擬攝影機穿梭於你的圖層之間、依深度排列圖層、為場景打光，並加入 3D 模型。</p><details class="toc"><summary>本頁內容</summary><ul><li><a href="#camera-layers">攝影機圖層</a></li><li><a href="#depth-order">深度順序</a></li><li><a href="#light-layers">燈光圖層</a></li><li><a href="#tilt-a-layer-in-3d">將圖層傾斜為 3D</a></li><li><a href="#3d-effects">3D 特效</a></li><li><a href="#3d-models">3D 模型</a></li></ul></details><h2 id="camera-layers">攝影機圖層</h2>
+<p><strong>攝影機圖層</strong>會讓專案變成三維：圖層具有深度（Z），而攝影機決定畫面中能看到什麼。從<strong>新增</strong>、<strong>物件／素材</strong>、<strong>攝影機</strong>加入一個。它會持續整個專案，使用透視投影，視角為 60 度，並且預設關閉對焦模糊與霧效。</p>
+<p>第一次新增攝影機時，會出現提示：「若要透過攝影機觀看，請開啟此面板並開啟攝影機視角。」<strong>攝影機視角</strong>按鈕位於預覽列中（請參閱<a href="editor.html">編輯器畫面</a>）。開啟後，你會透過攝影機看到專案。否則，攝影機會以深色矩形框顯示在預覽中。</p>
+<p>有多個攝影機時，會使用在播放頭位置上作用中、位於最上層的攝影機。</p>
+<h3 id="moving-the-camera">移動攝影機</h3>
+<p>選取攝影機圖層。在預覽中拖曳可平移，捏合可變更視角。在<strong>變形</strong>中，<strong>移動</strong>、<strong>旋轉</strong>和<strong>大小</strong>都適用於攝影機；<strong>大小</strong>會改變視角。開啟<strong>深度順序</strong>（見下文）後，<strong>傾斜</strong>也會生效：它會讓攝影機向上、向下或向側面看。傾斜是<strong>變形</strong>的<strong>進階控制</strong>之一（按住<strong>變形</strong>即可切換）。</p>
+<h3 id="camera-options">攝影機選項</h3>
+<p>共有三個分頁：</p>
+<ul><li><strong>攝影機視角</strong>。包含<strong>深度順序</strong>開關，開啟時還會顯示<strong>排序</strong>（見下文；在電腦上位於最後一列）、視錐示意圖、<strong>透視</strong>和<strong>正交</strong>按鈕、<strong>視角</strong>（0.1 至 179.9 度），以及隨視角變化的<strong>縮放</strong>。</li><li><strong>對焦模糊</strong>。一個開關，之後是<strong>對焦距離</strong>（對焦平面會以「位於 Z ...」顯示）、<strong>景深</strong>和<strong>模糊強度</strong>。</li><li><strong>霧效</strong>。一個開關、一個<strong>顏色</strong>，以及<strong>近</strong>與<strong>遠</strong>距離。</li></ul>
+<figure><img src="../assets/img/cam-options.webp" width="720" height="572" alt="攝影機選項：分頁 (1)、視錐 (2)、透視與正交 (3)、視角與縮放 (4)。" loading="lazy"><figcaption>攝影機選項：分頁 (1)、視錐 (2)、透視與正交 (3)、視角與縮放 (4)。</figcaption></figure>
+<p>每一列都可以用關鍵影格按鈕製作動畫。</p>
+<h3 id="camera-moves">攝影機運動</h3>
+<p>工具格線中的<strong>攝影機運動</strong>會加入現成的運動效果：<strong>推進</strong>、<strong>拉遠</strong>、<strong>環繞</strong>、<strong>平移</strong>、<strong>推拉變焦</strong>或<strong>手持</strong>。每個格子都有動畫預覽。將<strong>時長</strong>設定為 0.5 至 10 秒。運動會從播放頭位置開始，若攝影機圖層先結束，運動會被縮短。選擇另一個格子或變更時長會更新運動，結果是可以編輯的一般關鍵影格。開啟<strong>深度順序</strong>後，<strong>環繞</strong>會讓攝影機繞著場景旋轉，並持續對準中心，使不同深度的圖層相互穿插、前後錯開。</p>
+<figure><img src="../assets/img/cam-moves.webp" width="720" height="825" alt="攝影機運動：六種運動 (1) 與時長 (2)。" loading="lazy"><figcaption>攝影機運動：六種運動 (1) 與時長 (2)。</figcaption></figure>
+<h2 id="depth-order">深度順序</h2>
+<p>開啟<strong>深度順序</strong>後，攝影機會決定哪個圖層在前面：距離攝影機較遠的圖層會被繪製在較近圖層的後面，與它們在時間軸上的位置無關。當攝影機移動時，順序也會隨之變化。此開關位於<strong>攝影機選項</strong>的<strong>攝影機視角</strong>頂部，並會與專案一起儲存。新專案預設開啟。5.0 版之前建立的專案預設關閉，以保留原本的外觀；若要使用，請將其開啟。</p>
+<ul><li>圖層在 3D 中時才會參與排序：在深度（Z）上移動、傾斜、是 3D 模型，或是具有<strong>深度</strong>的<strong>粒子</strong>、<strong>3D 散佈</strong>或 <strong>3D 碎裂</strong>。</li><li>若要讓平面圖層參與排序，請選取它，然後點一下其工具第 2 頁上的 <strong>3D圖層</strong>按鈕。在深度順序開啟時，形狀、照片、影片、文字、繪圖和群組都會出現此格子，啟用時會亮起。</li><li>平面圖層會保留其在時間軸上的位置，並將 3D 圖層分隔成不同的堆疊：時間軸上位於它上方的 3D 圖層會保持在它前面，位於它下方的 3D 圖層則會保持在它後面。</li><li>深度相同的圖層會保持時間軸上的順序。</li><li>當<strong>排序</strong>設為<strong>依圖層</strong>時，每個圖層都會被整體排序。兩個互相穿過的圖層不會互相切割：位置較靠近攝影機的那個會被繪製在前面。3D 模型的面與特效的各個部分只會在彼此之間排序，而不會與其他圖層的各個部分混合排序。<strong>依區塊</strong>會改變這一點：見下文。</li><li>當攝影機傾斜或環繞時，<strong>3D 散佈</strong>、<strong>3D 碎裂</strong>以及 3D 形狀特效（例如<strong>立方體</strong>和<strong>環面</strong>）會和其他 3D 圖層一樣隨之轉動。3D 散佈和 3D 碎裂各部分的光線，在攝影機滾動或縮放時保持不變。</li></ul>
+<h3 id="sort-by-piece">依區塊排序</h3>
+<p><strong>排序</strong>位於<strong>攝影機選項</strong>的<strong>攝影機視角</strong>中（深度順序開啟時），有兩個選項。<strong>依圖層</strong>會將每個 3D 圖層整體排序。<strong>依區塊</strong>則會將 <strong>3D 散佈</strong>和 <strong>3D 碎裂</strong>的各個部分、3D 模型的面，以及具有<strong>深度</strong>的<strong>粒子</strong>，逐一與同一堆疊中的其他 3D 圖層一併排序。這樣相互穿越的物件就會在應該重疊的地方重疊，例如兩個碎裂物件互相穿過，或模型穿過一團粒子。新舊專案預設都是<strong>依圖層</strong>。</p>
+<p><strong>將區塊與其他圖層混合</strong>是 <strong>3D 散佈</strong>、<strong>3D 碎裂</strong>與<strong>粒子</strong>卡片（粒子需開啟<strong>深度</strong>）以及<strong>模型選項</strong>中的開關。當排序設為<strong>依區塊</strong>時，所有圖層都會啟用此項。若要讓該圖層保持完整，請將其關閉：此時它會以單一項目的形式，在自己的深度進行排序。開啟此開關也會同時為專案開啟深度順序與依區塊，因此只需一個開關即可。</p>
+<p>依區塊不會做到的事：</p>
+<ul><li>互相切割的區塊不會被分割。每個區塊、面或粒子都會依其中心的深度來放置，因此穿過某個平面的區塊會完整地顯示在該平面的前面或後面。</li><li>群組不會混合。區塊只會在專案的最上層混合：群組會被整體排序，其內部不會混合。群組內部不會顯示此開關。</li><li>有些圖層會保持完整，並以單一項目排序：具有陰影、邊框、剪裁遮罩、重複、回音、動態模糊或真實動態模糊的圖層；後面接有特效（移動與文字特效除外）的 3D 散佈與 3D 碎裂；帶有其他特效的粒子與模型；以及被攝影機的對焦模糊模糊化或被霧效染色的圖層。</li><li>平面圖層仍會如上所述把 3D 圖層分隔成堆疊。區塊只會在同一堆疊內混合。</li></ul>
+<h2 id="light-layers">燈光圖層</h2>
+<p><strong>新增</strong>、<strong>物件／素材</strong>、<strong>燈光</strong>會加入一盞燈。與攝影機一樣，它會持續整個專案，並且本身永遠不會被繪製出來。燈光會為 3D 模型，以及 <strong>3D 散佈</strong>和 <strong>3D 碎裂</strong>的各個部分提供陰影。</p>
+<p>選取燈光，然後點一下<strong>燈光選項</strong>：</p>
+<ul><li><strong>環境光</strong>會從各個方向均勻照亮。<strong>平行光</strong>（預設）會從一個方向照射，就像太陽。<strong>點光源</strong>會從燈光所在的位置向外照射，就像燈泡，距離越遠越弱。</li><li><strong>顏色</strong>，以及 0 至 4 的<strong>強度</strong>（預設 1）。</li><li><strong>衰減</strong>（僅點光源，0 至 100，預設 1）表示光線隨距離減弱的速度。</li></ul>
+<p>以上所有項目都可以用關鍵影格製作動畫。新燈光會放在場景中央的前方，並照向場景。使用<strong>變形</strong>來移動點光源（包括 Z 軸），並使用<strong>旋轉</strong>和<strong>傾斜</strong>來轉動平行光。</p>
+<p>最多可同時使用四盞燈。只要有燈光正在使用，燈光就會取代 3D 模型（在<strong>模型選項</strong>中）以及 3D 散佈和 3D 碎裂的光線設定。沒有燈光圖層的專案外觀完全不變。小技巧：在<strong>平行光</strong>旁加入一盞<strong>環境光</strong>，這樣背光的面就不會是全黑。</p>
+<h2 id="tilt-a-layer-in-3d">將圖層傾斜為 3D</h2>
+<p>任何圖層都可以沿 X 軸和 Y 軸傾斜。開啟<strong>變形</strong>中的<strong>傾斜</strong>分頁，裡面有以度為單位的 <strong>X軸旋轉</strong> 和 <strong>Y軸旋轉</strong>。在旋轉或傾斜開啟時於預覽上拖曳，也會傾斜圖層。</p>
+<p>當圖層已傾斜、其傾斜已製作動畫、是 3D 模型，或具有 3D 特效時，<strong>旋轉</strong>分頁會變成 3D 觸控板（「拖曳此處以進行 3D 旋轉」），並附有 <strong>X</strong>、<strong>Y</strong> 和 <strong>Z軸旋轉</strong>欄位。單指可傾斜圖層，雙指可扭轉圖層。<strong>更多</strong>選單中的<strong>重設3D旋轉</strong>可將它恢復原狀。</p>
+<h2 id="3d-effects">3D 特效</h2>
+<p><strong>3D</strong>類別中的特效會將圖層變為立體：立方體、方塊、中空方塊、圓柱、橢球、環面、角錐、八面體、六角柱、星形柱、星形多面體、心形、三軸十字、光柵擠出、翻轉圖層、球面化和隧道。當其中一種特效存在時，<strong>旋轉</strong>和<strong>傾斜</strong>控制項會改變該特效的旋轉。請參閱<a href="effects/index.html">特效庫</a>。</p>
+<h2 id="3d-models">3D 模型</h2>
+<p><strong>新增</strong>、<strong>物件／素材</strong>、<strong>3D模型</strong>會載入 <code>.obj</code>、<code>.glb</code> 或 <code>.gltf</code> 檔案。若模型具有材質與圖片檔案，請與模型一併選取。檔案總大小最多 256 MB，超過 50,000 個三角面的模型會以簡化形式顯示（應用程式會告知你）。</p>
+<p><strong>模型選項</strong>包含<strong>大小</strong>、<strong>自動旋轉</strong>、<strong>光線角度</strong>、<strong>環境光</strong>和<strong>光線強度</strong>，全部都可以製作動畫。專案中有燈光圖層時，這三項光線設定不會使用。模型也具有<strong>變形</strong>（包括 3D 旋轉）、<strong>不透明度</strong>、<strong>特效</strong>和<strong>預設集</strong>。</p><nav class="pager" aria-label="上一頁與下一頁"><a rel="prev" href="media.html">&larr; 照片、影片與速度</a><a rel="next" href="tracking.html">動態追蹤 &rarr;</a></nav></main></div></body></html>

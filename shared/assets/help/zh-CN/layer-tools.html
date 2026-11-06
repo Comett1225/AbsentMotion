@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>图层工具 | AbsentMotion</title><meta name="description" content="选中图层时出现的工具网格，以及其背后的每个面板。"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="帮助"><a href="index.html">目录</a><a href="effects/index.html">特效</a></nav></header><div class="wrap"><main id="main"><h1>图层工具</h1><p class="lead">选中图层时出现的工具网格，以及其背后的每个面板。</p><p>点按一个图层后，底部会打开一组工具。第一行有五个小按钮（速度、修剪和分割、音量），在<a href="timeline.html">时间轴</a>中有介绍。无法在播放头所在位置使用的修剪或延伸按钮根本不会显示。它们下方是大按钮，其组合取决于图层的类型。</p>
+<p>大按钮分为两页。左右滑动工具网格即可切换页面；其下方的两个圆点表示你所在的页面。只有一页的图层不显示圆点。在大屏平板上，工具位于预览旁边的一列中，全部在同一页，分为两到四列，以便全部显示。</p>
+<figure><img src="../assets/img/lt-grid.webp" width="720" height="572" alt="所选图层的工具网格：小按钮 (1)、大工具按钮 (2)、页面圆点 (3)。" loading="lazy"><figcaption>所选图层的工具网格：小按钮 (1)、大工具按钮 (2)、页面圆点 (3)。</figcaption></figure>
+<div class="table-wrap"><table><thead><tr><th>图层</th><th>工具</th></tr></thead><tbody><tr><td data-label="图层">形状、照片、视频</td><td data-label="工具">填充和颜色、边框和阴影、不透明度、变换、形状选项、预设、特效</td></tr><tr><td data-label="图层">路径形状（钢笔、SVG、多种形状）</td><td data-label="工具">同上，但用 <strong>编辑点</strong> 代替形状选项</td></tr><tr><td data-label="图层">文本</td><td data-label="工具">同上，但用 <strong>编辑文本</strong> 代替形状选项</td></tr><tr><td data-label="图层">绘画</td><td data-label="工具">同上，但用 <strong>编辑绘画</strong> 代替形状选项</td></tr><tr><td data-label="图层">组</td><td data-label="工具">填充和颜色、边框和阴影、不透明度、变换、<strong>编辑组</strong>、预设、特效。与素材关联的组会显示 <strong>素材属性</strong> 代替编辑组；由 <strong>移除背景（视频）</strong> 制作的视频抠图会显示 <strong>抠图边缘</strong> 代替</td></tr><tr><td data-label="图层">空对象</td><td data-label="工具">变换、预设、特效</td></tr><tr><td data-label="图层">相机</td><td data-label="工具">相机选项、变换、特效、预设、相机运镜</td></tr><tr><td data-label="图层">3D 模型</td><td data-label="工具">模型选项、不透明度、变换、预设、特效</td></tr><tr><td data-label="图层">灯光</td><td data-label="工具">灯光选项、变换</td></tr><tr><td data-label="图层">音频</td><td data-label="工具">预设、特效（包括语音滤镜）、<strong>标记节拍</strong>、AI（降噪和自动字幕）</td></tr></tbody></table></div>
+<p>照片或视频是带有图片填充的矩形，因此它与形状拥有相同的工具。</p>
+<p>该表列出的是第一页。第二页为除 3D 模型以外、你能看到的每个图层提供 <strong>裁剪</strong>：形状、文本、绘画、组、照片和视频。视频片段在那里还有四个按钮：<strong>AI</strong>、<strong>自动字幕</strong>、<strong>倒放</strong>和<strong>截图</strong>；照片在那里也有 <strong>AI</strong>。当项目的 <strong>深度顺序</strong> 开启时，第二页的开头还会加入 <strong>3D图层</strong>（适用于形状、照片、视频、文本、绘画和组）：参见<a href="camera-3d.html">相机图层和 3D</a>。音频、相机、灯光、空对象和 3D 模型图层只有一页。</p>
+<figure><img src="../assets/img/lt-grid-2.webp" width="720" height="572" alt="视频工具网格的第二页：裁剪 (1)、AI (2)、自动字幕 (3)、倒放 (4)。" loading="lazy"><figcaption>视频工具网格的第二页：裁剪 (1)、AI (2)、自动字幕 (3)、倒放 (4)。</figcaption></figure>
+<h2 id="every-panel">所有面板</h2>
+<p>大多数面板在左侧共享一列窄按钮：<strong>返回</strong>、<strong>添加关键帧</strong>或<strong>移除关键帧</strong>、<strong>缓动</strong>，以及仅在变换和特效中出现的 <strong>更多</strong>。灰色的关键帧按钮表示该设置无法设置动画。参见<a href="keyframes.html">关键帧和缓动</a>。</p>
+<p>点按任何数字框即可打开数字键盘。第一次点按会选中整个数值，因此输入会替换它。点击对勾即可应用；点按外部则关闭键盘。标尺（带刻度和中心指针的条）在你左右拖动时会改变数字。</p>
+<h3 id="transform">变换</h3>
+<p>右侧的标签：<strong>移动</strong>、<strong>旋转</strong>、<strong>大小</strong>、<strong>倾斜</strong>、<strong>斜切</strong>、<strong>锚点</strong>。对于相机，只有移动、旋转和大小可用，深度顺序开启时还可用倾斜；其他标签显示为灰色。在工具中长按 <strong>变换</strong>，或打开 <strong>更多</strong>，即可在 <strong>基础控制</strong>（移动、旋转、大小和斜切，默认）与 <strong>高级控制</strong>（全部六个标签）之间切换。</p>
+<ul><li><strong>移动。</strong> 一个触控板（“拖动此处以移动图层”）以及 X 和 Y 数字框。点按 <strong>Z</strong> 可沿深度轴移动图层。当图层与画布或另一个图层对齐时，会显示细红色参考线。</li><li><strong>旋转。</strong> 一个旋钮：拖动旋钮即可旋转，或点按度数即可输入。当图层在 3D 中倾斜时，此标签会变为 3D 触控板：单指倾斜，双指扭转。</li><li><strong>大小。</strong> 宽度和高度数字框，以及一个保持比例的 <strong>链接</strong> 按钮（默认开启）。对于相机，此标签会改变视角。链接设置会为每个图层记住并随项目保存；轻扫后标尺会继续滑动。</li><li><strong>倾斜。</strong> 以度为单位的 <strong>X轴旋转</strong> 和 <strong>Y轴旋转</strong>，用于 3D 倾斜。参见<a href="camera-3d.html">相机图层和 3D</a>。</li><li><strong>斜切。</strong> 以度为单位的 <strong>X倾斜</strong> 和 <strong>Y倾斜</strong>。</li><li><strong>锚点。</strong> 图层旋转和缩放所围绕的点，以像素为单位，从图层中心算起。输入 <strong>X</strong> 和 <strong>Y</strong>，拖动触控板，点按九个方格之一以选择角、边或中心，或拖动画布上的标记。图层及其子图层会保持原位。</li><li><strong>更多</strong> 包含 <strong>重置位置</strong>、<strong>重置旋转</strong>、<strong>重置缩放</strong>、<strong>重置3D旋转</strong>、<strong>重置斜切</strong>、<strong>重置锚点</strong>和 <strong>重置变换</strong>（全部六项）。</li></ul>
+<figure><img src="../assets/img/lt-transform.webp" width="720" height="572" alt="变换面板：标签页 (1)、触控板 (2)、X、Y、Z 输入框 (3)。" loading="lazy"><figcaption>变换面板：标签页 (1)、触控板 (2)、X、Y、Z 输入框 (3)。</figcaption></figure>
+<p>移动即位置，其中 X、Y 和 Z 会一起设置动画。旋转、大小、倾斜、斜切和锚点各自拥有关键帧；宽度和高度共享大小的关键帧。</p>
+<h3 id="crop">裁剪</h3>
+<p>照片、视频以及其他可见图层在工具网格的第二页有 <strong>裁剪</strong> 按钮。它会使将被裁掉的部分变暗，并显示一个带有八个把手的框：拖动角或边即可裁剪，拖动框内即可移动它。双指仍可缩放画布。<strong>自由</strong>、<strong>1:1</strong>、<strong>4:5</strong>、<strong>3:4</strong>、<strong>16:9</strong> 和 <strong>9:16</strong> 会适配该形状下最大的居中裁剪区域，并在拖动时保持该形状。点按一条边即可输入其数值，<strong>重置</strong> 会移除裁剪，<strong>完成</strong> 会关闭面板。关键帧按钮会同时为四条边设置关键帧。裁剪即 <strong>裁剪</strong> 特效，因此你也可以在 <strong>特效</strong> 中通过圆角和羽化进行更改；图层位置保持不变。</p>
+<figure><img src="../assets/img/lt-crop.webp" width="720" height="1487" alt="裁剪面板：图片上的裁剪框 (1)、比例按钮 (2)、四条边 (3)、重置和完成 (4)。" loading="lazy"><figcaption>裁剪面板：图片上的裁剪框 (1)、比例按钮 (2)、四条边 (3)、重置和完成 (4)。</figcaption></figure>
+<h3 id="fill-color">填充和颜色</h3>
+<p>顶部标签：<strong>无</strong>、<strong>颜色</strong>、<strong>渐变</strong>、<strong>媒体</strong>。</p>
+<ul><li><strong>颜色。</strong> 所选调色板的颜色（<strong>默认</strong> 调色板有十四种），然后是你保存的颜色。顶部的条显示调色板名称（点按可打开你的<a href="#color-palettes">调色板</a>），以及 #RRGGBB 格式的颜色及其不透明度；其上的 <strong>+</strong> 会保存当前颜色。三个按钮：<strong>吸管</strong>（触摸预览即可取样颜色）、<strong>颜色滑块</strong> 和 <strong>完整取色器</strong>（色轮，或 HSV 和 RGB 滑块以及十六进制输入框）。</li><li><strong>渐变。</strong> 选择线性、径向或扫描，然后选择起始颜色和结束颜色。预览上的两个把手可移动渐变。渐变恰好有两种颜色。</li><li><strong>媒体。</strong> 用照片或视频填充形状，或填充文本图层的文字。点按后会打开选择器。</li></ul>
+<figure><img src="../assets/img/lt-fill.webp" width="720" height="572" alt="填充和颜色：标签页 (1)、颜色条 (2)、色板 (3)、吸管、颜色滑块和完整取色器 (4)。" loading="lazy"><figcaption>填充和颜色：标签页 (1)、颜色条 (2)、色板 (3)、吸管、颜色滑块和完整取色器 (4)。</figcaption></figure>
+<p>只有“颜色”标签中的颜色可以设置关键帧。</p>
+<h3 id="color-palettes">调色板</h3>
+<p>调色板是一组可在每个项目中使用的颜色。<strong>填充和颜色</strong> 中的颜色条、<strong>完整取色器</strong> 以及特效设置中的颜色弹窗都会显示所选调色板的颜色。在那里点按调色板名称即可打开 <strong>调色板</strong>。</p>
+<ul><li>点按调色板即可使用它。点按铅笔可进行编辑。</li><li><strong>新建</strong> 会用你当前所选的颜色创建调色板。<strong>从图片</strong> 会从照片的 8 种主色中创建调色板；从 AbsentMotion 导出的调色板图片会还原为每种颜色。<strong>从文件</strong> 会读取调色板文件：GIMP <code>.gpl</code>、Adobe <code>.ase</code> 或 <code>.act</code>、<code>.pal</code>，或十六进制颜色列表，例如你可以从 Lospec 下载的调色板。</li><li>在打开的调色板中，点按名称即可重命名，点按 <strong>使用</strong> 即可选择它。点按颜色即可选中它：<strong>添加</strong> 会添加你当前所选的颜色，<strong>复制</strong> 会复制所选颜色，<strong>删除</strong> 会将其移除。<strong>排序</strong> 可按 <strong>色相</strong>、<strong>明度</strong> 或 <strong>饱和度</strong> 排列颜色。</li><li><strong>导出</strong> 会将调色板保存为 Pictures/AbsentMotion 中的 <strong>图片（PNG）</strong>，或 Documents/AbsentMotion 中的 <strong>GIMP调色板（.gpl）</strong> 或 <strong>Adobe色板（.ase）</strong>。<strong>创建副本</strong> 会制作一个可编辑的副本，<strong>删除调色板</strong> 会在询问后将其移除。</li><li><strong>锁定</strong> 可防止添加、复制或删除颜色，直到你将其关闭为止。</li></ul>
+<p>内置了八种调色板：<strong>默认</strong>、<strong>柔和</strong>、<strong>霓虹</strong>、<strong>大地色</strong>、<strong>肤色</strong>、<strong>灰色</strong>、<strong>PICO-8</strong> 和 <strong>Game Boy</strong>。它们是永久锁定的：如需更改，请使用 <strong>创建副本</strong>。选择内置调色板时，你保存的颜色会显示在它的颜色之后，<strong>+</strong> 会保存到这些颜色中。选择你自己的调色板时，<strong>+</strong> 会将颜色添加到该调色板中，除非它已被锁定。</p>
+<p>在电脑上，将 <code>.gpl</code>、<code>.ase</code>、<code>.act</code> 或 <code>.pal</code> 文件拖到窗口上即可：它会加入你的调色板，并成为所选调色板。你的调色板会保存在备份中：参见<a href="projects.html">项目、备份和导入</a>。</p>
+<h3 id="frame-shadow">边框和阴影</h3>
+<p>三个标签：<strong>描边</strong>、<strong>边框</strong> 和 <strong>阴影</strong>。</p>
+<ul><li><strong>描边</strong> 是形状的轮廓。它有一个开关、颜色、粗细、线帽和连接方式，以及开放线条两端各自的样式（箭头、圆形、菱形等）。</li><li><strong>边框</strong> 可让你叠加任意数量的边框。每个边框都有粗细、颜色和位置（<strong>内部</strong>、<strong>居中</strong>、<strong>外部</strong>）。拖动把手可更改它们的顺序。<strong>添加边框</strong> 会添加一个。</li><li><strong>阴影</strong> 有一个开关，以及 <strong>颜色</strong>、<strong>大小</strong>、<strong>Alpha</strong> 和 <strong>位置</strong>（X 和 Y）。</li></ul>
+<h3 id="opacity">不透明度</h3>
+<p>一个<strong>不透明度</strong>滑块，带有百分比输入框，以及七组共 28 种混合模式：正常；变暗（正片叠底、变暗、更深的颜色、颜色加深、线性加深）；变亮（滤色、变亮、更浅的颜色、颜色减淡、线性减淡）；对比（叠加、柔光、强光、柔和叠加、亮光、线性光、点光）；差值（差值、排除、减去、划分）；颜色（色相、饱和度、颜色、明度）；以及蒙版（蒙版、排除）。点按一组即可打开它，点按一种模式即可应用。<strong>蒙版</strong> 仅在此图层所在的位置保留下方的内容；<strong>排除</strong> 则会移除此图层所在位置下方的内容。</p>
+<h3 id="shape-options">形状选项</h3>
+<p>定义形状的设置，每行一项，带有标尺和数值框。例如：圆形有大小；圆角矩形有大小和半径；多边形有边数、半径和角度；星形有顶点数、外半径、内半径和角度；箭头有起点、终点、尾部宽度、头部宽度和头部长度。所选行即为关键帧按钮设置动画的那一行。照片和视频在此处使用大小。</p>
+<h3 id="edit-points-edit-drawing-edit-text">编辑点、编辑绘画、编辑文本</h3>
+<p>这些会打开全屏编辑器：参见<a href="shapes.html">形状、绘制和蒙版</a>和<a href="text.html">文本和字体</a>。</p>
+<h3 id="edit-group">编辑组</h3>
+<p>打开该组，使时间轴和预览只显示其中的图层，以便你进行更改。参见<a href="shapes.html">形状、绘制和蒙版</a>。</p>
+<h3 id="camera-options-light-options-and-model-options">相机选项、灯光选项和模型选项</h3>
+<p>参见<a href="camera-3d.html">相机图层和 3D</a>。</p>
+<h3 id="mark-beats">标记节拍</h3>
+<p>在音频图层上，<strong>标记节拍</strong> 会在声音的每个节拍处添加一个书签。它的作用与图层菜单中的 <strong>标记节拍</strong> 相同：参见<a href="audio.html">音频</a>。</p>
+<h3 id="volume">音量</h3>
+<p>适用于声音和视频。参见<a href="audio.html">音频</a>。</p>
+<h3 id="ai-auto-captions-reverse-and-screenshot">AI、自动字幕、倒放和截图</h3>
+<p>这四个按钮位于视频片段工具网格的第二页（GIF 也算视频）。<strong>AI</strong> 会打开特效库中的 AI 类别；照片的第二页也有它（用于移除背景），音频图层的唯一一页上也有同样的按钮。<strong>自动字幕</strong> 仅为此片段生成字幕：参见<a href="ai-tools.html">AI 工具</a>。<strong>倒放</strong> 会让片段倒着播放：参见<a href="media.html">媒体</a>。</p>
+<p><strong>截图</strong> 会将播放头下的片段画面按片段自身的完整尺寸保存为图片。它是原始素材画面：不包括特效、裁剪、边框和图层位置，但修剪、速度更改和倒放都会生效。图片会保存到手机相册（Pictures/AbsentMotion），并作为新图层添加在该片段上方。如果你在 10 秒内删除该新图层，图片也会从相册中删除。播放头必须位于该片段上。</p>
+<h3 id="effects-and-presets">特效和预设</h3>
+<p>参见<a href="effects-guide.html">使用特效</a>和<a href="assets-templates.html">素材、模板和预设</a>。</p><nav class="pager" aria-label="上一页和下一页"><a rel="prev" href="add-menu.html">&larr; 添加菜单</a><a rel="next" href="layer-menus.html">图层菜单和多选 &rarr;</a></nav></main></div></body></html>

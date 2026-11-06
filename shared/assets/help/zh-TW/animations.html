@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="zh-TW" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>轉場與動畫 | AbsentMotion</title><meta name="description" content="片段之間的一鍵轉場，以及任何圖層的進場、出場和循環動畫。"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="說明"><a href="index.html">目錄</a><a href="effects/index.html">特效</a></nav></header><div class="wrap"><main id="main"><h1>轉場與動畫</h1><p class="lead">片段之間的一鍵轉場，以及任何圖層的進場、出場和循環動畫。</p><details class="toc"><summary>本頁內容</summary><ul><li><a href="#in-out-and-loop-animations">進場、出場和循環動畫</a></li><li><a href="#transitions-between-two-clips">兩個片段之間的轉場</a></li><li><a href="#make-your-own">自訂</a></li></ul></details><p>兩者都會寫入一般的關鍵影格和特效，之後仍可編輯，因此可作為起點使用。</p>
+<h2 id="in-out-and-loop-animations">進場、出場和循環動畫</h2>
+<ol><li>選取一個視覺圖層（不能是音效、攝影機或空物件）。</li><li>點一下預覽右下角的圓形<strong>製作動畫</strong>按鈕。<strong>動畫</strong>面板會開啟。</li><li>在頂部選擇<strong>進場</strong>、<strong>出場</strong>或<strong>循環</strong>，然後點選一個格子。<strong>無</strong>位於格狀清單的第一個。</li><li>設定<strong>時長</strong>。</li></ol>
+<figure><img src="../assets/img/anim-button.webp" width="720" height="580" alt="預覽右下角的圓形製作動畫按鈕 (1)。" loading="lazy"><figcaption>預覽右下角的圓形製作動畫按鈕 (1)。</figcaption></figure>
+<figure><img src="../assets/img/anim-sheet.webp" width="720" height="825" alt="動畫面板：入場、出場與循環 (1)、動畫 (2)、時長 (3)。" loading="lazy"><figcaption>動畫面板：入場、出場與循環 (1)、動畫 (2)、時長 (3)。</figcaption></figure>
+<div class="table-wrap"><table><thead><tr><th></th><th>動畫</th><th>時長</th></tr></thead><tbody><tr><td data-label=""><strong>進場</strong>和<strong>出場</strong></td><td data-label="動畫">淡入、左滑、右滑、上滑、下滑、放大、縮小、彈出、彈跳、旋轉、模糊</td><td data-label="時長">0.1 至 2 秒（預設 0.5）</td></tr><tr><td data-label=""><strong>循環</strong></td><td data-label="動畫">脈動、搖晃、漂浮、旋轉</td><td data-label="時長">0.2 至 4 秒（預設 1）</td></tr></tbody></table></div>
+<p>進場動畫會放在片段開頭，出場動畫放在片段結尾，循環動畫則會在整個片段中播放。若該端已有轉場，選擇動畫會取代它，面板也會明確說明。</p>
+<h2 id="transitions-between-two-clips">兩個片段之間的轉場</h2>
+<p>轉場會讓一個片段與下一個片段融合。需要兩個視覺片段，且第二個片段的開始與結束時間都要比第一個晚。</p>
+<ol><li>將兩個片段排列成相接或重疊。在未選取任何內容時，當播放頭位於切點時，時間軸區域右下角、<strong>+</strong> 按鈕正上方會出現圓形的<strong>轉場</strong>按鈕。或者，選取兩個片段，然後點一下底部列中的<strong>在兩個片段之間新增轉場</strong>。</li><li><strong>轉場</strong>面板會顯示「片段 A 到片段 B」，以及轉場格狀清單，第一個為<strong>無</strong>。</li><li>選擇一種轉場，並設定<strong>時長</strong>（0.1 至 2 秒，預設 0.5）。</li></ol>
+<figure><img src="../assets/img/anim-transition-button.webp" width="720" height="572" alt="當播放頭位於兩個片段之間的剪接點時，轉場按鈕 (1) 會出現在新增圖層按鈕 (2) 的上方。" loading="lazy"><figcaption>當播放頭位於兩個片段之間的剪接點時，轉場按鈕 (1) 會出現在新增圖層按鈕 (2) 的上方。</figcaption></figure>
+<figure><img src="../assets/img/anim-transition.webp" width="720" height="825" alt="轉場面板：兩個片段 (1)、轉場效果 (2)、時長 (3)。" loading="lazy"><figcaption>轉場面板：兩個片段 (1)、轉場效果 (2)、時長 (3)。</figcaption></figure>
+<p>可用的轉場：交叉溶解、漸隱至黑、漸隱至白、左滑、右滑、上滑、下滑、左推、右推、上推、下推、右擦除、左擦除、上擦除、下擦除、時鐘擦除、放大、縮小、旋轉、模糊、發光、漩渦、甩動平移、故障、閃光、震動、像素化和雜訊溶解。推移、放大、縮小和旋轉都帶有動態模糊。格狀清單可以捲動：向上滑動即可看到最後幾個。</p>
+<figure><img src="../assets/img/anim-transition-new.webp" width="720" height="825" alt="捲到底的轉場清單，以及較新的轉場效果：光暈 (1)、旋渦 (2)、像素化 (3)、雜訊溶接 (4)。" loading="lazy"><figcaption>捲到底的轉場清單，以及較新的轉場效果：光暈 (1)、旋渦 (2)、像素化 (3)、雜訊溶接 (4)。</figcaption></figure>
+<p>若片段重疊不足，應用程式會移動或縮短片段並通知你，例如「已將 ... 提前，讓片段重疊。」以及「已縮短為 0.5 秒以符合片段。」音效、攝影機和空物件圖層不能加上轉場。</p>
+<p>若要讓<strong>轉場</strong>按鈕移開，請將它向左或向右滑向螢幕邊緣；移動播放頭時它會再次出現。<strong>設定 &gt; 編輯器 &gt; 預覽中的轉場按鈕</strong>可將它移到預覽的左下角。</p>
+<h2 id="make-your-own">自訂</h2>
+<p>特效、移動特效或一組關鍵影格可以完成相同的工作，並提供更精細的控制。將你喜歡的外觀儲存為預設集，即可重複使用：請參閱 <a href="assets-templates.html">素材、範本與預設集</a>。</p><nav class="pager" aria-label="上一頁與下一頁"><a rel="prev" href="tracking.html">&larr; 動態追蹤</a><a rel="next" href="assets-templates.html">素材、範本與預設集 &rarr;</a></nav></main></div></body></html>

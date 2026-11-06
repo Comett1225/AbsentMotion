@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="zh-TW" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>疑難排解與問題 | AbsentMotion</title><meta name="description" content="常見問題的解答：當機、遺失的媒體、匯出錯誤、儲存空間與播放緩慢。"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="說明"><a href="index.html">目錄</a><a href="effects/index.html">特效</a></nav></header><div class="wrap"><main id="main"><h1>疑難排解與問題</h1><p class="lead">常見問題的解答：當機、遺失的媒體、匯出錯誤、儲存空間與播放緩慢。</p><details class="toc"><summary>本頁內容</summary><ul><li><a href="#the-app-closed-by-itself">應用程式自行關閉了</a></li><li><a href="#this-phone-cannot-run-the-editor">這支手機無法執行編輯器</a></li><li><a href="#missing-media">遺失的媒體</a></li><li><a href="#export-problems">匯出問題</a></li><li><a href="#storage-is-full">儲存空間已滿</a></li><li><a href="#it-is-slow">速度很慢</a></li><li><a href="#an-update-does-not-install-on-a-samsung-phone">三星手機無法安裝更新</a></li><li><a href="#the-text-uses-the-wrong-font">文字使用了錯誤的字型</a></li><li><a href="#questions">問題與解答</a></li></ul></details><h2 id="the-app-closed-by-itself">應用程式自行關閉了</h2>
+<p>Android 會關閉使用過多記憶體的應用程式。這種情況最常發生在 4K 影片、大量高負載特效，或同時開啟其他應用程式時。</p>
+<ol><li>再次開啟 AbsentMotion。如果它顯示 <strong>AbsentMotion意外關閉</strong>，請點選<strong>還原</strong>，取回你最後的編輯內容。</li><li>關閉其他應用程式，然後再試一次這個專案。</li><li>在預覽列或<strong>設定</strong>中，將<strong>預覽品質</strong>調低為一半或四分之一。</li><li>在<strong>設定</strong>中開啟<strong>使用大型影片的預覽副本</strong>（預設即為開啟）。</li><li>以較低的解析度匯出，或將非常長的專案分割。</li></ol>
+<p>在<strong>設定</strong>的<strong>當機記錄</strong>中，每次當機都會以一句話說明發生了什麼。點選<strong>複製</strong>即可複製內容，然後附在 <a href="https://github.com/Comett1225/AbsentMotion/issues">GitHub</a> 的錯誤回報中。不會自動傳送任何資料。</p>
+<h2 id="this-phone-cannot-run-the-editor">這支手機無法執行編輯器</h2>
+<p>AbsentMotion 會透過 Vulkan 1.1 使用圖形晶片繪製預覽與匯出畫面；若手機沒有 Vulkan，則改用 OpenGL ES 3.0。如果兩者都無法啟動，應用程式會顯示 <strong>這支手機無法執行編輯器</strong>，並列出 Android 版本與圖形晶片資訊，而不會直接關閉。你的專案、設定、備份與當機記錄仍可開啟。點選<strong>複製詳細資料</strong>即可複製這些資訊，並附在 <a href="https://github.com/Comett1225/AbsentMotion/issues">GitHub</a> 的錯誤回報中。見<a href="requirements.html">系統需求與版本</a>。如果編輯器可以開啟，但預覽或匯出畫面看起來不對，請在<strong>設定</strong>的<strong>圖形</strong>中選擇 <strong>OpenGL</strong>。</p>
+<p>如果 AbsentMotion 在圖形啟動期間自行關閉，它會記住這件事。當<strong>圖形</strong>設為<strong>自動</strong>時，下次啟動會改用另一種方式（例如以 OpenGL 取代 Vulkan），讓應用程式能夠再次開啟。此記錄會針對這支手機上的這個版本保留。</p>
+<h2 id="missing-media">遺失的媒體</h2>
+<p>圖層是空的，或匯出時顯示<strong>媒體遺失</strong>：專案使用的照片、影片或音訊檔案已不在手機上。</p>
+<ul><li>選取圖層，在圖層選單中開啟<strong>媒體資訊</strong>，然後點選<strong>替換媒體檔案</strong>，重新選擇該檔案。</li><li>趁檔案仍在時，在專案卡片的選單中使用<strong>將媒體收集至專案</strong>，讓專案保有自己的副本。</li><li>在<strong>設定</strong>中保持開啟<strong>在專案中保留匯入媒體的副本</strong>。</li></ul>
+<p>如果仍然要匯出，使用遺失檔案的圖層會被排除在外。</p>
+<h2 id="export-problems">匯出問題</h2>
+<div class="table-wrap"><table><thead><tr><th>訊息</th><th>處理方式</th></tr></thead><tbody><tr><td data-label="訊息"><strong>儲存空間不足</strong></td><td data-label="處理方式">釋放手機上的空間，或選擇較小的解析度。預估大小顯示在匯出畫面上。</td></tr><tr><td data-label="訊息"><strong>此手機不支援</strong></td><td data-label="處理方式">手機的編碼器無法製作該尺寸或編碼格式。點選建議項目中的<strong>使用</strong>，或選擇 H.264 與較小的尺寸。</td></tr><tr><td data-label="訊息"><strong>匯出速度慢</strong></td><td data-label="處理方式">只能使用軟體編碼器，或在這些設定下硬體編碼器速度較慢。可以繼續，或改選建議的設定。</td></tr><tr><td data-label="訊息">匯出速度變慢</td><td data-label="處理方式">手機溫度較高，系統會刻意降速以降溫。讓手機冷卻，或將手機從保護殼中取出。</td></tr><tr><td data-label="訊息"><strong>匯出失敗</strong>，無法繪製影格</td><td data-label="處理方式">再試一次。如果仍然發生，請降低解析度，或將<strong>影格插補</strong>關閉。</td></tr><tr><td data-label="訊息"><strong>匯出失敗</strong>，影片編碼器忙碌中或無法製作此尺寸</td><td data-label="處理方式">關閉其他正在播放或錄製影片的應用程式，然後再試一次。如果仍然發生，請選擇較低的解析度或影格速率。</td></tr><tr><td data-label="訊息"><strong>匯出失敗</strong>，影片解碼器或編碼器停止運作</td><td data-label="處理方式">其他應用程式正在使用手機的影片硬體。請關閉正在播放或錄製影片的應用程式，然後再試一次。</td></tr><tr><td data-label="訊息">「手機的影片編碼器忙碌中，因此這次匯出會使用較慢的軟體編碼器」</td><td data-label="處理方式">沒有問題：匯出會花比較久的時間。下次請關閉其他影片應用程式，讓系統恢復使用較快的硬體編碼器。</td></tr><tr><td data-label="訊息">完成的影片顯示靜態畫面與播放按鈕</td><td data-label="處理方式">手機無法立即播放該影片。點選播放按鈕即可再試一次；檔案本身已經儲存。</td></tr><tr><td data-label="訊息">匯出的影片沒有聲音</td><td data-label="處理方式">隱藏的圖層或音量為 0% 的片段會是無聲的。<strong>已儲存至裝置</strong>畫面上的「已檢查：...」會回報遺失的音軌。</td></tr></tbody></table></div>
+<p>切換到其他應用程式時，匯出會繼續進行，並以通知顯示進度。從最近使用的應用程式清單關閉 AbsentMotion 會停止匯出。</p>
+<h2 id="storage-is-full">儲存空間已滿</h2>
+<ul><li>從首頁刪除不需要的專案，並從 Movies/AbsentMotion 刪除舊的匯出檔案。</li><li>在<strong>設定</strong>中點選<strong>清除預覽副本</strong>，可釋放最多 2 GB 的空間。</li><li>Documents/AbsentMotion 中的備份可能很大：請將它們複製到電腦，然後從手機刪除。</li><li>如果儲存失敗，應用程式會告知你。請釋放空間後繼續。</li></ul>
+<h2 id="it-is-slow">速度很慢</h2>
+<ul><li>調低<strong>預覽品質</strong>。</li><li>使用預覽列中的<strong>快速模糊</strong>選項。</li><li>大型照片與影片很吃資源。影片請使用預覽副本，並在加入前縮小非常大的照片。</li><li>大量套用特效的圖層會累積負擔。隱藏你目前沒有在編輯的圖層（點選眼睛圖示）。</li></ul>
+<h2 id="an-update-does-not-install-on-a-samsung-phone">三星手機無法安裝更新</h2>
+<p>在三星手機上，<strong>自動封鎖程式</strong>可能會阻擋 AbsentMotion 下載的更新。當它可能是原因時，<strong>更新已停止</strong>會顯示：「三星的自動封鎖程式可能正在阻擋此更新。」如果 Android 回報安裝遭到封鎖，會立即顯示此訊息；如果同一更新連續兩次安裝失敗，也會顯示。</p>
+<ol><li>開啟手機的<strong>設定</strong>，前往<strong>安全性與隱私權</strong>，點選<strong>自動封鎖程式</strong>，然後將它關閉。</li><li>回到 AbsentMotion，點選<strong>再試一次</strong>以安裝更新。你的專案會保留。</li><li>如果你想要，可以再將自動封鎖程式開啟。</li></ol>
+<h2 id="the-text-uses-the-wrong-font">文字使用了錯誤的字型</h2>
+<p>專案使用的字型不在這支手機上。開啟專案，然後在<strong>此手機缺少字型</strong>中點選<strong>下載</strong>。字型只需要連線網路一次。</p>
+<h2 id="questions">問題與解答</h2>
+<p><strong>真的免費嗎？</strong> 是的。沒有訂閱、不需要帳號、沒有浮水印，也沒有廣告。它是開放原始碼軟體，採用 GNU 通用公共授權條款第 3.0 版。</p>
+<p><strong>需要網路嗎？</strong> 不需要。只有某些選用功能會使用網路：下載 Google 字型、下載一次字幕模型，以及選用的更新檢查。見<a href="privacy.html">隱私權</a>。</p>
+<p><strong>我的專案在哪裡？</strong> 在應用程式的私有儲存空間中，包含你加入的所有媒體檔案。你可以從<strong>設定</strong>備份它們。匯出檔案位於 Movies、Pictures、Music 和 Documents 下的 AbsentMotion 資料夾中。</p>
+<p><strong>可以把專案搬到另一支手機嗎？</strong> 可以：匯出<strong>專案套件</strong>，將 <code>.absproj</code> 檔案複製到另一支手機，然後在那裡開啟。</p>
+<p><strong>可以開啟其他編輯器的專案嗎？</strong> 部分可以。見<a href="projects.html">專案、備份與匯入</a>。</p>
+<p><strong>有電腦版嗎？</strong> 有，從 5.0 版開始提供，適用於 Mac 與 Linux 電腦。Windows 版之後推出。手機版仍然優先。見<a href="requirements.html#absentmotion-on-your-computer">在電腦上使用 AbsentMotion</a>。</p>
+<p><strong>有哪些語言？</strong> 英文、印尼文、印地文、葡萄牙文（巴西）、西班牙文（拉丁美洲）、西班牙文（西班牙）、菲律賓文、越南文、泰文、馬來文、阿拉伯文、波斯文、烏爾都文、土耳其文、俄文、孟加拉文和日文。你可以在<strong>設定</strong>中切換。</p>
+<p><strong>如何回報問題或要求新功能？</strong> 請在 <a href="https://github.com/Comett1225/AbsentMotion/issues">GitHub</a> 上開一個 issue。請不要在其中包含私人資訊。</p>
+<p><strong>原始碼在哪裡？</strong> 在 <a href="https://github.com/Comett1225/AbsentMotion">GitHub 上的專案頁面</a>。</p><nav class="pager" aria-label="上一頁與下一頁"><a rel="prev" href="projects.html">&larr; 專案、備份與匯入</a><a rel="next" href="privacy.html">隱私權與授權 &rarr;</a></nav></main></div></body></html>

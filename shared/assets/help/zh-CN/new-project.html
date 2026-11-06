@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-CN" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>创建项目 | AbsentMotion</title><meta name="description" content="新建项目面板中的每个设置。"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="帮助"><a href="index.html">目录</a><a href="effects/index.html">特效</a></nav></header><div class="wrap"><main id="main"><h1>创建项目</h1><p class="lead">新建项目面板中的每个设置。</p><details class="toc"><summary>本页内容</summary><ul><li><a href="#project-or-asset">项目还是素材</a></li><li><a href="#name">名称</a></li><li><a href="#shape-of-the-picture-aspect-ratio">画面比例</a></li><li><a href="#resolution">分辨率</a></li><li><a href="#frame-rate">帧率</a></li><li><a href="#background">背景</a></li><li><a href="#buttons-at-the-bottom">底部按钮</a></li></ul></details><p>点按主屏幕底部的圆形 <strong>+</strong> 按钮。一个面板会从底部滑出。它会以你上次使用的值打开（画面比例、分辨率、帧率和背景；名称总是新的）。点按“返回”可在不创建任何内容的情况下关闭它。</p>
+<figure><img src="../assets/img/new-sheet.webp" width="720" height="853" alt="新建项目面板：项目或素材 (1)、名称 (2)、形状 (3)、分辨率 (4)、帧率 (5)、背景 (6)、创建项目 (7)。" loading="lazy"><figcaption>新建项目面板：项目或素材 (1)、名称 (2)、形状 (3)、分辨率 (4)、帧率 (5)、背景 (6)、创建项目 (7)。</figcaption></figure>
+<h2 id="project-or-asset">项目还是素材</h2>
+<p>顶部的开关有两个选项：<strong>项目</strong>（默认）和<strong>素材</strong>。素材是一个具有透明背景的可重复使用的片段：其背景设置锁定为“透明”。参见<a href="assets-templates.html">素材、模板和预设</a>。</p>
+<h2 id="name">名称</h2>
+<p>名称默认为“新项目 1”“新项目 2”，依此类推（素材默认为“新素材”）。点按输入框中的 X 即可清空。空白名称会回退为默认名称。</p>
+<h2 id="shape-of-the-picture-aspect-ratio">画面比例</h2>
+<p><strong>16:9</strong>、<strong>9:16</strong>、<strong>4:5</strong>、<strong>1:1</strong> 和 <strong>4:3</strong> 按钮，以及一个用于<strong>自定义画面比例</strong>的铅笔按钮。默认为 1:1。手机视频选择 9:16，横屏视频选择 16:9。</p>
+<h2 id="resolution">分辨率</h2>
+<p><strong>分辨率</strong> 一行显示画布尺寸，例如 1920 x 1080。对于五种画面比例，它是一个短边列表：</p>
+<div class="table-wrap"><table><thead><tr><th>选项</th><th>短边</th></tr></thead><tbody><tr><td data-label="选项">2160p（4k）</td><td data-label="短边">2160</td></tr><tr><td data-label="选项">1440p（QHD）</td><td data-label="短边">1440</td></tr><tr><td data-label="选项">1080p（FHD），默认</td><td data-label="短边">1080</td></tr><tr><td data-label="选项">720p（HD）</td><td data-label="短边">720</td></tr><tr><td data-label="选项">540p（SD）、360p、270p、180p</td><td data-label="短边">与名称一致</td></tr></tbody></table></div>
+<p>长边随画面比例而定。16:9 的 1080p 项目为 1920 x 1080，4:5 的项目为 1080 x 1350，4:3 的项目为 1440 x 1080。</p>
+<p>选择<strong>自定义画面比例</strong>后，列表会变为宽度和高度两个数字输入框，中间有一个圆形的<strong>链接</strong>按钮。开启链接后，更改一边会保持开启链接时两个输入框所具有的比例。每边可在 32 到 4096 像素之间；离开输入框时，应用会修正数值。</p>
+<p>若要保存尺寸以便日后使用，请点按输入框下方的 <strong>+ 保存尺寸</strong>，并为其命名（例如“横幅”）。已保存的尺寸会显示为其旁边的按钮；点按其中一个即可填入其宽度和高度。长按已保存的尺寸（电脑上为右键单击）即可重命名或删除。在编辑器中，选择自定义比例时，项目设置也会提供相同的已保存尺寸。</p>
+<p>更大的画布画面更清晰，但需要更多内存，导出也更慢。1080p 适合大多数项目。你之后可以在编辑器的项目设置中更改分辨率，这不会缩放你的图层。</p>
+<h2 id="frame-rate">帧率</h2>
+<p>可选择 12、15、18、20、24、25、30、48、50、60、90 或 120 fps（每秒帧数）。默认为 60。若想要电影般的质感和更小的文件，请使用 24 或 30；快速运动流畅时使用 60。90 和 120 适用于高刷新率屏幕上非常流畅的运动；并非每部手机都能以如此快的速度导出视频，导出屏幕会告诉你你的手机是否无法做到。此设置决定编辑器和导出绘制画面的频率。视频片段保留其自身的帧率；参见<a href="export.html">导出</a>页面中的帧插值选项。</p>
+<h2 id="background">背景</h2>
+<p>图层后方的颜色：<strong>黑色</strong>、<strong>白色</strong>、<strong>浅灰色</strong>、<strong>绿色</strong>、<strong>蓝色</strong> 或 <strong>透明</strong>（以棋盘格显示）。新安装时默认为透明。导出的视频中透明区域会显示为黑色；GIF 和图片导出可以让你选择透明区域变为何种颜色，而 PNG 会保留透明。</p>
+<h2 id="buttons-at-the-bottom">底部按钮</h2>
+<ul><li><strong>创建项目</strong>（素材则为 <strong>创建素材</strong>）会创建项目，并在编辑器中打开它。</li><li>其下方的 X 会关闭面板。</li></ul>
+<p>如果存储空间不足，应用会提示，并且不会创建项目。</p><nav class="pager" aria-label="上一页和下一页"><a rel="prev" href="home.html">&larr; 主屏幕</a><a rel="next" href="editor.html">编辑器界面 &rarr;</a></nav></main></div></body></html>

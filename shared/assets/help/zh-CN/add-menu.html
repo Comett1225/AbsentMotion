@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="zh-CN" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>添加菜单 | AbsentMotion</title><meta name="description" content="如何添加形状、照片、视频、声音、文本、绘图、相机、灯光、3D模型等内容。"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="帮助"><a href="index.html">目录</a><a href="effects/index.html">特效</a></nav></header><div class="wrap"><main id="main"><h1>添加菜单</h1><p class="lead">如何添加形状、照片、视频、声音、文本、绘图、相机、灯光、3D模型等内容。</p><details class="toc"><summary>本页内容</summary><ul><li><a href="#quick-buttons">快捷按钮</a></li><li><a href="#shape">形状</a></li><li><a href="#media">媒体</a></li><li><a href="#audio">音频</a></li><li><a href="#object-asset">对象／素材</a></li><li><a href="#template">模板</a></li></ul></details><p>时间轴区域右下角的圆形 <strong>+</strong> 按钮会打开添加菜单。只有在未选中任何内容时才会显示；选中图层后，它会被工具网格取代。</p>
+<p>新图层从播放头位置开始，时长与 <strong>新图层时长</strong> 设置相同（默认 2 秒）。照片和形状使用该时长；视频和声音则使用各自的时长。相机和灯光图层会持续整个项目。</p>
+<p>菜单顶部有五个标签（<strong>形状</strong>、<strong>媒体</strong>、<strong>音频</strong>、<strong>对象／素材</strong> 和 <strong>模板</strong>），右侧有四个快捷按钮。点击 X 可关闭菜单。</p>
+<figure><img src="../assets/img/add-shape.webp" width="720" height="451" alt="添加菜单：五个标签页 (1) 和四个快捷按钮 (2)。" loading="lazy"><figcaption>添加菜单：五个标签页 (1) 和四个快捷按钮 (2)。</figcaption></figure>
+<h2 id="quick-buttons">快捷按钮</h2>
+<ul><li><strong>自由画笔</strong>会创建一个绘图图层，并打开绘图编辑器。参见<a href="shapes.html">形状、绘图和蒙版</a>。</li><li><strong>钢笔工具</strong>会创建一个形状图层，并打开编辑点的界面，方便你逐点绘制形状。</li><li><strong>文本</strong>会添加一个文本图层，并立即打开文本编辑器。参见<a href="text.html">文本和字体</a>。</li><li><strong>字幕</strong>会打开自动字幕面板。参见<a href="ai-tools.html">AI工具</a>。</li></ul>
+<h2 id="shape">形状</h2>
+<p>提供五十四种现成形状，每行六个，分页显示，左右滑动即可翻页。点按某个形状即可将其添加到画布中央，颜色随机搭配。</p>
+<p>其中十九种是参数化形状，使用 <strong>形状选项</strong> 进行编辑：圆形、圆角矩形、加号、弧形、三角形、标注框、扇形、多边形、多叶形、箭头、四边形、月牙、矩形、星形、直线、粗线、不规则五边形、印章和水滴形。其余三十五种由点构成，使用 <strong>编辑点</strong> 进行编辑：心形、云朵、闪电、对勾、叉号、圆环、对话气泡、盾牌、房屋、书签、旗帜、新月与星形、太阳、树叶、印章爆炸形、六边形轮廓、星形轮廓、V形箭头、双箭头、弧形箭头、平行四边形、梯形、票券、标签、皇冠、眼睛、雨伞、音符、双水滴、钥匙、定位图钉、圆角播放键、暂停、录制和齿轮。</p>
+<h2 id="media">媒体</h2>
+<p>你的照片和视频，最新的排在前面，以网格显示。点按即可添加，并自动缩放以适应画布。</p>
+<ul><li><strong>查看全部</strong>会打开 Android 自带的照片选择器，无需任何权限。</li><li><strong>从文件导入</strong>是网格中的第一个格子，会打开 Android 的文件选择器，让你从任意文件夹中选择照片或视频，同样无需权限。</li><li>顶部的相册列表可以筛选网格内容（默认为 <strong>全部</strong>）。</li><li><strong>相机</strong>会打开应用内相机。相机控件说明请参见<a href="new-project.html">创建项目</a>。</li><li><strong>搜索</strong>可在网格中查找（提示语为“搜索照片和视频”）。</li><li>相册中的 SVG 文件也会显示在这里。</li></ul>
+<figure><img src="../assets/img/add-media.webp" width="720" height="451" alt="媒体标签页：查看全部 (1)、相册列表 (2)、相机 (3)、搜索 (4)。" loading="lazy"><figcaption>媒体标签页：查看全部 (1)、相册列表 (2)、相机 (3)、搜索 (4)。</figcaption></figure>
+<p>首次使用时，Android 会请求查看照片和视频的权限。在 Android 14 及更高版本上，你可以只允许应用访问你选择的内容。默认情况下，应用会在项目内保存已添加媒体的副本，因此即使之后删除原文件，项目仍可正常使用。</p>
+<h2 id="audio">音频</h2>
+<p>手机中保存的音乐和声音。首次使用时，应用会请求读取音频文件的权限。</p>
+<ul><li><strong>查看全部</strong>会打开音频文件的选择器。</li><li><strong>从文件导入</strong>会打开 Android 的文件选择器，让你从任意文件夹中选择音频文件，无需权限。</li><li><strong>文本转语音</strong>可将输入的文字转换为语音：参见<a href="audio.html">音频</a>。</li><li>点按声音格子即可试听，再次点按即可停止。点按格子底部的 <strong>+</strong> 条，即可将其添加到项目中播放头所在的位置。</li><li><strong>搜索音乐和音效</strong>会匹配标题、文件名、专辑和艺术家。</li></ul>
+<h2 id="object-asset">对象／素材</h2>
+<p>七个格子，用于添加其他类型的图层。</p>
+<ul><li><strong>相机</strong>会添加一个持续整个项目的相机图层。参见<a href="camera-3d.html">相机图层与3D</a>。</li><li><strong>灯光</strong>会添加一个灯光，用于为3D模型和3D特效的各个部分提供明暗效果。参见<a href="camera-3d.html">相机图层与3D</a>。</li><li><strong>空对象</strong>会添加一个不可见的辅助图层。可将其用作其他图层的父级，或作为运动跟踪的目标。</li><li><strong>空组</strong>会添加一个空的组。</li><li><strong>素材／项目</strong>会先列出你保存的素材，然后列出你的其他项目。点按某一项即可将其作为组插入到播放头位置。素材会与其来源保持链接；项目则会作为独立副本插入。参见<a href="assets-templates.html">素材、模板和预设</a>。</li><li><strong>导入SVG</strong>会打开文件选择器，选择 <code>.svg</code> 文件（最大 16 MB）。单个图形会变成一个形状图层；多个图形则会变成一个组。如果有内容无法导入，会弹出提示列出这些内容：文本、图片、嵌入内容、动画、剪贴路径、蒙版、滤镜、标记、虚线或渐变描边以及图案填充。渐变只会保留第一个和最后一个颜色。</li><li><strong>3D模型</strong>会打开文件选择器，选择 <code>.obj</code>、<code>.glb</code> 和 <code>.gltf</code> 文件。如果模型带有材质和贴图文件，请一并选择。文件总大小最多可达 256 MB；超过 50,000 个三角面的模型会以简化形式显示。</li></ul>
+<figure><img src="../assets/img/add-object.webp" width="720" height="451" alt="对象／素材标签页：相机、空对象、空组、素材／项目、导入SVG和3D模型 (1)。" loading="lazy"><figcaption>对象／素材标签页：相机、空对象、空组、素材／项目、导入SVG和3D模型 (1)。</figcaption></figure>
+<h2 id="template">模板</h2>
+<p><strong>查看全部</strong>会显示一个全屏网格，列出你保存的模板；网格下方每个模板也有一个格子。点按某个模板会打开一个页面，让你替换为自己的媒体。如果还没有模板，页面会显示“这里什么都没有。保存为模板的项目会显示在这里。”参见<a href="assets-templates.html">素材、模板和预设</a>。</p><nav class="pager" aria-label="上一页和下一页"><a rel="prev" href="timeline.html">&larr; 时间轴</a><a rel="next" href="layer-tools.html">图层工具 &rarr;</a></nav></main></div></body></html>

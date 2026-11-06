@@ -1,0 +1,6881 @@
+{
+ "categories": {
+  "3d": "3D",
+  "ai": "AI",
+  "beat": "Rytm",
+  "blur": "Rozmycie",
+  "color": "Kolor",
+  "distort": "Zniekształcenie",
+  "key": "Kluczowanie",
+  "move": "Ruch",
+  "new": "Nowe",
+  "noise": "Szum",
+  "other": "Inne",
+  "repeat": "Powtarzanie",
+  "stylize": "Stylizacja",
+  "text": "Tekst"
+ },
+ "effects": {
+  "ascii": {
+   "description": "Zamienia warstwę w obraz z liter i symboli: jaśniejsze obszary otrzymują pełniejsze znaki. Rozmiar określa szerokość znaku na warstwie, dzięki czemu znaki przesuwają się, obracają i skalują wraz z nią. Kolor zachowuje kolory obrazu lub używa jednego koloru, a Linie krawędzi rysują kontury znakami | - / i \\.",
+   "name": "ASCII",
+   "params": {
+    "background": {
+     "label": "Kolor tła"
+    },
+    "backgroundMode": {
+     "label": "Tło",
+     "options": [
+      "Brak",
+      "Kolor"
+     ]
+    },
+    "brightness": {
+     "label": "Jasność"
+    },
+    "cell": {
+     "label": "Rozmiar"
+    },
+    "characters": {
+     "label": "Własne"
+    },
+    "charset": {
+     "label": "Znaki",
+     "options": [
+      "Szczegółowe",
+      "Proste",
+      "Bloki",
+      "Binarne",
+      "Własne"
+     ]
+    },
+    "colorMode": {
+     "label": "Kolor",
+     "options": [
+      "Oryginalny",
+      "Jeden kolor"
+     ]
+    },
+    "contrast": {
+     "label": "Kontrast"
+    },
+    "edges": {
+     "label": "Linie krawędzi"
+    },
+    "invert": {
+     "label": "Odwróć"
+    },
+    "textColor": {
+     "label": "Kolor tekstu"
+    }
+   },
+   "presets": {
+    "amber-monitor": "Bursztynowy monitor",
+    "binary-rain": "Binarny deszcz",
+    "blocks": "Bloki",
+    "line-art": "Rysunek liniowy",
+    "newspaper": "Gazeta",
+    "terminal": "Terminal"
+   }
+  },
+  "autoshake": {
+   "description": "Losowo przesuwa warstwę w czasie w ustawionych granicach.",
+   "name": "Automatyczne drgania",
+   "params": {
+    "angle": {
+     "label": "Kąt"
+    },
+    "evolution": {
+     "label": "Ewolucja"
+    },
+    "frequency": {
+     "label": "Częstotliwość"
+    },
+    "magnitude": {
+     "label": "Amplituda"
+    },
+    "pattern": {
+     "label": "Wzór",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
+    },
+    "seed": {
+     "label": "Ziarno"
+    },
+    "slack": {
+     "label": "Luz"
+    },
+    "zshake": {
+     "label": "Drgania Z"
+    }
+   }
+  },
+  "backdrop": {
+   "description": "Dawniej nazywany warstwą dopasowania. Kopiuje obraz pod warstwą, aby kolejne efekty zmieniały tę kopię. Maskuj do warstwy ogranicza kopię do nieprzezroczystych części warstwy. Mieszanie przywraca wypełnienie warstwy. Efekty poza warstwą pozwala kolejnym efektom, takim jak Rozciągnięcie, wyprowadzić kopię poza krawędzie warstwy.",
+   "name": "Kopiuj tło",
+   "params": {
+    "mask": {
+     "label": "Maskuj do warstwy"
+    },
+    "mix": {
+     "label": "Mieszanie"
+    },
+    "spill": {
+     "label": "Efekty poza warstwą"
+    }
+   }
+  },
+  "beatblur": {
+   "description": "Przy każdym uderzeniu dodaje rozmycie przez powiększenie, które zanika wraz z uderzeniem. Najpierw wybierz klip muzyczny, otwórz jego menu i dotknij Oznacz uderzenia; bez znaczników używane jest ustawienie BPM.",
+   "name": "Rozmycie do rytmu",
+   "params": {
+    "beats": {
+     "label": "Uderzenia",
+     "options": [
+      "Każde uderzenie",
+      "Co drugie uderzenie",
+      "Co czwarte uderzenie"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Zanikanie"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "strength": {
+     "label": "Siła"
+    }
+   }
+  },
+  "beatflash": {
+   "description": "Przy każdym uderzeniu rozbłyskuje warstwę wybranym kolorem. Najpierw wybierz klip muzyczny, otwórz jego menu i dotknij Oznacz uderzenia; bez znaczników używane jest ustawienie BPM.",
+   "name": "Błysk do rytmu",
+   "params": {
+    "beats": {
+     "label": "Uderzenia",
+     "options": [
+      "Każde uderzenie",
+      "Co drugie uderzenie",
+      "Co czwarte uderzenie"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Kolor"
+    },
+    "decay": {
+     "label": "Zanikanie"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "strength": {
+     "label": "Siła"
+    }
+   }
+  },
+  "beatglitch": {
+   "description": "Przy każdym uderzeniu dzieli warstwę na przesunięte paski o rozdzielonych kolorach. Najpierw wybierz klip muzyczny, otwórz jego menu i dotknij Oznacz uderzenia; bez znaczników używane jest ustawienie BPM.",
+   "name": "Zakłócenia do rytmu",
+   "params": {
+    "beats": {
+     "label": "Uderzenia",
+     "options": [
+      "Każde uderzenie",
+      "Co drugie uderzenie",
+      "Co czwarte uderzenie"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Zanikanie"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "slices": {
+     "label": "Paski"
+    },
+    "strength": {
+     "label": "Siła"
+    }
+   }
+  },
+  "beatglow": {
+   "description": "Przy każdym uderzeniu rozświetla jasne części warstwy. Najpierw wybierz klip muzyczny, otwórz jego menu i dotknij Oznacz uderzenia; bez znaczników używane jest ustawienie BPM.",
+   "name": "Poświata do rytmu",
+   "params": {
+    "beats": {
+     "label": "Uderzenia",
+     "options": [
+      "Każde uderzenie",
+      "Co drugie uderzenie",
+      "Co czwarte uderzenie"
+     ]
+    },
+    "blur": {
+     "label": "Promień"
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Kolor"
+    },
+    "decay": {
+     "label": "Zanikanie"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "strength": {
+     "label": "Siła"
+    },
+    "threshold": {
+     "label": "Próg"
+    }
+   }
+  },
+  "beatpulse": {
+   "description": "Przy każdym uderzeniu rozjaśnia warstwę jak błysk ekspozycji; ujemna siła ją przyciemnia. Najpierw wybierz klip muzyczny, otwórz jego menu i dotknij Oznacz uderzenia; bez znaczników używane jest ustawienie BPM.",
+   "name": "Puls do rytmu",
+   "params": {
+    "beats": {
+     "label": "Uderzenia",
+     "options": [
+      "Każde uderzenie",
+      "Co drugie uderzenie",
+      "Co czwarte uderzenie"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Zanikanie"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "strength": {
+     "label": "Siła"
+    }
+   }
+  },
+  "beatrgbsplit": {
+   "description": "Przy każdym uderzeniu rozsuwa kanały czerwony i niebieski. Najpierw wybierz klip muzyczny, otwórz jego menu i dotknij Oznacz uderzenia; bez znaczników używane jest ustawienie BPM.",
+   "name": "Rozdzielenie RGB do rytmu",
+   "params": {
+    "angle": {
+     "label": "Kąt"
+    },
+    "beats": {
+     "label": "Uderzenia",
+     "options": [
+      "Każde uderzenie",
+      "Co drugie uderzenie",
+      "Co czwarte uderzenie"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Zanikanie"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "strength": {
+     "label": "Siła"
+    }
+   }
+  },
+  "beatrotate": {
+   "description": "Przy każdym uderzeniu przechyla warstwę na przemian w lewo i w prawo, po czym wraca do pierwotnej pozycji. Najpierw wybierz klip muzyczny, otwórz jego menu i dotknij Oznacz uderzenia; bez znaczników używane jest ustawienie BPM.",
+   "name": "Obrót do rytmu",
+   "params": {
+    "alternate": {
+     "label": "Naprzemiennie"
+    },
+    "beats": {
+     "label": "Uderzenia",
+     "options": [
+      "Każde uderzenie",
+      "Co drugie uderzenie",
+      "Co czwarte uderzenie"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "cover": {
+     "label": "Wypełnij kadr"
+    },
+    "decay": {
+     "label": "Zanikanie"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "strength": {
+     "label": "Siła"
+    }
+   }
+  },
+  "beatshake": {
+   "description": "Przy każdym uderzeniu wstrząsa warstwą w innym kierunku i uspokaja ją przed następnym. Najpierw wybierz klip muzyczny, otwórz jego menu i dotknij Oznacz uderzenia; bez znaczników używane jest ustawienie BPM.",
+   "name": "Drgania do rytmu",
+   "params": {
+    "beats": {
+     "label": "Uderzenia",
+     "options": [
+      "Każde uderzenie",
+      "Co drugie uderzenie",
+      "Co czwarte uderzenie"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Zanikanie"
+    },
+    "frequency": {
+     "label": "Częstotliwość"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "strength": {
+     "label": "Siła"
+    }
+   }
+  },
+  "beatzoom": {
+   "description": "Przy każdym uderzeniu powiększa obraz, po czym płynnie wraca do pierwotnego rozmiaru. Najpierw wybierz klip muzyczny, otwórz jego menu i dotknij Oznacz uderzenia; bez znaczników używane jest ustawienie BPM.",
+   "name": "Powiększenie do rytmu",
+   "params": {
+    "beats": {
+     "label": "Uderzenia",
+     "options": [
+      "Każde uderzenie",
+      "Co drugie uderzenie",
+      "Co czwarte uderzenie"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Zanikanie"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "strength": {
+     "label": "Siła"
+    }
+   }
+  },
+  "bend": {
+   "description": "Zgina warstwę wzdłuż łuku koła; strona początkowa pozostaje w miejscu, a przeciwna obraca się o ustawiony kąt, dodatni w lewo. Najlepiej działa na długich, wąskich warstwach.",
+   "name": "Zgięcie",
+   "params": {
+    "amount": {
+     "label": "Kąt"
+    },
+    "before": {
+     "label": "Przed początkiem",
+     "options": [
+      "Zamroź",
+      "Zegnij w tę samą stronę",
+      "Zegnij w przeciwną stronę"
+     ]
+    },
+    "origin": {
+     "label": "Punkt początkowy",
+     "options": [
+      "Lewo",
+      "Prawo",
+      "Góra",
+      "Dół"
+     ]
+    },
+    "start": {
+     "label": "Początek"
+    },
+    "tuneHead": {
+     "label": "Dostosuj początek"
+    },
+    "tuneTail": {
+     "label": "Dostosuj koniec"
+    }
+   }
+  },
+  "blink": {
+   "description": "Włącza i wyłącza warstwę kilka razy na sekundę.",
+   "name": "Migotanie",
+   "params": {
+    "frequency": {
+     "label": "Częstotliwość"
+    }
+   }
+  },
+  "blockdissolve": {
+   "description": "Usuwa losowe bloki z warstwy zgodnie z siatką. Animuj Siłę, aby usuwać coraz więcej bloków.",
+   "name": "Zanikanie bloków",
+   "params": {
+    "blockSize": {
+     "label": "Rozmiar"
+    },
+    "fade": {
+     "label": "Zanikanie"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "seed": {
+     "label": "Ziarno"
+    },
+    "strength": {
+     "label": "Siła"
+    },
+    "stretch": {
+     "label": "Rozciągnięcie"
+    }
+   }
+  },
+  "blocknoise": {
+   "description": "Wyświetla migoczące losowe bloki szumu na warstwie. Mnożenie moduluje istniejące kolory, a Dodaj dodaje do nich szum. Zamroź zatrzymuje wzór.",
+   "name": "Szum blokowy",
+   "params": {
+    "blending": {
+     "label": "Tryb mieszania",
+     "options": [
+      "Dodaj",
+      "Mnożenie"
+     ]
+    },
+    "blockSize": {
+     "label": "Rozmiar"
+    },
+    "extremes": {
+     "label": "Wartości skrajne"
+    },
+    "freeze": {
+     "label": "Zamroź"
+    },
+    "mono": {
+     "label": "Monochromatyczny"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "overshoot": {
+     "label": "Przeregulowanie"
+    },
+    "seed": {
+     "label": "Ziarno"
+    },
+    "strength": {
+     "label": "Siła"
+    },
+    "stretch": {
+     "label": "Rozciągnięcie"
+    }
+   }
+  },
+  "blur": {
+   "description": "Gładkie, równomierne rozmycie.",
+   "name": "Rozmycie",
+   "params": {
+    "strength": {
+     "label": "Siła"
+    }
+   }
+  },
+  "box": {
+   "description": "Nakłada warstwę na prostopadłościan o wybranej szerokości, wysokości i głębokości.",
+   "name": "Prostopadłościan",
+   "params": {
+    "depth": {
+     "label": "Głębokość"
+    },
+    "height": {
+     "label": "Wysokość"
+    },
+    "light": {
+     "label": "Kąt światła"
+    },
+    "perspective": {
+     "label": "Perspektywa"
+    },
+    "position": {
+     "label": "Pozycja"
+    },
+    "rotX": {
+     "label": "Obrót X"
+    },
+    "rotY": {
+     "label": "Obrót Y"
+    },
+    "rotZ": {
+     "label": "Obrót Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Cieniowanie"
+    },
+    "shine": {
+     "label": "Połysk"
+    },
+    "smoothing": {
+     "label": "Wygładzanie"
+    },
+    "width": {
+     "label": "Szerokość"
+    }
+   }
+  },
+  "brightnesscontrast": {
+   "description": "Dostosowuje jasność i kontrast obrazu.",
+   "name": "Jasność i kontrast",
+   "params": {
+    "brightness": {
+     "label": "Jasność"
+    },
+    "contrast": {
+     "label": "Kontrast"
+    },
+    "style": {
+     "label": "Styl",
+     "options": [
+      "Osobno dla kanałów",
+      "Zachowaj kolor"
+     ]
+    }
+   }
+  },
+  "bulge": {
+   "description": "Wybrzusza warstwę jak soczewka (dodatnia siła) lub ściska ją ku środkowi (ujemna) w obrębie koła o promieniu wyrażonym jako część rozmiaru warstwy.",
+   "name": "Ściśnięcie/wybrzuszenie",
+   "params": {
+    "amount": {
+     "label": "Siła"
+    },
+    "center": {
+     "label": "Środek"
+    },
+    "radius": {
+     "label": "Promień"
+    }
+   }
+  },
+  "bumpmap": {
+   "description": "Oświetla warstwę tak, jakby jej jasność tworzyła wypukłą powierzchnię, nadając jej fakturę i efekt tłoczenia z zachowaniem kolorów.",
+   "name": "Mapa wypukłości",
+   "params": {
+    "ambient": {
+     "label": "Światło otoczenia"
+    },
+    "angle": {
+     "label": "Kąt światła"
+    },
+    "height": {
+     "label": "Wysokość"
+    },
+    "light": {
+     "label": "Kolor światła"
+    },
+    "shine": {
+     "label": "Połysk"
+    }
+   }
+  },
+  "channelremap": {
+   "description": "Tworzy każdy kanał koloru na podstawie innego kanału warstwy, umożliwiając uzyskanie fałszywych kolorów lub przeniesienie luminancji do kanału alfa.",
+   "name": "Mapowanie kanałów (RGB)",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Czerwony",
+      "Zielony",
+      "Niebieski",
+      "Alfa",
+      "Luminancja",
+      "Zero",
+      "Pełny"
+     ]
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "Czerwony",
+      "Zielony",
+      "Niebieski",
+      "Alfa",
+      "Luminancja",
+      "Zero",
+      "Pełny"
+     ]
+    },
+    "g": {
+     "label": "G",
+     "options": [
+      "Czerwony",
+      "Zielony",
+      "Niebieski",
+      "Alfa",
+      "Luminancja",
+      "Zero",
+      "Pełny"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "Czerwony",
+      "Zielony",
+      "Niebieski",
+      "Alfa",
+      "Luminancja",
+      "Zero",
+      "Pełny"
+     ]
+    }
+   }
+  },
+  "channelremaphsv": {
+   "description": "Tworzy odcień, nasycenie, wartość i alfę na podstawie innych kanałów warstwy.",
+   "name": "Mapowanie kanałów (HSV)",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Barwa",
+      "Nasycenie",
+      "Jasność",
+      "Alfa",
+      "Luminancja",
+      "Zero",
+      "Pełna"
+     ]
+    },
+    "h": {
+     "label": "H",
+     "options": [
+      "Odcień",
+      "Nasycenie",
+      "Wartość",
+      "Alfa",
+      "Luminancja",
+      "Zero",
+      "Pełny"
+     ]
+    },
+    "s": {
+     "label": "S",
+     "options": [
+      "Odcień",
+      "Nasycenie",
+      "Wartość",
+      "Alfa",
+      "Luminancja",
+      "Zero",
+      "Pełny"
+     ]
+    },
+    "v": {
+     "label": "V",
+     "options": [
+      "Barwa",
+      "Nasycenie",
+      "Jasność",
+      "Alfa",
+      "Luminancja",
+      "Zero",
+      "Pełna"
+     ]
+    }
+   }
+  },
+  "checker": {
+   "description": "Nakłada szachownicę na nieprzezroczyste części warstwy lub wycina z niej pola szachownicy.",
+   "name": "Szachownica",
+   "params": {
+    "angle": {
+     "label": "Kąt"
+    },
+    "color": {
+     "label": "Kolor"
+    },
+    "count": {
+     "label": "Liczba"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "punch": {
+     "label": "Wycinanie"
+    },
+    "screenSpace": {
+     "label": "Przestrzeń ekranu"
+    },
+    "stretch": {
+     "label": "Rozciągnięcie"
+    }
+   }
+  },
+  "chromakey": {
+   "description": "Usuwa jeden kolor, na przykład zielone tło.",
+   "name": "Kluczowanie kolorem",
+   "params": {
+    "defringe": {
+     "label": "Usuwanie obwódek"
+    },
+    "invert": {
+     "label": "Odwróć"
+    },
+    "key": {
+     "label": "Kolor kluczowania"
+    },
+    "softness": {
+     "label": "Miękkość"
+    },
+    "tolerance": {
+     "label": "Tolerancja"
+    }
+   }
+  },
+  "chromaticzoomblur": {
+   "description": "Rozmywa obraz od środka, przesuwając błękit do wewnątrz, a czerwień na zewnątrz, przez co krawędzie zyskują tęczowe obwódki.",
+   "name": "Chromatyczne rozmycie zoomem",
+   "params": {
+    "amount": {
+     "label": "Siła"
+    },
+    "center": {
+     "label": "Środek"
+    }
+   }
+  },
+  "circularripple": {
+   "description": "Tworzy fale rozchodzące się z jednego punktu, jak po kropli wpadającej do wody.",
+   "name": "Koliste fale",
+   "params": {
+    "center": {
+     "label": "Środek"
+    },
+    "feather": {
+     "label": "Wtapianie"
+    },
+    "frequency": {
+     "label": "Częstotliwość"
+    },
+    "phase": {
+     "label": "Faza"
+    },
+    "radius": {
+     "label": "Promień"
+    },
+    "strength": {
+     "label": "Siła"
+    }
+   }
+  },
+  "clouds": {
+   "description": "Pokrywa nieprzezroczyste części warstwy miękkim wzorem chmur, który może też służyć jako źródło szumu.",
+   "name": "Chmury",
+   "params": {
+    "color1": {
+     "label": "Kolor 1"
+    },
+    "color2": {
+     "label": "Kolor 2"
+    },
+    "intensity": {
+     "label": "Intensywność"
+    },
+    "octaves": {
+     "label": "Oktawy"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "parallax": {
+     "label": "Paralaksa"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "seed": {
+     "label": "Ziarno losowe"
+    },
+    "stretch": {
+     "label": "Rozciągnięcie"
+    }
+   }
+  },
+  "cmykhalftone": {
+   "description": "Odtwarza warstwę jak druk w czasopiśmie: kropkami w kolorach cyjan, magenta, żółtym i czarnym na czterech obróconych rastrach.",
+   "name": "Raster punktowy CMYK",
+   "params": {
+    "amount": {
+     "label": "Ilość"
+    },
+    "angle": {
+     "label": "Kąt"
+    },
+    "black": {
+     "label": "Czerń"
+    },
+    "phase": {
+     "label": "Faza"
+    },
+    "strength": {
+     "label": "Siła"
+    }
+   }
+  },
+  "colorbalance": {
+   "description": "Zmienia kolory cieni, półtonów i świateł osobno; szary pozostawia dany zakres bez zmian.",
+   "name": "Balans kolorów",
+   "params": {
+    "amount": {
+     "label": "Ilość"
+    },
+    "highlights": {
+     "label": "Światła"
+    },
+    "midtones": {
+     "label": "Półtony"
+    },
+    "shadows": {
+     "label": "Cienie"
+    }
+   }
+  },
+  "colorize": {
+   "description": "Barwi całą warstwę jednym odcieniem. Światło i cień odwzorowuje jasność warstwy w wybranej barwie; Zachowaj jasność zachowuje jasność każdego piksela i zmienia jego kolor na wybraną barwę.",
+   "name": "Koloryzacja",
+   "params": {
+    "amount": {
+     "label": "Ilość"
+    },
+    "hue": {
+     "label": "Barwa"
+    },
+    "style": {
+     "label": "Styl",
+     "options": [
+      "Światło i cień",
+      "Zachowaj jasność"
+     ]
+    }
+   }
+  },
+  "colorwheels": {
+   "description": "Koła kolorów dla cieni, półtonów i świateł pozwalają ustawić barwę, jej siłę i poziom. Przesunięcie zmienia wszystkie tony. Styl Według jasności dostosowuje wpływ każdego koła do jasności piksela.",
+   "name": "Cienie, gamma, światła",
+   "params": {
+    "gainAmount": {
+     "label": "Siła barwy świateł"
+    },
+    "gainHue": {
+     "label": "Barwa świateł"
+    },
+    "gainLevel": {
+     "label": "Poziom świateł"
+    },
+    "gammaAmount": {
+     "label": "Siła barwy gammy"
+    },
+    "gammaHue": {
+     "label": "Barwa gammy"
+    },
+    "gammaLevel": {
+     "label": "Poziom gammy"
+    },
+    "liftAmount": {
+     "label": "Siła barwy cieni"
+    },
+    "liftHue": {
+     "label": "Barwa cieni"
+    },
+    "liftLevel": {
+     "label": "Poziom cieni"
+    },
+    "offsetAmount": {
+     "label": "Siła barwy przesunięcia"
+    },
+    "offsetHue": {
+     "label": "Barwa przesunięcia"
+    },
+    "offsetLevel": {
+     "label": "Poziom przesunięcia"
+    },
+    "style": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Według jasności"
+     ]
+    }
+   }
+  },
+  "contourgradient": {
+   "description": "Tworzy dwukolorowy gradient na zewnątrz krawędzi nieprzezroczystych części warstwy, niczym miękką kolorową poświatę.",
+   "name": "Gradient konturu",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blur": {
+     "label": "Szerokość"
+    },
+    "color1": {
+     "label": "Kolor 1"
+    },
+    "color2": {
+     "label": "Kolor 2"
+    },
+    "fade": {
+     "label": "Zanikanie"
+    },
+    "fill": {
+     "label": "Wypełnienie"
+    }
+   }
+  },
+  "contourlines": {
+   "description": "Rysuje pierścienie wokół nieprzezroczystych części warstwy, tworząc wielowarstwowe obrysy naklejek lub neonów.",
+   "name": "Linie konturu",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blur": {
+     "label": "Odsunięcie"
+    },
+    "color": {
+     "label": "Kolor"
+    },
+    "count": {
+     "label": "Liczba"
+    },
+    "fill": {
+     "label": "Wypełnienie"
+    },
+    "phase": {
+     "label": "Faza"
+    },
+    "width": {
+     "label": "Szerokość"
+    }
+   }
+  },
+  "contourstrips": {
+   "description": "Rysuje ułożone warstwowo papierowe paski, których wysokość zależy od jasności lub krycia warstwy, tworząc krajobraz z grzbietów.",
+   "name": "Paski konturu",
+   "params": {
+    "angle": {
+     "label": "Kąt"
+    },
+    "color1": {
+     "label": "Kolor 1"
+    },
+    "color2": {
+     "label": "Kolor 2"
+    },
+    "count": {
+     "label": "Liczba"
+    },
+    "edgeColor": {
+     "label": "Kolor krawędzi"
+    },
+    "height": {
+     "label": "Wysokość"
+    },
+    "invert": {
+     "label": "Odwróć"
+    },
+    "light": {
+     "label": "Kolor światła"
+    },
+    "lightAngle": {
+     "label": "Kąt światła"
+    },
+    "map": {
+     "label": "Mapa wysokości",
+     "options": [
+      "Alfa",
+      "Luminancja"
+     ]
+    },
+    "mask": {
+     "label": "Maskuj do warstwy"
+    },
+    "phase": {
+     "label": "Faza"
+    },
+    "thickness": {
+     "label": "Grubość"
+    }
+   }
+  },
+  "countupdown": {
+   "description": "Zmienia każdą liczbę w warstwie tekstowej, mnożąc ją i dodając do niej wartość. Animacja parametru Mnożenie od 0% do 100% odlicza do wpisanej liczby. Słowa wokół liczb pozostają bez zmian.",
+   "name": "Odliczanie",
+   "params": {
+    "add": {
+     "label": "Dodawanie"
+    },
+    "decimals": {
+     "label": "Miejsca po przecinku",
+     "options": [
+      "Jak wpisano",
+      "0",
+      "1",
+      "2",
+      "3"
+     ]
+    },
+    "multiply": {
+     "label": "Mnożenie"
+    },
+    "separator": {
+     "label": "Separator tysięcy",
+     "options": [
+      "1000.5",
+      "1,000.5",
+      "1.000,5",
+      "1 000.5"
+     ]
+    }
+   },
+   "presets": {
+    "count-up": "Odliczanie w górę"
+   }
+  },
+  "crop": {
+   "description": "Odcina krawędzie warstwy. Lewa, Góra, Prawa i Dół określają, jaka część szerokości lub wysokości warstwy zostanie odcięta z każdej strony. Zaokrąglenie zaokrągla narożniki, a Wtapianie zmiękcza krawędzie. Warstwa pozostaje na swoim miejscu.",
+   "name": "Kadrowanie",
+   "params": {
+    "bottom": {
+     "label": "Dół"
+    },
+    "feather": {
+     "label": "Wtapianie"
+    },
+    "left": {
+     "label": "Lewa"
+    },
+    "radius": {
+     "label": "Zaokrąglenie"
+    },
+    "right": {
+     "label": "Prawa"
+    },
+    "top": {
+     "label": "Góra"
+    }
+   }
+  },
+  "cross": {
+   "description": "Umieszcza warstwę na trzech belkach przecinających się pośrodku.",
+   "name": "Krzyż trójosiowy",
+   "params": {
+    "light": {
+     "label": "Kąt światła"
+    },
+    "perspective": {
+     "label": "Perspektywa"
+    },
+    "position": {
+     "label": "Pozycja"
+    },
+    "reach": {
+     "label": "Długość"
+    },
+    "rotX": {
+     "label": "Obrót X"
+    },
+    "rotY": {
+     "label": "Obrót Y"
+    },
+    "rotZ": {
+     "label": "Obrót Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Cieniowanie"
+    },
+    "shine": {
+     "label": "Połysk"
+    },
+    "smoothing": {
+     "label": "Wygładzanie"
+    },
+    "thickness": {
+     "label": "Grubość"
+    }
+   }
+  },
+  "cube": {
+   "description": "Nakłada warstwę na każdą ścianę obracającego się sześcianu z zaokrąglonymi krawędziami i oświetleniem.",
+   "name": "Sześcian",
+   "params": {
+    "edge": {
+     "label": "Rozmiar"
+    },
+    "light": {
+     "label": "Kąt światła"
+    },
+    "perspective": {
+     "label": "Perspektywa"
+    },
+    "position": {
+     "label": "Pozycja"
+    },
+    "rotX": {
+     "label": "Obrót X"
+    },
+    "rotY": {
+     "label": "Obrót Y"
+    },
+    "rotZ": {
+     "label": "Obrót Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Cieniowanie"
+    },
+    "shine": {
+     "label": "Połysk"
+    },
+    "smoothing": {
+     "label": "Wygładzanie"
+    }
+   }
+  },
+  "curl": {
+   "description": "Zwija jeden koniec warstwy w okrąg, pozostawiając drugi płasko. Animuj Przesunięcie, aby ją zwijać lub rozwijać. Najlepiej działa na szerokich, wąskich warstwach.",
+   "name": "Zwijanie",
+   "params": {
+    "curlFrom": {
+     "label": "Zwijaj od",
+     "options": [
+      "Lewej",
+      "Prawej"
+     ]
+    },
+    "direction": {
+     "label": "Kierunek",
+     "options": [
+      "W górę",
+      "W dół"
+     ]
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "radius": {
+     "label": "Promień"
+    },
+    "stretch": {
+     "label": "Rozciągnięcie"
+    }
+   }
+  },
+  "cylinder": {
+   "description": "Nakłada warstwę na powierzchnię walca i jego okrągłe podstawy.",
+   "name": "Walec",
+   "params": {
+    "height": {
+     "label": "Wysokość"
+    },
+    "light": {
+     "label": "Kąt światła"
+    },
+    "perspective": {
+     "label": "Perspektywa"
+    },
+    "position": {
+     "label": "Pozycja"
+    },
+    "radius": {
+     "label": "Promień"
+    },
+    "rotX": {
+     "label": "Obrót X"
+    },
+    "rotY": {
+     "label": "Obrót Y"
+    },
+    "rotZ": {
+     "label": "Obrót Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Cieniowanie"
+    },
+    "shine": {
+     "label": "Połysk"
+    },
+    "smoothing": {
+     "label": "Wygładzanie"
+    }
+   }
+  },
+  "darkglow": {
+   "description": "Rozprzestrzenia ciemne części warstwy na jasne, tworząc poświatę z cienia.",
+   "name": "Ciemna poświata",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blend": {
+     "label": "Mieszanie"
+    },
+    "blur": {
+     "label": "Rozproszenie"
+    },
+    "color": {
+     "label": "Kolor"
+    },
+    "threshold": {
+     "label": "Próg"
+    }
+   }
+  },
+  "datamosh": {
+   "description": "Między czasem początku i końca, liczonym w sekundach od początku warstwy, obraz przestaje się odświeżać i jest przeciągany przez kolejny ruch, jakby brakowało klatki kluczowej. Warstwy wideo są rozmazywane przez rzeczywisty ruch, a pozostałe przez ruchome bloki.",
+   "name": "Zakłócenie danych",
+   "params": {
+    "block": {
+     "label": "Rozmiar bloku"
+    },
+    "bloom": {
+     "label": "Poświata"
+    },
+    "decay": {
+     "label": "Zanikanie"
+    },
+    "end": {
+     "label": "Koniec"
+    },
+    "glitch": {
+     "label": "Zakłócenia"
+    },
+    "intensity": {
+     "label": "Intensywność"
+    },
+    "start": {
+     "label": "Początek"
+    }
+   }
+  },
+  "deepglow": {
+   "description": "Tworzy intensywną, jasną poświatę sięgającą daleko od warstwy: gorący rdzeń płynnie przechodzi w szeroką, miękką mgiełkę.",
+   "name": "Głęboka poświata",
+   "params": {
+    "blur": {
+     "label": "Promień"
+    },
+    "falloff": {
+     "label": "Zanikanie"
+    },
+    "high": {
+     "label": "Górny próg"
+    },
+    "hue": {
+     "label": "Przesunięcie barwy"
+    },
+    "intensity": {
+     "label": "Intensywność"
+    },
+    "limit": {
+     "label": "Próg"
+    },
+    "low": {
+     "label": "Dolny próg"
+    },
+    "opacity": {
+     "label": "Krycie poświaty"
+    },
+    "original": {
+     "label": "Krycie oryginału"
+    },
+    "outside": {
+     "label": "Poświata zewnętrzna"
+    },
+    "saturation": {
+     "label": "Nasycenie"
+    },
+    "softness": {
+     "label": "Miękkość progu"
+    },
+    "tint": {
+     "label": "Kolor zabarwienia"
+    },
+    "tintAmount": {
+     "label": "Zabarwienie"
+    },
+    "vibrance": {
+     "label": "Żywość"
+    }
+   }
+  },
+  "denoise": {
+   "description": "Usuwa szum obrazu za pomocą filtra bilateralnego, który zachowuje krawędzie i uśrednia tylko pobliskie piksele o podobnych kolorach.",
+   "name": "Odszumianie",
+   "params": {
+    "detail": {
+     "label": "Szczegóły"
+    },
+    "radius": {
+     "label": "Promień"
+    },
+    "strength": {
+     "label": "Siła"
+    }
+   }
+  },
+  "directionalblur": {
+   "description": "Tworzy rozmycie ruchu przez uśrednienie próbek w wybranym kierunku.",
+   "name": "Rozmycie kierunkowe",
+   "params": {
+    "angle": {
+     "label": "Kąt"
+    },
+    "blurLength": {
+     "label": "Długość"
+    }
+   }
+  },
+  "displacementmap": {
+   "description": "Używa kolorów warstwy do przesunięcia warstw pod nią, a następnie ją ukrywa. Jeśli jako Mapę wybierzesz Warstwę poniżej, przesuwa tę warstwę na podstawie warstwy pod nią.",
+   "name": "Mapa przemieszczenia",
+   "params": {
+    "edges": {
+     "label": "Krawędzie",
+     "options": [
+      "Powtórz",
+      "Odbij",
+      "Przezroczyste",
+      "Kafelki"
+     ]
+    },
+    "fromCenter": {
+     "label": "Od środka"
+    },
+    "invert": {
+     "label": "Odwróć"
+    },
+    "map": {
+     "label": "Mapa",
+     "options": [
+      "Ta warstwa",
+      "Warstwa poniżej"
+     ]
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "xchannel": {
+     "label": "X",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
+    },
+    "ychannel": {
+     "label": "Y",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
+    }
+   }
+  },
+  "dissolve": {
+   "description": "Usuwa losowe piksele lub bloki z warstwy. Animuj Siłę, aby utworzyć przejście rozpuszczania; Ziarno losowe wybiera wzór, a Rozmiar określa wielkość każdej plamki.",
+   "name": "Rozpuszczanie",
+   "params": {
+    "grain": {
+     "label": "Rozmiar"
+    },
+    "progress": {
+     "label": "Siła"
+    },
+    "seed": {
+     "label": "Ziarno losowe"
+    }
+   }
+  },
+  "dots": {
+   "description": "Rysuje na warstwie losowy, ale równomierny wzór miękkich kropek lub używa warstwy tylko jako maski dla kropek.",
+   "name": "Kropki",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blend": {
+     "label": "Tryb mieszania",
+     "options": [
+      "Normalny",
+      "Mnożenie",
+      "Ekran"
+     ]
+    },
+    "color1": {
+     "label": "Kolor 1"
+    },
+    "color2": {
+     "label": "Kolor 2"
+    },
+    "density": {
+     "label": "Gęstość"
+    },
+    "feather": {
+     "label": "Wtapianie"
+    },
+    "fill": {
+     "label": "Wypełnienie"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "phase": {
+     "label": "Faza"
+    },
+    "radius": {
+     "label": "Promień"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "seed": {
+     "label": "Ziarno losowe"
+    },
+    "slack": {
+     "label": "Luz"
+    }
+   }
+  },
+  "drawingprogress": {
+   "description": "Rysuje od początku do końca odręczny rysunek, pociągnięcie po pociągnięciu, lub obrys kształtu. Animuj Koniec od 0% do 100%, aby zobaczyć proces rysowania. Najlepiej działa na kształtach z wyłączonym Wypełnieniem i włączonym Obrysem.",
+   "name": "Postęp rysowania",
+   "params": {
+    "end": {
+     "label": "Koniec"
+    },
+    "start": {
+     "label": "Początek"
+    }
+   }
+  },
+  "dropshadow": {
+   "description": "Rysuje za warstwą miękki cień jej kształtu, przesunięty za pomocą parametrów Przesunięcie X i Przesunięcie Y.",
+   "name": "Rzucony cień",
+   "params": {
+    "blur": {
+     "label": "Miękkość"
+    },
+    "color": {
+     "label": "Kolor"
+    },
+    "opacity": {
+     "label": "Krycie"
+    },
+    "x": {
+     "label": "Przesunięcie X"
+    },
+    "y": {
+     "label": "Przesunięcie Y"
+    }
+   }
+  },
+  "duotone": {
+   "description": "Stosuje dwukolorową mapę gradientu opartą na luminancji, z regulacją kontrastu i siły efektu.",
+   "name": "Duoton",
+   "params": {
+    "amount": {
+     "label": "Ilość"
+    },
+    "color1": {
+     "label": "Kolor cieni"
+    },
+    "color2": {
+     "label": "Kolor świateł"
+    },
+    "contrast": {
+     "label": "Kontrast"
+    }
+   }
+  },
+  "echo": {
+   "description": "Rysuje kopie warstwy z wcześniejszych chwil, podążając za jej animacją.",
+   "name": "Echo klatek kluczowych",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "composite": {
+     "label": "Kompozycja",
+     "options": [
+      "Pod spodem",
+      "Na wierzchu"
+     ]
+    },
+    "count": {
+     "label": "Liczba"
+    },
+    "seconds": {
+     "label": "Sekundy"
+    }
+   }
+  },
+  "edgedetect": {
+   "description": "Tworzy jasne linie w miejscach zmian obrazu, a w pozostałych miejscach ciemne tło.",
+   "name": "Wykrywanie krawędzi",
+   "params": {
+    "strength": {
+     "label": "Siła"
+    }
+   }
+  },
+  "edgeglow": {
+   "description": "Wykrywa krawędzie warstwy i nadaje im neonową poświatę na przyciemnionym obrazie.",
+   "name": "Poświata krawędzi",
+   "params": {
+    "blend": {
+     "label": "Mieszanie"
+    },
+    "blur": {
+     "label": "Rozmycie"
+    },
+    "brightness": {
+     "label": "Jasność"
+    },
+    "color": {
+     "label": "Kolor"
+    },
+    "edges": {
+     "label": "Siła krawędzi"
+    },
+    "gamma": {
+     "label": "Gamma"
+    },
+    "invert": {
+     "label": "Odwróć"
+    },
+    "own": {
+     "label": "Kolor obrazu"
+    },
+    "spread": {
+     "label": "Rozprzestrzenienie"
+    },
+    "threshold": {
+     "label": "Próg"
+    },
+    "tint": {
+     "label": "Zabarwienie"
+    },
+    "tintColor": {
+     "label": "Kolor zabarwienia"
+    }
+   }
+  },
+  "electricedges": {
+   "description": "Rysuje wokół warstwy iskrzący, świecący obrys. Grubość poszerza go w świecący pas, każda wartość Ziarna losowego daje inny wzór, więc animacja tego parametru tworzy iskrzenie w każdej klatce, a Ewolucja wprawia wzór w ruch. Opcjonalnie dodaje linie konturu wewnątrz.",
+   "name": "Elektryczne krawędzie",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blur": {
+     "label": "Odległość"
+    },
+    "color": {
+     "label": "Kolor"
+    },
+    "contourAngle": {
+     "label": "Kąt konturów"
+    },
+    "contours": {
+     "label": "Renderuj kontury"
+    },
+    "count": {
+     "label": "Liczba konturów"
+    },
+    "detail": {
+     "label": "Szczegóły"
+    },
+    "distortion": {
+     "label": "Zniekształcenie"
+    },
+    "evolution": {
+     "label": "Ewolucja"
+    },
+    "fill": {
+     "label": "Wypełnienie"
+    },
+    "glow": {
+     "label": "Poświata"
+    },
+    "glowColor": {
+     "label": "Kolor poświaty"
+    },
+    "maskColor": {
+     "label": "Kolor maski"
+    },
+    "maskEvolution": {
+     "label": "Ewolucja maski"
+    },
+    "maskScale": {
+     "label": "Skala maski"
+    },
+    "maskSeed": {
+     "label": "Ziarno losowe maski"
+    },
+    "maskStrength": {
+     "label": "Siła maski"
+    },
+    "phase": {
+     "label": "Faza konturów"
+    },
+    "seed": {
+     "label": "Ziarno losowe"
+    },
+    "strength": {
+     "label": "Siła"
+    },
+    "thickness": {
+     "label": "Grubość"
+    }
+   }
+  },
+  "ellipsoid": {
+   "description": "Nakłada warstwę na kulę, którą można ściskać i spłaszczać.",
+   "name": "Elipsoida",
+   "params": {
+    "flattenRatio": {
+     "label": "Spłaszczenie"
+    },
+    "light": {
+     "label": "Kąt światła"
+    },
+    "perspective": {
+     "label": "Perspektywa"
+    },
+    "position": {
+     "label": "Pozycja"
+    },
+    "radius": {
+     "label": "Promień"
+    },
+    "rotX": {
+     "label": "Obrót X"
+    },
+    "rotY": {
+     "label": "Obrót Y"
+    },
+    "rotZ": {
+     "label": "Obrót Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Cieniowanie"
+    },
+    "shine": {
+     "label": "Połysk"
+    },
+    "squeezeRatio": {
+     "label": "Ściśnięcie"
+    }
+   }
+  },
+  "emboss": {
+   "description": "Tworzy efekt płaskorzeźby za pomocą gradientów luminancji wzdłuż wybranego kąta światła.",
+   "name": "Płaskorzeźba",
+   "params": {
+    "angle": {
+     "label": "Kąt światła"
+    },
+    "strength": {
+     "label": "Siła"
+    }
+   }
+  },
+  "energybeam": {
+   "description": "Rysuje między dwoma punktami świecącą wiązkę z jasnym rdzeniem i miękką poświatą, która może falować i wydłużać się.",
+   "name": "Wiązka energii",
+   "params": {
+    "blend": {
+     "label": "Mieszanie",
+     "options": [
+      "Dodawanie",
+      "Ekran",
+      "Normalny"
+     ]
+    },
+    "color": {
+     "label": "Kolor poświaty"
+    },
+    "dim": {
+     "label": "Przyciemnij tło"
+    },
+    "evolution": {
+     "label": "Ewolucja"
+    },
+    "frequency": {
+     "label": "Częstotliwość"
+    },
+    "from": {
+     "label": "Początek"
+    },
+    "glow": {
+     "label": "Poświata"
+    },
+    "halo": {
+     "label": "Aureola"
+    },
+    "haloColor": {
+     "label": "Kolor aureoli"
+    },
+    "haloWidth": {
+     "label": "Szerokość aureoli"
+    },
+    "opacity": {
+     "label": "Krycie"
+    },
+    "progress": {
+     "label": "Postęp"
+    },
+    "span": {
+     "label": "Długość"
+    },
+    "to": {
+     "label": "Koniec"
+    },
+    "width": {
+     "label": "Szerokość"
+    },
+    "wiggle": {
+     "label": "Falowanie"
+    }
+   }
+  },
+  "exposure": {
+   "description": "Symuluje ekspozycję fotograficzną za pomocą działek ekspozycji, przesunięcia i korekcji gamma. Rozjaśnij przezroczyste części pozwala częściowo przezroczystym pikselom, na przykład na rozmytej krawędzi, rozjaśnić się powyżej bieli.",
+   "name": "Ekspozycja",
+   "params": {
+    "gamma": {
+     "label": "Gamma"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "soft": {
+     "label": "Rozjaśnij przezroczyste części"
+    },
+    "stops": {
+     "label": "Działki ekspozycji"
+    }
+   }
+  },
+  "fade": {
+   "description": "Stopniowo pokazuje warstwę na początku i ukrywa ją na końcu w ustawionym czasie.",
+   "name": "Pojawianie i zanikanie",
+   "params": {
+    "fadeIn": {
+     "label": "Pojawianie"
+    },
+    "fadeOut": {
+     "label": "Zanikanie"
+    }
+   }
+  },
+  "feather": {
+   "description": "Zmiękcza krawędzie kanału alfa warstwy. Do wewnątrz wygasza je w obrębie istniejącego konturu; Rozmyj alfę rozprowadza zmiękczoną krawędź także poza kontur.",
+   "name": "Wtapianie",
+   "params": {
+    "blur": {
+     "label": "Siła"
+    },
+    "mode": {
+     "label": "Krawędzie",
+     "options": [
+      "Do wewnątrz",
+      "Rozmyj alfę"
+     ]
+    }
+   }
+  },
+  "fillbehind": {
+   "description": "Wypełnia kadr za warstwą jej rozmytą i powiększoną kopią, co przydaje się przy pionowym wideo w poziomym projekcie.",
+   "name": "Wypełnienie tła",
+   "params": {
+    "bgAlpha": {
+     "label": "Alfa tła"
+    },
+    "bgOffset": {
+     "label": "Przesunięcie tła"
+    },
+    "bgScale": {
+     "label": "Skala tła"
+    },
+    "blur": {
+     "label": "Siła"
+    },
+    "brightness": {
+     "label": "Jasność"
+    },
+    "edgeColor": {
+     "label": "Kolor krawędzi"
+    },
+    "edgeStrength": {
+     "label": "Siła krawędzi"
+    },
+    "feather": {
+     "label": "Wtapianie"
+    },
+    "fgAlpha": {
+     "label": "Alfa pierwszego planu"
+    },
+    "fgOffset": {
+     "label": "Przesunięcie przodu"
+    },
+    "fgScale": {
+     "label": "Skala pierwszego planu"
+    },
+    "gamma": {
+     "label": "Gamma"
+    },
+    "saturation": {
+     "label": "Nasycenie"
+    },
+    "scanCount": {
+     "label": "Liczba linii skanowania"
+    },
+    "scanStrength": {
+     "label": "Siła linii skanowania"
+    },
+    "tint": {
+     "label": "Zabarwienie"
+    },
+    "tintColor": {
+     "label": "Kolor zabarwienia"
+    }
+   }
+  },
+  "filmgrain": {
+   "description": "Animowane monochromatyczne ziarno filmowe z regulacją ilości, rozmiaru ziarna i prędkości animacji.",
+   "name": "Ziarno filmowe",
+   "params": {
+    "amount": {
+     "label": "Ilość"
+    },
+    "grainSize": {
+     "label": "Rozmiar ziarna"
+    },
+    "speed": {
+     "label": "Prędkość"
+    }
+   }
+  },
+  "flicker": {
+   "description": "Losowo zmienia krycie warstwy, tworząc migotanie.",
+   "name": "Migotanie",
+   "params": {
+    "intensity": {
+     "label": "Siła"
+    },
+    "seed": {
+     "label": "Ziarno losowe"
+    },
+    "speed": {
+     "label": "Częstotliwość"
+    },
+    "style": {
+     "label": "Tryb",
+     "options": [
+      "Miganie",
+      "Stały"
+     ]
+    }
+   }
+  },
+  "flip": {
+   "description": "Obraca warstwę w 3D jak kartę, której tył może być przezroczysty, pokryty obrazem lub kolorem.",
+   "name": "Obrót warstwy",
+   "params": {
+    "axis": {
+     "label": "Oś"
+    },
+    "back": {
+     "label": "Tył",
+     "options": [
+      "Przezroczysty",
+      "Obraz",
+      "Kolor"
+     ]
+    },
+    "backColor": {
+     "label": "Kolor tyłu"
+    },
+    "light": {
+     "label": "Kąt światła"
+    },
+    "perspective": {
+     "label": "Perspektywa"
+    },
+    "position": {
+     "label": "Pozycja"
+    },
+    "rotX": {
+     "label": "Obrót X"
+    },
+    "rotY": {
+     "label": "Obrót Y"
+    },
+    "rotZ": {
+     "label": "Obrót Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Cieniowanie"
+    },
+    "shine": {
+     "label": "Połysk"
+    }
+   }
+  },
+  "fontweight": {
+   "description": "Ustawia grubość liter, od cienkich do grubych, i pozwala animować ją klatkami kluczowymi. Działa z czcionkami zmiennymi, które zawierają wszystkie grubości w jednym pliku: Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display i Dancing Script na liście czcionek lub zaimportowaną czcionką zmienną. Czcionki o stałej grubości zachowują swój wygląd.",
+   "name": "Grubość czcionki",
+   "params": {
+    "weight": {
+     "label": "Grubość"
+    }
+   }
+  },
+  "fourcolor": {
+   "description": "Łączy na warstwie cztery kolory umieszczone w czterech punktach, których położenie jest mierzone w pikselach od środka warstwy.",
+   "name": "Gradient czterokolorowy",
+   "params": {
+    "blend": {
+     "label": "Mieszanie",
+     "options": [
+      "Normalny",
+      "Mnożenie",
+      "Ekran",
+      "Nakładka",
+      "Miękkie światło",
+      "Ostre światło",
+      "Dodawanie",
+      "Przyciemnianie",
+      "Rozjaśnianie",
+      "Różnica",
+      "Rozjaśnianie koloru",
+      "Ściemnianie koloru"
+     ]
+    },
+    "color1": {
+     "label": "Kolor 1"
+    },
+    "color2": {
+     "label": "Kolor 2"
+    },
+    "color3": {
+     "label": "Kolor 3"
+    },
+    "color4": {
+     "label": "Kolor 4"
+    },
+    "corner": {
+     "label": "Przesunięcia narożników"
+    },
+    "opacity": {
+     "label": "Krycie"
+    },
+    "point1": {
+     "label": "Punkt 1"
+    },
+    "point2": {
+     "label": "Punkt 2"
+    },
+    "point3": {
+     "label": "Punkt 3"
+    },
+    "point4": {
+     "label": "Punkt 4"
+    },
+    "softness": {
+     "label": "Miękkość"
+    }
+   }
+  },
+  "fractalridges": {
+   "description": "Wypełnia nieprzezroczyste części warstwy ostrymi, nieregularnymi grzbietami szumu fraktalnego.",
+   "name": "Fraktalne grzbiety",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "color1": {
+     "label": "Kolor 1"
+    },
+    "color2": {
+     "label": "Kolor 2"
+    },
+    "evolution": {
+     "label": "Ewolucja"
+    },
+    "intensity": {
+     "label": "Intensywność"
+    },
+    "octaves": {
+     "label": "Oktawy"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "seed": {
+     "label": "Ziarno losowe"
+    },
+    "stretch": {
+     "label": "Rozciągnięcie"
+    }
+   }
+  },
+  "fractalwarp": {
+   "description": "Zniekształca warstwę za pomocą złożonego szumu fraktalnego, tworząc efekty ognia, wody i falującego gorącego powietrza.",
+   "name": "Fraktalne zniekształcenie",
+   "params": {
+    "complexity": {
+     "label": "Złożoność"
+    },
+    "evolution": {
+     "label": "Ewolucja"
+    },
+    "intensity": {
+     "label": "Intensywność"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "parallax": {
+     "label": "Paralaksa"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "screenSpace": {
+     "label": "Przestrzeń ekranu"
+    },
+    "seed": {
+     "label": "Ziarno losowe"
+    },
+    "strength": {
+     "label": "Siła"
+    }
+   }
+  },
+  "fracture3d": {
+   "description": "Rozbija warstwę na poruszające się odłamki 3D.",
+   "name": "Rozbicie 3D",
+   "params": {
+    "depthPush": {
+     "label": "Przesunięcie w głąb"
+    },
+    "direction": {
+     "label": "Kierunek"
+    },
+    "fade": {
+     "label": "Zanikanie"
+    },
+    "force": {
+     "label": "Siła"
+    },
+    "gravity": {
+     "label": "Grawitacja"
+    },
+    "impact": {
+     "label": "Punkt uderzenia"
+    },
+    "intensity": {
+     "label": "Intensywność światła"
+    },
+    "light": {
+     "label": "Kierunek światła"
+    },
+    "pieces": {
+     "label": "Fragmenty"
+    },
+    "progress": {
+     "label": "Postęp"
+    },
+    "seed": {
+     "label": "Ziarno losowe"
+    },
+    "spin": {
+     "label": "Wirowanie"
+    },
+    "spread": {
+     "label": "Rozrzut kierunku"
+    },
+    "thickness": {
+     "label": "Grubość"
+    }
+   }
+  },
+  "fringeclean": {
+   "description": "Usuwa kolor pikseli na krawędzi maski warstwy, zmieniając kolorowe obwódki po kluczowaniu na szare, a maksymalnie trzy chronione kolory pozostawia bez zmian.",
+   "name": "Obwódka maski",
+   "params": {
+    "blur": {
+     "label": "Grubość"
+    },
+    "color1": {
+     "label": "Zachowaj kolor 1"
+    },
+    "color2": {
+     "label": "Zachowaj kolor 2"
+    },
+    "color3": {
+     "label": "Zachowaj kolor 3"
+    },
+    "feather": {
+     "label": "Wtapianie"
+    },
+    "threshold1": {
+     "label": "Zakres 1"
+    },
+    "threshold2": {
+     "label": "Zakres 2"
+    },
+    "threshold3": {
+     "label": "Zakres 3"
+    }
+   }
+  },
+  "glass": {
+   "description": "Zmienia kształt warstwy w fazowane szkło, które załamuje warstwy za nim i ma rozświetloną krawędź.",
+   "name": "Szkło",
+   "params": {
+    "angle": {
+     "label": "Kąt światła"
+    },
+    "blur": {
+     "label": "Fazowanie"
+    },
+    "color": {
+     "label": "Kolor"
+    },
+    "highlight": {
+     "label": "Rozświetlenie"
+    },
+    "refraction": {
+     "label": "Załamanie światła"
+    },
+    "tint": {
+     "label": "Zabarwienie"
+    }
+   }
+  },
+  "glitch": {
+   "description": "Losowo przesuwa poziome bloki i kanały kolorów, zmieniając je kilka razy na sekundę.",
+   "name": "Zakłócenia",
+   "params": {
+    "blockHeight": {
+     "label": "Wysokość bloku"
+    },
+    "intensity": {
+     "label": "Intensywność"
+    },
+    "seed": {
+     "label": "Ziarno losowe"
+    }
+   }
+  },
+  "glow": {
+   "description": "Tworzy jednokolorową poświatę wokół kształtu warstwy; twardość zmienia ją z miękkiej poświaty w jednolity kontur.",
+   "name": "Poświata",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blendMode": {
+     "label": "Tryb mieszania",
+     "options": [
+      "Normalny",
+      "Mnożenie",
+      "Ekran"
+     ]
+    },
+    "color": {
+     "label": "Kolor"
+    },
+    "hardness": {
+     "label": "Twardość"
+    },
+    "radius": {
+     "label": "Promień"
+    }
+   }
+  },
+  "glowscan": {
+   "description": "Rozmywa i rozświetla tylko fragmenty warstwy o jasności w wybranym zakresie; animuj położenie, aby przesunąć poświatę od cieni do świateł.",
+   "name": "Skanowanie poświatą",
+   "params": {
+    "blur": {
+     "label": "Rozmycie"
+    },
+    "color": {
+     "label": "Kolor poświaty"
+    },
+    "intensity": {
+     "label": "Intensywność"
+    },
+    "position": {
+     "label": "Położenie"
+    },
+    "show": {
+     "label": "Pokaż tylko zakres"
+    },
+    "softness": {
+     "label": "Miękkość"
+    },
+    "width": {
+     "label": "Szerokość"
+    }
+   }
+  },
+  "gradientmap": {
+   "description": "Zmienia kolory obrazu zależnie od jasności za pomocą trzech kolorów, powtórzeń i fazy; skalowanie jasności mnoży wynik przez jasność obrazu.",
+   "name": "Mapa gradientu",
+   "params": {
+    "color1": {
+     "label": "Cienie"
+    },
+    "color2": {
+     "label": "Półcienie"
+    },
+    "color3": {
+     "label": "Światła"
+    },
+    "opacity": {
+     "label": "Krycie"
+    },
+    "phase": {
+     "label": "Faza"
+    },
+    "repeat": {
+     "label": "Powtórzenia"
+    },
+    "reverse": {
+     "label": "Odwróć"
+    },
+    "saturation": {
+     "label": "Nasycenie"
+    },
+    "scaleBrightness": {
+     "label": "Skaluj jasność"
+    }
+   }
+  },
+  "gradientoverlay": {
+   "description": "Nakłada na warstwę dwukolorowy gradient z wyborem kształtu i trybu mieszania.",
+   "name": "Nakładka gradientu",
+   "params": {
+    "angle": {
+     "label": "Kąt"
+    },
+    "blend": {
+     "label": "Mieszanie",
+     "options": [
+      "Normalny",
+      "Mnożenie",
+      "Ekran",
+      "Nakładka",
+      "Łagodne światło",
+      "Ostre światło",
+      "Dodawanie",
+      "Przyciemnianie",
+      "Rozjaśnianie",
+      "Różnica",
+      "Rozjaśnianie koloru",
+      "Ściemnianie koloru"
+     ]
+    },
+    "color1": {
+     "label": "Kolor 1"
+    },
+    "color2": {
+     "label": "Kolor 2"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "opacity": {
+     "label": "Krycie"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shape": {
+     "label": "Kształt",
+     "options": [
+      "Liniowy",
+      "Promienisty",
+      "Odbity",
+      "Kątowy"
+     ]
+    },
+    "style": {
+     "label": "Długość",
+     "options": [
+      "Prostokąt",
+      "Owal"
+     ]
+    }
+   }
+  },
+  "grid": {
+   "description": "Rysuje linie siatki na nieprzezroczystych częściach warstwy lub je z niej wycina.",
+   "name": "Siatka",
+   "params": {
+    "angle": {
+     "label": "Kąt"
+    },
+    "color": {
+     "label": "Kolor"
+    },
+    "count": {
+     "label": "Liczba"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "punch": {
+     "label": "Wytnij"
+    },
+    "stretch": {
+     "label": "Rozciągnięcie"
+    },
+    "width": {
+     "label": "Szerokość"
+    }
+   }
+  },
+  "gridrepeat": {
+   "description": "Dynamicznie tworzy wiele kopii warstwy ułożonych w siatkę.",
+   "name": "Powtórzenie w siatce",
+   "params": {
+    "copyDelay": {
+     "label": "Opóźnienie na kopię"
+    },
+    "count": {
+     "label": "Liczba"
+    },
+    "easing": {
+     "label": "Wygładzanie",
+     "options": [
+      "Liniowe",
+      "Zwolnienie na początku",
+      "Zwolnienie na końcu",
+      "Początek i koniec"
+     ]
+    },
+    "fillAmount": {
+     "label": "Ilość wypełnienia"
+    },
+    "fillColor": {
+     "label": "Kolor wypełnienia"
+    },
+    "position": {
+     "label": "Położenie"
+    },
+    "randomOpacity": {
+     "label": "Losowe krycie"
+    },
+    "randomOrder": {
+     "label": "Losowa kolejność"
+    },
+    "randomPosition": {
+     "label": "Losowe położenie"
+    },
+    "randomRotation": {
+     "label": "Losowy obrót"
+    },
+    "randomScale": {
+     "label": "Losowa skala"
+    },
+    "rangeEnd": {
+     "label": "Koniec zakresu"
+    },
+    "rangeOffset": {
+     "label": "Przesunięcie zakresu"
+    },
+    "rangeOpacity": {
+     "label": "Krycie w zakresie"
+    },
+    "rangePosition": {
+     "label": "Położenie w zakresie"
+    },
+    "rangeRotation": {
+     "label": "Obrót w zakresie"
+    },
+    "rangeScale": {
+     "label": "Skala w zakresie"
+    },
+    "rangeStart": {
+     "label": "Początek zakresu"
+    },
+    "seed": {
+     "label": "Ziarno losowe"
+    },
+    "stagger": {
+     "label": "Przesunięcie naprzemienne"
+    }
+   }
+  },
+  "grunge": {
+   "description": "Postarza warstwę za pomocą ziarna, plam brudu, przypalonych krawędzi i przykurzonego zabarwienia.",
+   "name": "Postarzenie",
+   "params": {
+    "blotches": {
+     "label": "Brud"
+    },
+    "burn": {
+     "label": "Przypalone krawędzie"
+    },
+    "color": {
+     "label": "Kolor zabarwienia"
+    },
+    "grain": {
+     "label": "Ziarno"
+    },
+    "scale": {
+     "label": "Rozmiar brudu"
+    },
+    "seed": {
+     "label": "Ziarno losowe"
+    },
+    "strength": {
+     "label": "Siła"
+    },
+    "tint": {
+     "label": "Zabarwienie"
+    }
+   }
+  },
+  "halftone": {
+   "description": "Drukowane punkty, które rosną w ciemnych obszarach obrazu.",
+   "name": "Raster",
+   "params": {
+    "angle": {
+     "label": "Kąt"
+    },
+    "cell": {
+     "label": "Rozmiar"
+    },
+    "colored": {
+     "label": "Kolorowe punkty"
+    },
+    "ink": {
+     "label": "Kolor punktów"
+    },
+    "paper": {
+     "label": "Kolor papieru"
+    },
+    "style": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Dwukolorowy"
+     ]
+    }
+   }
+  },
+  "halftonelines": {
+   "description": "Przekształca warstwę w drukowane linie, grubsze w ciemnych obszarach i cieńsze w jasnych.",
+   "name": "Linie rastrowe",
+   "params": {
+    "amount": {
+     "label": "Ilość"
+    },
+    "angle": {
+     "label": "Kąt"
+    },
+    "color1": {
+     "label": "Kolor 1"
+    },
+    "color2": {
+     "label": "Kolor 2"
+    },
+    "phase": {
+     "label": "Faza"
+    },
+    "strength": {
+     "label": "Siła"
+    }
+   }
+  },
+  "heart": {
+   "description": "Wycina warstwę w kształt wypukłego serca.",
+   "name": "Serce",
+   "params": {
+    "depth": {
+     "label": "Głębia"
+    },
+    "heartSize": {
+     "label": "Rozmiar"
+    },
+    "light": {
+     "label": "Kąt światła"
+    },
+    "perspective": {
+     "label": "Perspektywa"
+    },
+    "position": {
+     "label": "Położenie"
+    },
+    "rotX": {
+     "label": "Obrót X"
+    },
+    "rotY": {
+     "label": "Obrót Y"
+    },
+    "rotZ": {
+     "label": "Obrót Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Cieniowanie"
+    },
+    "shine": {
+     "label": "Połysk"
+    },
+    "smoothing": {
+     "label": "Wygładzanie"
+    }
+   }
+  },
+  "hexagontilerotate": {
+   "description": "Dzieli warstwę na sześciokątne kafelki i obraca obraz w każdym z nich osobno.",
+   "name": "Obrót sześciokątnych kafelków",
+   "params": {
+    "angle": {
+     "label": "Kąt"
+    },
+    "count": {
+     "label": "Liczba"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "random": {
+     "label": "Losowość"
+    },
+    "rotation": {
+     "label": "Obrót"
+    },
+    "seed": {
+     "label": "Ziarno losowe"
+    }
+   }
+  },
+  "hexagontileshift": {
+   "description": "Dzieli warstwę na sześciokątne kafelki i przesuwa obraz w każdym z nich w losowym kierunku.",
+   "name": "Przesunięcie sześciokątnych kafelków",
+   "params": {
+    "angle": {
+     "label": "Kąt"
+    },
+    "count": {
+     "label": "Liczba"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "seed": {
+     "label": "Ziarno losowe"
+    },
+    "strength": {
+     "label": "Siła"
+    }
+   }
+  },
+  "hexagontiling": {
+   "description": "Powtarza środek warstwy w sześciokątnych kafelkach wypełniających ekran.",
+   "name": "Sześciokątne kafelki",
+   "params": {
+    "angle": {
+     "label": "Kąt"
+    },
+    "mirror": {
+     "label": "Odbicie lustrzane"
+    },
+    "scale": {
+     "label": "Skala"
+    }
+   }
+  },
+  "hexgrid": {
+   "description": "Pokrywa warstwę siatką sześciokątów wypełnionych jednym do trzech kolorów, z miękkimi krawędziami i odstępami.",
+   "name": "Siatka sześciokątów",
+   "params": {
+    "angle": {
+     "label": "Kąt"
+    },
+    "blend": {
+     "label": "Mieszanie",
+     "options": [
+      "Normalny",
+      "Mnożenie",
+      "Ekran",
+      "Nakładka",
+      "Łagodne światło",
+      "Ostre światło",
+      "Dodawanie",
+      "Przyciemnianie",
+      "Rozjaśnianie",
+      "Różnica",
+      "Rozjaśnianie koloru",
+      "Ściemnianie koloru"
+     ]
+    },
+    "cell": {
+     "label": "Rozmiar"
+    },
+    "color1": {
+     "label": "Kolor 1"
+    },
+    "color2": {
+     "label": "Kolor 2"
+    },
+    "color3": {
+     "label": "Kolor 3"
+    },
+    "colors": {
+     "label": "Kolory",
+     "options": [
+      "Jeden",
+      "Dwa",
+      "Trzy"
+     ]
+    },
+    "feather": {
+     "label": "Wtapianie"
+    },
+    "gap": {
+     "label": "Odstęp"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "opacity": {
+     "label": "Krycie"
+    },
+    "stretch": {
+     "label": "Rozciągnięcie"
+    }
+   }
+  },
+  "hexprism": {
+   "description": "Umieszcza warstwę na przedniej i tylnej ścianie graniastosłupa sześciokątnego.",
+   "name": "Graniastosłup sześciokątny",
+   "params": {
+    "depth": {
+     "label": "Głębia"
+    },
+    "light": {
+     "label": "Kąt światła"
+    },
+    "perspective": {
+     "label": "Perspektywa"
+    },
+    "position": {
+     "label": "Położenie"
+    },
+    "radius": {
+     "label": "Promień"
+    },
+    "rotX": {
+     "label": "Obrót X"
+    },
+    "rotY": {
+     "label": "Obrót Y"
+    },
+    "rotZ": {
+     "label": "Obrót Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Cieniowanie"
+    },
+    "shine": {
+     "label": "Połysk"
+    },
+    "smoothing": {
+     "label": "Wygładzanie"
+    }
+   }
+  },
+  "highlightshadow": {
+   "description": "Odzyskuje lub wzmacnia jasne światła oraz rozjaśnia lub pogłębia cienie zależnie od jasności każdego piksela.",
+   "name": "Światła i cienie",
+   "params": {
+    "highlights": {
+     "label": "Światła"
+    },
+    "shadows": {
+     "label": "Cienie"
+    },
+    "style": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Zachowaj kolor"
+     ]
+    }
+   }
+  },
+  "hollowbox": {
+   "description": "Pudełko z otwartą górą i dołem: warstwa pokrywa zewnętrzną stronę, a wnętrze przyjmuje wybrany kolor.",
+   "name": "Puste pudełko",
+   "params": {
+    "depth": {
+     "label": "Głębia"
+    },
+    "height": {
+     "label": "Wysokość"
+    },
+    "interior": {
+     "label": "Kolor wnętrza"
+    },
+    "light": {
+     "label": "Kąt światła"
+    },
+    "perspective": {
+     "label": "Perspektywa"
+    },
+    "position": {
+     "label": "Położenie"
+    },
+    "rotX": {
+     "label": "Obrót X"
+    },
+    "rotY": {
+     "label": "Obrót Y"
+    },
+    "rotZ": {
+     "label": "Obrót Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Cieniowanie"
+    },
+    "shine": {
+     "label": "Połysk"
+    },
+    "smoothing": {
+     "label": "Wygładzanie"
+    },
+    "thickness": {
+     "label": "Grubość"
+    },
+    "width": {
+     "label": "Szerokość"
+    }
+   }
+  },
+  "hsl": {
+   "description": "Zmienia odcień, nasycenie i jasność jednego zakresu kolorów naraz, pozostawiając pozostałe bez zmian.",
+   "name": "HSL",
+   "params": {
+    "blend": {
+     "label": "Mieszanie",
+     "options": [
+      "Normalny",
+      "Mnożenie",
+      "Ekran"
+     ]
+    },
+    "blueHue": {
+     "label": "Odcień"
+    },
+    "blueLightness": {
+     "label": "Jasność"
+    },
+    "blueSaturation": {
+     "label": "Nasycenie"
+    },
+    "brightness": {
+     "label": "Jasność"
+    },
+    "cyanHue": {
+     "label": "Odcień"
+    },
+    "cyanLightness": {
+     "label": "Jasność"
+    },
+    "cyanSaturation": {
+     "label": "Nasycenie"
+    },
+    "greenHue": {
+     "label": "Odcień"
+    },
+    "greenLightness": {
+     "label": "Jasność"
+    },
+    "greenSaturation": {
+     "label": "Nasycenie"
+    },
+    "magentaHue": {
+     "label": "Odcień"
+    },
+    "magentaLightness": {
+     "label": "Jasność"
+    },
+    "magentaSaturation": {
+     "label": "Nasycenie"
+    },
+    "opacity": {
+     "label": "Krycie"
+    },
+    "orangeHue": {
+     "label": "Odcień"
+    },
+    "orangeLightness": {
+     "label": "Jasność"
+    },
+    "orangeSaturation": {
+     "label": "Nasycenie"
+    },
+    "purpleHue": {
+     "label": "Odcień"
+    },
+    "purpleLightness": {
+     "label": "Jasność"
+    },
+    "purpleSaturation": {
+     "label": "Nasycenie"
+    },
+    "range": {
+     "label": "Kolor",
+     "options": [
+      "Czerwony",
+      "Pomarańczowy",
+      "Żółty",
+      "Zielony",
+      "Cyjan",
+      "Niebieski",
+      "Fioletowy",
+      "Magenta"
+     ]
+    },
+    "redHue": {
+     "label": "Odcień"
+    },
+    "redLightness": {
+     "label": "Jasność"
+    },
+    "redSaturation": {
+     "label": "Nasycenie"
+    },
+    "yellowHue": {
+     "label": "Odcień"
+    },
+    "yellowLightness": {
+     "label": "Jasność"
+    },
+    "yellowSaturation": {
+     "label": "Nasycenie"
+    }
+   }
+  },
+  "huesaturation": {
+   "description": "Przesuwa kolory na kole barw i zmienia ich nasycenie; ożywienie najmocniej wzmacnia stonowane kolory.",
+   "name": "Odcień i nasycenie",
+   "params": {
+    "hue": {
+     "label": "Odcień"
+    },
+    "lightness": {
+     "label": "Jasność"
+    },
+    "saturation": {
+     "label": "Nasycenie"
+    },
+    "style": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Zachowaj jasność"
+     ]
+    },
+    "vibrance": {
+     "label": "Ożywienie"
+    }
+   }
+  },
+  "innerblur": {
+   "description": "Rozmywa obraz wewnątrz warstwy, zachowując ostry kontur.",
+   "name": "Rozmycie wewnętrzne",
+   "params": {
+    "blur": {
+     "label": "Siła"
+    }
+   }
+  },
+  "innerbulge": {
+   "description": "Wybrzusza lub ściska środek warstwy, nie zmieniając położenia jej krawędzi.",
+   "name": "Wewnętrzne ściśnięcie i wybrzuszenie",
+   "params": {
+    "strength": {
+     "label": "Siła"
+    }
+   }
+  },
+  "innerglow": {
+   "description": "Dodaje poświatę wzdłuż wewnętrznych krawędzi nieprzezroczystych części warstwy.",
+   "name": "Poświata wewnętrzna",
+   "params": {
+    "blur": {
+     "label": "Rozmiar"
+    },
+    "color": {
+     "label": "Kolor"
+    },
+    "intensity": {
+     "label": "Intensywność"
+    }
+   }
+  },
+  "invert": {
+   "description": "Odwraca kanały kolorów obrazu z regulacją siły mieszania i opcjonalnym odwróceniem alfy.",
+   "name": "Odwróć",
+   "params": {
+    "amount": {
+     "label": "Ilość"
+    },
+    "invert_alpha": {
+     "label": "Odwróć alfę"
+    }
+   }
+  },
+  "iridescence": {
+   "description": "Pokrywa nieprzezroczyste części warstwy płynnym tęczowym połyskiem, jak olej na wodzie lub bańka mydlana.",
+   "name": "Iryzacja",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blend": {
+     "label": "Tryb mieszania",
+     "options": [
+      "Normalny",
+      "Mnożenie",
+      "Ekran",
+      "Nakładka",
+      "Łagodne światło",
+      "Ostre światło",
+      "Dodawanie",
+      "Przyciemnianie",
+      "Rozjaśnianie",
+      "Różnica",
+      "Rozjaśnianie koloru",
+      "Ściemnianie koloru"
+     ]
+    },
+    "evolution": {
+     "label": "Ewolucja"
+    },
+    "saturation": {
+     "label": "Nasycenie"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "seed": {
+     "label": "Ziarno losowe"
+    },
+    "shift": {
+     "label": "Przesunięcie odcienia"
+    }
+   }
+  },
+  "kaleidoscope": {
+   "description": "Lustrzane wycinki wokół punktu.",
+   "name": "Kalejdoskop",
+   "params": {
+    "angle": {
+     "label": "Kąt"
+    },
+    "center": {
+     "label": "Środek"
+    },
+    "mirror": {
+     "label": "Odbicie lustrzane"
+    },
+    "segments": {
+     "label": "Segmenty"
+    }
+   }
+  },
+  "lensblur": {
+   "description": "Obrotowe rozmycie, które pozostawia ostry obszar wokół środka i narasta ku krawędziom.",
+   "name": "Rozmycie obiektywu",
+   "params": {
+    "center": {
+     "label": "Środek"
+    },
+    "feather": {
+     "label": "Wtapianie"
+    },
+    "radius": {
+     "label": "Promień"
+    },
+    "sweep": {
+     "label": "Kąt"
+    }
+   }
+  },
+  "lensflare": {
+   "description": "Jasne światło z poświatą nałożone na obraz.",
+   "name": "Blask światła",
+   "params": {
+    "brightness": {
+     "label": "Jasność"
+    },
+    "center": {
+     "label": "Środek"
+    },
+    "color": {
+     "label": "Kolor"
+    },
+    "radius": {
+     "label": "Promień"
+    }
+   }
+  },
+  "levels": {
+   "description": "Reguluje poziomy obrazu za pomocą wejściowych i wyjściowych punktów czerni i bieli oraz gammy.",
+   "name": "Poziomy",
+   "params": {
+    "gamma": {
+     "label": "Gamma"
+    },
+    "inBlack": {
+     "label": "Czerń wejściowa"
+    },
+    "inWhite": {
+     "label": "Biel wejściowa"
+    },
+    "outBlack": {
+     "label": "Czerń wyjściowa"
+    },
+    "outWhite": {
+     "label": "Biel wyjściowa"
+    }
+   }
+  },
+  "lightglow": {
+   "description": "Dodaje kolorową poświatę wokół części obrazu jaśniejszych od progu.",
+   "name": "Poświata świateł",
+   "params": {
+    "blend": {
+     "label": "Mieszanie"
+    },
+    "blur": {
+     "label": "Rozmiar"
+    },
+    "color": {
+     "label": "Kolor"
+    },
+    "intensity": {
+     "label": "Intensywność"
+    },
+    "opacity": {
+     "label": "Krycie"
+    },
+    "threshold": {
+     "label": "Próg"
+    }
+   }
+  },
+  "lightning": {
+   "description": "Rysuje rozgałęzioną błyskawicę między dwoma punktami warstwy.",
+   "name": "Błyskawica",
+   "params": {
+    "color": {
+     "label": "Kolor"
+    },
+    "evolution": {
+     "label": "Ewolucja"
+    },
+    "from": {
+     "label": "Początek"
+    },
+    "glow": {
+     "label": "Poświata"
+    },
+    "jag": {
+     "label": "Szczegóły"
+    },
+    "seed": {
+     "label": "Ziarno losowe"
+    },
+    "to": {
+     "label": "Koniec"
+    },
+    "width": {
+     "label": "Szerokość"
+    }
+   }
+  },
+  "linearrepeat": {
+   "description": "Dynamicznie tworzy wiele kopii warstwy ułożonych wzdłuż linii.",
+   "name": "Powtórzenie liniowe",
+   "params": {
+    "copyDelay": {
+     "label": "Opóźnienie na kopię"
+    },
+    "count": {
+     "label": "Liczba"
+    },
+    "easing": {
+     "label": "Wygładzanie",
+     "options": [
+      "Liniowe",
+      "Zwolnienie na początku",
+      "Zwolnienie na końcu",
+      "Początek i koniec"
+     ]
+    },
+    "fillAmount": {
+     "label": "Ilość wypełnienia"
+    },
+    "fillColor": {
+     "label": "Kolor wypełnienia"
+    },
+    "position": {
+     "label": "Położenie"
+    },
+    "randomOpacity": {
+     "label": "Losowe krycie"
+    },
+    "randomOrder": {
+     "label": "Losowa kolejność"
+    },
+    "randomPosition": {
+     "label": "Losowe położenie"
+    },
+    "randomRotation": {
+     "label": "Losowy obrót"
+    },
+    "randomScale": {
+     "label": "Losowa skala"
+    },
+    "rangeEnd": {
+     "label": "Koniec zakresu"
+    },
+    "rangeOffset": {
+     "label": "Przesunięcie zakresu"
+    },
+    "rangeOpacity": {
+     "label": "Krycie w zakresie"
+    },
+    "rangePosition": {
+     "label": "Położenie w zakresie"
+    },
+    "rangeRotation": {
+     "label": "Obrót w zakresie"
+    },
+    "rangeScale": {
+     "label": "Skala w zakresie"
+    },
+    "rangeStart": {
+     "label": "Początek zakresu"
+    },
+    "seed": {
+     "label": "Ziarno losowe"
+    }
+   }
+  },
+  "linearstreaks": {
+   "description": "Tworzy proste smugi, przesuwając kopie warstwy pod wybranym kątem i mieszając je w miejscach nakładania.",
+   "name": "Liniowe smugi",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Kąt"
+    },
+    "bias": {
+     "label": "Odchylenie"
+    },
+    "mode": {
+     "label": "Mieszanie",
+     "options": [
+      "Rozjaśnianie",
+      "Średnia",
+      "Przyciemnianie"
+     ]
+    },
+    "reach": {
+     "label": "Długość"
+    }
+   }
+  },
+  "liquidglass": {
+   "description": "Zmienia kształt warstwy w przezroczyste, zaokrąglone szkło: warstwy za nim załamują się najsilniej przy krawędzi, która jest jasna od strony światła i łagodniejsza po przeciwnej stronie. Matowienie rozmywa tło, a tęczowa krawędź rozdziela kolory na brzegu.",
+   "name": "Płynne szkło",
+   "params": {
+    "angle": {
+     "label": "Kąt światła"
+    },
+    "blur": {
+     "label": "Krawędź"
+    },
+    "color": {
+     "label": "Kolor"
+    },
+    "dispersion": {
+     "label": "Tęczowa krawędź"
+    },
+    "frost": {
+     "label": "Matowienie"
+    },
+    "highlight": {
+     "label": "Rozświetlenie"
+    },
+    "refraction": {
+     "label": "Załamanie"
+    },
+    "tint": {
+     "label": "Zabarwienie"
+    }
+   }
+  },
+  "longshadow": {
+   "description": "Rzuca długie, równoległe cienie od nieprzezroczystych części warstwy.",
+   "name": "Długi cień",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Kąt"
+    },
+    "color": {
+     "label": "Kolor"
+    },
+    "fade": {
+     "label": "Zanikanie"
+    },
+    "reach": {
+     "label": "Długość"
+    },
+    "solidity": {
+     "label": "Jednolitość"
+    }
+   }
+  },
+  "lumakey": {
+   "description": "Usuwa ciemne lub jasne części warstwy.",
+   "name": "Kluczowanie jasnością",
+   "params": {
+    "invert": {
+     "label": "Odwróć"
+    },
+    "softness": {
+     "label": "Miękkość"
+    },
+    "threshold": {
+     "label": "Próg"
+    }
+   }
+  },
+  "lumastamp": {
+   "description": "Zmienia warstwę w jednolity kolor o kryciu zależnym od jasności każdego piksela, jak stempel lub szablon.",
+   "name": "Stempel jasności",
+   "params": {
+    "color": {
+     "label": "Kolor"
+    },
+    "gamma": {
+     "label": "Gamma"
+    },
+    "high": {
+     "label": "Punkt bieli"
+    },
+    "invert": {
+     "label": "Odwróć"
+    },
+    "low": {
+     "label": "Punkt czerni"
+    }
+   }
+  },
+  "magnifybackground": {
+   "description": "Zmienia warstwę w lupę, która pokazuje warstwy za nią powiększone wokół jej środka.",
+   "name": "Powiększenie tła",
+   "params": {
+    "magnify": {
+     "label": "Powiększ warstwę"
+    },
+    "sampling": {
+     "label": "Próbkowanie",
+     "options": [
+      "Najbliższy",
+      "Liniowe"
+     ]
+    },
+    "scale": {
+     "label": "Skala"
+    }
+   }
+  },
+  "maskblur": {
+   "description": "Rozmywa warstwy za nią w obrębie jej kształtu; jaśniejsze części rozmywają mocniej, więc gradient tworzy efekt tilt-shift.",
+   "name": "Rozmycie maski",
+   "params": {
+    "invert": {
+     "label": "Odwróć"
+    },
+    "strength": {
+     "label": "Siła"
+    }
+   }
+  },
+  "mattechoker": {
+   "description": "Zmniejsza nieprzezroczyste części warstwy, zwężając ich krawędzie.",
+   "name": "Zacieśnianie maski",
+   "params": {
+    "amount": {
+     "label": "Zacieśnienie"
+    },
+    "blur": {
+     "label": "Rozmiar"
+    },
+    "invert": {
+     "label": "Odwróć"
+    },
+    "softness": {
+     "label": "Miękkość"
+    }
+   }
+  },
+  "mirror": {
+   "description": "Odbija połowę obrazu względem linii lustra określonej przez kąt i punkt środkowy.",
+   "name": "Odbicie lustrzane",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Kąt"
+    },
+    "center": {
+     "label": "Środek"
+    },
+    "style": {
+     "label": "Styl",
+     "options": [
+      "Złóż",
+      "Odwróć"
+     ]
+    }
+   }
+  },
+  "mosaic": {
+   "description": "Dzieli warstwę na kwadraty i wypełnia każdy ich średnim kolorem.",
+   "name": "Mozaika",
+   "params": {
+    "count": {
+     "label": "Liczba"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "stretch": {
+     "label": "Rozciągnięcie"
+    }
+   }
+  },
+  "motionblur": {
+   "description": "Rozmywa warstwę zgodnie z jej ruchem, obrotem i zmianą rozmiaru wynikającymi z klatek kluczowych i efektów ruchu, takich jak automatyczne drgania i oscylacja. Regulacja zmienia siłę rozmycia. Podgląd pokazuje szybsze rozmycie, chyba że włączono pełne rozmycie.",
+   "name": "Rozmycie ruchu",
+   "params": {
+    "position": {
+     "label": "Położenie"
+    },
+    "rotation": {
+     "label": "Kąt"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "tune": {
+     "label": "Regulacja"
+    }
+   }
+  },
+  "movealongpath": {
+   "description": "Umieszcza warstwę w wybranym miejscu na konturze warstwy bezpośrednio pod nią.",
+   "name": "Ruch wzdłuż ścieżki",
+   "params": {
+    "inset": {
+     "label": "Do wewnątrz/na zewnątrz"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "orientation": {
+     "label": "Orientacja"
+    },
+    "progress": {
+     "label": "Postęp"
+    },
+    "rotate": {
+     "label": "Obracaj automatycznie"
+    }
+   }
+  },
+  "noise": {
+   "description": "Pokrywa warstwę drobnym ziarnem, po jednym na piksel, zmieniającym się w każdej klatce. Tryb monochromatyczny zmienia ziarno na szare, skrajności na całkiem jasne lub ciemne, a zamrożenie unieruchamia wzór.",
+   "name": "Szum",
+   "params": {
+    "amount": {
+     "label": "Siła"
+    },
+    "extremes": {
+     "label": "Skrajności"
+    },
+    "freeze": {
+     "label": "Zamroź"
+    },
+    "mono": {
+     "label": "Monochromatyczny"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "overshoot": {
+     "label": "Przekroczenie"
+    }
+   }
+  },
+  "noisedisplace": {
+   "description": "Przemieszcza piksele za pomocą płynnego szumu wartości animowanego w czasie.",
+   "name": "Przemieszczenie szumem",
+   "params": {
+    "amount": {
+     "label": "Ilość"
+    },
+    "scale": {
+     "label": "Skala szumu"
+    },
+    "speed": {
+     "label": "Prędkość animacji"
+    }
+   }
+  },
+  "octahedron": {
+   "description": "Układa warstwę na ośmiu ścianach ośmiościanu.",
+   "name": "Ośmiościan",
+   "params": {
+    "light": {
+     "label": "Kąt światła"
+    },
+    "perspective": {
+     "label": "Perspektywa"
+    },
+    "position": {
+     "label": "Pozycja"
+    },
+    "radius": {
+     "label": "Promień"
+    },
+    "rotX": {
+     "label": "Obrót X"
+    },
+    "rotY": {
+     "label": "Obrót Y"
+    },
+    "rotZ": {
+     "label": "Obrót Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Cieniowanie"
+    },
+    "shine": {
+     "label": "Połysk"
+    }
+   }
+  },
+  "offset": {
+   "description": "Przesuwa obraz warstwy i zawija go na krawędziach ramki warstwy.",
+   "name": "Przesunięcie",
+   "params": {
+    "feather": {
+     "label": "Zmiękczenie"
+    },
+    "mask": {
+     "label": "Maskuj do warstwy"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    }
+   }
+  },
+  "ominodiffusion": {
+   "description": "Przerysowuje warstwę w małej palecie i przenosi błąd zaokrąglenia wzdłuż kierunku, dając glitchowy efekt rastra, który ożywa w ruchu.",
+   "name": "Omino Diffusion+",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Kąt"
+    },
+    "blend": {
+     "label": "Tryb mieszania",
+     "options": [
+      "Normalny",
+      "Mnożenie",
+      "Ekran"
+     ]
+    },
+    "color1": {
+     "label": "Kolor 1"
+    },
+    "color2": {
+     "label": "Kolor 2"
+    },
+    "color3": {
+     "label": "Kolor 3"
+    },
+    "color4": {
+     "label": "Kolor 4"
+    },
+    "color5": {
+     "label": "Kolor 5"
+    },
+    "color6": {
+     "label": "Kolor 6"
+    },
+    "falloff": {
+     "label": "Zanikanie wagi"
+    },
+    "palette": {
+     "label": "Paleta",
+     "options": [
+      "Czarno-biała",
+      "Posteryzacja RGB (2 poziomy)",
+      "Posteryzacja RGB (3 poziomy)",
+      "Posteryzacja RGB (4 poziomy)",
+      "Szara (3 poziomy)",
+      "Szara (4 poziomy)",
+      "CGA zielony/czerwony/żółty",
+      "CGA cyjan/magenta/biały",
+      "CGA niebieski/cyjan/magenta/biały",
+      "Nasycenie i posteryzacja",
+      "Własna, 2 kolory",
+      "Własna, 3 kolory",
+      "Własna, 4 kolory",
+      "Własna, 5 kolorów",
+      "Własna, 6 kolorów"
+     ]
+    },
+    "steps": {
+     "label": "Kroki"
+    },
+    "strength": {
+     "label": "Siła"
+    },
+    "weight": {
+     "label": "Waga błędu"
+    }
+   }
+  },
+  "ominoglass": {
+   "description": "Szkło tworzone z jasności warstwy: załamuje to, co jest za nią, z tęczowymi obwódkami i oświetla powierzchnię jak soczewkę.",
+   "name": "Omino Glass",
+   "params": {
+    "aberration": {
+     "label": "Aberracja chromatyczna"
+    },
+    "ambient": {
+     "label": "Światło otoczenia"
+    },
+    "amount": {
+     "label": "Chropowatość"
+    },
+    "blend": {
+     "label": "Mieszanie"
+    },
+    "blur": {
+     "label": "Fazowanie"
+    },
+    "color": {
+     "label": "Kolor"
+    },
+    "direction": {
+     "label": "Kierunek"
+    },
+    "elevation": {
+     "label": "Wysokość"
+    },
+    "evolution": {
+     "label": "Ewolucja"
+    },
+    "feature": {
+     "label": "Rozmiar detali"
+    },
+    "intensity": {
+     "label": "Intensywność"
+    },
+    "light": {
+     "label": "Kolor światła"
+    },
+    "refraction": {
+     "label": "Załamanie"
+    },
+    "samples": {
+     "label": "Próbki wygładzania"
+    },
+    "scale": {
+     "label": "Skala chropowatości"
+    },
+    "seed": {
+     "label": "Ziarno"
+    },
+    "shading": {
+     "label": "Cieniowanie",
+     "options": [
+      "Brak",
+      "Światło punktowe",
+      "Światło kierunkowe"
+     ]
+    },
+    "shine": {
+     "label": "Połysk"
+    },
+    "specularity": {
+     "label": "Odbłysk"
+    },
+    "useLuma": {
+     "label": "Użyj luminancji warstwy"
+    }
+   }
+  },
+  "oscillate": {
+   "description": "Porusza warstwą tam i z powrotem wzdłuż kąta, w głąb lub po orbicie.",
+   "name": "Oscylacja",
+   "params": {
+    "angle": {
+     "label": "Kąt"
+    },
+    "direction": {
+     "label": "Kierunek",
+     "options": [
+      "Kąt",
+      "Głębia",
+      "Orbita"
+     ]
+    },
+    "frequency": {
+     "label": "Częstotliwość"
+    },
+    "magnitude": {
+     "label": "Amplituda"
+    },
+    "phase": {
+     "label": "Faza"
+    },
+    "wave": {
+     "label": "Fala",
+     "options": [
+      "Sinusoida",
+      "Trójkątna"
+     ]
+    }
+   }
+  },
+  "palettemap": {
+   "description": "Przypisuje każdemu pikselowi najbliższy kolor z palety: do ośmiu wybranych kolorów lub paletę do 512 kolorów z presetu albo zaimportowanego pliku. Wzory rastra mieszają sąsiednie kolory palety, aby pokazać więcej odcieni. Alfa miesza zmapowane kolory z oryginalną warstwą.",
+   "name": "Mapa palety",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "color1": {
+     "label": "Kolor 1"
+    },
+    "color2": {
+     "label": "Kolor 2"
+    },
+    "color3": {
+     "label": "Kolor 3"
+    },
+    "color4": {
+     "label": "Kolor 4"
+    },
+    "color5": {
+     "label": "Kolor 5"
+    },
+    "color6": {
+     "label": "Kolor 6"
+    },
+    "color7": {
+     "label": "Kolor 7"
+    },
+    "color8": {
+     "label": "Kolor 8"
+    },
+    "colors": {
+     "label": "Kolory"
+    },
+    "dither": {
+     "label": "Raster"
+    },
+    "palette": {
+     "label": "Paleta"
+    },
+    "pattern": {
+     "label": "Wzór rastra",
+     "options": [
+      "Brak",
+      "Szum",
+      "Szachownica",
+      "Bayer 2x2",
+      "Bayer 3x3",
+      "Bayer 4x4",
+      "Bayer 8x8",
+      "Punkty skupione 4x4",
+      "Punkty skupione 8x8",
+      "Linie poziome",
+      "Linie pionowe",
+      "Linie ukośne",
+      "Floyd-Steinberg",
+      "Fałszywy Floyd-Steinberg",
+      "Sierra Lite",
+      "Fan",
+      "Shiau-Fan",
+      "Jarvis-Judice-Ninke",
+      "Stucki",
+      "Burkes",
+      "Sierra",
+      "Sierra dwurzędowa",
+      "Atkinson"
+     ]
+    },
+    "source": {
+     "label": "Źródło kolorów",
+     "options": [
+      "Kolory",
+      "Paleta"
+     ]
+    }
+   }
+  },
+  "parenthelper": {
+   "description": "Zmienia sposób, w jaki warstwa podrzędna podąża za nadrzędną: skala i obrót mogą podążać w pełni, zostać zablokowane lub podążać w ustalonym stopniu. Automatyczny obrót obraca warstwę podczas ruchu, jak toczące się koło.",
+   "name": "Pomocnik nadrzędności",
+   "params": {
+    "autoRotate": {
+     "label": "Automatyczny obrót",
+     "options": [
+      "Wył.",
+      "Oś X",
+      "Oś Y"
+     ]
+    },
+    "radiusAdjust": {
+     "label": "Korekta promienia"
+    },
+    "rotateMode": {
+     "label": "Obrót",
+     "options": [
+      "Normalny",
+      "Zablokowany",
+      "Ważony"
+     ]
+    },
+    "rotateWeight": {
+     "label": "Waga obrotu"
+    },
+    "scaleMode": {
+     "label": "Skala",
+     "options": [
+      "Normalna",
+      "Zablokowana",
+      "Ważona"
+     ]
+    },
+    "scaleWeight": {
+     "label": "Waga skali"
+    }
+   }
+  },
+  "particles": {
+   "description": "Wyrzuca z warstwy cząsteczki: śnieg, iskry, konfetti, bąbelki, kurz, serca, gwiazdy, płatki lub małe kopie samej warstwy, poruszane grawitacją, wiatrem i wirem. Zacznij od presetu, a potem zmień emiter, ilość i siły. Opcja Na uderzenia wyrzuca salwę na każde uderzenie rytmu: najpierw zaznacz muzykę, otwórz jej menu i dotknij Zaznacz uderzenia.",
+   "name": "Cząsteczki",
+   "params": {
+    "beats": {
+     "label": "Uderzenia",
+     "options": [
+      "Każde uderzenie",
+      "Co 2. uderzenie",
+      "Co 4. uderzenie"
+     ]
+    },
+    "blend": {
+     "label": "Mieszanie",
+     "options": [
+      "Normalne",
+      "Dodawanie",
+      "Ekran"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Kolor"
+    },
+    "color2": {
+     "label": "Kolor 2"
+    },
+    "colorMode": {
+     "label": "Tryb koloru",
+     "options": [
+      "Jeden kolor",
+      "Losowa mieszanka",
+      "W czasie życia"
+     ]
+    },
+    "colorVariation": {
+     "label": "Zmienność koloru"
+    },
+    "count": {
+     "label": "Liczba"
+    },
+    "depth": {
+     "label": "Głębia"
+    },
+    "direction": {
+     "label": "Kierunek"
+    },
+    "drag": {
+     "label": "Opór powietrza"
+    },
+    "emission": {
+     "label": "Emisja",
+     "options": [
+      "Ciągła",
+      "Salwa",
+      "Na uderzenia"
+     ]
+    },
+    "emitter": {
+     "label": "Emiter",
+     "options": [
+      "Punkt",
+      "Linia",
+      "Obszar",
+      "Kontur"
+     ]
+    },
+    "emitterSize": {
+     "label": "Rozmiar emitera"
+    },
+    "endSize": {
+     "label": "Rozmiar końcowy"
+    },
+    "every": {
+     "label": "Powtarzaj co"
+    },
+    "fadeIn": {
+     "label": "Pojawianie się"
+    },
+    "fadeOut": {
+     "label": "Znikanie"
+    },
+    "gravity": {
+     "label": "Grawitacja"
+    },
+    "kind": {
+     "label": "Cząsteczka",
+     "options": [
+      "Śnieg",
+      "Iskry",
+      "Konfetti",
+      "Bąbelki",
+      "Kurz",
+      "Serca",
+      "Gwiazdy",
+      "Płatki",
+      "Warstwa"
+     ]
+    },
+    "layer": {
+     "label": "Warstwa",
+     "options": [
+      "Pod cząsteczkami",
+      "Nad cząsteczkami",
+      "Ukryta"
+     ]
+    },
+    "lifeVariation": {
+     "label": "Zmienność czasu życia"
+    },
+    "lifetime": {
+     "label": "Czas życia"
+    },
+    "more": {
+     "label": "Więcej ustawień"
+    },
+    "orientation": {
+     "label": "Orientacja",
+     "options": [
+      "Swobodna",
+      "Zgodna z ruchem"
+     ]
+    },
+    "perspective": {
+     "label": "Perspektywa"
+    },
+    "position": {
+     "label": "Pozycja emitera"
+    },
+    "prewarm": {
+     "label": "Start z pełnią"
+    },
+    "randomRotation": {
+     "label": "Losowy obrót"
+    },
+    "rate": {
+     "label": "Tempo"
+    },
+    "seed": {
+     "label": "Ziarno"
+    },
+    "size": {
+     "label": "Rozmiar"
+    },
+    "sizeVariation": {
+     "label": "Zmienność rozmiaru"
+    },
+    "speed": {
+     "label": "Prędkość"
+    },
+    "speedVariation": {
+     "label": "Zmienność prędkości"
+    },
+    "spin": {
+     "label": "Wirowanie"
+    },
+    "spinVariation": {
+     "label": "Zmienność wirowania"
+    },
+    "spread": {
+     "label": "Rozrzut"
+    },
+    "start": {
+     "label": "Czas salwy"
+    },
+    "swirl": {
+     "label": "Wir"
+    },
+    "swirlSpeed": {
+     "label": "Prędkość wiru"
+    },
+    "tint": {
+     "label": "Odcień"
+    },
+    "twinkle": {
+     "label": "Migotanie"
+    },
+    "wind": {
+     "label": "Wiatr"
+    },
+    "zSpeed": {
+     "label": "Prędkość Z"
+    },
+    "zSpread": {
+     "label": "Rozrzut Z"
+    }
+   },
+   "presets": {
+    "beat-confetti": "Konfetti w rytmie",
+    "bubbles": "Bąbelki",
+    "confetti": "Konfetti",
+    "dust": "Kurz",
+    "hearts": "Serca",
+    "layer-fountain": "Fontanna warstw",
+    "petals": "Płatki",
+    "snow": "Śnieg",
+    "sparks": "Iskry",
+    "twinkle": "Migotanie"
+   }
+  },
+  "pixelate": {
+   "description": "Zamienia warstwę w bloki jednego koloru, pobranego ze środka bloku, na siatce wyśrodkowanej na warstwie (lub na kadrze z opcją Przestrzeń ekranu). Rozciągnięcie, Przesunięcie i Kąt kształtują siatkę, a Winieta przyciemnia każdy blok ku krawędziom.",
+   "name": "Pikselizacja",
+   "params": {
+    "angle": {
+     "label": "Kąt"
+    },
+    "blockSize": {
+     "label": "Rozmiar"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "screenSpace": {
+     "label": "Przestrzeń ekranu"
+    },
+    "stretch": {
+     "label": "Rozciągnięcie"
+    },
+    "vignette": {
+     "label": "Winieta"
+    }
+   }
+  },
+  "pixeltiles": {
+   "description": "Odbudowuje warstwę z siatki małych kafelków ze wzorem pikseli. Każdy kafelek wybiera, ile swojego wzoru narysować, na podstawie jasności pod nim, jak połączenie sztuki ASCII z mozaiką. Chaos rozbija siatkę losowymi kafelkami.",
+   "name": "Kafelki pikseli",
+   "params": {
+    "alpha": {
+     "label": "Mieszanie"
+    },
+    "background": {
+     "label": "Tło"
+    },
+    "brightness": {
+     "label": "Jasność"
+    },
+    "chaos": {
+     "label": "Chaos"
+    },
+    "chaosAmount": {
+     "label": "Ilość chaosu"
+    },
+    "chaosSpeed": {
+     "label": "Prędkość chaosu"
+    },
+    "contrast": {
+     "label": "Kontrast"
+    },
+    "detail": {
+     "label": "Szczegółowość"
+    },
+    "flip": {
+     "label": "Odwróć piksele"
+    },
+    "foreground": {
+     "label": "Pierwszy plan"
+    },
+    "levels": {
+     "label": "Odcienie"
+    },
+    "offset": {
+     "label": "Przesunięcie wzoru"
+    },
+    "original": {
+     "label": "Użyj oryginalnego koloru"
+    },
+    "pattern": {
+     "label": "Wzór",
+     "options": [
+      "Wysoka szczegółowość",
+      "Cyfry i litery",
+      "Linie poziome",
+      "Kropki",
+      "Linie pionowe",
+      "Grunge",
+      "Kółka",
+      "Pełny",
+      "Ukos w lewo",
+      "Ukos w prawo"
+     ]
+    },
+    "randomPattern": {
+     "label": "Losowe wzory"
+    },
+    "scramble": {
+     "label": "Pomieszaj kafelki"
+    },
+    "seed": {
+     "label": "Losowe ziarno"
+    },
+    "tile": {
+     "label": "Rozmiar kafelka"
+    },
+    "tone": {
+     "label": "Ton z",
+     "options": [
+      "Luminancja",
+      "Średnia",
+      "Czerwony",
+      "Zielony",
+      "Niebieski"
+     ]
+    },
+    "transparent": {
+     "label": "Przezroczyste tło"
+    }
+   }
+  },
+  "polar": {
+   "description": "Wygina warstwę wokół jej środka, zamieniając linie proste w okręgi, albo rozwija okręgi w linie proste.",
+   "name": "Współrzędne biegunowe",
+   "params": {
+    "amount": {
+     "label": "Interpolacja"
+    },
+    "direction": {
+     "label": "Typ",
+     "options": [
+      "Prostokątne na biegunowe",
+      "Biegunowe na prostokątne"
+     ]
+    }
+   }
+  },
+  "polardisplacement": {
+   "description": "Obraca i przyciąga warstwy pod tą warstwą wokół punktu środkowego według jej kolorów, a następnie ukrywa warstwę.",
+   "name": "Biegunowa mapa przesunięcia",
+   "params": {
+    "angle": {
+     "label": "Kąt"
+    },
+    "angleChannel": {
+     "label": "Kąt z",
+     "options": [
+      "R",
+      "G",
+      "B",
+      "Luminancja",
+      "Alfa"
+     ]
+    },
+    "center": {
+     "label": "Środek"
+    },
+    "distanceChannel": {
+     "label": "Odległość z",
+     "options": [
+      "R",
+      "G",
+      "B",
+      "Luminancja",
+      "Alfa"
+     ]
+    },
+    "edges": {
+     "label": "Krawędzie",
+     "options": [
+      "Powtórz",
+      "Odbij",
+      "Przezroczyste",
+      "Kafelki"
+     ]
+    },
+    "fromCenter": {
+     "label": "Od środka"
+    },
+    "invert": {
+     "label": "Odwróć"
+    },
+    "reach": {
+     "label": "Do środka/na zewnątrz"
+    }
+   }
+  },
+  "posterize": {
+   "description": "Dzieli każdy kanał koloru na pewną liczbę płaskich Kroków, więc gładkie gradienty zamieniają się w pasy. Przesunięcie zmienia położenie krawędzi pasów.",
+   "name": "Posteryzacja",
+   "params": {
+    "levels": {
+     "label": "Kroki"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    }
+   }
+  },
+  "pulseopacity": {
+   "description": "Raz po raz wygasza i rozjaśnia warstwę na fali sinusoidalnej lub trójkątnej.",
+   "name": "Pulsujące krycie",
+   "params": {
+    "frequency": {
+     "label": "Częstotliwość"
+    },
+    "phase": {
+     "label": "Faza początkowa"
+    },
+    "strength": {
+     "label": "Siła"
+    },
+    "wave": {
+     "label": "Fala",
+     "options": [
+      "Sinusoida",
+      "Trójkątna"
+     ]
+    }
+   }
+  },
+  "pulsesize": {
+   "description": "Raz po raz powiększa i zmniejsza warstwę na fali sinusoidalnej lub trójkątnej.",
+   "name": "Pulsujący rozmiar",
+   "params": {
+    "frequency": {
+     "label": "Częstotliwość"
+    },
+    "grow": {
+     "label": "Powiększanie"
+    },
+    "phase": {
+     "label": "Faza początkowa"
+    },
+    "shrink": {
+     "label": "Zmniejszanie"
+    },
+    "wave": {
+     "label": "Fala",
+     "options": [
+      "Sinusoida",
+      "Trójkątna"
+     ]
+    }
+   }
+  },
+  "puppet": {
+   "description": "Wygina warstwę jak marionetkę: umieść na niej pinezki, a potem przeciągaj lub animuj pinezki, a obraz podąży za nimi płynnie.",
+   "name": "Pinezki marionetki",
+   "params": {
+    "density": {
+     "label": "Gęstość trójkątów"
+    },
+    "expansion": {
+     "label": "Rozszerzenie siatki"
+    },
+    "falloff": {
+     "label": "Zanikanie"
+    },
+    "sway": {
+     "label": "Kołysanie"
+    },
+    "swayAmount": {
+     "label": "Ilość kołysania"
+    },
+    "swayAngle": {
+     "label": "Kąt kołysania"
+    },
+    "swayDirection": {
+     "label": "Kierunek kołysania",
+     "options": [
+      "Kąt",
+      "Losowy"
+     ]
+    },
+    "swayPins": {
+     "label": "Pinezki kołysania",
+     "options": [
+      "Wszystkie",
+      "Zaznaczone"
+     ]
+    },
+    "swaySeed": {
+     "label": "Ziarno kołysania"
+    },
+    "swaySpeed": {
+     "label": "Prędkość kołysania"
+    }
+   }
+  },
+  "pyramid": {
+   "description": "Układa warstwę na ścianach piramidy o kwadratowej podstawie.",
+   "name": "Piramida",
+   "params": {
+    "base": {
+     "label": "Podstawa"
+    },
+    "height": {
+     "label": "Wysokość"
+    },
+    "light": {
+     "label": "Kąt światła"
+    },
+    "perspective": {
+     "label": "Perspektywa"
+    },
+    "position": {
+     "label": "Pozycja"
+    },
+    "rotX": {
+     "label": "Obrót X"
+    },
+    "rotY": {
+     "label": "Obrót Y"
+    },
+    "rotZ": {
+     "label": "Obrót Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Cieniowanie"
+    },
+    "shine": {
+     "label": "Połysk"
+    }
+   }
+  },
+  "radialblur": {
+   "description": "Stosuje promieniste rozmycie zoomem, uśredniając próbki wzdłuż promieni od punktu środkowego, z regulowaną siłą.",
+   "name": "Rozmycie zoomem",
+   "params": {
+    "amount": {
+     "label": "Siła"
+    },
+    "center": {
+     "label": "Środek"
+    }
+   }
+  },
+  "radialrays": {
+   "description": "Maluje pełne promienie słoneczne wychodzące z punktu na nieprzezroczystych częściach warstwy.",
+   "name": "Promienie radialne",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Kąt"
+    },
+    "center": {
+     "label": "Środek"
+    },
+    "color": {
+     "label": "Kolor"
+    },
+    "count": {
+     "label": "Liczba"
+    },
+    "width": {
+     "label": "Szerokość"
+    }
+   }
+  },
+  "radialrepeat": {
+   "description": "Dynamicznie tworzy wiele kopii warstwy ułożonych w okrąg.",
+   "name": "Powielanie radialne",
+   "params": {
+    "angle": {
+     "label": "Kąt"
+    },
+    "copyDelay": {
+     "label": "Opóźnienie na kopię"
+    },
+    "count": {
+     "label": "Liczba"
+    },
+    "easing": {
+     "label": "Wygładzanie",
+     "options": [
+      "Liniowe",
+      "Wolny start",
+      "Wolny koniec",
+      "Początek i koniec"
+     ]
+    },
+    "fillAmount": {
+     "label": "Ilość wypełnienia"
+    },
+    "fillColor": {
+     "label": "Kolor wypełnienia"
+    },
+    "orientation": {
+     "label": "Orientacja"
+    },
+    "radius": {
+     "label": "Promień"
+    },
+    "randomOpacity": {
+     "label": "Losowe krycie"
+    },
+    "randomOrder": {
+     "label": "Losowa kolejność"
+    },
+    "randomPosition": {
+     "label": "Losowa pozycja"
+    },
+    "randomRotation": {
+     "label": "Losowy obrót"
+    },
+    "randomScale": {
+     "label": "Losowa skala"
+    },
+    "rangeEnd": {
+     "label": "Koniec zakresu"
+    },
+    "rangeOffset": {
+     "label": "Przesunięcie zakresu"
+    },
+    "rangeOpacity": {
+     "label": "Zakres krycia"
+    },
+    "rangePosition": {
+     "label": "Zakres pozycji"
+    },
+    "rangeRotation": {
+     "label": "Zakres obrotu"
+    },
+    "rangeScale": {
+     "label": "Zakres skali"
+    },
+    "rangeStart": {
+     "label": "Początek zakresu"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "seed": {
+     "label": "Ziarno"
+    },
+    "sweep": {
+     "label": "Rozpiętość"
+    }
+   }
+  },
+  "radialshadow": {
+   "description": "Rzuca długie cienie z nieprzezroczystych części warstwy, rozchodzące się od punktu światła.",
+   "name": "Cień radialny",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "color": {
+     "label": "Kolor"
+    },
+    "fade": {
+     "label": "Zanikanie"
+    },
+    "light": {
+     "label": "Światło"
+    },
+    "reach": {
+     "label": "Długość"
+    }
+   }
+  },
+  "radialwipe": {
+   "description": "Ukrywa wycinek warstwy omiatany wokół Środka od Kąta początkowego, jak wskazówka zegara. Postęp to omiatany kąt, Liczba powtarza wycinek wokół okręgu, a Oba omiata w obu kierunkach. Animuj Postęp, aby uzyskać przejście.",
+   "name": "Wycieraczka radialna",
+   "params": {
+    "center": {
+     "label": "Środek"
+    },
+    "count": {
+     "label": "Liczba"
+    },
+    "direction": {
+     "label": "Kierunek",
+     "options": [
+      "Zgodnie z zegarem",
+      "Przeciwnie do zegara",
+      "Oba"
+     ]
+    },
+    "feather": {
+     "label": "Zmiękczenie"
+    },
+    "progress": {
+     "label": "Postęp"
+    },
+    "start": {
+     "label": "Kąt początkowy"
+    }
+   }
+  },
+  "randomdisplace": {
+   "description": "Automatycznie porusza warstwą płynnie, ale losowo w czasie. Ziarno wybiera inny ruch, Prędkość ustala, jak szybko warstwa wędruje, a Ewolucja zmienia wzór.",
+   "name": "Losowe przesunięcie",
+   "params": {
+    "evolution": {
+     "label": "Ewolucja"
+    },
+    "magnitude": {
+     "label": "Amplituda"
+    },
+    "scatter": {
+     "label": "Rozrzut"
+    },
+    "seed": {
+     "label": "Ziarno"
+    },
+    "speed": {
+     "label": "Prędkość"
+    }
+   }
+  },
+  "randomjitter": {
+   "description": "Sprawia, że warstwa skacze losowo tam i z powrotem wzdłuż kąta.",
+   "name": "Losowe drżenie",
+   "params": {
+    "angle": {
+     "label": "Kąt"
+    },
+    "frequency": {
+     "label": "Częstotliwość"
+    },
+    "magnitude": {
+     "label": "Amplituda"
+    },
+    "seed": {
+     "label": "Ziarno"
+    },
+    "slack": {
+     "label": "Luz"
+    },
+    "zjitter": {
+     "label": "Drżenie Z"
+    }
+   }
+  },
+  "rasterextrude": {
+   "description": "Wypycha obraz warstwy w pełny blok; boki przyjmują kolor wnętrza.",
+   "name": "Wytłoczenie rastra",
+   "params": {
+    "depth": {
+     "label": "Głębia"
+    },
+    "interior": {
+     "label": "Kolor wnętrza"
+    },
+    "light": {
+     "label": "Kąt światła"
+    },
+    "perspective": {
+     "label": "Perspektywa"
+    },
+    "position": {
+     "label": "Pozycja"
+    },
+    "rotX": {
+     "label": "Obrót X"
+    },
+    "rotY": {
+     "label": "Obrót Y"
+    },
+    "rotZ": {
+     "label": "Obrót Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Cieniowanie"
+    },
+    "shine": {
+     "label": "Połysk"
+    }
+   }
+  },
+  "rastertransform": {
+   "description": "Skaluje, obraca i przesuwa gotowy obraz warstwy, po efektach nad nim, dzięki czemu ich wynik też można przekształcić. Wypełnienie zachowuje część oryginału pod spodem, a Maskuj do warstwy trzyma wynik wewnątrz oryginalnego kształtu.",
+   "name": "Przekształcenie rastra",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Kąt"
+    },
+    "fill": {
+     "label": "Wypełnienie"
+    },
+    "mask": {
+     "label": "Maskuj do warstwy"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "sampling": {
+     "label": "Próbkowanie",
+     "options": [
+      "Najbliższe",
+      "Liniowe"
+     ]
+    },
+    "scale": {
+     "label": "Skala"
+    }
+   }
+  },
+  "rays": {
+   "description": "Wysyła promienie światła z jasnych części warstwy, od punktu środkowego na zewnątrz.",
+   "name": "Promienie",
+   "params": {
+    "blend": {
+     "label": "Mieszanie"
+    },
+    "center": {
+     "label": "Środek"
+    },
+    "color": {
+     "label": "Kolor"
+    },
+    "intensity": {
+     "label": "Intensywność"
+    },
+    "reach": {
+     "label": "Długość"
+    },
+    "style": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
+    },
+    "threshold": {
+     "label": "Próg"
+    },
+    "thresholdAdd": {
+     "label": "Dodatek do progu"
+    }
+   }
+  },
+  "reorient360": {
+   "description": "Obraca warstwę panoramy 360° wewnątrz jej sfery, aby wyrównać horyzont lub zmienić miejsce przodu.",
+   "name": "Zmiana orientacji sfery 360°",
+   "params": {
+    "pitch": {
+     "label": "Pochylenie"
+    },
+    "roll": {
+     "label": "Przechył"
+    },
+    "yaw": {
+     "label": "Odchylenie"
+    }
+   }
+  },
+  "repeat": {
+   "description": "Dynamicznie tworzy wiele kopii warstwy.",
+   "name": "Powielanie",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Kąt"
+    },
+    "count": {
+     "label": "Liczba"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "time": {
+     "label": "Czas"
+    }
+   }
+  },
+  "repeatalongpath": {
+   "description": "Dynamicznie tworzy wiele kopii warstwy wzdłuż ścieżki konturu warstwy bezpośrednio pod spodem.",
+   "name": "Powielanie wzdłuż ścieżki",
+   "params": {
+    "copyDelay": {
+     "label": "Opóźnienie na kopię"
+    },
+    "count": {
+     "label": "Liczba"
+    },
+    "easing": {
+     "label": "Wygładzanie",
+     "options": [
+      "Liniowe",
+      "Wolny start",
+      "Wolny koniec",
+      "Początek i koniec"
+     ]
+    },
+    "end": {
+     "label": "Koniec"
+    },
+    "fillAmount": {
+     "label": "Ilość wypełnienia"
+    },
+    "fillColor": {
+     "label": "Kolor wypełnienia"
+    },
+    "phase": {
+     "label": "Faza"
+    },
+    "randomOpacity": {
+     "label": "Losowe krycie"
+    },
+    "randomOrder": {
+     "label": "Losowa kolejność"
+    },
+    "randomPosition": {
+     "label": "Losowa pozycja"
+    },
+    "randomRotation": {
+     "label": "Losowy obrót"
+    },
+    "randomScale": {
+     "label": "Losowa skala"
+    },
+    "rangeEnd": {
+     "label": "Koniec zakresu"
+    },
+    "rangeOffset": {
+     "label": "Przesunięcie zakresu"
+    },
+    "rangeOpacity": {
+     "label": "Zakres krycia"
+    },
+    "rangePosition": {
+     "label": "Zakres pozycji"
+    },
+    "rangeRotation": {
+     "label": "Zakres obrotu"
+    },
+    "rangeScale": {
+     "label": "Zakres skali"
+    },
+    "rangeStart": {
+     "label": "Początek zakresu"
+    },
+    "seed": {
+     "label": "Ziarno"
+    },
+    "start": {
+     "label": "Początek"
+    },
+    "tangent": {
+     "label": "Styczna"
+    }
+   }
+  },
+  "replacecolor": {
+   "description": "Zamienia jeden kolor na inny. Alfa określa siłę zamiany; Zablokuj luminancję zachowuje światło i cień oryginału.",
+   "name": "Zamiana koloru",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "choke": {
+     "label": "Zwężenie"
+    },
+    "feather": {
+     "label": "Zmiękczenie"
+    },
+    "lockLuminance": {
+     "label": "Zablokuj luminancję"
+    },
+    "source": {
+     "label": "Zamień kolor"
+    },
+    "target": {
+     "label": "Nowy kolor"
+    },
+    "threshold": {
+     "label": "Próg"
+    }
+   }
+  },
+  "retrodither": {
+   "description": "Zamienia warstwę w retro grafikę pikselową: każdy blok pikseli bierze kolor z palety, np. starej konsoli lub komputera albo zaimportowanej, a wzór rastra miesza kolory palety, aby udawać więcej odcieni.",
+   "name": "Retro raster",
+   "params": {
+    "alpha": {
+     "label": "Mieszanie"
+    },
+    "dither": {
+     "label": "Siła"
+    },
+    "palette": {
+     "label": "Paleta"
+    },
+    "pattern": {
+     "label": "Rastrowanie",
+     "options": [
+      "Brak",
+      "Szum",
+      "Szachownica",
+      "Bayer 2x2",
+      "Bayer 3x3",
+      "Bayer 4x4",
+      "Bayer 8x8",
+      "Punkty klastrowe 4x4",
+      "Punkty klastrowe 8x8",
+      "Linie poziome",
+      "Linie pionowe",
+      "Linie ukośne",
+      "Floyd-Steinberg",
+      "Fałszywy Floyd-Steinberg",
+      "Sierra Lite",
+      "Fan",
+      "Shiau-Fan",
+      "Jarvis-Judice-Ninke",
+      "Stucki",
+      "Burkes",
+      "Sierra",
+      "Sierra dwurzędowa",
+      "Atkinson"
+     ]
+    },
+    "pixel": {
+     "label": "Rozmiar piksela"
+    }
+   }
+  },
+  "rgbsplit": {
+   "description": "Rozdziela kanały czerwony, zielony i niebieski: kanał środkowy zostaje na miejscu, a pozostałe dwa przesuwają się w przeciwnych kierunkach wzdłuż kąta. Jasny dodaje przesunięte kolory, Ciemny zachowuje je pełne, Maska zostawia tylko miejsca, gdzie nakładają się wszystkie trzy, a Luma sprawia, że obwódki są tak kryjące, jak jasne.",
+   "name": "Rozdzielenie RGB",
+   "params": {
+    "angle": {
+     "label": "Kąt"
+    },
+    "center": {
+     "label": "Środek",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
+    },
+    "mode": {
+     "label": "Tryb",
+     "options": [
+      "Jasny",
+      "Ciemny",
+      "Maska",
+      "Luma"
+     ]
+    },
+    "strength": {
+     "label": "Siła"
+    }
+   }
+  },
+  "ribbon": {
+   "description": "Rysuje skręconą wstęgę o zmiennej szerokości na nieprzezroczystych częściach warstwy. Animuj fazę, aby wstęga płynęła, albo wytnij ją z warstwy.",
+   "name": "Wstęga",
+   "params": {
+    "angle": {
+     "label": "Kąt"
+    },
+    "color": {
+     "label": "Kolor"
+    },
+    "frequency": {
+     "label": "Częstotliwość"
+    },
+    "magnitude": {
+     "label": "Wielkość"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "phase": {
+     "label": "Faza"
+    },
+    "punch": {
+     "label": "Wytnij"
+    },
+    "smoothing": {
+     "label": "Wygładzanie"
+    },
+    "tint": {
+     "label": "Odcień"
+    },
+    "tintAmount": {
+     "label": "Intensywność odcienia"
+    },
+    "width": {
+     "label": "Szerokość"
+    }
+   }
+  },
+  "ripple": {
+   "description": "Koncentryczne fale rozchodzące się od punktu środkowego, z regulowaną amplitudą, długością fali i prędkością.",
+   "name": "Fale",
+   "params": {
+    "amplitude": {
+     "label": "Amplituda"
+    },
+    "center": {
+     "label": "Środek"
+    },
+    "speed": {
+     "label": "Prędkość"
+    },
+    "wavelength": {
+     "label": "Długość fali"
+    }
+   }
+  },
+  "roughenedges": {
+   "description": "Wygryza krawędzie nieprzezroczystych części szumem, dla efektu podartego, zużytego lub przypalonego konturu.",
+   "name": "Postrzępione krawędzie",
+   "params": {
+    "blur": {
+     "label": "Obramowanie"
+    },
+    "evolution": {
+     "label": "Ewolucja"
+    },
+    "octaves": {
+     "label": "Oktawy"
+    },
+    "roughness": {
+     "label": "Chropowatość"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "seed": {
+     "label": "Ziarno"
+    }
+   }
+  },
+  "scaleassist": {
+   "description": "Dodaje dodatkową skalę do własnego rozmiaru warstwy w osi X, Y, obu albo X z odwróconym Y. Warstwy podrzędne podążają za nowym rozmiarem.",
+   "name": "Asystent skali",
+   "params": {
+    "axis": {
+     "label": "Oś",
+     "options": [
+      "X",
+      "Y",
+      "X,Y",
+      "X,-Y"
+     ]
+    },
+    "damp": {
+     "label": "Tłumienie"
+    },
+    "scale": {
+     "label": "Skala"
+    }
+   }
+  },
+  "scanlines": {
+   "description": "Dodaje poziome linie skanowania jak w monitorze CRT, z opcjonalnym pionowym przewijaniem.",
+   "name": "Linie skanowania",
+   "params": {
+    "darkness": {
+     "label": "Ciemność"
+    },
+    "roll_speed": {
+     "label": "Prędkość przewijania"
+    },
+    "spacing": {
+     "label": "Odstęp linii"
+    }
+   }
+  },
+  "scatter3d": {
+   "description": "Zamienia warstwę w siatkę rozproszonych elementów 3D.",
+   "name": "Rozproszenie 3D",
+   "params": {
+    "axis": {
+     "label": "Oś skręcenia",
+     "options": [
+      "X",
+      "Y",
+      "Z"
+     ]
+    },
+    "depth": {
+     "label": "Głębokość siatki"
+    },
+    "depthSpacing": {
+     "label": "Odstęp głębokości"
+    },
+    "intensity": {
+     "label": "Natężenie światła"
+    },
+    "light": {
+     "label": "Kierunek światła"
+    },
+    "lightHeight": {
+     "label": "Wysokość światła"
+    },
+    "perspective": {
+     "label": "Perspektywa"
+    },
+    "rotX": {
+     "label": "Obrót X"
+    },
+    "rotY": {
+     "label": "Obrót Y"
+    },
+    "rotZ": {
+     "label": "Obrót Z"
+    },
+    "scatter": {
+     "label": "Rozproszenie"
+    },
+    "seed": {
+     "label": "Ziarno"
+    },
+    "shading": {
+     "label": "Cieniowanie"
+    },
+    "shape": {
+     "label": "Kształt",
+     "options": [
+      "Sześcian",
+      "Kula",
+      "Kwadrat",
+      "Koło"
+     ]
+    },
+    "size": {
+     "label": "Rozmiar elementu"
+    },
+    "spacing": {
+     "label": "Odstęp siatki"
+    },
+    "spin": {
+     "label": "Obrót rozproszenia"
+    },
+    "twist": {
+     "label": "Kąt skręcenia"
+    }
+   }
+  },
+  "scatterfield": {
+   "description": "Rozprasza kopie warstwy w nieskończonym polu 3D, ukrywając oryginalną warstwę, i pozwala symulować ruch w polu w trzech wymiarach za pomocą animacji klatek kluczowych.",
+   "name": "Pole rozproszenia",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "amount": {
+     "label": "Ilość"
+    },
+    "angle": {
+     "label": "Kąt"
+    },
+    "angleVariance": {
+     "label": "Zmienność kąta"
+    },
+    "blending": {
+     "label": "Tryb mieszania",
+     "options": [
+      "Normalny",
+      "Dodawanie",
+      "Ekran",
+      "Mnożenie",
+      "Rozjaśnianie",
+      "Ściemnianie",
+      "Nakładka",
+      "Różnica"
+     ]
+    },
+    "color1": {
+     "label": "Kolor 1"
+    },
+    "color2": {
+     "label": "Kolor 2"
+    },
+    "color3": {
+     "label": "Kolor 3"
+    },
+    "coloring": {
+     "label": "Kolorowanie",
+     "options": [
+      "Brak",
+      "Losowe",
+      "Głębokość"
+     ]
+    },
+    "density": {
+     "label": "Gęstość"
+    },
+    "evolution": {
+     "label": "Ewolucja"
+    },
+    "fade": {
+     "label": "Zanikanie"
+    },
+    "interpolateHue": {
+     "label": "Interpoluj odcień"
+    },
+    "lockLuminance": {
+     "label": "Zablokuj luminancję"
+    },
+    "lockSaturation": {
+     "label": "Zablokuj nasycenie"
+    },
+    "position": {
+     "label": "Pozycja"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "seed": {
+     "label": "Ziarno"
+    },
+    "size": {
+     "label": "Rozmiar"
+    },
+    "sizeVariance": {
+     "label": "Zmienność rozmiaru"
+    },
+    "slack": {
+     "label": "Luz"
+    },
+    "z": {
+     "label": "Pozycja Z"
+    }
+   }
+  },
+  "sepia": {
+   "description": "Ciepłe brązowe tony, jak na starej fotografii.",
+   "name": "Sepia",
+   "params": {
+    "amount": {
+     "label": "Ilość"
+    }
+   }
+  },
+  "sharpen": {
+   "description": "Stosuje maskę wyostrzającą na sąsiedztwie 3x3, aby uwydatnić drobne szczegóły.",
+   "name": "Wyostrzenie",
+   "params": {
+    "amount": {
+     "label": "Siła"
+    },
+    "radius": {
+     "label": "Promień"
+    }
+   }
+  },
+  "shutterblur": {
+   "description": "Rozmywa warstwę wzdłuż toru, którym naprawdę się porusza, obraca i rośnie, jak migawka aparatu. Szerszy kąt migawki daje dłuższe smugi, a więcej próbek daje gładsze. Podgląd pokazuje szybsze rozmycie, chyba że włączono Pełne rozmycie.",
+   "name": "Prawdziwe rozmycie ruchu",
+   "params": {
+    "samples": {
+     "label": "Próbki"
+    },
+    "shutter": {
+     "label": "Kąt migawki"
+    }
+   }
+  },
+  "simplestarfield": {
+   "description": "Rozprasza małe gwiazdy w warstwach głębi na nieprzezroczystych częściach warstwy. Pozycja przesuwa pole z paralaksą, Głębokość przelatuje przez nie, Skala je przybliża, Rozmiar i Rozmycie kształtują każdą gwiazdę, a Ilość ustala ich liczbę.",
+   "name": "Proste pole gwiazd",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "amount": {
+     "label": "Ilość"
+    },
+    "blend": {
+     "label": "Tryb mieszania",
+     "options": [
+      "Normalny",
+      "Dodawanie",
+      "Ekran",
+      "Mnożenie"
+     ]
+    },
+    "brightness": {
+     "label": "Jasność"
+    },
+    "color": {
+     "label": "Kolor"
+    },
+    "depth": {
+     "label": "Głębokość"
+    },
+    "feather": {
+     "label": "Rozmycie krawędzi"
+    },
+    "position": {
+     "label": "Pozycja"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "starSize": {
+     "label": "Rozmiar"
+    }
+   }
+  },
+  "smear": {
+   "description": "Rozmazuje warstwę w jednym kierunku na stałą długość, jakby poruszała się szybko.",
+   "name": "Smuga",
+   "params": {
+    "angle": {
+     "label": "Kierunek"
+    },
+    "length": {
+     "label": "Długość"
+    }
+   }
+  },
+  "smoothbevel": {
+   "description": "Nadaje nieprzezroczystym częściom warstwy gładkie, zaokrąglone fazowanie oświetlone z jednej strony.",
+   "name": "Gładkie fazowanie",
+   "params": {
+    "angle": {
+     "label": "Kąt światła"
+    },
+    "blur": {
+     "label": "Rozmiar"
+    },
+    "depth": {
+     "label": "Głębokość"
+    },
+    "highlight": {
+     "label": "Światło"
+    },
+    "intensity": {
+     "label": "Intensywność"
+    },
+    "shadow": {
+     "label": "Cień"
+    }
+   }
+  },
+  "smoothedges": {
+   "description": "Zaokrągla i wygładza krawędzie nieprzezroczystych części warstwy bez zmiany kolorów wewnątrz. Maska do warstwy pozwala krawędziom przesuwać się tylko do środka.",
+   "name": "Wygładzenie krawędzi",
+   "params": {
+    "blur": {
+     "label": "Siła"
+    },
+    "mask": {
+     "label": "Maska do warstwy"
+    }
+   }
+  },
+  "softglow": {
+   "description": "Nakłada na obraz ekranem miękką, rozmytą kopię, dając marzycielską poświatę, głównie z jasnych partii.",
+   "name": "Miękka poświata",
+   "params": {
+    "blend": {
+     "label": "Mieszanie"
+    },
+    "blur": {
+     "label": "Rozmiar"
+    },
+    "brightness": {
+     "label": "Jasność"
+    },
+    "color": {
+     "label": "Kolor"
+    },
+    "contrast": {
+     "label": "Kontrast"
+    },
+    "highlights": {
+     "label": "Światła"
+    },
+    "opacity": {
+     "label": "Krycie"
+    },
+    "outside": {
+     "label": "Poświata zewnętrzna"
+    }
+   }
+  },
+  "solid": {
+   "description": "Nakłada jeden kolor na warstwę, zachowując jej kształt, z wyborem trybów mieszania.",
+   "name": "Pełny kolor",
+   "params": {
+    "amount": {
+     "label": "Alfa"
+    },
+    "blend": {
+     "label": "Tryb mieszania",
+     "options": [
+      "Normalny",
+      "Mnożenie",
+      "Ekran",
+      "Nakładka",
+      "Światło miękkie",
+      "Światło ostre",
+      "Dodawanie",
+      "Ściemnianie",
+      "Rozjaśnianie",
+      "Różnica",
+      "Rozjaśnianie koloru",
+      "Wypalanie koloru"
+     ]
+    },
+    "color": {
+     "label": "Kolor"
+    }
+   }
+  },
+  "solidmatte": {
+   "description": "Umieszcza jednolity kolor za warstwą, wypełniając jej przezroczyste części. Wytnij pokazuje tylko kolor z wyciętym kształtem warstwy, a Przestrzeń ekranu wypełnia cały ekran zamiast ramki warstwy.",
+   "name": "Pełna maska tła",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "color": {
+     "label": "Kolor"
+    },
+    "punch": {
+     "label": "Wytnij"
+    },
+    "screenSpace": {
+     "label": "Przestrzeń ekranu"
+    }
+   }
+  },
+  "spherize": {
+   "description": "Nakłada warstwę na kulę za pomocą rzutu z przodu lub tekstury równokątnej.",
+   "name": "Sferyzacja",
+   "params": {
+    "coverage": {
+     "label": "Pokrycie"
+    },
+    "light": {
+     "label": "Kąt światła"
+    },
+    "perspective": {
+     "label": "Perspektywa"
+    },
+    "position": {
+     "label": "Pozycja"
+    },
+    "projection": {
+     "label": "Rzut",
+     "options": [
+      "Z przodu",
+      "Równokątny"
+     ]
+    },
+    "radius": {
+     "label": "Promień"
+    },
+    "rotX": {
+     "label": "Obrót X"
+    },
+    "rotY": {
+     "label": "Obrót Y"
+    },
+    "rotZ": {
+     "label": "Obrót Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Cieniowanie"
+    },
+    "shine": {
+     "label": "Połysk"
+    }
+   }
+  },
+  "spillclean": {
+   "description": "Usuwa zielony lub niebieski odblask, jaki usunięte tło zostawia przy krawędziach warstwy, zachowując jasność pikseli.",
+   "name": "Usuwanie przebarwień",
+   "params": {
+    "blur": {
+     "label": "Szerokość krawędzi"
+    },
+    "channel": {
+     "label": "Kolor przebarwienia",
+     "options": [
+      "Auto",
+      "Zielony",
+      "Niebieski"
+     ]
+    },
+    "strength": {
+     "label": "Siła"
+    }
+   }
+  },
+  "spin": {
+   "description": "Obraca warstwę w kółko ze stałą prędkością; poniżej zera obraca ją w drugą stronę.",
+   "name": "Obrót ciągły",
+   "params": {
+    "rpm": {
+     "label": "Obr./min"
+    }
+   }
+  },
+  "spinblur": {
+   "description": "Rozmywa warstwę w kołach wokół punktu, jakby się obracała.",
+   "name": "Rozmycie obrotowe",
+   "params": {
+    "center": {
+     "label": "Środek"
+    },
+    "sweep": {
+     "label": "Kąt"
+    }
+   }
+  },
+  "spinstreaks": {
+   "description": "Tworzy łukowate smugi, obracając kopie warstwy wokół punktu i mieszając je tam, gdzie się nakładają. R, G, B i A wybierają dla każdego kanału, czy kopie zachowują wartość najniższą, najwyższą lub średnią, czy kanał jest pomijany.",
+   "name": "Smugi obrotowe",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Min",
+      "Maks",
+      "Śr.",
+      "Wył."
+     ]
+    },
+    "alpha": {
+     "label": "Alfa"
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "Min",
+      "Maks",
+      "Śr.",
+      "Wył."
+     ]
+    },
+    "bias": {
+     "label": "Przesunięcie"
+    },
+    "center": {
+     "label": "Środek"
+    },
+    "g": {
+     "label": "G",
+     "options": [
+      "Min",
+      "Maks",
+      "Śr.",
+      "Wył."
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "Min",
+      "Maks",
+      "Śr.",
+      "Wył."
+     ]
+    },
+    "sweep": {
+     "label": "Rozpiętość"
+    }
+   }
+  },
+  "splittone": {
+   "description": "Barwi cienie w jednym odcieniu, a światła w innym, zachowując czerń, biel i jasność. Poziom cieni zagina krzywą jasności, a Poziom świateł przesuwa miejsce, gdzie zaczyna się kolor świateł. Styl Mapa gradientu nadaje każdemu pikselowi kolor wyłącznie na podstawie jego jasności.",
+   "name": "Tonowanie podzielone",
+   "params": {
+    "highlightAmount": {
+     "label": "Intensywność świateł"
+    },
+    "highlightHue": {
+     "label": "Odcień świateł"
+    },
+    "highlightLevel": {
+     "label": "Poziom świateł"
+    },
+    "shadowAmount": {
+     "label": "Intensywność cieni"
+    },
+    "shadowHue": {
+     "label": "Odcień cieni"
+    },
+    "shadowLevel": {
+     "label": "Poziom cieni"
+    },
+    "style": {
+     "label": "Styl",
+     "options": [
+      "Odcień",
+      "Mapa gradientu"
+     ]
+    }
+   }
+  },
+  "spotcolor": {
+   "description": "Zachowuje jeden kolor i odbiera nasycenie wszystkim pozostałym kolorom w warstwie.",
+   "name": "Kolor punktowy",
+   "params": {
+    "choke": {
+     "label": "Zwężenie"
+    },
+    "color": {
+     "label": "Kolor"
+    },
+    "feather": {
+     "label": "Rozmycie krawędzi"
+    },
+    "saturation": {
+     "label": "Nasycenie"
+    },
+    "threshold": {
+     "label": "Próg"
+    }
+   }
+  },
+  "squeeze": {
+   "description": "Ściska środek warstwy do wewnątrz przy dodatniej sile i wybrzusza go na zewnątrz przy ujemnej. Starszy zachowuje kształt ze starszych projektów.",
+   "name": "Ściśnięcie",
+   "params": {
+    "amount": {
+     "label": "Siła"
+    },
+    "shape": {
+     "label": "Kształt",
+     "options": [
+      "Ściśnięcie/wybrzuszenie",
+      "Starszy"
+     ]
+    }
+   }
+  },
+  "star": {
+   "description": "Rysuje na warstwie jedną świecącą gwiazdę.",
+   "name": "Gwiazda",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blend": {
+     "label": "Tryb mieszania",
+     "options": [
+      "Normalny",
+      "Mnożenie",
+      "Ekran",
+      "Nakładka",
+      "Światło miękkie",
+      "Światło ostre",
+      "Dodawanie",
+      "Ściemnianie",
+      "Rozjaśnianie",
+      "Różnica",
+      "Rozjaśnianie koloru",
+      "Wypalanie koloru"
+     ]
+    },
+    "brightness": {
+     "label": "Jasność"
+    },
+    "color": {
+     "label": "Kolor"
+    },
+    "points": {
+     "label": "Ramiona"
+    },
+    "position": {
+     "label": "Pozycja"
+    },
+    "radius": {
+     "label": "Promień"
+    },
+    "shine": {
+     "label": "Blask"
+    }
+   }
+  },
+  "starfield": {
+   "description": "Wypełnia nieprzezroczyste części warstwy głębokim polem gwiazd. Przesunięcie porusza się po polu, a pobliskie gwiazdy przesuwają się dalej niż odległe.",
+   "name": "Pole gwiazd",
+   "params": {
+    "brightness": {
+     "label": "Jasność"
+    },
+    "darkMatter": {
+     "label": "Ciemna materia"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "scale": {
+     "label": "Skala"
+    }
+   }
+  },
+  "starpolyhedron": {
+   "description": "Umieszcza warstwę na gwieździe zbudowanej z dwóch skrzyżowanych piramid.",
+   "name": "Gwiazda wielościenna",
+   "params": {
+    "light": {
+     "label": "Kąt światła"
+    },
+    "perspective": {
+     "label": "Perspektywa"
+    },
+    "position": {
+     "label": "Pozycja"
+    },
+    "radius": {
+     "label": "Promień"
+    },
+    "rotX": {
+     "label": "Obrót X"
+    },
+    "rotY": {
+     "label": "Obrót Y"
+    },
+    "rotZ": {
+     "label": "Obrót Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Cieniowanie"
+    },
+    "shine": {
+     "label": "Połysk"
+    }
+   }
+  },
+  "starprism": {
+   "description": "Wycina z warstwy gwiazdę i nadaje jej głębię.",
+   "name": "Pryzmat gwiazdy",
+   "params": {
+    "depth": {
+     "label": "Głębokość"
+    },
+    "inner": {
+     "label": "Promień wewnętrzny"
+    },
+    "light": {
+     "label": "Kąt światła"
+    },
+    "perspective": {
+     "label": "Perspektywa"
+    },
+    "points": {
+     "label": "Ramiona"
+    },
+    "position": {
+     "label": "Pozycja"
+    },
+    "radius": {
+     "label": "Promień"
+    },
+    "rotX": {
+     "label": "Obrót X"
+    },
+    "rotY": {
+     "label": "Obrót Y"
+    },
+    "rotZ": {
+     "label": "Obrót Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Cieniowanie"
+    },
+    "shine": {
+     "label": "Połysk"
+    },
+    "smoothing": {
+     "label": "Wygładzanie"
+    }
+   }
+  },
+  "static": {
+   "description": "Migotliwy szary szum, jak w telewizorze bez sygnału.",
+   "name": "Zakłócenia",
+   "params": {
+    "amount": {
+     "label": "Ilość"
+    },
+    "grain": {
+     "label": "Rozmiar"
+    }
+   }
+  },
+  "stretch": {
+   "description": "Przecina warstwę wzdłuż linii i rozsuwa obie połowy, rozciągając piksele z linii w powstałą szczelinę.",
+   "name": "Rozciągnięcie segmentu",
+   "params": {
+    "angle": {
+     "label": "Kąt"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "relative": {
+     "label": "Mierz w rozmiarze warstwy"
+    },
+    "spread": {
+     "label": "Rozpiętość"
+    },
+    "stretch": {
+     "label": "Rozciągnięcie"
+    }
+   }
+  },
+  "stretchaxis": {
+   "description": "Rozciąga warstwę w dowolnym kierunku.",
+   "name": "Rozciągnięcie osi",
+   "params": {
+    "angle": {
+     "label": "Kąt"
+    },
+    "mask": {
+     "label": "Maska do warstwy"
+    },
+    "scale": {
+     "label": "Skala"
+    }
+   }
+  },
+  "stripes": {
+   "description": "Rysuje wzór pasków na nieprzezroczystych częściach warstwy albo wycina je z niej.",
+   "name": "Paski",
+   "params": {
+    "angle": {
+     "label": "Kąt"
+    },
+    "color": {
+     "label": "Kolor"
+    },
+    "count": {
+     "label": "Liczba"
+    },
+    "phase": {
+     "label": "Faza"
+    },
+    "punch": {
+     "label": "Wytnij"
+    },
+    "screenSpace": {
+     "label": "Przestrzeń ekranu"
+    },
+    "smoothing": {
+     "label": "Wygładzanie"
+    },
+    "width": {
+     "label": "Szerokość"
+    }
+   }
+  },
+  "stroketaper": {
+   "description": "Zwęża obrysy do punktu: pociągnięcia pióra i pędzla w rysunku odręcznym oraz obrys linii i kształtów (Ramka i cień > Obrys). Od zera do początku oraz od końca do zera. Ściśnięcie wyostrza zwężenie.",
+   "name": "Zwężenie obrysu",
+   "params": {
+    "end": {
+     "label": "Koniec"
+    },
+    "squeeze": {
+     "label": "Ściśnięcie"
+    },
+    "start": {
+     "label": "Początek"
+    }
+   }
+  },
+  "swing": {
+   "description": "Obraca warstwę tam i z powrotem między dwoma kątami.",
+   "name": "Wahadło",
+   "params": {
+    "angle1": {
+     "label": "Kąt 1"
+    },
+    "angle2": {
+     "label": "Kąt 2"
+    },
+    "frequency": {
+     "label": "Częstotliwość"
+    },
+    "phase": {
+     "label": "Faza"
+    },
+    "wave": {
+     "label": "Fala",
+     "options": [
+      "Sinusoida",
+      "Trójkątna"
+     ]
+    }
+   }
+  },
+  "temperature": {
+   "description": "Ociepla lub ochładza obraz jak światło o danej temperaturze barwowej w kelwinach; 6500 K nie zmienia go.",
+   "name": "Temperatura barwowa",
+   "params": {
+    "kelvin": {
+     "label": "Temperatura"
+    },
+    "strength": {
+     "label": "Siła"
+    }
+   }
+  },
+  "textblips": {
+   "description": "Wypisuje tekst litera po literze z krótkim dźwiękiem przy każdej literze, jak postać mówiąca w grze. Wybierz głos, a potem ustaw jego wysokość, szybkość pisania liter i długość pauzy po znakach interpunkcyjnych. Spacje i interpunkcja pozostają ciche.",
+   "name": "Dźwięki tekstu",
+   "params": {
+    "delay": {
+     "label": "Opóźnienie"
+    },
+    "every": {
+     "label": "Dźwięk co"
+    },
+    "pause": {
+     "label": "Pauza przy interpunkcji"
+    },
+    "pitch": {
+     "label": "Wysokość dźwięku"
+    },
+    "reveal": {
+     "label": "Pisanie"
+    },
+    "seed": {
+     "label": "Ziarno"
+    },
+    "speed": {
+     "label": "Prędkość"
+    },
+    "variation": {
+     "label": "Zmienność wysokości"
+    },
+    "voice": {
+     "label": "Głos",
+     "options": [
+      "Klasyczny",
+      "Łagodny",
+      "Niski",
+      "Wysoki",
+      "Robot",
+      "Piszczący",
+      "Maszyna do pisania",
+      "Chiptune"
+     ]
+    },
+    "volume": {
+     "label": "Głośność"
+    }
+   },
+   "presets": {
+    "fast-talker": "Szybki mówca",
+    "hero": "Bohater",
+    "monster": "Potwór",
+    "robot": "Robot",
+    "typewriter": "Maszyna do pisania"
+   }
+  },
+  "textpath": {
+   "description": "Układa tekst wzdłuż łuku, okręgu lub konturu warstwy tuż pod nim, litera po literze, z zachowaniem kształtowania, czcionek i emoji tekstu.",
+   "name": "Tekst wzdłuż ścieżki",
+   "params": {
+    "align": {
+     "label": "Wyrównanie",
+     "options": [
+      "Do lewej",
+      "Do środka",
+      "Do prawej"
+     ]
+    },
+    "baseline": {
+     "label": "Przesunięcie linii bazowej"
+    },
+    "center": {
+     "label": "Środek"
+    },
+    "control1": {
+     "label": "Punkt kontrolny 1"
+    },
+    "control2": {
+     "label": "Punkt kontrolny 2"
+    },
+    "end": {
+     "label": "Koniec"
+    },
+    "position": {
+     "label": "Pozycja"
+    },
+    "radius": {
+     "label": "Promień"
+    },
+    "reverse": {
+     "label": "Odwróć ścieżkę"
+    },
+    "rotate": {
+     "label": "Obracaj litery"
+    },
+    "shape": {
+     "label": "Ścieżka",
+     "options": [
+      "Łuk",
+      "Okrąg",
+      "Warstwa poniżej"
+     ]
+    },
+    "start": {
+     "label": "Początek"
+    }
+   }
+  },
+  "textprogress": {
+   "description": "Pokazuje tekst między początkiem a końcem, po znakach, słowach lub wierszach, z opcjonalnym zanikaniem, przesuwaniem, skalowaniem lub rozmyciem.",
+   "name": "Postęp tekstu",
+   "params": {
+    "appearance": {
+     "label": "Pojawianie się",
+     "options": [
+      "Wyskok",
+      "Zanikanie",
+      "Wsuń od dołu",
+      "Wsuń od góry",
+      "Wsuń od prawej",
+      "Wsuń od lewej",
+      "Powiększanie",
+      "Zmniejszanie",
+      "Rozmycie"
+     ]
+    },
+    "direction": {
+     "label": "Kierunek",
+     "options": [
+      "Od początku",
+      "Od końca",
+      "Od środka",
+      "Losowo"
+     ]
+    },
+    "distance": {
+     "label": "Odległość"
+    },
+    "progress": {
+     "label": "Koniec"
+    },
+    "seed": {
+     "label": "Ziarno"
+    },
+    "softness": {
+     "label": "Miękkość"
+    },
+    "start": {
+     "label": "Początek"
+    },
+    "unit": {
+     "label": "Według",
+     "options": [
+      "Znak",
+      "Słowo",
+      "Wiersz"
+     ]
+    }
+   },
+   "presets": {
+    "fade-in-by-word": "Pojawianie słowami",
+    "pop-in": "Wyskok",
+    "slide-up-by-letter": "Wsuwanie literami od dołu",
+    "typewriter": "Maszyna do pisania"
+   }
+  },
+  "textrandomizer": {
+   "description": "Losowo zastępuje daną ilość znaków między początkiem a końcem. Animuj ewolucję lub zwiększ prędkość, aby zmieniać zamienniki; Odsłonięcie przywraca je do oryginalnego tekstu.",
+   "name": "Randomizer tekstu",
+   "params": {
+    "amount": {
+     "label": "Ilość"
+    },
+    "characters": {
+     "label": "Własne"
+    },
+    "charset": {
+     "label": "Znaki",
+     "options": [
+      "Litery",
+      "Wielkie litery",
+      "Małe litery",
+      "Cyfry",
+      "Litery i cyfry",
+      "Symbole",
+      "Własne"
+     ]
+    },
+    "direction": {
+     "label": "Kierunek",
+     "options": [
+      "Od początku",
+      "Od końca",
+      "Od środka",
+      "Losowo"
+     ]
+    },
+    "end": {
+     "label": "Koniec"
+    },
+    "evolution": {
+     "label": "Ewolucja"
+    },
+    "keepSpaces": {
+     "label": "Zachowaj spacje"
+    },
+    "progress": {
+     "label": "Odsłonięcie"
+    },
+    "seed": {
+     "label": "Ziarno"
+    },
+    "speed": {
+     "label": "Prędkość"
+    },
+    "start": {
+     "label": "Początek"
+    }
+   },
+   "presets": {
+    "scramble": "Pomieszanie"
+   }
+  },
+  "textshake": {
+   "description": "Trzęsie każdą literą osobno, jak nerwowy dialog w grze. Drżenie dryfuje między punktami, Drgania skaczą do nowego punktu w każdym kroku, Fala buja litery w górę i w dół, Okrąg porusza je w małych pętlach, a Chybotanie przechyla je tam i z powrotem. Zmniejsz Drżące litery, aby trzęsły się tylko niektóre litery, losowane na nowo co kilka chwil.",
+   "name": "Drżenie tekstu",
+   "params": {
+    "amount": {
+     "label": "Ilość"
+    },
+    "cycles": {
+     "label": "Prędkość"
+    },
+    "end": {
+     "label": "Koniec"
+    },
+    "every": {
+     "label": "Nowe litery co"
+    },
+    "letters": {
+     "label": "Drżące litery"
+    },
+    "rotation": {
+     "label": "Obrót"
+    },
+    "seed": {
+     "label": "Ziarno"
+    },
+    "speed": {
+     "label": "Prędkość"
+    },
+    "spread": {
+     "label": "Rozpiętość"
+    },
+    "start": {
+     "label": "Początek"
+    },
+    "style": {
+     "label": "Styl",
+     "options": [
+      "Drżenie",
+      "Drgania",
+      "Fala",
+      "Okrąg",
+      "Chybotanie"
+     ]
+    },
+    "tilt": {
+     "label": "Przechył"
+    },
+    "unit": {
+     "label": "Według",
+     "options": [
+      "Znak",
+      "Słowo",
+      "Wiersz"
+     ]
+    }
+   },
+   "presets": {
+    "dizzy": "Oszołomiony",
+    "floaty": "Unoszący się",
+    "nervous": "Nerwowy",
+    "scared": "Przestraszony",
+    "uneasy": "Niespokojny",
+    "wavy": "Falisty",
+    "wobbly": "Chwiejny"
+   }
+  },
+  "texttransform": {
+   "description": "Przesuwa, skaluje, obraca, zanika i barwi litery, słowa lub wiersze w zakresie. Kotwica określa, czy skalowanie i obrót dotyczą każdego składnika, czy środka warstwy. Przesuwaj zakres za pomocą Przesunięcia, aby zmiana przebiegała przez tekst.",
+   "name": "Przekształcenie tekstu",
+   "params": {
+    "anchor": {
+     "label": "Kotwica",
+     "options": [
+      "Składnik",
+      "Warstwa"
+     ]
+    },
+    "end": {
+     "label": "Koniec"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "opacity": {
+     "label": "Krycie"
+    },
+    "position": {
+     "label": "Pozycja"
+    },
+    "randomOrder": {
+     "label": "Losowa kolejność"
+    },
+    "rotation": {
+     "label": "Obrót"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "seed": {
+     "label": "Ziarno"
+    },
+    "shape": {
+     "label": "Kształt",
+     "options": [
+      "Prostokątny",
+      "Narastający",
+      "Opadający",
+      "Trójkątny",
+      "Zaokrąglony",
+      "Gładki"
+     ]
+    },
+    "smoothness": {
+     "label": "Gładkość"
+    },
+    "start": {
+     "label": "Początek"
+    },
+    "tint": {
+     "label": "Odcień"
+    },
+    "unit": {
+     "label": "Według",
+     "options": [
+      "Znak",
+      "Słowo",
+      "Wiersz"
+     ]
+    }
+   },
+   "presets": {
+    "spin-cascade": "Kaskada obrotów",
+    "wave": "Fala"
+   }
+  },
+  "threshold": {
+   "description": "Czysta czerń i biel, rozdzielone na danej jasności.",
+   "name": "Próg",
+   "params": {
+    "blend": {
+     "label": "Tryb mieszania",
+     "options": [
+      "Normalny",
+      "Mnożenie",
+      "Ekran",
+      "Nakładka",
+      "Światło miękkie",
+      "Światło ostre",
+      "Dodawanie",
+      "Ściemnianie",
+      "Rozjaśnianie",
+      "Różnica",
+      "Rozjaśnianie koloru",
+      "Wypalanie koloru"
+     ]
+    },
+    "invert": {
+     "label": "Odwróć"
+    },
+    "level": {
+     "label": "Próg"
+    },
+    "softness": {
+     "label": "Rozmycie krawędzi"
+    }
+   }
+  },
+  "tile": {
+   "description": "Powtarza obraz w siatce.",
+   "name": "Kafelki",
+   "params": {
+    "mirror": {
+     "label": "Odbicie"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "scale": {
+     "label": "Skala"
+    }
+   }
+  },
+  "tilerotate": {
+   "description": "Dzieli warstwę na siatkę kafelków i obraca obraz w każdym kafelku osobno.",
+   "name": "Obrót kafelków",
+   "params": {
+    "angle": {
+     "label": "Kąt"
+    },
+    "count": {
+     "label": "Liczba"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "random": {
+     "label": "Losowo"
+    },
+    "rotation": {
+     "label": "Obrót"
+    },
+    "seed": {
+     "label": "Ziarno"
+    },
+    "stretch": {
+     "label": "Rozciągnięcie"
+    }
+   }
+  },
+  "tiles": {
+   "description": "Powtarza warstwę, aby wypełnić ekran. Zwiększ Kadrowanie, aby uzyskać mniejsze kafelki, z opcjonalnym odbiciem, przesunięciem rzędów i obrotem. Skala dawna zachowuje starsze projekty.",
+   "name": "Mozaika",
+   "params": {
+    "angle": {
+     "label": "Kąt"
+    },
+    "mirror": {
+     "label": "Odbicie"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "sizing": {
+     "label": "Rozmiar",
+     "options": [
+      "Kadrowanie",
+      "Skala dawna"
+     ]
+    },
+    "vertical": {
+     "label": "Przesuń w pionie"
+    },
+    "zoom": {
+     "label": "Kadrowanie"
+    }
+   }
+  },
+  "tileshift": {
+   "description": "Dzieli warstwę na siatkę kafelków i przesuwa obraz w każdym kafelku w losowym kierunku.",
+   "name": "Przesunięcie kafelków",
+   "params": {
+    "angle": {
+     "label": "Kąt"
+    },
+    "count": {
+     "label": "Liczba"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "seed": {
+     "label": "Ziarno"
+    },
+    "strength": {
+     "label": "Siła"
+    },
+    "stretch": {
+     "label": "Rozciągnięcie"
+    }
+   }
+  },
+  "timecode": {
+   "description": "Zastępuje tekst warstwy działającym zegarem czasu warstwy lub projektu. Rozpocznij od i ujemna prędkość dają odliczanie.",
+   "name": "Kod czasowy",
+   "params": {
+    "format": {
+     "label": "Format",
+     "options": [
+      "HH:MM:SS:FF",
+      "HH:MM:SS",
+      "MM:SS",
+      "MM:SS.hh",
+      "SS.hh",
+      "Klatki"
+     ]
+    },
+    "offset": {
+     "label": "Rozpocznij od"
+    },
+    "source": {
+     "label": "Czas",
+     "options": [
+      "Warstwa",
+      "Projekt"
+     ]
+    },
+    "speed": {
+     "label": "Prędkość"
+    }
+   }
+  },
+  "timequant": {
+   "description": "Sprawia, że ta warstwa porusza się z niższą liczbą klatek na sekundę, jak szarpany materiał lub animacja poklatkowa.",
+   "name": "Liczba klatek na sekundę",
+   "params": {
+    "fps": {
+     "label": "Klatki/s"
+    }
+   }
+  },
+  "tint": {
+   "description": "Odwzorowuje luminancję obrazu między kolorem cieni a kolorem świateł z podaną ilością mieszania.",
+   "name": "Barwienie",
+   "params": {
+    "amount": {
+     "label": "Ilość"
+    },
+    "highlightColor": {
+     "label": "Kolor świateł"
+    },
+    "shadowColor": {
+     "label": "Kolor cieni"
+    }
+   }
+  },
+  "torus": {
+   "description": "Owija warstwę wokół pierścienia.",
+   "name": "Torus",
+   "params": {
+    "light": {
+     "label": "Kąt światła"
+    },
+    "perspective": {
+     "label": "Perspektywa"
+    },
+    "position": {
+     "label": "Pozycja"
+    },
+    "radius": {
+     "label": "Promień"
+    },
+    "rotX": {
+     "label": "Obrót X"
+    },
+    "rotY": {
+     "label": "Obrót Y"
+    },
+    "rotZ": {
+     "label": "Obrót Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shading": {
+     "label": "Cieniowanie"
+    },
+    "shine": {
+     "label": "Połysk"
+    },
+    "thickness": {
+     "label": "Grubość"
+    }
+   }
+  },
+  "tunnel": {
+   "description": "Wykłada nieskończony tunel warstwą i przelatuje przez niego. Faza przesuwa teksturę wzdłuż jego długości.",
+   "name": "Tunel",
+   "params": {
+    "fog": {
+     "label": "Mgła"
+    },
+    "fogColor": {
+     "label": "Kolor mgły"
+    },
+    "phase": {
+     "label": "Faza"
+    },
+    "position": {
+     "label": "Pozycja"
+    },
+    "repeat": {
+     "label": "Powtórzenia"
+    },
+    "rotX": {
+     "label": "Obrót X"
+    },
+    "rotY": {
+     "label": "Obrót Y"
+    },
+    "rotZ": {
+     "label": "Obrót Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "speed": {
+     "label": "Prędkość"
+    },
+    "twist": {
+     "label": "Skręcenie"
+    }
+   }
+  },
+  "turbulence": {
+   "description": "Wypełnia nieprzezroczyste części warstwy gładkim szumem fraktalnym, dla chmur, dymu lub mapy jasności.",
+   "name": "Turbulencje",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "bias": {
+     "label": "Przesunięcie progu"
+    },
+    "blend": {
+     "label": "Tryb mieszania",
+     "options": [
+      "Normalny",
+      "Mnożenie",
+      "Ekran",
+      "Nakładka",
+      "Światło miękkie",
+      "Światło ostre",
+      "Dodawanie",
+      "Ściemnianie",
+      "Rozjaśnianie",
+      "Różnica",
+      "Rozjaśnianie koloru",
+      "Wypalanie koloru"
+     ]
+    },
+    "color1": {
+     "label": "Kolor 1"
+    },
+    "color2": {
+     "label": "Kolor 2"
+    },
+    "evolution": {
+     "label": "Ewolucja"
+    },
+    "intensity": {
+     "label": "Intensywność"
+    },
+    "octaves": {
+     "label": "Oktawy"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "parallax": {
+     "label": "Paralaksa"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "seed": {
+     "label": "Ziarno"
+    },
+    "stretch": {
+     "label": "Rozciągnięcie"
+    }
+   }
+  },
+  "turbulentdisplace": {
+   "description": "Przesuwa warstwę gładkim szumem fraktalnym, dla ognia, wody, drgającego powietrza lub nierównych naturalnych krawędzi.",
+   "name": "Przemieszczenie turbulentne",
+   "params": {
+    "bias": {
+     "label": "Przesunięcie progu"
+    },
+    "direction": {
+     "label": "Kierunek",
+     "options": [
+      "Oba",
+      "Poziomo",
+      "Pionowo",
+      "Promieniście",
+      "Skręcenie"
+     ]
+    },
+    "evolution": {
+     "label": "Ewolucja"
+    },
+    "octaves": {
+     "label": "Oktawy"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "parallax": {
+     "label": "Paralaksa"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "seed": {
+     "label": "Ziarno"
+    },
+    "strength": {
+     "label": "Siła"
+    },
+    "stretch": {
+     "label": "Rozciągnięcie"
+    }
+   }
+  },
+  "twirl": {
+   "description": "Skręca warstwę wokół środka jak wir wodny, najmocniej pośrodku i zanikając na promieniu (ułamku rozmiaru warstwy). Ujemna siła skręca w drugą stronę.",
+   "name": "Wir",
+   "params": {
+    "center": {
+     "label": "Środek"
+    },
+    "radius": {
+     "label": "Promień"
+    },
+    "strength": {
+     "label": "Siła"
+    }
+   }
+  },
+  "unsharpmask": {
+   "description": "Wyostrza, dodając z powrotem różnicę między warstwą a jej rozmytą kopią. Siła określa szerokość rozmycia, Ilość ile jest dodawane z powrotem, a Próg powyżej 50% pomija małe różnice.",
+   "name": "Maska wyostrzająca",
+   "params": {
+    "amount": {
+     "label": "Ilość"
+    },
+    "radius": {
+     "label": "Siła"
+    },
+    "showMask": {
+     "label": "Pokaż maskę"
+    },
+    "threshold": {
+     "label": "Próg"
+    }
+   }
+  },
+  "vhs": {
+   "description": "Wygląda jak stara taśma wideo: rozlewanie kolorów, rozmazane linie, linie skanowania, szum taśmy i przewijające się pasy śledzenia.",
+   "name": "VHS",
+   "params": {
+    "chroma": {
+     "label": "Rozlewanie kolorów"
+    },
+    "headSwitch": {
+     "label": "Przełączanie głowic"
+    },
+    "noise": {
+     "label": "Szum"
+    },
+    "saturation": {
+     "label": "Nasycenie"
+    },
+    "scanlines": {
+     "label": "Linie skanowania"
+    },
+    "seed": {
+     "label": "Ziarno"
+    },
+    "smear": {
+     "label": "Rozmazanie"
+    },
+    "tracking": {
+     "label": "Śledzenie"
+    },
+    "wobble": {
+     "label": "Chybotanie"
+    }
+   }
+  },
+  "videofeedback": {
+   "description": "Rysuje warstwę wewnątrz siebie raz po raz, jak kamera skierowana na własny ekran. Przesuwaj, skaluj lub obracaj warstwę, aby kierować tunelem.",
+   "name": "Sprzężenie wideo",
+   "params": {
+    "blend": {
+     "label": "Mieszanie",
+     "options": [
+      "Normalny",
+      "Dodawanie",
+      "Ekran"
+     ]
+    },
+    "center": {
+     "label": "Środek"
+    },
+    "copies": {
+     "label": "Kopie"
+    },
+    "delay": {
+     "label": "Opóźnienie"
+    },
+    "fade": {
+     "label": "Zanikanie"
+    },
+    "hueShift": {
+     "label": "Przesunięcie odcienia"
+    },
+    "offset": {
+     "label": "Przesunięcie"
+    },
+    "rotation": {
+     "label": "Obrót"
+    },
+    "useLayerTransform": {
+     "label": "Użyj przekształcenia warstwy"
+    },
+    "zoom": {
+     "label": "Powiększenie"
+    }
+   }
+  },
+  "viewer360": {
+   "description": "Pokazuje warstwę panoramy 360° przez wirtualną kamerę, którą można obracać i przybliżać.",
+   "name": "Podgląd 360°",
+   "params": {
+    "fov": {
+     "label": "Pole widzenia"
+    },
+    "pitch": {
+     "label": "Pochylenie"
+    },
+    "roll": {
+     "label": "Przechył"
+    },
+    "yaw": {
+     "label": "Odchylenie"
+    }
+   }
+  },
+  "vignette": {
+   "description": "Przyciemnia warstwę ku krawędziom poza zaokrąglonym kształtem: Rozmiar ustala kształt, Zaokrąglenie jego okrągłość, Rozmycie krawędzi miękkość brzegu, Siła stopień przyciemnienia, a Odcień to, w jakim stopniu przyjmuje kolor. Wytnij sprawia, że krawędzie stają się przezroczyste.",
+   "name": "Winieta",
+   "params": {
+    "color": {
+     "label": "Kolor"
+    },
+    "extent": {
+     "label": "Rozmiar"
+    },
+    "feather": {
+     "label": "Rozmycie krawędzi"
+    },
+    "punch": {
+     "label": "Wytnij"
+    },
+    "rounding": {
+     "label": "Zaokrąglenie"
+    },
+    "strength": {
+     "label": "Siła"
+    },
+    "style": {
+     "label": "Styl",
+     "options": [
+      "Zaokrąglona",
+      "Miękki owal"
+     ]
+    },
+    "tint": {
+     "label": "Odcień"
+    }
+   }
+  },
+  "voronoicells": {
+   "description": "Wypełnia nieprzezroczyste części warstwy wzorem komórek wokół losowo rozmieszczonych punktów.",
+   "name": "Komórki Voronoi",
+   "params": {
+    "color1": {
+     "label": "Kolor 1"
+    },
+    "color2": {
+     "label": "Kolor 2"
+    },
+    "lineColor": {
+     "label": "Kolor linii"
+    },
+    "lineWidth": {
+     "label": "Grubość linii"
+    },
+    "phase": {
+     "label": "Faza"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "seed": {
+     "label": "Ziarno"
+    }
+   }
+  },
+  "wavewarp": {
+   "description": "Wygina warstwę sinusoidą: Odstęp ustala, ile fal ją przecina, Wielkość jak daleko pchają, Kąt kierunek biegu fal, a Kąt zniekształcenia kierunek, w którym pchają.",
+   "name": "Zniekształcenie falą",
+   "params": {
+    "angle": {
+     "label": "Kąt"
+    },
+    "magnitude": {
+     "label": "Wielkość"
+    },
+    "phase": {
+     "label": "Faza"
+    },
+    "spacing": {
+     "label": "Odstęp"
+    },
+    "speed": {
+     "label": "Prędkość"
+    },
+    "warpAngle": {
+     "label": "Kąt zniekształcenia"
+    }
+   }
+  },
+  "wipe": {
+   "description": "Ukrywa warstwę z dwóch przeciwnych stron. Animuj początek lub koniec, aby uzyskać przejście wycierane.",
+   "name": "Wycieranie",
+   "params": {
+    "angle": {
+     "label": "Kąt"
+    },
+    "end": {
+     "label": "Koniec"
+    },
+    "feather": {
+     "label": "Rozmycie krawędzi"
+    },
+    "softness": {
+     "label": "Miękkość"
+    },
+    "start": {
+     "label": "Początek"
+    }
+   }
+  },
+  "zoomstreaks": {
+   "description": "Tworzy smugi wystrzeliwujące z punktu przez skalowanie kopii warstwy wokół niego i zachowywanie najjaśniejszych pikseli. Średnia daje rozmycie powiększeniem. R, G, B i A wybierają dla każdego kanału, czy kopie zachowują wartość najniższą, najwyższą lub średnią, czy kanał jest pomijany.",
+   "name": "Smugi powiększenia",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Min",
+      "Maks",
+      "Śr.",
+      "Wył."
+     ]
+    },
+    "alpha": {
+     "label": "Alfa"
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "Min",
+      "Maks",
+      "Śr.",
+      "Wył."
+     ]
+    },
+    "bias": {
+     "label": "Przesunięcie"
+    },
+    "center": {
+     "label": "Środek"
+    },
+    "g": {
+     "label": "G",
+     "options": [
+      "Min",
+      "Maks",
+      "Śr.",
+      "Wył."
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "Min",
+      "Maks",
+      "Śr.",
+      "Wył."
+     ]
+    },
+    "strength": {
+     "label": "Siła"
+    }
+   }
+  }
+ }
+}

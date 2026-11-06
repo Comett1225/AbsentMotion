@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-TW" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>編輯器畫面 | AbsentMotion</title><meta name="description" content="頂部列、預覽、播放列，以及各部分如何配合運作。"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="說明"><a href="index.html">目錄</a><a href="effects/index.html">特效</a></nav></header><div class="wrap"><main id="main"><h1>編輯器畫面</h1><p class="lead">頂部列、預覽、播放列，以及各部分如何配合運作。</p><details class="toc"><summary>本頁內容</summary><ul><li><a href="#the-top-bar">頂部列</a></li><li><a href="#the-preview">預覽</a></li><li><a href="#the-play-bar">播放列</a></li><li><a href="#multi-select">多選</a></li><li><a href="#on-a-tablet">在平板電腦上</a></li></ul></details><p>編輯器由上到下分為四個部分：<strong>頂部列</strong>、<strong>預覽</strong>、<strong>播放列</strong>，以及附有工具的<strong>時間軸</strong>。平板電腦有自己的版面配置：請參閱下方的<strong>在平板電腦上</strong>。</p>
+<figure><img src="../assets/img/editor.webp" width="720" height="1486" alt="編輯器的四個部分：頂端列 (1)、預覽 (2)、播放列 (3)，以及附有工具的時間軸 (4)。" loading="lazy"><figcaption>編輯器的四個部分：頂端列 (1)、預覽 (2)、播放列 (3)，以及附有工具的時間軸 (4)。</figcaption></figure>
+<p>每次編輯後，變更都會在片刻後自動儲存。編輯期間，系統也會每兩分鐘保留一個專案版本（請參閱<a href="projects.html">專案、備份與匯入</a>）。時間軸中最上層的圖層是最前面的圖層，新圖層會加入最前面。</p>
+<p>手機的返回鍵一次只會退回一層：它會依序關閉預覽列、清除多選、關閉緩動曲線圖、離開已開啟的特效、離開面板、取消選取圖層、離開已開啟的群組，最後才會離開編輯器。</p>
+<h2 id="the-top-bar">頂部列</h2>
+<p>頂部列顯示的內容取決於目前的選取狀態。</p>
+<p><strong>未選取任何內容</strong></p>
+<ul><li>左側的<strong>返回專案列表</strong>。</li><li><strong>專案名稱</strong>。點一下即可重新命名專案。</li><li><strong>專案設定</strong>（齒輪）：請見下文。</li><li><strong>匯出與分享</strong>（分享圖示）：會開啟<a href="export.html">匯出</a>畫面。</li></ul>
+<p><strong>已選取圖層</strong></p>
+<ul><li><strong>返回</strong>會取消選取圖層。</li><li><strong>圖層名稱</strong>。點一下即可重新命名；此名稱也會顯示在時間軸的圖層長條上。</li><li><strong>父層</strong>按鈕（一個虛線方框、一個實心方框和一個小圓圈）。它會列出「無」以及其他所有圖層。選擇其中一個即可將該圖層設為父層：之後被選取的圖層在移動、旋轉或縮放時都會跟隨父層，而且在你設定時會保持其在畫面上的位置。</li><li><strong>刪除圖層</strong>（垃圾桶）會立即刪除，不會再詢問。按<strong>復原</strong>即可讓它回來。該圖層的子圖層會被解除連結。</li><li><strong>圖層選單</strong>（三個點）：請參閱<a href="layer-menus.html">圖層選單與多選</a>。</li></ul>
+<figure><img src="../assets/img/editor-top-bar.webp" width="720" height="184" alt="選取圖層時的頂端列：返回 (1)、圖層名稱 (2)、父層按鈕 (3)、刪除圖層 (4)、圖層選單 (5)。" loading="lazy"><figcaption>選取圖層時的頂端列：返回 (1)、圖層名稱 (2)、父層按鈕 (3)、刪除圖層 (4)、圖層選單 (5)。</figcaption></figure>
+<p><strong>面板已開啟</strong>。頂部列會顯示返回箭頭和面板名稱，例如<strong>變形</strong>、<strong>填色與顏色</strong>或<strong>特效</strong>。</p>
+<p><strong>群組內</strong>。執行<strong>編輯群組</strong>後，頂部列會顯示路徑，而不是專案名稱：專案名稱，然後是每個已開啟群組的名稱。點一下專案名稱即可回到整個專案，點一下群組名稱則可回到該群組。選取圖層時，圖層名稱旁會出現一個小膠囊，上面有群組名稱，點一下即可離開群組。群組內會隱藏齒輪。請參閱<a href="shapes.html">形狀、繪圖與遮罩</a>。</p>
+<h3 id="project-settings">專案設定</h3>
+<p>齒輪會開啟一個面板，其中的選項與新專案面板相同：畫面比例（16:9、9:16、4:5、1:1、4:3 或自訂比例）、<strong>解析度</strong>、<strong>影格速率</strong>和<strong>背景</strong>。變更這些設定只會改變畫布；你的圖層不會重新縮放。此變更可以復原。<strong>版本紀錄</strong>列中有一個<strong>先前版本</strong>按鈕。</p>
+<figure><img src="../assets/img/editor-project-settings.webp" width="720" height="540" alt="專案設定：形狀 (1)、解析度 (2)、影格速率 (3)、背景 (4)、先前版本 (5)。" loading="lazy"><figcaption>專案設定：形狀 (1)、解析度 (2)、影格速率 (3)、背景 (4)、先前版本 (5)。</figcaption></figure>
+<p>若為素材專案，此面板還會有<strong>預合成</strong>和<strong>重新計時</strong>：請參閱<a href="assets-templates.html">素材、範本與預設集</a>。</p>
+<h2 id="the-preview">預覽</h2>
+<p>預覽會顯示畫布。透明背景會以棋盤格顯示。</p>
+<ul><li><strong>選取。</strong>點一下圖層即可選取它（手指下方最上層的圖層）。點一下空白畫布即可取消選取。</li><li><strong>移動。</strong>在預覽的任何位置拖曳，都可以移動選取的圖層，不必只拖曳圖層本身。</li><li><strong>縮放。</strong>選取的圖層會有白色外框與八個圓形控點。拖曳角落可等比例縮放圖層；拖曳邊緣則會沿該方向拉伸。用兩指捏合也可以縮放。控點會以錨點（<strong>變形</strong>中的<strong>錨點</strong>）為中心進行縮放，錨點位置保持不動。</li><li><strong>旋轉。</strong>一般圖層沒有旋轉控點，也不能用兩指旋轉。請使用<strong>變形</strong>中的<strong>旋轉</strong>（請參閱<a href="layer-tools.html">圖層工具</a>）。</li><li><strong>攝影機圖層。</strong>拖曳會平移攝影機，捏合則會改變其視角。</li><li><strong>文字。</strong>在文字編輯器中，文字框側邊的控點可以改變換行寬度。</li><li><strong>參考線。</strong>在<strong>變形</strong>中移動圖層時，若它與畫布中心或其他圖層對齊，會出現細的紅色參考線。</li></ul>
+<h3 id="zoom-and-pan-the-canvas">縮放與平移畫布</h3>
+<p>未選取任何內容時，用兩指可平移和縮放畫布（從 1% 到 6400%）。選取圖層時，點一下預覽左上角的小放大鏡，即可開啟平移與縮放模式；此時兩指會縮放畫布，單指仍可移動圖層。用兩指快速點兩下可回到 100%，再點兩下則回到先前的視圖。</p>
+<h3 id="the-preview-strip">預覽列</h3>
+<p>播放列最右側的按鈕（<strong>預覽模式</strong>）會在預覽右側邊緣開啟一條狹窄的列，從上到下有以下按鈕。</p>
+<ol><li><strong>像素預覽</strong>會以硬邊顯示專案的像素，放大時很有用。</li><li><strong>格線</strong>會每隔 40 個專案像素顯示一條格線。</li><li><strong>單獨顯示選取的圖層</strong>會隱藏所有其他圖層。再點一下會以半透明顯示其他圖層，第三次點選則會關閉此功能。</li><li><strong>攝影機視角</strong>會透過攝影機圖層觀看（僅在專案有攝影機時可用）。</li><li><strong>完整</strong>、<strong>一半</strong>或<strong>四分之一</strong>：預覽品質。數值越低，在較慢的手機上越快，且不會改變匯出結果。它與<a href="settings.html">設定</a>中的<strong>預覽品質</strong>是同一項設定。</li><li><strong>快速模糊</strong>或<strong>完整模糊</strong>：動態模糊特效的預覽方式。快速為近似效果；完整較精確但較慢。匯出一律使用精確效果。</li><li><strong>縮放</strong>：加號與減號按鈕，以及目前的百分比。</li></ol>
+<figure><img src="../assets/img/editor-preview-strip.webp" width="720" height="920" alt="預覽工具列：像素預覽 (1)、格線 (2)、單獨顯示選取的圖層 (3)、攝影機視角 (4)、預覽品質 (5)、模糊模式 (6)、縮放 (7)。" loading="lazy"><figcaption>預覽工具列：像素預覽 (1)、格線 (2)、單獨顯示選取的圖層 (3)、攝影機視角 (4)、預覽品質 (5)、模糊模式 (6)、縮放 (7)。</figcaption></figure>
+<p>介於<strong>快速模糊</strong>與<strong>縮放</strong>之間的<strong>預先算圖</strong>，會從播放頭開始一直算圖到結尾（或能放進記憶體與儲存空間的範圍），使負擔較重的專案也能順暢播放。預覽頂部的提示會顯示進度，並附有<strong>取消</strong>按鈕。播放使用預先算圖的畫面時，預覽右上角會出現一個小的<strong>已預先算圖</strong>標籤。對專案的任何變更都會使預先算圖過期：列中的<strong>預先算圖</strong>按鈕會變色，提示則會提供<strong>重新預先算圖</strong>。完成後，點一下<strong>預先算圖</strong>即可查看其涵蓋的時間，按住則可將它移除。</p>
+<h3 id="other-things-on-the-preview">預覽上的其他項目</h3>
+<ul><li>選取視覺圖層時，右下角會出現圓形的<strong>製作動畫</strong>按鈕：它會開啟進場、出場和循環動畫。請參閱<a href="animations.html">轉場與動畫</a>。</li><li>底部的「已復原／已重做」提示會顯示上一次復原或重做的內容。</li></ul>
+<h2 id="the-play-bar">播放列</h2>
+<p>由左至右共七個按鈕。</p>
+<ol><li><strong>復原</strong>和2. <strong>重做</strong>。應用程式最多保留 200 個步驟。一次完整的拖曳或滑桿移動算作一個步驟。每次復原或重做時，都會顯示簡短提示，例如「已復原：移動」。</li><li><strong>向後跳轉</strong>和5. <strong>向前跳轉</strong>會跳到上一個或下一個停靠點。未選取任何內容時，停靠點為專案的開頭與結尾；選取圖層時，停靠點則為該圖層的開頭、結尾與其關鍵影格。書籤一律是停靠點。</li><li><strong>播放</strong>／<strong>暫停</strong>。在停止狀態下按住播放鍵，可開啟或關閉循環播放。從結尾開始播放時，會從頭開始。</li><li><strong>複製與貼上</strong>會開啟選單，可用於複製、貼上與儲存預設集：請參閱<a href="layer-menus.html">圖層選單與多選</a>。</li><li><strong>預覽模式</strong>會開啟預覽列。</li></ol>
+<figure><img src="../assets/img/editor-play-bar.webp" width="720" height="138" alt="播放列：復原 (1)、重做 (2)、向後跳轉 (3)、播放 (4)、向前跳轉 (5)、複製與貼上 (6)、預覽模式 (7)。" loading="lazy"><figcaption>播放列：復原 (1)、重做 (2)、向後跳轉 (3)、播放 (4)、向前跳轉 (5)、複製與貼上 (6)、預覽模式 (7)。</figcaption></figure>
+<p>播放列下方的細線，是專案播放時的即時音量計：左半邊顯示左聲道，右半邊顯示右聲道，聲音越大，顏色由綠色變為黃色，再變為紅色。若某一側發生削波，該半邊會閃紅。</p>
+<h2 id="multi-select">多選</h2>
+<p>在圖層列的眼睛或名稱區域按住，然後上下滑動，即可一次選取多列；之後點一下即可切換列的選取狀態。頂部列會變色，並顯示群組、特效、刪除與對齊按鈕，底部也會出現一個附有片段時間指令的列。所有功能都在<a href="layer-menus.html">圖層選單與多選</a>中說明。</p>
+<h2 id="on-a-tablet">在平板電腦上</h2>
+<p>只要平板的螢幕夠寬，無論直向或橫向，平板都會使用較寬的版面（大多數 10 吋和 11 吋平板兩個方向皆可，較小的平板則在橫放時適用）。</p>
+<ul><li>選取圖層的面板與工具會在預覽旁的欄位中開啟，因此不會遮住時間軸。</li><li>時間軸會佔據預覽下方的整個寬度。直向時，它會佔據螢幕下半部，因此可容納更多圖層。</li><li>工具會以兩到四欄排列在同一頁上。</li></ul>
+<p>在較小的直立平板上，編輯器看起來與手機版相同；而調色盤、預設集、關於與說明等面板會以卡片形式出現在畫面中央，而不是佔滿整個螢幕。首頁也會以格狀顯示專案與範本，並將工具並排放置：請參閱<a href="home.html">首頁</a>。</p>
+<h2 id="next">下一步</h2>
+<ul><li><a href="timeline.html">時間軸</a></li><li><a href="add-menu.html">新增選單</a></li><li><a href="layer-tools.html">圖層工具</a></li></ul><nav class="pager" aria-label="上一頁與下一頁"><a rel="prev" href="new-project.html">&larr; 建立專案</a><a rel="next" href="timeline.html">時間軸 &rarr;</a></nav></main></div></body></html>

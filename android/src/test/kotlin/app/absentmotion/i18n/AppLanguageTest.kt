@@ -39,6 +39,17 @@ class AppLanguageTest {
         assertEquals(AppLanguage.SpanishSpain, pick("es_ES"))
         assertEquals(AppLanguage.Spanish, pick("es"))
         assertEquals(AppLanguage.Urdu, pick("ur-PK"))
+        assertEquals(AppLanguage.Korean, pick("ko-KR"))
+        assertEquals(AppLanguage.ChineseTraditional, pick("zh-Hant-TW"))
+        assertEquals(AppLanguage.ChineseTraditional, pick("zh-HK"))
+        assertEquals(AppLanguage.ChineseTraditional, pick("zh-Hant-MY"))
+        assertEquals(AppLanguage.ChineseSimplified, pick("zh-Hans-CN"))
+        assertEquals(AppLanguage.ChineseSimplified, pick("zh-SG"))
+        assertEquals(AppLanguage.ChineseSimplified, pick("zh"))
+        assertEquals(AppLanguage.French, pick("fr-CA"))
+        assertEquals(AppLanguage.German, pick("de-AT"))
+        assertEquals(AppLanguage.Italian, pick("it-IT"))
+        assertEquals(AppLanguage.Polish, pick("pl-PL"))
         assertEquals(AppLanguage.Japanese, pick("ja-JP"))
         assertEquals(AppLanguage.Spanish, pick("es-419"))
         assertEquals(AppLanguage.Spanish, pick("es_MX"))
@@ -54,13 +65,13 @@ class AppLanguageTest {
     }
 
     @Test fun unsupportedLanguagesFallBackToTheNextPhoneLanguageThenEnglish() {
-        assertEquals(AppLanguage.English, pick("zh-CN"))
-        assertEquals(AppLanguage.English, pick("zh-Hant-TW", "ko-KR"))
-        assertEquals(AppLanguage.Japanese, pick("zh-Hant-TW", "ja-JP"))
-        assertEquals(AppLanguage.Russian, pick("zh-CN", "ru-RU", "en-US"))
+        assertEquals(AppLanguage.English, pick("nl-NL"))
+        assertEquals(AppLanguage.English, pick("uk-UA", "sw-KE"))
+        assertEquals(AppLanguage.Japanese, pick("uk-UA", "ja-JP"))
+        assertEquals(AppLanguage.Russian, pick("nl-NL", "ru-RU", "en-US"))
         assertEquals(AppLanguage.English, pick())
         assertEquals(AppLanguage.English, pick(""))
-        assertNull(AppLanguage.match(listOf("zh-CN", "ko-KR")))
+        assertNull(AppLanguage.match(listOf("nl-NL", "sw-KE")))
     }
 
     @Test fun theSuggestedLanguageComesFirstAndEveryLanguageOnce() {
@@ -74,8 +85,8 @@ class AppLanguageTest {
     }
 
     @Test fun fourteenLanguagesEachKnowTheirOwnName() {
-        assertEquals(17, AppLanguage.entries.size)
-        assertEquals(17, AppLanguage.entries.map { it.nativeName }.toSet().size)
+        assertEquals(24, AppLanguage.entries.size)
+        assertEquals(24, AppLanguage.entries.map { it.nativeName }.toSet().size)
         assertEquals("বাংলা", AppLanguage.Bengali.nativeName)
         assertEquals("العربية", AppLanguage.Arabic.nativeName)
         assertEquals("فارسی", AppLanguage.Persian.nativeName)
