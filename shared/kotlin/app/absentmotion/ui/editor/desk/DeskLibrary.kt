@@ -76,6 +76,8 @@ private val Sections = listOf(
     Section(R.string.desk_draw, R.string.desk_draw, ChromeIcons.Freehand),
 )
 
+internal val DeskRailHeight = (Sections.size * 54 + 8).dp
+
 @Composable
 internal fun DeskLibraryRail(selected: Int, expanded: Boolean, modifier: Modifier, select: (Int) -> Unit) {
     Column(modifier.background(Am.Panel).tutorialTarget("lib_rail").deskVerticalScroll().padding(vertical = 4.dp), horizontalAlignment = Alignment.CenterHorizontally) {

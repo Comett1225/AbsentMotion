@@ -35,8 +35,6 @@ internal class LayerStream(val uri: String, startMs: Double, val loopMs: Double?
         private set
     @Volatile var rate = 0
         private set
-    @Volatile var channels = 0
-        private set
     @Volatile private var closed = false
     @Volatile var failed = false
         private set
@@ -71,7 +69,6 @@ internal class LayerStream(val uri: String, startMs: Double, val loopMs: Double?
                     lock.withLock { if (seekGen == handled) { if (!placed) place(rate, target); placed = true; eof = true; keepHead(true) } }
                     continue
                 }
-                channels = chunk.channels
                 if (!placed) lock.withLock { if (seekGen == handled) { place(chunk.rate, target); placed = true } }
                 if (placed && append(chunk, handled)) keepHead(false)
             }

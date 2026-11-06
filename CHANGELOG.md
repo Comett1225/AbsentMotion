@@ -37,8 +37,8 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - Chromebooks with Intel or AMD chips have their own x86_64 files, -foss-x86_64.apk and -compatible-x86_64.apk. The in-app update picks the right file, and the download page lists them. The Video Downloader is not in these files.
 - Desktop window bar in the app's colours with the system's own window buttons, and a menu button with File, Edit, View, Playback and Help.
 - Desktop media belongs to each project; right-click a folder and choose Pin to all projects to see it everywhere. Search lists the folder first.
-- Desktop Mixer: with nothing selected, the Inspector shows a fader, Mute, Solo and left/right (or mono) level meters for every layer with sound.
-- The level line under the play bar shows the left and right channel; tablets also show a master meter on the left while playing.
+- Desktop level meter for the whole project, right of the buttons on the left; with nothing selected, the Inspector shows the project settings and the list of layers.
+- The level line under the play bar shows the left and right channel; tablets held sideways also show a level meter at the top left of the preview.
 - Effect help on the desktop opens in its own window inside the app.
 - 90 and 120 fps projects.
 - Saved custom sizes in New Project and in the project settings.

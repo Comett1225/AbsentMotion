@@ -1258,17 +1258,9 @@
     <string name="volume_audio_effects">Аудиоэффекты</string>
     <string name="volume_audio_effects_count">Аудиоэффекты (%1$s)</string>
     <string name="volume_volume">Громкость</string>
-    <string name="mixer_master">Мастер</string>
-    <string name="mixer_mute">Выключить звук</string>
-    <string name="mixer_solo">Соло</string>
-    <string name="mixer_mute_short">M</string>
-    <string name="mixer_solo_short">S</string>
     <string name="meter_left_short">L</string>
     <string name="meter_right_short">R</string>
-    <string name="meter_mono">Моно</string>
     <string name="meter_master">Общий уровень</string>
-    <string name="mixer_empty">В этом проекте нет звука</string>
-    <string name="mixer_empty_hint">Добавьте музыку, звук или видео со звуком, и они появятся здесь.</string>
     <string name="blend_cat_normal">Обычные</string>
     <string name="blend_cat_darken">Затемнение</string>
     <string name="blend_cat_lighten">Осветление</string>

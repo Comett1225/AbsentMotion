@@ -1224,17 +1224,9 @@
     <string name="volume_audio_effects">افکت‌های صدا</string>
     <string name="volume_audio_effects_count">افکت‌های صدا (%1$s)</string>
     <string name="volume_volume">ولوم</string>
-    <string name="mixer_master">اصلی</string>
-    <string name="mixer_mute">بی‌صدا</string>
-    <string name="mixer_solo">تک‌صدا</string>
-    <string name="mixer_mute_short">M</string>
-    <string name="mixer_solo_short">S</string>
     <string name="meter_left_short">L</string>
     <string name="meter_right_short">R</string>
-    <string name="meter_mono">مونو</string>
     <string name="meter_master">سطح مستر</string>
-    <string name="mixer_empty">این پروژه صدا ندارد</string>
-    <string name="mixer_empty_hint">موسیقی، صدا یا ویدیوی صدادار اضافه کنید تا اینجا نمایش داده شود.</string>
     <string name="blend_cat_normal">عادی</string>
     <string name="blend_cat_darken">تیره‌کردن</string>
     <string name="blend_cat_lighten">روشن‌کردن</string>

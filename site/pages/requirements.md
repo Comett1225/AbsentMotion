@@ -67,7 +67,7 @@ What is different on a computer:
 - Keyboard shortcuts use Cmd on a Mac (Ctrl on Windows and Linux): Space plays and pauses, the arrow keys step one frame (ten with Shift), Cmd+Z undoes and Cmd+Shift+Z redoes, Cmd+C, Cmd+X and Cmd+V copy, cut and paste layers, Cmd+D duplicates, Cmd+B splits at the playhead, Option+Left and Option+Right (Alt on Windows and Linux) jump to the previous or next bookmark and then to the start or end, the comma and period keys nudge the selected clips by one frame (ten with Shift), Delete removes the selected layers and Cmd+E opens the export.
 - The bar at the top is part of the app, with the system's own window buttons (on the left on a Mac, on the right on Windows and Linux). The **☰** button next to the exit button opens the File, Edit, View, Playback and Help menus. If the bar causes trouble, **Settings** > **Editor** > **Use system title bar** brings back the normal one.
 - Each project shows only the media you picked or linked in it. Right-click a folder in the library and choose **Pin to all projects** to see it in every project. A search lists the folder first and then the matching files in it.
-- With nothing selected, the inspector shows the **Mixer**: a volume fader, Mute, Solo and a level meter for every layer that makes sound.
+- With nothing selected, the inspector shows the project: its name, size, frame rate, background, length, earlier versions and the list of layers. A level meter for the whole project sits right of the buttons on the left.
 - The **?** on an effect opens its help in a small window inside the app; close it with the X or Esc.
 - Taking a photo or a video uses the computer's webcam.
 - The Video Downloader is not on the computer yet.

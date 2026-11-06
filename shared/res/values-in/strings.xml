@@ -1207,17 +1207,9 @@
     <string name="volume_audio_effects">Efek audio</string>
     <string name="volume_audio_effects_count">Efek audio (%1$s)</string>
     <string name="volume_volume">Volume</string>
-    <string name="mixer_master">Master</string>
-    <string name="mixer_mute">Bisukan</string>
-    <string name="mixer_solo">Solo</string>
-    <string name="mixer_mute_short">M</string>
-    <string name="mixer_solo_short">S</string>
     <string name="meter_left_short">L</string>
     <string name="meter_right_short">R</string>
-    <string name="meter_mono">Mono</string>
     <string name="meter_master">Level master</string>
-    <string name="mixer_empty">Tidak ada suara di proyek ini</string>
-    <string name="mixer_empty_hint">Tambahkan musik, suara, atau video bersuara untuk menampilkannya di sini.</string>
     <string name="blend_cat_normal">Normal</string>
     <string name="blend_cat_darken">Darken</string>
     <string name="blend_cat_lighten">Lighten</string>

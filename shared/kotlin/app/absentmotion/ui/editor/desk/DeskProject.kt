@@ -4,6 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -33,11 +36,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.R
+import app.absentmotion.editor.EditorPanel
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.FullColor
 import app.absentmotion.editor.changeSettings
 import app.absentmotion.editor.rename
 import app.absentmotion.editor.setElementOption
+import app.absentmotion.editor.toggleHidden
 import app.absentmotion.model.Layer
 import app.absentmotion.ui.home.handCursor
 import app.absentmotion.ui.home.hoverFill
@@ -52,6 +57,30 @@ internal fun DeskProject(state: EditorState, onDismiss: () -> Unit) {
                 DeskNameField(state.scene.title, Modifier.weight(1f)) { state.rename(it) }
             }
             DeskSettings(state, heading = false)
+        }
+    }
+}
+
+@Composable
+internal fun DeskProjectPanel(state: EditorState, modifier: Modifier = Modifier) {
+    val layers = remember(state.scene) { state.scene.layers.asReversed() }
+    val list = rememberLazyListState()
+    LazyColumn(modifier.deskScrollbar(list).padding(horizontal = 12.dp), list, contentPadding = PaddingValues(bottom = 12.dp)) {
+        if (!state.inGroup) item(key = "name") {
+            Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(R.string.desk_name), color = Am.OnDarkDim, fontSize = 13.sp, maxLines = 1)
+                DeskNameField(state.scene.title, Modifier.weight(1f)) { state.rename(it) }
+            }
+        }
+        item(key = "settings") { DeskSettings(state) }
+        item(key = "layers-title") { DeskHeading(stringResource(R.string.desk_layers), Modifier.padding(top = 16.dp, bottom = 4.dp)) }
+        items(layers, key = { it.id }) { layer ->
+            Row(Modifier.fillMaxWidth().height(36.dp).clip(RoundedCornerShape(6.dp)).hoverFill(6.dp, Am.Field).handCursor().clickable { state.selectedId = layer.id; state.panel = EditorPanel.Tools }.padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                Icon(deskLayerIcon(layer), null, Modifier.size(18.dp), tint = Am.OnDarkDim)
+                Text(layer.label, Modifier.weight(1f).padding(horizontal = 8.dp), color = if (layer.hidden) Am.OnDarkDim else Am.OnDark, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                val label = stringResource(if (layer.hidden) R.string.a11y_show_layer else R.string.a11y_hide_layer)
+                BarButton(if (layer.hidden) TimelineIcons.EyeOff else TimelineIcons.Eye, label, Modifier.size(32.dp), iconSize = androidx.compose.ui.unit.DpSize(18.dp, 18.dp)) { state.toggleHidden(layer.id) }
+            }
         }
     }
 }

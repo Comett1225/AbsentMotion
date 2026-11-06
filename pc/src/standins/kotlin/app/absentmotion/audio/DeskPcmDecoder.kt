@@ -19,7 +19,6 @@ internal class PcmChunk {
     var frames = 0
     var rate = 0
     var ptsUs = 0L
-    var channels = 2
 }
 
 internal interface PcmSource : Closeable {
@@ -46,7 +45,6 @@ internal class PcmDecoder(context: Context, uri: String) : PcmSource {
         val stream = DeskProbe.of(file).audio ?: error(AppText.get(R.string.ai_no_audio_track, uri))
         durationUs = stream.durationUs
         channels = stream.channels.coerceAtLeast(1)
-        chunk.channels = channels
         chunk.rate = stream.sampleRate.takeIf { it > 0 } ?: 48_000
         mix = if (channels > 2) downmixGains(channels, 0) else null
     }

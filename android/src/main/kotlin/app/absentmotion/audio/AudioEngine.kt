@@ -131,7 +131,7 @@ class AudioEngine(context: Context) {
         @Volatile var stopRequested = false
         val rate = AudioTrack.getNativeOutputSampleRate(AudioManager.STREAM_MUSIC).takeIf { it > 0 } ?: 48_000
         val clock = AudioClock(startMs, rate)
-        private val rack = FxRack(rate).also { it.live = mix }
+        private val rack = FxRack(rate)
         private val limiter = SafeLimiter(rate)
 
         fun halt() {
@@ -288,7 +288,7 @@ internal fun mixStreams(
             if (!span.inMedia) { source.restart(); continue }
             if (source.mix(dst, span.from, span.to, span.pos, span.step, span.g0, span.g1, quality, span.clipMs0, dt, span.lengthMs)) rendered = true
         }
-        rack.finish(clip, out, frames, rendered, stream(clip)?.channels ?: 0)
+        rack.finish(clip, out, frames, rendered)
     }
     rack.sweep()
 }

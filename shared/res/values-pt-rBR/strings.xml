@@ -1241,17 +1241,9 @@
     <string name="volume_audio_effects">Efeitos de áudio</string>
     <string name="volume_audio_effects_count">Efeitos de áudio (%1$s)</string>
     <string name="volume_volume">Volume</string>
-    <string name="mixer_master">Principal</string>
-    <string name="mixer_mute">Silenciar</string>
-    <string name="mixer_solo">Solo</string>
-    <string name="mixer_mute_short">M</string>
-    <string name="mixer_solo_short">S</string>
     <string name="meter_left_short">L</string>
     <string name="meter_right_short">R</string>
-    <string name="meter_mono">Mono</string>
     <string name="meter_master">Nível mestre</string>
-    <string name="mixer_empty">Não há som neste projeto</string>
-    <string name="mixer_empty_hint">Adicione música, um som ou um vídeo com som para aparecer aqui.</string>
     <string name="blend_cat_normal">Normal</string>
     <string name="blend_cat_darken">Escurecer</string>
     <string name="blend_cat_lighten">Clarear</string>

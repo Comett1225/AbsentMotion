@@ -1207,17 +1207,9 @@
     <string name="volume_audio_effects">音声エフェクト</string>
     <string name="volume_audio_effects_count">音声エフェクト（%1$s）</string>
     <string name="volume_volume">音量</string>
-    <string name="mixer_master">マスター</string>
-    <string name="mixer_mute">ミュート</string>
-    <string name="mixer_solo">ソロ</string>
-    <string name="mixer_mute_short">M</string>
-    <string name="mixer_solo_short">S</string>
     <string name="meter_left_short">L</string>
     <string name="meter_right_short">R</string>
-    <string name="meter_mono">モノラル</string>
     <string name="meter_master">マスターレベル</string>
-    <string name="mixer_empty">このプロジェクトに音声はありません</string>
-    <string name="mixer_empty_hint">音楽、音声、または音声付きの動画を追加すると、ここに表示されます。</string>
     <string name="blend_cat_normal">通常</string>
     <string name="blend_cat_darken">暗くする</string>
     <string name="blend_cat_lighten">明るくする</string>

@@ -223,7 +223,7 @@ class DeskWorkspaceTest {
         waitForIdle()
         onAllNodesWithContentDescription("Project settings").onFirst().performClick()
         mainClock.advanceTimeBy(300)
-        onNodeWithText("1:1", substring = false).performClick()
+        onAllNodesWithText("1:1", substring = false).onLast().performClick()
         runOnIdle { check(editor.scene.width == editor.scene.height); editor.undo() }
         DeskBack.back()
         mainClock.advanceTimeBy(300)

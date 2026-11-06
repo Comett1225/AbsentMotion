@@ -61,6 +61,7 @@ import app.absentmotion.ui.tutorial.tutorialGuard
 import app.absentmotion.ui.tutorial.tutorialTarget
 
 private const val RailWidth = 56
+private const val MeterWidth = 28
 private const val InspectorRail = 44
 private const val DividerWidth = 7
 private const val LibraryMin = 240f
@@ -144,11 +145,11 @@ private fun DeskWorkspaceBody(state: EditorState, onExit: () -> Unit, library: A
             }
         } else false
     }.focusRequester(focusRequester).focusable()) { maxWidth, maxHeight ->
-        val both = (maxWidth - RailWidth.dp - 2 * DividerWidth.dp - MinPreview).value >= LibraryMin + InspectorMin
+        val both = (maxWidth - RailWidth.dp - MeterWidth.dp - 2 * DividerWidth.dp - MinPreview).value >= LibraryMin + InspectorMin
         SideEffect { spacious = both }
         val libraryShown = if (both) libraryOpen else soloLibrary
         val inspectorShown = if (both) inspectorOpen else soloInspector
-        val room = (maxWidth - RailWidth.dp - 2 * DividerWidth.dp - MinPreview - (if (inspectorShown) 0.dp else InspectorRail.dp)).value
+        val room = (maxWidth - RailWidth.dp - MeterWidth.dp - 2 * DividerWidth.dp - MinPreview - (if (inspectorShown) 0.dp else InspectorRail.dp)).value
         val inspectorNow = if (inspectorShown) (if (libraryShown) inspectorWidth.coerceAtMost(room - LibraryMin) else inspectorWidth.coerceAtMost(room)).coerceAtLeast(InspectorMin) else 0f
         val libraryNow = if (libraryShown) libraryWidth.coerceAtMost(room - inspectorNow).coerceAtLeast(LibraryMin) else 0f
         val closeLibrary = { if (both) libraryOpen = false else soloLibrary = false }
@@ -161,6 +162,7 @@ private fun DeskWorkspaceBody(state: EditorState, onExit: () -> Unit, library: A
                     libraryTab = index
                     if (both) libraryOpen = next else { soloLibrary = next; if (next) soloInspector = false }
                 }
+                DeskMasterMeter(state, DeskRailHeight, Modifier.width(MeterWidth.dp).fillMaxHeight())
                 if (libraryShown) {
                     DeskLibrary(state, library, libraryTab, Modifier.width(libraryNow.dp).fillMaxHeight().rubber(libraryBounce, true, 0f), closeLibrary)
                     DeskDivider(true, DividerDrag({ libraryNow }, { LibraryMin }, { minOf(LibraryMax, room - inspectorNow) }, 1, libraryBounce) { libraryWidth = it })
@@ -175,7 +177,7 @@ private fun DeskWorkspaceBody(state: EditorState, onExit: () -> Unit, library: A
                 }
                 if (inspectorShown) {
                     DeskDivider(true, DividerDrag({ inspectorNow }, { InspectorMin }, { minOf(InspectorMax, room - libraryNow) }, -1, inspectorBounce) { inspectorWidth = it })
-                    DeskInspector(state, library, Modifier.width(inspectorNow.dp).fillMaxHeight().rubber(inspectorBounce, true, 1f), closeInspector) { settings = true }
+                    DeskInspector(state, library, Modifier.width(inspectorNow.dp).fillMaxHeight().rubber(inspectorBounce, true, 1f), closeInspector)
                 } else {
                     DeskDivider(true, null)
                     DeskInspectorRail { if (both) inspectorOpen = true else { soloInspector = true; soloLibrary = false } }
@@ -328,7 +330,7 @@ private fun DeskTransport(state: EditorState, modifier: Modifier) {
 }
 
 @Composable
-private fun DeskInspector(state: EditorState, library: AddLibrary, modifier: Modifier, close: () -> Unit, onSettings: () -> Unit) {
+private fun DeskInspector(state: EditorState, library: AddLibrary, modifier: Modifier, close: () -> Unit) {
     var menu by remember { mutableStateOf(false) }
     var parentMenu by remember { mutableStateOf(false) }
     val textUi = remember { TextEditUi() }
@@ -352,7 +354,7 @@ private fun DeskInspector(state: EditorState, library: AddLibrary, modifier: Mod
         }
         when {
             MultiSelect.active -> DeskMulti(state, Modifier.weight(1f).fillMaxWidth())
-            state.selectedId == null -> Mixer(state, onSettings, Modifier.weight(1f).fillMaxWidth())
+            state.selectedId == null -> DeskProjectPanel(state, Modifier.weight(1f).fillMaxWidth())
             state.panel == EditorPanel.EditText && state.selected?.kind == "text" -> TextEditor(state, textUi, embedded = true)
             else -> DeskLayerArea(state, Modifier.weight(1f).fillMaxWidth())
         }

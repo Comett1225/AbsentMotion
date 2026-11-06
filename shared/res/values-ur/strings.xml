@@ -1224,17 +1224,9 @@
     <string name="volume_audio_effects">آڈیو ایفیکٹس</string>
     <string name="volume_audio_effects_count">آڈیو ایفیکٹس (%1$s)</string>
     <string name="volume_volume">والیوم</string>
-    <string name="mixer_master">ماسٹر</string>
-    <string name="mixer_mute">میوٹ</string>
-    <string name="mixer_solo">سولو</string>
-    <string name="mixer_mute_short">M</string>
-    <string name="mixer_solo_short">S</string>
     <string name="meter_left_short">L</string>
     <string name="meter_right_short">R</string>
-    <string name="meter_mono">مونو</string>
     <string name="meter_master">ماسٹر لیول</string>
-    <string name="mixer_empty">اس پروجیکٹ میں کوئی آواز نہیں</string>
-    <string name="mixer_empty_hint">موسیقی، آواز یا آواز والی ویڈیو شامل کریں تو وہ یہاں نظر آئے گی۔</string>
     <string name="blend_cat_normal">نارمل</string>
     <string name="blend_cat_darken">ڈارکن</string>
     <string name="blend_cat_lighten">لائٹن</string>

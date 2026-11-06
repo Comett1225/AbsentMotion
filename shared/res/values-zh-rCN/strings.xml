@@ -1207,17 +1207,9 @@
     <string name="volume_audio_effects">音频特效</string>
     <string name="volume_audio_effects_count">音频特效（%1$s）</string>
     <string name="volume_volume">音量</string>
-    <string name="mixer_master">主控</string>
-    <string name="mixer_mute">静音</string>
-    <string name="mixer_solo">独奏</string>
-    <string name="mixer_mute_short">M</string>
-    <string name="mixer_solo_short">S</string>
     <string name="meter_left_short">L</string>
     <string name="meter_right_short">R</string>
-    <string name="meter_mono">单声道</string>
     <string name="meter_master">主输出电平</string>
-    <string name="mixer_empty">此项目没有声音</string>
-    <string name="mixer_empty_hint">添加音乐、音效或带声音的视频后，就会显示在这里。</string>
     <string name="blend_cat_normal">正常</string>
     <string name="blend_cat_darken">变暗</string>
     <string name="blend_cat_lighten">变亮</string>
