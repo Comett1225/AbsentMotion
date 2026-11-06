@@ -52,6 +52,7 @@ import androidx.compose.ui.input.key.KeyShortcut
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.nativeKeyCode
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.pointer.PointerButton
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.input.pointer.pointerInput
@@ -209,6 +210,11 @@ object DeskWindow {
         }
     }
 
+    fun systemMenu() {
+        val window = window as? androidx.compose.ui.awt.ComposeWindow ?: return
+        if (DeskOs.windows && bar != null) runCatching { app.absentmotion.pc.engine.DesktopNative.systemMenu(window.windowHandle) }
+    }
+
     internal fun place(saved: Rectangle?, screens: List<Rectangle>, primary: Rectangle, minWidth: Int, minHeight: Int): Rectangle {
         val screen = saved?.let { s -> screens.firstOrNull { it.contains(s.x + s.width / 2, s.y + BAR / 2) } }
         val area = screen ?: primary
@@ -259,6 +265,7 @@ object DeskWindow {
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 private fun Modifier.dragArea(consume: Boolean): Modifier = pointerInput(consume) {
     awaitPointerEventScope {
         while (true) {
@@ -267,6 +274,7 @@ private fun Modifier.dragArea(consume: Boolean): Modifier = pointerInput(consume
             if (event.type == PointerEventType.Exit || event.type == PointerEventType.Scroll) continue
             DeskWindow.hit = false
             DeskWindow.bar?.let { bar -> runCatching { bar.forceHitTest(false) } }
+            if (event.type == PointerEventType.Release && event.button == PointerButton.Secondary) DeskWindow.systemMenu()
         }
     }
 }

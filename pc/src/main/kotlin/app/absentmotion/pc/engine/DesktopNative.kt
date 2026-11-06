@@ -53,4 +53,5 @@ object DesktopNative {
     external fun videoClose(video: Long)
     external fun blipTimes(text: String, speed: Float, pause: Float, every: Int): FloatArray
     external fun pickFiles(owner: Long, mode: Int, multiple: Boolean, title: String, name: String, filters: Array<String>): Array<String>?
+    external fun systemMenu(window: Long): Boolean
 }

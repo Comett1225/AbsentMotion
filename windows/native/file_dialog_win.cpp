@@ -1,8 +1,33 @@
 #include <jni.h>
 #include <windows.h>
 #include <shobjidl.h>
+#include <algorithm>
 #include <string>
 #include <vector>
+
+static HWND centreOwner;
+static HHOOK centreHook;
+
+static void centre(HWND dialog, HWND owner) {
+    RECT o, d;
+    MONITORINFO info = {sizeof(info)};
+    if (!GetWindowRect(owner, &o) || !GetWindowRect(dialog, &d) || !GetMonitorInfoW(MonitorFromWindow(owner, MONITOR_DEFAULTTONEAREST), &info)) return;
+    int w = d.right - d.left, h = d.bottom - d.top;
+    RECT a = info.rcWork;
+    int x = std::max(a.left, std::min<LONG>(o.left + (o.right - o.left - w) / 2, a.right - w));
+    int y = std::max(a.top, std::min<LONG>(o.top + (o.bottom - o.top - h) / 2, a.bottom - h));
+    SetWindowPos(dialog, nullptr, x, y, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+}
+
+static LRESULT CALLBACK onShow(int code, WPARAM w, LPARAM l) {
+    CWPRETSTRUCT* m = reinterpret_cast<CWPRETSTRUCT*>(l);
+    if (code == HC_ACTION && centreHook && m->message == WM_SHOWWINDOW && m->wParam && GetWindow(m->hwnd, GW_OWNER) == centreOwner) {
+        UnhookWindowsHookEx(centreHook);
+        centreHook = nullptr;
+        centre(m->hwnd, centreOwner);
+    }
+    return CallNextHookEx(nullptr, code, w, l);
+}
 
 static std::wstring wide(JNIEnv* e, jstring s) {
     if (!s) return {};
@@ -41,7 +66,11 @@ static bool show(HWND owner, int mode, bool multiple, const std::wstring& title,
         size_t dot = name.find_last_of(L'.');
         if (dot != std::wstring::npos && dot + 1 < name.size()) dialog->SetDefaultExtension(name.c_str() + dot + 1);
     }
+    centreOwner = owner;
+    centreHook = owner ? SetWindowsHookExW(WH_CALLWNDPROCRET, onShow, nullptr, GetCurrentThreadId()) : nullptr;
     HRESULT shown = dialog->Show(owner);
+    if (centreHook) UnhookWindowsHookEx(centreHook);
+    centreHook = nullptr;
     if (SUCCEEDED(shown) && mode == 0 && multiple) {
         IFileOpenDialog* open = nullptr;
         IShellItemArray* items = nullptr;

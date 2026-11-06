@@ -83,6 +83,8 @@ val jdkArch = mapOf("x64" to "x86_64", "arm64" to "aarch64")
 if (target != null && !(isMac && macArch in jdkArch)) throw GradleException("-Ptarget=$target cannot be built on this system")
 if (macArch != null && System.getProperty("os.arch") != jdkArch[macArch]) throw GradleException("-Ptarget=$target needs Gradle on a ${jdkArch[macArch]} JDK 21 (JAVA_HOME; for x64 also arch -x86_64)")
 val nativeDir = macArch?.let { "native-$it" } ?: "native"
+val gcFlags = listOf("-XX:+UseZGC", "-XX:+ZGenerational", "-XX:MaxRAMPercentage=60")
+val appArchive = "\$APPDIR/app-${(System.currentTimeMillis() / 1000).toString(16)}.jsa"
 val bundledTools = if (macArch != null) listOf("ffmpeg", "ffprobe").associate { "am.$it" to file("build/$nativeDir/$it").absolutePath } else emptyMap()
 
 val nativeBuild = tasks.register<Exec>("nativeBuild") {
@@ -118,8 +120,10 @@ compose.desktop {
             })
             packageName = "AbsentMotion"
             packageVersion = "5.0.0"
-            jvmArgs += listOf("-XX:+UseZGC", "-XX:+ZGenerational", "-XX:MaxRAMPercentage=60", "-Dapple.awt.application.name=AbsentMotion")
+            jvmArgs += gcFlags + "-Dapple.awt.application.name=AbsentMotion"
             if (isMac) jvmArgs += "-XX:SharedArchiveFile=\$APPDIR/app.jsa"
+            if (isWindows) jvmArgs += listOf("-XX:SharedArchiveFile=$appArchive", "-XX:+AutoCreateSharedArchive", "-Dam.cdsArchive=$appArchive")
+            modules("jdk.localedata")
             if (macArch != null) jvmArgs += listOf("ffmpeg", "ffprobe").map { "-Dam.$it=\$APPDIR/resources/$it" }
             macOS {
                 bundleID = "app.absentmotion.desktop"
@@ -171,35 +175,27 @@ val prepareResources = tasks.register<Sync>("prepareResources") {
 }
 tasks.matching { it.name == "createDistributable" || it.name.startsWith("prepareAppResources") }.configureEach { dependsOn(prepareResources) }
 tasks.matching { Regex("create(Release)?Distributable|package(Release)?(Dmg|Msi|Deb|Exe|Pkg|Rpm)").matches(it.name) }.configureEach { outputs.upToDateWhen { false } }
-tasks.matching { it.name == "createRuntimeImage" }.configureEach { inputs.property("javaHome", System.getProperty("java.home")) }
+tasks.matching { it.name == "createRuntimeImage" }.configureEach {
+    inputs.property("javaHome", System.getProperty("java.home"))
+    if (!isMac) doLast {
+        val runtime = layout.buildDirectory.dir("compose/tmp/main/runtime").get().asFile
+        fun archives() = runtime.walk().filter { it.name.startsWith("classes") && it.extension == "jsa" }.toList()
+        archives().forEach { it.setWritable(true); it.delete() }
+        val name = if (isWindows) "java.exe" else "java"
+        val java = File(System.getProperty("java.home"), "bin/$name").copyTo(runtime.resolve("bin/$name"), overwrite = true)
+        java.setExecutable(true)
+        val exit = try {
+            ProcessBuilder(listOf(java.path) + gcFlags + "-Xshare:dump").redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.DISCARD).start().waitFor()
+        } finally { java.delete() }
+        val base = archives().firstOrNull()
+        logger.lifecycle("start-up archive: " + (base?.let { "${it.relativeTo(runtime)}, ${it.length() / 1_000_000} MB" } ?: "not made (java exit $exit)"))
+    }
+}
 if (macArch != null) tasks.matching { it.name == "createDistributable" }.configureEach {
     doLast {
         val app = layout.buildDirectory.dir("compose/binaries/main/app/AbsentMotion.app").get().asFile
         listOf("ffmpeg", "ffprobe").forEach { check(app.resolve("Contents/app/resources/$it").setExecutable(true, false)) }
         check(ProcessBuilder("codesign", "--force", "--deep", "-s", "-", app.path).inheritIO().start().waitFor() == 0)
-    }
-}
-
-if (!isMac) tasks.matching { it.name == "createDistributable" }.configureEach {
-    doLast {
-        val image = layout.buildDirectory.dir("compose/binaries/main/app/AbsentMotion").get().asFile
-        fun archives() = image.walk().filter { it.name.startsWith("classes") && it.extension == "jsa" }.toList()
-        archives().forEach { it.setWritable(true); it.delete() }
-        val launcher = image.resolve(if (isWindows) "AbsentMotion.exe" else "bin/AbsentMotion")
-        val exit = ProcessBuilder(launcher.path).apply { environment()["_JAVA_OPTIONS"] = "-Xshare:dump" }
-            .redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.DISCARD).start().waitFor()
-        val base = archives().firstOrNull()
-        logger.lifecycle("start-up archive: " + (base?.let { "${it.relativeTo(image)}, ${it.length() / 1_000_000} MB" } ?: "not made (launcher exit $exit)"))
-        if (isWindows && base != null) {
-            val jars = image.resolve("app").listFiles { f -> f.extension == "jar" }.orEmpty().sortedBy { it.name }
-            val key = jars.joinToString("\n") { "${it.name} ${it.length()} ${it.lastModified()}" }.hashCode().toUInt().toString(16)
-            val archive = "\$APPDIR\\app-$key.jsa"
-            val cfg = image.resolve("app/AbsentMotion.cfg")
-            val text = cfg.readText()
-            val section = checkNotNull(Regex("\\[JavaOptions](\\r?\\n)").find(text)) { "no [JavaOptions] in ${cfg.path}" }
-            val lines = listOf("-XX:SharedArchiveFile=$archive", "-XX:+AutoCreateSharedArchive", "-Dam.cdsArchive=$archive").joinToString("") { "java-options=$it${section.groupValues[1]}" }
-            cfg.writeText(text.substring(0, section.range.last + 1) + lines + text.substring(section.range.last + 1))
-        }
     }
 }
 

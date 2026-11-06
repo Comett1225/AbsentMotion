@@ -256,14 +256,16 @@ when only the native library changed. `linux/distro_check.sh` (needs Docker) ins
 and checks that it renders, exports and starts there.
 
 **Start-up class archive (Windows and Linux).** The Java runtime that Compose links in has no class-data-sharing archive,
-so `createDistributable` makes one: it runs the app's launcher once with `_JAVA_OPTIONS=-Xshare:dump`, which writes
-`classes_nocoops.jsa` (the name the JVM looks for with ZGC) next to the runtime's `libjvm`/`jvm.dll`; the log line
-`start-up archive: ...` shows its size. On top of that the app's own classes go into a per-user archive the JVM writes when
-the app quits the first time (`-XX:+AutoCreateSharedArchive`): on Windows `app-<key>.jsa` in the install folder (the
-launcher's `.cfg` names it; the key changes with the jar files, and the app deletes older ones), on Linux in
+so `createRuntimeImage` makes one in the runtime image itself, which `createDistributable`, `packageMsi` and `packageDeb`
+all copy: it copies the build JDK's `java` launcher into the image for a moment, runs it with the app's GC options and
+`-Xshare:dump`, which writes `classes_nocoops.jsa` (the name the JVM looks for with ZGC) next to the runtime's
+`libjvm`/`jvm.dll`, then removes the launcher again; the log line `start-up archive: ...` shows its size. On top of that
+the app's own classes go into a per-user archive the JVM writes when the app quits the first time
+(`-XX:+AutoCreateSharedArchive`): on Windows `app-<key>.jsa` in the install folder, named in the app's `jvmArgs` (the key
+is the build time in hex, so every build gets a fresh name, and the app deletes older ones), on Linux in
 `~/.cache/absentmotion` through `linux/start.sh`. A JDK 21 dynamic archive is only made when none exists and is not
 rebuilt when it no longer matches, which is why the file name carries the key. The Mac keeps its own archive from
-`installMac`.
+`installMac`. The runtime image also carries `jdk.localedata`, so dates use each language's own month names and order.
 
 **Timing tests.** `AM_TIMING=1 ./gradlew test --tests app.absentmotion.pc.ExportTimingTest` exports a 10-second 1080x1920
 scene (a video, a picture and four effects) and prints frames per second for each stage (engine drawing and read-back,
