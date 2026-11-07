@@ -128,6 +128,7 @@ class MainActivity : ComponentActivity() {
     private var imported by mutableStateOf<List<ImportReport>>(emptyList())
     private var editingTemplate by mutableStateOf<String?>(null)
     private var firstRun by mutableStateOf<FirstRun?>(null)
+    private var whatsNew by mutableStateOf<app.absentmotion.ui.home.WhatsNew?>(null)
     private var opening by mutableStateOf(false)
     private var openingProject by mutableStateOf(false)
     private var openFailed by mutableStateOf<String?>(null)
@@ -215,6 +216,7 @@ class MainActivity : ComponentActivity() {
         app.absentmotion.ui.home.Updater.atLaunch(applicationContext)
         lifecycleScope.launch { engineWorks() }
         firstRun = FirstRun.of(settings, TestHooks.onboarding(intent).takeIf { savedInstanceState == null })
+        whatsNew = app.absentmotion.ui.home.WhatsNewNotes.pending(this, settings)
         window.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(Am.HomeBg.toArgb()))
         importShared()
         setContent {
@@ -318,11 +320,13 @@ class MainActivity : ComponentActivity() {
                     onDiscard = { seenCrash(outdated != null); offer?.let { answerRecovery(it, false) } },
                     onClose = { seenCrash(outdated != null) },
                 ) else if (open == null && first == null && !opening && editingTemplate == null && exportingFromList == null) {
-                    if (settings.updatesAsked) UpdateDialog() else UpdateAskDialog(settings)
+                    val notes = whatsNew
+                    if (notes != null) app.absentmotion.ui.home.WhatsNewDialog(notes) { whatsNew = null; app.absentmotion.ui.home.WhatsNewNotes.seen(this, settings) }
+                    else if (settings.updatesAsked) UpdateDialog() else UpdateAskDialog(settings)
                 }
                 app.absentmotion.ui.tutorial.TutorialHost(
                     open, store, settings,
-                    homeFree = open == null && first == null && !opening && editingTemplate == null && exportingFromList == null && offer == null && crashed == null && !problemShown && imported.isEmpty(),
+                    homeFree = open == null && first == null && !opening && editingTemplate == null && exportingFromList == null && offer == null && crashed == null && !problemShown && imported.isEmpty() && whatsNew == null,
                     onOpen = ::open, onCloseEditor = ::closeEditor, onChanged = { projectsChanged++ },
                 )
             }

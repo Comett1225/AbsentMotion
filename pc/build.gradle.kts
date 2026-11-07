@@ -237,6 +237,7 @@ val sceneCheck = tasks.register<JavaExec>("sceneCheck") {
 tasks.test {
     systemProperty("user.home", layout.buildDirectory.dir("test-home").get().asFile.absolutePath)
     systemProperty("am.onboarding", "done")
+    systemProperty("am.whatsNew", "off")
     systemProperty("am.fontOffer", "off")
     systemProperty("am.preload", "off")
     systemProperty("am.shell", "off")

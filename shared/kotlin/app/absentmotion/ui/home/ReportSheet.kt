@@ -116,7 +116,7 @@ internal object ReadmeSource : UpdateSource {
 }
 
 private val DiscordLink = Regex("""https://(?:discord\.gg|discord\.com/invite)/[A-Za-z0-9_-]+""")
-private val FormLink = Regex("""https://forms\.gle/[A-Za-z0-9_-]+""")
+private val FormLink = Regex("""https://(?:forms\.gle/[A-Za-z0-9_-]+|docs\.google\.com/forms/d/(?:e/)?[A-Za-z0-9_-]+/viewform)""")
 private val BugLine = Regex("""(?i)report[\s%20+-]*a[\s%20+-]*bug|bug report""")
 private val FeatureLine = Regex("""(?i)suggest[\s%20+-]*a[\s%20+-]*feature|feature request""")
 

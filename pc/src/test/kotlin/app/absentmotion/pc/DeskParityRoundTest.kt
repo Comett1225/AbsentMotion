@@ -1,5 +1,7 @@
 package app.absentmotion.pc
 
+import app.absentmotion.ui.home.WhatsNew
+import app.absentmotion.ui.home.WhatsNewNotes
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.toAwtImage
@@ -40,7 +42,7 @@ class DeskParityRoundTest {
     private val repo = File("..").canonicalFile
     private val shots = File("build/ui-shots/parity-round").also { it.mkdirs() }
     private val sizes = listOf(1024 to 700, 1280 to 800, 1728 to 1080, 2560 to 1440)
-    private val saved = listOf("am.data", "user.home", "am.exports", "am.onboarding", "am.fontOffer").associateWith { System.getProperty(it) }
+    private val saved = listOf("am.data", "user.home", "am.exports", "am.onboarding", "am.fontOffer", "am.whatsNew").associateWith { System.getProperty(it) }
 
     @org.junit.After fun restoreProperties() {
         saved.forEach { (key, value) -> if (value == null) System.clearProperty(key) else System.setProperty(key, value) }
@@ -83,6 +85,26 @@ class DeskParityRoundTest {
         waitUntil(timeoutMillis = 30_000) { app.engine.frame != null }
         settle(800)
         return app.editor!!
+    }
+
+    @Test fun whatsNewShowsOnceAfterAnUpdate() {
+        val key = WhatsNewNotes.key(app.absentmotion.desk.DeskInfo.version)!!
+        val title = WhatsNew.parse(repo.resolve("shared/assets/whats-new/$key.md").readText()).title
+        System.clearProperty("am.whatsNew")
+        prepare("whatsnew")
+        session(1280, 800) { app ->
+            settle(900)
+            onNodeWithText(title).assertExists()
+            shot("1280-whats-new")
+            onAllNodesWithText(text(R.string.action_continue)).onFirst().performClick()
+            settle()
+            onNodeWithText(title).assertDoesNotExist()
+            assertEquals(key, app.settings.whatsNewSeen)
+        }
+        session(1280, 800) {
+            settle(900)
+            onNodeWithText(title).assertDoesNotExist()
+        }
     }
 
     @Test fun firstRunWelcomeThenTheTourOffer() {

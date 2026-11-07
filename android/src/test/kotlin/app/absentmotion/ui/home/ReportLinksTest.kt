@@ -38,6 +38,18 @@ class ReportLinksTest {
     }
 
     @Test
+    fun acceptsLongGoogleFormLinks() {
+        val long = "https://docs.google.com/forms/d/e/1FAIpQLSf_Long-Id123/viewform"
+        val links = parseReportLinks("<a href=\"$long?usp=sf_link\"><img alt=\"Report a bug\"></a>\n[Suggest a feature](https://docs.google.com/forms/d/Abc_1-2/viewform)")
+        assertEquals(long, links.form)
+        assertEquals("https://docs.google.com/forms/d/Abc_1-2/viewform", links.feature)
+        assertTrue(isFormLink(long))
+        assertFalse(isFormLink("https://docs.google.com/forms/d/e/../viewform"))
+        assertFalse(isFormLink("https://docs.google.com.evil.example/forms/d/e/abc/viewform"))
+        assertFalse(isFormLink("https://docs.google.com/document/d/abc/edit"))
+    }
+
+    @Test
     fun acceptsInviteStyleDiscordLink() {
         assertEquals("https://discord.com/invite/xyz-1", parseReportLinks("join https://discord.com/invite/xyz-1 now").discord)
     }

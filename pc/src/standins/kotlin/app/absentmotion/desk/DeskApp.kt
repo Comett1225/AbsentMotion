@@ -112,6 +112,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import app.absentmotion.ui.home.WhatsNewDialog
+import app.absentmotion.ui.home.WhatsNewNotes
+import app.absentmotion.platform.LocalContext
 
 private val PaletteFiles = setOf("gpl", "ase", "act", "pal")
 
@@ -472,6 +475,8 @@ private fun DeskContent(app: DeskAppState, scale: Float) {
     }
     val open = app.editor
     var firstRun by remember { mutableStateOf(FirstRun.of(app.settings, System.getProperty("am.onboarding"))) }
+    val context = LocalContext.current
+    var whatsNew by remember { mutableStateOf(if (System.getProperty("am.whatsNew") == "off") null else WhatsNewNotes.pending(context, app.settings)) }
     val density = LocalDensity.current
     val homePress = remember(Am.PressHome) { PressIndication(Am.PressHome) }
     val editorPress = remember(Am.PressEditor) { PressIndication(Am.PressEditor) }
@@ -535,9 +540,12 @@ private fun DeskContent(app: DeskAppState, scale: Float) {
             }
             if (app.settingsOpen) DeskSettings(app.settings, app.settingsPage, onClose = { app.settingsOpen = false }, onRestored = { app.projectsChanged++ })
             app.recovered?.takeIf { open == null }?.let { offer -> DeskRecovery(offer, { scope.launch { app.answerRecovery(offer, it) } }) { app.recovered = null } }
+            whatsNew?.takeIf { open == null && first == null && !app.opening && app.editingTemplate == null && app.exportingFromList == null && app.recovered == null && !app.settingsOpen }?.let { notes ->
+                WhatsNewDialog(notes) { whatsNew = null; WhatsNewNotes.seen(context, app.settings) }
+            }
             TutorialHost(
                 open, app.store, app.settings,
-                homeFree = open == null && first == null && !app.opening && app.editingTemplate == null && app.exportingFromList == null && app.recovered == null && app.imported.isEmpty() && !app.settingsOpen && Updates.answer == null,
+                homeFree = open == null && first == null && !app.opening && app.editingTemplate == null && app.exportingFromList == null && app.recovered == null && app.imported.isEmpty() && !app.settingsOpen && Updates.answer == null && whatsNew == null,
                 onOpen = { id -> run { app.openNow(id) } }, onCloseEditor = { scope.launch { app.closeEditor() } }, onChanged = { app.projectsChanged++ },
             )
             app.fontOffer?.takeIf { it.first === open }?.let { (state, names) -> DeskFontOffer(names, { app.downloadFonts(names) }) { app.declineFonts(state) } }

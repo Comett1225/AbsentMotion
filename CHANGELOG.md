@@ -38,6 +38,7 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - Desktop window bar in the app's colours with the system's own window buttons, and a menu button with File, Edit, View, Playback and Help.
 - Desktop media belongs to each project; right-click a folder and choose Pin to all projects to see it everywhere. Search lists the folder first.
 - Desktop level meter for the whole project, right of the buttons on the left; with nothing selected, the Inspector shows the project settings and the list of layers.
+- What's new: the first start after updating to a version with release notes shows what changed, once, with links to report problems.
 - The level line under the play bar shows the left and right channel; tablets held sideways also show a level meter at the top left of the preview.
 - Effect help on the desktop opens in its own window inside the app.
 - 90 and 120 fps projects.
@@ -68,6 +69,7 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - Desktop: editing and scrubbing respond sooner, with less waiting on each step and on video frames.
 - Phones and tablets: editing a project that has a video no longer waits for the video on every step; the exact frame follows when it is ready.
 - Phones and tablets: compiled graphics programs are kept between launches, so effects stutter less the first time they show after a restart.
+- The bug report, feature request and Discord links in Settings, Tools and the report window follow the project's README, so they stay current; long Google Forms links work too.
 
 ### Removed
 
