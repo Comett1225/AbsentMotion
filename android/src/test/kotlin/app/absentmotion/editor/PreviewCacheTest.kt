@@ -88,6 +88,18 @@ class PreviewCacheTest {
         assertEquals(key, CacheKey("p", Scene(edited.node.copy(attrs = edited.node.attrs - "bgcolor")), 1, false))
     }
 
+    @Test fun theLineStaysUpWhileTheCacheCatchesUpWithAnEdit() {
+        val scene = Scene.parse("""<scene width="100" height="100" fps="30" totalTime="1000"><shape id="1" startTime="0" endTime="999"/></scene>""")
+        val edited = Scene(scene.node.copy(attrs = scene.node.attrs + ("bgcolor" to "#ff00ff00")))
+        val cached = CacheKey("p", scene, 1, false)
+        assertTrue(cacheBarShows(cached, CacheKey("p", scene, 2, false), catchingUp = false))
+        assertTrue(cacheBarShows(cached, CacheKey("p", edited, 1, false), catchingUp = true))
+        assertFalse(cacheBarShows(cached, CacheKey("p", edited, 1, false), catchingUp = false))
+        assertFalse(cacheBarShows(cached, CacheKey("p", edited, 2, false), catchingUp = true))
+        assertFalse(cacheBarShows(cached, CacheKey("p", edited, 1, false, group = listOf(1L)), catchingUp = true))
+        assertFalse(cacheBarShows(cached, CacheKey("q", scene, 1, false), catchingUp = true))
+    }
+
     @Test fun aReplacedPictureOrNewFontOutdatesTheCache() {
         val scene = Scene.parse("""<scene width="100" height="100" fps="30" totalTime="1000"><shape id="1" startTime="0" endTime="999" fillType="media" fillImage="file:///a.png"/></scene>""")
         assertNotEquals(CacheKey("p", scene, 1, false, 3), CacheKey("p", scene, 1, false, 4))

@@ -1915,8 +1915,7 @@ private fun DrawScope.drawBookmark(x: Float, outline: Path) {
 
 private fun DrawScope.drawCacheBar(state: EditorState, time: TimeScale, fps: Int, left: Float, rulerH: Float) {
     PreviewCache.revision
-    if (PreviewCache.key?.let { it.projectId == state.projectId && it.scene.node === state.scene.node } != true) return
-    val runs = PreviewCache.runs()
+    val runs = PreviewCache.runsFor(state)
     if (runs.isEmpty()) return
     val height = CacheBarHeight.toPx()
     val top = rulerH - height - 1.dp.toPx()

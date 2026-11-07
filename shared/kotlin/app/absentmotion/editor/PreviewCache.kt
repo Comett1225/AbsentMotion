@@ -190,7 +190,10 @@ class FrameStore(val first: Int, val budget: Long, private val file: java.io.Fil
 
 fun diskBudget(free: Long): Long = minOf(MAX_DISK_BUDGET, (free - DISK_RESERVE) / 4).coerceAtLeast(0L)
 
-data class CacheKey(val projectId: String, val scene: Scene, val divisor: Int, val androidEmoji: Boolean, val resources: Long = 0, val accurateBlur: Boolean = true)
+data class CacheKey(val projectId: String, val scene: Scene, val divisor: Int, val androidEmoji: Boolean, val resources: Long = 0, val accurateBlur: Boolean = true, val group: List<Long> = emptyList())
+
+internal fun cacheBarShows(cached: CacheKey, now: CacheKey, catchingUp: Boolean): Boolean =
+    cached.projectId == now.projectId && (cached.scene.node === now.scene.node || catchingUp && cached.copy(scene = now.scene) == now)
 
 class FramePlayer internal constructor(private val store: FrameStore, val width: Int, val height: Int) {
     class Shown(val frame: Int, val image: ImageBitmap, val at: Long)
@@ -323,6 +326,8 @@ object PreviewCache {
         if (force || now - revisedNs > 100_000_000L) { revisedNs = now; revision++ }
     }
     fun runs(): List<IntRange> = if (automatic || phase == Phase.Ready) store?.runs().orEmpty() else emptyList()
+    fun runsFor(state: EditorState): List<IntRange> =
+        if (key?.let { cacheBarShows(it, keyOf(state), automatic && phase != Phase.Rendering) } == true) runs() else emptyList()
     var fit by mutableFloatStateOf(0f)
     var checkerCell by mutableFloatStateOf(25f)
     var automatic = false
@@ -429,7 +434,7 @@ object PreviewCache {
     }
 
     fun keyOf(state: EditorState, resources: Long = state.engine.mediaRevision.value) =
-        CacheKey(state.projectId, state.scene, state.settings.previewQuality.divisor, state.settings.androidEmoji, resources, state.settings.fullMotionBlur)
+        CacheKey(state.projectId, state.scene, state.settings.previewQuality.divisor, state.settings.androidEmoji, resources, state.settings.fullMotionBlur, state.groupPath)
 
     fun render(state: EditorState, context: Context, scope: CoroutineScope) {
         if (phase == Phase.Rendering) return
