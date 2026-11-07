@@ -45,6 +45,7 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - 90 and 120 fps projects.
 - Saved custom sizes in New Project and in the project settings.
 - Copy and Report on crash and error screens, with links to GitHub, Discord and the bug report form.
+- Join Discord: a button on the About page and links in Settings and the Tools tab.
 - Desktop: Alt+Left and Alt+Right jump between bookmarks; comma and period nudge the selected clips.
 - Linux: a .tar.gz with an install script for any distribution.
 - Effects library: swipe left or right on the Recent and Favorite grid to switch, or press and hold the two small icons and slide your thumb.
