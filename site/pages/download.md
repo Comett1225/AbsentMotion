@@ -2,7 +2,7 @@
 title: Download
 kind: download
 site_only: true
-summary: A free, open-source motion graphics and video editor for Android. It works offline. No account, no subscription, no ads.
+summary: A free, open-source motion graphics and video editor for Android, Mac, Windows and Linux. It works offline. No account, no subscription, no ads.
 ---
 ## Install in three steps
 

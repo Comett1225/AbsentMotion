@@ -44,7 +44,8 @@
             return { platform: "android", android: androidMajor(hints.platformVersion), model: String(hints.model || "").trim() || null };
           });
       }
-      return Promise.resolve({ platform: data.platform === "iOS" ? "ios" : "desktop", android: null, model: null });
+      if (data.platform === "iOS") return Promise.resolve({ platform: "ios", android: null, model: null });
+      return Promise.resolve({ platform: "desktop", os: computerOs(data.platform + " " + ua), arm: /aarch64|arm/i.test(ua), android: null, model: null });
     }
     if (/iPhone|iPad|iPod/.test(ua) || (nav.platform === "MacIntel" && nav.maxTouchPoints > 1)) {
       return Promise.resolve({ platform: "ios", android: null, model: null });
@@ -58,7 +59,15 @@
         model: reduced ? null : modelFromUserAgent(ua)
       });
     }
-    return Promise.resolve({ platform: "desktop", android: null, model: null });
+    return Promise.resolve({ platform: "desktop", os: computerOs(ua), arm: /aarch64|arm/i.test(ua), android: null, model: null });
+  }
+
+  function computerOs(text) {
+    if (/CrOS|Chrome OS|ChromeOS/i.test(text)) return "chromeos";
+    if (/Windows/i.test(text)) return "windows";
+    if (/Mac/i.test(text)) return "mac";
+    if (/Linux/i.test(text)) return "linux";
+    return null;
   }
 
   function buildIndex(devices) {
@@ -139,7 +148,7 @@
 
   function recommend(env, device) {
     if (env.platform === "ios") return { kind: "ios" };
-    if (env.platform !== "android") return { kind: "desktop" };
+    if (env.platform !== "android") return env.os === "chromeos" ? { kind: "chromebook", arm: !!env.arm } : { kind: "desktop", os: env.os || null, arm: !!env.arm };
     var bits = device && device.arm64 === false ? 32 : 64;
     if (env.android == null) return bits === 32 && device.tier === "compatible" ? { kind: "compatible", device: device, android: null, bits: 32 } : { kind: "unknown", device: device };
     if (env.android >= LATEST_FROM && bits === 64) return { kind: "latest", device: device, android: env.android };
@@ -241,6 +250,40 @@
         heading = "AbsentMotion is an Android app";
         kids.push(el("p", { text: "It cannot be installed on an iPhone or iPad. Open this page on an Android phone to download it." }));
         break;
+      case "chromebook":
+        heading = "AbsentMotion for your Chromebook";
+        kids.push(el("p", { text: "Chromebooks run the Android app. " + (rec.arm ? "This one has an ARM chip, so it uses the phone file." : "Chromebooks with an Intel or AMD chip have their own file.") + " Chromebooks from the last few years run Android 13 or newer; older ones use the Compatible file." }));
+        if (rec.arm) {
+          actions.push(el("a", { "class": "btn big", href: link("dl-foss") }, ["Download for your Chromebook", el("span", { "class": "sub", text: "Latest, Android 13 or newer, " + version })]));
+          if (link("dl-compatible") !== "#all") actions.push(el("a", { "class": "btn alt", href: link("dl-compatible"), text: "Android 9 to 12: Compatible" }));
+        } else {
+          actions.push(el("a", { "class": "btn big", href: link("dl-foss-x86") }, ["Download for your Chromebook", el("span", { "class": "sub", text: "Intel or AMD, Android 13 or newer, " + version })]));
+          actions.push(el("a", { "class": "btn alt", href: link("dl-compatible-x86"), text: "Android 9 to 12: Compatible" }));
+        }
+        break;
+      case "desktop":
+        if (rec.os === "mac" && link("dl-mac-arm64") !== "#all") {
+          heading = "AbsentMotion for Mac";
+          kids.push(el("p", { text: "Pick the file for your Mac's chip: Apple silicon (M1 or newer) or Intel. The first time, macOS asks you to allow it in System Settings, Privacy & Security, Open Anyway." }));
+          actions.push(el("a", { "class": "btn big", href: link("dl-mac-arm64") }, ["Download for Apple silicon", el("span", { "class": "sub", text: "M1 or newer, macOS 11 or newer, " + version })]));
+          actions.push(el("a", { "class": "btn alt", href: link("dl-mac-x64"), text: "Mac with an Intel chip" }));
+          break;
+        }
+        if (rec.os === "windows" && link("dl-windows") !== "#all") {
+          heading = "AbsentMotion for Windows";
+          kids.push(el("p", { text: "For 64-bit Windows 10 and 11. If your browser says the file isn't commonly downloaded, keep it. If Windows says it protected your PC, choose More info, then Run anyway." }));
+          actions.push(el("a", { "class": "btn big", href: link("dl-windows") }, ["Download for Windows", el("span", { "class": "sub", text: "Installer (.msi), " + version })]));
+          break;
+        }
+        if (rec.os === "linux" && link("dl-linux-x86_64-appimage") !== "#all") {
+          var chip = rec.arm ? "arm64" : "x86_64";
+          heading = "AbsentMotion for Linux";
+          kids.push(el("p", { text: "For " + (rec.arm ? "ARM (arm64)" : "Intel or AMD (x86_64)") + " computers with glibc 2.35 or newer: Ubuntu 22.04, Debian 12 and later. The AppImage runs without installing, the .deb installs on Ubuntu and Debian, and the .tar.gz installs for your user on any distribution." }));
+          actions.push(el("a", { "class": "btn big", href: link("dl-linux-" + chip + "-appimage") }, ["Download AppImage", el("span", { "class": "sub", text: chip + ", " + version })]));
+          actions.push(el("a", { "class": "btn alt", href: link("dl-linux-" + chip + "-deb"), text: ".deb" }));
+          actions.push(el("a", { "class": "btn alt", href: link("dl-linux-" + chip + "-tar"), text: ".tar.gz" }));
+          break;
+        }
       default:
         heading = "Open this page on your Android phone";
         kids.push(el("p", { text: "AbsentMotion is an Android app, and this looks like a computer. On your phone, this page will pick the right file for it. You can also see every download below or check a phone model." }));

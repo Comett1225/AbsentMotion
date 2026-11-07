@@ -501,7 +501,7 @@ class Site:
         else:
             parts.append(body)
         parts.append(self.pager(page.slug, depth))
-        title = "AbsentMotion: free video editor for Android" if page.kind == "download" else page.title + " | AbsentMotion"
+        title = "AbsentMotion: free video editor for Android, Mac, Windows and Linux" if page.kind == "download" else page.title + " | AbsentMotion"
         description = page.summary or "AbsentMotion, a free open-source motion graphics and video editor for Android."
         self.add(path, self.shell(path, title, re.sub(r"[`*]|\]\([^)]*\)|\[", "", description), "".join(parts), page.slug, page.kind, page.kind not in ("download",)))
 
@@ -523,7 +523,9 @@ class Site:
         v = self.version
         base = "%s/releases/download/v%s/AbsentMotion-%s-" % (REPO, v, v)
         return {"foss": base + "foss.apk", "compatible": base + "compatible.apk", "compatible32": base + "compatible-32bit.apk",
-                "foss_x86": base + "foss-x86_64.apk", "compatible_x86": base + "compatible-x86_64.apk", "sums": "%s/releases/download/v%s/SHA256SUMS.txt" % (REPO, v)}
+                "foss_x86": base + "foss-x86_64.apk", "compatible_x86": base + "compatible-x86_64.apk", "sums": "%s/releases/download/v%s/SHA256SUMS.txt" % (REPO, v),
+                "mac_arm64": base + "macos-arm64.dmg", "mac_x64": base + "macos-x64.dmg", "windows": base + "windows-x64.msi",
+                **{"linux_%s_%s" % (chip, kind): base + "linux-%s.%s" % (chip, ext) for chip in ("x86_64", "arm64") for kind, ext in (("deb", "deb"), ("appimage", "AppImage"), ("tar", "tar.gz"))}}
 
     def download_top(self, page, depth):
         return (
@@ -544,7 +546,20 @@ class Site:
             '%s</ul>'
             '<p class="small"><a id="dl-sums" href="%s">SHA256SUMS.txt</a> has the checksum of every file. <a href="%s" rel="noopener">All releases and older versions</a> &middot; '
             '<a href="%s" rel="noopener">Source code</a></p></section>'
-        ) % (v, links["foss"], v, self.compatible_item(), links["sums"], SHORT["releases"], REPO)
+        ) % (v, links["foss"], v, self.compatible_item() + self.computer_items(), links["sums"], SHORT["releases"], REPO)
+
+    def computer_items(self):
+        if tuple(int(part) for part in self.version.split(".")[:3]) < (5, 0, 0):
+            return ""
+        l, v = self.download_links(), self.version
+        linux = "".join('<li><a id="dl-linux-%s-appimage" class="btn alt" href="%s">Linux %s</a><div><strong>Linux on %s</strong>, glibc 2.35 or newer (Ubuntu 22.04, Debian 12 and later). '
+                        'AppImage <code>AbsentMotion-%s-linux-%s.AppImage</code>, also as <a id="dl-linux-%s-deb" href="%s">.deb</a> and <a id="dl-linux-%s-tar" href="%s">.tar.gz</a>.</div></li>'
+                        % (chip, l["linux_%s_appimage" % chip], chip, label, v, chip, chip, l["linux_%s_deb" % chip], chip, l["linux_%s_tar" % chip])
+                        for chip, label in (("x86_64", "Intel or AMD computers (x86_64)"), ("arm64", "ARM computers (arm64)")))
+        return ('<li><a id="dl-mac-arm64" class="btn alt" href="%s">Mac, Apple silicon</a><div><strong>Macs with Apple silicon</strong> (M1 or newer), macOS 11 or newer. <code>AbsentMotion-%s-macos-arm64.dmg</code></div></li>'
+                '<li><a id="dl-mac-x64" class="btn alt" href="%s">Mac, Intel</a><div><strong>Macs with an Intel chip</strong>, macOS 11 or newer. <code>AbsentMotion-%s-macos-x64.dmg</code></div></li>'
+                '<li><a id="dl-windows" class="btn alt" href="%s">Windows</a><div><strong>64-bit Windows 10 and 11.</strong> Installer for your user. <code>AbsentMotion-%s-windows-x64.msi</code></div></li>'
+                % (l["mac_arm64"], v, l["mac_x64"], v, l["windows"], v)) + linux
 
     def compatible_item(self):
         v = self.version

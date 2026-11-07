@@ -66,9 +66,19 @@ async function main() {
 
   r = await recommendation({ userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/130.0.0.0 Safari/537.36", userAgentData: { platform: "Windows", mobile: false } });
   assert.strictEqual(r.rec.kind, "desktop");
+  assert.strictEqual(r.rec.os, "windows");
+
+  r = await recommendation({ userAgent: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/130.0.0.0 Safari/537.36" });
+  assert.deepStrictEqual([r.rec.kind, r.rec.os, r.rec.arm], ["desktop", "linux", false]);
+
+  r = await recommendation({ userAgent: "Mozilla/5.0 (X11; CrOS x86_64 15359.58.0) AppleWebKit/537.36 Chrome/130.0.0.0 Safari/537.36" });
+  assert.deepStrictEqual([r.rec.kind, r.rec.arm], ["chromebook", false]);
+
+  r = await recommendation({ userAgent: "Mozilla/5.0 (X11; CrOS aarch64 15359.58.0) AppleWebKit/537.36 Chrome/130.0.0.0 Safari/537.36" });
+  assert.deepStrictEqual([r.rec.kind, r.rec.arm], ["chromebook", true]);
 
   r = await recommendation({ userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Version/17.0 Safari/605.1.15", platform: "MacIntel", maxTouchPoints: 0 });
-  assert.strictEqual(r.rec.kind, "desktop");
+  assert.deepStrictEqual([r.rec.kind, r.rec.os], ["desktop", "mac"]);
 
   r = await recommendation({ userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Version/17.0 Mobile/15E148 Safari/604.1", platform: "iPhone", maxTouchPoints: 5 });
   assert.strictEqual(r.rec.kind, "ios");
