@@ -230,8 +230,8 @@ Windows:
 - Used in: the Windows installer. `amdesktop.dll` links the shared `avformat`, `avcodec`, `avutil`, `swresample` and
   `swscale` DLLs for video decoding (D3D11 hardware decoding when available), and `ffmpeg.exe` and `ffprobe.exe` run export,
   the Tools tab and media probing. The DLLs sit unchanged in the app folder, so they can be replaced with another build.
-- Source: `AbsentMotion-<version>-ffmpeg-source-1.tar` and `-2.tar`, attached to every release that ships the desktop apps,
-  hold the FFmpeg source of this build (commit `1e65c6cd5d3d2d12cbb374460dbf08bedf54772a`), BtbN's build scripts (commit
+- Source: `Source-FFmpeg-<version>-windows-linux-part1.tar` and `-part2.tar`, attached to every release that ships the
+  desktop apps, hold the FFmpeg source of this build (commit `1e65c6cd5d3d2d12cbb374460dbf08bedf54772a`), BtbN's build scripts (commit
   `5ece62897c650b863c1ddda7b6964845344aef2d`) and the source archive of every library those scripts build.
 
 Linux (x86_64 and arm64):
@@ -253,7 +253,7 @@ Linux (x86_64 and arm64):
   `swscale` libraries (and `swresample` through them) for video decoding (VA-API when available), and `ffmpeg` and `ffprobe`
   run export, the Tools tab and media probing. They sit in the app's `lib/app/resources` folder
   (`/opt/absentmotion/lib/app/resources` for the `.deb`), so they can be replaced with another build.
-- Source: the same `AbsentMotion-<version>-ffmpeg-source-1.tar` and `-2.tar` hold the FFmpeg source of this build (commit
+- Source: the same `Source-FFmpeg-<version>-windows-linux-part1.tar` and `-part2.tar` hold the FFmpeg source of this build (commit
   `b204e94e90fca64045e9ca7dd44c65678c7eb29e`) next to BtbN's build scripts and library sources.
 
 macOS (Apple silicon and Intel):
@@ -273,7 +273,7 @@ macOS (Apple silicon and Intel):
 - Used in: the macOS apps. `libamdesktop.dylib` links the shared `avformat`, `avcodec`, `avutil` and `swscale` libraries for
   video decoding (VideoToolbox when available), and `ffmpeg` and `ffprobe` run export, the Tools tab, the camera and media
   probing. They sit in `AbsentMotion.app/Contents/app/resources`, so they can be replaced with another build.
-- Source: `AbsentMotion-<version>-macos-ffmpeg-source.tar`, attached to every release that ships the macOS apps, holds the
+- Source: `Source-FFmpeg-<version>-macos.tar`, attached to every release that ships the macOS apps, holds the
   unchanged source archives of FFmpeg, LAME and the codec libraries below and the scripts that built them.
 
 The codec libraries in the macOS FFmpeg are built for arm64 and x86_64 (minimum macOS 11) as static libraries from the
