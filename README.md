@@ -19,6 +19,11 @@
   <a href="https://comett1225.github.io/AbsentMotion/effects/index.html"><img alt="All effects" src="https://img.shields.io/badge/All-effects-2b2b33?style=for-the-badge"></a>
   <a href="https://github.com/Comett1225/AbsentMotion/releases"><img alt="All versions" src="https://img.shields.io/badge/All-versions-2b2b33?style=for-the-badge"></a>
 </p>
+<p align="center">
+  <a href="https://discord.gg/xXEHj8Sx8X"><img alt="Join the Discord" src="https://img.shields.io/badge/Discord-join%20the%20server-5865F2?style=for-the-badge&logo=discord&logoColor=white"></a>
+  <br>
+  <sub>Found a bug or have an idea? Come tell us on Discord.</sub>
+</p>
 
 AbsentMotion is a free, open-source alternative to CapCut and Alight Motion: a motion graphics, animation and video
 editor for Android phones and Chromebooks, with desktop versions for Mac and Linux from 5.0. Everything runs on your device and it works without
