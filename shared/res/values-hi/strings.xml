@@ -138,6 +138,7 @@
     <string name="settings_about">परिचय</string>
     <string name="settings_report_issue">समस्या की रिपोर्ट करें</string>
     <string name="settings_suggest_feature">कोई फ़ीचर सुझाएँ</string>
+    <string name="join_discord">Discord से जुड़ें</string>
     <string name="settings_help">सहायता</string>
     <string name="tutorial_settings_start">ट्यूटोरियल शुरू करें</string>
     <string name="tutorial_settings_continue">ट्यूटोरियल जारी रखें</string>
@@ -2095,7 +2096,7 @@
     <string name="tools_downloader_intro">YouTube, Instagram, TikTok और दूसरे सोशल मीडिया से वीडियो और तस्वीरें सीधे आपकी गैलरी में डाउनलोड करता है। इसके लिए एक बार %1$d MB का ऐड-ऑन चाहिए।</string>
     <string name="tools_download_progress">डाउनलोड हो रहा है %1$d%%</string>
     <string name="tools_more">आने वाले अपडेट में और टूल आएँगे...</string>
-    <string name="tools_suggestions">किसी टूल का सुझाव है? %1$s या %2$s पर बताएँ!</string>
+    <string name="tools_suggestions">किसी टूल का सुझाव है? %1$s, %2$s या %3$s पर बताएँ!</string>
     <string name="tools_github">GitHub</string>
     <string name="tools_form">फ़ॉर्म</string>
     <string name="effectbrowser_favorite_preset">पसंदीदा प्रीसेट</string>

@@ -138,6 +138,7 @@
     <string name="settings_about">정보</string>
     <string name="settings_report_issue">문제 신고</string>
     <string name="settings_suggest_feature">기능 제안</string>
+    <string name="join_discord">Discord 참여하기</string>
     <string name="settings_help">도움말</string>
     <string name="tutorial_settings_start">튜토리얼 시작</string>
     <string name="tutorial_settings_continue">튜토리얼 계속하기</string>
@@ -2066,7 +2067,7 @@
     <string name="tools_downloader_intro">YouTube, Instagram, TikTok 및 기타 소셜 미디어의 동영상과 이미지를 갤러리에 바로 다운로드합니다. %1$d MB의 추가 기능을 한 번 설치해야 합니다.</string>
     <string name="tools_download_progress">다운로드 중 %1$d%%</string>
     <string name="tools_more">향후 업데이트에서 더 많은 도구가 추가됩니다...</string>
-    <string name="tools_suggestions">제안할 도구가 있나요? %1$s 또는 %2$s에 남겨주세요!</string>
+    <string name="tools_suggestions">제안할 도구가 있나요? %1$s, %2$s 또는 %3$s에 남겨주세요!</string>
     <string name="tools_github">GitHub</string>
     <string name="tools_form">양식</string>
     <string name="effectbrowser_favorite_preset">즐겨찾는 프리셋</string>

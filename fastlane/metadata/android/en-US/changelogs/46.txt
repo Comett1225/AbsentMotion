@@ -1,0 +1,1 @@
+The biggest update yet: AbsentMotion for Mac, Windows and Linux, real 3D with depth order and lights, colour palettes, Adobe Animate import, Text Shake, Text Blips, ASCII, groups you can open, Trim, Extract Audio and Make a GIF tools, tablet layouts, seven new languages and many fixes. The Play build is gone: Play installs move to the foss build. 5.0 and later are GPL-3.0.

@@ -96,6 +96,8 @@ private fun AboutPage(onClose: () -> Unit, onLicences: () -> Unit) {
                 Body(it)
             }
             Spacer(Modifier.height(20.dp))
+            DiscordButton()
+            Spacer(Modifier.height(12.dp))
             Row(
                 Modifier.fillMaxWidth().height(44.dp).clip(RowShape).background(Am.Card).clickable(onClick = onLicences).padding(start = 15.dp, end = 7.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -113,6 +115,23 @@ private fun AboutPage(onClose: () -> Unit, onLicences: () -> Unit) {
 }
 
 private val RowShape = RoundedCornerShape(7.dp)
+
+private val DiscordBlue = androidx.compose.ui.graphics.Color(0xFF5865F2)
+
+@Composable
+internal fun DiscordButton(modifier: Modifier = Modifier) {
+    val links = LocalUriHandler.current
+    val found = rememberReportLinks()
+    Row(
+        modifier.fillMaxWidth().height(52.dp).clip(RoundedCornerShape(12.dp)).background(DiscordBlue)
+            .clickable(role = androidx.compose.ui.semantics.Role.Button) { runCatching { links.openUri(found.discord) } }.padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
+    ) {
+        Icon(HomeIcons.Discord, null, Modifier.size(26.dp), tint = androidx.compose.ui.graphics.Color.White)
+        Spacer(Modifier.size(10.dp))
+        Text(stringResource(R.string.join_discord), color = androidx.compose.ui.graphics.Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+    }
+}
 
 @Composable
 private fun Link(label: String, url: String) {

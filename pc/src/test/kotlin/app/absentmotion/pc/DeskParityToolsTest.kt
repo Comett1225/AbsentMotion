@@ -125,6 +125,7 @@ class DeskParityToolsTest {
         val s = app.absentmotion.desk.Strings
         assertEquals(listOf("one", "few", "many", "many"), listOf(1, 3, 5, 12).map { s.pluralCategory("pl", it) })
         assertEquals(listOf("one", "few", "many", "one"), listOf(21, 22, 11, 101).map { s.pluralCategory("ru", it) })
+        assertEquals(listOf("one", "few", "many", "many"), listOf(1, 3, 5, 11).map { s.pluralCategory("uk", it) })
         assertEquals(listOf("zero", "two", "few", "many", "other"), listOf(0, 2, 7, 11, 100).map { s.pluralCategory("ar", it) })
         assertEquals(listOf("one", "other"), listOf(0, 0).mapIndexed { i, n -> s.pluralCategory(if (i == 0) "fr" else "en", n) })
     }

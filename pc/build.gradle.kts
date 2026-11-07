@@ -50,10 +50,10 @@ val generateBuildConfig = tasks.register("generateBuildConfig") {
     val out = layout.buildDirectory.file("generated/strings/app/absentmotion/BuildConfig.kt")
     val version = rootDir.resolve("../version.properties").takeIf { it.isFile }?.readLines()?.associate { it.substringBefore('=').trim() to it.substringAfter('=', "").trim() }.orEmpty()
     inputs.property("version", version.toString())
-    inputs.property("versionName", findProperty("amVersionName")?.toString() ?: "5.0.0 pre")
+    inputs.property("versionName", findProperty("amVersionName")?.toString() ?: version["versionName"].orEmpty())
     outputs.file(out)
     doLast {
-        out.get().asFile.apply { parentFile.mkdirs(); writeText("package app.absentmotion\n\nobject BuildConfig {\n    const val APPLICATION_ID = \"app.absentmotion\"\n    const val FLAVOR = \"desktop\"\n    const val DEBUG = false\n    const val COMPATIBLE = false\n    const val VERSION_NAME = \"${findProperty("amVersionName") ?: "5.0.0 pre"}\"\n    const val VERSION_CODE = ${version["versionCode"] ?: "500"}\n}\n") }
+        out.get().asFile.apply { parentFile.mkdirs(); writeText("package app.absentmotion\n\nobject BuildConfig {\n    const val APPLICATION_ID = \"app.absentmotion\"\n    const val FLAVOR = \"desktop\"\n    const val DEBUG = false\n    const val COMPATIBLE = false\n    const val VERSION_NAME = \"${findProperty("amVersionName") ?: version["versionName"]}\"\n    const val VERSION_CODE = ${version["versionCode"] ?: "500"}\n}\n") }
     }
 }
 tasks.matching { it.name == "compileKotlin" }.configureEach { dependsOn(generateBuildConfig) }
@@ -119,7 +119,7 @@ compose.desktop {
                 else -> org.jetbrains.compose.desktop.application.dsl.TargetFormat.Deb
             })
             packageName = "AbsentMotion"
-            packageVersion = "5.0.0"
+            packageVersion = rootDir.resolve("../version.properties").readLines().first { it.startsWith("versionName=") }.substringAfter('=').trim()
             jvmArgs += gcFlags + "-Dapple.awt.application.name=AbsentMotion"
             if (isMac) jvmArgs += "-XX:SharedArchiveFile=\$APPDIR/app.jsa"
             if (isWindows) jvmArgs += listOf("-XX:SharedArchiveFile=$appArchive", "-XX:+AutoCreateSharedArchive", "-Dam.cdsArchive=$appArchive")

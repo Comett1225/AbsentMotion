@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -84,6 +85,7 @@ private fun AboutBody(onLicences: () -> Unit) {
         AboutText(stringResource(R.string.about_compatibility_note))
         compatibleNote()?.let { AboutText(it) }
         Spacer(Modifier.height(4.dp))
+        DiscordButton(Modifier.widthIn(max = 420.dp))
         Row(
             Modifier.fillMaxWidth().height(48.dp).clip(RoundedCornerShape(10.dp)).background(Am.HomePanel).deskPress(10.dp).clickable(onClick = onLicences).padding(start = 16.dp, end = 8.dp),
             verticalAlignment = Alignment.CenterVertically,

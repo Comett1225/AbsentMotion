@@ -149,6 +149,11 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
                 Modifier.padding(horizontal = 6.dp).clickable { runCatching { links.openUri(found.feature) } }.padding(horizontal = 15.dp, vertical = 10.dp),
                 color = Am.HomeInk, fontSize = 13.sp, textDecoration = TextDecoration.Underline,
             )
+            Text(
+                stringResource(R.string.join_discord),
+                Modifier.padding(horizontal = 6.dp).clickable { runCatching { links.openUri(found.discord) } }.padding(horizontal = 15.dp, vertical = 10.dp),
+                color = Am.HomeInk, fontSize = 13.sp, textDecoration = TextDecoration.Underline,
+            )
             UpdateRows(settings) { crashLogs = true }
         }
     }

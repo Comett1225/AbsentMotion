@@ -53,7 +53,7 @@ The color names are the editor and home screen colors: TopBar, PreviewBg, Timeli
 
 ## Language
 
-The **Language** row shows the current language and opens the list of the 24 languages: English, Indonesian, Hindi, Portuguese (Brazil), Spanish (Latin America), Spanish (Spain), Filipino, Vietnamese, Thai, Malay, Arabic, Persian, Urdu, Turkish, Russian, Bengali, Japanese, Korean, Chinese (Traditional), Chinese (Simplified), French, German, Italian and Polish. Picking one applies it at once.
+The **Language** row shows the current language and opens the list of the 25 languages: English, Indonesian, Hindi, Portuguese (Brazil), Spanish (Latin America), Spanish (Spain), Filipino, Vietnamese, Thai, Malay, Arabic, Persian, Urdu, Turkish, Russian, Bengali, Japanese, Korean, Chinese (Traditional), Chinese (Simplified), French, German, Italian, Polish and Ukrainian. Picking one applies it at once.
 
 ## About, Help and other rows
 

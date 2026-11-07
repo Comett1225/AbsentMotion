@@ -30,7 +30,7 @@ The launcher icon is an own drawing, made by `tools/icon/make_icon.py` (source o
 | Lucide only | 174 |
 | Lucide shapes plus own parts | 8 |
 | Own drawing only | 43 |
-| Tabler | 2 |
+| Tabler | 3 |
 | Material Symbols | 0 |
 
 (An icon is one named member of an `*Icons` object, or one icon-drawing composable.)
@@ -141,6 +141,7 @@ The launcher icon is an own drawing, made by `tools/icon/make_icon.py` (source o
 | `ui/editor/PanelIcons.kt` | `Backspace` | Lucide | `delete` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/delete.svg | - |
 | `ui/editor/PanelIcons.kt` | `Check` | Lucide | `check` | ISC and MIT (Feather) | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/check.svg | - |
 | `ui/editor/PanelIcons.kt` | `Reverse` | Lucide | `arrow-right-left` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/arrow-right-left.svg | Reverse tile on the second tool page |
+| `ui/home/HomeIcons.kt` | `Discord` | Tabler | `brand-discord` (filled) | MIT | https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/filled/brand-discord.svg | filled, unchanged; Discord's logo, used only to link to the project's Discord server |
 | `ui/home/HomeIcons.kt` | `Receive` | Lucide | `download` | ISC and MIT (Feather) | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/download.svg | - |
 | `ui/home/HomeIcons.kt` | `Menu` | Lucide | `menu` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/menu.svg | menu scaled x1.1 |
 | `ui/home/HomeIcons.kt` | `ChevronDown` | Lucide | `chevron-down` | ISC and MIT (Feather) | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/chevron-down.svg | chevron-down scaled x1.15 |

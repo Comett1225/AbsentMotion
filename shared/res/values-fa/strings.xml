@@ -138,6 +138,7 @@
     <string name="settings_about">درباره</string>
     <string name="settings_report_issue">گزارش مشکل</string>
     <string name="settings_suggest_feature">پیشنهاد یک قابلیت</string>
+    <string name="join_discord">به Discord بپیوندید</string>
     <string name="settings_help">راهنما</string>
     <string name="tutorial_settings_start">شروع آموزش</string>
     <string name="tutorial_settings_continue">ادامه آموزش</string>
@@ -2095,7 +2096,7 @@
     <string name="tools_downloader_intro">ویدیوها و عکس‌ها را از YouTube، Instagram، TikTok و دیگر شبکه‌های اجتماعی مستقیماً در گالری شما دانلود می‌کند. یک افزونهٔ یک‌باره به حجم %1$d مگابایت لازم دارد.</string>
     <string name="tools_download_progress">در حال دانلود %1$d%%</string>
     <string name="tools_more">ابزارهای بیشتری در به‌روزرسانی‌های بعدی اضافه می‌شوند...</string>
-    <string name="tools_suggestions">پیشنهادی برای ابزارها دارید؟ آن را در %1$s یا %2$s مطرح کنید!</string>
+    <string name="tools_suggestions">پیشنهادی برای ابزارها دارید؟ آن را در %1$s، %2$s یا %3$s مطرح کنید!</string>
     <string name="tools_github">GitHub</string>
     <string name="tools_form">فرم</string>
     <string name="effectbrowser_favorite_preset">پریست مورد علاقه</string>

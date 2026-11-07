@@ -917,6 +917,7 @@ Windows:
 - Licence: GNU General Public License, version 3 or later (the build uses --enable-gpl --enable-version3 and no --enable-nonfree). The GPLv3 text from the package ships next to the libraries as ffmpeg-LICENSE.txt.
 - Codec libraries in this build (as reported by the binaries): x264 core 165, x265 4.3, SVT-AV1 4.2, libvpx 1.17.0, dav1d, libopus, libaom 3.15.2, LAME, libvorbis, rav1e, libvmaf, libplacebo, libxml2, fontconfig, FreeType, HarfBuzz, FriBidi, lcms2, GMP, liblzma and zlib, all under licences compatible with GPL-3.0. BtbN's build scripts list the exact sources.
 - Used in: the Windows installer. amdesktop.dll links the shared avformat, avcodec, avutil, swresample and swscale DLLs for video decoding (D3D11 hardware decoding when available), and ffmpeg.exe and ffprobe.exe run export, the Tools tab and media probing. The DLLs sit unchanged in the app folder, so they can be replaced with another build.
+- Source: AbsentMotion-<version>-ffmpeg-source-1.tar and -2.tar, attached to every release that ships the desktop apps, hold the FFmpeg source of this build (commit 1e65c6cd5d3d2d12cbb374460dbf08bedf54772a), BtbN's build scripts (commit 5ece62897c650b863c1ddda7b6964845344aef2d) and the source archive of every library those scripts build.
 
 Linux (x86_64 and arm64):
 
@@ -924,6 +925,7 @@ Linux (x86_64 and arm64):
 - Licence: GNU General Public License, version 3 or later (the build uses --enable-gpl --enable-version3 and no --enable-nonfree). The GPLv3 text from the package ships next to the libraries as ffmpeg-LICENSE.txt.
 - Codec libraries in this build (from its configure line): x264, x265, SVT-AV1, libaom, rav1e, dav1d, libvpx, Opus, Vorbis, LAME, Theora, OpenH264, Kvazaar, VVenC, libvmaf, libplacebo, libass, FreeType, HarfBuzz, FriBidi, fontconfig, libxml2, lcms2, GMP, OpenSSL, liblzma, zlib and others, linked statically into the libraries, all under licences compatible with GPL-3.0. BtbN's build scripts list the exact sources.
 - Used in: the Linux packages (.deb and AppImage). libamdesktop.so links the shared avformat, avcodec, avutil and swscale libraries (and swresample through them) for video decoding (VA-API when available), and ffmpeg and ffprobe run export, the Tools tab and media probing. They sit in the app's lib/app/resources folder (/opt/absentmotion/lib/app/resources for the .deb), so they can be replaced with another build.
+- Source: the same AbsentMotion-<version>-ffmpeg-source-1.tar and -2.tar hold the FFmpeg source of this build (commit b204e94e90fca64045e9ca7dd44c65678c7eb29e) next to BtbN's build scripts and library sources.
 
 macOS (Apple silicon and Intel):
 
@@ -931,6 +933,7 @@ macOS (Apple silicon and Intel):
 - Configure options: --enable-shared --disable-static --install-name-dir=@rpath --disable-doc --disable-debug --disable-ffplay --disable-sdl2 --disable-xlib --disable-libxcb --disable-sndio --enable-videotoolbox --enable-audiotoolbox --enable-avfoundation --enable-gpl --enable-libmp3lame --enable-libx264 --enable-libx265 --enable-libvpx --enable-libdav1d --enable-libopus --enable-libsvtav1 (plus --pkg-config-flags=--static and the compiler and path options; the Intel build assembles FFmpeg's x86 code with NASM). No --enable-version3 or --enable-nonfree.
 - Licence: GNU General Public License, version 2 or later (--enable-gpl, which x264 and x265 need; AbsentMotion 5.0 and later uses it under version 3, see LICENSE). FFmpeg's COPYING.GPLv2 ships next to the libraries as ffmpeg-LICENSE.txt; the same terms are in appendix A.22 (the Classpath Exception there applies only to OpenJDK). LAME (above) and the codec libraries below are linked statically into libavcodec.
 - Used in: the macOS apps. libamdesktop.dylib links the shared avformat, avcodec, avutil and swscale libraries for video decoding (VideoToolbox when available), and ffmpeg and ffprobe run export, the Tools tab, the camera and media probing. They sit in AbsentMotion.app/Contents/app/resources, so they can be replaced with another build.
+- Source: AbsentMotion-<version>-macos-ffmpeg-source.tar, attached to every release that ships the macOS apps, holds the unchanged source archives of FFmpeg, LAME and the codec libraries below and the scripts that built them.
 
 The codec libraries in the macOS FFmpeg are built for arm64 and x86_64 (minimum macOS 11) as static libraries from the unchanged sources below; the SHA-256 sums of x265, libvpx, Opus and SVT-AV1 match the ones Homebrew pins for the same versions, dav1d matches VideoLAN's published sum and signature, and x264 is the named commit of its stable branch.
 
@@ -3777,7 +3780,7 @@ COUNTS
 - Lucide only - 174
 - Lucide shapes plus own parts - 8
 - Own drawing only - 43
-- Tabler - 2
+- Tabler - 3
 - Material Symbols - 0
 
 (An icon is one named member of an *Icons object, or one icon-drawing composable.)
@@ -3886,6 +3889,7 @@ ICONS
 - Backspace (Lucide delete) - ISC - ui/editor/PanelIcons.kt
 - Check (Lucide check) - ISC and MIT (Feather) - ui/editor/PanelIcons.kt
 - Reverse (Lucide arrow-right-left) - ISC - ui/editor/PanelIcons.kt
+- Discord (Tabler brand-discord (filled)) - MIT - ui/home/HomeIcons.kt
 - Receive (Lucide download) - ISC and MIT (Feather) - ui/home/HomeIcons.kt
 - Menu (Lucide menu) - ISC - ui/home/HomeIcons.kt
 - ChevronDown (Lucide chevron-down) - ISC and MIT (Feather) - ui/home/HomeIcons.kt

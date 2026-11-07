@@ -138,6 +138,7 @@
     <string name="settings_about">Informacje</string>
     <string name="settings_report_issue">Zgłoś problem</string>
     <string name="settings_suggest_feature">Zaproponuj funkcję</string>
+    <string name="join_discord">Dołącz do Discorda</string>
     <string name="settings_help">Pomoc</string>
     <string name="tutorial_settings_start">Rozpocznij samouczek</string>
     <string name="tutorial_settings_continue">Kontynuuj samouczek</string>
@@ -2153,7 +2154,7 @@
     <string name="tools_downloader_intro">Pobiera wideo i obrazy z YouTube, Instagramu, TikToka i innych mediów społecznościowych bezpośrednio do galerii. Wymaga jednorazowego pobrania dodatku o rozmiarze %1$d MB.</string>
     <string name="tools_download_progress">Pobieranie %1$d%%</string>
     <string name="tools_more">Więcej narzędzi pojawi się w przyszłych aktualizacjach...</string>
-    <string name="tools_suggestions">Masz propozycje narzędzi? Zostaw je na %1$s lub wypełnij %2$s!</string>
+    <string name="tools_suggestions">Masz propozycje narzędzi? Zostaw je na %1$s, wypełnij %2$s lub napisz na %3$s!</string>
     <string name="tools_github">GitHub</string>
     <string name="tools_form">formularz</string>
     <string name="effectbrowser_favorite_preset">Ulubiony preset</string>

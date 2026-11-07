@@ -69,7 +69,8 @@ enum class AppLanguage(val tag: String, val nativeName: String) {
     French("fr", "Français"),
     German("de", "Deutsch"),
     Italian("it", "Italiano"),
-    Polish("pl", "Polski");
+    Polish("pl", "Polski"),
+    Ukrainian("uk", "Українська");
 
     val language: String get() = tag.substringBefore('-')
     val region: String? get() = tag.substringAfter('-', "").ifEmpty { null }

@@ -138,6 +138,7 @@
     <string name="settings_about">เกี่ยวกับ</string>
     <string name="settings_report_issue">รายงานปัญหา</string>
     <string name="settings_suggest_feature">เสนอฟีเจอร์</string>
+    <string name="join_discord">เข้าร่วม Discord</string>
     <string name="settings_help">ช่วยเหลือ</string>
     <string name="tutorial_settings_start">เริ่มบทแนะนำ</string>
     <string name="tutorial_settings_continue">ทำบทแนะนำต่อ</string>
@@ -2066,7 +2067,7 @@
     <string name="tools_downloader_intro">ดาวน์โหลดวิดีโอและรูปภาพจาก YouTube, Instagram, TikTok และโซเชียลมีเดียอื่นๆ ลงแกลเลอรีของคุณโดยตรง ต้องดาวน์โหลดส่วนเสริมขนาด %1$d MB เพียงครั้งเดียว</string>
     <string name="tools_download_progress">กำลังดาวน์โหลด %1$d%%</string>
     <string name="tools_more">จะมีเครื่องมือเพิ่มเติมในการอัปเดตครั้งต่อไป...</string>
-    <string name="tools_suggestions">มีข้อเสนอแนะเรื่องเครื่องมือไหม แจ้งได้ที่ %1$s หรือ %2$s!</string>
+    <string name="tools_suggestions">มีข้อเสนอแนะเรื่องเครื่องมือไหม แจ้งได้ที่ %1$s, %2$s หรือ %3$s!</string>
     <string name="tools_github">GitHub</string>
     <string name="tools_form">แบบฟอร์ม</string>
     <string name="effectbrowser_favorite_preset">พรีเซ็ตโปรด</string>

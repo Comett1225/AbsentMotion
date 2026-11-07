@@ -30,7 +30,8 @@
     "fr": "L’écran d’accueil : menu (1), recherche (2), Projets et Ressources (3), une carte de projet (4), le bouton de menu de la carte (5) et Nouveau projet (6).",
     "de": "Der Startbildschirm: Menü (1), Suche (2), Projekte und Assets (3), eine Projektkarte (4), die Menüschaltfläche der Karte (5) und Neues Projekt (6).",
     "it": "La schermata iniziale: menu (1), ricerca (2), Progetti e Risorse (3), una scheda progetto (4), il pulsante del menu della scheda (5) e Nuovo progetto (6).",
-    "pl": "Ekran główny: menu (1), wyszukiwanie (2), Projekty i Zasoby (3), karta projektu (4), przycisk menu karty (5) i Nowy projekt (6)."
+    "pl": "Ekran główny: menu (1), wyszukiwanie (2), Projekty i Zasoby (3), karta projektu (4), przycisk menu karty (5) i Nowy projekt (6).",
+    "uk": "Головний екран: меню (1), пошук (2), Проєкти й Ресурси (3), картка проєкту (4), кнопка меню картки (5) і Новий проєкт (6)."
    },
    "start": {
     "scene": "demo",
@@ -124,7 +125,8 @@
     "fr": "Le bouton de menu de la carte (1) ouvre le menu de la carte (2) : Exporter, Dupliquer, Rassembler les médias dans le projet, Historique des versions et Supprimer.",
     "de": "Die Menüschaltfläche der Karte (1) öffnet das Kartenmenü (2): Exportieren, Duplizieren, Medien im Projekt sammeln, Versionsverlauf und Löschen.",
     "it": "Il pulsante del menu della scheda (1) apre il menu della scheda (2): Esporta, Duplica, Raccogli i media nel progetto, Cronologia versioni ed Elimina.",
-    "pl": "Przycisk menu karty (1) otwiera menu karty (2): Eksportuj, Duplikuj, Zbierz multimedia w projekcie, Historia wersji i Usuń."
+    "pl": "Przycisk menu karty (1) otwiera menu karty (2): Eksportuj, Duplikuj, Zbierz multimedia w projekcie, Historia wersji i Usuń.",
+    "uk": "Кнопка меню картки (1) відкриває меню картки (2): Експорт, Дублювати, Зібрати медіа в проєкт, Історія версій і Видалити."
    },
    "start": "home",
    "steps": [
@@ -194,7 +196,8 @@
     "fr": "La feuille de nouveau projet : PROJET ou RESSOURCE (1), le nom (2), la forme (3), Résolution (4), Fréquence d’images (5), Arrière-plan (6) et CRÉER UN PROJET (7).",
     "de": "Das Blatt für neue Projekte: PROJEKT oder ASSET (1), der Name (2), die Form (3), Auflösung (4), Bildrate (5), Hintergrund (6) und Projekt erstellen (7).",
     "it": "Il foglio del nuovo progetto: PROGETTO o RISORSA (1), il nome (2), la forma (3), Risoluzione (4), Frequenza fotogrammi (5), Sfondo (6) e CREA PROGETTO (7).",
-    "pl": "Arkusz nowego projektu: PROJEKT lub ZASÓB (1), nazwa (2), kształt (3), Rozdzielczość (4), Liczba klatek na sekundę (5), Tło (6) i UTWÓRZ PROJEKT (7)."
+    "pl": "Arkusz nowego projektu: PROJEKT lub ZASÓB (1), nazwa (2), kształt (3), Rozdzielczość (4), Liczba klatek na sekundę (5), Tło (6) i UTWÓRZ PROJEKT (7).",
+    "uk": "Вікно нового проєкту: ПРОЄКТ або РЕСУРС (1), назва (2), фігура (3), Роздільна здатність (4), Частота кадрів (5), Фон (6) і СТВОРИТИ ПРОЄКТ (7)."
    },
    "start": "home",
    "steps": [
@@ -310,7 +313,8 @@
     "fr": "Sur l’écran d’accueil, touchez le bouton rond + (1) pour démarrer un projet.",
     "de": "Tippe auf dem Startbildschirm auf die runde Schaltfläche + (1), um ein Projekt zu starten.",
     "it": "Nella schermata iniziale, tocca il pulsante rotondo + (1) per iniziare un progetto.",
-    "pl": "Na ekranie głównym dotknij okrągłego przycisku + (1), aby rozpocząć projekt."
+    "pl": "Na ekranie głównym dotknij okrągłego przycisku + (1), aby rozpocząć projekt.",
+    "uk": "На головному екрані торкніться круглої кнопки + (1), щоб почати проєкт."
    },
    "start": "home",
    "highlight": [
@@ -356,7 +360,8 @@
     "fr": "Dans l’éditeur, touchez le bouton rond + (1) pour ajouter une forme, une photo ou du texte.",
     "de": "Tippe im Editor auf die runde Schaltfläche + (1), um eine Form, ein Foto oder Text hinzuzufügen.",
     "it": "Nell’editor, tocca il pulsante rotondo + (1) per aggiungere una forma, una foto o del testo.",
-    "pl": "W edytorze dotknij okrągłego przycisku + (1), aby dodać kształt, zdjęcie lub tekst."
+    "pl": "W edytorze dotknij okrągłego przycisku + (1), aby dodać kształt, zdjęcie lub tekst.",
+    "uk": "У редакторі торкніться круглої кнопки + (1), щоб додати фігуру, фото або текст."
    },
    "start": {
     "scene": "demo",
@@ -407,7 +412,8 @@
     "fr": "Touchez l’icône de partage dans la barre du haut (1), puis Exporter.",
     "de": "Tippe oben in der Leiste auf das Teilen-Symbol (1) und dann auf Exportieren.",
     "it": "Tocca l’icona di condivisione nella barra superiore (1), poi Esporta.",
-    "pl": "Dotknij ikony udostępniania na górnym pasku (1), a potem Eksportuj."
+    "pl": "Dotknij ikony udostępniania na górnym pasku (1), a potem Eksportuj.",
+    "uk": "Торкніться значка поширення у верхній панелі (1), а потім Експорт."
    },
    "start": {
     "scene": "demo",
@@ -458,7 +464,8 @@
     "fr": "Les quatre parties de l’éditeur : la barre du haut (1), l’aperçu (2), la barre de lecture (3) et la timeline avec ses outils (4).",
     "de": "Die vier Teile des Editors: die obere Leiste (1), die Vorschau (2), die Wiedergabeleiste (3) und die Zeitleiste mit ihren Werkzeugen (4).",
     "it": "Le quattro parti dell’editor: la barra superiore (1), l’anteprima (2), la barra di riproduzione (3) e la timeline con i suoi strumenti (4).",
-    "pl": "Cztery części edytora: górny pasek (1), podgląd (2), pasek odtwarzania (3) i oś czasu z narzędziami (4)."
+    "pl": "Cztery części edytora: górny pasek (1), podgląd (2), pasek odtwarzania (3) i oś czasu z narzędziami (4).",
+    "uk": "Чотири частини редактора: верхня панель (1), попередній перегляд (2), панель відтворення (3) і таймлайн з інструментами (4)."
    },
    "start": {
     "scene": "demo",
@@ -565,7 +572,8 @@
     "fr": "La barre du haut avec un calque sélectionné : Retour (1), le nom du calque (2), le bouton parent (3), Supprimer le calque (4) et Menu du calque (5).",
     "de": "Die obere Leiste bei ausgewählter Ebene: Zurück (1), der Ebenenname (2), die Schaltfläche für die übergeordnete Ebene (3), Ebene löschen (4) und Ebenenmenü (5).",
     "it": "La barra superiore con un livello selezionato: Indietro (1), il nome del livello (2), il pulsante genitore (3), Elimina livello (4) e Menu livello (5).",
-    "pl": "Górny pasek przy zaznaczonej warstwie: Wstecz (1), nazwa warstwy (2), przycisk warstwy nadrzędnej (3), Usuń warstwę (4) i Menu warstwy (5)."
+    "pl": "Górny pasek przy zaznaczonej warstwie: Wstecz (1), nazwa warstwy (2), przycisk warstwy nadrzędnej (3), Usuń warstwę (4) i Menu warstwy (5).",
+    "uk": "Верхня панель із вибраним шаром: Назад (1), назва шару (2), кнопка батьківського шару (3), Видалити шар (4) і Меню шару (5)."
    },
    "start": {
     "scene": "demo",
@@ -660,7 +668,8 @@
     "fr": "Paramètres du projet : la forme (1), Résolution (2), Fréquence d’images (3), Arrière-plan (4) et Versions précédentes (5).",
     "de": "Projekteinstellungen: die Form (1), Auflösung (2), Bildrate (3), Hintergrund (4) und Frühere Versionen (5).",
     "it": "Impostazioni progetto: la forma (1), Risoluzione (2), Frequenza fotogrammi (3), Sfondo (4) e Versioni precedenti (5).",
-    "pl": "Ustawienia projektu: kształt (1), Rozdzielczość (2), Liczba klatek na sekundę (3), Tło (4) i Wcześniejsze wersje (5)."
+    "pl": "Ustawienia projektu: kształt (1), Rozdzielczość (2), Liczba klatek na sekundę (3), Tło (4) i Wcześniejsze wersje (5).",
+    "uk": "Налаштування проєкту: фігура (1), Роздільна здатність (2), Частота кадрів (3), Фон (4) і Попередні версії (5)."
    },
    "start": {
     "scene": "demo",
@@ -767,7 +776,8 @@
     "fr": "La bande d’aperçu : Aperçu des pixels (1), Grille (2), Isoler les calques sélectionnés (3), Vue caméra (4), la qualité de l’aperçu (5), le mode de flou (6) et le zoom (7).",
     "de": "Die Vorschauleiste: Pixelvorschau (1), Raster (2), Ausgewählte Ebenen solo schalten (3), Kameraansicht (4), die Vorschauqualität (5), der Unschärfemodus (6) und der Zoom (7).",
     "it": "La barra dell’anteprima: Anteprima pixel (1), Griglia (2), Isola i livelli selezionati (3), Vista camera (4), la qualità dell’anteprima (5), la modalità sfocatura (6) e lo zoom (7).",
-    "pl": "Pasek podglądu: Podgląd pikseli (1), Siatka (2), Wyświetl tylko zaznaczone warstwy (3), Widok kamery (4), jakość podglądu (5), tryb rozmycia (6) i powiększenie (7)."
+    "pl": "Pasek podglądu: Podgląd pikseli (1), Siatka (2), Wyświetl tylko zaznaczone warstwy (3), Widok kamery (4), jakość podglądu (5), tryb rozmycia (6) i powiększenie (7).",
+    "uk": "Смуга перегляду: Піксельний перегляд (1), Сітка (2), Соло для вибраних шарів (3), Вид з камери (4), якість перегляду (5), режим розмиття (6) і масштаб (7)."
    },
    "start": {
     "scene": "demo",
@@ -906,7 +916,8 @@
     "fr": "La barre de lecture : Annuler (1), Rétablir (2), Reculer (3), Lire (4), Avancer (5), Copier et coller (6) et Mode aperçu (7).",
     "de": "Die Wiedergabeleiste: Rückgängig (1), Wiederholen (2), Zurückspringen (3), Abspielen (4), Vorwärtsspringen (5), Kopieren und einfügen (6) und Vorschaumodus (7).",
     "it": "La barra di riproduzione: Annulla (1), Ripeti (2), Vai indietro (3), Riproduci (4), Vai avanti (5), Copia e incolla (6) e Modalità anteprima (7).",
-    "pl": "Pasek odtwarzania: Cofnij (1), Ponów (2), Przeskocz wstecz (3), Odtwórz (4), Przeskocz dalej (5), Kopiuj i wklej (6) i Tryb podglądu (7)."
+    "pl": "Pasek odtwarzania: Cofnij (1), Ponów (2), Przeskocz wstecz (3), Odtwórz (4), Przeskocz dalej (5), Kopiuj i wklej (6) i Tryb podglądu (7).",
+    "uk": "Панель відтворення: Скасувати (1), Повторити (2), Перемотати назад (3), Відтворити (4), Перемотати вперед (5), Копіювати й вставити (6) і Режим перегляду (7)."
    },
    "start": {
     "scene": "demo",
@@ -999,7 +1010,8 @@
     "fr": "La timeline : la tête de lecture et le temps (1), la règle (2), l’œil d’un calque (3), les barres de calque (4) et un losange d’image clé (5).",
     "de": "Die Zeitleiste: der Abspielkopf und die Zeit (1), das Lineal (2), das Auge einer Ebene (3), die Ebenenbalken (4) und eine Keyframe-Raute (5).",
     "it": "La timeline: l’indicatore di riproduzione e il tempo (1), il righello (2), l’occhio di un livello (3), le barre dei livelli (4) e un rombo di keyframe (5).",
-    "pl": "Oś czasu: głowica odtwarzania i czas (1), linijka (2), oko warstwy (3), paski warstw (4) i romb klatki kluczowej (5)."
+    "pl": "Oś czasu: głowica odtwarzania i czas (1), linijka (2), oko warstwy (3), paski warstw (4) i romb klatki kluczowej (5).",
+    "uk": "Таймлайн: курсор відтворення й час (1), лінійка (2), око шару (3), смуги шарів (4) і ромб ключового кадру (5)."
    },
    "start": {
     "scene": "demo",
@@ -1110,7 +1122,8 @@
     "fr": "Dans un panneau : le bouton d’image clé (1), un losange d’image clé sur la barre du calque (2) et Lissage (3).",
     "de": "In einem Bedienfeld: die Keyframe-Schaltfläche (1), eine Keyframe-Raute auf dem Ebenenbalken (2) und Easing (3).",
     "it": "In un pannello: il pulsante keyframe (1), un rombo di keyframe sulla barra del livello (2) ed Easing (3).",
-    "pl": "W panelu: przycisk klatki kluczowej (1), romb klatki kluczowej na pasku warstwy (2) i Wygładzanie (3)."
+    "pl": "W panelu: przycisk klatki kluczowej (1), romb klatki kluczowej na pasku warstwy (2) i Wygładzanie (3).",
+    "uk": "На панелі: кнопка ключового кадру (1), ромб ключового кадру на смузі шару (2) і Згладжування (3)."
    },
    "start": {
     "scene": "demo",
@@ -1191,7 +1204,8 @@
     "fr": "Le graphique de lissage : les poignées de la courbe (1), les courbes prêtes à l’emploi (2), les types de courbe (3), Inverser la courbe (4) et Plus (5).",
     "de": "Das Easing-Diagramm: die Kurvengriffe (1), die vorgefertigten Kurven (2), die Kurventypen (3), Kurve umkehren (4) und Mehr (5).",
     "it": "Il grafico dell’easing: le maniglie della curva (1), le curve già pronte (2), i tipi di curva (3), Inverti la curva (4) e Altro (5).",
-    "pl": "Wykres wygładzania: uchwyty krzywej (1), gotowe krzywe (2), rodzaje krzywych (3), Odwróć krzywą (4) i Więcej (5)."
+    "pl": "Wykres wygładzania: uchwyty krzywej (1), gotowe krzywe (2), rodzaje krzywych (3), Odwróć krzywą (4) i Więcej (5).",
+    "uk": "Графік згладжування: маркери кривої (1), готові криві (2), види кривих (3), Обернути криву (4) і Більше (5)."
    },
    "start": {
     "scene": "demo",
@@ -1296,7 +1310,8 @@
     "fr": "Le menu Ajouter : les cinq onglets (1) et les quatre boutons rapides (2).",
     "de": "Das Menü Hinzufügen: die fünf Tabs (1) und die vier Schnellschaltflächen (2).",
     "it": "Il menu Aggiungi: le cinque schede (1) e i quattro pulsanti rapidi (2).",
-    "pl": "Menu Dodaj: pięć kart (1) i cztery szybkie przyciski (2)."
+    "pl": "Menu Dodaj: pięć kart (1) i cztery szybkie przyciski (2).",
+    "uk": "Меню Додати: п'ять вкладок (1) і чотири швидкі кнопки (2)."
    },
    "start": {
     "scene": "demo",
@@ -1370,7 +1385,8 @@
     "fr": "La liste des effets : Réorganiser (1), Visibilité (2), Plus (3) et Ajouter un effet (4).",
     "de": "Die Effektliste: Reihenfolge ändern (1), Sichtbarkeit (2), Mehr (3) und Effekt hinzufügen (4).",
     "it": "L’elenco degli effetti: Riordina (1), Visibilità (2), Altro (3) e Aggiungi effetto (4).",
-    "pl": "Lista efektów: Zmień kolejność (1), Widoczność (2), Więcej (3) i Dodaj efekt (4)."
+    "pl": "Lista efektów: Zmień kolejność (1), Widoczność (2), Więcej (3) i Dodaj efekt (4).",
+    "uk": "Список ефектів: Змінити порядок (1), Видимість (2), Більше (3) і Додати ефект (4)."
    },
    "start": {
     "scene": "demo",
@@ -1459,7 +1475,8 @@
     "fr": "Un effet ouvert : son en-tête (1) et un réglage avec sa règle et sa valeur (2).",
     "de": "Ein geöffneter Effekt: seine Kopfzeile (1) und eine Einstellung mit Lineal und Wert (2).",
     "it": "Un effetto aperto: la sua intestazione (1) e un’impostazione con il suo righello e il valore (2).",
-    "pl": "Otwarty efekt: jego nagłówek (1) oraz ustawienie z linijką i wartością (2)."
+    "pl": "Otwarty efekt: jego nagłówek (1) oraz ustawienie z linijką i wartością (2).",
+    "uk": "Відкритий ефект: його заголовок (1) і параметр із лінійкою та значенням (2)."
    },
    "start": {
     "scene": "demo",
@@ -1539,7 +1556,8 @@
     "fr": "L’éditeur de texte : Alignement (1), la police (2), la taille (3), la couleur (4) et Terminé (5).",
     "de": "Der Texteditor: Ausrichtung (1), die Schriftart (2), die Größe (3), die Farbe (4) und Fertig (5).",
     "it": "L’editor di testo: Allineamento (1), il font (2), la dimensione (3), il colore (4) e Fine (5).",
-    "pl": "Edytor tekstu: Wyrównanie (1), czcionka (2), rozmiar (3), kolor (4) i Gotowe (5)."
+    "pl": "Edytor tekstu: Wyrównanie (1), czcionka (2), rozmiar (3), kolor (4) i Gotowe (5).",
+    "uk": "Редактор тексту: Вирівнювання (1), шрифт (2), розмір (3), колір (4) і Готово (5)."
    },
    "start": {
     "scene": "demo",
@@ -1638,7 +1656,8 @@
     "fr": "Le panneau Transformation : les onglets (1), le pavé tactile (2) et les cases X, Y et Z (3).",
     "de": "Das Bedienfeld Transformieren: die Tabs (1), das Trackpad (2) und die Felder X, Y und Z (3).",
     "it": "Il pannello Trasforma: le schede (1), il trackpad (2) e le caselle X, Y e Z (3).",
-    "pl": "Panel Przekształcenie: karty (1), gładzik (2) oraz pola X, Y i Z (3)."
+    "pl": "Panel Przekształcenie: karty (1), gładzik (2) oraz pola X, Y i Z (3).",
+    "uk": "Панель Трансформація: вкладки (1), трекпад (2) і поля X, Y та Z (3)."
    },
    "start": {
     "scene": "demo",
@@ -1726,7 +1745,8 @@
     "fr": "Remplissage et couleur : les onglets (1), la barre de couleurs (2), les échantillons (3) et Pipette, Curseurs de couleur et Sélecteur de couleur complet (4).",
     "de": "Füllung & Farbe: die Tabs (1), die Farbleiste (2), die Farbfelder (3) und Pipette, Farbregler und Vollständige Farbauswahl (4).",
     "it": "Riempimento e colore: le schede (1), la barra dei colori (2), i campioni (3) e Contagocce, Cursori colore e Selettore colore completo (4).",
-    "pl": "Wypełnienie i kolor: karty (1), pasek kolorów (2), próbki (3) oraz Pipeta, Suwaki koloru i Pełny wybór koloru (4)."
+    "pl": "Wypełnienie i kolor: karty (1), pasek kolorów (2), próbki (3) oraz Pipeta, Suwaki koloru i Pełny wybór koloru (4).",
+    "uk": "Заливка й колір: вкладки (1), смуга кольорів (2), зразки (3) і Піпетка, Повзунки кольору та Повний вибір кольору (4)."
    },
    "start": {
     "scene": "demo",
@@ -1825,7 +1845,8 @@
     "fr": "Le bouton du menu du calque (1) ouvre le menu du calque (2).",
     "de": "Die Schaltfläche für das Ebenenmenü (1) öffnet das Ebenenmenü (2).",
     "it": "Il pulsante del menu livello (1) apre il menu livello (2).",
-    "pl": "Przycisk menu warstwy (1) otwiera menu warstwy (2)."
+    "pl": "Przycisk menu warstwy (1) otwiera menu warstwy (2).",
+    "uk": "Кнопка меню шару (1) відкриває меню шару (2)."
    },
    "start": {
     "scene": "demo",
@@ -1902,7 +1923,8 @@
     "fr": "Le bouton copier-coller (1) ouvre ce menu (2).",
     "de": "Die Schaltfläche zum Kopieren und Einfügen (1) öffnet dieses Menü (2).",
     "it": "Il pulsante copia e incolla (1) apre questo menu (2).",
-    "pl": "Przycisk kopiowania i wklejania (1) otwiera to menu (2)."
+    "pl": "Przycisk kopiowania i wklejania (1) otwiera to menu (2).",
+    "uk": "Кнопка копіювання й вставлення (1) відкриває це меню (2)."
    },
    "start": {
     "scene": "demo",
@@ -1979,7 +2001,8 @@
     "fr": "Le bouton rond Animer (1) en bas à droite de l’aperçu.",
     "de": "Die runde Schaltfläche Animieren (1) unten rechts in der Vorschau.",
     "it": "Il pulsante rotondo Anima (1) in basso a destra nell’anteprima.",
-    "pl": "Okrągły przycisk Animuj (1) w prawym dolnym rogu podglądu."
+    "pl": "Okrągły przycisk Animuj (1) w prawym dolnym rogu podglądu.",
+    "uk": "Кругла кнопка Анімувати (1) унизу праворуч від попереднього перегляду."
    },
    "start": {
     "scene": "demo",
@@ -2038,7 +2061,8 @@
     "fr": "La feuille des animations : Entrée, Sortie et Boucle (1), les animations (2) et Durée (3).",
     "de": "Das Animationsblatt: Einblenden, Ausblenden und Schleife (1), die Animationen (2) und Dauer (3).",
     "it": "Il foglio delle animazioni: Ingresso, Uscita e Loop (1), le animazioni (2) e Durata (3).",
-    "pl": "Arkusz animacji: Wejście, Wyjście i Zapętl (1), animacje (2) i Czas trwania (3)."
+    "pl": "Arkusz animacji: Wejście, Wyjście i Zapętl (1), animacje (2) i Czas trwania (3).",
+    "uk": "Вікно анімацій: Поява, Зникнення й Повтор (1), анімації (2) і Тривалість (3)."
    },
    "start": {
     "scene": "demo",
@@ -2126,7 +2150,8 @@
     "fr": "Le panneau du volume : Effets audio (1), le curseur de volume (2), sa valeur (3) et le bouton d’image clé (4).",
     "de": "Das Lautstärke-Bedienfeld: Audioeffekte (1), der Lautstärkeregler (2), sein Wert (3) und die Keyframe-Schaltfläche (4).",
     "it": "Il pannello del volume: Effetti audio (1), il cursore del volume (2), il suo valore (3) e il pulsante keyframe (4).",
-    "pl": "Panel głośności: Efekty dźwiękowe (1), suwak głośności (2), jego wartość (3) i przycisk klatki kluczowej (4)."
+    "pl": "Panel głośności: Efekty dźwiękowe (1), suwak głośności (2), jego wartość (3) i przycisk klatki kluczowej (4).",
+    "uk": "Панель гучності: Аудіоефекти (1), повзунок гучності (2), його значення (3) і кнопка ключового кадру (4)."
    },
    "start": {
     "scene": "demo",
@@ -2213,7 +2238,8 @@
     "fr": "Effets audio : les puces de préréglage (1), Désactiver (2) et Réorganiser (3) pour chaque effet, tout désactiver (4) et Tout supprimer (5).",
     "de": "Audioeffekte: die Voreinstellungs-Chips (1), Umgehen (2) und Reihenfolge ändern (3) für jeden Effekt, alle umgehen (4) und Alle löschen (5).",
     "it": "Effetti audio: i chip dei preset (1), Escludi (2) e Riordina (3) per ogni effetto, escludi tutto (4) ed Elimina tutto (5).",
-    "pl": "Efekty dźwiękowe: chipy presetów (1), Pomiń (2) i Zmień kolejność (3) dla każdego efektu, pomiń wszystkie (4) i Usuń wszystko (5)."
+    "pl": "Efekty dźwiękowe: chipy presetów (1), Pomiń (2) i Zmień kolejność (3) dla każdego efektu, pomiń wszystkie (4) i Usuń wszystko (5).",
+    "uk": "Аудіоефекти: пресети (1), Обхід (2) і Змінити порядок (3) для кожного ефекту, обхід усіх (4) і Видалити все (5)."
    },
    "start": {
     "scene": "demo",
@@ -2327,7 +2353,8 @@
     "fr": "La feuille Sous-titres automatiques : Source (1), l’échantillon (2), Langue (3), Mots par sous-titre (4), le modèle vocal (5), Apparence (6) et Générer (7).",
     "de": "Das Blatt Automatische Untertitel: Quelle (1), das Beispiel (2), Sprache (3), Wörter pro Untertitel (4), das Sprachmodell (5), Darstellung (6) und Erstellen (7).",
     "it": "Il foglio Sottotitoli automatici: Origine (1), l’esempio (2), Lingua (3), Parole per sottotitolo (4), il modello vocale (5), Aspetto (6) e Genera (7).",
-    "pl": "Arkusz Automatyczne napisy: Źródło (1), próbka (2), Język (3), Słów na napis (4), model mowy (5), Wygląd (6) i Generuj (7)."
+    "pl": "Arkusz Automatyczne napisy: Źródło (1), próbka (2), Język (3), Słów na napis (4), model mowy (5), Wygląd (6) i Generuj (7).",
+    "uk": "Вікно Автосубтитри: Джерело (1), зразок (2), Мова (3), Слів у субтитрі (4), модель мовлення (5), Вигляд (6) і Створити (7)."
    },
    "start": {
     "scene": "demo",
@@ -2454,7 +2481,8 @@
     "fr": "L’écran Exporter le projet : les lignes d’information (1), la carte Vidéo (2), sa flèche d’options (3), l’interrupteur Modèle (4) et le bouton Exporter (5).",
     "de": "Der Bildschirm Projekt exportieren: die Infozeilen (1), die Karte Video (2), ihr Optionspfeil (3), der Schalter Vorlage (4) und die Schaltfläche Exportieren (5).",
     "it": "La schermata Esporta progetto: le righe di informazioni (1), la scheda Video (2), la sua freccia delle opzioni (3), l’interruttore Modello (4) e il pulsante Esporta (5).",
-    "pl": "Ekran Eksportuj projekt: wiersze informacji (1), karta Wideo (2), jej strzałka opcji (3), przełącznik Szablon (4) i przycisk Eksportuj (5)."
+    "pl": "Ekran Eksportuj projekt: wiersze informacji (1), karta Wideo (2), jej strzałka opcji (3), przełącznik Szablon (4) i przycisk Eksportuj (5).",
+    "uk": "Екран Експорт проєкту: рядки інформації (1), картка Відео (2), стрілка її параметрів (3), перемикач Шаблон (4) і кнопка Експорт (5)."
    },
    "start": {
     "scene": "demo",
@@ -2556,7 +2584,8 @@
     "fr": "Historique des versions : chaque version a une miniature, une heure et une taille (1), ainsi qu’un bouton Restaurer (2).",
     "de": "Versionsverlauf: Jede Version hat eine Miniaturansicht, eine Uhrzeit und eine Größe (1) sowie eine Schaltfläche Wiederherstellen (2).",
     "it": "Cronologia versioni: ogni versione ha una miniatura, un orario e una dimensione (1), e un pulsante Ripristina (2).",
-    "pl": "Historia wersji: każda wersja ma miniaturę, godzinę i rozmiar (1) oraz przycisk Przywróć (2)."
+    "pl": "Historia wersji: każda wersja ma miniaturę, godzinę i rozmiar (1) oraz przycisk Przywróć (2).",
+    "uk": "Історія версій: кожна версія має мініатюру, час і розмір (1), а також кнопку Відновити (2)."
    },
    "start": "home",
    "steps": [
@@ -2638,7 +2667,8 @@
     "fr": "Dans le menu du calque, choisissez Enregistrer dans Mes ressources (1).",
     "de": "Wähle im Ebenenmenü Unter „Meine Assets“ speichern (1).",
     "it": "Nel menu livello, scegli Salva in Le mie risorse (1).",
-    "pl": "W menu warstwy wybierz Zapisz w Moich zasobach (1)."
+    "pl": "W menu warstwy wybierz Zapisz w Moich zasobach (1).",
+    "uk": "У меню шару виберіть Зберегти в «Мої ресурси» (1)."
    },
    "start": {
     "scene": "demo",
@@ -2699,7 +2729,8 @@
     "fr": "Dans le menu copier-coller, choisissez Enregistrer le préréglage (1).",
     "de": "Wähle im Menü zum Kopieren und Einfügen Voreinstellung speichern (1).",
     "it": "Nel menu copia e incolla, scegli Salva preset (1).",
-    "pl": "W menu kopiowania i wklejania wybierz Zapisz preset (1)."
+    "pl": "W menu kopiowania i wklejania wybierz Zapisz preset (1).",
+    "uk": "У меню копіювання й вставлення виберіть Зберегти пресет (1)."
    },
    "start": {
     "scene": "demo",
@@ -2760,7 +2791,8 @@
     "fr": "Le tiroir Paramètres : les quatre groupes (1) et les lignes en dessous (2).",
     "de": "Die Schublade Einstellungen: die vier Gruppen (1) und die Zeilen darunter (2).",
     "it": "Il pannello Impostazioni: i quattro gruppi (1) e le righe sotto di essi (2).",
-    "pl": "Szuflada Ustawienia: cztery grupy (1) i wiersze pod nimi (2)."
+    "pl": "Szuflada Ustawienia: cztery grupy (1) i wiersze pod nimi (2).",
+    "uk": "Панель Налаштування: чотири групи (1) і рядки під ними (2)."
    },
    "start": "home",
    "steps": [
@@ -2831,7 +2863,8 @@
     "fr": "Le groupe Éditeur : Thème (1), Durée des nouveaux calques (2), Vibration (3), l’interrupteur du bouton de transition (4) et Style des émojis (5).",
     "de": "Die Gruppe Editor: Design (1), Länge neuer Ebenen (2), Vibration (3), der Schalter für die Übergangsschaltfläche (4) und Emoji-Stil (5).",
     "it": "Il gruppo Editor: Tema (1), Durata dei nuovi livelli (2), Vibrazione (3), l’interruttore del pulsante di transizione (4) e Stile emoji (5).",
-    "pl": "Grupa Edytor: Motyw (1), Długość nowej warstwy (2), Wibracje (3), przełącznik przycisku przejścia (4) i Styl emoji (5)."
+    "pl": "Grupa Edytor: Motyw (1), Długość nowej warstwy (2), Wibracje (3), przełącznik przycisku przejścia (4) i Styl emoji (5).",
+    "uk": "Група Редактор: Тема (1), Тривалість нового шару (2), Вібрація (3), перемикач кнопки переходу (4) і Стиль емодзі (5)."
    },
    "start": "home",
    "steps": [
@@ -3006,7 +3039,8 @@
     "fr": "Plusieurs calques sélectionnés : la barre du haut (1), les calques cochés (2) et la barre du bas avec les commandes de durée (3).",
     "de": "Mehrere Ebenen ausgewählt: die obere Leiste (1), die markierten Ebenen (2) und die untere Leiste mit den Zeitbefehlen (3).",
     "it": "Più livelli selezionati: la barra superiore (1), i livelli spuntati (2) e la barra inferiore con i comandi di tempo (3).",
-    "pl": "Zaznaczono kilka warstw: górny pasek (1), zaznaczone warstwy (2) i dolny pasek z poleceniami czasu (3)."
+    "pl": "Zaznaczono kilka warstw: górny pasek (1), zaznaczone warstwy (2) i dolny pasek z poleceniami czasu (3).",
+    "uk": "Вибрано кілька шарів: верхня панель (1), позначені шари (2) і нижня панель із командами часу (3)."
    }
   },
   {
@@ -3094,7 +3128,8 @@
     "fr": "L’onglet Médias : Tout voir (1), la liste des albums (2), Caméra (3) et Rechercher (4).",
     "de": "Der Tab Medien: Alle anzeigen (1), die Albumliste (2), Kamera (3) und Suchen (4).",
     "it": "La scheda Media: Mostra tutto (1), l’elenco degli album (2), Camera (3) e Cerca (4).",
-    "pl": "Karta Multimedia: Zobacz wszystkie (1), lista albumów (2), Kamera (3) i Szukaj (4)."
+    "pl": "Karta Multimedia: Zobacz wszystkie (1), lista albumów (2), Kamera (3) i Szukaj (4).",
+    "uk": "Вкладка Медіа: Показати все (1), список альбомів (2), Камера (3) і Пошук (4)."
    }
   },
   {
@@ -3160,7 +3195,8 @@
     "fr": "L’onglet Objet / Ressource : Caméra, Objet nul, Groupe vide, Ressource / Projet, Importer un SVG et Modèle 3D (1).",
     "de": "Der Tab Objekt / Asset: Kamera, Nullobjekt, Leere Gruppe, Asset / Projekt, SVG importieren und 3D-Modell (1).",
     "it": "La scheda Oggetto / Risorsa: Camera, Oggetto nullo, Gruppo vuoto, Risorsa / Progetto, Importa SVG e Modello 3D (1).",
-    "pl": "Karta Obiekt / zasób: Kamera, Obiekt zerowy, Pusta grupa, Zasób / projekt, Importuj SVG i Model 3D (1)."
+    "pl": "Karta Obiekt / zasób: Kamera, Obiekt zerowy, Pusta grupa, Zasób / projekt, Importuj SVG i Model 3D (1).",
+    "uk": "Вкладка Об'єкт / ресурс: Камера, Нуль, Порожня група, Ресурс / проєкт, Імпортувати SVG і 3D-модель (1)."
    }
   },
   {
@@ -3237,7 +3273,8 @@
     "fr": "Le menu du calque d’une vidéo : Adapter au canevas, Remplir le canevas et Étirer au canevas (1), et Infos sur le média (2).",
     "de": "Das Ebenenmenü eines Videos: An Leinwand anpassen, Leinwand füllen und Auf Leinwand strecken (1) sowie Medieninfo (2).",
     "it": "Il menu livello di un video: Adatta alla tela, Riempi la tela ed Estendi alla tela (1), e Info media (2).",
-    "pl": "Menu warstwy wideo: Dopasuj do obszaru roboczego, Wypełnij obszar roboczy i Rozciągnij do obszaru roboczego (1) oraz Informacje o multimediach (2)."
+    "pl": "Menu warstwy wideo: Dopasuj do obszaru roboczego, Wypełnij obszar roboczy i Rozciągnij do obszaru roboczego (1) oraz Informacje o multimediach (2).",
+    "uk": "Меню шару відео: Вписати в полотно, Заповнити полотно й Розтягнути на полотно (1), а також Інформація про медіа (2)."
    }
   },
   {
@@ -3369,7 +3406,8 @@
     "fr": "L’éditeur de points : Ouvrir le tracé (1), Rendre le point anguleux (2), Supprimer le point (3), le pavé tactile (4), les flèches de contour (5) et la liste des points (6).",
     "de": "Der Punkteditor: Pfad öffnen (1), Punkt zuspitzen (2), Punkt löschen (3), das Trackpad (4), die Konturpfeile (5) und die Punkteliste (6).",
     "it": "L’editor dei punti: Apri il tracciato (1), Rendi il punto angolare (2), Elimina punto (3), il trackpad (4), le frecce del contorno (5) e l’elenco dei punti (6).",
-    "pl": "Edytor punktów: Otwórz ścieżkę (1), Wyostrz punkt (2), Usuń punkt (3), gładzik (4), strzałki konturu (5) i lista punktów (6)."
+    "pl": "Edytor punktów: Otwórz ścieżkę (1), Wyostrz punkt (2), Usuń punkt (3), gładzik (4), strzałki konturu (5) i lista punktów (6).",
+    "uk": "Редактор точок: Розімкнути контур (1), Зробити точку гострою (2), Видалити точку (3), трекпад (4), стрілки контуру (5) і список точок (6)."
    }
   },
   {
@@ -3486,7 +3524,8 @@
     "fr": "L’éditeur de dessin : les quatre outils (1), le curseur de taille (2) et le sélecteur de couleur (3).",
     "de": "Der Zeicheneditor: die vier Werkzeuge (1), der Größenregler (2) und die Farbauswahl (3).",
     "it": "L’editor di disegno: i quattro strumenti (1), il cursore della dimensione (2) e il selettore colore (3).",
-    "pl": "Edytor rysowania: cztery narzędzia (1), suwak rozmiaru (2) i wybór koloru (3)."
+    "pl": "Edytor rysowania: cztery narzędzia (1), suwak rozmiaru (2) i wybór koloru (3).",
+    "uk": "Редактор малювання: чотири інструменти (1), повзунок розміру (2) і вибір кольору (3)."
    }
   },
   {
@@ -3591,7 +3630,8 @@
     "fr": "Options de caméra : les onglets (1), le cône de vue (2), Perspective et Orthographique (3), Angle de vue et Zoom (4).",
     "de": "Kameraoptionen: die Tabs (1), der Sichtkegel (2), Perspektive und Orthografisch (3), Blickwinkel und Zoom (4).",
     "it": "Opzioni camera: le schede (1), il cono di visuale (2), Prospettiva e Ortografica (3), Angolo di visuale e Zoom (4).",
-    "pl": "Opcje kamery: karty (1), stożek widzenia (2), Perspektywa i Rzut ortograficzny (3), Kąt widzenia i Powiększenie (4)."
+    "pl": "Opcje kamery: karty (1), stożek widzenia (2), Perspektywa i Rzut ortograficzny (3), Kąt widzenia i Powiększenie (4).",
+    "uk": "Параметри камери: вкладки (1), конус огляду (2), Перспектива й Ортографічна (3), Кут огляду та Масштаб (4)."
    }
   },
   {
@@ -3674,7 +3714,8 @@
     "fr": "Mouvements de caméra : les six mouvements (1) et Durée (2).",
     "de": "Kamerabewegungen: die sechs Bewegungen (1) und Dauer (2).",
     "it": "Movimenti camera: i sei movimenti (1) e Durata (2).",
-    "pl": "Ruchy kamery: sześć ruchów (1) i Czas trwania (2)."
+    "pl": "Ruchy kamery: sześć ruchów (1) i Czas trwania (2).",
+    "uk": "Рухи камери: шість рухів (1) і Тривалість (2)."
    }
   },
   {
@@ -3706,7 +3747,8 @@
     "fr": "Le bouton Transition (1) au-dessus du bouton Ajouter un calque (2), quand la tête de lecture est sur la coupe entre deux clips.",
     "de": "Die Schaltfläche Übergang (1) über der Schaltfläche Ebene hinzufügen (2), wenn der Abspielkopf am Schnitt zwischen zwei Clips steht.",
     "it": "Il pulsante Transizione (1) sopra il pulsante Aggiungi livello (2), quando l’indicatore di riproduzione è sul taglio tra due clip.",
-    "pl": "Przycisk Przejście (1) nad przyciskiem Dodaj warstwę (2), gdy głowica odtwarzania jest na cięciu między dwoma klipami."
+    "pl": "Przycisk Przejście (1) nad przyciskiem Dodaj warstwę (2), gdy głowica odtwarzania jest na cięciu między dwoma klipami.",
+    "uk": "Кнопка Перехід (1) над кнопкою Додати шар (2), коли курсор відтворення стоїть на стику двох кліпів."
    },
    "start": {
     "scene": "clips",
@@ -3823,7 +3865,8 @@
     "fr": "La feuille de transition : les deux clips (1), les transitions (2) et Durée (3).",
     "de": "Das Übergangsblatt: die beiden Clips (1), die Übergänge (2) und Dauer (3).",
     "it": "Il foglio delle transizioni: le due clip (1), le transizioni (2) e Durata (3).",
-    "pl": "Arkusz przejścia: dwa klipy (1), przejścia (2) i Czas trwania (3)."
+    "pl": "Arkusz przejścia: dwa klipy (1), przejścia (2) i Czas trwania (3).",
+    "uk": "Вікно переходу: два кліпи (1), переходи (2) і Тривалість (3)."
    }
   },
   {
@@ -3957,7 +4000,8 @@
     "fr": "Suivi de mouvement : le cadre sur le détail (1), Suivre (2), Direction (3), Appliquer à (4) et le bouton de suivi (5).",
     "de": "Bewegung verfolgen: der Rahmen auf dem Detail (1), Verfolgen (2), Richtung (3), Anwenden auf (4) und die Verfolgen-Schaltfläche (5).",
     "it": "Traccia movimento: il riquadro sul dettaglio (1), Traccia (2), Direzione (3), Applica a (4) e il pulsante di tracciamento (5).",
-    "pl": "Śledzenie ruchu: ramka na szczególe (1), Śledź (2), Kierunek (3), Zastosuj do (4) i przycisk śledzenia (5)."
+    "pl": "Śledzenie ruchu: ramka na szczególe (1), Śledź (2), Kierunek (3), Zastosuj do (4) i przycisk śledzenia (5).",
+    "uk": "Відстеження руху: рамка на деталі (1), Відстежувати (2), Напрямок (3), Застосувати до (4) і кнопка відстеження (5)."
    }
   },
   {
@@ -4042,7 +4086,8 @@
     "fr": "Le groupe Sauvegarde : Sauvegarder tous les projets (1), Restaurer une sauvegarde (2) et la sauvegarde automatique hebdomadaire (projets uniquement) (3).",
     "de": "Die Gruppe Sicherung: Alle Projekte sichern (1), Aus Sicherung wiederherstellen (2) und wöchentliche automatische Sicherung (nur Projekte) (3).",
     "it": "Il gruppo Backup: Esegui il backup di tutti i progetti (1), Ripristina da backup (2) e il backup automatico settimanale (solo progetti) (3).",
-    "pl": "Grupa Kopia zapasowa: Utwórz kopię zapasową wszystkich projektów (1), Przywróć z kopii zapasowej (2) i cotygodniowa automatyczna kopia zapasowa (tylko projekty) (3)."
+    "pl": "Grupa Kopia zapasowa: Utwórz kopię zapasową wszystkich projektów (1), Przywróć z kopii zapasowej (2) i cotygodniowa automatyczna kopia zapasowa (tylko projekty) (3).",
+    "uk": "Група Резервне копіювання: Створити копію всіх проєктів (1), Відновити з резервної копії (2) і Щотижнева автоматична копія (лише проєкти) (3)."
    }
   },
   {
@@ -4136,7 +4181,8 @@
     "fr": "Options vidéo : Résolution d’exportation (1), Format (2) et Codec (3).",
     "de": "Videooptionen: Exportauflösung (1), Format (2) und Codec (3).",
     "it": "Opzioni video: Risoluzione di esportazione (1), Formato (2) e Codec (3).",
-    "pl": "Opcje wideo: Rozdzielczość eksportu (1), Format (2) i Kodek (3)."
+    "pl": "Opcje wideo: Rozdzielczość eksportu (1), Format (2) i Kodek (3).",
+    "uk": "Параметри відео: Роздільна здатність експорту (1), Формат (2) і Кодек (3)."
    }
   },
   {
@@ -4245,7 +4291,8 @@
     "fr": "Autres options vidéo : Flou de mouvement (1), Qualité (2) et Audio (3).",
     "de": "Weitere Videooptionen: Bewegungsunschärfe (1), Qualität (2) und Audio (3).",
     "it": "Altre opzioni video: Sfocatura di movimento (1), Qualità (2) e Audio (3).",
-    "pl": "Więcej opcji wideo: Rozmycie ruchu (1), Jakość (2) i Dźwięk (3)."
+    "pl": "Więcej opcji wideo: Rozmycie ruchu (1), Jakość (2) i Dźwięk (3).",
+    "uk": "Додаткові параметри відео: Розмиття в русі (1), Якість (2) і Аудіо (3)."
    }
   },
   {
@@ -4323,7 +4370,8 @@
     "fr": "La carte Export lent (1) avec son bouton Continuer quand même (2).",
     "de": "Die Karte Langsamer Export (1) mit ihrer Schaltfläche Trotzdem fortfahren (2).",
     "it": "La scheda Esportazione lenta (1) con il suo pulsante Continua comunque (2).",
-    "pl": "Karta Powolny eksport (1) z przyciskiem Kontynuuj mimo to (2)."
+    "pl": "Karta Powolny eksport (1) z przyciskiem Kontynuuj mimo to (2).",
+    "uk": "Картка Повільний експорт (1) із кнопкою Все одно продовжити (2)."
    }
   },
   {
@@ -4355,7 +4403,8 @@
     "fr": "La grille d’outils d’un calque sélectionné : les petits boutons (1), les grands boutons d’outils (2) et les points de page (3).",
     "de": "Das Werkzeugraster einer ausgewählten Ebene: die kleinen Schaltflächen (1), die großen Werkzeugschaltflächen (2) und die Seitenpunkte (3).",
     "it": "La griglia degli strumenti di un livello selezionato: i pulsanti piccoli (1), i pulsanti grandi degli strumenti (2) e i punti delle pagine (3).",
-    "pl": "Siatka narzędzi zaznaczonej warstwy: małe przyciski (1), duże przyciski narzędzi (2) i kropki stron (3)."
+    "pl": "Siatka narzędzi zaznaczonej warstwy: małe przyciski (1), duże przyciski narzędzi (2) i kropki stron (3).",
+    "uk": "Сітка інструментів вибраного шару: малі кнопки (1), великі кнопки інструментів (2) і крапки сторінок (3)."
    },
    "start": {
     "scene": "demo",
@@ -4441,7 +4490,8 @@
     "fr": "La deuxième page de la grille d’outils d’une vidéo : Recadrer (1), IA (2), Sous-titres automatiques (3) et Inverser (4).",
     "de": "Die zweite Seite des Werkzeugrasters eines Videos: Zuschneiden (1), KI (2), Automatische Untertitel (3) und Umkehren (4).",
     "it": "La seconda pagina della griglia degli strumenti di un video: Ritaglia (1), IA (2), Sottotitoli automatici (3) e Inverti (4).",
-    "pl": "Druga strona siatki narzędzi wideo: Kadruj (1), AI (2), Automatyczne napisy (3) i Odwróć (4)."
+    "pl": "Druga strona siatki narzędzi wideo: Kadruj (1), AI (2), Automatyczne napisy (3) i Odwróć (4).",
+    "uk": "Друга сторінка сітки інструментів відео: Обрізати (1), AI (2), Автосубтитри (3) і Реверс (4)."
    },
    "start": {
     "scene": "video",
@@ -4527,7 +4577,8 @@
     "fr": "Le panneau Recadrer : le cadre de recadrage sur l’image (1), les boutons de format (2), les quatre côtés (3) et Réinitialiser et Terminé (4).",
     "de": "Das Bedienfeld Zuschneiden: der Zuschneiderahmen auf dem Bild (1), die Seitenverhältnis-Schaltflächen (2), die vier Seiten (3) sowie Zurücksetzen und Fertig (4).",
     "it": "Il pannello Ritaglia: la cornice di ritaglio sull’immagine (1), i pulsanti delle proporzioni (2), i quattro lati (3) e Ripristina e Fine (4).",
-    "pl": "Panel Kadruj: ramka kadrowania na obrazie (1), przyciski proporcji (2), cztery boki (3) oraz Resetuj i Gotowe (4)."
+    "pl": "Panel Kadruj: ramka kadrowania na obrazie (1), przyciski proporcji (2), cztery boki (3) oraz Resetuj i Gotowe (4).",
+    "uk": "Панель Обрізати: рамка обрізання на зображенні (1), кнопки співвідношення сторін (2), чотири сторони (3) і Скинути та Готово (4)."
    },
    "start": {
     "scene": "demo",
@@ -4636,7 +4687,8 @@
     "fr": "La première ligne de la grille d’outils : les cinq petits boutons (1).",
     "de": "Die erste Reihe des Werkzeugrasters: die fünf kleinen Schaltflächen (1).",
     "it": "La prima riga della griglia degli strumenti: i cinque pulsanti piccoli (1).",
-    "pl": "Pierwszy rząd siatki narzędzi: pięć małych przycisków (1)."
+    "pl": "Pierwszy rząd siatki narzędzi: pięć małych przycisków (1).",
+    "uk": "Перший рядок сітки інструментів: п'ять малих кнопок (1)."
    },
    "start": {
     "scene": "video",
@@ -4700,7 +4752,8 @@
     "fr": "Le panneau Remappage temporel, onglet Normal : les onglets (1), les boutons qui définissent le début ou la fin (2), la règle avec la vitesse (3) et Fluidifier, Inverser et Arrêt sur image (4).",
     "de": "Das Bedienfeld Zeitsteuerung, Tab Normal: die Tabs (1), die Schaltflächen, die den Anfang oder das Ende festlegen (2), das Lineal mit der Geschwindigkeit (3) sowie Glätten, Umkehren und Standbild (4).",
     "it": "Il pannello Rimappatura temporale, scheda Normale: le schede (1), i pulsanti che impostano l’inizio o la fine (2), il righello con la velocità (3) e Rendi fluido, Inverti e Blocca fotogramma (4).",
-    "pl": "Panel Zmiana tempa, karta Zwykły: karty (1), przyciski ustawiające początek lub koniec (2), linijka z prędkością (3) oraz Wygładź, Odwróć i Zatrzymaj klatkę (4)."
+    "pl": "Panel Zmiana tempa, karta Zwykły: karty (1), przyciski ustawiające początek lub koniec (2), linijka z prędkością (3) oraz Wygładź, Odwróć i Zatrzymaj klatkę (4).",
+    "uk": "Панель Ремапінг часу, вкладка Звичайні: вкладки (1), кнопки, що задають початок або кінець (2), лінійка зі швидкістю (3) і Згладити, Реверс та Стоп-кадр (4)."
    },
    "start": {
     "scene": "video",
@@ -4818,7 +4871,8 @@
     "fr": "L’onglet Courbe : les onglets (1), les vignettes de courbe (2) et l’indication en dessous (3).",
     "de": "Der Tab Kurve: die Tabs (1), die Kurvenkacheln (2) und der Hinweis darunter (3).",
     "it": "La scheda Curva: le schede (1), i riquadri delle curve (2) e il suggerimento sotto di essi (3).",
-    "pl": "Karta Krzywa: karty (1), kafelki krzywych (2) i podpowiedź pod nimi (3)."
+    "pl": "Karta Krzywa: karty (1), kafelki krzywych (2) i podpowiedź pod nimi (3).",
+    "uk": "Вкладка Крива: вкладки (1), плитки кривих (2) і підказка під ними (3)."
    },
    "start": {
     "scene": "video",
@@ -4913,7 +4967,8 @@
     "fr": "L’éditeur de courbe de vitesse : la barre du haut avec le nom, la durée et Réinitialiser (1), la courbe (2) et la vitesse, Ajouter un point et Fluidifier (3).",
     "de": "Der Geschwindigkeitskurven-Editor: die obere Leiste mit dem Namen, der Länge und Zurücksetzen (1), die Kurve (2) sowie die Geschwindigkeit, Punkt hinzufügen und Glätten (3).",
     "it": "L’editor della curva di velocità: la barra superiore con il nome, la durata e Ripristina (1), la curva (2) e la velocità, Aggiungi punto e Rendi fluido (3).",
-    "pl": "Edytor krzywej prędkości: górny pasek z nazwą, długością i Resetuj (1), krzywa (2) oraz prędkość, Dodaj punkt i Wygładź (3)."
+    "pl": "Edytor krzywej prędkości: górny pasek z nazwą, długością i Resetuj (1), krzywa (2) oraz prędkość, Dodaj punkt i Wygładź (3).",
+    "uk": "Редактор кривої швидкості: верхня панель з назвою, довжиною та кнопкою Скинути (1), крива (2) і швидкість, Додати точку та Згладити (3)."
    },
    "start": {
     "scene": "video",
@@ -5014,7 +5069,8 @@
     "fr": "Inverser en cours : la boîte avec le temps restant et Annuler (1).",
     "de": "Umkehren in Arbeit: das Feld mit der verbleibenden Zeit und Abbrechen (1).",
     "it": "Inverti al lavoro: il riquadro con il tempo rimasto e Annulla (1).",
-    "pl": "Odwracanie w toku: ramka z pozostałym czasem i Anuluj (1)."
+    "pl": "Odwracanie w toku: ramka z pozostałym czasem i Anuluj (1).",
+    "uk": "Реверс у роботі: вікно із часом, що залишився, і кнопкою Скасувати (1)."
    },
    "start": {
     "scene": "long",
@@ -5090,7 +5146,8 @@
     "fr": "La feuille Fluidifier : la méthode et le niveau (1), Flou de mouvement (2) et Démarrer (3).",
     "de": "Das Blatt Glätten: die Methode und die Stufe (1), Bewegungsunschärfe (2) und Starten (3).",
     "it": "Il foglio Rendi fluido: il metodo e il livello (1), Sfocatura di movimento (2) e Avvia (3).",
-    "pl": "Arkusz Wygładź: metoda i poziom (1), Rozmycie ruchu (2) i Rozpocznij (3)."
+    "pl": "Arkusz Wygładź: metoda i poziom (1), Rozmycie ruchu (2) i Rozpocznij (3).",
+    "uk": "Вікно Згладити: метод і рівень (1), Розмиття в русі (2) і Почати (3)."
    },
    "start": {
     "scene": "video",
@@ -5204,7 +5261,8 @@
     "fr": "La page Outils : Compresser (1) et Téléchargeur de vidéos (2), et le bouton Outils de la barre du bas (3).",
     "de": "Die Seite Werkzeuge: Komprimieren (1) und Video-Downloader (2) sowie die Schaltfläche Werkzeuge in der unteren Leiste (3).",
     "it": "La pagina Strumenti: Comprimi (1) e Scarica video (2), e il pulsante Strumenti della barra inferiore (3).",
-    "pl": "Strona Narzędzia: Kompresuj (1) i Pobieranie wideo (2) oraz przycisk Narzędzia na dolnym pasku (3)."
+    "pl": "Strona Narzędzia: Kompresuj (1) i Pobieranie wideo (2) oraz przycisk Narzędzia na dolnym pasku (3).",
+    "uk": "Сторінка Інструменти: Стиснення (1) і Завантажувач відео (2), а також кнопка Інструменти на нижній панелі (3)."
    },
    "start": "home",
    "steps": [
@@ -5295,7 +5353,8 @@
     "fr": "Compresser avec une vidéo choisie : le fichier (1), les choix sous Quel niveau de compression ? (2) et la taille attendue, avec le bouton Compresser (3).",
     "de": "Komprimieren mit ausgewähltem Video: die Datei (1), die Optionen unter Wie stark komprimieren? (2) und die erwartete Größe mit der Schaltfläche Komprimieren (3).",
     "it": "Comprimi con un video scelto: il file (1), le opzioni sotto Quanto comprimere? (2) e la dimensione prevista, con il pulsante Comprimi (3).",
-    "pl": "Kompresuj z wybranym wideo: plik (1), opcje pod Jak mocno skompresować? (2) oraz oczekiwany rozmiar z przyciskiem Kompresuj (3)."
+    "pl": "Kompresuj z wybranym wideo: plik (1), opcje pod Jak mocno skompresować? (2) oraz oczekiwany rozmiar z przyciskiem Kompresuj (3).",
+    "uk": "Стиснення з вибраним відео: файл (1), варіанти під заголовком Наскільки стиснути? (2) і очікуваний розмір із кнопкою Стиснення (3)."
    },
    "start": "home",
    "steps": [
@@ -5400,7 +5459,8 @@
     "fr": "Le résultat de Compresser : Après et Avant (1), l’aperçu avec son bouton Plein écran (2), les tailles (3), ainsi que Enregistrer dans la galerie et Partager (4).",
     "de": "Das Ergebnis von Komprimieren: Danach und Davor (1), die Vorschau mit ihrer Schaltfläche Vollbild (2), die Größen (3) sowie In Galerie speichern und Teilen (4).",
     "it": "Il risultato di Comprimi: Dopo e Prima (1), l’anteprima con il suo pulsante Schermo intero (2), le dimensioni (3), e Salva nella galleria e Condividi (4).",
-    "pl": "Wynik kompresji: Po i Przed (1), podgląd z przyciskiem Pełny ekran (2), rozmiary (3) oraz Zapisz w galerii i Udostępnij (4)."
+    "pl": "Wynik kompresji: Po i Przed (1), podgląd z przyciskiem Pełny ekran (2), rozmiary (3) oraz Zapisz w galerii i Udostępnij (4).",
+    "uk": "Результат Стиснення: Після та До (1), попередній перегляд із кнопкою На весь екран (2), розміри (3), а також Зберегти в галерею й Поділитися (4)."
    },
    "start": "home",
    "steps": [
@@ -5539,7 +5599,8 @@
     "fr": "La vue plein écran du résultat : Après et Avant (1), le bouton de fermeture (2) et la vidéo (3).",
     "de": "Die Vollbildansicht des Ergebnisses: Danach und Davor (1), die Schließen-Schaltfläche (2) und das Video (3).",
     "it": "La vista a schermo intero del risultato: Dopo e Prima (1), il pulsante di chiusura (2) e il video (3).",
-    "pl": "Widok wyniku na pełnym ekranie: Po i Przed (1), przycisk zamykania (2) i wideo (3)."
+    "pl": "Widok wyniku na pełnym ekranie: Po i Przed (1), przycisk zamykania (2) i wideo (3).",
+    "uk": "Повноекранний перегляд результату: Після та До (1), кнопка закриття (2) і відео (3)."
    },
    "start": "home",
    "steps": [
@@ -5675,7 +5736,8 @@
     "fr": "Le Téléchargeur de vidéos avant l’installation du module : la carte qui le demande (1).",
     "de": "Der Video-Downloader vor der Installation des Add-ons: die Karte, die danach fragt (1).",
     "it": "Scarica video prima dell’installazione del componente aggiuntivo: la scheda che lo richiede (1).",
-    "pl": "Pobieranie wideo przed zainstalowaniem dodatku: karta z prośbą o jego instalację (1)."
+    "pl": "Pobieranie wideo przed zainstalowaniem dodatku: karta z prośbą o jego instalację (1).",
+    "uk": "Завантажувач відео до встановлення додатка: картка із запитом на його встановлення (1)."
    },
    "start": "home",
    "steps": [
@@ -5767,7 +5829,8 @@
     "fr": "Un lien vérifié : le champ du lien (1), le titre et l’image de la vidéo (2), ce qu’il faut enregistrer (3), la qualité (4) et Télécharger (5).",
     "de": "Ein geprüfter Link: das Linkfeld (1), der Titel und das Bild des Videos (2), was gespeichert werden soll (3), die Qualität (4) und Herunterladen (5).",
     "it": "Un link controllato: il campo del link (1), il titolo e l’immagine del video (2), cosa salvare (3), la qualità (4) e Scarica (5).",
-    "pl": "Sprawdzony link: pole linku (1), tytuł i obraz wideo (2), co zapisać (3), jakość (4) i Pobierz (5)."
+    "pl": "Sprawdzony link: pole linku (1), tytuł i obraz wideo (2), co zapisać (3), jakość (4) i Pobierz (5).",
+    "uk": "Перевірене посилання: поле посилання (1), назва й зображення відео (2), що зберегти (3), якість (4) і Завантажити (5)."
    },
    "start": "home",
    "steps": [
@@ -5910,7 +5973,8 @@
     "fr": "Après le téléchargement : l’endroit où le fichier a été enregistré (1), et Nouveau projet et Compresser (2).",
     "de": "Nach dem Download: der Ort, an dem die Datei gespeichert wurde (1), sowie Neues Projekt und Komprimieren (2).",
     "it": "Dopo il download: il posto in cui è stato salvato il file (1), e Nuovo progetto e Comprimi (2).",
-    "pl": "Po pobraniu: miejsce zapisania pliku (1) oraz Nowy projekt i Kompresuj (2)."
+    "pl": "Po pobraniu: miejsce zapisania pliku (1) oraz Nowy projekt i Kompresuj (2).",
+    "uk": "Після завантаження: місце збереження файлу (1), а також Новий проєкт і Стиснення (2)."
    },
    "start": "home",
    "steps": [
@@ -6034,7 +6098,8 @@
     "fr": "La liste des transitions défilée jusqu’à la fin, avec les transitions plus récentes Lueur (1), Tourbillon (2), Pixellisation (3) et Fondu bruité (4).",
     "de": "Die ans Ende gescrollte Übergangsliste mit den neueren Übergängen Leuchten (1), Wirbel (2), Verpixeln (3) und Rauschblende (4).",
     "it": "L’elenco delle transizioni scorso fino alla fine, con le transizioni più recenti Bagliore (1), Vortice (2), Effetto pixel (3) e Dissolvenza con disturbo (4).",
-    "pl": "Lista przejść przewinięta do końca, z nowszymi przejściami Poświata (1), Wir (2), Pikselizacja (3) i Rozpuszczanie szumem (4)."
+    "pl": "Lista przejść przewinięta do końca, z nowszymi przejściami Poświata (1), Wir (2), Pikselizacja (3) i Rozpuszczanie szumem (4).",
+    "uk": "Список переходів, прокручений до кінця, з новими переходами Сяйво (1), Вихор (2), Пікселізація (3) і Розчинення шумом (4)."
    },
    "start": {
     "scene": "clips",
@@ -6155,7 +6220,8 @@
     "fr": "Le bouton Effets de la barre du bas (1) ouvre un menu avec Ajouter un effet à tous et Coller tous les effets (2).",
     "de": "Die Schaltfläche Effekte in der unteren Leiste (1) öffnet ein Menü mit Effekt hinzufügen für alle und Alle Effekte einfügen (2).",
     "it": "Il pulsante Effetti della barra inferiore (1) apre un menu con Aggiungi un effetto a tutti e Incolla tutti gli effetti (2).",
-    "pl": "Przycisk Efekty na dolnym pasku (1) otwiera menu z opcjami Dodaj efekt do wszystkich i Wklej wszystkie efekty (2)."
+    "pl": "Przycisk Efekty na dolnym pasku (1) otwiera menu z opcjami Dodaj efekt do wszystkich i Wklej wszystkie efekty (2).",
+    "uk": "Кнопка Ефекти на нижній панелі (1) відкриває меню з пунктами Додайте ефект усім і Вставити всі ефекти (2)."
    },
    "start": {
     "scene": "demo",
@@ -6247,7 +6313,8 @@
     "fr": "Le bouton Plus d’actions de la barre du bas (1) ouvre un menu avec les commandes de collage et Retirer l’audio de tous (2).",
     "de": "Die Schaltfläche Weitere Aktionen in der unteren Leiste (1) öffnet ein Menü mit den Einfügebefehlen und Audio aus allen entfernen (2).",
     "it": "Il pulsante Altre azioni della barra inferiore (1) apre un menu con i comandi di incolla e Rimuovi audio da tutti (2).",
-    "pl": "Przycisk Więcej działań na dolnym pasku (1) otwiera menu z poleceniami wklejania i Usuń dźwięk ze wszystkich (2)."
+    "pl": "Przycisk Więcej działań na dolnym pasku (1) otwiera menu z poleceniami wklejania i Usuń dźwięk ze wszystkich (2).",
+    "uk": "Кнопка Інші дії на нижній панелі (1) відкриває меню з командами вставлення й пунктом Прибрати аудіо з усіх (2)."
    },
    "start": {
     "scene": "demo",
@@ -6333,7 +6400,8 @@
     "fr": "La Bibliothèque d’effets : la recherche (1), les effets recommandés (2), les effets récents et favoris (3) et les catégories (4).",
     "de": "Die Effektbibliothek: die Suche (1), die empfohlenen Effekte (2), zuletzt verwendete und favorisierte Effekte (3) und die Kategorien (4).",
     "it": "La Libreria effetti: la ricerca (1), gli effetti consigliati (2), gli effetti recenti e preferiti (3) e le categorie (4).",
-    "pl": "Biblioteka efektów: wyszukiwanie (1), polecane efekty (2), ostatnie i ulubione efekty (3) oraz kategorie (4)."
+    "pl": "Biblioteka efektów: wyszukiwanie (1), polecane efekty (2), ostatnie i ulubione efekty (3) oraz kategorie (4).",
+    "uk": "Бібліотека ефектів: пошук (1), рекомендовані ефекти (2), нещодавні й улюблені ефекти (3) та категорії (4)."
    },
    "start": {
     "scene": "demo",
@@ -6432,7 +6500,8 @@
     "fr": "Le sélecteur de tramage : chaque motif a une petite image d’exemple (1).",
     "de": "Die Dither-Auswahl: Jedes Muster hat ein kleines Beispielbild (1).",
     "it": "Il selettore del dithering: ogni motivo ha una piccola immagine di esempio (1).",
-    "pl": "Wybór ditheringu: każdy wzór ma małe zdjęcie próbki (1)."
+    "pl": "Wybór ditheringu: każdy wzór ma małe zdjęcie próbki (1).",
+    "uk": "Вибір дизерингу: кожен візерунок має невеликий зразок-зображення (1)."
    },
    "start": {
     "scene": "demo",
@@ -6513,7 +6582,8 @@
     "fr": "L’effet Particules : la neige dans l’aperçu (1) et ses premiers réglages (2).",
     "de": "Der Effekt Partikel: der Schnee in der Vorschau (1) und seine ersten Einstellungen (2).",
     "it": "L’effetto Particelle: la neve nell’anteprima (1) e le sue prime impostazioni (2).",
-    "pl": "Efekt Cząsteczki: śnieg w podglądzie (1) i jego pierwsze ustawienia (2)."
+    "pl": "Efekt Cząsteczki: śnieg w podglądzie (1) i jego pierwsze ustawienia (2).",
+    "uk": "Ефект Частинки: сніг у попередньому перегляді (1) і його перші параметри (2)."
    },
    "start": {
     "scene": "demo",
@@ -6600,7 +6670,8 @@
     "fr": "Un calque audio sur la timeline et ses outils : Préréglages, Effets et IA (1).",
     "de": "Eine Audioebene auf der Zeitleiste und ihre Werkzeuge: Voreinstellungen, Effekte und KI (1).",
     "it": "Un livello audio sulla timeline e i suoi strumenti: Preset, Effetti e IA (1).",
-    "pl": "Warstwa dźwiękowa na osi czasu i jej narzędzia: Presety, Efekty i AI (1)."
+    "pl": "Warstwa dźwiękowa na osi czasu i jej narzędzia: Presety, Efekty i AI (1).",
+    "uk": "Аудіошар на таймлайні та його інструменти: Пресети, Ефекти й AI (1)."
    },
    "start": {
     "scene": "demo",
@@ -6664,7 +6735,8 @@
     "fr": "Étirer la durée (1) dans le menu Plus d’actions ouvre une feuille où vous choisissez la durée des clips (2), puis touchez Appliquer (3).",
     "de": "Zeit strecken (1) im Menü Weitere Aktionen öffnet ein Blatt, in dem du wählst, wie lang die Clips werden (2), und dann auf Anwenden tippst (3).",
     "it": "Ridimensiona durata (1) nel menu Altre azioni apre un foglio in cui scegli quanto diventano lunghe le clip (2) e tocchi Applica (3).",
-    "pl": "Rozciągnij czas (1) w menu Więcej działań otwiera arkusz, w którym wybierasz, jak długie mają być klipy (2), i dotykasz Zastosuj (3)."
+    "pl": "Rozciągnij czas (1) w menu Więcej działań otwiera arkusz, w którym wybierasz, jak długie mają być klipy (2), i dotykasz Zastosuj (3).",
+    "uk": "Розтягнути час (1) у меню Інші дії відкриває вікно, де ви вибираєте нову тривалість кліпів (2) і торкаєтеся Застосувати (3)."
    }
   },
   {
@@ -6696,7 +6768,8 @@
     "fr": "Un calque écrêté : sa flèche (1) pointe vers le bas, vers le calque auquel il est écrêté (2).",
     "de": "Eine beschnittene Ebene: Ihr Pfeil (1) zeigt nach unten auf die Ebene, an der sie beschnitten wird (2).",
     "it": "Un livello ritagliato: la sua freccia (1) punta verso il basso, al livello a cui è ritagliato (2).",
-    "pl": "Warstwa z maską przycinającą: jej strzałka (1) wskazuje w dół na warstwę, do której jest przycięta (2)."
+    "pl": "Warstwa z maską przycinającą: jej strzałka (1) wskazuje w dół na warstwę, do której jest przycięta (2).",
+    "uk": "Обрізаний шар: його стрілка (1) вказує вниз на шар, до якого його обрізано (2)."
    }
   },
   {
@@ -6728,7 +6801,8 @@
     "fr": "À l’intérieur d’un groupe : l’engrenage (1) ouvre les paramètres du groupe avec Modification du temps (2).",
     "de": "Innen in einer Gruppe: Das Zahnrad (1) öffnet die Gruppeneinstellungen mit Zeit ändern (2).",
     "it": "All’interno di un gruppo: l’ingranaggio (1) apre le impostazioni del gruppo con Modifica tempi (2).",
-    "pl": "Wewnątrz grupy: koło zębate (1) otwiera ustawienia grupy z opcją Zmiana czasu (2)."
+    "pl": "Wewnątrz grupy: koło zębate (1) otwiera ustawienia grupy z opcją Zmiana czasu (2).",
+    "uk": "Всередині групи: шестерня (1) відкриває налаштування групи із пунктом Зміна часу (2)."
    }
   },
   {
@@ -6760,7 +6834,8 @@
     "fr": "À l’intérieur d’une catégorie (1), balayez vers la gauche ou la droite (2) pour passer à la catégorie suivante ou précédente.",
     "de": "Wische in einer Kategorie (1) nach links oder rechts (2), um zur nächsten oder vorherigen Kategorie zu wechseln.",
     "it": "All’interno di una categoria (1), scorri a sinistra o a destra (2) per passare alla categoria successiva o precedente.",
-    "pl": "Wewnątrz kategorii (1) przesuń palcem w lewo lub w prawo (2), aby przejść do następnej lub poprzedniej kategorii."
+    "pl": "Wewnątrz kategorii (1) przesuń palcem w lewo lub w prawo (2), aby przejść do następnej lub poprzedniej kategorii.",
+    "uk": "Всередині категорії (1) проведіть пальцем ліворуч або праворуч (2), щоб перейти до наступної чи попередньої категорії."
    }
   },
   {
@@ -6792,7 +6867,8 @@
     "fr": "Balayer un effet vers la gauche (1) fait apparaître la corbeille (2) ; relâchez pour le supprimer.",
     "de": "Wenn du einen Effekt nach links wischst (1), erscheint der Papierkorb (2); lass los, um ihn zu löschen.",
     "it": "Scorrendo un effetto verso sinistra (1) appare il cestino (2); rilascia per eliminarlo.",
-    "pl": "Przesunięcie efektu w lewo (1) pokazuje kosz (2); puść, aby go usunąć."
+    "pl": "Przesunięcie efektu w lewo (1) pokazuje kosz (2); puść, aby go usunąć.",
+    "uk": "Якщо провести ефект ліворуч (1), з'явиться кошик (2); відпустіть, щоб видалити його."
    }
   }
  ]

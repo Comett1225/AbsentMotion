@@ -26,7 +26,7 @@
 </p>
 
 AbsentMotion is a free, open-source alternative to CapCut and Alight Motion: a motion graphics, animation and video
-editor for Android phones and Chromebooks, with desktop versions for Mac and Linux from 5.0. Everything runs on your device and it works without
+editor for Android phones and Chromebooks, with desktop versions for Mac, Windows and Linux from 5.0. Everything runs on your device and it works without
 an internet connection. There is no subscription, no account and no advertising, and your projects never leave your device.
 
 <p align="center">
@@ -134,7 +134,7 @@ MP4, MOV, MKV or WebM video (H.264, HEVC, AV1, VP9 or APV, as the phone supports
 <details>
 <summary><strong>Tablets, Chromebooks and computers</strong></summary>
 
-Layouts for big tablet screens in portrait and landscape, with panels beside the preview. Chromebooks run the Android app, with their own files for Intel and AMD chips. From 5.0 there is a desktop version for Macs with Apple silicon and for Linux (`.deb` and AppImage, arm64 and x86_64): the same editor, effects and export with a mouse timeline, right-click menus, keyboard shortcuts and drag and drop. Windows is being tested.
+Layouts for big tablet screens in portrait and landscape, with panels beside the preview. Chromebooks run the Android app, with their own files for Intel and AMD chips. From 5.0 there is a desktop version for Macs (Apple silicon and Intel), Windows and Linux (`.deb`, AppImage and `.tar.gz`, arm64 and x86_64): the same editor, effects and export with a mouse timeline, right-click menus, keyboard shortcuts and drag and drop.
 
 </details>
 
@@ -146,9 +146,9 @@ Automatic version history, crash recovery, crash logs that say in one sentence w
 </details>
 
 <details>
-<summary><strong>24 languages</strong></summary>
+<summary><strong>25 languages</strong></summary>
 
-English, Indonesian, Hindi, Portuguese (Brazil), Spanish (Latin America), Spanish (Spain), Filipino, Vietnamese, Thai, Malay, Arabic, Persian, Urdu, Turkish, Russian, Bengali, Japanese, Korean, Chinese (Traditional), Chinese (Simplified), French, German, Italian and Polish, chosen on first start.
+English, Indonesian, Hindi, Portuguese (Brazil), Spanish (Latin America), Spanish (Spain), Filipino, Vietnamese, Thai, Malay, Arabic, Persian, Urdu, Turkish, Russian, Bengali, Japanese, Korean, Chinese (Traditional), Chinese (Simplified), French, German, Italian, Polish and Ukrainian, chosen on first start.
 
 </details>
 
@@ -170,7 +170,23 @@ There are two builds: `foss`, which contains no Google libraries at all, and `co
 Not sure about your phone? The [phone checker](https://comett1225.github.io/AbsentMotion/phone-checker.html) tells you
 which build to download.
 
-The desktop version runs on Macs with Apple silicon (`arm64`) and on Linux (`.deb`, AppImage and `.tar.gz`, `arm64` and `x86_64`) with glibc 2.35 or newer: Ubuntu 22.04, Debian 12 and later. Windows builds and is being tested.
+The desktop version runs on Macs with Apple silicon (`-macos-arm64.dmg`) or an Intel chip (`-macos-x64.dmg`) from macOS 11, on 64-bit Windows 10 and 11 with an Intel or AMD chip (`-windows-x64.msi`), and on Linux (`.deb`, AppImage and `.tar.gz`, `arm64` and `x86_64`) with glibc 2.35 or newer: Ubuntu 22.04, Debian 12 and later.
+
+## Install on a Mac
+
+Download `AbsentMotion-*-macos-arm64.dmg` for a Mac with Apple silicon (M1 or newer) or `AbsentMotion-*-macos-x64.dmg` for
+a Mac with an Intel chip, open it and drag AbsentMotion into Applications.
+
+The app is not notarised by Apple, so the first time macOS says it cannot check it. Click **Done**, open **System
+Settings** > **Privacy & Security**, scroll down to the message about AbsentMotion, click **Open Anyway** and confirm.
+After that it starts like any other app. Updates are offered inside the app.
+
+## Install on Windows
+
+Download `AbsentMotion-*-windows-x64.msi` and open it. If your browser says the file isn't commonly downloaded, choose to
+keep it. It installs for your user only, without administrator rights, and adds AbsentMotion to the Start menu and the
+desktop. The installer is not signed, so Windows may say it protected your PC: click **More info**, then **Run anyway**. The first start after installing can take a little longer while Windows checks
+the new files. Remove it in **Settings** > **Apps**; your projects stay. Updates are offered inside the app.
 
 ## Install on Linux
 

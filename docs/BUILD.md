@@ -240,7 +240,7 @@ unpacked:
     docker run --rm -v "$PWD:/src" -w /src -e AM_ANDROID_API=/src/<android-api.jar> am-linux sh -c '
         linux/skia.sh &&
         FFMPEG_PREFIX=/src/<ffmpeg> ./gradlew -p pc test createDistributable packageDeb &&
-        linux/package.sh 5.0.0-pre'
+        linux/package.sh <version>'
 
 `linux/skia.sh` builds Skia with `linux/skia-args.gn` (Ganesh and Vulkan, no OpenGL, fontconfig, Skia's own FreeType) into
 `third_party/skia/out/linux-arm64` or `out/linux-x64` (about 175 MB; about 25 minutes in Docker on an Apple-silicon Mac).

@@ -138,6 +138,7 @@
     <string name="settings_about">Perihal</string>
     <string name="settings_report_issue">Laporkan masalah</string>
     <string name="settings_suggest_feature">Cadangkan ciri</string>
+    <string name="join_discord">Sertai Discord</string>
     <string name="settings_help">Bantuan</string>
     <string name="tutorial_settings_start">Mulakan tutorial</string>
     <string name="tutorial_settings_continue">Teruskan tutorial</string>
@@ -2066,7 +2067,7 @@
     <string name="tools_downloader_intro">Memuat turun video dan gambar dari YouTube, Instagram, TikTok dan media sosial lain terus ke galeri anda. Ia memerlukan tambahan sekali muat turun sebanyak %1$d MB.</string>
     <string name="tools_download_progress">Memuat turun %1$d%%</string>
     <string name="tools_more">Lebih banyak alat akan hadir dalam kemas kini akan datang...</string>
-    <string name="tools_suggestions">Ada cadangan alat? Kongsikannya di %1$s atau %2$s!</string>
+    <string name="tools_suggestions">Ada cadangan alat? Kongsikannya di %1$s, %2$s atau %3$s!</string>
     <string name="tools_github">GitHub</string>
     <string name="tools_form">Borang</string>
     <string name="effectbrowser_favorite_preset">Pratetap kegemaran</string>

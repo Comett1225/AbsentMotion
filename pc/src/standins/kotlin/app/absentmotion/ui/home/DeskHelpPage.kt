@@ -77,8 +77,21 @@ private val WidthAttr = Regex("width=\"(\\d+)\"")
 private val HeightAttr = Regex("height=\"(\\d+)\"")
 private val Skipped = setOf("head", "header", "nav", "script", "style", "svg")
 
-private fun entities(text: String): String = text.replace("&nbsp;", " ").replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">").replace("&quot;", "\"")
-    .replace("&#39;", "'").replace("&rarr;", "→").replace("&larr;", "←").replace("&middot;", "·").replace("&hellip;", "…").replace("&ndash;", "–").replace("&mdash;", "—")
+private val NamedEntities = mapOf(
+    "nbsp" to " ", "amp" to "&", "lt" to "<", "gt" to ">", "quot" to "\"", "apos" to "'", "rarr" to "→", "larr" to "←", "middot" to "·",
+    "hellip" to "…", "ndash" to "–", "mdash" to "—", "deg" to "°", "rsquo" to "’", "lsquo" to "‘", "rdquo" to "”", "ldquo" to "“", "times" to "×",
+)
+private val Entity = Regex("&(#[xX][0-9a-fA-F]+|#[0-9]+|[a-zA-Z]+);")
+
+internal fun entities(text: String): String = Entity.replace(text) { m ->
+    val v = m.groupValues[1]
+    val code = when {
+        v.startsWith("#x") || v.startsWith("#X") -> v.drop(2).toIntOrNull(16)
+        v.startsWith("#") -> v.drop(1).toIntOrNull()
+        else -> null
+    }
+    if (code != null) code.takeIf { Character.isValidCodePoint(it) }?.let { String(Character.toChars(it)) } ?: m.value else NamedEntities[v] ?: m.value
+}
 
 internal fun helpTarget(page: String, target: String): String? {
     val folder = page.substringBeforeLast('/', "")

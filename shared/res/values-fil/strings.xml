@@ -138,6 +138,7 @@
     <string name="settings_about">Tungkol</string>
     <string name="settings_report_issue">Mag-ulat ng problema</string>
     <string name="settings_suggest_feature">Magmungkahi ng feature</string>
+    <string name="join_discord">Sumali sa Discord</string>
     <string name="settings_help">Tulong</string>
     <string name="tutorial_settings_start">Simulan ang tutorial</string>
     <string name="tutorial_settings_continue">Ituloy ang tutorial</string>
@@ -2095,7 +2096,7 @@
     <string name="tools_downloader_intro">Nagda-download ng mga video at larawan mula sa YouTube, Instagram, TikTok at iba pang social media diretso sa gallery mo. Kailangan nito ng isang beses na add-on na %1$d MB.</string>
     <string name="tools_download_progress">Nagda-download %1$d%%</string>
     <string name="tools_more">May mga darating pang tool sa mga susunod na update...</string>
-    <string name="tools_suggestions">May mungkahi ka bang tool? Ibahagi ito sa %1$s o sa %2$s!</string>
+    <string name="tools_suggestions">May mungkahi ka bang tool? Ibahagi ito sa %1$s, sa %2$s, o sa %3$s!</string>
     <string name="tools_github">GitHub</string>
     <string name="tools_form">Form</string>
     <string name="effectbrowser_favorite_preset">Paboritong preset</string>

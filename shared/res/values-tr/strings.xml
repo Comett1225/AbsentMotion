@@ -138,6 +138,7 @@
     <string name="settings_about">Hakkında</string>
     <string name="settings_report_issue">Sorun bildir</string>
     <string name="settings_suggest_feature">Özellik öner</string>
+    <string name="join_discord">Discord\'a katıl</string>
     <string name="settings_help">Yardım</string>
     <string name="tutorial_settings_start">Eğitimi başlat</string>
     <string name="tutorial_settings_continue">Eğitime devam et</string>
@@ -2095,7 +2096,7 @@
     <string name="tools_downloader_intro">YouTube, Instagram, TikTok ve diğer sosyal medyadan videoları ve resimleri doğrudan galerinize indirir. Bir kerelik %1$d MB\'lık bir eklenti gerekir.</string>
     <string name="tools_download_progress">İndiriliyor %1$d%%</string>
     <string name="tools_more">Gelecek güncellemelerde daha fazla araç eklenecek...</string>
-    <string name="tools_suggestions">Araç öneriniz var mı? %1$s veya %2$s üzerinden paylaşın!</string>
+    <string name="tools_suggestions">Araç öneriniz var mı? %1$s, %2$s veya %3$s üzerinden paylaşın!</string>
     <string name="tools_github">GitHub</string>
     <string name="tools_form">Form</string>
     <string name="effectbrowser_favorite_preset">Ön ayarı favorilere ekle</string>

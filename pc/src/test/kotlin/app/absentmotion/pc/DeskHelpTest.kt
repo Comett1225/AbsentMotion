@@ -8,6 +8,11 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class DeskHelpTest {
+    @Test fun htmlEntitiesAreDecodedOnce() {
+        assertEquals("60° to 360°, it's a ‘x’ &lt; ×  ", app.absentmotion.ui.home.entities("60&deg; to 360&#176;, it&#x27;s a &lsquo;x&rsquo; &amp;lt; &times; &nbsp;"))
+        assertEquals("&bogus; &#xZZ;", app.absentmotion.ui.home.entities("&bogus; &#xZZ;"))
+    }
+
     @Test fun relativeLinksStayInTheirFolder() {
         assertEquals("ar/x.html", helpTarget("ar/editing.html", "x.html"))
         assertEquals("ar/sub/y.html", helpTarget("ar/editing.html", "sub/y.html"))

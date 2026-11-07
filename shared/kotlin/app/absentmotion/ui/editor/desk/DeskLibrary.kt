@@ -91,8 +91,9 @@ internal fun DeskLibraryRail(selected: Int, expanded: Boolean, modifier: Modifie
                 Column(Modifier.width(56.dp).height(54.dp).tutorialTarget(when (index) { 0 -> "lib_tab_media"; 1 -> "lib_tab_audio"; 3 -> "lib_tab_text"; else -> null }).clip(RoundedCornerShape(8.dp)).background(if (active) Am.Accent.copy(alpha = .16f) else if (hovered) Am.Field else androidx.compose.ui.graphics.Color.Transparent)
                     .hoverable(source).pointerHoverIcon(PointerIcon.Hand).clickable { select(index) }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                     Icon(section.icon, null, Modifier.size(22.dp), tint = tint)
-                    Text(stringResource(section.rail), Modifier.fillMaxWidth().padding(top = 3.dp), color = if (active) Am.Accent else Am.OnDarkDim, fontSize = 12.sp,
-                        lineHeight = 14.sp, maxLines = 1, overflow = TextOverflow.Clip, textAlign = TextAlign.Center)
+                    Text(stringResource(section.rail), Modifier.fillMaxWidth().padding(top = 3.dp), color = if (active) Am.Accent else Am.OnDarkDim,
+                        lineHeight = 14.sp, maxLines = 1, overflow = TextOverflow.Clip, textAlign = TextAlign.Center,
+                        autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(9.sp, 12.sp))
                 }
             }
         }

@@ -138,6 +138,7 @@
     <string name="settings_about">アプリについて</string>
     <string name="settings_report_issue">問題を報告</string>
     <string name="settings_suggest_feature">機能をリクエスト</string>
+    <string name="join_discord">Discordに参加</string>
     <string name="settings_help">ヘルプ</string>
     <string name="tutorial_settings_start">チュートリアルを開始</string>
     <string name="tutorial_settings_continue">チュートリアルを続ける</string>
@@ -2066,7 +2067,7 @@
     <string name="tools_downloader_intro">YouTube、Instagram、TikTok などの SNS から動画や画像をギャラリーに直接ダウンロードします。初回のみ %1$d MB のアドオンが必要です。</string>
     <string name="tools_download_progress">ダウンロード中 %1$d%%</string>
     <string name="tools_more">今後のアップデートでツールが追加されます...</string>
-    <string name="tools_suggestions">追加してほしいツールはありますか？%1$sまたは%2$sでお知らせください！</string>
+    <string name="tools_suggestions">追加してほしいツールはありますか？%1$s、%2$s、または%3$sでお知らせください！</string>
     <string name="tools_github">GitHub</string>
     <string name="tools_form">フォーム</string>
     <string name="effectbrowser_favorite_preset">お気に入りのプリセット</string>

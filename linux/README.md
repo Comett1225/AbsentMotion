@@ -10,7 +10,7 @@ Build on Linux (arm64 or x64), or in the Docker image on a Mac (`docs/BUILD.md` 
 
     linux/skia.sh
     FFMPEG_PREFIX=<unpacked BtbN linux64-gpl-shared-9.0 or linuxarm64-gpl-shared-9.0> ./gradlew -p pc test createDistributable packageDeb
-    linux/package.sh 5.0.0-pre
+    linux/package.sh 5.0.0
 
 `skia.sh` builds Skia for the running chip into `../third_party/skia/out/linux-arm64` or `out/linux-x64` (`SKIA_DIR`,
 `SKIA_OUT` and `GN` change the source, output and `gn`; `SKIA_LIBS` tells `build.sh` where the libraries are). Skia uses

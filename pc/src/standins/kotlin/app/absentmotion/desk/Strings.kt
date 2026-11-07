@@ -39,7 +39,7 @@ object Strings {
         val hundreds = n % 100
         val millions = n != 0 && n % 1_000_000 == 0
         return when (language) {
-            "ru" -> when { tens == 1 && hundreds != 11 -> "one"; tens in 2..4 && hundreds !in 12..14 -> "few"; else -> "many" }
+            "ru", "uk" -> when { tens == 1 && hundreds != 11 -> "one"; tens in 2..4 && hundreds !in 12..14 -> "few"; else -> "many" }
             "pl" -> when { n == 1 -> "one"; tens in 2..4 && hundreds !in 12..14 -> "few"; else -> "many" }
             "ar" -> when { n == 0 -> "zero"; n == 1 -> "one"; n == 2 -> "two"; hundreds in 3..10 -> "few"; hundreds in 11..99 -> "many"; else -> "other" }
             "fr", "pt" -> when { n <= 1 -> "one"; millions -> "many"; else -> "other" }

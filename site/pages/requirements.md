@@ -52,9 +52,9 @@ Phones running Android 16 and 17, and emulators from Android 13. Other phones sh
 
 From version 5.0 there is also a version for computers. It is the same app as on the phone, with the same effects, projects and export, laid out for a mouse and a keyboard. The phone app still comes first.
 
-- **Mac:** computers with Apple silicon (M1 or newer). Download the Mac file (`.dmg`) from the [releases page](@releases).
+- **Mac:** computers with Apple silicon (M1 or newer) or an Intel chip, with macOS 11 or newer. From the [releases page](@releases), download the Mac file for your chip: `-macos-arm64.dmg` for Apple silicon or `-macos-x64.dmg` for Intel. The first time, macOS says it cannot check the app: click **Done**, then open **System Settings** > **Privacy & Security** and click **Open Anyway**.
 - **Linux:** 64-bit computers with an ARM (`arm64`) or Intel or AMD (`x86_64`) chip, running Ubuntu 22.04, Debian 12 or newer, or another Linux with glibc 2.35 or newer. From the [releases page](@releases), download the `.deb` package, which adds AbsentMotion to the app menu of Ubuntu, Debian and similar systems, the `.AppImage`, which runs without installing: mark it as executable and open it, or the `.tar.gz`, which installs for your user on any distribution (Arch, Fedora, openSUSE and others): unpack it and run `install.sh`. Pick the file with `arm64` or `x86_64` in its name. The [README](@repo) has step-by-step install notes for each kind of Linux.
-- **Windows** is being tested and comes later.
+- **Windows:** 64-bit Windows 10 or 11 on an Intel or AMD chip. From the [releases page](@releases), download the installer (`-windows-x64.msi`). It installs for your user and adds AbsentMotion to the Start menu and the desktop. If Windows says it protected your PC, click **More info**, then **Run anyway**.
 
 On Linux, AbsentMotion draws with the graphics chip through Vulkan. Without a Vulkan driver (on Ubuntu and Debian, the package `mesa-vulkan-drivers`) it draws with the processor, which is slower, and frame blending, optical-flow and motion-blur smoothing, and Datamosh do not work.
 

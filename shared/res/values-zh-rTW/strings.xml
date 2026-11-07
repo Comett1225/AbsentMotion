@@ -138,6 +138,7 @@
     <string name="settings_about">關於</string>
     <string name="settings_report_issue">回報問題</string>
     <string name="settings_suggest_feature">建議功能</string>
+    <string name="join_discord">加入 Discord</string>
     <string name="settings_help">說明</string>
     <string name="tutorial_settings_start">開始教學</string>
     <string name="tutorial_settings_continue">繼續教學</string>
@@ -2066,7 +2067,7 @@
     <string name="tools_downloader_intro">將YouTube、Instagram、TikTok和其他社群媒體的影片與圖片直接下載至相簿。需要一次性下載 %1$d MB的附加元件。</string>
     <string name="tools_download_progress">正在下載 %1$d%%</string>
     <string name="tools_more">未來更新將加入更多工具…</string>
-    <string name="tools_suggestions">有工具建議嗎？歡迎在 %1$s 或 %2$s 留言！</string>
+    <string name="tools_suggestions">有工具建議嗎？歡迎在 %1$s、%2$s 或 %3$s 留言！</string>
     <string name="tools_github">GitHub</string>
     <string name="tools_form">表單</string>
     <string name="effectbrowser_favorite_preset">將預設集加入最愛</string>

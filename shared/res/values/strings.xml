@@ -138,6 +138,7 @@
     <string name="settings_about">About</string>
     <string name="settings_report_issue">Report issue</string>
     <string name="settings_suggest_feature">Suggest a feature</string>
+    <string name="join_discord">Join Discord</string>
     <string name="settings_help">Help</string>
     <string name="tutorial_settings_start">Start the tutorial</string>
     <string name="tutorial_settings_continue">Continue the tutorial</string>
@@ -2121,7 +2122,7 @@
     <string name="tools_downloader_intro">Downloads videos and pictures from YouTube, Instagram, TikTok and other social media straight to your gallery. It needs a one-time add-on of %1$d MB.</string>
     <string name="tools_download_progress">Downloading %1$d%%</string>
     <string name="tools_more">More tools will appear in future updates...</string>
-    <string name="tools_suggestions">Got any tool suggestions? Leave it on %1$s, or %2$s!</string>
+    <string name="tools_suggestions">Got any tool suggestions? Leave it on %1$s, %2$s, or %3$s!</string>
     <string name="tools_github">GitHub</string>
     <string name="tools_form">the Form</string>
     <string name="effectbrowser_favorite_preset">Favorite preset</string>

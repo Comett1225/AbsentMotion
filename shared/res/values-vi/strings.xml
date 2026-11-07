@@ -138,6 +138,7 @@
     <string name="settings_about">Giới thiệu</string>
     <string name="settings_report_issue">Báo cáo sự cố</string>
     <string name="settings_suggest_feature">Đề xuất tính năng</string>
+    <string name="join_discord">Tham gia Discord</string>
     <string name="settings_help">Trợ giúp</string>
     <string name="tutorial_settings_start">Bắt đầu hướng dẫn</string>
     <string name="tutorial_settings_continue">Tiếp tục hướng dẫn</string>
@@ -2066,7 +2067,7 @@
     <string name="tools_downloader_intro">Tải video và hình ảnh từ YouTube, Instagram, TikTok và các mạng xã hội khác thẳng vào thư viện của bạn. Cần một tiện ích bổ sung %1$d MB, chỉ tải một lần.</string>
     <string name="tools_download_progress">Đang tải %1$d%%</string>
     <string name="tools_more">Sẽ có thêm công cụ trong các bản cập nhật sau...</string>
-    <string name="tools_suggestions">Bạn có đề xuất công cụ nào không? Hãy gửi qua %1$s hoặc %2$s!</string>
+    <string name="tools_suggestions">Bạn có đề xuất công cụ nào không? Hãy gửi qua %1$s, %2$s hoặc %3$s!</string>
     <string name="tools_github">GitHub</string>
     <string name="tools_form">biểu mẫu</string>
     <string name="effectbrowser_favorite_preset">Yêu thích preset</string>

@@ -6,11 +6,12 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
-## [5.0.0] - Unreleased
+## [5.0.0] - 2026-11-07
 
 ### Added
 
-- AbsentMotion on the computer: a desktop version for Macs with Apple silicon and for Linux. It runs the phone's own editor, effects and export, laid out for a mouse and a keyboard, with a media library, an inspector, a mouse timeline, right-click menus, keyboard shortcuts, files dropped into the window, linked folders, the webcam, export in the background and in-app updates. Windows builds and is being tested.
+- AbsentMotion on the computer: a desktop version for Macs (Apple silicon and Intel), Windows and Linux. It runs the phone's own editor, effects and export, laid out for a mouse and a keyboard, with a media library, an inspector, a mouse timeline, right-click menus, keyboard shortcuts, files dropped into the window, linked folders, the webcam, export in the background and in-app updates.
+- Windows: a per-user installer (.msi) with Start menu and desktop shortcuts, for 64-bit Windows 10 and 11.
 - Linux: a .deb package and an AppImage, each for arm64 and x86_64. They run on glibc 2.35 or newer (Ubuntu 22.04, Debian 12 and later).
 - Text effects: Text Shake (letters shake on their own as Shake, Jitter, Wave, Circle or Wobble, or only some letters at a time), Text Blips (types the text out with a blip for each letter, eight voices, heard in the preview and the export) and Font Weight (animate the weight of variable fonts, imported ones too).
 - ASCII effect: any layer as text art made of letters and symbols, with six presets.
@@ -47,7 +48,7 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - Desktop: Alt+Left and Alt+Right jump between bookmarks; comma and period nudge the selected clips.
 - Linux: a .tar.gz with an install script for any distribution.
 - Effects library: swipe left or right on the Recent and Favorite grid to switch, or press and hold the two small icons and slide your thumb.
-- Seven new languages: Korean, Chinese (Traditional), Chinese (Simplified), French, German, Italian and Polish, with the help pages and picture captions in each. Phones set to Chinese for Taiwan, Hong Kong or Macau get Traditional Chinese.
+- Eight new languages: Korean, Chinese (Traditional), Chinese (Simplified), French, German, Italian, Polish and Ukrainian, with the help pages and picture captions in each. Phones set to Chinese for Taiwan, Hong Kong or Macau get Traditional Chinese.
 - The preview renders ahead while you pause, starting at the playhead and growing outward, and a thin green line at the bottom of the time ruler shows the frames that are ready. Settings has a switch to turn it off.
 
 ### Changed
@@ -139,7 +140,7 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 
 ### Fixed
 
-- Video clips showed black on older GPUs such as the Galaxy S3 Neo's.
+- Video clips showed black on some older phone GPUs.
 - Large or detailed SVG files took minutes to import.
 - The screen went black for a moment after choosing a language on the first start (Android 12 and older).
 - Pictures from the Video Downloader kept their original date.

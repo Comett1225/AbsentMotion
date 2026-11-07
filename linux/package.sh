@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 ROOT="$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)"
-VERSION="${1:?usage: linux/package.sh <version, e.g. 5.0.0-pre>}"
+VERSION="${1:?usage: linux/package.sh <version, e.g. 5.0.0>}"
 case "$(uname -m)" in
     aarch64|arm64) ARCH=arm64; APPIMAGE_ARCH=aarch64 ;;
     x86_64|amd64) ARCH=x86_64; APPIMAGE_ARCH=x86_64 ;;

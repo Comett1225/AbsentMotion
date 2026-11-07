@@ -50,6 +50,7 @@ class AppLanguageTest {
         assertEquals(AppLanguage.German, pick("de-AT"))
         assertEquals(AppLanguage.Italian, pick("it-IT"))
         assertEquals(AppLanguage.Polish, pick("pl-PL"))
+        assertEquals(AppLanguage.Ukrainian, pick("uk-UA"))
         assertEquals(AppLanguage.Japanese, pick("ja-JP"))
         assertEquals(AppLanguage.Spanish, pick("es-419"))
         assertEquals(AppLanguage.Spanish, pick("es_MX"))
@@ -66,8 +67,8 @@ class AppLanguageTest {
 
     @Test fun unsupportedLanguagesFallBackToTheNextPhoneLanguageThenEnglish() {
         assertEquals(AppLanguage.English, pick("nl-NL"))
-        assertEquals(AppLanguage.English, pick("uk-UA", "sw-KE"))
-        assertEquals(AppLanguage.Japanese, pick("uk-UA", "ja-JP"))
+        assertEquals(AppLanguage.English, pick("cs-CZ", "sw-KE"))
+        assertEquals(AppLanguage.Japanese, pick("cs-CZ", "ja-JP"))
         assertEquals(AppLanguage.Russian, pick("nl-NL", "ru-RU", "en-US"))
         assertEquals(AppLanguage.English, pick())
         assertEquals(AppLanguage.English, pick(""))
@@ -85,8 +86,8 @@ class AppLanguageTest {
     }
 
     @Test fun fourteenLanguagesEachKnowTheirOwnName() {
-        assertEquals(24, AppLanguage.entries.size)
-        assertEquals(24, AppLanguage.entries.map { it.nativeName }.toSet().size)
+        assertEquals(25, AppLanguage.entries.size)
+        assertEquals(25, AppLanguage.entries.map { it.nativeName }.toSet().size)
         assertEquals("বাংলা", AppLanguage.Bengali.nativeName)
         assertEquals("العربية", AppLanguage.Arabic.nativeName)
         assertEquals("فارسی", AppLanguage.Persian.nativeName)

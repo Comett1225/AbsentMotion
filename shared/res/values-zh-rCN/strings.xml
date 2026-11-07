@@ -138,6 +138,7 @@
     <string name="settings_about">关于</string>
     <string name="settings_report_issue">反馈问题</string>
     <string name="settings_suggest_feature">提出功能建议</string>
+    <string name="join_discord">加入 Discord</string>
     <string name="settings_help">帮助</string>
     <string name="tutorial_settings_start">开始教程</string>
     <string name="tutorial_settings_continue">继续教程</string>
@@ -2066,7 +2067,7 @@
     <string name="tools_downloader_intro">将YouTube、Instagram、TikTok及其他社交媒体上的视频和图片直接下载到相册。需要下载一次性附加组件，大小为 %1$d MB。</string>
     <string name="tools_download_progress">正在下载 %1$d%%</string>
     <string name="tools_more">未来更新将带来更多工具…</string>
-    <string name="tools_suggestions">对工具有什么建议？请在 %1$s 或 %2$s 留言！</string>
+    <string name="tools_suggestions">对工具有什么建议？请在 %1$s、%2$s 或 %3$s 留言！</string>
     <string name="tools_github">GitHub</string>
     <string name="tools_form">表单</string>
     <string name="effectbrowser_favorite_preset">收藏预设</string>

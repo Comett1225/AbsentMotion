@@ -138,6 +138,7 @@
     <string name="settings_about">حول</string>
     <string name="settings_report_issue">الإبلاغ عن مشكلة</string>
     <string name="settings_suggest_feature">اقترح ميزة</string>
+    <string name="join_discord">انضم إلى Discord</string>
     <string name="settings_help">مساعدة</string>
     <string name="tutorial_settings_start">بدء البرنامج التعليمي</string>
     <string name="tutorial_settings_continue">متابعة البرنامج التعليمي</string>
@@ -2211,7 +2212,7 @@
     <string name="tools_downloader_intro">ينزّل الفيديوهات والصور من YouTube وInstagram وTikTok ومواقع التواصل الأخرى مباشرة إلى معرض الصور. يحتاج إلى إضافة لمرة واحدة بحجم %1$d ميغابايت.</string>
     <string name="tools_download_progress">جارٍ التنزيل %1$d%%</string>
     <string name="tools_more">ستظهر المزيد من الأدوات في التحديثات القادمة...</string>
-    <string name="tools_suggestions">هل لديك اقتراحات للأدوات؟ شاركها على %1$s أو عبر %2$s!</string>
+    <string name="tools_suggestions">هل لديك اقتراحات للأدوات؟ شاركها على %1$s أو عبر %2$s أو على %3$s!</string>
     <string name="tools_github">GitHub</string>
     <string name="tools_form">النموذج</string>
     <string name="effectbrowser_favorite_preset">إعداد مسبق مفضّل</string>

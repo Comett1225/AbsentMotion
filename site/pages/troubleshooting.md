@@ -87,7 +87,7 @@ The project uses a font that is not on this phone. Open the project and tap **Do
 
 **Can I open projects from other editors?** Some. See [Projects, backup and import](@projects).
 
-**Is there a computer version?** Yes, from version 5.0, for Mac and Linux computers. Windows comes later. The phone app still comes first. See [AbsentMotion on your computer](@requirements#absentmotion-on-your-computer).
+**Is there a computer version?** Yes, from version 5.0, for Mac, Windows and Linux computers. The phone app still comes first. See [AbsentMotion on your computer](@requirements#absentmotion-on-your-computer).
 
 **Which languages are there?** English, Indonesian, Hindi, Portuguese (Brazil), Spanish (Latin America), Spanish (Spain), Filipino, Vietnamese, Thai, Malay, Arabic, Persian, Urdu, Turkish, Russian, Bengali and Japanese. Change it in Settings.
 
