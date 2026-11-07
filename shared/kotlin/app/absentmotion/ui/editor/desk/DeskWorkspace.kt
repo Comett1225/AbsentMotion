@@ -132,7 +132,7 @@ private fun DeskWorkspaceBody(state: EditorState, onExit: () -> Unit, library: A
             prefs.edit().putFloat("libraryWidth", libraryWidth).putFloat("inspectorWidth", inspectorWidth).putFloat("timelineFraction", timelineFraction).putBoolean("libraryOpen", libraryOpen).putBoolean("inspectorOpen", inspectorOpen).apply()
         }
     }
-    LaunchedEffect(state.selectedId) { if (state.selectedId != null) { soloInspector = true; soloLibrary = false } }
+    LaunchedEffect(state.selectedId, MultiSelect.active) { if (state.selectedId != null || MultiSelect.active) { soloInspector = true; soloLibrary = false } }
     LaunchedEffect(state.addOpen) { if (state.addOpen) state.addOpen = false }
     val modal = settings || state.effectBrowserOpen || state.presetsOpen || state.drawing != null || state.fullColor != null || EmbedRequest.templateId != null
     LaunchedEffect(modal) { if (!modal) focusRequester.requestFocus() }

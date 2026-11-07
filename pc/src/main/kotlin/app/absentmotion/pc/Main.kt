@@ -98,7 +98,7 @@ fun main(args: Array<String>) {
             onPreviewKeyEvent = { it.type == KeyEventType.KeyDown && it.key == Key.Escape && DeskBack.back() || DeskKeys.handle(desk, it) },
             onKeyEvent = { app.absentmotion.desk.DeskGlobalKeys.handle(desk, it) }) {
             DeskFiles.window = window
-            remember(window) { window.minimumSize = java.awt.Dimension(800, 560) }
+            remember(window) { window.minimumSize = java.awt.Dimension(820, 560) }
             remember(window) { DeskWindow.attach(window) }
             if (DeskOs.mac) DeskMenus(desk)
             DisposableEffect(window) {

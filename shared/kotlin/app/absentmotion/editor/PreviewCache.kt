@@ -334,6 +334,18 @@ object PreviewCache {
     val idleMs: Long get() = if (PlatformFeatures.desktop) 1_000L else 2_000L
     fun idle(): Boolean = System.nanoTime() - interactionNs >= idleMs * 1_000_000L
 
+    suspend fun follow(next: CacheKey) {
+        val previous = key ?: return
+        if (!automatic || phase == Phase.Rendering || previous.scene == next.scene || previous.copy(scene = next.scene) != next) return
+        val dirty = withContext(Dispatchers.Default) { previewDirtyRanges(previous.scene, next.scene) }
+        currentCoroutineContext().ensureActive()
+        if (key !== previous) return
+        store?.removeWhere { frame -> dirty.any { frame in it } || frame > next.scene.lastFrame }
+        if (dirty.isNotEmpty()) player?.drop()
+        key = next
+        revise(force = true)
+    }
+
     suspend fun prepare(state: EditorState, context: Context, accept: () -> Boolean) {
         if (!accept() || phase == Phase.Rendering || fit <= 0f || !state.settings.backgroundPreview) return
         val next = keyOf(state)
@@ -352,13 +364,7 @@ object PreviewCache {
             player = FramePlayer(store!!, width, height)
             automatic = true
             preparedCell = cell
-        } else if (previous.scene != next.scene) {
-            val dirty = withContext(Dispatchers.Default) { previewDirtyRanges(previous.scene, next.scene) }
-            currentCoroutineContext().ensureActive()
-            store?.removeWhere { frame -> dirty.any { frame in it } || frame > next.scene.lastFrame }
-            if (dirty.isNotEmpty()) player?.drop()
-            revise(force = true)
-        }
+        } else follow(next)
         key = next
         phase = Phase.Ready
         val mine = generation

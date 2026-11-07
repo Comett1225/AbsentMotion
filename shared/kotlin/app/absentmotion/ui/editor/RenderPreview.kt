@@ -245,8 +245,10 @@ private fun AutomaticPreview(state: EditorState) {
                             state.drawing == null && state.panel != EditorPanel.EditText &&
                             (state.cameraMode || state.scene.layers.none { it.kind == "camera" }), PreviewCache.fit, PreviewCache.checkerCell)
                 }.collectLatest { request ->
+                    delay(100)
+                    PreviewCache.follow(request.key)
                     if (!request.eligible) return@collectLatest
-                    delay(PreviewCache.idleMs)
+                    delay(PreviewCache.idleMs - 100)
                     while (!PreviewCache.idle()) delay(80)
                     fun current() = lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED) && PreviewCache.idle() && !thermal.hot &&
                         !state.playing && !state.exportOpen && state.scene == request.key.scene && state.frame == request.frame &&
