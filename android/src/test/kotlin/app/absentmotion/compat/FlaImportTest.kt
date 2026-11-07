@@ -184,6 +184,29 @@ class FlaImportTest {
         assertTrue(layers(fla.root).isEmpty())
     }
 
+    private fun expanded(node: XmlNode): Int = layers(node).sumOf { 1 + (it.child("scene")?.let(::expanded) ?: 0) }
+
+    private fun nested(levels: Int, copies: Int): List<Pair<String, String>> = (0..levels).map { k ->
+        val body = if (k == 0) square else (1..copies).joinToString("") { """<DOMSymbolInstance libraryItemName="S${k - 1}" symbolType="graphic"/>""" }
+        "S$k.xml" to symbol("S$k", layer("a", """<DOMFrame index="0"><elements>$body</elements></DOMFrame>"""), """symbolType="graphic"""")
+    }
+
+    @Test fun countsEveryCopyOfANestedSymbolAgainstTheLayerLimit() {
+        val library = nested(4, 10)
+        val stage = layer("L", """<DOMFrame index="0"><elements>${(1..10).joinToString("") { """<DOMSymbolInstance libraryItemName="S4" symbolType="graphic"/>""" }}</elements></DOMFrame>""")
+        val fla = readFla(mapOf("DOMDocument.xml" to document(stage)) + library.map { "LIBRARY/${it.first}" to it.second }, maxLayers = 1000)
+        assertTrue((fla.counts[FlaPart.Overflow] ?: 0) > 0)
+        assertTrue(expanded(fla.root) <= 1000)
+    }
+
+    @Test fun stopsAtDeeplyNestedSymbols() {
+        val library = nested(200, 1)
+        val stage = layer("L", """<DOMFrame index="0"><elements><DOMSymbolInstance libraryItemName="S200" symbolType="graphic"/></elements></DOMFrame>""")
+        val fla = readFla(mapOf("DOMDocument.xml" to document(stage)) + library.map { "LIBRARY/${it.first}" to it.second })
+        assertTrue((fla.counts[FlaPart.Overflow] ?: 0) > 0)
+        assertEquals("scene", XmlNode.parse(fla.root.toXml()).name)
+    }
+
     @Test fun playsSingleFrameGraphicsFromTheirFrame() {
         val two = symbol("Two", layer("a", """<DOMFrame index="0"><elements>$square</elements></DOMFrame><DOMFrame index="1"><elements/></DOMFrame>"""), """symbolType="graphic"""")
         val frames = """<DOMFrame index="0" duration="6"><elements><DOMSymbolInstance libraryItemName="Two" symbolType="graphic" loop="single frame" firstFrame="1"/></elements></DOMFrame>"""

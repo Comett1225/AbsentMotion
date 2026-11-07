@@ -176,7 +176,7 @@ class DeskAppState {
     suspend fun maintainNow() {
         autoBackupIfDue(context, settings)
         sweepStorageDaily(context)
-        withContext(Dispatchers.IO) { runCatching { sweepStaleTemps(context.filesDir, context.cacheDir) } }
+        withContext(Dispatchers.IO) { runCatching { sweepStaleTemps(context.filesDir, context.cacheDir) }; runCatching { app.absentmotion.export.MediaStoreExport(context).discardAbandoned() } }
     }
 
     suspend fun maintain() {
@@ -348,7 +348,7 @@ class DeskAppState {
         if (sounds.isNotEmpty()) MediaPicks.addSounds(sounds)
     }
 
-    fun openLater(files: List<File>) { background.launch { openLock.withLock { openFiles(files) } } }
+    fun openLater(files: List<File>) { job = background.launch { openLock.withLock { openFiles(files) } } }
 
     suspend fun openFiles(files: List<File>) {
         DeskLibrary.remember(files)

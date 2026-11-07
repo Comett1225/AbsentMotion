@@ -45,4 +45,13 @@ class NestedSceneTimeTest {
         assertEquals(500.0, half.nestedTime(2500.0, 60, quantize = false).ms, 0.0)
         assertEquals(2500.0, half.nestedHostTime(500.0, 60), 0.0)
     }
+
+    @Test fun hostTimeInvertsAStretchedGroup() {
+        val group = scene.layers.single()
+        val long = group.copy(node = group.node.with("endTime", "5999").withChild("scene", group.nested!!.node.with("retime", "stretch")))
+        for (host in listOf(2000.0, 3000.0, 4500.0, 5800.0)) {
+            val inner = long.nestedTime(host, 60, quantize = false).ms
+            assertEquals(host, long.nestedHostTime(inner, 60), 1.0)
+        }
+    }
 }

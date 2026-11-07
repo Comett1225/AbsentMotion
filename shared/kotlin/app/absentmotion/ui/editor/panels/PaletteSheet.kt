@@ -71,6 +71,10 @@ import app.absentmotion.ui.theme.Presence
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.delay
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 
 @Composable
 internal fun rememberPaletteLibrary(): PaletteLibrary {
@@ -192,6 +196,9 @@ private fun PaletteEditor(library: PaletteLibrary, palette: ColourPalette, curre
     val scope = rememberCoroutineScope()
     var selected by remember(palette.id) { mutableStateOf<Int?>(null) }
     var name by remember(palette.id) { mutableStateOf(palette.name) }
+    val latest by rememberUpdatedState(palette)
+    LaunchedEffect(palette.id, name) { if (name != latest.name) { delay(500); library.put(latest.renamed(name)) } }
+    DisposableEffect(palette.id) { onDispose { if (name != latest.name) library.put(latest.renamed(name)) } }
     var sortMenu by remember { mutableStateOf(false) }
     var exportMenu by remember { mutableStateOf(false) }
     var askDelete by remember { mutableStateOf(false) }
@@ -211,7 +218,7 @@ private fun PaletteEditor(library: PaletteLibrary, palette: ColourPalette, curre
     Row(Modifier.fillMaxWidth().height(48.dp), verticalAlignment = Alignment.CenterVertically) {
         BarButton(ChromeIcons.Back, stringResource(R.string.topbar_back), Modifier.size(40.dp), onClick = onBack)
         if (palette.editable) BasicTextField(
-            name, { name = it.take(ColourPalette.MAX_NAME); change(palette.renamed(name)) },
+            name, { name = it.take(ColourPalette.MAX_NAME) },
             Modifier.weight(1f).clip(PanelShape).background(Am.Field).padding(horizontal = 10.dp, vertical = 8.dp), singleLine = true,
             textStyle = TextStyle(color = Am.OnDark, fontSize = 15.sp), cursorBrush = SolidColor(Am.Accent),
         ) else Text(palette.label(), Modifier.weight(1f).padding(start = 6.dp), color = Am.OnDark, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)

@@ -125,6 +125,7 @@ class EditorState(
         MultiSelect.clear()
         selectedId = null
         panel = EditorPanel.Tools
+        enteredMs = enteredMs.take(groupPath.size) + hostMs
         groupPath = groupPath + id
         frame = inner.frameAt(group.nestedTime(hostMs.toDouble(), hostFps, quantize = false).ms.toInt().coerceIn(0, inner.totalTime)).coerceIn(0, maxOf(scene.lastFrame, 0))
         engine.setScene(scene)
@@ -135,16 +136,25 @@ class EditorState(
         endGesture()
         playing = false
         val innerMs = timeMs
+        val entered = enteredMs.getOrNull(groupPath.size - 1)
         MultiSelect.clear()
         panel = EditorPanel.Tools
         groupPath = groupPath.dropLast(1)
         val group = scene.layer(id)
         selectedId = group?.id
-        frame = scene.frameAt(group?.nestedHostTime(innerMs.toDouble(), scene.fps)?.toInt() ?: innerMs).coerceIn(0, maxOf(scene.lastFrame, 0))
+        frame = scene.frameAt(group?.let { hostMsOf(it, scene.fps, innerMs.toDouble(), entered).toInt() } ?: innerMs).coerceIn(0, maxOf(scene.lastFrame, 0))
         engine.setScene(scene)
     }
 
     fun leaveGroups() { while (groupPath.isNotEmpty()) exitGroup() }
+
+    private var enteredMs: List<Int> = emptyList()
+
+    private fun hostMsOf(group: Layer, hostFps: Int, innerMs: Double, entered: Int?): Double {
+        val inner = group.nested ?: return innerMs
+        if (entered != null && inner.frameAt(group.nestedTime(entered.toDouble(), hostFps, quantize = false).ms.toInt()) == inner.frameAt(innerMs.toInt())) return entered.toDouble()
+        return group.nestedHostTime(innerMs, hostFps)
+    }
 
     val premuteGain = HashMap<Long, Float>()
 
@@ -157,7 +167,7 @@ class EditorState(
             var inner = root
             for (id in groupPath) { val layer = inner.layer(id)!!; chain.add(layer to inner.fps); inner = layer.nested ?: inner }
             var ms = timeMs.toDouble()
-            for (i in chain.indices.reversed()) ms = chain[i].first.nestedHostTime(ms, chain[i].second)
+            for (i in chain.indices.reversed()) ms = hostMsOf(chain[i].first, chain[i].second, ms, enteredMs.getOrNull(i))
             return root.frameAt(ms.toInt()).coerceIn(0, maxOf(root.lastFrame, 0))
         }
 

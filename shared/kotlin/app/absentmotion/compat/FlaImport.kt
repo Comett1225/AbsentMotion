@@ -247,7 +247,7 @@ private class Wrap(val label: String, val hidden: Boolean, val blending: String?
     override val box: Box? = Box.union(items.map { it.box })
 }
 
-private class SymbolScene(val scene: XmlNode, val frames: Int, val box: Box?, val dx: Double, val dy: Double)
+private class SymbolScene(val scene: XmlNode, val frames: Int, val box: Box?, val dx: Double, val dy: Double, val size: Int)
 
 private class Key(val node: XmlNode) {
     val index = node["index"]?.toIntOrNull()?.coerceAtLeast(0) ?: 0
@@ -258,6 +258,8 @@ private class Key(val node: XmlNode) {
 }
 
 private class Placed(val key: Key, val inst: XmlNode)
+
+private const val MaxNesting = 32
 
 private class FlaReader(private val files: Map<String, String>, private val maxLayers: Int) {
     private val counts = LinkedHashMap<FlaPart, Int>()
@@ -829,7 +831,9 @@ private class FlaReader(private val files: Map<String, String>, private val maxL
     private fun symbolScene(name: String, frame: Int?): SymbolScene? {
         val key = "$name\u0000${frame ?: -1}"
         scenes[key]?.let { return it }
+        if (building.size >= MaxNesting) { count(FlaPart.Overflow); return null }
         if (!building.add(name)) return null
+        val start = layers
         try {
             val item = symbols[name] ?: return null
             val timeline = item.child("timeline")?.child("DOMTimeline") ?: return null
@@ -843,7 +847,7 @@ private class FlaReader(private val files: Map<String, String>, private val maxL
             val oy = if (box == null) 0.0 else pad - box.y0
             val end = endMs(frames)
             val scene = innerScene(w.roundToInt(), h.roundToInt(), end, finish(content, w, h, ox, oy, end))
-            return SymbolScene(scene, frames, box, ox - w / 2, oy - h / 2).also { scenes[key] = it }
+            return SymbolScene(scene, frames, box, ox - w / 2, oy - h / 2, layers - start).also { scenes[key] = it }
         } finally {
             building.remove(name)
         }
@@ -859,9 +863,11 @@ private class FlaReader(private val files: Map<String, String>, private val maxL
             type == "graphic" && mode == "single frame" -> first(head)
             else -> null
         }
+        val before = layers
         val symbol = symbolScene(name, frozen) ?: return emptyList()
-        if (layers >= maxLayers) { count(FlaPart.Overflow); return emptyList() }
-        layers++
+        val copies = symbol.size - (layers - before)
+        if (layers + copies >= maxLayers) { count(FlaPart.Overflow); return emptyList() }
+        layers += copies + 1
         if (sample == null) count(FlaPart.Symbols)
         for (p in run) {
             val inst = p.inst

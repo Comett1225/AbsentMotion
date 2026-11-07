@@ -12,6 +12,7 @@ object DeskDrop {
     var at by mutableStateOf(Offset.Unspecified)
     var removeHovered: (() -> Unit)? = null
     var browserKey: ((androidx.compose.ui.input.key.KeyEvent) -> Boolean)? = null
+    var panelKey: ((Boolean) -> Unit)? = null
     var frameAt: (Offset) -> Int? = { null }
 
     fun clear() {

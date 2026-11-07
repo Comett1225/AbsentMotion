@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.graphics.asComposeImageBitmap
+import androidx.compose.ui.graphics.asSkiaBitmap
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.isAltPressed
 import androidx.compose.ui.input.pointer.isCtrlPressed
@@ -111,7 +112,7 @@ internal val android.media.MediaCodecInfo.hardware: Boolean get() = false
 internal val android.media.MediaCodecInfo.alias: Boolean get() = false
 internal val android.content.pm.PackageInfo.versionCodeLong: Long get() = versionCode.toLong()
 internal fun android.media.MediaMetadataRetriever.scaledFrame(timeUs: Long, option: Int, width: Int, height: Int): Bitmap? = getScaledFrameAtTime(timeUs, option, width, height)
-internal fun webpFormat(lossless: Boolean) = android.graphics.Bitmap.CompressFormat.PNG
+internal fun webpFormat(lossless: Boolean) = if (lossless) android.graphics.Bitmap.CompressFormat.WEBP_LOSSLESS else android.graphics.Bitmap.CompressFormat.WEBP_LOSSY
 
 class MediaPicker(private val launchBlock: () -> Unit) { fun launch() = launchBlock() }
 
@@ -358,3 +359,7 @@ fun rawFrameImage(rgba: ByteArray, width: Int, height: Int): ImageBitmap = org.j
     installPixels(org.jetbrains.skia.ImageInfo(width, height, org.jetbrains.skia.ColorType.RGBA_8888, org.jetbrains.skia.ColorAlphaType.PREMUL), rgba, width * 4)
     setImmutable()
 }.asComposeImageBitmap()
+
+fun releaseFrameImage(image: ImageBitmap) {
+    javax.swing.SwingUtilities.invokeLater { runCatching { image.asSkiaBitmap().close() } }
+}

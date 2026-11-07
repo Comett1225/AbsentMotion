@@ -4,6 +4,8 @@ import app.absentmotion.ai.cutoutMatte
 import app.absentmotion.model.Layer
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
+import app.absentmotion.model.nestedCut
+import app.absentmotion.model.trimmedTo
 
 internal val Layer.isPlainGroup: Boolean get() = kind == "embedScene" && link == null && nested != null && cutoutMatte == null
 
@@ -52,13 +54,15 @@ internal fun Layer.ungroupLosesStyle(): Boolean = isPlainGroup && !flattensIntoA
 internal fun Scene.ungrouped(id: Long): Scene? {
     val group = layer(id)?.takeIf { it.isPlainGroup } ?: return null
     val inner = group.nested ?: return null
-    val length = group.endTime - group.startTime
+    val cut = group.nestedCut
+    val end = cut + group.endTime - group.startTime
     val clipped = Scene(inner.node.with("retime", null).copy(children = inner.node.children.mapNotNull { child ->
         if (child.name !in Scene.LAYER_TAGS) return@mapNotNull child
         val layer = Layer(child)
         when {
-            layer.startTime >= length -> null
-            layer.endTime > length -> child.with("endTime", "$length")
+            layer.startTime >= end || layer.endTime <= cut -> null
+            layer.startTime < cut || layer.endTime > end -> layer.trimmedTo(maxOf(layer.startTime, cut), minOf(layer.endTime, end)).let { it.movedTo(it.startTime - cut).node }
+            cut > 0 -> layer.movedTo(layer.startTime - cut).node
             else -> child
         }
     }))

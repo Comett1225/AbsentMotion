@@ -75,7 +75,8 @@ object DeskKeys {
 
     private fun modal(state: EditorState): Boolean =
         DeskModals.open > 0 || state.exportOpen || state.effectBrowserOpen || state.historyOpen || state.presetsOpen || state.cameraOpen ||
-            state.drawing != null || state.fullColor != null || state.keypad != null || state.easingHint || state.ungroupAsk
+            state.drawing != null || state.fullColor != null || state.keypad != null || state.easingHint || state.ungroupAsk ||
+            app.absentmotion.ui.home.EmbedRequest.templateId != null
 
     var viewer: ((KeyEvent) -> Boolean)? = null
 
@@ -94,6 +95,7 @@ object DeskKeys {
         if (modal(state) || altGr(windows, event.isCtrlPressed, event.isAltPressed)) return false
         val command = isCommand(event)
         if (DeskTyping.active > 0 && (!command || event.key in fieldKeys)) return false
+        if (command && !event.isShiftPressed && (event.key == Key.One || event.key == Key.Two)) DeskDrop.panelKey?.let { it(event.key == Key.One); return true }
         val shift = event.isShiftPressed
         val last = state.scene.lastFrame
         fun step(by: Int) { state.playing = false; state.frame = (state.frame + by).coerceIn(0, last) }

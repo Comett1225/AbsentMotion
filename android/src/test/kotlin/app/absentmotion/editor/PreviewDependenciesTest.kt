@@ -54,6 +54,22 @@ class PreviewDependenciesTest {
         assertEquals(listOf(0..camera.lastFrame), previewDirtyRanges(camera, Scene.parse(camera.node.toXml().replace("<camera id=\"7\" ", "<camera id=\"7\" zoom=\"2\" "))))
     }
 
+    @Test fun layersThatReadTheLayerBelowFollowItsEdits() {
+        fun stack(middle: String, top: String) = Scene(XmlNode.parse("<scene width=\"100\" height=\"100\" fps=\"30\" totalTime=\"5999\">" +
+            "<shape id=\"1\" startTime=\"0\" endTime=\"5999\"/>$middle<shape id=\"3\" startTime=\"0\" endTime=\"5999\" $top/></scene>"))
+        val a = "<shape id=\"2\" startTime=\"0\" endTime=\"1999\"/>"
+        val masked = previewDirtyRanges(stack(a, "clippingMask=\"true\""), stack("", "clippingMask=\"true\""))
+        assertTrue(masked.any { 150 in it })
+        val plain = previewDirtyRanges(stack(a, ""), stack("", ""))
+        assertFalse(plain.any { 150 in it })
+        val bent = "<shape id=\"2\" startTime=\"0\" endTime=\"1999\"><path d=\"M 0 0 L 10 10\"/></shape>"
+        val moved = previewDirtyRanges(stack(a, ""), stack(bent, ""))
+        assertFalse(moved.any { 150 in it })
+        val along = { m: String -> Scene(XmlNode.parse("<scene width=\"100\" height=\"100\" fps=\"30\" totalTime=\"5999\">$m" +
+            "<shape id=\"3\" startTime=\"0\" endTime=\"5999\"><effect id=\"absent.movealongpath\"/></shape></scene>")) }
+        assertTrue(previewDirtyRanges(along(a), along(bent)).any { 150 in it })
+    }
+
     @Test fun anEffectOnlyDirtiesItsOwnLayerButLinksParentsAndPathsReachTheirUsers() {
         val temporal = scene(first = "<effect id=\"absent.echo\"/>")
         val echoed = previewDirtyRanges(temporal, scene(first = "<effect id=\"absent.echo\"/>", second = "<fillColor value=\"#ff00ff00\"/>"))
@@ -79,6 +95,10 @@ class PreviewDependenciesTest {
         assertEquals(listOf(898, 899, 896, 895, 894), previewOrder(899, 897).take(5))
         assertEquals(listOf(1, 2, 3), previewOrder(3, 0))
         assertTrue(previewOrder(0, -50).isEmpty())
+        val runs = previewOrder(900, 100, 30)
+        assertEquals((101..160).toList() + (70..99).toList(), runs.take(90))
+        assertEquals(900, runs.toSet().size)
+        assertEquals(listOf(1, 2, 3), previewOrder(3, 0, 30))
     }
 
     @Test fun sparseFramesAreIndependentAndEvictionIsBounded() {

@@ -10,7 +10,33 @@ import java.io.File
 import java.io.OutputStream
 
 class MediaStoreExport(context: Context) : ExportStore {
-    fun discardAbandoned() {}
+    fun discardAbandoned() {
+        synchronized(Lock) {
+            val listed = if (pending.exists()) pending.readLines().filter { it.isNotBlank() } else emptyList()
+            val left = listed.filter { it in mine || File(it).let { f -> f.exists() && !(f.name.endsWith(".part") && f.delete()) } }
+            if (left.isEmpty()) pending.delete() else pending.writeText(left.joinToString("\n", postfix = "\n"))
+        }
+        val stale = System.currentTimeMillis() - 3_600_000L
+        File(android.content.Desk.context.cacheDir, "export").listFiles()?.filter { it.isFile && it.lastModified() < stale }?.forEach { it.delete() }
+    }
+
+    private val pending get() = File(android.content.Desk.context.filesDir, "export-pending.txt")
+
+    private fun note(path: String, open: Boolean) = synchronized(Lock) {
+        runCatching {
+            if (open) { mine += path; pending.parentFile?.mkdirs(); pending.appendText(path + "\n") }
+            else {
+                mine -= path
+                val left = if (pending.exists()) pending.readLines().filter { it.isNotBlank() && it != path } else emptyList()
+                if (left.isEmpty()) pending.delete() else pending.writeText(left.joinToString("\n", postfix = "\n"))
+            }
+        }
+    }
+
+    private companion object {
+        val Lock = Any()
+        val mine = HashSet<String>()
+    }
 
     private fun dir(mime: String, folder: String?): File {
         val root = (System.getProperty("am.exports")?.let(::File) ?: Environment.getExternalStorageDirectory()).resolve(rootFor(mime)).resolve(AppFolder)
@@ -21,11 +47,13 @@ class MediaStoreExport(context: Context) : ExportStore {
         val dir = dir(mime, folder).also { it.mkdirs() }
         val part = File(dir, ".${System.nanoTime()}.part")
         val access = try { java.io.RandomAccessFile(part, "rw") } catch (t: Throwable) { throw ExportError(txt(R.string.export_error_create, name, dir.path), t) }
+        note(part.path, true)
         return OpenExport(access.fd, access::close, {
             val target = freeFile(dir, name)
             if (!part.renameTo(target)) throw ExportError(txt(R.string.export_error_write, name))
+            note(part.path, false)
             Uri.fromFile(target)
-        }, { part.delete() })
+        }, { part.delete(); note(part.path, false) })
     }
 
     override fun save(folder: String?, name: String, mime: String, write: (OutputStream) -> Unit): Uri {

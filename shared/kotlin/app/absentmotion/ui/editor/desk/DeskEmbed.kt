@@ -3,6 +3,7 @@ package app.absentmotion.ui.editor
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import app.absentmotion.R
@@ -27,6 +28,7 @@ internal fun DeskTemplateEmbed(state: EditorState) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     fun end() { EmbedRequest.templateId = null; state.engine.setScene(state.scene) }
+    DisposableEffect(Unit) { onDispose { EmbedRequest.templateId = null } }
     Box(Modifier.fillMaxSize()) {
         TemplateEditor(id, state.engine, state.settings, onClose = ::end) { template ->
             scope.launch {

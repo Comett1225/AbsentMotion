@@ -48,6 +48,8 @@ void DrawModel(SkCanvas* canvas, const Layer& l, double timeMs, float alpha, con
                        SkM44::Translate(-p.pivot.fX, -p.pivot.fY) * spin * SkM44::Scale(size, size, size);
     const SkM44 turn = p.turn * spin;
     const SkM44 worldTurn = SkM44::Rotate({0, 0, 1}, p.rotation * kRadians) * p.tilt * spin;
+    const SkM44 worldPlace = SkM44::Rotate({0, 0, 1}, p.rotation * kRadians) * p.tilt * SkM44::Scale(sx, sy, std::sqrt(std::fabs(sx * sy))) *
+                             SkM44::Translate(-p.pivot.fX, -p.pivot.fY) * spin * SkM44::Scale(size, size, size);
     const LightSet lights = l.sight.layers ? SceneLights(*l.sight.layers, timeMs) : LightSet{};
     const float mirror = sx * sy < 0 ? -1.0f : 1.0f;
     const float angle = l.value("lightAngle", 0, t, 135) * kRadians;
@@ -107,8 +109,7 @@ void DrawModel(SkCanvas* canvas, const Layer& l, double timeMs, float alpha, con
                 SkV3 illumination{k, k, k};
                 if (lights.count) {
                     const SkV4 wn = worldTurn.map(m.normals[v * 3], m.normals[v * 3 + 1], m.normals[v * 3 + 2], 0);
-                    const SkV4 wp = worldTurn.map(m.positions[v * 3] * size * sx, m.positions[v * 3 + 1] * size * sy,
-                                                 m.positions[v * 3 + 2] * size * std::sqrt(std::fabs(sx * sy)), 0);
+                    const SkV4 wp = worldPlace.map(m.positions[v * 3], m.positions[v * 3 + 1], m.positions[v * 3 + 2], 1);
                     const float side = f->back ? -1.0f : 1.0f;
                     illumination = Illuminate(lights, {wn.x * side, wn.y * side, wn.z * side}, {wp.x + p.location.x(), wp.y + p.location.y(), wp.z + p.z});
                 }

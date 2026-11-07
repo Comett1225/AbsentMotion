@@ -41,6 +41,7 @@ import app.absentmotion.editor.EditorPanel
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.MultiSelect
 import app.absentmotion.editor.stepBack
+import app.absentmotion.editor.ungroupSelected
 import app.absentmotion.ui.editor.panels.FullColorPicker
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Presence
@@ -107,6 +108,13 @@ private fun EditorBody(state: EditorState, onExit: () -> Unit) {
         text = { Text(stringResource(R.string.easing_needs_at_least_two_keyframes)) },
         confirmButton = { TextButton({ state.easingHint = false }) { Text(stringResource(R.string.ok), color = Am.Accent) } },
         containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark,
+    )
+    if (state.ungroupAsk) androidx.compose.material3.AlertDialog(
+        onDismissRequest = { state.ungroupAsk = false },
+        text = { Text(stringResource(R.string.ungroup_loses_style), color = Am.OnDark) },
+        confirmButton = { androidx.compose.material3.TextButton({ state.ungroupAsk = false; state.ungroupSelected() }) { Text(stringResource(R.string.layer_tool_ungroup), color = Am.Accent) } },
+        dismissButton = { androidx.compose.material3.TextButton({ state.ungroupAsk = false }) { Text(stringResource(R.string.cancel), color = Am.Accent) } },
+        containerColor = Am.Field,
     )
     if (app.absentmotion.platform.PlatformFeatures.desktop) {
         DeskWorkspace(state, onExit, addLibrary)

@@ -132,7 +132,12 @@ private fun PictureStage(file: File) {
 
 @Composable
 private fun VideoStage(file: File, playing: Boolean, setPlaying: (Boolean) -> Unit, toggle: () -> Unit) {
-    val facts = remember(file) { DeskMedia.probe(file) }
+    val facts by produceState<Map<String, String>?>(null, file) { value = withContext(Dispatchers.IO) { DeskMedia.probe(file) } }
+    facts?.let { VideoStage(file, it, playing, setPlaying, toggle) }
+}
+
+@Composable
+private fun VideoStage(file: File, facts: Map<String, String>, playing: Boolean, setPlaying: (Boolean) -> Unit, toggle: () -> Unit) {
     val duration = facts["duration"]?.toLongOrNull()?.coerceAtLeast(1) ?: 1L
     var frame by remember { mutableStateOf<ImageBitmap?>(null) }
     var position by remember { mutableLongStateOf(0L) }

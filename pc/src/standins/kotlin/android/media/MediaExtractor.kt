@@ -78,7 +78,7 @@ open class MediaExtractor {
             process.inputStream.bufferedReader().forEachLine { line ->
                 val kv = line.split('|').associate { it.substringBefore('=') to it.substringAfter('=') }
                 val time = (kv["pts_time"]?.toDoubleOrNull() ?: kv["dts_time"]?.toDoubleOrNull() ?: return@forEachLine)
-                list += Sample(track, Math.round(time * 1_000_000), kv["size"]?.toIntOrNull() ?: 0, kv["flags"]?.startsWith("K") == true)
+                list += Sample(track, Math.round(time * 1_000_000) - stream.startUs, kv["size"]?.toIntOrNull() ?: 0, kv["flags"]?.startsWith("K") == true)
             }
             process.waitFor()
         }

@@ -37,7 +37,7 @@ class Looper private constructor(val main: Boolean, internal val worker: java.ut
 }
 
 open class Handler(private val looper: Looper = Looper.getMainLooper()) {
-    private val timer by lazy { looper.worker ?: java.util.concurrent.Executors.newSingleThreadScheduledExecutor { Thread(it, "handler").apply { isDaemon = true } } }
+    private val timer by lazy { looper.worker ?: if (looper.main) mainTimer else java.util.concurrent.Executors.newSingleThreadScheduledExecutor { Thread(it, "handler").apply { isDaemon = true } } }
     private val pending = java.util.concurrent.ConcurrentHashMap<Runnable, MutableList<java.util.concurrent.Future<*>>>()
     private fun run(r: Runnable) { if (looper.main) javax.swing.SwingUtilities.invokeLater(r) else r.run() }
     fun post(r: Runnable): Boolean = postDelayed(r, 0)
@@ -50,6 +50,10 @@ open class Handler(private val looper: Looper = Looper.getMainLooper()) {
     fun removeCallbacks(r: Runnable) { pending.remove(r)?.forEach { it.cancel(false) } }
     fun removeCallbacksAndMessages(token: Any?) { pending.values.forEach { l -> l.forEach { it.cancel(false) } }; pending.clear() }
     fun getLooper() = looper
+
+    private companion object {
+        val mainTimer: java.util.concurrent.ScheduledExecutorService by lazy { java.util.concurrent.Executors.newSingleThreadScheduledExecutor { Thread(it, "main-handler").apply { isDaemon = true } } }
+    }
 }
 
 class HandlerThread(name: String) : Thread(name) {

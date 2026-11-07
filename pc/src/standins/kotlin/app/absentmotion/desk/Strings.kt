@@ -10,6 +10,7 @@ import org.w3c.dom.Node
 object Strings {
     private val strings = HashMap<String, String>()
     private val plurals = HashMap<String, Map<String, String>>()
+    private var language = "en"
 
     fun resDir(): File = System.getProperty("am.res")?.let(::File)
         ?: System.getProperty("am.assets")?.let { File(it).parentFile.resolve("res") }
@@ -25,11 +26,29 @@ object Strings {
     }
 
     private fun folderFor(tag: String): String? {
-        val parts = tag.replace('_', '-').split('-')
-        val language = when (parts[0].lowercase()) { "id" -> "in"; "tl" -> "fil"; else -> parts[0].lowercase() }
-        if (language == "en") return null
-        val region = parts.drop(1).firstOrNull { it.length == 2 }?.uppercase()
-        return listOfNotNull(region?.let { "values-$language-r$it" }, "values-$language").firstOrNull { resDir().resolve("$it/strings.xml").isFile }
+        val match = app.absentmotion.i18n.AppLanguage.match(listOf(tag)) ?: return null
+        val code = if (match.language == "id") "in" else match.language
+        if (code == "en") return null
+        return listOfNotNull(match.region?.let { "values-$code-r$it" }, "values-$code").firstOrNull { resDir().resolve("$it/strings.xml").isFile }
+            ?.also { language = code }
+    }
+
+    internal fun pluralCategory(language: String, count: Int): String {
+        val n = kotlin.math.abs(count)
+        val tens = n % 10
+        val hundreds = n % 100
+        val millions = n != 0 && n % 1_000_000 == 0
+        return when (language) {
+            "ru" -> when { tens == 1 && hundreds != 11 -> "one"; tens in 2..4 && hundreds !in 12..14 -> "few"; else -> "many" }
+            "pl" -> when { n == 1 -> "one"; tens in 2..4 && hundreds !in 12..14 -> "few"; else -> "many" }
+            "ar" -> when { n == 0 -> "zero"; n == 1 -> "one"; n == 2 -> "two"; hundreds in 3..10 -> "few"; hundreds in 11..99 -> "many"; else -> "other" }
+            "fr", "pt" -> when { n <= 1 -> "one"; millions -> "many"; else -> "other" }
+            "es", "it" -> when { n == 1 -> "one"; millions -> "many"; else -> "other" }
+            "fa", "hi", "bn" -> if (n <= 1) "one" else "other"
+            "fil" -> if (tens != 4 && tens != 6 && tens != 9) "one" else "other"
+            "in", "ms", "th", "vi", "ja", "ko", "zh" -> "other"
+            else -> if (n == 1) "one" else "other"
+        }
     }
 
     private fun load(file: File) {
@@ -97,7 +116,7 @@ object Strings {
 
     fun plural(id: Int, count: Int, vararg args: Any?): String {
         val forms = RNames.plurals.getOrNull(id - 0x7f110000)?.let { plurals[it] } ?: return "#$id"
-        val text = (if (count == 1) forms["one"] else null) ?: forms["other"] ?: forms.values.firstOrNull() ?: ""
+        val text = forms[pluralCategory(language, count)] ?: forms["other"] ?: forms.values.firstOrNull() ?: ""
         return runCatching { String.format(Locale.ENGLISH, text, *args) }.getOrDefault(text)
     }
 

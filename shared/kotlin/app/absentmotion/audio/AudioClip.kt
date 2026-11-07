@@ -111,14 +111,14 @@ internal class AudioClip(layer: Layer, val uri: String, private val track: Layer
     )
 
     companion object {
-        fun of(scene: Scene): List<AudioClip> = scene.layerTracks().flatMap { track ->
+        fun of(scene: Scene, wait: Boolean = true): List<AudioClip> = scene.layerTracks().flatMap { track ->
             val layer = track.layer
             val uri = layer.soundUri
             val media = uri?.let { scene.media(it) ?: track.scene.media(it) }
             listOfNotNull(
                 if (uri == null || layer.hidden || layer.element(GainRef)?.mutes == true || media?.node?.get("audio") == "none") null
                 else AudioClip(layer, uri, track.takeIf { it.parents.isNotEmpty() }, media?.duration?.takeIf { it > 0 }?.div(1000.0) ?: Double.POSITIVE_INFINITY),
-                TextBlips.clip(layer, track.takeIf { it.parents.isNotEmpty() }),
+                TextBlips.clip(layer, track.takeIf { it.parents.isNotEmpty() }, wait),
             )
         }
     }

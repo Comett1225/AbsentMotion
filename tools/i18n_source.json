@@ -4322,6 +4322,7 @@
  "settings": "Settings",
  "settings_about": "About",
  "settings_ai_gpu": "Use the graphics chip for AI",
+ "settings_background_preview": "Pre-render the preview while idle",
  "settings_clear_preview_copies": "Clear preview copies",
  "settings_clear_preview_text": "Preview copies are rebuilt when a project needs them.",
  "settings_clear_preview_title": "Clear preview copies?",

@@ -194,7 +194,10 @@ fun TutorialHost(
                 deleting = id
                 if (current?.projectId == id) onCloseEditor()
             },
-            onNo = { deleteAsk = null },
+            onNo = {
+                deleteAsk = null
+                if (settings.tutorialProject == id) settings.tutorialProject = null
+            },
         )
     }
 }

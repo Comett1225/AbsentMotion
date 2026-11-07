@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap
 class DeskStream(
     val index: Int, val type: String, val codec: String, val profile: String, val sampleRate: Int, val channels: Int,
     val width: Int, val height: Int, val fps: Double, val durationUs: Long, val rotation: Int, val transfer: String,
-    val range: String, val primaries: String, val bitRate: Int, val language: String,
+    val range: String, val primaries: String, val bitRate: Int, val language: String, val startUs: Long = 0,
 ) {
     val mime: String get() = MIMES[codec] ?: if (codec.startsWith("pcm_")) "audio/raw" else "$type/$codec"
 
@@ -57,6 +57,7 @@ class DeskProbe(val streams: List<DeskStream>, val durationUs: Long, val tags: M
                     seconds(s.optString("duration")).takeIf { it > 0 } ?: total, Math.floorMod(turn, 360),
                     s.optString("color_transfer"), s.optString("color_range"), s.optString("color_primaries"),
                     s.optString("bit_rate").toIntOrNull() ?: 0, tags?.optString("language").orEmpty(),
+                    s.optString("start_time").toDoubleOrNull()?.takeIf { it.isFinite() }?.let { Math.round(it * 1_000_000) } ?: 0L,
                 )
             }
             val tags = format?.optJSONObject("tags")?.let { t -> t.keySet().associate { it.lowercase() to t.optString(it) } }.orEmpty()

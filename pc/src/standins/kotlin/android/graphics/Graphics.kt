@@ -36,9 +36,19 @@ class Bitmap(val image: BufferedImage) {
         for (c in px) { buffer.put((c shr 16).toByte()); buffer.put((c shr 8).toByte()); buffer.put(c.toByte()); buffer.put((c ushr 24).toByte()) }
     }
     fun compress(format: CompressFormat, quality: Int, out: OutputStream): Boolean {
-        val kind = when (format) { CompressFormat.JPEG -> "jpg"; else -> "png" }
-        val img = if (kind == "jpg") BufferedImage(width, height, BufferedImage.TYPE_INT_RGB).also { it.graphics.drawImage(image, 0, 0, null) } else image
-        return ImageIO.write(img, kind, out)
+        if (format == CompressFormat.PNG) return ImageIO.write(image, "png", out)
+        val jpeg = format == CompressFormat.JPEG
+        val q = quality.coerceIn(0, 100)
+        val source = if (jpeg) BufferedImage(width, height, BufferedImage.TYPE_INT_RGB).also { it.graphics.drawImage(image, 0, 0, null) } else image
+        val px = source.getRGB(0, 0, width, height, null, 0, width)
+        val rgba = ByteArray(px.size * 4)
+        for ((i, c) in px.withIndex()) { rgba[4 * i] = (c shr 16).toByte(); rgba[4 * i + 1] = (c shr 8).toByte(); rgba[4 * i + 2] = c.toByte(); rgba[4 * i + 3] = (c ushr 24).toByte() }
+        val data = if (jpeg) {
+            val info = org.jetbrains.skia.ImageInfo(width, height, org.jetbrains.skia.ColorType.RGBA_8888, org.jetbrains.skia.ColorAlphaType.UNPREMUL)
+            org.jetbrains.skia.Image.makeRaster(info, rgba, width * 4).use { it.encodeToData(org.jetbrains.skia.EncodedImageFormat.JPEG, q)?.use { d -> d.bytes } }
+        } else app.absentmotion.pc.engine.DesktopNative.encodeWebp(rgba, width, height, q, format == CompressFormat.WEBP_LOSSLESS || (format == CompressFormat.WEBP && q == 100))
+        out.write(data ?: return false)
+        return true
     }
     fun copy(config: Config, mutable: Boolean): Bitmap = Bitmap(BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB).also { it.graphics.drawImage(image, 0, 0, null) })
     fun eraseColor(c: Int) { val g = image.createGraphics(); g.composite = java.awt.AlphaComposite.Src; g.color = java.awt.Color(c, true); g.fillRect(0, 0, width, height); g.dispose() }

@@ -994,7 +994,9 @@ private class TimelineView(val state: EditorState, density: Density, private val
     fun hitAt(at: Offset): Hit {
         if (at.y < rulerH) {
             if (PlatformFeatures.desktop && at.x < headerWidth) return Hit.Corner
-            val centre = (timeScale().originX + PlayheadWidth.px / 2).let { if (PlatformFeatures.desktop) maxOf(it, headerWidth + PillInset.px + PillWidth.px / 2) else it }
+            val origin = timeScale().originX
+            if (PlatformFeatures.desktop && origin < headerWidth) return Hit.Ruler
+            val centre = (origin + PlayheadWidth.px / 2).let { if (PlatformFeatures.desktop) maxOf(it, headerWidth + PillInset.px + PillWidth.px / 2) else it }
             return if (at.y >= ReadoutTop.px && abs(at.x - centre) <= ReadoutHalfWidth.px) Hit.Readout else Hit.Ruler
         }
         val layer = layerAt(rowAt(at.y)) ?: return Hit.Empty
@@ -1049,10 +1051,10 @@ private class TimelineView(val state: EditorState, density: Density, private val
         return layer.keyframeTimes(scopeOf(layer)).map { scene.frameAt(it) }.minByOrNull(::distance)?.takeIf { distance(it) <= KeyGrab.px }
     }
 
-    fun grabKey(hit: Hit.Key) {
+    fun grabKey(hit: Hit.Key, scope: KeyScope? = if (hit.id == state.selectedId) state.keyScope else null) {
         state.playing = false
         keyLayer = state.scene.layer(hit.id)
-        keyScope = state.keyScope
+        keyScope = scope
         keyFrom = hit.frame
         keyFrame = hit.frame
         keyMs = TimelineMath.frameTimeMs(hit.frame, fps)
@@ -1568,7 +1570,12 @@ private suspend fun PointerInputScope.desktopTimelineGestures(view: TimelineView
                 if (!resizing) when (val h = hit) {
                     is Hit.Eye -> view.state.toggleHidden(h.id)
                     is Hit.Grip -> { view.selectDesktop(h.id, false, false); drag = view.beginDrag(h, Offset.Zero) }
-                    is Hit.Key -> { view.selectDesktop(h.id, false, false); view.grabKey(h); drag = Drag.Key }
+                    is Hit.Key -> {
+                        val scope = if (h.id == view.state.selectedId) view.state.keyScope else null
+                        view.selectDesktop(h.id, false, false)
+                        view.grabKey(h, scope)
+                        drag = Drag.Key
+                    }
                     is Hit.Bar -> {
                         if (plain) { view.selectDesktop(h.id, false, false); if (view.lift(h.id, at, 4.dp.toPx(), true)) drag = Drag.Lift }
                         else view.selectDesktop(h.id, command, modifiers.isShiftPressed)
@@ -1611,9 +1618,9 @@ private suspend fun PointerInputScope.desktopTimelineGestures(view: TimelineView
                 if (!moved && !resizing && !rubbering) when (val h = hit) {
                     is Hit.Bar -> {
                         if (plain && MultiSelect.active) { MultiSelect.clear(); view.state.selectedId = h.id; view.state.panel = EditorPanel.Tools }
-                        if (lastClickId == h.id && change.uptimeMillis - lastClickTime <= viewConfiguration.doubleTapTimeoutMillis) {
+                        if (plain && lastClickId == h.id && change.uptimeMillis - lastClickTime <= viewConfiguration.doubleTapTimeoutMillis) {
                             val layer = view.state.scene.layer(h.id)
-                            if (plain && layer?.isPlainGroup == true) view.state.enterGroup(h.id)
+                            if (layer?.isPlainGroup == true) view.state.enterGroup(h.id)
                             else {
                                 view.state.selectedId = h.id
                                 MultiSelect.clear()

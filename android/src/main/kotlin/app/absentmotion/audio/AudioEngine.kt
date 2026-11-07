@@ -69,14 +69,19 @@ class AudioEngine(context: Context) {
         }
     }
 
+    @Volatile private var lastScene: Scene? = null
+    private val blipsReady: () -> Unit = { main.post { lastScene?.let(::setScene) } }
+
     init {
         TextBlips.dir = java.io.File(this.context.cacheDir, "text-blips")
+        TextBlips.listeners += blipsReady
         ExportAudio.mixFor = { scene, rate -> OfflineMix.of(this.context, scene, Resampler.ULTRA, rate) }
     }
 
     fun setScene(scene: Scene) {
         if (closed) return
-        val next = AudioClip.of(scene)
+        lastScene = scene
+        val next = AudioClip.of(scene, wait = false)
         clips = next
         for (clip in next) if (sounds.putIfAbsent(clip.uri, true) == null) probe.execute { sounds[clip.uri] = OfflineMix.hasSoundTrack(context, clip.uri) }
     }
@@ -118,6 +123,8 @@ class AudioEngine(context: Context) {
 
     fun close() {
         closed = true
+        TextBlips.listeners -= blipsReady
+        lastScene = null
         clips = emptyList()
         release()
     }

@@ -17,6 +17,10 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import app.absentmotion.editor.Glide
 import app.absentmotion.ui.theme.Am
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -55,18 +59,32 @@ internal fun EffectRuler(
         }
         .pointerInput(enabled, s, min, max) {
             if (!enabled) return@pointerInput
-            awaitPointerEventScope {
-                while (true) {
-                    val e = awaitPointerEvent()
-                    if (e.type != PointerEventType.Scroll) continue
-                    val d = e.changes.firstOrNull()?.scrollDelta ?: continue
-                    val amount = if (abs(d.x) > abs(d.y)) d.x else d.y
-                    if (amount == 0f) continue
-                    start()
-                    change(clamp(current + (if (amount > 0) -s else s) * (if (abs(amount) > 1f) abs(amount).roundToInt() else 1)))
-                    end()
-                    e.changes.forEach { it.consume() }
-                }
+            coroutineScope {
+                var pending = 0f
+                var target = 0f
+                var open = false
+                var closing: Job? = null
+                try {
+                    awaitPointerEventScope {
+                        while (true) {
+                            val e = awaitPointerEvent()
+                            if (e.type != PointerEventType.Scroll) continue
+                            val d = e.changes.firstOrNull()?.scrollDelta ?: continue
+                            val amount = if (abs(d.x) > abs(d.y)) d.x else d.y
+                            if (amount == 0f) continue
+                            e.changes.forEach { it.consume() }
+                            pending += amount
+                            val steps = pending.toInt()
+                            if (steps == 0) continue
+                            pending -= steps
+                            if (!open) { start(); open = true; target = current }
+                            target = clamp(target - steps * s)
+                            change(target)
+                            closing?.cancel()
+                            closing = launch { delay(300); open = false; pending = 0f; end() }
+                        }
+                    }
+                } finally { if (open) end() }
             }
         }
     ) {

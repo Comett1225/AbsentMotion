@@ -10,7 +10,7 @@ Export the project from Alight Motion as XML and open it in AbsentMotion. After 
 
 - **64** Alight effects look the same and **30** are very close.
 - **78** are converted to a similar effect that does not look identical.
-- **53** are converted but have not been compared side by side yet.
+- **58** are converted but have not been compared side by side yet.
 - **47** are not converted yet (mostly very old effect versions, VR and some 3D solids).
 - **Blending modes:** all of Alight's blending modes come across. Multiply and Subtract get their opacity converted so they look the same.
 
@@ -201,9 +201,11 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Cube | Cube | Converted, not compared yet |
 | cube | Cube | Converted, not compared yet |
 | Cylinder | Cylinder | Converted, not compared yet |
+| deepglow | Deep Glow | Converted, not compared yet |
 | Denoise | Denoise | Converted, not compared yet |
 | drawing.progress | Drawing Progress | Converted, not compared yet |
 | drawing.stroketaper | Stroke Taper | Converted, not compared yet |
+| dropshadow.custom | Drop Shadow | Converted, not compared yet |
 | Echo Keyframes | Echo Keyframes | Converted, not compared yet |
 | effect.movealongpath3 | Move Along Path | Converted, not compared yet |
 | Ellipsoid | Ellipsoid | Converted, not compared yet |
@@ -211,6 +213,7 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | flip | Flip Layer | Converted, not compared yet |
 | Flip Layer | Flip Layer | Converted, not compared yet |
 | flip2 | Flip Layer | Converted, not compared yet |
+| fourcolorgradientnew | Four-Color Gradient | Converted, not compared yet |
 | Grid Repeat | Grid Repeat | Converted, not compared yet |
 | grunge | Grunge | Converted, not compared yet |
 | Heart | Heart | Converted, not compared yet |
@@ -219,6 +222,8 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | hexarray | Hexagon Array | Converted, not compared yet |
 | hextile | Hexagon Tiling | Converted, not compared yet |
 | Hollow Box | Hollow Box | Converted, not compared yet |
+| hsl | HSL | Converted, not compared yet |
+| internal.smoothbevel | Smooth Bevel | Converted, not compared yet |
 | irridescence | Iridescence | Converted, not compared yet |
 | irridescence2 | Iridescence | Converted, not compared yet |
 | Linear Repeat | Linear Repeat | Converted, not compared yet |

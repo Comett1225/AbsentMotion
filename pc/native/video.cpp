@@ -148,6 +148,8 @@ struct Video {
         return entry && toUs(entry->timestamp) > last;
     }
 
+    bool farFrom(int64_t t) const { return t < cover || (t > last && !ended && t - last > 2000000); }
+
     bool servable(int64_t t) const { return t >= cover && !frames.empty() && (ended || frames.back().us > t); }
     bool hopeless(int64_t t) const { return t >= cover && frames.empty() && ended; }
 
@@ -302,7 +304,7 @@ struct Video {
         for (size_t i = 0; i <= lanes.size(); ++i) {
             Video* v = i ? lanes[i - 1].get() : this;
             std::lock_guard<std::mutex> hold(v->lock);
-            if (v->asked && v->mustSeek(t)) continue;
+            if (v->asked && v->farFrom(t)) continue;
             const int64_t d = v->asked ? std::max<int64_t>(t - v->last, 0) : INT64_MAX - 1;
             if (d < gap) gap = d, best = v;
         }

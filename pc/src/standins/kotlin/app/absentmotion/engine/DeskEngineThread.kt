@@ -431,7 +431,7 @@ class EngineThread(private val background: Int, private val context: Context? = 
         return withContext(dispatcher) {
             applyPending(0)
             engine().shapeIcon(fonts?.prepareText(xml) ?: xml, size, color)?.let { px ->
-                Bitmap.createBitmap(size, size).apply { isPremultiplied = true; copyPixelsFromBuffer(ByteBuffer.wrap(px)) }
+                Bitmap.createBitmap(size, size).apply { copyPixelsFromBuffer(ByteBuffer.wrap(px)) }
             }
         }
     }

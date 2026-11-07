@@ -46,7 +46,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import app.absentmotion.editor.isPlainGroup
-import app.absentmotion.editor.ungroupSelected
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -153,13 +152,6 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
         ElementProperties(state, { properties = false }, modifier)
         return
     }
-    if (state.ungroupAsk) androidx.compose.material3.AlertDialog(
-        onDismissRequest = { state.ungroupAsk = false },
-        text = { Text(stringResource(R.string.ungroup_loses_style), color = Am.OnDark) },
-        confirmButton = { androidx.compose.material3.TextButton({ state.ungroupAsk = false; state.ungroupSelected() }) { Text(stringResource(R.string.layer_tool_ungroup), color = Am.Accent) } },
-        dismissButton = { androidx.compose.material3.TextButton({ state.ungroupAsk = false }) { Text(stringResource(R.string.cancel), color = Am.Accent) } },
-        containerColor = Am.Field,
-    )
     Column(modifier.background(Am.Panel).deskVerticalScroll().padding(start = 62.px, top = 42.px, end = 62.px)) {
         Row(Modifier.fillMaxWidth().height(107.px)) {
             SmallTool(PanelIcons.Speed, stringResource(R.string.a11y_speed), Modifier.width(183.px), ToolShape, enabled = state.selected?.mediaFill?.video == true || state.selected?.kind == "audio") { state.panel = EditorPanel.Speed }

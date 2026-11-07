@@ -134,7 +134,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
         scene.videoSamples(timeMs, playing, warm = false).all { installed[it.layer.id]?.matches(scene, timeMs, playing) == true }
 
     fun previewShown(scene: Scene, timeMs: Int, playing: Boolean): Boolean =
-        scene.videoSamples(timeMs, playing, warm = false).all { installed.containsKey(it.layer.id) }
+        scene.videoSamples(timeMs, playing, warm = false).all { installed[it.layer.id]?.uri == it.layer.mediaFill?.uri }
 
     fun resumePreview() { latest?.let { requests.trySend(it) } }
 
@@ -278,10 +278,9 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             if (this.source != wanted) { decoder?.close(); decoder = null; publishedPts = null; publishedMix = null; publishedMosh = null }
             val source = decoder ?: open(wanted).also { decoder = it }
             fun ready() {
-                if (!exact && !obsolete()) {
-                    installed[id] = PreviewVideoStamp(request.scene, request.timeMs, request.playing)
-                    engine.videoFrameReady()
-                }
+                if (exact) return
+                installed[id] = PreviewVideoStamp(request.scene, request.timeMs, request.playing, uri)
+                if (!obsolete()) engine.videoFrameReady()
             }
             val plan = layer.moshPlan(sample.timeMs, sample.scene)
             if (plan != null && moshed(source, sample, plan, exact, ::abandoned)) {

@@ -1107,7 +1107,7 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
             std::vector<sk_sp<SkImageFilter>> inputs = {f};
             if (d->blurred) {
                 const float spread = e.id == "absent.electricedges" ? Value(e, defaults, "strength", 0, t, -1) : -1;
-                const float sigma = spread >= 0 ? spread * kEdgeSpread * std::hypot((float)scene.width, (float)scene.height)
+                const float sigma = spread >= 0 ? std::max(spread, 0.02f) * kEdgeSpread * std::hypot((float)scene.width, (float)scene.height)
                                                 : std::max(Value(e, defaults, "blur", 0, t, 0), 0.0f) / 3;
                 auto blurOf = [&](sk_sp<SkImageFilter> source) {
                     return sigma > 0 ? SkImageFilters::Blur(sigma, sigma, SkTileMode::kDecal, source) : source;
@@ -1345,7 +1345,8 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
             backdrop.reset();
             failed = !read || pixels.size() != (size_t)gw * gh * 4;
             if (failed) break;
-            Diffuse(&pixels, gw, gh, *palette(e, d, t), method(e, d, t), std::max(Value(e, &d->defaults, "dither", 0, t, 1), 0.0f),
+            const float strength = Value(e, &d->defaults, "dither", 0, t, 1);
+            Diffuse(&pixels, gw, gh, *palette(e, d, t), method(e, d, t), std::isfinite(strength) ? std::max(strength, 0.0f) : 0.0f,
                     std::clamp(Value(e, &d->defaults, "alpha", 0, t, 1), 0.0f, 1.0f));
             image = OnGpu(Owned(std::move(pixels), gw, gh));
             imageGrid = grid;

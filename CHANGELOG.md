@@ -83,6 +83,8 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - Two layers using the same video play and export smoothly.
 - The background preview no longer stops for good when a project is still loading.
 - Full motion blur in the preview no longer risks freezing weaker tablets.
+- Long chains of linked values no longer freeze the editor.
+- The background preview redraws a clipping mask, a path follower or Displacement Map when the layer under it changes.
 
 ### Licence
 

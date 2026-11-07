@@ -155,16 +155,19 @@ private const val SUMS = "SHA256SUMS.txt"
 private val ARM_TAGS = listOf("arm64", "aarch64")
 private val INTEL_TAGS = listOf("x64", "x86_64", "amd64", "intel")
 
-internal fun installerExtensions(os: String): List<String> = when {
+internal fun installedFromDeb(): Boolean = System.getProperty("java.home").orEmpty().startsWith("/opt/absentmotion/")
+
+internal fun installerExtensions(os: String, deb: Boolean = installedFromDeb()): List<String> = when {
     os.startsWith("mac", ignoreCase = true) -> listOf(".dmg")
     os.startsWith("windows", ignoreCase = true) -> listOf(".msi", ".exe")
-    else -> listOf(".deb", ".rpm", ".appimage")
+    deb -> listOf(".deb")
+    else -> emptyList()
 }
 
 internal fun installerExtension(name: String): String? = listOf(".dmg", ".msi", ".exe", ".deb", ".rpm", ".appimage").firstOrNull { name.endsWith(it, ignoreCase = true) }
 
-internal fun installerName(names: List<String>, version: String, os: String = System.getProperty("os.name").orEmpty(), arch: String = System.getProperty("os.arch").orEmpty()): String? {
-    val own = installerExtensions(os)
+internal fun installerName(names: List<String>, version: String, os: String = System.getProperty("os.name").orEmpty(), arch: String = System.getProperty("os.arch").orEmpty(), deb: Boolean = installedFromDeb()): String? {
+    val own = installerExtensions(os, deb)
     val wanted = if (arch.contains("aarch64", ignoreCase = true) || arch.contains("arm", ignoreCase = true)) ARM_TAGS else INTEL_TAGS
     val others = (ARM_TAGS + INTEL_TAGS) - wanted.toSet()
     val candidates = names.filter { n -> n.startsWith("absentmotion", ignoreCase = true) && version in n && own.any { n.endsWith(it, ignoreCase = true) } && others.none { n.contains(it, ignoreCase = true) } }

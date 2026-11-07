@@ -435,7 +435,7 @@ JNIEXPORT jbyteArray JNICALL JNI(shapeIcon)(JNIEnv* e, jobject, jlong h, jstring
     bounds = orientation.mapRect(bounds);
     if (bounds.isEmpty()) return nullptr;
     std::vector<uint8_t> rgba;
-    const bool ok = d->offscreen(size, size, true, [&](SkCanvas* canvas) {
+    const bool ok = d->offscreen(size, size, false, [&](SkCanvas* canvas) {
         const float scale = size * 0.9f / std::max(bounds.width(), bounds.height());
         canvas->translate(size / 2.0f, size / 2.0f);
         canvas->scale(scale, scale);

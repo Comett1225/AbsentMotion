@@ -3,16 +3,24 @@ package app.absentmotion.editor
 import app.absentmotion.model.Layer
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
+import app.absentmotion.model.effects
+import app.absentmotion.model.isMask
+import app.absentmotion.model.leansOnBelow
 
-internal fun previewOrder(last: Int, playhead: Int): List<Int> {
+internal fun previewOrder(last: Int, playhead: Int, run: Int = 1): List<Int> {
     val end = last.coerceAtLeast(0)
     val at = playhead.coerceIn(0, end)
+    val step = run.coerceAtLeast(1)
     return buildList {
         var ahead = at + 1
         var behind = at - 1
         while (ahead <= end || behind >= 0) {
-            repeat(2) { if (ahead <= end) add(ahead++) }
-            if (behind >= 0) add(behind--)
+            repeat(2 * step) { if (ahead <= end) add(ahead++) }
+            if (behind >= 0) {
+                val from = maxOf(0, behind - step + 1)
+                for (frame in from..behind) add(frame)
+                behind = from - 1
+            }
         }
     }
 }
@@ -43,6 +51,22 @@ private fun XmlNode.followsBeats(): Boolean = children.any { c ->
     c.name == "effect" && c["hidden"] != "true" && (c["id"] == "absent.particles" || c["id"]?.startsWith("absent.beat") == true) || c.followsBeats()
 }
 
+private val Layer.readsBelow: Boolean
+    get() = leansOnBelow || effects.any { it["hidden"] != "true" && it["id"] == "absent.displacementmap" }
+
+private fun Scene.addBelowUsers(users: HashMap<String, MutableSet<String>>) {
+    val list = layers
+    for ((i, layer) in list.withIndex()) {
+        if (!layer.readsBelow) continue
+        var j = i - 1
+        while (j >= 0) {
+            users.getOrPut(list[j].id.toString()) { mutableSetOf() } += layer.id.toString()
+            if (list[j].kind != "audio" && !list.isMask(j)) break
+            j--
+        }
+    }
+}
+
 internal fun previewDirtyRanges(before: Scene, after: Scene): List<IntRange> {
     val whole = listOf(0..maxOf(before.lastFrame, after.lastFrame))
     if (before.visualHeader() != after.visualHeader()) return whole
@@ -57,6 +81,8 @@ internal fun previewDirtyRanges(before: Scene, after: Scene): List<IntRange> {
     val current = next.associateBy { it.id.toString() }
     val users = HashMap<String, MutableSet<String>>()
     for (layer in old + next) for (ref in layer.node.references()) users.getOrPut(ref) { mutableSetOf() } += layer.id.toString()
+    before.addBelowUsers(users)
+    after.addBelowUsers(users)
     val dirty = (previous.keys + current.keys).filter { previous[it]?.node?.visual() != current[it]?.node?.visual() }.toMutableSet()
     val queue = ArrayDeque(dirty.flatMap { id -> listOf(id) + listOfNotNull(previous[id], current[id]).flatMap { it.node.innerIds() } })
     while (queue.isNotEmpty()) users[queue.removeFirst()]?.forEach { if (dirty.add(it)) queue.addLast(it) }

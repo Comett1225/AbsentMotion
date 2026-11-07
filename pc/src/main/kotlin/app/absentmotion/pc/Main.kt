@@ -77,6 +77,7 @@ fun main(args: Array<String>) {
         val desk = remember { DeskAppState() }
         val scope = rememberCoroutineScope()
         remember { desk.quitNow = ::exitApplication }
+        LaunchedEffect(DeskOpen.raised.intValue) { if (DeskOpen.raised.intValue > 0) desk.hidden = false }
         DisposableEffect(Unit) {
             val platform = runCatching { java.awt.Desktop.getDesktop().takeIf { java.awt.Desktop.isDesktopSupported() && it.isSupported(java.awt.Desktop.Action.APP_QUIT_HANDLER) } }.getOrNull()
             platform?.setQuitHandler { _, response ->

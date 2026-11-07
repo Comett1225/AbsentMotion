@@ -73,6 +73,17 @@ class GroupEditTest {
         assertEquals(1, back.media.count { it.uri == "file:///a.png" })
     }
 
+    @Test fun ungroupOfASplitGroupKeepsTheVisiblePart() {
+        val grouped = start.grouped(setOf(1, 2), null, 100, "G")
+        val second = grouped.update(100) { Layer(it.node.with("startTime", "1500").with("inTime", "1500")) }
+        val back = second.ungrouped(100)!!
+        assertEquals(1500 to 3000, back.layer(1)!!.let { it.startTime to it.endTime })
+        assertEquals(1500 to 2500, back.layer(2)!!.let { it.startTime to it.endTime })
+        val first = grouped.update(100) { Layer(it.node.with("endTime", "800")) }.ungrouped(100)!!
+        assertEquals(0 to 800, first.layer(1)!!.let { it.startTime to it.endTime })
+        assertNull(first.layer(2))
+    }
+
     @Test fun ungroupKeepsAMovedGroupsPlacement() {
         val grouped = start.grouped(setOf(1, 2), null, 100, "G")
         val group = grouped.layer(100)!!

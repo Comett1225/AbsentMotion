@@ -121,13 +121,22 @@ class DeskParityToolsTest {
         } finally { bad.server.stop(0); Updates.source = app.absentmotion.ui.home.GitHubSource }
     }
 
+    @Test fun pluralFormsFollowEachLanguage() {
+        val s = app.absentmotion.desk.Strings
+        assertEquals(listOf("one", "few", "many", "many"), listOf(1, 3, 5, 12).map { s.pluralCategory("pl", it) })
+        assertEquals(listOf("one", "few", "many", "one"), listOf(21, 22, 11, 101).map { s.pluralCategory("ru", it) })
+        assertEquals(listOf("zero", "two", "few", "many", "other"), listOf(0, 2, 7, 11, 100).map { s.pluralCategory("ar", it) })
+        assertEquals(listOf("one", "other"), listOf(0, 0).mapIndexed { i, n -> s.pluralCategory(if (i == 0) "fr" else "en", n) })
+    }
+
     @Test fun theRightInstallerIsPickedForTheSystem() {
         val names = listOf("AbsentMotion-5.0.0-foss.apk", "AbsentMotion-5.0.0-macos-arm64.dmg", "AbsentMotion-5.0.0-macos-x64.dmg", "AbsentMotion-5.0.0.msi", "absentmotion_5.0.0-1_amd64.deb", "SHA256SUMS.txt", "Other-5.0.0.dmg", "AbsentMotion-4.9.0.dmg")
         assertEquals("AbsentMotion-5.0.0-macos-arm64.dmg", installerName(names, "5.0.0", "Mac OS X", "aarch64"))
         assertEquals("AbsentMotion-5.0.0-macos-x64.dmg", installerName(names, "5.0.0", "Mac OS X", "x86_64"))
         assertEquals("AbsentMotion-5.0.0.msi", installerName(names, "5.0.0", "Windows 11", "amd64"))
-        assertEquals("absentmotion_5.0.0-1_amd64.deb", installerName(names, "5.0.0", "Linux", "amd64"))
-        assertNull(installerName(listOf("AbsentMotion-5.0.0-foss.apk"), "5.0.0", "Linux", "amd64"))
+        assertEquals("absentmotion_5.0.0-1_amd64.deb", installerName(names, "5.0.0", "Linux", "amd64", deb = true))
+        assertNull(installerName(names + "AbsentMotion-5.0.0-linux-x64.AppImage", "5.0.0", "Linux", "amd64", deb = false))
+        assertNull(installerName(listOf("AbsentMotion-5.0.0-foss.apk"), "5.0.0", "Linux", "amd64", deb = true))
         val json = """{"tag_name":"v5.0.0","html_url":"https://github.com/Comett1225/AbsentMotion/releases/tag/v5.0.0","assets":[
             {"name":"AbsentMotion-5.0.0-macos-arm64.dmg","browser_download_url":"https://github.com/Comett1225/AbsentMotion/releases/download/v5.0.0/AbsentMotion-5.0.0-macos-arm64.dmg","size":123456789},
             {"name":"SHA256SUMS.txt","browser_download_url":"https://github.com/Comett1225/AbsentMotion/releases/download/v5.0.0/SHA256SUMS.txt","size":300}]}"""

@@ -29,8 +29,18 @@ internal object TextBlips {
     private const val GRACE_MS = 3_600_000L
     private val lock = Any()
     @Volatile var dir: File? = null
+    val listeners = java.util.concurrent.CopyOnWriteArraySet<() -> Unit>()
+    private val pending = LinkedHashMap<Long, () -> Unit>()
+    private val worker = java.util.concurrent.Executors.newSingleThreadExecutor { Thread(it, "text-blips").apply { isDaemon = true } }
 
-    fun clip(layer: Layer, track: LayerTrack?): AudioClip? {
+    private fun drain() {
+        val jobs = synchronized(pending) { pending.values.toList().also { pending.clear() } }
+        if (jobs.isEmpty()) return
+        jobs.forEach { it() }
+        listeners.forEach { it() }
+    }
+
+    fun clip(layer: Layer, track: LayerTrack?, wait: Boolean = true): AudioClip? {
         if (layer.kind != "text" || layer.hidden || layer.element(GainRef)?.mutes == true) return null
         val effect = layer.effects.lastOrNull { it["id"] == "absent.textblips" && it["hidden"] != "true" } ?: return null
         val folder = dir ?: return null
@@ -49,7 +59,7 @@ internal object TextBlips {
         val seed = value("seed", 1f).roundToInt()
         val key = "$voice|$volume|$pitch|$variation|$seed|${times.joinToString(",")}"
         val file = File(folder, "blips-${Integer.toHexString(key.hashCode())}-${key.length}.wav")
-        val ready = synchronized(lock) {
+        fun build() = synchronized(lock) {
             if (file.isFile) file.setLastModified(System.currentTimeMillis())
             else runCatching {
                 folder.mkdirs()
@@ -64,7 +74,12 @@ internal object TextBlips {
             }
             file.isFile
         }
-        if (!ready) return null
+        if (!file.isFile && !wait) {
+            synchronized(pending) { pending[layer.id] = { build() } }
+            worker.execute(::drain)
+            return null
+        }
+        if (!build()) return null
         val plain = XmlNode("text", mapOf("id" to "${layer.id or (1L shl 62)}", "startTime" to "${layer.startTime}", "endTime" to "${layer.endTime}"), listOfNotNull(layer.node.child("gain")))
         return AudioClip(Layer(plain), Uri.fromFile(file).toString(), track, (times.last() + 0.3) * 1000.0)
     }

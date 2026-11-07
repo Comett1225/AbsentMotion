@@ -64,7 +64,7 @@ private const val RailWidth = 56
 private const val MeterWidth = 28
 private const val InspectorRail = 44
 private const val DividerWidth = 7
-private const val LibraryMin = 240f
+private const val LibraryMin = 212f
 private const val LibraryMax = 440f
 private const val InspectorMin = 384f
 private const val InspectorMax = 560f
@@ -136,14 +136,20 @@ private fun DeskWorkspaceBody(state: EditorState, onExit: () -> Unit, library: A
     LaunchedEffect(state.addOpen) { if (state.addOpen) state.addOpen = false }
     val modal = settings || state.effectBrowserOpen || state.presetsOpen || state.drawing != null || state.fullColor != null || EmbedRequest.templateId != null
     LaunchedEffect(modal) { if (!modal) focusRequester.requestFocus() }
+    val togglePanel: (Boolean) -> Unit = remember {
+        { library ->
+            if (library) { if (spacious) libraryOpen = !libraryOpen else { soloLibrary = !soloLibrary; if (soloLibrary) soloInspector = false } }
+            else { if (spacious) inspectorOpen = !inspectorOpen else { soloInspector = !soloInspector; if (soloInspector) soloLibrary = false } }
+        }
+    }
+    DisposableEffect(togglePanel) {
+        app.absentmotion.ui.editor.DeskDrop.panelKey = togglePanel
+        onDispose { if (app.absentmotion.ui.editor.DeskDrop.panelKey === togglePanel) app.absentmotion.ui.editor.DeskDrop.panelKey = null }
+    }
     SizedBox(Modifier.fillMaxSize().onGloballyPositioned { rootOrigin = it.positionInWindow() }.background(Am.TopBar).onPreviewKeyEvent {
-        if (it.type == KeyEventType.KeyDown && (it.isCtrlPressed || it.isMetaPressed)) {
-            when (it.key) {
-                Key.One -> { if (spacious) libraryOpen = !libraryOpen else { soloLibrary = !soloLibrary; if (soloLibrary) soloInspector = false }; true }
-                Key.Two -> { if (spacious) inspectorOpen = !inspectorOpen else { soloInspector = !soloInspector; if (soloInspector) soloLibrary = false }; true }
-                else -> false
-            }
-        } else false
+        val panel = it.type == KeyEventType.KeyDown && (it.isCtrlPressed || it.isMetaPressed) && !it.isAltPressed && (it.key == Key.One || it.key == Key.Two)
+        if (panel) togglePanel(it.key == Key.One)
+        panel
     }.focusRequester(focusRequester).focusable()) { maxWidth, maxHeight ->
         val both = (maxWidth - RailWidth.dp - MeterWidth.dp - 2 * DividerWidth.dp - MinPreview).value >= LibraryMin + InspectorMin
         SideEffect { spacious = both }

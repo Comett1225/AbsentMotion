@@ -31,6 +31,7 @@ thread_local int gLinkComponents[64];
 thread_local int gLinkDepth = 0;
 thread_local uint8_t gLinkSeen[256];
 thread_local bool gLinkCycle = false;
+thread_local int gLinkWork = 0;
 thread_local int gLinkPlacement = 0;
 thread_local int64_t gLinkPlacementOwner = 0;
 
@@ -78,6 +79,8 @@ const Anim* LinkAnim(const Layer& l, const ValueLink& link) {
     for (const auto& l : anim.links) if (l.component == component) { link = &l; break; }
     if (!link) return false;
     if (gLinkDepth >= 64) { gLinkCycle = true; return false; }
+    if (gLinkDepth == 0) gLinkWork = 0;
+    if (++gLinkWork > 16384) { gLinkCycle = true; return false; }
     uint8_t& seen = gLinkSeen[((uintptr_t)&anim >> 3 ^ (uintptr_t)&anim >> 11 ^ (uintptr_t)component) & 255];
     if (seen) for (int n = 0; n < gLinkDepth; n++) {
         if (gLinkStack[n] == &anim && gLinkComponents[n] == component) { gLinkCycle = true; return false; }

@@ -168,7 +168,7 @@ $layers
                         println("$label $stage meter ${meter.left}..${meter.right} x ${meter.top}..${meter.bottom}")
                         assertTrue("$label $stage: on the left edge", meter.left.value <= 12.5f)
                         assertEquals("$label $stage: slim", 18f, (meter.right - meter.left).value, 0.5f)
-                        assertEquals("$label $stage: at the top of the preview", 60f, meter.top.value, 1f)
+                        assertEquals("$label $stage: under the canvas zoom button", 120f, meter.top.value, 1f)
                     }
                     check("stopped")
                     shot(shots, "tablet-$label-stopped")

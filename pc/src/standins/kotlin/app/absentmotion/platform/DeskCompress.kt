@@ -27,8 +27,9 @@ suspend fun compressVideoOnDesktop(uri: String, job: VideoJob, audio: Boolean, d
     val late = audio && shownUs < startUs
     val range = (if (startUs > 0) listOf("-ss", seconds(shownUs)) else emptyList()) + listOf("-noautorotate", "-i", input.path) +
         (if (late) listOf("-ss", seconds(startUs), "-i", input.path) else emptyList()) + (if (endUs > startUs) listOf("-t", seconds(endUs - startUs)) else emptyList())
-    val command = listOf(DeskMedia.ffmpeg, "-y", "-v", "error", "-progress", "pipe:1", "-nostats") + range + listOf("-map", "0:v:0") +
-        (if (audio) listOf("-map", if (late) "1:a:0?" else "0:a:0?") else emptyList()) + listOf("-vf", "scale=${job.width}:${job.height},fps=${job.fps}") + args + sound + listOf("-movflags", "+faststart", out.path)
+    val upload = if (encoder.endsWith("_vaapi")) ",format=nv12,hwupload" else ""
+    val command = listOf(DeskMedia.ffmpeg, "-y", "-v", "error", "-progress", "pipe:1", "-nostats") + DeskEncoders.device(encoder) + range + listOf("-map", "0:v:0") +
+        (if (audio) listOf("-map", if (late) "1:a:0?" else "0:a:0?") else emptyList()) + listOf("-vf", "scale=${job.width}:${job.height},fps=${job.fps}$upload") + args + sound + listOf("-movflags", "+faststart", out.path)
     val context = currentCoroutineContext()
     val process = ProcessBuilder(command).redirectError(ProcessBuilder.Redirect.DISCARD).start()
     try {

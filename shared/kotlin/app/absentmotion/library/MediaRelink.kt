@@ -27,7 +27,7 @@ object MediaRelink {
                 "${MediaStore.MediaColumns.DISPLAY_NAME} = ? AND ${MediaStore.MediaColumns.SIZE} = ?",
                 arrayOf(media.filename, media.size.toString()), null,
             )?.use { c -> pick(media, generateSequence { if (c.moveToNext()) c.getLong(0) else null }) }
-                ?.let { Uri.withAppendedPath(collection, it.toString()).toString() }
+                ?.let { android.content.ContentUris.withAppendedId(collection, it).toString() }
         }.getOrNull()
     }
 

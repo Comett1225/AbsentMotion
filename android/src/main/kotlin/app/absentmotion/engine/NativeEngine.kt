@@ -115,6 +115,11 @@ class NativeEngine(backend: Backend) : AutoCloseable {
         fun usePipelineCache(cacheDir: java.io.File, version: Int) {
             val dir = java.io.File(cacheDir, "gpu-$version")
             cacheDir.listFiles { f -> f.isDirectory && f.name.startsWith("gpu-") && f != dir }?.forEach { it.deleteRecursively() }
+            val files = dir.listFiles().orEmpty()
+            files.filter { ".tmp" in it.name }.forEach { it.delete() }
+            val programs = files.filter { it.name.startsWith("p") && ".tmp" !in it.name }.sortedByDescending { it.lastModified() }
+            var kept = 0L
+            for (file in programs) { kept += file.length(); if (kept > 32L shl 20) file.delete() }
             if (dir.isDirectory || dir.mkdirs()) nativeSetPipelineDir(dir.absolutePath)
         }
 

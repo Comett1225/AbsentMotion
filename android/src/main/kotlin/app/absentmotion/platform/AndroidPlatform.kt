@@ -436,3 +436,5 @@ internal fun desktopFrameReader(context: Context, uri: String): app.absentmotion
 
 fun rawFrameImage(rgba: ByteArray, width: Int, height: Int): androidx.compose.ui.graphics.ImageBitmap =
     android.graphics.Bitmap.createBitmap(width, height, android.graphics.Bitmap.Config.ARGB_8888).apply { copyPixelsFromBuffer(java.nio.ByteBuffer.wrap(rgba)) }.androidImageBitmap()
+
+fun releaseFrameImage(image: androidx.compose.ui.graphics.ImageBitmap) = Unit

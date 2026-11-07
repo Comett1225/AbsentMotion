@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import app.absentmotion.platform.PlatformFeatures
 import app.absentmotion.platform.rawFrameImage
+import app.absentmotion.platform.releaseFrameImage
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import app.absentmotion.R
@@ -275,7 +276,9 @@ class FramePlayer internal constructor(private val store: FrameStore, val width:
         if (decoded.size < POOL) return null
         val target = wanted
         val frame = decoded.keys.filter { it !in recent && it !in target..target + AHEAD }.maxByOrNull { abs(it - target) } ?: return null
-        return decoded.remove(frame)?.bitmap
+        val removed = decoded.remove(frame) ?: return null
+        if (store.raw) releaseFrameImage(removed.image)
+        return removed.bitmap
     }
 
     internal fun drop() {
@@ -367,7 +370,7 @@ object PreviewCache {
             return
         }
         try {
-            val order = previewOrder(next.scene.lastFrame, at)
+            val order = previewOrder(next.scene.lastFrame, at, if (built.raw) 30 else 1)
             var index = 0
             var refused = 0
             while (index < order.size) {
@@ -379,7 +382,7 @@ object PreviewCache {
                 val started = System.nanoTime()
                 val pixels = state.engine.capturePreviewFrame(next.scene, next.scene.frameStart(frame), width, height, next.accurateBlur, ::current)
                 if (pixels == null) {
-                    if (++refused >= 20) { refused = 0; index++ }
+                    if (!built.raw || ++refused >= 20) { refused = 0; index++; continue }
                     delay(50)
                     continue
                 }

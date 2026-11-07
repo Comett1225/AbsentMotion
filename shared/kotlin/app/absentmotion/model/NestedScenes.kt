@@ -26,7 +26,14 @@ private class NestedClock(private val layer: Layer, hostFps: Int) {
 
     fun hostTime(inner: Double): Double {
         if (method == "off") return origin + inner / speed
-        return origin + inner
+        if (method == "blank" || inner < intro) return origin + inner
+        if (inner >= outro && outro < sceneEnd) return origin + outroStart + (inner - outro)
+        val into = inner - intro
+        return origin + intro + when {
+            method == "stretch" && room > 0 && span > 0 -> into * room / span
+            method == "loop-stretch" && span > 0 && room > 0 -> into * (room / nearest(room / span).coerceAtLeast(1.0)) / span
+            else -> into
+        }
     }
 
     fun at(at: Double, quantize: Boolean): SceneTime {

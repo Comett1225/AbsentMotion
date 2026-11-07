@@ -97,7 +97,7 @@ internal fun MasterMeter(state: EditorState, reserveEnd: Dp, modifier: Modifier 
         val start = meterStart(maxWidth, maxHeight, reserveEnd, state.scene.width, state.scene.height)
         MeterReadout(
             state, mix,
-            Modifier.align(Alignment.TopStart).padding(start = start, top = 12.dp).width(StripWidth).height((maxHeight - 24.dp).coerceIn(80.dp, 240.dp))
+            Modifier.align(Alignment.TopStart).padding(start = start, top = 72.dp).width(StripWidth).height((maxHeight - 84.dp).coerceIn(80.dp, 240.dp))
                 .clip(RoundedCornerShape(6.dp)).background(Color.Black.copy(alpha = 0.45f)).padding(vertical = 6.dp),
             bar = 4.dp, labelSize = 8.sp,
         )

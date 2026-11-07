@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
 object DeskOpen {
     val projectExtensions = setOf("absproj", "amproj", "xml", "fla", "xfl")
     val arrived = mutableIntStateOf(0)
+    val raised = mutableIntStateOf(0)
     private val queue = ConcurrentLinkedQueue<File>()
 
     fun offer(files: List<File>) {
@@ -20,6 +21,7 @@ object DeskOpen {
     }
 
     fun raise() = javax.swing.SwingUtilities.invokeLater {
+        raised.intValue++
         DeskFiles.window?.let { if (it.extendedState and java.awt.Frame.ICONIFIED != 0) it.extendedState = it.extendedState and java.awt.Frame.ICONIFIED.inv(); it.toFront() }
     }
 
