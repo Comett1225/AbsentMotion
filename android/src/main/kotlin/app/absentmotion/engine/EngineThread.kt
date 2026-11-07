@@ -58,6 +58,7 @@ object EngineDebug {
 
 class EngineThread(private val background: Int, context: Context? = null, private val preferOpenGl: () -> Boolean = { false }) {
     private val gpuCheck = context?.let { GpuCheck(it.applicationContext) }
+    private val gpuCache = context?.cacheDir
     private val thread = HandlerThread("am-engine").apply { start() }
     private val handler = Handler(thread.looper)
     private val dispatcher = handler.asCoroutineDispatcher()
@@ -225,6 +226,7 @@ class EngineThread(private val background: Int, context: Context? = null, privat
         return try {
             EngineDebug.failStart?.let { throw IllegalStateException(it) }
             gpuCheck?.recover()
+            gpuCache?.let { dir -> runCatching { NativeEngine.usePipelineCache(dir, app.absentmotion.BuildConfig.VERSION_CODE) } }
             val order = GpuCheck.startOrder(EngineDebug.forceGl || preferOpenGl(), gpuCheck?.state(gl = true), gpuCheck?.state(gl = false), ::riskyVulkan)
                 .map { if (it) NativeEngine.Backend.GL else NativeEngine.Backend.GRAPHITE }
             if (order.isEmpty()) throw IllegalStateException(GpuCheck.BOTH_CLOSED)
@@ -480,7 +482,8 @@ class EngineThread(private val background: Int, context: Context? = null, privat
         try {
             applyPending()
             val v = view ?: return
-            if (mediaScene?.let { videos?.previewReady(it, v.timeMs, playing) == false } == true) return
+            val exact = mediaScene?.let { videos?.previewReady(it, v.timeMs, playing) } != false
+            if (!exact && mediaScene?.let { videos?.previewShown(it, v.timeMs, playing) } == false) return
             if (target != 0L) {
                 val native = engine()
                 val started = System.nanoTime()
@@ -492,7 +495,7 @@ class EngineThread(private val background: Int, context: Context? = null, privat
                 }
                 if (RenderStats.recording) RenderStats.add((System.nanoTime() - started) / 1e6, v.timeMs)
                 renders++
-                renderedView.value = RenderedView(shownSerial, v.timeMs)
+                if (exact) renderedView.value = RenderedView(shownSerial, v.timeMs)
             }
         } catch (e: Exception) {
             if (!closed) Log.e("AMEngine", "preview rendering failed", e)

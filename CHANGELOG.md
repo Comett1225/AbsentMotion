@@ -66,6 +66,8 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - Help on tablets opens in a wide panel with the pictures beside the text, instead of a phone-sized card.
 - A change to one layer now throws away only the prepared preview frames of that layer and of the layers parented or linked to it, instead of all of them.
 - Desktop: editing and scrubbing respond sooner, with less waiting on each step and on video frames.
+- Phones and tablets: editing a project that has a video no longer waits for the video on every step; the exact frame follows when it is ready.
+- Phones and tablets: compiled graphics programs are kept between launches, so effects stutter less the first time they show after a restart.
 
 ### Removed
 

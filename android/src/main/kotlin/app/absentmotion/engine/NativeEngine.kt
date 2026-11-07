@@ -112,7 +112,14 @@ class NativeEngine(backend: Backend) : AutoCloseable {
 
         fun vulkanDevice(): String? = nativeVulkanDevice()
 
+        fun usePipelineCache(cacheDir: java.io.File, version: Int) {
+            val dir = java.io.File(cacheDir, "gpu-$version")
+            cacheDir.listFiles { f -> f.isDirectory && f.name.startsWith("gpu-") && f != dir }?.forEach { it.deleteRecursively() }
+            if (dir.isDirectory || dir.mkdirs()) nativeSetPipelineDir(dir.absolutePath)
+        }
+
         @JvmStatic private external fun nativeCreate(backend: Int): Long
+        @JvmStatic private external fun nativeSetPipelineDir(dir: String)
         @JvmStatic private external fun nativeDestroy(engine: Long)
         @JvmStatic private external fun nativeInfo(engine: Long): String
         @JvmStatic private external fun nativeFailed(engine: Long): Boolean

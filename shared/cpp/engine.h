@@ -60,6 +60,8 @@ struct MoshParams {
     bool operator==(const MoshParams&) const = default;
 };
 
+void SetPipelineDir(const std::string& dir);
+
 class Engine {
 public:
     static std::unique_ptr<Engine> Make(Backend backend, std::string* error);

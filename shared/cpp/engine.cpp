@@ -22,6 +22,9 @@
 #include <cstring>
 #include <functional>
 #include <map>
+#include <mutex>
+#include <string>
+#include <thread>
 #include <vector>
 
 #include "include/android/SkImageAndroid.h"
@@ -56,6 +59,9 @@
 #include "include/gpu/graphite/BackendTexture.h"
 #include "include/gpu/graphite/Context.h"
 #include "include/gpu/graphite/ContextOptions.h"
+#include "include/gpu/graphite/PersistentPipelineStorage.h"
+#include "include/core/SkData.h"
+#include "include/core/SkString.h"
 #include "include/gpu/graphite/GraphiteTypes.h"
 #include "include/gpu/graphite/Image.h"
 #include "include/gpu/graphite/Recorder.h"
@@ -92,6 +98,74 @@ struct Target {
 namespace {
 
 constexpr size_t kImportedPerMedia = 6;
+constexpr size_t kMaxPipelineBytes = 32u << 20;
+
+std::mutex gPipelineMutex;
+std::string gPipelineDir;
+
+std::string PipelineDir() {
+    std::lock_guard<std::mutex> lock(gPipelineMutex);
+    return gPipelineDir;
+}
+
+void WriteAtomically(const std::string& path, const void* head, size_t headSize, const void* body, size_t bodySize) {
+    const std::string tmp = path + ".tmp" + std::to_string(std::hash<std::thread::id>{}(std::this_thread::get_id()));
+    FILE* file = fopen(tmp.c_str(), "wb");
+    if (!file) return;
+    bool ok = (headSize == 0 || fwrite(head, 1, headSize, file) == headSize) && (bodySize == 0 || fwrite(body, 1, bodySize, file) == bodySize);
+    ok = fclose(file) == 0 && ok;
+    if (!ok || rename(tmp.c_str(), path.c_str()) != 0) remove(tmp.c_str());
+}
+
+class DiskPipelines final : public skgpu::graphite::PersistentPipelineStorage, public GrContextOptions::PersistentCache {
+public:
+    sk_sp<SkData> load() override {
+        const std::string dir = PipelineDir();
+        return dir.empty() ? nullptr : SkData::MakeFromFileName((dir + "/graphite.bin").c_str());
+    }
+
+    void store(const SkData& data) override {
+        const std::string dir = PipelineDir();
+        if (!dir.empty()) WriteAtomically(dir + "/graphite.bin", data.data(), data.size(), nullptr, 0);
+    }
+
+    sk_sp<SkData> load(const SkData& key) override {
+        const std::string path = KeyPath(key);
+        if (path.empty()) return nullptr;
+        sk_sp<SkData> file = SkData::MakeFromFileName(path.c_str());
+        const size_t head = sizeof(uint32_t) + key.size();
+        if (!file || file->size() < head) return nullptr;
+        uint32_t size = 0;
+        memcpy(&size, file->data(), sizeof size);
+        if (size != key.size() || memcmp(file->bytes() + sizeof size, key.data(), key.size()) != 0) return nullptr;
+        return SkData::MakeSubset(file.get(), head, file->size() - head);
+    }
+
+    void store(const SkData& key, const SkData& data, const SkString&) override {
+        const std::string path = KeyPath(key);
+        if (path.empty()) return;
+        std::vector<uint8_t> head(sizeof(uint32_t) + key.size());
+        const uint32_t size = static_cast<uint32_t>(key.size());
+        memcpy(head.data(), &size, sizeof size);
+        memcpy(head.data() + sizeof size, key.data(), key.size());
+        WriteAtomically(path, head.data(), head.size(), data.data(), data.size());
+    }
+
+    void store(const SkData& key, const SkData& data) override { this->store(key, data, SkString()); }
+
+private:
+    static std::string KeyPath(const SkData& key) {
+        const std::string dir = PipelineDir();
+        if (dir.empty()) return {};
+        uint64_t hash = 1469598103934665603ull;
+        for (size_t i = 0; i < key.size(); i++) { hash ^= key.bytes()[i]; hash *= 1099511628211ull; }
+        char name[24];
+        snprintf(name, sizeof name, "/p%016" PRIx64, hash);
+        return dir + name;
+    }
+};
+
+DiskPipelines gDiskPipelines;
 
 int BufferId(const AHardwareBuffer* buffer, uint64_t* id) {
     if (__builtin_available(android 31, *)) return AHardwareBuffer_getId(buffer, id);
@@ -144,6 +218,7 @@ public:
     int renderBuffer(AHardwareBuffer* buffer, double timeMs, uint32_t background) override;
     void releaseBuffers() override;
     void trim() override;
+    void syncPipelines();
     void flushPartial();
     bool layerQuad(int64_t layerId, double timeMs, float xy[8]) override;
     bool propertyNumbers(int64_t layerId, int effect, const std::string& name, double timeMs, float values[3]) override;
@@ -453,7 +528,9 @@ bool EngineImpl::initGl(std::string* error) {
     fPresentationTime = (PFNEGLPRESENTATIONTIMEANDROIDPROC)eglGetProcAddress("eglPresentationTimeANDROID");
     sk_sp<const GrGLInterface> gl = GrGLInterfaces::MakeEGL();
     if (!gl) { *error = "Ganesh OpenGL interface failed"; return false; }
-    fGanesh = GrDirectContexts::MakeGL(gl);
+    GrContextOptions glOptions;
+    if (!PipelineDir().empty()) glOptions.fPersistentCache = &gDiskPipelines;
+    fGanesh = GrDirectContexts::MakeGL(gl, glOptions);
     if (!fGanesh) { *error = "Ganesh OpenGL context creation failed"; return false; }
     fInfo = std::string("{\"backend\":\"gl\",\"device\":\"") + Printable((const char*)glGetString(GL_RENDERER)) +
             "\",\"vendor\":\"" + Printable((const char*)glGetString(GL_VENDOR)) + "\",\"api\":\"" +
@@ -487,6 +564,7 @@ bool EngineImpl::init(std::string* error) {
             *error = "SkiaVMA::Make failed";
         } else if (fBackend == Backend::kGraphite) {
             skgpu::graphite::ContextOptions options;
+            if (!PipelineDir().empty()) options.fPersistentPipelineStorage = &gDiskPipelines;
             fGraphite = skgpu::graphite::ContextFactory::MakeVulkan(bc, options);
             if (fGraphite) fRecorder = fGraphite->makeRecorder();
             ready = fRecorder != nullptr;
@@ -496,7 +574,9 @@ bool EngineImpl::init(std::string* error) {
                 *error = "Graphite context creation failed";
             }
         } else {
-            fGanesh = GrDirectContexts::MakeVulkan(bc);
+            GrContextOptions vkOptions;
+            if (!PipelineDir().empty()) vkOptions.fPersistentCache = &gDiskPipelines;
+            fGanesh = GrDirectContexts::MakeVulkan(bc, vkOptions);
             ready = fGanesh != nullptr;
             if (!ready) *error = "Ganesh context creation failed";
         }
@@ -520,6 +600,7 @@ EngineImpl::~EngineImpl() {
     fMosh.clear();
     while (!fImported.empty()) this->forgetImported(fImported.begin()->first);
     this->syncGpu();
+    this->syncPipelines();
     if (fGraphite) {
         auto cleanup = fGraphite->makeRecorder();
         fRecorder.reset();
@@ -1234,7 +1315,14 @@ void EngineImpl::flushPartial() {
     }
 }
 
+void EngineImpl::syncPipelines() {
+    if (fGpuFailed || PipelineDir().empty()) return;
+    if (fGraphite) fGraphite->syncPipelineData(kMaxPipelineBytes);
+    else if (fGanesh) fGanesh->storeVkPipelineCacheData(kMaxPipelineBytes);
+}
+
 void EngineImpl::trim() {
+    this->syncPipelines();
     if (fGanesh && !fGpuFailed) {
         fGanesh->freeGpuResources();
         return;
@@ -1658,6 +1746,11 @@ std::string EngineImpl::timing(Target* target) {
     return buf;
 }
 
+}
+
+void SetPipelineDir(const std::string& dir) {
+    std::lock_guard<std::mutex> lock(gPipelineMutex);
+    gPipelineDir = dir;
 }
 
 std::unique_ptr<Engine> Engine::Make(Backend backend, std::string* error) {

@@ -133,6 +133,9 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
     fun previewReady(scene: Scene, timeMs: Int, playing: Boolean): Boolean =
         scene.videoSamples(timeMs, playing, warm = false).all { installed[it.layer.id]?.matches(scene, timeMs, playing) == true }
 
+    fun previewShown(scene: Scene, timeMs: Int, playing: Boolean): Boolean =
+        scene.videoSamples(timeMs, playing, warm = false).all { installed.containsKey(it.layer.id) }
+
     fun resumePreview() { latest?.let { requests.trySend(it) } }
 
     fun trim(): Job = scope.launch {

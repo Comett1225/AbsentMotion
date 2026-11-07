@@ -41,6 +41,12 @@ JNIEXPORT jlong JNICALL JNI_FN(nativeCreate)(JNIEnv* env, jclass, jint backend) 
     return reinterpret_cast<jlong>(engine.release());
 }
 
+JNIEXPORT void JNICALL JNI_FN(nativeSetPipelineDir)(JNIEnv* env, jclass, jstring dir) {
+    const char* chars = env->GetStringUTFChars(dir, nullptr);
+    am::SetPipelineDir(chars ? chars : "");
+    if (chars) env->ReleaseStringUTFChars(dir, chars);
+}
+
 JNIEXPORT jstring JNICALL JNI_FN(nativeVulkanDevice)(JNIEnv* env, jclass) {
     VkInstanceCreateInfo ici = {VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO};
     VkInstance instance = VK_NULL_HANDLE;
