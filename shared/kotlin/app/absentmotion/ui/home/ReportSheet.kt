@@ -46,20 +46,32 @@ import java.net.HttpURLConnection
 import java.net.URI
 import java.util.Locale
 
-internal data class ReportLinks(val issues: String, val discord: String, val form: String) {
+internal data class ReportLinks(val issues: String, val discord: String, val form: String, val feature: String = BuiltInFeature) {
+    fun named(name: String): String? = when (name) {
+        "github-issues" -> issues
+        "discord" -> discord
+        "bug-form" -> form
+        "feature-form" -> feature
+        else -> name.takeIf { it.startsWith("https://") }
+    }
+
     companion object {
-        val BuiltIn = ReportLinks("$HOME_PAGE/issues", "https://discord.gg/xXEHj8Sx8X", "https://forms.gle/6bY8KBPMKc2iUypV6")
+        val BuiltIn = ReportLinks("$HOME_PAGE/issues", "https://discord.gg/xXEHj8Sx8X", "https://forms.gle/6bY8KBPMKc2iUypV6", BuiltInFeature)
         private const val PREFS = "report_links"
+        @Volatile private var fetched: ReportLinks? = null
 
         fun stored(context: Context): ReportLinks {
+            fetched?.let { return it }
             val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
             return BuiltIn.copy(
                 discord = prefs.getString("discord", null)?.takeIf(::isDiscordLink) ?: BuiltIn.discord,
                 form = prefs.getString("form", null)?.takeIf(::isFormLink) ?: BuiltIn.form,
+                feature = prefs.getString("feature", null)?.takeIf(::isFormLink) ?: BuiltIn.feature,
             )
         }
 
         fun refresh(context: Context): ReportLinks {
+            fetched?.let { return it }
             val now = stored(context)
             val settings = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
             if (!settings.getBoolean("checkUpdates", true) || !settings.getBoolean("updatesAsked", false)) return now
@@ -72,10 +84,21 @@ internal data class ReportLinks(val issues: String, val discord: String, val for
                 null
             } ?: return now
             val found = parseReportLinks(readme, now)
-            context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putString("discord", found.discord).putString("form", found.form).apply()
+            context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putString("discord", found.discord).putString("form", found.form).putString("feature", found.feature).apply()
+            fetched = found
             return found
         }
     }
+}
+
+private const val BuiltInFeature = "https://forms.gle/5ZohVpB2eBPvzhu4A"
+
+@Composable
+internal fun rememberReportLinks(): ReportLinks {
+    val context = LocalContext.current
+    var found by remember { mutableStateOf(ReportLinks.stored(context)) }
+    LaunchedEffect(Unit) { found = withContext(Dispatchers.IO) { ReportLinks.refresh(context) } }
+    return found
 }
 
 internal object ReadmeSource : UpdateSource {
@@ -95,6 +118,7 @@ internal object ReadmeSource : UpdateSource {
 private val DiscordLink = Regex("""https://(?:discord\.gg|discord\.com/invite)/[A-Za-z0-9_-]+""")
 private val FormLink = Regex("""https://forms\.gle/[A-Za-z0-9_-]+""")
 private val BugLine = Regex("""(?i)report[\s%20+-]*a[\s%20+-]*bug|bug report""")
+private val FeatureLine = Regex("""(?i)suggest[\s%20+-]*a[\s%20+-]*feature|feature request""")
 
 internal fun isDiscordLink(text: String) = DiscordLink.matches(text)
 
@@ -103,7 +127,8 @@ internal fun isFormLink(text: String) = FormLink.matches(text)
 internal fun parseReportLinks(readme: String, fallback: ReportLinks = ReportLinks.BuiltIn): ReportLinks {
     val discord = DiscordLink.find(readme)?.value
     val form = readme.lineSequence().filter { BugLine.containsMatchIn(it) && !it.contains("feature", ignoreCase = true) }.firstNotNullOfOrNull { FormLink.find(it)?.value }
-    return fallback.copy(discord = discord ?: fallback.discord, form = form ?: fallback.form)
+    val feature = readme.lineSequence().filter { FeatureLine.containsMatchIn(it) && !BugLine.containsMatchIn(it) }.firstNotNullOfOrNull { FormLink.find(it)?.value }
+    return fallback.copy(discord = discord ?: fallback.discord, form = form ?: fallback.form, feature = feature ?: fallback.feature)
 }
 
 private val HomeFolders = listOf(Regex("""(?i)(?:\b[a-z]:)?[\\/]+(?:users|home)[\\/]+[^\\/\s"'<>]+"""))
@@ -129,9 +154,8 @@ internal fun ReportDialog(summary: String, onDismiss: () -> Unit) {
     val clipboard = LocalClipboardManager.current
     val opener = LocalUriHandler.current
     val details = remember(summary) { reportDetails(context, summary) }
-    var found by remember { mutableStateOf(ReportLinks.stored(context)) }
+    val found = rememberReportLinks()
     LaunchedEffect(details) { clipboard.setText(AnnotatedString(details)) }
-    LaunchedEffect(Unit) { found = withContext(Dispatchers.IO) { ReportLinks.refresh(context) } }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.report_title), color = Am.Navy) },

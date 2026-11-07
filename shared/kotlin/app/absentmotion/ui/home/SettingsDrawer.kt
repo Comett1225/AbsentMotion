@@ -138,14 +138,15 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
             Spacer(Modifier.height(CardGap))
             LinkRow(stringResource(R.string.settings_about)) { about = true }
             val links = LocalUriHandler.current
+            val found = rememberReportLinks()
             Text(
                 stringResource(R.string.settings_report_issue),
-                Modifier.padding(horizontal = 6.dp).clickable { runCatching { links.openUri(REPORT_FORM) } }.padding(horizontal = 15.dp, vertical = 10.dp),
+                Modifier.padding(horizontal = 6.dp).clickable { runCatching { links.openUri(found.form) } }.padding(horizontal = 15.dp, vertical = 10.dp),
                 color = Am.HomeInk, fontSize = 13.sp, textDecoration = TextDecoration.Underline,
             )
             Text(
                 stringResource(R.string.settings_suggest_feature),
-                Modifier.padding(horizontal = 6.dp).clickable { runCatching { links.openUri(FEATURE_FORM) } }.padding(horizontal = 15.dp, vertical = 10.dp),
+                Modifier.padding(horizontal = 6.dp).clickable { runCatching { links.openUri(found.feature) } }.padding(horizontal = 15.dp, vertical = 10.dp),
                 color = Am.HomeInk, fontSize = 13.sp, textDecoration = TextDecoration.Underline,
             )
             UpdateRows(settings) { crashLogs = true }

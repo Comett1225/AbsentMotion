@@ -252,13 +252,14 @@ private fun ToolCard(icon: ImageVector, title: String, about: String, engine: En
 @Composable
 private fun ToolsFooter() {
     val links = LocalUriHandler.current
+    val found = rememberReportLinks()
     val github = stringResource(R.string.tools_github)
     val form = stringResource(R.string.tools_form)
     val message = stringResource(R.string.tools_suggestions, github, form)
     val style = TextLinkStyles(style = SpanStyle(color = Am.Navy, textDecoration = TextDecoration.Underline))
     val text = buildAnnotatedString {
         append(message)
-        listOf(github to "https://github.com/Comett1225/AbsentMotion/issues/new/choose", form to FEATURE_FORM).forEach { (label, url) ->
+        listOf(github to "$HOME_PAGE/issues/new/choose", form to found.feature).forEach { (label, url) ->
             val start = message.indexOf(label)
             if (start >= 0) addLink(LinkAnnotation.Clickable(url, style) { runCatching { links.openUri(url) } }, start, start + label.length)
         }

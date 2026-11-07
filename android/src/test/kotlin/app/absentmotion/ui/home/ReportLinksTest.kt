@@ -25,6 +25,19 @@ class ReportLinksTest {
     }
 
     @Test
+    fun readsFeatureFormAndNamesEveryLink() {
+        val links = parseReportLinks(readme)
+        assertEquals("https://forms.gle/FeatureForm9", links.feature)
+        assertEquals("https://forms.gle/BugForm123", links.named("bug-form"))
+        assertEquals("https://forms.gle/FeatureForm9", links.named("feature-form"))
+        assertEquals("https://discord.gg/abcDEF123", links.named("discord"))
+        assertEquals(links.issues, links.named("github-issues"))
+        assertEquals("https://example.com/a", links.named("https://example.com/a"))
+        assertEquals(null, links.named("javascript:alert(1)"))
+        assertEquals(ReportLinks.BuiltIn.feature, parseReportLinks("[Report a bug](https://forms.gle/BugForm123)").feature)
+    }
+
+    @Test
     fun acceptsInviteStyleDiscordLink() {
         assertEquals("https://discord.com/invite/xyz-1", parseReportLinks("join https://discord.com/invite/xyz-1 now").discord)
     }

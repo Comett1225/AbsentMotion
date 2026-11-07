@@ -103,8 +103,9 @@ internal fun DeskSettings(settings: AppSettings, initial: SettingsPage, onClose:
                     SideItem(stringResource(entry.title), entry.icon(), page == entry, narrow) { page = entry }
                 }
                 Spacer(Modifier.height(16.dp))
-                SideLink(stringResource(R.string.settings_report_issue)) { runCatching { links.openUri(REPORT_FORM) } }
-                SideLink(stringResource(R.string.settings_suggest_feature)) { runCatching { links.openUri(FEATURE_FORM) } }
+                val found = rememberReportLinks()
+                SideLink(stringResource(R.string.settings_report_issue)) { runCatching { links.openUri(found.form) } }
+                SideLink(stringResource(R.string.settings_suggest_feature)) { runCatching { links.openUri(found.feature) } }
                 val version = appVersion().trim()
                 if (version.isNotEmpty()) Text("V $version", Modifier.padding(start = 10.dp, top = 6.dp), color = Am.HomeDim, fontSize = 12.sp)
             }
