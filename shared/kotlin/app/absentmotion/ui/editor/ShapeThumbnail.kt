@@ -26,6 +26,7 @@ import app.absentmotion.ui.theme.Am
 fun ShapeThumbnail(def: ShapeDef, engine: EngineThread, modifier: Modifier = Modifier) {
     val attrs = linkedMapOf("fillType" to def.fillType)
     if (def.id.isNotEmpty()) attrs["s"] = def.id
+    if (def.outline.isNotEmpty()) attrs["outlineShape"] = def.outline
     ShapeIcon(XmlNode("shape", attrs, def.children), Am.Caption.toArgb(), def.name, engine, modifier)
 }
 
@@ -36,7 +37,7 @@ fun LayerThumbnail(layer: Layer, engine: EngineThread, modifier: Modifier = Modi
     if (layer.kind == "model") { androidx.compose.material3.Icon(PanelIcons.TabTilt, layer.label, modifier, tint = Am.OnDark.copy(alpha = 0.8f)); return }
     if (layer.kind == "camera") { androidx.compose.material3.Icon(PanelIcons.Camera, layer.label, modifier, tint = Am.OnDark.copy(alpha = 0.8f)); return }
     if (layer.kind == "light") { androidx.compose.material3.Icon(PanelIcons.Brightness, layer.label, modifier, tint = Am.OnDark.copy(alpha = 0.8f)); return }
-    val shape = XmlNode(layer.kind, layer.node.attrs.filterKeys { it in setOf("s", "fillType", "fillImage", "fillVideo", "mediaFillMode", "id", "size", "font", "wrapWidth", "align") }, layer.node.children.filter { it.name != "transform" && it.name != "fillColor" })
+    val shape = XmlNode(layer.kind, layer.node.attrs.filterKeys { it in setOf("s", "outlineShape", "fillType", "fillImage", "fillVideo", "mediaFillMode", "id", "size", "font", "wrapWidth", "align") }, layer.node.children.filter { it.name != "transform" && it.name != "fillColor" })
     ShapeIcon(shape, layer.fillColor or 0xFF000000.toInt(), layer.label, engine, modifier)
 }
 

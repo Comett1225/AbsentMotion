@@ -65,6 +65,10 @@ private val Underline get() = Am.Deepest
 
 @Composable
 fun EditorTopBar(state: EditorState, onExit: () -> Unit, modifier: Modifier = Modifier) {
+    (state.drawing as? app.absentmotion.editor.PointMode)?.let {
+        PointTopBar(state, it, modifier)
+        return
+    }
     if (MultiSelect.active) {
         MultiTopBar(state, modifier)
         return

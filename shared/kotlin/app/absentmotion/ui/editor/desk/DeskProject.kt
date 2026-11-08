@@ -44,6 +44,7 @@ import app.absentmotion.editor.rename
 import app.absentmotion.editor.setElementOption
 import app.absentmotion.editor.toggleHidden
 import app.absentmotion.model.Layer
+import app.absentmotion.model.shownName
 import app.absentmotion.ui.home.handCursor
 import app.absentmotion.ui.home.hoverFill
 import app.absentmotion.ui.theme.Am
@@ -77,7 +78,7 @@ internal fun DeskProjectPanel(state: EditorState, modifier: Modifier = Modifier)
         items(layers, key = { it.id }) { layer ->
             Row(Modifier.fillMaxWidth().height(36.dp).clip(RoundedCornerShape(6.dp)).hoverFill(6.dp, Am.Field).handCursor().clickable { state.selectedId = layer.id; state.panel = EditorPanel.Tools }.padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Icon(deskLayerIcon(layer), null, Modifier.size(18.dp), tint = Am.OnDarkDim)
-                Text(layer.label, Modifier.weight(1f).padding(horizontal = 8.dp), color = if (layer.hidden) Am.OnDarkDim else Am.OnDark, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(layer.shownName(), Modifier.weight(1f).padding(horizontal = 8.dp), color = if (layer.hidden) Am.OnDarkDim else Am.OnDark, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 val label = stringResource(if (layer.hidden) R.string.a11y_show_layer else R.string.a11y_hide_layer)
                 BarButton(if (layer.hidden) TimelineIcons.EyeOff else TimelineIcons.Eye, label, Modifier.size(32.dp), iconSize = androidx.compose.ui.unit.DpSize(18.dp, 18.dp)) { state.toggleHidden(layer.id) }
             }

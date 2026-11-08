@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.*
 import app.absentmotion.R
 import kotlinx.coroutines.launch
 import app.absentmotion.editor.*
+import app.absentmotion.model.shownName
 import app.absentmotion.platform.Hint
 import app.absentmotion.platform.LocalContext
 import app.absentmotion.platform.resizeCursor
@@ -132,9 +133,9 @@ private fun DeskWorkspaceBody(state: EditorState, onExit: () -> Unit, library: A
             prefs.edit().putFloat("libraryWidth", libraryWidth).putFloat("inspectorWidth", inspectorWidth).putFloat("timelineFraction", timelineFraction).putBoolean("libraryOpen", libraryOpen).putBoolean("inspectorOpen", inspectorOpen).apply()
         }
     }
-    LaunchedEffect(state.selectedId, MultiSelect.active) { if (state.selectedId != null || MultiSelect.active) { soloInspector = true; soloLibrary = false } }
+    LaunchedEffect(state.selectedId, MultiSelect.active, state.drawing) { if (state.selectedId != null || MultiSelect.active || state.drawing is PointMode) { soloInspector = true; soloLibrary = false } }
     LaunchedEffect(state.addOpen) { if (state.addOpen) state.addOpen = false }
-    val modal = settings || state.effectBrowserOpen || state.presetsOpen || state.drawing != null || state.fullColor != null || EmbedRequest.templateId != null
+    val modal = settings || state.effectBrowserOpen || state.presetsOpen || (state.drawing != null && state.drawing !is PointMode) || state.fullColor != null || EmbedRequest.templateId != null
     LaunchedEffect(modal) { if (!modal) focusRequester.requestFocus() }
     val togglePanel: (Boolean) -> Unit = remember {
         { library ->
@@ -176,6 +177,7 @@ private fun DeskWorkspaceBody(state: EditorState, onExit: () -> Unit, library: A
                 Column(Modifier.weight(1f).fillMaxHeight()) {
                     Box(Modifier.fillMaxWidth().weight(1f).tutorialTarget("preview").onGloballyPositioned { val p = it.positionInWindow(); previewBounds = Rect(p, androidx.compose.ui.geometry.Size(it.size.width.toFloat(), it.size.height.toFloat())) }) {
                         Preview(state, Modifier.fillMaxSize())
+                        (state.drawing as? PointMode)?.let { PointOverlay(state, it, Modifier.fillMaxSize()) }
                         Presence(state.previewPanelOpen) { PreviewModePanel(state, Modifier.align(Alignment.CenterEnd)) }
                         HistoryNotes(state, Modifier.align(Alignment.BottomCenter))
                     }
@@ -192,12 +194,12 @@ private fun DeskWorkspaceBody(state: EditorState, onExit: () -> Unit, library: A
             DeskDivider(false, DividerDrag({ timelineHeight.value }, { TimelineMinDp }, { maxHeight.value * .6f }, -1, timelineBounce) { timelineFraction = (it / maxHeight.value).coerceIn(.1f, .6f) })
             Timeline(state, Modifier.fillMaxWidth().height(timelineHeight).rubber(timelineBounce, false, 1f).tutorialTarget("timeline"))
         }
-        app.absentmotion.platform.BackHandler(!both && (soloLibrary || soloInspector)) { if (soloInspector) soloInspector = false else soloLibrary = false }
+        app.absentmotion.platform.BackHandler(!both && state.drawing !is PointMode && (soloLibrary || soloInspector)) { if (soloInspector) soloInspector = false else soloLibrary = false }
         DeskDropGhost { rootOrigin }
         if (settings) DeskProject(state) { settings = false }
         if (state.effectBrowserOpen) DeskDialog(null, 1200.dp, { state.effectBrowserOpen = false }, height = 960.dp) { app.absentmotion.ui.editor.effects.EffectBrowser(state) }
         if (state.presetsOpen) DeskDialog(null, 800.dp, { state.presetsOpen = false }, height = 880.dp) { PresetScreen(state) }
-        if (state.drawing != null) PhoneScreen(Dp.Infinity, onDismiss = { state.stepBack(); focus.clearFocus() }) { DrawingEditor(state) }
+        if (state.drawing != null && state.drawing !is PointMode) PhoneScreen(Dp.Infinity, onDismiss = { state.stepBack(); focus.clearFocus() }) { DrawingEditor(state) }
         DeskTemplateEmbed(state)
     }
     DisposableEffect(previewBounds) {
@@ -345,7 +347,7 @@ private fun DeskInspector(state: EditorState, library: AddLibrary, modifier: Mod
         Row(Modifier.fillMaxWidth().height(44.dp).padding(start = 8.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             if (state.selectedId != null && state.panel == EditorPanel.EditText) Box(Modifier.tutorialTarget("back")) { DeskIcon(ChromeIcons.Back, stringResource(R.string.topbar_back)) { state.stepBack() } }
             else if (layer != null && !MultiSelect.active) Icon(deskLayerIcon(layer), null, Modifier.padding(start = 4.dp).size(20.dp), tint = Am.OnDarkDim)
-            if (layer != null && !MultiSelect.active) key(layer.id) { DeskNameField(layer.label, Modifier.weight(1f).padding(horizontal = 2.dp)) { state.renameLayer(layer.id, it) } }
+            if (layer != null && !MultiSelect.active) key(layer.id) { DeskNameField(layer.shownName(), Modifier.weight(1f).padding(horizontal = 2.dp)) { state.renameLayer(layer.id, it) } }
             else Text(
                 if (MultiSelect.active) pluralStringResource(R.plurals.structure_layers_selected, MultiSelect.ids.size, MultiSelect.ids.size.toString()) else layer?.label ?: stringResource(R.string.desk_inspector),
                 Modifier.weight(1f).padding(horizontal = 8.dp), color = Am.OnDark, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis,
@@ -373,6 +375,7 @@ private fun DeskLayerArea(state: EditorState, modifier: Modifier) {
     Box(modifier.tutorialTarget(if (state.panel == EditorPanel.Tools) "tools" else "panel")) {
         Swap(
             when {
+                state.drawing is PointMode -> "points"
                 state.volumeOpen && state.panel == EditorPanel.Tools -> "volume" to state.easingOpen
                 state.panel == EditorPanel.Tools -> "tools"
                 else -> state.panel to state.easingOpen
@@ -380,6 +383,12 @@ private fun DeskLayerArea(state: EditorState, modifier: Modifier) {
             Modifier.fillMaxSize(),
         ) {
             when {
+                state.drawing is PointMode -> (state.drawing as? PointMode)?.let { mode ->
+                    Column(Modifier.fillMaxSize()) {
+                        PointTopBar(state, mode, Modifier.fillMaxWidth().height(40.dp))
+                        Box(Modifier.fillMaxWidth().weight(1f)) { PointPanel(state, mode) }
+                    }
+                }
                 state.volumeOpen && state.panel == EditorPanel.Tools -> key(state.selectedId) { VolumePanel(state, Modifier.fillMaxSize()) }
                 state.panel == EditorPanel.Tools -> LayerTools(state, Modifier.fillMaxWidth().align(Alignment.TopCenter), side = true)
                 else -> LayerPanel(state, Modifier.fillMaxSize())

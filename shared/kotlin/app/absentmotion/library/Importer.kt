@@ -148,16 +148,16 @@ class Importer(
                         ?: uri.substringAfter(':').takeIf { uri.startsWith("amproj:") || uri.startsWith("am-docs:") }
                     entry?.let { find(it, files) }?.let { uri to it }
                 }.toMap()
-                val names = HashSet<String>()
+                val names = hashSetOf(ImportMarker)
                 fun unique(name: String) = (sequenceOf(name) + generateSequence(2) { it + 1 }.map { "${it}_$name" }).first { names.add(it) }
                 val target = HashMap<String, File>()
                 for ((uri, path) in entries) {
                     if (path in target) continue
                     val parts = companions[uri]?.mapNotNull { find(it, files) }
-                    if (parts == null) target[path] = File(store.mediaDir(id), unique(leaf(path)!!))
+                    if (parts == null) target[path] = File(store.mediaDir(id), unique(portable(leaf(path)!!)))
                     else {
                         val folder = File(store.mediaDir(id), generateSequence(1) { it + 1 }.map { "model-$it" }.first { names.add(it) })
-                        (listOf(path) + parts).forEach { part -> target.putIfAbsent(part, File(folder, leaf(part)!!)) }
+                        (listOf(path) + parts).forEach { part -> target.putIfAbsent(part, File(folder, portable(leaf(part)!!))) }
                     }
                 }
                 target.forEach { (path, file) -> copies.getOrPut(path) { ArrayList() } += file }
@@ -315,7 +315,7 @@ class Importer(
             "id", "label", "startTime", "endTime", "fillType", "fillImage", "fillVideo", "inTime", "outTime", "speed", "blending",
             "parent", "hidden", "clippingMask", "mediaFillMode", "s", "tag", "align", "font", "size", "wrapWidth", "src", "type", "link",
             "presetId", "templatePPId", "points", "color", "stroke", "style", "scaleLinked", "loop", "loopIn", "mixPieces", "threeD",
-            "noiseId", "retimeLength", "pathLayer", "matteFrame", "matteEdge",
+            "noiseId", "retimeLength", "pathLayer", "matteFrame", "matteEdge", "genIn", "genOut", "genLoop", "outlineShape", "outlineMark",
         )
 
         private fun uniqueLayerIds(root: XmlNode): XmlNode {
@@ -370,6 +370,8 @@ class Importer(
 
         private fun leaf(name: String): String? = name.substringAfterLast('/').substringAfterLast('\\').takeIf { it.isNotEmpty() && it != "." && it != ".." }
 
+        private fun portable(name: String) = name.replace(Regex("[<>:\"|?*\\x00-\\x1f]"), "_").trimEnd(' ', '.').ifEmpty { "media" }
+
         private fun entryPath(name: String) = name.replace('\\', '/').trimStart('/')
 
         private fun find(reference: String, paths: Collection<String>): String? {
@@ -391,7 +393,7 @@ class Importer(
                     override fun read(b: ByteArray, off: Int, len: Int): Int = zip.read(b, off, len).also { if (it > 0) charge(it) }
                 }
                 while (true) {
-                    val entry = zip.nextEntry ?: break
+                    val entry = (try { zip.nextEntry } catch (e: IllegalArgumentException) { throw ImportFailed(txt(R.string.library_err_malformed_package, e.message.toString())) }) ?: break
                     if (++entries > limits.entries) throw ImportFailed(txt(R.string.library_err_too_many_files, limits.entries.toString()))
                     if (!entry.isDirectory) entryPath(entry.name).takeIf { leaf(it) != null }?.let { visit(it, counted) }
                     counted.drain()

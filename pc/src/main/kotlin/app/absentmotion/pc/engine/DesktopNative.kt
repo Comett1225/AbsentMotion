@@ -45,6 +45,7 @@ object DesktopNative {
     external fun layerOutline(handle: Long, id: Long, timeMs: Double): String?
     external fun shapeIcon(handle: Long, xml: String, size: Int, color: Int): ByteArray?
     external fun ease(easing: String, u: Float): Float
+    external fun shapeOutline(scene: String, t: Float, rounded: Boolean): String?
     external fun encodeWebp(rgba: ByteArray, width: Int, height: Int, quality: Int, lossless: Boolean): ByteArray?
     external fun videoOpen(path: String): Long
     external fun videoInfo(video: Long): DoubleArray

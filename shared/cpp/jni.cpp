@@ -254,6 +254,15 @@ JNIEXPORT jfloatArray JNICALL JNI_FN(nativeEase)(JNIEnv* env, jclass, jstring ea
     return out;
 }
 
+JNIEXPORT jstring JNICALL JNI_FN(nativeShapeOutline)(JNIEnv* env, jclass, jbyteArray scene, jfloat t, jboolean rounded) {
+    const jsize n = env->GetArrayLength(scene);
+    std::string xml((size_t)n, '\0');
+    env->GetByteArrayRegion(scene, 0, n, reinterpret_cast<jbyte*>(xml.data()));
+    std::string svg;
+    if (!am::ShapeOutlineSvg(xml, t, rounded, &svg)) return nullptr;
+    return env->NewStringUTF(svg.c_str());
+}
+
 JNIEXPORT jfloatArray JNICALL JNI_FN(nativeBlipTimes)(JNIEnv* env, jclass, jbyteArray text, jfloat speed, jfloat pause, jint every) {
     const jsize n = env->GetArrayLength(text);
     std::string utf8((size_t)n, '\0');

@@ -114,6 +114,16 @@
       "note": ""
     },
     {
+      "id": "tool.shape_template_options",
+      "name": "Round Corners on every shape, options for the catalogue outlines (size, per-shape options, Advanced), Phone and Panel shapes, Edit Points that turns options into points",
+      "where": "model/ShapeCatalog.kt, panels/EditShapePanel.kt, LayerTools.kt, DrawingMode.kt, shared/cpp/shapes.cpp",
+      "android": "works",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "geometry is drawn by the shared engine on every platform; Windows and Linux builds were not run for this change"
+    },
+    {
       "id": "tool.edit_text",
       "name": "Edit text with font browser, on-canvas wrap handle",
       "where": "TextEditor.kt, FontBrowser.kt",

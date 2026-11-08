@@ -1,7 +1,9 @@
 <!doctype html>
 <html lang="zh-TW" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>形狀、繪圖與遮罩 | AbsentMotion</title><meta name="description" content="形狀、鋼筆工具、手繪繪圖、SVG 匯入、剪裁遮罩、群組、父圖層，以及動畫形狀遮罩。"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="說明"><a href="index.html">目錄</a><a href="effects/index.html">特效</a></nav></header><div class="wrap"><main id="main"><h1>形狀、繪圖與遮罩</h1><p class="lead">形狀、鋼筆工具、手繪繪圖、SVG 匯入、剪裁遮罩、群組、父圖層，以及動畫形狀遮罩。</p><details class="toc"><summary>本頁內容</summary><ul><li><a href="#shapes">形狀</a></li><li><a href="#the-pen-tool-and-edit-points">鋼筆工具與編輯節點</a></li><li><a href="#freehand-drawing">手繪繪圖</a></li><li><a href="#svg-files">SVG 檔案</a></li><li><a href="#masks-and-clipping">遮罩與剪裁</a></li><li><a href="#groups-and-parents">群組與父圖層</a></li></ul></details><h2 id="shapes">形狀</h2>
-<p>從<a href="add-menu.html">新增選單</a>的 <strong>形狀</strong> 頁籤新增現成的形狀。形狀分為兩種。</p>
-<ul><li><strong>參數化形狀</strong>（圓形、矩形、星形、多邊形等）使用 <strong>形狀選項</strong> 進行編輯：大小、半徑、節點數量等。這些設定可以製作動畫。</li><li><strong>路徑形狀</strong>（愛心、雲朵、齒輪等）使用 <strong>編輯節點</strong> 進行編輯。</li></ul>
+<p>從<a href="add-menu.html">新增選單</a>的 <strong>形狀</strong> 頁籤新增現成的形狀。選取形狀後點按 <strong>形狀選項</strong> 即可修改。每個選項都能用關鍵影格製作動畫。</p>
+<ul><li><strong>圓角</strong> 排在最前面，會讓形狀的每個角都變圓。圓角矩形、標註和郵票在這裡使用各自的圓角半徑。</li><li><strong>大小</strong> 設定寬度和高度。</li><li>接著是各形狀自己的選項，例如 <strong>齒輪</strong> 的齒、<strong>愛心</strong> 的凹口和尖端、<strong>手機</strong> 的邊框、相機和側鍵，或 <strong>面板</strong> 的邊框、標題列和格線。齒、光芒或尖角這類數量以整數變化。</li><li><strong>進階</strong> 會開啟較少用的選項，例如 <strong>圓環</strong> 的掃掠角，或 <strong>面板</strong> 的欄和列。</li></ul>
+<p>工具格中的 <strong>編輯節點</strong> 會把形狀依當下的外觀變成可移動的節點。圓角仍然有效，復原即可找回選項。如果有選項製作了動畫，App 會先詢問。圖層選單中的 <strong>轉換為外框</strong> 效果相同。用鋼筆工具繪製或從 SVG 匯入的形狀仍以 <strong>編輯節點</strong> 為主要工具，它們的 <strong>形狀選項</strong> 提供圓角。</p>
+<p>舊版的 AbsentMotion 會依圖層開始時的樣子顯示這些形狀，不含這些選項。</p>
 <p>顏色與外框使用 <strong>填色與顏色</strong> 和 <strong>邊框與陰影</strong> 設定。請參閱<a href="layer-tools.html">圖層工具</a>。</p>
 <h2 id="the-pen-tool-and-edit-points">鋼筆工具與編輯節點</h2>
 <p>新增選單中的 <strong>鋼筆工具</strong> 會建立新的形狀圖層，並開啟節點編輯器。工具格中的 <strong>編輯節點</strong> 則會為現有的路徑形狀開啟它。在預覽中點選即可放置節點；按住並拖曳可拉出曲線控點。虛影節點會顯示下一個節點將落在的位置。若未繪製任何內容就離開，會刪除新建立的圖層。</p>

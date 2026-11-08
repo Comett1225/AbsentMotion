@@ -26,6 +26,14 @@ object PivotEngine {
     }
 
     @JvmStatic external fun nativePlaces(xml: String, ids: LongArray, times: DoubleArray): FloatArray?
+    @JvmStatic external fun nativeSelectionQuad(xml: String, id: Long, t: Double): FloatArray?
+    @JvmStatic external fun nativeShapeOutline(xml: String, t: Float, rounded: Boolean): String?
+    @JvmStatic external fun nativeShapeHits(xml: String, t: Float, points: FloatArray): BooleanArray?
+    @JvmStatic external fun nativeLayerBounds(xml: String, id: Long, t: Double): FloatArray?
+    @JvmStatic external fun nativeHits(xml: String, t: Double, points: FloatArray): LongArray?
+    @JvmStatic external fun nativeDrawn(xml: String, t: Double): ByteArray?
+    @JvmStatic external fun nativeDrawnPreview(xml: String, t: Double, width: Int, height: Int, scale: Float, dx: Float, dy: Float): ByteArray?
+    @JvmStatic external fun nativePointMarks(xml: String, id: Long, t: Double): ByteArray?
 }
 
 class PivotEngineTest {
@@ -94,6 +102,20 @@ class PivotEngineTest {
         assertEquals(listOf(10f, 10f), out.layer(2)!!.pivot.take(2))
         assertStays(s, out, listOf(1, 2, 3), frames)
         assertStays(out, out.withPivotMoved(2, 500, 0f, 0f), listOf(1, 2, 3), frames)
+    }
+
+    @Test fun aHeavilyTiltedLayerKeepsAConvexSelectionFrameWhileItRotates() {
+        for (tilt in listOf("70,0", "0,-75", "80,60")) for (rotation in -180..180 step 15) {
+            val s = sceneOf(layer(1, prop("location", 0f to "540,960,0"), prop("rotation", 0f to "$rotation"), prop("scale", 0f to "60,60"), prop("tilt", 0f to tilt)))
+            val q = PivotEngine.nativeSelectionQuad(Scene.parse(s.toXml()).toXml(), 1, 500.0) ?: continue
+            val sides = (0 until 4).map { i ->
+                val a = i * 2
+                val b = ((i + 1) % 4) * 2
+                val c = ((i + 2) % 4) * 2
+                (q[b] - q[a]) * (q[c + 1] - q[b + 1]) - (q[b + 1] - q[a + 1]) * (q[c] - q[b])
+            }
+            assertTrue("tilt $tilt rotation $rotation: the frame folds over itself ${q.toList()}", sides.all { it >= 0f } || sides.all { it <= 0f })
+        }
     }
 
     @Test fun aLoneLayerWithEveryTransformStaysWhereItIs() {

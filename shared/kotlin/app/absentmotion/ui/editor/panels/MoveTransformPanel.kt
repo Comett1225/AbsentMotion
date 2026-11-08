@@ -147,7 +147,9 @@ private fun PositionTab(state: EditorState, layer: Layer) {
         },
     ) {
         TrackpadCorners()
-        TrackpadHint(stringResource(if (depth) R.string.drag_to_move_along_z else R.string.drag_here_to_move_the_layer), Modifier.align(Alignment.Center))
+        Box(if (app.absentmotion.platform.PlatformFeatures.desktop) Modifier.fillMaxWidth().height(app.absentmotion.ui.editor.PanelHeight) else Modifier.matchParentSize(), Alignment.Center) {
+            TrackpadHint(stringResource(if (depth) R.string.drag_to_move_along_z else R.string.drag_here_to_move_the_layer), Modifier)
+        }
         Column(Modifier.align(Alignment.TopCenter).padding(top = 17.px)) {
             Row {
                 Row(Modifier.width(354.px).height(70.px).clip(PanelShape).background(Am.Field)) {

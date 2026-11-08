@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include "scene.h"
 #include "xml.h"
@@ -21,5 +22,11 @@ constexpr int kPointEdit = 1 << 28;
 void DrawPointEdit(SkCanvas* canvas, const Layer& layer, const SkMatrix& toTarget, float px, int code, float t);
 
 std::string OutlineSvg(const SkPath& path);
+
+struct Piece {
+    SkPathVerb verb;
+    SkPoint c1, c2, p;
+};
+std::vector<Piece> Pieces(const SkPath& path);
 
 }

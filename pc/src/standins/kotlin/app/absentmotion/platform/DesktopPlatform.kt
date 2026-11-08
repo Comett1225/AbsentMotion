@@ -219,11 +219,16 @@ fun Modifier.resizeCursor(horizontal: Boolean = true): Modifier =
 
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
-fun Hint(text: String, content: @Composable () -> Unit) = androidx.compose.foundation.TooltipArea(
+fun Hint(text: String, content: @Composable () -> Unit) = Hint(text, Modifier, content)
+
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+@Composable
+fun Hint(text: String, modifier: Modifier, content: @Composable () -> Unit) = androidx.compose.foundation.TooltipArea(
     tooltip = {
         androidx.compose.material3.Text(text, color = app.absentmotion.ui.theme.Am.OnDark, fontSize = androidx.compose.ui.unit.TextUnit(12f, androidx.compose.ui.unit.TextUnitType.Sp),
             modifier = Modifier.background(app.absentmotion.ui.theme.Am.Field, androidx.compose.foundation.shape.RoundedCornerShape(6.dp)).padding(horizontal = 8.dp, vertical = 4.dp))
     },
+    modifier = modifier,
     delayMillis = 450,
 ) { content() }
 

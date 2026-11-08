@@ -452,6 +452,8 @@ def entry(name, contours):
 
 def build():
     text = open(XML).read()
+    if 'outlineShape="' in text:
+        sys.exit("shapes.xml keeps the outline shapes as options now; the engine draws them (shared/cpp/shapes.cpp), so this generator must not rewrite them")
     starts = [m.start() for m in re.finditer(r"^  <shape\b", text, re.M)]
     assert len(starts) >= PARAMETRIC
     head = text[:starts[PARAMETRIC]] if len(starts) > PARAMETRIC else text[:text.rindex("</shapes>")]

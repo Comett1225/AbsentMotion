@@ -11,8 +11,8 @@ static bool PreviewQuad(const Scene& scene, int64_t id, double time, float xy[8]
     const SceneScope scope(scene);
     const Layer* layer=scene.layer(id);
     if(!layer || !layer->activeAt(time))return false;
-    SkPoint q[4];SelectionBounds(*layer,time,SkMatrix::I()).toQuad(q);
-    WorldMatrix(scene,*layer,time).mapPoints(q);
+    SkPoint q[4];
+    if(!SelectionQuad(scene,*layer,time,q))return false;
     for(int i=0;i<4;i++){xy[2*i]=q[i].fX;xy[2*i+1]=q[i].fY;}
     return true;
 }
@@ -54,13 +54,15 @@ static void DrawSelection(SkCanvas* canvas, const SkPoint q[4], int handles, flo
 
 static long FrameOf(double ms, int fps) { return ((std::lround(ms) + 1) * fps + 999) / 1000 - 1; }
 
-static void DrawMotionPath(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& layer, double timeMs, int fps,
+static void DrawMotionPath(SkCanvas* canvas, const Scene& scene, const Layer& layer, double timeMs, int fps,
                            const SkMatrix& toTarget, float px) {
+    const std::vector<Layer>& siblings = scene.layers;
     SkPaint paint;
     paint.setAntiAlias(true);
     const float t = layer.localTime(timeMs);
     auto place = [&](double ms, SkPoint own) {
-        return toTarget.mapPoint(layer.parent != 0 ? EffectivePlacement(siblings, layer, ms).location : own);
+        const SkMatrix seen = PlaneMatrix(siblings, layer, scene.width, scene.height, ms, scene.depthOrder);
+        return toTarget.mapPoint(seen.mapPoint(layer.parent != 0 ? EffectivePlacement(siblings, layer, ms).location : own));
     };
     std::vector<SkPoint> points;
     int here = -1;
@@ -251,7 +253,7 @@ void RenderPreview(SkCanvas* canvas, int width, int height, const Scene& scene, 
         if (selected && selected->kind == "camera") selected = nullptr;
         if (selected && handles == -2) {
             if (selected->activeAt(timeMs)) {
-                DrawMotionPath(canvas, scene.layers, *selected, timeMs, scene.fps, SkMatrix::Translate(dx, dy).preScale(scale, scale), px);
+                DrawMotionPath(canvas, scene, *selected, timeMs, scene.fps, SkMatrix::Translate(dx, dy).preScale(scale, scale), px);
             }
         } else if (selected && handles >= kPointEdit) {
             if (selected->activeAt(timeMs)) {

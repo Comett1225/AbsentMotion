@@ -82,7 +82,7 @@ import app.absentmotion.model.cropIndex
 import app.absentmotion.model.cropRatio
 import app.absentmotion.editor.inverseMap
 import app.absentmotion.editor.LayerPoints
-import app.absentmotion.editor.map
+import app.absentmotion.editor.projected
 import app.absentmotion.editor.unmapVector
 import app.absentmotion.model.Pt
 import app.absentmotion.platform.Matrix
@@ -281,7 +281,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                     val multiQuad = multi?.let { multiBox }?.let { b -> listOf(Offset(b[0], b[1]), Offset(b[2], b[1]), Offset(b[2], b[3]), Offset(b[0], b[3])).map { it * currentScale + currentOffset } }
                     val multiCorner = multiQuad?.let { HandleHit.at(it, down.position, HandleHit.reach(it, density)) } ?: -1
                     val multiGrab = if (multiCorner >= 0 && multiQuad != null) multiQuad[multiCorner] - down.position else Offset.Zero
-                    var multiPan = Offset.Zero
+                    var multiShift = Offset.Zero
                     var multiZoom = 1f
                     var fingers = 1
                     var drifted = false
@@ -296,7 +296,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                     val turning = state.turner
                     val points = state.layerPoints.takeIf { startLayer != null && !state.playing && !state.panZoomMode }
                     val worldView = world?.takeUnless { state.playing }?.let { v -> Matrix().apply { setValues(v) } }?.takeIf { it.invert(Matrix()) }
-                    fun onScreen(p: Pt): Offset? = worldView?.map(p)?.let { Offset(it.x, it.y) * currentScale + currentOffset }
+                    fun onScreen(p: Pt): Offset? = world?.takeIf { worldView != null }?.projected(p)?.let { Offset(it.x, it.y) * currentScale + currentOffset }
                     fun inLayer(at: Offset): Pt? = worldView?.inverseMap(((at - currentOffset) / currentScale).let { Pt(it.x, it.y) })
                     val gradientMode = startLayer != null && startQuad != null && !state.panZoomMode && state.panel == EditorPanel.ColorFill && startLayer.fillType == "gradient"
                     val pointGrab = if (gradientMode) -1 else points?.points?.indices?.mapNotNull { i -> onScreen(points.points[i])?.let { i to (it - down.position).getDistance() } }
@@ -342,13 +342,14 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                                     state.edit(MULTI_KEY) { multiFrom.movedTogether(multi, ms, about.x, about.y, factor, 0f, 0f) }
                                 }
                             } else {
-                                multiPan += pan + held
-                                held = Offset.Zero
-                                multiZoom *= zoom
                                 val centroid = event.calculateCentroid(useCurrent = false)
-                                val about = if (centroid.isSpecified) (centroid - currentOffset) / currentScale else Offset.Zero
-                                val move = multiPan / currentScale
-                                state.edit(MULTI_KEY) { multiFrom.movedTogether(multi, ms, about.x, about.y, multiZoom, move.x, move.y) }
+                                if (centroid.isSpecified && (zoom != 1f || pan + held != Offset.Zero)) {
+                                    val about = (centroid - currentOffset) / currentScale
+                                    multiShift = about + (multiShift - about) * zoom + (pan + held) / currentScale
+                                    held = Offset.Zero
+                                    multiZoom *= zoom
+                                    state.edit(MULTI_KEY) { multiFrom.movedTogether(multi, ms, 0f, 0f, multiZoom, multiShift.x, multiShift.y) }
+                                }
                             }
                         } else if (moved && pointGrab >= 0 && points != null && fingers == 1) {
                             gesture = HIDDEN
@@ -475,7 +476,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
             MultiSelectionBox(b, scale, Offset(dx, dy), if (refPx > 0f) refPx else size.width / 1080f)
         }
         Presence(hint) { SwipeHint(hintLabel, Modifier.align(Alignment.Center).presence()) }
-        CanvasZoomHud(state, Modifier.align(Alignment.TopStart))
+        if (!fixedView) CanvasZoomHud(state, Modifier.align(Alignment.TopStart))
         if (state.drawing == null && !editingText) {
             RenderPreviewNotes(state, cachedPlaying, Modifier.align(Alignment.TopCenter))
             PreRenderBadge(cachedPlaying, Modifier.align(Alignment.TopEnd))
@@ -640,14 +641,15 @@ private fun inside(quad: List<Offset>, at: Offset): Boolean {
 
 @Composable
 private fun LayerPointsOverlay(points: LayerPoints, world: FloatArray, scale: Float, offset: Offset) {
-    val matrix = remember(world) { Matrix().apply { setValues(world) } }
     Canvas(Modifier.fillMaxSize()) {
-        val shown = points.points.map { p -> matrix.map(p).let { Offset(it.x, it.y) * scale + offset } }
+        val shown = points.points.map { p -> world.projected(p)?.let { Offset(it.x, it.y) * scale + offset } }
         val line = 1.2.dp.toPx()
-        val guide = points.guide.map { p -> matrix.map(p).let { Offset(it.x, it.y) * scale + offset } }
+        val guide = points.guide.map { p -> world.projected(p)?.let { Offset(it.x, it.y) * scale + offset } }
         for (i in 1 until guide.size) {
-            drawLine(Color.Black.copy(alpha = 0.35f), guide[i - 1], guide[i], line * 2.5f)
-            drawLine(Color.White.copy(alpha = 0.8f), guide[i - 1], guide[i], line)
+            val from = guide[i - 1] ?: continue
+            val to = guide[i] ?: continue
+            drawLine(Color.Black.copy(alpha = 0.35f), from, to, line * 2.5f)
+            drawLine(Color.White.copy(alpha = 0.8f), from, to, line)
         }
         for ((a, b) in points.lines) {
             val from = shown.getOrNull(a) ?: continue
@@ -656,6 +658,7 @@ private fun LayerPointsOverlay(points: LayerPoints, world: FloatArray, scale: Fl
             drawLine(Am.Accent, from, to, line)
         }
         shown.forEachIndexed { i, at ->
+            if (at == null) return@forEachIndexed
             val chosen = i == points.selected
             if (points.pivot) {
                 val r = 9.dp.toPx()

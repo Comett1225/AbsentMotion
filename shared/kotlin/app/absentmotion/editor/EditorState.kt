@@ -24,6 +24,7 @@ import app.absentmotion.model.Scene
 import app.absentmotion.model.nestedHostTime
 import app.absentmotion.model.nestedTime
 import app.absentmotion.model.withValueLinksFollowing
+import app.absentmotion.model.withOutlinesFollowing
 
 enum class EditorPanel(@StringRes val title: Int) {
     Tools(0), Speed(R.string.edit_panel_time_remapping), MoveTransform(R.string.edit_panel_transform), ColorFill(R.string.edit_panel_fill_color),
@@ -159,6 +160,8 @@ class EditorState(
     val premuteGain = HashMap<Long, Float>()
 
     var ungroupAsk by mutableStateOf(false)
+
+    var pointsAsk by mutableStateOf<(() -> Unit)?>(null)
 
     val exportFrame: Int
         get() {
@@ -323,7 +326,7 @@ class EditorState(
     fun edit(key: Any? = null, change: (Scene) -> Scene) {
         Glide.interrupt()
         val before = scene
-        history.edit(key, root.withFocused(groupPath, change(before).withValueLinksFollowing(before).withMattesFollowing(before)))
+        history.edit(key, root.withFocused(groupPath, change(before).withValueLinksFollowing(before).withMattesFollowing(before).withOutlinesFollowing(before)))
     }
 
     fun endGesture() {
@@ -358,7 +361,7 @@ class EditorState(
 
     val gestureOpen: Boolean get() = history.gesturing
 
-    fun amend(next: Scene) = history.amend(root.withFocused(groupPath, next.withValueLinksFollowing(scene).withMattesFollowing(scene)))
+    fun amend(next: Scene) = history.amend(root.withFocused(groupPath, next.withValueLinksFollowing(scene).withMattesFollowing(scene).withOutlinesFollowing(scene)))
 
     internal fun forgetEdit(after: Scene?): Boolean = after != null && scene.node === after.node && history.forget(root)
 

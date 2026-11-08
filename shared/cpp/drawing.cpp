@@ -324,21 +324,6 @@ bool DrawingContains(const Layer& layer, SkPoint local) {
     return false;
 }
 
-namespace {
-
-struct Knot {
-    SkPoint p{}, in{}, out{};
-    bool hasIn = false, hasOut = false;
-};
-struct Sub {
-    std::vector<Knot> knots;
-    bool closed = false;
-};
-
-struct Piece {
-    SkPathVerb verb;
-    SkPoint c1, c2, p;
-};
 std::vector<Piece> Pieces(const SkPath& path) {
     std::vector<Piece> out;
     auto quad = [&](SkPoint a, SkPoint q, SkPoint p) {
@@ -363,6 +348,17 @@ std::vector<Piece> Pieces(const SkPath& path) {
     }
     return out;
 }
+
+namespace {
+
+struct Knot {
+    SkPoint p{}, in{}, out{};
+    bool hasIn = false, hasOut = false;
+};
+struct Sub {
+    std::vector<Knot> knots;
+    bool closed = false;
+};
 
 std::vector<Sub> Knots(const SkPath& path) {
     std::vector<Sub> subs;
@@ -402,12 +398,17 @@ std::vector<Sub> Knots(const SkPath& path) {
 
 void DrawPointEdit(SkCanvas* canvas, const Layer& layer, const SkMatrix& toTarget, float px, int code, float t) {
     code -= kPointEdit;
-    const int selContour = (code >> 20) & 0x7f, selPoint = (code >> 4) & 0xffff, selHandle = code & 0xf;
+    if (code & 8) return;
+    const int selContour = (code >> 20) & 0x7f, selPoint = (code >> 4) & 0xffff, selHandle = code & 7;
     const SkColor accent = SkColorSetRGB(0xff, 0x8f, 0x66);
     SkPaint paint;
     paint.setAntiAlias(true);
-    auto map = [&](SkPoint q) { return toTarget.mapPoint(q); };
+    auto map = [&](SkPoint q) {
+        const SkPoint3 h = toTarget.mapPointToHomogeneous(q);
+        return h.fZ > 0 ? SkPoint{h.fX / h.fZ, h.fY / h.fZ} : SkPoint{NAN, NAN};
+    };
     auto line = [&](SkPoint a, SkPoint b) {
+        if (!a.isFinite() || !b.isFinite()) return;
         paint.setStyle(SkPaint::kStroke_Style);
         paint.setStrokeWidth(4.5f * px);
         paint.setColor(SK_ColorBLACK);
@@ -418,12 +419,14 @@ void DrawPointEdit(SkCanvas* canvas, const Layer& layer, const SkMatrix& toTarge
         paint.setStyle(SkPaint::kFill_Style);
     };
     auto dot = [&](SkPoint at, float radius, SkColor fill) {
+        if (!at.isFinite()) return;
         paint.setColor(SK_ColorBLACK);
         canvas->drawCircle(at, (radius + 3) * px, paint);
         paint.setColor(fill);
         canvas->drawCircle(at, radius * px, paint);
     };
     auto square = [&](SkPoint at, float half, SkColor fill) {
+        if (!at.isFinite()) return;
         paint.setColor(SK_ColorBLACK);
         canvas->drawRect(SkRect::MakeXYWH(at.fX - (half + 2.5f) * px, at.fY - (half + 2.5f) * px, (half + 2.5f) * 2 * px, (half + 2.5f) * 2 * px), paint);
         paint.setColor(fill);

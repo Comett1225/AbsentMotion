@@ -65,6 +65,7 @@ import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.animatedColor
+import kotlin.math.hypot
 import kotlin.math.min
 
 private val Divider get() = Am.PreviewBg
@@ -79,6 +80,13 @@ private fun ghostOf(c: Contour, mode: PointMode): Pt? {
     val c2 = b.inHandle ?: b.p
     val u = 1 - t
     return a.p * (u * u * u) + c1 * (3 * u * u * t) + c2 * (3 * u * t * t) + b.p * (t * t * t)
+}
+
+internal fun weightedDrag(dx: Float, dy: Float, weight: Float): Pt {
+    val far = hypot(dx, dy)
+    if (far <= weight) return Pt(0f, 0f)
+    val keep = (far - weight) / far
+    return Pt(dx * keep, dy * keep)
 }
 
 @Composable
@@ -96,6 +104,7 @@ internal fun PointOverlay(state: EditorState, mode: PointMode, modifier: Modifie
             awaitEachGesture {
                 val down = awaitFirstDown(requireUnconsumed = false)
                 down.consume()
+                state.playing = false
                 val (s, ox, oy) = view
                 val m = mode.screenMatrix(state.scene, state.timeMs) ?: return@awaitEachGesture
                 fun scene(p: Offset) = Pt((p.x - ox) / s, (p.y - oy) / s)
@@ -108,12 +117,22 @@ internal fun PointOverlay(state: EditorState, mode: PointMode, modifier: Modifie
                     mode.point = picked.second
                     mode.handle = picked.third
                     val start = contours[picked.first].knots[picked.second].at(picked.third) ?: return@awaitEachGesture
-                    while (true) {
-                        val change = awaitPointerEvent().changes.firstOrNull { it.id == down.id } ?: break
-                        if (!change.pressed) break
-                        if (!moved && (change.position - down.position).getDistance() > viewConfiguration.touchSlop) moved = true
-                        if (moved) state.moveSelectedTo(mode, start.dragged((change.position - down.position).let { Pt(it.x, it.y) }, s, m::map, m::inverseMap))
-                        change.consume()
+                    val weight = maxOf(viewConfiguration.touchSlop, 10.dp.toPx())
+                    try {
+                        while (true) {
+                            val change = awaitPointerEvent().changes.firstOrNull { it.id == down.id } ?: break
+                            if (!change.pressed) break
+                            val raw = change.position - down.position
+                            val far = raw.getDistance()
+                            if (!moved && far > weight) { moved = true; mode.holding = true }
+                            if (moved) {
+                                val eased = weightedDrag(raw.x, raw.y, weight)
+                                state.moveSelectedTo(mode, start.dragged(eased, s, m::map, m::inverseMap))
+                            }
+                            change.consume()
+                        }
+                    } finally {
+                        mode.holding = false
                     }
                     if (moved) state.endGesture()
                 } else if (mode.handle == Handle.Add && contours.getOrNull(mode.contour)?.endsAt(mode.point) == true) {

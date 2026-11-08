@@ -6,10 +6,16 @@ summary: Shapes, the pen tool, freehand drawing, SVG import, clipping masks, gro
 ---
 ## Shapes
 
-Add a ready-made shape from the **Shape** tab of the [Add menu](@add-menu). There are two kinds.
+Add a ready-made shape from the **Shape** tab of the [Add menu](@add-menu). Select it and tap **Shape Options** to change it. Every option can be animated with keyframes.
 
-- **Parametric shapes** (Circle, Rectangle, Star, Polygon and others) are edited with **Shape Options**: size, radius, number of points and so on. These settings can be animated.
-- **Path shapes** (Heart, Cloud, Gear and others) are edited with **Edit Points**.
+- **Round Corners** comes first and rounds every corner of the shape. Rounded Rectangle, Callout and Stamp use their own corner radius here.
+- **Size** sets the width and height.
+- Then come the options of that shape, for example the teeth of a **Gear**, the notch and point of a **Heart**, the border, camera and side buttons of a **Phone**, or the border, header and grid of a **Panel**. Counts such as teeth, rays or points change in whole steps.
+- **Advanced** opens the less common options, such as the sweep of a **Ring** or the columns and rows of a **Panel**.
+
+**Edit Points** in the tool grid turns the shape into points you can move, with the look it has at that moment. Round Corners keeps working, and Undo brings the options back. If some options are animated, the app asks first. **Convert to Outline** in the layer menu does the same. Shapes made with the pen tool or imported from SVG keep **Edit Points** as their main tool; their **Shape Options** offer Round Corners.
+
+Older versions of AbsentMotion show these shapes as they look at the start of the layer, without the options.
 
 Color and outline are set with **Fill & Color** and **Frame & Shadow**. See [Layer tools](@layer-tools).
 

@@ -148,7 +148,7 @@ struct Layer {
     int64_t id = 0;
     int64_t noiseId = 0;
     std::string kind;
-    std::string label, shape, fillType;
+    std::string label, shape, fillType, outlineShape;
     std::string mediaUri, mediaFillMode;
     int startTime = 0, endTime = 0;
     bool hidden = false, video = false, force3d = false, mixPieces = true;
@@ -172,6 +172,7 @@ struct Layer {
     bool fixedPrecompose = false;
     std::vector<PathContour> contours;
     bool keyedPoints = false;
+    bool outlineEdited = false;
     std::vector<FreehandStroke> strokes;
     Camera camera;
     std::string lightType;
@@ -307,11 +308,13 @@ float DepthPerPixel(const Layer& layer, double timeMs);
 SkMatrix WorldMatrix(const Scene& scene, const Layer& layer, double timeMs);
 int64_t TopLayerAt(const Scene& scene, double timeMs, float x, float y, const MediaPictures& masks);
 SkRect SelectionBounds(const Layer& layer, double timeMs, const SkMatrix& matrix);
+bool SelectionQuad(const Scene& scene, const Layer& layer, double timeMs, SkPoint corners[4]);
 bool ContentIconBounds(const Layer& layer, SkRect* bounds);
 void DrawContentIcon(SkCanvas* canvas, const Layer& layer, const MediaPictures& pictures);
 void DrawLayerList(SkCanvas* canvas, const Scene& scene, const std::vector<Layer>& layers, double timeMs, const MediaPictures& pictures);
 
-SkPath ShapePath(const Layer& layer, float t);
+SkPath ShapePath(const Layer& layer, float t, bool rounded = true);
+bool ShapeOutlineSvg(const std::string& sceneXml, float t, bool rounded, std::string* svg);
 SkRect CroppedBox(const Layer& layer, float t, size_t before);
 SkPath Cropped(const Layer& layer, float t, const SkPath& path, size_t before = SIZE_MAX);
 SkPath StrokePath(const Layer& layer, const SkPath& path, float t);

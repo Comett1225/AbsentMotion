@@ -80,5 +80,6 @@ class NativeEngine(backend: Backend = Backend.GANESH) : AutoCloseable {
         fun ease(easing: String, u: Float): Float = if (easing.isEmpty()) u else DesktopNative.ease(easing, u)
         fun blipTimes(text: String, speed: Float, pause: Float, every: Int): FloatArray = DesktopNative.blipTimes(text, speed, pause, every)
         fun fastCaptionCpu(): Boolean = false
+        fun shapeOutline(scene: String, t: Float, rounded: Boolean): String? = DesktopNative.shapeOutline(scene, t, rounded)
     }
 }

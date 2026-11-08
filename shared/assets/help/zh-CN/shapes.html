@@ -1,7 +1,9 @@
 <!doctype html>
 <html lang="zh-CN" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>形状、绘制和蒙版 | AbsentMotion</title><meta name="description" content="形状、钢笔工具、自由绘制、SVG 导入、剪贴蒙版、编组、父级以及带动画的形状蒙版。"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="帮助"><a href="index.html">目录</a><a href="effects/index.html">特效</a></nav></header><div class="wrap"><main id="main"><h1>形状、绘制和蒙版</h1><p class="lead">形状、钢笔工具、自由绘制、SVG 导入、剪贴蒙版、编组、父级以及带动画的形状蒙版。</p><details class="toc"><summary>本页内容</summary><ul><li><a href="#shapes">形状</a></li><li><a href="#the-pen-tool-and-edit-points">钢笔工具和编辑点</a></li><li><a href="#freehand-drawing">自由绘制</a></li><li><a href="#svg-files">SVG 文件</a></li><li><a href="#masks-and-clipping">蒙版和剪贴</a></li><li><a href="#groups-and-parents">组和父级</a></li></ul></details><h2 id="shapes">形状</h2>
-<p>在 <a href="add-menu.html">添加菜单</a> 的 <strong>形状</strong> 选项卡中可以添加现成的形状。形状分为两类。</p>
-<ul><li><strong>参数化形状</strong>（圆形、矩形、星形、多边形等）通过 <strong>形状选项</strong> 编辑：尺寸、半径、顶点数量等。这些设置都可以设置动画。</li><li><strong>路径形状</strong>（心形、云朵、齿轮等）通过 <strong>编辑点</strong> 编辑。</li></ul>
+<p>在 <a href="add-menu.html">添加菜单</a> 的 <strong>形状</strong> 选项卡中可以添加现成的形状。选中形状后点按 <strong>形状选项</strong> 即可修改。每个选项都可以用关键帧做动画。</p>
+<ul><li><strong>圆角</strong> 排在最前，会把形状的每个角都变圆。圆角矩形、标注和邮票在这里使用各自的圆角半径。</li><li><strong>大小</strong> 设置宽度和高度。</li><li>接下来是各个形状自己的选项，例如 <strong>齿轮</strong> 的齿、<strong>爱心</strong> 的凹口和尖端、<strong>手机</strong> 的边框、摄像头和侧键，或 <strong>面板</strong> 的边框、标题栏和网格。齿、光芒或尖角这类数量按整数变化。</li><li><strong>高级</strong> 会打开较少用的选项，例如 <strong>圆环</strong> 的扫掠角，或 <strong>面板</strong> 的列和行。</li></ul>
+<p>工具网格中的 <strong>编辑点</strong> 会把形状按当前外观变成可移动的点。圆角仍然有效，撤销可以恢复选项。如果有选项带动画，应用会先询问。图层菜单中的 <strong>转换为轮廓</strong> 效果相同。用钢笔工具画的或从 SVG 导入的形状仍以 <strong>编辑点</strong> 为主要工具，它们的 <strong>形状选项</strong> 提供圆角。</p>
+<p>旧版本的 AbsentMotion 会按图层开始时的样子显示这些形状，不带这些选项。</p>
 <p>颜色和轮廓通过 <strong>填充和颜色</strong> 与 <strong>边框和阴影</strong> 设置。参见 <a href="layer-tools.html">图层工具</a>。</p>
 <h2 id="the-pen-tool-and-edit-points">钢笔工具和编辑点</h2>
 <p>添加菜单中的 <strong>钢笔工具</strong> 会创建一个新的形状图层，并打开点编辑器。工具网格中的 <strong>编辑点</strong> 会为现有路径形状打开它。在预览中，点按可放置一个点；按住并拖动可拉出曲线控制柄。一个虚影点会显示下一个点将落在的位置。如果未绘制任何内容就离开，新图层会被删除。</p>

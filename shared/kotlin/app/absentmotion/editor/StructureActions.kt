@@ -285,12 +285,12 @@ private fun Scene.parentOf(layer: Layer): Layer? =
     layer.node["parent"]?.toLongOrNull()?.takeIf { it != layer.id }?.let { id -> layers.firstOrNull { it.id == id } }
 
 internal fun Scene.place(layer: Layer, timeMs: Int, depth: Int = 0): Place =
-    compose(ownPlace(layer, timeMs, fps), parentOf(layer)?.takeIf { depth <= 16 }?.let { place(it, timeMs, depth + 1) })
+    compose(ownPlace(layer, timeMs, fps), parentOf(layer)?.takeIf { depth < 16 }?.let { place(it, timeMs, depth + 1) })
 
 private fun Scene.pose(layer: Layer, timeMs: Int, depth: Int = 0): Pose {
     val own = ownPlace(layer, timeMs, fps)
     val turn = turnOf(own.rot, layer.at(timeMs, fps).tilt)
-    val parent = parentOf(layer)?.takeIf { depth <= 16 }?.let { pose(it, timeMs, depth + 1) } ?: return Pose(own, turn)
+    val parent = parentOf(layer)?.takeIf { depth < 16 }?.let { pose(it, timeMs, depth + 1) } ?: return Pose(own, turn)
     return Pose(lifted(own, parent), mul(parent.turn, turn))
 }
 

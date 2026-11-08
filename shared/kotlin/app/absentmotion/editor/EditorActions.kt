@@ -52,6 +52,7 @@ fun EditorState.addShape(def: ShapeDef) {
         "fillType" to def.fillType, "mediaFillMode" to "fill",
     )
     if (def.id.isNotEmpty()) attrs["s"] = def.id
+    if (def.outline.isNotEmpty()) attrs["outlineShape"] = def.outline
     val node = XmlNode(
         "shape",
         attrs,
@@ -67,6 +68,7 @@ fun EditorState.addShape(def: ShapeDef) {
 
 fun EditorState.stepBack(): Boolean {
     when {
+        drawing is PointMode -> leaveDrawing()
         MultiSelect.active -> MultiSelect.clear()
         selectedId == null -> if (inGroup) exitGroup() else return false
         easingOpen -> easingOpen = false
@@ -115,6 +117,22 @@ fun EditorState.trimStart() {
 fun EditorState.trimEnd() {
     val trimmed = selected?.let { scene.trimEndAt(it, frame) } ?: return
     editSelected { trimmed }
+}
+
+fun EditorState.trimChosen(start: Boolean) {
+    val next = scene.withTrims(chosenLayers.map { it.id }, frame, sampleMs, start) ?: return
+    edit { next }
+}
+
+internal fun Scene.withTrims(ids: List<Long>, frame: Int, sampleMs: Int, start: Boolean): Scene? {
+    var changed = false
+    val next = ids.fold(this) { acc, id ->
+        val layer = acc.layerAt(id, sampleMs) ?: return@fold acc
+        val trimmed = (if (start) acc.trimStartAt(layer, frame) else acc.trimEndAt(layer, frame)) ?: return@fold acc
+        changed = true
+        acc.update(id, sampleMs) { trimmed }
+    }
+    return next.takeIf { changed }
 }
 
 fun EditorState.split() {

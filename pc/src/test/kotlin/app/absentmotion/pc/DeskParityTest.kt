@@ -35,6 +35,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.performMouseInput
 import androidx.compose.ui.test.performMultiModalInput
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.rightClick
@@ -262,6 +263,57 @@ class DeskParityTest {
                 assertEquals(Offset.Zero, editor.canvasPan)
                 MultiSelect.clear()
             }
+            runBlocking { app.closeEditor() }
+        }
+    }
+
+    @Test fun pinchingSeveralLayersFollowsTheFingersAndStaysOnRelease() {
+        data("multi-pinch")
+        runSkikoComposeUiTest(size = Size(1280f, 800f)) {
+            val app = DeskAppState()
+            setContent { DeskApp(app) }
+            open(app, "styles")
+            val editor = app.editor!!
+            val chosen = editor.scene.layers.filter { it.kind != "camera" && it.kind != "audio" }.take(2).map { it.id }
+            fun places() = chosen.map { editor.scene.place(editor.scene.layer(it)!!, 0).let { p -> Offset(p.x, p.y) } }
+            val before = runOnIdle { places() }
+            runOnIdle { editor.selectedId = null; MultiSelect.ids = chosen.toSet(); MultiSelect.active = true }
+            mainClock.advanceTimeBy(800)
+            val centre = DeskPreviewBounds.bounds.center
+            fun pinch(drift: Float): Pair<List<Offset>, List<Offset>> {
+                onRoot().performTouchInput {
+                    down(0, centre + Offset(-50f, 0f))
+                    down(1, centre + Offset(50f, 0f))
+                    for (i in 1..12) {
+                        val t = i / 12f
+                        updatePointerTo(0, centre + Offset(-50f - 100f * t, drift * t))
+                        updatePointerTo(1, centre + Offset(50f + 100f * t, drift * t))
+                        move()
+                    }
+                }
+                mainClock.advanceTimeBy(100)
+                val held = runOnIdle { places() }
+                onRoot().performTouchInput { up(0); up(1) }
+                mainClock.advanceTimeBy(300)
+                return held to runOnIdle { places() }
+            }
+            val (heldStill, leftStill) = pinch(0f)
+            val spread = heldStill[1] - heldStill[0]
+            val start = before[1] - before[0]
+            assertEquals(start.x * 3f, spread.x, 1f)
+            assertEquals(start.y * 3f, spread.y, 1f)
+            for (k in chosen.indices) assertTrue("layer $k after release: ${heldStill[k]} then ${leftStill[k]}", (heldStill[k] - leftStill[k]).getDistance() < 0.01f)
+            runOnIdle { editor.undo() }
+            mainClock.advanceTimeBy(100)
+            assertEquals(before, runOnIdle { places() })
+            val (heldDown, leftDown) = pinch(60f)
+            for (k in chosen.indices) {
+                val shift = heldDown[k] - heldStill[k]
+                assertEquals("layer $k sideways", 0f, shift.x, 0.5f)
+                assertTrue("layer $k follows the fingers down: $shift", shift.y > 1f)
+                assertTrue("layer $k after release: ${heldDown[k]} then ${leftDown[k]}", (heldDown[k] - leftDown[k]).getDistance() < 0.01f)
+            }
+            runOnIdle { MultiSelect.clear() }
             runBlocking { app.closeEditor() }
         }
     }

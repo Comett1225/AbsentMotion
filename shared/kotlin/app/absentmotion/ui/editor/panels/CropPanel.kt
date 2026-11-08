@@ -107,7 +107,7 @@ internal fun CropPanel(state: EditorState, modifier: Modifier) {
             Spacer(Modifier.weight(2f))
         }
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-            Column(Modifier.weight(1f).fillMaxHeight().background(Am.PanelInset).padding(horizontal = 8.dp, vertical = 6.dp), Arrangement.SpaceEvenly) {
+            Column(Modifier.weight(1f).fillMaxHeight().background(Am.PanelInset).padding(horizontal = 8.dp, vertical = 6.dp), if (app.absentmotion.platform.PlatformFeatures.desktop) Arrangement.spacedBy(16.dp) else Arrangement.SpaceEvenly) {
                 Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), Arrangement.spacedBy(6.dp)) {
                     val free = stringResource(R.string.crop_free)
                     for ((ratio, name) in CropAspects) {

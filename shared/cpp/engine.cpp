@@ -1339,8 +1339,7 @@ bool EngineImpl::layerQuad(int64_t layerId, double timeMs, float xy[8]) {
     const Layer* layer = fScene.layer(layerId);
     if (!layer || !layer->activeAt(timeMs)) return false;
     SkPoint corners[4];
-    SelectionBounds(*layer, timeMs, SkMatrix::I()).toQuad(corners);
-    WorldMatrix(fScene, *layer, timeMs).mapPoints(corners);
+    if (!SelectionQuad(fScene, *layer, timeMs, corners)) return false;
     for (int i = 0; i < 4; i++) {
         xy[2 * i] = corners[i].fX;
         xy[2 * i + 1] = corners[i].fY;

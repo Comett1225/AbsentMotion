@@ -17,6 +17,8 @@ import app.absentmotion.editor.toggleKeyframe
 import app.absentmotion.audio.gain
 import app.absentmotion.model.PropRef
 import app.absentmotion.model.contours
+import app.absentmotion.model.ShapeCatalog
+import app.absentmotion.model.isShapeTemplate
 import app.absentmotion.ui.editor.panels.SpeedPanel
 import app.absentmotion.model.formatColor
 import app.absentmotion.ui.editor.panels.EasingPanel
@@ -74,7 +76,7 @@ import app.absentmotion.editor.EditorPanel
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.KeypadRequest
 import app.absentmotion.editor.editDrawing
-import app.absentmotion.editor.editPoints
+import app.absentmotion.editor.requestPoints
 import app.absentmotion.editor.canCrop
 import android.widget.Toast
 import kotlinx.coroutines.launch
@@ -138,7 +140,7 @@ import app.absentmotion.editor.markBeatsNote
 
 @Composable
 fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean = false) {
-    val drawn = state.selected?.shape?.isEmpty() == true
+    val drawn = state.selected?.let { it.shape.isEmpty() && !it.isShapeTemplate } == true
     var properties by remember(state.selectedId) { mutableStateOf(false) }
     var moving by remember(state.selectedId) { mutableStateOf(false) }
     var captions by remember(state.selectedId) { mutableStateOf(false) }
@@ -212,7 +214,7 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
                         else if (state.selected?.cutoutEdge != null) Tile(CutoutEdge) { state.panel = EditorPanel.Edge }
                         else if (state.selected?.isPlainGroup == true) Tile(EditGroup) { state.selectedId?.let(state::enterGroup) } else null
                     kind == "drawing" -> Tile(EditDrawing) { state.editDrawing() }
-                    drawn -> Tile(EditPoints, enabled = state.selected?.contours != null) { state.editPoints() }
+                    drawn -> Tile(EditPoints, enabled = state.selected?.contours != null) { state.requestPoints(enter = true) }
                     else -> Tile(EditShape) { state.panel = EditorPanel.EditShape }
                 }
                 listOf(
@@ -229,6 +231,8 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
         val saved = stringResource(R.string.screenshot_saved)
         val failed = stringResource(R.string.screenshot_failed)
         val more = listOfNotNull(
+            if (kind == "shape" && state.selected?.isShapeTemplate == true) Tile(EditPoints) { state.requestPoints(enter = true) } else null,
+            if (kind == "shape" && drawn && state.selected?.let(ShapeCatalog::paramsFor).orEmpty().isNotEmpty()) Tile(EditShape) { state.panel = EditorPanel.EditShape } else null,
             if (state.scene.depthOrder && kind in setOf("shape", "text", "drawing", "embedScene")) Tile(ThreeDLayer, active = state.selected?.node?.get("threeD") == "true") {
                 state.editSelected { it.copy(node = it.node.with("threeD", if (it.node["threeD"] == "true") null else "true")) }
             } else null,
@@ -462,8 +466,8 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
                         ROTATE_TAB -> deskShortcut(R.string.a11y_tab_rotate, "${DeskShift}${DeskAlt}${stringResource(R.string.desk_scroll_key)}")
                         else -> ""
                     }
-                    DeskTip(tip) { Box(
-                        Modifier.weight(1f).fillMaxWidth().then(if (usable) Modifier.clickable(role = androidx.compose.ui.semantics.Role.Tab) { tab = i } else Modifier.dimmed())
+                    Box(Modifier.weight(1f).fillMaxWidth()) { DeskTip(tip, Modifier.fillMaxSize()) { Box(
+                        Modifier.fillMaxSize().then(if (usable) Modifier.clickable(role = androidx.compose.ui.semantics.Role.Tab) { tab = i } else Modifier.dimmed())
                             .semantics(mergeDescendants = true) { this.selected = tab == i }.padding(start = 10.px, end = 11.px, top = 5.px, bottom = 5.px),
                     ) {
                         Column(
@@ -479,7 +483,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
                                 autoSize = if (app.absentmotion.platform.PlatformFeatures.desktop) null else androidx.compose.foundation.text.TextAutoSize.StepBased(6.sp, 9.sp, 0.5.sp),
                             )
                         }
-                    } }
+                    } } }
                 }
             }
         }

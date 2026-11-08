@@ -143,8 +143,8 @@ internal fun DeskSheetHost(onDismiss: () -> Unit, content: @Composable () -> Uni
 }
 
 @Composable
-internal fun DeskTip(text: String, content: @Composable () -> Unit) {
-    if (PlatformFeatures.desktop && text.isNotEmpty()) app.absentmotion.platform.Hint(text, content) else content()
+internal fun DeskTip(text: String, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    if (PlatformFeatures.desktop && text.isNotEmpty()) app.absentmotion.platform.Hint(text, modifier, content) else content()
 }
 
 @Composable

@@ -477,13 +477,17 @@ JNIEXPORT jfloatArray JNICALL JNI(layerQuad)(JNIEnv* e, jobject, jlong h, jlong 
     const auto* layer = d->scene.layer(id);
     if (!layer || !layer->activeAt(t)) return nullptr;
     SkPoint p[4];
-    am::SelectionBounds(*layer, t, SkMatrix::I()).toQuad(p);
-    am::WorldMatrix(d->scene, *layer, t).mapPoints(p);
+    if (!am::SelectionQuad(d->scene, *layer, t, p)) return nullptr;
     float values[8];
     for (int i = 0; i < 4; ++i) { values[2*i] = p[i].x(); values[2*i+1] = p[i].y(); }
     auto result = e->NewFloatArray(8);
     e->SetFloatArrayRegion(result, 0, 8, values);
     return result;
+}
+JNIEXPORT jstring JNICALL JNI(shapeOutline)(JNIEnv* e, jobject, jstring scene, jfloat t, jboolean rounded) {
+    std::string svg;
+    if (!am::ShapeOutlineSvg(str(e, scene), t, rounded, &svg)) return nullptr;
+    return e->NewStringUTF(svg.c_str());
 }
 JNIEXPORT jfloat JNICALL JNI(ease)(JNIEnv* e, jobject, jstring easing, jfloat u) { return am::Ease(am::ParseEasing(str(e, easing).c_str()), u); }
 JNIEXPORT jfloatArray JNICALL JNI(blipTimes)(JNIEnv* e, jobject, jstring text, jfloat speed, jfloat pause, jint every) {

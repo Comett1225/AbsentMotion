@@ -224,6 +224,9 @@ fun androidx.compose.ui.Modifier.resizeCursor(horizontal: Boolean = true): andro
 @androidx.compose.runtime.Composable
 fun Hint(text: String, content: @androidx.compose.runtime.Composable () -> Unit) = content()
 
+@androidx.compose.runtime.Composable
+fun Hint(text: String, modifier: androidx.compose.ui.Modifier, content: @androidx.compose.runtime.Composable () -> Unit) = content()
+
 fun linkFolderLabel(): String = ""
 
 fun libraryFolderName(uri: android.net.Uri): String? = null

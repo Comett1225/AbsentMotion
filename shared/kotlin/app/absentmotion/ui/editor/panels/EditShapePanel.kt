@@ -26,11 +26,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
@@ -54,18 +56,25 @@ import app.absentmotion.model.ShapeCatalog
 import app.absentmotion.model.ShapeParam
 import app.absentmotion.model.ShapeParam.Kind
 import app.absentmotion.model.formatFloats
+import app.absentmotion.ui.editor.ChromeIcons
 import app.absentmotion.ui.theme.Am
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
 @Composable
 internal fun EditShapePanel(state: EditorState, layer: Layer, modifier: Modifier = Modifier) {
-    val params = ShapeCatalog.byId(layer.shape)?.params ?: return
+    val all = ShapeCatalog.paramsFor(layer)
+    if (all.isEmpty()) return
+    var open by remember(layer.id) { mutableStateOf(false) }
+    val basic = all.filter { !it.advanced }
+    val extras = all.filter { it.advanced }
+    val params = basic + if (open) extras else emptyList()
     var activeRow by remember(layer.id) { mutableIntStateOf(0) }
     val activeParam = params.getOrNull(activeRow)?.takeIf { it.kind != Kind.Toggle }
     SideEffect { state.keyTarget = activeParam?.let { KeyTarget(PropRef.shape(it.prop), layer.propText(it.prop) ?: it.default, it.kind.type) } }
     Column(modifier.deskVerticalScroll()) {
         params.forEachIndexed { i, param ->
+            if (i == basic.size) AdvancedRow(true) { open = false; if (activeRow >= basic.size) activeRow = 0 }
             val edit = ShapeEdit(state, layer, param, stringResource(param.label))
             val activate = { activeRow = i }
             val active = activeRow == i
@@ -76,6 +85,17 @@ internal fun EditShapePanel(state: EditorState, layer: Layer, modifier: Modifier
                 else -> NumberRow(edit, active, activate)
             }
         }
+        if (extras.isNotEmpty() && !open) AdvancedRow(false) { open = true }
+    }
+}
+
+@Composable
+private fun AdvancedRow(open: Boolean, onToggle: () -> Unit) {
+    Row(Modifier.fillMaxWidth().height(104.px).clickable(onClick = onToggle), verticalAlignment = Alignment.CenterVertically) {
+        Spacer(Modifier.width(23.px))
+        Text(stringResource(R.string.shape_param_advanced), Modifier.weight(1f), color = Am.OnDark, fontSize = 14.5.sp, maxLines = 1)
+        Icon(if (open) ChromeIcons.ChevronDown else ChromeIcons.ChevronRight, null, Modifier.size(22.dp), tint = Am.Caption)
+        Spacer(Modifier.width(23.px))
     }
 }
 
@@ -85,21 +105,27 @@ private class ShapeEdit(val state: EditorState, val layer: Layer, val param: Sha
 
     fun change(box: Int, f: (Float) -> Float) = state.editSelected("shape-${param.prop}") { l ->
         val v = numbers(l, param)
-        v[box] = f(v[box])
+        v[box] = param.bounded(f(v[box]))
         l.withProp(param.prop, param.kind.type, formatFloats(v))
     }
 
     fun live(box: Int): Float = (state.selected?.let { numbers(it, param) } ?: values).getOrElse(box) { 0f }
 
-    fun show(v: Float) = formatFixed(v, param.decimals) + if (param.kind == Kind.Angle) "º" else ""
+    fun show(v: Float) = formatFixed(v, param.decimals) + when (param.kind) {
+        Kind.Angle -> "º"
+        Kind.Percent -> "%"
+        else -> ""
+    }
 
     fun openKeypad(box: Int) {
         val pair = param.kind == Kind.Size || param.kind == Kind.Point
-        val fields = if (pair) listOf(KeypadField("X", values[0]), KeypadField("Y", values[1]))
-            else if (param.kind == Kind.Count) listOf(KeypadField(label, values[0], "", MIN_COUNT.toFloat(), MAX_COUNT.toFloat()))
-            else listOf(KeypadField(label, values[0]))
+        val low = param.min ?: -Float.MAX_VALUE
+        val high = param.max ?: Float.MAX_VALUE
+        val fields = if (pair) listOf(KeypadField("X", values[0], "", low, high), KeypadField("Y", values[1], "", low, high))
+            else if (param.kind == Kind.Count) listOf(KeypadField(label, values[0], "", param.countMin.toFloat(), param.typedMax.toFloat()))
+            else listOf(KeypadField(label, values[0], if (param.kind == Kind.Percent) "%" else "", low, high))
         state.keypad = KeypadRequest(fields, if (pair) box else 0) { v ->
-            val entered = FloatArray(v.size) { if (param.kind == Kind.Count) v[it].roundToInt().coerceAtLeast(MIN_COUNT).toFloat() else v[it] }
+            val entered = FloatArray(v.size) { if (param.kind == Kind.Count) v[it].roundToInt().coerceIn(param.countMin, param.typedMax).toFloat() else param.bounded(v[it]) }
             state.editSelected { it.withProp(param.prop, param.kind.type, formatFloats(entered)) }
         }
     }
@@ -123,7 +149,7 @@ private fun LabelTile(edit: ShapeEdit, active: Boolean, topPad: Dp, onActivate: 
     ) {
         Text(
             edit.label, Modifier.padding(horizontal = 1.dp), color = if (active) Am.Accent else Am.OnDark, fontSize = deskSp(10.5f),
-            lineHeight = 13.sp, maxLines = 1, softWrap = false, textAlign = TextAlign.Center,
+            lineHeight = 13.sp, maxLines = if (app.absentmotion.platform.PlatformFeatures.desktop) 2 else 1, softWrap = app.absentmotion.platform.PlatformFeatures.desktop, textAlign = TextAlign.Center,
         )
     }
 }
@@ -207,13 +233,17 @@ private fun PairRow(edit: ShapeEdit, active: Boolean, onActivate: () -> Unit) {
 @Composable
 private fun CountRow(edit: ShapeEdit, active: Boolean, onActivate: () -> Unit) {
     val top = 8.px
-    val value = edit.values[0].roundToInt().coerceIn(MIN_COUNT, MAX_COUNT)
+    val low = edit.param.countMin
+    val high = edit.param.countMax
+    val value = edit.values[0].roundToInt().coerceIn(low, high)
     Row(Modifier.fillMaxWidth().height(144.px)) {
         Spacer(Modifier.width(8.px))
         LabelTile(edit, active, top, onActivate)
         Spacer(Modifier.width(23.px))
         CountSlider(
             value,
+            low,
+            high,
             onValue = { n ->
                 onActivate()
                 edit.change(0) { n.toFloat() }
@@ -233,27 +263,33 @@ private fun CountRow(edit: ShapeEdit, active: Boolean, onActivate: () -> Unit) {
 private const val MIN_COUNT = 3
 private const val MAX_COUNT = 32
 private const val FIRST_TICK = 24.5f
-private const val TICK_GAP = 14.9f
+private const val TICK_SPAN = 432.1f
 private const val TRACK_LEFT = 21f
 private const val TRACK_RIGHT = 461f
 
+private val ShapeParam.countMin: Int get() = min?.toInt() ?: MIN_COUNT
+private val ShapeParam.countMax: Int get() = max?.toInt() ?: MAX_COUNT
+private val ShapeParam.typedMax: Int get() = max?.toInt() ?: 360
+
 @Composable
-private fun CountSlider(value: Int, onValue: (Int) -> Unit, onEnd: () -> Unit, modifier: Modifier) {
+private fun CountSlider(value: Int, low: Int, high: Int, onValue: (Int) -> Unit, onEnd: () -> Unit, modifier: Modifier) {
     val set by rememberUpdatedState(onValue)
     val ended by rememberUpdatedState(onEnd)
+    val steps = maxOf(high - low, 1)
+    val gap = TICK_SPAN / steps
     Canvas(
         modifier
-            .pointerInput(Unit) {
+            .pointerInput(low, high) {
                 val u = 1.px.toPx()
-                fun valueAt(x: Float) = MIN_COUNT + ((x / u - FIRST_TICK) / TICK_GAP).roundToInt().coerceIn(0, MAX_COUNT - MIN_COUNT)
+                fun valueAt(x: Float) = low + ((x / u - FIRST_TICK) / gap).roundToInt().coerceIn(0, high - low)
                 detectTapGestures {
                     set(valueAt(it.x))
                     ended()
                 }
             }
-            .pointerInput(Unit) {
+            .pointerInput(low, high) {
                 val u = 1.px.toPx()
-                fun valueAt(x: Float) = MIN_COUNT + ((x / u - FIRST_TICK) / TICK_GAP).roundToInt().coerceIn(0, MAX_COUNT - MIN_COUNT)
+                fun valueAt(x: Float) = low + ((x / u - FIRST_TICK) / gap).roundToInt().coerceIn(0, high - low)
                 detectHorizontalDragGestures(onDragStart = { set(valueAt(it.x)) }, onDragEnd = { ended() }, onDragCancel = { ended() }) { change, _ ->
                     change.consume()
                     set(valueAt(change.position.x))
@@ -261,9 +297,9 @@ private fun CountSlider(value: Int, onValue: (Int) -> Unit, onEnd: () -> Unit, m
             },
     ) {
         val u = 1.px.toPx()
-        val knobX = (FIRST_TICK + (value - MIN_COUNT) * TICK_GAP) * u
-        for (i in 0..(MAX_COUNT - MIN_COUNT)) {
-            val x = (FIRST_TICK + i * TICK_GAP) * u
+        val knobX = (FIRST_TICK + (value - low) * gap) * u
+        for (i in 0..steps) {
+            val x = (FIRST_TICK + i * gap) * u
             drawLine(TickGrey, Offset(x, 18 * u), Offset(x, 36 * u), 4 * u)
             drawLine(TickGrey, Offset(x, 108 * u), Offset(x, 126 * u), 4 * u)
         }

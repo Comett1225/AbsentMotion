@@ -72,6 +72,7 @@ internal fun WideEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: 
             EditorTopBar(state, onExit, Modifier.fillMaxWidth().height(42.dp).enterFade().tutorialGuard(any = true))
             Box(Modifier.fillMaxWidth().weight(1f)) {
                 Preview(state, Modifier.fillMaxSize().tutorialTarget("preview"), reserveEnd = reserve)
+                (state.drawing as? app.absentmotion.editor.PointMode)?.let { PointOverlay(state, it, Modifier.fillMaxSize().padding(end = reserve)) }
                 if (!portrait) MasterMeter(state, reserve)
                 Box(Modifier.fillMaxSize().padding(end = reserve)) {
                     Presence(state.previewPanelOpen) { PreviewModePanel(state, Modifier.align(Alignment.CenterEnd).presence(slideX = 0.4f).tutorialGuard(any = true)) }

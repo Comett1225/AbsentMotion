@@ -1832,6 +1832,7 @@ static bool ContainsOne(const std::vector<Layer>& siblings, const Layer& l, doub
     const SkMatrix matrix = SiblingMatrix(siblings, l, timeMs);
     SkMatrix inverse;
     if (!matrix.invert(&inverse)) return false;
+    if (matrix.hasPerspective() && !(inverse.mapPointToHomogeneous(p).fZ > 0)) return false;
     const SkPoint local = inverse.mapPoint(p);
     if (l.kind == "drawing") return DrawingContains(l, local);
     if (l.kind != "embedScene") {
@@ -1875,6 +1876,18 @@ static bool ContentRect(const Layer& l, double timeMs, const SkMatrix& matrix, S
 }
 
 SkRect SelectionBounds(const Layer& layer, double timeMs, const SkMatrix& matrix) {
+    if (matrix.hasPerspective()) {
+        SkPoint corners[4];
+        SelectionBounds(layer, timeMs, SkMatrix::I()).toQuad(corners);
+        for (int i = 0; i < 4; i++) {
+            const SkPoint3 h = matrix.mapPointToHomogeneous(corners[i]);
+            if (!(h.fZ >= 1)) return SkRect::MakeEmpty();
+            corners[i] = {h.fX / h.fZ, h.fY / h.fZ};
+        }
+        SkRect bounds;
+        bounds.setBounds({corners, 4});
+        return bounds.isFinite() ? bounds : SkRect::MakeEmpty();
+    }
     if (layer.kind != "embedScene") return ShapePath(layer, layer.localTime(timeMs)).makeTransform(matrix).getBounds();
     SkRect bounds = SkRect::MakeEmpty();
     ContentRect(layer, timeMs, matrix, &bounds);
@@ -1941,6 +1954,43 @@ SkMatrix WorldMatrix(const Scene& scene, const Layer& layer, double timeMs) {
     const std::vector<Layer>& list = SeenProject(scene, timeMs, &storage);
     for (const Layer& l : list) if (l.id == layer.id) return SiblingMatrix(list, l, timeMs);
     return SiblingMatrix(scene.layers, layer, timeMs);
+}
+
+bool SelectionQuad(const Scene& scene, const Layer& layer, double timeMs, SkPoint corners[4]) {
+    SelectionBounds(layer, timeMs, SkMatrix::I()).toQuad(corners);
+    const SkMatrix m = WorldMatrix(scene, layer, timeMs);
+    if (!m.hasPerspective()) {
+        m.mapPoints({corners, 4});
+        return true;
+    }
+    constexpr float kNear = 1;
+    SkPoint3 h[4], out[4];
+    bool placed[4] = {};
+    for (int i = 0; i < 4; i++) h[i] = m.mapPointToHomogeneous(corners[i]);
+    for (int i = 0; i < 4; i++) {
+        if (h[i].fZ >= kNear) {
+            out[i] = h[i];
+            placed[i] = true;
+            continue;
+        }
+        SkPoint3 sum{0, 0, 0};
+        int n = 0;
+        for (const int j : {(i + 3) % 4, (i + 1) % 4}) {
+            if (h[j].fZ < kNear) continue;
+            sum += h[i] + ((kNear - h[i].fZ) / (h[j].fZ - h[i].fZ)) * (h[j] - h[i]);
+            n++;
+        }
+        if (n > 0) {
+            out[i] = (1.0f / n) * sum;
+            placed[i] = true;
+        }
+    }
+    if (std::none_of(placed, placed + 4, [](bool b) { return b; })) return false;
+    for (int i = 0; i < 4; i++) {
+        if (!placed[i]) out[i] = 0.5f * (out[(i + 3) % 4] + out[(i + 1) % 4]);
+        corners[i] = {out[i].fX / out[i].fZ, out[i].fY / out[i].fZ};
+    }
+    return std::all_of(corners, corners + 4, [](const SkPoint& c) { return c.isFinite(); });
 }
 
 Placement EffectivePlacement(const std::vector<Layer>& siblings, const Layer& layer, double timeMs) {

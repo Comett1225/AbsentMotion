@@ -6,6 +6,32 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [5.0.2] - 2026-11-08
+
+### Added
+
+- Round Corners on every shape, including shapes drawn or edited point by point.
+- Options for the newer shapes: gear teeth, depth, width and hole, heart notch and point, ring thickness and sweep, sun rays, cloud bumps, crown points, ticket holes, arrow and outline thickness and more. They can all be animated, and the less common ones sit behind Advanced.
+- Phone and Panel shapes with border, camera, header, columns and rows.
+- Edit Points on a shape with options turns it into points; Undo brings the options back.
+- Multi-select bar: Trim start, Split and Trim end next to the move-to-playhead button.
+
+### Changed
+
+- Edit Points and Pen Tool open inside the editor: the top bar, the play bar and the timeline stay and only the bottom panel changes; the preview keeps its size.
+- Dragging a point trails the finger a little and hides the other point markers while it moves, like Alight Motion.
+- The effects actions of the multi-select bar moved into its More menu; Stretch Timing stays in the clip's long-press menu.
+
+### Fixed
+
+- Pinching several selected layers follows the fingers and stays put when you let go.
+- Desktop: the Transform inspector showed only Rotate; all six tabs show again. Cut-off captions and labels, blank names of unnamed layers and stretched Crop rows are fixed, and a layout test now checks every panel at four window sizes.
+- Windows: overlay, multiply, hard-light, darken and soft-light blending drew hard diagonal blocks in the preview on Vulkan graphics when the view was not on whole pixels.
+- Tilted layers: the selection frame no longer stretches into a long band, tapping beyond a tilted layer does not select it, Align, Distribute, Fit and Group no longer throw it far away, and point markers and motion path dots are not mirrored behind the camera.
+- Parent chains longer than 16 layers are placed the same way by the editor and the engine.
+- Project packages no longer report the app's own shape attributes as unknown parts, a medium named like the import marker is not deleted, and 3D model file names stay valid on Windows.
+- Phone and Panel line up with the other shapes on the last page of the shape menu; the zoom button is hidden where the view is fixed.
+
 ## [5.0.1] - 2026-11-08
 
 ### Added

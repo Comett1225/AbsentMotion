@@ -16,7 +16,10 @@ import app.absentmotion.model.Layer
 import app.absentmotion.model.Pt
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
+import app.absentmotion.model.asPoints
+import app.absentmotion.model.outlineShape
 import app.absentmotion.model.contours
+import app.absentmotion.model.pointsLoseAnimation
 import app.absentmotion.model.formatColor
 import app.absentmotion.model.formatFloats
 import app.absentmotion.model.parseSvgPath
@@ -71,8 +74,10 @@ class PointMode(layerId: Long, created: Boolean, val vector: Boolean) : DrawingM
 
     var previewScale by mutableFloatStateOf(1f)
 
+    var holding by mutableStateOf(false)
+
     override val handlesCode: Int
-        get() = app.absentmotion.model.POINT_EDIT or (contour.coerceIn(0, 127) shl 20) or (point.coerceIn(0, 0xffff) shl 4) or handle.ordinal
+        get() = app.absentmotion.model.POINT_EDIT or (contour.coerceIn(0, 127) shl 20) or (point.coerceIn(0, 0xffff) shl 4) or (if (holding) 8 else 0) or handle.ordinal
 }
 
 private fun EditorState.newLayer(name: String, tag: String, fill: String, color: Int, children: List<XmlNode>): Layer {
@@ -135,7 +140,7 @@ fun EditorState.leaveDrawing() {
     }
     if (mode.created && empty && layer != null) {
         if (!forgetEdit(mode.added)) edit { it.remove(mode.layerId) }
-        selectedId = null
+        if (selectedId == mode.layerId) selectedId = null
     }
     if (mode is TrackMode) {
         mode.job?.cancel()
@@ -144,9 +149,31 @@ fun EditorState.leaveDrawing() {
     panel = EditorPanel.Tools
 }
 
+fun EditorState.convertToPoints(): Boolean {
+    val id = selectedId ?: return false
+    val layer = selected ?: return false
+    if (layer.kind != "shape" || layer.shape.isEmpty() && layer.outlineShape == null) return false
+    val before = scene
+    edit { s -> s.update(id, sampleMs) { it.asPoints() ?: it } }
+    return scene.node !== before.node
+}
+
+fun EditorState.requestPoints(enter: Boolean) {
+    val layer = selected ?: return
+    val run = {
+        convertToPoints()
+        if (enter) editPoints()
+    }
+    if (layer.pointsLoseAnimation) pointsAsk = run else run()
+}
+
 suspend fun EditorState.convertToOutline() {
     val layer = selected ?: return
-    if (layer.kind != "text" && !(layer.kind == "shape" && layer.shape.isNotEmpty())) return
+    if (layer.kind == "shape") {
+        requestPoints(enter = false)
+        return
+    }
+    if (layer.kind != "text") return
     val document = scene
     val svg = engine.layerOutline(layer.id, timeMs) ?: return
     if (scene != document) return
@@ -170,7 +197,7 @@ fun Scene.worldMatrix(id: Long, timeMs: Int): Matrix? {
     fun effective(l: Layer, depth: Int): FloatArray {
         val c = floatArrayOf(l.location[0], l.location[1], l.pivot[0], l.pivot[1], l.scale[0], l.scale[1], l.transform("rotation", 0f)[0])
         val parent = l.node["parent"]?.toLongOrNull()?.takeIf { it != l.id }?.let { layerAt(it, timeMs) }
-        if (parent == null || depth > 16) return c
+        if (parent == null || depth >= 16) return c
         val p = effective(parent, depth + 1)
         val vx = (c[0] + c[2] - p[2]) * p[4]
         val vy = (c[1] + c[3] - p[3]) * p[5]
@@ -195,6 +222,12 @@ fun Scene.worldMatrix(id: Long, timeMs: Int): Matrix? {
 }
 
 internal fun Matrix.map(p: Pt): Pt = floatArrayOf(p.x, p.y).also { mapPoints(it) }.let { Pt(it[0], it[1]) }
+
+internal fun FloatArray.projected(p: Pt): Pt? {
+    val w = this[6] * p.x + this[7] * p.y + this[8]
+    if (!(w > 0f)) return null
+    return Pt((this[0] * p.x + this[1] * p.y + this[2]) / w, (this[3] * p.x + this[4] * p.y + this[5]) / w).takeIf { it.x.isFinite() && it.y.isFinite() }
+}
 
 internal fun Matrix.unmapVector(v: Pt): Pt {
     val inverse = Matrix()

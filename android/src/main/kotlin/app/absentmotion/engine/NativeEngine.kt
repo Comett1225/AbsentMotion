@@ -110,6 +110,8 @@ class NativeEngine(backend: Backend) : AutoCloseable {
 
         fun fastCaptionCpu(): Boolean = nativeFastCaptionCpu()
 
+        fun shapeOutline(scene: String, t: Float, rounded: Boolean): String? = nativeShapeOutline(scene.toByteArray(), t, rounded)
+
         fun vulkanDevice(): String? = nativeVulkanDevice()
 
         fun usePipelineCache(cacheDir: java.io.File, version: Int) {
@@ -124,6 +126,7 @@ class NativeEngine(backend: Backend) : AutoCloseable {
         }
 
         @JvmStatic private external fun nativeCreate(backend: Int): Long
+        @JvmStatic private external fun nativeShapeOutline(scene: ByteArray, t: Float, rounded: Boolean): String?
         @JvmStatic private external fun nativeSetPipelineDir(dir: String)
         @JvmStatic private external fun nativeDestroy(engine: Long)
         @JvmStatic private external fun nativeInfo(engine: Long): String

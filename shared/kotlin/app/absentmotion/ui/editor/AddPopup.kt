@@ -145,7 +145,7 @@ private fun ShapePages(state: EditorState, modifier: Modifier) = androidx.compos
     val pages = ShapeCatalog.all.chunked(rows * columns)
     val pager = rememberPagerState { pages.size }
     Box(Modifier.fillMaxSize()) {
-        HorizontalPager(pager, Modifier.fillMaxSize(), beyondViewportPageCount = 1) { page ->
+        HorizontalPager(pager, Modifier.fillMaxSize(), beyondViewportPageCount = 1, verticalAlignment = Alignment.Top) { page ->
             Column(Modifier.padding(start = 9.6.dp, top = 8.9.dp)) {
                 for (row in pages[page].chunked(columns)) {
                     Row {

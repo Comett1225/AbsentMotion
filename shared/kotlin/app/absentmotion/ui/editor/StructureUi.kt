@@ -36,6 +36,9 @@ import app.absentmotion.editor.alignClipTimes
 import app.absentmotion.editor.moveClipEdges
 import app.absentmotion.editor.split
 import app.absentmotion.model.canSplitAt
+import app.absentmotion.model.trimEndAt
+import app.absentmotion.model.trimStartAt
+import app.absentmotion.editor.trimChosen
 import app.absentmotion.model.cutBetween
 import app.absentmotion.model.shownName
 import androidx.compose.runtime.Composable
@@ -290,48 +293,29 @@ internal fun MultiBar(state: EditorState, modifier: Modifier) {
     val cuts = if (layers.size == 2) listOfNotNull(cut?.let { it.first.id to it.second.id }) else state.scene.selectedCuts(layers.map { it.id }.toSet())
     var transition by remember { mutableStateOf<List<Pair<Long, Long>>?>(null) }
     var animation by remember { mutableStateOf<Set<Long>?>(null) }
-    var stretch by remember { mutableStateOf<Set<Long>?>(null) }
     transition?.let { TransitionSheet(state, it) { transition = null } }
     animation?.let { AnimationSheet(state, it) { animation = null } }
-    stretch?.let { StretchSheet(state, it) { stretch = null } }
     Row(modifier.padding(6.dp).clip(RoundedCornerShape(3.dp)).background(Am.PanelInset), verticalAlignment = Alignment.CenterVertically) {
         val end = layers.isNotEmpty() && state.timeMs >= layers.maxOf { it.endTime }
         val context = LocalContext.current
         val copied = EffectClipboard.effects
-        var effectsMenu by remember { mutableStateOf(false) }
-        Box(Modifier.width(60.dp).fillMaxHeight()) {
-            BarButton(PanelIcons.Effects, stringResource(R.string.layer_tool_effects), Modifier.fillMaxSize(), layers.isNotEmpty()) { effectsMenu = true }
-            Presence(effectsMenu) {
-                MenuPopup(AboveLeft, { effectsMenu = false }, TransformOrigin(0f, 1f)) {
+        var moreMenu by remember { mutableStateOf(false) }
+        Box(Modifier.width(40.dp).fillMaxHeight()) {
+            BarButton(PanelIcons.More, stringResource(R.string.structure_more_actions), Modifier.fillMaxSize(), layers.isNotEmpty()) { moreMenu = true }
+            Presence(moreMenu) {
+                MenuPopup(AboveLeft, { moreMenu = false }, TransformOrigin(0f, 1f)) {
                     val note = if (copied.isEmpty()) stringResource(R.string.effects_none_copied)
                         else pluralStringResource(R.plurals.effects_count, copied.size, copied.size.toString())
                     MenuRow(stringResource(R.string.effects_add_to_all)) {
-                        effectsMenu = false
+                        moreMenu = false
                         state.playing = false
                         state.effectCategory = null
                         state.effectTargets = layers.map { it.id }.toSet()
                         state.effectBrowserOpen = true
                     }
                     MenuRow(stringResource(R.string.effects_paste_all), enabled = copied.isNotEmpty(), subText = note) {
-                        effectsMenu = false
+                        moreMenu = false
                         pasteEffectsOnSelection(state, context)
-                    }
-                }
-            }
-        }
-        var moreMenu by remember { mutableStateOf(false) }
-        Box(Modifier.width(48.dp).fillMaxHeight()) {
-            BarButton(PanelIcons.More, stringResource(R.string.structure_more_actions), Modifier.fillMaxSize(), layers.isNotEmpty()) { moreMenu = true }
-            Presence(moreMenu) {
-                MenuPopup(AboveLeft, { moreMenu = false }, TransformOrigin(0f, 1f)) {
-                    MenuRow(stringResource(R.string.timeline_split), layers.any { state.scene.canSplitAt(it, state.frame) }) {
-                        moreMenu = false
-                        state.split()
-                    }
-                    MenuRow(stringResource(R.string.multi_stretch_timing), layers.any { it.endTime > it.startTime }) {
-                        moreMenu = false
-                        state.playing = false
-                        stretch = layers.map { it.id }.toSet()
                     }
                     MenuRow(stringResource(R.string.multi_animation)) {
                         moreMenu = false
@@ -362,11 +346,14 @@ internal fun MultiBar(state: EditorState, modifier: Modifier) {
                 }
             }
         }
-        BarButton(if (end) ChromeIcons.SkipForward else ChromeIcons.SkipBack, stringResource(if (end) R.string.structure_move_ends else R.string.structure_move_starts), Modifier.width(60.dp).fillMaxHeight(), layers.isNotEmpty()) {
+        BarButton(if (end) ChromeIcons.SkipForward else ChromeIcons.SkipBack, stringResource(if (end) R.string.structure_move_ends else R.string.structure_move_starts), Modifier.width(40.dp).fillMaxHeight(), layers.isNotEmpty()) {
             state.moveClipEdges(end, false)
         }
+        BarButton(PanelIcons.TrimLeft, stringResource(R.string.a11y_trim_start), Modifier.width(40.dp).fillMaxHeight(), layers.any { state.scene.trimStartAt(it, state.frame) != null }) { state.trimChosen(true) }
+        BarButton(PanelIcons.Split, stringResource(R.string.timeline_split), Modifier.width(40.dp).fillMaxHeight(), layers.any { state.scene.canSplitAt(it, state.frame) }) { state.split() }
+        BarButton(PanelIcons.TrimRight, stringResource(R.string.a11y_trim_end), Modifier.width(40.dp).fillMaxHeight(), layers.any { state.scene.trimEndAt(it, state.frame) != null }) { state.trimChosen(false) }
         Spacer(Modifier.weight(1f))
-        BarButton(ChromeIcons.Transition, stringResource(R.string.transition_add_between), Modifier.width(48.dp).fillMaxHeight().alpha(if (cuts.isNotEmpty()) 1f else DimAlpha)) {
+        BarButton(ChromeIcons.Transition, stringResource(R.string.transition_add_between), Modifier.width(40.dp).fillMaxHeight().alpha(if (cuts.isNotEmpty()) 1f else DimAlpha)) {
             if (cuts.isNotEmpty()) { state.playing = false; transition = cuts }
             else Toast.makeText(context, context.getString(when {
                 layers.size > 2 -> R.string.multi_no_cut
@@ -376,9 +363,9 @@ internal fun MultiBar(state: EditorState, modifier: Modifier) {
             }), Toast.LENGTH_LONG).show()
         }
         Spacer(Modifier.weight(1f))
-        BarButton(SelectionIcons.Align[0], stringResource(R.string.structure_align_starts), Modifier.width(40.dp).fillMaxHeight(), layers.size > 1) { state.alignClipTimes(0) }
-        BarButton(SelectionIcons.DistributeHorizontal, stringResource(R.string.structure_distribute_starts), Modifier.width(40.dp).fillMaxHeight(), layers.size > 2) { state.alignClipTimes(1) }
-        BarButton(SelectionIcons.Align[2], stringResource(R.string.structure_align_ends), Modifier.width(40.dp).fillMaxHeight(), layers.size > 1) { state.alignClipTimes(2) }
+        BarButton(SelectionIcons.Align[0], stringResource(R.string.structure_align_starts), Modifier.width(36.dp).fillMaxHeight(), layers.size > 1) { state.alignClipTimes(0) }
+        BarButton(SelectionIcons.DistributeHorizontal, stringResource(R.string.structure_distribute_starts), Modifier.width(36.dp).fillMaxHeight(), layers.size > 2) { state.alignClipTimes(1) }
+        BarButton(SelectionIcons.Align[2], stringResource(R.string.structure_align_ends), Modifier.width(36.dp).fillMaxHeight(), layers.size > 1) { state.alignClipTimes(2) }
     }
 }
 

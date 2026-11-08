@@ -19,6 +19,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -94,7 +95,7 @@ internal fun NumberBox(
 @Composable
 internal fun Caption(text: String, modifier: Modifier = Modifier) {
     Box(modifier, contentAlignment = Alignment.Center) {
-        Text(text, color = PanelCaption, fontSize = deskSp(6f), maxLines = 1, softWrap = false)
+        Text(text, Modifier.wrapContentHeight(unbounded = true), color = PanelCaption, fontSize = deskSp(6f), maxLines = 1, softWrap = false)
     }
 }
 

@@ -169,7 +169,7 @@ object Backup {
         }
         try {
             ZipInputStream(counted.buffered()).use { zip ->
-                val first = zip.nextEntry
+                val first = try { zip.nextEntry } catch (e: IllegalArgumentException) { throw ImportFailed(txt(R.string.library_err_malformed_package, e.message.toString())) }
                 val head = if (first?.name == MARKER) zip.readAtMost(4096).toString(Charsets.UTF_8).lines() else emptyList()
                 if (head.firstOrNull() != FORMAT) throw ImportFailed(txt(R.string.library_err_not_backup))
                 oldRoot = head.getOrNull(1).orEmpty().trim()
@@ -255,7 +255,7 @@ object Backup {
                 }
                 while (true) {
                     body.drain()
-                    val entry = zip.nextEntry ?: break
+                    val entry = (try { zip.nextEntry } catch (e: IllegalArgumentException) { throw ImportFailed(txt(R.string.library_err_malformed_package, e.message.toString())) }) ?: break
                     if (++entries > MAX_ENTRIES) throw ImportFailed(txt(R.string.library_err_too_many_files, MAX_ENTRIES.toString()))
                     val parts = entry.name.replace('\\', '/').split('/')
                     if (entry.isDirectory || !parts.all(::safeSegment)) continue

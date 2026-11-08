@@ -93,7 +93,7 @@ internal fun SearchField(
                 }
             },
         )
-        Box(Modifier.size(32.dp).then(if (!clearable) Modifier else Modifier.clickable {
+        Box(Modifier.size(if (!clearable && app.absentmotion.platform.PlatformFeatures.desktop) 8.dp else 32.dp).then(if (!clearable) Modifier else Modifier.clickable {
             onChange("")
             if (onClose != null) onClose() else { requester.requestFocus(); keyboard?.show() }
         }), Alignment.Center) {

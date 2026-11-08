@@ -315,7 +315,7 @@ fun Timeline(state: EditorState, modifier: Modifier = Modifier) {
     if (PlatformFeatures.desktop) LaunchedEffect(view) {
         snapshotFlow { state.frame to state.playing }.collect { (_, playing) -> if (playing) view.pagePlayback() else view.revealPlayhead() }
     }
-    if (PlatformFeatures.desktop) app.absentmotion.platform.BackHandler(view.desktopDragging || state.selectedId != null || MultiSelect.active) {
+    if (PlatformFeatures.desktop) app.absentmotion.platform.BackHandler(view.desktopDragging || (state.drawing !is app.absentmotion.editor.PointMode && (state.selectedId != null || MultiSelect.active))) {
         if (!view.cancelDesktopDrag()) state.clearSelection()
     }
     if (PlatformFeatures.desktop) app.absentmotion.platform.BackHandler(view.menuAt != null) { view.menuAt = null }

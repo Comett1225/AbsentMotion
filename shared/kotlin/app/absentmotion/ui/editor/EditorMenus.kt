@@ -44,6 +44,7 @@ import app.absentmotion.editor.MultiSelect
 import app.absentmotion.editor.openCrop
 import app.absentmotion.editor.keepCopy
 import app.absentmotion.model.replaceMedia
+import app.absentmotion.model.outlineShape
 import app.absentmotion.audio.soundUri
 import app.absentmotion.editor.canClip
 import app.absentmotion.editor.markBeatsNote
@@ -216,7 +217,7 @@ internal fun LayerMenu(state: EditorState, onDismiss: () -> Unit) {
                 onDismiss()
             }
             if (group) MenuRow(stringResource(R.string.layer_tool_ungroup), divider = true) { onDismiss(); state.askUngroup() }
-            MenuRow(stringResource(R.string.menu_convert_to_outline), enabled = state.selected?.let { it.kind == "text" || (it.kind == "shape" && it.shape.isNotEmpty()) } == true) {
+            MenuRow(stringResource(R.string.menu_convert_to_outline), enabled = state.selected?.let { it.kind == "text" || (it.kind == "shape" && (it.shape.isNotEmpty() || it.outlineShape != null)) } == true) {
                 scope.launch { state.convertToOutline(); onDismiss() }
             }
         }

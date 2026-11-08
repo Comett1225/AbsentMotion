@@ -67,11 +67,7 @@ private val Bar get() = Am.Button
 internal fun DrawingEditor(state: EditorState) {
     val mode = state.drawing ?: return
     BackHandler { state.leaveDrawing() }
-    LaunchedEffect(mode.layerId) { state.playing = false }
-    val gone = state.scene.layer(mode.layerId) == null
-    LaunchedEffect(gone) { if (gone) state.drawing = null }
-    DisposableEffect(mode) { onDispose { state.endGesture() } }
-    LaunchedEffect(mode, state.scene, state.cameraMode) { snapshotFlow { state.timeMs }.collectLatest { mode.seen = state.engine.layerMatrix(mode.layerId, it) } }
+    DrawingSession(state, mode)
     Column(Modifier.fillMaxSize().background(Am.TopBar).systemBarsPadding()) {
         DrawingBar(state, mode, Modifier.fillMaxWidth().height(42.dp).enterFade())
         Box(Modifier.fillMaxWidth().weight(1f)) {
@@ -89,6 +85,49 @@ internal fun DrawingEditor(state: EditorState) {
                 is PointMode -> PointPanel(state, mode)
                 is TrackMode -> TrackPanel(state, mode)
             }
+        }
+    }
+}
+
+@Composable
+internal fun DrawingSession(state: EditorState, mode: DrawingMode) {
+    LaunchedEffect(mode.layerId) { state.playing = false }
+    val gone = state.scene.layer(mode.layerId) == null
+    LaunchedEffect(gone) { if (gone) state.drawing = null }
+    DisposableEffect(mode) { onDispose { state.endGesture() } }
+    LaunchedEffect(mode, state.scene, state.cameraMode) { snapshotFlow { state.timeMs }.collectLatest { mode.seen = state.engine.layerMatrix(mode.layerId, it) } }
+}
+
+@Composable
+internal fun PointSession(state: EditorState) {
+    val mode = state.drawing as? PointMode ?: return
+    DrawingSession(state, mode)
+    LaunchedEffect(mode, state.selectedId) { if (state.selectedId != mode.layerId) state.leaveDrawing() }
+}
+
+@Composable
+internal fun PointTopBar(state: EditorState, mode: PointMode, modifier: Modifier) {
+    val cell = Modifier.width(40.dp).fillMaxHeight()
+    val layer = state.scene.layer(mode.layerId)
+    val first = layer?.let { state.scene.firstShownFrame(it.startTime) } ?: 0
+    val last = layer?.let { state.scene.lastShownFrame(it.endTime) } ?: 0
+    val keys = state.shapeKeyFrames(mode)
+    val on = state.frame in keys
+    Row(modifier.background(Am.Button), verticalAlignment = Alignment.CenterVertically) {
+        BarButton(ChromeIcons.Back, stringResource(R.string.draw_back), cell) { state.leaveDrawing() }
+        Text(
+            stringResource(if (mode.vector) R.string.add_quick_pen_tool else R.string.draw_title_edit_points),
+            Modifier.weight(1f), color = Am.OnDark, fontSize = 15.sp, maxLines = 1,
+        )
+        BarButton(ChromeIcons.SkipBack, stringResource(R.string.draw_previous_shape_keyframe), cell, enabled = keys.any { it < state.frame }) {
+            keys.lastOrNull { it < state.frame }?.let { if (first <= last) state.frame = it.coerceIn(first, last) }
+        }
+        BarButton(ChromeIcons.SkipForward, stringResource(R.string.draw_next_shape_keyframe), cell, enabled = keys.any { it > state.frame }) {
+            keys.firstOrNull { it > state.frame }?.let { if (first <= last) state.frame = it.coerceIn(first, last) }
+        }
+        Box(cell.clickable { state.toggleShapeKey(mode) }, Alignment.Center) {
+            Icon(if (on) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, stringResource(if (on) R.string.draw_remove_shape_keyframe else R.string.draw_add_shape_keyframe),
+                Modifier.size(26.dp), tint = if (keys.isNotEmpty()) Am.Accent else Am.OnDark)
         }
     }
 }
