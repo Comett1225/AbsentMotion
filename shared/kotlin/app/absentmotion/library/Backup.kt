@@ -41,14 +41,14 @@ object Backup {
     }
 
     fun write(root: File, out: OutputStream, includeMedia: Boolean, ai: File? = null, progress: (done: Long, total: Long) -> Unit = { _, _ -> }) =
-        writeFiles(root, files(root, includeMedia, ai), out, progress)
+        writeFiles(root, files(root, includeMedia, ai), out, progress, ai.takeIf { includeMedia })
 
-    internal fun writeFiles(root: File, files: List<Pair<String, File>>, out: OutputStream, progress: (done: Long, total: Long) -> Unit = { _, _ -> }) {
+    internal fun writeFiles(root: File, files: List<Pair<String, File>>, out: OutputStream, progress: (done: Long, total: Long) -> Unit = { _, _ -> }, ai: File? = null) {
         val total = files.sumOf { it.second.length() }.coerceAtLeast(1)
         var done = 0L
         ZipOutputStream(out.buffered()).use { zip ->
             zip.putNextEntry(ZipEntry(MARKER))
-            zip.write("$FORMAT\n${rootUri(root)}\n".toByteArray())
+            zip.write("$FORMAT\n${rootUri(root)}\n${ai?.let(::rootUri).orEmpty()}\n".toByteArray())
             zip.closeEntry()
             val buffer = ByteArray(64 * 1024)
             for ((name, file) in files) {
@@ -76,6 +76,8 @@ object Backup {
         val rejected = HashSet<String>()
         val scenes = HashSet<String>()
         val early = HashSet<String>()
+        val unsure = LinkedHashMap<String, File>()
+        val parked = ArrayList<Pair<List<String>, File>>()
         val waiting = ArrayList<Pair<String, File>>()
         val ready = ArrayList<Pair<String, File>>()
         val staged = ArrayList<File>()
@@ -87,14 +89,18 @@ object Backup {
         val held = HashMap<String, Boolean>()
         var added = 0
         var oldRoot = ""
+        var oldAi = ""
         var read = 0L
         val counted = object : FilterInputStream(input) {
             override fun read(): Int = super.read().also { if (it >= 0) progress(++read) }
             override fun read(b: ByteArray, off: Int, len: Int): Int = super.read(b, off, len).also { if (it > 0) { read += it; progress(read) } }
         }
-        fun moved(text: String): String = if (oldRoot.isEmpty()) text else Regex(Regex.escape(oldRoot) + "(?:media/([^/\"<>]+)/|templates/)").replace(text) {
-            val id = it.groupValues[1]
-            rootUri(root) + if (id.isEmpty()) "templates/" else "media/" + (renamed[id] ?: id) + "/"
+        fun moved(text: String): String {
+            val inside = if (oldRoot.isEmpty()) text else fileUris(oldRoot, "(?:media/([^/\"<>]+)/|templates/)").replace(text) {
+                val id = it.groupValues[2]
+                sameForm(it, root) + if (id.isEmpty()) "templates/" else "media/" + (renamed[id] ?: id) + "/"
+            }
+            return if (oldAi.isEmpty() || ai == null) inside else fileUris(oldAi, "").replace(inside) { sameForm(it, ai) }
         }
         fun remap(text: String, defuse: Boolean = true): String {
             val moved = moved(text)
@@ -112,19 +118,19 @@ object Backup {
             if (id in early) throw ImportFailed(txt(R.string.library_err_backup_changed))
             renamed[id] = freshId(id)
         }
-        fun settle() {
-            val same = ArrayList<Pair<String, File>>()
+        fun settle(final: Boolean) {
             for ((id, text) in waiting) {
                 val local = File(projects, "$id.xml")
                 if (local.exists()) {
-                    if (runCatching { sameScene(local.readText(), moved(text.readText())) }.getOrDefault(false)) { same += id to text; continue }
+                    if (runCatching { sameScene(local.readText(), moved(text.readText())) }.getOrDefault(false)) { unsure[id] = text; continue }
                     rename(id)
                 }
                 ready += id to text
             }
+            waiting.clear()
             do {
                 var changed = false
-                val iterator = same.iterator()
+                val iterator = unsure.iterator()
                 while (iterator.hasNext()) {
                     val (id, text) = iterator.next()
                     if (runCatching { sameScene(File(projects, "$id.xml").readText(), remap(text.readText(), defuse = false)) }.getOrDefault(false)) continue
@@ -134,8 +140,17 @@ object Backup {
                     changed = true
                 }
             } while (changed)
-            skipped += same.map { it.first }
-            waiting.clear()
+            val nodes = unsure.mapValues { (_, text) -> runCatching { Scene.parse(text.readText()).node }.getOrNull() }
+            val open = if (final) HashSet() else nodes.filterValues { node ->
+                node?.values("font")?.any { font -> font.removePrefix("imported?name=").let { it != font && safeSegment(it) && File(root, "fonts/imported/$it").exists() } } == true
+            }.keys.toHashSet()
+            do {
+                val links = open.map(store::linkOf).toSet()
+                val more = nodes.filter { (id, node) -> id !in open && node?.values("link")?.any(links::contains) == true }.keys
+                open += more
+            } while (more.isNotEmpty())
+            skipped += unsure.keys - open
+            unsure.keys.retainAll(open)
         }
         fun makeDirs(dir: File) {
             val missing = generateSequence(dir) { it.parentFile }.takeWhile { !it.exists() }.toList()
@@ -158,6 +173,7 @@ object Backup {
                 val head = if (first?.name == MARKER) zip.readAtMost(4096).toString(Charsets.UTF_8).lines() else emptyList()
                 if (head.firstOrNull() != FORMAT) throw ImportFailed(txt(R.string.library_err_not_backup))
                 oldRoot = head.getOrNull(1).orEmpty().trim()
+                oldAi = head.getOrNull(2).orEmpty().trim()
                 var unpacked = 0L
                 var entries = 0
                 fun charge(n: Int) {
@@ -168,6 +184,74 @@ object Backup {
                 val body = object : InputStream() {
                     override fun read(): Int = zip.read().also { if (it >= 0) charge(1) }
                     override fun read(b: ByteArray, off: Int, len: Int): Int = zip.read(b, off, len).also { if (it > 0) charge(it) }
+                }
+                fun place(parts: List<String>, input: InputStream) {
+                    if (parts.size == 1 && parts[0] == PaletteLibrary.FILE) {
+                        PaletteLibrary.at(root).merge(readText(input))
+                        return
+                    }
+                    fun known(id: String) = id.takeIf { ProjectId.matches(it) && it !in rejected }
+                    val target = when {
+                        parts.size == 2 && parts[0] == "projects" && parts[1].endsWith(".png") ->
+                            known(parts[1].removeSuffix(".png"))?.takeIf { it !in skipped }?.let { File(projects, (renamed[it] ?: it) + ".png") }
+                        parts.size == 4 && parts[0] == "projects" && parts[1] == "versions" && VersionFile.matches(parts[3]) ->
+                            known(parts[2])?.let { File(projects, "versions/${renamed[it] ?: it}/${parts[3]}") }
+                        parts.size >= 3 && parts[0] == "media" -> known(parts[1])?.let { File(root, "media/${renamed[it] ?: it}/" + parts.drop(2).joinToString("/")) }
+                        parts.size >= 3 && parts[0] == "templates" -> known(parts[1])?.let { id ->
+                            if (held.getOrPut(id) { File(root, "templates/$id/scene.xml").exists() }) File(staging, parts.drop(1).joinToString("/"))
+                            else File(root, parts.joinToString("/"))
+                        }
+                        parts.size == 2 && parts[0] == "presets" && parts[1].endsWith(".xml") -> File(root, "presets/${parts[1]}")
+                        parts.size == 3 && parts[0] == "fonts" && parts[1] == "imported" -> File(root, "fonts/imported/${parts[2]}")
+                        parts.size == 2 && parts[0] == "ai" -> ai?.let { File(it, parts[1]) }
+                        else -> null
+                    } ?: return
+                    when {
+                        parts[0] == "media" -> parts[1]
+                        parts[0] == "projects" && parts[1] == "versions" -> parts[2]
+                        parts[0] == "projects" -> parts[1].removeSuffix(".png")
+                        else -> null
+                    }?.also { if (it !in scenes) early += it }?.takeIf { it in unsure }?.let {
+                        val file = File.createTempFile("restore-", ".part", projects).also { f -> staged += f }
+                        file.outputStream().use { out -> input.copyTo(out) }
+                        parked += parts to file
+                        return
+                    }
+                    val font = parts[0] == "fonts"
+                    val preset = parts[0] == "presets"
+                    if (target.exists() && !font && !preset) return
+                    makeDirs(target.parentFile!!)
+                    val text = target.extension == "xml" && when (parts[0]) { "media" -> false; "templates" -> parts.size == 3; else -> true }
+                    if (text) {
+                        val content = remap(readText(input))
+                        var place = target
+                        if (preset && target.exists()) {
+                            if (target.parentFile!!.listFiles { f -> f.extension == "xml" }.orEmpty().any { f -> runCatching { sameScene(f.readText(), content) }.getOrDefault(false) }) return
+                            place = generateSequence { File(target.parentFile, "${UUID.randomUUID()}.xml") }.first { !it.exists() }
+                        }
+                        created += place
+                        texts += place
+                        writeAtomically(place, content)
+                    } else {
+                        val part = File(target.parentFile, target.name + ".part")
+                        try {
+                            part.outputStream().use { input.copyTo(it); it.fd.sync() }
+                            var place = target
+                            if (font && target.exists()) {
+                                if (target.length() == part.length() && target.readBytes().contentEquals(part.readBytes())) {
+                                    part.delete()
+                                    return
+                                }
+                                place = generateSequence(1) { it + 1 }.map { File(target.parentFile, "${target.nameWithoutExtension}-$it.${target.extension}") }.first { !it.exists() }
+                                fonts["imported?name=${target.name}"] = "imported?name=${place.name}"
+                            }
+                            if (!part.renameTo(place)) throw java.io.IOException("Cannot restore ${place.name}")
+                            created += place
+                        } catch (t: Throwable) {
+                            part.delete()
+                            throw t
+                        }
+                    }
                 }
                 while (true) {
                     body.drain()
@@ -189,75 +273,16 @@ object Backup {
                         }
                         continue
                     }
-                    if (waiting.isNotEmpty()) settle()
-                    if (parts.size == 1 && parts[0] == PaletteLibrary.FILE) {
-                        PaletteLibrary.at(root).merge(readText(body))
-                        continue
-                    }
-                    fun known(id: String) = id.takeIf { ProjectId.matches(it) && it !in rejected }
-                    val target = when {
-                        parts.size == 2 && parts[0] == "projects" && parts[1].endsWith(".png") ->
-                            known(parts[1].removeSuffix(".png"))?.takeIf { it !in skipped }?.let { File(projects, (renamed[it] ?: it) + ".png") }
-                        parts.size == 4 && parts[0] == "projects" && parts[1] == "versions" && VersionFile.matches(parts[3]) ->
-                            known(parts[2])?.let { File(projects, "versions/${renamed[it] ?: it}/${parts[3]}") }
-                        parts.size >= 3 && parts[0] == "media" -> known(parts[1])?.let { File(root, "media/${renamed[it] ?: it}/" + parts.drop(2).joinToString("/")) }
-                        parts.size >= 3 && parts[0] == "templates" -> known(parts[1])?.let { id ->
-                            if (held.getOrPut(id) { File(root, "templates/$id/scene.xml").exists() }) File(staging, parts.drop(1).joinToString("/"))
-                            else File(root, parts.joinToString("/"))
-                        }
-                        parts.size == 2 && parts[0] == "presets" && parts[1].endsWith(".xml") -> File(root, "presets/${parts[1]}")
-                        parts.size == 3 && parts[0] == "fonts" && parts[1] == "imported" -> File(root, "fonts/imported/${parts[2]}")
-                        parts.size == 2 && parts[0] == "ai" -> ai?.let { File(it, parts[1]) }
-                        else -> null
-                    } ?: continue
-                    when {
-                        parts[0] == "media" -> parts[1]
-                        parts[0] == "projects" && parts[1] == "versions" -> parts[2]
-                        parts[0] == "projects" -> parts[1].removeSuffix(".png")
-                        else -> null
-                    }?.takeIf { it !in scenes }?.let(early::add)
-                    val font = parts[0] == "fonts"
-                    val preset = parts[0] == "presets"
-                    if (target.exists() && !font && !preset) continue
-                    makeDirs(target.parentFile!!)
-                    val text = target.extension == "xml" && when (parts[0]) { "media" -> false; "templates" -> parts.size == 3; else -> true }
-                    if (text) {
-                        val content = remap(readText(body))
-                        var place = target
-                        if (preset && target.exists()) {
-                            if (target.parentFile!!.listFiles { f -> f.extension == "xml" }.orEmpty().any { f -> runCatching { sameScene(f.readText(), content) }.getOrDefault(false) }) continue
-                            place = generateSequence { File(target.parentFile, "${UUID.randomUUID()}.xml") }.first { !it.exists() }
-                        }
-                        created += place
-                        texts += place
-                        writeAtomically(place, content)
-                    } else {
-                        val part = File(target.parentFile, target.name + ".part")
-                        try {
-                            part.outputStream().use { body.copyTo(it); it.fd.sync() }
-                            var place = target
-                            if (font && target.exists()) {
-                                if (target.length() == part.length() && target.readBytes().contentEquals(part.readBytes())) {
-                                    part.delete()
-                                    continue
-                                }
-                                place = generateSequence(1) { it + 1 }.map { File(target.parentFile, "${target.nameWithoutExtension}-$it.${target.extension}") }.first { !it.exists() }
-                                fonts["imported?name=${target.name}"] = "imported?name=${place.name}"
-                            }
-                            if (!part.renameTo(place)) throw java.io.IOException("Cannot restore ${place.name}")
-                            created += place
-                        } catch (t: Throwable) {
-                            part.delete()
-                            throw t
-                        }
-                    }
+                    if (waiting.isNotEmpty()) settle(final = false)
+                    place(parts, body)
                 }
-                if (waiting.isNotEmpty()) settle()
+                settle(final = true)
                 if (fonts.isNotEmpty()) for (file in texts) {
                     val node = runCatching { Scene.parse(file.readText()).node }.getOrNull() ?: continue
                     val changed = node.mapFonts(fonts)
                     if (changed != node) writeAtomically(file, Scene(changed).toXml())
                 }
+                for ((parts, file) in parked) file.inputStream().use { place(parts, it) }
                 for ((id, aside) in held) if (aside) {
                     val dir = File(staging, id)
                     val incoming = File(dir, "scene.xml")
@@ -308,6 +333,12 @@ object Backup {
     }
 
     private fun rootUri(root: File) = root.toURI().toString().trimEnd('/') + "/"
+
+    private fun fileUris(rootUri: String, tail: String) = Regex("file:(/(?://)?)" + Regex.escape(rootUri.removePrefix("file:").trimStart('/')) + tail)
+
+    private fun sameForm(match: MatchResult, dir: File) = "file:" + match.groupValues[1] + rootUri(dir).removePrefix("file:").trimStart('/')
+
+    private fun XmlNode.values(key: String): List<String> = listOfNotNull(this[key]) + children.flatMap { it.values(key) }
 
     private fun storedEntry(name: String, input: InputStream): ZipEntry {
         val crc = java.util.zip.CRC32()

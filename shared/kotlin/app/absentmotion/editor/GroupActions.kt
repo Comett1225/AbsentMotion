@@ -6,6 +6,7 @@ import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.nestedCut
 import app.absentmotion.model.trimmedTo
+import app.absentmotion.model.withoutValueLinks
 
 internal val Layer.isPlainGroup: Boolean get() = kind == "embedScene" && link == null && nested != null && cutoutMatte == null
 
@@ -69,12 +70,14 @@ internal fun Scene.ungrouped(id: Long): Scene? {
     val plainAttrs = LinkedHashMap(group.node.attrs.filterKeys { it in PLAIN_GROUP_ATTRS })
     val plainChildren = listOf(clipped.node) + listOfNotNull(group.node.child("transform")?.let { t -> t.copy(children = t.children.filter { it.name in PLACEMENT }) })
     val plain = Layer(XmlNode("embedScene", plainAttrs, plainChildren))
-    val host = Scene(node.copy(children = node.children.map { if (it.name in Scene.LAYER_TAGS && Layer(it).id == id) plain.node else it }))
+    val placed = Scene(node.copy(children = node.children.map { if (it.name in Scene.LAYER_TAGS && Layer(it).id == id) plain.node else it }))
+    val host = placed.layers.filter { it.id != id && it.node["parent"]?.toLongOrNull() == id }
+        .fold(placed) { acc, child -> acc.update(child.id) { acc.flattened(it) ?: it.copy(node = it.node.with("parent", null)) } }
     val loose = host.elementNodes(plain, null).map { Layer(it).movedTo(Layer(it).startTime + group.startTime).node }
     if (loose.isEmpty()) return host.remove(id)
     val known = media.map { it.uri }.toSet()
     val newMedia = clipped.node.children.filter { it.name == "media" && it["uri"] !in known }
-    return Scene(host.node.copy(children = newMedia + host.node.children.flatMap { if (it === plain.node) loose else listOf(it) }))
+    return Scene(host.node.copy(children = newMedia + host.node.children.flatMap { if (it === plain.node) loose else listOf(it.withoutValueLinks(setOf(id))) }))
 }
 
 fun EditorState.askUngroup() {

@@ -1,7 +1,10 @@
 package app.absentmotion.editor
 
 import app.absentmotion.model.Layer
+import app.absentmotion.model.NumberRef
+import app.absentmotion.model.PropRef
 import app.absentmotion.model.Scene
+import app.absentmotion.model.ValueLink
 import app.absentmotion.model.XmlNode
 import app.absentmotion.sceneOf
 import app.absentmotion.shapeNode
@@ -93,6 +96,26 @@ class GroupEditTest {
         assertEquals(start.layer(1)!!.location[0] + 40f, back.layer(1)!!.location[0], 0.5f)
         assertEquals(start.layer(1)!!.location[1] - 20f, back.layer(1)!!.location[1], 0.5f)
         assertEquals(group.startTime, back.layers.filter { it.id in setOf(1L, 2L) }.minOf { it.startTime })
+    }
+
+    @Test fun ungroupKeepsALayerThatFollowedTheGroupMovingWithItAndDropsLinksToTheGroup() {
+        val sliding = XmlNode("transform", children = listOf(XmlNode("location", children = listOf(
+            XmlNode("kf", linkedMapOf("t" to "0", "v" to "100,50,0")), XmlNode("kf", linkedMapOf("t" to "1", "v" to "400,50,0"))))))
+        val linked = XmlNode("transform", children = listOf(XmlNode("opacity", mapOf("value" to "1"), listOf(
+            ValueLink(100, NumberRef(PropRef.Opacity)).node(0)))))
+        val grouped = start.grouped(setOf(1, 2), null, 100, "G").update(100) { Layer(it.node.withChild("transform", sliding)) }
+        val before = Scene(grouped.node.copy(children = grouped.node.children +
+            shapeNode(id = 4, start = 0, end = 3000, parent = 100, children = listOf(at(10f, 10f))) +
+            shapeNode(id = 5, start = 0, end = 3000, children = listOf(linked))))
+        val back = before.ungrouped(100)!!
+        assertNull(back.layer(4)!!.node["parent"])
+        for (ms in listOf(0, 750, 1500, 3000)) {
+            val was = before.place(before.layer(4)!!, ms)
+            val now = back.place(back.layer(4)!!, ms)
+            assertEquals("x at $ms", was.x, now.x, 0.5f)
+            assertEquals("y at $ms", was.y, now.y, 0.5f)
+        }
+        assertNull(back.layer(5)!!.node.child("transform")!!.child("opacity")!!.child("valueLink"))
     }
 
     @Test fun ungroupOfAStyledGroupAsksFirstAndStillWorks() {

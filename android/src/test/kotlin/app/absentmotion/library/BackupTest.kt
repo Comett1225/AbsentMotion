@@ -207,6 +207,74 @@ class BackupTest {
         assertEquals("font", File(newRoot, "fonts/imported/Mine.ttf").readText())
     }
 
+    @Test fun aiFilesSavedWithDesktopAddressesPointAtTheNewAiFolderAfterARestore() {
+        val oldRoot = tmp.newFolder("old")
+        val oldAi = tmp.newFolder("old-external", "ai")
+        fun desk(file: File) = file.toURI().toString().replaceFirst("file:/", "file:///")
+        val matte = desk(File(oldAi, "matte.png").apply { writeText("ai pixels") })
+        val original = desk(File(oldAi, "clip.png").apply { writeText("original pixels") })
+        val id = ProjectStore(oldRoot).create(Scene.parse("""<scene width="10" height="10" title="AI"><media uri="$matte"/><shape id="1" fillType="media" fillImage="$matte"><ai type="background" original="$original" result="$matte"/></shape></scene>"""))
+        val bytes = ByteArrayOutputStream().also { Backup.write(oldRoot, it, true, oldAi) }.toByteArray()
+        val newRoot = tmp.newFolder("new")
+        val external = tmp.newFolder("new-external")
+        val newAi = File(external, "ai")
+        val fresh = ProjectStore(newRoot)
+        assertEquals(Backup.Restored(1, 0, 0), Backup.restore(fresh, newRoot, ByteArrayInputStream(bytes), MediaAccess.forPhone(newRoot, external), newAi))
+        val shape = fresh.load(id)!!.layer(1)!!.node
+        assertEquals(desk(File(newAi, "matte.png")), shape["fillImage"])
+        assertEquals(shape["fillImage"], shape.child("ai")!!["result"])
+        assertEquals(desk(File(newAi, "clip.png")), shape.child("ai")!!["original"])
+        assertEquals(listOf(shape["fillImage"]), fresh.load(id)!!.media.map { it.uri })
+        assertEquals("ai pixels", File(java.net.URI(shape["fillImage"]!!)).readText())
+        val entries = ArrayList<Pair<String, ByteArray>>()
+        java.util.zip.ZipInputStream(ByteArrayInputStream(bytes)).use { zip -> while (true) { val e = zip.nextEntry ?: break; entries += e.name to zip.readBytes() } }
+        val older = ByteArrayOutputStream().also { out ->
+            ZipOutputStream(out).use { zip ->
+                for ((name, data) in entries) {
+                    zip.putNextEntry(ZipEntry(name))
+                    zip.write(if (name == "absentmotion-backup.txt") data.toString(Charsets.UTF_8).lines().take(2).joinToString("\n", postfix = "\n").toByteArray() else data)
+                }
+            }
+        }.toByteArray()
+        val other = tmp.newFolder("other")
+        Backup.restore(ProjectStore(other), other, ByteArrayInputStream(older), MediaAccess.Unlimited, File(tmp.newFolder("other-external"), "ai"))
+        assertEquals(matte, ProjectStore(other).load(id)!!.layer(1)!!.node["fillImage"])
+    }
+
+    @Test fun anUnchangedProjectWhoseFontComesBackUnderANewNameIsRestoredAsACopyWithItsMedia() {
+        val withFont = "imported?name=Mine.ttf"
+        val oldRoot = tmp.newFolder("old")
+        val old = ProjectStore(oldRoot)
+        val owner = old.newId()
+        val photo = old.mediaDir(owner).apply { mkdirs() }.resolve("photo.png").apply { writeText("pixels") }.toURI().toString()
+        old.save(owner, Scene.parse("""<scene width="10" height="10" title="Text"><media uri="$photo" filename="photo.png"/><shape id="1" fillType="media" fillImage="$photo"/><text id="2" font="$withFont"/></scene>"""))
+        old.versions.snapshot(owner, old.text(owner)!!)
+        val user = old.create(Scene.parse("""<scene width="10" height="10" title="User"><embedScene id="5" link="${old.linkOf(owner)}"><scene width="10" height="10"/></embedScene></scene>"""))
+        File(oldRoot, "fonts/imported/Mine.ttf").apply { parentFile.mkdirs(); writeText("backed up font") }
+        val bytes = backup(oldRoot)
+        assertEquals(Backup.Restored(0, 0, 2), Backup.restore(old, oldRoot, ByteArrayInputStream(bytes)))
+        assertEquals(listOf("Mine.ttf"), File(oldRoot, "fonts/imported").list()!!.toList())
+        val root = tmp.newFolder("new")
+        val store = ProjectStore(root)
+        assertEquals(Backup.Restored(2, 0, 0), Backup.restore(store, root, ByteArrayInputStream(bytes)))
+        File(root, "fonts/imported/Mine.ttf").writeText("another font")
+        val localOwner = store.text(owner)
+        val localUser = store.text(user)
+        assertEquals(Backup.Restored(added = 2, renamed = 2, skipped = 0), Backup.restore(store, root, ByteArrayInputStream(bytes)))
+        assertEquals(localOwner, store.text(owner))
+        assertEquals(localUser, store.text(user))
+        assertEquals("another font", File(root, "fonts/imported/Mine.ttf").readText())
+        assertEquals("backed up font", File(root, "fonts/imported/Mine-1.ttf").readText())
+        val copy = store.list().single { it.title == "Text" && it.id != owner }.id
+        assertEquals("imported?name=Mine-1.ttf", store.load(copy)!!.layer(2)!!.node["font"])
+        val picture = store.load(copy)!!.layer(1)!!.node["fillImage"]!!
+        assertTrue(picture, picture.contains("/media/$copy/"))
+        assertEquals("pixels", File(java.net.URI(picture)).readText())
+        assertTrue(store.versions.list(copy).single().file.readText().contains("Mine-1.ttf"))
+        val userCopy = store.list().single { it.title == "User" && it.id != user }.id
+        assertEquals(store.linkOf(copy), store.load(userCopy)!!.layer(5)!!.node["link"])
+    }
+
     @Test fun aBackedUpFontWithTheNameOfADifferentFontKeepsItsOwnFileAndEveryReference() {
         val oldRoot = tmp.newFolder("old")
         val old = ProjectStore(oldRoot)
