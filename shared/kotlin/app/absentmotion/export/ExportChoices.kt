@@ -68,8 +68,11 @@ fun audioCodecChoices(container: Container, hasEncoder: (String) -> Boolean): Li
 fun sampleRateChoices(only48: Any?): List<Choice<Int>> =
     AudioSampleRates.map { Choice(it, if (only48 != null && it != 48000) txt(R.string.export_reason_only_48k, only48) else null) }
 
-fun bitrateChoices(format: AudioFormat?): List<Choice<Int>> =
-    AudioBitratesKbps.map { Choice(it, if (format?.lossless == true) txt(R.string.export_reason_lossless, txt(format.label)) else null) }
+fun bitrateChoices(format: AudioFormat?, refuse: (Int) -> UiText? = { null }): List<Choice<Int>> =
+    AudioBitratesKbps.map { Choice(it, if (format?.lossless == true) txt(R.string.export_reason_lossless, txt(format.label)) else refuse(it)) }
+
+fun fitBitrate(s: ExportSettings, fits: (ExportSettings) -> Boolean): ExportSettings =
+    if (fits(s)) s else AudioBitratesKbps.filter { it < s.audio.bitrateKbps }.map { s.copy(audio = s.audio.copy(bitrateKbps = it)) }.lastOrNull(fits) ?: s
 
 fun audioFormatChoices(hasEncoder: (String) -> Boolean): List<Choice<AudioFormat>> = AudioFormat.entries.map { f ->
     val mime = when (f) {

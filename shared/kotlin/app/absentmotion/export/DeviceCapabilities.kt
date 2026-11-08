@@ -50,6 +50,7 @@ data class EncoderCaps(
     val profiles: List<Int> = emptyList(),
     val sampleRates: List<Int> = emptyList(),
     val maxChannels: Int = 0,
+    val channelBits: Int = 0,
 ) {
     val video: Boolean get() = mime.startsWith("video/")
 
@@ -62,7 +63,8 @@ data class EncoderCaps(
 
     fun takesAudio(rate: Int, channels: Int, bitsPerSecond: Int?): Boolean =
         (sampleRates.isEmpty() || rate in sampleRates) && (maxChannels <= 0 || channels <= maxChannels) &&
-            (bitsPerSecond == null || bitrates.last <= 0 || bitsPerSecond in bitrates)
+            (bitsPerSecond == null || bitrates.last <= 0 || bitsPerSecond in bitrates) &&
+            (bitsPerSecond == null || channelBits <= 0 || bitsPerSecond <= channelBits.toLong() * channels)
 
     fun fits(width: Int, height: Int, fps: Int): Boolean = fitsSize(width, height) &&
         covering(width, height).any { it.maxFps * it.width * it.height >= fps.toDouble() * width * height * 0.999 }
@@ -146,6 +148,18 @@ data class DeviceReport(
         return if (found.any { it.takesAudio(audioRate(s), s.audio.channels, bits) }) null else txt(R.string.export_support_audio_settings, label)
     }
 
+    fun takesBitrate(s: ExportSettings, audioOnly: Boolean): Boolean {
+        val mime = when {
+            !audioOnly -> s.audio.codec.mime
+            s.audioFormat == AudioFormat.Ogg -> AudioCodec.Opus.mime
+            s.audioFormat == AudioFormat.M4a -> AudioCodec.Aac.mime
+            else -> return true
+        }
+        val rate = if (audioOnly) audioRate(s) else s.audio.effectiveRate
+        val usable = encodersFor(mime).filter { it.takesAudio(rate, s.audio.channels, null) }
+        return usable.isEmpty() || usable.any { it.takesAudio(rate, s.audio.channels, s.audio.bitrateKbps * 1000) }
+    }
+
     private fun takes(a: AudioSettings): Boolean = encodersFor(a.codec.mime).any { it.takesAudio(a.effectiveRate, a.channels, a.bitrateKbps * 1000) }
 
     private fun audioFix(s: ExportSettings): ExportSettings? {
@@ -208,14 +222,14 @@ private fun EncoderCaps.toJson(): JSONObject = JSONObject().put("name", name).pu
     .put("widths", widths.toJson()).put("heights", heights.toJson()).put("widthAlign", widthAlign).put("heightAlign", heightAlign)
     .put("sizes", JSONArray().apply { sizes.forEach { put(JSONArray().put(it.width).put(it.height).put(it.maxFps)) } })
     .put("bitrates", bitrates.toJson())
-    .put("profiles", JSONArray(profiles)).put("sampleRates", JSONArray(sampleRates)).put("maxChannels", maxChannels)
+    .put("profiles", JSONArray(profiles)).put("sampleRates", JSONArray(sampleRates)).put("maxChannels", maxChannels).put("channelBits", channelBits)
 
 private fun encoderFromJson(o: JSONObject) = EncoderCaps(
     o.getString("name"), o.getString("mime"), o.getBoolean("hardware"),
     o.optJSONArray("widths").toRange(), o.optJSONArray("heights").toRange(), o.optInt("widthAlign", 1), o.optInt("heightAlign", 1),
     o.optJSONArray("sizes")?.let { a -> (0 until a.length()).map { i -> a.getJSONArray(i).let { SizePoint(it.getInt(0), it.getInt(1), it.getDouble(2)) } } }.orEmpty(),
     o.optJSONArray("bitrates").toRange(),
-    o.optJSONArray("profiles").ints(), o.optJSONArray("sampleRates").ints(), o.optInt("maxChannels"),
+    o.optJSONArray("profiles").ints(), o.optJSONArray("sampleRates").ints(), o.optInt("maxChannels"), o.optInt("channelBits"),
 )
 
 class DeviceCapabilities private constructor(context: Context) {

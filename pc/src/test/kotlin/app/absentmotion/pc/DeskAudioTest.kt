@@ -98,6 +98,33 @@ class DeskAudioTest {
         }
     }
 
+    private fun soundAt(file: File, seekUs: Long): Pair<Long, Long> {
+        val (pcm, first) = decodeAll(file, seekUs)
+        val at = pcm.indices.firstOrNull { abs(pcm[it].toInt()) > 300 } ?: -2
+        return first to at / 2 * 1_000_000L / 48000
+    }
+
+    @Test fun delayedSoundKeepsItsPlaceOnTheVideoTimeline() {
+        val late = File(dir, "late.mkv").also {
+            if (!it.isFile) ffmpeg("-f", "lavfi", "-i", "color=c=red:s=64x64:r=25:d=3", "-itsoffset", "1", "-f", "lavfi", "-i", "sine=frequency=440:sample_rate=48000:duration=2",
+                "-map", "0:v", "-map", "1:a", "-c:v", "mpeg4", "-c:a", "flac", it.path)
+        }
+        val early = File(dir, "early.mkv").also {
+            if (!it.isFile) ffmpeg("-itsoffset", "0.5", "-f", "lavfi", "-i", "color=c=red:s=64x64:r=25:d=3", "-f", "lavfi", "-i", "aevalsrc=if(gte(t\\,0.7)\\,0.25*sin(2*PI*440*t)\\,0):s=48000:d=3",
+                "-map", "0:v", "-map", "1:a", "-c:v", "mpeg4", "-c:a", "flac", it.path)
+        }
+        fun near(expected: Pair<Long, Long>, got: Pair<Long, Long>) =
+            assertTrue("expected $expected, got $got", got.first == expected.first && abs(got.second - expected.second) <= 1_000)
+        near(0L to 1_000_000L, soundAt(late, -1))
+        near(500_000L to 500_000L, soundAt(late, 500_000))
+        near(1_500_000L to 0L, soundAt(late, 1_500_000))
+        val lead = 700_000L - app.absentmotion.desk.DeskProbe.of(early).video!!.startUs
+        assertTrue("video starts at ${700_000 - lead}", lead in 100_000L..300_000L)
+        near(0L to lead, soundAt(early, -1))
+        near(100_000L to lead - 100_000L, soundAt(early, 100_000))
+        near(1_000_000L to 0L, soundAt(early, 1_000_000))
+    }
+
     @Test fun extractorReadsTracks() {
         val video = File("../testdata/media/test-video.mp4").absoluteFile
         val x = MediaExtractor()

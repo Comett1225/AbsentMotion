@@ -210,20 +210,21 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
         val frames = frameCount(scene, s.fps)
         imageProblem(s.image, android.os.Build.VERSION.SDK_INT)?.let { throw ExportError(it) }
         checkPicture(width, height)
+        val folder = withContext(Dispatchers.IO) { store.sequenceFolder(name, s.image.mime) }
         val bitmap = app.absentmotion.platform.makeBitmap(width, height)
         try {
             engine.exportSession(xml, s.smoothing, s.fps) {
                 for (k in 0 until frames) {
                     currentCoroutineContext().ensureActive()
                     val pixels = still(frameTimeMs(scene, s.fps, k), width, height) ?: throw ExportError(txt(R.string.export_error_draw_frame, k.toString()))
-                    save(saved, name, sequenceFrameName(k, s.image.ext), s.image.mime) { encode(pixels, width, height, s, bitmap, it) }
+                    save(saved, folder, sequenceFrameName(k, s.image.ext), s.image.mime) { encode(pixels, width, height, s, bitmap, it) }
                     progress((k + 1f) / frames)
                 }
             }
         } finally {
             app.absentmotion.platform.recycleBitmap(bitmap)
         }
-        return ExportResult(saved, s.image.mime, store.location("Pictures/$AppFolder/$name"))
+        return ExportResult(saved, s.image.mime, store.location("Pictures/$AppFolder/$folder"))
     }
 
     private suspend fun pack(scene: Scene, xml: String, out: OutputStream, progress: (Float) -> Unit) = withContext(Dispatchers.IO) {

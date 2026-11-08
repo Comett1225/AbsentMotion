@@ -170,6 +170,10 @@ class MediaStoreExport(context: Context) : ExportStore {
 
     override fun delete(uri: Uri) { discard(uri) }
 
+    @Suppress("DEPRECATION")
+    override fun sequenceFolder(name: String, mime: String): String =
+        freeFolder(File(Environment.getExternalStorageDirectory(), folderPath(collection(mime).second, null)), name)
+
     private companion object {
         val swept = java.util.concurrent.atomic.AtomicBoolean(false)
     }
@@ -199,6 +203,8 @@ class FolderExport(private val dir: File) : ExportStore {
     }
 
     override fun delete(uri: Uri) { uri.path?.let { File(it).delete() } }
+
+    override fun sequenceFolder(name: String, mime: String): String = freeFolder(dir, name)
 }
 
 fun freeSpace(): Long = ExportDebug.fakeFreeBytes.takeIf { it >= 0 } ?: StatFs(Environment.getExternalStorageDirectory().path).availableBytes

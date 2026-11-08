@@ -176,4 +176,19 @@ class DeviceReportTest {
         assertEquals(txt(R.string.export_support_audio_settings, "AAC"),
             DeviceReport("k", listOf(mono)).checkAudioOnly(ExportSettings(360, 30, audioFormat = AudioFormat.M4a)))
     }
+
+    @Test fun anEncoderWithAPerChannelLimitRefusesMonoAboveIt() {
+        val libopus = EncoderCaps("libopus", "audio/opus", false, maxChannels = 2, channelBits = 256_000)
+        val device = DeviceReport("k", listOf(video("video/x-vnd.on2.vp9", true), libopus))
+        assertEquals(libopus, DeviceReport.fromJson(JSONObject(device.toJson().toString())).encoders.last())
+        val mono = AudioSettings(AudioCodec.Opus, 320, 48000, 1)
+        val ogg = ExportSettings(360, 30, audio = mono, audioFormat = AudioFormat.Ogg)
+        assertEquals(txt(R.string.export_support_audio_settings, "Opus"), device.checkAudioOnly(ogg))
+        assertNull(device.checkAudioOnly(ogg.copy(audio = mono.copy(channels = 2))))
+        assertEquals(listOf(false, true, true), listOf(ogg, ogg.copy(audio = mono.copy(channels = 2)), ogg.copy(audio = mono.copy(bitrateKbps = 256))).map { device.takesBitrate(it, true) })
+        val webm = ExportSettings(360, 30, Codec.Vp9, container = Container.WebM, audio = mono)
+        assertEquals(mono.copy(bitrateKbps = 256), (device.check(webm, 360, 640) as Support.Unsupported).suggestion?.audio)
+        assertTrue(listOf(ogg, webm).all { report.takesBitrate(it, it == ogg) })
+        assertTrue(DeviceReport("k", listOf(opus)).takesBitrate(webm, false))
+    }
 }

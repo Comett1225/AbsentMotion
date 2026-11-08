@@ -38,11 +38,14 @@ internal class PcmDecoder(context: Context, uri: String) : PcmSource {
     private var frames = 0L
     private var ended = false
     private var bytes = ByteArray(0)
+    private val shiftUs: Long
 
     override val durationUs: Long
 
     init {
-        val stream = DeskProbe.of(file).audio ?: error(AppText.get(R.string.ai_no_audio_track, uri))
+        val probe = DeskProbe.of(file)
+        val stream = probe.audio ?: error(AppText.get(R.string.ai_no_audio_track, uri))
+        shiftUs = ((probe.video ?: stream).startUs - probe.startUs).coerceAtLeast(0)
         durationUs = stream.durationUs
         channels = stream.channels.coerceAtLeast(1)
         chunk.rate = stream.sampleRate.takeIf { it > 0 } ?: 48_000
@@ -76,11 +79,12 @@ internal class PcmDecoder(context: Context, uri: String) : PcmSource {
 
     private fun start(): InputStream {
         val command = mutableListOf(DeskMedia.ffmpeg, "-nostdin", "-v", "error")
-        val pre = maxOf(0L, fromUs - PREROLL_US)
+        val at = fromUs + shiftUs
+        val pre = maxOf(0L, at - PREROLL_US)
         if (pre > 0) command += listOf("-ss", seconds(pre))
         command += listOf("-i", file.path)
-        if (fromUs > pre) command += listOf("-ss", seconds(fromUs - pre))
-        command += listOf("-map", "0:a:0", "-vn", "-sn", "-dn", "-ar", "${chunk.rate}", "-ac", "$channels", "-f", "f32le", "-")
+        if (at > pre) command += listOf("-ss", seconds(at - pre))
+        command += listOf("-map", "0:a:0", "-vn", "-sn", "-dn", "-af", "aresample=async=1:first_pts=0", "-ar", "${chunk.rate}", "-ac", "$channels", "-f", "f32le", "-")
         val started = ProcessBuilder(command).redirectError(ProcessBuilder.Redirect.DISCARD).start()
         process = started
         return started.inputStream.buffered(1 shl 16).also { input = it }

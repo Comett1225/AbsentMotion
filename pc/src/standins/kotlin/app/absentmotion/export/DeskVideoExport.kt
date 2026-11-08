@@ -115,6 +115,8 @@ internal object DeskEncoders {
         AudioCodec.Opus -> listOf("libopus", "opus")
     }.filter { it in available }
 
+    private val channelBits = mapOf("libopus" to 256_000, "opus" to 255_000, "aac_at" to 256_000, "aac" to 264_600)
+
     fun audioExtra(name: String): List<String> = if (name == "opus") listOf("-strict", "-2") else emptyList()
 
     fun side(name: String): Int = if (hardware(name)) HardwareSide else SoftwareSide
@@ -160,7 +162,7 @@ internal object DeskEncoders {
                     EncoderCaps(name, codec.mime, hardware(name), 2..side, 2..side, 2, 2, listOf(SizePoint(side, side, 240.0)), 10_000..800_000_000)
                 }
             }
-            val sound = AudioCodec.entries.flatMap { codec -> audio(codec).map { EncoderCaps(it, codec.mime, false, maxChannels = 2) } } +
+            val sound = AudioCodec.entries.flatMap { codec -> audio(codec).map { EncoderCaps(it, codec.mime, false, maxChannels = 2, channelBits = channelBits[it] ?: 0) } } +
                 listOf("flac").filter { it in available }.map { EncoderCaps(it, "audio/flac", false, maxChannels = 2) }
             val report = DeviceReport(caps.key, video + sound, old?.takeIf { it.key == caps.key }?.probe, android.os.Build.VERSION.SDK_INT)
             prefs.edit().putString("report", report.toJson().toString()).apply()
@@ -202,8 +204,10 @@ internal fun copyInto(file: File, out: FileDescriptor) {
 internal fun exportTemp(ext: String): File =
     File(android.content.Desk.context.cacheDir, "export").also { it.mkdirs() }.resolve("${System.nanoTime()}.$ext")
 
-internal suspend fun writePcm(mix: AudioMix, totalUs: Long, rate: Int, file: File) = withContext(Dispatchers.IO) {
+internal suspend fun writePcm(mix: AudioMix, totalUs: Long, rate: Int, file: File, progress: (Float) -> Unit) = withContext(Dispatchers.IO) {
     val totalFrames = totalUs * rate / 1_000_000
+    val free = ExportDebug.fakeFreeBytes.takeIf { it >= 0 } ?: file.absoluteFile.parentFile.usableSpace
+    if (free < totalFrames * 4 + MinFreeBytes) throw StorageFullException()
     file.outputStream().buffered(1 shl 16).use { out ->
         var frame = 0L
         while (frame < totalFrames) {
@@ -215,6 +219,7 @@ internal suspend fun writePcm(mix: AudioMix, totalUs: Long, rate: Int, file: Fil
             bytes.asShortBuffer().put(pcm, 0, minOf(pcm.size, wanted))
             out.write(bytes.array())
             frame = next
+            progress(frame.toFloat() / totalFrames)
         }
     }
 }
@@ -233,7 +238,7 @@ internal suspend fun exportVideo(
     val pcm = audio?.let { exportTemp("pcm") }
     var ffmpeg: Ffmpeg? = null
     try {
-        if (audio != null && pcm != null) writePcm(audio, (scene.totalTime + 1) * 1000L, s.audio.effectiveRate, pcm)
+        if (audio != null && pcm != null) writePcm(audio, (scene.totalTime + 1) * 1000L, s.audio.effectiveRate, pcm) { progress(0f) }
         val sound = if (pcm == null) emptyList() else {
             val coder = DeskEncoders.audio(s.audio.codec, s.audio.bitrateKbps).firstOrNull() ?: throw ExportError(txt(R.string.export_support_no_encoder, s.audio.codec.label))
             listOf("-map", "1:a", "-c:a", coder) + DeskEncoders.audioExtra(coder) + listOf("-b:a", "${s.audio.bitrateKbps}k", "-ar", "${s.audio.effectiveRate}", "-ac", "${s.audio.channels}")

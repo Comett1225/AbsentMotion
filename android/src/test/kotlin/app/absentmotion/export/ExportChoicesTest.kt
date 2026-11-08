@@ -177,4 +177,31 @@ class ExportChoicesTest {
         assertEquals(2, scene.videoSamples(0, playing = false, warm = false).size)
         assertTrue(marked.videoSamples(0, playing = false, warm = false).isEmpty())
     }
+
+    @Test fun aBitRateTheEncoderCannotUseIsLockedAndLoweredToTheHighestThatWorks() {
+        val fits: (ExportSettings) -> Boolean = { it.audio.channels == 2 || it.audio.bitrateKbps <= 256 }
+        val mono = ExportSettings(360, 30, audio = AudioSettings(AudioCodec.Opus, 320, 48000, 1))
+        assertEquals(256, fitBitrate(mono, fits).audio.bitrateKbps)
+        assertEquals(mono.copy(audio = mono.audio.copy(channels = 2)), fitBitrate(mono.copy(audio = mono.audio.copy(channels = 2)), fits))
+        assertEquals(mono, fitBitrate(mono) { false })
+        val reason = txt(R.string.export_support_audio_settings, "Opus")
+        val choices = bitrateChoices(null) { kbps -> reason.takeIf { !fits(mono.copy(audio = mono.audio.copy(bitrateKbps = kbps))) } }
+        assertEquals(AudioBitratesKbps.map { it <= 256 }, choices.map { it.enabled })
+        assertEquals(reason, choices.last().reason)
+        assertTrue(bitrateChoices(AudioFormat.Flac) { reason }.all { it.reason == txt(R.string.export_reason_lossless, txt(R.string.export_audio_flac)) })
+    }
+
+    @Test fun eachSequenceGetsAFolderNoOtherExportUses() {
+        val parent = java.nio.file.Files.createTempDirectory("sequence").toFile()
+        try {
+            assertEquals("Take", freeFolder(parent, "Take"))
+            parent.resolve("Take").mkdirs()
+            assertEquals("Take (2)", freeFolder(parent, "Take"))
+            parent.resolve("Take (2)").writeText("")
+            assertEquals("Take (3)", freeFolder(parent, "Take"))
+            assertEquals("v1.2", freeFolder(parent, "v1.2"))
+        } finally {
+            parent.deleteRecursively()
+        }
+    }
 }

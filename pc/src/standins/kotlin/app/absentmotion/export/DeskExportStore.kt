@@ -75,6 +75,8 @@ class MediaStoreExport(context: Context) : ExportStore {
 
     override fun delete(uri: Uri) { uri.toFile()?.delete() }
 
+    override fun sequenceFolder(name: String, mime: String): String = freeFolder(dir(mime, null), name)
+
     private fun rootFor(mimeOrRoot: String): String = when {
         mimeOrRoot.startsWith("video/") || mimeOrRoot == Environment.DIRECTORY_MOVIES -> app.absentmotion.desk.DeskOs.videosFolder
         mimeOrRoot.startsWith("image/") || mimeOrRoot == Environment.DIRECTORY_PICTURES -> app.absentmotion.desk.DeskOs.picturesFolder
@@ -107,6 +109,8 @@ class FolderExport(private val dir: File) : ExportStore {
     }
 
     override fun delete(uri: Uri) { uri.path?.let { File(it).delete() } }
+
+    override fun sequenceFolder(name: String, mime: String): String = freeFolder(dir, name)
 }
 
 fun freeSpace(): Long = ExportDebug.fakeFreeBytes.takeIf { it >= 0 } ?: StatFs(Environment.getExternalStorageDirectory().path).availableBytes

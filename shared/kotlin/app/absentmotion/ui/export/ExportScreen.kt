@@ -134,6 +134,7 @@ import androidx.compose.ui.unit.sp
 import app.absentmotion.engine.EngineThread
 import app.absentmotion.export.AudioCodec
 import app.absentmotion.export.AudioFormat
+import app.absentmotion.export.AudioSettings
 import app.absentmotion.export.Choice
 import app.absentmotion.export.DeviceCapabilities
 import app.absentmotion.export.ExportPrefs
@@ -175,6 +176,7 @@ import app.absentmotion.export.audioRate
 import app.absentmotion.export.audioSummary
 import app.absentmotion.export.betterChoice
 import app.absentmotion.export.bitrateChoices
+import app.absentmotion.export.fitBitrate
 import app.absentmotion.export.channelsLabel
 import app.absentmotion.export.codecChoices
 import app.absentmotion.export.codecWarning
@@ -347,6 +349,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
     val estimate = remember(rawEstimate, sizeKey, phase is Phase.Idle) { if (rawEstimate < 0 || sizeKey == null) rawEstimate else (rawEstimate * sizes.ratio(sizeKey)).toLong() }
     val check: (ExportSettings) -> Support = remember(report, scene, hasAudio) { { caps.check(it, scene, hasAudio) } }
     val hasEncoder: (String) -> Boolean = remember(report) { { mime -> report?.encodersFor(mime)?.isNotEmpty() ?: true } }
+    val bitrateFits: (ExportSettings, Boolean) -> Boolean = remember(report) { { s, audioOnly -> report?.takesBitrate(s, audioOnly) ?: true } }
     val thermal = remember { ThermalMonitor.of(context) }
     DisposableEffect(thermal) {
         thermal.start()
@@ -531,7 +534,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
     val bar: @Composable () -> Unit = { ExportBar(enabled = phase == Phase.Idle, blocked = blocked, onClick = ::start) }
 
     if (DESK) DeskExport(
-        scene, frame, fromProjectList, engine, kinds, kind, { kind = it }, hasAudio, settings, check, hasEncoder, explain, { help = true }, exportName,
+        scene, frame, fromProjectList, engine, kinds, kind, { kind = it }, hasAudio, settings, check, hasEncoder, bitrateFits, explain, { help = true }, exportName,
         warning, support is Support.SlowSoftwareOnly, better?.let { suggestionLabel(video, it) }, ::useBetter, { acknowledged = warning },
         free, estimate, timeMs, storage, blocked, asTemplate, { asTemplate = it }, { templateInfo = true }, { packageInfo = true },
         phase, progress, heat.level, note, { (phase as? Phase.Running)?.job?.cancel() }, { phase = Phase.Idle }, { (phase as? Phase.Done)?.let { share(context, it) } }, ::start, onClose,
@@ -569,10 +572,10 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
             )
         }
         Presence(audioPage) {
-            AudioSettingsPage(video, hasAudio, hasEncoder, { settings[ExportKind.Video] = it }, explain) { audioPage = false }
+            AudioSettingsPage(video, hasAudio, hasEncoder, { bitrateFits(it, false) }, { settings[ExportKind.Video] = it }, explain) { audioPage = false }
         }
         Presence(page == ExportKind.Audio) {
-            AudioOnlyPage(settings.getValue(ExportKind.Audio), hasEncoder, info, bar, { settings[ExportKind.Audio] = it }, explain) { page = null }
+            AudioOnlyPage(settings.getValue(ExportKind.Audio), hasEncoder, { bitrateFits(it, true) }, info, bar, { settings[ExportKind.Audio] = it }, explain) { page = null }
         }
         Presence(page in SheetKinds) {
             val shown = lastPage
@@ -904,60 +907,62 @@ private fun VideoFields(
 
 @Composable
 private fun AudioSettingsPage(
-    s: ExportSettings, hasAudio: Boolean, hasEncoder: (String) -> Boolean,
+    s: ExportSettings, hasAudio: Boolean, hasEncoder: (String) -> Boolean, fits: (ExportSettings) -> Boolean,
     onChange: (ExportSettings) -> Unit, onReason: (UiText) -> Unit, onBack: () -> Unit,
 ) {
     PageFrame(stringResource(R.string.export_kind_audio), onBack) {
         ScrollArea(Modifier.weight(1f).fillMaxWidth(), Am.SheetBg, PaddingValues(start = 15.dp, end = 15.dp, top = 16.dp, bottom = 20.dp), GroupGap) {
-            AudioFields(s, hasAudio, hasEncoder, onChange, onReason)
+            AudioFields(s, hasAudio, hasEncoder, fits, onChange, onReason)
         }
     }
 }
 
 @Composable
-private fun AudioFields(s: ExportSettings, hasAudio: Boolean, hasEncoder: (String) -> Boolean, onChange: (ExportSettings) -> Unit, onReason: (UiText) -> Unit) {
+private fun AudioFields(s: ExportSettings, hasAudio: Boolean, hasEncoder: (String) -> Boolean, fits: (ExportSettings) -> Boolean, onChange: (ExportSettings) -> Unit, onReason: (UiText) -> Unit) {
     val a = s.audio
+    val change = { next: AudioSettings -> onChange(fitBitrate(s.copy(audio = next), fits)) }
     Hint(if (hasAudio) audioHint(s).text() else stringResource(R.string.export_audio_hint_silent))
-    Field(stringResource(R.string.export_codec)) { Segments(audioCodecChoices(s.container, hasEncoder), a.codec, { it.label }, onReason) { onChange(s.copy(audio = a.copy(codec = it))) } }
+    Field(stringResource(R.string.export_codec)) { Segments(audioCodecChoices(s.container, hasEncoder), a.codec, { it.label }, onReason) { change(a.copy(codec = it)) } }
     Field(stringResource(R.string.export_bit_rate), "${a.bitrateKbps} kbps") {
-        Segments(bitrateChoices(null), a.bitrateKbps, { "$it" }, onReason) { onChange(s.copy(audio = a.copy(bitrateKbps = it))) }
+        Segments(bitrateChoices(null) { kbps -> txt(R.string.export_support_audio_settings, a.codec.label).takeIf { !fits(s.copy(audio = a.copy(bitrateKbps = kbps))) } }, a.bitrateKbps, { "$it" }, onReason) { change(a.copy(bitrateKbps = it)) }
     }
     Field(stringResource(R.string.export_sample_rate)) {
-        Segments(sampleRateChoices(if (a.codec == AudioCodec.Opus) AudioCodec.Opus.label else null), a.effectiveRate, { khz(it) }, onReason) { onChange(s.copy(audio = a.copy(sampleRate = it))) }
+        Segments(sampleRateChoices(if (a.codec == AudioCodec.Opus) AudioCodec.Opus.label else null), a.effectiveRate, { khz(it) }, onReason) { change(a.copy(sampleRate = it)) }
     }
-    Field(stringResource(R.string.export_channels)) { Segments(listOf(Choice(2), Choice(1)), a.channels, { channelsLabel(it).text() }, onReason) { onChange(s.copy(audio = a.copy(channels = it))) } }
+    Field(stringResource(R.string.export_channels)) { Segments(listOf(Choice(2), Choice(1)), a.channels, { channelsLabel(it).text() }, onReason) { change(a.copy(channels = it)) } }
 }
 
 @Composable
 private fun AudioOnlyPage(
-    s: ExportSettings, hasEncoder: (String) -> Boolean, info: @Composable () -> Unit, bar: @Composable () -> Unit,
+    s: ExportSettings, hasEncoder: (String) -> Boolean, fits: (ExportSettings) -> Boolean, info: @Composable () -> Unit, bar: @Composable () -> Unit,
     onChange: (ExportSettings) -> Unit, onReason: (UiText) -> Unit, onBack: () -> Unit,
 ) {
     PageFrame(stringResource(R.string.export_kind_audio_only), onBack) {
         info()
         ScrollArea(Modifier.weight(1f).fillMaxWidth(), Am.SheetBg, PaddingValues(start = 15.dp, end = 15.dp, top = 16.dp, bottom = 20.dp), GroupGap) {
-            AudioOnlyFields(s, hasEncoder, onChange, onReason)
+            AudioOnlyFields(s, hasEncoder, fits, onChange, onReason)
         }
         bar()
     }
 }
 
 @Composable
-private fun AudioOnlyFields(s: ExportSettings, hasEncoder: (String) -> Boolean, onChange: (ExportSettings) -> Unit, onReason: (UiText) -> Unit) {
+private fun AudioOnlyFields(s: ExportSettings, hasEncoder: (String) -> Boolean, fits: (ExportSettings) -> Boolean, onChange: (ExportSettings) -> Unit, onReason: (UiText) -> Unit) {
     val a = s.audio
     val f = s.audioFormat
+    val change = { next: ExportSettings -> onChange(fitBitrate(next, fits)) }
     Field(stringResource(R.string.export_format)) {
         audioFormatChoices(hasEncoder).chunked(3).forEach { row ->
-            Segments(row, f, { stringResource(it.label) }, onReason) { onChange(s.copy(audioFormat = it)) }
+            Segments(row, f, { stringResource(it.label) }, onReason) { change(s.copy(audioFormat = it)) }
         }
     }
     Field(stringResource(R.string.export_bit_rate), if (f.lossless) stringResource(R.string.export_lossless) else "${a.bitrateKbps} kbps") {
-        Segments(bitrateChoices(f), if (f.lossless) -1 else a.bitrateKbps, { "$it" }, onReason) { onChange(s.copy(audio = a.copy(bitrateKbps = it))) }
+        Segments(bitrateChoices(f) { kbps -> txt(R.string.export_support_audio_settings, txt(f.label)).takeIf { !fits(s.copy(audio = a.copy(bitrateKbps = kbps))) } }, if (f.lossless) -1 else a.bitrateKbps, { "$it" }, onReason) { change(s.copy(audio = a.copy(bitrateKbps = it))) }
     }
     Field(stringResource(R.string.export_sample_rate)) {
-        Segments(sampleRateChoices(if (f == AudioFormat.Ogg) txt(f.label) else null), audioRate(s), { khz(it) }, onReason) { onChange(s.copy(audio = a.copy(sampleRate = it))) }
+        Segments(sampleRateChoices(if (f == AudioFormat.Ogg) txt(f.label) else null), audioRate(s), { khz(it) }, onReason) { change(s.copy(audio = a.copy(sampleRate = it))) }
     }
-    Field(stringResource(R.string.export_channels)) { Segments(listOf(Choice(2), Choice(1)), a.channels, { channelsLabel(it).text() }, onReason) { onChange(s.copy(audio = a.copy(channels = it))) } }
+    Field(stringResource(R.string.export_channels)) { Segments(listOf(Choice(2), Choice(1)), a.channels, { channelsLabel(it).text() }, onReason) { change(s.copy(audio = a.copy(channels = it))) } }
     Hint(stringResource(R.string.export_audio_only_hint))
 }
 
@@ -1256,7 +1261,7 @@ private fun DeskExport(
     scene: Scene, frame: Int, fromList: Boolean, engine: EngineThread,
     kinds: List<ExportKind>, kind: ExportKind, onKind: (ExportKind) -> Unit, hasAudio: Boolean,
     settings: MutableMap<ExportKind, ExportSettings>, check: (ExportSettings) -> Support, hasEncoder: (String) -> Boolean,
-    explain: (UiText) -> Unit, onHelp: () -> Unit, exportName: ExportName,
+    bitrateFits: (ExportSettings, Boolean) -> Boolean, explain: (UiText) -> Unit, onHelp: () -> Unit, exportName: ExportName,
     warning: UiText?, slow: Boolean, use: UiText?, onUse: () -> Unit, onContinue: () -> Unit,
     free: Long, estimate: Long, timeMs: Long?, storage: StorageStatus, blocked: UiText?,
     asTemplate: Boolean, onTemplate: (Boolean) -> Unit, onTemplateInfo: () -> Unit, onPackageInfo: () -> Unit,
@@ -1338,14 +1343,14 @@ private fun DeskExport(
                                             var open by remember { mutableStateOf(false) }
                                             Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                                                 NavRow(audioSummary(s.audio).text(), if (hasAudio) null else stringResource(R.string.export_no_sound_yet)) { open = !open }
-                                                if (open) AudioFields(s, hasAudio, hasEncoder, onChange, onReason)
+                                                if (open) AudioFields(s, hasAudio, hasEncoder, { bitrateFits(it, false) }, onChange, onReason)
                                             }
                                         }
                                         if (warning != null) Column(Modifier.clip(RoundedCornerShape(8.dp))) {
                                             WarningCard(stringResource(if (slow) R.string.export_slow_title else R.string.onboarding_check_unsupported), warning.text(), use?.text(), onUse, if (slow) onContinue else null)
                                         }
                                     }
-                                    ExportKind.Audio -> AudioOnlyFields(s, hasEncoder, onChange, onReason)
+                                    ExportKind.Audio -> AudioOnlyFields(s, hasEncoder, { bitrateFits(it, true) }, onChange, onReason)
                                     ExportKind.Package -> Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(Am.Card).deskPress(8.dp).clickable(onClick = onPackageInfo).padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
                                         Icon(ExportIcons.Info, null, Modifier.size(20.dp), tint = Am.HomeDim)
                                         Text(stringResource(R.string.one_absproj_package_with_the_project), Modifier.padding(start = 10.dp), color = Navy, fontSize = 13.sp, lineHeight = 18.sp)

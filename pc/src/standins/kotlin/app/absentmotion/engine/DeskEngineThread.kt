@@ -412,11 +412,12 @@ class EngineThread(private val background: Int, private val context: Context? = 
         suspend fun renderInto(buffer: HardwareBuffer, timeMs: Int): Boolean = still(timeMs, buffer.width, buffer.height) != null
         suspend fun releaseBuffers() {}
         private var textTime = 0
+        private val timedXml: String? by lazy { document.toXml().takeIf(::animatesTextSpacing) }
         private fun applyFonts(timeMs: Int) {
             if (timeMs == textTime) return
             textTime = timeMs
-            val xml = document.toXml()
-            if (animatesTextSpacing(xml)) engine().setScene(fonts?.prepareText(xml, timeMs) ?: xml)
+            val xml = timedXml ?: return
+            engine().setScene(fonts?.prepareText(xml, timeMs) ?: xml)
         }
     }
 

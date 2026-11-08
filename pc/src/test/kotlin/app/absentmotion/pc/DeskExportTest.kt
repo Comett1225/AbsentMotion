@@ -3,16 +3,26 @@ package app.absentmotion.pc
 import android.content.Desk
 import app.absentmotion.export.AudioCodec
 import app.absentmotion.export.AudioFormat
+import app.absentmotion.export.AudioMix
 import app.absentmotion.export.AudioSettings
 import app.absentmotion.export.Codec
 import app.absentmotion.export.Container
+import app.absentmotion.export.DeskEncoders
+import app.absentmotion.export.DeviceReport
 import app.absentmotion.export.ExportAudio
+import app.absentmotion.export.ExportDebug
 import app.absentmotion.export.ExportKind
 import app.absentmotion.export.ExportResult
 import app.absentmotion.export.ExportSettings
 import app.absentmotion.export.Exporter
 import app.absentmotion.export.ImageKind
 import app.absentmotion.export.MediaStoreExport
+import app.absentmotion.export.StorageFullException
+import app.absentmotion.export.Support
+import app.absentmotion.export.frameCount
+import app.absentmotion.export.sequenceFrameName
+import app.absentmotion.export.watched
+import app.absentmotion.export.writePcm
 import app.absentmotion.engine.EngineThread
 import app.absentmotion.model.Scene
 import kotlinx.coroutines.async
@@ -20,6 +30,7 @@ import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
@@ -115,5 +126,54 @@ class DeskExportTest {
             out.resolve("report.txt").writeText(report.toString())
             engine.close()
         }
+    }
+
+    @Test fun audioPreparationKeepsTheStallWatchFed() = runBlocking {
+        val file = File("build/desk-pcm").canonicalFile.also { it.mkdirs() }.resolve("mix.pcm")
+        val slow: AudioMix = { from, to -> Thread.sleep(20); ShortArray(((to - from) * 44100 / 1_000_000 * 2).toInt()) }
+        val seen = ArrayList<Float>()
+        watched(50) { alive -> writePcm(slow, 10_000_000, 44100, file) { seen += it; alive() } }
+        assertEquals(10L * 44100 * 4, file.length())
+        assertEquals(20, seen.size)
+        assertEquals(1f, seen.last())
+        file.delete()
+        ExportDebug.fakeFreeBytes = 10L * 44100 * 4
+        try {
+            assertTrue(runCatching { writePcm(slow, 10_000_000, 44100, file) {} }.exceptionOrNull() is StorageFullException)
+            assertTrue(!file.exists())
+        } finally {
+            ExportDebug.fakeFreeBytes = -1
+        }
+    }
+
+    @Test fun eachSequenceGetsItsOwnFolder() = runBlocking {
+        val home = File("build/desk-sequence").canonicalFile.also { it.deleteRecursively() }
+        System.setProperty("am.exports", home.path)
+        val engine = EngineThread(0xff000000.toInt(), Desk.context)
+        try {
+            val exporter = Exporter(Desk.context, engine, MediaStoreExport(Desk.context))
+            val takes = listOf(scene("text.xml", 299), scene("text.xml", 199)).map { it to exporter.export(ExportKind.Sequence, it, ExportSettings(180, 10), 0, "Repeat") {} }
+            val dirs = takes.map { (_, r) -> r.uris.map { it.toFile()!!.parentFile }.distinct().single() }
+            assertEquals(listOf("Repeat", "Repeat (2)"), dirs.map { it.name })
+            takes.zip(dirs).forEach { (take, dir) ->
+                assertEquals(List(frameCount(take.first, 10)) { sequenceFrameName(it, "png") }, dir.list()!!.sorted())
+                assertTrue(take.second.where, take.second.where.endsWith(dir.name))
+            }
+        } finally {
+            engine.close()
+        }
+    }
+
+    @Test fun monoOpusIsNotOfferedAboveWhatTheEncoderTakes() {
+        DeskEncoders.seedReport(Desk.context)
+        val report = DeviceReport.fromJson(JSONObject(Desk.context.getSharedPreferences("export_device", 0).getString("report", null)!!))
+        val mono = AudioSettings(AudioCodec.Opus, 320, 48000, 1)
+        val ogg = ExportSettings(360, 30, audio = mono, audioFormat = AudioFormat.Ogg)
+        assertNotNull(report.checkAudioOnly(ogg))
+        assertNull(report.checkAudioOnly(ogg.copy(audio = mono.copy(channels = 2))))
+        assertNull(report.checkAudioOnly(ogg.copy(audio = mono.copy(bitrateKbps = 256))))
+        val webm = ExportSettings(360, 30, Codec.Vp9, container = Container.WebM, audio = mono)
+        val support = report.check(webm, 640, 360) as Support.Unsupported
+        assertEquals(mono.copy(bitrateKbps = 256), support.suggestion?.audio)
     }
 }

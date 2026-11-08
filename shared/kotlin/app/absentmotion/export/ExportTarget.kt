@@ -16,7 +16,12 @@ interface ExportStore {
     fun location(where: String): String = where
 
     fun delete(uri: Uri)
+
+    fun sequenceFolder(name: String, mime: String): String
 }
+
+internal fun freeFolder(parent: java.io.File, name: String): String =
+    generateSequence(1) { it + 1 }.map { if (it == 1) name else "$name ($it)" }.first { !java.io.File(parent, it).exists() }
 
 class OpenExport(val fd: FileDescriptor, private val close: () -> Unit, private val finish: () -> Uri, private val remove: () -> Unit) {
     fun publish(): Uri {

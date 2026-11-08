@@ -21,8 +21,9 @@ class DeskStream(
     }
 }
 
-class DeskProbe(val streams: List<DeskStream>, val durationUs: Long, val tags: Map<String, String>) {
+class DeskProbe(val streams: List<DeskStream>, val durationUs: Long, val tags: Map<String, String>, val startUs: Long = 0) {
     val audio: DeskStream? get() = streams.firstOrNull { it.type == "audio" }
+    val video: DeskStream? get() = streams.firstOrNull { it.type == "video" }
 
     companion object {
         private val cache = ConcurrentHashMap<String, Pair<String, DeskProbe>>()
@@ -61,7 +62,8 @@ class DeskProbe(val streams: List<DeskStream>, val durationUs: Long, val tags: M
                 )
             }
             val tags = format?.optJSONObject("tags")?.let { t -> t.keySet().associate { it.lowercase() to t.optString(it) } }.orEmpty()
-            return DeskProbe(streams, total, tags)
+            val start = format?.optString("start_time")?.toDoubleOrNull()?.takeIf { it.isFinite() }?.let { Math.round(it * 1_000_000) }
+            return DeskProbe(streams, total, tags, start ?: streams.minOfOrNull { it.startUs } ?: 0L)
         }
 
         private fun seconds(text: String?): Long = text?.toDoubleOrNull()?.let { (it * 1_000_000).toLong() } ?: -1L
