@@ -1905,6 +1905,12 @@
     <string name="motion_rotate">Döndürme</string>
     <string name="model_choose_file">Bir .obj, .glb veya .gltf dosyası seçin; varsa .mtl, .bin ve görselleriyle birlikte</string>
     <string name="model_simplified">Bu modelde %1$s üçgen var, bu yüzden en fazla %2$s olacak şekilde basitleştirilmiş gösteriliyor</string>
+    <string name="settings_model_detail">Daha ayrıntılı 3D modeller</string>
+    <string name="settings_model_detail_note">3D modelleri %2$s yerine en fazla %1$s üçgenle göster. Düzenleme yavaşlayabilir.</string>
+    <string name="model_detail_ask_title">Bu model daha ayrıntılı gösterilsin mi?</string>
+    <string name="model_detail_ask_body">Bu modelde %1$s üçgen var, bu yüzden en fazla %2$s olacak şekilde basitleştirilmiş gösteriliyor. 3D modeller için en fazla %3$s üçgene izin verilsin mi? Düzenleme yavaşlayabilir. Bunu daha sonra Ayarlar\'dan değiştirebilirsiniz.</string>
+    <string name="model_detail_allow">%1$s izin ver</string>
+    <string name="model_detail_keep">%1$s kalsın</string>
     <string name="model_unreadable">Bu model okunamadı: %1$s</string>
     <string name="model_too_large">Bu model açılamayacak kadar büyük</string>
     <string name="model_layer_model">Model</string>

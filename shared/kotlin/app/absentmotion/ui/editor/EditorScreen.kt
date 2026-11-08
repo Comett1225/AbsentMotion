@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor
 
+import kotlinx.coroutines.flow.drop
 import app.absentmotion.platform.Log
 import app.absentmotion.platform.BackHandler
 import androidx.compose.foundation.background
@@ -98,6 +99,7 @@ private fun EditorBody(state: EditorState, onExit: () -> Unit) {
     val addLibrary = rememberAddLibrary(state.settings.demoMode)
     Playback(state)
     LaunchedEffect(state.playing) { state.engine.setPlaying(state.playing) }
+    LaunchedEffect(state) { app.absentmotion.media.ModelDetail.budget.drop(1).collect { state.engine.refreshMedia() } }
     LaunchedEffect(state.panel, state.selectedId) {
         state.easingOpen = false
         state.keypad = null

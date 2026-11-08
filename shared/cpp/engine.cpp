@@ -1419,6 +1419,17 @@ bool EngineImpl::shapeIcon(const std::string& xml, int size, uint32_t color, std
     if (!ParseScene(xml, &scene, &error) || scene.layers.empty()) return false;
     scene.layers.front().effects.clear();
     const Layer& layer = scene.layers.front();
+    SkRect content;
+    if (ContentIconBounds(layer, &content)) {
+        if (content.isEmpty()) return false;
+        return this->offscreen(size, size, true, [&](SkCanvas* canvas) {
+            const float scale = size * 0.9f / std::max(content.width(), content.height());
+            canvas->translate(size / 2.0f, size / 2.0f);
+            canvas->scale(scale, scale);
+            canvas->translate(-content.centerX(), -content.centerY());
+            DrawContentIcon(canvas, layer, this->pictures());
+        }, rgba);
+    }
     const SkPath path = ShapePath(layer, 0);
     const SkPath stroke = StrokePath(layer, path, 0);
     SkMatrix orientation = SkMatrix::I();

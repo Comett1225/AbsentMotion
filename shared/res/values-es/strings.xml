@@ -1929,6 +1929,12 @@
     <string name="motion_rotate">Rotar</string>
     <string name="model_choose_file">Elige un archivo .obj, .glb o .gltf, junto con sus .mtl, .bin e imágenes si los tiene</string>
     <string name="model_simplified">Este modelo tiene %1$s triángulos, así que se muestra simplificado a un máximo de %2$s</string>
+    <string name="settings_model_detail">Modelos 3D con más detalle</string>
+    <string name="settings_model_detail_note">Mostrar modelos 3D con hasta %1$s triángulos en lugar de %2$s. La edición puede ser más lenta.</string>
+    <string name="model_detail_ask_title">¿Mostrar este modelo con más detalle?</string>
+    <string name="model_detail_ask_body">Este modelo tiene %1$s triángulos, así que se muestra simplificado a un máximo de %2$s. ¿Permitir hasta %3$s triángulos en los modelos 3D? La edición puede ser más lenta. Puedes cambiarlo más tarde en Ajustes.</string>
+    <string name="model_detail_allow">Permitir %1$s</string>
+    <string name="model_detail_keep">Mantener %1$s</string>
     <string name="model_unreadable">No se pudo leer este modelo: %1$s</string>
     <string name="model_too_large">Este modelo es demasiado grande para abrirlo</string>
     <string name="model_layer_model">Modelo</string>

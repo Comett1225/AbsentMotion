@@ -131,7 +131,7 @@ import app.absentmotion.editor.duplicateChosen
 import app.absentmotion.editor.pasteLayer
 import app.absentmotion.editor.canPaste
 import app.absentmotion.editor.split
-import app.absentmotion.editor.groupLayers
+import app.absentmotion.editor.groupLayersCentred
 import app.absentmotion.editor.chosenLayers
 import app.absentmotion.editor.isPlainGroup
 import app.absentmotion.editor.askUngroup
@@ -370,6 +370,7 @@ private fun TimelineSurface(view: TimelineView, modifier: Modifier, content: @Co
 @Composable
 private fun DesktopTimelineMenu(view: TimelineView) {
     var stretch by remember { mutableStateOf<Set<Long>?>(null) }
+    val scope = rememberCoroutineScope()
     stretch?.let { StretchSheet(view.state, it) { stretch = null } }
     val at = view.menuAt ?: return
     val state = view.state
@@ -388,7 +389,7 @@ private fun DesktopTimelineMenu(view: TimelineView) {
                 DropdownMenuItem(colors = menuColors, text = { Text(stringResource(R.string.home_duplicate), fontSize = 14.sp) }, onClick = { close { state.duplicateChosen() } })
                 DropdownMenuItem(colors = menuColors, text = { Text(stringResource(R.string.timeline_split), fontSize = 14.sp) }, onClick = { close { state.split() } })
                 DropdownMenuItem(colors = menuColors, text = { Text(stringResource(R.string.delete), fontSize = 14.sp) }, onClick = { close { state.deleteChosen() } })
-                if (MultiSelect.active && MultiSelect.ids.size > 1) DropdownMenuItem(colors = menuColors, text = { Text(stringResource(R.string.structure_group), fontSize = 14.sp) }, onClick = { close { state.groupLayers(MultiSelect.ids) } })
+                if (MultiSelect.active && MultiSelect.ids.size > 1) DropdownMenuItem(colors = menuColors, text = { Text(stringResource(R.string.structure_group), fontSize = 14.sp) }, onClick = { close { scope.launch { state.groupLayersCentred(MultiSelect.ids) } } })
                 if (MultiSelect.active && MultiSelect.ids.size > 1) DropdownMenuItem(colors = menuColors, text = { Text(stringResource(R.string.multi_stretch_timing), fontSize = 14.sp) }, enabled = state.chosenLayers.any { it.endTime > it.startTime }, onClick = { close { state.playing = false; stretch = MultiSelect.ids } })
                 if (layer?.isPlainGroup == true && !MultiSelect.active) {
                     DropdownMenuItem(colors = menuColors, text = { Text(stringResource(R.string.layer_tool_edit_group), fontSize = 14.sp) }, onClick = { close { state.enterGroup(id) } })

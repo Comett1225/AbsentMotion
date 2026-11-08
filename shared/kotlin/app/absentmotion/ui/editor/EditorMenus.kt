@@ -261,8 +261,11 @@ internal class DropOrRiseSide(private val rose: androidx.compose.runtime.Mutable
 
 internal object AboveLeft : PopupPositionProvider {
     override fun calculatePosition(anchorBounds: IntRect, windowSize: IntSize, layoutDirection: LayoutDirection, popupContentSize: IntSize) =
-        IntOffset(0, anchorBounds.top - popupContentSize.height)
+        IntOffset(aboveLeftX(anchorBounds.left, windowSize.width, popupContentSize.width, app.absentmotion.platform.PlatformFeatures.desktop), anchorBounds.top - popupContentSize.height)
 }
+
+internal fun aboveLeftX(anchorLeft: Int, windowWidth: Int, popupWidth: Int, desktop: Boolean): Int =
+    if (desktop) anchorLeft.coerceIn(0, maxOf(0, windowWidth - popupWidth)) else 0
 
 @Composable
 internal fun TransformMenu(state: EditorState, tab: Int, turn: Turn?, onDismiss: () -> Unit) {

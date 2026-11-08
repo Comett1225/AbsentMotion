@@ -1881,6 +1881,12 @@
     <string name="motion_rotate">Xoay</string>
     <string name="model_choose_file">Chọn tệp .obj, .glb hoặc .gltf, kèm tệp .mtl, .bin và hình ảnh nếu có</string>
     <string name="model_simplified">Mô hình này có %1$s hình tam giác nên được hiển thị đơn giản hóa, tối đa còn %2$s</string>
+    <string name="settings_model_detail">Mô hình 3D chi tiết cao</string>
+    <string name="settings_model_detail_note">Hiển thị mô hình 3D với tối đa %1$s hình tam giác thay vì %2$s. Việc chỉnh sửa có thể chậm hơn.</string>
+    <string name="model_detail_ask_title">Hiển thị mô hình này chi tiết hơn?</string>
+    <string name="model_detail_ask_body">Mô hình này có %1$s hình tam giác nên được hiển thị đơn giản hóa, tối đa còn %2$s. Cho phép tối đa %3$s hình tam giác cho mô hình 3D? Việc chỉnh sửa có thể chậm hơn. Bạn có thể đổi lại sau trong Cài đặt.</string>
+    <string name="model_detail_allow">Cho phép %1$s</string>
+    <string name="model_detail_keep">Giữ %1$s</string>
     <string name="model_unreadable">Không thể đọc mô hình này: %1$s</string>
     <string name="model_too_large">Mô hình này quá lớn để mở</string>
     <string name="model_layer_model">Mô hình</string>

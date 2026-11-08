@@ -108,6 +108,16 @@ class AppSettings(private val context: Context) {
         get() = backgroundPreviewState
         set(value) { backgroundPreviewState = value; prefs.edit().putBoolean("backgroundPreview", value).apply() }
 
+    private var highDetailModelsState by mutableStateOf(prefs.getBoolean("highDetailModels", false).also(::useModelDetail))
+
+    var highDetailModels: Boolean
+        get() = highDetailModelsState
+        set(value) { highDetailModelsState = value; useModelDetail(value); prefs.edit().putBoolean("highDetailModels", value).apply() }
+
+    private fun useModelDetail(high: Boolean) {
+        app.absentmotion.media.ModelDetail.budget.value = if (high) app.absentmotion.media.MODEL_HIGH_DETAIL_BUDGET else app.absentmotion.media.MODEL_TRIANGLE_BUDGET
+    }
+
 
 
     private var keepMediaCopiesState by mutableStateOf(prefs.getBoolean("keepMediaCopies", true))

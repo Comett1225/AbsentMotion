@@ -1929,6 +1929,12 @@
     <string name="motion_rotate">Ruota</string>
     <string name="model_choose_file">Scegli un file .obj, .glb o .gltf, insieme ai relativi file .mtl, .bin e alle immagini, se presenti</string>
     <string name="model_simplified">Questo modello ha %1$s triangoli, quindi viene mostrato in forma semplificata con un massimo di %2$s triangoli</string>
+    <string name="settings_model_detail">Modelli 3D più dettagliati</string>
+    <string name="settings_model_detail_note">Mostra i modelli 3D con fino a %1$s triangoli invece di %2$s. La modifica può diventare più lenta.</string>
+    <string name="model_detail_ask_title">Mostrare questo modello con più dettagli?</string>
+    <string name="model_detail_ask_body">Questo modello ha %1$s triangoli, quindi viene mostrato in forma semplificata con un massimo di %2$s triangoli. Consentire fino a %3$s triangoli per i modelli 3D? La modifica può diventare più lenta. Puoi cambiarlo in seguito nelle Impostazioni.</string>
+    <string name="model_detail_allow">Consenti %1$s</string>
+    <string name="model_detail_keep">Mantieni %1$s</string>
     <string name="model_unreadable">Impossibile leggere questo modello: %1$s</string>
     <string name="model_too_large">Questo modello è troppo grande per essere aperto</string>
     <string name="model_layer_model">Modello</string>

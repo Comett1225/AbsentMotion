@@ -32,7 +32,7 @@ class MediaLibrary(context: Context, private val engine: EngineThread) {
     private val resolver = context.applicationContext.contentResolver
     private val lock = Mutex()
     private val loaded = mutableMapOf<String, Triple<MediaDeclaration?, String?, Pair<Int, Int>>>()
-    private val models = mutableMapOf<String, Triple<String?, Pair<Int, Int>, Int>>()
+    private val models = mutableMapOf<String, Triple<String?, Pair<Pair<Int, Int>, Int>, Int>>()
     @Volatile var pinned: Scene? = null
 
     suspend fun update(scene: Scene) = lock.withLock {
@@ -68,13 +68,14 @@ class MediaLibrary(context: Context, private val engine: EngineThread) {
             forget = { uri -> engine.setPicture(uri, null) },
         ) { uri, bitmap -> try { engine.setPicture(uri, bitmap) } finally { bitmap.recycle() } }
         for (uri in scene.node.imageUris()) engine.publishSource(uri, pictureIdentity(loaded[uri]?.second, loaded[uri]?.third?.first, engine.instance))
+        val budget = ModelDetail.budget.value
         for (uri in scene.node.modelUris()) {
             val version = withContext(Dispatchers.IO) { fileVersion(resolver, Uri.parse(uri)) }
-            if (models[uri]?.let { it.first == version && it.second == generation } == true) continue
-            val (mesh, textures) = withContext(Dispatchers.IO) { loadModel(resolver, uri, limit) } ?: continue
+            if (models[uri]?.let { it.first == version && it.second == generation to budget } == true) continue
+            val (mesh, textures) = withContext(Dispatchers.IO) { loadModel(resolver, uri, limit, budget) } ?: continue
             withContext(NonCancellable) {
                 try {
-                    if (engine.setModel(uri, mesh, textures)) models[uri] = Triple(version, generation, textures.size)
+                    if (engine.setModel(uri, mesh, textures)) models[uri] = Triple(version, generation to budget, textures.size)
                 } finally { textures.forEach { it?.recycle() } }
             }
         }
@@ -147,9 +148,9 @@ internal fun modelFiles(resolver: ContentResolver, uri: String): Pair<ByteArray,
     }
 }
 
-internal fun loadModel(resolver: ContentResolver, uri: String, limit: Int): Pair<Mesh, List<Bitmap?>>? = try {
+internal fun loadModel(resolver: ContentResolver, uri: String, limit: Int, budget: Int = ModelDetail.budget.value): Pair<Mesh, List<Bitmap?>>? = try {
     val (bytes, open) = modelFiles(resolver, uri)
-    val mesh = readModel(uri.substringAfterLast('/'), bytes, open)
+    val mesh = decimated(parseModel(uri.substringAfterLast('/'), bytes, open), budget)
     Log.i("AMMedia", "model $uri ${mesh.triangleCount} triangles ${mesh.textures.size} pictures")
     mesh to mesh.textures.map { decodeBytes(it, limit) }
 } catch (e: Exception) {

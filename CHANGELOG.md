@@ -6,6 +6,37 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [5.0.1] - 2026-11-08
+
+### Added
+
+- Move several selected layers together: with two or more layers selected, a box goes around all of them; drag anywhere in the preview to move them, and its corner dots make them bigger or smaller together. A pinch does the same.
+- High-detail 3D models (Settings, Playback): 3D models can keep up to 100,000 triangles instead of 50,000. Adding a model with more than 50,000 asks first; the setting turns it back down.
+
+### Changed
+
+- A new group's anchor point sits in the middle of what is in it, so a new group rotates and scales in place.
+
+### Fixed
+
+- Projects, templates and presets brought back by Android's own backup after a reinstall showed the date 21 January 1970.
+- Group corner and side dots grew and shrank a group around the middle of the canvas instead of the middle of the group.
+- A group's thumbnail in the timeline was a white rectangle; it shows what is in the group now. Drawing layers had an empty thumbnail.
+- Desktop: the effects "..." menu (Copy and Paste Effects), the Transform reset menu, the multi-selection Effects and More menus and the audio effect menu opened at the far left of the window instead of at their button.
+- Updating from 4.x straight to 5.0.1 shows the 5.0 What's new.
+- Groups no longer cut off what is inside them at the canvas edge: a group made smaller or moved shows the parts that were outside, and its box goes around all of it, as in Alight Motion.
+- Ungroup no longer makes layers that followed the group (parented to it) jump; they keep its movement.
+- Restoring a backup: a project whose imported font had to be renamed comes back as a copy that uses the backed-up font instead of being skipped. On the desktop, AI cut-outs, enhanced clips and other AI files point at the restored copies when the backup is restored in another folder or on another computer.
+- Exporting an image sequence again under the same name puts it in a new folder, Name (2), instead of mixing the frames of both.
+- Desktop: a video whose sound starts later than its picture keeps the sound in its place in playback, waveforms and exports.
+- Desktop: a long sound mix no longer stops a video export as stalled before the picture starts, and the export checks for room for the sound first.
+- Desktop: bit rates Opus and AAC cannot make in mono are no longer offered.
+- Desktop: exporting a big project does less work for each frame when no text in it animates.
+- 3D models over the triangle limit were simplified far more than needed (a 237,000-triangle phone kept only 5,600 triangles) and lost their sharp edges; they now stay close to the limit and keep hard edges.
+- 3D model faces with many corners, such as a phone's notched screen, are split into triangles that stay inside the face.
+- Inside a group, 3D layers and tilted pictures keep the project's depth order, so a picture placed on a phone model no longer goes behind it.
+- The import report no longer lists settings the app writes itself, such as the Scale lock, as not recognized.
+
 ## [5.0.0] - 2026-11-07
 
 ### Added

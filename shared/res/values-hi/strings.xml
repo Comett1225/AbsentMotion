@@ -1905,6 +1905,12 @@
     <string name="motion_rotate">रोटेट</string>
     <string name="model_choose_file">.obj, .glb या .gltf फ़ाइल चुनें; अगर उसमें .mtl, .bin और तस्वीरें हों तो उन्हें भी साथ रखें</string>
     <string name="model_simplified">इस मॉडल में %1$s त्रिकोण हैं, इसलिए इसे अधिकतम %2$s तक सरलीकृत दिखाया गया है।</string>
+    <string name="settings_model_detail">ज़्यादा डिटेल वाले 3D मॉडल</string>
+    <string name="settings_model_detail_note">3D मॉडल %2$s की जगह अधिकतम %1$s त्रिकोण तक दिखाएँ। एडिटिंग धीमी हो सकती है।</string>
+    <string name="model_detail_ask_title">इस मॉडल को ज़्यादा डिटेल में दिखाएँ?</string>
+    <string name="model_detail_ask_body">इस मॉडल में %1$s त्रिकोण हैं, इसलिए इसे अधिकतम %2$s तक सरलीकृत दिखाया गया है। 3D मॉडल के लिए अधिकतम %3$s त्रिकोण की अनुमति दें? एडिटिंग धीमी हो सकती है। आप इसे बाद में सेटिंग्स में बदल सकते हैं।</string>
+    <string name="model_detail_allow">%1$s की अनुमति दें</string>
+    <string name="model_detail_keep">%1$s ही रखें</string>
     <string name="model_unreadable">यह मॉडल पढ़ा नहीं जा सका: %1$s</string>
     <string name="model_too_large">यह मॉडल खोलने के लिए बहुत बड़ा है</string>
     <string name="model_layer_model">मॉडल</string>

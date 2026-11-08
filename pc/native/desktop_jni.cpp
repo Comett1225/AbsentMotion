@@ -423,6 +423,19 @@ JNIEXPORT jbyteArray JNICALL JNI(shapeIcon)(JNIEnv* e, jobject, jlong h, jstring
     if (!am::ParseScene(str(e, xml), &scene, &error) || scene.layers.empty()) return nullptr;
     scene.layers.front().effects.clear();
     const am::Layer& layer = scene.layers.front();
+    std::vector<uint8_t> rgba;
+    SkRect content;
+    if (am::ContentIconBounds(layer, &content)) {
+        if (content.isEmpty()) return nullptr;
+        const bool drawn = d->offscreen(size, size, false, [&](SkCanvas* canvas) {
+            const float scale = size * 0.9f / std::max(content.width(), content.height());
+            canvas->translate(size / 2.0f, size / 2.0f);
+            canvas->scale(scale, scale);
+            canvas->translate(-content.centerX(), -content.centerY());
+            am::DrawContentIcon(canvas, layer, d->media());
+        }, &rgba);
+        return drawn ? bytes(e, rgba) : nullptr;
+    }
     const SkPath path = am::ShapePath(layer, 0);
     const SkPath stroke = am::StrokePath(layer, path, 0);
     SkMatrix orientation = SkMatrix::I();
@@ -434,7 +447,6 @@ JNIEXPORT jbyteArray JNICALL JNI(shapeIcon)(JNIEnv* e, jobject, jlong h, jstring
     if (layer.fillType != "none" && !stroke.isEmpty()) bounds.join(stroke.getBounds());
     bounds = orientation.mapRect(bounds);
     if (bounds.isEmpty()) return nullptr;
-    std::vector<uint8_t> rgba;
     const bool ok = d->offscreen(size, size, false, [&](SkCanvas* canvas) {
         const float scale = size * 0.9f / std::max(bounds.width(), bounds.height());
         canvas->translate(size / 2.0f, size / 2.0f);

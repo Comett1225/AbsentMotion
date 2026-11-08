@@ -45,4 +45,24 @@ class PivotHandleTest {
         assertNull(handleScale(0, box, Offset(0f, 0f), Offset(-50f, -50f), one, 8f))
         assertNull(handleScale(7, box, Offset(0f, 30f), Offset(-50f, 30f), one, 8f))
     }
+
+    @Test fun aGroupScaledAboutItsMiddleKeepsTheMiddleInPlace() {
+        val far = Offset(-300f, 400f)
+        val doubled = handleScale(2, box, Offset(100f, 50f), Offset(300f, 150f), one, 8f)!!
+        assertEquals(2f, doubled[0], 1e-4f)
+        assertEquals(Offset(-400f, 350f), centreKept(box, far, one, doubled))
+        val wide = handleScale(5, box, Offset(100f, 50f), Offset(300f, 50f), one, 8f)!!
+        assertEquals(2f, wide[0], 1e-4f)
+        assertEquals(1f, wide[1], 1e-4f)
+        assertEquals(Offset(-400f, 0f), centreKept(box, far, one, wide))
+        assertEquals(Offset.Zero, centreKept(box, Offset(100f, 50f), one, doubled))
+    }
+
+    @Test fun desktopMenusOpenAtTheirButtonAndStayInTheWindow() {
+        assertEquals(0, aboveLeftX(900, 1200, 200, desktop = false))
+        assertEquals(900, aboveLeftX(900, 1200, 200, desktop = true))
+        assertEquals(1000, aboveLeftX(1100, 1200, 200, desktop = true))
+        assertEquals(0, aboveLeftX(-20, 1200, 200, desktop = true))
+        assertEquals(0, aboveLeftX(50, 100, 200, desktop = true))
+    }
 }

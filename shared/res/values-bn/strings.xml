@@ -1905,6 +1905,12 @@
     <string name="motion_rotate">রোটেট</string>
     <string name="model_choose_file">একটি .obj, .glb বা .gltf ফাইল বেছে নিন; থাকলে এর .mtl, .bin ও ছবিগুলোও দিন</string>
     <string name="model_simplified">এই মডেলে %1$sটি ত্রিভুজ আছে, তাই এটি সর্বোচ্চ %2$sটি পর্যন্ত সরল করে দেখানো হচ্ছে</string>
+    <string name="settings_model_detail">উচ্চ-বিস্তারিত 3D মডেল</string>
+    <string name="settings_model_detail_note">3D মডেল %2$sটির বদলে সর্বোচ্চ %1$sটি ত্রিভুজ পর্যন্ত দেখান। এডিটিং ধীর হতে পারে।</string>
+    <string name="model_detail_ask_title">এই মডেলটি আরও বিস্তারিতভাবে দেখাবেন?</string>
+    <string name="model_detail_ask_body">এই মডেলে %1$sটি ত্রিভুজ আছে, তাই এটি সর্বোচ্চ %2$sটি পর্যন্ত সরল করে দেখানো হচ্ছে। 3D মডেলের জন্য সর্বোচ্চ %3$sটি ত্রিভুজ অনুমতি দেবেন? এডিটিং ধীর হতে পারে। পরে সেটিংসে এটি বদলাতে পারবেন।</string>
+    <string name="model_detail_allow">%1$s অনুমতি দিন</string>
+    <string name="model_detail_keep">%1$s রাখুন</string>
     <string name="model_unreadable">এই মডেলটি পড়া যায়নি: %1$s</string>
     <string name="model_too_large">এই মডেলটি খোলার জন্য অনেক বড়</string>
     <string name="model_layer_model">মডেল</string>

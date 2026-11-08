@@ -89,7 +89,8 @@ class DeskParityRoundTest {
 
     @Test fun whatsNewShowsOnceAfterAnUpdate() {
         val key = WhatsNewNotes.key(app.absentmotion.desk.DeskInfo.version)!!
-        val title = WhatsNew.parse(repo.resolve("shared/assets/whats-new/$key.md").readText()).title
+        val notes = WhatsNewNotes.notesFor(key, null) { repo.resolve("shared/assets/whats-new/$it.md").isFile }!!
+        val title = WhatsNew.parse(repo.resolve("shared/assets/whats-new/$notes.md").readText()).title
         System.clearProperty("am.whatsNew")
         prepare("whatsnew")
         session(1280, 800) { app ->

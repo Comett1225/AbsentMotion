@@ -1905,6 +1905,12 @@
     <string name="motion_rotate">Rotate</string>
     <string name="model_choose_file">Pumili ng .obj, .glb o .gltf na file, kasama ang .mtl, .bin at mga larawan kung mayroon</string>
     <string name="model_simplified">May %1$s triangle ang model na ito, kaya ipinapakita itong pinasimple hanggang %2$s</string>
+    <string name="settings_model_detail">Mas detalyadong 3D model</string>
+    <string name="settings_model_detail_note">Ipakita ang mga 3D model nang hanggang %1$s triangle sa halip na %2$s. Maaaring bumagal ang pag-edit.</string>
+    <string name="model_detail_ask_title">Ipakita ang model na ito nang mas detalyado?</string>
+    <string name="model_detail_ask_body">May %1$s triangle ang model na ito, kaya ipinapakita itong pinasimple hanggang %2$s. Payagan ang hanggang %3$s triangle para sa mga 3D model? Maaaring bumagal ang pag-edit. Mapapalitan mo ito mamaya sa Mga setting.</string>
+    <string name="model_detail_allow">Payagan ang %1$s</string>
+    <string name="model_detail_keep">Panatilihin ang %1$s</string>
     <string name="model_unreadable">Hindi mabasa ang model na ito: %1$s</string>
     <string name="model_too_large">Masyadong malaki ang model na ito para buksan</string>
     <string name="model_layer_model">Model</string>

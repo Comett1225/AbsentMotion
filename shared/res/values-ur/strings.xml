@@ -1905,6 +1905,12 @@
     <string name="motion_rotate">روٹیٹ</string>
     <string name="model_choose_file">ایک .obj، .glb یا .gltf فائل منتخب کریں، ساتھ میں اس کی .mtl، .bin اور تصاویر اگر ہوں</string>
     <string name="model_simplified">اس ماڈل میں %1$s ٹرائینگلز ہیں، اس لیے اسے زیادہ سے زیادہ %2$s تک سادہ دکھایا گیا ہے</string>
+    <string name="settings_model_detail">زیادہ تفصیل والے 3D ماڈلز</string>
+    <string name="settings_model_detail_note">3D ماڈلز کو %2$s کے بجائے زیادہ سے زیادہ %1$s ٹرائینگلز تک دکھائیں۔ ایڈیٹنگ سست ہو سکتی ہے۔</string>
+    <string name="model_detail_ask_title">کیا یہ ماڈل زیادہ تفصیل سے دکھایا جائے؟</string>
+    <string name="model_detail_ask_body">اس ماڈل میں %1$s ٹرائینگلز ہیں، اس لیے اسے زیادہ سے زیادہ %2$s تک سادہ دکھایا گیا ہے۔ کیا 3D ماڈلز کے لیے زیادہ سے زیادہ %3$s ٹرائینگلز کی اجازت دیں؟ ایڈیٹنگ سست ہو سکتی ہے۔ آپ اسے بعد میں سیٹنگز میں بدل سکتے ہیں۔</string>
+    <string name="model_detail_allow">%1$s کی اجازت دیں</string>
+    <string name="model_detail_keep">%1$s رہنے دیں</string>
     <string name="model_unreadable">یہ ماڈل پڑھا نہیں جا سکا: %1$s</string>
     <string name="model_too_large">یہ ماڈل کھولنے کے لیے بہت بڑا ہے</string>
     <string name="model_layer_model">ماڈل</string>

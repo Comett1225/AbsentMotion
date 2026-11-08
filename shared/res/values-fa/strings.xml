@@ -1905,6 +1905,12 @@
     <string name="motion_rotate">دوران</string>
     <string name="model_choose_file">یک فایل .obj، .glb یا .gltf همراه با .mtl، .bin و تصاویرش (در صورت وجود) انتخاب کنید</string>
     <string name="model_simplified">این مدل %1$s مثلث دارد، بنابراین ساده‌شده و تا حداکثر %2$s مثلث نمایش داده می‌شود</string>
+    <string name="settings_model_detail">مدل‌های سه‌بعدی با جزئیات بالا</string>
+    <string name="settings_model_detail_note">نمایش مدل‌های سه‌بعدی با حداکثر %1$s مثلث به‌جای %2$s. ویرایش ممکن است کندتر شود.</string>
+    <string name="model_detail_ask_title">این مدل با جزئیات بیشتر نمایش داده شود؟</string>
+    <string name="model_detail_ask_body">این مدل %1$s مثلث دارد، بنابراین ساده‌شده و تا حداکثر %2$s مثلث نمایش داده می‌شود. اجازه می‌دهید مدل‌های سه‌بعدی تا %3$s مثلث داشته باشند؟ ویرایش ممکن است کندتر شود. بعداً می‌توانید این را در تنظیمات تغییر دهید.</string>
+    <string name="model_detail_allow">اجازه تا %1$s</string>
+    <string name="model_detail_keep">ماندن روی %1$s</string>
     <string name="model_unreadable">این مدل خوانده نشد: %1$s</string>
     <string name="model_too_large">این مدل برای باز شدن خیلی بزرگ است</string>
     <string name="model_layer_model">مدل</string>

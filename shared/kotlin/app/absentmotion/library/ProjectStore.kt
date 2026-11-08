@@ -39,7 +39,7 @@ class ProjectStore(private val root: File) {
 
     fun list(includeDamaged: Boolean = false): List<ProjectInfo> = dir.listFiles { f -> f.extension == "xml" && safeSegment(f.nameWithoutExtension) }.orEmpty().mapNotNull { file ->
         val id = file.nameWithoutExtension
-        val modified = file.lastModified()
+        val modified = file.savedTime()
         val size = file.length()
         val info = listed[id]?.takeIf { it.modified == modified && it.sizeBytes == size } ?: run {
             val text = runCatching { file.readText() }.getOrNull()
@@ -260,4 +260,15 @@ internal fun writeAtomically(target: File, text: String, sync: Boolean = true) =
         temp.delete()
         throw e
     }
+}
+
+private const val YEAR_2000_MS = 946_684_800_000L
+
+internal fun File.savedTime(now: Long = System.currentTimeMillis()): Long {
+    val time = lastModified()
+    if (time !in 1 until YEAR_2000_MS) return time
+    val repaired = time * 1000
+    if (repaired !in YEAR_2000_MS..now + 86_400_000L) return time
+    setLastModified(repaired)
+    return repaired
 }

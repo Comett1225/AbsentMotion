@@ -315,7 +315,7 @@ class EngineThread(private val background: Int, context: Context? = null, privat
             mediaScene = next
             audio?.setScene(next)
             videos?.update(next, requestedView?.timeMs ?: 0, playing)
-            val key = listOf(next.node.imageUris(), next.node.modelUris(), next.media)
+            val key = listOf(next.node.imageUris(), next.node.modelUris(), next.media, app.absentmotion.media.ModelDetail.budget.value)
             if (previous == null || key != mediaKey) {
                 mediaKey = key
                 val serial = refreshes.get()

@@ -46,7 +46,7 @@ import app.absentmotion.editor.chosenLayers
 import app.absentmotion.editor.copiedLayerForStyle
 import app.absentmotion.editor.deleteChosen
 import app.absentmotion.editor.distributeSelection
-import app.absentmotion.editor.groupLayers
+import app.absentmotion.editor.groupLayersCentred
 import app.absentmotion.editor.moveClipEdges
 import app.absentmotion.editor.pasteStyleOnChosen
 import app.absentmotion.editor.removeAudioOfChosen
@@ -120,9 +120,9 @@ internal fun DeskMulti(state: EditorState, modifier: Modifier) {
     fun paste(parts: Set<StylePart>) = styleToast(context, state.pasteStyleOnChosen(parts))
     val chosen = MultiSelect.ids
     val tiles = listOf(
-        MultiTile(SelectionIcons.Group, R.string.structure_group, chosen.isNotEmpty()) { state.groupLayers(chosen) },
-        MultiTile(SelectionIcons.Mask, R.string.structure_group_mask, chosen.size > 1, needsTwo) { state.groupLayers(chosen, "mask") },
-        MultiTile(SelectionIcons.Exclude, R.string.structure_group_exclude, chosen.size > 1, needsTwo) { state.groupLayers(chosen, "exclude") },
+        MultiTile(SelectionIcons.Group, R.string.structure_group, chosen.isNotEmpty()) { scope.launch { state.groupLayersCentred(chosen) } },
+        MultiTile(SelectionIcons.Mask, R.string.structure_group_mask, chosen.size > 1, needsTwo) { scope.launch { state.groupLayersCentred(chosen, "mask") } },
+        MultiTile(SelectionIcons.Exclude, R.string.structure_group_exclude, chosen.size > 1, needsTwo) { scope.launch { state.groupLayersCentred(chosen, "exclude") } },
         MultiTile(PanelIcons.Link, R.string.structure_link_parent, chosen.isNotEmpty(), parent = true) { parentMenu = true },
         MultiTile(ChromeIcons.Trash, R.string.structure_delete_selected, chosen.isNotEmpty()) { state.deleteChosen() },
     ) + SelectionIcons.Align.mapIndexed { edge, icon ->

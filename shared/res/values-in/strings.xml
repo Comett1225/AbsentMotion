@@ -1881,6 +1881,12 @@
     <string name="motion_rotate">Rotasi</string>
     <string name="model_choose_file">Pilih file .obj, .glb, atau .gltf, beserta .mtl, .bin, dan gambarnya jika ada</string>
     <string name="model_simplified">Model ini memiliki %1$s segitiga, jadi ditampilkan disederhanakan hingga maksimal %2$s</string>
+    <string name="settings_model_detail">Model 3D lebih detail</string>
+    <string name="settings_model_detail_note">Tampilkan model 3D hingga %1$s segitiga, bukan %2$s. Pengeditan bisa lebih lambat.</string>
+    <string name="model_detail_ask_title">Tampilkan model ini dengan lebih detail?</string>
+    <string name="model_detail_ask_body">Model ini memiliki %1$s segitiga, jadi ditampilkan disederhanakan hingga maksimal %2$s. Izinkan hingga %3$s segitiga untuk model 3D? Pengeditan bisa lebih lambat. Anda dapat mengubahnya nanti di Pengaturan.</string>
+    <string name="model_detail_allow">Izinkan %1$s</string>
+    <string name="model_detail_keep">Tetap %1$s</string>
     <string name="model_unreadable">Model ini tidak dapat dibaca: %1$s</string>
     <string name="model_too_large">Model ini terlalu besar untuk dibuka</string>
     <string name="model_layer_model">Model</string>

@@ -1881,6 +1881,12 @@
     <string name="motion_rotate">旋转</string>
     <string name="model_choose_file">选择.obj、.glb或.gltf文件，如有.mtl、.bin和图片文件也请一并选择</string>
     <string name="model_simplified">此模型有 %1$s 个三角形，显示时已简化至最多 %2$s 个</string>
+    <string name="settings_model_detail">高精度 3D 模型</string>
+    <string name="settings_model_detail_note">3D 模型最多显示 %1$s 个三角形，而不是 %2$s 个。编辑可能会变慢。</string>
+    <string name="model_detail_ask_title">以更高精度显示此模型？</string>
+    <string name="model_detail_ask_body">此模型有 %1$s 个三角形，显示时已简化至最多 %2$s 个。允许 3D 模型最多使用 %3$s 个三角形吗？编辑可能会变慢。你可以稍后在设置中更改。</string>
+    <string name="model_detail_allow">允许 %1$s 个</string>
+    <string name="model_detail_keep">保持 %1$s 个</string>
     <string name="model_unreadable">无法读取此模型：%1$s</string>
     <string name="model_too_large">此模型过大，无法打开</string>
     <string name="model_layer_model">模型</string>

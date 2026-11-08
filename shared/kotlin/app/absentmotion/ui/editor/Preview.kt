@@ -44,7 +44,10 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.pointer.PointerEventPass
@@ -72,6 +75,7 @@ import app.absentmotion.editor.clearSelection
 import app.absentmotion.editor.MultiSelect
 import app.absentmotion.editor.place
 import app.absentmotion.editor.withWorldLocation
+import app.absentmotion.editor.movedTogether
 import app.absentmotion.editor.setCrop
 import app.absentmotion.model.cropBox
 import app.absentmotion.model.cropIndex
@@ -184,6 +188,18 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
         }
     }
 
+    var multiBox by remember { mutableStateOf<FloatArray?>(null) }
+    var multiMoving by remember { mutableStateOf(false) }
+    val multiIds = MultiSelect.ids
+    LaunchedEffect(multiIds, scene, mediaRevision) {
+        if (multiIds.isEmpty()) { multiBox = null; return@LaunchedEffect }
+        snapshotFlow { state.timeMs.takeUnless { state.playing } }.collectLatest { timeMs ->
+            if (timeMs == null) return@collectLatest
+            val boxes = multiIds.mapNotNull { state.engine.layerBounds(it, timeMs) }
+            multiBox = if (boxes.isEmpty()) null else floatArrayOf(boxes.minOf { it[0] }, boxes.minOf { it[1] }, boxes.maxOf { it[2] }, boxes.maxOf { it[3] })
+        }
+    }
+
     val adjust = state.pointAdjust.takeIf { state.panel == EditorPanel.Effects }
     var hint by remember { mutableStateOf(false) }
     var hintLabel by remember { mutableStateOf("") }
@@ -260,6 +276,13 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                 awaitEachGesture {
                     val down = awaitFirstDown()
                     val canvasGesture = (state.selectedId == null && MultiSelect.ids.isEmpty()) || state.panZoomMode || state.panel == EditorPanel.Crop
+                    val multi = MultiSelect.ids.takeIf { it.isNotEmpty() && state.selectedId == null && !canvasGesture && !state.playing && state.drawing == null }
+                    val multiFrom = multi?.let { state.scene }
+                    val multiQuad = multi?.let { multiBox }?.let { b -> listOf(Offset(b[0], b[1]), Offset(b[2], b[1]), Offset(b[2], b[3]), Offset(b[0], b[3])).map { it * currentScale + currentOffset } }
+                    val multiCorner = multiQuad?.let { HandleHit.at(it, down.position, HandleHit.reach(it, density)) } ?: -1
+                    val multiGrab = if (multiCorner >= 0 && multiQuad != null) multiQuad[multiCorner] - down.position else Offset.Zero
+                    var multiPan = Offset.Zero
+                    var multiZoom = 1f
                     var fingers = 1
                     var drifted = false
                     val starts = HashMap<PointerId, Offset>()
@@ -308,7 +331,26 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                             moved = event.changes.size > 1 || (position - down.position).getDistance() > viewConfiguration.touchSlop
                             if (!moved) held += pan
                         }
-                        if (moved && pointGrab >= 0 && points != null && fingers == 1) {
+                        if (moved && multi != null && multiFrom != null) {
+                            multiMoving = true
+                            val ms = state.sampleMs
+                            if (multiCorner >= 0 && multiQuad != null) {
+                                val centre = (multiQuad[0] + multiQuad[2]) / 2f
+                                val factor = if (fingers == 1) handleScale(multiCorner, multiQuad, centre, position + multiGrab, floatArrayOf(1f, 1f), 8.dp.toPx())?.get(0) else null
+                                if (factor != null) {
+                                    val about = (centre - currentOffset) / currentScale
+                                    state.edit(MULTI_KEY) { multiFrom.movedTogether(multi, ms, about.x, about.y, factor, 0f, 0f) }
+                                }
+                            } else {
+                                multiPan += pan + held
+                                held = Offset.Zero
+                                multiZoom *= zoom
+                                val centroid = event.calculateCentroid(useCurrent = false)
+                                val about = if (centroid.isSpecified) (centroid - currentOffset) / currentScale else Offset.Zero
+                                val move = multiPan / currentScale
+                                state.edit(MULTI_KEY) { multiFrom.movedTogether(multi, ms, about.x, about.y, multiZoom, move.x, move.y) }
+                            }
+                        } else if (moved && pointGrab >= 0 && points != null && fingers == 1) {
                             gesture = HIDDEN
                             inLayer(position + grabOffset)?.let { points.move(pointGrab, it) }
                         } else if (moved && startLayer != null && handle >= 10 && startQuad != null) {
@@ -332,6 +374,14 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                             if (app.absentmotion.platform.PlatformFeatures.desktop && event.keyboardModifiers.isAltPressed) {
                                 val turn = handleTurn(down.position - pivot, position - pivot)
                                 state.editSelected(key = "preview-handle") { it.withRotation(startLayer.rotation + turn) }
+                                continue
+                            }
+                            if (startLayer.kind == "embedScene") {
+                                val scaled = handleScale(handle, startQuad, (startQuad[0] + startQuad[2]) / 2f, position + handleGrab, startLayer.scale, 8.dp.toPx()) ?: continue
+                                val shift = (centreKept(startQuad, pivot, startLayer.scale, scaled) / currentScale).let { Pt(it.x, it.y) }.let { planeView?.unmapVector(it) ?: it }
+                                state.editSelected(key = "preview-handle") {
+                                    state.scene.withWorldLocation(startLayer, state.sampleMs) { x, y -> x + shift.x to y + shift.y }.withTransform("scale", scaled[0], scaled[1])
+                                }
                                 continue
                             }
                             val scaled = handleScale(handle, startQuad, pivot, position + handleGrab, startLayer.scale, 8.dp.toPx()) ?: continue
@@ -383,6 +433,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                         if (moved) event.changes.forEach { if (it.positionChanged()) it.consume() }
                     } while (event.changes.any { it.pressed })
                     gesture = IDLE
+                    multiMoving = false
                     val farFromDots = gradientMode && gradientHandleDistance(startLayer, startQuad, down.position) > 24.dp.toPx()
                     if (canvasGesture && fingers == 2 && !drifted) {
                         if (down.uptimeMillis - lastTwoFingerTap < viewConfiguration.doubleTapTimeoutMillis) {
@@ -420,6 +471,9 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                 }
             },
         )
+        if (multiIds.isNotEmpty() && state.selectedId == null && !multiMoving && !state.playing && state.drawing == null) multiBox?.let { b ->
+            MultiSelectionBox(b, scale, Offset(dx, dy), if (refPx > 0f) refPx else size.width / 1080f)
+        }
         Presence(hint) { SwipeHint(hintLabel, Modifier.align(Alignment.Center).presence()) }
         CanvasZoomHud(state, Modifier.align(Alignment.TopStart))
         if (state.drawing == null && !editingText) {
@@ -514,6 +568,37 @@ internal fun handleScale(handle: Int, corners: List<Offset>, pivot: Offset, now:
     if (abs(along) < reach) return null
     val factor = (((now - pivot).x * axis.x + (now - pivot).y * axis.y) / length / along).coerceAtLeast(0.01f)
     return if (handle % 2 == 0) floatArrayOf(start[0], start[1] * factor) else floatArrayOf(start[0] * factor, start[1])
+}
+
+internal fun centreKept(corners: List<Offset>, pivot: Offset, start: FloatArray, scaled: FloatArray): Offset {
+    val centre = (corners[0] + corners[2]) / 2f
+    val handles = handlesOf(corners)
+    val ex = handles[5] - centre
+    val ey = handles[6] - centre
+    val det = ex.x * ey.y - ex.y * ey.x
+    if (abs(det) < 1e-6f) return Offset.Zero
+    val d = centre - pivot
+    val u = (d.x * ey.y - d.y * ey.x) / det
+    val v = (ex.x * d.y - ex.y * d.x) / det
+    val kx = if (start[0] != 0f) scaled[0] / start[0] else 1f
+    val ky = if (start[1] != 0f) scaled[1] / start[1] else 1f
+    return d - ex * (u * kx) - ey * (v * ky)
+}
+
+internal const val MULTI_KEY = "preview-multi"
+
+@Composable
+private fun MultiSelectionBox(box: FloatArray, scale: Float, offset: Offset, px: Float) {
+    Canvas(Modifier.fillMaxSize().clipToBounds()) {
+        val corners = listOf(Offset(box[0], box[1]), Offset(box[2], box[1]), Offset(box[2], box[3]), Offset(box[0], box[3])).map { it * scale + offset }
+        val outline = Path().apply { moveTo(corners[0].x, corners[0].y); corners.drop(1).forEach { lineTo(it.x, it.y) }; close() }
+        drawPath(outline, Color.Black, style = Stroke(7.3f * px))
+        drawPath(outline, Color.White, style = Stroke(5.3f * px))
+        for (corner in corners) {
+            drawCircle(Color.Black, 15.5f * px, corner)
+            drawCircle(Color.White, 12.5f * px, corner)
+        }
+    }
 }
 
 internal const val WHEEL_KEY = "preview-wheel"

@@ -1881,6 +1881,12 @@
     <string name="motion_rotate">회전</string>
     <string name="model_choose_file">.obj, .glb 또는 .gltf 파일과 함께 .mtl, .bin, 이미지 파일이 있다면 선택하세요</string>
     <string name="model_simplified">이 모델에는 삼각형이 %1$s개 있어 최대 %2$s개로 단순화하여 표시합니다</string>
+    <string name="settings_model_detail">더 정밀한 3D 모델</string>
+    <string name="settings_model_detail_note">3D 모델을 삼각형 %2$s개 대신 최대 %1$s개로 표시합니다. 편집이 느려질 수 있습니다.</string>
+    <string name="model_detail_ask_title">이 모델을 더 자세히 표시할까요?</string>
+    <string name="model_detail_ask_body">이 모델에는 삼각형이 %1$s개 있어 최대 %2$s개로 단순화하여 표시합니다. 3D 모델에 삼각형을 최대 %3$s개까지 허용할까요? 편집이 느려질 수 있습니다. 나중에 설정에서 바꿀 수 있습니다.</string>
+    <string name="model_detail_allow">%1$s개 허용</string>
+    <string name="model_detail_keep">%1$s개 유지</string>
     <string name="model_unreadable">이 모델을 읽을 수 없습니다: %1$s</string>
     <string name="model_too_large">이 모델은 너무 커서 열 수 없습니다</string>
     <string name="model_layer_model">모델</string>

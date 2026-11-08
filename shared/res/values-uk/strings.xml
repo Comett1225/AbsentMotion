@@ -1953,6 +1953,12 @@
     <string name="motion_rotate">Поворот</string>
     <string name="model_choose_file">Виберіть файл .obj, .glb або .gltf разом із .mtl, .bin і зображеннями, якщо вони є</string>
     <string name="model_simplified">Ця модель має %1$s трикутників, тому її показано спрощеною — щонайбільше %2$s</string>
+    <string name="settings_model_detail">Детальніші 3D-моделі</string>
+    <string name="settings_model_detail_note">Показувати 3D-моделі до %1$s трикутників замість %2$s. Редагування може сповільнитися.</string>
+    <string name="model_detail_ask_title">Показати цю модель детальніше?</string>
+    <string name="model_detail_ask_body">Ця модель має %1$s трикутників, тому її показано спрощеною — щонайбільше %2$s. Дозволити до %3$s трикутників для 3D-моделей? Редагування може сповільнитися. Це можна змінити пізніше в налаштуваннях.</string>
+    <string name="model_detail_allow">Дозволити %1$s</string>
+    <string name="model_detail_keep">Залишити %1$s</string>
     <string name="model_unreadable">Не вдалося прочитати цю модель: %1$s</string>
     <string name="model_too_large">Ця модель надто велика, щоб її відкрити</string>
     <string name="model_layer_model">Модель</string>

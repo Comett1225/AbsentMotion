@@ -28,7 +28,7 @@ class TemplateStore(private val root: File, private val open: (String) -> InputS
     fun list(): List<SavedTemplate> = root.listFiles { f -> f.isDirectory }.orEmpty().mapNotNull { dir ->
         val file = File(dir, "scene.xml")
         val scene = runCatching { Scene.parse(file.readText()) }.getOrNull() ?: return@mapNotNull null
-        SavedTemplate(dir.name, scene, File(dir, "thumb.png").takeIf { it.exists() }, file.lastModified())
+        SavedTemplate(dir.name, scene, File(dir, "thumb.png").takeIf { it.exists() }, file.savedTime())
     }.sortedByDescending { it.modified }
 
     fun load(id: String): Scene? = runCatching { Scene.parse(File(root, "$id/scene.xml").readText()) }.getOrNull()

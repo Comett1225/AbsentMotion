@@ -2001,6 +2001,12 @@
     <string name="motion_rotate">تدوير</string>
     <string name="model_choose_file">اختر ملف .obj أو .glb أو .gltf مع ملف .mtl و.bin والصور إن وُجدت</string>
     <string name="model_simplified">يحتوي هذا النموذج على %1$s مثلث، لذا يُعرض مبسّطًا بحد أقصى %2$s</string>
+    <string name="settings_model_detail">نماذج ثلاثية الأبعاد عالية التفاصيل</string>
+    <string name="settings_model_detail_note">عرض النماذج ثلاثية الأبعاد بما يصل إلى %1$s مثلث بدلًا من %2$s. قد يصبح التحرير أبطأ.</string>
+    <string name="model_detail_ask_title">هل تريد عرض هذا النموذج بتفاصيل أكثر؟</string>
+    <string name="model_detail_ask_body">يحتوي هذا النموذج على %1$s مثلث، لذا يُعرض مبسّطًا بحد أقصى %2$s. هل تسمح بما يصل إلى %3$s مثلث للنماذج ثلاثية الأبعاد؟ قد يصبح التحرير أبطأ. يمكنك تغيير ذلك لاحقًا من الإعدادات.</string>
+    <string name="model_detail_allow">السماح بـ %1$s</string>
+    <string name="model_detail_keep">الإبقاء على %1$s</string>
     <string name="model_unreadable">تعذرت قراءة هذا النموذج: %1$s</string>
     <string name="model_too_large">هذا النموذج أكبر من أن يُفتح</string>
     <string name="model_layer_model">نموذج</string>

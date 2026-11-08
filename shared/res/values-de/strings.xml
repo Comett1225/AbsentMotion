@@ -1905,6 +1905,12 @@
     <string name="motion_rotate">Drehen</string>
     <string name="model_choose_file">Wähle eine .obj-, .glb- oder .gltf-Datei samt zugehöriger .mtl-, .bin- und Bilddateien, falls vorhanden</string>
     <string name="model_simplified">Dieses Modell hat %1$s Dreiecke und wird daher vereinfacht mit höchstens %2$s dargestellt</string>
+    <string name="settings_model_detail">3D-Modelle mit mehr Details</string>
+    <string name="settings_model_detail_note">3D-Modelle mit bis zu %1$s statt %2$s Dreiecken anzeigen. Die Bearbeitung kann langsamer werden.</string>
+    <string name="model_detail_ask_title">Dieses Modell detaillierter anzeigen?</string>
+    <string name="model_detail_ask_body">Dieses Modell hat %1$s Dreiecke und wird daher vereinfacht mit höchstens %2$s dargestellt. Bis zu %3$s Dreiecke für 3D-Modelle erlauben? Die Bearbeitung kann langsamer werden. Du kannst das später in den Einstellungen ändern.</string>
+    <string name="model_detail_allow">%1$s erlauben</string>
+    <string name="model_detail_keep">Bei %1$s bleiben</string>
     <string name="model_unreadable">Dieses Modell konnte nicht gelesen werden: %1$s</string>
     <string name="model_too_large">Dieses Modell ist zu groß zum Öffnen</string>
     <string name="model_layer_model">Modell</string>

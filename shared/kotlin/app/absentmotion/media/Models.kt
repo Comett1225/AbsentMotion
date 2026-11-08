@@ -8,6 +8,8 @@ import org.json.JSONObject
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.Base64
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sqrt
@@ -27,6 +29,14 @@ class Mesh(
 }
 
 const val MODEL_TRIANGLE_BUDGET = 50_000
+const val MODEL_HIGH_DETAIL_BUDGET = 100_000
+
+fun triangles(count: Int): String = java.text.NumberFormat.getIntegerInstance().format(count)
+
+object ModelDetail {
+    val budget = MutableStateFlow(MODEL_TRIANGLE_BUDGET)
+    val high: Boolean get() = budget.value > MODEL_TRIANGLE_BUDGET
+}
 
 internal const val MODEL_WORK_LIMIT = 16_000_000L
 
@@ -39,7 +49,7 @@ fun parseModel(name: String, bytes: ByteArray, open: (String) -> ByteArray?): Me
     return mesh
 }
 
-fun readModel(name: String, bytes: ByteArray, open: (String) -> ByteArray?): Mesh = decimated(parseModel(name, bytes, open), MODEL_TRIANGLE_BUDGET)
+fun readModel(name: String, bytes: ByteArray, open: (String) -> ByteArray?): Mesh = decimated(parseModel(name, bytes, open), ModelDetail.budget.value)
 
 private class Floats {
     var data = FloatArray(4096)
@@ -148,6 +158,57 @@ private fun argb(r: Float, g: Float, b: Float, a: Float): Int {
     return (c(a) shl 24) or (c(r) shl 16) or (c(g) shl 8) or c(b)
 }
 
+internal fun polygonTriangles(xs: FloatArray, ys: FloatArray, zs: FloatArray): IntArray {
+    val n = xs.size
+    val fan = IntArray(max(0, n - 2) * 3) { i -> if (i % 3 == 0) 0 else i / 3 + i % 3 }
+    if (n <= 3 || n > 4096) return fan
+    var nx = 0.0; var ny = 0.0; var nz = 0.0
+    for (i in 0 until n) {
+        val j = (i + 1) % n
+        nx += (ys[i] - ys[j]).toDouble() * (zs[i] + zs[j])
+        ny += (zs[i] - zs[j]).toDouble() * (xs[i] + xs[j])
+        nz += (xs[i] - xs[j]).toDouble() * (ys[i] + ys[j])
+    }
+    val ax = abs(nx); val ay = abs(ny); val az = abs(nz)
+    if (max(ax, max(ay, az)) == 0.0) return fan
+    val u: FloatArray; val v: FloatArray; val sign: Double
+    when {
+        az >= ax && az >= ay -> { u = xs; v = ys; sign = nz }
+        ax >= ay -> { u = ys; v = zs; sign = nx }
+        else -> { u = zs; v = xs; sign = ny }
+    }
+    val flip = sign < 0
+    fun cross(a: Int, b: Int, c: Int): Double {
+        val r = (u[b] - u[a]).toDouble() * (v[c] - v[a]) - (v[b] - v[a]).toDouble() * (u[c] - u[a])
+        return if (flip) -r else r
+    }
+    val left = ArrayList<Int>(n).apply { for (i in 0 until n) add(i) }
+    val out = IntArray((n - 2) * 3)
+    var written = 0
+    var miss = 0
+    var i = 0
+    while (left.size > 3 && miss < left.size) {
+        val m = left.size
+        val a = left[(i + m - 1) % m]; val b = left[i % m]; val c = left[(i + 1) % m]
+        var ear = cross(a, b, c) > 0
+        if (ear) for (k in left) {
+            if (k == a || k == b || k == c) continue
+            if (cross(a, b, k) >= 0 && cross(b, c, k) >= 0 && cross(c, a, k) >= 0) { ear = false; break }
+        }
+        if (ear) {
+            out[written++] = a; out[written++] = b; out[written++] = c
+            left.removeAt(i % m)
+            miss = 0
+            if (i >= left.size) i = 0
+        } else {
+            miss++
+            i = (i + 1) % m
+        }
+    }
+    for (k in 1 until left.size - 1) { out[written++] = left[0]; out[written++] = left[k]; out[written++] = left[k + 1] }
+    return out
+}
+
 private fun tokens(line: String): List<String> = line.split(' ', '\t').filter { it.isNotEmpty() }
 
 private fun mapFileName(args: String): String? {
@@ -227,7 +288,12 @@ object ObjReader {
                                 argb(c[0] * vcs.data[v * 3], c[1] * vcs.data[v * 3 + 1], c[2] * vcs.data[v * 3 + 2], c[3]))
                         }
                     }
-                    for (k in 1 until corners.size - 1) builder.triangle(corners[0], corners[k], corners[k + 1], slot)
+                    if (corners.size == 3) builder.triangle(corners[0], corners[1], corners[2], slot)
+                    else {
+                        val at = { k: Int, axis: Int -> val v = resolve(t[k + 1].substringBefore('/').toIntOrNull() ?: 0, vs.size / 3); vs.data[v * 3 + axis] }
+                        val order = polygonTriangles(FloatArray(corners.size) { at(it, 0) }, FloatArray(corners.size) { at(it, 1) }, FloatArray(corners.size) { at(it, 2) })
+                        for (k in order.indices step 3) builder.triangle(corners[order[k]], corners[order[k + 1]], corners[order[k + 2]], slot)
+                    }
                 }
             }
         }
@@ -481,12 +547,23 @@ object GltfReader {
 
 fun decimated(mesh: Mesh, budget: Int): Mesh {
     if (mesh.triangleCount <= budget) return mesh
+    var best: Mesh? = null
+    var low = 0
+    var high = 4097
     var cells = 256
-    while (true) {
+    repeat(12) {
         val result = clustered(mesh, cells)
-        if (result.triangleCount <= budget || cells <= 4) return result
-        cells = max(4, (cells * 0.8f).toInt())
+        val count = result.triangleCount
+        if (count <= budget) {
+            if (best.let { it == null || count > it.triangleCount }) best = result
+            if (count >= budget * 0.85) return result
+            low = cells
+        } else high = cells
+        if (high - low <= 1) return best ?: clustered(mesh, 4)
+        val guess = (cells * sqrt(budget * 0.95 / max(1, count))).toInt()
+        cells = if (guess in low + 1 until high) guess else (low + high) / 2
     }
+    return best ?: clustered(mesh, 4)
 }
 
 private const val UV_CELLS = 512
@@ -518,7 +595,8 @@ private fun clustered(mesh: Mesh, cells: Int): Mesh {
         for (i in 0..2) corners.add(t[k * 3 + i])
         slots.add(mesh.slots[k])
     }
-    val output = HashMap<Long, Int>()
+    val output = HashMap<Pair<Long, Int>, Int>()
+    fun facing(v: Int) = (0..2).fold(0) { bins, i -> bins * 5 + (kotlin.math.round(mesh.normals[v * 3 + i] * 2f).toInt().coerceIn(-2, 2) + 2) }
     val outGroup = Ints()
     val sums = ArrayList<DoubleArray>()
     val triangles = IntArray(corners.size)
@@ -527,7 +605,7 @@ private fun clustered(mesh: Mesh, cells: Int): Mesh {
         val v = corners.data[k]
         val key = (group[v].toLong() shl 40) or (((slots.data[k / 3] + 1).toLong() and 0xff) shl 32) or
             (quantised(mesh.uvs[v * 2]) shl 16) or quantised(mesh.uvs[v * 2 + 1])
-        val out = output.getOrPut(key) { outGroup.add(group[v]); sums.add(DoubleArray(10)); sums.size - 1 }
+        val out = output.getOrPut(key to facing(v)) { outGroup.add(group[v]); sums.add(DoubleArray(10)); sums.size - 1 }
         triangles[k] = out
         val s = sums[out]
         for (i in 0..2) s[i] += mesh.normals[v * 3 + i].toDouble()

@@ -307,6 +307,8 @@ float DepthPerPixel(const Layer& layer, double timeMs);
 SkMatrix WorldMatrix(const Scene& scene, const Layer& layer, double timeMs);
 int64_t TopLayerAt(const Scene& scene, double timeMs, float x, float y, const MediaPictures& masks);
 SkRect SelectionBounds(const Layer& layer, double timeMs, const SkMatrix& matrix);
+bool ContentIconBounds(const Layer& layer, SkRect* bounds);
+void DrawContentIcon(SkCanvas* canvas, const Layer& layer, const MediaPictures& pictures);
 void DrawLayerList(SkCanvas* canvas, const Scene& scene, const std::vector<Layer>& layers, double timeMs, const MediaPictures& pictures);
 
 SkPath ShapePath(const Layer& layer, float t);

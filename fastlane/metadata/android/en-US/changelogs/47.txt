@@ -1,0 +1,1 @@
+Bug fixes for 5.0: move and scale several selected layers together in the preview, groups grow, shrink and rotate around their own middle and keep 3D depth, group and drawing thumbnails show their contents, better 3D models with a High-detail 3D models setting, project dates after a reinstall, desktop menus open at their button, backup restore, ungroup and desktop export fixes.

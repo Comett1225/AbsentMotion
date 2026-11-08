@@ -1,5 +1,7 @@
 package app.absentmotion.pc
 
+import app.absentmotion.editor.place
+import app.absentmotion.editor.EditorPanel
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -216,6 +218,50 @@ class DeskParityTest {
             mainClock.advanceTimeBy(300)
             onRoot().performMouseInput { moveTo(centre); press(MouseButton.Primary); moveTo(centre + Offset(60f, 30f), 200); release(MouseButton.Primary) }
             runOnIdle { assertNotEquals("dragging empty canvas pans", Offset.Zero, editor.canvasPan) }
+            runBlocking { app.closeEditor() }
+        }
+    }
+
+    @Test fun effectsMenuOpensAtItsButton() {
+        data("effects-menu")
+        runSkikoComposeUiTest(size = Size(1280f, 800f)) {
+            val app = DeskAppState()
+            setContent { DeskApp(app) }
+            open(app, "styles")
+            val editor = app.editor!!
+            runOnIdle { editor.selectedId = editor.scene.layers.last().id; editor.panel = EditorPanel.Effects }
+            mainClock.advanceTimeBy(500)
+            val more = onAllNodesWithContentDescription("More").filter(hasClickAction()).fetchSemanticsNodes().maxBy { it.boundsInRoot.left }
+            val button = more.boundsInRoot
+            onRoot().performMouseInput { click(button.center) }
+            mainClock.advanceTimeBy(500)
+            val menu = onAllNodesWithText("Copy Effects").onFirst().fetchSemanticsNode().boundsInRoot
+            assertTrue("menu at ${menu.left}, button at ${button.left}", menu.left > button.left - 60f && menu.left < button.right)
+            runBlocking { app.closeEditor() }
+        }
+    }
+
+    @Test fun draggingThePreviewMovesEverySelectedLayer() {
+        data("multi-move")
+        runSkikoComposeUiTest(size = Size(1280f, 800f)) {
+            val app = DeskAppState()
+            setContent { DeskApp(app) }
+            open(app, "styles")
+            val editor = app.editor!!
+            val chosen = editor.scene.layers.filter { it.kind != "camera" && it.kind != "audio" }.take(2).map { it.id }
+            val before = chosen.associateWith { editor.scene.place(editor.scene.layer(it)!!, 0) }
+            runOnIdle { editor.selectedId = null; MultiSelect.ids = chosen.toSet(); MultiSelect.active = true }
+            mainClock.advanceTimeBy(800)
+            val centre = DeskPreviewBounds.bounds.center
+            onRoot().performMouseInput { moveTo(centre); press(MouseButton.Primary); moveTo(centre + Offset(60f, 30f), 200); release(MouseButton.Primary) }
+            mainClock.advanceTimeBy(300)
+            runOnIdle {
+                val moved = chosen.map { editor.scene.place(editor.scene.layer(it)!!, 0).x - before.getValue(it).x }
+                assertTrue("moved $moved", moved.all { it > 1f })
+                assertEquals(moved[0], moved[1], 0.5f)
+                assertEquals(Offset.Zero, editor.canvasPan)
+                MultiSelect.clear()
+            }
             runBlocking { app.closeEditor() }
         }
     }

@@ -162,7 +162,7 @@ class EngineThread(private val background: Int, private val context: Context? = 
         val previous = mediaScene
         mediaScene = next
         audio?.setScene(next)
-        val key = listOf(next.node.imageUris(), next.node.modelUris(), next.media, videoUris(next))
+        val key = listOf(next.node.imageUris(), next.node.modelUris(), next.media, videoUris(next), app.absentmotion.media.ModelDetail.budget.value)
         if (previous == null || key != mediaKey) {
             mediaKey = key
             mediaJob?.cancel()

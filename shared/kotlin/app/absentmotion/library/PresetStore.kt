@@ -14,7 +14,7 @@ data class SavedPreset(val id: String, val scene: Scene) {
 class PresetStore(private val dir: File) {
     constructor(context: Context) : this(File(context.filesDir, "presets"))
 
-    fun list(): List<SavedPreset> = dir.listFiles { f -> f.extension == "xml" }.orEmpty().sortedByDescending { it.lastModified() }
+    fun list(): List<SavedPreset> = dir.listFiles { f -> f.extension == "xml" }.orEmpty().sortedByDescending { it.savedTime() }
         .mapNotNull { load(it.nameWithoutExtension) }
 
     fun load(id: String): SavedPreset? = runCatching { SavedPreset(id, Scene.parse(file(id).readText())) }.getOrNull()?.takeIf { it.layer != null }

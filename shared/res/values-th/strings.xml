@@ -1881,6 +1881,12 @@
     <string name="motion_rotate">หมุนรอบ</string>
     <string name="model_choose_file">เลือกไฟล์ .obj, .glb หรือ .gltf พร้อมไฟล์ .mtl, .bin และรูปภาพ (ถ้ามี)</string>
     <string name="model_simplified">โมเดลนี้มี %1$s สามเหลี่ยม จึงแสดงแบบย่อไม่เกิน %2$s</string>
+    <string name="settings_model_detail">โมเดล 3D แบบละเอียดสูง</string>
+    <string name="settings_model_detail_note">แสดงโมเดล 3D ได้สูงสุด %1$s สามเหลี่ยมแทน %2$s การแก้ไขอาจช้าลง</string>
+    <string name="model_detail_ask_title">แสดงโมเดลนี้ให้ละเอียดขึ้นไหม</string>
+    <string name="model_detail_ask_body">โมเดลนี้มี %1$s สามเหลี่ยม จึงแสดงแบบย่อไม่เกิน %2$s อนุญาตให้โมเดล 3D มีได้สูงสุด %3$s สามเหลี่ยมไหม การแก้ไขอาจช้าลง คุณเปลี่ยนได้ภายหลังในการตั้งค่า</string>
+    <string name="model_detail_allow">อนุญาต %1$s</string>
+    <string name="model_detail_keep">คงไว้ที่ %1$s</string>
     <string name="model_unreadable">อ่านโมเดลนี้ไม่ได้: %1$s</string>
     <string name="model_too_large">โมเดลนี้ใหญ่เกินไปที่จะเปิด</string>
     <string name="model_layer_model">โมเดล</string>

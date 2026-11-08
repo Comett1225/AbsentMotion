@@ -213,8 +213,15 @@ object WhatsNewNotes {
             settings.whatsNewSeen = key
             return null
         }
-        val text = runCatching { context.assets.open("whats-new/$key.md").bufferedReader().use { it.readText() } }.getOrNull() ?: return null
+        val shown = notesFor(key, settings.whatsNewSeen) { name -> runCatching { context.assets.open("whats-new/$name.md").close() }.isSuccess } ?: return null
+        val text = runCatching { context.assets.open("whats-new/$shown.md").bufferedReader().use { it.readText() } }.getOrNull() ?: return null
         return WhatsNew.parse(text).takeIf { it.sections.isNotEmpty() }
+    }
+
+    fun notesFor(key: String, seen: String?, exists: (String) -> Boolean): String? {
+        if (exists(key)) return key
+        val release = key.substringBeforeLast('.') + ".0"
+        return release.takeIf { it != key && it != seen && exists(it) }
     }
 
     fun seen(context: Context, settings: AppSettings) {

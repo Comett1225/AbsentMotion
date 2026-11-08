@@ -58,4 +58,13 @@ class WhatsNewTest {
             for (match in link.findAll(text)) assertNotNull(file.name + ": " + match.value, ReportLinks.BuiltIn.named(match.groupValues[2]))
         }
     }
+
+    @Test fun aPatchVersionWithoutItsOwnNotesShowsTheReleaseNotesOnce() {
+        val files = setOf("4.4.0", "5.0.0")
+        assertEquals("5.0.0", WhatsNewNotes.notesFor("5.0.1", "4.4.1") { it in files })
+        assertEquals(null, WhatsNewNotes.notesFor("5.0.1", "5.0.0") { it in files })
+        assertEquals("5.0.0", WhatsNewNotes.notesFor("5.0.0", "4.4.1") { it in files })
+        assertEquals(null, WhatsNewNotes.notesFor("5.1.0", "5.0.1") { it in files })
+        assertEquals("5.0.2", WhatsNewNotes.notesFor("5.0.2", "5.0.1") { it in files + "5.0.2" })
+    }
 }

@@ -1,5 +1,8 @@
 package app.absentmotion.ui.home
 
+import app.absentmotion.media.MODEL_HIGH_DETAIL_BUDGET
+import app.absentmotion.media.MODEL_TRIANGLE_BUDGET
+import app.absentmotion.media.triangles
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.captionBar
 import androidx.compose.foundation.layout.statusBars
@@ -189,6 +192,10 @@ internal fun PlaybackSettings(settings: AppSettings) {
     }
     Divider(10.dp)
     SwitchRow(stringResource(R.string.settings_background_preview), settings.backgroundPreview, enabled = true) { settings.backgroundPreview = it }
+    Divider(10.dp)
+    SwitchRow(stringResource(R.string.settings_model_detail), settings.highDetailModels, enabled = true) { settings.highDetailModels = it }
+    Text(stringResource(R.string.settings_model_detail_note, triangles(MODEL_HIGH_DETAIL_BUDGET), triangles(MODEL_TRIANGLE_BUDGET)), Modifier.padding(horizontal = 10.dp),
+        color = Am.HomeMid, fontSize = 12.sp, lineHeight = 16.sp)
     Divider(10.dp)
     if (!DESK) {
         val now = stringResource(R.string.settings_graphics_note, if (app.absentmotion.Tier.openGl) "OpenGL" else "Vulkan")

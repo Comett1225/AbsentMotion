@@ -1953,6 +1953,12 @@
     <string name="motion_rotate">Вращение</string>
     <string name="model_choose_file">Выберите файл .obj, .glb или .gltf вместе с .mtl, .bin и изображениями, если они есть</string>
     <string name="model_simplified">В этой модели %1$s треугольников, поэтому она показана упрощённо — до %2$s</string>
+    <string name="settings_model_detail">Детализированные 3D-модели</string>
+    <string name="settings_model_detail_note">Показывать 3D-модели до %1$s треугольников вместо %2$s. Редактирование может стать медленнее.</string>
+    <string name="model_detail_ask_title">Показать эту модель детальнее?</string>
+    <string name="model_detail_ask_body">В этой модели %1$s треугольников, поэтому она показана упрощённо — до %2$s. Разрешить до %3$s треугольников для 3D-моделей? Редактирование может стать медленнее. Это можно изменить позже в настройках.</string>
+    <string name="model_detail_allow">Разрешить %1$s</string>
+    <string name="model_detail_keep">Оставить %1$s</string>
     <string name="model_unreadable">Не удалось прочитать модель: %1$s</string>
     <string name="model_too_large">Модель слишком большая, чтобы открыть её</string>
     <string name="model_layer_model">Модель</string>

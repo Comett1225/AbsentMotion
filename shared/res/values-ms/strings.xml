@@ -1881,6 +1881,12 @@
     <string name="motion_rotate">Putar</string>
     <string name="model_choose_file">Pilih fail .obj, .glb atau .gltf, berserta .mtl, .bin dan gambar jika ada</string>
     <string name="model_simplified">Model ini mempunyai %1$s segi tiga, jadi ia dipaparkan secara ringkas sehingga maksimum %2$s</string>
+    <string name="settings_model_detail">Model 3D lebih terperinci</string>
+    <string name="settings_model_detail_note">Paparkan model 3D sehingga %1$s segi tiga dan bukannya %2$s. Penyuntingan mungkin lebih perlahan.</string>
+    <string name="model_detail_ask_title">Paparkan model ini dengan lebih terperinci?</string>
+    <string name="model_detail_ask_body">Model ini mempunyai %1$s segi tiga, jadi ia dipaparkan secara ringkas sehingga maksimum %2$s. Benarkan sehingga %3$s segi tiga untuk model 3D? Penyuntingan mungkin lebih perlahan. Anda boleh menukarnya kemudian dalam Tetapan.</string>
+    <string name="model_detail_allow">Benarkan %1$s</string>
+    <string name="model_detail_keep">Kekalkan %1$s</string>
     <string name="model_unreadable">Model ini tidak dapat dibaca: %1$s</string>
     <string name="model_too_large">Model ini terlalu besar untuk dibuka</string>
     <string name="model_layer_model">Model</string>

@@ -1953,6 +1953,12 @@
     <string name="motion_rotate">Obróć</string>
     <string name="model_choose_file">Wybierz plik .obj, .glb lub .gltf wraz z plikami .mtl, .bin i obrazami, jeśli je zawiera</string>
     <string name="model_simplified">Ten model ma %1$s trójkątów, dlatego jest wyświetlany w uproszczeniu do maksymalnie %2$s</string>
+    <string name="settings_model_detail">Dokładniejsze modele 3D</string>
+    <string name="settings_model_detail_note">Pokazuj modele 3D z maksymalnie %1$s trójkątów zamiast %2$s. Edycja może działać wolniej.</string>
+    <string name="model_detail_ask_title">Pokazać ten model dokładniej?</string>
+    <string name="model_detail_ask_body">Ten model ma %1$s trójkątów, dlatego jest wyświetlany w uproszczeniu do maksymalnie %2$s. Zezwolić na maksymalnie %3$s trójkątów w modelach 3D? Edycja może działać wolniej. Możesz to później zmienić w Ustawieniach.</string>
+    <string name="model_detail_allow">Zezwól na %1$s</string>
+    <string name="model_detail_keep">Zostaw %1$s</string>
     <string name="model_unreadable">Nie udało się odczytać modelu: %1$s</string>
     <string name="model_too_large">Ten model jest zbyt duży, aby go otworzyć</string>
     <string name="model_layer_model">Model</string>

@@ -15,7 +15,10 @@ import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.Base64
+import kotlin.math.abs
 import kotlin.math.sqrt
+import kotlin.math.cos
+import kotlin.math.sin
 
 class ModelReaderTest {
     private val cube = """
@@ -260,6 +263,57 @@ class ModelReaderTest {
         assertEquals(small.triangleCount, small.slots.size)
         val big = readModel("dense.obj", text.toString().toByteArray()) { null }
         assertTrue(big.triangleCount <= MODEL_TRIANGLE_BUDGET)
+    }
+
+    @Test fun aReducedModelKeepsCloseToItsBudget() {
+        val rings = 160
+        val segments = 320
+        val text = StringBuilder()
+        for (r in 0..rings) for (s in 0 until segments) {
+            val a = Math.PI * r / rings
+            val b = 2 * Math.PI * s / segments
+            text.append("v ${sin(a) * cos(b)} ${cos(a)} ${sin(a) * sin(b)}\n")
+        }
+        for (r in 0 until rings) for (s in 0 until segments) {
+            val a = r * segments + s + 1
+            val b = r * segments + (s + 1) % segments + 1
+            text.append("f $a ${a + segments} ${b + segments} $b\n")
+        }
+        val full = ObjReader.read(text.toString(), { null })
+        for (budget in listOf(5000, 20000)) {
+            val small = decimated(full, budget)
+            assertTrue("$budget -> ${small.triangleCount}", small.triangleCount in (budget * 0.7).toInt()..budget)
+        }
+    }
+
+    @Test fun reducingAModelKeepsSharpEdgesSharp() {
+        val rows = 200
+        val positions = ArrayList<Float>()
+        val normals = ArrayList<Float>()
+        val triangles = ArrayList<Int>()
+        fun face(up: Boolean) {
+            val start = positions.size / 3
+            for (i in 0..rows) for (j in 0..rows) {
+                val a = -0.8f + 0.8f * i / rows
+                val b = -0.8f + 1.6f * j / rows
+                if (up) { positions += listOf(a + 0.8f, b, 0f); normals += listOf(0f, 0f, 1f) }
+                else { positions += listOf(0.8f, b, -a - 0.8f); normals += listOf(1f, 0f, 0f) }
+            }
+            for (i in 0 until rows) for (j in 0 until rows) {
+                val k = start + i * (rows + 1) + j
+                triangles += listOf(k, k + rows + 1, k + rows + 2, k, k + rows + 2, k + 1)
+            }
+        }
+        face(true)
+        face(false)
+        val count = positions.size / 3
+        val full = Mesh(positions.toFloatArray(), normals.toFloatArray(), FloatArray(count * 2), IntArray(count) { -1 },
+            triangles.toIntArray(), IntArray(triangles.size / 3), emptyList(), false)
+        val small = decimated(full, 4000)
+        for (v in 0 until small.vertexCount) {
+            val n = (0..2).map { small.normals[v * 3 + it] }
+            assertTrue("a corner on the edge got a blended normal $n", n.count { abs(it) > 0.99f } == 1)
+        }
     }
 
     @Test fun reducingAModelKeepsEachTexturePieceOnItsOwnPartOfThePicture() {

@@ -1881,6 +1881,12 @@
     <string name="motion_rotate">回転</string>
     <string name="model_choose_file">.obj、.glb、.gltfファイルを選択してください（.mtl、.bin、画像がある場合はそれらも）</string>
     <string name="model_simplified">このモデルは%1$s個の三角形があるため、最大%2$s個に簡略化して表示されます</string>
+    <string name="settings_model_detail">高精細な3Dモデル</string>
+    <string name="settings_model_detail_note">3Dモデルを%2$s個ではなく最大%1$s個の三角形で表示します。編集が遅くなることがあります。</string>
+    <string name="model_detail_ask_title">このモデルをより細かく表示しますか？</string>
+    <string name="model_detail_ask_body">このモデルは%1$s個の三角形があるため、最大%2$s個に簡略化して表示されます。3Dモデルに最大%3$s個の三角形を許可しますか？編集が遅くなることがあります。あとで設定から変更できます。</string>
+    <string name="model_detail_allow">%1$sまで許可</string>
+    <string name="model_detail_keep">%1$sのまま</string>
     <string name="model_unreadable">このモデルを読み込めませんでした：%1$s</string>
     <string name="model_too_large">このモデルは大きすぎて開けません</string>
     <string name="model_layer_model">モデル</string>

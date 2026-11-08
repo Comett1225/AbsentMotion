@@ -1931,6 +1931,12 @@
 
     <string name="model_choose_file">Choose an .obj, .glb or .gltf file, with its .mtl, .bin and pictures if it has them</string>
     <string name="model_simplified">This model has %1$s triangles, so it is shown simplified to at most %2$s</string>
+    <string name="settings_model_detail">High-detail 3D models</string>
+    <string name="settings_model_detail_note">Show 3D models with up to %1$s triangles instead of %2$s. Editing can be slower.</string>
+    <string name="model_detail_ask_title">Show this model in more detail?</string>
+    <string name="model_detail_ask_body">This model has %1$s triangles, so it is shown simplified to at most %2$s. Allow up to %3$s triangles for 3D models? Editing can be slower. You can change this later in Settings.</string>
+    <string name="model_detail_allow">Allow %1$s</string>
+    <string name="model_detail_keep">Keep %1$s</string>
     <string name="model_unreadable">This model could not be read: %1$s</string>
     <string name="model_too_large">This model is too large to open</string>
     <string name="model_layer_model">Model</string>

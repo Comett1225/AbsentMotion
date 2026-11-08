@@ -148,14 +148,27 @@ fun EditorState.addEmptyGroup() {
     addAndSelect(scene.groupNode(attrs, emptyList(), attrs.getValue("endTime").toInt() - attrs.getValue("startTime").toInt()))
 }
 
-fun EditorState.groupLayers(ids: Set<Long>, blend: String? = null) {
+fun EditorState.groupLayers(ids: Set<Long>, blend: String? = null, anchor: Pair<Float, Float>? = null) {
     val id = Layer.newId()
     val label = numbered(AppText.get(R.string.model_layer_group))
-    edit { it.grouped(ids, blend, id, label, sampleMs) }
+    edit { s -> s.grouped(ids, blend, id, label, sampleMs).let { g -> anchor?.let { (x, y) -> g.withAnchorAt(id, x, y) } ?: g } }
     if (scene.layer(id) == null) return
     MultiSelect.clear()
     selectedId = id
     panel = EditorPanel.Tools
+}
+
+suspend fun EditorState.groupLayersCentred(ids: Set<Long>, blend: String? = null) {
+    val before = scene
+    val boxes = ids.mapNotNull { engine.layerBounds(it, sampleMs) }
+    if (scene.node !== before.node) return
+    val anchor = if (boxes.isEmpty()) null else ((boxes.minOf { it[0] } + boxes.maxOf { it[2] }) / 2f) to ((boxes.minOf { it[1] } + boxes.maxOf { it[3] }) / 2f)
+    groupLayers(ids, blend, anchor)
+}
+
+internal fun Scene.withAnchorAt(id: Long, x: Float, y: Float): Scene = update(id) { group ->
+    val inner = group.nested ?: return@update group
+    group.withTransform("location", x, y, group.location[2]).withTransform("pivot", x - inner.width / 2f, y - inner.height / 2f)
 }
 
 internal fun Scene.grouped(ids: Set<Long>, blend: String?, id: Long, label: String, atMs: Int? = null): Scene {
@@ -462,6 +475,16 @@ internal fun Scene.shiftedInWorld(moves: List<Pair<Layer, Float>>, horizontal: B
     moves.sortedBy { (l, _) -> chain(l).size }.fold(this) { acc, (l, d) ->
         val w = place(layer(l.id) ?: return@fold acc, timeMs)
         acc.update(l.id, timeMs) { layer -> acc.withWorldLocation(layer, timeMs) { _, _ -> if (horizontal) w.x + d to w.y else w.x to w.y + d } }
+    }
+
+private val NotPlaced = setOf("camera", "light", "audio")
+
+internal fun Scene.movedTogether(ids: Set<Long>, timeMs: Int, aboutX: Float, aboutY: Float, factor: Float, dx: Float, dy: Float): Scene =
+    layers.filter { l -> l.id in ids && l.kind !in NotPlaced && chain(l).drop(1).none { it.id in ids } }.fold(this) { acc, l ->
+        acc.update(l.id, timeMs) { layer ->
+            val placed = acc.withWorldLocation(layer, timeMs) { x, y -> aboutX + (x - aboutX) * factor + dx to aboutY + (y - aboutY) * factor + dy }
+            if (factor == 1f) placed else placed.withTransform("scale", layer.scale[0] * factor, layer.scale[1] * factor)
+        }
     }
 
 suspend fun EditorState.distributeSelection(horizontal: Boolean) {

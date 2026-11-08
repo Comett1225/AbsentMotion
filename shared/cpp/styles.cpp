@@ -566,7 +566,6 @@ void DrawList(SkCanvas* canvas, const std::vector<Layer>& layers, int width, int
 
 void DrawGroup(SkCanvas* canvas, const Layer& l, double timeMs, const MediaPictures& pictures) {
     canvas->translate(-l.innerWidth / 2.0f, -l.innerHeight / 2.0f);
-    canvas->clipRect(SkRect::MakeWH((float)l.innerWidth, (float)l.innerHeight), true);
     const double inner = NestedTime(l, timeMs);
     if (inner < 0) return;
     struct Context {
@@ -576,6 +575,8 @@ void DrawGroup(SkCanvas* canvas, const Layer& l, double timeMs, const MediaPictu
             scene.width = group.innerWidth;
             scene.height = group.innerHeight;
             scene.fps = std::max(1, (int)group.retiming.fps);
+            scene.depthOrder = previous && previous->depthOrder;
+            scene.pieceOrder = previous && previous->pieceOrder;
             if (previous) {
                 for (const double beat : previous->beats) {
                     const double inner = NestedTime(group, beat * 1000);
@@ -596,7 +597,11 @@ void DrawGroup(SkCanvas* canvas, const Layer& l, double timeMs, const MediaPictu
             return;
         }
     }
-    if (l.innerBackground >> 24) canvas->drawColor((SkColor)l.innerBackground);
+    if (l.innerBackground >> 24) {
+        SkPaint background;
+        background.setColor((SkColor)l.innerBackground);
+        canvas->drawRect(SkRect::MakeWH((float)l.innerWidth, (float)l.innerHeight), background);
+    }
     DrawList(canvas, l.children, l.innerWidth, l.innerHeight, false, inner, pictures);
 }
 
@@ -1839,9 +1844,8 @@ static bool ContainsOne(const std::vector<Layer>& siblings, const Layer& l, doub
         return DrawStroke(nullptr, l, StrokeGeometry(l, path, t).makeTransform(matrix), t, 1).contains(p.fX, p.fY);
     }
     const SkPoint inner = {local.fX + l.innerWidth / 2.0f, local.fY + l.innerHeight / 2.0f};
-    if (!SkRect::MakeWH(l.innerWidth, l.innerHeight).contains(inner.fX, inner.fY)) return false;
     const double innerTime = NestedTime(l, timeMs);
-    if (innerTime >= 0 && (l.innerBackground >> 24) != 0) return true;
+    if (innerTime >= 0 && (l.innerBackground >> 24) != 0 && SkRect::MakeWH(l.innerWidth, l.innerHeight).contains(inner.fX, inner.fY)) return true;
     for (auto it = l.children.rbegin(); innerTime >= 0 && it != l.children.rend(); ++it) {
         if (Contains(l.children, *it, innerTime, inner, l.innerWidth, l.innerHeight, masks)) return true;
     }
@@ -1866,8 +1870,7 @@ static bool ContentRect(const Layer& l, double timeMs, const SkMatrix& matrix, S
         right = std::max(right, child.fRight);
         bottom = std::max(bottom, child.fBottom);
     }
-    const SkRect seen = SkRect::MakeLTRB(std::max(left, out->fLeft), std::max(top, out->fTop), std::min(right, out->fRight), std::min(bottom, out->fBottom));
-    if (seen.fLeft <= seen.fRight && seen.fTop <= seen.fBottom) *out = seen;
+    if (left <= right && top <= bottom) *out = SkRect::MakeLTRB(left, top, right, bottom);
     return true;
 }
 
@@ -1877,6 +1880,21 @@ SkRect SelectionBounds(const Layer& layer, double timeMs, const SkMatrix& matrix
     ContentRect(layer, timeMs, matrix, &bounds);
     return bounds;
 }
+
+bool ContentIconBounds(const Layer& layer, SkRect* bounds) {
+    if (layer.kind == "drawing") *bounds = DrawingBounds(layer).getBounds();
+    else if (layer.kind == "embedScene") *bounds = SelectionBounds(layer, 0, SkMatrix::I());
+    else return false;
+    return true;
+}
+
+void DrawContentIcon(SkCanvas* canvas, const Layer& layer, const MediaPictures& pictures) {
+    canvas->saveLayer(nullptr, nullptr);
+    if (layer.kind == "drawing") DrawDrawing(canvas, layer, 1, 0);
+    else DrawGroup(canvas, layer, 0, pictures);
+    canvas->restore();
+}
+
 
 static std::mutex gOrientedLock;
 static std::set<std::string> gOrientedIds;
@@ -2009,8 +2027,8 @@ void DrawList(SkCanvas* canvas, const std::vector<Layer>& listed, int width, int
               const MediaPictures& pictures) {
     std::vector<Layer> inherited, storage;
     const std::vector<Layer>& source = InheritEffects(listed, &inherited) ? inherited : listed;
-    const bool pieces = top && gScene && gScene->depthOrder && gScene->pieceOrder;
-    const bool seen = SeeLayers(source, width, height, top, gScene ? gScene->fps : 30, timeMs, top && gScene && gScene->depthOrder, &storage, pieces);
+    const bool pieces = gScene && gScene->depthOrder && gScene->pieceOrder;
+    const bool seen = SeeLayers(source, width, height, top, gScene ? gScene->fps : 30, timeMs, gScene && gScene->depthOrder, &storage, pieces);
     if (seen) FaceForward(&storage);
     if (seen && !pieces) SplitSeen(&storage, timeMs);
     const std::vector<Layer>& layers = seen ? storage : source;
