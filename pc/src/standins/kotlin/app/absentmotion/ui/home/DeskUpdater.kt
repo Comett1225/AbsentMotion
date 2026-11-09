@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -45,7 +46,7 @@ internal sealed interface DeskStep {
     val release: Release? get() = null
     data object Idle : DeskStep
     data class Downloading(override val release: Release, val done: Long, val total: Long, val waiting: Boolean = false) : DeskStep
-    data class Ready(override val release: Release, val file: File) : DeskStep
+    data class Ready(override val release: Release, val file: File, val signed: Boolean = false) : DeskStep
     data class Opened(override val release: Release, val file: File) : DeskStep
     data class Failed(override val release: Release, val failure: UpdateFailure) : DeskStep
 }
@@ -79,7 +80,7 @@ internal object Updater {
         job = scope.launch {
             try {
                 val file = fetch(client, release, files) { done, waiting -> scope.launch { if (generation == mine) step = DeskStep.Downloading(release, done, apk.size, waiting) } }
-                if (generation == mine) step = DeskStep.Ready(release, file)
+                if (generation == mine) step = DeskStep.Ready(release, file, apk.manifest != null)
             } catch (e: CancellationException) {
                 withContext(NonCancellable + Dispatchers.IO) { if (generation != mine || step == DeskStep.Idle) files.part.delete() }
             } catch (e: Exception) {
@@ -96,7 +97,7 @@ internal object Updater {
         val wait: suspend (Long) -> Unit = { ms -> shown(files.part.length(), true); delay(ms) }
         val downloaded = patiently(apk.size, { files.part.length() }, wait) {
             ensureActive()
-            val sha = verifiedChecksum(client, apk)
+            val sha = checksumOf(client, release, apk)
             files.dir.mkdirs()
             checkSpace(files, release, sha, files.dir.usableSpace)
             var last = -1L
@@ -130,11 +131,37 @@ internal object Updater {
         hidden = false
     }
 
+    fun installs(ready: DeskStep.Ready): Boolean = ready.signed && UpdateInstall.supports(ready.file)
+
+    fun install(context: Context, ready: DeskStep.Ready, quit: () -> Unit): Boolean {
+        val site = installSite() ?: return false
+        return try {
+            val pending = UpdateInstall.prepare(ready.file, ready.release, site, ready.file.parentFile ?: context.cacheDir, File(context.filesDir, RESULT_FILE))
+            UpdateInstall.arm(pending)
+            step = DeskStep.Opened(ready.release, ready.file)
+            quit()
+            true
+        } catch (e: Exception) {
+            Log.i("AMUpdate", "update could not be prepared: $e")
+            false
+        }
+    }
+
     fun open(ready: DeskStep.Ready): Boolean {
         val opened = DeskOs.open(ready.file)
         if (opened) step = DeskStep.Opened(ready.release, ready.file)
         return opened
     }
+}
+
+internal const val RESULT_FILE = "update-result.txt"
+
+internal fun needsSignature(name: String) = name.endsWith("-update.zip", true) || name.endsWith(".tar.gz", true) || name.endsWith(".appimage", true) || name.endsWith(".deb", true)
+
+internal fun checksumOf(client: TrustedHttp, release: Release, apk: ApkAsset): String = when {
+    apk.manifest != null -> signedChecksum(client, release, apk)
+    needsSignature(apk.name) -> throw UpdateProblem(UpdateFailure.Unsigned)
+    else -> verifiedChecksum(client, apk)
 }
 
 internal fun safeName(name: String) = name.substringAfterLast('/').substringAfterLast('\\').replace(Regex("[^A-Za-z0-9._-]"), "_")
@@ -150,6 +177,11 @@ internal fun UpdateDialog(onQuit: () -> Unit = {}) {
     val context = LocalContext.current
     val links = LocalUriHandler.current
     val step = Updater.step
+    LaunchedEffect(Unit) {
+        UpdateInstall.lastFailure(File(context.filesDir, RESULT_FILE))?.let {
+            app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.desk_update_failed_last, it), app.absentmotion.platform.Toast.LENGTH_LONG).show()
+        }
+    }
     if (step != DeskStep.Idle) {
         if (!Updater.hidden) UpdateFlow(step, onQuit)
         return
@@ -191,7 +223,7 @@ private fun UpdateFlow(step: DeskStep, onQuit: () -> Unit) {
     val hide = { Updater.hidden = true }
     DeskModal(if (step is DeskStep.Downloading) hide else Updater::later, 480.dp, dismissOnScrim = false, onEnter = {
         when (step) {
-            is DeskStep.Ready -> Updater.open(step)
+            is DeskStep.Ready -> if (Updater.installs(step)) Updater.install(context, step, onQuit) else Updater.open(step)
             is DeskStep.Opened -> onQuit()
             else -> Unit
         }
@@ -216,8 +248,8 @@ private fun UpdateFlow(step: DeskStep, onQuit: () -> Unit) {
                     }
                     if (step.waiting) Text(stringResource(R.string.update_reconnecting), color = Am.HomeMid, fontSize = 13.sp)
                 }
-                is DeskStep.Ready -> Text(stringResource(R.string.desk_update_ready_body), color = Am.HomeInk, fontSize = 14.sp, lineHeight = 20.sp)
-                is DeskStep.Opened -> Text(stringResource(R.string.desk_update_opened_body), color = Am.HomeInk, fontSize = 14.sp, lineHeight = 20.sp)
+                is DeskStep.Ready -> Text(stringResource(if (Updater.installs(step)) R.string.desk_update_ready_install_body else R.string.desk_update_ready_body), color = Am.HomeInk, fontSize = 14.sp, lineHeight = 20.sp)
+                is DeskStep.Opened -> Text(stringResource(if (UpdateInstall.armed) R.string.desk_update_closing_body else R.string.desk_update_opened_body), color = Am.HomeInk, fontSize = 14.sp, lineHeight = 20.sp)
                 is DeskStep.Failed -> {
                     val failure = step.failure
                     Text(
@@ -237,11 +269,14 @@ private fun UpdateFlow(step: DeskStep, onQuit: () -> Unit) {
                 is DeskStep.Downloading -> DeskButton(stringResource(R.string.cancel), Updater::cancel)
                 is DeskStep.Ready -> {
                     DeskButton(stringResource(R.string.update_later), Updater::later)
-                    DeskButton(stringResource(R.string.desk_update_open), { if (!Updater.open(step)) { app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.desk_update_open_failed, step.file.path), app.absentmotion.platform.Toast.LENGTH_LONG).show() } }, primary = true)
+                    if (Updater.installs(step)) DeskButton(stringResource(R.string.desk_update_install_restart), {
+                        if (!Updater.install(context, step, onQuit)) app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.desk_update_open_failed, step.file.path), app.absentmotion.platform.Toast.LENGTH_LONG).show()
+                    }, primary = true)
+                    else DeskButton(stringResource(R.string.desk_update_open), { if (!Updater.open(step)) { app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.desk_update_open_failed, step.file.path), app.absentmotion.platform.Toast.LENGTH_LONG).show() } }, primary = true)
                 }
                 is DeskStep.Opened -> {
-                    DeskButton(stringResource(R.string.update_not_now), Updater::later)
-                    DeskButton(stringResource(R.string.desk_update_quit), { Updater.later(); onQuit() }, primary = true)
+                    DeskButton(stringResource(R.string.update_not_now), { UpdateInstall.cancel(); Updater.later() })
+                    DeskButton(stringResource(R.string.desk_update_quit), { UpdateInstall.rearm(); Updater.later(); onQuit() }, primary = true)
                 }
                 is DeskStep.Failed -> {
                     DeskButton(stringResource(R.string.update_later), Updater::later)

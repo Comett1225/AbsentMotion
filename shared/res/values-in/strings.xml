@@ -259,6 +259,8 @@
     <string name="update_permission_denied">Memasang pembaruan masih belum diizinkan. Buka Pengaturan dan aktifkan Izinkan dari sumber ini, atau batalkan.</string>
     <string name="update_waiting">Menunggu Android memasang pembaruan</string>
     <string name="update_install">Pasang</string>
+    <string name="update_notify_channel">Pembaruan aplikasi</string>
+    <string name="update_notify_done">AbsentMotion %1$s sudah terpasang. Ketuk untuk membukanya.</string>
     <string name="update_not_installed">Pembaruan tidak dipasang. Anda bisa memasangnya sekarang atau nanti.</string>
     <string name="update_stopped">Pembaruan terhenti</string>
     <string name="update_err_offline">Anda sedang offline. Sambungkan ke internet lalu coba lagi.</string>
@@ -267,6 +269,7 @@
     <string name="update_err_server">GitHub tidak mengirim pembaruan (kesalahan %1$s). Coba lagi nanti.</string>
     <string name="update_err_storage">Ruang kosong tidak cukup. Pembaruan memerlukan sekitar %1$s ruang kosong.</string>
     <string name="update_err_checksum">Unduhan tidak cocok dengan checksum yang diterbitkan bersama rilis, jadi unduhan dihapus.</string>
+    <string name="update_err_manifest">Pembaruan ini tidak memiliki daftar rilis bertanda tangan atau memerlukan pembaru yang lebih baru, jadi tidak diunduh. Dapatkan dari situs web AbsentMotion.</string>
     <string name="update_err_no_checksum">Rilis ini tidak mencantumkan checksum untuk file ini, jadi file tidak diunduh.</string>
     <string name="update_err_untrusted">Unduhan dialihkan ke alamat di luar rilis AbsentMotion, jadi unduhan dihentikan.</string>
     <string name="update_err_signature">Pembaruan ini ditandatangani dengan kunci yang berbeda dari aplikasi terpasang, jadi tidak bisa menggantikannya. Tidak ada yang diubah.</string>
@@ -2173,6 +2176,10 @@
     <string name="desk_update_opened_title">Penginstal terbuka</string>
     <string name="desk_update_opened_body">Keluar dari AbsentMotion agar penginstal dapat menggantinya. Proyek yang terbuka disimpan lebih dulu.</string>
     <string name="desk_update_quit">Keluar dari AbsentMotion</string>
+    <string name="desk_update_ready_install_body">Unduhan sudah dicocokkan dengan daftar rilis bertanda tangan. AbsentMotion menyimpan proyek Anda, keluar, memasang pembaruan, lalu terbuka lagi.</string>
+    <string name="desk_update_install_restart">Pasang dan mulai ulang</string>
+    <string name="desk_update_closing_body">Proyek Anda disimpan lebih dulu. AbsentMotion keluar, memasang pembaruan, lalu terbuka lagi.</string>
+    <string name="desk_update_failed_last">Pembaruan terakhir tidak terpasang (%1$s). Versi yang Anda miliki sebelumnya masih ada.</string>
     <string name="desk_tour_screen_body">Pustaka berisi media Anda ada di kiri, pratinjau di tengah, dan inspektor di kanan untuk mengedit lapisan yang dipilih. Di bawahnya, timeline memberi setiap lapisan barisnya sendiri.</string>
     <string name="desk_tour_picture_body">Buka Media di pustaka lalu klik sebuah gambar, atau seret satu ke pratinjau. Tidak punya gambar? Klik Lakukan untuk saya.</string>
     <string name="desk_tour_gestures_title">Gerakkan dengan mouse</string>

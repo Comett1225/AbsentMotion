@@ -259,6 +259,8 @@
     <string name="update_permission_denied">আপডেট ইনস্টল করার অনুমতি এখনও দেওয়া হয়নি। সেটিংস খুলে এই উৎস থেকে অনুমতি দিন চালু করুন, অথবা বাতিল করুন।</string>
     <string name="update_waiting">Android আপডেট ইনস্টল করার অপেক্ষায়</string>
     <string name="update_install">ইনস্টল করুন</string>
+    <string name="update_notify_channel">অ্যাপ আপডেট</string>
+    <string name="update_notify_done">AbsentMotion %1$s ইনস্টল হয়েছে। খুলতে ট্যাপ করুন।</string>
     <string name="update_not_installed">আপডেট ইনস্টল হয়নি। আপনি এখন বা পরে এটি ইনস্টল করতে পারেন।</string>
     <string name="update_stopped">আপডেট থেমে গেছে</string>
     <string name="update_err_offline">আপনি অফলাইনে আছেন। ইন্টারনেটে যুক্ত হয়ে আবার চেষ্টা করুন।</string>
@@ -267,6 +269,7 @@
     <string name="update_err_server">GitHub আপডেট পাঠায়নি (ত্রুটি %1$s)। পরে আবার চেষ্টা করুন।</string>
     <string name="update_err_storage">যথেষ্ট খালি জায়গা নেই। আপডেটের জন্য প্রায় %1$s খালি জায়গা দরকার।</string>
     <string name="update_err_checksum">ডাউনলোড করা ফাইল রিলিজের সাথে প্রকাশিত চেকসামের সাথে মেলেনি, তাই এটি মুছে ফেলা হয়েছে।</string>
+    <string name="update_err_manifest">এই আপডেটে স্বাক্ষরিত রিলিজ তালিকা নেই, অথবা এর জন্য নতুন আপডেটার লাগবে, তাই এটি ডাউনলোড করা হয়নি। এটি AbsentMotion ওয়েবসাইট থেকে নিন।</string>
     <string name="update_err_no_checksum">রিলিজে এই ফাইলের কোনো চেকসাম নেই, তাই এটি ডাউনলোড করা হয়নি।</string>
     <string name="update_err_untrusted">ডাউনলোডটি AbsentMotion রিলিজের বাইরের একটি ঠিকানায় পাঠানো হয়েছিল, তাই এটি থামানো হয়েছে।</string>
     <string name="update_err_signature">এই আপডেট ইনস্টল করা অ্যাপের চেয়ে আলাদা কী দিয়ে সাইন করা, তাই এটি সেটির জায়গা নিতে পারে না। কিছুই বদলানো হয়নি।</string>
@@ -2202,6 +2205,10 @@
     <string name="desk_update_opened_title">ইনস্টলার খোলা আছে</string>
     <string name="desk_update_opened_body">ইনস্টলার যাতে AbsentMotion বদলাতে পারে, তাই AbsentMotion বন্ধ করুন। আপনার খোলা প্রজেক্ট আগে সেভ হয়ে যায়।</string>
     <string name="desk_update_quit">AbsentMotion বন্ধ করুন</string>
+    <string name="desk_update_ready_install_body">ডাউনলোডটি স্বাক্ষরিত রিলিজ তালিকার সাথে মিলিয়ে দেখা হয়েছে। AbsentMotion আপনার প্রজেক্ট সেভ করে, বন্ধ হয়, আপডেট ইনস্টল করে এবং আবার খোলে।</string>
+    <string name="desk_update_install_restart">ইনস্টল করে আবার চালু করুন</string>
+    <string name="desk_update_closing_body">আপনার প্রজেক্ট আগে সেভ হয়ে যায়। AbsentMotion বন্ধ হয়, আপডেট ইনস্টল করে এবং আবার খোলে।</string>
+    <string name="desk_update_failed_last">শেষ আপডেটটি ইনস্টল হয়নি (%1$s)। আপনার আগের ভার্সন আগের মতোই আছে।</string>
     <string name="desk_tour_screen_body">বাঁ দিকে আপনার মিডিয়াসহ লাইব্রেরি, মাঝখানে প্রিভিউ, আর ডান দিকের ইন্সপেক্টর সিলেক্ট করা লেয়ার এডিট করে। নিচের টাইমলাইনে প্রতিটি লেয়ারের আলাদা সারি থাকে।</string>
     <string name="desk_tour_picture_body">লাইব্রেরিতে মিডিয়া খুলে একটি ছবিতে ক্লিক করুন, অথবা সেটি প্রিভিউতে টেনে আনুন। হাতের কাছে ছবি নেই? \"আমার হয়ে করুন\"-এ ক্লিক করুন।</string>
     <string name="desk_tour_gestures_title">মাউস দিয়ে সরান</string>

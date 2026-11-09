@@ -34,7 +34,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.net.HttpURLConnection
 
-internal data class ApkAsset(val name: String, val url: String, val size: Long, val sha256: String?, val sums: String?)
+internal data class ApkAsset(val name: String, val url: String, val size: Long, val sha256: String?, val sums: String?, val manifest: String? = null)
 
 internal data class Release(val version: String, val link: String, val apk: ApkAsset? = null) {
     val download: String? get() = apk?.url
@@ -147,27 +147,29 @@ private fun apkOf(release: JSONObject, tag: String, version: String, flavour: St
         else apkName(version, flavour, abi).let { n -> linkOf(n)?.let { n to it } }) ?: return null
     val size = asset.optLong("size", -1L).takeIf { it in 1..MAX_APK_BYTES } ?: return null
     val sums = linkOf(SUMS)?.let { source.asset(tag.trim(), SUMS) }
-    return ApkAsset(name, source.asset(tag.trim(), name), size, parseDigest(asset.optString("digest")), sums)
+    val manifest = if (flavour == "desktop" && linkOf(MANIFEST) != null && linkOf("$MANIFEST.sig") != null) source.asset(tag.trim(), MANIFEST) else null
+    return ApkAsset(name, source.asset(tag.trim(), name), size, parseDigest(asset.optString("digest")), sums, manifest)
 }
 
 private const val SUMS = "SHA256SUMS.txt"
+private const val MANIFEST = "update-manifest.json"
 
 private val ARM_TAGS = listOf("arm64", "aarch64")
 private val INTEL_TAGS = listOf("x64", "x86_64", "amd64", "intel")
 
-internal fun installedFromDeb(): Boolean = System.getProperty("java.home").orEmpty().startsWith("/opt/absentmotion/")
-
-internal fun installerExtensions(os: String, deb: Boolean = installedFromDeb()): List<String> = when {
-    os.startsWith("mac", ignoreCase = true) -> listOf(".dmg")
+internal fun installerExtensions(os: String, site: InstallSite? = installSite()): List<String> = when {
+    os.startsWith("mac", ignoreCase = true) -> if (site?.kind == InstallKind.MacApp) listOf("-update.zip", ".dmg") else listOf(".dmg")
     os.startsWith("windows", ignoreCase = true) -> listOf(".msi", ".exe")
-    deb -> listOf(".deb")
+    site?.kind == InstallKind.Deb -> listOf(".deb")
+    site?.kind == InstallKind.AppImage -> listOf(".appimage")
+    site?.kind == InstallKind.Tarball -> listOf(".tar.gz")
     else -> emptyList()
 }
 
-internal fun installerExtension(name: String): String? = listOf(".dmg", ".msi", ".exe", ".deb", ".rpm", ".appimage").firstOrNull { name.endsWith(it, ignoreCase = true) }
+internal fun installerExtension(name: String): String? = listOf(".dmg", ".msi", ".exe", ".deb", ".rpm", ".appimage", ".tar.gz", ".zip").firstOrNull { name.endsWith(it, ignoreCase = true) }
 
-internal fun installerName(names: List<String>, version: String, os: String = System.getProperty("os.name").orEmpty(), arch: String = System.getProperty("os.arch").orEmpty(), deb: Boolean = installedFromDeb()): String? {
-    val own = installerExtensions(os, deb)
+internal fun installerName(names: List<String>, version: String, os: String = System.getProperty("os.name").orEmpty(), arch: String = System.getProperty("os.arch").orEmpty(), site: InstallSite? = installSite()): String? {
+    val own = installerExtensions(os, site)
     val wanted = if (arch.contains("aarch64", ignoreCase = true) || arch.contains("arm", ignoreCase = true)) ARM_TAGS else INTEL_TAGS
     val others = (ARM_TAGS + INTEL_TAGS) - wanted.toSet()
     val candidates = names.filter { n -> n.startsWith("absentmotion", ignoreCase = true) && version in n && own.any { n.endsWith(it, ignoreCase = true) } && others.none { n.contains(it, ignoreCase = true) } }

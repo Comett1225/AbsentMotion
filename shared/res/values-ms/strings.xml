@@ -259,6 +259,8 @@
     <string name="update_permission_denied">Pemasangan kemas kini masih belum dibenarkan. Buka tetapan dan hidupkan Benarkan daripada sumber ini, atau batalkan.</string>
     <string name="update_waiting">Menunggu Android memasang kemas kini</string>
     <string name="update_install">Pasang</string>
+    <string name="update_notify_channel">Kemas kini apl</string>
+    <string name="update_notify_done">AbsentMotion %1$s telah dipasang. Ketik untuk membukanya.</string>
     <string name="update_not_installed">Kemas kini tidak dipasang. Anda boleh memasangnya sekarang atau kemudian.</string>
     <string name="update_stopped">Kemas kini terhenti</string>
     <string name="update_err_offline">Anda di luar talian. Sambung ke internet dan cuba lagi.</string>
@@ -267,6 +269,7 @@
     <string name="update_err_server">GitHub tidak menghantar kemas kini (ralat %1$s). Cuba lagi kemudian.</string>
     <string name="update_err_storage">Ruang kosong tidak mencukupi. Kemas kini memerlukan kira-kira %1$s ruang kosong.</string>
     <string name="update_err_checksum">Muat turun tidak sepadan dengan checksum yang diterbitkan bersama keluaran, jadi ia telah dipadam.</string>
+    <string name="update_err_manifest">Kemas kini ini tiada senarai keluaran bertandatangan atau memerlukan pengemas kini yang lebih baharu, jadi ia tidak dimuat turun. Dapatkannya daripada laman web AbsentMotion.</string>
     <string name="update_err_no_checksum">Keluaran ini tidak menyenaraikan checksum untuk fail ini, jadi fail tidak dimuat turun.</string>
     <string name="update_err_untrusted">Muat turun dialihkan ke alamat di luar keluaran AbsentMotion, jadi ia dihentikan.</string>
     <string name="update_err_signature">Kemas kini ini ditandatangani dengan kunci yang berbeza daripada apl yang dipasang, jadi ia tidak boleh menggantikannya. Tiada apa-apa yang diubah.</string>
@@ -2173,6 +2176,10 @@
     <string name="desk_update_opened_title">Pemasang telah dibuka</string>
     <string name="desk_update_opened_body">Keluar daripada AbsentMotion supaya pemasang boleh menggantikannya. Projek anda yang sedang dibuka disimpan dahulu.</string>
     <string name="desk_update_quit">Keluar daripada AbsentMotion</string>
+    <string name="desk_update_ready_install_body">Muat turun telah disemak dengan senarai keluaran bertandatangan. AbsentMotion menyimpan projek anda, keluar, memasang kemas kini dan dibuka semula.</string>
+    <string name="desk_update_install_restart">Pasang dan mulakan semula</string>
+    <string name="desk_update_closing_body">Projek anda disimpan dahulu. AbsentMotion keluar, memasang kemas kini dan dibuka semula.</string>
+    <string name="desk_update_failed_last">Kemas kini terakhir tidak dipasang (%1$s). Versi yang anda ada masih kekal.</string>
     <string name="desk_tour_screen_body">Pustaka dengan media anda berada di sebelah kiri, pratonton di tengah dan inspektor di sebelah kanan menyunting lapisan yang dipilih. Garis masa di bawah memberi setiap lapisan barisnya sendiri.</string>
     <string name="desk_tour_picture_body">Buka Media dalam pustaka dan klik satu imej, atau seret satu ke dalam pratonton. Tiada imej? Klik Buat untuk saya.</string>
     <string name="desk_tour_gestures_title">Gerakkan dengan tetikus</string>

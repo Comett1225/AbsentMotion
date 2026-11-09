@@ -1,0 +1,1 @@
+Updating is one step now: on Android 12 and newer an update installs without a confirmation dialog and a notification opens the app afterwards, and the desktop apps install and restart themselves from Settings > Updates. Tiles (Blocks) fill the whole screen even when the layer or group is moved or only partly on the canvas, also with Mirror.

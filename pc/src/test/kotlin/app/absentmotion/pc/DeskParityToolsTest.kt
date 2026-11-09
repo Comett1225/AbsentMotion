@@ -135,9 +135,10 @@ class DeskParityToolsTest {
         assertEquals("AbsentMotion-5.0.0-macos-arm64.dmg", installerName(names, "5.0.0", "Mac OS X", "aarch64"))
         assertEquals("AbsentMotion-5.0.0-macos-x64.dmg", installerName(names, "5.0.0", "Mac OS X", "x86_64"))
         assertEquals("AbsentMotion-5.0.0.msi", installerName(names, "5.0.0", "Windows 11", "amd64"))
-        assertEquals("absentmotion_5.0.0-1_amd64.deb", installerName(names, "5.0.0", "Linux", "amd64", deb = true))
-        assertNull(installerName(names + "AbsentMotion-5.0.0-linux-x64.AppImage", "5.0.0", "Linux", "amd64", deb = false))
-        assertNull(installerName(listOf("AbsentMotion-5.0.0-foss.apk"), "5.0.0", "Linux", "amd64", deb = true))
+        val deb = app.absentmotion.ui.home.InstallSite(app.absentmotion.ui.home.InstallKind.Deb, File("/opt/absentmotion"))
+        assertEquals("absentmotion_5.0.0-1_amd64.deb", installerName(names, "5.0.0", "Linux", "amd64", deb))
+        assertNull(installerName(names + "AbsentMotion-5.0.0-linux-x64.AppImage", "5.0.0", "Linux", "amd64", null))
+        assertNull(installerName(listOf("AbsentMotion-5.0.0-foss.apk"), "5.0.0", "Linux", "amd64", deb))
         val json = """{"tag_name":"v5.0.0","html_url":"https://github.com/Comett1225/AbsentMotion/releases/tag/v5.0.0","assets":[
             {"name":"AbsentMotion-5.0.0-macos-arm64.dmg","browser_download_url":"https://github.com/Comett1225/AbsentMotion/releases/download/v5.0.0/AbsentMotion-5.0.0-macos-arm64.dmg","size":123456789},
             {"name":"SHA256SUMS.txt","browser_download_url":"https://github.com/Comett1225/AbsentMotion/releases/download/v5.0.0/SHA256SUMS.txt","size":300}]}"""

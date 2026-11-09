@@ -283,3 +283,44 @@ blur smoothing and Datamosh fail (they need a GPU), so install `mesa-vulkan-driv
 real sound card and one AAC test expects the bit rate of the macOS and Windows encoders; FFmpeg's own `aac` encoder, the
 only one on Linux, writes far fewer bits for the quiet test clip.
 
+
+## 10. Updating the desktop apps
+
+The desktop app updates itself in one step: Settings > Updates > Check for Update, then Download update, then Install and
+restart. It saves the open project, closes, replaces itself and opens again. Nothing is installed through a wizard.
+
+| System | Installed by | What the update installs | How it is applied |
+|---|---|---|---|
+| Windows | per-user MSI | `AbsentMotion-<v>-windows-x64.msi` | a hidden PowerShell script waits for the app to exit, runs `msiexec /i ... INSTALLDIR=<current folder> /passive /norestart` (a major upgrade otherwise moves a custom install back to the default folder), then starts the launcher, found through the Uninstall entry if the old path is gone |
+| macOS | DMG, app in a user-writable folder | `AbsentMotion-<v>-macos-<arch>-update.zip` (the signed `.app`, made with `ditto -c -k --keepParent`) | the app is unpacked next to the installed one, checked with `codesign --verify`, then a shell script swaps the folders and runs `open` |
+| Linux, user install (`install.sh`) | `.tar.gz` | `AbsentMotion-<v>-linux-<arch>.tar.gz` | the folder `~/.local/opt/absentmotion` is swapped and `install.sh` refreshes the menu entry |
+| Linux AppImage | `.AppImage` | `AbsentMotion-<v>-linux-<arch>.AppImage` | the file is replaced in place |
+| Linux `.deb` | package | `AbsentMotion-<v>-linux-<arch>.deb` | after the app has closed, `pkexec apt-get install -y <file>` asks for the password in the system dialog and the app is started again; without `pkexec` the file is opened for the package installer |
+| macOS in a protected folder, Windows without a launcher path | manual | the usual installer, opened for the user | as before (open the file) |
+| Android | APK | `AbsentMotion-<v>-foss.apk` and the other APKs | `PackageInstaller` with `USER_ACTION_NOT_REQUIRED`: no dialog on Android 12+ when the OS allows it, a notification opens the app afterwards |
+
+The helper scripts are small and live in the app (`DeskUpdateInstall.kt`), so every release carries the updater that installs
+the next one. A release that needs a newer updater sets `minUpdater` in the signed list; older apps then tell the user to
+download the installer instead.
+
+**Trust.** Desktop updates are accepted only when `update-manifest.json` and `update-manifest.json.sig` are in the same
+release and the signature verifies against a public key built into the app (`UPDATE_KEYS` in `DeskUpdateTrust.kt`). The list
+holds the size and SHA-256 of every desktop file; the downloaded file must match it and the GitHub asset digest. Android does
+not use the list: the system checks the APK signature. The private key is a raw Ed25519 key kept outside the repository and
+backed up offline; losing it means every installed desktop copy must be reinstalled by hand once.
+
+```
+java tools/UpdateSign.java keygen <private-key-file> <public-key-file>
+java tools/UpdateSign.java manifest <version> <min-updater> <private-key-file> <out-dir> <desktop-file>...
+java tools/UpdateSign.java verify <out-dir>/update-manifest.json <out-dir>/update-manifest.json.sig <public-key-file>
+```
+
+Run `manifest` last, after every desktop file of the release is final (the MSI, both macOS update zips, the `.deb`s, AppImages
+and tarballs), and upload both output files with the release. Key rotation: ship an app with both public keys in `UPDATE_KEYS`,
+sign with the new key once most users have it.
+
+**Testing an update without a release.** A loopback-only test feed is read from `-Dam.updateFeed=http://127.0.0.1:<port>` (set
+through `JAVA_TOOL_OPTIONS` for a packaged app). The feed is a folder with `releases.json` (a GitHub-style list, asset URLs
+`http://127.0.0.1:<port>/download/<tag>/<file>`) and `download/<tag>/` holding the files and the signed list. A throwaway key
+can be trusted for that feed only with `-Dam.updateKey=<base64 public key>`; neither property has any effect on a normal install.
+Android debug builds read `updatefixture` from the intent (`TestHooks`).

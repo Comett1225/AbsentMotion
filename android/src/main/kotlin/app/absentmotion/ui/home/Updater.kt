@@ -432,7 +432,7 @@ internal object Updater {
             setAppPackageName(app.packageName)
             setSize(size)
             setInstallReason(PackageManager.INSTALL_REASON_USER)
-            if (Build.VERSION.SDK_INT >= 31) setRequireUserAction(PackageInstaller.SessionParams.USER_ACTION_REQUIRED)
+            if (Build.VERSION.SDK_INT >= 31) setRequireUserAction(PackageInstaller.SessionParams.USER_ACTION_NOT_REQUIRED)
         }
         val id = installer.createSession(params)
         session = id

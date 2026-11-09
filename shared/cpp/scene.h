@@ -338,6 +338,7 @@ struct LayerEffects {
     std::function<bool(const Layer&)> lifted;
     std::function<bool(const Layer&)> spills;
     std::function<bool(const Layer&)> behind;
+    std::function<bool(const Layer&)> wraps;
     std::function<bool(SkCanvas*, const Scene&, const Layer&, double, const SkRect&, const SkMatrix&, const std::function<void(SkCanvas*)>&,
                        const std::function<void(SkCanvas*)>&)> draw;
     std::function<bool(const Layer&, float, float)> steady;

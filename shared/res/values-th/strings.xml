@@ -259,6 +259,8 @@
     <string name="update_permission_denied">ยังไม่ได้รับอนุญาตให้ติดตั้งอัปเดต เปิดการตั้งค่าแล้วเปิดอนุญาตจากแหล่งที่มานี้ หรือยกเลิก</string>
     <string name="update_waiting">กำลังรอ Android ติดตั้งอัปเดต</string>
     <string name="update_install">ติดตั้ง</string>
+    <string name="update_notify_channel">อัปเดตแอป</string>
+    <string name="update_notify_done">ติดตั้ง AbsentMotion %1$s แล้ว แตะเพื่อเปิด</string>
     <string name="update_not_installed">ยังไม่ได้ติดตั้งอัปเดต คุณติดตั้งได้ตอนนี้หรือภายหลัง</string>
     <string name="update_stopped">อัปเดตหยุดลง</string>
     <string name="update_err_offline">คุณออฟไลน์อยู่ เชื่อมต่ออินเทอร์เน็ตแล้วลองอีกครั้ง</string>
@@ -267,6 +269,7 @@
     <string name="update_err_server">GitHub ไม่ได้ส่งอัปเดตมา (ข้อผิดพลาด %1$s) ลองอีกครั้งภายหลัง</string>
     <string name="update_err_storage">พื้นที่ว่างไม่พอ อัปเดตต้องใช้พื้นที่ว่างประมาณ %1$s</string>
     <string name="update_err_checksum">ไฟล์ที่ดาวน์โหลดไม่ตรงกับ checksum ที่เผยแพร่พร้อมรุ่นนี้ จึงถูกลบแล้ว</string>
+    <string name="update_err_manifest">อัปเดตนี้ไม่มีรายการรุ่นที่ลงนามแล้วหรือต้องใช้ตัวอัปเดตรุ่นใหม่กว่า จึงไม่ได้ดาวน์โหลด ขอรับได้จากเว็บไซต์ AbsentMotion</string>
     <string name="update_err_no_checksum">รุ่นนี้ไม่มี checksum ของไฟล์นี้ จึงไม่ได้ดาวน์โหลด</string>
     <string name="update_err_untrusted">การดาวน์โหลดถูกเปลี่ยนเส้นทางไปยังที่อยู่นอกรุ่นของ AbsentMotion จึงถูกหยุดไว้</string>
     <string name="update_err_signature">อัปเดตนี้ลงนามด้วยคีย์ที่ต่างจากแอปที่ติดตั้งอยู่ จึงแทนที่แอปนั้นไม่ได้ ไม่มีอะไรถูกเปลี่ยน</string>
@@ -2173,6 +2176,10 @@
     <string name="desk_update_opened_title">เปิดตัวติดตั้งแล้ว</string>
     <string name="desk_update_opened_body">ออกจาก AbsentMotion เพื่อให้ตัวติดตั้งแทนที่ได้ โปรเจกต์ที่เปิดอยู่ของคุณจะถูกบันทึกก่อน</string>
     <string name="desk_update_quit">ออกจาก AbsentMotion</string>
+    <string name="desk_update_ready_install_body">ไฟล์ที่ดาวน์โหลดผ่านการตรวจสอบกับรายการรุ่นที่ลงนามแล้ว AbsentMotion จะบันทึกโปรเจกต์ของคุณ ปิดตัว ติดตั้งอัปเดต และเปิดขึ้นมาอีกครั้ง</string>
+    <string name="desk_update_install_restart">ติดตั้งและรีสตาร์ท</string>
+    <string name="desk_update_closing_body">โปรเจกต์ของคุณจะถูกบันทึกก่อน จากนั้น AbsentMotion จะปิดตัว ติดตั้งอัปเดต และเปิดขึ้นมาอีกครั้ง</string>
+    <string name="desk_update_failed_last">อัปเดตครั้งล่าสุดไม่ได้ติดตั้ง (%1$s) เวอร์ชันเดิมของคุณยังอยู่ตามเดิม</string>
     <string name="desk_tour_screen_body">คลังที่เก็บสื่อของคุณอยู่ทางซ้าย ตัวอย่างอยู่ตรงกลาง และแผงคุณสมบัติทางขวาใช้แก้ไขเลเยอร์ที่เลือก ส่วนไทม์ไลน์ด้านล่างให้แต่ละเลเยอร์มีแถวของตัวเอง</string>
     <string name="desk_tour_picture_body">เปิด สื่อ ในคลังแล้วคลิกรูปภาพ หรือลากรูปภาพไปที่ตัวอย่าง ยังไม่มีรูปในมือ? คลิก ทำให้เลย</string>
     <string name="desk_tour_gestures_title">ย้ายด้วยเมาส์</string>

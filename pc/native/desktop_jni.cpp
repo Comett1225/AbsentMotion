@@ -63,6 +63,7 @@ struct Desktop {
         fx.lifted = [this](const am::Layer& l) { return runtime.lifted(l); };
         fx.spills = [this](const am::Layer& l) { return runtime.spills(l); };
         fx.behind = [this](const am::Layer& l) { return runtime.behind(l); };
+        fx.wraps = [this](const am::Layer& l) { return runtime.wraps(l); };
         fx.steady = [this](const am::Layer& l, float a, float b) { return runtime.steady(l, a, b); };
         fx.draw = [this](SkCanvas* c, const am::Scene& s, const am::Layer& l, double t, const SkRect& r, const SkMatrix& m, const std::function<void(SkCanvas*)>& src, const std::function<void(SkCanvas*)>& below) {
             return runtime.draw(c, s, l, t, r, m, src, below, [this](int w, int h, const std::function<void(SkCanvas*)>& paint, std::vector<uint8_t>* rgba) {

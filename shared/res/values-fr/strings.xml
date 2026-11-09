@@ -259,6 +259,8 @@
     <string name="update_permission_denied">L’installation des mises à jour n’est toujours pas autorisée. Ouvrez les paramètres et activez Autoriser depuis cette source, ou annulez.</string>
     <string name="update_waiting">En attente de l’installation de la mise à jour par Android</string>
     <string name="update_install">Installer</string>
+    <string name="update_notify_channel">Mises à jour de l’application</string>
+    <string name="update_notify_done">AbsentMotion %1$s est installé. Appuyez pour l’ouvrir.</string>
     <string name="update_not_installed">La mise à jour n’a pas été installée. Vous pouvez l’installer maintenant ou plus tard.</string>
     <string name="update_stopped">La mise à jour s’est arrêtée</string>
     <string name="update_err_offline">Vous êtes hors ligne. Connectez-vous à Internet et réessayez.</string>
@@ -267,6 +269,7 @@
     <string name="update_err_server">GitHub n’a pas envoyé la mise à jour (erreur %1$s). Réessayez plus tard.</string>
     <string name="update_err_storage">Espace libre insuffisant. La mise à jour nécessite environ %1$s d’espace libre.</string>
     <string name="update_err_checksum">Le téléchargement ne correspondait pas à la somme de contrôle publiée avec la version. Il a donc été supprimé.</string>
+    <string name="update_err_manifest">Cette mise à jour n’a pas de liste de versions signée ou nécessite un programme de mise à jour plus récent. Elle n’a donc pas été téléchargée. Obtenez-la sur le site web d’AbsentMotion.</string>
     <string name="update_err_no_checksum">Aucune somme de contrôle n’est indiquée pour ce fichier dans la version publiée. Il n’a donc pas été téléchargé.</string>
     <string name="update_err_untrusted">Le téléchargement a été redirigé vers une adresse extérieure aux versions publiées d’AbsentMotion. Il a donc été arrêté.</string>
     <string name="update_err_signature">Cette mise à jour est signée avec une clé différente de celle de l’application installée et ne peut donc pas la remplacer. Rien n’a été modifié.</string>
@@ -2231,6 +2234,10 @@
     <string name="desk_update_opened_title">Le programme d’installation est ouvert</string>
     <string name="desk_update_opened_body">Quittez AbsentMotion pour que le programme d’installation puisse le remplacer. Votre projet ouvert sera d’abord enregistré.</string>
     <string name="desk_update_quit">Quitter AbsentMotion</string>
+    <string name="desk_update_ready_install_body">Le téléchargement a été vérifié à l’aide de la liste de versions signée. AbsentMotion enregistre votre projet, se ferme, installe la mise à jour et se rouvre.</string>
+    <string name="desk_update_install_restart">Installer et redémarrer</string>
+    <string name="desk_update_closing_body">Votre projet est d’abord enregistré. AbsentMotion se ferme, installe la mise à jour et se rouvre.</string>
+    <string name="desk_update_failed_last">La dernière mise à jour n’a pas été installée (%1$s). La version que vous aviez est toujours là.</string>
     <string name="desk_tour_screen_body">La bibliothèque contenant vos médias se trouve à gauche, l’aperçu au centre et l’inspecteur à droite permet de modifier le calque sélectionné. Dans la timeline en dessous, chaque calque a sa propre ligne.</string>
     <string name="desk_tour_picture_body">Ouvrez Médias dans la bibliothèque et cliquez sur une image, ou faites-en glisser une dans l’aperçu. Pas d’image sous la main ? Cliquez sur Faire pour moi.</string>
     <string name="desk_tour_gestures_title">Déplacer avec la souris</string>

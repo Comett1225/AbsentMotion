@@ -53,7 +53,13 @@ def cutout_png(path):
     image.save(path)
 
 
-PICTURES = {"exif2.jpg": lambda path: exif_jpeg(path, 2), "exif5.jpg": lambda path: exif_jpeg(path, 5), "cutout.png": cutout_png}
+def halves_png(path):
+    image = Image.new("RGB", (100, 100), BLUE)
+    image.paste(RED, (0, 0, 50, 100))
+    image.save(path)
+
+
+PICTURES = {"exif2.jpg": lambda path: exif_jpeg(path, 2), "exif5.jpg": lambda path: exif_jpeg(path, 5), "cutout.png": cutout_png, "halves.png": halves_png}
 
 
 def cutout(extra=""):
@@ -64,6 +70,19 @@ def cutout(extra=""):
 CUT_STROKE = '<path-stroke><color value="#ff00ff00"/><size value="6"/></path-stroke>'
 CUT_GLOW = ('<border direction="outside"><color value="#ff0000ff"/><size value="8"/></border><effect id="absent.glow" hidden="false">'
             '<property name="radius" type="float" value="30"/><property name="hardness" type="float" value="1"/></effect>')
+
+
+def tiled(x, mirror=0):
+    return (f'<shape id="1" label="t" startTime="0" endTime="1000" fillType="media" mediaFillMode="stretch" s=".rect" fillImage="file://{DEVICE_DIR}/halves.png">'
+            f'{transform(f"{x},100,0")}<property name="size" type="vec2" value="50,50"/>'
+            f'<effect id="absent.tiles" hidden="false"><property name="zoom" type="float" value="1"/><property name="mirror" type="float" value="{mirror}"/></effect></shape>')
+
+
+def tiled_group(x):
+    return (f'<embedScene id="1" label="g" startTime="0" endTime="1000">{transform("100,100,0")}'
+            '<scene width="200" height="200" fps="30" totalTime="1000" bgcolor="#00000000">'
+            + rect(2, x - 25, 100, 25, 50, 0xffff0000) + rect(3, x + 25, 100, 25, 50, 0xff0000ff)
+            + '</scene><effect id="absent.tiles" hidden="false"><property name="zoom" type="float" value="1"/></effect></embedScene>')
 
 
 def video(path, fps, colours):
@@ -98,6 +117,10 @@ def fill_stroke(points):
 
 
 CASES = {
+    "tiles fill the canvas from a layer beside it": (scene(tiled(250)), [((25, 100), RED), ((75, 100), BLUE), ((125, 100), RED), ((175, 100), BLUE)]),
+    "tiles keep the hidden half of a layer partly off the canvas": (scene(tiled(230)), [((25, 100), RED), ((75, 100), BLUE), ((125, 100), RED), ((175, 100), BLUE)]),
+    "tiles fill the canvas from a group beside it": (scene(tiled_group(250)), [((25, 100), RED), ((75, 100), BLUE), ((125, 100), RED), ((175, 100), BLUE)]),
+    "mirrored tiles fill the canvas from a layer beside it": (scene(tiled(250, 1)), [((25, 100), RED), ((75, 100), BLUE), ((125, 100), BLUE), ((175, 100), RED)]),
     "drawing strokes share the layer opacity": (
         scene(f'<drawing id="1" label="d" startTime="0" endTime="1000">{transform(opacity=0.5)}'
               + fill_stroke([(20, 20), (120, 20), (120, 120), (20, 120)])

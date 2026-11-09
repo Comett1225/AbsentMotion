@@ -259,6 +259,8 @@
     <string name="update_permission_denied">Hindi pa rin pinapayagan ang pag-install ng mga update. Buksan ang mga setting at i-on ang Payagan mula sa source na ito, o kanselahin.</string>
     <string name="update_waiting">Hinihintay ang Android na i-install ang update</string>
     <string name="update_install">I-install</string>
+    <string name="update_notify_channel">Mga update ng app</string>
+    <string name="update_notify_done">Naka-install na ang AbsentMotion %1$s. I-tap para buksan.</string>
     <string name="update_not_installed">Hindi na-install ang update. Puwede mo itong i-install ngayon o mamaya.</string>
     <string name="update_stopped">Huminto ang update</string>
     <string name="update_err_offline">Offline ka. Kumonekta sa internet at subukan muli.</string>
@@ -267,6 +269,7 @@
     <string name="update_err_server">Hindi ipinadala ng GitHub ang update (error %1$s). Subukan muli mamaya.</string>
     <string name="update_err_storage">Kulang ang libreng espasyo. Kailangan ng update ng mga %1$s na libreng espasyo.</string>
     <string name="update_err_checksum">Hindi tumugma ang download sa checksum na kasama ng release, kaya binura ito.</string>
+    <string name="update_err_manifest">Walang naka-sign na listahan ng release ang update na ito o kailangan nito ng mas bagong updater, kaya hindi ito na-download. Kunin ito sa website ng AbsentMotion.</string>
     <string name="update_err_no_checksum">Walang checksum ang release para sa file na ito, kaya hindi ito na-download.</string>
     <string name="update_err_untrusted">Na-redirect ang download sa address na wala sa mga release ng AbsentMotion, kaya itinigil ito.</string>
     <string name="update_err_signature">Naka-sign ang update na ito gamit ang ibang key kaysa sa naka-install na app, kaya hindi nito mapapalitan iyon. Walang binago.</string>
@@ -2202,6 +2205,10 @@
     <string name="desk_update_opened_title">Bukas ang installer</string>
     <string name="desk_update_opened_body">Isara ang AbsentMotion para mapalitan ito ng installer. Sine-save muna ang bukas mong proyekto.</string>
     <string name="desk_update_quit">Lumabas sa AbsentMotion</string>
+    <string name="desk_update_ready_install_body">Sinuri ang download laban sa naka-sign na listahan ng release. Sine-save ng AbsentMotion ang proyekto mo, nagsasara ito, ini-install ang update, at muling bumubukas.</string>
+    <string name="desk_update_install_restart">I-install at i-restart</string>
+    <string name="desk_update_closing_body">Sine-save muna ang proyekto mo. Nagsasara ang AbsentMotion, ini-install ang update, at muling bumubukas.</string>
+    <string name="desk_update_failed_last">Hindi na-install ang huling update (%1$s). Nandito pa rin ang bersyong dati mong gamit.</string>
     <string name="desk_tour_screen_body">Nasa kaliwa ang library ng media mo, nasa gitna ang preview, at ang inspector sa kanan ang nag-e-edit ng napiling layer. Sa timeline sa ibaba, may sariling row ang bawat layer.</string>
     <string name="desk_tour_picture_body">Buksan ang Media sa library at i-click ang isang larawan, o i-drag ito sa preview. Walang larawan? I-click ang Gawin para sa akin.</string>
     <string name="desk_tour_gestures_title">Ilipat gamit ang mouse</string>

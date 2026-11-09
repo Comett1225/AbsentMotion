@@ -259,6 +259,8 @@
     <string name="update_permission_denied">لا يزال تثبيت التحديثات غير مسموح. افتح الإعدادات وفعّل السماح من هذا المصدر، أو ألغِ.</string>
     <string name="update_waiting">في انتظار أن يثبّت Android التحديث</string>
     <string name="update_install">تثبيت</string>
+    <string name="update_notify_channel">تحديثات التطبيق</string>
+    <string name="update_notify_done">‏AbsentMotion %1$s مثبّت. اضغط لفتحه.</string>
     <string name="update_not_installed">لم يُثبَّت التحديث. يمكنك تثبيته الآن أو لاحقًا.</string>
     <string name="update_stopped">توقف التحديث</string>
     <string name="update_err_offline">أنت غير متصل. اتصل بالإنترنت ثم أعد المحاولة.</string>
@@ -267,6 +269,7 @@
     <string name="update_err_server">لم يُرسل GitHub التحديث (الخطأ %1$s). أعد المحاولة لاحقًا.</string>
     <string name="update_err_storage">المساحة الفارغة غير كافية. يحتاج التحديث إلى نحو %1$s من المساحة الفارغة.</string>
     <string name="update_err_checksum">لم يطابق الملف المُنزَّل المجموع الاختباري المنشور مع الإصدار، لذلك حُذف.</string>
+    <string name="update_err_manifest">لا يحتوي هذا التحديث على قائمة إصدارات موقّعة أو يحتاج إلى مُحدِّث أحدث، لذلك لم يُنزَّل. احصل عليه من موقع AbsentMotion.</string>
     <string name="update_err_no_checksum">لا يذكر الإصدار مجموعًا اختباريًا لهذا الملف، لذلك لم يُنزَّل.</string>
     <string name="update_err_untrusted">أُعيد توجيه التنزيل إلى عنوان خارج إصدارات AbsentMotion، لذلك أُوقف.</string>
     <string name="update_err_signature">هذا التحديث موقّع بمفتاح مختلف عن التطبيق المثبّت، لذلك لا يمكنه أن يحل محله. لم يتغير شيء.</string>
@@ -2318,6 +2321,10 @@
     <string name="desk_update_opened_title">برنامج التثبيت مفتوح</string>
     <string name="desk_update_opened_body">أغلق AbsentMotion ليتمكن برنامج التثبيت من استبداله. يُحفظ مشروعك المفتوح أولًا.</string>
     <string name="desk_update_quit">إنهاء AbsentMotion</string>
+    <string name="desk_update_ready_install_body">تم التحقق من التنزيل باستخدام قائمة الإصدارات الموقّعة. يحفظ AbsentMotion مشروعك ثم يُغلق ويثبّت التحديث ويُفتح من جديد.</string>
+    <string name="desk_update_install_restart">تثبيت وإعادة التشغيل</string>
+    <string name="desk_update_closing_body">يُحفظ مشروعك أولًا. يُغلق AbsentMotion ويثبّت التحديث ثم يُفتح من جديد.</string>
+    <string name="desk_update_failed_last">لم يُثبَّت التحديث الأخير (%1$s). لا يزال الإصدار الذي لديك موجودًا.</string>
     <string name="desk_tour_screen_body">مكتبة وسائطك على اليسار، والمعاينة في المنتصف، ولوحة الخصائص على اليمين لتعديل الطبقة المحددة. أما الخط الزمني في الأسفل فيمنح كل طبقة صفًا خاصًا بها.</string>
     <string name="desk_tour_picture_body">افتح «وسائط» في المكتبة وانقر على صورة، أو اسحب واحدة إلى المعاينة. لا توجد صورة في متناولك؟ انقر على «نفّذها عني».</string>
     <string name="desk_tour_gestures_title">حرّكها بالماوس</string>

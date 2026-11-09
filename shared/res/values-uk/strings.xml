@@ -259,6 +259,8 @@
     <string name="update_permission_denied">Встановлення оновлень досі не дозволено. Відкрийте налаштування та увімкніть «Дозволити з цього джерела» або скасуйте.</string>
     <string name="update_waiting">Очікування встановлення оновлення Android</string>
     <string name="update_install">Встановити</string>
+    <string name="update_notify_channel">Оновлення застосунку</string>
+    <string name="update_notify_done">Встановлено версію AbsentMotion %1$s. Торкніться, щоб відкрити.</string>
     <string name="update_not_installed">Оновлення не встановлено. Ви можете встановити його зараз або пізніше.</string>
     <string name="update_stopped">Оновлення зупинено</string>
     <string name="update_err_offline">Ви офлайн. Підключіться до інтернету й спробуйте ще раз.</string>
@@ -267,6 +269,7 @@
     <string name="update_err_server">GitHub не надіслав оновлення (помилка %1$s). Спробуйте пізніше.</string>
     <string name="update_err_storage">Недостатньо вільного місця. Для оновлення потрібно близько %1$s.</string>
     <string name="update_err_checksum">Завантажений файл не збігся з контрольною сумою, опублікованою разом із випуском, тому його видалено.</string>
+    <string name="update_err_manifest">В оновленні немає підписаного списку випусків, або потрібна новіша програма оновлення, тому його не завантажено. Отримайте його на сайті AbsentMotion.</string>
     <string name="update_err_no_checksum">У випуску немає контрольної суми для цього файлу, тому його не завантажено.</string>
     <string name="update_err_untrusted">Завантаження було перенаправлено на адресу за межами випусків AbsentMotion, тому його зупинено.</string>
     <string name="update_err_signature">Це оновлення підписано іншим ключем, ніж встановлений застосунок, тому воно не може його замінити. Нічого не змінено.</string>
@@ -2260,6 +2263,10 @@
     <string name="desk_update_opened_title">Інсталятор відкрито</string>
     <string name="desk_update_opened_body">Вийдіть з AbsentMotion, щоб інсталятор міг його замінити. Відкритий проєкт буде попередньо збережено.</string>
     <string name="desk_update_quit">Вийти з AbsentMotion</string>
+    <string name="desk_update_ready_install_body">Завантаження перевірено за підписаним списком випусків. AbsentMotion збереже проєкт, закриється, встановить оновлення й відкриється знову.</string>
+    <string name="desk_update_install_restart">Встановити й перезапустити</string>
+    <string name="desk_update_closing_body">Спочатку проєкт буде збережено. AbsentMotion закриється, встановить оновлення й відкриється знову.</string>
+    <string name="desk_update_failed_last">Останнє оновлення не встановлено (%1$s). Попередня версія залишилася на місці.</string>
     <string name="desk_tour_screen_body">Ліворуч бібліотека з вашими медіа, посередині попередній перегляд, а інспектор праворуч редагує вибраний шар. Таймлайн унизу дає кожному шару власний рядок.</string>
     <string name="desk_tour_picture_body">Відкрийте «Медіа» в бібліотеці й клацніть зображення або перетягніть його в попередній перегляд. Немає зображення під рукою? Натисніть «Зробити за мене».</string>
     <string name="desk_tour_gestures_title">Рухайте мишею</string>

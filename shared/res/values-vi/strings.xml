@@ -259,6 +259,8 @@
     <string name="update_permission_denied">Vẫn chưa được phép cài bản cập nhật. Mở cài đặt và bật Cho phép từ nguồn này, hoặc hủy.</string>
     <string name="update_waiting">Đang chờ Android cài bản cập nhật</string>
     <string name="update_install">Cài đặt</string>
+    <string name="update_notify_channel">Cập nhật ứng dụng</string>
+    <string name="update_notify_done">AbsentMotion %1$s đã được cài đặt. Chạm để mở.</string>
     <string name="update_not_installed">Bản cập nhật chưa được cài. Bạn có thể cài ngay bây giờ hoặc để sau.</string>
     <string name="update_stopped">Bản cập nhật đã dừng</string>
     <string name="update_err_offline">Bạn đang ngoại tuyến. Hãy kết nối Internet rồi thử lại.</string>
@@ -267,6 +269,7 @@
     <string name="update_err_server">GitHub không gửi bản cập nhật (lỗi %1$s). Hãy thử lại sau.</string>
     <string name="update_err_storage">Không đủ dung lượng trống. Bản cập nhật cần khoảng %1$s trống.</string>
     <string name="update_err_checksum">Tệp tải về không khớp với checksum được công bố cùng bản phát hành nên đã bị xóa.</string>
+    <string name="update_err_manifest">Bản cập nhật này không có danh sách bản phát hành đã ký hoặc cần trình cập nhật mới hơn nên không được tải về. Hãy lấy bản này từ trang web AbsentMotion.</string>
     <string name="update_err_no_checksum">Bản phát hành không có checksum cho tệp này nên tệp không được tải về.</string>
     <string name="update_err_untrusted">Lượt tải bị chuyển hướng tới một địa chỉ ngoài các bản phát hành của AbsentMotion nên đã bị dừng.</string>
     <string name="update_err_signature">Bản cập nhật này được ký bằng khóa khác với ứng dụng đã cài nên không thể thay thế ứng dụng đó. Không có gì bị thay đổi.</string>
@@ -2173,6 +2176,10 @@
     <string name="desk_update_opened_title">Trình cài đặt đã mở</string>
     <string name="desk_update_opened_body">Hãy thoát AbsentMotion để trình cài đặt thay thế nó. Dự án đang mở của bạn sẽ được lưu trước.</string>
     <string name="desk_update_quit">Thoát AbsentMotion</string>
+    <string name="desk_update_ready_install_body">Bản tải xuống đã được đối chiếu với danh sách bản phát hành đã ký. AbsentMotion sẽ lưu dự án của bạn, đóng lại, cài đặt bản cập nhật rồi mở lại.</string>
+    <string name="desk_update_install_restart">Cài đặt và khởi động lại</string>
+    <string name="desk_update_closing_body">Dự án của bạn sẽ được lưu trước. AbsentMotion đóng lại, cài đặt bản cập nhật rồi mở lại.</string>
+    <string name="desk_update_failed_last">Bản cập nhật gần nhất chưa được cài đặt (%1$s). Phiên bản bạn đang dùng vẫn còn nguyên.</string>
     <string name="desk_tour_screen_body">Thư viện chứa phương tiện của bạn nằm bên trái, bản xem trước ở giữa, còn bảng thuộc tính bên phải dùng để chỉnh lớp đang chọn. Dòng thời gian bên dưới cho mỗi lớp một hàng riêng.</string>
     <string name="desk_tour_picture_body">Mở Phương tiện trong thư viện rồi nhấp vào một hình ảnh, hoặc kéo một hình vào bản xem trước. Chưa có hình? Hãy nhấp Làm giúp tôi.</string>
     <string name="desk_tour_gestures_title">Di chuyển bằng chuột</string>

@@ -259,6 +259,8 @@
     <string name="update_permission_denied">업데이트 설치가 아직 허용되지 않았습니다. 설정을 열고 이 출처 허용을 켜거나 취소하세요.</string>
     <string name="update_waiting">Android의 업데이트 설치 대기 중</string>
     <string name="update_install">설치</string>
+    <string name="update_notify_channel">앱 업데이트</string>
+    <string name="update_notify_done">AbsentMotion %1$s 설치가 완료되었습니다. 탭하여 여세요.</string>
     <string name="update_not_installed">업데이트가 설치되지 않았습니다. 지금 또는 나중에 설치할 수 있습니다.</string>
     <string name="update_stopped">업데이트가 중단되었습니다</string>
     <string name="update_err_offline">오프라인 상태입니다. 인터넷에 연결하고 다시 시도하세요.</string>
@@ -267,6 +269,7 @@
     <string name="update_err_server">GitHub에서 업데이트를 보내지 않았습니다 (오류 %1$s). 나중에 다시 시도하세요.</string>
     <string name="update_err_storage">저장 공간이 부족합니다. 업데이트하려면 약 %1$s의 여유 공간이 필요합니다.</string>
     <string name="update_err_checksum">다운로드한 파일이 릴리스에 게시된 체크섬과 일치하지 않아 삭제되었습니다.</string>
+    <string name="update_err_manifest">이 업데이트에는 서명된 릴리스 목록이 없거나 더 새로운 업데이터가 필요해서 다운로드하지 않았습니다. AbsentMotion 웹사이트에서 받으세요.</string>
     <string name="update_err_no_checksum">이 파일의 체크섬이 릴리스에 없어 다운로드하지 않았습니다.</string>
     <string name="update_err_untrusted">다운로드가 AbsentMotion 릴리스 외부 주소로 리디렉션되어 중단되었습니다.</string>
     <string name="update_err_signature">이 업데이트는 설치된 앱과 다른 키로 서명되어 교체할 수 없습니다. 변경된 내용은 없습니다.</string>
@@ -2173,6 +2176,10 @@
     <string name="desk_update_opened_title">설치 프로그램이 열렸습니다</string>
     <string name="desk_update_opened_body">설치 프로그램이 AbsentMotion을 교체할 수 있도록 종료하세요. 열려 있는 프로젝트는 먼저 저장됩니다.</string>
     <string name="desk_update_quit">AbsentMotion 종료</string>
+    <string name="desk_update_ready_install_body">다운로드한 파일을 서명된 릴리스 목록으로 확인했습니다. AbsentMotion이 프로젝트를 저장하고 종료한 뒤 업데이트를 설치하고 다시 시작합니다.</string>
+    <string name="desk_update_install_restart">설치 후 다시 시작</string>
+    <string name="desk_update_closing_body">프로젝트가 먼저 저장됩니다. AbsentMotion이 종료되고 업데이트를 설치한 뒤 다시 시작합니다.</string>
+    <string name="desk_update_failed_last">마지막 업데이트가 설치되지 않았습니다(%1$s). 사용하던 버전은 그대로 있습니다.</string>
     <string name="desk_tour_screen_body">왼쪽에는 미디어 라이브러리, 가운데에는 미리보기가 있고, 오른쪽 속성 패널에서 선택한 레이어를 편집합니다. 아래 타임라인에는 각 레이어가 별도의 행으로 표시됩니다.</string>
     <string name="desk_tour_picture_body">라이브러리에서 미디어를 열고 사진을 클릭하거나 미리보기로 드래그하세요. 사진이 없다면 대신 해주기를 클릭하세요.</string>
     <string name="desk_tour_gestures_title">마우스로 이동하기</string>

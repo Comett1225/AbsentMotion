@@ -259,6 +259,8 @@
     <string name="update_permission_denied">Die Installation von Updates ist noch nicht erlaubt. Öffne die Einstellungen und aktiviere „Aus dieser Quelle zulassen“ oder brich ab.</string>
     <string name="update_waiting">Warten, bis Android das Update installiert</string>
     <string name="update_install">Installieren</string>
+    <string name="update_notify_channel">App-Updates</string>
+    <string name="update_notify_done">AbsentMotion %1$s ist installiert. Tippe, um es zu öffnen.</string>
     <string name="update_not_installed">Das Update wurde nicht installiert. Du kannst es jetzt oder später installieren.</string>
     <string name="update_stopped">Das Update wurde angehalten</string>
     <string name="update_err_offline">Du bist offline. Stelle eine Internetverbindung her und versuche es erneut.</string>
@@ -267,6 +269,7 @@
     <string name="update_err_server">GitHub hat das Update nicht gesendet (Fehler %1$s). Versuche es später erneut.</string>
     <string name="update_err_storage">Nicht genug freier Speicherplatz. Das Update benötigt etwa %1$s freien Speicher.</string>
     <string name="update_err_checksum">Der Download stimmte nicht mit der zur Version veröffentlichten Prüfsumme überein und wurde daher gelöscht.</string>
+    <string name="update_err_manifest">Dieses Update hat keine signierte Versionsliste oder braucht ein neueres Update-Programm, daher wurde es nicht heruntergeladen. Hol es dir auf der Website von AbsentMotion.</string>
     <string name="update_err_no_checksum">Für diese Datei ist in der Version keine Prüfsumme angegeben, daher wurde sie nicht heruntergeladen.</string>
     <string name="update_err_untrusted">Der Download wurde an eine Adresse außerhalb der AbsentMotion-Veröffentlichungen weitergeleitet und daher gestoppt.</string>
     <string name="update_err_signature">Dieses Update ist mit einem anderen Schlüssel als die installierte App signiert und kann sie daher nicht ersetzen. Es wurde nichts geändert.</string>
@@ -2202,6 +2205,10 @@
     <string name="desk_update_opened_title">Das Installationsprogramm ist geöffnet</string>
     <string name="desk_update_opened_body">Beende AbsentMotion, damit das Installationsprogramm es ersetzen kann. Dein geöffnetes Projekt wird vorher gespeichert.</string>
     <string name="desk_update_quit">AbsentMotion beenden</string>
+    <string name="desk_update_ready_install_body">Der Download wurde anhand der signierten Versionsliste überprüft. AbsentMotion speichert dein Projekt, beendet sich, installiert das Update und öffnet sich wieder.</string>
+    <string name="desk_update_install_restart">Installieren und neu starten</string>
+    <string name="desk_update_closing_body">Dein Projekt wird zuerst gespeichert. AbsentMotion beendet sich, installiert das Update und öffnet sich wieder.</string>
+    <string name="desk_update_failed_last">Das letzte Update wurde nicht installiert (%1$s). Deine bisherige Version ist weiterhin vorhanden.</string>
     <string name="desk_tour_screen_body">Links findest du die Bibliothek mit deinen Medien, in der Mitte die Vorschau und rechts den Inspektor zum Bearbeiten der ausgewählten Ebene. In der Zeitleiste darunter hat jede Ebene eine eigene Zeile.</string>
     <string name="desk_tour_picture_body">Öffne „Medien“ in der Bibliothek und klicke auf ein Bild oder ziehe eines in die Vorschau. Kein Bild zur Hand? Klicke auf „Für mich erledigen“.</string>
     <string name="desk_tour_gestures_title">Mit der Maus verschieben</string>

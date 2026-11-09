@@ -259,6 +259,8 @@
     <string name="update_permission_denied">अपडेट इंस्टॉल करने की अनुमति अब भी नहीं है। सेटिंग्स खोलें और इस स्रोत से अनुमति दें चालू करें, या रद्द करें।</string>
     <string name="update_waiting">Android के अपडेट इंस्टॉल करने का इंतज़ार हो रहा है</string>
     <string name="update_install">इंस्टॉल करें</string>
+    <string name="update_notify_channel">ऐप अपडेट</string>
+    <string name="update_notify_done">AbsentMotion %1$s इंस्टॉल हो गया है। खोलने के लिए टैप करें।</string>
     <string name="update_not_installed">अपडेट इंस्टॉल नहीं हुआ। आप इसे अभी या बाद में इंस्टॉल कर सकते हैं।</string>
     <string name="update_stopped">अपडेट रुक गया</string>
     <string name="update_err_offline">आप ऑफ़लाइन हैं। इंटरनेट से जुड़ें और फिर से कोशिश करें।</string>
@@ -267,6 +269,7 @@
     <string name="update_err_server">GitHub ने अपडेट नहीं भेजा (त्रुटि %1$s)। बाद में फिर से कोशिश करें।</string>
     <string name="update_err_storage">खाली जगह कम है। अपडेट के लिए लगभग %1$s खाली जगह चाहिए।</string>
     <string name="update_err_checksum">डाउनलोड रिलीज़ के साथ प्रकाशित चेकसम से मेल नहीं खाया, इसलिए उसे हटा दिया गया।</string>
+    <string name="update_err_manifest">इस अपडेट में हस्ताक्षरित रिलीज़ सूची नहीं है या इसके लिए नए अपडेटर की ज़रूरत है, इसलिए इसे डाउनलोड नहीं किया गया। इसे AbsentMotion की वेबसाइट से लें।</string>
     <string name="update_err_no_checksum">रिलीज़ में इस फ़ाइल का चेकसम नहीं है, इसलिए इसे डाउनलोड नहीं किया गया।</string>
     <string name="update_err_untrusted">डाउनलोड को AbsentMotion रिलीज़ से बाहर के पते पर भेजा गया, इसलिए उसे रोक दिया गया।</string>
     <string name="update_err_signature">यह अपडेट इंस्टॉल ऐप से अलग कुंजी से साइन किया गया है, इसलिए यह उसकी जगह नहीं ले सकता। कुछ भी नहीं बदला गया।</string>
@@ -2202,6 +2205,10 @@
     <string name="desk_update_opened_title">इंस्टॉलर खुल गया है</string>
     <string name="desk_update_opened_body">इंस्टॉलर AbsentMotion को बदल सके, इसके लिए AbsentMotion से बाहर निकलें। आपका खुला प्रोजेक्ट पहले सेव हो जाता है।</string>
     <string name="desk_update_quit">AbsentMotion से बाहर निकलें</string>
+    <string name="desk_update_ready_install_body">डाउनलोड को हस्ताक्षरित रिलीज़ सूची से जाँचा गया है। AbsentMotion आपका प्रोजेक्ट सेव करता है, बंद होता है, अपडेट इंस्टॉल करता है और फिर से खुल जाता है।</string>
+    <string name="desk_update_install_restart">इंस्टॉल करें और फिर से शुरू करें</string>
+    <string name="desk_update_closing_body">आपका प्रोजेक्ट पहले सेव हो जाता है। AbsentMotion बंद होता है, अपडेट इंस्टॉल करता है और फिर से खुल जाता है।</string>
+    <string name="desk_update_failed_last">पिछला अपडेट इंस्टॉल नहीं हुआ (%1$s)। आपका पहले वाला वर्ज़न अब भी मौजूद है।</string>
     <string name="desk_tour_screen_body">बाईं ओर आपके मीडिया वाली लाइब्रेरी है, बीच में प्रीव्यू है, और दाईं ओर का इंस्पेक्टर चुनी हुई लेयर को एडिट करता है। नीचे टाइमलाइन में हर लेयर की अपनी अलग पंक्ति होती है।</string>
     <string name="desk_tour_picture_body">लाइब्रेरी में मीडिया खोलें और किसी तस्वीर पर क्लिक करें, या उसे प्रीव्यू में ड्रैग करें। कोई तस्वीर नहीं है? \"मेरे लिए करें\" पर क्लिक करें।</string>
     <string name="desk_tour_gestures_title">माउस से इसे मूव करें</string>

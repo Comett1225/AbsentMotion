@@ -6,6 +6,18 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [5.0.3] - 2026-11-09
+
+### Added
+
+- One-step updates on the desktop apps: Settings > Updates > Download update > Install and restart saves the project, closes, installs the new version and opens it again. It works for the Windows MSI, the macOS app (a new `-update.zip` next to the DMG), the Linux user install, AppImage and `.deb` (the system asks for the password once); a protected macOS folder still opens the installer.
+- Desktop updates are only installed when the release carries a signed list of its files (`update-manifest.json` and its signature).
+- Android 12 and newer install an update without a confirmation dialog when the system allows it, and a notification opens the app afterwards.
+
+### Fixed
+
+- Tiles (Blocks) now fill the whole screen when the layer or group is moved or only partly on the canvas, including with Mirror: the part of the layer outside the screen is used for the repeats instead of leaving black gaps.
+
 ## [5.0.2] - 2026-11-08
 
 ### Added

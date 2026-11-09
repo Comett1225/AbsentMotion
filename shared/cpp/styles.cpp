@@ -1269,7 +1269,12 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
         plain.unitOpacity = true;
         DrawOne(canvas, siblings, *under, timeMs, pictures, plain);
     };
-    if (!effects || !gEffects->draw(canvas, *gScene, l, timeMs, scenePath.getBounds(), m, picture, below)) picture(canvas);
+    SkRect effectArea = scenePath.getBounds();
+    if (effects && l.kind == "embedScene" && gEffects->wraps && gEffects->wraps(l)) {
+        const SkRect content = SelectionBounds(l, timeMs, m);
+        if (content.isFinite() && !content.isEmpty()) effectArea = content;
+    }
+    if (!effects || !gEffects->draw(canvas, *gScene, l, timeMs, effectArea, m, picture, below)) picture(canvas);
     if (effects && gEffects->lifted(l) && !(gEffects->spills && gEffects->spills(l)) && !scenePath.isEmpty()) {
         SkPaint mask;
         mask.setAntiAlias(true);

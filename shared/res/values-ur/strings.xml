@@ -259,6 +259,8 @@
     <string name="update_permission_denied">اپ ڈیٹس انسٹال کرنے کی اب بھی اجازت نہیں۔ سیٹنگز کھولیں اور اس ذریعے سے اجازت دیں کو آن کریں، یا منسوخ کریں۔</string>
     <string name="update_waiting">Android کے ذریعے اپ ڈیٹ انسٹال ہونے کا انتظار ہے</string>
     <string name="update_install">انسٹال کریں</string>
+    <string name="update_notify_channel">ایپ اپ ڈیٹس</string>
+    <string name="update_notify_done">AbsentMotion %1$s انسٹال ہو گیا ہے۔ کھولنے کے لیے ٹیپ کریں۔</string>
     <string name="update_not_installed">اپ ڈیٹ انسٹال نہیں ہوئی۔ آپ اسے ابھی یا بعد میں انسٹال کر سکتے ہیں۔</string>
     <string name="update_stopped">اپ ڈیٹ رک گئی</string>
     <string name="update_err_offline">آپ آف لائن ہیں۔ انٹرنیٹ سے جڑیں اور دوبارہ کوشش کریں۔</string>
@@ -267,6 +269,7 @@
     <string name="update_err_server">GitHub نے اپ ڈیٹ نہیں بھیجا (خرابی %1$s)۔ بعد میں دوبارہ کوشش کریں۔</string>
     <string name="update_err_storage">کافی خالی جگہ نہیں۔ اپ ڈیٹ کے لیے تقریباً %1$s خالی درکار ہے۔</string>
     <string name="update_err_checksum">ڈاؤن لوڈ ریلیز کے ساتھ شائع شدہ چیک سم سے میل نہیں کھا، اس لیے اسے حذف کر دیا گیا۔</string>
+    <string name="update_err_manifest">اس اپ ڈیٹ میں دستخط شدہ ریلیز فہرست نہیں ہے یا اسے نئے اپ ڈیٹر کی ضرورت ہے، اس لیے اسے ڈاؤن لوڈ نہیں کیا گیا۔ اسے AbsentMotion کی ویب سائٹ سے حاصل کریں۔</string>
     <string name="update_err_no_checksum">ریلیز میں اس فائل کا کوئی چیک سم درج نہیں، اس لیے اسے ڈاؤن لوڈ نہیں کیا گیا۔</string>
     <string name="update_err_untrusted">ڈاؤن لوڈ کو AbsentMotion ریلیزز سے باہر کے ایڈریس پر ری ڈائریکٹ کیا گیا، اس لیے اسے روک دیا گیا۔</string>
     <string name="update_err_signature">یہ اپ ڈیٹ نصب شدہ ایپ سے مختلف کلید کے ساتھ سائن شدہ ہے، اس لیے یہ اسے تبدیل نہیں کر سکتی۔ کچھ تبدیل نہیں ہوا۔</string>
@@ -2202,6 +2205,10 @@
     <string name="desk_update_opened_title">انسٹالر کھل گیا ہے</string>
     <string name="desk_update_opened_body">انسٹالر کے AbsentMotion کو بدلنے کے لیے اسے بند کریں۔ آپ کا کھلا ہوا پروجیکٹ پہلے محفوظ کر لیا جاتا ہے۔</string>
     <string name="desk_update_quit">AbsentMotion بند کریں</string>
+    <string name="desk_update_ready_install_body">ڈاؤن لوڈ کو دستخط شدہ ریلیز فہرست سے جانچ لیا گیا ہے۔ AbsentMotion آپ کا پروجیکٹ محفوظ کرتا ہے، بند ہوتا ہے، اپ ڈیٹ انسٹال کرتا ہے اور دوبارہ کھل جاتا ہے۔</string>
+    <string name="desk_update_install_restart">انسٹال کریں اور دوبارہ شروع کریں</string>
+    <string name="desk_update_closing_body">آپ کا پروجیکٹ پہلے محفوظ کر لیا جاتا ہے۔ AbsentMotion بند ہوتا ہے، اپ ڈیٹ انسٹال کرتا ہے اور دوبارہ کھل جاتا ہے۔</string>
+    <string name="desk_update_failed_last">آخری اپ ڈیٹ انسٹال نہیں ہوئی (%1$s)۔ آپ کا پرانا ورژن ابھی موجود ہے۔</string>
     <string name="desk_tour_screen_body">آپ کے میڈیا والی لائبریری بائیں طرف ہے، پری ویو درمیان میں ہے اور دائیں طرف انسپیکٹر منتخب لیئر میں ترمیم کرتا ہے۔ نیچے ٹائم لائن ہر لیئر کو اس کی اپنی قطار دیتی ہے۔</string>
     <string name="desk_tour_picture_body">لائبریری میں میڈیا کھولیں اور کسی تصویر پر کلک کریں، یا اسے پری ویو میں گھسیٹ لائیں۔ کوئی تصویر موجود نہیں؟ «میرے لیے کریں» پر کلک کریں۔</string>
     <string name="desk_tour_gestures_title">اسے ماؤس سے حرکت دیں</string>

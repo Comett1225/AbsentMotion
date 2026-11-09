@@ -259,6 +259,8 @@
     <string name="update_permission_denied">Instalowanie aktualizacji nadal jest niedozwolone. Otwórz ustawienia i włącz Zezwalaj z tego źródła lub anuluj.</string>
     <string name="update_waiting">Oczekiwanie na instalację aktualizacji przez Androida</string>
     <string name="update_install">Zainstaluj</string>
+    <string name="update_notify_channel">Aktualizacje aplikacji</string>
+    <string name="update_notify_done">Zainstalowano AbsentMotion %1$s. Dotknij, aby otworzyć.</string>
     <string name="update_not_installed">Aktualizacja nie została zainstalowana. Możesz ją zainstalować teraz lub później.</string>
     <string name="update_stopped">Aktualizacja została przerwana</string>
     <string name="update_err_offline">Jesteś offline. Połącz się z internetem i spróbuj ponownie.</string>
@@ -267,6 +269,7 @@
     <string name="update_err_server">GitHub nie przesłał aktualizacji (błąd %1$s). Spróbuj ponownie później.</string>
     <string name="update_err_storage">Za mało wolnego miejsca. Aktualizacja wymaga około %1$s wolnego miejsca.</string>
     <string name="update_err_checksum">Pobrany plik nie zgadzał się z sumą kontrolną opublikowaną z wydaniem, więc został usunięty.</string>
+    <string name="update_err_manifest">Ta aktualizacja nie ma podpisanej listy wydań albo wymaga nowszego programu aktualizującego, więc nie została pobrana. Pobierz ją ze strony AbsentMotion.</string>
     <string name="update_err_no_checksum">Wydanie nie zawiera sumy kontrolnej tego pliku, więc nie został on pobrany.</string>
     <string name="update_err_untrusted">Pobieranie przekierowano pod adres spoza wydań AbsentMotion, więc zostało zatrzymane.</string>
     <string name="update_err_signature">Ta aktualizacja jest podpisana innym kluczem niż zainstalowana aplikacja, więc nie może jej zastąpić. Nic nie zmieniono.</string>
@@ -2260,6 +2263,10 @@
     <string name="desk_update_opened_title">Instalator jest otwarty</string>
     <string name="desk_update_opened_body">Zamknij AbsentMotion, aby instalator mógł go zastąpić. Otwarty projekt zostanie wcześniej zapisany.</string>
     <string name="desk_update_quit">Zamknij AbsentMotion</string>
+    <string name="desk_update_ready_install_body">Pobrany plik sprawdzono z podpisaną listą wydań. AbsentMotion zapisze projekt, zamknie się, zainstaluje aktualizację i otworzy się ponownie.</string>
+    <string name="desk_update_install_restart">Zainstaluj i uruchom ponownie</string>
+    <string name="desk_update_closing_body">Projekt zostanie najpierw zapisany. AbsentMotion zamknie się, zainstaluje aktualizację i otworzy się ponownie.</string>
+    <string name="desk_update_failed_last">Ostatnia aktualizacja nie została zainstalowana (%1$s). Dotychczasowa wersja nadal jest na miejscu.</string>
     <string name="desk_tour_screen_body">Biblioteka multimediów znajduje się po lewej, podgląd pośrodku, a inspektor po prawej służy do edycji wybranej warstwy. Na osi czasu poniżej każda warstwa ma własny wiersz.</string>
     <string name="desk_tour_picture_body">Otwórz Multimedia w bibliotece i kliknij obraz lub przeciągnij go do podglądu. Nie masz obrazu pod ręką? Kliknij Zrób to za mnie.</string>
     <string name="desk_tour_gestures_title">Przesuń myszą</string>

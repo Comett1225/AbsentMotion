@@ -259,6 +259,8 @@
     <string name="update_permission_denied">نصب به‌روزرسانی هنوز مجاز نیست. تنظیمات را باز کنید و اجازه دادن از این منبع را روشن کنید، یا لغو کنید.</string>
     <string name="update_waiting">در انتظار نصب به‌روزرسانی توسط Android</string>
     <string name="update_install">نصب</string>
+    <string name="update_notify_channel">به‌روزرسانی‌های برنامه</string>
+    <string name="update_notify_done">‏AbsentMotion %1$s نصب شد. برای باز کردن ضربه بزنید.</string>
     <string name="update_not_installed">به‌روزرسانی نصب نشد. می‌توانید آن را الان یا بعداً نصب کنید.</string>
     <string name="update_stopped">به‌روزرسانی متوقف شد</string>
     <string name="update_err_offline">آفلاین هستید. به اینترنت وصل شوید و دوباره امتحان کنید.</string>
@@ -267,6 +269,7 @@
     <string name="update_err_server">‏GitHub به‌روزرسانی را نفرستاد (خطای %1$s). بعداً دوباره امتحان کنید.</string>
     <string name="update_err_storage">فضای خالی کافی نیست. به‌روزرسانی حدود %1$s فضای خالی لازم دارد.</string>
     <string name="update_err_checksum">فایل دانلودشده با checksum منتشرشده همراه نسخه مطابقت نداشت، برای همین حذف شد.</string>
+    <string name="update_err_manifest">این به‌روزرسانی فهرست نسخه‌های امضاشده ندارد یا به به‌روزرسان جدیدتری نیاز دارد، برای همین دانلود نشد. آن را از وب‌سایت AbsentMotion بگیرید.</string>
     <string name="update_err_no_checksum">این نسخه checksum این فایل را ندارد، برای همین دانلود نشد.</string>
     <string name="update_err_untrusted">دانلود به نشانی‌ای بیرون از نسخه‌های AbsentMotion هدایت شد، برای همین متوقف شد.</string>
     <string name="update_err_signature">این به‌روزرسانی با کلیدی متفاوت از برنامهٔ نصب‌شده امضا شده و نمی‌تواند جای آن را بگیرد. چیزی تغییر نکرد.</string>
@@ -2202,6 +2205,10 @@
     <string name="desk_update_opened_title">نصب‌کننده باز است</string>
     <string name="desk_update_opened_body">‏AbsentMotion را ببندید تا نصب‌کننده بتواند آن را جایگزین کند. ابتدا پروژهٔ بازتان ذخیره می‌شود.</string>
     <string name="desk_update_quit">خروج از AbsentMotion</string>
+    <string name="desk_update_ready_install_body">دانلود با فهرست نسخه‌های امضاشده بررسی شد. AbsentMotion پروژه‌تان را ذخیره می‌کند، بسته می‌شود، به‌روزرسانی را نصب می‌کند و دوباره باز می‌شود.</string>
+    <string name="desk_update_install_restart">نصب و راه‌اندازی دوباره</string>
+    <string name="desk_update_closing_body">ابتدا پروژه‌تان ذخیره می‌شود. AbsentMotion بسته می‌شود، به‌روزرسانی را نصب می‌کند و دوباره باز می‌شود.</string>
+    <string name="desk_update_failed_last">آخرین به‌روزرسانی نصب نشد (%1$s). نسخه‌ای که داشتید همچنان سر جایش است.</string>
     <string name="desk_tour_screen_body">کتابخانهٔ رسانه‌هایتان سمت چپ است، پیش‌نمایش وسط، و پنل ویژگی‌ها سمت راست لایهٔ انتخاب‌شده را ویرایش می‌کند. تایم‌لاین پایین برای هر لایه یک ردیف جدا دارد.</string>
     <string name="desk_tour_picture_body">در کتابخانه «رسانه» را باز کنید و روی یک تصویر کلیک کنید، یا یکی را به پیش‌نمایش بکشید. تصویری ندارید؟ روی «برایم انجام بده» کلیک کنید.</string>
     <string name="desk_tour_gestures_title">با ماوس جابه‌جایش کنید</string>

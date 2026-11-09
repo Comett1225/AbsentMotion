@@ -179,14 +179,14 @@ a Mac with an Intel chip, open it and drag AbsentMotion into Applications.
 
 The app is not notarised by Apple, so the first time macOS says it cannot check it. Click **Done**, open **System
 Settings** > **Privacy & Security**, scroll down to the message about AbsentMotion, click **Open Anyway** and confirm.
-After that it starts like any other app. Updates are offered inside the app.
+After that it starts like any other app. Updates are offered inside the app: **Settings** > **Updates** > **Download update** > **Install and restart** replaces the app in place and opens it again (the app has to sit in a folder you can write to, such as Applications; otherwise the disk image opens as before).
 
 ## Install on Windows
 
 Download `AbsentMotion-*-windows-x64.msi` and open it. If your browser says the file isn't commonly downloaded, choose to
 keep it. It installs for your user only, without administrator rights, and adds AbsentMotion to the Start menu and the
 desktop. The installer is not signed, so Windows may say it protected your PC: click **More info**, then **Run anyway**. The first start after installing can take a little longer while Windows checks
-the new files. Remove it in **Settings** > **Apps**; your projects stay. Updates are offered inside the app.
+the new files. Remove it in **Settings** > **Apps**; your projects stay. Updates are offered inside the app: **Settings** > **Updates** > **Download update** > **Install and restart** saves your project, installs the new version for your user and opens it again.
 
 ## Install on Linux
 
@@ -205,7 +205,7 @@ AppImages need FUSE 2. On Ubuntu 22.04 and Debian install it with `sudo apt inst
 
     sudo apt install ./AbsentMotion-*-linux-x86_64.deb
 
-It adds AbsentMotion to the app menu. Remove it with `sudo apt remove absentmotion`.
+It adds AbsentMotion to the app menu. Remove it with `sudo apt remove absentmotion`. The app updates itself from **Settings** > **Updates** > **Install and restart**; the system asks for your password once.
 
 **`.tar.gz`** (Arch, Manjaro, EndeavourOS, Fedora, openSUSE and any other distribution). It installs for your user only,
 without root:
@@ -215,7 +215,7 @@ without root:
 
 This copies the app to `~/.local/opt/absentmotion` and adds a menu entry, the icon, the `.absproj` file type and the
 command `absentmotion` (in `~/.local/bin`). Remove it with `~/.local/opt/absentmotion/install.sh --uninstall`; your projects
-stay. To update, unpack the new version and run its `install.sh` again.
+stay. The app updates itself from **Settings** > **Updates** > **Install and restart**; or unpack the new version and run its `install.sh` again. An AppImage also replaces itself in place when its folder is writable.
 
 Almost every desktop already has the libraries AbsentMotion needs. If it does not start, install them:
 

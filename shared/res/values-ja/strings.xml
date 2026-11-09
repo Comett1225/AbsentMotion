@@ -259,6 +259,8 @@
     <string name="update_permission_denied">アップデートのインストールがまだ許可されていません。「設定を開く」から「この提供元を許可」をオンにするか、キャンセルしてください。</string>
     <string name="update_waiting">Androidがアップデートをインストールするのを待機中</string>
     <string name="update_install">インストール</string>
+    <string name="update_notify_channel">アプリのアップデート</string>
+    <string name="update_notify_done">AbsentMotion %1$sをインストールしました。タップして開きます。</string>
     <string name="update_not_installed">アップデートはインストールされませんでした。今すぐインストールすることも、後で行うこともできます。</string>
     <string name="update_stopped">アップデートが停止しました</string>
     <string name="update_err_offline">オフラインです。インターネットに接続して、もう一度お試しください。</string>
@@ -267,6 +269,7 @@
     <string name="update_err_server">GitHubからアップデートが送信されませんでした（エラー %1$s）。後でもう一度お試しください。</string>
     <string name="update_err_storage">空き容量が足りません。アップデートには約%1$sの空き容量が必要です。</string>
     <string name="update_err_checksum">ダウンロードしたファイルがリリースで公開されたチェックサムと一致しなかったため、削除しました。</string>
+    <string name="update_err_manifest">このアップデートには署名付きのリリース一覧がないか、より新しいアップデーターが必要なため、ダウンロードしませんでした。AbsentMotionのウェブサイトから入手してください。</string>
     <string name="update_err_no_checksum">このファイルのチェックサムがリリースに記載されていないため、ダウンロードしませんでした。</string>
     <string name="update_err_untrusted">ダウンロードがAbsentMotionのリリース以外のアドレスにリダイレクトされたため、停止しました。</string>
     <string name="update_err_signature">このアップデートはインストール済みのアプリと異なるキーで署名されているため、置き換えできません。変更は行われていません。</string>
@@ -2173,6 +2176,10 @@
     <string name="desk_update_opened_title">インストーラーが開きました</string>
     <string name="desk_update_opened_body">インストーラーが置き換えられるよう、AbsentMotionを終了してください。開いているプロジェクトは先に保存されます。</string>
     <string name="desk_update_quit">AbsentMotionを終了</string>
+    <string name="desk_update_ready_install_body">ダウンロードしたファイルは、署名付きのリリース一覧で確認済みです。AbsentMotionはプロジェクトを保存して終了し、アップデートをインストールして、もう一度開きます。</string>
+    <string name="desk_update_install_restart">インストールして再起動</string>
+    <string name="desk_update_closing_body">先にプロジェクトを保存します。AbsentMotionは終了し、アップデートをインストールして、もう一度開きます。</string>
+    <string name="desk_update_failed_last">前回のアップデートはインストールされませんでした（%1$s）。これまでのバージョンはそのまま残っています。</string>
     <string name="desk_tour_screen_body">左にメディアのあるライブラリ、中央にプレビュー、右に選択中のレイヤーを編集するインスペクターがあります。下のタイムラインでは、レイヤーごとに専用の行が表示されます。</string>
     <string name="desk_tour_picture_body">ライブラリでメディアを開いて画像をクリックするか、プレビューにドラッグします。画像がない場合は「おまかせ」をクリックしてください。</string>
     <string name="desk_tour_gestures_title">マウスで動かす</string>

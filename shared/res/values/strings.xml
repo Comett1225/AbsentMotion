@@ -259,6 +259,8 @@
     <string name="update_permission_denied">Installing updates is still not allowed. Open Settings and turn on Allow from this source, or cancel.</string>
     <string name="update_waiting">Waiting for Android to install the update</string>
     <string name="update_install">Install</string>
+    <string name="update_notify_channel">App updates</string>
+    <string name="update_notify_done">AbsentMotion %1$s is installed. Tap to open it.</string>
     <string name="update_not_installed">The update was not installed. You can install it now or later.</string>
     <string name="update_stopped">The update stopped</string>
     <string name="update_err_offline">You are offline. Connect to the internet and try again.</string>
@@ -267,6 +269,7 @@
     <string name="update_err_server">GitHub did not send the update (error %1$s). Try again later.</string>
     <string name="update_err_storage">Not enough free space. The update needs about %1$s free.</string>
     <string name="update_err_checksum">The download did not match the checksum published with the release, so it was deleted.</string>
+    <string name="update_err_manifest">This update has no signed release list or needs a newer updater, so it was not downloaded. Get it from the AbsentMotion website.</string>
     <string name="update_err_no_checksum">The release lists no checksum for this file, so it was not downloaded.</string>
     <string name="update_err_untrusted">The download was redirected to an address outside the AbsentMotion releases, so it was stopped.</string>
     <string name="update_err_signature">This update is signed with a different key than the installed app, so it cannot replace it. Nothing was changed.</string>
@@ -2228,6 +2231,10 @@
     <string name="desk_update_opened_title">The installer is open</string>
     <string name="desk_update_opened_body">Quit AbsentMotion so the installer can replace it. Your open project is saved first.</string>
     <string name="desk_update_quit">Quit AbsentMotion</string>
+    <string name="desk_update_ready_install_body">The download was checked against the signed release list. AbsentMotion saves your project, closes, installs the update and opens again.</string>
+    <string name="desk_update_install_restart">Install and restart</string>
+    <string name="desk_update_closing_body">Your project is saved first. AbsentMotion closes, installs the update and opens again.</string>
+    <string name="desk_update_failed_last">The last update was not installed (%1$s). The version you had is still here.</string>
     <string name="desk_tour_screen_body">The library with your media is on the left, the preview is in the middle and the inspector on the right edits the selected layer. The timeline below gives every layer its own row.</string>
     <string name="desk_tour_picture_body">Open Media in the library and click a picture, or drag one into the preview. No picture handy? Click Do it for me.</string>
     <string name="desk_tour_gestures_title">Move it with the mouse</string>

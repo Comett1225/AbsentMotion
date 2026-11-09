@@ -316,6 +316,7 @@ class DeskAppState {
 
     fun keepExporting() {
         quitAsk = false
+        app.absentmotion.ui.home.UpdateInstall.disarm()
         background.launch {
             exportingFromList = null
             if (shutdown()) hidden = true

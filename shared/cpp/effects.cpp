@@ -50,6 +50,12 @@ bool BuiltIn(const std::string& id) {
     return id == "absent.blur" || id == "absent.glow" || id == "absent.smear" || id == kLift || id == kPuppet;
 }
 
+bool WrapsLayer(const std::string& id) {
+    return id == "absent.tiles" || id == "absent.tile" || id == "absent.tileshift" || id == "absent.tilerotate" || id == "absent.mirror" ||
+           id == "absent.hexagontiling" || id == "absent.hexagontileshift" || id == "absent.hexagontilerotate" || id == "absent.kaleidoscope" ||
+           id == "absent.offset";
+}
+
 const char* const kPuppetShader = R"(
 uniform shader image;
 uniform float3x3 toLocal;
@@ -953,6 +959,10 @@ int EffectRuntime::liftAt(const Layer& layer) const {
 
 bool EffectRuntime::lifted(const Layer& layer) const { return liftAt(layer) >= 0; }
 
+bool EffectRuntime::wraps(const Layer& layer) const {
+    return std::any_of(layer.effects.begin(), layer.effects.end(), [](const LayerEffect& e) { return !e.hidden && WrapsLayer(e.id); });
+}
+
 bool EffectRuntime::spills(const Layer& layer) const {
     const int lift = liftAt(layer);
     if (lift < 0) return false;
@@ -1364,6 +1374,12 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
         }
     }
     SkRect inside = local, layerBounds = bounds;
+    const bool wraps = lift < 0 && std::any_of(layer.effects.begin(), layer.effects.end(), [](const LayerEffect& e) { return !e.hidden && WrapsLayer(e.id); });
+    if (wraps && !bent) {
+        SkRect measured = drawn;
+        if (!seesBehind) record(source, &measured, std::min(std::max({(float)scene.width, (float)scene.height, bounds.width(), bounds.height(), at.width(), at.height()}), 4096.0f));
+        layerBounds.join(measured);
+    }
     if (bent) {
         SkRect measured = drawn;
         if (!seesBehind) record(source, &measured, margin);

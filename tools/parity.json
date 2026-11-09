@@ -1253,12 +1253,12 @@
     {
       "id": "home.updates",
       "name": "Update check and install",
-      "where": "UpdateCheck.kt, DeskUpdater.kt",
+      "where": "UpdateCheck.kt, DeskUpdater.kt, DeskUpdateInstall.kt, DeskUpdateTrust.kt",
       "android": "works",
       "macos": "works",
       "windows": "untested",
       "linux": "untested",
-      "note": "Downloads the .dmg, .msi or .deb of the release feed for this system, checks it against SHA256SUMS.txt (a mismatch is deleted), then opens it and offers to quit; never installs on its own; expects release assets named AbsentMotion-<version>... with the system's extension; Android takes AbsentMotion-<version>-<flavour>.apk, with -x86_64 before .apk when Build.SUPPORTED_ABIS starts with x86_64 (ChromeOS on Intel or AMD)"
+      "note": "Downloads the installer or update file of the release for this system, checks it against the signed list (update-manifest.json) and, on Windows, macOS, the Linux user install, AppImage and .deb, offers Install and restart (the app saves, closes, installs and opens again); other installs open the file as before. macOS verified end to end with a local test feed 2026-11-09; Windows and Linux follow the Windows round 66 report."
     },
     {
       "id": "home.onboarding",
@@ -1557,14 +1557,14 @@
     }
   ],
   "android_only": {
-    "app/absentmotion/MainActivity.kt": {
-      "desktop": "pc/src/standins/kotlin/app/absentmotion/desk/DeskApp.kt",
-      "reason": "app shell; the desktop shell is DeskApp plus pc/src/main Main.kt (features missing there: home.recovery, home.onboarding, home.tutorial, home.missing_fonts)"
-    },
     "app/absentmotion/ImportActivity.kt": {
       "desktop": null,
       "feature": "home.open_with",
       "reason": "Android share and VIEW intent entry; desktop imports with File > Import Project and drag and drop"
+    },
+    "app/absentmotion/MainActivity.kt": {
+      "desktop": "pc/src/standins/kotlin/app/absentmotion/desk/DeskApp.kt",
+      "reason": "app shell; the desktop shell is DeskApp plus pc/src/main Main.kt (features missing there: home.recovery, home.onboarding, home.tutorial, home.missing_fonts)"
     },
     "app/absentmotion/audio/AudioEngine.kt": {
       "desktop": "pc/src/standins/kotlin/app/absentmotion/audio/DeskAudioEngine.kt",
@@ -1577,6 +1577,10 @@
     "app/absentmotion/engine/EngineThread.kt": {
       "desktop": "pc/src/standins/kotlin/app/absentmotion/engine/DeskEngineThread.kt",
       "reason": "engine thread; stubs listed in fx.datamosh, fx.slowmo_smoothing, tool.model_layer, export.smoothing"
+    },
+    "app/absentmotion/engine/GpuCheck.kt": {
+      "desktop": null,
+      "reason": "chooses Vulkan or OpenGL on phones and survives driver crashes at start-up; the desktop engine has one GPU back end per system (Metal, Vulkan) with a CPU fallback"
     },
     "app/absentmotion/engine/NativeEngine.kt": {
       "desktop": "pc/src/standins/kotlin/app/absentmotion/engine/DeskNativeEngine.kt",
@@ -1659,6 +1663,11 @@
       "feature": "home.updates",
       "reason": "APK signature check; the desktop only opens the release page"
     },
+    "app/absentmotion/ui/home/UpdatedReceiver.kt": {
+      "desktop": "pc/src/standins/kotlin/app/absentmotion/ui/home/DeskUpdateInstall.kt",
+      "feature": "home.updates",
+      "reason": "notification that opens the app after Android replaced it; the desktop helper starts the app again itself"
+    },
     "app/absentmotion/ui/home/Updater.kt": {
       "desktop": "pc/src/standins/kotlin/app/absentmotion/ui/home/DeskUpdater.kt",
       "feature": "home.updates",
@@ -1668,10 +1677,6 @@
       "desktop": "pc/src/standins/kotlin/app/absentmotion/ui/tutorial/DeskGrip.kt",
       "feature": "home.tutorial",
       "reason": "touch grip detector of the tutorial"
-    },
-    "app/absentmotion/engine/GpuCheck.kt": {
-      "desktop": null,
-      "reason": "chooses Vulkan or OpenGL on phones and survives driver crashes at start-up; the desktop engine has one GPU back end per system (Metal, Vulkan) with a CPU fallback"
     }
   }
 }

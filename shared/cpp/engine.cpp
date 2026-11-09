@@ -278,6 +278,7 @@ private:
         fx.lifted = [this](const Layer& layer) { return fEffects.lifted(layer); };
         fx.spills = [this](const Layer& layer) { return fEffects.spills(layer); };
         fx.behind = [this](const Layer& layer) { return fEffects.behind(layer); };
+        fx.wraps = [this](const Layer& layer) { return fEffects.wraps(layer); };
         fx.steady = [this](const Layer& layer, float from, float to) { return fEffects.steady(layer, from, to); };
         fx.upload = [this](const sk_sp<SkImage>& image, bool mipmapped) {
             return fRecorder ? SkImages::TextureFromImage(fRecorder.get(), image.get(), {mipmapped}) : image;

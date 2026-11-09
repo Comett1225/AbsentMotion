@@ -259,6 +259,8 @@
     <string name="update_permission_denied">仍未允许安装更新。请打开设置并开启“允许来自此来源的应用”，或取消。</string>
     <string name="update_waiting">等待Android安装更新</string>
     <string name="update_install">安装</string>
+    <string name="update_notify_channel">应用更新</string>
+    <string name="update_notify_done">AbsentMotion %1$s 已安装。点击即可打开。</string>
     <string name="update_not_installed">更新未安装。你可以现在或稍后安装。</string>
     <string name="update_stopped">更新已停止</string>
     <string name="update_err_offline">当前未联网，请连接网络后重试。</string>
@@ -267,6 +269,7 @@
     <string name="update_err_server">GitHub未发送更新（错误 %1$s）。请稍后重试。</string>
     <string name="update_err_storage">可用空间不足。更新约需 %1$s 的可用空间。</string>
     <string name="update_err_checksum">下载文件与发布版本提供的校验和不符，已删除。</string>
+    <string name="update_err_manifest">此更新没有已签名的发布列表，或需要更高版本的更新程序，因此未下载。请从AbsentMotion网站获取。</string>
     <string name="update_err_no_checksum">发布版本未提供此文件的校验和，因此未下载。</string>
     <string name="update_err_untrusted">下载被重定向到AbsentMotion发布地址之外，已停止。</string>
     <string name="update_err_signature">此更新与已安装应用的签名密钥不同，无法替换。未作任何更改。</string>
@@ -2173,6 +2176,10 @@
     <string name="desk_update_opened_title">安装程序已打开</string>
     <string name="desk_update_opened_body">请退出AbsentMotion，以便安装程序替换它。当前打开的项目会先保存。</string>
     <string name="desk_update_quit">退出AbsentMotion</string>
+    <string name="desk_update_ready_install_body">下载文件已与已签名的发布列表核对。AbsentMotion会先保存项目，然后关闭、安装更新并重新打开。</string>
+    <string name="desk_update_install_restart">安装并重启</string>
+    <string name="desk_update_closing_body">项目会先保存。AbsentMotion会关闭、安装更新并重新打开。</string>
+    <string name="desk_update_failed_last">上次的更新未安装（%1$s）。你原来的版本仍然保留。</string>
     <string name="desk_tour_screen_body">左侧素材库中存放媒体，中间是预览区，右侧的检查器用于编辑选中的图层。下方时间轴为每个图层各显示一行。</string>
     <string name="desk_tour_picture_body">在素材库中打开“媒体”并点击一张图片，或将图片拖到预览区。手边没有图片？点击“帮我完成”。</string>
     <string name="desk_tour_gestures_title">用鼠标移动</string>

@@ -259,6 +259,8 @@
     <string name="update_permission_denied">Güncelleme yüklemeye hâlâ izin verilmiyor. Ayarları açıp Bu kaynaktan izin ver seçeneğini açın veya iptal edin.</string>
     <string name="update_waiting">Android güncellemeyi yüklüyor, bekleniyor</string>
     <string name="update_install">Yükle</string>
+    <string name="update_notify_channel">Uygulama güncellemeleri</string>
+    <string name="update_notify_done">AbsentMotion %1$s yüklendi. Açmak için dokunun.</string>
     <string name="update_not_installed">Güncelleme yüklenmedi. Şimdi veya daha sonra yükleyebilirsiniz.</string>
     <string name="update_stopped">Güncelleme durdu</string>
     <string name="update_err_offline">Çevrimdışısınız. İnternete bağlanıp yeniden deneyin.</string>
@@ -267,6 +269,7 @@
     <string name="update_err_server">GitHub güncellemeyi göndermedi (hata %1$s). Daha sonra yeniden deneyin.</string>
     <string name="update_err_storage">Yeterli boş alan yok. Güncelleme için yaklaşık %1$s boş alan gerekiyor.</string>
     <string name="update_err_checksum">İndirilen dosya sürümle birlikte yayımlanan sağlama toplamıyla eşleşmedi, bu yüzden silindi.</string>
+    <string name="update_err_manifest">Bu güncellemede imzalı bir sürüm listesi yok ya da daha yeni bir güncelleyici gerekiyor, bu yüzden indirilmedi. Güncellemeyi AbsentMotion web sitesinden edinin.</string>
     <string name="update_err_no_checksum">Sürüm bu dosya için bir sağlama toplamı içermiyor, bu yüzden indirilmedi.</string>
     <string name="update_err_untrusted">İndirme, AbsentMotion sürümleri dışındaki bir adrese yönlendirildi, bu yüzden durduruldu.</string>
     <string name="update_err_signature">Bu güncelleme yüklü uygulamadan farklı bir anahtarla imzalanmış, bu yüzden onun yerini alamaz. Hiçbir şey değişmedi.</string>
@@ -2202,6 +2205,10 @@
     <string name="desk_update_opened_title">Yükleyici açık</string>
     <string name="desk_update_opened_body">Yükleyicinin uygulamayı değiştirebilmesi için AbsentMotion\'dan çıkın. Açık projeniz önce kaydedilir.</string>
     <string name="desk_update_quit">AbsentMotion\'dan çık</string>
+    <string name="desk_update_ready_install_body">İndirilen dosya, imzalı sürüm listesiyle karşılaştırılarak doğrulandı. AbsentMotion projenizi kaydeder, kapanır, güncellemeyi yükler ve yeniden açılır.</string>
+    <string name="desk_update_install_restart">Yükle ve yeniden başlat</string>
+    <string name="desk_update_closing_body">Projeniz önce kaydedilir. AbsentMotion kapanır, güncellemeyi yükler ve yeniden açılır.</string>
+    <string name="desk_update_failed_last">Son güncelleme yüklenmedi (%1$s). Kullandığınız sürüm hâlâ yerinde.</string>
     <string name="desk_tour_screen_body">Medyanın bulunduğu kitaplık solda, önizleme ortada; seçili katmanı düzenleyen denetçi ise sağda. Alttaki zaman çizelgesi her katmana kendi satırını verir.</string>
     <string name="desk_tour_picture_body">Kitaplıkta Medya\'yı aç ve bir görsele tıkla ya da birini önizlemeye sürükle. Elinde görsel yok mu? Benim için yap\'a tıkla.</string>
     <string name="desk_tour_gestures_title">Fareyle taşı</string>
