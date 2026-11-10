@@ -256,6 +256,8 @@ On another chip or an older system, build it from source ([`docs/BUILD.md`](docs
 - True frame-by-frame Video Feedback: each copy shows the picture from a moment earlier, so movement leaves trails that swirl into the tunnel, like a camera pointed at its own screen.
 - Time Remap: keyframe which moment of a video clip plays at each point, so a clip can speed up, freeze and play backwards inside one layer, for reverse edits. Requested by users.
 - Better Alight Motion file support: more Alight Motion projects, packages and effects import correctly and look the same as in Alight Motion.
+- Tools inside the editor: use the tools, such as the Video Downloader, from inside the editor instead of leaving it.
+- The Video Downloader on every desktop version (Windows, Mac and Linux).
 - During 5.1 and after, there won't be many major patches or features; most updates will focus on stability for the PC versions.
 
 ### 6.0
