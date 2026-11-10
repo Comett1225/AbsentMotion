@@ -10,6 +10,9 @@ import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
 val SpeedRef = PropRef(PropRef.Kind.Child, "speedMap")
+val RemapRef = PropRef(PropRef.Kind.Child, "timeRemap")
+
+val Layer.remapped: Boolean get() = node.child("timeRemap") != null
 
 private const val MIN_SPEED = 0.00001
 const val SLOWEST_SPEED = 0.05f
@@ -20,6 +23,11 @@ class VideoTiming(layer: Layer) {
     private data class Point(val media: Double, val speed: Double, val item: Double)
     private val origin = layer.mediaFill?.inTime?.toDouble() ?: layer.node["inTime"]?.finiteDouble() ?: 0.0
     private val points: List<Point>
+    private val remap = layer.node.child("timeRemap")
+    private val span = (layer.endTime - layer.startTime).toDouble().coerceAtLeast(1.0)
+
+    private fun remapped(localMs: Double): Double? =
+        remap?.let { (it.valueAt((localMs / span).toFloat())?.toDoubleOrNull()?.takeIf(Double::isFinite) ?: 0.0) * 1000 }
 
     init {
         val map = layer.node.child("speedMap")
@@ -70,9 +78,13 @@ class VideoTiming(layer: Layer) {
         return a.media + a.speed * elapsed + (b.speed - a.speed) * elapsed * elapsed / (2 * (b.item - a.item))
     }
 
-    fun mediaMs(localMs: Double): Double = mediaAt(itemAt(origin) + localMs)
-    fun localMs(mediaMs: Double): Double = itemAt(mediaMs) - itemAt(origin)
+    fun mediaMs(localMs: Double): Double = remapped(localMs) ?: mediaAt(itemAt(origin) + localMs)
+    fun localMs(mediaMs: Double): Double {
+        if (remap == null) return itemAt(mediaMs) - itemAt(origin)
+        return (0..400).map { span * it / 400 }.minBy { abs(remapped(it)!! - mediaMs) }
+    }
     fun speed(localMs: Double): Float {
+        if (remap != null) return (abs(remapped(localMs + 1)!! - remapped(localMs - 1)!!) / 2).toFloat()
         val item = itemAt(origin) + localMs
         if (item <= points.first().item) return points.first().speed.toFloat()
         if (item >= points.last().item) return points.last().speed.toFloat()

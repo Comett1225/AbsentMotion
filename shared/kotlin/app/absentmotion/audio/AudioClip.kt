@@ -3,6 +3,7 @@ package app.absentmotion.audio
 import app.absentmotion.model.finiteFloat
 import app.absentmotion.model.finiteDouble
 import app.absentmotion.model.Layer
+import app.absentmotion.model.remapped
 import app.absentmotion.model.PropRef
 import app.absentmotion.model.Scene
 import app.absentmotion.model.VideoTiming
@@ -116,7 +117,7 @@ internal class AudioClip(layer: Layer, val uri: String, private val track: Layer
             val uri = layer.soundUri
             val media = uri?.let { scene.media(it) ?: track.scene.media(it) }
             listOfNotNull(
-                if (uri == null || layer.hidden || layer.element(GainRef)?.mutes == true || media?.node?.get("audio") == "none") null
+                if (uri == null || layer.hidden || layer.remapped || layer.element(GainRef)?.mutes == true || media?.node?.get("audio") == "none") null
                 else AudioClip(layer, uri, track.takeIf { it.parents.isNotEmpty() }, media?.duration?.takeIf { it > 0 }?.div(1000.0) ?: Double.POSITIVE_INFINITY),
                 TextBlips.clip(layer, track.takeIf { it.parents.isNotEmpty() }, wait),
             )

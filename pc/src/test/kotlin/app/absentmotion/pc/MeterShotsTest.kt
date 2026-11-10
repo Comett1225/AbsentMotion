@@ -33,6 +33,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
 import javax.imageio.ImageIO
+import app.absentmotion.ui.editor.DeskRailHeight
 
 @OptIn(ExperimentalTestApi::class)
 class MeterShotsTest {
@@ -89,7 +90,7 @@ $layers
                     println("${w}x$h $count meter ${meter.left}..${meter.right} x ${meter.top}..${meter.bottom}")
                     assertTrue("${w}x$h: right of the rail", meter.left.value >= 56f && meter.right.value <= 84f)
                     assertTrue("${w}x$h: starts at the top", meter.top.value < 90f)
-                    assertTrue("${w}x$h: no taller than the rail buttons", (meter.bottom - meter.top).value <= 368.5f)
+                    assertTrue("${w}x$h: no taller than the rail buttons", (meter.bottom - meter.top).value <= DeskRailHeight.value)
                     onAllNodesWithText("−∞").assertCountEquals(1)
                     if (w >= 1280) {
                         onAllNodesWithText("Layers").onFirst().assertExists()

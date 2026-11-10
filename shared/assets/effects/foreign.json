@@ -1512,6 +1512,89 @@
    }
   }
  },
+ "com.alightcreative.effects.repeat.scatter": {
+  "to": "scatterrepeat",
+  "params": {
+   "count": {
+    "to": "count",
+    "min": 0,
+    "max": 150
+   },
+   "angle": {
+    "to": "rangeRotation"
+   },
+   "scale": {
+    "to": "rangeScale",
+    "min": 0,
+    "max": 10
+   },
+   "alpha": {
+    "to": "rangeOpacity",
+    "min": 0,
+    "max": 1
+   },
+   "fillColor": {
+    "to": "fillColor"
+   },
+   "blend": {
+    "to": "fillAmount",
+    "min": 0,
+    "max": 1
+   },
+   "start": {
+    "to": "rangeStart",
+    "min": 0,
+    "max": 1
+   },
+   "end": {
+    "to": "rangeEnd",
+    "min": 0,
+    "max": 1
+   },
+   "phase": {
+    "to": "rangeOffset",
+    "min": -10,
+    "max": 10
+   },
+   "randomOrder": {
+    "to": "randomOrder"
+   },
+   "seed": {
+    "to": "seed",
+    "min": 0
+   },
+   "colorAltCopies": {
+    "neutral": "false"
+   },
+   "easeIn": {
+    "neutral": 0
+   },
+   "easeOut": {
+    "neutral": 0
+   },
+   "overlap": {
+    "neutral": 0
+   },
+   "shape": {
+    "neutral": 0
+   },
+   "invert": {
+    "neutral": "false"
+   },
+   "radius": {
+    "to": "radius",
+    "min": 0,
+    "max": 2000
+   },
+   "evolution": {
+    "to": "evolution"
+   },
+   "scatterSeed": {
+    "to": "scatterSeed",
+    "min": 0
+   }
+  }
+ },
  "com.alightcreative.effects.repeat.path": {
   "to": "repeatalongpath",
   "params": {
@@ -8751,6 +8834,189 @@
    },
    "MAX_ITER": {
     "neutral": 60
+   }
+  },
+  "set": {
+   "rotX": 45,
+   "rotY": 0,
+   "rotZ": 0,
+   "position": "0,0",
+   "scale": 1,
+   "perspective": 1,
+   "shading": 1,
+   "shine": 0.8,
+   "light": 45,
+   "radius": 0.6,
+   "thickness": 0.3
+  },
+  "orientation": {
+   "quat": "orient",
+   "euler": "rotate",
+   "to": [
+    "rotX",
+    "rotY",
+    "rotZ"
+   ]
+  }
+ },
+ "com.alightcreative.effects.pagecurl": {
+  "to": "pagecurl",
+  "params": {
+   "progress": {
+    "to": "progress",
+    "min": 0,
+    "max": 1
+   },
+   "radius": {
+    "to": "radius",
+    "min": 0,
+    "max": 1
+   },
+   "angle": {
+    "to": "angle"
+   },
+   "backColor": {
+    "to": "backColor"
+   },
+   "backAlpha": {
+    "to": "backAlpha",
+    "min": 0,
+    "max": 1
+   },
+   "shineAlpha": {
+    "to": "shine",
+    "min": 0,
+    "max": 1
+   },
+   "dropShadowAlpha": {
+    "to": "shadow",
+    "min": 0,
+    "max": 1
+   },
+   "alpha": {
+    "neutral": 1
+   },
+   "strength": {
+    "neutral": 0.1
+   },
+   "backBlendMode": {
+    "neutral": 1
+   },
+   "shineColor": {
+    "neutral": "#ffffffff"
+   },
+   "shineSpec": {
+    "neutral": 30
+   },
+   "shineBlendMode": {
+    "neutral": 2
+   },
+   "dropShadowColor": {
+    "neutral": "#ff000000"
+   },
+   "softDropShadow": {
+    "neutral": "true"
+   },
+   "frontShadowColor": {
+    "neutral": "#ffffffff"
+   },
+   "frontShadowAlpha": {
+    "neutral": 1
+   },
+   "frontShadowBlendMode": {
+    "neutral": 2
+   }
+  }
+ },
+ "com.alightcreative.effects.ring": {
+  "to": "torus",
+  "params": {
+   "position": {
+    "to": "position",
+    "take": 2,
+    "per": "height",
+    "scale": 0.0016666666666666668,
+    "signs": [
+     1,
+     -1
+    ],
+    "pre": [
+     0,
+     100
+    ]
+   },
+   "scale": {
+    "to": "scale",
+    "min": 0.05,
+    "max": 10
+   },
+   "shadingType": {
+    "neutral": 1
+   },
+   "lightIntensity": {
+    "to": "shading",
+    "scale": 1,
+    "min": 0,
+    "max": 1
+   },
+   "shine": {
+    "to": "shine",
+    "min": 0,
+    "max": 1
+   },
+   "spec": {
+    "neutral": 30
+   },
+   "ambient": {
+    "neutral": 0.1
+   },
+   "lightColor": {
+    "neutral": "#ffffffff"
+   },
+   "lightDir": {
+    "neutral": "75,-75"
+   },
+   "lightDepth": {
+    "neutral": 100
+   },
+   "radius": {
+    "to": "radius",
+    "scale": 0.3,
+    "min": 0.02,
+    "max": 5
+   },
+   "thickness": {
+    "to": "thickness",
+    "scale": 0.3,
+    "min": 0.01,
+    "max": 3
+   },
+   "mirror": {
+    "neutral": "false"
+   },
+   "texRepeatX": {
+    "neutral": 1
+   },
+   "texRepeatY": {
+    "neutral": 1
+   },
+   "texAngle": {
+    "neutral": 0
+   },
+   "texCrop": {
+    "neutral": 1
+   },
+   "texTwirl": {
+    "neutral": 0
+   },
+   "MAX_ITER": {
+    "neutral": 60
+   },
+   "height": {
+    "neutral": 0.5
+   },
+   "smooth": {
+    "neutral": 0
    }
   },
   "set": {

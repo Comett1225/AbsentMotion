@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -78,7 +79,7 @@ import java.util.Locale
 const val ONBOARDING_LANGUAGE_CHOSEN = 1
 const val ONBOARDING_DONE = 2
 
-enum class OnboardingStep { Language, Check }
+enum class OnboardingStep { Language, Look, Check }
 
 data class FirstRun(val step: OnboardingStep) {
     companion object {
@@ -94,7 +95,8 @@ data class FirstRun(val step: OnboardingStep) {
                 "check" -> ONBOARDING_LANGUAGE_CHOSEN
                 else -> 0
             }
-            val step = start(settings.onboarding) ?: return null
+            if (forced == "done") settings.lookChosen = true
+            val step = start(settings.onboarding) ?: (if (settings.lookChosen) return null else OnboardingStep.Look)
             return FirstRun(step)
         }
     }
@@ -104,14 +106,19 @@ data class FirstRun(val step: OnboardingStep) {
 fun Onboarding(settings: AppSettings, first: FirstRun, engine: () -> EngineThread, onDone: () -> Unit) {
     val context = LocalContext.current
     var step by rememberSaveable { mutableStateOf(first.step) }
-    BackHandler(step == OnboardingStep.Check) { step = OnboardingStep.Language }
+    BackHandler(step == OnboardingStep.Check || step == OnboardingStep.Look && settings.onboarding < ONBOARDING_DONE) {
+        step = if (step == OnboardingStep.Check) OnboardingStep.Look else OnboardingStep.Language
+    }
     Box(Modifier.fillMaxSize().background(Am.HomeBg).systemBarsPadding(), contentAlignment = Alignment.TopCenter) {
         Box(Modifier.widthIn(max = 560.dp).fillMaxSize()) {
             when (step) {
                 OnboardingStep.Language -> LanguageStep { language ->
                     settings.onboarding = ONBOARDING_LANGUAGE_CHOSEN
-                    step = OnboardingStep.Check
+                    step = if (settings.lookChosen) OnboardingStep.Check else OnboardingStep.Look
                     applyLanguage(context, language)
+                }
+                OnboardingStep.Look -> LookStep(settings) {
+                    if (settings.onboarding >= ONBOARDING_DONE) onDone() else step = OnboardingStep.Check
                 }
                 OnboardingStep.Check -> CheckStep(settings, engine) {
                     settings.chooseUpdates(settings.checkUpdates)
@@ -119,6 +126,61 @@ fun Onboarding(settings: AppSettings, first: FirstRun, engine: () -> EngineThrea
                     onDone()
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun LookStep(settings: AppSettings, onContinue: () -> Unit) {
+    Column(Modifier.fillMaxSize().enterFade()) {
+        Heading(stringResource(R.string.onboarding_look_title))
+        Box(Modifier.fillMaxWidth().weight(1f).padding(horizontal = 16.dp, vertical = 12.dp), Alignment.Center) {
+            Row(Modifier.fillMaxWidth().heightIn(max = 460.dp).fillMaxHeight(), Arrangement.spacedBy(12.dp)) {
+                LookCard(settings, "AbsentMotion", app.absentmotion.ui.theme.Palette.AbsentMotion, R.string.theme_light, Modifier.weight(1f))
+                LookCard(settings, "Dark", app.absentmotion.ui.theme.Palette.Dark, R.string.theme_dark, Modifier.weight(1f))
+            }
+        }
+        Footer {
+            Text(
+                stringResource(R.string.onboarding_language_later), Modifier.fillMaxWidth().padding(bottom = 10.dp),
+                color = Am.HomeMid, fontSize = 13.sp, textAlign = TextAlign.Center,
+            )
+            FilledButton(stringResource(R.string.action_continue), enabled = true) {
+                settings.lookChosen = true
+                onContinue()
+            }
+        }
+    }
+}
+
+@Composable
+private fun LookCard(settings: AppSettings, id: String, p: app.absentmotion.ui.theme.Palette, label: Int, modifier: Modifier) {
+    val chosen = settings.theme == id
+    val shape = RoundedCornerShape(16.dp)
+    Column(
+        modifier.fillMaxHeight().clip(shape).border(if (chosen) 2.dp else 1.dp, if (chosen) Am.HomeAccent else Am.HomeLine, shape)
+            .selectable(chosen, role = Role.RadioButton) { settings.theme = id }.padding(10.dp),
+    ) {
+        androidx.compose.foundation.Canvas(Modifier.fillMaxWidth().weight(1f).clip(RoundedCornerShape(10.dp))) {
+            val u = size.width / 12f
+            val round = androidx.compose.ui.geometry.CornerRadius(u * 0.6f)
+            fun box(c: Color, x: Float, y: Float, w: Float, h: Float) = drawRoundRect(c, androidx.compose.ui.geometry.Offset(x, y), androidx.compose.ui.geometry.Size(w, h), round)
+            drawRect(p.HomeBg)
+            box(p.Navy, u, u * 1.2f, u * 4f, u * 1.4f)
+            box(p.HomePanel, u * 5.6f, u * 1.2f, u * 4f, u * 1.4f)
+            var y = u * 3.8f
+            while (y + u * 2.6f < size.height - u * 3.6f) {
+                box(p.Card, u, y, size.width - u * 2f, u * 2.6f)
+                box(p.HomeLine, u * 1.4f, y + u * 0.3f, u * 2f, u * 2f)
+                box(p.HomeFaint, u * 4f, y + u * 0.6f, u * 5f, u * 0.5f)
+                box(p.HomeLine, u * 4f, y + u * 1.5f, u * 3.5f, u * 0.45f)
+                y += u * 3.2f
+            }
+            drawCircle(p.HomeAccent, u * 1.2f, androidx.compose.ui.geometry.Offset(size.width / 2f, size.height - u * 2f))
+        }
+        Row(Modifier.fillMaxWidth().padding(top = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(stringResource(label), Modifier.weight(1f), color = Am.HomeInk, fontSize = 16.sp, fontWeight = FontWeight.Medium)
+            if (chosen) Icon(PanelIcons.Check, null, Modifier.size(20.dp), tint = Am.HomeAccent)
         }
     }
 }

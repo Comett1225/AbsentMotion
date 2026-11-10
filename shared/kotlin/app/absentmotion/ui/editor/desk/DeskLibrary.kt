@@ -74,6 +74,7 @@ private val Sections = listOf(
     Section(R.string.add_tab_object_asset, R.string.desk_objects, ChromeIcons.ObjectTab),
     Section(R.string.add_tab_template, R.string.add_tab_template, ChromeIcons.TemplateTab),
     Section(R.string.desk_draw, R.string.desk_draw, ChromeIcons.Freehand),
+    Section(R.string.add_tab_tools, R.string.add_tab_tools, app.absentmotion.ui.home.HomeIcons.ToolsTab),
 )
 
 internal val DeskRailHeight = (Sections.size * 54 + 8).dp
@@ -123,6 +124,13 @@ internal fun DeskLibrary(state: EditorState, library: AddLibrary, tab: Int, modi
                 }
                 4 -> DeskObjects(state)
                 5 -> DeskTemplates(state)
+                7 -> Column(Modifier.fillMaxSize().deskVerticalScroll().padding(horizontal = 12.dp, vertical = 4.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    DeskToolRow(app.absentmotion.ui.home.HomeIcons.Compress, stringResource(R.string.tools_compress), stringResource(R.string.tools_compress_about)) { state.toolOpen = 1 }
+                    DeskToolRow(app.absentmotion.ui.home.HomeIcons.Trim, stringResource(R.string.tools_trim), stringResource(R.string.tools_trim_about)) { state.toolOpen = 3 }
+                    DeskToolRow(app.absentmotion.ui.home.HomeIcons.Audio, stringResource(R.string.tools_extract), stringResource(R.string.tools_extract_about)) { state.toolOpen = 4 }
+                    DeskToolRow(app.absentmotion.ui.home.HomeIcons.Gif, stringResource(R.string.tools_gif), stringResource(R.string.tools_gif_about)) { state.toolOpen = 5 }
+                    if (app.absentmotion.platform.videoDownloader().available) DeskToolRow(app.absentmotion.ui.home.HomeIcons.Download, stringResource(R.string.tools_downloader), stringResource(R.string.tools_downloader_about)) { state.toolOpen = 2 }
+                }
                 else -> Column(Modifier.fillMaxSize().padding(horizontal = 12.dp, vertical = 4.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     DeskToolRow(ChromeIcons.Freehand, stringResource(R.string.add_quick_freehand_brush), stringResource(R.string.desk_draw_freehand_hint)) { state.startFreehand() }
                     DeskToolRow(ChromeIcons.VectorDrawing, stringResource(R.string.add_quick_pen_tool), stringResource(R.string.desk_draw_pen_hint)) { state.startVectorDrawing() }

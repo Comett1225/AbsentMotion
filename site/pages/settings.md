@@ -20,7 +20,7 @@ On a computer, Settings is a window with its pages listed on the left. There the
 
 ## Editor
 
-- **Theme.** **AbsentMotion** (the default: a dark editor and a warm light home screen), **Daylight** (light everywhere) or **Custom**. **Import theme file...** loads a theme from a small file (see below).
+- **Theme.** **Light** (the default: a dark editor and a warm light home screen), **Dark** (dark everywhere, Home included), **Daylight** (light everywhere) or **Custom**. The first start asks **Light or dark?**, and so does the first start after updating to 5.1 if you never picked a theme. **Import theme file...** loads a theme from a small file (see below).
 - **New Layer Length.** How long new layers last: 1 to 10, 15, 20, 25, 30, 45 or 60 seconds. The default is 2.
 - **Vibration.** Small vibrations on the timeline for snaps, long presses and reordering. On by default.
 - **Transition button in preview.** Off by default. The round button that adds a transition normally sits at the bottom right of the timeline area. Turn this on to have it at the bottom left of the preview instead. See [Transitions and animations](@animations).

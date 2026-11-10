@@ -81,3 +81,23 @@ fun EditorState.freezeFrame(seconds: Float) {
     val frozen = layer.withFreezeFrame(sampleMs, (seconds * 1000).toInt().coerceIn(100, 30_000), scene.fps) ?: return
     edit { it.update(layer.id) { frozen } }
 }
+
+fun EditorState.turnOnRemap() = editSelected { layer ->
+    val timing = VideoTiming(layer)
+    val keys = listOf(0.0, (layer.endTime - layer.startTime).toDouble()).mapIndexed { i, local ->
+        XmlNode("kf", mapOf("t" to "$i", "v" to formatNumber((timing.mediaMs(local) / 1000).toFloat())))
+    }
+    layer.withElement(RemapRef, XmlNode("timeRemap", children = keys))
+}
+
+fun EditorState.turnOffRemap() = editSelected { layer ->
+    layer.copy(node = layer.node.copy(children = layer.node.children.filterNot { it.name == "timeRemap" }))
+}
+
+fun EditorState.reverseRemap() = editSelected { layer ->
+    val remap = layer.node.child("timeRemap") ?: return@editSelected layer
+    val values = remap.keyframes.mapNotNull { it.v.toFloatOrNull() }
+    if (values.isEmpty()) return@editSelected layer
+    val sum = values.first() + values.last()
+    layer.withElement(RemapRef, remap.copy(children = remap.children.map { if (it.name == "kf") it.with("v", formatNumber(sum - (it["v"]?.toFloatOrNull() ?: 0f))) else it }))
+}

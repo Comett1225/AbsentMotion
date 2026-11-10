@@ -112,7 +112,7 @@ SkVector Toward(float degrees, double distance) {
 double Seconds(const Layer& l, double timeMs) { return std::max(0.0, (l.steppedMs(timeMs) - l.startTime) / 1000.0); }
 
 const char* const kRepeatIds[] = {"absent.repeat", "absent.linearrepeat", "absent.radialrepeat", "absent.gridrepeat",
-                                  "absent.repeatalongpath", "absent.scatterfield"};
+                                  "absent.repeatalongpath", "absent.scatterfield", "absent.scatterrepeat"};
 
 constexpr size_t kMaxCopies = 25000;
 
@@ -256,6 +256,20 @@ void Radial(const LayerEffect& e, float t, std::vector<Spot>* spots) {
         s.at = {(float)(std::sin(r) * radius), (float)(-std::cos(r) * radius)};
         s.turn = a + orientation;
         s.size = size;
+        s.u = n > 1 ? (float)i / (n - 1) : 0;
+        spots->push_back(s);
+    }
+}
+
+void Scattered(const Layer& l, const LayerEffect& e, float t, std::vector<Spot>* spots) {
+    const int n = CountOf(e, t, 20, 150);
+    const float radius = std::max(Param(e, "radius", t, 300), 0.0f), evolution = Param(e, "evolution", t, 0);
+    const uint64_t base = Mix(Mix((uint64_t)(l.noiseId ? l.noiseId : l.id)) ^ Mix((uint64_t)std::llround((double)Param(e, "scatterSeed", t, 0) * 1000) + 0x5ca7ull));
+    for (int i = 0; i < n; i++) {
+        Spot s;
+        const double a = kTau * (Unit(base, i * 3) + evolution * (Unit(base, i * 3 + 1) * 2 - 1));
+        const double r = radius * std::sqrt(Unit(base, i * 3 + 2));
+        s.at = {(float)(std::cos(a) * r), (float)(std::sin(a) * r)};
         s.u = n > 1 ? (float)i / (n - 1) : 0;
         spots->push_back(s);
     }
@@ -601,6 +615,7 @@ bool ShutterBlurOf(const Layer& l, double timeMs, ShutterBlur* blur) {
         blur->angle = 360 * tune;
         blur->samples = std::clamp((int)std::lround(8 * tune), 8, 32);
         blur->adaptive = true;
+        blur->trailing = true;
         blur->position = Param(e, "position", t, 1) >= 0.5f;
         blur->scale = Param(e, "scale", t, 1) >= 0.5f;
         blur->rotation = Param(e, "rotation", t, 1) >= 0.5f;
@@ -664,6 +679,7 @@ void RepeatCopies(const Layer& l, double timeMs, const RepeatSpace& space, std::
             if (id == "linearrepeat") Linear(e, t, &spots);
             else if (id == "gridrepeat") Grid(e, t, &spots, limit == 256 ? 16 : 150);
             else if (id == "radialrepeat") Radial(e, t, &spots);
+            else if (id == "scatterrepeat") Scattered(l, e, t, &spots);
             else OnPath(e, t, space, &spots);
             Ranged(l, e, t, std::move(spots), &made);
         }

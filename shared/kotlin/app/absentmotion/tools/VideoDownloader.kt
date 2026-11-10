@@ -61,20 +61,20 @@ private const val DAY_MS = 24L * 60 * 60 * 1000
 private const val ENGINE_ESTIMATE = 3_100_000L
 private val SystemCertificates = listOf("/apex/com.android.conscrypt/cacerts", "/system/etc/security/cacerts")
 
-object VideoDownloader {
+object VideoDownloader : VideoFetcher {
     private val python = ModelFile(
         "python-3.14.10-aarch64-linux-android.tar.gz", PYTHON_RELEASE + "python-3.14.10-aarch64-linux-android.tar.gz",
         23_027_305, "423c80b957330cf0ebb92b9b20f2294c292144a441bdb0ceb8c69d14928e569b",
     )
     private val lock = Mutex()
     private val changes = MutableStateFlow(0)
-    val revision = changes.asStateFlow()
+    override val revision = changes.asStateFlow()
     @Volatile private var running = false
     @Volatile private var restartNeeded = false
 
-    val downloadBytes: Long get() = python.bytes + ENGINE_ESTIMATE
+    override val downloadBytes: Long get() = python.bytes + ENGINE_ESTIMATE
 
-    val available: Boolean get() = Process.is64Bit() && Build.SUPPORTED_64_BIT_ABIS.firstOrNull() == "arm64-v8a"
+    override val available: Boolean get() = Process.is64Bit() && Build.SUPPORTED_64_BIT_ABIS.firstOrNull() == "arm64-v8a"
 
     private fun folder(context: Context) = File(context.filesDir, "downloader")
     private fun home(context: Context) = File(folder(context), "python")
@@ -82,19 +82,19 @@ object VideoDownloader {
     private fun nextEngine(context: Context) = File(folder(context), "yt-dlp.next")
     private fun prefs(context: Context) = context.getSharedPreferences("downloader", Context.MODE_PRIVATE)
 
-    fun installed(context: Context): Boolean =
+    override fun installed(context: Context): Boolean =
         File(home(context), ".ok").let { it.isFile && it.readText() == python.sha256 } && engine(context).isFile
 
-    fun storedBytes(context: Context): Long = folder(context).walk().filter { it.isFile }.sumOf { it.length() }
+    override fun storedBytes(context: Context): Long = folder(context).walk().filter { it.isFile }.sumOf { it.length() }
 
-    fun remove(context: Context) {
+    override fun remove(context: Context) {
         folder(context).deleteRecursively()
         prefs(context).edit().clear().apply()
         if (running) restartNeeded = true
         changes.value += 1
     }
 
-    suspend fun install(context: Context, progress: (Float) -> Unit) = withContext(Dispatchers.IO) {
+    override suspend fun install(context: Context, progress: (Float) -> Unit): Unit = withContext(Dispatchers.IO) {
         val dir = folder(context)
         check(dir.isDirectory || dir.mkdirs()) { context.getString(R.string.downloader_engine_failed) }
         val home = home(context)
@@ -121,7 +121,7 @@ object VideoDownloader {
         progress(1f)
     }
 
-    suspend fun updateIfDue(context: Context) = withContext(Dispatchers.IO) {
+    override suspend fun updateIfDue(context: Context): Unit = withContext(Dispatchers.IO) {
         if (!installed(context)) return@withContext
         val prefs = prefs(context)
         val now = System.currentTimeMillis()
@@ -140,37 +140,7 @@ object VideoDownloader {
         }
     }
 
-    private fun latestEngine(): Pair<String, String> {
-        val connection = URL("$YT_DLP_RELEASES/latest").openConnection() as HttpURLConnection
-        val tag = try {
-            connection.instanceFollowRedirects = false
-            connection.connectTimeout = 15_000
-            connection.readTimeout = 15_000
-            connection.setRequestProperty("User-Agent", "AbsentMotion")
-            connection.responseCode
-            connection.getHeaderField("Location")?.substringAfterLast("/tag/", "")
-        } finally {
-            connection.disconnect()
-        }
-        if (tag == null || !tag.matches(Regex("[0-9][0-9.]{3,30}"))) throw DownloadProblem(R.string.downloader_engine_failed, "no release tag")
-        val sums = readSmall("$YT_DLP_RELEASES/download/$tag/SHA2-256SUMS")
-        val sha = sums.lineSequence().map { it.trim().split(Regex("\\s+")) }.firstOrNull { it.size == 2 && it[1] == "yt-dlp" }?.get(0)
-        if (sha == null || !sha.matches(Regex("[0-9a-f]{64}"))) throw DownloadProblem(R.string.downloader_engine_failed, "no checksum")
-        return tag to sha
-    }
-
-    private fun readSmall(url: String): String {
-        val connection = URL(url).openConnection() as HttpURLConnection
-        try {
-            connection.connectTimeout = 15_000
-            connection.readTimeout = 15_000
-            connection.setRequestProperty("User-Agent", "AbsentMotion")
-            if (connection.responseCode != HttpURLConnection.HTTP_OK) throw DownloadProblem(R.string.downloader_engine_failed, "HTTP ${connection.responseCode}")
-            return connection.inputStream.use { String(it.readAtMost(1 shl 16), Charsets.UTF_8) }
-        } finally {
-            connection.disconnect()
-        }
-    }
+    private fun latestEngine(): Pair<String, String> = latestRelease("yt-dlp")
 
     private suspend fun downloadEngine(tag: String, sha: String, target: File, progress: (Float) -> Unit) {
         val job = currentCoroutineContext().job
@@ -321,16 +291,16 @@ object VideoDownloader {
         }
     }
 
-    suspend fun warmUp(context: Context) = lock.withLock {
+    override suspend fun warmUp(context: Context): Unit = lock.withLock {
         withContext(Dispatchers.IO) { if (installed(context)) runCatching { start(context) }.onFailure { Log.w(TAG, "the downloader did not start", it) } }
     }
 
-    suspend fun check(context: Context, url: String): LinkInfo {
+    override suspend fun check(context: Context, url: String): LinkInfo {
         val data = python(context, JSONObject().put("op", "check").put("url", url))
         return parseLinkInfo(data.toString())
     }
 
-    suspend fun thumbnail(urls: List<String>): ImageBitmap? = withContext(Dispatchers.IO) { urls.asSequence().take(4).firstNotNullOfOrNull { thumbnail(it, 192) } }
+    override suspend fun thumbnail(urls: List<String>): ImageBitmap? = withContext(Dispatchers.IO) { urls.asSequence().take(4).firstNotNullOfOrNull { thumbnail(it, 192) } }
 
     private fun thumbnail(url: String, side: Int): ImageBitmap? =
         runCatching {
@@ -351,13 +321,13 @@ object VideoDownloader {
             }
         }.getOrNull()
 
-    val av1Hardware: Boolean by lazy {
+    override val av1Hardware: Boolean by lazy {
         Build.VERSION.SDK_INT >= 31 && MediaCodecList(MediaCodecList.REGULAR_CODECS).codecInfos.any { info ->
             !info.isEncoder && MediaFormat.MIMETYPE_VIDEO_AV1 in info.supportedTypes && info.isHardwareAccelerated
         }
     }
 
-    suspend fun download(context: Context, url: String, info: LinkInfo, mode: SaveMode, choice: Int, progress: (Float) -> Unit): List<SavedMedia> {
+    override suspend fun download(context: Context, url: String, info: LinkInfo, mode: SaveMode, choice: Int, progress: (Float) -> Unit): List<SavedMedia> {
         val work = File(context.cacheDir, "downloader-work")
         work.deleteRecursively()
         check(work.mkdirs()) { context.getString(R.string.downloader_error_unknown) }
@@ -576,6 +546,38 @@ internal fun pictureType(head: ByteArray): Pair<String, String> {
         at(4, "ftypavif") -> "image/avif" to "avif"
         at(4, "ftyphei") || at(4, "ftypmif1") -> "image/heif" to "heic"
         else -> "image/jpeg" to "jpg"
+    }
+}
+
+internal fun latestRelease(asset: String): Pair<String, String> {
+    val connection = URL("$YT_DLP_RELEASES/latest").openConnection() as HttpURLConnection
+    val tag = try {
+        connection.instanceFollowRedirects = false
+        connection.connectTimeout = 15_000
+        connection.readTimeout = 15_000
+        connection.setRequestProperty("User-Agent", "AbsentMotion")
+        connection.responseCode
+        connection.getHeaderField("Location")?.substringAfterLast("/tag/", "")
+    } finally {
+        connection.disconnect()
+    }
+    if (tag == null || !tag.matches(Regex("[0-9][0-9.]{3,30}"))) throw DownloadProblem(R.string.downloader_engine_failed, "no release tag")
+    val sums = readSmall("$YT_DLP_RELEASES/download/$tag/SHA2-256SUMS")
+    val sha = sums.lineSequence().map { it.trim().split(Regex("\\s+")) }.firstOrNull { it.size == 2 && it[1].trimStart('*') == asset }?.get(0)
+    if (sha == null || !sha.matches(Regex("[0-9a-f]{64}"))) throw DownloadProblem(R.string.downloader_engine_failed, "no checksum")
+    return tag to sha
+}
+
+internal fun readSmall(url: String): String {
+    val connection = URL(url).openConnection() as HttpURLConnection
+    try {
+        connection.connectTimeout = 15_000
+        connection.readTimeout = 15_000
+        connection.setRequestProperty("User-Agent", "AbsentMotion")
+        if (connection.responseCode != HttpURLConnection.HTTP_OK) throw DownloadProblem(R.string.downloader_engine_failed, "HTTP ${connection.responseCode}")
+        return connection.inputStream.use { String(it.readAtMost(1 shl 16), Charsets.UTF_8) }
+    } finally {
+        connection.disconnect()
     }
 }
 

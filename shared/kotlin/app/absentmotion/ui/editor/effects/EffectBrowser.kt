@@ -186,9 +186,11 @@ fun EffectBrowser(state: EditorState) {
     val audioName = stringResource(R.string.effects_category_audio)
     val voiceName = stringResource(R.string.layer_tool_voice_filters)
     val stepping = (category != null && !audio) || detail != null || searching || fromAudio
-    val heading = detail?.name ?: category?.let { key -> when (key) { "audio" -> audioName; "voice" -> voiceName; else -> catalog.categories.firstOrNull { it.first == key }?.second } } ?: stringResource(R.string.effectbrowser_title)
+    val heading = detail?.let { d -> catalog.categories.firstOrNull { it.first == d.category }?.second ?: d.name } ?: category?.let { key -> when (key) { "audio" -> audioName; "voice" -> voiceName; else -> catalog.categories.firstOrNull { it.first == key }?.second } } ?: stringResource(R.string.effectbrowser_title)
     val listed = catalog.categories.let { all -> if (hasSound) all.filter { it.first != "ai" } + ("audio" to audioName) + all.filter { it.first == "ai" } else all }
-    val page = listOf(detail?.id, searching, category)
+    val page = listOf(searching, category)
+    var shownDetail by remember { mutableStateOf<EffectDefinition?>(null) }
+    if (detail != null) shownDetail = detail
     fun pageAt() = if (audio || searching || detail != null) -1 else listed.indexOfFirst { it.first == category }
     val at = pageAt()
     val rtl = androidx.compose.ui.platform.LocalLayoutDirection.current == androidx.compose.ui.unit.LayoutDirection.Rtl
@@ -199,6 +201,9 @@ fun EffectBrowser(state: EditorState) {
     val pull = remember { floatArrayOf(0f) }
     val sliding = remember { arrayOfNulls<Job>(1) }
     LaunchedEffect(page) { if (page != slid) slid = null }
+    val depth = if (searching || category != null) 1 else 0
+    val lastDepth = remember { intArrayOf(depth) }
+    val way = remember(page) { (depth - lastDepth[0]).sign.also { lastDepth[0] = depth } }
     val slide = Modifier.graphicsLayer { translationX = shift }
     fun swipeStart(way: Int): Boolean {
         sliding[0]?.cancel()
@@ -267,35 +272,11 @@ fun EffectBrowser(state: EditorState) {
             if (audio) Spacer(Modifier.size(44.dp))
             else BrowserButton(EffectIcons.Search, stringResource(R.string.home_search), { state.effectDetail = null; detail = null; searching = true })
         }
-        Swap(page, Modifier.fillMaxSize().effectSwipe(at >= 0, ::swipeStart, ::swipeDrag, ::swipeEnd), rise = if (slid == page) 0.dp else 8.dp) {
+        Box(Modifier.fillMaxSize()) {
+        Swap(page, Modifier.fillMaxSize().effectSwipe(at >= 0, ::swipeStart, ::swipeDrag, ::swipeEnd), rise = if (slid == page || way != 0) 0.dp else 8.dp, shift = if (slid == page) 0.dp else 48.dp * way * (if (rtl) -1 else 1)) {
         if (catalog.message != null && !audio && (app.absentmotion.platform.effectsMessageOnHome() || (category != null && category != "ai" && category != "audio" && category != "voice" && !searching))) {
             Box(Modifier.fillMaxSize().then(slide).padding(24.dp), contentAlignment = Alignment.Center) {
                 Text(catalog.message!!, color = Am.OnDark, fontSize = 14.sp, textAlign = TextAlign.Center)
-            }
-        } else if (detail != null) {
-            val effect = detail!!
-            Column(Modifier.fillMaxSize().deskVerticalScroll().padding(16.dp)) {
-                Thumbnail(catalog, effect.thumbnail, Modifier.align(Alignment.CenterHorizontally).size(160.dp))
-                Text(effect.description, Modifier.padding(top = 16.dp, bottom = 4.dp), color = Am.OnDark, fontSize = 14.sp)
-                Row(Modifier.fillMaxWidth().height(48.dp).clickable { helpPage = "effects/${effect.page}.html" }.padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(ExportIcons.Help, null, Modifier.size(22.dp), tint = Am.OnDark)
-                    Text(stringResource(R.string.effect_help), Modifier.padding(start = 12.dp), color = Am.OnDark, fontSize = 15.sp)
-                }
-                if (state.effectDetail == null) Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Text(stringResource(R.string.standard_settings), Modifier.weight(1f).height(48.dp).alpha(if (effect.available) 1f else 0.35f)
-                        .clickable(enabled = effect.available) { add(effect) }.padding(12.dp), color = Am.OnDark, fontSize = 15.sp)
-                    Icon(PanelIcons.Star, stringResource(R.string.effectbrowser_favorite), Modifier.size(48.dp).clickable { favourite(effect) }.padding(12.dp), tint = if (effect.id in favourites) Am.Accent else Am.OnDark)
-                }
-                if (state.effectDetail == null) effect.presets.forEach { preset ->
-                    Row(Modifier.fillMaxWidth().height(72.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Row(Modifier.weight(1f).fillMaxHeight().alpha(if (effect.available) 1f else 0.35f)
-                            .clickable(enabled = effect.available) { add(effect, preset) }.padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Thumbnail(catalog, effect.thumbnail(preset), Modifier.size(56.dp).clip(RoundedCornerShape(5.dp)))
-                            Text(preset.name, Modifier.weight(1f).padding(start = 12.dp), color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
-                        }
-                        PresetStar(presetFavourites.contains(effect, preset)) { presetFavourites.toggle(effect, preset) }
-                    }
-                }
             }
         } else if (!searching && (category == "audio" || category == "voice")) {
             val effects = layer?.audioEffects.orEmpty()
@@ -383,6 +364,39 @@ fun EffectBrowser(state: EditorState) {
                             }
                         }
                         if (row.size == 1) Spacer(Modifier.weight(1f))
+                    }
+                }
+            }
+        }
+        }
+        androidx.compose.animation.AnimatedVisibility(
+            detail != null,
+            enter = androidx.compose.animation.slideInHorizontally(androidx.compose.animation.core.tween(300, easing = Motion.EaseOut)) { if (rtl) -it else it },
+            exit = androidx.compose.animation.slideOutHorizontally(androidx.compose.animation.core.tween(240, easing = Motion.EaseIn)) { if (rtl) -it else it },
+        ) {
+            shownDetail?.let { effect ->
+                Column(Modifier.fillMaxSize().background(BrowserBg).pointerInput(Unit) {}.deskVerticalScroll()) {
+                    EffectHero(catalog, effect)
+                    Column(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
+                    Row(Modifier.fillMaxWidth().height(48.dp).clickable { helpPage = "effects/${effect.page}.html" }.padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(ExportIcons.Help, null, Modifier.size(22.dp), tint = Am.OnDark)
+                        Text(stringResource(R.string.effect_help), Modifier.padding(start = 12.dp), color = Am.OnDark, fontSize = 15.sp)
+                    }
+                    if (state.effectDetail == null) Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        Text(stringResource(R.string.standard_settings), Modifier.weight(1f).height(48.dp).alpha(if (effect.available) 1f else 0.35f)
+                            .clickable(enabled = effect.available) { add(effect) }.padding(12.dp), color = Am.OnDark, fontSize = 15.sp)
+                        Icon(PanelIcons.Star, stringResource(R.string.effectbrowser_favorite), Modifier.size(48.dp).clickable { favourite(effect) }.padding(12.dp), tint = if (effect.id in favourites) Am.Accent else Am.OnDark)
+                    }
+                    if (state.effectDetail == null) effect.presets.forEach { preset ->
+                        Row(Modifier.fillMaxWidth().height(72.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Row(Modifier.weight(1f).fillMaxHeight().alpha(if (effect.available) 1f else 0.35f)
+                                .clickable(enabled = effect.available) { add(effect, preset) }.padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Thumbnail(catalog, effect.thumbnail(preset), Modifier.size(56.dp).clip(RoundedCornerShape(5.dp)))
+                                Text(preset.name, Modifier.weight(1f).padding(start = 12.dp), color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
+                            }
+                            PresetStar(presetFavourites.contains(effect, preset)) { presetFavourites.toggle(effect, preset) }
+                        }
+                    }
                     }
                 }
             }
@@ -489,6 +503,20 @@ private fun EffectTile(catalog: EffectCatalog, effect: EffectDefinition, width: 
 internal fun PresetStar(favourite: Boolean, onToggle: () -> Unit) {
     Box(Modifier.size(48.dp).toggleable(favourite, role = Role.Checkbox) { onToggle() }, contentAlignment = Alignment.Center) {
         app.absentmotion.ui.editor.DeskTip(stringResource(R.string.effectbrowser_favorite_preset)) { Icon(PanelIcons.Star, stringResource(R.string.effectbrowser_favorite_preset), Modifier.size(24.dp), tint = if (favourite) Am.Accent else Am.OnDark) }
+    }
+}
+
+@Composable
+private fun EffectHero(catalog: EffectCatalog, effect: EffectDefinition) {
+    androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxWidth()) {
+        Box(Modifier.fillMaxWidth().height(minOf(maxWidth / 1.25f, 340.dp))) {
+            Thumbnail(catalog, effect.thumbnail, Modifier.matchParentSize(), ContentScale.Crop)
+            Box(Modifier.matchParentSize().background(androidx.compose.ui.graphics.Brush.verticalGradient(0f to Color.Transparent, 0.3f to Color.Transparent, 0.62f to BrowserBg.copy(alpha = 0.72f), 1f to BrowserBg)))
+            Column(Modifier.align(Alignment.BottomStart).padding(start = 16.dp, end = 16.dp, bottom = 12.dp)) {
+                Text(effect.name, color = Am.OnDark, fontSize = 26.sp, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(effect.description, Modifier.padding(top = 4.dp), color = Am.OnDark, fontSize = 15.sp)
+            }
+        }
     }
 }
 

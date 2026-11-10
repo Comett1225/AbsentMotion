@@ -4,7 +4,7 @@
  "category": "repeat",
  "since": "4.4.0",
  "native": true,
- "description": "Draws the layer inside itself again and again, like a camera pointed at its own screen. Move, scale or turn the layer to steer the tunnel.",
+ "description": "Draws the layer inside itself again and again, like a camera pointed at its own screen. With Frame by Frame on, each copy shows the layer from one frame earlier, so movement leaves trails that swirl into the tunnel.",
  "params": [
   {
    "id": "copies",
@@ -82,6 +82,13 @@
    "min": -180,
    "max": 180,
    "step": 1
+  },
+  {
+   "id": "trails",
+   "label": "Frame by Frame",
+   "type": "switch",
+   "default": true,
+   "legacyDefault": false
   },
   {
    "id": "delay",

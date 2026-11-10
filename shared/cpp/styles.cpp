@@ -1450,11 +1450,13 @@ void DrawShuttered(SkCanvas* canvas, const std::vector<Layer>& siblings, const L
     const bool restricted = !(shutter.position && shutter.scale && shutter.rotation);
     FrozenScope scope(restricted ? &frozen : gFrozen);
     SkPaint composite;
+    const double lead = shutter.trailing ? 0 : open / 2;
     if (shutter.fast) {
         const SkPoint middle = ShapePath(l, l.localTime(timeMs)).getBounds().center();
-        const SkVector moved = SiblingMatrix(siblings, l, timeMs + open / 2).mapPoint(middle) -
-                               SiblingMatrix(siblings, l, timeMs - open / 2).mapPoint(middle);
-        composite.setImageFilter(SmearFilter(moved));
+        const SkVector moved = SiblingMatrix(siblings, l, timeMs + lead).mapPoint(middle) -
+                               SiblingMatrix(siblings, l, timeMs + lead - open).mapPoint(middle);
+        sk_sp<SkImageFilter> smear = SmearFilter(moved);
+        composite.setImageFilter(smear && shutter.trailing ? SkImageFilters::Offset(-moved.fX / 2, -moved.fY / 2, smear) : smear);
         if (!composite.getImageFilter()) return DrawOne(canvas, siblings, l, timeMs, pictures, sample);
     }
     if (ov.blend || !IsNormal(l.blending)) {
@@ -1469,10 +1471,15 @@ void DrawShuttered(SkCanvas* canvas, const std::vector<Layer>& siblings, const L
         canvas->restore();
         return;
     }
-    const auto at = [&](double u) { return std::clamp(timeMs + open * (u - 0.5), (double)l.startTime, (double)l.endTime); };
+    const auto at = [&](double u) { return std::clamp(timeMs + lead - open * (1 - u), (double)l.startTime, (double)l.endTime); };
     const bool steady = Steady(siblings, l, at(0), at(1));
     int samples = shutter.samples;
-    if (shutter.adaptive && !steady) samples = std::clamp((int)std::ceil(Reach(siblings, l, timeMs, open) / 2), samples, 48);
+    if (shutter.adaptive && !steady) samples = std::clamp((int)std::ceil(Reach(siblings, l, timeMs + lead - open / 2, open) / 2), samples, 64);
+    const SkPoint middle = ShapePath(l, l.localTime(timeMs)).getBounds().center();
+    const auto gap = [&](int from, int to) {
+        if (steady) return SkVector{0, 0};
+        return SiblingMatrix(siblings, l, at((double)to / samples)).mapPoint(middle) - SiblingMatrix(siblings, l, at((double)from / samples)).mapPoint(middle);
+    };
     if (l.kind == "embedScene") {
         canvas->saveLayer(SkCanvas::SaveLayerRec(nullptr, &composite, SkCanvas::kF16ColorType));
         SkPaint add;
@@ -1484,6 +1491,7 @@ void DrawShuttered(SkCanvas* canvas, const std::vector<Layer>& siblings, const L
             const float weight = (float)same / samples;
             const float scale[20] = {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, weight, 0};
             add.setColorFilter(SkColorFilters::Matrix(scale));
+            add.setImageFilter(SmearFilter(gap(i, i + same)));
             canvas->saveLayer(nullptr, &add);
             DrawOne(canvas, siblings, l, when, pictures, sample);
             canvas->restore();
@@ -1494,7 +1502,8 @@ void DrawShuttered(SkCanvas* canvas, const std::vector<Layer>& siblings, const L
         return;
     }
     const SkRect area = SkRect::MakeLTRB(-1e6f, -1e6f, 1e6f, 1e6f);
-    std::vector<std::pair<Recorded, float>> taken;
+    struct Taken { Recorded r; float share; SkVector move; };
+    std::vector<Taken> taken;
     SkRect all = SkRect::MakeEmpty();
     bool bounded = true;
     for (int i = 0; i < samples;) {
@@ -1504,16 +1513,21 @@ void DrawShuttered(SkCanvas* canvas, const std::vector<Layer>& siblings, const L
         Recorded r = RecordInDevice(canvas, area, [&](SkCanvas* c) { DrawOne(c, siblings, l, when, pictures, sample); });
         bounded = bounded && r.bounded;
         all.join(r.bounds);
-        taken.emplace_back(std::move(r), (float)same / samples);
+        taken.push_back({std::move(r), (float)same / samples, gap(i, i + same)});
         i += same;
     }
-    canvas->saveLayer(SkCanvas::SaveLayerRec(bounded ? &all : nullptr, &composite, SkCanvas::kF16ColorType));
+    float longest = 0;
+    for (const Taken& k : taken) longest = std::max(longest, k.move.length());
+    const SkRect wide = all.makeOutset(longest, longest);
+    canvas->saveLayer(SkCanvas::SaveLayerRec(bounded ? &wide : nullptr, &composite, SkCanvas::kF16ColorType));
     SkPaint add;
     add.setBlendMode(SkBlendMode::kPlus);
-    for (const auto& [r, share] : taken) {
+    for (const auto& [r, share, move] : taken) {
         const float scale[20] = {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, share, 0};
         add.setColorFilter(SkColorFilters::Matrix(scale));
-        canvas->saveLayer(bounded ? &r.bounds : nullptr, &add);
+        add.setImageFilter(SmearFilter(move));
+        const SkRect spread = r.bounds.makeOutset(move.length(), move.length());
+        canvas->saveLayer(bounded ? &spread : nullptr, &add);
         PlayInDevice(canvas, r.picture.get());
         canvas->restore();
         if (gBreak) (*gBreak)();
@@ -1529,26 +1543,31 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
         if (e.hidden || e.id != "absent.videofeedback") continue;
         const float t = l.localTime(timeMs);
         const int count = std::clamp((int)std::lround(Setting(e, "copies", t, 24)), 1, 64);
-        const float zoom = std::clamp(Setting(e, "zoom", t, 0.85f), 0.1f, 1.5f);
-        const float rotation = Setting(e, "rotation", t, 0);
         const float fade = std::clamp(Setting(e, "fade", t, 0.9f), 0.0f, 1.0f);
         const float hue = Setting(e, "hueShift", t, 0), delay = std::clamp(Setting(e, "delay", t, 0), 0.0f, 1.0f);
         const int blend = std::clamp((int)std::lround(Setting(e, "blend", t, 0)), 0, 2);
+        const bool trails = Setting(e, "trails", t, 0) >= 0.5f;
+        const double spacing = trails ? (delay > 0 ? 1000.0 * delay : 1000.0 / std::max(gScene ? gScene->fps : 30, 1)) : 1000.0 * delay;
         const SkMatrix placed = SiblingMatrix(siblings, l, timeMs);
-        const SkPoint centre = placed.mapPoint({Setting(e, "center", t, 0, 0), Setting(e, "center", t, 0, 1)});
-        float sx = zoom, sy = zoom, turn = rotation;
-        SkVector offset = {Setting(e, "offset", t, 0, 0), Setting(e, "offset", t, 0, 1)};
-        if (Setting(e, "useLayerTransform", t, 1) >= 0.5f) {
-            const Placement p = Effective(siblings, l, timeMs, 0);
-            sx *= p.scale.fX;
-            sy *= p.scale.fY;
-            turn += p.rotation;
-            offset += p.location - SkPoint{gScene ? gScene->width / 2.0f : 0, gScene ? gScene->height / 2.0f : 0};
-        }
-        SkMatrix step = SkMatrix::Translate(centre.fX + offset.fX, centre.fY + offset.fY);
-        step.preRotate(turn);
-        step.preScale(sx, sy);
-        step.preTranslate(-centre.fX, -centre.fY);
+        const auto stepAt = [&](double when) {
+            const float u = l.localTime(when);
+            const SkPoint middle = SiblingMatrix(siblings, l, when).mapPoint({Setting(e, "center", u, 0, 0), Setting(e, "center", u, 0, 1)});
+            float sx = std::clamp(Setting(e, "zoom", u, 0.85f), 0.1f, 1.5f), sy = sx, turn = Setting(e, "rotation", u, 0);
+            SkVector offset = {Setting(e, "offset", u, 0, 0), Setting(e, "offset", u, 0, 1)};
+            if (Setting(e, "useLayerTransform", u, 1) >= 0.5f) {
+                const Placement p = Effective(siblings, l, when, 0);
+                sx *= p.scale.fX;
+                sy *= p.scale.fY;
+                turn += p.rotation;
+                offset += p.location - SkPoint{gScene ? gScene->width / 2.0f : 0, gScene ? gScene->height / 2.0f : 0};
+            }
+            SkMatrix step = SkMatrix::Translate(middle.fX + offset.fX, middle.fY + offset.fY);
+            step.preRotate(turn);
+            step.preScale(sx, sy);
+            step.preTranslate(-middle.fX, -middle.fY);
+            return step;
+        };
+        const SkMatrix step = stepAt(timeMs);
         std::vector<SkMatrix> matrices;
         matrices.reserve(count);
         SkMatrix current = SkMatrix::I();
@@ -1557,11 +1576,12 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
         const float extent = std::max(bounds.width(), bounds.height());
         SkRect reach = placed.mapRect(bounds);
         reach.outset(std::max(reach.width(), reach.height()) * 0.5f + 64, std::max(reach.width(), reach.height()) * 0.5f + 64);
-        const float shrink = std::max(std::fabs(sx), std::fabs(sy));
+        const float shrink = step.getMaxScale();
         for (int i = 1; i <= count; i++) {
             alpha *= fade;
             if (alpha < 1.0f / 255 || (shrink < 1 && extent * std::pow(shrink, i) < 1)) break;
-            current = SkMatrix::Concat(step, current);
+            if (trails && timeMs - spacing * i < l.startTime) break;
+            current = trails ? SkMatrix::Concat(current, stepAt(timeMs - spacing * (i - 1))) : SkMatrix::Concat(step, current);
             matrices.push_back(current);
         }
         Override plain = ov;
@@ -1580,7 +1600,7 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
             const SkRect area = matrices[i - 1].mapRect(reach);
             canvas->saveLayer(&area, &paint);
             canvas->concat(matrices[i - 1]);
-            const double at = std::clamp(timeMs - 1000.0 * delay * i, (double)l.startTime, (double)l.endTime);
+            const double at = std::clamp(timeMs - spacing * i, (double)l.startTime, (double)l.endTime);
             DrawOne(canvas, siblings, l, at, pictures, plain);
             canvas->restore();
             if (gBreak) (*gBreak)();

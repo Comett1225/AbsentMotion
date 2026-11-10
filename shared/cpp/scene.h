@@ -242,6 +242,7 @@ struct ShutterBlur {
     int samples = 0;
     bool fast = false;
     bool adaptive = false;
+    bool trailing = false;
     bool position = true, scale = true, rotation = true;
 };
 

@@ -101,7 +101,7 @@ import app.absentmotion.tools.LinkSite
 import app.absentmotion.tools.Quality
 import app.absentmotion.tools.SaveMode
 import app.absentmotion.tools.SavedMedia
-import app.absentmotion.tools.VideoDownloader
+import app.absentmotion.platform.videoDownloader
 import app.absentmotion.tools.defaultQuality
 import app.absentmotion.tools.findMediaLink
 import app.absentmotion.tools.qualities
@@ -121,18 +121,19 @@ import kotlin.math.roundToInt
 
 private val installScope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + Dispatchers.Main.immediate)
 private var installPercent by mutableStateOf<Int?>(null)
+private val downloader = videoDownloader()
 
 @Composable
 internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSettings, onOpen: (String) -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val revision by VideoDownloader.revision.collectAsState()
-    var engine by remember { mutableStateOf(if (installPercent != null) Engine.Getting(installPercent!!) else if (!VideoDownloader.available) Engine.Unavailable else if (VideoDownloader.installed(context)) Engine.Ready else Engine.Missing) }
+    val revision by downloader.revision.collectAsState()
+    var engine by remember { mutableStateOf(if (installPercent != null) Engine.Getting(installPercent!!) else if (!downloader.available) Engine.Unavailable else if (downloader.installed(context)) Engine.Ready else Engine.Missing) }
     var open by rememberSaveable { mutableIntStateOf(0) }
     var compressFrom by remember { mutableStateOf<Uri?>(null) }
     var asking by remember { mutableStateOf(false) }
     LaunchedEffect(revision) {
-        if (engine !is Engine.Getting) engine = if (!VideoDownloader.available) Engine.Unavailable else if (VideoDownloader.installed(context)) Engine.Ready else Engine.Missing
+        if (engine !is Engine.Getting) engine = if (!downloader.available) Engine.Unavailable else if (downloader.installed(context)) Engine.Ready else Engine.Missing
     }
     fun getDownloader() {
         if (engine is Engine.Getting || installPercent != null) return
@@ -140,7 +141,7 @@ internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSett
         installPercent = 0
         installScope.launch {
             engine = try {
-                VideoDownloader.install(context) { fraction ->
+                downloader.install(context) { fraction ->
                     val percent = (fraction * 100).toInt().coerceIn(0, 100)
                     installPercent = percent
                     if (engine != Engine.Getting(percent)) engine = Engine.Getting(percent)
@@ -174,14 +175,14 @@ internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSett
         ToolCard(HomeIcons.Download, stringResource(R.string.tools_downloader), stringResource(R.string.tools_downloader_about), engine = engine, modifier = m) {
             when {
                 engine is Engine.Getting -> Unit
-                !VideoDownloader.available || VideoDownloader.installed(context) -> open = 2
+                !downloader.available || downloader.installed(context) -> open = 2
                 else -> asking = true
             }
         }
     }
     Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = if (PlatformFeatures.desktop) 28.dp else 16.dp)) {
         Spacer(Modifier.height(24.dp))
-        if (PlatformFeatures.desktop) ToolGrid(listOf(compressCard, trimCard, extractCard, gifCard))
+        if (PlatformFeatures.desktop) ToolGrid(listOf(compressCard, trimCard, extractCard, gifCard, downloaderCard))
         else if (LocalWide.current || app.absentmotion.ui.editor.LocalTablet.current) ToolGrid(listOf(compressCard, trimCard, extractCard, gifCard, downloaderCard))
         else {
             compressCard(Modifier)
@@ -199,7 +200,7 @@ internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSett
         if (asking) AlertDialog(
             onDismissRequest = { asking = false },
             title = { Text(stringResource(R.string.tools_downloader), color = Am.Navy) },
-            text = { Text(stringResource(R.string.tools_downloader_intro, (VideoDownloader.downloadBytes / (1024f * 1024f)).roundToInt()), color = Am.Navy) },
+            text = { Text(stringResource(R.string.tools_downloader_intro, (downloader.downloadBytes / (1024f * 1024f)).roundToInt()), color = Am.Navy) },
             confirmButton = { TextButton({ asking = false; getDownloader() }) { Text(stringResource(R.string.downloader_download), color = Am.Accent) } },
             dismissButton = { TextButton({ asking = false }) { Text(stringResource(R.string.home_back), color = Am.Navy) } },
             containerColor = Am.Card,
@@ -246,7 +247,7 @@ private fun ToolCard(icon: ImageVector, title: String, about: String, engine: En
                 Text(about, if (missing) Modifier.alpha(0f).clearAndSetSemantics {} else Modifier, color = Am.HomeDim, fontSize = 15.sp, lineHeight = 20.sp)
                 if (missing) Text(
                     if (engine is Engine.Getting) stringResource(R.string.tools_download_progress, engine.percent)
-                    else stringResource(R.string.tools_download_addon, (VideoDownloader.downloadBytes / (1024f * 1024f)).roundToInt()),
+                    else stringResource(R.string.tools_download_addon, (downloader.downloadBytes / (1024f * 1024f)).roundToInt()),
                     Modifier.matchParentSize(), color = Am.Accent, fontSize = 15.sp, lineHeight = 20.sp,
                     fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis,
                 )
@@ -403,15 +404,16 @@ private sealed interface Fetch {
 private fun problem(e: Exception): Int = (e as? DownloadProblem)?.text ?: R.string.downloader_error_unknown
 
 @Composable
-private fun DownloaderScreen(store: ProjectStore, settings: AppSettings, onOpen: (String) -> Unit, onCompress: (Uri) -> Unit, onClose: () -> Unit) {
+internal fun DownloaderScreen(store: ProjectStore, settings: AppSettings, onOpen: (String) -> Unit, onCompress: (Uri) -> Unit, onClose: () -> Unit) {
     val storage = app.absentmotion.platform.rememberStorageAccess()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var text by rememberSaveable { mutableStateOf("") }
     var pasteMissed by remember { mutableStateOf(false) }
+    @Suppress("DEPRECATION") val deskClipboard = androidx.compose.ui.platform.LocalClipboardManager.current
     var save by rememberSaveable { mutableIntStateOf(0) }
     var choice by remember { mutableIntStateOf(-1) }
-    var engine by remember { mutableStateOf(if (!VideoDownloader.available) Engine.Unavailable else if (VideoDownloader.installed(context)) Engine.Ready else Engine.Missing) }
+    var engine by remember { mutableStateOf(if (!downloader.available) Engine.Unavailable else if (downloader.installed(context)) Engine.Ready else Engine.Missing) }
     var check by remember { mutableStateOf<Check>(Check.Idle) }
     var fetch by remember { mutableStateOf<Fetch>(Fetch.Ready) }
     var work by remember { mutableStateOf<Job?>(null) }
@@ -423,14 +425,14 @@ private fun DownloaderScreen(store: ProjectStore, settings: AppSettings, onOpen:
     val single = info != null && info.items.size == 1
     val pictures = link?.kind?.pictures == true && info == null || info?.pictures == true
     val mode = SaveMode.entries[save]
-    val options = remember(info, mode) { if (info != null && single) qualities(info.items.first(), mode, VideoDownloader.av1Hardware) else emptyList() }
+    val options = remember(info, mode) { if (info != null && single) qualities(info.items.first(), mode, downloader.av1Hardware) else emptyList() }
     val running = fetch is Fetch.Running
 
     LaunchedEffect(options) { choice = defaultQuality(options, mode) }
     LaunchedEffect(ready) {
         if (!ready) return@LaunchedEffect
-        VideoDownloader.warmUp(context)
-        VideoDownloader.updateIfDue(context)
+        downloader.warmUp(context)
+        downloader.updateIfDue(context)
     }
     LaunchedEffect(link?.url, ready) {
         check = Check.Idle
@@ -444,7 +446,7 @@ private fun DownloaderScreen(store: ProjectStore, settings: AppSettings, onOpen:
         delay(350)
         check = Check.Checking
         check = try {
-            Check.Checked(url, VideoDownloader.check(context, url))
+            Check.Checked(url, downloader.check(context, url))
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -456,7 +458,7 @@ private fun DownloaderScreen(store: ProjectStore, settings: AppSettings, onOpen:
         engine = Engine.Getting(0)
         scope.launch {
             engine = try {
-                VideoDownloader.install(context) { fraction ->
+                downloader.install(context) { fraction ->
                     val percent = (fraction * 100).toInt().coerceIn(0, 100)
                     if (engine != Engine.Getting(percent)) engine = Engine.Getting(percent)
                 }
@@ -476,7 +478,7 @@ private fun DownloaderScreen(store: ProjectStore, settings: AppSettings, onOpen:
         fetch = Fetch.Running(0)
         work = scope.launch {
             fetch = try {
-                Fetch.Done(VideoDownloader.download(context, target.url, target.info, mode, choice) { fraction ->
+                Fetch.Done(downloader.download(context, target.url, target.info, mode, choice) { fraction ->
                     val percent = (fraction * 100).toInt().coerceIn(0, 100)
                     if (fetch != Fetch.Running(percent)) fetch = Fetch.Running(percent)
                 })
@@ -541,8 +543,8 @@ private fun DownloaderScreen(store: ProjectStore, settings: AppSettings, onOpen:
             }
             Box(
                 Modifier.height(44.dp).clip(RoundedCornerShape(10.dp)).background(Am.Navy).clickable(enabled = !running) {
-                    val clip = context.getSystemService(ClipboardManager::class.java)?.primaryClip
-                    val copied = clip?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.coerceToText(context)?.toString().orEmpty()
+                    val copied = if (app.absentmotion.platform.PlatformFeatures.desktop) deskClipboard.getText()?.text.orEmpty()
+                        else context.getSystemService(ClipboardManager::class.java)?.primaryClip?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.coerceToText(context)?.toString().orEmpty()
                     val found = findMediaLink(copied)
                     if (found != null) { text = found.url; pasteMissed = false } else pasteMissed = true
                 }.padding(horizontal = 16.dp),
@@ -600,7 +602,7 @@ private fun duration(seconds: Double): String? {
 @Composable
 private fun LinkCard(link: app.absentmotion.tools.MediaLink?, check: Check, @StringRes waiting: Int?, typed: Boolean) {
     val info = (check as? Check.Checked)?.info
-    val thumb by produceState<ImageBitmap?>(null, info?.thumbnails) { value = info?.thumbnails?.let { VideoDownloader.thumbnail(it) } }
+    val thumb by produceState<ImageBitmap?>(null, info?.thumbnails) { value = info?.thumbnails?.let { downloader.thumbnail(it) } }
     Row(
         Modifier.fillMaxWidth().height(88.dp).clip(RoundedCornerShape(12.dp)).background(Am.Card).padding(horizontal = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -655,7 +657,7 @@ private fun EngineCard(engine: Engine, onGet: () -> Unit) {
         }
         Text(stringResource(R.string.downloader_engine_title), color = Am.Navy, fontSize = 17.sp, fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(4.dp))
-        Text(stringResource(R.string.downloader_engine_about, formatBytes(VideoDownloader.downloadBytes)), color = Am.HomeDim, fontSize = 14.sp, lineHeight = 18.sp)
+        Text(stringResource(if (app.absentmotion.platform.PlatformFeatures.desktop) R.string.downloader_engine_about_desktop else R.string.downloader_engine_about, formatBytes(downloader.downloadBytes)), color = Am.HomeDim, fontSize = 14.sp, lineHeight = 18.sp)
         Spacer(Modifier.height(12.dp))
         Box(Modifier.fillMaxWidth().height(52.dp), contentAlignment = Alignment.CenterStart) {
             if (engine is Engine.Getting) Column(Modifier.fillMaxWidth()) {
@@ -749,6 +751,7 @@ private fun folderOf(media: SavedMedia): String = when {
 
 @Composable
 private fun DownloadBar(fetch: Fetch, enabled: Boolean, onStart: () -> Unit, onCancel: () -> Unit, onProject: (SavedMedia) -> Unit, onCompress: (SavedMedia) -> Unit) {
+    val add = LocalAddToProject.current
     Column(Modifier.fillMaxWidth().background(Am.Card).padding(16.dp)) {
         Box(Modifier.fillMaxWidth().height(44.dp), contentAlignment = Alignment.CenterStart) {
             when (fetch) {
@@ -771,8 +774,13 @@ private fun DownloadBar(fetch: Fetch, enabled: Boolean, onStart: () -> Unit, onC
         Spacer(Modifier.height(8.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             val first = (fetch as? Fetch.Done)?.saved?.firstOrNull { !it.mime.startsWith("audio/") }
+            val any = (fetch as? Fetch.Done)?.saved?.firstOrNull()
             when {
                 fetch is Fetch.Running -> BigButton(stringResource(R.string.cancel), Modifier.weight(1f), primary = false, onClick = onCancel)
+                add != null && any != null -> {
+                    BigButton(stringResource(R.string.tools_add_to_project), Modifier.weight(1f), HomeIcons.Plus) { add(any.uri) }
+                    if (first != null) BigButton(stringResource(R.string.tools_compress), Modifier.weight(1f), HomeIcons.Compress, primary = false) { onCompress(first) }
+                }
                 first != null -> {
                     BigButton(stringResource(R.string.downloader_new_project), Modifier.weight(1f), HomeIcons.Plus) { onProject(first) }
                     BigButton(stringResource(R.string.tools_compress), Modifier.weight(1f), HomeIcons.Compress, primary = false) { onCompress(first) }

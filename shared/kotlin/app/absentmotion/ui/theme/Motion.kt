@@ -37,6 +37,7 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.layer.GraphicsLayer
 import androidx.compose.ui.graphics.layer.drawLayer
@@ -156,7 +157,8 @@ private suspend fun androidx.compose.ui.input.pointer.PointerInputScope.consumeA
     }
 }
 
-private class Stage(val layer: GraphicsLayer, shown: Boolean) {
+private class Stage(val layer: GraphicsLayer, shown: Boolean, val shift: Float = 0f) {
+    var away = 0f
     val enter = Animatable(if (shown) 1f else 0f)
     val exit = Animatable(0f)
     var started = false
@@ -174,18 +176,21 @@ fun Swap(
     modifier: Modifier = Modifier,
     rise: Dp = 8.dp,
     animateFirst: Boolean = false,
+    shift: Dp = 0.dp,
     content: @Composable BoxScope.() -> Unit,
 ) {
     val layers = arrayOf(rememberGraphicsLayer(), rememberGraphicsLayer(), rememberGraphicsLayer())
     val board = remember { Board() }
     val scope = rememberCoroutineScope()
     val risePx = with(LocalDensity.current) { rise.toPx() }
+    val shiftPx = with(LocalDensity.current) { shift.toPx() }
     val stage = remember(key) {
         val prev = board.current
+        prev?.away = -shiftPx * 0.5f
         if (prev != null && prev !in board.ghosts) board.ghosts.add(prev)
         if (board.ghosts.size >= layers.size) board.ghosts.removeAt(0)
         val layer = layers.first { l -> board.ghosts.none { it.layer === l } }
-        Stage(layer, shown = prev == null && !animateFirst).also { board.current = it }
+        Stage(layer, shown = prev == null && !animateFirst, shift = shiftPx).also { board.current = it }
     }
     SideEffect {
         if (!stage.started) {
@@ -208,7 +213,7 @@ fun Swap(
                     val a = ghost.enter.value * (1f - ghost.exit.value)
                     if (a <= 0f) continue
                     ghost.layer.alpha = a
-                    drawLayer(ghost.layer)
+                    translate(left = ghost.exit.value * ghost.away) { drawLayer(ghost.layer) }
                 }
             },
         )
@@ -218,6 +223,7 @@ fun Swap(
                     val t = stage.enter.value
                     alpha = t
                     translationY = (1f - t) * risePx
+                    translationX = (1f - t) * stage.shift
                 }
                 .drawWithContent { recordInto(stage.layer) },
             content = content,

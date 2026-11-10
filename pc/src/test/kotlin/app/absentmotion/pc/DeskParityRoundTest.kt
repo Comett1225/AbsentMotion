@@ -158,11 +158,16 @@ class DeskParityRoundTest {
             for ((w, h) in sizes) {
                 prepare("welcome")
                 DeskAppState().settings.onboarding = 0
+                DeskAppState().settings.lookChosen = false
                 Tutorial.offerDismissed = false
                 session(w, h) { app ->
                     settle()
                     onNodeWithText(text(R.string.desk_welcome_title)).assertExists()
                     shot("$w-welcome-language")
+                    onAllNodesWithText(text(R.string.action_continue)).onFirst().performClick()
+                    settle()
+                    onNodeWithText(text(R.string.onboarding_look_title)).assertExists()
+                    shot("$w-welcome-look")
                     onAllNodesWithText(text(R.string.action_continue)).onFirst().performClick()
                     settle()
                     onNodeWithText(text(R.string.desk_welcome_updates_title)).assertExists()

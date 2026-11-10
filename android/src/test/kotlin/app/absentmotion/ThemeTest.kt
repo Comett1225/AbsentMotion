@@ -89,7 +89,8 @@ class ThemeTest {
     }
 
     @Test fun builtInPalettesAreListedAndDiffer() {
-        assertEquals(listOf("AbsentMotion", "Daylight"), Palette.BuiltIn.map { it.first })
+        assertEquals(listOf("AbsentMotion", "Dark", "Daylight"), Palette.BuiltIn.map { it.first })
+        assertTrue(Palette.Dark.HomeBg.luminance() < 0.5f)
         assertNotEquals(Palette.AbsentMotion, Palette.Daylight)
         assertTrue(Palette.Daylight.TopBar.luminance() > 0.5f)
         assertTrue(Palette.AbsentMotion.TopBar.luminance() < 0.5f)
@@ -126,7 +127,8 @@ class ThemeTest {
             assertTrue("$name: OnAudioBar on AudioBar", contrast(p.OnAudioBar, p.AudioBar) >= 4.5f)
             assertTrue("$name: OnScrim on Scrim", contrast(p.OnScrim, p.Scrim) >= 7f)
             assertFalse("$name: the Scrim must stay dark", p.Scrim.luminance() > 0.1f)
-            assertFalse("$name: Navy must stay dark", p.Navy.luminance() > 0.1f)
+            if (p.HomeBg.luminance() > 0.5f) assertFalse("$name: Navy must stay dark on a light home", p.Navy.luminance() > 0.1f)
+            else assertTrue("$name: Navy must be light on a dark home", p.Navy.luminance() > 0.5f)
         }
     }
 }

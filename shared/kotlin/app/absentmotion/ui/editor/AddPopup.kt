@@ -101,6 +101,7 @@ private class Tab(@StringRes val label: Int, val icon: ImageVector)
 private val Tabs = listOf(
     Tab(R.string.add_tab_shape, ChromeIcons.ShapeTab), Tab(R.string.add_tab_media, ChromeIcons.MediaTab), Tab(R.string.add_tab_audio, ChromeIcons.AudioTab),
     Tab(R.string.add_tab_object_asset, ChromeIcons.ObjectTab), Tab(R.string.add_tab_template, ChromeIcons.TemplateTab),
+    Tab(R.string.add_tab_tools, app.absentmotion.ui.home.HomeIcons.ToolsTab),
 )
 
 @Composable
@@ -109,12 +110,15 @@ internal fun AddPopup(state: EditorState, modifier: Modifier = Modifier, library
     BackHandler { state.addOpen = false }
     Row(modifier.clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)).background(PopupBar)) {
         Column(Modifier.weight(1f).fillMaxHeight()) {
-            Row(Modifier.padding(start = 6.dp).height(58.dp)) {
-                Tabs.forEachIndexed { i, tab -> TabButton(tab, active = i == selectedTab, enabled = i <= 4, Modifier.tutorialTarget(if (i == 1) "add_tab_media" else if (i == 2) "add_tab_audio" else null)) { selectedTab = i } }
+            androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxWidth().height(58.dp)) {
+                val tabWidth = minOf(64.dp, (maxWidth - 6.dp) / Tabs.size)
+                Row(Modifier.padding(start = 6.dp).fillMaxHeight()) {
+                    Tabs.forEachIndexed { i, tab -> TabButton(tab, active = i == selectedTab, enabled = true, Modifier.width(tabWidth).tutorialTarget(if (i == 1) "add_tab_media" else if (i == 2) "add_tab_audio" else null)) { selectedTab = i } }
+                }
             }
             val body = Modifier.weight(1f).fillMaxWidth().background(Am.Panel).tutorialTarget(if (selectedTab == 1) "add_media" else if (selectedTab == 2) "add_audio" else null)
             Swap(selectedTab, body, rise = 0.dp) {
-                when (selectedTab) { 0 -> ShapePages(state, Modifier.fillMaxSize()); 1 -> MediaTab(state, Modifier.fillMaxSize(), library); 3 -> ObjectPage(state, Modifier.fillMaxSize()); 4 -> TemplatePage(state, Modifier.fillMaxSize()); else -> AudioTab(state, Modifier.fillMaxSize(), library) }
+                when (selectedTab) { 0 -> ShapePages(state, Modifier.fillMaxSize()); 1 -> MediaTab(state, Modifier.fillMaxSize(), library); 3 -> ObjectPage(state, Modifier.fillMaxSize()); 4 -> TemplatePage(state, Modifier.fillMaxSize()); 5 -> ToolsPage(state, Modifier.fillMaxSize()); else -> AudioTab(state, Modifier.fillMaxSize(), library) }
             }
         }
         QuickBar(state, Modifier.width(64.dp).fillMaxHeight())
@@ -125,7 +129,7 @@ internal fun AddPopup(state: EditorState, modifier: Modifier = Modifier, library
 private fun TabButton(tab: Tab, active: Boolean, enabled: Boolean, modifier: Modifier, onClick: () -> Unit) {
     val tint = if (active) Am.Accent else Am.OnDark
     Column(
-        modifier.tutorialGuard().width(64.dp).fillMaxHeight().alpha(if (enabled) 1f else DimAlpha).clickable(enabled = enabled, onClick = onClick),
+        modifier.tutorialGuard().fillMaxHeight().alpha(if (enabled) 1f else DimAlpha).clickable(enabled = enabled, onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(Modifier.height(6.5.dp))
@@ -167,6 +171,29 @@ private fun ShapePages(state: EditorState, modifier: Modifier) = androidx.compos
         }
         Row(Modifier.align(Alignment.BottomCenter).padding(bottom = 3.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             repeat(pages.size) { Box(Modifier.size(4.dp).background(if (it == pager.currentPage) Am.OnDark else DotIdle, CircleShape)) }
+        }
+    }
+}
+
+@Composable
+private fun ToolsPage(state: EditorState, modifier: Modifier) {
+    val tools = listOfNotNull(
+        Triple(1, app.absentmotion.ui.home.HomeIcons.Compress, R.string.tools_compress),
+        Triple(3, app.absentmotion.ui.home.HomeIcons.Trim, R.string.tools_trim),
+        Triple(4, app.absentmotion.ui.home.HomeIcons.Audio, R.string.tools_extract),
+        Triple(5, app.absentmotion.ui.home.HomeIcons.Gif, R.string.tools_gif),
+        Triple(2, app.absentmotion.ui.home.HomeIcons.Download, R.string.tools_downloader).takeIf { app.absentmotion.platform.videoDownloader().available },
+    )
+    LazyHorizontalGrid(AtLeastTwo(96.dp), modifier.clipToBounds()) {
+        items(tools, key = { it.first }) { (id, icon, label) ->
+            val press = remember { MutableInteractionSource() }
+            Column(
+                Modifier.size(80.dp, 96.dp).tutorialGuard().pressScale(press, TilePress).clickable(press, LocalIndication.current) { state.addOpen = false; state.toolOpen = id },
+                horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
+            ) {
+                Icon(icon, null, Modifier.size(28.dp), tint = Am.OnDark)
+                Text(stringResource(label), Modifier.padding(top = 6.dp, start = 4.dp, end = 4.dp), color = Am.OnDark, fontSize = 12.sp, lineHeight = 14.sp, textAlign = TextAlign.Center, maxLines = 2)
+            }
         }
     }
 }

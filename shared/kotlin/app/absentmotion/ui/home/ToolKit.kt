@@ -59,6 +59,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+internal val LocalAddToProject = androidx.compose.runtime.staticCompositionLocalOf<((Uri) -> Unit)?> { null }
+
 internal sealed interface ToolStep {
     data object Ready : ToolStep
     data class Running(val percent: Int) : ToolStep
@@ -196,8 +198,10 @@ internal fun ToolBar(
             when (step) {
                 is ToolStep.Running -> BigButton(stringResource(R.string.cancel), Modifier.weight(1f), primary = false) { work.cancel() }
                 is ToolStep.Done -> {
-                    BigButton(stringResource(if (step.saved) R.string.compress_saved else R.string.tools_save), Modifier.weight(1f).fillMaxHeight(), HomeIcons.Download, enabled = !step.saved && !work.saving) { work.save(step) }
-                    BigButton(stringResource(R.string.compress_share), Modifier.weight(1f).fillMaxHeight(), ExportIcons.Share, primary = false) { work.share(step) }
+                    val add = LocalAddToProject.current
+                    if (add != null) BigButton(stringResource(R.string.tools_add_to_project), Modifier.weight(1f).fillMaxHeight(), HomeIcons.Plus) { add(Uri.fromFile(step.result.file)) }
+                    BigButton(stringResource(if (step.saved) R.string.compress_saved else R.string.tools_save), Modifier.weight(1f).fillMaxHeight(), HomeIcons.Download, enabled = !step.saved && !work.saving, primary = add == null) { work.save(step) }
+                    if (add == null) BigButton(stringResource(R.string.compress_share), Modifier.weight(1f).fillMaxHeight(), ExportIcons.Share, primary = false) { work.share(step) }
                 }
                 is ToolStep.Failed -> {
                     var reporting by remember { mutableStateOf(false) }

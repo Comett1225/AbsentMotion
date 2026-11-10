@@ -1037,8 +1037,8 @@ private class TimelineView(val state: EditorState, density: Density, private val
     fun tap(hit: Hit) {
         when (hit) {
             is Hit.Eye -> if (MultiSelect.active) MultiSelect.toggle(hit.id) else state.toggleHidden(hit.id)
-            is Hit.Header -> select(hit.id)
-            is Hit.Bar -> select(hit.id)
+            is Hit.Header -> select(hit.id, toggle = true)
+            is Hit.Bar -> select(hit.id, toggle = true)
             is Hit.Key -> select(hit.id)
             Hit.Readout -> state.toggleBookmark()
             Hit.Empty, Hit.Ruler, is Hit.Row -> state.clearSelection()
@@ -1046,8 +1046,8 @@ private class TimelineView(val state: EditorState, density: Density, private val
         }
     }
 
-    private fun select(id: Long) {
-        if (MultiSelect.active) MultiSelect.toggle(id) else {
+    private fun select(id: Long, toggle: Boolean = false) {
+        if (MultiSelect.active) MultiSelect.toggle(id) else if (toggle && state.selectedId == id) state.clearSelection() else {
             state.selectedId = id
             state.panel = EditorPanel.Tools
         }
@@ -1520,6 +1520,7 @@ private suspend fun PointerInputScope.desktopTimelineGestures(view: TimelineView
         var moved = false
         var previous = Offset.Zero
         var lastClickId: Long? = null
+        var wasSelected = false
         var lastHeaderId: Long? = null
         var lastClickTime = 0L
         var grab: Offset? = null
@@ -1577,6 +1578,8 @@ private suspend fun PointerInputScope.desktopTimelineGestures(view: TimelineView
                 rubbering = false
                 view.desktopCancel = false
                 view.desktopDragging = true
+                val pressedId = (hit as? Hit.Bar)?.id ?: (hit as? Hit.Header)?.id
+                wasSelected = plain && !MultiSelect.active && pressedId != null && pressedId == view.state.selectedId
                 if (!resizing) when (val h = hit) {
                     is Hit.Eye -> view.state.toggleHidden(h.id)
                     is Hit.Grip -> { view.selectDesktop(h.id, false, false); drag = view.beginDrag(h, Offset.Zero) }
@@ -1637,14 +1640,20 @@ private suspend fun PointerInputScope.desktopTimelineGestures(view: TimelineView
                                 view.state.panel = if (layer?.kind == "text") EditorPanel.EditText else EditorPanel.Tools
                             }
                             lastClickId = null
-                        } else { lastClickId = h.id; lastHeaderId = null; lastClickTime = change.uptimeMillis }
+                        } else {
+                            if (wasSelected) view.state.clearSelection()
+                            lastClickId = h.id; lastHeaderId = null; lastClickTime = change.uptimeMillis
+                        }
                     }
                     is Hit.Header -> {
                         if (plain && MultiSelect.active) { MultiSelect.clear(); view.state.selectedId = h.id; view.state.panel = EditorPanel.Tools }
                         if (lastHeaderId == h.id && change.uptimeMillis - lastClickTime <= viewConfiguration.doubleTapTimeoutMillis) {
                             if (plain && view.state.scene.layer(h.id)?.isPlainGroup == true) view.state.enterGroup(h.id)
                             lastHeaderId = null
-                        } else { lastHeaderId = h.id; lastClickId = null; lastClickTime = change.uptimeMillis }
+                        } else {
+                            if (wasSelected) view.state.clearSelection()
+                            lastHeaderId = h.id; lastClickId = null; lastClickTime = change.uptimeMillis
+                        }
                     }
                     Hit.Readout -> view.tap(h)
                     Hit.Empty, is Hit.Row -> view.state.clearSelection()

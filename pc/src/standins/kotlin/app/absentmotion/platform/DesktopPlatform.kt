@@ -388,3 +388,5 @@ fun rawFrameImage(rgba: ByteArray, width: Int, height: Int): ImageBitmap = org.j
 fun releaseFrameImage(image: ImageBitmap) {
     javax.swing.SwingUtilities.invokeLater { runCatching { image.asSkiaBitmap().close() } }
 }
+
+fun videoDownloader(): app.absentmotion.tools.VideoFetcher = app.absentmotion.tools.DeskVideoDownloader

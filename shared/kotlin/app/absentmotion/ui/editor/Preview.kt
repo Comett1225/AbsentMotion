@@ -151,11 +151,16 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
         else -> 8
     }
     val shownId = state.selectedId?.takeIf { handles != HIDDEN && !editingText } ?: 0
+    var blurSettled by remember { mutableStateOf(false) }
+    LaunchedEffect(state.timeMs, state.scene, state.playing) {
+        blurSettled = false
+        if (!state.playing) { kotlinx.coroutines.delay(300); blurSettled = true }
+    }
     val baseView = if (size.width > 0) PreviewView(
         0, scale * quality, dx * quality, dy * quality, shownId, handles,
         pixels = state.pixelMode, divisor = divisor, gridSpacing = if (state.gridMode) state.gridSpacing.toFloat() else 0f,
         solo = state.soloMode, soloIds = selection, camera = state.cameraMode, guides = state.snapGuides, refPx = refPx * quality,
-        accurateBlur = state.settings.fullMotionBlur,
+        accurateBlur = state.settings.fullMotionBlur || blurSettled,
     ) else null
     val cacheMatch by remember(state, mediaRevision) { derivedStateOf { cacheMatches(state, mediaRevision) } }
     val cacheUsable = cacheMatch && app.absentmotion.editor.cacheFrameSize(scene.width, scene.height, scale, divisor).first <= (PreviewCache.player?.width ?: 0) * 1.25f

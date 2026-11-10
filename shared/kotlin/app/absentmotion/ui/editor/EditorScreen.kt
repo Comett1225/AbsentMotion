@@ -45,6 +45,8 @@ import app.absentmotion.editor.stepBack
 import app.absentmotion.editor.ungroupSelected
 import app.absentmotion.ui.editor.panels.FullColorPicker
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.theme.Motion
+import androidx.compose.animation.core.tween
 import app.absentmotion.ui.theme.Presence
 import app.absentmotion.ui.theme.Swap
 import app.absentmotion.ui.theme.enterFade
@@ -55,6 +57,12 @@ import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 import app.absentmotion.ui.tutorial.tutorialGuard
 import app.absentmotion.ui.tutorial.tutorialTarget
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import kotlinx.coroutines.launch
+import androidx.compose.ui.platform.LocalContext
 
 internal val LocalEditorScope = staticCompositionLocalOf<CoroutineScope> { error("outside the editor") }
 
@@ -132,47 +140,83 @@ private fun EditorBody(state: EditorState, onExit: () -> Unit) {
         DeskWorkspace(state, onExit, addLibrary)
         return
     }
-    if (state.effectBrowserOpen) {
-        PhoneScreen(fillWidth = 720.dp) { Box(Modifier.fillMaxSize().enterFade()) { app.absentmotion.ui.editor.effects.EffectBrowser(state) } }
-        return
+    Box(Modifier.fillMaxSize()) {
+        if (wide) WideEditorBody(state, onExit, addLibrary) else PhoneEditorBody(state, onExit, addLibrary)
+        SlideOver(state.effectBrowserOpen) { PhoneScreen(fillWidth = 720.dp) { app.absentmotion.ui.editor.effects.EffectBrowser(state) } }
+        SlideOver(state.presetsOpen) { PhoneScreen { PresetScreen(state) } }
+        SlideOver(state.toolOpen != 0) { PhoneScreen(fillWidth = 720.dp) { EditorTools(state, LocalEditorScope.current) } }
     }
-    if (state.presetsOpen) {
-        PhoneScreen { Box(Modifier.fillMaxSize().enterFade()) { PresetScreen(state) } }
-        return
+}
+
+@Composable
+internal fun EditorTools(state: EditorState, scope: kotlinx.coroutines.CoroutineScope) {
+    val context = LocalContext.current
+    var shown by remember { mutableIntStateOf(state.toolOpen) }
+    if (state.toolOpen != 0) shown = state.toolOpen
+    var compressFrom by remember { mutableStateOf<android.net.Uri?>(null) }
+    val close = { state.toolOpen = 0 }
+    val add: (android.net.Uri) -> Unit = { uri ->
+        state.toolOpen = 0
+        val sound = uri.lastPathSegment.orEmpty().substringAfterLast('.', "").lowercase() in SoundFiles
+        scope.launch { if (sound) state.addSounds(context, listOf(uri)) else state.addPicked(context, uri) }
     }
-    if (wide) {
-        WideEditorBody(state, onExit, addLibrary)
-        return
-    }
-    androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxSize().background(Am.TopBar).systemBarsPadding().imePadding()) {
-        val available = maxHeight
-        Column(Modifier.fillMaxSize()) {
-            EditorTopBar(state, onExit, Modifier.fillMaxWidth().height(42.dp).enterFade().tutorialGuard(any = true))
-            Box(Modifier.fillMaxWidth().weight(1f).tutorialTarget("preview")) {
-                Preview(state, Modifier.fillMaxSize())
-                (state.drawing as? app.absentmotion.editor.PointMode)?.let { PointOverlay(state, it, Modifier.fillMaxSize()) }
-                Presence(state.previewPanelOpen) { PreviewModePanel(state, Modifier.align(Alignment.CenterEnd).presence(slideX = 0.4f).tutorialGuard(any = true)) }
-                AnimateButton(state, Modifier.align(Alignment.BottomEnd))
-                if (state.settings.transitionInPreview) TransitionButton(state, Modifier.align(Alignment.BottomStart).padding(12.dp).tutorialTarget("transition"))
-                HistoryNotes(state, Modifier.align(Alignment.BottomCenter))
-            }
-            Box(Modifier.fillMaxWidth().height(46.dp).enterFade().tutorialTarget("playbar")) {
-                PlayBar(state, Modifier.fillMaxSize().tutorialGuard(any = true))
-                LevelMeter(state, Modifier.align(Alignment.BottomStart).fillMaxWidth().height(2.1.dp))
-            }
-            val screen = LocalConfiguration.current
-            val wanted = if (isTablet(screen.smallestScreenWidthDp)) maxOf(280, screen.screenHeightDp * 2 / 5).dp else 280.dp
-            val lower = lowerPanelHeight(available, wanted)
-            val scroll = androidx.compose.foundation.rememberScrollState()
-            LaunchedEffect(scroll) { androidx.compose.runtime.snapshotFlow { scroll.maxValue }.collect { scroll.scrollTo(it) } }
-            Box(Modifier.fillMaxWidth().height(lower).enterFade().background(Am.TimelineBg).tutorialTarget("timeline").verticalScroll(scroll, enabled = lower < wanted)) {
-                Box(Modifier.fillMaxWidth().height(wanted)) {
-                    Timeline(state, Modifier.fillMaxSize())
-                    LowerPanels(state, addLibrary)
-                }
+    androidx.compose.runtime.CompositionLocalProvider(app.absentmotion.ui.home.LocalAddToProject provides add) {
+        Box(Modifier.fillMaxSize().background(Am.HomeBg)) {
+            when (shown) {
+                1 -> app.absentmotion.ui.home.CompressScreen(compressFrom) { close() }
+                2 -> app.absentmotion.ui.home.DownloaderScreen(state.store, state.settings, {}, { uri -> compressFrom = uri; state.toolOpen = 1 }) { close() }
+                3 -> app.absentmotion.ui.home.TrimScreen { close() }
+                4 -> app.absentmotion.ui.home.ExtractAudioScreen { close() }
+                5 -> app.absentmotion.ui.home.GifScreen { close() }
             }
         }
     }
+}
+
+private val SoundFiles = setOf("m4a", "mp3", "wav", "aac", "ogg", "opus", "flac")
+
+@Composable
+private fun SlideOver(open: Boolean, content: @Composable () -> Unit) {
+    androidx.compose.animation.AnimatedVisibility(
+        open,
+        enter = androidx.compose.animation.slideInHorizontally(tween(320, easing = Motion.EaseOut)) { it },
+        exit = androidx.compose.animation.slideOutHorizontally(tween(260, easing = Motion.EaseIn)) { it },
+    ) {
+        Box(Modifier.fillMaxSize().pointerInput(Unit) {}) { content() }
+    }
+}
+
+@Composable
+private fun PhoneEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: AddLibrary) {
+        androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxSize().background(Am.TopBar).systemBarsPadding().imePadding()) {
+            val available = maxHeight
+            Column(Modifier.fillMaxSize()) {
+                EditorTopBar(state, onExit, Modifier.fillMaxWidth().height(42.dp).enterFade().tutorialGuard(any = true))
+                Box(Modifier.fillMaxWidth().weight(1f).tutorialTarget("preview")) {
+                    Preview(state, Modifier.fillMaxSize())
+                    (state.drawing as? app.absentmotion.editor.PointMode)?.let { PointOverlay(state, it, Modifier.fillMaxSize()) }
+                    Presence(state.previewPanelOpen) { PreviewModePanel(state, Modifier.align(Alignment.CenterEnd).presence(slideX = 0.4f).tutorialGuard(any = true)) }
+                    AnimateButton(state, Modifier.align(Alignment.BottomEnd))
+                    if (state.settings.transitionInPreview) TransitionButton(state, Modifier.align(Alignment.BottomStart).padding(12.dp).tutorialTarget("transition"))
+                    HistoryNotes(state, Modifier.align(Alignment.BottomCenter))
+                }
+                Box(Modifier.fillMaxWidth().height(46.dp).enterFade().tutorialTarget("playbar")) {
+                    PlayBar(state, Modifier.fillMaxSize().tutorialGuard(any = true))
+                    LevelMeter(state, Modifier.align(Alignment.BottomStart).fillMaxWidth().height(2.1.dp))
+                }
+                val screen = LocalConfiguration.current
+                val wanted = if (isTablet(screen.smallestScreenWidthDp)) maxOf(280, screen.screenHeightDp * 2 / 5).dp else 280.dp
+                val lower = lowerPanelHeight(available, wanted)
+                val scroll = androidx.compose.foundation.rememberScrollState()
+                LaunchedEffect(scroll) { androidx.compose.runtime.snapshotFlow { scroll.maxValue }.collect { scroll.scrollTo(it) } }
+                Box(Modifier.fillMaxWidth().height(lower).enterFade().background(Am.TimelineBg).tutorialTarget("timeline").verticalScroll(scroll, enabled = lower < wanted)) {
+                    Box(Modifier.fillMaxWidth().height(wanted)) {
+                        Timeline(state, Modifier.fillMaxSize())
+                        LowerPanels(state, addLibrary)
+                    }
+                }
+            }
+        }
 }
 
 internal fun lowerPanelHeight(available: Dp, wanted: Dp): Dp = minOf(wanted, maxOf(available - EditorBars - MinPreview, MinLower))

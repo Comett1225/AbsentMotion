@@ -74,6 +74,19 @@ class DeskEngineFeaturesTest {
         } finally { engine.close() }
     }
 
+    @Test fun fastMotionBlurIsOneSmoothStreak() = runBlocking {
+        val xml = """<scene title="mb" width="640" height="120" totalTime="1000" fps="30" bgcolor="#ff000000"><shape id="1" startTime="0" endTime="999" fillType="color" mediaFillMode="fill" s=".rect"><transform><location><kf t="0" v="-300,60,0"/><kf t="1" v="7000,60,0"/></location></transform><fillColor value="#ffffffff"/><property name="size" type="vec2" value="20,40"/><effect id="absent.motionblur" hidden="false"/></shape></scene>"""
+        val engine = EngineThread(0xff000000.toInt(), context)
+        try {
+            val pixels = engine.exportSession(xml, Smoothing(), 30) { still(60, 640, 120) }!!
+            val steps = (0 until 639).map { x -> (pixels[(60 * 640 + x + 1) * 4].toInt() and 0xff) - (pixels[(60 * 640 + x) * 4].toInt() and 0xff) }.filter { kotlin.math.abs(it) > 1 }
+            val stripes = steps.zipWithNext().count { (a, b) -> a * b < 0 }
+            assertTrue("the streak shows $stripes stripes", stripes <= 2)
+            fun lit(x: Int) = pixels[(60 * 640 + x) * 4].toInt() and 0xff
+            assertTrue("the blur trails behind the layer like Alight's", lit(190) < 8 && lit(100) > 20)
+        } finally { engine.close() }
+    }
+
     @Test fun smoothingKeepsHigherRateSourceFrames() = runBlocking {
         val video = out.resolve("thirty.mp4")
         val process = ProcessBuilder(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-y", "-i", "../testdata/media/test-video.mp4",

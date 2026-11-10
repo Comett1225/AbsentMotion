@@ -326,6 +326,29 @@ data class Palette(
             PressHome = Color(0x12000000),
         )
 
+        val Dark = AbsentMotion.copy(
+            HomeBg = Color(0xFF111318),
+            Card = Color(0xFF1C1F27),
+            SheetBg = Color(0xFF181B22),
+            Navy = Color(0xFFF2F3F5),
+            HomeAccent = Color(0xFFFF7A45),
+            OnNavy = Color(0xFF111318),
+            OnNavyAccent = Color(0xFFB03F14),
+            NavyHi = Color(0xFFDADDE3),
+            NavyLine = Color(0xFFC9CDD4),
+            HomeInk = Color(0xFFF2F3F5),
+            HomeMid = Color(0xFFB4B9C3),
+            HomeDim = Color(0xFF9AA0AB),
+            HomeFaint = Color(0xFF5D636E),
+            HomeLine = Color(0xFF2A2E37),
+            HomePanel = Color(0xFF1F232B),
+            HomeDrawer = Color(0xFF171A20),
+            SwitchOff = Color(0xFF4A505B),
+            Thumb = Color(0xFF2A2E37),
+            MenuScrim = Color(0xCC111318),
+            PressHome = Color(0x14FFFFFF),
+        )
+
         val Daylight = Palette(
             TopBar = Color(0xFFFFFFFF),
             PreviewBg = Color(0xFFDDE0E6),
@@ -390,7 +413,7 @@ data class Palette(
             PressHome = Color(0x12000000),
         )
 
-        val BuiltIn: List<Pair<String, Palette>> = listOf("AbsentMotion" to AbsentMotion, "Daylight" to Daylight)
+        val BuiltIn: List<Pair<String, Palette>> = listOf("AbsentMotion" to AbsentMotion, "Dark" to Dark, "Daylight" to Daylight)
     }
 }
 

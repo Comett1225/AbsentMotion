@@ -449,3 +449,5 @@ fun rawFrameImage(rgba: ByteArray, width: Int, height: Int): androidx.compose.ui
     android.graphics.Bitmap.createBitmap(width, height, android.graphics.Bitmap.Config.ARGB_8888).apply { copyPixelsFromBuffer(java.nio.ByteBuffer.wrap(rgba)) }.androidImageBitmap()
 
 fun releaseFrameImage(image: androidx.compose.ui.graphics.ImageBitmap) = Unit
+
+fun videoDownloader(): app.absentmotion.tools.VideoFetcher = app.absentmotion.tools.VideoDownloader

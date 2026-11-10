@@ -324,9 +324,9 @@ private fun CaptionModelRow() {
 @Composable
 private fun DownloaderRow() {
     val context = LocalContext.current
-    var present by remember { mutableStateOf(app.absentmotion.tools.VideoDownloader.installed(context)) }
+    var present by remember { mutableStateOf(app.absentmotion.platform.videoDownloader().installed(context)) }
     var bytes by remember { mutableLongStateOf(-1L) }
-    androidx.compose.runtime.LaunchedEffect(present) { if (present) bytes = withContext(Dispatchers.IO) { app.absentmotion.tools.VideoDownloader.storedBytes(context) } }
+    androidx.compose.runtime.LaunchedEffect(present) { if (present) bytes = withContext(Dispatchers.IO) { app.absentmotion.platform.videoDownloader().storedBytes(context) } }
     if (!present) return
     var ask by remember { mutableStateOf(false) }
     val name = stringResource(R.string.downloader_engine_name)
@@ -338,7 +338,7 @@ private fun DownloaderRow() {
         confirmButton = {
             TextButton({
                 ask = false
-                app.absentmotion.tools.VideoDownloader.remove(context)
+                app.absentmotion.platform.videoDownloader().remove(context)
                 present = false
             }) { Text(stringResource(R.string.delete), color = Am.Navy) }
         },

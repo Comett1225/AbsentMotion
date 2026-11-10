@@ -22,7 +22,7 @@ To fit a picture to the canvas, use the layer menu: **Fit to Canvas** shows the 
 
 ## Speed
 
-Select a video or sound clip and tap **Speed** (the first small button of the tool grid). The **Time Remapping** panel opens. It has two tabs at the top, **Normal** and **Curve**. It opens on **Curve** when the clip already has a speed curve.
+Select a video or sound clip and tap **Speed** (the first small button of the tool grid). The **Time Remapping** panel opens. It has tabs at the top: **Normal**, **Curve** and, for videos, **Remap**. It opens on **Curve** when the clip already has a speed curve, and on **Remap** when Time Remap is on.
 
 ### Normal
 
@@ -64,6 +64,15 @@ Tap the chosen tile again to edit its curve. The editor shows the clip's picture
 - **Smooth** is a switch here: it is the same as the **Smooth** chip.
 
 ![The speed curve editor: the top bar with the name, the length and Reset (1), the curve (2) and the speed, Add point and Smooth (3).](img/media-curve-edit.webp)
+
+### Remap
+
+**Remap** picks which moment of the video shows at each point of the layer. Tap **Turn on Time Remap**: the clip keeps playing as before, with a keyframe at its start and its end. **Clip time** is the moment of the video under the playhead; drag the ruler or tap the number to change it, and the keyframe button on the left adds a keyframe there. Keyframes that go up play the clip forward, the same value twice **freezes** it, and keyframes that go down play it **backwards**. Easing between keyframes works as on any other setting.
+
+- **Reverse** turns the keyframes around, so the clip plays backwards.
+- **Turn off** removes Time Remap; the Normal or Curve speed comes back.
+
+The clip's sound is muted while Time Remap is on.
 
 ### Reverse
 

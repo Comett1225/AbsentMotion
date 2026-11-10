@@ -189,7 +189,8 @@ class AppSettings(private val context: Context) {
 
     private fun builtInThemeName(id: String) = when (id) {
         "Daylight" -> txt(R.string.theme_daylight)
-        else -> txt(R.string.theme_absentmotion)
+        "Dark" -> txt(R.string.theme_dark)
+        else -> txt(R.string.theme_light)
     }
 
     fun importTheme(text: String) {
@@ -211,6 +212,10 @@ class AppSettings(private val context: Context) {
     var templateHints: Int
         get() = prefs.getInt("templateHints", 0)
         set(value) { prefs.edit().putInt("templateHints", value).apply() }
+
+    var lookChosen: Boolean
+        get() = prefs.getBoolean("lookChosen", false) || themeState != Themes.DEFAULT
+        set(value) { prefs.edit().putBoolean("lookChosen", value).apply() }
 
     var onboarding: Int
         get() = prefs.getInt("onboarding", 0)

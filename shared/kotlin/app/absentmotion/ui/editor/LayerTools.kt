@@ -415,6 +415,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
         panel == EditorPanel.ColorFill && layer.fillType == "color" -> KeyTarget(PropRef.FillColor, formatColor(layer.fillColor))
         panel == EditorPanel.BorderShadow -> borderShadowTarget(layer)
         panel == EditorPanel.Blending -> KeyTarget(OpacityRef, "1.000000")
+        panel == EditorPanel.Speed && layer.node.child("timeRemap") != null -> KeyTarget(app.absentmotion.model.RemapRef, "0.000000")
         panel == EditorPanel.Frame && layer.picksFrames -> KeyTarget(FrameRef, formatFloats(floatArrayOf(layer.shownFrame(state.sampleMs.toDouble(), state.scene.fps).toFloat())))
         else -> null
     }

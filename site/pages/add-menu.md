@@ -8,7 +8,7 @@ The round **+** button at the bottom right of the timeline area opens the Add me
 
 New layers start at the playhead and last as long as the **New Layer Length** setting (2 seconds by default). Photos and shapes use that length; videos and sounds use their own length. Camera and light layers last the whole project.
 
-The menu has five tabs along the top (**Shape**, **Media**, **Audio**, **Object / Asset** and **Template**) and four quick buttons on the right. The X closes it.
+The menu has six tabs along the top (**Shape**, **Media**, **Audio**, **Object / Asset**, **Template** and **Tools**) and four quick buttons on the right. The X closes it.
 
 ![The Add menu: the five tabs (1) and the four quick buttons (2).](img/add-shape.webp)
 
@@ -67,3 +67,7 @@ Seven tiles for other kinds of layers.
 ## Template
 
 **View All** shows a full-screen grid of your saved templates, and below it each template has a tile. Tapping one opens the screen where you swap in your own media. With no templates yet, the page says "There's nothing here. Projects you save as templates show up here." See [Assets, templates and presets](@assets-templates).
+
+## Tools
+
+The **Tools** tab opens the same tools as the Tools tab on the Home screen without leaving the editor: **Compress**, **Trim**, **Extract Audio**, **Make a GIF** and the **Video Downloader**. When a tool is done, **Add to project** puts its result in the project as a new layer at the playhead (sounds go on a sound layer); **Save** still saves it to the gallery. On a computer, the tools are under **Tools** at the bottom of the left rail.

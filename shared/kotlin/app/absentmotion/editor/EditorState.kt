@@ -192,6 +192,8 @@ class EditorState(
 
     var presetsOpen by mutableStateOf(false)
 
+    var toolOpen by mutableStateOf(0)
+
     var effectBrowserOpen by mutableStateOf(false)
     var effectCategory by mutableStateOf<String?>(null)
     var audioFxFocus by mutableStateOf<Int?>(null)

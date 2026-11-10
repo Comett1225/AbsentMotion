@@ -1,0 +1,74 @@
+{
+ "id": "pagecurl",
+ "name": "Page Curl",
+ "category": "distort",
+ "since": "5.1.0",
+ "description": "Turns the layer like a page: a corner lifts and rolls over, showing the back of the page. Animate Progress to turn the page.",
+ "params": [
+  {
+   "id": "progress",
+   "label": "Progress",
+   "type": "float",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "radius",
+   "label": "Radius",
+   "type": "float",
+   "default": 0.1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "angle",
+   "label": "Angle",
+   "type": "angle",
+   "default": 38,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.1
+  },
+  {
+   "id": "backColor",
+   "label": "Back Color",
+   "type": "color",
+   "default": "#888888"
+  },
+  {
+   "id": "backAlpha",
+   "label": "Back Opacity",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "shine",
+   "label": "Shine",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  },
+  {
+   "id": "shadow",
+   "label": "Shadow",
+   "type": "float",
+   "default": 0.8,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float progress;\nuniform float radius;\nuniform float angle;\nlayout(color) uniform half4 backColor;\nuniform float backAlpha;\nuniform float shine;\nuniform float shadow;\nbool inside(float2 q) {\n    return q.x >= 0.0 && q.y >= 0.0 && q.x <= size.x && q.y <= size.y;\n}\nhalf4 backOf(float2 q, float light) {\n    half4 c = image.eval(q);\n    return half4(mix(c.rgb, backColor.rgb * c.a, half(clamp(backAlpha, 0.0, 1.0))) * half(light), c.a);\n}\nhalf4 main(float2 p) {\n    float a = radians(angle);\n    float2 d = float2(cos(a), sin(a));\n    float s0 = min(0.0, d.x * size.x) + min(0.0, d.y * size.y);\n    float s1 = max(0.0, d.x * size.x) + max(0.0, d.y * size.y);\n    float r = max(radius, 0.001) * min(size.x, size.y);\n    float pi = 3.14159265;\n    float fold = s1 - clamp(progress, 0.0, 1.0) * (s1 - s0 + pi * r);\n    float s = dot(p, d);\n    float2 base = p - s * d;\n    if (s <= fold) {\n        half4 page = image.eval(p);\n        float over = 2.0 * fold + pi * r - s;\n        float2 q = base + over * d;\n        if (over <= s1 && inside(q)) {\n            half4 b = backOf(q, 0.9);\n            return b + page * (1.0 - b.a);\n        }\n        return page;\n    }\n    if (s < fold + r) {\n        float k = clamp((s - fold) / r, 0.0, 1.0);\n        float back = fold + r * (pi - asin(k));\n        float2 q = base + back * d;\n        if (back <= s1 && inside(q)) return backOf(q, 0.7 + 0.3 * k);\n        float front = fold + r * asin(k);\n        float2 f = base + front * d;\n        if (inside(f)) {\n            half4 c = image.eval(f);\n            half glow = half(clamp(shine, 0.0, 1.0) * pow(1.0 - abs(k * 2.0 - 1.0), 4.0) * 0.5);\n            return half4(min(c.rgb * half(1.0 - 0.3 * k) + glow * c.a, half3(c.a)), c.a);\n        }\n        return half4(0.0);\n    }\n    float fade = 1.0 - (s - fold - r) / (0.6 * r);\n    if (fade > 0.0 && inside(p)) return half4(0.0, 0.0, 0.0, half(clamp(shadow, 0.0, 1.0) * fade * 0.5));\n    return half4(0.0);\n}\n"
+}

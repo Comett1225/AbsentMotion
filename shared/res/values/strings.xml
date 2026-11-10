@@ -5,6 +5,7 @@
     <string name="action_close">Close</string>
     <string name="settings_language">Language</string>
     <string name="onboarding_language_title">Choose your language</string>
+    <string name="onboarding_look_title">Light or dark?</string>
     <string name="onboarding_language_others">Other languages</string>
     <string name="onboarding_language_later">You can change this later in Settings.</string>
     <string name="onboarding_check_title">Check what this device can do</string>
@@ -290,7 +291,8 @@
     <string name="update_reconnecting">Connection lost. Trying again…</string>
     <string name="update_external">This copy did not come from an AbsentMotion GitHub release, so it cannot update itself. Get the update from where you installed it.</string>
     <string name="update_metered">This connection is metered, for example mobile data. The download may use up your data plan.</string>
-    <string name="theme_absentmotion">AbsentMotion</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
     <string name="theme_daylight">Daylight</string>
     <string name="theme_custom">Custom</string>
     <string name="theme_custom_named">Custom (%1$s)</string>
@@ -497,10 +499,12 @@
     <string name="downloader_rights">Only download what you have the right to use.</string>
     <string name="downloader_engine_title">Downloads need an add-on</string>
     <string name="downloader_engine_about">A one-time download of %1$s. It brings Python and yt-dlp, the free tools that do the downloading. You can remove it in Settings.</string>
+    <string name="downloader_engine_about_desktop">A one-time download of %1$s. It brings yt-dlp, the free program that does the downloading. You can remove it in Settings.</string>
     <string name="downloader_engine_get">Get the add-on</string>
     <string name="downloader_engine_getting">Getting the add-on… %1$d%%</string>
     <string name="downloader_engine_failed">The add-on could not be downloaded. Check the connection and try again.</string>
     <string name="downloader_engine_missing">Get the add-on first.</string>
+    <string name="downloader_engine_blocked">The downloader program is missing or was blocked by your antivirus. Allow it, or remove it in Settings and get it again.</string>
     <string name="downloader_engine_broken">The add-on did not start. Remove it in Settings and get it again.</string>
     <string name="downloader_restart">Close AbsentMotion and open it again to finish setting up the add-on.</string>
     <string name="downloader_engine_unavailable">Video downloads need a phone with a 64-bit processor.</string>
@@ -887,6 +891,7 @@
     <string name="add_tab_audio">Audio</string>
     <string name="add_tab_object_asset">Object / Asset</string>
     <string name="add_tab_template">Template</string>
+    <string name="add_tab_tools">Tools</string>
     <string name="add_quick_freehand_brush">Freehand Brush</string>
     <string name="add_quick_pen_tool">Pen Tool</string>
     <string name="add_quick_text">Text</string>
@@ -1375,6 +1380,12 @@
     <string name="speed_reverse_minutes_left">About %1$s min left</string>
     <string name="speed_normal">Normal</string>
     <string name="speed_curve">Curve</string>
+    <string name="speed_remap">Remap</string>
+    <string name="remap_about">Pick which moment of the clip shows at each point. Add keyframes to speed it up, freeze it or play it backwards. The clip\'s sound is muted while Time Remap is on.</string>
+    <string name="remap_turn_on">Turn on Time Remap</string>
+    <string name="remap_clip_time">Clip time</string>
+    <string name="remap_reverse">Reverse</string>
+    <string name="remap_turn_off">Turn off</string>
     <string name="speed_curve_custom">Custom</string>
     <string name="speed_curve_edit_hint">Tap the chosen curve again to edit it</string>
     <string name="speed_curve_graph">Speed curve</string>
@@ -2303,6 +2314,7 @@
     <string name="tools_too_big">This is too big for this phone. Try a smaller size or a shorter part.</string>
     <string name="tools_failed">Could not finish: %1$s</string>
     <string name="tools_save">Save</string>
+    <string name="tools_add_to_project">Add to project</string>
     <string name="tools_part">Part to keep</string>
     <string name="tools_start">Start</string>
     <string name="tools_end">End</string>

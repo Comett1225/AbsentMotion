@@ -198,6 +198,7 @@ private fun DeskWorkspaceBody(state: EditorState, onExit: () -> Unit, library: A
         DeskDropGhost { rootOrigin }
         if (settings) DeskProject(state) { settings = false }
         if (state.effectBrowserOpen) DeskDialog(null, 1200.dp, { state.effectBrowserOpen = false }, height = 960.dp) { app.absentmotion.ui.editor.effects.EffectBrowser(state) }
+        if (state.toolOpen != 0) DeskDialog(null, 760.dp, { state.toolOpen = 0 }, height = 900.dp) { app.absentmotion.ui.editor.EditorTools(state, app.absentmotion.ui.editor.LocalEditorScope.current) }
         if (state.presetsOpen) DeskDialog(null, 800.dp, { state.presetsOpen = false }, height = 880.dp) { PresetScreen(state) }
         if (state.drawing != null && state.drawing !is PointMode) PhoneScreen(Dp.Infinity, onDismiss = { state.stepBack(); focus.clearFocus() }) { DrawingEditor(state) }
         DeskTemplateEmbed(state)

@@ -229,7 +229,9 @@ class MainActivity : ComponentActivity() {
         importShared()
         setContent {
             val open = editor
-            val light = if (open == null && editingTemplate == null) Am.homeIsLight else Am.editorIsLight
+            val light = if ((open == null || open.toolOpen != 0) && editingTemplate == null) Am.homeIsLight else Am.editorIsLight
+            val homeBg = Am.HomeBg
+            LaunchedEffect(homeBg) { window.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(homeBg.toArgb())) }
             LaunchedEffect(light) {
                 val transparent = android.graphics.Color.TRANSPARENT
                 enableEdgeToEdge(if (light) SystemBarStyle.light(transparent, transparent) else SystemBarStyle.dark(transparent))

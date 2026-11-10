@@ -58,7 +58,9 @@ fun DeskOnboarding(settings: AppSettings, first: FirstRun, onDone: () -> Unit) {
     var step by remember { mutableStateOf(first.step) }
     val initial = remember { phoneLanguage(context) }
     var chosen by remember { mutableStateOf(initial) }
-    DeskBack.Handler(step == OnboardingStep.Check) { step = OnboardingStep.Language }
+    DeskBack.Handler(step == OnboardingStep.Check || step == OnboardingStep.Look && settings.onboarding < ONBOARDING_DONE) {
+        step = if (step == OnboardingStep.Check) OnboardingStep.Look else OnboardingStep.Language
+    }
     Box(Modifier.fillMaxSize().background(Am.HomeBg), Alignment.TopCenter) {
         Column(Modifier.widthIn(max = 760.dp).fillMaxSize().padding(horizontal = 32.dp, vertical = 36.dp)) {
             when (step) {
@@ -75,9 +77,12 @@ fun DeskOnboarding(settings: AppSettings, first: FirstRun, onDone: () -> Unit) {
                         DeskButton(stringResource(R.string.action_continue), {
                             settings.onboarding = ONBOARDING_LANGUAGE_CHOSEN
                             applyLanguage(context, chosen)
-                            step = OnboardingStep.Check
+                            step = if (settings.lookChosen) OnboardingStep.Check else OnboardingStep.Look
                         }, primary = true, minWidth = 140.dp, height = 40.dp)
                     }
+                }
+                OnboardingStep.Look -> LookStep(settings) {
+                    if (settings.onboarding >= ONBOARDING_DONE) onDone() else step = OnboardingStep.Check
                 }
                 OnboardingStep.Check -> {
                     var updates by remember { mutableStateOf(settings.checkUpdates) }
@@ -94,7 +99,7 @@ fun DeskOnboarding(settings: AppSettings, first: FirstRun, onDone: () -> Unit) {
                         ThinSwitch(updates, enabled = true, offTrack = Am.SwitchOff, onTrack = Am.HomeAccent.copy(alpha = 0.5f), onThumb = Am.HomeAccent, onChange = { updates = it })
                     }
                     Row(Modifier.padding(top = 24.dp).fillMaxWidth(), Arrangement.spacedBy(10.dp, Alignment.End)) {
-                        DeskButton(stringResource(R.string.topbar_back), { step = OnboardingStep.Language }, height = 40.dp)
+                        DeskButton(stringResource(R.string.topbar_back), { step = OnboardingStep.Look }, height = 40.dp)
                         DeskButton(stringResource(R.string.desk_welcome_start), {
                             settings.chooseUpdates(updates)
                             settings.onboarding = ONBOARDING_DONE

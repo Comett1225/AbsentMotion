@@ -21,6 +21,7 @@ import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -51,10 +52,16 @@ import app.absentmotion.ai.reverseMark
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.freezeFrame
 import app.absentmotion.editor.retimeVideo
+import app.absentmotion.editor.reverseRemap
+import app.absentmotion.editor.turnOffRemap
+import app.absentmotion.editor.turnOnRemap
 import app.absentmotion.editor.setVideoSpeed
 import app.absentmotion.model.CurvePoint
 import app.absentmotion.model.FASTEST_SPEED
 import app.absentmotion.model.Layer
+import app.absentmotion.model.RemapRef
+import app.absentmotion.model.VideoTiming
+import app.absentmotion.model.remapped
 import app.absentmotion.model.SLOWEST_SPEED
 import app.absentmotion.model.SpeedTicks
 import app.absentmotion.model.isKeyframed
@@ -77,17 +84,21 @@ fun SpeedPanel(state: EditorState, layer: Layer, modifier: Modifier = Modifier) 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val ai = remember(state, context, scope) { AiTools(context.applicationContext, state, scope) }
-    var curveTab by remember(layer.id) { mutableStateOf(layer.node.child("speedMap")?.isKeyframed == true) }
+    val video = layer.mediaFill?.video == true
+    var tab by remember(layer.id) { mutableIntStateOf(if (layer.remapped && video) 2 else if (layer.node.child("speedMap")?.isKeyframed == true) 1 else 0) }
     var editing by remember(layer.id) { mutableStateOf<List<CurvePoint>?>(null) }
     BackHandler(editing != null) { editing = null }
     Swap(editing != null, modifier, rise = 0.dp) {
         val base = editing
         if (base != null) SpeedCurveEditor(state, layer, ai, base, { editing = null }, Modifier.fillMaxSize())
         else Column(Modifier.fillMaxSize()) {
-            SpeedTabs(curveTab, Modifier.padding(top = 8.dp).align(Alignment.CenterHorizontally)) { curveTab = it }
-            Swap(curveTab, Modifier.fillMaxWidth().weight(1f), rise = 0.dp) {
-                if (curveTab) CurvePresets(state, layer, Modifier.fillMaxSize()) { editing = it }
-                else NormalSpeed(state, layer, ai, Modifier.fillMaxSize())
+            SpeedTabs(tab, if (video) 3 else 2, Modifier.padding(top = 8.dp).align(Alignment.CenterHorizontally)) { tab = it }
+            Swap(tab, Modifier.fillMaxWidth().weight(1f), rise = 0.dp) {
+                when (tab) {
+                    1 -> CurvePresets(state, layer, Modifier.fillMaxSize()) { editing = it }
+                    2 -> RemapTime(state, layer, Modifier.fillMaxSize())
+                    else -> NormalSpeed(state, layer, ai, Modifier.fillMaxSize())
+                }
             }
         }
     }
@@ -96,18 +107,52 @@ fun SpeedPanel(state: EditorState, layer: Layer, modifier: Modifier = Modifier) 
 }
 
 @Composable
-private fun SpeedTabs(curve: Boolean, modifier: Modifier, choose: (Boolean) -> Unit) {
+private fun SpeedTabs(current: Int, count: Int, modifier: Modifier, choose: (Int) -> Unit) {
     Row(modifier.height(28.dp).clip(PanelShape).background(Am.Field)) {
-        for (option in listOf(false, true)) {
-            val chosen = option == curve
+        for (option in 0 until count) {
+            val chosen = option == current
             Box(
                 Modifier.width(92.dp).fillMaxHeight().clip(PanelShape).fadeBackground(chosen, PanelDark)
                     .semantics { selected = chosen }.clickable(role = Role.Tab) { choose(option) },
                 Alignment.Center,
             ) {
-                Text(stringResource(if (option) R.string.speed_curve else R.string.speed_normal), color = animatedColor(if (chosen) Am.Accent else Am.OnDark),
+                Text(stringResource(SpeedTabNames[option]), color = animatedColor(if (chosen) Am.Accent else Am.OnDark),
                     fontSize = 12.5.sp, maxLines = 1, softWrap = false)
             }
+        }
+    }
+}
+
+private val SpeedTabNames = listOf(R.string.speed_normal, R.string.speed_curve, R.string.speed_remap)
+
+@Composable
+private fun RemapTime(state: EditorState, layer: Layer, modifier: Modifier) {
+    if (!layer.remapped) {
+        Column(modifier.padding(horizontal = 24.dp, vertical = 12.dp), Arrangement.spacedBy(12.dp), Alignment.CenterHorizontally) {
+            Text(stringResource(R.string.remap_about), color = Am.OnDarkDim, fontSize = 13.sp, textAlign = TextAlign.Center)
+            RampChip(stringResource(R.string.remap_turn_on), true, modifier = Modifier.height(36.dp)) { state.turnOnRemap() }
+        }
+        return
+    }
+    val local = (state.sampleMs - layer.startTime).coerceIn(0, (layer.endTime - layer.startTime).coerceAtLeast(0))
+    val seconds = remember(layer.node, local) { (VideoTiming(layer).mediaMs(local.toDouble()) / 1000).toFloat() }
+    val longest = ((layer.mediaFill?.let { state.scene.media(it.uri)?.duration } ?: 0L) / 1_000_000f).coerceAtLeast(seconds)
+    val label = stringResource(R.string.remap_clip_time)
+    Column(modifier.padding(top = 8.dp), Arrangement.spacedBy(8.dp)) {
+        Text(label, Modifier.padding(horizontal = 15.dp), color = Am.OnDarkDim, fontSize = 12.sp)
+        Row(Modifier.padding(horizontal = 15.dp).fillMaxWidth().height(48.dp), verticalAlignment = Alignment.CenterVertically) {
+            EffectRuler(seconds, 1f / state.scene.fps, 0f, longest, true, {}, { v -> state.setNumber(RemapRef, v.coerceIn(0f, longest), "remap") }, state::endGesture,
+                Modifier.weight(1f).fillMaxHeight(), null, state.settings.vibration)
+            Box(
+                Modifier.padding(start = 8.dp).width(88.dp).height(40.dp).clip(PanelShape).background(Am.Field)
+                    .clickable(role = Role.Button) { state.askNumber(label, seconds, "s", 0f, longest) { state.setNumber(RemapRef, it); state.endGesture() } }
+                    .padding(horizontal = 8.dp),
+                Alignment.CenterEnd,
+            ) { Text(formatFixed(seconds, 2) + "s", color = Am.OnDark, fontSize = 13.sp, maxLines = 1) }
+        }
+        Row(Modifier.fillMaxWidth().height(34.dp).padding(horizontal = 15.dp), Arrangement.spacedBy(6.dp)) {
+            RampChip(stringResource(R.string.remap_reverse), true) { state.reverseRemap() }
+            RampChip(stringResource(R.string.remap_turn_off), true) { state.turnOffRemap() }
         }
     }
 }
