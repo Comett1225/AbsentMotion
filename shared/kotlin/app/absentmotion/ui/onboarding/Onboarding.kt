@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -75,6 +74,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.util.Locale
+import androidx.compose.foundation.layout.aspectRatio
 
 const val ONBOARDING_LANGUAGE_CHOSEN = 1
 const val ONBOARDING_DONE = 2
@@ -135,7 +135,7 @@ fun LookStep(settings: AppSettings, onContinue: () -> Unit) {
     Column(Modifier.fillMaxSize().enterFade()) {
         Heading(stringResource(R.string.onboarding_look_title))
         Box(Modifier.fillMaxWidth().weight(1f).padding(horizontal = 16.dp, vertical = 12.dp), Alignment.Center) {
-            Row(Modifier.fillMaxWidth().heightIn(max = 460.dp).fillMaxHeight(), Arrangement.spacedBy(12.dp)) {
+            Row(Modifier.widthIn(max = 520.dp).fillMaxWidth(), Arrangement.spacedBy(12.dp), Alignment.CenterVertically) {
                 LookCard(settings, "AbsentMotion", app.absentmotion.ui.theme.Palette.AbsentMotion, R.string.theme_light, Modifier.weight(1f))
                 LookCard(settings, "Dark", app.absentmotion.ui.theme.Palette.Dark, R.string.theme_dark, Modifier.weight(1f))
             }
@@ -157,31 +157,48 @@ fun LookStep(settings: AppSettings, onContinue: () -> Unit) {
 private fun LookCard(settings: AppSettings, id: String, p: app.absentmotion.ui.theme.Palette, label: Int, modifier: Modifier) {
     val chosen = settings.theme == id
     val shape = RoundedCornerShape(16.dp)
+    val ring by androidx.compose.animation.animateColorAsState(if (chosen) Am.HomeAccent else Am.HomeLine, app.absentmotion.ui.theme.Motion.fast(), label = "look ring")
     Column(
-        modifier.fillMaxHeight().clip(shape).border(if (chosen) 2.dp else 1.dp, if (chosen) Am.HomeAccent else Am.HomeLine, shape)
-            .selectable(chosen, role = Role.RadioButton) { settings.theme = id }.padding(10.dp),
+        modifier.clip(shape).border(2.dp, ring, shape)
+            .selectable(chosen, role = Role.RadioButton) { if (!chosen) app.absentmotion.ui.theme.ThemeFade.change { settings.theme = id } }.padding(10.dp),
     ) {
-        androidx.compose.foundation.Canvas(Modifier.fillMaxWidth().weight(1f).clip(RoundedCornerShape(10.dp))) {
-            val u = size.width / 12f
-            val round = androidx.compose.ui.geometry.CornerRadius(u * 0.6f)
-            fun box(c: Color, x: Float, y: Float, w: Float, h: Float) = drawRoundRect(c, androidx.compose.ui.geometry.Offset(x, y), androidx.compose.ui.geometry.Size(w, h), round)
-            drawRect(p.HomeBg)
-            box(p.Navy, u, u * 1.2f, u * 4f, u * 1.4f)
-            box(p.HomePanel, u * 5.6f, u * 1.2f, u * 4f, u * 1.4f)
-            var y = u * 3.8f
-            while (y + u * 2.6f < size.height - u * 3.6f) {
-                box(p.Card, u, y, size.width - u * 2f, u * 2.6f)
-                box(p.HomeLine, u * 1.4f, y + u * 0.3f, u * 2f, u * 2f)
-                box(p.HomeFaint, u * 4f, y + u * 0.6f, u * 5f, u * 0.5f)
-                box(p.HomeLine, u * 4f, y + u * 1.5f, u * 3.5f, u * 0.45f)
-                y += u * 3.2f
-            }
-            drawCircle(p.HomeAccent, u * 1.2f, androidx.compose.ui.geometry.Offset(size.width / 2f, size.height - u * 2f))
-        }
+        HomeSketch(p, Modifier.fillMaxWidth().aspectRatio(0.6f).clip(RoundedCornerShape(12.dp)))
         Row(Modifier.fillMaxWidth().padding(top = 10.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(label), Modifier.weight(1f), color = Am.HomeInk, fontSize = 16.sp, fontWeight = FontWeight.Medium)
             if (chosen) Icon(PanelIcons.Check, null, Modifier.size(20.dp), tint = Am.HomeAccent)
         }
+    }
+}
+
+@Composable
+private fun HomeSketch(p: app.absentmotion.ui.theme.Palette, modifier: Modifier) {
+    androidx.compose.foundation.Canvas(modifier) {
+        val u = size.width / 20f
+        val corner = androidx.compose.ui.geometry.CornerRadius(u * 0.7f)
+        fun box(c: Color, x: Float, y: Float, w: Float, h: Float, r: androidx.compose.ui.geometry.CornerRadius = corner) =
+            drawRoundRect(c, androidx.compose.ui.geometry.Offset(x, y), androidx.compose.ui.geometry.Size(w, h), r)
+        val pill = androidx.compose.ui.geometry.CornerRadius(u * 2f)
+        drawRect(p.HomeBg)
+        for (i in 0..2) box(p.HomeInk, u * 1.2f, u * (1.6f + i * 0.7f), u * 2.2f, u * 0.32f, androidx.compose.ui.geometry.CornerRadius(u))
+        box(p.HomeInk, u * 6.5f, u * 1.85f, u * 7f, u * 0.9f, androidx.compose.ui.geometry.CornerRadius(u * 0.45f))
+        box(p.Navy, u * 1.2f, u * 4.6f, u * 5.6f, u * 2.2f, pill)
+        box(p.HomePanel, u * 7.4f, u * 4.6f, u * 5f, u * 2.2f, pill)
+        box(p.HomeInk, u * 1.2f, u * 8.4f, u * 7.5f, u * 0.9f, androidx.compose.ui.geometry.CornerRadius(u * 0.45f))
+        box(p.HomeFaint, u * 1.2f, u * 10.4f, u * 5f, u * 0.6f, androidx.compose.ui.geometry.CornerRadius(u * 0.3f))
+        var y = u * 11.8f
+        val bar = size.height - u * 4.4f
+        while (y + u * 5f < bar - u * 0.6f) {
+            box(p.Card, u * 1.2f, y, size.width - u * 2.4f, u * 5f)
+            box(p.HomeLine, u * 1.8f, y + u * 0.6f, u * 3.8f, u * 3.8f, androidx.compose.ui.geometry.CornerRadius(u * 0.5f))
+            box(p.HomeInk, u * 6.4f, y + u * 1.1f, u * 7.2f, u * 0.8f, androidx.compose.ui.geometry.CornerRadius(u * 0.4f))
+            box(p.HomeFaint, u * 6.4f, y + u * 2.6f, u * 4.6f, u * 0.55f, androidx.compose.ui.geometry.CornerRadius(u * 0.3f))
+            box(p.HomeFaint, u * 6.4f, y + u * 3.5f, u * 3.6f, u * 0.55f, androidx.compose.ui.geometry.CornerRadius(u * 0.3f))
+            for (d in 0..2) drawCircle(p.HomeFaint, u * 0.22f, androidx.compose.ui.geometry.Offset(size.width - u * 3.2f + d * u * 0.7f, y + u * 2.5f))
+            y += u * 5.8f
+        }
+        drawRect(p.Card, androidx.compose.ui.geometry.Offset(0f, bar), androidx.compose.ui.geometry.Size(size.width, size.height - bar))
+        for (x in listOf(0.18f, 0.66f, 0.86f)) box(p.HomeMid, size.width * x - u * 0.7f, bar + u * 1.3f, u * 1.4f, u * 1.4f, androidx.compose.ui.geometry.CornerRadius(u * 0.3f))
+        drawCircle(p.HomeAccent, u * 2.1f, androidx.compose.ui.geometry.Offset(size.width * 0.42f, bar + u * 0.4f))
     }
 }
 

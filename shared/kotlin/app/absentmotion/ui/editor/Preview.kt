@@ -152,9 +152,10 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
     }
     val shownId = state.selectedId?.takeIf { handles != HIDDEN && !editingText } ?: 0
     var blurSettled by remember { mutableStateOf(false) }
+    val blurred = remember(state.scene) { state.scene.node.hasEffect(setOf("absent.motionblur", "absent.shutterblur")) }
     LaunchedEffect(state.timeMs, state.scene, state.playing) {
         blurSettled = false
-        if (!state.playing) { kotlinx.coroutines.delay(300); blurSettled = true }
+        if (!state.playing && blurred) { kotlinx.coroutines.delay(300); blurSettled = true }
     }
     val baseView = if (size.width > 0) PreviewView(
         0, scale * quality, dx * quality, dy * quality, shownId, handles,
@@ -705,3 +706,6 @@ private fun LayerPointsOverlay(points: LayerPoints, world: FloatArray, scale: Fl
         }
     }
 }
+
+private fun app.absentmotion.model.XmlNode.hasEffect(ids: Set<String>): Boolean =
+    (name == "effect" && this["id"] in ids && this["hidden"] != "true") || children.any { it.hasEffect(ids) }

@@ -166,7 +166,7 @@ internal fun installerExtensions(os: String, site: InstallSite? = installSite())
     else -> emptyList()
 }
 
-internal fun installerExtension(name: String): String? = listOf(".dmg", ".msi", ".exe", ".deb", ".rpm", ".appimage", ".tar.gz", ".zip").firstOrNull { name.endsWith(it, ignoreCase = true) }
+internal fun installerExtension(name: String): String? = listOf(".dmg", ".msi", ".exe", ".ampack", ".deb", ".rpm", ".appimage", ".tar.gz", ".zip").firstOrNull { name.endsWith(it, ignoreCase = true) }
 
 internal fun installerName(names: List<String>, version: String, os: String = System.getProperty("os.name").orEmpty(), arch: String = System.getProperty("os.arch").orEmpty(), site: InstallSite? = installSite()): String? {
     val own = installerExtensions(os, site)

@@ -190,7 +190,7 @@ private fun Layer.matteSize(frameWidth: Int, frameHeight: Int): XmlNode {
 
 private fun XmlNode.isMatteSize() = name == "property" && this["name"] == "size"
 
-private val MatteFollowedChildren = setOf("transform", "speedMap", "gain", "effect")
+private val MatteFollowedChildren = setOf("transform", "speedMap", "timeRemap", "gain", "effect")
 
 private fun XmlNode.isFollowedEffect() = this["id"] == "absent.timequant" || this["id"] in MatteFollowedEffects
 
@@ -205,7 +205,7 @@ internal fun Layer.followingOriginal(original: Layer): Layer {
     val own = effects.filter { it !== key && !it.isFollowedEffect() }
     val kept = node.children.filterNot { it.name in MatteFollowedChildren || it.isMatteSize() }
     val attrs = MatteTimeAttributes.fold(node) { acc, name -> acc.with(name, original.node[name]) }.with("noiseId", "${original.id}")
-    return copy(node = attrs.copy(children = listOfNotNull(transform, original.node.child("speedMap"), size, node.child("gain")) + kept + moving + key + own))
+    return copy(node = attrs.copy(children = listOfNotNull(transform, original.node.child("speedMap"), original.node.child("timeRemap"), size, node.child("gain")) + kept + moving + key + own))
 }
 
 internal fun Scene.withVideoMatte(original: Layer, matte: MediaDeclaration, frameWidth: Int, frameHeight: Int, matteId: Long, groupId: Long): Scene? {

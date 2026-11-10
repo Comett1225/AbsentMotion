@@ -117,6 +117,7 @@ import java.io.File
 import app.absentmotion.ui.home.WhatsNewDialog
 import app.absentmotion.ui.home.WhatsNewNotes
 import app.absentmotion.platform.LocalContext
+import app.absentmotion.ui.theme.enterZoom
 
 private val PaletteFiles = setOf("gpl", "ase", "act", "pal")
 
@@ -532,7 +533,7 @@ private fun DeskContent(app: DeskAppState, scale: Float) {
                     app.exportingFromList?.let { ExportScreen(it, 0, app.engine, fromProjectList = true, null) { app.exportingFromList = null } }
                 }
             } else {
-                Box(Modifier.fillMaxSize()) {
+                Box(Modifier.fillMaxSize().enterZoom()) {
                     CompositionLocalProvider(LocalDensity provides Density(density.density, density.fontScale.coerceAtMost(1.3f))) {
                         key(open) { Ltr { EditorScreen(open, onExit = { scope.launch { app.closeEditor() } }) } }
                     }

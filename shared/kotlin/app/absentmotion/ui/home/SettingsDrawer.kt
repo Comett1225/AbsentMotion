@@ -606,7 +606,7 @@ private fun ThemeRow(settings: AppSettings) {
                 Icon(HomeIcons.ChevronDown, null, Modifier.size(24.dp), tint = Am.Navy)
             }
             RefMenu(open, { open = false }, Am.Navy, shape, Modifier.width(210.dp), maxHeight = 327.dp) {
-                for ((id, label) in settings.themes) ThemeItem(label.text(), id == settings.theme) { settings.theme = id; open = false }
+                for ((id, label) in settings.themes) ThemeItem(label.text(), id == settings.theme) { open = false; if (id != settings.theme) app.absentmotion.ui.theme.ThemeFade.change { settings.theme = id } }
                 Box(Modifier.fillMaxWidth().height(1.dp).background(ListLineColor))
                 ThemeItem(stringResource(R.string.settings_import_theme), false) { open = false; picker.launch() }
             }

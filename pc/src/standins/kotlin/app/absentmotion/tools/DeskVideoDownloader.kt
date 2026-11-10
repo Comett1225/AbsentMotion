@@ -165,7 +165,8 @@ object DeskVideoDownloader : VideoFetcher {
                 val quality = (if (items.size > 1) options.getOrNull(defaultQuality(options, itemMode)) else options.getOrNull(choice))
                     ?: if (items.size > 1) continue else throw DownloadProblem(R.string.downloader_error_novideo)
                 val start = index * share
-                val file = fetchTo(exe, url, if (items.size > 1) index + 1 else 0, quality.plan, itemMode, File(work, "item$index"), DeskMedia.ffmpeg) { progress(start + share * 0.95f * it) }
+                val fetched = fetchTo(exe, url, if (items.size > 1) index + 1 else 0, quality.plan, itemMode, File(work, "item$index"), DeskMedia.ffmpeg) { progress(start + share * 0.95f * it) }
+                val file = if (itemMode == SaveMode.VideoOnly && quality.plan.video?.hasAudio == true) withoutAudio(fetched, DeskMedia.ffmpeg) else fetched
                 val (mime, extension) = typeOf(file)
                 val saveName = "$name.$extension"
                 val uri: Uri = withContext(Dispatchers.IO) { MediaStoreExport(context).save(null, saveName, mime) { out -> file.inputStream().use { it.copyTo(out) } } }
@@ -313,4 +314,13 @@ private fun clear(dir: File) {
             }
         })
     }
+}
+
+internal suspend fun withoutAudio(file: File, ffmpeg: String): File = withContext(Dispatchers.IO) {
+    val out = File(file.parentFile, "silent." + file.extension)
+    val code = runCatching {
+        ProcessBuilder(ffmpeg, "-nostdin", "-v", "error", "-y", "-i", file.path, "-map", "0:v", "-c", "copy", out.path).redirectErrorStream(true).start()
+            .let { it.inputStream.readBytes(); it.waitFor() }
+    }.getOrDefault(-1)
+    if (code == 0 && out.length() > 0) out else file
 }

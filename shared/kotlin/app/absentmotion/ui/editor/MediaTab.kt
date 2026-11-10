@@ -82,6 +82,17 @@ private suspend fun looksLikeGif(context: Context, uri: Uri): Boolean = kotlinx.
     runCatching { context.contentResolver.openInputStream(uri)?.use { isGif(it.readAtMost(6)) } }.getOrNull() == true
 }
 
+internal suspend fun EditorState.addToolResult(context: Context, uri: Uri) {
+    if (uri.scheme != "file") return addPicked(context, uri)
+    val keeper = app.absentmotion.library.MediaKeeper(store, { u -> context.contentResolver.openInputStream(Uri.parse(u)) })
+    suspend fun kept(media: app.absentmotion.model.MediaDeclaration?) = media?.let { kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { keeper.keep(projectId, it, scene) } }
+    when (uri.lastPathSegment.orEmpty().substringAfterLast('.', "").lowercase()) {
+        "m4a", "mp3", "wav", "aac", "ogg", "opus", "flac" -> kept(audioDeclaration(context, uri))?.takeIf { it.duration > 0 }?.let { addAudio(it) } ?: unsupportedPick(context)
+        "gif" -> kept(app.absentmotion.media.imageDeclaration(context, uri))?.let { addPicked(context, Uri.parse(it.uri)) } ?: unsupportedPick(context)
+        else -> kept(app.absentmotion.media.videoDeclaration(context, uri))?.let { addVideo(it) } ?: unsupportedPick(context)
+    }
+}
+
 internal suspend fun EditorState.addPicked(context: Context, uri: Uri, video: Boolean? = null, svg: Boolean = false) {
     val type = runCatching { context.contentResolver.getType(uri) }.getOrNull().orEmpty()
     val name = uri.lastPathSegment.orEmpty()

@@ -310,3 +310,51 @@ fun Modifier.pressScale(source: InteractionSource, pressed: Float = 0.93f): Modi
         scaleY = s.value
     }
 }
+
+object ThemeFade {
+    internal var request by androidx.compose.runtime.mutableStateOf<(() -> Unit)?>(null)
+    internal var hosted = false
+
+    fun change(block: () -> Unit) {
+        if (hosted) request = block else block()
+    }
+}
+
+@Composable
+fun ThemeFadeHost(content: @Composable () -> Unit) {
+    androidx.compose.runtime.DisposableEffect(Unit) {
+        ThemeFade.hosted = true
+        onDispose { ThemeFade.hosted = false }
+    }
+    LaunchedEffect(Unit) {
+        androidx.compose.runtime.snapshotFlow { ThemeFade.request }.collect { change ->
+            if (change == null) return@collect
+            val from = Am.palette
+            try { change() } finally { ThemeFade.request = null }
+            val to = Am.palette
+            if (from == to) return@collect
+            val start = from.toMap()
+            val end = to.toMap()
+            try {
+                Animatable(0f).animateTo(1f, tween(400, easing = Motion.EaseOut)) {
+                    Am.palette = Palette.from(start.mapValues { (k, c) -> androidx.compose.ui.graphics.lerp(c, end[k] ?: c, value) }, to)
+                }
+            } finally {
+                Am.palette = to
+            }
+        }
+    }
+    content()
+}
+
+@Composable
+fun Modifier.enterZoom(): Modifier {
+    val p = androidx.compose.runtime.remember { Animatable(0f) }
+    LaunchedEffect(Unit) { p.animateTo(1f, tween(320, easing = Motion.EaseOut)) }
+    return graphicsLayer {
+        alpha = p.value
+        val s = 0.94f + 0.06f * p.value
+        scaleX = s
+        scaleY = s
+    }
+}

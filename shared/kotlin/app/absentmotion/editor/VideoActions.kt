@@ -45,7 +45,7 @@ fun EditorState.retimeVideo(start: Boolean) {
 }
 
 fun EditorState.setVideoSpeed(value: Float, original: Layer) {
-    if (selectedId != original.id || value.isNaN()) return
+    if (selectedId != original.id || value.isNaN() || original.remapped) return
     val speed = value.coerceIn(SLOWEST_SPEED, FASTEST_SPEED)
     val changed = original.withNormalSpeed(speed)
     if (!scene.showsAnyFrame(changed.startTime, changed.endTime)) return
@@ -95,9 +95,5 @@ fun EditorState.turnOffRemap() = editSelected { layer ->
 }
 
 fun EditorState.reverseRemap() = editSelected { layer ->
-    val remap = layer.node.child("timeRemap") ?: return@editSelected layer
-    val values = remap.keyframes.mapNotNull { it.v.toFloatOrNull() }
-    if (values.isEmpty()) return@editSelected layer
-    val sum = values.first() + values.last()
-    layer.withElement(RemapRef, remap.copy(children = remap.children.map { if (it.name == "kf") it.with("v", formatNumber(sum - (it["v"]?.toFloatOrNull() ?: 0f))) else it }))
+    layer.node.child("timeRemap")?.let { layer.withElement(RemapRef, it.reversedInTime()) } ?: layer
 }

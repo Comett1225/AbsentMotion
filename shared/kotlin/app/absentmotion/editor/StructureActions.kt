@@ -45,6 +45,7 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.math.tan
 import kotlin.math.sin
+import app.absentmotion.model.remapped
 
 object MultiSelect {
     var active by mutableStateOf(false)
@@ -627,7 +628,7 @@ internal fun Scene.stretchedTiming(ids: Set<Long>, percent: Int): Scene {
         val (s, e) = frames.getValue(l.id)
         val start = frameStart(s)
         var end = frameStart(e) - 1
-        val media = l.kind == "audio" || l.mediaFill?.video == true
+        val media = (l.kind == "audio" || l.mediaFill?.video == true) && !l.remapped
         if (media && l.node.child("speedMap")?.isKeyframed != true) {
             val timing = VideoTiming(l)
             val span = timing.mediaMs((l.endTime - l.startTime).toDouble()) - timing.mediaMs(0.0)

@@ -78,6 +78,7 @@ import app.absentmotion.ui.theme.Swap
 import app.absentmotion.ui.theme.animatedColor
 import app.absentmotion.ui.theme.fadeBackground
 import kotlin.math.roundToInt
+import androidx.compose.runtime.SideEffect
 
 @Composable
 fun SpeedPanel(state: EditorState, layer: Layer, modifier: Modifier = Modifier) {
@@ -92,7 +93,9 @@ fun SpeedPanel(state: EditorState, layer: Layer, modifier: Modifier = Modifier) 
         val base = editing
         if (base != null) SpeedCurveEditor(state, layer, ai, base, { editing = null }, Modifier.fillMaxSize())
         else Column(Modifier.fillMaxSize()) {
-            SpeedTabs(tab, if (video) 3 else 2, Modifier.padding(top = 8.dp).align(Alignment.CenterHorizontally)) { tab = it }
+            val locked = layer.remapped && video
+            if (locked && tab != 2) SideEffect { tab = 2 }
+            SpeedTabs(tab, if (video) 3 else 2, Modifier.padding(top = 8.dp).align(Alignment.CenterHorizontally), locked) { tab = it }
             Swap(tab, Modifier.fillMaxWidth().weight(1f), rise = 0.dp) {
                 when (tab) {
                     1 -> CurvePresets(state, layer, Modifier.fillMaxSize()) { editing = it }
@@ -107,13 +110,14 @@ fun SpeedPanel(state: EditorState, layer: Layer, modifier: Modifier = Modifier) 
 }
 
 @Composable
-private fun SpeedTabs(current: Int, count: Int, modifier: Modifier, choose: (Int) -> Unit) {
+private fun SpeedTabs(current: Int, count: Int, modifier: Modifier, locked: Boolean, choose: (Int) -> Unit) {
     Row(modifier.height(28.dp).clip(PanelShape).background(Am.Field)) {
         for (option in 0 until count) {
             val chosen = option == current
+            val usable = !locked || option == 2
             Box(
-                Modifier.width(92.dp).fillMaxHeight().clip(PanelShape).fadeBackground(chosen, PanelDark)
-                    .semantics { selected = chosen }.clickable(role = Role.Tab) { choose(option) },
+                Modifier.width(92.dp).fillMaxHeight().alpha(if (usable) 1f else 0.35f).clip(PanelShape).fadeBackground(chosen, PanelDark)
+                    .semantics { selected = chosen }.clickable(enabled = usable, role = Role.Tab) { choose(option) },
                 Alignment.Center,
             ) {
                 Text(stringResource(SpeedTabNames[option]), color = animatedColor(if (chosen) Am.Accent else Am.OnDark),

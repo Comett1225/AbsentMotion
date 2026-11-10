@@ -345,8 +345,10 @@ private fun CompressBar(
             when (step) {
                 is Step.Running -> BigButton(stringResource(R.string.cancel), Modifier.weight(1f), primary = false, onClick = onCancel)
                 is Step.Done -> {
+                    val add = LocalAddToProject.current
+                    if (add != null) BigButton(stringResource(R.string.tools_add_to_project), Modifier.weight(1f).fillMaxHeight(), HomeIcons.Plus) { add(android.net.Uri.fromFile(step.result.file)) }
                     BigButton(stringResource(if (step.saved) R.string.compress_saved else if (app.absentmotion.platform.PlatformFeatures.desktop) R.string.tools_save else R.string.compress_save), Modifier.weight(1f).fillMaxHeight(), HomeIcons.Download, enabled = !step.saved) { onSave(step) }
-                    BigButton(stringResource(R.string.compress_share), Modifier.weight(1f).fillMaxHeight(), ExportIcons.Share, primary = false) { onShare(step) }
+                    if (add == null) BigButton(stringResource(R.string.compress_share), Modifier.weight(1f).fillMaxHeight(), ExportIcons.Share, primary = false) { onShare(step) }
                 }
                 is Step.Failed -> {
                     var reporting by remember { mutableStateOf(false) }

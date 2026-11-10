@@ -14,6 +14,17 @@ val RemapRef = PropRef(PropRef.Kind.Child, "timeRemap")
 
 val Layer.remapped: Boolean get() = node.child("timeRemap") != null
 
+fun XmlNode.reversedInTime(): XmlNode {
+    val keys = children.filter { it.name == "kf" && it["t"]?.toFloatOrNull() != null }.sortedBy { it["t"]!!.toFloat() }
+    if (keys.size < 2) return this
+    val flipped = keys.indices.map { j ->
+        val source = keys[keys.lastIndex - j]
+        val curve = if (j == 0) null else keys[keys.lastIndex - j + 1]["e"]?.let { Easing.parse(it).reversed()?.toString() ?: it }
+        source.with("t", String.format(java.util.Locale.US, "%.6f", 1f - source["t"]!!.toFloat())).with("e", curve)
+    }
+    return copy(children = children.filter { it.name != "kf" } + flipped)
+}
+
 private const val MIN_SPEED = 0.00001
 const val SLOWEST_SPEED = 0.05f
 const val FASTEST_SPEED = 100f
@@ -117,6 +128,7 @@ val Layer.loopStart: Int?
     }
 
 private fun Layer.bounded(fill: MediaFill, mapped: Double): Double {
+    if (remapped) return mapped.coerceAtLeast(0.0)
     val from = loopStart ?: return mapped.coerceIn(fill.inTime.toDouble(), fill.outTime.toDouble().coerceAtLeast(fill.inTime.toDouble()))
     val span = (fill.outTime.toDouble() - from).coerceAtLeast(1.0)
     return from + ((mapped - from) % span + span) % span
@@ -184,7 +196,7 @@ private fun LongArray.atOrBefore(us: Double): Int {
 
 fun Layer.trimmedTo(start: Int, end: Int, mediaMs: Int = Int.MAX_VALUE): Layer {
     val fill = mediaFill
-    val timing = if (fill?.video == true || kind == "audio") VideoTiming(this) else null
+    val timing = if ((fill?.video == true || kind == "audio") && !remapped) VideoTiming(this) else null
     var from = start
     var to = end
     if (timing != null) {

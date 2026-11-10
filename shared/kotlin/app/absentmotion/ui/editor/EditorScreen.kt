@@ -157,8 +157,7 @@ internal fun EditorTools(state: EditorState, scope: kotlinx.coroutines.Coroutine
     val close = { state.toolOpen = 0 }
     val add: (android.net.Uri) -> Unit = { uri ->
         state.toolOpen = 0
-        val sound = uri.lastPathSegment.orEmpty().substringAfterLast('.', "").lowercase() in SoundFiles
-        scope.launch { if (sound) state.addSounds(context, listOf(uri)) else state.addPicked(context, uri) }
+        scope.launch { state.addToolResult(context, uri) }
     }
     androidx.compose.runtime.CompositionLocalProvider(app.absentmotion.ui.home.LocalAddToProject provides add) {
         Box(Modifier.fillMaxSize().background(Am.HomeBg)) {
@@ -173,7 +172,6 @@ internal fun EditorTools(state: EditorState, scope: kotlinx.coroutines.Coroutine
     }
 }
 
-private val SoundFiles = setOf("m4a", "mp3", "wav", "aac", "ogg", "opus", "flac")
 
 @Composable
 private fun SlideOver(open: Boolean, content: @Composable () -> Unit) {

@@ -110,6 +110,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import app.absentmotion.ui.editor.MediaPicks
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.theme.enterZoom
 
 class MainActivity : ComponentActivity() {
     private val visualPicker = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia()) { uri ->
@@ -228,6 +229,7 @@ class MainActivity : ComponentActivity() {
         window.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(Am.HomeBg.toArgb()))
         importShared()
         setContent {
+            app.absentmotion.ui.theme.ThemeFadeHost {
             val open = editor
             val light = if ((open == null || open.toolOpen != 0) && editingTemplate == null) Am.homeIsLight else Am.editorIsLight
             val homeBg = Am.HomeBg
@@ -273,7 +275,7 @@ class MainActivity : ComponentActivity() {
                         LowMemoryNotice()
                     }
                 } else {
-                    Box(Modifier.fillMaxSize()) {
+                    Box(Modifier.fillMaxSize().enterZoom()) {
                         val embed = EmbedRequest.templateId
                         if (embed != null) CompositionLocalProvider(LocalDensity provides dense) { TemplateEditor(embed, engine, settings, onClose = { endEmbed(open) }) { scene -> embedTemplate(open, scene) } }
                         else {
@@ -340,6 +342,7 @@ class MainActivity : ComponentActivity() {
                     onOpen = ::open, onCloseEditor = ::closeEditor, onChanged = { projectsChanged++ },
                 )
             }
+        }
         }
         Log.i("AMStart", "onCreate took ${SystemClock.elapsedRealtime() - started} ms")
         androidx.core.view.OneShotPreDrawListener.add(window.decorView) { Log.i("AMStart", "first frame after ${SystemClock.elapsedRealtime() - started} ms") }

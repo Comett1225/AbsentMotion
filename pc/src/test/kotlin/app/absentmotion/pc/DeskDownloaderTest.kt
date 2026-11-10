@@ -106,4 +106,15 @@ class DeskDownloaderTest {
         val broken = runCatching { runBlocking { DeskVideoDownloader.readInfo(plain, "u") } }.exceptionOrNull() as DownloadProblem
         assertEquals(R.string.downloader_engine_blocked, broken.text)
     }
+
+    @Test fun videoOnlyRemovesTheSoundFromAClipThatHasIt() = kotlinx.coroutines.runBlocking {
+        val ffmpeg = app.absentmotion.desk.DeskMedia.ffmpeg
+        val clip = File(temp.root, "both.mp4")
+        val made = ProcessBuilder(ffmpeg, "-nostdin", "-v", "error", "-y", "-f", "lavfi", "-i", "testsrc=size=64x36:rate=10", "-f", "lavfi", "-i", "sine=frequency=440",
+            "-t", "1", "-c:v", "mpeg4", "-c:a", "aac", "-shortest", clip.path).redirectErrorStream(true).start().let { it.inputStream.readBytes(); it.waitFor() }
+        org.junit.Assert.assertEquals(0, made)
+        val silent = app.absentmotion.tools.withoutAudio(clip, ffmpeg)
+        val probe = ProcessBuilder(ffmpeg, "-nostdin", "-hide_banner", "-i", silent.path).redirectErrorStream(true).start().let { p -> String(p.inputStream.readBytes()).also { p.waitFor() } }
+        org.junit.Assert.assertTrue(probe, "Video:" in probe && "Audio:" !in probe)
+    }
 }
