@@ -2393,6 +2393,12 @@
     <string name="desk_update_reason_helper">the update helper did not start</string>
     <string name="desk_update_reason_installer">the installer returned code %1$s</string>
     <string name="desk_update_reason_unknown">unknown reason</string>
+    <string name="desk_update_reason_blocked">the updater was stopped before it finished; security software such as Windows Defender may have blocked it</string>
+    <string name="desk_update_reason_locked">files of the app were still in use</string>
+    <string name="desk_update_reason_space">there was not enough disk space</string>
+    <string name="desk_update_reason_payload">the update file was missing or damaged</string>
+    <string name="desk_update_reason_old">the old version could not be removed</string>
+    <string name="desk_update_reason_system">macOS did not allow the app to be replaced; check System Settings &gt; Privacy &amp; Security &gt; App Management</string>
     <string name="desk_menu_file">File</string>
     <string name="desk_menu_view">View</string>
     <string name="desk_menu_playback">Playback</string>

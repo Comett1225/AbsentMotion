@@ -2,7 +2,9 @@ package app.absentmotion.ui.home
 
 import java.io.File
 
-internal enum class InstallKind { Msi, MacApp, Tarball, AppImage, Deb }
+internal enum class InstallKind { Msi, Setup, MacApp, Tarball, AppImage, Deb }
+
+internal const val SETUP_EXE = "AbsentMotionSetup.exe"
 
 internal data class InstallSite(val kind: InstallKind, val target: File)
 
@@ -16,7 +18,8 @@ internal fun installSite(
     debInstalled: Boolean = File("/usr/bin/apt-get").canExecute() && File("/var/lib/dpkg/info").listFiles { f -> f.name.startsWith("absentmotion") && f.name.endsWith(".list") }.orEmpty().isNotEmpty(),
 ): InstallSite? = when {
     os.startsWith("windows", ignoreCase = true) ->
-        appPath?.let(::File)?.takeIf { it.isFile && it.name.endsWith(".exe", ignoreCase = true) }?.let { InstallSite(InstallKind.Msi, it) }
+        appPath?.let(::File)?.takeIf { it.isFile && it.name.endsWith(".exe", ignoreCase = true) }
+            ?.let { InstallSite(if (File(it.parentFile, SETUP_EXE).isFile) InstallKind.Setup else InstallKind.Msi, it) }
     os.startsWith("mac", ignoreCase = true) -> {
         val bundle = generateSequence(appPath?.let(::File)) { it.parentFile }.firstOrNull { it.name.endsWith(".app") }
         bundle?.takeIf { "AppTranslocation" !in it.path && it.isDirectory && it.canWrite() && it.parentFile?.canWrite() == true }?.let { InstallSite(InstallKind.MacApp, it) }

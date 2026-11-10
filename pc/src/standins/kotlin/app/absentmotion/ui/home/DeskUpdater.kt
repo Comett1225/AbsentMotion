@@ -57,10 +57,12 @@ internal object Updater {
     var hidden by mutableStateOf(false)
     var preparing by mutableStateOf(false)
         private set
+    var report by mutableStateOf<String?>(null)
     private val scope = MainScope()
     private var job: Job? = null
     private var http: TrustedHttp? = null
     private var generation = 0
+    private var pendingFile: File? = null
 
     fun inApp(context: Context, source: UpdateSource): Boolean = true
 
@@ -132,6 +134,8 @@ internal object Updater {
 
     fun notNow() {
         UpdateInstall.cancel()
+        pendingFile?.delete()
+        pendingFile = null
         later()
     }
 
@@ -148,18 +152,34 @@ internal object Updater {
         val site = installSite() ?: return failed()
         preparing = true
         scope.launch {
+            var blocked: String? = null
             val pending = withContext(Dispatchers.IO) {
                 runCatching { UpdateInstall.prepare(ready.file, ready.release, site, ready.file.parentFile ?: context.cacheDir, File(context.filesDir, RESULT_FILE)) }
-                    .onFailure { Log.i("AMUpdate", "update could not be prepared: $it") }.getOrNull()
+                    .onFailure {
+                        Log.i("AMUpdate", "update could not be prepared: $it")
+                        if ("error=" in it.message.orEmpty()) blocked = UpdateInstall.startFailure(it.message.orEmpty())
+                    }.getOrNull()
             }
-            preparing = false
             when {
-                pending == null -> failed()
-                step != ready -> pending.discard()
+                pending == null -> { preparing = false; blocked?.let { report = it } ?: failed() }
+                step != ready -> { preparing = false; pending.discard() }
                 else -> {
-                    UpdateInstall.arm(pending)
-                    step = DeskStep.Opened(ready.release, ready.file)
-                    quit()
+                    val marker = File(context.filesDir, PENDING_FILE)
+                    val failure = withContext(Dispatchers.IO) {
+                        runCatching { marker.writeText(ready.release.version) }
+                        UpdateInstall.arm(pending)
+                    }
+                    preparing = false
+                    if (failure != null) {
+                        UpdateInstall.cancel()
+                        marker.delete()
+                        step = DeskStep.Idle
+                        report = failure
+                    } else {
+                        pendingFile = marker
+                        step = DeskStep.Opened(ready.release, ready.file)
+                        quit()
+                    }
                 }
             }
         }
@@ -173,6 +193,13 @@ internal object Updater {
 }
 
 internal const val RESULT_FILE = "update-result.txt"
+internal const val PENDING_FILE = "update-pending.txt"
+
+internal fun updateOutcome(result: String?, pending: String?, installed: String): String? = when {
+    result != null -> UpdateInstall.failureOf(result)
+    pending != null && pending.trim() != installed.trim() -> "the updater was stopped"
+    else -> null
+}
 internal const val INSTALL_LOG = "update-install.log"
 
 internal fun checksumOf(client: TrustedHttp, release: Release, apk: ApkAsset): String =
@@ -193,6 +220,12 @@ internal fun failureReason(context: Context, text: String): String = when {
     text == "the package could not be installed" -> context.getString(R.string.desk_update_reason_package)
     text == "the app was installed but could not be found to open" -> context.getString(R.string.desk_update_reason_missing)
     text == "the helper did not start" -> context.getString(R.string.desk_update_reason_helper)
+    text == "the updater was stopped" || text == "the update helper was blocked" -> context.getString(R.string.desk_update_reason_blocked)
+    text == "files were in use" -> context.getString(R.string.desk_update_reason_locked)
+    text == "the system did not allow the app to be replaced" -> context.getString(R.string.desk_update_reason_system)
+    text == "not enough disk space" -> context.getString(R.string.desk_update_reason_space)
+    text == "the update file was missing or damaged" -> context.getString(R.string.desk_update_reason_payload)
+    text == "the old version could not be removed" -> context.getString(R.string.desk_update_reason_old)
     text.startsWith("installer code ") -> context.getString(R.string.desk_update_reason_installer, text.removePrefix("installer code "))
     else -> context.getString(R.string.desk_update_reason_unknown)
 }
@@ -205,11 +238,26 @@ internal fun UpdateDialog(onQuit: () -> Unit = {}) {
     val links = LocalUriHandler.current
     val step = Updater.step
     LaunchedEffect(Unit) {
-        val failure = UpdateInstall.lastFailure(File(context.filesDir, RESULT_FILE))
-        failure?.let {
-            app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.desk_update_failed_last, failureReason(context, it)), app.absentmotion.platform.Toast.LENGTH_LONG).show()
+        Updater.report = withContext(Dispatchers.IO) {
+            val result = File(context.filesDir, RESULT_FILE)
+            val pending = File(context.filesDir, PENDING_FILE)
+            val outcome = updateOutcome(runCatching { result.readText() }.getOrNull(), runCatching { pending.readText() }.getOrNull(), Updates.installed(context))
+            result.delete()
+            pending.delete()
+            runCatching { sweepUpdates(updateFiles(context.cacheDir, context.filesDir).dir, Updates.installed(context), outcome != null) }
+            outcome
         }
-        withContext(Dispatchers.IO) { runCatching { sweepUpdates(updateFiles(context.cacheDir, context.filesDir).dir, Updates.installed(context), failure != null) } }
+    }
+    Updater.report?.let { reason ->
+        val close = { Updater.report = null }
+        DeskModal(close, 480.dp, onEnter = close) {
+            DeskDialogHeader(stringResource(R.string.update_stopped), close)
+            Text(stringResource(R.string.desk_update_failed_last, failureReason(context, reason)), Modifier.fillMaxWidth().padding(24.dp), color = Am.HomeInk, fontSize = 14.sp, lineHeight = 20.sp)
+            Row(Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, bottom = 20.dp), Arrangement.End) {
+                DeskButton(stringResource(R.string.ok), close, primary = true, minWidth = 96.dp)
+            }
+        }
+        return
     }
     if (step != DeskStep.Idle) {
         if (!Updater.hidden) UpdateFlow(step, onQuit)
@@ -259,6 +307,9 @@ private fun UpdateFlow(step: DeskStep, onQuit: () -> Unit) {
     val install = { ready: DeskStep.Ready -> Updater.install(context, ready, onQuit, toast) }
     val open = { ready: DeskStep.Ready -> if (!Updater.open(ready)) app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.desk_update_open_failed, ready.file.path), app.absentmotion.platform.Toast.LENGTH_LONG).show() }
     val quit = { UpdateInstall.rearm(); Updater.later(); onQuit() }
+    LaunchedEffect(step) {
+        if (step is DeskStep.Ready && Updater.installs(step) && !Updater.preparing && !app.absentmotion.export.ExportRun.running) install(step)
+    }
     DeskModal(close, 480.dp, dismissOnScrim = false, onEnter = {
         when (step) {
             is DeskStep.Ready -> if (Updater.installs(step)) install(step) else open(step)

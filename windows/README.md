@@ -18,3 +18,22 @@ and the app runs the `ffmpeg` program on `PATH` for every frame instead, which i
 
 `cd ..\pc`, then `gradlew createDistributable` builds the app and `gradlew packageMsi` the per-user installer (Compose
 downloads WiX for it).
+
+## setup
+
+`setup/` is AbsentMotion's own installer and updater, with its own window instead of the Windows Installer wizard.
+`setup/build.ps1` builds `AbsentMotionSetup.exe` (a small native program drawn with Direct2D) and `ampack.exe`, and packs the
+app image from `gradlew createDistributable` into `pc/build/compose/binaries/main/setup/`:
+
+- `AbsentMotion-<version>-windows-x64-setup.exe`: one file to download and run. It installs for the current Windows account
+  into `%LOCALAPPDATA%\Programs\AbsentMotion` without prompts or admin rights, adds Start menu and desktop shortcuts and an
+  Apps entry with an uninstaller, then opens the app.
+- `AbsentMotion-<version>-windows-x64.ampack`: the same package without the program, for in-app updates. An app installed
+  this way finds `AbsentMotionSetup.exe` next to its launcher, downloads the signed `.ampack`, and Install and restart runs a
+  copy of its own setup program: it unpacks next to the app while the app closes, swaps the two folders, and opens the new
+  version. If anything fails, the old version stays and opens again.
+
+The package uses the LZMS compression and SHA-256 built into Windows, so no third-party code is added. Command line:
+`--dir`, `--name`, `--no-launch`, `--quiet`, `--log`, `--uninstall`, `--update --payload <file> --wait-pid <pid> --result <file>`
+and `--probe`. With Smart App Control on, Windows refused to run the unsigned one-file setup while the small setup program
+ran, so sign the setup file before shipping it.

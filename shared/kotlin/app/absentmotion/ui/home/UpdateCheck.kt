@@ -159,7 +159,7 @@ private val INTEL_TAGS = listOf("x64", "x86_64", "amd64", "intel")
 
 internal fun installerExtensions(os: String, site: InstallSite? = installSite()): List<String> = when {
     os.startsWith("mac", ignoreCase = true) -> if (site?.kind == InstallKind.MacApp) listOf("-update.zip", ".dmg") else listOf(".dmg")
-    os.startsWith("windows", ignoreCase = true) -> listOf(".msi", ".exe")
+    os.startsWith("windows", ignoreCase = true) -> if (site?.kind == InstallKind.Setup) listOf(".ampack", ".msi") else listOf(".msi", ".exe")
     site?.kind == InstallKind.Deb -> listOf(".deb")
     site?.kind == InstallKind.AppImage -> listOf(".appimage")
     site?.kind == InstallKind.Tarball -> listOf(".tar.gz")

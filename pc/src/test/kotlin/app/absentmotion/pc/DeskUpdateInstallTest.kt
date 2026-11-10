@@ -63,6 +63,48 @@ class DeskUpdateInstallTest {
         assertFalse(staging.exists())
     }
 
+    @Test fun everyProgramRunningFromTheAppIsClosedBeforeTheSwapAndOthersAreLeftAlone() {
+        Assume.assumeTrue(posix)
+        val root = folder()
+        val source = File(root, "hold.c").apply { writeText("#include <unistd.h>\nint main(void) { for (;;) sleep(1); }\n") }
+        val compiled = File(root, "hold")
+        val cc = runCatching { ProcessBuilder("cc", "-o", compiled.path, source.path).start().waitFor() }.getOrNull()
+        Assume.assumeTrue(cc == 0 && compiled.canExecute())
+        val target = appFolder(root, "installed", "old")
+        val inside = File(target, "bin/hold").also { compiled.copyTo(it); it.setExecutable(true) }
+        val outside = File(root, "installed-other/hold").also { it.parentFile.mkdirs(); compiled.copyTo(it); it.setExecutable(true) }
+        val second = ProcessBuilder(inside.path).start()
+        val unrelated = ProcessBuilder(outside.path).start()
+        try {
+            val staging = File(root, "staging").also { it.mkdirs() }
+            val staged = appFolder(staging, "AbsentMotion", "new", root)
+            val result = File(root, "result.txt")
+            ProcessBuilder("/bin/sh", script(root).path, running().pid().toString(), staged.path, target.path, "tarball", result.path, staging.path).start()
+            assertTrue(waitFor(File(root, "launched.txt")))
+            assertEquals("ok", result.readText().trim())
+            assertFalse("the second copy running from the app was closed", second.isAlive)
+            assertTrue("a program outside the app was left running", unrelated.isAlive)
+        } finally {
+            second.destroyForcibly()
+            unrelated.destroyForcibly()
+        }
+    }
+
+    @Test fun anUpdateThatStoppedHalfWayOrNeverStartedIsReported() {
+        assertEquals("the updater was stopped", UpdateInstall.failureOf("started\n"))
+        assertEquals("the updater was stopped", UpdateInstall.failureOf("started\nstage swap\n"))
+        assertNull(UpdateInstall.failureOf("started\nok\n"))
+        assertNull(UpdateInstall.failureOf("started\nok 5.0.6\n"))
+        assertEquals("files were in use", UpdateInstall.failureOf("started\nfail files were in use\n"))
+        assertEquals("the updater was stopped", app.absentmotion.ui.home.updateOutcome(null, "5.0.6", "5.0.5"))
+        assertNull(app.absentmotion.ui.home.updateOutcome(null, "5.0.6", "5.0.6"))
+        assertNull(app.absentmotion.ui.home.updateOutcome(null, null, "5.0.5"))
+        assertEquals("the app did not close", app.absentmotion.ui.home.updateOutcome("started\nfail the app did not close", "5.0.6", "5.0.5"))
+        assertEquals("the update helper was blocked", UpdateInstall.startFailure("Cannot run program \"x\": CreateProcess error=225, Operation did not complete successfully because the file contains a virus"))
+        assertEquals("the update helper was blocked", UpdateInstall.startFailure("CreateProcess error=4551, An Application Control policy has blocked this file"))
+        assertEquals("the helper did not start", UpdateInstall.startFailure("CreateProcess error=193, %1 is not a valid Win32 application"))
+    }
+
     @Test fun aFileIsSwappedLikeAnAppImage() {
         Assume.assumeTrue(posix)
         val root = folder()
