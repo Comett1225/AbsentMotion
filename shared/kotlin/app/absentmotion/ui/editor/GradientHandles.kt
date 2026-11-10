@@ -17,8 +17,9 @@ import app.absentmotion.ui.editor.panels.textOn
 
 @Composable
 internal fun GradientHandles(state: EditorState, quad: FloatArray?, scale: Float, origin: Offset) {
+    if (state.panel != EditorPanel.ColorFill || quad == null) return
     val layer = state.selected ?: return
-    if (state.panel != EditorPanel.ColorFill || layer.fillType != "gradient" || quad == null) return
+    if (layer.fillType != "gradient") return
     val g = layer.gradient
     val q = List(4) { Offset(quad[2 * it], quad[2 * it + 1]) * scale + origin }
     val start = boxPoint(q, g.x0, g.y0)

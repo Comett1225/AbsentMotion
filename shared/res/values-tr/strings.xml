@@ -139,6 +139,7 @@
     <string name="settings_report_issue">Sorun bildir</string>
     <string name="settings_suggest_feature">Özellik öner</string>
     <string name="join_discord">Discord\'a katıl</string>
+    <string name="alight_reimport_tip">Eski Alight Motion içe aktarımı: en güncel görünüm için Alight Motion\'dan yeniden içe aktarın.</string>
     <string name="settings_help">Yardım</string>
     <string name="tutorial_settings_start">Eğitimi başlat</string>
     <string name="tutorial_settings_continue">Eğitime devam et</string>
@@ -246,6 +247,10 @@
     <string name="update_not_now">Şimdi değil</string>
     <string name="update_outdated">Bu, yeni sürümde düzeltilmiş olabilir (yüklü %1$s, en yeni %2$s).</string>
     <string name="update_changelog">Sürüm notları</string>
+    <string name="whats_new_see">%1$s sürümündeki yenilikleri gör</string>
+    <string name="settings_whats_new">Yenilikler</string>
+    <string name="settings_auto_check_on">Otomatik denetim: Açık</string>
+    <string name="settings_auto_check_off">Otomatik denetim: Kapalı</string>
     <string name="update_open_failed">Bu cihazda bağlantıyı açabilecek bir uygulama yok.</string>
     <string name="update_download_update">Güncellemeyi indir</string>
     <string name="update_installed">Yüklü sürüm: %1$s</string>
@@ -1077,6 +1082,7 @@
     <string name="layer_tool_edit_points">Noktaları düzenle</string>
     <string name="layer_tool_edit_drawing">Çizimi düzenle</string>
     <string name="layer_tool_edit_group">Grubu düzenle</string>
+    <string name="layer_tool_frame">Kare</string>
     <string name="layer_tool_ungroup">Grubu çöz</string>
     <string name="group_leave">Gruptan çık</string>
     <string name="ungroup_loses_style">Grubu çözmek, grubun kendi efektlerini, hızını, opaklığını ve karışımını kaldırır. Katmanlar yerinde ve aynı görünümde kalır.</string>

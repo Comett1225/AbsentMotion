@@ -139,6 +139,7 @@
     <string name="settings_report_issue">Signaler un problème</string>
     <string name="settings_suggest_feature">Suggérer une fonctionnalité</string>
     <string name="join_discord">Rejoindre Discord</string>
+    <string name="alight_reimport_tip">Ancienne importation d’Alight Motion : importez-la à nouveau depuis Alight Motion pour obtenir le dernier rendu.</string>
     <string name="settings_help">Aide</string>
     <string name="tutorial_settings_start">Démarrer le tutoriel</string>
     <string name="tutorial_settings_continue">Continuer le tutoriel</string>
@@ -246,6 +247,10 @@
     <string name="update_not_now">Pas maintenant</string>
     <string name="update_outdated">Ce problème est peut-être corrigé dans la nouvelle version (version installée : %1$s, dernière version : %2$s).</string>
     <string name="update_changelog">Notes de version</string>
+    <string name="whats_new_see">Voir les nouveautés de la %1$s</string>
+    <string name="settings_whats_new">Nouveautés</string>
+    <string name="settings_auto_check_on">Vérification auto : activée</string>
+    <string name="settings_auto_check_off">Vérification auto : désactivée</string>
     <string name="update_open_failed">Aucune application sur cet appareil ne peut ouvrir le lien.</string>
     <string name="update_download_update">Télécharger la mise à jour</string>
     <string name="update_installed">Version installée : %1$s</string>
@@ -1092,6 +1097,7 @@
     <string name="layer_tool_edit_points">Modifier les points</string>
     <string name="layer_tool_edit_drawing">Modifier le dessin</string>
     <string name="layer_tool_edit_group">Modifier le groupe</string>
+    <string name="layer_tool_frame">Image</string>
     <string name="layer_tool_ungroup">Dissocier</string>
     <string name="group_leave">Quitter le groupe</string>
     <string name="ungroup_loses_style">La dissociation supprime les effets, la vitesse, l’opacité et le mode de fusion du groupe. Ses calques conservent leur position et leur apparence.</string>

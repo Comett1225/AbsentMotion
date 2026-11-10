@@ -285,13 +285,17 @@ fun Scene.cutBetween(first: Long, second: Long): Pair<Layer, Layer>? {
 fun Scene.cutAt(timeMs: Int): Pair<Layer, Layer>? {
     val near = 2000 / fps
     val shown = layers.filter { it.canAnimate && !it.hidden }
+    val starts = IntArray(shown.size) { shown[it].startTime }
+    val ends = IntArray(shown.size) { shown[it].endTime }
     var best: Pair<Layer, Layer>? = null
     var bestGap = Int.MAX_VALUE
-    for (b in shown) for (a in shown) {
-        if (b.startTime <= a.startTime || b.endTime <= a.endTime || b.startTime > a.endTime + near) continue
-        if (timeMs < min(b.startTime, a.endTime) - near || timeMs > max(b.startTime, a.endTime) + near) continue
-        val gap = abs(2 * timeMs - b.startTime - a.endTime)
-        if (gap <= bestGap) { best = a to b; bestGap = gap }
+    for (j in shown.indices) for (i in shown.indices) {
+        val start = starts[j]
+        val end = ends[i]
+        if (start <= starts[i] || ends[j] <= end || start > end + near) continue
+        if (timeMs < min(start, end) - near || timeMs > max(start, end) + near) continue
+        val gap = abs(2 * timeMs - start - end)
+        if (gap <= bestGap) { best = shown[i] to shown[j]; bestGap = gap }
     }
     return best
 }

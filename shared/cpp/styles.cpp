@@ -592,7 +592,7 @@ void DrawGroup(SkCanvas* canvas, const Layer& l, double timeMs, const MediaPictu
     if (l.fixedPrecompose && l.innerWidth > 0 && l.innerHeight > 0) {
         if (auto surface = canvas->makeSurface(SkImageInfo::MakeN32Premul(l.innerWidth, l.innerHeight))) {
             surface->getCanvas()->drawColor((SkColor)l.innerBackground);
-            DrawList(surface->getCanvas(), l.children, l.innerWidth, l.innerHeight, false, inner, pictures);
+            DrawList(surface->getCanvas(), l.inner(), l.innerWidth, l.innerHeight, false, inner, pictures);
             canvas->drawImage(surface->makeImageSnapshot(), 0, 0, SkSamplingOptions(SkFilterMode::kLinear));
             return;
         }
@@ -607,7 +607,7 @@ void DrawGroup(SkCanvas* canvas, const Layer& l, double timeMs, const MediaPictu
         background.setColor((SkColor)l.innerBackground);
         canvas->drawRect(SkRect::MakeWH((float)l.innerWidth, (float)l.innerHeight), background);
     }
-    DrawList(canvas, l.children, l.innerWidth, l.innerHeight, false, inner, pictures);
+    DrawList(canvas, l.inner(), l.innerWidth, l.innerHeight, false, inner, pictures);
     if (framed) canvas->restore();
 }
 
@@ -1720,7 +1720,7 @@ static const std::vector<Layer>* ListWith(const std::vector<Layer>& layers, int6
         }
     }
     for (const Layer& l : layers) {
-        if (const std::vector<Layer>* inside = ListWith(l.children, id, found)) return inside;
+        if (const std::vector<Layer>* inside = ListWith(l.inner(), id, found)) return inside;
     }
     return nullptr;
 }
@@ -1858,8 +1858,8 @@ static bool ContainsOne(const std::vector<Layer>& siblings, const Layer& l, doub
     const SkPoint inner = {local.fX + l.innerWidth / 2.0f, local.fY + l.innerHeight / 2.0f};
     const double innerTime = NestedTime(l, timeMs);
     if (innerTime >= 0 && (l.innerBackground >> 24) != 0 && SkRect::MakeWH(l.innerWidth, l.innerHeight).contains(inner.fX, inner.fY)) return true;
-    for (auto it = l.children.rbegin(); innerTime >= 0 && it != l.children.rend(); ++it) {
-        if (Contains(l.children, *it, innerTime, inner, l.innerWidth, l.innerHeight, masks)) return true;
+    for (auto it = l.inner().rbegin(); innerTime >= 0 && it != l.inner().rend(); ++it) {
+        if (Contains(l.inner(), *it, innerTime, inner, l.innerWidth, l.innerHeight, masks)) return true;
     }
     return false;
 }
@@ -1886,9 +1886,9 @@ static bool ContentRect(const Layer& l, double timeMs, const SkMatrix& matrix, S
     const SkMatrix origin = SkMatrix::Concat(matrix, SkMatrix::Translate(-l.innerWidth / 2.0f, -l.innerHeight / 2.0f));
     float left = INFINITY, top = INFINITY, right = -INFINITY, bottom = -INFINITY;
     SkRect child;
-    for (const Layer& c : l.children) {
+    for (const Layer& c : l.inner()) {
         if (innerTime < 0 || !c.activeAt(innerTime) || c.kind == "nullobj" || c.kind == "camera" || c.kind == "light") continue;
-        if (!ContentRect(c, innerTime, SkMatrix::Concat(origin, SiblingMatrix(l.children, c, innerTime)), &child, drawn)) continue;
+        if (!ContentRect(c, innerTime, SkMatrix::Concat(origin, SiblingMatrix(l.inner(), c, innerTime)), &child, drawn)) continue;
         left = std::min(left, child.fLeft);
         top = std::min(top, child.fTop);
         right = std::max(right, child.fRight);

@@ -104,12 +104,28 @@ object ContentResolver {
     fun update(uri: Uri, values: android.content.ContentValues?, where: String?, args: Array<String>?): Int = 0
     fun notifyChange(uri: Uri, observer: android.database.ContentObserver?) {}
     fun takePersistableUriPermission(uri: Uri, flags: Int) {}
+    internal fun upright(picture: java.awt.image.BufferedImage, tag: Int): java.awt.image.BufferedImage {
+        val (degrees, mirror) = app.absentmotion.model.exifOrientation(tag)
+        if (degrees == 0 && !mirror) return picture
+        val turned = degrees == 90 || degrees == 270
+        val out = java.awt.image.BufferedImage(if (turned) picture.height else picture.width, if (turned) picture.width else picture.height, java.awt.image.BufferedImage.TYPE_INT_ARGB)
+        out.createGraphics().apply {
+            translate(out.width / 2.0, out.height / 2.0)
+            rotate(Math.toRadians(degrees.toDouble()))
+            if (mirror) scale(-1.0, 1.0)
+            drawImage(picture, -picture.width / 2, -picture.height / 2, null)
+            dispose()
+        }
+        return out
+    }
+
     fun loadThumbnail(uri: Uri, size: android.util.Size, signal: android.os.CancellationSignal?): android.graphics.Bitmap {
         val f = file(uri)?.takeIf { it.isFile } ?: throw java.io.IOException("No thumbnail")
         val side = maxOf(size.width, size.height)
         val video = Desk.mime(f.name)?.startsWith("video/") == true
         val img = if (video) app.absentmotion.desk.DeskMedia.frame(f, 0, side)
             else android.graphics.BitmapFactory.decodeFile(f.path, android.graphics.BitmapFactory.Options().apply { inSampleSize = 1 })?.let { android.graphics.Bitmap.createScaledBitmap(it, side, (side * it.height / it.width.coerceAtLeast(1)).coerceAtLeast(1), true).image }
+                ?.let { upright(it, androidx.exifinterface.media.ExifInterface(f).getAttributeInt(androidx.exifinterface.media.ExifInterface.TAG_ORIENTATION, 1)) }
         return android.graphics.Bitmap((img ?: throw java.io.IOException("No thumbnail")).let { src -> java.awt.image.BufferedImage(src.width, src.height, java.awt.image.BufferedImage.TYPE_INT_ARGB).also { it.createGraphics().apply { drawImage(src, 0, 0, null); dispose() } } })
     }
     fun releasePersistableUriPermission(uri: Uri, flags: Int) {}

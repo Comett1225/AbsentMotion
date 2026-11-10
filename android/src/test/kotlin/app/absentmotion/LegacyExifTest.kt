@@ -6,7 +6,7 @@ import org.junit.Test
 
 class LegacyExifTest {
     @Test fun legacyTransposedPhotosUpdateTheDeclarationAndKeepLayerEdits() {
-        for ((tag, rotation) in listOf(5 to 270f, 7 to 90f)) {
+        for ((tag, rotation) in listOf(5 to 270f, 7 to 90f, 3 to 180f, 4 to 180f, 6 to 90f, 8 to 270f)) {
             val original = Scene.parse("""<scene width="100" height="100"><media uri="picture" type="image/jpeg" orientation="0"/>
                 <embedScene id="1"><scene><shape id="2" fillImage="picture"><transform><rotation value="15"><kf t="0" v="30"/><kf t="1" v="45"/></rotation></transform></shape></scene></embedScene></scene>""")
             val updated = original.withLegacyExifOrientation("picture", tag)
@@ -22,5 +22,8 @@ class LegacyExifTest {
         val scene = Scene.parse("""<scene><media uri="picture" type="image/jpeg" orientation="90"/></scene>""")
         assertEquals(scene, scene.withLegacyExifOrientation("picture", 5))
         assertEquals(scene, scene.withLegacyExifOrientation("picture", 1))
+        val plain = Scene.parse("""<scene><media uri="picture" type="image/jpeg" orientation="0"/><shape id="1" fillImage="picture"/></scene>""")
+        assertEquals(plain, plain.withLegacyExifOrientation("picture", 1))
+        assertEquals(plain, plain.withLegacyExifOrientation("picture", 2))
     }
 }

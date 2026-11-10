@@ -165,10 +165,12 @@ struct Layer {
     bool clippingMask = false;
     int64_t parent = 0;
     int64_t pathLayer = 0;
-    std::vector<Layer> children;
+    std::shared_ptr<std::vector<Layer>> children;
+    const std::vector<Layer>& inner() const;
     int innerWidth = 0, innerHeight = 0;
     uint32_t innerBackground = 0;
     Retiming retiming;
+    Anim frame;
     bool fixedPrecompose = false;
     std::vector<PathContour> contours;
     bool keyedPoints = false;
@@ -196,6 +198,11 @@ struct Layer {
         return endTime > startTime ? (float)((steppedMs(timeMs) - startTime) / (endTime - startTime)) : 0.0f;
     }
 };
+
+inline const std::vector<Layer>& Layer::inner() const {
+    static const std::vector<Layer> none;
+    return children ? *children : none;
+}
 
 struct Placement {
     SkPoint location, pivot, scale;

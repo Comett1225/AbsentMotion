@@ -16,7 +16,7 @@ The large buttons come in two pages. Swipe the grid sideways to go from one page
 | Path shape (pen, SVG, many shapes) | The same, with **Edit Points** instead of Shape Options |
 | Text | The same, with **Edit Text** instead of Shape Options |
 | Drawing | The same, with **Edit Drawing** instead of Shape Options |
-| Group | Fill & Color, Frame & Shadow, Opacity, Transform, **Edit Group**, Presets, Effects. A group linked to an asset has **Asset Properties** instead of Edit Group; a video cut-out made by **Remove Background (video)** has **Cut-out Edge** instead |
+| Group | Fill & Color, Frame & Shadow, Opacity, **Frame**, Transform, **Edit Group**, Presets, Effects. A group linked to an asset has **Asset Properties** instead of Edit Group; a video cut-out made by **Remove Background (video)** has **Cut-out Edge** instead and no Frame |
 | Null | Transform, Presets, Effects |
 | Camera | Camera Options, Transform, Effects, Presets, Camera Moves |
 | 3D model | Model Options, Opacity, Transform, Presets, Effects |
@@ -106,6 +106,17 @@ These open full-screen editors: see [Shapes, drawing and masks](@shapes) and [Te
 ### Edit Group
 
 Opens the group, so the timeline and the preview show only the layers inside it and you can change them. See [Shapes, drawing and masks](@shapes).
+
+### Frame
+
+Groups and assets have a **Frame** button. It picks which frame of the group's own timeline shows, for example to switch between the mouths or eyes of a character, like the Frame Picker in Adobe Animate.
+
+- **Previous frame** and **Next frame** step one frame back or forward. After the last frame comes the first again.
+- The box between them shows the frame and the number of frames, for example 3 / 12. Tap it to type a frame number.
+- Without keyframes, the frame you pick shows for the whole clip. The keyframe button keys it, and once there are keys, picking a frame at another time adds a key there. Each key holds its frame until the next key. Choose another easing for a key to count through the frames in between instead.
+- **Off** removes the chosen frame and its keys, so the group plays its own timeline again. It shows only while a frame is chosen.
+
+Until you choose a frame, the box shows in a dimmer color the frame that plays at the playhead.
 
 ### Camera Options, Light options and Model Options
 

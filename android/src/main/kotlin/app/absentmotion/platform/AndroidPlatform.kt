@@ -372,16 +372,22 @@ internal fun webpFormat(lossless: Boolean) = when {
     else -> android.graphics.Bitmap.CompressFormat.WEBP_LOSSY
 }
 
+private val effectStills = object : android.util.LruCache<String, android.graphics.drawable.BitmapDrawable>(8 shl 20) {
+    override fun sizeOf(key: String, value: android.graphics.drawable.BitmapDrawable) = value.bitmap.allocationByteCount
+}
+
 @androidx.compose.runtime.Composable
 fun EffectPicture(catalog: app.absentmotion.effects.EffectCatalog, path: String?, scale: androidx.compose.ui.layout.ContentScale) {
+    val cached = androidx.compose.runtime.remember(path) { path?.let(effectStills::get) }
     val drawable by androidx.compose.runtime.produceState<android.graphics.drawable.Drawable?>(null, catalog, path) {
-        value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { catalog.drawable(path) }
+        if (cached == null) value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { catalog.drawable(path) }
+            ?.also { if (path != null && it is android.graphics.drawable.BitmapDrawable) effectStills.put(path, it) }
     }
     androidx.compose.runtime.DisposableEffect(drawable) {
         val shown = drawable
         onDispose { if (Build.VERSION.SDK_INT >= 28) (shown as? android.graphics.drawable.AnimatedImageDrawable)?.stop() }
     }
-    val d = drawable
+    val d = cached ?: drawable
     when {
         Build.VERSION.SDK_INT >= 28 && d is android.graphics.drawable.AnimatedImageDrawable -> androidx.compose.ui.viewinterop.AndroidView({ android.widget.ImageView(it) },
             androidx.compose.ui.Modifier.fillMaxSize().clipToBounds(), update = { v ->

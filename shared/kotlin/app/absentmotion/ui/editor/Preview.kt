@@ -120,6 +120,10 @@ internal fun previewFrame(width: Float, height: Float, reserve: Float, sceneW: F
     return Triple(scale, dx, dy)
 }
 
+private val SameFloats = object : androidx.compose.runtime.SnapshotMutationPolicy<FloatArray?> {
+    override fun equivalent(a: FloatArray?, b: FloatArray?) = a contentEquals b
+}
+
 @Composable
 fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 0.dp) {
     var size by remember { mutableStateOf(IntSize.Zero) }
@@ -176,9 +180,9 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
         }
     }
 
-    var quad by remember { mutableStateOf<FloatArray?>(null) }
-    var plane by remember { mutableStateOf<FloatArray?>(null) }
-    var world by remember { mutableStateOf<FloatArray?>(null) }
+    var quad by remember { mutableStateOf<FloatArray?>(null, SameFloats) }
+    var plane by remember { mutableStateOf<FloatArray?>(null, SameFloats) }
+    var world by remember { mutableStateOf<FloatArray?>(null, SameFloats) }
     var quadFor by remember { mutableStateOf<Long?>(null) }
     LaunchedEffect(state.selectedId, scene, mediaRevision, state.cameraMode) {
         if (quadFor != state.selectedId) {
@@ -196,7 +200,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
         }
     }
 
-    var multiBox by remember { mutableStateOf<FloatArray?>(null) }
+    var multiBox by remember { mutableStateOf<FloatArray?>(null, SameFloats) }
     var multiMoving by remember { mutableStateOf(false) }
     val multiIds = MultiSelect.ids
     LaunchedEffect(multiIds, scene, mediaRevision) {

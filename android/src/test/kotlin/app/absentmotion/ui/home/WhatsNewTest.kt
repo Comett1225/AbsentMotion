@@ -35,6 +35,51 @@ class WhatsNewTest {
         assertEquals(listOf("New features", "Bug fixes"), notes.sections.map { it.title })
         assertEquals(listOf("**One** - first", "**Two** - second wraps onto a new line"), notes.sections[0].items)
         assertEquals(listOf("fixed a thing"), notes.sections[1].items)
+        assertTrue(notes.sections.all { it.groups.isEmpty() && it.count == it.items.size })
+    }
+
+    @Test
+    fun groupsHoldTheirItemsAndAddUpToTheSectionCount() {
+        val notes = WhatsNew.parse(
+            """
+            # Notes
+
+            ## Bug fixes
+            - loose fix
+            ### Updates
+            - **One** - first
+            - **Two** - second
+              wraps on
+            ### Editor
+            * third
+
+            ## Only empty groups
+            ### Nothing here
+
+            ## Plain
+            - last
+            """.trimIndent(),
+        )
+        assertEquals(listOf("Bug fixes", "Plain"), notes.sections.map { it.title })
+        val fixes = notes.sections[0]
+        assertEquals(listOf("loose fix"), fixes.items)
+        assertEquals(listOf("Updates", "Editor"), fixes.groups.map { it.title })
+        assertEquals(listOf("**One** - first", "**Two** - second wraps on"), fixes.groups[0].items)
+        assertEquals(listOf("third"), fixes.groups[1].items)
+        assertEquals(4, fixes.count)
+        assertEquals(1, notes.sections[1].count)
+        assertTrue(notes.sections[1].groups.isEmpty())
+    }
+
+    @Test
+    fun the503NotesListEveryFixInGroups() {
+        val notes = WhatsNew.parse(TestData.project.resolve("shared/assets/whats-new/5.0.3.md").readText())
+        val fixes = notes.sections.single { it.title == "Bug fixes" }
+        assertTrue(fixes.items.isEmpty())
+        assertEquals(listOf("Updates", "Phone and Android", "Editor", "Effects and rendering", "Audio", "Export, import and projects", "AI tools", "Home and tools", "Desktop"), fixes.groups.map { it.title })
+        assertEquals(listOf(16, 12, 32, 16, 2, 17, 11, 8, 2), fixes.groups.map { it.items.size })
+        assertEquals(116, fixes.count)
+        assertEquals(3, notes.sections.single { it.title == "New features" }.count)
     }
 
     @Test
@@ -55,6 +100,7 @@ class WhatsNewTest {
             val text = file.readText()
             val notes = WhatsNew.parse(text)
             assertTrue(file.name, notes.title.isNotBlank() && notes.sections.isNotEmpty())
+            assertTrue(file.name, '`' !in text)
             for (match in link.findAll(text)) assertNotNull(file.name + ": " + match.value, ReportLinks.BuiltIn.named(match.groupValues[2]))
         }
     }

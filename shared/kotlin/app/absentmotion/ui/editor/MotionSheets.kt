@@ -147,7 +147,7 @@ internal fun TransitionButton(state: EditorState, modifier: Modifier, compact: B
 @Composable
 internal fun AnimateButton(state: EditorState, modifier: Modifier) {
     var open by remember { mutableStateOf<Long?>(null) }
-    val shown = state.selected?.canAnimate == true && state.panel == EditorPanel.Tools && !state.addOpen && !state.volumeOpen && !MultiSelect.active
+    val shown = state.selectedId?.let { state.scene.layer(it) }?.canAnimate == true && state.panel == EditorPanel.Tools && !state.addOpen && !state.volumeOpen && !MultiSelect.active
     val clear = animateDpAsState(if (state.previewPanelOpen) PreviewPanelWidth else 0.dp, ThemeMotion.enter(), label = "animate-clear")
     Presence(shown) {
         val press = remember { MutableInteractionSource() }

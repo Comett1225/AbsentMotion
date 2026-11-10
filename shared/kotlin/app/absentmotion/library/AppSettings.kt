@@ -216,9 +216,11 @@ class AppSettings(private val context: Context) {
         get() = prefs.getInt("onboarding", 0)
         set(value) { prefs.edit().putInt("onboarding", value).apply() }
 
+    private var whatsNewSeenState by mutableStateOf(prefs.getString("whatsNewSeen", null))
+
     var whatsNewSeen: String?
-        get() = prefs.getString("whatsNewSeen", null)
-        set(value) { prefs.edit().putString("whatsNewSeen", value).apply() }
+        get() = whatsNewSeenState
+        set(value) { whatsNewSeenState = value; prefs.edit().putString("whatsNewSeen", value).apply() }
 
     private var tutorialStepState by mutableStateOf(prefs.getString("tutorialStep", null))
 

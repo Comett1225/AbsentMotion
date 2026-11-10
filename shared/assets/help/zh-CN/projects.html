@@ -16,16 +16,20 @@
 <h2 id="backup-and-restore">备份与恢复</h2>
 <p>在 <a href="settings.html">设置</a> 的 <strong>备份</strong> 分组中：</p>
 <ul><li><strong>备份所有项目</strong>会在 Documents/AbsentMotion 中生成一个文件，文件名为 <code>AbsentMotion-backup-</code> 加上日期和时间，以 <code>.absbackup</code> 结尾。它包含所有项目及其版本历史、带媒体的模板、预设、你的颜色调色板、导入的字体、AI 结果以及所有保留的媒体。备份需要的可用空间约为内容大小加 50 MB。即使卸载 AbsentMotion，该文件也会保留在手机上；请将其复制到电脑或云服务中以妥善保存。</li><li><strong>每周自动备份（仅项目）</strong>默认关闭。开启后，应用打开几秒钟后，如果距离上次备份已过去七天，就会写入一个仅包含项目（不含媒体）的 <code>AbsentMotion-weekly-...absbackup</code> 文件，并删除之前的每周备份文件。手动备份永远不会被应用删除。</li><li><strong>从备份恢复</strong>会要求你选择一个备份文件。如果某个项目已存在且内容相同，就保持不动；如果同名但内容不同，则会作为单独的副本恢复。已存在的内容不会被覆盖。恢复可以随时停止，之后再重新运行。</li></ul>
-<figure><img src="../assets/img/projects-backup.webp" width="490" height="763" alt="备份分组：备份所有项目 (1)、从备份恢复 (2)，以及每周自动备份（仅项目）(3)。" loading="lazy"><figcaption>备份分组：备份所有项目 (1)、从备份恢复 (2)，以及每周自动备份（仅项目）(3)。</figcaption></figure>
+<figure><img src="../assets/img/projects-backup.webp" width="490" height="673" alt="备份分组：备份所有项目 (1)、从备份恢复 (2)，以及每周自动备份（仅项目）(3)。" loading="lazy"><figcaption>备份分组：备份所有项目 (1)、从备份恢复 (2)，以及每周自动备份（仅项目）(3)。</figcaption></figure>
 <h2 id="importing-project-files">导入项目文件</h2>
 <p>你可以通过“分享”或“打开方式”，从其他应用（例如文件管理器）打开项目文件。若想在主屏幕上显示导入按钮，请开启 <strong>在项目列表中显示导入卡片</strong>：此时 <strong>选择文件</strong> 卡片会出现在你的项目上方。</p>
 <div class="table-wrap"><table><thead><tr><th>文件</th><th>你会得到什么</th></tr></thead><tbody><tr><td data-label="文件">由 AbsentMotion 生成的 <code>.absproj</code></td><td data-label="你会得到什么">一个普通项目，包含其媒体</td></tr><tr><td data-label="文件">其他编辑器的项目包（<code>.amproj</code>）</td><td data-label="你会得到什么">每个场景变成一个<strong>模板</strong>，所有素材保持为素材</td></tr><tr><td data-label="文件">纯场景 XML 文件</td><td data-label="你会得到什么">一个普通项目。出于安全考虑，不会跟随媒体链接，因此除非能在相册中找到，媒体会显示为缺失。</td></tr><tr><td data-label="文件">Adobe Animate 文件（<code>.fla</code>）</td><td data-label="你会得到什么">一个普通项目：参见 <a href="#adobe-animate-files">Adobe Animate 文件</a></td></tr></tbody></table></div>
 <p>AbsentMotion 已有的特效会被转换。它没有的特效会保留在文件中，但不会绘制。导入后，报告只列出未能完整导入的内容：无法运行的特效、无法保留的设置、未找到的媒体以及未安装的字体。如果一切都已导入，则不显示报告。备份文件（<code>.absbackup</code>）从设置中恢复，不在此处导入。</p>
 <p>为保护手机，有一些限制。例如，一个包最多可包含 2000 个文件和 32 个项目，解压后最大为 2 GB；场景的尺寸最大为 16384 像素，帧率范围为 1 到 240。应用会说明文件违反了哪条规则。</p>
+<h3 id="projects-from-another-editor">其他编辑器的项目</h3>
+<p>在其他编辑器的场景 XML 文件和 <code>.amproj</code> 包中，广色域（Display P3）的照片看起来与在该编辑器中一样。</p>
+<p>AbsentMotion 的每个版本都会把这些项目转换得更好一点，而且项目会保留导入它的那个版本的转换结果。第一次打开由旧版本导入的项目时，会出现一条消息，建议你重新导入以获得最新外观。请从其他编辑器重新导入该文件，以获得当前的转换结果。</p>
 <h3 id="adobe-animate-files">Adobe Animate 文件</h3>
 <p>AbsentMotion 可导入由 Adobe Animate 或 Flash CS5 及更高版本保存的 <code>.fla</code> 文件。打开方式与其他项目文件相同：使用 <strong>选择文件</strong>、分享或“打开方式”。在电脑上，使用 <strong>文件</strong>、<strong>导入项目…</strong>，或将文件拖到窗口上；在那里，<code>.xfl</code> 文件也可以使用，只要其文件夹中的其余内容与它放在一起即可。在手机上，请将 XFL 文件夹压缩为 ZIP 文件，然后导入该 ZIP。</p>
 <p>该文件会成为一个项目，继承 Animate 文件的舞台尺寸、帧率和背景颜色，其场景会依次播放。</p>
 <ul><li><strong>可导入：</strong> 带纯色、双色渐变和图片填充的形状及其线条；元件，每个元件作为带有自身时间轴的组；图片；经典补间（转为关键帧，并保留其缓动）；透明度、色调和亮度；遮罩图层；以及主时间轴上的 MP3 声音。</li><li><strong>未导入：</strong> 文本字段、ActionScript、滤镜、混合模式、其他颜色效果、运动引导路径、相机图层、组件和已编译的影片剪辑、视频、骨骼（IK）姿势，以及未放在舞台上的库元件。形状补间显示其起始形状，运动补间显示其第一个关键帧。超过两种颜色的渐变保留两种，虚线和其他特殊线条以实线绘制，无法识别的缓动会变为直线运动。</li></ul>
+<p>每个会动的元件或图片都会成为一个带关键帧的图层，即使有多个元件共用同一个 Animate 图层也是如此。图形元件会保留自身时间轴的每一帧，所以带有嘴巴、眼睛或手的骨架依然可用：Animate 显示的帧（单帧、播放一次、循环或某种倒放模式）会被设为其组的<strong>帧</strong>的关键帧，之后你可以修改（参见 <a href="layer-tools.html#frame">图层工具</a>）。影片剪辑会循环播放它自己的时间轴，按钮则显示它的第一帧。</p>
 <p>导入后，报告会列出这两类内容，并附上每类的数量：<strong>从Animate文件导入</strong> 和 <strong>未导入（显示时不含这些内容）</strong>。</p>
 <p>由 Flash CS4 及更早版本保存的较旧 <code>.fla</code> 文件使用另一种格式。应用会提示：“此 .fla 文件由 Flash CS4 或更早版本保存。只能导入 Flash CS5 及更高版本保存的 .fla 文件。”</p>
 <h2 id="file-formats-and-where-things-are">文件格式和存放位置</h2>

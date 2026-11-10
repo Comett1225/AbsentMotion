@@ -174,11 +174,16 @@ class EngineThread(private val background: Int, private val context: Context? = 
 
     fun setScene(next: Scene, xml: String) = setScene(next, lazyOf(xml))
 
+    private var fontNames: List<String>? = null
+
     fun setScene(next: Scene, xml: Lazy<String> = lazy { next.toXml() }) {
         synchronized(this) { pendingXml = xml; pendingScene = next }
         fonts?.let { library ->
             val names = next.fontNames()
-            mediaScope.launch { names.forEach { library.resolve(it) } }
+            if (names != fontNames) {
+                fontNames = names
+                mediaScope.launch { names.forEach { library.resolve(it) } }
+            }
         }
         val previous = mediaScene
         mediaScene = next
@@ -197,13 +202,13 @@ class EngineThread(private val background: Int, private val context: Context? = 
 
     private fun file(uri: String): File? = runCatching { android.net.Uri.parse(uri).toFile() ?: File(uri) }.getOrNull()?.takeIf { it.isFile }
 
-    private suspend fun loadMedia(scene: Scene) {
+    private suspend fun loadMedia(scene: Scene, announce: Boolean = true) {
         val pictures = scene.node.imageUris()
         val clips = videoUris(scene)
         val models = scene.node.modelUris()
         withContext(dispatcher) {
             val native = engine()
-            pictures.forEach { uri -> file(uri)?.let { native.setPictureFile(uri, it.absolutePath) } }
+            pictures.forEach { uri -> file(uri)?.let { native.setPictureFile(uri, it.absolutePath, scene.fromAlight) } }
             (loadedPictures - pictures).forEach { native.setPicture(it, null) }
             loadedPictures = pictures
             (loadedModels.keys - models).forEach { uri ->
@@ -229,7 +234,7 @@ class EngineThread(private val background: Int, private val context: Context? = 
             var handed = false
             try { withContext(dispatcher) { handed = true; if (closed) source.close() else videos[uri] = source } } finally { if (!handed) source.close() }
         }
-        pictureRevision.update { it + 1 }
+        if (announce) pictureRevision.update { it + 1 }
     }
 
     fun refreshMedia() { mediaScene?.let { scene -> mediaKey = null; setScene(scene) } }
@@ -394,7 +399,7 @@ class EngineThread(private val background: Int, private val context: Context? = 
         effectJob?.join()
         val document = withContext(Dispatchers.Default) { Scene.parse(xml) }
         fonts?.let { library -> document.fontNames().forEach { library.resolve(it) } }
-        loadMedia(document)
+        loadMedia(document, announce = false)
         var shown: String? = null
         try {
             withContext(dispatcher) {
@@ -410,7 +415,7 @@ class EngineThread(private val background: Int, private val context: Context? = 
                 try { shown?.let { val at = view?.timeMs ?: 0; engine().setScene(fonts?.prepareText(it, at) ?: it); preparedAt = at } }
                 finally { capturing = false }
             }
-            mediaScene?.let { loadMedia(it) }
+            mediaScene?.let { loadMedia(it, announce = false) }
             requestRender()
         }
     }
@@ -445,7 +450,7 @@ class EngineThread(private val background: Int, private val context: Context? = 
             if (timeMs == textTime) return
             textTime = timeMs
             val xml = timedXml ?: return
-            engine().setScene(fonts?.prepareText(xml, timeMs) ?: xml)
+            engine().setScene(fonts?.prepareText(xml, timeMs, document) ?: xml)
         }
     }
 

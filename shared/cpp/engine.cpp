@@ -961,7 +961,7 @@ sk_sp<SkImage> EngineImpl::copyFrame(AHardwareBuffer* buffer, bool opaque, int c
     } else {
         surface->getCanvas()->drawImage(imported, -bounds.left(), -bounds.top(), SkSamplingOptions(), &paint);
     }
-    sk_sp<SkImage> image = surface->makeImageSnapshot();
+    sk_sp<SkImage> image = fGraphite ? SkSurfaces::AsImage(surface) : surface->makeImageSnapshot();
     if (fGraphite) {
         const bool ok = fGraphite->insertRecording({fRecorder->snap().get()}) &&
                         fGraphite->submit(skgpu::graphite::SyncToCpu::kYes);

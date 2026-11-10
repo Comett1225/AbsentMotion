@@ -83,6 +83,8 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
     private var current: DecodedFrame? = null
     private var currentPts = Long.MIN_VALUE
     private var positioned = false
+    private var skipped = false
+    private var decodedTo = Long.MIN_VALUE
     private var queued = false
     private var flushable = false
     private var format: MediaFormat
@@ -118,7 +120,8 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
         val wanted = wantedPts(timeUs)
         if (wanted == currentPts) return current
         val decoder = codec ?: return current
-        if (!positioned || wanted < currentPts || wanted - currentPts > 1_000_000 || outputEnded) reposition(decoder, wanted)
+        val at = if (skipped) decodedTo else currentPts
+        if (!positioned || (if (skipped) wanted <= at else wanted < at) || wanted - at > 1_000_000 || outputEnded) reposition(decoder, wanted)
         val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10)
         var held = -1
         var heldPts = 0L
@@ -147,6 +150,7 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
                 if (index < 0) continue
                 flushable = true
                 outputEnded = info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0
+                if (info.size > 0) decodedTo = maxOf(decodedTo, info.presentationTimeUs)
                 if (info.size <= 0) {
                     decoder.releaseOutputBuffer(index, false)
                 } else if (info.presentationTimeUs < wanted && !outputEnded) {
@@ -160,7 +164,7 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
                 }
             }
             if (obsolete()) {
-                positioned = false
+                skipped = true
                 return null
             }
             if (!outputEnded) {
@@ -190,7 +194,8 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
         }
         drainImages()
         extractor.seekTo(wanted, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
-        inputEnded = false; outputEnded = false; queued = false; positioned = true
+        inputEnded = false; outputEnded = false; queued = false; positioned = true; skipped = false
+        decodedTo = extractor.sampleTime - 1
         seeks++
     }
 
@@ -205,6 +210,7 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
         if (image == null) { positioned = false; return if (exact) null else current }
         current?.close()
         current = image
+        skipped = false
         currentPts = if (pts > wanted || pts < wanted && outputEnded) wanted else pts
         return image
     }

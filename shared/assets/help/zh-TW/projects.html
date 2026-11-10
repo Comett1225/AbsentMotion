@@ -16,16 +16,20 @@
 <h2 id="backup-and-restore">備份與還原</h2>
 <p>在<a href="settings.html">設定</a>的 <strong>備份</strong> 群組中：</p>
 <ul><li><strong>備份所有專案</strong>會在 Documents/AbsentMotion 中建立一個檔案，檔名為 <code>AbsentMotion-backup-</code> 加上日期與時間，並以 <code>.absbackup</code> 結尾。檔案內容包含所有專案及其版本紀錄、範本及其媒體、預設集、您的調色盤、匯入的字型、AI 結果，以及所有已保留的媒體。備份需要的可用空間約為內容大小再加 50 MB。即使您解除安裝 AbsentMotion，此檔案仍會留在手機上；為確保安全，請將它複製到電腦或雲端服務。</li><li><strong>每週自動備份（僅限專案）</strong>預設為關閉。開啟後，若距離上次備份已過七天，應用程式會在開啟後數秒寫入 <code>AbsentMotion-weekly-...absbackup</code>，此檔案只包含專案（不含媒體），並刪除先前的每週備份檔。應用程式絕不會刪除手動備份。</li><li><strong>從備份還原</strong>會要求您選擇一個備份檔。已存在且內容相同的專案會保持不變；名稱相同但內容不同的專案，會以另一份副本還原。不會覆寫任何現有內容。還原可以中止，並於稍後重新執行。</li></ul>
-<figure><img src="../assets/img/projects-backup.webp" width="490" height="763" alt="備份群組：備份所有專案 (1)、從備份還原 (2)，以及每週自動備份（僅限專案）(3)。" loading="lazy"><figcaption>備份群組：備份所有專案 (1)、從備份還原 (2)，以及每週自動備份（僅限專案）(3)。</figcaption></figure>
+<figure><img src="../assets/img/projects-backup.webp" width="490" height="673" alt="備份群組：備份所有專案 (1)、從備份還原 (2)，以及每週自動備份（僅限專案）(3)。" loading="lazy"><figcaption>備份群組：備份所有專案 (1)、從備份還原 (2)，以及每週自動備份（僅限專案）(3)。</figcaption></figure>
 <h2 id="importing-project-files">匯入專案檔案</h2>
 <p>您可以透過「分享」或「開啟方式」，從其他應用程式（例如檔案管理員）開啟專案檔案。若要在首頁顯示匯入按鈕，請開啟 <strong>在專案清單中顯示匯入卡片</strong>：此時 <strong>選擇檔案</strong> 卡片會出現在您的專案上方。</p>
 <div class="table-wrap"><table><thead><tr><th>檔案</th><th>您會得到什麼</th></tr></thead><tbody><tr><td data-label="檔案"><code>.absproj</code>（由 AbsentMotion 建立）</td><td data-label="您會得到什麼">一般專案，含其媒體</td></tr><tr><td data-label="檔案">其他編輯器的專案套件（<code>.amproj</code>）</td><td data-label="您會得到什麼">每個場景會變成一個<strong>範本</strong>，而任何素材仍維持為素材</td></tr><tr><td data-label="檔案">一般場景 XML 檔案</td><td data-label="您會得到什麼">一般專案。基於安全考量，不會追蹤媒體連結，因此除非能在相簿中找到，否則媒體會顯示為遺失。</td></tr><tr><td data-label="檔案">Adobe Animate 檔案（<code>.fla</code>）</td><td data-label="您會得到什麼">一般專案：請參閱 <a href="#adobe-animate-files">Adobe Animate 檔案</a></td></tr></tbody></table></div>
 <p>AbsentMotion 已有的特效會被轉換。它沒有的特效會保留在檔案中，但不會繪製。匯入後，報告只會列出未能成功匯入的項目：無法執行的特效、無法帶入的設定、找不到的媒體，以及未安裝的字型。若全部成功匯入，就不會顯示報告。備份檔（<code>.absbackup</code>）是從設定還原，而不是在此匯入。</p>
 <p>為保護手機，系統設有限制。例如，一個套件最多可包含 2000 個檔案與 32 個專案，解壓縮後最大為 2 GB；場景的尺寸最大為 16384 像素，影格速率需介於 1 到 240 之間。應用程式會告知檔案違反了哪一項規則。</p>
+<h3 id="projects-from-another-editor">其他編輯器的專案</h3>
+<p>在其他編輯器的場景 XML 檔案與 <code>.amproj</code> 套件中，廣色域（Display P3）的照片看起來與在該編輯器中一樣。</p>
+<p>AbsentMotion 的每個版本都會把這些專案轉換得更好一點，而且專案會保留匯入它的那個版本的轉換結果。第一次開啟由舊版本匯入的專案時，會出現一則訊息，建議您重新匯入以取得最新外觀。請從其他編輯器重新匯入該檔案，以取得目前的轉換結果。</p>
 <h3 id="adobe-animate-files">Adobe Animate 檔案</h3>
 <p>AbsentMotion 可匯入由 Adobe Animate 或 Flash CS5 及更新版本儲存的 <code>.fla</code> 檔案。開啟方式與其他專案檔案相同：使用 <strong>選擇檔案</strong>、分享或開啟方式。在電腦上，請使用 <strong>檔案</strong> &gt; <strong>匯入專案…</strong>，或將檔案拖放到視窗上；在這裡，<code>.xfl</code> 檔案也可以使用，只要其資料夾中的其他內容仍在它旁邊。在手機上，請將 XFL 資料夾壓縮為 ZIP 檔案，然後匯入該檔案。</p>
 <p>此檔案會成為一個專案，沿用 Animate 檔案的舞台尺寸、影格速率與背景顏色，其場景會依序播放。</p>
 <ul><li><strong>可匯入：</strong> 具有純色、雙色漸層與圖片填色的形狀及其線條；元件，每個元件會成為一個具有自己時間軸的群組；圖片；經典補間，會轉為關鍵影格並保留其緩動；透明度、色調與亮度；遮罩圖層；以及主時間軸上的 MP3 音效。</li><li><strong>未匯入：</strong> 文字欄位、ActionScript、濾鏡、混合模式、其他色彩特效、運動引導線、攝影機圖層、元件與已編譯的片段、影片、骨骼（IK）姿勢，以及庫中但不在舞台上的元件。形狀補間會顯示其起始形狀，動態補間則顯示其第一個關鍵影格。超過兩種顏色的漸層會保留兩種顏色，虛線及其他特殊線條會以實線繪製，無法讀取的緩動則會轉為直線運動。</li></ul>
+<p>每個會動的元件或圖片都會成為一個帶關鍵影格的圖層，即使有多個元件共用同一個 Animate 圖層也是如此。圖形元件會保留自身時間軸的每一個影格，所以帶有嘴巴、眼睛或手的骨架依然可用：Animate 顯示的影格（單一影格、播放一次、循環或某種倒轉模式）會被設為其群組的<strong>影格</strong>的關鍵影格，之後您可以修改（請參閱<a href="layer-tools.html#frame">圖層工具</a>）。影片剪輯會循環播放它自己的時間軸，按鈕則顯示它的第一個影格。</p>
 <p>匯入後，報告會同時列出這兩類內容，並附上各自的數量：<strong>從Animate檔案匯入</strong> 與 <strong>未匯入（顯示時不含此內容）</strong>。</p>
 <p>Flash CS4 及更早版本的 <code>.fla</code> 檔案使用另一種格式。此時應用程式會顯示：「此 .fla 檔案是由 Flash CS4 或更舊版本儲存。只能匯入由 Flash CS5 及更新版本儲存的 .fla 檔案。」</p>
 <h2 id="file-formats-and-where-things-are">檔案格式與檔案存放位置</h2>

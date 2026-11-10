@@ -32,19 +32,24 @@ data class XmlNode(
     fun toXml(): String = StringBuilder("<?xml version='1.0' encoding='UTF-8' ?>\n").also { write(it, 0) }.toString()
 
     private fun write(out: StringBuilder, depth: Int) {
-        out.append("  ".repeat(depth)).append('<').append(name)
-        for ((key, value) in attrs) out.append(' ').append(key).append("=\"").append(escape(value)).append('"')
+        repeat(depth) { out.append("  ") }
+        out.append('<').append(name)
+        for ((key, value) in attrs) {
+            out.append(' ').append(key).append("=\"")
+            escape(out, value)
+            out.append('"')
+        }
         if (children.isEmpty() && text.isEmpty()) {
             out.append(" />\n")
             return
         }
         out.append('>')
         if (children.isEmpty()) {
-            out.append(escape(text))
+            escape(out, text)
         } else {
             out.append('\n')
             for (child in children) child.write(out, depth + 1)
-            out.append("  ".repeat(depth))
+            repeat(depth) { out.append("  ") }
         }
         out.append("</").append(name).append(">\n")
     }
@@ -83,19 +88,24 @@ data class XmlNode(
             return XmlNode(name, attrs, children, if (children.isEmpty()) text.toString() else "")
         }
 
-        private fun escape(s: String): String = buildString(s.length) {
-            for (c in s) {
-                when (c) {
-                    '&' -> append("&amp;")
-                    '<' -> append("&lt;")
-                    '>' -> append("&gt;")
-                    '"' -> append("&quot;")
-                    '\n' -> append("&#10;")
-                    '\r' -> append("&#13;")
-                    '\t' -> append("&#9;")
-                    else -> if (c >= ' ' && c != '\uFFFE' && c != '\uFFFF') append(c)
+        private fun escape(out: StringBuilder, s: String) {
+            var from = 0
+            for (i in s.indices) {
+                val c = s[i]
+                val entity = when (c) {
+                    '&' -> "&amp;"
+                    '<' -> "&lt;"
+                    '>' -> "&gt;"
+                    '"' -> "&quot;"
+                    '\n' -> "&#10;"
+                    '\r' -> "&#13;"
+                    '\t' -> "&#9;"
+                    else -> if (c >= ' ' && c != '\uFFFE' && c != '\uFFFF') continue else ""
                 }
+                out.append(s, from, i).append(entity)
+                from = i + 1
             }
+            out.append(s, from, s.length)
         }
     }
 }

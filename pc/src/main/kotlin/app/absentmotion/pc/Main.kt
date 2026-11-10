@@ -101,6 +101,7 @@ fun main(args: Array<String>) {
             DeskFiles.window = window
             remember(window) { window.minimumSize = java.awt.Dimension(820, 560) }
             remember(window) { DeskWindow.attach(window) }
+            LaunchedEffect(window) { app.absentmotion.desk.copyDrops(window) }
             if (DeskOs.mac) DeskMenus(desk)
             DisposableEffect(window) {
                 val listener = object : ComponentAdapter() {

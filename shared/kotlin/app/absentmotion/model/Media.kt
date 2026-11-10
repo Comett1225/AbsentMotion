@@ -42,7 +42,9 @@ data class MediaFill(
 fun XmlNode.mediaUris(): Set<String> = buildSet {
     fun walk(n: XmlNode) {
         if (n.name != "media") {
-            listOf("fillImage", "fillVideo", "src").forEach { key -> n[key]?.let { add(it) } }
+            n["fillImage"]?.let { add(it) }
+            n["fillVideo"]?.let { add(it) }
+            n["src"]?.let { add(it) }
             n.children.forEach(::walk)
         }
     }

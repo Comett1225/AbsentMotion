@@ -186,7 +186,9 @@ fun HomeScreen(
     val navInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     val wide = (LocalWide.current || LocalTablet.current) && wideHeaderFits(androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp, LocalDensity.current.fontScale)
 
-    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { version++ }
+    val lifecycle = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle
+    val replayed = remember { booleanArrayOf(lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { if (replayed[0]) replayed[0] = false else version++ }
     app.absentmotion.platform.BackHandler(search != null) { search = null }
     LaunchedEffect(version, changes) { projects = withContext(Dispatchers.IO) { store.list(includeDamaged = true) }; loaded = true }
     val shown = remember(projects, tab, query) { projects.filter { it.isElement == (tab == 1) && matchesSearch(query, it.title) } }
@@ -207,8 +209,8 @@ fun HomeScreen(
     ) {
         Box(Modifier.fillMaxSize().background(Am.HomeBg)) {
             Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars.union(WindowInsets.captionBar))) {
-                if (wide) WideHeader(page, tab, { p, t -> page = p; tab = t; if (p == 2) search = null }, onSettings = { scope.launch { drawer.open() } }, onNew = newProject, search, { search = it })
-                else TopBar(onMenu = { scope.launch { drawer.open() } }, search, page, { search = it })
+                if (wide) WideHeader(page, tab, { p, t -> page = p; tab = t; if (p == 2) search = null }, onSettings = { scope.launch { drawer.open() } }, onNew = newProject, search, { search = it }, settings)
+                else TopBar(onMenu = { scope.launch { drawer.open() } }, search, page, { search = it }, settings)
                 val fill = Modifier.weight(1f)
                 if (page == 2) ToolsTab(fill, store, settings) { id -> version++; onOpen(id) }
                 else if (page == 1) TemplatesTab(version, onTemplate, onTemplateProject, fill, query) else ProjectsPane(
@@ -236,7 +238,7 @@ fun HomeScreen(
             Presence(creating) {
                 NewProjectSheet(
                     store, settings, projects.map { it.title }, initialElement, opening, onClose = { creating = false },
-                    onOpen = { id -> version++; onOpen(id) },
+                    onOpen = { id -> lastScroll.fill(0); version++; onOpen(id) },
                 )
             }
         }
@@ -245,17 +247,19 @@ fun HomeScreen(
 
 private var lastTab = 0
 private var lastPage = 0
+private val lastScroll = intArrayOf(0, 0)
 
 internal fun wideHeaderFits(widthDp: Int, fontScale: Float): Boolean = widthDp >= 380 + 340 * fontScale.coerceAtLeast(1f)
 
 @Composable
-private fun TopBar(onMenu: () -> Unit, search: String?, page: Int, onSearch: (String?) -> Unit) {
+private fun TopBar(onMenu: () -> Unit, search: String?, page: Int, onSearch: (String?) -> Unit, settings: AppSettings) {
     Box(Modifier.fillMaxWidth().height(57.dp)) {
         Box(Modifier.align(Alignment.CenterStart).size(50.dp).clickable(onClick = onMenu), contentAlignment = Alignment.Center) {
             Icon(HomeIcons.Menu, stringResource(R.string.settings), Modifier.size(24.dp), tint = Am.Navy)
         }
         if (search == null) Text("AbsentMotion", Modifier.align(Alignment.Center), color = Am.Navy, fontSize = 22.sp, fontWeight = FontWeight.Medium)
         else HomeSearchField(search, page == 1, onSearch, Modifier.align(Alignment.Center).padding(horizontal = 56.dp).fillMaxWidth())
+        if (search == null) ChangelogButton(settings, Modifier.align(Alignment.CenterEnd).padding(end = if (page != 2) 50.dp else 0.dp))
         if (page != 2) SearchButton(search, onSearch, Modifier.align(Alignment.CenterEnd))
     }
 }
@@ -294,11 +298,19 @@ private fun ProjectsPane(
     usedBy: (String) -> List<String> = { emptyList() },
 ) {
     val thumbs = remember {
-        object : LinkedHashMap<String, ImageBitmap>(16, 0.75f, true) {
-            override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, ImageBitmap>?) = size > 64
+        object : LinkedHashMap<String, Thumb>(16, 0.75f, true) {
+            override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Thumb>?) = size > 64
         }
     }
     val seen = remember { HashSet<Any>() }
+    val listState = androidx.compose.foundation.lazy.rememberLazyListState(lastScroll[0], lastScroll[1])
+    val gridState = androidx.compose.foundation.lazy.grid.rememberLazyGridState(lastScroll[0], lastScroll[1])
+    androidx.compose.runtime.DisposableEffect(wide) {
+        onDispose {
+            lastScroll[0] = if (wide) gridState.firstVisibleItemIndex else listState.firstVisibleItemIndex
+            lastScroll[1] = if (wide) gridState.firstVisibleItemScrollOffset else listState.firstVisibleItemScrollOffset
+        }
+    }
     var menu by remember { mutableStateOf<OpenMenu?>(null) }
     var deleting by remember { mutableStateOf<ProjectInfo?>(null) }
     var origin by remember { mutableStateOf(Offset.Zero) }
@@ -332,8 +344,8 @@ private fun ProjectsPane(
             if (shown.isNotEmpty()) {
                 Spacer(Modifier.height(13.dp))
                 ListHeader(if (tab == 0) stringResource(R.string.home_your_projects) else null, byName) { settings.sortBy = if (it) "name" else "date" }
-                if (wide) ProjectGrid(rows, tab == 0 && settings.xmlUpload, onUpload, card) else LazyColumn(
-                    Modifier.fillMaxSize(),
+                if (wide) ProjectGrid(rows, tab == 0 && settings.xmlUpload, onUpload, gridState, card) else LazyColumn(
+                    Modifier.fillMaxSize(), listState,
                     contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 28.dp),
                 ) {
                     if (tab == 0 && settings.xmlUpload) item(key = "upload") {
@@ -485,7 +497,7 @@ private fun SortRow(label: String, selected: Boolean, onClick: () -> Unit) {
 private fun ProjectCard(
     info: ProjectInfo,
     version: Int,
-    thumbs: MutableMap<String, ImageBitmap>,
+    thumbs: MutableMap<String, Thumb>,
     modifier: Modifier,
     menuOpen: Boolean,
     onMenu: (Rect) -> Unit,
@@ -571,17 +583,21 @@ internal fun duration(ms: Int): String {
     return String.format(Locale.ROOT, "%02d:%02d:%02d", s / 3600, s / 60 % 60, s % 60)
 }
 
+internal class Thumb(val stamp: Long, val image: ImageBitmap)
+
 @Composable
-private fun Thumbnail(info: ProjectInfo, version: Int, cache: MutableMap<String, ImageBitmap>, modifier: Modifier) {
-    val bitmap by produceState<ImageBitmap?>(cache[info.id], info.id, info.modified, info.thumbnail, version) {
+private fun Thumbnail(info: ProjectInfo, version: Int, cache: MutableMap<String, Thumb>, modifier: Modifier) {
+    val bitmap by produceState<ImageBitmap?>(cache[info.id]?.image, info.id, info.modified, info.thumbnail, version) {
         val file = info.thumbnail
         if (file == null) {
             value = null
             return@produceState
         }
+        val stamp = withContext(Dispatchers.IO) { file.lastModified() }
+        cache[info.id]?.takeIf { it.stamp == stamp }?.let { value = it.image; return@produceState }
         val decoded = withContext(Dispatchers.IO) { BitmapFactory.decodeFile(file.path)?.asImageBitmap() }
         if (decoded != null) {
-            cache[info.id] = decoded
+            cache[info.id] = Thumb(stamp, decoded)
             value = decoded
         }
     }

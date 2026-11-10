@@ -139,6 +139,7 @@
     <string name="settings_report_issue">Mag-ulat ng problema</string>
     <string name="settings_suggest_feature">Magmungkahi ng feature</string>
     <string name="join_discord">Sumali sa Discord</string>
+    <string name="alight_reimport_tip">Lumang import mula sa Alight Motion: i-import ulit mula sa Alight Motion para sa pinakabagong itsura.</string>
     <string name="settings_help">Tulong</string>
     <string name="tutorial_settings_start">Simulan ang tutorial</string>
     <string name="tutorial_settings_continue">Ituloy ang tutorial</string>
@@ -246,6 +247,10 @@
     <string name="update_not_now">Hindi muna</string>
     <string name="update_outdated">Maaaring naayos na ito sa mas bagong bersyon (naka-install %1$s, pinakabago %2$s).</string>
     <string name="update_changelog">Talaan ng mga pagbabago</string>
+    <string name="whats_new_see">Tingnan ang bago sa %1$s</string>
+    <string name="settings_whats_new">Ano ang bago</string>
+    <string name="settings_auto_check_on">Auto-check: Naka-on</string>
+    <string name="settings_auto_check_off">Auto-check: Naka-off</string>
     <string name="update_open_failed">Walang app sa device na ito na makakabukas ng link.</string>
     <string name="update_download_update">I-download ang update</string>
     <string name="update_installed">Naka-install na bersyon: %1$s</string>
@@ -1077,6 +1082,7 @@
     <string name="layer_tool_edit_points">I-edit ang mga punto</string>
     <string name="layer_tool_edit_drawing">I-edit ang drawing</string>
     <string name="layer_tool_edit_group">I-edit ang grupo</string>
+    <string name="layer_tool_frame">Frame</string>
     <string name="layer_tool_ungroup">I-ungroup</string>
     <string name="group_leave">Lumabas sa grupo</string>
     <string name="ungroup_loses_style">Tinatanggal ng pag-ungroup ang sariling mga epekto, bilis, opacity at blending ng grupo. Nananatili ang puwesto at hitsura ng mga layer nito.</string>

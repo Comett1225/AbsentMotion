@@ -43,8 +43,9 @@ internal fun cropGrabAt(q: List<Offset>, box: CropBox, at: Offset, density: Floa
 
 @Composable
 internal fun CropOverlay(state: EditorState, quad: FloatArray?, scale: Float, origin: Offset) {
+    if (state.panel != EditorPanel.Crop || quad == null) return
     val layer = state.selected ?: return
-    if (state.panel != EditorPanel.Crop || quad == null || layer.cropIndex < 0) return
+    if (layer.cropIndex < 0) return
     val q = List(4) { Offset(quad[2 * it], quad[2 * it + 1]) * scale + origin }
     val box = layer.cropBox()
     val description = stringResource(R.string.a11y_crop_area)

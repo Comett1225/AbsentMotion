@@ -139,6 +139,7 @@
     <string name="settings_report_issue">問題を報告</string>
     <string name="settings_suggest_feature">機能をリクエスト</string>
     <string name="join_discord">Discordに参加</string>
+    <string name="alight_reimport_tip">古いAlight Motionの読み込みです。最新の見た目にするには、Alight Motionからもう一度読み込んでください。</string>
     <string name="settings_help">ヘルプ</string>
     <string name="tutorial_settings_start">チュートリアルを開始</string>
     <string name="tutorial_settings_continue">チュートリアルを続ける</string>
@@ -246,6 +247,10 @@
     <string name="update_not_now">後で</string>
     <string name="update_outdated">新しいバージョンで修正されている可能性があります（インストール済み %1$s、最新 %2$s）。</string>
     <string name="update_changelog">変更履歴</string>
+    <string name="whats_new_see">%1$s の新機能を見る</string>
+    <string name="settings_whats_new">新機能</string>
+    <string name="settings_auto_check_on">自動確認: オン</string>
+    <string name="settings_auto_check_off">自動確認: オフ</string>
     <string name="update_open_failed">このデバイスでリンクを開けるアプリがありません。</string>
     <string name="update_download_update">アップデートをダウンロード</string>
     <string name="update_installed">インストール済みバージョン：%1$s</string>
@@ -1062,6 +1067,7 @@
     <string name="layer_tool_edit_points">ポイントを編集</string>
     <string name="layer_tool_edit_drawing">描画を編集</string>
     <string name="layer_tool_edit_group">グループを編集</string>
+    <string name="layer_tool_frame">フレーム</string>
     <string name="layer_tool_ungroup">グループ解除</string>
     <string name="group_leave">グループから出る</string>
     <string name="ungroup_loses_style">グループを解除すると、グループ自体のエフェクト、速度、不透明度、ブレンドが削除されます。中のレイヤーの位置と見た目はそのままです。</string>

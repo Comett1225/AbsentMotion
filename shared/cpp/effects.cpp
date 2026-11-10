@@ -57,6 +57,11 @@ bool TilesLayer(const std::string& id) {
 
 bool WrapsLayer(const std::string& id) { return TilesLayer(id) || id == "absent.mirror" || id == "absent.kaleidoscope" || id == "absent.offset"; }
 
+bool KeepsEdges(const std::string& id) {
+    return id == "absent.pixelate" || id == "absent.mosaic" || id == "absent.pixeltiles" || id == "absent.ascii" || id == "absent.halftone" ||
+           id == "absent.tileshift" || id == "absent.tilerotate" || id == "absent.hexagontileshift" || id == "absent.hexagontilerotate";
+}
+
 const float kWrapPixels = 4096;
 
 SkRect Budgeted(const SkRect& wanted, const SkRect& local, const SkMatrix& matrix, float pixels) {
@@ -948,7 +953,7 @@ bool EffectRuntime::grabs(const std::vector<Layer>& layers) const {
         return std::any_of(l.effects.begin(), l.effects.end(), [&](const LayerEffect& e) {
             const Definition* d = e.hidden ? nullptr : find(e.id);
             return !e.hidden && (pieces3d::IsEffect(e.id) || (d && d->palette && d->matrix && mayDiffuse(e, d)));
-        }) || grabs(l.children);
+        }) || grabs(l.inner());
     });
 }
 
@@ -1139,8 +1144,14 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
                     b.uniform(u.name).set(v.data(), n);
                 }
             }
+            const bool cells = KeepsEdges(e.id) && area.width() > 2 && area.height() > 2;
+            SkRect box = SkRect::MakeWH(area.width(), area.height());
+            if (cells && any) {
+                const SkRect grown = f->computeFastBounds(box);
+                if (grown.width() > box.width() + 8 || grown.height() > box.height() + 8) box = grown;
+            }
             std::vector<std::string_view> names = {"image"};
-            std::vector<sk_sp<SkImageFilter>> inputs = {f};
+            std::vector<sk_sp<SkImageFilter>> inputs = {cells ? SkImageFilters::Crop(box.makeInset(1, 1), SkTileMode::kMirror, f) : f};
             if (d->blurred) {
                 const float spread = e.id == "absent.electricedges" ? Value(e, defaults, "strength", 0, t, -1) : -1;
                 const float sigma = spread >= 0 ? std::max(spread, 0.02f) * kEdgeSpread * std::hypot((float)scene.width, (float)scene.height)
@@ -1170,8 +1181,9 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
                 inputs.push_back(below ? below : SkImageFilters::Empty());
             }
             const float radius = d->pointwise ? 0.0f : (int)k <= lastWrap ? wrapReach : reach;
-            f = inputs.size() == 1 ? SkImageFilters::RuntimeShader(b, radius, "image", f)
+            f = inputs.size() == 1 ? SkImageFilters::RuntimeShader(b, radius, "image", inputs[0])
                                    : SkImageFilters::RuntimeShader(b, radius, names.data(), inputs.data(), (int)inputs.size());
+            if (cells) f = SkImageFilters::Crop(box, f);
         } else {
             continue;
         }

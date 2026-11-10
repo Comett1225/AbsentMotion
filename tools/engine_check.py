@@ -117,6 +117,9 @@ def fill_stroke(points):
 
 
 CASES = {
+    "pixelate covers the whole layer and stays inside it": (
+        scene(rect(1, 100, 100, 50, 30, 0xffff0000, extra='<effect id="absent.pixelate" hidden="false"><property name="blockSize" type="float" value="40"/></effect>')),
+        [((55, 100), RED), ((100, 75), RED), ((145, 125), RED), ((158, 100), BLACK), ((100, 100), RED)]),
     "tiles fill the canvas from a layer beside it": (scene(tiled(250)), [((25, 100), RED), ((75, 100), BLUE), ((125, 100), RED), ((175, 100), BLUE)]),
     "tiles keep the hidden half of a layer partly off the canvas": (scene(tiled(230)), [((25, 100), RED), ((75, 100), BLUE), ((125, 100), RED), ((175, 100), BLUE)]),
     "tiles fill the canvas from a group beside it": (scene(tiled_group(250)), [((25, 100), RED), ((75, 100), BLUE), ((125, 100), RED), ((175, 100), BLUE)]),

@@ -62,8 +62,9 @@ internal fun rememberAddLibrary(demoMode: Boolean): AddLibrary {
     }
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     DisposableEffect(lifecycle) {
+        var replayed = lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) { library.mediaRevision++; library.audioRevision++ }
+            if (event == Lifecycle.Event.ON_RESUME) { if (replayed) replayed = false else { library.mediaRevision++; library.audioRevision++ } }
         }
         lifecycle.addObserver(observer)
         onDispose { lifecycle.removeObserver(observer) }

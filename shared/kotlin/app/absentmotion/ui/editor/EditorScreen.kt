@@ -216,6 +216,11 @@ internal fun LowerPanels(state: EditorState, addLibrary: AddLibrary, top: Boolea
 
 @Composable
 private fun Playback(state: EditorState) {
+    val view = androidx.compose.ui.platform.LocalView.current
+    androidx.compose.runtime.DisposableEffect(state.playing) {
+        view.keepScreenOn = state.playing
+        onDispose { view.keepScreenOn = false }
+    }
     LaunchedEffect(state.playing) {
         if (!state.playing) return@LaunchedEffect
         if (state.frame >= state.scene.lastFrame) state.frame = 0

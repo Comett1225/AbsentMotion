@@ -139,6 +139,7 @@
     <string name="settings_report_issue">Zgłoś problem</string>
     <string name="settings_suggest_feature">Zaproponuj funkcję</string>
     <string name="join_discord">Dołącz do Discorda</string>
+    <string name="alight_reimport_tip">Stary import z Alight Motion: zaimportuj go ponownie z Alight Motion, aby uzyskać najnowszy wygląd.</string>
     <string name="settings_help">Pomoc</string>
     <string name="tutorial_settings_start">Rozpocznij samouczek</string>
     <string name="tutorial_settings_continue">Kontynuuj samouczek</string>
@@ -246,6 +247,10 @@
     <string name="update_not_now">Nie teraz</string>
     <string name="update_outdated">Nowsza wersja może rozwiązać ten problem (zainstalowana: %1$s, najnowsza: %2$s).</string>
     <string name="update_changelog">Lista zmian</string>
+    <string name="whats_new_see">Zobacz nowości w %1$s</string>
+    <string name="settings_whats_new">Nowości</string>
+    <string name="settings_auto_check_on">Autosprawdzanie: wł.</string>
+    <string name="settings_auto_check_off">Autosprawdzanie: wył.</string>
     <string name="update_open_failed">Żadna aplikacja na tym urządzeniu nie może otworzyć linku.</string>
     <string name="update_download_update">Pobierz aktualizację</string>
     <string name="update_installed">Zainstalowana wersja: %1$s</string>
@@ -1107,6 +1112,7 @@
     <string name="layer_tool_edit_points">Edytuj punkty</string>
     <string name="layer_tool_edit_drawing">Edytuj rysunek</string>
     <string name="layer_tool_edit_group">Edytuj grupę</string>
+    <string name="layer_tool_frame">Klatka</string>
     <string name="layer_tool_ungroup">Rozgrupuj</string>
     <string name="group_leave">Opuść grupę</string>
     <string name="ungroup_loses_style">Rozgrupowanie usuwa efekty, prędkość, krycie i tryb mieszania grupy. Jej warstwy zachowują swoje położenie i wygląd.</string>

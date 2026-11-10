@@ -115,7 +115,7 @@ internal fun DeskSettings(settings: AppSettings, initial: SettingsPage, onClose:
                 when (page) {
                     SettingsPage.Help -> DeskHelpPage()
                     SettingsPage.Tutorial -> DeskTutorialPage(settings, onClose)
-                    SettingsPage.About -> DeskAbout()
+                    SettingsPage.About -> DeskAbout(settings)
                     SettingsPage.Crash -> DeskCrashLogs()
                     SettingsPage.Language -> DeskLanguages()
                     else -> Column(Modifier.fillMaxSize().deskVerticalScroll(color = Am.Navy).padding(24.dp)) {

@@ -58,6 +58,12 @@ Effects that AbsentMotion has are converted. Effects it does not have stay in th
 
 There are limits to protect the phone. For example, a package can have at most 2000 files and 32 projects, be at most 2 GB unpacked, and a scene needs a size of at most 16384 pixels and a frame rate from 1 to 240. The app says which rule a file broke.
 
+### Projects from another editor
+
+In scene XML files and `.amproj` packages from another editor, photos with wide colors (Display P3) look as they do in that editor.
+
+Each version of AbsentMotion converts these projects a little better, and a project keeps the conversion of the version that imported it. The first time you open a project that an older version imported, a message suggests importing it again for the latest look. Import the file from the other editor again to get the current conversion.
+
 ### Adobe Animate files
 
 AbsentMotion imports `.fla` files saved by Adobe Animate or Flash CS5 and later. Open one like any other project file: with **Choose file**, Share or Open with. On a computer, use **File**, **Import Project…** or drop the file on the window; there an `.xfl` file works too, as long as the rest of its folder is next to it. On the phone, pack an XFL folder into a ZIP file and import that.
@@ -66,6 +72,8 @@ The file becomes one project with the stage size, frame rate and background colo
 
 - **Comes over:** shapes with solid, two-color gradient and picture fills, and their lines; symbols, each as a group with its own timeline; pictures; classic tweens as keyframes, with their eases; alpha, tint and brightness; mask layers; and MP3 sounds on the main timeline.
 - **Left out:** text fields, ActionScript, filters, blend modes, other color effects, motion guide paths, camera layers, components and compiled clips, videos, bone (IK) poses and library symbols that are not on the stage. A shape tween shows its start shape and a motion tween its first keyframe. Gradients with more than two colors keep two, dashed and other special lines are drawn solid, and eases that cannot be read become straight motion.
+
+Each symbol or picture that moves becomes one layer with keyframes, also when several of them share one Animate layer. A graphic symbol keeps every frame of its own timeline, so rigs with mouths, eyes or hands keep working: the frame Animate shows (single frame, play once, loop or one of the reverse modes) is keyed on the **Frame** of its group, which you can change later (see [Layer tools](@layer-tools#frame)). A movie clip loops its own timeline, and a button shows its first frame.
 
 After the import, the report lists both, with a count for each: **Imported from the Animate file** and **Not imported (shown without it)**.
 

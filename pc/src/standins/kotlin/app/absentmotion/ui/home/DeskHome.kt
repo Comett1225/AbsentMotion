@@ -56,6 +56,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.draw.shadow
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -183,7 +184,7 @@ internal fun DeskHome(
 
     Box(Modifier.fillMaxSize().background(Am.HomeBg)) {
         Column(Modifier.fillMaxSize()) {
-            DeskHeader(section, { section = it; if (it == DeskSection.Templates) selected = null }, search, { search = it }, templates = section == DeskSection.Templates, newProject, import, onSettings)
+            DeskHeader(section, { section = it; if (it == DeskSection.Templates) selected = null }, search, { search = it }, templates = section == DeskSection.Templates, newProject, import, onSettings, settings)
             Box(Modifier.weight(1f).fillMaxWidth(), Alignment.TopCenter) {
                 Box(Modifier.widthIn(max = ContentMax).fillMaxSize()) {
                     when (section) {
@@ -219,12 +220,15 @@ internal fun DeskHome(
 @Composable
 private fun DeskHeader(
     section: DeskSection, onSection: (DeskSection) -> Unit, search: String, onSearch: (String) -> Unit, templates: Boolean,
-    onNew: () -> Unit, onImport: () -> Unit, onSettings: () -> Unit,
+    onNew: () -> Unit, onImport: () -> Unit, onSettings: () -> Unit, settings: AppSettings,
 ) = SizedBox(Modifier.fillMaxWidth()) { maxWidth, _ ->
+    val context = LocalContext.current
+    val notes = remember { WhatsNewNotes.currentName(context) != null }
+    var changelog by remember { mutableStateOf(false) }
     val compact = maxWidth < 1180.dp
     val iconNew = maxWidth < 900.dp
     val tight = maxWidth < 780.dp
-    val fixed = if (tight) 510.dp else 456.dp + (if (compact) 72.dp else 216.dp) + (if (iconNew) 36.dp else 150.dp) + 32.dp
+    val fixed = (if (tight) 510.dp else 456.dp + (if (compact) 72.dp else 216.dp) + (if (iconNew) 36.dp else 150.dp) + 32.dp) + (if (notes) 44.dp else 0.dp)
     val searchWidth = (maxWidth - fixed).coerceIn(if (tight) 110.dp else 140.dp, 300.dp)
     Box(Modifier.fillMaxWidth(), Alignment.TopCenter) {
         Row(Modifier.widthIn(max = ContentMax).fillMaxWidth().height(68.dp).padding(horizontal = if (tight) 16.dp else GridPad), Arrangement.spacedBy(if (tight) 6.dp else 8.dp), Alignment.CenterVertically) {
@@ -233,6 +237,11 @@ private fun DeskHeader(
             DeskTab(stringResource(R.string.home_tab_templates), section == DeskSection.Templates, tight) { onSection(DeskSection.Templates) }
             DeskTab(stringResource(R.string.home_tab_tools), section == DeskSection.Tools, tight) { onSection(DeskSection.Tools) }
             Spacer(Modifier.weight(1f))
+            if (notes) Hint(stringResource(R.string.update_changelog)) {
+                Box(Modifier.size(36.dp).clip(RoundedCornerShape(10.dp)).deskPress(10.dp).clickable(role = Role.Button) { changelog = true }, Alignment.Center) {
+                    ChangelogIcon(WhatsNewNotes.unseen(context, settings))
+                }
+            }
             SearchField(
                 search, onSearch, Modifier.width(searchWidth).height(36.dp),
                 hint = stringResource(if (searchWidth < 210.dp) R.string.home_search else if (templates) R.string.home_search_templates_hint else R.string.home_search_hint),
@@ -250,6 +259,7 @@ private fun DeskHeader(
             }
         }
     }
+    if (changelog) CurrentWhatsNew(settings) { changelog = false }
 }
 
 @Composable
@@ -273,7 +283,7 @@ private fun ProjectsPane(
     val locale = androidx.compose.ui.platform.LocalConfiguration.current.locales[0]
     val rows = remember(shown, byName, locale) { listRows(shown, byName, dateHeader(locale)) }
     val cards = remember(rows) { rows.filterIsInstance<ListRow.Card>().map { it.info } }
-    val thumbs = remember { object : LinkedHashMap<String, ImageBitmap>(16, 0.75f, true) { override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, ImageBitmap>?) = size > 96 } }
+    val thumbs = remember { object : LinkedHashMap<String, Thumb>(16, 0.75f, true) { override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Thumb>?) = size > 96 } }
     val seen = remember { HashSet<Any>() }
     val grid = rememberLazyGridState()
     val focus = remember { FocusRequester() }
@@ -389,12 +399,14 @@ private fun ProjectsPane(
 internal fun factLine(info: ProjectInfo): String = facts(info).flatten().joinToString("  ·  ") { it.second }
 
 @Composable
-private fun rememberProjectThumb(info: ProjectInfo, version: Int, cache: MutableMap<String, ImageBitmap>): ImageBitmap? {
-    val bitmap by produceState<ImageBitmap?>(cache[info.id], info.id, info.modified, info.thumbnail, version) {
+private fun rememberProjectThumb(info: ProjectInfo, version: Int, cache: MutableMap<String, Thumb>): ImageBitmap? {
+    val bitmap by produceState<ImageBitmap?>(cache[info.id]?.image, info.id, info.modified, info.thumbnail, version) {
         val file = info.thumbnail
         if (file == null) { value = null; return@produceState }
+        val stamp = withContext(Dispatchers.IO) { file.lastModified() }
+        cache[info.id]?.takeIf { it.stamp == stamp }?.let { value = it.image; return@produceState }
         val decoded = withContext(Dispatchers.IO) { BitmapFactory.decodeFile(file.path)?.asImageBitmap() }
-        if (decoded != null) { cache[info.id] = decoded; value = decoded }
+        if (decoded != null) { cache[info.id] = Thumb(stamp, decoded); value = decoded }
     }
     return bitmap
 }

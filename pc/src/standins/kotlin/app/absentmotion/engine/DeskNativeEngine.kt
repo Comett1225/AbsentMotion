@@ -28,7 +28,7 @@ class NativeEngine(backend: Backend = Backend.GANESH) : AutoCloseable {
 
     fun setModel(uri: String, mesh: app.absentmotion.media.Mesh?): Boolean = DesktopNative.setModel(uri, mesh?.positions, mesh?.normals, mesh?.uvs, mesh?.colors, mesh?.triangles, mesh?.slots, mesh?.twoSided == true)
 
-    fun setPictureFile(uri: String, path: String): Boolean = DesktopNative.setPicture(handle, uri, path)
+    fun setPictureFile(uri: String, path: String, raw: Boolean = false): Boolean = DesktopNative.setPicture(handle, uri, path, raw)
 
     fun setFrame(uri: String, width: Int, height: Int, rgba: ByteArray): Boolean = DesktopNative.setFrame(handle, uri, width, height, rgba)
 

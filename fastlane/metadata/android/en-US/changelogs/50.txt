@@ -1,0 +1,1 @@
+Smoother editing and playback, a faster project list, and Pixelate, Mosaic and other block effects now cover the whole layer. Adobe Animate imports keep moving objects and rigs editable, with a new Frame tile for groups. Imported Alight Motion projects show photo colours as in Alight. A Changelog button, a more compact Settings page, and a What's new that lists every fix.

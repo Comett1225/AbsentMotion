@@ -1,5 +1,6 @@
 package app.absentmotion.desk
 
+import app.absentmotion.export.DeskEncoders
 import android.content.Context
 import android.widget.Toast
 import app.absentmotion.R
@@ -20,6 +21,7 @@ object DeskPreload {
             runCatching { app.engine.startProblem.await() }
             runCatching { gpuNotice(app.context) }
             runCatching { dropOldArchives() }
+            runCatching { DeskEncoders.available }
         }
     }
 

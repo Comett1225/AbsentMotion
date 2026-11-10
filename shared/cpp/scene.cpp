@@ -446,7 +446,7 @@ void LinkAnims(Layer& l, const std::function<void(Anim&)>& visit) {
 void BindLinks(std::vector<Layer>& layers) {
     bool linked = false;
     for (auto& l : layers) {
-        BindLinks(l.children);
+        if (l.children) BindLinks(*l.children);
         LinkAnims(l, [&](Anim& a) {
             a.linkStart = l.startTime;
             a.linkEnd = l.endTime;
@@ -501,9 +501,10 @@ void ParseGroup(const XmlNode& scene, int fps, Layer* group) {
         Nest() { depth++; }
         ~Nest() { depth--; }
     } nest;
+    group->children = std::make_shared<std::vector<Layer>>();
     for (const auto& n : scene.children) {
         Layer l;
-        if (ParseLayer(*n, innerFps, &l)) group->children.push_back(std::move(l));
+        if (ParseLayer(*n, innerFps, &l)) group->children->push_back(std::move(l));
     }
 }
 
@@ -530,6 +531,7 @@ bool ParseLayer(const XmlNode& node, int fps, Layer* out) {
         if (speed > 0 && std::isfinite(speed)) l.retiming.speed = speed;
         l.retiming.cut = std::max(0, IntAttr(*n, "inTime", 0));
         l.retiming.clock = IntAttr(*n, "retimeLength", -1);
+        l.frame = ParseAnim(n->child("frame"));
     }
     const char* id = n->attr("id");
     l.id = id ? strtoll(id, nullptr, 10) : 0;
@@ -647,7 +649,21 @@ const Layer* ActiveCamera(const std::vector<Layer>& layers, double timeMs) {
     return active ? active : lowest;
 }
 
+static double PickedTime(const Retiming& r, float frame) {
+    const double fps = r.fps > 0 ? r.fps : 30;
+    const double count = std::floor(std::max(0, r.length) * fps / 1000 + 1e-9) + 1;
+    const double f = std::isfinite(frame) ? std::floor(frame + 1e-4) : 0;
+    return std::floor((2 * (f - count * std::floor(f / count)) + 1) * 500 / fps);
+}
+
 double NestedTime(const Layer& group, double timeMs) {
+    if (!group.frame.empty()) {
+        const int fps = std::max(1, group.retiming.hostFps);
+        const long long ms = (long long)std::floor(group.steppedMs(timeMs));
+        const double at = (4.0 * (((ms + 1) * fps + 999) / 1000 - 1) + 3) * 250 / fps;
+        const float t = group.endTime > group.startTime ? (float)((at - group.startTime) / (group.endTime - group.startTime)) : 0.0f;
+        return PickedTime(group.retiming, group.frame.get(0, t, 0));
+    }
     return RetimedTime(group.retiming, group.startTime, group.endTime, group.steppedMs(timeMs));
 }
 

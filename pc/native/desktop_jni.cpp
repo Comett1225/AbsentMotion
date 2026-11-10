@@ -21,6 +21,7 @@
 #include "include/core/SkColorSpace.h"
 #include "include/core/SkData.h"
 #include "include/core/SkImage.h"
+#include "include/core/SkImageGenerator.h"
 #include "include/core/SkSurface.h"
 #include "include/codec/SkCodec.h"
 #include "include/core/SkPixmap.h"
@@ -49,7 +50,10 @@ struct Desktop {
     bool cameraView = true;
     bool accurateBlur = true;
     std::vector<uint8_t> frameBytes;
-    Desktop() : gpu(std::getenv("AM_SOFTWARE_RENDER") ? nullptr : CreateDesktopGpu()) { DesktopGpuState = gpu && gpu->context() ? 1 : 0; }
+    Desktop() : gpu(std::getenv("AM_SOFTWARE_RENDER") ? nullptr : CreateDesktopGpu()) {
+        DesktopGpuState = gpu && gpu->context() ? 1 : 0;
+        if (gpu && gpu->context()) gpu->context()->setResourceCacheLimit(size_t(512) << 20);
+    }
     ~Desktop() { mosh.clear(); layerPictures.clear(); masks.clear(); pictures.clear(); }
     am::MediaPictures maskLookup() {
         return [this](const std::string& uri, int64_t) -> sk_sp<SkImage> {
@@ -147,6 +151,43 @@ GrDirectContext* DesktopContext(jlong h) { return ptr(h)->gpu ? ptr(h)->gpu->con
 std::string DesktopString(JNIEnv* env, jstring s) { return str(env, s); }
 void DesktopInstall(jlong h, const std::string& uri, sk_sp<SkImage> image) { ptr(h)->pictures[uri] = std::move(image); }
 void DesktopInstallLayer(jlong h, const std::string& uri, int64_t layer, sk_sp<SkImage> image) { ptr(h)->layerPictures[{uri, layer}] = std::move(image); }
+namespace {
+class RawPicture : public SkImageGenerator {
+public:
+    RawPicture(std::unique_ptr<SkCodec> codec, bool mirror, bool raw) : SkImageGenerator(Info(*codec, raw)), fCodec(std::move(codec)), fMirror(mirror) {}
+
+protected:
+    bool onGetPixels(const SkImageInfo& info, void* pixels, size_t rowBytes, const Options&) override {
+        const SkCodec::Result result = fCodec->getPixels(info, pixels, rowBytes);
+        if (result != SkCodec::kSuccess && result != SkCodec::kIncompleteInput && result != SkCodec::kErrorInInput) return false;
+        const size_t pixel = info.bytesPerPixel();
+        if (!fMirror) return true;
+        for (int y = 0; y < info.height(); ++y) {
+            auto* row = (uint8_t*)pixels + (size_t)y * rowBytes;
+            for (int a = 0, b = info.width() - 1; a < b; ++a, --b) std::swap_ranges(row + a * pixel, row + (a + 1) * pixel, row + b * pixel);
+        }
+        return true;
+    }
+
+private:
+    static SkImageInfo Info(const SkCodec& codec, bool raw) {
+        const SkImageInfo info = raw ? codec.getInfo().makeColorSpace(nullptr) : codec.getInfo();
+        return info.alphaType() == kUnpremul_SkAlphaType ? info.makeAlphaType(kPremul_SkAlphaType) : info;
+    }
+    std::unique_ptr<SkCodec> fCodec;
+    bool fMirror;
+};
+
+sk_sp<SkImage> PictureAsStored(sk_sp<SkData> data, bool raw) {
+    auto codec = SkCodec::MakeFromData(data);
+    const SkEncodedOrigin origin = codec ? codec->getOrigin() : kTopLeft_SkEncodedOrigin;
+    if (origin == kTopLeft_SkEncodedOrigin && !(raw && codec)) return SkImages::DeferredFromEncodedData(data);
+    const bool mirror = origin == kTopRight_SkEncodedOrigin || origin == kBottomLeft_SkEncodedOrigin ||
+                        origin == kLeftTop_SkEncodedOrigin || origin == kRightBottom_SkEncodedOrigin;
+    return SkImages::DeferredFromGenerator(std::make_unique<RawPicture>(std::move(codec), mirror, raw));
+}
+}
+
 #define JNI(name) Java_app_absentmotion_pc_engine_DesktopNative_##name
 extern "C" {
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM*, void*) {
@@ -166,10 +207,10 @@ JNIEXPORT jstring JNICALL JNI(setScene)(JNIEnv* e, jobject, jlong h, jstring xml
     ptr(h)->scene = std::move(next);
     return nullptr;
 }
-JNIEXPORT jboolean JNICALL JNI(setPicture)(JNIEnv* e, jobject, jlong h, jstring uri, jstring path) {
+JNIEXPORT jboolean JNICALL JNI(setPicture)(JNIEnv* e, jobject, jlong h, jstring uri, jstring path, jboolean raw) {
     SkFILEStream stream(str(e, path).c_str());
     auto data = stream.isValid() ? SkData::MakeFromStream(&stream, stream.getLength()) : nullptr;
-    auto image = data ? SkImages::DeferredFromEncodedData(data) : nullptr;
+    auto image = data ? PictureAsStored(data, raw) : nullptr;
     if (!image) return false;
     auto* d = ptr(h);
     const auto key = str(e, uri);

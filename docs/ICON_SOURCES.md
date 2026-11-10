@@ -31,7 +31,7 @@ The launcher icon is an own drawing, made by `tools/icon/make_icon.py` (source o
 | --- | --- |
 | Lucide only | 174 |
 | Lucide shapes plus own parts | 8 |
-| Own drawing only | 43 |
+| Own drawing only | 44 |
 | Tabler | 2 |
 | Simple Icons | 1 |
 | Material Symbols | 0 |
@@ -176,6 +176,7 @@ The launcher icon is an own drawing, made by `tools/icon/make_icon.py` (source o
 | `ui/home/HomeIcons.kt` | `ToolsTab` | Lucide | `wrench` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/wrench.svg | - |
 | `ui/home/HomeIcons.kt` | `ToolsTabOn` | Lucide | `wrench` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/wrench.svg | also filled |
 | `ui/home/HomeIcons.kt` | `Compress` | Lucide | `shrink` | ISC | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/shrink.svg | - |
+| `ui/home/HomeIcons.kt` | `Notes` | own drawing | - | GPL-3.0 (own) | - | page with a folded corner and two lines (Changelog button) |
 | `ui/home/HomeIcons.kt` | `Download` | Lucide | `download` | ISC and MIT (Feather) | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/download.svg | - |
 | `ui/export/ExportIcons.kt` | `Close` | Lucide | `x` | ISC and MIT (Feather) | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/x.svg | x scaled x1.2 |
 | `ui/export/ExportIcons.kt` | `Back` | Lucide | `arrow-left` | ISC and MIT (Feather) | https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/arrow-left.svg | - |

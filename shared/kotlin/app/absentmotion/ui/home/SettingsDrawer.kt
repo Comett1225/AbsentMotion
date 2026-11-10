@@ -31,7 +31,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.selection.selectable
@@ -52,6 +54,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
@@ -118,6 +121,7 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
     var crashLogs by remember { mutableStateOf(false) }
     var language by remember { mutableStateOf(false) }
     var demoNote by remember { mutableStateOf(false) }
+    var whatsNew by remember { mutableStateOf(false) }
     ModalDrawerSheet(
         drawer, Modifier.width(280.dp), drawerShape = RectangleShape, drawerContainerColor = Am.HomeDrawer,
         windowInsets = WindowInsets(0),
@@ -127,6 +131,8 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
                 stringResource(R.string.settings), Modifier.fillMaxWidth().heightIn(min = 50.dp).wrapContentHeight(Alignment.CenterVertically).padding(start = 11.dp),
                 color = Am.HomeInk, fontSize = 18.sp, fontWeight = FontWeight.Bold,
             )
+            AppCard(settings) { whatsNew = true }
+            Spacer(Modifier.height(CardGap))
             Category(R.string.settings_group_editor, HomeIcons.Pencil) { EditorSettings(settings) }
             Category(R.string.settings_group_playback, HomeIcons.ProjectsTabOff) { PlaybackSettings(settings) }
             Category(R.string.settings_group_projects, HomeIcons.Folder) { ProjectsSettings(settings) { demoNote = it } }
@@ -140,30 +146,26 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
             app.absentmotion.ui.tutorial.TutorialRows(settings)
             Spacer(Modifier.height(CardGap))
             LinkRow(stringResource(R.string.settings_about)) { about = true }
+            Spacer(Modifier.height(CardGap))
             val links = LocalUriHandler.current
             val found = rememberReportLinks()
-            Text(
-                stringResource(R.string.settings_report_issue),
-                Modifier.padding(horizontal = 6.dp).clickable { runCatching { links.openUri(found.form) } }.padding(horizontal = 15.dp, vertical = 10.dp),
-                color = Am.HomeInk, fontSize = 13.sp, textDecoration = TextDecoration.Underline,
-            )
-            Text(
-                stringResource(R.string.settings_suggest_feature),
-                Modifier.padding(horizontal = 6.dp).clickable { runCatching { links.openUri(found.feature) } }.padding(horizontal = 15.dp, vertical = 10.dp),
-                color = Am.HomeInk, fontSize = 13.sp, textDecoration = TextDecoration.Underline,
-            )
+            Row(Modifier.padding(horizontal = 6.dp).fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Pill(stringResource(R.string.settings_report_issue), PanelColor, Am.HomeInk, Modifier.weight(1f).fillMaxHeight(), pad = 8.dp) { runCatching { links.openUri(found.form) } }
+                Pill(stringResource(R.string.settings_suggest_feature), PanelColor, Am.HomeInk, Modifier.weight(1f).fillMaxHeight(), pad = 8.dp) { runCatching { links.openUri(found.feature) } }
+            }
             Text(
                 stringResource(R.string.join_discord),
                 Modifier.padding(horizontal = 6.dp).clickable { runCatching { links.openUri(found.discord) } }.padding(horizontal = 15.dp, vertical = 10.dp),
                 color = Am.HomeInk, fontSize = 13.sp, textDecoration = TextDecoration.Underline,
             )
-            UpdateRows(settings) { crashLogs = true }
+            LinkRow(stringResource(R.string.crash_logs)) { crashLogs = true }
         }
     }
     if (language) LanguageDialog { language = false }
     if (help) HelpScreen { help = false }
-    if (about) AboutScreen { about = false }
+    if (about) AboutScreen(settings) { about = false }
     if (crashLogs) CrashLogsScreen { crashLogs = false }
+    if (whatsNew) CurrentWhatsNew(settings) { whatsNew = false }
     if (demoNote) AlertDialog(
         onDismissRequest = { demoNote = false },
         title = { Text(stringResource(R.string.demo_mode_is_on), color = Am.Navy) },
@@ -451,11 +453,40 @@ internal fun Divider(inset: androidx.compose.ui.unit.Dp) {
 }
 
 @Composable
-private fun UpdateRows(settings: AppSettings, onCrashLogs: () -> Unit) {
-    Column(Modifier.padding(horizontal = 6.dp).fillMaxWidth().clip(PanelShape).background(PanelColor)) {
-        ActionRow(stringResource(R.string.crash_logs), onClick = onCrashLogs)
-        Divider(10.dp)
-        UpdateSettings(settings)
+private fun AppCard(settings: AppSettings, onWhatsNew: () -> Unit) {
+    val context = LocalContext.current
+    val version = app.absentmotion.platform.appVersion().trim()
+    val notes = remember { WhatsNewNotes.currentName(context) != null }
+    Column(Modifier.padding(horizontal = 6.dp).fillMaxWidth().clip(PanelShape).background(PanelColor).padding(start = 12.dp, end = 10.dp, top = 10.dp, bottom = 12.dp)) {
+        Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
+            Column(Modifier.widthIn(max = 140.dp).padding(end = 8.dp)) {
+                Text("AbsentMotion", color = Am.HomeInk, fontSize = 15.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                if (version.isNotEmpty()) Text(stringResource(R.string.about_version, version), color = Am.HomeMid, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
+            Pill(stringResource(R.string.update_check_now), Am.Navy, Am.OnNavy, Modifier.weight(1f, fill = false), pad = 12.dp, busy = Updates.checking) { Updates.check(context, settings, manual = true) }
+        }
+        Spacer(Modifier.height(10.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (notes) Pill(stringResource(R.string.settings_whats_new), Am.Card, Am.HomeInk, onClick = onWhatsNew)
+            val on = settings.autoUpdateCheck
+            Pill(
+                stringResource(if (on) R.string.settings_auto_check_on else R.string.settings_auto_check_off), Am.Card, Am.HomeInk,
+                Modifier.toggleable(value = on, role = androidx.compose.ui.semantics.Role.Switch) { settings.chooseUpdates(it) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun Pill(label: String, fill: Color, ink: Color, modifier: Modifier = Modifier, pad: androidx.compose.ui.unit.Dp = 14.dp, busy: Boolean = false, onClick: (() -> Unit)? = null) {
+    Box(
+        Modifier.heightIn(min = 38.dp).clip(RoundedCornerShape(50)).background(fill).then(modifier)
+            .then(if (onClick != null) Modifier.deskPress(19.dp).clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = onClick) else Modifier)
+            .padding(horizontal = pad, vertical = 6.dp),
+        Alignment.Center,
+    ) {
+        Text(label, Modifier.alpha(if (busy) 0f else 1f), color = ink, fontSize = 13.sp, lineHeight = 16.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center, maxLines = 2, overflow = TextOverflow.Ellipsis)
+        if (busy) CircularProgressIndicator(Modifier.size(16.dp), color = ink, strokeWidth = 2.dp)
     }
 }
 

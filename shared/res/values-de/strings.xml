@@ -139,6 +139,7 @@
     <string name="settings_report_issue">Problem melden</string>
     <string name="settings_suggest_feature">Funktion vorschlagen</string>
     <string name="join_discord">Discord beitreten</string>
+    <string name="alight_reimport_tip">Alter Alight-Motion-Import: Importiere ihn erneut aus Alight Motion, um den neuesten Look zu erhalten.</string>
     <string name="settings_help">Hilfe</string>
     <string name="tutorial_settings_start">Tutorial starten</string>
     <string name="tutorial_settings_continue">Tutorial fortsetzen</string>
@@ -246,6 +247,10 @@
     <string name="update_not_now">Jetzt nicht</string>
     <string name="update_outdated">Dies ist möglicherweise in der neueren Version behoben (installiert: %1$s, neueste: %2$s).</string>
     <string name="update_changelog">Änderungsprotokoll</string>
+    <string name="whats_new_see">Neuigkeiten in %1$s ansehen</string>
+    <string name="settings_whats_new">Neuigkeiten</string>
+    <string name="settings_auto_check_on">Auto-Prüfung: Ein</string>
+    <string name="settings_auto_check_off">Auto-Prüfung: Aus</string>
     <string name="update_open_failed">Keine App auf diesem Gerät kann den Link öffnen.</string>
     <string name="update_download_update">Update herunterladen</string>
     <string name="update_installed">Installierte Version: %1$s</string>
@@ -1077,6 +1082,7 @@
     <string name="layer_tool_edit_points">Punkte bearbeiten</string>
     <string name="layer_tool_edit_drawing">Zeichnung bearbeiten</string>
     <string name="layer_tool_edit_group">Gruppe bearbeiten</string>
+    <string name="layer_tool_frame">Bild</string>
     <string name="layer_tool_ungroup">Gruppierung aufheben</string>
     <string name="group_leave">Gruppe verlassen</string>
     <string name="ungroup_loses_style">Beim Aufheben der Gruppierung werden die eigenen Effekte, Geschwindigkeit, Deckkraft und der Mischmodus der Gruppe entfernt. Ihre Ebenen behalten ihre Position und ihr Aussehen.</string>

@@ -342,7 +342,7 @@ private fun DeskInspector(state: EditorState, library: AddLibrary, modifier: Mod
     var menu by remember { mutableStateOf(false) }
     var parentMenu by remember { mutableStateOf(false) }
     val textUi = remember { TextEditUi() }
-    val layer = state.selected
+    val layer = state.selectedId?.let { state.scene.layer(it) }
     Column(modifier.background(Am.Panel).tutorialTarget("inspector")) {
         Row(Modifier.fillMaxWidth().height(44.dp).padding(start = 8.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             if (state.selectedId != null && state.panel == EditorPanel.EditText) Box(Modifier.tutorialTarget("back")) { DeskIcon(ChromeIcons.Back, stringResource(R.string.topbar_back)) { state.stepBack() } }

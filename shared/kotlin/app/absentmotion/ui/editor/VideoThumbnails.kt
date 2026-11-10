@@ -77,14 +77,17 @@ internal fun videoStripPicture(layer: Layer, scene: Scene, fromMs: Float, toMs: 
     val checked by versions.collectAsState()
     val request = StripRequest(uri, checked.versions[uri], tiles)
     val seed = remember(request, checked.trusted) { cachedFrames(uri, checked.seed(uri), tiles) }
+    val spacing = remember { floatArrayOf(tileMs) }
     val shown by produceState(null as Stamped<StripRequest, List<Pair<Int, ImageBitmap>>>?, request) {
+        if (value != null && spacing[0] != tileMs) kotlinx.coroutines.delay(120)
+        spacing[0] = tileMs
         val version = withContext(Dispatchers.IO) { thumbnailVersion(context, uri) }
         if (version != request.version) { versions.update { it.with(uri, version) }; return@produceState }
         val known = cachedFrames(uri, version, tiles)
-        value = Stamped(request, known)
+        if (version == null || known.size == tiles.size || value?.key?.uri != uri) value = Stamped(request, known)
         if (version != null && known.size < tiles.size) value = Stamped(request, withContext(Dispatchers.IO) { retrieving.withLock { thumbnailsAt(context, uri, version, tiles) } }.ifEmpty { known })
     }
-    val pictures = shown.of(request) ?: seed
+    val pictures = shown.of(request) ?: seed.takeIf { it.size == tiles.size } ?: shown?.takeIf { it.key.uri == uri }?.value?.takeIf { it.size > seed.size } ?: seed
     val bitmap = pictures.firstOrNull()?.second ?: return null
     return StripPicture(bitmap, IntOffset.Zero, IntSize(bitmap.width, bitmap.height), pictures)
 }

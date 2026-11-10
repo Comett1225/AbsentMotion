@@ -44,10 +44,19 @@ import java.util.Locale
 private val Marks = Regex("\\p{M}+")
 private val Spaces = Regex("\\s+")
 
-private fun folded(text: String): String = Normalizer.normalize(text, Normalizer.Form.NFD).replace(Marks, "").lowercase(Locale.ROOT)
+private fun folded(text: String): String =
+    if (text.all { it < '\u0080' }) text.lowercase(Locale.ROOT) else Normalizer.normalize(text, Normalizer.Form.NFD).replace(Marks, "").lowercase(Locale.ROOT)
+
+@Volatile private var lastWords: Pair<String, List<String>> = "" to emptyList()
+
+private fun wordsOf(query: String): List<String> {
+    val last = lastWords
+    if (last.first == query) return last.second
+    return folded(query).split(Spaces).filter { it.isNotEmpty() }.also { lastWords = query to it }
+}
 
 fun matchesSearch(query: String, vararg texts: String): Boolean {
-    val words = folded(query).split(Spaces).filter { it.isNotEmpty() }
+    val words = wordsOf(query)
     if (words.isEmpty()) return true
     val fields = texts.map(::folded)
     return words.all { word -> fields.any { it.contains(word) } }

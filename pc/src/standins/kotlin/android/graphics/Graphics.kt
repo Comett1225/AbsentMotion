@@ -93,13 +93,45 @@ object BitmapFactory {
     @JvmStatic fun decodeStream(input: InputStream?, pad: Rect? = null, options: Options? = null): Bitmap? {
         input ?: return null
         val bytes = input.readBytes()
-        val img = runCatching { ImageIO.read(bytes.inputStream()) }.getOrNull() ?: return null
+        if (options?.inJustDecodeBounds == true) {
+            val size = bounds(bytes) ?: return null
+            options.outWidth = size.first
+            options.outHeight = size.second
+            return null
+        }
+        val img = runCatching { ImageIO.read(bytes.inputStream()) }.getOrNull() ?: skia(bytes) ?: return null
         options?.apply { outWidth = img.width; outHeight = img.height }
-        if (options?.inJustDecodeBounds == true) return null
         val s = options?.inSampleSize?.coerceAtLeast(1) ?: 1
         val full = Bitmap(argb(img))
         return if (s > 1) Bitmap.createScaledBitmap(full, img.width / s, img.height / s, true) else full
     }
+    private fun bounds(bytes: ByteArray): Pair<Int, Int>? =
+        runCatching {
+            ImageIO.createImageInputStream(bytes.inputStream()).use { stream ->
+                ImageIO.getImageReaders(stream).asSequence().firstOrNull()?.let { reader ->
+                    try { reader.input = stream; reader.getWidth(0) to reader.getHeight(0) } finally { reader.dispose() }
+                }
+            }
+        }.getOrNull() ?: runCatching {
+            org.jetbrains.skia.Data.makeFromBytes(bytes).use { data -> org.jetbrains.skia.Codec.makeFromData(data).use { it.width to it.height } }
+        }.getOrNull()
+
+    private fun skia(bytes: ByteArray): BufferedImage? = runCatching {
+        org.jetbrains.skia.Data.makeFromBytes(bytes).use { data ->
+            org.jetbrains.skia.Codec.makeFromData(data).use { codec ->
+                val info = org.jetbrains.skia.ImageInfo(codec.width, codec.height, org.jetbrains.skia.ColorType.BGRA_8888, org.jetbrains.skia.ColorAlphaType.UNPREMUL)
+                org.jetbrains.skia.Bitmap().use { pixels ->
+                    pixels.allocPixels(info)
+                    codec.readPixels(pixels)
+                    BufferedImage(codec.width, codec.height, BufferedImage.TYPE_INT_ARGB).also { out ->
+                        java.nio.ByteBuffer.wrap(pixels.readPixels(info, codec.width * 4, 0, 0)!!).order(java.nio.ByteOrder.LITTLE_ENDIAN).asIntBuffer()
+                            .get((out.raster.dataBuffer as java.awt.image.DataBufferInt).data)
+                    }
+                }
+            }
+        }
+    }.getOrNull()
+
     @JvmStatic fun decodeStream(input: InputStream?): Bitmap? = decodeStream(input, null, null)
     @JvmStatic fun decodeFile(path: String, options: Options? = null): Bitmap? = java.io.File(path).takeIf { it.isFile }?.inputStream()?.use { decodeStream(it, null, options) }
     @JvmStatic fun decodeByteArray(data: ByteArray, offset: Int, length: Int, options: Options? = null): Bitmap? = decodeStream(data.inputStream(offset, length), null, options)

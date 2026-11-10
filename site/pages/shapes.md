@@ -98,6 +98,8 @@ Inside a group, the copy and paste menu also has **Set intro end** and **Set out
 
 ![Inside a group: the gear (1) opens the group settings with Re-timing (2).](img/sh-group-retiming.webp)
 
+To show one chosen frame of the group instead, use **Frame** in its tools: see [Layer tools](@layer-tools#frame).
+
 ### Ungroup
 
 **Ungroup** in the layer menu of a group puts its layers back into the project, where they were in time and on screen. If the group has its own effects, speed, opacity or blending, the app warns that these are removed before it ungroups. Undo brings the group back.

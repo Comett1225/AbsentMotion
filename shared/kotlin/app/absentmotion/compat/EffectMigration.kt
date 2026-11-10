@@ -233,3 +233,13 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
         )
     }
 }
+
+fun Scene.oldAlightImport(): Boolean {
+    if (!fromAlight || node["reimportTip"] != null) return false
+    fun lacks(effect: XmlNode, name: String) = effect.children.none { it.name == "property" && it["name"] == name }
+    fun stale(n: XmlNode): Boolean = n.name == "effect" && (n["id"] == "absent.backdrop" && lacks(n, "spill") || n["id"] == "absent.exposure" && lacks(n, "soft")) ||
+        n.children.any(::stale)
+    return stale(node)
+}
+
+fun Scene.withReimportTipShown(): Scene = Scene(node.with("reimportTip", "shown"))

@@ -1,7 +1,16 @@
 package app.absentmotion.pc
 
 import app.absentmotion.ui.home.WhatsNew
+import app.absentmotion.ui.home.WhatsNewCard
 import app.absentmotion.ui.home.WhatsNewNotes
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.toAwtImage
@@ -105,6 +114,41 @@ class DeskParityRoundTest {
         session(1280, 800) {
             settle(900)
             onNodeWithText(title).assertDoesNotExist()
+        }
+    }
+
+    @Test fun whatsNewKeepsTheSectionAndGroupHeadersPinned() {
+        val notes = WhatsNew.parse(repo.resolve("shared/assets/whats-new/5.0.3.md").readText())
+        runSkikoComposeUiTest(size = Size(420f, 860f)) {
+            setContent {
+                Box(Modifier.fillMaxSize().background(Color(0xFF3A3A40)).padding(horizontal = 16.dp, vertical = 24.dp), Alignment.Center) {
+                    WhatsNewCard(notes, "Continue", { null }, {})
+                }
+            }
+            onNodeWithText("Bug fixes").performClick()
+            settle()
+            onNodeWithText("Android update").assertIsDisplayed()
+            shot("420-whats-new-1-before-scroll")
+            val list = onNode(hasScrollAction())
+            list.performScrollToNode(hasText("Undo and redo"))
+            list.performMouseInput { scroll(3f) }
+            settle()
+            shot("420-whats-new-2-pinned")
+            val view = list.getBoundsInRoot()
+            val head = onNodeWithText("Bug fixes").assertIsDisplayed().getBoundsInRoot()
+            onAllNodesWithText("Editor").assertCountEquals(1)
+            val group = onNodeWithText("Editor").assertIsDisplayed().getBoundsInRoot()
+            onNodeWithText("Android update").assertDoesNotExist()
+            assertEquals(view.top.value, head.top.value, 1f)
+            assertTrue("${group.top} under ${head.bottom}", group.top >= head.bottom && group.top < head.bottom + 16.dp)
+            onNodeWithText("Bug fixes").performClick()
+            settle(800)
+            shot("420-whats-new-3-collapsed")
+            onNodeWithText("Undo and redo").assertDoesNotExist()
+            onNodeWithText("Editor").assertDoesNotExist()
+            val after = onNodeWithText("Bug fixes").assertIsDisplayed().getBoundsInRoot()
+            assertTrue("$after in $view", after.top >= view.top && after.bottom <= view.bottom)
+            onNodeWithText("Continue").assertIsDisplayed()
         }
     }
 

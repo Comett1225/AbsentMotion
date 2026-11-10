@@ -3780,7 +3780,7 @@ COUNTS
 
 - Lucide only - 174
 - Lucide shapes plus own parts - 8
-- Own drawing only - 43
+- Own drawing only - 44
 - Tabler - 2
 - Simple Icons - 1
 - Material Symbols - 0
@@ -3923,6 +3923,7 @@ ICONS
 - ToolsTab (Lucide wrench) - ISC - ui/home/HomeIcons.kt
 - ToolsTabOn (Lucide wrench) - ISC - ui/home/HomeIcons.kt
 - Compress (Lucide shrink) - ISC - ui/home/HomeIcons.kt
+- Notes (own drawing) - GPL-3.0 (own) - ui/home/HomeIcons.kt
 - Download (Lucide download) - ISC and MIT (Feather) - ui/home/HomeIcons.kt
 - Close (Lucide x) - ISC and MIT (Feather) - ui/export/ExportIcons.kt
 - Back (Lucide arrow-left) - ISC and MIT (Feather) - ui/export/ExportIcons.kt

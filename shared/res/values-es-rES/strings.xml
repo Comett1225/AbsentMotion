@@ -139,6 +139,7 @@
     <string name="settings_report_issue">Informar de un problema</string>
     <string name="settings_suggest_feature">Sugerir una función</string>
     <string name="join_discord">Únete a Discord</string>
+    <string name="alight_reimport_tip">Importación antigua de Alight Motion: vuelve a importarla desde Alight Motion para ver el aspecto más reciente.</string>
     <string name="settings_help">Ayuda</string>
     <string name="tutorial_settings_start">Empezar el tutorial</string>
     <string name="tutorial_settings_continue">Continuar el tutorial</string>
@@ -246,6 +247,10 @@
     <string name="update_not_now">Ahora no</string>
     <string name="update_outdated">Puede que esto esté corregido en la versión más reciente (instalada: %1$s, más reciente: %2$s).</string>
     <string name="update_changelog">Registro de cambios</string>
+    <string name="whats_new_see">Ver las novedades de la %1$s</string>
+    <string name="settings_whats_new">Novedades</string>
+    <string name="settings_auto_check_on">Búsqueda automática: activada</string>
+    <string name="settings_auto_check_off">Búsqueda automática: desactivada</string>
     <string name="update_open_failed">Ninguna app de este dispositivo puede abrir el enlace.</string>
     <string name="update_download_update">Descargar actualización</string>
     <string name="update_installed">Versión instalada: %1$s</string>
@@ -1092,6 +1097,7 @@
     <string name="layer_tool_edit_points">Editar puntos</string>
     <string name="layer_tool_edit_drawing">Editar dibujo</string>
     <string name="layer_tool_edit_group">Editar grupo</string>
+    <string name="layer_tool_frame">Fotograma</string>
     <string name="layer_tool_ungroup">Desagrupar</string>
     <string name="group_leave">Salir del grupo</string>
     <string name="ungroup_loses_style">Al desagrupar se pierden los efectos, la velocidad, la opacidad y la fusión del propio grupo. Sus capas conservan su posición y su aspecto.</string>

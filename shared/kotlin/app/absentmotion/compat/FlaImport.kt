@@ -1,6 +1,7 @@
 package app.absentmotion.compat
 
 import app.absentmotion.R
+import app.absentmotion.model.HoldEasing
 import app.absentmotion.model.Layer
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.formatColor
@@ -259,6 +260,8 @@ private class Key(val node: XmlNode) {
 
 private class Placed(val key: Key, val inst: XmlNode)
 
+private class Slot(val items: List<Item>?) { val run = ArrayList<Placed>() }
+
 private const val MaxNesting = 32
 
 private class FlaReader(private val files: Map<String, String>, private val maxLayers: Int) {
@@ -296,10 +299,10 @@ private class FlaReader(private val files: Map<String, String>, private val maxL
         val built = ArrayList<Item>()
         var base = 0
         for (timeline in timelines) {
-            built += timeline(timeline, base, null, true)
+            built += timeline(timeline, base, true)
             base += frameCount(timeline)
         }
-        count(FlaPart.Unused, symbols.keys.count { name -> scenes.keys.none { it.substringBefore('\u0000') == name } })
+        count(FlaPart.Unused, symbols.keys.count { it !in scenes })
         val total = max(1, base)
         val layers = finish(built, width.toDouble(), height.toDouble(), 0.0, 0.0, endMs(total))
         val root = XmlNode("scene", linkedMapOf(
@@ -332,7 +335,7 @@ private class FlaReader(private val files: Map<String, String>, private val maxL
         "bgcolor" to "#00000000", "totalTime" to "$end", "fps" to "$fps", "retime" to "off",
     ), children)
 
-    private fun timeline(timeline: XmlNode, base: Int, only: Int?, root: Boolean): List<Item> {
+    private fun timeline(timeline: XmlNode, base: Int, root: Boolean): List<Item> {
         val list = timeline.child("layers")?.children?.filter { it.name == "DOMLayer" }.orEmpty()
         val out = ArrayList<Item>()
         for (i in list.indices.reversed()) {
@@ -340,23 +343,23 @@ private class FlaReader(private val files: Map<String, String>, private val maxL
             when (layer["layerType"]) {
                 "folder" -> continue
                 "guide" -> {
-                    if (only == null && list.any { it["parentLayerIndex"]?.toIntOrNull() == i }) count(FlaPart.MotionGuides)
+                    if (list.any { it["parentLayerIndex"]?.toIntOrNull() == i }) count(FlaPart.MotionGuides)
                     continue
                 }
-                "camera" -> { if (only == null) count(FlaPart.Cameras); continue }
+                "camera" -> { count(FlaPart.Cameras); continue }
             }
             val parent = layer["parentLayerIndex"]?.toIntOrNull()?.let(list::getOrNull)
             if (parent?.get("layerType") == "mask") continue
             if (layer["layerType"] == "mask") {
                 val inside = list.indices.filter { list[it]["parentLayerIndex"]?.toIntOrNull() == i && list[it]["layerType"] != "guide" }
-                    .reversed().mapNotNull { named(list[it], content(list[it], base, only, root)) }
-                val mask = content(layer, base, only, root)
+                    .reversed().mapNotNull { named(list[it], content(list[it], base, root)) }
+                val mask = content(layer, base, root)
                 if (mask.isEmpty() || inside.isEmpty()) { out += inside; continue }
-                if (only == null) count(FlaPart.Masks)
+                count(FlaPart.Masks)
                 out += Wrap(layer["name"] ?: "", false, null, inside + Wrap(layer["name"] ?: "", false, "mask", mask))
                 continue
             }
-            named(layer, content(layer, base, only, root))?.let(out::add)
+            named(layer, content(layer, base, root))?.let(out::add)
         }
         return out
     }
@@ -377,34 +380,47 @@ private class FlaReader(private val files: Map<String, String>, private val maxL
         }
     }
 
-    private fun content(layer: XmlNode, base: Int, only: Int?, root: Boolean): List<Item> {
+    private fun content(layer: XmlNode, base: Int, root: Boolean): List<Item> {
         val keys = layer.child("frames")?.children.orEmpty().filter { it.name == "DOMFrame" }.map(::Key).sortedBy { it.index }
-        val out = ArrayList<Item>()
-        if (only != null) {
-            val at = keys.indexOfLast { it.index <= only }
-            val key = keys.getOrNull(at)?.takeIf { only < it.end } ?: return out
-            val inst = single(key)
-            if (inst == null) out += statics(key.elements, 0, 0, key, only)
-            else {
-                val next = keys.getOrNull(at + 1)?.let(::single)?.let { Placed(keys[at + 1], it) }?.takeIf { continues(Placed(key, inst), it) }
-                out += instance(listOf(Placed(key, inst)) + listOfNotNull(next), 0, only)
-            }
-            return out
-        }
-        var run = ArrayList<Placed>()
-        fun flush() {
-            if (run.isNotEmpty()) out += instance(run, base, null)
-            run = ArrayList()
-        }
+        val order = ArrayList<Slot>()
+        var open = emptyMap<String, Slot>()
         for (key in keys) {
             note(key, base, root)
-            val inst = single(key)
-            if (inst != null && run.isNotEmpty() && continues(run.last(), Placed(key, inst))) { run += Placed(key, inst); continue }
-            flush()
-            if (inst != null) run += Placed(key, inst) else out += statics(key.elements, base + key.index, base + key.end - 1, null, null)
+            val elements = key.elements
+            val seen = HashMap<String, Int>()
+            val ids = elements.map { e -> track(e)?.let { "$it\u0000${seen.merge(it, 1) { a, b -> a + b }}" } }
+            val slots = elements.indices.map { i -> ids[i]?.let(open::get)?.takeIf { continues(it.run.last(), Placed(key, elements[i])) } }.toMutableList()
+            var i = 0
+            while (i < elements.size) {
+                if (slots[i] != null) { i++; continue }
+                var j = i + 1
+                if (ids[i] == null) while (j < elements.size && ids[j] == null) j++
+                val slot = Slot(if (ids[i] == null) statics(elements.subList(i, j), base + key.index, base + key.end - 1) else null)
+                val prev = slots.getOrNull(i - 1)
+                order.add(when {
+                    prev == null -> slots.firstOrNull { it != null }?.let(order::indexOf) ?: order.size
+                    order.last() === prev -> order.size
+                    else -> order.indexOf(prev) + 1
+                }, slot)
+                for (k in i until j) slots[k] = slot
+                i = j
+            }
+            open = buildMap { for (k in elements.indices) ids[k]?.let { id -> slots[k]!!.run += Placed(key, elements[k]); put(id, slots[k]!!) } }
         }
-        flush()
-        return out
+        return order.flatMap { slot ->
+            val run = slot.run
+            slot.items ?: if (run.first().inst.name == "DOMBitmapInstance") listOfNotNull(bitmap(run.first().inst["libraryItemName"], run.map { base + it.key.index to matrix(it.inst) }, base + run.last().key.end - 1))
+                else instance(run, base)
+        }
+    }
+
+    private fun track(e: XmlNode): String? {
+        val name = e["libraryItemName"] ?: return null
+        return when (e.name) {
+            "DOMSymbolInstance" -> if (symbols.containsKey(name)) "s$name" else null
+            "DOMBitmapInstance" -> if (items[name]?.name == "DOMBitmapItem") "b$name" else null
+            else -> null
+        }
     }
 
     private fun note(key: Key, base: Int, root: Boolean) {
@@ -440,38 +456,26 @@ private class FlaReader(private val files: Map<String, String>, private val maxL
         count(FlaPart.Sounds)
     }
 
-    private fun single(key: Key): XmlNode? = key.elements.singleOrNull()?.takeIf { it.name == "DOMSymbolInstance" && symbols.containsKey(it["libraryItemName"]) }
-
     private fun kind(inst: XmlNode): String = inst["symbolType"] ?: symbols[inst["libraryItemName"]]?.get("symbolType") ?: "movie clip"
 
     private fun loop(inst: XmlNode): String = inst["loop"] ?: "loop"
 
     private fun first(inst: XmlNode): Int = inst["firstFrame"]?.toIntOrNull()?.coerceAtLeast(0) ?: 0
 
-    private fun continues(a: Placed, b: Placed): Boolean {
-        if (a.key.end != b.key.index || a.inst["libraryItemName"] != b.inst["libraryItemName"] || kind(a.inst) != kind(b.inst)) return false
-        if (kind(a.inst) != "graphic") return true
-        if (loop(a.inst) != loop(b.inst)) return false
-        val frames = symbols[a.inst["libraryItemName"]]?.let { s -> s.child("timeline")?.child("DOMTimeline")?.let(::frameCount) } ?: 1
-        return when (loop(a.inst)) {
-            "single frame" -> first(a.inst) == first(b.inst)
-            "play once" -> min(first(a.inst) + b.key.index - a.key.index, frames - 1) == first(b.inst)
-            else -> Math.floorMod(first(a.inst) + b.key.index - a.key.index, max(1, frames)) == first(b.inst)
-        }
-    }
+    private fun continues(a: Placed, b: Placed): Boolean =
+        a.key.end == b.key.index && (a.inst.name != "DOMSymbolInstance" || kind(a.inst) == kind(b.inst))
 
-    private fun statics(elements: List<XmlNode>, from: Int, to: Int, key: Key?, sample: Int?): List<Item> {
+    private fun statics(elements: List<XmlNode>, from: Int, to: Int): List<Item> {
         val out = ArrayList<Item>()
         for (e in elements) {
             if (layers >= maxLayers) { count(FlaPart.Overflow); break }
             when (e.name) {
                 "DOMShape" -> { out += shape(e, matrix(e), from, to); count(FlaPart.Shapes) }
-                "DOMGroup" -> out += statics(e.child("members")?.children.orEmpty(), from, to, key, sample)
+                "DOMGroup" -> out += statics(e.child("members")?.children.orEmpty(), from, to)
                 "DOMRectangleObject", "DOMOvalObject" -> { out += primitive(e, from, to); count(FlaPart.Shapes) }
-                "DOMBitmapInstance" -> bitmap(e, from, to)?.let { out += it }
+                "DOMBitmapInstance" -> bitmap(e["libraryItemName"], listOf(from to matrix(e)), to)?.let { out += it }
                 "DOMSymbolInstance" -> if (symbols.containsKey(e["libraryItemName"])) {
-                    val at = if (sample != null && key != null) key else Key(XmlNode("DOMFrame", mapOf("index" to "$from", "duration" to "${to - from + 1}")))
-                    out += instance(listOf(Placed(at, e)), 0, sample)
+                    out += instance(listOf(Placed(Key(XmlNode("DOMFrame", mapOf("index" to "$from", "duration" to "${to - from + 1}"))), e)), 0)
                 }
                 "DOMStaticText", "DOMDynamicText", "DOMInputText", "DOMTLFText" -> count(FlaPart.Text)
                 "DOMVideoInstance" -> count(FlaPart.Videos)
@@ -568,11 +572,13 @@ private class FlaReader(private val files: Map<String, String>, private val maxL
         return uri to item
     }
 
-    private fun picture(uri: String, label: String, w: Double, h: Double, m: Mat, from: Int, to: Int, blending: String?): Leaf {
-        val cx = m.x(w / 2, h / 2)
-        val cy = m.y(w / 2, h / 2)
-        val pose = decompose(m, cx, cy, 0.0, 0.0, 1.0, null)
-        val box = Box.of(sequenceOf(0.0 to 0.0, w to 0.0, 0.0 to h, w to h).map { (x, y) -> m.x(x, y) to m.y(x, y) })
+    private fun picture(uri: String, label: String, w: Double, h: Double, placed: List<Pair<Int, Mat>>, to: Int, blending: String?): Leaf {
+        var previous: Pose? = null
+        val keys = placed.mapIndexed { i, (at, m) ->
+            Triple(ms(at), decompose(m, m.x(w / 2, h / 2), m.y(w / 2, h / 2), 0.0, 0.0, 1.0, previous).also { previous = it }, if (i == 0) null else HoldEasing)
+        }
+        val box = Box.union(placed.map { (_, m) -> Box.of(sequenceOf(0.0 to 0.0, w to 0.0, 0.0 to h, w to h).map { (x, y) -> m.x(x, y) to m.y(x, y) }) })
+        val from = placed.first().first
         layers++
         return Leaf(box) { dx, dy ->
             val attrs = base(Layer.newId(), label, from, to)
@@ -582,18 +588,18 @@ private class FlaReader(private val files: Map<String, String>, private val maxL
             attrs["s"] = ".rect"
             blending?.let { attrs["blending"] = it }
             XmlNode("shape", attrs, listOf(
-                poseTransform(listOf(Triple(ms(from), pose.moved(dx, dy), null)), ms(from), endMs(to + 1)),
+                poseTransform(keys.map { (t, pose, e) -> Triple(t, pose.moved(dx, dy), e) }, ms(from), endMs(to + 1)),
                 XmlNode("property", linkedMapOf("name" to "size", "type" to "vec2", "value" to "${f6(w / 2)},${f6(h / 2)}")),
             ))
         }
     }
 
-    private fun bitmap(e: XmlNode, from: Int, to: Int): Item? {
-        val (uri, item) = bitmapItem(e["libraryItemName"]) ?: return null
+    private fun bitmap(name: String?, placed: List<Pair<Int, Mat>>, to: Int): Item? {
+        val (uri, item) = bitmapItem(name) ?: return null
         count(FlaPart.Pictures)
         val w = (item["frameRight"]?.toDoubleOrNull() ?: 0.0) / 20
         val h = (item["frameBottom"]?.toDoubleOrNull() ?: 0.0) / 20
-        return picture(uri, leafName(item["name"] ?: ""), w, h, matrix(e), from, to, null)
+        return picture(uri, leafName(item["name"] ?: ""), w, h, placed, to, null)
     }
 
     private fun bitmapFill(path: PathData, fill: XmlNode, m: Mat, from: Int, to: Int): Item? {
@@ -619,7 +625,7 @@ private class FlaReader(private val files: Map<String, String>, private val maxL
             children += XmlNode("fillColor", mapOf("value" to "#ffffffff"))
             children += XmlNode("path", linkedMapOf("d" to path.svg((b.x0 + b.x1) / 2, (b.y0 + b.y1) / 2), "fillRule" to "evenodd"))
         } ?: return null
-        return Wrap("", false, null, listOf(picture(uri, leafName(item["name"] ?: ""), w, h, placed, from, to, null), shape))
+        return Wrap("", false, null, listOf(picture(uri, leafName(item["name"] ?: ""), w, h, listOf(from to placed), to, null), shape))
     }
 
     private fun strokeLayer(path: PathData, style: XmlNode, from: Int, to: Int): Item? {
@@ -828,17 +834,16 @@ private class FlaReader(private val files: Map<String, String>, private val maxL
         return out
     }
 
-    private fun symbolScene(name: String, frame: Int?): SymbolScene? {
-        val key = "$name\u0000${frame ?: -1}"
-        scenes[key]?.let { return it }
+    private fun symbolScene(name: String): SymbolScene? {
+        scenes[name]?.let { return it }
         if (building.size >= MaxNesting) { count(FlaPart.Overflow); return null }
         if (!building.add(name)) return null
         val start = layers
         try {
             val item = symbols[name] ?: return null
             val timeline = item.child("timeline")?.child("DOMTimeline") ?: return null
-            val frames = if (frame == null) max(1, frameCount(timeline)) else 1
-            val content = timeline(timeline, 0, frame, false)
+            val frames = max(1, frameCount(timeline))
+            val content = timeline(timeline, 0, false)
             val box = Box.union(content.map { it.box })
             val pad = 1.0
             val w = if (box == null) 2.0 else ceil(box.x1 - box.x0 + 2 * pad).coerceIn(1.0, 8192.0)
@@ -847,28 +852,24 @@ private class FlaReader(private val files: Map<String, String>, private val maxL
             val oy = if (box == null) 0.0 else pad - box.y0
             val end = endMs(frames)
             val scene = innerScene(w.roundToInt(), h.roundToInt(), end, finish(content, w, h, ox, oy, end))
-            return SymbolScene(scene, frames, box, ox - w / 2, oy - h / 2, layers - start).also { scenes[key] = it }
+            return SymbolScene(scene, frames, box, ox - w / 2, oy - h / 2, layers - start).also { scenes[name] = it }
         } finally {
             building.remove(name)
         }
     }
 
-    private fun instance(run: List<Placed>, base: Int, sample: Int?): List<Item> {
+    private fun tweened(key: Key): Boolean = key.tween == "motion" && key.elements.size == 1
+
+    private fun instance(run: List<Placed>, base: Int): List<Item> {
         val head = run.first().inst
         val name = head["libraryItemName"] ?: return emptyList()
         val type = kind(head)
-        val mode = loop(head)
-        val frozen = when {
-            type == "button" -> 0
-            type == "graphic" && mode == "single frame" -> first(head)
-            else -> null
-        }
         val before = layers
-        val symbol = symbolScene(name, frozen) ?: return emptyList()
+        val symbol = symbolScene(name) ?: return emptyList()
         val copies = symbol.size - (layers - before)
         if (layers + copies >= maxLayers) { count(FlaPart.Overflow); return emptyList() }
         layers += copies + 1
-        if (sample == null) count(FlaPart.Symbols)
+        count(FlaPart.Symbols)
         for (p in run) {
             val inst = p.inst
             if (inst.child("filters") != null) count(FlaPart.Filters)
@@ -883,7 +884,7 @@ private class FlaReader(private val files: Map<String, String>, private val maxL
             val alpha = p.inst.child("color")?.child("Color")?.get("alphaMultiplier")?.toDoubleOrNull() ?: 1.0
             val m = matrix(p.inst)
             val previous = poses.lastOrNull()
-            val spin = if (i > 0 && run[i - 1].key.tween == "motion") run[i - 1].key.node else null
+            val spin = if (i > 0 && tweened(run[i - 1].key)) run[i - 1].key.node else null
             val effect = p.inst.child("color")?.child("Color")
             val bright = effect?.get("brightness")?.toDoubleOrNull()?.coerceIn(-1.0, 1.0) ?: 0.0
             val share = effect?.get("tintMultiplier")?.toDoubleOrNull()?.coerceIn(0.0, 1.0) ?: 0.0
@@ -895,55 +896,29 @@ private class FlaReader(private val files: Map<String, String>, private val maxL
             }
         }
         val keys = ArrayList<Triple<Int, Pose, String?>>()
-        val start: Int
-        val end: Int
-        if (sample != null) {
-            val k = run.first().key
-            val next = run.getOrNull(1)
-            var pose = poses.first()
-            if (next != null && k.tween == "motion") {
-                val x = (sample - k.index).toDouble() / max(1, next.key.index - k.index)
-                pose = Pose.lerp(poses[0], poses[1], easeAt(eases(k.node), x))
-            }
-            keys += Triple(0, pose, null)
-            start = 0
-            end = endMs(1)
-        } else {
-            start = ms(base + run.first().key.index)
-            end = endMs(base + run.last().key.end)
-            for ((i, p) in run.withIndex()) {
-                val at = ms(base + p.key.index)
-                if (i == 0) { keys += Triple(at, poses[i], null); continue }
-                val before = run[i - 1].key
-                val from = ms(base + before.index)
-                if (before.tween == "motion") {
-                    count(FlaPart.Tweens)
-                    val segs = eases(before.node)
-                    for ((j, seg) in segs.withIndex()) {
-                        val time = if (j == segs.lastIndex) at else (from + (at - from) * seg[6]).roundToInt().coerceIn(from + 1, at - 1)
-                        val pose = if (j == segs.lastIndex) poses[i] else Pose.lerp(poses[i - 1], poses[i], seg[7])
-                        if (time > keys.last().first) keys += Triple(time, pose, bezier(seg))
-                    }
-                } else {
-                    if (at - 1 > keys.last().first) keys += Triple(at - 1, poses[i - 1], null)
-                    keys += Triple(at, poses[i], null)
+        val start = ms(base + run.first().key.index)
+        val end = endMs(base + run.last().key.end)
+        for ((i, p) in run.withIndex()) {
+            val at = ms(base + p.key.index)
+            if (i == 0) { keys += Triple(at, poses[i], null); continue }
+            val before = run[i - 1].key
+            val from = ms(base + before.index)
+            if (tweened(before)) {
+                count(FlaPart.Tweens)
+                val segs = eases(before.node)
+                for ((j, seg) in segs.withIndex()) {
+                    val time = if (j == segs.lastIndex) at else (from + (at - from) * seg[6]).roundToInt().coerceIn(from + 1, at - 1)
+                    val pose = if (j == segs.lastIndex) poses[i] else Pose.lerp(poses[i - 1], poses[i], seg[7])
+                    if (time > keys.last().first) keys += Triple(time, pose, bezier(seg))
                 }
-            }
+            } else keys += Triple(at, poses[i], HoldEasing)
         }
         val frames = symbol.frames
-        val point = when {
-            frozen != null -> 0
-            type == "graphic" -> {
-                val k = run.first()
-                val f = first(k.inst) + (if (sample != null) sample - k.key.index else 0)
-                if (mode == "play once") min(f, frames - 1) else Math.floorMod(f, frames)
-            }
-            else -> 0
-        }
-        val retime = when {
-            frozen != null || frames <= 1 -> "freeze"
-            type == "graphic" && mode == "play once" -> "freeze"
-            else -> "loop"
+        val picks = when {
+            frames <= 1 -> null
+            type == "graphic" -> frameKeys(run, base, frames)
+            type == "button" -> listOf(Triple(start, doubleArrayOf(0.0), null))
+            else -> null
         }
         val label = head["name"]?.takeIf { it.isNotBlank() } ?: leafName(name)
         val hidden = head["isVisible"] == "false"
@@ -957,13 +932,31 @@ private class FlaReader(private val files: Map<String, String>, private val maxL
         }
         return listOf(Leaf(box) { dx, dy ->
             val attrs = linkedMapOf("id" to "${Layer.newId()}", "label" to label, "startTime" to "$start", "endTime" to "$end")
-            if (point > 0) attrs["inTime"] = "${ms(point)}"
             if (hidden) attrs["hidden"] = "true"
-            val inner = if (retime == "loop") symbol.scene.with("retime", "loop").with("totalTime", "${endMs(frames + 1)}").with("retimeOut", "${ms(frames)}")
-                else symbol.scene.with("retime", retime)
+            val inner = if (picks == null && frames > 1) symbol.scene.with("retime", "loop").with("totalTime", "${endMs(frames + 1)}").with("retimeOut", "${ms(frames)}")
+                else symbol.scene.with("retime", "freeze")
             val moved = keys.map { (t, pose, e) -> Triple(t, pose.moved(dx, dy), e) }
-            XmlNode("embedScene", attrs, listOfNotNull(poseTransform(moved, start, end), tint(moved, start, end), inner))
+            XmlNode("embedScene", attrs, listOfNotNull(poseTransform(moved, start, end), tint(moved, start, end), picks?.let { values("frame", it, start, end) }, inner))
         })
+    }
+
+    private fun frameKeys(run: List<Placed>, base: Int, frames: Int): List<Triple<Int, DoubleArray, String?>> {
+        val out = ArrayList<Triple<Int, DoubleArray, String?>>()
+        for ((i, p) in run.withIndex()) {
+            val from = base + p.key.index
+            val first = first(p.inst)
+            val last = p.key.duration - 1
+            out += Triple(ms(from), doubleArrayOf(first.toDouble()), if (i == 0) null else HoldEasing)
+            val step = when (loop(p.inst)) {
+                "single frame" -> 0
+                "play once" -> min(last, frames - 1 - first).coerceAtLeast(0)
+                "play once reverse" -> -min(last, first)
+                "loop reverse" -> -last
+                else -> last
+            }
+            if (step != 0) out += Triple(ms(from + abs(step)), doubleArrayOf((first + step).toDouble()), null)
+        }
+        return out
     }
 
     private fun decompose(m: Mat, x: Double, y: Double, px: Double, py: Double, alpha: Double, previous: Pose?, spin: XmlNode? = null): Pose {
@@ -1015,7 +1008,7 @@ private class FlaReader(private val files: Map<String, String>, private val maxL
             val attrs = linkedMapOf("name" to name, "type" to type)
             if (keys.all { text(it.second) == first }) return XmlNode("property", attrs + ("value" to first))
             return XmlNode("property", attrs, keys.map { (t, p, e) ->
-                XmlNode("kf", linkedMapOf("t" to f6((t - start) / span), "v" to text(p)).also { a -> e?.let { a["e"] = it } })
+                XmlNode("kf", linkedMapOf("t" to keyTime((t - start) / span, e), "v" to text(p)).also { a -> e?.let { a["e"] = it } })
             })
         }
         val shade = { p: Pose -> formatColor((0xFF shl 24) or ((p.tr * 255).roundToInt().coerceIn(0, 255) shl 16) or ((p.tg * 255).roundToInt().coerceIn(0, 255) shl 8) or (p.tb * 255).roundToInt().coerceIn(0, 255)) }
@@ -1033,11 +1026,13 @@ private class FlaReader(private val files: Map<String, String>, private val maxL
         if (keys.all { text(it.second) == first }) return XmlNode(name, mapOf("value" to first))
         val span = max(1, end - start).toDouble()
         return XmlNode(name, children = keys.map { (t, v, e) ->
-            val attrs = linkedMapOf("t" to f6((t - start) / span), "v" to text(v))
+            val attrs = linkedMapOf("t" to keyTime((t - start) / span, e), "v" to text(v))
             e?.let { attrs["e"] = it }
             XmlNode("kf", attrs)
         })
     }
+
+    private fun keyTime(t: Double, e: String?) = f6(if (e == HoldEasing) floor(t * 1e6) / 1e6 else t)
 
     private fun eases(frame: XmlNode): List<DoubleArray> {
         val tweens = frame.child("tweens")?.children.orEmpty()
@@ -1082,18 +1077,6 @@ private class FlaReader(private val files: Map<String, String>, private val maxL
     }
 
     private fun num4(v: Double) = String.format(Locale.US, "%.4f", v).trimEnd('0').trimEnd('.').ifEmpty { "0" }
-
-    private fun easeAt(segs: List<DoubleArray>, x: Double): Double {
-        val seg = segs.firstOrNull { x <= it[6] } ?: segs.last()
-        var lo = 0.0
-        var hi = 1.0
-        fun cubic(a: Double, b: Double, c: Double, d: Double, t: Double) = (1 - t) * (1 - t) * (1 - t) * a + 3 * (1 - t) * (1 - t) * t * b + 3 * (1 - t) * t * t * c + t * t * t * d
-        repeat(40) {
-            val mid = (lo + hi) / 2
-            if (cubic(seg[0], seg[2], seg[4], seg[6], mid) < x) lo = mid else hi = mid
-        }
-        return cubic(seg[1], seg[3], seg[5], seg[7], (lo + hi) / 2)
-    }
 
     private fun leafName(name: String): String = name.substringAfterLast('/')
 

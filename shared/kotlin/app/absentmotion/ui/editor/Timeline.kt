@@ -286,12 +286,13 @@ fun Timeline(state: EditorState, modifier: Modifier = Modifier) {
     val haptic = LocalHapticFeedback.current
     val focus = LocalFocusManager.current
     val wide = LocalWide.current
-    val view = remember(state, density, wide) {
-        TimelineView(state, density, scope, wide).also { v ->
+    val view = remember(state, density) {
+        TimelineView(state, density, scope).also { v ->
             v.onTick = { if (state.settings.vibration) haptic.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick) }
         }
     }
-    val measurer = rememberTextMeasurer(cacheSize = if (PlatformFeatures.desktop) 128 else 32)
+    view.wide = wide
+    val measurer = rememberTextMeasurer(cacheSize = if (PlatformFeatures.desktop) 128 else 64)
     val styles = remember(Am.palette) { TimelineStyles() }
     val eye = rememberVectorPainter(TimelineIcons.Eye)
     val eyeOff = rememberVectorPainter(TimelineIcons.EyeOff)
@@ -312,6 +313,7 @@ fun Timeline(state: EditorState, modifier: Modifier = Modifier) {
 
     LoadWaveforms(state.scene)
     LaunchedEffect(view, state.selectedId) { if (PlatformFeatures.desktop) view.revealRow() else view.revealSelected() }
+    if (PlatformFeatures.desktop) LaunchedEffect(view, view.layers.isEmpty()) { view.refit() }
     val appear = remember(state.selectedId) { Animatable(if (state.selectedId == null) 1f else 0f) }
     LaunchedEffect(appear) { appear.animateTo(1f, Motion.enter()) }
     LaunchedEffect(view, state.playing) { if (state.playing) view.followPlayback() }
@@ -618,7 +620,8 @@ private const val KEY_MOVE = "keyframe-move"
 private const val MOVE_EDIT = "clip-move"
 
 
-private class TimelineView(val state: EditorState, density: Density, private val scope: CoroutineScope, private val wide: Boolean) {
+private class TimelineView(val state: EditorState, density: Density, private val scope: CoroutineScope) {
+    var wide = false
     private val scale = density.density
     private val Dp.px get() = value * scale
     private val decay = splineBasedDecay<Float>(density)
@@ -932,7 +935,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
 
     fun keyFrames(layer: Layer): List<Int> {
         val fps = state.scene.fps
-        if (keyFramesFps != fps || keyFrames.size > state.scene.layers.size * 4 + 16) {
+        if (keyFramesFps != fps || keyFrames.size > layers.size * 4 + 16) {
             keyFrames.clear()
             keyFrameNodes.clear()
             keyFramesFps = fps
@@ -1053,7 +1056,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
     private fun keyNear(layer: Layer, x: Float, time: TimeScale): Int? {
         val scene = state.scene
         fun distance(frame: Int) = abs(time.x(scene.frameStart(frame).toFloat()) - x)
-        return layer.keyframeTimes(scopeOf(layer)).map { scene.frameAt(it) }.minByOrNull(::distance)?.takeIf { distance(it) <= KeyGrab.px }
+        return keyFrames(layer).minByOrNull(::distance)?.takeIf { distance(it) <= KeyGrab.px }
     }
 
     fun grabKey(hit: Hit.Key, scope: KeyScope? = if (hit.id == state.selectedId) state.keyScope else null) {
@@ -1215,7 +1218,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
             val before = timeScale().time(at)
             val far = if (dpPerSecond >= fitZoom) 1f else (ln(dpPerSecond / minZoom) / ln(fitZoom / minZoom)).coerceIn(0f, 1f)
             state.timelineZoom = (dpPerSecond * factor.pow(0.3f + 0.7f * far)).coerceIn(minZoom, maxZoom)
-            followFit = state.timelineZoom >= fitZoom * 0.999f
+            followFit = abs(state.timelineZoom - fitZoom) <= fitZoom * 0.001f
             setViewStart(before - (at - headerWidth) / timeScale().pxPerMs)
         } else state.timelineZoom = (dpPerSecond * factor).coerceIn(MIN_ZOOM, MAX_ZOOM)
     }
@@ -1530,6 +1533,7 @@ private suspend fun PointerInputScope.desktopTimelineGestures(view: TimelineView
             when (event.type) {
                 PointerEventType.Scroll -> {
                     view.wheel(change.scrollDelta, at, modifiers.isCtrlPressed || modifiers.isMetaPressed, modifiers.isShiftPressed)
+                    if (down == null) view.hover(at)
                     change.consume()
                     continue
                 }
@@ -2118,7 +2122,8 @@ private fun DrawScope.drawLabel(label: String, measurer: TextMeasurer, left: Flo
     val inset = LabelInset.toPx()
     val room = min((right - left - 2 * inset).toInt(), MAX_LABEL_PX)
     if (room < 1 || left + inset > size.width || left + inset + room < 0) return
-    val text = measurer.measure(label, style, TextOverflow.Ellipsis, maxLines = 1, constraints = Constraints(maxWidth = room))
+    val whole = measurer.measure(label, style, TextOverflow.Ellipsis, maxLines = 1)
+    val text = if (whole.size.width <= room) whole else measurer.measure(label, style, TextOverflow.Ellipsis, maxLines = 1, constraints = Constraints(maxWidth = room))
     val textTop = (top + bottom - text.size.height) / 2
     if (backdrop) drawRoundRect(Color.Black.copy(alpha = 0.65f), Offset(left + inset - 3.dp.toPx(), textTop), Size(text.size.width + 6.dp.toPx(), text.size.height.toFloat()), CornerRadius(3.dp.toPx()))
     drawText(text, topLeft = Offset(left + inset, textTop))

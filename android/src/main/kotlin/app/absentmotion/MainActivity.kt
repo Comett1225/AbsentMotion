@@ -40,6 +40,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
 import app.absentmotion.compat.EffectMigration
+import app.absentmotion.compat.oldAlightImport
+import app.absentmotion.compat.withReimportTipShown
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.MultiSelect
 import app.absentmotion.engine.EngineThread
@@ -415,9 +417,9 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private suspend fun saveThumbnail(scene: Scene, timeMs: Int, id: String): Boolean {
+    private suspend fun saveThumbnail(scene: Scene, timeMs: Int, id: String, xml: String? = null): Boolean {
         val longSide = maxOf(scene.width, scene.height, 1)
-        return engine.stillPng(scene.toXml(), timeMs, (256 * scene.width / longSide).coerceAtLeast(1), (256 * scene.height / longSide).coerceAtLeast(1), store.thumbnailFile(id))
+        return engine.stillPng(xml ?: withContext(Dispatchers.Default) { scene.toXml() }, timeMs, (256 * scene.width / longSide).coerceAtLeast(1), (256 * scene.height / longSide).coerceAtLeast(1), store.thumbnailFile(id))
     }
 
     private fun projectFromTemplate(scene: Scene) {
@@ -465,6 +467,7 @@ class MainActivity : ComponentActivity() {
     private suspend fun loadInBackground(id: String): Scene? {
         opening = true
         val started = SystemClock.elapsedRealtime()
+        var tip = false
         val scene = try {
             val loaded = CrashLogs.during("opening a project") {
                 withContext(DiskThread.dispatcher) {
@@ -475,7 +478,8 @@ class MainActivity : ComponentActivity() {
             loaded?.let { scene ->
                 withContext(Dispatchers.IO) {
                     ShapeCatalog.load(applicationContext)
-                    migration.migrate(MediaRelink.relink(this@MainActivity, scene)).scene.also {
+                    migration.migrate(MediaRelink.relink(this@MainActivity, scene)).scene
+                        .let { if (it.oldAlightImport()) it.withReimportTipShown().also { tip = true } else it }.also {
                         if (it != scene) try { store.save(id, it) } catch (e: java.io.IOException) { Log.e("AMStore", "cannot save the updated project $id", e) }
                     }
                 }
@@ -489,6 +493,7 @@ class MainActivity : ComponentActivity() {
             opening = false
         }
         if (scene == null) openFailed = id
+        if (tip) Toast.makeText(this, getString(R.string.alight_reimport_tip), Toast.LENGTH_LONG).show()
         return scene
     }
 
@@ -617,10 +622,11 @@ class MainActivity : ComponentActivity() {
                 return@launch
             }
             closeAnyway = false
-            closing.saver.snapshot(scene.toXml())
+            val xml = withContext(Dispatchers.Default) { scene.toXml() }
+            closing.saver.snapshot(xml)
             engine.audio?.release()
             try {
-                saveThumbnail(scene, closing.timeMs, closing.projectId)
+                saveThumbnail(scene, closing.timeMs, closing.projectId, xml)
             } finally {
                 MultiSelect.clear()
                 if (editor === closing) editor = null

@@ -1,7 +1,13 @@
 package app.absentmotion.editor
 
 import app.absentmotion.ai.cutoutMatte
+import app.absentmotion.model.FrameRef
+import app.absentmotion.model.HoldEasing
+import app.absentmotion.model.formatFloats
+import app.absentmotion.model.keyframeAt
+import app.absentmotion.model.keyframes
 import app.absentmotion.model.mediaUris
+import app.absentmotion.model.withKeyframes
 import app.absentmotion.model.Layer
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
@@ -13,6 +19,18 @@ import app.absentmotion.model.withoutValueLinks
 import kotlin.math.roundToInt
 
 internal val Layer.isPlainGroup: Boolean get() = kind == "embedScene" && link == null && nested != null && cutoutMatte == null
+
+internal val Layer.picksFrames: Boolean get() = isPlainGroup || (kind == "embedScene" && link != null && nested != null)
+
+internal fun Layer.withPickedFrame(frame: Int): Layer = withValue(FrameRef, formatFloats(floatArrayOf(frame.toFloat()))).withFrameHold()
+
+internal fun Layer.withFrameHold(): Layer {
+    val element = element(FrameRef) ?: return this
+    val here = element.keyframeAt(snap)
+    val keys = element.keyframes
+    if (here < 0 || keys[here].e != null) return this
+    return withElement(FrameRef, element.withKeyframes(keys.toMutableList().also { it[here] = it[here].copy(e = HoldEasing) }))
+}
 
 private fun Scene.groupNode(id: Long): XmlNode? = node.children.firstOrNull { it.name in Scene.LAYER_TAGS && Layer(it).id == id }
 

@@ -151,10 +151,10 @@ internal object DeskEncoders {
     private val seeded = AtomicBoolean()
 
     fun seedReport(context: Context) {
-        if (!seeded.compareAndSet(false, true)) return
+        val prefs = context.getSharedPreferences("export_device", Context.MODE_PRIVATE)
+        if (prefs.getString("report", null) != null && !seeded.compareAndSet(false, true)) return
         runCatching {
             val caps = DeviceCapabilities.of(context)
-            val prefs = context.getSharedPreferences("export_device", Context.MODE_PRIVATE)
             val old = runCatching { prefs.getString("report", null)?.let { DeviceReport.fromJson(JSONObject(it)) } }.getOrNull()
             val video = Codec.entries.flatMap { codec ->
                 video(codec).map { name ->

@@ -165,7 +165,7 @@ class UiContracts(unittest.TestCase):
         for path in ['ui/editor/EditorScreen.kt', 'ui/editor/WideEditor.kt']:
             self.assertIn('AnimateButton(state, Modifier.align(Alignment.BottomEnd))', source(path))
         text = source('ui/editor/MotionSheets.kt').split('internal fun AnimateButton', 1)[1].split('\n}\n', 1)[0]
-        self.assertIn('state.selected?.canAnimate == true', text)
+        self.assertIn('state.selectedId?.let { state.scene.layer(it) }?.canAnimate == true', text)
         self.assertIn('Icon(PanelIcons.Animate, stringResource(R.string.a11y_animate)', text)
         self.assertIn('state.playing = false', text)
 

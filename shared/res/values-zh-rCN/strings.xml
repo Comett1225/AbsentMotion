@@ -139,6 +139,7 @@
     <string name="settings_report_issue">反馈问题</string>
     <string name="settings_suggest_feature">提出功能建议</string>
     <string name="join_discord">加入 Discord</string>
+    <string name="alight_reimport_tip">这是旧版的Alight Motion导入：请从Alight Motion重新导入，以获得最新外观。</string>
     <string name="settings_help">帮助</string>
     <string name="tutorial_settings_start">开始教程</string>
     <string name="tutorial_settings_continue">继续教程</string>
@@ -246,6 +247,10 @@
     <string name="update_not_now">暂时不要</string>
     <string name="update_outdated">新版本可能已修复此问题（已安装 %1$s，最新版本 %2$s）。</string>
     <string name="update_changelog">更新日志</string>
+    <string name="whats_new_see">查看 %1$s 的新功能</string>
+    <string name="settings_whats_new">新功能</string>
+    <string name="settings_auto_check_on">自动检查：开启</string>
+    <string name="settings_auto_check_off">自动检查：关闭</string>
     <string name="update_open_failed">此设备上没有可打开该链接的应用。</string>
     <string name="update_download_update">下载更新</string>
     <string name="update_installed">已安装版本： %1$s</string>
@@ -1062,6 +1067,7 @@
     <string name="layer_tool_edit_points">编辑点</string>
     <string name="layer_tool_edit_drawing">编辑绘画</string>
     <string name="layer_tool_edit_group">编辑组</string>
+    <string name="layer_tool_frame">帧</string>
     <string name="layer_tool_ungroup">取消编组</string>
     <string name="group_leave">退出组</string>
     <string name="ungroup_loses_style">取消编组会移除组自身的特效、速度、不透明度和混合模式。组内图层的位置和外观保持不变。</string>

@@ -31,6 +31,27 @@ class XmlNodeTest {
         assertEquals(listOf("first", "last"), property.withKeyframeToggled(0.5f, 0.5f..0.5f).children.map { it["x-note"] }.filterNotNull())
     }
 
+    @Test fun writingEscapesMarkupAndDropsControlCharacters() {
+        val node = XmlNode("a", linkedMapOf("v" to "x&<>\"\n\r\t\u0001y", "plain" to "1,2"), text = "<b>&\uFFFE")
+        assertEquals("<?xml version='1.0' encoding='UTF-8' ?>\n<a v=\"x&amp;&lt;&gt;&quot;&#10;&#13;&#9;y\" plain=\"1,2\">&lt;b&gt;&amp;</a>\n", node.toXml())
+        val nested = XmlNode("a", children = listOf(XmlNode("b", children = listOf(XmlNode("c")))))
+        assertEquals("<?xml version='1.0' encoding='UTF-8' ?>\n<a>\n  <b>\n    <c />\n  </b>\n</a>\n", nested.toXml())
+    }
+
+    @Test fun aMediaRecordGoesOnlyWhenNoLayerUsesItsFile() {
+        fun picture(id: Int, uri: String) = XmlNode("shape", linkedMapOf("id" to "$id", "startTime" to "0", "endTime" to "999", "fillType" to "media", "fillImage" to uri))
+        val group = XmlNode("embedScene", linkedMapOf("id" to "3", "startTime" to "0", "endTime" to "999"), listOf(XmlNode("scene", children = listOf(picture(4, "b")))))
+        val scene = Scene(XmlNode("scene", linkedMapOf("width" to "10", "height" to "10", "fps" to "30"),
+            listOf(XmlNode("media", mapOf("uri" to "a")), XmlNode("media", mapOf("uri" to "b")), XmlNode("media", mapOf("uri" to "c")), picture(1, "a"), picture(2, "a"), group, picture(5, "c"))))
+        fun records(s: Scene) = s.media.map { it.uri }
+        assertEquals(listOf("a", "b", "c"), records(scene.update(1) { it.withLabel("renamed") }))
+        assertEquals(listOf("a", "b", "c"), records(scene.remove(1)))
+        assertEquals(listOf("b", "c"), records(scene.remove(1).remove(2)))
+        assertEquals(listOf("a", "c"), records(scene.remove(3)))
+        assertEquals(listOf("a", "b"), records(scene.update(5) { it.copy(node = it.node.with("fillImage", "a")) }))
+        assertEquals(listOf("a", "b", "c"), records(scene.update(1) { it.copy(node = it.node.with("fillImage", "c")) }))
+    }
+
     @Test fun aCompleteDocumentParsesBackToTheSameTree() {
         assertEquals(document, XmlNode.parse(document).toXml())
     }

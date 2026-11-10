@@ -335,8 +335,8 @@ private class BoxAt(val sides: Sides, val sx: Float, val sy: Float)
 private fun SizeTab(state: EditorState, layer: Layer) {
     val linked = layer.scaleLinked
     var active by remember { mutableIntStateOf(0) }
-    val measured by produceState<BoxAt?>(null, layer.node, state.sampleMs) {
-        value = state.engine.layerQuad(layer.id, state.sampleMs)?.let { q -> BoxAt(sidesOf(q), layer.scale[0], layer.scale[1]) }
+    val measured by produceState<BoxAt?>(null, layer.node, state.sampleMs, state.playing) {
+        if (!state.playing) value = state.engine.layerQuad(layer.id, state.sampleMs)?.let { q -> BoxAt(sidesOf(q), layer.scale[0], layer.scale[1]) }
     }
     val upright = measured?.sides?.upright == true
     val box = measured?.let { m ->
@@ -546,7 +546,8 @@ internal fun pivotFrame(matrix: FloatArray, quad: FloatArray?): PivotFrame {
 @Composable
 private fun PivotTab(state: EditorState, layer: Layer) {
     val at = layer.pivot
-    val frame by produceState<PivotFrame?>(null, layer.id, layer.node, state.timeMs) {
+    val frame by produceState<PivotFrame?>(null, layer.id, layer.node, state.timeMs, state.playing) {
+        if (state.playing) return@produceState
         val m = state.engine.layerMatrix(layer.id, state.timeMs)
         value = m?.let { pivotFrame(it, state.engine.layerQuad(layer.id, state.timeMs)) }
     }

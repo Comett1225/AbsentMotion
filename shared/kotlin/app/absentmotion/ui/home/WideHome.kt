@@ -41,7 +41,7 @@ import app.absentmotion.ui.theme.Motion
 internal val WideCard = Modifier.widthIn(max = 420.dp)
 
 @Composable
-internal fun WideHeader(page: Int, tab: Int, onTab: (page: Int, tab: Int) -> Unit, onSettings: () -> Unit, onNew: () -> Unit, search: String?, onSearch: (String?) -> Unit) = BoxWithConstraints(Modifier.fillMaxWidth()) {
+internal fun WideHeader(page: Int, tab: Int, onTab: (page: Int, tab: Int) -> Unit, onSettings: () -> Unit, onNew: () -> Unit, search: String?, onSearch: (String?) -> Unit, settings: app.absentmotion.library.AppSettings) = BoxWithConstraints(Modifier.fillMaxWidth()) {
     val compact = maxWidth < FullHeaderWidth * LocalDensity.current.fontScale.coerceAtLeast(1f)
     Row(Modifier.fillMaxWidth().height(72.dp).padding(horizontal = 20.dp), Arrangement.spacedBy(12.dp), Alignment.CenterVertically) {
         if (!compact) {
@@ -53,6 +53,7 @@ internal fun WideHeader(page: Int, tab: Int, onTab: (page: Int, tab: Int) -> Uni
         Chip(stringResource(R.string.home_tab_templates), page == 1) { onTab(1, tab) }
         if (app.absentmotion.platform.PlatformFeatures.tools) Chip(stringResource(R.string.home_tab_tools), page == 2) { onTab(2, tab) }
         if (search == null) Spacer(Modifier.weight(1f)) else HomeSearchField(search, page == 1, onSearch, Modifier.weight(1f))
+        ChangelogButton(settings)
         if (page == 2) Spacer(Modifier.size(50.dp)) else SearchButton(search, onSearch)
         HeaderButton(stringResource(R.string.home_new_project), HomeIcons.Plus, Am.Accent, Am.OnAccent, compact, onNew)
         HeaderButton(stringResource(R.string.settings), ChromeIcons.Gear, Am.Card, Am.Navy, compact, onSettings)
@@ -76,9 +77,9 @@ private fun HeaderButton(label: String, icon: ImageVector, background: Color, co
 }
 
 @Composable
-internal fun ProjectGrid(rows: List<ListRow>, upload: Boolean, onUpload: () -> Unit, card: @Composable (ProjectInfo, Int, Modifier) -> Unit) {
+internal fun ProjectGrid(rows: List<ListRow>, upload: Boolean, onUpload: () -> Unit, state: androidx.compose.foundation.lazy.grid.LazyGridState, card: @Composable (ProjectInfo, Int, Modifier) -> Unit) {
     LazyVerticalGrid(
-        GridCells.Adaptive(340.dp), Modifier.fillMaxSize(),
+        GridCells.Adaptive(340.dp), Modifier.fillMaxSize(), state,
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 28.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {

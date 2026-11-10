@@ -139,6 +139,7 @@
     <string name="settings_report_issue">Laporkan masalah</string>
     <string name="settings_suggest_feature">Sarankan fitur</string>
     <string name="join_discord">Gabung ke Discord</string>
+    <string name="alight_reimport_tip">Impor Alight Motion lama: impor lagi dari Alight Motion untuk tampilan terbaru.</string>
     <string name="settings_help">Bantuan</string>
     <string name="tutorial_settings_start">Mulai tutorial</string>
     <string name="tutorial_settings_continue">Lanjutkan tutorial</string>
@@ -246,6 +247,10 @@
     <string name="update_not_now">Nanti saja</string>
     <string name="update_outdated">Ini mungkin sudah diperbaiki di versi yang lebih baru (terpasang %1$s, terbaru %2$s).</string>
     <string name="update_changelog">Log perubahan</string>
+    <string name="whats_new_see">Lihat yang baru di %1$s</string>
+    <string name="settings_whats_new">Yang baru</string>
+    <string name="settings_auto_check_on">Cek otomatis: Aktif</string>
+    <string name="settings_auto_check_off">Cek otomatis: Nonaktif</string>
     <string name="update_open_failed">Tidak ada aplikasi di perangkat ini yang dapat membuka tautan.</string>
     <string name="update_download_update">Unduh pembaruan</string>
     <string name="update_installed">Versi terpasang: %1$s</string>
@@ -1062,6 +1067,7 @@
     <string name="layer_tool_edit_points">Edit Titik</string>
     <string name="layer_tool_edit_drawing">Edit Gambar</string>
     <string name="layer_tool_edit_group">Edit Grup</string>
+    <string name="layer_tool_frame">Frame</string>
     <string name="layer_tool_ungroup">Bubarkan grup</string>
     <string name="group_leave">Keluar dari grup</string>
     <string name="ungroup_loses_style">Membubarkan grup akan menghapus efek, kecepatan, opasitas, dan blending milik grup itu. Lapisan di dalamnya tetap di tempatnya dan terlihat sama.</string>

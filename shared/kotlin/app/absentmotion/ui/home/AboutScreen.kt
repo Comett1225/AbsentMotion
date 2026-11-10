@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -62,22 +63,26 @@ internal const val WEBSITE = "https://comett1225.github.io/AbsentMotion/"
 internal const val LICENCES_ASSET = "licenses.txt"
 
 @Composable
-fun AboutScreen(onClose: () -> Unit) {
+fun AboutScreen(settings: app.absentmotion.library.AppSettings, onClose: () -> Unit) {
     var licences by remember { mutableStateOf(false) }
+    var whatsNew by remember { mutableStateOf(false) }
     Dialog({ if (licences) licences = false else onClose() }, sheetDialogProperties()) {
         PhoneScreen {
             DialogStatusBarIcons(darkIcons = Am.Card.luminance() > 0.5f)
             Box(Modifier.fillMaxSize().background(Am.SheetBg)) {
                 if (licences) LicencesPage { licences = false }
-                else AboutPage(onClose, onLicences = { licences = true })
+                else AboutPage(onClose, onLicences = { licences = true }, onWhatsNew = { whatsNew = true })
             }
         }
     }
+    if (whatsNew) CurrentWhatsNew(settings) { whatsNew = false }
 }
 
 @Composable
-private fun AboutPage(onClose: () -> Unit, onLicences: () -> Unit) {
+private fun AboutPage(onClose: () -> Unit, onLicences: () -> Unit, onWhatsNew: () -> Unit) {
     val version = appVersion()
+    val context = LocalContext.current
+    val notes = remember { WhatsNewNotes.currentName(context) }
     Column(Modifier.fillMaxSize().navigationBarsPadding()) {
         TitleBar(stringResource(R.string.settings_about), HomeIcons.Close, stringResource(R.string.action_close), onClose)
         Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)) {
@@ -85,6 +90,13 @@ private fun AboutPage(onClose: () -> Unit, onLicences: () -> Unit) {
             Text("AbsentMotion", color = Am.Navy, fontSize = 26.sp, fontWeight = FontWeight.Bold)
             if (version.isNotEmpty()) Text(stringResource(if (Tier.compatible) R.string.about_version_compatible else R.string.about_version, version),
                 Modifier.padding(top = 2.dp), color = Am.HomeMid, fontSize = 14.sp)
+            if (notes != null) Box(
+                Modifier.padding(top = 14.dp).heightIn(min = 44.dp).clip(RoundedCornerShape(50)).background(Am.Navy)
+                    .clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = onWhatsNew).padding(horizontal = 20.dp, vertical = 10.dp),
+                Alignment.Center,
+            ) {
+                Text(stringResource(R.string.whats_new_see, WhatsNewNotes.key(version) ?: notes), color = Am.OnNavy, fontSize = 15.sp, fontWeight = FontWeight.Medium)
+            }
             Spacer(Modifier.height(20.dp))
             Body(stringResource(R.string.about_licence_line))
             Spacer(Modifier.height(12.dp))

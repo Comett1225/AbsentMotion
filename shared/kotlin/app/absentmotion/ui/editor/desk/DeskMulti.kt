@@ -94,8 +94,10 @@ internal fun DeskMulti(state: EditorState, modifier: Modifier) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var parentMenu by remember { mutableStateOf(false) }
-    val cut = layers.takeIf { it.size == 2 }?.let { state.scene.cutBetween(it[0].id, it[1].id) }
-    val cuts = if (layers.size == 2) listOfNotNull(cut?.let { it.first.id to it.second.id }) else state.scene.selectedCuts(layers.map { it.id }.toSet())
+    val ids = layers.map { it.id }
+    val cuts = remember(state.scene, ids) {
+        if (ids.size == 2) listOfNotNull(state.scene.cutBetween(ids[0], ids[1])?.let { it.first.id to it.second.id }) else state.scene.selectedCuts(ids.toSet())
+    }
     var transition by remember { mutableStateOf<List<Pair<Long, Long>>?>(null) }
     var animation by remember { mutableStateOf<Set<Long>?>(null) }
     transition?.let { TransitionSheet(state, it) { transition = null } }

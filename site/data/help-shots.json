@@ -7,31 +7,31 @@
    "section": "",
    "block": 1,
    "alt": {
-    "en": "The home screen: menu (1), search (2), Projects and Assets (3), a project card (4), the card menu button (5) and New project (6).",
-    "ar": "الشاشة الرئيسية: القائمة (1)، البحث (2)، المشاريع والأصول (3)، بطاقة مشروع (4)، زر قائمة البطاقة (5) ومشروع جديد (6).",
-    "bn": "হোম স্ক্রিন: মেনু (1), সার্চ (2), প্রজেক্ট ও অ্যাসেট (3), একটি প্রজেক্ট কার্ড (4), কার্ড মেনু বোতাম (5) এবং নতুন প্রজেক্ট (6)।",
-    "es": "La pantalla de inicio: el menú (1), la búsqueda (2), Proyectos y Recursos (3), una tarjeta de proyecto (4), el botón del menú de la tarjeta (5) y Nuevo proyecto (6).",
-    "fa": "صفحه اصلی: منو (1)، جستجو (2)، پروژه‌ها و دارایی‌ها (3)، یک کارت پروژه (4)، دکمه منوی کارت (5) و پروژه جدید (6).",
-    "fil": "Ang home screen: menu (1), search (2), Mga proyekto at Mga asset (3), isang project card (4), ang card menu button (5) at Bagong proyekto (6).",
-    "hi": "होम स्क्रीन: मेन्यू (1), खोज (2), प्रोजेक्ट और एसेट (3), एक प्रोजेक्ट कार्ड (4), कार्ड मेन्यू बटन (5) और नया प्रोजेक्ट (6)।",
-    "id": "Layar beranda: menu (1), pencarian (2), Proyek dan Aset (3), sebuah kartu proyek (4), tombol menu kartu (5), dan Proyek baru (6).",
-    "ms": "Skrin utama: menu (1), carian (2), Projek dan Aset (3), satu kad projek (4), butang menu kad (5) dan Projek baharu (6).",
-    "pt-BR": "A tela inicial: o menu (1), a pesquisa (2), Projetos e Recursos (3), um cartão de projeto (4), o botão de menu do cartão (5) e Novo projeto (6).",
-    "ru": "Главный экран: меню (1), поиск (2), Проекты и Ресурсы (3), карточка проекта (4), кнопка меню карточки (5) и Новый проект (6).",
-    "th": "หน้าจอหลัก: เมนู (1), ค้นหา (2), โปรเจกต์ และ แอสเซท (3), การ์ดโปรเจกต์ (4), ปุ่มเมนูการ์ด (5) และ โปรเจกต์ใหม่ (6)",
-    "tr": "Ana ekran: menü (1), arama (2), Projeler ve Varlıklar (3), bir proje kartı (4), kart menüsü düğmesi (5) ve Yeni proje (6).",
-    "vi": "Màn hình chính: menu (1), tìm kiếm (2), Dự án và Tài nguyên (3), một thẻ dự án (4), nút menu thẻ (5) và Dự án mới (6).",
-    "es-ES": "La pantalla de inicio: menú (1), búsqueda (2), Proyectos y Recursos (3), una tarjeta de proyecto (4), el botón de menú de la tarjeta (5) y Nuevo proyecto (6).",
-    "ur": "ہوم اسکرین: مینو (1)، تلاش (2)، پروجیکٹس اور ایسیٹس (3)، ایک پروجیکٹ کارڈ (4)، کارڈ مینو بٹن (5) اور نیا پروجیکٹ (6)۔",
-    "ja": "ホーム画面：メニュー(1)、検索(2)、プロジェクトとアセット(3)、プロジェクトカード(4)、カードメニューボタン(5)、新規プロジェクト(6)です。",
-    "ko": "홈 화면: 메뉴 (1), 검색 (2), 프로젝트 및 에셋 (3), 프로젝트 카드 (4), 카드 메뉴 버튼 (5), 새 프로젝트 (6).",
-    "zh-TW": "主畫面：選單 (1)、搜尋 (2)、專案與素材 (3)、專案卡片 (4)、卡片選單按鈕 (5)、新增專案 (6)。",
-    "zh-CN": "主屏幕：菜单 (1)、搜索 (2)、项目和素材 (3)、项目卡片 (4)、卡片菜单按钮 (5)、新建项目 (6)。",
-    "fr": "L’écran d’accueil : menu (1), recherche (2), Projets et Ressources (3), une carte de projet (4), le bouton de menu de la carte (5) et Nouveau projet (6).",
-    "de": "Der Startbildschirm: Menü (1), Suche (2), Projekte und Assets (3), eine Projektkarte (4), die Menüschaltfläche der Karte (5) und Neues Projekt (6).",
-    "it": "La schermata iniziale: menu (1), ricerca (2), Progetti e Risorse (3), una scheda progetto (4), il pulsante del menu della scheda (5) e Nuovo progetto (6).",
-    "pl": "Ekran główny: menu (1), wyszukiwanie (2), Projekty i Zasoby (3), karta projektu (4), przycisk menu karty (5) i Nowy projekt (6).",
-    "uk": "Головний екран: меню (1), пошук (2), Проєкти й Ресурси (3), картка проєкту (4), кнопка меню картки (5) і Новий проєкт (6)."
+    "en": "The home screen: menu (1), Changelog (2), search (3), Projects and Assets (4), a project card (5), the card menu button (6) and New project (7).",
+    "ar": "الشاشة الرئيسية: القائمة (1)، سجل التغييرات (2)، البحث (3)، المشاريع والأصول (4)، بطاقة مشروع (5)، زر قائمة البطاقة (6) ومشروع جديد (7).",
+    "bn": "হোম স্ক্রিন: মেনু (1), চেঞ্জলগ (2), সার্চ (3), প্রজেক্ট ও অ্যাসেট (4), একটি প্রজেক্ট কার্ড (5), কার্ড মেনু বোতাম (6) এবং নতুন প্রজেক্ট (7)।",
+    "es": "La pantalla de inicio: el menú (1), Novedades (2), la búsqueda (3), Proyectos y Recursos (4), una tarjeta de proyecto (5), el botón del menú de la tarjeta (6) y Nuevo proyecto (7).",
+    "fa": "صفحه اصلی: منو (1)، تغییرات (2)، جستجو (3)، پروژه‌ها و دارایی‌ها (4)، یک کارت پروژه (5)، دکمه منوی کارت (6) و پروژه جدید (7).",
+    "fil": "Ang home screen: menu (1), Talaan ng mga pagbabago (2), search (3), Mga proyekto at Mga asset (4), isang project card (5), ang card menu button (6) at Bagong proyekto (7).",
+    "hi": "होम स्क्रीन: मेन्यू (1), चेंजलॉग (2), खोज (3), प्रोजेक्ट और एसेट (4), एक प्रोजेक्ट कार्ड (5), कार्ड मेन्यू बटन (6) और नया प्रोजेक्ट (7)।",
+    "id": "Layar beranda: menu (1), Log perubahan (2), pencarian (3), Proyek dan Aset (4), sebuah kartu proyek (5), tombol menu kartu (6), dan Proyek baru (7).",
+    "ms": "Skrin utama: menu (1), Log perubahan (2), carian (3), Projek dan Aset (4), satu kad projek (5), butang menu kad (6) dan Projek baharu (7).",
+    "pt-BR": "A tela inicial: o menu (1), Novidades (2), a pesquisa (3), Projetos e Recursos (4), um cartão de projeto (5), o botão de menu do cartão (6) e Novo projeto (7).",
+    "ru": "Главный экран: меню (1), Список изменений (2), поиск (3), Проекты и Ресурсы (4), карточка проекта (5), кнопка меню карточки (6) и Новый проект (7).",
+    "th": "หน้าจอหลัก: เมนู (1), บันทึกการอัปเดต (2), ค้นหา (3), โปรเจกต์ และ แอสเซท (4), การ์ดโปรเจกต์ (5), ปุ่มเมนูการ์ด (6) และ โปรเจกต์ใหม่ (7)",
+    "tr": "Ana ekran: menü (1), Sürüm notları (2), arama (3), Projeler ve Varlıklar (4), bir proje kartı (5), kart menüsü düğmesi (6) ve Yeni proje (7).",
+    "vi": "Màn hình chính: menu (1), Nhật ký thay đổi (2), tìm kiếm (3), Dự án và Tài nguyên (4), một thẻ dự án (5), nút menu thẻ (6) và Dự án mới (7).",
+    "es-ES": "La pantalla de inicio: el menú (1), Registro de cambios (2), la búsqueda (3), Proyectos y Recursos (4), una tarjeta de proyecto (5), el botón del menú de la tarjeta (6) y Nuevo proyecto (7).",
+    "ur": "ہوم اسکرین: مینو (1)، چینج لاگ (2)، تلاش (3)، پروجیکٹس اور ایسیٹس (4)، ایک پروجیکٹ کارڈ (5)، کارڈ مینو بٹن (6) اور نیا پروجیکٹ (7)۔",
+    "ja": "ホーム画面：メニュー(1)、変更履歴(2)、検索(3)、プロジェクトとアセット(4)、プロジェクトカード(5)、カードメニューボタン(6)、新規プロジェクト(7)です。",
+    "ko": "홈 화면: 메뉴 (1), 변경 사항 (2), 검색 (3), 프로젝트 및 에셋 (4), 프로젝트 카드 (5), 카드 메뉴 버튼 (6), 새 프로젝트 (7).",
+    "zh-TW": "主畫面：選單 (1)、更新紀錄 (2)、搜尋 (3)、專案與素材 (4)、專案卡片 (5)、卡片選單按鈕 (6)、新增專案 (7)。",
+    "zh-CN": "主屏幕：菜单 (1)、更新日志 (2)、搜索 (3)、项目和素材 (4)、项目卡片 (5)、卡片菜单按钮 (6)、新建项目 (7)。",
+    "fr": "L’écran d’accueil : menu (1), Notes de version (2), recherche (3), Projets et Ressources (4), une carte de projet (5), le bouton de menu de la carte (6) et Nouveau projet (7).",
+    "de": "Der Startbildschirm: Menü (1), Änderungsprotokoll (2), Suche (3), Projekte und Assets (4), eine Projektkarte (5), die Menüschaltfläche der Karte (6) und Neues Projekt (7).",
+    "it": "La schermata iniziale: menu (1), Novità (2), ricerca (3), Progetti e Risorse (4), una scheda progetto (5), il pulsante del menu della scheda (6) e Nuovo progetto (7).",
+    "pl": "Ekran główny: menu (1), Lista zmian (2), wyszukiwanie (3), Projekty i Zasoby (4), karta projektu (5), przycisk menu karty (6) i Nowy projekt (7).",
+    "uk": "Головний екран: меню (1), Список змін (2), пошук (3), Проєкти й Ресурси (4), картка проєкту (5), кнопка меню картки (6) і Новий проєкт (7)."
    },
    "start": {
     "scene": "demo",
@@ -50,18 +50,37 @@
    ],
    "highlight": [
     {
-     "select": "Settings",
-     "exact": true,
-     "pad": 14,
+     "box": [
+      8,
+      146,
+      123,
+      261
+     ],
      "n": 1,
-     "badge": "br"
+     "badge": "br",
+     "pad": 0
     },
     {
-     "select": "Search",
-     "exact": true,
-     "pad": 14,
+     "box": [
+      826,
+      146,
+      941,
+      261
+     ],
      "n": 2,
-     "badge": "bl"
+     "badge": "b",
+     "pad": 0
+    },
+    {
+     "box": [
+      957,
+      146,
+      1072,
+      261
+     ],
+     "n": 3,
+     "badge": "b",
+     "pad": 0
     },
     {
      "union": [
@@ -76,24 +95,32 @@
       },
       "Assets"
      ],
-     "n": 3,
-     "badge": "tl"
-    },
-    {
-     "select": "Mountain Lake",
      "n": 4,
      "badge": "tl"
     },
     {
-     "select": "More",
+     "select": "Mountain Lake",
      "n": 5,
+     "badge": "tl"
+    },
+    {
+     "select": "More",
+     "exact": true,
+     "pad": 8,
+     "n": 6,
      "badge": "bl"
     },
     {
      "select": "New project",
-     "n": 6,
+     "n": 7,
      "badge": "tl"
     }
+   ],
+   "crop": [
+    0,
+    128,
+    1080,
+    2337
    ]
   },
   {
@@ -2768,31 +2795,31 @@
    "section": "",
    "block": 1,
    "alt": {
-    "en": "The Settings drawer: the four groups (1) and the rows below them (2).",
-    "ar": "درج الإعدادات: المجموعات الأربع (1) والصفوف الموجودة أسفلها (2).",
-    "bn": "সেটিংস ড্রয়ার: চারটি গ্রুপ (1) এবং তাদের নিচের সারিগুলো (2)।",
-    "es": "El panel de Ajustes: los cuatro grupos (1) y las filas debajo de ellos (2).",
-    "fa": "کشوی تنظیمات: چهار گروه (1) و ردیف‌های زیر آن‌ها (2).",
-    "fil": "Ang Settings drawer: ang apat na grupo (1) at ang mga row sa ilalim ng mga ito (2).",
-    "hi": "सेटिंग्स ड्रॉअर: चार ग्रुप (1) और उनके नीचे की पंक्तियाँ (2)।",
-    "id": "Drawer Pengaturan: empat grup (1) dan baris di bawahnya (2).",
-    "ms": "Laci Tetapan: empat kumpulan (1) dan baris di bawahnya (2).",
-    "pt-BR": "A gaveta de Configurações: os quatro grupos (1) e as linhas abaixo deles (2).",
-    "ru": "Панель настроек: четыре группы (1) и строки под ними (2).",
-    "th": "ลิ้นชักการตั้งค่า: สี่กลุ่ม (1) และแถวด้านล่างกลุ่มเหล่านี้ (2)",
-    "tr": "Ayarlar çekmecesi: dört grup (1) ve altlarındaki satırlar (2).",
-    "vi": "Ngăn kéo Cài đặt: bốn nhóm (1) và các hàng bên dưới chúng (2).",
-    "es-ES": "El panel de Ajustes: los cuatro grupos (1) y las filas que hay debajo (2).",
-    "ur": "سیٹنگز ڈراور: چار گروپس (1) اور ان کے نیچے قطاریں (2)۔",
-    "ja": "設定ドロワー：4つのグループ(1)、その下の行(2)です。",
-    "ko": "설정 서랍: 그룹 네 개 (1)와 그 아래의 항목 (2).",
-    "zh-TW": "設定抽屜：四個群組 (1) 與其下的各個項目 (2)。",
-    "zh-CN": "设置抽屉：四个分组 (1) 及其下方的各项 (2)。",
-    "fr": "Le tiroir Paramètres : les quatre groupes (1) et les lignes en dessous (2).",
-    "de": "Die Schublade Einstellungen: die vier Gruppen (1) und die Zeilen darunter (2).",
-    "it": "Il pannello Impostazioni: i quattro gruppi (1) e le righe sotto di essi (2).",
-    "pl": "Szuflada Ustawienia: cztery grupy (1) i wiersze pod nimi (2).",
-    "uk": "Панель Налаштування: чотири групи (1) і рядки під ними (2)."
+    "en": "The Settings drawer: the card with the version and the update buttons (1), the four groups (2) and the rows below them (3).",
+    "ar": "درج الإعدادات: البطاقة التي تعرض الإصدار وأزرار التحديث (1)، والمجموعات الأربع (2) والصفوف الموجودة أسفلها (3).",
+    "bn": "সেটিংস ড্রয়ার: ভার্সন ও আপডেট বোতামসহ কার্ড (1), চারটি গ্রুপ (2) এবং তাদের নিচের সারিগুলো (3)।",
+    "es": "El panel de Ajustes: la tarjeta con la versión y los botones de actualización (1), los cuatro grupos (2) y las filas debajo de ellos (3).",
+    "fa": "کشوی تنظیمات: کارتی با نسخه و دکمه‌های به‌روزرسانی (1)، چهار گروه (2) و ردیف‌های زیر آن‌ها (3).",
+    "fil": "Ang Settings drawer: ang card na may version at mga button ng update (1), ang apat na grupo (2) at ang mga row sa ilalim ng mga ito (3).",
+    "hi": "सेटिंग्स ड्रॉअर: वर्शन और अपडेट बटन वाला कार्ड (1), चार ग्रुप (2) और उनके नीचे की पंक्तियाँ (3)।",
+    "id": "Drawer Pengaturan: kartu berisi versi dan tombol pembaruan (1), empat grup (2), dan baris di bawahnya (3).",
+    "ms": "Laci Tetapan: kad dengan versi dan butang kemas kini (1), empat kumpulan (2) dan baris di bawahnya (3).",
+    "pt-BR": "A gaveta de Configurações: o cartão com a versão e os botões de atualização (1), os quatro grupos (2) e as linhas abaixo deles (3).",
+    "ru": "Панель настроек: карточка с версией и кнопками обновления (1), четыре группы (2) и строки под ними (3).",
+    "th": "ลิ้นชักการตั้งค่า: การ์ดที่แสดงเวอร์ชันและปุ่มอัปเดต (1), สี่กลุ่ม (2) และแถวด้านล่างกลุ่มเหล่านี้ (3)",
+    "tr": "Ayarlar çekmecesi: sürümü ve güncelleme düğmelerini içeren kart (1), dört grup (2) ve altlarındaki satırlar (3).",
+    "vi": "Ngăn kéo Cài đặt: thẻ có phiên bản và các nút cập nhật (1), bốn nhóm (2) và các hàng bên dưới chúng (3).",
+    "es-ES": "El panel de Ajustes: la tarjeta con la versión y los botones de actualización (1), los cuatro grupos (2) y las filas debajo de ellos (3).",
+    "ur": "سیٹنگز ڈراور: ورژن اور اپ ڈیٹ بٹنوں والا کارڈ (1)، چار گروپس (2) اور ان کے نیچے قطاریں (3)۔",
+    "ja": "設定ドロワー：バージョンとアップデートのボタンがあるカード(1)、4つのグループ(2)、その下の行(3)です。",
+    "ko": "설정 서랍: 버전과 업데이트 버튼이 있는 카드 (1), 그룹 네 개 (2), 그 아래의 항목 (3).",
+    "zh-TW": "設定抽屜：顯示版本與更新按鈕的卡片 (1)、四個群組 (2) 與其下的各個項目 (3)。",
+    "zh-CN": "设置抽屉：显示版本和更新按钮的卡片 (1)、四个分组 (2) 及其下方的各项 (3)。",
+    "fr": "Le tiroir Paramètres : la carte avec la version et les boutons de mise à jour (1), les quatre groupes (2) et les lignes en dessous (3).",
+    "de": "Die Schublade Einstellungen: die Karte mit der Version und den Update-Schaltflächen (1), die vier Gruppen (2) und die Zeilen darunter (3).",
+    "it": "Il pannello Impostazioni: la scheda con la versione e i pulsanti di aggiornamento (1), i quattro gruppi (2) e le righe sotto di essi (3).",
+    "pl": "Szuflada Ustawienia: karta z wersją i przyciskami aktualizacji (1), cztery grupy (2) i wiersze pod nimi (3).",
+    "uk": "Панель Налаштування: картка з версією та кнопками оновлення (1), чотири групи (2) і рядки під ними (3)."
    },
    "start": "home",
    "steps": [
@@ -2807,9 +2834,9 @@
     {
      "box": [
       16,
-      254,
+      259,
       719,
-      806
+      543
      ],
      "n": 1,
      "badge": "tl",
@@ -2818,20 +2845,31 @@
     {
      "box": [
       16,
-      822,
+      569,
       719,
-      1700
+      1111
      ],
      "n": 2,
+     "badge": "tl",
+     "pad": 0
+    },
+    {
+     "box": [
+      16,
+      1137,
+      719,
+      2013
+     ],
+     "n": 3,
      "badge": "tl",
      "pad": 0
     }
    ],
    "crop": [
     0,
-    106,
+    128,
     735,
-    1700
+    2039
    ]
   },
   {
@@ -2882,9 +2920,9 @@
     {
      "box": [
       24,
-      364,
+      690,
       700,
-      510
+      804
      ],
      "n": 1,
      "badge": "tl",
@@ -2893,9 +2931,9 @@
     {
      "box": [
       24,
-      520,
+      808,
       700,
-      612
+      916
      ],
      "n": 2,
      "badge": "tl",
@@ -2904,9 +2942,9 @@
     {
      "box": [
       16,
-      612,
+      920,
       719,
-      716
+      1036
      ],
      "n": 3,
      "badge": "tl",
@@ -2915,9 +2953,9 @@
     {
      "box": [
       16,
-      722,
+      1036,
       719,
-      850
+      1152
      ],
      "n": 4,
      "badge": "tl",
@@ -2926,9 +2964,9 @@
     {
      "box": [
       24,
-      860,
+      1170,
       700,
-      1070
+      1358
      ],
      "n": 5,
      "badge": "tl",
@@ -2937,9 +2975,9 @@
    ],
    "crop": [
     0,
-    106,
+    543,
     735,
-    1200
+    1482
    ]
   },
   {
@@ -4025,9 +4063,9 @@
     {
      "box": [
       16,
-      799,
+      1114,
       719,
-      915
+      1230
      ],
      "n": 1,
      "badge": "tl",
@@ -4036,9 +4074,9 @@
     {
      "box": [
       16,
-      915,
+      1230,
       719,
-      1031
+      1346
      ],
      "n": 2,
      "badge": "tl",
@@ -4047,9 +4085,9 @@
     {
      "box": [
       16,
-      1031,
+      1346,
       719,
-      1157
+      1462
      ],
      "n": 3,
      "badge": "tl",
@@ -4058,9 +4096,9 @@
    ],
    "crop": [
     0,
-    106,
+    543,
     735,
-    1250
+    1552
    ],
    "alt": {
     "en": "The Backup group: Back up all projects (1), Restore from backup (2) and Weekly automatic backup (projects only) (3).",
@@ -5296,9 +5334,9 @@
     {
      "box": [
       42,
-      646,
+      1561,
       1038,
-      919
+      1834
      ],
      "n": 2,
      "badge": "tl",
@@ -5318,7 +5356,7 @@
    ],
    "crop": [
     0,
-    106,
+    128,
     1080,
     2337
    ],

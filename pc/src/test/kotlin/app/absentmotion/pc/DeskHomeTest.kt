@@ -77,6 +77,8 @@ class DeskHomeTest {
 
     private fun ComposeUiTest.settle(ms: Long = 600) { mainClock.advanceTimeBy(ms); waitForIdle() }
 
+    private fun ComposeUiTest.shown(text: String) = waitUntil(timeoutMillis = 10_000) { onAllNodesWithText(text).fetchSemanticsNodes().isNotEmpty() }
+
     private fun ComposeUiTest.press(key: androidx.compose.ui.input.key.Key) {
         runOnIdle { runCatching { focus.requestFocus() } }
         onAllNodes(isRoot()).onFirst().performKeyInput { withKeyDown(if (mac) androidx.compose.ui.input.key.Key.MetaLeft else androidx.compose.ui.input.key.Key.CtrlLeft) { pressKey(key) } }
@@ -195,6 +197,7 @@ class DeskHomeTest {
             settle(1200)
             val count = app.store.list().size
             assertEquals(3, count)
+            shown("Styles")
             onAllNodesWithText("Styles").onFirst().performMouseInput { doubleClick() }
             waitUntil(timeoutMillis = 30_000) { app.editor != null }
             assertNotNull(app.editor)
@@ -202,6 +205,7 @@ class DeskHomeTest {
             settle(1200)
             assertNull(app.editor)
             for (gap in listOf(330L, 10L)) {
+                shown("Text")
                 onAllNodesWithText("Text").onFirst().performMouseInput { click(); advanceEventTime(gap); click() }
                 waitUntil(timeoutMillis = 30_000) { app.editor != null }
                 assertNotNull(app.editor)
@@ -209,6 +213,7 @@ class DeskHomeTest {
                 settle(1200)
                 assertNull(app.editor)
             }
+            shown("Media")
             onAllNodesWithText("Media").onFirst().performMouseInput { moveTo(center) }
             settle()
             shot("1280-16-card-hover", park = false)
@@ -219,6 +224,7 @@ class DeskHomeTest {
             assertEquals("Media", app.editor!!.project.title)
             runBlocking { app.closeEditor() }
             settle(1200)
+            shown("Text")
             onAllNodesWithText("Text").onFirst().performClick()
             settle(600)
             onAllNodes(isRoot()).onFirst().performKeyInput { pressKey(Key.Delete) }
@@ -269,6 +275,7 @@ class DeskHomeTest {
             settle(1200)
             val titles = app.store.list().map { it.title }.sortedBy { it.lowercase() }
             assertEquals(6, titles.size)
+            shown(titles[0])
             onAllNodesWithText(titles[0]).onFirst().performClick()
             settle(400)
             shot("1280-23-arrow-start")

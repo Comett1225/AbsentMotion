@@ -164,6 +164,16 @@
       "note": "Breadcrumb on phone and PC; phone shows a group pill next to a selected layer; double-click a group clip or row name opens it on PC only. Windows (installed app, 2026-11-04): Group from the context menu, double-click the group clip to enter, breadcrumb to leave"
     },
     {
+      "id": "tool.frame",
+      "name": "Frame tile for groups and assets: pick, step or keyframe which frame of the group's own timeline is shown (rigs imported from Adobe Animate), Off goes back to normal playback",
+      "where": "LayerTools.kt, panels/FramePanel.kt, editor/GroupActions.kt, model/NestedScenes.kt, cpp/scene.cpp NestedTime",
+      "android": "untested",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "macOS: desktop UI test FlaRigTest (tile, steps, keyframe, Off, undo) and engine renders. Android: built and JVM-tested, not run on a device yet"
+    },
+    {
       "id": "tool.asset_props",
       "name": "Asset properties, Open original of a linked asset",
       "where": "ElementUi.kt, editor/ElementActions.kt",
@@ -1132,13 +1142,13 @@
     },
     {
       "id": "import.fla",
-      "name": "Import Adobe Animate files (.fla from CS5 on, or the XFL folder): shapes, symbols, pictures, classic tweens, masks, sounds, with a report of what was skipped",
+      "name": "Import Adobe Animate files (.fla from CS5 on, or the XFL folder): shapes, symbols, pictures, classic tweens, masks, sounds, with a report of what was skipped; each moving symbol or picture becomes one keyframed layer, graphic symbols keep every frame with a keyframed Frame choice",
       "where": "compat/FlaImport.kt, Importer.kt fromFla, DeskOpen.kt xflZip",
       "android": "works",
       "macos": "untested",
       "windows": "untested",
       "linux": "untested",
-      "note": "Same Kotlin importer on every platform; the desktop also takes an .xfl file by packing its folder. Checked with JVM tests and 36 real files rendered by the host engine; the desktop app was not run on an imported file"
+      "note": "Same Kotlin importer on every platform; the desktop also takes an .xfl file by packing its folder. Checked with JVM tests and 36 real files rendered by the host engine; the desktop app was not run on an imported file. Rig frames are checked by the desktop render test FlaRigTest"
     },
     {
       "id": "effect.parenting_helper",
@@ -1209,6 +1219,16 @@
       "windows": "untested",
       "linux": "untested",
       "note": ""
+    },
+    {
+      "id": "home.whats_new",
+      "name": "What's new: the notes after an update, the Changelog button on Home, What's new in Settings and on the About page",
+      "where": "WhatsNew.kt, HomeScreen.kt, SettingsDrawer.kt, AboutScreen.kt, DeskHome.kt, DeskPages.kt",
+      "android": "untested",
+      "macos": "works",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "the phone screens were checked in desktop UI tests at phone width (DeskChangelogTest), not yet on a phone; the desktop has the Home button and the About button, and its Settings window keeps its own Updates page"
     },
     {
       "id": "home.crash_logs",

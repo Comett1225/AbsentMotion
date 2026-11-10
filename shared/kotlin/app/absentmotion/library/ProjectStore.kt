@@ -37,11 +37,43 @@ class ProjectStore(private val root: File) {
 
     val versions = ProjectVersions(File(dir, "versions"))
 
-    fun list(includeDamaged: Boolean = false): List<ProjectInfo> = dir.listFiles { f -> f.extension == "xml" && safeSegment(f.nameWithoutExtension) }.orEmpty().mapNotNull { file ->
+    private val index = File(root, "projects.index")
+    private var indexRead = false
+
+    @Synchronized private fun readIndex() {
+        if (indexRead) return
+        indexRead = true
+        runCatching {
+            val all = org.json.JSONObject(index.readText())
+            for (id in all.keys()) {
+                val a = all.getJSONArray(id)
+                listed.putIfAbsent(id, ProjectInfo(id, a.getString(0), a.getInt(1), a.getInt(2), a.getInt(3), a.getInt(4), a.getLong(5), a.getLong(6), null, a.getBoolean(7)))
+            }
+        }
+    }
+
+    private fun writeIndex(ids: Set<String>) {
+        listed.keys.retainAll(ids)
+        val all = org.json.JSONObject()
+        for (info in listed.values) if (!info.damaged) all.put(info.id, org.json.JSONArray(listOf(info.title, info.width, info.height, info.fps, info.durationMs, info.sizeBytes, info.modified, info.isElement)))
+        runCatching { writeAtomically(index, all.toString(), sync = false) }
+    }
+
+    fun list(includeDamaged: Boolean = false): List<ProjectInfo> {
+        readIndex()
+        val files = dir.listFiles { f -> f.extension == "xml" && safeSegment(f.nameWithoutExtension) }.orEmpty()
+        var parsed = false
+        val infos = files.mapNotNull { file -> info(file, includeDamaged) { parsed = true } }
+        if (parsed || listed.size != files.size) writeIndex(files.mapTo(HashSet()) { it.nameWithoutExtension })
+        return infos
+    }
+
+    private fun info(file: File, includeDamaged: Boolean, onParsed: () -> Unit): ProjectInfo? {
         val id = file.nameWithoutExtension
         val modified = file.savedTime()
         val size = file.length()
         val info = listed[id]?.takeIf { it.modified == modified && it.sizeBytes == size } ?: run {
+            onParsed()
             val text = runCatching { file.readText() }.getOrNull()
             val scene = text?.let(::projectScene)
             if (scene == null) ProjectInfo(id, damagedTitle(text), 0, 0, 0, 0, size, modified, null, isElement = false, damaged = true)
@@ -51,7 +83,7 @@ class ProjectStore(private val root: File) {
                 thumbnail = null, isElement = scene.node["type"] == "element",
             )
         }.also { listed[id] = it }
-        if (info.damaged && !includeDamaged) null else info.copy(thumbnail = thumbnailFile(id).takeIf { it.exists() })
+        return if (info.damaged && !includeDamaged) null else info.copy(thumbnail = thumbnailFile(id).takeIf { it.exists() })
     }
 
     private fun damagedTitle(text: String?): String =

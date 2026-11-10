@@ -49,6 +49,7 @@
  "history_size": "Name of an edit shown in the undo toast: changing the size of a layer.",
  "history_timing": "Name of an edit shown in the undo toast: trimming or moving a clip in time.",
  "history_undid": "Short toast shown after the user presses Undo; %1$s is the short name of the change that was undone (e.g. Move, Opacity). Past tense: 'Undid'.",
+ "layer_tool_frame": "Tile and panel title for a group or element: chooses which frame of the group's own animation is shown at this point of the video (an animation frame, like a frame of a flipbook; not a picture frame or border). Keep it to one short word.",
  "layer_tool_voice_filters": "Button on an audio clip that opens ready-made voice filters (presets for changing how a voice sounds).",
  "low_memory_body": "%1$s is a number such as 1.8; GB means gigabytes of RAM (working memory), not storage.",
  "low_memory_title": "Title of a one-time warning: the phone has little RAM.",

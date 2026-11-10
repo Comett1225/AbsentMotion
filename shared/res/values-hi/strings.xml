@@ -139,6 +139,7 @@
     <string name="settings_report_issue">समस्या की रिपोर्ट करें</string>
     <string name="settings_suggest_feature">कोई फ़ीचर सुझाएँ</string>
     <string name="join_discord">Discord से जुड़ें</string>
+    <string name="alight_reimport_tip">पुराना Alight Motion इम्पोर्ट: नवीनतम रूप के लिए इसे Alight Motion से फिर से इम्पोर्ट करें।</string>
     <string name="settings_help">सहायता</string>
     <string name="tutorial_settings_start">ट्यूटोरियल शुरू करें</string>
     <string name="tutorial_settings_continue">ट्यूटोरियल जारी रखें</string>
@@ -246,6 +247,10 @@
     <string name="update_not_now">अभी नहीं</string>
     <string name="update_outdated">यह नए वर्शन में ठीक हो सकता है (इंस्टॉल %1$s, नवीनतम %2$s)।</string>
     <string name="update_changelog">चेंजलॉग</string>
+    <string name="whats_new_see">%1$s में नया क्या है देखें</string>
+    <string name="settings_whats_new">नया क्या है</string>
+    <string name="settings_auto_check_on">ऑटो-जाँच: चालू</string>
+    <string name="settings_auto_check_off">ऑटो-जाँच: बंद</string>
     <string name="update_open_failed">इस डिवाइस पर कोई ऐप यह लिंक नहीं खोल सकता।</string>
     <string name="update_download_update">अपडेट डाउनलोड करें</string>
     <string name="update_installed">इंस्टॉल वर्ज़न: %1$s</string>
@@ -1077,6 +1082,7 @@
     <string name="layer_tool_edit_points">पॉइंट एडिट करें</string>
     <string name="layer_tool_edit_drawing">ड्रॉइंग एडिट करें</string>
     <string name="layer_tool_edit_group">ग्रुप एडिट करें</string>
+    <string name="layer_tool_frame">फ़्रेम</string>
     <string name="layer_tool_ungroup">अनग्रुप करें</string>
     <string name="group_leave">ग्रुप से बाहर निकलें</string>
     <string name="ungroup_loses_style">अनग्रुप करने पर ग्रुप के अपने इफ़ेक्ट, स्पीड, ओपेसिटी और ब्लेंडिंग हट जाते हैं। उसकी लेयर्स अपनी जगह और लुक बनाए रखती हैं।</string>

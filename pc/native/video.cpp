@@ -307,24 +307,31 @@ struct Video {
         const size_t rowBytes = (size_t)f->width * 4;
         auto data = SkData::MakeUninitialized(rowBytes * f->height);
         auto* out = (uint8_t*)data->writable_data();
-        for (int y = 0; y < f->height; ++y) {
-            const auto* in = (const uint16_t*)(wide->data[0] + (size_t)y * wide->linesize[0]);
-            uint8_t* row = out + y * rowBytes;
-            for (int x = 0; x < f->width; ++x, in += 4, row += 4) {
-                float r = levels[in[0] >> 4], g = levels[in[1] >> 4], b = levels[in[2] >> 4];
-                if (hlg) {
-                    const float gain = 4.926f * std::pow(std::max(0.2627f * r + 0.678f * g + 0.0593f * b, 1e-6f), 0.2f);
-                    r *= gain;
-                    g *= gain;
-                    b *= gain;
+        const auto rows = [&](int from, int to) {
+            for (int y = from; y < to; ++y) {
+                const auto* in = (const uint16_t*)(wide->data[0] + (size_t)y * wide->linesize[0]);
+                uint8_t* row = out + y * rowBytes;
+                for (int x = 0; x < f->width; ++x, in += 4, row += 4) {
+                    float r = levels[in[0] >> 4], g = levels[in[1] >> 4], b = levels[in[2] >> 4];
+                    if (hlg) {
+                        const float gain = 4.926f * std::pow(std::max(0.2627f * r + 0.678f * g + 0.0593f * b, 1e-6f), 0.2f);
+                        r *= gain;
+                        g *= gain;
+                        b *= gain;
+                    }
+                    float c[3] = {1.6605f * r - 0.5876f * g - 0.0728f * b, -0.1246f * r + 1.1329f * g - 0.0083f * b, -0.0182f * r - 0.1006f * g + 1.1187f * b};
+                    const float peak = std::max({c[0], c[1], c[2], 1e-6f});
+                    const float scale = SoftKnee(peak) / peak;
+                    for (int k = 0; k < 3; ++k) row[k] = (uint8_t)encode[(int)(std::clamp(c[k] * scale, 0.0f, 1.0f) * 4095.0f + 0.5f)];
+                    row[3] = 255;
                 }
-                float c[3] = {1.6605f * r - 0.5876f * g - 0.0728f * b, -0.1246f * r + 1.1329f * g - 0.0083f * b, -0.0182f * r - 0.1006f * g + 1.1187f * b};
-                const float peak = std::max({c[0], c[1], c[2], 1e-6f});
-                const float scale = SoftKnee(peak) / peak;
-                for (int k = 0; k < 3; ++k) row[k] = (uint8_t)encode[(int)(std::clamp(c[k] * scale, 0.0f, 1.0f) * 4095.0f + 0.5f)];
-                row[3] = 255;
             }
-        }
+        };
+        const int workers = std::clamp((int)std::thread::hardware_concurrency(), 1, 8);
+        std::vector<std::thread> pool;
+        for (int k = 1; k < workers; ++k) pool.emplace_back(rows, f->height * k / workers, f->height * (k + 1) / workers);
+        rows(0, f->height / workers);
+        for (std::thread& worker : pool) worker.join();
         const auto info = SkImageInfo::Make(f->width, f->height, kRGBA_8888_SkColorType, kOpaque_SkAlphaType, SkColorSpace::MakeSRGB());
         auto image = SkImages::RasterFromData(info, std::move(data), rowBytes);
         if (image && context) {

@@ -27,6 +27,8 @@ internal fun previewOrder(last: Int, playhead: Int, run: Int = 1): List<Int> {
 
 private fun XmlNode.visual(): XmlNode = copy(attrs = attrs - "label", children = children.map { it.visual() })
 
+private fun sameVisual(a: XmlNode?, b: XmlNode?): Boolean = a === b || a != null && b != null && a.visual() == b.visual()
+
 private fun Scene.visualLayers(): List<Layer> = layers.filter { it.kind != "audio" }
 
 private fun Scene.visualHeader(): XmlNode = node.copy(
@@ -73,7 +75,7 @@ internal fun previewDirtyRanges(before: Scene, after: Scene): List<IntRange> {
     if (before.bookmarks != after.bookmarks && (before.node.followsBeats() || after.node.followsBeats())) return whole
     val old = before.visualLayers()
     val next = after.visualLayers()
-    if (old.map { it.node.visual() } == next.map { it.node.visual() }) return emptyList()
+    if (old.size == next.size && old.indices.all { sameVisual(old[it].node, next[it].node) }) return emptyList()
     val oldIds = old.map { it.id }
     val newIds = next.map { it.id }
     if (oldIds.filter { it in newIds } != newIds.filter { it in oldIds }) return whole
@@ -83,7 +85,7 @@ internal fun previewDirtyRanges(before: Scene, after: Scene): List<IntRange> {
     for (layer in old + next) for (ref in layer.node.references()) users.getOrPut(ref) { mutableSetOf() } += layer.id.toString()
     before.addBelowUsers(users)
     after.addBelowUsers(users)
-    val dirty = (previous.keys + current.keys).filter { previous[it]?.node?.visual() != current[it]?.node?.visual() }.toMutableSet()
+    val dirty = (previous.keys + current.keys).filter { !sameVisual(previous[it]?.node, current[it]?.node) }.toMutableSet()
     val queue = ArrayDeque(dirty.flatMap { id -> listOf(id) + listOfNotNull(previous[id], current[id]).flatMap { it.node.innerIds() } })
     while (queue.isNotEmpty()) users[queue.removeFirst()]?.forEach { if (dirty.add(it)) queue.addLast(it) }
     if (dirty.any { id -> listOfNotNull(previous[id], current[id]).any { it.drivesEverything() } }) return whole

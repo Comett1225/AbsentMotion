@@ -139,6 +139,7 @@
     <string name="settings_report_issue">گزارش مشکل</string>
     <string name="settings_suggest_feature">پیشنهاد یک قابلیت</string>
     <string name="join_discord">به Discord بپیوندید</string>
+    <string name="alight_reimport_tip">ورود قدیمی از Alight Motion: برای جدیدترین ظاهر، دوباره آن را از Alight Motion وارد کنید.</string>
     <string name="settings_help">راهنما</string>
     <string name="tutorial_settings_start">شروع آموزش</string>
     <string name="tutorial_settings_continue">ادامه آموزش</string>
@@ -246,6 +247,10 @@
     <string name="update_not_now">الان نه</string>
     <string name="update_outdated">این مشکل ممکن است در نسخه جدیدتر برطرف شده باشد (نصب‌شده %1$s، جدیدترین %2$s).</string>
     <string name="update_changelog">تغییرات</string>
+    <string name="whats_new_see">ببینید در %1$s چه چیزهایی تازه است</string>
+    <string name="settings_whats_new">چه چیزهایی تازه است</string>
+    <string name="settings_auto_check_on">بررسی خودکار: روشن</string>
+    <string name="settings_auto_check_off">بررسی خودکار: خاموش</string>
     <string name="update_open_failed">هیچ برنامه‌ای در این دستگاه نمی‌تواند این پیوند را باز کند.</string>
     <string name="update_download_update">دانلود به‌روزرسانی</string>
     <string name="update_installed">نسخهٔ نصب‌شده: %1$s</string>
@@ -1077,6 +1082,7 @@
     <string name="layer_tool_edit_points">ویرایش نقاط</string>
     <string name="layer_tool_edit_drawing">ویرایش نقاشی</string>
     <string name="layer_tool_edit_group">ویرایش گروه</string>
+    <string name="layer_tool_frame">فریم</string>
     <string name="layer_tool_ungroup">لغو گروه‌بندی</string>
     <string name="group_leave">خروج از گروه</string>
     <string name="ungroup_loses_style">با لغو گروه‌بندی، افکت‌ها، سرعت، شفافیت و ترکیب خود گروه حذف می‌شوند. لایه‌های آن جا و ظاهرشان را حفظ می‌کنند.</string>

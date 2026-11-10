@@ -139,6 +139,7 @@
     <string name="settings_report_issue">回報問題</string>
     <string name="settings_suggest_feature">建議功能</string>
     <string name="join_discord">加入 Discord</string>
+    <string name="alight_reimport_tip">這是舊版的Alight Motion匯入：請從Alight Motion重新匯入，以取得最新外觀。</string>
     <string name="settings_help">說明</string>
     <string name="tutorial_settings_start">開始教學</string>
     <string name="tutorial_settings_continue">繼續教學</string>
@@ -246,6 +247,10 @@
     <string name="update_not_now">現在不要</string>
     <string name="update_outdated">新版可能已修正此問題（已安裝 %1$s，最新版 %2$s）。</string>
     <string name="update_changelog">更新紀錄</string>
+    <string name="whats_new_see">查看 %1$s 的新功能</string>
+    <string name="settings_whats_new">新功能</string>
+    <string name="settings_auto_check_on">自動檢查：開啟</string>
+    <string name="settings_auto_check_off">自動檢查：關閉</string>
     <string name="update_open_failed">此裝置上沒有可開啟連結的應用程式。</string>
     <string name="update_download_update">下載更新</string>
     <string name="update_installed">已安裝版本： %1$s</string>
@@ -1062,6 +1067,7 @@
     <string name="layer_tool_edit_points">編輯節點</string>
     <string name="layer_tool_edit_drawing">編輯繪圖</string>
     <string name="layer_tool_edit_group">編輯群組</string>
+    <string name="layer_tool_frame">影格</string>
     <string name="layer_tool_ungroup">取消群組</string>
     <string name="group_leave">離開群組</string>
     <string name="ungroup_loses_style">取消群組會移除群組本身的特效、速度、不透明度和混合模式。群組內的圖層會保留原有位置與外觀。</string>

@@ -33,7 +33,8 @@ object DeskGallery {
         if (!video && !text.startsWith("content://media/external/images")) return null
         val columns = projection ?: arrayOf("_id", "_display_name", "bucket_id", "bucket_display_name", "date_added", "date_modified", "mime_type")
         val byNameAndSize = selection != null && args?.size == 2 && "_display_name" in selection && "_size" in selection
-        val files = scan(video).filter { !byNameAndSize || it.name == args!![0] && it.length().toString() == args[1] }.sortedByDescending { it.lastModified() }
+        val files = scan(video).filter { !byNameAndSize || it.name == args!![0] && it.length().toString() == args[1] }.map { it to it.lastModified() }.sortedByDescending { it.second }.map { it.first }
+        if (video && "duration" in columns) files.parallelStream().forEach { duration(it) }
         val rows = files.map { f ->
             Array<Any?>(columns.size) { i ->
                 when (columns[i]) {

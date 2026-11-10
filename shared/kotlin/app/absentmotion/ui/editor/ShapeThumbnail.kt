@@ -59,6 +59,7 @@ private fun rememberShapePicture(shape: XmlNode, color: Int, engine: EngineThrea
     val seed = remember(key) { key.takeIf { it.sources != null && engine.sourcesChecked }?.let { icons[it] } }
     val shown by produceState<Stamped<IconKey, ImageBitmap>?>(null, key) {
         if (seed != null) return@produceState
+        if (value != null) kotlinx.coroutines.delay(120)
         val scene = XmlNode("scene", mapOf("width" to "1", "height" to "1"), listOf(shape))
         val bitmap = engine.shapeIcon(scene.toXml(), 96, color)?.asImageBitmap()
         val after = key.copy(sources = sourceIdentity(uris, engine.sources.value),
@@ -66,7 +67,7 @@ private fun rememberShapePicture(shape: XmlNode, color: Int, engine: EngineThrea
         if (bitmap != null && key.sources != null && after == key) icons[key] = bitmap
         value = Stamped(key, bitmap)
     }
-    return seed ?: shown.of(key)
+    return seed ?: shown.of(key) ?: shown?.takeIf { key.shape["id"] != null && it.key.shape["id"] == key.shape["id"] }?.value
 }
 
 internal fun XmlNode.hasText(): Boolean = name == "text" || children.any { it.hasText() }

@@ -19,9 +19,9 @@ private val preparedTexts = object : LinkedHashMap<TextInput, XmlNode>(64, 0.75f
     override fun removeEldestEntry(eldest: MutableMap.MutableEntry<TextInput, XmlNode>) = size > 128
 }
 
-fun FontLibrary.prepareText(xml: String, timeMs: Int = 0): String {
+fun FontLibrary.prepareText(xml: String, timeMs: Int = 0, parsed: Scene? = null): String {
     val last = lastPrepared?.takeIf { it.xml === xml }
-    val scene = if (last != null) last.scene else Scene.parse(xml).takeIf { hasText(it.node) }
+    val scene = if (last != null) last.scene else if ("<text" !in xml) null else (parsed ?: Scene.parse(xml)).takeIf { hasText(it.node) }
     if (scene == null) {
         lastPrepared = PreparedScene(xml, null, emptyList(), xml)
         return xml

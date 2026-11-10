@@ -141,17 +141,22 @@ internal fun RulerSpinner(
     val scope = rememberCoroutineScope()
     val running = remember { booleanArrayOf(false) }
     val lastTap = remember { longArrayOf(0L) }
+    val wheelEnd = remember { arrayOfNulls<Job>(1) }
     DisposableEffect(Unit) { onDispose { Glide.stop(); if (running[0]) ended() } }
     Canvas(
         modifier.then(app.absentmotion.platform.wheel { delta, _, _ ->
-            Glide.stop(); started()
+            Glide.stop()
+            if (!running[0]) { started(); running[0] = true }
             val px = (delta.x + delta.y) * 10f * wheelDensity
-            shift += px; dragging(RulerMath.travel(px, wheelDensity)); ended()
+            shift += px; dragging(RulerMath.travel(px, wheelDensity))
+            wheelEnd[0]?.cancel()
+            wheelEnd[0] = scope.launch { kotlinx.coroutines.delay(300); if (running[0]) { running[0] = false; ended() } }
         }).pointerInput(Unit) {
             val decay = splineBasedDecay<Float>(this)
             awaitEachGesture {
                 val down = awaitFirstDown(requireUnconsumed = false)
                 Glide.stop()
+                if (wheelEnd[0]?.isActive == true) { wheelEnd[0]?.cancel(); running[0] = false; ended() }
                 val undo = reset
                 if (undo != null && down.uptimeMillis - lastTap[0] < viewConfiguration.doubleTapTimeoutMillis) {
                     lastTap[0] = 0L

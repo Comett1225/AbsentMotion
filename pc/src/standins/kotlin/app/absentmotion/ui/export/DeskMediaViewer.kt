@@ -63,6 +63,7 @@ import app.absentmotion.ui.home.DeskModals
 import app.absentmotion.ui.home.deskPress
 import app.absentmotion.ui.theme.Am
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import org.jetbrains.skia.ColorAlphaType
@@ -144,17 +145,19 @@ private fun VideoStage(file: File, facts: Map<String, String>, playing: Boolean,
     var restart by remember { mutableIntStateOf(0) }
     var scrubbing by remember { mutableStateOf(false) }
     val currentPlaying by rememberUpdatedState(playing)
-    LaunchedEffect(file, playing, restart) {
+    LaunchedEffect(file, playing, restart, scrubbing) {
         if (!playing || scrubbing) return@LaunchedEffect
         val from = if (position >= duration - 80) 0L else position
         withContext(Dispatchers.IO) {
-            streamFrames(file, facts, from) { image, ms -> frame = image; position = ms; isActive }
+            streamFrames(file, facts, from) { image, ms -> if (isActive) { frame = image; position = ms }; isActive }
         }
         if (isActive && currentPlaying) { position = duration; setPlaying(false) }
     }
-    LaunchedEffect(file, position.takeIf { !playing || scrubbing }, restart) {
+    LaunchedEffect(file, playing, scrubbing, restart) {
         if (playing && !scrubbing) return@LaunchedEffect
-        withContext(Dispatchers.IO) { DeskMedia.frame(file, position, ViewerSide) }?.let { frame = it.toComposeImageBitmap() }
+        androidx.compose.runtime.snapshotFlow { position }.conflate().collect { at ->
+            withContext(Dispatchers.IO) { DeskMedia.frame(file, at, ViewerSide) }?.let { frame = it.toComposeImageBitmap() }
+        }
     }
     Column(Modifier.fillMaxSize()) {
         Box(Modifier.weight(1f).fillMaxWidth().clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = toggle), Alignment.Center) {

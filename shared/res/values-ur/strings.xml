@@ -139,6 +139,7 @@
     <string name="settings_report_issue">مسئلہ رپورٹ کریں</string>
     <string name="settings_suggest_feature">کوئی فیچر تجویز کریں</string>
     <string name="join_discord">Discord میں شامل ہوں</string>
+    <string name="alight_reimport_tip">پرانا Alight Motion امپورٹ: تازہ ترین شکل کے لیے اسے Alight Motion سے دوبارہ امپورٹ کریں۔</string>
     <string name="settings_help">مدد</string>
     <string name="tutorial_settings_start">ٹیوٹوریل شروع کریں</string>
     <string name="tutorial_settings_continue">ٹیوٹوریل جاری رکھیں</string>
@@ -246,6 +247,10 @@
     <string name="update_not_now">ابھی نہیں</string>
     <string name="update_outdated">یہ نئی ورژن میں ٹھیک ہو سکتا ہے (نصب شدہ %1$s، تازہ ترین %2$s)۔</string>
     <string name="update_changelog">چینج لاگ</string>
+    <string name="whats_new_see">%1$s میں نیا کیا ہے دیکھیں</string>
+    <string name="settings_whats_new">نیا کیا ہے</string>
+    <string name="settings_auto_check_on">آٹو چیک: آن</string>
+    <string name="settings_auto_check_off">آٹو چیک: بند</string>
     <string name="update_open_failed">اس ڈیوائس پر کوئی ایپ یہ لنک نہیں کھول سکتی۔</string>
     <string name="update_download_update">اپ ڈیٹ ڈاؤن لوڈ کریں</string>
     <string name="update_installed">نصب شدہ ورژن: %1$s</string>
@@ -1077,6 +1082,7 @@
     <string name="layer_tool_edit_points">پوائنٹس میں ترمیم</string>
     <string name="layer_tool_edit_drawing">ڈرائنگ میں ترمیم</string>
     <string name="layer_tool_edit_group">گروپ میں ترمیم</string>
+    <string name="layer_tool_frame">فریم</string>
     <string name="layer_tool_ungroup">گروپ ختم کریں</string>
     <string name="group_leave">گروپ سے باہر نکلیں</string>
     <string name="ungroup_loses_style">گروپ ختم کرنے سے گروپ کے اپنے ایفیکٹس، اسپیڈ، اوپیسٹی اور بلینڈنگ ہٹ جاتے ہیں۔ اس کی لیئرز اپنی جگہ اور شکل برقرار رکھتی ہیں۔</string>

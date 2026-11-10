@@ -6,13 +6,20 @@ summary: Your projects, assets and templates, the tools in the Tools tab (Compre
 ---
 The home screen is the first thing you see after the first start. It lists your projects and has the buttons for creating one, searching and changing settings. On a tablet with a wide enough screen, the top bar becomes a wide header and projects and templates show as a grid, in portrait and in landscape.
 
-![The home screen: menu (1), search (2), Projects and Assets (3), a project card (4), the card menu button (5) and New project (6).](img/home-screen.webp)
+![The home screen: menu (1), Changelog (2), search (3), Projects and Assets (4), a project card (5), the card menu button (6) and New project (7).](img/home-screen.webp)
 
 ## The top bar
 
 - **Menu button** (top left, three lines). Opens the [Settings](@settings) drawer.
 - **AbsentMotion** in the middle.
+- **Changelog** (the notes icon left of Search, or at the right on the Tools page). Opens **What's new** for the version you have. An orange dot on the icon means you have not opened these notes yet. On a tablet and on a computer the button sits left of the search too.
 - **Search** (the magnifier at the right). Opens a search field. While searching, the same place shows an X to close it, and the Back button closes it too.
+
+### What's new
+
+**What's new** lists the new features and every fix of a version, in sections and groups. Each section header shows how many changes it has; tap it to open or close the section. While you scroll, the section header and the name of the group stay at the top, so you can close a long section from anywhere. **Continue** closes the notes.
+
+The notes open by themselves the first time you open the app after an update. **What's new** in [Settings](@settings) and the button on the **About** page open them at any time.
 
 ## The bottom bar
 

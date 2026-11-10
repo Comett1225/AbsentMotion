@@ -48,6 +48,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.R
 import app.absentmotion.compat.EffectMigration
+import app.absentmotion.compat.oldAlightImport
+import app.absentmotion.compat.withReimportTipShown
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.ElementNav
 import app.absentmotion.editor.MultiSelect
@@ -220,13 +222,14 @@ class DeskAppState {
 
     private fun toast(id: Int) = Toast.makeText(context, context.getString(id), Toast.LENGTH_LONG).show()
 
-    suspend fun saveThumbnail(scene: Scene, timeMs: Int, id: String): Boolean {
+    suspend fun saveThumbnail(scene: Scene, timeMs: Int, id: String, xml: String? = null): Boolean {
         val longSide = maxOf(scene.width, scene.height, 1)
-        return engine.stillPng(scene.toXml(), timeMs, (256 * scene.width / longSide).coerceAtLeast(1), (256 * scene.height / longSide).coerceAtLeast(1), store.thumbnailFile(id))
+        return engine.stillPng(xml ?: withContext(Dispatchers.Default) { scene.toXml() }, timeMs, (256 * scene.width / longSide).coerceAtLeast(1), (256 * scene.height / longSide).coerceAtLeast(1), store.thumbnailFile(id))
     }
 
     suspend fun load(id: String): Scene? {
         opening = true
+        var tip = false
         val scene = try {
             withContext(DiskThread.dispatcher) {
                 store.text(id)?.let { runCatching { store.versions.snapshot(id, it) } }
@@ -234,13 +237,16 @@ class DeskAppState {
             }?.let { scene ->
                 withContext(Dispatchers.IO) {
                     ShapeCatalog.load(context)
-                    migration.migrate(MediaRelink.relink(context, scene)).scene.also { if (it != scene) runCatching { store.save(id, it) } }
+                    migration.migrate(MediaRelink.relink(context, scene)).scene
+                        .let { if (it.oldAlightImport()) it.withReimportTipShown().also { tip = true } else it }
+                        .also { if (it != scene) runCatching { store.save(id, it) } }
                 }
             }
         } catch (e: kotlinx.coroutines.CancellationException) { throw e }
         catch (e: Throwable) { android.util.Log.e("AMStore", "cannot open project $id", e); null }
         finally { opening = false }
         if (scene == null) openFailed = id
+        if (tip) toast(R.string.alight_reimport_tip)
         return scene
     }
 
@@ -295,9 +301,10 @@ class DeskAppState {
         }
         closeAnyway = false
         try {
-            state.saver.snapshot(scene.toXml())
+            val xml = withContext(Dispatchers.Default) { scene.toXml() }
+            state.saver.snapshot(xml)
             engine.audio?.release()
-            saveThumbnail(scene, state.timeMs, state.projectId)
+            saveThumbnail(scene, state.timeMs, state.projectId, xml)
         } finally {
             MultiSelect.clear()
             DeskLibrary.close()
@@ -577,6 +584,28 @@ private fun DeskRecovery(offer: RecoveryOffer, answer: (restore: Boolean) -> Uni
     }
 }
 
+private class CopyDropTarget(component: java.awt.Component, inner: java.awt.dnd.DropTarget) :
+    java.awt.dnd.DropTarget(component, inner.defaultActions, CopyDrop(inner), true)
+
+private class CopyDrop(private val inner: java.awt.dnd.DropTarget) : java.awt.dnd.DropTargetListener {
+    private fun action(drop: Int, source: Int) = if (source and java.awt.dnd.DnDConstants.ACTION_COPY != 0) java.awt.dnd.DnDConstants.ACTION_COPY else drop
+    private fun copy(e: java.awt.dnd.DropTargetDragEvent) = java.awt.dnd.DropTargetDragEvent(e.dropTargetContext, e.location, action(e.dropAction, e.sourceActions), e.sourceActions)
+    override fun dragEnter(e: java.awt.dnd.DropTargetDragEvent) = inner.dragEnter(copy(e))
+    override fun dragOver(e: java.awt.dnd.DropTargetDragEvent) = inner.dragOver(copy(e))
+    override fun dropActionChanged(e: java.awt.dnd.DropTargetDragEvent) = inner.dropActionChanged(copy(e))
+    override fun dragExit(e: java.awt.dnd.DropTargetEvent) = inner.dragExit(e)
+    override fun drop(e: java.awt.dnd.DropTargetDropEvent) =
+        inner.drop(java.awt.dnd.DropTargetDropEvent(e.dropTargetContext, e.location, action(e.dropAction, e.sourceActions), e.sourceActions, e.isLocalTransfer))
+}
+
+fun copyDrops(window: java.awt.Window) {
+    fun all(c: java.awt.Component): Sequence<java.awt.Component> = sequenceOf(c) + ((c as? java.awt.Container)?.components.orEmpty().asSequence().flatMap(::all))
+    for (c in all(window).toList()) {
+        val target = c.dropTarget ?: continue
+        if (target !is CopyDropTarget) CopyDropTarget(c, target)
+    }
+}
+
 @OptIn(androidx.compose.ui.ExperimentalComposeUiApi::class)
 private class DeskDrop(private val app: DeskAppState, private val run: (suspend () -> Unit) -> Unit) : androidx.compose.ui.draganddrop.DragAndDropTarget {
     override fun onDrop(event: androidx.compose.ui.draganddrop.DragAndDropEvent): Boolean {
@@ -588,7 +617,7 @@ private class DeskDrop(private val app: DeskAppState, private val run: (suspend 
         if (files.isEmpty()) return true
         DeskLibrary.remember(files)
         val uris = files.map(Uri::fromFile)
-        if (app.editor == null) { run { app.importFiles(uris) }; return true }
+        if (app.editor == null) { run { if (files.all(DeskOpen::isProject)) app.importFiles(uris) else app.openFiles(files) }; return true }
         app.queueMedia(uris)
         return true
     }

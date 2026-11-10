@@ -55,7 +55,7 @@ class DesktopEngine(val assets: File, private val repo: File?, private val bundl
                 val ffmpeg = DesktopPlatform.executable("ffmpeg")
                 val ffprobe = DesktopPlatform.executable("ffprobe")
                 runCatching { videos[uri] = FfmpegVideoSource(file, ffmpeg, ffprobe) }
-            } else DesktopNative.setPicture(handle, uri, file.absolutePath)
+            } else DesktopNative.setPicture(handle, uri, file.absolutePath, value.fromAlight)
         }
     }
 

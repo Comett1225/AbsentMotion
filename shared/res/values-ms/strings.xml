@@ -139,6 +139,7 @@
     <string name="settings_report_issue">Laporkan masalah</string>
     <string name="settings_suggest_feature">Cadangkan ciri</string>
     <string name="join_discord">Sertai Discord</string>
+    <string name="alight_reimport_tip">Import Alight Motion lama: import semula dari Alight Motion untuk rupa terkini.</string>
     <string name="settings_help">Bantuan</string>
     <string name="tutorial_settings_start">Mulakan tutorial</string>
     <string name="tutorial_settings_continue">Teruskan tutorial</string>
@@ -246,6 +247,10 @@
     <string name="update_not_now">Bukan sekarang</string>
     <string name="update_outdated">Ini mungkin dibetulkan dalam versi baharu (dipasang %1$s, terkini %2$s).</string>
     <string name="update_changelog">Log perubahan</string>
+    <string name="whats_new_see">Lihat yang baharu dalam %1$s</string>
+    <string name="settings_whats_new">Apa yang baharu</string>
+    <string name="settings_auto_check_on">Semak automatik: Hidup</string>
+    <string name="settings_auto_check_off">Semak automatik: Mati</string>
     <string name="update_open_failed">Tiada aplikasi pada peranti ini yang boleh membuka pautan.</string>
     <string name="update_download_update">Muat turun kemas kini</string>
     <string name="update_installed">Versi dipasang: %1$s</string>
@@ -1062,6 +1067,7 @@
     <string name="layer_tool_edit_points">Edit Titik</string>
     <string name="layer_tool_edit_drawing">Edit Lukisan</string>
     <string name="layer_tool_edit_group">Edit Kumpulan</string>
+    <string name="layer_tool_frame">Bingkai</string>
     <string name="layer_tool_ungroup">Nyahkumpul</string>
     <string name="group_leave">Keluar daripada kumpulan</string>
     <string name="ungroup_loses_style">Menyahkumpul akan membuang kesan, kelajuan, kelegapan dan campuran kumpulan itu sendiri. Lapisan di dalamnya kekal pada tempatnya dan rupanya.</string>

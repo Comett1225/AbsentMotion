@@ -184,6 +184,7 @@ class EngineThread(private val background: Int, context: Context? = null, privat
             target = 0L
             engine?.close()
             engine = null
+            installed = null
             lost = true
         }
         return engine ?: startEngine().also { next ->
@@ -263,8 +264,15 @@ class EngineThread(private val background: Int, context: Context? = null, privat
         mediaScope.async { withContext(dispatcher) { if (!closed) runCatching { engine() }; startFailure } }
     }
 
-    fun attach(surface: Surface, retry: Boolean = true): Boolean = handler.post {
-        if (closed) return@post
+    private val attachSerial = java.util.concurrent.atomic.AtomicInteger()
+
+    fun attach(surface: Surface, retry: Boolean = true): Boolean {
+        val mine = attachSerial.incrementAndGet()
+        return handler.post { if (mine == attachSerial.get()) attachNow(surface, retry) }
+    }
+
+    private fun attachNow(surface: Surface, retry: Boolean) {
+        if (closed) return
         try {
             val previous = target
             target = 0L
@@ -304,7 +312,10 @@ class EngineThread(private val background: Int, context: Context? = null, privat
 
     fun setScene(next: Scene, xml: String) = setScene(next, lazyOf(xml))
 
+    @Volatile private var sent: Pair<Lazy<String>, Scene>? = null
+
     fun setScene(next: Scene, xml: Lazy<String> = lazy { next.toXml() }) {
+        sent = xml to next
         pendingScene.set(xml)
         fonts?.let { library ->
             val names = next.fontNames()
@@ -372,9 +383,7 @@ class EngineThread(private val background: Int, context: Context? = null, privat
     internal suspend fun setVideoPicture(uri: String, buffer: HardwareBuffer, layerId: Long,
                                          exact: Boolean, standard: Int, range: Int, crop: Rect, accept: () -> Boolean): Boolean = withContext(dispatcher) {
         if (closed || (!exact && capturing) || !accept()) return@withContext false
-        engine().setPicture(uri, buffer, layerId, standard = standard, range = range, crop = crop).also {
-            if (!exact) requestRender()
-        }
+        engine().setPicture(uri, buffer, layerId, standard = standard, range = range, crop = crop)
     }
 
     internal suspend fun setVideoFrame(uri: String, buffer: HardwareBuffer, layerId: Long, pts: Long, standard: Int = 0, range: Int = 0, crop: Rect? = null): Boolean = withContext(dispatcher) {
@@ -459,8 +468,16 @@ class EngineThread(private val background: Int, context: Context? = null, privat
     private var animatedText = false
     private var textTime = Int.MIN_VALUE
 
+    private var installed: String? = null
+
     private fun setEngineScene(xml: String, timeMs: Int = view?.timeMs ?: 0) {
-        engine().setScene(fonts?.prepareText(xml, timeMs) ?: xml)
+        val native = engine()
+        val parsed = sent?.takeIf { it.first.isInitialized() && it.first.value === xml }?.second
+        val prepared = fonts?.prepareText(xml, timeMs, parsed) ?: xml
+        if (prepared !== installed) {
+            native.setScene(prepared)
+            installed = prepared
+        }
         rememberScene(xml, timeMs)
     }
 

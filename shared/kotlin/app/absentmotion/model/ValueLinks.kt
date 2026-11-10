@@ -88,6 +88,13 @@ fun XmlNode.withoutAnyValueLinks(): XmlNode {
 fun Scene.withValueLinksFollowing(before: Scene): Scene {
     val oldLayers = before.layers.associateBy { it.id }
     val newLayers = layers.associateBy { it.id }
+    fun sameEffects(old: Layer, now: Layer): Boolean {
+        if (old.node === now.node) return true
+        val a = old.effects
+        val b = now.effects
+        return a.size == b.size && a.indices.all { a[it] === b[it] }
+    }
+    if (oldLayers.all { (id, old) -> newLayers[id]?.let { sameEffects(old, it) } == true }) return this
     fun walk(node: XmlNode): XmlNode? {
         if (node.name == "scene") return node
         if (node.name == "valueLink" && node["kind"] == "effect") {

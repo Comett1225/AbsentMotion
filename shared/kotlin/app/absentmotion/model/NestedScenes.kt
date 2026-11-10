@@ -10,9 +10,10 @@ private fun nearest(value: Double) = sign(value) * floor(abs(value) + 0.5)
 
 internal val Layer.nestedCut: Int get() = (node["inTime"]?.toIntOrNull() ?: 0).coerceAtLeast(0)
 
-private class NestedClock(private val layer: Layer, hostFps: Int) {
+private class NestedClock(private val layer: Layer, private val hostFps: Int) {
     private val scene = layer.nested!!
     private val method = scene.node["retime"] ?: "off"
+    private val picks = layer.node.child("frame") != null
     private val speed = (layer.node.child("speedMap")?.valueAt(0f)?.toDoubleOrNull() ?: layer.node["speed"]?.toDoubleOrNull() ?: 1.0).let { if (it > 0 && it.isFinite()) it else 1.0 }
     private fun middle(length: Int, fps: Int) = floor((2 * floor(length.toDouble() * fps / 1000 + 1e-9) + 1) * 500 / fps)
     private val origin = layer.startTime - layer.nestedCut
@@ -26,7 +27,7 @@ private class NestedClock(private val layer: Layer, hostFps: Int) {
 
     fun hostTime(inner: Double): Double {
         if (method == "off") return origin + inner / speed
-        if (method == "blank" || inner < intro) return origin + inner
+        if (picks || method == "blank" || inner < intro) return origin + inner
         if (inner >= outro && outro < sceneEnd) return origin + outroStart + (inner - outro)
         val into = inner - intro
         return origin + intro + when {
@@ -37,6 +38,7 @@ private class NestedClock(private val layer: Layer, hostFps: Int) {
     }
 
     fun at(at: Double, quantize: Boolean): SceneTime {
+        layer.pickedFrame(at, hostFps)?.let { return SceneTime(floor((2 * it + 1) * 500.0 / scene.fps), 0.0) }
         val local = (if (quantize) layer.steppedMs(at) else at) - origin
         if (method == "off") return SceneTime(local * speed, speed)
         if (method == "blank") return if (local < sceneEnd) SceneTime(if (quantize) nearest(local) else local) else SceneTime(-1.0, 0.0)
@@ -58,6 +60,27 @@ private class NestedClock(private val layer: Layer, hostFps: Int) {
         }
         return if (quantize) mapped.copy(ms = nearest(mapped.ms)) else mapped
     }
+}
+
+val FrameRef = PropRef(PropRef.Kind.Child, "frame")
+
+const val HoldEasing = "step 1 0"
+
+internal fun Layer.shownFrame(at: Double, hostFps: Int): Int {
+    val inner = nested ?: return 0
+    return pickedFrame(at, hostFps) ?: floor(nestedTime(at, hostFps).ms.coerceAtLeast(0.0) * inner.fps / 1000 + 1e-9).toInt().coerceIn(0, inner.frameCount - 1)
+}
+
+internal val Scene.frameCount: Int get() = (floor(totalTime.coerceAtLeast(0).toDouble() * fps / 1000 + 1e-9) + 1).toInt()
+
+internal fun Layer.pickedFrame(at: Double, hostFps: Int): Int? {
+    val picks = node.child("frame") ?: return null
+    val scene = nested ?: return null
+    val fps = hostFps.coerceAtLeast(1)
+    val read = (4.0 * frameOfMs(floor(steppedMs(at)).toLong(), fps) + 3) * 250 / fps
+    val t = if (endTime > startTime) ((read - startTime) / (endTime - startTime)).toFloat() else 0f
+    val frame = floor((picks.valueAt(t)?.substringBefore(',')?.finiteFloat() ?: 0f) + 1e-4).toInt()
+    return Math.floorMod(frame, scene.frameCount)
 }
 
 internal fun Layer.nestedTime(at: Double, hostFps: Int, quantize: Boolean = true): SceneTime =

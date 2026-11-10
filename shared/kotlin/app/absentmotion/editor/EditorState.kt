@@ -30,7 +30,7 @@ enum class EditorPanel(@StringRes val title: Int) {
     Tools(0), Speed(R.string.edit_panel_time_remapping), MoveTransform(R.string.edit_panel_transform), ColorFill(R.string.edit_panel_fill_color),
     EditShape(R.string.edit_panel_shape_options), EditText(R.string.edit_panel_edit_text),
     BorderShadow(R.string.edit_panel_frame_shadow), Blending(R.string.edit_panel_opacity_blend), Effects(R.string.edit_panel_effects), Camera(R.string.edit_panel_camera_options), Model(R.string.edit_panel_model_options), Crop(R.string.layer_tool_crop),
-    Edge(R.string.cutout_edge), Light(R.string.light_options),
+    Edge(R.string.cutout_edge), Light(R.string.light_options), Frame(R.string.layer_tool_frame),
 }
 
 data class KeyTarget(val ref: PropRef, val default: String, val type: String = "float")
@@ -334,8 +334,9 @@ class EditorState(
         val ended = history.endGesture()
         if (pending || ended) {
             dropDraft()
-            val xml = root.toXml()
-            if (pending) show(root, lazyOf(xml))
+            val now = root
+            val xml = lazy { now.toXml() }
+            if (pending) show(now, xml)
             if (ended) saver.commit(xml) else saver.draft(xml)
         }
         saver.flush()
@@ -406,7 +407,10 @@ class EditorState(
         root = next
         groupPath = next.openablePath(groupPath)
         val now = scene
-        if (MultiSelect.active) MultiSelect.ids = MultiSelect.ids.filter { now.layer(it) != null }.toSet()
+        if (MultiSelect.active) {
+            val alive = now.layers.mapTo(HashSet()) { it.id }
+            MultiSelect.ids = MultiSelect.ids.filterTo(LinkedHashSet()) { it in alive }
+        }
         canUndo = history.canUndo
         canRedo = history.canRedo
         if (selectedId != null && now.layer(selectedId!!) == null) {
@@ -422,8 +426,8 @@ class EditorState(
             return
         }
         dropDraft()
-        val xml = next.toXml()
-        show(next, lazyOf(xml))
+        val xml = lazy { next.toXml() }
+        show(next, xml)
         saver.commit(xml)
     }
 

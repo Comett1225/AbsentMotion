@@ -77,7 +77,9 @@ class ProjectSaver(
 
     val failing: Boolean get() = project.failing
 
-    fun commit(xml: String) {
+    fun commit(xml: String) = commit(lazyOf(xml))
+
+    fun commit(xml: Lazy<String>) {
         drafts.cancel()
         project.submit(xml)
     }

@@ -18,6 +18,7 @@ import app.absentmotion.model.withPinnedClock
 import app.absentmotion.model.trimEndAt
 import app.absentmotion.model.trimStartAt
 import app.absentmotion.model.SpeedRef
+import app.absentmotion.model.FrameRef
 import app.absentmotion.model.VideoTiming
 import app.absentmotion.model.withSpeedKeyframeToggled
 import app.absentmotion.model.Easing
@@ -201,7 +202,7 @@ fun EditorState.toggleKeyframe() {
             else -> layer
         }
         if (target.ref == SpeedRef) present.withSpeedKeyframeToggled(sampleMs, scene.fps)
-        else present.withKeyframeToggled(target.ref, target.default)
+        else present.withKeyframeToggled(target.ref, target.default).let { if (target.ref == FrameRef) it.withFrameHold() else it }
     }
 }
 

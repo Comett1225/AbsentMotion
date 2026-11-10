@@ -139,6 +139,7 @@
     <string name="settings_report_issue">รายงานปัญหา</string>
     <string name="settings_suggest_feature">เสนอฟีเจอร์</string>
     <string name="join_discord">เข้าร่วม Discord</string>
+    <string name="alight_reimport_tip">นำเข้าจาก Alight Motion แบบเก่า: นำเข้าอีกครั้งจาก Alight Motion เพื่อให้ได้ลุคล่าสุด</string>
     <string name="settings_help">ช่วยเหลือ</string>
     <string name="tutorial_settings_start">เริ่มบทแนะนำ</string>
     <string name="tutorial_settings_continue">ทำบทแนะนำต่อ</string>
@@ -246,6 +247,10 @@
     <string name="update_not_now">ไม่ใช่ตอนนี้</string>
     <string name="update_outdated">อาจแก้ไขแล้วในเวอร์ชันใหม่ (ติดตั้ง %1$s, ล่าสุด %2$s)</string>
     <string name="update_changelog">บันทึกการอัปเดต</string>
+    <string name="whats_new_see">ดูสิ่งใหม่ใน %1$s</string>
+    <string name="settings_whats_new">มีอะไรใหม่</string>
+    <string name="settings_auto_check_on">ตรวจอัตโนมัติ: เปิด</string>
+    <string name="settings_auto_check_off">ตรวจอัตโนมัติ: ปิด</string>
     <string name="update_open_failed">ไม่มีแอปในเครื่องนี้ที่เปิดลิงก์ได้</string>
     <string name="update_download_update">ดาวน์โหลดอัปเดต</string>
     <string name="update_installed">เวอร์ชันที่ติดตั้ง: %1$s</string>
@@ -1062,6 +1067,7 @@
     <string name="layer_tool_edit_points">แก้ไขจุด</string>
     <string name="layer_tool_edit_drawing">แก้ไขภาพวาด</string>
     <string name="layer_tool_edit_group">แก้ไขกลุ่ม</string>
+    <string name="layer_tool_frame">เฟรม</string>
     <string name="layer_tool_ungroup">ยกเลิกการจัดกลุ่ม</string>
     <string name="group_leave">ออกจากกลุ่ม</string>
     <string name="ungroup_loses_style">การยกเลิกการจัดกลุ่มจะลบเอฟเฟกต์ ความเร็ว ความทึบ และการผสมของตัวกลุ่มเอง ส่วนเลเยอร์ข้างในยังอยู่ที่เดิมและหน้าตาเหมือนเดิม</string>

@@ -139,6 +139,7 @@
     <string name="settings_report_issue">الإبلاغ عن مشكلة</string>
     <string name="settings_suggest_feature">اقترح ميزة</string>
     <string name="join_discord">انضم إلى Discord</string>
+    <string name="alight_reimport_tip">استيراد قديم من Alight Motion: استورده مرة أخرى من Alight Motion للحصول على أحدث مظهر.</string>
     <string name="settings_help">مساعدة</string>
     <string name="tutorial_settings_start">بدء البرنامج التعليمي</string>
     <string name="tutorial_settings_continue">متابعة البرنامج التعليمي</string>
@@ -246,6 +247,10 @@
     <string name="update_not_now">ليس الآن</string>
     <string name="update_outdated">قد يُصلَح هذا في الإصدار الأحدث (المثبت %1$s، الأحدث %2$s).</string>
     <string name="update_changelog">سجل التغييرات</string>
+    <string name="whats_new_see">اطّلع على الجديد في %1$s</string>
+    <string name="settings_whats_new">ما الجديد</string>
+    <string name="settings_auto_check_on">التحقق التلقائي: تشغيل</string>
+    <string name="settings_auto_check_off">التحقق التلقائي: إيقاف</string>
     <string name="update_open_failed">لا يوجد تطبيق على هذا الجهاز يمكنه فتح الرابط.</string>
     <string name="update_download_update">تنزيل التحديث</string>
     <string name="update_installed">الإصدار المثبّت: %1$s</string>
@@ -1137,6 +1142,7 @@
     <string name="layer_tool_edit_points">تحرير النقاط</string>
     <string name="layer_tool_edit_drawing">تحرير الرسم</string>
     <string name="layer_tool_edit_group">تعديل المجموعة</string>
+    <string name="layer_tool_frame">الإطار</string>
     <string name="layer_tool_ungroup">فك التجميع</string>
     <string name="group_leave">الخروج من المجموعة</string>
     <string name="ungroup_loses_style">يزيل فك التجميع تأثيرات المجموعة نفسها وسرعتها وعتامتها ودمجها. وتحتفظ طبقاتها بمكانها ومظهرها.</string>

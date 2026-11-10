@@ -19,6 +19,26 @@ class ProjectStoreTest {
     private fun scene(vararg layers: XmlNode) = Scene(XmlNode("scene", linkedMapOf("width" to "100", "height" to "100", "fps" to "30"), layers.toList()))
     private fun image(uri: String) = XmlNode("shape", linkedMapOf("id" to "1", "startTime" to "0", "endTime" to "99", "fillType" to "media", "fillImage" to uri))
 
+    @Test fun listIsServedFromTheSavedIndexUntilAProjectChanges() {
+        val root = tmp.newFolder()
+        val first = ProjectStore(root)
+        val kept = first.create(scene().withTitle("Kept"))
+        val changed = first.create(scene().withTitle("Before"))
+        val gone = first.create(scene().withTitle("Gone"))
+        assertEquals(setOf("Kept", "Before", "Gone"), first.list().map { it.title }.toSet())
+        val file = root.resolve("projects/$kept.xml")
+        val stamp = file.lastModified()
+        file.writeText(file.readText().replace("Kept", "Lost"))
+        file.setLastModified(stamp)
+        root.resolve("projects/$changed.xml").writeText(scene().withTitle("After it changed").toXml())
+        root.resolve("projects/$gone.xml").delete()
+        val second = ProjectStore(root)
+        assertEquals(setOf("Kept", "After it changed"), second.list().map { it.title }.toSet())
+        assertFalse(org.json.JSONObject(root.resolve("projects.index").readText()).has(gone))
+        root.resolve("projects.index").writeText("not json")
+        assertEquals(setOf("Lost", "After it changed"), ProjectStore(root).list().map { it.title }.toSet())
+    }
+
     @Test fun deleteKeepsFilesAnotherProjectStillUses() {
         val store = ProjectStore(tmp.newFolder())
         val a = store.create(scene())

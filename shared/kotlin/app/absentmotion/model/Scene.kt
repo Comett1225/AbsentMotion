@@ -8,6 +8,7 @@ import kotlin.random.Random
 @JvmInline
 value class Scene(val node: XmlNode) {
     val title: String get() = node["title"] ?: ""
+    val fromAlight: Boolean get() = node["amver"] != null || node["am"]?.startsWith("com.alightcreative") == true
     val width: Int get() = node["width"]?.toIntOrNull() ?: 1080
     val height: Int get() = node["height"]?.toIntOrNull() ?: 1080
     val fps: Int get() = node["fps"]?.toIntOrNull()?.takeIf { it > 0 } ?: 30
@@ -159,9 +160,15 @@ value class Scene(val node: XmlNode) {
 
     private fun withChildren(children: List<XmlNode>): Scene {
         val end = children.filter { it.name in LAYER_TAGS }.maxOfOrNull { Layer(it).endTime } ?: 0
-        val removed = node.mediaUris() - node.copy(children = children).mediaUris()
+        val before = identitySet(node.children)
+        val after = identitySet(children)
+        val dropped = node.children.filterNot { it in after }.flatMapTo(HashSet()) { it.mediaUris() }
+        if (dropped.isNotEmpty()) dropped -= children.filterNot { it in before }.flatMapTo(HashSet()) { it.mediaUris() }
+        val removed = if (dropped.isEmpty()) dropped else dropped - node.copy(children = children).mediaUris()
         return Scene(node.copy(children = children.filterNot { it.name == "media" && it["uri"] in removed }).with("totalTime", "$end"))
     }
+
+    private fun identitySet(nodes: List<XmlNode>): Set<XmlNode> = java.util.Collections.newSetFromMap(java.util.IdentityHashMap<XmlNode, Boolean>(nodes.size * 2)).apply { addAll(nodes) }
 
     fun toXml(): String = node.with("modifiedTime", "${System.currentTimeMillis()}").toXml()
 

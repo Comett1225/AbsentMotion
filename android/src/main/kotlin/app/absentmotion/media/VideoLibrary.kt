@@ -136,7 +136,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
     fun previewShown(scene: Scene, timeMs: Int, playing: Boolean): Boolean =
         scene.videoSamples(timeMs, playing, warm = false).all { installed[it.layer.id]?.uri == it.layer.mediaFill?.uri }
 
-    fun resumePreview() { latest?.let { requests.trySend(it) } }
+    fun resumePreview() { if (latest?.let { requests.trySend(it) } == null) suspendPreview() }
 
     fun trim(): Job = scope.launch {
         lock.withLock {

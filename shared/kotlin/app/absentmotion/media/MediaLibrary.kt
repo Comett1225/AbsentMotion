@@ -59,10 +59,11 @@ class MediaLibrary(context: Context, private val engine: EngineThread) {
     private suspend fun prepareLocked(scene: Scene) {
         val limit = pictureLimit(engine.maxPictureSize(), listOfNotNull(scene, pinned).maxOf { maxOf(it.width, it.height) })
         val generation = engine.generation to limit
+        val alight = scene.fromAlight
         loadPictures(scene.node.imageUris(), loaded,
-            { uri -> Triple(scene.media(uri) ?: loaded[uri]?.first, withContext(Dispatchers.IO) { fileVersion(resolver, Uri.parse(uri)) }, generation) },
+            { uri -> Triple(scene.media(uri) ?: loaded[uri]?.first, withContext(Dispatchers.IO) { fileVersion(resolver, Uri.parse(uri)) }?.let { if (alight) "$it#alight" else it }, generation) },
             { uri ->
-                withContext(Dispatchers.IO) { decodePicture(resolver, Uri.parse(uri), limit) }
+                withContext(Dispatchers.IO) { decodePicture(resolver, Uri.parse(uri), limit, alightColours = alight) }
                     .also { Log.i("AMMedia", "picture $uri ${it?.width}x${it?.height} limit $limit") }
             },
             forget = { uri -> engine.setPicture(uri, null) },
@@ -110,13 +111,13 @@ internal fun pictureSample(side: Int, limit: Int): Int {
     return if (side / sample * 2 > limit.coerceAtLeast(1) * 3) sample * 2 else sample
 }
 
-internal fun decodePicture(resolver: ContentResolver, uri: Uri, limit: Int, keepOutOfMemory: Boolean = false): Bitmap? = try {
+internal fun decodePicture(resolver: ContentResolver, uri: Uri, limit: Int, keepOutOfMemory: Boolean = false, alightColours: Boolean = false): Bitmap? = try {
     val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
     resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bounds) }
     if (bounds.outWidth <= 0 || bounds.outHeight <= 0) null else {
         val options = BitmapFactory.Options().apply {
             inPreferredConfig = Bitmap.Config.ARGB_8888
-            inPreferredColorSpace = android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.SRGB)
+            if (!alightColours) inPreferredColorSpace = android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.SRGB)
             inScaled = false
             inSampleSize = pictureSample(maxOf(bounds.outWidth, bounds.outHeight), limit)
         }

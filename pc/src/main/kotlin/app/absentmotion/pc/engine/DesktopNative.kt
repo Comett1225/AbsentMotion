@@ -18,7 +18,7 @@ object DesktopNative {
     external fun destroy(handle: Long)
     external fun loadEffect(handle: Long, xml: String): String
     external fun setScene(handle: Long, xml: String): String?
-    external fun setPicture(handle: Long, uri: String, path: String): Boolean
+    external fun setPicture(handle: Long, uri: String, path: String, raw: Boolean): Boolean
     external fun setFrame(handle: Long, uri: String, width: Int, height: Int, rgba: ByteArray): Boolean
     external fun clearLayerFrames(handle: Long)
     external fun dropVideo(handle: Long, uri: String)

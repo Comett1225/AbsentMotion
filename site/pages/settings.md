@@ -4,9 +4,19 @@ group: Interface
 order: 8
 summary: Every setting in the drawer on the home screen, with its default.
 ---
-Tap the menu button at the top left of the home screen to open the Settings drawer. It has four groups that start closed (tap a group to open it) and a few more rows below them.
+Tap the menu button at the top left of the home screen to open the Settings drawer. At the top is a card with the version and the update buttons. Below it are four groups that start closed (tap a group to open it) and a few more rows.
 
-![The Settings drawer: the four groups (1) and the rows below them (2).](img/settings-drawer.webp)
+![The Settings drawer: the card with the version and the update buttons (1), the four groups (2) and the rows below them (3).](img/settings-drawer.webp)
+
+## Version and updates
+
+The card at the top shows the version you have and three buttons.
+
+- **Check for Update** checks once, now, whether there is a newer version. If there is, the dialog shows its version and download size. **Changelog** opens its release notes, and **Download update** downloads the matching app file (Latest or Compatible version, and the Intel or AMD file on Chromebooks with those chips) inside the app, with a progress bar and **Cancel**. Before anything is downloaded, the app asks you to turn on **Allow from this source** for AbsentMotion if Android does not allow it yet. The app checks the file against the checksum and signing key of the release, then Android installs it; on Android 12 and newer it does so without a confirmation dialog when the system allows it, and a notification opens the app afterwards (older Android asks you to confirm). On Windows, Mac and Linux, **Install and restart** saves your project, closes the app, installs the update and opens it again. If the matching file cannot be found, **Download** opens the release page. On a Samsung phone, Auto Blocker can stop the install: see [Troubleshooting](@troubleshooting#an-update-does-not-install-on-a-samsung-phone).
+- **What's new** opens the notes of the version you have: the new features and every fix, in groups. See [What's new](@home#what-s-new).
+- **Auto-check: On** or **Auto-check: Off** shows whether the app looks for a new version each time it opens. Tap it to switch. The app asks you once whether it may do this. If it is on, the app makes one request to GitHub for the latest version number when it opens. It sends nothing else and never downloads or installs anything by itself.
+
+On a computer, Settings is a window with its pages listed on the left. There the **Updates** page has the switch **Check for a new version each time the app opens**, **Check for Update** and the version, and the notes of the version open from the **About** page.
 
 ## Editor
 
@@ -59,8 +69,6 @@ The **Language** row shows the current language and opens the list of the 25 lan
 
 - **Help** opens this guide inside the app, without a connection.
 - **Start the tutorial** starts a 5-minute tour. You make a short animation in a practice project, so your own projects stay untouched. If you leave the tour half way, the row becomes **Continue the tutorial** and a second row, **Start the tutorial again**, appears. The home screen also offers the tour until you choose **Don't ask again**.
-- **About** shows the version, the license (GNU General Public License v3.0), a note that AbsentMotion is an independent project, **Open source licenses** (the full license text of every library the app uses) and two links that open in your web browser: **Project home page** (the GitHub repository) and **Website and guide** (the AbsentMotion website with this guide).
-- **Report issue** (the underlined link under **About**) opens the bug report form in your web browser.
+- **About** shows the version, a button that opens the notes of this version, the license (GNU General Public License v3.0), a note that AbsentMotion is an independent project, **Open source licenses** (the full license text of every library the app uses) and two links that open in your web browser: **Project home page** (the GitHub repository) and **Website and guide** (the AbsentMotion website with this guide).
+- **Report issue** and **Suggest a feature**, the two buttons under **About**, open the bug report form and the form for ideas in your web browser. **Join Discord** under them opens the invitation to the AbsentMotion Discord server.
 - **Crash logs** lists the crashes the app recorded. Tap one to read it and use **Copy** to copy it, for example to send with a bug report. See [Troubleshooting](@troubleshooting).
-- **Check for a new version each time the app opens.** The app asks you once whether it may do this. If it is on, the app makes one request to GitHub for the latest version number when it opens. It sends nothing else and never downloads or installs anything by itself.
-- **Check for Update** does the same check once, now. If a newer version exists, the dialog shows its version and download size. **Changelog** opens its release notes, and **Download update** downloads the matching app file (Latest or Compatible version, and the Intel or AMD file on Chromebooks with those chips) inside the app, with a progress bar and **Cancel**. Before anything is downloaded, the app asks you to turn on **Allow from this source** for AbsentMotion if Android does not allow it yet. The app checks the file against the checksum and signing key of the release, then Android installs it; on Android 12 and newer it does so without a confirmation dialog when the system allows it, and a notification opens the app afterwards (older Android asks you to confirm). On Windows, Mac and Linux, **Install and restart** saves your project, closes the app, installs the update and opens it again. If the matching file cannot be found, **Download** opens the release page. On a Samsung phone, Auto Blocker can stop the install: see [Troubleshooting](@troubleshooting#an-update-does-not-install-on-a-samsung-phone).

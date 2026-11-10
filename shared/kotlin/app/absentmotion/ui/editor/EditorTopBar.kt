@@ -73,7 +73,7 @@ fun EditorTopBar(state: EditorState, onExit: () -> Unit, modifier: Modifier = Mo
         MultiTopBar(state, modifier)
         return
     }
-    val layer = state.selected
+    val layer = state.selectedId?.let { state.scene.layer(it) }
     val inPanel = layer != null && state.panel != EditorPanel.Tools
     val focus = LocalFocusManager.current
     var settingsOpen by remember { mutableStateOf(false) }

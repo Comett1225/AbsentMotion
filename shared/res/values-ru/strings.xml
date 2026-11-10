@@ -139,6 +139,7 @@
     <string name="settings_report_issue">Сообщить о проблеме</string>
     <string name="settings_suggest_feature">Предложить функцию</string>
     <string name="join_discord">Присоединиться к Discord</string>
+    <string name="alight_reimport_tip">Старый импорт из Alight Motion: импортируйте его заново из Alight Motion, чтобы получить актуальный вид.</string>
     <string name="settings_help">Справка</string>
     <string name="tutorial_settings_start">Начать обучение</string>
     <string name="tutorial_settings_continue">Продолжить обучение</string>
@@ -246,6 +247,10 @@
     <string name="update_not_now">Не сейчас</string>
     <string name="update_outdated">Возможно, это исправлено в новой версии (установлена %1$s, последняя %2$s).</string>
     <string name="update_changelog">Список изменений</string>
+    <string name="whats_new_see">Что нового в %1$s</string>
+    <string name="settings_whats_new">Что нового</string>
+    <string name="settings_auto_check_on">Автопроверка: вкл.</string>
+    <string name="settings_auto_check_off">Автопроверка: выкл.</string>
     <string name="update_open_failed">На этом устройстве нет приложения, которое может открыть ссылку.</string>
     <string name="update_download_update">Скачать обновление</string>
     <string name="update_installed">Установленная версия: %1$s</string>
@@ -1107,6 +1112,7 @@
     <string name="layer_tool_edit_points">Редактировать точки</string>
     <string name="layer_tool_edit_drawing">Редактировать рисунок</string>
     <string name="layer_tool_edit_group">Редактировать группу</string>
+    <string name="layer_tool_frame">Кадр</string>
     <string name="layer_tool_ungroup">Разгруппировать</string>
     <string name="group_leave">Выйти из группы</string>
     <string name="ungroup_loses_style">Разгруппировка убирает собственные эффекты, скорость, непрозрачность и режим наложения группы. Слои остаются на своих местах и выглядят как прежде.</string>

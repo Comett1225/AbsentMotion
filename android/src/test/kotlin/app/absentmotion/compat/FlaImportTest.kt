@@ -20,6 +20,7 @@ import java.io.File
 import java.util.zip.Deflater
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
+import kotlin.math.roundToInt
 
 class FlaImportTest {
     @get:Rule val tmp = TemporaryFolder()
@@ -136,11 +137,8 @@ class FlaImportTest {
             <DOMFrame index="8">${inst(200)}</DOMFrame>"""
         val group = layers(read(document(layer("L", frames)), "Box.xml" to box).root).single()
         val keys = value(group, "location")!!.children
-        assertEquals(listOf("0.000000", "0.000000", "100.000000", "150.000000", "200.000000"), keys.map { it["v"]!!.substringBefore(',') })
-        assertNull(keys[1]["e"])
-        assertNull(keys[2]["e"])
-        assertEquals("cubicBezier 0.2 0.4 0.6 0.8", keys[3]["e"])
-        assertEquals("cubicBezier 0.4 0.2 0.8 0.6", keys[4]["e"])
+        assertEquals(listOf("0.000000", "100.000000", "150.000000", "200.000000"), keys.map { it["v"]!!.substringBefore(',') })
+        assertEquals(listOf(null, "step 1 0", "cubicBezier 0.2 0.4 0.6 0.8", "cubicBezier 0.4 0.2 0.8 0.6"), keys.map { it["e"] })
     }
 
     @Test fun mapsTintAndBrightnessToTheTintEffect() {
@@ -211,9 +209,64 @@ class FlaImportTest {
         val two = symbol("Two", layer("a", """<DOMFrame index="0"><elements>$square</elements></DOMFrame><DOMFrame index="1"><elements/></DOMFrame>"""), """symbolType="graphic"""")
         val frames = """<DOMFrame index="0" duration="6"><elements><DOMSymbolInstance libraryItemName="Two" symbolType="graphic" loop="single frame" firstFrame="1"/></elements></DOMFrame>"""
         val group = layers(read(document(layer("L", frames)), "Two.xml" to two).root).single()
+        assertEquals("1.000000", group.child("frame")!!["value"])
         val inner = group.child("scene")!!
         assertEquals("freeze", inner["retime"])
-        assertTrue(layers(inner).isEmpty())
+        assertEquals(1, layers(inner).size)
+    }
+
+    @Test fun keepsEachMovingObjectOfALayerAsOneKeyframedLayer() {
+        val box = symbol("Box", layer("a", """<DOMFrame index="0"><elements>$square</elements></DOMFrame>"""))
+        val media = """<media><DOMBitmapItem name="dot.png" href="dot.png" bitmapDataHRef="M 1 1.dat" frameRight="40" frameBottom="20"/></media>"""
+        fun at(x: Int) = """<matrix><Matrix tx="$x" ty="$x"/></matrix>"""
+        fun key(index: Int, x: Int) = """<DOMFrame index="$index" duration="4"><elements>
+            <DOMSymbolInstance libraryItemName="Box">${at(x)}</DOMSymbolInstance><DOMSymbolInstance libraryItemName="Box">${at(x + 100)}</DOMSymbolInstance>
+            <DOMBitmapInstance libraryItemName="dot.png">${at(x + 200)}</DOMBitmapInstance></elements></DOMFrame>"""
+        val fla = read(document(layer("Pair", key(0, 0) + key(4, 10) + key(8, 20)), media), "Box.xml" to box)
+        val group = layers(fla.root).single()
+        assertEquals("Pair", group["label"])
+        val moving = layers(group.child("scene")!!)
+        assertEquals(listOf("embedScene", "embedScene", "shape"), moving.map { it.name })
+        for ((layer, x) in moving.zip(listOf(0.0, 100.0, 201.0))) {
+            assertEquals("0", layer["startTime"])
+            assertEquals("499", layer["endTime"])
+            val keys = value(layer, "location")!!.children
+            assertEquals(listOf(x, x + 10, x + 20), keys.map { it["v"]!!.substringBefore(',').toDouble() })
+            assertEquals(listOf(null, "step 1 0", "step 1 0"), keys.map { it["e"] })
+        }
+        assertEquals(2, fla.counts[FlaPart.Symbols])
+        assertEquals(1, fla.counts[FlaPart.Pictures])
+    }
+
+    private fun coloured(color: String) = """<DOMShape><fills><FillStyle index="1"><SolidColor color="$color"/></FillStyle></fills>
+        <edges><Edge fillStyle1="1" edges="!0 0|2000 0|2000 2000|0 2000|0 0"/></edges></DOMShape>"""
+
+    private val mouth = symbol("Mouth", layer("a", listOf("#FF0000", "#00FF00", "#0000FF").withIndex().joinToString("") { (i, c) ->
+        """<DOMFrame index="$i"><elements>${coloured(c)}</elements></DOMFrame>"""
+    }), """symbolType="graphic"""")
+
+    private fun pick(index: Int, loop: String, first: Int, duration: Int = 4) = """<DOMFrame index="$index" duration="$duration"><elements>
+        <DOMSymbolInstance libraryItemName="Mouth" symbolType="graphic" loop="$loop" firstFrame="$first"><matrix><Matrix tx="150" ty="100"/></matrix></DOMSymbolInstance></elements></DOMFrame>"""
+
+    @Test fun keepsEveryFrameOfARigAndKeysTheFrameEachKeyframePicks() {
+        val fla = read(document(layer("Face", pick(0, "single frame", 0) + pick(4, "single frame", 2) + pick(8, "single frame", 1))), "Mouth.xml" to mouth)
+        val rig = layers(fla.root).single()
+        assertEquals("embedScene", rig.name)
+        val drawn = layers(layers(rig.child("scene")!!).single().child("scene")!!)
+        assertEquals(listOf("#ffff0000", "#ff00ff00", "#ff0000ff"), drawn.map { it.child("fillColor")!!["value"] })
+        assertEquals(listOf("0", "41", "83"), drawn.map { it["startTime"] })
+        val frame = rig.child("frame")!!.children
+        assertEquals(listOf("0.000000", "2.000000", "1.000000"), frame.map { it["v"] })
+        assertEquals(listOf(null, "step 1 0", "step 1 0"), frame.map { it["e"] })
+        assertEquals(listOf(0, 166, 333), frame.map { (it["t"]!!.toDouble() * 499).roundToInt() })
+        assertEquals(1, fla.counts[FlaPart.Symbols])
+    }
+
+    @Test fun turnsLoopingAndPlayOnceGraphicsIntoFrameRamps() {
+        val rig = layers(read(document(layer("Face", pick(0, "loop", 1, 6) + pick(6, "play once", 1, 6))), "Mouth.xml" to mouth).root).single()
+        val frame = rig.child("frame")!!.children
+        assertEquals(listOf("1.000000", "6.000000", "1.000000", "2.000000"), frame.map { it["v"] })
+        assertEquals(listOf(null, null, "step 1 0", null), frame.map { it["e"] })
     }
 
     @Test fun decodesLosslessPicturesIntoPng() {

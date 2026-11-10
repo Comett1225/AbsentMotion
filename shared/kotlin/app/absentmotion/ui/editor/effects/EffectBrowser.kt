@@ -8,7 +8,6 @@ import androidx.compose.foundation.focusable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.ui.text.style.TextOverflow
 import app.absentmotion.platform.PlatformFeatures
 import app.absentmotion.ui.editor.ChromeIcons
@@ -134,12 +133,14 @@ fun EffectBrowser(state: EditorState) {
     fun hideKeyboard() { focusManager.clearFocus(force = true); keyboard?.hide() }
     fun close() { hideKeyboard(); state.effectDetail = null; state.effectCategory = null; state.effectTargets = null; state.effectBrowserOpen = false }
     var fromAudio by remember { mutableStateOf(false) }
+    val homeScroll = rememberScrollState()
+    val grids = remember { HashMap<String, androidx.compose.foundation.lazy.grid.LazyGridState>() }
     fun back() {
         when {
             detail != null -> if (state.effectDetail != null) close() else detail = null
-            searching -> { hideKeyboard(); searching = false; query = "" }
+            searching -> { hideKeyboard(); searching = false; query = ""; grids.keys.removeAll { it.startsWith("search:") } }
             fromAudio -> { fromAudio = false; category = "audio" }
-            category != null && !audio -> category = null
+            category != null && !audio -> { category = null; grids.clear() }
             else -> close()
         }
     }
@@ -298,7 +299,7 @@ fun EffectBrowser(state: EditorState) {
             }
         } else if (!searching && (category == "audio" || category == "voice")) {
             val effects = layer?.audioEffects.orEmpty()
-            val audioGrid = rememberLazyGridState()
+            val audioGrid = grids.getOrPut(category.orEmpty()) { androidx.compose.foundation.lazy.grid.LazyGridState() }
             LazyVerticalGrid(if (PlatformFeatures.desktop) GridCells.Adaptive(120.dp) else GridCells.Fixed(3), Modifier.fillMaxSize().then(slide).deskScrollbar(audioGrid), audioGrid, contentPadding = PaddingValues(if (PlatformFeatures.desktop) 16.dp else 10.dp)) {
                 if (category == "audio") {
                     item(key = "voice-category", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) { AudioFolderTile(voiceName, VoiceOrder.count { it != FxKind.Voice } + VoicePresets.size) { fromAudio = true; category = "voice" } }
@@ -315,7 +316,7 @@ fun EffectBrowser(state: EditorState) {
             val byPreset = if (audio || !searching) emptyList() else catalog.definitions.filter { d -> d !in byName && query.isNotBlank() && d.presets.any { matchesSearch(query, it.name) } }
             val results = if (audio) emptyList() else if (searching) byName + byPreset else catalog.listed(category).sortedBy { it.name.lowercase() }
             val actions = if (app.absentmotion.platform.PlatformFeatures.ai && (searching || category == "ai")) AiAction.entries.filter { it.offered && (!audio || it == AiAction.Noise) && matchesSearch(query, stringResource(it.title)) } else emptyList()
-            val resultGrid = key(category) { rememberLazyGridState() }
+            val resultGrid = grids.getOrPut(if (searching) "search:$query" else category.orEmpty()) { androidx.compose.foundation.lazy.grid.LazyGridState() }
             LazyVerticalGrid(if (PlatformFeatures.desktop) GridCells.Adaptive(120.dp) else GridCells.Fixed(3), Modifier.fillMaxSize().then(slide).deskScrollbar(resultGrid), resultGrid, contentPadding = PaddingValues(if (PlatformFeatures.desktop) 16.dp else 10.dp)) {
                 if (app.absentmotion.platform.PlatformFeatures.ai && hasSound && (category == "ai" || searching && matchesSearch(query, context.getString(R.string.auto_captions)))) {
                     item(key = "ai-captions") { AudioTile(stringResource(R.string.auto_captions), 5, true) { state.playing = false; captionClip = layer.id } }
@@ -324,9 +325,9 @@ fun EffectBrowser(state: EditorState) {
                 items(results, key = { it.id }) { effect -> EffectTile(catalog, effect, 100f, { if (effect in byPreset) detail = effect else pick(effect) }, { detail = effect }, effect.id in favourites) }
             }
         } else if (PlatformFeatures.desktop) {
-            DeskEffectsHome(catalog, recent, favourites, presetFavourites, favPage, { favPage = it }, hasSound, audioName, ::pick, { effect, preset -> if (effect.available) add(effect, preset) else detail = effect }, { detail = it }, { category = it })
+            DeskEffectsHome(homeScroll, catalog, recent, favourites, presetFavourites, favPage, { favPage = it }, hasSound, audioName, ::pick, { effect, preset -> if (effect.available) add(effect, preset) else detail = effect }, { detail = it }, { category = it })
         } else {
-            Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+            Column(Modifier.fillMaxSize().verticalScroll(homeScroll)) {
                 val recommended = listOf("absent.chromakey", "absent.blur", "absent.glow").mapNotNull(catalog::find)
                 Row(Modifier.fillMaxWidth().height(186.dp).background(RecommendedBg).horizontalScroll(rememberScrollState()).padding(start = 7.5.dp, top = 16.dp), Arrangement.spacedBy(15.dp)) {
                     recommended.forEach { effect -> EffectTile(catalog, effect, 121f, { pick(effect) }, { detail = effect }, effect.id in favourites) }
@@ -413,14 +414,14 @@ private fun BrowserButton(icon: ImageVector, description: String, onClick: () ->
 @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
 private fun DeskEffectsHome(
-    catalog: EffectCatalog, recent: List<String>, favourites: Set<String>, presetFavourites: app.absentmotion.effects.PresetFavourites, favPage: Boolean, onFavPage: (Boolean) -> Unit,
+    scroll: androidx.compose.foundation.ScrollState, catalog: EffectCatalog, recent: List<String>, favourites: Set<String>, presetFavourites: app.absentmotion.effects.PresetFavourites, favPage: Boolean, onFavPage: (Boolean) -> Unit,
     hasSound: Boolean, audioName: String, pick: (EffectDefinition) -> Unit, addPreset: (EffectDefinition, EffectPreset) -> Unit, detail: (EffectDefinition) -> Unit, open: (String) -> Unit,
 ) {
     val recommended = remember(catalog) { listOf("absent.chromakey", "absent.blur", "absent.glow").mapNotNull(catalog::find) }
     val shown: List<Pair<EffectDefinition, EffectPreset?>> = if (favPage) presetFavourites.resolve(catalog.definitions).map { it.first to it.second } + favourites.mapNotNull(catalog::find).map { it to null }
         else recent.mapNotNull(catalog::find).distinct().take(12).map { it to null }
     val listed = catalog.categories.let { all -> if (hasSound) all.filter { it.first != "ai" } + ("audio" to audioName) + all.filter { it.first == "ai" } else all }
-    Column(Modifier.fillMaxSize().deskVerticalScroll().padding(start = 20.dp, end = 20.dp, top = 4.dp, bottom = 20.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
+    Column(Modifier.fillMaxSize().deskVerticalScroll(scroll).padding(start = 20.dp, end = 20.dp, top = 4.dp, bottom = 20.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(stringResource(R.string.desk_recommended), color = Am.OnDarkDim, fontSize = 12.sp, fontWeight = FontWeight.Medium)
             Row(Modifier.clip(RoundedCornerShape(8.dp)).background(RecommendedBg).padding(8.dp), Arrangement.spacedBy(8.dp)) {
