@@ -3747,6 +3747,33 @@
     }
    }
   },
+  "pagecurl": {
+   "description": "Binubuklat ang layer na parang pahina: umaangat at nalulukot ang isang sulok, na ipinapakita ang likod ng pahina. I-animate ang Progreso para buksan ang pahina.",
+   "name": "Paglukot ng pahina",
+   "params": {
+    "angle": {
+     "label": "Anggulo"
+    },
+    "backAlpha": {
+     "label": "Opacity sa likod"
+    },
+    "backColor": {
+     "label": "Kulay sa likod"
+    },
+    "progress": {
+     "label": "Progreso"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "shadow": {
+     "label": "Anino"
+    },
+    "shine": {
+     "label": "Kintab"
+    }
+   }
+  },
   "palettemap": {
    "description": "Ginagawang pinakamalapit na kulay sa isang palette ang bawat pixel: hanggang walong kulay na pipiliin mo, o palette na hanggang 512 kulay mula sa isang preset o sa file na ii-import mo. Pinaghahalo ng mga dither pattern ang magkakatabing kulay ng palette para magpakita ng mas maraming shade. Hinahalo ng Alpha ang mga nakatapat na kulay sa orihinal na layer.",
    "name": "Mapa ng Palette",
@@ -5189,6 +5216,81 @@
     },
     "z": {
      "label": "Posisyon Z"
+    }
+   }
+  },
+  "scatterrepeat": {
+   "description": "Gumagawa ng mga kopya ng layer at ikinakalat ang mga ito nang random sa loob ng isang bilog sa paligid nito. Ginagalaw ng Ebolusyon ang mga kopya; pumipili naman ang Scatter Seed ng ibang pattern.",
+   "name": "Kalat na pag-uulit",
+   "params": {
+    "copyDelay": {
+     "label": "Delay bawat kopya"
+    },
+    "count": {
+     "label": "Bilang"
+    },
+    "easing": {
+     "label": "Easing",
+     "options": [
+      "Linear",
+      "Ease In",
+      "Ease Out",
+      "Ease In Out"
+     ]
+    },
+    "evolution": {
+     "label": "Ebolusyon"
+    },
+    "fillAmount": {
+     "label": "Dami ng fill"
+    },
+    "fillColor": {
+     "label": "Kulay ng fill"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "randomOpacity": {
+     "label": "Random na opacity"
+    },
+    "randomOrder": {
+     "label": "Random na pagkakasunod-sunod"
+    },
+    "randomPosition": {
+     "label": "Random na posisyon"
+    },
+    "randomRotation": {
+     "label": "Random na pag-ikot"
+    },
+    "randomScale": {
+     "label": "Random na scale"
+    },
+    "rangeEnd": {
+     "label": "Dulo ng saklaw"
+    },
+    "rangeOffset": {
+     "label": "Offset ng saklaw"
+    },
+    "rangeOpacity": {
+     "label": "Saklaw ng opacity"
+    },
+    "rangePosition": {
+     "label": "Saklaw ng posisyon"
+    },
+    "rangeRotation": {
+     "label": "Saklaw ng pag-ikot"
+    },
+    "rangeScale": {
+     "label": "Saklaw ng scale"
+    },
+    "rangeStart": {
+     "label": "Simula ng saklaw"
+    },
+    "scatterSeed": {
+     "label": "Scatter Seed"
+    },
+    "seed": {
+     "label": "Seed"
     }
    }
   },
@@ -6659,7 +6761,7 @@
    }
   },
   "videofeedback": {
-   "description": "Paulit-ulit na iginuguhit ang layer sa loob ng sarili nito, tulad ng kamerang nakatutok sa sarili nitong screen. Igalaw, baguhin ang laki o ikutin ang layer para idirekta ang tunnel.",
+   "description": "Paulit-ulit na iginuguhit ang layer sa loob ng sarili nito, tulad ng kamerang nakatutok sa sarili nitong screen. Kapag naka-on ang Frame by Frame, ipinapakita ng bawat kopya ang layer mula sa isang frame na mas maaga, kaya nag-iiwan ang galaw ng mga bakas na umiikot papasok sa tunnel.",
    "name": "Feedback ng bidyo",
    "params": {
     "blend": {
@@ -6690,6 +6792,9 @@
     },
     "rotation": {
      "label": "Pag-ikot"
+    },
+    "trails": {
+     "label": "Frame by Frame"
     },
     "useLayerTransform": {
      "label": "Gamitin ang transform ng layer"

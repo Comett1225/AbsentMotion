@@ -3747,6 +3747,33 @@
     }
    }
   },
+  "pagecurl": {
+   "description": "Gira il livello come una pagina: un angolo si solleva e si arrotola, mostrando il retro. Anima Avanzamento per girare la pagina.",
+   "name": "Pagina arricciata",
+   "params": {
+    "angle": {
+     "label": "Angolo"
+    },
+    "backAlpha": {
+     "label": "Opacità del retro"
+    },
+    "backColor": {
+     "label": "Colore del retro"
+    },
+    "progress": {
+     "label": "Avanzamento"
+    },
+    "radius": {
+     "label": "Raggio"
+    },
+    "shadow": {
+     "label": "Ombra"
+    },
+    "shine": {
+     "label": "Brillantezza"
+    }
+   }
+  },
   "palettemap": {
    "description": "Associa ogni pixel al colore più vicino di una palette: scegli fino a otto colori oppure usa una palette fino a 512 colori da un preset o da un file importato. I motivi di dithering mescolano colori vicini per mostrare più tonalità. Alfa fonde i colori risultanti con il livello originale.",
    "name": "Mappa palette",
@@ -5189,6 +5216,81 @@
     },
     "z": {
      "label": "Posizione Z"
+    }
+   }
+  },
+  "scatterrepeat": {
+   "description": "Crea copie del livello e le disperde casualmente in un cerchio intorno a esso. Evoluzione sposta le copie; Seme di dispersione sceglie un motivo diverso.",
+   "name": "Ripetizione sparsa",
+   "params": {
+    "copyDelay": {
+     "label": "Ritardo per copia"
+    },
+    "count": {
+     "label": "Numero"
+    },
+    "easing": {
+     "label": "Easing",
+     "options": [
+      "Lineare",
+      "Ease in",
+      "Ease out",
+      "Ease in out"
+     ]
+    },
+    "evolution": {
+     "label": "Evoluzione"
+    },
+    "fillAmount": {
+     "label": "Quantità riempimento"
+    },
+    "fillColor": {
+     "label": "Colore riempimento"
+    },
+    "radius": {
+     "label": "Raggio"
+    },
+    "randomOpacity": {
+     "label": "Opacità casuale"
+    },
+    "randomOrder": {
+     "label": "Ordine casuale"
+    },
+    "randomPosition": {
+     "label": "Posizione casuale"
+    },
+    "randomRotation": {
+     "label": "Rotazione casuale"
+    },
+    "randomScale": {
+     "label": "Scala casuale"
+    },
+    "rangeEnd": {
+     "label": "Fine intervallo"
+    },
+    "rangeOffset": {
+     "label": "Scostamento intervallo"
+    },
+    "rangeOpacity": {
+     "label": "Intervallo opacità"
+    },
+    "rangePosition": {
+     "label": "Intervallo posizione"
+    },
+    "rangeRotation": {
+     "label": "Intervallo rotazione"
+    },
+    "rangeScale": {
+     "label": "Intervallo scala"
+    },
+    "rangeStart": {
+     "label": "Inizio intervallo"
+    },
+    "scatterSeed": {
+     "label": "Seme di dispersione"
+    },
+    "seed": {
+     "label": "Seme"
     }
    }
   },
@@ -6659,7 +6761,7 @@
    }
   },
   "videofeedback": {
-   "description": "Disegna il livello dentro sé stesso più e più volte, come una telecamera puntata sul proprio schermo. Sposta, ridimensiona o ruota il livello per guidare il tunnel.",
+   "description": "Disegna il livello ripetutamente al suo interno, come una camera puntata sul proprio schermo. Quando Fotogramma per fotogramma è attivo, ogni copia mostra il livello di un fotogramma precedente, così il movimento lascia scie che vorticano nel tunnel.",
    "name": "Feedback video",
    "params": {
     "blend": {
@@ -6690,6 +6792,9 @@
     },
     "rotation": {
      "label": "Rotazione"
+    },
+    "trails": {
+     "label": "Fotogramma per fotogramma"
     },
     "useLayerTransform": {
      "label": "Usa trasformazione livello"

@@ -5,6 +5,7 @@
     <string name="action_close">Tutup</string>
     <string name="settings_language">Bahasa</string>
     <string name="onboarding_language_title">Pilih bahasa anda</string>
+    <string name="onboarding_look_title">Cerah atau gelap?</string>
     <string name="onboarding_language_others">Bahasa lain</string>
     <string name="onboarding_language_later">Anda boleh menukarnya kemudian dalam Tetapan.</string>
     <string name="onboarding_check_title">Semak keupayaan peranti ini</string>
@@ -290,7 +291,8 @@
     <string name="update_reconnecting">Sambungan terputus. Mencuba lagi…</string>
     <string name="update_external">Salinan ini bukan daripada keluaran AbsentMotion di GitHub, jadi ia tidak boleh mengemas kini dirinya sendiri. Dapatkan kemas kini dari tempat anda memasangnya.</string>
     <string name="update_metered">Sambungan ini bermeter, contohnya data mudah alih. Muat turun mungkin menggunakan kuota data anda.</string>
-    <string name="theme_absentmotion">AbsentMotion</string>
+    <string name="theme_light">Cerah</string>
+    <string name="theme_dark">Gelap</string>
     <string name="theme_daylight">Cahaya siang</string>
     <string name="theme_custom">Tersuai</string>
     <string name="theme_custom_named">Tersuai (%1$s)</string>
@@ -496,10 +498,12 @@
     <string name="downloader_rights">Hanya muat turun perkara yang anda berhak gunakan.</string>
     <string name="downloader_engine_title">Muat turun perlukan alat tambah</string>
     <string name="downloader_engine_about">Muat turun sekali sahaja sebanyak %1$s. Ia menyertakan Python dan yt-dlp, alat percuma yang melakukan muat turun. Anda boleh membuangnya dalam Tetapan.</string>
+    <string name="downloader_engine_about_desktop">Muat turun %1$s sekali sahaja. Muat turun ini mengandungi yt-dlp, program percuma yang melakukan muat turun. Anda boleh membuangnya dalam Tetapan.</string>
     <string name="downloader_engine_get">Dapatkan alat tambah</string>
     <string name="downloader_engine_getting">Mendapatkan alat tambah… %1$d%%</string>
     <string name="downloader_engine_failed">Alat tambah tidak dapat dimuat turun. Semak sambungan dan cuba lagi.</string>
     <string name="downloader_engine_missing">Dapatkan alat tambah dahulu.</string>
+    <string name="downloader_engine_blocked">Program pemuat turun tiada atau telah disekat oleh antivirus anda. Benarkan program itu, atau buangnya dalam Tetapan dan dapatkannya semula.</string>
     <string name="downloader_engine_broken">Alat tambah tidak bermula. Buangnya dalam Tetapan dan dapatkannya semula.</string>
     <string name="downloader_restart">Tutup AbsentMotion dan buka semula untuk selesai menyediakan alat tambah.</string>
     <string name="downloader_engine_unavailable">Muat turun video memerlukan telefon dengan pemproses 64-bit.</string>
@@ -862,6 +866,7 @@
     <string name="add_tab_audio">Audio</string>
     <string name="add_tab_object_asset">Objek / aset</string>
     <string name="add_tab_template">Templat</string>
+    <string name="add_tab_tools">Alat</string>
     <string name="add_quick_freehand_brush">Berus bebas</string>
     <string name="add_quick_pen_tool">Alat pen</string>
     <string name="add_quick_text">Teks</string>
@@ -1333,6 +1338,12 @@
     <string name="speed_reverse_minutes_left">Tinggal kira-kira %1$s min</string>
     <string name="speed_normal">Biasa</string>
     <string name="speed_curve">Lengkung</string>
+    <string name="speed_remap">Pemetaan semula masa</string>
+    <string name="remap_about">Pilih detik klip yang dipaparkan pada setiap titik masa. Tambah bingkai kunci untuk mempercepat, membekukan atau memainkan klip secara terbalik. Bunyi klip disenyapkan semasa pemetaan semula masa dihidupkan.</string>
+    <string name="remap_turn_on">Hidupkan pemetaan semula masa</string>
+    <string name="remap_clip_time">Masa klip</string>
+    <string name="remap_reverse">Terbalikkan</string>
+    <string name="remap_turn_off">Matikan</string>
     <string name="speed_curve_custom">Tersuai</string>
     <string name="speed_curve_edit_hint">Ketik lengkung yang dipilih sekali lagi untuk mengeditnya</string>
     <string name="speed_curve_graph">Lengkung kelajuan</string>
@@ -2248,6 +2259,7 @@
     <string name="tools_too_big">Ini terlalu besar untuk telefon ini. Cuba saiz yang lebih kecil atau bahagian yang lebih pendek.</string>
     <string name="tools_failed">Tidak dapat disiapkan: %1$s</string>
     <string name="tools_save">Simpan</string>
+    <string name="tools_add_to_project">Tambah pada projek</string>
     <string name="tools_part">Bahagian yang dikekalkan</string>
     <string name="tools_start">Mula</string>
     <string name="tools_end">Tamat</string>

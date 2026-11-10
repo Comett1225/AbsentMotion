@@ -3747,6 +3747,33 @@
     }
    }
   },
+  "pagecurl": {
+   "description": "Gira la capa como una página: una esquina se levanta y se enrolla, dejando ver el reverso. Anima el progreso para pasar la página.",
+   "name": "Paso de página",
+   "params": {
+    "angle": {
+     "label": "Ángulo"
+    },
+    "backAlpha": {
+     "label": "Opacidad del reverso"
+    },
+    "backColor": {
+     "label": "Color del reverso"
+    },
+    "progress": {
+     "label": "Progreso"
+    },
+    "radius": {
+     "label": "Radio"
+    },
+    "shadow": {
+     "label": "Sombra"
+    },
+    "shine": {
+     "label": "Brillo"
+    }
+   }
+  },
   "palettemap": {
    "description": "Asigna a cada píxel el color más cercano de una paleta: hasta ocho colores que elijas, o una paleta de hasta 512 colores de un preajuste o de un archivo importado. Los patrones de tramado mezclan colores contiguos de la paleta para mostrar más tonos. La opacidad mezcla los colores asignados con la capa original.",
    "name": "Mapa de paleta",
@@ -5189,6 +5216,81 @@
     },
     "z": {
      "label": "Posición Z"
+    }
+   }
+  },
+  "scatterrepeat": {
+   "description": "Crea copias de la capa y las dispersa al azar dentro de un círculo a su alrededor. La evolución mueve las copias; la semilla de dispersión elige otro patrón.",
+   "name": "Repetición dispersa",
+   "params": {
+    "copyDelay": {
+     "label": "Retraso por copia"
+    },
+    "count": {
+     "label": "Cantidad"
+    },
+    "easing": {
+     "label": "Suavizado",
+     "options": [
+      "Lineal",
+      "Suavizar entrada",
+      "Suavizar salida",
+      "Suavizar entrada y salida"
+     ]
+    },
+    "evolution": {
+     "label": "Evolución"
+    },
+    "fillAmount": {
+     "label": "Cantidad de relleno"
+    },
+    "fillColor": {
+     "label": "Color de relleno"
+    },
+    "radius": {
+     "label": "Radio"
+    },
+    "randomOpacity": {
+     "label": "Opacidad aleatoria"
+    },
+    "randomOrder": {
+     "label": "Orden aleatorio"
+    },
+    "randomPosition": {
+     "label": "Posición aleatoria"
+    },
+    "randomRotation": {
+     "label": "Rotación aleatoria"
+    },
+    "randomScale": {
+     "label": "Escala aleatoria"
+    },
+    "rangeEnd": {
+     "label": "Fin del rango"
+    },
+    "rangeOffset": {
+     "label": "Desplazamiento del rango"
+    },
+    "rangeOpacity": {
+     "label": "Rango de opacidad"
+    },
+    "rangePosition": {
+     "label": "Rango de posición"
+    },
+    "rangeRotation": {
+     "label": "Rango de rotación"
+    },
+    "rangeScale": {
+     "label": "Rango de escala"
+    },
+    "rangeStart": {
+     "label": "Inicio del rango"
+    },
+    "scatterSeed": {
+     "label": "Semilla de dispersión"
+    },
+    "seed": {
+     "label": "Semilla"
     }
    }
   },
@@ -6659,7 +6761,7 @@
    }
   },
   "videofeedback": {
-   "description": "Dibuja la capa dentro de sí misma repetidamente, como una cámara apuntada a su propia pantalla. Mueve, escala o gira la capa para dirigir el túnel.",
+   "description": "Dibuja la capa dentro de sí misma una y otra vez, como una cámara apuntando a su propia pantalla. Con Fotograma a fotograma activado, cada copia muestra la capa un fotograma antes, por lo que el movimiento deja estelas que giran hacia el túnel.",
    "name": "Retroalimentación de vídeo",
    "params": {
     "blend": {
@@ -6690,6 +6792,9 @@
     },
     "rotation": {
      "label": "Rotación"
+    },
+    "trails": {
+     "label": "Fotograma a fotograma"
     },
     "useLayerTransform": {
      "label": "Usar transformación de capa"

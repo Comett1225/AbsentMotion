@@ -5,6 +5,7 @@
     <string name="action_close">Закрити</string>
     <string name="settings_language">Мова</string>
     <string name="onboarding_language_title">Виберіть мову</string>
+    <string name="onboarding_look_title">Світла чи темна тема?</string>
     <string name="onboarding_language_others">Інші мови</string>
     <string name="onboarding_language_later">Це можна змінити пізніше в налаштуваннях.</string>
     <string name="onboarding_check_title">Перевірте можливості пристрою</string>
@@ -290,7 +291,8 @@
     <string name="update_reconnecting">З\'єднання втрачено. Повторна спроба…</string>
     <string name="update_external">Ця копія не походить із випуску AbsentMotion на GitHub, тому не може оновлюватися самостійно. Отримайте оновлення там, звідки ви її встановили.</string>
     <string name="update_metered">Це з\'єднання з лімітом трафіку, наприклад мобільний інтернет. Завантаження може витратити ваш трафік.</string>
-    <string name="theme_absentmotion">AbsentMotion</string>
+    <string name="theme_light">Світла</string>
+    <string name="theme_dark">Темна</string>
     <string name="theme_daylight">Денна</string>
     <string name="theme_custom">Власна</string>
     <string name="theme_custom_named">Власна (%1$s)</string>
@@ -499,10 +501,12 @@
     <string name="downloader_rights">Завантажуйте лише те, що маєте право використовувати.</string>
     <string name="downloader_engine_title">Для завантаження потрібне доповнення</string>
     <string name="downloader_engine_about">Одноразове завантаження розміром %1$s. Воно містить Python і yt-dlp — безкоштовні інструменти, які виконують завантаження. Ви можете видалити його в налаштуваннях.</string>
+    <string name="downloader_engine_about_desktop">Одноразове завантаження: %1$s. Воно містить yt-dlp — безкоштовну програму для завантаження. Її можна видалити в налаштуваннях.</string>
     <string name="downloader_engine_get">Отримати доповнення</string>
     <string name="downloader_engine_getting">Отримання доповнення… %1$d%%</string>
     <string name="downloader_engine_failed">Не вдалося завантажити доповнення. Перевірте з\'єднання й спробуйте ще раз.</string>
     <string name="downloader_engine_missing">Спочатку отримайте доповнення.</string>
+    <string name="downloader_engine_blocked">Програму для завантаження не знайдено або її заблокував антивірус. Дозвольте її використання або видаліть у налаштуваннях і завантажте знову.</string>
     <string name="downloader_engine_broken">Доповнення не запустилося. Видаліть його в налаштуваннях і отримайте знову.</string>
     <string name="downloader_restart">Закрийте AbsentMotion і відкрийте його знову, щоб завершити налаштування доповнення.</string>
     <string name="downloader_engine_unavailable">Для завантаження відео потрібен телефон із 64-бітним процесором.</string>
@@ -892,6 +896,7 @@
     <string name="add_tab_audio">Аудіо</string>
     <string name="add_tab_object_asset">Об\'єкт / ресурс</string>
     <string name="add_tab_template">Шаблон</string>
+    <string name="add_tab_tools">Інструменти</string>
     <string name="add_quick_freehand_brush">Пензель</string>
     <string name="add_quick_pen_tool">Перо</string>
     <string name="add_quick_text">Текст</string>
@@ -1393,6 +1398,12 @@
     <string name="speed_reverse_minutes_left">Залишилося близько %1$s хв</string>
     <string name="speed_normal">Звичайна</string>
     <string name="speed_curve">Крива</string>
+    <string name="speed_remap">Перепризначення</string>
+    <string name="remap_about">Виберіть, який момент кліпу показувати в кожній точці. Додайте ключові кадри, щоб прискорити кліп, зупинити кадр або відтворити його у зворотному напрямку. Коли перепризначення часу ввімкнено, звук кліпу вимкнено.</string>
+    <string name="remap_turn_on">Увімкнути перепризначення часу</string>
+    <string name="remap_clip_time">Час кліпу</string>
+    <string name="remap_reverse">У зворотному напрямку</string>
+    <string name="remap_turn_off">Вимкнути</string>
     <string name="speed_curve_custom">Власна</string>
     <string name="speed_curve_edit_hint">Торкніться вибраної кривої ще раз, щоб змінити її</string>
     <string name="speed_curve_graph">Крива швидкості</string>
@@ -2335,6 +2346,7 @@
     <string name="tools_too_big">Це завелике для цього телефона. Спробуйте менший розмір або коротшу частину.</string>
     <string name="tools_failed">Не вдалося завершити: %1$s</string>
     <string name="tools_save">Зберегти</string>
+    <string name="tools_add_to_project">Додати до проєкту</string>
     <string name="tools_part">Частина, яку залишити</string>
     <string name="tools_start">Початок</string>
     <string name="tools_end">Кінець</string>

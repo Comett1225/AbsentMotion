@@ -5,6 +5,7 @@
     <string name="action_close">Zamknij</string>
     <string name="settings_language">Język</string>
     <string name="onboarding_language_title">Wybierz język</string>
+    <string name="onboarding_look_title">Jasny czy ciemny?</string>
     <string name="onboarding_language_others">Inne języki</string>
     <string name="onboarding_language_later">Możesz to później zmienić w ustawieniach.</string>
     <string name="onboarding_check_title">Sprawdź możliwości urządzenia</string>
@@ -290,7 +291,8 @@
     <string name="update_reconnecting">Utracono połączenie. Ponawianie próby…</string>
     <string name="update_external">Ta kopia nie pochodzi z wydania AbsentMotion w GitHub, więc nie może się sama zaktualizować. Pobierz aktualizację ze źródła, z którego ją zainstalowano.</string>
     <string name="update_metered">To połączenie jest taryfowe, jak na przykład dane komórkowe. Pobieranie może wykorzystać pakiet danych.</string>
-    <string name="theme_absentmotion">AbsentMotion</string>
+    <string name="theme_light">Jasny</string>
+    <string name="theme_dark">Ciemny</string>
     <string name="theme_daylight">Światło dzienne</string>
     <string name="theme_custom">Niestandardowy</string>
     <string name="theme_custom_named">Niestandardowy (%1$s)</string>
@@ -499,10 +501,12 @@
     <string name="downloader_rights">Pobieraj tylko materiały, do których masz prawa.</string>
     <string name="downloader_engine_title">Do pobierania potrzebny jest dodatek</string>
     <string name="downloader_engine_about">Jednorazowe pobranie: %1$s. Dodatek zawiera Python i yt-dlp, czyli darmowe narzędzia do pobierania. Możesz go usunąć w ustawieniach.</string>
+    <string name="downloader_engine_about_desktop">Jednorazowe pobranie: %1$s. Zawiera yt-dlp, darmowy program do pobierania. Możesz go usunąć w ustawieniach.</string>
     <string name="downloader_engine_get">Pobierz dodatek</string>
     <string name="downloader_engine_getting">Pobieranie dodatku… %1$d%%</string>
     <string name="downloader_engine_failed">Nie udało się pobrać dodatku. Sprawdź połączenie i spróbuj ponownie.</string>
     <string name="downloader_engine_missing">Najpierw pobierz dodatek.</string>
+    <string name="downloader_engine_blocked">Brakuje programu do pobierania lub został on zablokowany przez program antywirusowy. Zezwól na jego działanie albo usuń go w ustawieniach i pobierz ponownie.</string>
     <string name="downloader_engine_broken">Dodatek nie uruchomił się. Usuń go w ustawieniach i pobierz ponownie.</string>
     <string name="downloader_restart">Zamknij AbsentMotion i otwórz go ponownie, aby dokończyć konfigurację dodatku.</string>
     <string name="downloader_engine_unavailable">Do pobierania wideo potrzebny jest telefon z procesorem 64-bitowym.</string>
@@ -892,6 +896,7 @@
     <string name="add_tab_audio">Dźwięk</string>
     <string name="add_tab_object_asset">Obiekt / zasób</string>
     <string name="add_tab_template">Szablon</string>
+    <string name="add_tab_tools">Narzędzia</string>
     <string name="add_quick_freehand_brush">Pędzel odręczny</string>
     <string name="add_quick_pen_tool">Pióro</string>
     <string name="add_quick_text">Tekst</string>
@@ -1393,6 +1398,12 @@
     <string name="speed_reverse_minutes_left">Pozostało około %1$s min</string>
     <string name="speed_normal">Normalna</string>
     <string name="speed_curve">Krzywa</string>
+    <string name="speed_remap">Mapowanie czasu</string>
+    <string name="remap_about">Wybierz, jaki moment klipu ma być widoczny w danym punkcie. Dodaj klatki kluczowe, aby przyspieszyć, zatrzymać lub odtworzyć klip wstecz. Dźwięk klipu jest wyciszony, gdy mapowanie czasu jest włączone.</string>
+    <string name="remap_turn_on">Włącz mapowanie czasu</string>
+    <string name="remap_clip_time">Czas klipu</string>
+    <string name="remap_reverse">Odwróć</string>
+    <string name="remap_turn_off">Wyłącz</string>
     <string name="speed_curve_custom">Własna</string>
     <string name="speed_curve_edit_hint">Dotknij ponownie wybranej krzywej, aby ją edytować</string>
     <string name="speed_curve_graph">Krzywa prędkości</string>
@@ -2335,6 +2346,7 @@
     <string name="tools_too_big">Plik jest zbyt duży dla tego telefonu. Wybierz mniejszy rozmiar lub krótszy fragment.</string>
     <string name="tools_failed">Nie udało się ukończyć: %1$s</string>
     <string name="tools_save">Zapisz</string>
+    <string name="tools_add_to_project">Dodaj do projektu</string>
     <string name="tools_part">Fragment do zachowania</string>
     <string name="tools_start">Początek</string>
     <string name="tools_end">Koniec</string>

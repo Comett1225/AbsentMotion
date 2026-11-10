@@ -3747,6 +3747,33 @@
     }
    }
   },
+  "pagecurl": {
+   "description": "レイヤーをページのようにめくります。角が持ち上がって巻き上がり、ページの裏側が見えます。進行度をアニメーションさせるとページをめくれます。",
+   "name": "ページカール",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "backAlpha": {
+     "label": "裏面の不透明度"
+    },
+    "backColor": {
+     "label": "裏面の色"
+    },
+    "progress": {
+     "label": "進行度"
+    },
+    "radius": {
+     "label": "半径"
+    },
+    "shadow": {
+     "label": "影"
+    },
+    "shine": {
+     "label": "光沢"
+    }
+   }
+  },
   "palettemap": {
    "description": "各ピクセルをパレット内の最も近い色にマッピングします。選んだ最大8色、またはプリセットや読み込んだファイルから最大512色のパレットを使用できます。ディザーパターンは隣接するパレット色を混ぜてより多くの階調を表現します。アルファはマッピングした色を元のレイヤーとブレンドします。",
    "name": "パレットマップ",
@@ -5189,6 +5216,81 @@
     },
     "z": {
      "label": "Z位置"
+    }
+   }
+  },
+  "scatterrepeat": {
+   "description": "レイヤーのコピーを作成し、その周囲の円内にランダムに散らします。変化でコピーを動かし、散乱シードで別のパターンを選びます。",
+   "name": "散乱リピート",
+   "params": {
+    "copyDelay": {
+     "label": "コピーごとの遅延"
+    },
+    "count": {
+     "label": "数"
+    },
+    "easing": {
+     "label": "イージング",
+     "options": [
+      "リニア",
+      "イーズイン",
+      "イーズアウト",
+      "イーズインアウト"
+     ]
+    },
+    "evolution": {
+     "label": "変化"
+    },
+    "fillAmount": {
+     "label": "塗りの量"
+    },
+    "fillColor": {
+     "label": "塗りの色"
+    },
+    "radius": {
+     "label": "半径"
+    },
+    "randomOpacity": {
+     "label": "ランダムな不透明度"
+    },
+    "randomOrder": {
+     "label": "ランダムな順序"
+    },
+    "randomPosition": {
+     "label": "ランダムな位置"
+    },
+    "randomRotation": {
+     "label": "ランダムな回転"
+    },
+    "randomScale": {
+     "label": "ランダムなスケール"
+    },
+    "rangeEnd": {
+     "label": "範囲の終了"
+    },
+    "rangeOffset": {
+     "label": "範囲のオフセット"
+    },
+    "rangeOpacity": {
+     "label": "不透明度の範囲"
+    },
+    "rangePosition": {
+     "label": "位置の範囲"
+    },
+    "rangeRotation": {
+     "label": "回転の範囲"
+    },
+    "rangeScale": {
+     "label": "スケールの範囲"
+    },
+    "rangeStart": {
+     "label": "範囲の開始"
+    },
+    "scatterSeed": {
+     "label": "散乱シード"
+    },
+    "seed": {
+     "label": "シード"
     }
    }
   },
@@ -6659,7 +6761,7 @@
    }
   },
   "videofeedback": {
-   "description": "カメラを自分の画面に向けたように、レイヤーを内側に繰り返し描画します。レイヤーを移動、拡大縮小、回転してトンネルを操作できます。",
+   "description": "カメラを自分の画面に向けたときのように、レイヤーを自身の内側に繰り返し描画します。フレームごとをオンにすると、各コピーに1フレーム前のレイヤーが表示され、動きの軌跡が渦を巻きながらトンネルの奥へ続きます。",
    "name": "ビデオフィードバック",
    "params": {
     "blend": {
@@ -6690,6 +6792,9 @@
     },
     "rotation": {
      "label": "回転"
+    },
+    "trails": {
+     "label": "フレームごと"
     },
     "useLayerTransform": {
      "label": "レイヤーの変形を使用"

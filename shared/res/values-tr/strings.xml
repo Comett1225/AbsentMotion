@@ -5,6 +5,7 @@
     <string name="action_close">Kapat</string>
     <string name="settings_language">Dil</string>
     <string name="onboarding_language_title">Dilinizi seçin</string>
+    <string name="onboarding_look_title">Açık mı koyu mu?</string>
     <string name="onboarding_language_others">Diğer diller</string>
     <string name="onboarding_language_later">Bunu daha sonra Ayarlar\'dan değiştirebilirsiniz.</string>
     <string name="onboarding_check_title">Cihazınızın neler yapabildiğini görün</string>
@@ -290,7 +291,8 @@
     <string name="update_reconnecting">Bağlantı koptu. Yeniden deneniyor…</string>
     <string name="update_external">Bu kopya AbsentMotion\'ın GitHub sürümlerinden gelmedi, bu yüzden kendini güncelleyemez. Güncellemeyi yüklediğiniz yerden alın.</string>
     <string name="update_metered">Bu bağlantı sınırlı, örneğin mobil veri. İndirme, veri paketinizi tüketebilir.</string>
-    <string name="theme_absentmotion">AbsentMotion</string>
+    <string name="theme_light">Açık</string>
+    <string name="theme_dark">Koyu</string>
     <string name="theme_daylight">Gün ışığı</string>
     <string name="theme_custom">Özel</string>
     <string name="theme_custom_named">Özel (%1$s)</string>
@@ -497,10 +499,12 @@
     <string name="downloader_rights">Yalnızca kullanma hakkına sahip olduğunuz içerikleri indirin.</string>
     <string name="downloader_engine_title">İndirmeler için eklenti gerekli</string>
     <string name="downloader_engine_about">Tek seferlik %1$s indirme. İndirmeyi gerçekleştiren ücretsiz araçlar olan Python ve yt-dlp\'yi getirir. Ayarlar\'dan kaldırabilirsiniz.</string>
+    <string name="downloader_engine_about_desktop">Tek seferlik indirme: %1$s. İndirme işlemini yapan ücretsiz yt-dlp programını içerir. Ayarlar üzerinden kaldırabilirsiniz.</string>
     <string name="downloader_engine_get">Eklentiyi indir</string>
     <string name="downloader_engine_getting">Eklenti indiriliyor… %1$d%%</string>
     <string name="downloader_engine_failed">Eklenti indirilemedi. Bağlantıyı kontrol edip tekrar deneyin.</string>
     <string name="downloader_engine_missing">Önce eklentiyi indirin.</string>
+    <string name="downloader_engine_blocked">İndirme programı bulunamadı veya antivirüsünüz tarafından engellendi. Programa izin verin ya da Ayarlar üzerinden kaldırıp yeniden indirin.</string>
     <string name="downloader_engine_broken">Eklenti başlatılamadı. Ayarlar\'dan kaldırıp yeniden indirin.</string>
     <string name="downloader_restart">Eklentinin kurulumunu bitirmek için AbsentMotion\'ı kapatıp yeniden açın.</string>
     <string name="downloader_engine_unavailable">Video indirmeler için 64 bit işlemcili bir telefon gerekir.</string>
@@ -872,6 +876,7 @@
     <string name="add_tab_audio">Ses</string>
     <string name="add_tab_object_asset">Nesne / Varlık</string>
     <string name="add_tab_template">Şablon</string>
+    <string name="add_tab_tools">Araçlar</string>
     <string name="add_quick_freehand_brush">Serbest Fırça</string>
     <string name="add_quick_pen_tool">Kalem Aracı</string>
     <string name="add_quick_text">Metin</string>
@@ -1353,6 +1358,12 @@
     <string name="speed_reverse_minutes_left">Yaklaşık %1$s min kaldı</string>
     <string name="speed_normal">Normal</string>
     <string name="speed_curve">Eğri</string>
+    <string name="speed_remap">Yeniden eşle</string>
+    <string name="remap_about">Her noktada klibin hangi anının gösterileceğini seçin. Hızlandırmak, dondurmak veya geriye oynatmak için anahtar kareler ekleyin. Zamanı yeniden eşleme açıkken klibin sesi kapatılır.</string>
+    <string name="remap_turn_on">Zamanı yeniden eşlemeyi aç</string>
+    <string name="remap_clip_time">Klip zamanı</string>
+    <string name="remap_reverse">Ters çevir</string>
+    <string name="remap_turn_off">Kapat</string>
     <string name="speed_curve_custom">Özel</string>
     <string name="speed_curve_edit_hint">Düzenlemek için seçilen eğriye tekrar dokunun</string>
     <string name="speed_curve_graph">Hız eğrisi</string>
@@ -2277,6 +2288,7 @@
     <string name="tools_too_big">Bu telefon için fazla büyük. Daha küçük bir boyut veya daha kısa bir bölüm deneyin.</string>
     <string name="tools_failed">Tamamlanamadı: %1$s</string>
     <string name="tools_save">Kaydet</string>
+    <string name="tools_add_to_project">Projeye ekle</string>
     <string name="tools_part">Tutulacak bölüm</string>
     <string name="tools_start">Başlangıç</string>
     <string name="tools_end">Bitiş</string>

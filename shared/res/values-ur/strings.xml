@@ -5,6 +5,7 @@
     <string name="action_close">بند کریں</string>
     <string name="settings_language">زبان</string>
     <string name="onboarding_language_title">اپنی زبان منتخب کریں</string>
+    <string name="onboarding_look_title">لائٹ یا ڈارک؟</string>
     <string name="onboarding_language_others">دیگر زبانیں</string>
     <string name="onboarding_language_later">آپ اسے بعد میں سیٹنگز میں تبدیل کر سکتے ہیں۔</string>
     <string name="onboarding_check_title">دیکھیں یہ آلہ کیا کر سکتا ہے</string>
@@ -290,7 +291,8 @@
     <string name="update_reconnecting">کنکشن ٹوٹ گیا۔ دوبارہ کوشش ہو رہی ہے…</string>
     <string name="update_external">یہ کاپی AbsentMotion کی GitHub ریلیز سے نہیں آئی، اس لیے یہ خود کو اپ ڈیٹ نہیں کر سکتی۔ اپ ڈیٹ وہیں سے حاصل کریں جہاں سے آپ نے اسے انسٹال کیا تھا۔</string>
     <string name="update_metered">یہ کنکشن میٹرڈ ہے، مثلاً موبائل ڈیٹا۔ ڈاؤن لوڈ آپ کا ڈیٹا پلان استعمال کر سکتا ہے۔</string>
-    <string name="theme_absentmotion">AbsentMotion</string>
+    <string name="theme_light">لائٹ</string>
+    <string name="theme_dark">ڈارک</string>
     <string name="theme_daylight">ڈے لائٹ</string>
     <string name="theme_custom">کسٹم</string>
     <string name="theme_custom_named">کسٹم (%1$s)</string>
@@ -497,10 +499,12 @@
     <string name="downloader_rights">صرف وہی ڈاؤن لوڈ کریں جسے استعمال کرنے کا آپ کو حق ہو۔</string>
     <string name="downloader_engine_title">ڈاؤن لوڈز کے لیے ایڈ آن درکار ہے</string>
     <string name="downloader_engine_about">%1$s کی ایک بار ڈاؤن لوڈ۔ یہ Python اور yt-dlp لاتا ہے، یعنی ڈاؤن لوڈنگ کے مفت اوزار۔ آپ اسے سیٹنگز میں ہٹا سکتے ہیں۔</string>
+    <string name="downloader_engine_about_desktop">%1$s کا ایک بار کا ڈاؤن لوڈ۔ اس میں yt-dlp شامل ہے، جو ڈاؤن لوڈ کرنے والا مفت پروگرام ہے۔ آپ اسے سیٹنگز میں ہٹا سکتے ہیں۔</string>
     <string name="downloader_engine_get">ایڈ آن حاصل کریں</string>
     <string name="downloader_engine_getting">ایڈ آن حاصل ہو رہا ہے… %1$d%%</string>
     <string name="downloader_engine_failed">ایڈ آن ڈاؤن لوڈ نہیں ہو سکا۔ کنکشن چیک کریں اور دوبارہ کوشش کریں۔</string>
     <string name="downloader_engine_missing">پہلے ایڈ آن حاصل کریں۔</string>
+    <string name="downloader_engine_blocked">ڈاؤن لوڈر پروگرام موجود نہیں یا آپ کے اینٹی وائرس نے اسے بلاک کر دیا ہے۔ اسے اجازت دیں، یا سیٹنگز میں ہٹا کر دوبارہ ڈاؤن لوڈ کریں۔</string>
     <string name="downloader_engine_broken">ایڈ آن شروع نہیں ہوا۔ اسے سیٹنگز میں ہٹائیں اور دوبارہ حاصل کریں۔</string>
     <string name="downloader_restart">ایڈ آن کی سیٹنگ مکمل کرنے کے لیے AbsentMotion بند کر کے دوبارہ کھولیں۔</string>
     <string name="downloader_engine_unavailable">ویڈیو ڈاؤن لوڈز کے لیے 64-bit پروسیسر والا فون درکار ہے۔</string>
@@ -872,6 +876,7 @@
     <string name="add_tab_audio">آڈیو</string>
     <string name="add_tab_object_asset">آبجیکٹ / ایسیٹ</string>
     <string name="add_tab_template">ٹیمپلیٹ</string>
+    <string name="add_tab_tools">ٹولز</string>
     <string name="add_quick_freehand_brush">فری ہینڈ برش</string>
     <string name="add_quick_pen_tool">پین ٹول</string>
     <string name="add_quick_text">ٹیکسٹ</string>
@@ -1353,6 +1358,12 @@
     <string name="speed_reverse_minutes_left">تقریباً %1$s min باقی</string>
     <string name="speed_normal">نارمل</string>
     <string name="speed_curve">کرو</string>
+    <string name="speed_remap">ری میپ</string>
+    <string name="remap_about">منتخب کریں کہ ہر مقام پر کلپ کا کون سا لمحہ دکھائی دے۔ کلپ کی رفتار بڑھانے، اسے روکنے یا الٹا چلانے کے لیے کی فریم شامل کریں۔ ٹائم ری میپ آن ہونے پر کلپ کی آواز بند رہتی ہے۔</string>
+    <string name="remap_turn_on">ٹائم ری میپ آن کریں</string>
+    <string name="remap_clip_time">کلپ کا وقت</string>
+    <string name="remap_reverse">الٹا کریں</string>
+    <string name="remap_turn_off">بند کریں</string>
     <string name="speed_curve_custom">کسٹم</string>
     <string name="speed_curve_edit_hint">ترمیم کے لیے منتخب کرو پر دوبارہ ٹیپ کریں</string>
     <string name="speed_curve_graph">اسپیڈ کرو</string>
@@ -2277,6 +2288,7 @@
     <string name="tools_too_big">یہ اس فون کے لیے بہت بڑا ہے۔ چھوٹا سائز یا مختصر حصہ آزمائیں۔</string>
     <string name="tools_failed">مکمل نہیں ہو سکا: %1$s</string>
     <string name="tools_save">محفوظ کریں</string>
+    <string name="tools_add_to_project">پروجیکٹ میں شامل کریں</string>
     <string name="tools_part">رکھنے والا حصہ</string>
     <string name="tools_start">شروع</string>
     <string name="tools_end">اختتام</string>

@@ -5,6 +5,7 @@
     <string name="action_close">বন্ধ করুন</string>
     <string name="settings_language">ভাষা</string>
     <string name="onboarding_language_title">আপনার ভাষা বেছে নিন</string>
+    <string name="onboarding_look_title">লাইট নাকি ডার্ক?</string>
     <string name="onboarding_language_others">অন্যান্য ভাষা</string>
     <string name="onboarding_language_later">এটি পরে সেটিংসে পরিবর্তন করতে পারবেন।</string>
     <string name="onboarding_check_title">এই ডিভাইসটি কী করতে পারে দেখুন</string>
@@ -290,7 +291,8 @@
     <string name="update_reconnecting">সংযোগ বিচ্ছিন্ন হয়েছে। আবার চেষ্টা করা হচ্ছে…</string>
     <string name="update_external">এই কপিটি AbsentMotion-এর GitHub রিলিজ থেকে আসেনি, তাই এটি নিজে আপডেট হতে পারে না। যেখান থেকে ইনস্টল করেছেন সেখান থেকে আপডেট নিন।</string>
     <string name="update_metered">এই সংযোগটি মিটারযুক্ত, যেমন মোবাইল ডেটা। ডাউনলোডে আপনার ডেটা প্যাক খরচ হতে পারে।</string>
-    <string name="theme_absentmotion">AbsentMotion</string>
+    <string name="theme_light">লাইট</string>
+    <string name="theme_dark">ডার্ক</string>
     <string name="theme_daylight">ডেলাইট</string>
     <string name="theme_custom">কাস্টম</string>
     <string name="theme_custom_named">কাস্টম (%1$s)</string>
@@ -497,10 +499,12 @@
     <string name="downloader_rights">শুধু আপনার ব্যবহারের অধিকার আছে এমন কনটেন্টই ডাউনলোড করুন।</string>
     <string name="downloader_engine_title">ডাউনলোডের জন্য অ্যাড-অন দরকার</string>
     <string name="downloader_engine_about">%1$s-এর একবার ডাউনলোড। এতে Python ও yt-dlp থাকে—ডাউনলোডের ফ্রি টুল দুটি। সেটিংসে এটি সরাতে পারবেন।</string>
+    <string name="downloader_engine_about_desktop">%1$s একবার ডাউনলোড করতে হবে। এতে আছে yt-dlp, ডাউনলোড করার ফ্রি প্রোগ্রাম। সেটিংস থেকে এটি সরাতে পারবেন।</string>
     <string name="downloader_engine_get">অ্যাড-অন নিন</string>
     <string name="downloader_engine_getting">অ্যাড-অন আনা হচ্ছে… %1$d%%</string>
     <string name="downloader_engine_failed">অ্যাড-অন ডাউনলোড করা যায়নি। সংযোগ পরীক্ষা করে আবার চেষ্টা করুন।</string>
     <string name="downloader_engine_missing">আগে অ্যাড-অন নিন।</string>
+    <string name="downloader_engine_blocked">ডাউনলোড প্রোগ্রামটি নেই অথবা আপনার অ্যান্টিভাইরাস সেটি ব্লক করেছে। সেটিকে অনুমতি দিন, অথবা সেটিংস থেকে সরিয়ে আবার ডাউনলোড করুন।</string>
     <string name="downloader_engine_broken">অ্যাড-অন চালু হয়নি। সেটিংস থেকে সরিয়ে আবার নিন।</string>
     <string name="downloader_restart">অ্যাড-অন সেট আপ শেষ করতে AbsentMotion বন্ধ করে আবার খুলুন।</string>
     <string name="downloader_engine_unavailable">ভিডিও ডাউনলোডের জন্য 64-বিট প্রসেসরের ফোন দরকার।</string>
@@ -872,6 +876,7 @@
     <string name="add_tab_audio">অডিও</string>
     <string name="add_tab_object_asset">অবজেক্ট / অ্যাসেট</string>
     <string name="add_tab_template">টেমপ্লেট</string>
+    <string name="add_tab_tools">টুলস</string>
     <string name="add_quick_freehand_brush">ফ্রিহ্যান্ড ব্রাশ</string>
     <string name="add_quick_pen_tool">পেন টুল</string>
     <string name="add_quick_text">টেক্সট</string>
@@ -1353,6 +1358,12 @@
     <string name="speed_reverse_minutes_left">প্রায় %1$s min বাকি</string>
     <string name="speed_normal">স্বাভাবিক</string>
     <string name="speed_curve">কার্ভ</string>
+    <string name="speed_remap">রিম্যাপ</string>
+    <string name="remap_about">প্রতিটি পয়েন্টে ক্লিপের কোন মুহূর্ত দেখা যাবে তা বেছে নিন। গতি বাড়াতে, স্থির করতে বা উল্টো চালাতে কীফ্রেম যোগ করুন। টাইম রিম্যাপ চালু থাকলে ক্লিপের অডিও মিউট থাকে।</string>
+    <string name="remap_turn_on">টাইম রিম্যাপ চালু করুন</string>
+    <string name="remap_clip_time">ক্লিপের সময়</string>
+    <string name="remap_reverse">উল্টো করুন</string>
+    <string name="remap_turn_off">বন্ধ করুন</string>
     <string name="speed_curve_custom">কাস্টম</string>
     <string name="speed_curve_edit_hint">এডিট করতে বেছে নেওয়া কার্ভে আবার ট্যাপ করুন</string>
     <string name="speed_curve_graph">স্পিড কার্ভ</string>
@@ -2277,6 +2288,7 @@
     <string name="tools_too_big">এটি এই ফোনের জন্য খুব বড়। ছোট সাইজ বা ছোট অংশ চেষ্টা করুন।</string>
     <string name="tools_failed">শেষ করা যায়নি: %1$s</string>
     <string name="tools_save">সেভ</string>
+    <string name="tools_add_to_project">প্রজেক্টে যোগ করুন</string>
     <string name="tools_part">যে অংশ রাখবেন</string>
     <string name="tools_start">শুরু</string>
     <string name="tools_end">শেষ</string>

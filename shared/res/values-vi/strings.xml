@@ -5,6 +5,7 @@
     <string name="action_close">Đóng</string>
     <string name="settings_language">Ngôn ngữ</string>
     <string name="onboarding_language_title">Chọn ngôn ngữ của bạn</string>
+    <string name="onboarding_look_title">Giao diện sáng hay tối?</string>
     <string name="onboarding_language_others">Ngôn ngữ khác</string>
     <string name="onboarding_language_later">Bạn có thể đổi lại sau trong Cài đặt.</string>
     <string name="onboarding_check_title">Xem thiết bị này làm được gì</string>
@@ -290,7 +291,8 @@
     <string name="update_reconnecting">Mất kết nối. Đang thử lại…</string>
     <string name="update_external">Bản này không đến từ bản phát hành AbsentMotion trên GitHub nên không thể tự cập nhật. Hãy lấy bản cập nhật từ nơi bạn đã cài nó.</string>
     <string name="update_metered">Kết nối này bị giới hạn dung lượng, ví dụ dữ liệu di động. Việc tải xuống có thể dùng hết gói dữ liệu của bạn.</string>
-    <string name="theme_absentmotion">AbsentMotion</string>
+    <string name="theme_light">Sáng</string>
+    <string name="theme_dark">Tối</string>
     <string name="theme_daylight">Ban ngày</string>
     <string name="theme_custom">Tùy chỉnh</string>
     <string name="theme_custom_named">Tùy chỉnh (%1$s)</string>
@@ -496,10 +498,12 @@
     <string name="downloader_rights">Chỉ tải xuống nội dung bạn có quyền sử dụng.</string>
     <string name="downloader_engine_title">Tải xuống cần tiện ích bổ sung</string>
     <string name="downloader_engine_about">Tải xuống một lần %1$s. Tiện ích này gồm Python và yt-dlp, các công cụ miễn phí thực hiện việc tải xuống. Bạn có thể gỡ nó trong Cài đặt.</string>
+    <string name="downloader_engine_about_desktop">Chỉ cần tải xuống một lần: %1$s. Gói này chứa yt-dlp, chương trình tải xuống miễn phí. Bạn có thể xóa chương trình trong Cài đặt.</string>
     <string name="downloader_engine_get">Tải tiện ích</string>
     <string name="downloader_engine_getting">Đang tải tiện ích… %1$d%%</string>
     <string name="downloader_engine_failed">Không thể tải tiện ích. Kiểm tra kết nối và thử lại.</string>
     <string name="downloader_engine_missing">Hãy tải tiện ích trước.</string>
+    <string name="downloader_engine_blocked">Không tìm thấy chương trình tải xuống hoặc chương trình đã bị phần mềm diệt vi-rút chặn. Hãy cho phép chương trình, hoặc xóa trong Cài đặt rồi tải lại.</string>
     <string name="downloader_engine_broken">Tiện ích không khởi động được. Gỡ nó trong Cài đặt rồi tải lại.</string>
     <string name="downloader_restart">Hãy đóng AbsentMotion rồi mở lại để hoàn tất cài đặt tiện ích.</string>
     <string name="downloader_engine_unavailable">Tải video cần điện thoại có bộ xử lý 64-bit.</string>
@@ -862,6 +866,7 @@
     <string name="add_tab_audio">Âm thanh</string>
     <string name="add_tab_object_asset">Đối tượng / Tài nguyên</string>
     <string name="add_tab_template">Mẫu</string>
+    <string name="add_tab_tools">Công cụ</string>
     <string name="add_quick_freehand_brush">Cọ vẽ tự do</string>
     <string name="add_quick_pen_tool">Công cụ bút</string>
     <string name="add_quick_text">Văn bản</string>
@@ -1333,6 +1338,12 @@
     <string name="speed_reverse_minutes_left">Còn khoảng %1$s min</string>
     <string name="speed_normal">Thường</string>
     <string name="speed_curve">Đường cong</string>
+    <string name="speed_remap">Ánh xạ lại</string>
+    <string name="remap_about">Chọn thời điểm của clip được hiển thị tại mỗi điểm. Thêm keyframe để tăng tốc, đóng băng hoặc phát ngược clip. Âm thanh của clip sẽ bị tắt khi bật Ánh xạ lại thời gian.</string>
+    <string name="remap_turn_on">Bật ánh xạ lại thời gian</string>
+    <string name="remap_clip_time">Thời gian clip</string>
+    <string name="remap_reverse">Đảo ngược</string>
+    <string name="remap_turn_off">Tắt</string>
     <string name="speed_curve_custom">Tùy chỉnh</string>
     <string name="speed_curve_edit_hint">Nhấn lại vào đường cong đã chọn để chỉnh sửa</string>
     <string name="speed_curve_graph">Đường cong tốc độ</string>
@@ -2248,6 +2259,7 @@
     <string name="tools_too_big">Quá lớn đối với điện thoại này. Hãy thử kích thước nhỏ hơn hoặc đoạn ngắn hơn.</string>
     <string name="tools_failed">Không thể hoàn tất: %1$s</string>
     <string name="tools_save">Lưu</string>
+    <string name="tools_add_to_project">Thêm vào dự án</string>
     <string name="tools_part">Phần giữ lại</string>
     <string name="tools_start">Bắt đầu</string>
     <string name="tools_end">Kết thúc</string>

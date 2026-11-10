@@ -5,6 +5,7 @@
     <string name="action_close">إغلاق</string>
     <string name="settings_language">اللغة</string>
     <string name="onboarding_language_title">اختر لغتك</string>
+    <string name="onboarding_look_title">فاتح أم داكن؟</string>
     <string name="onboarding_language_others">لغات أخرى</string>
     <string name="onboarding_language_later">يمكنك تغيير ذلك لاحقًا من الإعدادات.</string>
     <string name="onboarding_check_title">تحقق مما يمكن لهذا الجهاز فعله</string>
@@ -290,7 +291,8 @@
     <string name="update_reconnecting">انقطع الاتصال. جارٍ إعادة المحاولة…</string>
     <string name="update_external">هذه النسخة لم تأتِ من إصدار AbsentMotion على GitHub، لذلك لا يمكنها تحديث نفسها. احصل على التحديث من المكان الذي ثبّتها منه.</string>
     <string name="update_metered">هذا الاتصال محدود الاستخدام، مثل بيانات الجوال. قد يستهلك التنزيل من باقة بياناتك.</string>
-    <string name="theme_absentmotion">AbsentMotion</string>
+    <string name="theme_light">فاتح</string>
+    <string name="theme_dark">داكن</string>
     <string name="theme_daylight">نهاري</string>
     <string name="theme_custom">مخصص</string>
     <string name="theme_custom_named">مخصص (%1$s)</string>
@@ -501,10 +503,12 @@
     <string name="downloader_rights">نزّل فقط ما تملك حق استخدامه.</string>
     <string name="downloader_engine_title">التنزيلات تتطلب إضافة</string>
     <string name="downloader_engine_about">تنزيل لمرة واحدة بحجم %1$s. يضم Python وyt-dlp، الأداتين المجانيتين المسؤولتين عن التنزيل. يمكنك إزالتها من الإعدادات.</string>
+    <string name="downloader_engine_about_desktop">تنزيل %1$s لمرة واحدة. يتضمن yt-dlp، البرنامج المجاني الذي يتولى التنزيل. يمكنك إزالته من الإعدادات.</string>
     <string name="downloader_engine_get">تنزيل الإضافة</string>
     <string name="downloader_engine_getting">جارٍ تنزيل الإضافة… %1$d%%</string>
     <string name="downloader_engine_failed">تعذر تنزيل الإضافة. تحقق من الاتصال وحاول مرة أخرى.</string>
     <string name="downloader_engine_missing">نزّل الإضافة أولاً.</string>
+    <string name="downloader_engine_blocked">برنامج التنزيل مفقود أو حظره برنامج مكافحة الفيروسات. اسمح بتشغيله، أو أزله من الإعدادات ونزّله مجددًا.</string>
     <string name="downloader_engine_broken">لم تعمل الإضافة. أزلها من الإعدادات ثم نزّلها مجددًا.</string>
     <string name="downloader_restart">أغلق AbsentMotion ثم افتحه مجددًا لإكمال إعداد الإضافة.</string>
     <string name="downloader_engine_unavailable">يتطلب تنزيل الفيديو هاتفًا بمعالج 64 بت.</string>
@@ -912,6 +916,7 @@
     <string name="add_tab_audio">صوت</string>
     <string name="add_tab_object_asset">كائن / أصل</string>
     <string name="add_tab_template">قالب</string>
+    <string name="add_tab_tools">الأدوات</string>
     <string name="add_quick_freehand_brush">فرشاة الرسم الحر</string>
     <string name="add_quick_pen_tool">أداة القلم</string>
     <string name="add_quick_text">نص</string>
@@ -1433,6 +1438,12 @@
     <string name="speed_reverse_minutes_left">بقي حوالي %1$s دقيقة</string>
     <string name="speed_normal">عادي</string>
     <string name="speed_curve">منحنى</string>
+    <string name="speed_remap">إعادة تعيين الوقت</string>
+    <string name="remap_about">اختر لحظة المقطع التي تظهر عند كل نقطة. أضف إطارات مفتاحية لتسريعه أو تجميده أو تشغيله بالعكس. يُكتم صوت المقطع أثناء تفعيل إعادة تعيين الوقت.</string>
+    <string name="remap_turn_on">تفعيل إعادة تعيين الوقت</string>
+    <string name="remap_clip_time">وقت المقطع</string>
+    <string name="remap_reverse">عكس</string>
+    <string name="remap_turn_off">إيقاف</string>
     <string name="speed_curve_custom">مخصص</string>
     <string name="speed_curve_edit_hint">اضغط على المنحنى المختار مرة أخرى لتعديله</string>
     <string name="speed_curve_graph">منحنى السرعة</string>
@@ -2393,6 +2404,7 @@
     <string name="tools_too_big">هذا كبير جدًا على هذا الهاتف. جرّب حجمًا أصغر أو جزءًا أقصر.</string>
     <string name="tools_failed">تعذّر الإنهاء: %1$s</string>
     <string name="tools_save">حفظ</string>
+    <string name="tools_add_to_project">إضافة إلى المشروع</string>
     <string name="tools_part">الجزء المراد الاحتفاظ به</string>
     <string name="tools_start">البداية</string>
     <string name="tools_end">النهاية</string>

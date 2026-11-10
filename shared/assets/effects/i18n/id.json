@@ -3747,6 +3747,33 @@
     }
    }
   },
+  "pagecurl": {
+   "description": "Membalik lapisan seperti halaman: satu sudut terangkat dan menggulung, memperlihatkan bagian belakang halaman. Animasikan Progres untuk membalik halaman.",
+   "name": "Lipatan halaman",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "backAlpha": {
+     "label": "Opasitas belakang"
+    },
+    "backColor": {
+     "label": "Warna belakang"
+    },
+    "progress": {
+     "label": "Progres"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "shadow": {
+     "label": "Bayangan"
+    },
+    "shine": {
+     "label": "Kilau"
+    }
+   }
+  },
   "palettemap": {
    "description": "Mengubah setiap piksel menjadi warna terdekat dalam palet: hingga delapan warna yang Anda pilih, atau palet hingga 512 warna dari preset atau file yang Anda impor. Pola dither memadukan warna palet yang berdekatan agar terlihat lebih banyak nada. Alpha memadukan warna hasilnya dengan lapisan asli.",
    "name": "Peta Palet",
@@ -5189,6 +5216,81 @@
     },
     "z": {
      "label": "Posisi Z"
+    }
+   }
+  },
+  "scatterrepeat": {
+   "description": "Membuat salinan lapisan dan menyebarkannya secara acak di dalam lingkaran di sekitarnya. Evolusi menggerakkan salinan; Seed sebaran memilih pola yang berbeda.",
+   "name": "Pengulangan tersebar",
+   "params": {
+    "copyDelay": {
+     "label": "Jeda per salinan"
+    },
+    "count": {
+     "label": "Jumlah"
+    },
+    "easing": {
+     "label": "Easing",
+     "options": [
+      "Linear",
+      "Ease in",
+      "Ease out",
+      "Ease in out"
+     ]
+    },
+    "evolution": {
+     "label": "Evolusi"
+    },
+    "fillAmount": {
+     "label": "Jumlah isi"
+    },
+    "fillColor": {
+     "label": "Warna isi"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "randomOpacity": {
+     "label": "Opasitas acak"
+    },
+    "randomOrder": {
+     "label": "Urutan acak"
+    },
+    "randomPosition": {
+     "label": "Posisi acak"
+    },
+    "randomRotation": {
+     "label": "Rotasi acak"
+    },
+    "randomScale": {
+     "label": "Skala acak"
+    },
+    "rangeEnd": {
+     "label": "Akhir rentang"
+    },
+    "rangeOffset": {
+     "label": "Offset rentang"
+    },
+    "rangeOpacity": {
+     "label": "Rentang opasitas"
+    },
+    "rangePosition": {
+     "label": "Rentang posisi"
+    },
+    "rangeRotation": {
+     "label": "Rentang rotasi"
+    },
+    "rangeScale": {
+     "label": "Rentang skala"
+    },
+    "rangeStart": {
+     "label": "Awal rentang"
+    },
+    "scatterSeed": {
+     "label": "Seed sebaran"
+    },
+    "seed": {
+     "label": "Seed"
     }
    }
   },
@@ -6659,7 +6761,7 @@
    }
   },
   "videofeedback": {
-   "description": "Menggambar lapisan di dalam dirinya berulang kali, seperti kamera yang diarahkan ke layarnya sendiri. Geser, ubah ukuran, atau putar lapisan untuk mengarahkan terowongan.",
+   "description": "Menggambar lapisan berulang kali di dalam dirinya sendiri, seperti kamera yang diarahkan ke layarnya sendiri. Saat Frame demi frame aktif, setiap salinan menampilkan lapisan satu frame sebelumnya, sehingga gerakan meninggalkan jejak yang berputar ke dalam terowongan.",
    "name": "Umpan balik video",
    "params": {
     "blend": {
@@ -6690,6 +6792,9 @@
     },
     "rotation": {
      "label": "Rotasi"
+    },
+    "trails": {
+     "label": "Frame demi frame"
     },
     "useLayerTransform": {
      "label": "Gunakan transformasi lapisan"

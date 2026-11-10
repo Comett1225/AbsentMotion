@@ -2,13 +2,13 @@
 <html lang="zh-CN" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>照片、视频和速度 | AbsentMotion</title><meta name="description" content="添加照片和视频，用标尺或曲线更改其速度，倒放片段，定格画面，并让大型视频保持流畅。"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="帮助"><a href="index.html">目录</a><a href="effects/index.html">特效</a></nav></header><div class="wrap"><main id="main"><h1>照片、视频和速度</h1><p class="lead">添加照片和视频，用标尺或曲线更改其速度，倒放片段，定格画面，并让大型视频保持流畅。</p><details class="toc"><summary>本页内容</summary><ul><li><a href="#add-photos-and-videos">添加照片和视频</a></li><li><a href="#speed">速度</a></li><li><a href="#big-videos-and-the-preview">大型视频和预览</a></li><li><a href="#take-the-sound-out-of-a-video">从视频中取出声音</a></li><li><a href="#remove-the-background">移除背景</a></li><li><a href="#smooth-a-clip">为片段添加流畅效果</a></li><li><a href="#smoother-motion-when-you-export">导出时获得更流畅的动作</a></li></ul></details><h2 id="add-photos-and-videos">添加照片和视频</h2>
 <p>打开<a href="add-menu.html">添加菜单</a>中的 <strong>媒体</strong> 选项卡，然后点按图片或视频。它会添加在播放头处，并调整大小以适应画布，同时尊重文件的旋转方向。视频的时长与文件相同。你还可以使用同一选项卡中的 <strong>相机</strong> 拍摄新内容。</p>
 <p>照片和视频是带有图片填充的矩形，因此所有形状工具都适用于它们：<strong>变换</strong>、<strong>边框和阴影</strong>、<strong>不透明度</strong>、特效等。</p>
-<p>默认情况下，应用会在项目内保留所添加媒体的副本（设置中的“在项目中保留导入媒体的副本”）。超过 32 MB 的文件在制作副本时会显示“正在复制……到项目中……”。如果可用空间不足，项目会改为继续使用原始文件。</p>
+<p>默认情况下，应用会在项目内保留所添加媒体的副本（设置中的“<strong>在项目中保留导入媒体的副本</strong>”）。超过 32 MB 的文件在制作副本时会显示“正在复制……到项目中……”。如果可用空间不足，项目会改为继续使用原始文件。</p>
 <p>若要使图片适应画布，请使用图层菜单：<strong>适应画布</strong> 会显示整张图片，<strong>填满画布</strong> 会覆盖画布并裁掉边缘，<strong>拉伸至画布</strong> 会将其变形以恰好适配。参见<a href="layer-menus.html">图层菜单和多选</a>。</p>
 <figure><img src="../assets/img/media-layer-menu.webp" width="720" height="1077" alt="视频的图层菜单：适应画布、填满画布和拉伸至画布 (1)，以及媒体信息 (2)。" loading="lazy"><figcaption>视频的图层菜单：适应画布、填满画布和拉伸至画布 (1)，以及媒体信息 (2)。</figcaption></figure>
 <h3 id="media-info-and-swapping-a-file">媒体信息和替换文件</h3>
 <p>图层菜单中的 <strong>媒体信息</strong> 会显示文件的名称、尺寸、帧率、时长、格式和大小。<strong>替换媒体文件</strong> 会打开照片选择器，并替换项目中所有使用该文件的图层。当图层的文件丢失时，可以用这种方法修复该图层。</p>
 <h2 id="speed">速度</h2>
-<p>选中视频或声音片段，然后点按 <strong>速度</strong>（工具网格的第一个小按钮）。将打开 <strong>时间重映射</strong> 面板。顶部有两个标签 <strong>正常</strong> 和 <strong>曲线</strong>。若片段已有速度曲线，它会默认打开 <strong>曲线</strong>。</p>
+<p>选中视频或声音片段，然后点按 <strong>速度</strong>（工具网格的第一个小按钮）。将打开 <strong>时间重映射</strong> 面板。顶部有 <strong>正常</strong>、<strong>曲线</strong> 标签，视频还有 <strong>重映射</strong> 标签。若片段已有速度曲线，它会打开 <strong>曲线</strong>；若时间重映射已开启，则会打开 <strong>重映射</strong>。</p>
 <h3 id="normal">正常</h3>
 <ul><li>顶部的按钮会将片段的开头或结尾设置到播放头处，<strong>而不会修剪视频</strong>：速度会随之改变，使视频的同一部分适应新的时长。只显示适合播放头所在位置的按钮：片段之前为 <strong>将开头延伸至播放头</strong>，片段内部为 <strong>修剪开头</strong> 和 <strong>修剪结尾</strong>，片段之后为 <strong>将结尾延伸至播放头</strong>。</li><li>标尺为整个片段设置一个速度，范围从 0.05x 到 100x。左右拖动即可；它会在 1x 处发生吸附。</li><li>标尺旁边的框显示速度，以及一个随速度变化的小图片：蜗牛、乌龟、行走的人、兔子、马，以及顶部的猎豹。点按该框即可输入精确数值。</li><li>标尺下方是 <strong>流畅处理</strong>、<strong>倒放</strong> 和 <strong>定格</strong> 标签。它们在下文中有介绍。</li></ul>
 <figure><img src="../assets/img/media-speed.webp" width="720" height="572" alt="时间重映射面板的正常标签页：标签页 (1)、设置起点或终点的按钮 (2)、显示速度的标尺 (3)，以及流畅处理、倒放和定格 (4)。" loading="lazy"><figcaption>时间重映射面板的正常标签页：标签页 (1)、设置起点或终点的按钮 (2)、显示速度的标尺 (3)，以及流畅处理、倒放和定格 (4)。</figcaption></figure>
@@ -21,6 +21,10 @@
 <p>再次点按所选方块即可编辑其曲线。编辑器会在片段的画面上叠加曲线显示，范围为 0.1x 到 10x，并在 1x 处显示虚线。</p>
 <ul><li><strong>移动一个点。</strong> 触摸一个点并拖动它。上下拖动会更改其速度，速度会吸附到 1x 并给出一个小刻度；左右拖动会更改其在片段中的位置。在空白图表上触摸或拖动，则会沿片段移动播放头。</li><li><strong>添加点</strong> 会在播放头处放置一个新点，最多共十个。选中某个点时，该按钮会变为 <strong>删除点</strong>；第一个和最后一个点无法删除。</li><li>左下角的框显示所选点的速度；若未选中任何点，则显示播放头处的速度。点按它即可输入数值。</li><li>顶部栏中间显示片段的时长。拖动时，它会显示旧时长和新时长，例如“3.7 s → 4.2 s”，松开后更改才会生效。</li><li><strong>重置</strong> 会恢复你打开时的曲线（对于<strong>自定义</strong>，即为平坦的 1x）。左上角的箭头会关闭编辑器。</li><li>这里的 <strong>流畅处理</strong> 是一个开关：它与 <strong>流畅处理</strong> 标签作用相同。</li></ul>
 <figure><img src="../assets/img/media-curve-edit.webp" width="720" height="572" alt="速度曲线编辑器：含名称、长度和重置的顶部栏 (1)、曲线 (2)、速度、添加点和流畅处理 (3)。" loading="lazy"><figcaption>速度曲线编辑器：含名称、长度和重置的顶部栏 (1)、曲线 (2)、速度、添加点和流畅处理 (3)。</figcaption></figure>
+<h3 id="remap">重映射</h3>
+<p><strong>重映射</strong> 用于选择图层各个位置显示视频的哪个时刻。点按 <strong>启用时间重映射</strong>：片段会继续像之前一样播放，开头和结尾各有一个关键帧。 <strong>片段时间</strong> 是播放头下方的视频时刻；拖动标尺或点按数字即可更改，左侧的关键帧按钮会在该处添加关键帧。上升的关键帧使片段向前播放，两个相同的值会使画面<strong>冻结</strong>，下降的关键帧则使片段<strong>倒放</strong>。关键帧之间的缓动与其他设置中的用法相同。</p>
+<ul><li><strong>反向</strong> 会反转关键帧，让片段倒放。</li><li><strong>关闭</strong> 会移除时间重映射，恢复正常或曲线速度。</li></ul>
+<p>启用时间重映射时，片段的声音会静音。</p>
 <h3 id="reverse">倒放</h3>
 <p><strong>倒放</strong> 会让视频片段倒着播放，包括画面和声音。应用会制作一个倒放的片段副本，因此较长的片段需要一些时间：一个框会显示 <strong>正在倒放</strong> 和剩余时间，<strong>取消</strong> 会将其停止。已倒放的片段，其标签会以橙色亮起；再次点按 <strong>倒放</strong> 即可恢复原始片段。同一按钮也位于视频工具网格的第二页。若片段已启用 <strong>流畅处理</strong> 或 <strong>增强</strong>，必须先将其关闭：应用会提示“倒放此片段前，请先移除流畅处理和增强”。</p>
 <figure><img src="../assets/img/reverse-progress.webp" width="720" height="1487" alt="倒放处理中：显示剩余时间和取消的方框 (1)。" loading="lazy"><figcaption>倒放处理中：显示剩余时间和取消的方框 (1)。</figcaption></figure>

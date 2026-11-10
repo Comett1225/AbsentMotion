@@ -5,6 +5,7 @@
     <string name="action_close">閉じる</string>
     <string name="settings_language">言語</string>
     <string name="onboarding_language_title">言語を選択</string>
+    <string name="onboarding_look_title">ライトとダーク、どちらにしますか？</string>
     <string name="onboarding_language_others">その他の言語</string>
     <string name="onboarding_language_later">言語は後から設定で変更できます。</string>
     <string name="onboarding_check_title">この端末の性能を確認</string>
@@ -290,7 +291,8 @@
     <string name="update_reconnecting">接続が切れました。再試行中…</string>
     <string name="update_external">このコピーはAbsentMotionのGitHubリリースから入手したものではないため、自己更新できません。インストールした場所からアップデートを入手してください。</string>
     <string name="update_metered">この接続はモバイルデータなどの従量制です。ダウンロードによりデータ通信量が消費される場合があります。</string>
-    <string name="theme_absentmotion">AbsentMotion</string>
+    <string name="theme_light">ライト</string>
+    <string name="theme_dark">ダーク</string>
     <string name="theme_daylight">デイライト</string>
     <string name="theme_custom">カスタム</string>
     <string name="theme_custom_named">カスタム（%1$s）</string>
@@ -496,10 +498,12 @@
     <string name="downloader_rights">使用する権利のあるものだけをダウンロードしてください。</string>
     <string name="downloader_engine_title">ダウンロードにはアドオンが必要です</string>
     <string name="downloader_engine_about">%1$sを1回だけダウンロードします。ダウンロードを実行する無料ツール、Pythonとyt-dlpが含まれます。設定から削除できます。</string>
+    <string name="downloader_engine_about_desktop">%1$sを一度だけダウンロードします。ダウンロードを行う無料プログラムyt-dlpが含まれます。設定から削除できます。</string>
     <string name="downloader_engine_get">アドオンを取得</string>
     <string name="downloader_engine_getting">アドオンを取得中… %1$d%%</string>
     <string name="downloader_engine_failed">アドオンをダウンロードできませんでした。接続を確認して、もう一度お試しください。</string>
     <string name="downloader_engine_missing">先にアドオンを取得してください。</string>
+    <string name="downloader_engine_blocked">ダウンロードプログラムが見つからないか、ウイルス対策ソフトによってブロックされました。プログラムを許可するか、設定から削除して再度ダウンロードしてください。</string>
     <string name="downloader_engine_broken">アドオンが起動しませんでした。設定から削除して、もう一度取得してください。</string>
     <string name="downloader_restart">アドオンの設定を完了するには、AbsentMotion を閉じてもう一度開いてください。</string>
     <string name="downloader_engine_unavailable">動画のダウンロードには64ビットプロセッサのスマートフォンが必要です。</string>
@@ -862,6 +866,7 @@
     <string name="add_tab_audio">音声</string>
     <string name="add_tab_object_asset">オブジェクト／アセット</string>
     <string name="add_tab_template">テンプレート</string>
+    <string name="add_tab_tools">ツール</string>
     <string name="add_quick_freehand_brush">フリーハンドブラシ</string>
     <string name="add_quick_pen_tool">ペンツール</string>
     <string name="add_quick_text">テキスト</string>
@@ -1333,6 +1338,12 @@
     <string name="speed_reverse_minutes_left">残り約%1$s分</string>
     <string name="speed_normal">通常</string>
     <string name="speed_curve">カーブ</string>
+    <string name="speed_remap">リマップ</string>
+    <string name="remap_about">各時点に表示するクリップの瞬間を選びます。キーフレームを追加して、速度を上げたり、静止させたり、逆再生したりできます。タイムリマップがオンの間、クリップの音声はミュートされます。</string>
+    <string name="remap_turn_on">タイムリマップをオンにする</string>
+    <string name="remap_clip_time">クリップの時間</string>
+    <string name="remap_reverse">逆再生</string>
+    <string name="remap_turn_off">オフにする</string>
     <string name="speed_curve_custom">カスタム</string>
     <string name="speed_curve_edit_hint">選択中のカーブをもう一度タップすると編集できます</string>
     <string name="speed_curve_graph">速度カーブ</string>
@@ -2248,6 +2259,7 @@
     <string name="tools_too_big">この端末には大きすぎます。サイズを小さくするか、短い部分にしてください。</string>
     <string name="tools_failed">完了できませんでした：%1$s</string>
     <string name="tools_save">保存</string>
+    <string name="tools_add_to_project">プロジェクトに追加</string>
     <string name="tools_part">残す部分</string>
     <string name="tools_start">開始</string>
     <string name="tools_end">終了</string>

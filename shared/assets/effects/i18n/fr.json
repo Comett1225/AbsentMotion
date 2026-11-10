@@ -3747,6 +3747,33 @@
     }
    }
   },
+  "pagecurl": {
+   "description": "Tourne le calque comme une page : un coin se soulève et s’enroule, révélant le verso. Animez la progression pour tourner la page.",
+   "name": "Page cornée",
+   "params": {
+    "angle": {
+     "label": "Angle"
+    },
+    "backAlpha": {
+     "label": "Opacité du verso"
+    },
+    "backColor": {
+     "label": "Couleur du verso"
+    },
+    "progress": {
+     "label": "Progression"
+    },
+    "radius": {
+     "label": "Rayon"
+    },
+    "shadow": {
+     "label": "Ombre"
+    },
+    "shine": {
+     "label": "Brillance"
+    }
+   }
+  },
   "palettemap": {
    "description": "Associe chaque pixel à la couleur la plus proche d’une palette : choisissez jusqu’à huit couleurs ou utilisez une palette de 512 couleurs maximum issue d’un préréglage ou d’un fichier importé. Les motifs de tramage mélangent les couleurs voisines pour créer davantage de nuances. Alpha mélange les couleurs obtenues avec le calque d’origine.",
    "name": "Correspondance de palette",
@@ -5189,6 +5216,81 @@
     },
     "z": {
      "label": "Position Z"
+    }
+   }
+  },
+  "scatterrepeat": {
+   "description": "Crée des copies du calque et les disperse aléatoirement dans un cercle autour de celui-ci. Évolution déplace les copies ; Graine de dispersion choisit un autre motif.",
+   "name": "Répétition dispersée",
+   "params": {
+    "copyDelay": {
+     "label": "Délai par copie"
+    },
+    "count": {
+     "label": "Nombre"
+    },
+    "easing": {
+     "label": "Lissage",
+     "options": [
+      "Linéaire",
+      "Accélération",
+      "Décélération",
+      "Accélération et décélération"
+     ]
+    },
+    "evolution": {
+     "label": "Évolution"
+    },
+    "fillAmount": {
+     "label": "Quantité de remplissage"
+    },
+    "fillColor": {
+     "label": "Couleur de remplissage"
+    },
+    "radius": {
+     "label": "Rayon"
+    },
+    "randomOpacity": {
+     "label": "Opacité aléatoire"
+    },
+    "randomOrder": {
+     "label": "Ordre aléatoire"
+    },
+    "randomPosition": {
+     "label": "Position aléatoire"
+    },
+    "randomRotation": {
+     "label": "Rotation aléatoire"
+    },
+    "randomScale": {
+     "label": "Échelle aléatoire"
+    },
+    "rangeEnd": {
+     "label": "Fin de plage"
+    },
+    "rangeOffset": {
+     "label": "Décalage de plage"
+    },
+    "rangeOpacity": {
+     "label": "Plage d’opacité"
+    },
+    "rangePosition": {
+     "label": "Plage de position"
+    },
+    "rangeRotation": {
+     "label": "Plage de rotation"
+    },
+    "rangeScale": {
+     "label": "Plage d’échelle"
+    },
+    "rangeStart": {
+     "label": "Début de plage"
+    },
+    "scatterSeed": {
+     "label": "Graine de dispersion"
+    },
+    "seed": {
+     "label": "Graine"
     }
    }
   },
@@ -6659,7 +6761,7 @@
    }
   },
   "videofeedback": {
-   "description": "Dessine le calque à l'intérieur de lui-même encore et encore, comme une caméra pointée sur son propre écran. Déplacez, redimensionnez ou faites pivoter le calque pour orienter le tunnel.",
+   "description": "Dessine le calque en boucle à l’intérieur de lui-même, comme une caméra pointée vers son propre écran. Lorsque Image par image est activé, chaque copie affiche le calque une image plus tôt : le mouvement laisse ainsi des traînées qui tourbillonnent dans le tunnel.",
    "name": "Rétroaction vidéo",
    "params": {
     "blend": {
@@ -6690,6 +6792,9 @@
     },
     "rotation": {
      "label": "Rotation"
+    },
+    "trails": {
+     "label": "Image par image"
     },
     "useLayerTransform": {
      "label": "Utiliser la transformation du calque"

@@ -5,6 +5,7 @@
     <string name="action_close">بستن</string>
     <string name="settings_language">زبان</string>
     <string name="onboarding_language_title">زبان خود را انتخاب کنید</string>
+    <string name="onboarding_look_title">روشن یا تیره؟</string>
     <string name="onboarding_language_others">زبان‌های دیگر</string>
     <string name="onboarding_language_later">بعداً می‌توانید این را در تنظیمات تغییر دهید.</string>
     <string name="onboarding_check_title">بررسی قابلیت‌های این دستگاه</string>
@@ -290,7 +291,8 @@
     <string name="update_reconnecting">اتصال قطع شد. در حال تلاش دوباره…</string>
     <string name="update_external">این نسخه از انتشارهای AbsentMotion در GitHub نیامده، برای همین نمی‌تواند خودش را به‌روز کند. به‌روزرسانی را از همان جایی بگیرید که آن را نصب کرده‌اید.</string>
     <string name="update_metered">این اتصال حجمی است، مثلاً اینترنت همراه. دانلود ممکن است از بستهٔ اینترنت شما کم کند.</string>
-    <string name="theme_absentmotion">AbsentMotion</string>
+    <string name="theme_light">روشن</string>
+    <string name="theme_dark">تیره</string>
     <string name="theme_daylight">روشنایی روز</string>
     <string name="theme_custom">سفارشی</string>
     <string name="theme_custom_named">سفارشی (%1$s)</string>
@@ -497,10 +499,12 @@
     <string name="downloader_rights">فقط چیزی را دانلود کنید که حق استفاده از آن را دارید.</string>
     <string name="downloader_engine_title">دانلودها به افزونه نیاز دارند</string>
     <string name="downloader_engine_about">یک‌بار دانلود %1$s. این افزونه Python و yt-dlp را می‌آورد؛ ابزارهای رایگانی که کار دانلود را انجام می‌دهند. می‌توانید آن را در تنظیمات حذف کنید.</string>
+    <string name="downloader_engine_about_desktop">دانلود یک‌بارهٔ %1$s. این دانلود شامل yt-dlp، برنامهٔ رایگان دانلود است. می‌توانید آن را در تنظیمات حذف کنید.</string>
     <string name="downloader_engine_get">دریافت افزونه</string>
     <string name="downloader_engine_getting">در حال دریافت افزونه… %1$d%%</string>
     <string name="downloader_engine_failed">افزونه دانلود نشد. اتصال را بررسی کنید و دوباره تلاش کنید.</string>
     <string name="downloader_engine_missing">اول افزونه را دریافت کنید.</string>
+    <string name="downloader_engine_blocked">برنامهٔ دانلود وجود ندارد یا آنتی‌ویروس آن را مسدود کرده است. به آن اجازه دهید یا آن را در تنظیمات حذف و دوباره دانلود کنید.</string>
     <string name="downloader_engine_broken">افزونه شروع نشد. آن را در تنظیمات حذف کنید و دوباره دریافت کنید.</string>
     <string name="downloader_restart">AbsentMotion را ببندید و دوباره باز کنید تا راه‌اندازی افزونه تمام شود.</string>
     <string name="downloader_engine_unavailable">دانلود ویدیو به گوشی با پردازنده 64 بیتی نیاز دارد.</string>
@@ -872,6 +876,7 @@
     <string name="add_tab_audio">صدا</string>
     <string name="add_tab_object_asset">شیء / دارایی</string>
     <string name="add_tab_template">قالب</string>
+    <string name="add_tab_tools">ابزارها</string>
     <string name="add_quick_freehand_brush">براش آزاد</string>
     <string name="add_quick_pen_tool">ابزار قلم</string>
     <string name="add_quick_text">متن</string>
@@ -1353,6 +1358,12 @@
     <string name="speed_reverse_minutes_left">حدود %1$s دقیقه باقی مانده</string>
     <string name="speed_normal">عادی</string>
     <string name="speed_curve">منحنی</string>
+    <string name="speed_remap">بازنگاشت زمان</string>
+    <string name="remap_about">انتخاب کنید در هر نقطه کدام لحظه از کلیپ نمایش داده شود. برای افزایش سرعت، ثابت کردن یا پخش معکوس آن کی‌فریم اضافه کنید. تا وقتی بازنگاشت زمان روشن است، صدای کلیپ قطع می‌شود.</string>
+    <string name="remap_turn_on">روشن کردن بازنگاشت زمان</string>
+    <string name="remap_clip_time">زمان کلیپ</string>
+    <string name="remap_reverse">معکوس</string>
+    <string name="remap_turn_off">خاموش کردن</string>
     <string name="speed_curve_custom">سفارشی</string>
     <string name="speed_curve_edit_hint">برای ویرایش، دوباره روی منحنی انتخاب‌شده ضربه بزنید</string>
     <string name="speed_curve_graph">منحنی سرعت</string>
@@ -2277,6 +2288,7 @@
     <string name="tools_too_big">این برای این گوشی زیادی بزرگ است. اندازهٔ کوچک‌تر یا بخش کوتاه‌تری را امتحان کنید.</string>
     <string name="tools_failed">تمام نشد: %1$s</string>
     <string name="tools_save">ذخیره</string>
+    <string name="tools_add_to_project">افزودن به پروژه</string>
     <string name="tools_part">بخشی که نگه داشته می‌شود</string>
     <string name="tools_start">شروع</string>
     <string name="tools_end">پایان</string>

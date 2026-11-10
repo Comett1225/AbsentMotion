@@ -3747,6 +3747,33 @@
     }
    }
   },
+  "pagecurl": {
+   "description": "Katmanı bir sayfa gibi çevirir: bir köşe kalkıp kıvrılarak sayfanın arkasını gösterir. Sayfayı çevirmek için İlerleme değerini canlandırın.",
+   "name": "Sayfa kıvırma",
+   "params": {
+    "angle": {
+     "label": "Açı"
+    },
+    "backAlpha": {
+     "label": "Arka yüz opaklığı"
+    },
+    "backColor": {
+     "label": "Arka yüz rengi"
+    },
+    "progress": {
+     "label": "İlerleme"
+    },
+    "radius": {
+     "label": "Yarıçap"
+    },
+    "shadow": {
+     "label": "Gölge"
+    },
+    "shine": {
+     "label": "Parlaklık"
+    }
+   }
+  },
   "palettemap": {
    "description": "Her pikseli bir paletteki en yakın renge eşler: seçtiğiniz en fazla sekiz renk ya da bir hazır ayardan veya içe aktardığınız bir dosyadan en fazla 512 renklik bir palet. Titreşim desenleri komşu palet renklerini karıştırarak daha fazla ton gösterir. Alfa, eşlenen renkleri orijinal katmanla karıştırır.",
    "name": "Palet eşleme",
@@ -5189,6 +5216,81 @@
     },
     "z": {
      "label": "Z konumu"
+    }
+   }
+  },
+  "scatterrepeat": {
+   "description": "Katmanın kopyalarını oluşturur ve etrafındaki bir dairenin içine rastgele dağıtır. Değişim kopyaları hareket ettirir; Dağılım tohumu farklı bir düzen seçer.",
+   "name": "Dağınık tekrar",
+   "params": {
+    "copyDelay": {
+     "label": "Kopya başına gecikme"
+    },
+    "count": {
+     "label": "Sayı"
+    },
+    "easing": {
+     "label": "Yumuşatma",
+     "options": [
+      "Doğrusal",
+      "Girişte yumuşatma",
+      "Çıkışta yumuşatma",
+      "Giriş ve çıkışta yumuşatma"
+     ]
+    },
+    "evolution": {
+     "label": "Değişim"
+    },
+    "fillAmount": {
+     "label": "Dolgu miktarı"
+    },
+    "fillColor": {
+     "label": "Dolgu rengi"
+    },
+    "radius": {
+     "label": "Yarıçap"
+    },
+    "randomOpacity": {
+     "label": "Rastgele opaklık"
+    },
+    "randomOrder": {
+     "label": "Rastgele sıra"
+    },
+    "randomPosition": {
+     "label": "Rastgele konum"
+    },
+    "randomRotation": {
+     "label": "Rastgele dönüş"
+    },
+    "randomScale": {
+     "label": "Rastgele ölçek"
+    },
+    "rangeEnd": {
+     "label": "Aralık sonu"
+    },
+    "rangeOffset": {
+     "label": "Aralık kayması"
+    },
+    "rangeOpacity": {
+     "label": "Opaklık aralığı"
+    },
+    "rangePosition": {
+     "label": "Konum aralığı"
+    },
+    "rangeRotation": {
+     "label": "Dönme aralığı"
+    },
+    "rangeScale": {
+     "label": "Ölçek aralığı"
+    },
+    "rangeStart": {
+     "label": "Aralık başlangıcı"
+    },
+    "scatterSeed": {
+     "label": "Dağılım tohumu"
+    },
+    "seed": {
+     "label": "Tohum"
     }
    }
   },
@@ -6659,7 +6761,7 @@
    }
   },
   "videofeedback": {
-   "description": "Kendi ekranına yöneltilmiş bir kamera gibi katmanı kendi içinde tekrar tekrar çizer. Tüneli yönlendirmek için katmanı taşıyın, ölçekleyin veya döndürün.",
+   "description": "Katmanı, kendi ekranına doğrultulmuş bir kamera gibi tekrar tekrar kendi içine çizer. Kare kare açıkken her kopya katmanın bir önceki karesini gösterir; böylece hareket, tünelde dönen izler bırakır.",
    "name": "Video Geri Besleme",
    "params": {
     "blend": {
@@ -6690,6 +6792,9 @@
     },
     "rotation": {
      "label": "Döndürme"
+    },
+    "trails": {
+     "label": "Kare kare"
     },
     "useLayerTransform": {
      "label": "Katman dönüşümünü kullan"

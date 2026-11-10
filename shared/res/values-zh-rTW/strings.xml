@@ -5,6 +5,7 @@
     <string name="action_close">關閉</string>
     <string name="settings_language">語言</string>
     <string name="onboarding_language_title">選擇語言</string>
+    <string name="onboarding_look_title">淺色還是深色？</string>
     <string name="onboarding_language_others">其他語言</string>
     <string name="onboarding_language_later">之後可在設定中變更。</string>
     <string name="onboarding_check_title">檢查裝置效能</string>
@@ -290,7 +291,8 @@
     <string name="update_reconnecting">連線中斷，正在重試…</string>
     <string name="update_external">此版本並非來自AbsentMotion的GitHub發布版本，因此無法自行更新。請從原安裝來源取得更新。</string>
     <string name="update_metered">此連線按流量計費，例如行動數據。下載可能會消耗你的數據流量。</string>
-    <string name="theme_absentmotion">AbsentMotion</string>
+    <string name="theme_light">淺色</string>
+    <string name="theme_dark">深色</string>
     <string name="theme_daylight">日光</string>
     <string name="theme_custom">自訂</string>
     <string name="theme_custom_named">自訂（%1$s）</string>
@@ -496,10 +498,12 @@
     <string name="downloader_rights">請僅下載您有權使用的內容。</string>
     <string name="downloader_engine_title">下載需要附加元件</string>
     <string name="downloader_engine_about">需一次性下載 %1$s。此元件包含用於下載的免費工具Python和yt-dlp，可在設定中移除。</string>
+    <string name="downloader_engine_about_desktop">需下載一次：%1$s。下載內容包含免費的下載程式yt-dlp。您可以在設定中將其移除。</string>
     <string name="downloader_engine_get">取得附加元件</string>
     <string name="downloader_engine_getting">正在取得附加元件… %1$d%%</string>
     <string name="downloader_engine_failed">無法下載附加元件。請檢查網路連線後再試。</string>
     <string name="downloader_engine_missing">請先取得附加元件。</string>
+    <string name="downloader_engine_blocked">找不到下載程式，或程式已遭防毒軟體封鎖。請允許程式執行，或在設定中移除後重新下載。</string>
     <string name="downloader_engine_broken">附加元件無法啟動。請在設定中移除後重新取得。</string>
     <string name="downloader_restart">請關閉並重新開啟AbsentMotion，以完成附加元件設定。</string>
     <string name="downloader_engine_unavailable">下載影片需要配備64位元處理器的手機。</string>
@@ -862,6 +866,7 @@
     <string name="add_tab_audio">音訊</string>
     <string name="add_tab_object_asset">物件／素材</string>
     <string name="add_tab_template">範本</string>
+    <string name="add_tab_tools">工具</string>
     <string name="add_quick_freehand_brush">手繪筆刷</string>
     <string name="add_quick_pen_tool">鋼筆工具</string>
     <string name="add_quick_text">文字</string>
@@ -1333,6 +1338,12 @@
     <string name="speed_reverse_minutes_left">剩餘約 %1$s 分鐘</string>
     <string name="speed_normal">正常</string>
     <string name="speed_curve">曲線</string>
+    <string name="speed_remap">重新映射</string>
+    <string name="remap_about">選擇片段在每個位置顯示的時刻。加入關鍵影格可加速、定格或倒放片段。啟用時間重新映射時，片段的聲音會靜音。</string>
+    <string name="remap_turn_on">啟用時間重新映射</string>
+    <string name="remap_clip_time">片段時間</string>
+    <string name="remap_reverse">反轉</string>
+    <string name="remap_turn_off">關閉</string>
     <string name="speed_curve_custom">自訂</string>
     <string name="speed_curve_edit_hint">再次點選所選曲線以進行編輯</string>
     <string name="speed_curve_graph">速度曲線</string>
@@ -2248,6 +2259,7 @@
     <string name="tools_too_big">此內容對這支手機來說太大。請嘗試較小的尺寸或較短的片段。</string>
     <string name="tools_failed">無法完成：%1$s</string>
     <string name="tools_save">儲存</string>
+    <string name="tools_add_to_project">加入專案</string>
     <string name="tools_part">保留的片段</string>
     <string name="tools_start">開始</string>
     <string name="tools_end">結束</string>

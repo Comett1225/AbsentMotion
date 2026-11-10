@@ -3747,6 +3747,33 @@
     }
    }
   },
+  "pagecurl": {
+   "description": "Lật lớp như một trang giấy: một góc nhấc lên và cuộn lại, để lộ mặt sau. Tạo chuyển động cho Tiến trình để lật trang.",
+   "name": "Cuộn trang",
+   "params": {
+    "angle": {
+     "label": "Góc"
+    },
+    "backAlpha": {
+     "label": "Độ mờ mặt sau"
+    },
+    "backColor": {
+     "label": "Màu mặt sau"
+    },
+    "progress": {
+     "label": "Tiến trình"
+    },
+    "radius": {
+     "label": "Bán kính"
+    },
+    "shadow": {
+     "label": "Bóng"
+    },
+    "shine": {
+     "label": "Độ bóng"
+    }
+   }
+  },
   "palettemap": {
    "description": "Đổi mỗi điểm ảnh thành màu gần nhất trong một bảng màu: tối đa tám màu do bạn chọn, hoặc bảng màu tối đa 512 màu từ một thiết lập sẵn hay một tệp bạn nhập. Các kiểu dither trộn những màu cạnh nhau trong bảng màu để hiện nhiều sắc độ hơn. Alpha hòa trộn các màu đã ánh xạ với lớp gốc.",
    "name": "Ánh xạ bảng màu",
@@ -5189,6 +5216,81 @@
     },
     "z": {
      "label": "Vị trí Z"
+    }
+   }
+  },
+  "scatterrepeat": {
+   "description": "Tạo các bản sao của lớp và phân tán ngẫu nhiên trong một vòng tròn quanh lớp. Biến thiên di chuyển các bản sao; Hạt giống phân tán chọn một cách sắp xếp khác.",
+   "name": "Lặp phân tán",
+   "params": {
+    "copyDelay": {
+     "label": "Độ trễ mỗi bản sao"
+    },
+    "count": {
+     "label": "Số lượng"
+    },
+    "easing": {
+     "label": "Làm mượt",
+     "options": [
+      "Tuyến tính",
+      "Vào chậm",
+      "Ra chậm",
+      "Vào và ra chậm"
+     ]
+    },
+    "evolution": {
+     "label": "Biến thiên"
+    },
+    "fillAmount": {
+     "label": "Mức tô"
+    },
+    "fillColor": {
+     "label": "Màu tô"
+    },
+    "radius": {
+     "label": "Bán kính"
+    },
+    "randomOpacity": {
+     "label": "Độ mờ ngẫu nhiên"
+    },
+    "randomOrder": {
+     "label": "Thứ tự ngẫu nhiên"
+    },
+    "randomPosition": {
+     "label": "Vị trí ngẫu nhiên"
+    },
+    "randomRotation": {
+     "label": "Xoay ngẫu nhiên"
+    },
+    "randomScale": {
+     "label": "Tỷ lệ ngẫu nhiên"
+    },
+    "rangeEnd": {
+     "label": "Cuối phạm vi"
+    },
+    "rangeOffset": {
+     "label": "Độ lệch phạm vi"
+    },
+    "rangeOpacity": {
+     "label": "Phạm vi độ mờ"
+    },
+    "rangePosition": {
+     "label": "Phạm vi vị trí"
+    },
+    "rangeRotation": {
+     "label": "Phạm vi xoay"
+    },
+    "rangeScale": {
+     "label": "Phạm vi tỷ lệ"
+    },
+    "rangeStart": {
+     "label": "Đầu phạm vi"
+    },
+    "scatterSeed": {
+     "label": "Hạt giống phân tán"
+    },
+    "seed": {
+     "label": "Hạt giống"
     }
    }
   },
@@ -6659,7 +6761,7 @@
    }
   },
   "videofeedback": {
-   "description": "Vẽ lớp lặp lại bên trong chính nó, như máy quay hướng vào màn hình của mình. Di chuyển, đổi kích thước hoặc xoay lớp để điều khiển đường hầm.",
+   "description": "Vẽ lớp lặp lại bên trong chính nó, như máy ảnh hướng vào màn hình của mình. Khi bật Từng khung hình, mỗi bản sao hiển thị lớp lùi một khung hình, tạo vệt chuyển động xoáy vào đường hầm.",
    "name": "Phản hồi video",
    "params": {
     "blend": {
@@ -6690,6 +6792,9 @@
     },
     "rotation": {
      "label": "Xoay"
+    },
+    "trails": {
+     "label": "Từng khung hình"
     },
     "useLayerTransform": {
      "label": "Dùng biến đổi lớp"

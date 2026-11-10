@@ -3747,6 +3747,33 @@
     }
    }
   },
+  "pagecurl": {
+   "description": "Membelek lapisan seperti halaman: sudutnya terangkat dan melengkung, lalu menunjukkan bahagian belakang halaman. Animasikan Kemajuan untuk membelek halaman.",
+   "name": "Halaman melengkung",
+   "params": {
+    "angle": {
+     "label": "Sudut"
+    },
+    "backAlpha": {
+     "label": "Kelegapan belakang"
+    },
+    "backColor": {
+     "label": "Warna belakang"
+    },
+    "progress": {
+     "label": "Kemajuan"
+    },
+    "radius": {
+     "label": "Jejari"
+    },
+    "shadow": {
+     "label": "Bayang"
+    },
+    "shine": {
+     "label": "Kilauan"
+    }
+   }
+  },
   "palettemap": {
    "description": "Memetakan setiap piksel kepada warna terdekat dalam palet: sehingga lapan warna yang anda pilih, atau palet sehingga 512 warna daripada pratetap atau fail yang anda import. Corak dither mencampurkan warna palet yang berdekatan untuk menunjukkan lebih banyak ton. Alfa mencampurkan warna yang dipetakan dengan lapisan asal.",
    "name": "Peta Palet",
@@ -5189,6 +5216,81 @@
     },
     "z": {
      "label": "Kedudukan Z"
+    }
+   }
+  },
+  "scatterrepeat": {
+   "description": "Membuat salinan lapisan dan menyelerakkannya secara rawak dalam bulatan di sekelilingnya. Evolusi menggerakkan salinan; Benih serakan memilih corak lain.",
+   "name": "Ulangan berselerak",
+   "params": {
+    "copyDelay": {
+     "label": "Lengahan setiap salinan"
+    },
+    "count": {
+     "label": "Bilangan"
+    },
+    "easing": {
+     "label": "Pelembutan",
+     "options": [
+      "Linear",
+      "Perlahan masuk",
+      "Perlahan keluar",
+      "Perlahan masuk dan keluar"
+     ]
+    },
+    "evolution": {
+     "label": "Evolusi"
+    },
+    "fillAmount": {
+     "label": "Jumlah isi"
+    },
+    "fillColor": {
+     "label": "Warna isi"
+    },
+    "radius": {
+     "label": "Jejari"
+    },
+    "randomOpacity": {
+     "label": "Kelegapan rawak"
+    },
+    "randomOrder": {
+     "label": "Susunan rawak"
+    },
+    "randomPosition": {
+     "label": "Kedudukan rawak"
+    },
+    "randomRotation": {
+     "label": "Putaran rawak"
+    },
+    "randomScale": {
+     "label": "Skala rawak"
+    },
+    "rangeEnd": {
+     "label": "Akhir julat"
+    },
+    "rangeOffset": {
+     "label": "Ofset julat"
+    },
+    "rangeOpacity": {
+     "label": "Kelegapan julat"
+    },
+    "rangePosition": {
+     "label": "Kedudukan julat"
+    },
+    "rangeRotation": {
+     "label": "Putaran julat"
+    },
+    "rangeScale": {
+     "label": "Skala julat"
+    },
+    "rangeStart": {
+     "label": "Mula julat"
+    },
+    "scatterSeed": {
+     "label": "Benih serakan"
+    },
+    "seed": {
+     "label": "Benih"
     }
    }
   },
@@ -6659,7 +6761,7 @@
    }
   },
   "videofeedback": {
-   "description": "Melukis lapisan berulang kali di dalam dirinya, seperti kamera yang menghadap skrinnya sendiri. Gerakkan, skalakan atau putarkan lapisan untuk mengarah terowong.",
+   "description": "Melukis lapisan di dalam dirinya berulang kali, seperti kamera yang menghala ke skrinnya sendiri. Apabila Bingkai demi bingkai dihidupkan, setiap salinan memaparkan lapisan satu bingkai sebelumnya, jadi gerakan meninggalkan jejak yang berpusing ke dalam terowong.",
    "name": "Suap balik video",
    "params": {
     "blend": {
@@ -6690,6 +6792,9 @@
     },
     "rotation": {
      "label": "Putaran"
+    },
+    "trails": {
+     "label": "Bingkai demi bingkai"
     },
     "useLayerTransform": {
      "label": "Guna transformasi lapisan"

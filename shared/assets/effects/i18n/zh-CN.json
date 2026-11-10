@@ -3747,6 +3747,33 @@
     }
    }
   },
+  "pagecurl": {
+   "description": "像翻书一样翻转图层：一角抬起并卷起，露出页面背面。为“进度”添加动画即可翻页。",
+   "name": "卷页",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "backAlpha": {
+     "label": "背面不透明度"
+    },
+    "backColor": {
+     "label": "背面颜色"
+    },
+    "progress": {
+     "label": "进度"
+    },
+    "radius": {
+     "label": "半径"
+    },
+    "shadow": {
+     "label": "阴影"
+    },
+    "shine": {
+     "label": "光泽"
+    }
+   }
+  },
   "palettemap": {
    "description": "将每个像素映射为调色板中最接近的颜色：可自行选择最多8种颜色，或从预设或导入文件中使用最多512色的调色板。抖色图案混合相邻颜色以呈现更多色调。透明度用于混合映射颜色和原图层。",
    "name": "调色板映射",
@@ -5189,6 +5216,81 @@
     },
     "z": {
      "label": "Z轴位置"
+    }
+   }
+  },
+  "scatterrepeat": {
+   "description": "复制图层并将副本随机散布在其周围的圆形区域内。“演变”可移动副本；“散布种子”可更换排列方式。",
+   "name": "散布重复",
+   "params": {
+    "copyDelay": {
+     "label": "每个副本的延迟"
+    },
+    "count": {
+     "label": "数量"
+    },
+    "easing": {
+     "label": "缓动",
+     "options": [
+      "线性",
+      "缓入",
+      "缓出",
+      "缓入缓出"
+     ]
+    },
+    "evolution": {
+     "label": "演变"
+    },
+    "fillAmount": {
+     "label": "填充量"
+    },
+    "fillColor": {
+     "label": "填充颜色"
+    },
+    "radius": {
+     "label": "半径"
+    },
+    "randomOpacity": {
+     "label": "随机不透明度"
+    },
+    "randomOrder": {
+     "label": "随机顺序"
+    },
+    "randomPosition": {
+     "label": "随机位置"
+    },
+    "randomRotation": {
+     "label": "随机旋转"
+    },
+    "randomScale": {
+     "label": "随机缩放"
+    },
+    "rangeEnd": {
+     "label": "范围终点"
+    },
+    "rangeOffset": {
+     "label": "范围偏移"
+    },
+    "rangeOpacity": {
+     "label": "不透明度范围"
+    },
+    "rangePosition": {
+     "label": "位置范围"
+    },
+    "rangeRotation": {
+     "label": "旋转范围"
+    },
+    "rangeScale": {
+     "label": "缩放范围"
+    },
+    "rangeStart": {
+     "label": "范围起点"
+    },
+    "scatterSeed": {
+     "label": "散布种子"
+    },
+    "seed": {
+     "label": "种子"
     }
    }
   },
@@ -6659,7 +6761,7 @@
    }
   },
   "videofeedback": {
-   "description": "在图层内部反复绘制自身，如同相机对准自己的屏幕。移动、缩放或旋转图层可改变隧道方向。",
+   "description": "在图层内部反复绘制自身，如同相机对准自己的屏幕。启用“逐帧”后，每个副本都会显示前一帧的图层，让运动留下旋入隧道的轨迹。",
    "name": "视频反馈",
    "params": {
     "blend": {
@@ -6690,6 +6792,9 @@
     },
     "rotation": {
      "label": "旋转"
+    },
+    "trails": {
+     "label": "逐帧"
     },
     "useLayerTransform": {
      "label": "使用图层变换"

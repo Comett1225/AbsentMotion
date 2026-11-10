@@ -5,6 +5,7 @@
     <string name="action_close">Schließen</string>
     <string name="settings_language">Sprache</string>
     <string name="onboarding_language_title">Wähle deine Sprache</string>
+    <string name="onboarding_look_title">Hell oder dunkel?</string>
     <string name="onboarding_language_others">Weitere Sprachen</string>
     <string name="onboarding_language_later">Du kannst dies später in den Einstellungen ändern.</string>
     <string name="onboarding_check_title">Prüfe, was dieses Gerät leisten kann</string>
@@ -290,7 +291,8 @@
     <string name="update_reconnecting">Verbindung verloren. Erneuter Versuch…</string>
     <string name="update_external">Diese Kopie stammt nicht aus einer AbsentMotion-Veröffentlichung auf GitHub und kann sich daher nicht selbst aktualisieren. Beziehe das Update dort, wo du die App installiert hast.</string>
     <string name="update_metered">Diese Verbindung ist getaktet, zum Beispiel bei mobilen Daten. Der Download kann dein Datenvolumen verbrauchen.</string>
-    <string name="theme_absentmotion">AbsentMotion</string>
+    <string name="theme_light">Hell</string>
+    <string name="theme_dark">Dunkel</string>
     <string name="theme_daylight">Tageslicht</string>
     <string name="theme_custom">Benutzerdefiniert</string>
     <string name="theme_custom_named">Benutzerdefiniert (%1$s)</string>
@@ -497,10 +499,12 @@
     <string name="downloader_rights">Lade nur Inhalte herunter, zu deren Nutzung du berechtigt bist.</string>
     <string name="downloader_engine_title">Downloads benötigen eine Erweiterung</string>
     <string name="downloader_engine_about">Ein einmaliger Download von %1$s. Er enthält Python und yt-dlp, die kostenlosen Werkzeuge für Downloads. Du kannst die Erweiterung in den Einstellungen entfernen.</string>
+    <string name="downloader_engine_about_desktop">Ein einmaliger Download von %1$s. Er enthält yt-dlp, das kostenlose Programm zum Herunterladen. Du kannst es in den Einstellungen entfernen.</string>
     <string name="downloader_engine_get">Erweiterung herunterladen</string>
     <string name="downloader_engine_getting">Erweiterung wird heruntergeladen… %1$d%%</string>
     <string name="downloader_engine_failed">Die Erweiterung konnte nicht heruntergeladen werden. Prüfe die Verbindung und versuche es erneut.</string>
     <string name="downloader_engine_missing">Lade zuerst die Erweiterung herunter.</string>
+    <string name="downloader_engine_blocked">Das Downloadprogramm fehlt oder wurde von deinem Antivirusprogramm blockiert. Gib es frei oder entferne es in den Einstellungen und lade es erneut herunter.</string>
     <string name="downloader_engine_broken">Die Erweiterung wurde nicht gestartet. Entferne sie in den Einstellungen und lade sie erneut herunter.</string>
     <string name="downloader_restart">Schließe AbsentMotion und öffne es erneut, um die Einrichtung der Erweiterung abzuschließen.</string>
     <string name="downloader_engine_unavailable">Für Video-Downloads benötigst du ein Handy mit 64-Bit-Prozessor.</string>
@@ -872,6 +876,7 @@
     <string name="add_tab_audio">Audio</string>
     <string name="add_tab_object_asset">Objekt / Asset</string>
     <string name="add_tab_template">Vorlage</string>
+    <string name="add_tab_tools">Werkzeuge</string>
     <string name="add_quick_freehand_brush">Freihandpinsel</string>
     <string name="add_quick_pen_tool">Zeichenstift</string>
     <string name="add_quick_text">Text</string>
@@ -1353,6 +1358,12 @@
     <string name="speed_reverse_minutes_left">Noch etwa %1$s min</string>
     <string name="speed_normal">Normal</string>
     <string name="speed_curve">Kurve</string>
+    <string name="speed_remap">Zeit neu zuordnen</string>
+    <string name="remap_about">Wähle aus, welcher Moment des Clips an jeder Stelle angezeigt wird. Füge Keyframes hinzu, um ihn zu beschleunigen, einzufrieren oder rückwärts abzuspielen. Der Ton des Clips ist stummgeschaltet, solange die Zeitneuzuordnung aktiv ist.</string>
+    <string name="remap_turn_on">Zeitneuzuordnung aktivieren</string>
+    <string name="remap_clip_time">Clipzeit</string>
+    <string name="remap_reverse">Umkehren</string>
+    <string name="remap_turn_off">Deaktivieren</string>
     <string name="speed_curve_custom">Benutzerdefiniert</string>
     <string name="speed_curve_edit_hint">Tippe erneut auf die gewählte Kurve, um sie zu bearbeiten</string>
     <string name="speed_curve_graph">Geschwindigkeitskurve</string>
@@ -2277,6 +2288,7 @@
     <string name="tools_too_big">Das ist zu groß für dieses Gerät. Versuche eine kleinere Größe oder einen kürzeren Abschnitt.</string>
     <string name="tools_failed">Konnte nicht abgeschlossen werden: %1$s</string>
     <string name="tools_save">Speichern</string>
+    <string name="tools_add_to_project">Zum Projekt hinzufügen</string>
     <string name="tools_part">Beizubehaltender Abschnitt</string>
     <string name="tools_start">Anfang</string>
     <string name="tools_end">Ende</string>

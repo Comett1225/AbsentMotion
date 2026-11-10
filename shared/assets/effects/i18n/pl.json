@@ -3747,6 +3747,33 @@
     }
    }
   },
+  "pagecurl": {
+   "description": "Obraca warstwę jak stronę: narożnik unosi się i zawija, odsłaniając jej tył. Animuj postęp, aby przewrócić stronę.",
+   "name": "Zawijanie strony",
+   "params": {
+    "angle": {
+     "label": "Kąt"
+    },
+    "backAlpha": {
+     "label": "Krycie tyłu"
+    },
+    "backColor": {
+     "label": "Kolor tyłu"
+    },
+    "progress": {
+     "label": "Postęp"
+    },
+    "radius": {
+     "label": "Promień"
+    },
+    "shadow": {
+     "label": "Cień"
+    },
+    "shine": {
+     "label": "Połysk"
+    }
+   }
+  },
   "palettemap": {
    "description": "Przypisuje każdemu pikselowi najbliższy kolor z palety: do ośmiu wybranych kolorów lub paletę do 512 kolorów z presetu albo zaimportowanego pliku. Wzory rastra mieszają sąsiednie kolory palety, aby pokazać więcej odcieni. Alfa miesza zmapowane kolory z oryginalną warstwą.",
    "name": "Mapa palety",
@@ -5189,6 +5216,81 @@
     },
     "z": {
      "label": "Pozycja Z"
+    }
+   }
+  },
+  "scatterrepeat": {
+   "description": "Tworzy kopie warstwy i losowo rozrzuca je w okręgu wokół niej. Ewolucja przesuwa kopie, a ziarno rozproszenia wybiera inny wzór.",
+   "name": "Rozproszone powtórzenia",
+   "params": {
+    "copyDelay": {
+     "label": "Opóźnienie na kopię"
+    },
+    "count": {
+     "label": "Liczba"
+    },
+    "easing": {
+     "label": "Wygładzanie",
+     "options": [
+      "Liniowe",
+      "Łagodne wejście",
+      "Łagodne wyjście",
+      "Łagodne wejście i wyjście"
+     ]
+    },
+    "evolution": {
+     "label": "Ewolucja"
+    },
+    "fillAmount": {
+     "label": "Ilość wypełnienia"
+    },
+    "fillColor": {
+     "label": "Kolor wypełnienia"
+    },
+    "radius": {
+     "label": "Promień"
+    },
+    "randomOpacity": {
+     "label": "Losowe krycie"
+    },
+    "randomOrder": {
+     "label": "Losowa kolejność"
+    },
+    "randomPosition": {
+     "label": "Losowa pozycja"
+    },
+    "randomRotation": {
+     "label": "Losowy obrót"
+    },
+    "randomScale": {
+     "label": "Losowa skala"
+    },
+    "rangeEnd": {
+     "label": "Koniec zakresu"
+    },
+    "rangeOffset": {
+     "label": "Przesunięcie zakresu"
+    },
+    "rangeOpacity": {
+     "label": "Krycie zakresu"
+    },
+    "rangePosition": {
+     "label": "Pozycja zakresu"
+    },
+    "rangeRotation": {
+     "label": "Obrót zakresu"
+    },
+    "rangeScale": {
+     "label": "Skala zakresu"
+    },
+    "rangeStart": {
+     "label": "Początek zakresu"
+    },
+    "scatterSeed": {
+     "label": "Ziarno rozproszenia"
+    },
+    "seed": {
+     "label": "Ziarno"
     }
    }
   },
@@ -6659,7 +6761,7 @@
    }
   },
   "videofeedback": {
-   "description": "Rysuje warstwę wewnątrz siebie raz po raz, jak kamera skierowana na własny ekran. Przesuwaj, skaluj lub obracaj warstwę, aby kierować tunelem.",
+   "description": "Wielokrotnie rysuje warstwę wewnątrz niej samej, jak kamera skierowana na własny ekran. Gdy opcja Klatka po klatce jest włączona, każda kopia pokazuje warstwę o jedną klatkę wcześniej, dzięki czemu ruch zostawia smugi wirujące w tunelu.",
    "name": "Sprzężenie wideo",
    "params": {
     "blend": {
@@ -6690,6 +6792,9 @@
     },
     "rotation": {
      "label": "Obrót"
+    },
+    "trails": {
+     "label": "Klatka po klatce"
     },
     "useLayerTransform": {
      "label": "Użyj przekształcenia warstwy"

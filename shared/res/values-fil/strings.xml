@@ -5,6 +5,7 @@
     <string name="action_close">Isara</string>
     <string name="settings_language">Wika</string>
     <string name="onboarding_language_title">Piliin ang iyong wika</string>
+    <string name="onboarding_look_title">Maliwanag o madilim?</string>
     <string name="onboarding_language_others">Iba pang wika</string>
     <string name="onboarding_language_later">Mababago mo ito mamaya sa Settings.</string>
     <string name="onboarding_check_title">Tingnan ang kaya ng device na ito</string>
@@ -290,7 +291,8 @@
     <string name="update_reconnecting">Nawala ang koneksyon. Sinusubukan muli…</string>
     <string name="update_external">Hindi galing sa isang GitHub release ng AbsentMotion ang kopyang ito, kaya hindi nito maa-update ang sarili. Kunin ang update kung saan mo ito in-install.</string>
     <string name="update_metered">May limitasyon ang koneksyong ito, halimbawa mobile data. Maaaring maubos ng download ang iyong data plan.</string>
-    <string name="theme_absentmotion">AbsentMotion</string>
+    <string name="theme_light">Maliwanag</string>
+    <string name="theme_dark">Madilim</string>
     <string name="theme_daylight">Daylight</string>
     <string name="theme_custom">Pasadya</string>
     <string name="theme_custom_named">Pasadya (%1$s)</string>
@@ -497,10 +499,12 @@
     <string name="downloader_rights">Mag-download lang ng may karapatan kang gamitin.</string>
     <string name="downloader_engine_title">Kailangan ng add-on ang download</string>
     <string name="downloader_engine_about">Isang beses lang ida-download ang %1$s. Kasama nito ang Python at yt-dlp, ang libreng tool na nagda-download. Maaari mo itong alisin sa mga setting.</string>
+    <string name="downloader_engine_about_desktop">Isang beses na pag-download ng %1$s. Kasama rito ang yt-dlp, ang libreng program na nagda-download. Maaari mo itong alisin sa mga setting.</string>
     <string name="downloader_engine_get">Kunin ang add-on</string>
     <string name="downloader_engine_getting">Kinukuha ang add-on… %1$d%%</string>
     <string name="downloader_engine_failed">Hindi ma-download ang add-on. Tingnan ang koneksyon at subukang muli.</string>
     <string name="downloader_engine_missing">Kunin muna ang add-on.</string>
+    <string name="downloader_engine_blocked">Wala ang program sa pag-download o hinarangan ito ng iyong antivirus. Payagan ito, o alisin ito sa mga setting at kunin muli.</string>
     <string name="downloader_engine_broken">Hindi nag-start ang add-on. Alisin ito sa mga setting at kunin muli.</string>
     <string name="downloader_restart">Isara ang AbsentMotion at buksan muli para matapos ang pag-set up ng add-on.</string>
     <string name="downloader_engine_unavailable">Kailangan ng phone na may 64-bit na processor para sa pag-download ng bidyo.</string>
@@ -872,6 +876,7 @@
     <string name="add_tab_audio">Audio</string>
     <string name="add_tab_object_asset">Object / Asset</string>
     <string name="add_tab_template">Template</string>
+    <string name="add_tab_tools">Mga tool</string>
     <string name="add_quick_freehand_brush">Freehand na brush</string>
     <string name="add_quick_pen_tool">Pen tool</string>
     <string name="add_quick_text">Teksto</string>
@@ -1353,6 +1358,12 @@
     <string name="speed_reverse_minutes_left">Mga %1$s min ang natitira</string>
     <string name="speed_normal">Normal</string>
     <string name="speed_curve">Curve</string>
+    <string name="speed_remap">Remap</string>
+    <string name="remap_about">Piliin kung aling sandali ng clip ang ipapakita sa bawat punto. Magdagdag ng mga keyframe para bilisan, i-freeze o baligtarin ang pag-play nito. Naka-mute ang tunog ng clip habang naka-on ang Time Remap.</string>
+    <string name="remap_turn_on">I-on ang Time Remap</string>
+    <string name="remap_clip_time">Oras sa clip</string>
+    <string name="remap_reverse">Baligtarin</string>
+    <string name="remap_turn_off">I-off</string>
     <string name="speed_curve_custom">Custom</string>
     <string name="speed_curve_edit_hint">I-tap muli ang napiling curve para i-edit ito</string>
     <string name="speed_curve_graph">Curve ng bilis</string>
@@ -2277,6 +2288,7 @@
     <string name="tools_too_big">Masyadong malaki ito para sa phone na ito. Subukan ang mas maliit na size o mas maikling bahagi.</string>
     <string name="tools_failed">Hindi natapos: %1$s</string>
     <string name="tools_save">I-save</string>
+    <string name="tools_add_to_project">Idagdag sa proyekto</string>
     <string name="tools_part">Bahaging itatabi</string>
     <string name="tools_start">Simula</string>
     <string name="tools_end">Wakas</string>

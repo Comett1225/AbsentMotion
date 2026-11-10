@@ -5,6 +5,7 @@
     <string name="action_close">닫기</string>
     <string name="settings_language">언어</string>
     <string name="onboarding_language_title">언어 선택</string>
+    <string name="onboarding_look_title">라이트 모드 또는 다크 모드?</string>
     <string name="onboarding_language_others">다른 언어</string>
     <string name="onboarding_language_later">나중에 설정에서 변경할 수 있습니다.</string>
     <string name="onboarding_check_title">기기 성능 확인</string>
@@ -290,7 +291,8 @@
     <string name="update_reconnecting">연결이 끊어졌습니다. 다시 시도 중…</string>
     <string name="update_external">이 앱은 AbsentMotion GitHub 릴리스에서 받은 버전이 아니므로 자체 업데이트할 수 없습니다. 앱을 설치한 곳에서 업데이트를 받으세요.</string>
     <string name="update_metered">모바일 데이터와 같은 종량제 연결입니다. 다운로드 시 데이터가 소진될 수 있습니다.</string>
-    <string name="theme_absentmotion">AbsentMotion</string>
+    <string name="theme_light">라이트</string>
+    <string name="theme_dark">다크</string>
     <string name="theme_daylight">데이라이트</string>
     <string name="theme_custom">사용자 지정</string>
     <string name="theme_custom_named">사용자 지정 (%1$s)</string>
@@ -496,10 +498,12 @@
     <string name="downloader_rights">사용 권한이 있는 콘텐츠만 다운로드하세요.</string>
     <string name="downloader_engine_title">다운로드에 추가 기능이 필요합니다</string>
     <string name="downloader_engine_about">%1$s을(를) 한 번 다운로드합니다. 다운로드에 필요한 무료 도구인 Python과 yt-dlp가 포함되어 있습니다. 설정에서 삭제할 수 있습니다.</string>
+    <string name="downloader_engine_about_desktop">%1$s을(를) 한 번만 다운로드합니다. 다운로드를 수행하는 무료 프로그램 yt-dlp가 포함되어 있습니다. 설정에서 삭제할 수 있습니다.</string>
     <string name="downloader_engine_get">추가 기능 받기</string>
     <string name="downloader_engine_getting">추가 기능 받는 중… %1$d%%</string>
     <string name="downloader_engine_failed">추가 기능을 다운로드할 수 없습니다. 연결을 확인하고 다시 시도하세요.</string>
     <string name="downloader_engine_missing">먼저 추가 기능을 받으세요.</string>
+    <string name="downloader_engine_blocked">다운로더 프로그램이 없거나 백신 프로그램에 의해 차단되었습니다. 프로그램을 허용하거나 설정에서 삭제한 후 다시 받으세요.</string>
     <string name="downloader_engine_broken">추가 기능을 시작할 수 없습니다. 설정에서 삭제한 후 다시 받으세요.</string>
     <string name="downloader_restart">추가 기능 설정을 완료하려면 AbsentMotion을 닫았다가 다시 여세요.</string>
     <string name="downloader_engine_unavailable">동영상을 다운로드하려면 64비트 프로세서가 탑재된 휴대전화가 필요합니다.</string>
@@ -862,6 +866,7 @@
     <string name="add_tab_audio">오디오</string>
     <string name="add_tab_object_asset">오브젝트 / 에셋</string>
     <string name="add_tab_template">템플릿</string>
+    <string name="add_tab_tools">도구</string>
     <string name="add_quick_freehand_brush">자유형 브러시</string>
     <string name="add_quick_pen_tool">펜 도구</string>
     <string name="add_quick_text">텍스트</string>
@@ -1333,6 +1338,12 @@
     <string name="speed_reverse_minutes_left">약 %1$s분 남음</string>
     <string name="speed_normal">일반</string>
     <string name="speed_curve">곡선</string>
+    <string name="speed_remap">시간 재매핑</string>
+    <string name="remap_about">각 시점에 표시할 클립의 순간을 선택하세요. 키프레임을 추가해 속도를 높이거나 화면을 멈추고, 역방향으로 재생할 수 있습니다. 시간 재매핑이 켜져 있는 동안 클립의 소리는 음소거됩니다.</string>
+    <string name="remap_turn_on">시간 재매핑 켜기</string>
+    <string name="remap_clip_time">클립 시간</string>
+    <string name="remap_reverse">역방향</string>
+    <string name="remap_turn_off">끄기</string>
     <string name="speed_curve_custom">사용자 설정</string>
     <string name="speed_curve_edit_hint">선택한 곡선을 다시 탭하여 편집하세요</string>
     <string name="speed_curve_graph">속도 곡선</string>
@@ -2248,6 +2259,7 @@
     <string name="tools_too_big">이 휴대전화에는 크기가 너무 큽니다. 크기를 줄이거나 더 짧은 구간을 선택하세요.</string>
     <string name="tools_failed">완료하지 못했습니다: %1$s</string>
     <string name="tools_save">저장</string>
+    <string name="tools_add_to_project">프로젝트에 추가</string>
     <string name="tools_part">유지할 구간</string>
     <string name="tools_start">시작</string>
     <string name="tools_end">끝</string>

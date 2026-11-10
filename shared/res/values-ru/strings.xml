@@ -5,6 +5,7 @@
     <string name="action_close">Закрыть</string>
     <string name="settings_language">Язык</string>
     <string name="onboarding_language_title">Выберите язык</string>
+    <string name="onboarding_look_title">Светлая или тёмная?</string>
     <string name="onboarding_language_others">Другие языки</string>
     <string name="onboarding_language_later">Это можно изменить позже в настройках.</string>
     <string name="onboarding_check_title">Что умеет это устройство</string>
@@ -290,7 +291,8 @@
     <string name="update_reconnecting">Соединение прервалось. Повторная попытка…</string>
     <string name="update_external">Эта копия установлена не из выпуска AbsentMotion на GitHub, поэтому не может обновить себя сама. Получите обновление там, откуда вы её установили.</string>
     <string name="update_metered">Это лимитное подключение, например мобильный интернет. Загрузка может израсходовать ваш трафик.</string>
-    <string name="theme_absentmotion">AbsentMotion</string>
+    <string name="theme_light">Светлая</string>
+    <string name="theme_dark">Тёмная</string>
     <string name="theme_daylight">Дневной свет</string>
     <string name="theme_custom">Пользовательская</string>
     <string name="theme_custom_named">Пользовательская (%1$s)</string>
@@ -499,10 +501,12 @@
     <string name="downloader_rights">Скачивайте только то, на что у вас есть права.</string>
     <string name="downloader_engine_title">Для загрузок нужно дополнение</string>
     <string name="downloader_engine_about">Разовая загрузка — %1$s. Внутри Python и yt-dlp, бесплатные инструменты для скачивания. Удалить можно в настройках.</string>
+    <string name="downloader_engine_about_desktop">Однократная загрузка: %1$s. Она включает yt-dlp — бесплатную программу для скачивания. Её можно удалить в настройках.</string>
     <string name="downloader_engine_get">Скачать дополнение</string>
     <string name="downloader_engine_getting">Скачиваем дополнение… %1$d%%</string>
     <string name="downloader_engine_failed">Не удалось скачать дополнение. Проверьте подключение и повторите попытку.</string>
     <string name="downloader_engine_missing">Сначала скачайте дополнение.</string>
+    <string name="downloader_engine_blocked">Программа для скачивания отсутствует или заблокирована антивирусом. Разрешите её запуск либо удалите её в настройках и скачайте снова.</string>
     <string name="downloader_engine_broken">Дополнение не запустилось. Удалите его в настройках и скачайте снова.</string>
     <string name="downloader_restart">Закройте AbsentMotion и откройте снова, чтобы закончить настройку дополнения.</string>
     <string name="downloader_engine_unavailable">Для загрузки видео нужен телефон с 64-битным процессором.</string>
@@ -892,6 +896,7 @@
     <string name="add_tab_audio">Аудио</string>
     <string name="add_tab_object_asset">Объект / ресурс</string>
     <string name="add_tab_template">Шаблон</string>
+    <string name="add_tab_tools">Инструменты</string>
     <string name="add_quick_freehand_brush">Кисть от руки</string>
     <string name="add_quick_pen_tool">Перо</string>
     <string name="add_quick_text">Текст</string>
@@ -1393,6 +1398,12 @@
     <string name="speed_reverse_minutes_left">Осталось около %1$s мин</string>
     <string name="speed_normal">Обычная</string>
     <string name="speed_curve">Кривая</string>
+    <string name="speed_remap">Переназначение времени</string>
+    <string name="remap_about">Выберите, какой момент клипа показывать в каждой точке. Добавьте ключевые кадры, чтобы ускорить, заморозить или воспроизвести клип в обратном направлении. Пока переназначение времени включено, звук клипа отключён.</string>
+    <string name="remap_turn_on">Включить переназначение времени</string>
+    <string name="remap_clip_time">Время клипа</string>
+    <string name="remap_reverse">В обратном направлении</string>
+    <string name="remap_turn_off">Выключить</string>
     <string name="speed_curve_custom">Своя</string>
     <string name="speed_curve_edit_hint">Нажмите выбранную кривую ещё раз, чтобы изменить её</string>
     <string name="speed_curve_graph">Кривая скорости</string>
@@ -2335,6 +2346,7 @@
     <string name="tools_too_big">Слишком большой размер для этого телефона. Попробуйте меньший размер или более короткую часть.</string>
     <string name="tools_failed">Не удалось завершить: %1$s</string>
     <string name="tools_save">Сохранить</string>
+    <string name="tools_add_to_project">Добавить в проект</string>
     <string name="tools_part">Оставляемая часть</string>
     <string name="tools_start">Начало</string>
     <string name="tools_end">Конец</string>

@@ -3747,6 +3747,33 @@
     }
    }
   },
+  "pagecurl": {
+   "description": "레이어의 모서리가 들려 말리면서 뒷면이 보이도록 페이지처럼 넘깁니다. 진행률에 애니메이션을 적용해 페이지를 넘기세요.",
+   "name": "페이지 말기",
+   "params": {
+    "angle": {
+     "label": "각도"
+    },
+    "backAlpha": {
+     "label": "뒷면 불투명도"
+    },
+    "backColor": {
+     "label": "뒷면 색상"
+    },
+    "progress": {
+     "label": "진행률"
+    },
+    "radius": {
+     "label": "반경"
+    },
+    "shadow": {
+     "label": "그림자"
+    },
+    "shine": {
+     "label": "광택"
+    }
+   }
+  },
   "palettemap": {
    "description": "각 픽셀을 직접 고른 최대 8색 또는 프리셋이나 가져온 파일의 최대 512색 팔레트에서 가장 가까운 색상에 매핑합니다. 디더 패턴은 인접한 팔레트 색상을 섞어 더 많은 색조를 표현합니다. 알파는 매핑된 색상을 원본 레이어와 혼합합니다.",
    "name": "팔레트 매핑",
@@ -5189,6 +5216,81 @@
     },
     "z": {
      "label": "Z 위치"
+    }
+   }
+  },
+  "scatterrepeat": {
+   "description": "레이어를 복사해 주변 원 안에 무작위로 흩뿌립니다. 변화로 복사본을 움직이고, 흩뿌리기 시드로 패턴을 바꿉니다.",
+   "name": "흩뿌리기 반복",
+   "params": {
+    "copyDelay": {
+     "label": "복사본당 지연"
+    },
+    "count": {
+     "label": "개수"
+    },
+    "easing": {
+     "label": "이징",
+     "options": [
+      "선형",
+      "이즈 인",
+      "이즈 아웃",
+      "이즈 인 아웃"
+     ]
+    },
+    "evolution": {
+     "label": "변화"
+    },
+    "fillAmount": {
+     "label": "채우기 양"
+    },
+    "fillColor": {
+     "label": "채우기 색상"
+    },
+    "radius": {
+     "label": "반경"
+    },
+    "randomOpacity": {
+     "label": "무작위 불투명도"
+    },
+    "randomOrder": {
+     "label": "무작위 순서"
+    },
+    "randomPosition": {
+     "label": "무작위 위치"
+    },
+    "randomRotation": {
+     "label": "무작위 회전"
+    },
+    "randomScale": {
+     "label": "무작위 크기"
+    },
+    "rangeEnd": {
+     "label": "범위 끝"
+    },
+    "rangeOffset": {
+     "label": "범위 오프셋"
+    },
+    "rangeOpacity": {
+     "label": "범위 불투명도"
+    },
+    "rangePosition": {
+     "label": "범위 위치"
+    },
+    "rangeRotation": {
+     "label": "범위 회전"
+    },
+    "rangeScale": {
+     "label": "범위 크기"
+    },
+    "rangeStart": {
+     "label": "범위 시작"
+    },
+    "scatterSeed": {
+     "label": "흩뿌리기 시드"
+    },
+    "seed": {
+     "label": "시드"
     }
    }
   },
@@ -6659,7 +6761,7 @@
    }
   },
   "videofeedback": {
-   "description": "카메라를 자기 화면에 향한 것처럼 레이어 안에 레이어를 계속 반복해서 그립니다. 레이어를 이동하거나 크기를 바꾸거나 회전해 터널을 조종하세요.",
+   "description": "카메라로 자신의 화면을 촬영하듯 레이어 안에 같은 레이어를 반복해서 그립니다. 프레임 단위가 켜져 있으면 각 복사본이 한 프레임 전의 레이어를 표시해 움직임의 잔상이 터널 속으로 소용돌이칩니다.",
    "name": "비디오 피드백",
    "params": {
     "blend": {
@@ -6690,6 +6792,9 @@
     },
     "rotation": {
      "label": "회전"
+    },
+    "trails": {
+     "label": "프레임 단위"
     },
     "useLayerTransform": {
      "label": "레이어 변형 사용"

@@ -3747,6 +3747,33 @@
     }
    }
   },
+  "pagecurl": {
+   "description": "像翻書一樣翻轉圖層：一角抬起並捲起，露出頁面背面。為「進度」加入動畫即可翻頁。",
+   "name": "捲頁",
+   "params": {
+    "angle": {
+     "label": "角度"
+    },
+    "backAlpha": {
+     "label": "背面不透明度"
+    },
+    "backColor": {
+     "label": "背面顏色"
+    },
+    "progress": {
+     "label": "進度"
+    },
+    "radius": {
+     "label": "半徑"
+    },
+    "shadow": {
+     "label": "陰影"
+    },
+    "shine": {
+     "label": "光澤"
+    }
+   }
+  },
   "palettemap": {
    "description": "將每個像素映射到調色盤中最接近的顏色：可自行選取最多8色，或使用預設集或匯入檔案中最多512色的調色盤。抖色圖案混合相鄰顏色以呈現更多色階；透明度可將映射顏色與原圖層混合。",
    "name": "調色盤映射",
@@ -5189,6 +5216,81 @@
     },
     "z": {
      "label": "Z軸位置"
+    }
+   }
+  },
+  "scatterrepeat": {
+   "description": "複製圖層並將副本隨機散布在其周圍的圓形範圍內。「演變」可移動副本；「散布種子」可變更排列方式。",
+   "name": "散布重複",
+   "params": {
+    "copyDelay": {
+     "label": "每個副本的延遲"
+    },
+    "count": {
+     "label": "數量"
+    },
+    "easing": {
+     "label": "緩動",
+     "options": [
+      "線性",
+      "緩入",
+      "緩出",
+      "緩入緩出"
+     ]
+    },
+    "evolution": {
+     "label": "演變"
+    },
+    "fillAmount": {
+     "label": "填色量"
+    },
+    "fillColor": {
+     "label": "填色顏色"
+    },
+    "radius": {
+     "label": "半徑"
+    },
+    "randomOpacity": {
+     "label": "隨機不透明度"
+    },
+    "randomOrder": {
+     "label": "隨機順序"
+    },
+    "randomPosition": {
+     "label": "隨機位置"
+    },
+    "randomRotation": {
+     "label": "隨機旋轉"
+    },
+    "randomScale": {
+     "label": "隨機縮放"
+    },
+    "rangeEnd": {
+     "label": "範圍終點"
+    },
+    "rangeOffset": {
+     "label": "範圍偏移"
+    },
+    "rangeOpacity": {
+     "label": "不透明度範圍"
+    },
+    "rangePosition": {
+     "label": "位置範圍"
+    },
+    "rangeRotation": {
+     "label": "旋轉範圍"
+    },
+    "rangeScale": {
+     "label": "縮放範圍"
+    },
+    "rangeStart": {
+     "label": "範圍起點"
+    },
+    "scatterSeed": {
+     "label": "散布種子"
+    },
+    "seed": {
+     "label": "種子"
     }
    }
   },
@@ -6659,7 +6761,7 @@
    }
   },
   "videofeedback": {
-   "description": "不斷把圖層畫進自己裡面，就像攝影機對著自己的螢幕。移動、縮放或旋轉圖層即可控制隧道的走向。",
+   "description": "在圖層內部反覆繪製自身，如同攝影機對準自己的螢幕。啟用「逐影格」後，每個副本都會顯示前一個影格的圖層，讓動作留下旋入隧道的軌跡。",
    "name": "影像回授",
    "params": {
     "blend": {
@@ -6690,6 +6792,9 @@
     },
     "rotation": {
      "label": "旋轉"
+    },
+    "trails": {
+     "label": "逐影格"
     },
     "useLayerTransform": {
      "label": "使用圖層變形"

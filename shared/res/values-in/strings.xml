@@ -5,6 +5,7 @@
     <string name="action_close">Tutup</string>
     <string name="settings_language">Bahasa</string>
     <string name="onboarding_language_title">Pilih bahasa Anda</string>
+    <string name="onboarding_look_title">Terang atau gelap?</string>
     <string name="onboarding_language_others">Bahasa lainnya</string>
     <string name="onboarding_language_later">Anda bisa mengubahnya nanti di Setelan.</string>
     <string name="onboarding_check_title">Cek kemampuan perangkat ini</string>
@@ -290,7 +291,8 @@
     <string name="update_reconnecting">Koneksi terputus. Mencoba lagi…</string>
     <string name="update_external">Salinan ini tidak berasal dari rilis AbsentMotion di GitHub, jadi tidak bisa memperbarui dirinya sendiri. Dapatkan pembaruan dari tempat Anda memasangnya.</string>
     <string name="update_metered">Koneksi ini berkuota, misalnya data seluler. Unduhan dapat menghabiskan kuota data Anda.</string>
-    <string name="theme_absentmotion">AbsentMotion</string>
+    <string name="theme_light">Terang</string>
+    <string name="theme_dark">Gelap</string>
     <string name="theme_daylight">Siang</string>
     <string name="theme_custom">Kustom</string>
     <string name="theme_custom_named">Kustom (%1$s)</string>
@@ -496,10 +498,12 @@
     <string name="downloader_rights">Unduh hanya konten yang berhak Anda gunakan.</string>
     <string name="downloader_engine_title">Unduhan memerlukan add-on</string>
     <string name="downloader_engine_about">Unduhan sekali sebesar %1$s. Ini menyertakan Python dan yt-dlp, alat gratis untuk mengunduh. Anda dapat menghapusnya di Pengaturan.</string>
+    <string name="downloader_engine_about_desktop">Unduh %1$s sekali saja. Unduhan ini menyertakan yt-dlp, program gratis untuk mengunduh. Anda dapat menghapusnya di Pengaturan.</string>
     <string name="downloader_engine_get">Dapatkan add-on</string>
     <string name="downloader_engine_getting">Mendapatkan add-on… %1$d%%</string>
     <string name="downloader_engine_failed">Add-on gagal diunduh. Periksa koneksi lalu coba lagi.</string>
     <string name="downloader_engine_missing">Dapatkan add-on terlebih dahulu.</string>
+    <string name="downloader_engine_blocked">Program pengunduh tidak ada atau diblokir oleh antivirus Anda. Izinkan program tersebut, atau hapus di Pengaturan lalu unduh lagi.</string>
     <string name="downloader_engine_broken">Add-on tidak berhasil dimulai. Hapus di Pengaturan dan dapatkan kembali.</string>
     <string name="downloader_restart">Tutup AbsentMotion lalu buka lagi untuk menyelesaikan penyiapan add-on.</string>
     <string name="downloader_engine_unavailable">Unduhan video memerlukan ponsel dengan prosesor 64-bit.</string>
@@ -862,6 +866,7 @@
     <string name="add_tab_audio">Audio</string>
     <string name="add_tab_object_asset">Objek / Aset</string>
     <string name="add_tab_template">Template</string>
+    <string name="add_tab_tools">Alat</string>
     <string name="add_quick_freehand_brush">Kuas Bebas</string>
     <string name="add_quick_pen_tool">Alat Pena</string>
     <string name="add_quick_text">Teks</string>
@@ -1333,6 +1338,12 @@
     <string name="speed_reverse_minutes_left">Sisa sekitar %1$s min</string>
     <string name="speed_normal">Normal</string>
     <string name="speed_curve">Kurva</string>
+    <string name="speed_remap">Remap</string>
+    <string name="remap_about">Pilih momen klip yang ditampilkan di setiap titik. Tambahkan keyframe untuk mempercepat, membekukan, atau memutarnya mundur. Suara klip dibisukan saat Remap waktu aktif.</string>
+    <string name="remap_turn_on">Aktifkan Remap waktu</string>
+    <string name="remap_clip_time">Waktu klip</string>
+    <string name="remap_reverse">Balik</string>
+    <string name="remap_turn_off">Nonaktifkan</string>
     <string name="speed_curve_custom">Kustom</string>
     <string name="speed_curve_edit_hint">Ketuk kurva yang dipilih lagi untuk mengeditnya</string>
     <string name="speed_curve_graph">Kurva kecepatan</string>
@@ -2248,6 +2259,7 @@
     <string name="tools_too_big">Ini terlalu besar untuk ponsel ini. Coba ukuran yang lebih kecil atau bagian yang lebih pendek.</string>
     <string name="tools_failed">Tidak dapat menyelesaikan: %1$s</string>
     <string name="tools_save">Simpan</string>
+    <string name="tools_add_to_project">Tambahkan ke proyek</string>
     <string name="tools_part">Bagian yang disimpan</string>
     <string name="tools_start">Mulai</string>
     <string name="tools_end">Akhir</string>

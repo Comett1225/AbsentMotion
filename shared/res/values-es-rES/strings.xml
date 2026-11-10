@@ -5,6 +5,7 @@
     <string name="action_close">Cerrar</string>
     <string name="settings_language">Idioma</string>
     <string name="onboarding_language_title">Elige tu idioma</string>
+    <string name="onboarding_look_title">¿Claro u oscuro?</string>
     <string name="onboarding_language_others">Otros idiomas</string>
     <string name="onboarding_language_later">Puedes cambiarlo más adelante en Ajustes.</string>
     <string name="onboarding_check_title">Comprueba lo que puede hacer este dispositivo</string>
@@ -290,7 +291,8 @@
     <string name="update_reconnecting">Conexión perdida. Reintentando…</string>
     <string name="update_external">Esta copia no procede de una versión de AbsentMotion en GitHub, así que no puede actualizarse sola. Consigue la actualización donde la instalaste.</string>
     <string name="update_metered">Esta conexión tiene límite de datos, por ejemplo datos móviles. La descarga puede consumir tu tarifa de datos.</string>
-    <string name="theme_absentmotion">AbsentMotion</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_dark">Oscuro</string>
     <string name="theme_daylight">Luz de día</string>
     <string name="theme_custom">Personalizado</string>
     <string name="theme_custom_named">Personalizado (%1$s)</string>
@@ -498,10 +500,12 @@
     <string name="downloader_rights">Descarga solo lo que tengas derecho a usar.</string>
     <string name="downloader_engine_title">Las descargas necesitan un complemento</string>
     <string name="downloader_engine_about">Una descarga única de %1$s. Incluye Python y yt-dlp, las herramientas gratuitas que hacen la descarga. Puedes quitarlo en Ajustes.</string>
+    <string name="downloader_engine_about_desktop">Una descarga única de %1$s que incluye yt-dlp, el programa gratuito que realiza las descargas. Puedes eliminarlo en Ajustes.</string>
     <string name="downloader_engine_get">Obtener el complemento</string>
     <string name="downloader_engine_getting">Obteniendo el complemento… %1$d%%</string>
     <string name="downloader_engine_failed">No se pudo descargar el complemento. Comprueba la conexión e inténtalo de nuevo.</string>
     <string name="downloader_engine_missing">Obtén primero el complemento.</string>
+    <string name="downloader_engine_blocked">Falta el programa de descarga o tu antivirus lo ha bloqueado. Permítelo o elimínalo en Ajustes y vuelve a descargarlo.</string>
     <string name="downloader_engine_broken">El complemento no se ha iniciado. Quítalo en Ajustes y vuelve a obtenerlo.</string>
     <string name="downloader_restart">Cierra AbsentMotion y vuelve a abrirlo para acabar de configurar el complemento.</string>
     <string name="downloader_engine_unavailable">Las descargas de vídeo necesitan un móvil con un procesador de 64 bits.</string>
@@ -882,6 +886,7 @@
     <string name="add_tab_audio">Audio</string>
     <string name="add_tab_object_asset">Objeto / recurso</string>
     <string name="add_tab_template">Plantilla</string>
+    <string name="add_tab_tools">Herramientas</string>
     <string name="add_quick_freehand_brush">Pincel libre</string>
     <string name="add_quick_pen_tool">Pluma</string>
     <string name="add_quick_text">Texto</string>
@@ -1373,6 +1378,12 @@
     <string name="speed_reverse_minutes_left">Quedan unos %1$s min</string>
     <string name="speed_normal">Normal</string>
     <string name="speed_curve">Curva</string>
+    <string name="speed_remap">Remapeo</string>
+    <string name="remap_about">Elige qué momento del clip se muestra en cada punto. Añade fotogramas clave para acelerarlo, congelarlo o reproducirlo hacia atrás. El sonido del clip se silencia mientras el remapeo de tiempo está activado.</string>
+    <string name="remap_turn_on">Activar remapeo de tiempo</string>
+    <string name="remap_clip_time">Tiempo del clip</string>
+    <string name="remap_reverse">Invertir</string>
+    <string name="remap_turn_off">Desactivar</string>
     <string name="speed_curve_custom">Personalizada</string>
     <string name="speed_curve_edit_hint">Toca otra vez la curva elegida para editarla</string>
     <string name="speed_curve_graph">Curva de velocidad</string>
@@ -2306,6 +2317,7 @@
     <string name="tools_too_big">Esto es demasiado grande para este móvil. Prueba con un tamaño menor o una parte más corta.</string>
     <string name="tools_failed">No se ha podido terminar: %1$s</string>
     <string name="tools_save">Guardar</string>
+    <string name="tools_add_to_project">Añadir al proyecto</string>
     <string name="tools_part">Parte que conservar</string>
     <string name="tools_start">Inicio</string>
     <string name="tools_end">Fin</string>

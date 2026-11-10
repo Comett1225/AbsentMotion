@@ -5,6 +5,7 @@
     <string name="action_close">ปิด</string>
     <string name="settings_language">ภาษา</string>
     <string name="onboarding_language_title">เลือกภาษาของคุณ</string>
+    <string name="onboarding_look_title">สว่างหรือมืด?</string>
     <string name="onboarding_language_others">ภาษาอื่นๆ</string>
     <string name="onboarding_language_later">คุณเปลี่ยนภาษาได้ภายหลังในการตั้งค่า</string>
     <string name="onboarding_check_title">ตรวจสอบว่าเครื่องนี้ทำอะไรได้บ้าง</string>
@@ -290,7 +291,8 @@
     <string name="update_reconnecting">การเชื่อมต่อขาด กำลังลองอีกครั้ง…</string>
     <string name="update_external">สำเนานี้ไม่ได้มาจากรุ่นเผยแพร่ของ AbsentMotion บน GitHub จึงอัปเดตตัวเองไม่ได้ รับอัปเดตจากที่ที่คุณติดตั้งมา</string>
     <string name="update_metered">การเชื่อมต่อนี้คิดตามปริมาณข้อมูล เช่น อินเทอร์เน็ตมือถือ การดาวน์โหลดอาจใช้ข้อมูลในแพ็กเกจของคุณ</string>
-    <string name="theme_absentmotion">AbsentMotion</string>
+    <string name="theme_light">สว่าง</string>
+    <string name="theme_dark">มืด</string>
     <string name="theme_daylight">กลางวัน</string>
     <string name="theme_custom">กำหนดเอง</string>
     <string name="theme_custom_named">กำหนดเอง (%1$s)</string>
@@ -496,10 +498,12 @@
     <string name="downloader_rights">ดาวน์โหลดเฉพาะสิ่งที่คุณมีสิทธิ์ใช้งาน</string>
     <string name="downloader_engine_title">การดาวน์โหลดต้องใช้ส่วนเสริม</string>
     <string name="downloader_engine_about">ดาวน์โหลดครั้งเดียว %1$s มาพร้อม Python และ yt-dlp ซึ่งเป็นเครื่องมือฟรีที่ใช้ดาวน์โหลด คุณสามารถลบได้ในการตั้งค่า</string>
+    <string name="downloader_engine_about_desktop">ดาวน์โหลด %1$s เพียงครั้งเดียว โดยมี yt-dlp โปรแกรมฟรีสำหรับดาวน์โหลดรวมอยู่ด้วย คุณลบโปรแกรมนี้ได้ในการตั้งค่า</string>
     <string name="downloader_engine_get">ติดตั้งส่วนเสริม</string>
     <string name="downloader_engine_getting">กำลังติดตั้งส่วนเสริม… %1$d%%</string>
     <string name="downloader_engine_failed">ดาวน์โหลดส่วนเสริมไม่สำเร็จ ตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง</string>
     <string name="downloader_engine_missing">ติดตั้งส่วนเสริมก่อน</string>
+    <string name="downloader_engine_blocked">ไม่พบโปรแกรมดาวน์โหลด หรือโปรแกรมป้องกันไวรัสบล็อกไว้ โปรดอนุญาตให้โปรแกรมทำงาน หรือลบโปรแกรมในการตั้งค่าแล้วดาวน์โหลดอีกครั้ง</string>
     <string name="downloader_engine_broken">ส่วนเสริมไม่สามารถเริ่มทำงานได้ ลบในการตั้งค่าแล้วติดตั้งใหม่</string>
     <string name="downloader_restart">ปิด AbsentMotion แล้วเปิดใหม่เพื่อตั้งค่าส่วนเสริมให้เสร็จ</string>
     <string name="downloader_engine_unavailable">การดาวน์โหลดวิดีโอต้องใช้โทรศัพท์ที่มีโปรเซสเซอร์ 64 บิต</string>
@@ -862,6 +866,7 @@
     <string name="add_tab_audio">เสียง</string>
     <string name="add_tab_object_asset">ออบเจ็กต์ / แอสเซท</string>
     <string name="add_tab_template">เทมเพลต</string>
+    <string name="add_tab_tools">เครื่องมือ</string>
     <string name="add_quick_freehand_brush">แปรงวาดมือ</string>
     <string name="add_quick_pen_tool">เครื่องมือปากกา</string>
     <string name="add_quick_text">ข้อความ</string>
@@ -1333,6 +1338,12 @@
     <string name="speed_reverse_minutes_left">เหลือประมาณ %1$s นาที</string>
     <string name="speed_normal">ปกติ</string>
     <string name="speed_curve">เส้นโค้ง</string>
+    <string name="speed_remap">ปรับเวลา</string>
+    <string name="remap_about">เลือกช่วงเวลาของคลิปที่จะแสดงในแต่ละจุด เพิ่มคีย์เฟรมเพื่อเร่งความเร็ว หยุดภาพ หรือเล่นคลิปย้อนกลับ เสียงของคลิปจะปิดอยู่ขณะเปิดการปรับเวลา</string>
+    <string name="remap_turn_on">เปิดการปรับเวลา</string>
+    <string name="remap_clip_time">เวลาของคลิป</string>
+    <string name="remap_reverse">ย้อนกลับ</string>
+    <string name="remap_turn_off">ปิด</string>
     <string name="speed_curve_custom">กำหนดเอง</string>
     <string name="speed_curve_edit_hint">แตะเส้นโค้งที่เลือกอีกครั้งเพื่อแก้ไข</string>
     <string name="speed_curve_graph">เส้นโค้งความเร็ว</string>
@@ -2248,6 +2259,7 @@
     <string name="tools_too_big">ใหญ่เกินไปสำหรับโทรศัพท์เครื่องนี้ ลองใช้ขนาดเล็กลงหรือส่วนที่สั้นลง</string>
     <string name="tools_failed">ทำไม่สำเร็จ: %1$s</string>
     <string name="tools_save">บันทึก</string>
+    <string name="tools_add_to_project">เพิ่มในโปรเจกต์</string>
     <string name="tools_part">ส่วนที่จะเก็บไว้</string>
     <string name="tools_start">เริ่ม</string>
     <string name="tools_end">สิ้นสุด</string>

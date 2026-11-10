@@ -5,6 +5,7 @@
     <string name="action_close">बंद करें</string>
     <string name="settings_language">भाषा</string>
     <string name="onboarding_language_title">अपनी भाषा चुनें</string>
+    <string name="onboarding_look_title">लाइट या डार्क?</string>
     <string name="onboarding_language_others">अन्य भाषाएँ</string>
     <string name="onboarding_language_later">आप इसे बाद में सेटिंग में बदल सकते हैं।</string>
     <string name="onboarding_check_title">देखें यह डिवाइस क्या-क्या कर सकता है</string>
@@ -290,7 +291,8 @@
     <string name="update_reconnecting">कनेक्शन टूट गया। फिर से कोशिश की जा रही है…</string>
     <string name="update_external">यह कॉपी AbsentMotion के GitHub रिलीज़ से नहीं आई है, इसलिए यह खुद को अपडेट नहीं कर सकती। अपडेट वहीं से लें जहाँ से आपने इसे इंस्टॉल किया था।</string>
     <string name="update_metered">यह कनेक्शन मीटर्ड है, जैसे मोबाइल डेटा। डाउनलोड से आपका डेटा प्लान खर्च हो सकता है।</string>
-    <string name="theme_absentmotion">AbsentMotion</string>
+    <string name="theme_light">लाइट</string>
+    <string name="theme_dark">डार्क</string>
     <string name="theme_daylight">डेलाइट</string>
     <string name="theme_custom">कस्टम</string>
     <string name="theme_custom_named">कस्टम (%1$s)</string>
@@ -497,10 +499,12 @@
     <string name="downloader_rights">सिर्फ़ वही डाउनलोड करें जिसे इस्तेमाल करने का आपको अधिकार है।</string>
     <string name="downloader_engine_title">डाउनलोड के लिए ऐड-ऑन ज़रूरी है</string>
     <string name="downloader_engine_about">एक बार %1$s का डाउनलोड। इसमें Python और yt-dlp आते हैं, जो डाउनलोड करने वाले मुफ़्त टूल हैं। आप इसे सेटिंग्स में हटा सकते हैं।</string>
+    <string name="downloader_engine_about_desktop">%1$s को एक बार डाउनलोड करना होगा। इसमें डाउनलोड करने वाला मुफ़्त प्रोग्राम yt-dlp शामिल है। आप इसे सेटिंग्स में हटा सकते हैं।</string>
     <string name="downloader_engine_get">ऐड-ऑन पाएं</string>
     <string name="downloader_engine_getting">ऐड-ऑन प्राप्त हो रहा है… %1$d%%</string>
     <string name="downloader_engine_failed">ऐड-ऑन डाउनलोड नहीं हो सका। कनेक्शन जांचें और फिर कोशिश करें।</string>
     <string name="downloader_engine_missing">पहले ऐड-ऑन पाएं।</string>
+    <string name="downloader_engine_blocked">डाउनलोड करने वाला प्रोग्राम मौजूद नहीं है या आपके एंटीवायरस ने उसे ब्लॉक कर दिया है। उसे अनुमति दें या सेटिंग्स में हटाकर फिर से डाउनलोड करें।</string>
     <string name="downloader_engine_broken">ऐड-ऑन शुरू नहीं हुआ। इसे सेटिंग्स में हटाएं और दोबारा पाएं।</string>
     <string name="downloader_restart">ऐड-ऑन की सेटिंग पूरी करने के लिए AbsentMotion बंद करें और फिर से खोलें।</string>
     <string name="downloader_engine_unavailable">वीडियो डाउनलोड के लिए 64-बिट प्रोसेसर वाला फ़ोन चाहिए।</string>
@@ -872,6 +876,7 @@
     <string name="add_tab_audio">ऑडियो</string>
     <string name="add_tab_object_asset">ऑब्जेक्ट / एसेट</string>
     <string name="add_tab_template">टेम्पलेट</string>
+    <string name="add_tab_tools">टूल्स</string>
     <string name="add_quick_freehand_brush">फ्रीहैंड ब्रश</string>
     <string name="add_quick_pen_tool">पेन टूल</string>
     <string name="add_quick_text">टेक्स्ट</string>
@@ -1353,6 +1358,12 @@
     <string name="speed_reverse_minutes_left">लगभग %1$s मिनट बाकी</string>
     <string name="speed_normal">सामान्य</string>
     <string name="speed_curve">कर्व</string>
+    <string name="speed_remap">रीमैप</string>
+    <string name="remap_about">चुनें कि हर बिंदु पर क्लिप का कौन-सा पल दिखे। क्लिप को तेज़ करने, फ़्रीज़ करने या उल्टा चलाने के लिए कीफ़्रेम जोड़ें। टाइम रीमैप चालू रहने पर क्लिप की आवाज़ म्यूट रहती है।</string>
+    <string name="remap_turn_on">टाइम रीमैप चालू करें</string>
+    <string name="remap_clip_time">क्लिप का समय</string>
+    <string name="remap_reverse">उल्टा करें</string>
+    <string name="remap_turn_off">बंद करें</string>
     <string name="speed_curve_custom">कस्टम</string>
     <string name="speed_curve_edit_hint">चुने गए कर्व को एडिट करने के लिए उस पर दोबारा टैप करें</string>
     <string name="speed_curve_graph">स्पीड कर्व</string>
@@ -2277,6 +2288,7 @@
     <string name="tools_too_big">यह इस फ़ोन के लिए बहुत बड़ा है। छोटा साइज़ या छोटा हिस्सा आज़माएँ।</string>
     <string name="tools_failed">पूरा नहीं हो सका: %1$s</string>
     <string name="tools_save">सेव करें</string>
+    <string name="tools_add_to_project">प्रोजेक्ट में जोड़ें</string>
     <string name="tools_part">रखने वाला हिस्सा</string>
     <string name="tools_start">शुरू</string>
     <string name="tools_end">अंत</string>

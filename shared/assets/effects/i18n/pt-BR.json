@@ -3747,6 +3747,33 @@
     }
    }
   },
+  "pagecurl": {
+   "description": "Vira a camada como uma página: um canto se levanta e se enrola, mostrando o verso. Anime o Progresso para virar a página.",
+   "name": "Virar página",
+   "params": {
+    "angle": {
+     "label": "Ângulo"
+    },
+    "backAlpha": {
+     "label": "Opacidade do verso"
+    },
+    "backColor": {
+     "label": "Cor do verso"
+    },
+    "progress": {
+     "label": "Progresso"
+    },
+    "radius": {
+     "label": "Raio"
+    },
+    "shadow": {
+     "label": "Sombra"
+    },
+    "shine": {
+     "label": "Brilho"
+    }
+   }
+  },
   "palettemap": {
    "description": "Troca cada pixel pela cor mais próxima de uma paleta: até oito cores que você escolhe, ou uma paleta de até 512 cores de uma predefinição ou de um arquivo importado. Os padrões de dither misturam cores vizinhas da paleta para mostrar mais tons. Alfa mistura as cores mapeadas com a camada original.",
    "name": "Mapa de paleta",
@@ -5189,6 +5216,81 @@
     },
     "z": {
      "label": "Posição Z"
+    }
+   }
+  },
+  "scatterrepeat": {
+   "description": "Cria cópias da camada e as espalha aleatoriamente em um círculo ao redor dela. Evolução move as cópias; Semente de dispersão escolhe outro padrão.",
+   "name": "Repetição dispersa",
+   "params": {
+    "copyDelay": {
+     "label": "Atraso por cópia"
+    },
+    "count": {
+     "label": "Quantidade"
+    },
+    "easing": {
+     "label": "Suavização",
+     "options": [
+      "Linear",
+      "Entrada suave",
+      "Saída suave",
+      "Entrada e saída suaves"
+     ]
+    },
+    "evolution": {
+     "label": "Evolução"
+    },
+    "fillAmount": {
+     "label": "Quantidade de preenchimento"
+    },
+    "fillColor": {
+     "label": "Cor do preenchimento"
+    },
+    "radius": {
+     "label": "Raio"
+    },
+    "randomOpacity": {
+     "label": "Opacidade aleatória"
+    },
+    "randomOrder": {
+     "label": "Ordem aleatória"
+    },
+    "randomPosition": {
+     "label": "Posição aleatória"
+    },
+    "randomRotation": {
+     "label": "Rotação aleatória"
+    },
+    "randomScale": {
+     "label": "Escala aleatória"
+    },
+    "rangeEnd": {
+     "label": "Fim do intervalo"
+    },
+    "rangeOffset": {
+     "label": "Deslocamento do intervalo"
+    },
+    "rangeOpacity": {
+     "label": "Opacidade do intervalo"
+    },
+    "rangePosition": {
+     "label": "Posição do intervalo"
+    },
+    "rangeRotation": {
+     "label": "Rotação do intervalo"
+    },
+    "rangeScale": {
+     "label": "Escala do intervalo"
+    },
+    "rangeStart": {
+     "label": "Início do intervalo"
+    },
+    "scatterSeed": {
+     "label": "Semente de dispersão"
+    },
+    "seed": {
+     "label": "Semente"
     }
    }
   },
@@ -6659,7 +6761,7 @@
    }
   },
   "videofeedback": {
-   "description": "Desenha a camada dentro dela mesma repetidamente, como uma câmera apontada para a própria tela. Mova, redimensione ou gire a camada para direcionar o túnel.",
+   "description": "Desenha a camada dentro dela mesma repetidamente, como uma câmera apontada para a própria tela. Com Quadro a quadro ativado, cada cópia mostra a camada um quadro antes, criando rastros de movimento que giram para dentro do túnel.",
    "name": "Realimentação de vídeo",
    "params": {
     "blend": {
@@ -6690,6 +6792,9 @@
     },
     "rotation": {
      "label": "Rotação"
+    },
+    "trails": {
+     "label": "Quadro a quadro"
     },
     "useLayerTransform": {
      "label": "Usar transformação da camada"

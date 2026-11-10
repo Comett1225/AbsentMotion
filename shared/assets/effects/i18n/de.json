@@ -3747,6 +3747,33 @@
     }
    }
   },
+  "pagecurl": {
+   "description": "Blättert die Ebene wie eine Seite um: Eine Ecke hebt und rollt sich um und zeigt die Rückseite. Animiere den Fortschritt, um die Seite umzublättern.",
+   "name": "Seitenumblättern",
+   "params": {
+    "angle": {
+     "label": "Winkel"
+    },
+    "backAlpha": {
+     "label": "Deckkraft der Rückseite"
+    },
+    "backColor": {
+     "label": "Rückseitenfarbe"
+    },
+    "progress": {
+     "label": "Fortschritt"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "shadow": {
+     "label": "Schatten"
+    },
+    "shine": {
+     "label": "Glanz"
+    }
+   }
+  },
   "palettemap": {
    "description": "Ordnet jedem Pixel die nächste Farbe einer Palette zu: bis zu acht selbst gewählte Farben oder eine Palette mit bis zu 512 Farben aus einer Voreinstellung oder importierten Datei. Rastermuster mischen benachbarte Palettenfarben für mehr Farbtöne. Alpha überblendet die zugeordneten Farben mit der ursprünglichen Ebene.",
    "name": "Palettenzuordnung",
@@ -5189,6 +5216,81 @@
     },
     "z": {
      "label": "Position Z"
+    }
+   }
+  },
+  "scatterrepeat": {
+   "description": "Erstellt Kopien der Ebene und verteilt sie zufällig in einem Kreis um sie herum. Evolution bewegt die Kopien; der Streuungs-Seed wählt ein anderes Muster.",
+   "name": "Zufällige Wiederholung",
+   "params": {
+    "copyDelay": {
+     "label": "Verzögerung pro Kopie"
+    },
+    "count": {
+     "label": "Anzahl"
+    },
+    "easing": {
+     "label": "Easing",
+     "options": [
+      "Linear",
+      "Ease In",
+      "Ease Out",
+      "Ease In Out"
+     ]
+    },
+    "evolution": {
+     "label": "Evolution"
+    },
+    "fillAmount": {
+     "label": "Füllstärke"
+    },
+    "fillColor": {
+     "label": "Füllfarbe"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "randomOpacity": {
+     "label": "Zufällige Deckkraft"
+    },
+    "randomOrder": {
+     "label": "Zufällige Reihenfolge"
+    },
+    "randomPosition": {
+     "label": "Zufällige Position"
+    },
+    "randomRotation": {
+     "label": "Zufällige Drehung"
+    },
+    "randomScale": {
+     "label": "Zufällige Skalierung"
+    },
+    "rangeEnd": {
+     "label": "Bereichsende"
+    },
+    "rangeOffset": {
+     "label": "Bereichsversatz"
+    },
+    "rangeOpacity": {
+     "label": "Deckkraftbereich"
+    },
+    "rangePosition": {
+     "label": "Positionsbereich"
+    },
+    "rangeRotation": {
+     "label": "Drehungsbereich"
+    },
+    "rangeScale": {
+     "label": "Skalierungsbereich"
+    },
+    "rangeStart": {
+     "label": "Bereichsanfang"
+    },
+    "scatterSeed": {
+     "label": "Streuungs-Seed"
+    },
+    "seed": {
+     "label": "Seed"
     }
    }
   },
@@ -6659,7 +6761,7 @@
    }
   },
   "videofeedback": {
-   "description": "Zeichnet die Ebene immer wieder in sich selbst, wie eine Kamera, die auf ihren eigenen Bildschirm gerichtet ist. Bewege, skaliere oder drehe die Ebene, um den Tunnel zu steuern.",
+   "description": "Zeichnet die Ebene immer wieder in sich selbst, wie eine Kamera, die auf ihren eigenen Bildschirm gerichtet ist. Ist Bild für Bild aktiviert, zeigt jede Kopie die Ebene ein Bild früher, sodass Bewegungen Spuren hinterlassen, die sich in den Tunnel drehen.",
    "name": "Videofeedback",
    "params": {
     "blend": {
@@ -6690,6 +6792,9 @@
     },
     "rotation": {
      "label": "Rotation"
+    },
+    "trails": {
+     "label": "Bild für Bild"
     },
     "useLayerTransform": {
      "label": "Ebenentransformation verwenden"
