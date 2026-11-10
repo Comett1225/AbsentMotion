@@ -28,12 +28,22 @@ app image from `gradlew createDistributable` into `pc/build/compose/binaries/mai
 - `AbsentMotion-<version>-windows-x64-setup.exe`: one file to download and run. It installs for the current Windows account
   into `%LOCALAPPDATA%\Programs\AbsentMotion` without prompts or admin rights, adds Start menu and desktop shortcuts and an
   Apps entry with an uninstaller, then opens the app.
-- `AbsentMotion-<version>-windows-x64.ampack`: the same package without the program, for in-app updates. An app installed
-  this way finds `AbsentMotionSetup.exe` next to its launcher, downloads the signed `.ampack`, and Install and restart runs a
-  copy of its own setup program: it unpacks next to the app while the app closes, swaps the two folders, and opens the new
-  version. If anything fails, the old version stays and opens again.
+- `AbsentMotion-<version>-windows-x64.ampack`: the same package without the program, for in-app updates. An app that finds
+  `AbsentMotionSetup.exe` next to its launcher downloads the signed `.ampack` and runs a copy of its own setup program with no
+  further clicks. The setup unpacks next to the app, closes every program running from the app folder (a polite close, then
+  ended after 5 s), swaps the two folders and opens the new version. If anything fails, the old version stays and opens again.
 
-The package uses the LZMS compression and SHA-256 built into Windows, so no third-party code is added. Command line:
-`--dir`, `--name`, `--no-launch`, `--quiet`, `--log`, `--uninstall`, `--update --payload <file> --wait-pid <pid> --result <file>`
-and `--probe`. With Smart App Control on, Windows refused to run the unsigned one-file setup while the small setup program
-ran, so sign the setup file before shipping it.
+`gradlew packageMsi` builds the setup program first and ships it next to `AbsentMotion.exe` (jpackage `--app-content`), so an
+MSI install updates through the setup from its next update on. That first setup update moves the install off Windows
+Installer: it moves the old folder aside, removes the MSI product with `msiexec /x` (passing `INSTALLDIR` for that folder and
+`MSIRESTARTMANAGERCONTROL=Disable`, so nothing outside it is touched or closed), puts the new version in place and adds its
+own Apps entry, Start menu shortcut and `.absproj`/`.amproj` file types. `gradlew packageAmpack` writes the `.ampack` and the
+one-file setup into `pc/build/compose/binaries/main/ampack/`.
+
+During an update the setup appends to the `--result` file: `started`, then `stage verify`, `stage close`, `stage msi`,
+`stage swap` and `stage register`, and last `ok <version>` or `fail <reason>`. The app reads the last line on its next start
+and explains a failure. The package uses the LZMS compression and SHA-256 built into Windows, so no third-party code is
+added. Command line: `--dir`, `--name`, `--no-launch`, `--quiet`, `--log`, `--uninstall`,
+`--update --payload <file> --wait-pid <pid> --result <file>` and `--probe`. `build.ps1 -StubOnly` builds only the setup
+program; `-UpgradeCode` and `-DefaultName` make a test build that never matches a real install. With Smart App Control on,
+Windows refuses unsigned programs, so sign the setup before relying on it there.

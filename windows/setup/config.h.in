@@ -1,0 +1,4 @@
+#pragma once
+
+#define AM_UPGRADE_CODE L"@AM_UPGRADE_CODE@"
+#define AM_DEFAULT_NAME L"@AM_DEFAULT_NAME@"

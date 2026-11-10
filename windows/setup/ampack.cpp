@@ -87,8 +87,8 @@ int wmain(int argc, wchar_t** argv) {
         std::sort(src.begin(), src.end(), [](const Source& a, const Source& b) { return _wcsicmp(a.rel.c_str(), b.rel.c_str()) < 0; });
         if (std::find_if(src.begin(), src.end(), [](const Source& s) { return _wcsicmp(s.rel.c_str(), L"AbsentMotion.exe") == 0; }) == src.end())
             Fail(L"the app folder has no AbsentMotion.exe");
-        for (const Source& s : src)
-            if (_wcsicmp(s.rel.c_str(), kSetupName) == 0) Fail(L"the app folder already has " + std::wstring(kSetupName));
+        auto bundled = std::find_if(src.begin(), src.end(), [](const Source& s) { return _wcsicmp(s.rel.c_str(), kSetupName) == 0; });
+        if (bundled != src.end()) src.erase(bundled);
         src.push_back({stub, kSetupName, (uint64_t)fs::file_size(stub)});
 
         std::vector<FileEntry> files;

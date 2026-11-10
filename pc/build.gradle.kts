@@ -175,6 +175,23 @@ val prepareResources = tasks.register<Sync>("prepareResources") {
 }
 tasks.matching { it.name == "createDistributable" || it.name.startsWith("prepareAppResources") }.configureEach { dependsOn(prepareResources) }
 tasks.matching { Regex("create(Release)?Distributable|package(Release)?(Dmg|Msi|Deb|Exe|Pkg|Rpm)").matches(it.name) }.configureEach { outputs.upToDateWhen { false } }
+val setupDir = layout.buildDirectory.dir("setup-stub")
+val appVersion = rootDir.resolve("../version.properties").readLines().first { it.startsWith("versionName=") }.substringAfter('=').trim()
+val setupStub = tasks.register<Exec>("setupStub") {
+    onlyIf { isWindows }
+    outputs.upToDateWhen { false }
+    commandLine("powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "../windows/setup/build.ps1", "-StubOnly", "-Version", appVersion, "-Out", setupDir.get().asFile.path)
+}
+if (isWindows) tasks.withType<org.jetbrains.compose.desktop.application.tasks.AbstractJPackageTask>().configureEach {
+    dependsOn(setupStub)
+    freeArgs.addAll("--app-content", setupDir.get().file("AbsentMotionSetup.exe").asFile.path)
+}
+tasks.register<Exec>("packageAmpack") {
+    onlyIf { isWindows }
+    dependsOn("createDistributable")
+    commandLine("powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "../windows/setup/build.ps1", "-Version", appVersion,
+        "-App", layout.buildDirectory.dir("compose/binaries/main/app/AbsentMotion").get().asFile.path, "-Out", layout.buildDirectory.dir("compose/binaries/main/ampack").get().asFile.path)
+}
 tasks.matching { it.name == "createRuntimeImage" }.configureEach {
     inputs.property("javaHome", System.getProperty("java.home"))
     if (!isMac) doLast {

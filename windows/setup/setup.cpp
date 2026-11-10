@@ -1,7 +1,9 @@
+#include "config.h"
 #include "pack.h"
 #include "ui.h"
 
 #include <compressapi.h>
+#include <msi.h>
 #include <shellapi.h>
 #include <shlobj.h>
 #include <shobjidl.h>
@@ -25,7 +27,7 @@ enum class Mode { Install, Update, Uninstall };
 struct Options {
     Mode mode = Mode::Install;
     std::wstring dir;
-    std::wstring name = L"AbsentMotion";
+    std::wstring name = AM_DEFAULT_NAME;
     std::wstring result;
     std::wstring log;
     std::wstring payload;
@@ -37,6 +39,20 @@ struct Options {
 };
 
 struct Cancelled {};
+
+struct Stop {
+    std::string reason;
+    std::wstring detail;
+};
+
+constexpr const char* kNoClose = "the app did not close";
+constexpr const char* kInUse = "files were in use";
+constexpr const char* kSpace = "not enough disk space";
+constexpr const char* kPayload = "the update file was missing or damaged";
+constexpr const char* kOld = "the old version could not be removed";
+constexpr const char* kPlace = "the new version could not be put in place";
+
+[[noreturn]] void StopWith(const char* reason, const std::wstring& detail) { throw Stop{reason, detail}; }
 
 class Handle {
 public:
@@ -460,12 +476,131 @@ void Launch(const std::wstring& folder) {
     CloseHandle(pi.hProcess);
 }
 
-void WriteResult(const std::wstring& path, const std::string& text) {
+void ResultLine(const std::wstring& path, const std::string& line, bool fresh = false) {
     if (path.empty()) return;
-    Handle h(CreateFileW(path.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr));
-    if (!h.Valid()) return;
+    std::string text = line + "\r\n";
+    for (int attempt = 0; attempt < 20; ++attempt) {
+        Handle h(CreateFileW(path.c_str(), fresh ? GENERIC_WRITE : FILE_APPEND_DATA, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr,
+                             fresh ? CREATE_ALWAYS : OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr));
+        if (h.Valid()) {
+            DWORD n = 0;
+            WriteFile(h.Get(), text.data(), (DWORD)text.size(), &n, nullptr);
+            FlushFileBuffers(h.Get());
+            Log(L"result: " + Widen(line));
+            return;
+        }
+        Sleep(50);
+    }
+}
+
+void WriteResult(const std::wstring& path, const std::string& text) { ResultLine(path, text, true); }
+
+void Stage(const Options& o, const char* name) { ResultLine(o.result, std::string("stage ") + name); }
+
+void PostClose(const std::vector<DWORD>& pids) {
+    EnumWindows(
+        [](HWND h, LPARAM l) -> BOOL {
+            const auto* list = reinterpret_cast<const std::vector<DWORD>*>(l);
+            DWORD pid = 0;
+            GetWindowThreadProcessId(h, &pid);
+            if (IsWindowVisible(h) && std::find(list->begin(), list->end(), pid) != list->end()) PostMessageW(h, WM_CLOSE, 0, 0);
+            return TRUE;
+        },
+        reinterpret_cast<LPARAM>(&pids));
+}
+
+bool CloseAll(const std::wstring& folder) {
+    std::vector<DWORD> left = Running(folder);
+    if (left.empty()) return true;
+    Log(L"asking " + std::to_wstring(left.size()) + L" programs from the app folder to close");
+    PostClose(left);
+    ULONGLONG end = GetTickCount64() + 5000;
+    while (!(left = Running(folder)).empty() && GetTickCount64() < end) Sleep(100);
+    for (DWORD pid : left) {
+        Handle h(OpenProcess(PROCESS_TERMINATE | SYNCHRONIZE, FALSE, pid));
+        bool ended = h.Valid() && TerminateProcess(h.Get(), 1);
+        if (ended) WaitForSingleObject(h.Get(), 5000);
+        Log(L"ended " + std::to_wstring(pid) + (ended ? L"" : L" failed: " + SystemMessage(GetLastError())));
+    }
+    end = GetTickCount64() + 5000;
+    while (!(left = Running(folder)).empty() && GetTickCount64() < end) Sleep(100);
+    return left.empty();
+}
+
+bool Writable(const std::wstring& folder) {
+    std::wstring probe = Join(folder, L".absentmotion-" + std::to_wstring(GetCurrentProcessId()) + L".tmp");
+    Handle h(CreateFileW(Long(probe).c_str(), GENERIC_WRITE, 0, nullptr, CREATE_NEW, FILE_ATTRIBUTE_TEMPORARY | FILE_FLAG_DELETE_ON_CLOSE, nullptr));
+    return h.Valid();
+}
+
+std::wstring SystemFile(const wchar_t* name) {
+    std::wstring sys(MAX_PATH, L'\0');
+    sys.resize(GetSystemDirectoryW(sys.data(), (UINT)sys.size()));
+    return Join(sys, name);
+}
+
+DWORD RunAndWait(const std::wstring& exe, std::wstring cmd, DWORD ms) {
+    STARTUPINFOW si{};
+    si.cb = sizeof si;
+    PROCESS_INFORMATION pi{};
+    if (!CreateProcessW(exe.c_str(), cmd.data(), nullptr, nullptr, FALSE, CREATE_NO_WINDOW, nullptr, nullptr, &si, &pi)) return GetLastError() | 0x40000000;
+    CloseHandle(pi.hThread);
+    DWORD code = WAIT_TIMEOUT;
+    if (WaitForSingleObject(pi.hProcess, ms) == WAIT_OBJECT_0) GetExitCodeProcess(pi.hProcess, &code);
+    CloseHandle(pi.hProcess);
+    return code;
+}
+
+std::wstring MsiProperty(const wchar_t* code, const wchar_t* name) {
+    std::wstring buf(2048, L'\0');
+    DWORD n = (DWORD)buf.size();
+    if (MsiGetProductInfoExW(code, nullptr, MSIINSTALLCONTEXT_USERUNMANAGED, name, buf.data(), &n) != ERROR_SUCCESS) return L"?";
+    buf.resize(n);
+    return buf;
+}
+
+std::wstring FindMsi(const std::wstring& root) {
+    std::vector<std::pair<std::wstring, std::wstring>> found;
+    wchar_t code[39];
+    for (DWORD i = 0; MsiEnumRelatedProductsW(AM_UPGRADE_CODE, 0, i, code) == ERROR_SUCCESS; ++i) {
+        std::wstring where = MsiProperty(code, INSTALLPROPERTY_INSTALLLOCATION);
+        Log(L"MSI product " + std::wstring(code) + L" at " + where);
+        if (where == L"?") continue;
+        found.emplace_back(code, where.empty() ? where : Full(where));
+    }
+    for (const auto& f : found)
+        if (!f.second.empty() && CompareStringOrdinal(f.second.c_str(), -1, root.c_str(), -1, TRUE) == CSTR_EQUAL) return f.first;
+    if (found.size() == 1 && found[0].second.empty()) return found[0].first;
+    return {};
+}
+
+bool RemoveMsi(const std::wstring& code, const std::wstring& root, const std::wstring& logDir) {
+    std::wstring msiexec = SystemFile(L"msiexec.exe"), log = Join(logDir, L"update-msi-remove.log");
+    for (int attempt = 0;; ++attempt) {
+        std::wstring cmd = Quote(msiexec) + L" /x " + code + L" INSTALLDIR=" + Quote(root + L"\\") + L" MSIRESTARTMANAGERCONTROL=Disable /qn /norestart /L*v " + Quote(log);
+        DWORD exit = RunAndWait(msiexec, cmd, 900000);
+        Log(L"msiexec /x " + code + L" exit " + std::to_wstring(exit));
+        if (exit == ERROR_SUCCESS || exit == ERROR_SUCCESS_REBOOT_REQUIRED || exit == ERROR_SUCCESS_REBOOT_INITIATED || exit == ERROR_UNKNOWN_PRODUCT) return true;
+        if (exit == ERROR_INSTALL_ALREADY_RUNNING && attempt < 40) {
+            Sleep(3000);
+            continue;
+        }
+        return false;
+    }
+}
+
+std::wstring InstalledVersion(const std::wstring& root) {
+    Handle h(CreateFileW(Long(Join(root, L"app\\AbsentMotion.cfg")).c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr));
+    if (!h.Valid()) return L"";
+    std::string text(64 * 1024, '\0');
     DWORD n = 0;
-    WriteFile(h.Get(), text.data(), (DWORD)text.size(), &n, nullptr);
+    ReadFile(h.Get(), text.data(), (DWORD)text.size(), &n, nullptr);
+    text.resize(n);
+    const std::string key = "-Djpackage.app-version=";
+    size_t at = text.find(key);
+    if (at == std::string::npos) return L"";
+    size_t end = text.find_first_of("\r\n", at);
+    return Widen(text.substr(at + key.size(), end == std::string::npos ? std::string::npos : end - at - key.size()));
 }
 
 void SetString(HKEY k, const wchar_t* name, const std::wstring& v) {
@@ -474,14 +609,14 @@ void SetString(HKEY k, const wchar_t* name, const std::wstring& v) {
 
 void SetDword(HKEY k, const wchar_t* name, DWORD v) { RegSetValueExW(k, name, 0, REG_DWORD, reinterpret_cast<const BYTE*>(&v), sizeof v); }
 
-void Register(const Options& o, const Payload& p) {
+void Register(const Options& o, const std::wstring& version, uint64_t bytes) {
     HKEY k = nullptr;
     LSTATUS st = RegCreateKeyExW(HKEY_CURRENT_USER, UninstallKey(o).c_str(), 0, nullptr, 0, KEY_SET_VALUE, nullptr, &k, nullptr);
     if (st != ERROR_SUCCESS) Fail(L"Could not add AbsentMotion to Apps: " + SystemMessage((DWORD)st));
     std::wstring setup = Join(o.dir, kSetupName), exe = Join(o.dir, kAppName);
     std::wstring tail = L" --dir " + Quote(o.dir) + (o.name == L"AbsentMotion" ? L"" : L" --name " + Quote(o.name));
     SetString(k, L"DisplayName", o.name);
-    SetString(k, L"DisplayVersion", p.version);
+    SetString(k, L"DisplayVersion", version);
     SetString(k, L"Publisher", L"AbsentMotion");
     SetString(k, L"DisplayIcon", exe + L",0");
     SetString(k, L"InstallLocation", o.dir + L"\\");
@@ -489,13 +624,68 @@ void Register(const Options& o, const Payload& p) {
     SetString(k, L"QuietUninstallString", Quote(setup) + L" --uninstall --quiet" + tail);
     SetDword(k, L"NoModify", 1);
     SetDword(k, L"NoRepair", 1);
-    SetDword(k, L"EstimatedSize", (DWORD)(p.header.rawTotal / 1024));
+    if (bytes) SetDword(k, L"EstimatedSize", (DWORD)(bytes / 1024));
     SYSTEMTIME t;
     GetLocalTime(&t);
     wchar_t date[16];
     swprintf_s(date, L"%04u%02u%02u", t.wYear, t.wMonth, t.wDay);
     SetString(k, L"InstallDate", date);
     RegCloseKey(k);
+}
+
+constexpr const wchar_t* kExtensions[] = {L".absproj", L".amproj"};
+
+std::wstring ProgId(const Options& o) { return KeyName(o.name) + L".project"; }
+
+bool ClassExists(const std::wstring& progId) {
+    HKEY k = nullptr;
+    if (progId.empty() || RegOpenKeyExW(HKEY_CLASSES_ROOT, progId.c_str(), 0, KEY_READ, &k) != ERROR_SUCCESS) return false;
+    RegCloseKey(k);
+    return true;
+}
+
+void SetKeyDefault(const std::wstring& sub, const std::wstring& value) {
+    HKEY k = nullptr;
+    if (RegCreateKeyExW(HKEY_CURRENT_USER, sub.c_str(), 0, nullptr, 0, KEY_SET_VALUE, nullptr, &k, nullptr) != ERROR_SUCCESS) return;
+    SetString(k, nullptr, value);
+    RegCloseKey(k);
+}
+
+void Associate(const Options& o) {
+    const std::wstring id = ProgId(o), exe = Join(o.dir, kAppName), classes = L"Software\\Classes\\";
+    SetKeyDefault(classes + id, o.name + L" project");
+    SetKeyDefault(classes + id + L"\\DefaultIcon", exe + L",0");
+    SetKeyDefault(classes + id + L"\\shell\\open\\command", Quote(exe) + L" \"%1\" %*");
+    for (const wchar_t* ext : kExtensions) {
+        const std::wstring key = classes + ext;
+        std::wstring current = ReadString(HKEY_CURRENT_USER, key.c_str(), nullptr);
+        if (current.empty() || current == id || !ClassExists(current)) SetKeyDefault(key, id);
+        HKEY k = nullptr;
+        if (RegCreateKeyExW(HKEY_CURRENT_USER, (key + L"\\OpenWithProgids").c_str(), 0, nullptr, 0, KEY_SET_VALUE, nullptr, &k, nullptr) == ERROR_SUCCESS) {
+            RegSetValueExW(k, id.c_str(), 0, REG_NONE, nullptr, 0);
+            RegCloseKey(k);
+        }
+        Log(L"association " + std::wstring(ext) + L": was '" + current + L"', now '" + ReadString(HKEY_CURRENT_USER, key.c_str(), nullptr) + L"'");
+    }
+    SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, nullptr, nullptr);
+}
+
+void Unassociate(const Options& o) {
+    const std::wstring id = ProgId(o), classes = L"Software\\Classes\\";
+    for (const wchar_t* ext : kExtensions) {
+        const std::wstring key = classes + ext;
+        HKEY k = nullptr;
+        if (RegOpenKeyExW(HKEY_CURRENT_USER, key.c_str(), 0, KEY_READ | KEY_SET_VALUE, &k) == ERROR_SUCCESS) {
+            if (ReadString(HKEY_CURRENT_USER, key.c_str(), nullptr) == id) RegDeleteValueW(k, nullptr);
+            RegCloseKey(k);
+        }
+        if (RegOpenKeyExW(HKEY_CURRENT_USER, (key + L"\\OpenWithProgids").c_str(), 0, KEY_SET_VALUE, &k) == ERROR_SUCCESS) {
+            RegDeleteValueW(k, id.c_str());
+            RegCloseKey(k);
+        }
+    }
+    RegDeleteTreeW(HKEY_CURRENT_USER, (classes + id).c_str());
+    SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, nullptr, nullptr);
 }
 
 std::vector<std::wstring> LinkPlaces(const Options& o) {
@@ -574,11 +764,10 @@ bool AskWhileRunning(const Options& o, Shared& s) {
 }
 
 int Install(const Options& o, Shared& s, const Payload& p) {
-    const bool update = o.mode == Mode::Update;
     const std::wstring root = o.dir, staging = root + L".new", old = root + L".old";
     const bool existed = Exists(Join(root, kAppName));
-    const std::wstring headline = update ? L"Updating to " + p.version : (existed ? L"Reinstalling " + o.name : L"Installing " + o.name);
-    Log(L"start " + std::wstring(update ? L"update" : L"install") + L" " + p.version + L" into " + root + L", files " + std::to_wstring(p.files.size()));
+    const std::wstring headline = existed ? L"Reinstalling " + o.name : L"Installing " + o.name;
+    Log(L"start install " + p.version + L" into " + root + L", files " + std::to_wstring(p.files.size()));
     s.Show(Working(headline, L"Checking the download"));
     try {
         Verify(p);
@@ -590,13 +779,7 @@ int Install(const Options& o, Shared& s, const Payload& p) {
         Log(L"unpacked in " + std::to_wstring(GetTickCount64() - t0) + L" ms");
         Screen w = Working(headline, L"");
         w.closable = false;
-        if (update) {
-            if (!Running(root).empty() || o.waitPid) {
-                w.detail = L"Waiting for AbsentMotion to close";
-                s.Show(w);
-            }
-            WaitClosed(o.waitPid, root, 600000);
-        } else if (existed && !AskWhileRunning(o, s)) {
+        if (existed && !AskWhileRunning(o, s)) {
             DeleteTree(staging);
             s.Quit();
             return 2;
@@ -612,7 +795,8 @@ int Install(const Options& o, Shared& s, const Payload& p) {
             FailLast(L"Could not put the new version in place");
         }
         Log(L"swapped in " + std::to_wstring(GetTickCount64() - t0) + L" ms");
-        Register(o, p);
+        Register(o, p.version, p.header.rawTotal);
+        Associate(o);
         if (!existed)
             for (const std::wstring& l : LinkPlaces(o)) MakeLink(l, root);
         WriteResult(o.result, "exit 0");
@@ -639,25 +823,155 @@ int Install(const Options& o, Shared& s, const Payload& p) {
         Log(L"cancelled");
         s.Quit();
         DeleteTree(staging);
-        WriteResult(o.result, "fail the update was cancelled");
-        if (update && o.launch && Exists(Join(root, kAppName))) {
-            try {
-                Launch(root);
-            } catch (const Error&) {
-            }
-        }
         return 2;
     } catch (const Error& e) {
         if (Exists(staging)) DeleteTree(staging);
         WriteResult(o.result, "fail " + Narrow(e.message));
-        if (update && o.launch && Exists(Join(root, kAppName))) {
+        return Fault(o, s, o.name + L" was not installed", e.message);
+    }
+}
+
+void TryLaunch(const std::wstring& root) {
+    if (!Exists(Join(root, kAppName))) return;
+    try {
+        Launch(root);
+    } catch (const Error& e) {
+        Log(L"could not open the app again: " + e.message);
+    }
+}
+
+const char* WriteFailure(const Error& e) {
+    if (e.code == ERROR_DISK_FULL || e.code == ERROR_HANDLE_DISK_FULL) return kSpace;
+    return e.code ? kPlace : kPayload;
+}
+
+int Update(const Options& o, Shared& s) {
+    const std::wstring root = o.dir, staging = root + L".new", old = root + L".old";
+    const std::wstring logDir = o.log.empty() ? Parent(g_log) : Parent(o.log);
+    Screen w = Working(L"Updating " + o.name, L"Checking the update");
+    w.closable = false;
+    s.Show(w);
+    bool moved = false, msiRemoved = false, desktop = false;
+    std::wstring msi, oldVersion;
+    ULONGLONG t0 = GetTickCount64();
+    try {
+        Stage(o, "verify");
+        Payload p;
+        try {
+            if (o.payload.empty()) Fail(L"No update file was given");
+            p = ReadPayload(o.payload);
+            Verify(p);
+        } catch (const Error& e) {
+            StopWith(kPayload, e.message);
+        }
+        Log(L"start update " + p.version + L" into " + root + L", files " + std::to_wstring(p.files.size()));
+        w.headline = L"Updating to " + p.version;
+        w.detail = L"";
+        s.Show(w);
+        if (!Exists(Join(root, kAppName))) StopWith(kPlace, L"There is no AbsentMotion in " + root);
+        if (!Writable(Parent(root))) StopWith(kPlace, L"Windows does not allow changes in " + Parent(root));
+        oldVersion = InstalledVersion(root);
+        if (Exists(staging)) DeleteTree(staging);
+        if (Exists(old)) DeleteTree(old);
+        ULARGE_INTEGER space{};
+        if (GetDiskFreeSpaceExW(Parent(root).c_str(), &space, nullptr, nullptr) && space.QuadPart < p.header.rawTotal + (64ull << 20))
+            StopWith(kSpace, L"There is not enough free space on the disk");
+        msi = FindMsi(root);
+        try {
+            Extract(p, staging, s);
+        } catch (const Error& e) {
+            StopWith(WriteFailure(e), e.message);
+        }
+        Log(L"unpacked in " + std::to_wstring(GetTickCount64() - t0) + L" ms");
+        Stage(o, "close");
+        w.detail = L"Closing AbsentMotion";
+        s.Show(w);
+        if (o.waitPid) {
+            Handle app(OpenProcess(SYNCHRONIZE, FALSE, o.waitPid));
+            if (app.Valid() && WaitForSingleObject(app.Get(), 60000) == WAIT_TIMEOUT) Log(L"the app did not quit by itself");
+        }
+        for (ULONGLONG end = GetTickCount64() + 3000; !Running(root).empty() && GetTickCount64() < end;) Sleep(100);
+        if (!CloseAll(root)) StopWith(kNoClose, L"AbsentMotion did not close");
+        w.headline = L"Finishing up";
+        w.detail = L"";
+        s.Show(w);
+        if (!msi.empty()) {
+            Stage(o, "msi");
+            const std::wstring msiLink = Join(Known(FOLDERID_Desktop), std::wstring(L"AbsentMotion.lnk")), target = LinkTarget(msiLink);
+            desktop = Exists(msiLink) && (target.empty() || StartsWithFolder(Full(target), root));
+            if (!MoveRetry(root, old, 20000)) StopWith(kInUse, L"Files of AbsentMotion were still in use: " + SystemMessage(GetLastError()));
+            moved = true;
+            if (!RemoveMsi(msi, root, logDir)) {
+                if (MoveRetry(old, root, 20000)) moved = false;
+                StopWith(kOld, L"Windows Installer did not remove the old version");
+            }
+            msiRemoved = true;
+        }
+        Stage(o, "swap");
+        if (!moved) {
+            if (!MoveRetry(root, old, 20000)) StopWith(kInUse, L"Files of AbsentMotion were still in use: " + SystemMessage(GetLastError()));
+            moved = true;
+        }
+        if (!MoveRetry(staging, root, 20000)) {
+            std::wstring why = SystemMessage(GetLastError());
+            if (MoveRetry(old, root, 20000)) moved = false;
+            StopWith(kPlace, L"Could not put the new version in place: " + why);
+        }
+        Log(L"swapped in " + std::to_wstring(GetTickCount64() - t0) + L" ms");
+        Stage(o, "register");
+        try {
+            Register(o, p.version, p.header.rawTotal);
+        } catch (const Error& e) {
+            Log(L"could not update the Apps entry: " + e.message);
+        }
+        std::vector<std::wstring> links = LinkPlaces(o);
+        if (msiRemoved || !StartsWithFolder(LinkTarget(links[0]), root)) MakeLink(links[0], root);
+        if (msiRemoved && desktop) MakeLink(links[1], root);
+        Associate(o);
+        ResultLine(o.result, "ok " + Narrow(p.version));
+        if (o.launch) {
+            w.headline = L"Opening " + o.name;
+            s.Show(w);
+            TryLaunch(root);
+            ULONGLONG end = GetTickCount64() + 60000;
+            while (!AppWindowVisible(root) && GetTickCount64() < end) Sleep(100);
+            Log(L"app window after " + std::to_wstring(GetTickCount64() - t0) + L" ms");
+        }
+        s.Quit();
+        if (Exists(old)) DeleteTree(old);
+        Log(L"done");
+        return 0;
+    } catch (const Stop& f) {
+        Log(L"failed: " + Widen(f.reason) + L": " + f.detail);
+        if (moved && !Exists(root) && Exists(old)) MoveRetry(old, root, 20000);
+        if (Exists(staging)) DeleteTree(staging);
+        if (msiRemoved || (!msi.empty() && Exists(Join(root, kAppName)) && FindMsi(root).empty())) {
             try {
-                Launch(root);
+                Register(o, oldVersion.empty() ? L"unknown" : oldVersion, 0);
             } catch (const Error&) {
             }
+            MakeLink(LinkPlaces(o)[0], root);
+            Associate(o);
         }
-        return Fault(o, s, update ? L"The update did not finish" : o.name + L" was not installed",
-                     e.message + (update ? L"\nYour current version is still installed." : L""));
+        ResultLine(o.result, std::string("fail ") + f.reason);
+        if (o.launch) TryLaunch(root);
+        Screen fail;
+        fail.look = Look::Failed;
+        fail.headline = L"The update did not finish";
+        fail.detail = f.detail + L"\nYour current version is still installed.";
+        fail.closable = false;
+        s.Show(fail);
+        Sleep(2500);
+        s.Quit();
+        return 1;
+    } catch (const Cancelled&) {
+        Log(L"cancelled");
+        if (moved && !Exists(root) && Exists(old)) MoveRetry(old, root, 20000);
+        if (Exists(staging)) DeleteTree(staging);
+        ResultLine(o.result, "fail the update was cancelled");
+        if (o.launch) TryLaunch(root);
+        s.Quit();
+        return 2;
     }
 }
 
@@ -695,6 +1009,7 @@ int Uninstall(const Options& o, Shared& s) {
         for (const std::wstring& l : LinkPlaces(o))
             if (StartsWithFolder(LinkTarget(l), root)) DeleteFileW(l.c_str());
         RegDeleteTreeW(HKEY_CURRENT_USER, UninstallKey(o).c_str());
+        Unassociate(o);
         Log(L"removed");
     } catch (const Error& e) {
         return Fault(o, s, o.name + L" was not removed", e.message);
@@ -750,13 +1065,14 @@ int Run(HINSTANCE instance) {
     } else {
         g_log = o.log;
     }
+    if (o.mode == Mode::Update) ResultLine(o.result, "started", true);
     CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
     if (o.mode == Mode::Uninstall && !o.fromTemp && RelaunchFromTemp(o)) return 0;
     Shared s;
     s.title = o.name + (o.mode == Mode::Uninstall ? L" Uninstall" : (o.mode == Mode::Update ? L" Update" : L" Setup"));
     Payload p;
     std::wstring broken;
-    if (o.mode != Mode::Uninstall) {
+    if (o.mode == Mode::Install) {
         try {
             p = ReadPayload(o.payload.empty() ? SelfPath() : o.payload);
             s.version = L"Version " + p.version;
@@ -766,6 +1082,12 @@ int Run(HINSTANCE instance) {
     }
     Handle lock(CreateMutexW(nullptr, FALSE, (L"Local\\AbsentMotionSetup-" + KeyName(o.name)).c_str()));
     if (lock.Valid() && WaitForSingleObject(lock.Get(), o.mode == Mode::Install ? 0 : 120000) == WAIT_TIMEOUT) {
+        if (o.mode == Mode::Update) {
+            Log(L"another update of " + o.dir + L" was still running");
+            ResultLine(o.result, std::string("fail ") + kInUse);
+            CoUninitialize();
+            return 1;
+        }
         HWND other = FindWindowW(L"AbsentMotionSetupWindow", nullptr);
         if (other) SetForegroundWindow(other);
         return 0;
@@ -775,9 +1097,9 @@ int Run(HINSTANCE instance) {
         CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
         if (!broken.empty()) {
             WriteResult(o.result, "fail " + Narrow(broken));
-            code = Fault(o, s, o.mode == Mode::Update ? L"The update did not finish" : o.name + L" was not installed", broken);
+            code = Fault(o, s, o.name + L" was not installed", broken);
         } else {
-            code = o.mode == Mode::Uninstall ? Uninstall(o, s) : Install(o, s, p);
+            code = o.mode == Mode::Uninstall ? Uninstall(o, s) : (o.mode == Mode::Update ? Update(o, s) : Install(o, s, p));
         }
         s.Quit();
         CoUninitialize();

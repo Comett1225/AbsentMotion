@@ -78,15 +78,16 @@ inline std::wstring SystemMessage(DWORD code) {
 
 class Error : public std::runtime_error {
 public:
-    explicit Error(const std::wstring& m) : std::runtime_error(Narrow(m)), message(m) {}
+    explicit Error(const std::wstring& m, DWORD c = 0) : std::runtime_error(Narrow(m)), message(m), code(c) {}
     std::wstring message;
+    DWORD code;
 };
 
 [[noreturn]] inline void Fail(const std::wstring& what) { throw Error(what); }
 
 [[noreturn]] inline void FailLast(const std::wstring& what) {
     DWORD code = GetLastError();
-    throw Error(what + L": " + SystemMessage(code));
+    throw Error(what + L": " + SystemMessage(code), code);
 }
 
 class Sha256 {
