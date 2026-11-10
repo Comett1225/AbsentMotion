@@ -127,3 +127,28 @@ internal fun fdStream(fd: java.io.FileDescriptor): OutputStream = object : java.
     override fun write(b: ByteArray, off: Int, len: Int) = out.write(b, off, len)
     override fun close() = flush()
 }
+
+class BundleFolder(private val dir: File) : ExportStore {
+    override fun open(folder: String?, name: String, mime: String): OpenExport {
+        val file = freeFile(dir, name)
+        val access = try { java.io.RandomAccessFile(file, "rw") } catch (t: Throwable) { throw ExportError(txt(R.string.export_error_create, name, dir.path), t) }
+        return OpenExport(access.fd, access::close, { Uri.fromFile(file) }, { file.delete() })
+    }
+
+    override fun save(folder: String?, name: String, mime: String, write: (OutputStream) -> Unit): Uri {
+        val file = open(folder, name, mime)
+        return try {
+            fdStream(file.fd).use(write)
+            file.publish()
+        } catch (t: Throwable) {
+            file.discard()
+            throw t
+        }
+    }
+
+    override fun location(where: String): String = app.absentmotion.platform.folderLabel(dir.path)
+
+    override fun delete(uri: Uri) { uri.path?.let { File(it).delete() } }
+
+    override fun sequenceFolder(name: String, mime: String): String = freeFolder(dir, name)
+}

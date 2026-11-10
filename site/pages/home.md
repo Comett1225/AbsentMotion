@@ -43,7 +43,7 @@ The thumbnail is a still taken when you close the editor, at the place where the
 
 ### The card menu
 
-The three-dot button on a card (named **More**) has these entries.
+The three-dot button on a card (named **More**) has these entries. Tap it to open the menu, or hold it: the menu opens under your finger, and when you slide onto an entry and let go, that entry runs at once.
 
 - **Export** opens the export screen straight from the list. The "Current Frame" options use the first frame. This is also the only place that offers the **XML** export. See [Export](@export).
 - **Duplicate** (**Duplicate Asset** for an asset) makes a copy named "name Copy", with its media.

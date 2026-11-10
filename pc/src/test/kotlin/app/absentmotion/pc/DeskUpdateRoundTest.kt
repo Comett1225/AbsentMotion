@@ -70,6 +70,8 @@ class DeskUpdateRoundTest {
         assertTrue(newer.exists())
         assertTrue(log.exists())
         sweepUpdates(dir, "5.0.3", false)
+        assertTrue(log.exists())
+        sweepUpdates(dir, "5.0.3", false, log.lastModified() + 11 * 60_000L)
         assertFalse(log.exists())
     }
 

@@ -451,3 +451,24 @@ fun rawFrameImage(rgba: ByteArray, width: Int, height: Int): androidx.compose.ui
 fun releaseFrameImage(image: androidx.compose.ui.graphics.ImageBitmap) = Unit
 
 fun videoDownloader(): app.absentmotion.tools.VideoFetcher = app.absentmotion.tools.VideoDownloader
+
+fun bundleStore(context: android.content.Context, folder: String?): app.absentmotion.export.ExportStore? {
+    val tree = folder?.let(android.net.Uri::parse) ?: return null
+    val allowed = context.contentResolver.persistedUriPermissions.any { it.uri == tree && it.isWritePermission }
+    return if (allowed) app.absentmotion.export.TreeExport(context, tree) else null
+}
+
+fun folderLabel(folder: String): String =
+    runCatching { android.provider.DocumentsContract.getTreeDocumentId(android.net.Uri.parse(folder)).substringAfter(':').ifEmpty { "/" } }.getOrDefault(folder)
+
+@androidx.compose.runtime.Composable
+fun rememberFolderPicker(onPicked: (String) -> Unit): () -> Unit {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val launcher = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree()) { uri ->
+        if (uri != null) {
+            runCatching { context.contentResolver.takePersistableUriPermission(uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION or android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION) }
+            onPicked(uri.toString())
+        }
+    }
+    return { launcher.launch(null) }
+}

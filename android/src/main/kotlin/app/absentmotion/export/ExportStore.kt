@@ -217,3 +217,34 @@ internal fun fdStream(fd: java.io.FileDescriptor): OutputStream = object : java.
     override fun write(b: ByteArray, off: Int, len: Int) = out.write(b, off, len)
     override fun close() = flush()
 }
+
+class TreeExport(context: Context, private val tree: Uri) : ExportStore {
+    private val resolver = context.contentResolver
+
+    private fun parent(): Uri = android.provider.DocumentsContract.buildDocumentUriUsingTree(tree, android.provider.DocumentsContract.getTreeDocumentId(tree))
+
+    override fun open(folder: String?, name: String, mime: String): OpenExport {
+        val document = runCatching { android.provider.DocumentsContract.createDocument(resolver, parent(), mime, name) }.getOrNull()
+            ?: throw ExportError(txt(R.string.export_error_create, name, location("")))
+        val file = runCatching { resolver.openFileDescriptor(document, "rw") }.getOrNull()
+            ?: throw ExportError(txt(R.string.export_error_create, name, location("")))
+        return OpenExport(file.fileDescriptor, file::close, { document }, { android.provider.DocumentsContract.deleteDocument(resolver, document) })
+    }
+
+    override fun save(folder: String?, name: String, mime: String, write: (OutputStream) -> Unit): Uri {
+        val file = open(folder, name, mime)
+        return try {
+            fdStream(file.fd).use(write)
+            file.publish()
+        } catch (t: Throwable) {
+            file.discard()
+            throw t
+        }
+    }
+
+    override fun location(where: String): String = app.absentmotion.platform.folderLabel(tree.toString())
+
+    override fun delete(uri: Uri) { runCatching { android.provider.DocumentsContract.deleteDocument(resolver, uri) } }
+
+    override fun sequenceFolder(name: String, mime: String): String = name
+}

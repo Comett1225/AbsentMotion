@@ -18,7 +18,7 @@ The button turns gray with a reason when the export cannot run: **Not enough sto
 |---|---|---|
 | **Video** | MP4, MOV, MKV or WebM | Movies/AbsentMotion |
 | **Audio Only** | WAV, FLAC, M4A, OGG or MP3 | Music/AbsentMotion |
-| **Project Bundle** | An `.absproj` file with the project and its media | Documents/AbsentMotion |
+| **Project Bundle** | An `.absproj` file with the project and its media | Documents/AbsentMotion, or the **Bundles folder** you chose |
 | **Current Frame as PNG** | One PNG image of the frame at the playhead | Pictures/AbsentMotion |
 | **Current Frame as...** | One image: PNG, JPEG, WebP, WebP lossless or BMP | Pictures/AbsentMotion |
 | **Image Sequence** | One image per frame, in a folder | Pictures/AbsentMotion |
@@ -112,6 +112,9 @@ One image per frame, saved in a folder named like the **Filename** (the project 
 ## Project Bundle and XML
 
 - **Project Bundle** makes one `.absproj` file with the project and the original media it uses. Keep it as a backup or move the project to another phone: see [Projects, backup and import](@projects).
+- The arrow on the **Project Bundle** card opens its page, with two choices: **Project bundle** (the normal file) and **Community bundle**.
+- A **Community bundle** is the same file with details for sharing it with the AbsentMotion community: a **Title**, a **Thumbnail** that you pick with a slider from a moment of your project, a **Description**, up to 8 **Tags** (pick from the list or add your own) and **Created by** (your name, remembered for next time). Tick **I made this and I'm happy for it to be shared** before you export. A Community bundle can be at most 20 MB, media and fonts included; the **File size** line shows how big it will be.
+- Bundles are saved to Documents/AbsentMotion. To save them somewhere else, choose a **Bundles folder** in Settings: see [Settings](@settings).
 - **XML** saves only the project file, without media. It is only offered from the project list.
 
 ## Check before and during export

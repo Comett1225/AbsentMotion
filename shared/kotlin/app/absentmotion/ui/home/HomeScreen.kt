@@ -1,5 +1,13 @@
 package app.absentmotion.ui.home
 
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
+import androidx.compose.ui.composed
+import androidx.compose.ui.unit.toSize
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import kotlinx.coroutines.withTimeoutOrNull
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.captionBar
 import androidx.compose.foundation.layout.statusBars
@@ -11,6 +19,7 @@ import app.absentmotion.platform.Uri
 import app.absentmotion.platform.rememberLauncherForActivityResult
 import app.absentmotion.platform.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -106,6 +115,7 @@ import androidx.compose.ui.window.PopupProperties
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import app.absentmotion.library.AppSettings
+import app.absentmotion.library.CommunityInfo
 import app.absentmotion.library.ImportReport
 import app.absentmotion.library.ProjectInfo
 import app.absentmotion.library.ProjectStore
@@ -193,7 +203,7 @@ fun HomeScreen(
     LaunchedEffect(version, changes) { projects = withContext(Dispatchers.IO) { store.list(includeDamaged = true) }; loaded = true }
     val shown = remember(projects, tab, query) { projects.filter { it.isElement == (tab == 1) && matchesSearch(query, it.title) } }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) onImportFile(uri) }
-    val toReport = imported.filter { it.sections.isNotEmpty() }
+    val toReport = imported.filter { it.sections.isNotEmpty() || it.community != null }
     LaunchedEffect(imported) {
         if (imported.isEmpty()) return@LaunchedEffect
         tab = if (imported.all { it.element }) 1 else 0
@@ -416,7 +426,8 @@ private fun ImportDialog(reports: List<ImportReport>, onDismiss: () -> Unit, onO
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
                 for (report in reports) {
-                    if (reports.size > 1) Text(report.title, Modifier.padding(top = 8.dp), color = Am.Navy, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    report.community?.let { CommunityCard(it) }
+                    if (reports.size > 1 && report.community == null) Text(report.title, Modifier.padding(top = 8.dp), color = Am.Navy, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                     for ((heading, lines) in report.sections) {
                         Text(heading.text(), Modifier.padding(top = 8.dp), color = Am.Navy, fontSize = 15.sp, fontWeight = FontWeight.Medium)
                         for (line in lines) Text("\u2022 ${line.text()}", color = Am.Navy, fontSize = 14.sp, lineHeight = 19.sp)
@@ -428,6 +439,18 @@ private fun ImportDialog(reports: List<ImportReport>, onDismiss: () -> Unit, onO
         confirmButton = { TextButton(onOpen) { Text(stringResource(R.string.open), color = Am.Navy) } },
         containerColor = Am.Card,
     )
+}
+
+@Composable
+internal fun CommunityCard(info: CommunityInfo) {
+    val picture = remember(info) { info.thumbnail?.let { runCatching { BitmapFactory.decodeByteArray(it, 0, it.size)?.asImageBitmap() }.getOrNull() } }
+    Column(Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        picture?.let { Image(it, null, Modifier.fillMaxWidth().aspectRatio(it.width.toFloat() / it.height).clip(RoundedCornerShape(10.dp)), contentScale = ContentScale.Fit) }
+        Text(info.title, Modifier.padding(top = 4.dp), color = Am.Navy, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+        if (info.creator.isNotEmpty()) Text(stringResource(R.string.community_by, info.creator), color = Am.Navy.copy(alpha = 0.7f), fontSize = 14.sp)
+        if (info.description.isNotEmpty()) Text(info.description, color = Am.Navy, fontSize = 14.sp, lineHeight = 19.sp)
+        if (info.tags.isNotEmpty()) Text(info.tags.joinToString("  \u00B7  "), color = Am.Navy.copy(alpha = 0.7f), fontSize = 13.sp)
+    }
 }
 
 @Composable
@@ -510,6 +533,7 @@ private fun ProjectCard(
     onCollect: () -> Unit,
 ) {
     val coords = remember { arrayOfNulls<LayoutCoordinates>(1) }
+    val pick = remember { HoldPick() }
     Box(
         modifier.padding(bottom = 12.dp).fillMaxWidth().heightIn(min = 96.dp)
             .onGloballyPositioned { coords[0] = it }
@@ -529,7 +553,8 @@ private fun ProjectCard(
             }
         }
         Box(
-            Modifier.align(Alignment.CenterEnd).size(48.dp).clickable { coords[0]?.let { onMenu(it.boundsInRoot()) } },
+            Modifier.align(Alignment.CenterEnd).size(48.dp).clickable { coords[0]?.let { onMenu(it.boundsInRoot()) } }
+                .holdToPick(pick) { coords[0]?.let { onMenu(it.boundsInRoot()) } },
             contentAlignment = Alignment.Center,
         ) {
             Icon(HomeIcons.More, stringResource(R.string.home_more), Modifier.size(24.dp), tint = Grey)
@@ -537,25 +562,69 @@ private fun ProjectCard(
         Box(Modifier.align(Alignment.BottomEnd).offset(y = 8.dp)) {
             RefMenu(menuOpen, onDismissMenu, Am.Card, RoundedCornerShape(14.dp), Modifier.width(270.dp)) {
                 if (!info.damaged) {
-                    MenuRow(stringResource(R.string.export), HomeIcons.Export, onExport)
-                    MenuRow(stringResource(if (info.isElement) R.string.home_duplicate_asset else R.string.home_duplicate), HomeIcons.Duplicate, onDuplicate)
-                    MenuRow(stringResource(R.string.home_collect_media), HomeIcons.Folder, onCollect)
+                    MenuRow(stringResource(R.string.export), HomeIcons.Export, onExport, pick)
+                    MenuRow(stringResource(if (info.isElement) R.string.home_duplicate_asset else R.string.home_duplicate), HomeIcons.Duplicate, onDuplicate, pick)
+                    MenuRow(stringResource(R.string.home_collect_media), HomeIcons.Folder, onCollect, pick)
                 }
-                MenuRow(stringResource(R.string.version_history), ChromeIcons.Undo, onHistory)
-                MenuRow(stringResource(if (info.isElement) R.string.home_delete_asset else R.string.delete), HomeIcons.Delete, onDelete)
+                MenuRow(stringResource(R.string.version_history), ChromeIcons.Undo, onHistory, pick)
+                MenuRow(stringResource(if (info.isElement) R.string.home_delete_asset else R.string.delete), HomeIcons.Delete, onDelete, pick)
             }
         }
     }
 }
 
 @Composable
-private fun MenuRow(label: String, icon: ImageVector, onClick: () -> Unit) {
+private fun MenuRow(label: String, icon: ImageVector, onClick: () -> Unit, pick: HoldPick? = null) {
     Row(
-        Modifier.fillMaxWidth().height(48.dp).clickable(onClick = onClick).padding(horizontal = 16.dp),
+        Modifier.fillMaxWidth().height(48.dp).then(pick?.row(label, onClick) ?: Modifier).clickable(onClick = onClick).padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(label, Modifier.weight(1f), color = Am.HomeInk, fontSize = 16.sp)
         Icon(icon, null, Modifier.size(24.dp), tint = Am.HomeInk)
+    }
+}
+
+internal class HoldPick {
+    var hovered by mutableStateOf<String?>(null)
+    private val rows = HashMap<String, Pair<LayoutCoordinates, () -> Unit>>()
+
+    fun row(key: String, action: () -> Unit): Modifier = Modifier
+        .onGloballyPositioned { rows[key] = it to action }
+        .drawBehind { if (hovered == key) drawRect(Am.Navy.copy(alpha = 0.1f)) }
+
+    fun at(screen: Offset): String? = rows.entries.firstOrNull { (_, row) ->
+        row.first.isAttached && Rect(row.first.localToScreen(Offset.Zero), row.first.size.toSize()).contains(screen)
+    }?.key
+
+    fun run(key: String) = rows[key]?.second?.invoke()
+}
+
+private const val HoldMs = 300L
+
+internal fun Modifier.holdToPick(pick: HoldPick, open: () -> Unit): Modifier = composed {
+    val haptics = LocalHapticFeedback.current
+    val where = remember { arrayOfNulls<LayoutCoordinates>(1) }
+    onGloballyPositioned { where[0] = it }.pointerInput(pick) {
+        awaitEachGesture {
+            val down = awaitFirstDown(requireUnconsumed = false)
+            var ended = false
+            withTimeoutOrNull(HoldMs) { waitForUpOrCancellation().also { ended = true } }
+            if (ended) return@awaitEachGesture
+            open()
+            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+            while (true) {
+                val change = awaitPointerEvent().changes.firstOrNull { it.id == down.id } ?: break
+                change.consume()
+                val screen = where[0]?.takeIf { it.isAttached }?.localToScreen(change.position)
+                val over = screen?.let(pick::at)
+                if (!change.pressed) {
+                    pick.hovered = null
+                    over?.let(pick::run)
+                    break
+                }
+                pick.hovered = over
+            }
+        }
     }
 }
 

@@ -46,7 +46,26 @@ data class ImportReport(
     val element: Boolean,
     val sections: List<Pair<UiText, List<UiText>>>,
     val template: Boolean = false,
+    val community: CommunityInfo? = null,
 ) : Serializable
+
+class CommunityInfo(
+    val title: String,
+    val creator: String,
+    val description: String,
+    val tags: List<String>,
+    val thumbnail: ByteArray?,
+) : Serializable {
+    companion object {
+        internal fun read(json: JSONObject, entries: Map<String, ByteArray>) = CommunityInfo(
+            json.optString("title").trim().take(80),
+            json.optString("creator").trim().take(80),
+            json.optString("description").trim().take(500),
+            json.optJSONArray("tags")?.let { list -> List(list.length()) { list.optString(it).trim().take(30) }.filter { it.isNotEmpty() }.take(8) }.orEmpty(),
+            entries[json.optString("thumbnail")],
+        )
+    }
+}
 
 data class ImportLimits(
     val entries: Int = 2_000,
@@ -91,6 +110,8 @@ class Importer(
         val fontFiles = ArrayList<File>()
         var projectEntry: String? = null
         var ours = false
+        var community: JSONObject? = null
+        val communityFiles = HashMap<String, ByteArray>()
         var sceneText = 0
         var written = limits.unpacked
         val ids = ArrayList<String>()
@@ -99,12 +120,14 @@ class Importer(
             eachEntry(open, limits) { name, input ->
                 files += name
                 when {
+                    name.startsWith("community/") -> input.readAtMost(MaxThumb + 1).takeIf { it.size <= MaxThumb }?.let { communityFiles[name] = it }
                     leaf(name) == "manifest.txt" -> sigs = readText(input, MaxXml).lineSequence().map { it.trim().split(':', limit = 3) }.filter { it.size >= 2 }
                         .associate { p -> p[0] to p.last() }
                     leaf(name) == "manifest.json" -> {
                         val manifest = JSONObject(readText(input, MaxXml))
                         projectEntry = manifest.optString("project").takeIf { it.isNotBlank() }
                         ours = manifest.optString("format") == "absentmotion-package"
+                        community = manifest.optJSONObject("community")
                         val listed = manifest.optJSONArray("media")?.let { list -> (0 until list.length()).map { list.getJSONObject(it) }.filter { it.has("entry") } }.orEmpty()
                         links = listed.associate { m -> m.getString("uri") to m.getString("entry") }
                         companions = listed.filter { it.has("companions") }.associate { m ->
@@ -177,7 +200,8 @@ class Importer(
             val renamedFonts = localFonts.filter { (old, new) -> old != new }
             scenes.indices.mapTo(saved) { add(ids[it], check(scenes[it]).let { root -> if (renamedFonts.isEmpty()) root else root.mapFonts(renamedFonts) }, moved[it]) }
             ids.forEach { File(store.mediaDir(it), ImportMarker).delete(); store.mediaDir(it).delete() }
-            return if (ours) saved else saved.map { if (it.element) it else it.copy(template = true) }
+            val shared = community?.takeIf { saved.size == 1 }?.let { CommunityInfo.read(it, communityFiles) }
+            return if (!ours) saved.map { if (it.element) it else it.copy(template = true) } else if (shared != null) saved.map { it.copy(community = shared) } else saved
         } catch (t: Throwable) {
             ids.forEach { store.mediaDir(it).deleteRecursively() }
             saved.forEach { store.delete(it.id) }
@@ -295,6 +319,7 @@ class Importer(
     companion object {
         private const val MaxXml = 16 shl 20
         private const val MaxFlaMedia = 256 shl 20
+        private const val MaxThumb = 2 shl 20
         private const val MaxSide = 16384
         private const val MaxFps = 240
         private const val MaxHours = 24

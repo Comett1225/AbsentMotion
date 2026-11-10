@@ -50,6 +50,7 @@ The color names are the editor and home screen colors: TopBar, PreviewBg, Timeli
 ## Projects and media
 
 - **Show the import card in the project list.** Off by default. Adds a card with **Choose file** at the top of the project list.
+- **Bundles folder.** Where project bundles (`.absproj`) are saved. Tap it to pick a folder once; after that every bundle goes straight there. **Use the default bundles folder** goes back to Documents/AbsentMotion.
 - **Keep a copy of imported media in the project.** On by default. The photo, video or audio you add is copied inside the project, so it keeps working if the original is moved or deleted. Turn it off to save storage if you never move your files.
 - **Cut-out quality.** **Standard** or **AI background removal 2.0**: the kind of cut-out you get when you remove the background of a photo. See [AI tools](@ai-tools).
 - **Remove caption model.** Only shown after the speech model for captions has been downloaded. It shows the size of the file and deletes it; the app downloads it again if you use captions later.

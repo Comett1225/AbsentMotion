@@ -221,6 +221,7 @@ internal fun PlaybackSettings(settings: AppSettings) {
 internal fun ProjectsSettings(settings: AppSettings, onDemoMode: (Boolean) -> Unit) {
     if (!DESK) SwitchRow(stringResource(R.string.settings_open_xml), settings.xmlUpload, enabled = true) { settings.xmlUpload = it }
     SwitchRow(stringResource(R.string.settings_keep_media_copies), settings.keepMediaCopies, enabled = true) { settings.keepMediaCopies = it }
+    BundlesFolderRows(settings)
     if (settings.demoModeShown) SwitchRow(stringResource(R.string.settings_demo_mode), settings.demoMode, enabled = true) { settings.demoMode = it; onDemoMode(it) }
     CaptionModelRow()
     CutoutRows()
@@ -319,6 +320,14 @@ private fun CaptionModelRow() {
         dismissButton = { TextButton({ ask = false }) { Text(stringResource(R.string.cancel), color = Am.Navy) } },
         containerColor = Am.Card,
     )
+}
+
+@Composable
+private fun BundlesFolderRows(settings: AppSettings) {
+    val pick = app.absentmotion.platform.rememberFolderPicker { settings.bundlesFolder = it }
+    val folder = settings.bundlesFolder
+    ActionRow(stringResource(R.string.settings_bundles_folder), folder?.let { app.absentmotion.platform.folderLabel(it) } ?: "Documents/${app.absentmotion.export.AppFolder}", chevron = true) { pick() }
+    if (folder != null) ActionRow(stringResource(R.string.settings_bundles_default), "", chevron = false) { settings.bundlesFolder = null }
 }
 
 @Composable

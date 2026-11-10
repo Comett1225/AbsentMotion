@@ -390,3 +390,17 @@ fun releaseFrameImage(image: ImageBitmap) {
 }
 
 fun videoDownloader(): app.absentmotion.tools.VideoFetcher = app.absentmotion.tools.DeskVideoDownloader
+
+fun bundleStore(context: android.content.Context, folder: String?): app.absentmotion.export.ExportStore? =
+    folder?.let { java.io.File(it) }?.takeIf { it.isDirectory || it.mkdirs() }?.let { app.absentmotion.export.BundleFolder(it) }
+
+fun folderLabel(folder: String): String {
+    val home = System.getProperty("user.home").orEmpty()
+    return if (home.isNotEmpty() && folder.startsWith(home)) "~" + folder.removePrefix(home) else folder
+}
+
+@androidx.compose.runtime.Composable
+fun rememberFolderPicker(onPicked: (String) -> Unit): () -> Unit {
+    val title = app.absentmotion.i18n.AppText.get(app.absentmotion.R.string.settings_bundles_folder)
+    return { app.absentmotion.desk.DeskPicker.openFolder(title)?.let { onPicked(it.absolutePath) } }
+}

@@ -156,7 +156,7 @@ internal fun DeskHome(
     val firstTick = remember { newTick }
     LaunchedEffect(newTick) { if (newTick != firstTick) newProject() }
     LaunchedEffect(version, changes) { projects = withContext(Dispatchers.IO) { store.list(includeDamaged = true) }; loaded = true }
-    val toReport = imported.filter { it.sections.isNotEmpty() }
+    val toReport = imported.filter { it.sections.isNotEmpty() || it.community != null }
     LaunchedEffect(imported) {
         if (imported.isEmpty()) return@LaunchedEffect
         section = when { imported.all { it.template } -> DeskSection.Templates; imported.all { it.element } -> DeskSection.Assets; else -> DeskSection.Projects }
@@ -502,7 +502,8 @@ private fun DeskImportReport(reports: List<ImportReport>, onDismiss: () -> Unit,
         DeskDialogHeader(stringResource(R.string.import_complete), onDismiss)
         Column(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()).padding(horizontal = 24.dp, vertical = 16.dp)) {
             for (report in reports) {
-                if (reports.size > 1) Text(report.title, Modifier.padding(top = 8.dp), color = Am.Navy, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                report.community?.let { CommunityCard(it) }
+                if (reports.size > 1 && report.community == null) Text(report.title, Modifier.padding(top = 8.dp), color = Am.Navy, fontSize = 15.sp, fontWeight = FontWeight.Bold)
                 for ((heading, lines) in report.sections) {
                     Text(heading.text(), Modifier.padding(top = 10.dp), color = Am.Navy, fontSize = 14.sp, fontWeight = FontWeight.Medium)
                     for (line in lines) Text("• ${line.text()}", color = Am.HomeInk, fontSize = 13.sp, lineHeight = 18.sp)

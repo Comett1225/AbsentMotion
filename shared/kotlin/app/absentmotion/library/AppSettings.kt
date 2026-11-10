@@ -121,6 +121,15 @@ class AppSettings(private val context: Context) {
 
 
     private var keepMediaCopiesState by mutableStateOf(prefs.getBoolean("keepMediaCopies", true))
+    private var bundlesFolderState by mutableStateOf(prefs.getString("bundlesFolder", null))
+
+    var communityCreator: String
+        get() = prefs.getString("communityCreator", "").orEmpty()
+        set(value) { prefs.edit().putString("communityCreator", value).apply() }
+
+    var bundlesFolder: String?
+        get() = bundlesFolderState
+        set(value) { bundlesFolderState = value; prefs.edit().putString("bundlesFolder", value).apply() }
 
     var keepMediaCopies: Boolean
         get() = keepMediaCopiesState

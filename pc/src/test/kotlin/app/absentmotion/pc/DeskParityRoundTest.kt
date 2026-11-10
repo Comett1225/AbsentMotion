@@ -43,6 +43,8 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import app.absentmotion.export.CommunityThumbnail
+import androidx.compose.ui.test.performScrollTo
 import java.io.File
 import javax.imageio.ImageIO
 
@@ -327,6 +329,32 @@ class DeskParityRoundTest {
             assertTrue(DeskExports.finish!!.files.single().toFile()!!.length() > 1000)
             settle()
             shot("export-finished-home")
+        }
+    }
+
+    @Test fun aCommunityBundleCarriesItsThumbnailAndDetails() {
+        prepare("community-bundle")
+        session(1280, 800) { app ->
+            val editor = openEditor(app, "styles.xml")
+            runOnIdle { editor.exportOpen = true }
+            settle(900)
+            onAllNodesWithText(text(R.string.project_bundle)).onFirst().performClick()
+            settle()
+            onAllNodesWithText(text(R.string.bundle_community)).onFirst().performClick()
+            settle(1500)
+            onAllNodesWithText(text(R.string.community_confirm)).onFirst().performScrollTo().performClick()
+            settle()
+            shot("community-bundle")
+            onAllNodesWithText(text(R.string.export)).filter(hasClickAction()).onLast().performClick()
+            waitUntil(timeoutMillis = 60_000) { DeskExports.finish != null }
+            assertEquals(true, DeskExports.finish!!.ok)
+            java.util.zip.ZipFile(DeskExports.finish!!.files.single().toFile()!!).use { zip ->
+                val manifest = org.json.JSONObject(zip.getInputStream(zip.getEntry("manifest.json")).readBytes().decodeToString())
+                val community = manifest.getJSONObject("community")
+                assertEquals(CommunityThumbnail, community.getString("thumbnail"))
+                assertTrue(community.getString("title").isNotBlank())
+                assertTrue(zip.getEntry(CommunityThumbnail).size > 1000)
+            }
         }
     }
 

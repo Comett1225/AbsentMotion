@@ -54,7 +54,7 @@ You can open a project file from another app (for example a file manager) with S
 | A plain scene XML file | A normal project. Media links are not followed for safety, so media shows as missing unless it can be found in the gallery. |
 | An Adobe Animate file (`.fla`) | A normal project: see [Adobe Animate files](#adobe-animate-files) |
 
-Effects that AbsentMotion has are converted. Effects it does not have stay in the file but are not drawn. After an import, a report lists only what did not come over: effects it cannot run, settings that could not be carried over, media not found and fonts not installed. When everything came over, no report is shown. Backup files (`.absbackup`) are restored from Settings, not imported here.
+Effects that AbsentMotion has are converted. Effects it does not have stay in the file but are not drawn. A **Community bundle** shows its thumbnail, title, creator, description and tags when it is imported. After an import, a report lists only what did not come over: effects it cannot run, settings that could not be carried over, media not found and fonts not installed. When everything came over, no report is shown. Backup files (`.absbackup`) are restored from Settings, not imported here.
 
 There are limits to protect the phone. For example, a package can have at most 2000 files and 32 projects, be at most 2 GB unpacked, and a scene needs a size of at most 16384 pixels and a frame rate from 1 to 240. The app says which rule a file broke.
 
@@ -82,7 +82,7 @@ Older `.fla` files from Flash CS4 and before use another format. The app then sa
 ## File formats and where things are
 
 - A project is one XML text file. Media sit beside it in the project's private folder.
-- An `.absproj` is a ZIP: `project.xml`, a `manifest.json` and the media files under `media/`. 3D models keep their files in a folder.
+- An `.absproj` is a ZIP: `project.xml`, a `manifest.json` and the media files under `media/`. 3D models keep their files in a folder. A Community bundle also has its details in `manifest.json` and its thumbnail in `community/`.
 - An `.absbackup` is a ZIP with every project, preset, template, font and media file.
 - **Private app storage** (removed when you uninstall): projects and their thumbnails, version history, kept media, templates, presets, color palettes, crash drafts, crash logs, imported fonts, the caption model, preview copies and AI results.
 - **Shared storage** (stays when you uninstall): Movies/AbsentMotion (videos), Pictures/AbsentMotion (GIFs, still frames, image sequences and palette pictures), Music/AbsentMotion (audio exports), Documents/AbsentMotion (`.absproj`, XML, backups and palette files) and DCIM/AbsentMotion (photos and videos from the in-app camera).

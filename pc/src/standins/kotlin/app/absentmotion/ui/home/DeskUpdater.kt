@@ -205,12 +205,15 @@ internal const val INSTALL_LOG = "update-install.log"
 internal fun checksumOf(client: TrustedHttp, release: Release, apk: ApkAsset): String =
     if (apk.manifest != null) signedChecksum(client, release, apk) else throw UpdateProblem(UpdateFailure.Unsigned)
 
-internal fun sweepUpdates(dir: File, installed: String, keepLog: Boolean) {
+internal const val LOG_KEEP_MS = 10 * 60_000L
+
+internal fun sweepUpdates(dir: File, installed: String, keepLog: Boolean, now: Long = System.currentTimeMillis()) {
     val have = Version.parse(installed) ?: return
     val named = Regex("^AbsentMotion-(\\d+\\.\\d+\\.\\d+)")
     dir.listFiles().orEmpty().filter { it.isFile }.forEach { file ->
         val version = named.find(file.name)?.groupValues?.get(1)?.let { Version.parse(it) }
-        if ((version != null && version <= have) || (!keepLog && file.name == INSTALL_LOG)) file.delete()
+        val oldLog = !keepLog && file.name == INSTALL_LOG && now - file.lastModified() > LOG_KEEP_MS
+        if ((version != null && version <= have) || oldLog) file.delete()
     }
 }
 
