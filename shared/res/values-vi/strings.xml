@@ -2338,6 +2338,12 @@
     <string name="desk_update_reason_helper">trình hỗ trợ cập nhật không khởi động</string>
     <string name="desk_update_reason_installer">trình cài đặt trả về mã %1$s</string>
     <string name="desk_update_reason_unknown">lý do không xác định</string>
+    <string name="desk_update_reason_blocked">trình cập nhật đã dừng trước khi xong; phần mềm bảo mật như Windows Defender có thể đã chặn nó</string>
+    <string name="desk_update_reason_locked">tệp của ứng dụng vẫn đang được dùng</string>
+    <string name="desk_update_reason_space">không đủ dung lượng đĩa</string>
+    <string name="desk_update_reason_payload">tệp cập nhật bị thiếu hoặc bị hỏng</string>
+    <string name="desk_update_reason_old">không thể gỡ phiên bản cũ</string>
+    <string name="desk_update_reason_system">macOS không cho phép thay ứng dụng; hãy xem Cài đặt hệ thống &gt; Quyền riêng tư &amp; Bảo mật &gt; Quản lý ứng dụng</string>
     <string name="desk_menu_file">Tệp</string>
     <string name="desk_menu_view">Xem</string>
     <string name="desk_menu_playback">Phát</string>

@@ -2338,6 +2338,12 @@
     <string name="desk_update_reason_helper">pembantu kemas kini tidak bermula</string>
     <string name="desk_update_reason_installer">pemasang memulangkan kod %1$s</string>
     <string name="desk_update_reason_unknown">sebab tidak diketahui</string>
+    <string name="desk_update_reason_blocked">pengemas kini berhenti sebelum selesai; perisian keselamatan seperti Windows Defender mungkin telah menyekatnya</string>
+    <string name="desk_update_reason_locked">fail aplikasi masih digunakan</string>
+    <string name="desk_update_reason_space">ruang cakera tidak mencukupi</string>
+    <string name="desk_update_reason_payload">fail kemas kini hilang atau rosak</string>
+    <string name="desk_update_reason_old">versi lama tidak dapat dibuang</string>
+    <string name="desk_update_reason_system">macOS tidak membenarkan aplikasi diganti; semak Seting Sistem &gt; Privasi &amp; Keselamatan &gt; Pengurusan App</string>
     <string name="desk_menu_file">Fail</string>
     <string name="desk_menu_view">Lihat</string>
     <string name="desk_menu_playback">Main Balik</string>

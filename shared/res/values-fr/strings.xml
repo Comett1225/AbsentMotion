@@ -2396,6 +2396,12 @@
     <string name="desk_update_reason_helper">l’assistant de mise à jour ne s’est pas lancé</string>
     <string name="desk_update_reason_installer">le programme d’installation a renvoyé le code %1$s</string>
     <string name="desk_update_reason_unknown">raison inconnue</string>
+    <string name="desk_update_reason_blocked">le programme de mise à jour s’est arrêté avant la fin ; un logiciel de sécurité comme Windows Defender l’a peut-être bloqué</string>
+    <string name="desk_update_reason_locked">des fichiers de l’app étaient encore utilisés</string>
+    <string name="desk_update_reason_space">il n’y avait pas assez d’espace disque</string>
+    <string name="desk_update_reason_payload">le fichier de mise à jour était absent ou endommagé</string>
+    <string name="desk_update_reason_old">l’ancienne version n’a pas pu être supprimée</string>
+    <string name="desk_update_reason_system">macOS n’a pas permis de remplacer l’app ; vérifiez Réglages Système &gt; Confidentialité et sécurité &gt; Gestion des apps</string>
     <string name="desk_menu_file">Fichier</string>
     <string name="desk_menu_view">Affichage</string>
     <string name="desk_menu_playback">Lecture</string>

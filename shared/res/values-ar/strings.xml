@@ -2483,6 +2483,12 @@
     <string name="desk_update_reason_helper">لم تبدأ أداة مساعدة التحديث</string>
     <string name="desk_update_reason_installer">أعاد برنامج التثبيت الرمز %1$s</string>
     <string name="desk_update_reason_unknown">سبب غير معروف</string>
+    <string name="desk_update_reason_blocked">توقّف المحدِّث قبل أن ينتهي؛ ربما حظره برنامج أمان مثل Windows Defender</string>
+    <string name="desk_update_reason_locked">كانت ملفات التطبيق لا تزال قيد الاستخدام</string>
+    <string name="desk_update_reason_space">لم تكن هناك مساحة كافية على القرص</string>
+    <string name="desk_update_reason_payload">ملف التحديث مفقود أو تالف</string>
+    <string name="desk_update_reason_old">تعذّرت إزالة الإصدار القديم</string>
+    <string name="desk_update_reason_system">لم يسمح macOS باستبدال التطبيق؛ راجع إعدادات النظام &gt; الخصوصية والأمن &gt; إدارة التطبيقات</string>
     <string name="desk_menu_file">ملف</string>
     <string name="desk_menu_view">عرض</string>
     <string name="desk_menu_playback">التشغيل</string>

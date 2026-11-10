@@ -2338,6 +2338,12 @@
     <string name="desk_update_reason_helper">アップデートヘルパーが起動しなかった</string>
     <string name="desk_update_reason_installer">インストーラーがコード%1$sを返した</string>
     <string name="desk_update_reason_unknown">原因不明</string>
+    <string name="desk_update_reason_blocked">アップデーターが完了前に止まった。Windows Defender などのセキュリティソフトがブロックした可能性がある</string>
+    <string name="desk_update_reason_locked">アプリのファイルがまだ使用中だった</string>
+    <string name="desk_update_reason_space">ディスクの空き容量が足りなかった</string>
+    <string name="desk_update_reason_payload">アップデートファイルが見つからないか壊れていた</string>
+    <string name="desk_update_reason_old">古いバージョンを削除できなかった</string>
+    <string name="desk_update_reason_system">macOS がアプリの置き換えを許可しなかった。システム設定 &gt; プライバシーとセキュリティ &gt; App管理 を確認してください</string>
     <string name="desk_menu_file">ファイル</string>
     <string name="desk_menu_view">表示</string>
     <string name="desk_menu_playback">再生</string>

@@ -2367,6 +2367,12 @@
     <string name="desk_update_reason_helper">güncelleme yardımcısı başlamadı</string>
     <string name="desk_update_reason_installer">yükleyici %1$s kodunu döndürdü</string>
     <string name="desk_update_reason_unknown">bilinmeyen neden</string>
+    <string name="desk_update_reason_blocked">güncelleyici bitmeden durdu; Windows Defender gibi bir güvenlik yazılımı onu engellemiş olabilir</string>
+    <string name="desk_update_reason_locked">uygulamanın dosyaları hâlâ kullanılıyordu</string>
+    <string name="desk_update_reason_space">yeterli disk alanı yoktu</string>
+    <string name="desk_update_reason_payload">güncelleme dosyası eksik ya da bozuktu</string>
+    <string name="desk_update_reason_old">eski sürüm kaldırılamadı</string>
+    <string name="desk_update_reason_system">macOS uygulamanın değiştirilmesine izin vermedi; Sistem Ayarları &gt; Gizlilik ve Güvenlik &gt; Uygulama Yönetimi\'ni kontrol edin</string>
     <string name="desk_menu_file">Dosya</string>
     <string name="desk_menu_view">Görünüm</string>
     <string name="desk_menu_playback">Oynatma</string>

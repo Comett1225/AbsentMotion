@@ -2367,6 +2367,12 @@
     <string name="desk_update_reason_helper">ابزار کمکی به‌روزرسانی شروع نشد</string>
     <string name="desk_update_reason_installer">نصب‌کننده کد %1$s را برگرداند</string>
     <string name="desk_update_reason_unknown">دلیل نامشخص</string>
+    <string name="desk_update_reason_blocked">به‌روزرسان پیش از پایان متوقف شد؛ ممکن است نرم‌افزار امنیتی مانند Windows Defender آن را مسدود کرده باشد</string>
+    <string name="desk_update_reason_locked">فایل‌های برنامه هنوز در حال استفاده بودند</string>
+    <string name="desk_update_reason_space">فضای دیسک کافی نبود</string>
+    <string name="desk_update_reason_payload">فایل به‌روزرسانی موجود نبود یا آسیب دیده بود</string>
+    <string name="desk_update_reason_old">نسخه قدیمی حذف نشد</string>
+    <string name="desk_update_reason_system">‏macOS اجازه جایگزینی برنامه را نداد؛ تنظیمات سیستم &gt; حریم خصوصی و امنیت &gt; مدیریت برنامه‌ها را بررسی کنید</string>
     <string name="desk_menu_file">فایل</string>
     <string name="desk_menu_view">نما</string>
     <string name="desk_menu_playback">پخش</string>

@@ -2367,6 +2367,12 @@
     <string name="desk_update_reason_helper">der Update-Helfer wurde nicht gestartet</string>
     <string name="desk_update_reason_installer">das Installationsprogramm hat den Code %1$s zurückgegeben</string>
     <string name="desk_update_reason_unknown">unbekannter Grund</string>
+    <string name="desk_update_reason_blocked">das Update-Programm wurde vor dem Ende gestoppt; Sicherheitssoftware wie Windows Defender hat es vielleicht blockiert</string>
+    <string name="desk_update_reason_locked">Dateien der App waren noch in Benutzung</string>
+    <string name="desk_update_reason_space">es war nicht genug Speicherplatz frei</string>
+    <string name="desk_update_reason_payload">die Update-Datei fehlte oder war beschädigt</string>
+    <string name="desk_update_reason_old">die alte Version konnte nicht entfernt werden</string>
+    <string name="desk_update_reason_system">macOS hat das Ersetzen der App nicht erlaubt; prüfe Systemeinstellungen &gt; Datenschutz &amp; Sicherheit &gt; App-Verwaltung</string>
     <string name="desk_menu_file">Datei</string>
     <string name="desk_menu_view">Ansicht</string>
     <string name="desk_menu_playback">Wiedergabe</string>

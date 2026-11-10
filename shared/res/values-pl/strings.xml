@@ -2425,6 +2425,12 @@
     <string name="desk_update_reason_helper">program pomocniczy aktualizacji nie uruchomił się</string>
     <string name="desk_update_reason_installer">instalator zwrócił kod %1$s</string>
     <string name="desk_update_reason_unknown">nieznany powód</string>
+    <string name="desk_update_reason_blocked">program aktualizacji zatrzymał się przed końcem; mogło go zablokować oprogramowanie zabezpieczające, takie jak Windows Defender</string>
+    <string name="desk_update_reason_locked">pliki aplikacji były jeszcze używane</string>
+    <string name="desk_update_reason_space">zabrakło miejsca na dysku</string>
+    <string name="desk_update_reason_payload">brakowało pliku aktualizacji albo był uszkodzony</string>
+    <string name="desk_update_reason_old">nie udało się usunąć starej wersji</string>
+    <string name="desk_update_reason_system">macOS nie pozwolił zastąpić aplikacji; sprawdź Ustawienia systemowe &gt; Prywatność i ochrona &gt; Zarządzanie aplikacjami</string>
     <string name="desk_menu_file">Plik</string>
     <string name="desk_menu_view">Widok</string>
     <string name="desk_menu_playback">Odtwarzanie</string>

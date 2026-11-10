@@ -2425,6 +2425,12 @@
     <string name="desk_update_reason_helper">помічник оновлення не запустився</string>
     <string name="desk_update_reason_installer">інсталятор повернув код %1$s</string>
     <string name="desk_update_reason_unknown">невідома причина</string>
+    <string name="desk_update_reason_blocked">програма оновлення зупинилася, не завершивши роботу; її могла заблокувати захисна програма, наприклад Windows Defender</string>
+    <string name="desk_update_reason_locked">файли застосунку ще використовувалися</string>
+    <string name="desk_update_reason_space">на диску бракувало місця</string>
+    <string name="desk_update_reason_payload">файл оновлення був відсутній або пошкоджений</string>
+    <string name="desk_update_reason_old">не вдалося видалити стару версію</string>
+    <string name="desk_update_reason_system">macOS не дозволила замінити застосунок; перевірте Системні параметри &gt; Приватність і безпека &gt; Керування програмами</string>
     <string name="desk_menu_file">Файл</string>
     <string name="desk_menu_view">Вигляд</string>
     <string name="desk_menu_playback">Відтворення</string>

@@ -2338,6 +2338,12 @@
     <string name="desk_update_reason_helper">更新助手未启动</string>
     <string name="desk_update_reason_installer">安装程序返回了代码 %1$s</string>
     <string name="desk_update_reason_unknown">原因未知</string>
+    <string name="desk_update_reason_blocked">更新程序在完成前停止了；可能是Windows Defender等安全软件将其阻止</string>
+    <string name="desk_update_reason_locked">App的文件仍在使用中</string>
+    <string name="desk_update_reason_space">磁盘空间不足</string>
+    <string name="desk_update_reason_payload">更新文件丢失或已损坏</string>
+    <string name="desk_update_reason_old">无法移除旧版本</string>
+    <string name="desk_update_reason_system">macOS不允许替换App；请检查“系统设置”&gt;“隐私与安全性”&gt;“App管理”</string>
     <string name="desk_menu_file">文件</string>
     <string name="desk_menu_view">视图</string>
     <string name="desk_menu_playback">播放</string>

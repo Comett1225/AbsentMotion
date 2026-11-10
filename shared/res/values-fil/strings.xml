@@ -2367,6 +2367,12 @@
     <string name="desk_update_reason_helper">hindi nagsimula ang update helper</string>
     <string name="desk_update_reason_installer">nagbalik ng code na %1$s ang installer</string>
     <string name="desk_update_reason_unknown">hindi alam na dahilan</string>
+    <string name="desk_update_reason_blocked">huminto ang updater bago matapos; maaaring hinarangan ito ng security software tulad ng Windows Defender</string>
+    <string name="desk_update_reason_locked">ginagamit pa ang mga file ng app</string>
+    <string name="desk_update_reason_space">kulang ang espasyo sa disk</string>
+    <string name="desk_update_reason_payload">nawawala o sira ang update file</string>
+    <string name="desk_update_reason_old">hindi maalis ang lumang bersyon</string>
+    <string name="desk_update_reason_system">hindi pinayagan ng macOS na palitan ang app; tingnan ang System Settings &gt; Privacy &amp; Security &gt; App Management</string>
     <string name="desk_menu_file">File</string>
     <string name="desk_menu_view">Tingnan</string>
     <string name="desk_menu_playback">Playback</string>

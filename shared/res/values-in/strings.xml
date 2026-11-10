@@ -2338,6 +2338,12 @@
     <string name="desk_update_reason_helper">pembantu pembaruan tidak berjalan</string>
     <string name="desk_update_reason_installer">penginstal mengembalikan kode %1$s</string>
     <string name="desk_update_reason_unknown">alasan tidak diketahui</string>
+    <string name="desk_update_reason_blocked">pembaru dihentikan sebelum selesai; perangkat lunak keamanan seperti Windows Defender mungkin memblokirnya</string>
+    <string name="desk_update_reason_locked">file aplikasi masih digunakan</string>
+    <string name="desk_update_reason_space">ruang disk tidak cukup</string>
+    <string name="desk_update_reason_payload">file pembaruan hilang atau rusak</string>
+    <string name="desk_update_reason_old">versi lama tidak dapat dihapus</string>
+    <string name="desk_update_reason_system">macOS tidak mengizinkan aplikasi diganti; periksa Pengaturan Sistem &gt; Privasi &amp; Keamanan &gt; Manajemen App</string>
     <string name="desk_menu_file">File</string>
     <string name="desk_menu_view">Tampilan</string>
     <string name="desk_menu_playback">Pemutaran</string>

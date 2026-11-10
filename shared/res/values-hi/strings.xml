@@ -2367,6 +2367,12 @@
     <string name="desk_update_reason_helper">अपडेट हेल्पर शुरू नहीं हुआ</string>
     <string name="desk_update_reason_installer">इंस्टॉलर ने कोड %1$s लौटाया</string>
     <string name="desk_update_reason_unknown">कारण पता नहीं है</string>
+    <string name="desk_update_reason_blocked">अपडेटर पूरा होने से पहले रुक गया; Windows Defender जैसे सुरक्षा सॉफ़्टवेयर ने इसे रोका हो सकता है</string>
+    <string name="desk_update_reason_locked">ऐप की फ़ाइलें अभी भी इस्तेमाल में थीं</string>
+    <string name="desk_update_reason_space">डिस्क में पर्याप्त जगह नहीं थी</string>
+    <string name="desk_update_reason_payload">अपडेट फ़ाइल गायब या खराब थी</string>
+    <string name="desk_update_reason_old">पुराना वर्शन हटाया नहीं जा सका</string>
+    <string name="desk_update_reason_system">macOS ने ऐप को बदलने नहीं दिया; सिस्टम सेटिंग्स &gt; गोपनीयता और सुरक्षा &gt; ऐप प्रबंधन देखें</string>
     <string name="desk_menu_file">फ़ाइल</string>
     <string name="desk_menu_view">देखें</string>
     <string name="desk_menu_playback">प्लेबैक</string>

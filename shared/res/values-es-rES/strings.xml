@@ -2396,6 +2396,12 @@
     <string name="desk_update_reason_helper">el asistente de actualización no se inició</string>
     <string name="desk_update_reason_installer">el instalador devolvió el código %1$s</string>
     <string name="desk_update_reason_unknown">motivo desconocido</string>
+    <string name="desk_update_reason_blocked">el actualizador se detuvo antes de terminar; un software de seguridad como Windows Defender puede haberlo bloqueado</string>
+    <string name="desk_update_reason_locked">algunos archivos de la app seguían en uso</string>
+    <string name="desk_update_reason_space">no había espacio suficiente en el disco</string>
+    <string name="desk_update_reason_payload">el archivo de actualización faltaba o estaba dañado</string>
+    <string name="desk_update_reason_old">no se ha podido quitar la versión anterior</string>
+    <string name="desk_update_reason_system">macOS no ha permitido sustituir la app; revisa Ajustes del Sistema &gt; Privacidad y seguridad &gt; Gestión de apps</string>
     <string name="desk_menu_file">Archivo</string>
     <string name="desk_menu_view">Visualización</string>
     <string name="desk_menu_playback">Reproducción</string>

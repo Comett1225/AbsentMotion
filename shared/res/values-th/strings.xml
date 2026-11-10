@@ -2338,6 +2338,12 @@
     <string name="desk_update_reason_helper">ตัวช่วยอัปเดตไม่เริ่มทำงาน</string>
     <string name="desk_update_reason_installer">ตัวติดตั้งส่งรหัส %1$s กลับมา</string>
     <string name="desk_update_reason_unknown">ไม่ทราบสาเหตุ</string>
+    <string name="desk_update_reason_blocked">ตัวอัปเดตหยุดก่อนทำเสร็จ ซอฟต์แวร์ความปลอดภัยอย่าง Windows Defender อาจบล็อกไว้</string>
+    <string name="desk_update_reason_locked">ไฟล์ของแอปยังถูกใช้งานอยู่</string>
+    <string name="desk_update_reason_space">พื้นที่ดิสก์ไม่พอ</string>
+    <string name="desk_update_reason_payload">ไฟล์อัปเดตหายไปหรือเสียหาย</string>
+    <string name="desk_update_reason_old">ลบเวอร์ชันเก่าไม่ได้</string>
+    <string name="desk_update_reason_system">macOS ไม่อนุญาตให้แทนที่แอป ตรวจดูที่ การตั้งค่าระบบ &gt; ความเป็นส่วนตัวและความปลอดภัย &gt; การจัดการแอป</string>
     <string name="desk_menu_file">ไฟล์</string>
     <string name="desk_menu_view">มุมมอง</string>
     <string name="desk_menu_playback">การเล่น</string>
