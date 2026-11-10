@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
@@ -80,7 +81,7 @@ fun HelpScreen(page: String = "index.html", onClose: () -> Unit) {
                     factory = { base ->
                         val night = if (dark) Configuration.UI_MODE_NIGHT_YES else Configuration.UI_MODE_NIGHT_NO
                         val themed = Configuration(base.resources.configuration).apply { uiMode = (uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or night }
-                        WebView(base.createConfigurationContext(themed)).apply {
+                        runCatching { WebView(base.createConfigurationContext(themed)) }.getOrNull()?.apply {
                             settings.javaScriptEnabled = false
                             settings.allowFileAccess = false
                             settings.allowContentAccess = false
@@ -89,6 +90,10 @@ fun HelpScreen(page: String = "index.html", onClose: () -> Unit) {
                             webViewClient = client
                             loadUrl(helpUrl(client.tag, page, exists))
                             web = this
+                        } ?: android.widget.TextView(base).apply {
+                            text = base.getString(R.string.help_unavailable)
+                            setPadding(48, 48, 48, 48)
+                            setTextColor(Am.Navy.toArgb())
                         }
                     },
                     modifier = Modifier.weight(1f).fillMaxWidth().navigationBarsPadding(),

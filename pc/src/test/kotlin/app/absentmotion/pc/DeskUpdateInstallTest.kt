@@ -110,9 +110,12 @@ class DeskUpdateInstallTest {
         val opt = File(home, ".local/opt/absentmotion/lib/runtime").also { it.mkdirs() }
         assertEquals(InstallKind.Tarball, installSite("Linux", home.path, opt.path, null, null)!!.kind)
         assertEquals(File(home, ".local/opt/absentmotion"), installSite("Linux", home.path, opt.path, null, null)!!.target)
-        assertEquals(InstallKind.Deb, installSite("Linux", home.path, "/opt/absentmotion/lib/runtime", null, null)!!.kind)
+        assertEquals(InstallKind.Deb, installSite("Linux", home.path, "/opt/absentmotion/lib/runtime", null, null, null, true)!!.kind)
+        assertNull(installSite("Linux", home.path, "/opt/absentmotion/lib/runtime", null, null, null, false))
         val image = File(home, "AbsentMotion.AppImage").apply { writeText("x") }
-        assertEquals(InstallKind.AppImage, installSite("Linux", home.path, "/tmp/.mount_x/lib/runtime", null, image.path)!!.kind)
+        assertEquals(InstallKind.AppImage, installSite("Linux", home.path, "/tmp/.mount_x/lib/runtime", null, image.path, "/tmp/.mount_x")!!.kind)
+        assertEquals(InstallKind.Tarball, installSite("Linux", home.path, opt.path, null, image.path, "/tmp/.mount_other", false)!!.kind)
+        assertEquals(InstallKind.Deb, installSite("Linux", home.path, "/opt/absentmotion/lib/runtime", null, image.path, null, true)!!.kind)
         assertNull(installSite("Linux", home.path, "/tmp/elsewhere/runtime", null, null))
     }
 
@@ -233,7 +236,7 @@ class DeskUpdateInstallTest {
         builder.start()
         assertTrue(waitFor(File(root, "launched.txt")))
         assertEquals("ok", result.readText().trim())
-        assertEquals("apt-get install -y /tmp/AbsentMotion-5.0.3-linux-x86_64.deb", File(root, "pkexec.txt").readText().trim())
+        assertEquals("apt-get -o DPkg::Lock::Timeout=120 install -y /tmp/AbsentMotion-5.0.3-linux-x86_64.deb", File(root, "pkexec.txt").readText().trim())
     }
 
     @Test fun aRefusedDebStillStartsTheOldApp() {

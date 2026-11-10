@@ -63,14 +63,14 @@ suspend fun EditorState.screenshotFrame(context: Context, scope: CoroutineScope)
         }
         addImage(own?.takeIf { store.inMediaFolder(it.uri) } ?: keepCopy(context, picture))
         val added = selectedId ?: return true
-        scope.launch { dropIfRemoved(added, saved, gallery) }
+        scope.launch { dropIfRemoved(groupPath, added, saved, gallery) }
         return true
     } finally {
         withContext(Dispatchers.IO) { png.delete() }
     }
 }
 
-private suspend fun EditorState.dropIfRemoved(id: Long, saved: Uri, store: MediaStoreExport) {
-    val gone = withTimeoutOrNull(SCREENSHOT_UNDO_MS) { snapshotFlow { scene.layer(id) == null }.first { it } } == true
+private suspend fun EditorState.dropIfRemoved(path: List<Long>, id: Long, saved: Uri, store: MediaStoreExport) {
+    val gone = withTimeoutOrNull(SCREENSHOT_UNDO_MS) { snapshotFlow { project.focused(path)?.layer(id) == null }.first { it } } == true
     if (gone) withContext(Dispatchers.IO) { runCatching { store.delete(saved) } }
 }

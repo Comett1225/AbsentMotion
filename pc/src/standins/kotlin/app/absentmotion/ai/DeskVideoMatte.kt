@@ -25,7 +25,7 @@ internal suspend fun desktopVideoMatte(context: Context, layer: Layer, media: Me
     check(width.toLong() * height <= 16_000_000L) { AppText.get(R.string.ai_unable_to_process) }
     val fps = (media.fps?.toDouble() ?: stream.fps).takeIf { it > 0 }?.coerceIn(1.0, 240.0) ?: 30.0
     val endMs = minOf(if (fill.outTime == Int.MAX_VALUE) Long.MAX_VALUE else fill.outTime.toLong(), stream.durationUs / 1000)
-    val startMs = fill.inTime.toLong().coerceAtLeast(0)
+    val startMs = layer.processFromMs.toLong().coerceAtLeast(0)
     val spanMs = endMs - startMs
     check(spanMs > 0 && spanMs <= MAX_MATTE_SECONDS * 1000L) { AppText.get(R.string.ai_unable_to_process) }
     val count = ceil(spanMs / 1000.0 * fps).toInt().coerceAtLeast(1)

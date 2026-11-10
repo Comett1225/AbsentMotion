@@ -10,6 +10,7 @@ import app.absentmotion.engine.EngineThread
 import app.absentmotion.library.CrashLogs
 import app.absentmotion.library.CrashReason
 import app.absentmotion.library.crashReason
+import app.absentmotion.library.ImportLimits
 import app.absentmotion.library.MediaAccess
 import app.absentmotion.library.modelFolder
 import app.absentmotion.model.Scene
@@ -268,10 +269,24 @@ internal suspend fun <T> watched(stallMs: Long = StallMs, block: suspend (alive:
     }
 }
 
+internal fun Scene.packageBytes(): Long = node.storedMediaUris().sumOf { uri ->
+    modelFolder(uri)?.listFiles { f -> f.isFile }?.sumOf { it.length() }
+        ?: media(uri)?.size?.takeIf { it > 0 }
+        ?: runCatching { File(URI(uri)).length() }.getOrDefault(0L)
+}
+
+private const val PACKAGE_MARGIN = 64L shl 20
+
 internal suspend fun writeProjectPackage(
     scene: Scene, xml: String, out: OutputStream, access: MediaAccess, open: (String) -> InputStream?, progress: (Float) -> Unit,
 ) {
+    val allowed = ImportLimits().unpacked - PACKAGE_MARGIN
+    if (scene.packageBytes() > allowed) throw ExportError(txt(R.string.export_package_too_large, (allowed shr 20).toString()))
     val uris = scene.node.storedMediaUris().toList()
+    val limit = ImportLimits().entries
+    val entries = 2 + scene.fontNames().mapNotNull { access.importedFont(it) }.toSet().size +
+        uris.sumOf { uri -> if (access.allows(uri)) modelFolder(uri)?.listFiles { f -> f.isFile }?.size ?: 1 else 0 }
+    if (entries > limit) throw ExportError(txt(R.string.library_err_too_many_files, limit.toString()))
     val manifest = JSONObject().put("format", "absentmotion-package").put("version", 1)
         .put("title", scene.title).put("project", "project.xml")
     val media = JSONArray()

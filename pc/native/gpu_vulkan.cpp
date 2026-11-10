@@ -10,6 +10,7 @@ static void* OpenVulkan() { void* library = dlopen("libvulkan.so.1", RTLD_NOW | 
 static void* VulkanSymbol(void* library, const char* name) { return dlsym(library, name); }
 static void CloseVulkan(void* library) { dlclose(library); }
 #endif
+#include <cstdlib>
 #include <vector>
 #include "include/gpu/ganesh/GrDirectContext.h"
 #include "include/gpu/ganesh/vk/GrVkDirectContext.h"
@@ -65,7 +66,7 @@ struct VulkanGpu : DesktopGpu {
         if (enumerate(instance, &count, devices.data()) != VK_SUCCESS) return false;
         VkPhysicalDevice physical = VK_NULL_HANDLE;
         uint32_t family = UINT32_MAX;
-        int best = 4;
+        int best = std::getenv("AM_VULKAN_CPU") ? 4 : 3;
         for (auto candidate : devices) {
             VkPhysicalDeviceProperties props{};
             properties(candidate, &props);

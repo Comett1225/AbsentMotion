@@ -143,10 +143,31 @@ class EngineThread(private val background: Int, private val context: Context? = 
 
     fun attach(surface: Surface, retry: Boolean = true): Boolean = false
 
-    fun attachDesktop(divisor: Int, size: IntSize) {
-        outDivisor = divisor.coerceAtLeast(1)
-        outSize = size
+    private val surfaces = ArrayList<Triple<Any, Int, IntSize>>()
+
+    private val viewsBySurface = HashMap<Any?, PreviewView>()
+
+    private fun applySurface() {
+        val top = surfaces.lastOrNull()
+        outDivisor = top?.second ?: outDivisor
+        outSize = top?.third ?: outSize
         requestRender()
+    }
+
+    fun attachDesktop(token: Any, divisor: Int, size: IntSize) = synchronized(surfaces) {
+        val entry = Triple(token, divisor.coerceAtLeast(1), size)
+        val at = surfaces.indexOfFirst { it.first === token }
+        if (at >= 0) surfaces[at] = entry else surfaces += entry
+        applySurface()
+    }
+
+    fun detachDesktop(token: Any) = synchronized(surfaces) {
+        if (surfaces.removeAll { it.first === token }) {
+            viewsBySurface.remove(token)
+            val back = viewsBySurface[surfaces.lastOrNull()?.first]
+            if (back != null) synchronized(this) { view = back; viewSerial = serials.incrementAndGet() }
+            applySurface()
+        }
     }
 
     fun detach() {}
@@ -245,6 +266,7 @@ class EngineThread(private val background: Int, private val context: Context? = 
     fun setView(view: PreviewView): Long {
         val serial = serials.incrementAndGet()
         synchronized(this) { this.view = view; viewSerial = serial }
+        synchronized(surfaces) { viewsBySurface[surfaces.lastOrNull()?.first] = view }
         requestRender()
         return serial
     }
@@ -277,7 +299,7 @@ class EngineThread(private val background: Int, private val context: Context? = 
         }
     }
 
-    private fun syncVideo(scene: Scene?, timeMs: Int, exact: Boolean = true): Boolean {
+    private fun syncVideo(scene: Scene?, timeMs: Int, exact: Boolean = true, strict: Boolean = false): Boolean {
         scene ?: return true
         var current = true
         engine().clearLayerFrames()
@@ -289,10 +311,16 @@ class EngineThread(private val background: Int, private val context: Context? = 
             val localTime = mapped.ms.toInt()
             val at = layer.videoTimeUs(localTime, track.scene, VideoTiming(layer)).coerceAtLeast(0)
             when (val source = videos[uri]) {
-                is NativeVideoSource -> if (engine().showVideoLayer(uri, layer.id, source, at, exact, if (exact) 15000 else 0) == 0) { if (exact) current = false else late += Triple(uri, layer.id, source to at) }
-                is VideoSource -> source.frame(at / 1000)?.let { engine().setLayerFrame(uri, layer.id, it.width, it.height, it.rgba) }
+                is NativeVideoSource -> {
+                    val shown = engine().showVideoLayer(uri, layer.id, source, at, exact, if (exact) 15000 else 0)
+                    if (strict) check(shown == 1) { "Video frame unavailable" } else if (shown == 0) { if (exact) current = false else late += Triple(uri, layer.id, source to at) }
+                }
+                is VideoSource -> {
+                    val frame = source.frame(at / 1000)
+                    if (frame != null) engine().setLayerFrame(uri, layer.id, frame.width, frame.height, frame.rgba) else check(!strict) { "Video frame unavailable" }
+                }
             }
-            mosh?.apply(track.scene, layer, localTime, engine())
+            mosh?.apply(track.scene, layer, localTime, engine(), strict)
         }
         val until = System.nanoTime() + LIVE_VIDEO_WAIT_MS * 1_000_000L
         for ((uri, id, pick) in late) {
@@ -389,17 +417,17 @@ class EngineThread(private val background: Int, private val context: Context? = 
 
     suspend fun stillPng(xml: String, timeMs: Int, width: Int, height: Int, file: File): Boolean = runCatching {
         withDocument(xml, timeMs) { document ->
-            val pixels = withContext(dispatcher) { syncVideo(document, timeMs); engine().still(timeMs.toDouble(), width, height) }
+            val pixels = withContext(dispatcher) { syncVideo(document, timeMs, strict = true); engine().still(timeMs.toDouble(), width, height) }
             pixels != null && writePng(pixels, width, height, file)
         }
     }.getOrElse { if (it is kotlinx.coroutines.CancellationException) throw it; false }
 
     inner class ExportSession internal constructor(private val document: Scene, private val interpolation: DeskInterpolation? = null) {
         suspend fun still(timeMs: Int, width: Int, height: Int): ByteArray? = withContext(dispatcher) {
-            applyFonts(timeMs); syncVideo(document, timeMs); interpolation?.apply(document, timeMs, engine()); engine().still(timeMs.toDouble(), width, height)
+            applyFonts(timeMs); syncVideo(document, timeMs, strict = true); interpolation?.apply(document, timeMs, engine()); engine().still(timeMs.toDouble(), width, height)
         }
         suspend fun stillInto(timeMs: Int, width: Int, height: Int, out: ByteArray): Boolean = withContext(dispatcher) {
-            applyFonts(timeMs); syncVideo(document, timeMs); interpolation?.apply(document, timeMs, engine()); engine().stillInto(timeMs.toDouble(), width, height, out)
+            applyFonts(timeMs); syncVideo(document, timeMs, strict = true); interpolation?.apply(document, timeMs, engine()); engine().stillInto(timeMs.toDouble(), width, height, out)
         }
         suspend fun previewStill(timeMs: Int, width: Int, height: Int, accurateBlur: Boolean): ByteArray? = withContext(dispatcher) {
             applyFonts(timeMs); syncVideo(document, timeMs); engine().previewStill(timeMs.toDouble(), width, height, accurateBlur)

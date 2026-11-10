@@ -506,7 +506,8 @@ internal fun AiSmoothDialog(tools: AiTools, scene: Scene) {
                 Text(
                     when {
                         media == null -> stringResource(R.string.ai_video_missing)
-                        tooLong -> stringResource(R.string.ai_clip_too_long, (MAX_MATTE_SECONDS / 60).toString())
+                        plan != null && plan.seconds > MAX_MATTE_SECONDS -> stringResource(R.string.ai_clip_too_long, (MAX_MATTE_SECONDS / 60).toString())
+                        tooLong -> stringResource(R.string.smooth_too_many_frames, MAX_SMOOTH_FRAMES.toString())
                         plan == null -> stringResource(R.string.smooth_nothing)
                         else -> pluralStringResource(R.plurals.smooth_estimate, plan.frames, plan.frames.toString(), plan.fps.toString(),
                             plan.width.toString(), plan.height.toString(), (plan.bytes / 1_000_000 + 1).toString())

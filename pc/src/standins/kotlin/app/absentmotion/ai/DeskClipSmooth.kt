@@ -22,7 +22,9 @@ internal suspend fun desktopClipSmooth(context: Context, layer: Layer, media: Me
                                        providedEngine: EngineThread? = null, progress: AiProgress): AiMedia {
     val fill = checkNotNull(layer.mediaFill?.takeIf { it.video }) { AppText.get(R.string.ai_select_video_layer) }
     val plan = checkNotNull(smoothPlan(layer, media, projectFps, smoothing)) { AppText.get(R.string.smooth_nothing) }
-    check(plan.seconds <= MAX_MATTE_SECONDS && plan.frames <= MAX_SMOOTH_FRAMES && plan.width.toLong() * plan.height <= 16_000_000L) { AppText.get(R.string.ai_unable_to_process) }
+    check(plan.seconds <= MAX_MATTE_SECONDS) { AppText.get(R.string.ai_clip_too_long, (MAX_MATTE_SECONDS / 60).toString()) }
+    check(plan.frames <= MAX_SMOOTH_FRAMES) { AppText.get(R.string.smooth_too_many_frames, MAX_SMOOTH_FRAMES.toString()) }
+    check(plan.width.toLong() * plan.height <= 16_000_000L) { AppText.get(R.string.ai_unable_to_process) }
     val input = Uri.parse(openableUri(fill.uri)).toFile() ?: error(AppText.get(R.string.ai_unable_to_process))
     val start = String.format(Locale.US, "%.6f", fill.inTime / 1000.0)
     val span = String.format(Locale.US, "%.6f", plan.seconds)

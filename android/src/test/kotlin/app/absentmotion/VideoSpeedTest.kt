@@ -39,6 +39,11 @@ class VideoSpeedTest {
     @Test fun aLongClipAtTheLowestSpeedDoesNotWrapItsEnd() {
         val slowed = videoLayer(1000, 1000 + 40 * 60_000).withVideoSpeedMap(XmlNode("speedMap", mapOf("value" to "0.001")))
         assertTrue(slowed.endTime > slowed.startTime)
-        assertEquals((1000 + 40 * 60_000 * 20).toDouble(), slowed.endTime.toDouble(), 2.0)
+        assertEquals((1000 + (40 * 60_000 + 1) * 20 - 1).toDouble(), slowed.endTime.toDouble(), 2.0)
+    }
+
+    @Test fun doublingTheSpeedHalvesTheFrameCountWithoutAnExtraFrame() {
+        val fast = videoLayer(0, 2999).withVideoSpeedMap(XmlNode("speedMap", mapOf("value" to "2")))
+        assertEquals(1499, fast.endTime)
     }
 }

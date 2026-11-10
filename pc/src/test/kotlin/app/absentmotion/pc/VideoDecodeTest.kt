@@ -152,7 +152,7 @@ class VideoDecodeTest {
         val engine = app.absentmotion.engine.EngineThread(0xff000000.toInt())
         try {
             engine.setScene(app.absentmotion.model.Scene.parse(sceneXml(file, w, h)))
-            engine.attachDesktop(1, androidx.compose.ui.unit.IntSize(1280, 1280 * h / w))
+            engine.attachDesktop(this, 1, androidx.compose.ui.unit.IntSize(1280, 1280 * h / w))
             kotlinx.coroutines.runBlocking { engine.awaitMedia() }
             fun showAt(timeMs: Int): Double {
                 val s = System.nanoTime()

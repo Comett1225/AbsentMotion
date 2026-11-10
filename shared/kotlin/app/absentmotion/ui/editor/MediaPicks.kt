@@ -87,5 +87,6 @@ internal suspend fun EditorState.addSounds(context: Context, uris: List<Uri>) {
     } finally { addingMedia = false }
 }
 
-private fun keepAccess(context: Context, uris: List<Uri>) =
-    uris.forEach { runCatching { context.contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION) } }
+private fun EditorState.keepAccess(context: Context, uris: List<Uri>) {
+    if (!settings.keepMediaCopies) uris.forEach { runCatching { context.contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION) } }
+}

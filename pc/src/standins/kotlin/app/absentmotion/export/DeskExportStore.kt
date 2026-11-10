@@ -45,6 +45,7 @@ class MediaStoreExport(context: Context) : ExportStore {
 
     override fun open(folder: String?, name: String, mime: String): OpenExport {
         val dir = dir(mime, folder).also { it.mkdirs() }
+        if (ExportDebug.fakeFreeBytes < 0 && dir.usableSpace < MinFreeBytes) throw StorageFullException()
         val part = File(dir, ".${System.nanoTime()}.part")
         val access = try { java.io.RandomAccessFile(part, "rw") } catch (t: Throwable) { throw ExportError(txt(R.string.export_error_create, name, dir.path), t) }
         note(part.path, true)
@@ -113,7 +114,10 @@ class FolderExport(private val dir: File) : ExportStore {
     override fun sequenceFolder(name: String, mime: String): String = freeFolder(dir, name)
 }
 
-fun freeSpace(): Long = ExportDebug.fakeFreeBytes.takeIf { it >= 0 } ?: StatFs(Environment.getExternalStorageDirectory().path).availableBytes
+fun freeSpace(): Long = ExportDebug.fakeFreeBytes.takeIf { it >= 0 } ?: minOf(
+    StatFs(Environment.getExternalStorageDirectory().path).availableBytes,
+    File(android.content.Desk.context.cacheDir, "export").also { it.mkdirs() }.usableSpace,
+)
 
 fun ensureStorage() {
     if (freeSpace() < MinFreeBytes) throw StorageFullException()

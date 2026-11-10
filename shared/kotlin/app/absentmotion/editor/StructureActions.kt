@@ -18,6 +18,7 @@ import app.absentmotion.model.retimedVideo
 import app.absentmotion.model.canAnimate
 import app.absentmotion.model.cutBetween
 import app.absentmotion.model.withAnimation
+import app.absentmotion.model.withEdgeMotions
 import app.absentmotion.model.withTransition
 import app.absentmotion.model.Layer
 import app.absentmotion.model.MediaDeclaration
@@ -505,6 +506,8 @@ suspend fun EditorState.distributeSelection(horizontal: Boolean) {
     edit { it.shiftedInWorld(moves, horizontal, at) }
 }
 
+private val NO_FILL_KINDS = setOf("audio", "camera", "nullobj", "light", "embedScene")
+
 enum class StylePart { ColorFill, BorderShadow, Blending }
 
 fun EditorState.pasteStyle(parts: Set<StylePart>) {
@@ -520,7 +523,7 @@ internal fun Scene.withPastedStyle(id: Long, timeMs: Int, from: Layer, media: Li
             node = node.copy(children = node.children.filterNot { it.name in names } + from.node.children.filter { it.name in names })
             for (a in attrs) node = node.with(a, from.node[a])
         }
-        if (StylePart.ColorFill in parts) {
+        if (StylePart.ColorFill in parts && l.kind !in NO_FILL_KINDS && from.kind !in NO_FILL_KINDS) {
             take(listOf("fillColor", "gradient", "speedMap", "gain"), listOf("fillType", "fillImage", "fillVideo", "mediaFillMode", "inTime", "outTime", "speed", "loop", "loopIn"))
         }
         if (StylePart.BorderShadow in parts) take(listOf("border", "shadow", "path-stroke"), emptyList())
@@ -584,8 +587,8 @@ internal fun Scene.withClipEdgesAt(ids: List<Long>, frame: Int, end: Boolean, ex
         val layer = acc.layer(id) ?: return@fold acc
         when {
             !extend -> acc.update(id) { movedClip(it, if (end) target - (it.endTime - it.startTime) else target, keepEnd = end) }
-            end && target > layer.endTime && showsAnyFrame(layer.startTime, target) -> acc.withClip(id, acc.trimmedClip(layer, layer.startTime, target))
-            !end && target < layer.startTime && showsAnyFrame(target, layer.endTime) -> acc.withClip(id, acc.trimmedClip(layer, target, layer.endTime))
+            end && target > layer.endTime && showsAnyFrame(layer.startTime, target) -> acc.withClip(id, acc.withEdgeMotions(layer, acc.trimmedClip(layer, layer.startTime, target)))
+            !end && target < layer.startTime && showsAnyFrame(target, layer.endTime) -> acc.withClip(id, acc.withEdgeMotions(layer, acc.trimmedClip(layer, target, layer.endTime)))
             else -> acc
         }
     }

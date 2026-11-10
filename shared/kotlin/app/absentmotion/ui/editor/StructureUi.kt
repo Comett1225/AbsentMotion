@@ -7,6 +7,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -295,12 +296,14 @@ internal fun MultiBar(state: EditorState, modifier: Modifier) {
     var animation by remember { mutableStateOf<Set<Long>?>(null) }
     transition?.let { TransitionSheet(state, it) { transition = null } }
     animation?.let { AnimationSheet(state, it) { animation = null } }
-    Row(modifier.padding(6.dp).clip(RoundedCornerShape(3.dp)).background(Am.PanelInset), verticalAlignment = Alignment.CenterVertically) {
+    BoxWithConstraints(modifier.padding(6.dp)) {
+    val cell = minOf(40.dp, maxWidth / 8.7f)
+    Row(Modifier.fillMaxSize().clip(RoundedCornerShape(3.dp)).background(Am.PanelInset), verticalAlignment = Alignment.CenterVertically) {
         val end = layers.isNotEmpty() && state.timeMs >= layers.maxOf { it.endTime }
         val context = LocalContext.current
         val copied = EffectClipboard.effects
         var moreMenu by remember { mutableStateOf(false) }
-        Box(Modifier.width(40.dp).fillMaxHeight()) {
+        Box(Modifier.width(cell).fillMaxHeight()) {
             BarButton(PanelIcons.More, stringResource(R.string.structure_more_actions), Modifier.fillMaxSize(), layers.isNotEmpty()) { moreMenu = true }
             Presence(moreMenu) {
                 MenuPopup(AboveLeft, { moreMenu = false }, TransformOrigin(0f, 1f)) {
@@ -346,14 +349,14 @@ internal fun MultiBar(state: EditorState, modifier: Modifier) {
                 }
             }
         }
-        BarButton(if (end) ChromeIcons.SkipForward else ChromeIcons.SkipBack, stringResource(if (end) R.string.structure_move_ends else R.string.structure_move_starts), Modifier.width(40.dp).fillMaxHeight(), layers.isNotEmpty()) {
+        BarButton(if (end) ChromeIcons.SkipForward else ChromeIcons.SkipBack, stringResource(if (end) R.string.structure_move_ends else R.string.structure_move_starts), Modifier.width(cell).fillMaxHeight(), layers.isNotEmpty()) {
             state.moveClipEdges(end, false)
         }
-        BarButton(PanelIcons.TrimLeft, stringResource(R.string.a11y_trim_start), Modifier.width(40.dp).fillMaxHeight(), layers.any { state.scene.trimStartAt(it, state.frame) != null }) { state.trimChosen(true) }
-        BarButton(PanelIcons.Split, stringResource(R.string.timeline_split), Modifier.width(40.dp).fillMaxHeight(), layers.any { state.scene.canSplitAt(it, state.frame) }) { state.split() }
-        BarButton(PanelIcons.TrimRight, stringResource(R.string.a11y_trim_end), Modifier.width(40.dp).fillMaxHeight(), layers.any { state.scene.trimEndAt(it, state.frame) != null }) { state.trimChosen(false) }
+        BarButton(PanelIcons.TrimLeft, stringResource(R.string.a11y_trim_start), Modifier.width(cell).fillMaxHeight(), layers.any { state.scene.trimStartAt(it, state.frame) != null }) { state.trimChosen(true) }
+        BarButton(PanelIcons.Split, stringResource(R.string.timeline_split), Modifier.width(cell).fillMaxHeight(), layers.any { state.scene.canSplitAt(it, state.frame) }) { state.split() }
+        BarButton(PanelIcons.TrimRight, stringResource(R.string.a11y_trim_end), Modifier.width(cell).fillMaxHeight(), layers.any { state.scene.trimEndAt(it, state.frame) != null }) { state.trimChosen(false) }
         Spacer(Modifier.weight(1f))
-        BarButton(ChromeIcons.Transition, stringResource(R.string.transition_add_between), Modifier.width(40.dp).fillMaxHeight().alpha(if (cuts.isNotEmpty()) 1f else DimAlpha)) {
+        BarButton(ChromeIcons.Transition, stringResource(R.string.transition_add_between), Modifier.width(cell).fillMaxHeight().alpha(if (cuts.isNotEmpty()) 1f else DimAlpha)) {
             if (cuts.isNotEmpty()) { state.playing = false; transition = cuts }
             else Toast.makeText(context, context.getString(when {
                 layers.size > 2 -> R.string.multi_no_cut
@@ -363,9 +366,10 @@ internal fun MultiBar(state: EditorState, modifier: Modifier) {
             }), Toast.LENGTH_LONG).show()
         }
         Spacer(Modifier.weight(1f))
-        BarButton(SelectionIcons.Align[0], stringResource(R.string.structure_align_starts), Modifier.width(36.dp).fillMaxHeight(), layers.size > 1) { state.alignClipTimes(0) }
-        BarButton(SelectionIcons.DistributeHorizontal, stringResource(R.string.structure_distribute_starts), Modifier.width(36.dp).fillMaxHeight(), layers.size > 2) { state.alignClipTimes(1) }
-        BarButton(SelectionIcons.Align[2], stringResource(R.string.structure_align_ends), Modifier.width(36.dp).fillMaxHeight(), layers.size > 1) { state.alignClipTimes(2) }
+        BarButton(SelectionIcons.Align[0], stringResource(R.string.structure_align_starts), Modifier.width(cell * 0.9f).fillMaxHeight(), layers.size > 1) { state.alignClipTimes(0) }
+        BarButton(SelectionIcons.DistributeHorizontal, stringResource(R.string.structure_distribute_starts), Modifier.width(cell * 0.9f).fillMaxHeight(), layers.size > 2) { state.alignClipTimes(1) }
+        BarButton(SelectionIcons.Align[2], stringResource(R.string.structure_align_ends), Modifier.width(cell * 0.9f).fillMaxHeight(), layers.size > 1) { state.alignClipTimes(2) }
+    }
     }
 }
 

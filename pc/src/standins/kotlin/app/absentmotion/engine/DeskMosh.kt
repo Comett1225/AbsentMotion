@@ -18,22 +18,23 @@ internal class DeskMosh(private val context: Context) : Closeable {
     private val stamps = HashMap<String, LongArray>()
     private val variableRates = HashMap<String, Boolean>()
 
-    fun apply(scene: Scene, layer: Layer, timeMs: Int, engine: NativeEngine): Boolean {
+    fun apply(scene: Scene, layer: Layer, timeMs: Int, engine: NativeEngine, strict: Boolean = false): Boolean {
+        fun fail(): Boolean = if (strict) error("Datamosh step failed") else false
         val plan = layer.moshPlan(timeMs.toDouble(), scene) ?: return false
         val uri = layer.mediaFill?.uri ?: return false
         val file = Uri.parse(uri).toFile()?.takeIf { it.isFile } ?: return false
         val times = stamps.getOrPut(uri) { VideoSources.timestamps(context, uri) }
-        if (times.isEmpty()) return false
+        if (times.isEmpty()) return fail()
         val timing = VideoTiming(layer)
         val requests = plan.frames.map { layer.videoTimeUs(it, scene, timing).coerceAtLeast(0) }
         val pts = requests.map { times.ptsAt(it) }.toLongArray()
         val from = engine.moshStart(uri, layer.id, pts, plan.params)
-        if (from < 0) return false
+        if (from < 0) return fail()
         val reader = readers.getOrPut(uri) { FfmpegVideoSource(file, DeskMedia.ffmpeg, DeskMedia.ffprobe, 1920, 4_000_000) }
         val variable = variableRates.getOrPut(uri) { times.variableRate() }
         for (step in from until pts.size) {
-            val frame = (if (variable) reader.frameExact(pts[step]) else reader.frame((pts[step] + 999) / 1000)) ?: return false
-            if (!engine.moshFrame(uri, layer.id, step, frame.width, frame.height, frame.rgba)) return false
+            val frame = (if (variable) reader.frameExact(pts[step]) else reader.frame((pts[step] + 999) / 1000)) ?: return fail()
+            if (!engine.moshFrame(uri, layer.id, step, frame.width, frame.height, frame.rgba)) return fail()
         }
         return true
     }

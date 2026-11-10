@@ -1,6 +1,7 @@
 package app.absentmotion.desk
 
 import android.content.mime
+import app.absentmotion.i18n.AppText
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -336,58 +337,59 @@ class DeskMenuItem(val label: String, val enabled: Boolean = true, val keys: Men
 
 fun deskMenus(app: DeskAppState, scope: kotlinx.coroutines.CoroutineScope): List<DeskMenuItem> {
     fun key(k: Key) = MenuKey(k)
+    fun t(id: Int) = AppText.get(id)
     val editor = app.editor
     val chosen = editor?.chosenLayers?.isNotEmpty() == true
     val picked = editor?.selectedId != null || MultiSelect.active
     val linked = DeskLibrary.folders.also { DeskLibrary.revision.intValue }
     val separator = DeskMenuItem.Separator
     return listOf(
-        DeskMenuItem("File", children = listOfNotNull(
-            DeskMenuItem("New Project…", editor == null, key(Key.N)) { app.newProjectTick++ },
-            DeskMenuItem("Settings…", keys = key(Key.Comma)) { app.openSettings() },
+        DeskMenuItem(t(R.string.desk_menu_file), children = listOfNotNull(
+            DeskMenuItem(t(R.string.desk_menu_new_project), editor == null, key(Key.N)) { app.newProjectTick++ },
+            DeskMenuItem(t(R.string.settings) + "…", keys = key(Key.Comma)) { app.openSettings() },
             separator,
-            DeskMenuItem("Import Media…", editor != null) {
+            DeskMenuItem(t(R.string.desk_menu_import_media), editor != null) {
                 val files = DeskFiles.chooseFiles(media = true, multiple = true).map(Uri::fromFile)
                 app.queueMedia(files)
             },
-            DeskMenuItem("Import Project…", editor == null) {
+            DeskMenuItem(t(R.string.desk_menu_import_project), editor == null) {
                 val files = DeskFiles.chooseFiles(media = false, multiple = true).map(Uri::fromFile)
                 if (files.isNotEmpty()) scope.launch { app.importFiles(files) }
             },
-            DeskMenuItem("Link Media Folder…") { linkMediaFolder() },
-            if (linked.isEmpty()) null else DeskMenuItem("Unlink Folder", children = linked.map { folder -> DeskMenuItem(folder.name.ifEmpty { folder.path }) { DeskLibrary.unlink(folder) } }),
+            DeskMenuItem(t(R.string.desk_menu_link_folder)) { linkMediaFolder() },
+            if (linked.isEmpty()) null else DeskMenuItem(t(R.string.desk_menu_unlink_folder), children = linked.map { folder -> DeskMenuItem(folder.name.ifEmpty { folder.path }) { DeskLibrary.unlink(folder) } }),
             separator,
-            DeskMenuItem("Export…", editor != null, key(Key.E)) { editor?.let { it.playing = false; it.exportOpen = true } },
-            DeskMenuItem("Close Project", editor != null, key(Key.W)) { app.closeSoon() },
-        ) + if (DeskOs.mac) emptyList() else listOf(separator, DeskMenuItem("Quit", true, key(Key.Q)) { app.requestQuit() })),
-        DeskMenuItem("Edit", children = listOf(
-            DeskMenuItem("Undo", editor?.canUndo == true) { editor?.undo() },
-            DeskMenuItem("Redo", editor?.canRedo == true) { editor?.redo() },
+            DeskMenuItem(t(R.string.export) + "…", editor != null, key(Key.E)) { editor?.let { it.playing = false; it.exportOpen = true } },
+            DeskMenuItem(t(R.string.desk_menu_close_project), editor != null, key(Key.W)) { app.closeSoon() },
+        ) + if (DeskOs.mac) emptyList() else listOf(separator, DeskMenuItem(t(R.string.desk_export_quit), true, key(Key.Q)) { app.requestQuit() })),
+        DeskMenuItem(t(R.string.history_edit), children = listOf(
+            DeskMenuItem(t(R.string.draw_undo), editor?.canUndo == true) { editor?.undo() },
+            DeskMenuItem(t(R.string.draw_redo), editor?.canRedo == true) { editor?.redo() },
             separator,
-            DeskMenuItem("Cut Layer", chosen) { editor?.let { it.copySelected(); if (MultiSelect.active) it.deleteChosen() else it.deleteSelected() } },
-            DeskMenuItem("Copy Layer", chosen) { editor?.copySelected() },
-            DeskMenuItem("Paste Layer", editor != null) { editor?.pasteLayer() },
-            DeskMenuItem("Duplicate", picked) { editor?.let { if (MultiSelect.active) it.duplicateChosen() else it.duplicateSelected() } },
-            DeskMenuItem("Split at Playhead", picked) { editor?.split() },
-            DeskMenuItem("Delete", picked) { editor?.let { if (MultiSelect.active) it.deleteChosen() else it.deleteSelected() } },
+            DeskMenuItem(t(R.string.desk_menu_cut_layer), chosen) { editor?.let { it.copySelected(); if (MultiSelect.active) it.deleteChosen() else it.deleteSelected() } },
+            DeskMenuItem(t(R.string.desk_menu_copy_layer), chosen) { editor?.copySelected() },
+            DeskMenuItem(t(R.string.desk_menu_paste_layer), editor != null) { editor?.pasteLayer() },
+            DeskMenuItem(t(R.string.home_duplicate), picked) { editor?.let { if (MultiSelect.active) it.duplicateChosen() else it.duplicateSelected() } },
+            DeskMenuItem(t(R.string.timeline_split), picked) { editor?.split() },
+            DeskMenuItem(t(R.string.delete), picked) { editor?.let { if (MultiSelect.active) it.deleteChosen() else it.deleteSelected() } },
         )),
-        DeskMenuItem("View", children = listOf(
-            DeskMenuItem("Zoom In", DeskScale.percent < DeskScale.MAX, key(Key.Equals)) { DeskScale.zoomIn() },
-            DeskMenuItem("Zoom Out", DeskScale.percent > DeskScale.MIN, key(Key.Minus)) { DeskScale.zoomOut() },
-            DeskMenuItem("Actual Size", DeskScale.percent != 100, key(Key.Zero)) { DeskScale.reset() },
+        DeskMenuItem(t(R.string.desk_menu_view), children = listOf(
+            DeskMenuItem(t(R.string.desk_menu_zoom_in), DeskScale.percent < DeskScale.MAX, key(Key.Equals)) { DeskScale.zoomIn() },
+            DeskMenuItem(t(R.string.desk_menu_zoom_out), DeskScale.percent > DeskScale.MIN, key(Key.Minus)) { DeskScale.zoomOut() },
+            DeskMenuItem(t(R.string.desk_menu_actual_size), DeskScale.percent != 100, key(Key.Zero)) { DeskScale.reset() },
         )),
-        DeskMenuItem("Playback", children = listOf(
-            DeskMenuItem(if (editor?.playing == true) "Pause" else "Play", editor != null) { editor?.let { it.playing = !it.playing } },
-            DeskMenuItem("Go to Start", editor != null) { editor?.let { it.playing = false; it.frame = 0 } },
-            DeskMenuItem("Go to End", editor != null) { editor?.let { it.playing = false; it.frame = it.scene.lastFrame } },
+        DeskMenuItem(t(R.string.desk_menu_playback), children = listOf(
+            DeskMenuItem(if (editor?.playing == true) t(R.string.export_pause) else t(R.string.export_play), editor != null) { editor?.let { it.playing = !it.playing } },
+            DeskMenuItem(t(R.string.desk_menu_go_start), editor != null) { editor?.let { it.playing = false; it.frame = 0 } },
+            DeskMenuItem(t(R.string.desk_menu_go_end), editor != null) { editor?.let { it.playing = false; it.frame = it.scene.lastFrame } },
             separator,
-            DeskMenuItem("Previous Bookmark", editor != null, MenuKey(Key.DirectionLeft, command = false, alt = true)) { editor?.let { DeskJump.previous(it) } },
-            DeskMenuItem("Next Bookmark", editor != null, MenuKey(Key.DirectionRight, command = false, alt = true)) { editor?.let { DeskJump.next(it) } },
+            DeskMenuItem(t(R.string.desk_menu_previous_bookmark), editor != null, MenuKey(Key.DirectionLeft, command = false, alt = true)) { editor?.let { DeskJump.previous(it) } },
+            DeskMenuItem(t(R.string.desk_menu_next_bookmark), editor != null, MenuKey(Key.DirectionRight, command = false, alt = true)) { editor?.let { DeskJump.next(it) } },
         )),
-        DeskMenuItem("Help", children = listOf(
-            DeskMenuItem("AbsentMotion Help") { app.openSettings(SettingsPage.Help) },
-            DeskMenuItem("About AbsentMotion") { app.openSettings(SettingsPage.About) },
-            DeskMenuItem("Crash Logs") { app.openSettings(SettingsPage.Crash) },
+        DeskMenuItem(t(R.string.settings_help), children = listOf(
+            DeskMenuItem(t(R.string.desk_menu_help)) { app.openSettings(SettingsPage.Help) },
+            DeskMenuItem(t(R.string.desk_menu_about)) { app.openSettings(SettingsPage.About) },
+            DeskMenuItem(t(R.string.desk_menu_crash_logs)) { app.openSettings(SettingsPage.Crash) },
         )),
     )
 }

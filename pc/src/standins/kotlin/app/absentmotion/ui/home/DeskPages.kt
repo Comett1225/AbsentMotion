@@ -173,7 +173,7 @@ private fun CrashList(onOpen: (CrashEntry) -> Unit) {
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Column(Modifier.weight(1f)) {
-                        Text(versionLabel(log.time).text(), color = Am.HomeMid, fontSize = 12.sp)
+                        Text(versionLabel(log.time, locale = androidx.compose.ui.platform.LocalConfiguration.current.locales[0]).text(), color = Am.HomeMid, fontSize = 12.sp)
                         Text(stringResource(log.reason.sentence), color = Am.HomeInk, fontSize = 14.sp, lineHeight = 19.sp)
                     }
                     Icon(HomeIcons.ChevronRight, null, Modifier.size(24.dp), tint = Am.HomeMid)

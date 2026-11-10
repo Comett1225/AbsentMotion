@@ -90,13 +90,14 @@ internal fun EffectRuler(
     ) {
         val mid = size.width / 2f
         val ticks = (size.width / spacing / 2).toInt() + 2
-        val base = (value - min) / s
+        val origin = if (min < -1e30f) 0f else min
+        val base = (value - origin) / s
         val frac = base - base.toInt()
         for (i in -ticks..ticks) {
             val x = mid + (i - frac) * spacing
             if (x < 8f * density || x > size.width - 8f * density) continue
             val index = base.toInt() + i
-            val at = min + index * s
+            val at = origin + index * s
             if (at < min - s / 2 || at > max + s / 2) continue
             val big = index % 10 == 0
             val h = size.height * if (big) 0.5f else 0.28f

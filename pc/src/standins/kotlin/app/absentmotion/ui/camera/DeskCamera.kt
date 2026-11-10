@@ -35,7 +35,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.toComposeImageBitmap
+import androidx.compose.ui.graphics.asComposeImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -83,6 +83,8 @@ class DeskCameraController(private val ffmpeg: String, private val folder: File,
     var startedAt by mutableLongStateOf(0L)
         private set
     @Volatile private var latest: ByteArray? = null
+    private val ring = arrayOfNulls<Pair<org.jetbrains.skia.Bitmap, ImageBitmap>>(3)
+    private var slot = 0
     @Volatile private var session: DeskCameraSession? = null
     @Volatile private var generation = 0
     private var encoder: List<String> = emptyList()
@@ -126,7 +128,20 @@ class DeskCameraController(private val ffmpeg: String, private val folder: File,
 
     private fun show(bytes: ByteArray) {
         latest = bytes
-        runCatching { org.jetbrains.skia.Image.makeFromEncoded(bytes).toComposeImageBitmap() }.getOrNull()?.let { frame = it; phase = CameraPhase.Live }
+        runCatching {
+            org.jetbrains.skia.Image.makeFromEncoded(bytes).use { image ->
+                val next = (slot + 1) % ring.size
+                val entry = ring[next]?.takeIf { it.first.width == image.width && it.first.height == image.height } ?: run {
+                    val bitmap = org.jetbrains.skia.Bitmap().also { it.allocN32Pixels(image.width, image.height) }
+                    (bitmap to bitmap.asComposeImageBitmap()).also { ring[next] = it }
+                }
+                if (image.readPixels(entry.first)) {
+                    slot = next
+                    frame = entry.second
+                    phase = CameraPhase.Live
+                }
+            }
+        }
     }
 
     private fun fail(log: String, wasRecording: Boolean) {

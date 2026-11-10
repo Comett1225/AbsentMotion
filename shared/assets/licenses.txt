@@ -3766,6 +3766,7 @@ Every icon in AbsentMotion is either taken from an open icon set whose licence a
 
 - Lucide (https://lucide.dev, https://github.com/lucide-icons/lucide), ISC licence, version 1.59.0 (SVG files at https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/<name>.svg, pages at https://lucide.dev/icons/<name>). Lucide's licence file marks a few icons as derived from Feather (https://github.com/feathericons/feather); those are also under the MIT licence below, so both notices apply to them. The Licence column says "ISC and MIT (Feather)" for those.
 - Tabler Icons (https://tabler.io/icons, https://github.com/tabler/tabler-icons), MIT licence, version 3.31.0 (SVG files at https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline/<name>.svg). Used the same way as the Lucide shapes.
+- Simple Icons (https://simpleicons.org, https://github.com/simple-icons/simple-icons), CC0-1.0: only the Discord logo, used as Discord publishes it, to link to the project's Discord server.
 - Material Symbols (https://github.com/google/material-design-icons, Apache-2.0): none are used.
 - Own drawing: made for AbsentMotion from circles, lines, rectangles and arcs; GPL-3.0 like the rest of the code (Apache-2.0 up to 4.x).
 - Effect thumbnails are not icons: they are small renders of six CC0 photographs, listed in THIRD_PARTY_NOTICES.md (section 4, "Effect thumbnail photos").
@@ -3780,7 +3781,8 @@ COUNTS
 - Lucide only - 174
 - Lucide shapes plus own parts - 8
 - Own drawing only - 43
-- Tabler - 3
+- Tabler - 2
+- Simple Icons - 1
 - Material Symbols - 0
 
 (An icon is one named member of an *Icons object, or one icon-drawing composable.)
@@ -3889,7 +3891,7 @@ ICONS
 - Backspace (Lucide delete) - ISC - ui/editor/PanelIcons.kt
 - Check (Lucide check) - ISC and MIT (Feather) - ui/editor/PanelIcons.kt
 - Reverse (Lucide arrow-right-left) - ISC - ui/editor/PanelIcons.kt
-- Discord (Tabler brand-discord (filled)) - MIT - ui/home/HomeIcons.kt
+- Discord (Simple Icons discord) - CC0-1.0 - ui/home/HomeIcons.kt
 - Receive (Lucide download) - ISC and MIT (Feather) - ui/home/HomeIcons.kt
 - Menu (Lucide menu) - ISC - ui/home/HomeIcons.kt
 - ChevronDown (Lucide chevron-down) - ISC and MIT (Feather) - ui/home/HomeIcons.kt

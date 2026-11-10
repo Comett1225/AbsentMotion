@@ -108,4 +108,11 @@ class CropTest {
         assertBox(CropBox(0.1f, 0.2f, 0.3f, 0.4f), unkeyed.cropBox())
         assertBox(CropBox(0.1f, 0.2f, 0.3f, 0.4f), Layer(XmlNode.parse(keyed.node.toXml()), 0.25f, 0.24f..0.26f).cropBox())
     }
+
+    @Test fun leftAndTopHandlesSurviveAMaximumRightAndBottom() {
+        val box = CropBox(0f, 0f, 0.99f, 0.99f)
+        assertEquals(0f, box.dragged(7, 0.1f, 0f).left, 1e-4f)
+        assertEquals(0f, box.dragged(4, 0f, 0.1f).top, 1e-4f)
+        assertEquals(0f, box.dragged(0, 0.1f, 0.1f).left, 1e-4f)
+    }
 }

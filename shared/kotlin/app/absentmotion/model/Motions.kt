@@ -142,7 +142,7 @@ enum class TransitionKind(val id: String, @StringRes val label: Int, val overlap
             WhipPan -> pair(Whip, listOf(slide(dir)), fx = listOf(Fx("absent.smear", mapOf("length" to (0f to 300f)), mapOf("angle" to number(0f)))))
             Glitch -> pair(EaseOut, emptyList(), fx = listOf(Fx("absent.glitch", mapOf("intensity" to (0f to 1f))), Fx("absent.rgbsplit", mapOf("strength" to (0f to 0.3f)))))
             Flash -> pair(EaseOut, emptyList(), fx = listOf(Fx("absent.exposure", mapOf("stops" to (0f to 4f)))))
-            Shake -> pair(EaseOut, emptyList(), fx = listOf(Fx("absent.autoshake", mapOf("magnitude" to (0f to 48f), "rotation" to (0f to 4f)), mapOf("frequency" to number(14f)))))
+            Shake -> pair(EaseOut, emptyList(), fx = listOf(Fx("absent.autoshake", mapOf("magnitude" to (0f to 48f)), mapOf("frequency" to number(14f)))))
         }
     }
 
@@ -262,6 +262,17 @@ fun Scene.withAnimation(id: Long, slot: MotionSlot, motionId: String?, ms: Int):
         val done = it.withSide(motion, slot, slot == MotionSlot.In, from, to, width.toFloat(), height.toFloat())
         done.copy(node = done.node.with(slot.attr, MotionRecord(false, motionId, d).toString()))
     }
+}
+
+fun Scene.withEdgeMotions(before: Layer, after: Layer): Layer {
+    var l = after
+    for (slot in listOf(MotionSlot.In, MotionSlot.Out)) {
+        val record = before.motion(slot)?.takeIf { !it.transition } ?: continue
+        if (if (slot == MotionSlot.In) l.startTime == before.startTime else l.endTime == before.endTime) continue
+        val alone = Scene(node.copy(children = node.children.filter { it.name !in Scene.LAYER_TAGS } + l.node))
+        l = alone.withAnimation(l.id, slot, record.id, record.ms).layer(l.id) ?: l
+    }
+    return l
 }
 
 fun Scene.cutBetween(first: Long, second: Long): Pair<Layer, Layer>? {

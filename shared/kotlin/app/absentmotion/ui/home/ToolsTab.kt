@@ -119,12 +119,15 @@ import kotlinx.coroutines.withContext
 import java.util.Locale
 import kotlin.math.roundToInt
 
+private val installScope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + Dispatchers.Main.immediate)
+private var installPercent by mutableStateOf<Int?>(null)
+
 @Composable
 internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSettings, onOpen: (String) -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val revision by VideoDownloader.revision.collectAsState()
-    var engine by remember { mutableStateOf(if (!VideoDownloader.available) Engine.Unavailable else if (VideoDownloader.installed(context)) Engine.Ready else Engine.Missing) }
+    var engine by remember { mutableStateOf(if (installPercent != null) Engine.Getting(installPercent!!) else if (!VideoDownloader.available) Engine.Unavailable else if (VideoDownloader.installed(context)) Engine.Ready else Engine.Missing) }
     var open by rememberSaveable { mutableIntStateOf(0) }
     var compressFrom by remember { mutableStateOf<Uri?>(null) }
     var asking by remember { mutableStateOf(false) }
@@ -132,12 +135,14 @@ internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSett
         if (engine !is Engine.Getting) engine = if (!VideoDownloader.available) Engine.Unavailable else if (VideoDownloader.installed(context)) Engine.Ready else Engine.Missing
     }
     fun getDownloader() {
-        if (engine is Engine.Getting) return
+        if (engine is Engine.Getting || installPercent != null) return
         engine = Engine.Getting(0)
-        scope.launch {
+        installPercent = 0
+        installScope.launch {
             engine = try {
                 VideoDownloader.install(context) { fraction ->
                     val percent = (fraction * 100).toInt().coerceIn(0, 100)
+                    installPercent = percent
                     if (engine != Engine.Getting(percent)) engine = Engine.Getting(percent)
                 }
                 Engine.Ready
@@ -148,6 +153,8 @@ internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSett
                 val error = problem(e).takeIf { it != R.string.downloader_error_unknown } ?: R.string.downloader_engine_failed
                 Toast.makeText(context, context.getString(error), Toast.LENGTH_LONG).show()
                 Engine.Failed(error)
+            } finally {
+                installPercent = null
             }
         }
     }
@@ -488,6 +495,7 @@ private fun DownloaderScreen(store: ProjectStore, settings: AppSettings, onOpen:
         if (fetch !is Fetch.Ready) fetch = Fetch.Ready
     }
 
+    var creating by remember { mutableStateOf(false) }
     val back = { if (running) work?.cancel() ?: Unit else onClose() }
     ToolSheet(stringResource(R.string.tools_downloader), back, bounded = true, bottom = {
         val view = LocalView.current
@@ -500,9 +508,16 @@ private fun DownloaderScreen(store: ProjectStore, settings: AppSettings, onOpen:
             onStart = ::startDownload,
             onCancel = { work?.cancel() },
             onProject = { media ->
-                scope.launch {
-                    val id = try { projectFrom(context, store, settings, media) } catch (e: CancellationException) { throw e } catch (e: Exception) { null }
-                    if (id == null) Toast.makeText(context, context.getString(R.string.home_create_project_failed), Toast.LENGTH_LONG).show() else onOpen(id)
+                if (!creating) {
+                    creating = true
+                    scope.launch {
+                        try {
+                            val id = try { projectFrom(context, store, settings, media) } catch (e: CancellationException) { throw e } catch (e: Exception) { null }
+                            if (id == null) Toast.makeText(context, context.getString(R.string.home_create_project_failed), Toast.LENGTH_LONG).show() else onOpen(id)
+                        } finally {
+                            creating = false
+                        }
+                    }
                 }
             },
             onCompress = { media -> onCompress(media.uri) },

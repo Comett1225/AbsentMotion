@@ -12,11 +12,19 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 
 - One-step updates on the desktop apps: Settings > Updates > Download update > Install and restart saves the project, closes, installs the new version and opens it again. It works for the Windows MSI, the macOS app (a new `-update.zip` next to the DMG), the Linux user install, AppImage and `.deb` (the system asks for the password once); a protected macOS folder still opens the installer.
 - Desktop updates are only installed when the release carries a signed list of its files (`update-manifest.json` and its signature).
-- Android 12 and newer install an update without a confirmation dialog when the system allows it, and a notification opens the app afterwards.
+- Android 12 and newer install an update without a confirmation dialog when nothing is open in the app (otherwise it waits for a tap on Install), and a notification opens the app afterwards.
 
 ### Fixed
 
 - Tiles (Blocks) now fill the whole screen when the layer or group is moved or only partly on the canvas, including with Mirror: the part of the layer outside the screen is used for the repeats instead of leaving black gaps.
+- Audio effects: Add Audio Effect opens the Audio page of Effects, Voice filters shows as a folder, Back leaves the panel after an effect is removed, and the eye button has its normal size.
+- Crop: dragging a crop handle no longer closes the app when the other side is cropped to 99%.
+- Background export: keeps running with the screen off and when the app is swiped away from recent apps.
+- Effects at the edge: Blur, Glow, Drop Shadow, Flip and Tiles use the part of a layer just outside the screen, and Tiles on a big layer use far less memory.
+- Editor: Edit Points and the Pen Tool hit the right spot on tablets, Paste style keeps the timing of audio and groups, and Ungroup keeps every layer of a sped-up group.
+- Desktop: menus follow the app language, Reverse keeps all of its sound, HDR videos are tone-mapped, and opening several projects at once uses one window.
+- Compatible build: starts with OpenGL and only switches to Vulkan after a safe test in the background shows that Vulkan draws correctly on that phone.
+- And more: over 100 other fixes from a full check of the code.
 
 ## [5.0.2] - 2026-11-08
 

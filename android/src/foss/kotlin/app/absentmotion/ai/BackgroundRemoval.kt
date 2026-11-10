@@ -43,7 +43,10 @@ internal object BackgroundRemoval {
             val width = bitmap.width
             val height = bitmap.height
             progress(0.2f, AppText.get(R.string.ai_removing_background))
-            val alpha = cutout.refine(matte(context, bitmap), width, height)
+            val turn = original?.orientation ?: 0
+            val upright = bitmap.turned(turn)
+            val uprightAlpha = try { cutout.refine(matte(context, upright), upright.width, upright.height) } finally { if (upright !== bitmap) upright.recycle() }
+            val alpha = uprightAlpha.turned(if (turn % 180 == 0) width else height, if (turn % 180 == 0) height else width, 360 - turn)
             coroutineContext.ensureActive()
             check(alpha.size == width * height) { AppText.get(R.string.ai_mask_unexpected_size) }
             val row = IntArray(width)

@@ -15,6 +15,10 @@ done
 failed=0
 skipped=""
 fail() { printf 'check.sh: FAILED: %s\n' "$1" >&2; failed=$((failed + 1)); }
+version_code=$(sed -n 's/^versionCode=//p' version.properties)
+version_name=$(sed -n 's/^versionName=//p' version.properties)
+[ -f "fastlane/metadata/android/en-US/changelogs/$version_code.txt" ] || fail "fastlane/metadata/android/en-US/changelogs/$version_code.txt is missing"
+grep -q "^## \[$version_name\]" CHANGELOG.md || fail "CHANGELOG.md has no heading for $version_name"
 native_libs() {
     newest=$(ls -t "android/build/intermediates/merged_native_libs/$1/"*/out/lib/"${3:-arm64-v8a}"/*.so 2>/dev/null | head -n 1)
     if [ -z "$newest" ]; then

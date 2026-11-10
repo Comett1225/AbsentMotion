@@ -95,9 +95,9 @@ class UiContracts(unittest.TestCase):
 
     def test_crop_mode_owns_the_canvas_without_scale_handles(self):
         text = source('ui/editor/Preview.kt')
-        self.assertIn('state.panel == EditorPanel.Crop -> HIDDEN', text)
-        self.assertIn('} else if (moved && state.panel == EditorPanel.Crop) {', text)
-        self.assertIn('state.panel != EditorPanel.EditText && state.panel != EditorPanel.Crop', text)
+        self.assertIn('state.livePanel == EditorPanel.Crop -> HIDDEN', text)
+        self.assertIn('} else if (moved && state.livePanel == EditorPanel.Crop) {', text)
+        self.assertIn('state.livePanel != EditorPanel.EditText && state.livePanel != EditorPanel.Crop', text)
         self.assertIn('"crop-drag"', text)
         self.assertIn('state.openCrop()', source('ui/editor/LayerTools.kt'))
         self.assertEqual('Crop', english('layer_tool_crop'))

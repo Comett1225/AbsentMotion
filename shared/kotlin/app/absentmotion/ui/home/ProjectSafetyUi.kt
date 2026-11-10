@@ -146,7 +146,7 @@ private data class VersionItem(val version: ProjectVersions.Version, val bytes: 
 @Composable
 fun VersionHistory(
     store: ProjectStore, id: String, title: String, engine: EngineThread, onRestore: (ProjectVersions.Version) -> Unit,
-    onDelete: (() -> Unit)? = null, editor: Boolean = false, onDismiss: () -> Unit,
+    onDelete: (() -> Unit)? = null, editor: Boolean = false, damaged: Boolean = onDelete != null, onDismiss: () -> Unit,
 ) {
     val style = historyStyle(editor)
     val items by produceState<List<VersionItem>?>(null, id) {
@@ -163,7 +163,6 @@ fun VersionHistory(
     }
     var chosenTime by rememberSaveable { mutableStateOf<Long?>(null) }
     var deleting by rememberSaveable { mutableStateOf(false) }
-    val damaged = onDelete != null
     val list = items
     val chosen = chosenTime?.let { time -> list?.firstOrNull { it.version.time == time }?.version }
     if (chosenTime != null && list != null && chosen == null) LaunchedEffect(list) { chosenTime = null }
@@ -197,7 +196,7 @@ fun VersionHistory(
         Rule(style)
         Row(Modifier.fillMaxWidth().background(style.bar).padding(horizontal = 16.dp, vertical = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             if (damaged) {
-                SquareButton(stringResource(R.string.delete), null, style.danger, style.danger, Modifier.weight(1f)) { deleting = true }
+                if (onDelete != null) SquareButton(stringResource(R.string.delete), null, style.danger, style.danger, Modifier.weight(1f)) { deleting = true }
                 SquareButton(stringResource(R.string.action_close), style.button, style.onButton, null, Modifier.weight(1f), onDismiss)
             } else {
                 Spacer(Modifier.weight(1f))
@@ -214,7 +213,7 @@ fun VersionHistory(
     chosen?.let { version ->
         SquareDialog(style, VersionPanel.CONFIRM_WIDTH, { chosenTime = null }) {
             Confirmation(
-                style, stringResource(R.string.restore_this_version), versionRestoreText(version.time).text(), stringResource(R.string.restore), destructive = false,
+                style, stringResource(R.string.restore_this_version), versionRestoreText(version.time, locale = androidx.compose.ui.platform.LocalConfiguration.current.locales[0]).text(), stringResource(R.string.restore), destructive = false,
                 onCancel = { chosenTime = null }, onConfirm = { if (chosenTime != null) { chosenTime = null; onRestore(version) } },
             )
         }
@@ -287,7 +286,7 @@ private fun VersionRow(style: HistoryStyle, item: VersionItem, engine: EngineThr
             }
         }
         Column(Modifier.weight(1f).padding(start = 12.dp)) {
-            Text(versionLabel(version.time).text(), color = style.ink, fontSize = 15.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium, maxLines = 3, overflow = TextOverflow.Ellipsis)
+            Text(versionLabel(version.time, locale = androidx.compose.ui.platform.LocalConfiguration.current.locales[0]).text(), color = style.ink, fontSize = 15.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium, maxLines = 3, overflow = TextOverflow.Ellipsis)
             Text(formatBytes(item.bytes), Modifier.padding(top = 2.dp), color = style.dim, fontSize = 13.sp, lineHeight = 18.sp, maxLines = 1)
             if (stacked) SquareButton(restore, null, style.accent, style.accent, Modifier.padding(top = 8.dp), onRestore)
         }
@@ -311,13 +310,13 @@ private suspend fun versionThumbnail(version: ProjectVersions.Version, engine: E
     null
 }
 
-internal fun versionLabel(time: Long, now: Long = System.currentTimeMillis()): UiText =
-    versionMoment(time, now, R.string.safety_version_today, R.string.safety_version_yesterday, R.string.safety_version_on_date)
+internal fun versionLabel(time: Long, now: Long = System.currentTimeMillis(), locale: Locale = Locale.getDefault()): UiText =
+    versionMoment(time, now, R.string.safety_version_today, R.string.safety_version_yesterday, R.string.safety_version_on_date, locale)
 
-private fun versionRestoreText(time: Long, now: Long = System.currentTimeMillis()): UiText =
-    versionMoment(time, now, R.string.safety_restore_today, R.string.safety_restore_yesterday, R.string.safety_restore_on_date)
+private fun versionRestoreText(time: Long, now: Long = System.currentTimeMillis(), locale: Locale = Locale.getDefault()): UiText =
+    versionMoment(time, now, R.string.safety_restore_today, R.string.safety_restore_yesterday, R.string.safety_restore_on_date, locale)
 
-private fun versionMoment(time: Long, now: Long, today: Int, yesterday: Int, other: Int): UiText {
+private fun versionMoment(time: Long, now: Long, today: Int, yesterday: Int, other: Int, locale: Locale): UiText {
     val zone = ZoneId.systemDefault()
     val at = Instant.ofEpochMilli(time).atZone(zone)
     val current = Instant.ofEpochMilli(now).atZone(zone).toLocalDate()
@@ -325,7 +324,7 @@ private fun versionMoment(time: Long, now: Long, today: Int, yesterday: Int, oth
     return when (at.toLocalDate()) {
         current -> txt(today, clock)
         current.minusDays(1) -> txt(yesterday, clock)
-        else -> txt(other, at.format(DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.getDefault()).withDecimalStyle(DecimalStyle.STANDARD)), clock)
+        else -> txt(other, at.format(DateTimeFormatter.ofPattern("d MMMM yyyy", locale).withDecimalStyle(DecimalStyle.STANDARD)), clock)
     }
 }
 
@@ -341,7 +340,7 @@ internal fun ClosedDialog(
         title = { Text(stringResource(R.string.absentmotion_closed_unexpectedly), color = Am.Navy) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
-                if (crash != null) Text(closedText(crash.time).text() + " " + stringResource(crash.reason.sentence), color = Am.Navy)
+                if (crash != null) Text(closedText(crash.time, locale = androidx.compose.ui.platform.LocalConfiguration.current.locales[0]).text() + " " + stringResource(crash.reason.sentence), color = Am.Navy)
                 OutdatedHint(outdated, Modifier.padding(top = 8.dp))
                 if (recoveryTitle != null) Text(
                     stringResource(R.string.safety_recovery_body, recoveryTitle.ifBlank { stringResource(R.string.recovery_your_project) }),
@@ -361,8 +360,8 @@ internal fun ClosedDialog(
     )
 }
 
-internal fun closedText(time: Long, now: Long = System.currentTimeMillis()): UiText =
-    versionMoment(time, now, R.string.crash_closed_today, R.string.crash_closed_yesterday, R.string.crash_closed_on_date)
+internal fun closedText(time: Long, now: Long = System.currentTimeMillis(), locale: Locale = Locale.getDefault()): UiText =
+    versionMoment(time, now, R.string.crash_closed_today, R.string.crash_closed_yesterday, R.string.crash_closed_on_date, locale)
 
 @Composable
 internal fun OpenFailedDialog(onHistory: (() -> Unit)?, outdated: Outdated?, onDismiss: () -> Unit) {

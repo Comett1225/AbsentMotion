@@ -34,6 +34,7 @@ internal class FrameReader(context: Context, uri: String) : Closeable {
     private val info by lazy { MediaCodec.BufferInfo() }
     private var queued = false
     private var positioned = false
+    private var inputEnded = false
     private var lastPts = 0L
     val timestamps: LongArray
     var colorStandard = 0
@@ -76,9 +77,9 @@ internal class FrameReader(context: Context, uri: String) : Closeable {
             if (queued) decoder.flush()
             extractor.seekTo(wanted.first(), MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
             queued = false
+            inputEnded = false
             positioned = true
         }
-        var inputEnded = false
         var next = 0
         var waiting = System.nanoTime()
         while (next < wanted.size) {

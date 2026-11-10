@@ -17,6 +17,7 @@ import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.app.NotificationManagerCompat
 import app.absentmotion.platform.Context
 import app.absentmotion.platform.Log
 import app.absentmotion.platform.Uri
@@ -41,7 +42,7 @@ internal sealed interface UpdateStep {
     data class Checking(val release: Release) : UpdateStep
     data class Permission(val release: Release, val denied: Boolean, val downloaded: Boolean = true) : UpdateStep
     data class Installing(val release: Release) : UpdateStep
-    data class NotInstalled(val release: Release) : UpdateStep
+    data class NotInstalled(val release: Release, val ready: Boolean = false) : UpdateStep
     data class Failed(val release: Release, val failure: UpdateFailure) : UpdateStep
 }
 
@@ -56,6 +57,7 @@ internal sealed interface UpdateEvent {
     data object NeedsPermission : UpdateEvent
     data class SettingsClosed(val granted: Boolean) : UpdateEvent
     data object Install : UpdateEvent
+    data object Hold : UpdateEvent
     data class Answer(val status: Int, val blocked: Boolean = false) : UpdateEvent
     data class Fail(val failure: UpdateFailure) : UpdateEvent
     data object Cancel : UpdateEvent
@@ -144,6 +146,7 @@ internal fun reduce(step: UpdateStep, event: UpdateEvent): UpdateStep {
             is UpdateStep.Permission -> if (step.downloaded) UpdateStep.Installing(step.release) else step
             else -> step
         }
+        UpdateEvent.Hold -> if (step is UpdateStep.Checking) UpdateStep.NotInstalled(step.release, ready = true) else step
         is UpdateEvent.Answer -> when {
             step !is UpdateStep.Installing -> step
             event.status == PackageInstaller.STATUS_PENDING_USER_ACTION -> step
@@ -181,7 +184,8 @@ internal object Updater {
     private var job: Job? = null
     private var tail: Job? = null
     private var http: TrustedHttp? = null
-    private var generation = 0
+    @Volatile private var generation = 0
+    var calm: () -> Boolean = { false }
     @Volatile private var session = -1
     private var awaitingSettings = false
     private var flow: File? = null
@@ -293,6 +297,10 @@ internal object Updater {
             on(UpdateEvent.Fail(problem))
             return
         }
+        if (!calm() || hidden) {
+            on(UpdateEvent.Hold)
+            return
+        }
         install(app)
     }
 
@@ -401,10 +409,11 @@ internal object Updater {
     private fun commit(app: Context, release: Release) {
         val apk = release.apk ?: return
         val mine = ++generation
+        val silent = Build.VERSION.SDK_INT >= 31 && calm() && NotificationManagerCompat.from(app).areNotificationsEnabled()
         job = scope.launch {
             try {
-                val id = withContext(Dispatchers.IO) {
-                    writeSession(app, files(app).apk, apk.size, apk.sha256 ?: stampSha(files(app))).also {
+                val id = withContext(NonCancellable + Dispatchers.IO) {
+                    writeSession(app, files(app).apk, apk.size, apk.sha256 ?: stampSha(files(app)), silent) { generation == mine }.also {
                         if (isSamsung(Build.MANUFACTURER)) tries(app).let { file -> writeTries(file, tryStarted(readTries(file), Updates.installed(app), release.version)) }
                     }
                 }
@@ -423,7 +432,7 @@ internal object Updater {
 
     private fun stampSha(files: UpdateFiles): String? = runCatching { files.stamp.readLines().getOrNull(2) }.getOrNull()?.takeIf(::isSha256)
 
-    private fun writeSession(app: Context, file: File, size: Long, sha256: String?): Int {
+    private fun writeSession(app: Context, file: File, size: Long, sha256: String?, silent: Boolean, wanted: () -> Boolean): Int {
         if (!file.isFile) throw UpdateProblem(UpdateFailure.Removed)
         if (sha256 == null || file.length() != size) throw UpdateProblem(UpdateFailure.Checksum)
         claimSpace(installSpace(size), { freeBytes(app) }, { usableBytes(app) }) { allocate(app, it) }
@@ -432,7 +441,7 @@ internal object Updater {
             setAppPackageName(app.packageName)
             setSize(size)
             setInstallReason(PackageManager.INSTALL_REASON_USER)
-            if (Build.VERSION.SDK_INT >= 31) setRequireUserAction(PackageInstaller.SessionParams.USER_ACTION_NOT_REQUIRED)
+            if (Build.VERSION.SDK_INT >= 31) setRequireUserAction(if (silent) PackageInstaller.SessionParams.USER_ACTION_NOT_REQUIRED else PackageInstaller.SessionParams.USER_ACTION_REQUIRED)
         }
         val id = installer.createSession(params)
         session = id
@@ -452,6 +461,7 @@ internal object Updater {
                     }
                 }
                 if (hex(digest.digest()) != sha256) throw UpdateProblem(UpdateFailure.Checksum)
+                if (!wanted()) throw CancellationException("update cancelled")
                 val intent = Intent(app, UpdateReceiver::class.java).setAction(ACTION).setPackage(app.packageName)
                 val flags = PendingIntent.FLAG_UPDATE_CURRENT or (if (Build.VERSION.SDK_INT >= 31) PendingIntent.FLAG_MUTABLE else 0)
                 session.commit(PendingIntent.getBroadcast(app, id, intent, flags).intentSender)

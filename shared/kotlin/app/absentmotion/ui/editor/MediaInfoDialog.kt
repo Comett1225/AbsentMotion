@@ -35,7 +35,7 @@ internal fun MediaInfoDialog(record: MediaDeclaration, onReplace: (suspend (Medi
     val scope = LocalEditorScope.current
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri != null) {
-            runCatching { context.contentResolver.takePersistableUriPermission(uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION) }
+            if (!app.absentmotion.library.AppSettings(context).keepMediaCopies) runCatching { context.contentResolver.takePersistableUriPermission(uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION) }
             scope.launch { mediaDeclaration(context, uri)?.let { onReplace?.invoke(it) } }
         }
     }

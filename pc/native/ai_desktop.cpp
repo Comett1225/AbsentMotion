@@ -456,10 +456,9 @@ Java_app_absentmotion_ai_AiNative_nativeInterpolate(JNIEnv *env, jobject, jlong 
 #endif
     if (flow.w != pw || flow.h != ph || flow.c < 4 || mask.w != pw || mask.h != ph || mask.c < 1) return -3;
     if (m->cancel) return 1;
-    Pixels a(env, first);
-    Pixels b(env, second);
-    Pixels out(env, output);
-    if (!a.data || !b.data || !out.data) return -2;
+    std::vector<uint32_t> a(static_cast<size_t>(count)), b(static_cast<size_t>(count)), out(static_cast<size_t>(count));
+    env->GetIntArrayRegion(first, 0, count, reinterpret_cast<jint *>(a.data()));
+    env->GetIntArrayRegion(second, 0, count, reinterpret_cast<jint *>(b.data()));
     const float fx = static_cast<float>(nw) / width, fy = static_cast<float>(nh) / height;
     const float sx = static_cast<float>(width) / nw, sy = static_cast<float>(height) / nh;
     const ncnn::Mat f0 = flow.channel(0), f1 = flow.channel(1), f2 = flow.channel(2), f3 = flow.channel(3), weight = mask.channel(0);
@@ -470,13 +469,13 @@ Java_app_absentmotion_ai_AiNative_nativeInterpolate(JNIEnv *env, jobject, jlong 
                 float nx = (x + 0.5f) * fx - 0.5f;
                 float w0 = sampleBilinear(weight, nx, ny, nw, nh);
                 float ca[3], cb[3];
-                warpPixel(a.data, width, height, x + sampleBilinear(f0, nx, ny, nw, nh) * sx, y + sampleBilinear(f1, nx, ny, nw, nh) * sy, ca);
-                warpPixel(b.data, width, height, x + sampleBilinear(f2, nx, ny, nw, nh) * sx, y + sampleBilinear(f3, nx, ny, nw, nh) * sy, cb);
+                warpPixel(a.data(), width, height, x + sampleBilinear(f0, nx, ny, nw, nh) * sx, y + sampleBilinear(f1, nx, ny, nw, nh) * sy, ca);
+                warpPixel(b.data(), width, height, x + sampleBilinear(f2, nx, ny, nw, nh) * sx, y + sampleBilinear(f3, nx, ny, nw, nh) * sy, cb);
                 size_t at = static_cast<size_t>(y) * width + x;
-                float alpha = static_cast<float>(a.data[at] >> 24) * (1 - t) + static_cast<float>(b.data[at] >> 24) * t;
+                float alpha = static_cast<float>(a[at] >> 24) * (1 - t) + static_cast<float>(b[at] >> 24) * t;
                 uint32_t value = static_cast<uint32_t>(std::clamp(static_cast<int>(std::lround(alpha)), 0, 255)) << 24;
                 for (int c = 0; c < 3; c++) value |= byte(ca[c] * w0 + cb[c] * (1 - w0)) << (16 - 8 * c);
-                out.data[at] = value;
+                out[at] = value;
             }
         }
     };
@@ -504,6 +503,7 @@ Java_app_absentmotion_ai_AiNative_nativeInterpolate(JNIEnv *env, jobject, jlong 
     rows(bands[0].from, bands[0].to);
     for (pthread_t worker : workers) pthread_join(worker, nullptr);
 #endif
+    env->SetIntArrayRegion(output, 0, count, reinterpret_cast<const jint *>(out.data()));
     return 0;
 }
 

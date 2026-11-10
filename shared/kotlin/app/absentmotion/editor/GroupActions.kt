@@ -1,12 +1,16 @@
 package app.absentmotion.editor
 
 import app.absentmotion.ai.cutoutMatte
+import app.absentmotion.model.mediaUris
 import app.absentmotion.model.Layer
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.nestedCut
+import app.absentmotion.model.retimedVideo
 import app.absentmotion.model.trimmedTo
+import app.absentmotion.model.valueAt
 import app.absentmotion.model.withoutValueLinks
+import kotlin.math.roundToInt
 
 internal val Layer.isPlainGroup: Boolean get() = kind == "embedScene" && link == null && nested != null && cutoutMatte == null
 
@@ -39,7 +43,13 @@ internal fun Scene.withFocused(path: List<Long>, edited: Scene): Scene {
     val added = mediaNodes.filter { it["uri"] !in ownUris && it["uri"] !in rootUris }
     val inner = Scene(edited.node.copy(children = kept + others))
     val placed = replaceInside(path, inner)
-    return if (added.isEmpty()) placed else Scene(placed.node.copy(children = added + placed.node.children))
+    val withAdded = if (added.isEmpty()) placed else Scene(placed.node.copy(children = added + placed.node.children))
+    return withAdded.withoutOrphanMedia(node.mediaUris())
+}
+
+private fun Scene.withoutOrphanMedia(before: Set<String>): Scene {
+    val gone = before - node.mediaUris()
+    return if (gone.isEmpty()) this else Scene(node.copy(children = node.children.filterNot { it.name == "media" && it["uri"] in gone }))
 }
 
 private fun Scene.replaceInside(path: List<Long>, inner: Scene): Scene {
@@ -56,15 +66,24 @@ internal fun Scene.ungrouped(id: Long): Scene? {
     val group = layer(id)?.takeIf { it.isPlainGroup } ?: return null
     val inner = group.nested ?: return null
     val cut = group.nestedCut
-    val end = cut + group.endTime - group.startTime
+    val speed = if (inner.retime == "off") (group.node.child("speedMap")?.valueAt(0f)?.toDoubleOrNull() ?: group.node["speed"]?.toDoubleOrNull())?.takeIf { it > 0 && it.isFinite() } ?: 1.0 else 1.0
+    val lo = cut * speed
+    val hi = (cut + group.endTime - group.startTime) * speed
+    val from = Math.ceil(lo).toInt()
+    val to = Math.floor(hi).toInt()
+    fun place(t: Int) = if (speed == 1.0) t - cut else ((t - lo) / speed).roundToInt()
     val clipped = Scene(inner.node.with("retime", null).copy(children = inner.node.children.mapNotNull { child ->
         if (child.name !in Scene.LAYER_TAGS) return@mapNotNull child
         val layer = Layer(child)
+        if (layer.startTime >= hi || layer.endTime <= lo) return@mapNotNull null
+        val kept = if (layer.startTime < lo || layer.endTime > hi) layer.trimmedTo(maxOf(layer.startTime, from), minOf(layer.endTime, to)) else layer
         when {
-            layer.startTime >= end || layer.endTime <= cut -> null
-            layer.startTime < cut || layer.endTime > end -> layer.trimmedTo(maxOf(layer.startTime, cut), minOf(layer.endTime, end)).let { it.movedTo(it.startTime - cut).node }
-            cut > 0 -> layer.movedTo(layer.startTime - cut).node
-            else -> child
+            speed == 1.0 -> if (kept !== layer || cut > 0) kept.movedTo(kept.startTime - cut).node else child
+            else -> {
+                val start = place(kept.startTime)
+                val end = maxOf(place(kept.endTime), start + 1)
+                if (kept.kind == "audio" || kept.mediaFill?.video == true) kept.retimedVideo(start, end).node else kept.node.with("startTime", "$start").with("endTime", "$end")
+            }
         }
     }))
     val plainAttrs = LinkedHashMap(group.node.attrs.filterKeys { it in PLAIN_GROUP_ATTRS })
@@ -77,7 +96,8 @@ internal fun Scene.ungrouped(id: Long): Scene? {
     if (loose.isEmpty()) return host.remove(id)
     val known = media.map { it.uri }.toSet()
     val newMedia = clipped.node.children.filter { it.name == "media" && it["uri"] !in known }
-    return Scene(host.node.copy(children = newMedia + host.node.children.flatMap { if (it === plain.node) loose else listOf(it.withoutValueLinks(setOf(id))) }))
+    val result = Scene(host.node.copy(children = newMedia + host.node.children.flatMap { if (it === plain.node) loose else listOf(it.withoutValueLinks(setOf(id))) }))
+    return result.withLayers(result.layers).withoutOrphanMedia(node.mediaUris())
 }
 
 fun EditorState.askUngroup() {

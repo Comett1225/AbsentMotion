@@ -60,11 +60,11 @@ internal class DeskInterpolation(private val context: Context, private val smoot
             if (b > fill.outTime.toLong() * 1000L - 500 || b <= a) continue
             var t = if (interpolate) around.pair.t else 0f
             if (smoothing.method == FrameInterpolation.Blend && smoothing.level == SmoothLevel.Low) t = ((t - 0.25f) * 2).coerceIn(0f, 1f)
-            val first = read(a) ?: continue
+            val first = checkNotNull(read(a))
             val width = first.width
             val height = first.height
             val before = first.rgba.copyOf()
-            val second = read(b) ?: continue
+            val second = checkNotNull(read(b))
             if (second.width != width || second.height != height) continue
             val after = second.rgba.copyOf()
             val blur = if (smoothing.blur == MotionBlur.Off) 0f else (smoothing.blur.shutter / 360f * (timing.speed(layer.localMs(mapped, childScene)) * position.rate * 1_000_000f / fps) / (b - a) * smoothing.blurScale).toFloat()

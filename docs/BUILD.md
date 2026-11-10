@@ -305,7 +305,7 @@ download the installer instead.
 
 **Trust.** Desktop updates are accepted only when `update-manifest.json` and `update-manifest.json.sig` are in the same
 release and the signature verifies against a public key built into the app (`UPDATE_KEYS` in `DeskUpdateTrust.kt`). The list
-holds the size and SHA-256 of every desktop file; the downloaded file must match it and the GitHub asset digest. Android does
+holds the size and SHA-256 of every desktop file; the downloaded file must match it and the GitHub asset digest. A desktop release without the list is refused for every file kind. Android does
 not use the list: the system checks the APK signature. The private key is a raw Ed25519 key kept outside the repository and
 backed up offline; losing it means every installed desktop copy must be reinstalled by hand once.
 
@@ -315,8 +315,8 @@ java tools/UpdateSign.java manifest <version> <min-updater> <private-key-file> <
 java tools/UpdateSign.java verify <out-dir>/update-manifest.json <out-dir>/update-manifest.json.sig <public-key-file>
 ```
 
-Run `manifest` last, after every desktop file of the release is final (the MSI, both macOS update zips, the `.deb`s, AppImages
-and tarballs), and upload both output files with the release. Key rotation: ship an app with both public keys in `UPDATE_KEYS`,
+Run `manifest` last, after every desktop file of the release is final (the MSI, both macOS update zips and both DMGs, the `.deb`s,
+AppImages and tarballs; a file that is missing from the list cannot be downloaded by the app), and upload both output files with the release. Key rotation: ship an app with both public keys in `UPDATE_KEYS`,
 sign with the new key once most users have it.
 
 **Testing an update without a release.** A loopback-only test feed is read from `-Dam.updateFeed=http://127.0.0.1:<port>` (set

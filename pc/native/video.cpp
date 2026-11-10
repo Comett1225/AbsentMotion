@@ -1,5 +1,6 @@
 #include "video.h"
 #include <algorithm>
+#include <atomic>
 #include <chrono>
 #include <cmath>
 #include <condition_variable>
@@ -54,6 +55,27 @@ SkYUVColorSpace YuvSpace(const AVFrame* f) {
     }
 }
 
+bool Hdr(const AVFrame* f) { return f->color_trc == AVCOL_TRC_ARIB_STD_B67 || f->color_trc == AVCOL_TRC_SMPTE2084; }
+
+std::vector<float> HdrLevels(bool hlg) {
+    std::vector<float> table(4096);
+    for (int i = 0; i < 4096; ++i) {
+        const float n = i / 4095.0f;
+        if (hlg) {
+            table[i] = n <= 0.5f ? n * n / 3 : (std::exp((n - 0.55991073f) / 0.17883277f) + 0.28466892f) / 12;
+        } else {
+            const float p = std::pow(n, 1 / 78.84375f);
+            table[i] = std::pow(std::max(p - 0.8359375f, 0.0f) / (18.8515625f - 18.6875f * p), 1 / 0.1593017578125f) * 10000 / 203;
+        }
+    }
+    return table;
+}
+
+float SoftKnee(float m) {
+    constexpr float k = 0.8f;
+    return m <= k ? m : k + (1 - k) * (m - k) / ((m - k) + (1 - k));
+}
+
 AVPixelFormat PickFormat(AVCodecContext* c, const AVPixelFormat* list) {
     const auto hw = (AVPixelFormat)(intptr_t)c->opaque;
     for (auto p = list; *p != AV_PIX_FMT_NONE; ++p) if (*p == hw) return *p;
@@ -72,8 +94,9 @@ struct Video {
     std::mutex lock;
     std::condition_variable wake, ready;
     std::deque<Decoded> frames;
-    int64_t want = 0, cover = INT64_MAX, last = INT64_MIN;
-    bool asked = false, ended = false, quit = false;
+    std::atomic<int64_t> want{0};
+    int64_t cover = INT64_MAX, last = INT64_MIN;
+    bool asked = false, ended = false, broken = false, quit = false;
     std::thread worker;
     bool hardware = false;
     int64_t shownUs = INT64_MIN;
@@ -141,7 +164,9 @@ struct Video {
 
     bool mustSeek(int64_t t) const {
         if (t < cover) return true;
-        if (t <= last || ended) return false;
+        if (t <= last) return false;
+        if (broken) return true;
+        if (ended) return false;
         const int key = av_index_search_timestamp(stream, fromUs(t), AVSEEK_FLAG_BACKWARD);
         if (key < 0) return t - last > 2000000;
         const AVIndexEntry* entry = avformat_index_get_entry(stream, key);
@@ -151,7 +176,7 @@ struct Video {
     bool farFrom(int64_t t) const { return t < cover || (t > last && !ended && t - last > 2000000); }
 
     bool servable(int64_t t) const { return t >= cover && !frames.empty() && (ended || frames.back().us > t); }
-    bool hopeless(int64_t t) const { return t >= cover && frames.empty() && ended; }
+    bool hopeless(int64_t t) const { return t >= cover && frames.empty() && ended && !(broken && t > last); }
 
     const Decoded& chosen(int64_t t) const {
         auto it = std::upper_bound(frames.begin(), frames.end(), t, [](int64_t v, const Decoded& d) { return v < d.us; });
@@ -190,7 +215,7 @@ struct Video {
                 continue;
             }
             if (packet->stream_index == stream->index) {
-                const bool early = packet->pts != AV_NOPTS_VALUE && packet->duration > 0 && toUs(packet->pts + packet->duration) <= target;
+                const bool early = packet->pts != AV_NOPTS_VALUE && packet->duration > 0 && toUs(packet->pts + packet->duration) <= std::min(target, want.load());
                 codec->skip_frame = early ? AVDISCARD_NONREF : AVDISCARD_DEFAULT;
                 avcodec_send_packet(codec, packet);
             }
@@ -207,6 +232,7 @@ struct Video {
             if (mustSeek(t)) {
                 frames.clear();
                 ended = false;
+                broken = false;
                 last = t;
                 cover = t <= 0 ? INT64_MIN : t;
                 hold.unlock();
@@ -223,7 +249,7 @@ struct Video {
             hold.unlock();
             const int r = decode(frame.get(), t);
             hold.lock();
-            if (r < 0) ended = true;
+            if (r < 0) { ended = true; broken = r != AVERROR_EOF; }
             else {
                 int64_t pts = frame->best_effort_timestamp != AV_NOPTS_VALUE ? frame->best_effort_timestamp : frame->pts;
                 const int64_t us = pts != AV_NOPTS_VALUE ? toUs(pts) : last + 1;
@@ -259,7 +285,57 @@ struct Video {
         return SkImages::TextureFromYUVAPixmaps(context, SkYUVAPixmaps::FromExternalPixmaps(yuva, planes), skgpu::Mipmapped::kNo, false, SkColorSpace::MakeSRGB());
     }
 
+    sk_sp<SkImage> toneMapped(GrDirectContext* context, AVFrame* f) {
+        if (!scaler && (scaler = sws_alloc_context())) scaler->flags = SWS_BILINEAR | SWS_ACCURATE_RND | SWS_FULL_CHR_H_INT;
+        if (f->colorspace == AVCOL_SPC_UNSPECIFIED) f->colorspace = AVCOL_SPC_BT2020_NCL;
+        FramePtr wide(av_frame_alloc());
+        wide->format = AV_PIX_FMT_RGBA64LE;
+        wide->width = f->width;
+        wide->height = f->height;
+        if (!scaler || sws_scale_frame(scaler, wide.get(), f) < 0) return nullptr;
+        const bool hlg = f->color_trc == AVCOL_TRC_ARIB_STD_B67;
+        static const std::vector<float> hlgLevels = HdrLevels(true), pqLevels = HdrLevels(false);
+        static const std::vector<float> encode = [] {
+            std::vector<float> table(4096);
+            for (int i = 0; i < 4096; ++i) {
+                const float v = i / 4095.0f;
+                table[i] = (v <= 0.0031308f ? 12.92f * v : 1.055f * std::pow(v, 1 / 2.4f) - 0.055f) * 255.0f + 0.5f;
+            }
+            return table;
+        }();
+        const std::vector<float>& levels = hlg ? hlgLevels : pqLevels;
+        const size_t rowBytes = (size_t)f->width * 4;
+        auto data = SkData::MakeUninitialized(rowBytes * f->height);
+        auto* out = (uint8_t*)data->writable_data();
+        for (int y = 0; y < f->height; ++y) {
+            const auto* in = (const uint16_t*)(wide->data[0] + (size_t)y * wide->linesize[0]);
+            uint8_t* row = out + y * rowBytes;
+            for (int x = 0; x < f->width; ++x, in += 4, row += 4) {
+                float r = levels[in[0] >> 4], g = levels[in[1] >> 4], b = levels[in[2] >> 4];
+                if (hlg) {
+                    const float gain = 4.926f * std::pow(std::max(0.2627f * r + 0.678f * g + 0.0593f * b, 1e-6f), 0.2f);
+                    r *= gain;
+                    g *= gain;
+                    b *= gain;
+                }
+                float c[3] = {1.6605f * r - 0.5876f * g - 0.0728f * b, -0.1246f * r + 1.1329f * g - 0.0083f * b, -0.0182f * r - 0.1006f * g + 1.1187f * b};
+                const float peak = std::max({c[0], c[1], c[2], 1e-6f});
+                const float scale = SoftKnee(peak) / peak;
+                for (int k = 0; k < 3; ++k) row[k] = (uint8_t)encode[(int)(std::clamp(c[k] * scale, 0.0f, 1.0f) * 4095.0f + 0.5f)];
+                row[3] = 255;
+            }
+        }
+        const auto info = SkImageInfo::Make(f->width, f->height, kRGBA_8888_SkColorType, kOpaque_SkAlphaType, SkColorSpace::MakeSRGB());
+        auto image = SkImages::RasterFromData(info, std::move(data), rowBytes);
+        if (image && context) {
+            auto uploaded = SkImages::TextureFromImage(context, image.get());
+            if (uploaded) image = uploaded;
+        }
+        return image;
+    }
+
     sk_sp<SkImage> software(GrDirectContext* context, AVFrame* f) {
+        if (Hdr(f)) if (auto image = toneMapped(context, f)) return image;
         if (UnspecifiedHd(f)) f->colorspace = AVCOL_SPC_BT709;
         if (auto image = planar(context, f)) return image;
         if (!scaler && (scaler = sws_alloc_context())) scaler->flags = SWS_BILINEAR | SWS_ACCURATE_RND | SWS_FULL_CHR_H_INT;
@@ -289,7 +365,7 @@ struct Video {
 
     sk_sp<SkImage> image(GrDirectContext* context, FramePtr f) {
         if (f->hw_frames_ctx) {
-            if (auto image = VideoHwImage(context, f.get(), YuvSpace(f.get()))) return image;
+            if (!Hdr(f.get())) if (auto image = VideoHwImage(context, f.get(), YuvSpace(f.get()))) return image;
             FramePtr copy(av_frame_alloc());
             if (av_hwframe_transfer_data(copy.get(), f.get(), 0) < 0) return nullptr;
             av_frame_copy_props(copy.get(), f.get());
@@ -404,6 +480,7 @@ extern "C" {
 JNIEXPORT jlong JNICALL JNI(videoOpen)(JNIEnv* e, jobject, jstring path) { return reinterpret_cast<jlong>(Open(DesktopString(e, path)).release()); }
 JNIEXPORT jdoubleArray JNICALL JNI(videoInfo)(JNIEnv* e, jobject, jlong v) {
     auto result = e->NewDoubleArray(7);
+    if (!result) return nullptr;
     e->SetDoubleArrayRegion(result, 0, 7, video(v)->info);
     return result;
 }

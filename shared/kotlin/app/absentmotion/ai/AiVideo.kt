@@ -241,7 +241,7 @@ internal suspend fun rewriteVideo(context: Context, job: VideoJob, progress: AiP
     var encoder: FrameEncoder? = null
     try {
         FrameReader(context, fill.uri).use { reader ->
-            val stamps = matteStamps(reader.timestamps, fill.inTime, fill.outTime)
+            val stamps = matteStamps(reader.timestamps, job.layer.processFromMs, fill.outTime)
             check(stamps.isNotEmpty()) { AppText.get(R.string.ai_no_video_frames) }
             var size = 0 to 0
             val emit: suspend (Long, IntArray) -> Unit = { pts, argb ->

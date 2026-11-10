@@ -42,7 +42,7 @@ internal fun TrimScreen(initial: Uri? = null, onClose: () -> Unit) {
         picked?.let { value = keyframeTimes(context, it.uri) }
     }
     val cuts = keys
-    LaunchedEffect(fast, cuts) {
+    LaunchedEffect(fast, cuts, picked) {
         if (fast && cuts != null && cuts.isNotEmpty()) range = range.copy(startUs = snapStart(range.startUs, cuts, range.endUs))
     }
     val waiting = fast && cuts == null

@@ -1,5 +1,6 @@
 package app.absentmotion.desk
 
+import app.absentmotion.R
 import android.content.SharedPreferences
 import androidx.compose.runtime.mutableIntStateOf
 import java.io.File
@@ -104,5 +105,5 @@ object DeskLibrary {
         return found.toList()
     }
 
-    fun chooseFolder(): File? = DeskPicker.openFolder("Link a media folder")
+    fun chooseFolder(): File? = DeskPicker.openFolder(app.absentmotion.i18n.AppText.get(R.string.desk_link_folder_title))
 }

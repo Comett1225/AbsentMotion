@@ -221,7 +221,7 @@ object WhatsNewNotes {
     fun notesFor(key: String, seen: String?, exists: (String) -> Boolean): String? {
         if (exists(key)) return key
         val release = key.substringBeforeLast('.') + ".0"
-        return release.takeIf { it != key && it != seen && exists(it) }
+        return release.takeIf { it != key && seen?.substringBeforeLast('.') != release.substringBeforeLast('.') && exists(it) }
     }
 
     fun seen(context: Context, settings: AppSettings) {

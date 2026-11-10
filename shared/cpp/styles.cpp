@@ -597,12 +597,18 @@ void DrawGroup(SkCanvas* canvas, const Layer& l, double timeMs, const MediaPictu
             return;
         }
     }
+    const bool framed = l.fixedPrecompose && l.innerWidth > 0 && l.innerHeight > 0;
+    if (framed) {
+        canvas->save();
+        canvas->clipRect(SkRect::MakeIWH(l.innerWidth, l.innerHeight));
+    }
     if (l.innerBackground >> 24) {
         SkPaint background;
         background.setColor((SkColor)l.innerBackground);
         canvas->drawRect(SkRect::MakeWH((float)l.innerWidth, (float)l.innerHeight), background);
     }
     DrawList(canvas, l.children, l.innerWidth, l.innerHeight, false, inner, pictures);
+    if (framed) canvas->restore();
 }
 
 SkPaint FillPaint(SkColor4f color) {
@@ -1271,7 +1277,7 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
     };
     SkRect effectArea = scenePath.getBounds();
     if (effects && l.kind == "embedScene" && gEffects->wraps && gEffects->wraps(l)) {
-        const SkRect content = SelectionBounds(l, timeMs, m);
+        const SkRect content = DrawnBounds(l, timeMs, m);
         if (content.isFinite() && !content.isEmpty()) effectArea = content;
     }
     if (!effects || !gEffects->draw(canvas, *gScene, l, timeMs, effectArea, m, picture, below)) picture(canvas);
@@ -1858,10 +1864,22 @@ static bool ContainsOne(const std::vector<Layer>& siblings, const Layer& l, doub
     return false;
 }
 
-static bool ContentRect(const Layer& l, double timeMs, const SkMatrix& matrix, SkRect* out) {
+static float DrawnOutset(const Layer& l, float t) {
+    float most = 0;
+    for (const Edge& e : l.borders) {
+        if (!e.enabled) continue;
+        const float size = std::max(e.size.get(0, t, e.direction == "centered" ? 4 : 6), 0.0f);
+        most = std::max(most, e.direction == "outside" ? size : e.direction == "centered" ? size / 2 : 0.0f);
+    }
+    if (l.stroke.present && l.stroke.enabled) most = std::max(most, std::max(l.stroke.size.get(0, t, 0), 0.0f) * std::max(l.stroke.endSize, 1.0f) / 2);
+    return std::isfinite(most) ? most : 0;
+}
+
+static bool ContentRect(const Layer& l, double timeMs, const SkMatrix& matrix, SkRect* out, bool drawn = false) {
     const SkPath shape = ShapePath(l, l.localTime(timeMs));
     if (shape.isEmpty()) return false;
-    *out = matrix.mapRect(shape.getBounds());
+    const float grow = drawn ? DrawnOutset(l, l.localTime(timeMs)) : 0;
+    *out = matrix.mapRect(shape.getBounds().makeOutset(grow, grow));
     if (l.kind != "embedScene") return true;
     const double innerTime = NestedTime(l, timeMs);
     if (innerTime >= 0 && (l.innerBackground >> 24) != 0) return true;
@@ -1870,7 +1888,7 @@ static bool ContentRect(const Layer& l, double timeMs, const SkMatrix& matrix, S
     SkRect child;
     for (const Layer& c : l.children) {
         if (innerTime < 0 || !c.activeAt(innerTime) || c.kind == "nullobj" || c.kind == "camera" || c.kind == "light") continue;
-        if (!ContentRect(c, innerTime, SkMatrix::Concat(origin, SiblingMatrix(l.children, c, innerTime)), &child)) continue;
+        if (!ContentRect(c, innerTime, SkMatrix::Concat(origin, SiblingMatrix(l.children, c, innerTime)), &child, drawn)) continue;
         left = std::min(left, child.fLeft);
         top = std::min(top, child.fTop);
         right = std::max(right, child.fRight);
@@ -1896,6 +1914,13 @@ SkRect SelectionBounds(const Layer& layer, double timeMs, const SkMatrix& matrix
     if (layer.kind != "embedScene") return ShapePath(layer, layer.localTime(timeMs)).makeTransform(matrix).getBounds();
     SkRect bounds = SkRect::MakeEmpty();
     ContentRect(layer, timeMs, matrix, &bounds);
+    return bounds;
+}
+
+SkRect DrawnBounds(const Layer& layer, double timeMs, const SkMatrix& matrix) {
+    if (matrix.hasPerspective() || layer.kind != "embedScene") return SelectionBounds(layer, timeMs, matrix);
+    SkRect bounds = SkRect::MakeEmpty();
+    ContentRect(layer, timeMs, matrix, &bounds, true);
     return bounds;
 }
 

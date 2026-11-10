@@ -181,7 +181,7 @@ object CrashLogs {
 
     @RequiresApi(30)
     private fun recordExits(app: Context, prefs: SharedPreferences, dir: File) {
-        val infos = runCatching { app.getSystemService(ActivityManager::class.java).getHistoricalProcessExitReasons(app.packageName, 0, 0) }.getOrDefault(emptyList())
+        val infos = runCatching { app.getSystemService(ActivityManager::class.java).getHistoricalProcessExitReasons(app.packageName, 0, 0) }.getOrDefault(emptyList()).filter { it.processName == app.packageName }
         val seen = prefs.getLong("exitsSeen", -1L)
         if (seen >= 0) {
             val exits = infos.map { Exit(it.timestamp, it.reason, it.importance, it.processStateSummary?.decodeToString().orEmpty()) }

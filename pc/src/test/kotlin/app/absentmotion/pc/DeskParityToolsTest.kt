@@ -94,7 +94,7 @@ class DeskParityToolsTest {
         while (!check()) { check(System.currentTimeMillis() < until) { "timed out waiting for $what, step ${Updater.step}" }; Thread.sleep(25) }
     }
 
-    @Test fun anUpdateIsDownloadedCheckedAndOnlyThenOffered() {
+    @Test fun anUpdateWithoutTheSignedListIsRefusedBeforeItIsDownloaded() {
         prepare("updater")
         val name = "AbsentMotion-9.0.0.dmg"
         val good = local(name, honest = true)
@@ -102,23 +102,11 @@ class DeskParityToolsTest {
             Updates.source = good.source
             val release = Release("9.0.0", "https://github.com/Comett1225/AbsentMotion/releases/tag/v9.0.0", ApkAsset(name, "http://127.0.0.1:${good.port}/$name", good.payload.size.toLong(), null, "http://127.0.0.1:${good.port}/SHA256SUMS.txt"))
             Updater.start(android.content.Desk.context, release)
-            waitFor("the verified download") { Updater.step is DeskStep.Ready }
-            val ready = Updater.step as DeskStep.Ready
-            assertEquals(name, ready.file.name)
-            assertTrue(good.payload.contentEquals(ready.file.readBytes()))
+            waitFor("the refusal") { Updater.step is DeskStep.Failed }
+            assertEquals(UpdateFailure.Unsigned, (Updater.step as DeskStep.Failed).failure)
             Updater.later()
-            assertTrue(DeskStep.Idle == Updater.step)
-        } finally { good.server.stop(0) }
-        val bad = local(name, honest = false)
-        try {
-            Updates.source = bad.source
-            val release = Release("9.0.1", "https://github.com/Comett1225/AbsentMotion/releases/tag/v9.0.1", ApkAsset(name, "http://127.0.0.1:${bad.port}/$name", bad.payload.size.toLong(), null, "http://127.0.0.1:${bad.port}/SHA256SUMS.txt"))
-            Updater.start(android.content.Desk.context, release)
-            waitFor("the checksum failure") { Updater.step is DeskStep.Failed }
-            assertEquals(UpdateFailure.Checksum, (Updater.step as DeskStep.Failed).failure)
-            Updater.later()
-            assertTrue(File(android.content.Desk.context.cacheDir, "updates").listFiles().orEmpty().none { it.name.startsWith("update.apk") })
-        } finally { bad.server.stop(0); Updates.source = app.absentmotion.ui.home.GitHubSource }
+            assertTrue(File(android.content.Desk.context.cacheDir, "updates").listFiles().orEmpty().none { it.name == name || it.name.startsWith("update.apk") })
+        } finally { good.server.stop(0); Updates.source = app.absentmotion.ui.home.GitHubSource }
     }
 
     @Test fun pluralFormsFollowEachLanguage() {

@@ -248,7 +248,7 @@ fun estimateBytes(kind: ExportKind, scene: Scene, s: ExportSettings, hasAudio: B
         ExportKind.FrameAs -> (scene.width.toLong() * scene.height * s.image.bytesPerPixel).toLong()
         ExportKind.Xml -> scene.toXml().length.toLong()
         ExportKind.Audio -> (audioBytesPerSecond(s) * seconds).toLong() + 4096
-        ExportKind.Package -> scene.toXml().length + scene.node.mediaUris().sumOf { (scene.media(it)?.size ?: 0).coerceAtLeast(0) }
+        ExportKind.Package -> scene.toXml().length + scene.packageBytes()
     }
 }
 

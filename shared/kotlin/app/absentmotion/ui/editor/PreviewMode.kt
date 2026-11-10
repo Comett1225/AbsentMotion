@@ -1,9 +1,13 @@
 package app.absentmotion.ui.editor
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -52,8 +56,10 @@ private val DisabledTint = Color(0xFF818390)
 internal fun PreviewModePanel(state: EditorState, modifier: Modifier = Modifier) {
     val selected = state.selectedId != null || MultiSelect.ids.isNotEmpty()
     val cameraToggle = state.cameraMode || state.scene.layers.any { it.kind == "camera" }
-    Column(modifier.width(55.dp).fillMaxHeight().background(PanelBg).pointerInput(Unit) {}) {
-        val cell = Modifier.weight(1f)
+    BoxWithConstraints(modifier.width(55.dp).fillMaxHeight().background(PanelBg).pointerInput(Unit) {}) {
+    val tight = maxHeight < 127.dp + 36.dp * 7
+    Column(Modifier.fillMaxSize().then(if (tight) Modifier.verticalScroll(rememberScrollState()) else Modifier)) {
+        val cell = if (tight) Modifier.height(36.dp) else Modifier.weight(1f)
         ModeCell(cell, true, { state.pixelMode = !state.pixelMode }, stringResource(R.string.a11y_pixel_preview)) { PixelIcon(state.pixelMode) }
         ModeCell(cell, true, { state.gridMode = !state.gridMode }, stringResource(R.string.camera_grid)) { GridIcon(state.gridMode) }
         ModeCell(cell, selected, { state.soloMode = (state.soloMode + 1) % 3 }, stringResource(R.string.a11y_solo)) { SoloIcon(state.soloMode, selected) }
@@ -69,6 +75,7 @@ internal fun PreviewModePanel(state: EditorState, modifier: Modifier = Modifier)
         }
         PreRenderCell(state, cell)
         ZoomBlock(state)
+    }
     }
 }
 

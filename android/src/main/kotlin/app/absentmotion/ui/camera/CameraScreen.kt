@@ -290,16 +290,27 @@ private fun CameraBody(ui: CameraUi, aspect: Float, mic: Boolean, askMic: () -> 
         }
     }
     LaunchedEffect(ui.video) {
-        controller.setEnabledUseCases(if (ui.video) CameraController.VIDEO_CAPTURE else CameraController.IMAGE_CAPTURE)
+        try {
+            controller.setEnabledUseCases(if (ui.video) CameraController.VIDEO_CAPTURE else CameraController.IMAGE_CAPTURE)
+        } catch (e: IllegalStateException) {
+            if (ui.video) {
+                ui.video = false
+                Toast.makeText(context, R.string.camera_error_start_recording, Toast.LENGTH_LONG).show()
+            }
+        }
     }
     LaunchedEffect(ui.front) {
-        controller.cameraSelector = if (ui.front) CameraSelector.DEFAULT_FRONT_CAMERA else CameraSelector.DEFAULT_BACK_CAMERA
+        try {
+            controller.cameraSelector = if (ui.front) CameraSelector.DEFAULT_FRONT_CAMERA else CameraSelector.DEFAULT_BACK_CAMERA
+        } catch (e: IllegalStateException) {
+            if (ui.front) ui.front = false
+        }
     }
     LaunchedEffect(ui.flash) { controller.imageCaptureFlashMode = ui.flash.mode }
     LaunchedEffect(ui.torch, ui.video, hasFlash) { if (hasFlash) controller.enableTorch(ui.torch && ui.video) }
     LaunchedEffect(focusCount) { delay(1200); focusAt = null }
 
-    fun failed(@StringRes text: Int) = Toast.makeText(context, context.getString(text), Toast.LENGTH_LONG).show()
+    fun failed(@StringRes text: Int) = Toast.makeText(context, text, Toast.LENGTH_LONG).show()
 
     fun takePhoto() {
         ui.busy = true

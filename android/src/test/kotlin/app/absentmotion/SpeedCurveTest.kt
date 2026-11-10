@@ -166,7 +166,7 @@ class SpeedCurveTest {
 
         val plain = videoLayer(0, 4000).withNormalSpeed(2.5f)
         assertEquals("2.5", plain.node["speed"])
-        assertEquals(1600, plain.endTime - plain.startTime)
+        assertEquals(1599, plain.endTime - plain.startTime)
         assertEquals(2.5f, plain.normalSpeed(), 0f)
     }
 

@@ -128,7 +128,7 @@ class EditorState(
         panel = EditorPanel.Tools
         enteredMs = enteredMs.take(groupPath.size) + hostMs
         groupPath = groupPath + id
-        frame = inner.frameAt(group.nestedTime(hostMs.toDouble(), hostFps, quantize = false).ms.toInt().coerceIn(0, inner.totalTime)).coerceIn(0, maxOf(scene.lastFrame, 0))
+        frame = inner.frameAt(group.nestedTime(hostMs.toDouble(), hostFps, quantize = false).ms.toInt().coerceIn(0, maxOf(inner.totalTime, 0))).coerceIn(0, maxOf(scene.lastFrame, 0))
         engine.setScene(scene)
     }
 
@@ -388,25 +388,34 @@ class EditorState(
     fun undo() {
         Glide.interrupt()
         val before = scene
-        history.undo()?.let { note(true, it to before) }
+        val path = groupPath
+        history.undo()?.let { previous -> previous.focused(path)?.let { note(true, it to before) } }
     }
 
     fun redo() {
         Glide.interrupt()
         val before = scene
-        history.redo()?.let { note(false, before to it) }
+        val path = groupPath
+        history.redo()?.let { next -> next.focused(path)?.let { note(false, before to it) } }
     }
 
     private fun apply(next: Scene, save: Boolean) {
         val previous = scene
+        val oldRoot = root
+        val oldPath = groupPath
         root = next
         groupPath = next.openablePath(groupPath)
         val now = scene
         if (MultiSelect.active) MultiSelect.ids = MultiSelect.ids.filter { now.layer(it) != null }.toSet()
         canUndo = history.canUndo
         canRedo = history.canRedo
-        if (selectedId != null && now.layer(selectedId!!) == null) selectedId = null
-        frame = keptFrame(previous, now, frame)
+        if (selectedId != null && now.layer(selectedId!!) == null) {
+            selectedId = null
+            panel = EditorPanel.Tools
+            effectIndex = -1
+            keyTarget = null
+        }
+        frame = if (groupPath.size < oldPath.size) frameAfterLeaving(oldRoot, oldPath, previous, now, frame) else keptFrame(previous, now, frame)
         if (!save) {
             if (drafted == null) Choreographer.getInstance().postFrameCallback(sendDraft)
             drafted = next
@@ -416,6 +425,16 @@ class EditorState(
         val xml = next.toXml()
         show(next, lazyOf(xml))
         saver.commit(xml)
+    }
+
+    private fun frameAfterLeaving(oldRoot: Scene, oldPath: List<Long>, previous: Scene, now: Scene, frame: Int): Int {
+        var ms = previous.frameStart(frame).toDouble()
+        for (i in oldPath.size - 1 downTo groupPath.size) {
+            val host = oldRoot.focused(oldPath.take(i)) ?: return keptFrame(previous, now, frame)
+            val group = host.layer(oldPath[i]) ?: return keptFrame(previous, now, frame)
+            ms = hostMsOf(group, host.fps, ms, enteredMs.getOrNull(i))
+        }
+        return now.frameAt(ms.toInt()).coerceIn(0, maxOf(now.lastFrame, 0))
     }
 
     private companion object {

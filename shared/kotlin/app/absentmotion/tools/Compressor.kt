@@ -222,8 +222,9 @@ private fun replaced(old: Bitmap, new: Bitmap): Bitmap {
 }
 
 suspend fun saveToGallery(context: Context, result: Compressed): String = withContext(Dispatchers.IO) {
-    MediaStoreExport(context).save(null, result.file.name, result.mime) { out -> result.file.inputStream().use { it.copyTo(out) } }
-    (if (result.mime.startsWith("audio/")) Environment.DIRECTORY_MUSIC else if (result.video) Environment.DIRECTORY_MOVIES else Environment.DIRECTORY_PICTURES) + "/" + AppFolder
+    val store = MediaStoreExport(context)
+    store.save(null, result.file.name, result.mime) { out -> result.file.inputStream().use { it.copyTo(out) } }
+    store.location((if (result.mime.startsWith("audio/")) Environment.DIRECTORY_MUSIC else if (result.video) Environment.DIRECTORY_MOVIES else Environment.DIRECTORY_PICTURES) + "/" + AppFolder)
 }
 
 fun shareCompressed(context: Context, result: Compressed) =

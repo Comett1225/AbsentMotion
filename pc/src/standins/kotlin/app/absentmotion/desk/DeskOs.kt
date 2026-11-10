@@ -14,7 +14,7 @@ object DeskOs {
         else -> File(System.getenv("XDG_DATA_HOME")?.takeIf { it.isNotBlank() } ?: home.resolve(".local/share").path).resolve("absentmotion")
     }
     val nativeName = when { mac -> "libamdesktop.dylib"; windows -> "amdesktop.dll"; else -> "libamdesktop.so" }
-    val revealLabel = when { mac -> "Show in Finder"; windows -> "Show in Explorer"; else -> "Show in Folder" }
+    val revealLabel: String get() = Strings.byName(when { mac -> "desk_reveal_finder"; windows -> "desk_reveal_explorer"; else -> "desk_reveal_folder" }) ?: when { mac -> "Show in Finder"; windows -> "Show in Explorer"; else -> "Show in Folder" }
     val videosFolder by lazy { if (mac) "Movies" else userFolder("VIDEOS") ?: "Videos" }
     val picturesFolder by lazy { userFolder("PICTURES") ?: "Pictures" }
     val musicFolder by lazy { userFolder("MUSIC") ?: "Music" }

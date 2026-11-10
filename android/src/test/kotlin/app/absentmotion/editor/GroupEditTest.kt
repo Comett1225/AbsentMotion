@@ -124,4 +124,22 @@ class GroupEditTest {
         val back = grouped.ungrouped(100)!!
         assertEquals(listOf(1L, 2L, 3L), back.layers.map { it.id })
     }
+
+    @Test fun ungroupOfAFastGroupKeepsEveryLayerAndShortensIt() {
+        val fast = start.grouped(setOf(1, 2), null, 100, "G").update(100) { Layer(it.node.with("speed", "2").with("endTime", "1500")) }
+        val back = fast.ungrouped(100)!!
+        assertEquals(0 to 1500, back.layer(1)!!.let { it.startTime to it.endTime })
+        assertEquals(500 to 1250, back.layer(2)!!.let { it.startTime to it.endTime })
+        assertEquals(back.layers.maxOf { it.endTime }, back.totalTime)
+    }
+
+    @Test fun ungroupOfAFastGroupKeepsKeyframesAtTheSameShareOfTheLayer() {
+        val keyed = start.update(1) { l ->
+            val spin = app.absentmotion.model.XmlNode.parse("""<rotation value="0"><kf t="0" v="0"/><kf t="1" v="90"/></rotation>""")
+            Layer(l.node.withChild("transform", (l.node.child("transform") ?: app.absentmotion.model.XmlNode("transform")).withChild("rotation", spin)))
+        }
+        val fast = keyed.grouped(setOf(1, 2), null, 100, "G").update(100) { Layer(it.node.with("speed", "2").with("endTime", "1500")) }
+        val keys = fast.ungrouped(100)!!.layer(1)!!.node.child("transform")!!.child("rotation")!!.children.filter { it.name == "kf" }.map { it["t"]!!.toFloat() }
+        assertEquals(listOf(0f, 1f), keys)
+    }
 }

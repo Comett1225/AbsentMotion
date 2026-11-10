@@ -86,7 +86,7 @@ internal fun ProjectGrid(rows: List<ListRow>, upload: Boolean, onUpload: () -> U
             Box(Modifier.padding(bottom = 24.dp).then(WideCard)) { UploadCard(onUpload) }
         }
         itemsIndexed(
-            rows, key = { _, r -> if (r is ListRow.Card) r.info.id else "date-${(r as ListRow.Date).text}" },
+            rows, key = { _, r -> if (r is ListRow.Card) "p-" + r.info.id else "date-${(r as ListRow.Date).text}" },
             span = { _, r -> GridItemSpan(if (r is ListRow.Date) maxLineSpan else 1) },
         ) { i, row ->
             when (row) {

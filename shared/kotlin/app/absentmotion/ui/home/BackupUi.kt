@@ -147,7 +147,7 @@ private fun backUp(context: Context, task: BackupTask): List<UiText> {
     val uri = MediaStoreExport(context).save(null, name, "application/octet-stream") { out ->
         Backup.write(root, out, includeMedia = true, ai) { done, total -> task.report(done.toFloat() / total) }
     }
-    task.report(1f)
+    task.progress = 1f
     val written = runCatching {
         context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { if (it.moveToFirst()) it.getString(0) else null }
     }.getOrNull() ?: name
@@ -163,7 +163,7 @@ private fun restoreBackup(context: Context, uri: Uri, task: BackupTask): List<Ui
         val external = context.getExternalFilesDir(null)
         Backup.restore(ProjectStore(context), context.filesDir, input, MediaAccess.forPhone(context.filesDir, external), external?.resolve("ai")) { read -> if (size > 0) task.report(read.toFloat() / size) else task.report(0f) }
     }
-    task.report(1f)
+    task.progress = 1f
     fun count(n: Int) = UiText.plural(R.plurals.backup_projects, n, n.toString())
     return listOfNotNull(
         txt(R.string.backup_restored, count(restored.added)),

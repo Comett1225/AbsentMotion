@@ -116,6 +116,7 @@ internal fun decodePicture(resolver: ContentResolver, uri: Uri, limit: Int, keep
     if (bounds.outWidth <= 0 || bounds.outHeight <= 0) null else {
         val options = BitmapFactory.Options().apply {
             inPreferredConfig = Bitmap.Config.ARGB_8888
+            inPreferredColorSpace = android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.SRGB)
             inScaled = false
             inSampleSize = pictureSample(maxOf(bounds.outWidth, bounds.outHeight), limit)
         }
@@ -164,6 +165,7 @@ private fun decodeBytes(bytes: ByteArray, limit: Int): Bitmap? = try {
     val ratio = maxOf(bounds.outWidth, bounds.outHeight).toDouble() / limit.coerceAtLeast(1)
     BitmapFactory.decodeByteArray(bytes, 0, bytes.size, BitmapFactory.Options().apply {
         inPreferredConfig = Bitmap.Config.ARGB_8888
+        inPreferredColorSpace = android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.SRGB)
         inScaled = false
         inSampleSize = Integer.highestOneBit(kotlin.math.ceil(ratio).toInt().coerceAtLeast(1))
     })

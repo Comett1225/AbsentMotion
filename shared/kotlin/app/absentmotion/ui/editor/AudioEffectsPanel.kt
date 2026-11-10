@@ -90,7 +90,7 @@ internal fun AudioEffectsPanel(state: EditorState, modifier: Modifier, onBack: (
     val layer = state.selected ?: return
     val effects = layer.audioEffects
     var editing by remember(layer.id) { mutableIntStateOf(state.audioFxFocus ?: -1) }
-    LaunchedEffect(Unit) { state.audioFxFocus = null }
+    LaunchedEffect(state.audioFxFocus) { state.audioFxFocus?.let { editing = it; state.audioFxFocus = null } }
     val shown = effects.getOrNull(editing)
     LaunchedEffect(shown == null) { if (shown == null) editing = -1 }
     SideEffect { state.keyTarget = null }
@@ -121,7 +121,6 @@ internal fun AudioEffectsPanel(state: EditorState, modifier: Modifier, onBack: (
 
 @Composable
 private fun EffectList(state: EditorState, effects: List<AudioFx>, cards: CardScope, scroll: ScrollState, open: (Int) -> Unit) {
-    var adding by remember { mutableStateOf(false) }
     val marks = state.selected?.aiMarks.orEmpty()
     val reorder = rememberReorder(state, scroll, top = RowHeight + 13.dp + (AiMarkRowHeight + AiMarkRowGap) * marks.size)
     val id = state.selectedId
@@ -147,21 +146,11 @@ private fun EffectList(state: EditorState, effects: List<AudioFx>, cards: CardSc
         Box(Modifier.cardAway(cards, Int.MAX_VALUE).padding(6.5.dp).fillMaxWidth().height(RowHeight)) {
             val room = effects.sumOf { it.kind?.units ?: 0 } < MAX_AUDIO_FX
             Box(Modifier.fillMaxSize().clip(RowShape).background(Am.Button).alpha(if (room) 1f else 0.35f)
-                .clickable(enabled = room) { adding = true }, Alignment.Center) {
+                .clickable(enabled = room) { state.playing = false; state.audioFxFocus = -1; state.effectCategory = "audio"; state.effectBrowserOpen = true }, Alignment.Center) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(EffectIcons.Add, null, Modifier.size(18.dp), tint = Am.OnDark)
                     Spacer(Modifier.width(6.dp))
                     Text(stringResource(R.string.add_audio_effect), color = Am.OnDark, fontSize = 14.sp)
-                }
-            }
-            Presence(adding) {
-                MenuPopup(AboveLeft, { adding = false }, TransformOrigin(0f, 1f)) {
-                    for (kind in FxKind.entries) MenuRow(stringResource(kind.label), enabled = effects.fits(kind)) {
-                        adding = false
-                        val at = effects.size
-                        state.editSelected { it.withAudioEffects(it.audioEffects + AudioFx.of(kind)) }
-                        open(at)
-                    }
                 }
             }
         }
@@ -178,9 +167,9 @@ private fun EffectRow(state: EditorState, reorder: Reorder, index: Int, fx: Audi
             Icon(EffectIcons.Expand, null, Modifier.size(18.dp).alpha(0.3f), tint = Am.OnDark)
             Text(fx.kind?.let { stringResource(it.label) } ?: stringResource(R.string.audiofx_unknown_effect), Modifier.padding(start = 6.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
         }
-        Icon(if (fx.bypass) EffectIcons.EyeOff else EffectIcons.Eye, stringResource(if (fx.bypass) R.string.audiofx_turn_on else R.string.audiofx_bypass), Modifier.width(36.dp).fillMaxHeight().clickable {
-            state.editSelected { it.updateAudioEffect(index) { e -> e.withBypass(!e.bypass) } }
-        }, tint = Am.OnDark)
+        Box(Modifier.width(36.dp).fillMaxHeight().clickable { state.editSelected { it.updateAudioEffect(index) { e -> e.withBypass(!e.bypass) } } }, Alignment.Center) {
+            Icon(if (fx.bypass) EffectIcons.EyeOff else EffectIcons.Eye, stringResource(if (fx.bypass) R.string.audiofx_turn_on else R.string.audiofx_bypass), Modifier.size(22.dp), tint = Am.OnDark)
+        }
         Box(Modifier.width(36.dp).fillMaxHeight().clickable(enabled = known, onClick = open).reorderGrip(reorder, index, count, move), Alignment.Center) {
             Icon(EffectIcons.Grip, stringResource(R.string.audiofx_reorder), Modifier.size(20.dp), tint = Am.OnDark)
         }

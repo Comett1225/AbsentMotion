@@ -619,7 +619,7 @@ private fun Choices(labels: List<Int>, chosen: Int, onPick: (Int) -> Unit) {
                 Modifier.weight(1f).fillMaxHeight().background(if (selected) Am.Navy else Color.Transparent, shape).then(if (selected) Modifier else Modifier.deskPress(6.dp)).clickable { onPick(index) },
                 contentAlignment = Alignment.Center,
             ) {
-                Text(stringResource(label).uppercase(java.util.Locale.getDefault()), Modifier.padding(horizontal = 2.dp), color = if (selected) Am.OnNavyAccent else Am.Navy,
+                Text(stringResource(label).uppercase(androidx.compose.ui.platform.LocalConfiguration.current.locales[0]), Modifier.padding(horizontal = 2.dp), color = if (selected) Am.OnNavyAccent else Am.Navy,
                     fontWeight = FontWeight.Medium, maxLines = 1, autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(9.sp, 14.sp))
             }
         }

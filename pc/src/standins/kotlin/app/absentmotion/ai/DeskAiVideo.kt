@@ -23,7 +23,7 @@ internal suspend fun desktopRewriteVideo(context: Context, job: VideoJob, progre
     check(width > 0 && height > 0 && job.scale in 1..4 && width.toLong() * height * job.scale * job.scale <= 16_000_000L) { AppText.get(R.string.ai_unable_to_process) }
     val fps = (job.media.fps?.toDouble() ?: video.fps).takeIf { it > 0 }?.coerceIn(1.0, 240.0) ?: 30.0
     val outFps = fps * job.fpsScale
-    val startMs = fill.inTime.toLong().coerceAtLeast(0)
+    val startMs = job.layer.processFromMs.toLong().coerceAtLeast(0)
     val endMs = minOf(video.durationUs / 1000, if (fill.outTime == Int.MAX_VALUE) Long.MAX_VALUE else fill.outTime.toLong())
     val span = endMs - startMs
     check(span in 1..MAX_MATTE_SECONDS * 1000L) { AppText.get(R.string.ai_unable_to_process) }

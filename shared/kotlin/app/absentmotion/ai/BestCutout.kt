@@ -90,17 +90,20 @@ internal object BestCutout {
             val gpu = AiDevice.probeGpu(context, model)
             val side = sideOverride ?: cutoutSide(aiRam(context), gpu)
             coroutineContext.ensureActive()
-            val picture = decode(context, Uri.parse(uri), limit.coerceAtLeast(1))
-            bitmap = picture
+            val turn = original?.orientation ?: 0
+            val stored = decode(context, Uri.parse(uri), limit.coerceAtLeast(1))
+            bitmap = stored
+            val picture = stored.turned(turn).also { if (it !== stored) { bitmap = it; stored.recycle() } }
             progress(0.2f, AppText.get(R.string.ai_removing_background))
             AiNet.open(context, model, paramName = if (side == CUTOUT_LARGE_SIDE) CUTOUT_PARAM_1024 else CUTOUT_PARAM_768).use { it.cutout(picture, side) }
             picture.setHasAlpha(true)
             picture.isPremultiplied = false
             if (!cutout.plain) picture.refineAlpha(cutout)
             progress(0.9f, AppText.get(R.string.ai_saving_transparent))
-            file.outputStream().use { check(picture.compress(Bitmap.CompressFormat.PNG, 100, it)) { AppText.get(R.string.ai_cannot_save_image) } }
+            val result = picture.turned(360 - turn).also { if (it !== picture) { bitmap = it; picture.recycle() } }
+            file.outputStream().use { check(result.compress(Bitmap.CompressFormat.PNG, 100, it)) { AppText.get(R.string.ai_cannot_save_image) } }
             coroutineContext.ensureActive()
-            return aiMedia(context, file, "image/png", mapOf("width" to "${picture.width}", "height" to "${picture.height}",
+            return aiMedia(context, file, "image/png", mapOf("width" to "${result.width}", "height" to "${result.height}",
                 "orientation" to "${original?.orientation ?: 0}")).also { success = true }
         } finally {
             bitmap?.recycle()
@@ -132,4 +135,33 @@ internal object BestCutout {
         if (decoded.isMutable && decoded.config == Bitmap.Config.ARGB_8888) return decoded
         return try { checkNotNull(decoded.copy(Bitmap.Config.ARGB_8888, true)) { AppText.get(R.string.ai_cannot_decode_image) } } finally { decoded.recycle() }
     }
+}
+
+private fun turnedIndex(x: Int, y: Int, w: Int, h: Int, quarters: Int): Int = when (quarters) {
+    1 -> x * h + (h - 1 - y)
+    2 -> (h - 1 - y) * w + (w - 1 - x)
+    else -> (w - 1 - x) * h + y
+}
+
+internal fun Bitmap.turned(degrees: Int): Bitmap {
+    val quarters = Math.floorMod(degrees / 90, 4)
+    if (quarters == 0) return this
+    val w = width
+    val h = height
+    val source = IntArray(w * h).also { getPixels(it, 0, w, 0, 0, w, h) }
+    val target = IntArray(w * h)
+    for (y in 0 until h) for (x in 0 until w) target[turnedIndex(x, y, w, h, quarters)] = source[y * w + x]
+    val out = Bitmap.createBitmap(if (quarters == 2) w else h, if (quarters == 2) h else w, Bitmap.Config.ARGB_8888)
+    out.setHasAlpha(true)
+    out.isPremultiplied = isPremultiplied
+    out.setPixels(target, 0, out.width, 0, 0, out.width, out.height)
+    return out
+}
+
+internal fun ByteArray.turned(width: Int, height: Int, degrees: Int): ByteArray {
+    val quarters = Math.floorMod(degrees / 90, 4)
+    if (quarters == 0) return this
+    val target = ByteArray(size)
+    for (y in 0 until height) for (x in 0 until width) target[turnedIndex(x, y, width, height, quarters)] = this[y * width + x]
+    return target
 }

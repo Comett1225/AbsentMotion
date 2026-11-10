@@ -492,7 +492,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
                 }
                 if (aiLevel != null && !AiSmooth.installed(context, aiLevel)) AiSmooth.download(context, aiLevel) { progress = it }
                 val began = System.nanoTime()
-                val result = (if (background) Exporter(context, app.absentmotion.platform.exportEngine(engine), MediaStoreExport(context)) else exporter).export(chosen, exported, s, frame, name, { note = it }) { progress = it; ExportRun.progress = it }
+                val result = (if (background) Exporter(context.applicationContext, app.absentmotion.platform.exportEngine(engine), MediaStoreExport(context.applicationContext)) else exporter).export(chosen, exported, s, frame, name, { note = it }) { progress = it; ExportRun.progress = it }
                 outcome = true
                 if (background) app.absentmotion.platform.exportDone(result)
                 phase = Phase.Done(chosen, result)
@@ -527,6 +527,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
         }
         phase = Phase.Running(chosen, System.nanoTime(), job, timeMs)
         if (background) ExportRun.begin(context, runningTitle(chosen)) { job.cancel() }
+        if (background && !ExportRun.running) phase = Phase.Idle
     }
 
     val info: @Composable () -> Unit = { InfoBlock(free, estimate, timeMs, storage) }
@@ -540,7 +541,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
         phase, progress, heat.level, note, { (phase as? Phase.Running)?.job?.cancel() }, { phase = Phase.Idle }, { (phase as? Phase.Done)?.let { share(context, it) } }, ::start, onClose,
     ) else Box(Modifier.fillMaxSize().background(Am.SheetBg).pointerInput(Unit) {}.enterFade(12.dp)) {
         Column(Modifier.align(Alignment.TopCenter).widthIn(max = SheetMaxWidth).fillMaxSize()) {
-            TitleBar(stringResource(R.string.export_title), ExportIcons.Close, stringResource(R.string.cancel), onClose)
+            TitleBar(stringResource(R.string.export_title), ExportIcons.Close, stringResource(R.string.cancel)) { (phase as? Phase.Running)?.job?.cancel(); onClose() }
             info()
             ScrollArea(Modifier.weight(1f), Am.SheetBg, PaddingValues(15.dp), 10.dp) {
                 FileNameField(exportName, kind, options = false)

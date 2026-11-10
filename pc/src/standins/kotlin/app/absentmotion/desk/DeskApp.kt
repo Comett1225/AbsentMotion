@@ -390,7 +390,7 @@ class DeskAppState {
                         xfl?.delete()
                     }
                 } catch (e: kotlinx.coroutines.CancellationException) { throw e }
-                catch (e: Exception) { importFailed = e.message ?: context.getString(R.string.library_err_unsupported_type) }
+                catch (e: Exception) { importFailed = (e as? app.absentmotion.library.ImportFailed)?.text?.resolve(context) ?: e.message ?: context.getString(R.string.library_err_unsupported_type) }
             }
         } finally { opening = false; projectsChanged++ }
         if (reports.isNotEmpty()) imported = reports
@@ -536,8 +536,8 @@ private fun DeskContent(app: DeskAppState, scale: Float) {
             app.openFailed?.let { id -> OpenFailedDialog({ app.openFailed = null; app.historyFor = Triple(id, "", false) }, null) { app.openFailed = null } }
             app.importFailed?.let { reason -> DeskMessage(stringResource(R.string.home_import_failed, reason)) { app.importFailed = null } }
             if (open?.historyOpen == true) VersionHistory(app.store, open.projectId, open.project.title, app.engine, onRestore = { v -> scope.launch { app.restoreVersion(open.projectId, v) } }, editor = true) { open.historyOpen = false }
-            app.historyFor?.let { (id, title, _) ->
-                VersionHistory(app.store, id, title, app.engine, onRestore = { v -> scope.launch { app.restoreVersion(id, v) } }) { app.historyFor = null }
+            app.historyFor?.let { (id, title, damaged) ->
+                VersionHistory(app.store, id, title, app.engine, onRestore = { v -> scope.launch { app.restoreVersion(id, v) } }, damaged = damaged) { app.historyFor = null }
             }
             if (app.settingsOpen) DeskSettings(app.settings, app.settingsPage, onClose = { app.settingsOpen = false }, onRestored = { app.projectsChanged++ })
             app.recovered?.takeIf { open == null }?.let { offer -> DeskRecovery(offer, { scope.launch { app.answerRecovery(offer, it) } }) { app.recovered = null } }

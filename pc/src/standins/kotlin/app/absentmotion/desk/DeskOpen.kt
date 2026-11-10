@@ -61,6 +61,26 @@ object DeskOpen {
 object DeskInstance {
     private val file get() = (System.getProperty("am.data")?.let(::File) ?: DeskOs.dataDir).resolve("instance")
     private var server: ServerSocket? = null
+    private var held: java.nio.channels.FileLock? = null
+
+    fun claim(files: List<File>): Boolean {
+        if (DeskOs.mac) return true
+        val channel = runCatching {
+            file.parentFile.mkdirs()
+            java.nio.channels.FileChannel.open(file.resolveSibling("instance.lock").toPath(), java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.WRITE)
+        }.getOrNull() ?: return !forward(files)
+        val lock = runCatching { channel.tryLock() }.getOrNull()
+        if (lock != null) {
+            held = lock
+            return true
+        }
+        runCatching { channel.close() }
+        repeat(20) {
+            if (forward(files)) return false
+            Thread.sleep(100)
+        }
+        return true
+    }
 
     fun forward(files: List<File>): Boolean {
         val lines = runCatching { file.readLines() }.getOrNull()?.takeIf { it.size >= 2 } ?: return false
@@ -80,7 +100,7 @@ object DeskInstance {
     }
 
     fun serve(onFiles: (List<File>) -> Unit) {
-        if (DeskOs.mac || forward(emptyList())) return
+        if (DeskOs.mac) return
         runCatching {
             val socket = ServerSocket(0, 8, InetAddress.getLoopbackAddress())
             val token = java.util.UUID.randomUUID().toString()

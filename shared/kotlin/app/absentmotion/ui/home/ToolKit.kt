@@ -70,6 +70,8 @@ internal class ToolWork(private val scope: CoroutineScope, private val context: 
     var step by mutableStateOf<ToolStep>(ToolStep.Ready)
         private set
     private var job: Job? = null
+    var saving by mutableStateOf(false)
+        private set
     val running: Boolean get() = step is ToolStep.Running
 
     fun start(block: suspend (progress: (Float) -> Unit) -> Compressed) {
@@ -105,13 +107,19 @@ internal class ToolWork(private val scope: CoroutineScope, private val context: 
 
     fun save(done: ToolStep.Done) {
         fun write() {
+            if (saving) return
+            saving = true
             scope.launch {
                 try {
                     val where = saveToGallery(context, done.result)
                     if (step == done) step = done.copy(saved = true)
                     Toast.makeText(context, context.getString(R.string.compress_saved_to, where), Toast.LENGTH_SHORT).show()
+                } catch (e: CancellationException) {
+                    throw e
                 } catch (e: Exception) {
                     Toast.makeText(context, context.getString(R.string.compress_save_failed, e.message.orEmpty()), Toast.LENGTH_LONG).show()
+                } finally {
+                    saving = false
                 }
             }
         }
@@ -188,7 +196,7 @@ internal fun ToolBar(
             when (step) {
                 is ToolStep.Running -> BigButton(stringResource(R.string.cancel), Modifier.weight(1f), primary = false) { work.cancel() }
                 is ToolStep.Done -> {
-                    BigButton(stringResource(if (step.saved) R.string.compress_saved else R.string.tools_save), Modifier.weight(1f).fillMaxHeight(), HomeIcons.Download, enabled = !step.saved) { work.save(step) }
+                    BigButton(stringResource(if (step.saved) R.string.compress_saved else R.string.tools_save), Modifier.weight(1f).fillMaxHeight(), HomeIcons.Download, enabled = !step.saved && !work.saving) { work.save(step) }
                     BigButton(stringResource(R.string.compress_share), Modifier.weight(1f).fillMaxHeight(), ExportIcons.Share, primary = false) { work.share(step) }
                 }
                 is ToolStep.Failed -> {

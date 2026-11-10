@@ -85,23 +85,10 @@ internal class GpuCheck(private val context: Context) {
     fun drawsRight(engine: NativeEngine): Boolean {
         val gl = engine.openGl
         prefs.getString(key(gl), null)?.let { return it == "ok" }
-        val good = EngineDebug.failCheck?.let { it != (if (gl) "gl" else "vk") } ?: render(engine)
+        val good = EngineDebug.failCheck?.let { it != (if (gl) "gl" else "vk") } ?: render(engine) ?: return true
         prefs.edit().putString(key(gl), if (good) "ok" else "bad").apply()
         if (!good) Log.w("AMEngine", "the ${if (gl) "OpenGL" else "Vulkan"} check picture came out wrong")
         return good
-    }
-
-    private fun render(engine: NativeEngine): Boolean = try {
-        engine.setScene(SCENE)
-        engine.setPicture(URI, quad())
-        val px = engine.previewStill(0.0, SIZE, SIZE, false)
-        px == null || px.size < SIZE * SIZE * 4 || matches(px)
-    } catch (e: Exception) {
-        Log.w("AMEngine", "GPU check could not run", e)
-        true
-    } finally {
-        runCatching { engine.setPicture(URI, null) }
-        runCatching { engine.setScene(EMPTY) }
     }
 
     internal data class Judged(val badGl: Boolean?, val strike: String?)
@@ -114,6 +101,19 @@ internal class GpuCheck(private val context: Context) {
         private val crashHandler = java.util.concurrent.atomic.AtomicBoolean()
 
         private fun name(gl: Boolean) = if (gl) "gl" else "vk"
+
+        internal fun render(engine: NativeEngine): Boolean? = try {
+            engine.setScene(SCENE)
+            engine.setPicture(URI, quad())
+            val px = engine.previewStill(0.0, SIZE, SIZE, false)
+            if (px == null || px.size < SIZE * SIZE * 4) null else matches(px)
+        } catch (e: Exception) {
+            Log.w("AMEngine", "GPU check could not run", e)
+            null
+        } finally {
+            runCatching { engine.setPicture(URI, null) }
+            runCatching { engine.setScene(EMPTY) }
+        }
 
         private fun clearOnCrash(prefs: SharedPreferences) {
             if (!crashHandler.compareAndSet(false, true)) return

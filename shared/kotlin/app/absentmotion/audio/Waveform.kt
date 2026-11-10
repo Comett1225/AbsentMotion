@@ -26,16 +26,27 @@ class AudioPeaks(val data: ByteArray) {
 
 object Waveforms {
     private val ready = mutableStateMapOf<String, AudioPeaks>()
-    private val asked = HashSet<String>()
+    private val asked = HashMap<String, Long>()
     private val worker = Executors.newSingleThreadExecutor { r -> Thread(r, "am-waveform").apply { isDaemon = true; priority = Thread.MIN_PRIORITY } }
 
     fun peaks(uri: String): AudioPeaks? = ready[uri]
 
     fun request(context: Context, uri: String) {
-        synchronized(asked) { if (!asked.add(uri)) return }
+        val now = System.currentTimeMillis()
+        synchronized(asked) {
+            val before = asked[uri]
+            if (before != null && (before == 0L || now - before < RETRY_MS)) return
+            asked[uri] = Long.MAX_VALUE
+        }
         val app = context.applicationContext
-        worker.execute { ready[uri] = load(app, uri) }
+        worker.execute {
+            val peaks = load(app, uri)
+            ready[uri] = peaks
+            synchronized(asked) { asked[uri] = if (peaks.data.isNotEmpty()) 0L else System.currentTimeMillis() }
+        }
     }
+
+    private const val RETRY_MS = 30_000L
 
     private fun cacheFile(context: Context, uri: String) = File(File(context.cacheDir, "waveforms"), "${uri.hashCode().toUInt().toString(16)}-${uri.length}.bin")
 

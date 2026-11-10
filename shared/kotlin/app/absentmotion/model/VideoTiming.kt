@@ -202,10 +202,10 @@ fun Layer.trimHitsSourceLimit(start: Boolean, wanted: Int, mediaMs: Int = Int.MA
     else wanted > endTime && trimmedTo(startTime, wanted, mediaMs).endTime < wanted
 
 fun Scene.trimStartAt(layer: Layer, frame: Int): Layer? =
-    frameStart(frame).takeIf { it > layer.startTime && showsAnyFrame(it, layer.endTime) }?.let { layer.trimmedTo(it, layer.endTime) }
+    frameStart(frame).takeIf { it > layer.startTime && showsAnyFrame(it, layer.endTime) }?.let { withEdgeMotions(layer, layer.trimmedTo(it, layer.endTime)) }
 
 fun Scene.trimEndAt(layer: Layer, frame: Int): Layer? =
-    frameEnd(frame).takeIf { it < layer.endTime && showsAnyFrame(layer.startTime, it) }?.let { layer.trimmedTo(layer.startTime, it) }
+    frameEnd(frame).takeIf { it < layer.endTime && showsAnyFrame(layer.startTime, it) }?.let { withEdgeMotions(layer, layer.trimmedTo(layer.startTime, it)) }
 
 fun Scene.canSplitAt(layer: Layer, frame: Int): Boolean {
     val cut = frameStart(frame)
@@ -265,7 +265,7 @@ fun Layer.withVideoSpeedMap(map: XmlNode): Layer {
     val old = VideoTiming(this)
     var changed = copy(node = node.withChild("speedMap", map).with("speed", null))
     val timing = VideoTiming(changed)
-    val duration = timing.localMs(old.mediaMs((endTime - startTime).toDouble())).coerceIn(1.0, (Int.MAX_VALUE.toLong() - startTime).toDouble()).roundToInt()
+    val duration = (timing.localMs(old.mediaMs((endTime - startTime + 1).toDouble())).coerceIn(2.0, maxOf(2.0, (Int.MAX_VALUE.toLong() - startTime).toDouble())).roundToInt() - 1).coerceAtLeast(1)
     fun adjust(n: XmlNode): XmlNode {
         if (n.name == "speedMap" || n.name == "scene") return n
         if (n.name == "kf") {
@@ -308,7 +308,7 @@ fun Layer.withSpeedKeyframeToggled(projectTime: Int, fps: Int): Layer {
         val next = keys.indexOfFirst { it.t > media }
         val value = timing.speed(local).toString()
         val inserted = Keyframe(media, value)
-        if (next > 0 && !Easing.parse(keys[next].e).isLinear) {
+        if (next > 0 && !Easing.parse(keys[next].e).isLinear && keys[next - 1].v.finiteFloat() != null && keys[next].v.finiteFloat() != null && keys[next].t > keys[next - 1].t) {
             val a = keys[next - 1]; val b = keys[next]
             val curve = Easing.parse(b.e)
             val split = splitSpeedBezier(curve, (media - a.t) / (b.t - a.t))

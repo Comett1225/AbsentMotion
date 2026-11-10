@@ -485,4 +485,12 @@ class SvgImportTest {
         assertEquals(0xFF0000FF.toInt(), parseSvgColor("hsla(240deg, 100%, 50%, 1)"))
         assertNull(parseSvgColor("hsl(nope)"))
     }
+
+    @Test fun byteOrderMarkAndEntityDeclarationsDoNotStopTheImport() {
+        val svg = "\uFEFF<?xml version=\"1.0\"?>\n<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\" [<!ENTITY ns_svg \"http://www.w3.org/2000/svg\"><!ENTITY fill \"#ff0000\">]>\n" +
+            "<svg xmlns=\"&ns_svg;\" width=\"10\" height=\"10\"><rect width=\"10\" height=\"10\" fill=\"&fill;\"/></svg>"
+        val out = importSvg(svg, "Logo", host, 0, 2000)
+        assertNotNull(out.layer)
+        assertEquals(1, out.shapes)
+    }
 }

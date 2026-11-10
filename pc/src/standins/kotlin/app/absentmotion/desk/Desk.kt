@@ -1,5 +1,6 @@
 package app.absentmotion.desk
 
+import app.absentmotion.R
 import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -45,7 +46,7 @@ object DeskFiles {
 
     val videoExtensions = setOf("mp4", "mov", "m4v", "webm", "mkv", "avi")
 
-    fun chooseFiles(media: Boolean, multiple: Boolean, videoOnly: Boolean = false, title: String = when { videoOnly -> "Choose a video"; media -> "Choose media"; else -> "Choose a file" }): List<File> {
+    fun chooseFiles(media: Boolean, multiple: Boolean, videoOnly: Boolean = false, title: String = when { videoOnly -> app.absentmotion.i18n.AppText.get(R.string.tools_choose_video); media -> app.absentmotion.i18n.AppText.get(R.string.desk_choose_media); else -> app.absentmotion.i18n.AppText.get(R.string.desk_choose_file) }): List<File> {
         System.getProperty("am.pick")?.let { return listOf(File(it)) }
         val filters = when {
             !media -> emptyList()
@@ -57,7 +58,7 @@ object DeskFiles {
 
     fun chooseOne(media: Boolean, videoOnly: Boolean = false): Uri? = chooseFiles(media, false, videoOnly = videoOnly).firstOrNull()?.let(Uri::fromFile)
 
-    fun chooseSave(name: String, title: String = "Save"): File? = DeskPicker.saveFile(title, name)
+    fun chooseSave(name: String, title: String = app.absentmotion.i18n.AppText.get(R.string.tools_save)): File? = DeskPicker.saveFile(title, name)
 
     fun reveal(uris: List<Uri>) {
         val file = uris.firstOrNull()?.toFile() ?: return

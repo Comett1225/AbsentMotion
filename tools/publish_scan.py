@@ -13,6 +13,9 @@ patterns = [re.compile(w.encode(), re.I) for w in words]
 allow = [re.compile(re.escape(a.encode()), re.I) for a in allowed]
 
 
+WIDE = ("androidmanifest.xml", ".arsc", ".exe", ".dll", ".msi", ".ps1")
+
+
 def dex_strings(data):
     size, start = struct.unpack_from("<II", data, 0x38)
     parts = []
@@ -67,6 +70,8 @@ for path in sys.stdin.read().split("\n"):
         data = content(path)
     except OSError:
         continue
+    if path.lower().endswith(WIDE):
+        data = data + b"\n" + data.replace(b"\0", b"")
     for a in allow:
         data = a.sub(b"", data)
     hits = []

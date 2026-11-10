@@ -14,7 +14,7 @@ data class CropBox(val left: Float = 0f, val top: Float = 0f, val right: Float =
     fun side(i: Int): Float = when (i) { 0 -> left; 1 -> top; 2 -> right; else -> bottom }
 
     fun withSide(i: Int, value: Float): CropBox {
-        val v = value.coerceIn(0f, 1f - MIN - side((i + 2) % 4))
+        val v = value.coerceIn(0f, maxOf(0f, 1f - MIN - side((i + 2) % 4)))
         return when (i) { 0 -> copy(left = v); 1 -> copy(top = v); 2 -> copy(right = v); else -> copy(bottom = v) }
     }
 
@@ -36,10 +36,10 @@ data class CropBox(val left: Float = 0f, val top: Float = 0f, val right: Float =
         var x1 = 1f - right
         var y0 = top
         var y1 = 1f - bottom
-        if (movesLeft) x0 = (x0 + du).coerceIn(0f, x1 - MIN)
-        if (movesRight) x1 = (x1 + du).coerceIn(x0 + MIN, 1f)
-        if (movesTop) y0 = (y0 + dv).coerceIn(0f, y1 - MIN)
-        if (movesBottom) y1 = (y1 + dv).coerceIn(y0 + MIN, 1f)
+        if (movesLeft) x0 = (x0 + du).coerceIn(0f, maxOf(0f, x1 - MIN))
+        if (movesRight) x1 = (x1 + du).coerceIn(minOf(x0 + MIN, 1f), 1f)
+        if (movesTop) y0 = (y0 + dv).coerceIn(0f, maxOf(0f, y1 - MIN))
+        if (movesBottom) y1 = (y1 + dv).coerceIn(minOf(y0 + MIN, 1f), 1f)
         if (ratio == null || ratio <= 0f) return CropBox(x0, y0, 1f - x1, 1f - y1)
         val horizontal = movesLeft || movesRight
         val vertical = movesTop || movesBottom
@@ -64,7 +64,7 @@ data class CropBox(val left: Float = 0f, val top: Float = 0f, val right: Float =
     fun clamped(): CropBox {
         val l = left.coerceIn(0f, 1f - MIN)
         val t = top.coerceIn(0f, 1f - MIN)
-        return CropBox(l, t, right.coerceIn(0f, 1f - MIN - l), bottom.coerceIn(0f, 1f - MIN - t))
+        return CropBox(l, t, right.coerceIn(0f, maxOf(0f, 1f - MIN - l)), bottom.coerceIn(0f, maxOf(0f, 1f - MIN - t)))
     }
 
     companion object {

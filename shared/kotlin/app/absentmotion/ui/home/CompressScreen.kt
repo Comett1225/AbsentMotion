@@ -123,6 +123,7 @@ internal fun CompressScreen(initial: android.net.Uri? = null, onClose: () -> Uni
     var custom by remember { mutableStateOf(CustomChoice()) }
     var step by remember { mutableStateOf<Step>(Step.Ready) }
     var work by remember { mutableStateOf<Job?>(null) }
+    var saving by remember { mutableStateOf(false) }
     val running = step is Step.Running
     LaunchedEffect(Unit) { withContext(Dispatchers.IO) { clearCompressed(context) } }
     val picker = rememberMediaPicker { uri ->
@@ -178,13 +179,19 @@ internal fun CompressScreen(initial: android.net.Uri? = null, onClose: () -> Uni
             onCancel = { work?.cancel() },
             onSave = { done ->
                 fun save() {
+                    if (saving) return
+                    saving = true
                     scope.launch {
                         try {
                             val where = saveToGallery(context, done.result)
                             if (step == done) step = done.copy(saved = true)
                             Toast.makeText(context, context.getString(R.string.compress_saved_to, where), Toast.LENGTH_SHORT).show()
+                        } catch (e: kotlinx.coroutines.CancellationException) {
+                            throw e
                         } catch (e: Exception) {
                             Toast.makeText(context, context.getString(R.string.compress_save_failed, e.message.orEmpty()), Toast.LENGTH_LONG).show()
+                        } finally {
+                            saving = false
                         }
                     }
                 }
@@ -371,6 +378,7 @@ private fun CustomPanel(video: Boolean, custom: CustomChoice, enabled: Boolean, 
         if (custom.bySize) -1 else custom.quality, enabled,
     ) { onChange(custom.copy(quality = it, bySize = false)) }
     Spacer(Modifier.height(8.dp))
+    var text by remember { mutableStateOf(custom.targetMb.toString()) }
     Row(verticalAlignment = Alignment.CenterVertically) {
         ToolChip(stringResource(R.string.compress_aim_size), custom.bySize, enabled) { onChange(custom.copy(bySize = true)) }
         Spacer(Modifier.width(10.dp))
@@ -380,7 +388,7 @@ private fun CustomPanel(video: Boolean, custom: CustomChoice, enabled: Boolean, 
             verticalAlignment = Alignment.CenterVertically,
         ) {
             BasicTextField(
-                custom.targetMb.toString(), { typed -> onChange(custom.copy(targetMb = typed.filter(Char::isDigit).take(4).toIntOrNull() ?: 0)) },
+                text, { typed -> text = typed.filter(Char::isDigit).take(4); onChange(custom.copy(targetMb = text.toIntOrNull() ?: 0)) },
                 Modifier.weight(1f), enabled = typing, singleLine = true,
                 textStyle = TextStyle(color = Am.HomeInk, fontSize = 16.sp), cursorBrush = SolidColor(Am.Accent),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),

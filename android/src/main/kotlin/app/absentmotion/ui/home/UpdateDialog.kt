@@ -125,7 +125,7 @@ private fun UpdateFlowDialog(step: UpdateStep) {
             Buttons { Secondary(stringResource(R.string.cancel), cancel) }
         }
         is UpdateStep.NotInstalled -> UpdateCard(HomeIcons.ArrowDown, stringResource(R.string.update_available, release.version), cancel) {
-            Body(stringResource(R.string.update_not_installed), live = true)
+            Body(stringResource(if (step.ready) R.string.update_ready_to_install else R.string.update_not_installed), live = true)
             Buttons {
                 Secondary(stringResource(R.string.update_later), cancel)
                 Primary(stringResource(R.string.update_install)) { Updater.install(context) }

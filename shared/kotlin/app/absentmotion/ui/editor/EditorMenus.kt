@@ -1,6 +1,7 @@
 package app.absentmotion.ui.editor
 
 import app.absentmotion.platform.Toast
+import app.absentmotion.editor.deselectLayer
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -189,7 +190,7 @@ internal fun LayerMenu(state: EditorState, onDismiss: () -> Unit) {
     val video = media?.takeIf { it.video }
     val mediaRecord = media?.let { state.scene.media(it.uri) }
     if (mediaInfo && mediaRecord != null) {
-        MediaInfoDialog(mediaRecord, onReplace = { picked -> val kept = state.keepCopy(context, picked); state.edit { s -> s.replaceMedia(mediaRecord.uri, kept) } }) { mediaInfo = false; onDismiss() }
+        MediaInfoDialog(mediaRecord, onReplace = { picked -> val kept = state.keepCopy(context, picked); state.edit { s -> s.replaceMedia(mediaRecord.uri, kept, dropMarks = true) } }) { mediaInfo = false; onDismiss() }
         return
     }
     val saveElement = rememberSaveToMyElements(state)
@@ -315,7 +316,7 @@ internal fun CopyPasteMenu(state: EditorState, below: Boolean = false, onDismiss
     saved?.let { PresetSavedDialog(it, PresetStore(context), onDismiss); return }
     MenuPopup(position, onDismiss) {
         MenuRow(stringResource(R.string.menu_select_all_layers), enabled = state.scene.layers.isNotEmpty(), icon = ChromeIcons.SelectAll) {
-            state.selectedId = null
+            state.deselectLayer()
             MultiSelect.ids = state.scene.layers.map { it.id }.toSet()
             MultiSelect.active = true
             onDismiss()

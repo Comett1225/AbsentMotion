@@ -24,6 +24,7 @@ import app.absentmotion.model.withEffect
 import app.absentmotion.model.floats
 import app.absentmotion.model.formatFloats
 import app.absentmotion.model.fpsText
+import app.absentmotion.model.loopStart
 import java.io.Closeable
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -45,11 +46,13 @@ internal fun matteSize(width: Int, height: Int, side: Int): Pair<Int, Int> {
 
 internal fun matteBitrate(width: Int, height: Int): Int = (width.toLong() * height * 4).coerceIn(500_000, 6_000_000).toInt()
 
+internal val Layer.processFromMs: Int get() = minOf(mediaFill?.inTime ?: 0, loopStart ?: Int.MAX_VALUE)
+
 internal fun Layer.matteSeconds(media: MediaDeclaration): Double {
     val fill = mediaFill ?: return 0.0
     if (fill.outTime == Int.MAX_VALUE && media.duration <= 0) return MAX_MATTE_SECONDS.toDouble()
     val end = if (fill.outTime == Int.MAX_VALUE) media.duration / 1000.0 else fill.outTime.toDouble()
-    return ((end - fill.inTime) / 1000).coerceAtLeast(0.0)
+    return ((end - processFromMs) / 1000).coerceAtLeast(0.0)
 }
 
 internal fun matteBytes(seconds: Double, width: Int, height: Int): Long = (matteBitrate(width, height) / 8.0 * seconds).roundToLong() + 1_000_000
@@ -364,7 +367,7 @@ internal object VideoBackground {
             var encoded = width to height
             val (frameWidth, frameHeight) = BackgroundRemoval.withFrameMatte(context) { matte ->
                 FrameReader(context, fill.uri).use { reader ->
-                    val stamps = matteStamps(reader.timestamps, fill.inTime, fill.outTime)
+                    val stamps = matteStamps(reader.timestamps, layer.processFromMs, fill.outTime)
                     check(stamps.isNotEmpty()) { AppText.get(R.string.ai_no_video_frames) }
                     var frame = media.width to media.height
                     MatteEncoder.open(file, width, height, fps).use { encoder ->

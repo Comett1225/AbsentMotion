@@ -1582,6 +1582,10 @@
       "desktop": null,
       "reason": "chooses Vulkan or OpenGL on phones and survives driver crashes at start-up; the desktop engine has one GPU back end per system (Metal, Vulkan) with a CPU fallback"
     },
+    "app/absentmotion/engine/VulkanProbe.kt": {
+      "desktop": null,
+      "reason": "the Compatible build proves Vulkan in a separate process before using it; the desktop picks its GPU back end per system"
+    },
     "app/absentmotion/engine/NativeEngine.kt": {
       "desktop": "pc/src/standins/kotlin/app/absentmotion/engine/DeskNativeEngine.kt",
       "reason": "JNI wrapper"

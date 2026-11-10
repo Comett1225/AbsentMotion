@@ -101,8 +101,8 @@ object EmbedRequest {
     var templateId by mutableStateOf<String?>(null)
 }
 
-private fun layersOf(scene: XmlNode): Sequence<XmlNode> = scene.children.asSequence().filter { it.name in Scene.LAYER_TAGS }
-    .flatMap { sequenceOf(it) + (it.child("scene")?.let(::layersOf) ?: emptySequence()) }
+private fun layersOf(scene: XmlNode, offset: Int = 0): Sequence<Pair<XmlNode, Int>> = scene.children.asSequence().filter { it.name in Scene.LAYER_TAGS }
+    .flatMap { sequenceOf(it to offset) + (it.child("scene")?.let { inner -> layersOf(inner, offset + it.int("startTime", 0)) } ?: emptySequence()) }
 
 private fun XmlNode.mapLayers(change: (XmlNode) -> XmlNode): XmlNode = copy(
     children = children.map { c ->
@@ -125,14 +125,15 @@ private fun XmlNode.sourceEnd() = app.absentmotion.model.VideoTiming(Layer(this)
 private fun XmlNode.sourceStart() = Layer(this).loopStart ?: int("inTime", 0)
 
 internal fun slotsOf(scene: Scene): List<Slot> =
-    layersOf(scene.node).filter { it["fillType"] == "media" && (it["fillImage"] ?: it["fillVideo"]) != null }
-        .sortedWith(compareBy({ it.int("startTime", 0) }, { it.int("endTime", 0) }))
-        .groupBy { it["fillImage"] ?: it["fillVideo"]!! }
-        .map { (uri, layers) ->
+    layersOf(scene.node).filter { (it, _) -> it["fillType"] == "media" && (it["fillImage"] ?: it["fillVideo"]) != null }
+        .sortedWith(compareBy({ (it, at) -> it.int("startTime", 0) + at }, { (it, at) -> it.int("endTime", 0) + at }))
+        .groupBy { (it, _) -> it["fillImage"] ?: it["fillVideo"]!! }
+        .map { (uri, pairs) ->
+            val layers = pairs.map { it.first }
             val video = layers.first()["fillImage"] == null
             val length = if (video) layers.maxOf { minOf(it.int("outTime", Int.MAX_VALUE), it.sourceEnd()) } - layers.minOf { it.sourceStart() }
                 else layers.maxOf { it.span() }
-            Slot(uri, video, length, layers.minOf { it.int("startTime", 0) }, layers.maxOf { it.int("endTime", 0) },
+            Slot(uri, video, length, pairs.minOf { (it, at) -> it.int("startTime", 0) + at }, pairs.maxOf { (it, at) -> it.int("endTime", 0) + at },
                 MediaFillMode.entries.firstOrNull { it.xml == layers.first()["mediaFillMode"] } ?: MediaFillMode.Fill, video && layers.any { it["loop"] == "true" })
         }
 
@@ -141,7 +142,7 @@ internal fun applied(template: Scene, slots: List<Slot>, choices: Map<String, Ch
     for (slot in slots) {
         val choice = choices[slot.uri] ?: continue
         val old = template.media(slot.uri)
-        val minIn = layersOf(template.node).filter { (it["fillImage"] ?: it["fillVideo"]) == slot.uri }.minOf { it.sourceStart() }
+        val minIn = layersOf(template.node).map { it.first }.filter { (it["fillImage"] ?: it["fillVideo"]) == slot.uri }.minOf { it.sourceStart() }
         node = node.mapLayers { l -> if ((l["fillImage"] ?: l["fillVideo"]) == slot.uri) swap(l, slot, choice, old, minIn) else l }
         choice.media?.let { new ->
             node = Scene(node.copy(children = node.children.filterNot { it.name == "media" && it["uri"] == slot.uri })).withMedia(new).node
@@ -251,7 +252,7 @@ fun TemplateEditor(templateId: String, engine: EngineThread, settings: AppSettin
     LaunchedEffect(playing) { engine.setPlaying(playing) }
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) { playing = false }
     val fit =if (box.width == 0) 1f else min(box.width.toFloat() / shown.width, box.height.toFloat() / shown.height)
-    LaunchedEffect(fit, time, shown) {
+    LaunchedEffect(fit, time, shown, box) {
         if (box.width > 0) engine.setView(PreviewView(time, fit, (box.width - shown.width * fit) / 2, (box.height - shown.height * fit) / 2, 0, -1))
     }
     LaunchedEffect(playing) {

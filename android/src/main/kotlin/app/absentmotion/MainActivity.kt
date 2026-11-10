@@ -169,11 +169,16 @@ class MainActivity : ComponentActivity() {
             val (offer, crash) = withContext(DiskThread.dispatcher) { runCatching { recovery.pending(store) }.getOrNull() to runCatching { CrashLogs.collect(applicationContext) }.getOrNull() }
             crashed = crash
             recovered = offer
-            if (reopen != null && offer?.id != reopen && editor == null && !opening) openJob = lifecycleScope.launch {
-                val state = openNow(reopen) ?: return@launch
-                state.frame = savedInstanceState.getInt(OPEN_FRAME).coerceIn(0, state.scene.lastFrame)
-                if (savedInstanceState.containsKey(OPEN_LAYER)) state.selectedId = savedInstanceState.getLong(OPEN_LAYER)
-                if (state.selected == null) state.selectedId = null
+            if (reopen != null && offer?.id != reopen && editor == null && !opening && !openingProject) {
+                openingProject = true
+                openJob = lifecycleScope.launch {
+                    try {
+                        val state = openNow(reopen) ?: return@launch
+                        state.frame = savedInstanceState.getInt(OPEN_FRAME).coerceIn(0, state.scene.lastFrame)
+                        if (savedInstanceState.containsKey(OPEN_LAYER)) state.selectedId = savedInstanceState.getLong(OPEN_LAYER)
+                        if (state.selected == null) state.selectedId = null
+                    } finally { openingProject = false }
+                }
             }
         }
         lifecycleScope.launch {
@@ -213,6 +218,7 @@ class MainActivity : ComponentActivity() {
         }
         TestHooks.start(this)
         lifecycleScope.launch { androidx.compose.runtime.snapshotFlow { settings.openGl }.drop(1).collect { engine.restart() } }
+        app.absentmotion.ui.home.Updater.calm = ::updateCalm
         app.absentmotion.ui.home.Updater.atLaunch(applicationContext)
         lifecycleScope.launch { engineWorks() }
         firstRun = FirstRun.of(settings, TestHooks.onboarding(intent).takeIf { savedInstanceState == null })
@@ -336,6 +342,10 @@ class MainActivity : ComponentActivity() {
     }
 
 
+
+    private fun updateCalm() = lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED) && editor == null && !closingEditor && !opening && !openingProject &&
+        editingTemplate == null && exportingFromList == null && firstRun == null && recovered == null && crashed == null && !problemShown && whatsNew == null &&
+        settings.updatesAsked && !app.absentmotion.export.ExportRun.running
 
     private fun importShared() {
         val uris = ImportHandOff.take().map(Uri::parse)
@@ -489,7 +499,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun open(id: String) {
-        if (opening || openingProject) return
+        if (opening || openingProject || closingEditor) return
         openingProject = true
         openJob = lifecycleScope.launch { try { openNow(id) } finally { openingProject = false } }
     }
@@ -613,7 +623,7 @@ class MainActivity : ComponentActivity() {
                 saveThumbnail(scene, closing.timeMs, closing.projectId)
             } finally {
                 MultiSelect.clear()
-                editor = null
+                if (editor === closing) editor = null
                 closingEditor = false
             }
         }
@@ -658,6 +668,7 @@ class MainActivity : ComponentActivity() {
         super.onPause()
         distrustVideoThumbnails()
         editor?.saver?.flush()
+        app.absentmotion.export.ExportRun.resumeService(this)
     }
 
     override fun onStop() {
@@ -671,7 +682,8 @@ class MainActivity : ComponentActivity() {
         elementNav = null
         MediaPicks.release(this)
         crashSaver?.current = { null }
-        engine.close()
+        if (app.absentmotion.ui.home.Updater.calm == ::updateCalm) app.absentmotion.ui.home.Updater.calm = { false }
+        app.absentmotion.export.ExportEngine.release(engine)
     }
 
     override fun onTrimMemory(level: Int) {
@@ -687,6 +699,7 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         app.absentmotion.ui.home.Updater.resumed(this)
+        androidx.core.app.NotificationManagerCompat.from(this).cancel(app.absentmotion.ui.home.UPDATED_NOTIFICATION_ID)
         engine.refreshMedia()
         lifecycleScope.launch { recheckVideoThumbnails(applicationContext) }
     }

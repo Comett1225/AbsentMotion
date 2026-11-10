@@ -161,7 +161,7 @@ private fun DeskWorkspaceBody(state: EditorState, onExit: () -> Unit, library: A
         val libraryNow = if (libraryShown) libraryWidth.coerceAtMost(room - inspectorNow).coerceAtLeast(LibraryMin) else 0f
         val closeLibrary = { if (both) libraryOpen = false else soloLibrary = false }
         val closeInspector = { if (both) inspectorOpen = false else soloInspector = false }
-        val timelineHeight = (maxHeight * timelineFraction).coerceIn(180.dp, maxHeight * .6f)
+        val timelineHeight = (maxHeight * timelineFraction).coerceIn(180.dp, (maxHeight * .6f).coerceAtLeast(180.dp))
         Column(Modifier.fillMaxSize()) {
             Row(Modifier.fillMaxWidth().weight(1f)) {
                 DeskLibraryRail(libraryTab, libraryShown, Modifier.width(RailWidth.dp).fillMaxHeight()) { index ->

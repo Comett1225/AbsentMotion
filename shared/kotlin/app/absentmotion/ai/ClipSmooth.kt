@@ -121,7 +121,7 @@ internal fun Scene.smoothChange(layer: Layer): SmoothChange? {
     val length = (layer.endTime - layer.startTime).coerceAtLeast(1)
     val timing = VideoTiming(base)
     val start = timing.mediaMs(0.0)
-    val end = timing.mediaMs(length.toDouble()).let { if (layer.node["loop"] == "true") minOf(it, base.mediaFill!!.outTime.toDouble()) else it }
+    val end = timing.mediaMs(length.toDouble()).let { out -> base.mediaFill!!.outTime.toDouble().takeIf { it > 0 }?.let { minOf(out, it) } ?: out }
     val mean = ((end - start) / length).coerceAtLeast(1e-6)
     val uncovered = (maxOf(0.0, facts.from - start) + maxOf(0.0, end - (facts.from + facts.span))) / mean
     val retimed = base.speedSignature(fps) != facts.sig
@@ -250,7 +250,8 @@ internal object ClipSmooth {
         if (app.absentmotion.platform.PlatformFeatures.desktop) return app.absentmotion.platform.desktopClipSmooth(context, engine, layer, media, projectFps, smoothing, progress)
         val fill = checkNotNull(layer.mediaFill?.takeIf { it.video }) { AppText.get(R.string.ai_select_video_layer) }
         val plan = checkNotNull(smoothPlan(layer, media, projectFps, smoothing)) { AppText.get(R.string.smooth_nothing) }
-        check(plan.seconds <= MAX_MATTE_SECONDS && plan.frames <= MAX_SMOOTH_FRAMES) { AppText.get(R.string.ai_clip_too_long, (MAX_MATTE_SECONDS / 60).toString()) }
+        check(plan.seconds <= MAX_MATTE_SECONDS) { AppText.get(R.string.ai_clip_too_long, (MAX_MATTE_SECONDS / 60).toString()) }
+        check(plan.frames <= MAX_SMOOTH_FRAMES) { AppText.get(R.string.smooth_too_many_frames, MAX_SMOOTH_FRAMES.toString()) }
         val file = aiFile(context, "mp4")
         check(file.parentFile!!.usableSpace >= plan.bytes * 2) { AppText.get(R.string.ai_not_enough_storage, (plan.bytes * 2 / 1_000_000).toString()) }
         val scene = smoothScene(fill, media, plan)
@@ -261,7 +262,7 @@ internal object ClipSmooth {
         var success = false
         try {
             progress(0f, AppText.get(R.string.ai_preparing))
-            sound = kept?.let { soundTrack(context, it.uri) }
+            sound = kept?.let { soundTrack(context, it.uri) }?.takeIf { hasSound(it.first, fill.inTime * 1000L, spanUs) || run { it.first.release(); false } }
             encode(engine, scene, plan, file.path, frames, fill.inTime * 1000L, spanUs, smoothing.copy(blurScale = plan.blurScale), sound) { done ->
                 progress(0.98f * done / frames, AppText.get(R.string.smooth_frame, done.toString(), frames.toString()))
             }
@@ -273,6 +274,17 @@ internal object ClipSmooth {
             kept?.close()
             if (!success) file.delete()
         }
+    }
+
+    private fun hasSound(extractor: MediaExtractor, fromUs: Long, spanUs: Long): Boolean {
+        if (fromUs > 0) extractor.seekTo(fromUs, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
+        while (extractor.sampleTrackIndex >= 0) {
+            val time = extractor.sampleTime
+            if (time >= fromUs + spanUs) return false
+            if (time >= fromUs) return true
+            if (!extractor.advance()) return false
+        }
+        return false
     }
 
     private fun soundTrack(context: Context, uri: String): Pair<MediaExtractor, Int>? {

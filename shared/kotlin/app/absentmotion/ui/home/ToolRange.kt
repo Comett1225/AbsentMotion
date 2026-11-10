@@ -47,6 +47,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.R
+import app.absentmotion.i18n.Ltr
 import app.absentmotion.platform.LocalContext
 import app.absentmotion.tools.TrimRange
 import app.absentmotion.tools.clock
@@ -131,10 +132,12 @@ internal fun RangePicker(
                 }
             },
         ) {
-            Row(Modifier.fillMaxSize()) {
-                repeat(FRAMES_IN_STRIP) { i ->
-                    Box(Modifier.weight(1f).fillMaxHeight()) {
-                        frames.getOrNull(i)?.let { Image(it, null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop) }
+            Ltr {
+                Row(Modifier.fillMaxSize()) {
+                    repeat(FRAMES_IN_STRIP) { i ->
+                        Box(Modifier.weight(1f).fillMaxHeight()) {
+                            frames.getOrNull(i)?.let { Image(it, null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop) }
+                        }
                     }
                 }
             }

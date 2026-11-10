@@ -495,6 +495,12 @@ void ParseGroup(const XmlNode& scene, int fps, Layer* group) {
     r.hostFps = fps;
     group->fixedPrecompose = StrAttr(scene, "precompose") == "fixedResolution";
     const int innerFps = FpsAttr(scene);
+    thread_local int depth = 0;
+    if (depth >= 64) return;
+    struct Nest {
+        Nest() { depth++; }
+        ~Nest() { depth--; }
+    } nest;
     for (const auto& n : scene.children) {
         Layer l;
         if (ParseLayer(*n, innerFps, &l)) group->children.push_back(std::move(l));

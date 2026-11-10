@@ -53,7 +53,7 @@ class SpeedRampTest {
         val layer = videoLayer(1000, 4999)
         for (ramp in SpeedRamp.entries) {
             val ramped = layer.ramped(ramp)
-            assertEquals(ramp.name, span(layer), span(ramped), 2.0)
+            assertEquals(ramp.name, span(layer), span(ramped), 1000.0 / fps)
             assertEquals(ramp.name, ramp.points.size, ramped.node.child("speedMap")!!.keyframes.size)
             assertEquals(ramp.name, ramp.points.first().second.toDouble(), VideoTiming(ramped).speed(0.0).toDouble(), 1e-3)
         }

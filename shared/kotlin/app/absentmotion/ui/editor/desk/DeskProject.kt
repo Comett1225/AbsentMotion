@@ -93,7 +93,7 @@ internal fun deskLayerIcon(layer: Layer) = when {
     layer.kind == "light" -> PanelIcons.Brightness
     layer.kind == "drawing" -> ChromeIcons.Freehand
     layer.kind == "embedScene" -> SelectionIcons.Group
-    layer.kind == "null" -> ChromeIcons.NullObject
+    layer.kind == "nullobj" -> ChromeIcons.NullObject
     layer.mediaFill != null -> ChromeIcons.MediaTab
     else -> ChromeIcons.ShapeTab
 }
@@ -244,6 +244,8 @@ private fun DeskNumber(value: Int, modifier: Modifier, commit: (Int) -> Unit) {
     var focused by remember { mutableStateOf(false) }
     val focus = LocalFocusManager.current
     fun save() { val number = text.toIntOrNull()?.coerceIn(MIN_SIDE, MAX_SIDE); if (number != null && number != value) commit(number); text = (number ?: value).toString() }
+    val saveNow by rememberUpdatedState(::save)
+    DisposableEffect(Unit) { onDispose { saveNow() } }
     BasicTextField(text, { if (it.length <= 4 && it.all(Char::isDigit)) text = it }, modifier.height(32.dp).clip(RoundedCornerShape(6.dp)).background(Am.Field).padding(horizontal = 8.dp)
         .onFocusChanged { if (focused && !it.isFocused) save(); focused = it.isFocused },
         textStyle = TextStyle(color = Am.OnDark, fontSize = 13.sp, textAlign = TextAlign.Center), singleLine = true, cursorBrush = SolidColor(Am.Accent),

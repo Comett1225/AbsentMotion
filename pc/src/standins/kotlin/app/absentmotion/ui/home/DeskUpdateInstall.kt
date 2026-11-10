@@ -2,6 +2,7 @@ package app.absentmotion.ui.home
 
 import java.io.File
 import java.io.IOException
+import java.nio.file.Files
 import java.util.concurrent.TimeUnit
 
 internal const val POSIX_SWAP = """#!/bin/sh
@@ -43,7 +44,7 @@ while kill -0 "${'$'}pid" 2>/dev/null; do
     if [ "${'$'}n" -gt 6000 ]; then echo "fail the app did not close" > "${'$'}result"; exit 1; fi
     sleep 0.1
 done
-if pkexec apt-get install -y "${'$'}package" >/dev/null 2>&1; then
+if pkexec apt-get -o DPkg::Lock::Timeout=120 install -y "${'$'}package" >/dev/null 2>&1; then
     echo "ok" > "${'$'}result"
 else
     echo "fail the package could not be installed" > "${'$'}result"
@@ -59,16 +60,20 @@ ${'$'}msi = ${quoted(msi)}
 ${'$'}launcher = ${quoted(launcher)}
 ${'$'}result = ${quoted(result)}
 ${'$'}log = ${quoted(log)}
-Wait-Process -Id ${'$'}pidToWait -Timeout 600
-if (Get-Process -Id ${'$'}pidToWait) { Set-Content -Path ${'$'}result -Value 'fail the app did not close'; exit 1 }
+${'$'}expected = [IO.Path]::GetFileNameWithoutExtension(${'$'}launcher)
+function Alive { ${'$'}p = Get-Process -Id ${'$'}pidToWait; return (${'$'}null -ne ${'$'}p -and ${'$'}p.ProcessName -eq ${'$'}expected) }
+if (Alive) {
+    Wait-Process -Id ${'$'}pidToWait -Timeout 600
+    if (Alive) { Set-Content -LiteralPath ${'$'}result -Value 'fail the app did not close'; exit 1 }
+}
 ${'$'}folder = (Split-Path -Parent ${'$'}launcher).TrimEnd('\') + '\'
 ${'$'}run = Start-Process -FilePath 'msiexec.exe' -ArgumentList @('/i', ('"' + ${'$'}msi + '"'), ('INSTALLDIR="' + ${'$'}folder + '"'), '/passive', '/norestart', '/L*v', ('"' + ${'$'}log + '"')) -Wait -PassThru
-Set-Content -Path ${'$'}result -Value ('exit ' + ${'$'}run.ExitCode)
-if (-not (Test-Path ${'$'}launcher)) {
+Set-Content -LiteralPath ${'$'}result -Value ('exit ' + ${'$'}run.ExitCode)
+if (-not (Test-Path -LiteralPath ${'$'}launcher)) {
     ${'$'}entry = Get-ChildItem 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall', 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall' | Get-ItemProperty | Where-Object { ${'$'}_.DisplayName -eq 'AbsentMotion' -and ${'$'}_.InstallLocation } | Select-Object -First 1
     if (${'$'}entry) { ${'$'}launcher = Join-Path ${'$'}entry.InstallLocation (Split-Path -Leaf ${'$'}launcher) }
 }
-if (Test-Path ${'$'}launcher) { Start-Process -FilePath ${'$'}launcher } else { Set-Content -Path ${'$'}result -Value 'fail the app was installed but could not be found to open' }
+if (Test-Path -LiteralPath ${'$'}launcher) { Start-Process -FilePath ${'$'}launcher } else { Set-Content -LiteralPath ${'$'}result -Value 'fail the app was installed but could not be found to open' }
 """
 }
 
@@ -76,7 +81,9 @@ internal fun windowsCommand(script: String): List<String> =
     listOf("powershell.exe", "-NoProfile", "-NonInteractive", "-WindowStyle", "Hidden", "-ExecutionPolicy", "Bypass", "-EncodedCommand",
         java.util.Base64.getEncoder().encodeToString(script.toByteArray(Charsets.UTF_16LE)))
 
-internal class PendingInstall(val command: List<String>)
+internal class PendingInstall(val command: List<String>, val result: File? = null, private val leftovers: List<File> = emptyList()) {
+    fun discard() = leftovers.forEach { runCatching { UpdateInstall.clear(it) } }
+}
 
 internal object UpdateInstall {
     private var hook: Thread? = null
@@ -99,10 +106,10 @@ internal object UpdateInstall {
         result.delete()
         work.mkdirs()
         return when (site.kind) {
-            InstallKind.Msi -> PendingInstall(windowsCommand(windowsScript(pid, file.path, site.target.path, result.path, File(work, "update-install.log").path)))
+            InstallKind.Msi -> PendingInstall(windowsCommand(windowsScript(pid, file.path, site.target.path, result.path, File(work, INSTALL_LOG).path)), result)
             InstallKind.MacApp -> {
                 val staging = File(site.target.parentFile, ".AbsentMotion-update")
-                staging.deleteRecursively()
+                clear(staging)
                 if (!staging.mkdirs()) throw IOException("The update folder could not be made next to the app")
                 try {
                     run(listOf("/usr/bin/ditto", "-x", "-k", file.path, staging.path))
@@ -111,40 +118,41 @@ internal object UpdateInstall {
                     val wanted = plistValue(File(site.target, "Contents/Info.plist"), "CFBundleIdentifier")
                     if (plistValue(File(app, "Contents/Info.plist"), "CFBundleIdentifier") != wanted) throw IOException("The update is another app")
                     if (plistValue(File(app, "Contents/Info.plist"), "CFBundleShortVersionString") != release.version) throw IOException("The update is another version")
-                    swap(work, pid, app, site.target, "mac", result, staging)
+                    swap(work, pid, app, site.target, "mac", result, staging, listOf(staging))
                 } catch (e: Exception) {
-                    staging.deleteRecursively()
+                    runCatching { clear(staging) }
                     throw e
                 }
             }
             InstallKind.Tarball -> {
                 val staging = File(site.target.parentFile, ".absentmotion-update")
-                staging.deleteRecursively()
+                clear(staging)
                 if (!staging.mkdirs()) throw IOException("The update folder could not be made")
                 try {
                     run(listOf("tar", "-xzf", file.path, "-C", staging.path, "--no-same-owner"))
                     val app = File(staging, "AbsentMotion")
                     if (!File(app, "bin/AbsentMotion").canExecute() || !File(app, "install.sh").isFile) throw IOException("The update is not an AbsentMotion folder")
-                    swap(work, pid, app, site.target, "tarball", result, staging)
+                    swap(work, pid, app, site.target, "tarball", result, staging, listOf(staging))
                 } catch (e: Exception) {
-                    staging.deleteRecursively()
+                    runCatching { clear(staging) }
                     throw e
                 }
             }
             InstallKind.AppImage -> {
                 val staged = File(site.target.parentFile, site.target.name + ".new")
                 try {
+                    Files.deleteIfExists(staged.toPath())
                     file.copyTo(staged, overwrite = true)
                     if (!staged.setExecutable(true, false)) throw IOException("The update could not be made executable")
-                    swap(work, pid, staged, site.target, "appimage", result, null)
+                    swap(work, pid, staged, site.target, "appimage", result, null, listOf(staged))
                 } catch (e: Exception) {
-                    staged.delete()
+                    runCatching { Files.deleteIfExists(staged.toPath()) }
                     throw e
                 }
             }
             InstallKind.Deb -> {
                 val script = File(work, "update-apply.sh").apply { writeText(DEB_INSTALL); setExecutable(true) }
-                PendingInstall(listOf("/bin/sh", script.path, pid.toString(), file.path, result.path, File(site.target, "bin/AbsentMotion").path))
+                PendingInstall(listOf("/bin/sh", script.path, pid.toString(), file.path, result.path, File(site.target, "bin/AbsentMotion").path), result)
             }
         }
     }
@@ -160,6 +168,7 @@ internal object UpdateInstall {
         if (hook != null) return
         val thread = Thread {
             runCatching { ProcessBuilder(install.command).redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.DISCARD).start() }
+                .onFailure { install.result?.let { file -> runCatching { file.writeText("fail the helper did not start") } } }
         }
         hook = thread
         Runtime.getRuntime().addShutdownHook(thread)
@@ -172,6 +181,7 @@ internal object UpdateInstall {
 
     fun cancel() {
         disarm()
+        pending?.discard()
         pending = null
     }
 
@@ -179,27 +189,38 @@ internal object UpdateInstall {
         val text = runCatching { result.readText().trim() }.getOrNull() ?: return null
         result.delete()
         return when {
+            text.isEmpty() || text == "ok" -> null
             text.startsWith("fail") -> text.removePrefix("fail").trim().ifEmpty { "unknown" }
-            text.startsWith("exit ") && text.removePrefix("exit ").trim() !in setOf("0", "3010") -> "installer code " + text.removePrefix("exit ").trim()
-            else -> null
+            text.startsWith("exit") -> text.removePrefix("exit").trim().takeIf { it !in setOf("0", "3010") }?.let { "installer code " + it.ifEmpty { "unknown" } }
+            else -> "unknown"
         }
     }
 
-    private fun swap(work: File, pid: Long, staged: File, target: File, kind: String, result: File, cleanup: File?): PendingInstall {
+    private fun swap(work: File, pid: Long, staged: File, target: File, kind: String, result: File, cleanup: File?, leftovers: List<File>): PendingInstall {
         val script = File(work, "update-apply.sh").apply { writeText(POSIX_SWAP); setExecutable(true) }
-        return PendingInstall(listOf("/bin/sh", script.path, pid.toString(), staged.path, target.path, kind, result.path, cleanup?.path.orEmpty()))
+        return PendingInstall(listOf("/bin/sh", script.path, pid.toString(), staged.path, target.path, kind, result.path, cleanup?.path.orEmpty()), result, leftovers)
     }
 
-    private fun plistValue(plist: File, key: String): String = run(listOf("/usr/bin/plutil", "-extract", key, "raw", "-o", "-", plist.path)).trim()
+    fun clear(dir: File) {
+        val path = dir.toPath()
+        if (Files.isSymbolicLink(path)) Files.delete(path) else if (dir.exists()) run(listOf("/bin/rm", "-rf", dir.path))
+    }
+
+    private fun plistValue(plist: File, key: String): String = run(listOf("/usr/libexec/PlistBuddy", "-c", "Print :$key", plist.path)).trim()
 
     private fun run(command: List<String>): String {
-        val process = ProcessBuilder(command).redirectErrorStream(true).start()
-        val output = process.inputStream.bufferedReader().readText()
-        if (!process.waitFor(300, TimeUnit.SECONDS)) {
-            process.destroyForcibly()
-            throw IOException("${command.first()} took too long")
+        val log = File.createTempFile("am-update", ".log")
+        try {
+            val process = ProcessBuilder(command).redirectErrorStream(true).redirectOutput(log).start()
+            if (!process.waitFor(300, TimeUnit.SECONDS)) {
+                process.destroyForcibly()
+                throw IOException("${command.first()} took too long")
+            }
+            val output = log.readText()
+            if (process.exitValue() != 0) throw IOException("${File(command.first()).name} failed: ${output.take(200)}")
+            return output
+        } finally {
+            log.delete()
         }
-        if (process.exitValue() != 0) throw IOException("${File(command.first()).name} failed: ${output.take(200)}")
-        return output
     }
 }

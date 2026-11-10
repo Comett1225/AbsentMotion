@@ -98,7 +98,7 @@ fun planVideo(src: CompressSource, level: CompressLevel, custom: CustomChoice = 
             val side = listOf(1080, 720, 540, 480, 360).firstOrNull { s ->
                 scaledToShort(src.width, src.height, s).let { (w, h) -> budget >= bitsFor(w, h, fps, 0.04) }
             } ?: 240
-            job(side, fps, { w, h, _ -> minOf(budget, bitsFor(w, h, fps, 0.10), source) }, kbps, limit = discord.bytes)
+            job(side, fps, { w, h, _ -> minOf(budget, maxOf(bitsFor(w, h, fps, 0.10), MIN_VIDEO_BITRATE), source) }, kbps, limit = discord.bytes)
         }
         CompressLevel.Custom -> {
             val fps = if (custom.fps > 0) min(srcFps, custom.fps) else srcFps

@@ -130,7 +130,7 @@ private fun PositionTab(state: EditorState, layer: Layer) {
             ) { change, drag ->
                 change.consume()
                 if (deep) {
-                    travel += drag * scale
+                    travel += drag / density * scale
                     state.editSelected(key = "move-z") { l -> l.withTransform("location", origin[0], origin[1], origin[2] - travel.y) }
                     return@detectDragGestures
                 }
@@ -356,8 +356,9 @@ private fun SizeTab(state: EditorState, layer: Layer) {
         val first = isWidth != upright
         val ref = if (linked) maxOf(abs(drag[0]), abs(drag[1])) else abs(drag[if (first) 0 else 1])
         val factor = RulerMath.scale(ref, drag[2]) / ref.coerceAtLeast(1e-4f)
+        val fromZero = if (ref < 1e-4f) (drag[2] * 0.01f).coerceAtLeast(0f) else null
         val s = l.scale
-        l.withTransform("scale", if (first || linked) drag[0] * factor else s[0], if (!first || linked) drag[1] * factor else s[1])
+        l.withTransform("scale", if (first || linked) fromZero ?: (drag[0] * factor) else s[0], if (!first || linked) fromZero ?: (drag[1] * factor) else s[1])
     }
     val widthLabel = stringResource(R.string.transform_width)
     val heightLabel = stringResource(R.string.transform_height)
@@ -366,7 +367,17 @@ private fun SizeTab(state: EditorState, layer: Layer) {
         if (box == null) return
         val old = if (isWidth) boxW else boxH
         val field = KeypadField(if (isWidth) widthLabel else heightLabel, old)
-        state.keypad = KeypadRequest(listOf(field), 0) { v -> if (old > 0f && v[0] > 0f) stretch(v[0] / old, isWidth) }
+        state.keypad = KeypadRequest(listOf(field), 0) { v ->
+            if (v[0] > 0f) {
+                if (old > 0f) stretch(v[0] / old, isWidth)
+                else state.editSelected { l ->
+                    val first = isWidth != upright
+                    val s = l.scale
+                    val set = v[0] / 100f
+                    l.withTransform("scale", if (first || linked) set else s[0], if (!first || linked) set else s[1])
+                }
+            }
+        }
     }
     fun colour(which: Int) = if (linked || active == which) Am.Accent else Am.OnDark
 

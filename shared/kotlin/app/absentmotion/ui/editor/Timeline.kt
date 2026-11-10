@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor
 
+import app.absentmotion.model.withEdgeMotions
 import app.absentmotion.ui.tutorial.tutorialGuard
 import app.absentmotion.model.Scene
 import app.absentmotion.model.shownName
@@ -106,6 +107,7 @@ import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import app.absentmotion.R
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import app.absentmotion.platform.SystemClock
@@ -282,6 +284,7 @@ fun Timeline(state: EditorState, modifier: Modifier = Modifier) {
     val density = LocalDensity.current
     val scope = rememberCoroutineScope()
     val haptic = LocalHapticFeedback.current
+    val focus = LocalFocusManager.current
     val wide = LocalWide.current
     val view = remember(state, density, wide) {
         TimelineView(state, density, scope, wide).also { v ->
@@ -347,7 +350,7 @@ fun Timeline(state: EditorState, modifier: Modifier = Modifier) {
             .tutorialRegion("clip") { view.clipRows(media = false) }
             .tutorialRegion("clip_media") { view.clipRows(media = true) }
             .pointerInput(view) {
-                if (PlatformFeatures.desktop) desktopTimelineGestures(view)
+                if (PlatformFeatures.desktop) desktopTimelineGestures(view, focus)
                 else timelineGestures(view) { if (state.settings.vibration) haptic.performHapticFeedback(HapticFeedbackType.LongPress) }
             }
             .drawBehind { drawTimeline(view, measurer, styles, eye, eyeOff, outline, mediaPictures, proxies, appear.value) },
@@ -569,7 +572,7 @@ internal object TimelineMath {
         val frame = nearestFrame(wantedMs, from.fps)
         val edge = if (start) frame.coerceIn(0, from.lastShownFrame(base.endTime).coerceAtLeast(0)) else (frame - 1).coerceAtLeast(from.firstShownFrame(base.startTime)) + 1
         val time = if (start) from.frameStart(edge) else from.frameEnd(edge - 1)
-        val trimmed = if (start) from.trimmedClip(base, time, base.endTime) else from.trimmedClip(base, base.startTime, time)
+        val trimmed = from.withEdgeMotions(base, if (start) from.trimmedClip(base, time, base.endTime) else from.trimmedClip(base, base.startTime, time))
         return EdgeTrim(trimmed, edge, time, if (start) trimmed.startTime > time else trimmed.endTime < time)
     }
 
@@ -794,7 +797,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
 
     fun seek(x: Float) {
         state.playing = false
-        state.frame = TimelineMath.nearestFrame(timeScale().time(x.coerceIn(headerWidth, size.width.toFloat())), fps).coerceIn(0, state.scene.lastFrame)
+        state.frame = TimelineMath.nearestFrame(timeScale().time(x.coerceIn(headerWidth, size.width.toFloat().coerceAtLeast(headerWidth))), fps).coerceIn(0, state.scene.lastFrame)
         scrubMs = null
     }
 
@@ -857,9 +860,10 @@ private class TimelineView(val state: EditorState, density: Density, private val
             MultiSelect.active = MultiSelect.ids.isNotEmpty()
             state.deselectLayer()
         } else if (range || !(MultiSelect.active && id in MultiSelect.ids)) {
+            val same = state.selectedId == id
             MultiSelect.clear()
             state.selectedId = id
-            state.panel = EditorPanel.Tools
+            if (!same) state.panel = EditorPanel.Tools
         }
     }
 
@@ -1503,7 +1507,7 @@ private val GripStub = 2.5.dp
 
 private val MacOs = System.getProperty("os.name").orEmpty().lowercase().contains("mac")
 
-private suspend fun PointerInputScope.desktopTimelineGestures(view: TimelineView) {
+private suspend fun PointerInputScope.desktopTimelineGestures(view: TimelineView, focus: androidx.compose.ui.focus.FocusManager) {
     awaitPointerEventScope {
         var down: Offset? = null
         var hit: Hit? = null
@@ -1549,6 +1553,7 @@ private suspend fun PointerInputScope.desktopTimelineGestures(view: TimelineView
                 change.consume()
                 continue
             }
+            if (event.type == PointerEventType.Press && down == null && app.absentmotion.platform.textFieldFocused()) focus.clearFocus()
             if (event.type == PointerEventType.Press && (event.buttons.isSecondaryPressed || MacOs && modifiers.isCtrlPressed) && down == null) {
                 val id = view.clipId(view.hitAt(at))
                 if (id != null) view.selectDesktop(id, false, false)
@@ -1724,7 +1729,10 @@ private suspend fun PointerInputScope.timelineGestures(view: TimelineView, onLon
                 first == null || !first.pressed -> break
                 drag == null -> {
                     val moved = first.position - down.position
-                    if (moved.getDistance() > viewConfiguration.touchSlop) drag = view.beginDrag(hit, moved)
+                    if (moved.getDistance() > viewConfiguration.touchSlop) {
+                        drag = view.beginDrag(hit, moved)
+                        first.consume()
+                    }
                 }
                 else -> {
                     view.dragBy(drag, first.position - first.previousPosition, first.position)

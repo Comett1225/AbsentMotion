@@ -12,6 +12,8 @@ internal fun installSite(
     javaHome: String = System.getProperty("java.home").orEmpty(),
     appPath: String? = System.getProperty("jpackage.app-path"),
     appImage: String? = System.getenv("APPIMAGE"),
+    appDir: String? = System.getenv("APPDIR"),
+    debInstalled: Boolean = File("/usr/bin/apt-get").canExecute() && File("/var/lib/dpkg/info").listFiles { f -> f.name.startsWith("absentmotion") && f.name.endsWith(".list") }.orEmpty().isNotEmpty(),
 ): InstallSite? = when {
     os.startsWith("windows", ignoreCase = true) ->
         appPath?.let(::File)?.takeIf { it.isFile && it.name.endsWith(".exe", ignoreCase = true) }?.let { InstallSite(InstallKind.Msi, it) }
@@ -19,9 +21,9 @@ internal fun installSite(
         val bundle = generateSequence(appPath?.let(::File)) { it.parentFile }.firstOrNull { it.name.endsWith(".app") }
         bundle?.takeIf { "AppTranslocation" !in it.path && it.isDirectory && it.canWrite() && it.parentFile?.canWrite() == true }?.let { InstallSite(InstallKind.MacApp, it) }
     }
-    !appImage.isNullOrBlank() ->
+    !appImage.isNullOrBlank() && !appDir.isNullOrBlank() && javaHome.startsWith(appDir.trimEnd('/') + "/") ->
         File(appImage).takeIf { it.isFile && it.parentFile?.canWrite() == true }?.let { InstallSite(InstallKind.AppImage, it) }
-    javaHome.startsWith("/opt/absentmotion/") -> InstallSite(InstallKind.Deb, File("/opt/absentmotion"))
+    javaHome.startsWith("/opt/absentmotion/") && debInstalled -> InstallSite(InstallKind.Deb, File("/opt/absentmotion"))
     home.isNotEmpty() && javaHome.startsWith("$home/.local/opt/absentmotion/") ->
         File(home, ".local/opt/absentmotion").takeIf { it.isDirectory && it.parentFile?.canWrite() == true }?.let { InstallSite(InstallKind.Tarball, it) }
     else -> null

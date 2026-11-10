@@ -50,10 +50,21 @@ bool BuiltIn(const std::string& id) {
     return id == "absent.blur" || id == "absent.glow" || id == "absent.smear" || id == kLift || id == kPuppet;
 }
 
-bool WrapsLayer(const std::string& id) {
-    return id == "absent.tiles" || id == "absent.tile" || id == "absent.tileshift" || id == "absent.tilerotate" || id == "absent.mirror" ||
-           id == "absent.hexagontiling" || id == "absent.hexagontileshift" || id == "absent.hexagontilerotate" || id == "absent.kaleidoscope" ||
-           id == "absent.offset";
+bool TilesLayer(const std::string& id) {
+    return id == "absent.tiles" || id == "absent.tile" || id == "absent.tileshift" || id == "absent.tilerotate" || id == "absent.hexagontiling" ||
+           id == "absent.hexagontileshift" || id == "absent.hexagontilerotate";
+}
+
+bool WrapsLayer(const std::string& id) { return TilesLayer(id) || id == "absent.mirror" || id == "absent.kaleidoscope" || id == "absent.offset"; }
+
+const float kWrapPixels = 4096;
+
+SkRect Budgeted(const SkRect& wanted, const SkRect& local, const SkMatrix& matrix, float pixels) {
+    const float scale = matrix.hasPerspective() ? 1.0f : matrix.getMaxScale();
+    const float limit = pixels / (std::isfinite(scale) && scale > 0 ? scale : 1.0f);
+    if (wanted.width() <= limit && wanted.height() <= limit) return wanted;
+    SkRect window = local.makeOutset(std::max(0.0f, (limit - local.width()) / 2), std::max(0.0f, (limit - local.height()) / 2));
+    return window.intersect(wanted) ? window : SkRect::MakeEmpty();
 }
 
 const char* const kPuppetShader = R"(
@@ -960,7 +971,7 @@ int EffectRuntime::liftAt(const Layer& layer) const {
 bool EffectRuntime::lifted(const Layer& layer) const { return liftAt(layer) >= 0; }
 
 bool EffectRuntime::wraps(const Layer& layer) const {
-    return std::any_of(layer.effects.begin(), layer.effects.end(), [](const LayerEffect& e) { return !e.hidden && WrapsLayer(e.id); });
+    return std::any_of(layer.effects.begin(), layer.effects.end(), [](const LayerEffect& e) { return !e.hidden && TilesLayer(e.id); });
 }
 
 bool EffectRuntime::spills(const Layer& layer) const {
@@ -980,6 +991,15 @@ bool EffectRuntime::needs(const Layer& layer, bool Definition::*input) const {
 
 bool EffectRuntime::behind(const Layer& layer) const { return needs(layer, &Definition::backdrop); }
 
+bool EffectRuntime::reaches(const Layer& layer) const {
+    return std::any_of(layer.effects.begin(), layer.effects.end(), [&](const LayerEffect& e) {
+        if (e.hidden || e.id == kLift) return false;
+        if (BuiltIn(e.id)) return true;
+        const Definition* d = find(e.id);
+        return d && d->shader && (!d->pointwise || d->blurred);
+    });
+}
+
 bool EffectRuntime::steady(const Layer& layer, float from, float to) const {
     const auto still = [&](const Anim& a) { return a.steady(from, to); };
     return std::all_of(layer.effects.begin(), layer.effects.end(), [&](const LayerEffect& e) {
@@ -997,10 +1017,16 @@ bool EffectRuntime::steady(const Layer& layer, float from, float to) const {
 
 sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer, double timeMs, const SkRect& area, const SkRect& seen,
                                           const SkRect& drawn, const SkMatrix& placed, sk_sp<SkImageFilter> content,
-                                          sk_sp<SkImageFilter> below, int before, int from) const {
+                                          sk_sp<SkImageFilter> below, int before, int from, const SkRect* window) const {
     const float t = layer.localTime(timeMs), seconds = (float)((layer.steppedMs(timeMs) - layer.startTime) / 1000.0);
     const float reach = std::max({(float)scene.width, (float)scene.height, seen.width(), seen.height()});
     const SkRect bounds = seen.makeOffset(-area.left(), -area.top()).makeOutset(before >= 0 ? reach : 0, before >= 0 ? reach : 0);
+    int lastWrap = -1;
+    for (size_t k = 0; window && k < layer.effects.size(); k++) {
+        if (!layer.effects[k].hidden && WrapsLayer(layer.effects[k].id)) lastWrap = (int)k;
+    }
+    const float wrapReach = window ? std::max({reach, window->right() - bounds.left(), bounds.right() - window->left(), window->bottom() - bounds.top(),
+                                               bounds.bottom() - window->top()}) : reach;
     std::optional<SkRect> shape;
     size_t at = 0, shapeAt = 0;
     const auto own = [&]() -> const SkRect& {
@@ -1143,13 +1169,13 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
                 names.push_back("below");
                 inputs.push_back(below ? below : SkImageFilters::Empty());
             }
-            const float radius = d->pointwise ? 0.0f : reach;
+            const float radius = d->pointwise ? 0.0f : (int)k <= lastWrap ? wrapReach : reach;
             f = inputs.size() == 1 ? SkImageFilters::RuntimeShader(b, radius, "image", f)
                                    : SkImageFilters::RuntimeShader(b, radius, names.data(), inputs.data(), (int)inputs.size());
         } else {
             continue;
         }
-        f = SkImageFilters::Crop(bounds, f);
+        f = SkImageFilters::Crop((int)k < lastWrap ? *window : bounds, f);
         any = true;
     }
     return any ? f->makeWithLocalMatrix(SkMatrix::Translate(area.left(), area.top())) : nullptr;
@@ -1164,15 +1190,15 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
     const float t = layer.localTime(timeMs);
     const SkRect at = area.isEmpty() ? bounds : area;
     const SkRect local = bounds.makeOffset(-at.left(), -at.top());
-    auto record = [&](const std::function<void(SkCanvas*)>& draw, SkRect* bounded = nullptr, float outset = 0) {
+    auto record = [&](const std::function<void(SkCanvas*)>& draw, SkRect* bounded = nullptr, float outset = 0, const SkRect* cull = nullptr) {
         SkPictureRecorder recorder;
         SkRTreeFactory tight;
-        SkCanvas* c = recorder.beginRecording(local.makeOutset(outset, outset), &tight);
+        SkCanvas* c = recorder.beginRecording(cull ? *cull : local.makeOutset(outset, outset), &tight);
         c->translate(-at.left(), -at.top());
         draw(c);
         sk_sp<SkPicture> picture = recorder.finishRecordingAsPicture();
-        const SkRect drawn = picture->cullRect().makeOutset(2, 2);
-        if (bounded) *bounded = drawn.makeOffset(at.left(), at.top());
+        const SkRect drawn = picture->cullRect().isEmpty() ? SkRect::MakeEmpty() : picture->cullRect().makeOutset(2, 2);
+        if (bounded) *bounded = drawn.isEmpty() ? SkRect::MakeEmpty() : drawn.makeOffset(at.left(), at.top());
         return SkImageFilters::Picture(std::move(picture), drawn);
     };
     if (lift < 0 && std::any_of(layer.effects.begin(), layer.effects.end(), [](const LayerEffect& e) { return !e.hidden && pieces3d::IsEffect(e.id); })) {
@@ -1255,8 +1281,11 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
     }
     const bool seesBehind = lift < 0 && behind(layer), bent = lift < 0 && Bent(layer, t, timeMs);
     const float margin = bent ? std::max({(float)scene.width, (float)scene.height, bounds.width(), bounds.height()}) : 0;
+    const bool capture = !bent && lift < 0 && std::any_of(layer.effects.begin(), layer.effects.end(), [](const LayerEffect& e) { return !e.hidden && WrapsLayer(e.id); });
+    const SkRect window = capture ? Budgeted(SkRect::MakeWH(at.width(), at.height()), local, canvas->getTotalMatrix(), kWrapPixels) : SkRect::MakeEmpty();
     SkRect drawn = SkRect::MakeEmpty();
-    sk_sp<SkImageFilter> content = seesBehind ? record(source, &drawn, margin) : nullptr;
+    const float around = bent ? margin : reaches(layer) ? std::max(bounds.width(), bounds.height()) / 4 : 0;
+    sk_sp<SkImageFilter> content = seesBehind ? record(source, &drawn, around, window.isEmpty() ? nullptr : &window) : nullptr;
     sk_sp<SkImageFilter> under = below && needs(layer, &Definition::below) ? record(below) : nullptr;
     const LayerEffect* adjustment = lift >= 0 ? &layer.effects[lift] : nullptr;
     const Definition* adjustmentType = adjustment ? find(adjustment->id) : nullptr;
@@ -1374,11 +1403,10 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
         }
     }
     SkRect inside = local, layerBounds = bounds;
-    const bool wraps = lift < 0 && std::any_of(layer.effects.begin(), layer.effects.end(), [](const LayerEffect& e) { return !e.hidden && WrapsLayer(e.id); });
-    if (wraps && !bent) {
-        SkRect measured = drawn;
-        if (!seesBehind) record(source, &measured, std::min(std::max({(float)scene.width, (float)scene.height, bounds.width(), bounds.height(), at.width(), at.height()}), 4096.0f));
-        layerBounds.join(measured);
+    const sk_sp<SkImageFilter> captured = capture && !seesBehind && !window.isEmpty() ? record(source, nullptr, 0, &window) : nullptr;
+    if (!capture && !bent && !seesBehind && lift < 0 && reaches(layer)) {
+        SkRect wanted = at.makeOutset(2, 2);
+        if (wanted.intersect(bounds.makeOutset(bounds.width() / 4, bounds.height() / 4))) layerBounds.join(wanted);
     }
     if (bent) {
         SkRect measured = drawn;
@@ -1387,7 +1415,8 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
         inside = measured.makeOffset(-at.left(), -at.top()).makeOutset(pad, pad);
         layerBounds.join(inside.makeOffset(at.left(), at.top()));
     }
-    sk_sp<SkImageFilter> filter = this->chain(scene, layer, timeMs, at, layerBounds, inside, placed, std::move(content), std::move(under));
+    sk_sp<SkImageFilter> filter = this->chain(scene, layer, timeMs, at, layerBounds, inside, placed, std::move(content), std::move(under), -1, -1,
+                                              capture && !window.isEmpty() ? &window : nullptr);
     if (!filter && lift < 0) return false;
     if (seesBehind) {
         float reach = 0;
@@ -1416,10 +1445,11 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
         return true;
     }
     SkPaint paint;
-    paint.setImageFilter(std::move(filter));
+    paint.setImageFilter(captured ? SkImageFilters::Compose(std::move(filter), captured->makeWithLocalMatrix(SkMatrix::Translate(at.left(), at.top())))
+                                  : std::move(filter));
     if (lift < 0) {
         canvas->saveLayer(&layerBounds, &paint);
-        source(canvas);
+        if (!captured) source(canvas);
         canvas->restore();
         return true;
     }

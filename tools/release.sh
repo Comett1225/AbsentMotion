@@ -10,7 +10,18 @@ for arg in "$@"; do
     esac
 done
 
+SAVED=""
+restore() {
+    status=$?
+    if [ -n "$SAVED" ]; then
+        if [ "$status" -ne 0 ]; then cp "$SAVED" version.properties; echo "release failed: version.properties is back to its old value" >&2; fi
+        rm -f "$SAVED"
+    fi
+}
+trap restore EXIT
 if [ -n "$BUMP" ]; then
+    SAVED="$(mktemp)"
+    cp version.properties "$SAVED"
     python3 - "$BUMP" <<'BUMP'
 import re, sys
 from pathlib import Path

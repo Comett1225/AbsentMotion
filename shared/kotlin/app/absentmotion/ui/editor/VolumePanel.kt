@@ -70,11 +70,12 @@ private val BarShape = RoundedCornerShape(4.dp)
 internal fun VolumePanel(state: EditorState, modifier: Modifier = Modifier) {
     val layer = state.selected ?: return
     DisposableEffect(Unit) {
-        onDispose { state.volumeOpen = false; state.easingOpen = false; state.keyTarget = null }
+        onDispose { if (!state.effectBrowserOpen) state.volumeOpen = false; state.easingOpen = false; state.keyTarget = null }
     }
-    var effects by remember { mutableStateOf(state.audioFxFocus != null) }
+    val direct = remember { state.audioFxFocus != null }
+    var effects by remember { mutableStateOf(direct) }
     Swap(effects, modifier, rise = 0.dp) {
-        if (effects) AudioEffectsPanel(state, Modifier.fillMaxSize()) { effects = false }
+        if (effects) AudioEffectsPanel(state, Modifier.fillMaxSize()) { if (direct) state.volumeOpen = false else effects = false }
         else VolumeMain(state, layer, Modifier.fillMaxSize()) { state.easingOpen = false; effects = true }
     }
 }

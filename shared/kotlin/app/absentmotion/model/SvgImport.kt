@@ -17,7 +17,7 @@ import kotlin.math.tan
 class SvgImport(val layer: Layer?, val skipped: List<UiText>, val shapes: Int)
 
 fun importSvg(text: String, title: String, host: Scene, startTime: Int, endTime: Int): SvgImport {
-    val root = XmlNode.parse(text, MaxSvgNodes)
+    val root = XmlNode.parse(plainSvgText(text), MaxSvgNodes)
     require(root.local == "svg") { AppText.get(R.string.svg_err_invalid) }
     val reader = SvgReader(root)
     val items = reader.read()
@@ -32,6 +32,20 @@ fun importSvg(text: String, title: String, host: Scene, startTime: Int, endTime:
     }
     val node = top?.let { writer.node(it, startTime, endTime) }
     return SvgImport(node?.let(::Layer), reader.skipped.toList(), reader.shapeCount)
+}
+
+private val EntityDecl = Regex("<!ENTITY\\s+([^\\s%]+)\\s+(?:\"([^\"]*)\"|'([^']*)')\\s*>")
+private val DoctypeDecl = Regex("<!DOCTYPE[^\\[>]*(?:\\[(.*?)]\\s*)?>", RegexOption.DOT_MATCHES_ALL)
+private val EntityRef = Regex("&([A-Za-z_][\\w.-]*);")
+private val PredefinedEntities = setOf("amp", "lt", "gt", "quot", "apos")
+
+internal fun plainSvgText(text: String): String {
+    val clean = text.removePrefix("\uFEFF").trimStart()
+    val doctype = DoctypeDecl.find(clean) ?: return clean
+    val values = EntityDecl.findAll(doctype.groupValues[1]).associate { it.groupValues[1] to it.groupValues[2].ifEmpty { it.groupValues[3] }.take(1000) }
+    return EntityRef.replace(clean.removeRange(doctype.range)) { ref ->
+        if (ref.groupValues[1] in PredefinedEntities) ref.value else (values[ref.groupValues[1]] ?: "").replace(EntityRef, "")
+    }
 }
 
 private val XmlNode.local: String get() = name.substringAfter(':')

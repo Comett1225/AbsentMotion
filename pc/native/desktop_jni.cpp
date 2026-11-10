@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <atomic>
 #include <clocale>
+#include <cmath>
 #include <cstdlib>
 #include <map>
 #include <string>
@@ -41,6 +42,7 @@ struct Desktop {
     am::Scene scene;
     am::EffectRuntime runtime;
     std::map<std::string, sk_sp<SkImage>> pictures;
+    std::map<std::string, sk_sp<SkImage>> masks;
     std::map<std::pair<std::string, int64_t>, sk_sp<SkImage>> layerPictures;
     std::map<std::pair<std::string, int64_t>, DesktopMosh> mosh;
     std::unique_ptr<DesktopGpu> gpu;
@@ -48,7 +50,13 @@ struct Desktop {
     bool accurateBlur = true;
     std::vector<uint8_t> frameBytes;
     Desktop() : gpu(std::getenv("AM_SOFTWARE_RENDER") ? nullptr : CreateDesktopGpu()) { DesktopGpuState = gpu && gpu->context() ? 1 : 0; }
-    ~Desktop() { mosh.clear(); layerPictures.clear(); pictures.clear(); }
+    ~Desktop() { mosh.clear(); layerPictures.clear(); masks.clear(); pictures.clear(); }
+    am::MediaPictures maskLookup() {
+        return [this](const std::string& uri, int64_t) -> sk_sp<SkImage> {
+            auto it = masks.find(uri);
+            return it == masks.end() ? nullptr : it->second;
+        };
+    }
     am::MediaPictures media() {
         return [this](const std::string& uri, int64_t layer) -> sk_sp<SkImage> {
             auto found = layerPictures.find({uri, layer});
@@ -83,6 +91,9 @@ struct Desktop {
         if (!s) return false;
         s->getCanvas()->clear(SK_ColorTRANSPARENT);
         paint(s->getCanvas());
+        void* probe = std::malloc((size_t)width * height * 4);
+        if (!probe) return false;
+        std::free(probe);
         rgba->resize((size_t)width * height * 4);
         return s->readPixels(premultiplied ? info : info.makeAlphaType(kUnpremul_SkAlphaType), rgba->data(), (size_t)width * 4, 0, 0);
     }
@@ -90,12 +101,14 @@ struct Desktop {
 
 static jbyteArray bytes(JNIEnv* e, const std::vector<uint8_t>& v) {
     auto r = e->NewByteArray((jsize)v.size());
+    if (!r) return nullptr;
     e->SetByteArrayRegion(r, 0, (jsize)v.size(), (const jbyte*)v.data());
     return r;
 }
 
 static jfloatArray floats(JNIEnv* e, const float* v, int n) {
     auto r = e->NewFloatArray(n);
+    if (!r) return nullptr;
     e->SetFloatArrayRegion(r, 0, n, v);
     return r;
 }
@@ -154,10 +167,23 @@ JNIEXPORT jstring JNICALL JNI(setScene)(JNIEnv* e, jobject, jlong h, jstring xml
     return nullptr;
 }
 JNIEXPORT jboolean JNICALL JNI(setPicture)(JNIEnv* e, jobject, jlong h, jstring uri, jstring path) {
-    auto data = SkData::MakeFromFileName(str(e, path).c_str());
+    SkFILEStream stream(str(e, path).c_str());
+    auto data = stream.isValid() ? SkData::MakeFromStream(&stream, stream.getLength()) : nullptr;
     auto image = data ? SkImages::DeferredFromEncodedData(data) : nullptr;
     if (!image) return false;
-    ptr(h)->pictures[str(e, uri)] = image;
+    auto* d = ptr(h);
+    const auto key = str(e, uri);
+    d->masks.erase(key);
+    if (!image->isOpaque() && image->width() > 0 && image->height() > 0) {
+        const float scale = std::min(1.0f, 256.0f / std::max(image->width(), image->height()));
+        auto surface = SkSurfaces::Raster(SkImageInfo::MakeA8(std::max(1, (int)std::lround(image->width() * scale)), std::max(1, (int)std::lround(image->height() * scale))));
+        if (surface) {
+            surface->getCanvas()->clear(SK_ColorTRANSPARENT);
+            surface->getCanvas()->drawImageRect(image, SkRect::MakeWH((float)surface->width(), (float)surface->height()), SkSamplingOptions(SkFilterMode::kLinear));
+            if (auto mask = surface->makeImageSnapshot()) d->masks[key] = std::move(mask);
+        }
+    }
+    d->pictures[key] = image;
     return true;
 }
 JNIEXPORT jboolean JNICALL JNI(setFrame)(JNIEnv* e, jobject, jlong h, jstring uri, jint w, jint height, jbyteArray bytes) {
@@ -165,6 +191,7 @@ JNIEXPORT jboolean JNICALL JNI(setFrame)(JNIEnv* e, jobject, jlong h, jstring ur
     auto data = SkData::MakeUninitialized((size_t)w * height * 4);
     e->GetByteArrayRegion(bytes, 0, e->GetArrayLength(bytes), (jbyte*)data->writable_data());
     auto info = SkImageInfo::Make(w, height, kRGBA_8888_SkColorType, kUnpremul_SkAlphaType, SkColorSpace::MakeSRGB());
+    ptr(h)->masks.erase(str(e, uri));
     ptr(h)->pictures[str(e, uri)] = SkImages::RasterFromData(info, data, (size_t)w * 4);
     return true;
 }
@@ -181,6 +208,7 @@ JNIEXPORT void JNICALL JNI(dropVideo)(JNIEnv* e, jobject, jlong h, jstring uri) 
     const auto key = str(e, uri);
     std::erase_if(d->mosh, [&](const auto& item) { return item.first.first == key; });
     std::erase_if(d->layerPictures, [&](const auto& item) { return item.first.first == key; });
+    d->masks.erase(key);
     d->pictures.erase(key);
 }
 JNIEXPORT jboolean JNICALL JNI(setLayerFrame)(JNIEnv* e, jobject, jlong h, jstring uri, jlong layer, jint w, jint height, jbyteArray data) {
@@ -469,7 +497,7 @@ JNIEXPORT jlong JNICALL JNI(hitTest)(JNIEnv*, jobject, jlong h, jfloat x, jfloat
     Desktop* d = ptr(h);
     const am::SceneScope scope(d->scene);
     am::SetCameraView(d->cameraView);
-    return am::TopLayerAt(d->scene, t, x, y, d->media());
+    return am::TopLayerAt(d->scene, t, x, y, d->maskLookup());
 }
 JNIEXPORT jfloatArray JNICALL JNI(layerQuad)(JNIEnv* e, jobject, jlong h, jlong id, jdouble t) {
     Desktop* d = ptr(h);
@@ -482,6 +510,7 @@ JNIEXPORT jfloatArray JNICALL JNI(layerQuad)(JNIEnv* e, jobject, jlong h, jlong 
     float values[8];
     for (int i = 0; i < 4; ++i) { values[2*i] = p[i].x(); values[2*i+1] = p[i].y(); }
     auto result = e->NewFloatArray(8);
+    if (!result) return nullptr;
     e->SetFloatArrayRegion(result, 0, 8, values);
     return result;
 }
@@ -494,6 +523,7 @@ JNIEXPORT jfloat JNICALL JNI(ease)(JNIEnv* e, jobject, jstring easing, jfloat u)
 JNIEXPORT jfloatArray JNICALL JNI(blipTimes)(JNIEnv* e, jobject, jstring text, jfloat speed, jfloat pause, jint every) {
     auto times = am::textanim::BlipTimes(str(e, text), speed, pause, every);
     auto result = e->NewFloatArray((jsize)times.size());
+    if (!result) return nullptr;
     e->SetFloatArrayRegion(result, 0, (jsize)times.size(), times.data());
     return result;
 }

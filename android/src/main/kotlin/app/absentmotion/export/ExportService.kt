@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.os.PowerManager
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
@@ -26,6 +27,7 @@ object ExportRun {
     @Volatile internal var outcome: Boolean? = null
     @Volatile private var stop: (() -> Unit)? = null
     @Volatile private var stopped = false
+    @Volatile internal var serviceGone = false
 
     fun begin(context: Context, @StringRes title: Int, stop: () -> Unit) {
         this.title = title
@@ -34,6 +36,21 @@ object ExportRun {
         outcome = null
         stopped = false
         running = true
+        serviceGone = false
+        try {
+            ContextCompat.startForegroundService(context, Intent(context, ExportService::class.java))
+        } catch (e: Exception) {
+            android.util.Log.w("AMExport", "the export runs without its notification", e)
+            if (Build.VERSION.SDK_INT >= 31 && e is android.app.ForegroundServiceStartNotAllowedException) {
+                stop()
+                end(null)
+            }
+        }
+    }
+
+    fun resumeService(context: Context) {
+        if (!running || !serviceGone) return
+        serviceGone = false
         try {
             ContextCompat.startForegroundService(context, Intent(context, ExportService::class.java))
         } catch (e: Exception) {
@@ -45,11 +62,27 @@ object ExportRun {
         outcome = done ?: if (stopped || visible) null else false
         stop = null
         running = false
+        ExportEngine.ended()
     }
 
     internal fun cancel() {
         stopped = true
         stop?.invoke()
+    }
+}
+
+object ExportEngine {
+    private var orphan: app.absentmotion.engine.EngineThread? = null
+
+    @Synchronized fun release(engine: app.absentmotion.engine.EngineThread) {
+        if (!ExportRun.running) return engine.close()
+        if (orphan !== engine) orphan?.close()
+        orphan = engine
+    }
+
+    @Synchronized internal fun ended() {
+        orphan?.close()
+        orphan = null
     }
 }
 
@@ -75,6 +108,7 @@ class ExportService : Service() {
     private val handler = Handler(Looper.getMainLooper())
     private val tick = Runnable { update() }
     private var shown = -1
+    private var lock: PowerManager.WakeLock? = null
 
     override fun attachBaseContext(newBase: Context) = super.attachBaseContext(newBase.inAppLanguage())
 
@@ -99,6 +133,9 @@ class ExportService : Service() {
             stopSelf()
             return START_NOT_STICKY
         }
+        if (lock == null) lock = runCatching {
+            getSystemService(PowerManager::class.java).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "absentmotion:export").apply { setReferenceCounted(false); acquire(WakeMs) }
+        }.getOrNull()
         handler.removeCallbacks(tick)
         handler.postDelayed(tick, TickMs)
         return START_NOT_STICKY
@@ -116,7 +153,13 @@ class ExportService : Service() {
         handler.postDelayed(tick, TickMs)
     }
 
+    private fun unlock() {
+        lock?.takeIf { it.isHeld }?.release()
+        lock = null
+    }
+
     private fun finish() {
+        unlock()
         val outcome = ExportRun.outcome
         if (outcome == null || ExportRun.visible) {
             ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
@@ -157,16 +200,24 @@ class ExportService : Service() {
     }
 
     override fun onTimeout(startId: Int, fgsType: Int) {
+        handler.removeCallbacks(tick)
+        if (ExportRun.running && ExportRun.visible) {
+            ExportRun.serviceGone = true
+            unlock()
+            ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
+            stopSelf()
+            return
+        }
         if (ExportRun.running) {
             ExportRun.cancel()
             ExportRun.end(false)
         }
-        handler.removeCallbacks(tick)
         finish()
     }
 
     override fun onDestroy() {
         handler.removeCallbacks(tick)
+        unlock()
         super.onDestroy()
     }
 
@@ -175,6 +226,7 @@ class ExportService : Service() {
         const val NotificationId = 7101
         const val ActionCancel = "app.absentmotion.export.CANCEL"
         const val TickMs = 500L
+        const val WakeMs = 6L * 60 * 60 * 1000
 
         fun serviceType(): Int =
             if (Build.VERSION.SDK_INT >= 35) ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROCESSING else ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC

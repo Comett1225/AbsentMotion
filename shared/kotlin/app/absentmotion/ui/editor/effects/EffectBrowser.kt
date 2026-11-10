@@ -301,7 +301,7 @@ fun EffectBrowser(state: EditorState) {
             val audioGrid = rememberLazyGridState()
             LazyVerticalGrid(if (PlatformFeatures.desktop) GridCells.Adaptive(120.dp) else GridCells.Fixed(3), Modifier.fillMaxSize().then(slide).deskScrollbar(audioGrid), audioGrid, contentPadding = PaddingValues(if (PlatformFeatures.desktop) 16.dp else 10.dp)) {
                 if (category == "audio") {
-                    item(key = "voice-category") { AudioTile(voiceName, 2, true) { fromAudio = true; category = "voice" } }
+                    item(key = "voice-category", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) { AudioFolderTile(voiceName, VoiceOrder.count { it != FxKind.Voice } + VoicePresets.size) { fromAudio = true; category = "voice" } }
                     itemsIndexed(AudioOrder) { i, kind ->
                         AudioTile(stringResource(kind.label), i, effects.fits(kind)) { addAudio(kind) }
                     }

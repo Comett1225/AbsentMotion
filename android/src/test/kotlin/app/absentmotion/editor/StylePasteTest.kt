@@ -27,4 +27,13 @@ class StylePasteTest {
         assertNull(out.node.child("transform")?.child("opacity"))
         assertEquals("12,34,0", out.node.child("transform")?.child("location")?.get("value"))
     }
+
+    @Test fun fillPasteLeavesAudioAndGroupTimingAlone() {
+        val audio = Layer(XmlNode("audio", mapOf("id" to "1", "startTime" to "0", "endTime" to "999", "src" to "file:///a.wav", "inTime" to "200", "speed" to "2"), listOf(XmlNode("gain", mapOf("value" to "0.3")))))
+        val scene = Scene.create("p", 100, 100, 30, 0).add(audio)
+        val out = scene.withPastedStyle(1, 0, shapeLayer(), emptyList(), setOf(StylePart.ColorFill)).layer(1)!!
+        assertEquals("200", out.node["inTime"])
+        assertEquals("2", out.node["speed"])
+        assertNotNull(out.node.child("gain"))
+    }
 }

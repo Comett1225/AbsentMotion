@@ -86,7 +86,7 @@ class Bitmap(val image: BufferedImage) {
 }
 
 object BitmapFactory {
-    class Options { var inBitmap: Bitmap? = null; var inScaled = true; var inDensity = 0; var inTargetDensity = 0; var inPremultiplied = true; var inJustDecodeBounds = false; var inSampleSize = 1; var outWidth = 0; var outHeight = 0; var outMimeType: String? = null; var inPreferredConfig: Bitmap.Config? = null; var inMutable = false }
+    class Options { var inBitmap: Bitmap? = null; var inScaled = true; var inDensity = 0; var inTargetDensity = 0; var inPremultiplied = true; var inJustDecodeBounds = false; var inSampleSize = 1; var outWidth = 0; var outHeight = 0; var outMimeType: String? = null; var inPreferredConfig: Bitmap.Config? = null; var inPreferredColorSpace: ColorSpace? = null; var inMutable = false }
 
     private fun argb(img: BufferedImage): BufferedImage = if (img.type == BufferedImage.TYPE_INT_ARGB) img else BufferedImage(img.width, img.height, BufferedImage.TYPE_INT_ARGB).also { it.createGraphics().apply { drawImage(img, 0, 0, null); dispose() } }
 

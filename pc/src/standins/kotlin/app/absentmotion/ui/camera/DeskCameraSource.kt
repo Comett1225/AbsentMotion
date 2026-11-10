@@ -1,5 +1,6 @@
 package app.absentmotion.ui.camera
 
+import app.absentmotion.R
 import app.absentmotion.desk.DeskOs
 import java.io.File
 
@@ -72,7 +73,7 @@ object DeskCameraSource {
         val video = nodes.filter { node -> runCatching { node.resolve("index").readText().trim() == "0" }.getOrDefault(true) }.map { node ->
             CameraDevice(File(dev, node.name).invariantSeparatorsPath,runCatching { node.resolve("name").readText().trim() }.getOrNull()?.takeIf { it.isNotEmpty() } ?: node.name)
         }
-        return CameraDevices(video, if (video.isEmpty()) emptyList() else listOf(CameraDevice("default", "Default microphone")))
+        return CameraDevices(video, if (video.isEmpty()) emptyList() else listOf(CameraDevice("default", app.absentmotion.i18n.AppText.get(R.string.desk_default_microphone))))
     }
 
     fun listCommand(ffmpeg: String, mac: Boolean, windows: Boolean): List<String>? = when {

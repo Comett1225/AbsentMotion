@@ -308,6 +308,7 @@ float DepthPerPixel(const Layer& layer, double timeMs);
 SkMatrix WorldMatrix(const Scene& scene, const Layer& layer, double timeMs);
 int64_t TopLayerAt(const Scene& scene, double timeMs, float x, float y, const MediaPictures& masks);
 SkRect SelectionBounds(const Layer& layer, double timeMs, const SkMatrix& matrix);
+SkRect DrawnBounds(const Layer& layer, double timeMs, const SkMatrix& matrix);
 bool SelectionQuad(const Scene& scene, const Layer& layer, double timeMs, SkPoint corners[4]);
 bool ContentIconBounds(const Layer& layer, SkRect* bounds);
 void DrawContentIcon(SkCanvas* canvas, const Layer& layer, const MediaPictures& pictures);

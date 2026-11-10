@@ -7,8 +7,9 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-C_LIKE = {".kt", ".kts", ".java", ".cpp", ".cc", ".c", ".h", ".hpp", ".gradle", ".js", ".css"}
-HASH = {".sh", ".yml"}
+C_LIKE = {".kt", ".kts", ".java", ".cpp", ".cc", ".c", ".mm", ".h", ".hpp", ".gradle", ".js", ".css"}
+HASH = {".sh", ".yml", ".ps1", ".cmake", ".gn", ".pro"}
+HASH_NAMES = ("gradlew", "CMakeLists.txt", "Dockerfile")
 SKIP_DIRS = ("third_party/", "gradlew", "gradle/wrapper/", "shared/assets/licenses.txt")
 
 
@@ -113,8 +114,10 @@ def main():
             lines = c_comments(text)
         elif suffix == ".py":
             lines = python_comments(text)
-        elif suffix in HASH or path.name in ("gradlew",):
+        elif suffix in HASH or path.name in HASH_NAMES:
             lines = shell_comments(text)
+            if suffix == ".ps1":
+                lines += [number for number, line in enumerate(text.splitlines(), 1) if "<#" in line]
         elif suffix in (".xml", ".html"):
             lines = xml_comments(text)
         elif suffix == ".json" and "assets/effects" in name:

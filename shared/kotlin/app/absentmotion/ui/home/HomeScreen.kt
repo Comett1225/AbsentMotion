@@ -59,6 +59,7 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -169,8 +170,9 @@ fun HomeScreen(
     var projects by remember { mutableStateOf<List<ProjectInfo>>(emptyList()) }
     var loaded by remember { mutableStateOf(false) }
     var version by remember { mutableIntStateOf(0) }
-    var tab by rememberSaveable { mutableIntStateOf(0) }
-    var page by rememberSaveable { mutableIntStateOf(0) }
+    var tab by rememberSaveable { mutableIntStateOf(lastTab) }
+    var page by rememberSaveable { mutableIntStateOf(lastPage) }
+    SideEffect { lastTab = tab; lastPage = page }
     var creating by remember { mutableStateOf(false) }
     var opening by remember { mutableIntStateOf(0) }
     var initialElement by remember { mutableStateOf(false) }
@@ -193,7 +195,7 @@ fun HomeScreen(
     LaunchedEffect(imported) {
         if (imported.isEmpty()) return@LaunchedEffect
         tab = if (imported.all { it.element }) 1 else 0
-        page = if (imported.all { it.template }) 1 else 0
+        if (page != 2) page = if (imported.all { it.template }) 1 else 0
         version++
         if (toReport.isEmpty()) onImportShown()
     }
@@ -221,7 +223,7 @@ fun HomeScreen(
                             version++
                         } finally { duplicating = false } }
                     } },
-                    onDelete = { id -> scope.launch { withContext(Dispatchers.IO) { store.delete(id, context.getExternalFilesDir(null)?.resolve("ai")) }; version++ } },
+                    onDelete = { id -> projects = projects.filter { it.id != id }; scope.launch { withContext(Dispatchers.IO) { store.delete(id, context.getExternalFilesDir(null)?.resolve("ai")) }; version++ } },
                     onHistory = onHistory,
                     onCollect = onCollect,
                     wide = wide,
@@ -240,6 +242,9 @@ fun HomeScreen(
         }
     }
 }
+
+private var lastTab = 0
+private var lastPage = 0
 
 internal fun wideHeaderFits(widthDp: Int, fontScale: Float): Boolean = widthDp >= 380 + 340 * fontScale.coerceAtLeast(1f)
 
@@ -335,7 +340,7 @@ private fun ProjectsPane(
                         UploadCard(onUpload)
                         Spacer(Modifier.height(24.dp))
                     }
-                    itemsIndexed(rows, key = { _, r -> if (r is ListRow.Card) r.info.id else "date-${(r as ListRow.Date).text}" }) { i, row ->
+                    itemsIndexed(rows, key = { _, r -> if (r is ListRow.Card) "p-" + r.info.id else "date-${(r as ListRow.Date).text}" }) { i, row ->
                         when (row) {
                             is ListRow.Date -> DateLabel(row.text, first = i == 0)
                             is ListRow.Card -> card(row.info, i, Modifier.animateItem(fadeInSpec = null, placementSpec = Motion.enter(), fadeOutSpec = Motion.exit()))

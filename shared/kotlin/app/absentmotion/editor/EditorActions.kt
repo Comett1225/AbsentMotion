@@ -98,6 +98,7 @@ fun EditorState.clearSelection() {
 fun EditorState.deleteSelected() {
     val id = selectedId ?: return
     edit { it.unparentChildrenOf(setOf(id), sampleMs).remove(id) }
+    deselectLayer()
 }
 
 fun EditorState.duplicateSelected() {
@@ -139,7 +140,7 @@ fun EditorState.split() {
     val next = scene.withSplits(chosenLayers.map { it.id }, frame, sampleMs) ?: return
     edit { next }
     MultiSelect.clear()
-    selectedId = null
+    deselectLayer()
 }
 
 internal fun Scene.withSplits(ids: List<Long>, frame: Int, sampleMs: Int): Scene? {
@@ -319,7 +320,7 @@ internal fun Scene.layersToCopy(ids: Set<Long>): List<Layer> {
     val outsideParents = layers.filter { it.id in ids }.mapNotNull { it.node["parent"]?.toLongOrNull() }.filter { it !in ids }.toSet()
     val list = unparentChildrenOf(outsideParents).layers
     return list.indices.filter { list[it].id in ids }.map { i ->
-        val layer = list[i]
+        val layer = pinnedPath(list[i])
         val base = (i - 1 downTo 0).firstOrNull { !list.isMask(it) }
         if (layer.node["clippingMask"] == "true" && (base == null || list[base].id !in ids)) layer.copy(node = layer.node.with("clippingMask", null)) else layer
     }
@@ -327,7 +328,7 @@ internal fun Scene.layersToCopy(ids: Set<Long>): List<Layer> {
 
 fun EditorState.duplicateChosen() {
     if (!MultiSelect.active) return duplicateSelected()
-    val copies = chosenLayers.zip(copyLayers(chosenLayers, preserveOutsideParents = true))
+    val copies = chosenLayers.zip(copyLayers(chosenLayers.map { scene.pinnedPath(it) }, preserveOutsideParents = true))
         .associate { (source, copy) -> source.id to copy.withLabel(AppText.get(R.string.edit_layer_copy_name, source.label)) }
     if (copies.isEmpty()) return
     edit { it.withCopiesAbove(copies) }

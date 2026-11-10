@@ -35,7 +35,9 @@ import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.sp
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.PointMode
@@ -90,12 +92,11 @@ internal fun weightedDrag(dx: Float, dy: Float, weight: Float): Pt {
 }
 
 @Composable
-internal fun PointOverlay(state: EditorState, mode: PointMode, modifier: Modifier) {
+internal fun PointOverlay(state: EditorState, mode: PointMode, modifier: Modifier, reserveEnd: Dp = 0.dp) {
     var size by remember { mutableStateOf(IntSize.Zero) }
     val scene = state.scene
-    val scale = if (size.width == 0) 1f else min(size.width.toFloat() / scene.width, size.height.toFloat() / scene.height)
-    val dx = (size.width - scene.width * scale) / 2
-    val dy = (size.height - scene.height * scale) / 2
+    val reservePx = with(LocalDensity.current) { reserveEnd.toPx() }
+    val (scale, dx, dy) = previewFrame(size.width + reservePx, size.height.toFloat(), reservePx, scene.width.toFloat(), scene.height.toFloat(), 1f, Offset.Zero)
     SideEffect { mode.previewScale = scale }
     val view by rememberUpdatedState(Triple(scale, dx, dy))
     var pulling by remember { mutableStateOf<Pair<Offset, Offset>?>(null) }

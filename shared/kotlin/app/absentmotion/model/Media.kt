@@ -82,6 +82,10 @@ fun XmlNode.mapMediaUris(change: (String) -> String): XmlNode {
 fun Scene.mediaName(uri: String): String = (media(uri)?.filename?.takeIf { it.isNotEmpty() }
     ?: (runCatching { java.net.URI(uri).path }.getOrNull() ?: uri).substringAfterLast('/').takeIf { it.isNotEmpty() } ?: "media").substringAfterLast('/')
 
-fun Scene.replaceMedia(old: String, with: MediaDeclaration): Scene =
+private fun XmlNode.withoutMarksOf(uri: String): XmlNode =
+    copy(children = children.filterNot { it.name == "ai" && it["result"] == uri }.map { it.withoutMarksOf(uri) })
+
+fun Scene.replaceMedia(old: String, with: MediaDeclaration, dropMarks: Boolean = false): Scene =
     Scene(node.copy(children = node.children.filterNot { it.name == "media" && it["uri"] == old })
+        .let { if (dropMarks) it.withoutMarksOf(old) else it }
         .mapMediaUris { if (it == old) with.uri else it }).withMedia(with)

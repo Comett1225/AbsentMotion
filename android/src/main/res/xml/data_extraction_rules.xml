@@ -4,6 +4,10 @@
         <exclude domain="root" path="cache" />
         <exclude domain="root" path="code_cache" />
         <exclude domain="file" path="models" />
+        <exclude domain="file" path="downloader" />
+        <exclude domain="external" path="compress" />
+        <exclude domain="file" path="absent_bg.abg" />
+        <exclude domain="file" path="absent_bg.abg.stamp" />
         <exclude domain="file" path="fonts/google" />
         <exclude domain="file" path="fonts/builtin" />
         <exclude domain="file" path="fonts/imported" />
@@ -23,6 +27,10 @@
         <exclude domain="root" path="cache" />
         <exclude domain="root" path="code_cache" />
         <exclude domain="file" path="models" />
+        <exclude domain="file" path="downloader" />
+        <exclude domain="external" path="compress" />
+        <exclude domain="file" path="absent_bg.abg" />
+        <exclude domain="file" path="absent_bg.abg.stamp" />
         <exclude domain="file" path="fonts/google" />
         <exclude domain="file" path="crashlogs" />
         <exclude domain="sharedpref" path="crashlogs.xml" />

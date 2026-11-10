@@ -195,7 +195,9 @@ fun ExportMediaPreview(kind: app.absentmotion.export.ExportKind, uris: List<Uri>
 
 fun effectsMessageOnHome() = false
 
-fun exportScope(own: kotlinx.coroutines.CoroutineScope): kotlinx.coroutines.CoroutineScope = own
+private val exportJobs = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.Main)
+
+fun exportScope(own: kotlinx.coroutines.CoroutineScope): kotlinx.coroutines.CoroutineScope = exportJobs
 
 fun exportEngine(engine: app.absentmotion.engine.EngineThread): app.absentmotion.engine.EngineThread = engine
 

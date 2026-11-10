@@ -12,7 +12,9 @@ import kotlin.coroutines.coroutineContext
 
 internal class DeskFrameReader(context: Context, uri: String) : DesktopFrameInput {
     private val file = requireNotNull(Uri.parse(uri).toFile())
-    private val stream = DeskProbe.of(file).streams.first { it.type == "video" }
+    private val probe = DeskProbe.of(file)
+    private val stream = probe.streams.first { it.type == "video" }
+    private val shiftUs = (stream.startUs - probe.startUs).coerceAtLeast(0)
     private val width = stream.width
     private val height = stream.height
     override val timestamps = VideoSources.timestamps(context, uri)
@@ -32,7 +34,7 @@ internal class DeskFrameReader(context: Context, uri: String) : DesktopFrameInpu
         if (wanted.isEmpty()) return 0
         val indices = wanted.map { pts -> timestamps.binarySearch(pts).let { if (it >= 0) it else -it - 1 } }
         if (indices.all { it in timestamps.indices } && indices.zipWithNext().all { (a, b) -> a <= b } && indices.last() - indices.first() <= 96) {
-            val seconds = String.format(Locale.ROOT, "%.6f", (timestamps[indices.first()] - 1).coerceAtLeast(0) / 1_000_000.0)
+            val seconds = String.format(Locale.ROOT, "%.6f", ((timestamps[indices.first()] - 1).coerceAtLeast(0) + shiftUs) / 1_000_000.0)
             val process = ProcessBuilder(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-ss", seconds, "-noautorotate", "-i", file.path, "-map", "0:v:0",
                 "-frames:v", "${indices.last() - indices.first() + 1}", "-fps_mode", "passthrough", "-pix_fmt", "yuv420p", "-f", "rawvideo", "-")
                 .redirectError(ProcessBuilder.Redirect.DISCARD).start()
@@ -64,7 +66,7 @@ internal class DeskFrameReader(context: Context, uri: String) : DesktopFrameInpu
         var count = 0
         for (pts in wanted) {
             coroutineContext.ensureActive()
-            val seconds = String.format(Locale.ROOT, "%.6f", (pts - 1).coerceAtLeast(0) / 1_000_000.0)
+            val seconds = String.format(Locale.ROOT, "%.6f", ((pts - 1).coerceAtLeast(0) + shiftUs) / 1_000_000.0)
             val process = ProcessBuilder(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-ss", seconds, "-noautorotate", "-i", file.path, "-map", "0:v:0",
                 "-frames:v", "1", "-pix_fmt", "yuv420p", "-f", "rawvideo", "-")
                 .redirectError(ProcessBuilder.Redirect.DISCARD).start()

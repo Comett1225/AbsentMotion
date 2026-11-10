@@ -125,7 +125,7 @@ class DeskToolsTest {
         assertEquals("mp3", sound.stream("audio")!!.getString("codec_name"))
         assertEquals(5.0, sound.seconds(), 0.2)
         assertTrue(mp3.file.length() in 60_000..100_000)
-        assertEquals("Music/AbsentMotion", saveToGallery(context, mp3))
+        assertEquals(app.absentmotion.export.MediaStoreExport(context).location("Music/AbsentMotion"), saveToGallery(context, mp3))
         assertTrue(File("build/tools-sound-exports/Music/AbsentMotion", mp3.file.name).length() == mp3.file.length())
         shareCompressed(context, mp3)
         println("SOUND copy=${copy.file.length()} aac=${again.file.length()} mp3=${mp3.file.length()} progress=${seen.size}")

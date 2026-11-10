@@ -60,7 +60,7 @@ fun main(args: Array<String>) {
         }
     }
     val files = DeskOpen.fromArguments(args)
-    if (!DeskOs.mac && DeskInstance.forward(files)) return
+    if (!DeskInstance.claim(files)) return
     DeskOpen.offer(files)
     DeskOpen.listenForFiles()
     DeskInstance.serve { DeskOpen.offer(it); DeskOpen.raise() }

@@ -333,4 +333,14 @@ class UpdateFlowTest {
             file.delete()
         }
     }
+
+    @Test fun aFinishedDownloadWaitsForATapWhenTheScreenIsNotFree() {
+        val held = run(UpdateEvent.Start(release), UpdateEvent.Downloaded, UpdateEvent.Hold)
+        assertEquals(UpdateStep.NotInstalled(release, ready = true), held)
+        assertTrue(needsAttention(held))
+        assertEquals(UpdateStep.Installing(release), reduce(held, UpdateEvent.Install))
+        assertSame(downloading, reduce(downloading, UpdateEvent.Hold))
+        val installing = UpdateStep.Installing(release)
+        assertSame(installing, reduce(installing, UpdateEvent.Hold))
+    }
 }
