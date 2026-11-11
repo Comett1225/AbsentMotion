@@ -34,6 +34,42 @@ void SetModel(const std::string& uri, std::shared_ptr<const Model> model) {
     else Models().erase(uri);
 }
 
+namespace {
+
+SkM44 Spin(const Layer& l, double timeMs) {
+    const float seconds = (float)((l.steppedMs(timeMs) - l.startTime) / 1000);
+    return SkM44::Rotate({0, 1, 0}, -l.value("spin", 0, l.localTime(timeMs), 0) * seconds * kRadians);
+}
+
+SkM44 Body(const Layer& l, const Placement& p, double timeMs) {
+    const float size = l.value("size", 0, l.localTime(timeMs), 200);
+    const float sx = p.scale.fX, sy = p.scale.fY;
+    return p.space * SkM44::Scale(sx, sy, std::sqrt(std::fabs(sx * sy))) * SkM44::Translate(-p.pivot.fX, -p.pivot.fY) * Spin(l, timeMs) *
+           SkM44::Scale(size, size, size);
+}
+
+}
+
+SkRect ModelBounds(const Layer& l, double timeMs) {
+    auto found = Models().find(l.mediaUri);
+    Placement p;
+    if (found == Models().end() || !l.projected || !SeenPlacement(l, timeMs, &p)) return SkRect::MakeEmpty();
+    const Model& m = *found->second;
+    const SkM44 body = Body(l, p, timeMs);
+    float left = INFINITY, top = INFINITY, right = -INFINITY, bottom = -INFINITY;
+    for (size_t v = 0; v + 2 < m.positions.size(); v += 3) {
+        const SkV4 c = body.map(m.positions[v], m.positions[v + 1], m.positions[v + 2], 1);
+        if (!(c.w >= kNear)) continue;
+        const SkPoint at{c.x / c.w, c.y / c.w};
+        if (!at.isFinite()) continue;
+        left = std::min(left, at.fX);
+        top = std::min(top, at.fY);
+        right = std::max(right, at.fX);
+        bottom = std::max(bottom, at.fY);
+    }
+    return left <= right && top <= bottom ? SkRect::MakeLTRB(left - 1, top - 1, right + 1, bottom + 1) : SkRect::MakeEmpty();
+}
+
 void DrawModel(SkCanvas* canvas, const Layer& l, double timeMs, float alpha, const MediaPictures& pictures) {
     auto found = Models().find(l.mediaUri);
     Placement p;
@@ -41,11 +77,9 @@ void DrawModel(SkCanvas* canvas, const Layer& l, double timeMs, float alpha, con
     const Model& m = *found->second;
     const float t = l.localTime(timeMs);
     const float size = l.value("size", 0, t, 200);
-    const float seconds = (float)((l.steppedMs(timeMs) - l.startTime) / 1000);
-    const SkM44 spin = SkM44::Rotate({0, 1, 0}, -l.value("spin", 0, t, 0) * seconds * kRadians);
+    const SkM44 spin = Spin(l, timeMs);
     const float sx = p.scale.fX, sy = p.scale.fY;
-    const SkM44 full = canvas->getLocalToDevice() * p.space * SkM44::Scale(sx, sy, std::sqrt(std::fabs(sx * sy))) *
-                       SkM44::Translate(-p.pivot.fX, -p.pivot.fY) * spin * SkM44::Scale(size, size, size);
+    const SkM44 full = canvas->getLocalToDevice() * Body(l, p, timeMs);
     const SkM44 turn = p.turn * spin;
     const SkM44 worldTurn = SkM44::Rotate({0, 0, 1}, p.rotation * kRadians) * p.tilt * spin;
     const SkM44 worldPlace = SkM44::Rotate({0, 0, 1}, p.rotation * kRadians) * p.tilt * SkM44::Scale(sx, sy, std::sqrt(std::fabs(sx * sy))) *

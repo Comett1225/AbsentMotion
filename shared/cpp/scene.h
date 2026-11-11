@@ -342,6 +342,7 @@ struct Model {
 };
 void SetModel(const std::string& uri, std::shared_ptr<const Model> model);
 void DrawModel(SkCanvas* canvas, const Layer& layer, double timeMs, float alpha, const MediaPictures& pictures);
+SkRect ModelBounds(const Layer& layer, double timeMs);
 struct LayerEffects {
     std::function<bool(const Layer&)> active;
     std::function<bool(const Layer&)> lifted;

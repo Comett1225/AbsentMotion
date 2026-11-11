@@ -48,6 +48,7 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - Block Noise, Block Dissolve, Dissolve, Static, Glitch, Beat Glitch and Datamosh: the block size changes each block in place instead of zooming the whole pattern.
 - Frame Interpolation: thin lines no longer break up into patterns with Optical flow at Medium.
 - Smoothing a Time Remap clip: a trimmed clip keeps the right moments, and a clip played backwards keeps its motion blur.
+- 3D models with effects: Pixelate, Vignette and other effects no longer cut off or darken a turned 3D model.
 - Effects panel: no white flash when it opens.
 - Motion Blur: fast moves blur into one smooth streak that trails behind the layer, and the paused preview shows the real blur.
 

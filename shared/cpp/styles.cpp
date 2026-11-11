@@ -1275,11 +1275,19 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
         DrawOne(canvas, siblings, *under, timeMs, pictures, plain);
     };
     SkRect effectArea = scenePath.getBounds();
+    SkMatrix effectMatrix = m;
     if (effects && l.kind == "embedScene" && gEffects->wraps && gEffects->wraps(l)) {
         const SkRect content = DrawnBounds(l, timeMs, m);
         if (content.isFinite() && !content.isEmpty()) effectArea = content;
     }
-    if (!effects || !gEffects->draw(canvas, *gScene, l, timeMs, effectArea, m, picture, below)) picture(canvas);
+    if (effects && l.kind == "model") {
+        const SkRect body = ModelBounds(l, timeMs);
+        if (body.isFinite() && !body.isEmpty() && !path.getBounds().isEmpty()) {
+            effectArea = body;
+            effectMatrix = SkMatrix::RectToRect(path.getBounds(), body);
+        }
+    }
+    if (!effects || !gEffects->draw(canvas, *gScene, l, timeMs, effectArea, effectMatrix, picture, below)) picture(canvas);
     if (effects && gEffects->lifted(l) && !(gEffects->spills && gEffects->spills(l)) && !scenePath.isEmpty()) {
         SkPaint mask;
         mask.setAntiAlias(true);
@@ -1292,7 +1300,7 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
                 canvas->drawPath(copy.first, mask);
             canvas->restore();
         } else {
-            SkPath outside = Cropped(l, t, path).makeTransform(m);
+            SkPath outside = Cropped(l, t, path).makeTransform(effectMatrix);
             outside.toggleInverseFillType();
             mask.setBlendMode(SkBlendMode::kClear);
             canvas->drawPath(outside, mask);
