@@ -235,4 +235,26 @@ class ClipSmoothTest {
         assertNull(restored.media("smooth.mp4"))
         assertTrue(restored.layer(1)!!.aiMarks.isEmpty())
     }
+
+    private fun remap(vararg seconds: String) = XmlNode("timeRemap", children = seconds.mapIndexed { i, v ->
+        XmlNode("kf", linkedMapOf("t" to "${i.toFloat() / (seconds.size - 1)}", "v" to v)) })
+
+    @Test fun aRemappedClipShowsTheSameMomentsAfterSmoothing() {
+        val layer = clip("1").let { it.copy(node = it.node.with("inTime", "1000").with("endTime", "2000").withChild("timeRemap", remap("3", "0.5"))) }
+        val smoothed = layer.withSmoothed("smooth.mp4", "raw.mp4", "Flow:Medium:Off", media, layer)
+        val restored = smoothed.smoothSource(smoothed.aiMarks.single())
+        for (local in listOf(0.0, 500.0, 2000.0)) {
+            val wanted = app.absentmotion.model.VideoTiming(layer).mediaMs(local)
+            assertEquals(wanted - 1000, app.absentmotion.model.VideoTiming(smoothed).mediaMs(local), 1e-3)
+            assertEquals(wanted, app.absentmotion.model.VideoTiming(restored).mediaMs(local), 1e-3)
+        }
+    }
+
+    @Test fun aReversedRemapKeepsItsMotionBlur() {
+        val forward = clip("1").let { it.copy(node = it.node.with("endTime", "8000").withChild("timeRemap", remap("0", "4"))) }
+        val backward = forward.copy(node = forward.node.withChild("timeRemap", remap("4", "0")))
+        val blur = Smoothing(FrameInterpolation.Flow, blur = MotionBlur.Medium)
+        assertEquals(1f, smoothPlan(forward, media, 30, blur)!!.blurScale, 0.02f)
+        assertEquals(1f, smoothPlan(backward, media, 30, blur)!!.blurScale, 0.02f)
+    }
 }

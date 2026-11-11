@@ -81,7 +81,13 @@ internal fun Layer.shiftedMedia(by: Int): Layer {
             k["t"]?.toDoubleOrNull()?.takeIf { k.name == "kf" && it.isFinite() }?.let { k.with("t", String.format(java.util.Locale.US, "%.6f", it + delta)) } ?: k
         }))
     }
-    return copy(node = if (fill.outTime == Int.MAX_VALUE) moved else moved.with("outTime", "${(fill.outTime.toLong() + by).coerceIn(0L, Int.MAX_VALUE - 1L)}"))
+    val seconds = (inTime - fill.inTime) / 1000.0
+    val remap = moved.child("timeRemap")
+    fun later(value: String?): String? = value?.toDoubleOrNull()?.takeIf { it.isFinite() }?.let { String.format(java.util.Locale.US, "%.6f", it + seconds) }
+    val timed = if (remap == null || seconds == 0.0) moved else moved.withChild("timeRemap", remap.copy(children = remap.children.map { k ->
+        later(k["v"].takeIf { k.name == "kf" })?.let { k.with("v", it) } ?: k
+    }).let { r -> later(r["value"])?.let { r.with("value", it) } ?: r })
+    return copy(node = if (fill.outTime == Int.MAX_VALUE) timed else timed.with("outTime", "${(fill.outTime.toLong() + by).coerceIn(0L, Int.MAX_VALUE - 1L)}"))
 }
 
 fun Layer.withoutAiMark(kind: AiKind): Layer {

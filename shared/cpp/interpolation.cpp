@@ -98,13 +98,37 @@ float4 relax(float2 q, float4 m) {
 half4 main(float2 p) {
 )";
 
-const char* const kWarp = R"(
+const char* const kSharp = R"(
+half4 sharpNAME(float2 x) {
+    float2 c = floor(x - 0.5) + 0.5;
+    float2 f = x - c;
+    float2 w0 = f * (-0.5 + f * (1.0 - 0.5 * f));
+    float2 w1 = 1.0 + f * f * (-2.5 + 1.5 * f);
+    float2 w2 = f * (0.5 + f * (2.0 - 1.5 * f));
+    float2 w3 = f * f * (-0.5 + 0.5 * f);
+    float2 w12 = w1 + w2;
+    float2 m = c + w2 / w12;
+    float2 lo = c - 1.0;
+    float2 hi = c + 2.0;
+    float4 sum = float4(NAME.eval(m)) * w12.x * w12.y
+        + float4(NAME.eval(float2(lo.x, m.y))) * w0.x * w12.y + float4(NAME.eval(float2(hi.x, m.y))) * w3.x * w12.y
+        + float4(NAME.eval(float2(m.x, lo.y))) * w12.x * w0.y + float4(NAME.eval(float2(m.x, hi.y))) * w12.x * w3.y;
+    float4 v = sum / (w12.x * w12.y + (w0.x + w3.x) * w12.y + w12.x * (w0.y + w3.y));
+    float alpha = clamp(v.a, 0.0, 1.0);
+    return half4(half3(clamp(v.rgb, float3(0.0), float3(alpha))), half(alpha));
+}
+)";
+
+const char* const kWarpHead = R"(
 uniform shader a;
 uniform shader b;
 uniform shader flow;
 uniform float t;
 uniform float d;
 uniform float2 size;
+)";
+
+const char* const kWarp = R"(
 float2 fwd(float2 x) { return flow.eval(x / d).rg * d; }
 float2 bwd(float2 x) { return flow.eval(x / d).ba * d; }
 float inside(float2 x) { return step(0, x.x) * step(0, x.y) * step(x.x, size.x) * step(x.y, size.y); }
@@ -131,7 +155,7 @@ half4 main(float2 p) {
     float wa = max(1 - t, 0.01) * ca;
     float wb = max(t, 0.01) * cb;
     if (wa + wb <= 0) { return blend; }
-    half4 warped = (a.eval(pa) * half(wa) + b.eval(pb) * half(wb)) / half(wa + wb);
+    half4 warped = (sharpa(pa) * half(wa) + sharpb(pb) * half(wb)) / half(wa + wb);
     return mix(blend, warped, half(max(ca, cb)));
 }
 )";
@@ -209,6 +233,13 @@ std::string Name(int step, int x, int y) {
     return "v" + std::to_string(step) + "_" + number(x) + "_" + number(y);
 }
 
+std::string Named(std::string source, const std::string& name) {
+    for (size_t at = source.find("NAME"); at != std::string::npos; at = source.find("NAME", at)) source.replace(at, 4, name);
+    return source;
+}
+
+std::string WarpSource() { return std::string(kWarpHead) + Named(kSharp, "a") + Named(kSharp, "b") + kWarp; }
+
 std::string JacobiSource(int steps) {
     std::string s = kJacobiHead;
     for (int step = 0; step <= steps; step++) {
@@ -244,7 +275,7 @@ sk_sp<SkRuntimeEffect> Compile(const std::string& sksl) {
 }
 
 const Effects& Shaders() {
-    static const Effects effects{Compile(kGrey), Compile(kDown), Compile(kDerivatives), Compile(kWarp), Compile(kBlend),
+    static const Effects effects{Compile(kGrey), Compile(kDown), Compile(kDerivatives), Compile(WarpSource()), Compile(kBlend),
                                  {Compile(JacobiSource(kFused[0])), Compile(JacobiSource(kFused[1])), Compile(JacobiSource(kFused[2]))}};
     return effects;
 }

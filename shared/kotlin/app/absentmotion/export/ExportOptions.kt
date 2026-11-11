@@ -155,10 +155,10 @@ data class Smoothing(
     @get:StringRes val label: Int get() = if (method != FrameInterpolation.Off) method.label else R.string.export_motion_blur
 
     fun flowParams(medium: FloatArray): FloatArray = when {
-        method != FrameInterpolation.Flow || level == SmoothLevel.Medium -> medium
-        level == SmoothLevel.High && !Tier.has(Feature.FlowHigh) -> medium
+        method != FrameInterpolation.Flow -> medium
         level == SmoothLevel.Low -> floatArrayOf(8f, 4f, 4f, 1f, 0.15f, 4f)
-        else -> floatArrayOf(2f, 6f, 8f, 2f, 0.15f, 4f)
+        level == SmoothLevel.High && Tier.has(Feature.FlowHigh) -> floatArrayOf(2f, 6f, 8f, 2f, 0.15f, 4f)
+        else -> medium.copyOf().also { it[3] = maxOf(it[3], 2f) }
     }
 }
 

@@ -95,7 +95,10 @@ class VideoTiming(layer: Layer) {
         return (0..400).map { span * it / 400 }.minBy { abs(remapped(it)!! - mediaMs) }
     }
     fun speed(localMs: Double): Float {
-        if (remap != null) return (abs(remapped(localMs + 1)!! - remapped(localMs - 1)!!) / 2).toFloat()
+        if (remap != null) {
+            val at = localMs.coerceIn(1.0, maxOf(1.0, span - 1))
+            return (abs(remapped(at + 1)!! - remapped(at - 1)!!) / 2).toFloat()
+        }
         val item = itemAt(origin) + localMs
         if (item <= points.first().item) return points.first().speed.toFloat()
         if (item >= points.last().item) return points.last().speed.toFloat()

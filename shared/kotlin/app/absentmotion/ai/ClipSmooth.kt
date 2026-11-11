@@ -34,6 +34,7 @@ import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.MediaFill
 import app.absentmotion.model.Scene
 import app.absentmotion.model.VideoTiming
+import app.absentmotion.model.remapped
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.fpsText
 import app.absentmotion.model.mediaLengthMs
@@ -86,6 +87,7 @@ internal fun smoothPlan(layer: Layer, media: MediaDeclaration, projectFps: Int, 
 internal fun Layer.meanSpeed(): Double {
     val timing = VideoTiming(this)
     val length = (endTime - startTime).coerceAtLeast(1)
+    if (remapped) return (0..64).map { timing.speed(length * it / 64.0).toDouble() }.average()
     return (timing.mediaMs(length.toDouble()) - timing.mediaMs(0.0)) / length
 }
 
