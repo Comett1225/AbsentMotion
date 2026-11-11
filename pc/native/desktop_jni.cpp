@@ -13,6 +13,7 @@
 #include "easing.h"
 #include "textanim.h"
 #include "gpu.h"
+#include "trails.h"
 #include "drawing.h"
 #include "text.h"
 #include "preview.h"
@@ -46,6 +47,7 @@ struct Desktop {
     std::map<std::string, sk_sp<SkImage>> masks;
     std::map<std::pair<std::string, int64_t>, sk_sp<SkImage>> layerPictures;
     std::map<std::pair<std::string, int64_t>, DesktopMosh> mosh;
+    am::Trails trails;
     std::unique_ptr<DesktopGpu> gpu;
     bool cameraView = true;
     bool accurateBlur = true;
@@ -53,8 +55,10 @@ struct Desktop {
     Desktop() : gpu(std::getenv("AM_SOFTWARE_RENDER") ? nullptr : CreateDesktopGpu()) {
         DesktopGpuState = gpu && gpu->context() ? 1 : 0;
         if (gpu && gpu->context()) gpu->context()->setResourceCacheLimit(size_t(512) << 20);
+        trails.layerBudget = size_t(128) << 20;
+        trails.budget = size_t(384) << 20;
     }
-    ~Desktop() { mosh.clear(); layerPictures.clear(); masks.clear(); pictures.clear(); }
+    ~Desktop() { trails.clear(); mosh.clear(); layerPictures.clear(); masks.clear(); pictures.clear(); }
     am::MediaPictures maskLookup() {
         return [this](const std::string& uri, int64_t) -> sk_sp<SkImage> {
             auto it = masks.find(uri);
@@ -77,6 +81,7 @@ struct Desktop {
         fx.behind = [this](const am::Layer& l) { return runtime.behind(l); };
         fx.wraps = [this](const am::Layer& l) { return runtime.wraps(l); };
         fx.steady = [this](const am::Layer& l, float a, float b) { return runtime.steady(l, a, b); };
+        fx.past = [this](const std::string& uri, int64_t layer, int copy) { return trails.at(uri, layer, copy); };
         fx.draw = [this](SkCanvas* c, const am::Scene& s, const am::Layer& l, double t, const SkRect& r, const SkMatrix& m, const std::function<void(SkCanvas*)>& src, const std::function<void(SkCanvas*)>& below) {
             return runtime.draw(c, s, l, t, r, m, src, below, [this](int w, int h, const std::function<void(SkCanvas*)>& paint, std::vector<uint8_t>* rgba) {
                 return offscreen(w, h, false, paint, rgba);
@@ -87,6 +92,15 @@ struct Desktop {
     sk_sp<SkSurface> surface(const SkImageInfo& info) {
         auto made = gpu && gpu->context() ? SkSurfaces::RenderTarget(gpu->context(), skgpu::Budgeted::kNo, info) : nullptr;
         return made ? made : SkSurfaces::Raster(info);
+    }
+    am::Trails::Shrink shrink() {
+        return [this](const sk_sp<SkImage>& image, int width, int height) -> sk_sp<SkImage> {
+            auto s = surface(SkImageInfo::Make(width, height, kRGBA_8888_SkColorType, kPremul_SkAlphaType, SkColorSpace::MakeSRGB()));
+            if (!s) return nullptr;
+            s->getCanvas()->clear(SK_ColorTRANSPARENT);
+            s->getCanvas()->drawImageRect(image, SkRect::MakeIWH(width, height), SkSamplingOptions(SkFilterMode::kLinear));
+            return s->makeImageSnapshot();
+        };
     }
     bool offscreen(int width, int height, bool premultiplied, const std::function<void(SkCanvas*)>& paint, std::vector<uint8_t>* rgba) {
         if (width <= 0 || height <= 0) return false;
@@ -249,6 +263,7 @@ JNIEXPORT void JNICALL JNI(dropVideo)(JNIEnv* e, jobject, jlong h, jstring uri) 
     const auto key = str(e, uri);
     std::erase_if(d->mosh, [&](const auto& item) { return item.first.first == key; });
     std::erase_if(d->layerPictures, [&](const auto& item) { return item.first.first == key; });
+    d->trails.dropUri(key);
     d->masks.erase(key);
     d->pictures.erase(key);
 }
@@ -286,6 +301,23 @@ JNIEXPORT jboolean JNICALL JNI(interpolate)(JNIEnv* e, jobject, jlong h, jstring
     if (!image) return false;
     d->layerPictures[{str(e, uri), layer}] = std::move(image);
     return true;
+}
+JNIEXPORT jlongArray JNICALL JNI(videoTrail)(JNIEnv* e, jobject, jlong h, jstring uri, jlong layer, jlong shown, jlongArray tags) {
+    auto* d = ptr(h);
+    const auto key = std::make_pair(str(e, uri), (int64_t)layer);
+    std::vector<int64_t> wanted((size_t)e->GetArrayLength(tags));
+    e->GetLongArrayRegion(tags, 0, (jsize)wanted.size(), reinterpret_cast<jlong*>(wanted.data()));
+    const auto found = d->layerPictures.find(key);
+    const std::vector<int64_t> missing = d->trails.plan(key, shown, wanted, found == d->layerPictures.end() ? nullptr : found->second, d->shrink());
+    jlongArray out = e->NewLongArray((jsize)missing.size());
+    if (out) e->SetLongArrayRegion(out, 0, (jsize)missing.size(), reinterpret_cast<const jlong*>(missing.data()));
+    return out;
+}
+JNIEXPORT jboolean JNICALL JNI(videoTrailKeep)(JNIEnv* e, jobject, jlong h, jstring uri, jlong layer, jlong tag) {
+    auto* d = ptr(h);
+    const auto key = std::make_pair(str(e, uri), (int64_t)layer);
+    const auto found = d->layerPictures.find(key);
+    return found != d->layerPictures.end() && d->trails.keep(key, tag, found->second, d->shrink());
 }
 JNIEXPORT jint JNICALL JNI(moshStart)(JNIEnv* e, jobject, jlong h, jstring uri, jlong layer, jlongArray stamps, jfloatArray values) {
     auto* d = ptr(h);

@@ -27,6 +27,8 @@ object DesktopNative {
         before: ByteArray?, after: ByteArray?, made: ByteArray?, t: Float, mode: Int, blur: Float, parameters: FloatArray): Boolean
     external fun moshStart(handle: Long, uri: String, layerId: Long, stamps: LongArray, params: FloatArray): Int
     external fun moshFrame(handle: Long, uri: String, layerId: Long, step: Int, width: Int, height: Int, rgba: ByteArray): Boolean
+    external fun videoTrail(handle: Long, uri: String, layerId: Long, shown: Long, tags: LongArray): LongArray?
+    external fun videoTrailKeep(handle: Long, uri: String, layerId: Long, tag: Long): Boolean
     external fun render(handle: Long, timeMs: Double, width: Int, height: Int, output: ByteBuffer): Boolean
     external fun hitTest(handle: Long, x: Float, y: Float, timeMs: Double): Long
     external fun layerQuad(handle: Long, id: Long, timeMs: Double): FloatArray?

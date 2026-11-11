@@ -22,7 +22,9 @@ import app.absentmotion.media.Mesh
 import app.absentmotion.model.Scene
 import app.absentmotion.export.Smoothing
 import app.absentmotion.model.VideoTiming
+import app.absentmotion.model.feedbackTrail
 import app.absentmotion.model.fontNames
+import app.absentmotion.model.moshPlan
 import app.absentmotion.model.imageUris
 import app.absentmotion.model.modelUris
 import app.absentmotion.model.layerTracks
@@ -98,6 +100,7 @@ class EngineThread(private val background: Int, private val context: Context? = 
     private var mediaKey: Any? = null
     private val videos = HashMap<String, AutoCloseable>()
     private val mosh = context?.let { DeskMosh(it) }
+    private val trailed = HashSet<Pair<String, Long>>()
     private val loadedModels = HashMap<String, Pair<String, Int>>()
     private var loadedPictures: Set<String> = emptySet()
     private var view: PreviewView? = null
@@ -309,6 +312,8 @@ class EngineThread(private val background: Int, private val context: Context? = 
         var current = true
         engine().clearLayerFrames()
         val late = ArrayList<Triple<String, Long, Pair<NativeVideoSource, Long>>>()
+        val trails = ArrayList<Triple<app.absentmotion.model.LayerTrack, Long, Double>>()
+        val stale = HashSet<Long>()
         for (track in scene.layerTracks()) {
             val layer = track.layer
             val uri = layer.node["fillVideo"] ?: continue
@@ -319,20 +324,47 @@ class EngineThread(private val background: Int, private val context: Context? = 
                 is NativeVideoSource -> {
                     val shown = engine().showVideoLayer(uri, layer.id, source, at, exact, if (exact) 15000 else 0)
                     if (strict) check(shown == 1) { "Video frame unavailable" } else if (shown == 0) { if (exact) current = false else late += Triple(uri, layer.id, source to at) }
+                    if (shown != 1 && exact) stale += layer.id
                 }
                 is VideoSource -> {
                     val frame = source.frame(at / 1000)
                     if (frame != null) engine().setLayerFrame(uri, layer.id, frame.width, frame.height, frame.rgba) else check(!strict) { "Video frame unavailable" }
+                    if (frame == null) stale += layer.id
                 }
             }
             mosh?.apply(track.scene, layer, localTime, engine(), strict)
+            trails += Triple(track, at, mapped.ms)
         }
         val until = System.nanoTime() + LIVE_VIDEO_WAIT_MS * 1_000_000L
         for ((uri, id, pick) in late) {
             val left = ((until - System.nanoTime()) / 1_000_000L).toInt().coerceAtLeast(0)
-            if (engine().showVideoLayer(uri, id, pick.first, pick.second, false, left) == 0) current = false
+            if (engine().showVideoLayer(uri, id, pick.first, pick.second, false, left) == 0) { current = false; stale += id }
         }
+        for ((track, at, localMs) in trails) if (track.layer.id !in stale && !syncTrail(track, at, localMs, exact)) current = false
         return current
+    }
+
+    private fun syncTrail(track: app.absentmotion.model.LayerTrack, at: Long, localMs: Double, exact: Boolean): Boolean {
+        val layer = track.layer
+        val uri = layer.node["fillVideo"] ?: return true
+        val times = layer.feedbackTrail(localMs, track.scene)
+        if (times == null) {
+            if (trailed.remove(uri to layer.id)) engine().videoTrail(uri, layer.id, 0, LongArray(0))
+            return true
+        }
+        trailed += uri to layer.id
+        val timing = VideoTiming(layer)
+        val missing = engine().videoTrail(uri, layer.id, at, LongArray(times.size) { layer.videoTimeUs(times[it], track.scene, timing).coerceAtLeast(0) })
+        if (missing.isEmpty() || (!exact && playing) || layer.moshPlan(localMs, track.scene) != null) return true
+        fun show(us: Long): Boolean = when (val source = videos[uri]) {
+            is NativeVideoSource -> engine().showVideoLayer(uri, layer.id, source, us, true, if (exact) 15000 else 500) == 1
+            is VideoSource -> source.frame(us / 1000)?.let { engine().setLayerFrame(uri, layer.id, it.width, it.height, it.rgba) } == true
+            else -> false
+        }
+        val batch = missing.sorted().let { if (exact) it else it.takeLast(TRAIL_BATCH) }
+        batch.forEach { if (show(it)) engine().videoTrailKeep(uri, layer.id, it) }
+        show(at)
+        return exact || batch.size == missing.size
     }
 
     private fun renderNow() {
@@ -501,3 +533,4 @@ private val instances = AtomicLong()
 
 
 private const val LIVE_VIDEO_WAIT_MS = 12
+private const val TRAIL_BATCH = 6

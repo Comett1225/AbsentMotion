@@ -370,7 +370,7 @@ class EngineThread(private val background: Int, context: Context? = null, privat
 
     fun trimMemory() {
         videos?.trim()
-        handler.post { if (!closed && !capturing) runCatching { engine?.trim() } }
+        handler.post { if (!closed && !capturing) runCatching { engine?.trim(); videos?.refresh() } }
     }
 
     fun releaseVideo(): Job? = videos?.release()
@@ -404,6 +404,16 @@ class EngineThread(private val background: Int, context: Context? = null, privat
                                    standard: Int, range: Int, crop: Rect, accept: () -> Boolean): Boolean = withContext(dispatcher) {
         if (closed || (!exact && capturing) || !accept()) return@withContext false
         engine().moshFrame(uri, layerId, step, buffer, standard, range, crop).also { if (it && last && !exact) renderNow() }
+    }
+
+    internal suspend fun videoTrail(uri: String, layerId: Long, shown: Long, tags: LongArray, exact: Boolean): LongArray = withContext(dispatcher) {
+        if (closed || (!exact && capturing)) LongArray(0) else engine().videoTrail(uri, layerId, shown, tags)
+    }
+
+    internal suspend fun videoTrailFrame(uri: String, buffer: HardwareBuffer, layerId: Long, tag: Long, exact: Boolean,
+                                         standard: Int, range: Int, crop: Rect, accept: () -> Boolean): Boolean = withContext(dispatcher) {
+        if (closed || (!exact && capturing) || !accept()) return@withContext false
+        engine().videoTrailFrame(uri, layerId, tag, buffer, standard, range, crop)
     }
 
     suspend fun maxPictureSize(): Int = withContext(dispatcher) { if (closed) 1 else engine().maxPictureSize }

@@ -23,6 +23,7 @@ import app.absentmotion.model.layerTracks
 import app.absentmotion.model.moshPlan
 import app.absentmotion.model.Scene
 import app.absentmotion.model.exportFrameMs
+import app.absentmotion.model.feedbackTrail
 import app.absentmotion.model.localMs
 import app.absentmotion.model.needs
 import app.absentmotion.model.pairAround
@@ -136,6 +137,8 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
     fun previewShown(scene: Scene, timeMs: Int, playing: Boolean): Boolean =
         scene.videoSamples(timeMs, playing, warm = false).all { installed[it.layer.id]?.uri == it.layer.mediaFill?.uri }
 
+    fun refresh() { latest?.let { requests.trySend(it) } }
+
     fun resumePreview() { if (latest?.let { requests.trySend(it) } == null) suspendPreview() }
 
     fun trim(): Job = scope.launch {
@@ -222,6 +225,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
         private var publishedMix: Pair<SmoothFrame, Smoothing>? = null
         private var publishedMosh: Pair<List<Long>, List<Float>>? = null
         private val held = mutableSetOf<Long>()
+        private var trailing = false
         private var aiSmooth: AiSmooth? = null
         private var aiReader: Pair<String, FrameReader>? = null
         private val aiFrames = HashMap<Long, Pair<IntArray, Pair<Int, Int>>>()
@@ -258,18 +262,47 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
         }
 
         private suspend fun decode(request: Request, sample: VideoSample, exact: Boolean) = decoderLock.withLock {
+            val source = show(request, sample, exact) ?: return@withLock
+            trail(source, request, sample, exact)
+        }
+
+        private fun obsolete(request: Request, exact: Boolean): Boolean = !exact && latest.let { now ->
+            paused || stopped || ((!request.playing || now?.playing != true) && now !== request) ||
+                now.scene != request.scene || visible(now).none { it.layer.id == id }
+        }
+
+        private suspend fun trail(source: VideoDecoder, request: Request, sample: VideoSample, exact: Boolean) {
+            val layer = sample.layer
+            val times = layer.feedbackTrail(sample.timeMs, sample.scene)
+            if (times == null) {
+                if (trailing) { trailing = false; engine.videoTrail(uri, id, 0, LongArray(0), exact) }
+                return
+            }
+            trailing = true
+            val ahead = if (request.playing) (leadMs * (sample.track.timeAt(request.timeMs.toDouble(), false)?.rate ?: 1.0)).toInt() else 0
+            fun stamp(ms: Int) = source.wantedPts(layer.videoTimeUs(ms, sample.scene))
+            val shown = publishedPts ?: stamp(sample.timeMs.toInt())
+            val missing = engine.videoTrail(uri, id, shown, LongArray(times.size) { stamp(times[it] + ahead) }, exact)
+            if (missing.isEmpty() || (!exact && request.playing)) return
+            var added = false
+            for (pts in missing.sorted()) {
+                if (obsolete(request, exact)) return
+                val image = source.frame(pts, true) { obsolete(request, exact) } ?: continue
+                if (image.hardwareBuffer!!.use { engine.videoTrailFrame(uri, it, id, pts, exact, source.colorStandard, source.colorRange, image.cropRect) { !obsolete(request, exact) } }) added = true
+            }
+            if (added && !exact && !obsolete(request, exact)) engine.videoFrameReady()
+        }
+
+        private suspend fun show(request: Request, sample: VideoSample, exact: Boolean): VideoDecoder? {
             val layer = sample.layer
             if (stopped) {
                 exportCheck(!exact) { txt(R.string.media_error_video_unavailable, uri) }
-                return@withLock
+                return null
             }
-            if (!exact && System.nanoTime() < retryAt) return@withLock
-            fun obsolete(): Boolean = !exact && latest.let { now ->
-                paused || stopped || ((!request.playing || now?.playing != true) && now !== request) ||
-                    now.scene != request.scene || visible(now).none { it.layer.id == id }
-            }
+            if (!exact && System.nanoTime() < retryAt) return null
+            fun obsolete(): Boolean = obsolete(request, exact)
             fun abandoned(): Boolean = !exact && latest.let { now -> now == null || paused || stopped || visible(now).none { it.layer.id == id } }
-            if (obsolete()) return@withLock
+            if (obsolete()) return null
             if (!exact && proxyRevision != VideoProxies.revision.value) {
                 proxyRevision = VideoProxies.revision.value
                 proxy = VideoProxies.ready(context, uri, version)
@@ -284,14 +317,15 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             }
             val plan = layer.moshPlan(sample.timeMs, sample.scene)
             if (plan != null && moshed(source, sample, plan, exact, ::abandoned)) {
-                if (publishedMosh != null) ready()
-                return@withLock
+                if (publishedMosh == null) return null
+                ready()
+                return source
             }
-            if (exact && request.smoothing.active && mixed(source, request, sample)) return@withLock
+            if (exact && request.smoothing.active && mixed(source, request, sample)) return source
             val ahead = if (request.playing) leadMs * (sample.track.timeAt(request.timeMs.toDouble(), false)?.rate ?: 1.0) else 0.0
             val time = layer.videoTimeUs((sample.timeMs + ahead).toInt(), sample.scene)
             val pts = source.wantedPts(time)
-            if (publishedPts == pts) { ready(); return@withLock }
+            if (publishedPts == pts) { ready(); return source }
             val seeks = source.seeks
             val image = source.frame(time, exact || !request.playing, ::obsolete) ?: (if (exact) source.frame(time, true, ::obsolete) else null) ?: run {
                 if (!exact && !obsolete()) {
@@ -302,10 +336,10 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
                     }
                 }
                 exportCheck(!exact) { txt(R.string.media_error_decode_frame, source.timestamps.frameNumber(pts)) }
-                return@withLock
+                return null
             }
-            if (obsolete()) return@withLock
-            image.hardwareBuffer!!.use { buffer ->
+            if (obsolete()) return null
+            return image.hardwareBuffer!!.use { buffer ->
                 val accepted = engine.setVideoPicture(uri, buffer, id, exact, source.colorStandard, source.colorRange, image.cropRect) { !obsolete() }
                 if (exact) exportCheck(accepted) { txt(R.string.media_error_import_frame, source.timestamps.frameNumber(pts), uri) }
                 if (accepted) {
@@ -318,6 +352,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
                     ready()
                     if (!exact && request.playing && source.seeks == seeks) leadMs = (leadMs * 0.8 + (System.nanoTime() - request.born) / 1e6 * 0.2).coerceIn(0.0, MAX_LEAD_MS)
                 }
+                source.takeIf { accepted }
             }
         }
 

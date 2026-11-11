@@ -1600,7 +1600,15 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
             canvas->saveLayer(&area, &paint);
             canvas->concat(matrices[i - 1]);
             const double at = std::clamp(timeMs - spacing * i, (double)l.startTime, (double)l.endTime);
-            DrawOne(canvas, siblings, l, at, pictures, plain);
+            if (trails && l.fillType == "media" && gEffects && gEffects->past) {
+                const MediaPictures earlier = [&](const std::string& uri, int64_t id) {
+                    sk_sp<SkImage> image = id == l.id && uri == l.mediaUri ? gEffects->past(uri, id, i) : nullptr;
+                    return image ? image : pictures(uri, id);
+                };
+                DrawOne(canvas, siblings, l, at, earlier, plain);
+            } else {
+                DrawOne(canvas, siblings, l, at, pictures, plain);
+            }
             canvas->restore();
             if (gBreak) (*gBreak)();
         }

@@ -181,6 +181,26 @@ JNIEXPORT jboolean JNICALL JNI_FN(nativeMoshFrame)(JNIEnv* env, jclass, jlong en
                                        {left, top, right, bottom});
 }
 
+JNIEXPORT jlongArray JNICALL JNI_FN(nativeVideoTrail)(JNIEnv* env, jclass, jlong engine, jbyteArray uri, jlong layerId, jlong shown,
+                                                      jlongArray tags) {
+    std::string text((size_t)env->GetArrayLength(uri), '\0');
+    env->GetByteArrayRegion(uri, 0, (jsize)text.size(), reinterpret_cast<jbyte*>(text.data()));
+    std::vector<int64_t> wanted((size_t)env->GetArrayLength(tags));
+    env->GetLongArrayRegion(tags, 0, (jsize)wanted.size(), reinterpret_cast<jlong*>(wanted.data()));
+    const std::vector<int64_t> missing = engineOf(engine)->videoTrail(text, layerId, shown, wanted);
+    jlongArray out = env->NewLongArray((jsize)missing.size());
+    if (out) env->SetLongArrayRegion(out, 0, (jsize)missing.size(), reinterpret_cast<const jlong*>(missing.data()));
+    return out;
+}
+
+JNIEXPORT jboolean JNICALL JNI_FN(nativeVideoTrailFrame)(JNIEnv* env, jclass, jlong engine, jbyteArray uri, jlong layerId, jlong tag,
+                                                         jobject hardwareBuffer, jint standard, jint range, jint left, jint top, jint right, jint bottom) {
+    std::string text((size_t)env->GetArrayLength(uri), '\0');
+    env->GetByteArrayRegion(uri, 0, (jsize)text.size(), reinterpret_cast<jbyte*>(text.data()));
+    return engineOf(engine)->videoTrailFrame(text, layerId, tag, AHardwareBuffer_fromHardwareBuffer(env, hardwareBuffer), standard, range,
+                                             {left, top, right, bottom});
+}
+
 JNIEXPORT jint JNICALL JNI_FN(nativeRenderFrame)(JNIEnv*, jclass, jlong engine, jlong target, jdouble timeMs,
                                                  jint background, jlong presentTimeNs) {
     return engineOf(engine)->renderFrame(targetOf(target), timeMs, (uint32_t)background, presentTimeNs);

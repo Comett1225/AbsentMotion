@@ -5,6 +5,7 @@
 #include "drawing.h"
 #include "interpolation.h"
 #include "gl_yuv.h"
+#include "trails.h"
 
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
@@ -210,6 +211,9 @@ public:
     int moshStart(const std::string& uri, int64_t layerId, const std::vector<int64_t>& pts, const MoshParams& params) override;
     bool moshFrame(const std::string& uri, int64_t layerId, int step, AHardwareBuffer* buffer, int colorStandard, int colorRange,
                    const FrameCrop& crop) override;
+    std::vector<int64_t> videoTrail(const std::string& uri, int64_t layerId, int64_t shown, const std::vector<int64_t>& tags) override;
+    bool videoTrailFrame(const std::string& uri, int64_t layerId, int64_t tag, AHardwareBuffer* buffer, int colorStandard, int colorRange,
+                         const FrameCrop& crop) override;
     int renderScene(Target*, double timeMs, float scale, float dx, float dy, uint32_t background,
                     int64_t selectedId, int handles, const PreviewOptions& view) override;
     void setCameraView(bool on) override { fCameraView = on; }
@@ -283,6 +287,7 @@ private:
         fx.upload = [this](const sk_sp<SkImage>& image, bool mipmapped) {
             return fRecorder ? SkImages::TextureFromImage(fRecorder.get(), image.get(), {mipmapped}) : image;
         };
+        fx.past = [this](const std::string& uri, int64_t id, int copy) { return fTrails.at(uri, id, copy); };
         fx.draw = [this](SkCanvas* canvas, const Scene& scene, const Layer& layer, double time, const SkRect& area, const SkMatrix& placed,
                          const std::function<void(SkCanvas*)>& source, const std::function<void(SkCanvas*)>& below) {
             return fEffects.draw(canvas, scene, layer, time, area, placed, source, below,
@@ -358,6 +363,8 @@ private:
         std::map<int, std::pair<sk_sp<SkImage>, sk_sp<SkImage>>> marks;
     };
     std::map<std::pair<std::string, int64_t>, Mosh> fMosh;
+    Trails fTrails;
+    Trails::Shrink shrink();
     std::map<uint64_t, sk_sp<SkSurface>> fBufferSurfaces;
     SkSurface* bufferSurface(AHardwareBuffer* buffer);
     bool fLoggedFrame = false;
@@ -599,6 +606,7 @@ EngineImpl::~EngineImpl() {
     fPictures.clear();
     fVideoFrames.clear();
     fMosh.clear();
+    fTrails.clear();
     while (!fImported.empty()) this->forgetImported(fImported.begin()->first);
     this->syncGpu();
     this->syncPipelines();
@@ -979,7 +987,7 @@ sk_sp<SkImage> EngineImpl::copyFrame(AHardwareBuffer* buffer, bool opaque, int c
 bool EngineImpl::setPicture(const std::string& uri, int64_t layerId, AHardwareBuffer* buffer,
                             const void* pixels, int width, int height, size_t rowBytes, bool opaque, int colorStandard, int colorRange, const FrameCrop& crop) {
     const auto key = std::make_pair(uri, layerId);
-    if (!buffer && !pixels) { fPictures.erase(key); fMasks.erase(key); fVideoFrames.erase(key); fMosh.erase(key); this->forgetImported(key); return true; }
+    if (!buffer && !pixels) { fPictures.erase(key); fMasks.erase(key); fVideoFrames.erase(key); fMosh.erase(key); fTrails.drop(key); this->forgetImported(key); return true; }
     sk_sp<SkImage> image, mask;
     if (buffer) {
         image = this->copyFrame(buffer, opaque, colorStandard, colorRange, crop, &key);
@@ -1010,6 +1018,32 @@ bool EngineImpl::setVideoFrame(const std::string& uri, int64_t layerId, int64_t 
                         image->height(), std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start).count());
     fVideoFrames[{uri, layerId}].frames[pts] = std::move(image);
     return true;
+}
+
+Trails::Shrink EngineImpl::shrink() {
+    return [this](const sk_sp<SkImage>& image, int width, int height) -> sk_sp<SkImage> {
+        if (fGpuFailed) return nullptr;
+        const auto info = SkImageInfo::Make(width, height, kRGBA_8888_SkColorType, image->isOpaque() ? kOpaque_SkAlphaType : kPremul_SkAlphaType,
+                                            SkColorSpace::MakeSRGB());
+        auto surface = fGraphite ? SkSurfaces::RenderTarget(fRecorder.get(), info)
+                                : SkSurfaces::RenderTarget(fGanesh.get(), skgpu::Budgeted::kNo, info);
+        if (!surface) return nullptr;
+        if (!image->isOpaque()) surface->getCanvas()->clear(SK_ColorTRANSPARENT);
+        surface->getCanvas()->drawImageRect(image, SkRect::MakeIWH(width, height), SkSamplingOptions(SkFilterMode::kLinear));
+        return fGraphite ? SkSurfaces::AsImage(surface) : surface->makeImageSnapshot();
+    };
+}
+
+std::vector<int64_t> EngineImpl::videoTrail(const std::string& uri, int64_t layerId, int64_t shown, const std::vector<int64_t>& tags) {
+    const auto found = fPictures.find({uri, layerId});
+    return fTrails.plan({uri, layerId}, shown, tags, found == fPictures.end() ? nullptr : found->second, this->shrink());
+}
+
+bool EngineImpl::videoTrailFrame(const std::string& uri, int64_t layerId, int64_t tag, AHardwareBuffer* buffer, int colorStandard, int colorRange,
+                                 const FrameCrop& crop) {
+    const auto key = std::make_pair(uri, layerId);
+    auto image = buffer && !fGpuFailed ? this->copyFrame(buffer, true, colorStandard, colorRange, crop, &key) : nullptr;
+    return fTrails.keep(key, tag, image, this->shrink());
 }
 
 double EngineImpl::heldMegabytes() const {
@@ -1323,6 +1357,7 @@ void EngineImpl::syncPipelines() {
 }
 
 void EngineImpl::trim() {
+    fTrails.clear();
     this->syncPipelines();
     if (fGanesh && !fGpuFailed) {
         fGanesh->freeGpuResources();
