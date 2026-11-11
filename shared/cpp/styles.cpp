@@ -261,9 +261,8 @@ Placement Effective(const std::vector<Layer>& siblings, const Layer& l, double t
     Placement p{};
     if (parent) {
         p = Effective(siblings, *parent, timeMs, depth + 1);
-        const SkV4 offset = Turn(p.rotation) * p.tilt * SkV4{(own.location.fX + own.pivot.fX - p.pivot.fX) * p.scale.fX,
-                                                             (own.location.fY + own.pivot.fY - p.pivot.fY) * p.scale.fY, own.z, 0};
-        own.location = p.location + SkVector{offset.x, offset.y} - own.pivot + p.pivot;
+        const SkV4 offset = Turn(p.rotation) * p.tilt * SkV4{own.location.fX * p.scale.fX, own.location.fY * p.scale.fY, own.z, 0};
+        own.location = p.location + SkVector{offset.x, offset.y};
         SkPoint followScale;
         float followRotation;
         ParentTerms(l, timeMs, p, &followScale, &followRotation);

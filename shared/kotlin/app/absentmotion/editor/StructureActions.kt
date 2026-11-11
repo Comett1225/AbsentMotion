@@ -260,15 +260,15 @@ private class Pose(val place: Place, val turn: DoubleArray)
 
 private fun lifted(p: Place, q: Pose?): Place {
     val o = q?.place ?: return p
-    val v = q.turn.on(((p.x + p.px - o.px) * o.sx).toDouble(), ((p.y + p.py - o.py) * o.sy).toDouble(), p.z.toDouble())
-    return Place((o.x + v[0] - p.px + o.px).toFloat(), (o.y + v[1] - p.py + o.py).toFloat(), p.px, p.py, p.sx * o.sx, p.sy * o.sy, p.rot + o.rot, (o.z + v[2]).toFloat())
+    val v = q.turn.on((p.x * o.sx).toDouble(), (p.y * o.sy).toDouble(), p.z.toDouble())
+    return Place((o.x + v[0]).toFloat(), (o.y + v[1]).toFloat(), p.px, p.py, p.sx * o.sx, p.sy * o.sy, p.rot + o.rot, (o.z + v[2]).toFloat())
 }
 
 private fun lowered(w: Place, q: Pose?): Place? {
     val o = q?.place ?: return w
     if (o.sx == 0f || o.sy == 0f) return null
-    val v = q.turn.inverse().on((w.x - o.x + w.px - o.px).toDouble(), (w.y - o.y + w.py - o.py).toDouble(), (w.z - o.z).toDouble())
-    return Place((v[0] / o.sx - w.px + o.px).toFloat(), (v[1] / o.sy - w.py + o.py).toFloat(), w.px, w.py, w.sx / o.sx, w.sy / o.sy, w.rot - o.rot, v[2].toFloat())
+    val v = q.turn.inverse().on((w.x - o.x).toDouble(), (w.y - o.y).toDouble(), (w.z - o.z).toDouble())
+    return Place((v[0] / o.sx).toFloat(), (v[1] / o.sy).toFloat(), w.px, w.py, w.sx / o.sx, w.sy / o.sy, w.rot - o.rot, v[2].toFloat())
 }
 
 private fun compose(p: Place, q: Place?): Place = lifted(p, q?.let { Pose(it, spin(2, it.rot.toDouble())) })

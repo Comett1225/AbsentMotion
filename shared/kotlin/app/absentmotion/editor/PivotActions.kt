@@ -349,11 +349,9 @@ private fun Layer.withPivotKey(x: Float, y: Float): PivotEdit? {
 
 private fun Scene.pull(layer: Layer, ms: Double, dx: Float, dy: Float): Pull {
     val stance = stance(layer, ms)
-    val d = doubleArrayOf(dx.toDouble(), dy.toDouble(), 0.0)
     val world = stance.mapped(layer.atMs(ms), dx, dy)
-    val reach = DoubleArray(3) { world[it] + d[it] }
-    val own = stance.solve(reach)?.let { v -> DoubleArray(3) { v[it] - d[it] } } ?: DoubleArray(3)
-    val child = stance.undo(reach)?.let { v -> DoubleArray(3) { d[it] - v[it] } } ?: DoubleArray(3)
+    val own = stance.solve(world) ?: DoubleArray(3)
+    val child = stance.undo(world)?.let { v -> DoubleArray(3) { -v[it] } } ?: DoubleArray(3)
     return Pull(own, child, world)
 }
 
