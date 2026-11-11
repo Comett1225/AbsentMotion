@@ -107,6 +107,7 @@ import app.absentmotion.ui.onboarding.LanguageDialog
 import androidx.compose.ui.res.stringResource
 
 private val PanelColor get() = Am.HomePanel
+private val OpenColor get() = androidx.compose.ui.graphics.lerp(Am.HomePanel, Am.HomeInk, 0.06f)
 private val PanelShape = RoundedCornerShape(7.dp)
 private val DividerColor get() = Am.HomeLine
 private val ListLineColor get() = Am.NavyLine
@@ -251,8 +252,7 @@ private fun Category(@StringRes name: Int, icon: ImageVector, content: @Composab
             enter = expandVertically(Motion.enter()) + fadeIn(Motion.enter()),
             exit = shrinkVertically(Motion.exit()) + fadeOut(Motion.exit()),
         ) {
-            Column(Modifier.fillMaxWidth().padding(bottom = 4.dp)) {
-                Divider(10.dp)
+            Column(Modifier.fillMaxWidth().background(OpenColor).padding(top = 4.dp, bottom = 4.dp)) {
                 content()
             }
         }

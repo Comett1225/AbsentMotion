@@ -10,7 +10,7 @@ import androidx.compose.ui.graphics.vector.addPathNodes
 import androidx.compose.ui.unit.dp
 
 internal object HomeIcons {
-    val Menu = icon("Menu", stroke = "M3.2 4.3L20.8 4.3M3.2 12L20.8 12M3.2 19.7L20.8 19.7", width = 1.8f)
+    val Menu = icon("Menu", stroke = "M3.2 6.5L20.8 6.5M3.2 12L20.8 12M3.2 17.5L20.8 17.5", width = 1.8f)
     val ChevronDown = icon("ChevronDown", stroke = "M5.1 8.55L12 15.45L18.9 8.55", width = 1.8f)
     val ChevronRight = icon("ChevronRight", stroke = "M9 18L15 12L9 6", mirror = true)
     val Close = icon("Close", stroke = "M19.2 4.8L4.8 19.2M4.8 4.8L19.2 19.2", width = 1.8f)
