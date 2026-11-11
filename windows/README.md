@@ -44,6 +44,14 @@ During an update the setup appends to the `--result` file: `started`, then `stag
 `stage swap` and `stage register`, and last `ok <version>` or `fail <reason>`. The app reads the last line on its next start
 and explains a failure. The package uses the LZMS compression and SHA-256 built into Windows, so no third-party code is
 added. Command line: `--dir`, `--name`, `--no-launch`, `--quiet`, `--log`, `--uninstall`,
-`--update --payload <file> --wait-pid <pid> --result <file>` and `--probe`. `build.ps1 -StubOnly` builds only the setup
+`--update --payload <file> --wait-pid <pid> --result <file>` and `--probe`.
+
+The setup also does what Windows Installer did for an install, except keeping a backup of every file. It writes the list of
+installed files to `AbsentMotionSetup.files`, so an update or an uninstall keeps files a user added to the app folder
+(everything outside `app\` and `runtime\` that is not on the list). It refuses to put an older version over a newer one unless
+asked (`--quiet` always refuses). When files are in use it asks Windows Restart Manager which programs hold them and names
+them, without closing anything outside the app folder. The Apps entry carries `VersionMajor` and `VersionMinor`.
+
+`build.ps1 -StubOnly` builds only the setup
 program; `-UpgradeCode` and `-DefaultName` make a test build that never matches a real install. With Smart App Control on,
 Windows refuses unsigned programs, so sign the setup before relying on it there.

@@ -1,6 +1,8 @@
+import gzip
 import re
 import struct
 import sys
+import zlib
 
 words_file, allowed_file, label = sys.argv[1], sys.argv[2], sys.argv[3]
 words = [l.strip() for l in open(words_file, encoding="utf-8") if l.strip()]
@@ -50,6 +52,11 @@ def elf_sections(data):
 
 def content(path):
     data = open(path, "rb").read()
+    if data[:2] == b"\x1f\x8b":
+        try:
+            return gzip.decompress(data)
+        except (OSError, EOFError, zlib.error):
+            return data
     if path.endswith(".dex") and data[:4] == b"dex\n":
         try:
             return dex_strings(data)

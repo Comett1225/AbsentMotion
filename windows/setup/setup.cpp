@@ -4,6 +4,7 @@
 
 #include <compressapi.h>
 #include <msi.h>
+#include <restartmanager.h>
 #include <shellapi.h>
 #include <shlobj.h>
 #include <shobjidl.h>
@@ -416,6 +417,141 @@ bool MoveRetry(const std::wstring& from, const std::wstring& to, DWORD ms) {
     }
 }
 
+constexpr const wchar_t* kListName = L"AbsentMotionSetup.files";
+
+std::wstring Lower(std::wstring s) {
+    if (!s.empty()) CharLowerBuffW(s.data(), (DWORD)s.size());
+    return s;
+}
+
+void FilesUnder(const std::wstring& dir, const std::wstring& rel, std::vector<std::wstring>& out) {
+    WIN32_FIND_DATAW fd;
+    HANDLE f = FindFirstFileExW(Long(Join(dir, L"*")).c_str(), FindExInfoBasic, &fd, FindExSearchNameMatch, nullptr, FIND_FIRST_EX_LARGE_FETCH);
+    if (f == INVALID_HANDLE_VALUE) return;
+    do {
+        std::wstring name = fd.cFileName;
+        if (name == L"." || name == L"..") continue;
+        std::wstring sub = rel.empty() ? name : rel + L"\\" + name;
+        if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && !(fd.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT)) FilesUnder(Join(dir, name), sub, out);
+        else out.push_back(sub);
+    } while (FindNextFileW(f, &fd));
+    FindClose(f);
+}
+
+void WriteList(const std::wstring& root, const Payload& p) {
+    std::string text;
+    for (const std::wstring& rel : p.paths) text += Narrow(rel) + "\n";
+    Handle h(CreateFileW(Long(Join(root, kListName)).c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr));
+    DWORD n = 0;
+    if (!h.Valid() || !WriteFile(h.Get(), text.data(), (DWORD)text.size(), &n, nullptr)) Log(L"could not write the file list: " + SystemMessage(GetLastError()));
+}
+
+bool ReadList(const std::wstring& root, std::set<std::wstring>& out) {
+    Handle h(CreateFileW(Long(Join(root, kListName)).c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr));
+    if (!h.Valid()) return false;
+    LARGE_INTEGER size{};
+    if (!GetFileSizeEx(h.Get(), &size) || size.QuadPart > (64ll << 20)) return false;
+    std::string text((size_t)size.QuadPart, '\0');
+    DWORD n = 0;
+    if (!ReadFile(h.Get(), text.data(), (DWORD)text.size(), &n, nullptr)) return false;
+    text.resize(n);
+    size_t at = 0;
+    while (at < text.size()) {
+        size_t end = text.find('\n', at);
+        if (end == std::string::npos) end = text.size();
+        std::string line = text.substr(at, end - at);
+        if (!line.empty() && line.back() == '\r') line.pop_back();
+        if (!line.empty()) out.insert(Lower(Widen(line)));
+        at = end + 1;
+    }
+    return true;
+}
+
+bool OwnedByApp(const std::wstring& rel, const std::set<std::wstring>& known) {
+    std::wstring l = Lower(rel);
+    return known.count(l) || l == Lower(kListName) || l == Lower(kSetupName) || l == Lower(kAppName) || l.rfind(L"app\\", 0) == 0 || l.rfind(L"runtime\\", 0) == 0;
+}
+
+std::vector<std::wstring> AddedFiles(const std::wstring& root, const std::set<std::wstring>& known) {
+    std::vector<std::wstring> all, added;
+    FilesUnder(root, L"", all);
+    for (const std::wstring& rel : all)
+        if (!OwnedByApp(rel, known)) added.push_back(rel);
+    return added;
+}
+
+int MoveFiles(const std::wstring& from, const std::wstring& to, const std::vector<std::wstring>& files) {
+    int moved = 0;
+    for (const std::wstring& rel : files) {
+        std::wstring target = Join(to, rel);
+        if (Exists(target)) continue;
+        for (size_t k = rel.find(L'\\'); k != std::wstring::npos; k = rel.find(L'\\', k + 1)) CreateDirectoryW(Long(Join(to, rel.substr(0, k))).c_str(), nullptr);
+        if (MoveFileExW(Long(Join(from, rel)).c_str(), Long(target).c_str(), 0)) ++moved;
+        else Log(L"could not keep " + rel + L": " + SystemMessage(GetLastError()));
+    }
+    return moved;
+}
+
+std::wstring Lockers(const std::wstring& folder) {
+    std::vector<std::wstring> rel;
+    FilesUnder(folder, L"", rel);
+    std::vector<std::wstring> paths;
+    std::vector<LPCWSTR> ptrs;
+    paths.reserve(rel.size());
+    for (const std::wstring& r : rel) paths.push_back(Join(folder, r));
+    for (const std::wstring& p : paths) ptrs.push_back(p.c_str());
+    DWORD session = 0;
+    WCHAR key[CCH_RM_SESSION_KEY + 1] = {};
+    if (ptrs.empty() || RmStartSession(&session, 0, key) != ERROR_SUCCESS) return {};
+    std::set<std::wstring> names;
+    if (RmRegisterResources(session, (UINT)ptrs.size(), ptrs.data(), 0, nullptr, 0, nullptr) == ERROR_SUCCESS) {
+        UINT needed = 0, count = 0;
+        DWORD reasons = 0;
+        std::vector<RM_PROCESS_INFO> info;
+        DWORD st = RmGetList(session, &needed, &count, nullptr, &reasons);
+        if (st == ERROR_MORE_DATA && needed) {
+            info.resize(needed);
+            count = needed;
+            st = RmGetList(session, &needed, &count, info.data(), &reasons);
+        }
+        if (st == ERROR_SUCCESS)
+            for (UINT i = 0; i < count; ++i)
+                if (info[i].Process.dwProcessId != GetCurrentProcessId()) names.insert(info[i].strAppName[0] ? info[i].strAppName : L"a program");
+    }
+    RmEndSession(session);
+    std::wstring out;
+    for (const std::wstring& n : names) out += (out.empty() ? L"" : L", ") + n;
+    if (!out.empty()) Log(L"files are open in: " + out);
+    return out;
+}
+
+std::wstring InUse(const std::wstring& folder) {
+    std::wstring who = Lockers(folder);
+    return who.empty() ? L"" : L"\nOpen in: " + who;
+}
+
+std::vector<int> VersionParts(const std::wstring& v) {
+    std::vector<int> parts;
+    int cur = -1;
+    for (wchar_t c : v) {
+        if (iswdigit(c)) cur = (cur < 0 ? 0 : cur) * 10 + (c - L'0');
+        else if (cur >= 0) {
+            parts.push_back(cur);
+            cur = -1;
+        }
+    }
+    if (cur >= 0) parts.push_back(cur);
+    return parts;
+}
+
+bool Older(const std::wstring& a, const std::wstring& b) {
+    std::vector<int> x = VersionParts(a), y = VersionParts(b);
+    if (x.empty() || y.empty()) return false;
+    x.resize(std::max(x.size(), y.size()), 0);
+    y.resize(x.size(), 0);
+    return x < y;
+}
+
 bool FromFolder(DWORD pid, const std::wstring& folder) {
     Handle h(OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid));
     if (!h.Valid()) return false;
@@ -625,6 +761,11 @@ void Register(const Options& o, const std::wstring& version, uint64_t bytes) {
     SetDword(k, L"NoModify", 1);
     SetDword(k, L"NoRepair", 1);
     if (bytes) SetDword(k, L"EstimatedSize", (DWORD)(bytes / 1024));
+    std::vector<int> parts = VersionParts(version);
+    if (parts.size() >= 2) {
+        SetDword(k, L"VersionMajor", (DWORD)parts[0]);
+        SetDword(k, L"VersionMinor", (DWORD)parts[1]);
+    }
     SYSTEMTIME t;
     GetLocalTime(&t);
     wchar_t date[16];
@@ -763,10 +904,53 @@ bool AskWhileRunning(const Options& o, Shared& s) {
     return true;
 }
 
+bool AskOlder(const Options& o, Shared& s, const std::wstring& installed, const std::wstring& version) {
+    if (installed.empty() || !Older(version, installed)) return true;
+    Log(L"installed " + installed + L" is newer than " + version);
+    if (o.quiet) return false;
+    Screen q;
+    q.look = Look::Question;
+    q.headline = L"A newer version is installed";
+    q.detail = o.name + L" " + installed + L" is installed. This installer has the older version " + version + L".";
+    q.primary = L"Install the older version";
+    q.secondary = L"Cancel";
+    s.Show(q);
+    return s.WaitChoice() == 1;
+}
+
+bool MoveAside(const Options& o, Shared& s, const std::wstring& root, const std::wstring& old) {
+    for (;;) {
+        if (MoveRetry(root, old, o.quiet ? 20000 : 3000)) return true;
+        DWORD e = GetLastError();
+        if (o.quiet) {
+            SetLastError(e);
+            return false;
+        }
+        std::wstring who = Lockers(root);
+        Screen q;
+        q.look = Look::Question;
+        q.headline = L"Files of " + o.name + L" are in use";
+        q.detail = who.empty() ? L"Close the programs that use them, then try again." : L"Close " + who + L", then try again.";
+        q.primary = L"Try again";
+        q.secondary = L"Cancel";
+        s.Show(q);
+        if (s.WaitChoice() != 1) {
+            SetLastError(e);
+            return false;
+        }
+    }
+}
+
 int Install(const Options& o, Shared& s, const Payload& p) {
     const std::wstring root = o.dir, staging = root + L".new", old = root + L".old";
     const bool existed = Exists(Join(root, kAppName));
     const std::wstring headline = existed ? L"Reinstalling " + o.name : L"Installing " + o.name;
+    if (existed && !AskOlder(o, s, InstalledVersion(root), p.version)) {
+        WriteResult(o.result, "fail a newer version is already installed");
+        if (o.quiet) return Fault(o, s, o.name + L" was not installed", L"A newer version is already installed.");
+        s.Quit();
+        return 2;
+    }
     Log(L"start install " + p.version + L" into " + root + L", files " + std::to_wstring(p.files.size()));
     s.Show(Working(headline, L"Checking the download"));
     try {
@@ -787,7 +971,12 @@ int Install(const Options& o, Shared& s, const Payload& p) {
         w.headline = L"Finishing up";
         w.detail = L"";
         s.Show(w);
-        if (existed && !MoveRetry(root, old, 20000)) FailLast(L"AbsentMotion is still in use");
+        if (existed && !MoveAside(o, s, root, old)) {
+            DWORD e = GetLastError();
+            DeleteTree(staging);
+            Fail(L"AbsentMotion is still in use: " + SystemMessage(e) + InUse(root));
+        }
+        s.Show(w);
         if (!MoveRetry(staging, root, 20000)) {
             DWORD e = GetLastError();
             if (existed) MoveFileExW(Long(old).c_str(), Long(root).c_str(), 0);
@@ -795,6 +984,13 @@ int Install(const Options& o, Shared& s, const Payload& p) {
             FailLast(L"Could not put the new version in place");
         }
         Log(L"swapped in " + std::to_wstring(GetTickCount64() - t0) + L" ms");
+        WriteList(root, p);
+        if (existed) {
+            std::set<std::wstring> known;
+            if (!ReadList(old, known)) for (const std::wstring& rel : p.paths) known.insert(Lower(rel));
+            int kept = MoveFiles(old, root, AddedFiles(old, known));
+            if (kept) Log(L"kept " + std::to_wstring(kept) + L" files you added");
+        }
         Register(o, p.version, p.header.rawTotal);
         Associate(o);
         if (!existed)
@@ -899,7 +1095,7 @@ int Update(const Options& o, Shared& s) {
             Stage(o, "msi");
             const std::wstring msiLink = Join(Known(FOLDERID_Desktop), std::wstring(L"AbsentMotion.lnk")), target = LinkTarget(msiLink);
             desktop = Exists(msiLink) && (target.empty() || StartsWithFolder(Full(target), root));
-            if (!MoveRetry(root, old, 20000)) StopWith(kInUse, L"Files of AbsentMotion were still in use: " + SystemMessage(GetLastError()));
+            if (!MoveRetry(root, old, 20000)) StopWith(kInUse, L"Files of AbsentMotion were still in use: " + SystemMessage(GetLastError()) + InUse(root));
             moved = true;
             if (!RemoveMsi(msi, root, logDir)) {
                 if (MoveRetry(old, root, 20000)) moved = false;
@@ -909,7 +1105,7 @@ int Update(const Options& o, Shared& s) {
         }
         Stage(o, "swap");
         if (!moved) {
-            if (!MoveRetry(root, old, 20000)) StopWith(kInUse, L"Files of AbsentMotion were still in use: " + SystemMessage(GetLastError()));
+            if (!MoveRetry(root, old, 20000)) StopWith(kInUse, L"Files of AbsentMotion were still in use: " + SystemMessage(GetLastError()) + InUse(root));
             moved = true;
         }
         if (!MoveRetry(staging, root, 20000)) {
@@ -918,6 +1114,13 @@ int Update(const Options& o, Shared& s) {
             StopWith(kPlace, L"Could not put the new version in place: " + why);
         }
         Log(L"swapped in " + std::to_wstring(GetTickCount64() - t0) + L" ms");
+        WriteList(root, p);
+        {
+            std::set<std::wstring> known;
+            if (!ReadList(old, known)) for (const std::wstring& rel : p.paths) known.insert(Lower(rel));
+            int kept = MoveFiles(old, root, AddedFiles(old, known));
+            if (kept) Log(L"kept " + std::to_wstring(kept) + L" files you added");
+        }
         Stage(o, "register");
         try {
             Register(o, p.version, p.header.rawTotal);
@@ -1000,9 +1203,20 @@ int Uninstall(const Options& o, Shared& s) {
     Screen w = Working(L"Removing " + o.name, L"Removing files");
     w.closable = false;
     s.Show(w);
+    int kept = 0;
     try {
         if (Exists(gone)) DeleteTree(gone);
-        if (Exists(root) && !MoveRetry(root, gone, 10000)) FailLast(L"Could not remove the app folder");
+        if (Exists(root) && !MoveRetry(root, gone, 10000)) {
+            DWORD e = GetLastError();
+            Fail(L"Could not remove the app folder: " + SystemMessage(e) + InUse(root));
+        }
+        std::set<std::wstring> known;
+        std::vector<std::wstring> added;
+        if (ReadList(gone, known)) added = AddedFiles(gone, known);
+        if (!added.empty() && CreateDirectoryW(Long(root).c_str(), nullptr)) {
+            kept = MoveFiles(gone, root, added);
+            Log(L"kept " + std::to_wstring(kept) + L" files you added in " + root);
+        }
         uint64_t total = std::max<uint64_t>(1, CountFiles(gone)), done = 0;
         s.Progress(0, total);
         DeleteTree(gone, [&] { s.Progress(++done, total); });
@@ -1018,7 +1232,8 @@ int Uninstall(const Options& o, Shared& s) {
         Screen d;
         d.look = Look::Done;
         d.headline = o.name + L" was removed";
-        d.detail = L"Your projects and settings are still on this PC.";
+        d.detail = kept ? L"Your projects and settings are still on this PC. Files you added to its folder are still in " + root + L"."
+                        : L"Your projects and settings are still on this PC.";
         d.primary = L"Close";
         s.Show(d);
         s.WaitChoice();

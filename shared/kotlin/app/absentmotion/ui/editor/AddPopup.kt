@@ -108,7 +108,7 @@ private val Tabs = listOf(
 @Composable
 internal fun AddPopup(state: EditorState, modifier: Modifier = Modifier, library: AddLibrary) {
     var selectedTab by remember { mutableIntStateOf(0) }
-    BackHandler { state.addOpen = false }
+    BackHandler(state.toolOpen == 0) { state.addOpen = false }
     Row(modifier.clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)).background(PopupBar)) {
         Column(Modifier.weight(1f).fillMaxHeight()) {
             androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxWidth().height(58.dp)) {
@@ -189,7 +189,7 @@ private fun ToolsPage(state: EditorState, modifier: Modifier) {
         items(tools, key = { it.first }) { (id, icon, label) ->
             val press = remember { MutableInteractionSource() }
             Column(
-                Modifier.size(80.dp, 96.dp).tutorialGuard().pressScale(press, TilePress).clickable(press, LocalIndication.current) { state.addOpen = false; state.toolOpen = id },
+                Modifier.size(80.dp, 96.dp).tutorialGuard().pressScale(press, TilePress).clickable(press, LocalIndication.current) { state.toolOpen = id },
                 horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
             ) {
                 Icon(icon, null, Modifier.size(28.dp), tint = Am.OnDark)

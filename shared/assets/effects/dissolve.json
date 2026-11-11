@@ -34,5 +34,5 @@
    "legacyDefault": 6
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float progress;\nuniform float grain;\nuniform float seed;\nfloat hash(float2 p) { p = fract(p * float2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }\nhalf4 main(float2 coord) {\n    return image.eval(coord) * half(step(progress, hash(floor(coord / max(grain, 1)) + seed * float2(17.13, 41.71))));\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float progress;\nuniform float grain;\nuniform float seed;\nfloat hash(float2 p) { p = fract(p * float2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }\nhalf4 main(float2 coord) {\n    return image.eval(coord) * half(step(progress, hash(floor((floor(coord / max(grain, 1)) + 0.5) * max(grain, 1)) + seed * float2(17.13, 41.71))));\n}\n"
 }

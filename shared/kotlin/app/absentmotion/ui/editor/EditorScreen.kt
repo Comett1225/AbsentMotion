@@ -155,8 +155,10 @@ internal fun EditorTools(state: EditorState, scope: kotlinx.coroutines.Coroutine
     if (state.toolOpen != 0) shown = state.toolOpen
     var compressFrom by remember { mutableStateOf<android.net.Uri?>(null) }
     val close = { state.toolOpen = 0 }
+    BackHandler(state.toolOpen != 0) { close() }
     val add: (android.net.Uri) -> Unit = { uri ->
         state.toolOpen = 0
+        state.addOpen = false
         scope.launch { state.addToolResult(context, uri) }
     }
     androidx.compose.runtime.CompositionLocalProvider(app.absentmotion.ui.home.LocalAddToProject provides add) {

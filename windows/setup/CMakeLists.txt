@@ -27,7 +27,7 @@ configure_file(setup.rc.in "${CMAKE_CURRENT_BINARY_DIR}/setup.rc" @ONLY)
 add_compile_definitions(UNICODE _UNICODE NOMINMAX WIN32_LEAN_AND_MEAN)
 
 add_executable(AbsentMotionSetup WIN32 setup.cpp ui.cpp "${CMAKE_CURRENT_BINARY_DIR}/setup.rc")
-target_link_libraries(AbsentMotionSetup PRIVATE d2d1 dwrite dwmapi cabinet bcrypt shell32 ole32 uuid advapi32 user32 msi)
+target_link_libraries(AbsentMotionSetup PRIVATE d2d1 dwrite dwmapi cabinet bcrypt shell32 ole32 uuid advapi32 user32 msi rstrtmgr)
 target_link_options(AbsentMotionSetup PRIVATE /MANIFEST:NO)
 
 add_executable(ampack ampack.cpp)
