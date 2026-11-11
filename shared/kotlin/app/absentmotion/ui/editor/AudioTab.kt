@@ -94,7 +94,7 @@ private val TilePalettes = listOf(
 private val AudioPermission get() = if (android.os.Build.VERSION.SDK_INT >= 33) Manifest.permission.READ_MEDIA_AUDIO else Manifest.permission.READ_EXTERNAL_STORAGE
 
 @Composable
-internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrary) {
+internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrary, settled: Boolean = true) {
     val context = LocalContext.current
     val activity = LocalActivity.current
     val scope = LocalEditorScope.current
@@ -129,8 +129,9 @@ internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrar
         scope.launch { state.addSounds(context, uris) }
     }
     fun fromFiles() = MediaPicks.openSounds()
-    androidx.compose.runtime.LaunchedEffect(Unit) {
-        if (!allowed && !prefs.getBoolean("askedAudio", false)) {
+    androidx.compose.runtime.LaunchedEffect(settled) {
+        if (settled && !allowed && !prefs.getBoolean("askedAudio", false)) {
+            kotlinx.coroutines.delay(AskDelayMs)
             prefs.edit().putBoolean("askedAudio", true).apply()
             permission.launch(AudioPermission)
         }
