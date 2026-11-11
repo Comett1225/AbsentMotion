@@ -4,7 +4,7 @@
 <p>카메라를 처음 추가하면 팁이 표시됩니다: "카메라를 통해 보려면 이 패널을 열고 카메라 보기를 켜세요." <strong>카메라 보기</strong> 버튼은 미리보기 띠에 있습니다(<a href="editor.html">편집기 화면</a> 참고). 켜면 카메라를 통해 프로젝트를 볼 수 있습니다. 끄면 카메라는 미리보기에 어두운 직사각형 틀로 표시됩니다.</p>
 <p>카메라가 여러 개면 재생 헤드 위치에서 활성 상태인 가장 위의 카메라가 사용됩니다.</p>
 <h3 id="moving-the-camera">카메라 움직이기</h3>
-<p>카메라 레이어를 선택하세요. 미리보기에서 드래그하면 카메라가 이동하고, 두 손가락으로 벌리거나 모으면 화각이 바뀝니다. <strong>변형</strong>에서 <strong>이동</strong>, <strong>회전</strong>, <strong>크기</strong>를 카메라에 사용할 수 있으며, <strong>크기</strong>는 화각을 바꿉니다. <strong>깊이 순서</strong>를 켜면(아래 참고) <strong>기울기</strong>도 작동하며, 카메라를 위, 아래 또는 옆을 보도록 돌립니다. 기울기는 변형의 <strong>고급 제어</strong> 중 하나입니다(<strong>변형</strong>을 길게 눌러 전환하세요).</p>
+<p>카메라 레이어를 선택하세요. 미리보기에서 드래그하면 카메라가 이동하고, 두 손가락으로 벌리거나 모으면 화각이 바뀝니다. <strong>변형</strong>에서 <strong>이동</strong>, <strong>회전</strong>, <strong>크기</strong>를 카메라에 사용할 수 있으며, <strong>크기</strong>는 화각을 바꿉니다. <strong>깊이 순서</strong>를 켜면(아래 참고) <strong>3D 회전</strong>도 작동하며, 카메라를 위, 아래 또는 옆을 보도록 돌립니다. <strong>회전</strong>, <strong>더보기</strong>, <strong>3D 회전</strong>에서 켜세요(컴퓨터에서는 <strong>고급 제어</strong> 중 하나인 <strong>기울기</strong> 탭입니다. <strong>변형</strong>을 길게 눌러 전환하세요).</p>
 <h3 id="camera-options">카메라 옵션</h3>
 <p>탭은 세 개입니다:</p>
 <ul><li><strong>카메라 보기.</strong> <strong>깊이 순서</strong> 스위치와, 이 스위치가 켜져 있으면 <strong>정렬</strong>(아래 참고, 컴퓨터에서는 마지막 행), 보기 원뿔 도식, <strong>원근</strong>과 <strong>직교</strong> 버튼, <strong>화각</strong>(0.1에서 179.9도), 화각에 따라 움직이는 <strong>줌</strong>이 나타납니다.</li><li><strong>초점 블러.</strong> 스위치가 있고, 그다음 <strong>초점 거리</strong>(초점 평면은 "Z ... 위치"로 표시됨), <strong>피사계 심도</strong>, <strong>블러 강도</strong>가 있습니다.</li><li><strong>안개.</strong> 스위치, <strong>색상</strong>, <strong>가까이</strong>와 <strong>멀리</strong> 거리가 있습니다.</li></ul>
@@ -25,10 +25,10 @@
 <p><strong>추가</strong>, <strong>오브젝트 / 에셋</strong>, <strong>조명</strong>에서 조명을 추가합니다. 카메라와 마찬가지로 프로젝트 전체 길이 동안 유지되며, 조명 자체는 그려지지 않습니다. 조명은 3D 모델과 <strong>3D 흩뿌리기</strong>, <strong>3D 파편화</strong>의 조각에 그림자를 드리웁니다.</p>
 <p>조명을 선택하고 <strong>조명 옵션</strong>을 누르세요:</p>
 <ul><li><strong>주변광</strong>은 모든 면을 똑같이 비춥니다. <strong>방향광</strong>(기본값)은 태양처럼 한 방향에서 비춥니다. <strong>점 광원</strong>은 전구처럼 조명이 있는 자리에서 사방으로 비추며, 멀어질수록 약해집니다.</li><li><strong>색상</strong>과 0에서 4까지의 <strong>강도</strong>(기본값 1).</li><li><strong>감쇠</strong>(점 광원 전용, 0에서 100, 기본값 1)는 거리에 따라 조명이 얼마나 빨리 약해지는지를 정합니다.</li></ul>
-<p>이 모든 값은 키프레임으로 애니메이션을 줄 수 있습니다. 새 조명은 장면 앞쪽 가운데에서 시작하며 장면을 비춥니다. 점 광원은 <strong>변형</strong>으로 옮길 수 있고(Z 포함), 방향광은 <strong>회전</strong>과 <strong>기울기</strong>로 돌릴 수 있습니다.</p>
+<p>이 모든 값은 키프레임으로 애니메이션을 줄 수 있습니다. 새 조명은 장면 앞쪽 가운데에서 시작하며 장면을 비춥니다. 점 광원은 <strong>변형</strong>으로 옮길 수 있고(Z 포함), 방향광은 <strong>회전</strong>과 그 안의 <strong>3D 회전</strong>으로 돌릴 수 있습니다.</p>
 <p>조명은 동시에 최대 네 개까지 작동합니다. 조명이 하나라도 사용되기 시작하면, 조명 레이어가 3D 모델(<strong>모델 옵션</strong>)과 3D 흩뿌리기, 3D 파편화의 조명 설정을 대신합니다. 조명 레이어가 없는 프로젝트는 이전과 똑같이 보입니다. 팁: <strong>방향광</strong> 옆에 <strong>주변광</strong>을 하나 추가하면 빛을 등진 면이 검게 보이지 않습니다.</p>
 <h2 id="tilt-a-layer-in-3d">레이어를 3D로 기울이기</h2>
-<p>모든 레이어는 X축과 Y축을 중심으로 기울일 수 있습니다. <strong>변형</strong>과 <strong>기울기</strong> 탭을 여세요. 이 탭에는 도 단위의 <strong>X 회전</strong>과 <strong>Y 회전</strong>이 있습니다. <strong>회전</strong> 또는 <strong>기울기</strong>가 열려 있는 상태에서 미리보기를 드래그하면 레이어도 기울어집니다.</p>
+<p>모든 레이어는 X축과 Y축을 중심으로 기울일 수 있습니다. <strong>변형</strong>, <strong>회전</strong>을 열고 <strong>더보기</strong>에서 <strong>3D 회전</strong>을 켜세요. 도 단위의 <strong>X 회전</strong>, <strong>Y 회전</strong>, <strong>Z 회전</strong>이 있습니다(컴퓨터에서는 <strong>기울기</strong> 탭에 X와 Y가 있습니다). 3D 회전이 열려 있는 상태에서 미리보기를 드래그하면 레이어도 기울어집니다.</p>
 <p>레이어가 기울어져 있거나, 기울기에 애니메이션이 있거나, 3D 모델이거나, 3D 이펙트가 있으면 <strong>회전</strong> 탭은 3D 트랙패드("여기를 드래그해 3D로 회전")로 바뀌며 <strong>X</strong>, <strong>Y</strong>, <strong>Z 회전</strong> 입력 칸이 나타납니다. 한 손가락으로는 레이어를 기울이고, 두 손가락으로는 비틀 수 있습니다. <strong>더보기</strong> 메뉴의 <strong>3D 회전 초기화</strong>를 누르면 원래대로 돌아갑니다.</p>
 <h2 id="3d-effects">3D 이펙트</h2>
 <p><strong>3D</strong> 카테고리의 이펙트는 레이어를 입체로 만듭니다. 큐브, 박스, 속이 빈 박스, 실린더, 타원체, 토러스, 피라미드, 팔면체, 육각 기둥, 별 기둥, 별 다면체, 하트, 삼축 십자, 래스터 압출, 레이어 뒤집기, 구체화, 터널이 있습니다. 이런 이펙트가 있으면 <strong>회전</strong>과 <strong>기울기</strong> 컨트롤은 그 이펙트의 회전을 바꿉니다. <a href="effects/index.html">이펙트 라이브러리</a>를 참고하세요.</p>

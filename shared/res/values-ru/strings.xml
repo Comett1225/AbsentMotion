@@ -100,6 +100,10 @@
     <string name="community_tag_hint">Добавить свой тег</string>
     <string name="community_creator">Автор</string>
     <string name="community_by">автор: %1$s</string>
+    <string name="transform_3d_rotation">3D-поворот</string>
+    <string name="transform_free_rotate">Свободный поворот</string>
+    <string name="transform_double_tap_pivot">Дважды коснитесь, чтобы переместить опорную точку</string>
+    <string name="transform_double_tap_layer">Дважды коснитесь, чтобы переместить слой</string>
     <string name="community_size">Размер файла</string>
     <string name="community_confirm">Я создал это и согласен на публикацию</string>
     <string name="community_need_title">Добавьте название пакета сообщества.</string>

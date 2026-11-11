@@ -76,21 +76,25 @@ import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 
 @Composable
-internal fun MoveTransformPanel(state: EditorState, layer: Layer, tab: Int, turn: Turn?, modifier: Modifier = Modifier) {
+internal fun MoveTransformPanel(state: EditorState, layer: Layer, tab: Int, turn: Turn?, modifier: Modifier = Modifier, onFlip: (() -> Unit)? = null) {
     Box(modifier) {
         when (tab) {
-            0 -> PositionTab(state, layer)
-            1 -> if (turn != null) TurnTab(state, layer, turn) else RotationTab(state, layer)
+            0 -> PositionTab(state, layer, onFlip)
+            1 -> when {
+                turn == null -> RotationTab(state, layer)
+                app.absentmotion.platform.PlatformFeatures.desktop || state.settings.rotateFree -> TurnTab(state, layer, turn)
+                else -> AxesTab(state, layer, turn)
+            }
             2 -> if (layer.kind == "camera") CameraSizeTab(state, layer) else SizeTab(state, layer)
             3 -> TiltTab(state, layer, turn)
             4 -> SkewTab(state, layer)
-            else -> PivotTab(state, layer)
+            else -> PivotTab(state, layer, onFlip)
         }
     }
 }
 
 @Composable
-private fun PositionTab(state: EditorState, layer: Layer) {
+private fun PositionTab(state: EditorState, layer: Layer, onFlip: (() -> Unit)?) {
     val at = layer.location
     var depth by remember(layer.id) { mutableStateOf(false) }
     val deep by rememberUpdatedState(depth)
@@ -113,7 +117,7 @@ private fun PositionTab(state: EditorState, layer: Layer) {
     val timing = remember { LongArray(2) }
     val context = androidx.compose.ui.platform.LocalContext.current
     Box(
-        Modifier.fillMaxSize().holdAndDoubleTap(timing, null).pointerInput(state) {
+        Modifier.fillMaxSize().holdAndDoubleTap(timing, FlipSlop, onFlip).pointerInput(state) {
             var axes = SnapAxis(emptyList()) to SnapAxis(emptyList())
             var origin = now.location
             var travel = Offset.Zero
@@ -148,7 +152,10 @@ private fun PositionTab(state: EditorState, layer: Layer) {
     ) {
         TrackpadCorners()
         Box(if (app.absentmotion.platform.PlatformFeatures.desktop) Modifier.fillMaxWidth().height(app.absentmotion.ui.editor.PanelHeight) else Modifier.matchParentSize(), Alignment.Center) {
-            TrackpadHint(stringResource(if (depth) R.string.drag_to_move_along_z else R.string.drag_here_to_move_the_layer), Modifier)
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                TrackpadHint(stringResource(if (depth) R.string.drag_to_move_along_z else R.string.drag_here_to_move_the_layer), Modifier)
+                if (onFlip != null && !depth) FlipHint(stringResource(R.string.transform_double_tap_pivot))
+            }
         }
         Column(Modifier.align(Alignment.TopCenter).padding(top = 17.px)) {
             Row {
@@ -544,7 +551,7 @@ internal fun pivotFrame(matrix: FloatArray, quad: FloatArray?): PivotFrame {
 }
 
 @Composable
-private fun PivotTab(state: EditorState, layer: Layer) {
+private fun PivotTab(state: EditorState, layer: Layer, onFlip: (() -> Unit)?) {
     val at = layer.pivot
     val frame by produceState<PivotFrame?>(null, layer.id, layer.node, state.timeMs, state.playing) {
         if (state.playing) return@produceState
@@ -564,7 +571,7 @@ private fun PivotTab(state: EditorState, layer: Layer) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val timing = remember { LongArray(2) }
     Box(
-        Modifier.fillMaxSize().holdAndDoubleTap(timing, null).pointerInput(state) {
+        Modifier.fillMaxSize().holdAndDoubleTap(timing, FlipSlop, onFlip).pointerInput(state) {
             var origin = Pt(0f, 0f)
             var travel = Offset.Zero
             var scale = 1f
@@ -585,7 +592,10 @@ private fun PivotTab(state: EditorState, layer: Layer) {
         },
     ) {
         TrackpadCorners()
-        TrackpadHint(stringResource(R.string.drag_here_to_move_the_pivot), Modifier.align(Alignment.Center).padding(bottom = 150.px))
+        Column(Modifier.align(Alignment.Center).padding(bottom = 150.px), horizontalAlignment = Alignment.CenterHorizontally) {
+            TrackpadHint(stringResource(R.string.drag_here_to_move_the_pivot), Modifier)
+            if (onFlip != null) FlipHint(stringResource(R.string.transform_double_tap_layer))
+        }
         Column(Modifier.align(Alignment.TopCenter).padding(top = 17.px)) {
             Row(Modifier.width(354.px).height(70.px).clip(PanelShape).background(Am.Field)) {
                 ValueCell(formatFixed(at[0], 2), Am.Accent, Modifier.weight(1f), "X") { openKeypad(0) }
@@ -624,6 +634,58 @@ private val PivotCells = listOf(
     R.string.a11y_pivot_left, R.string.a11y_pivot_center, R.string.a11y_pivot_right,
     R.string.a11y_pivot_bottom_left, R.string.a11y_pivot_bottom, R.string.a11y_pivot_bottom_right,
 )
+
+private val FlipSlop = 20.dp
+
+@Composable
+private fun FlipHint(text: String) {
+    Text(text, Modifier.padding(top = 4.dp, start = 8.dp, end = 8.dp), color = PanelCaption.copy(alpha = 0.7f), maxLines = 1, textAlign = TextAlign.Center, fontSize = 11.sp)
+}
+
+@Composable
+private fun AxesTab(state: EditorState, layer: Layer, turn: Turn) {
+    var axis by remember(layer.id) { mutableIntStateOf(2) }
+    SideEffect { state.keyTarget = turn.target(axis) }
+    TurnHook(state, turn)
+    val values = turn.values(layer)
+    val labels = listOf(stringResource(R.string.tilt_x_rotation), stringResource(R.string.tilt_y_rotation), stringResource(R.string.tilt_z_rotation))
+    fun openKeypad(which: Int) {
+        axis = which
+        state.keypad = KeypadRequest(labels.mapIndexed { i, label -> KeypadField(label, values[i], "\u00B0") }, which) { v ->
+            state.editSelected { turn.withValues(it, v.toFloatArray()) }
+        }
+    }
+    fun colour(which: Int) = if (turn.linked(which, axis)) Am.Accent else Am.OnDark
+    Box(Modifier.fillMaxSize()) {
+        Column(Modifier.align(Alignment.TopCenter).padding(top = 17.px)) {
+            Row(horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(20.px)) {
+                for (i in 0..2) NumberBox(formatFixed(values[i], 1) + "º", colour(i), Modifier.width(177.px).height(70.px), fontSize = 13.5f) { openKeypad(i) }
+            }
+            Row(Modifier.height(23.px), androidx.compose.foundation.layout.Arrangement.spacedBy(20.px)) {
+                for (label in labels) Caption(label, Modifier.width(177.px).fillMaxHeight())
+            }
+        }
+        for (which in 0..2) {
+            Box(Modifier.padding(top = (122 + which * 139).px).fillMaxWidth().height(137.px)) {
+                RulerSpinner(
+                    colour(which),
+                    onDrag = { dx ->
+                        state.editSelected(key = "axis-$which") { l ->
+                            val v = turn.values(l)
+                            v[which] += dx * TILT_PER_DP
+                            turn.withValues(l, v)
+                        }
+                    },
+                    onEnd = { state.endGesture() },
+                    modifier = Modifier.fillMaxSize(),
+                    onStart = { axis = which },
+                    onReset = { state.editSelected { l -> turn.values(l).let { v -> v[which] = turn.default(which); turn.withValues(l, v) } } },
+                )
+                Text("XYZ"[which].toString(), Modifier.align(Alignment.CenterStart).padding(start = 22.px), color = if (turn.linked(which, axis)) Am.Accent else PanelCaption, fontSize = 13.sp)
+            }
+        }
+    }
+}
 
 @Composable
 private fun TrackpadHint(text: String, modifier: Modifier) {

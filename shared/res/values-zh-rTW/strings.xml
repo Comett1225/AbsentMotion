@@ -100,6 +100,10 @@
     <string name="community_tag_hint">新增自訂標籤</string>
     <string name="community_creator">建立者</string>
     <string name="community_by">作者：%1$s</string>
+    <string name="transform_3d_rotation">3D旋轉</string>
+    <string name="transform_free_rotate">自由旋轉</string>
+    <string name="transform_double_tap_pivot">點兩下以移動錨點</string>
+    <string name="transform_double_tap_layer">點兩下以移動圖層</string>
     <string name="community_size">檔案大小</string>
     <string name="community_confirm">這是我製作的，我同意分享</string>
     <string name="community_need_title">請為社群套件新增標題。</string>

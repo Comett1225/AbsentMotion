@@ -100,6 +100,10 @@
     <string name="community_tag_hint">Eigenen Tag hinzufügen</string>
     <string name="community_creator">Erstellt von</string>
     <string name="community_by">von %1$s</string>
+    <string name="transform_3d_rotation">3D-Drehung</string>
+    <string name="transform_free_rotate">Freies Drehen</string>
+    <string name="transform_double_tap_pivot">Doppeltippen, um den Drehpunkt zu verschieben</string>
+    <string name="transform_double_tap_layer">Doppeltippen, um die Ebene zu verschieben</string>
     <string name="community_size">Dateigröße</string>
     <string name="community_confirm">Ich habe dies erstellt und bin mit dem Teilen einverstanden</string>
     <string name="community_need_title">Füge deinem Community-Paket einen Titel hinzu.</string>

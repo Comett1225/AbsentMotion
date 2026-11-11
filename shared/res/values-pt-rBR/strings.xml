@@ -100,6 +100,10 @@
     <string name="community_tag_hint">Adicione sua própria tag</string>
     <string name="community_creator">Criado por</string>
     <string name="community_by">por %1$s</string>
+    <string name="transform_3d_rotation">Rotação 3D</string>
+    <string name="transform_free_rotate">Rotação livre</string>
+    <string name="transform_double_tap_pivot">Toque duas vezes para mover o pivô</string>
+    <string name="transform_double_tap_layer">Toque duas vezes para mover a camada</string>
     <string name="community_size">Tamanho do arquivo</string>
     <string name="community_confirm">Eu criei este conteúdo e concordo com seu compartilhamento</string>
     <string name="community_need_title">Adicione um título ao pacote da comunidade.</string>

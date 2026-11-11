@@ -100,6 +100,10 @@
     <string name="community_tag_hint">Thêm thẻ của bạn</string>
     <string name="community_creator">Người tạo</string>
     <string name="community_by">bởi %1$s</string>
+    <string name="transform_3d_rotation">Xoay 3D</string>
+    <string name="transform_free_rotate">Xoay tự do</string>
+    <string name="transform_double_tap_pivot">Chạm hai lần để di chuyển điểm xoay</string>
+    <string name="transform_double_tap_layer">Chạm hai lần để di chuyển lớp</string>
     <string name="community_size">Kích thước tệp</string>
     <string name="community_confirm">Tôi đã tạo nội dung này và đồng ý chia sẻ</string>
     <string name="community_need_title">Thêm tiêu đề cho Gói cộng đồng của bạn.</string>

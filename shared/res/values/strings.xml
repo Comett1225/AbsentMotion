@@ -100,6 +100,10 @@
     <string name="community_tag_hint">Add your own tag</string>
     <string name="community_creator">Created by</string>
     <string name="community_by">by %1$s</string>
+    <string name="transform_3d_rotation">3D rotation</string>
+    <string name="transform_free_rotate">Free rotate</string>
+    <string name="transform_double_tap_pivot">Double-tap to move the pivot</string>
+    <string name="transform_double_tap_layer">Double-tap to move the layer</string>
     <string name="community_size">File size</string>
     <string name="community_confirm">I made this and I\'m happy for it to be shared</string>
     <string name="community_need_title">Add a title for your Community bundle.</string>

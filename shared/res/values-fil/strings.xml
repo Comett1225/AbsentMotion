@@ -100,6 +100,10 @@
     <string name="community_tag_hint">Magdagdag ng sariling tag</string>
     <string name="community_creator">Ginawa ni</string>
     <string name="community_by">ni %1$s</string>
+    <string name="transform_3d_rotation">3D rotation</string>
+    <string name="transform_free_rotate">Malayang pag-rotate</string>
+    <string name="transform_double_tap_pivot">I-double-tap para ilipat ang pivot</string>
+    <string name="transform_double_tap_layer">I-double-tap para ilipat ang layer</string>
     <string name="community_size">Laki ng file</string>
     <string name="community_confirm">Ako ang gumawa nito at pumapayag akong ibahagi ito</string>
     <string name="community_need_title">Magdagdag ng pamagat para sa bundle ng komunidad.</string>

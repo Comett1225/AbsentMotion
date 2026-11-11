@@ -14,7 +14,7 @@ With several cameras, the top-most camera that is active at the playhead is used
 
 ### Moving the camera
 
-Select the camera layer. In the preview, drag to pan it and pinch to change the view angle. In **Transform**, **Move**, **Rotate** and **Size** work for a camera; **Size** changes the view angle. With **Depth order** on (see below), **Tilt** works too: it turns the camera to look up, down or to the side. Tilt is one of the **Advanced Controls** of Transform (press and hold **Transform** to switch).
+Select the camera layer. In the preview, drag to pan it and pinch to change the view angle. In **Transform**, **Move**, **Rotate** and **Size** work for a camera; **Size** changes the view angle. With **Depth order** on (see below), **3D rotation** works too: it turns the camera to look up, down or to the side. Turn it on in **Rotate**, **More**, **3D rotation** (on a computer it is the **Tilt** tab, one of the **Advanced Controls**: press and hold **Transform** to switch).
 
 ### Camera Options
 
@@ -68,13 +68,13 @@ Select the light and tap **Light options**:
 - **Color**, and **Intensity** from 0 to 4 (default 1).
 - **Falloff** (Point only, 0 to 100, default 1) is how fast the light gets weaker with distance.
 
-All of them can be animated with keyframes. A new light starts in the middle, in front of the scene, and shines at it. Use **Transform** to move a Point light (Z included) and to turn a Directional light with **Rotate** and **Tilt**.
+All of them can be animated with keyframes. A new light starts in the middle, in front of the scene, and shines at it. Use **Transform** to move a Point light (Z included) and to turn a Directional light with **Rotate** and its **3D rotation**.
 
 Up to four lights work at the same time. As soon as a light is in use, the lights replace the light settings of 3D models (in **Model Options**) and of 3D Scatter and 3D Fracture. A project without light layers looks exactly as before. Tip: add an **Ambient** light next to a **Directional** one, so the sides that face away are not black.
 
 ## Tilt a layer in 3D
 
-Any layer can be tilted around the X and Y axes. Open **Transform** and the **Tilt** tab, which has **X ROTATION** and **Y ROTATION** in degrees. Dragging on the preview while Rotate or Tilt is open tilts the layer too.
+Any layer can be tilted around the X and Y axes. Open **Transform**, **Rotate** and turn on **3D rotation** in **More**: it has **X ROTATION**, **Y ROTATION** and **Z ROTATION** in degrees (on a computer, the **Tilt** tab has X and Y). Dragging on the preview while 3D rotation is open tilts the layer too.
 
 When a layer is tilted, animated in tilt, is a 3D model or has a 3D effect, the **Rotate** tab turns into a 3D trackpad ("Drag here to rotate in 3D") with **X**, **Y** and **Z ROTATION** boxes. One finger tilts the layer and two fingers twist it. **Reset 3D Rotation** in the **More** menu puts it back.
 

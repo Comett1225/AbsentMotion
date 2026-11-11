@@ -100,6 +100,10 @@
     <string name="community_tag_hint">برچسب خود را اضافه کنید</string>
     <string name="community_creator">ساخته‌شده توسط</string>
     <string name="community_by">توسط %1$s</string>
+    <string name="transform_3d_rotation">چرخش سه‌بعدی</string>
+    <string name="transform_free_rotate">چرخش آزاد</string>
+    <string name="transform_double_tap_pivot">برای جابه‌جایی محور دو بار ضربه بزنید</string>
+    <string name="transform_double_tap_layer">برای جابه‌جایی لایه دو بار ضربه بزنید</string>
     <string name="community_size">حجم فایل</string>
     <string name="community_confirm">این را خودم ساخته‌ام و با اشتراک‌گذاری آن موافقم</string>
     <string name="community_need_title">برای بسته انجمن خود عنوانی اضافه کنید.</string>

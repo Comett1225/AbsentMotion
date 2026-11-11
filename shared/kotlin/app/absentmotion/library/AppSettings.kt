@@ -28,6 +28,8 @@ class AppSettings(private val context: Context) {
     private var xmlUploadState by mutableStateOf(prefs.getBoolean("xmlUpload", false))
     private var vibrationState by mutableStateOf(prefs.getBoolean("trimLimitVibration", true))
     private var basicTransformState by mutableStateOf(prefs.getBoolean("basicTransform", true))
+    private var rotate3dState by mutableStateOf(prefs.getBoolean("rotate3d", false))
+    private var rotateFreeState by mutableStateOf(prefs.getBoolean("rotateFree", false))
     private var openGlState by mutableStateOf(prefs.getBoolean("graphicsOpenGl", false))
 
     private var themeState by mutableStateOf(prefs.getString("theme", Themes.DEFAULT)!!)
@@ -66,6 +68,14 @@ class AppSettings(private val context: Context) {
     var basicTransform: Boolean
         get() = basicTransformState
         set(value) { basicTransformState = value; prefs.edit().putBoolean("basicTransform", value).apply() }
+
+    var rotate3d: Boolean
+        get() = rotate3dState
+        set(value) { rotate3dState = value; prefs.edit().putBoolean("rotate3d", value).apply() }
+
+    var rotateFree: Boolean
+        get() = rotateFreeState
+        set(value) { rotateFreeState = value; prefs.edit().putBoolean("rotateFree", value).apply() }
 
     var openGl: Boolean
         get() = openGlState

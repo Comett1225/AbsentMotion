@@ -100,6 +100,10 @@
     <string name="community_tag_hint">Tambah tag sendiri</string>
     <string name="community_creator">Dicipta oleh</string>
     <string name="community_by">oleh %1$s</string>
+    <string name="transform_3d_rotation">Putaran 3D</string>
+    <string name="transform_free_rotate">Putaran bebas</string>
+    <string name="transform_double_tap_pivot">Ketik dua kali untuk mengalih pangsi</string>
+    <string name="transform_double_tap_layer">Ketik dua kali untuk mengalih lapisan</string>
     <string name="community_size">Saiz fail</string>
     <string name="community_confirm">Saya yang menghasilkannya dan bersetuju untuk berkongsi</string>
     <string name="community_need_title">Tambah tajuk untuk bundel komuniti anda.</string>

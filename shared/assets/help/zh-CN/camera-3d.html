@@ -4,7 +4,7 @@
 <p>首次添加相机时，会显示一条提示：“要通过相机观看，请打开此面板并开启相机视图。” <strong>相机视图</strong> 按钮位于预览条中（参见<a href="editor.html">编辑器界面</a>）。开启后，你将通过相机观看项目；否则，相机会在预览中显示为深色矩形框。</p>
 <p>如果有多个相机，则使用在播放头位置处于激活状态且位于最上层的相机。</p>
 <h3 id="moving-the-camera">移动相机</h3>
-<p>选中相机图层。在预览中拖动可平移相机，双指捏合可更改视角。在 <strong>变换</strong> 中，<strong>移动</strong>、<strong>旋转</strong> 和 <strong>大小</strong> 都可用于相机；<strong>大小</strong> 会改变视角。开启 <strong>深度顺序</strong>（见下文）后，<strong>倾斜</strong> 也可使用：它会让相机向上、向下或侧向看。倾斜是 <strong>变换</strong> 的 <strong>高级控制</strong> 之一（长按 <strong>变换</strong> 即可切换）。</p>
+<p>选中相机图层。在预览中拖动可平移相机，双指捏合可更改视角。在 <strong>变换</strong> 中，<strong>移动</strong>、<strong>旋转</strong> 和 <strong>大小</strong> 都可用于相机；<strong>大小</strong> 会改变视角。开启 <strong>深度顺序</strong>（见下文）后，<strong>3D旋转</strong> 也可使用：它会让相机向上、向下或侧向看。在<strong>旋转</strong>、<strong>更多</strong>、<strong>3D旋转</strong>中开启它（在电脑上，它是<strong>倾斜</strong>标签，属于<strong>高级控制</strong>之一：长按<strong>变换</strong>即可切换）。</p>
 <h3 id="camera-options">相机选项</h3>
 <p>三个标签：</p>
 <ul><li><strong>相机视图</strong>。<strong>深度顺序</strong> 开关；开启时还会显示 <strong>排序</strong>（见下文；在电脑上它位于最后一行）、视锥示意图、<strong>透视</strong> 和 <strong>正交</strong> 按钮、<strong>视角</strong>（0.1 至 179.9 度），以及随视角变化的 <strong>缩放</strong>。</li><li><strong>对焦模糊</strong>。一个开关，然后是 <strong>对焦距离</strong>（焦平面会显示为“位于 Z ……”）、<strong>景深</strong> 和 <strong>模糊强度</strong>。</li><li><strong>雾效</strong>。一个开关、一个 <strong>颜色</strong>，以及 <strong>近</strong> 和 <strong>远</strong> 距离。</li></ul>
@@ -25,10 +25,10 @@
 <p>依次点按 <strong>添加</strong>、<strong>对象／素材</strong>、<strong>灯光</strong>，即可添加灯光。它与相机一样会持续整个项目，并且其本身永远不会被绘制出来。灯光会为3D模型以及3D散布和3D碎裂的分块提供明暗效果。</p>
 <p>选中灯光并点按 <strong>灯光选项</strong>：</p>
 <ul><li><strong>环境光</strong>会均匀照亮每个面。<strong>方向光</strong>（默认）从一个方向照射，类似太阳。<strong>点光源</strong>从灯光所在位置向外照射，类似灯泡，并且距离越远越弱。</li><li><strong>颜色</strong>，以及 <strong>强度</strong>（范围 0 到 4，默认 1）。</li><li><strong>衰减</strong>（仅限点光源，范围 0 到 100，默认 1）是光线随距离减弱的速度。</li></ul>
-<p>以上所有设置都可以使用关键帧设置动画。新灯光会放在场景前方的中间位置，并对准场景照射。使用 <strong>变换</strong> 可移动点光源（包括 Z 轴），并使用 <strong>旋转</strong> 和 <strong>倾斜</strong> 转动方向光。</p>
+<p>以上所有设置都可以使用关键帧设置动画。新灯光会放在场景前方的中间位置，并对准场景照射。使用 <strong>变换</strong> 可移动点光源（包括 Z 轴），并使用 <strong>旋转</strong> 和其中的 <strong>3D旋转</strong> 转动方向光。</p>
 <p>最多可同时使用四个灯光。只要存在正在使用的灯光，灯光设置就会取代3D模型（<strong>模型选项</strong>中）以及3D散布和3D碎裂的灯光设置。没有灯光图层的项目外观保持不变。小贴士：在 <strong>方向光</strong> 旁边添加一个 <strong>环境光</strong>，这样背向光源的一面就不会是全黑的。</p>
 <h2 id="tilt-a-layer-in-3d">以3D方式倾斜图层</h2>
-<p>任何图层都可以绕 X 轴和 Y 轴倾斜。打开 <strong>变换</strong> 中的 <strong>倾斜</strong> 标签，其中有以度为单位的 <strong>X轴旋转</strong> 和 <strong>Y轴旋转</strong>。在打开 <strong>旋转</strong> 或 <strong>倾斜</strong> 时拖动预览，同样可以倾斜图层。</p>
+<p>任何图层都可以绕 X 轴和 Y 轴倾斜。打开<strong>变换</strong>、<strong>旋转</strong>，并在<strong>更多</strong>中开启<strong>3D旋转</strong>：其中有以度为单位的<strong>X轴旋转</strong>、<strong>Y轴旋转</strong>和<strong>Z轴旋转</strong>（在电脑上，<strong>倾斜</strong>标签包含X和Y）。打开3D旋转时拖动预览，同样可以倾斜图层。</p>
 <p>当图层已倾斜、设置了倾斜动画、是3D模型或带有3D特效时，<strong>旋转</strong> 标签会变为3D触控板（“拖动此处可进行3D旋转”），并带有 <strong>X</strong>、<strong>Y</strong> 和 <strong>Z轴旋转</strong> 输入框。单指可倾斜图层，双指可扭转图层。点按 <strong>更多</strong> 菜单中的 <strong>重置3D旋转</strong> 即可将其恢复。</p>
 <h2 id="3d-effects">3D特效</h2>
 <p><strong>3D</strong> 分类中的特效可将图层变为立体物体：立方体、方盒、空心方盒、圆柱体、椭球体、圆环、棱锥、八面体、六棱柱、星形棱柱、星形多面体、心形、三轴十字、栅格拉伸、翻转图层、球化和隧道。当其中某个特效存在时，<strong>旋转</strong> 和 <strong>倾斜</strong> 控件会改变该特效的旋转。参见<a href="effects/index.html">特效库</a>。</p>

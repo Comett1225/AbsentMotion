@@ -100,6 +100,10 @@
     <string name="community_tag_hint">Dodaj własny tag</string>
     <string name="community_creator">Autor</string>
     <string name="community_by">autor: %1$s</string>
+    <string name="transform_3d_rotation">Obrót 3D</string>
+    <string name="transform_free_rotate">Swobodny obrót</string>
+    <string name="transform_double_tap_pivot">Dotknij dwukrotnie, aby przesunąć punkt obrotu</string>
+    <string name="transform_double_tap_layer">Dotknij dwukrotnie, aby przesunąć warstwę</string>
     <string name="community_size">Rozmiar pliku</string>
     <string name="community_confirm">To moje dzieło i zgadzam się na jego udostępnianie</string>
     <string name="community_need_title">Dodaj tytuł pakietu społeczności.</string>

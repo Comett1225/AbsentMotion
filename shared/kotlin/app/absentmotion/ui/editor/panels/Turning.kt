@@ -90,6 +90,8 @@ internal data class Turn(val effect: Int = -1, private val axes: List<EffectPara
         }
     }
 
+    fun default(axis: Int): Float = if (effect < 0) 0f else axes[axis].default.finiteFloat() ?: 0f
+
     fun target(axis: Int): KeyTarget =
         if (effect >= 0) KeyTarget(PropRef.effect(effect, axes[axis].id), axes[axis].default, axes[axis].type)
         else TransformTargets[if (axis < 2) TILT_TAB else ROTATE_TAB]
@@ -97,15 +99,15 @@ internal data class Turn(val effect: Int = -1, private val axes: List<EffectPara
     fun linked(a: Int, b: Int): Boolean = a == b || (effect < 0 && a < 2 && b < 2)
 }
 
-internal fun turnFor(layer: Layer, catalog: EffectCatalog, tab: Int): Turn? {
+internal fun turnFor(layer: Layer, catalog: EffectCatalog, tab: Int, threeD: Boolean = false): Turn? {
     if (tab != ROTATE_TAB && tab != TILT_TAB) return null
-    if (layer.kind == "camera") return if (tab == TILT_TAB) Turn() else null
+    if (layer.kind == "camera") return if (tab == TILT_TAB || threeD) Turn() else null
     val turn = layer.effects.withIndex().firstNotNullOfOrNull { (i, node) ->
         val definition = catalog.find(node["id"] ?: "")?.takeIf { it.available && node["hidden"] != "true" } ?: return@firstNotNullOfOrNull null
         val axes = TURN_AXES.map { id -> definition.params.firstOrNull { it.id == id } ?: return@firstNotNullOfOrNull null }
         Turn(i, axes)
     } ?: Turn()
-    return turn.takeIf { tab == TILT_TAB || turn.effect >= 0 }
+    return turn.takeIf { tab == TILT_TAB || threeD || turn.effect >= 0 }
 }
 
 private val TURN_AXES = listOf("rotX", "rotY", "rotZ")

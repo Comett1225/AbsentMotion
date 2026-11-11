@@ -56,6 +56,19 @@ class TurningTest {
         assertNull(turnFor(shapeLayer("camera").addEffect(effect("cube")), catalog, ROTATE_TAB))
     }
 
+    @Test fun onThePhoneRotateCarries3dAndMovePivotSoThereAreFourTabs() {
+        assertEquals(listOf(0, ROTATE_TAB, SIZE_TAB, SKEW_TAB), transformTabs(basic = false, desktop = false))
+        assertEquals((0..PIVOT_TAB).toList(), transformTabs(basic = false, desktop = true))
+        assertEquals(-1, turnFor(shapeLayer(), catalog, ROTATE_TAB, threeD = true)!!.effect)
+        assertEquals(-1, turnFor(shapeLayer("camera"), catalog, ROTATE_TAB, threeD = true)!!.effect)
+        assertFalse(shapeLayer().hasTilt())
+        assertTrue(shapeLayer().withTilt(0f, 15f).hasTilt())
+        val turn = Turn()
+        val tilted = turn.withValues(shapeLayer(), floatArrayOf(10f, 0f, 30f))
+        assertArrayEquals(floatArrayOf(10f, 0f, 30f), turn.values(tilted), 1e-4f)
+        assertEquals(0f, turn.default(2), 0f)
+    }
+
     @Test fun theTopmostVisibleThreeDEffectIsTheOneThatTurns() {
         val blurred = shapeLayer().addEffect(effect("blur")).addEffect(effect("cube", hidden = true)).addEffect(effect("torus")).addEffect(effect("flip"))
         assertEquals(2, turnFor(blurred, catalog, ROTATE_TAB)!!.effect)

@@ -100,6 +100,10 @@
     <string name="community_tag_hint">Додати власний тег</string>
     <string name="community_creator">Автор</string>
     <string name="community_by">Автор: %1$s</string>
+    <string name="transform_3d_rotation">3D-обертання</string>
+    <string name="transform_free_rotate">Вільне обертання</string>
+    <string name="transform_double_tap_pivot">Двічі торкніться, щоб перемістити опорну точку</string>
+    <string name="transform_double_tap_layer">Двічі торкніться, щоб перемістити шар</string>
     <string name="community_size">Розмір файлу</string>
     <string name="community_confirm">Я створив(-ла) це та погоджуюся на поширення</string>
     <string name="community_need_title">Додайте назву для пакета спільноти.</string>

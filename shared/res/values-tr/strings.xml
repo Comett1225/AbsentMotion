@@ -100,6 +100,10 @@
     <string name="community_tag_hint">Kendi etiketinizi ekleyin</string>
     <string name="community_creator">Oluşturan</string>
     <string name="community_by">%1$s tarafından</string>
+    <string name="transform_3d_rotation">3D döndürme</string>
+    <string name="transform_free_rotate">Serbest döndürme</string>
+    <string name="transform_double_tap_pivot">Pivotu taşımak için iki kez dokunun</string>
+    <string name="transform_double_tap_layer">Katmanı taşımak için iki kez dokunun</string>
     <string name="community_size">Dosya boyutu</string>
     <string name="community_confirm">Bunu ben yaptım ve paylaşılmasını kabul ediyorum</string>
     <string name="community_need_title">Topluluk paketiniz için bir başlık ekleyin.</string>

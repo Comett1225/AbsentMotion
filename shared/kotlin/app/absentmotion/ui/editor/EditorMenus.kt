@@ -270,9 +270,11 @@ internal fun aboveLeftX(anchorLeft: Int, windowWidth: Int, popupWidth: Int, desk
     if (desktop) anchorLeft.coerceIn(0, maxOf(0, windowWidth - popupWidth)) else 0
 
 @Composable
-internal fun TransformMenu(state: EditorState, tab: Int, turn: Turn?, onDismiss: () -> Unit) {
-    val resetName = listOf(R.string.menu_reset_location, R.string.menu_reset_rotation, R.string.menu_reset_scale, R.string.menu_reset_3d_rotation, R.string.menu_reset_skew, R.string.menu_reset_pivot)[tab]
+internal fun TransformMenu(state: EditorState, tab: Int, turn: Turn?, extra: (@Composable (close: () -> Unit) -> Unit)? = null, onDismiss: () -> Unit) {
+    val resetName = if (extra != null && tab == ROTATE_TAB && turn != null) R.string.menu_reset_3d_rotation
+        else listOf(R.string.menu_reset_location, R.string.menu_reset_rotation, R.string.menu_reset_scale, R.string.menu_reset_3d_rotation, R.string.menu_reset_skew, R.string.menu_reset_pivot)[tab]
     MenuPopup(AboveLeft, onDismiss, TransformOrigin(0f, 1f)) {
+        extra?.invoke(onDismiss)
         MenuRow(stringResource(resetName)) {
             if (tab == ROTATE_TAB && turn != null) state.editSelected { turn.reset(it) } else state.resetTransform(listOf(tab))
             onDismiss()
@@ -281,10 +283,12 @@ internal fun TransformMenu(state: EditorState, tab: Int, turn: Turn?, onDismiss:
             state.resetTransform(listOf(0, 1, 2, 3, 4, 5))
             onDismiss()
         }
-        val basic = state.settings.basicTransform
-        MenuRow(stringResource(if (basic) R.string.transform_advanced_controls else R.string.transform_basic_controls), divider = true) {
-            state.settings.basicTransform = !basic
-            onDismiss()
+        if (extra == null) {
+            val basic = state.settings.basicTransform
+            MenuRow(stringResource(if (basic) R.string.transform_advanced_controls else R.string.transform_basic_controls), divider = true) {
+                state.settings.basicTransform = !basic
+                onDismiss()
+            }
         }
     }
 }

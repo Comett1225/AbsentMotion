@@ -100,6 +100,10 @@
     <string name="community_tag_hint">أضف وسمًا خاصًا بك</string>
     <string name="community_creator">أنشأه</string>
     <string name="community_by">بواسطة %1$s</string>
+    <string name="transform_3d_rotation">تدوير 3D</string>
+    <string name="transform_free_rotate">تدوير حر</string>
+    <string name="transform_double_tap_pivot">انقر مرتين لنقل المحور</string>
+    <string name="transform_double_tap_layer">انقر مرتين لنقل الطبقة</string>
     <string name="community_size">حجم الملف</string>
     <string name="community_confirm">أنشأت هذا العمل وأوافق على مشاركته</string>
     <string name="community_need_title">أضف عنوانًا لحزمة المجتمع.</string>

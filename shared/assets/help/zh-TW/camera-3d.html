@@ -4,7 +4,7 @@
 <p>第一次新增攝影機時，會出現提示：「若要透過攝影機觀看，請開啟此面板並開啟攝影機視角。」<strong>攝影機視角</strong>按鈕位於預覽列中（請參閱<a href="editor.html">編輯器畫面</a>）。開啟後，你會透過攝影機看到專案。否則，攝影機會以深色矩形框顯示在預覽中。</p>
 <p>有多個攝影機時，會使用在播放頭位置上作用中、位於最上層的攝影機。</p>
 <h3 id="moving-the-camera">移動攝影機</h3>
-<p>選取攝影機圖層。在預覽中拖曳可平移，捏合可變更視角。在<strong>變形</strong>中，<strong>移動</strong>、<strong>旋轉</strong>和<strong>大小</strong>都適用於攝影機；<strong>大小</strong>會改變視角。開啟<strong>深度順序</strong>（見下文）後，<strong>傾斜</strong>也會生效：它會讓攝影機向上、向下或向側面看。傾斜是<strong>變形</strong>的<strong>進階控制</strong>之一（按住<strong>變形</strong>即可切換）。</p>
+<p>選取攝影機圖層。在預覽中拖曳可平移，捏合可變更視角。在<strong>變形</strong>中，<strong>移動</strong>、<strong>旋轉</strong>和<strong>大小</strong>都適用於攝影機；<strong>大小</strong>會改變視角。開啟<strong>深度順序</strong>（見下文）後，<strong>3D旋轉</strong>也會生效：它會讓攝影機向上、向下或向側面看。在<strong>旋轉</strong>、<strong>更多</strong>、<strong>3D旋轉</strong>中開啟它（在電腦上，它是<strong>傾斜</strong>標籤，屬於<strong>進階控制</strong>之一：按住<strong>變形</strong>即可切換）。</p>
 <h3 id="camera-options">攝影機選項</h3>
 <p>共有三個分頁：</p>
 <ul><li><strong>攝影機視角</strong>。包含<strong>深度順序</strong>開關，開啟時還會顯示<strong>排序</strong>（見下文；在電腦上位於最後一列）、視錐示意圖、<strong>透視</strong>和<strong>正交</strong>按鈕、<strong>視角</strong>（0.1 至 179.9 度），以及隨視角變化的<strong>縮放</strong>。</li><li><strong>對焦模糊</strong>。一個開關，之後是<strong>對焦距離</strong>（對焦平面會以「位於 Z ...」顯示）、<strong>景深</strong>和<strong>模糊強度</strong>。</li><li><strong>霧效</strong>。一個開關、一個<strong>顏色</strong>，以及<strong>近</strong>與<strong>遠</strong>距離。</li></ul>
@@ -25,10 +25,10 @@
 <p><strong>新增</strong>、<strong>物件／素材</strong>、<strong>燈光</strong>會加入一盞燈。與攝影機一樣，它會持續整個專案，並且本身永遠不會被繪製出來。燈光會為 3D 模型，以及 <strong>3D 散佈</strong>和 <strong>3D 碎裂</strong>的各個部分提供陰影。</p>
 <p>選取燈光，然後點一下<strong>燈光選項</strong>：</p>
 <ul><li><strong>環境光</strong>會從各個方向均勻照亮。<strong>平行光</strong>（預設）會從一個方向照射，就像太陽。<strong>點光源</strong>會從燈光所在的位置向外照射，就像燈泡，距離越遠越弱。</li><li><strong>顏色</strong>，以及 0 至 4 的<strong>強度</strong>（預設 1）。</li><li><strong>衰減</strong>（僅點光源，0 至 100，預設 1）表示光線隨距離減弱的速度。</li></ul>
-<p>以上所有項目都可以用關鍵影格製作動畫。新燈光會放在場景中央的前方，並照向場景。使用<strong>變形</strong>來移動點光源（包括 Z 軸），並使用<strong>旋轉</strong>和<strong>傾斜</strong>來轉動平行光。</p>
+<p>以上所有項目都可以用關鍵影格製作動畫。新燈光會放在場景中央的前方，並照向場景。使用<strong>變形</strong>來移動點光源（包括 Z 軸），並使用<strong>旋轉</strong>和其中的<strong>3D旋轉</strong>來轉動平行光。</p>
 <p>最多可同時使用四盞燈。只要有燈光正在使用，燈光就會取代 3D 模型（在<strong>模型選項</strong>中）以及 3D 散佈和 3D 碎裂的光線設定。沒有燈光圖層的專案外觀完全不變。小技巧：在<strong>平行光</strong>旁加入一盞<strong>環境光</strong>，這樣背光的面就不會是全黑。</p>
 <h2 id="tilt-a-layer-in-3d">將圖層傾斜為 3D</h2>
-<p>任何圖層都可以沿 X 軸和 Y 軸傾斜。開啟<strong>變形</strong>中的<strong>傾斜</strong>分頁，裡面有以度為單位的 <strong>X軸旋轉</strong> 和 <strong>Y軸旋轉</strong>。在旋轉或傾斜開啟時於預覽上拖曳，也會傾斜圖層。</p>
+<p>任何圖層都可以沿 X 軸和 Y 軸傾斜。開啟<strong>變形</strong>、<strong>旋轉</strong>，並在<strong>更多</strong>中開啟<strong>3D旋轉</strong>：裡面有以度為單位的<strong>X軸旋轉</strong>、<strong>Y軸旋轉</strong>和<strong>Z軸旋轉</strong>（在電腦上，<strong>傾斜</strong>標籤有X和Y）。開啟3D旋轉時在預覽上拖曳，也會傾斜圖層。</p>
 <p>當圖層已傾斜、其傾斜已製作動畫、是 3D 模型，或具有 3D 特效時，<strong>旋轉</strong>分頁會變成 3D 觸控板（「拖曳此處以進行 3D 旋轉」），並附有 <strong>X</strong>、<strong>Y</strong> 和 <strong>Z軸旋轉</strong>欄位。單指可傾斜圖層，雙指可扭轉圖層。<strong>更多</strong>選單中的<strong>重設3D旋轉</strong>可將它恢復原狀。</p>
 <h2 id="3d-effects">3D 特效</h2>
 <p><strong>3D</strong>類別中的特效會將圖層變為立體：立方體、方塊、中空方塊、圓柱、橢球、環面、角錐、八面體、六角柱、星形柱、星形多面體、心形、三軸十字、光柵擠出、翻轉圖層、球面化和隧道。當其中一種特效存在時，<strong>旋轉</strong>和<strong>傾斜</strong>控制項會改變該特效的旋轉。請參閱<a href="effects/index.html">特效庫</a>。</p>

@@ -192,7 +192,7 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
         if (kind == "camera" && moving) state.selectedId?.let { CameraMovesSheet(state, it) { moving = false } }
         val presets = Tile(Presets) { openPresets(state) }
         val effects = Tile(Effects) { state.effectIndex = -1; state.panel = EditorPanel.Effects }
-        val transform = Tile(MoveTransform, onLongClick = { controls = true }, menu = {
+        val transform = Tile(MoveTransform, onLongClick = if (app.absentmotion.platform.PlatformFeatures.desktop) { { controls = true } } else null, menu = {
             Presence(controls) { TransformControlsMenu(state) { basic -> controls = false; if (basic != null) state.panel = EditorPanel.MoveTransform } }
         }) { state.panel = EditorPanel.MoveTransform }
         val blending = Tile(Blending) { state.panel = EditorPanel.Blending }
@@ -403,15 +403,20 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
         return
     }
     val move = panel == EditorPanel.MoveTransform
+    val desk = app.absentmotion.platform.PlatformFeatures.desktop
     var tab by remember(selected.kind) { mutableIntStateOf(0) }
+    var pivotMode by remember(selected.kind) { mutableStateOf(false) }
     val basic = state.settings.basicTransform
-    if (tab !in transformTabs(basic)) SideEffect { tab = 0 }
+    if (tab !in transformTabs(basic, desk)) SideEffect { tab = 0 }
+    val canPivot = !desk && selected.kind != "camera"
+    val shown = if (tab == 0 && pivotMode && canPivot) PIVOT_TAB else tab
     val catalog by state.engine.effects.collectAsState()
-    val turn = if (move) turnFor(selected, catalog, tab) else null
+    val threeD = !desk && shown == ROTATE_TAB && (state.settings.rotate3d || layer.hasTilt()) && (selected.kind != "camera" || state.scene.depthOrder)
+    val turn = if (move) turnFor(selected, catalog, shown, threeD) else null
     var menuOpen by remember { mutableStateOf(false) }
-    val named = panel != EditorPanel.EditShape && panel != EditorPanel.Camera && panel != EditorPanel.Model && panel != EditorPanel.Light && !(move && tab == ROTATE_TAB && turn != null)
+    val named = panel != EditorPanel.EditShape && panel != EditorPanel.Camera && panel != EditorPanel.Model && panel != EditorPanel.Light && !(move && shown == ROTATE_TAB && turn != null)
     val known = if (!named) null else when {
-        move -> if (selected.kind == "camera" && tab == SIZE_TAB) KeyTarget(app.absentmotion.model.CameraFov, "60.000000") else TransformTargets[tab]
+        move -> if (selected.kind == "camera" && shown == SIZE_TAB) KeyTarget(app.absentmotion.model.CameraFov, "60.000000") else TransformTargets[shown]
         panel == EditorPanel.ColorFill && layer.fillType == "color" -> KeyTarget(PropRef.FillColor, formatColor(layer.fillColor))
         panel == EditorPanel.BorderShadow -> borderShadowTarget(layer)
         panel == EditorPanel.Blending -> KeyTarget(OpacityRef, "1.000000")
@@ -442,7 +447,15 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
             if (move) {
                 Box(Modifier.weight(1f).fillMaxWidth()) {
                     FrameButton(PanelIcons.More, stringResource(R.string.effects_more), Modifier.fillMaxSize()) { menuOpen = true }
-                    Presence(menuOpen) { TransformMenu(state, tab, turn) { menuOpen = false } }
+                    Presence(menuOpen) {
+                        TransformMenu(state, shown, turn, extra = if (desk) null else { close ->
+                            if (canPivot && tab == 0) MenuRow(stringResource(R.string.a11y_tab_pivot), trailing = if (pivotMode) PanelIcons.Check else null, divider = true) { pivotMode = !pivotMode; close() }
+                            if (tab == ROTATE_TAB && (selected.kind != "camera" || state.scene.depthOrder)) {
+                                MenuRow(stringResource(R.string.transform_3d_rotation), enabled = !layer.hasTilt() && (turn?.effect ?: -1) < 0, trailing = if (state.settings.rotate3d || turn != null) PanelIcons.Check else null, divider = turn == null) { state.settings.rotate3d = !state.settings.rotate3d; close() }
+                                if (turn != null) MenuRow(stringResource(R.string.transform_free_rotate), trailing = if (state.settings.rotateFree) PanelIcons.Check else null, divider = true) { state.settings.rotateFree = !state.settings.rotateFree; close() }
+                            }
+                        }) { menuOpen = false }
+                    }
                 }
             } else {
                 Spacer(Modifier.weight(1f))
@@ -451,7 +464,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
         Box(Modifier.weight(1f).fillMaxHeight().tutorialGuard().background(if (move) Am.PanelInset else Am.Panel)) {
             if (panel == EditorPanel.BorderShadow) BorderShadowTabs(Modifier.align(if (app.absentmotion.platform.PlatformFeatures.desktop) Alignment.TopEnd else Alignment.CenterEnd).width(168.px).then(if (app.absentmotion.platform.PlatformFeatures.desktop) Modifier.height(PanelHeight) else Modifier.fillMaxHeight()).background(Am.Panel))
             when (panel) {
-                EditorPanel.MoveTransform -> Swap(tab, Modifier.fillMaxSize().tutorialTarget("pad"), rise = 0.dp) { MoveTransformPanel(state, layer, tab, turn, Modifier.fillMaxSize()) }
+                EditorPanel.MoveTransform -> Swap(shown, Modifier.fillMaxSize().tutorialTarget("pad"), rise = 0.dp) { MoveTransformPanel(state, layer, shown, turn, Modifier.fillMaxSize(), if (canPivot) { { pivotMode = !pivotMode } } else null) }
                 EditorPanel.ColorFill -> ColorFillPanel(state, layer, Modifier.fillMaxSize())
                 EditorPanel.EditShape -> EditShapePanel(state, layer, Modifier.fillMaxSize())
                 EditorPanel.Speed -> SpeedPanel(state, layer, Modifier.fillMaxSize())
@@ -471,8 +484,8 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
             Column(Modifier.width(168.px).then(if (app.absentmotion.platform.PlatformFeatures.desktop) Modifier.height(PanelHeight) else Modifier.fillMaxHeight()).tutorialGuard()) {
                 val names = listOf(R.string.a11y_tab_move, R.string.a11y_tab_rotate, R.string.panel_size, R.string.a11y_tab_tilt, R.string.a11y_tab_skew, R.string.a11y_tab_pivot)
                 val icons = listOf(PanelIcons.TabMove, PanelIcons.TabRotate, PanelIcons.TabSize, PanelIcons.TabTilt, PanelIcons.TabSkew, PanelIcons.TabPivot)
-                transformTabs(state.settings.basicTransform).forEach { i ->
-                    val icon = icons[i]
+                transformTabs(state.settings.basicTransform, desk).forEach { i ->
+                    val icon = if (i == 0 && shown == PIVOT_TAB) icons[PIVOT_TAB] else icons[i]
                     val usable = i <= SIZE_TAB || selected.kind != "camera" || (i == TILT_TAB && state.scene.depthOrder)
                     val tip = if (!app.absentmotion.platform.PlatformFeatures.desktop) "" else when (i) {
                         SIZE_TAB -> deskShortcut(R.string.panel_size, "${DeskAlt}${stringResource(R.string.desk_scroll_key)}")
@@ -490,7 +503,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
                             val tint = if (tab == i) Am.Accent else Am.OnDark
                             PanelIcon(icon, tint, size = 17.dp)
                             Text(
-                                stringResource(names[i]), Modifier.fillMaxWidth().padding(horizontal = 2.dp), color = animatedColor(tint), maxLines = 1, softWrap = false,
+                                stringResource(names[if (i == 0 && shown == PIVOT_TAB) PIVOT_TAB else i]), Modifier.fillMaxWidth().padding(horizontal = 2.dp), color = animatedColor(tint), maxLines = 1, softWrap = false,
                                 textAlign = androidx.compose.ui.text.style.TextAlign.Center, lineHeight = if (app.absentmotion.platform.PlatformFeatures.desktop) 14.sp else 9.sp,
                                 fontSize = if (app.absentmotion.platform.PlatformFeatures.desktop) 12.sp else androidx.compose.ui.unit.TextUnit.Unspecified,
                                 autoSize = if (app.absentmotion.platform.PlatformFeatures.desktop) null else androidx.compose.foundation.text.TextAutoSize.StepBased(6.sp, 9.sp, 0.5.sp),
@@ -512,7 +525,10 @@ internal val TransformTargets = listOf(
     KeyTarget(PropRef.Pivot, "0.000000,0.000000,0.000000"),
 )
 
-internal fun transformTabs(basic: Boolean) = if (basic) listOf(0, ROTATE_TAB, SIZE_TAB, SKEW_TAB) else (0..PIVOT_TAB).toList()
+internal fun transformTabs(basic: Boolean, desktop: Boolean = true) = if (basic || !desktop) listOf(0, ROTATE_TAB, SIZE_TAB, SKEW_TAB) else (0..PIVOT_TAB).toList()
+
+internal fun app.absentmotion.model.Layer.hasTilt(): Boolean =
+    tilt.any { kotlin.math.abs(it) > 1e-4f } || element(PropRef.Tilt)?.children?.any { it.name == "kf" } == true
 
 internal const val ROTATE_TAB = 1
 internal const val SIZE_TAB = 2

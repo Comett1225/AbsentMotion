@@ -248,11 +248,13 @@ internal fun rulerTip(context: android.content.Context) {
     android.widget.Toast.makeText(context, context.getString(app.absentmotion.R.string.ruler_tip), android.widget.Toast.LENGTH_LONG).show()
 }
 
-internal fun Modifier.holdAndDoubleTap(timing: LongArray, onDoubleTap: (() -> Unit)?): Modifier = pointerInput(onDoubleTap != null) {
+internal fun Modifier.holdAndDoubleTap(timing: LongArray, slop: Dp? = null, onDoubleTap: (() -> Unit)?): Modifier = pointerInput(onDoubleTap != null) {
+    var lastTap = Offset.Zero
     awaitEachGesture {
         val down = awaitFirstDown(requireUnconsumed = false, pass = androidx.compose.ui.input.pointer.PointerEventPass.Initial)
         timing[0] = down.uptimeMillis
-        if (onDoubleTap != null && down.uptimeMillis - timing[1] < viewConfiguration.doubleTapTimeoutMillis) {
+        val near = slop == null || (down.position - lastTap).getDistance() <= slop.toPx()
+        if (onDoubleTap != null && near && down.uptimeMillis - timing[1] < viewConfiguration.doubleTapTimeoutMillis) {
             timing[1] = 0L
             down.consume()
             onDoubleTap()
@@ -263,7 +265,7 @@ internal fun Modifier.holdAndDoubleTap(timing: LongArray, onDoubleTap: (() -> Un
             val change = awaitPointerEvent(androidx.compose.ui.input.pointer.PointerEventPass.Initial).changes.firstOrNull { it.id == down.id } ?: break
             if ((change.position - down.position).getDistance() > viewConfiguration.touchSlop) moved = true
             if (!change.pressed) {
-                if (!moved && change.uptimeMillis - down.uptimeMillis < viewConfiguration.longPressTimeoutMillis) timing[1] = change.uptimeMillis
+                if (!moved && change.uptimeMillis - down.uptimeMillis < viewConfiguration.longPressTimeoutMillis) { timing[1] = change.uptimeMillis; lastTap = down.position }
                 break
             }
         }

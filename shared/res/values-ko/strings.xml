@@ -100,6 +100,10 @@
     <string name="community_tag_hint">직접 태그 추가</string>
     <string name="community_creator">제작자</string>
     <string name="community_by">제작: %1$s</string>
+    <string name="transform_3d_rotation">3D 회전</string>
+    <string name="transform_free_rotate">자유 회전</string>
+    <string name="transform_double_tap_pivot">두 번 탭하여 기준점 이동</string>
+    <string name="transform_double_tap_layer">두 번 탭하여 레이어 이동</string>
     <string name="community_size">파일 크기</string>
     <string name="community_confirm">제가 만든 작품이며 공유에 동의합니다</string>
     <string name="community_need_title">커뮤니티 번들의 제목을 추가하세요.</string>

@@ -37,19 +37,19 @@ Tap any number box to open the number pad. The first tap selects the whole value
 
 ### Transform
 
-Tabs on the right: **Move**, **Rotate**, **Size**, **Tilt**, **Skew**, **Pivot**. For a camera only Move, Rotate and Size work, and Tilt too while Depth order is on; the other tabs are gray. Hold **Transform** in the tools, or open **More**, to switch between **Basic Controls** (Move, Rotate, Size and Skew, the default) and **Advanced Controls** (all six tabs).
+Tabs on the right: **Move**, **Rotate**, **Size**, **Skew**. The pivot is inside Move and 3D rotation is inside Rotate. For a camera only Move, Rotate and Size work; Skew is gray. On a computer the tabs are **Move**, **Rotate**, **Size**, **Tilt**, **Skew** and **Pivot**: hold **Transform** in the tools, or open **More**, to switch between **Basic Controls** (Move, Rotate, Size and Skew, the default) and **Advanced Controls** (all six tabs).
 
-- **Move.** A trackpad ("Drag here to move the layer") and X and Y boxes. Tap **Z** to move the layer along the depth axis. Thin red guides show when the layer lines up with the canvas or another layer.
-- **Rotate.** A dial: drag the knob around or tap the degrees to type. When the layer is tilted in 3D, this tab becomes a 3D trackpad: one finger tilts, two fingers twist.
+- **Move.** A trackpad ("Drag here to move the layer") and X and Y boxes. Tap **Z** to move the layer along the depth axis. Thin red guides show when the layer lines up with the canvas or another layer. Double-tap the trackpad to move the **Pivot** instead: the tab then says **Pivot**, and a double-tap goes back. **More** has **Pivot** too.
+- **Rotate.** A dial: drag the knob around or tap the degrees to type. Turn on **3D rotation** in **More** to turn the layer around **X**, **Y** and **Z**: one ruler for each axis, or with **Free rotate** in **More** a trackpad where one finger tilts and two fingers twist. A layer that is already tilted, and a 3D object, always shows its 3D rotation; **Reset 3D Rotation** makes it flat again.
 - **Size.** Width and height boxes and a **link** button (on by default) that keeps the proportions. For a camera this tab changes the view angle. The link is remembered for each layer and saved with the project, and the ruler keeps gliding after a flick.
-- **Tilt.** **X ROTATION** and **Y ROTATION** in degrees, for 3D tilt. See [Camera layers and 3D](@camera-3d).
+- **Tilt** (on a computer). **X ROTATION** and **Y ROTATION** in degrees, for 3D tilt. See [Camera layers and 3D](@camera-3d).
 - **Skew.** **X SKEW** and **Y SKEW** in degrees.
-- **Pivot.** The point the layer turns and scales around, in pixels from the middle of the layer. Type **X** and **Y**, drag the trackpad, tap one of the nine squares for a corner, an edge or the center, or drag the marker on the canvas. The layer and its child layers stay where they are.
-- **More** has **Reset Location**, **Reset Rotation**, **Reset Scale**, **Reset 3D Rotation**, **Reset Skew**, **Reset Pivot** and **Reset Transform** (all six).
+- **Pivot** (double-tap Move; on a computer, the Pivot tab). The point the layer turns and scales around, in pixels from the middle of the layer. Type **X** and **Y**, drag the trackpad, tap one of the nine squares for a corner, an edge or the center, or drag the marker on the canvas. The layer and its child layers stay where they are.
+- **More** has **Reset Location**, **Reset Rotation**, **Reset Scale**, **Reset 3D Rotation**, **Reset Skew**, **Reset Pivot** and **Reset Transform** (all six), and on a phone or tablet **Pivot**, **3D rotation** and **Free rotate**.
 
 ![The Transform panel: the tabs (1), the trackpad (2) and the X, Y and Z boxes (3).](img/lt-transform.webp)
 
-Move is the position, with X, Y and Z animated together. Rotate, Size, Tilt, Skew and Pivot each have their own keyframes; width and height share the Size keyframes.
+Move is the position, with X, Y and Z animated together. Rotate, Size, 3D rotation, Skew and Pivot each have their own keyframes (the X and Y of 3D rotation share theirs, Z is the rotation); width and height share the Size keyframes.
 
 ### Crop
 

@@ -100,6 +100,10 @@
     <string name="community_tag_hint">अपना टैग जोड़ें</string>
     <string name="community_creator">बनाया है</string>
     <string name="community_by">%1$s द्वारा</string>
+    <string name="transform_3d_rotation">3D रोटेशन</string>
+    <string name="transform_free_rotate">फ़्री रोटेट</string>
+    <string name="transform_double_tap_pivot">पिवट मूव करने के लिए दो बार टैप करें</string>
+    <string name="transform_double_tap_layer">लेयर मूव करने के लिए दो बार टैप करें</string>
     <string name="community_size">फ़ाइल का साइज़</string>
     <string name="community_confirm">मैंने इसे बनाया है और इसे शेयर करने की सहमति देता/देती हूँ</string>
     <string name="community_need_title">अपने कम्युनिटी बंडल के लिए टाइटल जोड़ें।</string>
