@@ -6,6 +6,50 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [5.1.0] - 2026-11-11
+
+### Added
+
+- Light and Dark mode: pick one on the first start or later in Settings > Editor > Theme. Dark covers the whole app, Home included, and switching fades smoothly.
+- Time Remap: a Remap tab in Speed keyframes which moment of a video shows, to speed it up, freeze it or play it backwards inside one layer.
+- Tools inside the editor: a Tools tab in the + menu, and Tools in the left rail on a computer. Compress, Trim, Extract Audio, Make a GIF and the Video Downloader add their result to the project.
+- Video Downloader on Windows, Mac and Linux, with a one-time add-on.
+- Video Feedback Frame by Frame: each copy shows the layer one frame earlier, so movement leaves trails.
+- Page Curl and Scatter Repeat effects.
+- Effect previews: an effect's page opens with a big, sharp preview.
+- Community bundle: Project Bundle in Export adds a title, a thumbnail picked with Choose thumbnail, a description, tags and a name.
+- Bundles folder: pick a folder once and every project bundle saves there.
+- Hold to pick: hold the three dots on a project, slide to an entry and let go to run it.
+- Community tab on Home. Sharing arrives in 5.2.
+- Favourites show a filled star with a small pop.
+- Alight Motion import: Page Curl, Scatter Repeat and Ring (as Torus).
+
+### Changed
+
+- Smaller app: the Android download went from about 80 MB to 49 MB. Other languages unpack when picked, and background removal downloads on first use.
+- Simpler Transform: four tabs on phones and tablets, double-tap Move for the pivot, and 3D rotation in the Rotate menu.
+- Smoother menus: the effects panel and effect pages slide in from the right, and projects open with a soft zoom.
+- Clearer Settings: an open section is shaded.
+- Updates on a computer: they install themselves after the download and close every open window first, and the next start says what went wrong when one fails.
+- Windows updates: AbsentMotion's own installer, about 12 times faster than the Windows installer (about 11 seconds instead of about 2 minutes 15 seconds).
+- Windows installer: keeps files you added to AbsentMotion's folder, names the program that keeps a file in use, and asks before an older version replaces a newer one.
+- Mac updates: the app replaces itself.
+- Optical flow frame interpolation: sharper at every level.
+
+### Fixed
+
+- Selected layer: tapping or clicking it again drops its focus.
+- Parenting: a child stays attached when the parent turns or is resized, also when the pivots differ.
+- Fonts on a computer: fonts with a space in their name can be used and deleted again, and Google Fonts such as Open Sans no longer turn into Roboto.
+- Text: the preview can zoom out while a text box is edited.
+- Tools: after a tool on the second page of a layer's tools, the tools stay on that page.
+- Tools in the + menu: closing a tool returns to the Tools tab, and Back closes the tool instead of the project.
+- Block Noise, Block Dissolve, Dissolve, Static, Glitch, Beat Glitch and Datamosh: the block size changes each block in place instead of zooming the whole pattern.
+- Frame Interpolation: thin lines no longer break up into patterns with Optical flow at Medium.
+- Smoothing a Time Remap clip: a trimmed clip keeps the right moments, and a clip played backwards keeps its motion blur.
+- Effects panel: no white flash when it opens.
+- Motion Blur: fast moves blur into one smooth streak that trails behind the layer, and the paused preview shows the real blur.
+
 ## [5.0.4] - 2026-11-10
 
 ### Added
