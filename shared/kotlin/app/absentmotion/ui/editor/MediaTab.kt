@@ -142,7 +142,7 @@ private suspend fun EditorState.addGif(context: Context, uri: Uri): Boolean {
 }
 
 @Composable
-internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrary, settled: Boolean = true) {
+internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrary) {
     val context = LocalContext.current
     val scope = LocalEditorScope.current
     var album by remember { mutableStateOf<String?>(null) }
@@ -182,9 +182,8 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
         if (blocked) context.startActivity(android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null)))
         else permission.launch(request)
     }
-    LaunchedEffect(settled) {
-        if (settled && !prefs.getBoolean("asked", false) && !full && !some) {
-            kotlinx.coroutines.delay(AskDelayMs)
+    LaunchedEffect(Unit) {
+        if (!prefs.getBoolean("asked", false) && !full && !some) {
             prefs.edit().putBoolean("asked", true).apply()
             permission.launch(request)
         }

@@ -451,7 +451,7 @@ private fun RowSemantics(view: TimelineView) {
                     selected = chosen
                     if (layer.hidden) stateDescription = hidden
                     onClick(select) { view.tap(Hit.Header(layer.id)); true }
-                    customActions = if (app.absentmotion.ui.tutorial.Tutorial.running) emptyList() else listOf(CustomAccessibilityAction(if (layer.hidden) show else hide) { view.state.toggleHidden(layer.id); true })
+                    customActions = if (app.absentmotion.ui.tutorial.Tutorial.running || view.state.lookOnly) emptyList() else listOf(CustomAccessibilityAction(if (layer.hidden) show else hide) { view.state.toggleHidden(layer.id); true })
                 })
             }
         }
@@ -1035,6 +1035,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
     private fun edgeZone(left: Float, right: Float) = min(6.dp.px, (right - left) / 3f)
 
     fun tap(hit: Hit) {
+        if (state.lookOnly) return
         when (hit) {
             is Hit.Eye -> if (MultiSelect.active) MultiSelect.toggle(hit.id) else state.toggleHidden(hit.id)
             is Hit.Header -> select(hit.id, toggle = true)
@@ -1146,7 +1147,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
 
     fun beginDrag(hit: Hit, moved: Offset): Drag {
         return when {
-            hit is Hit.Grip -> {
+            hit is Hit.Grip && !state.lookOnly -> {
                 state.playing = false
                 val layer = layers.firstOrNull { it.id == hit.id }
                 dragId = hit.id
@@ -1157,7 +1158,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
                 snapTargets = TimelineMath.snapTargets(state.scene, trimGroup.map { it.id }.toSet() + hit.id, state.frame)
                 if (hit.start) Drag.TrimStart else Drag.TrimEnd
             }
-            hit is Hit.Handle -> {
+            hit is Hit.Handle && !state.lookOnly -> {
                 dragId = hit.id
                 Drag.Reorder
             }
@@ -1687,7 +1688,7 @@ private suspend fun PointerInputScope.timelineGestures(view: TimelineView, onLon
     var finger = down.position
     var second: PointerId? = null
     val dismissing = view.dismissZone(down.position)
-    val holdable = !dismissing && (hit is Hit.Eye || hit is Hit.Header || hit is Hit.Row || hit is Hit.Key || hit is Hit.Bar)
+    val holdable = !view.state.lookOnly && !dismissing && (hit is Hit.Eye || hit is Hit.Header || hit is Hit.Row || hit is Hit.Key || hit is Hit.Bar)
     val deadline = down.uptimeMillis + viewConfiguration.longPressTimeoutMillis
     try {
         while (true) {

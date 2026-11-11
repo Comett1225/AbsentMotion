@@ -13,7 +13,7 @@ An effect changes how a layer looks or moves: a blur, a glow, a color change, a 
 3. Tap **Add Effect** at the end of the list. The **Effects Library** opens.
 4. Tap an effect. It is added with its standard settings and its settings open at once.
 
-To read about an effect first, press and hold its tile. A page opens with an animated preview, a description, a star to mark it as a favorite, **+ Standard Settings** and, for a few effects, ready-made presets.
+To read about an effect first, press and hold its tile. A page opens with an animated preview, a description, a star to mark it as a favorite (it fills in when it is one), **+ Standard Settings** and, for a few effects, ready-made presets.
 
 ## The Effects Library
 

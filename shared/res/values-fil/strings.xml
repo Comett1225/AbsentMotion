@@ -93,6 +93,9 @@
     <string name="bundle_community">Bundle ng komunidad</string>
     <string name="bundle_community_note">Nagdaragdag ng pamagat, thumbnail mula sa proyekto, paglalarawan, mga tag at pangalan mo, na handa nang ibahagi sa komunidad.</string>
     <string name="community_thumbnail">Thumbnail</string>
+    <string name="community_choose_thumbnail">Pumili ng thumbnail</string>
+    <string name="community_confirm_thumbnail">Kumpirmahin ang thumbnail</string>
+    <string name="community_picker_hint">I-slide ang timeline sa sandaling pinakamahusay na nagpapakita ng proyekto mo.</string>
     <string name="community_thumbnail_hint">I-drag sa sandali ng proyekto na pinakamainam na nagpapakita nito.</string>
     <string name="community_title">Pamagat</string>
     <string name="community_description">Paglalarawan</string>
@@ -101,7 +104,6 @@
     <string name="community_creator">Ginawa ni</string>
     <string name="community_by">ni %1$s</string>
     <string name="transform_3d_rotation">3D rotation</string>
-    <string name="caption_engine_download">Minsang dina-download ang caption engine (%1$s) mula sa AbsentMotion sa GitHub.</string>
     <string name="transform_free_rotate">Malayang pag-rotate</string>
     <string name="transform_double_tap_pivot">I-double-tap para ilipat ang pivot</string>
     <string name="transform_double_tap_layer">I-double-tap para ilipat ang layer</string>
@@ -158,6 +160,10 @@
     <string name="settings_keep_media_copies">Magtabi ng kopya ng na-import na media sa proyekto</string>
     <string name="settings_bundles_folder">Folder ng mga bundle</string>
     <string name="settings_bundles_default">Gamitin ang default na folder ng mga bundle</string>
+    <string name="bundle_save_in">I-save sa</string>
+    <string name="bundle_pick_folder">Pumili ng folder na pagse-save-an</string>
+    <string name="bundle_for_now">Sa ngayon: %1$s</string>
+    <string name="bundle_folder_lost">Hindi ma-access ang folder na ito. I-tap para piliin itong muli; hanggang noon, sa %1$s mase-save ang mga bundle.</string>
     <string name="settings_about">Tungkol</string>
     <string name="settings_report_issue">Mag-ulat ng problema</string>
     <string name="settings_suggest_feature">Magmungkahi ng feature</string>
@@ -437,6 +443,9 @@
     <string name="home_new_project">Bagong proyekto</string>
     <string name="home_back">Bumalik</string>
     <string name="home_tab_tools">Mga tool</string>
+    <string name="home_tab_community">Komunidad</string>
+    <string name="community_coming">Darating sa 5.2</string>
+    <string name="community_coming_note">Dito ibabahagi ang mga bundle ng komunidad para makita mo ang mga gawa ng iba gamit ang AbsentMotion.</string>
     <string name="tools_compress">I-compress</string>
     <string name="tools_compress_about">Kino-compress ang iyong mga bidyo o larawan.</string>
     <string name="tools_downloader">Downloader ng bidyo</string>

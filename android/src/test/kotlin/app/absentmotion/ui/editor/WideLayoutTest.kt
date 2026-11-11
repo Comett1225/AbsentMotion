@@ -55,7 +55,7 @@ class WideLayoutTest {
     }
 
     @Test fun theWideHomeHeaderNeedsRoomForItsTabsAndButtons() {
-        assertTrue(app.absentmotion.ui.home.wideHeaderFits(800, 1f))
+        assertTrue(app.absentmotion.ui.home.wideHeaderFits(860, 1f))
         assertTrue(app.absentmotion.ui.home.wideHeaderFits(1280, 1.5f))
         assertFalse(app.absentmotion.ui.home.wideHeaderFits(600, 1f))
         assertFalse(app.absentmotion.ui.home.wideHeaderFits(800, 1.5f))

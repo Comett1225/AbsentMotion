@@ -269,10 +269,12 @@ internal object TestHooks {
         intent.getStringExtra("batch")?.let { list ->
             scope.launch {
                 for (line in File(list).readLines().filter { it.isNotBlank() }) {
-                    val (path, frame, name) = line.trim().split(' ')
+                    val parts = line.trim().split(' ')
+                    val (path, frame, name) = parts
                     val scene = activity.migration.migrate(Scene.parse(File(path).readText())).scene
                     downloadFonts(activity, scene)
-                    val ok = engine.stillPng(scene.toXml(), scene.frameStart(frame.toInt()), scene.width, scene.height, File(activity.getExternalFilesDir(null), "$name.png"))
+                    val width = parts.getOrNull(3)?.toInt() ?: scene.width
+                    val ok = engine.stillPng(scene.toXml(), scene.frameStart(frame.toInt()), width, width * scene.height / scene.width.coerceAtLeast(1), File(activity.getExternalFilesDir(null), "$name.png"))
                     Log.i("AMTest", "still $name ok=$ok render=${"%.1f".format(java.util.Locale.US, engine.lastStillMs)}ms")
                 }
                 Log.i("AMTest", "batch done")

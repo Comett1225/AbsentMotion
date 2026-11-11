@@ -530,14 +530,14 @@ private fun DeskContent(app: DeskAppState, scale: Float) {
                     app.editingTemplate?.let { id ->
                         TemplateEditor(id, app.engine, app.settings, onClose = { app.editingTemplate = null }, onContinue = { scene -> run { app.projectFromTemplate(scene) } })
                     }
-                    app.exportingFromList?.let { ExportScreen(it, 0, app.engine, fromProjectList = true, null) { app.exportingFromList = null } }
+                    app.exportingFromList?.let { ExportScreen(it, 0, app.engine, app.settings, fromProjectList = true, null) { app.exportingFromList = null } }
                 }
             } else {
                 Box(Modifier.fillMaxSize().enterZoom()) {
                     CompositionLocalProvider(LocalDensity provides Density(density.density, density.fontScale.coerceAtMost(1.3f))) {
                         key(open) { Ltr { EditorScreen(open, onExit = { scope.launch { app.closeEditor() } }) } }
                     }
-                    if (open.exportOpen) ExportScreen(open.project, open.exportFrame, app.engine, fromProjectList = false, null) { open.exportOpen = false }
+                    if (open.exportOpen) ExportScreen(open.project, open.exportFrame, app.engine, app.settings, fromProjectList = false, null) { open.exportOpen = false }
                 }
             }
             if (app.opening) OpeningOverlay { app.job?.cancel() }

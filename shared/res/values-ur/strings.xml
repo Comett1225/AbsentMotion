@@ -93,6 +93,9 @@
     <string name="bundle_community">کمیونٹی بنڈل</string>
     <string name="bundle_community_note">کمیونٹی کے ساتھ شیئر کرنے کے لیے عنوان، پروجیکٹ سے تھمب نیل، تفصیل، ٹیگز اور آپ کا نام شامل کرتا ہے۔</string>
     <string name="community_thumbnail">تھمب نیل</string>
+    <string name="community_choose_thumbnail">تھمب نیل منتخب کریں</string>
+    <string name="community_confirm_thumbnail">تھمب نیل کی تصدیق کریں</string>
+    <string name="community_picker_hint">ٹائم لائن کو اس لمحے تک سلائیڈ کریں جو آپ کا پروجیکٹ بہترین انداز میں دکھاتا ہے۔</string>
     <string name="community_thumbnail_hint">پروجیکٹ کے اس لمحے تک ڈریگ کریں جو اسے بہترین انداز میں دکھاتا ہے۔</string>
     <string name="community_title">عنوان</string>
     <string name="community_description">تفصیل</string>
@@ -101,7 +104,6 @@
     <string name="community_creator">تخلیق کار</string>
     <string name="community_by">از %1$s</string>
     <string name="transform_3d_rotation">3D روٹیشن</string>
-    <string name="caption_engine_download">کیپشن انجن (%1$s) GitHub پر AbsentMotion سے ایک بار ڈاؤن لوڈ ہوتا ہے۔</string>
     <string name="transform_free_rotate">فری روٹیٹ</string>
     <string name="transform_double_tap_pivot">پیوٹ ہلانے کے لیے دو بار ٹیپ کریں</string>
     <string name="transform_double_tap_layer">لیئر ہلانے کے لیے دو بار ٹیپ کریں</string>
@@ -158,6 +160,10 @@
     <string name="settings_keep_media_copies">پروجیکٹ میں امپورٹ شدہ میڈیا کی کاپی رکھیں</string>
     <string name="settings_bundles_folder">بنڈلز فولڈر</string>
     <string name="settings_bundles_default">ڈیفالٹ بنڈلز فولڈر استعمال کریں</string>
+    <string name="bundle_save_in">محفوظ کرنے کی جگہ</string>
+    <string name="bundle_pick_folder">محفوظ کرنے کے لیے فولڈر منتخب کریں</string>
+    <string name="bundle_for_now">فی الحال: %1$s</string>
+    <string name="bundle_folder_lost">اس فولڈر تک رسائی نہیں ہو رہی۔ اسے دوبارہ منتخب کرنے کے لیے تھپتھپائیں؛ تب تک بنڈلز %1$s میں محفوظ ہوں گے۔</string>
     <string name="settings_about">ایپ کے بارے میں</string>
     <string name="settings_report_issue">مسئلہ رپورٹ کریں</string>
     <string name="settings_suggest_feature">کوئی فیچر تجویز کریں</string>
@@ -437,6 +443,9 @@
     <string name="home_new_project">نیا پروجیکٹ</string>
     <string name="home_back">واپس</string>
     <string name="home_tab_tools">ٹولز</string>
+    <string name="home_tab_community">کمیونٹی</string>
+    <string name="community_coming">5.2 میں آ رہا ہے</string>
+    <string name="community_coming_note">کمیونٹی بنڈلز یہاں شیئر ہوں گے، تاکہ آپ دیکھ سکیں کہ دوسرے لوگ AbsentMotion سے کیا بناتے ہیں۔</string>
     <string name="tools_compress">کمپریس</string>
     <string name="tools_compress_about">آپ کی ویڈیوز یا تصاویر کو کمپریس کرتا ہے۔</string>
     <string name="tools_downloader">ویڈیو ڈاؤن لوڈر</string>

@@ -59,7 +59,7 @@ The preview shows the canvas. A transparent background shows as a checkerboard.
 
 ### Zoom and pan the canvas
 
-With nothing selected, two fingers pan and zoom the canvas (from 1 % to 6400 %). With a layer selected, tap the small magnifier at the top left of the preview to turn on pan and zoom mode; then two fingers zoom the canvas while one finger still moves the layer. Double-tap with two fingers to go back to 100 %, and again to return to the previous view.
+With nothing selected, two fingers pan and zoom the canvas (from 1 % to 6400 %). With a layer selected, tap the small magnifier at the top left of the preview to turn on pan and zoom mode; then two fingers zoom the canvas while one finger still moves the layer. Double-tap with two fingers to go back to 100 %, and again to return to the previous view. Zooming also works while you edit a text box, so you can zoom out to stretch a long box.
 
 ### The preview strip
 

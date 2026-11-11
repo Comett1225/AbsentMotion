@@ -93,6 +93,9 @@
     <string name="bundle_community">بسته انجمن</string>
     <string name="bundle_community_note">عنوان، تصویر بندانگشتی از پروژه، توضیحات، برچسب‌ها و نام شما را اضافه می‌کند تا برای اشتراک‌گذاری با انجمن آماده باشد.</string>
     <string name="community_thumbnail">تصویر بندانگشتی</string>
+    <string name="community_choose_thumbnail">انتخاب تصویر بندانگشتی</string>
+    <string name="community_confirm_thumbnail">تأیید تصویر بندانگشتی</string>
+    <string name="community_picker_hint">تایم‌لاین را به لحظه‌ای ببرید که پروژه‌تان را به بهترین شکل نشان می‌دهد.</string>
     <string name="community_thumbnail_hint">به لحظه‌ای از پروژه که آن را بهتر نشان می‌دهد بکشید.</string>
     <string name="community_title">عنوان</string>
     <string name="community_description">توضیحات</string>
@@ -101,7 +104,6 @@
     <string name="community_creator">ساخته‌شده توسط</string>
     <string name="community_by">توسط %1$s</string>
     <string name="transform_3d_rotation">چرخش سه‌بعدی</string>
-    <string name="caption_engine_download">موتور زیرنویس (%1$s) یک بار از AbsentMotion در GitHub دانلود می‌شود.</string>
     <string name="transform_free_rotate">چرخش آزاد</string>
     <string name="transform_double_tap_pivot">برای جابه‌جایی محور دو بار ضربه بزنید</string>
     <string name="transform_double_tap_layer">برای جابه‌جایی لایه دو بار ضربه بزنید</string>
@@ -158,6 +160,10 @@
     <string name="settings_keep_media_copies">نگه‌داشتن نسخه‌ای از رسانه‌های واردشده در پروژه</string>
     <string name="settings_bundles_folder">پوشه بسته‌ها</string>
     <string name="settings_bundles_default">استفاده از پوشه پیش‌فرض بسته‌ها</string>
+    <string name="bundle_save_in">ذخیره در</string>
+    <string name="bundle_pick_folder">پوشه‌ای برای ذخیره انتخاب کنید</string>
+    <string name="bundle_for_now">فعلاً: %1$s</string>
+    <string name="bundle_folder_lost">دسترسی به این پوشه ممکن نیست. برای انتخاب دوباره روی آن بزنید؛ تا آن زمان بسته‌ها در %1$s ذخیره می‌شوند.</string>
     <string name="settings_about">درباره</string>
     <string name="settings_report_issue">گزارش مشکل</string>
     <string name="settings_suggest_feature">پیشنهاد یک قابلیت</string>
@@ -437,6 +443,9 @@
     <string name="home_new_project">پروژه جدید</string>
     <string name="home_back">بازگشت</string>
     <string name="home_tab_tools">ابزارها</string>
+    <string name="home_tab_community">انجمن</string>
+    <string name="community_coming">به‌زودی در 5.2</string>
+    <string name="community_coming_note">بسته‌های انجمن اینجا به اشتراک گذاشته می‌شوند تا بتوانید آنچه دیگران با AbsentMotion می‌سازند پیدا کنید.</string>
     <string name="tools_compress">فشرده‌سازی</string>
     <string name="tools_compress_about">ویدیوها یا تصاویر شما را فشرده می‌کند.</string>
     <string name="tools_downloader">دانلود ویدیو</string>

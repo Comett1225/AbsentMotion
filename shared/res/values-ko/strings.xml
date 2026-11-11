@@ -93,6 +93,9 @@
     <string name="bundle_community">커뮤니티 번들</string>
     <string name="bundle_community_note">제목, 프로젝트의 썸네일, 설명, 태그와 이름을 추가하여 커뮤니티와 공유할 수 있습니다.</string>
     <string name="community_thumbnail">썸네일</string>
+    <string name="community_choose_thumbnail">썸네일 선택</string>
+    <string name="community_confirm_thumbnail">썸네일 확인</string>
+    <string name="community_picker_hint">프로젝트를 가장 잘 보여주는 순간으로 타임라인을 밀어 주세요.</string>
     <string name="community_thumbnail_hint">프로젝트를 가장 잘 보여 주는 순간으로 드래그하세요.</string>
     <string name="community_title">제목</string>
     <string name="community_description">설명</string>
@@ -101,7 +104,6 @@
     <string name="community_creator">제작자</string>
     <string name="community_by">제작: %1$s</string>
     <string name="transform_3d_rotation">3D 회전</string>
-    <string name="caption_engine_download">자막 엔진(%1$s)은 GitHub의 AbsentMotion에서 한 번 다운로드합니다.</string>
     <string name="transform_free_rotate">자유 회전</string>
     <string name="transform_double_tap_pivot">두 번 탭하여 기준점 이동</string>
     <string name="transform_double_tap_layer">두 번 탭하여 레이어 이동</string>
@@ -158,6 +160,10 @@
     <string name="settings_keep_media_copies">가져온 미디어의 사본을 프로젝트에 보관</string>
     <string name="settings_bundles_folder">번들 폴더</string>
     <string name="settings_bundles_default">기본 번들 폴더 사용</string>
+    <string name="bundle_save_in">저장 위치</string>
+    <string name="bundle_pick_folder">저장할 폴더 선택</string>
+    <string name="bundle_for_now">현재 위치: %1$s</string>
+    <string name="bundle_folder_lost">이 폴더에 접근할 수 없습니다. 탭하여 다시 선택하세요. 그전까지 번들은 %1$s에 저장됩니다.</string>
     <string name="settings_about">정보</string>
     <string name="settings_report_issue">문제 신고</string>
     <string name="settings_suggest_feature">기능 제안</string>
@@ -436,6 +442,9 @@
     <string name="home_new_project">새 프로젝트</string>
     <string name="home_back">뒤로</string>
     <string name="home_tab_tools">도구</string>
+    <string name="home_tab_community">커뮤니티</string>
+    <string name="community_coming">5.2에서 제공 예정</string>
+    <string name="community_coming_note">여기에서 커뮤니티 번들을 공유하므로 다른 사람들이 AbsentMotion으로 만든 작품을 찾아볼 수 있습니다.</string>
     <string name="tools_compress">압축</string>
     <string name="tools_compress_about">동영상이나 이미지를 압축합니다.</string>
     <string name="tools_downloader">동영상 다운로더</string>

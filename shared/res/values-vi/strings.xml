@@ -93,6 +93,9 @@
     <string name="bundle_community">Gói cộng đồng</string>
     <string name="bundle_community_note">Thêm tiêu đề, hình thu nhỏ từ dự án, mô tả, thẻ và tên của bạn để chia sẻ với cộng đồng.</string>
     <string name="community_thumbnail">Hình thu nhỏ</string>
+    <string name="community_choose_thumbnail">Chọn hình thu nhỏ</string>
+    <string name="community_confirm_thumbnail">Xác nhận hình thu nhỏ</string>
+    <string name="community_picker_hint">Trượt dòng thời gian đến thời điểm thể hiện dự án của bạn tốt nhất.</string>
     <string name="community_thumbnail_hint">Kéo đến thời điểm thể hiện dự án của bạn rõ nhất.</string>
     <string name="community_title">Tiêu đề</string>
     <string name="community_description">Mô tả</string>
@@ -101,7 +104,6 @@
     <string name="community_creator">Người tạo</string>
     <string name="community_by">bởi %1$s</string>
     <string name="transform_3d_rotation">Xoay 3D</string>
-    <string name="caption_engine_download">Công cụ phụ đề (%1$s) được tải xuống một lần từ AbsentMotion trên GitHub.</string>
     <string name="transform_free_rotate">Xoay tự do</string>
     <string name="transform_double_tap_pivot">Chạm hai lần để di chuyển điểm xoay</string>
     <string name="transform_double_tap_layer">Chạm hai lần để di chuyển lớp</string>
@@ -158,6 +160,10 @@
     <string name="settings_keep_media_copies">Giữ bản sao phương tiện đã nhập trong dự án</string>
     <string name="settings_bundles_folder">Thư mục gói</string>
     <string name="settings_bundles_default">Dùng thư mục gói mặc định</string>
+    <string name="bundle_save_in">Lưu tại</string>
+    <string name="bundle_pick_folder">Chọn thư mục để lưu</string>
+    <string name="bundle_for_now">Hiện tại: %1$s</string>
+    <string name="bundle_folder_lost">Không thể truy cập thư mục này. Nhấn để chọn lại; trong lúc đó, các gói sẽ được lưu vào %1$s.</string>
     <string name="settings_about">Giới thiệu</string>
     <string name="settings_report_issue">Báo cáo sự cố</string>
     <string name="settings_suggest_feature">Đề xuất tính năng</string>
@@ -436,6 +442,9 @@
     <string name="home_new_project">Dự án mới</string>
     <string name="home_back">Quay lại</string>
     <string name="home_tab_tools">Công cụ</string>
+    <string name="home_tab_community">Cộng đồng</string>
+    <string name="community_coming">Sắp có trong 5.2</string>
+    <string name="community_coming_note">Các gói cộng đồng sẽ được chia sẻ tại đây để bạn khám phá những gì người khác tạo bằng AbsentMotion.</string>
     <string name="tools_compress">Nén</string>
     <string name="tools_compress_about">Nén video hoặc hình ảnh của bạn.</string>
     <string name="tools_downloader">Tải video</string>

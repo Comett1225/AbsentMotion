@@ -271,7 +271,7 @@ class MainActivity : ComponentActivity() {
                         editingTemplate?.let { id ->
                             CompositionLocalProvider(LocalDensity provides dense) { TemplateEditor(id, engine, settings, onClose = { editingTemplate = null }, onContinue = ::projectFromTemplate) }
                         }
-                        exportingFromList?.let { ExportScreen(it, 0, engine, fromProjectList = true, outdated) { exportingFromList = null } }
+                        exportingFromList?.let { ExportScreen(it, 0, engine, settings, fromProjectList = true, outdated) { exportingFromList = null } }
                         LowMemoryNotice()
                     }
                 } else {
@@ -284,7 +284,7 @@ class MainActivity : ComponentActivity() {
                                 key(open) { Ltr { EditorScreen(open, onExit = ::closeEditor) } }
                             }
                         }
-                        if (open.exportOpen) ExportScreen(open.project, open.exportFrame, engine, fromProjectList = false, outdated) { open.exportOpen = false }
+                        if (open.exportOpen) ExportScreen(open.project, open.exportFrame, engine, settings, fromProjectList = false, outdated) { open.exportOpen = false }
                     }
                 }
                 if (opening || openingProject) OpeningOverlay { openJob?.cancel() }

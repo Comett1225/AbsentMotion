@@ -164,7 +164,9 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
     }
 
     private suspend fun direct(saved: MutableList<Uri>, name: String, ext: String, mime: String, where: String, target: ExportStore = store, make: suspend (java.io.FileDescriptor) -> Unit): ExportResult {
-        val file = withContext(Dispatchers.IO) { target.open(null, "$name.$ext", mime) }
+        val (file, used) = withContext(Dispatchers.IO) {
+            try { target.open(null, "$name.$ext", mime) to target } catch (e: ExportError) { if (target === store) throw e else store.open(null, "$name.$ext", mime) to store }
+        }
         val uri = try {
             make(file.fd)
             withContext(Dispatchers.IO) { file.publish() }
@@ -174,7 +176,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
             throw if (full) StorageFullException() else t
         }
         saved.add(uri)
-        return ExportResult(saved, mime, target.location(where))
+        return ExportResult(saved, mime, used.location(where))
     }
 
     private suspend fun ExportResult.verified(kind: ExportKind, scene: Scene, s: ExportSettings, hasAudio: Boolean, looks: FrameLooks? = null): ExportResult {

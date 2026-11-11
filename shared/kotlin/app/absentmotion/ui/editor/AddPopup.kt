@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -45,7 +46,6 @@ import app.absentmotion.ui.home.EmbedRequest
 import app.absentmotion.ui.home.rememberFileBitmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.launch
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableIntStateOf
@@ -102,29 +102,24 @@ private class Tab(@StringRes val label: Int, val icon: ImageVector)
 private val Tabs = listOf(
     Tab(R.string.add_tab_shape, ChromeIcons.ShapeTab), Tab(R.string.add_tab_media, ChromeIcons.MediaTab), Tab(R.string.add_tab_audio, ChromeIcons.AudioTab),
     Tab(R.string.add_tab_object_asset, ChromeIcons.ObjectTab), Tab(R.string.add_tab_template, ChromeIcons.TemplateTab),
+    Tab(R.string.add_tab_tools, app.absentmotion.ui.home.HomeIcons.ToolsTab),
 )
-
-internal const val AddToolsPage = 5
-
-internal const val AskDelayMs = 700L
 
 @Composable
 internal fun AddPopup(state: EditorState, modifier: Modifier = Modifier, library: AddLibrary) {
-    val pager = rememberPagerState { AddToolsPage + 1 }
-    val scope = androidx.compose.runtime.rememberCoroutineScope()
-    val selectedTab = pager.targetPage
+    var selectedTab by remember { mutableIntStateOf(0) }
     BackHandler { state.addOpen = false }
     Row(modifier.clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)).background(PopupBar)) {
         Column(Modifier.weight(1f).fillMaxHeight()) {
             androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxWidth().height(58.dp)) {
-                val tabWidth = minOf(64.dp, (maxWidth - 6.dp) / Tabs.size)
-                Row(Modifier.padding(start = 6.dp).fillMaxHeight()) {
-                    Tabs.forEachIndexed { i, tab -> TabButton(tab, active = i == selectedTab, enabled = true, Modifier.width(tabWidth).tutorialTarget(if (i == 1) "add_tab_media" else if (i == 2) "add_tab_audio" else null)) { scope.launch { pager.animateScrollToPage(i) } } }
+                val tabWidth = minOf(64.dp, (maxWidth - 6.dp) / (Tabs.size - 1))
+                Row(Modifier.fillMaxHeight().horizontalScroll(androidx.compose.foundation.rememberScrollState()).padding(start = 6.dp)) {
+                    Tabs.forEachIndexed { i, tab -> TabButton(tab, active = i == selectedTab, enabled = true, Modifier.width(tabWidth).tutorialTarget(if (i == 1) "add_tab_media" else if (i == 2) "add_tab_audio" else null)) { selectedTab = i } }
                 }
             }
             val body = Modifier.weight(1f).fillMaxWidth().background(Am.Panel).tutorialTarget(if (selectedTab == 1) "add_media" else if (selectedTab == 2) "add_audio" else null)
-            HorizontalPager(pager, body, key = { it }, verticalAlignment = Alignment.Top) { page ->
-                when (page) { 0 -> ShapePages(state, Modifier.fillMaxSize()); 1 -> MediaTab(state, Modifier.fillMaxSize(), library, pager.settledPage == 1); 3 -> ObjectPage(state, Modifier.fillMaxSize()); 4 -> TemplatePage(state, Modifier.fillMaxSize()); AddToolsPage -> ToolsPage(state, Modifier.fillMaxSize()); else -> AudioTab(state, Modifier.fillMaxSize(), library, pager.settledPage == 2) }
+            Swap(selectedTab, body, rise = 0.dp) {
+                when (selectedTab) { 0 -> ShapePages(state, Modifier.fillMaxSize()); 1 -> MediaTab(state, Modifier.fillMaxSize(), library); 3 -> ObjectPage(state, Modifier.fillMaxSize()); 4 -> TemplatePage(state, Modifier.fillMaxSize()); 5 -> ToolsPage(state, Modifier.fillMaxSize()); else -> AudioTab(state, Modifier.fillMaxSize(), library) }
             }
         }
         QuickBar(state, Modifier.width(64.dp).fillMaxHeight())

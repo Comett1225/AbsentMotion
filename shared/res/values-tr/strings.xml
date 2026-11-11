@@ -93,6 +93,9 @@
     <string name="bundle_community">Topluluk paketi</string>
     <string name="bundle_community_note">Toplulukla paylaşmaya hazır olması için bir başlık, projenizden bir küçük resim, açıklama, etiketler ve adınızı ekler.</string>
     <string name="community_thumbnail">Küçük resim</string>
+    <string name="community_choose_thumbnail">Küçük resim seç</string>
+    <string name="community_confirm_thumbnail">Küçük resmi onayla</string>
+    <string name="community_picker_hint">Zaman çizelgesini projenizi en iyi gösteren ana kaydırın.</string>
     <string name="community_thumbnail_hint">Projenizi en iyi gösteren ana sürükleyin.</string>
     <string name="community_title">Başlık</string>
     <string name="community_description">Açıklama</string>
@@ -101,7 +104,6 @@
     <string name="community_creator">Oluşturan</string>
     <string name="community_by">%1$s tarafından</string>
     <string name="transform_3d_rotation">3D döndürme</string>
-    <string name="caption_engine_download">Altyazı motoru (%1$s), GitHub\'daki AbsentMotion\'dan bir kez indirilir.</string>
     <string name="transform_free_rotate">Serbest döndürme</string>
     <string name="transform_double_tap_pivot">Pivotu taşımak için iki kez dokunun</string>
     <string name="transform_double_tap_layer">Katmanı taşımak için iki kez dokunun</string>
@@ -158,6 +160,10 @@
     <string name="settings_keep_media_copies">İçe aktarılan medyanın bir kopyasını projede tut</string>
     <string name="settings_bundles_folder">Paketler klasörü</string>
     <string name="settings_bundles_default">Varsayılan paketler klasörünü kullan</string>
+    <string name="bundle_save_in">Kaydetme konumu</string>
+    <string name="bundle_pick_folder">Kaydetmek için bir klasör seçin</string>
+    <string name="bundle_for_now">Şimdilik: %1$s</string>
+    <string name="bundle_folder_lost">Bu klasöre erişilemiyor. Yeniden seçmek için dokunun; o zamana kadar paketler %1$s konumuna kaydedilir.</string>
     <string name="settings_about">Hakkında</string>
     <string name="settings_report_issue">Sorun bildir</string>
     <string name="settings_suggest_feature">Özellik öner</string>
@@ -437,6 +443,9 @@
     <string name="home_new_project">Yeni proje</string>
     <string name="home_back">Geri</string>
     <string name="home_tab_tools">Araçlar</string>
+    <string name="home_tab_community">Topluluk</string>
+    <string name="community_coming">5.2 sürümünde geliyor</string>
+    <string name="community_coming_note">Topluluk paketleri burada paylaşılacak; böylece başkalarının AbsentMotion ile neler yaptığını keşfedebileceksiniz.</string>
     <string name="tools_compress">Sıkıştır</string>
     <string name="tools_compress_about">Videolarınızı veya görsellerinizi sıkıştırır.</string>
     <string name="tools_downloader">Video indirici</string>

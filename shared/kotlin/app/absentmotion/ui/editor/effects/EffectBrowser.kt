@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor.effects
 
+import app.absentmotion.platform.asImageBitmap
 import app.absentmotion.editor.addEffectToChosen
 import app.absentmotion.platform.BackHandler
 import androidx.compose.foundation.background
@@ -385,7 +386,7 @@ fun EffectBrowser(state: EditorState) {
                     if (state.effectDetail == null) Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Text(stringResource(R.string.standard_settings), Modifier.weight(1f).height(48.dp).alpha(if (effect.available) 1f else 0.35f)
                             .clickable(enabled = effect.available) { add(effect) }.padding(12.dp), color = Am.OnDark, fontSize = 15.sp)
-                        Icon(PanelIcons.Star, stringResource(R.string.effectbrowser_favorite), Modifier.size(48.dp).clickable { favourite(effect) }.padding(12.dp), tint = if (effect.id in favourites) Am.Accent else Am.OnDark)
+                        FavouriteStar(effect.id in favourites, stringResource(R.string.effectbrowser_favorite), Modifier.size(48.dp).clickable { favourite(effect) }.padding(12.dp))
                     }
                     if (state.effectDetail == null) effect.presets.forEach { preset ->
                         Row(Modifier.fillMaxWidth().height(72.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -490,7 +491,7 @@ private fun EffectTile(catalog: EffectCatalog, effect: EffectDefinition, width: 
         .rightClick(onLongClick).combinedClickable(press, LocalIndication.current, onClick = onClick, onLongClick = onLongClick).padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Box {
             Thumbnail(catalog, preset?.let(effect::thumbnail) ?: effect.thumbnail, Modifier.size((width - 7).dp).clip(RoundedCornerShape(5.dp)))
-            if (favourite) Icon(PanelIcons.Star, null, Modifier.align(Alignment.TopEnd).size(14.dp), tint = Am.Accent)
+            if (favourite) Icon(PanelIcons.StarFilled, null, Modifier.align(Alignment.TopEnd).size(14.dp), tint = Am.Accent)
             if (preset == null && catalog.isNew(effect)) Text(stringResource(R.string.t_new), Modifier.align(Alignment.TopStart).padding(3.dp).clip(RoundedCornerShape(3.dp)).background(Am.Accent)
                 .padding(horizontal = 3.dp), color = Color.White, fontSize = if (PlatformFeatures.desktop) 12.sp else 7.sp, lineHeight = if (PlatformFeatures.desktop) 14.sp else 9.sp, fontWeight = FontWeight.Bold, maxLines = 1)
         }
@@ -502,17 +503,25 @@ private fun EffectTile(catalog: EffectCatalog, effect: EffectDefinition, width: 
 @Composable
 internal fun PresetStar(favourite: Boolean, onToggle: () -> Unit) {
     Box(Modifier.size(48.dp).toggleable(favourite, role = Role.Checkbox) { onToggle() }, contentAlignment = Alignment.Center) {
-        app.absentmotion.ui.editor.DeskTip(stringResource(R.string.effectbrowser_favorite_preset)) { Icon(PanelIcons.Star, stringResource(R.string.effectbrowser_favorite_preset), Modifier.size(24.dp), tint = if (favourite) Am.Accent else Am.OnDark) }
+        app.absentmotion.ui.editor.DeskTip(stringResource(R.string.effectbrowser_favorite_preset)) { FavouriteStar(favourite, stringResource(R.string.effectbrowser_favorite_preset), Modifier.size(24.dp)) }
     }
 }
 
 @Composable
 private fun EffectHero(catalog: EffectCatalog, effect: EffectDefinition) {
+    val big by androidx.compose.runtime.produceState<androidx.compose.ui.graphics.ImageBitmap?>(null, catalog, effect.key) {
+        value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            catalog.bytes(effect.hero)?.let { runCatching { app.absentmotion.platform.BitmapFactory.decodeByteArray(it, 0, it.size)?.asImageBitmap() }.getOrNull() }
+        }
+    }
     androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxWidth()) {
         Box(Modifier.fillMaxWidth().height(minOf(maxWidth / 1.25f, 340.dp))) {
-            Thumbnail(catalog, effect.thumbnail, Modifier.matchParentSize(), ContentScale.Crop)
-            Box(Modifier.matchParentSize().background(androidx.compose.ui.graphics.Brush.verticalGradient(0f to Color.Transparent, 0.3f to Color.Transparent, 0.62f to BrowserBg.copy(alpha = 0.72f), 1f to BrowserBg)))
-            Column(Modifier.align(Alignment.BottomStart).padding(start = 16.dp, end = 16.dp, bottom = 12.dp)) {
+            Box(Modifier.matchParentSize().background(RecommendedBg)) {
+                big?.let { androidx.compose.foundation.Image(it, null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop) }
+                    ?: app.absentmotion.platform.EffectPicture(catalog, effect.thumbnail, ContentScale.Crop)
+            }
+            Box(Modifier.matchParentSize().background(androidx.compose.ui.graphics.Brush.verticalGradient(0f to Color.Transparent, 0.5f to Color.Transparent, 0.8f to BrowserBg.copy(alpha = 0.72f), 1f to BrowserBg)))
+            Column(Modifier.align(Alignment.BottomStart).padding(start = 16.dp, end = 16.dp, bottom = 8.dp)) {
                 Text(effect.name, color = Am.OnDark, fontSize = 26.sp, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 Text(effect.description, Modifier.padding(top = 4.dp), color = Am.OnDark, fontSize = 15.sp)
             }
@@ -585,4 +594,18 @@ internal fun Modifier.effectSwipe(enabled: Boolean, accept: (Int) -> Boolean, dr
             finish(tracker.calculateVelocity().x, width)
         }
     }
+}
+
+@Composable
+internal fun FavouriteStar(on: Boolean, description: String?, modifier: Modifier = Modifier) {
+    val pop = remember { androidx.compose.animation.core.Animatable(1f) }
+    val shown = remember { booleanArrayOf(on) }
+    LaunchedEffect(on) {
+        if (shown[0] == on) return@LaunchedEffect
+        shown[0] = on
+        pop.animateTo(0.85f, androidx.compose.animation.core.tween(70, easing = androidx.compose.animation.core.FastOutSlowInEasing))
+        pop.animateTo(1.15f, androidx.compose.animation.core.tween(90, easing = androidx.compose.animation.core.FastOutSlowInEasing))
+        pop.animateTo(1f, androidx.compose.animation.core.tween(90, easing = androidx.compose.animation.core.FastOutSlowInEasing))
+    }
+    Icon(if (on) PanelIcons.StarFilled else PanelIcons.Star, description, modifier.graphicsLayer { scaleX = pop.value; scaleY = pop.value }, tint = if (on) Am.Accent else Am.OnDark)
 }

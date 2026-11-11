@@ -119,7 +119,7 @@ private val GridPad = 24.dp
 
 internal fun deskKey(letter: String): String = app.absentmotion.desk.DeskOs.commandKey + letter
 
-internal enum class DeskSection { Projects, Assets, Templates, Tools }
+internal enum class DeskSection { Projects, Assets, Community, Templates, Tools }
 
 @Composable
 internal fun DeskHome(
@@ -190,6 +190,7 @@ internal fun DeskHome(
                     when (section) {
                         DeskSection.Templates -> DeskTemplates(version, query, onTemplate, onTemplateProject)
                         DeskSection.Tools -> ToolsTab(Modifier, store, settings) { id -> version++; onOpen(id) }
+                        DeskSection.Community -> CommunitySoon(Modifier.fillMaxSize())
                         else -> ProjectsPane(
                             shown, loaded, section == DeskSection.Assets, query, settings, version, selected, { selected = it },
                             onOpen = { info -> if (info.damaged) onHistory(info) else onOpen(info.id) },
@@ -228,12 +229,13 @@ private fun DeskHeader(
     val compact = maxWidth < 1180.dp
     val iconNew = maxWidth < 900.dp
     val tight = maxWidth < 780.dp
-    val fixed = (if (tight) 510.dp else 456.dp + (if (compact) 72.dp else 216.dp) + (if (iconNew) 36.dp else 150.dp) + 32.dp) + (if (notes) 44.dp else 0.dp)
+    val fixed = (if (tight) 600.dp else 566.dp + (if (compact) 72.dp else 216.dp) + (if (iconNew) 36.dp else 150.dp) + 32.dp) + (if (notes) 44.dp else 0.dp)
     val searchWidth = (maxWidth - fixed).coerceIn(if (tight) 110.dp else 140.dp, 300.dp)
     Box(Modifier.fillMaxWidth(), Alignment.TopCenter) {
         Row(Modifier.widthIn(max = ContentMax).fillMaxWidth().height(68.dp).padding(horizontal = if (tight) 16.dp else GridPad), Arrangement.spacedBy(if (tight) 6.dp else 8.dp), Alignment.CenterVertically) {
             DeskTab(stringResource(R.string.home_tab_projects), section == DeskSection.Projects, tight) { onSection(DeskSection.Projects) }
             DeskTab(stringResource(R.string.home_tab_assets), section == DeskSection.Assets, tight) { onSection(DeskSection.Assets) }
+            DeskTab(stringResource(R.string.home_tab_community), section == DeskSection.Community, tight) { onSection(DeskSection.Community) }
             DeskTab(stringResource(R.string.home_tab_templates), section == DeskSection.Templates, tight) { onSection(DeskSection.Templates) }
             DeskTab(stringResource(R.string.home_tab_tools), section == DeskSection.Tools, tight) { onSection(DeskSection.Tools) }
             Spacer(Modifier.weight(1f))

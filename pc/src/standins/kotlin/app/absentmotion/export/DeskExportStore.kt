@@ -130,6 +130,7 @@ internal fun fdStream(fd: java.io.FileDescriptor): OutputStream = object : java.
 
 class BundleFolder(private val dir: File) : ExportStore {
     override fun open(folder: String?, name: String, mime: String): OpenExport {
+        if (!dir.isDirectory) throw ExportError(txt(R.string.export_error_create, name, dir.path))
         val file = freeFile(dir, name)
         val access = try { java.io.RandomAccessFile(file, "rw") } catch (t: Throwable) { throw ExportError(txt(R.string.export_error_create, name, dir.path), t) }
         return OpenExport(access.fd, access::close, { Uri.fromFile(file) }, { file.delete() })
@@ -146,7 +147,7 @@ class BundleFolder(private val dir: File) : ExportStore {
         }
     }
 
-    override fun location(where: String): String = app.absentmotion.platform.folderLabel(dir.path)
+    override fun location(where: String): String = app.absentmotion.platform.homeShort(dir.path)
 
     override fun delete(uri: Uri) { uri.path?.let { File(it).delete() } }
 

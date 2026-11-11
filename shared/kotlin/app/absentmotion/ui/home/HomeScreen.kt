@@ -219,10 +219,11 @@ fun HomeScreen(
     ) {
         Box(Modifier.fillMaxSize().background(Am.HomeBg)) {
             Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars.union(WindowInsets.captionBar))) {
-                if (wide) WideHeader(page, tab, { p, t -> page = p; tab = t; if (p == 2) search = null }, onSettings = { scope.launch { drawer.open() } }, onNew = newProject, search, { search = it }, settings)
+                if (wide) WideHeader(page, tab, { p, t -> page = p; tab = t; if (p >= 2) search = null }, onSettings = { scope.launch { drawer.open() } }, onNew = newProject, search, { search = it }, settings)
                 else TopBar(onMenu = { scope.launch { drawer.open() } }, search, page, { search = it }, settings)
                 val fill = Modifier.weight(1f)
-                if (page == 2) ToolsTab(fill, store, settings) { id -> version++; onOpen(id) }
+                if (page == 3) CommunitySoon(fill)
+                else if (page == 2) ToolsTab(fill, store, settings) { id -> version++; onOpen(id) }
                 else if (page == 1) TemplatesTab(version, onTemplate, onTemplateProject, fill, query) else ProjectsPane(
                     Modifier.weight(1f), shown, loaded, tab, { tab = it }, settings, version, onOpen, onExport, query,
                     onUpload = { picker.launch(arrayOf("text/xml", "application/xml", "application/zip", "application/octet-stream")) },
@@ -243,7 +244,7 @@ fun HomeScreen(
                 )
                 Spacer(Modifier.height(if (wide) navInset else BarHeight + navInset))
             }
-            if (!wide) BottomBar(onNew = newProject, page, { page = it; if (it == 2) search = null }, Modifier.align(Alignment.BottomCenter), navInset)
+            if (!wide) BottomBar(onNew = newProject, page, { page = it; if (it >= 2) search = null }, Modifier.align(Alignment.BottomCenter), navInset)
             if (toReport.isNotEmpty()) ImportDialog(toReport, onDismiss = onImportShown, onOpen = { onImportShown(); toReport.first().let { if (it.template) onTemplate(it.id) else onOpen(it.id) } })
             Presence(creating) {
                 NewProjectSheet(
@@ -259,7 +260,7 @@ private var lastTab = 0
 private var lastPage = 0
 private val lastScroll = intArrayOf(0, 0)
 
-internal fun wideHeaderFits(widthDp: Int, fontScale: Float): Boolean = widthDp >= 380 + 340 * fontScale.coerceAtLeast(1f)
+internal fun wideHeaderFits(widthDp: Int, fontScale: Float): Boolean = widthDp >= 380 + 460 * fontScale.coerceAtLeast(1f)
 
 @Composable
 private fun TopBar(onMenu: () -> Unit, search: String?, page: Int, onSearch: (String?) -> Unit, settings: AppSettings) {
@@ -269,8 +270,8 @@ private fun TopBar(onMenu: () -> Unit, search: String?, page: Int, onSearch: (St
         }
         if (search == null) Text("AbsentMotion", Modifier.align(Alignment.Center), color = Am.Navy, fontSize = 22.sp, fontWeight = FontWeight.Medium)
         else HomeSearchField(search, page == 1, onSearch, Modifier.align(Alignment.Center).padding(horizontal = 56.dp).fillMaxWidth())
-        if (search == null) ChangelogButton(settings, Modifier.align(Alignment.CenterEnd).padding(end = if (page != 2) 50.dp else 0.dp))
-        if (page != 2) SearchButton(search, onSearch, Modifier.align(Alignment.CenterEnd))
+        if (search == null) ChangelogButton(settings, Modifier.align(Alignment.CenterEnd).padding(end = if (page < 2) 50.dp else 0.dp))
+        if (page < 2) SearchButton(search, onSearch, Modifier.align(Alignment.CenterEnd))
     }
 }
 
@@ -729,8 +730,11 @@ private fun BottomBar(onNew: () -> Unit, page: Int, onPage: (Int) -> Unit, modif
             Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(BarHeight + navInset)
                 .shadow(8.dp).background(Am.Card).padding(top = 12.dp),
         ) {
-            Box(Modifier.weight(2f), contentAlignment = Alignment.TopCenter) {
+            Box(Modifier.weight(1f), contentAlignment = Alignment.TopCenter) {
                 BarItem(stringResource(R.string.home_tab_projects), if (page == 0) HomeIcons.ProjectsTab else HomeIcons.ProjectsTabOff) { onPage(0) }
+            }
+            Box(Modifier.weight(1f), contentAlignment = Alignment.TopCenter) {
+                BarItem(stringResource(R.string.home_tab_community), if (page == 3) HomeIcons.CommunityTabOn else HomeIcons.CommunityTab) { onPage(3) }
             }
             Spacer(Modifier.width(56.dp))
             Box(Modifier.weight(1f), contentAlignment = Alignment.TopCenter) {
@@ -757,7 +761,8 @@ private fun BarItem(label: String, icon: ImageVector, onClick: () -> Unit) {
     Column(Modifier.widthIn(min = 78.dp).heightIn(min = 48.dp).clickable(onClick = onClick), horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(icon, null, Modifier.size(24.dp), tint = Am.Navy)
         Spacer(Modifier.height(8.dp))
-        Text(label, color = Am.Navy, fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium, maxLines = 1)
+        Text(label, Modifier.padding(horizontal = 2.dp), color = Am.Navy, fontWeight = FontWeight.Medium, maxLines = 1, style = androidx.compose.ui.text.TextStyle(lineHeight = 16.sp),
+            autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(9.sp, 12.sp))
     }
 }
 
@@ -786,5 +791,14 @@ private object MenuPosition : PopupPositionProvider {
         val fitsBelow = anchorBounds.bottom + popupContentSize.height <= windowSize.height
         val y = if (fitsBelow) anchorBounds.bottom else (anchorBounds.top - popupContentSize.height).coerceAtLeast(0)
         return IntOffset(x, y)
+    }
+}
+
+@Composable
+internal fun CommunitySoon(modifier: Modifier) {
+    Column(modifier.fillMaxWidth().padding(horizontal = 32.dp), Arrangement.Center, Alignment.CenterHorizontally) {
+        Icon(HomeIcons.CommunityTab, null, Modifier.size(40.dp), tint = Am.HomeMid)
+        Text(stringResource(R.string.community_coming), Modifier.padding(top = 14.dp), color = Am.Navy, fontSize = 20.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+        Text(stringResource(R.string.community_coming_note), Modifier.padding(top = 8.dp), color = Am.HomeMid, fontSize = 15.sp, lineHeight = 20.sp, textAlign = TextAlign.Center)
     }
 }

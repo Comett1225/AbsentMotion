@@ -265,7 +265,8 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
         if (side) (rows.flatten() + more).let { tiles -> sideColumns(tiles.size, LocalSideHeight.current).let { TileRows(tiles.chunked(it), it) } }
         else if (more.isEmpty()) TileRows(rows, null)
         else key(state.selectedId) {
-            val pager = rememberPagerState { 2 }
+            val pager = rememberPagerState(state.toolPage.takeIf { it.first == state.selectedId }?.second?.coerceIn(0, 1) ?: 0) { 2 }
+            androidx.compose.runtime.LaunchedEffect(pager) { androidx.compose.runtime.snapshotFlow { pager.currentPage }.collect { state.toolPage = state.selectedId to it } }
             HorizontalPager(pager, Modifier.fillMaxWidth().height((rows.size * 160 + (rows.size - 1) * 17).px), pageSpacing = 17.px, verticalAlignment = Alignment.Top,
                 flingBehavior = PagerDefaults.flingBehavior(pager, snapAnimationSpec = tween(ToolPageSnapMs, easing = FastOutSlowInEasing))) { page ->
                 Column { TileRows(if (page == 0) rows else more.chunked(4), if (page == 0) null else 4) }

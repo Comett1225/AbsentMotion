@@ -28,10 +28,8 @@ internal object PanelIcons {
     val Crop = icon("Crop", width = 1.7f, stroke = "M7 2.5L7 17L21.5 17M2.5 7L17 7L17 21.5")
     val MoveTransform = icon("MoveTransform", width = 1.7f, stroke = "M5 3L5 19L21 19M5 19L11 13M2 6L5 3L8 6M18 16L21 19L18 22")
     val EditShape = icon("EditShape", width = 1.7f, stroke = "M17 5A2 2 0 1 0 21 5A2 2 0 1 0 17 5ZM3 19A2 2 0 1 0 7 19A2 2 0 1 0 3 19ZM5 17A12 12 0 0 1 17 5")
-    val Star = icon("Star", width = 1.7f, stroke = "M11.525 2.295A0.53 0.53 0 0 1 12.475 2.295L14.785 6.974A2.123 2.123 0 0 0 16.38 8.134L21.546 8.89A0.53 0.53 0 0 1 21.84 9.794L18.104 13.432" +
-            "A2.123 2.123 0 0 0 17.493 15.31L18.375 20.45A0.53 0.53 0 0 1 17.604 21.01L12.986 18.582A2.122 2.122 0 0 0 11.013 18.582L6.396 21.01" +
-            "A0.53 0.53 0 0 1 5.626 20.45L6.507 15.311A2.122 2.122 0 0 0 5.896 13.432L2.16 9.795A0.53 0.53 0 0 1 2.454 8.889L7.619 8.134" +
-            "A2.122 2.122 0 0 0 9.216 6.974Z")
+    val Star = icon("Star", width = 1.7f, stroke = STAR)
+    val StarFilled = icon("StarFilled", width = 1.7f, stroke = STAR, fill = STAR)
     val Effects = icon("Effects", width = 1.8f, stroke = "M11.017 2.814A1 1 0 0 1 12.983 2.814L14.034 8.372A2 2 0 0 0 15.628 9.966L21.186 11.017A1 1 0 0 1 21.186 12.983L15.628 14.034A2 2 0 0 0 14.034 15.628" +
             "L12.983 21.186A1 1 0 0 1 11.017 21.186L9.966 15.628A2 2 0 0 0 8.372 14.034L2.814 12.983A1 1 0 0 1 2.814 11.017L8.372 9.966A2 2 0 0 0 9.966 8.372ZM20 2" +
             "L20 6M22 4L18 4M2 20A2 2 0 1 0 6 20A2 2 0 1 0 2 20Z")
@@ -92,6 +90,11 @@ internal object PanelIcons {
     val Screenshot = icon("Screenshot", width = 1.7f, stroke = "M14.5 4L9.5 4L7 7L4 7A2 2 0 0 0 2 9L2 18A2 2 0 0 0 4 20L20 20A2 2 0 0 0 22 18L22 9A2 2 0 0 0 20 7L17 7ZM9 13A3 3 0 1 0 15 13A3 3 0 1 0 9 13Z")
     val Reverse = icon("Reverse", width = 1.7f, stroke = "M16 3L20 7L16 11M20 7L4 7M8 21L4 17L8 13M4 17L20 17")
 }
+
+private const val STAR = "M11.525 2.295A0.53 0.53 0 0 1 12.475 2.295L14.785 6.974A2.123 2.123 0 0 0 16.38 8.134L21.546 8.89A0.53 0.53 0 0 1 21.84 9.794L18.104 13.432" +
+    "A2.123 2.123 0 0 0 17.493 15.31L18.375 20.45A0.53 0.53 0 0 1 17.604 21.01L12.986 18.582A2.122 2.122 0 0 0 11.013 18.582L6.396 21.01" +
+    "A0.53 0.53 0 0 1 5.626 20.45L6.507 15.311A2.122 2.122 0 0 0 5.896 13.432L2.16 9.795A0.53 0.53 0 0 1 2.454 8.889L7.619 8.134" +
+    "A2.122 2.122 0 0 0 9.216 6.974Z"
 
 private fun icon(name: String, stroke: String? = null, fill: String? = null, width: Float = 1.6f): ImageVector =
     ImageVector.Builder(name, 24.dp, 24.dp, 24f, 24f).apply {

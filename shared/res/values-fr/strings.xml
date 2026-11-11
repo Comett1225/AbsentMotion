@@ -93,6 +93,9 @@
     <string name="bundle_community">Paquet communautaire</string>
     <string name="bundle_community_note">Ajoute un titre, une miniature de votre projet, une description, des tags et votre nom, pour le partager avec la communauté.</string>
     <string name="community_thumbnail">Miniature</string>
+    <string name="community_choose_thumbnail">Choisir une miniature</string>
+    <string name="community_confirm_thumbnail">Confirmer la miniature</string>
+    <string name="community_picker_hint">Faites glisser la timeline jusqu’au moment qui représente le mieux votre projet.</string>
     <string name="community_thumbnail_hint">Faites glisser le curseur jusqu’au moment qui représente le mieux votre projet.</string>
     <string name="community_title">Titre</string>
     <string name="community_description">Description</string>
@@ -101,7 +104,6 @@
     <string name="community_creator">Créé par</string>
     <string name="community_by">par %1$s</string>
     <string name="transform_3d_rotation">Rotation 3D</string>
-    <string name="caption_engine_download">Le moteur de sous-titrage (%1$s) est téléchargé une seule fois depuis AbsentMotion sur GitHub.</string>
     <string name="transform_free_rotate">Rotation libre</string>
     <string name="transform_double_tap_pivot">Appuyez deux fois pour déplacer le pivot</string>
     <string name="transform_double_tap_layer">Appuyez deux fois pour déplacer le calque</string>
@@ -158,6 +160,10 @@
     <string name="settings_keep_media_copies">Conserver une copie des médias importés dans le projet</string>
     <string name="settings_bundles_folder">Dossier des paquets</string>
     <string name="settings_bundles_default">Utiliser le dossier des paquets par défaut</string>
+    <string name="bundle_save_in">Enregistrer dans</string>
+    <string name="bundle_pick_folder">Choisir un dossier d’enregistrement</string>
+    <string name="bundle_for_now">Pour le moment : %1$s</string>
+    <string name="bundle_folder_lost">Impossible d’accéder à ce dossier. Touchez pour le choisir à nouveau ; en attendant, les paquets sont enregistrés dans %1$s.</string>
     <string name="settings_about">À propos</string>
     <string name="settings_report_issue">Signaler un problème</string>
     <string name="settings_suggest_feature">Suggérer une fonctionnalité</string>
@@ -438,6 +444,9 @@
     <string name="home_new_project">Nouveau projet</string>
     <string name="home_back">Retour</string>
     <string name="home_tab_tools">Outils</string>
+    <string name="home_tab_community">Communauté</string>
+    <string name="community_coming">Disponible en 5.2</string>
+    <string name="community_coming_note">Les paquets de la communauté seront partagés ici pour vous permettre de découvrir les créations des autres avec AbsentMotion.</string>
     <string name="tools_compress">Compresser</string>
     <string name="tools_compress_about">Compresse vos vidéos ou images.</string>
     <string name="tools_downloader">Téléchargeur de vidéos</string>

@@ -93,6 +93,9 @@
     <string name="bundle_community">社区包</string>
     <string name="bundle_community_note">添加标题、项目缩略图、描述、标签和你的名字，以便与社区分享。</string>
     <string name="community_thumbnail">缩略图</string>
+    <string name="community_choose_thumbnail">选择缩略图</string>
+    <string name="community_confirm_thumbnail">确认缩略图</string>
+    <string name="community_picker_hint">滑动时间轴，找到最能展示项目的时刻。</string>
     <string name="community_thumbnail_hint">拖动到最能展示项目的时刻。</string>
     <string name="community_title">标题</string>
     <string name="community_description">描述</string>
@@ -101,7 +104,6 @@
     <string name="community_creator">创建者</string>
     <string name="community_by">作者：%1$s</string>
     <string name="transform_3d_rotation">3D旋转</string>
-    <string name="caption_engine_download">字幕引擎（%1$s）从GitHub上的AbsentMotion下载一次。</string>
     <string name="transform_free_rotate">自由旋转</string>
     <string name="transform_double_tap_pivot">双击以移动锚点</string>
     <string name="transform_double_tap_layer">双击以移动图层</string>
@@ -158,6 +160,10 @@
     <string name="settings_keep_media_copies">在项目中保留导入媒体的副本</string>
     <string name="settings_bundles_folder">包文件夹</string>
     <string name="settings_bundles_default">使用默认包文件夹</string>
+    <string name="bundle_save_in">保存位置</string>
+    <string name="bundle_pick_folder">选择保存文件夹</string>
+    <string name="bundle_for_now">当前： %1$s</string>
+    <string name="bundle_folder_lost">无法访问此文件夹。点击重新选择；在此之前，包将保存到 %1$s。</string>
     <string name="settings_about">关于</string>
     <string name="settings_report_issue">反馈问题</string>
     <string name="settings_suggest_feature">提出功能建议</string>
@@ -436,6 +442,9 @@
     <string name="home_new_project">新建项目</string>
     <string name="home_back">返回</string>
     <string name="home_tab_tools">工具</string>
+    <string name="home_tab_community">社区</string>
+    <string name="community_coming">即将在5.2中推出</string>
+    <string name="community_coming_note">社区包将在此分享，你可以发现其他人用AbsentMotion创作的内容。</string>
     <string name="tools_compress">压缩</string>
     <string name="tools_compress_about">压缩视频或图片。</string>
     <string name="tools_downloader">视频下载器</string>

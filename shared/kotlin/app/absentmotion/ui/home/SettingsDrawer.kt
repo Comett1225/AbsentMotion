@@ -324,10 +324,47 @@ private fun CaptionModelRow() {
 
 @Composable
 private fun BundlesFolderRows(settings: AppSettings) {
-    val pick = app.absentmotion.platform.rememberFolderPicker { settings.bundlesFolder = it }
+    val context = LocalContext.current
+    val pick = rememberBundleFolderPicker(settings)
     val folder = settings.bundlesFolder
-    ActionRow(stringResource(R.string.settings_bundles_folder), folder?.let { app.absentmotion.platform.folderLabel(it) } ?: "Documents/${app.absentmotion.export.AppFolder}", chevron = true) { pick() }
-    if (folder != null) ActionRow(stringResource(R.string.settings_bundles_default), "", chevron = false) { settings.bundlesFolder = null }
+    val view = folderView(folder)
+    ActionRow(stringResource(R.string.settings_bundles_folder), if (folder == null) defaultBundles() else view?.label.orEmpty(), chevron = true) { pick() }
+    if (view?.reachable == false) Text(stringResource(R.string.bundle_folder_lost, defaultBundles()), Modifier.padding(start = 15.dp, end = 15.dp, bottom = 6.dp), color = Am.HomeAccent, fontSize = 12.sp, lineHeight = 16.sp)
+    if (folder != null) ActionRow(stringResource(R.string.settings_bundles_default), "", chevron = false) {
+        app.absentmotion.platform.forgetFolder(context, folder)
+        settings.bundlesFolder = null
+    }
+}
+
+@Composable
+internal fun defaultBundles(): String {
+    val context = LocalContext.current
+    return remember { app.absentmotion.export.MediaStoreExport(context).location("Documents/${app.absentmotion.export.AppFolder}") }
+}
+
+internal class FolderView(val label: String, val reachable: Boolean)
+
+@Composable
+internal fun folderView(folder: String?): FolderView? {
+    val context = LocalContext.current
+    var tick by remember { androidx.compose.runtime.mutableIntStateOf(0) }
+    androidx.lifecycle.compose.LifecycleEventEffect(androidx.lifecycle.Lifecycle.Event.ON_RESUME) { tick++ }
+    var view by remember(folder) { mutableStateOf<FolderView?>(null) }
+    androidx.compose.runtime.LaunchedEffect(folder, tick) {
+        view = folder?.let {
+            withContext(Dispatchers.IO) { FolderView(app.absentmotion.platform.folderLabel(context, it), app.absentmotion.platform.folderReachable(context, it)) }
+        }
+    }
+    return view
+}
+
+@Composable
+internal fun rememberBundleFolderPicker(settings: AppSettings): () -> Unit {
+    val context = LocalContext.current
+    return app.absentmotion.platform.rememberFolderPicker(settings.bundlesFolder) { picked ->
+        settings.bundlesFolder?.takeIf { it != picked }?.let { app.absentmotion.platform.forgetFolder(context, it) }
+        settings.bundlesFolder = picked
+    }
 }
 
 @Composable

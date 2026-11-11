@@ -93,6 +93,9 @@
     <string name="bundle_community">Пакет сообщества</string>
     <string name="bundle_community_note">Добавляет название, миниатюру из проекта, описание, теги и ваше имя для публикации в сообществе.</string>
     <string name="community_thumbnail">Миниатюра</string>
+    <string name="community_choose_thumbnail">Выбрать миниатюру</string>
+    <string name="community_confirm_thumbnail">Подтвердить миниатюру</string>
+    <string name="community_picker_hint">Переместите таймлайн к моменту, который лучше всего показывает ваш проект.</string>
     <string name="community_thumbnail_hint">Перетащите ползунок к моменту, который лучше всего показывает проект.</string>
     <string name="community_title">Название</string>
     <string name="community_description">Описание</string>
@@ -101,7 +104,6 @@
     <string name="community_creator">Автор</string>
     <string name="community_by">автор: %1$s</string>
     <string name="transform_3d_rotation">3D-поворот</string>
-    <string name="caption_engine_download">Движок субтитров (%1$s) загружается один раз из AbsentMotion на GitHub.</string>
     <string name="transform_free_rotate">Свободный поворот</string>
     <string name="transform_double_tap_pivot">Дважды коснитесь, чтобы переместить опорную точку</string>
     <string name="transform_double_tap_layer">Дважды коснитесь, чтобы переместить слой</string>
@@ -158,6 +160,10 @@
     <string name="settings_keep_media_copies">Хранить копию импортированных медиа в проекте</string>
     <string name="settings_bundles_folder">Папка пакетов</string>
     <string name="settings_bundles_default">Использовать папку пакетов по умолчанию</string>
+    <string name="bundle_save_in">Сохранить в</string>
+    <string name="bundle_pick_folder">Выберите папку для сохранения</string>
+    <string name="bundle_for_now">Пока: %1$s</string>
+    <string name="bundle_folder_lost">Нет доступа к этой папке. Нажмите, чтобы выбрать её снова; до этого пакеты будут сохраняться в %1$s.</string>
     <string name="settings_about">О приложении</string>
     <string name="settings_report_issue">Сообщить о проблеме</string>
     <string name="settings_suggest_feature">Предложить функцию</string>
@@ -439,6 +445,9 @@
     <string name="home_new_project">Новый проект</string>
     <string name="home_back">Назад</string>
     <string name="home_tab_tools">Инструменты</string>
+    <string name="home_tab_community">Сообщество</string>
+    <string name="community_coming">Появится в версии 5.2</string>
+    <string name="community_coming_note">Здесь будут публиковаться пакеты сообщества, чтобы вы могли находить работы других пользователей AbsentMotion.</string>
     <string name="tools_compress">Сжатие</string>
     <string name="tools_compress_about">Сжимает видео и изображения.</string>
     <string name="tools_downloader">Загрузчик видео</string>

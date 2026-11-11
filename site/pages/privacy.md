@@ -21,7 +21,7 @@ If the app closes unexpectedly it keeps a crash log in its own storage: when it 
 The app asks for the internet permission for these things only:
 
 - **Fonts.** When you pick one of the downloadable fonts, the app downloads it from Google Fonts. Google receives the request for that font and your IP address, as for any web request.
-- **Auto captions.** The first time you generate captions, the app tells you the size of the speech model (about 57 MB) and downloads it from Hugging Face, with the caption engine (about 3 MB) from GitHub. Recognizing speech runs on the phone.
+- **Auto captions.** The first time you generate captions, the app tells you the size of the speech model (about 57 MB) and downloads it from Hugging Face. Recognizing speech runs on the phone.
 - **Background removal.** The first time you remove a background, the app downloads its model once (about 3 MB) from GitHub. The cut-out itself runs on the phone.
 - **AI Enhance and AI Smooth.** The first time you use one of them, the app tells you the size of the model it needs (about 1 to 11 MB) and downloads it from GitHub. The AI work itself runs on the phone.
 - **AI background removal 2.0.** Only if you choose AI background removal 2.0 for removing backgrounds, the app downloads its model once (about 62 MB) from GitHub. The cut-out itself runs on the phone.

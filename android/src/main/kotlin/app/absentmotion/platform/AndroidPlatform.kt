@@ -253,61 +253,10 @@ fun revealFolderLabel(): String = ""
 
 internal const val CAPTION_MODEL_NAME = "ggml-base-q5_1.bin"
 internal const val CAPTION_MODEL_BYTES = 59_707_625L
-internal object CaptionEngine {
-    private val libraries = listOf(
-        Triple("libwhisper_jni.so", 1_555_448L, "e5e1b4f04292aae164a6bf09e43780c3b4cf8386c67f08905c1f433510ad82ff"),
-        Triple("libwhisper_jni_fast.so", 1_548_200L, "58fec17a9e1e7d2911466103a71beb00a92eecc71dcc0ddae897f8e98fdd2411"),
-    )
-    @Volatile private var folder: java.io.File? = null
-    @Volatile private var checked = false
-
-    private fun bundled(context: Context) = java.io.File(context.applicationInfo.nativeLibraryDir, libraries[0].first).isFile
-    private fun home(context: Context) = app.absentmotion.ai.CaptionModel.engineDir(context)
-    private fun files() = libraries.map { (name, bytes, sha) -> app.absentmotion.ai.addon(name, bytes, sha) }
-
-    fun missing(context: Context): List<app.absentmotion.ai.ModelFile> =
-        if (bundled(context)) emptyList() else files().filter { java.io.File(home(context), it.name).length() != it.bytes }
-
-    suspend fun download(context: Context, progress: (Float) -> Unit) = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
-        val wanted = missing(context)
-        val total = wanted.sumOf { it.bytes }.coerceAtLeast(1L).toFloat()
-        var before = 0L
-        check(home(context).let { it.isDirectory || it.mkdirs() }) { context.getString(R.string.ai_cannot_create_model_storage) }
-        for (file in wanted) {
-            val job = coroutineContext[kotlinx.coroutines.Job]
-            app.absentmotion.ai.fetch(file, java.io.File(home(context), file.name), { job?.let { if (!it.isActive) throw java.util.concurrent.CancellationException() } }) { progress((before + it * file.bytes) / total) }
-            before += file.bytes
-        }
-        checked = true
-    }
-
-    fun prepare(context: Context) {
-        if (bundled(context)) { folder = null; return }
-        val home = home(context)
-        if (!checked) for (file in files()) {
-            val target = java.io.File(home, file.name)
-            val intact = target.length() == file.bytes && target.inputStream().use(app.absentmotion.ai.CaptionModel::sha256) == file.sha256
-            if (!intact) target.delete()
-            check(intact) { context.getString(R.string.ai_caption_model_load_failed) }
-        }
-        checked = true
-        folder = home
-    }
-
-    fun load(name: String) {
-        val from = folder
-        if (from == null) System.loadLibrary(name) else System.load(java.io.File(from, "lib$name.so").path)
-    }
-}
-
-internal fun captionEngineMissingBytes(context: Context): Long = CaptionEngine.missing(context).sumOf { it.bytes }
-internal suspend fun downloadCaptionEngine(context: Context, progress: (Float) -> Unit) = CaptionEngine.download(context, progress)
-internal fun prepareCaptionEngine(context: Context) = CaptionEngine.prepare(context)
-
 internal fun loadCaptionLibrary() {
     val fast = runCatching { app.absentmotion.engine.NativeEngine.fastCaptionCpu() }
         .getOrElse { fastCaptionCpu(runCatching { java.io.File("/proc/cpuinfo").readText() }.getOrDefault("")) }
-    android.util.Log.i("AMCaptions", "caption library " + loadCaptionLibrary(fast, CaptionEngine::load))
+    android.util.Log.i("AMCaptions", "caption library " + loadCaptionLibrary(fast, System::loadLibrary))
 }
 internal fun loadCaptionLibrary(fast: Boolean, load: (String) -> Unit): String {
     if (fast) try { load("whisper_jni_fast"); return "whisper_jni_fast" } catch (_: UnsatisfiedLinkError) {}
@@ -503,23 +452,56 @@ fun releaseFrameImage(image: androidx.compose.ui.graphics.ImageBitmap) = Unit
 
 fun videoDownloader(): app.absentmotion.tools.VideoFetcher = app.absentmotion.tools.VideoDownloader
 
-fun bundleStore(context: android.content.Context, folder: String?): app.absentmotion.export.ExportStore? {
-    val tree = folder?.let(android.net.Uri::parse) ?: return null
-    val allowed = context.contentResolver.persistedUriPermissions.any { it.uri == tree && it.isWritePermission }
-    return if (allowed) app.absentmotion.export.TreeExport(context, tree) else null
+fun bundleStore(context: android.content.Context, folder: String?): app.absentmotion.export.ExportStore? =
+    folder?.let { app.absentmotion.export.TreeExport(context, android.net.Uri.parse(it)) }
+
+fun folderLabel(context: android.content.Context, folder: String): String {
+    val tree = android.net.Uri.parse(folder)
+    val id = runCatching { android.provider.DocumentsContract.getTreeDocumentId(tree) }.getOrNull() ?: return folder
+    if (tree.authority == "com.android.externalstorage.documents") {
+        val volume = id.substringBefore(':')
+        val path = id.substringAfter(':', "").trim('/')
+        val where = if (volume == "primary") null else runCatching {
+            context.getSystemService(android.os.storage.StorageManager::class.java).storageVolumes.firstOrNull { it.uuid.equals(volume, true) }?.getDescription(context)
+        }.getOrNull() ?: volume
+        return listOfNotNull(where, path.ifEmpty { null }).joinToString(" › ").ifEmpty { "/" }
+    }
+    val name = runCatching {
+        context.contentResolver.query(android.provider.DocumentsContract.buildDocumentUriUsingTree(tree, id), arrayOf(android.provider.DocumentsContract.Document.COLUMN_DISPLAY_NAME), null, null, null)
+            ?.use { if (it.moveToFirst()) it.getString(0) else null }
+    }.getOrNull()
+    val provider = runCatching { context.packageManager.resolveContentProvider(tree.authority.orEmpty(), 0)?.loadLabel(context.packageManager)?.toString() }.getOrNull()
+    return listOfNotNull(provider, name).distinct().joinToString(" › ").ifEmpty { folder }
 }
 
-fun folderLabel(folder: String): String =
-    runCatching { android.provider.DocumentsContract.getTreeDocumentId(android.net.Uri.parse(folder)).substringAfter(':').ifEmpty { "/" } }.getOrDefault(folder)
+fun folderReachable(context: android.content.Context, folder: String): Boolean {
+    val tree = android.net.Uri.parse(folder)
+    if (context.contentResolver.persistedUriPermissions.none { it.uri == tree && it.isWritePermission }) return false
+    return runCatching {
+        val doc = android.provider.DocumentsContract.buildDocumentUriUsingTree(tree, android.provider.DocumentsContract.getTreeDocumentId(tree))
+        context.contentResolver.query(doc, arrayOf(android.provider.DocumentsContract.Document.COLUMN_FLAGS), null, null, null)
+            ?.use { it.moveToFirst() && (it.getInt(0) and android.provider.DocumentsContract.Document.FLAG_DIR_SUPPORTS_CREATE) != 0 }
+    }.getOrNull() == true
+}
+
+fun forgetFolder(context: android.content.Context, folder: String) {
+    val tree = android.net.Uri.parse(folder)
+    context.contentResolver.persistedUriPermissions.filter { it.uri == tree }.forEach {
+        val flags = (if (it.isReadPermission) android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION else 0) or (if (it.isWritePermission) android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION else 0)
+        runCatching { context.contentResolver.releasePersistableUriPermission(tree, flags) }
+    }
+}
 
 @androidx.compose.runtime.Composable
-fun rememberFolderPicker(onPicked: (String) -> Unit): () -> Unit {
+fun rememberFolderPicker(start: String?, onPicked: (String) -> Unit): () -> Unit {
     val context = androidx.compose.ui.platform.LocalContext.current
     val launcher = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree()) { uri ->
         if (uri != null) {
             runCatching { context.contentResolver.takePersistableUriPermission(uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION or android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION) }
-            onPicked(uri.toString())
+            if (context.contentResolver.persistedUriPermissions.any { it.uri == uri && it.isWritePermission }) onPicked(uri.toString())
         }
     }
-    return { launcher.launch(null) }
+    val initial = start?.let { runCatching { android.net.Uri.parse(it).let { tree -> android.provider.DocumentsContract.buildDocumentUriUsingTree(tree, android.provider.DocumentsContract.getTreeDocumentId(tree)) } }.getOrNull() }
+        ?: android.provider.DocumentsContract.buildDocumentUri("com.android.externalstorage.documents", "primary:Documents")
+    return { runCatching { launcher.launch(initial) }.onFailure { runCatching { launcher.launch(null) } } }
 }

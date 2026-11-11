@@ -93,6 +93,9 @@
     <string name="bundle_community">Пакет спільноти</string>
     <string name="bundle_community_note">Додає назву, мініатюру з вашого проєкту, опис, теги та ваше ім’я для поширення в спільноті.</string>
     <string name="community_thumbnail">Мініатюра</string>
+    <string name="community_choose_thumbnail">Вибрати мініатюру</string>
+    <string name="community_confirm_thumbnail">Підтвердити мініатюру</string>
+    <string name="community_picker_hint">Пересуньте таймлайн до моменту, який найкраще показує ваш проєкт.</string>
     <string name="community_thumbnail_hint">Перетягніть до моменту, який найкраще показує ваш проєкт.</string>
     <string name="community_title">Назва</string>
     <string name="community_description">Опис</string>
@@ -101,7 +104,6 @@
     <string name="community_creator">Автор</string>
     <string name="community_by">Автор: %1$s</string>
     <string name="transform_3d_rotation">3D-обертання</string>
-    <string name="caption_engine_download">Рушій субтитрів (%1$s) завантажується один раз із AbsentMotion на GitHub.</string>
     <string name="transform_free_rotate">Вільне обертання</string>
     <string name="transform_double_tap_pivot">Двічі торкніться, щоб перемістити опорну точку</string>
     <string name="transform_double_tap_layer">Двічі торкніться, щоб перемістити шар</string>
@@ -158,6 +160,10 @@
     <string name="settings_keep_media_copies">Зберігати копію імпортованих медіа в проєкті</string>
     <string name="settings_bundles_folder">Тека пакетів</string>
     <string name="settings_bundles_default">Використовувати стандартну теку пакетів</string>
+    <string name="bundle_save_in">Місце збереження</string>
+    <string name="bundle_pick_folder">Виберіть теку для збереження</string>
+    <string name="bundle_for_now">Поки що: %1$s</string>
+    <string name="bundle_folder_lost">Не вдається відкрити цю теку. Торкніться, щоб вибрати її знову; до того часу пакети зберігатимуться в %1$s.</string>
     <string name="settings_about">Про застосунок</string>
     <string name="settings_report_issue">Повідомити про проблему</string>
     <string name="settings_suggest_feature">Запропонувати функцію</string>
@@ -439,6 +445,9 @@
     <string name="home_new_project">Новий проєкт</string>
     <string name="home_back">Назад</string>
     <string name="home_tab_tools">Інструменти</string>
+    <string name="home_tab_community">Спільнота</string>
+    <string name="community_coming">З’явиться у версії 5.2</string>
+    <string name="community_coming_note">Тут публікуватимуть пакети спільноти, щоб ви могли знаходити роботи інших користувачів AbsentMotion.</string>
     <string name="tools_compress">Стиснення</string>
     <string name="tools_compress_about">Стискає ваші відео або зображення.</string>
     <string name="tools_downloader">Завантажувач відео</string>

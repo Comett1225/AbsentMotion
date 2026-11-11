@@ -423,10 +423,7 @@ private fun ColumnScope.ConfirmScreen(highPrecision: Boolean, minHeight: Dp, onC
         Text(stringResource(R.string.auto_captions), color = Am.OnDark, fontSize = 20.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
         Spacer(Modifier.height(16.dp))
         Text(
-            listOfNotNull(
-                app.absentmotion.platform.captionDownloadDescription(context, CaptionModel.name(highPrecision), CaptionModel.bytes(highPrecision)).takeIf { !CaptionModel.present(context, highPrecision) },
-                app.absentmotion.platform.captionEngineMissingBytes(context).takeIf { it > 0L }?.let { stringResource(R.string.caption_engine_download, app.absentmotion.export.formatBytes(it)) },
-            ).joinToString("\n\n"),
+            app.absentmotion.platform.captionDownloadDescription(context, CaptionModel.name(highPrecision), CaptionModel.bytes(highPrecision)),
             Modifier.fillMaxWidth(), color = Am.OnDark, fontSize = 14.sp, lineHeight = 20.sp, textAlign = TextAlign.Center,
         )
     }

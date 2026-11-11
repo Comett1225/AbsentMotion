@@ -93,6 +93,9 @@
     <string name="bundle_community">Community-Paket</string>
     <string name="bundle_community_note">Fügt einen Titel, eine Miniaturansicht aus deinem Projekt, eine Beschreibung, Tags und deinen Namen hinzu, damit du es mit der Community teilen kannst.</string>
     <string name="community_thumbnail">Miniaturansicht</string>
+    <string name="community_choose_thumbnail">Miniaturansicht auswählen</string>
+    <string name="community_confirm_thumbnail">Miniaturansicht bestätigen</string>
+    <string name="community_picker_hint">Verschiebe die Zeitleiste zu dem Moment, der dein Projekt am besten zeigt.</string>
     <string name="community_thumbnail_hint">Ziehe zum Zeitpunkt im Projekt, der es am besten zeigt.</string>
     <string name="community_title">Titel</string>
     <string name="community_description">Beschreibung</string>
@@ -101,7 +104,6 @@
     <string name="community_creator">Erstellt von</string>
     <string name="community_by">von %1$s</string>
     <string name="transform_3d_rotation">3D-Drehung</string>
-    <string name="caption_engine_download">Die Untertitel-Engine (%1$s) wird einmalig von AbsentMotion auf GitHub heruntergeladen.</string>
     <string name="transform_free_rotate">Freies Drehen</string>
     <string name="transform_double_tap_pivot">Doppeltippen, um den Drehpunkt zu verschieben</string>
     <string name="transform_double_tap_layer">Doppeltippen, um die Ebene zu verschieben</string>
@@ -158,6 +160,10 @@
     <string name="settings_keep_media_copies">Eine Kopie importierter Medien im Projekt behalten</string>
     <string name="settings_bundles_folder">Paketordner</string>
     <string name="settings_bundles_default">Standard-Paketordner verwenden</string>
+    <string name="bundle_save_in">Speichern in</string>
+    <string name="bundle_pick_folder">Ordner zum Speichern auswählen</string>
+    <string name="bundle_for_now">Vorerst: %1$s</string>
+    <string name="bundle_folder_lost">Dieser Ordner ist nicht erreichbar. Tippe, um ihn erneut auszuwählen; bis dahin werden Pakete in %1$s gespeichert.</string>
     <string name="settings_about">Über</string>
     <string name="settings_report_issue">Problem melden</string>
     <string name="settings_suggest_feature">Funktion vorschlagen</string>
@@ -437,6 +443,9 @@
     <string name="home_new_project">Neues Projekt</string>
     <string name="home_back">Zurück</string>
     <string name="home_tab_tools">Werkzeuge</string>
+    <string name="home_tab_community">Community</string>
+    <string name="community_coming">Kommt in 5.2</string>
+    <string name="community_coming_note">Hier werden Community-Pakete geteilt, damit du entdecken kannst, was andere mit AbsentMotion erstellen.</string>
     <string name="tools_compress">Komprimieren</string>
     <string name="tools_compress_about">Komprimiert deine Videos oder Bilder.</string>
     <string name="tools_downloader">Video-Downloader</string>

@@ -33,7 +33,7 @@ Auto captions turns speech into text layers that appear in time with the voice.
 
 The sample caption in the middle of the sheet shows the look you choose, including its position.
 
-The first time, the app asks before downloading a speech model. **Standard** is about 60 MB. The optional **Higher precision** model is about 82 MB. Both support multiple languages and stay below 100 MB. Downloads come from the Whisper model repository on Hugging Face and are checked before use; the caption engine (about 3 MB) comes with them from this project's GitHub releases. Recognition then runs offline on your device. **Settings > Remove caption model** removes downloaded caption models.
+The first time, the app asks before downloading a speech model. **Standard** is about 60 MB. The optional **Higher precision** model is about 82 MB. Both support multiple languages and stay below 100 MB. Downloads come from the Whisper model repository on Hugging Face and are checked before use. Recognition then runs offline on your device. **Settings > Remove caption model** removes downloaded caption models.
 
 While captions are generated, the setup controls disappear. The centre shows the current stage, progress and estimated time remaining; **Cancel** is the only action. The estimate appears after enough work has completed and may change. Long recordings are processed in ten-minute parts.
 
@@ -119,7 +119,6 @@ Each level has its own model, downloaded once (about 11 MB) after the app has sh
 | Item | When | Size | From |
 |---|---|---|---|
 | Speech model for captions | After you confirm the download | about 60 MB Standard, or 82 MB Higher precision | Hugging Face |
-| Caption engine | With the speech model, after you confirm the download | about 3 MB | this project's GitHub releases |
 | Background removal model | The first time you remove a background | about 3 MB | this project's GitHub releases |
 | Noise reduction | Never: it is inside the app | | |
 | AI Enhance models | The first time you use Enhance, after you tap Download and start | about 2.4 MB (cartoon 1.3 MB, film grain 2.4 MB more) | this project's GitHub releases |

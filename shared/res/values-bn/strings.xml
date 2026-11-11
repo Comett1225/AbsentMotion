@@ -93,6 +93,9 @@
     <string name="bundle_community">কমিউনিটি বান্ডল</string>
     <string name="bundle_community_note">কমিউনিটির সঙ্গে শেয়ার করার জন্য একটি শিরোনাম, প্রজেক্টের একটি থাম্বনেইল, বিবরণ, ট্যাগ ও আপনার নাম যোগ করে।</string>
     <string name="community_thumbnail">থাম্বনেইল</string>
+    <string name="community_choose_thumbnail">থাম্বনেইল বাছুন</string>
+    <string name="community_confirm_thumbnail">থাম্বনেইল নিশ্চিত করুন</string>
+    <string name="community_picker_hint">আপনার প্রজেক্টটি সবচেয়ে ভালো দেখায় এমন মুহূর্তে টাইমলাইন সরান।</string>
     <string name="community_thumbnail_hint">প্রজেক্টের যে মুহূর্তটি সেটিকে সবচেয়ে ভালোভাবে দেখায় সেখানে টেনে নিন।</string>
     <string name="community_title">শিরোনাম</string>
     <string name="community_description">বিবরণ</string>
@@ -101,7 +104,6 @@
     <string name="community_creator">তৈরি করেছেন</string>
     <string name="community_by">%1$s-এর তৈরি</string>
     <string name="transform_3d_rotation">3D রোটেশন</string>
-    <string name="caption_engine_download">ক্যাপশন ইঞ্জিন (%1$s) AbsentMotion-এর GitHub থেকে একবার ডাউনলোড করা হয়।</string>
     <string name="transform_free_rotate">ফ্রি রোটেট</string>
     <string name="transform_double_tap_pivot">পিভট সরাতে দুবার ট্যাপ করুন</string>
     <string name="transform_double_tap_layer">লেয়ার সরাতে দুবার ট্যাপ করুন</string>
@@ -158,6 +160,10 @@
     <string name="settings_keep_media_copies">প্রজেক্টে ইমপোর্ট করা মিডিয়ার কপি রাখুন</string>
     <string name="settings_bundles_folder">বান্ডল ফোল্ডার</string>
     <string name="settings_bundles_default">ডিফল্ট বান্ডল ফোল্ডার ব্যবহার করুন</string>
+    <string name="bundle_save_in">যেখানে সেভ হবে</string>
+    <string name="bundle_pick_folder">সেভ করার জন্য একটি ফোল্ডার বাছুন</string>
+    <string name="bundle_for_now">আপাতত: %1$s</string>
+    <string name="bundle_folder_lost">এই ফোল্ডারে পৌঁছানো যাচ্ছে না। আবার বাছতে ট্যাপ করুন; ততক্ষণ বান্ডল %1$s-এ সেভ হবে।</string>
     <string name="settings_about">সম্পর্কে</string>
     <string name="settings_report_issue">সমস্যা জানান</string>
     <string name="settings_suggest_feature">একটি ফিচার প্রস্তাব করুন</string>
@@ -437,6 +443,9 @@
     <string name="home_new_project">নতুন প্রজেক্ট</string>
     <string name="home_back">ফিরে যান</string>
     <string name="home_tab_tools">টুলস</string>
+    <string name="home_tab_community">কমিউনিটি</string>
+    <string name="community_coming">আসছে 5.2-এ</string>
+    <string name="community_coming_note">কমিউনিটি বান্ডল এখানে শেয়ার করা হবে, যাতে AbsentMotion দিয়ে অন্যরা কী তৈরি করে তা আপনি খুঁজে পান।</string>
     <string name="tools_compress">কম্প্রেস</string>
     <string name="tools_compress_about">আপনার ভিডিও বা ইমেজ কম্প্রেস করে।</string>
     <string name="tools_downloader">ভিডিও ডাউনলোডার</string>

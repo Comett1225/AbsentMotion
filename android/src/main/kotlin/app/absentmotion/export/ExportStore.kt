@@ -219,6 +219,7 @@ internal fun fdStream(fd: java.io.FileDescriptor): OutputStream = object : java.
 }
 
 class TreeExport(context: Context, private val tree: Uri) : ExportStore {
+    private val appContext = context.applicationContext
     private val resolver = context.contentResolver
 
     private fun parent(): Uri = android.provider.DocumentsContract.buildDocumentUriUsingTree(tree, android.provider.DocumentsContract.getTreeDocumentId(tree))
@@ -226,8 +227,8 @@ class TreeExport(context: Context, private val tree: Uri) : ExportStore {
     override fun open(folder: String?, name: String, mime: String): OpenExport {
         val document = runCatching { android.provider.DocumentsContract.createDocument(resolver, parent(), mime, name) }.getOrNull()
             ?: throw ExportError(txt(R.string.export_error_create, name, location("")))
-        val file = runCatching { resolver.openFileDescriptor(document, "rw") }.getOrNull()
-            ?: throw ExportError(txt(R.string.export_error_create, name, location("")))
+        val file = runCatching { resolver.openFileDescriptor(document, "rw") }.getOrNull() ?: runCatching { resolver.openFileDescriptor(document, "w") }.getOrNull()
+            ?: run { runCatching { android.provider.DocumentsContract.deleteDocument(resolver, document) }; throw ExportError(txt(R.string.export_error_create, name, location(""))) }
         return OpenExport(file.fileDescriptor, file::close, { document }, { android.provider.DocumentsContract.deleteDocument(resolver, document) })
     }
 
@@ -242,7 +243,7 @@ class TreeExport(context: Context, private val tree: Uri) : ExportStore {
         }
     }
 
-    override fun location(where: String): String = app.absentmotion.platform.folderLabel(tree.toString())
+    override fun location(where: String): String = app.absentmotion.platform.folderLabel(appContext, tree.toString())
 
     override fun delete(uri: Uri) { runCatching { android.provider.DocumentsContract.deleteDocument(resolver, uri) } }
 

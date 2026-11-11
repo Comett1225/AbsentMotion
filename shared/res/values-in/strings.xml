@@ -93,6 +93,9 @@
     <string name="bundle_community">Bundel komunitas</string>
     <string name="bundle_community_note">Menambahkan judul, thumbnail dari proyek, deskripsi, tag, dan nama Anda agar siap dibagikan ke komunitas.</string>
     <string name="community_thumbnail">Thumbnail</string>
+    <string name="community_choose_thumbnail">Pilih thumbnail</string>
+    <string name="community_confirm_thumbnail">Konfirmasi thumbnail</string>
+    <string name="community_picker_hint">Geser timeline ke momen yang paling menampilkan proyek Anda.</string>
     <string name="community_thumbnail_hint">Geser ke momen yang paling menggambarkan proyek Anda.</string>
     <string name="community_title">Judul</string>
     <string name="community_description">Deskripsi</string>
@@ -101,7 +104,6 @@
     <string name="community_creator">Dibuat oleh</string>
     <string name="community_by">oleh %1$s</string>
     <string name="transform_3d_rotation">Rotasi 3D</string>
-    <string name="caption_engine_download">Mesin takarir (%1$s) diunduh sekali dari AbsentMotion di GitHub.</string>
     <string name="transform_free_rotate">Putar bebas</string>
     <string name="transform_double_tap_pivot">Ketuk dua kali untuk memindahkan pivot</string>
     <string name="transform_double_tap_layer">Ketuk dua kali untuk memindahkan lapisan</string>
@@ -158,6 +160,10 @@
     <string name="settings_keep_media_copies">Simpan salinan media impor di proyek</string>
     <string name="settings_bundles_folder">Folder bundel</string>
     <string name="settings_bundles_default">Gunakan folder bundel default</string>
+    <string name="bundle_save_in">Simpan di</string>
+    <string name="bundle_pick_folder">Pilih folder penyimpanan</string>
+    <string name="bundle_for_now">Untuk saat ini: %1$s</string>
+    <string name="bundle_folder_lost">Folder ini tidak dapat diakses. Ketuk untuk memilihnya lagi; sampai saat itu, bundel disimpan di %1$s.</string>
     <string name="settings_about">Tentang</string>
     <string name="settings_report_issue">Laporkan masalah</string>
     <string name="settings_suggest_feature">Sarankan fitur</string>
@@ -436,6 +442,9 @@
     <string name="home_new_project">Proyek baru</string>
     <string name="home_back">Kembali</string>
     <string name="home_tab_tools">Alat</string>
+    <string name="home_tab_community">Komunitas</string>
+    <string name="community_coming">Hadir di 5.2</string>
+    <string name="community_coming_note">Bundel komunitas akan dibagikan di sini agar Anda dapat menemukan karya orang lain yang dibuat dengan AbsentMotion.</string>
     <string name="tools_compress">Kompres</string>
     <string name="tools_compress_about">Mengompres video atau gambar Anda.</string>
     <string name="tools_downloader">Pengunduh Video</string>

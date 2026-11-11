@@ -93,6 +93,9 @@
     <string name="bundle_community">Pacote da comunidade</string>
     <string name="bundle_community_note">Adiciona um título, uma miniatura do projeto, uma descrição, tags e seu nome para compartilhar com a comunidade.</string>
     <string name="community_thumbnail">Miniatura</string>
+    <string name="community_choose_thumbnail">Escolher miniatura</string>
+    <string name="community_confirm_thumbnail">Confirmar miniatura</string>
+    <string name="community_picker_hint">Deslize a linha do tempo até o momento que melhor mostra seu projeto.</string>
     <string name="community_thumbnail_hint">Arraste até o momento que melhor representa seu projeto.</string>
     <string name="community_title">Título</string>
     <string name="community_description">Descrição</string>
@@ -101,7 +104,6 @@
     <string name="community_creator">Criado por</string>
     <string name="community_by">por %1$s</string>
     <string name="transform_3d_rotation">Rotação 3D</string>
-    <string name="caption_engine_download">O mecanismo de legendas (%1$s) é baixado uma vez do AbsentMotion no GitHub.</string>
     <string name="transform_free_rotate">Rotação livre</string>
     <string name="transform_double_tap_pivot">Toque duas vezes para mover o pivô</string>
     <string name="transform_double_tap_layer">Toque duas vezes para mover a camada</string>
@@ -158,6 +160,10 @@
     <string name="settings_keep_media_copies">Manter uma cópia da mídia importada no projeto</string>
     <string name="settings_bundles_folder">Pasta de pacotes</string>
     <string name="settings_bundles_default">Usar a pasta de pacotes padrão</string>
+    <string name="bundle_save_in">Salvar em</string>
+    <string name="bundle_pick_folder">Escolha uma pasta para salvar</string>
+    <string name="bundle_for_now">Por enquanto: %1$s</string>
+    <string name="bundle_folder_lost">Não é possível acessar esta pasta. Toque para escolhê-la novamente; até lá, os pacotes serão salvos em %1$s.</string>
     <string name="settings_about">Sobre</string>
     <string name="settings_report_issue">Relatar problema</string>
     <string name="settings_suggest_feature">Sugerir um recurso</string>
@@ -438,6 +444,9 @@
     <string name="home_new_project">Novo projeto</string>
     <string name="home_back">Voltar</string>
     <string name="home_tab_tools">Ferramentas</string>
+    <string name="home_tab_community">Comunidade</string>
+    <string name="community_coming">Em breve na versão 5.2</string>
+    <string name="community_coming_note">Os pacotes da comunidade serão compartilhados aqui para você descobrir o que outras pessoas criam com o AbsentMotion.</string>
     <string name="tools_compress">Comprimir</string>
     <string name="tools_compress_about">Comprime seus vídeos ou imagens.</string>
     <string name="tools_downloader">Baixar vídeos</string>

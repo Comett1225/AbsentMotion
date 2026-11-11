@@ -166,7 +166,7 @@ compose.desktop {
 val prepareResources = tasks.register<Sync>("prepareResources") {
     dependsOn(nativeBuild)
     into(layout.buildDirectory.dir("app-resources/common"))
-    from("../shared/assets") { into("assets") }
+    from("../shared/assets") { into("assets"); exclude("effects/thumb/*.hero.avif") }
     from("../android/src/foss/assets/absent_bg.abg") { into("assets") }
     from("../shared/res") { into("res"); include("values*/strings.xml") }
     from("build/$nativeDir/$nativeName")

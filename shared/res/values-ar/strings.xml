@@ -93,6 +93,9 @@
     <string name="bundle_community">حزمة المجتمع</string>
     <string name="bundle_community_note">تضيف عنوانًا وصورة مصغرة من مشروعك ووصفًا ووسومًا واسمك، لتكون جاهزة للمشاركة مع المجتمع.</string>
     <string name="community_thumbnail">صورة مصغرة</string>
+    <string name="community_choose_thumbnail">اختيار صورة مصغرة</string>
+    <string name="community_confirm_thumbnail">تأكيد الصورة المصغرة</string>
+    <string name="community_picker_hint">حرّك الخط الزمني إلى اللحظة التي تُظهر مشروعك بأفضل صورة.</string>
     <string name="community_thumbnail_hint">اسحب إلى اللحظة التي تعرض مشروعك بأفضل صورة.</string>
     <string name="community_title">العنوان</string>
     <string name="community_description">الوصف</string>
@@ -101,7 +104,6 @@
     <string name="community_creator">أنشأه</string>
     <string name="community_by">بواسطة %1$s</string>
     <string name="transform_3d_rotation">تدوير 3D</string>
-    <string name="caption_engine_download">يُنَزَّل محرك التسميات التوضيحية (%1$s) مرة واحدة من AbsentMotion على GitHub.</string>
     <string name="transform_free_rotate">تدوير حر</string>
     <string name="transform_double_tap_pivot">انقر مرتين لنقل المحور</string>
     <string name="transform_double_tap_layer">انقر مرتين لنقل الطبقة</string>
@@ -158,6 +160,10 @@
     <string name="settings_keep_media_copies">الاحتفاظ بنسخة من الوسائط المستوردة في المشروع</string>
     <string name="settings_bundles_folder">مجلد الحزم</string>
     <string name="settings_bundles_default">استخدام مجلد الحزم الافتراضي</string>
+    <string name="bundle_save_in">حفظ في</string>
+    <string name="bundle_pick_folder">اختر مجلدًا للحفظ فيه</string>
+    <string name="bundle_for_now">حاليًا: %1$s</string>
+    <string name="bundle_folder_lost">تعذّر الوصول إلى هذا المجلد. اضغط لاختياره مجددًا؛ حتى ذلك الحين تُحفظ الحزم في %1$s.</string>
     <string name="settings_about">حول</string>
     <string name="settings_report_issue">الإبلاغ عن مشكلة</string>
     <string name="settings_suggest_feature">اقترح ميزة</string>
@@ -441,6 +447,9 @@
     <string name="home_new_project">مشروع جديد</string>
     <string name="home_back">رجوع</string>
     <string name="home_tab_tools">الأدوات</string>
+    <string name="home_tab_community">المجتمع</string>
+    <string name="community_coming">قريبًا في 5.2</string>
+    <string name="community_coming_note">ستُشارك حزم المجتمع هنا، لتتمكن من اكتشاف ما ينشئه الآخرون باستخدام AbsentMotion.</string>
     <string name="tools_compress">ضغط</string>
     <string name="tools_compress_about">يضغط الفيديوهات أو الصور.</string>
     <string name="tools_downloader">منزّل الفيديو</string>

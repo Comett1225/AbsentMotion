@@ -93,6 +93,9 @@
     <string name="bundle_community">ชุดชุมชน</string>
     <string name="bundle_community_note">เพิ่มชื่อ ภาพขนาดย่อจากโปรเจกต์ คำอธิบาย แท็ก และชื่อของคุณ พร้อมแชร์กับชุมชน</string>
     <string name="community_thumbnail">ภาพขนาดย่อ</string>
+    <string name="community_choose_thumbnail">เลือกภาพขนาดย่อ</string>
+    <string name="community_confirm_thumbnail">ยืนยันภาพขนาดย่อ</string>
+    <string name="community_picker_hint">เลื่อนไทม์ไลน์ไปยังช่วงเวลาที่แสดงโปรเจกต์ของคุณได้ดีที่สุด</string>
     <string name="community_thumbnail_hint">ลากไปยังช่วงเวลาที่แสดงโปรเจกต์ของคุณได้ดีที่สุด</string>
     <string name="community_title">ชื่อ</string>
     <string name="community_description">คำอธิบาย</string>
@@ -101,7 +104,6 @@
     <string name="community_creator">สร้างโดย</string>
     <string name="community_by">โดย %1$s</string>
     <string name="transform_3d_rotation">การหมุน 3D</string>
-    <string name="caption_engine_download">ดาวน์โหลดเอนจินคำบรรยาย (%1$s) จาก AbsentMotion บน GitHub เพียงครั้งเดียว</string>
     <string name="transform_free_rotate">หมุนอิสระ</string>
     <string name="transform_double_tap_pivot">แตะสองครั้งเพื่อย้ายจุดหมุน</string>
     <string name="transform_double_tap_layer">แตะสองครั้งเพื่อย้ายเลเยอร์</string>
@@ -158,6 +160,10 @@
     <string name="settings_keep_media_copies">เก็บสำเนาสื่อที่นำเข้าไว้ในโปรเจกต์</string>
     <string name="settings_bundles_folder">โฟลเดอร์ชุด</string>
     <string name="settings_bundles_default">ใช้โฟลเดอร์ชุดเริ่มต้น</string>
+    <string name="bundle_save_in">บันทึกใน</string>
+    <string name="bundle_pick_folder">เลือกโฟลเดอร์ที่จะบันทึก</string>
+    <string name="bundle_for_now">ตอนนี้: %1$s</string>
+    <string name="bundle_folder_lost">ไม่สามารถเข้าถึงโฟลเดอร์นี้ได้ แตะเพื่อเลือกอีกครั้ง ระหว่างนี้ชุดจะบันทึกใน %1$s</string>
     <string name="settings_about">เกี่ยวกับ</string>
     <string name="settings_report_issue">รายงานปัญหา</string>
     <string name="settings_suggest_feature">เสนอฟีเจอร์</string>
@@ -436,6 +442,9 @@
     <string name="home_new_project">โปรเจกต์ใหม่</string>
     <string name="home_back">ย้อนกลับ</string>
     <string name="home_tab_tools">เครื่องมือ</string>
+    <string name="home_tab_community">ชุมชน</string>
+    <string name="community_coming">พบกันในเวอร์ชัน 5.2</string>
+    <string name="community_coming_note">ชุดชุมชนจะถูกแชร์ที่นี่ เพื่อให้คุณพบผลงานที่ผู้อื่นสร้างด้วย AbsentMotion</string>
     <string name="tools_compress">บีบอัด</string>
     <string name="tools_compress_about">บีบอัดวิดีโอหรือรูปภาพของคุณ</string>
     <string name="tools_downloader">ดาวน์โหลดวิดีโอ</string>

@@ -178,7 +178,6 @@ val packLanguages = tasks.register<PackLanguages>("packLanguages") {
 androidComponents {
     onVariants { variant ->
         variant.sources.assets?.addGeneratedSourceDirectory(packLanguages, PackLanguages::output)
-        if (variant.flavorName == "foss") variant.packaging.jniLibs.excludes.addAll(listOf("**/libwhisper_jni.so", "**/libwhisper_jni_fast.so"))
     }
 }
 

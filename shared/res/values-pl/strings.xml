@@ -93,6 +93,9 @@
     <string name="bundle_community">Pakiet społeczności</string>
     <string name="bundle_community_note">Dodaje tytuł, miniaturę z projektu, opis, tagi i Twoje imię, aby przygotować plik do udostępnienia społeczności.</string>
     <string name="community_thumbnail">Miniatura</string>
+    <string name="community_choose_thumbnail">Wybierz miniaturę</string>
+    <string name="community_confirm_thumbnail">Potwierdź miniaturę</string>
+    <string name="community_picker_hint">Przesuń oś czasu do momentu, który najlepiej pokazuje projekt.</string>
     <string name="community_thumbnail_hint">Przeciągnij do momentu, który najlepiej przedstawia projekt.</string>
     <string name="community_title">Tytuł</string>
     <string name="community_description">Opis</string>
@@ -101,7 +104,6 @@
     <string name="community_creator">Autor</string>
     <string name="community_by">autor: %1$s</string>
     <string name="transform_3d_rotation">Obrót 3D</string>
-    <string name="caption_engine_download">Silnik napisów (%1$s) jest pobierany jednorazowo z AbsentMotion w serwisie GitHub.</string>
     <string name="transform_free_rotate">Swobodny obrót</string>
     <string name="transform_double_tap_pivot">Dotknij dwukrotnie, aby przesunąć punkt obrotu</string>
     <string name="transform_double_tap_layer">Dotknij dwukrotnie, aby przesunąć warstwę</string>
@@ -158,6 +160,10 @@
     <string name="settings_keep_media_copies">Zachowaj kopię importowanych multimediów w projekcie</string>
     <string name="settings_bundles_folder">Folder pakietów</string>
     <string name="settings_bundles_default">Użyj domyślnego folderu pakietów</string>
+    <string name="bundle_save_in">Zapisz w</string>
+    <string name="bundle_pick_folder">Wybierz folder zapisu</string>
+    <string name="bundle_for_now">Na razie: %1$s</string>
+    <string name="bundle_folder_lost">Nie można uzyskać dostępu do tego folderu. Dotknij, aby wybrać go ponownie; do tego czasu pakiety będą zapisywane w %1$s.</string>
     <string name="settings_about">Informacje</string>
     <string name="settings_report_issue">Zgłoś problem</string>
     <string name="settings_suggest_feature">Zaproponuj funkcję</string>
@@ -439,6 +445,9 @@
     <string name="home_new_project">Nowy projekt</string>
     <string name="home_back">Wstecz</string>
     <string name="home_tab_tools">Narzędzia</string>
+    <string name="home_tab_community">Społeczność</string>
+    <string name="community_coming">Wkrótce w wersji 5.2</string>
+    <string name="community_coming_note">Tutaj będą udostępniane pakiety społeczności, aby można było odkrywać prace innych osób utworzone w AbsentMotion.</string>
     <string name="tools_compress">Kompresuj</string>
     <string name="tools_compress_about">Kompresuje filmy i obrazy.</string>
     <string name="tools_downloader">Pobieranie wideo</string>

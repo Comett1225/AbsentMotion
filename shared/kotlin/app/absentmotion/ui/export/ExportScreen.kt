@@ -58,6 +58,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -249,11 +250,11 @@ private sealed interface Phase {
 private class Failure(@StringRes val title: Int, val text: UiText, val action: UiText? = null, val proceed: (() -> Unit)? = null, val hint: Boolean = false)
 
 @Composable
-internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromProjectList: Boolean, outdated: Outdated? = null, onClose: () -> Unit) {
+internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSettings: app.absentmotion.library.AppSettings, fromProjectList: Boolean, outdated: Outdated? = null, onClose: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val bundles = remember { app.absentmotion.platform.bundleStore(context, app.absentmotion.library.AppSettings(context).bundlesFolder) }
-    val exporter = remember { Exporter(context, engine, MediaStoreExport(context), bundles = bundles) }
+    val bundles = remember(appSettings.bundlesFolder) { app.absentmotion.platform.bundleStore(context, appSettings.bundlesFolder) }
+    val exporter = remember(bundles) { Exporter(context, engine, MediaStoreExport(context), bundles = bundles) }
     val kinds = remember { listOf(ExportKind.Video, ExportKind.Audio, ExportKind.Package, ExportKind.Frame, ExportKind.FrameAs, ExportKind.Sequence, ExportKind.Gif) + if (fromProjectList) listOf(ExportKind.Xml) else emptyList() }
     var kind by remember { mutableStateOf(ExportKind.Video) }
     val exportName = remember(scene.title) { ExportName(scene.title) }
@@ -546,7 +547,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
     if (DESK) DeskExport(
         scene, frame, fromProjectList, engine, kinds, kind, { kind = it }, hasAudio, settings, check, hasEncoder, bitrateFits, explain, { help = true }, exportName,
         warning, support is Support.SlowSoftwareOnly, better?.let { suggestionLabel(video, it) }, ::useBetter, { acknowledged = warning },
-        free, estimate, timeMs, storage, blocked, asTemplate, { asTemplate = it }, { templateInfo = true }, { packageInfo = true }, { BundleFields(scene, engine, community) { community = it } },
+        free, estimate, timeMs, storage, blocked, asTemplate, { asTemplate = it }, { templateInfo = true }, { packageInfo = true }, { BundleFields(scene, engine, appSettings, community) { community = it } },
         phase, progress, heat.level, note, { (phase as? Phase.Running)?.job?.cancel() }, { phase = Phase.Idle }, { (phase as? Phase.Done)?.let { share(context, it) } }, ::start, onClose,
     ) else Box(Modifier.fillMaxSize().background(Am.SheetBg).pointerInput(Unit) {}.enterFade(12.dp)) {
         Column(Modifier.align(Alignment.TopCenter).widthIn(max = SheetMaxWidth).fillMaxSize()) {
@@ -585,7 +586,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, fromPr
             AudioSettingsPage(video, hasAudio, hasEncoder, { bitrateFits(it, false) }, { settings[ExportKind.Video] = it }, explain) { audioPage = false }
         }
         Presence(page == ExportKind.Package) {
-            BundlePage(scene, engine, community, { community = it }, info, bar) { page = null }
+            BundlePage(scene, engine, appSettings, community, { community = it }, info, bar) { page = null }
         }
         Presence(page == ExportKind.Audio) {
             AudioOnlyPage(settings.getValue(ExportKind.Audio), hasEncoder, { bitrateFits(it, true) }, info, bar, { settings[ExportKind.Audio] = it }, explain) { page = null }
@@ -1502,40 +1503,75 @@ private val SuggestedTags = listOf("Edit", "Text", "Transition", "Intro", "Effec
 
 @Composable
 private fun BundlePage(
-    scene: Scene, engine: EngineThread, community: app.absentmotion.export.CommunityDetails?, onChange: (app.absentmotion.export.CommunityDetails?) -> Unit,
+    scene: Scene, engine: EngineThread, settings: app.absentmotion.library.AppSettings, community: app.absentmotion.export.CommunityDetails?, onChange: (app.absentmotion.export.CommunityDetails?) -> Unit,
     info: @Composable () -> Unit, bar: @Composable () -> Unit, onBack: () -> Unit,
 ) {
     PageFrame(stringResource(R.string.project_bundle), onBack) {
         info()
         ScrollArea(Modifier.weight(1f).fillMaxWidth(), Am.SheetBg, PaddingValues(start = 15.dp, end = 15.dp, top = 16.dp, bottom = 20.dp), GroupGap) {
-            BundleFields(scene, engine, community, onChange)
+            BundleFields(scene, engine, settings, community, onChange)
         }
         bar()
     }
 }
 
 @Composable
-private fun BundleFields(scene: Scene, engine: EngineThread, community: app.absentmotion.export.CommunityDetails?, onChange: (app.absentmotion.export.CommunityDetails?) -> Unit) {
-    val context = LocalContext.current
-    val settings = remember { app.absentmotion.library.AppSettings(context) }
-    Chips(stringResource(R.string.project_bundle)) {
-        Chip(stringResource(R.string.project_bundle), community == null) { onChange(null) }
-        Chip(stringResource(R.string.bundle_community), community != null) {
-            if (community == null) onChange(app.absentmotion.export.CommunityDetails(scene.title, creator = settings.communityCreator, thumbMs = scene.totalTime / 2))
+private fun BundleFields(scene: Scene, engine: EngineThread, settings: app.absentmotion.library.AppSettings, community: app.absentmotion.export.CommunityDetails?, onChange: (app.absentmotion.export.CommunityDetails?) -> Unit) {
+    Field(stringResource(R.string.project_bundle)) {
+        Segments(listOf(Choice(false), Choice(true)), community != null, { stringResource(if (it) R.string.bundle_community else R.string.project_bundle) }, {}) { wanted ->
+            if (!wanted) onChange(null)
+            else if (community == null) onChange(app.absentmotion.export.CommunityDetails(scene.title, creator = settings.communityCreator, thumbMs = scene.totalTime / 2))
         }
+        Hint(stringResource(if (community == null) R.string.one_absproj_package_with_the_project else R.string.bundle_community_note))
     }
-    Hint(stringResource(if (community == null) R.string.one_absproj_package_with_the_project else R.string.bundle_community_note))
-    if (community == null) return
+    if (community != null) CommunityFields(scene, engine, settings, community, onChange)
+    SaveInField(settings)
+}
+
+@Composable
+private fun SaveInField(settings: app.absentmotion.library.AppSettings) {
+    val folder = settings.bundlesFolder
+    val view = app.absentmotion.ui.home.folderView(folder)
+    val pick = app.absentmotion.ui.home.rememberBundleFolderPicker(settings)
+    val fallback = app.absentmotion.ui.home.defaultBundles()
+    Field(stringResource(R.string.bundle_save_in)) {
+        Row(
+            Modifier.fillMaxWidth().heightIn(min = if (DESK) 38.dp else 46.dp).clip(RoundedCornerShape(4.dp)).background(Am.Card).deskPress(4.dp).clickable { pick() }.padding(horizontal = 12.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(app.absentmotion.ui.home.HomeIcons.Folder, null, Modifier.size(20.dp), tint = Navy)
+            Spacer(Modifier.width(10.dp))
+            Text(
+                if (folder == null) stringResource(R.string.bundle_pick_folder) else view?.label.orEmpty(), Modifier.weight(1f),
+                color = Navy, fontSize = if (DESK) 13.sp else 15.sp, maxLines = 2, overflow = TextOverflow.Ellipsis, style = Mixed,
+            )
+            Icon(ExportIcons.ChevronRight, null, Modifier.size(20.dp), tint = ValueGrey)
+        }
+        if (folder == null) Hint(stringResource(R.string.bundle_for_now, fallback))
+        else if (view?.reachable == false) Text(stringResource(R.string.bundle_folder_lost, fallback), color = Am.HomeAccent, fontSize = 13.sp, lineHeight = 18.sp)
+    }
+}
+
+@Composable
+private fun CommunityFields(scene: Scene, engine: EngineThread, settings: app.absentmotion.library.AppSettings, community: app.absentmotion.export.CommunityDetails, onChange: (app.absentmotion.export.CommunityDetails?) -> Unit) {
     Field(stringResource(R.string.community_thumbnail)) {
-        var at by remember { mutableFloatStateOf(community.thumbMs.toFloat()) }
         val ratio = scene.width.coerceAtLeast(1).toFloat() / scene.height.coerceAtLeast(1)
         DeskStill(scene, community.thumbMs, engine, Modifier.fillMaxWidth().aspectRatio(ratio.coerceIn(0.5f, 2f)).clip(RoundedCornerShape(8.dp)).background(Am.Card))
-        androidx.compose.material3.Slider(
-            at, { at = it }, valueRange = 0f..(scene.totalTime - 1).coerceAtLeast(1).toFloat(),
-            onValueChangeFinished = { onChange(community.copy(thumbMs = at.toInt())) },
-            colors = androidx.compose.material3.SliderDefaults.colors(thumbColor = Navy, activeTrackColor = Navy),
-        )
-        Hint(stringResource(R.string.community_thumbnail_hint))
+        if (DESK) {
+            var at by remember { mutableFloatStateOf(community.thumbMs.toFloat()) }
+            androidx.compose.material3.Slider(
+                at, { at = it }, valueRange = 0f..(scene.totalTime - 1).coerceAtLeast(1).toFloat(),
+                onValueChangeFinished = { onChange(community.copy(thumbMs = at.toInt())) },
+                colors = androidx.compose.material3.SliderDefaults.colors(thumbColor = Navy, activeTrackColor = Navy),
+            )
+            Hint(stringResource(R.string.community_thumbnail_hint))
+        } else {
+            var picking by remember { mutableStateOf(false) }
+            Box(Modifier.fillMaxWidth().height(42.dp).clip(RoundedCornerShape(4.dp)).background(Navy).clickable { picking = true }, contentAlignment = Alignment.Center) {
+                Text(stringResource(R.string.community_choose_thumbnail), color = Am.OnNavy, fontSize = 15.sp, fontWeight = FontWeight.Medium, maxLines = 1, style = Mixed)
+            }
+            if (picking) ThumbnailPicker(scene, engine, community.thumbMs, { onChange(community.copy(thumbMs = it)); picking = false }) { picking = false }
+        }
     }
     TextBox(R.string.community_title, community.title, 80) { onChange(community.copy(title = it)) }
     TextBox(R.string.community_description, community.description, 500, lines = 3) { onChange(community.copy(description = it)) }
@@ -1580,5 +1616,64 @@ private fun TextBox(@StringRes label: Int, value: String, limit: Int, lines: Int
             modifier = Modifier.fillMaxWidth().semantics { contentDescription = title }
                 .clip(RoundedCornerShape(4.dp)).background(Am.Card).padding(horizontal = 12.dp, vertical = 13.dp),
         )
+    }
+}
+
+@Composable
+private fun ThumbnailPicker(scene: Scene, engine: EngineThread, startMs: Int, onConfirm: (Int) -> Unit, onCancel: () -> Unit) {
+    val context = LocalContext.current
+    val state = remember {
+        val root = java.io.File(context.cacheDir, "thumbnail-picker").apply { deleteRecursively(); mkdirs() }
+        val store = app.absentmotion.library.ProjectStore(java.io.File(root, "projects"))
+        val saver = app.absentmotion.library.ProjectSaver("look", store, app.absentmotion.library.Recovery(java.io.File(root, "recovery")), failed = {})
+        app.absentmotion.editor.EditorState("look", scene, store, engine, app.absentmotion.library.AppSettings(context), saver, lookOnly = true)
+            .apply { frame = scene.frameAt(startMs).coerceIn(0, scene.lastFrame) }
+    }
+    var shownMs by remember { androidx.compose.runtime.mutableIntStateOf(-1) }
+    val ready = shownMs == state.timeMs
+    androidx.compose.ui.window.Dialog(onCancel, androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
+        androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxSize().background(Am.TopBar).systemBarsPadding()) {
+            val lower = app.absentmotion.ui.editor.lowerPanelHeight(maxHeight, 280.dp)
+            Column(Modifier.fillMaxSize()) {
+                Row(Modifier.fillMaxWidth().height(48.dp).padding(end = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Box(Modifier.size(48.dp).clickable(onClick = onCancel), contentAlignment = Alignment.Center) {
+                        Icon(app.absentmotion.ui.editor.ChromeIcons.Back, stringResource(R.string.export_back), Modifier.size(22.dp), tint = Am.OnDark)
+                    }
+                    Text(stringResource(R.string.community_thumbnail), Modifier.weight(1f), color = Am.OnDark, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Box(Modifier.height(34.dp).alpha(if (ready) 1f else Dimmed).clip(RoundedCornerShape(4.dp)).background(Am.Accent).clickable(enabled = ready) { onConfirm(state.timeMs) }.padding(horizontal = 14.dp), contentAlignment = Alignment.Center) {
+                        Text(stringResource(R.string.community_confirm_thumbnail), color = Am.OnAccent, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1, style = Mixed)
+                    }
+                }
+                PickerStill(scene, state.timeMs, engine, Modifier.fillMaxWidth().weight(1f).background(Am.PreviewBg)) { shownMs = it }
+                Row(Modifier.fillMaxWidth().height(46.dp).padding(horizontal = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(app.absentmotion.ui.editor.TimelineMath.timecode(state.frame, scene.fps), color = Am.OnDark, fontSize = 14.sp, maxLines = 1, style = Mixed)
+                    Spacer(Modifier.width(14.dp))
+                    Text(stringResource(R.string.community_picker_hint), Modifier.weight(1f), color = Am.OnDark.copy(alpha = 0.7f), fontSize = 12.sp, lineHeight = 15.sp, maxLines = 2)
+                }
+                Box(Modifier.fillMaxWidth().height(lower).background(Am.TimelineBg)) { app.absentmotion.ui.editor.Timeline(state, Modifier.fillMaxSize()) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PickerStill(scene: Scene, timeMs: Int, engine: EngineThread, modifier: Modifier, onShown: (Int) -> Unit) {
+    val context = LocalContext.current
+    var picture by remember { mutableStateOf<ImageBitmap?>(null) }
+    val xml by produceState<String?>(null, scene) { value = withContext(Dispatchers.IO) { scene.toXml() } }
+    LaunchedEffect(timeMs, xml) {
+        val source = xml ?: return@LaunchedEffect
+        delay(40)
+        val long = maxOf(scene.width, scene.height, 1)
+        val file = java.io.File(context.cacheDir, "thumbnail-picker-${System.nanoTime()}.png")
+        try {
+            val made = try {
+                engine.stillPng(source, timeMs, (900 * scene.width / long).coerceAtLeast(1), (900 * scene.height / long).coerceAtLeast(1), file)
+            } catch (e: CancellationException) { throw e } catch (e: Exception) { false }
+            if (made) withContext(Dispatchers.IO) { BitmapFactory.decodeFile(file.path)?.asImageBitmap() }?.let { picture = it; onShown(timeMs) }
+        } finally { file.delete() }
+    }
+    Box(modifier, Alignment.Center) {
+        picture?.let { Image(it, null, Modifier.fillMaxSize().padding(10.dp), contentScale = ContentScale.Fit) }
     }
 }

@@ -92,6 +92,7 @@ data class EffectDefinition(
 ) {
     val available: Boolean get() = status == "ok"
     val thumbnail: String get() = "thumb/$key.webp"
+    val hero: String get() = "thumb/$key.hero.avif"
 
     fun thumbnail(preset: EffectPreset): String = "thumb/$key.${preset.slug}.webp"
 

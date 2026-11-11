@@ -93,6 +93,9 @@
     <string name="bundle_community">コミュニティバンドル</string>
     <string name="bundle_community_note">タイトル、プロジェクトのサムネイル、説明、タグ、名前を追加して、コミュニティに共有できるようにします。</string>
     <string name="community_thumbnail">サムネイル</string>
+    <string name="community_choose_thumbnail">サムネイルを選択</string>
+    <string name="community_confirm_thumbnail">サムネイルを確定</string>
+    <string name="community_picker_hint">タイムラインをスライドして、プロジェクトを最もよく表す場面に合わせてください。</string>
     <string name="community_thumbnail_hint">プロジェクトを最もよく表す場面までドラッグします。</string>
     <string name="community_title">タイトル</string>
     <string name="community_description">説明</string>
@@ -101,7 +104,6 @@
     <string name="community_creator">作成者</string>
     <string name="community_by">%1$s作</string>
     <string name="transform_3d_rotation">3D回転</string>
-    <string name="caption_engine_download">キャプションエンジン（%1$s）はGitHubのAbsentMotionから一度だけダウンロードされます。</string>
     <string name="transform_free_rotate">自由回転</string>
     <string name="transform_double_tap_pivot">ダブルタップしてピボットを移動</string>
     <string name="transform_double_tap_layer">ダブルタップしてレイヤーを移動</string>
@@ -158,6 +160,10 @@
     <string name="settings_keep_media_copies">読み込んだメディアのコピーをプロジェクトに保持</string>
     <string name="settings_bundles_folder">バンドルフォルダ</string>
     <string name="settings_bundles_default">デフォルトのバンドルフォルダを使用</string>
+    <string name="bundle_save_in">保存先</string>
+    <string name="bundle_pick_folder">保存先のフォルダを選択</string>
+    <string name="bundle_for_now">現在の保存先：%1$s</string>
+    <string name="bundle_folder_lost">このフォルダにアクセスできません。タップしてもう一度選択してください。それまではバンドルが%1$sに保存されます。</string>
     <string name="settings_about">アプリについて</string>
     <string name="settings_report_issue">問題を報告</string>
     <string name="settings_suggest_feature">機能をリクエスト</string>
@@ -436,6 +442,9 @@
     <string name="home_new_project">新規プロジェクト</string>
     <string name="home_back">戻る</string>
     <string name="home_tab_tools">ツール</string>
+    <string name="home_tab_community">コミュニティ</string>
+    <string name="community_coming">5.2で登場</string>
+    <string name="community_coming_note">コミュニティのバンドルがここで共有され、AbsentMotionで他の人が作った作品を見つけられます。</string>
     <string name="tools_compress">圧縮</string>
     <string name="tools_compress_about">動画や画像を圧縮します。</string>
     <string name="tools_downloader">動画ダウンローダー</string>

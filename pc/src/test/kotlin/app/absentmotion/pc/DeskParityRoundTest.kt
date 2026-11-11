@@ -358,6 +358,27 @@ class DeskParityRoundTest {
         }
     }
 
+    @Test fun aBundleWhoseFolderIsGoneSavesToDocumentsAndSaysSo() {
+        prepare("bundle-folder-gone")
+        val blocked = File("build/bundle-folder-gone-home/not-a-folder").also { it.writeText("x") }
+        session(1280, 800) { app ->
+            app.settings.bundlesFolder = blocked.absolutePath
+            val editor = openEditor(app, "styles.xml")
+            runOnIdle { editor.exportOpen = true }
+            settle(900)
+            onAllNodesWithText(text(R.string.project_bundle)).onFirst().performClick()
+            settle(1500)
+            onAllNodesWithText(text(R.string.bundle_folder_lost).substringBefore("%1"), substring = true).onFirst().performScrollTo().assertExists()
+            shot("bundle-folder-gone")
+            onAllNodesWithText(text(R.string.export)).filter(hasClickAction()).onLast().performClick()
+            waitUntil(timeoutMillis = 60_000) { DeskExports.finish != null }
+            assertEquals(true, DeskExports.finish!!.ok)
+            val saved = DeskExports.finish!!.files.single().toFile()!!
+            assertTrue(saved.path, saved.isFile && saved.path.contains("Documents"))
+            assertTrue(blocked.isFile)
+        }
+    }
+
     @Test fun quittingDuringAnExportAsksFirst() {
         prepare("quit-ask")
         session(1280, 800) { app ->

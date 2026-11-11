@@ -85,6 +85,7 @@ class EditorState(
     val engine: EngineThread,
     val settings: AppSettings,
     val saver: ProjectSaver,
+    val lookOnly: Boolean = false,
 ) {
     private var root by mutableStateOf(initial.withMattesFollowing())
 
@@ -187,6 +188,8 @@ class EditorState(
     var panel by mutableStateOf(EditorPanel.Tools)
 
     var exportOpen by mutableStateOf(false)
+
+    var toolPage: Pair<Long?, Int> = null to 0
 
     var historyOpen by mutableStateOf(false)
 
@@ -322,7 +325,7 @@ class EditorState(
     var overshoot by mutableStateOf(false)
 
     init {
-        engine.setScene(scene)
+        if (!lookOnly) engine.setScene(scene)
     }
 
     fun edit(key: Any? = null, change: (Scene) -> Scene) {

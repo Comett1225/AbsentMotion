@@ -277,9 +277,6 @@ fun revealFolderLabel(): String = app.absentmotion.desk.DeskOs.revealLabel
 internal const val CAPTION_MODEL_NAME = "ggml-base-q5_1.bin"
 internal const val CAPTION_MODEL_BYTES = 59_707_625L
 internal fun loadCaptionLibrary() { app.absentmotion.pc.engine.DesktopNative.hashCode() }
-internal fun captionEngineMissingBytes(context: Context): Long = 0L
-internal suspend fun downloadCaptionEngine(context: Context, progress: (Float) -> Unit) = Unit
-internal fun prepareCaptionEngine(context: Context) = Unit
 internal fun fastCaptionCpu(cpuinfo: String): Boolean = false
 
 internal fun captionTextHeight(fonts: app.absentmotion.fonts.FontLibrary, text: String, font: String, size: Float, wrap: Int): Float {
@@ -395,15 +392,25 @@ fun releaseFrameImage(image: ImageBitmap) {
 fun videoDownloader(): app.absentmotion.tools.VideoFetcher = app.absentmotion.tools.DeskVideoDownloader
 
 fun bundleStore(context: android.content.Context, folder: String?): app.absentmotion.export.ExportStore? =
-    folder?.let { java.io.File(it) }?.takeIf { it.isDirectory || it.mkdirs() }?.let { app.absentmotion.export.BundleFolder(it) }
+    folder?.let { app.absentmotion.export.BundleFolder(java.io.File(it)) }
 
-fun folderLabel(folder: String): String {
-    val home = System.getProperty("user.home").orEmpty()
-    return if (home.isNotEmpty() && folder.startsWith(home)) "~" + folder.removePrefix(home) else folder
+fun folderLabel(context: android.content.Context, folder: String): String = homeShort(folder)
+
+internal fun homeShort(folder: String): String {
+    val home = System.getProperty("user.home").orEmpty().ifEmpty { return folder }
+    val path = runCatching { java.nio.file.Path.of(folder).normalize() }.getOrNull() ?: return folder
+    val base = java.nio.file.Path.of(home).normalize()
+    if (app.absentmotion.desk.DeskOs.windows || !path.startsWith(base)) return folder
+    return if (path == base) "~" else "~/" + base.relativize(path).toString()
 }
 
+fun folderReachable(context: android.content.Context, folder: String): Boolean =
+    java.io.File(folder).let { it.isDirectory && java.nio.file.Files.isWritable(it.toPath()) }
+
+fun forgetFolder(context: android.content.Context, folder: String) = Unit
+
 @androidx.compose.runtime.Composable
-fun rememberFolderPicker(onPicked: (String) -> Unit): () -> Unit {
+fun rememberFolderPicker(start: String?, onPicked: (String) -> Unit): () -> Unit {
     val title = app.absentmotion.i18n.AppText.get(app.absentmotion.R.string.settings_bundles_folder)
     return { app.absentmotion.desk.DeskPicker.openFolder(title)?.let { onPicked(it.absolutePath) } }
 }

@@ -23,6 +23,7 @@ APP_DIR = "files/effect-thumbs"
 APP_PATH = f"/data/user/0/{PKG}/{APP_DIR}"
 OUT_DIR = f"/sdcard/Android/data/{PKG}/files"
 RENDER, THUMB, SAME = 384, 192, 2.0
+HERO, HERO_QUALITY = 720, 55
 OPTION = 128
 ANIM_FPS, ANIM_BYTES, PRESET_FRAMES = 12, 150_000, 30
 FREE = {"cc0", "pd"}
@@ -218,17 +219,18 @@ class Batch:
     def __init__(self, work):
         self.work, self.jobs, self.images, self.raw = work, [], {}, {}
 
-    def add(self, name, xml, frames):
+    def add(self, name, xml, frames, size=None):
         (self.work / f"{name}.xml").write_text(xml)
         push(self.work / f"{name}.xml", f"{name}.xml")
         names = [f"thumbs-{name}-{f}" for f in frames]
-        self.jobs += [f"{APP_PATH}/{name}.xml {f} {out}" for f, out in zip(frames, names)]
+        self.jobs += [f"{APP_PATH}/{name}.xml {f} {out}" + (f" {size}" if size else "") for f, out in zip(frames, names)]
         return names
 
     def run(self):
         (self.work / "list.txt").write_text("\n".join(self.jobs) + "\n")
         push(self.work / "list.txt", "list.txt")
         adb("logcat", "-c")
+        adb("shell", "am", "force-stop", PKG)
         adb("shell", "am", "start", "-n", f"{PKG}/app.absentmotion.MainActivity", "--es", "batch", f"{APP_PATH}/list.txt")
         deadline = time.time() + 60 + 10 * len(self.jobs)
         while "batch done" not in (log := adb("logcat", "-d", "-s", "AMTest")):
@@ -259,15 +261,19 @@ def save_animated(frames, path):
     sys.exit(f"{path.name} stays above {ANIM_BYTES} bytes")
 
 
-def grid(images):
+def grid(images, size=THUMB):
     if len(images) == 1:
         return images[0]
-    side = THUMB // 2
-    out = Image.new("RGBA", (THUMB, THUMB))
+    side = size // 2
+    out = Image.new("RGBA", (size, size))
     for i, image in enumerate(images):
         cell = Image.alpha_composite(Image.new("RGBA", image.size, (0, 0, 0, 255)), image).resize((side - 4, side - 4), Image.LANCZOS)
         out.paste(cell, (i % 2 * side + 2, i // 2 * side + 2))
     return out
+
+
+def detail(image):
+    return ImageStat.Stat(Image.alpha_composite(Image.new("RGBA", image.size, (128, 128, 128, 255)), image).convert("L")).stddev[0]
 
 
 def change(a, b):
@@ -288,11 +294,40 @@ def sheet(path, thumbs):
     out.save(path)
 
 
+def heroes(work, batch, planned, plain):
+    big, jobs = Batch(work), []
+    for key, show, base, rendered, target in planned:
+        frames = list(range(show["animate"])) if show.get("animate") else show.get("frames", [show.get("frame", 0)])
+        if show.get("animate"):
+            small, reference = batch[rendered], batch[plain[base]]
+            changes = [change(f, r) for f, r in zip(small, reference)]
+            floor = 0.75 * max(detail(f) for f in small + reference)
+            keep = [i for i, f in enumerate(small) if detail(f) >= floor] or list(range(len(small)))
+            frames = [frames[max(keep, key=lambda i: changes[i])]]
+        if len(frames) == 1:
+            effect = json.loads((PACK / f"{key}.json").read_text())
+            jobs.append((key, big.add(f"{key}.hero", scene(show, effect), frames, HERO)))
+        else:
+            jobs.append((key, rendered))
+    big.run()
+    total = 0
+    for key, names in jobs:
+        images = [big.raw.get(n) or batch.raw[n] for n in names]
+        image = grid(images, HERO) if len(images) > 1 else images[0].resize((HERO, HERO), Image.LANCZOS)
+        out = image if image.getextrema()[3][0] < 255 else image.convert("RGB")
+        target = PACK / "thumb" / f"{key}.hero.avif"
+        out.save(target, quality=HERO_QUALITY)
+        total += target.stat().st_size
+        print(f"{target.name:40} {target.stat().st_size // 1024} KB", flush=True)
+    print(f"{len(jobs)} large pictures, {total // 1024} KB in all", flush=True)
+
+
 def main():
     args = argparse.ArgumentParser(description="Renders the effect thumbnails on the emulator from tools/effect_showcase.json.")
     args.add_argument("--work", type=Path, required=True, help="folder for the downloaded photos and renders, outside the repository")
     args.add_argument("--sheet", type=Path, help="also write a contact sheet of the thumbnails here")
     args.add_argument("--only-options", action="store_true", help="render only the per-option pictures of choice settings listed under \"options\"")
+    args.add_argument("--heroes", action="store_true", help="write only the large effect-page pictures (thumb/<key>.hero.avif)")
     args.add_argument("keys", nargs="*", help="only these effects (default: every effect in index.json)")
     opts = args.parse_args()
     index = json.loads((PACK / "index.json").read_text())
@@ -328,7 +363,7 @@ def main():
         if base not in plain:
             plain[base] = batch.add(f"plain{len(plain)}", scene(show, None), frames)
         effect = json.loads((PACK / f"{key}.json").read_text())
-        for pid in show.get("options", []):
+        for pid in [] if opts.heroes else show.get("options", []):
             param = next(p for p in effect["params"] if p["id"] == pid and p["type"] == "choice")
             for i in range(len(param["options"])):
                 name = f"{key}.{pid}.{i}"
@@ -337,7 +372,7 @@ def main():
         if opts.only_options:
             continue
         planned.append((key, show, base, batch.add(key, scene(show, effect), frames), PACK / "thumb" / f"{key}.webp"))
-        for preset in effect.get("presets", []):
+        for preset in [] if opts.heroes else effect.get("presets", []):
             name = f'{key}.{slug(preset["name"])}'
             custom = show.get("presets", {}).get(slug(preset["name"]), preset["name"])
             sample = {k: show[k] for k in ("layout", "photo", "half", "shape", "under") if k in show}
@@ -350,6 +385,10 @@ def main():
                 plain[base] = batch.add(f"plain{len(plain)}", scene(sample, None), frames)
             planned.append((name, sample, base, batch.add(name, scene(sample, effect, preset), frames), PACK / "thumb" / f"{name}.webp"))
     batch.run()
+    if opts.heroes:
+        heroes(opts.work, batch, planned, plain)
+        adb("shell", "run-as", PKG, "rm", "-r", APP_DIR)
+        return
     for out, target in options:
         image = batch.raw[out]
         left = (image.width - OPTION) // 2
@@ -378,7 +417,7 @@ def main():
     adb("shell", "run-as", PKG, "rm", "-r", APP_DIR)
     if not opts.keys and not opts.only_options:
         for stale in (PACK / "thumb").iterdir():
-            if stale.name not in {entry[4].name for entry in planned} | {target.name for _, target in options}:
+            if not stale.name.endswith(".hero.avif") and stale.name not in {entry[4].name for entry in planned} | {target.name for _, target in options}:
                 stale.unlink()
     if opts.sheet:
         sheet(opts.sheet, thumbs)

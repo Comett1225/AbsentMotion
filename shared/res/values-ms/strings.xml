@@ -93,6 +93,9 @@
     <string name="bundle_community">Bundel komuniti</string>
     <string name="bundle_community_note">Menambah tajuk, lakaran kecil daripada projek, perihalan, tag dan nama anda untuk dikongsi dengan komuniti.</string>
     <string name="community_thumbnail">Lakaran kecil</string>
+    <string name="community_choose_thumbnail">Pilih lakaran kecil</string>
+    <string name="community_confirm_thumbnail">Sahkan lakaran kecil</string>
+    <string name="community_picker_hint">Leret garis masa ke saat yang paling menyerlahkan projek anda.</string>
     <string name="community_thumbnail_hint">Seret ke saat yang paling sesuai menggambarkan projek anda.</string>
     <string name="community_title">Tajuk</string>
     <string name="community_description">Perihalan</string>
@@ -101,7 +104,6 @@
     <string name="community_creator">Dicipta oleh</string>
     <string name="community_by">oleh %1$s</string>
     <string name="transform_3d_rotation">Putaran 3D</string>
-    <string name="caption_engine_download">Enjin kapsyen (%1$s) dimuat turun sekali daripada AbsentMotion di GitHub.</string>
     <string name="transform_free_rotate">Putaran bebas</string>
     <string name="transform_double_tap_pivot">Ketik dua kali untuk mengalih pangsi</string>
     <string name="transform_double_tap_layer">Ketik dua kali untuk mengalih lapisan</string>
@@ -158,6 +160,10 @@
     <string name="settings_keep_media_copies">Simpan salinan media yang diimport dalam projek</string>
     <string name="settings_bundles_folder">Folder bundel</string>
     <string name="settings_bundles_default">Gunakan folder bundel lalai</string>
+    <string name="bundle_save_in">Simpan dalam</string>
+    <string name="bundle_pick_folder">Pilih folder untuk menyimpan</string>
+    <string name="bundle_for_now">Buat masa ini: %1$s</string>
+    <string name="bundle_folder_lost">Folder ini tidak dapat diakses. Ketik untuk memilihnya semula; sementara itu bundel disimpan dalam %1$s.</string>
     <string name="settings_about">Perihal</string>
     <string name="settings_report_issue">Laporkan masalah</string>
     <string name="settings_suggest_feature">Cadangkan ciri</string>
@@ -436,6 +442,9 @@
     <string name="home_new_project">Projek baharu</string>
     <string name="home_back">Kembali</string>
     <string name="home_tab_tools">Alat</string>
+    <string name="home_tab_community">Komuniti</string>
+    <string name="community_coming">Hadir dalam 5.2</string>
+    <string name="community_coming_note">Bundel komuniti akan dikongsi di sini supaya anda dapat melihat hasil ciptaan orang lain dengan AbsentMotion.</string>
     <string name="tools_compress">Mampatkan</string>
     <string name="tools_compress_about">Mampatkan video atau imej anda.</string>
     <string name="tools_downloader">Pemuat turun video</string>
