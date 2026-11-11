@@ -33,7 +33,7 @@ Auto captions turns speech into text layers that appear in time with the voice.
 
 The sample caption in the middle of the sheet shows the look you choose, including its position.
 
-The first time, the app asks before downloading a speech model. **Standard** is about 60 MB. The optional **Higher precision** model is about 82 MB. Both support multiple languages and stay below 100 MB. Downloads come from the Whisper model repository on Hugging Face and are checked before use. Recognition then runs offline on your device. **Settings > Remove caption model** removes downloaded caption models.
+The first time, the app asks before downloading a speech model. **Standard** is about 60 MB. The optional **Higher precision** model is about 82 MB. Both support multiple languages and stay below 100 MB. Downloads come from the Whisper model repository on Hugging Face and are checked before use; the caption engine (about 3 MB) comes with them from this project's GitHub releases. Recognition then runs offline on your device. **Settings > Remove caption model** removes downloaded caption models.
 
 While captions are generated, the setup controls disappear. The centre shows the current stage, progress and estimated time remaining; **Cancel** is the only action. The estimate appears after enough work has completed and may change. Long recordings are processed in ten-minute parts.
 
@@ -53,7 +53,7 @@ Before it starts, a dialog shows the photo. **Keep everything** (the default) ke
 
 The first time you remove a background from a photo, the app asks which cut-out you want. The answer is kept, and you can change it any time in **Settings**, **Projects and media**, **Cut-out quality**.
 
-- **Standard** is built into the app. It is fast and works offline.
+- **Standard** is downloaded once (about 3 MB) the first time you remove a background. Then it is fast and works offline.
 - **AI background removal 2.0** gives cleaner edges around hair and fine detail. It is an AI background removal model that is downloaded once (about 62 MB) and then works offline, on single photos only; videos always use Standard. It needs the Latest version of the app.
 
 If AI background removal 2.0 cannot be downloaded or cannot finish a photo, the app uses Standard for that photo and tells you. To free the space again, tap **Delete AI background removal 2.0** under **Cut-out quality**; the app then goes back to Standard.
@@ -119,7 +119,8 @@ Each level has its own model, downloaded once (about 11 MB) after the app has sh
 | Item | When | Size | From |
 |---|---|---|---|
 | Speech model for captions | After you confirm the download | about 60 MB Standard, or 82 MB Higher precision | Hugging Face |
-| Background removal model | Never: it is inside the app | about 3 MB | |
+| Caption engine | With the speech model, after you confirm the download | about 3 MB | this project's GitHub releases |
+| Background removal model | The first time you remove a background | about 3 MB | this project's GitHub releases |
 | Noise reduction | Never: it is inside the app | | |
 | AI Enhance models | The first time you use Enhance, after you tap Download and start | about 2.4 MB (cartoon 1.3 MB, film grain 2.4 MB more) | this project's GitHub releases |
 | AI background removal 2.0 | The first time you remove a background with AI background removal 2.0 | about 62 MB | this project's GitHub releases |

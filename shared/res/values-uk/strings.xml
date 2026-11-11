@@ -101,6 +101,7 @@
     <string name="community_creator">Автор</string>
     <string name="community_by">Автор: %1$s</string>
     <string name="transform_3d_rotation">3D-обертання</string>
+    <string name="caption_engine_download">Рушій субтитрів (%1$s) завантажується один раз із AbsentMotion на GitHub.</string>
     <string name="transform_free_rotate">Вільне обертання</string>
     <string name="transform_double_tap_pivot">Двічі торкніться, щоб перемістити опорну точку</string>
     <string name="transform_double_tap_layer">Двічі торкніться, щоб перемістити шар</string>

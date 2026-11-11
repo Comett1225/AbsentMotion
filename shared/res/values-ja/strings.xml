@@ -101,6 +101,7 @@
     <string name="community_creator">作成者</string>
     <string name="community_by">%1$s作</string>
     <string name="transform_3d_rotation">3D回転</string>
+    <string name="caption_engine_download">キャプションエンジン（%1$s）はGitHubのAbsentMotionから一度だけダウンロードされます。</string>
     <string name="transform_free_rotate">自由回転</string>
     <string name="transform_double_tap_pivot">ダブルタップしてピボットを移動</string>
     <string name="transform_double_tap_layer">ダブルタップしてレイヤーを移動</string>

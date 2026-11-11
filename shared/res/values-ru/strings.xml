@@ -101,6 +101,7 @@
     <string name="community_creator">Автор</string>
     <string name="community_by">автор: %1$s</string>
     <string name="transform_3d_rotation">3D-поворот</string>
+    <string name="caption_engine_download">Движок субтитров (%1$s) загружается один раз из AbsentMotion на GitHub.</string>
     <string name="transform_free_rotate">Свободный поворот</string>
     <string name="transform_double_tap_pivot">Дважды коснитесь, чтобы переместить опорную точку</string>
     <string name="transform_double_tap_layer">Дважды коснитесь, чтобы переместить слой</string>

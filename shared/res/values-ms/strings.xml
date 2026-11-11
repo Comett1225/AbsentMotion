@@ -101,6 +101,7 @@
     <string name="community_creator">Dicipta oleh</string>
     <string name="community_by">oleh %1$s</string>
     <string name="transform_3d_rotation">Putaran 3D</string>
+    <string name="caption_engine_download">Enjin kapsyen (%1$s) dimuat turun sekali daripada AbsentMotion di GitHub.</string>
     <string name="transform_free_rotate">Putaran bebas</string>
     <string name="transform_double_tap_pivot">Ketik dua kali untuk mengalih pangsi</string>
     <string name="transform_double_tap_layer">Ketik dua kali untuk mengalih lapisan</string>

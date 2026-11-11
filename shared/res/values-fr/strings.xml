@@ -101,6 +101,7 @@
     <string name="community_creator">Créé par</string>
     <string name="community_by">par %1$s</string>
     <string name="transform_3d_rotation">Rotation 3D</string>
+    <string name="caption_engine_download">Le moteur de sous-titrage (%1$s) est téléchargé une seule fois depuis AbsentMotion sur GitHub.</string>
     <string name="transform_free_rotate">Rotation libre</string>
     <string name="transform_double_tap_pivot">Appuyez deux fois pour déplacer le pivot</string>
     <string name="transform_double_tap_layer">Appuyez deux fois pour déplacer le calque</string>

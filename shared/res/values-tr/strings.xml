@@ -101,6 +101,7 @@
     <string name="community_creator">Oluşturan</string>
     <string name="community_by">%1$s tarafından</string>
     <string name="transform_3d_rotation">3D döndürme</string>
+    <string name="caption_engine_download">Altyazı motoru (%1$s), GitHub\'daki AbsentMotion\'dan bir kez indirilir.</string>
     <string name="transform_free_rotate">Serbest döndürme</string>
     <string name="transform_double_tap_pivot">Pivotu taşımak için iki kez dokunun</string>
     <string name="transform_double_tap_layer">Katmanı taşımak için iki kez dokunun</string>

@@ -101,6 +101,7 @@
     <string name="community_creator">Created by</string>
     <string name="community_by">by %1$s</string>
     <string name="transform_3d_rotation">3D rotation</string>
+    <string name="caption_engine_download">The caption engine (%1$s) is downloaded once from AbsentMotion on GitHub.</string>
     <string name="transform_free_rotate">Free rotate</string>
     <string name="transform_double_tap_pivot">Double-tap to move the pivot</string>
     <string name="transform_double_tap_layer">Double-tap to move the layer</string>

@@ -101,6 +101,7 @@
     <string name="community_creator">أنشأه</string>
     <string name="community_by">بواسطة %1$s</string>
     <string name="transform_3d_rotation">تدوير 3D</string>
+    <string name="caption_engine_download">يُنَزَّل محرك التسميات التوضيحية (%1$s) مرة واحدة من AbsentMotion على GitHub.</string>
     <string name="transform_free_rotate">تدوير حر</string>
     <string name="transform_double_tap_pivot">انقر مرتين لنقل المحور</string>
     <string name="transform_double_tap_layer">انقر مرتين لنقل الطبقة</string>

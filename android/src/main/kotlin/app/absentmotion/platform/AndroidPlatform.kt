@@ -253,10 +253,61 @@ fun revealFolderLabel(): String = ""
 
 internal const val CAPTION_MODEL_NAME = "ggml-base-q5_1.bin"
 internal const val CAPTION_MODEL_BYTES = 59_707_625L
+internal object CaptionEngine {
+    private val libraries = listOf(
+        Triple("libwhisper_jni.so", 1_555_448L, "e5e1b4f04292aae164a6bf09e43780c3b4cf8386c67f08905c1f433510ad82ff"),
+        Triple("libwhisper_jni_fast.so", 1_548_200L, "58fec17a9e1e7d2911466103a71beb00a92eecc71dcc0ddae897f8e98fdd2411"),
+    )
+    @Volatile private var folder: java.io.File? = null
+    @Volatile private var checked = false
+
+    private fun bundled(context: Context) = java.io.File(context.applicationInfo.nativeLibraryDir, libraries[0].first).isFile
+    private fun home(context: Context) = app.absentmotion.ai.CaptionModel.engineDir(context)
+    private fun files() = libraries.map { (name, bytes, sha) -> app.absentmotion.ai.addon(name, bytes, sha) }
+
+    fun missing(context: Context): List<app.absentmotion.ai.ModelFile> =
+        if (bundled(context)) emptyList() else files().filter { java.io.File(home(context), it.name).length() != it.bytes }
+
+    suspend fun download(context: Context, progress: (Float) -> Unit) = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+        val wanted = missing(context)
+        val total = wanted.sumOf { it.bytes }.coerceAtLeast(1L).toFloat()
+        var before = 0L
+        check(home(context).let { it.isDirectory || it.mkdirs() }) { context.getString(R.string.ai_cannot_create_model_storage) }
+        for (file in wanted) {
+            val job = coroutineContext[kotlinx.coroutines.Job]
+            app.absentmotion.ai.fetch(file, java.io.File(home(context), file.name), { job?.let { if (!it.isActive) throw java.util.concurrent.CancellationException() } }) { progress((before + it * file.bytes) / total) }
+            before += file.bytes
+        }
+        checked = true
+    }
+
+    fun prepare(context: Context) {
+        if (bundled(context)) { folder = null; return }
+        val home = home(context)
+        if (!checked) for (file in files()) {
+            val target = java.io.File(home, file.name)
+            val intact = target.length() == file.bytes && target.inputStream().use(app.absentmotion.ai.CaptionModel::sha256) == file.sha256
+            if (!intact) target.delete()
+            check(intact) { context.getString(R.string.ai_caption_model_load_failed) }
+        }
+        checked = true
+        folder = home
+    }
+
+    fun load(name: String) {
+        val from = folder
+        if (from == null) System.loadLibrary(name) else System.load(java.io.File(from, "lib$name.so").path)
+    }
+}
+
+internal fun captionEngineMissingBytes(context: Context): Long = CaptionEngine.missing(context).sumOf { it.bytes }
+internal suspend fun downloadCaptionEngine(context: Context, progress: (Float) -> Unit) = CaptionEngine.download(context, progress)
+internal fun prepareCaptionEngine(context: Context) = CaptionEngine.prepare(context)
+
 internal fun loadCaptionLibrary() {
     val fast = runCatching { app.absentmotion.engine.NativeEngine.fastCaptionCpu() }
         .getOrElse { fastCaptionCpu(runCatching { java.io.File("/proc/cpuinfo").readText() }.getOrDefault("")) }
-    android.util.Log.i("AMCaptions", "caption library " + loadCaptionLibrary(fast, System::loadLibrary))
+    android.util.Log.i("AMCaptions", "caption library " + loadCaptionLibrary(fast, CaptionEngine::load))
 }
 internal fun loadCaptionLibrary(fast: Boolean, load: (String) -> Unit): String {
     if (fast) try { load("whisper_jni_fast"); return "whisper_jni_fast" } catch (_: UnsatisfiedLinkError) {}

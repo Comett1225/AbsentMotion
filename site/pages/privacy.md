@@ -21,7 +21,8 @@ If the app closes unexpectedly it keeps a crash log in its own storage: when it 
 The app asks for the internet permission for these things only:
 
 - **Fonts.** When you pick one of the downloadable fonts, the app downloads it from Google Fonts. Google receives the request for that font and your IP address, as for any web request.
-- **Auto captions.** The first time you generate captions, the app tells you the size of the speech model (about 57 MB) and downloads it from Hugging Face. Recognizing speech runs on the phone.
+- **Auto captions.** The first time you generate captions, the app tells you the size of the speech model (about 57 MB) and downloads it from Hugging Face, with the caption engine (about 3 MB) from GitHub. Recognizing speech runs on the phone.
+- **Background removal.** The first time you remove a background, the app downloads its model once (about 3 MB) from GitHub. The cut-out itself runs on the phone.
 - **AI Enhance and AI Smooth.** The first time you use one of them, the app tells you the size of the model it needs (about 1 to 11 MB) and downloads it from GitHub. The AI work itself runs on the phone.
 - **AI background removal 2.0.** Only if you choose AI background removal 2.0 for removing backgrounds, the app downloads its model once (about 62 MB) from GitHub. The cut-out itself runs on the phone.
 - **Video Downloader.** Only if you use Tools > Video Downloader: the first time, the app downloads its add-on (about 25 MB): Python from `python.org` and yt-dlp from GitHub (`github.com`, served from `objects.githubusercontent.com` or `release-assets.githubusercontent.com`). While the add-on is installed, it asks GitHub at most once a day whether there is a newer yt-dlp and downloads it if there is. When you paste a link, the add-on contacts that website (for example YouTube, Instagram or TikTok) to read the video's details and download the parts you choose, the same as a web browser would; the files are saved on the device.

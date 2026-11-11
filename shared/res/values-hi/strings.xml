@@ -101,6 +101,7 @@
     <string name="community_creator">बनाया है</string>
     <string name="community_by">%1$s द्वारा</string>
     <string name="transform_3d_rotation">3D रोटेशन</string>
+    <string name="caption_engine_download">कैप्शन इंजन (%1$s) GitHub पर AbsentMotion से एक बार डाउनलोड होता है।</string>
     <string name="transform_free_rotate">फ़्री रोटेट</string>
     <string name="transform_double_tap_pivot">पिवट मूव करने के लिए दो बार टैप करें</string>
     <string name="transform_double_tap_layer">लेयर मूव करने के लिए दो बार टैप करें</string>

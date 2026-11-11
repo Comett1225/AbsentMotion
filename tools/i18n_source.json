@@ -445,6 +445,7 @@
  "caption_download": "Download",
  "caption_download_failed": "The download failed. Check your internet connection and try again.",
  "caption_downloading_model": "Downloading the speech model…",
+ "caption_engine_download": "The caption engine (%1$s) is downloaded once from AbsentMotion on GitHub.",
  "caption_estimating": "Estimating time remaining",
  "caption_font": "Font",
  "caption_generate": "Generate",

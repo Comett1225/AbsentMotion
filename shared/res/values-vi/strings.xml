@@ -101,6 +101,7 @@
     <string name="community_creator">Người tạo</string>
     <string name="community_by">bởi %1$s</string>
     <string name="transform_3d_rotation">Xoay 3D</string>
+    <string name="caption_engine_download">Công cụ phụ đề (%1$s) được tải xuống một lần từ AbsentMotion trên GitHub.</string>
     <string name="transform_free_rotate">Xoay tự do</string>
     <string name="transform_double_tap_pivot">Chạm hai lần để di chuyển điểm xoay</string>
     <string name="transform_double_tap_layer">Chạm hai lần để di chuyển lớp</string>

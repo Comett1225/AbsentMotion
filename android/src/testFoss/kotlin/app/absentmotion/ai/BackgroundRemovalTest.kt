@@ -25,19 +25,13 @@ class BackgroundRemovalTest {
         assertEquals(1, matteLimit(1, 1, 0))
     }
 
-    @Test fun theModelIsCopiedOnceAndAgainAfterAnUpdate() {
+    @Test fun theDownloadedModelIsPinnedToTheOneInTheProject() {
+        assertTrue(modelIntact(File("src/foss/assets/$MODEL_ASSET")))
         val dir = Files.createTempDirectory("bgmodel").toFile()
         try {
-            val target = File(dir, MODEL_ASSET)
-            val stamp = File(dir, "$MODEL_ASSET.stamp")
-            assertTrue(needsCopy(target, stamp, "100"))
-            target.writeBytes(byteArrayOf(1, 2, 3))
-            assertTrue(needsCopy(target, stamp, "100"))
-            stamp.writeText("100")
-            assertFalse(needsCopy(target, stamp, "100"))
-            assertTrue(needsCopy(target, stamp, "200"))
-            target.delete()
-            assertTrue(needsCopy(target, stamp, "100"))
+            val cut = File(dir, MODEL_ASSET).apply { writeBytes(File("src/foss/assets/$MODEL_ASSET").readBytes().copyOf(1000)) }
+            assertFalse(modelIntact(cut))
+            assertTrue(addon(MODEL_ASSET, MODEL_BYTES, MODEL_SHA256).url.endsWith("/releases/download/ai-models-4/$MODEL_ASSET"))
         } finally {
             dir.deleteRecursively()
         }

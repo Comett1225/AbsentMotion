@@ -101,6 +101,7 @@
     <string name="community_creator">สร้างโดย</string>
     <string name="community_by">โดย %1$s</string>
     <string name="transform_3d_rotation">การหมุน 3D</string>
+    <string name="caption_engine_download">ดาวน์โหลดเอนจินคำบรรยาย (%1$s) จาก AbsentMotion บน GitHub เพียงครั้งเดียว</string>
     <string name="transform_free_rotate">หมุนอิสระ</string>
     <string name="transform_double_tap_pivot">แตะสองครั้งเพื่อย้ายจุดหมุน</string>
     <string name="transform_double_tap_layer">แตะสองครั้งเพื่อย้ายเลเยอร์</string>

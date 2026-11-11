@@ -101,6 +101,7 @@
     <string name="community_creator">建立者</string>
     <string name="community_by">作者：%1$s</string>
     <string name="transform_3d_rotation">3D旋轉</string>
+    <string name="caption_engine_download">字幕引擎（%1$s）會從GitHub上的AbsentMotion下載一次。</string>
     <string name="transform_free_rotate">自由旋轉</string>
     <string name="transform_double_tap_pivot">點兩下以移動錨點</string>
     <string name="transform_double_tap_layer">點兩下以移動圖層</string>

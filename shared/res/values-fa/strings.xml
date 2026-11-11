@@ -101,6 +101,7 @@
     <string name="community_creator">ساخته‌شده توسط</string>
     <string name="community_by">توسط %1$s</string>
     <string name="transform_3d_rotation">چرخش سه‌بعدی</string>
+    <string name="caption_engine_download">موتور زیرنویس (%1$s) یک بار از AbsentMotion در GitHub دانلود می‌شود.</string>
     <string name="transform_free_rotate">چرخش آزاد</string>
     <string name="transform_double_tap_pivot">برای جابه‌جایی محور دو بار ضربه بزنید</string>
     <string name="transform_double_tap_layer">برای جابه‌جایی لایه دو بار ضربه بزنید</string>

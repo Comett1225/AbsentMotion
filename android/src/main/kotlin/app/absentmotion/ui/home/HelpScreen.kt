@@ -60,8 +60,12 @@ fun HelpScreen(page: String = "index.html", onClose: () -> Unit) {
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
     val tag = remember(configuration) { currentLanguage(context).tag }
-    val exists = remember(context) { { path: String -> runCatching { context.assets.open(path).close() }.isSuccess } }
-    val client = remember { HelpClient(tag) { url -> runCatching { links.openUri(url) } } }
+    val exists: (String) -> Boolean = remember(context, tag) {
+        app.absentmotion.i18n.LanguagePacks.prepare(context, tag)
+        val check: (String) -> Boolean = { path -> app.absentmotion.i18n.LanguagePacks.file(context, tag, path) != null || runCatching { context.assets.open(path).close() }.isSuccess }
+        check
+    }
+    val client = remember { HelpClient(tag, context.applicationContext) { url -> runCatching { links.openUri(url) } } }
     var web by remember { mutableStateOf<WebView?>(null) }
     val dark = Am.Card.luminance() < 0.5f
     DisposableEffect(Unit) { onDispose { web?.destroy() } }
@@ -103,7 +107,7 @@ fun HelpScreen(page: String = "index.html", onClose: () -> Unit) {
     }
 }
 
-private class HelpClient(var tag: String, private val openExternal: (String) -> Unit) : WebViewClient() {
+private class HelpClient(var tag: String, private val context: android.content.Context, private val openExternal: (String) -> Unit) : WebViewClient() {
     var clearHistory = false
 
     override fun onPageFinished(view: WebView, url: String) {
@@ -121,7 +125,12 @@ private class HelpClient(var tag: String, private val openExternal: (String) -> 
 
     override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
         val url = request.url.toString()
-        if (helpAllowed(url) || url.startsWith(HELP_THUMBS) && !url.contains("..")) return null
+        if (helpAllowed(url)) {
+            val path = "help/" + url.removePrefix(HELP_ROOT).substringBefore('#').substringBefore('?')
+            val unpacked = path.split('/').getOrNull(1)?.takeIf { it in HELP_LANGUAGES }?.let { app.absentmotion.i18n.LanguagePacks.file(context, it, path) }
+            return unpacked?.let { WebResourceResponse("text/html", "utf-8", it.inputStream()) }
+        }
+        if (url.startsWith(HELP_THUMBS) && !url.contains("..")) return null
         return WebResourceResponse("text/plain", "utf-8", 403, "Blocked", emptyMap(), ByteArrayInputStream(ByteArray(0)))
     }
 }

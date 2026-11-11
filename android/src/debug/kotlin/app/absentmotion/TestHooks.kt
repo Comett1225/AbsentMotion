@@ -158,6 +158,7 @@ internal object TestHooks {
         DebugFrameInterpolation.fuse = intent.getIntExtra("interpFuse", 4)
         intent.getStringExtra("fakeversion")?.let { Updates.installedOverride = it }
         intent.getStringExtra("updatefixture")?.let { Updates.source = UpdateFixture(it) }
+        intent.getStringExtra("addons")?.let { app.absentmotion.ai.AddonRelease.base = it }
         if (intent.getBooleanExtra("updatecheck", false)) Updates.check(activity, activity.settings, manual = true)
         intent.getFloatExtra("tutorialfont", 0f).takeIf { it > 0f }?.let { app.absentmotion.ui.tutorial.Tutorial.fontScale = it }
         intent.getStringExtra("crash")?.let { kind -> activity.window.decorView.postDelayed({ crash(activity, kind) }, 2000) }

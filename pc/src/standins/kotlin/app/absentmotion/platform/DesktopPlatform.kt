@@ -277,6 +277,9 @@ fun revealFolderLabel(): String = app.absentmotion.desk.DeskOs.revealLabel
 internal const val CAPTION_MODEL_NAME = "ggml-base-q5_1.bin"
 internal const val CAPTION_MODEL_BYTES = 59_707_625L
 internal fun loadCaptionLibrary() { app.absentmotion.pc.engine.DesktopNative.hashCode() }
+internal fun captionEngineMissingBytes(context: Context): Long = 0L
+internal suspend fun downloadCaptionEngine(context: Context, progress: (Float) -> Unit) = Unit
+internal fun prepareCaptionEngine(context: Context) = Unit
 internal fun fastCaptionCpu(cpuinfo: String): Boolean = false
 
 internal fun captionTextHeight(fonts: app.absentmotion.fonts.FontLibrary, text: String, font: String, size: Float, wrap: Int): Float {

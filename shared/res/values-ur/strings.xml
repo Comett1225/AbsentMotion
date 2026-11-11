@@ -101,6 +101,7 @@
     <string name="community_creator">تخلیق کار</string>
     <string name="community_by">از %1$s</string>
     <string name="transform_3d_rotation">3D روٹیشن</string>
+    <string name="caption_engine_download">کیپشن انجن (%1$s) GitHub پر AbsentMotion سے ایک بار ڈاؤن لوڈ ہوتا ہے۔</string>
     <string name="transform_free_rotate">فری روٹیٹ</string>
     <string name="transform_double_tap_pivot">پیوٹ ہلانے کے لیے دو بار ٹیپ کریں</string>
     <string name="transform_double_tap_layer">لیئر ہلانے کے لیے دو بار ٹیپ کریں</string>

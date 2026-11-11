@@ -21,6 +21,12 @@ internal class ModelFile(val name: String, val url: String, val bytes: Long, val
 internal const val MODEL_RELEASE = "$HOME_PAGE/releases/download/ai-models-1/"
 internal const val MODEL_RELEASE_2 = "$HOME_PAGE/releases/download/ai-models-2/"
 internal const val MODEL_RELEASE_3 = "$HOME_PAGE/releases/download/ai-models-3/"
+
+internal object AddonRelease {
+    @Volatile var base = "$HOME_PAGE/releases/download/ai-models-4/"
+}
+
+internal fun addon(name: String, bytes: Long, sha: String) = ModelFile(name, AddonRelease.base + name, bytes, sha)
 private const val RIFE_SOURCE = "https://raw.githubusercontent.com/TNTwise/rife-ncnn-vulkan/13338e38debe2e400b3eeecf6792312d01a692f9/models/"
 
 private fun rife(folder: String, paramBytes: Long, paramSha: String, binBytes: Long, binSha: String) = listOf(

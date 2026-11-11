@@ -101,6 +101,7 @@
     <string name="community_creator">제작자</string>
     <string name="community_by">제작: %1$s</string>
     <string name="transform_3d_rotation">3D 회전</string>
+    <string name="caption_engine_download">자막 엔진(%1$s)은 GitHub의 AbsentMotion에서 한 번 다운로드합니다.</string>
     <string name="transform_free_rotate">자유 회전</string>
     <string name="transform_double_tap_pivot">두 번 탭하여 기준점 이동</string>
     <string name="transform_double_tap_layer">두 번 탭하여 레이어 이동</string>

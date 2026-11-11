@@ -101,6 +101,7 @@
     <string name="community_creator">Erstellt von</string>
     <string name="community_by">von %1$s</string>
     <string name="transform_3d_rotation">3D-Drehung</string>
+    <string name="caption_engine_download">Die Untertitel-Engine (%1$s) wird einmalig von AbsentMotion auf GitHub heruntergeladen.</string>
     <string name="transform_free_rotate">Freies Drehen</string>
     <string name="transform_double_tap_pivot">Doppeltippen, um den Drehpunkt zu verschieben</string>
     <string name="transform_double_tap_layer">Doppeltippen, um die Ebene zu verschieben</string>

@@ -101,6 +101,7 @@
     <string name="community_creator">Criado por</string>
     <string name="community_by">por %1$s</string>
     <string name="transform_3d_rotation">Rotação 3D</string>
+    <string name="caption_engine_download">O mecanismo de legendas (%1$s) é baixado uma vez do AbsentMotion no GitHub.</string>
     <string name="transform_free_rotate">Rotação livre</string>
     <string name="transform_double_tap_pivot">Toque duas vezes para mover o pivô</string>
     <string name="transform_double_tap_layer">Toque duas vezes para mover a camada</string>

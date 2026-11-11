@@ -101,6 +101,7 @@
     <string name="community_creator">Ginawa ni</string>
     <string name="community_by">ni %1$s</string>
     <string name="transform_3d_rotation">3D rotation</string>
+    <string name="caption_engine_download">Minsang dina-download ang caption engine (%1$s) mula sa AbsentMotion sa GitHub.</string>
     <string name="transform_free_rotate">Malayang pag-rotate</string>
     <string name="transform_double_tap_pivot">I-double-tap para ilipat ang pivot</string>
     <string name="transform_double_tap_layer">I-double-tap para ilipat ang layer</string>

@@ -9,21 +9,22 @@ import android.net.Uri
 import app.absentmotion.media.decodePicture
 import app.absentmotion.model.MediaDeclaration
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.launch
 import java.io.File
 import kotlin.coroutines.coroutineContext
 
 internal class ModelNotReady : Exception(AppText.get(R.string.ai_model_not_ready_foss))
 
 internal const val MODEL_ASSET = "absent_bg.abg"
-internal fun needsCopy(target: File, stamp: File, version: String): Boolean =
-    !target.isFile || !stamp.isFile || stamp.readText() != version
+internal const val MODEL_BYTES = 2_943_735L
+internal const val MODEL_SHA256 = "9bfbfcba996eb0b0b4f5da03d7dcbce704f5b8810101eb92f62b9e6d44465439"
+
+internal fun modelIntact(file: File): Boolean = file.length() == MODEL_BYTES && file.inputStream().use(CaptionModel::sha256) == MODEL_SHA256
 
 internal object BackgroundRemoval {
-    val AVAILABLE: Boolean by lazy {
-        runCatching { System.loadLibrary("amengine") }.isSuccess &&
-            BackgroundRemoval::class.java.classLoader?.getResource("assets/$MODEL_ASSET") != null
-    }
+    val AVAILABLE: Boolean by lazy { runCatching { System.loadLibrary("amengine") }.isSuccess }
     private var handle = 0L
+    @Volatile private var checked = false
 
     private external fun nativeLoad(path: String): Long
     private external fun nativeMatte(handle: Long, rgb: ByteArray, width: Int, height: Int): ByteArray
@@ -37,6 +38,14 @@ internal object BackgroundRemoval {
         try {
             file = aiFile(context, "png")
             progress(0f, AppText.get(R.string.ai_loading_model))
+            kotlinx.coroutines.coroutineScope {
+                var shown = -1
+                ensureModel(context) { fraction ->
+                    val percent = (fraction * 100).toInt()
+                    if (percent != shown) { shown = percent; launch { progress(0.2f * fraction, AppText.get(R.string.ai_downloading_model)) } }
+                }
+            }
+            progress(0.2f, AppText.get(R.string.ai_loading_model))
             model(context)
             coroutineContext.ensureActive()
             bitmap = decode(context, Uri.parse(uri), limit.coerceAtLeast(1))
@@ -107,17 +116,20 @@ internal object BackgroundRemoval {
         return handle
     }
 
-    private fun modelFile(context: Context): File {
-        val target = File(context.filesDir, MODEL_ASSET)
-        val stamp = File(context.filesDir, "$MODEL_ASSET.stamp")
-        val version = "${context.packageManager.getPackageInfo(context.packageName, 0).lastUpdateTime}"
-        if (needsCopy(target, stamp, version)) {
-            val temp = File(context.filesDir, "$MODEL_ASSET.tmp")
-            context.assets.open(MODEL_ASSET).use { input -> temp.outputStream().use { input.copyTo(it) } }
-            check(temp.renameTo(target)) { AppText.get(R.string.ai_cannot_install_model) }
-            stamp.writeText(version)
+    private fun modelFile(context: Context) = File(context.filesDir, MODEL_ASSET)
+
+    private suspend fun ensureModel(context: Context, progress: (Float) -> Unit) = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+        val target = modelFile(context)
+        File(context.filesDir, "$MODEL_ASSET.stamp").delete()
+        if (checked && target.length() == MODEL_BYTES) return@withContext
+        if (target.isFile && modelIntact(target)) { checked = true; return@withContext }
+        target.delete()
+        try {
+            fetch(addon(MODEL_ASSET, MODEL_BYTES, MODEL_SHA256), target, { ensureActive() }, progress)
+        } catch (_: java.io.IOException) {
+            error(AppText.get(R.string.ai_model_download_failed))
         }
-        return target
+        checked = true
     }
 
     private fun decode(context: Context, uri: Uri, limit: Int): Bitmap {

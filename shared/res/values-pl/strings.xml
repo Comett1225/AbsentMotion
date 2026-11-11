@@ -101,6 +101,7 @@
     <string name="community_creator">Autor</string>
     <string name="community_by">autor: %1$s</string>
     <string name="transform_3d_rotation">Obrót 3D</string>
+    <string name="caption_engine_download">Silnik napisów (%1$s) jest pobierany jednorazowo z AbsentMotion w serwisie GitHub.</string>
     <string name="transform_free_rotate">Swobodny obrót</string>
     <string name="transform_double_tap_pivot">Dotknij dwukrotnie, aby przesunąć punkt obrotu</string>
     <string name="transform_double_tap_layer">Dotknij dwukrotnie, aby przesunąć warstwę</string>

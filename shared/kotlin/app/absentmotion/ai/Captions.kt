@@ -148,7 +148,7 @@ internal suspend fun recogniseCaptions(
     val windows = captionWindows(startMs, endMs)
     val words = ArrayList<Word>()
     try {
-        withContext(Dispatchers.IO) { CaptionModel.verify(context, style.highPrecision) }
+        withContext(Dispatchers.IO) { CaptionModel.verify(context, style.highPrecision); app.absentmotion.platform.prepareCaptionEngine(context) }
         windows.forEachIndexed { k, (keepFrom, keepTo) ->
             fun step(local: Float, label: Int) = progress((k + local) / windows.size, AppText.get(label))
             val from = maxOf(startMs, keepFrom - CAPTION_OVERLAP_MS)
@@ -342,9 +342,14 @@ internal object CaptionModel {
     private fun hash(highPrecision: Boolean) = if (highPrecision) PRECISE_SHA256 else SHA256
 
     fun file(context: Context, highPrecision: Boolean = false) = File(context.filesDir, "models/${name(highPrecision)}")
-    fun installed(context: Context, highPrecision: Boolean = false) = file(context, highPrecision).length() == bytes(highPrecision)
-    fun storedBytes(context: Context) = file(context).length() + file(context, true).length()
-    fun remove(context: Context) { file(context).delete(); file(context, true).delete() }
+    fun installed(context: Context, highPrecision: Boolean = false) =
+        file(context, highPrecision).length() == bytes(highPrecision) && app.absentmotion.platform.captionEngineMissingBytes(context) == 0L
+    fun missingBytes(context: Context, highPrecision: Boolean = false) =
+        (if (file(context, highPrecision).length() == bytes(highPrecision)) 0L else bytes(highPrecision)) + app.absentmotion.platform.captionEngineMissingBytes(context)
+    fun engineDir(context: Context) = File(context.filesDir, "models/captions")
+    fun present(context: Context, highPrecision: Boolean = false) = file(context, highPrecision).length() == bytes(highPrecision)
+    fun storedBytes(context: Context) = file(context).length() + file(context, true).length() + (engineDir(context).listFiles()?.sumOf { it.length() } ?: 0L)
+    fun remove(context: Context) { file(context).delete(); file(context, true).delete(); engineDir(context).deleteRecursively() }
 
     fun verify(context: Context, highPrecision: Boolean = false) {
         val file = file(context, highPrecision)
@@ -358,6 +363,14 @@ internal object CaptionModel {
     }
 
     suspend fun download(context: Context, highPrecision: Boolean = false, progress: (Float) -> Unit) = withContext(Dispatchers.IO) {
+        val model = if (file(context, highPrecision).length() == bytes(highPrecision)) 0L else bytes(highPrecision)
+        val engine = app.absentmotion.platform.captionEngineMissingBytes(context)
+        val total = (model + engine).coerceAtLeast(1L).toFloat()
+        if (model > 0L) downloadModel(context, highPrecision) { progress(it * model / total) }
+        if (engine > 0L) app.absentmotion.platform.downloadCaptionEngine(context) { progress((model + it * engine) / total) }
+    }
+
+    private suspend fun downloadModel(context: Context, highPrecision: Boolean, progress: (Float) -> Unit) = withContext(Dispatchers.IO) {
         val target = file(context, highPrecision)
         val part = File(target.path + ".part")
         try {

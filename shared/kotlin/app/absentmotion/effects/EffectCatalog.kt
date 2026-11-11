@@ -58,8 +58,12 @@ data class EffectCatalog(
         val Categories = linkedMapOf("color" to "Color", "blur" to "Blur", "distort" to "Distort", "stylize" to "Stylize",
             "noise" to "Noise", "repeat" to "Repeat", "key" to "Key", "move" to "Move", "beat" to "Beat", "3d" to "3D", "text" to "Text", "other" to "Other")
 
-        fun read(context: Context): EffectCatalog = parse(currentLanguage(context).tag) { context.assets.open("effects/$it") }
-            .let { if (it.message != null) it.copy(message = context.getString(R.string.effects_not_loaded)) else it }
+        fun read(context: Context): EffectCatalog {
+            val tag = currentLanguage(context).tag
+            app.absentmotion.i18n.LanguagePacks.prepare(context, tag)
+            return parse(tag) { app.absentmotion.i18n.LanguagePacks.open(context, tag, "effects/$it") }
+                .let { if (it.message != null) it.copy(message = context.getString(R.string.effects_not_loaded)) else it }
+        }
 
         fun parse(language: String = "en", open: (String) -> InputStream): EffectCatalog = runCatching {
             fun text(path: String) = open(path).bufferedReader().use { it.readText() }

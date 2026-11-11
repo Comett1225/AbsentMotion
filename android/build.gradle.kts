@@ -1,4 +1,8 @@
+import java.io.DataOutputStream
+import java.security.MessageDigest
 import java.util.Properties
+import java.util.zip.Deflater
+import java.util.zip.GZIPOutputStream
 
 plugins {
     id("com.android.application")
@@ -11,6 +15,15 @@ require(appAbi in setOf("arm64-v8a", "x86_64")) { "amAbi must be arm64-v8a or x8
 
 android {
     namespace = "app.absentmotion"
+
+    packaging {
+        jniLibs { useLegacyPackaging = true }
+        dex { useLegacyPackaging = true }
+    }
+
+    androidResources {
+        ignoreAssetsPatterns += listOf("!.svn", "!.git", "!.ds_store", "!*.scc", ".*", "<dir>_*", "!CVS", "!thumbs.db", "!picasa.ini", "!*~", "!absent_bg.abg")
+    }
     compileSdk = 37
     ndkVersion = "30.0.16248370"
 
@@ -105,7 +118,6 @@ android {
     sourceSets {
         named("main") {
             kotlin.directories += "../shared/kotlin"
-            assets.directories += "../shared/assets"
             res.directories += "../shared/res"
         }
         named("compat") {
@@ -120,6 +132,53 @@ android {
             manifest.srcFile("src/compat/AndroidManifest.xml")
         }
         named("testCompat32") { kotlin.directories += "src/testFoss/kotlin" }
+    }
+}
+
+abstract class PackLanguages : DefaultTask() {
+    @get:InputDirectory
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val source: DirectoryProperty
+
+    @get:OutputDirectory
+    abstract val output: DirectoryProperty
+
+    @TaskAction
+    fun pack() {
+        val from = source.get().asFile
+        val to = output.get().asFile
+        to.deleteRecursively()
+        val languages = from.resolve("help").listFiles().orEmpty().filter { it.isDirectory && it.name !in setOf("assets", "effects") }.map { it.name }.sorted()
+        val packed = languages.map { "help/$it/" } + "effects/i18n/"
+        from.walkTopDown().filter { it.isFile && !it.name.startsWith(".") }.forEach { file ->
+            val path = file.relativeTo(from).invariantSeparatorsPath
+            if (packed.none(path::startsWith)) file.copyTo(to.resolve(path))
+        }
+        for (language in languages) {
+            val files = (from.resolve("help/$language").walkTopDown() + from.resolve("effects/i18n/$language.json"))
+                .filter { it.isFile && !it.name.startsWith(".") }.map { it.relativeTo(from).invariantSeparatorsPath to it.readBytes() }.sortedBy { it.first }.toList()
+            val digest = MessageDigest.getInstance("SHA-256")
+            files.forEach { (path, bytes) -> digest.update(path.toByteArray()); digest.update(bytes) }
+            val target = to.resolve("langpacks/$language.pack").apply { parentFile.mkdirs() }
+            val zipped = object : GZIPOutputStream(target.outputStream().buffered()) { init { def.setLevel(Deflater.BEST_COMPRESSION) } }
+            DataOutputStream(zipped).use { out ->
+                out.writeUTF(digest.digest().joinToString("") { "%02x".format(it) }.take(16))
+                for ((path, bytes) in files) { out.writeUTF(path); out.writeInt(bytes.size); out.write(bytes) }
+                out.writeUTF("")
+            }
+        }
+    }
+}
+
+val packLanguages = tasks.register<PackLanguages>("packLanguages") {
+    source.set(rootProject.layout.projectDirectory.dir("shared/assets"))
+    output.set(layout.buildDirectory.dir("generated/amAssets"))
+}
+
+androidComponents {
+    onVariants { variant ->
+        variant.sources.assets?.addGeneratedSourceDirectory(packLanguages, PackLanguages::output)
+        if (variant.flavorName == "foss") variant.packaging.jniLibs.excludes.addAll(listOf("**/libwhisper_jni.so", "**/libwhisper_jni_fast.so"))
     }
 }
 
