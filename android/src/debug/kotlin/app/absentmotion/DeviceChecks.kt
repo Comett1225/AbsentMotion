@@ -68,6 +68,17 @@ internal suspend fun checkDevice(context: Context) {
             check(after.indices.any { it % 4 != 3 && after[it].toInt() != 0 })
             Log.i("AMDevice", "ok font import redraws nested preview text")
         } finally { if (imported.xml !in existing) fonts.deleteImported(imported.xml) }
+        val spaced = listOf("My Font", "Second Font Bold", "Третий шрифт").map { label ->
+            File(root, "$label.ttf").also { source.copyTo(it); it.appendBytes(label.toByteArray()) }
+        }
+        val names = spaced.map { fonts.import(Uri.fromFile(it)) }
+        for (font in names) {
+            check(app.absentmotion.fonts.FontName.parse(font.xml) == font) { "Font name ${font.xml} did not read back" }
+            check(fonts.localFile(font.xml) != null) { "Imported font ${font.xml} could not be found" }
+        }
+        names.forEach { fonts.deleteImported(it.xml) }
+        check(fonts.importedFonts().none { it in names }) { "Imported fonts with spaces could not be deleted" }
+        Log.i("AMDevice", "ok several fonts with spaces import, resolve and delete")
         val refused = runCatching { app.absentmotion.ai.Whisper.transcribe(File(root, "missing.bin"), FloatArray(16000), true) {} }.exceptionOrNull()
         check(refused is IllegalStateException) { "Captions did not reject a missing model: $refused" }
         Log.i("AMDevice", "ok the caption library loads and rejects a missing model")

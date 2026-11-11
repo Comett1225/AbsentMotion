@@ -5,7 +5,7 @@ import java.net.URI
 import java.net.URLDecoder
 
 class Uri private constructor(private val text: String) : Comparable<Uri> {
-    private val parsed: URI? = runCatching { URI(text) }.getOrNull()
+    private val parsed: URI? = runCatching { URI(text) }.getOrNull() ?: runCatching { URI(lenient(text)) }.getOrNull()
     val scheme: String? get() = parsed?.scheme ?: if (text.startsWith("/")) null else text.substringBefore(':', "").ifEmpty { null }
     val path: String? get() = parsed?.path ?: if (text.startsWith("/")) text else text.substringAfter(':', "").substringBefore('?').ifEmpty { null }
     val authority: String? get() = parsed?.authority
@@ -15,7 +15,7 @@ class Uri private constructor(private val text: String) : Comparable<Uri> {
     val lastPathSegment: String? get() = path?.trimEnd('/')?.substringAfterLast('/')?.ifEmpty { null }
     val pathSegments: List<String> get() = path?.split('/')?.filter { it.isNotEmpty() } ?: emptyList()
     val isAbsolute: Boolean get() = scheme != null
-    fun getQueryParameter(key: String): String? = query?.split('&')?.firstNotNullOfOrNull { part ->
+    fun getQueryParameter(key: String): String? = parsed?.rawQuery?.split('&')?.firstNotNullOfOrNull { part ->
         val (k, v) = part.split('=', limit = 2).let { it[0] to it.getOrElse(1) { "" } }
         if (URLDecoder.decode(k, "UTF-8") == key) URLDecoder.decode(v, "UTF-8") else null
     }
@@ -40,6 +40,14 @@ class Uri private constructor(private val text: String) : Comparable<Uri> {
     companion object {
         val EMPTY = Uri("")
         fun parse(text: String): Uri = Uri(text)
+        private fun lenient(text: String): String = buildString {
+            text.forEachIndexed { i, c ->
+                val escaped = c == '%' && !(i + 2 < text.length && text[i + 1].isHexDigit() && text[i + 2].isHexDigit())
+                if (escaped || c.isWhitespace() || c in "\"<>\\^`{|}") c.toString().toByteArray().forEach { append("%%%02X".format(it.toInt() and 0xff)) }
+                else append(c)
+            }
+        }
+        private fun Char.isHexDigit() = this in '0'..'9' || this in 'a'..'f' || this in 'A'..'F'
         fun fromFile(file: File): Uri = Uri(file.absoluteFile.toURI().toString().replaceFirst("file:/", "file:///").replace("file:////", "file:///"))
         fun encode(s: String): String = java.net.URLEncoder.encode(s, "UTF-8").replace("+", "%20")
         fun decode(s: String): String = URLDecoder.decode(s, "UTF-8")
