@@ -23,8 +23,10 @@ import app.absentmotion.model.Scene
 import app.absentmotion.ui.editor.LocalEditorScope
 import app.absentmotion.ui.editor.LocalTablet
 import app.absentmotion.ui.editor.LocalWide
+import app.absentmotion.ui.editor.LeftRailWidth
 import app.absentmotion.ui.editor.LevelMeter
 import app.absentmotion.ui.editor.WideEditorBody
+import app.absentmotion.ui.editor.railEditor
 import app.absentmotion.ui.editor.rememberAddLibrary
 import app.absentmotion.ui.home.DeskModals
 import kotlinx.coroutines.runBlocking
@@ -167,7 +169,8 @@ $layers
                         if (!landscape) { onAllNodesWithContentDescription("Master level").assertCountEquals(0); return }
                         val meter = onNodeWithContentDescription("Master level").getUnclippedBoundsInRoot()
                         println("$label $stage meter ${meter.left}..${meter.right} x ${meter.top}..${meter.bottom}")
-                        assertTrue("$label $stage: on the left edge", meter.left.value <= 12.5f)
+                        val edge = if (railEditor(size.first.dp, size.second.dp)) LeftRailWidth.value else 0f
+                        assertTrue("$label $stage: on the left edge of the preview", meter.left.value <= edge + 12.5f)
                         assertEquals("$label $stage: slim", 18f, (meter.right - meter.left).value, 0.5f)
                         assertEquals("$label $stage: under the canvas zoom button", 120f, meter.top.value, 1f)
                     }

@@ -11,8 +11,6 @@ import app.absentmotion.ui.home.HomeScreen
 import app.absentmotion.ui.home.SettingsPage
 import app.absentmotion.ui.home.WhatsNew
 import app.absentmotion.ui.home.WhatsNewNotes
-import app.absentmotion.ui.home.WideHeader
-import app.absentmotion.ui.home.wideHeaderFits
 import app.absentmotion.ui.onboarding.ONBOARDING_DONE
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -103,22 +101,6 @@ class DeskChangelogTest {
             onNodeWithText("See what's new in $key").performClick()
             readAndClose()
             onNodeWithText("See what's new in $key").assertIsDisplayed()
-        }
-    }
-
-    @Test fun wideHomeHeaderStillFitsAtTheSmallestWideWidth() {
-        prepare("changelog-wide")
-        val width = (0..2000).first { wideHeaderFits(it, 1f) }
-        runSkikoComposeUiTest(size = Size(width.toFloat(), 200f)) {
-            val state = DeskAppState()
-            setContent { WideHeader(0, 0, { _, _ -> }, {}, {}, null, {}, state.settings) }
-            settle()
-            val icon = onNodeWithContentDescription("Changelog").assertIsDisplayed().getBoundsInRoot()
-            val search = onNodeWithContentDescription("Search").getBoundsInRoot()
-            val settings = onNodeWithContentDescription("Settings").assertIsDisplayed().getBoundsInRoot()
-            assertTrue("$icon before $search", icon.right <= search.left + 1.dp)
-            assertTrue("$settings inside $width", settings.right.value <= width + 0.5f)
-            shot("$width-wide-home-header")
         }
     }
 

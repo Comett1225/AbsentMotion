@@ -142,7 +142,7 @@ private fun EditorBody(state: EditorState, onExit: () -> Unit) {
     }
     Box(Modifier.fillMaxSize()) {
         if (wide) WideEditorBody(state, onExit, addLibrary) else PhoneEditorBody(state, onExit, addLibrary)
-        SlideOver(state.effectBrowserOpen) { PhoneScreen(fillWidth = 720.dp) { app.absentmotion.ui.editor.effects.EffectBrowser(state) } }
+        SlideOver(state.effectBrowserOpen) { PhoneScreen(fillWidth = if (wide && LocalConfiguration.current.screenWidthDp >= 900) Dp.Infinity else 720.dp) { app.absentmotion.ui.editor.effects.EffectBrowser(state) } }
         SlideOver(state.presetsOpen) { PhoneScreen { PresetScreen(state) } }
         SlideOver(state.toolOpen != 0) { PhoneScreen(fillWidth = 720.dp) { EditorTools(state, LocalEditorScope.current) } }
     }

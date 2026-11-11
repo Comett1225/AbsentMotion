@@ -1,6 +1,7 @@
 package app.absentmotion.ui.export
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -53,8 +54,9 @@ fun DoneScreen(kind: ExportKind, result: ExportResult, onClose: () -> Unit, onSh
             app.absentmotion.platform.ExportMediaPreview(kind, result.uris)
         }
         Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(15.dp)) {
-            BottomButton(stringResource(shareLabel(kind)), ExportIcons.Share, onShare)
-            BottomButton(stringResource(R.string.ok), null, onClose)
+            val pills = !app.absentmotion.platform.PlatformFeatures.desktop && app.absentmotion.ui.editor.isTablet(androidx.compose.ui.platform.LocalConfiguration.current.smallestScreenWidthDp)
+            BottomButton(stringResource(shareLabel(kind)), ExportIcons.Share, pills, primary = true, onShare)
+            BottomButton(stringResource(R.string.ok), null, pills, primary = false, onClose)
         }
     }
 }
@@ -71,13 +73,16 @@ internal fun shareLabel(kind: ExportKind) = when (kind) {
 }
 
 @Composable
-private fun BottomButton(label: String, icon: ImageVector?, onClick: () -> Unit) {
+private fun BottomButton(label: String, icon: ImageVector?, pill: Boolean, primary: Boolean, onClick: () -> Unit) {
+    val content = if (pill && primary) Am.OnAccent else Am.OnNavy
     Row(
-        Modifier.fillMaxWidth().height(57.dp).clip(RoundedCornerShape(5.dp)).background(Am.NavyHi).clickable(onClick = onClick),
+        (if (!pill) Modifier.fillMaxWidth().height(57.dp).clip(RoundedCornerShape(5.dp)).background(Am.NavyHi)
+        else Modifier.fillMaxWidth().height(48.dp).clip(androidx.compose.foundation.shape.CircleShape).then(if (primary) Modifier.background(Am.Accent) else Modifier.border(1.dp, Am.OnNavy.copy(alpha = 0.4f), androidx.compose.foundation.shape.CircleShape)))
+            .clickable(onClick = onClick),
         horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (icon != null) Icon(icon, null, Modifier.padding(horizontal = 15.dp).size(20.dp), tint = Am.OnNavy)
-        Text(label, Modifier.padding(end = if (icon != null) 15.dp else 0.dp), color = Am.OnNavy, fontSize = 17.sp)
+        if (icon != null) Icon(icon, null, Modifier.padding(horizontal = 15.dp).size(20.dp), tint = content)
+        Text(label, Modifier.padding(end = if (icon != null) 15.dp else 0.dp), color = content, fontSize = if (pill) 16.sp else 17.sp)
     }
 }
 

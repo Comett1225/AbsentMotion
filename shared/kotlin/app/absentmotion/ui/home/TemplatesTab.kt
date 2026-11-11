@@ -3,6 +3,7 @@ package app.absentmotion.ui.home
 import app.absentmotion.platform.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -96,10 +97,10 @@ fun TemplatesTab(version: Int, onTemplate: (String) -> Unit, onProject: (Scene) 
     val wide = LocalWide.current || LocalTablet.current
 
     Column(modifier.fillMaxSize()) {
-        Spacer(Modifier.height(24.dp))
-        Row(Modifier.padding(start = 16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            SubChip(stringResource(R.string.template_my_templates), sub == 0) { sub = 0; menu = null }
-            SubChip(stringResource(R.string.template_my_presets), sub == 1) { sub = 1; menu = null }
+        Spacer(Modifier.height(if (wide) 8.dp else 24.dp))
+        Row(Modifier.padding(start = 16.dp), horizontalArrangement = Arrangement.spacedBy(if (wide) 8.dp else 12.dp)) {
+            SubChip(stringResource(R.string.template_my_templates), sub == 0, wide) { sub = 0; menu = null }
+            SubChip(stringResource(R.string.template_my_presets), sub == 1, wide) { sub = 1; menu = null }
         }
         Spacer(Modifier.height(13.dp))
         Box(Modifier.weight(1f).fillMaxWidth()) {
@@ -185,12 +186,16 @@ private fun EmptyText(text: String) {
 }
 
 @Composable
-private fun SubChip(text: String, selected: Boolean, onClick: () -> Unit) {
-    val shape = RoundedCornerShape(14.dp)
+private fun SubChip(text: String, selected: Boolean, crisp: Boolean, onClick: () -> Unit) = Chip(text, selected, crisp, onClick)
+
+@Composable
+internal fun Chip(text: String, selected: Boolean, crisp: Boolean, onClick: () -> Unit) {
+    val shape = RoundedCornerShape(if (crisp) 8.dp else 14.dp)
     Box(
-        Modifier.height(40.dp).shadow(3.dp, shape).clip(shape).background(animatedColor(if (selected) Am.Navy else Am.Card)).clickable(onClick = onClick).padding(horizontal = 16.dp),
+        Modifier.height(if (crisp) 36.dp else 40.dp).then(if (crisp) Modifier.border(1.dp, Am.NavyLine, shape) else Modifier.shadow(3.dp, shape)).clip(shape)
+            .background(animatedColor(if (selected) Am.Navy else Am.Card)).clickable(onClick = onClick).padding(horizontal = 16.dp),
         contentAlignment = Alignment.Center,
-    ) { Text(text, color = animatedColor(if (selected) Am.OnNavy else Grey), fontSize = 18.sp, fontWeight = FontWeight.Medium) }
+    ) { Text(text, color = animatedColor(if (selected) Am.OnNavy else Grey), fontSize = if (crisp) 15.sp else 18.sp, fontWeight = FontWeight.Medium) }
 }
 
 @Composable

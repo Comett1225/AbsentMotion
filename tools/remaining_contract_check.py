@@ -104,7 +104,7 @@ class RemainingContracts(unittest.TestCase):
             self.assertNotIn('onReceive', text)
             self.assertNotIn('Receive from phone', text)
             self.assertNotIn('val Receive =', text)
-        self.assertIn('WideHeader(', kotlin('ui/home/HomeScreen.kt'))
+        self.assertIn('BottomBar(onNew = newProject', kotlin('ui/home/HomeScreen.kt'))
 
 
 if __name__ == '__main__':

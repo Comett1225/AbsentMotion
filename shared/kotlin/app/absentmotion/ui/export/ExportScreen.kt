@@ -1,6 +1,9 @@
 package app.absentmotion.ui.export
 
 import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.captionBar
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -542,14 +545,19 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
 
     val info: @Composable () -> Unit = { InfoBlock(free, estimate, timeMs, storage) }
     val naming: @Composable (ExportKind) -> Unit = { FileNameField(exportName, it) }
-    val bar: @Composable () -> Unit = { ExportBar(enabled = phase == Phase.Idle, blocked = blocked, onClick = ::start) }
+    val card = !DESK && app.absentmotion.ui.editor.isTablet(androidx.compose.ui.platform.LocalConfiguration.current.smallestScreenWidthDp)
+    val bar: @Composable () -> Unit = { ExportBar(enabled = phase == Phase.Idle, blocked = blocked, pill = card, onClick = ::start) }
 
     if (DESK) DeskExport(
         scene, frame, fromProjectList, engine, kinds, kind, { kind = it }, hasAudio, settings, check, hasEncoder, bitrateFits, explain, { help = true }, exportName,
         warning, support is Support.SlowSoftwareOnly, better?.let { suggestionLabel(video, it) }, ::useBetter, { acknowledged = warning },
         free, estimate, timeMs, storage, blocked, asTemplate, { asTemplate = it }, { templateInfo = true }, { packageInfo = true }, { BundleFields(scene, engine, appSettings, community) { community = it } },
         phase, progress, heat.level, note, { (phase as? Phase.Running)?.job?.cancel() }, { phase = Phase.Idle }, { (phase as? Phase.Done)?.let { share(context, it) } }, ::start, onClose,
-    ) else Box(Modifier.fillMaxSize().background(Am.SheetBg).pointerInput(Unit) {}.enterFade(12.dp)) {
+    ) else Box(
+        if (card) Modifier.fillMaxSize().background(Scrim).pointerInput(Unit) {}.windowInsetsPadding(WindowInsets.systemBars.union(WindowInsets.ime)).padding(24.dp).wrapContentSize()
+            .widthIn(max = 520.dp).heightIn(max = 760.dp).enterFade(12.dp).clip(RoundedCornerShape(18.dp)).background(Am.SheetBg)
+        else Modifier.fillMaxSize().background(Am.SheetBg).pointerInput(Unit) {}.enterFade(12.dp),
+    ) {
         Column(Modifier.align(Alignment.TopCenter).widthIn(max = SheetMaxWidth).fillMaxSize()) {
             TitleBar(stringResource(R.string.export_title), ExportIcons.Close, stringResource(R.string.cancel)) { (phase as? Phase.Running)?.job?.cancel(); onClose() }
             info()
@@ -777,9 +785,15 @@ private fun TemplateToggle(checked: Boolean, onChange: (Boolean) -> Unit, onInfo
 }
 
 @Composable
-private fun ExportBar(enabled: Boolean, blocked: UiText?, onClick: () -> Unit) {
+private fun ExportBar(enabled: Boolean, blocked: UiText?, pill: Boolean, onClick: () -> Unit) {
     Box(Modifier.fillMaxWidth().background(Am.Card).navigationBarsPadding().padding(start = 15.dp, end = 15.dp, top = 12.dp, bottom = 15.dp)) {
-        Box(
+        if (pill) Box(
+            Modifier.fillMaxWidth().height(48.dp).clip(androidx.compose.foundation.shape.CircleShape)
+                .background(animatedColor(if (blocked == null) Am.Accent else lerp(Navy, Am.Card, 0.8f)))
+                .clickable(enabled = enabled, onClick = onClick),
+            contentAlignment = Alignment.Center,
+        ) { Text(blocked?.text() ?: stringResource(R.string.export), color = if (blocked == null) Am.OnAccent else Navy, fontSize = 16.sp, fontWeight = FontWeight.Medium, maxLines = 1) }
+        else Box(
             Modifier.fillMaxWidth().height(50.dp).shadow(4.dp, RoundedCornerShape(6.dp)).clip(RoundedCornerShape(6.dp))
                 .background(animatedColor(if (blocked == null) Navy else lerp(Navy, Am.Card, 0.8f)))
                 .clickable(enabled = enabled, onClick = onClick),

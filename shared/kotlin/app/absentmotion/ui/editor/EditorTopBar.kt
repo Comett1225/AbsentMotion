@@ -1,6 +1,7 @@
 package app.absentmotion.ui.editor
 
 import app.absentmotion.ui.tutorial.tutorialTarget
+import app.absentmotion.ui.tutorial.tutorialGuard
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -63,17 +64,25 @@ import app.absentmotion.ui.theme.enterFade
 
 private val Underline get() = Am.Deepest
 
+enum class BarPlace { Whole, Project, Layer }
+
 @Composable
-fun EditorTopBar(state: EditorState, onExit: () -> Unit, modifier: Modifier = Modifier) {
-    (state.drawing as? app.absentmotion.editor.PointMode)?.let {
-        PointTopBar(state, it, modifier)
+fun EditorTopBar(state: EditorState, onExit: () -> Unit, modifier: Modifier = Modifier, place: BarPlace = BarPlace.Whole) {
+    if (place != BarPlace.Project) {
+        (state.drawing as? app.absentmotion.editor.PointMode)?.let {
+            PointTopBar(state, it, modifier)
+            return
+        }
+        if (MultiSelect.active) {
+            MultiTopBar(state, modifier)
+            return
+        }
+    }
+    val layer = if (place == BarPlace.Project) null else state.selectedId?.let { state.scene.layer(it) }
+    if (place == BarPlace.Layer && layer == null) {
+        Box(modifier.background(Am.Button))
         return
     }
-    if (MultiSelect.active) {
-        MultiTopBar(state, modifier)
-        return
-    }
-    val layer = state.selectedId?.let { state.scene.layer(it) }
     val inPanel = layer != null && state.panel != EditorPanel.Tools
     val focus = LocalFocusManager.current
     var settingsOpen by remember { mutableStateOf(false) }
@@ -91,7 +100,8 @@ fun EditorTopBar(state: EditorState, onExit: () -> Unit, modifier: Modifier = Mo
     val cell = Modifier.width(40.dp).fillMaxHeight()
     Row(modifier.animatedBackground(color), verticalAlignment = Alignment.CenterVertically) {
         val crumbs = layer == null && state.inGroup
-        if (!crumbs) BarButton(
+        if (place == BarPlace.Project && !crumbs) Spacer(Modifier.width(8.dp))
+        else if (!crumbs) BarButton(
             if (layer == null) ChromeIcons.Exit else ChromeIcons.Back,
             stringResource(if (layer == null) R.string.topbar_exit_to_project_list else R.string.topbar_back), cell.tutorialTarget(if (layer == null) null else "back"),
         ) {
@@ -124,7 +134,12 @@ fun EditorTopBar(state: EditorState, onExit: () -> Unit, modifier: Modifier = Mo
         }
         if (layer == null) {
             BarButton(ChromeIcons.Gear, stringResource(R.string.topbar_project_settings), cell.enterFade().tutorialTarget("gear")) { act { settingsOpen = true } }
-            BarButton(ChromeIcons.Share, stringResource(R.string.topbar_export_share), cell.enterFade().tutorialTarget("export")) { act { state.playing = false; state.exportOpen = true } }
+            if (place == BarPlace.Project) Box(Modifier.width(52.dp).fillMaxHeight().enterFade().tutorialTarget("export").tutorialGuard().clickable { act { state.playing = false; state.exportOpen = true } }, contentAlignment = Alignment.Center) {
+                Box(Modifier.size(40.dp, 28.dp).background(Am.Accent, RoundedCornerShape(7.dp)), contentAlignment = Alignment.Center) {
+                    Icon(ChromeIcons.Share, stringResource(R.string.topbar_export_share), Modifier.size(18.dp), tint = Am.OnAccent)
+                }
+            }
+            else BarButton(ChromeIcons.Share, stringResource(R.string.topbar_export_share), cell.enterFade().tutorialTarget("export")) { act { state.playing = false; state.exportOpen = true } }
         } else if (!inPanel) {
             Spacer(Modifier.width(5.dp))
             Box(cell.enterFade().clickable { act { parentMenuOpen = true } }, contentAlignment = Alignment.Center) {

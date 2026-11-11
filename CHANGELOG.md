@@ -14,7 +14,7 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - Time Remap: a Remap tab in Speed keyframes which moment of a video shows, to speed it up, freeze it or play it backwards inside one layer.
 - Tools inside the editor: a Tools tab in the + menu, and Tools in the left rail on a computer. Compress, Trim, Extract Audio, Make a GIF and the Video Downloader add their result to the project.
 - Video Downloader on Windows, Mac and Linux, with a one-time add-on.
-- Video Feedback Frame by Frame: each copy shows the layer one frame earlier, so movement leaves trails.
+- Video Feedback Frame by Frame: each copy shows the layer one frame earlier, videos included, so movement leaves trails.
 - Page Curl and Scatter Repeat effects.
 - Effect previews: an effect's page opens with a big, sharp preview.
 - Community bundle: Project Bundle in Export adds a title, a thumbnail picked with Choose thumbnail, a description, tags and a name.
@@ -26,6 +26,7 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 
 ### Changed
 
+- Tablet layout: in landscape the editor has tool rails on both sides and a side panel that stays in place, Home has a bottom bar with a round +, and New project and Export open in a centred card with a pill button.
 - Smaller app: the Android download went from about 80 MB to 49 MB. Other languages unpack when picked, and background removal downloads on first use.
 - Simpler Transform: four tabs on phones and tablets, double-tap Move for the pivot, and 3D rotation in the Rotate menu.
 - Smoother menus: the effects panel and effect pages slide in from the right, and projects open with a soft zoom.

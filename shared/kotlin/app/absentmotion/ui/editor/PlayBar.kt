@@ -26,12 +26,14 @@ import app.absentmotion.ui.theme.Presence
 import app.absentmotion.ui.tutorial.tutorialTarget
 
 @Composable
-fun PlayBar(state: EditorState, modifier: Modifier = Modifier) {
+fun PlayBar(state: EditorState, modifier: Modifier = Modifier, transportOnly: Boolean = false) {
     var menuOpen by remember { mutableStateOf(false) }
     Row(modifier.background(Am.TimelineBg)) {
         val cell = Modifier.weight(1f).fillMaxHeight()
-        BarButton(ChromeIcons.Undo, stringResource(R.string.play_undo), cell.tutorialTarget("undo"), enabled = state.canUndo) { state.undo() }
-        BarButton(ChromeIcons.Redo, stringResource(R.string.play_redo), cell.tutorialTarget("redo"), enabled = state.canRedo) { state.redo() }
+        if (!transportOnly) {
+            BarButton(ChromeIcons.Undo, stringResource(R.string.play_undo), cell.tutorialTarget("undo"), enabled = state.canUndo) { state.undo() }
+            BarButton(ChromeIcons.Redo, stringResource(R.string.play_redo), cell.tutorialTarget("redo"), enabled = state.canRedo) { state.redo() }
+        }
         BarButton(ChromeIcons.SkipBack, stringResource(R.string.play_skip_back), cell.tutorialTarget("skip_back")) { state.skipBack() }
         val settings = state.settings
         BarButton(
@@ -41,7 +43,7 @@ fun PlayBar(state: EditorState, modifier: Modifier = Modifier) {
         ) { state.playing = !state.playing }
         BarButton(ChromeIcons.SkipForward, stringResource(R.string.play_skip_forward), cell.tutorialTarget("skip_forward")) { state.skipForward() }
         BarButton(ChromeIcons.CopyPaste, stringResource(R.string.play_copy_paste), cell) { menuOpen = true }
-        Box(cell) {
+        if (!transportOnly) Box(cell) {
             BarButton(
                 if (state.previewPanelOpen) ChromeIcons.PreviewModeOpen else ChromeIcons.PreviewMode, stringResource(R.string.play_preview_mode), Modifier.fillMaxSize(),
                 iconSize = DpSize(24.dp, 36.dp),

@@ -21,6 +21,7 @@ import app.absentmotion.platform.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -194,7 +195,7 @@ fun HomeScreen(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val navInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-    val wide = (LocalWide.current || LocalTablet.current) && wideHeaderFits(androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp, LocalDensity.current.fontScale)
+    val wide = LocalWide.current || LocalTablet.current
 
     val lifecycle = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle
     val replayed = remember { booleanArrayOf(lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
@@ -219,8 +220,7 @@ fun HomeScreen(
     ) {
         Box(Modifier.fillMaxSize().background(Am.HomeBg)) {
             Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars.union(WindowInsets.captionBar))) {
-                if (wide) WideHeader(page, tab, { p, t -> page = p; tab = t; if (p >= 2) search = null }, onSettings = { scope.launch { drawer.open() } }, onNew = newProject, search, { search = it }, settings)
-                else TopBar(onMenu = { scope.launch { drawer.open() } }, search, page, { search = it }, settings)
+                TopBar(onMenu = { scope.launch { drawer.open() } }, search, page, { search = it }, settings)
                 val fill = Modifier.weight(1f)
                 if (page == 3) CommunitySoon(fill)
                 else if (page == 2) ToolsTab(fill, store, settings) { id -> version++; onOpen(id) }
@@ -242,9 +242,9 @@ fun HomeScreen(
                     wide = wide,
                     usedBy = store::linkedBy,
                 )
-                Spacer(Modifier.height(if (wide) navInset else BarHeight + navInset))
+                Spacer(Modifier.height(BarHeight + navInset))
             }
-            if (!wide) BottomBar(onNew = newProject, page, { page = it; if (it >= 2) search = null }, Modifier.align(Alignment.BottomCenter), navInset)
+            BottomBar(onNew = newProject, page, { page = it; if (it >= 2) search = null }, Modifier.align(Alignment.BottomCenter), navInset, wide)
             if (toReport.isNotEmpty()) ImportDialog(toReport, onDismiss = onImportShown, onOpen = { onImportShown(); toReport.first().let { if (it.template) onTemplate(it.id) else onOpen(it.id) } })
             Presence(creating) {
                 NewProjectSheet(
@@ -259,8 +259,6 @@ fun HomeScreen(
 private var lastTab = 0
 private var lastPage = 0
 private val lastScroll = intArrayOf(0, 0)
-
-internal fun wideHeaderFits(widthDp: Int, fontScale: Float): Boolean = widthDp >= 380 + 460 * fontScale.coerceAtLeast(1f)
 
 @Composable
 private fun TopBar(onMenu: () -> Unit, search: String?, page: Int, onSearch: (String?) -> Unit, settings: AppSettings) {
@@ -344,10 +342,8 @@ private fun ProjectsPane(
 
     Box(modifier.fillMaxWidth().onGloballyPositioned { origin = it.positionInRoot() }) {
         Column(Modifier.fillMaxSize()) {
-            if (!wide) {
-                Spacer(Modifier.height(24.dp))
-                Chips(tab, onTab)
-            }
+            Spacer(Modifier.height(if (wide) 8.dp else 24.dp))
+            Chips(tab, onTab, wide)
             if (loaded && shown.isEmpty() && tab == 0 && settings.xmlUpload && query.isBlank()) {
                 Spacer(Modifier.height(13.dp))
                 Box(Modifier.padding(horizontal = 16.dp).then(if (wide) WideCard else Modifier)) { UploadCard(onUpload) }
@@ -373,7 +369,7 @@ private fun ProjectsPane(
             }
         }
         if (loaded && shown.isEmpty() && query.isNotBlank()) NoMatches(query, if (tab == 1) R.string.search_no_assets else R.string.search_no_projects, Modifier.fillMaxWidth().padding(top = 120.dp), Am.Navy, 17.sp)
-        else if (loaded && shown.isEmpty()) EmptyState(element = tab == 1, arrow = !wide)
+        else if (loaded && shown.isEmpty()) EmptyState(element = tab == 1)
         menu?.let { open ->
             Box(
                 Modifier.fillMaxSize().enterFade()
@@ -469,22 +465,10 @@ internal fun listRows(list: List<ProjectInfo>, byName: Boolean, dates: DateTimeF
     }
 
 @Composable
-private fun Chips(tab: Int, onTab: (Int) -> Unit) {
-    Row(Modifier.padding(start = 16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        Chip(stringResource(R.string.home_tab_projects), tab == 0) { onTab(0) }
-        Chip(stringResource(R.string.home_tab_assets), tab == 1) { onTab(1) }
-    }
-}
-
-@Composable
-internal fun Chip(text: String, selected: Boolean, onClick: () -> Unit) {
-    val shape = RoundedCornerShape(14.dp)
-    Box(
-        Modifier.height(40.dp).shadow(3.dp, shape).clip(shape)
-            .background(animatedColor(if (selected) Am.Navy else Am.Card)).clickable(onClick = onClick).padding(horizontal = 16.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(text, color = animatedColor(if (selected) Am.OnNavy else Grey), fontSize = 18.sp, fontWeight = FontWeight.Medium)
+private fun Chips(tab: Int, onTab: (Int) -> Unit, crisp: Boolean) {
+    Row(Modifier.padding(start = 16.dp), horizontalArrangement = Arrangement.spacedBy(if (crisp) 8.dp else 12.dp)) {
+        Chip(stringResource(R.string.home_tab_projects), tab == 0, crisp) { onTab(0) }
+        Chip(stringResource(R.string.home_tab_assets), tab == 1, crisp) { onTab(1) }
     }
 }
 
@@ -697,7 +681,7 @@ internal fun Modifier.checkerboard(cell: Dp): Modifier = drawWithCache {
 }
 
 @Composable
-private fun EmptyState(element: Boolean, arrow: Boolean = true) {
+private fun EmptyState(element: Boolean) {
     Box(Modifier.fillMaxSize().enterFade()) {
         Column(Modifier.fillMaxWidth().padding(top = 243.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
@@ -709,7 +693,7 @@ private fun EmptyState(element: Boolean, arrow: Boolean = true) {
                 Text(promptText(), color = Am.Navy, fontSize = 17.sp, lineHeight = 22.sp, textAlign = TextAlign.Center)
             }
         }
-        if (arrow) Icon(HomeIcons.ArrowDown, null, Modifier.align(Alignment.BottomCenter).padding(bottom = 28.dp).size(56.dp), tint = Am.HomeInk)
+        Icon(HomeIcons.ArrowDown, null, Modifier.align(Alignment.BottomCenter).padding(bottom = 28.dp).size(56.dp), tint = Am.HomeInk)
     }
 }
 
@@ -724,11 +708,11 @@ private fun promptText(): AnnotatedString {
 }
 
 @Composable
-private fun BottomBar(onNew: () -> Unit, page: Int, onPage: (Int) -> Unit, modifier: Modifier, navInset: Dp) {
+private fun BottomBar(onNew: () -> Unit, page: Int, onPage: (Int) -> Unit, modifier: Modifier, navInset: Dp, wide: Boolean) {
     Box(modifier.fillMaxWidth().height(BarHeight + PlusOverhang + navInset)) {
+        Box(Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(BarHeight + navInset).shadow(8.dp).background(Am.Card))
         Row(
-            Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(BarHeight + navInset)
-                .shadow(8.dp).background(Am.Card).padding(top = 12.dp),
+            Modifier.align(Alignment.BottomCenter).then(if (wide) Modifier.widthIn(max = 600.dp) else Modifier).fillMaxWidth().height(BarHeight + navInset).padding(top = 12.dp),
         ) {
             Box(Modifier.weight(1f), contentAlignment = Alignment.TopCenter) {
                 BarItem(stringResource(R.string.home_tab_projects), if (page == 0) HomeIcons.ProjectsTab else HomeIcons.ProjectsTabOff) { onPage(0) }

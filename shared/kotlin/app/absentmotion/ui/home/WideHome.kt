@@ -1,79 +1,41 @@
 package app.absentmotion.ui.home
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import app.absentmotion.ui.theme.Am
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.res.stringResource
-import app.absentmotion.R
 import app.absentmotion.library.ProjectInfo
-import app.absentmotion.ui.editor.ChromeIcons
-import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Motion
 
 internal val WideCard = Modifier.widthIn(max = 420.dp)
 
 @Composable
-internal fun WideHeader(page: Int, tab: Int, onTab: (page: Int, tab: Int) -> Unit, onSettings: () -> Unit, onNew: () -> Unit, search: String?, onSearch: (String?) -> Unit, settings: app.absentmotion.library.AppSettings) = BoxWithConstraints(Modifier.fillMaxWidth()) {
-    val compact = maxWidth < FullHeaderWidth * LocalDensity.current.fontScale.coerceAtLeast(1f)
-    Row(Modifier.fillMaxWidth().height(72.dp).padding(horizontal = 20.dp), Arrangement.spacedBy(12.dp), Alignment.CenterVertically) {
-        if (!compact) {
-            Text("AbsentMotion", color = Am.Navy, fontSize = 22.sp, fontWeight = FontWeight.Medium, maxLines = 1)
-            Spacer(Modifier.width(16.dp))
-        }
-        Chip(stringResource(R.string.home_tab_projects), page == 0 && tab == 0) { onTab(0, 0) }
-        Chip(stringResource(R.string.home_tab_assets), page == 0 && tab == 1) { onTab(0, 1) }
-        Chip(stringResource(R.string.home_tab_community), page == 3) { onTab(3, tab) }
-        Chip(stringResource(R.string.home_tab_templates), page == 1) { onTab(1, tab) }
-        if (app.absentmotion.platform.PlatformFeatures.tools) Chip(stringResource(R.string.home_tab_tools), page == 2) { onTab(2, tab) }
-        if (search == null) Spacer(Modifier.weight(1f)) else HomeSearchField(search, page == 1, onSearch, Modifier.weight(1f))
-        ChangelogButton(settings)
-        if (page >= 2) Spacer(Modifier.size(50.dp)) else SearchButton(search, onSearch)
-        HeaderButton(stringResource(R.string.home_new_project), HomeIcons.Plus, Am.Accent, Am.OnAccent, compact, onNew)
-        HeaderButton(stringResource(R.string.settings), ChromeIcons.Gear, Am.Card, Am.Navy, compact, onSettings)
-    }
-}
-
-private val FullHeaderWidth = 1300.dp
-
-@Composable
-private fun HeaderButton(label: String, icon: ImageVector, background: Color, content: Color, compact: Boolean, onClick: () -> Unit) {
-    Button(
-        onClick, Modifier.height(40.dp), shape = RoundedCornerShape(14.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = background, contentColor = content),
-        contentPadding = PaddingValues(horizontal = if (compact) 10.dp else 16.dp),
+internal fun AccentPill(text: String, modifier: Modifier = Modifier, enabled: Boolean = true, onClick: () -> Unit) {
+    Box(
+        modifier.height(48.dp).clip(CircleShape).background(if (enabled) Am.Accent else Am.Accent.copy(alpha = 0.4f)).clickable(enabled = enabled, onClick = onClick).padding(horizontal = 24.dp),
+        contentAlignment = Alignment.Center,
     ) {
-        Icon(icon, if (compact) label else null, Modifier.size(20.dp))
-        if (compact) return@Button
-        Spacer(Modifier.width(8.dp))
-        Text(label, fontSize = 15.sp, fontWeight = FontWeight.Medium, maxLines = 1, softWrap = false)
+        Text(text, color = Am.OnAccent, fontSize = 15.sp, fontWeight = FontWeight.Medium, maxLines = 1)
     }
 }
 

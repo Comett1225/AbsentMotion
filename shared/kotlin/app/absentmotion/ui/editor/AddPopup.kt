@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -106,9 +108,30 @@ private val Tabs = listOf(
 )
 
 @Composable
-internal fun AddPopup(state: EditorState, modifier: Modifier = Modifier, library: AddLibrary) {
+internal fun AddPopup(state: EditorState, modifier: Modifier = Modifier, library: AddLibrary, side: Boolean = false) {
     var selectedTab by remember { mutableIntStateOf(0) }
-    BackHandler(state.toolOpen == 0) { state.addOpen = false }
+    BackHandler(!side && state.toolOpen == 0) { state.addOpen = false }
+    if (side) {
+        Row(modifier.background(Am.Panel)) {
+            Column(Modifier.weight(1f).fillMaxHeight()) {
+                Box(Modifier.fillMaxWidth().height(42.dp).background(PopupBar), Alignment.Center) {
+                    Text(stringResource(Tabs[selectedTab].label), color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
+                }
+                Swap(selectedTab, Modifier.weight(1f).fillMaxWidth(), rise = 0.dp) { TabPage(selectedTab, state, library) }
+            }
+            androidx.compose.foundation.layout.BoxWithConstraints(Modifier.width(SideRailWidth).fillMaxHeight().background(PopupBar)) {
+                Column(Modifier.fillMaxSize().verticalScroll(androidx.compose.foundation.rememberScrollState())) {
+                    Column(Modifier.fillMaxWidth().heightIn(min = this@BoxWithConstraints.maxHeight), Arrangement.SpaceBetween) {
+                        Column(Modifier.padding(top = 4.dp)) {
+                            Tabs.forEachIndexed { i, tab -> TabButton(tab, active = i == selectedTab, enabled = true, Modifier.fillMaxWidth().height(58.dp)) { selectedTab = i } }
+                        }
+                        QuickBar(state, Modifier.fillMaxWidth(), close = false)
+                    }
+                }
+            }
+        }
+        return
+    }
     Row(modifier.clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)).background(PopupBar)) {
         Column(Modifier.weight(1f).fillMaxHeight()) {
             androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxWidth().height(58.dp)) {
@@ -118,12 +141,17 @@ internal fun AddPopup(state: EditorState, modifier: Modifier = Modifier, library
                 }
             }
             val body = Modifier.weight(1f).fillMaxWidth().background(Am.Panel).tutorialTarget(if (selectedTab == 1) "add_media" else if (selectedTab == 2) "add_audio" else null)
-            Swap(selectedTab, body, rise = 0.dp) {
-                when (selectedTab) { 0 -> ShapePages(state, Modifier.fillMaxSize()); 1 -> MediaTab(state, Modifier.fillMaxSize(), library); 3 -> ObjectPage(state, Modifier.fillMaxSize()); 4 -> TemplatePage(state, Modifier.fillMaxSize()); 5 -> ToolsPage(state, Modifier.fillMaxSize()); else -> AudioTab(state, Modifier.fillMaxSize(), library) }
-            }
+            Swap(selectedTab, body, rise = 0.dp) { TabPage(selectedTab, state, library) }
         }
         QuickBar(state, Modifier.width(64.dp).fillMaxHeight())
     }
+}
+
+internal val SideRailWidth = 64.dp
+
+@Composable
+private fun TabPage(tab: Int, state: EditorState, library: AddLibrary) {
+    when (tab) { 0 -> ShapePages(state, Modifier.fillMaxSize()); 1 -> MediaTab(state, Modifier.fillMaxSize(), library); 3 -> ObjectPage(state, Modifier.fillMaxSize()); 4 -> TemplatePage(state, Modifier.fillMaxSize()); 5 -> ToolsPage(state, Modifier.fillMaxSize()); else -> AudioTab(state, Modifier.fillMaxSize(), library) }
 }
 
 @Composable
@@ -242,14 +270,14 @@ private fun TemplateCell(template: SavedTemplate, modifier: Modifier, onClick: (
 }
 
 @Composable
-private fun QuickBar(state: EditorState, modifier: Modifier) {
+private fun QuickBar(state: EditorState, modifier: Modifier, close: Boolean = true) {
     var captions by remember { mutableStateOf(false) }
     Column(modifier) {
         QuickItem(R.string.add_quick_freehand_brush, ChromeIcons.Freehand, height = 61.dp, iconTop = 7.dp, labelTop = 35.dp, onClick = { state.startFreehand() })
         QuickItem(R.string.add_quick_pen_tool, ChromeIcons.VectorDrawing, height = 61.dp, iconTop = 6.5.dp, labelTop = 35.dp, onClick = { state.startVectorDrawing() })
         QuickItem(R.string.add_quick_text, ChromeIcons.TextTool, height = 48.dp, iconTop = 4.dp, labelTop = 31.dp, target = "add_text", onClick = { state.addText() })
         QuickItem(R.string.add_quick_captions, ChromeIcons.Captions, height = 48.dp, iconTop = 4.dp, labelTop = 31.dp, onClick = { captions = true })
-        BarButton(ChromeIcons.CloseThick, stringResource(R.string.action_close), Modifier.fillMaxWidth().weight(1f)) { state.addOpen = false }
+        if (close) BarButton(ChromeIcons.CloseThick, stringResource(R.string.action_close), Modifier.fillMaxWidth().weight(1f)) { state.addOpen = false }
     }
     if (captions) CaptionsSheet(state) { captions = false }
 }

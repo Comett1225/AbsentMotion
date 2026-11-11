@@ -251,6 +251,7 @@ fun EffectBrowser(state: EditorState) {
         app.absentmotion.ui.editor.DeskDrop.browserKey = hook
         onDispose { if (app.absentmotion.ui.editor.DeskDrop.browserKey === hook) app.absentmotion.ui.editor.DeskDrop.browserKey = null }
     }
+    val twoPane = !PlatformFeatures.desktop && app.absentmotion.ui.editor.LocalWide.current && androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp >= 900
     Column(Modifier.fillMaxSize().background(BrowserBg).systemBarsPadding().then(if (PlatformFeatures.desktop) Modifier.focusRequester(rootFocus).onKeyEvent(::browserKey).focusable() else Modifier)) {
         helpPage?.let { page -> HelpScreen(page) { helpPage = null } }
         if (PlatformFeatures.desktop) Row(Modifier.fillMaxWidth().height(52.dp).padding(start = 8.dp, end = 6.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -273,7 +274,42 @@ fun EffectBrowser(state: EditorState) {
             if (audio) Spacer(Modifier.size(44.dp))
             else BrowserButton(EffectIcons.Search, stringResource(R.string.home_search), { state.effectDetail = null; detail = null; searching = true })
         }
-        Box(Modifier.fillMaxSize()) {
+        val detailPane: @Composable () -> Unit = {
+        androidx.compose.animation.AnimatedVisibility(
+            detail != null,
+            enter = androidx.compose.animation.slideInHorizontally(androidx.compose.animation.core.tween(300, easing = Motion.EaseOut)) { if (rtl) -it else it },
+            exit = androidx.compose.animation.slideOutHorizontally(androidx.compose.animation.core.tween(240, easing = Motion.EaseIn)) { if (rtl) -it else it },
+        ) {
+            shownDetail?.let { effect ->
+                Column(Modifier.fillMaxSize().background(BrowserBg).pointerInput(Unit) {}.deskVerticalScroll()) {
+                    EffectHero(catalog, effect)
+                    Column(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
+                    Row(Modifier.fillMaxWidth().height(48.dp).clickable { helpPage = "effects/${effect.page}.html" }.padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(ExportIcons.Help, null, Modifier.size(22.dp), tint = Am.OnDark)
+                        Text(stringResource(R.string.effect_help), Modifier.padding(start = 12.dp), color = Am.OnDark, fontSize = 15.sp)
+                    }
+                    if (state.effectDetail == null) Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        Text(stringResource(R.string.standard_settings), Modifier.weight(1f).height(48.dp).alpha(if (effect.available) 1f else 0.35f)
+                            .clickable(enabled = effect.available) { add(effect) }.padding(12.dp), color = Am.OnDark, fontSize = 15.sp)
+                        FavouriteStar(effect.id in favourites, stringResource(R.string.effectbrowser_favorite), Modifier.size(48.dp).clickable { favourite(effect) }.padding(12.dp))
+                    }
+                    if (state.effectDetail == null) effect.presets.forEach { preset ->
+                        Row(Modifier.fillMaxWidth().height(72.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Row(Modifier.weight(1f).fillMaxHeight().alpha(if (effect.available) 1f else 0.35f)
+                                .clickable(enabled = effect.available) { add(effect, preset) }.padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Thumbnail(catalog, effect.thumbnail(preset), Modifier.size(56.dp).clip(RoundedCornerShape(5.dp)))
+                                Text(preset.name, Modifier.weight(1f).padding(start = 12.dp), color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
+                            }
+                            PresetStar(presetFavourites.contains(effect, preset)) { presetFavourites.toggle(effect, preset) }
+                        }
+                    }
+                    }
+                }
+            }
+        }
+        }
+        Row(Modifier.fillMaxSize()) {
+        Box(Modifier.weight(2f).fillMaxHeight()) {
         Swap(page, Modifier.fillMaxSize().effectSwipe(at >= 0, ::swipeStart, ::swipeDrag, ::swipeEnd), rise = if (slid == page || way != 0) 0.dp else 8.dp, shift = if (slid == page) 0.dp else 48.dp * way * (if (rtl) -1 else 1)) {
         if (catalog.message != null && !audio && (app.absentmotion.platform.effectsMessageOnHome() || (category != null && category != "ai" && category != "audio" && category != "voice" && !searching))) {
             Box(Modifier.fillMaxSize().then(slide).padding(24.dp), contentAlignment = Alignment.Center) {
@@ -282,7 +318,7 @@ fun EffectBrowser(state: EditorState) {
         } else if (!searching && (category == "audio" || category == "voice")) {
             val effects = layer?.audioEffects.orEmpty()
             val audioGrid = grids.getOrPut(category.orEmpty()) { androidx.compose.foundation.lazy.grid.LazyGridState() }
-            LazyVerticalGrid(if (PlatformFeatures.desktop) GridCells.Adaptive(120.dp) else GridCells.Fixed(3), Modifier.fillMaxSize().then(slide).deskScrollbar(audioGrid), audioGrid, contentPadding = PaddingValues(if (PlatformFeatures.desktop) 16.dp else 10.dp)) {
+            LazyVerticalGrid(if (PlatformFeatures.desktop || twoPane) GridCells.Adaptive(120.dp) else GridCells.Fixed(3), Modifier.fillMaxSize().then(slide).deskScrollbar(audioGrid), audioGrid, contentPadding = PaddingValues(if (PlatformFeatures.desktop) 16.dp else 10.dp)) {
                 if (category == "audio") {
                     item(key = "voice-category", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) { AudioFolderTile(voiceName, VoiceOrder.count { it != FxKind.Voice } + VoicePresets.size) { fromAudio = true; category = "voice" } }
                     itemsIndexed(AudioOrder) { i, kind ->
@@ -299,7 +335,7 @@ fun EffectBrowser(state: EditorState) {
             val results = if (audio) emptyList() else if (searching) byName + byPreset else catalog.listed(category).sortedBy { it.name.lowercase() }
             val actions = if (app.absentmotion.platform.PlatformFeatures.ai && (searching || category == "ai")) AiAction.entries.filter { it.offered && (!audio || it == AiAction.Noise) && matchesSearch(query, stringResource(it.title)) } else emptyList()
             val resultGrid = grids.getOrPut(if (searching) "search:$query" else category.orEmpty()) { androidx.compose.foundation.lazy.grid.LazyGridState() }
-            LazyVerticalGrid(if (PlatformFeatures.desktop) GridCells.Adaptive(120.dp) else GridCells.Fixed(3), Modifier.fillMaxSize().then(slide).deskScrollbar(resultGrid), resultGrid, contentPadding = PaddingValues(if (PlatformFeatures.desktop) 16.dp else 10.dp)) {
+            LazyVerticalGrid(if (PlatformFeatures.desktop || twoPane) GridCells.Adaptive(120.dp) else GridCells.Fixed(3), Modifier.fillMaxSize().then(slide).deskScrollbar(resultGrid), resultGrid, contentPadding = PaddingValues(if (PlatformFeatures.desktop) 16.dp else 10.dp)) {
                 if (app.absentmotion.platform.PlatformFeatures.ai && hasSound && (category == "ai" || searching && matchesSearch(query, context.getString(R.string.auto_captions)))) {
                     item(key = "ai-captions") { AudioTile(stringResource(R.string.auto_captions), 5, true) { state.playing = false; captionClip = layer.id } }
                 }
@@ -314,8 +350,8 @@ fun EffectBrowser(state: EditorState) {
                 Row(Modifier.fillMaxWidth().height(186.dp).background(RecommendedBg).horizontalScroll(rememberScrollState()).padding(start = 7.5.dp, top = 16.dp), Arrangement.spacedBy(15.dp)) {
                     recommended.forEach { effect -> EffectTile(catalog, effect, 121f, { pick(effect) }, { detail = effect }, effect.id in favourites) }
                 }
-                Box(Modifier.fillMaxWidth().height(210.dp).pageSwipe(favPage, rtl) { favPage = it }) {
-                    Crossfade(favPage, Modifier.matchParentSize(), animationSpec = tween(Motion.FastMs), label = "pages") { fav ->
+                Box(Modifier.fillMaxWidth().height(210.dp).then(if (twoPane) Modifier else Modifier.pageSwipe(favPage, rtl) { favPage = it })) {
+                    Crossfade(favPage && !twoPane, Modifier.matchParentSize(), animationSpec = tween(Motion.FastMs), label = "pages") { fav ->
                     Box(Modifier.fillMaxSize()) {
                     val shown = if (fav) presetFavourites.resolve(catalog.definitions).map { it.first to it.second } +
                         favourites.mapNotNull(catalog::find).map { it to null } else recent.mapNotNull(catalog::find).distinct().take(10).map { it to null }
@@ -349,9 +385,9 @@ fun EffectBrowser(state: EditorState) {
                         Modifier.align(Alignment.Center).padding(horizontal = 24.dp), color = Am.OnDarkDim, fontSize = 13.sp, textAlign = TextAlign.Center)
                     }
                     }
-                    PageDots(favPage, rtl, tick, Modifier.align(Alignment.BottomCenter)) { favPage = it }
+                    if (!twoPane) PageDots(favPage, rtl, tick, Modifier.align(Alignment.BottomCenter)) { favPage = it }
                 }
-                listed.chunked(2).forEach { row ->
+                listed.chunked(if (twoPane) 4 else 2).forEach { row ->
                     Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(1.5.dp)) {
                         row.forEach { (key, name) ->
                             val press = remember { MutableInteractionSource() }
@@ -364,43 +400,22 @@ fun EffectBrowser(state: EditorState) {
                                 Text(name, color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
                             }
                         }
-                        if (row.size == 1) Spacer(Modifier.weight(1f))
+                        repeat((if (twoPane) 4 else 2) - row.size) { Spacer(Modifier.weight(1f)) }
                     }
                 }
             }
         }
         }
-        androidx.compose.animation.AnimatedVisibility(
-            detail != null,
-            enter = androidx.compose.animation.slideInHorizontally(androidx.compose.animation.core.tween(300, easing = Motion.EaseOut)) { if (rtl) -it else it },
-            exit = androidx.compose.animation.slideOutHorizontally(androidx.compose.animation.core.tween(240, easing = Motion.EaseIn)) { if (rtl) -it else it },
-        ) {
-            shownDetail?.let { effect ->
-                Column(Modifier.fillMaxSize().background(BrowserBg).pointerInput(Unit) {}.deskVerticalScroll()) {
-                    EffectHero(catalog, effect)
-                    Column(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
-                    Row(Modifier.fillMaxWidth().height(48.dp).clickable { helpPage = "effects/${effect.page}.html" }.padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(ExportIcons.Help, null, Modifier.size(22.dp), tint = Am.OnDark)
-                        Text(stringResource(R.string.effect_help), Modifier.padding(start = 12.dp), color = Am.OnDark, fontSize = 15.sp)
-                    }
-                    if (state.effectDetail == null) Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        Text(stringResource(R.string.standard_settings), Modifier.weight(1f).height(48.dp).alpha(if (effect.available) 1f else 0.35f)
-                            .clickable(enabled = effect.available) { add(effect) }.padding(12.dp), color = Am.OnDark, fontSize = 15.sp)
-                        FavouriteStar(effect.id in favourites, stringResource(R.string.effectbrowser_favorite), Modifier.size(48.dp).clickable { favourite(effect) }.padding(12.dp))
-                    }
-                    if (state.effectDetail == null) effect.presets.forEach { preset ->
-                        Row(Modifier.fillMaxWidth().height(72.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Row(Modifier.weight(1f).fillMaxHeight().alpha(if (effect.available) 1f else 0.35f)
-                                .clickable(enabled = effect.available) { add(effect, preset) }.padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                                Thumbnail(catalog, effect.thumbnail(preset), Modifier.size(56.dp).clip(RoundedCornerShape(5.dp)))
-                                Text(preset.name, Modifier.weight(1f).padding(start = 12.dp), color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
-                            }
-                            PresetStar(presetFavourites.contains(effect, preset)) { presetFavourites.toggle(effect, preset) }
-                        }
-                    }
-                    }
-                }
+        if (!twoPane) detailPane()
+        }
+        if (twoPane) Box(Modifier.weight(1f).fillMaxHeight().background(RecommendedBg)) {
+            val starred = presetFavourites.resolve(catalog.definitions).map { it.first to it.second } + favourites.mapNotNull(catalog::find).map { it to null }
+            if (starred.isEmpty()) Text(stringResource(R.string.effectbrowser_favorite_empty), Modifier.align(Alignment.Center).padding(horizontal = 24.dp), color = Am.OnDarkDim, fontSize = 15.sp, textAlign = TextAlign.Center)
+            else LazyVerticalGrid(GridCells.Adaptive(110.dp), Modifier.fillMaxSize(), contentPadding = PaddingValues(10.dp)) {
+                item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) { Text(stringResource(R.string.effectbrowser_favorite), Modifier.padding(start = 6.dp, top = 6.dp, bottom = 10.dp), color = Am.OnDark, fontSize = 15.sp, fontWeight = FontWeight.Medium) }
+                items(starred) { (effect, preset) -> EffectTile(catalog, effect, 100f, { if (preset == null) pick(effect) else if (effect.available) add(effect, preset) else detail = effect }, { detail = effect }, true, preset) }
             }
+            detailPane()
         }
         }
     }

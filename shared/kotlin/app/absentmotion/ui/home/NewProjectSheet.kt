@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -219,12 +220,16 @@ fun NewProjectSheet(
     val form = remember(opening) { Form(settings.newProject, existingTitles, DefaultNames(context), initialElement) }
     val scope = rememberCoroutineScope()
     var creating by remember { mutableStateOf(false) }
+    val card = app.absentmotion.ui.editor.LocalTablet.current
     Box(Modifier.fillMaxSize()) {
         Box(Modifier.fillMaxSize().presenceScrim(Color.Black.copy(alpha = 0.7f)).pointerInput(Unit) { detectTapGestures { } })
-        BoxWithConstraints(Modifier.align(Alignment.BottomCenter).widthIn(max = 480.dp).presence(slide = 1f, fade = false)) {
+        BoxWithConstraints(
+            if (card) Modifier.align(Alignment.Center).windowInsetsPadding(WindowInsets.systemBars.union(WindowInsets.ime)).padding(24.dp).widthIn(max = 480.dp).presence(scaleFrom = 0.96f)
+            else Modifier.align(Alignment.BottomCenter).widthIn(max = 480.dp).presence(slide = 1f, fade = false),
+        ) {
             val density = LocalDensity.current
             CompositionLocalProvider(LocalDensity provides Density(density.density * minOf(1f, maxWidth / SheetWidth), density.fontScale)) {
-                SheetBody(form, settings, onClose, onCreate = create@{
+                SheetBody(form, settings, card, onClose, onCreate = create@{
                     if (creating) return@create
                     creating = true
                     settings.newProject = form.choice()
@@ -250,12 +255,19 @@ fun NewProjectSheet(
 }
 
 @Composable
-private fun SheetBody(form: Form, settings: AppSettings, onClose: () -> Unit, onCreate: () -> Unit) {
+private fun SheetBody(form: Form, settings: AppSettings, card: Boolean, onClose: () -> Unit, onCreate: () -> Unit) {
     Column(
-        Modifier.fillMaxWidth().clip(RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp)).background(Am.SheetBg)
+        if (card) Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(Am.SheetBg).verticalScroll(rememberScrollState())
+        else Modifier.fillMaxWidth().clip(RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp)).background(Am.SheetBg)
             .windowInsetsPadding(WindowInsets.navigationBars.union(WindowInsets.ime)).verticalScroll(rememberScrollState()),
     ) {
-        Spacer(Modifier.height(30.dp))
+        if (card) Row(Modifier.padding(start = 20.dp, top = 12.dp).height(48.dp), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(48.dp).clip(CircleShape).clickable(onClick = onClose), contentAlignment = Alignment.Center) {
+                Icon(HomeIcons.Close, stringResource(R.string.cancel), Modifier.size(22.dp), tint = Am.Navy)
+            }
+            Text(stringResource(R.string.home_new_project), Modifier.padding(start = 4.dp), color = Am.Navy, fontSize = 20.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+        }
+        Spacer(Modifier.height(if (card) 12.dp else 30.dp))
         TypeToggle(form)
         Spacer(Modifier.height(35.dp))
         NameField(form)
@@ -271,6 +283,12 @@ private fun SheetBody(form: Form, settings: AppSettings, onClose: () -> Unit, on
         Spacer(Modifier.height(16.dp))
         FormRow(stringResource(R.string.newproject_background)) { BackgroundField(form) }
         Spacer(Modifier.height(16.dp))
+        if (card) {
+            Spacer(Modifier.height(12.dp))
+            AccentPill(stringResource(if (form.element) R.string.newproject_create_asset else R.string.newproject_create_project), Modifier.padding(horizontal = 32.dp).fillMaxWidth(), onClick = onCreate)
+            Spacer(Modifier.height(32.dp))
+            return@Column
+        }
         Row(Modifier.padding(horizontal = 32.dp).fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             Box(Modifier.height(48.dp).clickable(onClick = onCreate), contentAlignment = Alignment.Center) {
                 Text(stringResource(if (form.element) R.string.newproject_create_asset else R.string.newproject_create_project), color = Ink, fontSize = 15.sp, fontWeight = FontWeight.Medium)

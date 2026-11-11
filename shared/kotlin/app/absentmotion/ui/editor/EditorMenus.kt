@@ -477,7 +477,8 @@ private fun SettingsPanel(state: EditorState, onDismiss: () -> Unit, modifier: M
     }
     Column(
         modifier.fillMaxWidth().height(if (scene.isElement) 447.dp else 377.dp).clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)).background(MenuBg)
-            .pointerInput(Unit) { detectTapGestures { } },
+            .pointerInput(Unit) { detectTapGestures { } }
+            .padding(horizontal = if (LocalWide.current) ((androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp.dp - 420.dp) / 2).coerceAtLeast(0.dp) else 0.dp),
     ) {
         Box(Modifier.size(40.dp).clickable(onClick = onDismiss), Alignment.Center) {
             Icon(ChromeIcons.Close, stringResource(R.string.action_close), Modifier.size(24.dp), tint = Am.OnDark)

@@ -5,6 +5,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -62,6 +65,10 @@ private val SideWidth = PhoneWidth
 @Composable
 internal fun WideEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: AddLibrary) {
     BoxWithConstraints(Modifier.fillMaxSize().background(Am.TopBar).systemBarsPadding().displayCutoutPadding()) {
+        if (railEditor(maxWidth, maxHeight)) {
+            RailEditorBody(state, onExit, addLibrary, (maxHeight - 88.dp - 260.dp).coerceIn(140.dp, 320.dp))
+            return@BoxWithConstraints
+        }
         val portrait = maxHeight > maxWidth
         val timeline = if (portrait) ((maxHeight - 88.dp) * 0.45f).coerceIn(260.dp, 640.dp) else (maxHeight - 88.dp - 260.dp).coerceIn(140.dp, 320.dp)
         val textEdit = state.panel == EditorPanel.EditText && state.selected?.kind == "text"
@@ -94,6 +101,59 @@ internal fun WideEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: 
         }
         if (textEdit && textUi.browser) PhoneScreen { Box(Modifier.fillMaxSize().enterFade(rise = 12.dp)) { TextFontBrowser(state, textUi) } }
     }
+}
+
+internal fun railEditor(width: Dp, height: Dp): Boolean = width > height && width >= RailEditorWidth
+
+private val RailEditorWidth = 960.dp
+internal val LeftRailWidth = 55.dp
+
+@Composable
+private fun RailEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: AddLibrary, timeline: Dp) {
+    val textEdit = state.panel == EditorPanel.EditText && state.selected?.kind == "text"
+    val textUi = remember { TextEditUi() }
+    val layerSide = textEdit || state.drawing is app.absentmotion.editor.PointMode || MultiSelect.active || (state.selectedId != null && !state.addOpen)
+    Row(Modifier.fillMaxSize()) {
+        Column(Modifier.width(LeftRailWidth).fillMaxHeight().background(Am.Button).tutorialGuard(any = true)) {
+            BarButton(ChromeIcons.Exit, stringResource(R.string.topbar_exit_to_project_list), Modifier.fillMaxWidth().height(42.dp)) { onExit() }
+            PreviewModePanel(state, Modifier.weight(1f))
+            BarButton(ChromeIcons.Undo, stringResource(R.string.play_undo), Modifier.fillMaxWidth().height(46.dp).tutorialTarget("undo"), enabled = state.canUndo) { state.undo() }
+            BarButton(ChromeIcons.Redo, stringResource(R.string.play_redo), Modifier.fillMaxWidth().height(46.dp).tutorialTarget("redo"), enabled = state.canRedo) { state.redo() }
+        }
+        Column(Modifier.weight(1f).fillMaxHeight()) {
+            EditorTopBar(state, onExit, Modifier.fillMaxWidth().height(42.dp).enterFade().tutorialGuard(any = true), BarPlace.Project)
+            Box(Modifier.fillMaxWidth().weight(1f)) {
+                Preview(state, Modifier.fillMaxSize().tutorialTarget("preview"))
+                (state.drawing as? app.absentmotion.editor.PointMode)?.let { PointOverlay(state, it, Modifier.fillMaxSize()) }
+                MasterMeter(state, 0.dp)
+                AnimateButton(state, Modifier.align(Alignment.BottomEnd))
+                if (state.settings.transitionInPreview) TransitionButton(state, Modifier.align(Alignment.BottomStart).padding(12.dp).tutorialTarget("transition"))
+                HistoryNotes(state, Modifier.align(Alignment.BottomCenter))
+            }
+            Box(Modifier.fillMaxWidth().height(46.dp).background(Am.TimelineBg)) {
+                PlayBar(state, Modifier.align(Alignment.Center).widthIn(max = 360.dp).fillMaxSize().tutorialTarget("playbar").tutorialGuard(any = true), transportOnly = true)
+                if (!state.settings.transitionInPreview) TransitionButton(state, Modifier.align(Alignment.CenterEnd).padding(end = 12.dp).tutorialTarget("transition"), compact = true)
+                LevelMeter(state, Modifier.align(Alignment.BottomStart).fillMaxWidth().height(2.1.dp))
+            }
+            Box(Modifier.fillMaxWidth().height(timeline).background(Am.TimelineBg).tutorialTarget("timeline")) { Timeline(state, Modifier.fillMaxSize()) }
+        }
+        Box(Modifier.width(SideWidth + SideRailWidth).fillMaxHeight().background(Am.Panel).pointerInput(Unit) {}) {
+            if (!layerSide) AddPopup(state, Modifier.fillMaxSize().tutorialTarget("add"), addLibrary, side = true)
+            else Row(Modifier.fillMaxSize().tutorialTarget("side_panel")) {
+                Column(Modifier.width(SideWidth).fillMaxHeight()) {
+                    EditorTopBar(state, onExit, Modifier.fillMaxWidth().height(42.dp).tutorialGuard(any = true), BarPlace.Layer)
+                    BoxWithConstraints(Modifier.fillMaxWidth().weight(1f)) {
+                        CompositionLocalProvider(LocalSideHeight provides maxHeight) {
+                            if (textEdit) TextEditor(state, textUi, embedded = true)
+                            else LowerPanels(state, addLibrary, top = true)
+                        }
+                    }
+                }
+                PanelRail(state, Modifier.width(SideRailWidth).fillMaxHeight())
+            }
+        }
+    }
+    if (textEdit && textUi.browser) PhoneScreen { Box(Modifier.fillMaxSize().enterFade(rise = 12.dp)) { TextFontBrowser(state, textUi) } }
 }
 
 @Composable

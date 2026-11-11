@@ -281,6 +281,42 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
     AiProgressDialog(ai)
 }
 
+@Composable
+internal fun PanelRail(state: EditorState, modifier: Modifier) {
+    val layer = state.selected
+    val panels = when {
+        layer == null || app.absentmotion.editor.MultiSelect.active || state.drawing != null -> emptyList()
+        else -> when (layer.kind) {
+            "audio" -> emptyList()
+            "camera" -> listOf(CameraOptions to EditorPanel.Camera, MoveTransform to EditorPanel.MoveTransform, Effects to EditorPanel.Effects)
+            "model" -> listOf(ModelOptions to EditorPanel.Model, Blending to EditorPanel.Blending, MoveTransform to EditorPanel.MoveTransform, Effects to EditorPanel.Effects)
+            "light" -> listOf(LightOptions to EditorPanel.Light, MoveTransform to EditorPanel.MoveTransform)
+            "nullobj" -> listOf(MoveTransform to EditorPanel.MoveTransform, Effects to EditorPanel.Effects)
+            else -> listOf(ColorFill to EditorPanel.ColorFill, BorderShadow to EditorPanel.BorderShadow, Blending to EditorPanel.Blending, MoveTransform to EditorPanel.MoveTransform, Effects to EditorPanel.Effects)
+        }
+    }
+    Column(modifier.background(Am.Button).verticalScroll(androidx.compose.foundation.rememberScrollState()).padding(top = 4.dp)) {
+        if (layer != null && !app.absentmotion.editor.MultiSelect.active && state.drawing == null) RailButton(ChromeIcons.More, stringResource(R.string.topbar_layer_menu), state.panel == EditorPanel.Tools) { state.volumeOpen = false; state.panel = EditorPanel.Tools }
+        for ((tool, panel) in panels) RailButton(tool.icon, stringResource(tool.label), state.panel == panel) {
+            if (panel == EditorPanel.Effects) state.effectIndex = -1
+            state.volumeOpen = false
+            state.panel = panel
+        }
+    }
+}
+
+@Composable
+private fun RailButton(icon: ImageVector, label: String, active: Boolean, onClick: () -> Unit) {
+    val tint = if (active) Am.Accent else Am.OnDark
+    Column(Modifier.fillMaxWidth().height(58.dp).tutorialGuard().clickable(onClick = onClick), horizontalAlignment = Alignment.CenterHorizontally) {
+        Spacer(Modifier.height(6.5.dp))
+        androidx.compose.material3.Icon(icon, null, Modifier.size(24.dp), tint = tint)
+        Spacer(Modifier.height(5.dp))
+        Text(label, Modifier.fillMaxWidth().padding(horizontal = 2.dp), color = tint, fontSize = 9.sp, lineHeight = 10.5.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center, maxLines = 2)
+    }
+}
+
 internal fun sideColumns(count: Int, available: Dp): Int =
     (2..3).firstOrNull { columns -> SideToolsTop + SideToolsRow * ((count + columns - 1) / columns) <= available } ?: 4
 
