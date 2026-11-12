@@ -71,7 +71,7 @@ data class EffectParam(
     }
 }
 
-data class EffectShortcut(val key: String, val name: String, val description: String, val since: String? = null)
+data class EffectShortcut(val key: String, val name: String, val description: String, val since: String? = null, val also: List<String> = emptyList())
 
 data class EffectPreset(
     val name: String, val values: Map<String, String>, val keys: Map<String, List<Keyframe>>,
@@ -93,13 +93,14 @@ data class EffectDefinition(
     val page: String = key,
     val shortcuts: List<EffectShortcut> = emptyList(),
     val shortcut: String? = null,
+    val alsoIn: List<String> = emptyList(),
 ) {
     val available: Boolean get() = status == "ok"
     val thumbnail: String get() = "thumb/${shortcut ?: key}.webp"
     val hero: String get() = "thumb/${shortcut ?: key}.hero.avif"
 
     fun shortcutTiles(): List<EffectDefinition> = shortcuts.map { s ->
-        copy(name = s.name, description = s.description, since = s.since ?: since, shortcut = s.key, shortcuts = emptyList())
+        copy(name = s.name, description = s.description, since = s.since ?: since, shortcut = s.key, shortcuts = emptyList(), alsoIn = s.also)
     }
 
     fun thumbnail(preset: EffectPreset): String = "thumb/$key.${preset.slug}.webp"
@@ -161,7 +162,11 @@ data class EffectDefinition(
                 presets = List(presets.length()) { preset(key, parsed, presets.getJSONObject(it)) },
                 page = json.optString("name", key).lowercase(Locale.US).replace(Regex("[^a-z0-9]"), ""),
                 shortcuts = List(shortcuts.length()) { i ->
-                    shortcuts.getJSONObject(i).let { s -> EffectShortcut(s.getString("key"), s.getString("name"), s.optString("description"), s.optString("since").takeIf { it.isNotBlank() }) }
+                    shortcuts.getJSONObject(i).let { s ->
+                        val also = s.optJSONArray("also") ?: JSONArray()
+                        EffectShortcut(s.getString("key"), s.getString("name"), s.optString("description"), s.optString("since").takeIf { it.isNotBlank() },
+                            List(also.length()) { also.getString(it) }.onEach { require(it in EffectCatalog.Categories) { "$key shortcut: unknown category $it" } })
+                    }
                 })
         }
 

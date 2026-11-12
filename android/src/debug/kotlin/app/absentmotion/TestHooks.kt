@@ -297,6 +297,7 @@ internal object TestHooks {
             if (intent.getBooleanExtra("openexport", false)) state.exportOpen = true
             if (intent.hasExtra("select")) state.selectedId = intent.getLongExtra("select", 0L)
             if (intent.getBooleanExtra("openeffects", false)) state.effectBrowserOpen = true
+            if (intent.hasExtra("effect")) { state.effectIndex = intent.getIntExtra("effect", 0); state.panel = app.absentmotion.editor.EditorPanel.Effects }
             intent.getStringExtra("clipsmooth")?.let { method -> launch { checkClipSmooth(activity, state, method, intent.getStringExtra("smoothlevel"), intent.getStringExtra("smoothblur")) } }
             intent.getStringExtra("svgimport")?.let { svg ->
                 launch {

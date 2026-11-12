@@ -112,6 +112,9 @@ internal fun turnFor(layer: Layer, catalog: EffectCatalog, tab: Int, threeD: Boo
 
 private val TURN_AXES = listOf("rotX", "rotY", "rotZ")
 
+internal fun effectTurn(definition: app.absentmotion.effects.EffectDefinition, index: Int): Turn? =
+    TURN_AXES.map { id -> definition.params.firstOrNull { it.id == id } ?: return null }.let { Turn(index, it) }
+
 internal const val TURN_PER_DP = 0.5f
 
 internal fun turnStep(dx: Float, dy: Float, twist: Float, z: Float): FloatArray {

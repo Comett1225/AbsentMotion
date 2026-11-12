@@ -26,7 +26,7 @@ data class EffectCatalog(
     private val tiles: List<EffectDefinition> get() = definitions + definitions.flatMap { it.shortcutTiles() }
 
     fun listed(category: String? = null): List<EffectDefinition> =
-        tiles.filter { category == null || it.category == category || (category == "new" && isNew(it)) }
+        tiles.filter { category == null || it.category == category || category in it.alsoIn || (category == "new" && isNew(it)) }
 
     fun search(query: String): List<EffectDefinition> {
         val all = tiles

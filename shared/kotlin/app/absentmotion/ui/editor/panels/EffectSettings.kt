@@ -69,6 +69,8 @@ internal fun EffectSettings(state: EditorState, layer: Layer, instance: XmlNode,
                             active: EffectParam?, select: (EffectParam) -> Unit) {
     val displayed = app.absentmotion.ui.editor.linkedNumbers(state, layer, definition.params.map { PropRef.effect(state.effectIndex, it.id) })
     val enabled = definition.available
+    val turn = effectTurn(definition, state.effectIndex)
+    if (turn != null && enabled) TurnHook(state, turn)
     if (definition.category != "move" && !(definition.native && definition.category == "repeat") && state.scene.hasChildren(layer)) {
         Row(Modifier.fillMaxWidth().height(38.dp).padding(horizontal = 8.dp).alpha(if (enabled) 1f else 0.35f), verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(R.string.apply_to_children), Modifier.weight(1f), color = Am.OnDark, fontSize = 14.sp)

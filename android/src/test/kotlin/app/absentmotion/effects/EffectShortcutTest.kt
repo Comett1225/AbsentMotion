@@ -28,6 +28,8 @@ class EffectShortcutTest {
         assertEquals(null, catalog.find("absent.rasterextrude")!!.shortcut)
         assertTrue(catalog.search("3D text").first().shortcut == "text3d")
         assertTrue(catalog.listed("new").any { it.shortcut == "text3d" })
+        assertTrue(catalog.listed("text").any { it.shortcut == "text3d" })
+        assertTrue(catalog.listed("text").none { it.id == "absent.rasterextrude" && it.shortcut == null })
         assertEquals(catalog.listed("3d").size, catalog.listed("3d").map { it.shortcut ?: it.id }.toSet().size)
     }
 

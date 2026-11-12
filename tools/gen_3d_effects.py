@@ -493,7 +493,7 @@ EFFECTS += [
 SHORTCUTS = {
     "rasterextrude": [{"key": "text3d", "name": "3D Text",
                        "description": "Turns a text layer into solid 3D letters you can turn in 3D. It adds Raster Extrude, which works on any layer.",
-                       "since": "5.1.0"}],
+                       "since": "5.1.0", "also": ["text"]}],
 }
 
 ORDER = ["cube", "box", "hollowbox", "cylinder", "ellipsoid", "torus", "pyramid", "octahedron", "hexprism", "starprism",
