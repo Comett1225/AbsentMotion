@@ -1,12 +1,15 @@
 package app.absentmotion.export
 
 import androidx.annotation.StringRes
+import app.absentmotion.Feature
 import app.absentmotion.R
+import app.absentmotion.Risk
+import app.absentmotion.Tier
 import app.absentmotion.i18n.UiText
 import app.absentmotion.i18n.txt
 import java.util.Locale
 
-data class Choice<T>(val value: T, val reason: UiText? = null, val locked: Boolean = false) {
+data class Choice<T>(val value: T, val reason: UiText? = null, val risky: Boolean = false) {
     val enabled: Boolean get() = reason == null
 }
 
@@ -30,7 +33,23 @@ fun listed(items: List<String>, @StringRes join: Int): Any =
 private fun ExportSettings.fitAudio(): ExportSettings =
     if (audio.codec in audioCodecsFor(container)) this else copy(audio = audio.copy(codec = audioCodecsFor(container).first()))
 
-private fun unsupported(support: Support): UiText? = (support as? Support.Unsupported)?.takeIf { !it.sound }?.reason
+private fun <T> choice(value: T, support: Support): Choice<T> =
+    (support as? Support.Unsupported)?.takeIf { !it.sound }.let { Choice(value, it?.reason, it?.risky == true) }
+
+val SmoothedKinds = setOf(ExportKind.Video, ExportKind.Gif, ExportKind.Sequence)
+
+fun exportRisks(kind: ExportKind, s: ExportSettings, support: Support): List<Risk> = listOfNotNull(
+    Tier.risk(Feature.AiSmooth).takeIf { kind in SmoothedKinds && s.interpolation == FrameInterpolation.Ai },
+    Tier.risk(Feature.FlowHigh).takeIf { kind in SmoothedKinds && s.interpolation == FrameInterpolation.Flow && s.interpolationLevel == SmoothLevel.High },
+    (support as? Support.Unsupported)?.takeIf { kind == ExportKind.Video && it.risky }?.let { Risk("${s.container} ${s.codec} ${s.shortSide}", it.reason) },
+)
+
+fun savable(s: ExportSettings, safe: ExportSettings, support: Support): ExportSettings {
+    val smooth = if (exportRisks(ExportKind.Video, s, Support.Supported).isEmpty()) s else safe
+    val format = if ((support as? Support.Unsupported)?.risky == true) safe else s
+    return s.copy(interpolation = smooth.interpolation, interpolationLevel = smooth.interpolationLevel,
+        shortSide = format.shortSide, codec = format.codec, container = format.container, audio = s.audio.copy(codec = format.audio.codec))
+}
 
 fun containerChoices(s: ExportSettings, check: (ExportSettings) -> Support): List<Choice<Container>> = Container.entries.map { c ->
     val codecs = videoCodecsFor(c)
@@ -40,21 +59,22 @@ fun containerChoices(s: ExportSettings, check: (ExportSettings) -> Support): Lis
         results.any { it !is Support.Unsupported } -> null
         noSound != null -> noSound
         else -> txt(R.string.export_reason_container_codecs, c.label, listed(codecs.map { it.shortName }, R.string.export_list_or), sizeLabel(s.shortSide))
-    })
+    }, risky = noSound == null && results.all { it is Support.Unsupported } && results.any { (it as Support.Unsupported).risky })
 }
 
 fun withContainer(s: ExportSettings, c: Container, check: (ExportSettings) -> Support): ExportSettings {
     val sounds = (listOf(s.audio.codec) + audioCodecsFor(c)).distinct().filter { it in audioCodecsFor(c) }
     val options = (listOf(s.codec) + videoCodecsFor(c)).distinct().filter { it in videoCodecsFor(c) }
         .flatMap { codec -> sounds.map { s.copy(container = c, codec = codec, audio = s.audio.copy(codec = it)) } }
-    return options.firstOrNull { check(it) is Support.Supported } ?: options.firstOrNull { check(it) !is Support.Unsupported } ?: options.first()
+    return options.firstOrNull { check(it) is Support.Supported } ?: options.firstOrNull { check(it) !is Support.Unsupported }
+        ?: options.firstOrNull { (check(it) as? Support.Unsupported)?.risky == true } ?: options.first()
 }
 
 fun codecChoices(s: ExportSettings, check: (ExportSettings) -> Support): List<Choice<Codec>> =
-    videoCodecsFor(s.container).map { Choice(it, unsupported(check(s.copy(codec = it)))) }
+    videoCodecsFor(s.container).map { choice(it, check(s.copy(codec = it))) }
 
 fun resolutionChoices(s: ExportSettings, check: (ExportSettings) -> Support): List<Choice<Resolution>> =
-    VideoResolutions.map { Choice(it, unsupported(check(s.copy(shortSide = it.shortSide)))) }
+    VideoResolutions.map { choice(it, check(s.copy(shortSide = it.shortSide))) }
 
 fun audioCodecChoices(container: Container, hasEncoder: (String) -> Boolean): List<Choice<AudioCodec>> = AudioCodec.entries.map { a ->
     Choice(a, when {
@@ -87,7 +107,7 @@ fun audioFormatChoices(hasEncoder: (String) -> Boolean): List<Choice<AudioFormat
 fun codecWarning(s: ExportSettings, support: Support): UiText? = when (support) {
     Support.Supported -> null
     is Support.SlowSoftwareOnly -> txt(R.string.export_warning_slow, s.codec.shortName, sizeLabel(s.shortSide), "${s.fps}")
-    is Support.Unsupported -> txt(R.string.export_warning_unsupported, support.reason)
+    is Support.Unsupported -> if (support.risky) support.reason else txt(R.string.export_warning_unsupported, support.reason)
 }
 
 fun betterChoice(s: ExportSettings, support: Support, check: (ExportSettings) -> Support): ExportSettings? {
@@ -111,7 +131,7 @@ fun suggestionLabel(from: ExportSettings, to: ExportSettings): UiText = listOfNo
 
 fun exportBlock(storage: StorageStatus, support: Support): UiText? = when {
     storage is StorageStatus.NotEnough -> txt(R.string.export_block_storage)
-    support is Support.Unsupported -> txt(R.string.export_block_unsupported)
+    support is Support.Unsupported && !support.risky -> txt(R.string.export_block_unsupported)
     else -> null
 }
 

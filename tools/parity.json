@@ -971,6 +971,16 @@
       "note": "Desktop export uses shared blend, flow and motion blur, with RIFE for AI interpolation."
     },
     {
+      "id": "device.use_anyway",
+      "name": "Use anyway: options the device is not made for stay available behind a warning that is asked for every run",
+      "where": "Tier.kt, ui/RiskDialog.kt, ExportScreen.kt, ExportChoices.kt, ai/AiTools.kt, effects/AiBrowser.kt",
+      "android": "works",
+      "macos": "untested",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "Same shared code on the desktop, which only meets it when it draws through OpenGL or an encoder does not list a size."
+    },
+    {
       "id": "export.result_viewer",
       "name": "Play the exported file in the app",
       "where": "ui/export/ExportPreview.kt, DeskMediaViewer.kt, DeskExportPreview.kt",

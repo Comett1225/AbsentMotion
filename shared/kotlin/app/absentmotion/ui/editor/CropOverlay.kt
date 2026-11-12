@@ -2,8 +2,14 @@ package app.absentmotion.ui.editor
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -13,6 +19,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import app.absentmotion.R
 import app.absentmotion.editor.EditorPanel
@@ -41,6 +48,71 @@ internal fun cropGrabAt(q: List<Offset>, box: CropBox, at: Offset, density: Floa
     return if (f.x in box.left..1f - box.right && f.y in box.top..1f - box.bottom) CROP_INSIDE else -1
 }
 
+internal const val CROP_FILL = 0.72f
+
+internal data class CanvasView(val zoom: Float, val pan: Offset)
+
+internal fun cropView(width: Float, height: Float, reserve: Float, sceneW: Float, sceneH: Float, corners: List<Offset>): CanvasView? {
+    if (width <= 0f || height <= 0f || corners.isEmpty()) return null
+    val free = width - reserve.coerceAtMost(width / 2f)
+    val fit = minOf(free / sceneW, height / sceneH)
+    val left = corners.minOf { it.x }
+    val top = corners.minOf { it.y }
+    val w = (corners.maxOf { it.x } - left).coerceAtLeast(1e-3f)
+    val h = (corners.maxOf { it.y } - top).coerceAtLeast(1e-3f)
+    val zoom = (minOf(free * CROP_FILL / w, height * CROP_FILL / h) / fit).coerceIn(0.01f, 64f)
+    val centre = minOf(width / 2f, free - sceneW * fit / 2f)
+    return CanvasView(zoom, Offset(sceneW / 2f - (left + w / 2f) + (free / 2f - centre) / (fit * zoom), sceneH / 2f - (top + h / 2f)))
+}
+
+internal fun viewBetween(from: CanvasView, to: CanvasView, t: Float): CanvasView {
+    if (t >= 1f) return to
+    val ratio = to.zoom / from.zoom
+    if (kotlin.math.abs(ratio - 1f) < 1e-3f) return CanvasView(from.zoom + (to.zoom - from.zoom) * t, from.pan + (to.pan - from.pan) * t)
+    val zoom = from.zoom * Math.pow(ratio.toDouble(), t.toDouble()).toFloat()
+    val still = (to.pan * to.zoom - from.pan * from.zoom) / (to.zoom - from.zoom)
+    return CanvasView(zoom, still - (still - from.pan) * (from.zoom / zoom))
+}
+
+private class CropViewMemory(var before: CanvasView? = null, var fitted: Any? = null, var written: CanvasView? = null)
+
+@Composable
+internal fun CropAutoView(state: EditorState, quad: FloatArray?, size: IntSize, reserve: Float, touching: Boolean) {
+    val active = state.livePanel == EditorPanel.Crop && state.drawing == null
+    val box = if (active) state.selected?.takeIf { it.cropIndex >= 0 }?.cropBox() else null
+    val memory = remember { CropViewMemory() }
+    val corners = if (box != null && quad != null) cropCorners(List(4) { Offset(quad[2 * it], quad[2 * it + 1]) }, box) else null
+    LaunchedEffect(active, corners, size, reserve, touching) {
+        suspend fun glide(to: CanvasView) {
+            val from = CanvasView(state.canvasZoom, state.canvasPan)
+            var mine = true
+            memory.written = from
+            Animatable(0f).animateTo(1f, tween(280, easing = FastOutSlowInEasing)) {
+                if (mine && CanvasView(state.canvasZoom, state.canvasPan) != memory.written) mine = false
+                if (mine) viewBetween(from, to, value).let { memory.written = it; state.canvasZoom = it.zoom; state.canvasPan = it.pan }
+            }
+        }
+        if (!active) {
+            memory.before?.let { glide(it) }
+            memory.before = null
+            memory.fitted = null
+            memory.written = null
+            return@LaunchedEffect
+        }
+        if (memory.before == null) memory.before = CanvasView(state.canvasZoom, state.canvasPan)
+        val key = Triple(corners ?: return@LaunchedEffect, size, reserve)
+        if (touching || key == memory.fitted) return@LaunchedEffect
+        if (memory.written.let { it != null && it != CanvasView(state.canvasZoom, state.canvasPan) }) {
+            memory.fitted = key
+            memory.written = null
+            return@LaunchedEffect
+        }
+        glide(cropView(size.width.toFloat(), size.height.toFloat(), reserve, state.scene.width.toFloat(), state.scene.height.toFloat(), corners) ?: return@LaunchedEffect)
+        memory.fitted = key
+        memory.written = null
+    }
+}
+
 @Composable
 internal fun CropOverlay(state: EditorState, quad: FloatArray?, scale: Float, origin: Offset) {
     if (state.panel != EditorPanel.Crop || quad == null) return
@@ -49,7 +121,7 @@ internal fun CropOverlay(state: EditorState, quad: FloatArray?, scale: Float, or
     val q = List(4) { Offset(quad[2 * it], quad[2 * it + 1]) * scale + origin }
     val box = layer.cropBox()
     val description = stringResource(R.string.a11y_crop_area)
-    Canvas(Modifier.fillMaxSize().semantics { contentDescription = description }) {
+    Canvas(Modifier.fillMaxSize().clipToBounds().semantics { contentDescription = description }) {
         val c = cropCorners(q, box)
         val dim = Path().apply {
             fillType = PathFillType.EvenOdd

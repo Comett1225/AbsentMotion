@@ -143,7 +143,18 @@ import app.absentmotion.engine.EngineThread
 import app.absentmotion.export.AudioCodec
 import app.absentmotion.export.AudioFormat
 import app.absentmotion.export.AudioSettings
+import app.absentmotion.Feature
+import app.absentmotion.Risk
+import app.absentmotion.RiskAsk
+import app.absentmotion.Tier
+import app.absentmotion.Unlock
+import app.absentmotion.ui.LocalRiskAsk
+import app.absentmotion.ui.RiskDialog
 import app.absentmotion.export.Choice
+import app.absentmotion.export.SmoothedKinds
+import app.absentmotion.export.exportRisks
+import app.absentmotion.export.savable
+import app.absentmotion.export.sizeLabel
 import app.absentmotion.export.DeviceCapabilities
 import app.absentmotion.export.ExportPrefs
 import app.absentmotion.export.ExportRun
@@ -271,7 +282,14 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
     val prefs = remember { ExportPrefs(context) }
     val settings = remember { mutableStateMapOf<ExportKind, ExportSettings>().apply { ExportKind.entries.forEach { put(it, prefs.load(it, scene)) } } }
     val stored = remember { HashMap(settings.toMap()) }
-    val persist = { settings.forEach { (k, v) -> if (stored[k] != v) { prefs.save(k, v); stored[k] = v } } }
+    val persist = {
+        settings.forEach { (k, v) ->
+            val keep = savable(v, stored.getValue(k), if (k == ExportKind.Video) DeviceCapabilities.of(context).check(v, scene) else Support.Supported)
+            if (stored[k] != keep) { prefs.save(k, keep); stored[k] = keep }
+        }
+    }
+    val unlock = remember { Unlock() }
+    var risk by remember { mutableStateOf<RiskAsk?>(null) }
     LaunchedEffect(settings) {
         snapshotFlow { settings.toMap() }.collectLatest {
             delay(SaveDelayMs)
@@ -398,6 +416,12 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
         else -> Support.Supported
     })
     val explain: (UiText) -> Unit = { failure = Failure(R.string.export_not_available, it) }
+    val askRisk: (UiText, () -> Unit) -> Unit = { reason, go ->
+        risk = RiskAsk(listOf(Risk(reason, reason))) {
+            go()
+            unlock.confirm(exportRisks(kind, settings.getValue(kind), if (kind == ExportKind.Video) check(settings.getValue(kind)) else Support.Supported))
+        }
+    }
 
     app.absentmotion.platform.ExportBars(dark = false, running = phase is Phase.Running)
     app.absentmotion.ui.theme.ThemeFade.Hold(phase is Phase.Running)
@@ -438,12 +462,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
         }
         if (kind in BackgroundKinds && !notifyAsk.ready { start(ignoreMissing, aiReady) }) return
         val s = settings.getValue(kind)
-        val aiLevel = s.interpolationLevel.takeIf { s.interpolation == FrameInterpolation.Ai && kind in AiKinds }
-        if (aiLevel != null && !aiReady && !AiSmooth.installed(context, aiLevel)) {
-            failure = Failure(R.string.ai_smooth_download_title, txt(R.string.ai_smooth_download_text, formatBytes(AiSmooth.downloadBytes(aiLevel))),
-                txt(R.string.ai_download_and_start), proceed = { start(ignoreMissing, true) })
-            return
-        }
+        val aiLevel = s.interpolationLevel.takeIf { s.interpolation == FrameInterpolation.Ai && kind in SmoothedKinds }
         if (kind == ExportKind.Package) community?.problem(scene)?.let {
             failure = Failure(R.string.export_failed_title, it)
             return
@@ -457,7 +476,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
             return
         }
         val fresh = check(s)
-        if (kind == ExportKind.Video && fresh is Support.Unsupported) {
+        if (kind == ExportKind.Video && fresh is Support.Unsupported && !fresh.risky) {
             val fix = betterChoice(s, fresh, check)
             failure = Failure(R.string.export_not_supported_title, codecWarning(s, fresh) ?: txt(R.string.export_block_unsupported), fix?.let { suggestionLabel(s, it) },
                 fix?.let { { settings[ExportKind.Video] = it } })
@@ -465,6 +484,16 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
         }
         if (kind == ExportKind.Audio) caps.checkAudioOnly(s)?.let {
             failure = Failure(R.string.export_not_supported_title, it)
+            return
+        }
+        val risks = exportRisks(kind, s, fresh)
+        unlock.pending(risks).takeIf { it.isNotEmpty() }?.let {
+            risk = RiskAsk(it) { unlock.confirm(it); start(ignoreMissing, aiReady) }
+            return
+        }
+        if (aiLevel != null && !aiReady && !AiSmooth.installed(context, aiLevel)) {
+            failure = Failure(R.string.ai_smooth_download_title, txt(R.string.ai_smooth_download_text, formatBytes(AiSmooth.downloadBytes(aiLevel))),
+                txt(R.string.ai_download_and_start), proceed = { start(ignoreMissing, true) })
             return
         }
         free = freeSpace()
@@ -475,7 +504,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
         val chosen = kind
         val estimated = rawEstimate
         val modelled = modelMs
-        prefs.save(chosen, s)
+        persist()
         val alsoTemplate = asTemplate
         val name = exportName.next(chosen)
         progress = 0f
@@ -513,7 +542,10 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
                 }
                 if (aiLevel != null && !AiSmooth.installed(context, aiLevel)) AiSmooth.download(context, aiLevel) { progress = it }
                 val began = System.nanoTime()
-                val result = (if (background) Exporter(context.applicationContext, app.absentmotion.platform.exportEngine(engine), MediaStoreExport(context.applicationContext), bundles = bundles) else exporter).export(chosen, exported, s, frame, name, { note = it }, community.takeIf { chosen == ExportKind.Package }) { progress = it; ExportRun.progress = it }
+                unlock.spend()
+                val result = Tier.unlocking(risks.mapNotNull { it.key as? Feature }) {
+                    (if (background) Exporter(context.applicationContext, app.absentmotion.platform.exportEngine(engine), MediaStoreExport(context.applicationContext), bundles = bundles) else exporter).export(chosen, exported, s, frame, name, { note = it }, community.takeIf { chosen == ExportKind.Package }) { progress = it; ExportRun.progress = it }
+                }
                 outcome = true
                 if (background) app.absentmotion.platform.exportDone(result)
                 phase = Phase.Done(chosen, result)
@@ -541,7 +573,11 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
                 Log.e("AMExport", "export failed", e)
                 outcome = false
                 phase = Phase.Idle
-                failure = Failure(R.string.export_failed_title, txt(R.string.library_text_value, e.message ?: e.toString()), hint = true)
+                failure = Failure(R.string.export_failed_title, when {
+                    e is OutOfMemoryError -> txt(R.string.export_error_too_large, sizeLabel(s.shortSide))
+                    e is IllegalStateException && risks.any { it.key is String } -> txt(R.string.export_error_encoder_busy)
+                    else -> txt(R.string.library_text_value, e.message ?: e.toString())
+                }, hint = true)
             } finally {
                 if (background) ExportRun.end(outcome)
             }
@@ -556,6 +592,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
     val card = !DESK && app.absentmotion.ui.editor.isTablet(androidx.compose.ui.platform.LocalConfiguration.current.smallestScreenWidthDp)
     val bar: @Composable () -> Unit = { ExportBar(enabled = phase == Phase.Idle, blocked = blocked, pill = card, onClick = ::start) }
 
+    androidx.compose.runtime.CompositionLocalProvider(LocalRiskAsk provides askRisk) {
     if (DESK) DeskExport(
         scene, frame, fromProjectList, engine, kinds, kind, { kind = it }, hasAudio, settings, check, hasEncoder, bitrateFits, explain, { help = true }, exportName,
         warning, support is Support.SlowSoftwareOnly, better?.let { suggestionLabel(video, it) }, ::useBetter, { acknowledged = warning },
@@ -638,6 +675,8 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
         }
     }
 
+    }
+    RiskDialog(risk, Navy, Navy, Alert, Am.Card) { risk = null; it?.proceed?.invoke() }
     if (packageInfo) {
         AlertDialog(
             onDismissRequest = { packageInfo = false },
@@ -687,7 +726,12 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
 
 private val NoSound = txt(R.string.export_no_sound)
 
-private val AiKinds = setOf(ExportKind.Video, ExportKind.Gif, ExportKind.Sequence)
+private fun <T> Choice<T>.tap(selected: Boolean, ask: (UiText, () -> Unit) -> Unit, onReason: (UiText) -> Unit, pick: () -> Unit) = when {
+    reason == null -> pick()
+    !risky -> onReason(reason)
+    !selected -> ask(reason, pick)
+    else -> Unit
+}
 
 @Composable
 private fun AiSmoothHint(scene: Scene, s: ExportSettings, width: Int, height: Int) {
@@ -862,6 +906,7 @@ private fun GifBadge() {
 @Composable
 private fun ResolutionDropdown(shortSide: Int, choices: List<Choice<app.absentmotion.export.Resolution>>, onReason: (UiText) -> Unit, onPick: (Int) -> Unit) {
     var open by remember { mutableStateOf(false) }
+    val ask = LocalRiskAsk.current
     Box(Modifier.fillMaxWidth().height(44.dp).clickable { open = true }) {
         Row(Modifier.fillMaxSize().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(resolutionLabel(shortSide), Modifier.weight(1f), color = Navy, fontSize = 16.sp)
@@ -870,8 +915,9 @@ private fun ResolutionDropdown(shortSide: Int, choices: List<Choice<app.absentmo
         DropdownMenu(open, { open = false }, containerColor = Am.Card, shape = if (app.absentmotion.platform.PlatformFeatures.desktop) androidx.compose.foundation.shape.RoundedCornerShape(10.dp) else androidx.compose.material3.MenuDefaults.shape) {
             choices.forEach { c ->
                 DropdownMenuItem(
-                    text = { Text(c.value.label, Modifier.alpha(if (c.enabled) 1f else Dimmed), color = Navy, fontSize = 17.sp) },
-                    onClick = { open = false; c.reason?.let(onReason) ?: onPick(c.value.shortSide) },
+                    text = { Text(c.value.label, Modifier.alpha(if (c.enabled || c.risky) 1f else Dimmed), color = Navy, fontSize = 17.sp) },
+                    trailingIcon = if (c.risky) { { Icon(ExportIcons.Warning, null, Modifier.size(16.dp), tint = Alert) } } else null,
+                    onClick = { open = false; c.tap(c.value.shortSide == shortSide, ask, onReason) { onPick(c.value.shortSide) } },
                 )
             }
         }
@@ -925,7 +971,7 @@ private fun VideoFields(
         Ends("${rates.first()}fps", "${rates.last()}fps")
     }
     Field(stringResource(R.string.export_interpolation), onHelp = onHelp) {
-        Segments(FrameInterpolation.entries.map { if (it == FrameInterpolation.Ai) app.absentmotion.Tier.choice(it, app.absentmotion.Feature.AiSmooth) else Choice(it) }, s.interpolation, { stringResource(it.label) }, onReason) { onChange(s.copy(interpolation = it)) }
+        Segments(FrameInterpolation.entries.map { if (it == FrameInterpolation.Ai) Tier.choice(it, Feature.AiSmooth) else Choice(it) }, s.interpolation, { stringResource(it.label) }, onReason) { onChange(s.copy(interpolation = it)) }
         Segments(levelChoices(s), s.interpolationLevel, { stringResource(it.label) }, onReason) { onChange(s.copy(interpolationLevel = it)) }
         Hint(stringResource(R.string.export_interpolation_hint))
         AiSmoothHint(scene, s, w, h)
@@ -1101,17 +1147,18 @@ private fun audioHint(s: ExportSettings): UiText =
 @Composable
 private fun <T> Segments(options: List<Choice<T>>, selected: T, label: @Composable (T) -> String, onReason: (UiText) -> Unit, onPick: (T) -> Unit) {
     val size = if (DESK) 13.sp else if (options.size > 4) 13.sp else 15.sp
+    val ask = LocalRiskAsk.current
     Row(Modifier.fillMaxWidth().height(if (DESK) 36.dp else 42.dp).clip(RoundedCornerShape(4.dp)).background(Am.Card).padding(3.dp)) {
         options.forEach { c ->
             val on = c.value == selected
             val fill = animatedColor(if (on) Navy else Am.Card)
             val text = animatedColor(if (on) Am.OnNavyAccent else Navy)
             Box(
-                Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(4.dp)).background(fill).deskPress(4.dp).clickable { c.reason?.let(onReason) ?: onPick(c.value) },
+                Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(4.dp)).background(fill).deskPress(4.dp).clickable { c.tap(on, ask, onReason) { onPick(c.value) } },
                 contentAlignment = Alignment.Center,
             ) {
-                Row(Modifier.alpha(if (c.enabled) 1f else Dimmed), verticalAlignment = Alignment.CenterVertically) {
-                    if (c.locked) Icon(ExportIcons.Lock, null, Modifier.size(13.dp), tint = text)
+                Row(Modifier.alpha(if (c.enabled || c.risky) 1f else Dimmed), verticalAlignment = Alignment.CenterVertically) {
+                    if (c.risky) Icon(ExportIcons.Warning, null, Modifier.size(13.dp), tint = if (on) text else Alert)
                     Text(label(c.value), Modifier.padding(horizontal = 2.dp), color = text, fontWeight = FontWeight.Medium, maxLines = 1, style = Mixed,
                         autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(9.sp, size))
                 }
@@ -1148,6 +1195,7 @@ private fun PointerInputScope.along(x: Float): Float {
 @Composable
 private fun OptionsPage(kind: ExportKind, scene: Scene, s: ExportSettings, onReason: (UiText) -> Unit, onHelp: () -> Unit, onChange: (ExportSettings) -> Unit) {
     if (kind == ExportKind.Frame) return
+    val ask = LocalRiskAsk.current
     val rates = (if (kind == ExportKind.Gif) GifFrameRates else (VideoFrameRates + scene.fps)).distinct().sorted()
     val images = kind == ExportKind.Sequence || kind == ExportKind.FrameAs
     if (images) {
@@ -1174,12 +1222,12 @@ private fun OptionsPage(kind: ExportKind, scene: Scene, s: ExportSettings, onRea
     Field(stringResource(R.string.export_interpolation), onHelp = onHelp) {
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             FrameInterpolation.entries.forEach {
-                val reason = if (it == FrameInterpolation.Ai) app.absentmotion.Tier.reason(app.absentmotion.Feature.AiSmooth) else null
-                Chip(stringResource(it.label), s.interpolation == it) { reason?.let(onReason) ?: onChange(s.copy(interpolation = it)) }
+                val c = if (it == FrameInterpolation.Ai) Tier.choice(it, Feature.AiSmooth) else Choice(it)
+                Chip(stringResource(it.label), s.interpolation == it, risky = c.risky) { c.tap(s.interpolation == it, ask, onReason) { onChange(s.copy(interpolation = it)) } }
             }
         }
         FlowRow(Modifier.alpha(if (s.interpolation == FrameInterpolation.Off) Dimmed else 1f), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            levelChoices(s).forEach { c -> Chip(stringResource(c.value.label), s.interpolationLevel == c.value) { c.reason?.let(onReason) ?: onChange(s.copy(interpolationLevel = c.value)) } }
+            levelChoices(s).forEach { c -> Chip(stringResource(c.value.label), s.interpolationLevel == c.value, risky = c.risky) { c.tap(s.interpolationLevel == c.value, ask, onReason) { onChange(s.copy(interpolationLevel = c.value)) } } }
         }
         Hint(stringResource(R.string.export_interpolation_hint))
         AiSmoothHint(scene, s, w, h)
@@ -1196,7 +1244,7 @@ private fun levelChoices(s: ExportSettings) =
     SmoothLevel.entries.map {
         when {
             s.interpolation == FrameInterpolation.Off -> Choice(it, txt(R.string.export_interpolation_pick_method))
-            s.interpolation == FrameInterpolation.Flow && it == SmoothLevel.High -> app.absentmotion.Tier.choice(it, app.absentmotion.Feature.FlowHigh)
+            s.interpolation == FrameInterpolation.Flow && it == SmoothLevel.High -> Tier.choice(it, Feature.FlowHigh)
             else -> Choice(it)
         }
     }
@@ -1210,11 +1258,14 @@ private fun Chips(label: String, value: String? = null, reason: UiText? = null, 
 }
 
 @Composable
-private fun Chip(label: String, selected: Boolean, enabled: Boolean = true, onClick: () -> Unit) {
+private fun Chip(label: String, selected: Boolean, enabled: Boolean = true, risky: Boolean = false, onClick: () -> Unit) {
     val fill = animatedColor(if (selected) Navy else Am.SheetBg)
     val text = animatedColor(if (selected) Am.OnNavyAccent else Navy)
     Box(Modifier.height(if (DESK) 30.dp else 34.dp).alpha(if (enabled) 1f else Dimmed).clip(RoundedCornerShape(17.dp)).background(fill).deskPress(17.dp).clickable(onClick = onClick).padding(horizontal = 14.dp), contentAlignment = Alignment.Center) {
-        Text(label, color = text, fontSize = if (DESK) 13.sp else 15.sp, maxLines = 1, style = Mixed)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (risky) Icon(ExportIcons.Warning, null, Modifier.padding(end = 4.dp).size(13.dp), tint = if (selected) text else Alert)
+            Text(label, color = text, fontSize = if (DESK) 13.sp else 15.sp, maxLines = 1, style = Mixed)
+        }
     }
 }
 

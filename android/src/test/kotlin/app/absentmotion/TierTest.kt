@@ -20,7 +20,7 @@ class TierTest {
             assertEquals(!BuildConfig.COMPATIBLE || feature.inCompatible, Tier.has(feature))
             assertEquals(Tier.has(feature), Tier.reason(feature) == null)
             val choice = Tier.choice(feature.name, feature)
-            assertEquals(!Tier.has(feature), choice.locked)
+            assertEquals(!Tier.has(feature), choice.risky)
             assertEquals(Tier.has(feature), choice.enabled)
         }
         assertEquals(Feature.entries.filter { BuildConfig.COMPATIBLE && !it.inCompatible }, Tier.leftOut)

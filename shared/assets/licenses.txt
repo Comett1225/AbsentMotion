@@ -3778,7 +3778,7 @@ The launcher icon is an own drawing, made by tools/icon/make_icon.py (source of 
 COUNTS
 ------
 
-- Lucide only - 174
+- Lucide only - 175
 - Lucide shapes plus own parts - 8
 - Own drawing only - 44
 - Tabler - 2
@@ -3937,6 +3937,7 @@ ICONS
 - Sequence (Lucide images) - ISC - ui/export/ExportIcons.kt
 - Xml (Lucide code-xml) - ISC - ui/export/ExportIcons.kt
 - Lock (own drawing) - GPL-3.0 (own) - ui/export/ExportIcons.kt
+- Warning (Lucide triangle-alert) - ISC and MIT (Feather) - ui/export/ExportIcons.kt
 - File (Lucide file) - ISC - ui/export/ExportIcons.kt
 - Play (Lucide play) - ISC - ui/export/ExportIcons.kt
 - Pause (Lucide pause) - ISC - ui/export/ExportIcons.kt

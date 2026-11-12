@@ -292,7 +292,11 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
             }
         }
     }
-    Box(modifier.background(Am.PreviewBg).onSizeChanged { size = it }.onGloballyPositioned { origin = it.positionInRoot() }.then(wheelView).then(middlePan)) {
+    var touching by remember { mutableStateOf(false) }
+    val touchWatch = Modifier.pointerInput(Unit) {
+        awaitPointerEventScope { while (true) touching = awaitPointerEvent(PointerEventPass.Initial).changes.any { it.pressed } }
+    }
+    Box(modifier.background(Am.PreviewBg).onSizeChanged { size = it }.onGloballyPositioned { origin = it.positionInRoot() }.then(wheelView).then(middlePan).then(touchWatch)) {
         app.absentmotion.platform.SceneSurface(state.engine, divisor, size, Modifier.fillMaxSize()) { state.previewSurface = it }
         CachedFrame(state, cacheUsable, live, dx, dy, scene.width * scale, scene.height * scale)
         Box(
@@ -519,6 +523,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
         EyedropperLoupe(state, Modifier.fillMaxSize())
         GradientHandles(state, quad.takeUnless { state.playing }, scale, Offset(dx, dy))
         CropOverlay(state, quad.takeUnless { state.playing }, scale, Offset(dx, dy))
+        CropAutoView(state, quad.takeUnless { state.playing }, size, with(LocalDensity.current) { reserveEnd.toPx() }, touching)
         state.layerPoints?.let { points -> world?.takeUnless { state.playing }?.let { LayerPointsOverlay(points, it, scale, Offset(dx, dy)) } }
         if (editingText) Canvas(Modifier.fillMaxSize()) {
             val q = quad.takeUnless { state.playing } ?: return@Canvas

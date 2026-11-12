@@ -423,7 +423,7 @@ private fun AiModelRows() {
 
 @Composable
 private fun CutoutRows() {
-    if (!app.absentmotion.ai.BestCutout.offered) return
+    if (!app.absentmotion.ai.BestCutout.kept) return
     val context = LocalContext.current
     val model = app.absentmotion.ai.AiModel.Cutout
     val choice = remember { app.absentmotion.ai.CutoutChoice.of(context) }

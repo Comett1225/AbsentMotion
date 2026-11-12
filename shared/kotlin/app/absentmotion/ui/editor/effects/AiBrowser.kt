@@ -35,6 +35,12 @@ import app.absentmotion.ai.AiEnhance
 import app.absentmotion.ai.AiSmooth
 import app.absentmotion.ai.AiTools
 import app.absentmotion.ai.CutoutQuality
+import app.absentmotion.Feature
+import app.absentmotion.Risk
+import app.absentmotion.Tier
+import app.absentmotion.ai.AiNative
+import app.absentmotion.ui.RiskDialog
+import app.absentmotion.ui.export.ExportIcons
 import app.absentmotion.ai.AiVerdict
 import app.absentmotion.ai.EnhanceMode
 import app.absentmotion.ai.aiEstimate
@@ -158,7 +164,10 @@ internal fun AiTile(action: AiAction, layer: Layer?, tools: AiTools) {
         val press = remember { MutableInteractionSource() }
         Column(Modifier.pressScale(press, TilePress).alpha(if (reason == null) 1f else 0.35f)
             .clickable(press, LocalIndication.current, enabled = reason == null && tools.running == null) { tools.apply(action) }, horizontalAlignment = Alignment.CenterHorizontally) {
-            AiBackdrop(Modifier.size(93.dp).clip(RoundedCornerShape(5.dp)), action)
+            Box {
+                AiBackdrop(Modifier.size(93.dp).clip(RoundedCornerShape(5.dp)), action)
+                if (action == AiAction.Enhance && !Tier.has(Feature.AiEnhance)) Icon(ExportIcons.Warning, null, Modifier.align(Alignment.TopEnd).padding(5.dp).size(16.dp), tint = Am.Warning)
+            }
             Text(stringResource(action.title), Modifier.fillMaxWidth().height(26.dp).padding(top = 4.dp), color = Am.OnDark, fontSize = 8.sp,
                 lineHeight = 9.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center, maxLines = 2)
         }
@@ -323,7 +332,7 @@ internal fun AiCutoutDialog(tools: AiTools, scene: Scene) {
     val source = mark?.original ?: layer.node["fillImage"]
     val turn = (source?.let(scene::media) ?: mark?.media)?.orientation ?: 0
     val picture by produceState<ImageBitmap?>(null, source, turn) { value = source?.let { pickPicture(context, it, turn) } }
-    val asks = remember(layer.id) { CutoutChoice.of(context).asks(BestCutout.offered) }
+    val asks = remember(layer.id) { BestCutout.offered && (!BestCutout.kept || CutoutChoice.of(context).asks(true)) }
     AlertDialog(onDismissRequest = { tools.cutoutSetup = null },
         title = { Text(stringResource(R.string.ai_remove_background), color = Am.OnDark) },
         text = {
@@ -343,13 +352,15 @@ internal fun AiCutoutDialog(tools: AiTools, scene: Scene) {
 @Composable
 private fun CutoutQualityChoice(tools: AiTools, size: String) {
     Text(stringResource(R.string.settings_cutout_quality), Modifier.padding(top = 14.dp), color = Am.OnDark, fontSize = 14.sp)
-    Text(stringResource(R.string.cutout_question), Modifier.padding(top = 4.dp), color = Am.Caption, fontSize = 12.sp, lineHeight = 16.sp)
+    val risk = Tier.risk(Feature.BestCutout)
+    if (risk == null) Text(stringResource(R.string.cutout_question), Modifier.padding(top = 4.dp), color = Am.Caption, fontSize = 12.sp, lineHeight = 16.sp)
     Column(Modifier.padding(top = 8.dp).selectableGroup(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         for (quality in CutoutQuality.entries) {
             val on = quality == tools.cutoutQuality
             Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp)).background(if (on) Am.FieldHi else Am.PanelInset)
-                .selectable(on, role = Role.RadioButton) { tools.cutoutQuality = quality }.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                .selectable(on, role = Role.RadioButton) { if (!on) tools.ask(risk.takeIf { quality == CutoutQuality.Best }) { tools.cutoutQuality = quality } }.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
                 RadioButton(on, null, colors = RadioButtonDefaults.colors(selectedColor = Am.Accent, unselectedColor = Am.OnDark))
+                if (risk != null && quality == CutoutQuality.Best) Icon(ExportIcons.Warning, null, Modifier.padding(start = 8.dp).size(16.dp), tint = Am.Warning)
                 Column(Modifier.padding(start = 10.dp)) {
                     Text(stringResource(quality.title), color = if (on) Am.Accent else Am.OnDark, fontSize = 14.sp)
                     Text(stringResource(quality.hint, size), color = Am.Caption, fontSize = 12.sp, lineHeight = 16.sp)
@@ -419,13 +430,16 @@ internal fun AiEnhanceDialog(tools: AiTools, scene: Scene, onQuickSharpen: () ->
                     else -> listOfNotNull(estimate ?: stringResource(R.string.ai_checking_phone),
                         if (missing > 0) stringResource(R.string.ai_download_once, formatBytes(missing)) else null).joinToString("\n")
                 }
-                Text(note, Modifier.padding(top = 12.dp).heightIn(min = 40.dp), color = if (!fits || tooLong || cannot) Am.Warning else Am.Caption, fontSize = 12.sp, lineHeight = 17.sp)
+                Row(Modifier.padding(top = 12.dp).heightIn(min = 40.dp)) {
+                    if (options.usesAi && fits && !tooLong && cannot) Icon(ExportIcons.Warning, null, Modifier.padding(end = 6.dp).size(16.dp), tint = Am.Warning)
+                    Text(note, color = if (!fits || tooLong || cannot) Am.Warning else Am.Caption, fontSize = 12.sp, lineHeight = 17.sp)
+                }
             }
         },
         confirmButton = {
             TextButton({
-                if (options.usesAi) tools.apply(AiAction.Enhance, confirmed = true) else { tools.enhanceSetup = null; onQuickSharpen() }
-            }, enabled = !options.usesAi || (fits && !tooLong && !cannot)) {
+                if (options.usesAi) tools.apply(AiAction.Enhance, confirmed = true, struggles = cannot) else { tools.enhanceSetup = null; onQuickSharpen() }
+            }, enabled = !options.usesAi || (fits && !tooLong && (!cannot || AiNative.loaded))) {
                 Text(stringResource(if (options.usesAi && missing > 0) R.string.ai_download_and_start else R.string.start), color = Am.Accent)
             }
         },
@@ -443,6 +457,7 @@ private fun EnhanceSwitch(label: String, on: Boolean, onChange: (Boolean) -> Uni
 
 @Composable
 internal fun AiProgressDialog(tools: AiTools) {
+    RiskDialog(tools.risk, Am.OnDark, Am.Accent, Am.Warning, Am.Field) { tools.risk = null; it?.proceed?.invoke() }
     if (tools.message.isEmpty()) return
     val action = tools.running
     app.absentmotion.ui.theme.ThemeFade.Hold(action != null)
@@ -499,9 +514,10 @@ internal fun AiSmoothDialog(tools: AiTools, scene: Scene) {
                 Text(stringResource(R.string.smooth_intro), color = Am.OnDark, fontSize = 14.sp)
                 Text(stringResource(R.string.smooth_method), Modifier.padding(top = 12.dp), color = Am.Caption, fontSize = 12.sp)
                 Pills(FrameInterpolation.entries, s.method, true, { stringResource(it.label) },
-                    locked = { it == FrameInterpolation.Ai && !app.absentmotion.Tier.has(app.absentmotion.Feature.AiSmooth) }) { tools.smoothing = s.copy(method = it) }
+                    risk = { Tier.risk(Feature.AiSmooth).takeIf { _ -> it == FrameInterpolation.Ai } ?: Tier.risk(Feature.FlowHigh).takeIf { _ -> it == FrameInterpolation.Flow && s.level == SmoothLevel.High } },
+                    ask = tools::ask) { tools.smoothing = s.copy(method = it) }
                 Pills(SmoothLevel.entries, s.level, s.method != FrameInterpolation.Off, { stringResource(it.label) },
-                    locked = { s.method == FrameInterpolation.Flow && it == SmoothLevel.High && !app.absentmotion.Tier.has(app.absentmotion.Feature.FlowHigh) }) { tools.smoothing = s.copy(level = it) }
+                    risk = { Tier.risk(Feature.FlowHigh).takeIf { _ -> s.method == FrameInterpolation.Flow && it == SmoothLevel.High } }, ask = tools::ask) { tools.smoothing = s.copy(level = it) }
                 Text(stringResource(R.string.export_motion_blur), Modifier.padding(top = 12.dp), color = Am.Caption, fontSize = 12.sp)
                 Pills(MotionBlur.entries, s.blur, true, { stringResource(it.label) }) { tools.smoothing = s.copy(blur = it) }
                 Text(
@@ -515,12 +531,14 @@ internal fun AiSmoothDialog(tools: AiTools, scene: Scene) {
                     },
                     Modifier.padding(top = 12.dp).height(54.dp), color = if (plan == null || tooLong) Am.Warning else Am.Caption, fontSize = 12.sp, lineHeight = 17.sp,
                 )
-                if (ai && plan != null && !tooLong) Text(app.absentmotion.ui.export.aiSmoothNote(estimate, s.level, clip = true), Modifier.padding(top = 4.dp),
-                    color = if (cannot) Am.Warning else Am.Caption, fontSize = 12.sp, lineHeight = 17.sp)
+                if (ai && plan != null && !tooLong) Row(Modifier.padding(top = 4.dp)) {
+                    if (cannot) Icon(ExportIcons.Warning, null, Modifier.padding(end = 6.dp).size(16.dp), tint = Am.Warning)
+                    Text(app.absentmotion.ui.export.aiSmoothNote(estimate, s.level, clip = true), color = if (cannot) Am.Warning else Am.Caption, fontSize = 12.sp, lineHeight = 17.sp)
+                }
             }
         },
         confirmButton = {
-            TextButton({ tools.apply(AiAction.Smooth, confirmed = true) }, enabled = plan != null && !tooLong && !cannot) {
+            TextButton({ tools.apply(AiAction.Smooth, confirmed = true, struggles = cannot) }, enabled = plan != null && !tooLong && (!cannot || AiNative.loaded)) {
                 Text(stringResource(if (download) R.string.ai_download_and_start else R.string.start), color = Am.Accent)
             }
         },
@@ -534,16 +552,15 @@ internal fun AiSmoothDialog(tools: AiTools, scene: Scene) {
 }
 
 @Composable
-private fun <T> Pills(options: List<T>, selected: T, enabled: Boolean, label: @Composable (T) -> String, locked: (T) -> Boolean = { false }, onPick: (T) -> Unit) {
-    val context = androidx.compose.ui.platform.LocalContext.current
-    val needs = stringResource(R.string.tier_needs_latest)
+private fun <T> Pills(options: List<T>, selected: T, enabled: Boolean, label: @Composable (T) -> String, risk: (T) -> Risk? = { null },
+                      ask: (Risk?, () -> Unit) -> Unit = { _, go -> go() }, onPick: (T) -> Unit) {
     Row(Modifier.padding(top = 6.dp).fillMaxWidth().height(36.dp).alpha(if (enabled) 1f else 0.4f).clip(RoundedCornerShape(6.dp)).background(Am.PanelInset)) {
         for (option in options) {
             val on = option == selected
             Box(Modifier.weight(1f).fillMaxHeight().padding(2.dp).clip(RoundedCornerShape(5.dp)).background(if (on) Am.FieldHi else Color.Transparent)
-                .clickable(enabled = enabled) { if (locked(option)) android.widget.Toast.makeText(context, needs, android.widget.Toast.LENGTH_SHORT).show() else onPick(option) }, Alignment.Center) {
-                Row(Modifier.alpha(if (locked(option)) 0.45f else 1f), verticalAlignment = Alignment.CenterVertically) {
-                    if (locked(option)) Icon(app.absentmotion.ui.export.ExportIcons.Lock, null, Modifier.size(12.dp), tint = Am.OnDark)
+                .clickable(enabled = enabled) { if (!on) ask(risk(option)) { onPick(option) } }, Alignment.Center) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (risk(option) != null) Icon(ExportIcons.Warning, null, Modifier.padding(end = 3.dp).size(12.dp), tint = Am.Warning)
                     Text(label(option), color = if (on) Am.Accent else Am.OnDark, fontSize = 12.sp, lineHeight = 13.sp, maxLines = 2, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
                 }
             }

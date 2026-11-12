@@ -1963,6 +1963,9 @@
     <string name="caption_layer_name">Takarir %1$s</string>
     <string name="tier_needs_latest">Butuh Android 13 (versi Latest)</string>
     <string name="tier_needs_vulkan">Butuh ponsel dengan grafis Vulkan</string>
+    <string name="unlock_title">Ponsel ini tidak dibuat untuk ini</string>
+    <string name="unlock_text">Fitur ini butuh daya lebih besar daripada yang dimiliki ponsel ini atau versi aplikasi ini. Bisa sangat lambat, membuat ponsel panas, gagal, atau menutup aplikasi. Tetap gunakan?</string>
+    <string name="unlock_use_anyway">Tetap gunakan</string>
     <string name="feature_flow_high">Optical flow Tinggi</string>
     <string name="feature_ai_enhance">Peningkatan AI</string>
     <string name="feature_best_cutout">Penghapusan latar belakang AI 2.0</string>

@@ -28,5 +28,30 @@ object Tier {
 
     fun reason(feature: Feature): UiText? = if (has(feature)) null else txt(if (compatible) R.string.tier_needs_latest else R.string.tier_needs_vulkan)
 
-    fun <T> choice(value: T, feature: Feature): Choice<T> = Choice(value, reason(feature), locked = !has(feature))
+    fun <T> choice(value: T, feature: Feature): Choice<T> = Choice(value, reason(feature), risky = !has(feature))
+
+    @Volatile var unlocked: Set<Feature> = emptySet()
+
+    fun runs(feature: Feature): Boolean = has(feature) || feature in unlocked
+
+    fun risk(feature: Feature): Risk? = reason(feature)?.let { Risk(feature, it) }
+
+    suspend fun <T> unlocking(features: Collection<Feature>, block: suspend () -> T): T {
+        unlocked = unlocked + features
+        try { return block() } finally { unlocked = unlocked - features.toSet() }
+    }
+}
+
+data class Risk(val key: Any, val reason: UiText)
+
+class RiskAsk(val risks: List<Risk>, val proceed: () -> Unit)
+
+class Unlock {
+    private var confirmed = emptySet<Any>()
+
+    fun confirm(risks: List<Risk>) { confirmed = confirmed + risks.map { it.key } }
+
+    fun pending(risks: List<Risk>): List<Risk> = risks.filter { it.key !in confirmed }
+
+    fun spend() { confirmed = emptySet() }
 }

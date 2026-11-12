@@ -1963,6 +1963,9 @@
     <string name="caption_layer_name">キャプション%1$s</string>
     <string name="tier_needs_latest">Android 13（Latestバージョン）が必要</string>
     <string name="tier_needs_vulkan">Vulkan対応のスマートフォンが必要</string>
+    <string name="unlock_title">このスマートフォンは対応していません</string>
+    <string name="unlock_text">このスマートフォンまたはこのバージョンのアプリの性能では不足しています。非常に遅くなる、本体が熱くなる、失敗する、アプリが終了するなどの可能性があります。それでも使用しますか？</string>
+    <string name="unlock_use_anyway">それでも使用</string>
     <string name="feature_flow_high">オプティカルフロー高</string>
     <string name="feature_ai_enhance">AI強化</string>
     <string name="feature_best_cutout">AI背景除去2.0</string>

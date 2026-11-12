@@ -95,8 +95,8 @@ internal object EncoderTrouble {
 
 internal fun openVideoEncoder(s: ExportSettings, width: Int, height: Int, hot: Boolean, note: (UiText) -> Unit = {}, bitrate: Int? = null): MediaCodec {
     val mime = s.codec.mime
-    val infos = MediaCodecList(MediaCodecList.REGULAR_CODECS).codecInfos
-        .filter { it.isEncoder && !it.alias && mime in it.supportedTypes && it.getCapabilitiesForType(mime).videoCapabilities?.isSizeSupported(width, height) == true }
+    val all = MediaCodecList(MediaCodecList.REGULAR_CODECS).codecInfos.filter { it.isEncoder && !it.alias && mime in it.supportedTypes }
+    val infos = all.filter { it.getCapabilitiesForType(mime).videoCapabilities?.isSizeSupported(width, height) == true }.ifEmpty { all }
         .sortedWith(compareBy<MediaCodecInfo> { it.name in EncoderTrouble.bad }.thenByDescending { it.hardware })
     if (infos.isEmpty()) throw ExportError(txt(R.string.export_error_cannot_encode, s.codec.label, "${width}x$height"))
     var last: Throwable? = null

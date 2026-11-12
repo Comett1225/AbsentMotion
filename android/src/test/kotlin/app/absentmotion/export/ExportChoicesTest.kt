@@ -136,10 +136,13 @@ class ExportChoicesTest {
 
     @Test fun unsupportedSettingsUseTheCheckSuggestionAndBlockTheButton() {
         val big = ExportSettings(2160, 30, Codec.H264)
-        val support = check(big)
-        assertTrue(support is Support.Unsupported)
+        val tried = check(big)
+        assertTrue(tried is Support.Unsupported && tried.risky)
+        assertEquals((tried as Support.Unsupported).reason, codecWarning(big, tried))
+        assertNull(exportBlock(StorageStatus.Enough, tried))
+        val support = tried.copy(risky = false)
         assertEquals(txt(R.string.export_use, "H.265"), suggestionLabel(big, betterChoice(big, support, check)!!))
-        assertEquals(txt(R.string.export_warning_unsupported, (support as Support.Unsupported).reason), codecWarning(big, support))
+        assertEquals(txt(R.string.export_warning_unsupported, support.reason), codecWarning(big, support))
         assertEquals(txt(R.string.export_block_unsupported), exportBlock(StorageStatus.Enough, support))
         assertEquals(txt(R.string.export_block_storage), exportBlock(StorageStatus.NotEnough(txt(R.string.library_text_value, "x")), Support.Supported))
         assertNull(exportBlock(StorageStatus.Low(txt(R.string.library_text_value, "x")), Support.SlowSoftwareOnly(txt(R.string.library_text_value, "x"))))

@@ -2083,6 +2083,9 @@
     <string name="caption_layer_name">تسمية توضيحية %1$s</string>
     <string name="tier_needs_latest">يتطلب Android 13 (إصدار Latest)</string>
     <string name="tier_needs_vulkan">يتطلب هاتفًا يدعم رسومات Vulkan</string>
+    <string name="unlock_title">هذا الهاتف غير مصمَّم لهذا</string>
+    <string name="unlock_text">يتطلب ذلك قدرة أكبر مما يوفره هذا الهاتف أو هذه النسخة من التطبيق. قد يكون بطيئًا جدًا، أو يسخّن الهاتف، أو يفشل، أو يغلق التطبيق. هل تريد استخدامه على أي حال؟</string>
+    <string name="unlock_use_anyway">استخدام على أي حال</string>
     <string name="feature_flow_high">التدفق البصري عالي</string>
     <string name="feature_ai_enhance">تحسين بالذكاء الاصطناعي</string>
     <string name="feature_best_cutout">إزالة الخلفية بالذكاء الاصطناعي 2.0</string>

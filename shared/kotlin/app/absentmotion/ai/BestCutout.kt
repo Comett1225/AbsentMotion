@@ -68,7 +68,9 @@ internal suspend fun <T> bestOrStandard(quality: CutoutQuality, install: suspend
 internal fun cutoutSide(ramBytes: Long, gpu: Boolean): Int = if (gpu && ramBytes >= CUTOUT_LARGE_RAM) CUTOUT_LARGE_SIDE else CUTOUT_SIDE
 
 internal object BestCutout {
-    val offered: Boolean get() = Tier.has(Feature.BestCutout) && BackgroundRemoval.AVAILABLE
+    val offered: Boolean get() = BackgroundRemoval.AVAILABLE
+
+    val kept: Boolean get() = offered && Tier.has(Feature.BestCutout)
 
     @Volatile var sideOverride: Int? = null
 

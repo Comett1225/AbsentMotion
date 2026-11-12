@@ -1963,6 +1963,9 @@
     <string name="caption_layer_name">Kapsyen %1$s</string>
     <string name="tier_needs_latest">Perlu Android 13 (Versi Latest)</string>
     <string name="tier_needs_vulkan">Perlu telefon dengan grafik Vulkan</string>
+    <string name="unlock_title">Telefon ini tidak dibuat untuk ini</string>
+    <string name="unlock_text">Ciri ini memerlukan kuasa lebih daripada yang ada pada telefon ini atau versi apl ini. Ia mungkin sangat perlahan, memanaskan telefon, gagal atau menutup apl. Guna juga?</string>
+    <string name="unlock_use_anyway">Guna juga</string>
     <string name="feature_flow_high">Aliran optik Tinggi</string>
     <string name="feature_ai_enhance">Peningkatan AI</string>
     <string name="feature_best_cutout">Penyingkiran latar belakang AI 2.0</string>

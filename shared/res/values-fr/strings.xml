@@ -2011,6 +2011,9 @@
     <string name="caption_layer_name">Sous-titre %1$s</string>
     <string name="tier_needs_latest">Nécessite Android 13 (version la plus récente)</string>
     <string name="tier_needs_vulkan">Nécessite un téléphone avec graphismes Vulkan</string>
+    <string name="unlock_title">Ce téléphone n\'est pas fait pour ça</string>
+    <string name="unlock_text">Cela demande plus de puissance que n\'en a ce téléphone ou cette version de l\'appli. Cela peut être très lent, faire chauffer le téléphone, échouer ou fermer l\'appli. L\'utiliser quand même ?</string>
+    <string name="unlock_use_anyway">Utiliser quand même</string>
     <string name="feature_flow_high">Flux optique élevé</string>
     <string name="feature_ai_enhance">Amélioration AI</string>
     <string name="feature_best_cutout">Suppression de l’arrière-plan AI 2.0</string>
