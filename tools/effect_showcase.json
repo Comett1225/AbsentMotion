@@ -116,7 +116,7 @@
     "heart": {"photo": "colour", "under": "grid", "params": {"rotY": [-30, 330], "scale": 0.75}, "animate": 16},
     "cross": {"photo": "colour", "under": "grid", "params": {"rotY": [-35, 325], "scale": 0.75}, "animate": 16},
     "rasterextrude": {"photo": "colour", "under": "grid", "params": {"rotY": [-35, 325], "scale": 0.7}, "animate": 16},
-    "text3d": {"layout": "text", "text": "3D", "size": 60, "font": "googlefonts?name=Montserrat&amp;weight=900", "effect": "rasterextrude", "under": "grid", "params": {"rotY": [-40, 20], "rotX": -15, "depth": 0.3}, "animate": 16},
+    "text3d": {"layout": "text", "text": "3D", "size": 60, "font": "googlefonts?name=Montserrat&amp;weight=900", "effect": "rasterextrude", "under": "grid", "params": {"rotY": [-5, 8.4, 19.7, 27.3, 30, 27.3, 19.7, 8.4, -5, -18.4, -29.7, -37.3, -40, -37.3, -29.7, -18.4, -5], "rotX": [-2, -2.8, -4.9, -8.2, -12, -15.8, -19.1, -21.2, -22, -21.2, -19.1, -15.8, -12, -8.2, -4.9, -2.8, -2], "depth": 0.3}, "animate": 16},
     "flip": {"photo": "colour", "under": "grid", "params": {"rotY": [0, 360], "scale": 0.75}, "animate": 16},
     "spherize": {"photo": "colour", "under": "grid", "params": {"rotY": [0, 360], "scale": 0.75}, "animate": 16},
     "tunnel": {"photo": "colour", "params": {"speed": 1.5}, "animate": 16},
