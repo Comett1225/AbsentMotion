@@ -257,6 +257,10 @@ On another chip or an older system, build it from source ([`docs/BUILD.md`](docs
 - A community library, hosted on GitHub, where people share what they make with AbsentMotion.
 - There won't be many major patches or features; most updates will focus on stability for the PC versions.
 
+### 5.3
+
+- Share projects between your own devices nearby: send the project you're editing from your phone to your computer, or back, and keep editing there.
+
 ### 6.0
 
 - An IPA file for sideloading on iPhones and iPads.
