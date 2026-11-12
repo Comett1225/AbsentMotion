@@ -458,6 +458,8 @@ class Site:
         ) % (html, escape(title), escape(description), '<link rel="icon" type="image/png" href="%sassets/logo.png">' % base if site else "", style, script, "site" if site else "app", kind, '<a class="skip" href="#main">Skip to the content</a>' if site else "", top, side, body, foot)
 
     def add(self, path, text):
+        if self.target == "site" and path.endswith(".html"):
+            text = clean_links(text)
         self.files[self.prefix + path] = text.encode()
 
     def build(self):
@@ -779,6 +781,30 @@ def validate_devices(devices):
     return problems
 
 
+def clean_link(ref):
+    if re.match(r"^([a-z]+:|//|#)", ref):
+        return ref
+    name, mark, frag = ref.partition("#")
+    if name == "index.html" or name.endswith("/index.html"):
+        name = name[:-len("index.html")] or "./"
+    elif name.endswith(".html"):
+        name = name[:-len(".html")]
+    return name + mark + frag
+
+
+def clean_links(text):
+    return re.sub(r'\bhref="([^"]*)"', lambda m: 'href="%s"' % clean_link(m.group(1)), text)
+
+
+def page_key(files, key):
+    if key in files:
+        return key
+    for candidate in (key + ".html", (key + "/" if key else "") + "index.html"):
+        if candidate in files:
+            return candidate
+    return key
+
+
 def check_links(files, target):
     problems = []
     ids = {}
@@ -807,7 +833,7 @@ def check_links(files, target):
                         parts.append("..")
                 elif part != ".":
                     parts.append(part)
-            key = "/".join(parts)
+            key = page_key(files, "/".join(parts))
             if key in files:
                 if frag and key.endswith(".html") and frag not in ids[key]:
                     problems.append("%s: %s has no anchor #%s" % (path, key, frag))
