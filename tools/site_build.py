@@ -29,6 +29,7 @@ SHORT = {
     "issues": REPO + "/issues",
     "report-form": "https://forms.gle/6bY8KBPMKc2iUypV6",
     "feature-form": "https://forms.gle/5ZohVpB2eBPvzhu4A",
+    "discord": "https://discord.gg/xXEHj8Sx8X",
     "privacy-file": REPO + "/blob/main/PRIVACY.md",
     "license-file": REPO + "/blob/main/LICENSE",
     "notices-file": REPO + "/blob/main/THIRD_PARTY_NOTICES.md",
@@ -852,7 +853,7 @@ def check_text(files):
         text = data.decode()
         lower = text.lower()
         for word in OTHER_EDITORS:
-            if path == "roadmap.html" and word in ("alight", "capcut"):
+            if path in ("roadmap.html", "index.html") and word in ("alight", "capcut"):
                 continue
             if word in lower and not path.startswith("effects/thumb"):
                 problems.append("%s: names another editor (%s)" % (path, word))
