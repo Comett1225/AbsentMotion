@@ -146,7 +146,7 @@ class ToolRegressions(unittest.TestCase):
                 shutil.copy(ROOT / 'tools' / name, repo / 'tools' / name)
             (repo / 'tools/publish_forbidden.txt').write_text('fixtureword\n')
             (repo / 'tools/publish_allowed.txt').write_text('https://example.invalid/fixtureword/app\n')
-            (repo / '.gitignore').write_text('/tools/publish_forbidden.txt\n/tools/publish_allowed.txt\n')
+            (repo / '.gitignore').write_text('/tools/publish_forbidden.txt\n/tools/publish_allowed.txt\n__pycache__/\n')
             (repo / 'page.txt').write_text('see https://example.invalid/FixtureWord/app\n')
             env = {k: v for k, v in os.environ.items() if not k.startswith('GIT_')}
             def git(*args, name='AbsentMotion', mail='noreply@absentmotion.invalid'):

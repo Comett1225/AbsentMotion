@@ -162,7 +162,7 @@ static_failed=0
 while IFS='|' read -r name command hint; do
     if [ "$(cat "$status/$name" 2>/dev/null || echo 1)" != 0 ]; then
         printf '\n-- %s failed (%s): %s\n' "$name" "$hint" "$command" >&2
-        tail -n 15 "$status/$name.log" >&2
+        if [ -n "${CI:-}" ]; then cat "$status/$name.log" >&2; else tail -n 15 "$status/$name.log" >&2; fi
         static_failed=1
     fi
     grep -h '^skipped:' "$status/$name.log" 2>/dev/null
