@@ -272,8 +272,8 @@ object EffectClipboard {
     fun copyOne(effect: XmlNode) { effects = listOf(effect) }
 }
 
-fun EditorState.addEffectToChosen(ids: Set<Long>, make: (Layer) -> XmlNode): Int {
-    val targets = scene.effectTargets(ids)
+fun EditorState.addEffectToChosen(ids: Set<Long>, skip: (Layer) -> Boolean = { false }, make: (Layer) -> XmlNode): Int {
+    val targets = scene.effectTargets(ids).filterNot(skip)
     if (targets.isNotEmpty()) edit { s -> targets.fold(s) { acc, target -> acc.update(target.id) { it.addEffect(make(it)) } } }
     return targets.size
 }

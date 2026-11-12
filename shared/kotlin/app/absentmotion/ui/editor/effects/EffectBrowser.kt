@@ -108,8 +108,21 @@ import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.sign
 
+internal val LocalBlockedCategory = androidx.compose.runtime.staticCompositionLocalOf<String?> { null }
+
+internal fun EffectDefinition.usable(blocked: String?): Boolean = available && category != blocked
+
+internal fun blockedCategory(layer: app.absentmotion.model.Layer?): String? = if (layer?.kind == "model") "3d" else null
+
 @Composable
 fun EffectBrowser(state: EditorState) {
+    val blocked = if (state.effectTargets == null) blockedCategory(state.selected) else null
+    androidx.compose.runtime.CompositionLocalProvider(LocalBlockedCategory provides blocked) { BrowserBody(state) }
+}
+
+@Composable
+private fun BrowserBody(state: EditorState) {
+    val blocked = LocalBlockedCategory.current
     val catalog by state.engine.effects.collectAsState()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -151,10 +164,10 @@ fun EffectBrowser(state: EditorState) {
         history.edit().putStringSet("favourites", favourites).apply()
     }
     fun add(effect: EffectDefinition, preset: EffectPreset? = null) {
-        if (!effect.available) return
+        if (!effect.usable(blocked)) return
         val targets = state.effectTargets
         if (targets != null) {
-            val added = state.addEffectToChosen(targets) { layer: app.absentmotion.model.Layer -> effect.instance(preset, layer.endTime - layer.startTime) }
+            val added = state.addEffectToChosen(targets, skip = { !effect.usable(blockedCategory(it)) }) { layer: app.absentmotion.model.Layer -> effect.instance(preset, layer.endTime - layer.startTime) }
             if (added == 0) app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.effects_paste_no_target), app.absentmotion.platform.Toast.LENGTH_LONG).show()
             recent = (listOf(effect.id) + recent.filterNot { it == effect.id }).take(40)
             history.edit().putString("recent", recent.joinToString("|")).apply()
@@ -167,7 +180,7 @@ fun EffectBrowser(state: EditorState) {
         state.effectIndex = (state.selected?.effects?.size ?: 0) - 1
         close()
     }
-    fun pick(effect: EffectDefinition) { if (effect.available) add(effect) else detail = effect }
+    fun pick(effect: EffectDefinition) { if (effect.usable(blocked)) add(effect) else detail = effect }
     fun editAudio(index: Int) {
         state.audioFxFocus = index
         state.panel = EditorPanel.Tools
@@ -289,14 +302,14 @@ fun EffectBrowser(state: EditorState) {
                         Text(stringResource(R.string.effect_help), Modifier.padding(start = 12.dp), color = Am.OnDark, fontSize = 15.sp)
                     }
                     if (state.effectDetail == null) Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        Text(stringResource(R.string.standard_settings), Modifier.weight(1f).height(48.dp).alpha(if (effect.available) 1f else 0.35f)
-                            .clickable(enabled = effect.available) { add(effect) }.padding(12.dp), color = Am.OnDark, fontSize = 15.sp)
+                        Text(stringResource(R.string.standard_settings), Modifier.weight(1f).height(48.dp).alpha(if (effect.usable(blocked)) 1f else 0.35f)
+                            .clickable(enabled = effect.usable(blocked)) { add(effect) }.padding(12.dp), color = Am.OnDark, fontSize = 15.sp)
                         FavouriteStar(effect.id in favourites, stringResource(R.string.effectbrowser_favorite), Modifier.size(48.dp).clickable { favourite(effect) }.padding(12.dp))
                     }
                     if (state.effectDetail == null) effect.presets.forEach { preset ->
                         Row(Modifier.fillMaxWidth().height(72.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Row(Modifier.weight(1f).fillMaxHeight().alpha(if (effect.available) 1f else 0.35f)
-                                .clickable(enabled = effect.available) { add(effect, preset) }.padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Row(Modifier.weight(1f).fillMaxHeight().alpha(if (effect.usable(blocked)) 1f else 0.35f)
+                                .clickable(enabled = effect.usable(blocked)) { add(effect, preset) }.padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Thumbnail(catalog, effect.thumbnail(preset), Modifier.size(56.dp).clip(RoundedCornerShape(5.dp)))
                                 Text(preset.name, Modifier.weight(1f).padding(start = 12.dp), color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
                             }
@@ -343,7 +356,7 @@ fun EffectBrowser(state: EditorState) {
                 items(results, key = { it.id }) { effect -> EffectTile(catalog, effect, 100f, { if (effect in byPreset) detail = effect else pick(effect) }, { detail = effect }, effect.id in favourites) }
             }
         } else if (PlatformFeatures.desktop) {
-            DeskEffectsHome(homeScroll, catalog, recent, favourites, presetFavourites, favPage, { favPage = it }, hasSound, audioName, ::pick, { effect, preset -> if (effect.available) add(effect, preset) else detail = effect }, { detail = it }, { category = it })
+            DeskEffectsHome(homeScroll, catalog, recent, favourites, presetFavourites, favPage, { favPage = it }, hasSound, audioName, ::pick, { effect, preset -> if (effect.usable(blocked)) add(effect, preset) else detail = effect }, { detail = it }, { category = it })
         } else {
             Column(Modifier.fillMaxSize().verticalScroll(homeScroll)) {
                 val recommended = listOf("absent.chromakey", "absent.blur", "absent.glow").mapNotNull(catalog::find)
@@ -361,7 +374,7 @@ fun EffectBrowser(state: EditorState) {
                                 repeat(2) { row ->
                                     Box(Modifier.height(100.dp)) {
                                         column.getOrNull(row)?.let { (effect, preset) ->
-                                            EffectTile(catalog, effect, 62f, { if (preset == null) pick(effect) else if (effect.available) add(effect, preset) else detail = effect },
+                                            EffectTile(catalog, effect, 62f, { if (preset == null) pick(effect) else if (effect.usable(blocked)) add(effect, preset) else detail = effect },
                                                 { detail = effect }, true, preset)
                                         }
                                     }
@@ -391,8 +404,8 @@ fun EffectBrowser(state: EditorState) {
                     Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(1.5.dp)) {
                         row.forEach { (key, name) ->
                             val press = remember { MutableInteractionSource() }
-                            Box(Modifier.weight(1f).height(66.5.dp).padding(bottom = 1.5.dp).pressScale(press, TilePress)
-                                .clickable(press, LocalIndication.current) { category = key }, contentAlignment = Alignment.Center) {
+                            Box(Modifier.weight(1f).height(66.5.dp).padding(bottom = 1.5.dp).pressScale(press, TilePress).alpha(if (key == blocked) 0.35f else 1f)
+                                .clickable(press, LocalIndication.current, enabled = key != blocked) { category = key }, contentAlignment = Alignment.Center) {
                                 if (key == "ai") AiBackdrop(Modifier.fillMaxSize())
                                 else if (key == "audio") AudioBackdrop(Modifier.fillMaxSize())
                                 else Thumbnail(catalog, catalog.listed(key).firstOrNull()?.thumbnail, Modifier.fillMaxSize(), ContentScale.Crop)
@@ -413,7 +426,7 @@ fun EffectBrowser(state: EditorState) {
             if (starred.isEmpty()) Text(stringResource(R.string.effectbrowser_favorite_empty), Modifier.align(Alignment.Center).padding(horizontal = 24.dp), color = Am.OnDarkDim, fontSize = 15.sp, textAlign = TextAlign.Center)
             else LazyVerticalGrid(GridCells.Adaptive(110.dp), Modifier.fillMaxSize(), contentPadding = PaddingValues(10.dp)) {
                 item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) { Text(stringResource(R.string.effectbrowser_favorite), Modifier.padding(start = 6.dp, top = 6.dp, bottom = 10.dp), color = Am.OnDark, fontSize = 15.sp, fontWeight = FontWeight.Medium) }
-                items(starred) { (effect, preset) -> EffectTile(catalog, effect, 100f, { if (preset == null) pick(effect) else if (effect.available) add(effect, preset) else detail = effect }, { detail = effect }, true, preset) }
+                items(starred) { (effect, preset) -> EffectTile(catalog, effect, 100f, { if (preset == null) pick(effect) else if (effect.usable(blocked)) add(effect, preset) else detail = effect }, { detail = effect }, true, preset) }
             }
             detailPane()
         }
@@ -476,7 +489,7 @@ private fun DeskEffectsHome(
                 listed.chunked(columns).forEach { row ->
                     Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(8.dp)) {
                         row.forEach { (key, name) ->
-                            Box(Modifier.weight(1f).height(72.dp).clip(RoundedCornerShape(8.dp)).hoverFill(8.dp, Color.White.copy(alpha = .12f)).handCursor().clickable { open(key) }, Alignment.Center) {
+                            Box(Modifier.weight(1f).height(72.dp).clip(RoundedCornerShape(8.dp)).alpha(if (key == LocalBlockedCategory.current) 0.35f else 1f).hoverFill(8.dp, Color.White.copy(alpha = .12f)).handCursor().clickable(enabled = key != LocalBlockedCategory.current) { open(key) }, Alignment.Center) {
                                 if (key == "ai") AiBackdrop(Modifier.fillMaxSize())
                                 else if (key == "audio") AudioBackdrop(Modifier.fillMaxSize())
                                 else Thumbnail(catalog, catalog.listed(key).firstOrNull()?.thumbnail, Modifier.fillMaxSize(), ContentScale.Crop)
@@ -502,7 +515,7 @@ private fun DeskTab(label: String, selected: Boolean, onClick: () -> Unit) {
 @Composable
 private fun EffectTile(catalog: EffectCatalog, effect: EffectDefinition, width: Float, onClick: () -> Unit, onLongClick: () -> Unit, favourite: Boolean, preset: EffectPreset? = null) {
     val press = remember { MutableInteractionSource() }
-    Column(Modifier.width(width.dp).pressScale(press, TilePress).alpha(if (effect.available) 1f else 0.35f).clip(RoundedCornerShape(6.dp)).hoverFill(6.dp, Am.Field).handCursor()
+    Column(Modifier.width(width.dp).pressScale(press, TilePress).alpha(if (effect.usable(LocalBlockedCategory.current)) 1f else 0.35f).clip(RoundedCornerShape(6.dp)).hoverFill(6.dp, Am.Field).handCursor()
         .rightClick(onLongClick).combinedClickable(press, LocalIndication.current, onClick = onClick, onLongClick = onLongClick).padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Box {
             Thumbnail(catalog, preset?.let(effect::thumbnail) ?: effect.thumbnail, Modifier.size((width - 7).dp).clip(RoundedCornerShape(5.dp)))
