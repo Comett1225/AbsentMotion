@@ -225,26 +225,26 @@
         if (!link(file)) {
           heading = "The version for your phone is coming soon";
           kids.push(el("p", { text: seen + needs + ", which comes with the next update. Check back here soon." }));
-          kids.push(el("p", { "class": "small" }, [el("a", { href: "compatible.html", text: "What the Compatible version is" }), "."]));
+          kids.push(el("p", { "class": "small" }, [el("a", { href: "compatible", text: "What the Compatible version is" }), "."]));
           break;
         }
         heading = narrow ? "Get the 32-bit Compatible version" : "Get the Compatible version";
         kids.push(el("p", { text: seen + needs + "." }));
         actions.push(el("a", { "class": "btn big", href: link(file) }, [narrow ? "Download 32-bit Compatible version" : "Download Compatible version", el("span", { "class": "sub", text: (narrow ? "32-bit, Android 8 or newer, " : "Android 8 to 12, ") + version })]));
-        kids.push(el("p", { "class": "small" }, ["Some features are left out of this version. ", el("a", { href: "compatible.html", text: "See which ones" }), ". If the phone is updated to Android 13 or newer later, the Latest version is the one to use."]));
+        kids.push(el("p", { "class": "small" }, ["Some features are left out of this version. ", el("a", { href: "compatible", text: "See which ones" }), ". If the phone is updated to Android 13 or newer later, the Latest version is the one to use."]));
         if (verdictInfo && verdictInfo.ai) kids.push(el("p", { "class": "small", text: verdictInfo.ai }));
         break;
       case "old":
         heading = "This phone is too old for AbsentMotion";
         kids.push(el("p", { text: "Your phone runs Android " + env.android + ". AbsentMotion needs Android 8 or newer (Android 13 or newer for the Latest version)." }));
-        kids.push(el("p", {}, ["If you have another phone, ", el("a", { href: "phone-checker.html", text: "type its model in the phone checker" }), " or pick a download from the list below."]));
+        kids.push(el("p", {}, ["If you have another phone, ", el("a", { href: "phone-checker", text: "type its model in the phone checker" }), " or pick a download from the list below."]));
         break;
       case "unknown":
         heading = "Which Android version do you have?";
         kids.push(el("p", { text: (name ? "We think this is a " + name + ", but " : "") + "your browser does not tell us the Android version. Open Settings, About phone, Android version." }));
         actions.push(el("a", { "class": "btn", href: link("dl-foss"), text: "Android 13 or newer: Latest" }));
         if (link("dl-compatible")) actions.push(el("a", { "class": "btn alt", href: link("dl-compatible"), text: "Android 8 to 12: Compatible" }));
-        kids.push(el("p", { "class": "small" }, ["Not sure it will run? ", el("a", { href: "phone-checker.html", text: "Use the phone checker" }), "."]));
+        kids.push(el("p", { "class": "small" }, ["Not sure it will run? ", el("a", { href: "phone-checker", text: "Use the phone checker" }), "."]));
         break;
       case "ios":
         heading = "AbsentMotion is an Android app";
@@ -294,7 +294,7 @@
           else copy.textContent = "Copy it from the address bar";
         });
         actions.push(copy);
-        actions.push(el("a", { "class": "btn alt", href: "phone-checker.html", text: "Phone checker" }));
+        actions.push(el("a", { "class": "btn alt", href: "phone-checker", text: "Phone checker" }));
     }
     box.textContent = "";
     box.appendChild(el("h2", { text: heading }));
