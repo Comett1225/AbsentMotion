@@ -43,6 +43,10 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.calculatePan
+import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -147,6 +151,9 @@ import app.absentmotion.export.NotifyAsk
 import app.absentmotion.export.imageProblem
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import app.absentmotion.export.withSquare
+import app.absentmotion.export.square
+import kotlinx.coroutines.flow.first
 import app.absentmotion.export.ExportSizes
 import app.absentmotion.export.ExportTimes
 import app.absentmotion.export.StorageStatus
@@ -1570,7 +1577,11 @@ private fun SaveInField(settings: app.absentmotion.library.AppSettings) {
 private fun CommunityFields(scene: Scene, engine: EngineThread, settings: app.absentmotion.library.AppSettings, community: app.absentmotion.export.CommunityDetails, onChange: (app.absentmotion.export.CommunityDetails?) -> Unit) {
     Field(stringResource(R.string.community_thumbnail)) {
         val ratio = scene.width.coerceAtLeast(1).toFloat() / scene.height.coerceAtLeast(1)
-        DeskStill(scene, community.thumbMs, engine, Modifier.fillMaxWidth().aspectRatio(ratio.coerceIn(0.5f, 2f)).clip(RoundedCornerShape(8.dp)).background(Am.Card))
+        Box(Modifier.fillMaxWidth().aspectRatio(ratio.coerceIn(0.5f, 2f)).clip(RoundedCornerShape(8.dp)).background(Am.Card)) {
+            DeskStill(scene, community.thumbMs, engine, Modifier.fillMaxSize())
+            SquareChooser(scene.width, scene.height, community.square(scene.width, scene.height), 12.dp, Modifier.fillMaxSize(),
+                if (DESK) { square -> onChange(community.withSquare(square, scene.width, scene.height)) } else null)
+        }
         if (DESK) {
             var at by remember { mutableFloatStateOf(community.thumbMs.toFloat()) }
             androidx.compose.material3.Slider(
@@ -1584,7 +1595,7 @@ private fun CommunityFields(scene: Scene, engine: EngineThread, settings: app.ab
             Box(Modifier.fillMaxWidth().height(42.dp).clip(RoundedCornerShape(4.dp)).background(Navy).clickable { picking = true }, contentAlignment = Alignment.Center) {
                 Text(stringResource(R.string.community_choose_thumbnail), color = Am.OnNavy, fontSize = 15.sp, fontWeight = FontWeight.Medium, maxLines = 1, style = Mixed)
             }
-            if (picking) ThumbnailPicker(scene, engine, community.thumbMs, { onChange(community.copy(thumbMs = it)); picking = false }) { picking = false }
+            if (picking) ThumbnailPicker(scene, engine, community, { onChange(it); picking = false }) { picking = false }
         }
     }
     TextBox(R.string.community_title, community.title, 80) { onChange(community.copy(title = it)) }
@@ -1634,7 +1645,9 @@ private fun TextBox(@StringRes label: Int, value: String, limit: Int, lines: Int
 }
 
 @Composable
-private fun ThumbnailPicker(scene: Scene, engine: EngineThread, startMs: Int, onConfirm: (Int) -> Unit, onCancel: () -> Unit) {
+private fun ThumbnailPicker(scene: Scene, engine: EngineThread, community: app.absentmotion.export.CommunityDetails, onConfirm: (app.absentmotion.export.CommunityDetails) -> Unit, onCancel: () -> Unit) {
+    val startMs = community.thumbMs
+    var square by remember { mutableStateOf(community.square(scene.width, scene.height)) }
     val context = LocalContext.current
     val state = remember {
         val root = java.io.File(context.cacheDir, "thumbnail-picker").apply { deleteRecursively(); mkdirs() }
@@ -1654,11 +1667,14 @@ private fun ThumbnailPicker(scene: Scene, engine: EngineThread, startMs: Int, on
                         Icon(app.absentmotion.ui.editor.ChromeIcons.Back, stringResource(R.string.export_back), Modifier.size(22.dp), tint = Am.OnDark)
                     }
                     Text(stringResource(R.string.community_thumbnail), Modifier.weight(1f), color = Am.OnDark, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Box(Modifier.height(34.dp).alpha(if (ready) 1f else Dimmed).clip(RoundedCornerShape(4.dp)).background(Am.Accent).clickable(enabled = ready) { onConfirm(state.timeMs) }.padding(horizontal = 14.dp), contentAlignment = Alignment.Center) {
+                    Box(Modifier.height(34.dp).alpha(if (ready) 1f else Dimmed).clip(RoundedCornerShape(4.dp)).background(Am.Accent).clickable(enabled = ready) { onConfirm(community.copy(thumbMs = state.timeMs).withSquare(square, scene.width, scene.height)) }.padding(horizontal = 14.dp), contentAlignment = Alignment.Center) {
                         Text(stringResource(R.string.community_confirm_thumbnail), color = Am.OnAccent, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1, style = Mixed)
                     }
                 }
-                PickerStill(scene, state.timeMs, engine, Modifier.fillMaxWidth().weight(1f).background(Am.PreviewBg)) { shownMs = it }
+                Box(Modifier.fillMaxWidth().weight(1f).background(Am.PreviewBg)) {
+                    PickerStill(scene, state.timeMs, engine, Modifier.fillMaxSize()) { shownMs = it }
+                    SquareChooser(scene.width, scene.height, square, 10.dp, Modifier.fillMaxSize()) { square = it }
+                }
                 Row(Modifier.fillMaxWidth().height(46.dp).padding(horizontal = 14.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text(app.absentmotion.ui.editor.TimelineMath.timecode(state.frame, scene.fps), color = Am.OnDark, fontSize = 14.sp, maxLines = 1, style = Mixed)
                     Spacer(Modifier.width(14.dp))
@@ -1672,22 +1688,106 @@ private fun ThumbnailPicker(scene: Scene, engine: EngineThread, startMs: Int, on
 
 @Composable
 private fun PickerStill(scene: Scene, timeMs: Int, engine: EngineThread, modifier: Modifier, onShown: (Int) -> Unit) {
-    val context = LocalContext.current
     var picture by remember { mutableStateOf<ImageBitmap?>(null) }
-    val xml by produceState<String?>(null, scene) { value = withContext(Dispatchers.IO) { scene.toXml() } }
-    LaunchedEffect(timeMs, xml) {
-        val source = xml ?: return@LaunchedEffect
-        delay(40)
+    val wanted by rememberUpdatedState(timeMs)
+    val shown by rememberUpdatedState(onShown)
+    LaunchedEffect(scene) {
+        val xml = withContext(Dispatchers.IO) { scene.toXml() }
         val long = maxOf(scene.width, scene.height, 1)
-        val file = java.io.File(context.cacheDir, "thumbnail-picker-${System.nanoTime()}.png")
+        fun sized(edge: Int) = (edge * scene.width / long).coerceAtLeast(1) to (edge * scene.height / long).coerceAtLeast(1)
+        val (quickW, quickH) = sized(PickerQuickEdge)
+        val (sharpW, sharpH) = sized(PickerSharpEdge)
         try {
-            val made = try {
-                engine.stillPng(source, timeMs, (900 * scene.width / long).coerceAtLeast(1), (900 * scene.height / long).coerceAtLeast(1), file)
-            } catch (e: CancellationException) { throw e } catch (e: Exception) { false }
-            if (made) withContext(Dispatchers.IO) { BitmapFactory.decodeFile(file.path)?.asImageBitmap() }?.let { picture = it; onShown(timeMs) }
-        } finally { file.delete() }
+            engine.exportSession(xml) {
+                var drawn = -1
+                while (true) {
+                    val at = wanted
+                    if (at != drawn) {
+                        drawn = at
+                        previewStill(at, quickW, quickH, false)?.let { picture = app.absentmotion.platform.rawFrameImage(it, quickW, quickH) }
+                        continue
+                    }
+                    if (kotlinx.coroutines.withTimeoutOrNull(PickerSettleMs) { snapshotFlow { wanted }.first { it != at } } != null) continue
+                    still(at, sharpW, sharpH)?.let { picture = app.absentmotion.platform.rawFrameImage(it, sharpW, sharpH); shown(at) }
+                    snapshotFlow { wanted }.first { it != at }
+                }
+            }
+        } catch (e: CancellationException) { throw e } catch (e: Exception) { }
     }
     Box(modifier, Alignment.Center) {
         picture?.let { Image(it, null, Modifier.fillMaxSize().padding(10.dp), contentScale = ContentScale.Fit) }
     }
 }
+
+@Composable
+private fun SquareChooser(width: Int, height: Int, square: app.absentmotion.export.ThumbSquare, pad: androidx.compose.ui.unit.Dp, modifier: Modifier,
+                          onChange: ((app.absentmotion.export.ThumbSquare) -> Unit)?) {
+    if (width == height) return
+    val latest by rememberUpdatedState(square)
+    val change by rememberUpdatedState(onChange)
+    val description = stringResource(R.string.a11y_crop_area)
+    androidx.compose.foundation.layout.BoxWithConstraints(modifier.padding(pad)) {
+        val density = androidx.compose.ui.platform.LocalDensity.current
+        val boxW = with(density) { maxWidth.toPx() }
+        val boxH = with(density) { maxHeight.toPx() }
+        val scale = minOf(boxW / width.coerceAtLeast(1), boxH / height.coerceAtLeast(1))
+        val origin = androidx.compose.ui.geometry.Offset((boxW - width * scale) / 2f, (boxH - height * scale) / 2f)
+        fun toScreen(x: Float, y: Float) = origin + androidx.compose.ui.geometry.Offset(x * scale, y * scale)
+        val reach = with(density) { 28.dp.toPx() }
+        androidx.compose.foundation.Canvas(Modifier.fillMaxSize().semantics { contentDescription = description }.then(if (onChange == null) Modifier else Modifier.pointerInput(width, height, scale, origin) {
+            awaitEachGesture {
+                val down = awaitFirstDown()
+                val start = latest
+                val corner = start.corners().map { (x, y) -> (toScreen(x, y) - down.position).getDistance() }.withIndex().filter { it.value < reach }.minByOrNull { it.value }?.index ?: -1
+                val topLeft = toScreen(start.left, start.top)
+                val inside = down.position.x in topLeft.x..topLeft.x + start.side * scale && down.position.y in topLeft.y..topLeft.y + start.side * scale
+                if (corner < 0 && !inside) return@awaitEachGesture
+                var now = start
+                do {
+                    val event = awaitPointerEvent()
+                    val pressed = event.changes.filter { it.pressed }
+                    now = when {
+                        pressed.size > 1 -> now.scaled(event.calculateZoom(), width, height).moved(event.calculatePan().x / scale, event.calculatePan().y / scale, width, height)
+                        corner >= 0 -> event.changes.first().position.let { p -> now.dragged(corner, (p.x - origin.x) / scale, (p.y - origin.y) / scale, width, height) }
+                        else -> event.calculatePan().let { now.moved(it.x / scale, it.y / scale, width, height) }
+                    }
+                    if (now != latest) change?.invoke(now)
+                    event.changes.forEach { it.consume() }
+                } while (event.changes.any { it.pressed })
+            }
+        })) {
+            val q = square
+            val a = toScreen(q.left, q.top)
+            val b = toScreen(q.left + q.side, q.top + q.side)
+            val image = androidx.compose.ui.geometry.Rect(origin, androidx.compose.ui.geometry.Size(width * scale, height * scale))
+            val dim = androidx.compose.ui.graphics.Path().apply {
+                fillType = androidx.compose.ui.graphics.PathFillType.EvenOdd
+                addRect(image)
+                addRect(androidx.compose.ui.geometry.Rect(a, b))
+            }
+            drawPath(dim, Color.Black.copy(alpha = 0.6f))
+            val thin = 1.dp.toPx()
+            for (i in 1..2) {
+                val f = i / 3f
+                drawLine(Color.White.copy(alpha = 0.35f), androidx.compose.ui.geometry.Offset(a.x + (b.x - a.x) * f, a.y), androidx.compose.ui.geometry.Offset(a.x + (b.x - a.x) * f, b.y), thin)
+                drawLine(Color.White.copy(alpha = 0.35f), androidx.compose.ui.geometry.Offset(a.x, a.y + (b.y - a.y) * f), androidx.compose.ui.geometry.Offset(b.x, a.y + (b.y - a.y) * f), thin)
+            }
+            drawRect(Color.Black.copy(alpha = 0.5f), a, androidx.compose.ui.geometry.Size(b.x - a.x, b.y - a.y), style = androidx.compose.ui.graphics.drawscope.Stroke(thin * 3f))
+            drawRect(Color.White, a, androidx.compose.ui.geometry.Size(b.x - a.x, b.y - a.y), style = androidx.compose.ui.graphics.drawscope.Stroke(thin * 1.5f))
+            if (onChange != null) {
+                val arm = minOf(16.dp.toPx(), (b.x - a.x) / 3f)
+                val stroke = 4.dp.toPx()
+                for ((corner, dx, dy) in listOf(Triple(a, 1f, 1f), Triple(androidx.compose.ui.geometry.Offset(b.x, a.y), -1f, 1f), Triple(b, -1f, -1f), Triple(androidx.compose.ui.geometry.Offset(a.x, b.y), 1f, -1f))) {
+                    for (end in listOf(corner + androidx.compose.ui.geometry.Offset(arm * dx, 0f), corner + androidx.compose.ui.geometry.Offset(0f, arm * dy))) {
+                        drawLine(Color.Black.copy(alpha = 0.55f), corner, end, stroke + 2.dp.toPx(), androidx.compose.ui.graphics.StrokeCap.Round)
+                        drawLine(Color.White, corner, end, stroke, androidx.compose.ui.graphics.StrokeCap.Round)
+                    }
+                }
+            }
+        }
+    }
+}
+
+private const val PickerQuickEdge = 480
+private const val PickerSharpEdge = 900
+private const val PickerSettleMs = 180L

@@ -18,8 +18,8 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - Page Curl and Scatter Repeat effects. Page Curl's Follow Shape curls a round picture or a 3D model from its own edge.
 - 3D Text: a tile in the 3D and Text effects that adds Raster Extrude, which turns a text layer into solid 3D letters.
 - Turn 3D effects on the preview: with a 3D effect's settings open, drag on the preview to turn it; two fingers twist it.
-- Effect previews: an effect's page opens with a big, sharp preview.
-- Community bundle: Project Bundle in Export adds a title, a thumbnail picked with Choose thumbnail, a description, tags and a name.
+- Effect previews: an effect's page opens with a big, sharp preview. Moving effect pictures play at 30 fps (12 fps on the Compatible build).
+- Community bundle: Project Bundle in Export adds a title, a thumbnail picked with Choose thumbnail, a description, tags and a name. The thumbnail is square, with smooth scrubbing and a square you move and resize on the picture.
 - Bundles folder: pick a folder once and every project bundle saves there.
 - Hold to pick: hold the three dots on a project, slide to an entry and let go to run it, with a small vibration for each entry you pass.
 - Bottom bar: a soft highlight when a tab is pressed, and hold and slide along the bar to switch tabs, with a small vibration for each one.

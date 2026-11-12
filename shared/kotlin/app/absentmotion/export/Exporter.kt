@@ -1,5 +1,6 @@
 package app.absentmotion.export
 
+import kotlin.math.roundToInt
 import app.absentmotion.R
 import app.absentmotion.i18n.UiText
 import app.absentmotion.i18n.txt
@@ -37,7 +38,8 @@ import java.util.zip.ZipOutputStream
 
 class ExportResult(val uris: List<Uri>, val mime: String, val where: String, val verification: Verification? = null)
 
-data class CommunityDetails(val title: String, val description: String = "", val tags: List<String> = emptyList(), val creator: String = "", val thumbMs: Int = 0, val confirmed: Boolean = false)
+data class CommunityDetails(val title: String, val description: String = "", val tags: List<String> = emptyList(), val creator: String = "", val thumbMs: Int = 0, val confirmed: Boolean = false,
+                            val squareX: Float = 0.5f, val squareY: Float = 0.5f, val squareSize: Float = 1f)
 
 const val CommunityLimitBytes = 20L shl 20
 
@@ -245,13 +247,15 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
     }
 
     private suspend fun communityPart(scene: Scene, xml: String, details: CommunityDetails): CommunityPart {
-        val long = maxOf(scene.width, scene.height, 1)
-        val width = (640 * scene.width / long).coerceAtLeast(1)
-        val height = (640 * scene.height / long).coerceAtLeast(1)
+        val square = details.square(scene.width, scene.height)
+        val scale = minOf(CommunityThumbSide / square.side, CommunityRenderLimit / maxOf(scene.width, scene.height, 1).toFloat())
+        val width = (scene.width * scale).roundToInt().coerceAtLeast(1)
+        val height = (scene.height * scale).roundToInt().coerceAtLeast(1)
         val time = details.thumbMs.coerceIn(0, (scene.totalTime - 1).coerceAtLeast(0))
         val pixels = engine.exportSession(xml) { still(time, width, height) } ?: throw ExportError(txt(R.string.export_error_draw_still))
+        val (cropped, side) = cropSquare(pixels, width, height, ThumbSquare(square.left * scale, square.top * scale, square.side * scale))
         val picture = java.io.ByteArrayOutputStream().also {
-            app.absentmotion.platform.encodeRgba(pixels, width, height, ExportSettings(shortSide = minOf(width, height), fps = scene.fps, image = ImageKind.Webp, imageQuality = 85), null, it)
+            app.absentmotion.platform.encodeRgba(cropped, side, side, ExportSettings(shortSide = side, fps = scene.fps, image = ImageKind.Webp, imageQuality = 85), null, it)
         }.toByteArray()
         val info = JSONObject().put("title", details.title.trim()).put("description", details.description.trim())
             .put("tags", JSONArray(details.tags)).put("creator", details.creator.trim()).put("thumbnail", CommunityThumbnail).put("thumbnailMs", time)
@@ -272,6 +276,8 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
 }
 
 internal const val StallMs = 60_000L
+private const val CommunityThumbSide = 640f
+private const val CommunityRenderLimit = 3072f
 private const val StallGraceMs = 5_000L
 
 internal class ExportStalled : Exception()
