@@ -32,20 +32,20 @@ fun DoneScreen(kind: ExportKind, result: ExportResult, onClose: () -> Unit, onSh
     app.absentmotion.platform.ExportBars(dark = true, running = false)
     Column(Modifier.fillMaxSize().presence().enterFade(10.dp).windowInsetsPadding(WindowInsets.statusBars.union(WindowInsets.captionBar)).navigationBarsPadding()) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 14.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(stringResource(R.string.saved_to_storage), color = Am.OnNavy, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.saved_to_storage), color = Am.OnDone, fontSize = 17.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(4.dp))
-            Text(result.where, color = Am.OnNavy.copy(alpha = 0.7f), fontSize = 13.sp, textAlign = TextAlign.Center)
+            Text(result.where, color = Am.OnDone.copy(alpha = 0.7f), fontSize = 13.sp, textAlign = TextAlign.Center)
             result.verification?.takeUnless { it.ok }?.let { v ->
                 Text(
                     verificationLine(v, still = kind == ExportKind.Frame || kind == ExportKind.FrameAs).text(), Modifier.padding(top = 2.dp),
-                    color = Am.OnNavyAccent,
+                    color = Am.OnDoneAccent,
                     fontSize = 13.sp, textAlign = TextAlign.Center, maxLines = 3,
                 )
             }
             result.verification?.takeIf { it.ok && it.unchecked }?.let {
                 Text(
                     stringResource(R.string.export_checked_unavailable), Modifier.padding(top = 2.dp),
-                    color = Am.OnNavy.copy(alpha = 0.7f),
+                    color = Am.OnDone.copy(alpha = 0.7f),
                     fontSize = 13.sp, textAlign = TextAlign.Center, maxLines = 3,
                 )
             }
@@ -74,10 +74,10 @@ internal fun shareLabel(kind: ExportKind) = when (kind) {
 
 @Composable
 private fun BottomButton(label: String, icon: ImageVector?, pill: Boolean, primary: Boolean, onClick: () -> Unit) {
-    val content = if (pill && primary) Am.OnAccent else Am.OnNavy
+    val content = if (pill && primary) Am.OnAccent else Am.OnDone
     Row(
-        (if (!pill) Modifier.fillMaxWidth().height(57.dp).clip(RoundedCornerShape(5.dp)).background(Am.NavyHi)
-        else Modifier.fillMaxWidth().height(48.dp).clip(androidx.compose.foundation.shape.CircleShape).then(if (primary) Modifier.background(Am.Accent) else Modifier.border(1.dp, Am.OnNavy.copy(alpha = 0.4f), androidx.compose.foundation.shape.CircleShape)))
+        (if (!pill) Modifier.fillMaxWidth().height(57.dp).clip(RoundedCornerShape(5.dp)).background(Am.DoneButton)
+        else Modifier.fillMaxWidth().height(48.dp).clip(androidx.compose.foundation.shape.CircleShape).then(if (primary) Modifier.background(Am.Accent) else Modifier.border(1.dp, Am.OnDone.copy(alpha = 0.4f), androidx.compose.foundation.shape.CircleShape)))
             .clickable(onClick = onClick),
         horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically,
     ) {

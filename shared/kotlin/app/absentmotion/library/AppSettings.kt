@@ -313,12 +313,12 @@ data class SavedSize(val name: String, val width: Int, val height: Int) {
 }
 
 object SavedSizes {
-    const val MAX = 20
     const val MAX_NAME = 40
 
     fun with(list: List<SavedSize>, name: String, width: Int, height: Int): List<SavedSize> {
         val clean = name.trim().take(MAX_NAME).ifEmpty { "$width × $height" }
-        return (listOf(SavedSize(clean, width, height)) + list.filterNot { it.width == width && it.height == height }).take(MAX)
+        val size = SavedSize(clean, width, height)
+        return listOf(size) + list.filterNot { it == size }
     }
 
     fun renamed(list: List<SavedSize>, size: SavedSize, name: String): List<SavedSize> {
@@ -341,6 +341,6 @@ object SavedSizes {
                 val h = o.getInt("h")
                 if (w in 1..8192 && h in 1..8192) SavedSize(o.getString("n"), w, h) else null
             }.getOrNull()
-        }.take(MAX)
+        }
     }.getOrDefault(emptyList())
 }

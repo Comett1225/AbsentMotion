@@ -630,7 +630,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
 
         Presence(phase !is Phase.Idle) {
             val shown = lastPhase
-            val background = animatedColor(if (shown is Phase.Done) Am.Navy else Scrim)
+            val background = animatedColor(if (shown is Phase.Done) Am.DoneBg else Scrim)
             Box(Modifier.fillMaxSize().presenceScrim(background).pointerInput(Unit) {}, contentAlignment = Alignment.Center) {
                 if (shown is Phase.Running) RunningPanel(shown, progress, heat.level, note) { shown.job.cancel() }
                 else if (shown is Phase.Done) DoneScreen(shown.kind, shown.result, { phase = Phase.Idle }) { share(context, shown) }

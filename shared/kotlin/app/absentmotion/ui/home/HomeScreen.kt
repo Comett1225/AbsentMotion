@@ -573,7 +573,7 @@ private fun ProjectCard(
 }
 
 @Composable
-private fun MenuRow(label: String, icon: ImageVector, onClick: () -> Unit, pick: HoldPick? = null) {
+internal fun MenuRow(label: String, icon: ImageVector, onClick: () -> Unit, pick: HoldPick? = null) {
     Row(
         Modifier.fillMaxWidth().height(48.dp).then(pick?.row(label, onClick) ?: Modifier).clickable(onClick = onClick).padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,

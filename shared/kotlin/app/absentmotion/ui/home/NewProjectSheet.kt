@@ -14,6 +14,27 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.withFrameMillis
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.LayoutDirection
+import app.absentmotion.platform.PlatformFeatures
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
 import app.absentmotion.library.SavedSize
@@ -84,6 +105,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import app.absentmotion.library.AppSettings
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import app.absentmotion.library.NewProjectChoice
@@ -140,6 +162,7 @@ internal class Form(saved: NewProjectChoice, val titles: List<String>, val names
     var linked by mutableStateOf(false)
     var fps by mutableIntStateOf(saved.fps)
     var background by mutableIntStateOf(saved.background)
+    var picked by mutableStateOf<SavedSize?>(null)
     private var ratio = 1f
 
     val size: Pair<Int, Int>
@@ -172,6 +195,14 @@ internal class Form(saved: NewProjectChoice, val titles: List<String>, val names
         if (linked) ratio = w.toFloat() / h
     }
 
+    fun pick(size: SavedSize) {
+        aspect = CUSTOM
+        pick(size.width, size.height)
+        picked = size
+    }
+
+    fun shows(size: SavedSize) = aspect == CUSTOM && picked == size && this.size == size.width to size.height
+
     fun toggleLink() {
         linked = !linked
         if (linked) ratio = side(customW).toFloat() / side(customH)
@@ -193,6 +224,43 @@ internal class Form(saved: NewProjectChoice, val titles: List<String>, val names
 }
 
 internal fun side(text: String) = text.toIntOrNull()?.coerceIn(MIN_SIDE, MAX_SIDE) ?: MIN_SIDE
+
+internal fun tileFrame(width: Int, height: Int): Pair<Float, Float> {
+    val ratio = maxOf(width, height).toFloat() / minOf(width, height).coerceAtLeast(1)
+    val long = minOf(TILE_SHORT * ratio, TILE_LONG)
+    val short = (long / ratio).coerceAtLeast(TILE_THIN)
+    return if (width >= height) long to short else short to long
+}
+
+private const val TILE_SHORT = 31f
+private const val TILE_LONG = 55f
+private const val TILE_THIN = 5f
+
+internal class MarqueeFrame(val offset: Float, val alpha: Float)
+
+internal object Marquee {
+    const val WAIT_MS = 1000L
+    const val HOLD_MS = 800L
+    const val FADE_MS = 300L
+
+    fun travelMs(overflow: Float, speed: Float): Long = (overflow / speed * 1000f).toLong().coerceAtLeast(1L)
+
+    fun frame(ms: Long, overflow: Float, speed: Float): MarqueeFrame {
+        if (overflow <= 0f || speed <= 0f) return MarqueeFrame(0f, 1f)
+        val travel = travelMs(overflow, speed)
+        val t = ms.coerceAtLeast(0L) % (WAIT_MS + travel + HOLD_MS + 2 * FADE_MS)
+        val moved = t - WAIT_MS
+        val held = moved - travel
+        val faded = held - HOLD_MS
+        return when {
+            moved < 0 -> MarqueeFrame(0f, 1f)
+            held < 0 -> MarqueeFrame(overflow * moved / travel, 1f)
+            faded < 0 -> MarqueeFrame(overflow, 1f)
+            faded < FADE_MS -> MarqueeFrame(overflow, 1f - faded.toFloat() / FADE_MS)
+            else -> MarqueeFrame(0f, (faded - FADE_MS).toFloat() / FADE_MS)
+        }
+    }
+}
 
 internal class DefaultNames(private val context: Context) {
     private val numbered = context.getString(R.string.newproject_default_project, "\u0000").split('\u0000', limit = 2)
@@ -272,11 +340,22 @@ private fun SheetBody(form: Form, settings: AppSettings, card: Boolean, onClose:
         Spacer(Modifier.height(35.dp))
         NameField(form)
         Spacer(Modifier.height(10.dp))
-        AspectRow(form)
-        Spacer(Modifier.height(16.dp))
+        val pages = if (PlatformFeatures.desktop) null else rememberPagerState { if (settings.savedSizes.isEmpty()) 1 else 2 }
+        if (pages == null) AspectRow(form) else HorizontalPager(pages, Modifier.fillMaxWidth().height(56.dp), verticalAlignment = Alignment.Top) { page ->
+            if (page == 0) AspectRow(form) else SavedPage(form, settings)
+        }
+        Row(Modifier.fillMaxWidth().height(16.dp), Arrangement.spacedBy(5.dp, Alignment.CenterHorizontally), Alignment.CenterVertically) {
+            if (pages != null && pages.pageCount > 1) repeat(2) { Box(Modifier.size(4.dp).background(if (pages.currentPage == it) Am.Navy else Am.HomeFaint, CircleShape)) }
+        }
         SizeRow(form)
         AnimatedVisibility(form.aspect == CUSTOM, enter = expandVertically() + fadeIn(), exit = shrinkVertically() + fadeOut()) {
-            SavedSizeStrip(form, settings)
+            val scope = rememberCoroutineScope()
+            SavedSizeStrip(form, settings, chips = pages == null) {
+                if (pages != null) scope.launch {
+                    androidx.compose.runtime.snapshotFlow { pages.pageCount }.first { it > 1 }
+                    pages.animateScrollToPage(1)
+                }
+            }
         }
         Spacer(Modifier.height(16.dp))
         FormRow(stringResource(R.string.newproject_frame_rate)) { FrameRateField(form) }
@@ -363,14 +442,98 @@ private fun AspectRow(form: Form) {
 @Composable
 private fun AspectButton(w: Dp, h: Dp, selected: Boolean, onClick: () -> Unit, content: @Composable BoxScope.() -> Unit) {
     Box(Modifier.height(56.dp).clickable(onClick = onClick).padding(horizontal = 9.25.dp), contentAlignment = Alignment.Center) {
-        val frame = Modifier.size(w, h)
-        val look = if (selected) {
-            val shape = RoundedCornerShape(2.dp)
-            Modifier.background(Am.Accent, shape).border(1.dp, Am.Navy, shape)
-        } else {
-            Modifier.background(Am.Card).corners(Am.Navy)
+        Box(Modifier.size(w, h).frameLook(selected), contentAlignment = Alignment.Center, content = content)
+    }
+}
+
+private fun Modifier.frameLook(selected: Boolean): Modifier = if (selected) {
+    val shape = RoundedCornerShape(2.dp)
+    background(Am.Accent, shape).border(1.dp, Am.Navy, shape)
+} else {
+    background(Am.Card).corners(Am.Navy)
+}
+
+@Composable
+private fun SavedPage(form: Form, settings: AppSettings) {
+    var renaming by remember { mutableStateOf<SavedSize?>(null) }
+    Row(Modifier.fillMaxSize().horizontalScroll(rememberScrollState()).padding(start = 27.dp, end = 18.dp)) {
+        settings.savedSizes.forEach { size ->
+            SavedTile(size, form.shows(size), settings.vibration, { form.pick(size) }, { renaming = size }) {
+                settings.savedSizes = SavedSizes.without(settings.savedSizes, size)
+            }
         }
-        Box(frame.then(look), contentAlignment = Alignment.Center, content = content)
+    }
+    renaming?.let { target ->
+        SizeNameDialog(stringResource(R.string.rename), target.name, dark = false, onDismiss = { renaming = null }) { name ->
+            renaming = null
+            val list = SavedSizes.renamed(settings.savedSizes, target, name)
+            if (form.picked == target) form.picked = list.getOrNull(settings.savedSizes.indexOf(target))
+            settings.savedSizes = list
+        }
+    }
+}
+
+@Composable
+private fun SavedTile(size: SavedSize, selected: Boolean, vibrate: Boolean, onClick: () -> Unit, onRename: () -> Unit, onDelete: () -> Unit) {
+    var menu by remember { mutableStateOf(false) }
+    val pick = remember { HoldPick() }
+    val rename = stringResource(R.string.rename)
+    val delete = stringResource(R.string.delete)
+    val (w, h) = tileFrame(size.width, size.height)
+    Box {
+        Row(
+            Modifier.height(56.dp)
+                .clearAndSetSemantics {
+                    contentDescription = size.name + ", " + size.label
+                    role = Role.Button
+                    this.selected = selected
+                    onClick { onClick(); true }
+                    customActions = listOf(CustomAccessibilityAction(rename) { onRename(); true }, CustomAccessibilityAction(delete) { onDelete(); true })
+                }
+                .clickable(onClick = onClick).holdToPick(pick, vibrate) { menu = true }.padding(horizontal = 9.25.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(Modifier.size(w.dp, h.dp).frameLook(selected))
+            Column(Modifier.padding(start = 8.dp).widthIn(max = 104.dp)) {
+                MarqueeText(size.name, Am.Navy)
+                Text(size.label, color = DimText, fontSize = 11.sp, lineHeight = 14.sp, maxLines = 1, softWrap = false)
+            }
+        }
+        RefMenu(menu, { menu = false }, Am.Card, RoundedCornerShape(14.dp), Modifier.width(200.dp)) {
+            MenuRow(rename, HomeIcons.Pencil, { menu = false; onRename() }, pick)
+            MenuRow(delete, HomeIcons.Delete, { menu = false; onDelete() }, pick)
+        }
+    }
+}
+
+@Composable
+private fun MarqueeText(text: String, color: Color) {
+    var overflow by remember(text) { mutableFloatStateOf(0f) }
+    var ms by remember(text) { mutableLongStateOf(0L) }
+    val speed = with(LocalDensity.current) { 28.dp.toPx() }
+    val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+    if (overflow > 0f) LaunchedEffect(text) {
+        val start = withFrameMillis { it }
+        while (true) withFrameMillis { ms = it - start }
+    }
+    Layout(
+        {
+            Text(
+                text,
+                Modifier.graphicsLayer {
+                    val frame = Marquee.frame(ms, overflow, speed)
+                    translationX = if (rtl) frame.offset else -frame.offset
+                    alpha = frame.alpha
+                },
+                color = color, fontSize = 14.sp, lineHeight = 18.sp, fontWeight = FontWeight.Medium, maxLines = 1, softWrap = false,
+            )
+        },
+        Modifier.clipToBounds(),
+    ) { measurables, constraints ->
+        val placeable = measurables.first().measure(constraints.copy(minWidth = 0, maxWidth = Constraints.Infinity))
+        val width = minOf(placeable.width, constraints.maxWidth)
+        overflow = (placeable.width - width).toFloat()
+        layout(width, placeable.height) { placeable.placeRelative(0, 0) }
     }
 }
 
@@ -516,7 +679,7 @@ private fun NumberField(value: String, onChange: (String) -> Unit, onLeave: () -
 
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
-private fun SavedSizeStrip(form: Form, settings: AppSettings) {
+private fun SavedSizeStrip(form: Form, settings: AppSettings, chips: Boolean, onSaved: () -> Unit) {
     var naming by remember { mutableStateOf<Pair<SavedSize?, String>?>(null) }
     Row(
         Modifier.padding(top = 12.dp).fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 32.dp),
@@ -530,7 +693,7 @@ private fun SavedSizeStrip(form: Form, settings: AppSettings) {
             }.padding(horizontal = 14.dp),
             contentAlignment = Alignment.Center,
         ) { Text(stringResource(R.string.newproject_save_size_chip), color = Am.Navy, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1) }
-        settings.savedSizes.forEach { size ->
+        if (chips) settings.savedSizes.forEach { size ->
             var menu by remember { mutableStateOf(false) }
             Box {
                 Column(
@@ -553,7 +716,10 @@ private fun SavedSizeStrip(form: Form, settings: AppSettings) {
             naming = null
             settings.savedSizes = if (target == null) {
                 val (w, h) = form.size
-                SavedSizes.with(settings.savedSizes, name, w, h)
+                SavedSizes.with(settings.savedSizes, name, w, h).also {
+                    form.picked = it.first()
+                    onSaved()
+                }
             } else SavedSizes.renamed(settings.savedSizes, target, name)
         }
     }

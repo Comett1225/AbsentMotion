@@ -18,18 +18,26 @@ class SavedSizesTest {
     }
 
     @Test
-    fun sameSizeReplacesTheOldEntry() {
+    fun sameSizeUnderAnotherNameKeepsBoth() {
         val list = SavedSizes.with(SavedSizes.with(emptyList(), "Old", 1080, 550), "New", 1080, 550)
-        assertEquals(listOf(SavedSize("New", 1080, 550)), list)
+        assertEquals(listOf(SavedSize("New", 1080, 550), SavedSize("Old", 1080, 550)), list)
+        assertEquals(list, SavedSizes.with(list, "New", 1080, 550))
+        assertEquals(list.reversed(), SavedSizes.with(list, " Old ", 1080, 550))
     }
 
     @Test
-    fun capsAtTwentyDroppingTheOldest() {
+    fun keepsEverySizeWithoutALimit() {
         var list = emptyList<SavedSize>()
-        for (i in 1..25) list = SavedSizes.with(list, "s$i", 100 + i, 100)
-        assertEquals(SavedSizes.MAX, list.size)
-        assertEquals("s25", list.first().name)
-        assertEquals("s6", list.last().name)
+        for (i in 1..250) list = SavedSizes.with(list, "s$i", 100 + i, 100)
+        assertEquals(250, list.size)
+        assertEquals("s250", list.first().name)
+        assertEquals("s1", list.last().name)
+        assertEquals(list, SavedSizes.decode(SavedSizes.encode(list)))
+    }
+
+    @Test
+    fun longNamesAreCut() {
+        assertEquals(SavedSizes.MAX_NAME, SavedSizes.with(emptyList(), "x".repeat(200), 100, 100).single().name.length)
     }
 
     @Test
@@ -39,6 +47,8 @@ class SavedSizesTest {
         assertEquals("Z", SavedSizes.renamed(list, a, " Z ").last().name)
         assertEquals(list, SavedSizes.renamed(list, a, "  "))
         assertEquals(listOf(list.first()), SavedSizes.without(list, a))
+        assertEquals(emptyList<SavedSize>(), SavedSizes.without(SavedSizes.without(list, a), list.first()))
+        assertEquals(list, SavedSizes.without(list, SavedSize("missing", 1, 1)))
     }
 
     @Test
