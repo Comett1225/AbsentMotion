@@ -33,6 +33,7 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - Simpler Transform: four tabs on phones and tablets, double-tap Move for the pivot, and 3D rotation in the Rotate menu.
 - Smoother menus: the effects panel and effect pages slide in from the right, and projects open with a soft zoom.
 - Clearer Settings: an open section is shaded.
+- Font filters: a cleaner filter menu in the font picker, with a Popular / Alphabetical switch and a proper language menu.
 - 3D models: the 3D effects category is greyed out for them, since a model is already 3D.
 - Updates on a computer: they install themselves after the download and close every open window first, and the next start says what went wrong when one fails.
 - Windows updates: AbsentMotion's own installer, about 12 times faster than the Windows installer (about 11 seconds instead of about 2 minutes 15 seconds).

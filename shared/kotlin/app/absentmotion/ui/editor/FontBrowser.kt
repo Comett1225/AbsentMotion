@@ -19,12 +19,14 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -62,7 +64,6 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
     var languageMenu by remember { mutableStateOf(false) }
     var loading by remember { mutableStateOf(false) }
     var deleting by remember { mutableStateOf<FontEntry?>(null) }
-    var sortMenu by remember { mutableStateOf(false) }
     var revision by remember { mutableIntStateOf(0) }
     val downloads by library.revision.collectAsState()
     var error by remember { mutableStateOf<FontError?>(null) }
@@ -142,41 +143,46 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
         }
         Presence(drawer) {
             Box(Modifier.fillMaxSize().presenceScrim(Color.Black.copy(alpha = .6f)).clickable { drawer = false })
-            Column(Modifier.presence(fade = false, slideX = -1f).width(280.dp).fillMaxHeight().background(DrawerBg).verticalScroll(rememberScrollState()).padding(horizontal = 10.dp)) {
+            Column(Modifier.presence(fade = false, slideX = -1f).width(280.dp).fillMaxHeight().background(DrawerBg).verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 12.dp)) {
                 listOf(2, 1, 3, 4, 5, 110, 100).forEach { category ->
-                    Row(Modifier.fillMaxWidth().height(40.dp).clickable { categories = if (category in categories) categories - category else categories + category },
+                    Row(Modifier.fillMaxWidth().height(46.dp).clip(DrawerShape).clickable { categories = if (category in categories) categories - category else categories + category }.padding(horizontal = 4.dp),
                         verticalAlignment = Alignment.CenterVertically) {
-                        Checkbox(category in categories, null, colors = CheckboxDefaults.colors(checkedColor = Favourite, uncheckedColor = Am.OnDark))
-                        Text(stringResource(CategoryLabels.getValue(category)), color = Am.OnDark, fontSize = 16.sp)
+                        Checkbox(category in categories, null, colors = CheckboxDefaults.colors(checkedColor = Am.Accent, uncheckedColor = Am.Caption, checkmarkColor = Am.OnAccent))
+                        Text(stringResource(CategoryLabels.getValue(category)), Modifier.padding(start = 14.dp), color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
                     }
                 }
-                HorizontalDivider(Modifier.padding(vertical = 10.dp), color = Am.OnDark)
-                Row(Modifier.height(50.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(stringResource(R.string.sorting), Modifier.width(79.dp), color = Am.OnDark, fontSize = 14.sp)
-                    Box {
-                        Text(stringResource(SortingLabels[sorting] ?: R.string.font_sort_popular) + "  ˅", Modifier.width(181.dp).background(Am.Well).padding(12.dp).clickable { sortMenu = true }, color = Am.OnDark, fontSize = 16.sp)
-                        DropdownMenu(sortMenu, { sortMenu = false }) { SortingLabels.forEach { (option, label) ->
-                            DropdownMenuItem({ Text(stringResource(label)) }, { sorting = option; sortMenu = false })
-                        } }
+                HorizontalDivider(Modifier.padding(vertical = 12.dp), color = BrowserLine)
+                DrawerLabel(stringResource(R.string.sorting))
+                Row(Modifier.fillMaxWidth().height(44.dp).background(Am.Field, DrawerShape).padding(3.dp)) {
+                    SortingLabels.forEach { (option, label) ->
+                        val chosen = option == (sorting.takeIf { it in SortingLabels } ?: "Popular")
+                        Box(Modifier.weight(1f).fillMaxHeight().clip(DrawerShape).background(if (chosen) Am.Accent else Color.Transparent).clickable { sorting = option }.padding(horizontal = 6.dp), Alignment.Center) {
+                            Text(stringResource(label), color = if (chosen) Am.OnAccent else Am.OnDark, fontSize = 13.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                        }
                     }
                 }
-                Row(Modifier.height(50.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(stringResource(R.string.languages), Modifier.width(79.dp), color = Am.OnDark, fontSize = 14.sp)
-                    Box {
-                        Text(stringResource(LanguageLabels[language] ?: R.string.all_languages) + "  ˅", Modifier.width(181.dp).background(Am.Well).padding(12.dp)
-                            .clickable { languageMenu = true }, color = Am.OnDark, fontSize = 16.sp, maxLines = 1)
-                        DropdownMenu(languageMenu, { languageMenu = false }) {
-                            DropdownMenuItem({ Text(stringResource(R.string.all_languages)) }, { language = 0; languageMenu = false })
-                            FontCatalog.languages.keys.map { it to stringResource(LanguageLabels.getValue(it)) }.sortedBy { it.second }.forEach { (id, label) ->
-                                DropdownMenuItem({ Text(label) }, { language = id; languageMenu = false })
+                Spacer(Modifier.height(16.dp))
+                DrawerLabel(stringResource(R.string.languages))
+                Box {
+                    Row(Modifier.fillMaxWidth().height(44.dp).clip(DrawerShape).background(Am.Field).clickable { languageMenu = true }.padding(start = 12.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Text(stringResource(LanguageLabels[language] ?: R.string.all_languages), Modifier.weight(1f), color = Am.OnDark, fontSize = 14.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                        Icon(ChromeIcons.ChevronDown, null, Modifier.size(20.dp), tint = Am.OnDark)
+                    }
+                    Presence(languageMenu) {
+                        MenuPopup(DropOrRise, { languageMenu = false }) {
+                            Column(Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState())) {
+                                MenuRow(stringResource(R.string.all_languages), trailing = if (language == 0) PanelIcons.Check else null) { language = 0; languageMenu = false }
+                                FontCatalog.languages.keys.map { it to stringResource(LanguageLabels.getValue(it)) }.sortedBy { it.second }.forEach { (id, label) ->
+                                    MenuRow(label, trailing = if (language == id) PanelIcons.Check else null) { language = id; languageMenu = false }
+                                }
                             }
                         }
                     }
                 }
-                HorizontalDivider(Modifier.padding(vertical = 10.dp), color = Am.OnDark)
-                Row(Modifier.height(48.dp).fillMaxWidth().clickable { importer.launch(arrayOf("*/*")) }, verticalAlignment = Alignment.CenterVertically) {
-                    Icon(TextIcons.Import, null, Modifier.padding(6.dp).size(28.dp), tint = Am.OnDark)
-                    Spacer(Modifier.width(24.dp)); Text(stringResource(R.string.import_fonts), color = Am.OnDark, fontSize = 16.sp)
+                HorizontalDivider(Modifier.padding(vertical = 16.dp), color = BrowserLine)
+                Row(Modifier.fillMaxWidth().height(44.dp).clip(DrawerShape).background(Am.Button).clickable { importer.launch(arrayOf("*/*")) }, horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+                    Icon(TextIcons.Import, null, Modifier.size(20.dp), tint = Am.OnDark)
+                    Text(stringResource(R.string.import_fonts), Modifier.padding(start = 10.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
                 }
             }
         }
@@ -188,6 +194,13 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
         confirmButton = { TextButton({ library.deleteImported(entry.name.xml); deleting = null; revision++ }) { Text(stringResource(R.string.delete_font), color = Am.Accent) } },
         dismissButton = { TextButton({ deleting = null }) { Text(stringResource(R.string.cancel), color = Am.Accent) } }, containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark) }
     error?.let { failure -> AlertDialog(onDismissRequest = { error = null }, title = { Text(stringResource(failure.title)) }, text = { Text(stringResource(failure.body, failure.detail)) }, confirmButton = { TextButton({ error = null }) { Text(stringResource(R.string.ok), color = Am.Accent) } }, containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark) }
+}
+
+private val DrawerShape = RoundedCornerShape(8.dp)
+
+@Composable
+private fun DrawerLabel(text: String) {
+    Text(text, Modifier.padding(start = 2.dp, bottom = 8.dp), color = Am.Caption, fontSize = 12.sp, maxLines = 1)
 }
 
 private class FontError(@StringRes val title: Int, @StringRes val body: Int, val detail: String = "")
