@@ -8926,6 +8926,9 @@
    "frontShadowBlendMode": {
     "neutral": 2
    }
+  },
+  "set": {
+   "follow": false
   }
  },
  "com.alightcreative.effects.ring": {

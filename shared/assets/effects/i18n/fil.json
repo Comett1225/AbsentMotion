@@ -3748,7 +3748,7 @@
    }
   },
   "pagecurl": {
-   "description": "Binubuklat ang layer na parang pahina: umaangat at nalulukot ang isang sulok, na ipinapakita ang likod ng pahina. I-animate ang Progreso para buksan ang pahina.",
+   "description": "Binubuklat ang layer na parang pahina: umaangat at nalulukot ang isang sulok, na ipinapakita ang likod ng pahina. I-animate ang Progreso para buksan ang pahina. Kapag naka-on ang Sundan ang Hugis, bumabaliktad ang pahina mula sa mga gilid ng nakikita mo, kaya ang bilog na larawan o 3D model ay kumukulot mula sa sarili nitong gilid sa halip na sa isang di-nakikitang kahon.",
    "name": "Paglukot ng pahina",
    "params": {
     "angle": {
@@ -3759,6 +3759,9 @@
     },
     "backColor": {
      "label": "Kulay sa likod"
+    },
+    "follow": {
+     "label": "Sundan ang Hugis"
     },
     "progress": {
      "label": "Progreso"

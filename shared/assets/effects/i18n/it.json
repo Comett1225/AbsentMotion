@@ -3748,7 +3748,7 @@
    }
   },
   "pagecurl": {
-   "description": "Gira il livello come una pagina: un angolo si solleva e si arrotola, mostrando il retro. Anima Avanzamento per girare la pagina.",
+   "description": "Gira il livello come una pagina: un angolo si solleva e si arrotola, mostrando il retro. Anima Avanzamento per girare la pagina. Con Segui la forma attivo, la pagina si gira dai bordi di ciò che si vede, così un'immagine rotonda o un modello 3D si arriccia dal proprio bordo invece che da un riquadro invisibile.",
    "name": "Pagina arricciata",
    "params": {
     "angle": {
@@ -3759,6 +3759,9 @@
     },
     "backColor": {
      "label": "Colore del retro"
+    },
+    "follow": {
+     "label": "Segui la forma"
     },
     "progress": {
      "label": "Avanzamento"

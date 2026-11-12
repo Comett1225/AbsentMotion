@@ -3748,7 +3748,7 @@
    }
   },
   "pagecurl": {
-   "description": "Katmanı bir sayfa gibi çevirir: bir köşe kalkıp kıvrılarak sayfanın arkasını gösterir. Sayfayı çevirmek için İlerleme değerini canlandırın.",
+   "description": "Katmanı bir sayfa gibi çevirir: bir köşe kalkıp kıvrılarak sayfanın arkasını gösterir. Sayfayı çevirmek için İlerleme değerini canlandırın. Şekli takip et açıkken sayfa görünen kısmın kenarlarından çevrilir; böylece yuvarlak bir resim ya da 3B model görünmez bir kutu yerine kendi kenarından kıvrılır.",
    "name": "Sayfa kıvırma",
    "params": {
     "angle": {
@@ -3759,6 +3759,9 @@
     },
     "backColor": {
      "label": "Arka yüz rengi"
+    },
+    "follow": {
+     "label": "Şekli takip et"
     },
     "progress": {
      "label": "İlerleme"

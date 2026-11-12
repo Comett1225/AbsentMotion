@@ -15,7 +15,7 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - Tools inside the editor: a Tools tab in the + menu, and Tools in the left rail on a computer. Compress, Trim, Extract Audio, Make a GIF and the Video Downloader add their result to the project.
 - Video Downloader on Windows, Mac and Linux, with a one-time add-on.
 - Video Feedback Frame by Frame: each copy shows the layer one frame earlier, videos included, so movement leaves trails.
-- Page Curl and Scatter Repeat effects.
+- Page Curl and Scatter Repeat effects. Page Curl's Follow Shape curls a round picture or a 3D model from its own edge.
 - Effect previews: an effect's page opens with a big, sharp preview.
 - Community bundle: Project Bundle in Export adds a title, a thumbnail picked with Choose thumbnail, a description, tags and a name.
 - Bundles folder: pick a folder once and every project bundle saves there.

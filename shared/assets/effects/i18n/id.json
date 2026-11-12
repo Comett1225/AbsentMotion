@@ -3748,7 +3748,7 @@
    }
   },
   "pagecurl": {
-   "description": "Membalik lapisan seperti halaman: satu sudut terangkat dan menggulung, memperlihatkan bagian belakang halaman. Animasikan Progres untuk membalik halaman.",
+   "description": "Membalik lapisan seperti halaman: satu sudut terangkat dan menggulung, memperlihatkan bagian belakang halaman. Animasikan Progres untuk membalik halaman. Jika Ikuti Bentuk aktif, halaman dibalik dari tepi bagian yang terlihat, sehingga gambar bulat atau model 3D melengkung dari tepinya sendiri, bukan dari kotak tak terlihat.",
    "name": "Lipatan halaman",
    "params": {
     "angle": {
@@ -3759,6 +3759,9 @@
     },
     "backColor": {
      "label": "Warna belakang"
+    },
+    "follow": {
+     "label": "Ikuti Bentuk"
     },
     "progress": {
      "label": "Progres"

@@ -37,7 +37,7 @@ class EffectPackTest {
             val expected = mapOf("image" to ("shader" to false), "size" to ("float2" to false), "time" to ("float" to false)) +
                 copies.associateWith { "shader" to false } +
                 (if ("duration" in uniforms) mapOf("duration" to ("float" to false)) else emptyMap()) +
-                listOf("backdrop", "below").filter { it in uniforms }.associateWith { "shader" to false } +
+                listOf("backdrop", "below", "extent").filter { it in uniforms }.associateWith { "shader" to false } +
                 (if ("screen" in uniforms) mapOf("screen" to ("float4" to false)) else emptyMap()) +
                 (if ("visible" in uniforms) mapOf("visible" to ("float4" to false)) else emptyMap()) +
                 (if ("layer" in uniforms) mapOf("layer" to ("float2" to false)) else emptyMap()) +
@@ -52,6 +52,7 @@ class EffectPackTest {
                 }
             assertEquals(effect.key, expected, uniforms)
             assertTrue("${effect.key} takes a blurred copy, so it needs a 'blur' size", !blurred || effect.params.any { it.id == "blur" && it.kind == "float" })
+            assertTrue("${effect.key} measures its reach along 'angle', so it needs one", uniforms["extent"]?.first != "shader" || effect.params.any { it.id == "angle" })
             assertTrue(effect.key, Regex("""half4\s+main\s*\(\s*float2\s+\w+\s*\)""").containsMatchIn(effect.sksl))
             assertTrue("${effect.key} declares 'pos', the name the GPU backend gives main's argument",
                 !Regex("""\b(float2|half2|float|half)\s+pos\b""").containsMatchIn(effect.sksl))

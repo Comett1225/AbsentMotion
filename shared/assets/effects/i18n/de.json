@@ -3748,7 +3748,7 @@
    }
   },
   "pagecurl": {
-   "description": "Blättert die Ebene wie eine Seite um: Eine Ecke hebt und rollt sich um und zeigt die Rückseite. Animiere den Fortschritt, um die Seite umzublättern.",
+   "description": "Blättert die Ebene wie eine Seite um: Eine Ecke hebt und rollt sich um und zeigt die Rückseite. Animiere den Fortschritt, um die Seite umzublättern. Mit „Form folgen“ wird die Seite an den Rändern des Sichtbaren umgeblättert, sodass sich ein rundes Bild oder ein 3D-Modell an seinem eigenen Rand einrollt statt an einem unsichtbaren Rechteck.",
    "name": "Seitenumblättern",
    "params": {
     "angle": {
@@ -3759,6 +3759,9 @@
     },
     "backColor": {
      "label": "Rückseitenfarbe"
+    },
+    "follow": {
+     "label": "Form folgen"
     },
     "progress": {
      "label": "Fortschritt"

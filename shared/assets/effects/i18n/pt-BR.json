@@ -3748,7 +3748,7 @@
    }
   },
   "pagecurl": {
-   "description": "Vira a camada como uma página: um canto se levanta e se enrola, mostrando o verso. Anime o Progresso para virar a página.",
+   "description": "Vira a camada como uma página: um canto se levanta e se enrola, mostrando o verso. Anime o Progresso para virar a página. Com Seguir a forma ativado, a página vira a partir das bordas do que está visível, então uma imagem redonda ou um modelo 3D se curva a partir da própria borda em vez de uma caixa invisível.",
    "name": "Virar página",
    "params": {
     "angle": {
@@ -3759,6 +3759,9 @@
     },
     "backColor": {
      "label": "Cor do verso"
+    },
+    "follow": {
+     "label": "Seguir a forma"
     },
     "progress": {
      "label": "Progresso"

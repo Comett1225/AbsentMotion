@@ -3748,7 +3748,7 @@
    }
   },
   "pagecurl": {
-   "description": "Obraca warstwę jak stronę: narożnik unosi się i zawija, odsłaniając jej tył. Animuj postęp, aby przewrócić stronę.",
+   "description": "Obraca warstwę jak stronę: narożnik unosi się i zawija, odsłaniając jej tył. Animuj postęp, aby przewrócić stronę. Gdy włączona jest opcja Podążaj za kształtem, strona odwraca się od krawędzi tego, co widać, więc okrągły obraz lub model 3D zawija się od własnej krawędzi zamiast od niewidocznego prostokąta.",
    "name": "Zawijanie strony",
    "params": {
     "angle": {
@@ -3759,6 +3759,9 @@
     },
     "backColor": {
      "label": "Kolor tyłu"
+    },
+    "follow": {
+     "label": "Podążaj za kształtem"
     },
     "progress": {
      "label": "Postęp"

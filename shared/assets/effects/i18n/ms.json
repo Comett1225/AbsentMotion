@@ -3748,7 +3748,7 @@
    }
   },
   "pagecurl": {
-   "description": "Membelek lapisan seperti halaman: sudutnya terangkat dan melengkung, lalu menunjukkan bahagian belakang halaman. Animasikan Kemajuan untuk membelek halaman.",
+   "description": "Membelek lapisan seperti halaman: sudutnya terangkat dan melengkung, lalu menunjukkan bahagian belakang halaman. Animasikan Kemajuan untuk membelek halaman. Apabila Ikut Bentuk dihidupkan, halaman diselak dari tepi bahagian yang kelihatan, jadi gambar bulat atau model 3D melengkung dari tepinya sendiri dan bukan dari kotak yang tidak kelihatan.",
    "name": "Halaman melengkung",
    "params": {
     "angle": {
@@ -3759,6 +3759,9 @@
     },
     "backColor": {
      "label": "Warna belakang"
+    },
+    "follow": {
+     "label": "Ikut Bentuk"
     },
     "progress": {
      "label": "Kemajuan"

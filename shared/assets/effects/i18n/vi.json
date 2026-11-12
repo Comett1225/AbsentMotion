@@ -3748,7 +3748,7 @@
    }
   },
   "pagecurl": {
-   "description": "Lật lớp như một trang giấy: một góc nhấc lên và cuộn lại, để lộ mặt sau. Tạo chuyển động cho Tiến trình để lật trang.",
+   "description": "Lật lớp như một trang giấy: một góc nhấc lên và cuộn lại, để lộ mặt sau. Tạo chuyển động cho Tiến trình để lật trang. Khi bật Theo hình dạng, trang lật từ mép của phần nhìn thấy được, nên ảnh tròn hay mô hình 3D sẽ cuộn từ chính mép của nó thay vì từ một khung vô hình.",
    "name": "Cuộn trang",
    "params": {
     "angle": {
@@ -3759,6 +3759,9 @@
     },
     "backColor": {
      "label": "Màu mặt sau"
+    },
+    "follow": {
+     "label": "Theo hình dạng"
     },
     "progress": {
      "label": "Tiến trình"

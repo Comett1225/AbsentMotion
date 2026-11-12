@@ -3748,7 +3748,7 @@
    }
   },
   "pagecurl": {
-   "description": "Gira la capa como una página: una esquina se levanta y se enrolla, dejando ver el reverso. Anima el progreso para pasar la página.",
+   "description": "Gira la capa como una página: una esquina se levanta y se enrolla, dejando ver el reverso. Anima el progreso para pasar la página. Con Seguir la forma activado, la página se pasa desde los bordes de lo que se ve, así que una imagen redonda o un modelo 3D se enrolla desde su propio borde en lugar de desde una caja invisible.",
    "name": "Paso de página",
    "params": {
     "angle": {
@@ -3759,6 +3759,9 @@
     },
     "backColor": {
      "label": "Color del reverso"
+    },
+    "follow": {
+     "label": "Seguir la forma"
     },
     "progress": {
      "label": "Progreso"

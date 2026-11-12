@@ -3748,7 +3748,7 @@
    }
   },
   "pagecurl": {
-   "description": "Tourne le calque comme une page : un coin se soulève et s’enroule, révélant le verso. Animez la progression pour tourner la page.",
+   "description": "Tourne le calque comme une page : un coin se soulève et s’enroule, révélant le verso. Animez la progression pour tourner la page. Avec Suivre la forme activé, la page se tourne à partir des bords de ce qui est visible : une image ronde ou un modèle 3D se recourbe depuis son propre bord et non depuis une boîte invisible.",
    "name": "Page cornée",
    "params": {
     "angle": {
@@ -3759,6 +3759,9 @@
     },
     "backColor": {
      "label": "Couleur du verso"
+    },
+    "follow": {
+     "label": "Suivre la forme"
     },
     "progress": {
      "label": "Progression"

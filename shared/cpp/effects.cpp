@@ -287,6 +287,40 @@ sk_sp<SkImageFilter> PuppetMesh(const std::vector<warp::Pin>& pins, float fallof
     return SkImageFilters::RuntimeShader(b, std::min(reach, distance + pad), "image", SkImageFilters::Crop(inside, std::move(input)), true);
 }
 
+sk_sp<SkImageFilter> ExtentFilter(float width, float height, float degrees, sk_sp<SkImageFilter> input) {
+    static const sk_sp<SkRuntimeEffect> reach = SkRuntimeEffect::MakeForShader(SkString(R"(
+uniform shader image;
+uniform float2 size;
+uniform float2 dir;
+half4 main(float2 p) {
+    float lo = 1e9;
+    float hi = -1e9;
+    float2 cell = size / 48.0;
+    for (int y = 0; y < 48; y++) {
+        for (int x = 0; x < 48; x++) {
+            float2 q = (float2(float(x), float(y)) + 0.5) * cell;
+            if (image.eval(q).a > 0.02) {
+                float s = dot(q, dir);
+                lo = min(lo, s);
+                hi = max(hi, s);
+            }
+        }
+    }
+    if (hi < lo) return half4(0.0, 0.0, 0.0, 1.0);
+    float pad = 0.5 * (abs(dir.x) * cell.x + abs(dir.y) * cell.y);
+    float span = max(length(size), 1.0);
+    float v = clamp(((p.x < 16.0 ? lo - pad : hi + pad) + span) / (2.0 * span), 0.0, 1.0);
+    return half4(half(floor(v * 255.0) / 255.0), half(fract(v * 255.0)), 1.0, 1.0);
+}
+)")).effect;
+    if (!reach || !(width > 0) || !(height > 0)) return nullptr;
+    SkRuntimeShaderBuilder b(reach);
+    const float a = degrees * 3.14159265f / 180;
+    b.uniform("size") = SkV2{width, height};
+    b.uniform("dir") = SkV2{std::cos(a), std::sin(a)};
+    return SkImageFilters::Crop(SkRect::MakeWH(32, 4), SkImageFilters::RuntimeShader(b, std::max(width, height) * 2, "image", std::move(input)));
+}
+
 sk_sp<SkImageFilter> PuppetFilter(const LayerEffect& e, const std::map<std::string, Anim>* defaults, float t, double timeMs, const SkRect& area,
                                   SkMatrix placed, const SkRect& seen, const SkRect& inside, float reach, sk_sp<SkImageFilter> input) {
     static const sk_sp<SkRuntimeEffect> effect = SkRuntimeEffect::MakeForShader(SkString(kPuppetShader)).effect;
@@ -889,6 +923,7 @@ std::string EffectRuntime::load(const std::string& xml) {
         d.blurred = d.brightPass || d.plainBlur;
         d.backdrop = result.effect->findChild("backdrop") != nullptr;
         d.below = result.effect->findChild("below") != nullptr;
+        d.extent = result.effect->findChild("extent") != nullptr;
         d.pointwise = Pointwise(sksl);
         d.timed = (result.effect->findUniform("time") && Mentions(sksl, "time") > 1) || result.effect->findUniform("beat") ||
                   result.effect->findUniform("beatTime") || result.effect->findUniform("beatIndex");
@@ -1179,6 +1214,11 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
             if (d->below) {
                 names.push_back("below");
                 inputs.push_back(below ? below : SkImageFilters::Empty());
+            }
+            if (d->extent) {
+                sk_sp<SkImageFilter> reach = ExtentFilter(area.width(), area.height(), Value(e, defaults, "angle", 0, t, 0), f);
+                names.push_back("extent");
+                inputs.push_back(reach ? reach : SkImageFilters::Empty());
             }
             const float radius = d->pointwise ? 0.0f : (int)k <= lastWrap ? wrapReach : reach;
             f = inputs.size() == 1 ? SkImageFilters::RuntimeShader(b, radius, "image", inputs[0])

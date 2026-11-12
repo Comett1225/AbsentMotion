@@ -41,6 +41,7 @@ private:
         bool plainBlur = false;
         bool backdrop = false;
         bool below = false;
+        bool extent = false;
         bool pointwise = false;
         bool timed = false;
         bool palette = false;
