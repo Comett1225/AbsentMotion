@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.Snapshot
 import app.absentmotion.export.Choice
 import app.absentmotion.i18n.UiText
 import app.absentmotion.i18n.txt
@@ -15,9 +16,11 @@ enum class Feature(@StringRes val label: Int, val inCompatible: Boolean) {
     BestCutout(R.string.feature_best_cutout, inCompatible = false),
 }
 
+internal fun <T> stateReadableFromOpenSnapshots(value: T) = Snapshot.global { Snapshot.withMutableSnapshot { mutableStateOf(value) } }
+
 object Tier {
     val compatible: Boolean = BuildConfig.COMPATIBLE
-    var openGl by mutableStateOf(false)
+    var openGl by stateReadableFromOpenSnapshots(false)
 
     fun has(feature: Feature): Boolean = (!compatible && !openGl) || feature.inCompatible
 

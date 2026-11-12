@@ -320,7 +320,7 @@ public:
             return !fFailed;
         }
 #ifdef AM_DESKTOP
-        return false;
+        return true;
 #else
         auto recording = fContext.recorder->snap();
         if (!recording || !fContext.graphite->insertRecording({recording.get()}) ||
@@ -337,7 +337,7 @@ public:
 private:
     sk_sp<SkSurface> surface(const SkImageInfo& info) {
 #ifdef AM_DESKTOP
-        return fContext.ganesh ? SkSurfaces::RenderTarget(fContext.ganesh, skgpu::Budgeted::kYes, info) : nullptr;
+        return fContext.ganesh ? SkSurfaces::RenderTarget(fContext.ganesh, skgpu::Budgeted::kYes, info) : SkSurfaces::Raster(info);
 #else
         return fContext.ganesh ? SkSurfaces::RenderTarget(fContext.ganesh, skgpu::Budgeted::kYes, info)
                                : SkSurfaces::RenderTarget(fContext.recorder, info);
@@ -383,8 +383,6 @@ sk_sp<SkImage> EstimateFlow(const GpuContext& context, const sk_sp<SkImage>& a,
     if (context.ganesh) context.ganesh->flushAndSubmit(GrSyncCpu::kYes);
 #ifndef AM_DESKTOP
     else context.graphite->submit(skgpu::graphite::SyncToCpu::kYes);
-#else
-    else return nullptr;
 #endif
     const auto start = Clock::now();
     Gpu gpu(context);

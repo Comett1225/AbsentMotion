@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import re
 import shlex
+import shutil
 import struct
 import subprocess
 import sys
@@ -137,6 +138,52 @@ class ToolRegressions(unittest.TestCase):
                 self.assertNotEqual(0, result.returncode, scanner + '\n' + result.stdout + result.stderr)
                 self.assertNotIn('publish_check: nothing found.', result.stdout)
 
+    def test_publish_check_reads_odd_names_and_links_and_refuses_other_identities(self):
+        with tempfile.TemporaryDirectory() as folder:
+            repo = Path(folder)
+            (repo / 'tools').mkdir()
+            for name in ['publish_check.sh', 'publish_scan.py', 'comment_check.py', 'source_policy.py']:
+                shutil.copy(ROOT / 'tools' / name, repo / 'tools' / name)
+            (repo / 'tools/publish_forbidden.txt').write_text('fixtureword\n')
+            (repo / 'tools/publish_allowed.txt').write_text('https://example.invalid/fixtureword/app\n')
+            (repo / '.gitignore').write_text('/tools/publish_forbidden.txt\n/tools/publish_allowed.txt\n')
+            (repo / 'page.txt').write_text('see https://example.invalid/FixtureWord/app\n')
+            env = {k: v for k, v in os.environ.items() if not k.startswith('GIT_')}
+            def git(*args, name='AbsentMotion', mail='noreply@absentmotion.invalid'):
+                subprocess.run(['git', '-C', str(repo), '-c', 'user.name=' + name, '-c', 'user.email=' + mail, '-c', 'commit.gpgsign=false', *args], check=True, capture_output=True, env=env)
+            def check():
+                result = subprocess.run(['sh', str(repo / 'tools/publish_check.sh')], capture_output=True, text=True, env=env)
+                return result.returncode, result.stdout + result.stderr
+            git('init', '-q')
+            git('add', '-A')
+            git('commit', '-q', '-m', 'first')
+            self.assertEqual(0, check()[0], check()[1])
+            def word(path):
+                path.write_text('a fixtureword here\n')
+            cases = [('\u56fe.txt', word, 'forbidden word in \u56fe.txt'), ('odd"name.txt', word, 'cannot be checked'),
+                     ('third_party/note.txt', word, 'forbidden word in third_party/note.txt'),
+                     ('link', lambda path: path.symlink_to('/nowhere/fixtureword/file'), 'forbidden word in link'),
+                     ('big.bin', lambda path: path.write_bytes(bytes(3145729)), 'large file: big.bin')]
+            for name, make, message in cases:
+                with self.subTest(name=name):
+                    (repo / name).parent.mkdir(exist_ok=True)
+                    make(repo / name)
+                    code, output = check()
+                    self.assertNotEqual(0, code, output)
+                    self.assertIn(message, output)
+                    (repo / name).unlink()
+            self.assertEqual(0, check()[0], check()[1])
+            git('commit', '-q', '--allow-empty', '-m', 'second', '-m', 'Co-Authored-By: Helper <helper@example.invalid>')
+            code, output = check()
+            self.assertNotEqual(0, code, output)
+            self.assertIn('attribution line in a commit message', output)
+            git('reset', '-q', '--hard', 'HEAD~1')
+            self.assertEqual(0, check()[0], check()[1])
+            git('commit', '-q', '--allow-empty', '-m', 'third', name='Someone Else', mail='someone@example.invalid')
+            code, output = check()
+            self.assertNotEqual(0, code, output)
+            self.assertIn('is not signed as AbsentMotion', output)
+
     def test_site_tests_are_required_in_ci_and_optional_elsewhere(self):
         with tempfile.TemporaryDirectory() as folder:
             env = {k: v for k, v in os.environ.items() if k != 'CI'}
@@ -188,6 +235,36 @@ class ToolRegressions(unittest.TestCase):
             dependency.touch()
             os.utime(dependency, (3000, 3000))
             self.assertIn('rc=1', run())
+
+    def test_check_waits_for_a_running_build_and_takes_over_from_a_dead_one(self):
+        script = (ROOT / 'tools/check.sh').read_text()
+        function = script[script.index('lock() {'):script.index('\n}\n', script.index('lock() {')) + 3]
+        with tempfile.TemporaryDirectory() as folder:
+            folder = Path(folder)
+            def run():
+                return subprocess.run(['sh', '-c', 'dir=.; ' + function + '\nlock android; echo "held=$held by $(readlink android.lock)"'],
+                                      cwd=folder, capture_output=True, text=True, timeout=60).stdout
+            self.assertRegex(run(), r'^held=\./android\.lock by \d+\n$')
+            dead = subprocess.Popen(['true'])
+            dead.wait()
+            (folder / 'android.lock').unlink()
+            os.symlink(str(dead.pid), folder / 'android.lock')
+            self.assertRegex(run(), r'^held=\./android\.lock by \d+\n$')
+            (folder / 'android.lock').unlink()
+            if shutil.which('ps'):
+                ended = subprocess.Popen(['true'])
+                while subprocess.run(['ps', '-o', 'stat=', '-p', str(ended.pid)], capture_output=True, text=True).stdout.strip()[:1] != 'Z':
+                    pass
+                os.symlink(str(ended.pid), folder / 'android.lock')
+                self.assertRegex(run(), r'^held=\./android\.lock by \d+\n$')
+                ended.wait()
+                (folder / 'android.lock').unlink()
+            running = int(subprocess.run(['sh', '-c', 'sleep 4 >/dev/null 2>&1 & echo $!'], capture_output=True, text=True, check=True).stdout)
+            os.symlink(str(running), folder / 'android.lock')
+            waited = run()
+            self.assertIn('waiting for another check.sh (process %d)' % running, waited)
+            self.assertIn('held=./android.lock by ', waited)
+            self.assertNotIn('by %d\n' % running, waited)
 
     def test_python_policy_rejects_docstrings_but_allows_data_strings(self):
         scanner = ROOT / 'tools/source_policy.py'
@@ -312,6 +389,44 @@ class ToolRegressions(unittest.TestCase):
             module.elf_alignment(library, 'shifted.so')
         with self.assertRaises(ValueError):
             module.elf_alignment(library[:64], 'truncated.so')
+
+    def test_apk_assets_need_language_packs_and_slow_pictures_in_compatible(self):
+        spec = importlib.util.spec_from_file_location('apk_check', ROOT / 'tools/apk_check.py')
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        def picture(*times):
+            frames = b''.join(b'ANMF' + struct.pack('<I', 17) + bytes(12) + time.to_bytes(3, 'little') + bytes(3) for time in times)
+            body = b'WEBP' + b'VP8X' + struct.pack('<I', 10) + bytes([2]) + bytes(9) + b'ANIM' + struct.pack('<I', 6) + bytes(6) + frames
+            return b'RIFF' + struct.pack('<I', len(body)) + body
+        self.assertEqual([83, 166], module.frame_times(picture(83, 166)))
+        self.assertEqual([], module.frame_times(b'RIFF' + struct.pack('<I', 16) + b'WEBPVP8 ' + struct.pack('<I', 4) + b'ANMF'))
+        good = {'assets/effects/index.json': b'[]', 'assets/langpacks/de.pack': b'pack', 'assets/effects/thumb/still.webp': b'RIFF',
+                'assets/effects/thumb/moving.webp': picture(83, 166, 83)}
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / 'fixture.apk'
+            def packed(files):
+                with zipfile.ZipFile(path, 'w') as archive:
+                    for name, data in files.items():
+                        archive.writestr(name, data)
+                return path
+            self.assertEqual(1, module.asset_packaging(packed(good), True))
+            fast = dict(good, **{'assets/effects/thumb/moving.webp': picture(99, 33, 66)})
+            self.assertEqual(1, module.asset_packaging(packed(fast), False))
+            with self.assertRaisesRegex(ValueError, 'faster than 12 frames'):
+                module.asset_packaging(packed(fast), True)
+            for extra in ['assets/help/de/index.html', 'assets/effects/i18n/de.json']:
+                with self.assertRaisesRegex(ValueError, 'packed twice'):
+                    module.asset_packaging(packed(dict(good, **{extra: b'x'})), False)
+            for gone, message in [('assets/langpacks/de.pack', 'language packs are missing'), ('assets/effects/index.json', 'language packs are missing'),
+                                  ('assets/effects/thumb/moving.webp', None), ('assets/effects/thumb/still.webp', None)]:
+                files = {name: data for name, data in good.items() if name != gone}
+                if message:
+                    with self.assertRaisesRegex(ValueError, message):
+                        module.asset_packaging(packed(files), False)
+                else:
+                    self.assertEqual(1, module.asset_packaging(packed(files), True))
+            with self.assertRaisesRegex(ValueError, 'effect pictures are missing'):
+                module.asset_packaging(packed({name: data for name, data in good.items() if 'thumb' not in name}), False)
 
     def test_publish_scan_reads_library_data_but_not_machine_code(self):
         def library(code, data, sections=True):

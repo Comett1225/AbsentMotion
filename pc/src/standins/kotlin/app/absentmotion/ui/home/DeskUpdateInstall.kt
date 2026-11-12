@@ -257,6 +257,7 @@ internal object UpdateInstall {
 
     fun cancel() {
         disarm()
+        pending?.result?.let { runCatching { it.delete() } }
         pending?.discard()
         pending = null
     }
@@ -285,7 +286,7 @@ internal object UpdateInstall {
 
     fun clear(dir: File) {
         val path = dir.toPath()
-        if (Files.isSymbolicLink(path)) Files.delete(path) else if (dir.exists()) run(listOf("/bin/rm", "-rf", dir.path))
+        if (Files.isSymbolicLink(path) || Files.isRegularFile(path, java.nio.file.LinkOption.NOFOLLOW_LINKS)) Files.delete(path) else if (dir.exists()) run(listOf("/bin/rm", "-rf", dir.path))
     }
 
     private fun plistValue(plist: File, key: String): String = run(listOf("/usr/libexec/PlistBuddy", "-c", "Print :$key", plist.path)).trim()

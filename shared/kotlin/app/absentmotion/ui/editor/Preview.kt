@@ -1,5 +1,8 @@
 package app.absentmotion.ui.editor
 
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import app.absentmotion.ui.theme.pressShape
 import android.graphics.Rect
 import android.os.Build
 import app.absentmotion.platform.SystemClock
@@ -153,9 +156,11 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
     val shownId = state.selectedId?.takeIf { handles != HIDDEN && !editingText } ?: 0
     var blurSettled by remember { mutableStateOf(false) }
     val blurred = remember(state.scene) { state.scene.node.hasEffect(setOf("absent.motionblur", "absent.shutterblur")) }
-    LaunchedEffect(state.timeMs, state.scene, state.playing) {
-        blurSettled = false
-        if (!state.playing && blurred) { kotlinx.coroutines.delay(300); blurSettled = true }
+    LaunchedEffect(state.scene, blurred) {
+        snapshotFlow { state.timeMs to state.playing }.collectLatest { (_, playing) ->
+            blurSettled = false
+            if (!playing && blurred) { kotlinx.coroutines.delay(300); blurSettled = true }
+        }
     }
     val baseView = if (size.width > 0) PreviewView(
         0, scale * quality, dx * quality, dy * quality, shownId, handles,
@@ -473,7 +478,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                     } else null
                     if (cancelled) {
                         if (moved) {
-                            listOf<Any>("preview-gesture", "preview-handle", "gradient-handle", "text-wrap", "crop-drag", MULTI_KEY).forEach { state.cancelGesture(it) }
+                            listOf<Any>("preview-gesture", "preview-handle", "gradient-handle", "text-wrap", "crop-drag", "turn", MULTI_KEY).forEach { state.cancelGesture(it) }
                         }
                         state.endGesture()
                     } else if (moved) {
@@ -538,11 +543,13 @@ private fun CanvasZoomHud(state: EditorState, modifier: Modifier) {
     }
     val selected = state.selectedId != null || MultiSelect.ids.isNotEmpty()
     Column(modifier.padding(start = 10.dp, top = 10.dp).width(50.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        val press = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+        val zoomLabel = stringResource(R.string.camerapanel_zoom)
         Box(
             Modifier.size(40.dp).alpha(if (selected) 1f else shown.value)
-                .then(if (selected) Modifier.clickable { state.panZoomMode = !state.panZoomMode } else Modifier),
+                .then(if (selected) Modifier.semantics { contentDescription = zoomLabel }.clickable(press, null, role = androidx.compose.ui.semantics.Role.Button) { state.panZoomMode = !state.panZoomMode } else Modifier),
             Alignment.Center,
-        ) { CanvasZoomIcon(on = state.panZoomMode, guide = !selected) }
+        ) { Box(Modifier.pressShape(press, RoundedCornerShape(3.dp))) { CanvasZoomIcon(on = state.panZoomMode, guide = !selected) } }
         Text(
             "${(state.canvasZoom * 100).toInt()}%", Modifier.alpha(shown.value), color = Am.Caption.copy(alpha = 0.6f), fontSize = 12.sp,
             fontWeight = FontWeight.Bold, maxLines = 1,

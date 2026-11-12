@@ -180,18 +180,19 @@ internal fun ObjectPage(state: EditorState, modifier: Modifier) {
 }
 
 @Composable
-private fun ObjectTiles(state: EditorState, reading: Boolean, pick: () -> Unit, importSvg: () -> Unit, importModel: () -> Unit) {
+private fun ObjectTiles(state: EditorState, reading: Boolean, pick: () -> Unit, importSvg: () -> Unit, importModel: () -> Unit) = BoxWithConstraints {
+    val tile = Modifier.size(minOf(70.dp, (maxWidth - 44.dp) / 4), 80.dp)
     Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            ObjectTile(stringResource(R.string.camera), PanelIcons.Camera, Modifier.size(70.dp, 80.dp)) { state.addCamera() }
-            ObjectTile(stringResource(R.string.light_layer), PanelIcons.Brightness, Modifier.size(70.dp, 80.dp)) { state.addLight() }
-            ObjectTile(stringResource(R.string.structure_null), ChromeIcons.NullObject, Modifier.size(70.dp, 80.dp)) { state.addNull() }
-            ObjectTile(stringResource(R.string.structure_empty_group), SelectionIcons.Group, Modifier.size(70.dp, 80.dp)) { state.addEmptyGroup() }
+            ObjectTile(stringResource(R.string.camera), PanelIcons.Camera, tile) { state.addCamera() }
+            ObjectTile(stringResource(R.string.light_layer), PanelIcons.Brightness, tile) { state.addLight() }
+            ObjectTile(stringResource(R.string.structure_null), ChromeIcons.NullObject, tile) { state.addNull() }
+            ObjectTile(stringResource(R.string.structure_empty_group), SelectionIcons.Group, tile) { state.addEmptyGroup() }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            ObjectTile(stringResource(R.string.structure_asset_project), ChromeIcons.AssetProject, Modifier.size(70.dp, 80.dp), onClick = pick)
-            ObjectTile(stringResource(R.string.structure_import_svg), ChromeIcons.ImportSvg, Modifier.size(70.dp, 80.dp), enabled = !reading, onClick = importSvg)
-            ObjectTile(stringResource(R.string.structure_3d_model), ChromeIcons.Model3d, Modifier.size(70.dp, 80.dp), enabled = !reading, onClick = importModel)
+            ObjectTile(stringResource(R.string.structure_asset_project), ChromeIcons.AssetProject, tile, onClick = pick)
+            ObjectTile(stringResource(R.string.structure_import_svg), ChromeIcons.ImportSvg, tile, enabled = !reading, onClick = importSvg)
+            ObjectTile(stringResource(R.string.structure_3d_model), ChromeIcons.Model3d, tile, enabled = !reading, onClick = importModel)
         }
     }
 }

@@ -69,7 +69,7 @@ object DeskFiles {
         runCatching {
             val file = Uri.parse(uri).toFile() ?: return@runCatching null
             if (video) app.absentmotion.desk.DeskMedia.frame(file, 0, size)?.toComposeImageBitmap()
-            else android.graphics.BitmapFactory.decodeFile(file.path)?.let { android.graphics.Bitmap.createScaledBitmap(it, size, (size * it.height / it.width.coerceAtLeast(1)).coerceAtLeast(1), true) }?.image?.toComposeImageBitmap()
+            else android.graphics.BitmapFactory.decodeThumb(file, size)?.let { android.graphics.Bitmap.createScaledBitmap(it, size, (size * it.height / it.width.coerceAtLeast(1)).coerceAtLeast(1), true) }?.image?.toComposeImageBitmap()
         }.getOrNull()
     }
 }

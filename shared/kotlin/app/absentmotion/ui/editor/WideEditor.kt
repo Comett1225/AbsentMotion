@@ -47,6 +47,7 @@ import app.absentmotion.ui.tutorial.tutorialTarget
 
 val LocalWide = compositionLocalOf { false }
 val LocalTablet = compositionLocalOf { false }
+internal val LocalRail = compositionLocalOf { false }
 internal val LocalDeskEditor = compositionLocalOf { false }
 internal val LocalSideHeight = compositionLocalOf { Dp.Infinity }
 
@@ -76,7 +77,7 @@ internal fun WideEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: 
             return@BoxWithConstraints
         }
         val timeline = (maxHeight - 88.dp - 260.dp).coerceIn(140.dp, 320.dp)
-        val textEdit = state.panel == EditorPanel.EditText && state.selected?.kind == "text"
+        val textEdit = state.panel == EditorPanel.EditText && state.selectedId?.let { state.scene.layer(it) }?.kind == "text"
         val textUi = remember { TextEditUi() }
         val side = textEdit || (state.selectedId != null && !state.addOpen && !MultiSelect.active)
         val reserve = if (side) SideWidth else 0.dp
@@ -115,7 +116,7 @@ internal val LeftRailWidth = 55.dp
 
 @Composable
 private fun RailEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: AddLibrary, timeline: Dp, dock: Dp?) {
-    val textEdit = state.panel == EditorPanel.EditText && state.selected?.kind == "text"
+    val textEdit = state.panel == EditorPanel.EditText && state.selectedId?.let { state.scene.layer(it) }?.kind == "text"
     val textUi = remember { TextEditUi() }
     val layerSide = textEdit || state.drawing is app.absentmotion.editor.PointMode || MultiSelect.active || (state.selectedId != null && !state.addOpen)
     Box(Modifier.fillMaxSize()) {
@@ -141,7 +142,9 @@ private fun RailEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: A
                     if (!state.settings.transitionInPreview) TransitionButton(state, Modifier.align(Alignment.CenterEnd).padding(end = 12.dp).tutorialTarget("transition"), compact = true)
                     LevelMeter(state, Modifier.align(Alignment.BottomStart).fillMaxWidth().height(2.1.dp))
                 }
-                Box(Modifier.fillMaxWidth().height(timeline).background(Am.TimelineBg).tutorialTarget("timeline")) { Timeline(state, Modifier.fillMaxSize()) }
+                Box(Modifier.fillMaxWidth().height(timeline).background(Am.TimelineBg).tutorialTarget("timeline")) {
+                    CompositionLocalProvider(LocalRail provides true) { Timeline(state, Modifier.fillMaxSize()) }
+                }
             }
         }
         if (!layerSide) AddPopup(state, library = addLibrary) { content, rail -> SideFrame(dock, "add", content, rail) }

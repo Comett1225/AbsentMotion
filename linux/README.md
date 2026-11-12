@@ -2,9 +2,9 @@
 
 What only Linux uses: the Skia build (`skia.sh` with `skia-args.gn`), the native build (`build.sh`, using
 `native/linux.cmake` and `native/glibc_compat.c`), the packages (`package.sh`, with `start.sh` and `install.sh`), the
-distribution check (`distro_check.sh`), the app icon and `Dockerfile`, an Ubuntu 24.04 build machine. The engine draws with Vulkan (`../pc/native/gpu_vulkan.cpp`, shared with Windows) when a Vulkan 1.1
-driver is installed (a graphics card before a software Vulkan driver such as lavapipe), else on the CPU; decodes video through VA-API when the VA-API libraries are installed
-(`../pc/native/video_copy.cpp`), else in software; and finds fallback fonts (Arabic, Hebrew, CJK) through fontconfig.
+distribution check (`distro_check.sh`), the app icon and `Dockerfile`, an Ubuntu 24.04 build machine. The engine draws with Vulkan (`../pc/native/gpu_vulkan.cpp`, shared with Windows) when a graphics card has a Vulkan 1.1
+driver, else on the CPU (a software Vulkan driver such as lavapipe is only used with `AM_VULKAN_CPU=1`, which the tests in Docker need); decodes video through VA-API when libva 2.21 or newer and its DRM and X11 libraries are installed
+(`../pc/native/video_copy.cpp`; the bundled FFmpeg needs `vaMapBuffer2`, so older libva, as on Ubuntu 22.04 and 24.04 and Debian 12, decodes in software), else in software; and finds fallback fonts (Arabic, Hebrew, CJK) through fontconfig.
 
 Build on Linux (arm64 or x64), or in the Docker image on a Mac (`docs/BUILD.md` section 9 has the full commands):
 

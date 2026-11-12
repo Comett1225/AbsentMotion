@@ -317,7 +317,9 @@ private fun SetupScreen(
             Column(Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
                 Text(stringResource(R.string.caption_model), color = Am.OnDark, fontSize = 14.sp)
                 Spacer(Modifier.height(8.dp))
-                Choices(listOf(stringResource(R.string.caption_model_standard), stringResource(R.string.caption_model_precision)), if (style.highPrecision) 1 else 0) { onStyle(style.copy(highPrecision = it == 1)) }
+                Row(Modifier.horizontalScroll(rememberScrollState())) {
+                    Choices(listOf(stringResource(R.string.caption_model_standard), stringResource(R.string.caption_model_precision)), if (style.highPrecision) 1 else 0) { onStyle(style.copy(highPrecision = it == 1)) }
+                }
             }
             Line(stringResource(R.string.caption_appearance), Modifier.clickable { onAppearance(!appearanceOpen) }) {
                 Icon(if (appearanceOpen) ChromeIcons.ChevronDown else ChromeIcons.ChevronRight, null, Modifier.size(24.dp), tint = Am.OnDark)
@@ -479,7 +481,7 @@ internal fun Choices(options: List<String>, chosen: Int, onChoose: (Int) -> Unit
     Row(Modifier.height(32.dp).background(Am.Field, ChoiceShape).padding(2.dp)) {
         options.forEachIndexed { i, label ->
             Box(
-                Modifier.fillMaxHeight().background(if (i == chosen) Am.Accent else Color.Transparent, ChoiceShape)
+                Modifier.fillMaxHeight().clip(ChoiceShape).background(if (i == chosen) Am.Accent else Color.Transparent)
                     .clickable { onChoose(i) }.padding(horizontal = 10.dp),
                 Alignment.Center,
             ) {

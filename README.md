@@ -222,7 +222,7 @@ Almost every desktop already has the libraries AbsentMotion needs. If it does no
 - Arch, Manjaro, EndeavourOS: `sudo pacman -S --needed alsa-lib fontconfig freetype2 libglvnd libx11 libxext libxi libxrender libxtst zlib`
 - Fedora: `sudo dnf install alsa-lib fontconfig freetype libglvnd-glx libX11 libXext libXi libXrender libXtst zlib`
 - openSUSE: `sudo zypper install libasound2 fontconfig libfreetype6 libGL1 libX11-6 libXext6 libXi6 libXrender1 libXtst6 libz1`
-- Debian, Ubuntu, Mint: `sudo apt install libasound2 libfontconfig1 libfreetype6 libgl1 libx11-6 libxext6 libxi6 libxrender1 libxtst6 zlib1g`
+- Debian, Ubuntu, Mint: `sudo apt install libasound2 libfontconfig1 libfreetype6 libgl1 libx11-6 libxext6 libxi6 libxrender1 libxtst6 zlib1g` (on Ubuntu 24.04 and later and Mint 22, write `libasound2t64` instead of `libasound2`)
 
 Optional, for speed: a Vulkan driver for your graphics card (Mesa's, or NVIDIA's own driver) makes previews and exports
 faster; without one AbsentMotion draws on the processor. A VA-API driver (Intel: `intel-media-driver`, AMD: Mesa's VA-API

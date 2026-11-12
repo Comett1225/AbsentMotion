@@ -1,4 +1,5 @@
 import gzip
+import os
 import re
 import struct
 import sys
@@ -12,7 +13,7 @@ try:
 except OSError:
     pass
 patterns = [re.compile(w.encode(), re.I) for w in words]
-allow = [re.compile(re.escape(a.encode()), re.I) for a in allowed]
+allow = [(a.encode().lower(), re.compile(re.escape(a.encode()), re.I)) for a in allowed]
 
 
 WIDE = ("androidmanifest.xml", ".arsc", ".exe", ".dll", ".msi", ".ps1")
@@ -74,13 +75,16 @@ for path in sys.stdin.read().split("\n"):
     if not path:
         continue
     try:
-        data = content(path)
+        data = os.readlink(path).encode() if os.path.islink(path) else content(path)
     except OSError:
         continue
     if path.lower().endswith(WIDE):
         data = data + b"\n" + data.replace(b"\0", b"")
-    for a in allow:
-        data = a.sub(b"", data)
+    low = data.lower()
+    for plain, a in allow:
+        if plain in low:
+            data = a.sub(b"", data)
+            low = data.lower()
     hits = []
     for p in patterns:
         for m in p.finditer(data):

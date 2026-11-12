@@ -1,5 +1,7 @@
 package app.absentmotion.ui.editor.panels
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import app.absentmotion.ui.theme.pressShape
 import app.absentmotion.ui.editor.deskSp
 import app.absentmotion.ui.editor.deskVerticalScroll
 import app.absentmotion.model.path
@@ -147,8 +149,9 @@ internal fun BorderShadowTabs(modifier: Modifier) {
     val usable = colourEditing == null
     Column(modifier.then(if (usable) Modifier else Modifier.dimmed())) {
         for (i in 0..2) {
-            Box(Modifier.weight(1f).fillMaxWidth().then(if (usable) Modifier.clickable { tab = i; endPicker = -1 } else Modifier).padding(10.px, 11.px, 11.px, 11.px)) {
-                Box(Modifier.fillMaxSize().clip(PanelShape).then(if (tab == i) Modifier.background(PanelDark) else Modifier), contentAlignment = Alignment.Center) {
+            val press = remember { MutableInteractionSource() }
+            Box(Modifier.weight(1f).fillMaxWidth().then(if (usable) Modifier.clickable(press, null) { tab = i; endPicker = -1 } else Modifier).padding(10.px, 11.px, 11.px, 11.px)) {
+                Box(Modifier.fillMaxSize().pressShape(press, PanelShape).then(if (tab == i) Modifier.background(PanelDark) else Modifier), contentAlignment = Alignment.Center) {
                     PanelIcon(TabIcons[i], if (tab == i) Am.Accent else Am.OnDark, description = stringResource(TabNames[i]))
                 }
             }
@@ -191,7 +194,7 @@ private fun ColourEditor(state: EditorState, layer: Layer, ref: PropRef) {
     Box(Modifier.fillMaxSize()) {
         Row(Modifier.offset(28.px, 37.px).size(856.px, 83.px).clip(PanelShape).background(Am.Field), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(83.px).clickable { colourEditing = null }, contentAlignment = Alignment.Center) {
-                PanelIcon(PanelIcons.Check, Am.Accent)
+                PanelIcon(PanelIcons.Check, Am.Accent, description = stringResource(R.string.done))
             }
             Text(stringResource(R.string.color), color = Am.OnDark, fontSize = 15.sp, maxLines = 1, softWrap = false)
         }
@@ -375,7 +378,7 @@ private fun BorderTab(state: EditorState, layer: Layer) {
                                             PanelIcon(ChromeIcons.Trash, Am.OnDark, size = 28.dp, description = stringResource(R.string.delete))
                                         }
                                     } else Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Text(formatPlain(b.size) + "px", Modifier.padding(start = 28.px).width(78.px), color = Am.OnDark, fontSize = 16.sp, maxLines = 1, softWrap = false)
+                                        Text(formatPlain(b.size) + "px", Modifier.padding(start = 28.px).width(78.px), color = Am.OnDark, maxLines = 1, softWrap = false, autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(8.sp, 16.sp, 0.5.sp))
                                         ColourSwatch(b.color, 56.px, Modifier.padding(start = 28.px), round = true)
                                         Text(stringResource(DirectionLabels[Directions.indexOf(b.direction).coerceAtLeast(0)]), Modifier.padding(start = 28.px).weight(1f), color = Am.OnDark, fontSize = 16.sp, maxLines = 1, softWrap = false)
                                         Canvas(Modifier.size(84.px).semantics { contentDescription = reorderLabel }.reorderGrip(reorder, b.index, borders.size) { from, to ->
@@ -395,7 +398,7 @@ private fun BorderTab(state: EditorState, layer: Layer) {
                                         val chosen = b.direction == d
                                         Box(Modifier.weight(1f).fillMaxHeight().background(if (chosen) Am.Chosen else Am.FieldHi)
                                             .clickable { state.editSelected { it.withBorderDirection(b.index, d) } }, contentAlignment = Alignment.Center) {
-                                            Text(stringResource(DirectionLabels[i]).uppercase(), color = if (chosen) Am.Accent else Am.OnDark, fontSize = 15.sp, fontWeight = FontWeight.Medium, maxLines = 1, softWrap = false)
+                                            Text(stringResource(DirectionLabels[i]).uppercase(), Modifier.padding(horizontal = 2.dp), color = if (chosen) Am.Accent else Am.OnDark, fontWeight = FontWeight.Medium, maxLines = 1, softWrap = false, autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(8.sp, 15.sp, 0.5.sp))
                                         }
                                     }
                                 }

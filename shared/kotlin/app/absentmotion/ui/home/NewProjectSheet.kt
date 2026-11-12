@@ -492,7 +492,7 @@ private fun CustomSize(form: Form) {
     Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
         NumberField(form.customW, form::editWidth, form::commitSides, Modifier.width(68.dp))
         val tint = if (form.linked) Am.Navy else Am.HomeFaint
-        Box(Modifier.size(44.dp).clickable(onClick = form::toggleLink), contentAlignment = Alignment.Center) {
+        Box(Modifier.size(44.dp).clip(CircleShape).clickable(onClick = form::toggleLink), contentAlignment = Alignment.Center) {
             Box(Modifier.size(27.dp).border(1.dp, tint, CircleShape), contentAlignment = Alignment.Center) {
                 Icon(HomeIcons.Link, stringResource(R.string.newproject_link), Modifier.size(20.dp), tint = tint)
             }

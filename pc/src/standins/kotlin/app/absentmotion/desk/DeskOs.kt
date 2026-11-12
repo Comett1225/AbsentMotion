@@ -18,10 +18,23 @@ object DeskOs {
         }
     }.getOrDefault(false)
 
+    @Volatile private var gsettings = true
+    @Volatile private var gnome = false
+    @Volatile private var gnomeAt = 0L
+
     private fun gnomeDark(): Boolean {
-        val process = ProcessBuilder("gsettings", "get", "org.gnome.desktop.interface", "color-scheme").redirectErrorStream(true).start()
-        if (!process.waitFor(1, java.util.concurrent.TimeUnit.SECONDS)) { process.destroyForcibly(); return false }
-        return process.inputStream.bufferedReader().use { it.readText() }.contains("dark")
+        val now = System.nanoTime()
+        if (!gsettings || gnomeAt != 0L && now - gnomeAt < 10_000_000_000L) return gnome
+        gnomeAt = now
+        val process = try {
+            ProcessBuilder("gsettings", "get", "org.gnome.desktop.interface", "color-scheme").redirectErrorStream(true).start()
+        } catch (e: java.io.IOException) {
+            gsettings = false
+            return false
+        }
+        if (!process.waitFor(1, java.util.concurrent.TimeUnit.SECONDS)) { process.destroyForcibly(); return gnome }
+        gnome = process.inputStream.bufferedReader().use { it.readText() }.contains("dark")
+        return gnome
     }
     val dataDir: File get() = when {
         mac -> home.resolve("Library/Application Support/AbsentMotion")
@@ -96,6 +109,12 @@ object DeskOs {
         mac -> listOf("open", "x-apple.systempreferences:com.apple.preference.security?Privacy_Camera")
         windows -> listOf("cmd", "/c", "start", "", "ms-settings:privacy-webcam")
         else -> null
+    }
+
+    internal fun isTool(command: String): Boolean = File(command).name.lowercase().let { name -> listOf("ffmpeg", "ffprobe", "yt-dlp").any { name == it || name.startsWith("$it.") || name.startsWith("${it}_") } }
+
+    fun stopTools() {
+        runCatching { ProcessHandle.current().descendants().filter { handle -> handle.info().command().map(::isTool).orElse(false) }.forEach { it.destroyForcibly() } }
     }
 
     fun openCameraSettings() { cameraSettingsCommand(mac, windows)?.let { command -> runCatching { ProcessBuilder(command).start() } } }

@@ -5,11 +5,11 @@ import subprocess
 import sys
 import time
 from pathlib import Path
-from sdk import adb_command
+from sdk import PACKAGE, adb_command
 
 ROOT = Path(__file__).resolve().parents[1]
 ADB = adb_command()
-PKG = "app.absentmotion"
+PKG = PACKAGE
 DEVICE_DIR = f"/sdcard/Android/data/{PKG}/files"
 WORDS = ("This is a long sentence so that the voice takes a while to make and the preview button can be pressed "
          "while it is still being made by the speech engine of this phone")

@@ -10,6 +10,8 @@ import androidx.compose.animation.core.rememberTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.IndicationNodeFactory
+import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.HoverInteraction
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
@@ -32,9 +34,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.drawscope.translate
@@ -303,6 +307,9 @@ class PressIndication(private val tint: Color, private val hover: Boolean = fals
 const val TilePress = 0.96f
 
 @Composable
+fun Modifier.pressShape(source: InteractionSource, shape: Shape): Modifier = clip(shape).indication(source, LocalIndication.current)
+
+@Composable
 fun Modifier.pressScale(source: InteractionSource, pressed: Float = 0.93f): Modifier {
     val down by source.collectIsPressedAsState()
     val s = animateFloatAsState(if (down) pressed else 1f, Motion.fast(), label = "press")
@@ -337,6 +344,7 @@ object ThemeFade {
 
 @Composable
 fun FollowSystemTheme(settings: app.absentmotion.library.AppSettings) {
+    if (settings.theme != Themes.SYSTEM) return
     val dark = app.absentmotion.platform.systemDarkLive()
     LaunchedEffect(dark) {
         while (ThemeFade.busy) kotlinx.coroutines.delay(500)

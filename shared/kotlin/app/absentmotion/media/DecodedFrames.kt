@@ -84,7 +84,7 @@ private class NdkFrame(private var image: Long) : DecodedFrame {
 
 private class NdkFrames(width: Int, height: Int, count: Int) : DecodedFrames {
     private var handle = NdkImages.open(width, height, count).also { check(it != 0L) { "cannot create a $width x $height image reader" } }
-    override val surface: Surface = checkNotNull(NdkImages.surface(handle)) { "the image reader has no surface" }
+    override val surface: Surface = NdkImages.surface(handle) ?: run { NdkImages.close(handle); error("the image reader has no surface") }
     override fun poll(timeoutNanos: Long): DecodedFrame? =
         NdkImages.poll(handle, TimeUnit.NANOSECONDS.toMillis(timeoutNanos).coerceAtLeast(0)).takeIf { it != 0L }?.let(::NdkFrame)
     override fun drain() = NdkImages.drain(handle)

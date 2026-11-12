@@ -297,6 +297,15 @@ Java_app_absentmotion_ai_AiNative_nativeCpuCores(JNIEnv *, jobject) {
     return std::max(1, ncnn::get_big_cpu_count());
 }
 
+extern "C" JNIEXPORT jboolean JNICALL
+Java_app_absentmotion_ai_DeskAiNative_nativeCaptionCpu(JNIEnv *, jobject) {
+#if defined(__x86_64__) || defined(_M_X64)
+    return ncnn::cpu_support_x86_avx2() && ncnn::cpu_support_x86_f16c() ? JNI_TRUE : JNI_FALSE;
+#else
+    return JNI_TRUE;
+#endif
+}
+
 extern "C" JNIEXPORT jlong JNICALL
 Java_app_absentmotion_ai_AiNative_nativeOpen(JNIEnv *env, jobject, jstring param, jstring bin, jstring blendBin, jfloat weight, jboolean useGpu) {
     auto *m = new (std::nothrow) Model;

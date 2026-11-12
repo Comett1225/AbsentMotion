@@ -48,7 +48,7 @@ internal fun AiMarkRow(state: EditorState, mark: AiMark) {
         verticalAlignment = Alignment.CenterVertically) {
         Text(name, Modifier.weight(1f).padding(start = 12.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         if (kind.ai) Text(stringResource(R.string.ai), Modifier.padding(horizontal = 6.dp).clip(RoundedCornerShape(3.dp)).background(Am.Accent).padding(horizontal = 5.dp, vertical = 1.dp),
-            color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+            color = Am.OnAccent, fontSize = 10.sp, fontWeight = FontWeight.Bold, maxLines = 1)
         if (mark.restorable) Icon(ChromeIcons.Trash, stringResource(R.string.ai_mark_restore), Modifier.size(36.dp).clickable {
             state.selectedId?.let { id -> state.edit { it.withoutAiMark(id, kind) } }
         }.padding(7.dp), tint = Am.OnDark)

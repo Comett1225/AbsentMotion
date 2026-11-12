@@ -30,8 +30,10 @@ app image from `gradlew createDistributable` into `pc/build/compose/binaries/mai
   Apps entry with an uninstaller, then opens the app.
 - `AbsentMotion-<version>-windows-x64.ampack`: the same package without the program, for in-app updates. An app that finds
   `AbsentMotionSetup.exe` next to its launcher downloads the signed `.ampack` and runs a copy of its own setup program with no
-  further clicks. The setup unpacks next to the app, closes every program running from the app folder (a polite close, then
-  ended after 5 s), swaps the two folders and opens the new version. If anything fails, the old version stays and opens again.
+  further clicks. The setup unpacks next to the app, waits for the app to quit, closes every program still running from the app folder (a polite
+  close, then ended after 5 s), swaps the two folders and opens the new version. An app that still shows a window a minute after
+  the update began (an export or an unsaved project kept it open) is asked to close once more and never ended: the update stops
+  with `the app did not close`. If anything fails, the old version stays and opens again.
 
 `gradlew packageMsi` builds the setup program first and ships it next to `AbsentMotion.exe` (jpackage `--app-content`), so an
 MSI install updates through the setup from its next update on. That first setup update moves the install off Windows

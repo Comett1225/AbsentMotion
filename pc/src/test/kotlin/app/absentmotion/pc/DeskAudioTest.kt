@@ -290,15 +290,17 @@ class DeskAudioTest {
             assertTrue(player.isPlaying)
             while (player.currentPosition <= 0 && System.nanoTime() - startedAt < 2_000_000_000L) Thread.sleep(1)
             val moving = (System.nanoTime() - startedAt) / 1e6
+            val from = System.nanoTime()
             Thread.sleep(400)
             val pos = player.currentPosition
+            val waited = ((System.nanoTime() - from) / 1_000_000).toInt()
             player.pause()
             assertTrue(!player.isPlaying)
             val held = player.currentPosition
             Thread.sleep(100)
             assertEquals(held, player.currentPosition)
             println("preview: prepared %.1f ms, position moving %.1f ms after start(), at %d ms after +400 ms".format((startedAt - t0) / 1e6, moving, pos))
-            assertTrue(pos in 300..600)
+            assertTrue("at $pos ms after $waited ms", pos in waited - 100..waited + 200)
             player.release()
         } finally {
             DeskOutput.capture = null

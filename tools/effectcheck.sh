@@ -15,4 +15,5 @@ for path in sorted(pack.glob("*.json")):
     if not effect.get("native"): (out / f"{path.stem}.sksl").write_text(effect["sksl"])
 EOF
 cd "$OUT"
-"$CHECK" *.sksl
+"$CHECK" *.sksl > result.txt || { grep -v '^OK ' result.txt; echo "effectcheck: $(grep -c '^ERR ' result.txt) effect shader(s) do not compile" >&2; exit 1; }
+echo "effectcheck: $(grep -c '^OK ' result.txt) effect shaders compile"

@@ -120,8 +120,8 @@ private fun SpeedTabs(current: Int, count: Int, modifier: Modifier, locked: Bool
                     .semantics { selected = chosen }.clickable(enabled = usable, role = Role.Tab) { choose(option) },
                 Alignment.Center,
             ) {
-                Text(stringResource(SpeedTabNames[option]), color = animatedColor(if (chosen) Am.Accent else Am.OnDark),
-                    fontSize = 12.5.sp, maxLines = 1, softWrap = false)
+                Text(stringResource(SpeedTabNames[option]), Modifier.padding(horizontal = 3.dp), color = animatedColor(if (chosen) Am.Accent else Am.OnDark),
+                    maxLines = 1, softWrap = false, autoSize = TextAutoSize.StepBased(8.sp, 12.5.sp, 0.5.sp))
             }
         }
     }
@@ -133,7 +133,7 @@ private val SpeedTabNames = listOf(R.string.speed_normal, R.string.speed_curve, 
 private fun RemapTime(state: EditorState, layer: Layer, modifier: Modifier) {
     if (!layer.remapped) {
         Column(modifier.padding(horizontal = 24.dp, vertical = 12.dp), Arrangement.spacedBy(12.dp), Alignment.CenterHorizontally) {
-            Text(stringResource(R.string.remap_about), color = Am.OnDarkDim, fontSize = 13.sp, textAlign = TextAlign.Center)
+            Text(stringResource(R.string.remap_about), Modifier.weight(1f, fill = false), color = Am.OnDarkDim, textAlign = TextAlign.Center, autoSize = TextAutoSize.StepBased(9.sp, 13.sp, 0.5.sp))
             RampChip(stringResource(R.string.remap_turn_on), true, modifier = Modifier.height(36.dp)) { state.turnOnRemap() }
         }
         return
@@ -204,9 +204,9 @@ internal fun SpeedValue(speed: Float, modifier: Modifier, onClick: (() -> Unit)?
 
 @Composable
 internal fun RampChip(label: String, enabled: Boolean, active: Boolean = false, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    Box(modifier.fillMaxHeight().alpha(if (enabled) 1f else 0.35f).background(if (active) Am.Accent else Am.Button, RoundedCornerShape(4.dp))
+    Box(modifier.fillMaxHeight().alpha(if (enabled) 1f else 0.35f).clip(RoundedCornerShape(4.dp)).background(if (active) Am.Accent else Am.Button)
         .clickable(enabled = enabled, onClick = onClick).padding(horizontal = 10.dp), Alignment.Center) {
-        Text(label, color = Am.OnDark, maxLines = 1, softWrap = false, autoSize = TextAutoSize.StepBased(8.sp, 12.sp, 0.5.sp))
+        Text(label, color = if (active) Am.OnAccent else Am.OnDark, maxLines = 1, softWrap = false, autoSize = TextAutoSize.StepBased(8.sp, 12.sp, 0.5.sp))
     }
 }
 
@@ -220,7 +220,7 @@ private fun RetimeButtons(state: EditorState, usable: List<Boolean>, modifier: M
             val shape = RoundedCornerShape(topStart = if (first) 4.dp else 0.dp, bottomStart = if (first) 4.dp else 0.dp, topEnd = if (last) 4.dp else 0.dp, bottomEnd = if (last) 4.dp else 0.dp)
             val name = stringResource(RetimeNames[i])
             Box(Modifier.weight(1f).fillMaxHeight().alpha(if (usable[i]) 1f else 0.35f)
-                .background(Am.Button, shape).clickable(enabled = usable[i], role = Role.Button) { state.retimeVideo(i < 2) }.semantics { contentDescription = name }, Alignment.Center) {
+                .clip(shape).background(Am.Button).clickable(enabled = usable[i], role = Role.Button) { state.retimeVideo(i < 2) }.semantics { contentDescription = name }, Alignment.Center) {
                 RetimeGlyph(i, Modifier.size(23.dp))
             }
         }

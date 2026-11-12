@@ -133,6 +133,7 @@ struct Video {
                     codec->opaque = (void*)(intptr_t)config->pix_fmt;
                     codec->get_format = PickFormat;
                     codec->thread_count = 1;
+                    codec->extra_hw_frames = kAhead;
                     hardware = true;
                     break;
                 }
@@ -151,7 +152,12 @@ struct Video {
             if (packet->stream_index == stream->index) {
                 ++sent;
                 if (avcodec_send_packet(codec, packet) < 0) { av_packet_unref(packet); break; }
-                got = avcodec_receive_frame(codec, frame.get()) >= 0 && frame->hw_frames_ctx;
+                if (avcodec_receive_frame(codec, frame.get()) >= 0) {
+                    FramePtr copy(av_frame_alloc());
+                    got = frame->hw_frames_ctx && copy && av_hwframe_transfer_data(copy.get(), frame.get(), 0) >= 0;
+                    av_packet_unref(packet);
+                    break;
+                }
             }
             av_packet_unref(packet);
         }
@@ -286,7 +292,10 @@ struct Video {
     }
 
     sk_sp<SkImage> toneMapped(GrDirectContext* context, AVFrame* f) {
-        if (!scaler && (scaler = sws_alloc_context())) scaler->flags = SWS_BILINEAR | SWS_ACCURATE_RND | SWS_FULL_CHR_H_INT;
+        if (!scaler && (scaler = sws_alloc_context())) {
+            scaler->flags = SWS_BILINEAR | SWS_ACCURATE_RND | SWS_FULL_CHR_H_INT;
+            scaler->threads = std::clamp((int)std::thread::hardware_concurrency(), 1, 8);
+        }
         if (f->colorspace == AVCOL_SPC_UNSPECIFIED) f->colorspace = AVCOL_SPC_BT2020_NCL;
         FramePtr wide(av_frame_alloc());
         wide->format = AV_PIX_FMT_RGBA64LE;
@@ -345,7 +354,10 @@ struct Video {
         if (Hdr(f)) if (auto image = toneMapped(context, f)) return image;
         if (UnspecifiedHd(f)) f->colorspace = AVCOL_SPC_BT709;
         if (auto image = planar(context, f)) return image;
-        if (!scaler && (scaler = sws_alloc_context())) scaler->flags = SWS_BILINEAR | SWS_ACCURATE_RND | SWS_FULL_CHR_H_INT;
+        if (!scaler && (scaler = sws_alloc_context())) {
+            scaler->flags = SWS_BILINEAR | SWS_ACCURATE_RND | SWS_FULL_CHR_H_INT;
+            scaler->threads = std::clamp((int)std::thread::hardware_concurrency(), 1, 8);
+        }
         AVFrame* rgba = av_frame_alloc();
         rgba->format = AV_PIX_FMT_RGBA;
         rgba->width = f->width;

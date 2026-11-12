@@ -30,7 +30,8 @@ About 15 GB free (Skia with its dependencies, the Gradle cache, the Android SDK 
 | Android NDK | **30.0.16248370** (r30) | The engine for Android (`ndkVersion` in `android/build.gradle.kts`). |
 | CMake (Android SDK package) | **3.31.6** | Pinned in `android/build.gradle.kts` for the Android engine. |
 | Ninja | any recent (1.13 used) | Skia (`ninja` must be on `PATH`). |
-| Python | 3 | The Skia dependency sync and the helper scripts in `tools/`. |
+| Python | 3 | The Skia dependency sync and the helper scripts in `tools/`. `tools/check.sh` also needs the packages `numpy`, `Pillow` and `fontTools`. |
+| C++ compiler | `clang++` (the Xcode command line tools, or the `clang` package) | The host tests in `tools/check.sh`. |
 | git | system | Fetching Skia and its dependencies. |
 
 The Gradle wrapper downloads **Gradle 9.8.2** itself. The build files pin the Android Gradle Plugin 9.4.1, Kotlin 2.4.21
@@ -42,8 +43,8 @@ and the Compose BOM 2026.09.00.
 brew install openjdk@21 ninja
 ```
 
-**JDK.** Set `JAVA_HOME` to JDK 21. The scripts in `tools/` source `tools/env.sh`, which uses `JAVA_HOME` if set and
-otherwise looks for a JDK 21 (including Homebrew's).
+**JDK.** Set `JAVA_HOME` to JDK 21. The scripts in `tools/` source `tools/env.sh`, which takes a JetBrains Runtime 21 when
+one is installed, otherwise `JAVA_HOME` if set, and otherwise looks for a JDK 21 (including Homebrew's).
 
 **Android SDK location.** Create `local.properties` in the project root (it is git-ignored):
 
@@ -175,14 +176,53 @@ Outputs: `android/build/outputs/apk/<flavour>/<type>/app-<flavour>-<type>.apk`, 
   `AM_PACKAGE=<app id>` points the device tools at a debug copy installed under another app id (an `applicationIdSuffix`), so a
   device that has the real app can be tested without touching it.
 
+- **Assets in the APK:** the task `packLanguages` (`android/build.gradle.kts`) copies `shared/assets` into the APK without the translated help pages
+  and effect names, and adds one gzip pack per language (`assets/langpacks/<tag>.pack`), which the app unpacks the first time that language is
+  used. The Compatible flavours use `packLanguagesCompat`, which also lays `android/src/compat/slow-assets` over that copy: the 12 fps versions of
+  the moving effect pictures, which `tools/effect_thumbs.py` writes next to the 30 fps ones in `shared/assets/effects/thumb`. A unit test
+  (`EffectPackTest`) fails when a moving picture has no 12 fps copy, and `tools/apk_check.py` refuses an APK without language packs, with
+  translated pages outside their pack, or a Compatible APK that carries a 30 fps picture. `tools/effect_thumbs.py` saves every picture again at a
+  slightly lower quality when its bytes happen to spell a word that `tools/publish_check.sh` refuses.
+- **Baseline profile:** `android/src/main/baseline-prof.txt` names the app's own classes that run when the app starts, a project opens and the
+  editor is used: one `HSPL<class>*;->**(**)**` rule and one `L<class>*;` rule for each outer class under `app/absentmotion`. The Android
+  Gradle plugin merges it with the profiles the libraries bring and puts the result in the APK (`assets/dexopt/baseline.prof`), and the phone
+  compiles those methods ahead of time instead of interpreting them (in the background after the first start; it costs about 13 MB of storage
+  for compiled code). To refresh the list, install a release build on a rooted emulator, run
+  `adb shell cmd package compile --reset app.absentmotion`, use the app (start it, open a project, play, select a layer, open the panels and the
+  **+** menu, export, visit the Home tabs and Settings), save the profile with `adb shell kill -USR1 <pid>` and dump it:
+  `adb shell cmd package dump-profiles --dump-classes-and-methods app.absentmotion` on Android 14 (it prints where it saved the text), or
+  `profman --dump-classes-and-methods --profile-file=/data/misc/profiles/cur/0/app.absentmotion/primary.prof --apk=<base.apk> --dex-location=<base.apk>`
+  on Android 8.1. Write the two rules for every outer class under `app/absentmotion` in the dump. A rule for a class that no longer exists
+  does nothing.
+
 The signing helper uses each APK's manifest minimum Android version and build-tools 37.0.0. `python3 tools/apk_check.py <apk> [<apk> ...]` checks signatures at every supported API through 37, resource-table and native-library packaging, ELF alignment (16 KB pages on arm64 and x86_64, 4 KB on 32-bit ARM), and matching app IDs, versions and certificates across the supplied APKs. Use `--unsigned` for unsigned CI output and `--libraries <folder>` to check only the 16 KB alignment of built `.so` files. Signed APKs must carry the release certificate pinned as `RELEASE_SIGNER` in `UpdateSource.kt`, the key the in-app updater accepts. This validates packaging; installation and runtime testing on emulators and real devices remain necessary.
 
 ## 7. Checking a change, and releases
 
-`tools/check.sh` compiles the Android flavours and runs the unit tests (`--full` also lints foss and compat and checks the native API floor and 16 KB page alignment of both).
+`tools/check.sh [--quick|--full]` is the check to run before every commit; without an argument it is the full one. Both modes start, in the
+background, the static checks (generated files up to date, translations, effect lint, every effect shader compiles, no comments, the publish
+check, UI contracts, tool regressions, feature parity) and the host tests of the C++ code (cut-out clean-up, text animation, particles, warp,
+easing, and on a Mac with the host Skia build the 3D pieces, crossing layers, Puppet Pin, Crop and Rays checks, which share one engine build in
+`build/render_bench/current` that only compiles what changed). Both also build the three host libraries the unit tests load
+(`tools/audio_dsp.sh --lib`, `tools/pivot.sh --lib`, `tools/tracker_check.sh --lib`). `--quick` then compiles `foss`, runs its unit tests and
+compiles the desktop app. `--full` compiles `foss`, `compat` and `compat32`, runs the foss and compat unit tests and lint, checks the native API
+floor and page alignment of the release libraries (when they are not built it ends as INCOMPLETE with exit code 3) and runs the desktop tests.
+Logs are in `build/check/`. Two runs can work in the same folder at the same time: each keeps its own results, and the second waits
+while the first runs its Gradle build (a second Gradle build in the same folder deletes class files the first one is using). A check that cannot run on this machine prints a line that starts
+with `skipped:` (the shader check needs `tools/sksl_check/build.sh` once, the publish check needs the private word list).
 
-`tools/release.sh [patch|minor|major]` bumps `version.properties` (with no argument it keeps the current version),
-runs `tools/check.sh`, and builds the release APKs of every flavour (signed as described in section 6). Results:
+The unit test tasks name what the tests read as inputs (the shared assets and texts, `testdata/`, the 12 fps pictures, the host libraries,
+`version.properties`), so Gradle runs the tests again when one of those changes and skips them otherwise. A test that reads another file needs
+its own `inputs` line in `android/build.gradle.kts` or `pc/build.gradle.kts`.
+
+`tools/publish_check.sh` also refuses a commit or tag that is not signed as `AbsentMotion <noreply@absentmotion.invalid>` (commits made on
+GitHub's website carry GitHub as committer), an attribution line (`Co-Authored-By:`) in a commit or tag message, a link whose target names a
+refused word, and a file name it cannot read back (a quote, a backslash or a control character).
+
+`tools/release.sh [patch|minor|major]` needs `signing.properties`. It bumps `version.properties` (with no argument it keeps the current
+version), runs `tools/check.sh --quick` so that a missing changelog or a failing test stops it before the long builds, builds the release APKs
+of every flavour (signed as described in section 6), runs the full `tools/check.sh` against those builds, and then `tools/api_floor.py`,
+`tools/apk_check.py` and `tools/publish_check.sh --apk` on every APK. When a step fails, a bumped version is put back. Results:
 
 - `build/release/AbsentMotion-<version>-foss.apk` (the `foss` flavour; 4.x Play installs update to this file, see below)
 - `build/release/AbsentMotion-<version>-compatible.apk` (the `compat` flavour, Android 8 to 12)
@@ -255,7 +295,7 @@ with a menu entry and the `.absproj` file type. The packaging tasks always run a
 when only the native library changed. `linux/distro_check.sh` (needs Docker) installs the `.tar.gz` on seven distributions
 and checks that it renders, exports and starts there.
 
-**Start-up class archive (Windows and Linux).** The Java runtime that Compose links in has no class-data-sharing archive,
+**Start-up class archive.** The Java runtime that Compose links in has no class-data-sharing archive,
 so `createRuntimeImage` makes one in the runtime image itself, which `createDistributable`, `packageMsi` and `packageDeb`
 all copy: it copies the build JDK's `java` launcher into the image for a moment, runs it with the app's GC options and
 `-Xshare:dump`, which writes `classes_nocoops.jsa` (the name the JVM looks for with ZGC) next to the runtime's
@@ -264,8 +304,9 @@ the app's own classes go into a per-user archive the JVM writes when the app qui
 (`-XX:+AutoCreateSharedArchive`): on Windows `app-<key>.jsa` in the install folder, named in the app's `jvmArgs` (the key
 is the build time in hex, so every build gets a fresh name, and the app deletes older ones), on Linux in
 `~/.cache/absentmotion` through `linux/start.sh`. A JDK 21 dynamic archive is only made when none exists and is not
-rebuilt when it no longer matches, which is why the file name carries the key. The Mac keeps its own archive from
-`installMac`. The runtime image also carries `jdk.localedata`, so dates use each language's own month names and order.
+rebuilt when it no longer matches, which is why the file name carries the key. A Mac build for a release
+(`-Ptarget=macos-<arch>`) gets the same base archive in its runtime image and no app archive, because the signed app must not be
+written to; `installMac` keeps making its own full archive in the installed copy. The runtime image also carries `jdk.localedata`, so dates use each language's own month names and order.
 
 **Timing tests.** `AM_TIMING=1 ./gradlew test --tests app.absentmotion.pc.ExportTimingTest` exports a 10-second 1080x1920
 scene (a video, a picture and four effects) and prints frames per second for each stage (engine drawing and read-back,
@@ -279,7 +320,9 @@ Tests: run them as a normal user (as root the read-only-folder test cannot make 
 that honours folder permissions (a Docker Desktop bind mount does not; a `tmpfs` mount on `pc/build/save-failed-data` does).
 `DeskParityRoundTest.filesFromTheSystemOpenOrImport` hangs headless on Linux; leave it out by passing `--tests` for every other
 class and method. Without any Vulkan driver the engine draws on the CPU, and frame blending, optical-flow smoothing, motion
-blur smoothing and Datamosh fail (they need a GPU), so install `mesa-vulkan-drivers` for the tests. Two sound tests need a
+blur smoothing and Datamosh fail (they need a GPU), so install `mesa-vulkan-drivers` for the tests and run them with
+`AM_VULKAN_CPU=1` (the engine skips a software Vulkan driver otherwise) and a UTF-8 locale (`LC_ALL=C.UTF-8`; without one, file
+names outside ASCII fail). Two sound tests need a
 real sound card and one AAC test expects the bit rate of the macOS and Windows encoders; FFmpeg's own `aac` encoder, the
 only one on Linux, writes far fewer bits for the quiet test clip.
 

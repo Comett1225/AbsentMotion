@@ -116,7 +116,7 @@ internal fun FullColorPicker(state: EditorState, request: FullColor, modifier: M
     val end = { state.endGesture() }
 
     Box(modifier.fillMaxSize().background(ScreenBg).pointerInput(Unit) {}) {
-        Column(Modifier.fillMaxSize().systemBarsPadding()) {
+        PhoneFit(Modifier.fillMaxSize().systemBarsPadding()) { Column(Modifier.fillMaxSize()) {
             Row(Modifier.fillMaxWidth().height(127.px)) {
                 TopTab(PanelIcons.ColorWheel, stringResource(R.string.a11y_color_wheel), tab == 0, Modifier.weight(469f)) { tab = 0 }
                 TopTab(PanelIcons.RgbSliders, stringResource(R.string.a11y_color_sliders), tab == 1, Modifier.weight(470f)) { tab = 1 }
@@ -126,7 +126,7 @@ internal fun FullColorPicker(state: EditorState, request: FullColor, modifier: M
             }
             BoxWithConstraints(Modifier.weight(1f).fillMaxWidth().padding(vertical = if (PlatformFeatures.desktop) 12.dp else 0.dp), Alignment.Center) {
                 val base = LocalDensity.current
-                val fit = if (PlatformFeatures.desktop) minOf(1f, maxHeight / WHEEL.px, maxWidth / WHEEL.px).coerceAtLeast(.4f) else 1f
+                val fit = minOf(1f, maxHeight / WHEEL.px, maxWidth / WHEEL.px).coerceAtLeast(.4f)
                 if (tab == 0) CompositionLocalProvider(LocalDensity provides Density(base.density * fit, base.fontScale)) { Wheel(hsva, request.start, argb, ::setHsva, end, ::enterHex, ::keepColour) }
                 else Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     ColourCard(request.start, argb, 394.px, 197.px, ::keepColour)
@@ -174,7 +174,7 @@ internal fun FullColorPicker(state: EditorState, request: FullColor, modifier: M
                     }
                 }
             }
-        }
+        } }
         Swap(keypad, Modifier.fillMaxSize(), rise = 0.dp) { keypad?.let { ValueKeypad(it, { keypad = null }, Modifier.fillMaxSize()) } }
     }
 }
@@ -219,7 +219,7 @@ private fun Wheel(hsva: Hsva, start: Int, argb: Int, onChange: (Hsva) -> Unit, o
 
 @Composable
 private fun ColourCard(start: Int, now: Int, width: Dp, height: Dp, onSave: () -> Unit) {
-    Canvas(Modifier.size(width, height).clickable(onClick = onSave)) {
+    Canvas(Modifier.size(width, height).clip(RoundedCornerShape(20.px)).buttonLabel(stringResource(R.string.palette_add)).clickable(onClick = onSave)) {
         val half = size.width / 2f
         clipPath(Path().apply { addRoundRect(RoundRect(0f, 0f, size.width, size.height, CornerRadius(20 * 1.px.toPx()))) }) {
             checker(Offset.Zero, size, 20 * 1.px.toPx())
@@ -304,6 +304,10 @@ internal fun EyedropperLoupe(state: EditorState, modifier: Modifier = Modifier) 
     ) {
         val u = 1.dp.toPx()
         val c = at()
+        val under = Color.Black.copy(alpha = 0.5f)
+        drawCircle(under, 23 * u, c, style = Stroke(3f * u))
+        drawLine(under, c - Offset(6 * u, 0f), c + Offset(6 * u, 0f), 2.5f * u)
+        drawLine(under, c - Offset(0f, 6 * u), c + Offset(0f, 6 * u), 2.5f * u)
         drawCircle(Color.White.copy(alpha = 0.9f), 23 * u, c, style = Stroke(1.5f * u))
         drawLine(Color.White, c - Offset(5 * u, 0f), c + Offset(5 * u, 0f), 1 * u)
         drawLine(Color.White, c - Offset(0f, 5 * u), c + Offset(0f, 5 * u), 1 * u)

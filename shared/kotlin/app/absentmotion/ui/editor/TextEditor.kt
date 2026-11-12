@@ -1,5 +1,7 @@
 package app.absentmotion.ui.editor
 
+import app.absentmotion.ui.editor.panels.buttonLabel
+import androidx.compose.ui.draw.clip
 import app.absentmotion.ui.tutorial.tutorialGuard
 
 import app.absentmotion.ui.tutorial.tutorialTarget
@@ -123,7 +125,7 @@ internal fun TextEditor(state: EditorState, ui: TextEditUi = remember { TextEdit
             Column(Modifier.fillMaxSize()) {
                 Row(Modifier.fillMaxWidth().height(42.dp).background(Am.Deepest), verticalAlignment = Alignment.CenterVertically) {
                     val alignIcon = when (layer.textAlign) { "center" -> TextIcons.Centre; "right" -> TextIcons.Right; "justify" -> TextIcons.Justify; else -> TextIcons.Left }
-                    Box(Modifier.padding(1.5.dp).width(38.dp).fillMaxHeight().background(TextControl, RoundedCornerShape(2.dp)).tutorialGuard().clickable {
+                    Box(Modifier.padding(1.5.dp).width(38.dp).fillMaxHeight().clip(RoundedCornerShape(2.dp)).background(TextControl).tutorialGuard().clickable {
                         val alignments = listOf("left", "center", "right", "justify")
                         state.editSelected { it.withTextAlign(alignments[(alignments.indexOf(it.textAlign) + 1) % alignments.size]) }
                     }, contentAlignment = Alignment.Center) { DeskTip(stringResource(R.string.text_alignment)) { Icon(alignIcon, stringResource(R.string.text_alignment), Modifier.size(24.dp), tint = Am.OnDark) } }
@@ -141,7 +143,7 @@ internal fun TextEditor(state: EditorState, ui: TextEditUi = remember { TextEdit
                         Icon(if (popup == "size") TextIcons.DownOutline else TextIcons.Down, null, Modifier.padding(horizontal = 6.dp).size(16.dp),
                             tint = if (popup == "size") Am.Accent else Am.OnDark)
                     }
-                    Box(Modifier.padding(1.5.dp).width(38.dp).fillMaxHeight().background(TextControl).tutorialGuard().clickable { popup = if (popup == "color") "" else "color" }, contentAlignment = Alignment.Center) {
+                    Box(Modifier.padding(1.5.dp).width(38.dp).fillMaxHeight().background(TextControl).tutorialGuard().buttonLabel(stringResource(R.string.color)).clickable { popup = if (popup == "color") "" else "color" }, contentAlignment = Alignment.Center) {
                         ColourSwatch(layer.fillColor, 24.dp)
                     }
                     FontIconButton(TextIcons.Tick, stringResource(R.string.done), Modifier.tutorialTarget("text_done"), tint = Am.Accent, onClick = finish)
@@ -155,7 +157,7 @@ internal fun TextEditor(state: EditorState, ui: TextEditUi = remember { TextEdit
                     "size" -> {
                         val index = TextSizes.indexOfFirst { it >= layer.textSize.roundToInt() }.let { if (it < 0) TextSizes.lastIndex else it }
                         Row(Modifier.padding(top = 42.dp).fillMaxWidth().height(40.dp).background(TextControl), verticalAlignment = Alignment.CenterVertically) {
-                            Box(Modifier.padding(start = 6.dp).width(54.dp).height(30.dp).background(Am.Field, RoundedCornerShape(4.dp)).tutorialGuard().clickable {
+                            Box(Modifier.padding(start = 6.dp).width(54.dp).height(30.dp).clip(RoundedCornerShape(4.dp)).background(Am.Field).tutorialGuard().clickable {
                                 state.askNumber("", layer.textSize, "", 1f, 1000f) { v -> state.editSelected { it.withTextSize(v) } }
                             }, contentAlignment = Alignment.Center) {
                                 Text(app.absentmotion.ui.editor.panels.formatPlain(layer.textSize), color = Am.Accent, fontSize = 14.sp, maxLines = 1, softWrap = false)
@@ -225,7 +227,7 @@ private fun FontStrip(library: FontLibrary, current: String, modifier: Modifier,
                 Row(Modifier.width(if (header != null) 85.dp else 65.dp).fillMaxHeight()
                     .then(if (header != null) Modifier.background(Brush.horizontalGradient(listOf(Am.Chosen.copy(alpha = 0.69f), Am.Chosen.copy(alpha = 0f))), RoundedCornerShape(topStart = 5.dp, bottomStart = 5.dp)) else Modifier)) {
                     if (header != null) Icon(header, null, Modifier.width(20.dp).fillMaxHeight().padding(2.dp), tint = if (header == TextIcons.FilledStar) Am.Gold else Am.OnDark)
-                    Column(Modifier.width(65.dp).fillMaxHeight().padding(3.dp)
+                    Column(Modifier.width(65.dp).fillMaxHeight().padding(3.dp).clip(RoundedCornerShape(5.dp))
                         .border(if (active) 1.dp else 0.dp, if (active) Am.Accent else Color.Transparent, RoundedCornerShape(5.dp))
                         .tutorialGuard().clickable { onPick(name) }.padding(horizontal = 2.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                         FontPreview(library, name, "Abc", Modifier.fillMaxWidth().height(35.dp))

@@ -285,18 +285,15 @@ private:
         fx.behind = [this](const Layer& layer) { return fEffects.behind(layer); };
         fx.wraps = [this](const Layer& layer) { return fEffects.wraps(layer); };
         fx.steady = [this](const Layer& layer, float from, float to) { return fEffects.steady(layer, from, to); };
-        fx.upload = [this](const sk_sp<SkImage>& image, bool mipmapped) {
-            return fRecorder ? SkImages::TextureFromImage(fRecorder.get(), image.get(), {mipmapped}) : image;
-        };
+        if (++fDraws % kUploadIdle == 0) std::erase_if(fUploads, [&](const auto& kept) { return kept.second.seen + kUploadIdle < fDraws; });
+        fx.upload = [this](const sk_sp<SkImage>& image, bool mipmapped) { return this->upload(image, mipmapped); };
         fx.past = [this](const std::string& uri, int64_t id, int copy, float gain) { return fTrails.at(uri, id, copy, gain); };
         fx.draw = [this](SkCanvas* canvas, const Scene& scene, const Layer& layer, double time, const SkRect& area, const SkMatrix& placed,
                          const std::function<void(SkCanvas*)>& source, const std::function<void(SkCanvas*)>& below) {
             return fEffects.draw(canvas, scene, layer, time, area, placed, source, below,
                                  [this](int w, int h, const std::function<void(SkCanvas*)>& paint, std::vector<uint8_t>* rgba) {
                                      return this->grab(w, h, paint, rgba);
-                                 }, [this](const sk_sp<SkImage>& image) {
-                                     return fRecorder ? SkImages::TextureFromImage(fRecorder.get(), image.get(), {}) : image;
-                                 });
+                                 }, [this](const sk_sp<SkImage>& image) { return this->upload(image, false); });
         };
         return fx;
     }
@@ -366,6 +363,14 @@ private:
     std::map<std::pair<std::string, int64_t>, Mosh> fMosh;
     Trails fTrails;
     Trails::Shrink shrink();
+    struct Uploaded {
+        sk_sp<SkImage> image;
+        uint64_t seen = 0;
+    };
+    static constexpr uint64_t kUploadIdle = 32;
+    std::map<std::pair<uint32_t, bool>, Uploaded> fUploads;
+    uint64_t fDraws = 0;
+    sk_sp<SkImage> upload(const sk_sp<SkImage>& image, bool mipmapped);
     std::map<uint64_t, sk_sp<SkSurface>> fBufferSurfaces;
     SkSurface* bufferSurface(AHardwareBuffer* buffer);
     bool fLoggedFrame = false;
@@ -604,6 +609,7 @@ bool EngineImpl::init(std::string* error) {
 EngineImpl::~EngineImpl() {
     while (!fTargets.empty()) this->detach(fTargets.back().get());
     fBufferSurfaces.clear();
+    fUploads.clear();
     fPictures.clear();
     fVideoFrames.clear();
     fMosh.clear();
@@ -1021,6 +1027,17 @@ bool EngineImpl::setVideoFrame(const std::string& uri, int64_t layerId, int64_t 
     return true;
 }
 
+sk_sp<SkImage> EngineImpl::upload(const sk_sp<SkImage>& image, bool mipmapped) {
+    if (!fRecorder || !image) return image;
+    Uploaded& kept = fUploads[{image->uniqueID(), mipmapped}];
+    const bool again = kept.seen != 0 && kept.seen != fDraws;
+    kept.seen = fDraws;
+    if (kept.image) return kept.image;
+    sk_sp<SkImage> made = SkImages::TextureFromImage(fRecorder.get(), image.get(), {mipmapped});
+    if (again) kept.image = made;
+    return made;
+}
+
 Trails::Shrink EngineImpl::shrink() {
     return [this](const sk_sp<SkImage>& image, int width, int height) -> sk_sp<SkImage> {
         if (fGpuFailed) return nullptr;
@@ -1359,6 +1376,7 @@ void EngineImpl::syncPipelines() {
 
 void EngineImpl::trim() {
     fTrails.clear();
+    fUploads.clear();
     this->syncPipelines();
     if (fGanesh && !fGpuFailed) {
         fGanesh->freeGpuResources();

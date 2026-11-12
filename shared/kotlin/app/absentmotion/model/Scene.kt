@@ -57,7 +57,7 @@ value class Scene(val node: XmlNode) {
         return Scene(node.copy(children = node.children.toMutableList().also { it.add(index, media.node) }))
     }
 
-    fun layer(id: Long): Layer? = layers.firstOrNull { it.id == id }
+    fun layer(id: Long): Layer? = node.children.firstOrNull { it.name in LAYER_TAGS && (it["id"]?.toLongOrNull() ?: 0L) == id }?.let { Layer(it) }
 
     fun layerAt(id: Long, timeMs: Int): Layer? = layer(id)?.at(timeMs, fps)
 
@@ -98,6 +98,13 @@ value class Scene(val node: XmlNode) {
     fun update(id: Long, timeMs: Int? = null, change: (Layer) -> Layer): Scene = withChildren(
         node.children.map {
             if (it.name !in LAYER_TAGS || Layer(it).id != id) it
+            else change(if (timeMs == null) Layer(it) else Layer(it).at(timeMs, fps)).node
+        },
+    )
+
+    fun updateAll(ids: Set<Long>, timeMs: Int? = null, change: (Layer) -> Layer): Scene = withChildren(
+        node.children.map {
+            if (it.name !in LAYER_TAGS || Layer(it).id !in ids) it
             else change(if (timeMs == null) Layer(it) else Layer(it).at(timeMs, fps)).node
         },
     )

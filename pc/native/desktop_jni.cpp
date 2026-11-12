@@ -5,6 +5,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 #include "effects.h"
@@ -40,6 +41,12 @@ struct DesktopMosh {
 
 static std::atomic<int> DesktopGpuState{-1};
 
+struct ExportRead {
+    int width = 0, height = 0;
+    std::unique_ptr<const SkImage::AsyncReadResult> pixels;
+    bool done = false;
+};
+
 struct Desktop {
     am::Scene scene;
     am::EffectRuntime runtime;
@@ -52,13 +59,15 @@ struct Desktop {
     bool cameraView = true;
     bool accurateBlur = true;
     std::vector<uint8_t> frameBytes;
+    std::shared_ptr<ExportRead> exportPending;
+    sk_sp<SkSurface> exportSurface;
     Desktop() : gpu(std::getenv("AM_SOFTWARE_RENDER") ? nullptr : CreateDesktopGpu()) {
         DesktopGpuState = gpu && gpu->context() ? 1 : 0;
         if (gpu && gpu->context()) gpu->context()->setResourceCacheLimit(size_t(512) << 20);
         trails.layerBudget = size_t(128) << 20;
         trails.budget = size_t(384) << 20;
     }
-    ~Desktop() { trails.clear(); mosh.clear(); layerPictures.clear(); masks.clear(); pictures.clear(); }
+    ~Desktop() { exportPending.reset(); exportSurface.reset(); trails.clear(); mosh.clear(); layerPictures.clear(); masks.clear(); pictures.clear(); }
     am::MediaPictures maskLookup() {
         return [this](const std::string& uri, int64_t) -> sk_sp<SkImage> {
             auto it = masks.find(uri);
@@ -101,6 +110,23 @@ struct Desktop {
             s->getCanvas()->drawImageRect(image, SkRect::MakeIWH(width, height), SkSamplingOptions(SkCubicResampler::CatmullRom()));
             return s->makeImageSnapshot();
         };
+    }
+    bool take(JNIEnv* e, jbyteArray out) {
+        const std::shared_ptr<ExportRead> read = std::move(exportPending);
+        if (!read) return false;
+        GrDirectContext* context = gpu ? gpu->context() : nullptr;
+        if (!read->done && context) {
+            context->submit(GrSyncCpu::kYes);
+            context->checkAsyncWorkCompletion();
+        }
+        const size_t row = (size_t)read->width * 4;
+        if (!out || !read->pixels || read->pixels->count() != 1 || read->pixels->rowBytes(0) < row ||
+            (int64_t)e->GetArrayLength(out) < (int64_t)row * read->height) return false;
+        const auto* from = (const jbyte*)read->pixels->data(0);
+        const size_t stride = read->pixels->rowBytes(0);
+        if (stride == row) e->SetByteArrayRegion(out, 0, (jsize)(row * read->height), from);
+        else for (int y = 0; y < read->height; ++y) e->SetByteArrayRegion(out, (jsize)(y * row), (jsize)row, from + y * stride);
+        return true;
     }
     bool offscreen(int width, int height, bool premultiplied, const std::function<void(SkCanvas*)>& paint, std::vector<uint8_t>* rgba) {
         if (width <= 0 || height <= 0) return false;
@@ -277,7 +303,6 @@ JNIEXPORT jboolean JNICALL JNI(interpolate)(JNIEnv* e, jobject, jlong h, jstring
                                            jbyteArray first, jbyteArray second, jbyteArray before, jbyteArray after, jbyteArray made,
                                            jfloat t, jint mode, jfloat blur, jfloatArray parameters) {
     auto* d = ptr(h);
-    if (!d->gpu || !d->gpu->context()) return false;
     auto a = frameImage(e, w, height, first), b = frameImage(e, w, height, second);
     if (!a || !b) return false;
     am::InterpolationParams params;
@@ -286,7 +311,7 @@ JNIEXPORT jboolean JNICALL JNI(interpolate)(JNIEnv* e, jobject, jlong h, jstring
         e->GetFloatArrayRegion(parameters, 0, 6, p);
         params = {(int)p[0], (int)p[1], (int)p[2], (int)p[3], p[4], (int)p[5]};
     }
-    am::GpuContext context{nullptr, nullptr, d->gpu->context()};
+    am::GpuContext context{nullptr, nullptr, DesktopContext(h)};
     sk_sp<SkImage> field;
     if (mode == 2 || blur > 0) {
         am::FlowStats stats;
@@ -325,7 +350,7 @@ JNIEXPORT void JNICALL JNI(trailBudget)(JNIEnv*, jobject, jlong h, jint layerMb,
 }
 JNIEXPORT jint JNICALL JNI(moshStart)(JNIEnv* e, jobject, jlong h, jstring uri, jlong layer, jlongArray stamps, jfloatArray values) {
     auto* d = ptr(h);
-    if (!d->gpu || !d->gpu->context() || !stamps || !values || e->GetArrayLength(values) < 5) return -1;
+    if (!stamps || !values || e->GetArrayLength(values) < 5) return -1;
     const int count = e->GetArrayLength(stamps);
     if (count <= 0 || count > 61) return -1;
     std::vector<jlong> input((size_t)count);
@@ -345,7 +370,7 @@ JNIEXPORT jboolean JNICALL JNI(moshFrame)(JNIEnv* e, jobject, jlong h, jstring u
     auto* d = ptr(h);
     const auto key = std::make_pair(str(e, uri), (int64_t)layer);
     auto found = d->mosh.find(key);
-    if (found == d->mosh.end() || !d->gpu || !d->gpu->context()) return false;
+    if (found == d->mosh.end()) return false;
     auto& m = found->second;
     if (step < 0 || (size_t)step != m.done.size() || (size_t)step >= m.pts.size()) return false;
     auto frame = frameImage(e, w, height, data);
@@ -355,7 +380,7 @@ JNIEXPORT jboolean JNICALL JNI(moshFrame)(JNIEnv* e, jobject, jlong h, jstring u
         m.motion = nullptr;
     } else {
         if (!m.previous || !m.state || frame->dimensions() != m.previous->dimensions()) return false;
-        am::GpuContext context{nullptr, nullptr, d->gpu->context()};
+        am::GpuContext context{nullptr, nullptr, DesktopContext(h)};
         sk_sp<SkImage> flow;
         if (m.pts[step] != m.pts[step - 1]) {
             am::FlowStats stats;
@@ -443,6 +468,45 @@ JNIEXPORT jboolean JNICALL JNI(stillInto)(JNIEnv* e, jobject, jlong h, jdouble t
     }, &d->frameBytes);
     if (ok) e->SetByteArrayRegion(out, 0, (jsize)d->frameBytes.size(), (const jbyte*)d->frameBytes.data());
     return ok;
+}
+JNIEXPORT jint JNICALL JNI(exportFrame)(JNIEnv* e, jobject, jlong h, jdouble time, jint w, jint height, jbyteArray out) {
+    Desktop* d = ptr(h);
+    if (d->scene.width <= 0 || d->scene.height <= 0 || w <= 0 || height <= 0) return -1;
+    const auto info = SkImageInfo::Make(w, height, kRGBA_8888_SkColorType, kPremul_SkAlphaType, SkColorSpace::MakeSRGB());
+    if (!d->exportSurface || d->exportSurface->width() != w || d->exportSurface->height() != height) d->exportSurface = d->surface(info);
+    const sk_sp<SkSurface> surface = d->exportSurface;
+    if (!surface) return -1;
+    {
+        SkCanvas* c = surface->getCanvas();
+        SkAutoCanvasRestore restore(c, true);
+        c->clear(SK_ColorTRANSPARENT);
+        c->scale((float)w / d->scene.width, (float)height / d->scene.height);
+        am::SetCameraView(true);
+        const am::LayerEffects fx = d->effects();
+        am::DrawScene(c, d->scene, time, d->media(), &fx);
+    }
+    const bool had = d->exportPending != nullptr;
+    const bool took = had && d->take(e, out);
+    auto read = std::make_shared<ExportRead>();
+    read->width = w;
+    read->height = height;
+    d->exportPending = read;
+    surface->asyncRescaleAndReadPixels(info, SkIRect::MakeWH(w, height), SkImage::RescaleGamma::kSrc, SkImage::RescaleMode::kNearest,
+        [](void* context, std::unique_ptr<const SkImage::AsyncReadResult> pixels) {
+            const std::unique_ptr<std::shared_ptr<ExportRead>> held(static_cast<std::shared_ptr<ExportRead>*>(context));
+            (*held)->pixels = std::move(pixels);
+            (*held)->done = true;
+        }, new std::shared_ptr<ExportRead>(read));
+    if (d->gpu && d->gpu->context()) d->gpu->context()->submit(GrSyncCpu::kNo);
+    return !had ? 0 : took ? 1 : -1;
+}
+JNIEXPORT jint JNICALL JNI(exportFlush)(JNIEnv* e, jobject, jlong h, jbyteArray out) {
+    Desktop* d = ptr(h);
+    const bool had = d->exportPending != nullptr;
+    const bool took = had && d->take(e, out);
+    d->exportPending.reset();
+    d->exportSurface.reset();
+    return !had || !out ? 0 : took ? 1 : -1;
 }
 JNIEXPORT jboolean JNICALL JNI(setPixels)(JNIEnv* e, jobject, jlong h, jstring uri, jint w, jint height, jintArray argb) {
     if (w <= 0 || height <= 0 || (int64_t)w * height != e->GetArrayLength(argb)) return false;

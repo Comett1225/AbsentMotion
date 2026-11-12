@@ -87,16 +87,27 @@ class ExportTimingTest {
             }
             line("old path, render + unpremultiplied readback into a new array: ${fps(frames, render)}")
             val buffer = ByteArray(w * h * 4)
-            var into = 0L
-            engine.exportSession(scene.toXml(), s.smoothing, s.fps) {
-                check(stillInto(0, w, h, buffer))
-                for (k in 0 until frames) {
-                    val t = System.nanoTime()
-                    check(stillInto(frameTimeMs(scene, s.fps, k), w, h, buffer))
-                    into += System.nanoTime() - t
+            repeat(2) {
+                var into = 0L
+                engine.exportSession(scene.toXml(), s.smoothing, s.fps) {
+                    check(stillInto(0, w, h, buffer))
+                    for (k in 0 until frames) {
+                        val t = System.nanoTime()
+                        check(stillInto(frameTimeMs(scene, s.fps, k), w, h, buffer))
+                        into += System.nanoTime() - t
+                    }
                 }
+                line("export path before, each frame waits for the graphics chip: ${fps(frames, into)}")
+                var piped = 0L
+                engine.exportSession(scene.toXml(), s.smoothing, s.fps) {
+                    check(stillInto(0, w, h, buffer))
+                    val t = System.nanoTime()
+                    for (k in 0 until frames) check(frameInto(frameTimeMs(scene, s.fps, k), w, h, buffer) >= 0)
+                    check(lastFrameInto(buffer) == 1)
+                    piped = System.nanoTime() - t
+                }
+                line("export path now, the next frame is drawn while the graphics chip finishes the last: ${fps(frames, piped)}")
             }
-            line("export path, render + premultiplied readback into a reused array: ${fps(frames, into)}")
             val empty = Scene.create("Empty", scene.width, scene.height, 30, 0xff000000.toInt())
             var blank = 0L
             var blankInto = 0L

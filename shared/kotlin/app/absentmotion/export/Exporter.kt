@@ -19,9 +19,11 @@ import app.absentmotion.model.fontNames
 import app.absentmotion.model.mediaName
 import app.absentmotion.model.storedMediaUris
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
@@ -131,22 +133,6 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
         }
     }
 
-    private suspend fun <T> retryingEncoder(note: (UiText) -> Unit, attempt: suspend () -> T): T = try {
-        attempt()
-    } catch (t: Throwable) {
-        if (!encoderTrouble(t)) throw t
-        EncoderTrouble.blameLast()
-        android.util.Log.w("AMExport", "the encoder failed, trying once more with another one", t)
-        note(txt(R.string.export_note_retry))
-        try {
-            attempt()
-        } catch (again: Throwable) {
-            if (again is kotlinx.coroutines.CancellationException) throw again
-            t.addSuppressed(again)
-            throw t
-        }
-    }
-
     private fun plainCodecError(t: Throwable): Throwable {
         if (t is ExportError || t is kotlinx.coroutines.CancellationException) return t
         if (generateSequence(t) { it.cause }.none { it is android.media.MediaCodec.CodecException }) return t
@@ -208,16 +194,30 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
     private suspend fun gif(scene: Scene, xml: String, s: ExportSettings, out: OutputStream, pauseMs: () -> Long, progress: (Float) -> Unit) {
         val (width, height) = exportSize(scene, s.shortSide, even = false)
         val frames = frameCount(scene, s.fps)
+        val lanes = workLanes(width.toLong() * height * 6)
+        val coders = java.util.concurrent.ConcurrentLinkedQueue<GifFrameCoder>()
         engine.exportSession(xml, s.smoothing, s.fps) {
             out.buffered().use { stream ->
                 val writer = GifWriter(stream, width, height)
-                for (k in 0 until frames) {
-                    currentCoroutineContext().ensureActive()
-                    val pixels = still(frameTimeMs(scene, s.fps, k), width, height) ?: throw ExportError(txt(R.string.export_error_draw_frame, k.toString()))
-                    withContext(Dispatchers.Default) { writer.frame(ImageEncode.flatten(pixels, s.background, pixels), (k + 1) * 1000L / s.fps) }
-                    progress((k + 1f) / frames)
-                    if (k % 30 == 0) ensureStorage()
-                    pauseMs().takeIf { it > 0 }?.let { kotlinx.coroutines.delay(it) }
+                coroutineScope {
+                    val coding = ArrayDeque<Deferred<ByteArray>>()
+                    for (k in 0 until frames) {
+                        currentCoroutineContext().ensureActive()
+                        val pixels = still(frameTimeMs(scene, s.fps, k), width, height) ?: throw ExportError(txt(R.string.export_error_draw_frame, k.toString()))
+                        val delay = writer.delay((k + 1) * 1000L / s.fps)
+                        coding += async(Dispatchers.Default) {
+                            val coder = coders.poll() ?: GifFrameCoder(width, height)
+                            try { coder.encode(ImageEncode.flatten(pixels, s.background, pixels), delay) } finally { coders.offer(coder) }
+                        }
+                        while (coding.size >= lanes) writer.write(coding.removeFirst().await())
+                        progress((k + 1f - coding.size) / frames)
+                        if (k % 30 == 0) ensureStorage()
+                        pauseMs().takeIf { it > 0 }?.let { kotlinx.coroutines.delay(it) }
+                    }
+                    while (coding.isNotEmpty()) {
+                        writer.write(coding.removeFirst().await())
+                        progress((frames - coding.size).toFloat() / frames)
+                    }
                 }
                 writer.finish()
             }
@@ -230,19 +230,39 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
         imageProblem(s.image, android.os.Build.VERSION.SDK_INT)?.let { throw ExportError(it) }
         checkPicture(width, height)
         val folder = withContext(Dispatchers.IO) { store.sequenceFolder(name, s.image.mime) }
-        val bitmap = app.absentmotion.platform.makeBitmap(width, height)
+        val lanes = workLanes(width.toLong() * height * 8)
+        val bitmaps = java.util.concurrent.ConcurrentLinkedQueue<Bitmap>()
+        val uris = arrayOfNulls<Uri>(frames)
         try {
             engine.exportSession(xml, s.smoothing, s.fps) {
-                for (k in 0 until frames) {
-                    currentCoroutineContext().ensureActive()
-                    val pixels = still(frameTimeMs(scene, s.fps, k), width, height) ?: throw ExportError(txt(R.string.export_error_draw_frame, k.toString()))
-                    save(saved, folder, sequenceFrameName(k, s.image.ext), s.image.mime) { encode(pixels, width, height, s, bitmap, it) }
-                    progress((k + 1f) / frames)
+                coroutineScope {
+                    val saving = ArrayDeque<Deferred<Unit>>()
+                    for (k in 0 until frames) {
+                        currentCoroutineContext().ensureActive()
+                        val pixels = still(frameTimeMs(scene, s.fps, k), width, height) ?: throw ExportError(txt(R.string.export_error_draw_frame, k.toString()))
+                        saving += async(Dispatchers.IO) {
+                            val bitmap = if (app.absentmotion.platform.PlatformFeatures.desktop) null else bitmaps.poll() ?: app.absentmotion.platform.makeBitmap(width, height)
+                            try {
+                                val uri = store.save(folder, sequenceFrameName(k, s.image.ext), s.image.mime) { encode(pixels, width, height, s, bitmap, it) }
+                                uris[k] = uri
+                                synchronized(saved) { saved += uri }
+                            } finally {
+                                bitmap?.let(bitmaps::offer)
+                            }
+                        }
+                        while (saving.size >= lanes) saving.removeFirst().await()
+                        progress((k + 1f - saving.size) / frames)
+                    }
+                    while (saving.isNotEmpty()) {
+                        saving.removeFirst().await()
+                        progress((frames - saving.size).toFloat() / frames)
+                    }
                 }
             }
         } finally {
-            app.absentmotion.platform.recycleBitmap(bitmap)
+            generateSequence { bitmaps.poll() }.forEach { app.absentmotion.platform.recycleBitmap(it) }
         }
+        synchronized(saved) { saved.clear(); saved.addAll(uris.filterNotNull()) }
         return ExportResult(saved, s.image.mime, store.location("Pictures/$AppFolder/$folder"))
     }
 
@@ -281,6 +301,27 @@ private const val CommunityRenderLimit = 3072f
 private const val StallGraceMs = 5_000L
 
 internal class ExportStalled : Exception()
+
+internal fun workLanes(bytesEach: Long, cores: Int = Runtime.getRuntime().availableProcessors(), memory: Long = Runtime.getRuntime().maxMemory()): Int =
+    minOf(cores - 1L, minOf(memory / 4, 96L shl 20) / bytesEach.coerceAtLeast(1)).toInt().coerceIn(1, 8)
+
+internal suspend fun <T> retryingEncoder(note: (UiText) -> Unit, attempt: suspend () -> T): T = try {
+    attempt()
+} catch (t: Throwable) {
+    if (!encoderTrouble(t)) throw t
+    val blamed = EncoderTrouble.last
+    EncoderTrouble.blameLast()
+    runCatching { android.util.Log.w("AMExport", "the encoder failed, trying once more with another one", t) }
+    note(txt(R.string.export_note_retry))
+    try {
+        attempt()
+    } catch (again: Throwable) {
+        if (again is kotlinx.coroutines.CancellationException) throw again
+        blamed?.let { EncoderTrouble.bad -= it }
+        t.addSuppressed(again)
+        throw t
+    }
+}
 
 internal fun encoderTrouble(t: Throwable): Boolean =
     generateSequence(t) { it.cause }.take(16).any { it is ExportStalled || it is android.media.MediaCodec.CodecException }

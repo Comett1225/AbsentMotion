@@ -123,7 +123,7 @@ void Simulate(const Field& f, double t, std::vector<Particle>* out) {
             }
         }
     } else if (now.emission == kBurst) {
-        const double every = now.every > 0 ? std::max((double)now.every, 0.05) : 0.0, first = std::isfinite(now.start) ? now.start : 0.0;
+        const double every = now.every > 0 ? std::max((double)now.every, 0.05) : 0.0, first = std::isfinite(now.start) ? std::clamp((double)now.start, -1e9, 1e9) : 0.0;
         int64_t j0 = 0, j1 = first <= t && first >= from ? 0 : -1;
         if (every > 0) {
             j0 = std::max<int64_t>(0, (int64_t)std::ceil((from - first) / every));

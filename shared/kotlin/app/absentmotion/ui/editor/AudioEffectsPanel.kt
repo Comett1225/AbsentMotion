@@ -87,7 +87,7 @@ private val SliderHeight = 40.dp
 
 @Composable
 internal fun AudioEffectsPanel(state: EditorState, modifier: Modifier, onBack: () -> Unit) {
-    val layer = state.selected ?: return
+    val layer = state.selectedId?.let { state.scene.layer(it) } ?: return
     val effects = layer.audioEffects
     var editing by remember(layer.id) { mutableIntStateOf(state.audioFxFocus ?: -1) }
     LaunchedEffect(state.audioFxFocus) { state.audioFxFocus?.let { editing = it; state.audioFxFocus = null } }
@@ -121,7 +121,7 @@ internal fun AudioEffectsPanel(state: EditorState, modifier: Modifier, onBack: (
 
 @Composable
 private fun EffectList(state: EditorState, effects: List<AudioFx>, cards: CardScope, scroll: ScrollState, open: (Int) -> Unit) {
-    val marks = state.selected?.aiMarks.orEmpty()
+    val marks = state.selectedId?.let { state.scene.layer(it) }?.aiMarks.orEmpty()
     val reorder = rememberReorder(state, scroll, top = RowHeight + 13.dp + (AiMarkRowHeight + AiMarkRowGap) * marks.size)
     val id = state.selectedId
     Column(Modifier.fillMaxSize().deskVerticalScroll(scroll)) {

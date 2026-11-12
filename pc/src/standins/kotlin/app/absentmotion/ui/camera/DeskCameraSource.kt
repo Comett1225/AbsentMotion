@@ -8,13 +8,16 @@ data class CameraDevice(val id: String, val name: String)
 
 class CameraDevices(val video: List<CameraDevice>, val audio: List<CameraDevice>)
 
-class CameraInput(val video: CameraDevice, val audio: CameraDevice?, val mac: Boolean = DeskOs.mac, val windows: Boolean = DeskOs.windows) {
+data class CameraMode(val width: Int, val height: Int, val rate: String)
+
+class CameraInput(val video: CameraDevice, val audio: CameraDevice?, val mac: Boolean = DeskOs.mac, val windows: Boolean = DeskOs.windows, val mode: CameraMode? = null) {
     val fake: Boolean get() = video.id == FAKE
     val separateAudio: Boolean get() = audio != null && !mac && !windows || fake && audio != null
 
     fun args(): List<String> = when {
         fake -> listOf("-re", "-f", "lavfi", "-i", "testsrc2=size=1280x720:rate=30") + if (audio != null) listOf("-re", "-f", "lavfi", "-i", "sine=frequency=440:sample_rate=48000") else emptyList()
-        mac -> listOf("-f", "avfoundation", "-i", "${video.id}:${audio?.id ?: "none"}")
+        mac -> listOf("-f", "avfoundation") + (mode?.let { listOf("-video_size", "${it.width}x${it.height}", "-framerate", it.rate) } ?: listOf("-framerate", "30")) +
+            listOf("-i", "${video.id}:${audio?.id ?: "none"}")
         windows -> listOf("-f", "dshow", "-rtbufsize", "200M", "-i", "video=${video.id}" + (audio?.let { ":audio=${it.id}" } ?: ""))
         else -> listOf("-f", "v4l2", "-i", video.id) + if (audio != null) listOf("-f", "pulse", "-i", audio.id) else emptyList()
     }
@@ -49,6 +52,19 @@ object DeskCameraSource {
             }
         }
         return CameraDevices(video.filterNot { it.name.startsWith("Capture screen") }, audio)
+    }
+
+    private val avfoundationMode = Regex("""(\d+)x(\d+)@\[[\d.]+ ([\d.]+)]fps""")
+
+    fun macMode(log: String): CameraMode? {
+        if ("Supported modes" !in log) return null
+        return avfoundationMode.findAll(log).mapNotNull { m ->
+            val rate = m.groupValues[3].toDoubleOrNull() ?: return@mapNotNull null
+            val width = m.groupValues[1].toIntOrNull() ?: return@mapNotNull null
+            val height = m.groupValues[2].toIntOrNull() ?: return@mapNotNull null
+            val area = width.toLong() * height
+            Triple(CameraMode(width, height, m.groupValues[3]), kotlin.math.abs(rate - 30.0), if (area <= 1920L * 1080) -area else area)
+        }.minWithOrNull(compareBy({ it.second }, { it.third }))?.first
     }
 
     fun parseDshow(text: String): CameraDevices {

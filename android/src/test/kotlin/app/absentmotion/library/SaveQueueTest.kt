@@ -69,6 +69,21 @@ class SaveQueueTest {
         assertEquals(2, reports)
     }
 
+    @Test fun anErrorWhileWritingKeepsTheSaveForRetry() {
+        var broken = true
+        val written = ArrayList<String>()
+        var reports = 0
+        val queue = SaveQueue(executor, 60_000, { if (broken) throw OutOfMemoryError("no room") else written += it }, { reports++ })
+        queue.submit("a")
+        queue.flush().get(5, TimeUnit.SECONDS)
+        assertEquals(1, reports)
+        assertTrue(queue.failing)
+        broken = false
+        queue.flush().get(5, TimeUnit.SECONDS)
+        assertEquals(listOf("a"), written)
+        assertFalse(queue.failing)
+    }
+
     @Test fun cancellingAnInFlightFailedDraftDoesNotRestoreItForRetry() {
         val entered = CountDownLatch(1)
         val release = CountDownLatch(1)

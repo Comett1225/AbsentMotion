@@ -221,7 +221,7 @@ private fun PaletteView(state: EditorState, argb: Int, onColor: ((Int, key: Stri
         }
         if (palettes.canKeep(rgb, saved)) {
             Box(Modifier.offset(603.px, 0.dp).size(73.px).clickable { palettes.keep(rgb, state.settings) }, contentAlignment = Alignment.Center) {
-                PanelIcon(PanelIcons.AddColor, Am.OnDark.copy(alpha = 0.35f), size = 26.dp)
+                PanelIcon(PanelIcons.AddColor, textOn(argb).copy(alpha = 0.6f), size = 26.dp, description = stringResource(R.string.palette_add))
             }
         }
         Box(Modifier.offset(47.px, 81.px).size(591.px, 270.px).deskVerticalScroll()) {

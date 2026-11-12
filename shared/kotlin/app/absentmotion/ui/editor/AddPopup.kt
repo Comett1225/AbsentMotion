@@ -179,6 +179,7 @@ private fun TabButton(tab: Tab, active: Boolean, enabled: Boolean, modifier: Mod
 private fun ShapePages(state: EditorState, modifier: Modifier) = androidx.compose.foundation.layout.BoxWithConstraints(modifier) {
     val rows = maxOf(3, ((maxHeight - 20.dp) / 61.dp).toInt())
     val columns = maxOf(6, ((maxWidth - 9.6.dp) / 50.84.dp).toInt())
+    val cell = minOf(50.84.dp, (maxWidth - 9.6.dp) / columns)
     val pages = ShapeCatalog.all.chunked(rows * columns)
     val pager = rememberPagerState { pages.size }
     Box(Modifier.fillMaxSize()) {
@@ -189,7 +190,7 @@ private fun ShapePages(state: EditorState, modifier: Modifier) = androidx.compos
                         for (def in row) {
                             val press = remember { MutableInteractionSource() }
                             Box(
-                                Modifier.size(50.84.dp, 61.dp).tutorialGuard().pressScale(press, TilePress).clickable(press, LocalIndication.current) {
+                                Modifier.size(cell, 61.dp).tutorialGuard().pressScale(press, TilePress).clickable(press, LocalIndication.current) {
                                     state.addShape(def)
                                     state.addOpen = false
                                 },

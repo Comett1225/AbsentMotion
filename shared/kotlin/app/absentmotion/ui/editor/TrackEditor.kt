@@ -86,10 +86,10 @@ internal fun TrackOverlay(state: EditorState, mode: TrackMode, modifier: Modifie
                 if (grab.getDistance() > 48.dp.toPx()) return@awaitEachGesture
                 while (true) {
                     val change = awaitPointerEvent().changes.firstOrNull { it.id == down.id } ?: break
-                    if (!change.pressed) break
+                    if (!change.pressed || mode.running || index !in mode.points.indices) break
                     val at = change.position + grab
                     val p = inverse.map(Pt((at.x - ox) / s, (at.y - oy) / s))
-                    mode.points[index] = Pt(p.x.coerceIn(0f, bounds.first - 1f), p.y.coerceIn(0f, bounds.second - 1f))
+                    mode.points[index] = Pt(p.x.coerceIn(0f, (bounds.first - 1f).coerceAtLeast(0f)), p.y.coerceIn(0f, (bounds.second - 1f).coerceAtLeast(0f)))
                     change.consume()
                 }
             }
@@ -164,7 +164,7 @@ internal fun TrackPanel(state: EditorState, mode: TrackMode) {
 @Composable
 private fun <T> Choices(label: String, options: List<Pair<String, T>>, chosen: T, enabled: Boolean, onPick: (T) -> Unit) {
     Row(Modifier.fillMaxWidth().height(34.dp).alpha(if (enabled) 1f else DimAlpha), verticalAlignment = Alignment.CenterVertically) {
-        Text(label, Modifier.width(72.dp), color = Am.Caption, fontSize = 12.sp, maxLines = 1)
+        Text(label, Modifier.width(72.dp).padding(end = 4.dp), color = Am.Caption, maxLines = 1, autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(8.sp, 12.sp, 0.5.sp))
         Row(Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(6.dp)).background(Am.PanelInset)) {
             for ((text, value) in options) {
                 val on = value == chosen
@@ -172,7 +172,7 @@ private fun <T> Choices(label: String, options: List<Pair<String, T>>, chosen: T
                     Modifier.weight(1f).fillMaxHeight().padding(2.dp).clip(RoundedCornerShape(5.dp)).background(if (on) Am.FieldHi else Color.Transparent)
                         .clickable(enabled = enabled && !on) { onPick(value) },
                     Alignment.Center,
-                ) { Text(text, color = if (on) Am.Accent else Am.OnDark, fontSize = 12.sp, maxLines = 1, textAlign = TextAlign.Center) }
+                ) { Text(text, Modifier.padding(horizontal = 2.dp), color = if (on) Am.Accent else Am.OnDark, maxLines = 1, textAlign = TextAlign.Center, autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(8.sp, 12.sp, 0.5.sp)) }
             }
         }
     }
@@ -185,7 +185,7 @@ private fun TargetChoice(state: EditorState, mode: TrackMode, enabled: Boolean) 
     val targets = video?.let(state.scene::trackTargets).orEmpty()
     val chosen = mode.target?.let { id -> targets.firstOrNull { it.id == id } }
     Row(Modifier.fillMaxWidth().height(34.dp).alpha(if (enabled) 1f else DimAlpha), verticalAlignment = Alignment.CenterVertically) {
-        Text(stringResource(R.string.apply_to), Modifier.width(72.dp), color = Am.Caption, fontSize = 12.sp, maxLines = 1)
+        Text(stringResource(R.string.apply_to), Modifier.width(72.dp).padding(end = 4.dp), color = Am.Caption, maxLines = 1, autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(8.sp, 12.sp, 0.5.sp))
         Box(Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(6.dp)).background(Am.PanelInset).clickable(enabled = enabled) { open = true }.padding(horizontal = 10.dp), Alignment.CenterStart) {
             Text(chosen?.shownName() ?: stringResource(R.string.track_new_null), color = Am.OnDark, fontSize = 12.sp, maxLines = 1)
             Presence(open) {
@@ -204,5 +204,5 @@ private fun ActionChip(text: String, enabled: Boolean, onClick: () -> Unit) {
         Modifier.padding(start = 8.dp).width(84.dp).height(36.dp).clip(RoundedCornerShape(6.dp)).background(Am.Button)
             .alpha(if (enabled) 1f else DimAlpha).clickable(enabled = enabled, onClick = onClick),
         Alignment.Center,
-    ) { Text(text, color = Am.Accent, fontSize = 13.sp, maxLines = 1) }
+    ) { Text(text, Modifier.padding(horizontal = 4.dp), color = Am.Accent, maxLines = 1, autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(9.sp, 13.sp, 0.5.sp)) }
 }

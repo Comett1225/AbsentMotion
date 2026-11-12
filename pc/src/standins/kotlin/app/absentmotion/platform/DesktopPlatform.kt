@@ -237,12 +237,15 @@ fun textFieldFocused(): Boolean = app.absentmotion.desk.DeskTyping.active > 0
 fun systemDark(context: Context): Boolean = app.absentmotion.desk.DeskOs.systemDark()
 
 @androidx.compose.runtime.Composable
-fun systemDarkLive(): Boolean = androidx.compose.runtime.produceState(app.absentmotion.desk.DeskOs.systemDark()) {
-    while (true) {
-        kotlinx.coroutines.delay(2000)
-        value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { app.absentmotion.desk.DeskOs.systemDark() }
-    }
-}.value
+fun systemDarkLive(): Boolean {
+    val first = androidx.compose.runtime.remember { app.absentmotion.desk.DeskOs.systemDark() }
+    return androidx.compose.runtime.produceState(first) {
+        while (true) {
+            kotlinx.coroutines.delay(2000)
+            value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { app.absentmotion.desk.DeskOs.systemDark() }
+        }
+    }.value
+}
 
 fun Modifier.resizeCursor(horizontal: Boolean = true): Modifier =
     pointerHoverIcon(androidx.compose.ui.input.pointer.PointerIcon(java.awt.Cursor(if (horizontal) java.awt.Cursor.E_RESIZE_CURSOR else java.awt.Cursor.N_RESIZE_CURSOR)))
@@ -286,7 +289,10 @@ fun revealFolderLabel(): String = app.absentmotion.desk.DeskOs.revealLabel
 
 internal const val CAPTION_MODEL_NAME = "ggml-base-q5_1.bin"
 internal const val CAPTION_MODEL_BYTES = 59_707_625L
-internal fun loadCaptionLibrary() { app.absentmotion.pc.engine.DesktopNative.hashCode() }
+internal fun loadCaptionLibrary() {
+    app.absentmotion.pc.engine.DesktopNative.hashCode()
+    if (!app.absentmotion.ai.DeskAiNative.captionCpu()) throw UnsatisfiedLinkError("Auto Captions needs a processor with AVX2")
+}
 internal fun fastCaptionCpu(cpuinfo: String): Boolean = false
 
 internal fun captionTextHeight(fonts: app.absentmotion.fonts.FontLibrary, text: String, font: String, size: Float, wrap: Int): Float {

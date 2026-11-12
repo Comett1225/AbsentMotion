@@ -82,6 +82,30 @@ class StallAndProbeTest {
         assertTrue(cleaned.get())
     }
 
+    @Test fun anEncoderStaysBlamedOnlyWhenAnotherOneFinishesTheExport() = runBlocking {
+        EncoderTrouble.bad.clear()
+        var runs = 0
+        try {
+            retryingEncoder({}) { runs++; EncoderTrouble.last = "encoder $runs"; throw IllegalStateException("frame 7 cannot be read", ExportStalled()) }
+            fail("an export that fails twice must fail")
+        } catch (e: IllegalStateException) {
+            assertEquals(1, e.suppressed.size)
+        }
+        assertEquals(2, runs)
+        assertTrue(EncoderTrouble.bad.isEmpty())
+        runs = 0
+        assertEquals("done", retryingEncoder({}) { runs++; EncoderTrouble.last = "encoder $runs"; if (runs == 1) throw IllegalStateException("stuck", ExportStalled()); "done" })
+        assertEquals(setOf("encoder 1"), EncoderTrouble.bad.toSet())
+        EncoderTrouble.bad.clear()
+        runs = 0
+        try {
+            retryingEncoder({}) { runs++; throw IllegalArgumentException("broken frame") }
+            fail()
+        } catch (e: IllegalArgumentException) {
+            assertEquals(1, runs)
+        }
+    }
+
     @Test fun anEncoderListThatThrowsOrHangsGivesUpWithNoAnswer() = runBlocking {
         assertEquals(listOf(1), finishedWithin(1_000, "t") { listOf(1) })
         assertNull(finishedWithin(1_000, "t") { throw IllegalStateException("mediaserver died") })

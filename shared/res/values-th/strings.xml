@@ -6,7 +6,7 @@
     <string name="settings_language">ภาษา</string>
     <string name="onboarding_language_title">เลือกภาษาของคุณ</string>
     <string name="onboarding_language_others">ภาษาอื่นๆ</string>
-    <string name="onboarding_language_later">คุณเปลี่ยนภาษาได้ภายหลังในการตั้งค่า</string>
+    <string name="onboarding_language_later">คุณเปลี่ยนได้ภายหลังในการตั้งค่า</string>
     <string name="onboarding_check_title">ตรวจสอบว่าเครื่องนี้ทำอะไรได้บ้าง</string>
     <string name="onboarding_check_body">การตรวจสอบอย่างรวดเร็วจะแสดงว่าเครื่องนี้ส่งออกวิดีโอรูปแบบและขนาดใดได้ และเร็วแค่ไหน ใช้เวลาเพียงไม่กี่วินาที และข้อมูลทั้งหมดยังอยู่บนเครื่องนี้</string>
     <string name="onboarding_check_run">เริ่มตรวจสอบ</string>

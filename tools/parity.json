@@ -1602,6 +1602,10 @@
       "desktop": null,
       "reason": "plays the app's haptics through the vibrator when the system touch vibration is off; desktop computers have no vibrator"
     },
+    "app/absentmotion/platform/SystemBars.kt": {
+      "desktop": null,
+      "reason": "sets light or dark icons and scrims on the Android status and navigation bars; a desktop window has no system bars"
+    },
     "app/absentmotion/engine/GpuCheck.kt": {
       "desktop": null,
       "reason": "chooses Vulkan or OpenGL on phones and survives driver crashes at start-up; the desktop engine has one GPU back end per system (Metal, Vulkan) with a CPU fallback"

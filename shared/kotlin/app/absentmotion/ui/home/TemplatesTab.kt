@@ -195,7 +195,7 @@ internal fun Chip(text: String, selected: Boolean, crisp: Boolean, onClick: () -
         Modifier.height(if (crisp) 36.dp else 40.dp).then(if (crisp) Modifier.border(1.dp, Am.NavyLine, shape) else Modifier.shadow(3.dp, shape)).clip(shape)
             .background(animatedColor(if (selected) Am.Navy else Am.Card)).clickable(onClick = onClick).padding(horizontal = 16.dp),
         contentAlignment = Alignment.Center,
-    ) { Text(text, color = animatedColor(if (selected) Am.OnNavy else Grey), fontSize = if (crisp) 15.sp else 18.sp, fontWeight = FontWeight.Medium) }
+    ) { Text(text, color = animatedColor(if (selected) Am.OnNavy else Grey), fontWeight = FontWeight.Medium, maxLines = 1, autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(11.sp, if (crisp) 15.sp else 18.sp, 0.5.sp)) }
 }
 
 @Composable

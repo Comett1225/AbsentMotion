@@ -314,6 +314,7 @@ object PreviewCache {
     private var rendered by mutableStateOf<CacheKey?>(null)
     var paused by mutableStateOf(false)
         private set
+    private var resumable = false
     private var storeSize = 0 to 0
     @Volatile private var store: FrameStore? = null
     @Volatile private var stopRequested = false
@@ -456,7 +457,7 @@ object PreviewCache {
         val next = keyOf(state)
         val cell = checkerCell
         val kept = store?.takeIf { paused && !automatic && phase == Phase.Ready && key == next && storeSize == width to height }
-        if (kept != null && kept.last >= scene.lastFrame) {
+        if (kept != null && (!resumable || kept.last >= scene.lastFrame)) {
             paused = false
             rendered = next
             revise(force = true)
@@ -469,6 +470,7 @@ object PreviewCache {
             memoryStopped = false
             player?.close()
             player = null
+            progress = (kept.count.toFloat() / (range.last - kept.first + 1).coerceAtLeast(1)).coerceAtMost(0.99f)
         }
         state.playing = false
         val mine = generation
@@ -485,7 +487,7 @@ object PreviewCache {
                 building = built
                 var resources = next.resources
                 val outcome = try {
-                    withContext(Dispatchers.Default) { renderFrames(state.engine, scene, if (kept == null) range else kept.last + 1..range.last, expected.count(), range.count(), width, height, cell, next.accurateBlur, built) { resources = it } }
+                    withContext(Dispatchers.Default) { renderFrames(state.engine, scene, if (kept == null) range else kept.last + 1..range.last, expected.count(), (range.last - built.first + 1).coerceAtLeast(1), width, height, cell, next.accurateBlur, built) { resources = it } }
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: OutOfMemoryError) {
@@ -583,6 +585,7 @@ object PreviewCache {
         store = built
         key = next
         paused = outcome == Outcome.Stopped && !memoryStopped
+        resumable = paused
         rendered = if (paused) null else next
         storeSize = width to height
         player = FramePlayer(built, width, height)
@@ -630,6 +633,7 @@ object PreviewCache {
         store = null
         key = null
         paused = false
+        resumable = false
         player?.close()
         player = null
         phase = Phase.Empty

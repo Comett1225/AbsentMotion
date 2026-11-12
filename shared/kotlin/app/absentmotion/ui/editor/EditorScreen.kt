@@ -96,7 +96,7 @@ private fun EditorBody(state: EditorState, onExit: () -> Unit) {
         lifecycle.addObserver(observer)
         onDispose { lifecycle.removeObserver(observer) }
     }
-    if (!app.absentmotion.platform.PlatformFeatures.desktop && !wide && state.panel == EditorPanel.EditText && state.selected?.kind == "text") {
+    if (!app.absentmotion.platform.PlatformFeatures.desktop && !wide && state.panel == EditorPanel.EditText && state.selectedId?.let { state.scene.layer(it) }?.kind == "text") {
         PhoneScreen(plain = true) { TextEditor(state) }
         return
     }
@@ -248,9 +248,9 @@ internal fun LowerPanels(state: EditorState, addLibrary: AddLibrary, top: Boolea
                 if (transitionHere && !state.settings.transitionInPreview) TransitionButton(state, Modifier.align(Alignment.BottomEnd).padding(bottom = 58.dp).tutorialTarget("transition"), fromEnd = true)
                 AddButton(state, Modifier.align(Alignment.BottomEnd).tutorialTarget("add"))
             }
-            state.volumeOpen && state.panel == EditorPanel.Tools -> key(state.selectedId) { VolumePanel(state, lower.height(PanelHeight).tutorialTarget("panel")) }
+            state.volumeOpen && state.panel == EditorPanel.Tools -> key(state.selectedId) { app.absentmotion.ui.editor.panels.PhoneFit(lower.height(PanelHeight).tutorialTarget("panel")) { VolumePanel(state, Modifier.fillMaxSize()) } }
             state.panel == EditorPanel.Tools -> LayerTools(state, (if (top) lower else lower.height(PanelHeight)).tutorialTarget("tools"), side = top)
-            else -> LayerPanel(state, (if (tall) lower.fillMaxHeight() else lower.height(PanelHeight)).tutorialTarget("panel"))
+            else -> app.absentmotion.ui.editor.panels.PhoneFit((if (tall) lower.fillMaxHeight() else lower.height(PanelHeight)).tutorialTarget("panel")) { LayerPanel(state, Modifier.fillMaxSize()) }
         }
     }
     Swap(state.keypad, Modifier.fillMaxSize(), rise = 0.dp) {

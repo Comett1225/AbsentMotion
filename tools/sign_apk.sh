@@ -17,7 +17,9 @@ PW="$(mktemp)"
 trap 'rm -f "$PW"' EXIT
 chmod 600 "$PW"
 { prop storePassword; prop keyPassword; } > "$PW"
-"$BT/apksigner" sign --ks "$ROOT/$(prop storeFile)" --ks-key-alias "$(prop keyAlias)" \
+STORE="$(prop storeFile)"
+case "$STORE" in /*) ;; *) STORE="$ROOT/$STORE" ;; esac
+"$BT/apksigner" sign --ks "$STORE" --ks-key-alias "$(prop keyAlias)" \
     --ks-pass "file:$PW" --key-pass "file:$PW" \
     --v1-signing-enabled false --v2-signing-enabled true --v3-signing-enabled true \
     --alignment-preserved true --out "$OUT" "$UNSIGNED"

@@ -177,7 +177,7 @@ private fun decodeFrames(extractor: MediaExtractor, track: Int, format: MediaFor
         val last = decode(codec, extractor, SystemClock.elapsedRealtime() + budget)?.let { it >= 0 && lastSample - it <= 1_000 }
         return Decoded(first?.let { it.pts >= 0 }, middle, last, firstLooks)
     } catch (e: MediaCodec.CodecException) {
-        return if (e.errorCode == MediaCodec.CodecException.ERROR_RECLAIMED) Decoded() else Decoded(false, null, false)
+        return if (app.absentmotion.media.codecBusy(e)) Decoded() else Decoded(false, null, false)
     } catch (e: Exception) {
         return Decoded(false, null, false)
     } finally {

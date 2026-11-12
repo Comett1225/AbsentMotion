@@ -9,6 +9,7 @@ import time
 import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
+from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -179,6 +180,7 @@ def effect_assets(units, translations):
 
 def flatten_effect_asset(data, units):
     flat = {}
+    counts = Counter(k[:k.rindex(':option') + 7] for k in units if ':option' in k)
     for cat, name in data.get('categories', {}).items():
         flat[f'fxcat:{cat}'] = name
     for key, effect in data.get('effects', {}).items():
@@ -195,7 +197,7 @@ def flatten_effect_asset(data, units):
             if param.get('label'):
                 flat[f'fx:{key}:{pid}:label'] = param['label']
             options = param.get('options') or []
-            expected = sum(1 for k in units if k.startswith(f'fx:{key}:{pid}:option'))
+            expected = counts[f'fx:{key}:{pid}:option']
             if len(options) == expected:
                 for i, option in enumerate(options):
                     flat[f'fx:{key}:{pid}:option{i}'] = option

@@ -397,7 +397,7 @@ private fun SeekBar(fraction: Float, onSeek: (Float) -> Unit, onDone: () -> Unit
         val top = (size.height - thick) / 2
         val x = pad + fraction.coerceIn(0f, 1f) * (size.width - 2 * pad)
         drawRoundRect(Track, Offset(pad, top), Size(size.width - 2 * pad, thick), CornerRadius(thick / 2))
-        drawRoundRect(Am.OnNavyAccent, Offset(pad, top), Size(x - pad, thick), CornerRadius(thick / 2))
-        drawCircle(Am.OnNavyAccent, (if (large) 10.dp else 7.dp).toPx(), Offset(x, size.height / 2))
+        drawRoundRect(Am.OnScrimAccent, Offset(pad, top), Size(x - pad, thick), CornerRadius(thick / 2))
+        drawCircle(Am.OnScrimAccent, (if (large) 10.dp else 7.dp).toPx(), Offset(x, size.height / 2))
     }
 }

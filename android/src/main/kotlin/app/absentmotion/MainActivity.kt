@@ -11,8 +11,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.SystemBarStyle
-import androidx.activity.enableEdgeToEdge
+import app.absentmotion.platform.SystemBars
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,6 +38,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import app.absentmotion.compat.EffectMigration
 import app.absentmotion.compat.oldAlightImport
 import app.absentmotion.compat.withReimportTipShown
@@ -150,13 +150,16 @@ class MainActivity : ComponentActivity() {
     private var problemShown by mutableStateOf(false)
     private var elementNav: ((String) -> Unit)? = null
     private var effectLanguage = ""
+    internal var memoryLow: () -> Boolean = { false }
+    internal var afterImport: () -> Unit = {}
 
     override fun attachBaseContext(newBase: Context) = super.attachBaseContext(newBase.inAppLanguage())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val started = SystemClock.elapsedRealtime()
-        enableEdgeToEdge()
+        SystemBars.screen(this, !app.absentmotion.platform.systemDark(this))
         super.onCreate(savedInstanceState)
+        if (android.os.Build.VERSION.SDK_INT < 28) window.setSoftInputMode(window.attributes.softInputMode or android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
         app.absentmotion.i18n.keepLegacyLanguage(this)
         app.absentmotion.i18n.AppText.install(this)
         effectLanguage = app.absentmotion.i18n.currentLanguage(this).tag
@@ -219,6 +222,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+        watchMemory()
         TestHooks.start(this)
         lifecycleScope.launch { androidx.compose.runtime.snapshotFlow { settings.openGl }.drop(1).collect { engine.restart() } }
         app.absentmotion.ui.home.Updater.calm = ::updateCalm
@@ -235,10 +239,7 @@ class MainActivity : ComponentActivity() {
             val light = if ((open == null || open.toolOpen != 0) && editingTemplate == null) Am.homeIsLight else Am.editorIsLight
             val homeBg = Am.HomeBg
             LaunchedEffect(homeBg) { window.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(homeBg.toArgb())) }
-            LaunchedEffect(light, open?.exportOpen, exportingFromList != null) {
-                val transparent = android.graphics.Color.TRANSPARENT
-                enableEdgeToEdge(if (light) SystemBarStyle.light(transparent, transparent) else SystemBarStyle.dark(transparent))
-            }
+            LaunchedEffect(light) { SystemBars.screen(this@MainActivity, light) }
             val density = LocalDensity.current.density
             val fontScale = LocalDensity.current.fontScale
             val dense = remember(density, fontScale) { Density(density, fontScale.coerceAtMost(EDITOR_FONT_LIMIT)) }
@@ -375,10 +376,14 @@ class MainActivity : ComponentActivity() {
                     val importer = Importer.forApp(applicationContext, store)
                     for (uri in uris) try {
                         reports += importer.import { contentResolver.openInputStream(uri)?.let { stoppable(it, job) } }.map {
+                            afterImport()
                             if (!it.template) it else templates.adopt(store, it.id, engine)?.let { id -> it.copy(id = id) } ?: it.copy(template = false)
                         }
                     } catch (e: kotlinx.coroutines.CancellationException) {
                         throw e
+                    } catch (e: OutOfMemoryError) {
+                        Log.w("AMImport", "no memory left to import $uri", e)
+                        failure = failure ?: getString(R.string.crash_reason_memory)
                     } catch (e: Exception) {
                         Log.w("AMImport", "cannot import $uri", e)
                         failure = failure ?: (e as? ImportFailed)?.text?.resolve(this@MainActivity) ?: getString(R.string.backup_open_failed).takeIf { e is SecurityException } ?: e.message ?: getString(R.string.library_err_unsupported_type)
@@ -701,8 +706,35 @@ class MainActivity : ComponentActivity() {
         app.absentmotion.export.ExportEngine.release(engine)
     }
 
+    private fun watchMemory() {
+        if (android.os.Build.VERSION.SDK_INT < 34) return
+        val manager = getSystemService(android.app.ActivityManager::class.java) ?: return
+        val info = android.app.ActivityManager.MemoryInfo()
+        memoryLow = { manager.getMemoryInfo(info); info.lowMemory }
+        lifecycleScope.launch {
+            var low = false
+            var trimmed = -MEMORY_REST_MS
+            repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.RESUMED) {
+                while (true) {
+                    val now = memoryLow()
+                    if (now && !low && SystemClock.elapsedRealtime() - trimmed >= MEMORY_REST_MS) {
+                        trimmed = SystemClock.elapsedRealtime()
+                        Log.i("AMStart", "the phone is low on memory")
+                        freeMemory(TRIM_RUNNING_LOW)
+                    }
+                    low = now
+                    kotlinx.coroutines.delay(MEMORY_CHECK_MS)
+                }
+            }
+        }
+    }
+
     override fun onTrimMemory(level: Int) {
         super.onTrimMemory(level)
+        freeMemory(level)
+    }
+
+    private fun freeMemory(level: Int) {
         app.absentmotion.editor.PreviewCache.trim(level)
         if (level < TRIM_RUNNING_LOW) return
         dropThumbnails()
@@ -726,5 +758,7 @@ class MainActivity : ComponentActivity() {
         const val UI_FONT_LIMIT = 2f
         const val EDITOR_FONT_LIMIT = 1.3f
         const val TRIM_RUNNING_LOW = 10
+        const val MEMORY_CHECK_MS = 5_000L
+        const val MEMORY_REST_MS = 60_000L
     }
 }

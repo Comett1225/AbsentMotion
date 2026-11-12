@@ -201,6 +201,7 @@ class AppSettings(private val context: Context) {
         set(value) {
             themeState = value
             prefs.edit().putString("theme", value).apply()
+            if (value == Themes.SYSTEM) systemDarkState = app.absentmotion.platform.systemDark(context)
             Am.palette = Themes.palette(context, value, systemDarkState)
         }
 

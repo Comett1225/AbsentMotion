@@ -41,11 +41,11 @@ class FfmpegVideoSource(private val file: File, private val ffmpeg: String, ffpr
     private var decodedFrame = -1L
     private var bytes: ByteArray
     private val exactFrames = object : LinkedHashMap<Long, VideoFrame>(4, 0.75f, true) {
-        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Long, VideoFrame>?) = size > 2
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Long, VideoFrame>?) = size > 6
     }
 
     init {
-        val probe = ProcessBuilder(ffprobe, "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height,avg_frame_rate:format=duration", "-of", "json", file.absolutePath).start()
+        val probe = ProcessBuilder(ffprobe, "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height,avg_frame_rate,r_frame_rate:format=duration", "-of", "json", file.absolutePath).start()
         val json = JSONObject(probe.inputStream.bufferedReader().readText())
         check(probe.waitFor() == 0)
         val video = json.getJSONArray("streams").getJSONObject(0)
@@ -54,8 +54,12 @@ class FfmpegVideoSource(private val file: File, private val ffmpeg: String, ffpr
         val scale = minOf(1.0, maxSide.toDouble() / maxOf(originalWidth, originalHeight), kotlin.math.sqrt(maxPixels.toDouble() / (originalWidth.toDouble() * originalHeight)))
         width = maxOf(2, (originalWidth * scale).toInt() / 2 * 2)
         height = maxOf(2, (originalHeight * scale).toInt() / 2 * 2)
-        val rate = video.optString("avg_frame_rate", "30/1").split('/')
-        fps = ((rate.getOrNull(0)?.toDoubleOrNull() ?: 30.0) / (rate.getOrNull(1)?.toDoubleOrNull()?.takeIf { it > 0 } ?: 1.0)).coerceIn(0.001, 1000.0)
+        fun rate(key: String): Double? = video.optString(key).split('/').let { parts ->
+            val top = parts.getOrNull(0)?.toDoubleOrNull() ?: return null
+            val bottom = parts.getOrNull(1)?.toDoubleOrNull() ?: 1.0
+            (top / bottom).takeIf { bottom > 0 && it > 0 && it.isFinite() }
+        }
+        fps = (rate("avg_frame_rate") ?: rate("r_frame_rate") ?: 30.0).coerceIn(0.001, 1000.0)
         val duration = (json.optJSONObject("format")?.optString("duration")?.toDoubleOrNull()?.times(1000) ?: 0.0).toLong()
         info = VideoInfo(originalWidth, originalHeight, duration, fps)
         bytes = ByteArray(width * height * 4)

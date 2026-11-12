@@ -436,6 +436,7 @@ bool SeeLayers(const std::vector<Layer>& layers, int width, int height, bool top
     const double beforeMs = timeMs - 1000.0 / std::max(fps, 1);
     const View now = camera ? LayerView(layers, *camera, width, height, timeMs, depthOrder) : DefaultView(width, height);
     const View before = camera ? LayerView(layers, *camera, width, height, beforeMs, depthOrder) : now;
+    const bool smears = camera && MotionBlurTune(*camera, camera->localTime(timeMs)) > 0;
 
     std::vector<Layer> copies;
     std::vector<float> depth;
@@ -456,7 +457,7 @@ bool SeeLayers(const std::vector<Layer>& layers, int width, int height, bool top
             d = s.depth;
             drop = !s.visible;
             copy.projected = Solid(l, p) || (camera && now.tilt != SkM44() && Spatial(l, p, timeMs));
-            if (camera) AddCameraEffects(*camera, timeMs, d, Look(before, EffectivePlacement(layers, l, beforeMs)).location, s.location, &copy);
+            if (camera) AddCameraEffects(*camera, timeMs, d, smears ? Look(before, EffectivePlacement(layers, l, beforeMs)).location : s.location, s.location, &copy);
         }
         copy.sight.depth = d;
         copies.push_back(std::move(copy));

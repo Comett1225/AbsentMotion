@@ -9,6 +9,7 @@ import app.absentmotion.i18n.txt
 
 import androidx.compose.ui.graphics.asImageBitmap as androidImageBitmap
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.asAndroidPath
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import kotlin.math.roundToInt
@@ -164,13 +165,13 @@ fun encodeRgba(pixels: ByteArray, width: Int, height: Int, settings: app.absentm
 @androidx.compose.runtime.Composable
 fun ExportBars(dark: Boolean, running: Boolean) {
     val view = androidx.compose.ui.platform.LocalView.current
-    androidx.compose.runtime.DisposableEffect(dark) {
-        val bars = (view.context as? android.app.Activity)?.window?.let { androidx.core.view.WindowInsetsControllerCompat(it, view) }
-        val status = bars?.isAppearanceLightStatusBars
-        val navigation = bars?.isAppearanceLightNavigationBars
-        bars?.isAppearanceLightStatusBars = !dark
-        if (dark) bars?.isAppearanceLightNavigationBars = false
-        onDispose { status?.let { bars.isAppearanceLightStatusBars = it }; if (dark) navigation?.let { bars.isAppearanceLightNavigationBars = it } }
+    val light = (if (dark) app.absentmotion.ui.theme.Am.Navy else app.absentmotion.ui.theme.Am.Card).luminance() > 0.5f
+    val floating = !dark && app.absentmotion.ui.editor.isTablet(androidx.compose.ui.platform.LocalConfiguration.current.smallestScreenWidthDp)
+    if (!floating) androidx.compose.runtime.DisposableEffect(light) {
+        val activity = view.context as? androidx.activity.ComponentActivity
+        val before = SystemBars.cover
+        activity?.let { SystemBars.cover(it, light) }
+        onDispose { activity?.let { SystemBars.cover(it, before) } }
     }
     androidx.compose.runtime.DisposableEffect(running) { view.keepScreenOn = running; onDispose { view.keepScreenOn = false } }
 }

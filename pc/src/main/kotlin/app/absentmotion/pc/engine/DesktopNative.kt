@@ -37,6 +37,8 @@ object DesktopNative {
         selectedId: Long, handles: Int, pixels: Boolean, pixelDivisor: Int, gridSpacing: Float, solo: Int, soloIds: LongArray?, guides: FloatArray, refPx: Float): Boolean
     external fun still(handle: Long, timeMs: Double, width: Int, height: Int, accurate: Boolean): ByteArray?
     external fun stillInto(handle: Long, timeMs: Double, width: Int, height: Int, out: ByteArray): Boolean
+    external fun exportFrame(handle: Long, timeMs: Double, width: Int, height: Int, out: ByteArray): Int
+    external fun exportFlush(handle: Long, out: ByteArray?): Int
     external fun setPixels(handle: Long, uri: String, width: Int, height: Int, argb: IntArray): Boolean
     external fun setModel(uri: String, positions: FloatArray?, normals: FloatArray?, uvs: FloatArray?, colors: IntArray?, triangles: IntArray?, slots: IntArray?, twoSided: Boolean): Boolean
     external fun dropPicture(handle: Long, uri: String)

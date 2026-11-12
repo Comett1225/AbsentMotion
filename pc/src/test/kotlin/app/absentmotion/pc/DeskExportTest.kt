@@ -19,13 +19,16 @@ import app.absentmotion.export.ImageKind
 import app.absentmotion.export.MediaStoreExport
 import app.absentmotion.export.StorageFullException
 import app.absentmotion.export.Support
+import app.absentmotion.export.exportSize
 import app.absentmotion.export.frameCount
+import app.absentmotion.export.frameTimeMs
 import app.absentmotion.export.sequenceFrameName
 import app.absentmotion.export.watched
 import app.absentmotion.export.writePcm
 import app.absentmotion.engine.EngineThread
 import app.absentmotion.model.Scene
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -124,6 +127,41 @@ class DeskExportTest {
             java.util.zip.ZipFile(pack.file()).use { zip -> report.append("  package entries: ${zip.entries().toList().map { it.name }}\n"); assertNotNull(zip.getEntry("project.xml")) }
         } finally {
             out.resolve("report.txt").writeText(report.toString())
+            engine.close()
+        }
+    }
+
+    @Test fun framesDrawnAheadMatchFramesDrawnOneByOne() = runBlocking {
+        val scene = scene("media.xml", 999)
+        val s = ExportSettings(360, 30)
+        val (w, h) = exportSize(scene, s.shortSide, even = true)
+        val frames = frameCount(scene, s.fps)
+        val engine = EngineThread(0xff000000.toInt(), Desk.context)
+        try {
+            engine.effects.first { it.definitions.isNotEmpty() }
+            val waited = ArrayList<ByteArray>()
+            engine.exportSession(scene.toXml(), s.smoothing, s.fps) {
+                for (k in 0 until frames) waited += ByteArray(w * h * 4).also { assertTrue(stillInto(frameTimeMs(scene, s.fps, k), w, h, it)) }
+            }
+            val ahead = ArrayList<ByteArray>()
+            engine.exportSession(scene.toXml(), s.smoothing, s.fps) {
+                val buffer = ByteArray(w * h * 4)
+                for (k in 0 until frames) {
+                    assertEquals(if (k == 0) 0 else 1, frameInto(frameTimeMs(scene, s.fps, k), w, h, buffer))
+                    if (k > 0) ahead += buffer.copyOf()
+                }
+                assertEquals(1, lastFrameInto(buffer))
+                ahead += buffer.copyOf()
+                assertEquals(0, lastFrameInto(buffer))
+                assertEquals(0, frameInto(0, w, h, buffer))
+                assertEquals(0, lastFrameInto(null))
+                assertEquals(0, lastFrameInto(buffer))
+            }
+            assertEquals(frames, ahead.size)
+            for (k in 0 until frames) assertTrue("frame $k is not the same picture", waited[k].contentEquals(ahead[k]))
+            assertTrue(!waited.first().contentEquals(waited.last()))
+            assertTrue(waited.first().any { it.toInt() != 0 })
+        } finally {
             engine.close()
         }
     }

@@ -59,7 +59,9 @@ const val FLA_MEDIA = "fla:"
 
 fun readFla(files: Map<String, String>, maxLayers: Int = 40_000): FlaScene = FlaReader(files, maxLayers).read()
 
-fun flaPicture(data: ByteArray): Pair<ByteArray, String>? {
+fun flaPicture(data: ByteArray): Pair<ByteArray, String>? = try { decodedFlaPicture(data) } catch (e: OutOfMemoryError) { null }
+
+private fun decodedFlaPicture(data: ByteArray): Pair<ByteArray, String>? {
     fun at(i: Int) = data[i].toInt() and 0xFF
     if (data.size >= 3 && at(0) == 0xFF && at(1) == 0xD8) return data to "jpg"
     if (data.size >= 8 && at(0) == 0x89 && at(1) == 'P'.code && at(2) == 'N'.code) return data to "png"
@@ -104,7 +106,7 @@ fun flaPicture(data: ByteArray): Pair<ByteArray, String>? {
         if (data.size - p < size) return null
         System.arraycopy(data, p, pixels, 0, size)
     }
-    val rgba = ByteArray(size)
+    val rgba = pixels
     for (i in 0 until width * height) {
         var a = pixels[i * 4].toInt() and 0xFF
         var r = pixels[i * 4 + 1].toInt() and 0xFF

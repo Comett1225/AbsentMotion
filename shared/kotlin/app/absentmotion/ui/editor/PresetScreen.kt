@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor
 
+import androidx.compose.foundation.layout.widthIn
 import app.absentmotion.platform.Toast
 import app.absentmotion.platform.BackHandler
 import androidx.compose.foundation.Canvas
@@ -163,13 +164,14 @@ fun PresetScreen(state: EditorState) {
             DeskIcon(ChromeIcons.Close, deskShortcut(R.string.action_close, "Esc")) { state.presetsOpen = false }
         } else {
         Spacer(Modifier.height(16.dp))
-        Box(Modifier.fillMaxWidth().height(48.dp)) {
+        Row(Modifier.fillMaxWidth().height(48.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(48.dp).padding(start = 4.dp).clickable { state.presetsOpen = false }, Alignment.Center) {
                 DeskTip(stringResource(R.string.preset_back)) { Icon(ChromeIcons.Back, stringResource(R.string.preset_back), Modifier.size(24.dp), tint = Am.OnDark) }
             }
-            Text(stringResource(R.string.try_a_preset), Modifier.align(Alignment.Center), color = Am.OnDark, fontSize = 22.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+            Text(stringResource(R.string.try_a_preset), Modifier.weight(1f).padding(horizontal = 4.dp), color = Am.OnDark, fontWeight = FontWeight.Bold, maxLines = 1,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center, autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(12.sp, 22.sp))
             Box(
-                Modifier.align(Alignment.CenterEnd).height(48.dp).width(52.dp).alpha(if (current == null) DimAlpha else 1f)
+                Modifier.height(48.dp).widthIn(min = 52.dp).padding(horizontal = 4.dp).alpha(if (current == null) DimAlpha else 1f)
                     .then(if (current == null) Modifier else Modifier.clickable(onClick = applyChosen)),
                 Alignment.Center,
             ) { Text(stringResource(R.string.apply), color = Am.OnDark, fontSize = 18.sp, maxLines = 1) }

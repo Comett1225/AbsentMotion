@@ -2,11 +2,11 @@
 import os, subprocess, sys, time
 import numpy as np
 from PIL import Image
-from sdk import adb_command
+from sdk import PACKAGE, adb_command
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ADB = adb_command()
-PKG = "app.absentmotion"
+PKG = PACKAGE
 DEVICE_DIR = f"/sdcard/Android/data/{PKG}/files"
 OUT = os.path.join(ROOT, "build/export-check")
 LIMIT = 400

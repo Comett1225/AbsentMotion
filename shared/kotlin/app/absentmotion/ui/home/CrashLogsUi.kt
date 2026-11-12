@@ -127,7 +127,7 @@ private fun CrashDetails(log: CrashEntry, onBack: () -> Unit) {
     val context = LocalContext.current
     val detail by produceState("", log.file) { value = withContext(Dispatchers.IO) { CrashLogs.text(log) } }
     val sentence = stringResource(log.reason.sentence)
-    val time = versionLabel(log.time).text()
+    val time = versionLabel(log.time, locale = androidx.compose.ui.platform.LocalConfiguration.current.locales[0]).text()
     Column(Modifier.fillMaxSize().navigationBarsPadding()) {
         TitleBar(stringResource(R.string.crash_logs), ExportIcons.Back, stringResource(R.string.home_back), onBack)
         Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()).padding(16.dp)) {

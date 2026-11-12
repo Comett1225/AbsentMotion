@@ -45,11 +45,11 @@ class SaveQueue(
         try {
             write(task.first.value)
             failing = false
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             synchronized(this) { if (pending == null && generation == task.second) pending = task.first }
             if (!failing) {
                 failing = true
-                failed(e)
+                failed(e as? Exception ?: java.io.IOException(e))
             }
         }
     }

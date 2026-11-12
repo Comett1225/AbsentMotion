@@ -1,5 +1,7 @@
 package app.absentmotion.ui.editor.panels
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import app.absentmotion.ui.theme.pressShape
 import app.absentmotion.ui.editor.deskSp
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -241,11 +243,12 @@ private fun Graph(state: EditorState, easing: Easing, overshoot: Boolean, modifi
 @Composable
 private fun StretchButton(state: EditorState, direction: Int) {
     val enabled = state.hasStretch(direction)
+    val press = remember { MutableInteractionSource() }
     Box(
-        Modifier.size(98.px).then(if (enabled) Modifier.clickable { state.gotoStretch(direction) } else Modifier),
+        Modifier.size(98.px).buttonLabel(stringResource(if (direction > 0) R.string.export_next else R.string.export_previous)).then(if (enabled) Modifier.clickable(press, null) { state.gotoStretch(direction) } else Modifier),
         Alignment.Center,
     ) {
-        Box(Modifier.size(70.px).clip(RoundedCornerShape(14.px)).background(NavButton), Alignment.Center) {
+        Box(Modifier.size(70.px).pressShape(press, RoundedCornerShape(14.px)).background(NavButton), Alignment.Center) {
             ChevronIcon(next = direction > 0, tint = Am.OnDark.copy(alpha = if (enabled) 0.6f else 0.1f))
         }
     }
@@ -304,10 +307,11 @@ private fun Presets(state: EditorState, easing: Easing, family: Int, modifier: M
         for (preset in EasingCatalog.families[family]) {
             val lit = EasingCatalog.matches(preset.easing, easing.copy(prefixes = emptyList())) ||
                 (easing.type != "cubicBezier" && preset.easing.type == easing.type)
+            val press = remember { MutableInteractionSource() }
             Box(
-                Modifier.weight(1f).fillMaxWidth().clickable { state.setEasing(preset.easing) }
+                Modifier.weight(1f).fillMaxWidth().buttonLabel(stringResource(preset.label)).clickable(press, null) { state.setEasing(preset.easing) }
                     .padding(start = 22.px, end = 22.px, top = 11.px, bottom = 12.px)
-                    .then(if (lit) Modifier.clip(TileShape).background(PresetTile) else Modifier),
+                    .pressShape(press, TileShape).then(if (lit) Modifier.background(PresetTile) else Modifier),
                 Alignment.Center,
             ) {
                 val icon = if (preset.easing.type == "linear") Easing("cubicBezier", listOf(0.25f, 0.25f, 0.75f, 0.75f)) else preset.easing
@@ -332,10 +336,11 @@ private fun Families(state: EditorState, family: Int, modifier: Modifier) {
     ) {
         for (i in 0..2) {
             val chosen = i == family
+            val press = remember { MutableInteractionSource() }
             Box(
-                Modifier.weight(1f).fillMaxWidth().alpha(if (state.panel == EditorPanel.Speed && i != 0) 0.35f else 1f).clickable(enabled = state.panel != EditorPanel.Speed || i == 0) { if (!chosen) state.setEasing(EasingCatalog.families[i][0].easing) }
+                Modifier.weight(1f).fillMaxWidth().alpha(if (state.panel == EditorPanel.Speed && i != 0) 0.35f else 1f).clickable(press, null, enabled = state.panel != EditorPanel.Speed || i == 0) { if (!chosen) state.setEasing(EasingCatalog.families[i][0].easing) }
                     .padding(start = 22.px, end = 22.px, top = 11.px, bottom = 12.px)
-                    .then(if (chosen) Modifier.clip(TileShape).background(PanelDark) else Modifier),
+                    .pressShape(press, TileShape).then(if (chosen) Modifier.background(PanelDark) else Modifier),
                 Alignment.Center,
             ) {
                 val icon = EasingCatalog.families[i].let { it[if (i == 0) 3 else 0] }.easing

@@ -482,11 +482,9 @@ internal fun Scene.shiftedInWorld(moves: List<Pair<Layer, Float>>, horizontal: B
 private val NotPlaced = setOf("camera", "light", "audio")
 
 internal fun Scene.movedTogether(ids: Set<Long>, timeMs: Int, aboutX: Float, aboutY: Float, factor: Float, dx: Float, dy: Float): Scene =
-    layers.filter { l -> l.id in ids && l.kind !in NotPlaced && chain(l).drop(1).none { it.id in ids } }.fold(this) { acc, l ->
-        acc.update(l.id, timeMs) { layer ->
-            val placed = acc.withWorldLocation(layer, timeMs) { x, y -> aboutX + (x - aboutX) * factor + dx to aboutY + (y - aboutY) * factor + dy }
-            if (factor == 1f) placed else placed.withTransform("scale", layer.scale[0] * factor, layer.scale[1] * factor)
-        }
+    updateAll(layers.filter { l -> l.id in ids && l.kind !in NotPlaced && chain(l).drop(1).none { it.id in ids } }.mapTo(HashSet()) { it.id }, timeMs) { layer ->
+        val placed = withWorldLocation(layer, timeMs) { x, y -> aboutX + (x - aboutX) * factor + dx to aboutY + (y - aboutY) * factor + dy }
+        if (factor == 1f) placed else placed.withTransform("scale", layer.scale[0] * factor, layer.scale[1] * factor)
     }
 
 suspend fun EditorState.distributeSelection(horizontal: Boolean) {
@@ -555,13 +553,13 @@ fun EditorState.alignClipTimes(mode: Int) {
     edit { s -> layers.fold(s) { acc, layer -> acc.update(layer.id) { acc.movedClip(it, starts.getValue(layer.id), keepEnd = mode == 2) } } }
 }
 
-private class BlockMove(val scene: Scene, val end: Boolean, val frame: Int, val selection: Long)
+private class BlockMove(val scene: java.lang.ref.WeakReference<app.absentmotion.model.XmlNode>, val end: Boolean, val frame: Int, val selection: Long)
 
 private var lastBlockMove: BlockMove? = null
 
 fun EditorState.moveClipEdges(end: Boolean, extend: Boolean) {
     val ids = chosenLayers.map { it.id }
-    val again = lastBlockMove?.let { it.scene.node === scene.node && it.end == end && it.frame == frame && it.selection == MultiSelect.revision } == true
+    val again = lastBlockMove?.let { it.scene.get() === scene.node && it.end == end && it.frame == frame && it.selection == MultiSelect.revision } == true
     lastBlockMove = null
     if (extend || ids.size < 2 || again) {
         edit { it.withClipEdgesAt(ids, frame, end, extend) }
@@ -571,7 +569,7 @@ fun EditorState.moveClipEdges(end: Boolean, extend: Boolean) {
     val lined = scene.withClipEdgesAt(ids, frame, end, false)
     edit { block }
     if (block == lined) return
-    lastBlockMove = BlockMove(scene, end, frame, MultiSelect.revision)
+    lastBlockMove = BlockMove(java.lang.ref.WeakReference(scene.node), end, frame, MultiSelect.revision)
     hint(R.string.history_line_up_hint)
 }
 

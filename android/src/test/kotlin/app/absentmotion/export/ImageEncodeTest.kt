@@ -49,6 +49,44 @@ class ImageEncodeTest {
         assertTrue(second(solid(255, 0, 0)).contentEquals(second(solid(0, 0, 255))))
     }
 
+    private fun noisy(w: Int, h: Int, seed: Long): ByteArray {
+        val random = java.util.Random(seed)
+        return ByteArray(w * h * 4) { i -> if (i % 4 == 3) (if (seed % 2 == 0L) 255 else 128 + random.nextInt(128)).toByte() else (128 + 100 * sin(i / (37.0 + seed)) + random.nextGaussian() * 9).toInt().coerceIn(0, 255).toByte() }
+    }
+
+    @Test
+    fun gifFramesEncodedOnSeveralThreadsGiveTheSameFile() {
+        val w = 61
+        val h = 47
+        val frames = List(12) { noisy(w, h, it.toLong()) }
+        val oneByOne = java.io.ByteArrayOutputStream()
+        GifWriter(oneByOne, w, h).apply { frames.forEachIndexed { k, rgba -> frame(rgba, (k + 1) * 1000L / 15) }; finish() }
+        val together = java.io.ByteArrayOutputStream()
+        val writer = GifWriter(together, w, h)
+        val delays = frames.indices.map { writer.delay((it + 1) * 1000L / 15) }
+        val pool = java.util.concurrent.Executors.newFixedThreadPool(4)
+        try {
+            val coded = frames.indices.reversed().map { k -> k to pool.submit<ByteArray> { GifFrameCoder(w, h).encode(frames[k], delays[k]) } }.sortedBy { it.first }
+            coded.forEach { writer.write(it.second.get()) }
+        } finally {
+            pool.shutdown()
+        }
+        writer.finish()
+        assertTrue(oneByOne.toByteArray().contentEquals(together.toByteArray()))
+        val reused = GifFrameCoder(w, h)
+        assertTrue(reused.encode(frames[3], delays[3]).contentEquals(reused.also { it.encode(frames[5], delays[5]) }.encode(frames[3], delays[3])))
+    }
+
+    @Test
+    fun workIsSpreadOverTheCoresThatMemoryAllows() {
+        assertEquals(7, workLanes(1080L * 1920 * 6, cores = 8, memory = 512L shl 20))
+        assertEquals(5, workLanes(1080L * 1920 * 6, cores = 8, memory = 256L shl 20))
+        assertEquals(1, workLanes(3840L * 2160 * 8, cores = 8, memory = 512L shl 20))
+        assertEquals(1, workLanes(100, cores = 1, memory = 512L shl 20))
+        assertEquals(3, workLanes(100, cores = 4, memory = 512L shl 20))
+        assertEquals(8, workLanes(100, cores = 32, memory = 4096L shl 20))
+    }
+
     @Test
     fun aTransparentGifFrameTakesTheChosenBackground() {
         fun firstColour(background: Int): List<Int> {

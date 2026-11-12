@@ -121,7 +121,7 @@ compose.desktop {
             packageName = "AbsentMotion"
             packageVersion = rootDir.resolve("../version.properties").readLines().first { it.startsWith("versionName=") }.substringAfter('=').trim()
             jvmArgs += gcFlags + "-Dapple.awt.application.name=AbsentMotion"
-            if (isMac) jvmArgs += "-XX:SharedArchiveFile=\$APPDIR/app.jsa"
+            if (isMac && macArch == null) jvmArgs += "-XX:SharedArchiveFile=\$APPDIR/app.jsa"
             if (isWindows) jvmArgs += listOf("-XX:SharedArchiveFile=$appArchive", "-XX:+AutoCreateSharedArchive", "-Dam.cdsArchive=$appArchive")
             modules("jdk.localedata")
             if (macArch != null) jvmArgs += listOf("ffmpeg", "ffprobe").map { "-Dam.$it=\$APPDIR/resources/$it" }
@@ -194,7 +194,7 @@ tasks.register<Exec>("packageAmpack") {
 }
 tasks.matching { it.name == "createRuntimeImage" }.configureEach {
     inputs.property("javaHome", System.getProperty("java.home"))
-    if (!isMac) doLast {
+    if (!isMac || macArch != null) doLast {
         val runtime = layout.buildDirectory.dir("compose/tmp/main/runtime").get().asFile
         fun archives() = runtime.walk().filter { it.name.startsWith("classes") && it.extension == "jsa" }.toList()
         archives().forEach { it.setWritable(true); it.delete() }
@@ -252,6 +252,7 @@ val sceneCheck = tasks.register<JavaExec>("sceneCheck") {
 }
 
 tasks.test {
+    testLogging.quiet.events(org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED)
     systemProperty("user.home", layout.buildDirectory.dir("test-home").get().asFile.absolutePath)
     systemProperty("am.onboarding", "done")
     systemProperty("am.systemDark", "false")

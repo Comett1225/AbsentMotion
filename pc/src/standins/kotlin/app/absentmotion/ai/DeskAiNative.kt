@@ -4,6 +4,9 @@ import android.graphics.Bitmap
 
 internal object DeskAiNative {
     private external fun nativeCutoutPixels(handle: Long, pixels: IntArray, width: Int, height: Int, size: Int): Int
+    private external fun nativeCaptionCpu(): Boolean
+
+    fun captionCpu(): Boolean = runCatching { nativeCaptionCpu() }.getOrDefault(true)
 
     fun cutout(handle: Long, bitmap: Bitmap, size: Int): Int {
         val pixels = IntArray(bitmap.width * bitmap.height)

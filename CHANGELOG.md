@@ -6,7 +6,7 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
-## [5.1.0] - 2026-11-11
+## [5.1.0] - 2026-11-12
 
 ### Added
 
@@ -31,7 +31,7 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 ### Changed
 
 - Tablet layout: in landscape the editor has tool rails on both sides and a side panel that stays in place, Home has a bottom bar with a round +, and New project and Export open in a centred card with a pill button. In portrait the same rails run full height with a fixed panel under the timeline. Move & Transform shows the numbers on top and a bigger pad, dial or ruler below, Media and Audio are grids, Home shows one row per project, and pressed buttons get a soft rounded highlight.
-- Smaller app: the Android download went from about 80 MB to 49 MB. Other languages unpack when picked, and background removal downloads on first use.
+- Smaller app: the Android download went from about 80 MB to 62 MB (Compatible: 72 MB to 52 MB). Other languages unpack when picked, and background removal downloads on first use.
 - Simpler Transform: four tabs on phones and tablets, double-tap Move for the pivot, and 3D rotation in the Rotate menu.
 - Smoother menus: the effects panel and effect pages slide in from the right, and projects open with a soft zoom.
 - Clearer Settings: an open section is shaded.
@@ -42,6 +42,19 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - Windows installer: keeps files you added to AbsentMotion's folder, names the program that keeps a file in use, and asks before an older version replaces a newer one.
 - Mac updates: the app replaces itself.
 - Optical flow frame interpolation: sharper at every level.
+
+- Faster video export on a computer: the next frame is drawn while the graphics card finishes the last one (about 90 to 104 fps with effects on an M4 Mac), with the same frames.
+- GIF export uses every core: a 1080x1920 GIF of 75 frames takes about 0.7 s instead of 3.1 s, with the same file.
+- Image sequence export uses several cores: PNG about 4.5 times faster and JPEG about 3 times.
+- Particles, ASCII, Palette Map and Retro Dither keep their fixed pictures on the graphics chip on Android, so they draw about 12% faster.
+- Moving or scaling many selected layers is about 3.5 times faster, and the editor redraws less while a project plays.
+- Android: projects open faster and stutter less right after the start, with a start-up profile for the app's own code.
+- Mac: the app starts faster with Java's start-up class archive, like on Windows and Linux.
+- Windows: PCs without a graphics-card video encoder export H.264 and HEVC with x264 and x265, for better quality than Windows' basic encoder.
+- Computers: picker thumbnails read big photos at a reduced size, HDR, 10-bit and see-through video frames convert on several cores, and a video the graphics card refuses opens faster.
+- Computers without a graphics card: frame blending, optical flow, motion-blur smoothing and Datamosh run on the processor instead of failing.
+- Phones narrower than 384 dp: layer panels and the colour picker are drawn slightly smaller so they fit.
+- Project checks and release tools: the quick check takes about 30 s instead of 140 s, the privacy check is stricter, and the release script stops early on a missing key or a failing check.
 
 ### Fixed
 
@@ -60,6 +73,46 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - 3D models with effects: Pixelate, Vignette and other effects no longer cut off or darken a turned 3D model.
 - Effects panel: no white flash when it opens.
 - Motion Blur: fast moves blur into one smooth streak that trails behind the layer, and the paused preview shows the real blur.
+- Press highlights on phones: rounded buttons, tabs, switches and chips light up in their own shape instead of a white rectangle.
+- Small phones (360 dp): every layer panel, the colour picker and the Add menu fit on screen.
+- Long languages such as German and Russian fit in the editor's tabs, chips, headers and labels.
+- Dark theme: the export progress bar, the heat warning, Cancel and the Done seek bar are readable, and a few switches and checkboxes are visible again.
+- Visibility: the eyedropper ring, the save-colour +, the fog swatch marker, the NEW and AI badges, the active speed chip and the "Still working" overlay are easier to see.
+- Screen readers: about a dozen buttons that had no label now have one.
+- Motion tracking: no crash when the point count changes while a tracker box is held.
+- Saving: a save that runs out of memory is kept and retried, with a warning, instead of being dropped.
+- Pre-render: a resumed render's percentage carries on, and turning a partial copy back on is instant.
+- Tablets: selecting several layers no longer blocks the bottom of the timeline.
+- Turning a 3D effect on the preview is undone when the system cancels the gesture.
+- Auto captions: the font browser shows "Loading font" while a font downloads.
+- Tools: the Video Downloader add-on card no longer freezes at "Downloading" after switching tabs.
+- Tutorial: Start and Continue no longer go dead after a double tap, and leaving it no longer restarts it at step 1.
+- Effect settings: Keyframe and Easing no longer start on a hidden setting.
+- Community bundle: with 8 tags the other tags dim, and a typed tag is kept.
+- Import: big bundle thumbnails and huge Adobe Animate (FLA) library pictures no longer risk running out of memory.
+- Import on Android: running out of memory after reading a project shows "Import Failed" instead of closing the app.
+- Home: the changelog button stays in place when switching tabs.
+- Japanese and Thai: the theme step's footer no longer says "language".
+- Theme: the device theme is only followed with System default, and picking System default applies it at once.
+- Status bar on Android: readable on the Export screen and after rotating, split screen or changing the font size.
+- Navigation bar with three buttons: it follows the app's colours (Android 8.1 showed white buttons on white).
+- Android 8: the keyboard no longer pops up over the editor when you come back to the app.
+- Android 14 and newer: preview and thumbnail caches are freed again when memory runs low.
+- Video Feedback on three or more video layers: every layer shows its trail (the third showed none and decoded every frame again).
+- Export: one failed export no longer keeps later exports on the slow software encoder until a restart, and the check after export no longer calls a good file wrong when the decoder is busy.
+- Damaged projects: an extremely deep project file or an absurd particle burst is refused instead of crashing or hanging the engine.
+- Android 8 (Compatible): a small memory leak when a video surface cannot be made.
+- Linux: no crash on the first hardware-decoded video frame on Ubuntu 22.04 and 24.04, Debian 12 and Mint.
+- Auto Captions on a computer: no crash on processors without AVX2.
+- Exports on a computer: large exports to slow or external drives no longer fail with "stalled" at the end.
+- Mac: webcams that report 30 fps start.
+- Quitting during Compress, Reverse, GIF or a download no longer leaves ffmpeg or yt-dlp running.
+- Windows installer: reinstalling over a leftover folder works, a busy app is never force-closed by an update, the app opens again after a failed update, new and network folders work, and damaged files and files in use get clear messages.
+- Updates: "Not now" on a ready update no longer shows "the update was stopped" on the next start.
+- Computers: opening a stray .xfl file no longer zips its whole folder first, and a rare crash at start is gone.
+- Computers: hardware video decoding keeps enough frames and falls back to software when frames cannot be copied, a video with an unknown frame rate plays past its first frame, and Frame Blending on High no longer starts a new decoder for every frame.
+- Linux install: Ubuntu 24.04 and Mint 22 use libasound2t64.
+
 
 ## [5.0.4] - 2026-11-10
 

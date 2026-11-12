@@ -144,6 +144,7 @@ fun TutorialHost(
             Tutorial.request = null
             val open = current
             if (open != null && open.projectId != settings.tutorialProject) switchTo = request else begin(request)
+            Tutorial.request = null
         }
     }
     LaunchedEffect(afterClose, editor == null) {
@@ -186,7 +187,7 @@ fun TutorialHost(
             onYes = { switchTo = null; afterClose = resume; onCloseEditor() }, onNo = { switchTo = null })
     }
     if (exitAsk) Question(dark, R.string.tutorial_exit_title, R.string.tutorial_exit_body, R.string.tutorial_exit_leave, R.string.tutorial_exit_stay,
-        onYes = { exitAsk = false; Tutorial.tour = null; deleteAsk = settings.tutorialProject }, onNo = { exitAsk = false })
+        onYes = { exitAsk = false; finish() }, onNo = { exitAsk = false })
     deleteAsk?.let { id ->
         Question(dark, R.string.tutorial_delete_title, R.string.tutorial_delete_body, R.string.delete, R.string.tutorial_delete_keep,
             onYes = {

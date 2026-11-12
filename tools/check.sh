@@ -4,6 +4,11 @@ cd "$(dirname "$0")/.."
 . tools/env.sh
 dir="build/check"
 mkdir -p "$dir"
+find "$dir" -maxdepth 1 -name 'run.*' -mtime +1 -exec rm -rf {} + 2>/dev/null
+status=$(mktemp -d "$dir/run.XXXXXX") || exit 1
+held=""
+trap 'rm -rf "$status"; [ -z "$held" ] || rm -f "$held"' EXIT
+trap 'exit 130' INT TERM
 mode=full
 for arg in "$@"; do
     case "$arg" in
@@ -15,6 +20,25 @@ done
 failed=0
 skipped=""
 fail() { printf 'check.sh: FAILED: %s\n' "$1" >&2; failed=$((failed + 1)); }
+lock() {
+    waited=""
+    until ln -sn $$ "$dir/$1.lock" 2>/dev/null; do
+        holder=$(readlink "$dir/$1.lock" 2>/dev/null)
+        if kill -0 "$holder" 2>/dev/null && ! ps -o stat= -p "$holder" 2>/dev/null | grep -q '^Z'; then
+            [ "$waited" = "$holder" ] || printf 'waiting for another check.sh (process %s) to finish its %s build in this folder\n' "$holder" "$1"
+            waited=$holder
+            sleep 3
+        else
+            rm -f "$dir/$1.lock"
+        fi
+    done
+    held="$dir/$1.lock"
+}
+unlock() { rm -f "$held"; held=""; }
+excerpt() {
+    grep -E "$1" "$2" | sed 's|file://[^ ]*/shared/kotlin/app/absentmotion/||' | head -40 >&2
+    sed -n '/What went wrong/,/^\* Try/p' "$2" | grep -v '^\* Try' | head -12 >&2
+}
 version_code=$(sed -n 's/^versionCode=//p' version.properties)
 version_name=$(sed -n 's/^versionName=//p' version.properties)
 [ -f "fastlane/metadata/android/en-US/changelogs/$version_code.txt" ] || fail "fastlane/metadata/android/en-US/changelogs/$version_code.txt is missing"
@@ -50,50 +74,56 @@ native_libs() {
 }
 start=$(date +%s)
 
-STATIC="licences|python3 tools/gen_licenses.py --check|python3 tools/gen_licenses.py
+CHECKS="licences|python3 tools/gen_licenses.py --check|python3 tools/gen_licenses.py
 fonts|python3 tools/gen_fonts.py --check|see tools/gen_fonts.py
 site-help|python3 tools/site_build.py --check|python3 tools/site_build.py
 alight-compat|python3 tools/alight_compat.py --check|python3 tools/alight_compat.py
 3d-effects|python3 tools/gen_3d_effects.py --check|python3 tools/gen_3d_effects.py
-translations|python3 tools/i18n_extract.py check|python3 tools/i18n_translate.py
+test-scenes|python3 tools/gen_testscenes.py --check|python3 tools/gen_testscenes.py
+translations|python3 tools/i18n_extract.py selftest && python3 tools/i18n_extract.py check|python3 tools/i18n_translate.py
 effect-lint|python3 tools/effect_lint.py|fix the effect JSON it lists
+shaders|if [ -x build/sksl_check/sksl_check ]; then sh tools/effectcheck.sh; else echo 'skipped: the shader checker is not built (tools/sksl_check/build.sh)'; fi|fix the effect shader it lists
 comments|python3 tools/comment_check.py|the project ships without comments
 publish|if [ -f tools/publish_forbidden.txt ]; then sh tools/publish_check.sh; else echo 'skipped: tools/publish_forbidden.txt is private and not in this checkout'; fi|fix what it lists, never loosen it
 ui-contract|python3 tools/ui_contract_check.py|update the contract or the UI
 remaining-contract|python3 tools/remaining_contract_check.py|update the contract or the code
 tool-regressions|python3 tools/bug_regression_check.py|the tool scripts regressed
 tier|python3 tools/compat/tier_check.py|gate the feature with Tier.has or Tier.choice (shared/kotlin/app/absentmotion/Tier.kt)
-parity|python3 tools/parity_check.py|list the desktop gap in tools/parity.json, or build the feature for the desktop"
+parity|python3 tools/parity_check.py|list the desktop gap in tools/parity.json, or build the feature for the desktop
+cutout-clean|sh tools/cutout_clean.sh|the cut-out clean-up host test
+textanim|sh tools/textanim.sh|the text animation host tests
+particles|sh tools/particles.sh|the particle host tests
+warp|sh tools/warp.sh|the path and puppet warp host tests
+easing|python3 tools/easing_check.py|the easing curves against their reference samples
+host-engine|if [ -f third_party/skia/out/mac-v2-2-arm64/libskia.a ]; then sh tools/render_bench/build.sh >/dev/null && python3 tools/pieces3d_check.py && python3 tools/crossing_check.py && python3 tools/puppet_check.py && python3 tools/crop_check.py && python3 tools/rays_check.py; else echo 'skipped: the host Skia build (third_party/skia/out/mac-v2-2-arm64) is missing'; fi|the 3D pieces, crossing layers, Puppet Pin, Crop and Rays checks against the host engine"
 
-printf '== Native audio effects and text animation: host build and tests\n'
-sh tools/audio_dsp.sh --lib >"$dir/audio-dsp.log" 2>&1 || { tail -n 15 "$dir/audio-dsp.log" >&2; fail "the audio DSP host tests"; }
-sh tools/cutout_clean.sh >"$dir/cutout-clean.log" 2>&1 || { tail -n 15 "$dir/cutout-clean.log" >&2; fail "the cut-out clean-up host test"; }
-sh tools/textanim.sh >"$dir/textanim.log" 2>&1 || { tail -n 15 "$dir/textanim.log" >&2; fail "the text animation host tests"; }
-sh tools/particles.sh >"$dir/particles.log" 2>&1 || { tail -n 15 "$dir/particles.log" >&2; fail "the particle host tests"; }
-sh tools/warp.sh >"$dir/warp.log" 2>&1 || { tail -n 15 "$dir/warp.log" >&2; fail "the path and puppet warp host tests"; }
-if [ "$(uname -s)" = Darwin ] && [ "$(uname -m)" = arm64 ]; then
-    python3 tools/pieces3d_check.py >"$dir/pieces3d.log" 2>&1 || { tail -n 15 "$dir/pieces3d.log" >&2; fail "the 3D pieces host tests"; }
-    python3 tools/crossing_check.py >"$dir/crossing.log" 2>&1 || { tail -n 15 "$dir/crossing.log" >&2; fail "the crossing 3D layers host tests"; }
-fi
-python3 tools/puppet_check.py >"$dir/puppet.log" 2>&1 || { tail -n 15 "$dir/puppet.log" >&2; fail "the Puppet Pin checks against the host engine"; }
-python3 tools/crop_check.py >"$dir/crop.log" 2>&1 || { tail -n 15 "$dir/crop.log" >&2; fail "the Crop checks against the host engine"; }
-sh tools/pivot.sh --lib >"$dir/pivot.log" 2>&1 || { tail -n 15 "$dir/pivot.log" >&2; fail "the host engine library for the pivot tests"; }
-
-printf '\n== Static checks (in parallel)\n'
+printf '== Static checks and host tests (in the background)\n'
 while IFS='|' read -r name command hint; do
-    ( sh -c "$command" >"$dir/$name.log" 2>&1; echo $? >"$dir/$name.status" ) &
+    ( sh -c "$command" >"$status/$name.log" 2>&1; echo $? >"$status/$name" ) &
 done <<EOF
-$STATIC
+$CHECKS
 EOF
+
+printf '\n== Host libraries the unit tests load: audio effects, pivot engine, motion tracker\n'
+lock android
+sh tools/audio_dsp.sh --lib >"$status/audio-dsp.log" 2>&1 &
+audio=$!
+sh tools/tracker_check.sh --lib >"$status/tracker.log" 2>&1 &
+tracker=$!
+sh tools/pivot.sh --lib >"$status/pivot.log" 2>&1 || { tail -n 15 "$status/pivot.log" >&2; fail "the host engine library for the pivot tests"; }
+wait "$audio" || { tail -n 15 "$status/audio-dsp.log" >&2; fail "the audio DSP host tests"; }
+wait "$tracker" || { tail -n 15 "$status/tracker.log" >&2; fail "the motion tracker host tests"; }
 
 if [ "$mode" = quick ]; then
     printf '\n== Android: compile and unit tests (foss)\n'
-    ./gradlew :app:compileFossDebugKotlin :app:testFossDebugUnitTest -q >"$dir/gradle.log" 2>&1 || { grep -E '^e: |FAILED|Test.*>' "$dir/gradle.log" | sed 's|file://[^ ]*/shared/kotlin/app/absentmotion/||' | head -40 >&2; fail "Android compile or unit tests (full output: $dir/gradle.log)"; }
+    ./gradlew :app:compileFossDebugKotlin :app:testFossDebugUnitTest -q >"$status/gradle.log" 2>&1 || { excerpt '^e: |FAILED|Test.*>' "$status/gradle.log"; fail "Android compile or unit tests (full output: $dir/gradle.log)"; }
+    unlock
 else
     printf '\n== Android: compile (foss, compat and compat32), unit tests, lint\n'
     tasks=":app:compileFossDebugKotlin :app:compileCompatDebugKotlin :app:compileCompat32DebugKotlin :app:testFossDebugUnitTest :app:testCompatDebugUnitTest"
     [ -f android/lint-baseline.xml ] && tasks="$tasks :app:lintFossDebug :app:lintCompatDebug"
-    ./gradlew $tasks -q >"$dir/gradle.log" 2>&1 || { grep -E '^e: |FAILED|Test.*>|Error:|error:' "$dir/gradle.log" | sed 's|file://[^ ]*/shared/kotlin/app/absentmotion/||' | head -40 >&2; fail "Android compile, unit tests or lint (full output: $dir/gradle.log)"; }
+    ./gradlew $tasks -q >"$status/gradle.log" 2>&1 || { excerpt '^e: |FAILED|Test.*>|Error:|error:' "$status/gradle.log"; fail "Android compile, unit tests or lint (full output: $dir/gradle.log)"; }
+    unlock
     printf '\n== Native libraries: lowest Android version they need, 16 KB page alignment\n'
     if native_libs fossRelease mergeFossReleaseNativeLibs; then
         python3 tools/api_floor.py "$libs" >"$dir/api-floor.log" 2>&1 || { cat "$dir/api-floor.log" >&2; fail "a native library needs a newer Android than minSdk"; }
@@ -117,28 +147,30 @@ else
     fi
 fi
 
+lock desktop
 if [ "$mode" = quick ]; then
     printf '\n== Desktop: compile\n'
-    (cd pc && ./gradlew compileKotlin compileTestKotlin -q) >"$dir/desktop.log" 2>&1 || { grep -E '^e: |error:' "$dir/desktop.log" | head -40 >&2; fail "desktop compile (full output: $dir/desktop.log)"; }
+    (cd pc && ./gradlew compileKotlin compileTestKotlin -q) >"$status/desktop.log" 2>&1 || { excerpt '^e: |error:' "$status/desktop.log"; fail "desktop compile (full output: $dir/desktop.log)"; }
 else
     printf '\n== Desktop: compile and tests\n'
-    (cd pc && ./gradlew test -q) >"$dir/desktop.log" 2>&1 || { grep -E '^e: |error:|FAILED|Test.*>' "$dir/desktop.log" | head -40 >&2; fail "desktop compile or tests (full output: $dir/desktop.log)"; }
+    (cd pc && ./gradlew test -q) >"$status/desktop.log" 2>&1 || { excerpt '^e: |error:|FAILED|Test.*>' "$status/desktop.log"; fail "desktop compile or tests (full output: $dir/desktop.log)"; }
 fi
+unlock
 
 wait
 static_failed=0
 while IFS='|' read -r name command hint; do
-    status=$(cat "$dir/$name.status" 2>/dev/null || echo 1)
-    if [ "$status" != 0 ]; then
+    if [ "$(cat "$status/$name" 2>/dev/null || echo 1)" != 0 ]; then
         printf '\n-- %s failed (%s): %s\n' "$name" "$hint" "$command" >&2
-        tail -n 15 "$dir/$name.log" >&2
+        tail -n 15 "$status/$name.log" >&2
         static_failed=1
     fi
+    grep -h '^skipped:' "$status/$name.log" 2>/dev/null
 done <<EOF
-$STATIC
+$CHECKS
 EOF
-[ "$static_failed" = 1 ] && fail "static checks (logs in $dir)"
-rm -f "$dir"/*.status
+cp "$status"/*.log "$dir"/ 2>/dev/null
+[ "$static_failed" = 1 ] && fail "static checks or host tests (logs in $dir)"
 
 elapsed=$(( $(date +%s) - start ))
 if [ "$failed" -gt 0 ]; then

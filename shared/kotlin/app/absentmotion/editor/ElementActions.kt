@@ -69,9 +69,11 @@ internal fun Scene.elementNodes(layer: Layer, bounds: FloatArray?): List<XmlNode
     fun hostMs(innerMs: Int) = (box.startTime + innerMs / speed).roundToInt().coerceIn(box.startTime, box.endTime)
     val outer = chain(box)
     val outerTimes = outer.flatMap { it.keyframeTimes() }.map { ((it - box.startTime) * speed).roundToInt() }
+    val placed = HashMap<Int, Place>()
+    val moving = outer.any { it.moves() }
     return flat.layers.map { inner ->
-        (inner.rebaked(outer.any { it.moves() }, outerTimes, group.fps) { own, ms ->
-            val g = place(box, hostMs(ms))
+        (inner.rebaked(moving, outerTimes, group.fps) { own, ms ->
+            val g = placed.getOrPut(hostMs(ms)) { place(box, hostMs(ms)) }
             val vx = (own.x - group.width / 2f - g.px) * g.sx
             val vy = (own.y - group.height / 2f - g.py) * g.sy
             val a = Math.toRadians(g.rot.toDouble())

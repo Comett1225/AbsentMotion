@@ -800,13 +800,13 @@ private fun ExportBar(enabled: Boolean, blocked: UiText?, pill: Boolean, onClick
                 .background(animatedColor(if (blocked == null) Am.Accent else lerp(Navy, Am.Card, 0.8f)))
                 .clickable(enabled = enabled, onClick = onClick),
             contentAlignment = Alignment.Center,
-        ) { Text(blocked?.text() ?: stringResource(R.string.export), color = if (blocked == null) Am.OnAccent else Navy, fontSize = 16.sp, fontWeight = FontWeight.Medium, maxLines = 1) }
+        ) { Text(blocked?.text() ?: stringResource(R.string.export), Modifier.padding(horizontal = 12.dp), color = if (blocked == null) Am.OnAccent else Navy, fontWeight = FontWeight.Medium, maxLines = 1, autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(10.sp, 16.sp, 0.5.sp)) }
         else Box(
             Modifier.fillMaxWidth().height(50.dp).shadow(4.dp, RoundedCornerShape(6.dp)).clip(RoundedCornerShape(6.dp))
                 .background(animatedColor(if (blocked == null) Navy else lerp(Navy, Am.Card, 0.8f)))
                 .clickable(enabled = enabled, onClick = onClick),
             contentAlignment = Alignment.Center,
-        ) { Text(blocked?.text() ?: stringResource(R.string.export), color = if (blocked == null) Am.OnNavyAccent else Navy, fontSize = if (blocked == null) 21.sp else 18.sp, maxLines = 1) }
+        ) { Text(blocked?.text() ?: stringResource(R.string.export), Modifier.padding(horizontal = 10.dp), color = if (blocked == null) Am.OnNavyAccent else Navy, maxLines = 1, autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(11.sp, if (blocked == null) 21.sp else 18.sp, 0.5.sp)) }
     }
 }
 
@@ -828,7 +828,7 @@ private fun OptionCard(
                 }
             }
             Box(Modifier.width(38.dp).fillMaxSize().then(if (right != null) Modifier.clickable(onClick = onRight) else Modifier), contentAlignment = Alignment.Center) {
-                if (right != null) Icon(right, null, Modifier.size(24.dp).alpha(if (enabled || right == ExportIcons.Info) 1f else Dimmed), tint = Am.HomeDim)
+                if (right != null) Icon(right, stringResource(if (right == ExportIcons.Info) R.string.export_info else R.string.settings), Modifier.size(24.dp).alpha(if (enabled || right == ExportIcons.Info) 1f else Dimmed), tint = Am.HomeDim)
             }
         }
         below?.let {
@@ -1060,7 +1060,7 @@ private fun FileNameField(name: ExportName, kind: ExportKind, options: Boolean =
         if (options && kind.randomNameAllowed) {
             Row(Modifier.fillMaxWidth().semantics(mergeDescendants = true) {}, verticalAlignment = Alignment.CenterVertically) {
                 Text(stringResource(R.string.export_filename_random), Modifier.weight(1f), color = Navy, fontSize = 15.sp)
-                Switch(name.random, { name.random = it; keyboard?.hide() }, colors = SwitchDefaults.colors(checkedTrackColor = Navy, checkedThumbColor = Am.OnNavy))
+                Switch(name.random, { name.random = it; keyboard?.hide() }, colors = SwitchDefaults.colors(checkedTrackColor = Navy, checkedThumbColor = Am.OnNavy, uncheckedThumbColor = Am.Thumb, uncheckedTrackColor = Am.SwitchOff, uncheckedBorderColor = Color.Transparent))
             }
         }
     }
@@ -1227,7 +1227,7 @@ private fun BoxScope.RunningPanel(p: Phase.Running, progress: Float, heat: Therm
         Text(stringResource(runningTitle(p.kind)), color = Am.OnScrim, fontSize = 18.sp, textAlign = TextAlign.Center)
         Spacer(Modifier.height(15.dp))
         Box(Modifier.width(220.dp).height(7.dp).clip(RoundedCornerShape(5.dp)).background(Am.OnScrim.copy(alpha = 0.2f))) {
-            Box(Modifier.fillMaxWidth(progress.coerceIn(0f, 1f)).fillMaxHeight().background(Am.OnNavyAccent))
+            Box(Modifier.fillMaxWidth(progress.coerceIn(0f, 1f)).fillMaxHeight().background(Am.OnScrimAccent))
         }
         Spacer(Modifier.height(5.dp))
         Row(Modifier.width(220.dp)) {
@@ -1235,10 +1235,10 @@ private fun BoxScope.RunningPanel(p: Phase.Running, progress: Float, heat: Therm
             Text(left?.let { "%d:%02d".format(Locale.ROOT, it / 60, it % 60) } ?: "", color = Am.OnScrim, fontSize = 13.sp)
         }
         Box(Modifier.width(300.dp).height(96.dp).padding(top = 16.dp), contentAlignment = Alignment.TopCenter) {
-            exportHeatText(heat)?.let { Text(it.text(), color = Am.OnNavyAccent, fontSize = 21.sp, lineHeight = 27.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, maxLines = 3) }
+            exportHeatText(heat)?.let { Text(it.text(), color = Am.OnScrimAccent, fontSize = 21.sp, lineHeight = 27.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, maxLines = 3) }
                 ?: note?.let { Text(it.text(), color = Am.OnScrim, fontSize = 15.sp, lineHeight = 20.sp, textAlign = TextAlign.Center, maxLines = 4) }
         }
-        TextButton(onCancel) { Text(stringResource(R.string.cancel), color = Am.OnNavyAccent, fontSize = 17.sp) }
+        TextButton(onCancel) { Text(stringResource(R.string.cancel), color = Am.OnScrimAccent, fontSize = 17.sp) }
     }
     Text(
         stringResource(if (p.kind in BackgroundKinds) R.string.export_running_leave else R.string.keep_absentmotion_open_and_your_screen),
@@ -1602,15 +1602,18 @@ private fun CommunityFields(scene: Scene, engine: EngineThread, settings: app.ab
     TextBox(R.string.community_title, community.title, 80) { onChange(community.copy(title = it)) }
     TextBox(R.string.community_description, community.description, 500, lines = 3) { onChange(community.copy(description = it)) }
     Chips(stringResource(R.string.community_tags), "${community.tags.size}/8") {
-        for (tag in (SuggestedTags + community.tags).distinct()) Chip(tag, tag in community.tags) {
+        for (tag in (SuggestedTags + community.tags).distinct()) Chip(tag, tag in community.tags, enabled = tag in community.tags || community.tags.size < 8) {
             onChange(community.copy(tags = if (tag in community.tags) community.tags - tag else (community.tags + tag).take(8)))
         }
     }
     var custom by remember { mutableStateOf("") }
     TextBox(R.string.community_tag_hint, custom, 24, done = {
         val tag = custom.trim()
-        if (tag.isNotEmpty() && tag !in community.tags) onChange(community.copy(tags = (community.tags + tag).take(8)))
-        custom = ""
+        if (tag.isEmpty() || tag in community.tags) custom = ""
+        else if (community.tags.size < 8) {
+            onChange(community.copy(tags = community.tags + tag))
+            custom = ""
+        }
     }) { custom = it }
     TextBox(R.string.community_creator, community.creator, 60) { settings.communityCreator = it; onChange(community.copy(creator = it)) }
     val bytes = remember(scene) { scene.communityBytes() }
@@ -1622,7 +1625,7 @@ private fun CommunityFields(scene: Scene, engine: EngineThread, settings: app.ab
         verticalAlignment = Alignment.CenterVertically,
     ) {
         androidx.compose.material3.Checkbox(community.confirmed, { onChange(community.copy(confirmed = it)) },
-            colors = androidx.compose.material3.CheckboxDefaults.colors(checkedColor = Navy, checkmarkColor = Am.OnNavy))
+            colors = androidx.compose.material3.CheckboxDefaults.colors(checkedColor = Navy, uncheckedColor = Navy, checkmarkColor = Am.OnNavy))
         Text(stringResource(R.string.community_confirm), color = Navy, fontSize = if (DESK) 13.sp else 15.sp)
     }
 }

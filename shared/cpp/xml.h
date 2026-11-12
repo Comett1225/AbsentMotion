@@ -12,6 +12,11 @@ struct XmlNode {
     std::vector<std::pair<std::string, std::string>> attrs;
     std::vector<std::unique_ptr<XmlNode>> children;
 
+    XmlNode() = default;
+    XmlNode(const XmlNode&) = delete;
+    XmlNode& operator=(const XmlNode&) = delete;
+    ~XmlNode();
+
     const char* attr(const char* key) const;
     const XmlNode* child(const char* name) const;
 };

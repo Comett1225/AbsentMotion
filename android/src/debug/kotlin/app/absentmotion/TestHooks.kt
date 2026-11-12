@@ -23,6 +23,7 @@ import app.absentmotion.ui.editor.addPicked
 import app.absentmotion.ui.editor.importSvgFile
 import app.absentmotion.ui.home.Updates
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -161,6 +162,20 @@ internal object TestHooks {
         intent.getStringExtra("addons")?.let { app.absentmotion.ai.AddonRelease.base = it }
         if (intent.getBooleanExtra("updatecheck", false)) Updates.check(activity, activity.settings, manual = true)
         intent.getFloatExtra("tutorialfont", 0f).takeIf { it > 0f }?.let { app.absentmotion.ui.tutorial.Tutorial.fontScale = it }
+        if (intent.getBooleanExtra("thumbdecode", false)) scope.launch(Dispatchers.IO) {
+            val catalog = engine.effects.first { it.definitions.isNotEmpty() }
+            val times = catalog.definitions.mapNotNull { it.thumbnail }.distinct().map { path ->
+                val started = System.nanoTime()
+                val picture = catalog.drawable(path)
+                (android.os.Build.VERSION.SDK_INT >= 28 && picture is android.graphics.drawable.AnimatedImageDrawable) to (System.nanoTime() - started) / 1e6
+            }
+            for ((moving, list) in times.groupBy({ it.first }, { it.second })) {
+                val sorted = list.sorted()
+                Log.i("AMTest", "thumbdecode moving=$moving n=${sorted.size} median=${"%.2f".format(java.util.Locale.US, sorted[sorted.size / 2])}ms max=${"%.2f".format(java.util.Locale.US, sorted.last())}ms total=${"%.0f".format(java.util.Locale.US, sorted.sum())}ms")
+            }
+        }
+        if (intent.getBooleanExtra("importoom", false)) activity.afterImport = { throw OutOfMemoryError("import test") }
+        if (intent.hasExtra("lowmemory")) intent.getBooleanExtra("lowmemory", false).let { low -> activity.memoryLow = { low } }
         intent.getStringExtra("crash")?.let { kind -> activity.window.decorView.postDelayed({ crash(activity, kind) }, 2000) }
         if (intent.getBooleanExtra("audiolog", false)) engine.audio?.log = true
         if (intent.hasExtra("previewCopies")) activity.settings.previewCopies = intent.getBooleanExtra("previewCopies", true)

@@ -116,7 +116,7 @@ internal fun CameraPanel(state: EditorState, layer: Layer, modifier: Modifier = 
                 Box(
                     Modifier.weight(1f).fillMaxHeight().clickable { tab = i; active = 0 }.fadeBackground(tab == i, PanelDark),
                     contentAlignment = Alignment.Center,
-                ) { Text(stringResource(name), color = if (tab == i) Am.Accent else Am.OnDark, fontSize = 13.sp, maxLines = 1, softWrap = false) }
+                ) { Text(stringResource(name), Modifier.padding(horizontal = 3.dp), color = if (tab == i) Am.Accent else Am.OnDark, maxLines = 1, softWrap = false, autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(8.sp, 13.sp, 0.5.sp)) }
             }
         }
         Swap(tab, Modifier.fillMaxSize(), rise = 0.dp) {
@@ -167,9 +167,9 @@ internal fun CameraPanel(state: EditorState, layer: Layer, modifier: Modifier = 
                             FogSwatches.forEach { argb ->
                                 val c = argb.toInt()
                                 Box(
-                                    Modifier.padding(end = 4.dp).size(22.dp).clip(PanelShape).background(Color(c))
+                                    Modifier.padding(end = 4.dp).size(22.dp).clip(PanelShape).background(Color(c)).buttonLabel(colourText(c))
                                         .clickable(enabled = on) { state.setColour(FogColor, c) },
-                                ) { if (c == colour) Box(Modifier.align(Alignment.Center).size(8.dp).clip(PanelShape).background(if (c == 0xFF000000.toInt()) Color.White else Color.Black)) }
+                                ) { if (c == colour) Box(Modifier.align(Alignment.Center).size(8.dp).clip(PanelShape).background(textOn(c))) }
                             }
                         }
                         FieldRows(state, layer, rows, active, on, { active = it }, ::write)
@@ -283,7 +283,7 @@ private fun NumberRow(
 ) {
     Row(Modifier.fillMaxWidth().height(RowHeight).padding(horizontal = 8.dp).alpha(if (enabled) 1f else 0.35f), verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.width(96.dp)) {
-            Text(label, color = Am.OnDark, fontSize = 14.sp, lineHeight = 16.sp, maxLines = 1, softWrap = false)
+            Text(label, color = Am.OnDark, lineHeight = 16.sp, maxLines = 1, softWrap = false, autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(9.sp, 14.sp, 0.5.sp))
             if (note != null) Text(note, color = Am.OnDarkDim, fontSize = deskSp(10f), lineHeight = 12.sp, maxLines = 1, softWrap = false)
         }
         NumberBox(text, if (active) Am.Accent else Am.OnDark, Modifier.width(BoxWidth).height(32.dp), onClick = if (enabled) onTap else null)

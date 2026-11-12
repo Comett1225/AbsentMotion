@@ -17,6 +17,7 @@ printf '== Tracker: host tests\n'
 printf '== Tracker: host JNI library and the Kotlin end-to-end test\n'
 "$cxx" -std=c++17 -O2 -Wall -Werror -shared -fPIC -I "$JAVA_HOME/include" -I "$JAVA_HOME/include/darwin" -I "$JAVA_HOME/include/linux" \
     -I shared/cpp "$source/tracker.cpp" shared/cpp/tracker_jni.cpp -o "$out/libtracker_host.so"
+[ "${1:-}" = "--lib" ] && exit 0
 ./gradlew :app:testFossDebugUnitTest --tests 'app.absentmotion.media.MotionTrackerJniTest' -q
 grep -q 'skipped="0"' android/build/test-results/testFossDebugUnitTest/TEST-app.absentmotion.media.MotionTrackerJniTest.xml
 

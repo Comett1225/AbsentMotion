@@ -422,6 +422,7 @@ object Am {
 
     val editorIsLight: Boolean get() = palette.TopBar.luminance() > 0.5f
     val homeIsLight: Boolean get() = palette.HomeBg.luminance() > 0.5f
+    val OnScrimAccent: Color get() = if (homeIsLight) palette.OnNavyAccent else palette.HomeAccent
 
     val TopBar: Color get() = palette.TopBar
     val PreviewBg: Color get() = palette.PreviewBg

@@ -89,7 +89,7 @@ fun OpeningOverlay(onCancel: () -> Unit) {
     var slow by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { delay(250); shown = true; delay(4750); slow = true }
     Box(
-        Modifier.fillMaxSize().background(if (shown) Color.Black.copy(alpha = 0.35f) else Color.Transparent).pointerInput(Unit) { detectTapGestures { } },
+        Modifier.fillMaxSize().background(if (shown) Color.Black.copy(alpha = if (slow) 0.6f else 0.35f) else Color.Transparent).pointerInput(Unit) { detectTapGestures { } },
         contentAlignment = Alignment.Center,
     ) {
         if (shown) Column(Modifier.size(220.dp, 150.dp), horizontalAlignment = Alignment.CenterHorizontally) {

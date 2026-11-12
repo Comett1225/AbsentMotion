@@ -135,6 +135,11 @@ internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSett
     LaunchedEffect(revision) {
         if (engine !is Engine.Getting) engine = if (!downloader.available) Engine.Unavailable else if (downloader.installed(context)) Engine.Ready else Engine.Missing
     }
+    LaunchedEffect(installPercent) {
+        val percent = installPercent
+        if (percent != null) engine = Engine.Getting(percent)
+        else if (engine is Engine.Getting) engine = if (downloader.installed(context)) Engine.Ready else Engine.Missing
+    }
     fun getDownloader() {
         if (engine is Engine.Getting || installPercent != null) return
         engine = Engine.Getting(0)

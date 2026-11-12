@@ -32,6 +32,7 @@ object DeskOpen {
     fun xflZip(uri: android.net.Uri): File? {
         val file = uri.toFile()?.takeIf { it.extension.equals("xfl", ignoreCase = true) && it.isFile } ?: return null
         val folder = file.absoluteFile.parentFile?.toPath() ?: return null
+        if (!java.nio.file.Files.isRegularFile(folder.resolve("DOMDocument.xml"))) return null
         val zip = File.createTempFile("am-xfl", ".zip")
         try {
             java.util.zip.ZipOutputStream(zip.outputStream().buffered()).use { out ->

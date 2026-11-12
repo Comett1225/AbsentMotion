@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor
 
+import app.absentmotion.ui.theme.pressShape
 import app.absentmotion.ui.tutorial.tutorialTarget
 import app.absentmotion.ui.tutorial.tutorialGuard
 import app.absentmotion.model.finiteFloat
@@ -283,7 +284,7 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
 
 @Composable
 internal fun PanelRail(state: EditorState, modifier: Modifier) {
-    val layer = state.selected
+    val layer = state.selectedId?.let { state.scene.layer(it) }
     val panels = when {
         layer == null || app.absentmotion.editor.MultiSelect.active || state.drawing != null -> emptyList()
         else -> when (layer.kind) {
@@ -527,12 +528,13 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
                 ROTATE_TAB -> deskShortcut(R.string.a11y_tab_rotate, "${DeskShift}${DeskAlt}${stringResource(R.string.desk_scroll_key)}")
                 else -> ""
             }
+            val press = remember { MutableInteractionSource() }
             Box(cell) { DeskTip(tip, Modifier.fillMaxSize()) { Box(
-                Modifier.fillMaxSize().then(if (usable) Modifier.clickable(role = androidx.compose.ui.semantics.Role.Tab) { tab = i } else Modifier.dimmed())
+                Modifier.fillMaxSize().then(if (usable) Modifier.clickable(press, null, role = androidx.compose.ui.semantics.Role.Tab) { tab = i } else Modifier.dimmed())
                     .semantics(mergeDescendants = true) { this.selected = tab == i }.padding(start = 10.px, end = 11.px, top = 5.px, bottom = 5.px),
             ) {
                 Column(
-                    Modifier.fillMaxSize().clip(PanelShape).fadeBackground(tab == i, PanelDark),
+                    Modifier.fillMaxSize().pressShape(press, PanelShape).fadeBackground(tab == i, PanelDark),
                     horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
                 ) {
                     val tint = if (tab == i) Am.Accent else Am.OnDark

@@ -381,7 +381,7 @@ def main():
         print("puppet_check: skipped (needs the host Skia build in third_party/skia/out/mac-v2-2-arm64)")
         return 0
     with tempfile.TemporaryDirectory() as tmp:
-        build = subprocess.run(["sh", str(ROOT / "tools/render_bench/build.sh"), str(ROOT / "shared/cpp"), tmp + "/bin"], capture_output=True, text=True)
+        build = subprocess.run(["sh", str(ROOT / "tools/render_bench/build.sh")], capture_output=True, text=True)
         if build.returncode != 0:
             print(build.stdout[-2000:], build.stderr[-2000:])
             return 1
@@ -389,7 +389,7 @@ def main():
         work.mkdir()
         marked.mkdir()
         arm_rests = [(-90, -90), (90, -90), (-90, 90), (0, 0), (90, 90)]
-        run(Bench(Path(tmp) / "bin/render_bench", work, picture()), Bench(Path(tmp) / "bin/render_bench", marked, marks(arm_rests)))
+        run(Bench(ROOT / "build/render_bench/current/render_bench", work, picture()), Bench(ROOT / "build/render_bench/current/render_bench", marked, marks(arm_rests)))
     print(f"puppet_check: {CHECKS[0]} checks, {len(FAILURES)} failed")
     return 1 if FAILURES else 0
 

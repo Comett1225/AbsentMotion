@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <exception>
 #include <functional>
 #include <memory>
 #include <mutex>
@@ -118,7 +119,10 @@ std::wstring Full(const std::wstring& p) {
     return s;
 }
 
-std::wstring Long(const std::wstring& p) { return p.rfind(L"\\\\?\\", 0) == 0 ? p : L"\\\\?\\" + p; }
+std::wstring Long(const std::wstring& p) {
+    if (p.rfind(L"\\\\?\\", 0) == 0) return p;
+    return p.rfind(L"\\\\", 0) == 0 ? L"\\\\?\\UNC\\" + p.substr(2) : L"\\\\?\\" + p;
+}
 
 bool Exists(const std::wstring& p) { return GetFileAttributesW(Long(p).c_str()) != INVALID_FILE_ATTRIBUTES; }
 
@@ -226,7 +230,7 @@ Payload ReadPayload(const std::wstring& self) {
     p.size = t.size;
     memcpy(p.sha, t.sha256, sizeof p.sha);
     ReadAt(h.Get(), p.base, &p.header, sizeof p.header);
-    if (memcmp(p.header.magic, kMagic, sizeof kMagic) != 0 || p.header.dataOffset > p.size) Fail(L"The installer is damaged. Download it again.");
+    if (memcmp(p.header.magic, kMagic, sizeof kMagic) != 0 || p.header.dataOffset > p.size || p.header.dataOffset < sizeof(Header)) Fail(L"The installer is damaged. Download it again.");
     std::vector<uint8_t> table((size_t)(p.header.dataOffset - sizeof(Header)));
     if (!table.empty()) ReadAt(h.Get(), p.base + sizeof(Header), table.data(), (uint32_t)table.size());
     size_t at = 0;
@@ -273,7 +277,15 @@ void Verify(const Payload& p) {
     if (memcmp(got, p.sha, sizeof got) != 0) Fail(L"The installer is damaged. Download it again.");
 }
 
+void MakeParents(const std::wstring& dir) {
+    const std::wstring up = Parent(dir);
+    if (dir.size() <= 3 || up.size() >= dir.size() || Exists(dir)) return;
+    MakeParents(up);
+    CreateDirectoryW(Long(dir).c_str(), nullptr);
+}
+
 void MakeDirs(const Payload& p, const std::wstring& dest) {
+    MakeParents(Parent(dest));
     std::set<std::wstring> dirs;
     for (const std::wstring& rel : p.paths)
         for (size_t k = rel.find(L'\\'); k != std::wstring::npos; k = rel.find(L'\\', k + 1)) dirs.insert(rel.substr(0, k));
@@ -941,9 +953,19 @@ bool MoveAside(const Options& o, Shared& s, const std::wstring& root, const std:
     }
 }
 
+void TryLaunch(const std::wstring& root) {
+    if (!Exists(Join(root, kAppName))) return;
+    try {
+        Launch(root);
+    } catch (const Error& e) {
+        Log(L"could not open the app again: " + e.message);
+    }
+}
+
 int Install(const Options& o, Shared& s, const Payload& p) {
     const std::wstring root = o.dir, staging = root + L".new", old = root + L".old";
     const bool existed = Exists(Join(root, kAppName));
+    const bool present = existed || Exists(root);
     const std::wstring headline = existed ? L"Reinstalling " + o.name : L"Installing " + o.name;
     if (existed && !AskOlder(o, s, InstalledVersion(root), p.version)) {
         WriteResult(o.result, "fail a newer version is already installed");
@@ -971,7 +993,7 @@ int Install(const Options& o, Shared& s, const Payload& p) {
         w.headline = L"Finishing up";
         w.detail = L"";
         s.Show(w);
-        if (existed && !MoveAside(o, s, root, old)) {
+        if (present && !MoveAside(o, s, root, old)) {
             DWORD e = GetLastError();
             DeleteTree(staging);
             Fail(L"AbsentMotion is still in use: " + SystemMessage(e) + InUse(root));
@@ -979,19 +1001,23 @@ int Install(const Options& o, Shared& s, const Payload& p) {
         s.Show(w);
         if (!MoveRetry(staging, root, 20000)) {
             DWORD e = GetLastError();
-            if (existed) MoveFileExW(Long(old).c_str(), Long(root).c_str(), 0);
+            if (present) MoveFileExW(Long(old).c_str(), Long(root).c_str(), 0);
             SetLastError(e);
             FailLast(L"Could not put the new version in place");
         }
         Log(L"swapped in " + std::to_wstring(GetTickCount64() - t0) + L" ms");
         WriteList(root, p);
-        if (existed) {
+        if (present) {
             std::set<std::wstring> known;
             if (!ReadList(old, known)) for (const std::wstring& rel : p.paths) known.insert(Lower(rel));
             int kept = MoveFiles(old, root, AddedFiles(old, known));
             if (kept) Log(L"kept " + std::to_wstring(kept) + L" files you added");
         }
-        Register(o, p.version, p.header.rawTotal);
+        try {
+            Register(o, p.version, p.header.rawTotal);
+        } catch (const Error& e) {
+            Log(L"could not update the Apps entry: " + e.message);
+        }
         Associate(o);
         if (!existed)
             for (const std::wstring& l : LinkPlaces(o)) MakeLink(l, root);
@@ -999,7 +1025,7 @@ int Install(const Options& o, Shared& s, const Payload& p) {
         if (o.launch) {
             w.headline = L"Opening " + o.name;
             s.Show(w);
-            Launch(root);
+            TryLaunch(root);
             ULONGLONG end = GetTickCount64() + 60000;
             while (!AppWindowVisible(root) && GetTickCount64() < end) Sleep(100);
             Log(L"app window after " + std::to_wstring(GetTickCount64() - t0) + L" ms");
@@ -1027,15 +1053,6 @@ int Install(const Options& o, Shared& s, const Payload& p) {
     }
 }
 
-void TryLaunch(const std::wstring& root) {
-    if (!Exists(Join(root, kAppName))) return;
-    try {
-        Launch(root);
-    } catch (const Error& e) {
-        Log(L"could not open the app again: " + e.message);
-    }
-}
-
 const char* WriteFailure(const Error& e) {
     if (e.code == ERROR_DISK_FULL || e.code == ERROR_HANDLE_DISK_FULL) return kSpace;
     return e.code ? kPlace : kPayload;
@@ -1059,6 +1076,8 @@ int Update(const Options& o, Shared& s) {
             Verify(p);
         } catch (const Error& e) {
             StopWith(kPayload, e.message);
+        } catch (const std::exception&) {
+            StopWith(kPayload, L"The update file is damaged");
         }
         Log(L"start update " + p.version + L" into " + root + L", files " + std::to_wstring(p.files.size()));
         w.headline = L"Updating to " + p.version;
@@ -1084,7 +1103,14 @@ int Update(const Options& o, Shared& s) {
         s.Show(w);
         if (o.waitPid) {
             Handle app(OpenProcess(SYNCHRONIZE, FALSE, o.waitPid));
-            if (app.Valid() && WaitForSingleObject(app.Get(), 60000) == WAIT_TIMEOUT) Log(L"the app did not quit by itself");
+            if (app.Valid() && WaitForSingleObject(app.Get(), 60000) == WAIT_TIMEOUT) {
+                Log(L"the app did not quit by itself");
+                if (AppWindowVisible(root)) {
+                    PostClose(Running(root));
+                    for (ULONGLONG end = GetTickCount64() + 10000; AppWindowVisible(root) && GetTickCount64() < end;) Sleep(100);
+                    if (AppWindowVisible(root)) StopWith(kNoClose, L"AbsentMotion did not close");
+                }
+            }
         }
         for (ULONGLONG end = GetTickCount64() + 3000; !Running(root).empty() && GetTickCount64() < end;) Sleep(100);
         if (!CloseAll(root)) StopWith(kNoClose, L"AbsentMotion did not close");
@@ -1095,7 +1121,10 @@ int Update(const Options& o, Shared& s) {
             Stage(o, "msi");
             const std::wstring msiLink = Join(Known(FOLDERID_Desktop), std::wstring(L"AbsentMotion.lnk")), target = LinkTarget(msiLink);
             desktop = Exists(msiLink) && (target.empty() || StartsWithFolder(Full(target), root));
-            if (!MoveRetry(root, old, 20000)) StopWith(kInUse, L"Files of AbsentMotion were still in use: " + SystemMessage(GetLastError()) + InUse(root));
+            if (!MoveRetry(root, old, 20000)) {
+                const DWORD e = GetLastError();
+                StopWith(kInUse, L"Files of AbsentMotion were still in use: " + SystemMessage(e) + InUse(root));
+            }
             moved = true;
             if (!RemoveMsi(msi, root, logDir)) {
                 if (MoveRetry(old, root, 20000)) moved = false;
@@ -1105,7 +1134,10 @@ int Update(const Options& o, Shared& s) {
         }
         Stage(o, "swap");
         if (!moved) {
-            if (!MoveRetry(root, old, 20000)) StopWith(kInUse, L"Files of AbsentMotion were still in use: " + SystemMessage(GetLastError()) + InUse(root));
+            if (!MoveRetry(root, old, 20000)) {
+                const DWORD e = GetLastError();
+                StopWith(kInUse, L"Files of AbsentMotion were still in use: " + SystemMessage(e) + InUse(root));
+            }
             moved = true;
         }
         if (!MoveRetry(staging, root, 20000)) {
@@ -1157,13 +1189,16 @@ int Update(const Options& o, Shared& s) {
             Associate(o);
         }
         ResultLine(o.result, std::string("fail ") + f.reason);
-        if (o.launch) TryLaunch(root);
         Screen fail;
         fail.look = Look::Failed;
         fail.headline = L"The update did not finish";
         fail.detail = f.detail + L"\nYour current version is still installed.";
         fail.closable = false;
         s.Show(fail);
+        if (o.launch) {
+            if (f.reason != kNoClose) WaitClosed(o.waitPid, root, 15000);
+            TryLaunch(root);
+        }
         Sleep(2500);
         s.Quit();
         return 1;
@@ -1172,7 +1207,10 @@ int Update(const Options& o, Shared& s) {
         if (moved && !Exists(root) && Exists(old)) MoveRetry(old, root, 20000);
         if (Exists(staging)) DeleteTree(staging);
         ResultLine(o.result, "fail the update was cancelled");
-        if (o.launch) TryLaunch(root);
+        if (o.launch) {
+            WaitClosed(o.waitPid, root, 15000);
+            TryLaunch(root);
+        }
         s.Quit();
         return 2;
     }
@@ -1293,6 +1331,8 @@ int Run(HINSTANCE instance) {
             s.version = L"Version " + p.version;
         } catch (const Error& e) {
             broken = e.message;
+        } catch (const std::exception&) {
+            broken = L"The installer is damaged. Download it again.";
         }
     }
     Handle lock(CreateMutexW(nullptr, FALSE, (L"Local\\AbsentMotionSetup-" + KeyName(o.name)).c_str()));

@@ -1,5 +1,7 @@
 package app.absentmotion.ui.home
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import app.absentmotion.ui.theme.pressShape
 import app.absentmotion.model.finiteDouble
 import app.absentmotion.i18n.Ltr
 import app.absentmotion.platform.Uri
@@ -373,7 +375,8 @@ private fun TopBar(title: String, icon: ImageVector, description: String, action
     val desk = app.absentmotion.platform.PlatformFeatures.desktop
     Box(Modifier.fillMaxWidth().height(48.dp)) {
         Box(Modifier.size(48.dp).deskPress(8.dp).clickable(onClick = onBack), Alignment.Center) { Icon(icon, description, Modifier.size(24.dp), tint = Am.OnDark) }
-        Text(title, Modifier.align(Alignment.Center), color = Am.OnDark, fontSize = if (desk) 18.sp else 22.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+        Text(title, Modifier.align(Alignment.Center).padding(horizontal = 92.dp), color = Am.OnDark, fontWeight = FontWeight.Bold, maxLines = 1,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center, autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(11.sp, if (desk) 18.sp else 22.sp, 0.5.sp))
         Box(Modifier.align(Alignment.CenterEnd).height(48.dp).deskPress(8.dp).clickable(onClick = onAction).padding(horizontal = 16.dp), Alignment.Center) {
             Text(action, color = Am.Accent, fontSize = if (desk) 15.sp else 18.sp, fontWeight = if (desk) FontWeight.Medium else null, maxLines = 1)
         }
@@ -413,14 +416,15 @@ private fun Track(progress: Float, lit: Pair<Float, Float>?, modifier: Modifier,
 @Composable
 private fun SlotCell(picture: ImageBitmap?, selected: Boolean, mode: MediaFillMode, onTap: () -> Unit, onScale: () -> Unit) {
     Box(
-        Modifier.size(96.dp).clip(Rounded).background(Color.Black).then(if (selected) Modifier.border(2.dp, Am.Accent, Rounded) else Modifier).handCursor().clickable(onClick = onTap),
+        Modifier.size(96.dp).clip(Rounded).background(Color.Black).then(if (selected) Modifier.border(2.dp, Am.Accent, Rounded) else Modifier).handCursor().clickable(onClickLabel = stringResource(if (selected) R.string.template_replace else R.string.template_tap_to_pick), onClick = onTap),
     ) {
         picture?.let { Image(it, null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop) }
         if (selected) Box(Modifier.align(Alignment.Center).size(40.dp).clip(CircleShape).background(Color(0x99000000)), Alignment.Center) {
             Icon(HomeIcons.Replace, stringResource(R.string.template_replace), Modifier.size(24.dp), tint = Color.White)
         }
-        Box(Modifier.align(Alignment.TopEnd).size(44.dp).clickable(onClick = onScale), Alignment.Center) {
-            Box(Modifier.size(28.dp).clip(CircleShape).background(Color(0x99000000)), Alignment.Center) {
+        val press = remember { MutableInteractionSource() }
+        Box(Modifier.align(Alignment.TopEnd).size(44.dp).clickable(press, null, onClick = onScale), Alignment.Center) {
+            Box(Modifier.size(28.dp).pressShape(press, CircleShape).background(Color(0x99000000)), Alignment.Center) {
                 Icon(when (mode) { MediaFillMode.Fill -> HomeIcons.CropFill; MediaFillMode.Fit -> HomeIcons.CropFit; MediaFillMode.Stretch -> HomeIcons.CropStretch }, stringResource(R.string.template_scale), Modifier.size(20.dp), tint = Color.White)
             }
         }

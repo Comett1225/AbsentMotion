@@ -1,17 +1,11 @@
 package app.absentmotion.export
 
+import java.io.ByteArrayOutputStream
 import java.io.OutputStream
 
 class GifWriter(private val out: OutputStream, private val width: Int, private val height: Int, loop: Boolean = true) {
-    private val indices = ByteArray(width * height)
-    private val keyToIndex = IntArray(KEYS)
-    private var errNow = IntArray((width + 2) * 3)
-    private var errNext = IntArray((width + 2) * 3)
-    private val want = IntArray(3)
-    private val count = IntArray(KEYS)
-    private val sum = Array(3) { IntArray(KEYS) }
+    private val coder by lazy { GifFrameCoder(width, height) }
     private var timeCs = 0
-    private var frames = 0
 
     init {
         out.write("GIF89a".toByteArray())
@@ -20,7 +14,34 @@ class GifWriter(private val out: OutputStream, private val width: Int, private v
         if (loop) out.write(byteArrayOf(0x21, 0xFF.toByte(), 11) + "NETSCAPE2.0".toByteArray() + byteArrayOf(3, 1, 0, 0, 0))
     }
 
-    fun frame(rgba: ByteArray, endTimeMs: Long) {
+    fun delay(endTimeMs: Long): Int {
+        val endCs = ((endTimeMs + 5) / 10).toInt()
+        val delay = (endCs - timeCs).coerceAtLeast(2)
+        timeCs += delay
+        return delay
+    }
+
+    fun frame(rgba: ByteArray, endTimeMs: Long) = coder.encode(rgba, delay(endTimeMs), out)
+
+    fun write(frame: ByteArray) = out.write(frame)
+
+    fun finish() = out.write(0x3B)
+
+    private fun short(v: Int) { out.write(v and 255); out.write(v shr 8 and 255) }
+}
+
+class GifFrameCoder(private val width: Int, private val height: Int) {
+    private val indices = ByteArray(width * height)
+    private val keyToIndex = IntArray(KEYS)
+    private var errNow = IntArray((width + 2) * 3)
+    private var errNext = IntArray((width + 2) * 3)
+    private val want = IntArray(3)
+    private val count = IntArray(KEYS)
+    private val sum = Array(3) { IntArray(KEYS) }
+
+    fun encode(rgba: ByteArray, delay: Int): ByteArray = ByteArrayOutputStream(width * height / 2 + 1024).also { encode(rgba, delay, it) }.toByteArray()
+
+    fun encode(rgba: ByteArray, delay: Int, out: OutputStream) {
         val n = width * height
         count.fill(0)
         sum.forEach { it.fill(0) }
@@ -55,21 +76,14 @@ class GifWriter(private val out: OutputStream, private val width: Int, private v
             }
             errNow.fill(0); errNow = errNext.also { errNext = errNow }
         }
-
-        val endCs = ((endTimeMs + 5) / 10).toInt()
-        val delay = (endCs - timeCs).coerceAtLeast(2)
-        timeCs += delay
         out.write(byteArrayOf(0x21, 0xF9.toByte(), 4, 0x04, (delay and 255).toByte(), (delay shr 8).toByte(), 0, 0))
-        out.write(0x2C); short(0); short(0); short(width); short(height)
+        out.write(0x2C); short(out, 0); short(out, 0); short(out, width); short(out, height)
         out.write(0x87)
         for (c in palette) { out.write(c shr 16); out.write(c shr 8); out.write(c) }
         Lzw(out).encode(indices)
-        frames++
     }
 
-    fun finish() = out.write(0x3B)
-
-    private fun short(v: Int) { out.write(v and 255); out.write(v shr 8 and 255) }
+    private fun short(out: OutputStream, v: Int) { out.write(v and 255); out.write(v shr 8 and 255) }
 
     private fun nearest(palette: IntArray, count: IntArray, sum: Array<IntArray>, key: Int): Int {
         val r: Int; val g: Int; val b: Int

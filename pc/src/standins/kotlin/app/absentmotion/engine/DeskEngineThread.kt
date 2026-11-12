@@ -469,6 +469,10 @@ class EngineThread(private val background: Int, private val context: Context? = 
         suspend fun stillInto(timeMs: Int, width: Int, height: Int, out: ByteArray): Boolean = withContext(dispatcher) {
             applyFonts(timeMs); syncVideo(document, timeMs, strict = true); interpolation?.apply(document, timeMs, engine()); engine().stillInto(timeMs.toDouble(), width, height, out)
         }
+        suspend fun frameInto(timeMs: Int, width: Int, height: Int, out: ByteArray): Int = withContext(dispatcher) {
+            applyFonts(timeMs); syncVideo(document, timeMs, strict = true); interpolation?.apply(document, timeMs, engine()); engine().exportFrame(timeMs.toDouble(), width, height, out)
+        }
+        suspend fun lastFrameInto(out: ByteArray?): Int = withContext(NonCancellable + dispatcher) { engine?.exportFlush(out) ?: 0 }
         suspend fun previewStill(timeMs: Int, width: Int, height: Int, accurateBlur: Boolean): ByteArray? = withContext(dispatcher) {
             applyFonts(timeMs); syncVideo(document, timeMs); engine().previewStill(timeMs.toDouble(), width, height, accurateBlur)
         }

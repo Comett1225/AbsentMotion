@@ -46,7 +46,7 @@ internal fun FramePanel(state: EditorState, layer: Layer, modifier: Modifier = M
             Modifier.height(113.px).clip(PanelShape).background(Am.Button).clickable { state.editSelected { it.copy(node = it.node.withChild("frame", null)) } }
                 .padding(horizontal = 34.px),
             Alignment.Center,
-        ) { Text(stringResource(R.string.group_retime_off), color = Am.OnDark, fontSize = 14.sp, maxLines = 1, softWrap = false) }
+        ) { Text(stringResource(R.string.group_retime_off), color = Am.OnDark, maxLines = 1, softWrap = false, autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(9.sp, 14.sp, 0.5.sp)) }
     }
 }
 

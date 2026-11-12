@@ -200,6 +200,11 @@ class ProjectStore(private val root: File) {
         thumbnailFile(id).delete()
         recoveryFile(id).delete()
         versions.delete(id)
+        val targets = owners.filter { it == id || !sceneFile(it).exists() }
+        if (aiDir?.list().isNullOrEmpty() && targets.all { mediaDir(it).list().isNullOrEmpty() }) {
+            targets.forEach { mediaDir(it).delete() }
+            return
+        }
         val projectFiles = dir.listFiles { f -> f.extension == "xml" }.orEmpty().toList()
         val templateFiles = File(root, "templates").listFiles { f -> f.isDirectory }.orEmpty().map { File(it, "scene.xml") }.filter { it.exists() }
         val folders = owners.map { folderUri(mediaDir(it)) }
@@ -226,7 +231,7 @@ class ProjectStore(private val root: File) {
         }
         if (unreadable) return
         fun mentioned(part: String) = damaged.any { it.contains(part) || it.contains(part.replace("&", "&amp;")) }
-        for (owner in owners.filter { it == id || !sceneFile(it).exists() }) {
+        for (owner in targets) {
             val folder = mediaDir(owner)
             folder.listFiles()?.filter { f ->
                 val uri = f.toURI().toString()

@@ -292,6 +292,7 @@ fun Timeline(state: EditorState, modifier: Modifier = Modifier) {
         }
     }
     view.wide = wide
+    view.rail = LocalRail.current
     val measurer = rememberTextMeasurer(cacheSize = if (PlatformFeatures.desktop) 128 else 64)
     val styles = remember(Am.palette) { TimelineStyles() }
     val eye = rememberVectorPainter(TimelineIcons.Eye)
@@ -622,6 +623,7 @@ private const val MOVE_EDIT = "clip-move"
 
 private class TimelineView(val state: EditorState, density: Density, private val scope: CoroutineScope) {
     var wide = false
+    var rail = false
     private val scale = density.density
     private val Dp.px get() = value * scale
     private val decay = splineBasedDecay<Float>(density)
@@ -887,7 +889,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
 
     private val covered: Boolean get() = !wide && !PlatformFeatures.desktop && state.selectedId != null
 
-    private val multiBar: Float get() = if (MultiSelect.active && !PlatformFeatures.desktop) MultiBarHeight.px else 0f
+    private val multiBar: Float get() = if (MultiSelect.active && !PlatformFeatures.desktop && !rail) MultiBarHeight.px else 0f
 
     private val panelTop: Float get() = size.height - PanelHeight.px
 

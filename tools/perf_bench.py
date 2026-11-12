@@ -6,10 +6,10 @@ import subprocess
 import sys
 import time
 from pathlib import Path
-from sdk import adb_command
+from sdk import PACKAGE, adb_command
 
 ADB = adb_command()
-PKG = "app.absentmotion"
+PKG = PACKAGE
 DEVICE_DIR = f"/sdcard/Android/data/{PKG}/files"
 WIDTH, HEIGHT, FPS, LENGTH = 1080, 1920, 30, 12000
 VIDEOS = [("bench-a.mp4", 1920, 1080, 30, "testsrc2"), ("bench-b.mp4", 1920, 1080, 30, "smptehdbars"),

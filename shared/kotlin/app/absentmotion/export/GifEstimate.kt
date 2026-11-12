@@ -9,7 +9,7 @@ import kotlin.math.roundToLong
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-internal data class GifSample(val bytes: Long, val encodeMs: List<Double>, val renderMs: List<Double> = emptyList())
+internal data class GifSample(val bytes: Long, val encodeMs: List<Double>, val renderMs: List<Double> = emptyList(), val lanes: Int = 1)
 
 internal fun gifSampleEstimate(width: Int, height: Int, frames: Int, samples: List<ByteArray>): GifSample {
     require(samples.isNotEmpty())
@@ -35,7 +35,7 @@ internal fun gifSampleEstimate(width: Int, height: Int, frames: Int, samples: Li
 internal fun gifTimeMs(frames: Int, sample: GifSample, renderMs: Long?): Long {
     fun median(values: List<Double>) = values.sorted().let { if (it.isEmpty()) 0.0 else it[it.size / 2] }
     val sampled = (DefaultSetupMs + frames * median(sample.renderMs)).roundToLong()
-    return maxOf(renderMs ?: 0L, sampled) + (frames * median(sample.encodeMs)).roundToLong()
+    return maxOf(renderMs ?: 0L, sampled) + (frames * median(sample.encodeMs) / sample.lanes.coerceAtLeast(1)).roundToLong()
 }
 
 internal fun drawSamples(frames: Int, interpolation: FrameInterpolation): List<Int> {
@@ -102,6 +102,6 @@ internal suspend fun measureGif(engine: EngineThread, scene: Scene, settings: Ex
                 renderMs += (System.nanoTime() - started) / 1e6
             }
         }
-        withContext(Dispatchers.Default) { gifSampleEstimate(width, height, frames, samples) }.copy(renderMs = renderMs)
+        withContext(Dispatchers.Default) { gifSampleEstimate(width, height, frames, samples) }.copy(renderMs = renderMs, lanes = workLanes(width.toLong() * height * 6))
     }
 }

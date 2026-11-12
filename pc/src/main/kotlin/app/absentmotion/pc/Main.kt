@@ -64,6 +64,8 @@ fun main(args: Array<String>) {
     DeskOpen.offer(files)
     DeskOpen.listenForFiles()
     DeskInstance.serve { DeskOpen.offer(it); DeskOpen.raise() }
+    Runtime.getRuntime().addShutdownHook(Thread { DeskOs.stopTools() })
+    app.absentmotion.Tier.hashCode()
     application {
         val prefs = remember { Preferences.userNodeForPackage(DesktopPlatform::class.java) }
         val placed = remember {

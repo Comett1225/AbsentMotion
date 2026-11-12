@@ -56,6 +56,22 @@ import kotlin.math.max
 internal val Int.px: Dp get() = (this / 2.8125f).dp
 internal val Float.px: Dp get() = (this / 2.8125f).dp
 
+@Composable
+internal fun PhoneFit(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    if (app.absentmotion.platform.PlatformFeatures.desktop) {
+        Box(modifier) { content() }
+        return
+    }
+    androidx.compose.foundation.layout.BoxWithConstraints(modifier) {
+        val fit = maxWidth / 1080.px
+        val density = androidx.compose.ui.platform.LocalDensity.current
+        androidx.compose.runtime.CompositionLocalProvider(
+            androidx.compose.ui.platform.LocalDensity provides if (fit >= 1f) density else androidx.compose.ui.unit.Density(density.density * fit, density.fontScale),
+            content = content,
+        )
+    }
+}
+
 internal val PanelDark get() = Am.PreviewBg
 internal val PanelCaption get() = Am.Caption
 internal val PanelGreen get() = Am.AccentGlow

@@ -40,6 +40,22 @@ class NativeFixesTest {
         assertEquals(listOf("differ true"), child("corrupt", bad.absolutePath, mapOf("AM_VIDEO_SOFTWARE" to "1")))
     }
 
+    @Test fun aSceneNestedTooDeepIsRefusedAndTheEngineCarriesOn() {
+        fun nested(depth: Int) = "<scene width=\"100\" height=\"100\" fps=\"30\" totalTime=\"999\">" + "<a>".repeat(depth) + "</a>".repeat(depth) + "</scene>"
+        val handle = DesktopNative.create()
+        try {
+            assertEquals(null, DesktopNative.setScene(handle, nested(500)))
+            assertTrue(DesktopNative.setScene(handle, nested(200_000)) != null)
+            assertEquals(null, DesktopNative.setScene(handle, nested(10)))
+        } finally {
+            DesktopNative.destroy(handle)
+        }
+    }
+
+    @Test fun smoothingAndDatamoshRunWithoutAGraphicsChip() {
+        assertEquals(listOf("gpu 0", "blend true", "flow true", "mosh 0 true true"), child("nogpu", "", mapOf("AM_SOFTWARE_RENDER" to "1")))
+    }
+
     @Test fun twoLayersOnOneVideoKeepTheirOwnDecoders() {
         val file = File("../testdata/media/test-video.mp4").canonicalFile
         val source = NativeVideoSource(file)
@@ -132,6 +148,17 @@ object NativeFixesChild {
                 val m = DesktopNative.layerMatrix(handle, 1, 0.0)!!
                 println("RESULT matrix ${m[0]} ${m[4]} ${m[2]} ${m[5]}")
                 println("RESULT outline ${DesktopNative.layerOutline(handle, 1, 0.0)}")
+            }
+            "nogpu" -> {
+                val w = 64
+                val h = 36
+                fun frame(shift: Int) = ByteArray(w * h * 4) { i -> if (i % 4 == 3) -1 else ((i / 4 % w + shift) * 3).toByte() }
+                val flow = floatArrayOf(4f, 5f, 6f, 1f, 0.15f, 4f)
+                println("RESULT gpu ${DesktopNative.gpuState()}")
+                println("RESULT blend ${DesktopNative.interpolate(handle, "v", 1, w, h, frame(0), frame(6), null, null, null, 0.5f, 1, 0f, flow)}")
+                println("RESULT flow ${DesktopNative.interpolate(handle, "v", 1, w, h, frame(0), frame(6), null, null, null, 0.5f, 2, 0.5f, flow)}")
+                val from = DesktopNative.moshStart(handle, "v", 1, longArrayOf(0, 33_000), floatArrayOf(1f, 16f, 0.05f, 0.1f, 0.3f))
+                println("RESULT mosh $from ${DesktopNative.moshFrame(handle, "v", 1, 0, w, h, frame(0))} ${DesktopNative.moshFrame(handle, "v", 1, 1, w, h, frame(6))}")
             }
             "corrupt" -> {
                 val file = File(args[1])

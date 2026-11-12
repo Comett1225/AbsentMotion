@@ -186,9 +186,9 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
                 }
             }
         }
-    }
-    if (loading) Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = .5f)).clickable(interactionSource = null, indication = null) {}, contentAlignment = Alignment.Center) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) { CircularProgressIndicator(color = Favourite); Text(stringResource(R.string.loading_font), color = Color.White, fontSize = 16.sp) }
+        if (loading) Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = .5f)).clickable(interactionSource = null, indication = null) {}, contentAlignment = Alignment.Center) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) { CircularProgressIndicator(color = Favourite); Text(stringResource(R.string.loading_font), color = Color.White, fontSize = 16.sp) }
+        }
     }
     deleting?.let { entry -> AlertDialog(onDismissRequest = { deleting = null }, title = { Text(stringResource(R.string.remove_this_imported_font)) }, text = { Text(entry.name.label) },
         confirmButton = { TextButton({ library.deleteImported(entry.name.xml); deleting = null; revision++ }) { Text(stringResource(R.string.delete_font), color = Am.Accent) } },

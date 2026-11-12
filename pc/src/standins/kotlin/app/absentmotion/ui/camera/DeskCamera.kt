@@ -89,6 +89,7 @@ class DeskCameraController(private val ffmpeg: String, private val folder: File,
     @Volatile private var generation = 0
     private var encoder: List<String> = emptyList()
     private var target: File? = null
+    private var mode: CameraMode? = null
 
     fun open() {
         scope.launch {
@@ -103,6 +104,7 @@ class DeskCameraController(private val ffmpeg: String, private val folder: File,
     fun choose(device: CameraDevice) {
         if (recording || busy) return
         video = device
+        mode = null
         scope.launch { begin(null) }
     }
 
@@ -116,7 +118,7 @@ class DeskCameraController(private val ffmpeg: String, private val folder: File,
         if (old != null) delay(350)
         if (record == null) { phase = CameraPhase.Starting; frame = null; latest = null }
         try {
-            val input = CameraInput(chosen, if (record != null) audio else null)
+            val input = CameraInput(chosen, if (record != null) audio else null, mode = mode)
             session = DeskCameraSession(DeskCameraSource.command(ffmpeg, input, record, encoder), { bytes -> if (generation == mine) show(bytes) }) { _, log ->
                 if (generation == mine && session?.stopping != true) scope.launch { fail(log, record != null) }
             }
@@ -145,6 +147,7 @@ class DeskCameraController(private val ffmpeg: String, private val folder: File,
     }
 
     private fun fail(log: String, wasRecording: Boolean) {
+        if (!wasRecording && mode == null && app.absentmotion.desk.DeskOs.mac) DeskCameraSource.macMode(log)?.let { mode = it; retry(); return }
         problem = log
         if (wasRecording) {
             recording = false

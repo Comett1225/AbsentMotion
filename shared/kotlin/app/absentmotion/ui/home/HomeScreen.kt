@@ -271,7 +271,7 @@ private fun TopBar(onMenu: () -> Unit, search: String?, page: Int, onSearch: (St
         }
         if (search == null) Text("AbsentMotion", Modifier.align(Alignment.Center), color = Am.Navy, fontSize = 22.sp, fontWeight = FontWeight.Medium)
         else HomeSearchField(search, page == 1, onSearch, Modifier.align(Alignment.Center).padding(horizontal = 56.dp).fillMaxWidth())
-        if (search == null) ChangelogButton(settings, Modifier.align(Alignment.CenterEnd).padding(end = if (page < 2) 50.dp else 0.dp))
+        if (search == null) ChangelogButton(settings, Modifier.align(Alignment.CenterEnd).padding(end = 50.dp))
         if (page < 2) SearchButton(search, onSearch, Modifier.align(Alignment.CenterEnd))
     }
 }
@@ -444,7 +444,16 @@ private fun ImportDialog(reports: List<ImportReport>, onDismiss: () -> Unit, onO
 
 @Composable
 internal fun CommunityCard(info: CommunityInfo) {
-    val picture = remember(info) { info.thumbnail?.let { runCatching { BitmapFactory.decodeByteArray(it, 0, it.size)?.asImageBitmap() }.getOrNull() } }
+    val picture = remember(info) {
+        info.thumbnail?.let { bytes ->
+            runCatching {
+                val bounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bounds)
+                val sampled = android.graphics.BitmapFactory.Options().apply { inSampleSize = app.absentmotion.media.pictureSample(maxOf(bounds.outWidth, bounds.outHeight), 1024) }
+                BitmapFactory.decodeByteArray(bytes, 0, bytes.size, sampled)?.asImageBitmap()
+            }.getOrNull()
+        }
+    }
     Column(Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         picture?.let { Image(it, null, Modifier.fillMaxWidth().aspectRatio(it.width.toFloat() / it.height).clip(RoundedCornerShape(10.dp)), contentScale = ContentScale.Fit) }
         Text(info.title, Modifier.padding(top = 4.dp), color = Am.Navy, fontSize = 17.sp, fontWeight = FontWeight.Bold)

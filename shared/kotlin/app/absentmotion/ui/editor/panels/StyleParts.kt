@@ -1,5 +1,8 @@
 package app.absentmotion.ui.editor.panels
 
+import androidx.compose.runtime.remember
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import app.absentmotion.ui.theme.pressShape
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.selection.toggleable
@@ -77,7 +80,9 @@ internal fun ThinSwitch(
     offTrack: Color = Am.Well, onTrack: Color = Am.AccentDeep, onThumb: Color = Am.AccentLit, onChange: (Boolean) -> Unit,
 ) {
     val thumbX by animateDpAsState(if (on) 19.5.dp else 3.5.dp, Motion.fast(), label = "switch thumb")
-    Box(modifier.size(47.dp, 27.dp).toggleable(value = on, enabled = enabled, role = Role.Switch, onValueChange = onChange)) {
+    val press = remember { MutableInteractionSource() }
+    Box(modifier.size(47.dp, 27.dp).toggleable(value = on, interactionSource = press, indication = null, enabled = enabled, role = Role.Switch, onValueChange = onChange)) {
+        Box(Modifier.matchParentSize().pressShape(press, CircleShape))
         Box(Modifier.offset(7.5.dp, 6.5.dp).size(28.dp, 14.dp).background(if (on) onTrack else offTrack, RoundedCornerShape(7.dp)))
         Box(Modifier.offset(thumbX, 3.5.dp).size(20.dp).shadow(2.dp, CircleShape).background(if (on) onThumb else Am.Thumb, CircleShape))
     }

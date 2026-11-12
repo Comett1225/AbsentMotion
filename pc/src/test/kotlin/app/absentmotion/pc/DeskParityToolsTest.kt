@@ -163,8 +163,20 @@ class DeskParityToolsTest {
         assertEquals(listOf("/dev/video0"), DeskCameraSource.linuxDevices(sys).video.map { it.id })
         val camera = CameraDevice("0", "Cam")
         val mic = CameraDevice("1", "Mic")
-        assertEquals(listOf("-f", "avfoundation", "-i", "0:1"), CameraInput(camera, mic, mac = true, windows = false).args())
-        assertEquals(listOf("-f", "avfoundation", "-i", "0:none"), CameraInput(camera, null, mac = true, windows = false).args())
+        assertEquals(listOf("-f", "avfoundation", "-framerate", "30", "-i", "0:1"), CameraInput(camera, mic, mac = true, windows = false).args())
+        assertEquals(listOf("-f", "avfoundation", "-framerate", "30", "-i", "0:none"), CameraInput(camera, null, mac = true, windows = false).args())
+        val modes = """
+            [avfoundation @ 0x1] Selected framerate (30.000000) is not supported by the device.
+            [avfoundation @ 0x1] Supported modes:
+            [avfoundation @ 0x1]   640x480@[1.000000 25.000000]fps
+            [avfoundation @ 0x1]   1280x720@[1.000000 25.000000]fps
+            [avfoundation @ 0x1]   3840x2160@[1.000000 25.000000]fps
+            [avfoundation @ 0x1]   1920x1080@[1.000000 60.000240]fps
+        """.trimIndent()
+        val mode = DeskCameraSource.macMode(modes)
+        assertEquals(app.absentmotion.ui.camera.CameraMode(1280, 720, "25.000000"), mode)
+        assertEquals(listOf("-f", "avfoundation", "-video_size", "1280x720", "-framerate", "25.000000", "-i", "0:none"), CameraInput(camera, null, mac = true, windows = false, mode = mode).args())
+        assertEquals(null, DeskCameraSource.macMode("Input/output error"))
         assertEquals(listOf("-f", "dshow", "-rtbufsize", "200M", "-i", "video=Cam:audio=Mic"), CameraInput(CameraDevice("Cam", "Cam"), CameraDevice("Mic", "Mic"), mac = false, windows = true).args())
         assertEquals(listOf("-f", "v4l2", "-i", "0", "-f", "pulse", "-i", "1"), CameraInput(camera, mic, mac = false, windows = false).args())
         assertEquals("1:a", CameraInput(camera, mic, mac = false, windows = false).audioMap)

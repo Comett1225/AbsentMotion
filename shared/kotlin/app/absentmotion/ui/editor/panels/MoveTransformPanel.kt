@@ -1,5 +1,7 @@
 package app.absentmotion.ui.editor.panels
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import app.absentmotion.ui.theme.pressShape
 import app.absentmotion.ui.editor.deskSp
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -105,6 +107,7 @@ private fun PositionTab(state: EditorState, layer: Layer, onFlip: (() -> Unit)?)
     }
     val others by produceState(emptyList<SnapOther>(), layer.id, state.scene.layers, state.timeMs, state.playing) {
         if (state.playing) return@produceState
+        kotlinx.coroutines.delay(120)
         value = state.scene.layers.filter { it.id != layer.id && it.kind != "audio" && it.activeAt(state.sampleMs) }.map { o ->
             val at = state.scene.place(o, state.sampleMs)
             SnapOther(at.x, at.y, state.engine.layerBounds(o.id, state.timeMs))
@@ -640,9 +643,10 @@ private fun PivotTab(state: EditorState, layer: Layer, onFlip: (() -> Unit)?) {
                         val x = box?.let { it[0] + (it[2] - it[0]) * col / 2f }
                         val y = box?.let { it[1] + (it[3] - it[1]) * row / 2f }
                         val here = x != null && y != null && abs(x - at[0]) < 0.01f && abs(y - at[1]) < 0.01f
+                        val press = remember { MutableInteractionSource() }
                         Box(
-                            Modifier.size(72.px).then(if (x != null && y != null) Modifier.clickable(role = Role.Button) { state.setPivot(x, y) } else Modifier.dimmed())
-                                .semantics { contentDescription = names[row * 3 + col]; selected = here }.padding(5.px).clip(PanelShape).background(if (here) PanelDark else Am.Field),
+                            Modifier.size(72.px).then(if (x != null && y != null) Modifier.clickable(press, null, role = Role.Button) { state.setPivot(x, y) } else Modifier.dimmed())
+                                .semantics { contentDescription = names[row * 3 + col]; selected = here }.padding(5.px).pressShape(press, PanelShape).background(if (here) PanelDark else Am.Field),
                             contentAlignment = Alignment.Center,
                         ) {
                             Box(Modifier.size(14.px).clip(androidx.compose.foundation.shape.CircleShape).background(if (here) Am.Accent else Am.OnDark))

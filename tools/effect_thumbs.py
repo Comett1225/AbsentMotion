@@ -264,6 +264,14 @@ def clean(path):
     return not any(p.search(data) for p in FORBIDDEN)
 
 
+def save_still(image, path, quality, **options):
+    for q in range(quality, quality - 6, -1):
+        image.save(path, quality=q, **options)
+        if clean(path):
+            return
+    sys.exit(f"{path.name}: its bytes keep spelling a word tools/publish_check.sh refuses")
+
+
 def save_animated(frames, path, fps=ANIM_FPS, limit=ANIM_BYTES):
     opaque = all(f.getextrema()[3][0] == 255 for f in frames)
     frames = [f.convert("RGB") if opaque else f for f in frames]
@@ -336,7 +344,7 @@ def heroes(work, batch, planned, plain):
         image = grid(images, HERO) if len(images) > 1 else images[0].resize((HERO, HERO), Image.LANCZOS)
         out = image if image.getextrema()[3][0] < 255 else image.convert("RGB")
         target = PACK / "thumb" / f"{key}.hero.avif"
-        out.save(target, quality=HERO_QUALITY)
+        save_still(out, target, HERO_QUALITY)
         total += target.stat().st_size
         print(f"{target.name:40} {target.stat().st_size // 1024} KB", flush=True)
     print(f"{len(jobs)} large pictures, {total // 1024} KB in all", flush=True)
@@ -412,7 +420,8 @@ def main():
     for out, target in options:
         image = batch.raw[out]
         left = (image.width - OPTION) // 2
-        Image.alpha_composite(Image.new("RGBA", image.size, (0, 0, 0, 255)), image).crop((left, left, left + OPTION, left + OPTION)).convert("RGB").save(target, lossless=True, method=6)
+        picture = Image.alpha_composite(Image.new("RGBA", image.size, (0, 0, 0, 255)), image).crop((left, left, left + OPTION, left + OPTION)).convert("RGB")
+        save_still(picture, target, 80, lossless=True, method=6)
         print(f"{target.name:32} {target.stat().st_size // 1024} KB", flush=True)
     for key, show, base, rendered, target in planned:
         reference, frames = batch[plain[base]], batch[rendered]
@@ -435,7 +444,7 @@ def main():
                 (SLOW / target.name).unlink(missing_ok=True)
         else:
             out = image if image.getextrema()[3][0] < 255 else image.convert("RGB")
-            out.save(target, quality=82, method=6)
+            save_still(out, target, 82, method=6)
         print(f"{key:20} {show.get('photo', show.get('layout')):12} {diff:6.1f}{note}", flush=True)
         if diff < SAME or (moving is not None and moving < SAME):
             unchanged.append(key)

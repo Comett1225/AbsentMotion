@@ -111,6 +111,34 @@ def zip_packaging(path, extract):
     return libraries, abis.pop()
 
 
+def frame_times(data):
+    at, times = 12, []
+    while at + 8 <= len(data):
+        size = int.from_bytes(data[at + 4:at + 8], "little")
+        if data[at:at + 4] == b"ANMF":
+            times.append(int.from_bytes(data[at + 20:at + 23], "little"))
+        at += 8 + size + (size & 1)
+    return times
+
+
+def asset_packaging(path, compatible):
+    with zipfile.ZipFile(path) as archive:
+        names = archive.namelist()
+        packs = [name[len("assets/langpacks/"):-len(".pack")] for name in names if name.startswith("assets/langpacks/") and name.endswith(".pack")]
+        if "assets/effects/index.json" not in names or not packs:
+            raise ValueError("the effects or the language packs are missing from the assets")
+        loose = [name for name in names if name.startswith("assets/effects/i18n/") or name.startswith(tuple(f"assets/help/{tag}/" for tag in packs))]
+        if loose:
+            raise ValueError(f"{loose[0]} is packed twice: it belongs in its language pack only")
+        thumbs = [name for name in names if name.startswith("assets/effects/thumb/") and name.endswith(".webp")]
+        if not thumbs:
+            raise ValueError("the effect pictures are missing from the assets")
+        for name in thumbs if compatible else []:
+            if any(time < 80 for time in frame_times(archive.read(name))):
+                raise ValueError(f"{name} plays faster than 12 frames a second: the Compatible build takes its moving pictures from android/src/compat/slow-assets")
+    return len(packs)
+
+
 def check(path, build_tools, unsigned, max_api, signer=None):
     badging = run(build_tools / "aapt2", "dump", "badging", path)
     package = re.search(r"^package: name='([^']+)' versionCode='(\d+)' versionName='([^']+)'", badging, re.M)
@@ -125,6 +153,7 @@ def check(path, build_tools, unsigned, max_api, signer=None):
         raise ValueError("release APK must not be debuggable or test-only")
     extract = not re.search(r":extractNativeLibs\([^\n]*=false", manifest)
     libraries, abi = zip_packaging(path, extract)
+    packs = asset_packaging(path, api < 33)
     run(build_tools / "zipalign", "-c", "-P", "16", "4", path)
     certificate = None
     if not unsigned:
@@ -140,7 +169,7 @@ def check(path, build_tools, unsigned, max_api, signer=None):
         certificate = next(iter(digests))
         if signer and certificate != signer:
             raise ValueError(f"signed with certificate {certificate[:16]}..., not the release key {signer[:16]}... the installed app accepts")
-    print(f"{path.name}: API {api}-{max_api}, {libraries} {abi} libraries, native extraction {'on' if extract else 'off'}: PASS")
+    print(f"{path.name}: API {api}-{max_api}, {libraries} {abi} libraries, native extraction {'on' if extract else 'off'}, {packs} language packs: PASS")
     return package[1], package[2], package[3], certificate
 
 

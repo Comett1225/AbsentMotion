@@ -14,9 +14,11 @@ import app.absentmotion.model.Scene
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
@@ -90,11 +92,11 @@ internal object DeskEncoders {
         }.getOrDefault(emptySet())
     }
 
-    fun hardware(name: String): Boolean = !name.startsWith("lib") && name !in setOf("aac", "opus", "flac")
+    fun hardware(name: String): Boolean = !name.startsWith("lib") && !name.endsWith("_mf") && name !in setOf("aac", "opus", "flac")
 
     fun video(codec: Codec): List<String> = when (codec) {
-        Codec.H264 -> listOf("h264_videotoolbox", "h264_nvenc", "h264_qsv", "h264_amf", "h264_mf", "h264_vaapi", "libx264")
-        Codec.Hevc -> listOf("hevc_videotoolbox", "hevc_nvenc", "hevc_qsv", "hevc_amf", "hevc_mf", "hevc_vaapi", "libx265")
+        Codec.H264 -> listOf("h264_videotoolbox", "h264_nvenc", "h264_qsv", "h264_amf", "h264_vaapi", "libx264", "h264_mf")
+        Codec.Hevc -> listOf("hevc_videotoolbox", "hevc_nvenc", "hevc_qsv", "hevc_amf", "hevc_vaapi", "libx265", "hevc_mf")
         Codec.Av1 -> listOf("av1_nvenc", "av1_qsv", "av1_amf", "av1_vaapi", "libsvtav1", "libaom-av1")
         Codec.Vp9 -> listOf("vp9_qsv", "libvpx-vp9")
         Codec.Apv -> listOf("liboapv")
@@ -201,6 +203,11 @@ internal fun copyInto(file: File, out: FileDescriptor) {
     }
 }
 
+internal suspend fun <T> beating(progress: (Float) -> Unit, at: Float, everyMs: Long = 1000, work: suspend () -> T): T = coroutineScope {
+    val beat = launch { while (true) { delay(everyMs); progress(at) } }
+    try { work() } finally { beat.cancel() }
+}
+
 internal fun exportTemp(ext: String): File =
     File(android.content.Desk.context.cacheDir, "export").also { it.mkdirs() }.resolve("${System.nanoTime()}.$ext")
 
@@ -292,15 +299,28 @@ internal suspend fun exportVideo(
                 try {
                     repeat(buffers) { free.add(ByteArray(width * height * 4)) }
                     engine.exportSession(xml, s.smoothing, s.fps) {
-                        for (k in 0 until frames) {
-                            currentCoroutineContext().ensureActive()
-                            failure.get()?.let { throw ExportError(txt(R.string.library_text_value, running.problem()), it) }
-                            val pixels = runInterruptible(Dispatchers.IO) { waitFor { free.poll(50, java.util.concurrent.TimeUnit.MILLISECONDS) } } ?: continue
-                            if (!stillInto(frameTimeMs(scene, s.fps, k), width, height, pixels)) throw ExportError(txt(R.string.export_error_draw_frame, k.toString()))
-                            runInterruptible(Dispatchers.IO) { waitFor { pixels.takeIf { queue.offer(it, 50, java.util.concurrent.TimeUnit.MILLISECONDS) } } }
-                            progress((k + 1f) / frames * 0.98f)
-                            if (k % 30 == 0) ensureStorage()
-                            pauseMs().takeIf { it > 0 }?.let { delay(it) }
+                        suspend fun buffer() = runInterruptible(Dispatchers.IO) { waitFor { free.poll(50, java.util.concurrent.TimeUnit.MILLISECONDS) } }
+                        suspend fun send(pixels: ByteArray) { runInterruptible(Dispatchers.IO) { waitFor { pixels.takeIf { queue.offer(it, 50, java.util.concurrent.TimeUnit.MILLISECONDS) } } } }
+                        try {
+                            for (k in 0 until frames) {
+                                currentCoroutineContext().ensureActive()
+                                failure.get()?.let { throw ExportError(txt(R.string.library_text_value, running.problem()), it) }
+                                val pixels = buffer() ?: continue
+                                when (frameInto(frameTimeMs(scene, s.fps, k), width, height, pixels)) {
+                                    1 -> send(pixels)
+                                    0 -> free.offer(pixels)
+                                    else -> throw ExportError(txt(R.string.export_error_draw_frame, k.toString()))
+                                }
+                                progress((k + 1f) / frames * 0.98f)
+                                if (k % 30 == 0) ensureStorage()
+                                pauseMs().takeIf { it > 0 }?.let { delay(it) }
+                            }
+                            buffer()?.let { pixels ->
+                                if (lastFrameInto(pixels) != 1) throw ExportError(txt(R.string.export_error_draw_frame, (frames - 1).toString()))
+                                send(pixels)
+                            }
+                        } finally {
+                            lastFrameInto(null)
                         }
                     }
                     runInterruptible(Dispatchers.IO) { while (failure.get() == null && !queue.offer(end, 50, java.util.concurrent.TimeUnit.MILLISECONDS)) Unit }
@@ -308,7 +328,7 @@ internal suspend fun exportVideo(
                 } finally {
                     if (writer.isAlive) { running.kill(); queue.clear(); queue.offer(end); writer.join() }
                 }
-                runInterruptible(Dispatchers.IO) { running.finish() }
+                beating(progress, 0.98f) { runInterruptible(Dispatchers.IO) { running.finish() } }
             } catch (t: Throwable) {
                 if (t is kotlinx.coroutines.CancellationException || failure.get() == null) throw t
                 false
@@ -327,7 +347,7 @@ internal suspend fun exportVideo(
             Log.i("AMExport", "${written.get()} frames written by $encoder")
             break
         }
-        withContext(Dispatchers.IO) { copyInto(result, out) }
+        beating(progress, 0.99f) { withContext(Dispatchers.IO) { copyInto(result, out) } }
     } finally {
         withContext(NonCancellable + Dispatchers.IO) {
             ffmpeg?.kill()

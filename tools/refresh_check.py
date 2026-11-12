@@ -7,11 +7,11 @@ from pathlib import Path
 
 import numpy as np
 from PIL import Image
-from sdk import adb_command
+from sdk import PACKAGE, adb_command
 
 ROOT = Path(__file__).resolve().parents[1]
 ADB = adb_command()
-PKG = "app.absentmotion"
+PKG = PACKAGE
 DEVICE_DIR = f"/sdcard/Android/data/{PKG}/files"
 SCENE = (f'<scene title="refreshcheck" width="360" height="360" fps="30" totalTime="11999" bgcolor="#ff000000">'
          f'<shape id="1" label="p" startTime="0" endTime="11999" fillType="media" mediaFillMode="stretch" s=".rect" '

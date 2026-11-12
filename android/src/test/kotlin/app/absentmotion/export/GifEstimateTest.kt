@@ -31,6 +31,7 @@ class GifEstimateTest {
         assertEquals(DefaultSetupMs + 300 * 11 + 300 * 50, gifTimeMs(300, sample, renderMs = 1_200))
         assertEquals(9_000L + 100 * 50, gifTimeMs(100, sample, renderMs = 9_000))
         assertEquals(DefaultSetupMs + 100 * 11 + 100 * 50, gifTimeMs(100, sample, renderMs = null))
+        assertEquals(DefaultSetupMs + 100 * 11 + 100 * 50 / 5, gifTimeMs(100, sample.copy(lanes = 5), renderMs = null))
     }
 
     @Test fun oneSlowSampleDoesNotDecideTheEstimate() {

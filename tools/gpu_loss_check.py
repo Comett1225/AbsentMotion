@@ -8,11 +8,11 @@ from pathlib import Path
 
 import numpy as np
 from PIL import Image
-from sdk import adb_command
+from sdk import PACKAGE, adb_command
 
 ROOT = Path(__file__).resolve().parents[1]
 ADB = adb_command()
-PKG = "app.absentmotion"
+PKG = PACKAGE
 DEVICE_DIR = f"/sdcard/Android/data/{PKG}/files"
 SCENE = ('<scene title="gpulosscheck" width="360" height="360" fps="30" totalTime="999" bgcolor="#ff000000">'
          '<shape id="1" label="r" startTime="0" endTime="999" fillType="color" mediaFillMode="fill" s=".rect">'

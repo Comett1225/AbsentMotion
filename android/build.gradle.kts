@@ -200,9 +200,15 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 }
 
 tasks.withType<Test>().configureEach {
+    jvmArgs("--enable-native-access=ALL-UNNAMED")
+    testLogging.quiet.events(org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED)
     inputs.dir("../shared/assets").withPropertyName("mainAssets").withPathSensitivity(PathSensitivity.RELATIVE)
     inputs.dir("../shared/res").withPropertyName("mainRes").withPathSensitivity(PathSensitivity.RELATIVE)
     inputs.dir("../testdata").withPropertyName("testData").withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.dir("src/compat/slow-assets").withPropertyName("slowAssets").withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.files("build.gradle.kts", "../version.properties", "src/main/res/xml/locales_config.xml", "src/foss/assets").withPropertyName("filesTheTestsRead").withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.files(fileTree("build/hostfx") { include("libamfx.*") }, fileTree("build/hostpivot") { include("libampivot.*") }, fileTree("../build/tracker-host") { include("libtracker_host.so") })
+        .withPropertyName("hostLibraries").withPathSensitivity(PathSensitivity.RELATIVE)
 }
 
 dependencies {

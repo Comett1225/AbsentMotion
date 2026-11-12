@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor
 
+import app.absentmotion.ui.editor.panels.buttonLabel
 import app.absentmotion.platform.Toast
 import app.absentmotion.editor.deselectLayer
 import androidx.compose.foundation.Canvas
@@ -372,7 +373,7 @@ private fun LabelColours(state: EditorState, onDismiss: () -> Unit) {
     ) {
         for (colour in listOf(null) + LabelColour.entries) {
             Box(
-                Modifier.width(34.dp).fillMaxHeight().clickable {
+                Modifier.width(34.dp).fillMaxHeight().buttonLabel(colour?.let { app.absentmotion.ui.editor.panels.colourText(it.start) } ?: stringResource(R.string.none)).clickable {
                     state.editSelected { it.withLabelColour(colour) }
                     onDismiss()
                 },
@@ -609,7 +610,7 @@ private fun AspectButton(w: Dp, h: Dp, selected: Boolean, onClick: () -> Unit, c
 @Composable
 private fun SettingRow(label: String, field: @Composable BoxScope.() -> Unit) {
     Row(Modifier.padding(start = 32.dp).height(37.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(label, Modifier.width(140.dp), color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
+        Text(label, Modifier.width(140.dp).padding(end = 6.dp), color = Am.OnDark, maxLines = 2, lineHeight = 16.sp, autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(10.sp, 15.sp, 0.5.sp))
         Box(Modifier.width(180.dp).fillMaxHeight(), content = field)
     }
 }

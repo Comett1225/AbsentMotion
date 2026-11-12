@@ -9,6 +9,7 @@ for arg in "$@"; do
         *) echo "usage: tools/release.sh [patch|minor|major]" >&2; exit 2 ;;
     esac
 done
+[ -f signing.properties ] || { echo "release.sh: signing.properties is missing, so the APKs would be left unsigned (docs/BUILD.md, section 6)" >&2; exit 1; }
 
 SAVED=""
 restore() {
@@ -37,6 +38,9 @@ fi
 version=$(sed -n 's/^versionName=//p' version.properties)
 echo "AbsentMotion $version (versionCode $(sed -n 's/^versionCode=//p' version.properties))"
 
+printf '\n== Quick check before the long builds\n'
+tools/check.sh --quick
+
 printf '\n== Android: release APKs (the standard build and the Compatible builds for Android 8 to 12, 64-bit and 32-bit, for ARM and for x86_64)\n'
 [ -f third_party/skia/out/android-arm64-compat/libskia.a ] || sh tools/build_skia.sh compat
 [ -f third_party/skia/out/android-arm-compat/libskia.a ] || sh tools/build_skia.sh compat32
@@ -59,6 +63,11 @@ python3 tools/api_floor.py "$out-compatible-32bit.apk" --abi armeabi-v7a --min 2
 python3 tools/api_floor.py "$out-foss-x86_64.apk" --abi x86_64
 python3 tools/api_floor.py "$out-compatible-x86_64.apk" --abi x86_64 --min 26
 python3 tools/apk_check.py "$out-foss.apk" "$out-compatible.apk" "$out-compatible-32bit.apk" "$out-foss-x86_64.apk" "$out-compatible-x86_64.apk"
+if [ -f tools/publish_forbidden.txt ]; then
+    sh tools/publish_check.sh --apk "$out-foss.apk" --apk "$out-compatible.apk" --apk "$out-compatible-32bit.apk" --apk "$out-foss-x86_64.apk" --apk "$out-compatible-x86_64.apk"
+else
+    echo "skipped: tools/publish_forbidden.txt is private and not in this checkout, so the APKs were not searched for personal data"
+fi
 
 printf '\nReleased %s:\n' "$version"
 for kind in foss compatible compatible-32bit foss-x86_64 compatible-x86_64; do printf '  %s\n' "$PWD/$out-$kind.apk"; done

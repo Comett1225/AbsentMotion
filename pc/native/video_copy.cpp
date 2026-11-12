@@ -12,8 +12,13 @@ AVBufferRef* VideoHwDevice() {
 #ifdef _WIN32
         const AVHWDeviceType type = AV_HWDEVICE_TYPE_D3D11VA;
 #else
-        for (const char* library : {"libva.so.2", "libva-drm.so.2", "libva-x11.so.2", "libX11.so.6", "libdrm.so.2"})
-            if (!dlopen(library, RTLD_NOW | RTLD_GLOBAL)) return nullptr;
+        void* va = nullptr;
+        for (const char* library : {"libva.so.2", "libva-drm.so.2", "libva-x11.so.2", "libX11.so.6", "libdrm.so.2"}) {
+            void* loaded = dlopen(library, RTLD_NOW | RTLD_GLOBAL);
+            if (!loaded) return nullptr;
+            if (!va) va = loaded;
+        }
+        if (!dlsym(va, "vaMapBuffer2")) return nullptr;
         const AVHWDeviceType type = AV_HWDEVICE_TYPE_VAAPI;
 #endif
         return av_hwdevice_ctx_create(&made, type, nullptr, nullptr, 0) < 0 ? nullptr : made;

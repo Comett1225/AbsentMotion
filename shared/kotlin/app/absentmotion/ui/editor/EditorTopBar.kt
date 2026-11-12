@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor
 
+import app.absentmotion.ui.editor.panels.buttonLabel
 import app.absentmotion.ui.tutorial.tutorialTarget
 import app.absentmotion.ui.tutorial.tutorialGuard
 import androidx.compose.foundation.background
@@ -144,7 +145,7 @@ fun EditorTopBar(state: EditorState, onExit: () -> Unit, modifier: Modifier = Mo
             else BarButton(ChromeIcons.Share, stringResource(R.string.topbar_export_share), cell.enterFade().tutorialTarget("export")) { act { state.playing = false; state.exportOpen = true } }
         } else if (!inPanel) {
             Spacer(Modifier.width(5.dp))
-            Box(cell.enterFade().clickable { act { parentMenuOpen = true } }, contentAlignment = Alignment.Center) {
+            Box(cell.enterFade().buttonLabel(stringResource(R.string.structure_link_parent)).clickable { act { parentMenuOpen = true } }, contentAlignment = Alignment.Center) {
                 LayerParentIcon()
                 Presence(parentMenuOpen) { ParentMenu(state) { parentMenuOpen = false } }
             }

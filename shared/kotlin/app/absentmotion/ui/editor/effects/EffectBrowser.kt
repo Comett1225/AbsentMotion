@@ -521,7 +521,7 @@ private fun EffectTile(catalog: EffectCatalog, effect: EffectDefinition, width: 
             Thumbnail(catalog, preset?.let(effect::thumbnail) ?: effect.thumbnail, Modifier.size((width - 7).dp).clip(RoundedCornerShape(5.dp)))
             if (favourite) Icon(PanelIcons.StarFilled, null, Modifier.align(Alignment.TopEnd).size(14.dp), tint = Am.Accent)
             if (preset == null && catalog.isNew(effect)) Text(stringResource(R.string.t_new), Modifier.align(Alignment.TopStart).padding(3.dp).clip(RoundedCornerShape(3.dp)).background(Am.Accent)
-                .padding(horizontal = 3.dp), color = Color.White, fontSize = if (PlatformFeatures.desktop) 12.sp else 7.sp, lineHeight = if (PlatformFeatures.desktop) 14.sp else 9.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                .padding(horizontal = 3.dp), color = Am.OnAccent, fontSize = if (PlatformFeatures.desktop) 12.sp else 7.sp, lineHeight = if (PlatformFeatures.desktop) 14.sp else 9.sp, fontWeight = FontWeight.Bold, maxLines = 1)
         }
         Text(preset?.name ?: effect.name, Modifier.fillMaxWidth().padding(top = 4.dp), color = Am.OnDark, fontSize = if (PlatformFeatures.desktop) 12.sp else if (width > 100) 10.sp else 8.sp,
             lineHeight = if (PlatformFeatures.desktop) 14.sp else 9.sp, textAlign = TextAlign.Center, maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)

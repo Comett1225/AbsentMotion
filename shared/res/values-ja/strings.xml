@@ -6,7 +6,7 @@
     <string name="settings_language">言語</string>
     <string name="onboarding_language_title">言語を選択</string>
     <string name="onboarding_language_others">その他の言語</string>
-    <string name="onboarding_language_later">言語は後から設定で変更できます。</string>
+    <string name="onboarding_language_later">後から設定で変更できます。</string>
     <string name="onboarding_check_title">この端末の性能を確認</string>
     <string name="onboarding_check_body">この端末で書き出せる動画の形式やサイズ、処理速度を簡単に確認します。確認は一度だけ、数秒で完了し、データはすべて端末内に留まります。</string>
     <string name="onboarding_check_run">確認する</string>

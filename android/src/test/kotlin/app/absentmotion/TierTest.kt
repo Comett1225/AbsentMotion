@@ -27,6 +27,21 @@ class TierTest {
         assertEquals(BuildConfig.COMPATIBLE, !Tier.has(Feature.FlowHigh))
     }
 
+    @Test fun aSnapshotTakenBeforeTheGraphicsStateExistedCanStillReadIt() {
+        val earlier = androidx.compose.runtime.snapshots.Snapshot.takeSnapshot()
+        try {
+            val plain = androidx.compose.runtime.mutableStateOf(false)
+            assertTrue(runCatching { earlier.enter { plain.value } }.isFailure)
+            val safe = stateReadableFromOpenSnapshots(false)
+            assertFalse(earlier.enter { safe.value })
+            safe.value = true
+            assertFalse(earlier.enter { safe.value })
+            assertTrue(safe.value)
+        } finally {
+            earlier.dispose()
+        }
+    }
+
     @Test fun onlyPhonesUnderThreeGigabytesAreWarned() {
         assertTrue(lowMemory(1_900_000_000L))
         assertFalse(lowMemory(2_800_000_000L))

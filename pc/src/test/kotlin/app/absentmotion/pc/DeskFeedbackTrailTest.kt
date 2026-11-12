@@ -148,6 +148,35 @@ class DeskFeedbackTrailTest {
         }
     }
 
+    @Test fun threeLayersShareTheMemoryAndAllKeepTheirHistory() = runBlocking {
+        fun layer(id: Int, x: Int, trails: Int) = """<shape id="$id" startTime="0" endTime="1999" fillType="media" fillVideo="$video" inTime="1000" outTime="5000" mediaFillMode="fill" s=".rect">
+<transform><location value="$x,180,0"/></transform><property name="size" type="vec2" value="300,170"/>
+<effect id="absent.videofeedback"><property name="copies" type="float" value="6"/><property name="zoom" type="float" value="0.8"/>
+<property name="fade" type="float" value="1"/><property name="trails" type="float" value="$trails"/></effect></shape>"""
+        fun three(trails: Int) = Scene.parse("""<scene title="three" width="960" height="360" fps="30" totalTime="1999" bgcolor="#ff000000">
+<media uri="$video" filename="test-video.mp4" title="test-video.mp4" type="video/mp4" size="119175" orientation="0" duration="5000000" fps="30.00" infoUpdated="1760000000000" width="1280" height="720" />
+${layer(1, 160, trails)}${layer(2, 480, trails)}${layer(3, 800, trails)}</scene>""")
+        System.setProperty("am.data", out.resolve("data-three").path)
+        EngineDebug.trailMb = 2
+        val engine = EngineThread(0xff000000.toInt(), Desk.context)
+        try {
+            engine.effects.first { it.definitions.isNotEmpty() }
+            suspend fun inOrder(trails: Int): ByteArray = engine.exportSession(three(trails).toXml()) {
+                var pixels: ByteArray? = null
+                for (frame in 0..30) pixels = checkNotNull(still(three(trails).frameStart(frame), 960, 360))
+                pixels!!
+            }
+            val trailed = inOrder(1)
+            val plain = inOrder(0)
+            fun third(pixels: ByteArray, k: Int) = ByteArray(320 * 360 * 4).also { part -> for (y in 0 until 360) System.arraycopy(pixels, (y * 960 + k * 320) * 4, part, y * 320 * 4, 320 * 4) }
+            val gaps = (0..2).map { gap(third(trailed, it), third(plain, it)) }
+            assertTrue("every layer shows earlier frames in its copies: $gaps", gaps.all { it > 1.0 })
+        } finally {
+            EngineDebug.trailMb = 0
+            engine.close()
+        }
+    }
+
     private companion object {
         const val W = 1920
         const val H = 1080

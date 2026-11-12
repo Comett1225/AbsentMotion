@@ -255,8 +255,10 @@ Placement Effective(const std::vector<Layer>& siblings, const Layer& l, double t
     Placement own = Own(l, timeMs);
     if (depth >= kMaxParentDepth) return own;
     const Layer* parent = nullptr;
-    for (const Layer& s : siblings) {
-        if (l.parent != 0 && s.id == l.parent && &s != &l) { parent = &s; break; }
+    if (l.parent != 0) {
+        for (const Layer& s : siblings) {
+            if (s.id == l.parent && &s != &l) { parent = &s; break; }
+        }
     }
     Placement p{};
     if (parent) {

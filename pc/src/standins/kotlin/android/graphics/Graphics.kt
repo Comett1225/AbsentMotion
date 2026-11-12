@@ -134,6 +134,21 @@ object BitmapFactory {
 
     @JvmStatic fun decodeStream(input: InputStream?): Bitmap? = decodeStream(input, null, null)
     @JvmStatic fun decodeFile(path: String, options: Options? = null): Bitmap? = java.io.File(path).takeIf { it.isFile }?.inputStream()?.use { decodeStream(it, null, options) }
+
+    internal fun decodeThumb(file: java.io.File, side: Int): Bitmap? {
+        val quick = runCatching {
+            ImageIO.createImageInputStream(file)?.use { stream ->
+                ImageIO.getImageReaders(stream).asSequence().firstOrNull()?.let { reader ->
+                    try {
+                        reader.input = stream
+                        val step = maxOf(reader.getWidth(0), reader.getHeight(0)) / (2 * side.coerceAtLeast(1))
+                        if (step < 2) null else reader.read(0, reader.defaultReadParam.apply { setSourceSubsampling(step, step, 0, 0) })
+                    } finally { reader.dispose() }
+                }
+            }
+        }.getOrNull()
+        return quick?.let { Bitmap(argb(it)) } ?: decodeFile(file.path)
+    }
     @JvmStatic fun decodeByteArray(data: ByteArray, offset: Int, length: Int, options: Options? = null): Bitmap? = decodeStream(data.inputStream(offset, length), null, options)
 }
 

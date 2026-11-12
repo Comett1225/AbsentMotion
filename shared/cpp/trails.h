@@ -49,10 +49,12 @@ struct Trails {
         return {std::max(1, (int)(layer.width * scale)), std::max(1, (int)(layer.height * scale))};
     }
 
+    size_t share() const { return std::min(layerBudget, budget / std::max<size_t>(layers.size(), 1)); }
+
     void fit(Layer& layer, int width, int height) const {
         layer.width = width;
         layer.height = height;
-        const double room = layerBudget / (4.0 * std::max(width, 1) * std::max(height, 1));
+        const double room = this->share() / (4.0 * std::max(width, 1) * std::max(height, 1));
         const auto cost = [&](double fit) {
             double sum = 0;
             for (const auto& [tag, want] : layer.want) sum += std::pow(std::min(1.0, want * fit), 2);
@@ -95,9 +97,17 @@ struct Trails {
         layer.frames.erase(tag);
         const SkISize to = Size(layer, tag);
         const size_t need = (size_t)4 * to.width() * to.height();
-        if (Bytes(layer) + need > layerBudget) Tidy(layer, shrink, 1);
-        if (Bytes(layer) + need > layerBudget) layer.frames.clear();
-        if (this->bytes() + need > budget) return false;
+        const size_t room = this->share();
+        if (Bytes(layer) + need > room) Tidy(layer, shrink, 1);
+        if (Bytes(layer) + need > room) layer.frames.clear();
+        if (this->bytes() + need > budget) {
+            for (auto& [other, held] : layers) {
+                if (&held == &layer || held.width < 1 || held.height < 1) continue;
+                this->fit(held, held.width, held.height);
+                Tidy(held, shrink, 1);
+            }
+            if (this->bytes() + need > budget) return false;
+        }
         auto small = Reduce(image, to.width(), to.height(), shrink);
         if (!small) return false;
         layer.frames[tag] = std::move(small);

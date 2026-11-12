@@ -95,7 +95,7 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
     val shownFor = remember { longArrayOf(layer.id) }
     LaunchedEffect(layer.id) { if (shownFor[0] != layer.id) { shownFor[0] = layer.id; state.effectIndex = -1 } }
     LaunchedEffect(instance == null) { if (instance == null && index >= 0) state.effectIndex = -1 }
-    var active by remember(layer.id, index, definition?.id) { mutableStateOf(definition?.params?.firstOrNull { it.kind != "color" && it.kind != "switch" && it.kind != "choice" && it.kind != "text" }) }
+    var active by remember(layer.id, index, definition?.id) { mutableStateOf(definition?.params?.firstOrNull { it.kind != "color" && it.kind != "switch" && it.kind != "choice" && it.kind != "text" && definition.shown(it, instance, layer.t) }) }
     LaunchedEffect(definition) { active = definition?.params?.firstOrNull { it.id == active?.id } }
     var menu by remember { mutableStateOf(false) }
     var choosing by remember { mutableStateOf(false) }
@@ -244,10 +244,10 @@ private fun EffectHeader(state: EditorState, index: Int, effect: XmlNode, defini
     var presets by remember { mutableStateOf(false) }
     Row(Modifier.fillMaxWidth().height(37.dp).background(Am.CardHeader).deleteWhenHovered { state.editSelected { it.removeEffect(index) }; state.effectIndex = -1 }.clickable { state.effectIndex = -1 }.padding(start = 3.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
         Icon(EffectIcons.Expanded, null, Modifier.padding(start = 8.dp).size(18.dp).alpha(0.9f), tint = Am.OnDark)
-        Text(definition?.name ?: effect["id"]?.substringAfterLast('.') ?: "", Modifier.weight(1f).padding(start = 6.dp, end = 4.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
+        Text(definition?.name ?: effect["id"]?.substringAfterLast('.') ?: "", Modifier.weight(1f).padding(start = 6.dp, end = 4.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
         if (definition != null && definition.presets.isNotEmpty()) Box {
-            Text(stringResource(R.string.presets), Modifier.clip(RowShape).background(Color(0x33000000)).clickable { presets = true }.padding(horizontal = 9.dp, vertical = 5.dp),
-                color = Am.OnDark, fontSize = 13.sp, maxLines = 1)
+            Text(stringResource(R.string.presets), Modifier.widthIn(max = 104.dp).clip(RowShape).background(Color(0x33000000)).clickable { presets = true }.padding(horizontal = 9.dp, vertical = 5.dp),
+                color = Am.OnDark, maxLines = 1, autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(9.sp, 13.sp, 0.5.sp))
             Presence(presets) {
                 MenuPopup(DropOrRise, { presets = false }) {
                     val catalog by state.engine.effects.collectAsState()

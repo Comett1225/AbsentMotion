@@ -39,6 +39,7 @@ step "install dependencies"
 case "$FAMILY" in
     apt)
         apt-get update -qq >/dev/null
+        if apt-cache show libasound2t64 >/dev/null 2>&1; then DEPS="$(printf '%s' "$DEPS" | sed 's/libasound2/libasound2t64/')"; fi
         DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends $DEPS xvfb fonts-dejavu-core >/dev/null
         ;;
     dnf) dnf install -y -q $DEPS tar gzip xorg-x11-server-Xvfb dejavu-sans-fonts >/dev/null ;;

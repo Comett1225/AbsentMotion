@@ -124,7 +124,7 @@ object ContentResolver {
         val side = maxOf(size.width, size.height)
         val video = Desk.mime(f.name)?.startsWith("video/") == true
         val img = if (video) app.absentmotion.desk.DeskMedia.frame(f, 0, side)
-            else android.graphics.BitmapFactory.decodeFile(f.path, android.graphics.BitmapFactory.Options().apply { inSampleSize = 1 })?.let { android.graphics.Bitmap.createScaledBitmap(it, side, (side * it.height / it.width.coerceAtLeast(1)).coerceAtLeast(1), true).image }
+            else android.graphics.BitmapFactory.decodeThumb(f, side)?.let { android.graphics.Bitmap.createScaledBitmap(it, side, (side * it.height / it.width.coerceAtLeast(1)).coerceAtLeast(1), true).image }
                 ?.let { upright(it, androidx.exifinterface.media.ExifInterface(f).getAttributeInt(androidx.exifinterface.media.ExifInterface.TAG_ORIENTATION, 1)) }
         return android.graphics.Bitmap((img ?: throw java.io.IOException("No thumbnail")).let { src -> java.awt.image.BufferedImage(src.width, src.height, java.awt.image.BufferedImage.TYPE_INT_ARGB).also { it.createGraphics().apply { drawImage(src, 0, 0, null); dispose() } } })
     }

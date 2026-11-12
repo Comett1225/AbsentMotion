@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor.panels
 
+import androidx.compose.foundation.selection.toggleable
 import app.absentmotion.ui.editor.deskSp
 import app.absentmotion.ui.editor.deskVerticalScroll
 import app.absentmotion.model.finiteFloat
@@ -315,7 +316,7 @@ private fun ToggleRow(edit: ShapeEdit) {
     Row(Modifier.fillMaxWidth().height(104.px), verticalAlignment = Alignment.CenterVertically) {
         Spacer(Modifier.width(23.px))
         Text(edit.label, Modifier.weight(1f), color = Am.OnDark, fontSize = 14.5.sp, maxLines = 1)
-        Canvas(Modifier.size(132.px, 68.px).clickable { edit.flip() }) {
+        Canvas(Modifier.size(132.px, 68.px).clip(androidx.compose.foundation.shape.CircleShape).toggleable(value = edit.isOn, role = androidx.compose.ui.semantics.Role.Switch) { edit.flip() }) {
             val u = 1.px.toPx()
             val on = edit.isOn
             val centreY = size.height / 2f
