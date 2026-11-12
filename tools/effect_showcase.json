@@ -201,7 +201,7 @@
     "contourgradient": {"photo": "colour", "layout": "move", "params": {"blur": 50}},
     "textprogress": {"layout": "text", "text": "Text Progress", "params": {"progress": [0, 1, 1], "appearance": 2, "softness": 4}, "animate": 20},
     "texttransform": {"layout": "text", "text": "Text Transform", "params": {"shape": 5, "end": 0.35, "offset": [-0.35, 1], "position": [0, -36], "scale": 1.25, "tint": "#ffffc23d"}, "animate": 20},
-    "textrandomizer": {"layout": "text", "text": "Random Text", "params": {"progress": [0, 1, 1], "charset": 1}, "animate": 20},
+    "textrandomizer": {"layout": "text", "text": "Random Text", "params": {"progress": [0, 1, 1], "charset": 1, "amount": 1, "speed": 12}, "animate": 20},
     "fontweight": {"layout": "text", "text": "Font Weight", "font": "googlefonts?name=Raleway&amp;weight=400", "params": {"weight": [100, 900, 100]}, "animate": 24},
     "textshake": {"layout": "text", "text": "Text Shake", "params": {"amount": 6}, "animate": 20, "presets": {"uneasy": {"text": "Uneasy, so uneasy", "params": {"amount": 5, "letters": 0.3}}}},
     "textblips": {"layout": "text", "text": "Text Blips", "params": {"speed": 12}, "animate": 20},

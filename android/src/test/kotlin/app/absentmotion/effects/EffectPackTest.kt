@@ -149,8 +149,12 @@ class EffectPackTest {
 
     @Test fun thumbnailsStaySmallAndMovingEffectsAnimate() {
         val thumbs = File(pack, "thumb").listFiles()!!.filter { it.extension == "webp" }
-        for (thumb in thumbs) assertTrue("${thumb.name} is ${thumb.length()} bytes", thumb.length() <= 150_000)
-        val animated = thumbs.filter { String(it.readBytes().copyOf(64), Charsets.ISO_8859_1).contains("ANIM") }.map { it.nameWithoutExtension }.toSet()
+        for (thumb in thumbs) assertTrue("${thumb.name} is ${thumb.length()} bytes", thumb.length() <= 400_000)
+        fun moving(file: File) = String(file.readBytes().copyOf(64), Charsets.ISO_8859_1).contains("ANIM")
+        val animated = thumbs.filter(::moving).map { it.nameWithoutExtension }.toSet()
+        val slow = File("src/compat/slow-assets/effects/thumb")
+        assertEquals("every moving picture has a 12 fps copy for the Compatible builds", animated, slow.listFiles()!!.map { it.nameWithoutExtension }.toSet())
+        for (copy in slow.listFiles()!!) assertTrue("${copy.name} is ${copy.length()} bytes", moving(copy) && copy.length() <= 150_000)
         val wanted = catalog.listed("move").map { it.key } + catalog.listed("3d").map { it.key } + catalog.listed("text").map { it.key } +
             catalog.listed("beat").map { it.key } + listOf("vhs", "flicker", "blink", "glitch", "static", "particles")
         assertEquals("still pictures", emptyList<String>(), wanted.filter { it !in animated })

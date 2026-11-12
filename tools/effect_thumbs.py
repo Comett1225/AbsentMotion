@@ -16,6 +16,7 @@ from sdk import PACKAGE, adb_command
 
 ROOT = Path(__file__).resolve().parents[1]
 PACK = ROOT / "shared/assets/effects"
+SLOW = ROOT / "android/src/compat/slow-assets/effects/thumb"
 SHOWCASE = json.loads((ROOT / "tools/effect_showcase.json").read_text())
 ADB = adb_command()
 PKG = PACKAGE
@@ -25,7 +26,7 @@ OUT_DIR = f"/sdcard/Android/data/{PKG}/files"
 RENDER, THUMB, SAME = 384, 192, 2.0
 HERO, HERO_QUALITY = 720, 55
 OPTION = 128
-ANIM_FPS, ANIM_BYTES, PRESET_FRAMES = 12, 150_000, 30
+BASE_FPS, ANIM_FPS, ANIM_BYTES, SLOW_BYTES, PRESET_FRAMES = 12, 30, 400_000, 150_000, 30
 FREE = {"cc0", "pd"}
 TYPES = {"point": "vec2", "color": "color", "switch": "bool", "text": "string"}
 UA = {"User-Agent": "AbsentMotion-effect-thumbs/1.0"}
@@ -188,7 +189,7 @@ def scene(show, effect, preset=None):
     fx = ""
     if effect:
         params = {p["id"]: p["default"] for p in effect["params"]}
-        chosen = {**preset_params(preset, show["animate"] / ANIM_FPS), **show.get("params", {})} if preset else show.get("params", {})
+        chosen = {**preset_params(preset, show["animate"] / BASE_FPS), **show.get("params", {})} if preset else show.get("params", {})
         unknown = set(chosen) - set(params)
         if unknown:
             sys.exit(f"{effect['id']}: no such parameter {', '.join(sorted(unknown))}")
@@ -196,7 +197,7 @@ def scene(show, effect, preset=None):
         pins = "".join(prop({"id": f"rest{k}", "type": "point"}, rest) + prop({"id": f"pin{k}", "type": "point"}, at)
                        for k, (rest, at) in enumerate(show.get("pins", []), 1))
         fx = f'<effect id="absent.{effect["id"]}" hidden="false">' + "".join(prop(p, params[p["id"]]) for p in effect["params"]) + pins + "</effect>"
-    fps, total = (ANIM_FPS, round(show["animate"] * 1000 / ANIM_FPS)) if "animate" in show else (30, 1000)
+    fps, total = (ANIM_FPS, round(show["animate"] * 1000 / BASE_FPS)) if "animate" in show else (30, 1000)
     layers = [layer(1, name, end=total - 1) for name in backdrops(show)]
     if "path" in show:
         layers.append(path_layer(show, total - 1))
@@ -250,15 +251,34 @@ class Batch:
         return [self.images[n] for n in names]
 
 
-def save_animated(frames, path):
+def span(count):
+    return round(count * ANIM_FPS / BASE_FPS)
+
+
+WORDS = ROOT / "tools/publish_forbidden.txt"
+FORBIDDEN = [re.compile(w.strip().encode(), re.I) for w in WORDS.read_text(encoding="utf-8").splitlines() if w.strip()] if WORDS.exists() else []
+
+
+def clean(path):
+    data = path.read_bytes()
+    return not any(p.search(data) for p in FORBIDDEN)
+
+
+def save_animated(frames, path, fps=ANIM_FPS, limit=ANIM_BYTES):
     opaque = all(f.getextrema()[3][0] == 255 for f in frames)
     frames = [f.convert("RGB") if opaque else f for f in frames]
-    for quality in range(80, 20, -10):
-        frames[0].save(path, save_all=True, append_images=frames[1:], duration=round(1000 / ANIM_FPS), loop=0,
+    for quality in [q - step for q in range(80, 20, -10) for step in (0, 2, 4)]:
+        frames[0].save(path, save_all=True, append_images=frames[1:], duration=round(1000 / fps), loop=0,
                        quality=quality, method=6, minimize_size=True)
-        if path.stat().st_size <= ANIM_BYTES:
+        if path.stat().st_size <= limit and clean(path):
             return quality
-    sys.exit(f"{path.name} stays above {ANIM_BYTES} bytes")
+    sys.exit(f"{path.name} stays above {limit} bytes")
+
+
+def save_slow(frames, path):
+    count = round(len(frames) * BASE_FPS / ANIM_FPS)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    return save_animated([frames[min(len(frames) - 1, round(i * ANIM_FPS / BASE_FPS))] for i in range(count)], path, BASE_FPS, SLOW_BYTES)
 
 
 def grid(images, size=THUMB):
@@ -297,7 +317,7 @@ def sheet(path, thumbs):
 def heroes(work, batch, planned, plain):
     big, jobs = Batch(work), []
     for key, show, base, rendered, target in planned:
-        frames = list(range(show["animate"])) if show.get("animate") else show.get("frames", [show.get("frame", 0)])
+        frames = list(range(span(show["animate"]))) if show.get("animate") else show.get("frames", [show.get("frame", 0)])
         if show.get("animate"):
             small, reference = batch[rendered], batch[plain[base]]
             changes = [change(f, r) for f, r in zip(small, reference)]
@@ -357,7 +377,7 @@ def main():
                 push(opts.work / f"{name}.png", f"{name}.png")
                 pushed.add(name)
         animated = show.get("animate", 0)
-        frames = list(range(animated)) if animated else show.get("frames", [show.get("frame", 0)])
+        frames = list(range(span(animated))) if animated else show.get("frames", [show.get("frame", 0)])
         base = (show.get("photo"), show.get("text"), show.get("under"), show.get("split"), tuple(frames), show.get("layout"),
                 json.dumps(show.get("keys")), animated, json.dumps(show.get("path")), json.dumps(show.get("half")), show.get("shape"))
         if base not in plain:
@@ -379,7 +399,7 @@ def main():
             sample.update(custom if isinstance(custom, dict) else {"text": custom})
             sample["animate"] = PRESET_FRAMES
             need(sample)
-            frames = list(range(PRESET_FRAMES))
+            frames = list(range(span(PRESET_FRAMES)))
             base = ("preset", json.dumps(sample, sort_keys=True))
             if base not in plain:
                 plain[base] = batch.add(f"plain{len(plain)}", scene(sample, None), frames)
@@ -408,6 +428,11 @@ def main():
         if show.get("animate"):
             quality = save_animated(frames, target)
             note += f"   animated q{quality} {target.stat().st_size // 1024} KB"
+            if getattr(Image.open(target), "n_frames", 1) > 1:
+                slow = save_slow(frames, SLOW / target.name)
+                note += f", compatible q{slow} {(SLOW / target.name).stat().st_size // 1024} KB"
+            else:
+                (SLOW / target.name).unlink(missing_ok=True)
         else:
             out = image if image.getextrema()[3][0] < 255 else image.convert("RGB")
             out.save(target, quality=82, method=6)
@@ -418,6 +443,9 @@ def main():
     if not opts.keys and not opts.only_options:
         for stale in (PACK / "thumb").iterdir():
             if not stale.name.endswith(".hero.avif") and stale.name not in {entry[4].name for entry in planned} | {target.name for _, target in options}:
+                stale.unlink()
+        for stale in SLOW.iterdir():
+            if stale.name not in {entry[4].name for entry in planned if entry[1].get("animate")}:
                 stale.unlink()
     if opts.sheet:
         sheet(opts.sheet, thumbs)

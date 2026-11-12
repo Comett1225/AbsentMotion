@@ -140,6 +140,11 @@ abstract class PackLanguages : DefaultTask() {
     @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val source: DirectoryProperty
 
+    @get:Optional
+    @get:InputDirectory
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val slow: DirectoryProperty
+
     @get:OutputDirectory
     abstract val output: DirectoryProperty
 
@@ -148,12 +153,14 @@ abstract class PackLanguages : DefaultTask() {
         val from = source.get().asFile
         val to = output.get().asFile
         to.deleteRecursively()
+        val lighter = slow.orNull?.asFile
         val languages = from.resolve("help").listFiles().orEmpty().filter { it.isDirectory && it.name !in setOf("assets", "effects") }.map { it.name }.sorted()
         val packed = languages.map { "help/$it/" } + "effects/i18n/"
         from.walkTopDown().filter { it.isFile && !it.name.startsWith(".") }.forEach { file ->
             val path = file.relativeTo(from).invariantSeparatorsPath
             if (packed.none(path::startsWith)) file.copyTo(to.resolve(path))
         }
+        lighter?.walkTopDown()?.filter { it.isFile && !it.name.startsWith(".") }?.forEach { it.copyTo(to.resolve(it.relativeTo(lighter).invariantSeparatorsPath), overwrite = true) }
         for (language in languages) {
             val files = (from.resolve("help/$language").walkTopDown() + from.resolve("effects/i18n/$language.json"))
                 .filter { it.isFile && !it.name.startsWith(".") }.map { it.relativeTo(from).invariantSeparatorsPath to it.readBytes() }.sortedBy { it.first }.toList()
@@ -175,9 +182,16 @@ val packLanguages = tasks.register<PackLanguages>("packLanguages") {
     output.set(layout.buildDirectory.dir("generated/amAssets"))
 }
 
+val packLanguagesCompat = tasks.register<PackLanguages>("packLanguagesCompat") {
+    source.set(rootProject.layout.projectDirectory.dir("shared/assets"))
+    slow.set(layout.projectDirectory.dir("src/compat/slow-assets"))
+    output.set(layout.buildDirectory.dir("generated/amAssetsCompat"))
+}
+
 androidComponents {
     onVariants { variant ->
-        variant.sources.assets?.addGeneratedSourceDirectory(packLanguages, PackLanguages::output)
+        val pack = if (variant.flavorName?.startsWith("compat") == true) packLanguagesCompat else packLanguages
+        variant.sources.assets?.addGeneratedSourceDirectory(pack, PackLanguages::output)
     }
 }
 
