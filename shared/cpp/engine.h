@@ -87,7 +87,8 @@ public:
     virtual int moshStart(const std::string& uri, int64_t layerId, const std::vector<int64_t>& pts, const MoshParams& params) = 0;
     virtual bool moshFrame(const std::string& uri, int64_t layerId, int step, AHardwareBuffer* buffer, int colorStandard, int colorRange,
                            const FrameCrop& crop) = 0;
-    virtual std::vector<int64_t> videoTrail(const std::string& uri, int64_t layerId, int64_t shown, const std::vector<int64_t>& tags) = 0;
+    virtual std::vector<int64_t> videoTrail(const std::string& uri, int64_t layerId, int64_t shown, const std::vector<int64_t>& tags, float step) = 0;
+    virtual void setTrailBudget(int layerMb) = 0;
     virtual bool videoTrailFrame(const std::string& uri, int64_t layerId, int64_t tag, AHardwareBuffer* buffer, int colorStandard, int colorRange,
                                  const FrameCrop& crop) = 0;
 

@@ -543,7 +543,7 @@ bool ParseLayer(const XmlNode& node, int fps, Layer* out) {
     l.fillType = StrAttr(*n, "fillType");
     l.mediaUri = StrAttr(*n, "fillImage");
     if (l.mediaUri.empty()) l.mediaUri = StrAttr(*n, "fillVideo");
-    if (l.kind == "model") l.mediaUri = StrAttr(*n, "src");
+    if (l.kind == "model") l.mediaUri = (StrAttr(*n, "pose") == "skin" ? "skin:" : "") + StrAttr(*n, "src");
     l.video = l.fillType == "media" && StrAttr(*n, "fillImage").empty() && !l.mediaUri.empty();
     l.mediaFillMode = StrAttr(*n, "mediaFillMode");
     l.startTime = IntAttr(*n, "startTime", 0);

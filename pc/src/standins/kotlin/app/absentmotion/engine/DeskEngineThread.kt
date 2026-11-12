@@ -22,6 +22,7 @@ import app.absentmotion.media.Mesh
 import app.absentmotion.model.Scene
 import app.absentmotion.export.Smoothing
 import app.absentmotion.model.VideoTiming
+import app.absentmotion.model.feedbackStep
 import app.absentmotion.model.feedbackTrail
 import app.absentmotion.model.fontNames
 import app.absentmotion.model.moshPlan
@@ -60,6 +61,7 @@ object EngineDebug {
     @Volatile var failStart: String? = null
     @Volatile var forceGl = false
     @Volatile var failCheck: String? = null
+    @Volatile var trailMb = 0
 }
 
 class EngineThread(private val background: Int, private val context: Context? = null, private val preferOpenGl: () -> Boolean = { false }) {
@@ -222,7 +224,7 @@ class EngineThread(private val background: Int, private val context: Context? = 
             (videos.keys - clips).forEach { uri -> videos.remove(uri)?.close(); mosh?.drop(uri); native.dropVideo(uri) }
         }
         for (uri in models) {
-            val source = file(uri) ?: continue
+            val source = file(app.absentmotion.media.modelSource(uri)) ?: continue
             val version = "${source.length()}:${source.lastModified()}"
             if (loadedModels[uri]?.first == version) continue
             val resolver = context?.contentResolver ?: continue
@@ -349,12 +351,13 @@ class EngineThread(private val background: Int, private val context: Context? = 
         val uri = layer.node["fillVideo"] ?: return true
         val times = layer.feedbackTrail(localMs, track.scene)
         if (times == null) {
-            if (trailed.remove(uri to layer.id)) engine().videoTrail(uri, layer.id, 0, LongArray(0))
+            if (trailed.remove(uri to layer.id)) engine().videoTrail(uri, layer.id, 0, LongArray(0), 1f)
             return true
         }
         trailed += uri to layer.id
+        EngineDebug.trailMb.takeIf { it > 0 }?.let { engine().trailBudget(it, it * 2) }
         val timing = VideoTiming(layer)
-        val missing = engine().videoTrail(uri, layer.id, at, LongArray(times.size) { layer.videoTimeUs(times[it], track.scene, timing).coerceAtLeast(0) })
+        val missing = engine().videoTrail(uri, layer.id, at, LongArray(times.size) { layer.videoTimeUs(times[it], track.scene, timing).coerceAtLeast(0) }, layer.feedbackStep(localMs, track.scene))
         if (missing.isEmpty() || (!exact && playing) || layer.moshPlan(localMs, track.scene) != null) return true
         fun show(us: Long): Boolean = when (val source = videos[uri]) {
             is NativeVideoSource -> engine().showVideoLayer(uri, layer.id, source, us, true, if (exact) 15000 else 500) == 1

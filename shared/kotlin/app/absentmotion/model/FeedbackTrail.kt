@@ -1,5 +1,6 @@
 package app.absentmotion.model
 
+import kotlin.math.abs
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
@@ -23,3 +24,14 @@ fun Layer.feedbackTrail(timeMs: Double, scene: Scene): List<Int>? {
     }
     return times.takeIf { it.isNotEmpty() }
 }
+
+fun Layer.feedbackStep(timeMs: Double, scene: Scene): Float {
+    val effect = effects.firstOrNull { it["id"] == "absent.videofeedback" && it["hidden"] != "true" } ?: return 1f
+    val t = ((steppedMs(timeMs) - startTime) / (endTime - startTime).coerceAtLeast(1)).toFloat()
+    fun value(name: String, fallback: Float) = effect.effectProperty(name)?.valueAt(t)?.finiteFloat() ?: fallback
+    val own = if (value("useLayerTransform", 1f) >= 0.5f) at(timeMs.toInt(), scene.fps).scale.maxOf { abs(it) } else 1f
+    return value("zoom", 0.85f).coerceIn(0.1f, 1.5f) * own
+}
+
+fun trailBudgetMb(totalMb: Long, lowRam: Boolean, memoryClassMb: Int, compatible: Boolean): Int =
+    if (lowRam || compatible || memoryClassMb < 256 || totalMb < 7000) 24 else if (totalMb < 11000) 48 else 64

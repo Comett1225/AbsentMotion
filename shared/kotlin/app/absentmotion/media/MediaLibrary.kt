@@ -71,7 +71,7 @@ class MediaLibrary(context: Context, private val engine: EngineThread) {
         for (uri in scene.node.imageUris()) engine.publishSource(uri, pictureIdentity(loaded[uri]?.second, loaded[uri]?.third?.first, engine.instance))
         val budget = ModelDetail.budget.value
         for (uri in scene.node.modelUris()) {
-            val version = withContext(Dispatchers.IO) { fileVersion(resolver, Uri.parse(uri)) }
+            val version = withContext(Dispatchers.IO) { fileVersion(resolver, Uri.parse(modelSource(uri))) }
             if (models[uri]?.let { it.first == version && it.second == generation to budget } == true) continue
             val (mesh, textures) = withContext(Dispatchers.IO) { loadModel(resolver, uri, limit, budget) } ?: continue
             withContext(NonCancellable) {
@@ -151,8 +151,8 @@ internal fun modelFiles(resolver: ContentResolver, uri: String): Pair<ByteArray,
 }
 
 internal fun loadModel(resolver: ContentResolver, uri: String, limit: Int, budget: Int = ModelDetail.budget.value): Pair<Mesh, List<Bitmap?>>? = try {
-    val (bytes, open) = modelFiles(resolver, uri)
-    val mesh = decimated(parseModel(uri.substringAfterLast('/'), bytes, open), budget)
+    val (bytes, open) = modelFiles(resolver, modelSource(uri))
+    val mesh = decimated(parseModel(uri.substringAfterLast('/'), bytes, open, modelSkinned(uri)), budget)
     Log.i("AMMedia", "model $uri ${mesh.triangleCount} triangles ${mesh.textures.size} pictures")
     mesh to mesh.textures.map { decodeBytes(it, limit) }
 } catch (e: Exception) {

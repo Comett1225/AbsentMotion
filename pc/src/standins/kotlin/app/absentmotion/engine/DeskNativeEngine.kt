@@ -41,8 +41,9 @@ class NativeEngine(backend: Backend = Backend.GANESH) : AutoCloseable {
     fun moshStart(uri: String, layer: Long, stamps: LongArray, params: FloatArray) = DesktopNative.moshStart(handle, uri, layer, stamps, params)
     fun moshFrame(uri: String, layer: Long, step: Int, width: Int, height: Int, rgba: ByteArray) = DesktopNative.moshFrame(handle, uri, layer, step, width, height, rgba)
 
-    fun videoTrail(uri: String, layer: Long, shown: Long, tags: LongArray): LongArray = DesktopNative.videoTrail(handle, uri, layer, shown, tags) ?: LongArray(0)
+    fun videoTrail(uri: String, layer: Long, shown: Long, tags: LongArray, step: Float): LongArray = DesktopNative.videoTrail(handle, uri, layer, shown, tags, step) ?: LongArray(0)
     fun videoTrailKeep(uri: String, layer: Long, tag: Long) = DesktopNative.videoTrailKeep(handle, uri, layer, tag)
+    fun trailBudget(layerMb: Int, totalMb: Int) = DesktopNative.trailBudget(handle, layerMb, totalMb)
 
     fun showVideo(uri: String, source: app.absentmotion.pc.engine.NativeVideoSource, timeUs: Long, exact: Boolean): Int = source.show(handle, uri, timeUs, exact)
 

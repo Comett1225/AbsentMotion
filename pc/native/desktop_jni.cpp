@@ -81,7 +81,7 @@ struct Desktop {
         fx.behind = [this](const am::Layer& l) { return runtime.behind(l); };
         fx.wraps = [this](const am::Layer& l) { return runtime.wraps(l); };
         fx.steady = [this](const am::Layer& l, float a, float b) { return runtime.steady(l, a, b); };
-        fx.past = [this](const std::string& uri, int64_t layer, int copy) { return trails.at(uri, layer, copy); };
+        fx.past = [this](const std::string& uri, int64_t layer, int copy, float gain) { return trails.at(uri, layer, copy, gain); };
         fx.draw = [this](SkCanvas* c, const am::Scene& s, const am::Layer& l, double t, const SkRect& r, const SkMatrix& m, const std::function<void(SkCanvas*)>& src, const std::function<void(SkCanvas*)>& below) {
             return runtime.draw(c, s, l, t, r, m, src, below, [this](int w, int h, const std::function<void(SkCanvas*)>& paint, std::vector<uint8_t>* rgba) {
                 return offscreen(w, h, false, paint, rgba);
@@ -98,7 +98,7 @@ struct Desktop {
             auto s = surface(SkImageInfo::Make(width, height, kRGBA_8888_SkColorType, kPremul_SkAlphaType, SkColorSpace::MakeSRGB()));
             if (!s) return nullptr;
             s->getCanvas()->clear(SK_ColorTRANSPARENT);
-            s->getCanvas()->drawImageRect(image, SkRect::MakeIWH(width, height), SkSamplingOptions(SkFilterMode::kLinear));
+            s->getCanvas()->drawImageRect(image, SkRect::MakeIWH(width, height), SkSamplingOptions(SkCubicResampler::CatmullRom()));
             return s->makeImageSnapshot();
         };
     }
@@ -302,13 +302,13 @@ JNIEXPORT jboolean JNICALL JNI(interpolate)(JNIEnv* e, jobject, jlong h, jstring
     d->layerPictures[{str(e, uri), layer}] = std::move(image);
     return true;
 }
-JNIEXPORT jlongArray JNICALL JNI(videoTrail)(JNIEnv* e, jobject, jlong h, jstring uri, jlong layer, jlong shown, jlongArray tags) {
+JNIEXPORT jlongArray JNICALL JNI(videoTrail)(JNIEnv* e, jobject, jlong h, jstring uri, jlong layer, jlong shown, jlongArray tags, jfloat step) {
     auto* d = ptr(h);
     const auto key = std::make_pair(str(e, uri), (int64_t)layer);
     std::vector<int64_t> wanted((size_t)e->GetArrayLength(tags));
     e->GetLongArrayRegion(tags, 0, (jsize)wanted.size(), reinterpret_cast<jlong*>(wanted.data()));
     const auto found = d->layerPictures.find(key);
-    const std::vector<int64_t> missing = d->trails.plan(key, shown, wanted, found == d->layerPictures.end() ? nullptr : found->second, d->shrink());
+    const std::vector<int64_t> missing = d->trails.plan(key, shown, wanted, step, found == d->layerPictures.end() ? nullptr : found->second, d->shrink());
     jlongArray out = e->NewLongArray((jsize)missing.size());
     if (out) e->SetLongArrayRegion(out, 0, (jsize)missing.size(), reinterpret_cast<const jlong*>(missing.data()));
     return out;
@@ -318,6 +318,10 @@ JNIEXPORT jboolean JNICALL JNI(videoTrailKeep)(JNIEnv* e, jobject, jlong h, jstr
     const auto key = std::make_pair(str(e, uri), (int64_t)layer);
     const auto found = d->layerPictures.find(key);
     return found != d->layerPictures.end() && d->trails.keep(key, tag, found->second, d->shrink());
+}
+JNIEXPORT void JNICALL JNI(trailBudget)(JNIEnv*, jobject, jlong h, jint layerMb, jint totalMb) {
+    ptr(h)->trails.layerBudget = size_t(layerMb) << 20;
+    ptr(h)->trails.budget = size_t(totalMb) << 20;
 }
 JNIEXPORT jint JNICALL JNI(moshStart)(JNIEnv* e, jobject, jlong h, jstring uri, jlong layer, jlongArray stamps, jfloatArray values) {
     auto* d = ptr(h);

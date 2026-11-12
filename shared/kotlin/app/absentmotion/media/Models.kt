@@ -43,8 +43,15 @@ internal const val MODEL_WORK_LIMIT = 16_000_000L
 internal fun modelFileName(value: String): String = value.substringAfterLast('/').substringAfterLast('\\').replace('\u0000', '_')
     .takeUnless { it.isBlank() || it == "." || it == ".." } ?: "model"
 
-fun parseModel(name: String, bytes: ByteArray, open: (String) -> ByteArray?): Mesh {
-    val mesh = if (name.substringAfterLast('.').lowercase() == "obj") ObjReader.read(bytes.toString(Charsets.UTF_8), open) else GltfReader.read(bytes, open)
+const val MODEL_SKIN_POSE = "skin"
+private const val MODEL_SKIN_KEY = "skin:"
+
+fun modelKey(uri: String, pose: String?): String = if (pose == MODEL_SKIN_POSE) MODEL_SKIN_KEY + uri else uri
+fun modelSource(key: String): String = key.removePrefix(MODEL_SKIN_KEY)
+fun modelSkinned(key: String): Boolean = key.startsWith(MODEL_SKIN_KEY)
+
+fun parseModel(name: String, bytes: ByteArray, open: (String) -> ByteArray?, skin: Boolean = false): Mesh {
+    val mesh = if (name.substringAfterLast('.').lowercase() == "obj") ObjReader.read(bytes.toString(Charsets.UTF_8), open) else GltfReader.read(bytes, open, skin = skin)
     require(mesh.triangleCount > 0) { AppText.get(R.string.model_err_no_triangles) }
     return mesh
 }
@@ -322,7 +329,7 @@ object GltfReader {
     private const val JSON = 0x4E4F534A
     private const val BIN = 0x004E4942
 
-    fun read(bytes: ByteArray, open: (String) -> ByteArray?, limit: Long = MODEL_WORK_LIMIT): Mesh {
+    fun read(bytes: ByteArray, open: (String) -> ByteArray?, limit: Long = MODEL_WORK_LIMIT, skin: Boolean = false): Mesh {
         var bin: ByteBuffer? = null
         val json = if (bytes.size >= 12 && le(bytes, 0) == GLB) {
             var at = 12
@@ -360,12 +367,12 @@ object GltfReader {
             return Triple(data.duplicate().apply { limit(offset + length) }.order(ByteOrder.LITTLE_ENDIAN), offset, view.optInt("byteStride", 0))
         }
 
-        fun read(index: Int, normalizeInts: Boolean = true, expect: Int = -1): Pair<FloatArray, Int>? {
+        fun read(index: Int, normalizeInts: Boolean = true, expect: Int = -1, matrices: Boolean = false): Pair<FloatArray, Int>? {
             val a = accessors.getOrNull(index) ?: return null
             val count = a.optInt("count", 0)
             require(count <= limit) { AppText.get(R.string.model_err_too_complex) }
             if (expect >= 0 && count != expect) return null
-            val comps = when (a.optString("type")) { "SCALAR" -> 1; "VEC2" -> 2; "VEC3" -> 3; "VEC4" -> 4; else -> return null }
+            val comps = when (a.optString("type")) { "SCALAR" -> 1; "VEC2" -> 2; "VEC3" -> 3; "VEC4" -> 4; "MAT4" -> if (matrices) 16 else return null; else -> return null }
             val type = a.optInt("componentType")
             val size = when (type) { 5120, 5121 -> 1; 5122, 5123 -> 2; 5125, 5126 -> 4; else -> return null }
             if (!a.has("bufferView")) return if (expect >= 0) FloatArray(count * comps) to comps else null
@@ -426,9 +433,26 @@ object GltfReader {
             require(work <= limit) { AppText.get(R.string.model_err_too_complex) }
         }
 
-        fun addMesh(meshIndex: Int, world: FloatArray) {
+        val worlds = arrayOfNulls<FloatArray>(nodes.size)
+        val skins = json.optJSONArray("skins").objects()
+        val poses = HashMap<Int, Array<FloatArray>?>()
+
+        fun pose(skinIndex: Int): Array<FloatArray>? = poses.getOrPut(skinIndex) {
+            val joints = skins.getOrNull(skinIndex)?.optJSONArray("joints")?.takeIf { it.length() > 0 } ?: return@getOrPut null
+            val inverse = skins[skinIndex].optInt("inverseBindMatrices", -1).takeIf { it >= 0 }?.let { accessor ->
+                charge(accessor)
+                read(accessor, expect = joints.length(), matrices = true)?.takeIf { it.second == 16 }?.first ?: return@getOrPut null
+            }
+            Array(joints.length()) { j ->
+                val world = worlds.getOrNull(joints.optInt(j, -1)) ?: return@getOrPut null
+                if (inverse == null) world else multiply(world, inverse.copyOfRange(j * 16, j * 16 + 16))
+            }
+        }
+
+        fun addMesh(meshIndex: Int, world: FloatArray, skinIndex: Int = -1) {
             val normalMatrix = normalMatrix(world)
-            val flip = determinant(world) < 0
+            val mirrored = determinant(world) < 0
+            val pose = if (skinIndex >= 0) pose(skinIndex) else null
             for (primitive in meshes.getOrNull(meshIndex)?.optJSONArray("primitives").objects()) {
                 val mode = primitive.optInt("mode", 4)
                 if (mode !in 4..6) continue
@@ -448,11 +472,36 @@ object GltfReader {
                 val slot = pbr?.optJSONObject("baseColorTexture")?.optInt("index", -1)?.let { textureList.getOrNull(it) }?.optInt("source", -1)
                     ?.takeIf { it >= 0 }?.let { src -> imageSlots.getOrPut(src) { image(src)?.let { textures += it; textures.size - 1 } ?: -1 } } ?: -1
                 val list = indices(primitive, count)
+                val joints = if (pose == null) null else read(attributes.optInt("JOINTS_0", -1), normalizeInts = false, expect = count)
+                    ?.takeIf { it.second == 4 && it.first.size == count * 4 }?.first
+                val weights = if (joints == null) null else read(attributes.optInt("WEIGHTS_0", -1), expect = count)
+                    ?.takeIf { it.second == 4 && it.first.size == count * 4 }?.first
+                val skinned = pose != null && joints != null && weights != null && joints.all { it.toInt() in pose.indices }
+                if (skinned) { charge(attributes.optInt("JOINTS_0", -1)); charge(attributes.optInt("WEIGHTS_0", -1)) }
+                val flip = if (skinned) determinant(pose[0]) < 0 else mirrored
+                val blend = FloatArray(16)
                 builder.reserve(count, list.size)
                 val first = builder.count
                 for (v in 0 until count) {
-                    val p = transform(world, positions[v * 3], positions[v * 3 + 1], positions[v * 3 + 2])
-                    val n = normals?.let { transformNormal(normalMatrix, it[v * 3], it[v * 3 + 1], it[v * 3 + 2]) }
+                    var matrix = world
+                    var cofactors = normalMatrix
+                    if (skinned) {
+                        var total = 0f
+                        for (k in 0..3) total += max(weights[v * 4 + k], 0f)
+                        if (total > 0f) {
+                            blend.fill(0f)
+                            for (k in 0..3) {
+                                val w = max(weights[v * 4 + k], 0f) / total
+                                if (w <= 0f) continue
+                                val joint = pose[joints[v * 4 + k].toInt()]
+                                for (i in 0..15) blend[i] += joint[i] * w
+                            }
+                            matrix = blend
+                            cofactors = normalMatrix(blend)
+                        }
+                    }
+                    val p = transform(matrix, positions[v * 3], positions[v * 3 + 1], positions[v * 3 + 2])
+                    val n = normals?.let { transformNormal(cofactors, it[v * 3], it[v * 3 + 1], it[v * 3 + 2]) }
                     val c = colours?.let { (values, comps) -> FloatArray(4) { i -> if (i < comps) values[v * comps + i] else 1f } } ?: floatArrayOf(1f, 1f, 1f, 1f)
                     builder.vertex(p[0], p[1], p[2], n, uvs?.get(v * 2) ?: 0f, uvs?.get(v * 2 + 1) ?: 0f,
                         argb(factor[0] * c[0], factor[1] * c[1], factor[2] * c[2], factor[3] * c[3]))
@@ -472,12 +521,14 @@ object GltfReader {
         }
 
         val visited = BooleanArray(nodes.size)
+        val holders = Ints()
         fun visit(index: Int, parent: FloatArray, depth: Int) {
             val node = nodes.getOrNull(index) ?: return
             if (depth > 64 || visited[index]) return
             visited[index] = true
             val world = multiply(parent, localMatrix(node))
-            if (node.has("mesh")) addMesh(node.getInt("mesh"), world)
+            worlds[index] = world
+            if (node.has("mesh")) holders.add(index)
             node.optJSONArray("children")?.let { c -> for (i in 0 until c.length()) visit(c.optInt(i, -1), world, depth + 1) }
         }
 
@@ -489,6 +540,10 @@ object GltfReader {
             val roots = scenes.getOrNull(json.optInt("scene", 0))?.optJSONArray("nodes")?.let { r -> List(r.length()) { r.optInt(it, -1) } }
                 ?: nodes.indices.filter { it !in children }
             roots.forEach { visit(it, identity, 0) }
+            for (k in 0 until holders.size) {
+                val node = nodes[holders.data[k]]
+                addMesh(node.getInt("mesh"), worlds[holders.data[k]]!!, if (skin) node.optInt("skin", -1) else -1)
+            }
         }
         return builder.build(textures, twoSided)
     }

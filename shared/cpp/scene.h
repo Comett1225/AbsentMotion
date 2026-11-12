@@ -353,7 +353,7 @@ struct LayerEffects {
                        const std::function<void(SkCanvas*)>&)> draw;
     std::function<bool(const Layer&, float, float)> steady;
     std::function<sk_sp<SkImage>(const sk_sp<SkImage>&, bool)> upload;
-    std::function<sk_sp<SkImage>(const std::string&, int64_t, int)> past;
+    std::function<sk_sp<SkImage>(const std::string&, int64_t, int, float)> past;
 };
 void DrawScene(SkCanvas* canvas, const Scene& scene, double timeMs, const MediaPictures& pictures,
                const LayerEffects* effects = nullptr);

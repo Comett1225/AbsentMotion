@@ -387,4 +387,49 @@ class ModelReaderTest {
             assertEquals(AppText.get(R.string.model_err_too_complex), e.message)
         }
     }
+
+    private fun skinned(attributes: String = ""","JOINTS_0":1,"WEIGHTS_0":2"""): ByteArray {
+        val data = floats(0f, 0f, 0f, 1f, 0f, 0f, 0f, 1f, 0f) + ByteArray(12) + floats(1f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 1f, 0f, 0f, 0f) +
+            floats(2f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f) + shorts(0, 1, 2)
+        val uri = "data:application/octet-stream;base64," + Base64.getEncoder().encodeToString(data)
+        return """
+            {"asset":{"version":"2.0"},"scene":0,"scenes":[{"nodes":[0]}],
+             "nodes":[{"children":[1,2],"rotation":[-0.70710678,0,0,0.70710678]},{"mesh":0,"skin":0},{"rotation":[0.70710678,0,0,0.70710678]}],
+             "skins":[{"joints":[2],"inverseBindMatrices":3}],
+             "meshes":[{"primitives":[{"attributes":{"POSITION":0$attributes},"indices":4}]}],
+             "buffers":[{"byteLength":${data.size},"uri":"$uri"}],
+             "bufferViews":[{"buffer":0,"byteOffset":0,"byteLength":36},{"buffer":0,"byteOffset":36,"byteLength":12},{"buffer":0,"byteOffset":48,"byteLength":48},
+                            {"buffer":0,"byteOffset":96,"byteLength":64},{"buffer":0,"byteOffset":160,"byteLength":6}],
+             "accessors":[{"bufferView":0,"componentType":5126,"count":3,"type":"VEC3"},{"bufferView":1,"componentType":5121,"count":3,"type":"VEC4"},
+                          {"bufferView":2,"componentType":5126,"count":3,"type":"VEC4"},{"bufferView":3,"componentType":5126,"count":1,"type":"MAT4"},
+                          {"bufferView":4,"componentType":5123,"count":3,"type":"SCALAR"}]}
+        """.trimIndent().toByteArray()
+    }
+
+    private fun extent(mesh: Mesh, axis: Int) = (0 until mesh.vertexCount).map { mesh.positions[it * 3 + axis] }.let { it.max() - it.min() }
+
+    @Test fun aSkinnedGltfStandsInItsSkinPoseOnlyWhenAsked() {
+        val posed = parseModel("rig.gltf", skinned(), { null }, skin = true)
+        assertEquals(0f, extent(posed, 2), 1e-5f)
+        assertEquals(2f, extent(posed, 0) / extent(posed, 1), 1e-4f)
+        assertEquals(1f, abs(normal(posed, 0)[2]), 1e-5f)
+        val old = readModel("rig.gltf", skinned()) { null }
+        assertEquals(0f, extent(old, 1), 1e-5f)
+        assertEquals(1f, extent(old, 0) / extent(old, 2), 1e-4f)
+        val bare = parseModel("rig.gltf", skinned(""), { null }, skin = true)
+        assertArrayEquals(old.positions, bare.positions, 0f)
+        assertArrayEquals(old.normals, bare.normals, 0f)
+        val uri = "data:application/octet-stream;base64," + Base64.getEncoder().encodeToString(triangle)
+        val plain = gltf("""{"byteLength":${triangle.size},"uri":"$uri"}""").toByteArray()
+        assertArrayEquals(readModel("tri.gltf", plain) { null }.positions, parseModel("tri.gltf", plain, { null }, skin = true).positions, 0f)
+    }
+
+    @Test fun modelLayersAreKeyedByTheirPose() {
+        val scene = Scene.parse("""<scene title="m" width="100" height="100" fps="30" totalTime="999">
+<model id="1" startTime="0" endTime="999" src="file:///a.glb"/><model id="2" startTime="0" endTime="999" src="file:///a.glb" pose="skin"/></scene>""")
+        val keys = scene.node.modelUris()
+        assertEquals(setOf("file:///a.glb", "skin:file:///a.glb"), keys)
+        assertEquals(setOf("file:///a.glb"), keys.map(::modelSource).toSet())
+        assertEquals(listOf(false, true), keys.sorted().map(::modelSkinned))
+    }
 }

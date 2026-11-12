@@ -1594,6 +1594,10 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
         Override plain = ov;
         plain.feedback = true;
         const bool inward = shrink < 1;
+        float gain = 1;
+        if (const sk_sp<SkImage> shown = trails && l.fillType == "media" ? pictures(l.mediaUri, l.id) : nullptr) {
+            gain = SkMatrix::Concat(canvas->getTotalMatrix(), placed).getMaxScale() * std::max(bounds.width() / shown->width(), bounds.height() / shown->height());
+        }
         if (inward) DrawOne(canvas, siblings, l, timeMs, pictures, plain);
         const int n = (int)matrices.size();
         for (int k = 0; k < n; k++) {
@@ -1610,7 +1614,7 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
             const double at = std::clamp(timeMs - spacing * i, (double)l.startTime, (double)l.endTime);
             if (trails && l.fillType == "media" && gEffects && gEffects->past) {
                 const MediaPictures earlier = [&](const std::string& uri, int64_t id) {
-                    sk_sp<SkImage> image = id == l.id && uri == l.mediaUri ? gEffects->past(uri, id, i) : nullptr;
+                    sk_sp<SkImage> image = id == l.id && uri == l.mediaUri ? gEffects->past(uri, id, i, gain) : nullptr;
                     return image ? image : pictures(uri, id);
                 };
                 DrawOne(canvas, siblings, l, at, earlier, plain);

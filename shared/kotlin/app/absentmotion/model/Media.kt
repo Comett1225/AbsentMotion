@@ -69,7 +69,7 @@ fun XmlNode.imageUris(): Set<String> = buildSet {
 
 fun XmlNode.modelUris(): Set<String> = buildSet {
     fun walk(n: XmlNode) {
-        if (n.name == "model") n["src"]?.let { add(it) }
+        if (n.name == "model") n["src"]?.let { add(app.absentmotion.media.modelKey(it, n["pose"])) }
         n.children.forEach(::walk)
     }
     walk(this@modelUris)

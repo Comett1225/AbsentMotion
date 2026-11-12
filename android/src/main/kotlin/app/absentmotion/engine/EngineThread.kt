@@ -250,6 +250,10 @@ class EngineThread(private val background: Int, context: Context? = null, privat
                 app.absentmotion.Tier.openGl = it.openGl
                 if (waitForProof && it.openGl) VulkanProbe.startOnce(appContext)
                 gpuCheck?.trying(it.openGl)
+                appContext?.getSystemService(android.app.ActivityManager::class.java)?.let { manager ->
+                    val memory = android.app.ActivityManager.MemoryInfo().also(manager::getMemoryInfo)
+                    it.setTrailBudget(app.absentmotion.model.trailBudgetMb(memory.totalMem shr 20, manager.isLowRamDevice, manager.memoryClass, app.absentmotion.Tier.compatible || it.openGl))
+                }
                 handler.postDelayed({ if (engine?.failed != true && watchedFrames < 0) gpuCheck?.survived() }, SURVIVE_MS)
             }
         } catch (t: Throwable) {
@@ -406,8 +410,8 @@ class EngineThread(private val background: Int, context: Context? = null, privat
         engine().moshFrame(uri, layerId, step, buffer, standard, range, crop).also { if (it && last && !exact) renderNow() }
     }
 
-    internal suspend fun videoTrail(uri: String, layerId: Long, shown: Long, tags: LongArray, exact: Boolean): LongArray = withContext(dispatcher) {
-        if (closed || (!exact && capturing)) LongArray(0) else engine().videoTrail(uri, layerId, shown, tags)
+    internal suspend fun videoTrail(uri: String, layerId: Long, shown: Long, tags: LongArray, step: Float, exact: Boolean): LongArray = withContext(dispatcher) {
+        if (closed || (!exact && capturing)) LongArray(0) else engine().videoTrail(uri, layerId, shown, tags, step)
     }
 
     internal suspend fun videoTrailFrame(uri: String, buffer: HardwareBuffer, layerId: Long, tag: Long, exact: Boolean,

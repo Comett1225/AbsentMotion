@@ -46,8 +46,10 @@ class NativeEngine(backend: Backend) : AutoCloseable {
     fun moshFrame(uri: String, layerId: Long, step: Int, buffer: HardwareBuffer, standard: Int = 0, range: Int = 0, crop: Rect? = null): Boolean =
         nativeMoshFrame(handle, uri.toByteArray(), layerId, step, buffer, standard, range, crop?.left ?: 0, crop?.top ?: 0, crop?.right ?: 0, crop?.bottom ?: 0)
 
-    fun videoTrail(uri: String, layerId: Long, shown: Long, tags: LongArray): LongArray =
-        nativeVideoTrail(handle, uri.toByteArray(), layerId, shown, tags) ?: LongArray(0)
+    fun videoTrail(uri: String, layerId: Long, shown: Long, tags: LongArray, step: Float): LongArray =
+        nativeVideoTrail(handle, uri.toByteArray(), layerId, shown, tags, step) ?: LongArray(0)
+
+    fun setTrailBudget(layerMb: Int) = nativeSetTrailBudget(handle, layerMb)
 
     fun videoTrailFrame(uri: String, layerId: Long, tag: Long, buffer: HardwareBuffer, standard: Int = 0, range: Int = 0, crop: Rect? = null): Boolean =
         nativeVideoTrailFrame(handle, uri.toByteArray(), layerId, tag, buffer, standard, range, crop?.left ?: 0, crop?.top ?: 0, crop?.right ?: 0, crop?.bottom ?: 0)
@@ -150,7 +152,8 @@ class NativeEngine(backend: Backend) : AutoCloseable {
                                                                mode: Int, soft: Boolean, blur: Float, params: FloatArray, made: Bitmap?): Boolean
         @JvmStatic private external fun nativeMoshStart(engine: Long, uri: ByteArray, layerId: Long, pts: LongArray, mosh: FloatArray, flow: FloatArray): Int
         @JvmStatic private external fun nativeMoshFrame(engine: Long, uri: ByteArray, layerId: Long, step: Int, buffer: HardwareBuffer, standard: Int, range: Int, left: Int, top: Int, right: Int, bottom: Int): Boolean
-        @JvmStatic private external fun nativeVideoTrail(engine: Long, uri: ByteArray, layerId: Long, shown: Long, tags: LongArray): LongArray?
+        @JvmStatic private external fun nativeVideoTrail(engine: Long, uri: ByteArray, layerId: Long, shown: Long, tags: LongArray, step: Float): LongArray?
+        @JvmStatic private external fun nativeSetTrailBudget(engine: Long, layerMb: Int)
         @JvmStatic private external fun nativeVideoTrailFrame(engine: Long, uri: ByteArray, layerId: Long, tag: Long, buffer: HardwareBuffer, standard: Int, range: Int, left: Int, top: Int, right: Int, bottom: Int): Boolean
         @JvmStatic private external fun nativeRenderScene(
             engine: Long, target: Long, timeMs: Double, scale: Float, dx: Float, dy: Float, background: Int,

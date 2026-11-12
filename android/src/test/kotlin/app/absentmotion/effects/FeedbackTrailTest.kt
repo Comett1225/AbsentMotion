@@ -2,7 +2,9 @@ package app.absentmotion.effects
 
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
+import app.absentmotion.model.feedbackStep
 import app.absentmotion.model.feedbackTrail
+import app.absentmotion.model.trailBudgetMb
 import app.absentmotion.model.videoTimeUs
 import app.absentmotion.shapeLayer
 import org.junit.Assert.assertEquals
@@ -54,5 +56,26 @@ class FeedbackTrailTest {
         assertEquals(listOf(plain.videoTimeUs(scene.frameStart(89), scene), plain.videoTimeUs(scene.frameStart(88), scene)), a)
         assertEquals(a.map { it + 4_000_000 }, b)
         assertEquals(33_333.0, (a[0] - a[1]).toDouble(), 1000.0)
+    }
+
+    @Test fun eachCopyShrinksByTheZoomAndTheLayersOwnScale() {
+        assertEquals(0.85f, layer("trails" to "1").feedbackStep(3000.0, scene), 1e-4f)
+        assertEquals(0.5f, layer("trails" to "1", "zoom" to "0.5").feedbackStep(3000.0, scene), 1e-4f)
+        val scaled = shapeLayer(id = 3, start = 1000, end = 12000, children = listOf(
+            XmlNode("transform", children = listOf(XmlNode("scale", mapOf("value" to "2,0.5")))),
+            XmlNode("effect", mapOf("id" to "absent.videofeedback"), listOf(property("zoom", "0.5")))))
+        assertEquals(1f, scaled.feedbackStep(3000.0, scene), 1e-4f)
+        assertEquals(0.5f, scaled.copy(node = scaled.node.copy(children = scaled.node.children.map {
+            if (it.name == "effect") it.copy(children = it.children + property("useLayerTransform", "0")) else it
+        })).feedbackStep(3000.0, scene), 1e-4f)
+    }
+
+    @Test fun weakDevicesKeepTheSmallTrailBudget() {
+        assertEquals(24, trailBudgetMb(3700, lowRam = false, memoryClassMb = 256, compatible = false))
+        assertEquals(24, trailBudgetMb(16000, lowRam = true, memoryClassMb = 512, compatible = false))
+        assertEquals(24, trailBudgetMb(16000, lowRam = false, memoryClassMb = 512, compatible = true))
+        assertEquals(24, trailBudgetMb(7600, lowRam = false, memoryClassMb = 192, compatible = false))
+        assertEquals(48, trailBudgetMb(7600, lowRam = false, memoryClassMb = 256, compatible = false))
+        assertEquals(64, trailBudgetMb(11500, lowRam = false, memoryClassMb = 512, compatible = false))
     }
 }

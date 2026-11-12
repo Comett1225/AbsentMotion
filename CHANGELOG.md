@@ -14,7 +14,7 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - Time Remap: a Remap tab in Speed keyframes which moment of a video shows, to speed it up, freeze it or play it backwards inside one layer.
 - Tools inside the editor: a Tools tab in the + menu, and Tools in the left rail on a computer. Compress, Trim, Extract Audio, Make a GIF and the Video Downloader add their result to the project.
 - Video Downloader on Windows, Mac and Linux, with a one-time add-on.
-- Video Feedback Frame by Frame: each copy shows the layer one frame earlier, videos included, so movement leaves trails.
+- Video Feedback Frame by Frame: each copy shows the layer one frame earlier, videos included, so movement leaves trails. On a video the nearest copies stay sharp, and phones with more memory keep every copy sharp.
 - Page Curl and Scatter Repeat effects. Page Curl's Follow Shape curls a round picture or a 3D model from its own edge.
 - 3D Text: a tile in the 3D and Text effects that adds Raster Extrude, which turns a text layer into solid 3D letters.
 - Turn 3D effects on the preview: with a 3D effect's settings open, drag on the preview to turn it; two fingers twist it.
@@ -53,6 +53,7 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - Block Noise, Block Dissolve, Dissolve, Static, Glitch, Beat Glitch and Datamosh: the block size changes each block in place instead of zooming the whole pattern.
 - Frame Interpolation: thin lines no longer break up into patterns with Optical flow at Medium.
 - Smoothing a Time Remap clip: a trimmed clip keeps the right moments, and a clip played backwards keeps its motion blur.
+- Rigged 3D models: a rigged GLB model now comes in standing up; models already in projects keep their orientation.
 - 3D models with effects: Pixelate, Vignette and other effects no longer cut off or darken a turned 3D model.
 - Effects panel: no white flash when it opens.
 - Motion Blur: fast moves blur into one smooth streak that trails behind the layer, and the paused preview shows the real blur.

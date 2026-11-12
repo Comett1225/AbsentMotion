@@ -23,6 +23,7 @@ import app.absentmotion.model.layerTracks
 import app.absentmotion.model.moshPlan
 import app.absentmotion.model.Scene
 import app.absentmotion.model.exportFrameMs
+import app.absentmotion.model.feedbackStep
 import app.absentmotion.model.feedbackTrail
 import app.absentmotion.model.localMs
 import app.absentmotion.model.needs
@@ -275,14 +276,14 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             val layer = sample.layer
             val times = layer.feedbackTrail(sample.timeMs, sample.scene)
             if (times == null) {
-                if (trailing) { trailing = false; engine.videoTrail(uri, id, 0, LongArray(0), exact) }
+                if (trailing) { trailing = false; engine.videoTrail(uri, id, 0, LongArray(0), 1f, exact) }
                 return
             }
             trailing = true
             val ahead = if (request.playing) (leadMs * (sample.track.timeAt(request.timeMs.toDouble(), false)?.rate ?: 1.0)).toInt() else 0
             fun stamp(ms: Int) = source.wantedPts(layer.videoTimeUs(ms, sample.scene))
             val shown = publishedPts ?: stamp(sample.timeMs.toInt())
-            val missing = engine.videoTrail(uri, id, shown, LongArray(times.size) { stamp(times[it] + ahead) }, exact)
+            val missing = engine.videoTrail(uri, id, shown, LongArray(times.size) { stamp(times[it] + ahead) }, layer.feedbackStep(sample.timeMs, sample.scene), exact)
             if (missing.isEmpty() || (!exact && request.playing)) return
             var added = false
             for (pts in missing.sorted()) {

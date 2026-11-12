@@ -181,13 +181,17 @@ JNIEXPORT jboolean JNICALL JNI_FN(nativeMoshFrame)(JNIEnv* env, jclass, jlong en
                                        {left, top, right, bottom});
 }
 
+JNIEXPORT void JNICALL JNI_FN(nativeSetTrailBudget)(JNIEnv*, jclass, jlong engine, jint layerMb) {
+    engineOf(engine)->setTrailBudget(layerMb);
+}
+
 JNIEXPORT jlongArray JNICALL JNI_FN(nativeVideoTrail)(JNIEnv* env, jclass, jlong engine, jbyteArray uri, jlong layerId, jlong shown,
-                                                      jlongArray tags) {
+                                                      jlongArray tags, jfloat step) {
     std::string text((size_t)env->GetArrayLength(uri), '\0');
     env->GetByteArrayRegion(uri, 0, (jsize)text.size(), reinterpret_cast<jbyte*>(text.data()));
     std::vector<int64_t> wanted((size_t)env->GetArrayLength(tags));
     env->GetLongArrayRegion(tags, 0, (jsize)wanted.size(), reinterpret_cast<jlong*>(wanted.data()));
-    const std::vector<int64_t> missing = engineOf(engine)->videoTrail(text, layerId, shown, wanted);
+    const std::vector<int64_t> missing = engineOf(engine)->videoTrail(text, layerId, shown, wanted, step);
     jlongArray out = env->NewLongArray((jsize)missing.size());
     if (out) env->SetLongArrayRegion(out, 0, (jsize)missing.size(), reinterpret_cast<const jlong*>(missing.data()));
     return out;
