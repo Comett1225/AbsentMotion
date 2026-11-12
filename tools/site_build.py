@@ -553,8 +553,8 @@ class Site:
             return ""
         l, v = self.download_links(), self.version
         linux = "".join('<li><a id="dl-linux-%s-appimage" class="btn alt" href="%s">Linux %s</a><div><strong>Linux on %s</strong>, glibc 2.35 or newer (Ubuntu 22.04, Debian 12 and later). '
-                        'AppImage <code>AbsentMotion-%s-linux-%s.AppImage</code>, also as <a id="dl-linux-%s-deb" href="%s">.deb</a> and <a id="dl-linux-%s-tar" href="%s">.tar.gz</a>.</div></li>'
-                        % (chip, l["linux_%s_appimage" % chip], chip, label, v, chip, chip, l["linux_%s_deb" % chip], chip, l["linux_%s_tar" % chip])
+                        'AppImage, also as <a id="dl-linux-%s-deb" href="%s">.deb</a> and <a id="dl-linux-%s-tar" href="%s">.tar.gz</a>. <code>AbsentMotion-%s-linux-%s.AppImage</code></div></li>'
+                        % (chip, l["linux_%s_appimage" % chip], chip, label, chip, l["linux_%s_deb" % chip], chip, l["linux_%s_tar" % chip], v, chip)
                         for chip, label in (("x86_64", "Intel or AMD computers (x86_64)"), ("arm64", "ARM computers (arm64)")))
         return ('<li><a id="dl-mac-arm64" class="btn alt" href="%s">Mac, Apple silicon</a><div><strong>Macs with Apple silicon</strong> (M1 or newer), macOS 11 or newer. <code>AbsentMotion-%s-macos-arm64.dmg</code></div></li>'
                 '<li><a id="dl-mac-x64" class="btn alt" href="%s">Mac, Intel</a><div><strong>Macs with an Intel chip</strong>, macOS 11 or newer. <code>AbsentMotion-%s-macos-x64.dmg</code></div></li>'
