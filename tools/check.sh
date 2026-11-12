@@ -24,7 +24,7 @@ lock() {
     waited=""
     until ln -sn $$ "$dir/$1.lock" 2>/dev/null; do
         holder=$(readlink "$dir/$1.lock" 2>/dev/null)
-        if kill -0 "$holder" 2>/dev/null && ! ps -o stat= -p "$holder" 2>/dev/null | grep -q '^Z'; then
+        if kill -0 "$holder" 2>/dev/null && ! { ps -o stat= -p "$holder" 2>/dev/null || sed -n 's/^.*) \(.\).*/\1/p' "/proc/$holder/stat" 2>/dev/null; } | grep -q '^Z'; then
             [ "$waited" = "$holder" ] || printf 'waiting for another check.sh (process %s) to finish its %s build in this folder\n' "$holder" "$1"
             waited=$holder
             sleep 3
