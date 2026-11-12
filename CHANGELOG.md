@@ -19,7 +19,8 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - Effect previews: an effect's page opens with a big, sharp preview.
 - Community bundle: Project Bundle in Export adds a title, a thumbnail picked with Choose thumbnail, a description, tags and a name.
 - Bundles folder: pick a folder once and every project bundle saves there.
-- Hold to pick: hold the three dots on a project, slide to an entry and let go to run it.
+- Hold to pick: hold the three dots on a project, slide to an entry and let go to run it, with a small vibration for each entry you pass.
+- Bottom bar: a soft highlight when a tab is pressed, and hold and slide along the bar to switch tabs, with a small vibration for each one.
 - Community tab on Home. Sharing arrives in 5.2.
 - Favourites show a filled star with a small pop.
 - Alight Motion import: Page Curl, Scatter Repeat and Ring (as Torus).

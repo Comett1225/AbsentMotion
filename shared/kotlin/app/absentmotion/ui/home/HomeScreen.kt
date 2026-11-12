@@ -1,6 +1,9 @@
 package app.absentmotion.ui.home
 
 import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.geometry.Size
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.ui.composed
@@ -244,7 +247,7 @@ fun HomeScreen(
                 )
                 Spacer(Modifier.height(BarHeight + navInset))
             }
-            BottomBar(onNew = newProject, page, { page = it; if (it >= 2) search = null }, Modifier.align(Alignment.BottomCenter), navInset, wide)
+            BottomBar(onNew = newProject, page, { page = it; if (it >= 2) search = null }, Modifier.align(Alignment.BottomCenter), navInset, wide, settings.vibration)
             if (toReport.isNotEmpty()) ImportDialog(toReport, onDismiss = onImportShown, onOpen = { onImportShown(); toReport.first().let { if (it.template) onTemplate(it.id) else onOpen(it.id) } })
             Presence(creating) {
                 NewProjectSheet(
@@ -337,6 +340,7 @@ private fun ProjectsPane(
             onDelete = { menu = null; deleting = info },
             onHistory = { menu = null; onHistory(info) },
             onCollect = { menu = null; onCollect(info.id) },
+            vibrate = settings.vibration,
         )
     }
 
@@ -516,6 +520,7 @@ private fun ProjectCard(
     onDelete: () -> Unit,
     onHistory: () -> Unit,
     onCollect: () -> Unit,
+    vibrate: Boolean,
 ) {
     val coords = remember { arrayOfNulls<LayoutCoordinates>(1) }
     val pick = remember { HoldPick() }
@@ -539,7 +544,7 @@ private fun ProjectCard(
         }
         Box(
             Modifier.align(Alignment.CenterEnd).size(48.dp).clickable { coords[0]?.let { onMenu(it.boundsInRoot()) } }
-                .holdToPick(pick) { coords[0]?.let { onMenu(it.boundsInRoot()) } },
+                .holdToPick(pick, vibrate) { coords[0]?.let { onMenu(it.boundsInRoot()) } },
             contentAlignment = Alignment.Center,
         ) {
             Icon(HomeIcons.More, stringResource(R.string.home_more), Modifier.size(24.dp), tint = Grey)
@@ -586,8 +591,9 @@ internal class HoldPick {
 
 private const val HoldMs = 300L
 
-internal fun Modifier.holdToPick(pick: HoldPick, open: () -> Unit): Modifier = composed {
+internal fun Modifier.holdToPick(pick: HoldPick, vibrate: Boolean, open: () -> Unit): Modifier = composed {
     val haptics = LocalHapticFeedback.current
+    val buzz by androidx.compose.runtime.rememberUpdatedState(vibrate)
     val where = remember { arrayOfNulls<LayoutCoordinates>(1) }
     onGloballyPositioned { where[0] = it }.pointerInput(pick) {
         awaitEachGesture {
@@ -596,7 +602,7 @@ internal fun Modifier.holdToPick(pick: HoldPick, open: () -> Unit): Modifier = c
             withTimeoutOrNull(HoldMs) { waitForUpOrCancellation().also { ended = true } }
             if (ended) return@awaitEachGesture
             open()
-            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+            if (buzz) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
             while (true) {
                 val change = awaitPointerEvent().changes.firstOrNull { it.id == down.id } ?: break
                 change.consume()
@@ -607,6 +613,7 @@ internal fun Modifier.holdToPick(pick: HoldPick, open: () -> Unit): Modifier = c
                     over?.let(pick::run)
                     break
                 }
+                if (buzz && over != null && over != pick.hovered) haptics.performHapticFeedback(HapticFeedbackType.SegmentTick)
                 pick.hovered = over
             }
         }
@@ -707,25 +714,82 @@ private fun promptText(): AnnotatedString {
     }
 }
 
+internal object BarSlide {
+    fun tab(x: Float, width: Float, gap: Float, tools: Boolean, rtl: Boolean): Int? {
+        val side = (width - gap) / 2f
+        if (side <= 0f) return null
+        val at = (if (rtl) width - x else x).coerceIn(0f, width)
+        return when {
+            at < side / 2f -> 0
+            at < side -> 3
+            at <= side + gap -> null
+            at < side + gap + side / 2f -> 1
+            tools -> 2
+            else -> null
+        }
+    }
+}
+
 @Composable
-private fun BottomBar(onNew: () -> Unit, page: Int, onPage: (Int) -> Unit, modifier: Modifier, navInset: Dp, wide: Boolean) {
+private fun BottomBar(onNew: () -> Unit, page: Int, onPage: (Int) -> Unit, modifier: Modifier, navInset: Dp, wide: Boolean, vibrate: Boolean) {
+    val haptics = LocalHapticFeedback.current
+    val rtl = androidx.compose.ui.platform.LocalLayoutDirection.current == LayoutDirection.Rtl
+    val gap = with(LocalDensity.current) { 56.dp.toPx() }
+    val tools = app.absentmotion.platform.PlatformFeatures.tools
+    var held by remember { mutableStateOf(false) }
+    val current by androidx.compose.runtime.rememberUpdatedState(page)
+    val go by androidx.compose.runtime.rememberUpdatedState(onPage)
+    val buzz by androidx.compose.runtime.rememberUpdatedState(vibrate)
     Box(modifier.fillMaxWidth().height(BarHeight + PlusOverhang + navInset)) {
         Box(Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(BarHeight + navInset).shadow(8.dp).background(Am.Card))
         Row(
-            Modifier.align(Alignment.BottomCenter).then(if (wide) Modifier.widthIn(max = 600.dp) else Modifier).fillMaxWidth().height(BarHeight + navInset).padding(top = 12.dp),
+            Modifier.align(Alignment.BottomCenter).then(if (wide) Modifier.widthIn(max = 600.dp) else Modifier).fillMaxWidth().height(BarHeight + navInset)
+                .pointerInput(rtl, gap, tools) {
+                    awaitEachGesture {
+                        val initial = androidx.compose.ui.input.pointer.PointerEventPass.Initial
+                        val down = awaitFirstDown(requireUnconsumed = false, pass = initial)
+                        val early = withTimeoutOrNull(viewConfiguration.longPressTimeoutMillis) {
+                            var done = false
+                            while (!done) {
+                                val change = awaitPointerEvent(initial).changes.firstOrNull { it.id == down.id }
+                                done = change == null || !change.pressed || (change.position - down.position).getDistance() > viewConfiguration.touchSlop
+                            }
+                        }
+                        if (early != null) return@awaitEachGesture
+                        var at = current
+                        fun slide(x: Float): Boolean {
+                            val next = BarSlide.tab(x, size.width.toFloat(), gap, tools, rtl) ?: return false
+                            if (next == at) return false
+                            at = next
+                            go(next)
+                            return true
+                        }
+                        held = true
+                        if (buzz) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                        slide(down.position.x)
+                        try {
+                            while (true) {
+                                val change = awaitPointerEvent(initial).changes.firstOrNull { it.id == down.id } ?: break
+                                change.consume()
+                                if (!change.pressed) break
+                                if (slide(change.position.x) && buzz) haptics.performHapticFeedback(HapticFeedbackType.SegmentTick)
+                            }
+                        } finally { held = false }
+                    }
+                }.padding(top = 12.dp),
         ) {
             Box(Modifier.weight(1f), contentAlignment = Alignment.TopCenter) {
-                BarItem(stringResource(R.string.home_tab_projects), if (page == 0) HomeIcons.ProjectsTab else HomeIcons.ProjectsTabOff) { onPage(0) }
+                BarItem(stringResource(R.string.home_tab_projects), if (page == 0) HomeIcons.ProjectsTab else HomeIcons.ProjectsTabOff, held && page == 0) { onPage(0) }
             }
             Box(Modifier.weight(1f), contentAlignment = Alignment.TopCenter) {
-                BarItem(stringResource(R.string.home_tab_community), if (page == 3) HomeIcons.CommunityTabOn else HomeIcons.CommunityTab) { onPage(3) }
+                BarItem(stringResource(R.string.home_tab_community), if (page == 3) HomeIcons.CommunityTabOn else HomeIcons.CommunityTab, held && page == 3) { onPage(3) }
             }
             Spacer(Modifier.width(56.dp))
             Box(Modifier.weight(1f), contentAlignment = Alignment.TopCenter) {
-                BarItem(stringResource(R.string.home_tab_templates), if (page == 1) HomeIcons.TemplatesTabOn else HomeIcons.TemplatesTab) { onPage(1) }
+                BarItem(stringResource(R.string.home_tab_templates), if (page == 1) HomeIcons.TemplatesTabOn else HomeIcons.TemplatesTab, held && page == 1) { onPage(1) }
             }
             Box(Modifier.weight(1f), contentAlignment = Alignment.TopCenter) {
-                if (app.absentmotion.platform.PlatformFeatures.tools) BarItem(stringResource(R.string.home_tab_tools), if (page == 2) HomeIcons.ToolsTabOn else HomeIcons.ToolsTab) { onPage(2) }
+                if (tools) BarItem(stringResource(R.string.home_tab_tools), if (page == 2) HomeIcons.ToolsTabOn else HomeIcons.ToolsTab, held && page == 2) { onPage(2) }
             }
         }
         val press = remember { MutableInteractionSource() }
@@ -741,9 +805,22 @@ private fun BottomBar(onNew: () -> Unit, page: Int, onPage: (Int) -> Unit, modif
 }
 
 @Composable
-private fun BarItem(label: String, icon: ImageVector, onClick: () -> Unit) {
-    Column(Modifier.widthIn(min = 78.dp).heightIn(min = 48.dp).clickable(onClick = onClick), horizontalAlignment = Alignment.CenterHorizontally) {
-        Icon(icon, null, Modifier.size(24.dp), tint = Am.Navy)
+private fun BarItem(label: String, icon: ImageVector, lit: Boolean, onClick: () -> Unit) {
+    val source = remember { MutableInteractionSource() }
+    val pressed by source.collectIsPressedAsState()
+    val glow by androidx.compose.animation.core.animateFloatAsState(if (pressed || lit) 1f else 0f, androidx.compose.animation.core.tween(140), label = "bar")
+    val ink = Am.Navy
+    Column(
+        Modifier.widthIn(min = 78.dp).heightIn(min = 48.dp).drawBehind {
+            if (glow > 0f) {
+                val w = 64.dp.toPx()
+                val h = 32.dp.toPx()
+                drawRoundRect(ink, Offset((size.width - w) / 2f, 12.dp.toPx() - h / 2f), Size(w, h), CornerRadius(h / 2f), alpha = 0.1f * glow)
+            }
+        }.clickable(interactionSource = source, indication = null, onClick = onClick),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Icon(icon, null, Modifier.size(24.dp).graphicsLayer { val s = 1f - 0.1f * glow; scaleX = s; scaleY = s }, tint = Am.Navy)
         Spacer(Modifier.height(8.dp))
         Text(label, Modifier.padding(horizontal = 2.dp), color = Am.Navy, fontWeight = FontWeight.Medium, maxLines = 1, style = androidx.compose.ui.text.TextStyle(lineHeight = 16.sp),
             autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(9.sp, 12.sp))
