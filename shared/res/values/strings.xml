@@ -5,7 +5,6 @@
     <string name="action_close">Close</string>
     <string name="settings_language">Language</string>
     <string name="onboarding_language_title">Choose your language</string>
-    <string name="onboarding_look_title">Light or dark?</string>
     <string name="onboarding_language_others">Other languages</string>
     <string name="onboarding_language_later">You can change this later in Settings.</string>
     <string name="onboarding_check_title">Check what this device can do</string>
@@ -132,7 +131,6 @@
     <string name="restore_this_version">Restore this version?</string>
     <string name="no_earlier_versions_yet_a_version">No earlier versions yet. A version is kept each time the project is opened or closed, and every two minutes while you edit.</string>
     <string name="still_working">Still working…</string>
-    <string name="theme">Theme</string>
     <string name="new_layer_length">New Layer Length</string>
     <string name="remove_caption_model">Remove caption model</string>
     <string name="the_media_picker_lists_only_albums">The media picker lists only albums and folders whose name contains Demo.</string>
@@ -319,6 +317,8 @@
     <string name="update_reconnecting">Connection lost. Trying again…</string>
     <string name="update_external">This copy did not come from an AbsentMotion GitHub release, so it cannot update itself. Get the update from where you installed it.</string>
     <string name="update_metered">This connection is metered, for example mobile data. The download may use up your data plan.</string>
+    <string name="theme_select">Select your theme</string>
+    <string name="theme_system">System default</string>
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_daylight">Daylight</string>

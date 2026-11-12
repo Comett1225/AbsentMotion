@@ -5,7 +5,6 @@
     <string name="action_close">Tutup</string>
     <string name="settings_language">Bahasa</string>
     <string name="onboarding_language_title">Pilih bahasa Anda</string>
-    <string name="onboarding_look_title">Terang atau gelap?</string>
     <string name="onboarding_language_others">Bahasa lainnya</string>
     <string name="onboarding_language_later">Anda bisa mengubahnya nanti di Setelan.</string>
     <string name="onboarding_check_title">Cek kemampuan perangkat ini</string>
@@ -132,7 +131,6 @@
     <string name="restore_this_version">Pulihkan versi ini?</string>
     <string name="no_earlier_versions_yet_a_version">Belum ada versi sebelumnya. Versi disimpan setiap kali proyek dibuka atau ditutup, dan setiap dua menit saat Anda mengedit.</string>
     <string name="still_working">Masih memproses…</string>
-    <string name="theme">Tema</string>
     <string name="new_layer_length">Durasi lapisan baru</string>
     <string name="remove_caption_model">Hapus model takarir</string>
     <string name="the_media_picker_lists_only_albums">Pemilih media hanya menampilkan album dan folder yang namanya mengandung Demo.</string>
@@ -319,6 +317,8 @@
     <string name="update_reconnecting">Koneksi terputus. Mencoba lagi…</string>
     <string name="update_external">Salinan ini tidak berasal dari rilis AbsentMotion di GitHub, jadi tidak bisa memperbarui dirinya sendiri. Dapatkan pembaruan dari tempat Anda memasangnya.</string>
     <string name="update_metered">Koneksi ini berkuota, misalnya data seluler. Unduhan dapat menghabiskan kuota data Anda.</string>
+    <string name="theme_select">Pilih tema Anda</string>
+    <string name="theme_system">Default sistem</string>
     <string name="theme_light">Terang</string>
     <string name="theme_dark">Gelap</string>
     <string name="theme_daylight">Siang</string>

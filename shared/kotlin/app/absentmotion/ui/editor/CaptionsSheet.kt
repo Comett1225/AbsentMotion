@@ -154,6 +154,7 @@ internal fun CaptionsSheet(state: EditorState, clipId: Long? = null, onClose: ()
     var status by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }
     var job by remember { mutableStateOf<Job?>(null) }
+    app.absentmotion.ui.theme.ThemeFade.Hold(phase == Phase.Work || phase == Phase.Download)
     var browsing by remember { mutableStateOf(false) }
     var appearanceOpen by remember { mutableStateOf(false) }
     var phaseStart by remember { mutableLongStateOf(0L) }

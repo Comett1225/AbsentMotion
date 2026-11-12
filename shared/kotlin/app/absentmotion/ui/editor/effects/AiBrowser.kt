@@ -445,6 +445,7 @@ private fun EnhanceSwitch(label: String, on: Boolean, onChange: (Boolean) -> Uni
 internal fun AiProgressDialog(tools: AiTools) {
     if (tools.message.isEmpty()) return
     val action = tools.running
+    app.absentmotion.ui.theme.ThemeFade.Hold(action != null)
     var reporting by remember { mutableStateOf(false) }
     if (reporting) app.absentmotion.ui.home.ReportDialog(tools.message) { reporting = false }
     AlertDialog(onDismissRequest = { if (action == null) tools.dismiss() },

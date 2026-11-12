@@ -5,7 +5,6 @@
     <string name="action_close">닫기</string>
     <string name="settings_language">언어</string>
     <string name="onboarding_language_title">언어 선택</string>
-    <string name="onboarding_look_title">라이트 모드 또는 다크 모드?</string>
     <string name="onboarding_language_others">다른 언어</string>
     <string name="onboarding_language_later">나중에 설정에서 변경할 수 있습니다.</string>
     <string name="onboarding_check_title">기기 성능 확인</string>
@@ -132,7 +131,6 @@
     <string name="restore_this_version">이 버전을 복원할까요?</string>
     <string name="no_earlier_versions_yet_a_version">이전 버전이 없습니다. 프로젝트를 열거나 닫을 때마다, 편집 중에는 2분마다 버전이 저장됩니다.</string>
     <string name="still_working">계속 작업 중…</string>
-    <string name="theme">테마</string>
     <string name="new_layer_length">새 레이어 길이</string>
     <string name="remove_caption_model">자막 모델 삭제</string>
     <string name="the_media_picker_lists_only_albums">미디어 선택기에 이름에 Demo가 포함된 앨범과 폴더만 표시됩니다.</string>
@@ -319,6 +317,8 @@
     <string name="update_reconnecting">연결이 끊어졌습니다. 다시 시도 중…</string>
     <string name="update_external">이 앱은 AbsentMotion GitHub 릴리스에서 받은 버전이 아니므로 자체 업데이트할 수 없습니다. 앱을 설치한 곳에서 업데이트를 받으세요.</string>
     <string name="update_metered">모바일 데이터와 같은 종량제 연결입니다. 다운로드 시 데이터가 소진될 수 있습니다.</string>
+    <string name="theme_select">테마 선택</string>
+    <string name="theme_system">시스템 기본값</string>
     <string name="theme_light">라이트</string>
     <string name="theme_dark">다크</string>
     <string name="theme_daylight">데이라이트</string>

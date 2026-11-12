@@ -230,20 +230,24 @@ class MainActivity : ComponentActivity() {
         importShared()
         setContent {
             app.absentmotion.ui.theme.ThemeFadeHost {
+            app.absentmotion.ui.theme.FollowSystemTheme(settings)
             val open = editor
             val light = if ((open == null || open.toolOpen != 0) && editingTemplate == null) Am.homeIsLight else Am.editorIsLight
             val homeBg = Am.HomeBg
             LaunchedEffect(homeBg) { window.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(homeBg.toArgb())) }
-            LaunchedEffect(light) {
+            LaunchedEffect(light, open?.exportOpen, exportingFromList != null) {
                 val transparent = android.graphics.Color.TRANSPARENT
                 enableEdgeToEdge(if (light) SystemBarStyle.light(transparent, transparent) else SystemBarStyle.dark(transparent))
             }
             val density = LocalDensity.current.density
             val fontScale = LocalDensity.current.fontScale
             val dense = remember(density, fontScale) { Density(density, fontScale.coerceAtMost(EDITOR_FONT_LIMIT)) }
-            val editorPress = remember(Am.PressEditor) { PressIndication(Am.PressEditor) }
-            val homePress = remember(Am.PressHome) { PressIndication(Am.PressHome) }
-            CompositionLocalProvider(LocalIndication provides if (open == null) homePress else editorPress, LocalDensity provides remember(density, fontScale) { Density(density, fontScale.coerceAtMost(UI_FONT_LIMIT)) }) {
+            val softPress = isTablet(androidx.compose.ui.platform.LocalConfiguration.current.smallestScreenWidthDp)
+            val editorPress = remember(Am.PressEditor, softPress) { PressIndication(Am.PressEditor, soft = softPress) }
+            val homePress = remember(Am.PressHome, softPress) { PressIndication(Am.PressHome, soft = softPress) }
+            val systemHaptics = androidx.compose.ui.platform.LocalHapticFeedback.current
+            val haptics = remember(systemHaptics) { app.absentmotion.platform.AppHaptics(applicationContext, systemHaptics) { settings.vibration } }
+            CompositionLocalProvider(androidx.compose.ui.platform.LocalHapticFeedback provides haptics, LocalIndication provides if (open == null) homePress else editorPress, LocalDensity provides remember(density, fontScale) { Density(density, fontScale.coerceAtMost(UI_FONT_LIMIT)) }) {
                 val first = firstRun
                 val outdated = outdatedNow(settings)
                 val screen = when {

@@ -169,6 +169,7 @@ internal fun CompressScreen(initial: android.net.Uri? = null, onClose: () -> Uni
     val back = { if (running) work?.cancel() ?: Unit else onClose() }
     ToolSheet(stringResource(R.string.tools_compress), back, bottom = {
         val view = LocalView.current
+        app.absentmotion.ui.theme.ThemeFade.Hold(running)
         DisposableEffect(running) {
             view.keepScreenOn = running
             onDispose { view.keepScreenOn = false }

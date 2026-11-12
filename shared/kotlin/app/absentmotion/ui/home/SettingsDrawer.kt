@@ -642,7 +642,7 @@ private fun ThemeRow(settings: AppSettings) {
         }
     }
     Row(Modifier.fillMaxWidth().heightIn(min = 44.dp).padding(horizontal = 15.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(stringResource(R.string.theme), Modifier.weight(1f), color = Am.HomeInk, fontSize = if (DESK) 14.sp else 12.sp, fontWeight = if (DESK) FontWeight.Normal else FontWeight.Bold)
+        Text(stringResource(R.string.theme_select), Modifier.weight(1f).padding(end = 8.dp), color = Am.HomeInk, fontSize = if (DESK) 14.sp else 12.sp, fontWeight = if (DESK) FontWeight.Normal else FontWeight.Bold)
         Box(Modifier.size(if (DESK) 190.dp else 150.dp, if (DESK) 34.dp else 37.dp)) {
             Row(
                 Modifier.fillMaxSize().clip(shape).background(Am.Card).deskPress(10.dp).clickable { open = true }.padding(start = 10.dp, end = 4.dp),

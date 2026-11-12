@@ -174,6 +174,7 @@ internal fun ToolBar(
 ) {
     val step = work.step
     val view = LocalView.current
+    app.absentmotion.ui.theme.ThemeFade.Hold(work.running)
     DisposableEffect(work.running) {
         view.keepScreenOn = work.running
         onDispose { view.keepScreenOn = false }

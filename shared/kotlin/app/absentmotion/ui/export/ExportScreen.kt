@@ -400,6 +400,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
     val explain: (UiText) -> Unit = { failure = Failure(R.string.export_not_available, it) }
 
     app.absentmotion.platform.ExportBars(dark = false, running = phase is Phase.Running)
+    app.absentmotion.ui.theme.ThemeFade.Hold(phase is Phase.Running)
     BackHandler {
         when (phase) {
             is Phase.Running -> if (DESK) onClose() else (phase as? Phase.Running)?.job?.cancel()

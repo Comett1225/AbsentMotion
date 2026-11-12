@@ -5,7 +5,6 @@
     <string name="action_close">Kapat</string>
     <string name="settings_language">Dil</string>
     <string name="onboarding_language_title">Dilinizi seçin</string>
-    <string name="onboarding_look_title">Açık mı koyu mu?</string>
     <string name="onboarding_language_others">Diğer diller</string>
     <string name="onboarding_language_later">Bunu daha sonra Ayarlar\'dan değiştirebilirsiniz.</string>
     <string name="onboarding_check_title">Cihazınızın neler yapabildiğini görün</string>
@@ -132,7 +131,6 @@
     <string name="restore_this_version">Bu sürüm geri yüklensin mi?</string>
     <string name="no_earlier_versions_yet_a_version">Henüz daha eski sürüm yok. Proje her açıldığında veya kapatıldığında ve siz düzenlerken her iki dakikada bir sürüm saklanır.</string>
     <string name="still_working">Hâlâ çalışıyor…</string>
-    <string name="theme">Tema</string>
     <string name="new_layer_length">Yeni katman uzunluğu</string>
     <string name="remove_caption_model">Altyazı modelini kaldır</string>
     <string name="the_media_picker_lists_only_albums">Medya seçici yalnızca adında Demo geçen albümleri ve klasörleri listeler.</string>
@@ -319,6 +317,8 @@
     <string name="update_reconnecting">Bağlantı koptu. Yeniden deneniyor…</string>
     <string name="update_external">Bu kopya AbsentMotion\'ın GitHub sürümlerinden gelmedi, bu yüzden kendini güncelleyemez. Güncellemeyi yüklediğiniz yerden alın.</string>
     <string name="update_metered">Bu bağlantı sınırlı, örneğin mobil veri. İndirme, veri paketinizi tüketebilir.</string>
+    <string name="theme_select">Temanızı seçin</string>
+    <string name="theme_system">Sistem varsayılanı</string>
     <string name="theme_light">Açık</string>
     <string name="theme_dark">Koyu</string>
     <string name="theme_daylight">Gün ışığı</string>

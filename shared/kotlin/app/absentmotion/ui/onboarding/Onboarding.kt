@@ -133,9 +133,10 @@ fun Onboarding(settings: AppSettings, first: FirstRun, engine: () -> EngineThrea
 @Composable
 fun LookStep(settings: AppSettings, onContinue: () -> Unit) {
     Column(Modifier.fillMaxSize().enterFade()) {
-        Heading(stringResource(R.string.onboarding_look_title))
-        Box(Modifier.fillMaxWidth().weight(1f).padding(horizontal = 16.dp, vertical = 12.dp), Alignment.Center) {
-            Row(Modifier.widthIn(max = 520.dp).fillMaxWidth(), Arrangement.spacedBy(12.dp), Alignment.CenterVertically) {
+        Heading(stringResource(R.string.theme_select))
+        Column(Modifier.fillMaxWidth().weight(1f).padding(horizontal = 16.dp, vertical = 12.dp), Arrangement.spacedBy(12.dp, Alignment.CenterVertically), Alignment.CenterHorizontally) {
+            SystemLook(settings, Modifier.widthIn(max = 520.dp).fillMaxWidth())
+            Row(Modifier.widthIn(max = 520.dp).fillMaxWidth().weight(1f, fill = false), Arrangement.spacedBy(12.dp), Alignment.CenterVertically) {
                 LookCard(settings, "AbsentMotion", app.absentmotion.ui.theme.Palette.AbsentMotion, R.string.theme_light, Modifier.weight(1f))
                 LookCard(settings, "Dark", app.absentmotion.ui.theme.Palette.Dark, R.string.theme_dark, Modifier.weight(1f))
             }
@@ -154,6 +155,22 @@ fun LookStep(settings: AppSettings, onContinue: () -> Unit) {
 }
 
 @Composable
+private fun SystemLook(settings: AppSettings, modifier: Modifier) {
+    val chosen = settings.theme == app.absentmotion.ui.theme.Themes.SYSTEM
+    val shape = RoundedCornerShape(16.dp)
+    val ring by androidx.compose.animation.animateColorAsState(if (chosen) Am.HomeAccent else Am.HomeLine, app.absentmotion.ui.theme.Motion.fast(), label = "look ring")
+    Row(
+        modifier.clip(shape).border(2.dp, ring, shape)
+            .selectable(chosen, role = Role.RadioButton) { if (!chosen) app.absentmotion.ui.theme.ThemeFade.change { settings.theme = app.absentmotion.ui.theme.Themes.SYSTEM } }
+            .heightIn(min = 56.dp).padding(horizontal = 14.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(stringResource(R.string.theme_system), Modifier.weight(1f), color = Am.HomeInk, fontSize = 16.sp, fontWeight = FontWeight.Medium)
+        Box(Modifier.size(20.dp)) { if (chosen) Icon(PanelIcons.Check, null, Modifier.size(20.dp), tint = Am.HomeAccent) }
+    }
+}
+
+@Composable
 private fun LookCard(settings: AppSettings, id: String, p: app.absentmotion.ui.theme.Palette, label: Int, modifier: Modifier) {
     val chosen = settings.theme == id
     val shape = RoundedCornerShape(16.dp)
@@ -162,7 +179,7 @@ private fun LookCard(settings: AppSettings, id: String, p: app.absentmotion.ui.t
         modifier.clip(shape).border(2.dp, ring, shape)
             .selectable(chosen, role = Role.RadioButton) { if (!chosen) app.absentmotion.ui.theme.ThemeFade.change { settings.theme = id } }.padding(10.dp),
     ) {
-        HomeSketch(p, Modifier.fillMaxWidth().aspectRatio(0.6f).clip(RoundedCornerShape(12.dp)))
+        HomeSketch(p, Modifier.weight(1f, fill = false).align(Alignment.CenterHorizontally).aspectRatio(0.6f).clip(RoundedCornerShape(12.dp)))
         Row(Modifier.fillMaxWidth().padding(top = 10.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(label), Modifier.weight(1f), color = Am.HomeInk, fontSize = 16.sp, fontWeight = FontWeight.Medium)
             if (chosen) Icon(PanelIcons.Check, null, Modifier.size(20.dp), tint = Am.HomeAccent)

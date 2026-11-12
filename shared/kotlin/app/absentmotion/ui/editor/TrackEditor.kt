@@ -129,6 +129,7 @@ private val RangeLabels = mapOf(
 
 @Composable
 internal fun TrackPanel(state: EditorState, mode: TrackMode) {
+    app.absentmotion.ui.theme.ThemeFade.Hold(mode.running)
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     DisposableEffect(mode) { onDispose { mode.job?.cancel() } }

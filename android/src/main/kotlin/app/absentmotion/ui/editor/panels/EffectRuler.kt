@@ -5,7 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.os.Bundle
 import android.view.GestureDetector
-import android.view.HapticFeedbackConstants
+import app.absentmotion.platform.appHaptic
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
@@ -86,7 +86,7 @@ private class EffectRulerView(context: Context, private val scope: CoroutineScop
             fine = true
             fineX = e.x
             begin()
-            if (vibrate) performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+            if (vibrate) appHaptic(click = true)
             invalidate()
         }
 
@@ -220,7 +220,7 @@ private class EffectRulerView(context: Context, private val scope: CoroutineScop
             start()
             change(value.coerceIn(low * step, high * step))
             end()
-            if (vibrate) performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+            if (vibrate) appHaptic(click = false)
             return true
         }
         if (event.actionMasked == MotionEvent.ACTION_MOVE && abs(event.rawX - downX) > interceptSlop &&

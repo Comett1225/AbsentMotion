@@ -5,7 +5,6 @@
     <string name="action_close">Fermer</string>
     <string name="settings_language">Langue</string>
     <string name="onboarding_language_title">Choisissez votre langue</string>
-    <string name="onboarding_look_title">Clair ou sombre ?</string>
     <string name="onboarding_language_others">Autres langues</string>
     <string name="onboarding_language_later">Vous pourrez la changer plus tard dans les paramètres.</string>
     <string name="onboarding_check_title">Vérifiez les capacités de cet appareil</string>
@@ -132,7 +131,6 @@
     <string name="restore_this_version">Restaurer cette version ?</string>
     <string name="no_earlier_versions_yet_a_version">Aucune version précédente pour le moment. Une version est conservée à chaque ouverture ou fermeture du projet et toutes les deux minutes pendant la modification.</string>
     <string name="still_working">Toujours en cours…</string>
-    <string name="theme">Thème</string>
     <string name="new_layer_length">Durée des nouveaux calques</string>
     <string name="remove_caption_model">Supprimer le modèle de sous-titrage</string>
     <string name="the_media_picker_lists_only_albums">Le sélecteur de médias n’affiche que les albums et dossiers dont le nom contient Demo.</string>
@@ -319,6 +317,8 @@
     <string name="update_reconnecting">Connexion perdue. Nouvelle tentative…</string>
     <string name="update_external">Cette copie ne provient pas d’une version d’AbsentMotion publiée sur GitHub et ne peut donc pas se mettre à jour elle-même. Obtenez la mise à jour auprès de la source d’installation.</string>
     <string name="update_metered">Cette connexion est facturée à l’usage, comme les données mobiles. Le téléchargement peut consommer votre forfait.</string>
+    <string name="theme_select">Choisissez votre thème</string>
+    <string name="theme_system">Par défaut du système</string>
     <string name="theme_light">Clair</string>
     <string name="theme_dark">Sombre</string>
     <string name="theme_daylight">Lumière du jour</string>

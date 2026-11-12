@@ -234,6 +234,16 @@ object PlatformFeatures {
 
 fun textFieldFocused(): Boolean = app.absentmotion.desk.DeskTyping.active > 0
 
+fun systemDark(context: Context): Boolean = app.absentmotion.desk.DeskOs.systemDark()
+
+@androidx.compose.runtime.Composable
+fun systemDarkLive(): Boolean = androidx.compose.runtime.produceState(app.absentmotion.desk.DeskOs.systemDark()) {
+    while (true) {
+        kotlinx.coroutines.delay(2000)
+        value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { app.absentmotion.desk.DeskOs.systemDark() }
+    }
+}.value
+
 fun Modifier.resizeCursor(horizontal: Boolean = true): Modifier =
     pointerHoverIcon(androidx.compose.ui.input.pointer.PointerIcon(java.awt.Cursor(if (horizontal) java.awt.Cursor.E_RESIZE_CURSOR else java.awt.Cursor.N_RESIZE_CURSOR)))
 

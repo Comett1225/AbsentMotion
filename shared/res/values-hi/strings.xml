@@ -5,7 +5,6 @@
     <string name="action_close">बंद करें</string>
     <string name="settings_language">भाषा</string>
     <string name="onboarding_language_title">अपनी भाषा चुनें</string>
-    <string name="onboarding_look_title">लाइट या डार्क?</string>
     <string name="onboarding_language_others">अन्य भाषाएँ</string>
     <string name="onboarding_language_later">आप इसे बाद में सेटिंग में बदल सकते हैं।</string>
     <string name="onboarding_check_title">देखें यह डिवाइस क्या-क्या कर सकता है</string>
@@ -132,7 +131,6 @@
     <string name="restore_this_version">यह वर्ज़न रिस्टोर करें?</string>
     <string name="no_earlier_versions_yet_a_version">अभी कोई पुराना वर्ज़न नहीं है। प्रोजेक्ट खोलने या बंद करने पर और एडिट करते समय हर दो मिनट में एक वर्ज़न रखा जाता है।</string>
     <string name="still_working">अभी काम चल रहा है…</string>
-    <string name="theme">थीम</string>
     <string name="new_layer_length">नई लेयर की लंबाई</string>
     <string name="remove_caption_model">कैप्शन मॉडल हटाएँ</string>
     <string name="the_media_picker_lists_only_albums">मीडिया पिकर सिर्फ़ उन एल्बम और फ़ोल्डर दिखाता है जिनके नाम में Demo है।</string>
@@ -319,6 +317,8 @@
     <string name="update_reconnecting">कनेक्शन टूट गया। फिर से कोशिश की जा रही है…</string>
     <string name="update_external">यह कॉपी AbsentMotion के GitHub रिलीज़ से नहीं आई है, इसलिए यह खुद को अपडेट नहीं कर सकती। अपडेट वहीं से लें जहाँ से आपने इसे इंस्टॉल किया था।</string>
     <string name="update_metered">यह कनेक्शन मीटर्ड है, जैसे मोबाइल डेटा। डाउनलोड से आपका डेटा प्लान खर्च हो सकता है।</string>
+    <string name="theme_select">अपनी थीम चुनें</string>
+    <string name="theme_system">सिस्टम डिफ़ॉल्ट</string>
     <string name="theme_light">लाइट</string>
     <string name="theme_dark">डार्क</string>
     <string name="theme_daylight">डेलाइट</string>

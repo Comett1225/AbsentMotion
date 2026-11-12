@@ -108,6 +108,7 @@ internal fun BackupRows(settings: AppSettings, onRestored: () -> Unit) {
         )
     }
     task?.let { current ->
+        app.absentmotion.ui.theme.ThemeFade.Hold(current.result == null)
         AlertDialog(
             onDismissRequest = {},
             title = { Text((if (current.result == null) current.title else current.finished).text(), color = Am.Navy) },

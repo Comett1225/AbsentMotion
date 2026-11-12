@@ -501,6 +501,7 @@ internal fun DownloaderScreen(store: ProjectStore, settings: AppSettings, onOpen
     val back = { if (running) work?.cancel() ?: Unit else onClose() }
     ToolSheet(stringResource(R.string.tools_downloader), back, bounded = true, bottom = {
         val view = LocalView.current
+        app.absentmotion.ui.theme.ThemeFade.Hold(running)
         DisposableEffect(running) {
             view.keepScreenOn = running
             onDispose { view.keepScreenOn = false }

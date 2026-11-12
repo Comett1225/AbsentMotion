@@ -241,12 +241,12 @@ internal object HoverTargets {
     var count by mutableIntStateOf(0)
 }
 
-class PressIndication(private val tint: Color, private val hover: Boolean = false) : IndicationNodeFactory {
-    override fun create(interactionSource: InteractionSource): DelegatableNode = PressNode(interactionSource, tint, hover)
-    override fun equals(other: Any?) = other is PressIndication && other.tint == tint && other.hover == hover
-    override fun hashCode() = tint.hashCode() * 31 + hover.hashCode()
+class PressIndication(private val tint: Color, private val hover: Boolean = false, private val soft: Boolean = false) : IndicationNodeFactory {
+    override fun create(interactionSource: InteractionSource): DelegatableNode = PressNode(interactionSource, tint, hover, soft)
+    override fun equals(other: Any?) = other is PressIndication && other.tint == tint && other.hover == hover && other.soft == soft
+    override fun hashCode() = (tint.hashCode() * 31 + hover.hashCode()) * 31 + soft.hashCode()
 
-    private class PressNode(private val source: InteractionSource, private val tint: Color, private val hover: Boolean) : Modifier.Node(), DrawModifierNode {
+    private class PressNode(private val source: InteractionSource, private val tint: Color, private val hover: Boolean, private val soft: Boolean) : Modifier.Node(), DrawModifierNode {
         private val level = Animatable(0f)
         private val glow = if (hover) Animatable(0f) else null
         private val hovers = if (hover) mutableListOf<HoverInteraction.Enter>() else null
@@ -294,7 +294,8 @@ class PressIndication(private val tint: Color, private val hover: Boolean = fals
                 if (g > 0f) drawRect(tint, alpha = g * 0.7f)
             }
             val l = level.value
-            if (l > 0f) drawRect(tint, alpha = l)
+            if (l > 0f && soft) drawRoundRect(tint, cornerRadius = androidx.compose.ui.geometry.CornerRadius(minOf(12.dp.toPx(), size.minDimension / 2f)), alpha = l)
+            else if (l > 0f) drawRect(tint, alpha = l)
         }
     }
 }
@@ -317,6 +318,29 @@ object ThemeFade {
 
     fun change(block: () -> Unit) {
         if (hosted) request = block else block()
+    }
+
+    private val jobs = java.util.concurrent.atomic.AtomicInteger()
+
+    val busy: Boolean
+        get() = jobs.get() > 0 || app.absentmotion.export.ExportRun.running ||
+            app.absentmotion.editor.PreviewCache.phase == app.absentmotion.editor.PreviewCache.Phase.Rendering
+
+    @Composable
+    fun Hold(running: Boolean) {
+        androidx.compose.runtime.DisposableEffect(running) {
+            if (running) jobs.incrementAndGet()
+            onDispose { if (running) jobs.decrementAndGet() }
+        }
+    }
+}
+
+@Composable
+fun FollowSystemTheme(settings: app.absentmotion.library.AppSettings) {
+    val dark = app.absentmotion.platform.systemDarkLive()
+    LaunchedEffect(dark) {
+        while (ThemeFade.busy) kotlinx.coroutines.delay(500)
+        if (settings.systemDark != dark) ThemeFade.change { settings.systemDark = dark }
     }
 }
 

@@ -32,10 +32,14 @@ class AppSettings(private val context: Context) {
     private var rotateFreeState by mutableStateOf(prefs.getBoolean("rotateFree", false))
     private var openGlState by mutableStateOf(prefs.getBoolean("graphicsOpenGl", false))
 
-    private var themeState by mutableStateOf(prefs.getString("theme", Themes.DEFAULT)!!)
+    private var themeState by mutableStateOf(Themes.firstChoice(prefs.getString("theme", null), prefs.getInt("onboarding", 0), prefs.getBoolean("lookChosen", false)))
+    private var systemDarkState by mutableStateOf(app.absentmotion.platform.systemDark(context))
     private var customThemeState by mutableStateOf(Themes.custom(context)?.let { it.name ?: "" })
 
-    init { Am.palette = Themes.palette(context, themeState) }
+    init {
+        if (!prefs.contains("theme")) prefs.edit().putString("theme", themeState).apply()
+        Am.palette = Themes.palette(context, themeState, systemDarkState)
+    }
 
     private var savedColoursState by mutableStateOf(
         prefs.getString("savedColours", null)?.split(',')?.mapNotNull { it.toIntOrNull() } ?: listOf(0x264653, 0x2A9D8F, 0xE9C46A, 0xE76F51),
@@ -197,11 +201,18 @@ class AppSettings(private val context: Context) {
         set(value) {
             themeState = value
             prefs.edit().putString("theme", value).apply()
-            Am.palette = Themes.palette(context, value)
+            Am.palette = Themes.palette(context, value, systemDarkState)
+        }
+
+    var systemDark: Boolean
+        get() = systemDarkState
+        set(value) {
+            systemDarkState = value
+            if (themeState == Themes.SYSTEM) Am.palette = Themes.palette(context, themeState, value)
         }
 
     val themes: List<Pair<String, UiText>>
-        get() = Palette.BuiltIn.map { it.first to builtInThemeName(it.first) } +
+        get() = listOf(Themes.SYSTEM to txt(R.string.theme_system)) + Palette.BuiltIn.map { it.first to builtInThemeName(it.first) } +
             listOfNotNull(customThemeState?.let { Themes.CUSTOM to if (it.isEmpty()) txt(R.string.theme_custom) else txt(R.string.theme_custom_named, it) })
 
     val themeLabel: UiText get() = themes.firstOrNull { it.first == themeState }?.second ?: builtInThemeName(Themes.DEFAULT)
@@ -233,7 +244,7 @@ class AppSettings(private val context: Context) {
         set(value) { prefs.edit().putInt("templateHints", value).apply() }
 
     var lookChosen: Boolean
-        get() = prefs.getBoolean("lookChosen", false) || themeState != Themes.DEFAULT
+        get() = prefs.getBoolean("lookChosen", false) || themeState != Themes.DEFAULT && themeState != Themes.SYSTEM
         set(value) { prefs.edit().putBoolean("lookChosen", value).apply() }
 
     var onboarding: Int

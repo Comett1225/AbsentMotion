@@ -118,7 +118,7 @@ fun main(args: Array<String>) {
                 window.addWindowStateListener(maximized)
                 onDispose { window.removeComponentListener(listener); window.removeWindowStateListener(maximized) }
             }
-            app.absentmotion.ui.theme.ThemeFadeHost { DeskApp(desk) }
+            app.absentmotion.ui.theme.ThemeFadeHost { app.absentmotion.ui.theme.FollowSystemTheme(desk.settings); DeskApp(desk) }
         }
     }
 }

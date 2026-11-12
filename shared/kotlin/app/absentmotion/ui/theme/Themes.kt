@@ -38,6 +38,7 @@ object ThemeFile {
 
 object Themes {
     const val CUSTOM = "custom"
+    const val SYSTEM = "system"
     val DEFAULT = Palette.BuiltIn.first().first
     const val MAX_BYTES = 64 * 1024
 
@@ -45,7 +46,13 @@ object Themes {
 
     fun custom(context: Context): Theme? = runCatching { ThemeFile.parse(customFile(context).readText()) }.getOrNull()
 
-    fun palette(context: Context, id: String): Palette =
+    fun resolve(id: String, systemDark: Boolean): String = if (id != SYSTEM) id else if (systemDark) "Dark" else DEFAULT
+
+    fun firstChoice(saved: String?, onboarding: Int, lookChosen: Boolean): String = saved ?: if (onboarding == 0 && !lookChosen) SYSTEM else DEFAULT
+
+    fun palette(context: Context, id: String, systemDark: Boolean = false): Palette = palette(context, resolve(id, systemDark))
+
+    private fun palette(context: Context, id: String): Palette =
         if (id == CUSTOM) custom(context)?.palette ?: Palette.AbsentMotion
         else Palette.BuiltIn.firstOrNull { it.first == id }?.second ?: Palette.AbsentMotion
 

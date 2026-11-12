@@ -5,7 +5,6 @@
     <string name="action_close">Закрити</string>
     <string name="settings_language">Мова</string>
     <string name="onboarding_language_title">Виберіть мову</string>
-    <string name="onboarding_look_title">Світла чи темна тема?</string>
     <string name="onboarding_language_others">Інші мови</string>
     <string name="onboarding_language_later">Це можна змінити пізніше в налаштуваннях.</string>
     <string name="onboarding_check_title">Перевірте можливості пристрою</string>
@@ -132,7 +131,6 @@
     <string name="restore_this_version">Відновити цю версію?</string>
     <string name="no_earlier_versions_yet_a_version">Попередніх версій поки немає. Версія зберігається щоразу, коли проєкт відкривається або закривається, а також кожні дві хвилини під час редагування.</string>
     <string name="still_working">Ще працюємо…</string>
-    <string name="theme">Тема</string>
     <string name="new_layer_length">Тривалість нового шару</string>
     <string name="remove_caption_model">Видалити модель субтитрів</string>
     <string name="the_media_picker_lists_only_albums">Засіб вибору медіа показує лише альбоми й папки, назва яких містить Demo.</string>
@@ -319,6 +317,8 @@
     <string name="update_reconnecting">З\'єднання втрачено. Повторна спроба…</string>
     <string name="update_external">Ця копія не походить із випуску AbsentMotion на GitHub, тому не може оновлюватися самостійно. Отримайте оновлення там, звідки ви її встановили.</string>
     <string name="update_metered">Це з\'єднання з лімітом трафіку, наприклад мобільний інтернет. Завантаження може витратити ваш трафік.</string>
+    <string name="theme_select">Виберіть тему</string>
+    <string name="theme_system">Як у системі</string>
     <string name="theme_light">Світла</string>
     <string name="theme_dark">Темна</string>
     <string name="theme_daylight">Денна</string>

@@ -254,6 +254,7 @@ val sceneCheck = tasks.register<JavaExec>("sceneCheck") {
 tasks.test {
     systemProperty("user.home", layout.buildDirectory.dir("test-home").get().asFile.absolutePath)
     systemProperty("am.onboarding", "done")
+    systemProperty("am.systemDark", "false")
     systemProperty("am.whatsNew", "off")
     systemProperty("am.fontOffer", "off")
     systemProperty("am.preload", "off")
@@ -261,6 +262,9 @@ tasks.test {
     systemProperty("am.data", layout.buildDirectory.dir("test-data").get().asFile.absolutePath)
     dependsOn(nativeBuild)
     inputs.file(layout.buildDirectory.file("$nativeDir/$nativeName"))
+    inputs.dir("../shared/assets").withPropertyName("sharedAssets").withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.dir("../shared/res").withPropertyName("sharedRes").withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.dir("../testdata").withPropertyName("testData").withPathSensitivity(PathSensitivity.RELATIVE)
     systemProperty("am.native", layout.buildDirectory.file("$nativeDir/$nativeName").get().asFile.absolutePath)
     systemProperties(bundledTools)
     systemProperty("am.assets", file("../shared/assets").absolutePath)

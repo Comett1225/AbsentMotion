@@ -168,7 +168,7 @@ class DeskParityRoundTest {
                     shot("$w-welcome-language")
                     onAllNodesWithText(text(R.string.action_continue)).onFirst().performClick()
                     settle()
-                    onNodeWithText(text(R.string.onboarding_look_title)).assertExists()
+                    onNodeWithText(text(R.string.theme_select)).assertExists()
                     shot("$w-welcome-look")
                     onAllNodesWithText(text(R.string.action_continue)).onFirst().performClick()
                     settle()

@@ -5,7 +5,6 @@
     <string name="action_close">关闭</string>
     <string name="settings_language">语言</string>
     <string name="onboarding_language_title">选择语言</string>
-    <string name="onboarding_look_title">浅色还是深色？</string>
     <string name="onboarding_language_others">其他语言</string>
     <string name="onboarding_language_later">以后可在设置中更改。</string>
     <string name="onboarding_check_title">检查设备性能</string>
@@ -132,7 +131,6 @@
     <string name="restore_this_version">恢复此版本？</string>
     <string name="no_earlier_versions_yet_a_version">暂无历史版本。每次打开或关闭项目时都会保存一个版本，编辑期间每两分钟保存一次。</string>
     <string name="still_working">仍在处理…</string>
-    <string name="theme">主题</string>
     <string name="new_layer_length">新图层时长</string>
     <string name="remove_caption_model">移除字幕模型</string>
     <string name="the_media_picker_lists_only_albums">媒体选择器仅显示名称包含Demo的相册和文件夹。</string>
@@ -319,6 +317,8 @@
     <string name="update_reconnecting">连接已断开，正在重试…</string>
     <string name="update_external">此应用并非来自AbsentMotion的GitHub发布版本，无法自行更新。请从安装来源获取更新。</string>
     <string name="update_metered">当前使用按流量计费的网络，例如移动数据。下载可能消耗套餐流量。</string>
+    <string name="theme_select">选择主题</string>
+    <string name="theme_system">跟随系统</string>
     <string name="theme_light">浅色</string>
     <string name="theme_dark">深色</string>
     <string name="theme_daylight">日光</string>

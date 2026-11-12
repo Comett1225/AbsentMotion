@@ -5,7 +5,6 @@
     <string name="action_close">Schließen</string>
     <string name="settings_language">Sprache</string>
     <string name="onboarding_language_title">Wähle deine Sprache</string>
-    <string name="onboarding_look_title">Hell oder dunkel?</string>
     <string name="onboarding_language_others">Weitere Sprachen</string>
     <string name="onboarding_language_later">Du kannst dies später in den Einstellungen ändern.</string>
     <string name="onboarding_check_title">Prüfe, was dieses Gerät leisten kann</string>
@@ -132,7 +131,6 @@
     <string name="restore_this_version">Diese Version wiederherstellen?</string>
     <string name="no_earlier_versions_yet_a_version">Noch keine früheren Versionen. Eine Version wird bei jedem Öffnen und Schließen des Projekts sowie während der Bearbeitung alle zwei Minuten gespeichert.</string>
     <string name="still_working">Wird noch bearbeitet…</string>
-    <string name="theme">Design</string>
     <string name="new_layer_length">Länge neuer Ebenen</string>
     <string name="remove_caption_model">Untertitelmodell entfernen</string>
     <string name="the_media_picker_lists_only_albums">Die Medienauswahl zeigt nur Alben und Ordner, deren Name Demo enthält.</string>
@@ -319,6 +317,8 @@
     <string name="update_reconnecting">Verbindung verloren. Erneuter Versuch…</string>
     <string name="update_external">Diese Kopie stammt nicht aus einer AbsentMotion-Veröffentlichung auf GitHub und kann sich daher nicht selbst aktualisieren. Beziehe das Update dort, wo du die App installiert hast.</string>
     <string name="update_metered">Diese Verbindung ist getaktet, zum Beispiel bei mobilen Daten. Der Download kann dein Datenvolumen verbrauchen.</string>
+    <string name="theme_select">Design auswählen</string>
+    <string name="theme_system">Systemstandard</string>
     <string name="theme_light">Hell</string>
     <string name="theme_dark">Dunkel</string>
     <string name="theme_daylight">Tageslicht</string>

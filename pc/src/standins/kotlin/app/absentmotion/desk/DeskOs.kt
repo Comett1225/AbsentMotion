@@ -8,6 +8,21 @@ object DeskOs {
     val windows = name.startsWith("windows")
     val linux = !mac && !windows
     val home: File get() = File(System.getProperty("user.home"))
+
+    fun systemDark(): Boolean = runCatching {
+        System.getProperty("am.systemDark")?.let { return it == "true" }
+        when (org.jetbrains.skiko.currentSystemTheme) {
+            org.jetbrains.skiko.SystemTheme.DARK -> true
+            org.jetbrains.skiko.SystemTheme.LIGHT -> false
+            else -> linux && gnomeDark()
+        }
+    }.getOrDefault(false)
+
+    private fun gnomeDark(): Boolean {
+        val process = ProcessBuilder("gsettings", "get", "org.gnome.desktop.interface", "color-scheme").redirectErrorStream(true).start()
+        if (!process.waitFor(1, java.util.concurrent.TimeUnit.SECONDS)) { process.destroyForcibly(); return false }
+        return process.inputStream.bufferedReader().use { it.readText() }.contains("dark")
+    }
     val dataDir: File get() = when {
         mac -> home.resolve("Library/Application Support/AbsentMotion")
         windows -> File(System.getenv("APPDATA") ?: home.path).resolve("AbsentMotion")

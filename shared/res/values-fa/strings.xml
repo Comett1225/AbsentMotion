@@ -5,7 +5,6 @@
     <string name="action_close">بستن</string>
     <string name="settings_language">زبان</string>
     <string name="onboarding_language_title">زبان خود را انتخاب کنید</string>
-    <string name="onboarding_look_title">روشن یا تیره؟</string>
     <string name="onboarding_language_others">زبان‌های دیگر</string>
     <string name="onboarding_language_later">بعداً می‌توانید این را در تنظیمات تغییر دهید.</string>
     <string name="onboarding_check_title">بررسی قابلیت‌های این دستگاه</string>
@@ -132,7 +131,6 @@
     <string name="restore_this_version">این نسخه بازیابی شود؟</string>
     <string name="no_earlier_versions_yet_a_version">هنوز نسخه قبلی وجود ندارد. هر بار که پروژه باز یا بسته می‌شود و هر دو دقیقه هنگام ویرایش، یک نسخه نگه داشته می‌شود.</string>
     <string name="still_working">در حال انجام…</string>
-    <string name="theme">پوسته</string>
     <string name="new_layer_length">مدت لایه جدید</string>
     <string name="remove_caption_model">حذف مدل زیرنویس</string>
     <string name="the_media_picker_lists_only_albums">انتخابگر رسانه فقط آلبوم‌ها و پوشه‌هایی را نشان می‌دهد که نامشان شامل Demo است.</string>
@@ -319,6 +317,8 @@
     <string name="update_reconnecting">اتصال قطع شد. در حال تلاش دوباره…</string>
     <string name="update_external">این نسخه از انتشارهای AbsentMotion در GitHub نیامده، برای همین نمی‌تواند خودش را به‌روز کند. به‌روزرسانی را از همان جایی بگیرید که آن را نصب کرده‌اید.</string>
     <string name="update_metered">این اتصال حجمی است، مثلاً اینترنت همراه. دانلود ممکن است از بستهٔ اینترنت شما کم کند.</string>
+    <string name="theme_select">پوسته خود را انتخاب کنید</string>
+    <string name="theme_system">پیش‌فرض سیستم</string>
     <string name="theme_light">روشن</string>
     <string name="theme_dark">تیره</string>
     <string name="theme_daylight">روشنایی روز</string>

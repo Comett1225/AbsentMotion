@@ -5,7 +5,6 @@
     <string name="action_close">ปิด</string>
     <string name="settings_language">ภาษา</string>
     <string name="onboarding_language_title">เลือกภาษาของคุณ</string>
-    <string name="onboarding_look_title">สว่างหรือมืด?</string>
     <string name="onboarding_language_others">ภาษาอื่นๆ</string>
     <string name="onboarding_language_later">คุณเปลี่ยนภาษาได้ภายหลังในการตั้งค่า</string>
     <string name="onboarding_check_title">ตรวจสอบว่าเครื่องนี้ทำอะไรได้บ้าง</string>
@@ -132,7 +131,6 @@
     <string name="restore_this_version">กู้คืนเวอร์ชันนี้หรือไม่?</string>
     <string name="no_earlier_versions_yet_a_version">ยังไม่มีเวอร์ชันก่อนหน้า ระบบจะเก็บเวอร์ชันทุกครั้งที่เปิดหรือปิดโปรเจกต์ และทุกสองนาทีขณะแก้ไข</string>
     <string name="still_working">กำลังดำเนินการ…</string>
-    <string name="theme">ธีม</string>
     <string name="new_layer_length">ความยาวของเลเยอร์ใหม่</string>
     <string name="remove_caption_model">ลบโมเดลคำบรรยาย</string>
     <string name="the_media_picker_lists_only_albums">ตัวเลือกสื่อจะแสดงเฉพาะอัลบั้มและโฟลเดอร์ที่ชื่อมี Demo เท่านั้น</string>
@@ -319,6 +317,8 @@
     <string name="update_reconnecting">การเชื่อมต่อขาด กำลังลองอีกครั้ง…</string>
     <string name="update_external">สำเนานี้ไม่ได้มาจากรุ่นเผยแพร่ของ AbsentMotion บน GitHub จึงอัปเดตตัวเองไม่ได้ รับอัปเดตจากที่ที่คุณติดตั้งมา</string>
     <string name="update_metered">การเชื่อมต่อนี้คิดตามปริมาณข้อมูล เช่น อินเทอร์เน็ตมือถือ การดาวน์โหลดอาจใช้ข้อมูลในแพ็กเกจของคุณ</string>
+    <string name="theme_select">เลือกธีมของคุณ</string>
+    <string name="theme_system">ค่าเริ่มต้นของระบบ</string>
     <string name="theme_light">สว่าง</string>
     <string name="theme_dark">มืด</string>
     <string name="theme_daylight">กลางวัน</string>

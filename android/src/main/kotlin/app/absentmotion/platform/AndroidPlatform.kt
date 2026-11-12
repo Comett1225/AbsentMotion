@@ -221,6 +221,12 @@ object PlatformFeatures {
 
 fun textFieldFocused(): Boolean = false
 
+fun systemDark(context: Context): Boolean =
+    context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK == android.content.res.Configuration.UI_MODE_NIGHT_YES
+
+@androidx.compose.runtime.Composable
+fun systemDarkLive(): Boolean = androidx.compose.foundation.isSystemInDarkTheme()
+
 fun androidx.compose.ui.Modifier.resizeCursor(horizontal: Boolean = true): androidx.compose.ui.Modifier = this
 
 @androidx.compose.runtime.Composable

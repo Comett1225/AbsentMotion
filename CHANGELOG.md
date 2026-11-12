@@ -10,7 +10,8 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 
 ### Added
 
-- Light and Dark mode: pick one on the first start or later in Settings > Editor > Theme. Dark covers the whole app, Home included, and switching fades smoothly.
+- Light and Dark mode: Select your theme on the first start or later in Settings > Editor. System default follows the device live and waits for a running export or job to finish. Dark covers the whole app, Home included, and switching fades smoothly.
+- Vibration: the app's haptics also work when the system touch vibration is off, while Vibration is on in AbsentMotion.
 - Time Remap: a Remap tab in Speed keyframes which moment of a video shows, to speed it up, freeze it or play it backwards inside one layer.
 - Tools inside the editor: a Tools tab in the + menu, and Tools in the left rail on a computer. Compress, Trim, Extract Audio, Make a GIF and the Video Downloader add their result to the project.
 - Video Downloader on Windows, Mac and Linux, with a one-time add-on.

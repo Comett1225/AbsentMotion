@@ -5,7 +5,6 @@
     <string name="action_close">Cerrar</string>
     <string name="settings_language">Idioma</string>
     <string name="onboarding_language_title">Elige tu idioma</string>
-    <string name="onboarding_look_title">¿Claro u oscuro?</string>
     <string name="onboarding_language_others">Otros idiomas</string>
     <string name="onboarding_language_later">Puedes cambiarlo más tarde en Configuración.</string>
     <string name="onboarding_check_title">Comprueba lo que puede hacer este dispositivo</string>
@@ -132,7 +131,6 @@
     <string name="restore_this_version">¿Restaurar esta versión?</string>
     <string name="no_earlier_versions_yet_a_version">Aún no hay versiones anteriores. Se guarda una versión cada vez que se abre o se cierra el proyecto, y cada dos minutos mientras editas.</string>
     <string name="still_working">Aún trabajando…</string>
-    <string name="theme">Tema</string>
     <string name="new_layer_length">Duración de capa nueva</string>
     <string name="remove_caption_model">Eliminar modelo de subtítulos</string>
     <string name="the_media_picker_lists_only_albums">El selector de medios solo muestra álbumes y carpetas cuyo nombre contenga Demo.</string>
@@ -319,6 +317,8 @@
     <string name="update_reconnecting">Se perdió la conexión. Reintentando…</string>
     <string name="update_external">Esta copia no proviene de una versión de AbsentMotion en GitHub, así que no puede actualizarse sola. Consigue la actualización donde la instalaste.</string>
     <string name="update_metered">Esta conexión es de uso medido, por ejemplo datos móviles. La descarga puede consumir tu plan de datos.</string>
+    <string name="theme_select">Selecciona tu tema</string>
+    <string name="theme_system">Predeterminado del sistema</string>
     <string name="theme_light">Claro</string>
     <string name="theme_dark">Oscuro</string>
     <string name="theme_daylight">Luz de día</string>

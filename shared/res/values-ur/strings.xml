@@ -5,7 +5,6 @@
     <string name="action_close">بند کریں</string>
     <string name="settings_language">زبان</string>
     <string name="onboarding_language_title">اپنی زبان منتخب کریں</string>
-    <string name="onboarding_look_title">لائٹ یا ڈارک؟</string>
     <string name="onboarding_language_others">دیگر زبانیں</string>
     <string name="onboarding_language_later">آپ اسے بعد میں سیٹنگز میں تبدیل کر سکتے ہیں۔</string>
     <string name="onboarding_check_title">دیکھیں یہ آلہ کیا کر سکتا ہے</string>
@@ -132,7 +131,6 @@
     <string name="restore_this_version">یہ ورژن بحال کریں؟</string>
     <string name="no_earlier_versions_yet_a_version">ابھی کوئی پرانا ورژن نہیں۔ پروجیکٹ ہر بار کھلنے یا بند ہونے پر، اور ایڈٹنگ کے دوران ہر دو منٹ میں ایک ورژن محفوظ کیا جاتا ہے۔</string>
     <string name="still_working">ابھی کام جاری ہے…</string>
-    <string name="theme">تھیم</string>
     <string name="new_layer_length">نئی لیئر کی لمبائی</string>
     <string name="remove_caption_model">کیپشن ماڈل ہٹائیں</string>
     <string name="the_media_picker_lists_only_albums">میڈیا پکر صرف وہ البمز اور فولڈرز دکھاتا ہے جن کے نام میں Demo شامل ہو۔</string>
@@ -319,6 +317,8 @@
     <string name="update_reconnecting">کنکشن ٹوٹ گیا۔ دوبارہ کوشش ہو رہی ہے…</string>
     <string name="update_external">یہ کاپی AbsentMotion کی GitHub ریلیز سے نہیں آئی، اس لیے یہ خود کو اپ ڈیٹ نہیں کر سکتی۔ اپ ڈیٹ وہیں سے حاصل کریں جہاں سے آپ نے اسے انسٹال کیا تھا۔</string>
     <string name="update_metered">یہ کنکشن میٹرڈ ہے، مثلاً موبائل ڈیٹا۔ ڈاؤن لوڈ آپ کا ڈیٹا پلان استعمال کر سکتا ہے۔</string>
+    <string name="theme_select">اپنی تھیم منتخب کریں</string>
+    <string name="theme_system">سسٹم ڈیفالٹ</string>
     <string name="theme_light">لائٹ</string>
     <string name="theme_dark">ڈارک</string>
     <string name="theme_daylight">ڈے لائٹ</string>

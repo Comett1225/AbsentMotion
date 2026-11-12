@@ -5,7 +5,6 @@
     <string name="action_close">إغلاق</string>
     <string name="settings_language">اللغة</string>
     <string name="onboarding_language_title">اختر لغتك</string>
-    <string name="onboarding_look_title">فاتح أم داكن؟</string>
     <string name="onboarding_language_others">لغات أخرى</string>
     <string name="onboarding_language_later">يمكنك تغيير ذلك لاحقًا من الإعدادات.</string>
     <string name="onboarding_check_title">تحقق مما يمكن لهذا الجهاز فعله</string>
@@ -132,7 +131,6 @@
     <string name="restore_this_version">استعادة هذه النسخة؟</string>
     <string name="no_earlier_versions_yet_a_version">لا توجد نسخ سابقة بعد. تُحفظ نسخة في كل مرة يُفتح فيها المشروع أو يُغلق، وكل دقيقتين أثناء التحرير.</string>
     <string name="still_working">لا يزال يعمل…</string>
-    <string name="theme">المظهر</string>
     <string name="new_layer_length">طول الطبقة الجديدة</string>
     <string name="remove_caption_model">إزالة نموذج التسميات التوضيحية</string>
     <string name="the_media_picker_lists_only_albums">يعرض منتقي الوسائط الألبومات والمجلدات التي يحتوي اسمها على Demo فقط.</string>
@@ -319,6 +317,8 @@
     <string name="update_reconnecting">انقطع الاتصال. جارٍ إعادة المحاولة…</string>
     <string name="update_external">هذه النسخة لم تأتِ من إصدار AbsentMotion على GitHub، لذلك لا يمكنها تحديث نفسها. احصل على التحديث من المكان الذي ثبّتها منه.</string>
     <string name="update_metered">هذا الاتصال محدود الاستخدام، مثل بيانات الجوال. قد يستهلك التنزيل من باقة بياناتك.</string>
+    <string name="theme_select">اختر المظهر</string>
+    <string name="theme_system">الوضع الافتراضي للنظام</string>
     <string name="theme_light">فاتح</string>
     <string name="theme_dark">داكن</string>
     <string name="theme_daylight">نهاري</string>

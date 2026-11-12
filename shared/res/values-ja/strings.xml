@@ -5,7 +5,6 @@
     <string name="action_close">閉じる</string>
     <string name="settings_language">言語</string>
     <string name="onboarding_language_title">言語を選択</string>
-    <string name="onboarding_look_title">ライトとダーク、どちらにしますか？</string>
     <string name="onboarding_language_others">その他の言語</string>
     <string name="onboarding_language_later">言語は後から設定で変更できます。</string>
     <string name="onboarding_check_title">この端末の性能を確認</string>
@@ -132,7 +131,6 @@
     <string name="restore_this_version">このバージョンを復元しますか？</string>
     <string name="no_earlier_versions_yet_a_version">以前のバージョンはまだありません。プロジェクトを開くたび、閉じるたび、および編集中は2分ごとにバージョンが保存されます。</string>
     <string name="still_working">処理中…</string>
-    <string name="theme">テーマ</string>
     <string name="new_layer_length">新規レイヤーの長さ</string>
     <string name="remove_caption_model">キャプションモデルを削除</string>
     <string name="the_media_picker_lists_only_albums">メディアピッカーには、名前にDemoを含むアルバムとフォルダのみが表示されます。</string>
@@ -319,6 +317,8 @@
     <string name="update_reconnecting">接続が切れました。再試行中…</string>
     <string name="update_external">このコピーはAbsentMotionのGitHubリリースから入手したものではないため、自己更新できません。インストールした場所からアップデートを入手してください。</string>
     <string name="update_metered">この接続はモバイルデータなどの従量制です。ダウンロードによりデータ通信量が消費される場合があります。</string>
+    <string name="theme_select">テーマを選択</string>
+    <string name="theme_system">システムのデフォルト</string>
     <string name="theme_light">ライト</string>
     <string name="theme_dark">ダーク</string>
     <string name="theme_daylight">デイライト</string>

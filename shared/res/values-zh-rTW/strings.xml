@@ -5,7 +5,6 @@
     <string name="action_close">關閉</string>
     <string name="settings_language">語言</string>
     <string name="onboarding_language_title">選擇語言</string>
-    <string name="onboarding_look_title">淺色還是深色？</string>
     <string name="onboarding_language_others">其他語言</string>
     <string name="onboarding_language_later">之後可在設定中變更。</string>
     <string name="onboarding_check_title">檢查裝置效能</string>
@@ -132,7 +131,6 @@
     <string name="restore_this_version">要還原此版本嗎？</string>
     <string name="no_earlier_versions_yet_a_version">尚無先前版本。每次開啟或關閉專案時，以及編輯期間每兩分鐘，都會保留一個版本。</string>
     <string name="still_working">處理中…</string>
-    <string name="theme">主題</string>
     <string name="new_layer_length">新圖層時長</string>
     <string name="remove_caption_model">移除字幕模型</string>
     <string name="the_media_picker_lists_only_albums">媒體選擇器只會列出名稱包含Demo的相簿和資料夾。</string>
@@ -319,6 +317,8 @@
     <string name="update_reconnecting">連線中斷，正在重試…</string>
     <string name="update_external">此版本並非來自AbsentMotion的GitHub發布版本，因此無法自行更新。請從原安裝來源取得更新。</string>
     <string name="update_metered">此連線按流量計費，例如行動數據。下載可能會消耗你的數據流量。</string>
+    <string name="theme_select">選擇主題</string>
+    <string name="theme_system">系統預設</string>
     <string name="theme_light">淺色</string>
     <string name="theme_dark">深色</string>
     <string name="theme_daylight">日光</string>

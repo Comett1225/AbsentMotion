@@ -5,7 +5,6 @@
     <string name="action_close">Isara</string>
     <string name="settings_language">Wika</string>
     <string name="onboarding_language_title">Piliin ang iyong wika</string>
-    <string name="onboarding_look_title">Maliwanag o madilim?</string>
     <string name="onboarding_language_others">Iba pang wika</string>
     <string name="onboarding_language_later">Mababago mo ito mamaya sa Settings.</string>
     <string name="onboarding_check_title">Tingnan ang kaya ng device na ito</string>
@@ -132,7 +131,6 @@
     <string name="restore_this_version">I-restore ang bersyong ito?</string>
     <string name="no_earlier_versions_yet_a_version">Wala pang naunang bersyon. Nagtatabi ng bersyon tuwing binubuksan o isinasara ang proyekto, at tuwing dalawang minuto habang nag-e-edit ka.</string>
     <string name="still_working">Ginagawa pa rin…</string>
-    <string name="theme">Tema</string>
     <string name="new_layer_length">Tagal ng bagong layer</string>
     <string name="remove_caption_model">Alisin ang modelo ng kapsyon</string>
     <string name="the_media_picker_lists_only_albums">Ang media picker ay naglilista lamang ng mga album at folder na may \"Demo\" sa pangalan.</string>
@@ -319,6 +317,8 @@
     <string name="update_reconnecting">Nawala ang koneksyon. Sinusubukan muli…</string>
     <string name="update_external">Hindi galing sa isang GitHub release ng AbsentMotion ang kopyang ito, kaya hindi nito maa-update ang sarili. Kunin ang update kung saan mo ito in-install.</string>
     <string name="update_metered">May limitasyon ang koneksyong ito, halimbawa mobile data. Maaaring maubos ng download ang iyong data plan.</string>
+    <string name="theme_select">Piliin ang iyong tema</string>
+    <string name="theme_system">Default ng system</string>
     <string name="theme_light">Maliwanag</string>
     <string name="theme_dark">Madilim</string>
     <string name="theme_daylight">Daylight</string>

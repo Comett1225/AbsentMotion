@@ -5,7 +5,6 @@
     <string name="action_close">Закрыть</string>
     <string name="settings_language">Язык</string>
     <string name="onboarding_language_title">Выберите язык</string>
-    <string name="onboarding_look_title">Светлая или тёмная?</string>
     <string name="onboarding_language_others">Другие языки</string>
     <string name="onboarding_language_later">Это можно изменить позже в настройках.</string>
     <string name="onboarding_check_title">Что умеет это устройство</string>
@@ -132,7 +131,6 @@
     <string name="restore_this_version">Восстановить эту версию?</string>
     <string name="no_earlier_versions_yet_a_version">Ранних версий пока нет. Версия сохраняется при каждом открытии и закрытии проекта, а также каждые две минуты во время редактирования.</string>
     <string name="still_working">Ещё работаем…</string>
-    <string name="theme">Тема</string>
     <string name="new_layer_length">Длительность нового слоя</string>
     <string name="remove_caption_model">Удалить модель субтитров</string>
     <string name="the_media_picker_lists_only_albums">Выбор медиа показывает только альбомы и папки, в названии которых есть Demo.</string>
@@ -319,6 +317,8 @@
     <string name="update_reconnecting">Соединение прервалось. Повторная попытка…</string>
     <string name="update_external">Эта копия установлена не из выпуска AbsentMotion на GitHub, поэтому не может обновить себя сама. Получите обновление там, откуда вы её установили.</string>
     <string name="update_metered">Это лимитное подключение, например мобильный интернет. Загрузка может израсходовать ваш трафик.</string>
+    <string name="theme_select">Выберите тему</string>
+    <string name="theme_system">Как в системе</string>
     <string name="theme_light">Светлая</string>
     <string name="theme_dark">Тёмная</string>
     <string name="theme_daylight">Дневной свет</string>

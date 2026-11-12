@@ -1598,6 +1598,10 @@
       "desktop": "pc/src/standins/kotlin/app/absentmotion/engine/DeskEngineThread.kt",
       "reason": "engine thread; stubs listed in fx.datamosh, fx.slowmo_smoothing, tool.model_layer, export.smoothing"
     },
+    "app/absentmotion/platform/AppHaptics.kt": {
+      "desktop": null,
+      "reason": "plays the app's haptics through the vibrator when the system touch vibration is off; desktop computers have no vibrator"
+    },
     "app/absentmotion/engine/GpuCheck.kt": {
       "desktop": null,
       "reason": "chooses Vulkan or OpenGL on phones and survives driver crashes at start-up; the desktop engine has one GPU back end per system (Metal, Vulkan) with a CPU fallback"
