@@ -11,12 +11,12 @@
   <a href="#requirements"><img alt="Android 8 and newer" src="https://img.shields.io/badge/Android-8%2B-3DDC84?style=for-the-badge&logo=android&logoColor=white"></a>
 </p>
 <p align="center">
-  <a href="https://comett1225.github.io/AbsentMotion/"><img alt="Download for your phone" src="https://img.shields.io/badge/Download-for%20your%20phone-f07850?style=for-the-badge"></a>
-  <a href="https://comett1225.github.io/AbsentMotion/roadmap.html"><img alt="Roadmap" src="https://img.shields.io/badge/Roadmap-what%27s%20next-7b61ff?style=for-the-badge"></a>
-  <a href="https://comett1225.github.io/AbsentMotion/guide.html"><img alt="Guide and docs" src="https://img.shields.io/badge/Guide-and%20docs-2b2b33?style=for-the-badge"></a>
+  <a href="https://absentmotion.com/"><img alt="Download for your phone" src="https://img.shields.io/badge/Download-for%20your%20phone-f07850?style=for-the-badge"></a>
+  <a href="https://absentmotion.com/roadmap.html"><img alt="Roadmap" src="https://img.shields.io/badge/Roadmap-what%27s%20next-7b61ff?style=for-the-badge"></a>
+  <a href="https://absentmotion.com/guide.html"><img alt="Guide and docs" src="https://img.shields.io/badge/Guide-and%20docs-2b2b33?style=for-the-badge"></a>
   <a href="https://forms.gle/6bY8KBPMKc2iUypV6"><img alt="Report a bug" src="https://img.shields.io/badge/Report-a%20bug-2b2b33?style=for-the-badge"></a>
   <a href="https://forms.gle/5ZohVpB2eBPvzhu4A"><img alt="Suggest a feature" src="https://img.shields.io/badge/Suggest-a%20feature-2b2b33?style=for-the-badge"></a>
-  <a href="https://comett1225.github.io/AbsentMotion/effects/index.html"><img alt="All effects" src="https://img.shields.io/badge/All-effects-2b2b33?style=for-the-badge"></a>
+  <a href="https://absentmotion.com/effects/index.html"><img alt="All effects" src="https://img.shields.io/badge/All-effects-2b2b33?style=for-the-badge"></a>
   <a href="https://github.com/Comett1225/AbsentMotion/releases"><img alt="All versions" src="https://img.shields.io/badge/All-versions-2b2b33?style=for-the-badge"></a>
 </p>
 <p align="center">
@@ -57,7 +57,7 @@ Any value (position, size, rotation, 3D tilt, skew, opacity, colour, shape and e
 <details>
 <summary><strong>213 effects</strong></summary>
 
-Colour, blur, distort, stylize, noise, keying, Move (Auto-Shake, Oscillate, Swing, Spin, Random Displacement, Random Jitter, Pulse, Echo, Offset, Move Along Path, true motion blur, Parenting Helper, Scale Assist), Repeat (linear, radial, grid, along a path, scatter, with a delay and random variation per copy), 3D objects (cube, sphere, torus, prisms, raster extrude and more), Text (typewriter reveal, per-letter transforms, shaking letters, talking blips, font weight, scramble, count up, timecode), ASCII art, Copy Background (an adjustment layer), VHS, Datamosh, Glass, Displacement Map and many more, with animated previews, presets and a "New" category. [Check out all the effects](https://comett1225.github.io/AbsentMotion/effects/index.html).
+Colour, blur, distort, stylize, noise, keying, Move (Auto-Shake, Oscillate, Swing, Spin, Random Displacement, Random Jitter, Pulse, Echo, Offset, Move Along Path, true motion blur, Parenting Helper, Scale Assist), Repeat (linear, radial, grid, along a path, scatter, with a delay and random variation per copy), 3D objects (cube, sphere, torus, prisms, raster extrude and more), Text (typewriter reveal, per-letter transforms, shaking letters, talking blips, font weight, scramble, count up, timecode), ASCII art, Copy Background (an adjustment layer), VHS, Datamosh, Glass, Displacement Map and many more, with animated previews, presets and a "New" category. [Check out all the effects](https://absentmotion.com/effects/index.html).
 
 </details>
 
@@ -167,7 +167,7 @@ without Optical flow High, AI Smooth, AI Enhance and AI background removal 2.0.
 There are two builds: `foss`, which contains no Google libraries at all, and `compat`, the Compatible build of `foss`
 (with a 32-bit file). The `play` build ended with 4.4; Play installs move to `foss` when they update.
 
-Not sure about your phone? The [phone checker](https://comett1225.github.io/AbsentMotion/phone-checker.html) tells you
+Not sure about your phone? The [phone checker](https://absentmotion.com/phone-checker.html) tells you
 which build to download.
 
 The desktop version runs on Macs with Apple silicon (`-macos-arm64.dmg`) or an Intel chip (`-macos-x64.dmg`) from macOS 11, on 64-bit Windows 10 and 11 with an Intel or AMD chip (`-windows-x64.msi`), and on Linux (`.deb`, AppImage and `.tar.gz`, `arm64` and `x86_64`) with glibc 2.35 or newer: Ubuntu 22.04, Debian 12 and later.
@@ -249,7 +249,7 @@ On another chip or an older system, build it from source ([`docs/BUILD.md`](docs
 
 ## Roadmap
 
-[Go here for the full roadmap.](https://comett1225.github.io/AbsentMotion/roadmap.html)
+[Go here for the full roadmap.](https://absentmotion.com/roadmap.html)
 
 ### 5.2
 
@@ -274,7 +274,7 @@ There will be weekly updates at minimum, whether it's bug patches, improvement t
 AbsentMotion is a young project. Please know these before you rely on it:
 
 - **Some Alight Motion effects are still missing.** - Please if you're able to, make sure to make an issue for anything that isn't implemented correctly or is broken. If you can't or don't want to use GitHub issues, use the [bug report form](https://forms.gle/6bY8KBPMKc2iUypV6) instead.
-- **It's a new project, so it needs lots of feedback.** Tell us what breaks, what is confusing and what is missing: [GitHub issues](https://github.com/Comett1225/AbsentMotion/issues), the [bug report form](https://forms.gle/6bY8KBPMKc2iUypV6) or the [feature request form](https://forms.gle/5ZohVpB2eBPvzhu4A). Check the [roadmap](https://comett1225.github.io/AbsentMotion/roadmap.html) before suggesting something, it might already be planned.
+- **It's a new project, so it needs lots of feedback.** Tell us what breaks, what is confusing and what is missing: [GitHub issues](https://github.com/Comett1225/AbsentMotion/issues), the [bug report form](https://forms.gle/6bY8KBPMKc2iUypV6) or the [feature request form](https://forms.gle/5ZohVpB2eBPvzhu4A). Check the [roadmap](https://absentmotion.com/roadmap.html) before suggesting something, it might already be planned.
 
 ## Why?
 

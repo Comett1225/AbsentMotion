@@ -58,7 +58,7 @@ import app.absentmotion.R
 import app.absentmotion.Tier
 
 internal const val HOME_PAGE ="https://github.com/Comett1225/AbsentMotion"
-internal const val WEBSITE = "https://comett1225.github.io/AbsentMotion/"
+internal const val WEBSITE = "https://absentmotion.com/"
 
 internal const val LICENCES_ASSET = "licenses.txt"
 
