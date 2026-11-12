@@ -1987,6 +1987,9 @@
     <string name="caption_layer_name">ক্যাপশন %1$s</string>
     <string name="tier_needs_latest">Android 13 প্রয়োজন (Latest ভার্সন)</string>
     <string name="tier_needs_vulkan">Vulkan গ্রাফিক্স সমর্থিত ফোন প্রয়োজন</string>
+    <string name="unlock_title">এই ফোনটি এর জন্য তৈরি নয়</string>
+    <string name="unlock_text">এর জন্য এই ফোন বা অ্যাপের এই সংস্করণের চেয়ে বেশি ক্ষমতা দরকার। এটি খুব ধীর হতে পারে, ফোন গরম করতে পারে, ব্যর্থ হতে পারে বা অ্যাপ বন্ধ করে দিতে পারে। তবুও ব্যবহার করবেন?</string>
+    <string name="unlock_use_anyway">তবুও ব্যবহার করুন</string>
     <string name="feature_flow_high">অপটিক্যাল ফ্লো হাই</string>
     <string name="feature_ai_enhance">AI এনহ্যান্স</string>
     <string name="feature_best_cutout">AI ব্যাকগ্রাউন্ড রিমুভাল 2.0</string>

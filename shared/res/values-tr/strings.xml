@@ -1987,6 +1987,9 @@
     <string name="caption_layer_name">Altyazı %1$s</string>
     <string name="tier_needs_latest">Android 13 (Latest sürümü) gerekir</string>
     <string name="tier_needs_vulkan">Vulkan grafik destekli bir telefon gerekir</string>
+    <string name="unlock_title">Bu telefon bunun için yapılmadı</string>
+    <string name="unlock_text">Bu, bu telefonun veya uygulamanın bu sürümünün sahip olduğundan daha fazla güç gerektirir. Çok yavaş olabilir, telefonu ısıtabilir, başarısız olabilir veya uygulamayı kapatabilir. Yine de kullanılsın mı?</string>
+    <string name="unlock_use_anyway">Yine de kullan</string>
     <string name="feature_flow_high">Optik akış High</string>
     <string name="feature_ai_enhance">AI İyileştirme</string>
     <string name="feature_best_cutout">AI arka plan kaldırma 2.0</string>

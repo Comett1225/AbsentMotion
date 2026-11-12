@@ -2035,6 +2035,9 @@
     <string name="caption_layer_name">Субтитры %1$s</string>
     <string name="tier_needs_latest">Нужен Android 13 (версия Latest)</string>
     <string name="tier_needs_vulkan">Нужен телефон с графикой Vulkan</string>
+    <string name="unlock_title">Этот телефон на такое не рассчитан</string>
+    <string name="unlock_text">Для этого нужно больше мощности, чем есть у этого телефона или у этой версии приложения. Работа может идти очень медленно, телефон может нагреться, операция может не удаться, а приложение — закрыться. Всё равно использовать?</string>
+    <string name="unlock_use_anyway">Всё равно использовать</string>
     <string name="feature_flow_high">Оптический поток High</string>
     <string name="feature_ai_enhance">AI-улучшение</string>
     <string name="feature_best_cutout">AI-удаление фона 2.0</string>

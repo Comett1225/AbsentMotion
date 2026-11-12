@@ -2011,6 +2011,9 @@
     <string name="caption_layer_name">Legenda %1$s</string>
     <string name="tier_needs_latest">Requer Android 13 (versão Latest)</string>
     <string name="tier_needs_vulkan">Requer um celular com gráficos Vulkan</string>
+    <string name="unlock_title">Este celular não foi feito para isso</string>
+    <string name="unlock_text">Isso exige mais potência do que este celular ou esta versão do app tem. Pode ficar muito lento, esquentar o celular, falhar ou fechar o app. Usar mesmo assim?</string>
+    <string name="unlock_use_anyway">Usar mesmo assim</string>
     <string name="feature_flow_high">Fluxo óptico alto</string>
     <string name="feature_ai_enhance">Aprimorar com AI</string>
     <string name="feature_best_cutout">Remoção de fundo com IA 2.0</string>

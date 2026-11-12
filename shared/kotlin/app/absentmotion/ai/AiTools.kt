@@ -1,7 +1,13 @@
 package app.absentmotion.ai
 
 import androidx.annotation.StringRes
+import app.absentmotion.Feature
 import app.absentmotion.R
+import app.absentmotion.Risk
+import app.absentmotion.RiskAsk
+import app.absentmotion.Tier
+import app.absentmotion.Unlock
+import app.absentmotion.export.SmoothLevel
 import app.absentmotion.i18n.AppText
 import app.absentmotion.i18n.UiText
 import app.absentmotion.i18n.txt
@@ -46,7 +52,7 @@ enum class AiAction(@StringRes val title: Int) {
     fun unavailable(layer: Layer?): UiText? = when (this) {
         Background -> if (layer?.mediaFill?.video == false) null else txt(R.string.ai_select_image_layer)
         Noise -> if (layer?.kind == "audio") null else txt(R.string.ai_select_audio_layer)
-        Enhance -> app.absentmotion.Tier.reason(app.absentmotion.Feature.AiEnhance) ?: videoReason(layer, AiKind.Enhance)
+        Enhance -> videoReason(layer, AiKind.Enhance)
         Smooth -> videoReason(layer, AiKind.Smooth)
         Reverse -> videoReason(layer, null) ?: if (layer?.aiMarks.orEmpty().any { it.kind == AiKind.Smooth || it.kind == AiKind.Enhance }) txt(R.string.speed_reverse_remove_ai) else null
         Video -> videoReason(layer, null) ?: if (layer?.shape.isNullOrEmpty()) txt(R.string.ai_select_video_layer) else null
@@ -86,6 +92,22 @@ class AiTools(private val context: Context, private val state: EditorState, priv
     internal var subject by mutableStateOf<List<Tap>>(emptyList())
     internal var edge by mutableStateOf(MatteEdge())
     private var job: Job? = null
+    private val unlock = Unlock()
+    var risk by mutableStateOf<RiskAsk?>(null)
+
+    fun ask(risk: Risk?, go: () -> Unit) {
+        if (risk == null) go() else this.risk = RiskAsk(listOf(risk)) { unlock.confirm(listOf(risk, struggle)); go() }
+    }
+
+    private val struggle = Risk(AiVerdict.Cannot, txt(R.string.ai_phone_cannot))
+
+    private fun risks(action: AiAction, confirmed: Boolean, struggles: Boolean): List<Risk> = listOfNotNull(
+        Tier.risk(Feature.AiEnhance).takeIf { action == AiAction.Enhance },
+        Tier.risk(Feature.AiSmooth).takeIf { confirmed && action == AiAction.Smooth && smoothing.method == FrameInterpolation.Ai },
+        Tier.risk(Feature.FlowHigh).takeIf { confirmed && action == AiAction.Smooth && smoothing.method == FrameInterpolation.Flow && smoothing.level == SmoothLevel.High },
+        Tier.risk(Feature.BestCutout).takeIf { confirmed && action == AiAction.Background && cutoutSetup != null && BestCutout.offered && cutoutQuality == CutoutQuality.Best },
+        struggle.takeIf { struggles },
+    )
 
     private suspend fun <T> holdingPreview(action: AiAction, block: suspend () -> T): T =
         if (action == AiAction.Noise || action == AiAction.Background) block() else holdingVideo(state.engine::holdVideo, state.engine::releaseVideo, block)
@@ -93,11 +115,16 @@ class AiTools(private val context: Context, private val state: EditorState, priv
     fun cancel() { job?.cancel(); message = AppText.get(R.string.ai_cancelling) }
     fun dismiss() { message = ""; retry = null }
 
-    fun apply(action: AiAction, confirmed: Boolean = false, target: Long? = null) {
+    fun apply(action: AiAction, confirmed: Boolean = false, target: Long? = null, struggles: Boolean = false) {
         if (running != null) return
         val layer = (target ?: state.selectedId)?.let(state.scene::layer)
         action.unavailable(layer)?.let { message = AppText.get(it); return }
         layer ?: return
+        val risks = risks(action, confirmed, struggles)
+        unlock.pending(risks).takeIf { it.isNotEmpty() }?.let { open ->
+            risk = RiskAsk(open) { unlock.confirm(open + struggle); apply(action, confirmed, target, struggles) }
+            return
+        }
         if (action == AiAction.Reverse && layer.reverseMark != null) {
             dismiss()
             state.playing = false
@@ -117,6 +144,7 @@ class AiTools(private val context: Context, private val state: EditorState, priv
         }
         if (action == AiAction.Smooth && !confirmed) {
             dismiss()
+            if (risks(action, true, false).isNotEmpty()) smoothing = smoothing.copy(method = FrameInterpolation.Flow, level = SmoothLevel.Medium)
             smoothSetup = layer
             return
         }
@@ -132,7 +160,9 @@ class AiTools(private val context: Context, private val state: EditorState, priv
             cutoutSetup = layer
             return
         }
-        if (action == AiAction.Background && cutoutSetup != null && CutoutChoice.of(context).asks(BestCutout.offered)) CutoutChoice.of(context).choose(cutoutQuality)
+        if (action == AiAction.Background && cutoutSetup != null && CutoutChoice.of(context).asks(BestCutout.kept)) CutoutChoice.of(context).choose(cutoutQuality)
+        val quality = if (BestCutout.kept) CutoutChoice.of(context).quality(true) else cutoutQuality.takeIf { BestCutout.offered && cutoutSetup != null } ?: CutoutQuality.Standard
+        unlock.spend()
         cutoutSetup = null
         videoSetup = null
         noiseSetup = null
@@ -144,7 +174,7 @@ class AiTools(private val context: Context, private val state: EditorState, priv
             var result: AiMedia? = null
             var committed = false
             var fallback: Int? = null
-            try { CrashLogs.during("running AI ${action.name.lowercase()}") { holdingPreview(action) {
+            try { CrashLogs.during("running AI ${action.name.lowercase()}") { Tier.unlocking(risks.mapNotNull { it.key as? Feature }) { holdingPreview(action) {
                 val report: AiProgress = { fraction, text ->
                     withContext(Dispatchers.Main) { progress = fraction.coerceIn(0f, 1f); message = text }
                 }
@@ -212,7 +242,7 @@ class AiTools(private val context: Context, private val state: EditorState, priv
                         result = when (action) {
                             AiAction.Background -> {
                                 val limit = state.engine.maxPictureSize()
-                                bestOrStandard(CutoutChoice.of(context).quality(BestCutout.offered),
+                                bestOrStandard(quality,
                                     install = {
                                         if (!AiModel.Cutout.installed(context)) report(0f, AppText.get(R.string.ai_downloading_model))
                                         BestCutout.install(context) { fraction -> progress = fraction.coerceIn(0f, 1f) }
@@ -244,7 +274,7 @@ class AiTools(private val context: Context, private val state: EditorState, priv
                     state.panel = EditorPanel.Tools
                     state.effectBrowserOpen = false
                 }
-            } } } catch (_: CancellationException) {
+            } } } } catch (_: CancellationException) {
                 message = AppText.get(R.string.ai_cancelled)
             } catch (e: ModelNotReady) {
                 message = e.message ?: AppText.get(R.string.ai_model_not_ready_default); retry = action

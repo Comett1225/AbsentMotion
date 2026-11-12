@@ -1987,6 +1987,9 @@
     <string name="caption_layer_name">زیرنویس %1$s</string>
     <string name="tier_needs_latest">به اندروید 13 (Latest) نیاز دارد</string>
     <string name="tier_needs_vulkan">به گوشی با گرافیک Vulkan نیاز دارد</string>
+    <string name="unlock_title">این گوشی برای این کار ساخته نشده است</string>
+    <string name="unlock_text">این کار به توانی بیشتر از این گوشی یا این نسخهٔ برنامه نیاز دارد. ممکن است بسیار کند باشد، گوشی را داغ کند، ناموفق شود یا برنامه را ببندد. با این حال استفاده شود؟</string>
+    <string name="unlock_use_anyway">با این حال استفاده شود</string>
     <string name="feature_flow_high">جریان نوری بالا</string>
     <string name="feature_ai_enhance">بهسازی AI</string>
     <string name="feature_best_cutout">حذف پس‌زمینه با AI 2.0</string>

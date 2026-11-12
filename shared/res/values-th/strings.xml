@@ -1963,6 +1963,9 @@
     <string name="caption_layer_name">คำบรรยาย %1$s</string>
     <string name="tier_needs_latest">ต้องใช้ Android 13 (เวอร์ชัน Latest)</string>
     <string name="tier_needs_vulkan">ต้องใช้โทรศัพท์ที่รองรับกราฟิก Vulkan</string>
+    <string name="unlock_title">โทรศัพท์เครื่องนี้ไม่ได้ออกแบบมาสำหรับสิ่งนี้</string>
+    <string name="unlock_text">ฟีเจอร์นี้ต้องใช้กำลังมากกว่าที่โทรศัพท์เครื่องนี้หรือแอปเวอร์ชันนี้มี อาจช้ามาก ทำให้เครื่องร้อน ล้มเหลว หรือทำให้แอปปิดตัว ยังต้องการใช้อยู่หรือไม่</string>
+    <string name="unlock_use_anyway">ใช้ต่อไป</string>
     <string name="feature_flow_high">ออปติคอลโฟลว์ ระดับสูง</string>
     <string name="feature_ai_enhance">ปรับปรุงด้วย AI</string>
     <string name="feature_best_cutout">การลบพื้นหลังด้วย AI 2.0</string>

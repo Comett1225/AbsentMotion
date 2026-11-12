@@ -1987,6 +1987,9 @@
     <string name="caption_layer_name">Untertitel %1$s</string>
     <string name="tier_needs_latest">Benötigt Android 13 (aktuelle Version)</string>
     <string name="tier_needs_vulkan">Benötigt ein Telefon mit Vulkan-Grafik</string>
+    <string name="unlock_title">Dieses Telefon ist dafür nicht gemacht</string>
+    <string name="unlock_text">Das braucht mehr Leistung, als dieses Telefon oder diese Version der App hat. Es kann sehr langsam sein, das Telefon heiß machen, fehlschlagen oder die App schließen. Trotzdem verwenden?</string>
+    <string name="unlock_use_anyway">Trotzdem verwenden</string>
     <string name="feature_flow_high">Optischer Fluss: Hoch</string>
     <string name="feature_ai_enhance">AI-Verbesserung</string>
     <string name="feature_best_cutout">AI-Hintergrundentfernung 2.0</string>

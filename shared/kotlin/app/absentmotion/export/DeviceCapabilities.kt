@@ -79,7 +79,7 @@ data class ProbeResult(val codec: Codec, val width: Int, val height: Int, val fr
 sealed interface Support {
     data object Supported : Support
     data class SlowSoftwareOnly(val reason: UiText) : Support
-    data class Unsupported(val reason: UiText, val suggestion: ExportSettings?, val sound: Boolean = false) : Support
+    data class Unsupported(val reason: UiText, val suggestion: ExportSettings?, val sound: Boolean = false, val risky: Boolean = false) : Support
 }
 
 data class DeviceReport(
@@ -117,7 +117,7 @@ data class DeviceReport(
         val (encodeWidth, encodeHeight) = encodeSize(s, width, height)
         val sized = all.filter { it.fitsSize(encodeWidth, encodeHeight) }
         if (sized.isEmpty()) {
-            return Support.Unsupported(txt(R.string.export_support_cannot_encode, s.codec.label, "${width}x$height"), alternative(s, width, height))
+            return Support.Unsupported(txt(R.string.export_support_cannot_encode, s.codec.label, "${width}x$height"), alternative(s, width, height), risky = true)
         }
         if (hasAudio && encodersFor(s.audio.codec.mime).isEmpty()) {
             return Support.Unsupported(txt(R.string.export_support_no_encoder, s.audio.codec.label), withAac(s), sound = true)

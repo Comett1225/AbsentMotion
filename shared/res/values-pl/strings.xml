@@ -2035,6 +2035,9 @@
     <string name="caption_layer_name">Napisy %1$s</string>
     <string name="tier_needs_latest">Wymaga Androida 13 (najnowsza wersja)</string>
     <string name="tier_needs_vulkan">Wymaga telefonu z grafiką Vulkan</string>
+    <string name="unlock_title">Ten telefon nie jest do tego przeznaczony</string>
+    <string name="unlock_text">To wymaga większej mocy, niż ma ten telefon lub ta wersja aplikacji. Może działać bardzo wolno, nagrzewać telefon, zakończyć się błędem albo zamknąć aplikację. Użyć mimo to?</string>
+    <string name="unlock_use_anyway">Użyj mimo to</string>
     <string name="feature_flow_high">Przepływ optyczny — wysoki</string>
     <string name="feature_ai_enhance">Ulepszanie AI</string>
     <string name="feature_best_cutout">Usuwanie tła AI 2.0</string>

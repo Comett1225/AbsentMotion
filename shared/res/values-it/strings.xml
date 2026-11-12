@@ -2011,6 +2011,9 @@
     <string name="caption_layer_name">Sottotitolo %1$s</string>
     <string name="tier_needs_latest">Richiede Android 13 (versione più recente)</string>
     <string name="tier_needs_vulkan">Richiede un telefono con grafica Vulkan</string>
+    <string name="unlock_title">Questo telefono non è fatto per questo</string>
+    <string name="unlock_text">Richiede più potenza di quella di questo telefono o di questa versione dell\'app. Può essere molto lento, scaldare il telefono, non riuscire o chiudere l\'app. Usarlo comunque?</string>
+    <string name="unlock_use_anyway">Usa comunque</string>
     <string name="feature_flow_high">Flusso ottico Alto</string>
     <string name="feature_ai_enhance">Miglioramento AI</string>
     <string name="feature_best_cutout">Rimozione sfondo AI 2.0</string>

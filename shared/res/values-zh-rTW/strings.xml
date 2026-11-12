@@ -1963,6 +1963,9 @@
     <string name="caption_layer_name">字幕 %1$s</string>
     <string name="tier_needs_latest">需要Android 13（最新版）</string>
     <string name="tier_needs_vulkan">需要支援Vulkan圖形的手機</string>
+    <string name="unlock_title">這支手機不適合執行此功能</string>
+    <string name="unlock_text">它需要的效能超出了這支手機或此版本 App 的能力。可能會非常慢、讓手機發熱、失敗或導致 App 關閉。仍要使用嗎？</string>
+    <string name="unlock_use_anyway">仍要使用</string>
     <string name="feature_flow_high">光流：高</string>
     <string name="feature_ai_enhance">AI增強</string>
     <string name="feature_best_cutout">AI背景移除2.0</string>

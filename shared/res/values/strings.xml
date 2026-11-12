@@ -2013,6 +2013,9 @@
     <string name="caption_layer_name">Caption %1$s</string>
     <string name="tier_needs_latest">Needs Android 13 (Latest version)</string>
     <string name="tier_needs_vulkan">Needs a phone with Vulkan graphics</string>
+    <string name="unlock_title">This phone isn\'t made for this</string>
+    <string name="unlock_text">It needs more power than this phone or this version of the app has. It may be very slow, make the phone hot, fail, or close the app. Use it anyway?</string>
+    <string name="unlock_use_anyway">Use anyway</string>
     <string name="feature_flow_high">Optical flow High</string>
     <string name="feature_ai_enhance">AI Enhance</string>
     <string name="feature_best_cutout">AI background removal 2.0</string>

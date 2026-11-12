@@ -1987,6 +1987,9 @@
     <string name="caption_layer_name">Kapsyon %1$s</string>
     <string name="tier_needs_latest">Kailangan ang Android 13 (Latest na bersyon)</string>
     <string name="tier_needs_vulkan">Kailangan ng phone na may Vulkan graphics</string>
+    <string name="unlock_title">Hindi ginawa ang phone na ito para dito</string>
+    <string name="unlock_text">Kailangan nito ng mas malakas na power kaysa sa kaya ng phone na ito o ng bersyong ito ng app. Maaaring napakabagal nito, uminit ang phone, pumalya, o magsara ang app. Gamitin pa rin?</string>
+    <string name="unlock_use_anyway">Gamitin pa rin</string>
     <string name="feature_flow_high">Optical flow (Mataas)</string>
     <string name="feature_ai_enhance">Pagandahin gamit ang AI</string>
     <string name="feature_best_cutout">AI pagtanggal ng background 2.0</string>
