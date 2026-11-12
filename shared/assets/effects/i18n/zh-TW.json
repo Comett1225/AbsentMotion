@@ -4661,6 +4661,12 @@
     "shine": {
      "label": "光澤"
     }
+   },
+   "shortcuts": {
+    "text3d": {
+     "description": "把文字圖層變成可在 3D 中旋轉的立體文字。它會加入適用於任何圖層的「點陣擠出」。",
+     "name": "3D 文字"
+    }
    }
   },
   "rastertransform": {

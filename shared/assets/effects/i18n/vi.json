@@ -4661,6 +4661,12 @@
     "shine": {
      "label": "Độ bóng"
     }
+   },
+   "shortcuts": {
+    "text3d": {
+     "description": "Biến lớp chữ thành chữ 3D đặc mà bạn có thể xoay trong không gian 3D. Hiệu ứng này thêm Đùn raster, dùng được trên mọi lớp.",
+     "name": "Chữ 3D"
+    }
    }
   },
   "rastertransform": {

@@ -4661,6 +4661,12 @@
     "shine": {
      "label": "Brillo"
     }
+   },
+   "shortcuts": {
+    "text3d": {
+     "description": "Convierte una capa de texto en letras 3D sólidas que puedes girar en 3D. Agrega Extrusión ráster, que funciona en cualquier capa.",
+     "name": "Texto 3D"
+    }
    }
   },
   "rastertransform": {

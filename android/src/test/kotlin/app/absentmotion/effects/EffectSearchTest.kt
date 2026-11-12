@@ -15,6 +15,6 @@ class EffectSearchTest {
         assertTrue(copies.toString(), "Echo Keyframes" in copies && "Repeat" in copies && "Grid Repeat" in copies)
         val glow = catalog.search("glow")
         assertTrue(glow.takeWhile { "glow" in it.name.lowercase() }.size == glow.count { "glow" in it.name.lowercase() })
-        assertEquals(catalog.definitions.size, catalog.search("  ").size)
+        assertEquals(catalog.definitions.size + catalog.definitions.sumOf { it.shortcuts.size }, catalog.search("  ").size)
     }
 }

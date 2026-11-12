@@ -4661,6 +4661,12 @@
     "shine": {
      "label": "Glanz"
     }
+   },
+   "shortcuts": {
+    "text3d": {
+     "description": "Macht aus einer Textebene massive 3D-Buchstaben, die du in 3D drehen kannst. Fügt „Raster extrudieren“ hinzu, das auf jeder Ebene funktioniert.",
+     "name": "3D-Text"
+    }
    }
   },
   "rastertransform": {

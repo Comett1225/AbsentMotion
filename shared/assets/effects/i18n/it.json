@@ -4661,6 +4661,12 @@
     "shine": {
      "label": "Lucentezza"
     }
+   },
+   "shortcuts": {
+    "text3d": {
+     "description": "Trasforma un livello di testo in lettere 3D solide che puoi ruotare in 3D. Aggiunge Estrusione raster, che funziona su qualsiasi livello.",
+     "name": "Testo 3D"
+    }
    }
   },
   "rastertransform": {

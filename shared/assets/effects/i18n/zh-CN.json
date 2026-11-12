@@ -4661,6 +4661,12 @@
     "shine": {
      "label": "光泽"
     }
+   },
+   "shortcuts": {
+    "text3d": {
+     "description": "把文字图层变成可在 3D 中旋转的立体文字。它会添加适用于任何图层的“栅格挤出”。",
+     "name": "3D 文字"
+    }
    }
   },
   "rastertransform": {

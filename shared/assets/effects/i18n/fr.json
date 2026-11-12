@@ -4661,6 +4661,12 @@
     "shine": {
      "label": "Brillance"
     }
+   },
+   "shortcuts": {
+    "text3d": {
+     "description": "Transforme un calque de texte en lettres 3D pleines que vous pouvez faire pivoter en 3D. Ajoute Extrusion matricielle, qui fonctionne sur n'importe quel calque.",
+     "name": "Texte 3D"
+    }
    }
   },
   "rastertransform": {

@@ -4661,6 +4661,12 @@
     "shine": {
      "label": "Kilauan"
     }
+   },
+   "shortcuts": {
+    "text3d": {
+     "description": "Menukar lapisan teks kepada huruf 3D padu yang boleh diputar dalam 3D. Ia menambah Ekstrud raster, yang berfungsi pada mana-mana lapisan.",
+     "name": "Teks 3D"
+    }
    }
   },
   "rastertransform": {

@@ -4661,6 +4661,12 @@
     "shine": {
      "label": "Parlama"
     }
+   },
+   "shortcuts": {
+    "text3d": {
+     "description": "Bir metin katmanını 3B olarak döndürebileceğin dolu 3B harflere dönüştürür. Her katmanda çalışan Raster ekstrüzyon efektini ekler.",
+     "name": "3B Metin"
+    }
    }
   },
   "rastertransform": {

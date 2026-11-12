@@ -4661,6 +4661,12 @@
     "shine": {
      "label": "Brilho"
     }
+   },
+   "shortcuts": {
+    "text3d": {
+     "description": "Transforma uma camada de texto em letras 3D sólidas que você pode girar em 3D. Adiciona Extrusão raster, que funciona em qualquer camada.",
+     "name": "Texto 3D"
+    }
    }
   },
   "rastertransform": {

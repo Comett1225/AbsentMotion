@@ -135,13 +135,14 @@ class EffectPackTest {
         })
         val major = (releases + catalog.definitions.mapNotNull { it.since }).maxOf { it.substringBefore('.').toInt() }
         assertTrue(catalog.newest.isNotEmpty() && catalog.newest.all { it.substringBefore('.').toInt() == major })
-        val fresh = catalog.listed("new").map { it.key }.toSet()
-        assertEquals(catalog.definitions.filter { it.since?.substringBefore('.')?.toInt() == major }.map { it.key }.toSet(), fresh)
+        val fresh = catalog.listed("new").map { it.shortcut ?: it.key }.toSet()
+        val tiles = catalog.definitions + catalog.definitions.flatMap { it.shortcutTiles() }
+        assertEquals(tiles.filter { it.since?.substringBefore('.')?.toInt() == major }.map { it.shortcut ?: it.key }.toSet(), fresh)
         assertTrue(fresh.none { it in listOf("textpath", "puppet") })
         assertTrue(listOf("blur", "glow", "vhs", "oscillate", "timequant").none { it in fresh })
         assertEquals(File("../version.properties").readLines().first { it.startsWith("versionName=") }.removePrefix("versionName="), releases.last())
         assertEquals(listOf("new") + EffectCatalog.Categories.keys + "ai", catalog.categories.map { it.first })
-        val old = EffectCatalog(catalog.definitions.map { it.copy(since = null) }, newest = catalog.newest)
+        val old = EffectCatalog(catalog.definitions.map { d -> d.copy(since = null, shortcuts = d.shortcuts.map { it.copy(since = null) }) }, newest = catalog.newest)
         assertTrue(old.listed("new").isEmpty())
         assertEquals(EffectCatalog.Categories.keys.toList() + "ai", old.categories.map { it.first })
     }

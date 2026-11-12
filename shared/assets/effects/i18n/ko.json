@@ -4661,6 +4661,12 @@
     "shine": {
      "label": "광택"
     }
+   },
+   "shortcuts": {
+    "text3d": {
+     "description": "텍스트 레이어를 3D로 돌릴 수 있는 입체 글자로 바꿉니다. 어떤 레이어에도 쓸 수 있는 래스터 돌출 효과를 추가합니다.",
+     "name": "3D 텍스트"
+    }
    }
   },
   "rastertransform": {

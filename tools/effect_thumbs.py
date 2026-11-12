@@ -141,9 +141,9 @@ def parented(id, image, effect, half, end):
     return parent + child
 
 
-def words(id, content, effect="", end=999, font="googlefonts?name=Montserrat&amp;weight=700"):
+def words(id, content, effect="", end=999, font="googlefonts?name=Montserrat&amp;weight=700", size=18):
     c = RENDER // 2
-    return (f'<text id="{id}" label="text" startTime="0" endTime="{end}" fillType="color" size="18" wrapWidth="{RENDER - 48}" '
+    return (f'<text id="{id}" label="text" startTime="0" endTime="{end}" fillType="color" size="{size}" wrapWidth="{RENDER - 48}" '
             f'align="center" font="{font}"><transform><location value="{c},{c},0"/></transform>'
             f'<fillColor value="#ffffffff"/><content>{content}</content>{effect}</text>')
 
@@ -201,7 +201,7 @@ def scene(show, effect, preset=None):
     if "path" in show:
         layers.append(path_layer(show, total - 1))
     if show.get("layout") == "text":
-        layers.append(words(2, show["text"], fx, total - 1, *([show["font"]] if "font" in show else [])))
+        layers.append(words(2, show["text"], fx, total - 1, show.get("font", "googlefonts?name=Montserrat&amp;weight=700"), show.get("size", 18)))
     elif show.get("layout") == "drawing":
         layers.append(sketch(2, fx, total - 1))
     elif show.get("layout") == "parent":
@@ -305,7 +305,7 @@ def heroes(work, batch, planned, plain):
             keep = [i for i, f in enumerate(small) if detail(f) >= floor] or list(range(len(small)))
             frames = [frames[max(keep, key=lambda i: changes[i])]]
         if len(frames) == 1:
-            effect = json.loads((PACK / f"{key}.json").read_text())
+            effect = json.loads((PACK / f"{show.get('effect', key)}.json").read_text())
             jobs.append((key, big.add(f"{key}.hero", scene(show, effect), frames, HERO)))
         else:
             jobs.append((key, rendered))
@@ -331,7 +331,7 @@ def main():
     args.add_argument("keys", nargs="*", help="only these effects (default: every effect in index.json)")
     opts = args.parse_args()
     index = json.loads((PACK / "index.json").read_text())
-    keys = opts.keys or index
+    keys = opts.keys or index + [s["key"] for k in index for s in json.loads((PACK / f"{k}.json").read_text()).get("shortcuts", [])]
     missing = [k for k in keys if k not in SHOWCASE["effects"]]
     if missing:
         sys.exit("no showcase for " + " ".join(missing))
@@ -362,7 +362,7 @@ def main():
                 json.dumps(show.get("keys")), animated, json.dumps(show.get("path")), json.dumps(show.get("half")), show.get("shape"))
         if base not in plain:
             plain[base] = batch.add(f"plain{len(plain)}", scene(show, None), frames)
-        effect = json.loads((PACK / f"{key}.json").read_text())
+        effect = json.loads((PACK / f"{show.get('effect', key)}.json").read_text())
         for pid in [] if opts.heroes else show.get("options", []):
             param = next(p for p in effect["params"] if p["id"] == pid and p["type"] == "choice")
             for i in range(len(param["options"])):

@@ -16,6 +16,7 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - Video Downloader on Windows, Mac and Linux, with a one-time add-on.
 - Video Feedback Frame by Frame: each copy shows the layer one frame earlier, videos included, so movement leaves trails.
 - Page Curl and Scatter Repeat effects. Page Curl's Follow Shape curls a round picture or a 3D model from its own edge.
+- 3D Text: a tile in the 3D effects that adds Raster Extrude, which turns a text layer into solid 3D letters.
 - Effect previews: an effect's page opens with a big, sharp preview.
 - Community bundle: Project Bundle in Export adds a title, a thumbnail picked with Choose thumbnail, a description, tags and a name.
 - Bundles folder: pick a folder once and every project bundle saves there.

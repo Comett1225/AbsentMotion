@@ -71,6 +71,8 @@ data class EffectParam(
     }
 }
 
+data class EffectShortcut(val key: String, val name: String, val description: String, val since: String? = null)
+
 data class EffectPreset(
     val name: String, val values: Map<String, String>, val keys: Map<String, List<Keyframe>>,
     val slug: String = name.lowercase(Locale.US).replace(Regex("[^a-z0-9]+"), "-").trim('-'),
@@ -89,10 +91,16 @@ data class EffectDefinition(
     val since: String? = null,
     val presets: List<EffectPreset> = emptyList(),
     val page: String = key,
+    val shortcuts: List<EffectShortcut> = emptyList(),
+    val shortcut: String? = null,
 ) {
     val available: Boolean get() = status == "ok"
-    val thumbnail: String get() = "thumb/$key.webp"
-    val hero: String get() = "thumb/$key.hero.avif"
+    val thumbnail: String get() = "thumb/${shortcut ?: key}.webp"
+    val hero: String get() = "thumb/${shortcut ?: key}.hero.avif"
+
+    fun shortcutTiles(): List<EffectDefinition> = shortcuts.map { s ->
+        copy(name = s.name, description = s.description, since = s.since ?: since, shortcut = s.key, shortcuts = emptyList())
+    }
 
     fun thumbnail(preset: EffectPreset): String = "thumb/$key.${preset.slug}.webp"
 
@@ -147,10 +155,14 @@ data class EffectDefinition(
             val parsed = List(params.length()) { EffectParam.parse(params.getJSONObject(it)) }
             parsed.forEachIndexed { i, p -> require(p.after == null || parsed.take(i).any { it.id == p.after }) { "$key.${p.id}: after ${p.after} is not an earlier parameter" } }
             val presets = json.optJSONArray("presets") ?: JSONArray()
+            val shortcuts = json.optJSONArray("shortcuts") ?: JSONArray()
             return EffectDefinition("absent.$key", key, json.optString("name", key), category, json.optString("description"),
                 parsed, if (native) null else sksl, native, since = json.optString("since").takeIf { it.isNotBlank() },
                 presets = List(presets.length()) { preset(key, parsed, presets.getJSONObject(it)) },
-                page = json.optString("name", key).lowercase(Locale.US).replace(Regex("[^a-z0-9]"), ""))
+                page = json.optString("name", key).lowercase(Locale.US).replace(Regex("[^a-z0-9]"), ""),
+                shortcuts = List(shortcuts.length()) { i ->
+                    shortcuts.getJSONObject(i).let { s -> EffectShortcut(s.getString("key"), s.getString("name"), s.optString("description"), s.optString("since").takeIf { it.isNotBlank() }) }
+                })
         }
 
         private fun preset(key: String, params: List<EffectParam>, json: JSONObject): EffectPreset {

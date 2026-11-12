@@ -3901,6 +3901,8 @@
  "fxpreset:textshake:wobbly": "Wobbly",
  "fxpreset:texttransform:spin-cascade": "Spin Cascade",
  "fxpreset:texttransform:wave": "Wave",
+ "fxshortcut:rasterextrude:text3d:description": "Turns a text layer into solid 3D letters you can turn in 3D. It adds Raster Extrude, which works on any layer.",
+ "fxshortcut:rasterextrude:text3d:name": "3D Text",
  "gif": "GIF",
  "group_leave": "Leave group",
  "group_retime_off": "Off",

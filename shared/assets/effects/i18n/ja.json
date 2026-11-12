@@ -4661,6 +4661,12 @@
     "shine": {
      "label": "光沢"
     }
+   },
+   "shortcuts": {
+    "text3d": {
+     "description": "テキストレイヤーを、3Dで回転できる立体的な文字に変えます。どのレイヤーにも使える「ラスター押し出し」を追加します。",
+     "name": "3Dテキスト"
+    }
    }
   },
   "rastertransform": {

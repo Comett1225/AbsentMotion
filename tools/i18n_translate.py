@@ -135,6 +135,10 @@ def effect_units():
                 units[f'fx:{key}:{p["id"]}:option{i}'] = (option, f'choice option of the parameter "{p.get("label", p["id"])}" of the effect "{data.get("name", key)}"')
         for preset in data.get('presets', []):
             units[f'fxpreset:{key}:{slug(preset["name"])}'] = (preset['name'], f'name of a one-tap animation preset of the effect "{data.get("name", key)}" (short, shown under an animated tile)')
+        for shortcut in data.get('shortcuts', []):
+            units[f'fxshortcut:{key}:{shortcut["key"]}:name'] = (shortcut['name'], f'name of an extra effect tile that adds the effect "{data.get("name", key)}" (short, like an effect name)')
+            if shortcut.get('description'):
+                units[f'fxshortcut:{key}:{shortcut["key"]}:description'] = (shortcut['description'], f'description of the extra effect tile "{shortcut["name"]}" (short)')
     text = CATALOG_KT.read_text(encoding='utf-8')
     for cat, name in re.findall(r'"([a-z0-9]+)" to "([^"]+)"', text):
         units[f'fxcat:{cat}'] = (name, 'effect category name (one or two words)')
@@ -154,6 +158,9 @@ def effect_assets(units, translations):
         effect = out['effects'].setdefault(parts[1], {})
         if parts[0] == 'fxpreset':
             effect.setdefault('presets', {})[parts[2]] = value
+            continue
+        if parts[0] == 'fxshortcut':
+            effect.setdefault('shortcuts', {}).setdefault(parts[2], {})[parts[3]] = value
             continue
         if len(parts) == 3:
             effect[parts[2]] = value
@@ -180,6 +187,10 @@ def flatten_effect_asset(data, units):
                 flat[f'fx:{key}:{field}'] = effect[field]
         for preset, name in effect.get('presets', {}).items():
             flat[f'fxpreset:{key}:{preset}'] = name
+        for shortcut, fields in effect.get('shortcuts', {}).items():
+            for field in ('name', 'description'):
+                if fields.get(field):
+                    flat[f'fxshortcut:{key}:{shortcut}:{field}'] = fields[field]
         for pid, param in effect.get('params', {}).items():
             if param.get('label'):
                 flat[f'fx:{key}:{pid}:label'] = param['label']

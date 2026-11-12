@@ -116,6 +116,7 @@
     "heart": {"photo": "colour", "under": "grid", "params": {"rotY": [-30, 330], "scale": 0.75}, "animate": 16},
     "cross": {"photo": "colour", "under": "grid", "params": {"rotY": [-35, 325], "scale": 0.75}, "animate": 16},
     "rasterextrude": {"photo": "colour", "under": "grid", "params": {"rotY": [-35, 325], "scale": 0.7}, "animate": 16},
+    "text3d": {"layout": "text", "text": "3D", "size": 60, "font": "googlefonts?name=Montserrat&amp;weight=900", "effect": "rasterextrude", "under": "grid", "params": {"rotY": [-40, 20], "rotX": -15, "depth": 0.3}, "animate": 16},
     "flip": {"photo": "colour", "under": "grid", "params": {"rotY": [0, 360], "scale": 0.75}, "animate": 16},
     "spherize": {"photo": "colour", "under": "grid", "params": {"rotY": [0, 360], "scale": 0.75}, "animate": 16},
     "tunnel": {"photo": "colour", "params": {"speed": 1.5}, "animate": 16},

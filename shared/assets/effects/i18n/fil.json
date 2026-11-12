@@ -4661,6 +4661,12 @@
     "shine": {
      "label": "Kintab"
     }
+   },
+   "shortcuts": {
+    "text3d": {
+     "description": "Ginagawang solidong 3D na letra ang text layer na maiikot mo sa 3D. Idinadagdag nito ang Raster Extrude, na gumagana sa anumang layer.",
+     "name": "3D na Teksto"
+    }
    }
   },
   "rastertransform": {

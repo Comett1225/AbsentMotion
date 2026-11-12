@@ -490,6 +490,12 @@ EFFECTS += [
     ("tunnel", "Tunnel", "Lines an endless tunnel with the layer and flies through it. Phase shifts the texture along its length.", TUNNEL_PARAMS, TUNNEL),
 ]
 
+SHORTCUTS = {
+    "rasterextrude": [{"key": "text3d", "name": "3D Text",
+                       "description": "Turns a text layer into solid 3D letters you can turn in 3D. It adds Raster Extrude, which works on any layer.",
+                       "since": "5.1.0"}],
+}
+
 ORDER = ["cube", "box", "hollowbox", "cylinder", "ellipsoid", "torus", "pyramid", "octahedron", "hexprism", "starprism",
          "starpolyhedron", "heart", "cross", "rasterextrude", "flip", "spherize", "tunnel"]
 
@@ -500,6 +506,8 @@ def main():
     for key in ORDER:
         name, description, params, sksl = found[key]
         effect = {"id": key, "name": name, "category": "3d", "since": SINCE, "description": description, "params": params, "sksl": sksl}
+        if key in SHORTCUTS:
+            effect["shortcuts"] = SHORTCUTS[key]
         text = json.dumps(effect, indent=1, ensure_ascii=False) + "\n"
         path = PACK / f"{key}.json"
         if "--check" in sys.argv:

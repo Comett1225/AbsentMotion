@@ -4661,6 +4661,12 @@
     "shine": {
      "label": "Połysk"
     }
+   },
+   "shortcuts": {
+    "text3d": {
+     "description": "Zamienia warstwę tekstu w pełne litery 3D, które możesz obracać w 3D. Dodaje efekt Wytłoczenie rastra, który działa na każdej warstwie.",
+     "name": "Tekst 3D"
+    }
    }
   },
   "rastertransform": {

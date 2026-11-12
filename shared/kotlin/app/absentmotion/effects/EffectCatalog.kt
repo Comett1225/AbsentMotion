@@ -23,12 +23,15 @@ data class EffectCatalog(
 
     fun isNew(effect: EffectDefinition): Boolean = effect.since in newest
 
+    private val tiles: List<EffectDefinition> get() = definitions + definitions.flatMap { it.shortcutTiles() }
+
     fun listed(category: String? = null): List<EffectDefinition> =
-        definitions.filter { category == null || it.category == category || (category == "new" && isNew(it)) }
+        tiles.filter { category == null || it.category == category || (category == "new" && isNew(it)) }
 
     fun search(query: String): List<EffectDefinition> {
-        val byName = definitions.filter { matchesSearch(query, it.name) }.sortedWith(compareBy({ searchRank(query, it.name) }, { it.name.lowercase() }))
-        return byName + definitions.filter { it !in byName && matchesSearch(query, it.name, it.description) }.sortedBy { it.name.lowercase() }
+        val all = tiles
+        val byName = all.filter { matchesSearch(query, it.name) }.sortedWith(compareBy({ searchRank(query, it.name) }, { it.name.lowercase() }))
+        return byName + all.filter { it !in byName && matchesSearch(query, it.name, it.description) }.sortedBy { it.name.lowercase() }
     }
 
     val categories: List<Pair<String, String>> get() =
@@ -104,6 +107,11 @@ private fun EffectDefinition.translated(json: JSONObject): EffectDefinition {
             )
         },
         presets = presets.map { it.copy(name = presetNames.optString(it.slug).ifBlank { it.name }) },
+        shortcuts = shortcuts.map { s ->
+            json.optJSONObject("shortcuts")?.optJSONObject(s.key)?.let { t ->
+                s.copy(name = t.optString("name").ifBlank { s.name }, description = t.optString("description").ifBlank { s.description })
+            } ?: s
+        },
     )
 }
 

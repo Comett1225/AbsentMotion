@@ -4661,6 +4661,12 @@
     "shine": {
      "label": "Kilau"
     }
+   },
+   "shortcuts": {
+    "text3d": {
+     "description": "Mengubah lapisan teks menjadi huruf 3D padat yang bisa diputar dalam 3D. Menambahkan Ekstrusi Raster, yang berfungsi di lapisan apa pun.",
+     "name": "Teks 3D"
+    }
    }
   },
   "rastertransform": {
