@@ -32,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -339,18 +340,42 @@ internal fun sidesOf(q: FloatArray): Sides {
 private class BoxAt(val sides: Sides, val sx: Float, val sy: Float)
 
 @Composable
-private fun SizeTab(state: EditorState, layer: Layer) {
-    val linked = layer.scaleLinked
-    var active by remember { mutableIntStateOf(0) }
+private fun layerBox(state: EditorState, layer: Layer): Pair<BoxAt?, Pair<Float, Float>?> {
     val measured by produceState<BoxAt?>(null, layer.node, state.sampleMs, state.playing) {
         if (!state.playing) value = state.engine.layerQuad(layer.id, state.sampleMs)?.let { q -> BoxAt(sidesOf(q), layer.scale[0], layer.scale[1]) }
     }
-    val upright = measured?.sides?.upright == true
-    val box = measured?.let { m ->
+    return measured to measured?.let { m ->
         val x = m.sides.x * if (m.sx != 0f) abs(layer.scale[0] / m.sx) else 1f
         val y = m.sides.y * if (m.sy != 0f) abs(layer.scale[1] / m.sy) else 1f
-        if (upright) y to x else x to y
+        if (m.sides.upright) y to x else x to y
     }
+}
+
+@Composable
+internal fun TransformSummary(state: EditorState, layer: Layer, modifier: Modifier) {
+    val at = layer.location
+    val box = if (layer.kind == "camera") null else layerBox(state, layer).second
+    val rows = listOfNotNull(
+        R.string.a11y_tab_move to "X ${formatFixed(at[0], 2)}   Y ${formatFixed(at[1], 2)}   Z ${formatFixed(at[2], 2)}",
+        R.string.a11y_tab_rotate to formatFixed(layer.rotation, 1) + "º",
+        box?.let { R.string.panel_size to "W ${formatFixed(it.first, 1)}   H ${formatFixed(it.second, 1)}" },
+        R.string.a11y_tab_skew to "X ${formatFixed(layer.skew[0], 1)}º   Y ${formatFixed(layer.skew[1], 1)}º",
+        if (layer.kind == "camera") null else R.string.a11y_tab_pivot to "X ${formatFixed(layer.pivot[0], 2)}   Y ${formatFixed(layer.pivot[1], 2)}",
+    )
+    Column(modifier.clipToBounds().padding(horizontal = 16.dp, vertical = 10.dp)) {
+        for ((label, value) in rows) Row(Modifier.fillMaxWidth().height(26.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(stringResource(label), color = Am.OnDarkDim, fontSize = 13.sp, maxLines = 1)
+            Text(value, Modifier.weight(1f), color = Am.OnDark, fontSize = 13.sp, maxLines = 1, softWrap = false, textAlign = androidx.compose.ui.text.style.TextAlign.End)
+        }
+    }
+}
+
+@Composable
+private fun SizeTab(state: EditorState, layer: Layer) {
+    val linked = layer.scaleLinked
+    var active by remember { mutableIntStateOf(0) }
+    val (measured, box) = layerBox(state, layer)
+    val upright = measured?.sides?.upright == true
     val (boxW, boxH) = box ?: (0f to 0f)
 
     fun stretch(factor: Float, isWidth: Boolean, key: Any? = null) = state.editSelected(key) { l ->

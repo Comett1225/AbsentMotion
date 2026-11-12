@@ -312,6 +312,9 @@ object PreviewCache {
     var player by mutableStateOf<FramePlayer?>(null)
         private set
     private var rendered by mutableStateOf<CacheKey?>(null)
+    var paused by mutableStateOf(false)
+        private set
+    private var storeSize = 0 to 0
     @Volatile private var store: FrameStore? = null
     @Volatile private var stopRequested = false
     @Volatile private var memoryStopped = false
@@ -325,7 +328,7 @@ object PreviewCache {
         val now = System.nanoTime()
         if (force || now - revisedNs > 100_000_000L) { revisedNs = now; revision++ }
     }
-    fun runs(): List<IntRange> = if (automatic || phase == Phase.Ready) store?.runs().orEmpty() else emptyList()
+    fun runs(): List<IntRange> = if (!paused && (automatic || phase == Phase.Ready)) store?.runs().orEmpty() else emptyList()
     fun runsFor(state: EditorState): List<IntRange> =
         if (key?.let { cacheBarShows(it, keyOf(state), automatic && phase != Phase.Rendering) } == true) runs() else emptyList()
     var fit by mutableFloatStateOf(0f)
@@ -428,6 +431,7 @@ object PreviewCache {
 
     fun preRender(state: EditorState, resources: Long = state.engine.mediaRevision.value): PreRender = when {
         phase == Phase.Rendering -> PreRender.Rendering
+        paused -> PreRender.None
         phase == Phase.Ready && !automatic && key == keyOf(state, resources) -> PreRender.Ready
         rendered?.projectId == state.projectId -> PreRender.Outdated
         else -> PreRender.None
@@ -451,7 +455,21 @@ object PreviewCache {
         val range = expected.first..maxOf(scene.lastFrame, 0)
         val next = keyOf(state)
         val cell = checkerCell
-        clear()
+        val kept = store?.takeIf { paused && !automatic && phase == Phase.Ready && key == next && storeSize == width to height }
+        if (kept != null && kept.last >= scene.lastFrame) {
+            paused = false
+            rendered = next
+            revise(force = true)
+            toast(app, rangeLabel(app, scene.fps))
+            return
+        }
+        if (kept == null) clear() else {
+            paused = false
+            stopRequested = false
+            memoryStopped = false
+            player?.close()
+            player = null
+        }
         state.playing = false
         val mine = generation
         phase = Phase.Rendering
@@ -459,7 +477,7 @@ object PreviewCache {
             var made: FrameStore? = null
             try {
                 val started = System.nanoTime()
-                val built = withContext(Dispatchers.IO) {
+                val built = kept ?: withContext(Dispatchers.IO) {
                     folder.listFiles { f -> f.name.startsWith(CACHE_PREFIX) }?.forEach { it.delete() }
                     if (onDisk > memory) runCatching { FrameStore(range.first, budget, java.io.File(folder, CACHE_PREFIX + System.nanoTime() + ".bin")) }.getOrNull() else null
                 } ?: FrameStore(range.first, memory)
@@ -467,7 +485,7 @@ object PreviewCache {
                 building = built
                 var resources = next.resources
                 val outcome = try {
-                    withContext(Dispatchers.Default) { renderFrames(state.engine, scene, range, expected.count(), width, height, cell, next.accurateBlur, built) { resources = it } }
+                    withContext(Dispatchers.Default) { renderFrames(state.engine, scene, if (kept == null) range else kept.last + 1..range.last, expected.count(), range.count(), width, height, cell, next.accurateBlur, built) { resources = it } }
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: OutOfMemoryError) {
@@ -505,7 +523,7 @@ object PreviewCache {
     @Volatile private var stillNs = 0L
     @Volatile private var encodeNs = 0L
 
-    private suspend fun renderFrames(engine: EngineThread, scene: Scene, range: IntRange, expected: Int, width: Int, height: Int, cell: Float, accurateBlur: Boolean, built: FrameStore,
+    private suspend fun renderFrames(engine: EngineThread, scene: Scene, range: IntRange, expected: Int, total: Int, width: Int, height: Int, cell: Float, accurateBlur: Boolean, built: FrameStore,
                                      ready: (Long) -> Unit): Outcome =
         engine.exportSession(scene.toXml(), Smoothing(), scene.fps) {
             ready(engine.mediaRevision.value)
@@ -521,7 +539,7 @@ object PreviewCache {
                         val bytes = previous.await() ?: return Outcome.Failed
                         if (!built.add(bytes)) return Outcome.Full
                         val fit = if (built.bytes > 0) (built.budget.toDouble() * built.count / built.bytes).toInt() else expected
-                        progress = (built.count.toFloat() / fit.coerceIn(1, range.count())).coerceAtMost(0.99f)
+                        progress = (built.count.toFloat() / fit.coerceIn(1, total)).coerceAtMost(0.99f)
                         return null
                     }
                     for ((index, frame) in range.withIndex()) {
@@ -564,7 +582,9 @@ object PreviewCache {
         }
         store = built
         key = next
-        rendered = next
+        paused = outcome == Outcome.Stopped && !memoryStopped
+        rendered = if (paused) null else next
+        storeSize = width to height
         player = FramePlayer(built, width, height)
         phase = Phase.Ready
         progress = 1f
@@ -584,6 +604,17 @@ object PreviewCache {
         if (phase == Phase.Rendering) stopRequested = true
     }
 
+    fun pause() {
+        if (phase != Phase.Ready || automatic) return
+        paused = true
+        rendered = null
+        revise(force = true)
+    }
+
+    fun forget() {
+        if (automatic) rendered = null else remove()
+    }
+
     fun remove() {
         clear()
         rendered = null
@@ -598,6 +629,7 @@ object PreviewCache {
         store?.close()
         store = null
         key = null
+        paused = false
         player?.close()
         player = null
         phase = Phase.Empty
@@ -621,7 +653,7 @@ object PreviewCache {
             return
         }
         if (phase == Phase.Empty) return
-        clear()
+        remove()
         Log.i(TAG, "cache freed at trim level $level")
     }
 

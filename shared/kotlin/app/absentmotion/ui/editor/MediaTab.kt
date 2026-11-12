@@ -192,9 +192,11 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
     val allLabel = stringResource(R.string.mediatab_all)
     val shown = remember(media, album, query) { media.filter { (album == null || it.albumId == album) && matchesSearch(query, it.name, it.album) } }
     Box(modifier.clipToBounds()) {
-        LazyHorizontalGrid(AtLeastTwo(96.dp), Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(0.dp)) {
+        val tall = LocalSideLibrary.current
+        val cell = if (tall) Modifier.fillMaxWidth().height(96.dp) else Modifier.width(97.dp)
+        val cells: androidx.compose.foundation.lazy.grid.LazyGridScope.() -> Unit = {
             item(key = "albums") {
-                Column(Modifier.width(97.dp).padding(6.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                Column(cell.padding(6.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
                     val press = remember { MutableInteractionSource() }
                     Box(Modifier.fillMaxWidth().weight(1f).pressScale(press, TilePress).background(Am.Well).semantics { contentDescription = viewAll }.clickable(press, LocalIndication.current) {
                         MediaPicks.openVisual()
@@ -219,29 +221,29 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
                 }
             }
             item(key = "camera") {
-                Column(Modifier.width(97.dp).padding(6.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                Column(cell.padding(6.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
                     if (app.absentmotion.platform.PlatformFeatures.camera) MediaSquare(CameraIcons.Camera, stringResource(R.string.camera), false) { state.playing = false; state.cameraOpen = true }
                     MediaSquare(TextIcons.Search, stringResource(R.string.search_hint), searching || search.isNotEmpty()) { searching = true }
                     if (app.absentmotion.platform.PlatformFeatures.linkFolders) MediaSquare(app.absentmotion.ui.home.HomeIcons.Folder, app.absentmotion.platform.linkFolderLabel(), false) { app.absentmotion.platform.linkMediaFolder() }
                 }
             }
             item(key = "files") {
-                Column(Modifier.width(97.dp).padding(6.dp)) {
+                Column(cell.padding(6.dp)) {
                     MediaSquare(TextIcons.Import, stringResource(R.string.sounds_from_files), false) { MediaPicks.openFiles() }
                 }
             }
             if (!full) item(key = "access", span = { GridItemSpan(maxLineSpan) }) {
-                AccessNotice(Modifier.width(168.dp).fillMaxHeight().padding(6.dp), blocked, ::ask,
+                AccessNotice((if (tall) Modifier.fillMaxWidth().height(120.dp) else Modifier.width(168.dp).fillMaxHeight()).padding(6.dp), blocked, ::ask,
                     body = if (some) R.string.media_permission_partial else R.string.media_permission_body,
                     allow = if (some) R.string.media_permission_more else R.string.sounds_permission_allow)
             }
             if (shown.isEmpty() && query.isNotBlank()) item(key = "none", span = { GridItemSpan(maxLineSpan) }) {
-                NoMatches(query, R.string.search_no_photos_or_videos, Modifier.width(200.dp).fillMaxHeight())
+                NoMatches(query, R.string.search_no_photos_or_videos, if (tall) Modifier.fillMaxWidth().height(96.dp) else Modifier.width(200.dp).fillMaxHeight())
             }
             items(shown, key = { it.uri.toString() }) { file ->
                 val bitmap by produceState<android.graphics.Bitmap?>(cachedMediaThumbnail(file.uri), file.uri, file.modified, library.mediaRevision) { value = mediaThumbnail(context, file.uri) }
                 val press = remember { MutableInteractionSource() }
-                Box(Modifier.fillMaxHeight().aspectRatio(1f).pressScale(press, TilePress).background(Color.Black).semantics { contentDescription = file.name }.clickable(press, LocalIndication.current, enabled = !state.addingMedia) {
+                Box((if (tall) Modifier.fillMaxWidth() else Modifier.fillMaxHeight()).aspectRatio(1f).pressScale(press, TilePress).background(Color.Black).semantics { contentDescription = file.name }.clickable(press, LocalIndication.current, enabled = !state.addingMedia) {
                     scope.launch {
                         state.addingMedia = true
                         try {
@@ -261,6 +263,8 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
                 }
             }
         }
+        if (tall) androidx.compose.foundation.lazy.grid.LazyVerticalGrid(androidx.compose.foundation.lazy.grid.GridCells.Adaptive(96.dp), Modifier.fillMaxSize(), content = cells)
+        else LazyHorizontalGrid(AtLeastTwo(96.dp), Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(0.dp), content = cells)
         Presence(searching) {
             Box(Modifier.align(Alignment.TopCenter).presence(slide = -1f).fillMaxWidth().background(Am.Panel).padding(6.dp)) {
                 SearchField(search, { search = it }, Modifier.fillMaxWidth().height(36.dp), hint = stringResource(R.string.mediatab_search_hint), autoFocus = true,

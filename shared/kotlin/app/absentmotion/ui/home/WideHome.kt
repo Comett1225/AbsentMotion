@@ -42,7 +42,7 @@ internal fun AccentPill(text: String, modifier: Modifier = Modifier, enabled: Bo
 @Composable
 internal fun ProjectGrid(rows: List<ListRow>, upload: Boolean, onUpload: () -> Unit, state: androidx.compose.foundation.lazy.grid.LazyGridState, card: @Composable (ProjectInfo, Int, Modifier) -> Unit) {
     LazyVerticalGrid(
-        GridCells.Adaptive(340.dp), Modifier.fillMaxSize(), state,
+        if (app.absentmotion.ui.editor.LocalTablet.current) GridCells.Fixed(1) else GridCells.Adaptive(340.dp), Modifier.fillMaxSize(), state,
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 28.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {

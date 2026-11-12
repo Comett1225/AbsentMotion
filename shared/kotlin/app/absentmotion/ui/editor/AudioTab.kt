@@ -139,23 +139,25 @@ internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrar
     DisposableEffect(Unit) { onDispose { preview.stop() } }
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) { preview.stop() }
 
+    val tall = LocalSideLibrary.current
+    val cell = if (tall) Modifier.fillMaxWidth().height(84.dp) else Modifier.width(80.dp).fillMaxHeight()
     Column(modifier) {
         SearchField(search, { search = it }, Modifier.padding(start = 6.dp, end = 6.dp, top = 6.dp).fillMaxWidth().height(32.dp), hint = stringResource(R.string.audiotab_search_hint))
-        LazyHorizontalGrid(AtLeastTwo(84.dp), Modifier.fillMaxWidth().weight(1f).clipToBounds()) {
-            item(key = "viewAll") { ActionTile(stringResource(R.string.view_all), { MediaGridIcon(Modifier.size(20.dp)) }) { browsing = true } }
-            item(key = "files") { ActionTile(stringResource(R.string.sounds_from_files), { Icon(TextIcons.Import, null, Modifier.size(20.dp), tint = Am.OnDark) }, ::fromFiles) }
-            if (app.absentmotion.platform.PlatformFeatures.linkFolders) item(key = "folder") { ActionTile(app.absentmotion.platform.linkFolderLabel(), { Icon(app.absentmotion.ui.home.HomeIcons.Folder, null, Modifier.size(20.dp), tint = Am.OnDark) }) { app.absentmotion.platform.linkMediaFolder() } }
-            item(key = "speech") { ActionTile(stringResource(R.string.text_to_speech), { Icon(ChromeIcons.Captions, null, Modifier.size(20.dp), tint = Am.OnDark) }) { speaking = true } }
+        val cells: androidx.compose.foundation.lazy.grid.LazyGridScope.() -> Unit = {
+            item(key = "viewAll") { ActionTile(cell, stringResource(R.string.view_all), { MediaGridIcon(Modifier.size(20.dp)) }) { browsing = true } }
+            item(key = "files") { ActionTile(cell, stringResource(R.string.sounds_from_files), { Icon(TextIcons.Import, null, Modifier.size(20.dp), tint = Am.OnDark) }, ::fromFiles) }
+            if (app.absentmotion.platform.PlatformFeatures.linkFolders) item(key = "folder") { ActionTile(cell, app.absentmotion.platform.linkFolderLabel(), { Icon(app.absentmotion.ui.home.HomeIcons.Folder, null, Modifier.size(20.dp), tint = Am.OnDark) }) { app.absentmotion.platform.linkMediaFolder() } }
+            item(key = "speech") { ActionTile(cell, stringResource(R.string.text_to_speech), { Icon(ChromeIcons.Captions, null, Modifier.size(20.dp), tint = Am.OnDark) }) { speaking = true } }
             if (!allowed) item(key = "access", span = { GridItemSpan(maxLineSpan) }) {
-                AccessNotice(Modifier.width(168.dp).fillMaxHeight().padding(6.dp), blocked, ::ask)
+                AccessNotice((if (tall) Modifier.fillMaxWidth().height(120.dp) else Modifier.width(168.dp).fillMaxHeight()).padding(6.dp), blocked, ::ask)
             }
             if (shown.isEmpty() && query.isNotBlank()) item(key = "none", span = { GridItemSpan(maxLineSpan) }) {
-                NoMatches(query, R.string.search_no_sounds, Modifier.width(200.dp).fillMaxHeight())
+                NoMatches(query, R.string.search_no_sounds, if (tall) Modifier.fillMaxWidth().height(84.dp) else Modifier.width(200.dp).fillMaxHeight())
             }
             items(shown, key = { it.uri }) { file ->
                 val (top, bottom) = TilePalettes[file.title.hashCode().mod(TilePalettes.size)]
                 val playing = preview.uri == file.uri
-                Box(Modifier.width(80.dp).fillMaxHeight(), Alignment.Center) {
+                Box(cell, Alignment.Center) {
                     Box(
                         Modifier.size(75.dp).clip(RoundedCornerShape(2.dp))
                             .background(Brush.verticalGradient(listOf(Color(top), Color(bottom))))
@@ -174,6 +176,8 @@ internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrar
                 }
             }
         }
+        if (tall) androidx.compose.foundation.lazy.grid.LazyVerticalGrid(androidx.compose.foundation.lazy.grid.GridCells.Adaptive(80.dp), Modifier.fillMaxWidth().weight(1f).clipToBounds(), content = cells)
+        else LazyHorizontalGrid(AtLeastTwo(84.dp), Modifier.fillMaxWidth().weight(1f).clipToBounds(), content = cells)
     }
     if (speaking) VoiceSheet(state) { speaking = false }
     if (browsing) SoundLibrary(
@@ -184,8 +188,8 @@ internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrar
 }
 
 @Composable
-private fun ActionTile(label: String, icon: @Composable () -> Unit, onClick: () -> Unit) {
-    Box(Modifier.width(80.dp).fillMaxHeight(), Alignment.Center) {
+private fun ActionTile(cell: Modifier, label: String, icon: @Composable () -> Unit, onClick: () -> Unit) {
+    Box(cell, Alignment.Center) {
         val press = remember { MutableInteractionSource() }
         Column(
             Modifier.size(75.dp).pressScale(press, TilePress).clip(RoundedCornerShape(2.dp)).background(Am.Well).clickable(press, LocalIndication.current, onClick = onClick),

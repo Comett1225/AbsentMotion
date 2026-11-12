@@ -72,7 +72,7 @@ internal class LiveHandoff {
 }
 
 internal fun cacheMatches(state: EditorState, resources: Long): Boolean =
-    PreviewCache.phase == PreviewCache.Phase.Ready && PreviewCache.key == PreviewCache.keyOf(state, resources) && state.soloMode == 0 && !state.pixelMode &&
+    PreviewCache.phase == PreviewCache.Phase.Ready && !PreviewCache.paused && PreviewCache.key == PreviewCache.keyOf(state, resources) && state.soloMode == 0 && !state.pixelMode &&
         !state.gridMode && state.canvasZoom == 1f && state.canvasPan == Offset.Zero && (state.selectedId == null || state.playing) && state.drawing == null && state.panel != EditorPanel.EditText &&
         (state.cameraMode || state.scene.layers.none { it.kind == "camera" })
 
@@ -101,7 +101,8 @@ internal fun PreRenderCell(state: EditorState, modifier: Modifier) {
             onClick = {
                 when (status) {
                     PreviewCache.PreRender.Rendering -> PreviewCache.cancel()
-                    PreviewCache.PreRender.Ready -> Toast.makeText(context, PreviewCache.rangeLabel(context, state.scene.fps), Toast.LENGTH_LONG).show()
+                    PreviewCache.PreRender.Ready -> PreviewCache.pause()
+                    PreviewCache.PreRender.Outdated -> PreviewCache.forget()
                     else -> PreviewCache.render(state, context, scope)
                 }
             },

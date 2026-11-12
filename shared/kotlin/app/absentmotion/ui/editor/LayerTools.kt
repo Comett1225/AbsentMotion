@@ -467,89 +467,118 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
         return
     }
     val target = if (named) known else state.keyTarget
-    Row(modifier.tutorialGuard(any = true).background(Am.Panel)) {
-        Column(Modifier.width(168.px).heightIn(max = PanelHeight).fillMaxHeight()) {
-            FrameButton(PanelIcons.Back, stringResource(R.string.topbar_back), Modifier.weight(1f).fillMaxWidth().tutorialTarget(if (app.absentmotion.platform.PlatformFeatures.desktop) "back" else null)) { state.stepBack() }
-            if (target == null) {
-                FrameButton(PanelIcons.Keyframe, stringResource(R.string.a11y_add_keyframe), Modifier.weight(1f).fillMaxWidth().dimmed(), enabled = false)
-                FrameButton(PanelIcons.Easing, stringResource(R.string.a11y_easing), Modifier.weight(1f).fillMaxWidth().dimmed(), enabled = false)
-            } else {
-                val linked = layer.element(target.ref)?.children?.any { it.name == "valueLink" } == true
-                val onKeyframe = layer.onKeyframe(target.ref)
-                FrameButton(if (onKeyframe) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, stringResource(if (onKeyframe) R.string.a11y_remove_keyframe else R.string.a11y_add_keyframe), Modifier.weight(1f).fillMaxWidth().tutorialTarget("keyframe"), enabled = !linked) {
-                    state.toggleKeyframe()
-                }
-                FrameButton(PanelIcons.Easing, stringResource(R.string.a11y_easing), Modifier.weight(1f).fillMaxWidth().tutorialTarget("easing"), enabled = !linked) { if (layer.easing(target.ref) != null) state.easingOpen = true else state.easingHint = true }
+    val buttons: @Composable (Modifier) -> Unit = { cell ->
+        FrameButton(PanelIcons.Back, stringResource(R.string.topbar_back), cell.tutorialTarget(if (app.absentmotion.platform.PlatformFeatures.desktop) "back" else null)) { state.stepBack() }
+        if (target == null) {
+            FrameButton(PanelIcons.Keyframe, stringResource(R.string.a11y_add_keyframe), cell.dimmed(), enabled = false)
+            FrameButton(PanelIcons.Easing, stringResource(R.string.a11y_easing), cell.dimmed(), enabled = false)
+        } else {
+            val linked = layer.element(target.ref)?.children?.any { it.name == "valueLink" } == true
+            val onKeyframe = layer.onKeyframe(target.ref)
+            FrameButton(if (onKeyframe) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, stringResource(if (onKeyframe) R.string.a11y_remove_keyframe else R.string.a11y_add_keyframe), cell.tutorialTarget("keyframe"), enabled = !linked) {
+                state.toggleKeyframe()
             }
-            if (move) {
-                Box(Modifier.weight(1f).fillMaxWidth()) {
-                    FrameButton(PanelIcons.More, stringResource(R.string.effects_more), Modifier.fillMaxSize()) { menuOpen = true }
-                    Presence(menuOpen) {
-                        TransformMenu(state, shown, turn, extra = if (desk) null else { close ->
-                            if (canPivot && tab == 0) MenuRow(stringResource(R.string.a11y_tab_pivot), trailing = if (pivotMode) PanelIcons.Check else null, divider = true) { pivotMode = !pivotMode; close() }
-                            if (tab == ROTATE_TAB && (selected.kind != "camera" || state.scene.depthOrder)) {
-                                MenuRow(stringResource(R.string.transform_3d_rotation), enabled = !layer.hasTilt() && (turn?.effect ?: -1) < 0, trailing = if (state.settings.rotate3d || turn != null) PanelIcons.Check else null, divider = turn == null) { state.settings.rotate3d = !state.settings.rotate3d; close() }
-                                if (turn != null) MenuRow(stringResource(R.string.transform_free_rotate), trailing = if (state.settings.rotateFree) PanelIcons.Check else null, divider = true) { state.settings.rotateFree = !state.settings.rotateFree; close() }
-                            }
-                        }) { menuOpen = false }
-                    }
-                }
-            } else {
-                Spacer(Modifier.weight(1f))
-            }
-        }
-        Box(Modifier.weight(1f).fillMaxHeight().tutorialGuard().background(if (move) Am.PanelInset else Am.Panel)) {
-            if (panel == EditorPanel.BorderShadow) BorderShadowTabs(Modifier.align(if (app.absentmotion.platform.PlatformFeatures.desktop) Alignment.TopEnd else Alignment.CenterEnd).width(168.px).then(if (app.absentmotion.platform.PlatformFeatures.desktop) Modifier.height(PanelHeight) else Modifier.fillMaxHeight()).background(Am.Panel))
-            when (panel) {
-                EditorPanel.MoveTransform -> Swap(shown, Modifier.fillMaxSize().tutorialTarget("pad"), rise = 0.dp) { MoveTransformPanel(state, layer, shown, turn, Modifier.fillMaxSize(), if (canPivot) { { pivotMode = !pivotMode } } else null) }
-                EditorPanel.ColorFill -> ColorFillPanel(state, layer, Modifier.fillMaxSize())
-                EditorPanel.EditShape -> EditShapePanel(state, layer, Modifier.fillMaxSize())
-                EditorPanel.Speed -> SpeedPanel(state, layer, Modifier.fillMaxSize())
-                EditorPanel.BorderShadow -> BorderShadowPanel(state, layer, Modifier.fillMaxSize())
-                EditorPanel.Blending -> BlendingPanel(state, layer, Modifier.fillMaxSize())
-                EditorPanel.Camera -> CameraPanel(state, layer, Modifier.fillMaxSize())
-                EditorPanel.Model -> ModelPanel(state, layer, Modifier.fillMaxSize())
-                EditorPanel.Light -> LightPanel(state, layer, Modifier.fillMaxSize())
-                EditorPanel.Edge -> app.absentmotion.ui.editor.panels.EdgePanel(state, layer, Modifier.fillMaxSize())
-                EditorPanel.Frame -> app.absentmotion.ui.editor.panels.FramePanel(state, layer, Modifier.fillMaxSize())
-                EditorPanel.Tools, EditorPanel.EditText, EditorPanel.Effects, EditorPanel.Crop -> {}
-            }
-            Box(Modifier.width(2.px).fillMaxHeight().background(PanelDark))
-            if (move) Box(Modifier.align(Alignment.CenterEnd).width(2.px).fillMaxHeight().background(PanelDark))
+            FrameButton(PanelIcons.Easing, stringResource(R.string.a11y_easing), cell.tutorialTarget("easing"), enabled = !linked) { if (layer.easing(target.ref) != null) state.easingOpen = true else state.easingHint = true }
         }
         if (move) {
-            Column(Modifier.width(168.px).then(if (app.absentmotion.platform.PlatformFeatures.desktop) Modifier.height(PanelHeight) else Modifier.fillMaxHeight()).tutorialGuard()) {
-                val names = listOf(R.string.a11y_tab_move, R.string.a11y_tab_rotate, R.string.panel_size, R.string.a11y_tab_tilt, R.string.a11y_tab_skew, R.string.a11y_tab_pivot)
-                val icons = listOf(PanelIcons.TabMove, PanelIcons.TabRotate, PanelIcons.TabSize, PanelIcons.TabTilt, PanelIcons.TabSkew, PanelIcons.TabPivot)
-                transformTabs(state.settings.basicTransform, desk).forEach { i ->
-                    val icon = if (i == 0 && shown == PIVOT_TAB) icons[PIVOT_TAB] else icons[i]
-                    val usable = i <= SIZE_TAB || selected.kind != "camera" || (i == TILT_TAB && state.scene.depthOrder)
-                    val tip = if (!app.absentmotion.platform.PlatformFeatures.desktop) "" else when (i) {
-                        SIZE_TAB -> deskShortcut(R.string.panel_size, "${DeskAlt}${stringResource(R.string.desk_scroll_key)}")
-                        ROTATE_TAB -> deskShortcut(R.string.a11y_tab_rotate, "${DeskShift}${DeskAlt}${stringResource(R.string.desk_scroll_key)}")
-                        else -> ""
-                    }
-                    Box(Modifier.weight(1f).fillMaxWidth()) { DeskTip(tip, Modifier.fillMaxSize()) { Box(
-                        Modifier.fillMaxSize().then(if (usable) Modifier.clickable(role = androidx.compose.ui.semantics.Role.Tab) { tab = i } else Modifier.dimmed())
-                            .semantics(mergeDescendants = true) { this.selected = tab == i }.padding(start = 10.px, end = 11.px, top = 5.px, bottom = 5.px),
-                    ) {
-                        Column(
-                            Modifier.fillMaxSize().clip(PanelShape).fadeBackground(tab == i, PanelDark),
-                            horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
-                        ) {
-                            val tint = if (tab == i) Am.Accent else Am.OnDark
-                            PanelIcon(icon, tint, size = 17.dp)
-                            Text(
-                                stringResource(names[if (i == 0 && shown == PIVOT_TAB) PIVOT_TAB else i]), Modifier.fillMaxWidth().padding(horizontal = 2.dp), color = animatedColor(tint), maxLines = 1, softWrap = false,
-                                textAlign = androidx.compose.ui.text.style.TextAlign.Center, lineHeight = if (app.absentmotion.platform.PlatformFeatures.desktop) 14.sp else 9.sp,
-                                fontSize = if (app.absentmotion.platform.PlatformFeatures.desktop) 12.sp else androidx.compose.ui.unit.TextUnit.Unspecified,
-                                autoSize = if (app.absentmotion.platform.PlatformFeatures.desktop) null else androidx.compose.foundation.text.TextAutoSize.StepBased(6.sp, 9.sp, 0.5.sp),
-                            )
+            Box(cell) {
+                FrameButton(PanelIcons.More, stringResource(R.string.effects_more), Modifier.fillMaxSize()) { menuOpen = true }
+                Presence(menuOpen) {
+                    TransformMenu(state, shown, turn, extra = if (desk) null else { close ->
+                        if (canPivot && tab == 0) MenuRow(stringResource(R.string.a11y_tab_pivot), trailing = if (pivotMode) PanelIcons.Check else null, divider = true) { pivotMode = !pivotMode; close() }
+                        if (tab == ROTATE_TAB && (selected.kind != "camera" || state.scene.depthOrder)) {
+                            MenuRow(stringResource(R.string.transform_3d_rotation), enabled = !layer.hasTilt() && (turn?.effect ?: -1) < 0, trailing = if (state.settings.rotate3d || turn != null) PanelIcons.Check else null, divider = turn == null) { state.settings.rotate3d = !state.settings.rotate3d; close() }
+                            if (turn != null) MenuRow(stringResource(R.string.transform_free_rotate), trailing = if (state.settings.rotateFree) PanelIcons.Check else null, divider = true) { state.settings.rotateFree = !state.settings.rotateFree; close() }
                         }
-                    } } }
+                    }) { menuOpen = false }
                 }
             }
+        } else {
+            Spacer(cell)
         }
+    }
+    val pad: @Composable androidx.compose.foundation.layout.BoxScope.() -> Unit = {
+        if (panel == EditorPanel.BorderShadow) BorderShadowTabs(Modifier.align(if (app.absentmotion.platform.PlatformFeatures.desktop) Alignment.TopEnd else Alignment.CenterEnd).width(168.px).then(if (app.absentmotion.platform.PlatformFeatures.desktop) Modifier.height(PanelHeight) else Modifier.fillMaxHeight()).background(Am.Panel))
+        when (panel) {
+            EditorPanel.MoveTransform -> Swap(shown, Modifier.fillMaxSize().tutorialTarget("pad"), rise = 0.dp) { MoveTransformPanel(state, layer, shown, turn, Modifier.fillMaxSize(), if (canPivot) { { pivotMode = !pivotMode } } else null) }
+            EditorPanel.ColorFill -> ColorFillPanel(state, layer, Modifier.fillMaxSize())
+            EditorPanel.EditShape -> EditShapePanel(state, layer, Modifier.fillMaxSize())
+            EditorPanel.Speed -> SpeedPanel(state, layer, Modifier.fillMaxSize())
+            EditorPanel.BorderShadow -> BorderShadowPanel(state, layer, Modifier.fillMaxSize())
+            EditorPanel.Blending -> BlendingPanel(state, layer, Modifier.fillMaxSize())
+            EditorPanel.Camera -> CameraPanel(state, layer, Modifier.fillMaxSize())
+            EditorPanel.Model -> ModelPanel(state, layer, Modifier.fillMaxSize())
+            EditorPanel.Light -> LightPanel(state, layer, Modifier.fillMaxSize())
+            EditorPanel.Edge -> app.absentmotion.ui.editor.panels.EdgePanel(state, layer, Modifier.fillMaxSize())
+            EditorPanel.Frame -> app.absentmotion.ui.editor.panels.FramePanel(state, layer, Modifier.fillMaxSize())
+            EditorPanel.Tools, EditorPanel.EditText, EditorPanel.Effects, EditorPanel.Crop -> {}
+        }
+        Box(Modifier.width(2.px).fillMaxHeight().background(PanelDark))
+        if (move) Box(Modifier.align(Alignment.CenterEnd).width(2.px).fillMaxHeight().background(PanelDark))
+    }
+    val tabs: @Composable (Modifier) -> Unit = { cell ->
+        val names = listOf(R.string.a11y_tab_move, R.string.a11y_tab_rotate, R.string.panel_size, R.string.a11y_tab_tilt, R.string.a11y_tab_skew, R.string.a11y_tab_pivot)
+        val icons = listOf(PanelIcons.TabMove, PanelIcons.TabRotate, PanelIcons.TabSize, PanelIcons.TabTilt, PanelIcons.TabSkew, PanelIcons.TabPivot)
+        transformTabs(state.settings.basicTransform, desk).forEach { i ->
+            val icon = if (i == 0 && shown == PIVOT_TAB) icons[PIVOT_TAB] else icons[i]
+            val usable = i <= SIZE_TAB || selected.kind != "camera" || (i == TILT_TAB && state.scene.depthOrder)
+            val tip = if (!app.absentmotion.platform.PlatformFeatures.desktop) "" else when (i) {
+                SIZE_TAB -> deskShortcut(R.string.panel_size, "${DeskAlt}${stringResource(R.string.desk_scroll_key)}")
+                ROTATE_TAB -> deskShortcut(R.string.a11y_tab_rotate, "${DeskShift}${DeskAlt}${stringResource(R.string.desk_scroll_key)}")
+                else -> ""
+            }
+            Box(cell) { DeskTip(tip, Modifier.fillMaxSize()) { Box(
+                Modifier.fillMaxSize().then(if (usable) Modifier.clickable(role = androidx.compose.ui.semantics.Role.Tab) { tab = i } else Modifier.dimmed())
+                    .semantics(mergeDescendants = true) { this.selected = tab == i }.padding(start = 10.px, end = 11.px, top = 5.px, bottom = 5.px),
+            ) {
+                Column(
+                    Modifier.fillMaxSize().clip(PanelShape).fadeBackground(tab == i, PanelDark),
+                    horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
+                ) {
+                    val tint = if (tab == i) Am.Accent else Am.OnDark
+                    PanelIcon(icon, tint, size = 17.dp)
+                    Text(
+                        stringResource(names[if (i == 0 && shown == PIVOT_TAB) PIVOT_TAB else i]), Modifier.fillMaxWidth().padding(horizontal = 2.dp), color = animatedColor(tint), maxLines = 1, softWrap = false,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center, lineHeight = if (app.absentmotion.platform.PlatformFeatures.desktop) 14.sp else 9.sp,
+                        fontSize = if (app.absentmotion.platform.PlatformFeatures.desktop) 12.sp else androidx.compose.ui.unit.TextUnit.Unspecified,
+                        autoSize = if (app.absentmotion.platform.PlatformFeatures.desktop) null else androidx.compose.foundation.text.TextAutoSize.StepBased(6.sp, 9.sp, 0.5.sp),
+                    )
+                }
+            } } }
+        }
+    }
+    val sideHeight = LocalSideHeight.current
+    if (move && !desk && sideHeight != androidx.compose.ui.unit.Dp.Infinity) androidx.compose.foundation.layout.BoxWithConstraints(modifier.tutorialGuard(any = true).background(Am.Panel)) {
+        val beside = maxWidth >= PhoneWidth + 200.dp
+        val padWidth = PhoneWidth - 168.px * 2
+        val scale = minOf(PhoneWidth / padWidth, (maxHeight - 98.dp - if (beside) 0.dp else 150.dp) / PanelHeight)
+        if (scale >= 0.85f) {
+            val summary: @Composable (Modifier) -> Unit = { app.absentmotion.ui.editor.panels.TransformSummary(state, layer, it) }
+            val control: @Composable () -> Unit = {
+                Column(Modifier.width(PhoneWidth)) {
+                    Row(Modifier.fillMaxWidth().height(46.dp)) { buttons(Modifier.weight(1f).fillMaxHeight()) }
+                    Box(Modifier.fillMaxWidth().height(PanelHeight * scale).background(Am.PanelInset), Alignment.Center) {
+                        val density = androidx.compose.ui.platform.LocalDensity.current
+                        androidx.compose.runtime.CompositionLocalProvider(androidx.compose.ui.platform.LocalDensity provides androidx.compose.ui.unit.Density(density.density * scale, density.fontScale)) {
+                            Box(Modifier.width(padWidth).height(PanelHeight).tutorialGuard(), content = pad)
+                        }
+                    }
+                    Row(Modifier.fillMaxWidth().height(52.dp)) { tabs(Modifier.weight(1f).fillMaxHeight()) }
+                }
+            }
+            if (beside) Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.Bottom) { summary(Modifier.weight(1f).fillMaxHeight()); control() }
+            else Column(Modifier.fillMaxSize()) { summary(Modifier.weight(1f).fillMaxWidth()); control() }
+            return@BoxWithConstraints
+        }
+        Row(Modifier.fillMaxWidth().height(PanelHeight)) {
+            Column(Modifier.width(168.px).fillMaxHeight()) { buttons(Modifier.weight(1f).fillMaxWidth()) }
+            Box(Modifier.weight(1f).fillMaxHeight().tutorialGuard().background(Am.PanelInset), content = pad)
+            Column(Modifier.width(168.px).fillMaxHeight().tutorialGuard()) { tabs(Modifier.weight(1f).fillMaxWidth()) }
+        }
+    } else Row(modifier.tutorialGuard(any = true).background(Am.Panel)) {
+        Column(Modifier.width(168.px).heightIn(max = PanelHeight).fillMaxHeight()) { buttons(Modifier.weight(1f).fillMaxWidth()) }
+        Box(Modifier.weight(1f).fillMaxHeight().tutorialGuard().background(if (move) Am.PanelInset else Am.Panel), content = pad)
+        if (move) Column(Modifier.width(168.px).then(if (app.absentmotion.platform.PlatformFeatures.desktop) Modifier.height(PanelHeight) else Modifier.fillMaxHeight()).tutorialGuard()) { tabs(Modifier.weight(1f).fillMaxWidth()) }
     }
 }
 

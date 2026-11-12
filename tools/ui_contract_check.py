@@ -199,7 +199,7 @@ class UiContracts(unittest.TestCase):
         for tab, ref in [(1, 'PropRef.Rotation'), (2, 'PropRef.Scale'), (3, 'PropRef.Tilt')]:
             self.assertTrue(any(line.strip().startswith(f'{tab} -> ') and f'resetValue({ref}' in line for line in reset.splitlines()))
         self.assertIn('val usable = i <= SIZE_TAB || selected.kind != "camera"', text)
-        self.assertIn('PanelIcon(icon, tint, size = 17.dp)\n                            Text(\n                                stringResource(names[if (i == 0 && shown == PIVOT_TAB) PIVOT_TAB else i])', text)
+        self.assertIn('PanelIcon(icon, tint, size = 17.dp)\n                    Text(\n                        stringResource(names[if (i == 0 && shown == PIVOT_TAB) PIVOT_TAB else i])', text)
         self.assertIn('2 -> if (layer.kind == "camera") CameraSizeTab(state, layer) else SizeTab(state, layer)', source('ui/editor/panels/MoveTransformPanel.kt'))
 
     def test_scale_link_is_saved_on_the_layer_and_the_ruler_glides(self):

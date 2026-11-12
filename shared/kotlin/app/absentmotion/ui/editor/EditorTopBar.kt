@@ -58,6 +58,7 @@ import app.absentmotion.platform.PlatformFeatures
 import app.absentmotion.ui.home.handCursor
 import app.absentmotion.ui.home.hoverFill
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.theme.pressScale
 import app.absentmotion.ui.theme.Presence
 import app.absentmotion.ui.theme.animatedBackground
 import app.absentmotion.ui.theme.enterFade
@@ -134,8 +135,9 @@ fun EditorTopBar(state: EditorState, onExit: () -> Unit, modifier: Modifier = Mo
         }
         if (layer == null) {
             BarButton(ChromeIcons.Gear, stringResource(R.string.topbar_project_settings), cell.enterFade().tutorialTarget("gear")) { act { settingsOpen = true } }
-            if (place == BarPlace.Project) Box(Modifier.width(52.dp).fillMaxHeight().enterFade().tutorialTarget("export").tutorialGuard().clickable { act { state.playing = false; state.exportOpen = true } }, contentAlignment = Alignment.Center) {
-                Box(Modifier.size(40.dp, 28.dp).background(Am.Accent, RoundedCornerShape(7.dp)), contentAlignment = Alignment.Center) {
+            val exportPress = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+            if (place == BarPlace.Project) Box(Modifier.width(52.dp).fillMaxHeight().enterFade().tutorialTarget("export").tutorialGuard().clickable(exportPress, null) { act { state.playing = false; state.exportOpen = true } }, contentAlignment = Alignment.Center) {
+                Box(Modifier.size(40.dp, 28.dp).pressScale(exportPress).background(Am.Accent, RoundedCornerShape(7.dp)), contentAlignment = Alignment.Center) {
                     Icon(ChromeIcons.Share, stringResource(R.string.topbar_export_share), Modifier.size(18.dp), tint = Am.OnAccent)
                 }
             }

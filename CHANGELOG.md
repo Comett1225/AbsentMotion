@@ -30,7 +30,7 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 
 ### Changed
 
-- Tablet layout: in landscape the editor has tool rails on both sides and a side panel that stays in place, Home has a bottom bar with a round +, and New project and Export open in a centred card with a pill button.
+- Tablet layout: in landscape the editor has tool rails on both sides and a side panel that stays in place, Home has a bottom bar with a round +, and New project and Export open in a centred card with a pill button. In portrait the same rails run full height with a fixed panel under the timeline. Move & Transform shows the numbers on top and a bigger pad, dial or ruler below, Media and Audio are grids, Home shows one row per project, and pressed buttons get a soft rounded highlight.
 - Smaller app: the Android download went from about 80 MB to 49 MB. Other languages unpack when picked, and background removal downloads on first use.
 - Simpler Transform: four tabs on phones and tablets, double-tap Move for the pivot, and 3D rotation in the Rotate menu.
 - Smoother menus: the effects panel and effect pages slide in from the right, and projects open with a soft zoom.
@@ -45,6 +45,8 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 
 ### Fixed
 
+- Pre-render: pressing the button while it renders stops it and keeps the frames, and pressing again continues from where it stopped. A finished pre-render turns off and on with a press, a red (outdated) one clears with a press instead of staying red, and a copy Android frees in the background no longer leaves the button red.
+- Export button on tablets: no white rectangle on the round orange button when pressed.
 - Selected layer: tapping or clicking it again drops its focus.
 - Parenting: a child stays attached when the parent turns or is resized, also when the pivots differ.
 - Fonts on a computer: fonts with a space in their name can be used and deleted again, and Google Fonts such as Open Sans no longer turn into Roboto.

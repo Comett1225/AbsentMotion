@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.sizeIn
@@ -65,12 +66,16 @@ private val SideWidth = PhoneWidth
 @Composable
 internal fun WideEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: AddLibrary) {
     BoxWithConstraints(Modifier.fillMaxSize().background(Am.TopBar).systemBarsPadding().displayCutoutPadding()) {
-        if (railEditor(maxWidth, maxHeight)) {
-            RailEditorBody(state, onExit, addLibrary, (maxHeight - 88.dp - 260.dp).coerceIn(140.dp, 320.dp))
+        if (maxHeight > maxWidth) {
+            val dock = ((maxHeight - 88.dp) * 0.3f).coerceIn(280.dp, 360.dp)
+            RailEditorBody(state, onExit, addLibrary, (maxHeight - 88.dp - dock - 420.dp).coerceIn(200.dp, 320.dp), dock)
             return@BoxWithConstraints
         }
-        val portrait = maxHeight > maxWidth
-        val timeline = if (portrait) ((maxHeight - 88.dp) * 0.45f).coerceIn(260.dp, 640.dp) else (maxHeight - 88.dp - 260.dp).coerceIn(140.dp, 320.dp)
+        if (railEditor(maxWidth, maxHeight)) {
+            RailEditorBody(state, onExit, addLibrary, (maxHeight - 88.dp - 260.dp).coerceIn(140.dp, 320.dp), null)
+            return@BoxWithConstraints
+        }
+        val timeline = (maxHeight - 88.dp - 260.dp).coerceIn(140.dp, 320.dp)
         val textEdit = state.panel == EditorPanel.EditText && state.selected?.kind == "text"
         val textUi = remember { TextEditUi() }
         val side = textEdit || (state.selectedId != null && !state.addOpen && !MultiSelect.active)
@@ -80,7 +85,7 @@ internal fun WideEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: 
             Box(Modifier.fillMaxWidth().weight(1f)) {
                 Preview(state, Modifier.fillMaxSize().tutorialTarget("preview"), reserveEnd = reserve)
                 (state.drawing as? app.absentmotion.editor.PointMode)?.let { PointOverlay(state, it, Modifier.fillMaxSize().padding(end = reserve), reserve) }
-                if (!portrait) MasterMeter(state, reserve)
+                MasterMeter(state, reserve)
                 Box(Modifier.fillMaxSize().padding(end = reserve)) {
                     Presence(state.previewPanelOpen) { PreviewModePanel(state, Modifier.align(Alignment.CenterEnd).presence(slideX = 0.4f).tutorialGuard(any = true)) }
                     AnimateButton(state, Modifier.align(Alignment.BottomEnd))
@@ -109,51 +114,59 @@ private val RailEditorWidth = 960.dp
 internal val LeftRailWidth = 55.dp
 
 @Composable
-private fun RailEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: AddLibrary, timeline: Dp) {
+private fun RailEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: AddLibrary, timeline: Dp, dock: Dp?) {
     val textEdit = state.panel == EditorPanel.EditText && state.selected?.kind == "text"
     val textUi = remember { TextEditUi() }
     val layerSide = textEdit || state.drawing is app.absentmotion.editor.PointMode || MultiSelect.active || (state.selectedId != null && !state.addOpen)
-    Row(Modifier.fillMaxSize()) {
-        Column(Modifier.width(LeftRailWidth).fillMaxHeight().background(Am.Button).tutorialGuard(any = true)) {
-            BarButton(ChromeIcons.Exit, stringResource(R.string.topbar_exit_to_project_list), Modifier.fillMaxWidth().height(42.dp)) { onExit() }
-            PreviewModePanel(state, Modifier.weight(1f))
-            BarButton(ChromeIcons.Undo, stringResource(R.string.play_undo), Modifier.fillMaxWidth().height(46.dp).tutorialTarget("undo"), enabled = state.canUndo) { state.undo() }
-            BarButton(ChromeIcons.Redo, stringResource(R.string.play_redo), Modifier.fillMaxWidth().height(46.dp).tutorialTarget("redo"), enabled = state.canRedo) { state.redo() }
-        }
-        Column(Modifier.weight(1f).fillMaxHeight()) {
-            EditorTopBar(state, onExit, Modifier.fillMaxWidth().height(42.dp).enterFade().tutorialGuard(any = true), BarPlace.Project)
-            Box(Modifier.fillMaxWidth().weight(1f)) {
-                Preview(state, Modifier.fillMaxSize().tutorialTarget("preview"))
-                (state.drawing as? app.absentmotion.editor.PointMode)?.let { PointOverlay(state, it, Modifier.fillMaxSize()) }
-                MasterMeter(state, 0.dp)
-                AnimateButton(state, Modifier.align(Alignment.BottomEnd))
-                if (state.settings.transitionInPreview) TransitionButton(state, Modifier.align(Alignment.BottomStart).padding(12.dp).tutorialTarget("transition"))
-                HistoryNotes(state, Modifier.align(Alignment.BottomCenter))
+    Box(Modifier.fillMaxSize()) {
+        Row(Modifier.fillMaxSize().padding(end = if (dock == null) SideWidth + SideRailWidth else SideRailWidth)) {
+            Column(Modifier.width(LeftRailWidth).fillMaxHeight().background(Am.Button).tutorialGuard(any = true)) {
+                BarButton(ChromeIcons.Exit, stringResource(R.string.topbar_exit_to_project_list), Modifier.fillMaxWidth().height(42.dp)) { onExit() }
+                PreviewModePanel(state, Modifier.weight(1f))
+                BarButton(ChromeIcons.Undo, stringResource(R.string.play_undo), Modifier.fillMaxWidth().height(46.dp).tutorialTarget("undo"), enabled = state.canUndo) { state.undo() }
+                BarButton(ChromeIcons.Redo, stringResource(R.string.play_redo), Modifier.fillMaxWidth().height(46.dp).tutorialTarget("redo"), enabled = state.canRedo) { state.redo() }
             }
-            Box(Modifier.fillMaxWidth().height(46.dp).background(Am.TimelineBg)) {
-                PlayBar(state, Modifier.align(Alignment.Center).widthIn(max = 360.dp).fillMaxSize().tutorialTarget("playbar").tutorialGuard(any = true), transportOnly = true)
-                if (!state.settings.transitionInPreview) TransitionButton(state, Modifier.align(Alignment.CenterEnd).padding(end = 12.dp).tutorialTarget("transition"), compact = true)
-                LevelMeter(state, Modifier.align(Alignment.BottomStart).fillMaxWidth().height(2.1.dp))
+            Column(Modifier.weight(1f).fillMaxHeight().padding(bottom = dock ?: 0.dp)) {
+                EditorTopBar(state, onExit, Modifier.fillMaxWidth().height(42.dp).enterFade().tutorialGuard(any = true), BarPlace.Project)
+                Box(Modifier.fillMaxWidth().weight(1f)) {
+                    Preview(state, Modifier.fillMaxSize().tutorialTarget("preview"))
+                    (state.drawing as? app.absentmotion.editor.PointMode)?.let { PointOverlay(state, it, Modifier.fillMaxSize()) }
+                    if (dock == null) MasterMeter(state, 0.dp)
+                    AnimateButton(state, Modifier.align(Alignment.BottomEnd))
+                    if (state.settings.transitionInPreview) TransitionButton(state, Modifier.align(Alignment.BottomStart).padding(12.dp).tutorialTarget("transition"))
+                    HistoryNotes(state, Modifier.align(Alignment.BottomCenter))
+                }
+                Box(Modifier.fillMaxWidth().height(46.dp).background(Am.TimelineBg)) {
+                    PlayBar(state, Modifier.align(Alignment.Center).widthIn(max = 360.dp).fillMaxSize().tutorialTarget("playbar").tutorialGuard(any = true), transportOnly = true)
+                    if (!state.settings.transitionInPreview) TransitionButton(state, Modifier.align(Alignment.CenterEnd).padding(end = 12.dp).tutorialTarget("transition"), compact = true)
+                    LevelMeter(state, Modifier.align(Alignment.BottomStart).fillMaxWidth().height(2.1.dp))
+                }
+                Box(Modifier.fillMaxWidth().height(timeline).background(Am.TimelineBg).tutorialTarget("timeline")) { Timeline(state, Modifier.fillMaxSize()) }
             }
-            Box(Modifier.fillMaxWidth().height(timeline).background(Am.TimelineBg).tutorialTarget("timeline")) { Timeline(state, Modifier.fillMaxSize()) }
         }
-        Box(Modifier.width(SideWidth + SideRailWidth).fillMaxHeight().background(Am.Panel).pointerInput(Unit) {}) {
-            if (!layerSide) AddPopup(state, Modifier.fillMaxSize().tutorialTarget("add"), addLibrary, side = true)
-            else Row(Modifier.fillMaxSize().tutorialTarget("side_panel")) {
-                Column(Modifier.width(SideWidth).fillMaxHeight()) {
-                    EditorTopBar(state, onExit, Modifier.fillMaxWidth().height(42.dp).tutorialGuard(any = true), BarPlace.Layer)
-                    BoxWithConstraints(Modifier.fillMaxWidth().weight(1f)) {
-                        CompositionLocalProvider(LocalSideHeight provides maxHeight) {
-                            if (textEdit) TextEditor(state, textUi, embedded = true)
-                            else LowerPanels(state, addLibrary, top = true)
-                        }
+        if (!layerSide) AddPopup(state, library = addLibrary) { content, rail -> SideFrame(dock, "add", content, rail) }
+        else SideFrame(dock, "side_panel", {
+            Column(Modifier.fillMaxSize()) {
+                EditorTopBar(state, onExit, Modifier.fillMaxWidth().height(42.dp).tutorialGuard(any = true), BarPlace.Layer)
+                BoxWithConstraints(Modifier.fillMaxWidth().weight(1f)) {
+                    CompositionLocalProvider(LocalSideHeight provides maxHeight) {
+                        if (textEdit) TextEditor(state, textUi, embedded = true)
+                        else LowerPanels(state, addLibrary, top = true)
                     }
                 }
-                PanelRail(state, Modifier.width(SideRailWidth).fillMaxHeight())
             }
-        }
+        }) { PanelRail(state, Modifier.fillMaxSize()) }
     }
     if (textEdit && textUi.browser) PhoneScreen { Box(Modifier.fillMaxSize().enterFade(rise = 12.dp)) { TextFontBrowser(state, textUi) } }
+}
+
+@Composable
+private fun androidx.compose.foundation.layout.BoxScope.SideFrame(dock: Dp?, target: String, content: @Composable () -> Unit, rail: @Composable () -> Unit) {
+    val solid = Modifier.background(Am.Panel).pointerInput(Unit) {}
+    val place = if (dock == null) Modifier.align(Alignment.CenterEnd).padding(end = SideRailWidth).width(SideWidth).fillMaxHeight()
+        else Modifier.align(Alignment.BottomStart).imePadding().padding(start = LeftRailWidth, end = SideRailWidth).fillMaxWidth().height(dock)
+    Box(place.then(solid).tutorialTarget(target)) { content() }
+    Box(Modifier.align(Alignment.CenterEnd).width(SideRailWidth).fillMaxHeight().then(solid)) { rail() }
 }
 
 @Composable

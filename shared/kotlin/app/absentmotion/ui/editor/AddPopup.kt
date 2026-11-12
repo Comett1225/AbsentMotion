@@ -108,18 +108,21 @@ private val Tabs = listOf(
 )
 
 @Composable
-internal fun AddPopup(state: EditorState, modifier: Modifier = Modifier, library: AddLibrary, side: Boolean = false) {
+internal fun AddPopup(state: EditorState, modifier: Modifier = Modifier, library: AddLibrary, side: (@Composable (content: @Composable () -> Unit, rail: @Composable () -> Unit) -> Unit)? = null) {
     var selectedTab by remember { mutableIntStateOf(0) }
-    BackHandler(!side && state.toolOpen == 0) { state.addOpen = false }
-    if (side) {
-        Row(modifier.background(Am.Panel)) {
-            Column(Modifier.weight(1f).fillMaxHeight()) {
+    BackHandler(side == null && state.toolOpen == 0) { state.addOpen = false }
+    if (side != null) {
+        side({
+            Column(Modifier.fillMaxSize()) {
                 Box(Modifier.fillMaxWidth().height(42.dp).background(PopupBar), Alignment.Center) {
                     Text(stringResource(Tabs[selectedTab].label), color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
                 }
-                Swap(selectedTab, Modifier.weight(1f).fillMaxWidth(), rise = 0.dp) { TabPage(selectedTab, state, library) }
+                androidx.compose.runtime.CompositionLocalProvider(LocalSideLibrary provides true) {
+                    Swap(selectedTab, Modifier.weight(1f).fillMaxWidth(), rise = 0.dp) { TabPage(selectedTab, state, library) }
+                }
             }
-            androidx.compose.foundation.layout.BoxWithConstraints(Modifier.width(SideRailWidth).fillMaxHeight().background(PopupBar)) {
+        }) {
+            androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxSize().background(PopupBar)) {
                 Column(Modifier.fillMaxSize().verticalScroll(androidx.compose.foundation.rememberScrollState())) {
                     Column(Modifier.fillMaxWidth().heightIn(min = this@BoxWithConstraints.maxHeight), Arrangement.SpaceBetween) {
                         Column(Modifier.padding(top = 4.dp)) {
@@ -148,6 +151,7 @@ internal fun AddPopup(state: EditorState, modifier: Modifier = Modifier, library
 }
 
 internal val SideRailWidth = 64.dp
+internal val LocalSideLibrary = androidx.compose.runtime.compositionLocalOf { false }
 
 @Composable
 private fun TabPage(tab: Int, state: EditorState, library: AddLibrary) {
