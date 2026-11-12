@@ -1567,13 +1567,13 @@
     },
     {
       "id": "home.saved_sizes",
-      "name": "Saved custom project sizes (New Project strip, project settings menu)",
-      "where": "NewProjectSheet.kt SavedSizeStrip, DeskNewProject.kt DeskSavedSizes, EditorMenus.kt SavedSizesButton, DeskProject.kt DeskSavedSizes, AppSettings.kt SavedSizes",
-      "android": "untested",
+      "name": "Saved custom project sizes (New Project second page, project settings menu)",
+      "where": "NewProjectSheet.kt SavedPage + SavedSizeStrip, DeskNewProject.kt DeskSavedSizes, EditorMenus.kt SavedSizesButton, DeskProject.kt DeskSavedSizes, AppSettings.kt SavedSizes",
+      "android": "works",
       "macos": "works",
       "windows": "untested",
       "linux": "untested",
-      "note": "Phone: long-press a chip for Rename or Delete. PC: right-click"
+      "note": "Phone: saved sizes are tiles on a second page of the aspect row, hold a tile for Rename or Delete; any number can be saved. PC: chips, right-click"
     }
   ],
   "android_only": {

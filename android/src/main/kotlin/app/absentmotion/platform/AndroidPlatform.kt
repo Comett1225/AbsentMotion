@@ -165,7 +165,7 @@ fun encodeRgba(pixels: ByteArray, width: Int, height: Int, settings: app.absentm
 @androidx.compose.runtime.Composable
 fun ExportBars(dark: Boolean, running: Boolean) {
     val view = androidx.compose.ui.platform.LocalView.current
-    val light = (if (dark) app.absentmotion.ui.theme.Am.Navy else app.absentmotion.ui.theme.Am.Card).luminance() > 0.5f
+    val light = (if (dark) app.absentmotion.ui.theme.Am.DoneBg else app.absentmotion.ui.theme.Am.Card).luminance() > 0.5f
     val floating = !dark && app.absentmotion.ui.editor.isTablet(androidx.compose.ui.platform.LocalConfiguration.current.smallestScreenWidthDp)
     if (!floating) androidx.compose.runtime.DisposableEffect(light) {
         val activity = view.context as? androidx.activity.ComponentActivity
