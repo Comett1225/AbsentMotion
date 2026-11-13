@@ -8,6 +8,7 @@ case "$ARCH" in
         CPU="$ARCH"; [ "$ARCH" = x64 ] && CPU=x86_64
         OUT="$ROOT/pc/build/native-$ARCH"; BUILD="$ROOT/pc/build/native-mac-$ARCH"
         DEPS="${FFAMP_DEPS:?set FFAMP_DEPS to the folder third_party/FFamp/third_party/build_mac.sh made for $CPU}"
+        [ -f "$DEPS/lib/libxvidcore.a" ] || { echo "$DEPS has no libxvidcore.a: run third_party/FFamp/third_party/build_mac.sh $CPU again" >&2; exit 1; }
         set -- -DCMAKE_OSX_ARCHITECTURES=$CPU -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DAM_ARCH=$ARCH "-DFFAMP_DEPS=$DEPS" ;;
     *) echo "usage: macos/build.sh [arm64|x64]" >&2; exit 2 ;;
 esac

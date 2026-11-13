@@ -332,6 +332,14 @@ JNIEXPORT jstring JNICALL JNI(openProblem)(JNIEnv* e, jobject, jstring path) {
     return error.empty() ? nullptr : e->NewStringUTF(error.c_str());
 }
 
+JNIEXPORT jboolean JNICALL JNI(divxDecoder)(JNIEnv*, jobject) {
+#ifdef ABSENT_XVID
+    return JNI_TRUE;
+#else
+    return JNI_FALSE;
+#endif
+}
+
 JNIEXPORT jstring JNICALL JNI(encoders)(JNIEnv* e, jobject) {
     std::string text;
     for (const absent::EncoderInfo& info : absent::encoders()) text += info.name + "\n";

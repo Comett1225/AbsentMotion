@@ -45,22 +45,62 @@ class FfampFormatsTest {
   </shape>
 </scene>"""
 
-    private fun preview(file: File, w: Int, h: Int): ByteArray {
+    private fun preview(file: File, w: Int, h: Int, ms: Int = 300): ByteArray {
         val native = NativeVideoSource(file)
         val handle = DesktopNative.create()
         try {
             assertEquals(null, DesktopNative.setScene(handle, scene(file, w, h)))
-            assertEquals(1, native.show(handle, file.absolutePath, 300_000, true))
-            return DesktopNative.still(handle, 300.0, w, h, true)!!
+            assertEquals(1, native.show(handle, file.absolutePath, ms * 1000L, true))
+            return DesktopNative.still(handle, ms.toDouble(), w, h, true)!!
         } finally {
             native.close()
             DesktopNative.destroy(handle)
         }
     }
 
-    private fun exported(file: File, w: Int, h: Int): ByteArray = runBlocking {
+    private fun exported(file: File, w: Int, h: Int, ms: Int = 300): ByteArray = runBlocking {
         val engine = EngineThread(0xff000000.toInt(), context)
-        try { engine.exportSession(scene(file, w, h)) { still(300, w, h) }!! } finally { engine.close() }
+        try { engine.exportSession(scene(file, w, h)) { still(ms, w, h) }!! } finally { engine.close() }
+    }
+
+    private fun apart(a: ByteArray, b: ByteArray): Double = a.indices.filter { it % 4 != 3 }.sumOf { abs((a[it].toInt() and 255) - (b[it].toInt() and 255)) }.toDouble() / (a.size / 4 * 3)
+
+    private fun playsDivx(file: File, w: Int, h: Int, frames: Int): String {
+        assertEquals(file.name, null, MediaEngine.current.trouble(file))
+        val probe = DeskProbe.parse(org.json.JSONObject(MediaEngine.current.probe(file)))
+        assertEquals(file.name, w to h, probe.video!!.width to probe.video!!.height)
+        assertEquals(file.name, frames, VideoSources.timestamps(context, Uri.fromFile(file).toString()).size)
+        val shown = listOf(100, 420, 740, 980).map { ms ->
+            val still = preview(file, w, h, ms)
+            val (r, g, b) = pixel(still, w, w / 2, h / 2)
+            assertTrue("${file.name} at $ms ms: the picture is drawn ($r $g $b)", !(r < 30 && g > 220 && b < 30))
+            val out = exported(file, w, h, ms)
+            assertTrue("${file.name} at $ms ms: export and preview show the same frame (${apart(still, out)})", apart(still, out) < 3)
+            still
+        }
+        val moves = (1 until shown.size).map { apart(shown[it - 1], shown[it]) }
+        assertTrue("${file.name}: each frame moves on from the one before ($moves)", moves.all { it > 2 })
+        return "${file.name} (frames move by %.1f to %.1f)".format(moves.min(), moves.max())
+    }
+
+    @Test fun divxAndXvidFilesWithBFramesPlayInPreviewAndExport() {
+        assumeTrue("this build has no Xvid", FfampNative.divxDecoder())
+        val fixtures = File("../third_party/FFamp/tests/fixtures/asp").absoluteFile
+        val checked = mutableListOf(
+            playsDivx(File(fixtures, "lavc_packed.avi"), 160, 120, 30),
+            playsDivx(File(fixtures, "xvid_gmc.avi"), 160, 120, 30),
+            playsDivx(File(fixtures, "xvid_interlaced.avi"), 176, 144, 30),
+        )
+        val clip = listOf("-i", source.path, "-t", "1", "-vf", "scale=320:180")
+        val film = made("divx.avi", *clip.toTypedArray(), "-c:v", "mpeg4", "-bf", "2", "-flags", "+qpel+mv4", "-mbd", "2", "-vtag", "DX50", "-c:a", "libmp3lame")!!
+        checked += playsDivx(film, 320, 180, 30)
+        heard(film).let { (ms, loud) -> assertTrue("${film.name}: $ms ms", abs(ms - 1000) < 150 && loud) }
+        val judge = ProcessBuilder(Judge.ffmpeg, "-nostdin", "-v", "error", "-i", film.path, "-vf", "select=eq(n\\,12)", "-frames:v", "1", "-f", "rawvideo", "-pix_fmt", "rgba", "-").start()
+        val theirs = judge.inputStream.readBytes()
+        assertEquals(0, judge.waitFor())
+        val ours = preview(film, 320, 180, 420)
+        assertTrue("the preview of frame 12 is FFmpeg's frame 12 (${apart(ours, theirs)})", theirs.size == ours.size && apart(ours, theirs) < 4)
+        println("divx checked: ${checked.joinToString()}; frame 12 of ${film.name} is %.2f levels from FFmpeg's".format(apart(ours, theirs)))
     }
 
     private fun pixel(pixels: ByteArray, w: Int, x: Int, y: Int) = Triple(pixels[(y * w + x) * 4].toInt() and 255, pixels[(y * w + x) * 4 + 1].toInt() and 255, pixels[(y * w + x) * 4 + 2].toInt() and 255)
@@ -138,11 +178,11 @@ class FfampFormatsTest {
             assertTrue(DeskProbe.parse(org.json.JSONObject(MediaEngine.current.probe(file).ifBlank { "{}" })).streams.isEmpty())
         }
         val film = made("advanced.avi", *clip.toTypedArray(), "-c:v", "mpeg4", "-bf", "2", "-c:a", "libmp3lame")!!
-        assertEquals(R.string.media_error_mpeg4_asp, MediaEngine.current.trouble(film))
+        assertEquals(if (FfampNative.divxDecoder()) null else R.string.media_error_mpeg4_asp, MediaEngine.current.trouble(film))
         val probe = DeskProbe.parse(org.json.JSONObject(MediaEngine.current.probe(film)))
         assertTrue(probe.video != null && probe.audio != null)
         assertTrue(heard(film).second)
-        assertTrue(runCatching { NativeVideoSource(film) }.isFailure)
+        assertTrue(runCatching { NativeVideoSource(film).close() }.isFailure != FfampNative.divxDecoder())
         assertEquals(null, MediaEngine.current.trouble(source))
     }
 }

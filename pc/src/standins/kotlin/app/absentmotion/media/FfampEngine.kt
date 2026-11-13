@@ -48,6 +48,7 @@ internal object FfampNative {
     external fun framesClose(handle: Long)
     external fun framesSteady(handle: Long, start: Double, fps: Double, length: Double): IntArray
     external fun encoders(): String
+    external fun divxDecoder(): Boolean
     external fun openProblem(path: String): String?
     external fun encoderWorks(codec: String, width: Int, height: Int, fps: Int, bitrate: Int): Boolean
     external fun exportOpen(path: String, codec: String, width: Int, height: Int, fps: Int, bitrate: Int, sound: Int, soundBitrate: Int, rate: Int, channels: Int, pcm: String?): Long

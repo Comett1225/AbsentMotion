@@ -6,8 +6,10 @@ the sound output delay (`native/audio_mac.cpp`), the native build (`build.sh`, u
 
 The macOS app contains no FFmpeg: the native library links none and the app starts no `ffmpeg` or `ffprobe`. Reading, playing,
 export, the tools, the camera and the video downloader all go through FFamp (`MediaEngine` in
-`pc/src/standins/kotlin/app/absentmotion/media`). FFamp uses libopus, LAME, libvorbis, libogg, OpenAPV, libvpx, dav1d and SVT-AV1
-(and mpg123 when LAME is built with its decoder) when CMake finds them.
+`pc/src/standins/kotlin/app/absentmotion/media`). FFamp uses libopus, LAME, libvorbis, libogg, OpenAPV, libvpx, dav1d, SVT-AV1
+and Xvid (and mpg123 when LAME is built with its decoder) when CMake finds them; Xvid plays DivX and Xvid video with B-frames,
+and a build without it says that such a file cannot play. `build.sh arm64` and `build.sh x64` stop when the codec folder has no
+Xvid.
 
 Needs Skia built for macOS in `../third_party/skia/out/mac-v2-2-arm64` (Apple silicon) or `out/mac-x64` (Intel, same
 `args.gn` with `target_cpu = "x64"`). `cd ../pc && ./gradlew createDistributable` makes `AbsentMotion.app` for this Mac with
