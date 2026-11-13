@@ -255,7 +255,6 @@ On another chip or an older system, build it from source ([`docs/BUILD.md`](docs
 
 - Custom tools made by the community: tools that people write themselves and add to AbsentMotion.
 - A community library, hosted on GitHub, where people share what they make with AbsentMotion.
-- There won't be many major patches or features; most updates will focus on stability for the PC versions.
 
 ### 5.3
 
