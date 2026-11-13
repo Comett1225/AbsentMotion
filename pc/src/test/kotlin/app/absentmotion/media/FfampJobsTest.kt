@@ -49,15 +49,15 @@ class FfampJobsTest {
         return text
     }
 
-    private fun ffmpeg(vararg args: String) = run(DeskMedia.ffmpeg, "-nostdin", "-y", "-v", "error", *args)
+    private fun ffmpeg(vararg args: String) = run(app.absentmotion.Judge.ffmpeg, "-nostdin", "-y", "-v", "error", *args)
 
-    private fun judged(file: File): JSONObject = JSONObject(run(DeskMedia.ffprobe, "-v", "error", "-count_packets", "-show_streams", "-show_format", "-of", "json", file.path))
+    private fun judged(file: File): JSONObject = JSONObject(run(app.absentmotion.Judge.ffprobe, "-v", "error", "-count_packets", "-show_streams", "-show_format", "-of", "json", file.path))
 
     private fun stream(json: JSONObject, type: String): JSONObject? =
         json.getJSONArray("streams").let { list -> (0 until list.length()).map { list.getJSONObject(it) }.firstOrNull { it.optString("codec_type") == type } }
 
     private fun raw(file: File, vararg args: String): ByteArray {
-        val process = ProcessBuilder(listOf(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-i", file.path) + args + listOf("-")).redirectError(ProcessBuilder.Redirect.DISCARD).start()
+        val process = ProcessBuilder(listOf(app.absentmotion.Judge.ffmpeg, "-nostdin", "-v", "error", "-i", file.path) + args + listOf("-")).redirectError(ProcessBuilder.Redirect.DISCARD).start()
         return process.inputStream.readBytes().also { process.waitFor() }
     }
 
@@ -66,7 +66,7 @@ class FfampJobsTest {
         val old = names.associateWith { System.getProperty(it) }
         names.forEach { System.setProperty(it, File(dir, "absent/${it.substringAfter('.')}").path) }
         try {
-            assertTrue(runCatching { FfmpegEngine.probe(source) }.isFailure)
+            assertTrue(runCatching { app.absentmotion.Judge.engine.probe(source) }.isFailure)
             return work()
         } finally {
             old.forEach { (name, value) -> if (value == null) System.clearProperty(name) else System.setProperty(name, value) }
@@ -115,7 +115,7 @@ class FfampJobsTest {
     }
 
     @Test fun encodersAreListedAndTriedWithoutFfmpeg() {
-        val old = FfmpegEngine.encoders()
+        val old = app.absentmotion.Judge.engine.encoders()
         withoutFfmpeg {
             val names = MediaEngine.current.encoders()
             assertTrue("$names", names.containsAll(listOf("h264_videotoolbox", "hevc_videotoolbox", "aac_at", "flac")))
@@ -154,8 +154,8 @@ class FfampJobsTest {
             assertEquals(label, expected, sound16.size / 4 / 48000.0, 0.03)
             val verified = withoutFfmpeg { runBlocking { verifyExport(context, Uri.fromFile(made), Expectation(true, true, (expected * 1e6).toLong(), 1_000_000L / fps)) } }
             assertTrue("$label: ${verified.problems}", verified.ok && verified.firstFrame == true && verified.lastFrame == true)
-            if ("lib" !in DeskEncoders.video(codec).first() || FfmpegEngine.encoders().contains(DeskEncoders.video(codec).first())) {
-                val before = runCatching { export(FfmpegEngine, s, "old-$label") }.getOrNull() ?: continue
+            if ("lib" !in DeskEncoders.video(codec).first() || app.absentmotion.Judge.engine.encoders().contains(DeskEncoders.video(codec).first())) {
+                val before = runCatching { export(app.absentmotion.Judge.engine, s, "old-$label") }.getOrNull() ?: continue
                 val was = judged(before)
                 assertEquals(label, stream(was, "video")!!.getString("nb_read_packets"), video.getString("nb_read_packets"))
                 assertEquals(label, was.getJSONObject("format").getString("duration").toDouble(), json.getJSONObject("format").getString("duration").toDouble(), 0.1)
@@ -182,7 +182,7 @@ class FfampJobsTest {
                 return result
             }
             val made = withoutFfmpeg { make(FfampEngine, "new-${format.name}") }
-            val before = make(FfmpegEngine, "old-${format.name}")
+            val before = make(app.absentmotion.Judge.engine, "old-${format.name}")
             val one = judged(made)
             val two = judged(before)
             assertEquals(format.name, stream(two, "audio")!!.getString("codec_name"), stream(one, "audio")!!.getString("codec_name"))
@@ -214,7 +214,7 @@ class FfampJobsTest {
     @Test fun exportCheckReadsTimesLikeFfprobe() {
         for (from in listOf("%+#1", "0.0%", "3.0%")) for (decoded in listOf(true, false)) {
             if (from == "%+#1" && !decoded) continue
-            val old = FfmpegEngine.frameTimes(source, decoded, from)
+            val old = app.absentmotion.Judge.engine.frameTimes(source, decoded, from)
             val new = withoutFfmpeg { MediaEngine.current.frameTimes(source, decoded, from) }
             assertEquals("$from $decoded", old.size, new.size)
             assertTrue("$from $decoded", old.sorted().zip(new.sorted()).all { (a, b) -> abs(a - b) <= 1 })
@@ -226,7 +226,7 @@ class FfampJobsTest {
     }
 
     private fun packets(file: File, type: String): List<String> =
-        run(DeskMedia.ffprobe, "-v", "error", "-select_streams", "$type:0", "-show_entries", "packet=size", "-of", "csv=p=0", file.path).lines().map { it.trim().trimEnd(',') }.filter { it.isNotEmpty() }
+        run(app.absentmotion.Judge.ffprobe, "-v", "error", "-select_streams", "$type:0", "-show_entries", "packet=size", "-of", "csv=p=0", file.path).lines().map { it.trim().trimEnd(',') }.filter { it.isNotEmpty() }
 
     private fun seconds(file: File) = judged(file).getJSONObject("format").getString("duration").toDouble()
 
@@ -239,7 +239,7 @@ class FfampJobsTest {
         val seen = ArrayList<Float>()
         withoutFfmpeg { runBlocking { app.absentmotion.platform.compressVideoOnDesktop(uri, job, true, 2_000_000, small, { seen += it }, 1_000_000, 3_000_000) } }
         val before = File(dir, "small-old.mp4").also { it.delete() }
-        FfmpegEngine.compress(source, job, true, 2_000_000, before, 1_000_000, 3_000_000, {}) { true }
+        app.absentmotion.Judge.engine.compress(source, job, true, 2_000_000, before, 1_000_000, 3_000_000, {}) { true }
         val one = judged(small)
         val two = judged(before)
         assertTrue(seen.isNotEmpty() && seen.zipWithNext().all { it.first <= it.second })
@@ -258,7 +258,7 @@ class FfampJobsTest {
         val copied = File(dir, "sound.m4a").also { it.delete() }
         withoutFfmpeg { runBlocking { app.absentmotion.platform.extractAudioOnDesktop(uri, app.absentmotion.tools.AudioJob(false, 128, true), 5_000_000, copied) {} } }
         val copiedOld = File(dir, "sound-old.m4a").also { it.delete() }
-        FfmpegEngine.extractAudio(source, app.absentmotion.tools.AudioJob(false, 128, true), 5_000_000, copiedOld, {}) { true }
+        app.absentmotion.Judge.engine.extractAudio(source, app.absentmotion.tools.AudioJob(false, 128, true), 5_000_000, copiedOld, {}) { true }
         assertEquals(packets(source, "a"), packets(copied, "a"))
         assertEquals(packets(copiedOld, "a"), packets(copied, "a"))
         assertArrayEquals(raw(copiedOld, "-f", "s16le"), raw(copied, "-f", "s16le"))
@@ -272,7 +272,7 @@ class FfampJobsTest {
         val cut = File(dir, "cut.mp4").also { it.delete() }
         withoutFfmpeg { runBlocking { app.absentmotion.platform.trimCopyOnDesktop(uri, 1_000_000, 3_000_000, cut) {} } }
         val cutOld = File(dir, "cut-old.mp4").also { it.delete() }
-        FfmpegEngine.trim(source, 1_000_000, 3_000_000, cutOld, {}) { true }
+        app.absentmotion.Judge.engine.trim(source, 1_000_000, 3_000_000, cutOld, {}) { true }
         assertEquals(packets(cutOld, "v"), packets(cut, "v"))
         assertEquals(seconds(cutOld), seconds(cut), 0.05)
         assertEquals(packets(cutOld, "a").size.toDouble(), packets(cut, "a").size.toDouble(), 2.0)
@@ -287,7 +287,7 @@ class FfampJobsTest {
             return out
         }
         val made = withoutFfmpeg { reversed(FfampEngine, "back") }
-        val before = reversed(FfmpegEngine, "back-old")
+        val before = reversed(app.absentmotion.Judge.engine, "back-old")
         assertEquals(seconds(before), seconds(made), 0.08)
         assertEquals(packets(before, "v").size, packets(made, "v").size)
         assertTrue(stream(judged(made), "audio") != null)
@@ -303,7 +303,7 @@ class FfampJobsTest {
         val (w, h) = checkNotNull(gifEncodeSize(64, 48) { a, b -> a <= 8192 && b <= 8192 })
         fun converted(engine: MediaEngine, name: String) = File(dir, "$name.mp4").also { it.delete(); engine.gifVideo(GifPlan(gif, it, null, w, h)) { true } }
         val film = withoutFfmpeg { converted(FfampEngine, "gif") }
-        val filmOld = converted(FfmpegEngine, "gif-old")
+        val filmOld = converted(app.absentmotion.Judge.engine, "gif-old")
         val one = stream(judged(film), "video")!!
         val two = stream(judged(filmOld), "video")!!
         assertEquals(w to h, one.getInt("width") to one.getInt("height"))
@@ -319,7 +319,7 @@ class FfampJobsTest {
     @Test fun framePipesRunWithoutFfmpeg() {
         fun read(engine: MediaEngine, w: Int, h: Int) = engine.steadyFrames(source, "1.000000", "0.500000", "10.000000", w, h).use { it.input.readBytes() }
         for ((w, h) in listOf(0 to 0, 160 to 90)) {
-            val old = read(FfmpegEngine, w, h)
+            val old = read(app.absentmotion.Judge.engine, w, h)
             val new = withoutFfmpeg { read(FfampEngine, w, h) }
             assertEquals(old.size, new.size)
             assertEquals(5 * (if (w == 0) 1280 * 720 else w * h) * 3, new.size)
@@ -344,7 +344,7 @@ class FfampJobsTest {
                 return out
             }
             val made = withoutFfmpeg { write(FfampEngine, "pipe-$format") }
-            val before = write(FfmpegEngine, "pipe-$format-old")
+            val before = write(app.absentmotion.Judge.engine, "pipe-$format-old")
             val one = judged(made)
             val two = judged(before)
             assertEquals(format, "h264", stream(one, "video")!!.getString("codec_name"))
@@ -365,7 +365,7 @@ class FfampJobsTest {
             val made = File(dir, "said-$tempo-$pitch.wav").also { it.delete() }
             val before = File(dir, "said-$tempo-$pitch-old.wav").also { it.delete() }
             assertTrue(withoutFfmpeg { MediaEngine.current.speech(spoken, made, 44100, tempo, pitch, 60_000) })
-            assertTrue(FfmpegEngine.speech(spoken, before, 44100, tempo, pitch, 60_000))
+            assertTrue(app.absentmotion.Judge.engine.speech(spoken, before, 44100, tempo, pitch, 60_000))
             val one = stream(judged(made), "audio")!!
             assertEquals(listOf("pcm_s16le", "44100", "1"), listOf(one.getString("codec_name"), one.getString("sample_rate"), "${one.getInt("channels")}"))
             assertEquals("$tempo $pitch", seconds(before), seconds(made), seconds(before) * 0.02 + 0.02)
@@ -421,7 +421,7 @@ class FfampJobsTest {
         ffmpeg("-i", source.path, "-an", "-c", "copy", File(two, "item.136.mp4").path)
         ffmpeg("-i", source.path, "-vn", "-c", "copy", File(two, "item.140.m4a").path)
         val plan = app.absentmotion.tools.Plan(picture, sound)
-        val options = MediaEngine.current.downloadOptions(plan, app.absentmotion.tools.SaveMode.Both, two, "ffmpeg")
+        val options = MediaEngine.current.downloadOptions(plan, app.absentmotion.tools.SaveMode.Both, two)
         assertTrue("$options", options.containsAll(listOf("--fixup", "never", "136,140", "m3u8:native", "dash:native")) && "ffmpeg" !in options && File(options[options.indexOf("--ffmpeg-location") + 1]).exists().not())
         assertTrue(options.last().endsWith("item.%(format_id)s.%(ext)s"))
         val joined = withoutFfmpeg { MediaEngine.current.downloaded(plan, app.absentmotion.tools.SaveMode.Both, two)!! }
@@ -453,7 +453,7 @@ class FfampJobsTest {
         val whole = folder("whole")
         source.copyTo(File(whole, "item.mp4"))
         assertEquals("item.mp4", withoutFfmpeg { MediaEngine.current.downloaded(app.absentmotion.tools.Plan(both, both), app.absentmotion.tools.SaveMode.Both, whole)!! }.name)
-        val silent = withoutFfmpeg { MediaEngine.current.withoutAudio(File(whole, "item.mp4"), "ffmpeg") }
+        val silent = withoutFfmpeg { MediaEngine.current.withoutAudio(File(whole, "item.mp4")) }
         assertEquals("silent.mp4", silent.name)
         assertTrue(stream(judged(silent), "audio") == null)
         assertEquals(packets(source, "v"), packets(silent, "v"))
@@ -492,7 +492,7 @@ class FfampJobsTest {
         for (file in listOf(tagged, song, lossless)) {
             val facts = withoutFfmpeg { DeskMedia.probe(file) }
             assertEquals(file.name, listOf("A Title", "An Artist", "An Album"), listOf(facts["title"], facts["artist"], facts["album"]))
-            val old = DeskProbe.parse(JSONObject(FfmpegEngine.probe(file)))
+            val old = DeskProbe.parse(JSONObject(app.absentmotion.Judge.engine.probe(file)))
             val new = DeskProbe.parse(JSONObject(FfampEngine.probe(file)))
             assertEquals(file.name, listOf("title", "artist", "album").map { old.tags[it] }, listOf("title", "artist", "album").map { new.tags[it] })
         }

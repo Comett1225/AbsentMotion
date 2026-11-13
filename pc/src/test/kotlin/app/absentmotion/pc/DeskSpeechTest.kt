@@ -46,7 +46,7 @@ class DeskSpeechTest {
         File(dir, name).also { out -> runBlocking { DeskSpeech.toFile(text, voice, rate, pitch, out) } }
 
     private fun probe(file: File): JSONObject {
-        val p = ProcessBuilder(DeskMedia.ffprobe, "-v", "error", "-show_streams", "-show_format", "-of", "json", file.path).redirectError(ProcessBuilder.Redirect.DISCARD).start()
+        val p = ProcessBuilder(app.absentmotion.Judge.ffprobe, "-v", "error", "-show_streams", "-show_format", "-of", "json", file.path).redirectError(ProcessBuilder.Redirect.DISCARD).start()
         val text = p.inputStream.readBytes().decodeToString()
         check(p.waitFor() == 0) { "ffprobe failed on ${file.name}" }
         return JSONObject(text)
@@ -55,7 +55,7 @@ class DeskSpeechTest {
     private fun seconds(file: File) = probe(file).getJSONObject("format").getDouble("duration")
 
     private fun crossings(file: File): Double {
-        val p = ProcessBuilder(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-i", file.path, "-f", "s16le", "-ac", "1", "-ar", "44100", "-").redirectError(ProcessBuilder.Redirect.DISCARD).start()
+        val p = ProcessBuilder(app.absentmotion.Judge.ffmpeg, "-nostdin", "-v", "error", "-i", file.path, "-f", "s16le", "-ac", "1", "-ar", "44100", "-").redirectError(ProcessBuilder.Redirect.DISCARD).start()
         val bytes = p.inputStream.readBytes()
         p.waitFor()
         val n = bytes.size / 2
@@ -174,7 +174,7 @@ class DeskSpeechTest {
     }
 
     private fun silence(name: String, seconds: Double) = File(dir, name).also {
-        val p = ProcessBuilder(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-y", "-f", "lavfi", "-i", "anullsrc=r=44100:cl=mono", "-t", "$seconds", "-c:a", "pcm_s16le", it.path).start()
+        val p = ProcessBuilder(app.absentmotion.Judge.ffmpeg, "-nostdin", "-v", "error", "-y", "-f", "lavfi", "-i", "anullsrc=r=44100:cl=mono", "-t", "$seconds", "-c:a", "pcm_s16le", it.path).start()
         check(p.waitFor() == 0)
     }
 

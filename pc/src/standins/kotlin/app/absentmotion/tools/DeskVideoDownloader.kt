@@ -6,7 +6,6 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import app.absentmotion.R
 import app.absentmotion.ai.CaptionModel
-import app.absentmotion.desk.DeskMedia
 import app.absentmotion.desk.DeskOs
 import app.absentmotion.export.MediaStoreExport
 import app.absentmotion.media.MediaEngine
@@ -166,8 +165,8 @@ object DeskVideoDownloader : VideoFetcher {
                 val quality = (if (items.size > 1) options.getOrNull(defaultQuality(options, itemMode)) else options.getOrNull(choice))
                     ?: if (items.size > 1) continue else throw DownloadProblem(R.string.downloader_error_novideo)
                 val start = index * share
-                val fetched = fetchTo(exe, url, if (items.size > 1) index + 1 else 0, quality.plan, itemMode, File(work, "item$index"), DeskMedia.ffmpeg) { progress(start + share * 0.95f * it) }
-                val file = if (itemMode == SaveMode.VideoOnly && quality.plan.video?.hasAudio == true) withoutAudio(fetched, DeskMedia.ffmpeg) else fetched
+                val fetched = fetchTo(exe, url, if (items.size > 1) index + 1 else 0, quality.plan, itemMode, File(work, "item$index")) { progress(start + share * 0.95f * it) }
+                val file = if (itemMode == SaveMode.VideoOnly && quality.plan.video?.hasAudio == true) withoutAudio(fetched) else fetched
                 val (mime, extension) = typeOf(file)
                 val saveName = "$name.$extension"
                 val uri: Uri = withContext(Dispatchers.IO) { MediaStoreExport(context).save(null, saveName, mime) { out -> file.inputStream().use { it.copyTo(out) } } }
@@ -186,12 +185,12 @@ object DeskVideoDownloader : VideoFetcher {
         try { return block() } finally { busy.decrementAndGet() }
     }
 
-    internal suspend fun fetchTo(exe: File, url: String, entry: Int, plan: Plan, mode: SaveMode, dir: File, ffmpeg: String, progress: (Float) -> Unit): File = counted {
+    internal suspend fun fetchTo(exe: File, url: String, entry: Int, plan: Plan, mode: SaveMode, dir: File, progress: (Float) -> Unit): File = counted {
         if (!exe.isFile) throw DownloadProblem(R.string.downloader_engine_blocked)
         withContext(Dispatchers.IO) { dir.mkdirs() }
         val pieces = listOfNotNull(plan.video, plan.audio?.takeIf { it !== plan.video }).size.coerceAtLeast(1)
         val args = ArrayList<String>()
-        args += listOf("--no-playlist", "--no-warnings", "--newline", "--no-mtime") + MediaEngine.current.downloadOptions(plan, mode, dir, ffmpeg)
+        args += listOf("--no-playlist", "--no-warnings", "--newline", "--no-mtime") + MediaEngine.current.downloadOptions(plan, mode, dir)
         if (entry > 0) args += listOf("--playlist-items", entry.toString())
         var stream = 0
         val result = execute(exe, args + url) { line ->
@@ -313,4 +312,4 @@ private fun clear(dir: File) {
     }
 }
 
-internal suspend fun withoutAudio(file: File, ffmpeg: String): File = withContext(Dispatchers.IO) { MediaEngine.current.withoutAudio(file, ffmpeg) }
+internal suspend fun withoutAudio(file: File): File = withContext(Dispatchers.IO) { MediaEngine.current.withoutAudio(file) }

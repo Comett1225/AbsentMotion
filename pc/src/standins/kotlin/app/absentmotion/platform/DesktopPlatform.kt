@@ -430,3 +430,6 @@ fun rememberFolderPicker(start: String?, onPicked: (String) -> Unit): () -> Unit
     val title = app.absentmotion.i18n.AppText.get(app.absentmotion.R.string.settings_bundles_folder)
     return { app.absentmotion.desk.DeskPicker.openFolder(title)?.let { onPicked(it.absolutePath) } }
 }
+
+fun mediaTrouble(context: Context, uri: android.net.Uri): String? =
+    uri.toFile()?.let { file -> runCatching { app.absentmotion.media.MediaEngine.current.trouble(file) }.getOrNull() }?.let { context.getString(it) }

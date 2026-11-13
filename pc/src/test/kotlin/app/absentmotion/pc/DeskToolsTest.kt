@@ -65,7 +65,7 @@ class DeskToolsTest {
     private fun near(want: Double, got: Number, delta: Double) = org.junit.Assert.assertEquals(want, got.toDouble(), delta)
 
     private fun probe(file: File): JSONObject {
-        val process = ProcessBuilder(DeskMedia.ffprobe, "-v", "error", "-show_streams", "-show_format", "-of", "json", file.path).redirectError(ProcessBuilder.Redirect.DISCARD).start()
+        val process = ProcessBuilder(app.absentmotion.Judge.ffprobe, "-v", "error", "-show_streams", "-show_format", "-of", "json", file.path).redirectError(ProcessBuilder.Redirect.DISCARD).start()
         val json = JSONObject(process.inputStream.bufferedReader().readText())
         process.waitFor()
         return json
@@ -76,13 +76,13 @@ class DeskToolsTest {
     private fun JSONObject.seconds(): Double = getJSONObject("format").getString("duration").toDouble()
 
     private fun counted(file: File): Int {
-        val process = ProcessBuilder(DeskMedia.ffprobe, "-v", "error", "-count_frames", "-select_streams", "v:0", "-show_entries", "stream=nb_read_frames", "-of", "csv=p=0", file.path)
+        val process = ProcessBuilder(app.absentmotion.Judge.ffprobe, "-v", "error", "-count_frames", "-select_streams", "v:0", "-show_entries", "stream=nb_read_frames", "-of", "csv=p=0", file.path)
             .redirectError(ProcessBuilder.Redirect.DISCARD).start()
         return process.inputStream.bufferedReader().readText().trim().toInt().also { process.waitFor() }
     }
 
     private fun frameAt(file: File, index: Int): BufferedImage {
-        val process = ProcessBuilder(DeskMedia.ffmpeg, "-v", "error", "-i", file.path, "-vf", "select=eq(n\\,$index)", "-frames:v", "1", "-f", "image2pipe", "-vcodec", "png", "-")
+        val process = ProcessBuilder(app.absentmotion.Judge.ffmpeg, "-v", "error", "-i", file.path, "-vf", "select=eq(n\\,$index)", "-frames:v", "1", "-f", "image2pipe", "-vcodec", "png", "-")
             .redirectError(ProcessBuilder.Redirect.DISCARD).start()
         return ImageIO.read(process.inputStream.readBytes().inputStream()).also { process.waitFor() }
     }
@@ -135,7 +135,7 @@ class DeskToolsTest {
         prepare("nosound")
         val context = android.content.Desk.context
         val silent = File("build/tools-nosound-silent.mp4").also { it.delete() }
-        ProcessBuilder(DeskMedia.ffmpeg, "-v", "error", "-y", "-i", video.path, "-an", "-c:v", "copy", silent.path).start().waitFor()
+        ProcessBuilder(app.absentmotion.Judge.ffmpeg, "-v", "error", "-y", "-i", video.path, "-an", "-c:v", "copy", silent.path).start().waitFor()
         val picked = readPicked(context, Uri.fromFile(silent))!!
         assertFalse(picked.source.audio)
         val failed = runCatching { extractAudio(context, picked, planAudio(picked.source, ExtractChoice())) {} }.exceptionOrNull()
@@ -213,7 +213,7 @@ class DeskToolsTest {
         prepare("rotated")
         val context = android.content.Desk.context
         val turned = File("build/tools-rotated-source.mp4").also { it.delete() }
-        assertEquals(0, ProcessBuilder(DeskMedia.ffmpeg, "-v", "error", "-y", "-display_rotation:v", "90", "-i", video.path, "-c", "copy", turned.path).start().waitFor())
+        assertEquals(0, ProcessBuilder(app.absentmotion.Judge.ffmpeg, "-v", "error", "-y", "-display_rotation:v", "90", "-i", video.path, "-c", "copy", turned.path).start().waitFor())
         val picked = readPicked(context, Uri.fromFile(turned))!!
         assertEquals(270, picked.rotation)
         val job = planGif(picked.source, picked.rotation, GifChoice(480, 10, true), TrimRange(1_000_000, 2_000_000))
@@ -246,7 +246,7 @@ class DeskToolsTest {
         prepare("onefps")
         val context = android.content.Desk.context
         val slow = File("build/tools-one-fps.mp4").also { it.delete() }
-        assertEquals(0, ProcessBuilder(DeskMedia.ffmpeg, "-v", "error", "-y", "-f", "lavfi", "-i", "testsrc2=size=320x240:rate=1", "-f", "lavfi", "-i", "sine=frequency=440",
+        assertEquals(0, ProcessBuilder(app.absentmotion.Judge.ffmpeg, "-v", "error", "-y", "-f", "lavfi", "-i", "testsrc2=size=320x240:rate=1", "-f", "lavfi", "-i", "sine=frequency=440",
             "-t", "5", "-pix_fmt", "yuv420p", slow.path).start().waitFor())
         val picked = readPicked(context, Uri.fromFile(slow))!!
         val made = trimVideo(context, picked, planTrim(TrimRange(1_200_000, 1_500_000), LongArray(0), false)) {}

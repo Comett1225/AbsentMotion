@@ -1,14 +1,10 @@
 package app.absentmotion.desk
 
 import app.absentmotion.media.MediaEngine
-import app.absentmotion.pc.platform.DesktopPlatform
 import java.awt.image.BufferedImage
 import java.io.File
 
 object DeskMedia {
-    val ffmpeg get() = DesktopPlatform.executable("ffmpeg")
-    val ffprobe get() = DesktopPlatform.executable("ffprobe")
-
     fun probe(file: File): Map<String, String> = runCatching {
         val json = org.json.JSONObject(MediaEngine.current.probe(file, "stream=codec_type,width,height:stream_tags=rotate:stream_side_data=rotation:format=duration:format_tags=title,artist,album"))
         val out = HashMap<String, String>()

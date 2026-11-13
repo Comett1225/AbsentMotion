@@ -52,7 +52,7 @@ class VideoDecodeTest {
         val ours = BufferedImage(w, h, BufferedImage.TYPE_INT_RGB)
         ours.setRGB(0, 0, w, h, IntArray(w * h) { i -> ((rgba[i * 4].toInt() and 255) shl 16) or ((rgba[i * 4 + 1].toInt() and 255) shl 8) or (rgba[i * 4 + 2].toInt() and 255) }, 0, w)
         ImageIO.write(ours, "png", out.resolve(png))
-        val ref = ProcessBuilder(DeskMedia.ffmpeg, "-v", "error", "-i", file.absolutePath, "-vf", "select=eq(n\\,$k),scale=in_color_matrix=bt709:in_range=tv:flags=accurate_rnd+full_chroma_int+bicubic",
+        val ref = ProcessBuilder(app.absentmotion.Judge.ffmpeg, "-v", "error", "-i", file.absolutePath, "-vf", "select=eq(n\\,$k),scale=in_color_matrix=bt709:in_range=tv:flags=accurate_rnd+full_chroma_int+bicubic",
             "-frames:v", "1", "-pix_fmt", "rgb24", "-f", "rawvideo", "-").start().inputStream.readBytes()
         assertEquals(w * h * 3, ref.size)
         var sum = 0.0
@@ -63,7 +63,7 @@ class VideoDecodeTest {
     @Test fun editListStartsAtCut() {
         val original = File("../testdata/media/test-video.mp4")
         val cut = out.resolve("cut.mp4")
-        check(ProcessBuilder(DeskMedia.ffmpeg, "-v", "error", "-y", "-ss", "0.5", "-i", original.path, "-c", "copy", cut.path).start().waitFor() == 0)
+        check(ProcessBuilder(app.absentmotion.Judge.ffmpeg, "-v", "error", "-y", "-ss", "0.5", "-i", original.path, "-c", "copy", cut.path).start().waitFor() == 0)
         val source = NativeVideoSource(cut)
         val handle = DesktopNative.create()
         try {
@@ -129,7 +129,7 @@ class VideoDecodeTest {
             native.close()
 
             t = System.nanoTime()
-            val old = FfmpegVideoSource(file, DeskMedia.ffmpeg, DeskMedia.ffprobe)
+            val old = FfmpegVideoSource(file, app.absentmotion.Judge.ffmpeg, app.absentmotion.Judge.ffprobe)
             fun oldShow(us: Long) = old.frame(us / 1000)!!.let { DesktopNative.setFrame(handle, uri, it.width, it.height, it.rgba) }
             oldShow(0)
             val oldFirst = ms(t)
@@ -181,7 +181,7 @@ class VideoDecodeTest {
 
     @Test fun rotationMatchesPhone() {
         val rotated = out.resolve("rotated.mp4")
-        check(ProcessBuilder(DeskMedia.ffmpeg, "-v", "error", "-y", "-display_rotation:v", "90", "-i", "../testdata/media/test-video.mp4", "-c", "copy", rotated.path).start().waitFor() == 0)
+        check(ProcessBuilder(app.absentmotion.Judge.ffmpeg, "-v", "error", "-y", "-display_rotation:v", "90", "-i", "../testdata/media/test-video.mp4", "-c", "copy", rotated.path).start().waitFor() == 0)
         val source = NativeVideoSource(rotated)
         assertEquals(270, source.orientation)
         assertEquals(1280, source.info.width)
@@ -203,7 +203,7 @@ class VideoDecodeTest {
         val file = av1Dir.resolve("$name.mp4")
         if (!file.isFile) {
             av1Dir.mkdirs()
-            val args = listOf(DeskMedia.ffmpeg, "-v", "error", "-y", "-f", "lavfi", "-i", "testsrc2=size=$size:rate=30:duration=4", "-pix_fmt", format, "-c:v", "libsvtav1", "-preset", "10", "-g", "30", file.path)
+            val args = listOf(app.absentmotion.Judge.ffmpeg, "-v", "error", "-y", "-f", "lavfi", "-i", "testsrc2=size=$size:rate=30:duration=4", "-pix_fmt", format, "-c:v", "libsvtav1", "-preset", "10", "-g", "30", file.path)
             check(ProcessBuilder(args).redirectErrorStream(true).start().also { it.inputStream.readBytes() }.waitFor() == 0)
         }
         return file
@@ -241,7 +241,7 @@ class VideoDecodeTest {
 
     private fun av1Child(mode: String, file: File, env: Map<String, String>): String {
         val java = File(System.getProperty("java.home"), "bin/java").path
-        val builder = ProcessBuilder(java, "-cp", System.getProperty("java.class.path"), "-Dam.native=${System.getProperty("am.native")}", "-Dam.ffmpeg=${DeskMedia.ffmpeg}", "-Dam.ffprobe=${DeskMedia.ffprobe}",
+        val builder = ProcessBuilder(java, "-cp", System.getProperty("java.class.path"), "-Dam.native=${System.getProperty("am.native")}", "-Dam.ffmpeg=${app.absentmotion.Judge.ffmpeg}", "-Dam.ffprobe=${app.absentmotion.Judge.ffprobe}",
             "-Djava.awt.headless=true", "-Dskiko.renderApi=SOFTWARE", "-Dskiko.data.path=${System.getProperty("skiko.data.path")}", "-Dam.assets=${System.getProperty("am.assets")}", "app.absentmotion.pc.Av1Child", mode, file.absolutePath)
         builder.environment().putAll(env)
         val process = builder.redirectErrorStream(true).start()

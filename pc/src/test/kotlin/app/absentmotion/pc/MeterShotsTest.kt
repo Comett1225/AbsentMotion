@@ -130,7 +130,7 @@ $layers
         val file = File("build/meter-media/stereo-l-loud.m4a").absoluteFile
         if (!file.exists()) {
             file.parentFile.mkdirs()
-            val p = ProcessBuilder(DeskMedia.ffmpeg, "-nostdin", "-y", "-v", "error", "-f", "lavfi", "-i", "aevalsrc=0.5*sin(2*PI*440*t)|0.12*sin(2*PI*660*t):s=48000:d=8", file.path).start()
+            val p = ProcessBuilder(app.absentmotion.Judge.ffmpeg, "-nostdin", "-y", "-v", "error", "-f", "lavfi", "-i", "aevalsrc=0.5*sin(2*PI*440*t)|0.12*sin(2*PI*660*t):s=48000:d=8", file.path).start()
             check(p.waitFor() == 0)
         }
         return Uri.fromFile(file).toString()

@@ -319,6 +319,19 @@ JNIEXPORT jboolean JNICALL JNI(framesRead)(JNIEnv* e, jobject, jlong h, jint ind
 
 JNIEXPORT void JNICALL JNI(framesClose)(JNIEnv*, jobject, jlong h) { delete frames(h); }
 
+JNIEXPORT jstring JNICALL JNI(openProblem)(JNIEnv* e, jobject, jstring path) {
+    const std::string file = DesktopString(e, path);
+    std::string error;
+    Guarded(false, [&] {
+        auto reader = absent::Reader::open(file, &error);
+        if (!reader) return false;
+        const absent::Track* track = reader->first(absent::Kind::Video);
+        if (track) absent::VideoDecoder::open(*reader, *track, &error);
+        return true;
+    });
+    return error.empty() ? nullptr : e->NewStringUTF(error.c_str());
+}
+
 JNIEXPORT jstring JNICALL JNI(encoders)(JNIEnv* e, jobject) {
     std::string text;
     for (const absent::EncoderInfo& info : absent::encoders()) text += info.name + "\n";

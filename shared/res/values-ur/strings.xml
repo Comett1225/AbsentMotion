@@ -904,6 +904,8 @@
     <string name="project_too_many_linked">یہ پروجیکٹ بہت زیادہ لنک شدہ ایلیمنٹس ایمبیڈ کرتا ہے۔</string>
     <string name="media_error_read_frames">یہ فون اس ویڈیو کے فریم نہیں پڑھ سکتا</string>
     <string name="media_error_pixel_format">یہ ویڈیو ایسا پکسل فارمیٹ استعمال کرتی ہے جو پڑھا نہیں جا سکتا</string>
+    <string name="media_error_windows_media">یہ Mac ‏Windows Media فائلیں (WMA، WMV، ASF) نہیں کھول سکتا: macOS میں ان کے لیے کوئی ڈیکوڈر نہیں ہے۔</string>
+    <string name="media_error_mpeg4_asp">یہ DivX یا Xvid ویڈیو ایسی خصوصیات (جیسے B فریم) استعمال کرتی ہے جنہیں macOS نہیں چلا سکتا۔ آواز چلتی ہے، لیکن تصویر نہیں آتی۔</string>
     <string name="media_error_video_unavailable">ویڈیو دستیاب نہیں: %1$s</string>
     <string name="media_error_decode_frame">ویڈیو کا درست فریم %1$s ڈیکوڈ نہیں ہو سکتا</string>
     <string name="media_error_import_frame">%2$s کے لیے ویڈیو فریم %1$s درآمد نہیں ہو سکتا</string>

@@ -35,7 +35,7 @@ class FfampEngineTest {
     }
 
     private fun ffmpeg(vararg args: String) {
-        val process = ProcessBuilder(listOf(DeskMedia.ffmpeg, "-nostdin", "-y", "-v", "error") + args).redirectErrorStream(true).start()
+        val process = ProcessBuilder(listOf(app.absentmotion.Judge.ffmpeg, "-nostdin", "-y", "-v", "error") + args).redirectErrorStream(true).start()
         val text = process.inputStream.readBytes().decodeToString()
         check(process.waitFor() == 0) { text }
     }
@@ -45,8 +45,8 @@ class FfampEngineTest {
         val old = names.associateWith { System.getProperty(it) }
         names.forEach { System.setProperty(it, File(dir, "absent/${it.substringAfter('.')}").path) }
         try {
-            assertTrue(runCatching { FfmpegEngine.probe(source) }.isFailure)
-            assertTrue(runCatching { FfmpegEngine.playback(source, 0, 48000) }.isFailure)
+            assertTrue(runCatching { app.absentmotion.Judge.engine.probe(source) }.isFailure)
+            assertTrue(runCatching { app.absentmotion.Judge.engine.playback(source, 0, 48000) }.isFailure)
             return work()
         } finally {
             old.forEach { (name, value) -> if (value == null) System.clearProperty(name) else System.setProperty(name, value) }
@@ -136,7 +136,7 @@ class FfampEngineTest {
         val rotated = File(dir, "turned.mp4")
         ffmpeg("-display_rotation:v", "90", "-i", source.path, "-c", "copy", rotated.path)
         for (file in listOf(source, rotated)) {
-            val old = DeskProbe.parse(JSONObject(FfmpegEngine.probe(file)))
+            val old = DeskProbe.parse(JSONObject(app.absentmotion.Judge.engine.probe(file)))
             val new = DeskProbe.parse(JSONObject(FfampEngine.probe(file)))
             assertEquals(old.streams.size, new.streams.size)
             assertTrue(abs(old.durationUs - new.durationUs) <= 1)
@@ -149,7 +149,7 @@ class FfampEngineTest {
             assertEquals(listOf("${old.video!!.width}", "${old.video!!.height}", "${old.video!!.rotation}", "${old.durationUs / 1000}", "1"),
                 listOf(facts["width"], facts["height"], facts["rotation"] ?: "0", facts["duration"], facts["audio"]))
             for (stream in old.streams) {
-                val a = FfmpegEngine.packets(file, stream.index)
+                val a = app.absentmotion.Judge.engine.packets(file, stream.index)
                 val b = FfampEngine.packets(file, stream.index)
                 assertEquals(a.size, b.size)
                 assertTrue(a.indices.all { abs(a[it].seconds - b[it].seconds) < 2e-6 && a[it].size == b[it].size && a[it].sync == b[it].sync })
@@ -159,14 +159,14 @@ class FfampEngineTest {
 
     @Test fun framesMatchFfmpeg() {
         for ((seconds, count) in listOf("0.000000" to 3, "1.999999" to 4, "4.933332" to 9)) {
-            val old = FfmpegEngine.yuv(source, seconds, count, true).use { it.input.readBytes() }
+            val old = app.absentmotion.Judge.engine.yuv(source, seconds, count, true).use { it.input.readBytes() }
             val new = FfampEngine.yuv(source, seconds, count, true).use { it.input.readBytes() }
             assertTrue(old.isNotEmpty())
             assertArrayEquals("frames from $seconds", old, new)
         }
-        val one = FfmpegEngine.yuv(source, "2.500000", 1, false).use { it.input.readBytes() }
+        val one = app.absentmotion.Judge.engine.yuv(source, "2.500000", 1, false).use { it.input.readBytes() }
         assertArrayEquals(one, FfampEngine.yuv(source, "2.500000", 1, false).use { it.input.readBytes() })
-        FfmpegEngine.videoSource(source, 640).use { old ->
+        app.absentmotion.Judge.engine.videoSource(source, 640).use { old ->
             FfampEngine.videoSource(source, 640).use { new ->
                 assertEquals(old.info, new.info)
                 for (ms in listOf(0L, 33L, 1000L, 1033L, 4966L)) {
@@ -182,7 +182,7 @@ class FfampEngineTest {
             }
         }
         for ((ms, side) in listOf(0L to 256, 2500L to 2000)) {
-            val a = FfmpegEngine.still(source, ms, side)!!
+            val a = app.absentmotion.Judge.engine.still(source, ms, side)!!
             val b = FfampEngine.still(source, ms, side)!!
             assertEquals(a.width to a.height, b.width to b.height)
             fun bytes(image: java.awt.image.BufferedImage) = ByteArray(image.width * image.height * 3).also { out ->
@@ -194,13 +194,13 @@ class FfampEngineTest {
         }
         val turned = File(dir, "turned-still.mp4")
         ffmpeg("-display_rotation:v", "90", "-i", source.path, "-c", "copy", turned.path)
-        val a = FfmpegEngine.still(turned, 1000, 300)!!
+        val a = app.absentmotion.Judge.engine.still(turned, 1000, 300)!!
         val b = FfampEngine.still(turned, 1000, 300)!!
         assertEquals(a.width to a.height, b.width to b.height)
         assertTrue(b.height > b.width)
         val w = 90
         val h = 160
-        val old = FfmpegEngine.play(turned, 4800, w, h, false).use { it.input.readNBytes(w * h * 4) }
+        val old = app.absentmotion.Judge.engine.play(turned, 4800, w, h, false).use { it.input.readNBytes(w * h * 4) }
         val new = FfampEngine.play(turned, 4800, w, h, false).use { it.input.readNBytes(w * h * 4) }
         val quality = psnr(old, new)
         assertTrue("played frame: $quality dB", quality > 30)
@@ -213,23 +213,23 @@ class FfampEngineTest {
         ffmpeg("-f", "lavfi", "-i", "aevalsrc=0.1*sin(2*PI*200*t)|0.1*sin(2*PI*300*t)|0.1*sin(2*PI*400*t)|0.1*sin(2*PI*50*t)|0.1*sin(2*PI*500*t)|0.1*sin(2*PI*600*t):s=44100:d=1", "-channel_layout", "5.1", wav.path)
         for ((file, rate, channels) in listOf(Triple(flac, 48000, 2), Triple(wav, 44100, 6))) {
             for ((before, after) in listOf(0L to 0L, 0L to 250_000L, 300_000L to 200_000L)) {
-                val old = floats(FfmpegEngine.pcm(file, before, after, rate, channels))
+                val old = floats(app.absentmotion.Judge.engine.pcm(file, before, after, rate, channels))
                 val new = floats(FfampEngine.pcm(file, before, after, rate, channels))
                 assertTrue(old.isNotEmpty())
                 assertArrayEquals("${file.name} from $before + $after", old, new, 0f)
             }
         }
-        val old = floats(FfmpegEngine.pcm(source, 0, 0, 44100, 2))
+        val old = floats(app.absentmotion.Judge.engine.pcm(source, 0, 0, 44100, 2))
         val new = floats(FfampEngine.pcm(source, 0, 0, 44100, 2))
         assertEquals(old.size, new.size)
         val worst = old.indices.maxOf { abs(old[it] - new[it]) }
         assertTrue("AAC differs by $worst", worst < 0.002f)
-        val apple = ProcessBuilder(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-c:a", "aac_at", "-i", source.path, "-ac", "2", "-f", "f32le", "-").redirectError(ProcessBuilder.Redirect.DISCARD).start()
+        val apple = ProcessBuilder(app.absentmotion.Judge.ffmpeg, "-nostdin", "-v", "error", "-c:a", "aac_at", "-i", source.path, "-ac", "2", "-f", "f32le", "-").redirectError(ProcessBuilder.Redirect.DISCARD).start()
         val same = floats(MediaStream(apple.inputStream, apple))
         assertEquals(same.size, new.size)
         assertTrue(same.indices.all { abs(same[it] - new[it]) <= 1.0f / 32768 })
         val shorts = FfampEngine.playback(flac, 250, 48000).use { it.input.readBytes() }
-        val reference = FfmpegEngine.playback(flac, 250, 48000).use { it.input.readBytes() }
+        val reference = app.absentmotion.Judge.engine.playback(flac, 250, 48000).use { it.input.readBytes() }
         assertEquals(reference.size, shorts.size)
         val one = ByteBuffer.wrap(reference).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer()
         val two = ByteBuffer.wrap(shorts).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer()

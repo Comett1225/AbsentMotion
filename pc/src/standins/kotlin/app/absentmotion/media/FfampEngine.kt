@@ -48,6 +48,7 @@ internal object FfampNative {
     external fun framesClose(handle: Long)
     external fun framesSteady(handle: Long, start: Double, fps: Double, length: Double): IntArray
     external fun encoders(): String
+    external fun openProblem(path: String): String?
     external fun encoderWorks(codec: String, width: Int, height: Int, fps: Int, bitrate: Int): Boolean
     external fun exportOpen(path: String, codec: String, width: Int, height: Int, fps: Int, bitrate: Int, sound: Int, soundBitrate: Int, rate: Int, channels: Int, pcm: String?): Long
     external fun exportFrame(handle: Long, pixels: ByteArray): Boolean
@@ -381,6 +382,15 @@ object FfampEngine : MediaEngine {
 
     override fun encoders(): Set<String> = listed
 
+    override fun trouble(file: File): Int? {
+        val problem = FfampNative.openProblem(file.path) ?: return null
+        return when {
+            "Windows Media" in problem -> R.string.media_error_windows_media
+            "Advanced Simple Profile" in problem -> R.string.media_error_mpeg4_asp
+            else -> null
+        }
+    }
+
     override fun encoderWorks(name: String, s: ExportSettings, width: Int, height: Int): Boolean =
         name in listed && FfampNative.encoderWorks(codec(s), width, height, s.fps, videoBitrate(width, height, s))
 
@@ -500,7 +510,7 @@ object FfampEngine : MediaEngine {
     override fun camera(input: CameraInput, record: File?, encoder: List<String>, onFrame: (ByteArray) -> Unit, onEnd: (Int, String) -> Unit): CameraFeed =
         CameraSession(input, record, onFrame, onEnd)
 
-    override fun downloadOptions(plan: Plan, mode: SaveMode, dir: File, ffmpeg: String): List<String> {
+    override fun downloadOptions(plan: Plan, mode: SaveMode, dir: File): List<String> {
         val chosen = listOfNotNull(plan.video?.id, plan.audio?.id).distinct()
         return listOf("--ffmpeg-location", File(dir, "none").path, "--fixup", "never", "--downloader", "m3u8:native", "--downloader", "dash:native",
             "-f", chosen.joinToString(","), "-o", File(dir, if (chosen.size > 1) "item.%(format_id)s.%(ext)s" else "item.%(ext)s").path)
@@ -527,7 +537,7 @@ object FfampEngine : MediaEngine {
         return if (FfampNative.rewrap(one.path, out.path) == null) out else null
     }
 
-    override fun withoutAudio(file: File, ffmpeg: String): File {
+    override fun withoutAudio(file: File): File {
         val out = File(file.parentFile, "silent." + file.extension)
         return if (FfampNative.stripAudio(file.path, out.path) == null && out.length() > 0) out else file
     }

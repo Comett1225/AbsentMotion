@@ -894,6 +894,8 @@
     <string name="project_too_many_linked">Projek ini menyematkan terlalu banyak elemen berpaut.</string>
     <string name="media_error_read_frames">Telefon ini tidak dapat membaca bingkai video ini</string>
     <string name="media_error_pixel_format">Video ini menggunakan format piksel yang tidak dapat dibaca</string>
+    <string name="media_error_windows_media">Mac ini tidak dapat membuka fail Windows Media (WMA, WMV, ASF): macOS tiada penyahkod untuknya.</string>
+    <string name="media_error_mpeg4_asp">Video DivX atau Xvid ini menggunakan ciri (seperti bingkai B) yang tidak dapat dimainkan oleh macOS. Bunyi dimainkan, tetapi tiada gambar.</string>
     <string name="media_error_video_unavailable">Video tidak tersedia: %1$s</string>
     <string name="media_error_decode_frame">Tidak dapat menyahkod bingkai video tepat %1$s</string>
     <string name="media_error_import_frame">Tidak dapat mengimport bingkai video %1$s untuk %2$s</string>

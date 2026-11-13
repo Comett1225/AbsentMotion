@@ -27,7 +27,7 @@ class DeskAiPortsTest {
 
     private fun tinyVideo(): Pair<Layer, MediaDeclaration> {
         val file = File("build/ai-input-small.mp4").absoluteFile
-        val process = ProcessBuilder(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-y", "-i", media.resolve("test-video.mp4").path,
+        val process = ProcessBuilder(app.absentmotion.Judge.ffmpeg, "-nostdin", "-v", "error", "-y", "-i", media.resolve("test-video.mp4").path,
             "-t", "0.8", "-vf", "scale=64:36,fps=5", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac", file.path).start()
         check(process.waitFor() == 0)
         val uri = Uri.fromFile(file).toString()
@@ -100,7 +100,7 @@ class DeskAiPortsTest {
     @Test fun aiInterpolationUsesAdjacentThirtyFpsFrames() = runBlocking {
         assumeTrue(AiModel.SmoothLow.installed(context))
         val file = File("build/ai-input-thirty.mp4").absoluteFile
-        val process = ProcessBuilder(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-y", "-i", media.resolve("test-video.mp4").path,
+        val process = ProcessBuilder(app.absentmotion.Judge.ffmpeg, "-nostdin", "-v", "error", "-y", "-i", media.resolve("test-video.mp4").path,
             "-t", "0.2", "-vf", "scale=64:36", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-an", file.path).start()
         check(process.waitFor() == 0)
         val uri = Uri.fromFile(file).toString()

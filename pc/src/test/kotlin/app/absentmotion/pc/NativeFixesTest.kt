@@ -25,7 +25,7 @@ class NativeFixesTest {
     }
 
     private fun ffmpeg(vararg args: String) =
-        check(ProcessBuilder(listOf(DeskMedia.ffmpeg, "-v", "error", "-y") + args).redirectErrorStream(true).start().also { it.inputStream.readBytes() }.waitFor() == 0)
+        check(ProcessBuilder(listOf(app.absentmotion.Judge.ffmpeg, "-v", "error", "-y") + args).redirectErrorStream(true).start().also { it.inputStream.readBytes() }.waitFor() == 0)
 
     @Test fun engineReadsAndWritesDotNumbersUnderACommaLocale() {
         assertEquals(listOf("matrix 0.5 0.25 540.5 960.25", "outline M -100.5 -100.5L 100.5 -100.5L 100.5 100.5L -100.5 100.5Z"),

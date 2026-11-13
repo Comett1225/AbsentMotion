@@ -85,7 +85,9 @@ if (macArch != null && System.getProperty("os.arch") != jdkArch[macArch]) throw 
 val nativeDir = macArch?.let { "native-$it" } ?: "native"
 val gcFlags = listOf("-XX:+UseZGC", "-XX:+ZGenerational", "-XX:MaxRAMPercentage=60")
 val appArchive = "\$APPDIR/app-${(System.currentTimeMillis() / 1000).toString(16)}.jsa"
-val bundledTools = if (macArch != null) listOf("ffmpeg", "ffprobe").associate { "am.$it" to file("build/$nativeDir/$it").absolutePath } else emptyMap()
+val judgeTools = if (isMac) listOf("ffmpeg", "ffprobe").mapNotNull { name ->
+    (System.getenv("PATH").orEmpty().split(File.pathSeparatorChar) + listOf("/opt/homebrew/bin", "/usr/local/bin")).map { File(it, name) }.firstOrNull { it.isFile && it.canExecute() }?.let { "am.$name" to it.absolutePath }
+}.toMap() else emptyMap()
 
 val nativeBuild = tasks.register<Exec>("nativeBuild") {
     when {
@@ -100,7 +102,6 @@ tasks.withType<JavaExec>().matching { it.name == "run" }.configureEach {
     systemProperty("am.assets", file("../shared/assets").absolutePath)
     systemProperty("am.bgmodel", file("../android/src/foss/assets/absent_bg.abg").absolutePath)
     systemProperty("am.native", file("build/$nativeDir/$nativeName").absolutePath)
-    systemProperties(bundledTools)
     systemProperty("am.repo", file("..").absolutePath)
     systemProperty("skiko.data.path", file("build/skiko").absolutePath)
     systemProperty("apple.awt.application.name", "AbsentMotion")
@@ -124,7 +125,6 @@ compose.desktop {
             if (isMac && macArch == null) jvmArgs += "-XX:SharedArchiveFile=\$APPDIR/app.jsa"
             if (isWindows) jvmArgs += listOf("-XX:SharedArchiveFile=$appArchive", "-XX:+AutoCreateSharedArchive", "-Dam.cdsArchive=$appArchive")
             modules("jdk.localedata")
-            if (macArch != null) jvmArgs += listOf("ffmpeg", "ffprobe").map { "-Dam.$it=\$APPDIR/resources/$it" }
             macOS {
                 bundleID = "app.absentmotion.desktop"
                 iconFile.set(file("../macos/AbsentMotion.icns"))
@@ -211,7 +211,6 @@ tasks.matching { it.name == "createRuntimeImage" }.configureEach {
 if (macArch != null) tasks.matching { it.name == "createDistributable" }.configureEach {
     doLast {
         val app = layout.buildDirectory.dir("compose/binaries/main/app/AbsentMotion.app").get().asFile
-        listOf("ffmpeg", "ffprobe").forEach { check(app.resolve("Contents/app/resources/$it").setExecutable(true, false)) }
         check(ProcessBuilder("codesign", "--force", "--deep", "-s", "-", app.path).inheritIO().start().waitFor() == 0)
     }
 }
@@ -232,7 +231,6 @@ val renderCheck = tasks.register<JavaExec>("renderCheck") {
     systemProperty("am.assets", file("../shared/assets").absolutePath)
     systemProperty("am.bgmodel", file("../android/src/foss/assets/absent_bg.abg").absolutePath)
     systemProperty("am.native", file("build/$nativeDir/$nativeName").absolutePath)
-    systemProperties(bundledTools)
     systemProperty("am.repo", file("..").absolutePath)
     systemProperty("am.output", file("build").absolutePath)
 }
@@ -246,7 +244,6 @@ val sceneCheck = tasks.register<JavaExec>("sceneCheck") {
     systemProperty("am.assets", file("../shared/assets").absolutePath)
     systemProperty("am.bgmodel", file("../android/src/foss/assets/absent_bg.abg").absolutePath)
     systemProperty("am.native", file("build/$nativeDir/$nativeName").absolutePath)
-    systemProperties(bundledTools)
     systemProperty("am.repo", file("..").absolutePath)
     systemProperty("am.output", file("build").absolutePath)
 }
@@ -267,7 +264,7 @@ tasks.test {
     inputs.dir("../shared/res").withPropertyName("sharedRes").withPathSensitivity(PathSensitivity.RELATIVE)
     inputs.dir("../testdata").withPropertyName("testData").withPathSensitivity(PathSensitivity.RELATIVE)
     systemProperty("am.native", layout.buildDirectory.file("$nativeDir/$nativeName").get().asFile.absolutePath)
-    systemProperties(bundledTools)
+    systemProperties(judgeTools)
     systemProperty("am.assets", file("../shared/assets").absolutePath)
     systemProperty("am.bgmodel", file("../android/src/foss/assets/absent_bg.abg").absolutePath)
     systemProperty("am.repo", file("..").absolutePath)

@@ -59,7 +59,7 @@ class DeskEngineFeaturesTest {
 
     @Test fun exportBlendFlowAndBlurChangeVideo() = runBlocking {
         val video = out.resolve("smooth.mp4")
-        val process = ProcessBuilder(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-y", "-i", "../testdata/media/test-video.mp4",
+        val process = ProcessBuilder(app.absentmotion.Judge.ffmpeg, "-nostdin", "-v", "error", "-y", "-i", "../testdata/media/test-video.mp4",
             "-t", "0.8", "-vf", "scale=64:36,fps=5", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-an", video.path).start()
         assertEquals(0, process.waitFor())
         val uri = Uri.fromFile(video).toString()
@@ -89,7 +89,7 @@ class DeskEngineFeaturesTest {
 
     @Test fun smoothingKeepsHigherRateSourceFrames() = runBlocking {
         val video = out.resolve("thirty.mp4")
-        val process = ProcessBuilder(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-y", "-i", "../testdata/media/test-video.mp4",
+        val process = ProcessBuilder(app.absentmotion.Judge.ffmpeg, "-nostdin", "-v", "error", "-y", "-i", "../testdata/media/test-video.mp4",
             "-t", "0.5", "-vf", "scale=64:36", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-an", video.path).start()
         assertEquals(0, process.waitFor())
         val uri = Uri.fromFile(video).toString()
@@ -104,7 +104,7 @@ class DeskEngineFeaturesTest {
 
     @Test fun nestedVideoIsDrawnAndSmoothed() = runBlocking {
         val video = out.resolve("nested.mp4")
-        val process = ProcessBuilder(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-y", "-i", "../testdata/media/test-video.mp4",
+        val process = ProcessBuilder(app.absentmotion.Judge.ffmpeg, "-nostdin", "-v", "error", "-y", "-i", "../testdata/media/test-video.mp4",
             "-t", "0.8", "-vf", "scale=64:36,fps=5", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-an", video.path).start()
         assertEquals(0, process.waitFor())
         val uri = Uri.fromFile(video).toString()
@@ -121,7 +121,7 @@ class DeskEngineFeaturesTest {
     @Test fun variableRateFramesAreDecodedAtTheirTimestamps() = runBlocking {
         val source = File("../testdata/media/test-video.mp4").absoluteFile
         val video = out.resolve("variable.mkv")
-        val process = ProcessBuilder(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-y", "-i", source.path, "-vf",
+        val process = ProcessBuilder(app.absentmotion.Judge.ffmpeg, "-nostdin", "-v", "error", "-y", "-i", source.path, "-vf",
             "select=eq(n\\,0)+eq(n\\,3)+eq(n\\,12),scale=64:36", "-fps_mode", "vfr", "-c:v", "libx264", "-pix_fmt", "yuv420p", video.path).start()
         assertEquals(0, process.waitFor())
         val uri = Uri.fromFile(video).toString()
@@ -145,10 +145,10 @@ class DeskEngineFeaturesTest {
 
     @Test fun highRateVideoKeepsItsFrameRate() {
         val video = out.resolve("high-rate.mkv")
-        val process = ProcessBuilder(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-y", "-f", "lavfi", "-i", "testsrc=size=64x48:rate=240",
+        val process = ProcessBuilder(app.absentmotion.Judge.ffmpeg, "-nostdin", "-v", "error", "-y", "-f", "lavfi", "-i", "testsrc=size=64x48:rate=240",
             "-frames:v", "24", "-c:v", "ffv1", video.path).start()
         assertEquals(0, process.waitFor())
-        FfmpegVideoSource(video, DeskMedia.ffmpeg, DeskMedia.ffprobe).use { reader ->
+        FfmpegVideoSource(video, app.absentmotion.Judge.ffmpeg, app.absentmotion.Judge.ffprobe).use { reader ->
             assertTrue(reader.info.fps > 200)
             val first = reader.frame(0)!!.rgba.copyOf()
             val later = reader.frame(25)!!.rgba.copyOf()
@@ -179,7 +179,7 @@ class DeskEngineFeaturesTest {
             ImageIO.write(image, "png", out.resolve("track-$frame.png"))
         }
         val video = out.resolve("track.mkv")
-        val process = ProcessBuilder(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-y", "-framerate", "5", "-i", out.resolve("track-%d.png").path,
+        val process = ProcessBuilder(app.absentmotion.Judge.ffmpeg, "-nostdin", "-v", "error", "-y", "-framerate", "5", "-i", out.resolve("track-%d.png").path,
             "-c:v", "libx264", "-crf", "10", "-pix_fmt", "yuv420p", video.path).start()
         assertEquals(0, process.waitFor())
         FrameReader(context, Uri.fromFile(video).toString()).use { reader ->

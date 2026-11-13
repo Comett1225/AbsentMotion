@@ -64,9 +64,10 @@ interface MediaEngine {
     fun cameraDevices(): CameraDevices
     fun cameraEncoder(): List<String>
     fun camera(input: CameraInput, record: File?, encoder: List<String>, onFrame: (ByteArray) -> Unit, onEnd: (Int, String) -> Unit): CameraFeed
-    fun downloadOptions(plan: Plan, mode: SaveMode, dir: File, ffmpeg: String): List<String>
+    fun downloadOptions(plan: Plan, mode: SaveMode, dir: File): List<String>
     fun downloaded(plan: Plan, mode: SaveMode, dir: File): File?
-    fun withoutAudio(file: File, ffmpeg: String): File
+    fun withoutAudio(file: File): File
+    fun trouble(file: File): Int? = null
 
     companion object {
         val current: MediaEngine = if (DeskOs.mac) FfampEngine else FfmpegEngine

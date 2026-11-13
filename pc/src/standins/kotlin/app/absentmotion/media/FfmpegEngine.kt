@@ -1,7 +1,6 @@
 package app.absentmotion.media
 
 import app.absentmotion.R
-import app.absentmotion.desk.DeskMedia
 import app.absentmotion.desk.SpeechCommands
 import app.absentmotion.desk.SpeechRun
 import app.absentmotion.export.AudioCodec
@@ -24,6 +23,7 @@ import app.absentmotion.ui.camera.CameraInput
 import app.absentmotion.ui.camera.DeskCameraSession
 import app.absentmotion.ui.camera.DeskCameraSource
 import app.absentmotion.pc.engine.FfmpegVideoSource
+import app.absentmotion.pc.platform.DesktopPlatform
 import app.absentmotion.pc.engine.VideoSource
 import java.awt.image.BufferedImage
 import java.io.File
@@ -35,11 +35,14 @@ import kotlin.math.min
 import javax.imageio.ImageIO
 
 object FfmpegEngine : MediaEngine {
+    val ffmpeg: String get() = DesktopPlatform.executable("ffmpeg")
+    val ffprobe: String get() = DesktopPlatform.executable("ffprobe")
+
     private fun start(command: List<String>) = ProcessBuilder(command).redirectError(ProcessBuilder.Redirect.DISCARD).start()
 
     override fun probe(file: File, entries: String?): String {
         val shown = entries?.let { listOf("-show_entries", it) } ?: listOf("-show_streams", "-show_format")
-        val process = start(listOf(DeskMedia.ffprobe, "-v", "error") + shown + listOf("-of", "json", file.path))
+        val process = start(listOf(ffprobe, "-v", "error") + shown + listOf("-of", "json", file.path))
         val text = process.inputStream.bufferedReader().readText()
         process.waitFor()
         return text
@@ -47,7 +50,7 @@ object FfmpegEngine : MediaEngine {
 
     override fun packets(file: File, stream: Int): List<MediaPacket> {
         val list = ArrayList<MediaPacket>()
-        val process = start(listOf(DeskMedia.ffprobe, "-v", "error", "-select_streams", "$stream",
+        val process = start(listOf(ffprobe, "-v", "error", "-select_streams", "$stream",
             "-show_entries", "packet=pts_time,dts_time,size,pos,flags", "-of", "compact=p=0", file.path))
         process.inputStream.bufferedReader().forEachLine { line ->
             val kv = line.split('|').associate { it.substringBefore('=') to it.substringAfter('=') }
@@ -59,7 +62,7 @@ object FfmpegEngine : MediaEngine {
     }
 
     override fun still(file: File, timeMs: Long, maxSide: Int): BufferedImage? {
-        val process = start(listOf(DeskMedia.ffmpeg, "-v", "error", "-ss", "%.3f".format(Locale.ROOT, timeMs / 1000.0), "-i", file.path, "-frames:v", "1",
+        val process = start(listOf(ffmpeg, "-v", "error", "-ss", "%.3f".format(Locale.ROOT, timeMs / 1000.0), "-i", file.path, "-frames:v", "1",
             "-vf", "scale='min($maxSide,iw)':'min($maxSide,ih)':force_original_aspect_ratio=decrease", "-f", "image2pipe", "-vcodec", "png", "-"))
         val bytes = process.inputStream.readBytes()
         process.waitFor()
@@ -67,7 +70,7 @@ object FfmpegEngine : MediaEngine {
     }
 
     override fun pcm(file: File, beforeUs: Long, afterUs: Long, rate: Int, channels: Int): MediaStream {
-        val command = mutableListOf(DeskMedia.ffmpeg, "-nostdin", "-v", "error")
+        val command = mutableListOf(ffmpeg, "-nostdin", "-v", "error")
         if (beforeUs > 0) command += listOf("-ss", seconds(beforeUs))
         command += listOf("-i", file.path)
         if (afterUs > 0) command += listOf("-ss", seconds(afterUs))
@@ -77,30 +80,30 @@ object FfmpegEngine : MediaEngine {
     }
 
     override fun playback(file: File, fromMs: Long, rate: Int): MediaStream {
-        val started = start(listOf(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-ss", "%.3f".format(Locale.ROOT, fromMs / 1000.0), "-i", file.path,
+        val started = start(listOf(ffmpeg, "-nostdin", "-v", "error", "-ss", "%.3f".format(Locale.ROOT, fromMs / 1000.0), "-i", file.path,
             "-map", "0:a:0", "-vn", "-ar", "$rate", "-ac", "2", "-f", "s16le", "-"))
         return MediaStream(started.inputStream.buffered(1 shl 16), started, true)
     }
 
     override fun yuv(file: File, seconds: String, count: Int, batch: Boolean): MediaStream {
-        val started = start(listOf(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-ss", seconds, "-noautorotate", "-i", file.path, "-map", "0:v:0", "-frames:v", "$count") +
+        val started = start(listOf(ffmpeg, "-nostdin", "-v", "error", "-ss", seconds, "-noautorotate", "-i", file.path, "-map", "0:v:0", "-frames:v", "$count") +
             (if (batch) listOf("-fps_mode", "passthrough") else emptyList()) + listOf("-pix_fmt", "yuv420p", "-f", "rawvideo", "-"))
         return MediaStream(started.inputStream, started)
     }
 
     override fun play(file: File, fromMs: Long, width: Int, height: Int, loop: Boolean): MediaStream {
         val from = if (loop) listOf("-re", "-stream_loop", "-1") else listOf("-ss", "%.3f".format(Locale.ROOT, fromMs / 1000.0), "-re")
-        val started = start(listOf(DeskMedia.ffmpeg, "-v", "error") + from + listOf("-i", file.path, "-an", "-vf", "scale=$width:$height", "-f", "rawvideo", "-pix_fmt", "rgba", "-"))
+        val started = start(listOf(ffmpeg, "-v", "error") + from + listOf("-i", file.path, "-an", "-vf", "scale=$width:$height", "-f", "rawvideo", "-pix_fmt", "rgba", "-"))
         return MediaStream(started.inputStream, started)
     }
 
-    override fun videoSource(file: File, maxSide: Int, maxPixels: Int): VideoSource = FfmpegVideoSource(file, DeskMedia.ffmpeg, DeskMedia.ffprobe, maxSide, maxPixels)
+    override fun videoSource(file: File, maxSide: Int, maxPixels: Int): VideoSource = FfmpegVideoSource(file, ffmpeg, ffprobe, maxSide, maxPixels)
 
     private fun seconds(us: Long) = "%.6f".format(Locale.ROOT, us / 1e6)
 
     private val listed: Set<String> by lazy {
         runCatching {
-            val process = start(listOf(DeskMedia.ffmpeg, "-hide_banner", "-encoders"))
+            val process = start(listOf(ffmpeg, "-hide_banner", "-encoders"))
             val names = process.inputStream.bufferedReader().readLines().mapNotNull { line ->
                 line.trim().split(Regex("\\s+")).takeIf { it.size >= 2 && it[0].length == 6 && it[0][0] in "VAS" }?.get(1)
             }.toSet()
@@ -112,7 +115,7 @@ object FfmpegEngine : MediaEngine {
     override fun encoders(): Set<String> = listed
 
     override fun encoderWorks(name: String, s: ExportSettings, width: Int, height: Int): Boolean = runCatching {
-        val args = listOf(DeskMedia.ffmpeg, "-v", "error") + DeskEncoders.device(name) + listOf("-f", "lavfi", "-i", "color=c=black:s=${width}x$height:r=${s.fps}:d=0.2") +
+        val args = listOf(ffmpeg, "-v", "error") + DeskEncoders.device(name) + listOf("-f", "lavfi", "-i", "color=c=black:s=${width}x$height:r=${s.fps}:d=0.2") +
             DeskEncoders.filter(name) + DeskEncoders.videoArgs(name, s, width, height) + listOf("-frames:v", "2", "-f", "null", "-")
         val process = ProcessBuilder(args).redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.DISCARD).start()
         try { process.waitFor(20, TimeUnit.SECONDS) && process.exitValue() == 0 } finally { process.destroyForcibly() }
@@ -151,7 +154,7 @@ object FfmpegEngine : MediaEngine {
     }
 
     override fun frameTimes(file: File, decoded: Boolean, from: String): List<Long> {
-        val process = start(listOf(DeskMedia.ffprobe, "-v", "error", "-select_streams", "v:0", "-read_intervals", from, "-show_entries", "${if (decoded) "frame" else "packet"}=pts_time", "-of", "csv=p=0", file.path))
+        val process = start(listOf(ffprobe, "-v", "error", "-select_streams", "v:0", "-read_intervals", from, "-show_entries", "${if (decoded) "frame" else "packet"}=pts_time", "-of", "csv=p=0", file.path))
         return process.inputStream.bufferedReader().readText().also { process.waitFor() }.lines().mapNotNull { it.trim().trimEnd(',').toDoubleOrNull()?.let { t -> (t * 1e6).toLong() } }
     }
 
@@ -180,13 +183,13 @@ object FfmpegEngine : MediaEngine {
         val range = (if (startUs > 0) listOf("-ss", seconds(shownUs)) else emptyList()) + listOf("-noautorotate", "-i", input.path) +
             (if (late) listOf("-ss", seconds(startUs), "-i", input.path) else emptyList()) + (if (endUs > startUs) listOf("-t", seconds(endUs - startUs)) else emptyList())
         val upload = if (encoder.endsWith("_vaapi")) ",format=nv12,hwupload" else ""
-        val command = listOf(DeskMedia.ffmpeg, "-y", "-v", "error", "-progress", "pipe:1", "-nostats") + DeskEncoders.device(encoder) + range + listOf("-map", "0:v:0") +
+        val command = listOf(ffmpeg, "-y", "-v", "error", "-progress", "pipe:1", "-nostats") + DeskEncoders.device(encoder) + range + listOf("-map", "0:v:0") +
             (if (audio) listOf("-map", if (late) "1:a:0?" else "0:a:0?") else emptyList()) + listOf("-vf", "scale=${job.width}:${job.height},fps=${job.fps}$upload") + args + sound + listOf("-movflags", "+faststart", out.path)
         watched(command, durationUs, 1f, { ExportError(txt(R.string.compress_failed, "ffmpeg")) }, progress, alive)
     }
 
     private fun shownFrom(input: File, startUs: Long, endUs: Long): Long = runCatching {
-        val process = start(listOf(DeskMedia.ffprobe, "-v", "error", "-select_streams", "v:0", "-read_intervals", "${seconds(startUs)}%${seconds(endUs)}",
+        val process = start(listOf(ffprobe, "-v", "error", "-select_streams", "v:0", "-read_intervals", "${seconds(startUs)}%${seconds(endUs)}",
             "-show_entries", "packet=pts_time", "-of", "csv=p=0", input.path))
         val times = process.inputStream.bufferedReader().readLines().mapNotNull { line -> line.trim().trimEnd(',').toDoubleOrNull()?.let { Math.round(it * 1_000_000) } }
         process.waitFor()
@@ -194,7 +197,7 @@ object FfmpegEngine : MediaEngine {
     }.getOrDefault(startUs)
 
     private fun tool(args: List<String>, spanUs: Long, progress: (Float) -> Unit, alive: () -> Boolean) =
-        watched(listOf(DeskMedia.ffmpeg, "-y", "-v", "error", "-progress", "pipe:1", "-nostats") + args, spanUs, 0.99f, { ExportError(txt(R.string.tools_engine_stopped)) }, progress, alive)
+        watched(listOf(ffmpeg, "-y", "-v", "error", "-progress", "pipe:1", "-nostats") + args, spanUs, 0.99f, { ExportError(txt(R.string.tools_engine_stopped)) }, progress, alive)
 
     override fun extractAudio(input: File, job: AudioJob, durationUs: Long, out: File, progress: (Float) -> Unit, alive: () -> Boolean) {
         val coder = when {
@@ -232,7 +235,7 @@ object FfmpegEngine : MediaEngine {
                 val frames = minOf(parts.perPart, parts.total - i * parts.perPart)
                 val start = maxOf(parts.firstUs, parts.firstUs + Math.round((from - 0.5) * 1_000_000 / parts.fps))
                 val part = File(parts.folder, "$i.mkv")
-                val args = mutableListOf(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-y", "-noautorotate", "-ss", time(start), "-t", time(Math.round(frames * 1_000_000 / parts.fps)), "-i", parts.input.path,
+                val args = mutableListOf(ffmpeg, "-nostdin", "-v", "error", "-y", "-noautorotate", "-ss", time(start), "-t", time(Math.round(frames * 1_000_000 / parts.fps)), "-i", parts.input.path,
                     "-map", "0:v:0", "-map", "0:a:0?", "-frames:v", "$frames", "-vf", "reverse,setpts=PTS-STARTPTS,pad=ceil(iw/2)*2:ceil(ih/2)*2", "-c:v", "mpeg4", "-q:v", "2", "-pix_fmt", "yuv420p")
                 if (parts.sound) args += listOf("-af", "areverse,asetpts=PTS-STARTPTS", "-c:a", "pcm_s16le")
                 args += part.path
@@ -241,7 +244,7 @@ object FfmpegEngine : MediaEngine {
                 progress((count - i).toFloat() / (count + 1))
             }
         }
-        waited(listOf(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-y", "-f", "concat", "-safe", "0", "-i", list.path, "-c:v", "copy", "-c:a", "aac", parts.output.path), alive, problem)
+        waited(listOf(ffmpeg, "-nostdin", "-v", "error", "-y", "-f", "concat", "-safe", "0", "-i", list.path, "-c:v", "copy", "-c:a", "aac", parts.output.path), alive, problem)
         return null
     }
 
@@ -252,7 +255,7 @@ object FfmpegEngine : MediaEngine {
             if (!alive()) throw CancellationException()
             val filter = "scale=${plan.width}:${plan.height}:flags=neighbor,format=rgba," +
                 if (mask) "alphaextract,format=yuv420p" else "premultiply=inplace=1,format=yuv420p"
-            val process = start(listOf(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-y", "-ignore_loop", "1", "-min_delay", "2", "-default_delay", "10",
+            val process = start(listOf(ffmpeg, "-nostdin", "-v", "error", "-y", "-ignore_loop", "1", "-min_delay", "2", "-default_delay", "10",
                 "-i", plan.source.path, "-vf", filter, "-fps_mode", "vfr") + encoder + listOf("-pix_fmt", "yuv420p", "-an", file.path))
             try {
                 while (!process.waitFor(200, TimeUnit.MILLISECONDS)) if (!alive()) throw CancellationException()
@@ -265,13 +268,13 @@ object FfmpegEngine : MediaEngine {
     }
 
     override fun steadyFrames(file: File, start: String, length: String, rate: String, width: Int, height: Int): MediaStream {
-        val started = start(listOf(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-ss", start, "-noautorotate", "-i", file.path, "-t", length,
+        val started = start(listOf(ffmpeg, "-nostdin", "-v", "error", "-ss", start, "-noautorotate", "-i", file.path, "-t", length,
             "-vf", "fps=$rate" + (if (width > 0) ",scale=$width:$height" else ""), "-pix_fmt", "rgb24", "-f", "rawvideo", "-"))
         return MediaStream(started.inputStream, started)
     }
 
     override fun frameSink(out: File, spec: FrameSinkSpec): MediaSink {
-        val args = mutableListOf(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", spec.format, "-s", "${spec.width}x${spec.height}", "-r", spec.rate, "-i", "-")
+        val args = mutableListOf(ffmpeg, "-nostdin", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", spec.format, "-s", "${spec.width}x${spec.height}", "-r", spec.rate, "-i", "-")
         if (spec.audioFrom != null) {
             if (spec.audioStart != null) args += listOf("-ss", spec.audioStart, "-t", spec.audioLength.orEmpty())
             args += listOf("-i", spec.audioFrom.path, "-map", "0:v:0", "-map", "1:a:0?")
@@ -292,20 +295,20 @@ object FfmpegEngine : MediaEngine {
     }
 
     override fun speech(input: File, out: File, rate: Int, tempo: Float, pitch: Float, timeoutMs: Long): Boolean {
-        val process = ProcessBuilder(SpeechCommands.convert(DeskMedia.ffmpeg, input, SpeechRun(emptyList(), tempo = tempo, pitch = pitch), out))
+        val process = ProcessBuilder(SpeechCommands.convert(ffmpeg, input, SpeechRun(emptyList(), tempo = tempo, pitch = pitch), out))
             .redirectOutput(ProcessBuilder.Redirect.DISCARD).redirectError(ProcessBuilder.Redirect.DISCARD).start()
         process.outputStream.close()
         try { return process.waitFor(timeoutMs, TimeUnit.MILLISECONDS) && process.exitValue() == 0 } finally { if (process.isAlive) process.destroyForcibly() }
     }
 
-    override fun cameraDevices(): CameraDevices = DeskCameraSource.list(DeskMedia.ffmpeg)
+    override fun cameraDevices(): CameraDevices = DeskCameraSource.list(ffmpeg)
 
-    override fun cameraEncoder(): List<String> = DeskCameraSource.videoEncoder(DeskCameraSource.encoders(DeskMedia.ffmpeg))
+    override fun cameraEncoder(): List<String> = DeskCameraSource.videoEncoder(DeskCameraSource.encoders(ffmpeg))
 
     override fun camera(input: CameraInput, record: File?, encoder: List<String>, onFrame: (ByteArray) -> Unit, onEnd: (Int, String) -> Unit): CameraFeed =
-        DeskCameraSession(DeskCameraSource.command(DeskMedia.ffmpeg, input, record, encoder), onFrame, onEnd)
+        DeskCameraSession(DeskCameraSource.command(ffmpeg, input, record, encoder), onFrame, onEnd)
 
-    override fun downloadOptions(plan: Plan, mode: SaveMode, dir: File, ffmpeg: String): List<String> {
+    override fun downloadOptions(plan: Plan, mode: SaveMode, dir: File): List<String> {
         val chosen = listOfNotNull(plan.video?.id, plan.audio?.id).distinct().joinToString("+")
         return listOf("--ffmpeg-location", ffmpeg, "-f", chosen, "-o", File(dir, "item.%(ext)s").path) + when {
             mode == SaveMode.AudioOnly -> listOf("-x", "--audio-format", "m4a")
@@ -317,7 +320,7 @@ object FfmpegEngine : MediaEngine {
     override fun downloaded(plan: Plan, mode: SaveMode, dir: File): File? =
         dir.listFiles().orEmpty().filter { it.isFile && it.name.startsWith("item.") && !it.name.endsWith(".part") && !it.name.endsWith(".ytdl") }.maxByOrNull { it.length() }
 
-    override fun withoutAudio(file: File, ffmpeg: String): File {
+    override fun withoutAudio(file: File): File {
         val out = File(file.parentFile, "silent." + file.extension)
         val code = runCatching {
             ProcessBuilder(ffmpeg, "-nostdin", "-v", "error", "-y", "-i", file.path, "-map", "0:v", "-c", "copy", out.path).redirectErrorStream(true).start()

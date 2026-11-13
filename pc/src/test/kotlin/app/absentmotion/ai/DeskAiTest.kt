@@ -48,7 +48,7 @@ class DeskAiTest {
 
     @Test fun reverseWithoutAudio() = runBlocking {
         val input = File("build/ai-silent.mp4")
-        val process = ProcessBuilder(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-y", "-i", media.resolve("test-video.mp4").path, "-an", "-c:v", "copy", input.path).start()
+        val process = ProcessBuilder(app.absentmotion.Judge.ffmpeg, "-nostdin", "-v", "error", "-y", "-i", media.resolve("test-video.mp4").path, "-an", "-c:v", "copy", input.path).start()
         assertEquals(0, process.waitFor())
         val uri = Uri.fromFile(input.absoluteFile).toString()
         val layer = Layer(XmlNode("shape", mapOf("id" to "1", "startTime" to "0", "endTime" to "3000", "fillType" to "media", "fillVideo" to uri, "outTime" to "3000")))

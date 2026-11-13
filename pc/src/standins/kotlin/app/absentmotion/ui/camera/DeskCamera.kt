@@ -45,7 +45,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.R
-import app.absentmotion.desk.DeskMedia
 import app.absentmotion.desk.DeskOs
 import app.absentmotion.media.MediaEngine
 import app.absentmotion.platform.Hint
@@ -65,7 +64,7 @@ import java.io.File
 
 enum class CameraPhase { Starting, Live, NoCamera, Failed }
 
-class DeskCameraController(private val ffmpeg: String, private val folder: File, private val scope: CoroutineScope) {
+class DeskCameraController(private val folder: File, private val scope: CoroutineScope) {
     var devices by mutableStateOf<CameraDevices?>(null)
         private set
     var video by mutableStateOf<CameraDevice?>(null)
@@ -205,7 +204,7 @@ class DeskCameraController(private val ffmpeg: String, private val folder: File,
 fun CameraScreen(aspect: Float, onClose: () -> Unit, onCaptured: (Uri, Boolean) -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val camera = remember { DeskCameraController(DeskMedia.ffmpeg, File(context.cacheDir, "camera"), scope) }
+    val camera = remember { DeskCameraController(File(context.cacheDir, "camera"), scope) }
     var video by remember { mutableStateOf(false) }
     var seconds by remember { mutableStateOf(0) }
     LaunchedEffect(Unit) { camera.open() }

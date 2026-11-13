@@ -6,7 +6,6 @@ import android.media.MediaCodecInfo
 import android.media.MediaFormat
 import android.util.Log
 import app.absentmotion.R
-import app.absentmotion.desk.DeskMedia
 import app.absentmotion.engine.EngineThread
 import app.absentmotion.i18n.UiText
 import app.absentmotion.i18n.txt
@@ -162,7 +161,7 @@ internal object DeskEncoders {
 
 internal class Ffmpeg(args: List<String>, private val log: File) : MediaSink() {
     val process: Process = try {
-        ProcessBuilder(listOf(DeskMedia.ffmpeg, "-hide_banner", "-v", "error") + args).redirectError(log).redirectOutput(ProcessBuilder.Redirect.DISCARD).start()
+        ProcessBuilder(listOf(app.absentmotion.media.FfmpegEngine.ffmpeg, "-hide_banner", "-v", "error") + args).redirectError(log).redirectOutput(ProcessBuilder.Redirect.DISCARD).start()
     } catch (e: java.io.IOException) {
         throw ExportError(txt(R.string.desk_export_no_ffmpeg), e)
     }

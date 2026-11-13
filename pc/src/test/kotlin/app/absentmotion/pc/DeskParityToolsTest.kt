@@ -199,7 +199,7 @@ class DeskParityToolsTest {
         try {
             val scope = CoroutineScope(Dispatchers.Default)
             val folder = File("build/camera-out").also { it.deleteRecursively() }
-            val camera = DeskCameraController(DeskMedia.ffmpeg, folder, scope)
+            val camera = DeskCameraController(folder, scope)
             camera.open()
             waitFor("the live preview") { camera.phase == CameraPhase.Live }
             val photo = camera.photo()!!
@@ -220,7 +220,7 @@ class DeskParityToolsTest {
         System.setProperty("am.fakeCamera", "true")
         try {
             val blocked = File("build/camera-blocked").apply { writeText("not a folder") }
-            val camera = DeskCameraController(DeskMedia.ffmpeg, blocked, CoroutineScope(Dispatchers.Default))
+            val camera = DeskCameraController(blocked, CoroutineScope(Dispatchers.Default))
             camera.open()
             waitFor("the live preview") { camera.phase == CameraPhase.Live }
             camera.startRecording()
@@ -264,7 +264,7 @@ class DeskParityToolsTest {
         val music = File(System.getProperty("user.home"), "Music").also { it.mkdirs() }
         fun make(folder: String, name: String, freq: Int, vararg tags: String) {
             val dir = File(music, folder).also { it.mkdirs() }
-            val p = ProcessBuilder(listOf(DeskMedia.ffmpeg, "-nostdin", "-y", "-v", "error", "-f", "lavfi", "-i", "sine=frequency=$freq:duration=2") + tags + File(dir, name).path).start()
+            val p = ProcessBuilder(listOf(app.absentmotion.Judge.ffmpeg, "-nostdin", "-y", "-v", "error", "-f", "lavfi", "-i", "sine=frequency=$freq:duration=2") + tags + File(dir, name).path).start()
             check(p.waitFor() == 0)
         }
         make("Album One", "alpha.m4a", 330, "-metadata", "title=Alpha", "-metadata", "artist=Ada", "-metadata", "album=First")

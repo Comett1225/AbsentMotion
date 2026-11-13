@@ -22,14 +22,22 @@
 #include "include/gpu/ganesh/mtl/GrMtlBackendSurface.h"
 #include "include/gpu/ganesh/mtl/GrMtlTypes.h"
 #import <CoreVideo/CoreVideo.h>
-#import <dispatch/dispatch.h>
+#import <Foundation/Foundation.h>
+#import <objc/runtime.h>
 #import <Metal/Metal.h>
+
+@interface AMFrameKeeper : NSObject {
+@public
+    std::shared_ptr<void> pixels;
+}
+@end
+
+@implementation AMFrameKeeper
+@end
 
 namespace {
 
 constexpr int64_t kAhead = 3;
-constexpr int64_t kConceal = 8;
-constexpr int64_t kHoldMs = 250;
 
 CVMetalTextureCacheRef Cache() {
     static CVMetalTextureCacheRef cache = [] {
@@ -43,18 +51,16 @@ CVMetalTextureCacheRef Cache() {
 
 struct Held {
     CVMetalTextureRef planes[2] = {};
-    std::shared_ptr<void> pixels;
 };
-
-void Free(Held* held) {
-    for (auto plane : held->planes) if (plane) CFRelease(plane);
-    delete held;
-}
 
 void Release(void* context) {
     auto* held = static_cast<Held*>(context);
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, kHoldMs * NSEC_PER_MSEC), dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{ Free(held); });
+    for (auto plane : held->planes) if (plane) CFRelease(plane);
+    delete held;
+    if (Cache()) CVMetalTextureCacheFlush(Cache(), 0);
 }
+
+const char kKeeperKey = 0;
 
 SkYUVColorSpace Space(const absent::Frame& f) {
     const bool full = f.color.full;
@@ -78,15 +84,17 @@ sk_sp<SkImage> Direct(GrDirectContext* context, const absent::Frame& frame) {
     else if (chromaWidth == (width + 1) / 2 && chromaHeight == (height + 1) / 2) subsampling = SkYUVAInfo::Subsampling::k420;
     else return nullptr;
     auto* held = new Held;
-    held->pixels = frame.native;
+    AMFrameKeeper* keeper = [AMFrameKeeper new];
+    keeper->pixels = frame.native;
     GrBackendTexture textures[SkYUVAInfo::kMaxPlanes];
     for (int i = 0; i < 2; ++i) {
         const MTLPixelFormat format = i == 0 ? (deep ? MTLPixelFormatR16Unorm : MTLPixelFormatR8Unorm) : (deep ? MTLPixelFormatRG16Unorm : MTLPixelFormatRG8Unorm);
         const size_t w = CVPixelBufferGetWidthOfPlane(pixels, i), h = CVPixelBufferGetHeightOfPlane(pixels, i);
         if (CVMetalTextureCacheCreateTextureFromImage(kCFAllocatorDefault, Cache(), pixels, nullptr, format, w, h, i, &held->planes[i]) != kCVReturnSuccess) {
-            Free(held);
+            Release(held);
             return nullptr;
         }
+        objc_setAssociatedObject(CVMetalTextureGetTexture(held->planes[i]), &kKeeperKey, keeper, OBJC_ASSOCIATION_RETAIN);
         GrMtlTextureInfo info;
         info.fTexture.retain((__bridge GrMTLHandle)CVMetalTextureGetTexture(held->planes[i]));
         textures[i] = GrBackendTextures::MakeMtl((int)w, (int)h, skgpu::Mipmapped::kNo, info);
@@ -98,6 +106,12 @@ sk_sp<SkImage> Direct(GrDirectContext* context, const absent::Frame& frame) {
     return image;
 }
 
+bool Alpha(const absent::Frame& frame) {
+    CFTypeRef veil = CVBufferCopyAttachment(static_cast<CVPixelBufferRef>(frame.native.get()), CFSTR("absent.alpha"), nullptr);
+    if (veil) CFRelease(veil);
+    return veil != nullptr;
+}
+
 sk_sp<SkImage> Copied(GrDirectContext* context, const absent::Frame& frame) {
     auto* pixels = new std::vector<uint8_t>;
     if (!absent::copyBGRA(frame, *pixels)) {
@@ -106,7 +120,7 @@ sk_sp<SkImage> Copied(GrDirectContext* context, const absent::Frame& frame) {
     }
     const size_t rowBytes = (size_t)frame.width * 4;
     auto data = SkData::MakeWithProc(pixels->data(), pixels->size(), [](const void*, void* c) { delete static_cast<std::vector<uint8_t>*>(c); }, pixels);
-    const auto info = SkImageInfo::Make(frame.width, frame.height, kBGRA_8888_SkColorType, kOpaque_SkAlphaType, SkColorSpace::MakeSRGB());
+    const auto info = SkImageInfo::Make(frame.width, frame.height, kBGRA_8888_SkColorType, Alpha(frame) ? kUnpremul_SkAlphaType : kOpaque_SkAlphaType, SkColorSpace::MakeSRGB());
     auto image = SkImages::RasterFromData(info, std::move(data), rowBytes);
     if (image && context) {
         auto uploaded = SkImages::TextureFromImage(context, image.get());
@@ -116,7 +130,7 @@ sk_sp<SkImage> Copied(GrDirectContext* context, const absent::Frame& frame) {
 }
 
 sk_sp<SkImage> Image(GrDirectContext* context, const absent::Frame& frame) {
-    if (!Hdr(frame)) if (auto image = Direct(context, frame)) return image;
+    if (!Hdr(frame) && !Alpha(frame)) if (auto image = Direct(context, frame)) return image;
     return Copied(context, frame);
 }
 
@@ -186,8 +200,6 @@ struct Lane {
             }
             hold.unlock();
             absent::Frame frame = decode(next);
-            if (!frame) frame = decode(next);
-            for (int64_t back = next - 1; !frame && back >= 0 && back >= next - kConceal; --back) frame = decode(back);
             hold.lock();
             if (frame) frames[next] = std::move(frame); else failed.insert(next);
             std::erase_if(frames, [&](const auto& e) { return e.first < want || e.first > want + kAhead; });

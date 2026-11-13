@@ -34,7 +34,7 @@ class DeskAudioTest {
     }
 
     private fun ffmpeg(vararg args: String) {
-        val p = ProcessBuilder(listOf(DeskMedia.ffmpeg, "-nostdin", "-y", "-v", "error") + args).redirectErrorStream(true).start()
+        val p = ProcessBuilder(listOf(app.absentmotion.Judge.ffmpeg, "-nostdin", "-y", "-v", "error") + args).redirectErrorStream(true).start()
         val out = p.inputStream.readBytes().decodeToString()
         check(p.waitFor() == 0) { out }
     }
@@ -48,7 +48,7 @@ class DeskAudioTest {
     private val surround get() = tone("c.wav", "0.1*sin(2*PI*200*t)|0.1*sin(2*PI*300*t)|0.1*sin(2*PI*400*t)|0.1*sin(2*PI*50*t)|0.1*sin(2*PI*500*t)|0.1*sin(2*PI*600*t)", 48000, 1.0, "-channel_layout", "5.1")
 
     private fun floats(vararg args: String): FloatArray {
-        val p = ProcessBuilder(listOf(DeskMedia.ffmpeg, "-nostdin", "-v", "error") + args + listOf("-f", "f32le", "-")).redirectError(ProcessBuilder.Redirect.DISCARD).start()
+        val p = ProcessBuilder(listOf(app.absentmotion.Judge.ffmpeg, "-nostdin", "-v", "error") + args + listOf("-f", "f32le", "-")).redirectError(ProcessBuilder.Redirect.DISCARD).start()
         val bytes = p.inputStream.readBytes()
         p.waitFor()
         return FloatArray(bytes.size / 4).also { ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).asFloatBuffer().get(it) }

@@ -894,6 +894,8 @@
     <string name="project_too_many_linked">此项目嵌入的链接元素过多。</string>
     <string name="media_error_read_frames">此手机无法读取该视频的帧</string>
     <string name="media_error_pixel_format">此视频使用的像素格式无法读取</string>
+    <string name="media_error_windows_media">这台 Mac 无法打开 Windows Media 文件（WMA、WMV、ASF）：macOS 没有它们的解码器。</string>
+    <string name="media_error_mpeg4_asp">这个 DivX 或 Xvid 视频使用了 macOS 无法播放的功能（例如 B 帧）。声音可以播放，但没有画面。</string>
     <string name="media_error_video_unavailable">视频不可用：%1$s</string>
     <string name="media_error_decode_frame">无法精确解码视频第%1$s 帧</string>
     <string name="media_error_import_frame">无法为%2$s 导入视频第%1$s 帧</string>

@@ -25,7 +25,7 @@ class DeskSoundShotsTest {
         val home = File("build/desk-sound-home").absoluteFile.also { it.deleteRecursively() }
         val music = File(home, "Music/Tones").also { it.mkdirs() }
         fun make(name: String, expr: String, vararg tags: String) {
-            val p = ProcessBuilder(listOf(DeskMedia.ffmpeg, "-nostdin", "-y", "-v", "error", "-f", "lavfi", "-i", "aevalsrc=$expr:s=44100:d=4") + tags + File(music, name).path).start()
+            val p = ProcessBuilder(listOf(app.absentmotion.Judge.ffmpeg, "-nostdin", "-y", "-v", "error", "-f", "lavfi", "-i", "aevalsrc=$expr:s=44100:d=4") + tags + File(music, name).path).start()
             check(p.waitFor() == 0)
         }
         make("tone-b.m4a", "0.3*sin(2*PI*330*t)*sin(PI*t)", "-metadata", "title=Tone B", "-metadata", "artist=Tester")

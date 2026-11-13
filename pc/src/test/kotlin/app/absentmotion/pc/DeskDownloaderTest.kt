@@ -75,7 +75,7 @@ class DeskDownloaderTest {
         val item = DeskVideoDownloader.readInfo(fake, "u").items.single()
         val plan: Plan = qualities(item, SaveMode.Both).first().plan
         val seen = ArrayList<Float>()
-        val file = DeskVideoDownloader.fetchTo(fake, "https://example.invalid/watch", 0, plan, SaveMode.Both, temp.newFolder("out"), "ffmpeg") { seen += it }
+        val file = DeskVideoDownloader.fetchTo(fake, "https://example.invalid/watch", 0, plan, SaveMode.Both, temp.newFolder("out")) { seen += it }
         assertEquals("item.mp4", file.name)
         assertTrue(file.length() > 0)
         assertEquals(1f, seen.last(), 0f)
@@ -108,12 +108,12 @@ class DeskDownloaderTest {
     }
 
     @Test fun videoOnlyRemovesTheSoundFromAClipThatHasIt() = kotlinx.coroutines.runBlocking {
-        val ffmpeg = app.absentmotion.desk.DeskMedia.ffmpeg
+        val ffmpeg = app.absentmotion.Judge.ffmpeg
         val clip = File(temp.root, "both.mp4")
         val made = ProcessBuilder(ffmpeg, "-nostdin", "-v", "error", "-y", "-f", "lavfi", "-i", "testsrc=size=64x36:rate=10", "-f", "lavfi", "-i", "sine=frequency=440",
             "-t", "1", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac", "-shortest", clip.path).redirectErrorStream(true).start().let { it.inputStream.readBytes(); it.waitFor() }
         org.junit.Assert.assertEquals(0, made)
-        val silent = app.absentmotion.tools.withoutAudio(clip, ffmpeg)
+        val silent = app.absentmotion.tools.withoutAudio(clip)
         val probe = ProcessBuilder(ffmpeg, "-nostdin", "-hide_banner", "-i", silent.path).redirectErrorStream(true).start().let { p -> String(p.inputStream.readBytes()).also { p.waitFor() } }
         org.junit.Assert.assertTrue(probe, "Video:" in probe && "Audio:" !in probe)
     }

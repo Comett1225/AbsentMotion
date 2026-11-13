@@ -5140,5 +5140,7 @@
  "xml_err_too_many": "The file has too many elements",
  "xml_err_unexpected_end": "The file ends unexpectedly inside %1$s",
  "your_asset_collection_is_empty": "Your asset collection is empty",
- "your_video_ended_early_so_its": "Your video ended early, so its last frame is held.\nSwap in a longer clip for a cleaner result."
+ "your_video_ended_early_so_its": "Your video ended early, so its last frame is held.\nSwap in a longer clip for a cleaner result.",
+ "media_error_windows_media": "This Mac cannot open Windows Media files (WMA, WMV, ASF): macOS has no decoder for them.",
+ "media_error_mpeg4_asp": "This DivX or Xvid video uses features (such as B-frames) that macOS cannot play. The sound plays, but there is no picture."
 }

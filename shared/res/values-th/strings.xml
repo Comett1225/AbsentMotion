@@ -894,6 +894,8 @@
     <string name="project_too_many_linked">โปรเจกต์นี้ฝังองค์ประกอบที่เชื่อมโยงมากเกินไป</string>
     <string name="media_error_read_frames">เครื่องนี้อ่านเฟรมของวิดีโอนี้ไม่ได้</string>
     <string name="media_error_pixel_format">วิดีโอนี้ใช้รูปแบบพิกเซลที่อ่านไม่ได้</string>
+    <string name="media_error_windows_media">Mac เครื่องนี้เปิดไฟล์ Windows Media (WMA, WMV, ASF) ไม่ได้: macOS ไม่มีตัวถอดรหัสสำหรับไฟล์เหล่านี้</string>
+    <string name="media_error_mpeg4_asp">วิดีโอ DivX หรือ Xvid นี้ใช้คุณสมบัติ (เช่น เฟรม B) ที่ macOS เล่นไม่ได้ เสียงเล่นได้ แต่ไม่มีภาพ</string>
     <string name="media_error_video_unavailable">วิดีโอไม่พร้อมใช้งาน: %1$s</string>
     <string name="media_error_decode_frame">ถอดรหัสเฟรมวิดีโอ %1$s ไม่ได้</string>
     <string name="media_error_import_frame">ไม่สามารถนำเข้าเฟรมวิดีโอ %1$s สำหรับ %2$s</string>

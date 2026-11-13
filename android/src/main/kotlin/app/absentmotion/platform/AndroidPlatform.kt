@@ -512,3 +512,5 @@ fun rememberFolderPicker(start: String?, onPicked: (String) -> Unit): () -> Unit
         ?: android.provider.DocumentsContract.buildDocumentUri("com.android.externalstorage.documents", "primary:Documents")
     return { runCatching { launcher.launch(initial) }.onFailure { runCatching { launcher.launch(null) } } }
 }
+
+fun mediaTrouble(context: android.content.Context, uri: android.net.Uri): String? = null

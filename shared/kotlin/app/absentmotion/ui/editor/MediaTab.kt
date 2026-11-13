@@ -74,8 +74,12 @@ import kotlinx.coroutines.launch
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 
-private fun unsupportedPick(context: android.content.Context) {
-    android.widget.Toast.makeText(context, context.getString(R.string.library_err_unsupported_type), android.widget.Toast.LENGTH_LONG).show()
+private fun unsupportedPick(context: android.content.Context, uri: Uri) {
+    android.widget.Toast.makeText(context, app.absentmotion.platform.mediaTrouble(context, uri) ?: context.getString(R.string.library_err_unsupported_type), android.widget.Toast.LENGTH_LONG).show()
+}
+
+private fun troubledPick(context: android.content.Context, uri: Uri) {
+    app.absentmotion.platform.mediaTrouble(context, uri)?.let { android.widget.Toast.makeText(context, it, android.widget.Toast.LENGTH_LONG).show() }
 }
 
 private suspend fun looksLikeGif(context: Context, uri: Uri): Boolean = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
@@ -87,9 +91,9 @@ internal suspend fun EditorState.addToolResult(context: Context, uri: Uri) {
     val keeper = app.absentmotion.library.MediaKeeper(store, { u -> context.contentResolver.openInputStream(Uri.parse(u)) })
     suspend fun kept(media: app.absentmotion.model.MediaDeclaration?) = media?.let { kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { keeper.keep(projectId, it, scene) } }
     when (uri.lastPathSegment.orEmpty().substringAfterLast('.', "").lowercase()) {
-        "m4a", "mp3", "wav", "aac", "ogg", "opus", "flac" -> kept(audioDeclaration(context, uri))?.takeIf { it.duration > 0 }?.let { addAudio(it) } ?: unsupportedPick(context)
-        "gif" -> kept(app.absentmotion.media.imageDeclaration(context, uri))?.let { addPicked(context, Uri.parse(it.uri)) } ?: unsupportedPick(context)
-        else -> kept(app.absentmotion.media.videoDeclaration(context, uri))?.let { addVideo(it) } ?: unsupportedPick(context)
+        "m4a", "mp3", "wav", "aac", "ogg", "opus", "flac" -> kept(audioDeclaration(context, uri))?.takeIf { it.duration > 0 }?.let { addAudio(it) } ?: unsupportedPick(context, uri)
+        "gif" -> kept(app.absentmotion.media.imageDeclaration(context, uri))?.let { addPicked(context, Uri.parse(it.uri)) } ?: unsupportedPick(context, uri)
+        else -> kept(app.absentmotion.media.videoDeclaration(context, uri))?.let { addVideo(it); troubledPick(context, uri) } ?: unsupportedPick(context, uri)
     }
 }
 
@@ -98,9 +102,9 @@ internal suspend fun EditorState.addPicked(context: Context, uri: Uri, video: Bo
     val name = uri.lastPathSegment.orEmpty()
     when {
         svg || type == "image/svg+xml" || name.endsWith(".svg", ignoreCase = true) -> importSvgFile(context, uri)
-        video == null && type.startsWith("audio/") -> audioDeclaration(context, uri)?.let { keepCopy(context, it) }?.takeIf { it.duration > 0 }?.let { addAudio(it) } ?: unsupportedPick(context)
+        video == null && type.startsWith("audio/") -> audioDeclaration(context, uri)?.let { keepCopy(context, it) }?.takeIf { it.duration > 0 }?.let { addAudio(it) } ?: unsupportedPick(context, uri)
         video != true && !type.startsWith("video/") && looksLikeGif(context, uri) && addGif(context, uri) -> Unit
-        else -> mediaDeclaration(context, uri)?.let { keepCopy(context, it) }?.let { if (it.type.startsWith("video/")) addVideo(it) else addImage(it) } ?: unsupportedPick(context)
+        else -> mediaDeclaration(context, uri)?.let { keepCopy(context, it) }?.let { if (it.type.startsWith("video/")) { addVideo(it); troubledPick(context, uri) } else addImage(it) } ?: unsupportedPick(context, uri)
     }
 }
 

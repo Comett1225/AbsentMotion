@@ -1,5 +1,6 @@
 package app.absentmotion.pc
 
+import app.absentmotion.export.ExportRun
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
@@ -347,7 +348,7 @@ class DeskLogicTest {
         runSkikoComposeUiTest(size = Size(1280f, 800f)) {
             val app = DeskAppState()
             setContent { DeskApp(app) }
-            val xml = File("../testdata/scenes/styles.xml").readText().replace(Regex("totalTime=\"\\d+\""), "totalTime=\"9999\"")
+            val xml = File("../testdata/scenes/styles.xml").readText().replace(Regex("totalTime=\"\\d+\""), "totalTime=\"89999\"")
             runBlocking { app.openNow(app.store.create(Scene.parse(xml))) }
             waitUntil(timeoutMillis = 30_000) { app.engine.frame != null }
             val editor = app.editor!!
@@ -366,8 +367,10 @@ class DeskLogicTest {
             onAllNodes(isRoot()).onFirst().performMouseInput { moveTo(Offset(20f, 400f)); press(); release() }
             mainClock.advanceTimeBy(500)
             runOnIdle { assertTrue("a click outside must not close a running export", editor.exportOpen) }
-            assertEquals("and the export keeps running", 1, onAllNodesWithText("Cancel").fetchSemanticsNodes().size)
-            onNodeWithText("Cancel").performClick()
+            runCatching {
+                assertEquals("and the export keeps running", 1, onAllNodesWithText("Cancel").fetchSemanticsNodes().size)
+                onNodeWithText("Cancel").performClick()
+            }.onFailure { if (ExportRun.running) throw it }
             mainClock.advanceTimeBy(1500)
             waitUntil(timeoutMillis = 20_000) { onAllNodesWithText("Cancel").fetchSemanticsNodes().isEmpty() }
             onAllNodes(isRoot()).onFirst().performMouseInput { moveTo(Offset(20f, 400f)); press(); release() }

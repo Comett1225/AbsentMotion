@@ -904,6 +904,8 @@
     <string name="project_too_many_linked">Bu proje çok fazla bağlı öğe içeriyor.</string>
     <string name="media_error_read_frames">Bu telefon bu videonun karelerini okuyamıyor</string>
     <string name="media_error_pixel_format">Bu video okunamayan bir piksel biçimi kullanıyor</string>
+    <string name="media_error_windows_media">Bu Mac, Windows Media dosyalarını (WMA, WMV, ASF) açamıyor: macOS\'ta bunlar için kod çözücü yok.</string>
+    <string name="media_error_mpeg4_asp">Bu DivX veya Xvid videosu, macOS\'un oynatamadığı özellikler (B kareleri gibi) kullanıyor. Ses çalıyor ama görüntü yok.</string>
     <string name="media_error_video_unavailable">Video kullanılamıyor: %1$s</string>
     <string name="media_error_decode_frame">Tam video karesi %1$s çözülemiyor</string>
     <string name="media_error_import_frame">%2$s için %1$s video karesi içe aktarılamıyor</string>

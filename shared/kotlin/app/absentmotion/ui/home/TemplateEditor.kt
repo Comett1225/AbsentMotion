@@ -239,7 +239,7 @@ fun TemplateEditor(templateId: String, engine: EngineThread, settings: AppSettin
             val media = mediaDeclaration(context, uri)
             val duration = (media?.duration ?: -1) / 1000
             when {
-                media == null -> Toast.makeText(context, context.getString(R.string.library_err_unsupported_type), Toast.LENGTH_SHORT).show()
+                media == null -> Toast.makeText(context, app.absentmotion.platform.mediaTrouble(context, uri) ?: context.getString(R.string.library_err_unsupported_type), Toast.LENGTH_SHORT).show()
                 !media.type.startsWith("video/") -> choose(slot, media, 0)
                 !slot.loop && slot.length - 300 > duration -> { frozen = true; choose(slot, media, 0) }
                 slot.length + 600 < duration -> { trimStart = 0; playing = false; trimming = Trimming(slot, media) }

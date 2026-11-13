@@ -894,6 +894,8 @@
     <string name="project_too_many_linked">Dự án này nhúng quá nhiều phần tử được liên kết.</string>
     <string name="media_error_read_frames">Điện thoại này không thể đọc khung hình của video này</string>
     <string name="media_error_pixel_format">Video này dùng định dạng pixel không thể đọc được</string>
+    <string name="media_error_windows_media">Máy Mac này không mở được tệp Windows Media (WMA, WMV, ASF): macOS không có bộ giải mã cho chúng.</string>
+    <string name="media_error_mpeg4_asp">Video DivX hoặc Xvid này dùng các tính năng (như khung hình B) mà macOS không phát được. Âm thanh vẫn phát, nhưng không có hình.</string>
     <string name="media_error_video_unavailable">Video không khả dụng: %1$s</string>
     <string name="media_error_decode_frame">Không thể giải mã đúng khung hình video %1$s</string>
     <string name="media_error_import_frame">Không thể nhập khung hình video %1$s cho %2$s</string>

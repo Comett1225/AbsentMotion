@@ -47,7 +47,7 @@ class ExportTimingTest {
     private fun ffmpeg(args: List<String>, frames: List<ByteArray>, count: Int): Long {
         val log = out.resolve("ffmpeg.log")
         val started = System.nanoTime()
-        val process = ProcessBuilder(listOf(DeskMedia.ffmpeg, "-hide_banner", "-v", "error") + args).redirectError(log).redirectOutput(ProcessBuilder.Redirect.DISCARD).start()
+        val process = ProcessBuilder(listOf(app.absentmotion.Judge.ffmpeg, "-hide_banner", "-v", "error") + args).redirectError(log).redirectOutput(ProcessBuilder.Redirect.DISCARD).start()
         process.outputStream.buffered(1 shl 20).use { stdin -> for (k in 0 until count) stdin.write(frames[k % frames.size]) }
         check(process.waitFor() == 0) { log.readText() }
         return System.nanoTime() - started

@@ -917,6 +917,8 @@
     <string name="project_too_many_linked">This project embeds too many linked elements.</string>
     <string name="media_error_read_frames">This phone cannot read the frames of this video</string>
     <string name="media_error_pixel_format">This video uses a pixel format that cannot be read</string>
+    <string name="media_error_windows_media">This Mac cannot open Windows Media files (WMA, WMV, ASF): macOS has no decoder for them.</string>
+    <string name="media_error_mpeg4_asp">This DivX or Xvid video uses features (such as B-frames) that macOS cannot play. The sound plays, but there is no picture.</string>
     <string name="media_error_video_unavailable">Video is unavailable: %1$s</string>
     <string name="media_error_decode_frame">Cannot decode exact video frame %1$s</string>
     <string name="media_error_import_frame">Cannot import video frame %1$s for %2$s</string>

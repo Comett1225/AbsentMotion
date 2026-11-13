@@ -81,7 +81,7 @@ internal suspend fun EditorState.addSounds(context: Context, uris: List<Uri>) {
     try {
         for (uri in uris) {
             val media = audioDeclaration(context, uri)?.let { keepCopy(context, it) }
-            if (media == null || media.duration <= 0) Toast.makeText(context, AppText.get(R.string.library_err_unsupported_type), Toast.LENGTH_LONG).show()
+            if (media == null || media.duration <= 0) Toast.makeText(context, app.absentmotion.platform.mediaTrouble(context, uri) ?: AppText.get(R.string.library_err_unsupported_type), Toast.LENGTH_LONG).show()
             else addAudio(media)
         }
     } finally { addingMedia = false }

@@ -924,6 +924,8 @@
     <string name="project_too_many_linked">Ten projekt zawiera zbyt wiele osadzonych połączonych elementów.</string>
     <string name="media_error_read_frames">Ten telefon nie może odczytać klatek tego wideo</string>
     <string name="media_error_pixel_format">To wideo używa formatu pikseli, którego nie można odczytać</string>
+    <string name="media_error_windows_media">Ten Mac nie może otworzyć plików Windows Media (WMA, WMV, ASF): macOS nie ma dla nich dekodera.</string>
+    <string name="media_error_mpeg4_asp">To wideo DivX lub Xvid używa funkcji (takich jak klatki B), których macOS nie potrafi odtworzyć. Dźwięk jest odtwarzany, ale nie ma obrazu.</string>
     <string name="media_error_video_unavailable">Wideo jest niedostępne: %1$s</string>
     <string name="media_error_decode_frame">Nie można zdekodować dokładnej klatki wideo %1$s</string>
     <string name="media_error_import_frame">Nie można zaimportować klatki wideo %1$s dla %2$s</string>

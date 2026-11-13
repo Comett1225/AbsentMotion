@@ -894,6 +894,8 @@
     <string name="project_too_many_linked">이 프로젝트에 포함된 연결 요소가 너무 많습니다.</string>
     <string name="media_error_read_frames">이 휴대전화에서 동영상의 프레임을 읽을 수 없습니다</string>
     <string name="media_error_pixel_format">이 동영상은 읽을 수 없는 픽셀 형식을 사용합니다</string>
+    <string name="media_error_windows_media">이 Mac에서는 Windows Media 파일(WMA, WMV, ASF)을 열 수 없습니다. macOS에 해당 디코더가 없습니다.</string>
+    <string name="media_error_mpeg4_asp">이 DivX 또는 Xvid 동영상은 macOS에서 재생할 수 없는 기능(B 프레임 등)을 사용합니다. 소리는 재생되지만 화면은 나오지 않습니다.</string>
     <string name="media_error_video_unavailable">동영상을 사용할 수 없습니다: %1$s</string>
     <string name="media_error_decode_frame">동영상 프레임 %1$s을(를) 정확히 디코딩할 수 없습니다</string>
     <string name="media_error_import_frame">%2$s에 사용할 동영상 프레임 %1$s을(를) 가져올 수 없습니다</string>

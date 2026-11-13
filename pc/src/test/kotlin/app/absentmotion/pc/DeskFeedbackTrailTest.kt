@@ -106,7 +106,7 @@ class DeskFeedbackTrailTest {
         sharp.deleteRecursively()
         sharp.mkdirs()
         runCatching {
-            ProcessBuilder(DeskMedia.ffmpeg, "-v", "error", "-f", "lavfi", "-i", "testsrc2=s=${W}x$H:r=30", "-vf", "loop=loop=35:size=1:start=0", "-frames:v", "36", "-c:v", "libx264", "-crf", "10",
+            ProcessBuilder(app.absentmotion.Judge.ffmpeg, "-v", "error", "-f", "lavfi", "-i", "testsrc2=s=${W}x$H:r=30", "-vf", "loop=loop=35:size=1:start=0", "-frames:v", "36", "-c:v", "libx264", "-crf", "10",
                 "-pix_fmt", "yuv420p", "-y", clip.path).redirectErrorStream(true).start().also { it.inputStream.readBytes() }.waitFor()
         }
         assumeTrue("no encoder to make the test clip", clip.length() > 0)

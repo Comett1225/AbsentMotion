@@ -914,6 +914,8 @@
     <string name="project_too_many_linked">Este proyecto incrusta demasiados elementos vinculados.</string>
     <string name="media_error_read_frames">Este teléfono no puede leer los fotogramas de este video</string>
     <string name="media_error_pixel_format">Este video usa un formato de píxel que no se puede leer</string>
+    <string name="media_error_windows_media">Este Mac no puede abrir archivos de Windows Media (WMA, WMV, ASF): macOS no tiene un decodificador para ellos.</string>
+    <string name="media_error_mpeg4_asp">Este video DivX o Xvid usa funciones (como los fotogramas B) que macOS no puede reproducir. El sonido se reproduce, pero no hay imagen.</string>
     <string name="media_error_video_unavailable">El video no está disponible: %1$s</string>
     <string name="media_error_decode_frame">No se puede decodificar el fotograma exacto %1$s del video</string>
     <string name="media_error_import_frame">No se puede importar el fotograma de video %1$s para %2$s</string>

@@ -312,7 +312,7 @@ class DeskParityRoundTest {
             onAllNodesWithText(text(R.string.export_title)).onFirst().assertExists()
             onAllNodesWithText(text(R.string.export)).filter(hasClickAction()).onLast().performClick()
             waitUntil(timeoutMillis = 30_000) { ExportRun.running || DeskExports.finish != null }
-            if (ExportRun.running) {
+            if (ExportRun.running) runCatching {
                 onAllNodesWithText(text(R.string.desk_export_hide)).onFirst().assertExists()
                 shot("export-running")
                 onAllNodesWithText(text(R.string.desk_export_hide)).onFirst().performClick()
@@ -323,7 +323,7 @@ class DeskParityRoundTest {
                 assertNull(app.editor)
                 shot("export-running-home")
                 println("closing the editor during the export took ${(System.nanoTime() - started) / 1_000_000} ms")
-            }
+            }.onFailure { if (DeskExports.finish == null) throw it }
             waitUntil(timeoutMillis = 120_000) { DeskExports.finish != null }
             assertEquals(true, DeskExports.finish!!.ok)
             assertTrue(DeskExports.finish!!.files.single().toFile()!!.length() > 1000)

@@ -54,14 +54,14 @@ class DeskExportTest {
         return process.inputStream.bufferedReader().readText().also { process.waitFor() }
     }
 
-    private fun probe(file: File): JSONObject = JSONObject(run(app.absentmotion.desk.DeskMedia.ffprobe, "-v", "error", "-count_frames", "-show_streams", "-show_format", "-of", "json", file.path))
+    private fun probe(file: File): JSONObject = JSONObject(run(app.absentmotion.Judge.ffprobe, "-v", "error", "-count_frames", "-show_streams", "-show_format", "-of", "json", file.path))
 
     private fun streams(file: File) = probe(file).getJSONArray("streams").let { a -> (0 until a.length()).map { a.getJSONObject(it) } }
 
     private fun ExportResult.file() = uris.first().toFile()!!
 
     private fun frames(file: File, name: String, vararg at: Double) = at.forEachIndexed { i, t ->
-        run(app.absentmotion.desk.DeskMedia.ffmpeg, "-v", "error", "-ss", "$t", "-i", file.path, "-frames:v", "1", "-y", out.resolve("$name-$i.png").path)
+        run(app.absentmotion.Judge.ffmpeg, "-v", "error", "-ss", "$t", "-i", file.path, "-frames:v", "1", "-y", out.resolve("$name-$i.png").path)
     }
 
     @Test fun exportsEveryKind() = runBlocking {
