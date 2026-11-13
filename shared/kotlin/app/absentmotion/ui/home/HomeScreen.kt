@@ -5,6 +5,8 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.geometry.Size
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.awaitHorizontalTouchSlopOrCancellation
+import androidx.compose.foundation.gestures.horizontalDrag
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.ui.composed
 import androidx.compose.ui.unit.toSize
@@ -34,6 +36,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -72,7 +75,7 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -94,6 +97,7 @@ import androidx.compose.ui.graphics.TransformOrigin
 import app.absentmotion.platform.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInRoot
@@ -186,7 +190,7 @@ fun HomeScreen(
     var version by remember { mutableIntStateOf(0) }
     var tab by rememberSaveable { mutableIntStateOf(lastTab) }
     var page by rememberSaveable { mutableIntStateOf(lastPage) }
-    SideEffect { lastTab = tab; lastPage = page }
+    DisposableEffect(Unit) { onDispose { lastTab = tab; lastPage = page } }
     var creating by remember { mutableStateOf(false) }
     var opening by remember { mutableIntStateOf(0) }
     var initialElement by remember { mutableStateOf(false) }
@@ -216,12 +220,14 @@ fun HomeScreen(
         if (toReport.isEmpty()) onImportShown()
     }
 
+    val rtl = androidx.compose.ui.platform.LocalLayoutDirection.current == LayoutDirection.Rtl
     ModalNavigationDrawer(
         drawerContent = { SettingsDrawer(settings, drawer, onRestored = { version++ }) },
         drawerState = drawer,
         scrimColor = Color.Black.copy(alpha = 0.94f),
+        gesturesEnabled = drawer.isOpen,
     ) {
-        Box(Modifier.fillMaxSize().background(Am.HomeBg)) {
+        Box(Modifier.fillMaxSize().background(Am.HomeBg).halfSwipeOpens(page != 3, rtl) { scope.launch { drawer.open() } }) {
             Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars.union(WindowInsets.captionBar))) {
                 TopBar(onMenu = { scope.launch { drawer.open() } }, search, page, { search = it }, settings)
                 val fill = Modifier.weight(1f)
@@ -255,6 +261,24 @@ fun HomeScreen(
                     onOpen = { id -> lastScroll.fill(0); version++; onOpen(id) },
                 )
             }
+        }
+    }
+}
+
+private fun Modifier.halfSwipeOpens(enabled: Boolean, rtl: Boolean, onOpen: () -> Unit): Modifier = if (!enabled) this else pointerInput(rtl) {
+    val needed = 48.dp.toPx()
+    awaitEachGesture {
+        val down = awaitFirstDown(requireUnconsumed = false)
+        if ((down.position.x < size.width / 2f) == rtl) return@awaitEachGesture
+        var moved = 0f
+        val start = awaitHorizontalTouchSlopOrCancellation(down.id) { change, over ->
+            if ((over > 0f) != rtl) { change.consume(); moved = over }
+        } ?: return@awaitEachGesture
+        var opened = false
+        horizontalDrag(start.id) { change ->
+            moved += change.positionChange().x
+            change.consume()
+            if (!opened && (if (rtl) -moved else moved) > needed) { opened = true; onOpen() }
         }
     }
 }
@@ -425,19 +449,24 @@ private fun ImportDialog(reports: List<ImportReport>, onDismiss: () -> Unit, onO
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.import_complete), color = Am.Navy) },
         text = {
-            Column(Modifier.verticalScroll(rememberScrollState())) {
-                for (report in reports) {
-                    report.community?.let { CommunityCard(it) }
-                    if (reports.size > 1 && report.community == null) Text(report.title, Modifier.padding(top = 8.dp), color = Am.Navy, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                    for ((heading, lines) in report.sections) {
-                        Text(heading.text(), Modifier.padding(top = 8.dp), color = Am.Navy, fontSize = 15.sp, fontWeight = FontWeight.Medium)
-                        for (line in lines) Text("\u2022 ${line.text()}", color = Am.Navy, fontSize = 14.sp, lineHeight = 19.sp)
+            Column {
+                Column(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState())) {
+                    for (report in reports) {
+                        report.community?.let { CommunityCard(it) }
+                        if (reports.size > 1 && report.community == null) Text(report.title, Modifier.padding(top = 8.dp), color = Am.Navy, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        for ((heading, lines) in report.sections) {
+                            Text(heading.text(), Modifier.padding(top = 8.dp), color = Am.Navy, fontSize = 15.sp, fontWeight = FontWeight.Medium)
+                            for (line in lines) Text("\u2022 ${line.text()}", color = Am.Navy, fontSize = 14.sp, lineHeight = 19.sp)
+                        }
                     }
+                }
+                Row(Modifier.fillMaxWidth().padding(top = 16.dp).height(androidx.compose.foundation.layout.IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    BigButton(stringResource(R.string.ok), Modifier.weight(1f).fillMaxHeight(), primary = false, onClick = onDismiss)
+                    BigButton(stringResource(R.string.open), Modifier.weight(1f).fillMaxHeight(), onClick = onOpen)
                 }
             }
         },
-        dismissButton = { TextButton(onDismiss) { Text(stringResource(R.string.ok), color = Am.Navy) } },
-        confirmButton = { TextButton(onOpen) { Text(stringResource(R.string.open), color = Am.Navy) } },
+        confirmButton = {},
         containerColor = Am.Card,
     )
 }
