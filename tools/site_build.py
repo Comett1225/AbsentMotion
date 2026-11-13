@@ -432,10 +432,11 @@ class Site:
                 '<header class="top"><a class="brand" href="%sindex.html"><img src="%sassets/logo.png" width="32" height="32" alt="">AbsentMotion</a>'
                 '<nav class="main" aria-label="Main"><a href="%sindex.html"%s>Download</a><a href="%sguide.html"%s>Guide</a>'
                 '<a href="%seffects/index.html"%s>Effects</a><a href="%sphone-checker.html"%s>Phone checker</a>'
-                '<a href="%s" rel="noopener">Source</a></nav></header>'
+                '<a href="%sroadmap.html"%s>Roadmap</a><a href="%s" rel="noopener">Source</a></nav></header>'
             ) % (
                 base, base, base, ' aria-current="page"' if current == "download" else "", base, ' aria-current="page"' if current == "guide" else "",
-                base, ' aria-current="page"' if current == "effects" else "", base, ' aria-current="page"' if current == "phone-checker" else "", REPO)
+                base, ' aria-current="page"' if current == "effects" else "", base, ' aria-current="page"' if current == "phone-checker" else "",
+                base, ' aria-current="page"' if current == "roadmap" else "", REPO)
         else:
             top = '<header class="top appbar"><nav class="main" aria-label="%s"><a href="%sindex.html">%s</a><a href="%seffects/index.html">%s</a></nav></header>' % (
                 self.t("Help"), base, self.t("Contents"), base, self.t("Effects"))
