@@ -1,19 +1,16 @@
 package app.absentmotion.desk
 
+import app.absentmotion.media.MediaEngine
 import app.absentmotion.pc.platform.DesktopPlatform
 import java.awt.image.BufferedImage
 import java.io.File
-import javax.imageio.ImageIO
 
 object DeskMedia {
     val ffmpeg get() = DesktopPlatform.executable("ffmpeg")
     val ffprobe get() = DesktopPlatform.executable("ffprobe")
 
     fun probe(file: File): Map<String, String> = runCatching {
-        val process = ProcessBuilder(ffprobe, "-v", "error", "-show_entries", "stream=codec_type,width,height:stream_tags=rotate:stream_side_data=rotation:format=duration:format_tags=title,artist,album", "-of", "json", file.path)
-            .redirectError(ProcessBuilder.Redirect.DISCARD).start()
-        val json = org.json.JSONObject(process.inputStream.bufferedReader().readText())
-        process.waitFor()
+        val json = org.json.JSONObject(MediaEngine.current.probe(file, "stream=codec_type,width,height:stream_tags=rotate:stream_side_data=rotation:format=duration:format_tags=title,artist,album"))
         val out = HashMap<String, String>()
         val streams = json.optJSONArray("streams")
         for (i in 0 until (streams?.length() ?: 0)) {
@@ -30,12 +27,5 @@ object DeskMedia {
         out
     }.getOrDefault(emptyMap())
 
-    fun frame(file: File, timeMs: Long, maxSide: Int): BufferedImage? = runCatching {
-        val process = ProcessBuilder(ffmpeg, "-v", "error", "-ss", "%.3f".format(java.util.Locale.ROOT, timeMs / 1000.0), "-i", file.path, "-frames:v", "1",
-            "-vf", "scale='min($maxSide,iw)':'min($maxSide,ih)':force_original_aspect_ratio=decrease", "-f", "image2pipe", "-vcodec", "png", "-")
-            .redirectError(ProcessBuilder.Redirect.DISCARD).start()
-        val bytes = process.inputStream.readBytes()
-        process.waitFor()
-        ImageIO.read(bytes.inputStream())
-    }.getOrNull()
+    fun frame(file: File, timeMs: Long, maxSide: Int): BufferedImage? = runCatching { MediaEngine.current.still(file, timeMs, maxSide) }.getOrNull()
 }

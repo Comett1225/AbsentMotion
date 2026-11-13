@@ -75,9 +75,10 @@ class DeskAudioTest {
 
     @Test fun decoderMatchesFfmpeg() {
         val (pcm, _) = decodeAll(a)
-        val ref = floats("-i", a.path, "-ac", "2")
+        val apple = app.absentmotion.desk.DeskOs.mac
+        val ref = floats(*(if (apple) arrayOf("-c:a", "aac_at") else emptyArray()), "-i", a.path, "-ac", "2")
         assertEquals(ref.size, pcm.size)
-        assertTrue(ref.indices.all { pcm[it] == toShort(ref[it]) })
+        assertTrue(ref.indices.all { abs(pcm[it] - toShort(ref[it])) <= if (apple) 1 else 0 })
         val (mono, _) = decodeAll(b)
         val refMono = floats("-i", b.path)
         assertEquals(refMono.size * 2, mono.size)
@@ -105,13 +106,13 @@ class DeskAudioTest {
     }
 
     @Test fun delayedSoundKeepsItsPlaceOnTheVideoTimeline() {
-        val late = File(dir, "late.mkv").also {
+        val late = File(dir, "late-264.mkv").also {
             if (!it.isFile) ffmpeg("-f", "lavfi", "-i", "color=c=red:s=64x64:r=25:d=3", "-itsoffset", "1", "-f", "lavfi", "-i", "sine=frequency=440:sample_rate=48000:duration=2",
-                "-map", "0:v", "-map", "1:a", "-c:v", "mpeg4", "-c:a", "flac", it.path)
+                "-map", "0:v", "-map", "1:a", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "flac", it.path)
         }
-        val early = File(dir, "early.mkv").also {
+        val early = File(dir, "early-264.mkv").also {
             if (!it.isFile) ffmpeg("-itsoffset", "0.5", "-f", "lavfi", "-i", "color=c=red:s=64x64:r=25:d=3", "-f", "lavfi", "-i", "aevalsrc=if(gte(t\\,0.7)\\,0.25*sin(2*PI*440*t)\\,0):s=48000:d=3",
-                "-map", "0:v", "-map", "1:a", "-c:v", "mpeg4", "-c:a", "flac", it.path)
+                "-map", "0:v", "-map", "1:a", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "flac", it.path)
         }
         fun near(expected: Pair<Long, Long>, got: Pair<Long, Long>) =
             assertTrue("expected $expected, got $got", got.first == expected.first && abs(got.second - expected.second) <= 1_000)

@@ -7,6 +7,7 @@ import java.io.InputStream
 interface VideoSource : AutoCloseable {
     val info: VideoInfo
     fun frame(timeMs: Long): VideoFrame?
+    fun frameExact(timeUs: Long): VideoFrame?
 }
 
 data class VideoInfo(val width: Int, val height: Int, val durationMs: Long, val fps: Double)
@@ -87,7 +88,7 @@ class FfmpegVideoSource(private val file: File, private val ffmpeg: String, ffpr
         return VideoFrame(width, height, bytes)
     }
 
-    fun frameExact(timeUs: Long): VideoFrame? {
+    override fun frameExact(timeUs: Long): VideoFrame? {
         exactFrames[timeUs]?.let { return it }
         val seconds = String.format(java.util.Locale.ROOT, "%.6f", (timeUs - 1).coerceAtLeast(0) / 1_000_000.0)
         val process = ProcessBuilder(ffmpeg, "-nostdin", "-v", "error", "-ss", seconds, "-noautorotate", "-i", file.absolutePath,

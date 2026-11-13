@@ -1,7 +1,12 @@
 # macos
 
-What only macOS uses: Metal for the engine (`native/gpu_metal.mm`), VideoToolbox video frames (`native/video_mac.mm`), the
-sound output delay (`native/audio_mac.cpp`), the native build (`build.sh`, using `native/macos.cmake`) and the app icon.
+What only macOS uses: Metal for the engine (`native/gpu_metal.mm`), the media engine on FFamp (`native/video_ffamp.mm` for the
+preview decoder, `native/media_ffamp.cpp` for describing files, sound and frames; FFamp is the submodule `../third_party/FFamp`),
+the sound output delay (`native/audio_mac.cpp`), the native build (`build.sh`, using `native/macos.cmake`) and the app icon.
+
+The native library links no FFmpeg. Reading and playing media goes through FFamp; export and the tools still start the `ffmpeg`
+and `ffprobe` programs until they move too. FFamp uses libopus, LAME, mpg123, libvorbis, libogg, liboapv, dav1d, libvpx and SVT-AV1
+when CMake finds them (Homebrew on a developer's Mac; `FFAMP_DEPS=<prefix>` puts another prefix first).
 
 Needs Skia built for macOS in `../third_party/skia/out/mac-v2-2-arm64` (Apple silicon) or `out/mac-x64` (Intel, same
 `args.gn` with `target_cpu = "x64"`). `cd ../pc && ./gradlew createDistributable` makes `AbsentMotion.app` for this Mac

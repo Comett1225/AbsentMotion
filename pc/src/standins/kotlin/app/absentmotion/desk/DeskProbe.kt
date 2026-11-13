@@ -32,10 +32,7 @@ class DeskProbe(val streams: List<DeskStream>, val durationUs: Long, val tags: M
             val stamp = "${file.length()}:${file.lastModified()}"
             cache[file.path]?.takeIf { it.first == stamp }?.let { return it.second }
             if (!file.isFile) throw java.io.FileNotFoundException(file.path)
-            val process = ProcessBuilder(DeskMedia.ffprobe, "-v", "error", "-show_streams", "-show_format", "-of", "json", file.path)
-                .redirectError(ProcessBuilder.Redirect.DISCARD).start()
-            val text = process.inputStream.bufferedReader().readText()
-            process.waitFor()
+            val text = app.absentmotion.media.MediaEngine.current.probe(file)
             return parse(JSONObject(text.ifBlank { "{}" })).also { cache[file.path] = stamp to it }
         }
 

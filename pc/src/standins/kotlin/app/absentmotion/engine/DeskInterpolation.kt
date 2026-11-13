@@ -3,7 +3,6 @@ package app.absentmotion.engine
 import android.content.Context
 import android.net.Uri
 import app.absentmotion.ai.AiSmooth
-import app.absentmotion.desk.DeskMedia
 import app.absentmotion.export.FrameInterpolation
 import app.absentmotion.export.MotionBlur
 import app.absentmotion.export.SmoothLevel
@@ -19,11 +18,12 @@ import app.absentmotion.model.localMs
 import app.absentmotion.model.exportFrameMs
 import app.absentmotion.model.moshPlan
 import app.absentmotion.model.layerTracks
-import app.absentmotion.pc.engine.FfmpegVideoSource
+import app.absentmotion.media.MediaEngine
+import app.absentmotion.pc.engine.VideoSource
 import java.io.Closeable
 
 internal class DeskInterpolation(private val context: Context, private val smoothing: Smoothing, private val fps: Int, private var net: AiSmooth?) : Closeable {
-    private val readers = HashMap<String, FfmpegVideoSource>()
+    private val readers = HashMap<String, VideoSource>()
     private val stamps = HashMap<String, LongArray>()
     private val variableRates = HashMap<String, Boolean>()
 
@@ -43,7 +43,7 @@ internal class DeskInterpolation(private val context: Context, private val smoot
             val around = layer.pairAround(mapped, childScene, times) ?: continue
             val interpolate = smoothing.method != FrameInterpolation.Off && layer.needs(around, mapped, childScene, fps, position.rate)
             if (!interpolate && smoothing.blur == MotionBlur.Off && (smoothing.method == FrameInterpolation.Off || fps == childScene.fps && position.rate == 1.0)) continue
-            val reader = readers.getOrPut(fill.uri) { FfmpegVideoSource(file, DeskMedia.ffmpeg, DeskMedia.ffprobe, 8192, 16_000_000) }
+            val reader = readers.getOrPut(fill.uri) { MediaEngine.current.videoSource(file, 8192, 16_000_000) }
             val variable = variableRates.getOrPut(fill.uri) { times.variableRate() }
             fun read(stamp: Long) = if (variable) reader.frameExact(stamp) else reader.frame((stamp + 999) / 1000)
             if (!interpolate && smoothing.blur == MotionBlur.Off) {

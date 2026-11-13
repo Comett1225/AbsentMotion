@@ -218,11 +218,10 @@ private fun streamFrames(file: File, facts: Map<String, String>, fromMs: Long, s
     val scale = minOf(1.0, ViewerSide.toDouble() / maxOf(sw, sh))
     val w = maxOf(2, (sw * scale).toInt() and 1.inv())
     val h = maxOf(2, (sh * scale).toInt() and 1.inv())
-    val process = ProcessBuilder(DeskMedia.ffmpeg, "-v", "error", "-ss", "%.3f".format(Locale.ROOT, fromMs / 1000.0), "-re", "-i", file.path, "-an", "-vf", "scale=$w:$h", "-f", "rawvideo", "-pix_fmt", "rgba", "-")
-        .redirectError(ProcessBuilder.Redirect.DISCARD).start()
+    val stream = app.absentmotion.media.MediaEngine.current.play(file, fromMs, w, h, false)
     try {
         val info = ImageInfo(w, h, ColorType.RGBA_8888, ColorAlphaType.UNPREMUL)
-        val input = process.inputStream
+        val input = stream.input
         val started = System.nanoTime()
         while (true) {
             val bytes = input.readNBytes(w * h * 4)
@@ -231,6 +230,6 @@ private fun streamFrames(file: File, facts: Map<String, String>, fromMs: Long, s
             if (!show(org.jetbrains.skia.Image.makeRaster(info, bytes, w * 4).toComposeImageBitmap(), at)) return
         }
     } finally {
-        process.destroyForcibly()
+        stream.close()
     }
 }

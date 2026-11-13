@@ -13,7 +13,6 @@ import androidx.compose.ui.graphics.asComposeImageBitmap
 import androidx.compose.ui.unit.IntSize
 import app.absentmotion.R
 import app.absentmotion.audio.AudioEngine
-import app.absentmotion.desk.DeskMedia
 import app.absentmotion.effects.EffectCatalog
 import app.absentmotion.fonts.FontLibrary
 import app.absentmotion.fonts.prepareText
@@ -31,7 +30,6 @@ import app.absentmotion.model.modelUris
 import app.absentmotion.model.layerTracks
 import app.absentmotion.media.loadModel
 import app.absentmotion.model.videoTimeUs
-import app.absentmotion.pc.engine.FfmpegVideoSource
 import app.absentmotion.pc.engine.NativeVideoSource
 import app.absentmotion.pc.engine.VideoSource
 import kotlinx.coroutines.CoroutineScope
@@ -235,7 +233,7 @@ class EngineThread(private val background: Int, private val context: Context? = 
         }
         for (uri in clips) {
             if (videos.containsKey(uri)) continue
-            val source = file(uri)?.let { f -> runCatching { NativeVideoSource(f) }.getOrNull() ?: runCatching { FfmpegVideoSource(f, DeskMedia.ffmpeg, DeskMedia.ffprobe) }.getOrNull() } ?: continue
+            val source = file(uri)?.let { f -> runCatching { NativeVideoSource(f) }.getOrNull() ?: runCatching { app.absentmotion.media.MediaEngine.current.videoSource(f) }.getOrNull() } ?: continue
             var handed = false
             try { withContext(dispatcher) { handed = true; if (closed) source.close() else videos[uri] = source } } finally { if (!handed) source.close() }
         }

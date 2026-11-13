@@ -80,6 +80,7 @@ class DeskAiTest {
                 }
                 return sum
             }
+            assumeReadable(output.media.file)
             for (at in listOf(100L, 1100L, 2100L, 3100L, 4100L)) {
                 val expected = DeskMedia.frame(input, video.durationUs / 1000 - at, 128)!!
                 val wrong = DeskMedia.frame(input, at, 128)!!

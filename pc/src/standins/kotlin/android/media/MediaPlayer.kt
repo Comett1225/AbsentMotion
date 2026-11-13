@@ -5,7 +5,8 @@ import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import app.absentmotion.audio.DeskOutput
-import app.absentmotion.desk.DeskMedia
+import app.absentmotion.media.MediaEngine
+import app.absentmotion.media.MediaStream
 import app.absentmotion.desk.DeskOs
 import app.absentmotion.desk.DeskProbe
 import java.io.File
@@ -102,17 +103,15 @@ open class MediaPlayer {
         if (isLooping) start() else completed?.onCompletion(this)
     }
 
-    private class Playback(val process: Process, val line: SourceDataLine) {
-        fun close() { process.destroy(); runCatching { line.close() } }
+    private class Playback(val stream: MediaStream, val line: SourceDataLine) {
+        fun close() { stream.close(); runCatching { line.close() } }
 
         companion object {
             fun open(source: File, fromMs: Long): Playback {
                 val rate = DeskOutput.nativeRate
-                val command = listOf(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-ss", "%.3f".format(java.util.Locale.ROOT, fromMs / 1000.0), "-i", source.path,
-                    "-map", "0:a:0", "-vn", "-ar", "$rate", "-ac", "2", "-f", "s16le", "-")
-                val started = ProcessBuilder(command).redirectError(ProcessBuilder.Redirect.DISCARD).start()
+                val started = MediaEngine.current.playback(source, fromMs, rate)
                 val format = AudioFormat(rate.toFloat(), 16, 2, true, false)
-                val line = runCatching { AudioSystem.getSourceDataLine(format).apply { open(format, rate * 100 / 1000 * 4) } }.getOrElse { started.destroy(); throw it }
+                val line = runCatching { AudioSystem.getSourceDataLine(format).apply { open(format, rate * 100 / 1000 * 4) } }.getOrElse { started.close(); throw it }
                 return Playback(started, line)
             }
         }
@@ -121,7 +120,7 @@ open class MediaPlayer {
     private inner class Runner(private val source: File, private val probe: DeskProbe, private val fromMs: Long, private val ready: Playback? = null) : Thread("am-media-player") {
         @Volatile var done = false
         @Volatile private var line: SourceDataLine? = null
-        @Volatile private var process: Process? = null
+        @Volatile private var stream: MediaStream? = null
         @Volatile private var began = 0L
         private val rate = DeskOutput.nativeRate
 
@@ -135,7 +134,7 @@ open class MediaPlayer {
         fun finish(): Long {
             val at = positionMs()
             done = true
-            process?.destroy()
+            stream?.close()
             interrupt()
             return at
         }
@@ -151,16 +150,15 @@ open class MediaPlayer {
             } catch (_: Exception) {
             } finally {
                 runCatching { line?.close() }
-                process?.destroy()
+                stream?.close()
                 if (!done) { done = true; finished(this) }
             }
         }
 
         private fun play() {
             val playback = ready ?: Playback.open(source, fromMs)
-            val started = playback.process
-            process = started
-            val input = started.inputStream.buffered(1 shl 16)
+            stream = playback.stream
+            val input = playback.stream.input
             val out = playback.line
             line = out
             val buf = ByteArray(4096)

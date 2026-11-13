@@ -2,7 +2,6 @@ package app.absentmotion.engine
 
 import android.content.Context
 import android.net.Uri
-import app.absentmotion.desk.DeskMedia
 import app.absentmotion.media.VideoSources
 import app.absentmotion.media.ptsAt
 import app.absentmotion.model.Layer
@@ -10,11 +9,12 @@ import app.absentmotion.model.Scene
 import app.absentmotion.model.VideoTiming
 import app.absentmotion.model.moshPlan
 import app.absentmotion.model.videoTimeUs
-import app.absentmotion.pc.engine.FfmpegVideoSource
+import app.absentmotion.media.MediaEngine
+import app.absentmotion.pc.engine.VideoSource
 import java.io.Closeable
 
 internal class DeskMosh(private val context: Context) : Closeable {
-    private val readers = HashMap<String, FfmpegVideoSource>()
+    private val readers = HashMap<String, VideoSource>()
     private val stamps = HashMap<String, LongArray>()
     private val variableRates = HashMap<String, Boolean>()
 
@@ -30,7 +30,7 @@ internal class DeskMosh(private val context: Context) : Closeable {
         val pts = requests.map { times.ptsAt(it) }.toLongArray()
         val from = engine.moshStart(uri, layer.id, pts, plan.params)
         if (from < 0) return fail()
-        val reader = readers.getOrPut(uri) { FfmpegVideoSource(file, DeskMedia.ffmpeg, DeskMedia.ffprobe, 1920, 4_000_000) }
+        val reader = readers.getOrPut(uri) { MediaEngine.current.videoSource(file, 1920, 4_000_000) }
         val variable = variableRates.getOrPut(uri) { times.variableRate() }
         for (step in from until pts.size) {
             val frame = (if (variable) reader.frameExact(pts[step]) else reader.frame((pts[step] + 999) / 1000)) ?: return fail()

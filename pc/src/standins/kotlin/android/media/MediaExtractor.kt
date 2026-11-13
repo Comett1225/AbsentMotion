@@ -2,7 +2,7 @@ package android.media
 
 import android.content.Context
 import android.net.Uri
-import app.absentmotion.desk.DeskMedia
+import app.absentmotion.media.MediaEngine
 import app.absentmotion.desk.DeskProbe
 import app.absentmotion.desk.DeskStream
 import java.io.File
@@ -72,15 +72,7 @@ open class MediaExtractor {
         val list = ArrayList<Sample>()
         for (track in selected) {
             val stream = streams[track]
-            val process = ProcessBuilder(DeskMedia.ffprobe, "-v", "error", "-select_streams", "${stream.index}",
-                "-show_entries", "packet=pts_time,dts_time,size,pos,flags", "-of", "compact=p=0", source.path)
-                .redirectError(ProcessBuilder.Redirect.DISCARD).start()
-            process.inputStream.bufferedReader().forEachLine { line ->
-                val kv = line.split('|').associate { it.substringBefore('=') to it.substringAfter('=') }
-                val time = (kv["pts_time"]?.toDoubleOrNull() ?: kv["dts_time"]?.toDoubleOrNull() ?: return@forEachLine)
-                list += Sample(track, Math.round(time * 1_000_000) - stream.startUs, kv["size"]?.toIntOrNull() ?: 0, kv["flags"]?.startsWith("K") == true)
-            }
-            process.waitFor()
+            MediaEngine.current.packets(source, stream.index).forEach { list += Sample(track, Math.round(it.seconds * 1_000_000) - stream.startUs, it.size, it.sync) }
         }
         if (selected.size > 1) list.sortBy { it.timeUs }
         at = 0

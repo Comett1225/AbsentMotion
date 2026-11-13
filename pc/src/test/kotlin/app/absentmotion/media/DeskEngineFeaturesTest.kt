@@ -60,7 +60,7 @@ class DeskEngineFeaturesTest {
     @Test fun exportBlendFlowAndBlurChangeVideo() = runBlocking {
         val video = out.resolve("smooth.mp4")
         val process = ProcessBuilder(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-y", "-i", "../testdata/media/test-video.mp4",
-            "-t", "0.8", "-vf", "scale=64:36,fps=5", "-c:v", "mpeg4", "-an", video.path).start()
+            "-t", "0.8", "-vf", "scale=64:36,fps=5", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-an", video.path).start()
         assertEquals(0, process.waitFor())
         val uri = Uri.fromFile(video).toString()
         val xml = """<scene title="x" width="64" height="36" totalTime="800" fps="10" bgcolor="#ff000000"><media uri="$uri" type="video/mp4" width="64" height="36" duration="800000" fps="5"/><shape id="1" startTime="0" endTime="800" fillType="media" fillVideo="$uri" outTime="800" mediaFillMode="stretch" s=".rect"><transform><location value="32,18,0"/></transform><property name="size" type="vec2" value="32,18"/></shape></scene>"""
@@ -90,7 +90,7 @@ class DeskEngineFeaturesTest {
     @Test fun smoothingKeepsHigherRateSourceFrames() = runBlocking {
         val video = out.resolve("thirty.mp4")
         val process = ProcessBuilder(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-y", "-i", "../testdata/media/test-video.mp4",
-            "-t", "0.5", "-vf", "scale=64:36", "-c:v", "mpeg4", "-an", video.path).start()
+            "-t", "0.5", "-vf", "scale=64:36", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-an", video.path).start()
         assertEquals(0, process.waitFor())
         val uri = Uri.fromFile(video).toString()
         val xml = """<scene title="x" width="64" height="36" totalTime="500" fps="10" bgcolor="#ff000000"><media uri="$uri" type="video/mp4" width="64" height="36" duration="500000" fps="30"/><shape id="1" startTime="0" endTime="500" fillType="media" fillVideo="$uri" outTime="500" mediaFillMode="stretch" s=".rect"><transform><location value="32,18,0"/></transform><property name="size" type="vec2" value="32,18"/></shape></scene>"""
@@ -105,7 +105,7 @@ class DeskEngineFeaturesTest {
     @Test fun nestedVideoIsDrawnAndSmoothed() = runBlocking {
         val video = out.resolve("nested.mp4")
         val process = ProcessBuilder(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-y", "-i", "../testdata/media/test-video.mp4",
-            "-t", "0.8", "-vf", "scale=64:36,fps=5", "-c:v", "mpeg4", "-an", video.path).start()
+            "-t", "0.8", "-vf", "scale=64:36,fps=5", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-an", video.path).start()
         assertEquals(0, process.waitFor())
         val uri = Uri.fromFile(video).toString()
         val xml = """<scene title="x" width="64" height="36" totalTime="800" fps="10" bgcolor="#ff000000"><media uri="$uri" type="video/mp4" width="64" height="36" duration="800000" fps="5"/><embedScene id="2" startTime="0" endTime="800"><transform><location value="32,18,0"/></transform><scene width="64" height="36" totalTime="800" fps="10" retime="off" bgcolor="#00000000"><shape id="1" startTime="0" endTime="800" fillType="media" fillVideo="$uri" outTime="800" mediaFillMode="stretch" s=".rect"><transform><location value="32,18,0"/></transform><property name="size" type="vec2" value="32,18"/></shape></scene></embedScene></scene>"""
@@ -122,13 +122,13 @@ class DeskEngineFeaturesTest {
         val source = File("../testdata/media/test-video.mp4").absoluteFile
         val video = out.resolve("variable.mkv")
         val process = ProcessBuilder(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-y", "-i", source.path, "-vf",
-            "select=eq(n\\,0)+eq(n\\,3)+eq(n\\,12),scale=64:36", "-fps_mode", "vfr", "-c:v", "ffv1", video.path).start()
+            "select=eq(n\\,0)+eq(n\\,3)+eq(n\\,12),scale=64:36", "-fps_mode", "vfr", "-c:v", "libx264", "-pix_fmt", "yuv420p", video.path).start()
         assertEquals(0, process.waitFor())
         val uri = Uri.fromFile(video).toString()
         val timestamps = VideoSources.timestamps(context, uri)
         assertEquals(3, timestamps.size)
         assertTrue(timestamps.variableRate())
-        FfmpegVideoSource(video, DeskMedia.ffmpeg, DeskMedia.ffprobe).use { reader ->
+        MediaEngine.current.videoSource(video).use { reader ->
             val first = reader.frameExact(timestamps[0])!!.rgba
             val second = reader.frameExact(timestamps[1])!!.rgba
             val third = reader.frameExact(timestamps[2])!!.rgba
@@ -180,7 +180,7 @@ class DeskEngineFeaturesTest {
         }
         val video = out.resolve("track.mkv")
         val process = ProcessBuilder(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-y", "-framerate", "5", "-i", out.resolve("track-%d.png").path,
-            "-c:v", "ffv1", video.path).start()
+            "-c:v", "libx264", "-crf", "10", "-pix_fmt", "yuv420p", video.path).start()
         assertEquals(0, process.waitFor())
         FrameReader(context, Uri.fromFile(video).toString()).use { reader ->
             MotionTracker(listOf(Pt(48f, 48f))).use { tracker ->

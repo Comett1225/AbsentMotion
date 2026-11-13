@@ -52,9 +52,7 @@ class DesktopEngine(val assets: File, private val repo: File?, private val bundl
         (used + declared).forEach { (uri, video) ->
             val file = resolve(uri, base) ?: return@forEach
             if (video) {
-                val ffmpeg = DesktopPlatform.executable("ffmpeg")
-                val ffprobe = DesktopPlatform.executable("ffprobe")
-                runCatching { videos[uri] = FfmpegVideoSource(file, ffmpeg, ffprobe) }
+                runCatching { videos[uri] = app.absentmotion.media.MediaEngine.current.videoSource(file) }
             } else DesktopNative.setPicture(handle, uri, file.absolutePath, value.fromAlight)
         }
     }

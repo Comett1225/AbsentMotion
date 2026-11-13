@@ -109,18 +109,17 @@ private fun play(file: File, show: (ImageBitmap) -> Boolean) {
     val scale = minOf(1.0, PreviewSide.toDouble() / maxOf(w0, h0))
     val w = maxOf(2, (w0 * scale).toInt() and 1.inv())
     val h = maxOf(2, (h0 * scale).toInt() and 1.inv())
-    val process = ProcessBuilder(DeskMedia.ffmpeg, "-v", "error", "-re", "-stream_loop", "-1", "-i", file.path, "-an", "-vf", "scale=$w:$h", "-f", "rawvideo", "-pix_fmt", "rgba", "-")
-        .redirectError(ProcessBuilder.Redirect.DISCARD).start()
+    val stream = app.absentmotion.media.MediaEngine.current.play(file, 0, w, h, true)
     try {
         val info = ImageInfo(w, h, ColorType.RGBA_8888, ColorAlphaType.UNPREMUL)
-        val input = process.inputStream
+        val input = stream.input
         while (true) {
             val bytes = input.readNBytes(w * h * 4)
             if (bytes.size < w * h * 4) return
             if (!show(org.jetbrains.skia.Image.makeRaster(info, bytes, w * 4).toComposeImageBitmap())) return
         }
     } finally {
-        process.destroyForcibly()
+        stream.close()
     }
 }
 

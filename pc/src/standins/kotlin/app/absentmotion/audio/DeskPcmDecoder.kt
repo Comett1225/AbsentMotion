@@ -4,13 +4,13 @@ import android.content.Context
 import android.media.AudioFormat
 import android.net.Uri
 import app.absentmotion.R
-import app.absentmotion.desk.DeskMedia
 import app.absentmotion.desk.DeskProbe
 import app.absentmotion.i18n.AppText
 import app.absentmotion.library.openableUri
+import app.absentmotion.media.MediaEngine
+import app.absentmotion.media.MediaStream
 import java.io.Closeable
 import java.io.File
-import java.io.InputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
@@ -32,8 +32,7 @@ internal class PcmDecoder(context: Context, uri: String) : PcmSource {
     private val chunk = PcmChunk()
     private val channels: Int
     private val mix: FloatArray?
-    private var process: Process? = null
-    private var input: InputStream? = null
+    private var stream: MediaStream? = null
     private var fromUs = 0L
     private var frames = 0L
     private var ended = false
@@ -61,7 +60,7 @@ internal class PcmDecoder(context: Context, uri: String) : PcmSource {
 
     override fun next(): PcmChunk? {
         if (ended) return null
-        val source = input ?: start()
+        val source = (stream ?: start()).input
         val frameBytes = 4 * channels
         val want = CHUNK_FRAMES * frameBytes
         if (bytes.size < want) bytes = ByteArray(want)
@@ -77,26 +76,15 @@ internal class PcmDecoder(context: Context, uri: String) : PcmSource {
         return chunk
     }
 
-    private fun start(): InputStream {
-        val command = mutableListOf(DeskMedia.ffmpeg, "-nostdin", "-v", "error")
+    private fun start(): MediaStream {
         val at = fromUs + shiftUs
         val pre = maxOf(0L, at - PREROLL_US)
-        if (pre > 0) command += listOf("-ss", seconds(pre))
-        command += listOf("-i", file.path)
-        if (at > pre) command += listOf("-ss", seconds(at - pre))
-        command += listOf("-map", "0:a:0", "-vn", "-sn", "-dn", "-af", "aresample=async=1:first_pts=0", "-ar", "${chunk.rate}", "-ac", "$channels", "-f", "f32le", "-")
-        val started = ProcessBuilder(command).redirectError(ProcessBuilder.Redirect.DISCARD).start()
-        process = started
-        return started.inputStream.buffered(1 shl 16).also { input = it }
+        return MediaEngine.current.pcm(file, pre, at - pre, chunk.rate, channels).also { stream = it }
     }
 
-    private fun seconds(us: Long) = "%.6f".format(java.util.Locale.ROOT, us / 1e6)
-
     private fun stop() {
-        runCatching { input?.close() }
-        process?.destroy()
-        input = null
-        process = null
+        stream?.close()
+        stream = null
     }
 
     private fun fill(count: Int) {
