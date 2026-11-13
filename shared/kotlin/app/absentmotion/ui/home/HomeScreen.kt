@@ -225,7 +225,7 @@ fun HomeScreen(
             Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars.union(WindowInsets.captionBar))) {
                 TopBar(onMenu = { scope.launch { drawer.open() } }, search, page, { search = it }, settings)
                 val fill = Modifier.weight(1f)
-                if (page == 3) CommunitySoon(fill)
+                if (page == 3) CommunityTab(fill) { onImportFile(Uri.fromFile(it)) }
                 else if (page == 2) ToolsTab(fill, store, settings) { id -> version++; onOpen(id) }
                 else if (page == 1) TemplatesTab(version, onTemplate, onTemplateProject, fill, query) else ProjectsPane(
                     Modifier.weight(1f), shown, loaded, tab, { tab = it }, settings, version, onOpen, onExport, query,
@@ -861,14 +861,5 @@ private object MenuPosition : PopupPositionProvider {
         val fitsBelow = anchorBounds.bottom + popupContentSize.height <= windowSize.height
         val y = if (fitsBelow) anchorBounds.bottom else (anchorBounds.top - popupContentSize.height).coerceAtLeast(0)
         return IntOffset(x, y)
-    }
-}
-
-@Composable
-internal fun CommunitySoon(modifier: Modifier) {
-    Column(modifier.fillMaxWidth().padding(horizontal = 32.dp), Arrangement.Center, Alignment.CenterHorizontally) {
-        Icon(HomeIcons.CommunityTab, null, Modifier.size(40.dp), tint = Am.HomeMid)
-        Text(stringResource(R.string.community_coming), Modifier.padding(top = 14.dp), color = Am.Navy, fontSize = 20.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-        Text(stringResource(R.string.community_coming_note), Modifier.padding(top = 8.dp), color = Am.HomeMid, fontSize = 15.sp, lineHeight = 20.sp, textAlign = TextAlign.Center)
     }
 }

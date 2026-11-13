@@ -190,7 +190,7 @@ internal fun DeskHome(
                     when (section) {
                         DeskSection.Templates -> DeskTemplates(version, query, onTemplate, onTemplateProject)
                         DeskSection.Tools -> ToolsTab(Modifier, store, settings) { id -> version++; onOpen(id) }
-                        DeskSection.Community -> CommunitySoon(Modifier.fillMaxSize())
+                        DeskSection.Community -> CommunityTab(Modifier.fillMaxSize()) { onImportFiles(listOf(Uri.fromFile(it))) }
                         else -> ProjectsPane(
                             shown, loaded, section == DeskSection.Assets, query, settings, version, selected, { selected = it },
                             onOpen = { info -> if (info.damaged) onHistory(info) else onOpen(info.id) },

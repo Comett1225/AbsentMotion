@@ -23,7 +23,7 @@ The notes open by themselves the first time you open the app after an update. **
 
 ## The bottom bar
 
-- **Projects**, **Community**, **Templates** and **Tools** switch between the pages of the home screen. **Community** is where community bundles will be shared; it arrives in 5.2.
+- **Projects**, **Community**, **Templates** and **Tools** switch between the pages of the home screen. **Community** lists projects and presets shared by the community, and tapping one shows its details with an Add button.
 - The round **+** button between them creates a new project: see [Creating a project](@new-project).
 
 ## Projects and Assets
