@@ -29,6 +29,7 @@ public:
     bool behind(const Layer& layer) const;
     bool steady(const Layer& layer, float from, float to) const;
     bool grabs(const std::vector<Layer>& layers) const;
+    bool turnCorners(const Layer& layer, double timeMs, SkPoint corners[4]) const;
     bool draw(SkCanvas* canvas, const Scene& scene, const Layer& layer, double timeMs, const SkRect& area, const SkMatrix& placed,
               const std::function<void(SkCanvas*)>& source, const std::function<void(SkCanvas*)>& below, const Grab& grab = nullptr,
               const Upload& upload = nullptr) const;

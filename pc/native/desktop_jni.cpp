@@ -90,6 +90,7 @@ struct Desktop {
         fx.behind = [this](const am::Layer& l) { return runtime.behind(l); };
         fx.wraps = [this](const am::Layer& l) { return runtime.wraps(l); };
         fx.steady = [this](const am::Layer& l, float a, float b) { return runtime.steady(l, a, b); };
+        fx.turn = [this](const am::Layer& l, double t, SkPoint* c) { return runtime.turnCorners(l, t, c); };
         fx.past = [this](const std::string& uri, int64_t layer, int copy, float gain) { return trails.at(uri, layer, copy, gain); };
         fx.draw = [this](SkCanvas* c, const am::Scene& s, const am::Layer& l, double t, const SkRect& r, const SkMatrix& m, const std::function<void(SkCanvas*)>& src, const std::function<void(SkCanvas*)>& below) {
             return runtime.draw(c, s, l, t, r, m, src, below, [this](int w, int h, const std::function<void(SkCanvas*)>& paint, std::vector<uint8_t>* rgba) {
@@ -647,7 +648,9 @@ JNIEXPORT jfloatArray JNICALL JNI(layerQuad)(JNIEnv* e, jobject, jlong h, jlong 
     const auto* layer = d->scene.layer(id);
     if (!layer || !layer->activeAt(t)) return nullptr;
     SkPoint p[4];
-    if (!am::SelectionQuad(d->scene, *layer, t, p)) return nullptr;
+    am::LayerEffects fx;
+    fx.turn = [d](const am::Layer& l, double time, SkPoint* c) { return d->runtime.turnCorners(l, time, c); };
+    if (!am::SelectionQuad(d->scene, *layer, t, p, &fx)) return nullptr;
     float values[8];
     for (int i = 0; i < 4; ++i) { values[2*i] = p[i].x(); values[2*i+1] = p[i].y(); }
     auto result = e->NewFloatArray(8);

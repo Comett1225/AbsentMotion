@@ -285,6 +285,7 @@ private:
         fx.behind = [this](const Layer& layer) { return fEffects.behind(layer); };
         fx.wraps = [this](const Layer& layer) { return fEffects.wraps(layer); };
         fx.steady = [this](const Layer& layer, float from, float to) { return fEffects.steady(layer, from, to); };
+        fx.turn = [this](const Layer& layer, double time, SkPoint* corners) { return fEffects.turnCorners(layer, time, corners); };
         if (++fDraws % kUploadIdle == 0) std::erase_if(fUploads, [&](const auto& kept) { return kept.second.seen + kUploadIdle < fDraws; });
         fx.upload = [this](const sk_sp<SkImage>& image, bool mipmapped) { return this->upload(image, mipmapped); };
         fx.past = [this](const std::string& uri, int64_t id, int copy, float gain) { return fTrails.at(uri, id, copy, gain); };
@@ -1394,7 +1395,9 @@ bool EngineImpl::layerQuad(int64_t layerId, double timeMs, float xy[8]) {
     const Layer* layer = fScene.layer(layerId);
     if (!layer || !layer->activeAt(timeMs)) return false;
     SkPoint corners[4];
-    if (!SelectionQuad(fScene, *layer, timeMs, corners)) return false;
+    LayerEffects fx;
+    fx.turn = [this](const Layer& l, double t, SkPoint* c) { return fEffects.turnCorners(l, t, c); };
+    if (!SelectionQuad(fScene, *layer, timeMs, corners, &fx)) return false;
     for (int i = 0; i < 4; i++) {
         xy[2 * i] = corners[i].fX;
         xy[2 * i + 1] = corners[i].fY;
