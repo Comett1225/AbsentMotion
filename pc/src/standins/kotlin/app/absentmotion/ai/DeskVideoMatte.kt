@@ -3,10 +3,11 @@ package app.absentmotion.ai
 import android.content.Context
 import android.net.Uri
 import app.absentmotion.R
-import app.absentmotion.desk.DeskMedia
 import app.absentmotion.desk.DeskProbe
 import app.absentmotion.i18n.AppText
 import app.absentmotion.library.openableUri
+import app.absentmotion.media.FrameSinkSpec
+import app.absentmotion.media.MediaEngine
 import app.absentmotion.model.Layer
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.fpsText
@@ -35,13 +36,8 @@ internal suspend fun desktopVideoMatte(context: Context, layer: Layer, media: Me
     val rate = String.format(Locale.US, "%.6f", fps)
     val start = String.format(Locale.US, "%.6f", startMs / 1000.0)
     val duration = String.format(Locale.US, "%.6f", spanMs / 1000.0)
-    val reader = ProcessBuilder(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-ss", start, "-noautorotate", "-i", source.path,
-        "-t", duration, "-vf", "fps=$rate,scale=$width:$height", "-pix_fmt", "rgb24", "-f", "rawvideo", "-")
-        .redirectError(ProcessBuilder.Redirect.DISCARD).start()
-    val writerArgs = mutableListOf(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "gray", "-s", "${width}x$height", "-r", rate, "-i", "-")
-    if (startMs > 0) writerArgs += listOf("-vf", "setpts=if(eq(N\\,0)\\,0\\,(N-1)/$rate/TB+$start/TB)", "-fps_mode", "vfr")
-    writerArgs += listOf("-an", "-c:v", "mpeg4", "-q:v", "2", "-pix_fmt", "yuv420p", file.path)
-    val writer = ProcessBuilder(writerArgs).redirectError(ProcessBuilder.Redirect.DISCARD).redirectOutput(ProcessBuilder.Redirect.DISCARD).start()
+    val reader = MediaEngine.current.steadyFrames(source, start, duration, rate, width, height)
+    val writer = MediaEngine.current.frameSink(file, FrameSinkSpec(width, height, "gray", rate, start.takeIf { startMs > 0 }))
     var success = false
     try {
         progress(0f, AppText.get(R.string.ai_loading_model))
@@ -50,12 +46,12 @@ internal suspend fun desktopVideoMatte(context: Context, layer: Layer, media: Me
             val follower = if (keep.isEmpty()) null else PartFollower(keep)
             val bytes = ByteArray(width * height * 3)
             val pixels = IntArray(width * height)
-            val output = writer.outputStream.buffered()
+            val output = writer.output.buffered()
             if (startMs > 0) output.write(ByteArray(width * height))
             var done = 0
             while (true) {
                 currentCoroutineContext().ensureActive()
-                val read = reader.inputStream.readNBytes(bytes, 0, bytes.size)
+                val read = reader.input.readNBytes(bytes, 0, bytes.size)
                 if (read == 0) break
                 check(read == bytes.size) { AppText.get(R.string.ai_unable_to_process) }
                 for (i in pixels.indices) pixels[i] = (0xff shl 24) or ((bytes[3 * i].toInt() and 255) shl 16) or ((bytes[3 * i + 1].toInt() and 255) shl 8) or (bytes[3 * i + 2].toInt() and 255)
@@ -67,15 +63,15 @@ internal suspend fun desktopVideoMatte(context: Context, layer: Layer, media: Me
             }
             check(done > 0) { AppText.get(R.string.ai_no_video_frames) }
             smoother.flush()?.let { output.write(encodeMatte(it.second, width, height)) }
-            output.close()
+            output.flush()
         }
-        check(reader.waitFor() == 0 && writer.waitFor() == 0) { AppText.get(R.string.ai_cannot_encode_mask) }
+        check(reader.finished() && writer.finish()) { AppText.get(R.string.ai_cannot_encode_mask) }
         val result = aiMedia(context, file, "video/mp4", mapOf("width" to "$width", "height" to "$height", "orientation" to "0", "duration" to "${media.duration}", "fps" to fpsText(fps.toFloat())))
         success = true
         return VideoMatte(result, stream.width, stream.height)
     } finally {
-        if (reader.isAlive) reader.destroyForcibly()
-        if (writer.isAlive) writer.destroyForcibly()
+        reader.close()
+        writer.close()
         if (!success) file.delete()
     }
 }

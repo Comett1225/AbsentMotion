@@ -4,7 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.os.SystemClock
 import app.absentmotion.R
-import app.absentmotion.desk.DeskMedia
+import app.absentmotion.media.MediaEngine
 import app.absentmotion.i18n.UiText
 import app.absentmotion.i18n.txt
 import kotlinx.coroutines.Dispatchers
@@ -61,11 +61,6 @@ internal fun judge(tracks: List<ProbedTrack>, expect: Expectation, firstFrame: B
     return problems
 }
 
-private fun ffprobe(file: File, vararg args: String): String {
-    val process = ProcessBuilder(listOf(DeskMedia.ffprobe, "-v", "error") + args + file.path).redirectError(ProcessBuilder.Redirect.DISCARD).start()
-    return process.inputStream.bufferedReader().readText().also { process.waitFor() }
-}
-
 private fun seconds(text: String?): Long? = text?.trim()?.toDoubleOrNull()?.let { (it * 1e6).toLong() }
 
 private fun clock(text: String?): Long? = text?.split(':')?.takeIf { it.size == 3 }?.let { (h, m, s) ->
@@ -73,14 +68,13 @@ private fun clock(text: String?): Long? = text?.split(':')?.takeIf { it.size == 
     ((h.toLongOrNull() ?: return null) * 3600 + (m.toLongOrNull() ?: return null) * 60) * 1_000_000 + (sec * 1e6).toLong()
 }
 
-private fun times(file: File, entry: String, from: String): List<Long> =
-    ffprobe(file, "-select_streams", "v:0", "-read_intervals", from, "-show_entries", "$entry=pts_time", "-of", "csv=p=0").lines().mapNotNull { seconds(it.trim().trimEnd(',')) }
+private fun times(file: File, entry: String, from: String): List<Long> = MediaEngine.current.frameTimes(file, entry == "frame", from)
 
 suspend fun verifyExport(context: Context, uri: Uri, expect: Expectation): Verification = withContext(Dispatchers.IO) {
     val start = SystemClock.elapsedRealtime()
     try {
         val file = uri.toFile() ?: throw java.io.FileNotFoundException(uri.toString())
-        val json = JSONObject(ffprobe(file, "-show_entries", "stream=codec_type,codec_name,duration:stream_tags=DURATION:format=duration", "-of", "json"))
+        val json = JSONObject(MediaEngine.current.probe(file, "stream=codec_type,codec_name,duration:stream_tags=DURATION:format=duration"))
         val whole = seconds(json.optJSONObject("format")?.optString("duration")) ?: 0L
         val streams = json.optJSONArray("streams")
         val tracks = (0 until (streams?.length() ?: 0)).map { streams!!.getJSONObject(it) }.filter { it.optString("codec_type") in setOf("video", "audio") }.map { s ->

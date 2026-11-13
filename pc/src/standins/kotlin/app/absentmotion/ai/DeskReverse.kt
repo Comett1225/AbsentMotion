@@ -2,20 +2,24 @@ package app.absentmotion.ai
 
 import android.content.Context
 import android.net.Uri
-import app.absentmotion.desk.DeskMedia
 import app.absentmotion.desk.DeskProbe
 import app.absentmotion.i18n.AppText
 import app.absentmotion.R
 import app.absentmotion.library.openableUri
+import app.absentmotion.media.MediaEngine
+import app.absentmotion.media.ReverseParts
 import app.absentmotion.model.Layer
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.fpsText
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.isActive
 import java.io.File
-import java.util.Locale
 import java.util.UUID
-import java.util.concurrent.TimeUnit
 import kotlin.math.ceil
 
 internal suspend fun desktopReverse(context: Context, layer: Layer, media: MediaDeclaration, progress: AiProgress): ReversedClip {
@@ -38,43 +42,25 @@ internal suspend fun desktopReverse(context: Context, layer: Layer, media: Media
     val output = aiFile(context, "mp4")
     var success = false
     try {
-        val list = File(folder, "list.txt")
-        list.bufferedWriter().use { writer ->
-            for (i in count - 1 downTo 0) {
-                currentCoroutineContext().ensureActive()
-                val from = i.toLong() * perPart
-                val frames = minOf(perPart, total - i * perPart)
-                val start = maxOf(first, first + Math.round((from - 0.5) * 1_000_000 / fps))
-                val part = File(folder, "$i.mkv")
-                val args = mutableListOf(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-y", "-noautorotate", "-ss", time(start), "-t", time(Math.round(frames * 1_000_000 / fps)), "-i", input.path,
-                    "-map", "0:v:0", "-map", "0:a:0?", "-frames:v", "$frames", "-vf", "reverse,setpts=PTS-STARTPTS,pad=ceil(iw/2)*2:ceil(ih/2)*2", "-c:v", "mpeg4", "-q:v", "2", "-pix_fmt", "yuv420p")
-                if (probe.audio != null) args += listOf("-af", "areverse,asetpts=PTS-STARTPTS", "-c:a", "pcm_s16le")
-                args += part.path
-                reverseProcess(args)
-                writer.write("file '$i.mkv'\n")
-                progress((count - i).toFloat() / (count + 1), AppText.get(R.string.speed_reversing))
+        val parts = ReverseParts(input, output, folder, first, last, fps, total, perPart, probe.audio != null)
+        val done = java.util.concurrent.atomic.AtomicInteger(-1)
+        val size = coroutineScope {
+            val work = async(Dispatchers.IO) { MediaEngine.current.reverse(parts, { done.set((it * 1000).toInt()) }) { isActive } }
+            var shown = -1
+            while (work.isActive) {
+                delay(100)
+                val now = done.get()
+                if (now != shown) { shown = now; progress(now / 1000f, AppText.get(R.string.speed_reversing)) }
             }
+            work.await()
         }
-        reverseProcess(listOf(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-y", "-f", "concat", "-safe", "0", "-i", list.path, "-c:v", "copy", "-c:a", "aac", output.path))
-        val width = (video.width + 1) and 1.inv()
-        val height = (video.height + 1) and 1.inv()
+        val width = size?.first ?: ((video.width + 1) and 1.inv())
+        val height = size?.second ?: ((video.height + 1) and 1.inv())
         val result = aiMedia(context, output, "video/mp4", mapOf("width" to "$width", "height" to "$height", "orientation" to "${video.rotation}", "duration" to "${last - first}", "fps" to fpsText(fps.toFloat())))
         success = true
         return ReversedClip(result, last)
     } finally {
         folder.deleteRecursively()
         if (!success) output.delete()
-    }
-}
-
-private fun time(us: Long): String = String.format(Locale.US, "%.6f", us / 1_000_000.0)
-
-private suspend fun reverseProcess(args: List<String>) {
-    val process = ProcessBuilder(args).redirectError(ProcessBuilder.Redirect.DISCARD).redirectOutput(ProcessBuilder.Redirect.DISCARD).start()
-    try {
-        while (!process.waitFor(200, TimeUnit.MILLISECONDS)) currentCoroutineContext().ensureActive()
-        check(process.exitValue() == 0) { AppText.get(R.string.ai_unable_to_process) }
-    } finally {
-        if (process.isAlive) { process.destroyForcibly(); process.waitFor() }
     }
 }

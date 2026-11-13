@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import app.absentmotion.R
 import app.absentmotion.desk.DeskMedia
 import app.absentmotion.desk.DeskOs
+import app.absentmotion.media.MediaEngine
 import app.absentmotion.platform.Hint
 import app.absentmotion.platform.LocalContext
 import app.absentmotion.ui.home.DeskButton
@@ -85,7 +86,7 @@ class DeskCameraController(private val ffmpeg: String, private val folder: File,
     @Volatile private var latest: ByteArray? = null
     private val ring = arrayOfNulls<Pair<org.jetbrains.skia.Bitmap, ImageBitmap>>(3)
     private var slot = 0
-    @Volatile private var session: DeskCameraSession? = null
+    @Volatile private var session: CameraFeed? = null
     @Volatile private var generation = 0
     private var encoder: List<String> = emptyList()
     private var target: File? = null
@@ -93,7 +94,7 @@ class DeskCameraController(private val ffmpeg: String, private val folder: File,
 
     fun open() {
         scope.launch {
-            val found = withContext(Dispatchers.IO) { encoder = DeskCameraSource.videoEncoder(DeskCameraSource.encoders(ffmpeg)); DeskCameraSource.list(ffmpeg) }
+            val found = withContext(Dispatchers.IO) { encoder = MediaEngine.current.cameraEncoder(); MediaEngine.current.cameraDevices() }
             devices = found
             video = found.video.firstOrNull()
             audio = found.audio.firstOrNull()
@@ -119,7 +120,7 @@ class DeskCameraController(private val ffmpeg: String, private val folder: File,
         if (record == null) { phase = CameraPhase.Starting; frame = null; latest = null }
         try {
             val input = CameraInput(chosen, if (record != null) audio else null, mode = mode)
-            session = DeskCameraSession(DeskCameraSource.command(ffmpeg, input, record, encoder), { bytes -> if (generation == mine) show(bytes) }) { _, log ->
+            session = MediaEngine.current.camera(input, record, encoder, { bytes -> if (generation == mine) show(bytes) }) { _, log ->
                 if (generation == mine && session?.stopping != true) scope.launch { fail(log, record != null) }
             }
         } catch (e: java.io.IOException) {

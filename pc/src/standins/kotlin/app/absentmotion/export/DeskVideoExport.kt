@@ -10,6 +10,8 @@ import app.absentmotion.desk.DeskMedia
 import app.absentmotion.engine.EngineThread
 import app.absentmotion.i18n.UiText
 import app.absentmotion.i18n.txt
+import app.absentmotion.media.MediaEngine
+import app.absentmotion.media.MediaSink
 import app.absentmotion.model.Scene
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -81,16 +83,7 @@ internal object DeskEncoders {
     private const val HardwareSide = 4096
     private const val SoftwareSide = 8192
 
-    val available: Set<String> by lazy {
-        runCatching {
-            val process = ProcessBuilder(DeskMedia.ffmpeg, "-hide_banner", "-encoders").redirectError(ProcessBuilder.Redirect.DISCARD).start()
-            val names = process.inputStream.bufferedReader().readLines().mapNotNull { line ->
-                line.trim().split(Regex("\\s+")).takeIf { it.size >= 2 && it[0].length == 6 && it[0][0] in "VAS" }?.get(1)
-            }.toSet()
-            process.waitFor()
-            names
-        }.getOrDefault(emptySet())
-    }
+    val available: Set<String> by lazy { MediaEngine.current.encoders() }
 
     fun hardware(name: String): Boolean = !name.startsWith("lib") && !name.endsWith("_mf") && name !in setOf("aac", "opus", "flac")
 
@@ -126,12 +119,7 @@ internal object DeskEncoders {
     private val working = java.util.concurrent.ConcurrentHashMap<String, Boolean>()
 
     fun works(name: String, s: ExportSettings, width: Int, height: Int): Boolean = (name != "av1_amf" || width % 64 == 0 && height % 16 == 0) && working.getOrPut("$name ${width}x$height ${s.fps} ${s.codec} ${videoBitrate(width, height, s)}") {
-        runCatching {
-            val args = listOf(DeskMedia.ffmpeg, "-v", "error") + device(name) + listOf("-f", "lavfi", "-i", "color=c=black:s=${width}x$height:r=${s.fps}:d=0.2") +
-                filter(name) + videoArgs(name, s, width, height) + listOf("-frames:v", "2", "-f", "null", "-")
-            val process = ProcessBuilder(args).redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.DISCARD).start()
-            try { process.waitFor(20, java.util.concurrent.TimeUnit.SECONDS) && process.exitValue() == 0 } finally { process.destroyForcibly() }
-        }.getOrDefault(false)
+        MediaEngine.current.encoderWorks(name, s, width, height)
     }
 
     fun videoArgs(name: String, s: ExportSettings, width: Int, height: Int): List<String> {
@@ -172,21 +160,23 @@ internal object DeskEncoders {
     }
 }
 
-internal class Ffmpeg(args: List<String>, private val log: File) {
+internal class Ffmpeg(args: List<String>, private val log: File) : MediaSink() {
     val process: Process = try {
         ProcessBuilder(listOf(DeskMedia.ffmpeg, "-hide_banner", "-v", "error") + args).redirectError(log).redirectOutput(ProcessBuilder.Redirect.DISCARD).start()
     } catch (e: java.io.IOException) {
         throw ExportError(txt(R.string.desk_export_no_ffmpeg), e)
     }
 
-    fun finish(): Boolean {
+    override val output: java.io.OutputStream get() = process.outputStream
+
+    override fun finish(): Boolean {
         runCatching { process.outputStream.close() }
         return process.waitFor() == 0
     }
 
-    fun problem(): String = runCatching { log.readLines().lastOrNull { it.isNotBlank() } }.getOrNull() ?: "ffmpeg stopped"
+    override fun problem(): String = runCatching { log.readLines().lastOrNull { it.isNotBlank() } }.getOrNull() ?: "ffmpeg stopped"
 
-    fun kill() { process.destroyForcibly() }
+    override fun close() { process.destroyForcibly() }
 }
 
 internal fun copyInto(file: File, out: FileDescriptor) {
@@ -243,22 +233,9 @@ internal suspend fun exportVideo(
     val result = exportTemp(s.container.ext)
     val log = exportTemp("log")
     val pcm = audio?.let { exportTemp("pcm") }
-    var ffmpeg: Ffmpeg? = null
+    var ffmpeg: MediaSink? = null
     try {
         if (audio != null && pcm != null) writePcm(audio, (scene.totalTime + 1) * 1000L, s.audio.effectiveRate, pcm) { progress(0f) }
-        val sound = if (pcm == null) emptyList() else {
-            val coder = DeskEncoders.audio(s.audio.codec, s.audio.bitrateKbps).firstOrNull() ?: throw ExportError(txt(R.string.export_support_no_encoder, s.audio.codec.label))
-            listOf("-map", "1:a", "-c:a", coder) + DeskEncoders.audioExtra(coder) + listOf("-b:a", "${s.audio.bitrateKbps}k", "-ar", "${s.audio.effectiveRate}", "-ac", "${s.audio.channels}")
-        }
-        val inputs = listOf("-f", "rawvideo", "-pix_fmt", "rgb0", "-s", "${width}x$height", "-r", "${s.fps}", "-i", "-") +
-            (if (pcm == null) emptyList() else listOf("-f", "s16le", "-ar", "${s.audio.effectiveRate}", "-ac", "2", "-i", pcm.path))
-        val tag = if (s.codec == Codec.Hevc && (s.container == Container.Mp4 || s.container == Container.Mov)) listOf("-tag:v", "hvc1") else emptyList()
-        val format = when (s.container) {
-            Container.Mp4 -> listOf("-f", "mp4", "-movflags", "+faststart")
-            Container.Mov -> listOf("-f", "mov", "-movflags", "+faststart")
-            Container.WebM -> listOf("-f", "webm")
-            Container.Mkv -> listOf("-f", "matroska")
-        }
         var trouble: Throwable? = null
         while (true) {
             val encoder = withContext(Dispatchers.IO) { names.firstOrNull { DeskEncoders.works(it, s, width, height) } }
@@ -267,8 +244,7 @@ internal suspend fun exportVideo(
             if (!DeskEncoders.hardware(encoder) && DeskEncoders.video(s.codec).any(DeskEncoders::hardware)) note(txt(R.string.desk_export_note_software))
             EncoderTrouble.last = encoder
             Log.i("AMExport", "encoding ${width}x$height at ${s.fps} fps with $encoder")
-            val running = Ffmpeg(DeskEncoders.device(encoder) + inputs + listOf("-map", "0:v") + DeskEncoders.filter(encoder) +
-                DeskEncoders.videoArgs(encoder, s, width, height) + tag + sound + format + listOf("-y", result.path), log).also { ffmpeg = it }
+            val running = MediaEngine.current.videoExport(encoder, s, width, height, pcm, result, log).also { ffmpeg = it }
             val buffers = frameBufferCount(width, height)
             val queue = ArrayBlockingQueue<ByteArray>(buffers)
             val free = ArrayBlockingQueue<ByteArray>(buffers)
@@ -281,7 +257,7 @@ internal suspend fun exportVideo(
             }
             val writer = thread(name = "am-export-write") {
                 try {
-                    val stdin = running.process.outputStream
+                    val stdin = running.output
                     while (true) {
                         val pixels = queue.take()
                         if (pixels === end) break
@@ -326,7 +302,7 @@ internal suspend fun exportVideo(
                     runInterruptible(Dispatchers.IO) { while (failure.get() == null && !queue.offer(end, 50, java.util.concurrent.TimeUnit.MILLISECONDS)) Unit }
                     runInterruptible(Dispatchers.IO) { writer.join() }
                 } finally {
-                    if (writer.isAlive) { running.kill(); queue.clear(); queue.offer(end); writer.join() }
+                    if (writer.isAlive) { running.close(); queue.clear(); queue.offer(end); writer.join() }
                 }
                 beating(progress, 0.98f) { runInterruptible(Dispatchers.IO) { running.finish() } }
             } catch (t: Throwable) {
@@ -337,7 +313,7 @@ internal suspend fun exportVideo(
                 ?: if (!ok) ExportError(txt(R.string.library_text_value, running.problem())) else null
             if (problem != null && result.length() == 0L && names.isNotEmpty()) {
                 Log.w("AMExport", "$encoder failed at start, trying the next encoder", problem)
-                running.kill()
+                running.close()
                 EncoderTrouble.blameLast()
                 note(txt(R.string.export_note_retry))
                 trouble = problem
@@ -350,7 +326,7 @@ internal suspend fun exportVideo(
         beating(progress, 0.99f) { withContext(Dispatchers.IO) { copyInto(result, out) } }
     } finally {
         withContext(NonCancellable + Dispatchers.IO) {
-            ffmpeg?.kill()
+            ffmpeg?.close()
             result.delete(); log.delete(); pcm?.delete()
             (audio as? java.io.Closeable)?.close()
         }

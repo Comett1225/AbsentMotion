@@ -54,7 +54,7 @@ class DeskDownloaderTest {
         echo "[download] Destination: two"
         echo "[download]  50.0% of 1.00MiB at 1.00MiB/s ETA 00:01"
         echo "[download] 100% of 1.00MiB in 00:01"
-        f=${'$'}(printf %s "${'$'}out" | sed 's/%(ext)s/mp4/')
+        f=${'$'}(printf %s "${'$'}out" | sed 's/%(format_id)s\.//; s/%(ext)s/mp4/')
         echo data > "${'$'}f"
         """.trimIndent(),
     )
@@ -111,7 +111,7 @@ class DeskDownloaderTest {
         val ffmpeg = app.absentmotion.desk.DeskMedia.ffmpeg
         val clip = File(temp.root, "both.mp4")
         val made = ProcessBuilder(ffmpeg, "-nostdin", "-v", "error", "-y", "-f", "lavfi", "-i", "testsrc=size=64x36:rate=10", "-f", "lavfi", "-i", "sine=frequency=440",
-            "-t", "1", "-c:v", "mpeg4", "-c:a", "aac", "-shortest", clip.path).redirectErrorStream(true).start().let { it.inputStream.readBytes(); it.waitFor() }
+            "-t", "1", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac", "-shortest", clip.path).redirectErrorStream(true).start().let { it.inputStream.readBytes(); it.waitFor() }
         org.junit.Assert.assertEquals(0, made)
         val silent = app.absentmotion.tools.withoutAudio(clip, ffmpeg)
         val probe = ProcessBuilder(ffmpeg, "-nostdin", "-hide_banner", "-i", silent.path).redirectErrorStream(true).start().let { p -> String(p.inputStream.readBytes()).also { p.waitFor() } }

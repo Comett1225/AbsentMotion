@@ -22,12 +22,14 @@
 #include "include/gpu/ganesh/mtl/GrMtlBackendSurface.h"
 #include "include/gpu/ganesh/mtl/GrMtlTypes.h"
 #import <CoreVideo/CoreVideo.h>
+#import <dispatch/dispatch.h>
 #import <Metal/Metal.h>
 
 namespace {
 
 constexpr int64_t kAhead = 3;
 constexpr int64_t kConceal = 8;
+constexpr int64_t kHoldMs = 250;
 
 CVMetalTextureCacheRef Cache() {
     static CVMetalTextureCacheRef cache = [] {
@@ -44,10 +46,14 @@ struct Held {
     std::shared_ptr<void> pixels;
 };
 
-void Release(void* context) {
-    auto* held = static_cast<Held*>(context);
+void Free(Held* held) {
     for (auto plane : held->planes) if (plane) CFRelease(plane);
     delete held;
+}
+
+void Release(void* context) {
+    auto* held = static_cast<Held*>(context);
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, kHoldMs * NSEC_PER_MSEC), dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{ Free(held); });
 }
 
 SkYUVColorSpace Space(const absent::Frame& f) {
@@ -78,7 +84,7 @@ sk_sp<SkImage> Direct(GrDirectContext* context, const absent::Frame& frame) {
         const MTLPixelFormat format = i == 0 ? (deep ? MTLPixelFormatR16Unorm : MTLPixelFormatR8Unorm) : (deep ? MTLPixelFormatRG16Unorm : MTLPixelFormatRG8Unorm);
         const size_t w = CVPixelBufferGetWidthOfPlane(pixels, i), h = CVPixelBufferGetHeightOfPlane(pixels, i);
         if (CVMetalTextureCacheCreateTextureFromImage(kCFAllocatorDefault, Cache(), pixels, nullptr, format, w, h, i, &held->planes[i]) != kCVReturnSuccess) {
-            Release(held);
+            Free(held);
             return nullptr;
         }
         GrMtlTextureInfo info;
@@ -180,6 +186,7 @@ struct Lane {
             }
             hold.unlock();
             absent::Frame frame = decode(next);
+            if (!frame) frame = decode(next);
             for (int64_t back = next - 1; !frame && back >= 0 && back >= next - kConceal; --back) frame = decode(back);
             hold.lock();
             if (frame) frames[next] = std::move(frame); else failed.insert(next);

@@ -3,10 +3,11 @@ package app.absentmotion.ai
 import android.content.Context
 import android.net.Uri
 import app.absentmotion.R
-import app.absentmotion.desk.DeskMedia
 import app.absentmotion.desk.DeskProbe
 import app.absentmotion.i18n.AppText
 import app.absentmotion.library.openableUri
+import app.absentmotion.media.FrameSinkSpec
+import app.absentmotion.media.MediaEngine
 import app.absentmotion.model.fpsText
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
@@ -35,19 +36,14 @@ internal suspend fun desktopRewriteVideo(context: Context, job: VideoJob, progre
     val start = number(startMs / 1000.0)
     val rate = number(fps)
     val outRate = number(outFps)
-    val reader = ProcessBuilder(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-ss", start, "-noautorotate", "-i", input.path, "-t", number(span / 1000.0),
-        "-vf", "fps=$rate", "-pix_fmt", "rgb24", "-f", "rawvideo", "-").redirectError(ProcessBuilder.Redirect.DISCARD).start()
-    val writerArgs = mutableListOf(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", "${width * job.scale}x${height * job.scale}",
-        "-r", outRate, "-i", "-", "-i", input.path, "-map", "0:v:0", "-map", "1:a:0?")
-    if (startMs > 0) writerArgs += listOf("-vf", "setpts=if(eq(N\\,0)\\,0\\,(N-1)/$outRate/TB+$start/TB)", "-fps_mode", "vfr")
-    writerArgs += listOf("-c:v", "mpeg4", "-q:v", "2", "-pix_fmt", "yuv420p", "-c:a", "aac", "-t", number(endMs / 1000.0), output.path)
-    val writer = ProcessBuilder(writerArgs).redirectError(ProcessBuilder.Redirect.DISCARD).redirectOutput(ProcessBuilder.Redirect.DISCARD).start()
+    val reader = MediaEngine.current.steadyFrames(input, start, number(span / 1000.0), rate)
+    val writer = MediaEngine.current.frameSink(output, FrameSinkSpec(width * job.scale, height * job.scale, "rgb24", outRate, start.takeIf { startMs > 0 }, input, limit = number(endMs / 1000.0)))
     var success = false
     try {
         val bytes = ByteArray(width * height * 3)
         val pixels = IntArray(width * height)
         val encoded = ByteArray(width * height * job.scale * job.scale * 3)
-        val sink = writer.outputStream.buffered()
+        val sink = writer.output.buffered()
         var done = 0
         var emitted = 0
         val emit: suspend (Long, IntArray) -> Unit = { _, frame ->
@@ -63,7 +59,7 @@ internal suspend fun desktopRewriteVideo(context: Context, job: VideoJob, progre
         }
         while (true) {
             currentCoroutineContext().ensureActive()
-            val got = reader.inputStream.readNBytes(bytes, 0, bytes.size)
+            val got = reader.input.readNBytes(bytes, 0, bytes.size)
             if (got == 0) break
             check(got == bytes.size) { AppText.get(R.string.ai_unable_to_process) }
             for (i in pixels.indices) pixels[i] = (0xff shl 24) or ((bytes[3*i].toInt() and 255) shl 16) or ((bytes[3*i+1].toInt() and 255) shl 8) or (bytes[3*i+2].toInt() and 255)
@@ -72,13 +68,13 @@ internal suspend fun desktopRewriteVideo(context: Context, job: VideoJob, progre
             progress((0.01f + 0.97f * done / count).coerceAtMost(0.98f), AppText.get(R.string.ai_saving_video))
         }
         check(emitted > 0) { AppText.get(R.string.ai_unable_to_process) }
-        sink.close()
-        check(reader.waitFor() == 0 && writer.waitFor() == 0) { AppText.get(R.string.ai_unable_to_process) }
+        sink.flush()
+        check(reader.finished() && writer.finish()) { AppText.get(R.string.ai_unable_to_process) }
         success = true
         return aiMedia(context, output, "video/mp4", mapOf("width" to "${width * job.scale}", "height" to "${height * job.scale}", "duration" to "${endMs * 1000}", "fps" to fpsText(outFps.toFloat()), "orientation" to "${job.media.orientation}"))
     } finally {
-        if (reader.isAlive) reader.destroyForcibly()
-        if (writer.isAlive) writer.destroyForcibly()
+        reader.close()
+        writer.close()
         if (!success) output.delete()
     }
 }

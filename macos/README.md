@@ -4,8 +4,9 @@ What only macOS uses: Metal for the engine (`native/gpu_metal.mm`), the media en
 preview decoder, `native/media_ffamp.cpp` for describing files, sound and frames; FFamp is the submodule `../third_party/FFamp`),
 the sound output delay (`native/audio_mac.cpp`), the native build (`build.sh`, using `native/macos.cmake`) and the app icon.
 
-The native library links no FFmpeg. Reading and playing media goes through FFamp; export and the tools still start the `ffmpeg`
-and `ffprobe` programs until they move too. FFamp uses libopus, LAME, mpg123, libvorbis, libogg, liboapv, dav1d, libvpx and SVT-AV1
+The native library links no FFmpeg and the app starts neither `ffmpeg` nor `ffprobe`: reading, playing, export, the tools, the
+camera and the video downloader all go through FFamp (`MediaEngine` in `pc/src/standins/kotlin/app/absentmotion/media`). The
+release build still copies FFmpeg next to the library; that goes when the bundle is cleaned up. FFamp uses libopus, LAME, mpg123, libvorbis, libogg, liboapv, dav1d, libvpx and SVT-AV1
 when CMake finds them (Homebrew on a developer's Mac; `FFAMP_DEPS=<prefix>` puts another prefix first).
 
 Needs Skia built for macOS in `../third_party/skia/out/mac-v2-2-arm64` (Apple silicon) or `out/mac-x64` (Intel, same

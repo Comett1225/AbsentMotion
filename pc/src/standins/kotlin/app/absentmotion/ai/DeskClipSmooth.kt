@@ -3,20 +3,22 @@ package app.absentmotion.ai
 import android.content.Context
 import android.net.Uri
 import app.absentmotion.R
-import app.absentmotion.desk.DeskMedia
 import app.absentmotion.engine.EngineThread
 import app.absentmotion.export.Smoothing
 import app.absentmotion.export.frameCount
 import app.absentmotion.export.frameTimeMs
 import app.absentmotion.i18n.AppText
 import app.absentmotion.library.openableUri
+import app.absentmotion.media.FrameSinkSpec
+import app.absentmotion.media.MediaEngine
 import app.absentmotion.model.Layer
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.fpsText
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.runInterruptible
 import java.util.Locale
-import java.util.concurrent.TimeUnit
 
 internal suspend fun desktopClipSmooth(context: Context, layer: Layer, media: MediaDeclaration, projectFps: Int, smoothing: Smoothing,
                                        providedEngine: EngineThread? = null, progress: AiProgress): AiMedia {
@@ -36,24 +38,20 @@ internal suspend fun desktopClipSmooth(context: Context, layer: Layer, media: Me
     var success = false
     try {
         progress(0f, AppText.get(R.string.ai_preparing))
-        val process = ProcessBuilder(DeskMedia.ffmpeg, "-nostdin", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgba",
-            "-s", "${plan.width}x${plan.height}", "-r", "${plan.fps}", "-i", "-", "-ss", start, "-t", span, "-i", input.path,
-            "-map", "0:v:0", "-map", "1:a:0?", "-c:v", "mpeg4", "-q:v", "2", "-pix_fmt", "yuv420p", "-c:a", "aac", "-t", span, file.path)
-            .redirectError(ProcessBuilder.Redirect.DISCARD).redirectOutput(ProcessBuilder.Redirect.DISCARD).start()
+        val sink = MediaEngine.current.frameSink(file, FrameSinkSpec(plan.width, plan.height, "rgba", "${plan.fps}", null, input, start, span, span))
         try {
-            process.outputStream.buffered(1 shl 20).use { output ->
-                engine.exportSession(scene.toXml(), smoothing.copy(blurScale = plan.blurScale), plan.fps) {
-                    for (index in 0 until frames) {
-                        currentCoroutineContext().ensureActive()
-                        val pixels = checkNotNull(still(frameTimeMs(scene, plan.fps, index), plan.width, plan.height)) { AppText.get(R.string.ai_unable_to_process) }
-                        output.write(pixels)
-                        progress(0.98f * (index + 1) / frames, AppText.get(R.string.smooth_frame, (index + 1).toString(), frames.toString()))
-                    }
+            val output = sink.output.buffered(1 shl 20)
+            engine.exportSession(scene.toXml(), smoothing.copy(blurScale = plan.blurScale), plan.fps) {
+                for (index in 0 until frames) {
+                    currentCoroutineContext().ensureActive()
+                    val pixels = checkNotNull(still(frameTimeMs(scene, plan.fps, index), plan.width, plan.height)) { AppText.get(R.string.ai_unable_to_process) }
+                    output.write(pixels)
+                    progress(0.98f * (index + 1) / frames, AppText.get(R.string.smooth_frame, (index + 1).toString(), frames.toString()))
                 }
             }
-            while (!process.waitFor(200, TimeUnit.MILLISECONDS)) currentCoroutineContext().ensureActive()
-            check(process.exitValue() == 0) { AppText.get(R.string.ai_unable_to_process) }
-        } finally { if (process.isAlive) process.destroyForcibly() }
+            output.flush()
+            check(runInterruptible(Dispatchers.IO) { sink.finish() }) { AppText.get(R.string.ai_unable_to_process) }
+        } finally { sink.close() }
         progress(0.99f, AppText.get(R.string.smooth_saving))
         success = true
         return aiMedia(context, file, "video/mp4", mapOf("width" to "${plan.width}", "height" to "${plan.height}", "duration" to "${(plan.seconds * 1_000_000).toLong()}",

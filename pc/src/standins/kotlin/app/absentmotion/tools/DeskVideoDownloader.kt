@@ -9,6 +9,7 @@ import app.absentmotion.ai.CaptionModel
 import app.absentmotion.desk.DeskMedia
 import app.absentmotion.desk.DeskOs
 import app.absentmotion.export.MediaStoreExport
+import app.absentmotion.media.MediaEngine
 import app.absentmotion.platform.readAtMost
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.awaitCancellation
@@ -189,12 +190,9 @@ object DeskVideoDownloader : VideoFetcher {
         if (!exe.isFile) throw DownloadProblem(R.string.downloader_engine_blocked)
         withContext(Dispatchers.IO) { dir.mkdirs() }
         val pieces = listOfNotNull(plan.video, plan.audio?.takeIf { it !== plan.video }).size.coerceAtLeast(1)
-        val chosen = listOfNotNull(plan.video?.id, plan.audio?.id).distinct().joinToString("+")
         val args = ArrayList<String>()
-        args += listOf("--no-playlist", "--no-warnings", "--newline", "--no-mtime", "--ffmpeg-location", ffmpeg, "-f", chosen, "-o", File(dir, "item.%(ext)s").path)
+        args += listOf("--no-playlist", "--no-warnings", "--newline", "--no-mtime") + MediaEngine.current.downloadOptions(plan, mode, dir, ffmpeg)
         if (entry > 0) args += listOf("--playlist-items", entry.toString())
-        if (mode == SaveMode.AudioOnly) args += listOf("-x", "--audio-format", "m4a")
-        else if (plan.video != null) args += listOf("--merge-output-format", if (plan.webm) "webm" else "mp4")
         var stream = 0
         val result = execute(exe, args + url) { line ->
             if (line.startsWith("[download] Destination:")) stream += 1
@@ -204,8 +202,7 @@ object DeskVideoDownloader : VideoFetcher {
             }
         }
         failIf(result)
-        val file = dir.listFiles().orEmpty().filter { it.isFile && it.name.startsWith("item.") && !it.name.endsWith(".part") && !it.name.endsWith(".ytdl") }.maxByOrNull { it.length() }
-            ?: throw DownloadProblem(R.string.downloader_error_save, "no file")
+        val file = withContext(Dispatchers.IO) { MediaEngine.current.downloaded(plan, mode, dir) } ?: throw DownloadProblem(R.string.downloader_error_save, "no file")
         progress(1f)
         file
     }
@@ -316,11 +313,4 @@ private fun clear(dir: File) {
     }
 }
 
-internal suspend fun withoutAudio(file: File, ffmpeg: String): File = withContext(Dispatchers.IO) {
-    val out = File(file.parentFile, "silent." + file.extension)
-    val code = runCatching {
-        ProcessBuilder(ffmpeg, "-nostdin", "-v", "error", "-y", "-i", file.path, "-map", "0:v", "-c", "copy", out.path).redirectErrorStream(true).start()
-            .let { it.inputStream.readBytes(); it.waitFor() }
-    }.getOrDefault(-1)
-    if (code == 0 && out.length() > 0) out else file
-}
+internal suspend fun withoutAudio(file: File, ffmpeg: String): File = withContext(Dispatchers.IO) { MediaEngine.current.withoutAudio(file, ffmpeg) }

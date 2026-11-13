@@ -22,23 +22,13 @@ internal suspend fun exportAudio(s: ExportSettings, totalUs: Long, mix: AudioMix
     val totalFrames = totalUs * rate / 1_000_000
     val deep = s.audioFormat == AudioFormat.Wav24
     if (s.audioFormat == AudioFormat.Wav16 || deep) exportCheck(wavFits(totalFrames, channels, if (deep) 24 else 16)) { txt(R.string.export_error_wav_too_long) }
-    val bitrate = listOf("-b:a", "${s.audio.bitrateKbps}k")
-    fun coder(name: String, label: String) = name.takeIf { it in DeskEncoders.available } ?: throw ExportError(txt(R.string.export_support_no_encoder, label))
-    val encode = when (s.audioFormat) {
-        AudioFormat.Wav16 -> listOf("-c:a", "pcm_s16le", "-f", "wav")
-        AudioFormat.Wav24 -> listOf("-c:a", "pcm_s24le", "-f", "wav")
-        AudioFormat.Flac -> listOf("-c:a", coder("flac", "FLAC"), "-compression_level", "5", "-f", "flac")
-        AudioFormat.M4a -> listOf("-c:a", DeskEncoders.audio(AudioCodec.Aac, s.audio.bitrateKbps).firstOrNull() ?: coder("aac", AudioCodec.Aac.label)) + bitrate + listOf("-f", "ipod")
-        AudioFormat.Ogg -> (DeskEncoders.audio(AudioCodec.Opus).firstOrNull() ?: coder("libopus", AudioCodec.Opus.label)).let { listOf("-c:a", it) + DeskEncoders.audioExtra(it) } + bitrate + listOf("-f", "ogg")
-        AudioFormat.Mp3 -> listOf("-c:a", coder("libmp3lame", "MP3")) + bitrate + listOf("-f", "mp3")
-    }
     val floats = deep && mix is FloatMix
     val result = exportTemp(s.audioFormat.ext)
     val log = exportTemp("log")
-    val ffmpeg = Ffmpeg(listOf("-f", if (floats) "f32le" else "s16le", "-ar", "$rate", "-ac", "2", "-i", "-", "-ar", "$rate", "-ac", "$channels") + encode + listOf("-y", result.path), log)
-    val watcher = launch { try { awaitCancellation() } finally { ffmpeg.kill() } }
+    val ffmpeg = app.absentmotion.media.MediaEngine.current.audioExport(s, rate, floats, result, log)
+    val watcher = launch { try { awaitCancellation() } finally { ffmpeg.close() } }
     try {
-        val stdin = ffmpeg.process.outputStream.buffered(1 shl 16)
+        val stdin = ffmpeg.output.buffered(1 shl 16)
         var frame = 0L
         try {
             while (frame < totalFrames) {
@@ -62,7 +52,7 @@ internal suspend fun exportAudio(s: ExportSettings, totalUs: Long, mix: AudioMix
         copyInto(result, out)
     } finally {
         watcher.cancel()
-        withContext(NonCancellable) { ffmpeg.kill(); result.delete(); log.delete() }
+        withContext(NonCancellable) { ffmpeg.close(); result.delete(); log.delete() }
     }
     progress(1f)
 }

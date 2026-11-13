@@ -180,12 +180,18 @@ class JpegSplitter(private val onFrame: (ByteArray) -> Unit) {
     }
 }
 
-class DeskCameraSession(command: List<String>, private val onFrame: (ByteArray) -> Unit, private val onEnd: (Int, String) -> Unit) {
+interface CameraFeed {
+    val stopping: Boolean
+    fun finish(timeoutMs: Long = 8000): Boolean
+    fun stop()
+}
+
+class DeskCameraSession(command: List<String>, private val onFrame: (ByteArray) -> Unit, private val onEnd: (Int, String) -> Unit) : CameraFeed {
     private val process: Process = ProcessBuilder(command).start()
     private val notes = ArrayDeque<String>()
     @Volatile var frames = 0
         private set
-    @Volatile var stopping = false
+    @Volatile override var stopping = false
         private set
 
     init {
@@ -211,7 +217,7 @@ class DeskCameraSession(command: List<String>, private val onFrame: (ByteArray) 
         }, "am-camera-wait").apply { isDaemon = true }.start()
     }
 
-    fun finish(timeoutMs: Long = 8000): Boolean {
+    override fun finish(timeoutMs: Long): Boolean {
         stopping = true
         runCatching { process.outputStream.apply { write("q\n".toByteArray()); flush() } }
         val done = runCatching { process.waitFor(timeoutMs, java.util.concurrent.TimeUnit.MILLISECONDS) }.getOrDefault(false)
@@ -219,7 +225,7 @@ class DeskCameraSession(command: List<String>, private val onFrame: (ByteArray) 
         return done
     }
 
-    fun stop() {
+    override fun stop() {
         stopping = true
         process.destroy()
     }

@@ -197,8 +197,8 @@ object DeskSpeech {
             input.writeText(spoken, Charsets.UTF_8)
             val run = SpeechCommands.speak(found, voice.id, rate, pitch, input, raw)
             exportCheck(exec(run, null, 30_000L + 25L * spoken.length) && raw.length() > 44) { txt(R.string.platform_error_voice) }
-            val convert = SpeechRun(SpeechCommands.convert(DeskMedia.ffmpeg, raw, run, out))
-            exportCheck(exec(convert, null, 60_000L + 25L * spoken.length) && out.length() > 44) { txt(R.string.platform_error_voice) }
+            val converted = runInterruptible { app.absentmotion.media.MediaEngine.current.speech(raw, out, SpeechCommands.SAMPLE_RATE, run.tempo, run.pitch, 60_000L + 25L * spoken.length) }
+            exportCheck(converted && out.length() > 44) { txt(R.string.platform_error_voice) }
         } catch (e: Throwable) {
             out.delete()
             throw if (e is IOException) ExportError(txt(R.string.platform_error_voice), e) else e
