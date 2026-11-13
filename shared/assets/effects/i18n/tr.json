@@ -770,6 +770,13 @@
     },
     "center": {
      "label": "Merkez"
+    },
+    "sampling": {
+     "label": "Örnekleme",
+     "options": [
+      "Doğrusal",
+      "Işınlar"
+     ]
     }
    }
   },
@@ -2252,6 +2259,13 @@
     },
     "radius": {
      "label": "Yarıçap"
+    },
+    "spread": {
+     "label": "Yayılma",
+     "options": [
+      "Standart",
+      "Tam"
+     ]
     }
    }
   },
@@ -3355,6 +3369,13 @@
     },
     "low": {
      "label": "Siyah noktası"
+    },
+    "compositing": {
+     "label": "Kompozisyon",
+     "options": [
+      "Damga",
+      "Ton"
+     ]
     }
    }
   },
@@ -3404,6 +3425,13 @@
     },
     "softness": {
      "label": "Yumuşaklık"
+    },
+    "method": {
+     "label": "Yöntem",
+     "options": [
+      "Eşik",
+      "Aşındır"
+     ]
     }
    }
   },
@@ -3425,6 +3453,17 @@
      "options": [
       "Katla",
       "Çevir"
+     ]
+    },
+    "offset": {
+     "label": "Ofset"
+    },
+    "blend": {
+     "label": "Karışım",
+     "options": [
+      "Normal",
+      "Çarpma",
+      "Ekran"
      ]
     }
    }

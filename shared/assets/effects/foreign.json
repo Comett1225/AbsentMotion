@@ -2037,6 +2037,14 @@
      "2": 2
     }
    }
+  },
+  "set": {
+   "radius": 100,
+   "alpha": 0.75,
+   "hardness": 0.5,
+   "color": "#ffffffaa",
+   "blendMode": 2,
+   "spread": 1
   }
  },
  "com.alightcreative.effects.blocknoise2": {
@@ -6182,13 +6190,24 @@
   "params": {
    "strength": {
     "to": "amount",
-    "scale": 0.562,
+    "scale": 1,
     "min": 0,
     "max": 1.9
    },
    "adaptive": {
     "neutral": true
+   },
+   "centerPoint": {
+    "to": "center",
+    "relative": true,
+    "scale": 0.45,
+    "offset": 0.275
    }
+  },
+  "set": {
+   "amount": 0.0525,
+   "sampling": 1,
+   "center": "0.500000,0.500000"
   }
  },
  "com.alightcreative.effects.texttransform": {
@@ -6410,6 +6429,14 @@
    "invert": {
     "to": "invert"
    }
+  },
+  "set": {
+   "color": "#ffff5566",
+   "low": 0,
+   "high": 1,
+   "gamma": 1,
+   "invert": false,
+   "compositing": 1
   }
  },
  "com.alightcreative.effects.mattefringe": {
@@ -7077,6 +7104,17 @@
     "to": "alpha",
     "min": 0,
     "max": 1
+   },
+   "offset": {
+    "to": "offset"
+   },
+   "blendMode": {
+    "to": "blend",
+    "values": {
+     "0": 0,
+     "1": 1,
+     "2": 2
+    }
    }
   },
   "set": {
@@ -7118,7 +7156,7 @@
   "params": {
    "choke": {
     "to": "blur",
-    "scale": 1.5,
+    "scale": 0.9,
     "min": 0,
     "max": 300
    },
@@ -7133,7 +7171,9 @@
    }
   },
   "set": {
-   "amount": 0.97
+   "amount": 0.97,
+   "method": 1,
+   "blur": 1
   }
  },
  "com.alightcreative.mattechoke": {
@@ -7141,7 +7181,7 @@
   "params": {
    "choke": {
     "to": "blur",
-    "scale": 1.5,
+    "scale": 0.9,
     "min": 0,
     "max": 300
    },
@@ -7156,7 +7196,9 @@
    }
   },
   "set": {
-   "amount": 0.97
+   "amount": 0.97,
+   "method": 1,
+   "blur": 1
   }
  },
  "com.alightcreative.effects.box": {

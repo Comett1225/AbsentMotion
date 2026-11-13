@@ -50,16 +50,19 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
         val converted = linkedMapOf<String, Int>()
         val dropped = sortedSetOf<String>()
         var renamed = false
-        fun visit(node: XmlNode, dims: FloatArray): XmlNode {
+        fun visit(node: XmlNode, dims: FloatArray, clipped: Boolean = false): XmlNode {
             val rule = if (node.name == "effect") rules[node["id"]]?.takeIf { r -> r.onlyWith == null || node.children.any { c -> c.name == "property" && c["name"] == r.onlyWith } } else null
             val own = rule?.let { catalog.definitions.firstOrNull { d -> d.key == it.to } }
             val older = own != null && node["id"] == own.id
             if (rule != null && own != null && (!older || node.children.any { c -> c.name == "property" && own.params.none { it.id == c["name"] } })) {
                 if (older) renamed = true else converted.merge("${node["id"]!!.substringAfterLast('.')} → ${own.name}", 1, Int::plus)
-                return convert(node, rule, own, older, dims) { dropped += "${own.name}: $it" }
+                val convertedEffect = convert(node, rule, own, older, dims) { dropped += "${own.name}: $it" }
+                return if (node["id"] == "com.alightcreative.effects.lumastamper" && clipped) convertedEffect.copy(children = convertedEffect.children.map {
+                    if (it["name"] == "compositing") it.with("value", "0") else it
+                }) else convertedEffect
             }
             val inner = if (node.name in Scene.LAYER_TAGS) layerDims(node, dims) else dims
-            return if (node.children.isEmpty()) node else node.copy(children = node.children.map { visit(it, inner) })
+            return if (node.children.isEmpty()) node else node.copy(children = node.children.map { visit(it, inner, node["clippingMask"] == "true") })
         }
         val w = scene.node["width"]?.finiteFloat()?.takeIf { it > 0f } ?: 1080f
         val h = scene.node["height"]?.finiteFloat()?.takeIf { it > 0f } ?: 1080f

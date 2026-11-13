@@ -421,6 +421,7 @@ uniform float grow;
 uniform float soft;
 uniform float amount;
 uniform float mode;
+uniform float imported;
 uniform half4 tint;
 half4 main(float2 p) {
     half4 src = image.eval(p);
@@ -428,6 +429,7 @@ half4 main(float2 p) {
     float r = float(f.r) + 1.0 - float(f.a);
     float d = max(r * reach - shift, 0.0);
     float g = r > 0.995 ? 0.0 : soft > 0.0 ? 1.0 - smoothstep(grow - soft, grow + soft, d) : (d <= grow ? 1.0 : 0.0);
+    if (imported > 0.5 && grow + soft > 0.3 && src.a > 0.0) g = 1.0;
     half k = half(g * amount) * tint.a;
     half3 c = tint.rgb;
     if (mode > 0.5) {
@@ -528,7 +530,8 @@ sk_sp<SkImageFilter> GlowFilter(const std::function<float(const char*, int, floa
     if (step > 1) field = SkImageFilters::MatrixTransform(SkMatrix::Scale(step, step), linear, field);
     SkRuntimeShaderBuilder b(mix);
     b.uniform("reach") = cells * step;
-    b.uniform("shift") = 0.5f - grown;
+    b.uniform("shift") = (v("spread", 0, 0) > 0.5f ? -0.05f : 0.5f) - grown;
+    b.uniform("imported") = v("spread", 0, 0);
     b.uniform("grow") = grow;
     b.uniform("soft") = soft;
     b.uniform("amount") = amount;
@@ -1260,7 +1263,12 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
                 }
                 if (d->plainBlur) {
                     names.push_back("blurred");
-                    inputs.push_back(blurOf(f));
+                    if (e.id == "absent.mattechoker" && Value(e, defaults, "method", 0, t, 0) > 0.5f) {
+                        const float radius = std::max(Value(e, defaults, "blur", 0, t, 0), 0.0f);
+                        const float feather = 2 * radius * Value(e, defaults, "softness", 0, t, 0);
+                        auto eroded = SkImageFilters::Erode(radius, radius, f);
+                        inputs.push_back(feather > 0 ? SkImageFilters::Blur(feather, feather, SkTileMode::kDecal, eroded) : eroded);
+                    } else inputs.push_back(blurOf(f));
                 }
             }
             if (d->backdrop) {

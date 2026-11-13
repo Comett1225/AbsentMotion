@@ -770,6 +770,13 @@
     },
     "center": {
      "label": "Centro"
+    },
+    "sampling": {
+     "label": "Campionamento",
+     "options": [
+      "Lineare",
+      "Raggi"
+     ]
     }
    }
   },
@@ -2252,6 +2259,13 @@
     },
     "radius": {
      "label": "Raggio"
+    },
+    "spread": {
+     "label": "Diffusione",
+     "options": [
+      "Standard",
+      "Completa"
+     ]
     }
    }
   },
@@ -3355,6 +3369,13 @@
     },
     "low": {
      "label": "Punto di nero"
+    },
+    "compositing": {
+     "label": "Composizione",
+     "options": [
+      "Timbro",
+      "Tinta"
+     ]
     }
    }
   },
@@ -3404,6 +3425,13 @@
     },
     "softness": {
      "label": "Morbidezza"
+    },
+    "method": {
+     "label": "Metodo",
+     "options": [
+      "Soglia",
+      "Erodi"
+     ]
     }
    }
   },
@@ -3425,6 +3453,17 @@
      "options": [
       "Piega",
       "Ribalta"
+     ]
+    },
+    "offset": {
+     "label": "Scostamento"
+    },
+    "blend": {
+     "label": "Fusione",
+     "options": [
+      "Normale",
+      "Moltiplica",
+      "Scolora"
      ]
     }
    }

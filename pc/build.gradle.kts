@@ -266,6 +266,10 @@ tasks.test {
     inputs.dir("../shared/assets").withPropertyName("sharedAssets").withPathSensitivity(PathSensitivity.RELATIVE)
     inputs.dir("../shared/res").withPropertyName("sharedRes").withPathSensitivity(PathSensitivity.RELATIVE)
     inputs.dir("../testdata").withPropertyName("testData").withPathSensitivity(PathSensitivity.RELATIVE)
+    listOf("ALIGHT_REPO", "ALIGHT_STILLS", "ALIGHT_TEST_IMAGE", "ALIGHT_LOOK_OUT", "ALIGHT_GLOW_CAPTURES").forEach { name ->
+        inputs.property(name, providers.environmentVariable(name).orElse(""))
+    }
+    outputs.upToDateWhen { System.getenv("ALIGHT_GLOW_CAPTURES").isNullOrBlank() && (System.getenv("ALIGHT_STILLS").isNullOrBlank() || System.getenv("ALIGHT_TEST_IMAGE").isNullOrBlank()) }
     systemProperty("am.native", layout.buildDirectory.file("$nativeDir/$nativeName").get().asFile.absolutePath)
     systemProperties(bundledTools)
     systemProperty("am.assets", file("../shared/assets").absolutePath)

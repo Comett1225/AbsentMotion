@@ -49,6 +49,16 @@
     "Multiply",
     "Screen"
    ]
+  },
+  {
+   "id": "spread",
+   "label": "Spread",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Standard",
+    "Full"
+   ]
   }
  ]
 }

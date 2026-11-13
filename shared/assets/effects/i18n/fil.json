@@ -770,6 +770,13 @@
     },
     "center": {
      "label": "Sentro"
+    },
+    "sampling": {
+     "label": "Sampling",
+     "options": [
+      "Linear",
+      "Mga Sinag"
+     ]
     }
    }
   },
@@ -2252,6 +2259,13 @@
     },
     "radius": {
      "label": "Radius"
+    },
+    "spread": {
+     "label": "Kalat",
+     "options": [
+      "Karaniwan",
+      "Buo"
+     ]
     }
    }
   },
@@ -3355,6 +3369,13 @@
     },
     "low": {
      "label": "Black point"
+    },
+    "compositing": {
+     "label": "Komposisyon",
+     "options": [
+      "Tatak",
+      "Tint"
+     ]
     }
    }
   },
@@ -3404,6 +3425,13 @@
     },
     "softness": {
      "label": "Lambot"
+    },
+    "method": {
+     "label": "Paraan",
+     "options": [
+      "Hangganan",
+      "Paliitin"
+     ]
     }
    }
   },
@@ -3425,6 +3453,17 @@
      "options": [
       "Tupi",
       "Baliktad"
+     ]
+    },
+    "offset": {
+     "label": "Offset"
+    },
+    "blend": {
+     "label": "Blend",
+     "options": [
+      "Normal",
+      "Multiply",
+      "Screen"
      ]
     }
    }

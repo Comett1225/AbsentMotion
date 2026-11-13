@@ -770,6 +770,13 @@
     },
     "center": {
      "label": "Pusat"
+    },
+    "sampling": {
+     "label": "Persampelan",
+     "options": [
+      "Linear",
+      "Sinar"
+     ]
     }
    }
   },
@@ -2252,6 +2259,13 @@
     },
     "radius": {
      "label": "Jejari"
+    },
+    "spread": {
+     "label": "Sebaran",
+     "options": [
+      "Standard",
+      "Penuh"
+     ]
     }
    }
   },
@@ -3355,6 +3369,13 @@
     },
     "low": {
      "label": "Titik hitam"
+    },
+    "compositing": {
+     "label": "Pengkompositan",
+     "options": [
+      "Cap",
+      "Tona"
+     ]
     }
    }
   },
@@ -3404,6 +3425,13 @@
     },
     "softness": {
      "label": "Kelembutan"
+    },
+    "method": {
+     "label": "Kaedah",
+     "options": [
+      "Ambang",
+      "Hakisan"
+     ]
     }
    }
   },
@@ -3425,6 +3453,17 @@
      "options": [
       "Lipat",
       "Kilas"
+     ]
+    },
+    "offset": {
+     "label": "Anjakan"
+    },
+    "blend": {
+     "label": "Campuran",
+     "options": [
+      "Normal",
+      "Darab",
+      "Skrin"
      ]
     }
    }
