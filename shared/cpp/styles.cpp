@@ -1489,7 +1489,7 @@ void DrawShuttered(SkCanvas* canvas, const std::vector<Layer>& siblings, const L
         if (steady) return SkVector{0, 0};
         return SiblingMatrix(siblings, l, at((double)to / samples)).mapPoint(middle) - SiblingMatrix(siblings, l, at((double)from / samples)).mapPoint(middle);
     };
-    if (l.kind == "embedScene") {
+    if (l.kind == "embedScene" || HasRepeat(l) || EffectsApply(siblings, l)) {
         canvas->saveLayer(SkCanvas::SaveLayerRec(nullptr, &composite, SkCanvas::kF16ColorType));
         SkPaint add;
         add.setBlendMode(SkBlendMode::kPlus);
