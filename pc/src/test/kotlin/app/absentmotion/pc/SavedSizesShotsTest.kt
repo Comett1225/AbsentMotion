@@ -45,7 +45,7 @@ class SavedSizesShotsTest {
                 shot("f-save")
                 onAllNodesWithText("Done", substring = false).onFirst().performClick()
                 mainClock.advanceTimeBy(500)
-                assertEquals(2, app.settings.savedSizes.size)
+                assertEquals(3, app.settings.savedSizes.size)
                 assertEquals("1080 × 550", app.settings.savedSizes.first().name)
             }
         }

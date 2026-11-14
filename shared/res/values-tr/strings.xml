@@ -1994,7 +1994,7 @@
     <string name="feature_ai_enhance">AI İyileştirme</string>
     <string name="feature_best_cutout">AI arka plan kaldırma 2.0</string>
     <string name="about_version_compatible">Sürüm %1$s Compatible</string>
-    <string name="about_compatible_note">Bu, Android 8 ile 12 için Compatible sürümüdür. Dışarıda bırakılanlar: %1$s. Bunlar için Android 13 ve Latest sürümü gerekir.</string>
+    <string name="about_compatible_note">Bu, Android 8 ile 12 için Compatible sürümüdür. %1$s: Bunlar en iyi Android 13 ve Latest sürümüyle çalışır, bu yüzden uygulama burada her kullanımdan önce sorar.</string>
     <string name="low_memory_title">Düşük bellek</string>
     <string name="low_memory_body">Bu telefonda %1$s GB bellek var. AbsentMotion en iyi 3 GB veya daha fazlasıyla çalışır: uzun projeler, büyük videolar ve çok sayıda efekt yavaşlayabilir veya uygulamayı kapatabilir.</string>
     <string name="preview_cache_render">Önizlemeyi işle</string>

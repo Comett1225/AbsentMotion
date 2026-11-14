@@ -2042,7 +2042,7 @@
     <string name="feature_ai_enhance">AI-покращення</string>
     <string name="feature_best_cutout">AI-видалення фону 2.0</string>
     <string name="about_version_compatible">Версія %1$s Compatible</string>
-    <string name="about_compatible_note">Це версія Compatible для Android 8–12. Не входять: %1$s. Вони потребують Android 13 і версії Latest.</string>
+    <string name="about_compatible_note">Це версія Compatible для Android 8–12. %1$s: ці функції найкраще працюють на Android 13 у версії Latest, тому тут застосунок питає перед кожним використанням.</string>
     <string name="low_memory_title">Мало пам\'яті</string>
     <string name="low_memory_body">У цього телефона %1$s ГБ пам\'яті. AbsentMotion працює найкраще з 3 ГБ і більше: довгі проєкти, великі відео та багато ефектів можуть гальмувати або закривати застосунок.</string>
     <string name="preview_cache_render">Рендеринг перегляду</string>

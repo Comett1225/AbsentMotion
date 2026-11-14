@@ -1994,7 +1994,7 @@
     <string name="feature_ai_enhance">AI اینہانس</string>
     <string name="feature_best_cutout">AI بیک گراؤنڈ ریموول 2.0</string>
     <string name="about_version_compatible">ورژن %1$s Compatible</string>
-    <string name="about_compatible_note">یہ Android 8 سے 12 کے لیے Compatible ورژن ہے۔ شامل نہیں: %1$s۔ ان کے لیے Android 13 اور Latest ورژن درکار ہے۔</string>
+    <string name="about_compatible_note">یہ Android 8 سے 12 کے لیے Compatible ورژن ہے۔ %1$s: یہ Android 13 اور Latest ورژن پر سب سے بہتر چلتے ہیں، اس لیے یہاں ایپ ہر استعمال سے پہلے پوچھتی ہے۔</string>
     <string name="low_memory_title">کم میموری</string>
     <string name="low_memory_body">اس فون میں %1$s GB میموری ہے۔ AbsentMotion 3 GB یا اس سے زیادہ کے ساتھ بہترین کام کرتا ہے: لمبے پروجیکٹس، بڑی ویڈیوز اور بہت سے ایفیکٹس سست ہو سکتے ہیں یا ایپ بند ہو سکتی ہے۔</string>
     <string name="preview_cache_render">پری ویو رینڈر کریں</string>

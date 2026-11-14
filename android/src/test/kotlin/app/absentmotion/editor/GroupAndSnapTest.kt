@@ -8,9 +8,12 @@ import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.blend
+import app.absentmotion.ui.editor.isFlat
 import app.absentmotion.ui.editor.panels.Snap
 import app.absentmotion.ui.editor.panels.SnapAxis
+import app.absentmotion.ui.editor.panels.snapAxes
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -105,6 +108,22 @@ class GroupAndSnapTest {
 
     private val line = SnapGuide(true, 0f, false)
     private val other = SnapGuide(false, 0f, true)
+
+    @Test fun thePreviewDragSnapsWithItsOwnReach() {
+        val (x, y) = snapAxes(1000f, 1000f, floatArrayOf(400f, 500f), null, emptyList(), 1f, 1f, threshold = 4f)
+        assertEquals(100f, x.map(100f), 1e-4f)
+        assertEquals(100f, x.map(103f), 1e-4f)
+        assertEquals(101f, x.map(105f), 1e-4f)
+        assertEquals(0f, y.map(1.5f), 1e-4f)
+        assertEquals(1f, y.map(3f), 1e-4f)
+    }
+
+    @Test fun onlyAFlatLayerPlaneSnapsOnThePreview() {
+        assertTrue(null.isFlat())
+        assertTrue(floatArrayOf(1f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 1f).isFlat())
+        assertFalse(floatArrayOf(2f, 0f, 0f, 0f, 2f, 0f, 0f, 0f, 1f).isFlat())
+        assertFalse(floatArrayOf(1f, 0.2f, 0f, 0f, 1f, 0f, 0f, 0.001f, 1f).isFlat())
+    }
 
     @Test fun withoutSnapsTheLayerFollowsTheFinger() {
         val axis = SnapAxis(emptyList())

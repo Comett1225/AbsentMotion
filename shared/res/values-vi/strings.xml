@@ -1970,7 +1970,7 @@
     <string name="feature_ai_enhance">Nâng cấp bằng AI</string>
     <string name="feature_best_cutout">Xóa nền bằng AI 2.0</string>
     <string name="about_version_compatible">Phiên bản %1$s Compatible</string>
-    <string name="about_compatible_note">Đây là bản Compatible cho Android 8 đến 12. Không bao gồm: %1$s. Các tính năng này cần Android 13 và bản Latest.</string>
+    <string name="about_compatible_note">Đây là bản Compatible cho Android 8 đến 12. %1$s: các tính năng này chạy tốt nhất trên Android 13 với bản Latest, nên ở đây ứng dụng sẽ hỏi trước mỗi lần dùng.</string>
     <string name="low_memory_title">Bộ nhớ thấp</string>
     <string name="low_memory_body">Điện thoại này có %1$s GB bộ nhớ. AbsentMotion hoạt động tốt nhất với 3 GB trở lên: dự án dài, video lớn và nhiều hiệu ứng có thể bị chậm hoặc khiến ứng dụng thoát.</string>
     <string name="preview_cache_render">Kết xuất bản xem trước</string>

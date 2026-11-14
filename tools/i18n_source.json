@@ -52,7 +52,7 @@
  "a11y_zoom_in": "Zoom in",
  "a11y_zoom_out": "Zoom out",
  "about_compatibility_note": "AbsentMotion can open scene XML files and .amproj packages exported from Alight Motion, and it exports scene XML in the same format. It saves its own packages as .absproj.",
- "about_compatible_note": "This is the Compatible version for Android 8 to 12. Left out: %1$s. They need Android 13 and the Latest version.",
+ "about_compatible_note": "This is the Compatible version for Android 8 to 12. %1$s work best on Android 13 with the Latest version, so here the app asks before each use.",
  "about_independent_note": "AbsentMotion is an independent project. It is not affiliated with, endorsed by or sponsored by any other app maker; names of other products belong to their owners.",
  "about_licence_line": "Free and open source, licensed under the GNU General Public License v3.0.",
  "about_licence_unreadable": "The license text could not be read.",

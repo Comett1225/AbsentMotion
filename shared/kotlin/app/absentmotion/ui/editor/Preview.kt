@@ -34,6 +34,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
 import app.absentmotion.editor.PreviewCache
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -100,6 +101,10 @@ import app.absentmotion.model.withResizedTextWrap
 import app.absentmotion.model.wrapWidth
 import app.absentmotion.model.onTextPath
 import app.absentmotion.ui.editor.panels.EyedropperLoupe
+import app.absentmotion.ui.editor.panels.SnapScene
+import app.absentmotion.ui.editor.panels.previewSnapAxes
+import app.absentmotion.ui.editor.panels.snapScene
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.presence
 import app.absentmotion.ui.theme.Presence
@@ -233,6 +238,13 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
     }
 
     val scope = rememberCoroutineScope()
+    val tick = rememberHaptic(state)
+    val snapScene by produceState<SnapScene?>(null, state.selectedId, state.scene.layers, state.timeMs, state.playing) {
+        val id = state.selectedId ?: return@produceState
+        if (state.playing) return@produceState
+        delay(120)
+        value = state.snapScene(id)
+    }
     val currentScale by rememberUpdatedState(scale)
     val currentOffset by rememberUpdatedState(Offset(dx, dy))
 
@@ -349,6 +361,11 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                         boxPoint(startQuad, if (handle == 10) g.x0 else g.x1, if (handle == 10) g.y0 else g.y1) - down.position
                     } else Offset.Zero
                     val startPivot = startLayer?.pivot?.let { onScreen(Pt(it[0], it[1])) }
+                    val snapAxes = snapScene?.takeIf { startLayer != null && it.id == startLayer.id && plane.isFlat() && !state.playing && startLayer.kind != "camera" && turning == null }
+                        ?.let { state.scene.previewSnapAxes(startLayer!!, state.sampleMs, it, SnapReach.toPx() / currentScale) }
+                    var snapping = snapAxes != null
+                    var snapTravel = Offset.Zero
+                    var snapShown = Offset.Zero
                     var moved = false
                     var held = Offset.Zero
                     var cancelled = false
@@ -455,7 +472,23 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                             held = Offset.Zero
                             val centroid = event.calculateCentroid(useCurrent = false)
                             val about = if (centroid.isSpecified) ((centroid - currentOffset) / s).let { Pt(it.x, it.y) }.let { planeView?.inverseMap(it) ?: it } else null
-                            state.editSelected(key = "preview-gesture") { layer ->
+                            if (snapping && (fingers > 1 || zoom != 1f)) {
+                                snapping = false
+                                state.snapGuides = emptyList()
+                            }
+                            val axes = snapAxes?.takeIf { snapping }
+                            if (axes != null) {
+                                snapTravel += Offset(move.x, move.y)
+                                val snapped = Offset(axes.first.map(snapTravel.x), axes.second.map(snapTravel.y))
+                                val step = snapped - snapShown
+                                snapShown = snapped
+                                val guides = axes.first.guidesAt(snapped.x) + axes.second.guidesAt(snapped.y)
+                                if (guides.any { it !in state.snapGuides }) tick(HapticFeedbackType.SegmentTick)
+                                state.snapGuides = guides
+                                if (step != Offset.Zero) state.editSelected(key = "preview-gesture") { layer ->
+                                    state.scene.withWorldLocation(layer, state.sampleMs) { x, y -> x + step.x to y + step.y }
+                                }
+                            } else state.editSelected(key = "preview-gesture") { layer ->
                                 if (zoom == 1f || about == null) {
                                     state.scene.withWorldLocation(layer, state.sampleMs) { x, y -> x + move.x to y + move.y }
                                 } else {
@@ -466,6 +499,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                         }
                         if (moved) event.changes.forEach { if (it.positionChanged()) it.consume() }
                     } while (event.changes.any { it.pressed })
+                    if (snapAxes != null) state.snapGuides = emptyList()
                     gesture = IDLE
                     multiMoving = false
                     val farFromDots = gradientMode && gradientHandleDistance(startLayer, startQuad, down.position) > 24.dp.toPx()
@@ -589,6 +623,10 @@ private fun SwipeHint(label: String, modifier: Modifier) {
     }
 }
 
+private val SnapReach = 16.dp
+private val FlatPlane = floatArrayOf(1f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 1f)
+
+internal fun FloatArray?.isFlat(): Boolean = this == null || size == 9 && indices.all { abs(this[it] - FlatPlane[it]) < 1e-3f }
 private const val IDLE = -10
 private const val HIDDEN = -11
 

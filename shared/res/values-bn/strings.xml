@@ -1994,7 +1994,7 @@
     <string name="feature_ai_enhance">AI এনহ্যান্স</string>
     <string name="feature_best_cutout">AI ব্যাকগ্রাউন্ড রিমুভাল 2.0</string>
     <string name="about_version_compatible">ভার্সন %1$s Compatible</string>
-    <string name="about_compatible_note">এটি Android 8 থেকে 12-এর জন্য Compatible ভার্সন। বাদ দেওয়া হয়েছে: %1$s। এগুলোর জন্য Android 13 এবং Latest ভার্সন প্রয়োজন।</string>
+    <string name="about_compatible_note">এটি Android 8 থেকে 12-এর জন্য Compatible ভার্সন। %1$s: এগুলো Android 13 এবং Latest ভার্সনে সবচেয়ে ভালো চলে, তাই এখানে প্রতিবার ব্যবহারের আগে অ্যাপ জিজ্ঞেস করে।</string>
     <string name="low_memory_title">মেমোরি কম</string>
     <string name="low_memory_body">এই ফোনে %1$s GB মেমোরি আছে। AbsentMotion 3 GB বা তার বেশি মেমোরিতে সবচেয়ে ভালো কাজ করে: দীর্ঘ প্রজেক্ট, বড় ভিডিও ও অনেক ইফেক্টে অ্যাপ ধীর হতে পারে বা বন্ধ হয়ে যেতে পারে।</string>
     <string name="preview_cache_render">প্রিভিউ রেন্ডার করুন</string>

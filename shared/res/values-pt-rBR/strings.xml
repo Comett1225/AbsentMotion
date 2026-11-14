@@ -2018,7 +2018,7 @@
     <string name="feature_ai_enhance">Aprimorar com AI</string>
     <string name="feature_best_cutout">Remoção de fundo com IA 2.0</string>
     <string name="about_version_compatible">Versão %1$s Compatible</string>
-    <string name="about_compatible_note">Esta é a versão Compatible para Android 8 a 12. Ficaram de fora: %1$s. Eles precisam do Android 13 e da versão Latest.</string>
+    <string name="about_compatible_note">Esta é a versão Compatible para Android 8 a 12. %1$s: funcionam melhor no Android 13 com a versão Latest, então aqui o app pergunta antes de cada uso.</string>
     <string name="low_memory_title">Pouca memória</string>
     <string name="low_memory_body">Este celular tem %1$s GB de memória. O AbsentMotion funciona melhor com 3 GB ou mais: projetos longos, vídeos grandes e muitos efeitos podem ficar lentos ou fechar o app.</string>
     <string name="preview_cache_render">Renderizar pré-visualização</string>

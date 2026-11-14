@@ -1994,7 +1994,7 @@
     <string name="feature_ai_enhance">AI-Verbesserung</string>
     <string name="feature_best_cutout">AI-Hintergrundentfernung 2.0</string>
     <string name="about_version_compatible">Version %1$s Kompatibel</string>
-    <string name="about_compatible_note">Dies ist die kompatible Version für Android 8 bis 12. Nicht enthalten: %1$s. Diese Funktionen benötigen Android 13 und die aktuelle Version.</string>
+    <string name="about_compatible_note">Dies ist die kompatible Version für Android 8 bis 12. %1$s: Diese Funktionen laufen am besten mit Android 13 und der aktuellen Version, deshalb fragt die App hier vor jeder Nutzung nach.</string>
     <string name="low_memory_title">Wenig Arbeitsspeicher</string>
     <string name="low_memory_body">Dieses Telefon hat %1$s GB Arbeitsspeicher. AbsentMotion funktioniert am besten mit mindestens 3 GB: Lange Projekte, große Videos und viele Effekte können langsam sein oder die App beenden.</string>
     <string name="preview_cache_render">Vorschau rendern</string>

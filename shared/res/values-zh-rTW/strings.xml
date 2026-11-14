@@ -1970,7 +1970,7 @@
     <string name="feature_ai_enhance">AI增強</string>
     <string name="feature_best_cutout">AI背景移除2.0</string>
     <string name="about_version_compatible">版本 %1$s 相容版</string>
-    <string name="about_compatible_note">這是適用於Android 8至12的相容版。不含：%1$s。這些功能需要Android 13和最新版。</string>
+    <string name="about_compatible_note">這是適用於Android 8至12的相容版。%1$s：這些功能在Android 13和最新版上效果最好，因此這裡每次使用前都會先詢問。</string>
     <string name="low_memory_title">記憶體不足</string>
     <string name="low_memory_body">此手機有 %1$s GB記憶體。AbsentMotion在3 GB以上的記憶體環境中運作最佳：長專案、大型影片及大量特效可能導致速度變慢或應用程式關閉。</string>
     <string name="preview_cache_render">算圖預覽</string>

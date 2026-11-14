@@ -1994,7 +1994,7 @@
     <string name="feature_ai_enhance">Pagandahin gamit ang AI</string>
     <string name="feature_best_cutout">AI pagtanggal ng background 2.0</string>
     <string name="about_version_compatible">Bersyon %1$s Compatible</string>
-    <string name="about_compatible_note">Ito ang Compatible na bersyon para sa Android 8 hanggang 12. Hindi kasama: %1$s. Kailangan nila ang Android 13 at ang Latest na bersyon.</string>
+    <string name="about_compatible_note">Ito ang Compatible na bersyon para sa Android 8 hanggang 12. %1$s: pinakamahusay itong gumagana sa Android 13 gamit ang Latest na bersyon, kaya dito ay nagtatanong muna ang app bago ang bawat paggamit.</string>
     <string name="low_memory_title">Mababang memory</string>
     <string name="low_memory_body">May %1$s GB na memory ang teleponong ito. Gumagana nang pinakamahusay ang AbsentMotion sa 3 GB o higit pa: sa mahahabang proyekto, malalaking bidyo, at maraming epekto, maaaring bumagal o magsara ang app.</string>
     <string name="preview_cache_render">I-render ang preview</string>
