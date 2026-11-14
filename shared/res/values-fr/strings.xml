@@ -914,7 +914,6 @@
     <string name="project_too_many_linked">Ce projet contient trop d’éléments liés intégrés.</string>
     <string name="media_error_read_frames">Cet appareil ne peut pas lire les images de cette vidéo</string>
     <string name="media_error_pixel_format">Cette vidéo utilise un format de pixels illisible</string>
-    <string name="media_error_windows_media">Ce Mac ne peut pas ouvrir les fichiers Windows Media (WMA, WMV, ASF) : macOS n\'a pas de décodeur pour eux.</string>
     <string name="media_error_mpeg4_asp">Cette vidéo DivX ou Xvid utilise des fonctions (comme les images B) que macOS ne peut pas lire. Le son est lu, mais il n\'y a pas d\'image.</string>
     <string name="media_error_video_unavailable">Vidéo indisponible : %1$s</string>
     <string name="media_error_decode_frame">Impossible de décoder précisément l’image vidéo %1$s</string>

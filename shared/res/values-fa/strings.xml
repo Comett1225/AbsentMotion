@@ -904,7 +904,6 @@
     <string name="project_too_many_linked">این پروژه عناصر پیوندی بیش از حدی را جاسازی کرده است.</string>
     <string name="media_error_read_frames">این گوشی نمی‌تواند فریم‌های این ویدیو را بخواند</string>
     <string name="media_error_pixel_format">این ویدیو از قالب پیکسلی استفاده می‌کند که خوانده نمی‌شود</string>
-    <string name="media_error_windows_media">این Mac نمی‌تواند فایل‌های Windows Media (WMA، WMV، ASF) را باز کند: macOS رمزگشایی برای آن‌ها ندارد.</string>
     <string name="media_error_mpeg4_asp">این ویدیوی DivX یا Xvid از قابلیت‌هایی (مانند فریم‌های B) استفاده می‌کند که macOS نمی‌تواند پخش کند. صدا پخش می‌شود، اما تصویری وجود ندارد.</string>
     <string name="media_error_video_unavailable">ویدیو در دسترس نیست: %1$s</string>
     <string name="media_error_decode_frame">فریم دقیق ویدیو %1$s رمزگشایی نمی‌شود</string>

@@ -9,7 +9,7 @@ import android.content.mime
 
 object DeskGallery {
     private val images = setOf("png", "jpg", "jpeg", "webp", "gif", "bmp", "heic", "heif", "svg", "tif", "tiff")
-    private val videos = setOf("mp4", "mov", "m4v", "webm", "mkv", "avi")
+    private val videos = setOf("mp4", "mov", "m4v", "webm", "mkv", "avi", "wmv", "asf")
     private val ids = ConcurrentHashMap<Long, File>()
     private val durations = ConcurrentHashMap<String, Long>()
 

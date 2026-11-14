@@ -170,12 +170,16 @@ class FfampFormatsTest {
         println("alpha checked: ${files.joinToString { it.name }}")
     }
 
-    @Test fun filesTheMacCannotPlaySayWhy() {
+    @Test fun oldFormatsPlayOrSayWhy() {
         val clip = listOf("-i", source.path, "-t", "1", "-vf", "scale=320:180")
-        made("old.wmv", *clip.toTypedArray(), "-c:v", "wmv2", "-c:a", "wmav2")?.let { file ->
-            assertEquals(R.string.media_error_windows_media, MediaEngine.current.trouble(file))
-            assertTrue(app.absentmotion.platform.mediaTrouble(context, Uri.fromFile(file))!!.contains("Windows Media"))
-            assertTrue(DeskProbe.parse(org.json.JSONObject(MediaEngine.current.probe(file).ifBlank { "{}" })).streams.isEmpty())
+        for ((name, video, sound) in listOf(Triple("old.wmv", "wmv2", "wmav2"), Triple("older.asf", "wmv1", "wmav1"), Triple("divx3.avi", "msmpeg4", "libmp3lame"))) {
+            val file = made(name, *clip.toTypedArray(), "-c:v", video, "-c:a", sound) ?: continue
+            assertEquals(null, MediaEngine.current.trouble(file))
+            assertEquals(null, app.absentmotion.platform.mediaTrouble(context, Uri.fromFile(file)))
+            val probe = DeskProbe.parse(org.json.JSONObject(MediaEngine.current.probe(file)))
+            assertTrue(name, probe.video != null && probe.audio != null)
+            assertTrue(name, heard(file).second)
+            NativeVideoSource(file).close()
         }
         val film = made("advanced.avi", *clip.toTypedArray(), "-c:v", "mpeg4", "-bf", "2", "-c:a", "libmp3lame")!!
         assertEquals(if (FfampNative.divxDecoder()) null else R.string.media_error_mpeg4_asp, MediaEngine.current.trouble(film))

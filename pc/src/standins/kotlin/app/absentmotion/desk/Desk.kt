@@ -42,9 +42,9 @@ object DeskBack {
 
 object DeskFiles {
     var window: java.awt.Frame? = null
-    val mediaExtensions = setOf("mp4", "mov", "m4v", "webm", "mkv", "avi", "png", "jpg", "jpeg", "webp", "gif", "bmp", "heic", "svg", "mp3", "wav", "m4a", "aac", "ogg", "opus", "flac")
+    val mediaExtensions = setOf("mp4", "mov", "m4v", "webm", "mkv", "avi", "wmv", "asf", "png", "jpg", "jpeg", "webp", "gif", "bmp", "heic", "svg", "mp3", "wav", "m4a", "aac", "ogg", "opus", "flac", "wma")
 
-    val videoExtensions = setOf("mp4", "mov", "m4v", "webm", "mkv", "avi")
+    val videoExtensions = setOf("mp4", "mov", "m4v", "webm", "mkv", "avi", "wmv", "asf")
 
     fun chooseFiles(media: Boolean, multiple: Boolean, videoOnly: Boolean = false, title: String = when { videoOnly -> app.absentmotion.i18n.AppText.get(R.string.tools_choose_video); media -> app.absentmotion.i18n.AppText.get(R.string.desk_choose_media); else -> app.absentmotion.i18n.AppText.get(R.string.desk_choose_file) }): List<File> {
         System.getProperty("am.pick")?.let { return listOf(File(it)) }

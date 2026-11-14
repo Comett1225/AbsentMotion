@@ -904,7 +904,6 @@
     <string name="project_too_many_linked">এই প্রজেক্টে অনেক বেশি লিঙ্ক করা এলিমেন্ট এমবেড করা আছে।</string>
     <string name="media_error_read_frames">এই ফোন এই ভিডিওর ফ্রেম পড়তে পারে না</string>
     <string name="media_error_pixel_format">এই ভিডিওতে এমন পিক্সেল ফরম্যাট ব্যবহার হয়েছে যা পড়া যায় না</string>
-    <string name="media_error_windows_media">এই Mac Windows Media ফাইল (WMA, WMV, ASF) খুলতে পারে না: macOS-এ এগুলোর কোনো ডিকোডার নেই।</string>
     <string name="media_error_mpeg4_asp">এই DivX বা Xvid ভিডিওতে এমন বৈশিষ্ট্য (যেমন B-ফ্রেম) আছে যা macOS চালাতে পারে না। শব্দ বাজবে, কিন্তু ছবি দেখা যাবে না।</string>
     <string name="media_error_video_unavailable">ভিডিও পাওয়া যাচ্ছে না: %1$s</string>
     <string name="media_error_decode_frame">ভিডিওর সঠিক ফ্রেম %1$s ডিকোড করা যায়নি</string>

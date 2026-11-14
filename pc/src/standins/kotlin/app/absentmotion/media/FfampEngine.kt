@@ -386,7 +386,6 @@ object FfampEngine : MediaEngine {
     override fun trouble(file: File): Int? {
         val problem = FfampNative.openProblem(file.path) ?: return null
         return when {
-            "Windows Media" in problem -> R.string.media_error_windows_media
             "Advanced Simple Profile" in problem -> R.string.media_error_mpeg4_asp
             else -> null
         }

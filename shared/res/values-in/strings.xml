@@ -894,7 +894,6 @@
     <string name="project_too_many_linked">Proyek ini menyematkan terlalu banyak elemen tertaut.</string>
     <string name="media_error_read_frames">Ponsel ini tidak dapat membaca frame video ini</string>
     <string name="media_error_pixel_format">Video ini menggunakan format piksel yang tidak dapat dibaca</string>
-    <string name="media_error_windows_media">Mac ini tidak dapat membuka file Windows Media (WMA, WMV, ASF): macOS tidak memiliki dekoder untuk file tersebut.</string>
     <string name="media_error_mpeg4_asp">Video DivX atau Xvid ini memakai fitur (seperti B-frame) yang tidak dapat diputar macOS. Suaranya diputar, tetapi tidak ada gambar.</string>
     <string name="media_error_video_unavailable">Video tidak tersedia: %1$s</string>
     <string name="media_error_decode_frame">Tidak dapat mendekode frame video persis %1$s</string>

@@ -904,7 +904,6 @@
     <string name="project_too_many_linked">Masyadong maraming naka-link na elemento ang naka-embed sa proyektong ito.</string>
     <string name="media_error_read_frames">Hindi kayang basahin ng phone na ito ang mga frame ng bidyong ito</string>
     <string name="media_error_pixel_format">Gumagamit ang bidyong ito ng pixel format na hindi mabasa</string>
-    <string name="media_error_windows_media">Hindi mabuksan ng Mac na ito ang mga Windows Media file (WMA, WMV, ASF): walang decoder ang macOS para sa mga ito.</string>
     <string name="media_error_mpeg4_asp">Gumagamit ang DivX o Xvid na video na ito ng mga feature (gaya ng B-frames) na hindi kayang i-play ng macOS. Tumutunog ang audio, pero walang larawan.</string>
     <string name="media_error_video_unavailable">Hindi available ang bidyo: %1$s</string>
     <string name="media_error_decode_frame">Hindi ma-decode ang eksaktong video frame %1$s</string>

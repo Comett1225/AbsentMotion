@@ -924,7 +924,6 @@
     <string name="project_too_many_linked">В этом проекте встроено слишком много связанных элементов.</string>
     <string name="media_error_read_frames">Этот телефон не может прочитать кадры этого видео</string>
     <string name="media_error_pixel_format">В этом видео используется формат пикселей, который не удаётся прочитать</string>
-    <string name="media_error_windows_media">Этот Mac не может открыть файлы Windows Media (WMA, WMV, ASF): в macOS нет декодера для них.</string>
     <string name="media_error_mpeg4_asp">Это видео DivX или Xvid использует возможности (например, B-кадры), которые macOS не может воспроизвести. Звук воспроизводится, но изображения нет.</string>
     <string name="media_error_video_unavailable">Видео недоступно: %1$s</string>
     <string name="media_error_decode_frame">Не удаётся декодировать точный видеокадр %1$s</string>
