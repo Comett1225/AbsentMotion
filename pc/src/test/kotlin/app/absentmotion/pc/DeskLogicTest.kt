@@ -373,6 +373,10 @@ class DeskLogicTest {
             }.onFailure { if (ExportRun.running) throw it }
             mainClock.advanceTimeBy(1500)
             waitUntil(timeoutMillis = 20_000) { onAllNodesWithText("Cancel").fetchSemanticsNodes().isEmpty() }
+            onAllNodesWithText("OK").filter(hasClickAction()).fetchSemanticsNodes().takeIf { it.isNotEmpty() }?.let {
+                onAllNodesWithText("OK").filter(hasClickAction()).onLast().performClick()
+                mainClock.advanceTimeBy(500)
+            }
             onAllNodes(isRoot()).onFirst().performMouseInput { moveTo(Offset(20f, 400f)); press(); release() }
             mainClock.advanceTimeBy(500)
             runOnIdle { assertFalse("an idle export dialog closes on an outside click", editor.exportOpen) }
