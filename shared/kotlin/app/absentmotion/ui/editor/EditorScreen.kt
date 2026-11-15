@@ -301,7 +301,7 @@ private fun Playback(state: EditorState) {
                         audible = audio?.play(startMs.toDouble()) == true
                         state.frame = 0
                     } else {
-                        state.frame = state.scene.lastFrame
+                        state.parkAtEnd()
                         state.playing = false
                     }
                 } else {

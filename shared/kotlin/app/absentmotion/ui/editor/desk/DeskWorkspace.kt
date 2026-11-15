@@ -311,14 +311,14 @@ private fun DeskTransport(state: EditorState, modifier: Modifier) {
         val centred = (maxWidth - 16.dp - centre) / 2 >= tools
         Row(Modifier.fillMaxSize().padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
-                Text(TimelineMath.timecode(state.frame, state.scene.fps), color = Am.OnDark, fontSize = 13.sp, style = Tabular, maxLines = 1, softWrap = false)
+                Text(TimelineMath.timecode(state.playheadFrame, state.scene.fps), color = Am.OnDark, fontSize = 13.sp, style = Tabular, maxLines = 1, softWrap = false)
                 if (total) Text(" / " + TimelineMath.timecode(state.scene.lastFrame + 1, state.scene.fps), color = Am.OnDarkDim, fontSize = 13.sp, style = Tabular, maxLines = 1, softWrap = false)
             }
             if (skips) DeskIcon(ChromeIcons.SkipBack, deskShortcut(R.string.desk_start, "Home"), size = 32.dp) { state.playing = false; state.frame = 0 }
-            DeskIcon(DrawingIcons.Prev, deskShortcut(R.string.desk_previous_frame, "←"), size = 32.dp) { state.playing = false; state.frame = (state.frame - 1).coerceAtLeast(0) }
+            DeskIcon(DrawingIcons.Prev, deskShortcut(R.string.desk_previous_frame, "←"), size = 32.dp) { state.playing = false; state.stepTo(state.playheadFrame - 1) }
             DeskIcon(if (state.playing) ChromeIcons.Pause else ChromeIcons.Play, deskShortcut(if (state.playing) R.string.play_pause else R.string.play_play, "Space"), size = 32.dp) { state.playing = !state.playing }
-            DeskIcon(DrawingIcons.Next, deskShortcut(R.string.desk_next_frame, "→"), size = 32.dp) { state.playing = false; state.frame = (state.frame + 1).coerceAtMost(state.scene.lastFrame) }
-            if (skips) DeskIcon(ChromeIcons.SkipForward, deskShortcut(R.string.desk_end, "End"), size = 32.dp) { state.playing = false; state.frame = state.scene.lastFrame }
+            DeskIcon(DrawingIcons.Next, deskShortcut(R.string.desk_next_frame, "→"), size = 32.dp) { state.playing = false; state.stepTo(state.playheadFrame + 1) }
+            if (skips) DeskIcon(ChromeIcons.SkipForward, deskShortcut(R.string.desk_end, "End"), size = 32.dp) { state.playing = false; state.parkAtEnd() }
             if (loop) DeskIcon(ChromeIcons.PlayRepeat, stringResource(R.string.desk_loop), active = state.settings.loopingPlay, size = 32.dp) { state.settings.loopingPlay = !state.settings.loopingPlay }
             Row(if (centred) Modifier.weight(1f) else Modifier, Arrangement.End, Alignment.CenterVertically) {
                 Box(Modifier.size(32.dp), Alignment.Center) { Hint(stringResource(R.string.a11y_animate)) { AnimateButton(state, Modifier) } }

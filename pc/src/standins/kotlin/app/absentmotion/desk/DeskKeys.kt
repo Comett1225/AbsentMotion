@@ -98,7 +98,7 @@ object DeskKeys {
         if (command && !event.isShiftPressed && (event.key == Key.One || event.key == Key.Two)) DeskDrop.panelKey?.let { it(event.key == Key.One); return true }
         val shift = event.isShiftPressed
         val last = state.scene.lastFrame
-        fun step(by: Int) { state.playing = false; state.frame = (state.frame + by).coerceIn(0, last) }
+        fun step(by: Int) { state.playing = false; state.stepTo(state.playheadFrame + by) }
         fun nudge(by: Int) {
             val layers = state.chosenLayers
             val firstLayer = layers.firstOrNull() ?: return
@@ -120,7 +120,7 @@ object DeskKeys {
             event.key == Key.DirectionLeft && !command -> step(if (shift) -10 else -1)
             event.key == Key.DirectionRight && !command -> step(if (shift) 10 else 1)
             event.key == Key.MoveHome -> { state.playing = false; state.frame = 0 }
-            event.key == Key.MoveEnd -> { state.playing = false; state.frame = last }
+            event.key == Key.MoveEnd -> { state.playing = false; state.parkAtEnd() }
             command && event.key == Key.Z && !shift -> if (state.canUndo) state.undo()
             command && (event.key == Key.Z && shift || event.key == Key.Y) -> if (state.canRedo) state.redo()
             (event.key == Key.Delete || event.key == Key.Backspace) && !command && DeskDrop.removeHovered != null -> { if (first) DeskDrop.removeHovered?.invoke() }
