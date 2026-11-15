@@ -8,14 +8,15 @@ copied from the licence files that ship with the vendored or checked-out sources
 file the entry says "see upstream" instead of guessing.
 
 Full licence texts for the C and C++ libraries are in the appendix at the end of this file. The Apache License 2.0 text
-that applies to the Apache-2.0 components is in appendix A.21; the GPL-2.0 with Classpath Exception text for the Java runtime is in A.22.
+that applies to the Apache-2.0 components is in appendix A.21; the GPL-2.0 with Classpath Exception text for the Java runtime is in A.22, which also
+holds the GPL-2.0 terms for FFmpeg, x264 and x265 in the macOS app.
 
 This list was written by hand on 2026-10-18 from the build files and the vendored sources. It is not generated. When a
 dependency is added, removed or upgraded, update this file in the same change.
 
 **Contents**
 
-1. Engine libraries (C and C++): Skia and the libraries it links, whisper.cpp and ggml, RNNoise, ncnn, glslang, the RIFE warp layer, LAME, FFmpeg (Windows and Linux desktop apps only), FFamp with its codec libraries (macOS app only: Opus, LAME, mpg123, libvorbis, libogg, OpenAPV, libvpx, dav1d, SVT-AV1, Xvid), the AppImage runtime (Linux AppImage only), and the video downloader add-on (CPython and yt-dlp, downloaded at run time)
+1. Engine libraries (C and C++): Skia and the libraries it links, whisper.cpp and ggml, RNNoise, ncnn, glslang, the RIFE warp layer, LAME, FFmpeg (desktop apps only) with the codec libraries of the macOS build (x264, x265, libvpx, dav1d, Opus, SVT-AV1), FFamp with its codec libraries (macOS app only, when it is switched on: Opus, LAME, mpg123, libvorbis, libogg, OpenAPV, libvpx, dav1d, SVT-AV1, Xvid), the AppImage runtime (Linux AppImage only), and the video downloader add-on (CPython and yt-dlp, downloaded at run time)
 2. Machine learning models: OpenAI Whisper weights, RIFE and Real-ESRGAN weights and the AI background removal 2.0 model (all downloaded at run time), the built-in background removal model
 3. Kotlin and Compose libraries, including those bundled in the desktop apps (OpenJDK, Compose Desktop, Skiko, kotlinx)
 4. Fonts, icons and effect thumbnails
@@ -210,12 +211,11 @@ together with Skia.
 - Used in: MP3 audio export. LAME is built as its own shared library, `libmp3lame.so`, and loaded through a small
   separate library, `liblame_jni.so`, so it can be replaced with another build of LAME.
 
-### FFmpeg (Windows and Linux desktop apps only)
+### FFmpeg (desktop apps only)
 
 - Copyright: Copyright (c) 2000-2026 the FFmpeg developers.
 - URL: https://ffmpeg.org/
-- The Android app and, from AbsentMotion 5.2 on, the macOS app do not contain, link or start FFmpeg. This notice applies to
-  the Windows and Linux desktop apps only.
+- The Android app does not use FFmpeg.
 
 Windows:
 
@@ -256,6 +256,55 @@ Linux (x86_64 and arm64):
 - Source: the same `Source-FFmpeg-<version>-windows-linux-part1.tar` and `-part2.tar` hold the FFmpeg source of this build (commit
   `b204e94e90fca64045e9ca7dd44c65678c7eb29e`) next to BtbN's build scripts and library sources.
 
+macOS (Apple silicon and Intel):
+
+- Version: 9.0.2, built for arm64 and x86_64 (minimum macOS 11) from the unchanged release source
+  https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz (SHA-256 `8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e`,
+  signed with the FFmpeg release signing key).
+- Configure options: `--enable-shared --disable-static --install-name-dir=@rpath --disable-doc --disable-debug
+  --disable-ffplay --disable-sdl2 --disable-xlib --disable-libxcb --disable-sndio --enable-videotoolbox --enable-audiotoolbox
+  --enable-avfoundation --enable-gpl --enable-libmp3lame --enable-libx264 --enable-libx265 --enable-libvpx --enable-libdav1d
+  --enable-libopus --enable-libsvtav1` (plus `--pkg-config-flags=--static` and the compiler and path options; the Intel
+  build assembles FFmpeg's x86 code with NASM). No `--enable-version3` or `--enable-nonfree`.
+- Licence: GNU General Public License, version 2 or later (`--enable-gpl`, which x264 and x265 need; AbsentMotion 5.0 and
+  later uses it under version 3, see `LICENSE`). FFmpeg's `COPYING.GPLv2` ships next to the libraries as
+  `ffmpeg-LICENSE.txt`; the same terms are in appendix A.22 (the Classpath Exception there applies only to OpenJDK). LAME
+  (above) and the codec libraries named below are linked statically into `libavcodec`.
+- Used in: the macOS app, where it is the standard media reader. `libamdesktop.dylib` links the shared `avformat`,
+  `avcodec`, `avutil` and `swscale` libraries for video decoding (VideoToolbox when available), and `ffmpeg` and `ffprobe`
+  run export, the Tools tab, the camera and media probing. They sit in `AbsentMotion.app/Contents/app/resources`, so they
+  can be replaced with another build. When FFamp is switched on (below), FFmpeg still opens the files FFamp cannot read.
+- Source: `Source-FFmpeg-<version>-macos.tar`, attached to every release that ships the macOS apps, holds the
+  unchanged source archives of FFmpeg, LAME and the codec libraries below and the scripts that built them.
+
+The codec libraries in the macOS FFmpeg are built for arm64 and x86_64 (minimum macOS 11) as static libraries from
+unchanged sources: x264 and x265 below, and the libvpx, Opus and SVT-AV1 versions listed under FFamp. Its dav1d is the same
+1.5.4, from `dav1d-1.5.4.tar.xz` at https://downloads.videolan.org/pub/videolan/dav1d/1.5.4/ (SHA-256
+`686616b7c69eb88d44459391ab25cac13b6647a3b288835c5784e71c1514a5c5`, signed with the VideoLAN release signing key). In this
+FFmpeg, libvpx makes VP9 exports (`libvpx-vp9`) and VP8, dav1d decodes AV1, Opus makes Opus audio and SVT-AV1 makes AV1
+exports.
+
+#### x264
+
+- Version: r3222, commit `b35605ace3ddf7c1a5d67a2eb553f034aef41d55` (head of the `stable` branch; x264 publishes no
+  release archives), from https://code.videolan.org/videolan/x264.git.
+- Licence: GNU General Public License, version 2 or later (text in appendix A.22, without the Classpath Exception).
+- Copyright: Copyright (C) 2003-2025 x264 project.
+- URL: https://www.videolan.org/developers/x264.html
+- Used in: H.264 software encoding (`libx264`) in the macOS FFmpeg, for sizes above VideoToolbox's 4096 px and when
+  VideoToolbox fails.
+
+#### x265
+
+- Version: 4.3, `x265_4.3.tar.gz` from https://github.com/Multicorewareinc/x265/releases (SHA-256
+  `83c53e4c8bbb8f1e33ed59e10a7d621d1d7801ca853910c3eb41f038b8ffb121`), 8-bit build.
+- Licence: GNU General Public License, version 2 or later (text in appendix A.22, without the Classpath Exception). x265
+  is also offered under a commercial licence; AbsentMotion uses it under the GPL.
+- Copyright: Copyright (C) 2013-2020 MulticoreWare, Inc.
+- URL: https://github.com/Multicorewareinc/x265
+- Used in: HEVC software encoding (`libx265`) in the macOS FFmpeg, for sizes above VideoToolbox's 4096 px and when
+  VideoToolbox fails.
+
 ### FFamp (macOS app only)
 
 - Version: the commit of the `third_party/FFamp` submodule this release was built from.
@@ -263,9 +312,11 @@ Linux (x86_64 and arm64):
   Project) is written by the AbsentMotion project itself, from the public specifications and the operating-system
   documentation; it contains no code from FFmpeg.
 - Copyright: Copyright (c) 2026 the AbsentMotion project.
-- Used in: the macOS app (Apple silicon and Intel), which reads, plays, exports and converts every media file through it:
+- Used in: the macOS app (Apple silicon and Intel), when Settings > Playback > Media reader is set to FFamp
+  (experimental; off by default). From the next start the app then reads, plays, exports and converts media through it:
   its own readers and writers for MP4, MOV, Matroska, WebM, Ogg, WAV and transport streams on top of the system's
-  VideoToolbox, AudioToolbox and AVFoundation. It is linked statically into `libamdesktop.dylib`.
+  VideoToolbox, AudioToolbox and AVFoundation. A file FFamp cannot open or describe goes to FFmpeg (above) instead. It is
+  linked statically into `libamdesktop.dylib`.
 
 The codec libraries below are linked statically into FFamp. `third_party/FFamp/third_party/build_mac.sh` builds them for
 arm64 and x86_64 (minimum macOS 11) from the unchanged source archives named here and checks each SHA-256 sum before it

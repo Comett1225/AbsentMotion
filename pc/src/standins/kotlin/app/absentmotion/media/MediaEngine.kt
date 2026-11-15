@@ -1,7 +1,8 @@
 package app.absentmotion.media
 
-import app.absentmotion.desk.DeskOs
 import app.absentmotion.export.ExportSettings
+import app.absentmotion.platform.Context
+import app.absentmotion.platform.PlatformFeatures
 import app.absentmotion.tools.AudioJob
 import app.absentmotion.tools.Plan
 import app.absentmotion.tools.SaveMode
@@ -14,6 +15,7 @@ import java.awt.image.BufferedImage
 import java.io.Closeable
 import java.io.File
 import java.io.InputStream
+import java.util.concurrent.ConcurrentHashMap
 
 class MediaPacket(val seconds: Double, val size: Int, val sync: Boolean)
 
@@ -70,6 +72,37 @@ interface MediaEngine {
     fun trouble(file: File): Int? = null
 
     companion object {
-        val current: MediaEngine = if (DeskOs.mac) FfampEngine else FfmpegEngine
+        val ffamp: Boolean by lazy { PlatformFeatures.ffamp && (System.getProperty("am.mediaReader")?.let { it == "ffamp" } ?: MediaReader.ffamp(Context())) }
+        val current: MediaEngine by lazy { if (ffamp) FfampFirst else FfmpegEngine }
     }
+}
+
+object FfampFirst : MediaEngine by FfampEngine {
+    private val readable = ConcurrentHashMap<String, Boolean>()
+
+    fun reads(file: File): Boolean = readable.getOrPut("${file.absolutePath}|${file.length()}|${file.lastModified()}") {
+        runCatching { FfampNative.openProblem(file.path) == null && FfampNative.probe(file.path) != null }.getOrDefault(false)
+    }
+
+    private fun of(file: File): MediaEngine = if (reads(file)) FfampEngine else FfmpegEngine
+
+    override fun probe(file: File, entries: String?) = of(file).probe(file, entries)
+    override fun packets(file: File, stream: Int) = of(file).packets(file, stream)
+    override fun still(file: File, timeMs: Long, maxSide: Int) = of(file).still(file, timeMs, maxSide)
+    override fun pcm(file: File, beforeUs: Long, afterUs: Long, rate: Int, channels: Int) = of(file).pcm(file, beforeUs, afterUs, rate, channels)
+    override fun playback(file: File, fromMs: Long, rate: Int) = of(file).playback(file, fromMs, rate)
+    override fun yuv(file: File, seconds: String, count: Int, batch: Boolean) = of(file).yuv(file, seconds, count, batch)
+    override fun play(file: File, fromMs: Long, width: Int, height: Int, loop: Boolean) = of(file).play(file, fromMs, width, height, loop)
+    override fun videoSource(file: File, maxSide: Int, maxPixels: Int) = of(file).videoSource(file, maxSide, maxPixels)
+    override fun frameTimes(file: File, decoded: Boolean, from: String) = of(file).frameTimes(file, decoded, from)
+    override fun compress(input: File, job: VideoJob, audio: Boolean, durationUs: Long, out: File, startUs: Long, endUs: Long, progress: (Float) -> Unit, alive: () -> Boolean) =
+        of(input).compress(input, job, audio, durationUs, out, startUs, endUs, progress, alive)
+    override fun extractAudio(input: File, job: AudioJob, durationUs: Long, out: File, progress: (Float) -> Unit, alive: () -> Boolean) =
+        of(input).extractAudio(input, job, durationUs, out, progress, alive)
+    override fun trim(input: File, startUs: Long, endUs: Long, out: File, progress: (Float) -> Unit, alive: () -> Boolean) = of(input).trim(input, startUs, endUs, out, progress, alive)
+    override fun reverse(parts: ReverseParts, progress: (Float) -> Unit, alive: () -> Boolean) = of(parts.input).reverse(parts, progress, alive)
+    override fun steadyFrames(file: File, start: String, length: String, rate: String, width: Int, height: Int) = of(file).steadyFrames(file, start, length, rate, width, height)
+    override fun frameSink(out: File, spec: FrameSinkSpec) = (spec.audioFrom?.let(::of) ?: FfampEngine).frameSink(out, spec)
+    override fun withoutAudio(file: File) = of(file).withoutAudio(file)
+    override fun trouble(file: File) = of(file).trouble(file)
 }

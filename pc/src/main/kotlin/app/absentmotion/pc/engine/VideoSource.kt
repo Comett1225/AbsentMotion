@@ -14,20 +14,30 @@ data class VideoInfo(val width: Int, val height: Int, val durationMs: Long, val 
 
 data class VideoFrame(val width: Int, val height: Int, val rgba: ByteArray)
 
-class NativeVideoSource(file: File) : AutoCloseable {
-    private var video = DesktopNative.videoOpen(file.absolutePath).also { require(it != 0L) { "native decoder cannot open ${file.name}" } }
-    private val values = DesktopNative.videoInfo(video)
+class NativeVideoSource(file: File, tryFfamp: Boolean = app.absentmotion.media.MediaEngine.ffamp) : AutoCloseable {
+    private val opened = if (tryFfamp) DesktopNative.ffampVideoOpen(file.absolutePath) else 0L
+    val ffamp = opened != 0L
+    private var video = (if (ffamp) opened else DesktopNative.videoOpen(file.absolutePath)).also { require(it != 0L) { "native decoder cannot open ${file.name}" } }
+    private val values = if (ffamp) DesktopNative.ffampVideoInfo(video) else DesktopNative.videoInfo(video)
     val info = VideoInfo(values[0].toInt(), values[1].toInt(), values[2].toLong() / 1000, values[3])
     val orientation = values[4].toInt()
     val hasAudio = values[5] != 0.0
     val hardware = values[6] != 0.0
 
-    fun show(handle: Long, uri: String, timeUs: Long, exact: Boolean): Int = if (video == 0L) -1 else DesktopNative.videoFrame(handle, video, uri, timeUs, exact)
+    fun show(handle: Long, uri: String, timeUs: Long, exact: Boolean): Int = when {
+        video == 0L -> -1
+        ffamp -> DesktopNative.ffampVideoFrame(handle, video, uri, timeUs, exact)
+        else -> DesktopNative.videoFrame(handle, video, uri, timeUs, exact)
+    }
 
-    fun showLayer(handle: Long, uri: String, layer: Long, timeUs: Long, exact: Boolean, waitMs: Int = if (exact) 15000 else 30): Int = if (video == 0L) -1 else DesktopNative.videoFrameLayer(handle, video, uri, layer, timeUs, waitMs)
+    fun showLayer(handle: Long, uri: String, layer: Long, timeUs: Long, exact: Boolean, waitMs: Int = if (exact) 15000 else 30): Int = when {
+        video == 0L -> -1
+        ffamp -> DesktopNative.ffampVideoFrameLayer(handle, video, uri, layer, timeUs, waitMs)
+        else -> DesktopNative.videoFrameLayer(handle, video, uri, layer, timeUs, waitMs)
+    }
 
     override fun close() {
-        if (video != 0L) DesktopNative.videoClose(video)
+        if (video != 0L) { if (ffamp) DesktopNative.ffampVideoClose(video) else DesktopNative.videoClose(video) }
         video = 0L
     }
 }

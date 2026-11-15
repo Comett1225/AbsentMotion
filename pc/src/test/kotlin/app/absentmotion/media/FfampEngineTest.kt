@@ -65,14 +65,32 @@ class FfampEngineTest {
         FloatArray(bytes.size / 4).also { ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).asFloatBuffer().get(it) }
     }
 
-    @Test fun macUsesFfampAndTheLibraryLinksNoFfmpeg() {
-        assertSame(FfampEngine, MediaEngine.current)
+    @Test fun macCarriesFfmpegAndFfampAndReadsWithTheChosenOne() {
+        System.getProperty("am.mediaReader")?.let { assertEquals(it == "ffamp", MediaEngine.ffamp) }
+        assertSame(if (MediaEngine.ffamp) FfampFirst else FfmpegEngine, MediaEngine.current)
         val linked = ProcessBuilder("otool", "-L", System.getProperty("am.native")).redirectErrorStream(true).start().let { p -> p.inputStream.bufferedReader().readText().also { p.waitFor() } }
-        assertTrue(linked, "libamdesktop" in linked)
-        for (name in listOf("libav", "libsw", "libpostproc", "ffmpeg")) assertTrue("$name in\n$linked", name !in linked.lowercase())
+        for (name in listOf("libavformat", "libavcodec", "libavutil", "libswscale")) assertTrue("$name in\n$linked", name in linked)
+        assertTrue("h264_videotoolbox" in FfampNative.encoders())
+        NativeVideoSource(source, true).use { assertTrue(it.ffamp) }
+        NativeVideoSource(source, false).use { assertTrue(!it.ffamp && it.info.width == 1280) }
+    }
+
+    @Test fun ffampHandsFilesItCannotReadToFfmpeg() {
+        val odd = File(dir, "odd.nut").also { it.delete() }
+        ffmpeg("-i", source.path, "-t", "1", "-c:v", "mpeg4", "-c:a", "pcm_s16le", odd.path)
+        assertTrue(FfampNative.openProblem(odd.path) != null || FfampNative.probe(odd.path) == null)
+        assertTrue(FfampFirst.reads(source) && !FfampFirst.reads(odd))
+        assertEquals(FfampEngine.probe(source), FfampFirst.probe(source))
+        val probe = DeskProbe.parse(JSONObject(FfampFirst.probe(odd)))
+        assertEquals(1280 to 720, probe.video!!.width to probe.video!!.height)
+        assertEquals(null, FfampFirst.trouble(odd))
+        FfampFirst.videoSource(odd, 320).use { assertTrue(it.frame(500) != null) }
+        assertTrue(floats(FfampFirst.pcm(odd, 0, 0, 48000, 2)).any { it != 0f })
+        NativeVideoSource(odd, true).use { assertTrue(!it.ffamp && it.info.width == 1280) }
     }
 
     @Test fun importAndPlaybackRunWithoutFfmpeg() {
+        assumeTrue(MediaEngine.ffamp)
         val file = File(dir, "alone.mp4")
         source.copyTo(file, overwrite = true)
         val uri = Uri.fromFile(file).toString()
@@ -120,7 +138,7 @@ class FfampEngineTest {
             val native = NativeVideoSource(file)
             val handle = DesktopNative.create()
             try {
-                assertTrue(native.hardware && native.hasAudio)
+                assertTrue(native.ffamp && native.hardware && native.hasAudio)
                 DesktopNative.setScene(handle, VideoDecodeTest().sceneXml(file, 1280, 720))
                 assertEquals(1, native.show(handle, file.absolutePath, 2_000_000, true))
                 val pixels = DesktopNative.still(handle, 2000.0, 1280, 720, true)!!

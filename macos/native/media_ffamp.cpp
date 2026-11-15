@@ -327,6 +327,8 @@ JNIEXPORT jstring JNICALL JNI(openProblem)(JNIEnv* e, jobject, jstring path) {
         if (!reader) return false;
         const absent::Track* track = reader->first(absent::Kind::Video);
         if (track) absent::VideoDecoder::open(*reader, *track, &error);
+        const absent::Track* sound = reader->first(absent::Kind::Audio);
+        if (sound && error.empty()) absent::AudioDecoder::open(*reader, *sound, &error);
         return true;
     });
     return error.empty() ? nullptr : e->NewStringUTF(error.c_str());
