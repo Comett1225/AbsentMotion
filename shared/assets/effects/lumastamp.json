@@ -43,7 +43,17 @@
    "label": "Invert",
    "type": "switch",
    "default": false
+  },
+  {
+   "id": "compositing",
+   "label": "Compositing",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Stamp",
+    "Tint"
+   ]
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nlayout(color) uniform half4 color;\nuniform float low;\nuniform float high;\nuniform float gamma;\nuniform float invert;\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    if (c.a <= 0.0) return c;\n    float luma = dot(float3(unpremul(c).rgb), float3(0.2126, 0.7152, 0.0722));\n    float g = clamp((pow(luma, 1.0 / max(gamma, 0.01)) - low) / max(high - low, 0.001), 0.0, 1.0);\n    float k = (invert > 0.5 ? 1.0 - g : g) * float(color.a) * float(c.a);\n    return half4(color.rgb * half(k), half(k));\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nlayout(color) uniform half4 color;\nuniform float low;\nuniform float high;\nuniform float gamma;\nuniform float invert;\nuniform float compositing;\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    if (c.a <= 0.0) return c;\n    float luma = dot(float3(unpremul(c).rgb), float3(0.2126, 0.7152, 0.0722));\n    float g = clamp((pow(luma, 1.0 / max(gamma, 0.01)) - low) / max(high - low, 0.001), 0.0, 1.0);\n    float k = (invert > 0.5 ? 1.0 - g : g) * float(color.a) * float(c.a);\n    if (compositing > 0.5) return half4(mix(c.rgb, color.rgb * c.a, half(k / max(float(c.a), 0.001))), c.a);\n    return half4(color.rgb * half(k), half(k));\n}\n"
 }

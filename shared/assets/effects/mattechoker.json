@@ -38,7 +38,17 @@
    "label": "Invert",
    "type": "switch",
    "default": false
+  },
+  {
+   "id": "method",
+   "label": "Method",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Threshold",
+    "Erode"
+   ]
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader blurred;\nuniform float blur;\nuniform float amount;\nuniform float softness;\nuniform float invert;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0 || blur <= 0.0) return src;\n    float b = float(blurred.eval(coord).a);\n    float keep = smoothstep(amount - softness * 0.5, amount + softness * 0.5, b);\n    return src * half(invert > 0.5 ? 1.0 - keep : keep);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader blurred;\nuniform float blur;\nuniform float amount;\nuniform float softness;\nuniform float invert;\nuniform float method;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0 || (method < 0.5 && blur <= 0.0)) return src;\n    float b = float(blurred.eval(coord).a);\n    float keep = method > 0.5 ? b : smoothstep(amount - softness * 0.5, amount + softness * 0.5, b);\n    return src * half(invert > 0.5 ? 1.0 - keep : keep);\n}\n"
 }

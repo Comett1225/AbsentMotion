@@ -706,6 +706,7 @@
     <string name="newproject_link">Lier</string>
     <string name="newproject_save_size_chip">+ Enregistrer la taille</string>
     <string name="newproject_save_size_title">Enregistrer la taille</string>
+    <string name="newproject_save_size_hint">Choisissez un nom, ou laissez vide pour utiliser %1$s</string>
     <string name="newproject_saved_sizes">Tailles enregistrées</string>
     <plurals name="backup_projects">
         <item quantity="one">%1$s projet</item>
@@ -2035,7 +2036,7 @@
     <string name="feature_ai_enhance">Amélioration AI</string>
     <string name="feature_best_cutout">Suppression de l’arrière-plan AI 2.0</string>
     <string name="about_version_compatible">Version %1$s compatible</string>
-    <string name="about_compatible_note">Voici la version compatible avec Android 8 à 12. Fonctions exclues : %1$s. Elles nécessitent Android 13 et la version la plus récente.</string>
+    <string name="about_compatible_note">Voici la version compatible avec Android 8 à 12. %1$s : ces fonctions marchent mieux sous Android 13 avec la version la plus récente, donc ici l\'app demande avant chaque utilisation.</string>
     <string name="low_memory_title">Mémoire faible</string>
     <string name="low_memory_body">Ce téléphone dispose de %1$s GB de mémoire. AbsentMotion fonctionne mieux avec au moins 3 GB : les projets longs, les vidéos volumineuses et les nombreux effets peuvent ralentir ou fermer l’application.</string>
     <string name="preview_cache_render">Calculer l’aperçu</string>

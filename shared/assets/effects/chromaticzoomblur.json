@@ -22,7 +22,17 @@
    "min": 0.0,
    "max": 1.9,
    "step": 0.01
+  },
+  {
+   "id": "sampling",
+   "label": "Sampling",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Linear",
+    "Rays"
+   ]
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float amount;\nuniform float2 center;\n\nhalf4 main(float2 coord) {\n    float2 c = center * size;\n    float2 d = coord - c;\n    float s = clamp(amount, 0.0, 1.9);\n    float4 sum = float4(0);\n    float4 weight = float4(0);\n    for (int i = 0; i < 48; ++i) {\n        float t = float(i) / 47.0;\n        float4 w = float4(t, 1.0 - abs(2.0 * t - 1.0), 1.0 - t, 1.0);\n        sum += float4(image.eval(c + d * (1.0 + s * (t - 0.5)))) * w;\n        weight += w;\n    }\n    float4 result = sum / weight;\n    return half4(half3(min(result.rgb, float3(result.a))), half(result.a));\n}"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float amount;\nuniform float2 center;\nuniform float sampling;\n\nhalf4 main(float2 coord) {\n    if (sampling > 0.5) {\n        float2 c = center * size;\n        float2 d = coord - c;\n        float s = clamp(amount, 0.0, 1.9) * 4.54;\n        float3 shift = float3(0.38, 0.11, -0.215);\n        float3 zoom = exp(s * shift);\n        float3 sum = float3(0);\n        float coverage = 0.0;\n        for (int i = 0; i < 32; ++i) {\n            float t = float(i) / 31.0 - 0.5365;\n            float3 factor = zoom * (1.0 + s * (float3(t) + shift));\n            half4 r = image.eval(c + d * factor.r);\n            half4 g = image.eval(c + d * factor.g);\n            half4 b = image.eval(c + d * factor.b);\n            sum += float3(r.r, g.g, b.b);\n            coverage += (float(r.a) + float(g.a) + float(b.a)) / 3.0;\n        }\n        float a = coverage / 32.0;\n        return half4(half3(min(sum / 32.0, float3(a))), half(a));\n    }\n\n    float2 c = center * size;\n    float2 d = coord - c;\n    float s = clamp(amount, 0.0, 1.9);\n    float4 sum = float4(0);\n    float4 weight = float4(0);\n    for (int i = 0; i < 48; ++i) {\n        float t = float(i) / 47.0;\n        float4 w = float4(t, 1.0 - abs(2.0 * t - 1.0), 1.0 - t, 1.0);\n        sum += float4(image.eval(c + d * (1.0 + s * (t - 0.5)))) * w;\n        weight += w;\n    }\n    float4 result = sum / weight;\n    return half4(half3(min(result.rgb, float3(result.a))), half(result.a));\n}"
 }

@@ -698,6 +698,7 @@
     <string name="newproject_link">Tautan</string>
     <string name="newproject_save_size_chip">+ Simpan ukuran</string>
     <string name="newproject_save_size_title">Simpan ukuran</string>
+    <string name="newproject_save_size_hint">Pilih nama, atau kosongkan untuk memakai %1$s</string>
     <string name="newproject_saved_sizes">Ukuran tersimpan</string>
     <plurals name="backup_projects">
         <item quantity="other">%1$s proyek</item>
@@ -1987,7 +1988,7 @@
     <string name="feature_ai_enhance">Peningkatan AI</string>
     <string name="feature_best_cutout">Penghapusan latar belakang AI 2.0</string>
     <string name="about_version_compatible">Versi %1$s Compatible</string>
-    <string name="about_compatible_note">Ini versi Compatible untuk Android 8 hingga 12. Tidak disertakan: %1$s. Fitur itu butuh Android 13 dan versi Latest.</string>
+    <string name="about_compatible_note">Ini versi Compatible untuk Android 8 hingga 12. %1$s: fitur ini paling baik di Android 13 dengan versi Latest, jadi di sini aplikasi bertanya sebelum setiap penggunaan.</string>
     <string name="low_memory_title">Memori rendah</string>
     <string name="low_memory_body">Ponsel ini punya memori %1$s GB. AbsentMotion paling lancar dengan 3 GB atau lebih: proyek panjang, video besar, dan banyak efek bisa membuat lambat atau menutup aplikasi.</string>
     <string name="preview_cache_render">Render pratinjau</string>

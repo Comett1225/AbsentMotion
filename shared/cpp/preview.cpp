@@ -7,12 +7,12 @@
 #include <algorithm>
 #include <cmath>
 namespace am {
-static bool PreviewQuad(const Scene& scene, int64_t id, double time, float xy[8]) {
+static bool PreviewQuad(const Scene& scene, int64_t id, double time, float xy[8], const LayerEffects* effects) {
     const SceneScope scope(scene);
     const Layer* layer=scene.layer(id);
     if(!layer || !layer->activeAt(time))return false;
     SkPoint q[4];
-    if(!SelectionQuad(scene,*layer,time,q))return false;
+    if(!SelectionQuad(scene,*layer,time,q,effects))return false;
     for(int i=0;i<4;i++){xy[2*i]=q[i].fX;xy[2*i+1]=q[i].fY;}
     return true;
 }
@@ -260,7 +260,7 @@ void RenderPreview(SkCanvas* canvas, int width, int height, const Scene& scene, 
                 const SkMatrix toTarget = SkMatrix::Translate(dx, dy).preScale(scale, scale).preConcat(WorldMatrix(scene, *selected, timeMs));
                 DrawPointEdit(canvas, *selected, toTarget, px, handles, selected->localTime(timeMs));
             }
-        } else if (selected && PreviewQuad(scene, selectedId, timeMs, xy)) {
+        } else if (selected && PreviewQuad(scene, selectedId, timeMs, xy, &effects)) {
             SkPoint q[4];
             for (int i = 0; i < 4; i++) q[i] = {xy[2 * i] * scale + dx, xy[2 * i + 1] * scale + dy};
             DrawSelection(canvas, q, handles, px);

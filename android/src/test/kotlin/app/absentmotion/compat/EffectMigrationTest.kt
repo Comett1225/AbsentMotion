@@ -218,7 +218,7 @@ class EffectMigrationTest {
         close(180.70256f, all[0].number("hue"))
         close(0.442514f, all[0].number("amount"))
         close(1f, all[0].number("style"))
-        close(0.01686f, all[1].number("amount"))
+        close(0.03f, all[1].number("amount"))
         assertEquals("#ffbebebe", all[2].prop("tint")["value"])
         close(1f, all[2].number("scale"))
         close(1f, all[2].number("opacity"))

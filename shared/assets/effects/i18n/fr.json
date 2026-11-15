@@ -770,6 +770,13 @@
     },
     "center": {
      "label": "Centre"
+    },
+    "sampling": {
+     "label": "Échantillonnage",
+     "options": [
+      "Linéaire",
+      "Rayons"
+     ]
     }
    }
   },
@@ -2252,6 +2259,13 @@
     },
     "radius": {
      "label": "Rayon"
+    },
+    "spread": {
+     "label": "Étendue",
+     "options": [
+      "Standard",
+      "Complète"
+     ]
     }
    }
   },
@@ -3355,6 +3369,13 @@
     },
     "low": {
      "label": "Point noir"
+    },
+    "compositing": {
+     "label": "Composition",
+     "options": [
+      "Tampon",
+      "Teinte"
+     ]
     }
    }
   },
@@ -3404,6 +3425,13 @@
     },
     "softness": {
      "label": "Adoucissement"
+    },
+    "method": {
+     "label": "Méthode",
+     "options": [
+      "Seuil",
+      "Éroder"
+     ]
     }
    }
   },
@@ -3425,6 +3453,17 @@
      "options": [
       "Plier",
       "Retourner"
+     ]
+    },
+    "offset": {
+     "label": "Décalage"
+    },
+    "blend": {
+     "label": "Fusion",
+     "options": [
+      "Normal",
+      "Produit",
+      "Superposition"
      ]
     }
    }

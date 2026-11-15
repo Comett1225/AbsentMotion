@@ -6,6 +6,28 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [5.1.1] - 2026-11-14
+
+### Added
+
+- Named custom sizes: save as many sizes as you like, each with a name, on a second page of the size row in New project (swipe left). The tiles take the size's shape, long names scroll, and holding a tile offers Rename and Delete.
+- Use anyway: features this phone may struggle with (Optical flow High, AI Smooth, AI Enhance, AI background removal 2.0 and export sizes the phone's encoder does not list) show a warning icon instead of being locked, and ask before each use.
+- Snapping when you drag a layer on the preview: it holds at the centre lines and at other layers' centres and edges, with guide lines and a small vibration, like the Move pad.
+
+### Changed
+
+- Crop: a small crop box is zoomed in so it is easy to adjust, and the view fits it again after each drag.
+- Alight Motion import: Mirror, Matte Choker, Luma Stamper and Glow look the same as in Alight Motion, and Chromatic Zoom Blur looks very close. Projects made in AbsentMotion look as before.
+- Phones with an Adreno 735 graphics chip, such as the Poco F6, start with OpenGL, since effects, text and the selection outline drew wrongly with Vulkan.
+- The app's links point to absentmotion.com.
+- Compatible version: the About page says which features ask first, instead of calling them left out.
+
+### Fixed
+
+- Motion Blur on a layer with another effect cut the layer to the bottom right when playback stopped and in exports.
+- The finished export screen stayed white in Dark mode.
+- The selection outline stayed flat on layers turned by Raster Extrude or Flip Layer in 3D.
+
 ## [5.1.0] - 2026-11-12
 
 ### Added

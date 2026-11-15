@@ -698,6 +698,7 @@
     <string name="newproject_link">链接</string>
     <string name="newproject_save_size_chip">+ 保存尺寸</string>
     <string name="newproject_save_size_title">保存尺寸</string>
+    <string name="newproject_save_size_hint">输入名称，留空则使用 %1$s</string>
     <string name="newproject_saved_sizes">已保存的尺寸</string>
     <plurals name="backup_projects">
         <item quantity="other">%1$s 个项目</item>
@@ -1987,7 +1988,7 @@
     <string name="feature_ai_enhance">AI增强</string>
     <string name="feature_best_cutout">AI去除背景2.0</string>
     <string name="about_version_compatible">版本 %1$s 兼容版</string>
-    <string name="about_compatible_note">这是适用于Android 8至12的兼容版。以下功能未包含：%1$s。这些功能需要Android 13和最新版。</string>
+    <string name="about_compatible_note">这是适用于Android 8至12的兼容版。%1$s：这些功能在Android 13和最新版上效果最好，因此这里每次使用前都会先询问。</string>
     <string name="low_memory_title">内存不足</string>
     <string name="low_memory_body">此手机有 %1$s GB内存。AbsentMotion在3 GB或更大内存下运行效果最佳：较长的项目、大型视频和大量特效可能导致运行缓慢或应用关闭。</string>
     <string name="preview_cache_render">渲染预览</string>

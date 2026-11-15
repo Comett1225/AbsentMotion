@@ -38,9 +38,9 @@ class GpuCheckTest {
 
     @Test fun oldMaliAndPowerVrStartWithOpenGl() {
         listOf("5045\tMali-G52 MC2", "5045\tMali-G51", "5045\tMali-G31 MP2", "5045\tMali-T880 MP12",
-            "4112\tPowerVR Rogue GE8320", "4112\tPowerVR B-Series BXM-8-256").forEach { assertTrue(it, GpuCheck.vulkanRisky(it)) }
+            "4112\tPowerVR Rogue GE8320", "4112\tPowerVR B-Series BXM-8-256", "20803\tAdreno (TM) 735").forEach { assertTrue(it, GpuCheck.vulkanRisky(it)) }
         listOf("5045\tMali-G57 MC2", "5045\tMali-G510", "5045\tMali-G310", "5045\tMali-G76 MP10", "5045\tMali-G715-Immortalis MC11",
-            "4112\tPowerVR D-Series DXT-48-1536", "20803\tAdreno (TM) 740", "6880\tSwiftShader Device (Subzero)",
+            "4112\tPowerVR D-Series DXT-48-1536", "20803\tAdreno (TM) 740", "20803\tAdreno (TM) 7350", "20803\tAdreno (TM) 840", "20803\tAdreno (TM) 750", "6880\tSwiftShader Device (Subzero)",
             "garbage", null).forEach { assertFalse("$it", GpuCheck.vulkanRisky(it)) }
     }
 

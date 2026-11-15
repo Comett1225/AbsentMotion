@@ -8,9 +8,9 @@ Export the project from Alight Motion as XML and open it in AbsentMotion. After 
 
 ## In short
 
-- **64** Alight effects look the same and **30** are very close.
+- **67** Alight effects look the same and **31** are very close.
 - **78** are converted to a similar effect that does not look identical.
-- **61** are converted but have not been compared side by side yet.
+- **57** are converted but have not been compared side by side yet.
 - **44** are not converted yet (mostly very old effect versions, VR and some 3D solids).
 - **Blending modes:** all of Alight's blending modes come across. Multiply and Subtract get their opacity converted so they look the same.
 
@@ -42,8 +42,11 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Halftone Lines | Halftone Lines | Same look |
 | Inner Blur | Inner Blur | Same look |
 | invert | Invert | Same look |
+| lumastamper | Luma Stamper | Same look |
 | Magnify Background | Magnify Background | Same look |
 | Mask Blur | Mask Blur | Same look |
+| mattechoke | Matte Choker | Same look |
+| mirror | Mirror | Same look |
 | Motion Blur | Motion Blur | Same look |
 | motionblur | Motion Blur | Same look |
 | motionblur2 | Motion Blur | Same look |
@@ -87,6 +90,7 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Bend | Bend | Very close |
 | Box Blur | Blur | Very close |
 | Chroma Key | Chroma Key | Very close |
+| chromaticzoomblur | Chromatic Zoom Blur | Very close |
 | Contour Lines | Contour Lines | Very close |
 | Flicker | Flicker | Very close |
 | Four-color Gradient | Four-Color Gradient | Very close |
@@ -196,7 +200,6 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Box | Box | Converted, not compared yet |
 | bumpmap | Bump Map | Converted, not compared yet |
 | bumpmap2 | Bump Map | Converted, not compared yet |
-| chromaticzoomblur | Chromatic Zoom Blur | Converted, not compared yet |
 | colorize | Colorize | Converted, not compared yet |
 | Cube | Cube | Converted, not compared yet |
 | cube | Cube | Converted, not compared yet |
@@ -227,10 +230,7 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | irridescence | Iridescence | Converted, not compared yet |
 | irridescence2 | Iridescence | Converted, not compared yet |
 | Linear Repeat | Linear Repeat | Converted, not compared yet |
-| lumastamper | Luma Stamper | Converted, not compared yet |
-| mattechoke | Matte Choker | Converted, not compared yet |
 | mattefringe | Matte Fringe | Converted, not compared yet |
-| mirror | Mirror | Converted, not compared yet |
 | Octahedron | Octahedron | Converted, not compared yet |
 | Page Curl | Page Curl | Converted, not compared yet |
 | Pyramid | Pyramid | Converted, not compared yet |

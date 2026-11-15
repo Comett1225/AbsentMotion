@@ -698,6 +698,7 @@
     <string name="newproject_link">リンク</string>
     <string name="newproject_save_size_chip">+ サイズを保存</string>
     <string name="newproject_save_size_title">サイズを保存</string>
+    <string name="newproject_save_size_hint">名前を入力（空欄なら %1$s）</string>
     <string name="newproject_saved_sizes">保存済みサイズ</string>
     <plurals name="backup_projects">
         <item quantity="other">%1$s件のプロジェクト</item>
@@ -1987,7 +1988,7 @@
     <string name="feature_ai_enhance">AI強化</string>
     <string name="feature_best_cutout">AI背景除去2.0</string>
     <string name="about_version_compatible">バージョン%1$s Compatible</string>
-    <string name="about_compatible_note">これはAndroid 8〜12向けのCompatibleバージョンです。含まれない機能：%1$s。これらにはAndroid 13とLatestバージョンが必要です。</string>
+    <string name="about_compatible_note">これはAndroid 8〜12向けのCompatibleバージョンです。%1$s：これらはAndroid 13とLatestバージョンで最もよく動作するため、ここでは使うたびに確認します。</string>
     <string name="low_memory_title">メモリ不足</string>
     <string name="low_memory_body">このスマートフォンのメモリは%1$s GBです。AbsentMotionは3 GB以上の環境での使用を推奨します。長いプロジェクトや大きな動画、多数のエフェクトがあると、動作が遅くなったりアプリが終了したりすることがあります。</string>
     <string name="preview_cache_render">プレビューをレンダリング</string>

@@ -957,7 +957,7 @@
  {
   "name": "chromaticzoomblur",
   "id": "chromaticzoomblur",
-  "measured": "unmeasured"
+  "measured": "close"
  },
  {
   "name": "clouds",
@@ -1082,7 +1082,7 @@
  {
   "name": "Glow",
   "id": "glow",
-  "measured": "unmeasured"
+  "measured": "same"
  },
  {
   "name": "glowscan",
@@ -1157,17 +1157,17 @@
  {
   "name": "lumastamper",
   "id": "lumastamper",
-  "measured": "unmeasured"
+  "measured": "same"
  },
  {
   "name": "mattechoke",
   "id": "mattechoke",
-  "measured": "unmeasured"
+  "measured": "same"
  },
  {
   "name": "mattechoke",
   "id": "mattechoke",
-  "measured": "unmeasured"
+  "measured": "same"
  },
  {
   "name": "mattefringe",
@@ -1177,7 +1177,7 @@
  {
   "name": "mirror",
   "id": "mirror",
-  "measured": "unmeasured"
+  "measured": "same"
  },
  {
   "name": "Octahedron",

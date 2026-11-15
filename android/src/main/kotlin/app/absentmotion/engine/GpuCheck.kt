@@ -165,6 +165,8 @@ internal class GpuCheck(private val context: Context) {
 
         private const val ARM = 0x13B5
         private const val IMAGINATION = 0x1010
+        private const val QUALCOMM = 0x5143
+        private val GlitchyAdreno = Regex("""^Adreno \(TM\) 735\b""")
         private val SlowMali = Regex("""^Mali-(G31|G51|G52|T\d+)\b""")
         private val NewPowerVr = Regex("""^PowerVR [D-Z]-Series""")
 
@@ -174,6 +176,7 @@ internal class GpuCheck(private val context: Context) {
             return when (vendor) {
                 ARM -> SlowMali.containsMatchIn(name)
                 IMAGINATION -> !NewPowerVr.containsMatchIn(name)
+                QUALCOMM -> GlitchyAdreno.containsMatchIn(name)
                 else -> false
             }
         }

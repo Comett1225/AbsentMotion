@@ -188,11 +188,13 @@ struct Layer {
     const Property* prop(const char* name) const;
     const LayerEffect* effect(const char* id) const;
     bool activeAt(double timeMs) const { return !hidden && timeMs >= startTime && timeMs < endTime + 1.0; }
+    float stepRate(double timeMs) const {
+        if (steps.empty() || endTime <= startTime) return 0;
+        return steps.get(0, (float)((timeMs - startTime) / (endTime - startTime)), 0);
+    }
     double steppedMs(double timeMs) const {
-        if (steps.empty() || endTime <= startTime) return timeMs;
-        const float fps = steps.get(0, (float)((timeMs - startTime) / (endTime - startTime)), 0);
-        if (!(fps > 0)) return timeMs;
-        return HeldMs(timeMs, startTime, fps);
+        const float fps = stepRate(timeMs);
+        return fps > 0 ? HeldMs(timeMs, startTime, fps) : timeMs;
     }
     float localTime(double timeMs) const {
         return endTime > startTime ? (float)((steppedMs(timeMs) - startTime) / (endTime - startTime)) : 0.0f;
@@ -317,7 +319,8 @@ SkMatrix WorldMatrix(const Scene& scene, const Layer& layer, double timeMs);
 int64_t TopLayerAt(const Scene& scene, double timeMs, float x, float y, const MediaPictures& masks);
 SkRect SelectionBounds(const Layer& layer, double timeMs, const SkMatrix& matrix);
 SkRect DrawnBounds(const Layer& layer, double timeMs, const SkMatrix& matrix);
-bool SelectionQuad(const Scene& scene, const Layer& layer, double timeMs, SkPoint corners[4]);
+struct LayerEffects;
+bool SelectionQuad(const Scene& scene, const Layer& layer, double timeMs, SkPoint corners[4], const LayerEffects* effects = nullptr);
 bool ContentIconBounds(const Layer& layer, SkRect* bounds);
 void DrawContentIcon(SkCanvas* canvas, const Layer& layer, const MediaPictures& pictures);
 void DrawLayerList(SkCanvas* canvas, const Scene& scene, const std::vector<Layer>& layers, double timeMs, const MediaPictures& pictures);
@@ -354,6 +357,7 @@ struct LayerEffects {
     std::function<bool(const Layer&, float, float)> steady;
     std::function<sk_sp<SkImage>(const sk_sp<SkImage>&, bool)> upload;
     std::function<sk_sp<SkImage>(const std::string&, int64_t, int, float)> past;
+    std::function<bool(const Layer&, double, SkPoint*)> turn;
 };
 void DrawScene(SkCanvas* canvas, const Scene& scene, double timeMs, const MediaPictures& pictures,
                const LayerEffects* effects = nullptr);

@@ -2027,11 +2027,15 @@ SkMatrix WorldMatrix(const Scene& scene, const Layer& layer, double timeMs) {
     return SiblingMatrix(scene.layers, layer, timeMs);
 }
 
-bool SelectionQuad(const Scene& scene, const Layer& layer, double timeMs, SkPoint corners[4]) {
+bool SelectionQuad(const Scene& scene, const Layer& layer, double timeMs, SkPoint corners[4], const LayerEffects* effects) {
     SelectionBounds(layer, timeMs, SkMatrix::I()).toQuad(corners);
-    const SkMatrix m = WorldMatrix(scene, layer, timeMs);
+    std::vector<Layer> storage;
+    const std::vector<Layer>& list = SeenProject(scene, timeMs, &storage);
+    const auto seen = std::find_if(list.begin(), list.end(), [&](const Layer& l) { return l.id == layer.id; });
+    const SkMatrix m = seen != list.end() ? SiblingMatrix(list, *seen, timeMs) : SiblingMatrix(scene.layers, layer, timeMs);
     if (!m.hasPerspective()) {
         m.mapPoints({corners, 4});
+        if (effects && effects->turn) effects->turn(seen != list.end() ? *seen : layer, timeMs, corners);
         return true;
     }
     constexpr float kNear = 1;

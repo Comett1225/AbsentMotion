@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
@@ -56,6 +57,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.luminance
@@ -308,7 +312,18 @@ internal fun ToolSheet(
                 }
             }
         }
-        if (bounded || !PlatformFeatures.desktop && (LocalWide.current || app.absentmotion.ui.editor.LocalTablet.current)) androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxSize().background(Am.SheetBg), contentAlignment = Alignment.Center) {
+        if (PlatformFeatures.desktop || app.absentmotion.ui.editor.LocalTablet.current) BoxWithConstraints(
+            Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.6f))
+                .pointerInput(Unit) { detectTapGestures { } }.systemBarsPadding().padding(24.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            val twoColumns = side != null && maxWidth >= FramedTwoColumns
+            val width = minOf(maxWidth, if (twoColumns) 1040.dp else 560.dp)
+            val height = minOf(maxHeight, 720.dp, if (twoColumns) width * 0.7f else 720.dp)
+            Box(Modifier.size(width, height).shadow(24.dp, RoundedCornerShape(12.dp)).clip(RoundedCornerShape(12.dp))) {
+                androidx.compose.runtime.CompositionLocalProvider(LocalWide provides false) { body(twoColumns) }
+            }
+        } else if (bounded || LocalWide.current) BoxWithConstraints(Modifier.fillMaxSize().background(Am.SheetBg), contentAlignment = Alignment.Center) {
             val twoColumns = side != null && maxWidth >= WideToolSheet && maxWidth > maxHeight
             Box(Modifier.widthIn(max = if (twoColumns) 1040.dp else 560.dp).fillMaxSize()) { body(twoColumns) }
         } else PhoneScreen { body(false) }
@@ -316,6 +331,7 @@ internal fun ToolSheet(
 }
 
 private val WideToolSheet = 840.dp
+private val FramedTwoColumns = 720.dp
 
 @Composable
 internal fun SectionTitle(text: String) {

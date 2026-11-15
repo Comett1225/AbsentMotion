@@ -89,11 +89,12 @@ class AlightCounterpartsTest {
         }
     }
 
-    @Test fun matteChokeGivesAnEdgeBlurAndAHighThreshold() {
+    @Test fun matteChokeUsesTheSquareErosionMethod() {
         for (id in listOf("com.alightcreative.effects.mattechoke", "com.alightcreative.mattechoke")) {
             val e = convert(id, f("choke", 53.75f) + f("feather", 0.25f) + """<property name="invert" type="bool" value="true" />""")
             assertEquals("absent.mattechoker", e["id"])
-            assertEquals(80.625f, e.number("blur"), 1e-2f)
+            assertEquals(48.375f, e.number("blur"), 1e-2f)
+            assertEquals(1f, e.number("method"), 1e-3f)
             assertEquals(0.045f, e.number("softness"), 1e-3f)
             assertEquals(0.97f, e.number("amount"), 1e-3f)
             assertEquals("true", e.value("invert"))

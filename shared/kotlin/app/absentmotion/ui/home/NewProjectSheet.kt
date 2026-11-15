@@ -688,8 +688,7 @@ private fun SavedSizeStrip(form: Form, settings: AppSettings, chips: Boolean, on
         Box(
             Modifier.height(44.dp).clip(FieldShape).border(1.dp, Am.Navy, FieldShape).clickable {
                 form.commitSides()
-                val (w, h) = form.size
-                naming = null to "$w × $h"
+                naming = null to ""
             }.padding(horizontal = 14.dp),
             contentAlignment = Alignment.Center,
         ) { Text(stringResource(R.string.newproject_save_size_chip), color = Am.Navy, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1) }
@@ -712,7 +711,10 @@ private fun SavedSizeStrip(form: Form, settings: AppSettings, chips: Boolean, on
         }
     }
     naming?.let { (target, initial) ->
-        SizeNameDialog(stringResource(if (target == null) R.string.newproject_save_size_title else R.string.rename), initial, dark = false, onDismiss = { naming = null }) { name ->
+        SizeNameDialog(
+            stringResource(if (target == null) R.string.newproject_save_size_title else R.string.rename), initial, dark = false, onDismiss = { naming = null },
+            hint = if (target == null) form.size.let { (w, h) -> stringResource(R.string.newproject_save_size_hint, "$w × $h") } else null,
+        ) { name ->
             naming = null
             settings.savedSizes = if (target == null) {
                 val (w, h) = form.size
@@ -726,7 +728,7 @@ private fun SavedSizeStrip(form: Form, settings: AppSettings, chips: Boolean, on
 }
 
 @Composable
-internal fun SizeNameDialog(title: String, initial: String, dark: Boolean, onDismiss: () -> Unit, onDone: (String) -> Unit) {
+internal fun SizeNameDialog(title: String, initial: String, dark: Boolean, onDismiss: () -> Unit, hint: String? = null, onDone: (String) -> Unit) {
     var text by remember { mutableStateOf(androidx.compose.ui.text.input.TextFieldValue(initial, androidx.compose.ui.text.TextRange(0, initial.length))) }
     val focus = remember { androidx.compose.ui.focus.FocusRequester() }
     androidx.compose.runtime.LaunchedEffect(Unit) { runCatching { focus.requestFocus() } }
@@ -740,6 +742,12 @@ internal fun SizeNameDialog(title: String, initial: String, dark: Boolean, onDis
                 textStyle = TextStyle(color = ink, fontSize = 16.sp), singleLine = true, cursorBrush = SolidColor(accent),
                 keyboardOptions = KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Done),
                 keyboardActions = androidx.compose.foundation.text.KeyboardActions(onDone = { onDone(text.text) }),
+                decorationBox = { inner ->
+                    Box {
+                        if (hint != null && text.text.isEmpty()) Text(hint, color = ink.copy(alpha = 0.45f), fontSize = 16.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                        inner()
+                    }
+                },
             )
         },
         confirmButton = { TextButton({ onDone(text.text) }) { Text(stringResource(R.string.done), color = accent) } },

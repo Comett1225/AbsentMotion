@@ -199,7 +199,23 @@ internal fun Scene.snapAxesFor(layer: Layer, timeMs: Int, mine: FloatArray?, oth
     return snapAxes(width.toFloat(), height.toFloat(), floatArrayOf(world.x, world.y), mine, others, parent?.sx ?: 1f, parent?.sy ?: 1f)
 }
 
-internal fun snapAxes(width: Float, height: Float, at: FloatArray, mine: FloatArray?, others: List<SnapOther>, sx: Float, sy: Float): Pair<SnapAxis, SnapAxis> {
+internal class SnapScene(val id: Long, val mine: FloatArray?, val others: List<SnapOther>)
+
+internal suspend fun EditorState.snapScene(id: Long): SnapScene {
+    val ms = sampleMs
+    val others = scene.layers.filter { it.id != id && it.kind != "audio" && it.activeAt(ms) }.map { o ->
+        val at = scene.place(o, ms)
+        SnapOther(at.x, at.y, engine.layerBounds(o.id, timeMs))
+    }
+    return SnapScene(id, engine.layerBounds(id, timeMs), others)
+}
+
+internal fun Scene.previewSnapAxes(layer: Layer, timeMs: Int, from: SnapScene, threshold: Float): Pair<SnapAxis, SnapAxis> {
+    val world = place(layer, timeMs)
+    return snapAxes(width.toFloat(), height.toFloat(), floatArrayOf(world.x, world.y), from.mine, from.others, 1f, 1f, threshold)
+}
+
+internal fun snapAxes(width: Float, height: Float, at: FloatArray, mine: FloatArray?, others: List<SnapOther>, sx: Float, sy: Float, threshold: Float = 25f): Pair<SnapAxis, SnapAxis> {
     val xs = arrayListOf(Snap((width / 2 - at[0]) / sx, SnapGuide(true, width / 2, true)))
     val ys = arrayListOf(Snap((height / 2 - at[1]) / sy, SnapGuide(false, height / 2, true)))
     for (o in others) {
@@ -211,7 +227,7 @@ internal fun snapAxes(width: Float, height: Float, at: FloatArray, mine: FloatAr
             (if (axis == 0) xs else ys) += Snap((b[theirs] - mine[own]) / (if (axis == 0) sx else sy), SnapGuide(axis == 0, b[theirs], false))
         }
     }
-    return SnapAxis(xs) to SnapAxis(ys)
+    return SnapAxis(xs, threshold) to SnapAxis(ys, threshold)
 }
 
 internal class SnapAxis(snaps: List<Snap>, private val threshold: Float = 25f) {

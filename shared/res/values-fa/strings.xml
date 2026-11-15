@@ -702,6 +702,7 @@
     <string name="newproject_link">لینک</string>
     <string name="newproject_save_size_chip">‏+ ذخیره اندازه</string>
     <string name="newproject_save_size_title">ذخیره اندازه</string>
+    <string name="newproject_save_size_hint">یک نام انتخاب کنید یا برای استفاده از %1$s خالی بگذارید</string>
     <string name="newproject_saved_sizes">اندازه‌های ذخیره‌شده</string>
     <plurals name="backup_projects">
         <item quantity="one">‏%1$s پروژه</item>
@@ -2011,7 +2012,7 @@
     <string name="feature_ai_enhance">بهسازی AI</string>
     <string name="feature_best_cutout">حذف پس‌زمینه با AI 2.0</string>
     <string name="about_version_compatible">نسخه %1$s Compatible</string>
-    <string name="about_compatible_note">این نسخه Compatible برای اندروید 8 تا 12 است. کنار گذاشته شده: %1$s. آن‌ها به اندروید 13 و نسخه Latest نیاز دارند.</string>
+    <string name="about_compatible_note">این نسخه Compatible برای اندروید 8 تا 12 است. %1$s: این قابلیت‌ها روی اندروید 13 با نسخه Latest بهتر کار می‌کنند، برای همین اینجا برنامه پیش از هر بار استفاده می‌پرسد.</string>
     <string name="low_memory_title">کمبود حافظه</string>
     <string name="low_memory_body">این گوشی %1$s GB حافظهٔ رم دارد. AbsentMotion با 3 GB یا بیشتر بهتر کار می‌کند: پروژه‌های طولانی، ویدیوهای بزرگ و افکت‌های زیاد می‌توانند کند شوند یا برنامه را ببندند.</string>
     <string name="preview_cache_render">رندر پیش‌نمایش</string>

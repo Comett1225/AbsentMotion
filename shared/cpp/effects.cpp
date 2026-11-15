@@ -421,6 +421,7 @@ uniform float grow;
 uniform float soft;
 uniform float amount;
 uniform float mode;
+uniform float imported;
 uniform half4 tint;
 half4 main(float2 p) {
     half4 src = image.eval(p);
@@ -428,6 +429,7 @@ half4 main(float2 p) {
     float r = float(f.r) + 1.0 - float(f.a);
     float d = max(r * reach - shift, 0.0);
     float g = r > 0.995 ? 0.0 : soft > 0.0 ? 1.0 - smoothstep(grow - soft, grow + soft, d) : (d <= grow ? 1.0 : 0.0);
+    if (imported > 0.5 && grow + soft > 0.3 && src.a > 0.0) g = 1.0;
     half k = half(g * amount) * tint.a;
     half3 c = tint.rgb;
     if (mode > 0.5) {
@@ -528,7 +530,8 @@ sk_sp<SkImageFilter> GlowFilter(const std::function<float(const char*, int, floa
     if (step > 1) field = SkImageFilters::MatrixTransform(SkMatrix::Scale(step, step), linear, field);
     SkRuntimeShaderBuilder b(mix);
     b.uniform("reach") = cells * step;
-    b.uniform("shift") = 0.5f - grown;
+    b.uniform("shift") = (v("spread", 0, 0) > 0.5f ? -0.05f : 0.5f) - grown;
+    b.uniform("imported") = v("spread", 0, 0);
     b.uniform("grow") = grow;
     b.uniform("soft") = soft;
     b.uniform("amount") = amount;
@@ -548,6 +551,21 @@ SkM44 Orientation(const Layer& layer, double timeMs) {
     const float r = p.rotation * 3.14159265f / 180;
     const SkM44 own = SkM44::Rotate({0, 0, 1}, r) * p.tilt * SkM44::Rotate({0, 0, 1}, -r);
     return camera == SkM44() ? own : camera * own;
+}
+
+SkM44 Columns3(float a, float b, float c, float d, float e, float f, float g, float h, float i) {
+    return SkM44(a, d, g, 0, b, e, h, 0, c, f, i, 0, 0, 0, 0, 1);
+}
+
+SkM44 TurnOf(float x, float y, float z) {
+    const float k = 3.14159265f / 180;
+    const float cx = std::cos(x * k), sx = std::sin(x * k), cy = std::cos(y * k), sy = std::sin(y * k), cz = std::cos(z * k), sz = std::sin(z * k);
+    return Columns3(cz, -sz, 0, sz, cz, 0, 0, 0, 1) * Columns3(cy, 0, sy, 0, 1, 0, -sy, 0, cy) * Columns3(1, 0, 0, 0, cx, -sx, 0, sx, cx);
+}
+
+SkM44 SpinOf(float degrees) {
+    const float a = degrees * 3.14159265f / 180;
+    return Columns3(std::cos(a), -std::sin(a), 0, std::sin(a), std::cos(a), 0, 0, 0, 1);
 }
 
 std::vector<float> columns3(const SkM44& m) {
@@ -1031,6 +1049,31 @@ bool EffectRuntime::needs(const Layer& layer, bool Definition::*input) const {
 
 bool EffectRuntime::behind(const Layer& layer) const { return needs(layer, &Definition::backdrop); }
 
+void EffectRuntime::forgetHeld() {
+    std::lock_guard<std::mutex> lock(fHeldLock);
+    fHeld.clear();
+}
+
+sk_sp<SkImage> EffectRuntime::held(SkCanvas* canvas, const Scene& scene, const Layer& layer, double timeMs, const SkRect& bounds, SkIRect* taken,
+                                   SkIRect* subset, SkMatrix* fromDevice) const {
+    const float rate = layer.stepRate(timeMs);
+    if (!(rate > 0) || rate >= scene.fps) return nullptr;
+    SkDevice* device = SkCanvasPriv::TopDevice(canvas);
+    if (!device || !device->localToDevice().invert(fromDevice)) return nullptr;
+    *taken = device->localToDevice().mapRect(bounds).roundOut();
+    if (!taken->intersect(SkIRect::MakeWH(device->width(), device->height()))) return nullptr;
+    const double at = layer.steppedMs(timeMs);
+    std::lock_guard<std::mutex> lock(fHeldLock);
+    if (fHeld.size() > 16) fHeld.clear();
+    Held& kept = fHeld[{layer.id, device->width(), device->height()}];
+    if (!kept.image || kept.at != at || kept.matrix != device->localToDevice() || kept.taken != *taken) {
+        const sk_sp<SkSpecialImage> snap = device->snapSpecial(*taken, true);
+        kept = {at, device->localToDevice(), *taken, snap ? snap->subset() : SkIRect::MakeEmpty(), snap ? snap->asImage() : nullptr};
+    }
+    *subset = kept.subset;
+    return kept.image;
+}
+
 bool EffectRuntime::reaches(const Layer& layer) const {
     return std::any_of(layer.effects.begin(), layer.effects.end(), [&](const LayerEffect& e) {
         if (e.hidden || e.id == kLift) return false;
@@ -1053,6 +1096,47 @@ bool EffectRuntime::steady(const Layer& layer, float from, float to) const {
         if (d && !std::all_of(d->defaults.begin(), d->defaults.end(), [&](const auto& k) { return still(k.second); })) return false;
         return std::all_of(e.props.begin(), e.props.end(), [&](const Property& p) { return still(p.anim); });
     });
+}
+
+bool EffectRuntime::turnCorners(const Layer& layer, double timeMs, SkPoint corners[4]) const {
+    const LayerEffect* turned = nullptr;
+    const Definition* d = nullptr;
+    for (const LayerEffect& e : layer.effects) {
+        if (e.hidden || (e.id != "absent.rasterextrude" && e.id != "absent.flip")) continue;
+        if (const Definition* found = find(e.id)) {
+            turned = &e;
+            d = found;
+        }
+    }
+    if (!turned) return false;
+    SkRect area;
+    area.setBounds({corners, 4});
+    const float side = std::min(area.width(), area.height());
+    if (!area.isFinite() || !(side > 0)) return false;
+    const float t = layer.localTime(timeMs);
+    const auto value = [&](const char* name, int i, float fallback) {
+        const float v = Value(*turned, &d->defaults, name, i, t, fallback);
+        return std::isfinite(v) ? v : fallback;
+    };
+    const bool card = turned->id == "absent.flip";
+    const float hx = area.width() / side, hy = area.height() / side;
+    const float depth = card ? 0.0f : value("depth", 0, 0.25f);
+    const float reach = std::sqrt(hx * hx + hy * hy + depth * depth);
+    const float dist = std::max(2.0f + 40.0f * std::pow(1.0f - std::clamp(value("perspective", 0, 0.5f), 0.0f, 1.0f), 3.0f), reach + 0.5f);
+    const float unit = std::max(side * 0.5f * value("scale", 0, 1), 0.5f);
+    const SkM44 turn = TurnOf(value("rotX", 0, 0), value("rotY", 0, 0), value("rotZ", 0, 0));
+    const SkM44 m = Orientation(layer, timeMs) * (card ? SpinOf(value("axis", 0, 0)) * turn * SpinOf(-value("axis", 0, 0)) : turn);
+    const SkPoint center = {area.centerX() + value("position", 0, 0), area.centerY() + value("position", 1, 0)};
+    SkPoint out[4];
+    for (int i = 0; i < 4; i++) {
+        const SkV4 w = m.map((corners[i].fX - area.centerX()) / (side * 0.5f), (corners[i].fY - area.centerY()) / (side * 0.5f), -depth, 0);
+        const float z = w.z + dist;
+        if (!(z > 0.01f)) return false;
+        out[i] = {center.fX + unit * dist * w.x / z, center.fY + unit * dist * w.y / z};
+        if (!out[i].isFinite()) return false;
+    }
+    std::copy(out, out + 4, corners);
+    return true;
 }
 
 sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer, double timeMs, const SkRect& area, const SkRect& seen,
@@ -1204,7 +1288,12 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
                 }
                 if (d->plainBlur) {
                     names.push_back("blurred");
-                    inputs.push_back(blurOf(f));
+                    if (e.id == "absent.mattechoker" && Value(e, defaults, "method", 0, t, 0) > 0.5f) {
+                        const float radius = std::max(Value(e, defaults, "blur", 0, t, 0), 0.0f);
+                        const float feather = 2 * radius * Value(e, defaults, "softness", 0, t, 0);
+                        auto eroded = SkImageFilters::Erode(radius, radius, f);
+                        inputs.push_back(feather > 0 ? SkImageFilters::Blur(feather, feather, SkTileMode::kDecal, eroded) : eroded);
+                    } else inputs.push_back(blurOf(f));
                 }
             }
             if (d->backdrop) {
@@ -1506,9 +1595,20 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
         return true;
     }
     paint.setBlendMode(masked && !spill ? SkBlendMode::kSrcOver : SkBlendMode::kSrc);
+    SkIRect taken, subset;
+    SkMatrix fromDevice;
+    const sk_sp<SkImage> still = held(canvas, scene, layer, timeMs, bounds, &taken, &subset, &fromDevice);
+    if (still) {
+        canvas->saveLayer(&bounds, nullptr);
+        canvas->save();
+        canvas->concat(fromDevice);
+        canvas->drawImageRect(still, SkRect::Make(subset), SkRect::Make(taken), SkSamplingOptions(), nullptr, SkCanvas::kStrict_SrcRectConstraint);
+        canvas->restore();
+    }
     canvas->saveLayer(SkCanvas::SaveLayerRec(&bounds, &paint, SkCanvas::kInitWithPrevious_SaveLayerFlag));
     adjust(canvas);
     canvas->restore();
+    if (still) canvas->restore();
     return true;
 }
 

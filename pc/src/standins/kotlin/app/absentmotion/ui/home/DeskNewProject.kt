@@ -247,8 +247,7 @@ private fun DeskSavedSizes(form: Form, settings: AppSettings) {
             Box(
                 Modifier.height(40.dp).clip(shape).border(1.dp, Am.Navy, shape).deskPress(10.dp).clickable {
                     form.commitSides()
-                    val (w, h) = form.size
-                    naming = null to "$w × $h"
+                    naming = null to ""
                 }.padding(horizontal = 14.dp),
                 Alignment.Center,
             ) { Text(stringResource(R.string.newproject_save_size_chip), color = Am.Navy, fontSize = 13.sp, fontWeight = FontWeight.Medium, maxLines = 1) }
@@ -275,7 +274,10 @@ private fun DeskSavedSizes(form: Form, settings: AppSettings) {
         }
     }
     naming?.let { (target, initial) ->
-        DeskSizeName(stringResource(if (target == null) R.string.newproject_save_size_title else R.string.rename), initial, { naming = null }) { name ->
+        DeskSizeName(
+            stringResource(if (target == null) R.string.newproject_save_size_title else R.string.rename), initial, { naming = null },
+            if (target == null) form.size.let { (w, h) -> stringResource(R.string.newproject_save_size_hint, "$w × $h") } else null,
+        ) { name ->
             naming = null
             settings.savedSizes = if (target == null) {
                 val (w, h) = form.size
@@ -286,7 +288,7 @@ private fun DeskSavedSizes(form: Form, settings: AppSettings) {
 }
 
 @Composable
-private fun DeskSizeName(title: String, initial: String, onDismiss: () -> Unit, onDone: (String) -> Unit) {
+private fun DeskSizeName(title: String, initial: String, onDismiss: () -> Unit, hint: String?, onDone: (String) -> Unit) {
     var text by remember { mutableStateOf(TextFieldValue(initial, TextRange(0, initial.length))) }
     val done = { onDone(text.text) }
     val focus = remember { FocusRequester() }
@@ -297,6 +299,12 @@ private fun DeskSizeName(title: String, initial: String, onDismiss: () -> Unit, 
             text, { text = it.copy(text = it.text.take(SavedSizes.MAX_NAME)) }, Modifier.padding(horizontal = 24.dp, vertical = 16.dp).fillMaxWidth().focusRequester(focus).clip(RoundedCornerShape(10.dp)).background(Am.HomeBg)
                 .border(1.dp, Am.HomeLine, RoundedCornerShape(10.dp)).padding(horizontal = 12.dp, vertical = 10.dp),
             textStyle = TextStyle(color = Am.Navy, fontSize = 14.sp), singleLine = true, cursorBrush = SolidColor(Am.Navy),
+            decorationBox = { inner ->
+                Box {
+                    if (hint != null && text.text.isEmpty()) Text(hint, color = Am.Navy.copy(alpha = 0.45f), fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    inner()
+                }
+            },
         )
         Row(Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, bottom = 20.dp), Arrangement.spacedBy(10.dp, Alignment.End)) {
             DeskButton(stringResource(R.string.cancel), onDismiss, minWidth = 92.dp)

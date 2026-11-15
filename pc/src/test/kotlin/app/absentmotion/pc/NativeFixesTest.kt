@@ -100,6 +100,33 @@ class NativeFixesTest {
         assertFalse(frame("#ffff0000").contentEquals(frame("#ff0000ff")))
     }
 
+    @Test fun theOutlineFollowsTheTurnOfRasterExtrudeAndFlip() {
+        val root = File("..").canonicalFile
+        fun compare(effect: String, tilt: String) = DesktopEngine(root.resolve("shared/assets"), root).use { engine ->
+            engine.setScene(Scene.parse("""<scene width="400" height="400" totalTime="999" fps="30" bgcolor="#ff000000"><shape id="1" startTime="0" endTime="999" fillType="color" s=".rect"><transform><location value="200,200,0" />$tilt</transform><fillColor value="#ffffffff" /><property name="size" type="vec2" value="160,100" />$effect</shape></scene>"""))
+            val pixels = engine.render(0, 400, 400).getRGB(0, 0, 400, 400, null, 0, 400)
+            var left = 400; var top = 400; var right = -1; var bottom = -1
+            for (y in 0 until 400) for (x in 0 until 400) {
+                val c = pixels[y * 400 + x]
+                if (maxOf(c shr 16 and 255, c shr 8 and 255, c and 255) > 60) { left = minOf(left, x); top = minOf(top, y); right = maxOf(right, x + 1); bottom = maxOf(bottom, y + 1) }
+            }
+            val q = engine.quad(1, 0)!!
+            val xs = (0..3).map { q[2 * it] }
+            val ys = (0..3).map { q[2 * it + 1] }
+            val label = "$effect $tilt: drawn $left,$top,$right,$bottom outline ${xs.minOrNull()},${ys.minOrNull()},${xs.maxOrNull()},${ys.maxOrNull()}"
+            assertTrue(label, right > left)
+            assertEquals(label, left.toFloat(), xs.minOrNull()!!, 4f)
+            assertEquals(label, right.toFloat(), xs.maxOrNull()!!, 4f)
+            assertEquals(label, top.toFloat(), ys.minOrNull()!!, 4f)
+            assertEquals(label, bottom.toFloat(), ys.maxOrNull()!!, 4f)
+        }
+        val thin = """<property name="depth" type="float" value="0.01" /><property name="shading" type="float" value="0" /><property name="shine" type="float" value="0" />"""
+        compare("""<effect id="absent.rasterextrude"><property name="rotX" type="float" value="0" /><property name="rotY" type="float" value="50" />$thin</effect>""", "")
+        compare("""<effect id="absent.rasterextrude"><property name="rotX" type="float" value="25" /><property name="rotY" type="float" value="-30" /><property name="rotZ" type="float" value="15" /><property name="position" type="vec2" value="20,-15" /><property name="scale" type="float" value="0.8" />$thin</effect>""", "")
+        compare("""<effect id="absent.rasterextrude"><property name="rotX" type="float" value="0" /><property name="rotY" type="float" value="0" />$thin</effect>""", """<tilt value="0,40" />""")
+        compare("""<effect id="absent.flip"><property name="rotX" type="float" value="0" /><property name="rotY" type="float" value="45" /><property name="shading" type="float" value="0" /><property name="shine" type="float" value="0" /></effect>""", "")
+    }
+
     @Test fun layerQuadFollowsTheCameraViewSwitchAfterAStill() {
         val handle = DesktopNative.create()
         try {

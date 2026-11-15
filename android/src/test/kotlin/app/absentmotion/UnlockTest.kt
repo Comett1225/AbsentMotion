@@ -65,7 +65,7 @@ class UnlockTest {
             assertFalse(Tier.runs(feature))
         }
         Tier.openGl = false
-        assertTrue(Feature.entries.all { Tier.has(it) && Tier.risk(it) == null && !Tier.choice(it, it).risky })
+        assertEquals(!Tier.compatible, Feature.entries.all { Tier.has(it) && Tier.risk(it) == null && !Tier.choice(it, it).risky })
     }
 
     @Test fun opticalFlowHighUsesItsOwnSettingsOnlyWhileUnlocked() = runBlocking {
@@ -86,7 +86,7 @@ class UnlockTest {
         assertEquals(listOf<Any>(Feature.FlowHigh), exportRisks(ExportKind.Sequence, flow, Support.Supported).map { it.key })
         assertTrue(exportRisks(ExportKind.Audio, ai, Support.Supported).isEmpty())
         Tier.openGl = false
-        assertTrue(exportRisks(ExportKind.Video, ai, Support.Supported).isEmpty())
+        assertEquals(!Tier.compatible, exportRisks(ExportKind.Video, ai, Support.Supported).isEmpty())
     }
 
     @Test fun aSizeTheEncoderDoesNotListCanBeTriedButAMissingEncoderCannot() {
@@ -114,6 +114,6 @@ class UnlockTest {
         assertEquals(plain, savable(plain, safe, check(plain)))
         assertEquals(FrameInterpolation.Blend, settingsFromJson(JSONObject(settingsToJson(ai).toString()), safe).interpolation)
         Tier.openGl = false
-        assertEquals(ai, savable(ai, safe, Support.Supported))
+        assertEquals(if (Tier.compatible) safe.copy(quality = 0.9f) else ai, savable(ai, safe, Support.Supported))
     }
 }
