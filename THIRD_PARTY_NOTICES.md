@@ -310,7 +310,10 @@ exports.
 - Version: the commit of the `third_party/FFamp` submodule this release was built from.
 - Licence: GNU General Public License, version 3 or later (the text in `LICENSE`). FFamp (Fast Forward Absent Multimedia
   Project) is written by the AbsentMotion project itself, from the public specifications and the operating-system
-  documentation; it contains no code from FFmpeg.
+  documentation. Some of its decoders (Windows Media Audio, VC-1 and older Windows video, and shared bit-reading and
+  transform code) are based on FFmpeg's code, which is licensed under the GNU Lesser General Public License, version 2.1
+  or later; `third_party/FFamp/docs/NOTICE.md` lists each of those files with the FFmpeg files and copyright holders it
+  comes from.
 - Copyright: Copyright (c) 2026 the AbsentMotion project.
 - Used in: the macOS app (Apple silicon and Intel), when Settings > Playback > Media engine is set to FFamp
   (experimental; off by default). From the next start the app then reads, plays, exports and converts media through it:
