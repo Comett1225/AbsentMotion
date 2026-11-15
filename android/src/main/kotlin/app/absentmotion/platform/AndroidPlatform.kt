@@ -218,7 +218,7 @@ object PlatformFeatures {
     const val tools = true
     const val userFiles = false
     const val linkFolders = false
-    val ffamp = false
+    val ffamp = android.os.Process.is64Bit()
 }
 
 fun textFieldFocused(): Boolean = false
@@ -451,7 +451,7 @@ internal fun desktopCutout(handle: Long, bitmap: android.graphics.Bitmap, size: 
 
 internal suspend fun desktopGifVideo(context: Context, uri: Uri): app.absentmotion.media.GifVideo? = null
 
-internal fun desktopFrameReader(context: Context, uri: String): app.absentmotion.media.DesktopFrameInput? = null
+internal fun desktopFrameReader(context: Context, uri: String): app.absentmotion.media.DesktopFrameInput? = app.absentmotion.media.MediaBackend.ffamp(context)?.softFrames(context, uri)
 
 fun rawFrameImage(rgba: ByteArray, width: Int, height: Int): androidx.compose.ui.graphics.ImageBitmap =
     android.graphics.Bitmap.createBitmap(width, height, android.graphics.Bitmap.Config.ARGB_8888).apply { copyPixelsFromBuffer(java.nio.ByteBuffer.wrap(rgba)) }.androidImageBitmap()

@@ -1,6 +1,5 @@
 package app.absentmotion.ui.editor
 
-import app.absentmotion.platform.scaledFrame
 import android.content.Context
 import android.media.MediaMetadataRetriever
 import android.net.Uri
@@ -13,9 +12,11 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import app.absentmotion.media.FrameGrabber
 import app.absentmotion.media.VideoProxies
 import app.absentmotion.media.VideoSources
 import app.absentmotion.media.fileVersion
+import app.absentmotion.media.openGrabber
 import app.absentmotion.media.ptsAt
 import app.absentmotion.model.Layer
 import app.absentmotion.model.Scene
@@ -104,7 +105,7 @@ internal fun thumbnailTimes(layer: Layer, scene: Scene, fromMs: Float, toMs: Flo
 }
 
 private suspend fun thumbnailsAt(context: Context, uri: String, version: String, tiles: List<Pair<Int, Long>>): List<Pair<Int, ImageBitmap>> {
-    var retriever: MediaMetadataRetriever? = null
+    var retriever: FrameGrabber? = null
     return try {
         val pts = VideoSources.timestamps(context, uri)
         val source = VideoProxies.ready(context, uri, version) ?: uri
@@ -117,10 +118,7 @@ private suspend fun thumbnailsAt(context: Context, uri: String, version: String,
             }
             val time = pts.ptsAt(timeUs)
             val key = FrameKey(uri, version, timeUs)
-            val picture = thumbnails[key] ?: (retriever ?: MediaMetadataRetriever().also {
-                retriever = it
-                it.setDataSource(context, Uri.parse(openableUri(source)))
-            }).scaledFrame(time, MediaMetadataRetriever.OPTION_CLOSEST, 160, 96)?.asImageBitmap()?.also { thumbnails[key] = it }
+            val picture = thumbnails[key] ?: (retriever ?: openGrabber(context, Uri.parse(openableUri(source))).also { retriever = it }).scaledFrame(time, MediaMetadataRetriever.OPTION_CLOSEST, 160, 96)?.asImageBitmap()?.also { thumbnails[key] = it }
             picture?.let { projectTime to it }
         }
     } catch (e: CancellationException) { throw e } catch (_: Exception) { emptyList() } finally { retriever?.release() }

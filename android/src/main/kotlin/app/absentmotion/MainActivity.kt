@@ -162,6 +162,8 @@ class MainActivity : ComponentActivity() {
         if (android.os.Build.VERSION.SDK_INT < 28) window.setSoftInputMode(window.attributes.softInputMode or android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
         app.absentmotion.i18n.keepLegacyLanguage(this)
         app.absentmotion.i18n.AppText.install(this)
+        app.absentmotion.media.MediaBackend.ffampReaders = app.absentmotion.ffamp.FfampMedia
+        android.util.Log.i("AMMedia", "Media reader: ${if (app.absentmotion.media.MediaReader.ffamp(this)) "FFamp" else "Standard"}")
         effectLanguage = app.absentmotion.i18n.currentLanguage(this).tag
         followScreenSize(resources.configuration)
         store = ProjectStore(this)

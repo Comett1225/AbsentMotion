@@ -179,6 +179,7 @@ internal object TestHooks {
         intent.getStringExtra("crash")?.let { kind -> activity.window.decorView.postDelayed({ crash(activity, kind) }, 2000) }
         if (intent.getBooleanExtra("audiolog", false)) engine.audio?.log = true
         if (intent.hasExtra("previewCopies")) activity.settings.previewCopies = intent.getBooleanExtra("previewCopies", true)
+        if (intent.hasExtra("mediaFfamp")) activity.settings.ffamp = intent.getBooleanExtra("mediaFfamp", false)
         if (intent.getBooleanExtra("effectcheck", false)) scope.launch {
             engine.effectCheck(activity.getExternalFilesDir(null)!!)
             Log.i("AMEffects", "effectcheck.json written")
@@ -205,6 +206,7 @@ internal object TestHooks {
             } catch (e: kotlinx.coroutines.CancellationException) { throw e }
             catch (e: Exception) { Log.e("AMCaps", "failed", e) }
         }
+        intent.getStringExtra("mediabench")?.let { folder -> scope.launch(Dispatchers.IO) { runMediaBench(activity, folder) } }
         if (intent.getBooleanExtra("devicecheck", false)) scope.launch {
             try { checkDevice(activity) }
             catch (e: kotlinx.coroutines.CancellationException) { throw e }

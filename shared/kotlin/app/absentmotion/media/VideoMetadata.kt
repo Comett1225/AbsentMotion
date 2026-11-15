@@ -2,7 +2,6 @@ package app.absentmotion.media
 
 import app.absentmotion.platform.numberOf
 import android.content.Context
-import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.media.MediaMetadataRetriever
 import android.net.Uri
@@ -17,9 +16,8 @@ suspend fun mediaDeclaration(context: Context, uri: Uri): MediaDeclaration? =
     if (context.contentResolver.getType(uri)?.startsWith("video/") == true) videoDeclaration(context, uri) else imageDeclaration(context, uri)
 
 suspend fun videoDeclaration(context: Context, uri: Uri): MediaDeclaration? = withContext(Dispatchers.IO) {
-    val extractor = MediaExtractor()
+    val extractor = try { openDemuxer(context, uri, "video/") } catch (_: Exception) { return@withContext null }
     try {
-        extractor.setDataSource(context, uri, null)
         val format = (0 until extractor.trackCount).map { extractor.getTrackFormat(it) }
             .first { it.getString(MediaFormat.KEY_MIME)?.startsWith("video/") == true }
         var name = uri.lastPathSegment ?: ""
@@ -27,11 +25,10 @@ suspend fun videoDeclaration(context: Context, uri: Uri): MediaDeclaration? = wi
         context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE), null, null, null)?.use { c ->
             if (c.moveToFirst()) { name = c.getString(0) ?: name; if (!c.isNull(1)) size = c.getLong(1) }
         }
-        val retriever = MediaMetadataRetriever()
+        val retriever = openGrabber(context, uri)
         var rotation = 0
         var duration = if (format.containsKey(MediaFormat.KEY_DURATION)) format.getLong(MediaFormat.KEY_DURATION) else 0L
         try {
-            retriever.setDataSource(context, uri)
             rotation = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION)?.toIntOrNull() ?: 0
             if (duration <= 0) duration = (retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull() ?: 0L) * 1000
         } finally { retriever.release() }
