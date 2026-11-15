@@ -5141,5 +5141,6 @@
  "xml_err_too_many": "The file has too many elements",
  "xml_err_unexpected_end": "The file ends unexpectedly inside %1$s",
  "your_asset_collection_is_empty": "Your asset collection is empty",
- "your_video_ended_early_so_its": "Your video ended early, so its last frame is held.\nSwap in a longer clip for a cleaner result."
+ "your_video_ended_early_so_its": "Your video ended early, so its last frame is held.\nSwap in a longer clip for a cleaner result.",
+ "newproject_save_size_hint": "Choose a name, or leave blank to use %1$s"
 }
