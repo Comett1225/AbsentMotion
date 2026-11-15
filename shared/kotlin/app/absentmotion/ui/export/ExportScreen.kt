@@ -323,12 +323,14 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
         if (anyAudio) value = withContext(Dispatchers.IO) { OfflineMix.audible(context, scene).isNotEmpty() }
     }
     val gifSettings = settings.getValue(ExportKind.Gif)
+    var gifFailed by remember { mutableStateOf(false) }
     val gifSample by produceState<GifSample?>(null, kind, scene, gifSettings, phase) {
         value = null
+        gifFailed = false
         if (kind == ExportKind.Gif && phase is Phase.Idle) {
             try { delay(MeasureDelayMs); value = measureGif(engine, scene, gifSettings) }
             catch (e: CancellationException) { throw e }
-            catch (e: Exception) { Log.w("AMExport", "Cannot sample GIF size", e) }
+            catch (e: Exception) { Log.w("AMExport", "Cannot sample GIF size", e); gifFailed = true }
         }
     }
     val videoSettings = settings.getValue(ExportKind.Video)
@@ -337,7 +339,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
         if (kind == ExportKind.Video && phase is Phase.Idle) {
             try { delay(MeasureDelayMs); value = measureVideoDraw(engine, scene, videoSettings) }
             catch (e: CancellationException) { throw e }
-            catch (e: Exception) { Log.w("AMExport", "Cannot sample the drawing time", e) }
+            catch (e: Exception) { Log.w("AMExport", "Cannot sample the drawing time", e); value = Double.NaN }
         }
     }
     val sequenceSettings = settings.getValue(ExportKind.Sequence)
@@ -346,7 +348,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
         if (kind == ExportKind.Sequence && phase is Phase.Idle) {
             try { delay(MeasureDelayMs); value = measureSequenceFrame(engine, scene, sequenceSettings) }
             catch (e: CancellationException) { throw e }
-            catch (e: Exception) { Log.w("AMExport", "Cannot sample the drawing time", e) }
+            catch (e: Exception) { Log.w("AMExport", "Cannot sample the drawing time", e); value = Double.NaN }
         }
     }
     var free by remember { mutableLongStateOf(freeSpace()) }
@@ -398,13 +400,21 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
     val current = settings.getValue(kind)
     val modelMs = remember(kind, current, report, heat.level, estimate, phase is Phase.Idle, gifSample, drawMs, sequenceMs) {
         when (kind) {
-            ExportKind.Video -> times.estimateMs(current, scene, report?.probe, heat.level, report, drawMs)
+            ExportKind.Video -> times.estimateMs(current, scene, report?.probe, heat.level, report, drawMs?.takeUnless(Double::isNaN))
+                ?: if (drawMs?.isNaN() == true) times.roughMs(current, scene) else null
             ExportKind.Gif -> gifSample?.let { gifTimeMs(frameCount(scene, current.fps), it, times.estimateMs(current, scene, report?.probe, heat.level)) }
-            ExportKind.Sequence -> times.estimateMs(current, scene, report?.probe, heat.level, null, sequenceMs)
+            ExportKind.Sequence -> times.estimateMs(current, scene, report?.probe, heat.level, null, sequenceMs?.takeUnless(Double::isNaN))
+                ?: if (sequenceMs?.isNaN() == true) times.roughMs(current, scene) else null
             ExportKind.Package -> estimate.coerceAtLeast(0) / 100_000
             ExportKind.Audio -> scene.totalTime / if (current.audioFormat.lossless) 20L else 14L
             else -> 0L
         }
+    }
+    val calculating = phase is Phase.Idle && when (kind) {
+        ExportKind.Video -> drawMs == null
+        ExportKind.Sequence -> sequenceMs == null
+        ExportKind.Gif -> gifSample == null && !gifFailed
+        else -> false
     }
     val timeMs = remember(modelMs, kind, phase is Phase.Idle) { modelMs?.let { m -> timeKey(kind)?.let { (m * sizes.ratio(it)).toLong() } ?: m } }
     val storage = if (estimate < 0) StorageStatus.Enough else storageStatus(estimate, free)
@@ -587,7 +597,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
         if (background && !ExportRun.running) phase = Phase.Idle
     }
 
-    val info: @Composable () -> Unit = { InfoBlock(free, estimate, timeMs, storage) }
+    val info: @Composable () -> Unit = { InfoBlock(free, estimate, timeMs, calculating, storage) }
     val naming: @Composable (ExportKind) -> Unit = { FileNameField(exportName, it) }
     val card = !DESK && app.absentmotion.ui.editor.isTablet(androidx.compose.ui.platform.LocalConfiguration.current.smallestScreenWidthDp)
     val bar: @Composable () -> Unit = { ExportBar(enabled = phase == Phase.Idle, blocked = blocked, pill = card, onClick = ::start) }
@@ -596,7 +606,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
     if (DESK) DeskExport(
         scene, frame, fromProjectList, engine, kinds, kind, { kind = it }, hasAudio, settings, check, hasEncoder, bitrateFits, explain, { help = true }, exportName,
         warning, support is Support.SlowSoftwareOnly, better?.let { suggestionLabel(video, it) }, ::useBetter, { acknowledged = warning },
-        free, estimate, timeMs, storage, blocked, asTemplate, { asTemplate = it }, { templateInfo = true }, { packageInfo = true }, { BundleFields(scene, engine, appSettings, community) { community = it } },
+        free, estimate, timeMs, calculating, storage, blocked, asTemplate, { asTemplate = it }, { templateInfo = true }, { packageInfo = true }, { BundleFields(scene, engine, appSettings, community) { community = it } },
         phase, progress, heat.level, note, { (phase as? Phase.Running)?.job?.cancel() }, { phase = Phase.Idle }, { (phase as? Phase.Done)?.let { share(context, it) } }, ::start, onClose,
     ) else Box(
         if (card) Modifier.fillMaxSize().background(Scrim).pointerInput(Unit) {}.windowInsetsPadding(WindowInsets.systemBars.union(WindowInsets.ime)).padding(24.dp).wrapContentSize()
@@ -774,7 +784,7 @@ private fun TitleBar(title: String, icon: ImageVector, description: String, onCl
 }
 
 @Composable
-private fun InfoBlock(free: Long, estimate: Long, timeMs: Long?, storage: StorageStatus) {
+private fun InfoBlock(free: Long, estimate: Long, timeMs: Long?, calculating: Boolean, storage: StorageStatus) {
     val space = when (storage) {
         StorageStatus.Enough -> null
         is StorageStatus.Low -> stringResource(R.string.export_space_low)
@@ -785,7 +795,7 @@ private fun InfoBlock(free: Long, estimate: Long, timeMs: Long?, storage: Storag
         Divider()
         InfoRow(stringResource(R.string.export_estimated_size), if (estimate < 0) stringResource(R.string.export_calculating) else formatBytes(estimate), false)
         Divider()
-        InfoRow(stringResource(R.string.export_estimated_time), timeMs?.let { timeLabel(it).text() } ?: stringResource(if (estimate < 0) R.string.export_calculating else R.string.export_time_unknown), false)
+        InfoRow(stringResource(R.string.export_estimated_time), timeMs?.let { timeLabel(it).text() } ?: stringResource(if (estimate < 0 || calculating) R.string.export_calculating else R.string.export_time_unknown), false)
     }
 }
 
@@ -1350,7 +1360,7 @@ private fun DeskExport(
     settings: MutableMap<ExportKind, ExportSettings>, check: (ExportSettings) -> Support, hasEncoder: (String) -> Boolean,
     bitrateFits: (ExportSettings, Boolean) -> Boolean, explain: (UiText) -> Unit, onHelp: () -> Unit, exportName: ExportName,
     warning: UiText?, slow: Boolean, use: UiText?, onUse: () -> Unit, onContinue: () -> Unit,
-    free: Long, estimate: Long, timeMs: Long?, storage: StorageStatus, blocked: UiText?,
+    free: Long, estimate: Long, timeMs: Long?, calculating: Boolean, storage: StorageStatus, blocked: UiText?,
     asTemplate: Boolean, onTemplate: (Boolean) -> Unit, onTemplateInfo: () -> Unit, onPackageInfo: () -> Unit, bundleFields: @Composable () -> Unit,
     phase: Phase, progress: Float, heat: ThermalLevel, note: UiText?, onCancel: () -> Unit, onDone: () -> Unit, onShare: () -> Unit,
     onStart: () -> Unit, onClose: () -> Unit,
@@ -1501,7 +1511,7 @@ private fun DeskExport(
                     }
                     DeskStat(stringResource(R.string.export_available_space), formatBytes(free), space)
                     DeskStat(stringResource(R.string.export_estimated_size), if (estimate < 0) stringResource(R.string.export_calculating) else formatBytes(estimate), null)
-                    DeskStat(stringResource(R.string.export_estimated_time), timeMs?.let { timeLabel(it).text() } ?: stringResource(if (estimate < 0) R.string.export_calculating else R.string.export_time_unknown), null)
+                    DeskStat(stringResource(R.string.export_estimated_time), timeMs?.let { timeLabel(it).text() } ?: stringResource(if (estimate < 0 || calculating) R.string.export_calculating else R.string.export_time_unknown), null)
                     Spacer(Modifier.weight(1f))
                     Row(Modifier.clip(RoundedCornerShape(8.dp)).deskPress(8.dp).clickable { onTemplate(!asTemplate) }.padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                         Text(stringResource(R.string.also_keep_a_copy_as_a), color = Navy, fontSize = 13.sp, maxLines = 1)

@@ -653,6 +653,7 @@
     <string name="crash_logs_empty">아직 비정상 종료 기록이 없습니다.</string>
     <string name="crash_logs_delete_all">모든 비정상 종료 로그를 삭제할까요?</string>
     <string name="crash_copy">복사</string>
+    <string name="desk_export_copy">복사</string>
     <string name="report_button">복사 후 보고</string>
     <string name="report_title">복사 후 보고</string>
     <string name="report_copied">상세 내용을 복사했습니다. 보고서에 붙여넣으세요.</string>

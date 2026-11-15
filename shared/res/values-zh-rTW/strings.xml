@@ -653,6 +653,7 @@
     <string name="crash_logs_empty">目前沒有當機記錄。</string>
     <string name="crash_logs_delete_all">要刪除所有當機記錄嗎？</string>
     <string name="crash_copy">複製</string>
+    <string name="desk_export_copy">複製</string>
     <string name="report_button">複製並回報</string>
     <string name="report_title">複製並回報</string>
     <string name="report_copied">詳細資訊已複製。請貼到回報內容中。</string>

@@ -653,6 +653,7 @@
     <string name="crash_logs_empty">暂无崩溃记录。</string>
     <string name="crash_logs_delete_all">删除所有崩溃日志？</string>
     <string name="crash_copy">复制</string>
+    <string name="desk_export_copy">复制</string>
     <string name="report_button">复制并报告</string>
     <string name="report_title">复制并报告</string>
     <string name="report_copied">详情已复制，请粘贴到报告中。</string>

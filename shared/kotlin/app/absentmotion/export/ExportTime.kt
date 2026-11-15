@@ -12,6 +12,7 @@ import kotlin.math.ln
 import kotlin.math.roundToLong
 
 internal const val DefaultSetupMs = 300L
+internal const val RoughMsPerMegapixel = 6.0
 
 data class ExportRecord(
     val codec: Codec,
@@ -143,6 +144,11 @@ class ExportTimes(context: Context) {
     @Synchronized fun record(record: ExportRecord) {
         val kept = (history() + record).takeLast(40)
         prefs.edit().putString("records", recordsToJson(kept).toString()).apply()
+    }
+
+    fun roughMs(s: ExportSettings, scene: Scene): Long {
+        val (w, h) = exportSize(scene, s.shortSide, even = true)
+        return (DefaultSetupMs + frameCount(scene, s.fps) * w * h / 1e6 * RoughMsPerMegapixel * codecCost(s.codec)).roundToLong()
     }
 
     fun estimateMs(

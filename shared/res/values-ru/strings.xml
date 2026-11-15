@@ -665,6 +665,7 @@
     <string name="crash_logs_empty">Сбоев пока не было.</string>
     <string name="crash_logs_delete_all">Удалить все отчёты о сбоях?</string>
     <string name="crash_copy">Копировать</string>
+    <string name="desk_export_copy">Копировать</string>
     <string name="report_button">Копировать и сообщить</string>
     <string name="report_title">Копировать и сообщить</string>
     <string name="report_copied">Данные скопированы. Вставьте их в сообщение об ошибке.</string>

@@ -661,6 +661,7 @@
     <string name="crash_logs_empty">Aucun plantage pour le moment.</string>
     <string name="crash_logs_delete_all">Supprimer tous les journaux de plantage ?</string>
     <string name="crash_copy">Copier</string>
+    <string name="desk_export_copy">Copier</string>
     <string name="report_button">Copier et signaler</string>
     <string name="report_title">Copier et signaler</string>
     <string name="report_copied">Les détails ont été copiés. Collez-les dans votre signalement.</string>

@@ -657,6 +657,7 @@
     <string name="crash_logs_empty">هنوز هیچ خرابی‌ای رخ نداده.</string>
     <string name="crash_logs_delete_all">همه گزارش‌های خرابی حذف شوند؟</string>
     <string name="crash_copy">کپی</string>
+    <string name="desk_export_copy">کپی</string>
     <string name="report_button">کپی و گزارش</string>
     <string name="report_title">کپی و گزارش</string>
     <string name="report_copied">جزئیات کپی شد. آن‌ها را در گزارش خود جای‌گذاری کنید.</string>

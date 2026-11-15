@@ -653,6 +653,7 @@
     <string name="crash_logs_empty">クラッシュはまだありません。</string>
     <string name="crash_logs_delete_all">すべてのクラッシュログを削除しますか？</string>
     <string name="crash_copy">コピー</string>
+    <string name="desk_export_copy">コピー</string>
     <string name="report_button">コピーして報告</string>
     <string name="report_title">コピーして報告</string>
     <string name="report_copied">詳細をコピーしました。報告に貼り付けてください。</string>

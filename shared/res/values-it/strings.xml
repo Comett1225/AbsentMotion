@@ -661,6 +661,7 @@
     <string name="crash_logs_empty">Nessun arresto anomalo finora.</string>
     <string name="crash_logs_delete_all">Eliminare tutti i log degli arresti?</string>
     <string name="crash_copy">Copia</string>
+    <string name="desk_export_copy">Copia</string>
     <string name="report_button">Copia e segnala</string>
     <string name="report_title">Copia e segnala</string>
     <string name="report_copied">Dettagli copiati. Incollali nella segnalazione.</string>

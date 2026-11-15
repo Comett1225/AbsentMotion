@@ -657,6 +657,7 @@
     <string name="crash_logs_empty">Bisher keine Abstürze.</string>
     <string name="crash_logs_delete_all">Alle Absturzprotokolle löschen?</string>
     <string name="crash_copy">Kopieren</string>
+    <string name="desk_export_copy">Kopieren</string>
     <string name="report_button">Kopieren und melden</string>
     <string name="report_title">Kopieren und melden</string>
     <string name="report_copied">Die Details wurden kopiert. Füge sie in deinen Bericht ein.</string>
