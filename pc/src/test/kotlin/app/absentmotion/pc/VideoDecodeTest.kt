@@ -241,7 +241,7 @@ class VideoDecodeTest {
 
     private fun av1Child(mode: String, file: File, env: Map<String, String>): String {
         val java = File(System.getProperty("java.home"), "bin/java").path
-        val builder = ProcessBuilder(java, "-cp", System.getProperty("java.class.path"), "-Dam.native=${System.getProperty("am.native")}", "-Dam.ffmpeg=${app.absentmotion.Judge.ffmpeg}", "-Dam.ffprobe=${app.absentmotion.Judge.ffprobe}",
+        val builder = ProcessBuilder(java, "-cp", System.getProperty("java.class.path"), "-Dam.native=${System.getProperty("am.native")}", "-Dam.mediaReader=${System.getProperty("am.mediaReader")}", "-Dam.ffmpeg=${app.absentmotion.Judge.ffmpeg}", "-Dam.ffprobe=${app.absentmotion.Judge.ffprobe}",
             "-Djava.awt.headless=true", "-Dskiko.renderApi=SOFTWARE", "-Dskiko.data.path=${System.getProperty("skiko.data.path")}", "-Dam.assets=${System.getProperty("am.assets")}", "app.absentmotion.pc.Av1Child", mode, file.absolutePath)
         builder.environment().putAll(env)
         val process = builder.redirectErrorStream(true).start()

@@ -293,18 +293,18 @@ Video* video(jlong v) { return reinterpret_cast<Video*>(v); }
 
 #define JNI(name) Java_app_absentmotion_pc_engine_DesktopNative_##name
 extern "C" {
-JNIEXPORT jlong JNICALL JNI(videoOpen)(JNIEnv* e, jobject, jstring path) { return reinterpret_cast<jlong>(Open(DesktopString(e, path))); }
-JNIEXPORT jdoubleArray JNICALL JNI(videoInfo)(JNIEnv* e, jobject, jlong v) {
+JNIEXPORT jlong JNICALL JNI(ffampVideoOpen)(JNIEnv* e, jobject, jstring path) { return reinterpret_cast<jlong>(Open(DesktopString(e, path))); }
+JNIEXPORT jdoubleArray JNICALL JNI(ffampVideoInfo)(JNIEnv* e, jobject, jlong v) {
     auto result = e->NewDoubleArray(7);
     if (!result) return nullptr;
     e->SetDoubleArrayRegion(result, 0, 7, video(v)->info);
     return result;
 }
-JNIEXPORT jint JNICALL JNI(videoFrame)(JNIEnv* e, jobject, jlong h, jlong v, jstring uri, jlong timeUs, jboolean exact) {
+JNIEXPORT jint JNICALL JNI(ffampVideoFrame)(JNIEnv* e, jobject, jlong h, jlong v, jstring uri, jlong timeUs, jboolean exact) {
     return video(v)->show(h, DesktopString(e, uri), timeUs, exact == JNI_TRUE ? 15000 : 30, 0);
 }
-JNIEXPORT jint JNICALL JNI(videoFrameLayer)(JNIEnv* e, jobject, jlong h, jlong v, jstring uri, jlong layer, jlong timeUs, jint waitMs) {
+JNIEXPORT jint JNICALL JNI(ffampVideoFrameLayer)(JNIEnv* e, jobject, jlong h, jlong v, jstring uri, jlong layer, jlong timeUs, jint waitMs) {
     return video(v)->show(h, DesktopString(e, uri), timeUs, waitMs, layer);
 }
-JNIEXPORT void JNICALL JNI(videoClose)(JNIEnv*, jobject, jlong v) { delete video(v); }
+JNIEXPORT void JNICALL JNI(ffampVideoClose)(JNIEnv*, jobject, jlong v) { delete video(v); }
 }

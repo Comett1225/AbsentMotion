@@ -38,7 +38,7 @@ class FfampJobsTest {
     private val source = File("../testdata/media/test-video.mp4").absoluteFile
 
     @Before fun macOnly() {
-        assumeTrue(DeskOs.mac)
+        assumeTrue(DeskOs.mac && MediaEngine.ffamp)
         DesktopNative.hashCode()
     }
 

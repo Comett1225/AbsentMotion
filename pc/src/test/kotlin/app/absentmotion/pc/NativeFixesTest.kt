@@ -17,7 +17,7 @@ class NativeFixesTest {
 
     private fun child(mode: String, path: String, env: Map<String, String>): List<String> {
         val command = listOf(File(System.getProperty("java.home"), "bin/java").path, "-Djava.awt.headless=true",
-            "-Dam.native=" + System.getProperty("am.native"), "-cp", System.getProperty("java.class.path"), NativeFixesChild::class.java.name, mode, path)
+            "-Dam.native=" + System.getProperty("am.native"), "-Dam.mediaReader=" + System.getProperty("am.mediaReader"), "-cp", System.getProperty("java.class.path"), NativeFixesChild::class.java.name, mode, path)
         val process = ProcessBuilder(command).redirectErrorStream(true).apply { environment().putAll(env) }.start()
         val text = process.inputStream.bufferedReader().readText()
         assertEquals(text, 0, process.waitFor())

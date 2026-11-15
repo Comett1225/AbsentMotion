@@ -75,7 +75,7 @@ class DeskAudioTest {
 
     @Test fun decoderMatchesFfmpeg() {
         val (pcm, _) = decodeAll(a)
-        val apple = app.absentmotion.desk.DeskOs.mac
+        val apple = app.absentmotion.media.MediaEngine.ffamp
         val ref = floats(*(if (apple) arrayOf("-c:a", "aac_at") else emptyArray()), "-i", a.path, "-ac", "2")
         assertEquals(ref.size, pcm.size)
         assertTrue(ref.indices.all { abs(pcm[it] - toShort(ref[it])) <= if (apple) 1 else 0 })

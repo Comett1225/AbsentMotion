@@ -42,11 +42,11 @@ class ZeroFfmpegTest {
     private var old = emptyMap<String, String?>()
 
     @Before fun macWithoutFfmpeg() {
-        assumeTrue(DeskOs.mac)
+        assumeTrue(DeskOs.mac && MediaEngine.ffamp)
         DesktopNative.hashCode()
         old = names.associateWith { System.getProperty(it) }
         names.forEach { System.setProperty(it, File(dir, "absent/${it.substringAfter('.')}").path) }
-        assertSame(FfampEngine, MediaEngine.current)
+        assertSame(FfampFirst, MediaEngine.current)
         assertTrue(runCatching { FfmpegEngine.probe(source) }.isFailure)
     }
 
