@@ -165,7 +165,8 @@ fun EditorState.skipBack() {
 }
 
 fun EditorState.skipForward() {
-    frame = stops().firstOrNull { it > frame } ?: frame
+    val next = stops().firstOrNull { it > frame }
+    if (next == null || next >= scene.lastFrame) parkAtEnd() else frame = next
 }
 
 fun EditorState.resetTransform(tabs: List<Int>) {

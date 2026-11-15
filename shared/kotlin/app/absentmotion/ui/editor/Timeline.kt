@@ -734,7 +734,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
     val fps: Int get() = state.scene.fps.coerceAtLeast(1)
 
     private val nowMs: Float
-        get() = scrubMs?.takeIf { state.frame == scrubFrame } ?: TimelineMath.frameTimeMs(state.frame, fps)
+        get() = scrubMs?.takeIf { state.playheadFrame == scrubFrame } ?: TimelineMath.frameTimeMs(state.playheadFrame, fps)
 
     fun timeScale(): TimeScale {
         val pxPerMs = dpPerSecond * scale / 1000f
@@ -802,7 +802,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
 
     fun seek(x: Float) {
         state.playing = false
-        state.frame = TimelineMath.nearestFrame(timeScale().time(x.coerceIn(headerWidth, size.width.toFloat().coerceAtLeast(headerWidth))), fps).coerceIn(0, state.scene.lastFrame)
+        state.stepTo(TimelineMath.nearestFrame(timeScale().time(x.coerceIn(headerWidth, size.width.toFloat().coerceAtLeast(headerWidth))), fps).coerceIn(0, state.scene.lastFrame + 1))
         scrubMs = null
     }
 
@@ -1229,10 +1229,10 @@ private class TimelineView(val state: EditorState, density: Density, private val
     private fun scrubBy(dx: Float): Boolean {
         val time = timeScale()
         val wanted = time.nowMs - dx / time.pxPerMs
-        val to = wanted.coerceIn(0f, TimelineMath.frameTimeMs(state.scene.lastFrame, fps))
+        val to = wanted.coerceIn(0f, TimelineMath.frameTimeMs(state.scene.lastFrame + 1, fps))
         scrubFrame = TimelineMath.nearestFrame(to, fps)
         scrubMs = to
-        state.frame = scrubFrame
+        state.stepTo(scrubFrame)
         return to == wanted
     }
 
@@ -1246,7 +1246,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
 
     private suspend fun settle() {
         val from = scrubMs ?: return
-        if (state.frame == scrubFrame) {
+        if (state.playheadFrame == scrubFrame) {
             animate(from, TimelineMath.frameTimeMs(scrubFrame, fps), animationSpec = tween(120)) { value, _ -> scrubMs = value }
         }
         scrubMs = null
@@ -1817,10 +1817,10 @@ private fun DrawScope.drawTimeline(view: TimelineView, measurer: TextMeasurer, s
     val onBookmark = marks.any { state.scene.frameAt(it) == state.frame }
     if (desktop) {
         clipRect(left = view.headerWidth) { for (ms in marks) drawBookmark(time.x(ms.toFloat()), outline) }
-        if (time.originX in view.headerWidth..size.width) drawPlayhead(time.originX, TimelineMath.timecode(state.frame, fps), measurer, styles, outline, onBookmark, view.headerWidth + PillInset.toPx())
+        if (time.originX in view.headerWidth..size.width) drawPlayhead(time.originX, TimelineMath.timecode(state.playheadFrame, fps), measurer, styles, outline, onBookmark, view.headerWidth + PillInset.toPx())
     } else {
         for (ms in marks) drawBookmark(time.x(ms.toFloat()), outline)
-        drawPlayhead(time.originX, TimelineMath.timecode(state.frame, fps), measurer, styles, outline, onBookmark)
+        drawPlayhead(time.originX, TimelineMath.timecode(state.playheadFrame, fps), measurer, styles, outline, onBookmark)
     }
 }
 

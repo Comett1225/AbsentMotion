@@ -181,7 +181,25 @@ class EditorState(
         get() = selection
         set(value) { if (value != selection) Glide.interrupt(); selection = value }
 
-    var frame by mutableIntStateOf(0)
+    private var frameState by mutableIntStateOf(0)
+
+    var atEnd by mutableStateOf(false)
+        private set
+
+    var frame: Int
+        get() = frameState
+        set(value) { frameState = value; atEnd = false }
+
+    val playheadFrame: Int get() = if (atEnd) frameState + 1 else frameState
+
+    fun parkAtEnd() {
+        frame = scene.lastFrame.coerceAtLeast(0)
+        atEnd = true
+    }
+
+    fun stepTo(target: Int) {
+        if (target > scene.lastFrame) parkAtEnd() else frame = target.coerceAtLeast(0)
+    }
 
     var playing by mutableStateOf(false)
 
