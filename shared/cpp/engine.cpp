@@ -201,7 +201,10 @@ public:
     Target* attach(ANativeWindow* window, bool forEncoder) override;
     void detach(Target* target) override;
     std::string timing(Target* target) override;
-    bool setScene(const std::string& xml, std::string* error) override { return ParseScene(xml, &fScene, error); }
+    bool setScene(const std::string& xml, std::string* error) override {
+        fEffects.forgetHeld();
+        return ParseScene(xml, &fScene, error);
+    }
     std::string loadEffect(const std::string& xml) override { return fEffects.load(xml); }
     int maxPictureSize() const override { return fGraphite ? fGraphite->maxTextureSize() : fGanesh->maxTextureSize(); }
     bool setPicture(const std::string& uri, int64_t layerId, AHardwareBuffer* buffer,
@@ -615,6 +618,7 @@ EngineImpl::~EngineImpl() {
     fVideoFrames.clear();
     fMosh.clear();
     fTrails.clear();
+    fEffects.forgetHeld();
     while (!fImported.empty()) this->forgetImported(fImported.begin()->first);
     this->syncGpu();
     this->syncPipelines();
@@ -1377,6 +1381,7 @@ void EngineImpl::syncPipelines() {
 
 void EngineImpl::trim() {
     fTrails.clear();
+    fEffects.forgetHeld();
     fUploads.clear();
     this->syncPipelines();
     if (fGanesh && !fGpuFailed) {

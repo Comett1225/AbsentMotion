@@ -237,7 +237,10 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM*, void*) {
 }
 JNIEXPORT jlong JNICALL JNI(create)(JNIEnv*, jobject) { return reinterpret_cast<jlong>(new Desktop()); }
 JNIEXPORT jint JNICALL JNI(gpuState)(JNIEnv*, jobject) { return DesktopGpuState.load(); }
-JNIEXPORT void JNICALL JNI(destroy)(JNIEnv*, jobject, jlong h) { delete ptr(h); }
+JNIEXPORT void JNICALL JNI(destroy)(JNIEnv*, jobject, jlong h) {
+    ptr(h)->runtime.forgetHeld();
+    delete ptr(h);
+}
 JNIEXPORT jstring JNICALL JNI(loadEffect)(JNIEnv* e, jobject, jlong h, jstring xml) {
     return e->NewStringUTF(ptr(h)->runtime.load(str(e, xml)).c_str());
 }
@@ -245,6 +248,7 @@ JNIEXPORT jstring JNICALL JNI(setScene)(JNIEnv* e, jobject, jlong h, jstring xml
     am::Scene next;
     std::string error;
     if (!am::ParseScene(str(e, xml), &next, &error)) return e->NewStringUTF(error.c_str());
+    ptr(h)->runtime.forgetHeld();
     ptr(h)->scene = std::move(next);
     return nullptr;
 }

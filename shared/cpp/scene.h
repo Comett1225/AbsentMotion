@@ -188,11 +188,13 @@ struct Layer {
     const Property* prop(const char* name) const;
     const LayerEffect* effect(const char* id) const;
     bool activeAt(double timeMs) const { return !hidden && timeMs >= startTime && timeMs < endTime + 1.0; }
+    float stepRate(double timeMs) const {
+        if (steps.empty() || endTime <= startTime) return 0;
+        return steps.get(0, (float)((timeMs - startTime) / (endTime - startTime)), 0);
+    }
     double steppedMs(double timeMs) const {
-        if (steps.empty() || endTime <= startTime) return timeMs;
-        const float fps = steps.get(0, (float)((timeMs - startTime) / (endTime - startTime)), 0);
-        if (!(fps > 0)) return timeMs;
-        return HeldMs(timeMs, startTime, fps);
+        const float fps = stepRate(timeMs);
+        return fps > 0 ? HeldMs(timeMs, startTime, fps) : timeMs;
     }
     float localTime(double timeMs) const {
         return endTime > startTime ? (float)((steppedMs(timeMs) - startTime) / (endTime - startTime)) : 0.0f;

@@ -1049,6 +1049,31 @@ bool EffectRuntime::needs(const Layer& layer, bool Definition::*input) const {
 
 bool EffectRuntime::behind(const Layer& layer) const { return needs(layer, &Definition::backdrop); }
 
+void EffectRuntime::forgetHeld() {
+    std::lock_guard<std::mutex> lock(fHeldLock);
+    fHeld.clear();
+}
+
+sk_sp<SkImage> EffectRuntime::held(SkCanvas* canvas, const Scene& scene, const Layer& layer, double timeMs, const SkRect& bounds, SkIRect* taken,
+                                   SkIRect* subset, SkMatrix* fromDevice) const {
+    const float rate = layer.stepRate(timeMs);
+    if (!(rate > 0) || rate >= scene.fps) return nullptr;
+    SkDevice* device = SkCanvasPriv::TopDevice(canvas);
+    if (!device || !device->localToDevice().invert(fromDevice)) return nullptr;
+    *taken = device->localToDevice().mapRect(bounds).roundOut();
+    if (!taken->intersect(SkIRect::MakeWH(device->width(), device->height()))) return nullptr;
+    const double at = layer.steppedMs(timeMs);
+    std::lock_guard<std::mutex> lock(fHeldLock);
+    if (fHeld.size() > 16) fHeld.clear();
+    Held& kept = fHeld[{layer.id, device->width(), device->height()}];
+    if (!kept.image || kept.at != at || kept.matrix != device->localToDevice() || kept.taken != *taken) {
+        const sk_sp<SkSpecialImage> snap = device->snapSpecial(*taken, true);
+        kept = {at, device->localToDevice(), *taken, snap ? snap->subset() : SkIRect::MakeEmpty(), snap ? snap->asImage() : nullptr};
+    }
+    *subset = kept.subset;
+    return kept.image;
+}
+
 bool EffectRuntime::reaches(const Layer& layer) const {
     return std::any_of(layer.effects.begin(), layer.effects.end(), [&](const LayerEffect& e) {
         if (e.hidden || e.id == kLift) return false;
@@ -1570,9 +1595,20 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
         return true;
     }
     paint.setBlendMode(masked && !spill ? SkBlendMode::kSrcOver : SkBlendMode::kSrc);
+    SkIRect taken, subset;
+    SkMatrix fromDevice;
+    const sk_sp<SkImage> still = held(canvas, scene, layer, timeMs, bounds, &taken, &subset, &fromDevice);
+    if (still) {
+        canvas->saveLayer(&bounds, nullptr);
+        canvas->save();
+        canvas->concat(fromDevice);
+        canvas->drawImageRect(still, SkRect::Make(subset), SkRect::Make(taken), SkSamplingOptions(), nullptr, SkCanvas::kStrict_SrcRectConstraint);
+        canvas->restore();
+    }
     canvas->saveLayer(SkCanvas::SaveLayerRec(&bounds, &paint, SkCanvas::kInitWithPrevious_SaveLayerFlag));
     adjust(canvas);
     canvas->restore();
+    if (still) canvas->restore();
     return true;
 }
 

@@ -1,12 +1,16 @@
 #pragma once
 
 #include "scene.h"
+#include "include/core/SkMatrix.h"
+#include "include/core/SkRect.h"
 #include "include/effects/SkRuntimeEffect.h"
 #include <cstdint>
 #include <functional>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <string>
+#include <tuple>
 #include <vector>
 
 class SkImage;
@@ -33,8 +37,15 @@ public:
     bool draw(SkCanvas* canvas, const Scene& scene, const Layer& layer, double timeMs, const SkRect& area, const SkMatrix& placed,
               const std::function<void(SkCanvas*)>& source, const std::function<void(SkCanvas*)>& below, const Grab& grab = nullptr,
               const Upload& upload = nullptr) const;
+    void forgetHeld();
 
 private:
+    struct Held {
+        double at = 0;
+        SkMatrix matrix;
+        SkIRect taken = SkIRect::MakeEmpty(), subset = SkIRect::MakeEmpty();
+        sk_sp<SkImage> image;
+    };
     struct Definition {
         sk_sp<SkRuntimeEffect> shader;
         bool blurred = false;
@@ -62,7 +73,11 @@ private:
                                const SkRect& drawn, const SkMatrix& placed, sk_sp<SkImageFilter> content, sk_sp<SkImageFilter> below,
                                int before = -1, int from = -1, const SkRect* window = nullptr) const;
     bool reaches(const Layer& layer) const;
+    sk_sp<SkImage> held(SkCanvas* canvas, const Scene& scene, const Layer& layer, double timeMs, const SkRect& bounds, SkIRect* taken,
+                        SkIRect* subset, SkMatrix* fromDevice) const;
     std::map<std::string, Definition> fDefinitions;
+    mutable std::mutex fHeldLock;
+    mutable std::map<std::tuple<int64_t, int, int>, Held> fHeld;
 };
 
 }
