@@ -67,6 +67,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.Dp
@@ -268,9 +269,17 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
         else key(state.selectedId) {
             val pager = rememberPagerState(state.toolPage.takeIf { it.first == state.selectedId }?.second?.coerceIn(0, 1) ?: 0) { 2 }
             androidx.compose.runtime.LaunchedEffect(pager) { androidx.compose.runtime.snapshotFlow { pager.currentPage }.collect { state.toolPage = state.selectedId to it } }
-            HorizontalPager(pager, Modifier.fillMaxWidth().height((rows.size * 160 + (rows.size - 1) * 17).px), pageSpacing = 17.px, verticalAlignment = Alignment.Top,
-                flingBehavior = PagerDefaults.flingBehavior(pager, snapAnimationSpec = tween(ToolPageSnapMs, easing = FastOutSlowInEasing))) { page ->
-                Column { TileRows(if (page == 0) rows else more.chunked(4), if (page == 0) null else 4) }
+            val height = (rows.size * 160 + (rows.size - 1) * 17).px
+            Box {
+                HorizontalPager(pager, Modifier.fillMaxWidth().height(height), pageSpacing = 17.px, verticalAlignment = Alignment.Top,
+                    flingBehavior = PagerDefaults.flingBehavior(pager, snapAnimationSpec = tween(ToolPageSnapMs, easing = FastOutSlowInEasing))) { page ->
+                    Column { TileRows(if (page == 0) rows else more.chunked(4), if (page == 0) null else 4) }
+                }
+                Box(
+                    Modifier.align(Alignment.TopEnd).width(ToolPageEdge).height(height)
+                        .graphicsLayer { alpha = 1f - (pager.currentPage + pager.currentPageOffsetFraction).coerceIn(0f, 1f) }
+                        .background(androidx.compose.ui.graphics.Brush.horizontalGradient(listOf(Color.Transparent, ToolPageShade))),
+                )
             }
             Row(Modifier.fillMaxWidth().padding(top = 14.px, bottom = 14.px), Arrangement.Center) {
                 repeat(2) { i ->
@@ -281,6 +290,9 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
     }
     AiProgressDialog(ai)
 }
+
+private val ToolPageEdge = 28.dp
+private val ToolPageShade = Color.Black.copy(alpha = 0.6f)
 
 @Composable
 internal fun PanelRail(state: EditorState, modifier: Modifier) {

@@ -696,6 +696,7 @@
     <string name="crash_logs_empty">Todavía no hay fallos.</string>
     <string name="crash_logs_delete_all">¿Eliminar todos los registros de fallos?</string>
     <string name="crash_copy">Copiar</string>
+    <string name="desk_export_copy">Copiar</string>
     <string name="report_button">Copiar e informar</string>
     <string name="report_title">Copiar e informar</string>
     <string name="report_copied">Se han copiado los detalles. Pégalos en tu informe.</string>

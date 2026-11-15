@@ -19,9 +19,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import app.absentmotion.platform.PlatformFeatures
-import app.absentmotion.ui.theme.Swap
-import androidx.compose.ui.unit.dp
 
 internal object CardMotion {
     const val MOVE_MS = 280
@@ -36,10 +33,6 @@ internal class CardScope(val shared: SharedTransitionScope?, val visibility: Ani
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 internal fun CardSwap(open: Int, modifier: Modifier, list: @Composable BoxScope.(CardScope) -> Unit, card: @Composable BoxScope.(CardScope, Int) -> Unit) {
-    if (PlatformFeatures.desktop) {
-        Swap(open, modifier, rise = 0.dp) { if (open < 0) list(CardScope(null, null, -1)) else card(CardScope(null, null, open), open) }
-        return
-    }
     SharedTransitionLayout(modifier.clipToBounds()) {
         val transition = updateTransition(open, "cards")
         transition.AnimatedContent(Modifier.fillMaxSize(), transitionSpec = {

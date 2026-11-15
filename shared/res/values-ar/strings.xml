@@ -708,6 +708,7 @@
     <string name="crash_logs_empty">لا توجد أعطال حتى الآن.</string>
     <string name="crash_logs_delete_all">حذف جميع سجلات الأعطال؟</string>
     <string name="crash_copy">نسخ</string>
+    <string name="desk_export_copy">نسخ</string>
     <string name="report_button">نسخ وإبلاغ</string>
     <string name="report_title">نسخ وإبلاغ</string>
     <string name="report_copied">تم نسخ التفاصيل. الصقها في بلاغك.</string>

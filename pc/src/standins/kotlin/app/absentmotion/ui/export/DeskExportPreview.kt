@@ -37,6 +37,12 @@ import androidx.compose.ui.unit.sp
 import app.absentmotion.R
 import app.absentmotion.desk.DeskMedia
 import app.absentmotion.export.ExportKind
+import app.absentmotion.ui.editor.ChromeIcons
+import app.absentmotion.ui.home.AtPosition
+import app.absentmotion.ui.home.DeskMenuItem
+import app.absentmotion.ui.home.DeskPopupMenu
+import app.absentmotion.ui.home.onSecondaryPress
+import androidx.compose.ui.unit.IntOffset
 import app.absentmotion.ui.home.handCursor
 import app.absentmotion.ui.theme.Am
 import kotlinx.coroutines.Dispatchers
@@ -54,15 +60,35 @@ internal fun DeskExportPreview(kind: ExportKind, uris: List<Uri>, large: Boolean
     var full by remember { mutableStateOf(false) }
     val viewable = kind != ExportKind.Package && kind != ExportKind.Xml && kind != ExportKind.Audio
     val open = if (!viewable || large) null else onTap ?: { full = true }
-    Box(Modifier.fillMaxSize().then(if (open != null) Modifier.handCursor().clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = open) else Modifier)) {
+    var menuAt by remember { mutableStateOf<IntOffset?>(null) }
+    Box(
+        Modifier.fillMaxSize().then(if (open != null) Modifier.handCursor().clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = open) else Modifier)
+            .onSecondaryPress { menuAt = IntOffset(it.x.toInt(), it.y.toInt()) },
+    ) {
         when (kind) {
             ExportKind.Video, ExportKind.Gif -> MoviePreview(uris.first(), !full)
             ExportKind.Frame, ExportKind.FrameAs -> PicturePreview(uris.first())
             ExportKind.Sequence -> SequencePreview(uris)
             ExportKind.Package, ExportKind.Xml, ExportKind.Audio -> FilePreview(uris.first())
         }
+        menuAt?.let { at ->
+            DeskPopupMenu(AtPosition(at), { menuAt = null }, 160.dp) {
+                DeskMenuItem(stringResource(R.string.desk_export_copy), { menuAt = null; copyFiles(uris.mapNotNull { it.toFile() }) }, ChromeIcons.Copy)
+            }
+        }
     }
     if (full) DeskMediaViewer(kind, uris) { full = false }
+}
+
+internal fun copyFiles(files: List<File>): Boolean {
+    val kept = files.filter { it.isFile }.ifEmpty { return false }
+    val transfer = object : java.awt.datatransfer.Transferable {
+        override fun getTransferDataFlavors() = arrayOf(java.awt.datatransfer.DataFlavor.javaFileListFlavor)
+        override fun isDataFlavorSupported(flavor: java.awt.datatransfer.DataFlavor) = flavor == java.awt.datatransfer.DataFlavor.javaFileListFlavor
+        override fun getTransferData(flavor: java.awt.datatransfer.DataFlavor): Any =
+            if (isDataFlavorSupported(flavor)) kept else throw java.awt.datatransfer.UnsupportedFlavorException(flavor)
+    }
+    return runCatching { java.awt.Toolkit.getDefaultToolkit().systemClipboard.setContents(transfer, null) }.isSuccess
 }
 
 @Composable

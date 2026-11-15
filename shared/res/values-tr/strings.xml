@@ -692,6 +692,7 @@
     <string name="crash_logs_empty">Henüz çökme yok.</string>
     <string name="crash_logs_delete_all">Tüm çökme günlükleri silinsin mi?</string>
     <string name="crash_copy">Kopyala</string>
+    <string name="desk_export_copy">Kopyala</string>
     <string name="report_button">Kopyala ve bildir</string>
     <string name="report_title">Kopyala ve bildir</string>
     <string name="report_copied">Ayrıntılar kopyalandı. Bunları raporunuza yapıştırın.</string>

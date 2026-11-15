@@ -5178,5 +5178,8 @@
  "ffamp_offer_note": "Measured on our test devices, so yours may be faster or slower. If FFamp cannot open a file, the standard engine opens it instead. You can change this any time in Settings > Playback > Media engine.",
  "ffamp_offer_use": "Use FFamp",
  "ffamp_offer_keep": "Keep the standard engine",
- "ffamp_offer_later": "FFamp turns on the next time AbsentMotion starts."
+ "ffamp_offer_later": "FFamp turns on the next time AbsentMotion starts.",
+ "community_coming": "Coming in 5.2",
+ "community_coming_note": "Community bundles will be shared here, so you can find what others make with AbsentMotion.",
+ "desk_export_copy": "Copy"
 }

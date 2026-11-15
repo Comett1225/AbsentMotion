@@ -688,6 +688,7 @@
     <string name="crash_logs_empty">ยังไม่มีการแครช</string>
     <string name="crash_logs_delete_all">ลบบันทึกข้อขัดข้องทั้งหมดหรือไม่</string>
     <string name="crash_copy">คัดลอก</string>
+    <string name="desk_export_copy">คัดลอก</string>
     <string name="report_button">คัดลอกและรายงาน</string>
     <string name="report_title">คัดลอกและรายงาน</string>
     <string name="report_copied">คัดลอกรายละเอียดแล้ว ให้วางลงในรายงานของคุณ</string>

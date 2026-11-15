@@ -692,6 +692,7 @@
     <string name="crash_logs_empty">এখনো কোনো ক্র্যাশ হয়নি।</string>
     <string name="crash_logs_delete_all">সব ক্র্যাশ লগ মুছবেন?</string>
     <string name="crash_copy">কপি</string>
+    <string name="desk_export_copy">কপি</string>
     <string name="report_button">কপি ও রিপোর্ট করুন</string>
     <string name="report_title">কপি ও রিপোর্ট করুন</string>
     <string name="report_copied">বিস্তারিত কপি হয়েছে। আপনার রিপোর্টে পেস্ট করুন।</string>

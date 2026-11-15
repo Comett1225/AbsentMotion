@@ -692,6 +692,7 @@
     <string name="crash_logs_empty">ابھی تک کوئی کریش نہیں۔</string>
     <string name="crash_logs_delete_all">تمام کریش لاگز حذف کریں؟</string>
     <string name="crash_copy">کاپی</string>
+    <string name="desk_export_copy">کاپی</string>
     <string name="report_button">کاپی کریں اور رپورٹ کریں</string>
     <string name="report_title">کاپی کریں اور رپورٹ کریں</string>
     <string name="report_copied">تفصیلات کاپی ہو گئی ہیں۔ انہیں اپنی رپورٹ میں پیسٹ کریں۔</string>

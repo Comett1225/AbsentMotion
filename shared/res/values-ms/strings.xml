@@ -688,6 +688,7 @@
     <string name="crash_logs_empty">Tiada ranap setakat ini.</string>
     <string name="crash_logs_delete_all">Padam semua log ranap?</string>
     <string name="crash_copy">Salin</string>
+    <string name="desk_export_copy">Salin</string>
     <string name="report_button">Salin dan laporkan</string>
     <string name="report_title">Salin dan laporkan</string>
     <string name="report_copied">Butiran telah disalin. Tampalkannya ke dalam laporan anda.</string>

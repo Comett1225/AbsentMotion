@@ -692,6 +692,7 @@
     <string name="crash_logs_empty">अभी तक कोई क्रैश नहीं।</string>
     <string name="crash_logs_delete_all">सभी क्रैश लॉग हटाएं?</string>
     <string name="crash_copy">कॉपी</string>
+    <string name="desk_export_copy">कॉपी</string>
     <string name="report_button">कॉपी करें और रिपोर्ट करें</string>
     <string name="report_title">कॉपी करें और रिपोर्ट करें</string>
     <string name="report_copied">जानकारी कॉपी हो गई है। इसे अपनी रिपोर्ट में पेस्ट करें।</string>

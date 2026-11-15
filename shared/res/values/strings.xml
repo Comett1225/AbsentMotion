@@ -692,6 +692,7 @@
     <string name="crash_logs_empty">No crashes so far.</string>
     <string name="crash_logs_delete_all">Delete all crash logs?</string>
     <string name="crash_copy">Copy</string>
+    <string name="desk_export_copy">Copy</string>
     <string name="report_button">Copy and Report</string>
     <string name="report_title">Copy and Report</string>
     <string name="report_copied">The details are copied. Paste them into your report.</string>

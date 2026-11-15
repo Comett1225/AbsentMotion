@@ -700,6 +700,7 @@
     <string name="crash_logs_empty">Nie było jeszcze awarii.</string>
     <string name="crash_logs_delete_all">Usunąć wszystkie dzienniki awarii?</string>
     <string name="crash_copy">Kopiuj</string>
+    <string name="desk_export_copy">Kopiuj</string>
     <string name="report_button">Skopiuj i zgłoś</string>
     <string name="report_title">Skopiuj i zgłoś</string>
     <string name="report_copied">Szczegóły zostały skopiowane. Wklej je do zgłoszenia.</string>

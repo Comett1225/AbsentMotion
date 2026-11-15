@@ -688,6 +688,7 @@
     <string name="crash_logs_empty">Belum ada crash.</string>
     <string name="crash_logs_delete_all">Hapus semua log crash?</string>
     <string name="crash_copy">Salin</string>
+    <string name="desk_export_copy">Salin</string>
     <string name="report_button">Salin dan laporkan</string>
     <string name="report_title">Salin dan laporkan</string>
     <string name="report_copied">Detail telah disalin. Tempelkan ke laporan Anda.</string>

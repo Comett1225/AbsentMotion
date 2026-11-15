@@ -692,6 +692,7 @@
     <string name="crash_logs_empty">Wala pang crash.</string>
     <string name="crash_logs_delete_all">Burahin ang lahat ng crash log?</string>
     <string name="crash_copy">Kopyahin</string>
+    <string name="desk_export_copy">Kopyahin</string>
     <string name="report_button">Kopyahin at iulat</string>
     <string name="report_title">Kopyahin at iulat</string>
     <string name="report_copied">Nakopya ang mga detalye. I-paste ang mga ito sa iyong ulat.</string>

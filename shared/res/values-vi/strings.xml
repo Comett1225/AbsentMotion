@@ -688,6 +688,7 @@
     <string name="crash_logs_empty">Chưa có sự cố nào.</string>
     <string name="crash_logs_delete_all">Xóa tất cả nhật ký sự cố?</string>
     <string name="crash_copy">Sao chép</string>
+    <string name="desk_export_copy">Sao chép</string>
     <string name="report_button">Sao chép và báo cáo</string>
     <string name="report_title">Sao chép và báo cáo</string>
     <string name="report_copied">Đã sao chép thông tin. Hãy dán vào báo cáo của bạn.</string>
