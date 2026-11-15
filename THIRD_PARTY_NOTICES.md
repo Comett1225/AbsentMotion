@@ -15,7 +15,7 @@ dependency is added, removed or upgraded, update this file in the same change.
 
 **Contents**
 
-1. Engine libraries (C and C++): Skia and the libraries it links, whisper.cpp and ggml, RNNoise, ncnn, glslang, the RIFE warp layer, LAME, FFmpeg (Windows and Linux desktop apps only), FFamp with its codec libraries (macOS app only: Opus, LAME, mpg123, libvorbis, libogg, OpenAPV, libvpx, dav1d, SVT-AV1, Xvid), the AppImage runtime (Linux AppImage only), and the video downloader add-on (CPython and yt-dlp, downloaded at run time)
+1. Engine libraries (C and C++): Skia and the libraries it links, whisper.cpp and ggml, RNNoise, ncnn, glslang, the RIFE warp layer, LAME, FFmpeg (Windows and Linux desktop apps only), FFamp with its codec libraries (macOS app: Opus, LAME, mpg123, libvorbis, libogg, OpenAPV, libvpx, dav1d, SVT-AV1, Xvid; 64-bit Android apps: Xvid), the AppImage runtime (Linux AppImage only), and the video downloader add-on (CPython and yt-dlp, downloaded at run time)
 2. Machine learning models: OpenAI Whisper weights, RIFE and Real-ESRGAN weights and the AI background removal 2.0 model (all downloaded at run time), the built-in background removal model
 3. Kotlin and Compose libraries, including those bundled in the desktop apps (OpenJDK, Compose Desktop, Skiko, kotlinx)
 4. Fonts, icons and effect thumbnails
@@ -256,7 +256,7 @@ Linux (x86_64 and arm64):
 - Source: the same `Source-FFmpeg-<version>-windows-linux-part1.tar` and `-part2.tar` hold the FFmpeg source of this build (commit
   `b204e94e90fca64045e9ca7dd44c65678c7eb29e`) next to BtbN's build scripts and library sources.
 
-### FFamp (macOS app only)
+### FFamp (macOS app and 64-bit Android apps)
 
 - Version: the commit of the `third_party/FFamp` submodule this release was built from.
 - Licence: GNU General Public License, version 3 or later (the text in `LICENSE`). FFamp (Fast Forward Absent Multimedia
@@ -266,6 +266,9 @@ Linux (x86_64 and arm64):
 - Used in: the macOS app (Apple silicon and Intel), which reads, plays, exports and converts every media file through it:
   its own readers and writers for MP4, MOV, Matroska, WebM, Ogg, WAV and transport streams on top of the system's
   VideoToolbox, AudioToolbox and AVFoundation. It is linked statically into `libamdesktop.dylib`.
+- Used on Android: the 64-bit apps (not the 32-bit Compatible APK) offer it as the experimental media reader, off by default
+  (Settings > Playback > Media reader). It then opens and reads media files and decodes Windows Media, DivX and Xvid video and
+  Windows Media Audio on top of the system's MediaCodec. It is linked statically into `libamffamp.so`.
 
 The codec libraries below are linked statically into FFamp. `third_party/FFamp/third_party/build_mac.sh` builds them for
 arm64 and x86_64 (minimum macOS 11) from the unchanged source archives named here and checks each SHA-256 sum before it
@@ -357,7 +360,8 @@ unpacks.
   `AUTHORS` and in the source file headers of the archive.
 - URL: https://www.xvid.com/
 - Used in: decoding DivX and Xvid video (MPEG-4 Part 2, Simple and Advanced Simple Profile: B-frames, quarter-pixel motion,
-  global motion compensation, custom quantiser matrices, interlaced video).
+  global motion compensation, custom quantiser matrices, interlaced video). On Android,
+  `third_party/FFamp/third_party/build_android.sh` builds it for arm64-v8a with the NDK from the same archive.
 
 ### AppImage runtime (Linux AppImage only)
 

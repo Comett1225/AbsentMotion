@@ -715,7 +715,7 @@ This list was written by hand on 2026-10-18 from the build files and the vendore
 
 Contents
 
-1. Engine libraries (C and C++): Skia and the libraries it links, whisper.cpp and ggml, RNNoise, ncnn, glslang, the RIFE warp layer, LAME, FFmpeg (Windows and Linux desktop apps only), FFamp with its codec libraries (macOS app only: Opus, LAME, mpg123, libvorbis, libogg, OpenAPV, libvpx, dav1d, SVT-AV1, Xvid), the AppImage runtime (Linux AppImage only), and the video downloader add-on (CPython and yt-dlp, downloaded at run time)
+1. Engine libraries (C and C++): Skia and the libraries it links, whisper.cpp and ggml, RNNoise, ncnn, glslang, the RIFE warp layer, LAME, FFmpeg (Windows and Linux desktop apps only), FFamp with its codec libraries (macOS app: Opus, LAME, mpg123, libvorbis, libogg, OpenAPV, libvpx, dav1d, SVT-AV1, Xvid; 64-bit Android apps: Xvid), the AppImage runtime (Linux AppImage only), and the video downloader add-on (CPython and yt-dlp, downloaded at run time)
 2. Machine learning models: OpenAI Whisper weights, RIFE and Real-ESRGAN weights and the AI background removal 2.0 model (all downloaded at run time), the built-in background removal model
 3. Kotlin and Compose libraries, including those bundled in the desktop apps (OpenJDK, Compose Desktop, Skiko, kotlinx)
 4. Fonts, icons and effect thumbnails
@@ -927,13 +927,14 @@ Linux (x86_64 and arm64):
 - Used in: the Linux packages (.deb and AppImage). libamdesktop.so links the shared avformat, avcodec, avutil and swscale libraries (and swresample through them) for video decoding (VA-API when available), and ffmpeg and ffprobe run export, the Tools tab and media probing. They sit in the app's lib/app/resources folder (/opt/absentmotion/lib/app/resources for the .deb), so they can be replaced with another build.
 - Source: the same Source-FFmpeg-<version>-windows-linux-part1.tar and -part2.tar hold the FFmpeg source of this build (commit b204e94e90fca64045e9ca7dd44c65678c7eb29e) next to BtbN's build scripts and library sources.
 
-FFamp (macOS app only)
-----------------------
+FFamp (macOS app and 64-bit Android apps)
+-----------------------------------------
 
 - Version: the commit of the third_party/FFamp submodule this release was built from.
 - Licence: GNU General Public License, version 3 or later (the text in LICENSE). FFamp (Fast Forward Absent Multimedia Project) is written by the AbsentMotion project itself, from the public specifications and the operating-system documentation; it contains no code from FFmpeg.
 - Copyright: Copyright (c) 2026 the AbsentMotion project.
 - Used in: the macOS app (Apple silicon and Intel), which reads, plays, exports and converts every media file through it: its own readers and writers for MP4, MOV, Matroska, WebM, Ogg, WAV and transport streams on top of the system's VideoToolbox, AudioToolbox and AVFoundation. It is linked statically into libamdesktop.dylib.
+- Used on Android: the 64-bit apps (not the 32-bit Compatible APK) offer it as the experimental media reader, off by default (Settings > Playback > Media reader). It then opens and reads media files and decodes Windows Media, DivX and Xvid video and Windows Media Audio on top of the system's MediaCodec. It is linked statically into libamffamp.so.
 
 The codec libraries below are linked statically into FFamp. third_party/FFamp/third_party/build_mac.sh builds them for arm64 and x86_64 (minimum macOS 11) from the unchanged source archives named here and checks each SHA-256 sum before it unpacks.
 
@@ -1016,7 +1017,7 @@ Xvid (xvidcore)
 - Licence: GNU General Public License, version 2 or (at your option) any later version (text of version 2 in appendix A.30); the app that links it is distributed under version 3.
 - Copyright: Copyright (C) 2001-2019 the Xvid authors: Christoph Lampert, Michael Militzer, Peter Ross and the others named in AUTHORS and in the source file headers of the archive.
 - URL: https://www.xvid.com/
-- Used in: decoding DivX and Xvid video (MPEG-4 Part 2, Simple and Advanced Simple Profile: B-frames, quarter-pixel motion, global motion compensation, custom quantiser matrices, interlaced video).
+- Used in: decoding DivX and Xvid video (MPEG-4 Part 2, Simple and Advanced Simple Profile: B-frames, quarter-pixel motion, global motion compensation, custom quantiser matrices, interlaced video). On Android, third_party/FFamp/third_party/build_android.sh builds it for arm64-v8a with the NDK from the same archive.
 
 AppImage runtime (Linux AppImage only)
 --------------------------------------

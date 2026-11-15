@@ -9,6 +9,10 @@ import android.media.MediaCodec
 import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.net.Uri
+import app.absentmotion.ffamp.FfampPcm
+import app.absentmotion.media.Demuxer
+import app.absentmotion.media.MediaReader
+import app.absentmotion.media.openDemuxer
 import java.io.Closeable
 import java.nio.ByteOrder
 import app.absentmotion.library.openableUri
@@ -27,7 +31,8 @@ internal interface PcmSource : Closeable {
 }
 
 internal class PcmDecoder(context: Context, uri: String) : PcmSource {
-    private val extractor = MediaExtractor()
+    private val soft = if (MediaReader.ffamp(context)) FfampPcm.openIfNeeded(context, uri) else null
+    private lateinit var extractor: Demuxer
     private var codec: MediaCodec? = null
     private val info = MediaCodec.BufferInfo()
     private val chunk = PcmChunk()
@@ -40,8 +45,9 @@ internal class PcmDecoder(context: Context, uri: String) : PcmSource {
     override val durationUs: Long
 
     init {
-        try {
-            extractor.setDataSource(context, Uri.parse(openableUri(uri)), null)
+        if (soft != null) durationUs = soft.durationUs
+        else try {
+            extractor = openDemuxer(context, Uri.parse(openableUri(uri)), "audio/")
             val track = (0 until extractor.trackCount).firstOrNull {
                 extractor.getTrackFormat(it).getString(MediaFormat.KEY_MIME)?.startsWith("audio/") == true
             } ?: error(AppText.get(R.string.ai_no_audio_track, uri))
@@ -60,6 +66,7 @@ internal class PcmDecoder(context: Context, uri: String) : PcmSource {
     }
 
     override fun seek(us: Long) {
+        soft?.let { it.seek(us); return }
         codec!!.flush()
         extractor.seekTo(us.coerceAtLeast(0), MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
         inputEnded = false
@@ -67,6 +74,7 @@ internal class PcmDecoder(context: Context, uri: String) : PcmSource {
     }
 
     override fun next(): PcmChunk? {
+        soft?.let { return it.next() }
         val decoder = codec ?: return null
         var progress = System.nanoTime()
         while (!outputEnded) {
@@ -156,10 +164,11 @@ internal class PcmDecoder(context: Context, uri: String) : PcmSource {
     }
 
     override fun close() {
+        soft?.close()
         runCatching { codec?.stop() }
         runCatching { codec?.release() }
         codec = null
-        extractor.release()
+        if (::extractor.isInitialized) extractor.release()
     }
 }
 

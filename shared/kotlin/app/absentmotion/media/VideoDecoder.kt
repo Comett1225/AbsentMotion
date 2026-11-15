@@ -74,7 +74,9 @@ internal fun codecBusy(e: Throwable): Boolean = e is MediaCodec.CodecException &
     (e.isTransient || e.errorCode == MediaCodec.CodecException.ERROR_INSUFFICIENT_RESOURCE || e.errorCode == MediaCodec.CodecException.ERROR_RECLAIMED)
 
 internal class VideoDecoder(private val context: Context, private val uri: String) : Closeable {
-    private val extractor = MediaExtractor()
+    private val extractor = openDemuxer(context, Uri.parse(openableUri(uri)), "video/")
+    private val ffamp = MediaBackend.ffamp(context)
+    private var soft: DesktopFrameInput? = null
     private var codec: MediaCodec? = null
     private var frames: DecodedFrames? = null
     private val info = MediaCodec.BufferInfo()
@@ -100,7 +102,6 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
 
     init {
         try {
-            extractor.setDataSource(context, Uri.parse(openableUri(uri)), null)
             val track = (0 until extractor.trackCount).first { extractor.getTrackFormat(it).getString(MediaFormat.KEY_MIME)?.startsWith("video/") == true }
             format = extractor.getTrackFormat(track)
             readColor(format)
@@ -110,7 +111,8 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
             frames = decodedFrames(format.getInteger(MediaFormat.KEY_WIDTH), format.getInteger(MediaFormat.KEY_HEIGHT), MAX_IMAGES)
             format.setInteger(MediaFormat.KEY_ROTATION, 0)
             hdr = format.requestSdr()
-            codec = openDecoder(format, frames!!.surface)
+            soft = ffamp?.softFrames(context, uri)
+            if (soft == null) codec = openDecoder(format, frames!!.surface)
         } catch (e: Exception) { close(); throw e }
     }
 
@@ -119,6 +121,7 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
     fun frame(timeUs: Long, exact: Boolean, obsolete: () -> Boolean): DecodedFrame? {
         val wanted = wantedPts(timeUs)
         if (wanted == currentPts) return current
+        soft?.let { return softFrame(it, wanted, exact) }
         val decoder = codec ?: return current
         val at = if (skipped) decodedTo else currentPts
         if (!positioned || (if (skipped) wanted <= at else wanted < at) || wanted - at > 1_000_000 || outputEnded) reposition(decoder, wanted)
@@ -215,10 +218,22 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
         return image
     }
 
+    private fun softFrame(source: DesktopFrameInput, wanted: Long, exact: Boolean): DecodedFrame? {
+        var made: DecodedFrame? = null
+        kotlinx.coroutines.runBlocking { source.read(listOf(wanted)) { _, yuv -> made = ffamp!!.softFrame(yuv, wanted) } }
+        val image = made ?: return if (exact) null else current
+        current?.close()
+        current = image
+        currentPts = wanted
+        seeks++
+        return image
+    }
+
     private fun drainImages() { frames?.drain() }
 
     override fun close() {
         current?.close(); current = null
+        soft?.close(); soft = null
         runCatching { codec?.stop() }; runCatching { codec?.release() }; codec = null
         frames?.close(); frames = null
         extractor.release()

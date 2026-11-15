@@ -29,7 +29,7 @@ internal interface DesktopFrameInput : Closeable {
 
 internal class FrameReader(context: Context, uri: String) : Closeable {
     private val desktop = app.absentmotion.platform.desktopFrameReader(context, uri)
-    private val extractor by lazy { MediaExtractor() }
+    private lateinit var extractor: Demuxer
     private var codec: MediaCodec? = null
     private val info by lazy { MediaCodec.BufferInfo() }
     private var queued = false
@@ -48,7 +48,7 @@ internal class FrameReader(context: Context, uri: String) : Closeable {
             colorStandard = desktop.colorStandard
             fullRange = desktop.fullRange
         } else try {
-            extractor.setDataSource(context, Uri.parse(openableUri(uri)), null)
+            extractor = openDemuxer(context, Uri.parse(openableUri(uri)), "video/")
             val track = (0 until extractor.trackCount).first { extractor.getTrackFormat(it).getString(MediaFormat.KEY_MIME)?.startsWith("video/") == true }
             val format = extractor.getTrackFormat(track)
             extractor.selectTrack(track)
@@ -133,7 +133,7 @@ internal class FrameReader(context: Context, uri: String) : Closeable {
         runCatching { codec?.stop() }
         runCatching { codec?.release() }
         codec = null
-        extractor.release()
+        if (::extractor.isInitialized) extractor.release()
     }
 
     private companion object {

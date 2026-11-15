@@ -1649,6 +1649,10 @@
       "desktop": "pc/src/standins/kotlin/app/absentmotion/export/DeskVideoExport.kt",
       "reason": "MediaCodec video export"
     },
+    "app/absentmotion/ffamp/Ffamp.kt": {
+      "desktop": "pc/src/standins/kotlin/app/absentmotion/media/FfampEngine.kt",
+      "reason": "FFamp media reader over JNI (libamffamp.so), chosen in Settings > Playback > Media reader"
+    },
     "app/absentmotion/fonts/TextLayout.kt": {
       "desktop": "pc/src/standins/kotlin/app/absentmotion/fonts/DeskTextLayout.kt",
       "reason": "text measuring"

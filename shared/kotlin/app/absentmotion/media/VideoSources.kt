@@ -25,9 +25,8 @@ internal object VideoSources {
     private fun index(context: Context, uri: String): Index = synchronized(locks.getOrPut(uri) { Any() }) {
         val key = uri + "\n" + fileVersion(context.contentResolver, Uri.parse(uri))
         indices.get(key)?.let { return it }
-        val extractor = MediaExtractor()
+        val extractor = openDemuxer(context, Uri.parse(openableUri(uri)), "video/")
         try {
-            extractor.setDataSource(context, Uri.parse(openableUri(uri)), null)
             val track = (0 until extractor.trackCount).first { extractor.getTrackFormat(it).getString(MediaFormat.KEY_MIME)?.startsWith("video/") == true }
             extractor.selectTrack(track)
             val samples = Stamps()
