@@ -1,5 +1,7 @@
 package app.absentmotion.desk
 
+import app.absentmotion.ui.home.FfampOffer
+import app.absentmotion.ui.home.FfampOfferDialog
 import android.content.Desk
 import android.net.Uri
 import android.widget.Toast
@@ -552,9 +554,12 @@ private fun DeskContent(app: DeskAppState, scale: Float) {
             whatsNew?.takeIf { open == null && first == null && !app.opening && app.editingTemplate == null && app.exportingFromList == null && app.recovered == null && !app.settingsOpen }?.let { notes ->
                 WhatsNewDialog(notes) { whatsNew = null; WhatsNewNotes.seen(context, app.settings) }
             }
+            if (whatsNew == null && open == null && first == null && !app.opening && app.editingTemplate == null && app.exportingFromList == null && app.recovered == null && !app.settingsOpen && FfampOffer.pending(app.settings)) {
+                FfampOfferDialog(app.settings)
+            }
             TutorialHost(
                 open, app.store, app.settings,
-                homeFree = open == null && first == null && !app.opening && app.editingTemplate == null && app.exportingFromList == null && app.recovered == null && app.imported.isEmpty() && !app.settingsOpen && Updates.answer == null && whatsNew == null,
+                homeFree = open == null && first == null && !app.opening && app.editingTemplate == null && app.exportingFromList == null && app.recovered == null && app.imported.isEmpty() && !app.settingsOpen && Updates.answer == null && whatsNew == null && !FfampOffer.pending(app.settings),
                 onOpen = { id -> run { app.openNow(id) } }, onCloseEditor = { scope.launch { app.closeEditor() } }, onChanged = { app.projectsChanged++ },
             )
             app.fontOffer?.takeIf { it.first === open }?.let { (state, names) -> DeskFontOffer(names, { app.downloadFonts(names) }) { app.declineFonts(state) } }

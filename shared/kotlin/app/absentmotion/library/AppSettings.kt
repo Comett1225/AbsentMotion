@@ -32,6 +32,7 @@ class AppSettings(private val context: Context) {
     private var rotateFreeState by mutableStateOf(prefs.getBoolean("rotateFree", false))
     private var openGlState by mutableStateOf(prefs.getBoolean("graphicsOpenGl", false))
     private var ffampState by mutableStateOf(prefs.getBoolean(app.absentmotion.media.FFAMP_PREF, false))
+    private var ffampAskedState by mutableStateOf(prefs.getBoolean("ffampAsked", false))
 
     private var themeState by mutableStateOf(Themes.firstChoice(prefs.getString("theme", null), prefs.getInt("onboarding", 0), prefs.getBoolean("lookChosen", false)))
     private var systemDarkState by mutableStateOf(app.absentmotion.platform.systemDark(context))
@@ -89,6 +90,10 @@ class AppSettings(private val context: Context) {
     var ffamp: Boolean
         get() = ffampState
         set(value) { ffampState = value; prefs.edit().putBoolean(app.absentmotion.media.FFAMP_PREF, value).apply() }
+
+    var ffampAsked: Boolean
+        get() = ffampAskedState
+        set(value) { ffampAskedState = value; prefs.edit().putBoolean("ffampAsked", value).apply() }
 
     var vibration: Boolean
         get() = vibrationState

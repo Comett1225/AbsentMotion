@@ -339,11 +339,12 @@ class MainActivity : ComponentActivity() {
                 ) else if (open == null && first == null && !opening && editingTemplate == null && exportingFromList == null) {
                     val notes = whatsNew
                     if (notes != null) app.absentmotion.ui.home.WhatsNewDialog(notes) { whatsNew = null; app.absentmotion.ui.home.WhatsNewNotes.seen(this, settings) }
+                    else if (app.absentmotion.ui.home.FfampOffer.pending(settings)) app.absentmotion.ui.home.FfampOfferDialog(settings)
                     else if (settings.updatesAsked) UpdateDialog() else UpdateAskDialog(settings)
                 }
                 app.absentmotion.ui.tutorial.TutorialHost(
                     open, store, settings,
-                    homeFree = open == null && first == null && !opening && editingTemplate == null && exportingFromList == null && offer == null && crashed == null && !problemShown && imported.isEmpty() && whatsNew == null,
+                    homeFree = open == null && first == null && !opening && editingTemplate == null && exportingFromList == null && offer == null && crashed == null && !problemShown && imported.isEmpty() && whatsNew == null && !app.absentmotion.ui.home.FfampOffer.pending(settings),
                     onOpen = ::open, onCloseEditor = ::closeEditor, onChanged = { projectsChanged++ },
                 )
             }
@@ -356,7 +357,7 @@ class MainActivity : ComponentActivity() {
 
 
     private fun updateCalm() = lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED) && editor == null && !closingEditor && !opening && !openingProject &&
-        editingTemplate == null && exportingFromList == null && firstRun == null && recovered == null && crashed == null && !problemShown && whatsNew == null &&
+        editingTemplate == null && exportingFromList == null && firstRun == null && recovered == null && crashed == null && !problemShown && whatsNew == null && !app.absentmotion.ui.home.FfampOffer.pending(settings) &&
         settings.updatesAsked && !app.absentmotion.export.ExportRun.running
 
     private fun importShared() {
