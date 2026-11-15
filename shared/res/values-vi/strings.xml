@@ -141,6 +141,10 @@
     <string name="settings_graphics_opengl">OpenGL</string>
     <string name="settings_graphics_note">Hiện đang dùng %1$s.</string>
     <string name="settings_graphics_hint">Chọn OpenGL nếu bản xem trước hoặc video xuất ra trông sai trên điện thoại này.</string>
+    <string name="settings_media">Trình đọc media</string>
+    <string name="settings_media_standard">Tiêu chuẩn</string>
+    <string name="settings_media_ffamp">FFamp (thử nghiệm)</string>
+    <string name="settings_media_hint">FFamp là trình đọc video và âm thanh riêng của AbsentMotion. Nó nhanh hơn và mở được nhiều loại tệp hơn, nhưng vẫn đang được thử nghiệm. Thay đổi sẽ có hiệu lực vào lần mở AbsentMotion tiếp theo.</string>
     <string name="playback_resampling">Lấy mẫu lại khi phát</string>
     <string name="settings">Cài đặt</string>
     <string name="your_video_ended_early_so_its">Video của bạn kết thúc sớm nên khung hình cuối được giữ lại.\nThay bằng clip dài hơn để có kết quả đẹp hơn.</string>

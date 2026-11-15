@@ -5158,5 +5158,10 @@
  "xml_err_unexpected_end": "The file ends unexpectedly inside %1$s",
  "your_asset_collection_is_empty": "Your asset collection is empty",
  "your_video_ended_early_so_its": "Your video ended early, so its last frame is held.\nSwap in a longer clip for a cleaner result.",
- "media_error_mpeg4_asp": "This DivX or Xvid video uses features (such as B-frames) that macOS cannot play. The sound plays, but there is no picture."
+ "media_error_mpeg4_asp": "This DivX or Xvid video uses features (such as B-frames) that macOS cannot play. The sound plays, but there is no picture.",
+ "newproject_save_size_hint": "Choose a name, or leave blank to use %1$s",
+ "settings_media": "Media reader",
+ "settings_media_standard": "Standard",
+ "settings_media_ffamp": "FFamp (experimental)",
+ "settings_media_hint": "FFamp is AbsentMotion's own reader for videos and sounds. It is faster and opens more file types, but it is still being tested. A change takes effect the next time AbsentMotion starts."
 }

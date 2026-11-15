@@ -141,6 +141,10 @@
     <string name="settings_graphics_opengl">OpenGL</string>
     <string name="settings_graphics_note">Kini menggunakan %1$s.</string>
     <string name="settings_graphics_hint">Pilih OpenGL jika pratonton atau eksport kelihatan salah pada telefon ini.</string>
+    <string name="settings_media">Pembaca media</string>
+    <string name="settings_media_standard">Standard</string>
+    <string name="settings_media_ffamp">FFamp (eksperimen)</string>
+    <string name="settings_media_hint">FFamp ialah pembaca video dan bunyi milik AbsentMotion sendiri. Ia lebih pantas dan membuka lebih banyak jenis fail, tetapi masih diuji. Perubahan berkuat kuasa apabila AbsentMotion dibuka semula.</string>
     <string name="playback_resampling">Persampelan semula main balik</string>
     <string name="settings">Tetapan</string>
     <string name="your_video_ended_early_so_its">Video anda tamat lebih awal, jadi bingkai terakhirnya ditahan.\nTukar dengan klip lebih panjang untuk hasil yang lebih bersih.</string>

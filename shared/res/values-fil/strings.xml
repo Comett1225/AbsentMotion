@@ -141,6 +141,10 @@
     <string name="settings_graphics_opengl">OpenGL</string>
     <string name="settings_graphics_note">Gumagamit ngayon ng %1$s.</string>
     <string name="settings_graphics_hint">Piliin ang OpenGL kung mali ang itsura ng preview o ng mga export sa phone na ito.</string>
+    <string name="settings_media">Media reader</string>
+    <string name="settings_media_standard">Karaniwan</string>
+    <string name="settings_media_ffamp">FFamp (eksperimental)</string>
+    <string name="settings_media_hint">Ang FFamp ay sariling reader ng AbsentMotion para sa mga video at tunog. Mas mabilis ito at nakakabukas ng mas maraming uri ng file, pero sinusubukan pa ito. Magkakabisa ang pagbabago sa susunod na pagbukas ng AbsentMotion.</string>
     <string name="playback_resampling">Resampling ng playback</string>
     <string name="settings">Mga setting</string>
     <string name="your_video_ended_early_so_its">Maagang natapos ang bidyo mo, kaya hawak ang huling frame nito.\nPalitan ng mas mahabang clip para sa mas malinis na resulta.</string>

@@ -218,6 +218,7 @@ object PlatformFeatures {
     const val tools = true
     const val userFiles = false
     const val linkFolders = false
+    val ffamp = false
 }
 
 fun textFieldFocused(): Boolean = false

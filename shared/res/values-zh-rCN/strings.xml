@@ -141,6 +141,10 @@
     <string name="settings_graphics_opengl">OpenGL</string>
     <string name="settings_graphics_note">当前使用 %1$s。</string>
     <string name="settings_graphics_hint">如果此手机上的预览或导出画面异常，请选择OpenGL。</string>
+    <string name="settings_media">媒体读取</string>
+    <string name="settings_media_standard">标准</string>
+    <string name="settings_media_ffamp">FFamp（实验性）</string>
+    <string name="settings_media_hint">FFamp 是 AbsentMotion 自己的视频和声音读取器。它更快，能打开更多文件类型，但仍在测试中。更改将在下次启动 AbsentMotion 时生效。</string>
     <string name="playback_resampling">播放重采样</string>
     <string name="settings">设置</string>
     <string name="your_video_ended_early_so_its">视频提前结束，已定格最后一帧。\n换用更长的片段可获得更好的效果。</string>

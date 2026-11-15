@@ -141,6 +141,10 @@
     <string name="settings_graphics_opengl">OpenGL</string>
     <string name="settings_graphics_note">अभी %1$s इस्तेमाल हो रहा है।</string>
     <string name="settings_graphics_hint">अगर इस फ़ोन पर प्रीव्यू या एक्सपोर्ट गलत दिखें तो OpenGL चुनें।</string>
+    <string name="settings_media">मीडिया रीडर</string>
+    <string name="settings_media_standard">सामान्य</string>
+    <string name="settings_media_ffamp">FFamp (प्रयोगात्मक)</string>
+    <string name="settings_media_hint">FFamp वीडियो और आवाज़ के लिए AbsentMotion का अपना रीडर है। यह तेज़ है और ज़्यादा तरह की फ़ाइलें खोलता है, लेकिन अभी इसकी जाँच चल रही है। बदलाव अगली बार AbsentMotion खुलने पर लागू होगा।</string>
     <string name="playback_resampling">प्लेबैक रीसैंपलिंग</string>
     <string name="settings">सेटिंग्स</string>
     <string name="your_video_ended_early_so_its">आपका वीडियो जल्दी खत्म हो गया, इसलिए उसका आखिरी फ़्रेम रोका गया है।\nबेहतर नतीजे के लिए लंबी क्लिप डालें।</string>

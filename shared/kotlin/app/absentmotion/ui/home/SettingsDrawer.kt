@@ -210,6 +210,16 @@ internal fun PlaybackSettings(settings: AppSettings) {
         }
         Divider(10.dp)
     }
+    if (app.absentmotion.platform.PlatformFeatures.ffamp) {
+        val reading = stringResource(if (app.absentmotion.media.MediaReader.ffamp(LocalContext.current)) R.string.settings_media_ffamp else R.string.settings_media_standard)
+        ChoicesBlock(R.string.settings_media, note = {
+            Text(stringResource(R.string.settings_graphics_note, reading) + " " + stringResource(R.string.settings_media_hint), Modifier.padding(horizontal = 10.dp),
+                color = Am.HomeMid, fontSize = 12.sp, lineHeight = 16.sp)
+        }) {
+            Choices(listOf(R.string.settings_media_standard, R.string.settings_media_ffamp), if (settings.ffamp) 1 else 0) { settings.ffamp = it == 1 }
+        }
+        Divider(10.dp)
+    }
     ChoicesBlock(R.string.playback_resampling) {
         Choices(listOf(R.string.settings_level_low, R.string.settings_level_high, R.string.settings_level_ultra), settings.audioResampling) { settings.audioResampling = it }
     }

@@ -141,6 +141,10 @@
     <string name="settings_graphics_opengl">OpenGL</string>
     <string name="settings_graphics_note">Aktuell wird %1$s verwendet.</string>
     <string name="settings_graphics_hint">Wähle OpenGL, wenn die Vorschau oder Exporte auf diesem Gerät fehlerhaft aussehen.</string>
+    <string name="settings_media">Medien-Lesemodul</string>
+    <string name="settings_media_standard">Standard</string>
+    <string name="settings_media_ffamp">FFamp (experimentell)</string>
+    <string name="settings_media_hint">FFamp ist AbsentMotions eigenes Lesemodul für Videos und Töne. Es ist schneller und öffnet mehr Dateitypen, wird aber noch getestet. Eine Änderung gilt ab dem nächsten Start von AbsentMotion.</string>
     <string name="playback_resampling">Resampling bei Wiedergabe</string>
     <string name="settings">Einstellungen</string>
     <string name="your_video_ended_early_so_its">Dein Video endete zu früh, daher wird das letzte Bild gehalten.\nTausche es gegen einen längeren Clip aus, um ein besseres Ergebnis zu erzielen.</string>
