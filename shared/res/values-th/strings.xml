@@ -682,6 +682,7 @@
     <string name="newproject_link">ลิงก์</string>
     <string name="newproject_save_size_chip">+ บันทึกขนาด</string>
     <string name="newproject_save_size_title">บันทึกขนาด</string>
+    <string name="newproject_save_size_hint">ตั้งชื่อ หรือเว้นว่างไว้เพื่อใช้ %1$s</string>
     <string name="newproject_saved_sizes">ขนาดที่บันทึกไว้</string>
     <plurals name="backup_projects">
         <item quantity="other">%1$s โปรเจกต์</item>

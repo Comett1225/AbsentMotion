@@ -686,6 +686,7 @@
     <string name="newproject_link">Link</string>
     <string name="newproject_save_size_chip">+ I-save ang laki</string>
     <string name="newproject_save_size_title">I-save ang laki</string>
+    <string name="newproject_save_size_hint">Pumili ng pangalan, o iwanang blangko para gamitin ang %1$s</string>
     <string name="newproject_saved_sizes">Mga na-save na laki</string>
     <plurals name="backup_projects">
         <item quantity="one">%1$s proyekto</item>

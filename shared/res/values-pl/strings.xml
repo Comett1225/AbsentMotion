@@ -694,6 +694,7 @@
     <string name="newproject_link">Połącz</string>
     <string name="newproject_save_size_chip">+ Zapisz rozmiar</string>
     <string name="newproject_save_size_title">Zapisz rozmiar</string>
+    <string name="newproject_save_size_hint">Wybierz nazwę lub zostaw puste, aby użyć %1$s</string>
     <string name="newproject_saved_sizes">Zapisane rozmiary</string>
     <plurals name="backup_projects">
         <item quantity="one">projekt</item>

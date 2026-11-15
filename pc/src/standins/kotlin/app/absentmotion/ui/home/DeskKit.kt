@@ -83,8 +83,9 @@ internal fun DeskModal(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     DeskBack.Handler(true, onClose)
+    var level by remember { mutableStateOf(0) }
     DisposableEffect(Unit) {
-        DeskModals.open++
+        level = ++DeskModals.open
         onDispose { DeskModals.open--; if (DeskModals.open == 0) DeskModals.fade = 0f }
     }
     var shown by remember { mutableStateOf(false) }
@@ -93,13 +94,20 @@ internal fun DeskModal(
     SideEffect { DeskModals.fade = fade }
     val focus = remember { FocusRequester() }
     androidx.compose.runtime.LaunchedEffect(Unit) { runCatching { focus.requestFocus() } }
+    val top = level == DeskModals.open
+    val hidden = level != 0 && !top
+    var wasHidden by remember { mutableStateOf(false) }
+    androidx.compose.runtime.LaunchedEffect(top) {
+        if (hidden) wasHidden = true
+        else if (wasHidden) { wasHidden = false; runCatching { focus.requestFocus() } }
+    }
     val enter by rememberUpdatedState(onEnter)
     val dismiss by rememberUpdatedState(onClose)
     Box(
         Modifier.fillMaxSize().background(Color.Black.copy(alpha = DeskModals.ScrimAlpha * fade))
             .pointerInput(Unit) { detectTapGestures { if (dismissOnScrim) dismiss() } }
             .focusRequester(focus).focusable()
-            .onPreviewKeyEvent { event -> DeskTyping.active > 0 && confirmOnEnter(event, enter) }
+            .onPreviewKeyEvent { event -> DeskTyping.active > 0 && top && confirmOnEnter(event, enter) }
             .onKeyEvent { event -> confirmOnEnter(event, enter) },
         Alignment.Center,
     ) {

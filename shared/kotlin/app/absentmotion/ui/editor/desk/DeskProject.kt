@@ -231,7 +231,7 @@ private fun DeskSavedSizes(settings: app.absentmotion.library.AppSettings, width
         }
     }
     if (naming) {
-        app.absentmotion.ui.home.SizeNameDialog(stringResource(R.string.newproject_save_size_title), "$width × $height", dark = true, onDismiss = { naming = false }) { name ->
+        app.absentmotion.ui.home.SizeNameDialog(stringResource(R.string.newproject_save_size_title), "", dark = true, onDismiss = { naming = false }, hint = stringResource(R.string.newproject_save_size_hint, "$width × $height")) { name ->
             naming = false
             settings.savedSizes = app.absentmotion.library.SavedSizes.with(settings.savedSizes, name, width, height)
         }

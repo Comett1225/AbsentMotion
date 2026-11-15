@@ -686,6 +686,7 @@
     <string name="newproject_link">Link</string>
     <string name="newproject_save_size_chip">+ Save size</string>
     <string name="newproject_save_size_title">Save size</string>
+    <string name="newproject_save_size_hint">Choose a name, or leave blank to use %1$s</string>
     <string name="newproject_saved_sizes">Saved sizes</string>
     <string name="library_text_value" translatable="false">%1$s</string>
     <plurals name="backup_projects">

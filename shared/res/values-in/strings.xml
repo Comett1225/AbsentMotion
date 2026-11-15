@@ -682,6 +682,7 @@
     <string name="newproject_link">Tautan</string>
     <string name="newproject_save_size_chip">+ Simpan ukuran</string>
     <string name="newproject_save_size_title">Simpan ukuran</string>
+    <string name="newproject_save_size_hint">Pilih nama, atau kosongkan untuk memakai %1$s</string>
     <string name="newproject_saved_sizes">Ukuran tersimpan</string>
     <plurals name="backup_projects">
         <item quantity="other">%1$s proyek</item>

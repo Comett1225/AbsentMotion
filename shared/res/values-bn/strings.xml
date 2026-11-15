@@ -686,6 +686,7 @@
     <string name="newproject_link">লিংক</string>
     <string name="newproject_save_size_chip">+ সাইজ সেভ করুন</string>
     <string name="newproject_save_size_title">সাইজ সেভ করুন</string>
+    <string name="newproject_save_size_hint">একটি নাম দিন, অথবা %1$s ব্যবহার করতে খালি রাখুন</string>
     <string name="newproject_saved_sizes">সেভ করা সাইজ</string>
     <plurals name="backup_projects">
         <item quantity="one">%1$sটি প্রজেক্ট</item>

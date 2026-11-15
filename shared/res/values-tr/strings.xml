@@ -686,6 +686,7 @@
     <string name="newproject_link">Bağlantı</string>
     <string name="newproject_save_size_chip">+ Boyutu kaydet</string>
     <string name="newproject_save_size_title">Boyutu kaydet</string>
+    <string name="newproject_save_size_hint">Bir ad seçin ya da %1$s kullanmak için boş bırakın</string>
     <string name="newproject_saved_sizes">Kaydedilen boyutlar</string>
     <plurals name="backup_projects">
         <item quantity="one">%1$s proje</item>

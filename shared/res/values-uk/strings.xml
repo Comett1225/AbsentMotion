@@ -694,6 +694,7 @@
     <string name="newproject_link">Зв\'язати</string>
     <string name="newproject_save_size_chip">+ Зберегти розмір</string>
     <string name="newproject_save_size_title">Зберегти розмір</string>
+    <string name="newproject_save_size_hint">Введіть назву або залиште порожнім, щоб використати %1$s</string>
     <string name="newproject_saved_sizes">Збережені розміри</string>
     <plurals name="backup_projects">
         <item quantity="one">%1$s проєкт</item>

@@ -682,6 +682,7 @@
     <string name="newproject_link">연결</string>
     <string name="newproject_save_size_chip">+ 크기 저장</string>
     <string name="newproject_save_size_title">크기 저장</string>
+    <string name="newproject_save_size_hint">이름을 정하거나, 비워 두면 %1$s(으)로 저장돼요</string>
     <string name="newproject_saved_sizes">저장된 크기</string>
     <plurals name="backup_projects">
         <item quantity="other">프로젝트 %1$s개</item>

@@ -682,6 +682,7 @@
     <string name="newproject_link">リンク</string>
     <string name="newproject_save_size_chip">+ サイズを保存</string>
     <string name="newproject_save_size_title">サイズを保存</string>
+    <string name="newproject_save_size_hint">名前を入力（空欄なら %1$s）</string>
     <string name="newproject_saved_sizes">保存済みサイズ</string>
     <plurals name="backup_projects">
         <item quantity="other">%1$s件のプロジェクト</item>

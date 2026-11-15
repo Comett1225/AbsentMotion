@@ -686,6 +686,7 @@
     <string name="newproject_link">Verknüpfen</string>
     <string name="newproject_save_size_chip">+ Größe speichern</string>
     <string name="newproject_save_size_title">Größe speichern</string>
+    <string name="newproject_save_size_hint">Namen wählen oder leer lassen für %1$s</string>
     <string name="newproject_saved_sizes">Gespeicherte Größen</string>
     <plurals name="backup_projects">
         <item quantity="one">%1$s Projekt</item>

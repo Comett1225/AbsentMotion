@@ -686,6 +686,7 @@
     <string name="newproject_link">لینک</string>
     <string name="newproject_save_size_chip">‏+ ذخیره اندازه</string>
     <string name="newproject_save_size_title">ذخیره اندازه</string>
+    <string name="newproject_save_size_hint">یک نام انتخاب کنید یا برای استفاده از %1$s خالی بگذارید</string>
     <string name="newproject_saved_sizes">اندازه‌های ذخیره‌شده</string>
     <plurals name="backup_projects">
         <item quantity="one">‏%1$s پروژه</item>

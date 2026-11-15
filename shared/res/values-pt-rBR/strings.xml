@@ -690,6 +690,7 @@
     <string name="newproject_link">Vincular</string>
     <string name="newproject_save_size_chip">+ Salvar tamanho</string>
     <string name="newproject_save_size_title">Salvar tamanho</string>
+    <string name="newproject_save_size_hint">Escolha um nome ou deixe em branco para usar %1$s</string>
     <string name="newproject_saved_sizes">Tamanhos salvos</string>
     <plurals name="backup_projects">
         <item quantity="one">%1$s projeto</item>

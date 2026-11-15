@@ -702,6 +702,7 @@
     <string name="newproject_link">ربط</string>
     <string name="newproject_save_size_chip">‏+ حفظ الحجم</string>
     <string name="newproject_save_size_title">حفظ الحجم</string>
+    <string name="newproject_save_size_hint">اختر اسمًا، أو اتركه فارغًا لاستخدام %1$s</string>
     <string name="newproject_saved_sizes">الأحجام المحفوظة</string>
     <plurals name="backup_projects">
         <item quantity="zero">‏%1$s مشاريع</item>

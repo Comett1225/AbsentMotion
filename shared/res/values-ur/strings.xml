@@ -686,6 +686,7 @@
     <string name="newproject_link">لنک</string>
     <string name="newproject_save_size_chip">+ سائز محفوظ کریں</string>
     <string name="newproject_save_size_title">سائز محفوظ کریں</string>
+    <string name="newproject_save_size_hint">نام منتخب کریں، یا %1$s استعمال کرنے کے لیے خالی چھوڑیں</string>
     <string name="newproject_saved_sizes">محفوظ شدہ سائز</string>
     <plurals name="backup_projects">
         <item quantity="one">%1$s پروجیکٹ</item>
