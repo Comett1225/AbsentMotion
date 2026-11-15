@@ -48,7 +48,7 @@ internal fun ffampSpeeds(desktop: Boolean = PlatformFeatures.desktop, os: String
 }
 
 object FfampOffer {
-    fun pending(settings: AppSettings) = PlatformFeatures.ffamp && !settings.ffampAsked
+    fun pending(settings: AppSettings) = PlatformFeatures.ffamp && !settings.ffampAsked && System.getProperty("am.mediaReader") == null
 }
 
 @Composable
