@@ -298,4 +298,53 @@ class AdaptivePagesShotsTest {
             shot("motion", w, h)
         }
     }
+    @Test fun editorPages() {
+        val desk = DeskAppState()
+        val id = desk.store.create(Scene.parse(File("../testdata/scenes/styles.xml").readText()))
+        val state = runBlocking { desk.openNow(id)!! }
+        state.selectedId = state.scene.layers.first().id
+        val ids = state.scene.layers.take(2).map { it.id }.toSet()
+        val fonts = app.absentmotion.fonts.FontLibrary(Context())
+        for ((w, h) in sizes) for (page in listOf("stretch", "voice", "captions", "presets", "effects", "colour", "fonts")) {
+            runSkikoComposeUiTest(size = Size(w.toFloat(), h.toFloat())) {
+                setContent {
+                    CompositionLocalProvider(LocalWide provides true, LocalTablet provides true) {
+                        Box(Modifier.fillMaxSize().background(Am.HomeBg))
+                        when (page) {
+                            "stretch" -> app.absentmotion.ui.editor.StretchSheet(state, ids) {}
+                            "voice" -> app.absentmotion.ui.editor.VoiceSheet(state) {}
+                            "captions" -> app.absentmotion.ui.editor.CaptionsSheet(state) {}
+                            else -> AdaptiveWindow {
+                                when (page) {
+                                    "presets" -> app.absentmotion.ui.editor.PresetScreen(state)
+                                    "effects" -> app.absentmotion.ui.editor.effects.EffectBrowser(state)
+                                    "colour" -> app.absentmotion.ui.editor.panels.FullColorPicker(state, app.absentmotion.editor.FullColor(0xFF4488CC.toInt()) { _, _ -> })
+                                    "fonts" -> app.absentmotion.ui.editor.FontBrowser(fonts, {}, {})
+                                }
+                            }
+                        }
+                    }
+                }
+                when (page) {
+                    "stretch" -> onNodeWithText("Stretch Timing").assertExists()
+                    "voice" -> onNodeWithText("Text to Speech").assertExists()
+                    "captions" -> onNodeWithText("Generate").assertExists()
+                    "presets" -> onNodeWithText("Try a Preset").assertExists()
+                    "effects" -> onNodeWithText("Effects Library").assertExists()
+                    "colour" -> onNodeWithContentDescription("Color sliders").assertExists()
+                    "fonts" -> onNodeWithText("All Fonts").assertExists()
+                }
+                shot("editor-$page", w, h)
+                if (page == "captions") {
+                    onNodeWithText("Appearance").performClick()
+                    shot("editor-captions-appearance", w, h)
+                }
+                if (page == "colour") {
+                    onNodeWithContentDescription("Color sliders").performClick()
+                    shot("editor-colour-sliders", w, h)
+                }
+            }
+        }
+    }
+
 }
