@@ -261,7 +261,10 @@ report outside the repository; `status`, `create`, `boot`, `run`, `stop` and `cl
 The desktop app compiles `shared/kotlin` with Compose Multiplatform (JDK 21) in its own Gradle build in `pc/`. The native
 library comes from `pc/native/CMakeLists.txt` plus the part for the running system (`macos/native/macos.cmake`,
 `windows/native/windows.cmake` or `linux/native/linux.cmake`); `pc`'s Gradle build runs `macos/build.sh`, `windows/build.ps1`
-or `linux/build.sh` for it. It needs Skia built for that system (section 5) and FFmpeg's libraries.
+or `linux/build.sh` for it. It needs Skia built for that system (section 5), FFmpeg's libraries and FFamp's codec
+libraries: `FFAMP_DEPS` points at the folder `third_party/FFamp/third_party/build_mac.sh`, `build_windows.sh` or
+`build_linux.sh` made (Linux x86_64 only for now; an arm64 Linux build leaves FFamp out), and on Windows and Linux NASM
+must be on `PATH` for the assembly of FFamp's H.264 decoder.
 
     cd pc
     ./gradlew run                    # start the app
@@ -279,7 +282,7 @@ unpacked:
     docker build -t am-linux linux
     docker run --rm -v "$PWD:/src" -w /src -e AM_ANDROID_API=/src/<android-api.jar> am-linux sh -c '
         linux/skia.sh &&
-        FFMPEG_PREFIX=/src/<ffmpeg> ./gradlew -p pc test createDistributable packageDeb &&
+        FFMPEG_PREFIX=/src/<ffmpeg> FFAMP_DEPS=/src/<FFamp libraries> ./gradlew -p pc test createDistributable packageDeb &&
         linux/package.sh <version>'
 
 `linux/skia.sh` builds Skia with `linux/skia-args.gn` (Ganesh and Vulkan, no OpenGL, fontconfig, Skia's own FreeType) into

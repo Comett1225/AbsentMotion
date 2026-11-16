@@ -16,6 +16,13 @@ the GPU through D3D11 when it can (`../pc/native/video_copy.cpp`), and `build.ps
 and the installer ships them, so it needs no FFmpeg on `PATH`. Without `FFMPEG_DIR` the engine is built without its decoder
 and the app runs the `ffmpeg` program on `PATH` for every frame instead, which is much slower.
 
+Set `FFAMP_DEPS` to the folder `../third_party/FFamp/third_party/build_windows.sh` made, with NASM on `PATH`: FFamp
+(`../third_party/FFamp`) is linked into `amdesktop.dll` next to FFmpeg. The app reads with FFmpeg unless Settings >
+Playback > Media reader is set to FFamp (experimental) before the start; then a file FFamp cannot open or describe is still
+read with FFmpeg, and the camera always uses FFmpeg. FFamp decodes through Media Foundation (on the GPU when it can) and
+falls back to its software libraries on Windows editions without it. Tests pick the reader with `-PmediaReader=ffamp`
+(default `standard`).
+
 `cd ..\pc`, then `gradlew createDistributable` builds the app and `gradlew packageMsi` the per-user installer (Compose
 downloads WiX for it).
 

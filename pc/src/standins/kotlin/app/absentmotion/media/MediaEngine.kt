@@ -86,6 +86,8 @@ object FfampFirst : MediaEngine by FfampEngine {
 
     private fun of(file: File): MediaEngine = if (reads(file)) FfampEngine else FfmpegEngine
 
+    private val capture: MediaEngine get() = if (app.absentmotion.desk.DeskOs.mac) FfampEngine else FfmpegEngine
+
     override fun probe(file: File, entries: String?) = of(file).probe(file, entries)
     override fun packets(file: File, stream: Int) = of(file).packets(file, stream)
     override fun still(file: File, timeMs: Long, maxSide: Int) = of(file).still(file, timeMs, maxSide)
@@ -105,4 +107,7 @@ object FfampFirst : MediaEngine by FfampEngine {
     override fun frameSink(out: File, spec: FrameSinkSpec) = (spec.audioFrom?.let(::of) ?: FfampEngine).frameSink(out, spec)
     override fun withoutAudio(file: File) = of(file).withoutAudio(file)
     override fun trouble(file: File) = of(file).trouble(file)
+    override fun cameraDevices() = capture.cameraDevices()
+    override fun cameraEncoder() = capture.cameraEncoder()
+    override fun camera(input: CameraInput, record: File?, encoder: List<String>, onFrame: (ByteArray) -> Unit, onEnd: (Int, String) -> Unit) = capture.camera(input, record, encoder, onFrame, onEnd)
 }

@@ -12,6 +12,11 @@
 #include <thread>
 #include <vector>
 
+namespace absent {
+FILE* openFile(const std::string& path, const char* mode);
+int64_t fileBytes(const std::string& path);
+}
+
 namespace {
 
 struct Pcm {
@@ -345,6 +350,11 @@ JNIEXPORT jboolean JNICALL JNI(divxDecoder)(JNIEnv*, jobject) {
 JNIEXPORT jstring JNICALL JNI(encoders)(JNIEnv* e, jobject) {
     std::string text;
     for (const absent::EncoderInfo& info : absent::encoders()) text += info.name + "\n";
+#if defined(_WIN32)
+    text += "h264_mf\nhevc_mf\naac\n";
+#elif !defined(__APPLE__)
+    text += "libx264\nlibx265\naac\n";
+#endif
     return e->NewStringUTF(text.c_str());
 }
 
@@ -377,11 +387,9 @@ JNIEXPORT jlong JNICALL JNI(exportOpen)(JNIEnv* e, jobject, jstring path, jstrin
         if (sound && !samples.empty()) {
             x.rate = rate;
             x.channels = channels == 1 ? 1 : 2;
-            x.sound = fopen(samples.c_str(), "rb");
+            x.sound = absent::openFile(samples, "rb");
             if (!x.sound) return 0;
-            fseeko(x.sound, 0, SEEK_END);
-            x.soundFrames = (int64_t)(ftello(x.sound) / 4);
-            fseeko(x.sound, 0, SEEK_SET);
+            x.soundFrames = absent::fileBytes(samples) / 4;
             absent::TrackSpec track;
             track.kind = absent::Kind::Audio;
             track.timescale = (uint32_t)rate;

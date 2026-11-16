@@ -10,6 +10,7 @@ import app.absentmotion.desk.DeskProbe
 import app.absentmotion.engine.EngineThread
 import app.absentmotion.pc.engine.DesktopNative
 import app.absentmotion.pc.engine.NativeVideoSource
+import app.absentmotion.platform.PlatformFeatures
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -24,8 +25,8 @@ class FfampFormatsTest {
     private val context = Context()
     private val source = File("../testdata/media/test-video.mp4").absoluteFile
 
-    @Before fun macOnly() {
-        assumeTrue(DeskOs.mac)
+    @Before fun withFfamp() {
+        assumeTrue(PlatformFeatures.ffamp && (DeskOs.mac || MediaEngine.ffamp))
         DesktopNative.hashCode()
     }
 

@@ -41,8 +41,8 @@ class ZeroFfmpegTest {
     private val names = listOf("am.ffmpeg", "am.ffprobe")
     private var old = emptyMap<String, String?>()
 
-    @Before fun macWithoutFfmpeg() {
-        assumeTrue(DeskOs.mac && MediaEngine.ffamp)
+    @Before fun withoutFfmpeg() {
+        assumeTrue(MediaEngine.ffamp)
         DesktopNative.hashCode()
         old = names.associateWith { System.getProperty(it) }
         names.forEach { System.setProperty(it, File(dir, "absent/${it.substringAfter('.')}").path) }
@@ -206,13 +206,15 @@ class ZeroFfmpegTest {
             assertTrue(MediaEngine.current.speech(spoken, shaped, 44100, 0.8f, 1.2f, 60_000))
             assertTrue(abs(probe(shaped).durationUs - probe(spoken).durationUs / 0.8) < 60_000)
         }
-        val fake = app.absentmotion.ui.camera.DeskCameraSource.fakeDevices
-        val record = fresh("camera.mp4")
-        val shown = java.util.concurrent.atomic.AtomicInteger()
-        val feed = MediaEngine.current.camera(app.absentmotion.ui.camera.CameraInput(fake.video[0], fake.audio[0]), record, emptyList(), { shown.incrementAndGet() }) { _, _ -> }
-        Thread.sleep(1500)
-        assertTrue(feed.finish())
-        assertTrue(shown.get() >= 8 && probe(record).video != null && probe(record).audio != null)
+        if (DeskOs.mac) {
+            val fake = app.absentmotion.ui.camera.DeskCameraSource.fakeDevices
+            val record = fresh("camera.mp4")
+            val shown = java.util.concurrent.atomic.AtomicInteger()
+            val feed = MediaEngine.current.camera(app.absentmotion.ui.camera.CameraInput(fake.video[0], fake.audio[0]), record, emptyList(), { shown.incrementAndGet() }) { _, _ -> }
+            Thread.sleep(1500)
+            assertTrue(feed.finish())
+            assertTrue(shown.get() >= 8 && probe(record).video != null && probe(record).audio != null)
+        }
 
         val pieces = File(dir, "pieces").also { it.deleteRecursively(); it.mkdirs() }
         val item = app.absentmotion.tools.parseLinkInfo("""{"title":"t","thumbnails":[],"site":"s","items":[{"title":"t","duration":5,"thumbnails":[],"pictures":[],"formats":[

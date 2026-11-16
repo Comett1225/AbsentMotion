@@ -4,6 +4,8 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.test.*
 import app.absentmotion.desk.DeskApp
 import app.absentmotion.desk.DeskAppState
+import app.absentmotion.export.Codec
+import app.absentmotion.export.DeskEncoders
 import app.absentmotion.export.ExportSettings
 import app.absentmotion.export.ExportTimes
 import app.absentmotion.model.Scene
@@ -27,7 +29,8 @@ class ExportEstimateTest {
             mainClock.advanceTimeBy(100)
             waitForIdle()
             assertEquals(0, onAllNodesWithText("Unknown", useUnmergedTree = true).fetchSemanticsNodes().size)
-            assertTrue(onAllNodesWithText("Calculating", substring = true, useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty())
+            if (DeskEncoders.video(Codec.H264).firstOrNull()?.let(DeskEncoders::hardware) != false)
+                assertTrue(onAllNodesWithText("Calculating", substring = true, useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty())
             repeat(60) { mainClock.advanceTimeBy(200); Thread.sleep(100) }
             waitForIdle()
             assertEquals(0, onAllNodesWithText("Unknown", useUnmergedTree = true).fetchSemanticsNodes().size)

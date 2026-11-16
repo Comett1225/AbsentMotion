@@ -4,7 +4,7 @@ ROOT="$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)"
 OUT="$ROOT/pc/build/native"
 FFMPEG="${FFMPEG_PREFIX:-}"
 [ -z "$FFMPEG" ] || export PKG_CONFIG_PATH="$FFMPEG/lib/pkgconfig"
-cmake -S "$ROOT/pc/native" -B "$ROOT/pc/build/native-linux" -G Ninja -DCMAKE_BUILD_TYPE=None ${SKIA_LIBS:+"-DSKIA_LIBS=$SKIA_LIBS"} >/dev/null
+cmake -S "$ROOT/pc/native" -B "$ROOT/pc/build/native-linux" -G Ninja -DCMAKE_BUILD_TYPE=None ${FFAMP_DEPS:+"-DFFAMP_DEPS=$FFAMP_DEPS"} ${SKIA_LIBS:+"-DSKIA_LIBS=$SKIA_LIBS"} >/dev/null
 cmake --build "$ROOT/pc/build/native-linux" --parallel "$(nproc)"
 if [ -n "$FFMPEG" ]; then
     for lib in avcodec avdevice avfilter avformat avutil swresample swscale; do

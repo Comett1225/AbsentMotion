@@ -9,14 +9,14 @@ file the entry says "see upstream" instead of guessing.
 
 Full licence texts for the C and C++ libraries are in the appendix at the end of this file. The Apache License 2.0 text
 that applies to the Apache-2.0 components is in appendix A.21; the GPL-2.0 with Classpath Exception text for the Java runtime is in A.22, which also
-holds the GPL-2.0 terms for FFmpeg, x264 and x265 in the macOS app.
+holds the GPL-2.0 terms for FFmpeg, x264 and x265 in the macOS app and for x264 and x265 in FFamp on Windows and Linux.
 
 This list was written by hand on 2026-10-18 from the build files and the vendored sources. It is not generated. When a
 dependency is added, removed or upgraded, update this file in the same change.
 
 **Contents**
 
-1. Engine libraries (C and C++): Skia and the libraries it links, whisper.cpp and ggml, RNNoise, ncnn, glslang, the RIFE warp layer, LAME, FFmpeg (desktop apps only) with the codec libraries of the macOS build (x264, x265, libvpx, dav1d, Opus, SVT-AV1), FFamp with its codec libraries (when it is switched on; macOS app: Opus, LAME, mpg123, libvorbis, libogg, OpenAPV, libvpx, dav1d, SVT-AV1, Xvid; 64-bit Android apps: Xvid), the AppImage runtime (Linux AppImage only), and the video downloader add-on (CPython and yt-dlp, downloaded at run time)
+1. Engine libraries (C and C++): Skia and the libraries it links, whisper.cpp and ggml, RNNoise, ncnn, glslang, the RIFE warp layer, LAME, FFmpeg (desktop apps only) with the codec libraries of the macOS build (x264, x265, libvpx, dav1d, Opus, SVT-AV1), FFamp with its codec libraries (when it is switched on; macOS app: Opus, LAME, mpg123, libvorbis, libogg, OpenAPV, libvpx, dav1d, SVT-AV1, Xvid; Windows and Linux apps: the same plus x264, x265, libde265, vo-aacenc and OpenCORE AMR, and on Linux libmpeg2, libjpeg-turbo and the libva headers; 64-bit Android apps: Xvid), the AppImage runtime (Linux AppImage only), and the video downloader add-on (CPython and yt-dlp, downloaded at run time)
 2. Machine learning models: OpenAI Whisper weights, RIFE and Real-ESRGAN weights and the AI background removal 2.0 model (all downloaded at run time), the built-in background removal model
 3. Kotlin and Compose libraries, including those bundled in the desktop apps (OpenJDK, Compose Desktop, Skiko, kotlinx)
 4. Fonts, icons and effect thumbnails
@@ -230,6 +230,7 @@ Windows:
 - Used in: the Windows installer. `amdesktop.dll` links the shared `avformat`, `avcodec`, `avutil`, `swresample` and
   `swscale` DLLs for video decoding (D3D11 hardware decoding when available), and `ffmpeg.exe` and `ffprobe.exe` run export,
   the Tools tab and media probing. The DLLs sit unchanged in the app folder, so they can be replaced with another build.
+  When FFamp is switched on (below), FFmpeg still opens the files FFamp cannot read, and it still runs the camera.
 - Source: `Source-FFmpeg-<version>-windows-linux-part1.tar` and `-part2.tar`, attached to every release that ships the
   desktop apps, hold the FFmpeg source of this build (commit `1e65c6cd5d3d2d12cbb374460dbf08bedf54772a`), BtbN's build scripts (commit
   `5ece62897c650b863c1ddda7b6964845344aef2d`) and the source archive of every library those scripts build.
@@ -252,7 +253,8 @@ Linux (x86_64 and arm64):
 - Used in: the Linux packages (`.deb` and AppImage). `libamdesktop.so` links the shared `avformat`, `avcodec`, `avutil` and
   `swscale` libraries (and `swresample` through them) for video decoding (VA-API when available), and `ffmpeg` and `ffprobe`
   run export, the Tools tab and media probing. They sit in the app's `lib/app/resources` folder
-  (`/opt/absentmotion/lib/app/resources` for the `.deb`), so they can be replaced with another build.
+  (`/opt/absentmotion/lib/app/resources` for the `.deb`), so they can be replaced with another build. When FFamp is
+  switched on (below), FFmpeg still opens the files FFamp cannot read, and it still runs the camera.
 - Source: the same `Source-FFmpeg-<version>-windows-linux-part1.tar` and `-part2.tar` hold the FFmpeg source of this build (commit
   `b204e94e90fca64045e9ca7dd44c65678c7eb29e`) next to BtbN's build scripts and library sources.
 
@@ -305,13 +307,14 @@ exports.
 - Used in: HEVC software encoding (`libx265`) in the macOS FFmpeg, for sizes above VideoToolbox's 4096 px and when
   VideoToolbox fails.
 
-### FFamp (macOS app and 64-bit Android apps)
+### FFamp (desktop apps and 64-bit Android apps)
 
 - Version: the commit of the `third_party/FFamp` submodule this release was built from.
 - Licence: GNU General Public License, version 3 or later (the text in `LICENSE`). FFamp (Fast Forward Absent Multimedia
   Project) is written by the AbsentMotion project itself, from the public specifications and the operating-system
-  documentation. Some of its decoders (Windows Media Audio, VC-1 and older Windows video, and shared bit-reading and
-  transform code) are based on FFmpeg's code, which is licensed under the GNU Lesser General Public License, version 2.1
+  documentation. Some of its decoders (Windows Media Audio, VC-1 and older Windows video, H.264, AAC, AC-3 and E-AC-3,
+  ALAC, TTA, ADPCM, ProRes, DV, H.263, the VA-API decoding on Linux, and shared bit-reading and transform code) are based
+  on FFmpeg's code, which is licensed under the GNU Lesser General Public License, version 2.1
   or later; `third_party/FFamp/docs/NOTICE.md` lists each of those files with the FFmpeg files and copyright holders it
   comes from.
 - Copyright: Copyright (c) 2026 the AbsentMotion project.
@@ -320,13 +323,21 @@ exports.
   its own readers and writers for MP4, MOV, Matroska, WebM, Ogg, WAV and transport streams on top of the system's
   VideoToolbox, AudioToolbox and AVFoundation. A file FFamp cannot open or describe goes to FFmpeg (above) instead. It is
   linked statically into `libamdesktop.dylib`.
+- Used on Windows and Linux: the same setting, off by default, with the same fallback to FFmpeg. There its readers and
+  writers run on top of Media Foundation, the Windows Imaging Component and Direct3D 11 on Windows (system libraries,
+  loaded at run time; a Windows edition without Media Foundation uses the software libraries below) and of VA-API on Linux
+  (the system's libva and libva-drm are opened at run time when they are installed; nothing is linked). It is linked
+  statically into `amdesktop.dll` and `libamdesktop.so`.
 - Used on Android: the 64-bit apps (not the 32-bit Compatible APK) offer it as the experimental media reader, off by default
   (Settings > Playback > Media engine). It then opens and reads media files and decodes Windows Media, DivX and Xvid video and
   Windows Media Audio on top of the system's MediaCodec. It is linked statically into `libamffamp.so`.
 
 The codec libraries below are linked statically into FFamp. `third_party/FFamp/third_party/build_mac.sh` builds them for
 arm64 and x86_64 (minimum macOS 11) from the unchanged source archives named here and checks each SHA-256 sum before it
-unpacks.
+unpacks. `build_windows.sh` (the libraries with MSVC, Xvid with clang-cl) and `build_linux.sh` (gcc) build them for x86_64
+Windows and Linux from the same archives, together with the libraries listed after Xvid. On Windows and Linux the assembly
+of x264, x265, dav1d, SVT-AV1, libvpx and FFamp's own H.264 decoder is built with NASM, a build tool that is not part of
+the app.
 
 #### Opus
 
@@ -338,7 +349,7 @@ unpacks.
 - URL: https://opus-codec.org/
 - Used in: Opus audio in WebM, MKV and OGG export, and decoding Opus sound.
 
-#### LAME (macOS build)
+#### LAME (FFamp build)
 
 - Version: 4.0, `lame-4.0.tar.gz` from https://downloads.sourceforge.net/project/lame/lame/4.0/ (SHA-256
   `3df5124d5ad3a98312ffd7ba6a9b36230e4f8a3e66d3ce0f425e336c32d216eb`), built without its front end and decoder.
@@ -354,8 +365,8 @@ unpacks.
 - Licence: GNU Lesser General Public License, version 2.1 (text in appendix A.29).
 - Copyright: Copyright (c) 1995-2020 by Michael Hipp and others.
 - URL: https://www.mpg123.de/
-- Used in: built next to LAME because a LAME with its decoder needs it. This build of LAME has no decoder, so the linker
-  takes no mpg123 code into the app; the entry is kept for builds that switch the decoder on.
+- Used in: decoding MP1, MP2 and MP3 sound on Windows and Linux. On macOS it is only built next to LAME, whose decoder is
+  switched off, so the linker takes no mpg123 code into the macOS app.
 
 #### libvorbis and libogg
 
@@ -392,7 +403,8 @@ unpacks.
 - Licence: BSD-2-Clause (text in appendix A.24).
 - Copyright: Copyright © 2018-2025, VideoLAN and dav1d authors.
 - URL: https://code.videolan.org/videolan/dav1d
-- Used in: AV1 decoding, so AV1 videos open on Macs without an AV1 hardware decoder (M1, M2 and Intel).
+- Used in: AV1 decoding, so AV1 videos open on Macs without an AV1 hardware decoder (M1, M2 and Intel), and on Windows and
+  Linux.
 
 #### SVT-AV1
 
@@ -407,7 +419,7 @@ unpacks.
 
 - Version: 1.3.7, `xvidcore-1.3.7.tar.bz2` from https://downloads.xvid.com/downloads/ (SHA-256
   `aeeaae952d4db395249839a3bd03841d6844843f5a4f84c271ff88f7aa1acff7`), the `libxvidcore` library, built from the unchanged
-  sources without its assembly code.
+  sources without its assembly code (the Linux build includes its x86-64 assembly, built with NASM).
 - Licence: GNU General Public License, version 2 or (at your option) any later version (text of version 2 in appendix
   A.30); the app that links it is distributed under version 3.
 - Copyright: Copyright (C) 2001-2019 the Xvid authors: Christoph Lampert, Michael Militzer, Peter Ross and the others named in
@@ -416,6 +428,82 @@ unpacks.
 - Used in: decoding DivX and Xvid video (MPEG-4 Part 2, Simple and Advanced Simple Profile: B-frames, quarter-pixel motion,
   global motion compensation, custom quantiser matrices, interlaced video). On Android,
   `third_party/FFamp/third_party/build_android.sh` builds it for arm64-v8a with the NDK from the same archive.
+
+#### x264 and x265 (FFamp build, Windows and Linux)
+
+- Version: x264 commit `b35605ace3ddf7c1a5d67a2eb553f034aef41d55` (the same as above), archive
+  `x264-b35605ace3ddf7c1a5d67a2eb553f034aef41d55.tar.bz2` from https://code.videolan.org/videolan/x264 (SHA-256
+  `6eeb82934e69fd51e043bd8c5b0d152839638d1ce7aa4eea65a3fedcf83ff224`); x265 4.2, `x265_4.2.tar.gz` from
+  https://download.videolan.org/pub/videolan/x265/ (SHA-256 `40b1ea0453e0309f0eba934e0ddf533f8f6295966679e8894e8f1c1c8d5e1210`).
+  Both 8-bit libraries without their command-line programs.
+- Licence: GNU General Public License, version 2 or later (text in appendix A.22, without the Classpath Exception); the
+  app that links them is distributed under version 3. x265 is also offered under a commercial licence; AbsentMotion uses it
+  under the GPL.
+- Copyright: Copyright (C) 2003-2025 x264 project; Copyright (C) 2013-2020 MulticoreWare, Inc.
+- URL: https://www.videolan.org/developers/x264.html and https://github.com/Multicorewareinc/x265
+- Used in: H.264 and HEVC export on Linux, and on Windows when Media Foundation has no encoder for the size or the system.
+
+#### libde265
+
+- Version: 1.1.3, the `v1.1.3` tag archive from https://github.com/strukturag/libde265 (SHA-256
+  `189baa08fd6d2dd34db099de411bd6b2e6bd5eb88e81236a3d0fa3826b9715c4`), the decoder library only.
+- Licence: GNU Lesser General Public License, version 3 or later (text in appendix A.31; it adds permissions to the GNU
+  General Public License, version 3, in `LICENSE`).
+- Copyright: Copyright (c) 2013-2014 struktur AG, Dirk Farin, and the other authors named in `AUTHORS` of the archive.
+- URL: https://github.com/strukturag/libde265
+- Used in: HEVC decoding on Linux when VA-API cannot take the video, and on Windows without the HEVC Video Extensions.
+
+#### vo-aacenc
+
+- Version: 0.1.3, `vo-aacenc-0.1.3.tar.gz` from https://sourceforge.net/projects/opencore-amr/ (SHA-256
+  `e51a7477a359f18df7c4f82d195dab4e14e7414cbd48cf79cc195fc446850f36`).
+- Licence: Apache License 2.0 (text in appendix A.21). Its `NOTICE`: "These files are Copyright 2003-2010 VisualOn, but
+  released under the Apache2 License."
+- Copyright: Copyright 2003-2010 VisualOn, Inc.
+- URL: https://sourceforge.net/projects/opencore-amr/
+- Used in: AAC export on Linux, and on Windows at the rates Media Foundation's AAC encoder does not offer or when it is
+  missing.
+
+#### OpenCORE AMR (opencore-amr)
+
+- Version: 0.1.6, `opencore-amr-0.1.6.tar.gz` from https://sourceforge.net/projects/opencore-amr/ (SHA-256
+  `483eb4061088e2b34b358e47540b5d495a96cd468e361050fae615b1809dc4a1`), the `libopencore-amrnb` and `libopencore-amrwb` libraries,
+  decoders only, built from the unchanged sources.
+- Licence: Apache License 2.0 (text in appendix A.21).
+- Copyright: Copyright (C) 1998-2010 PacketVideo, Copyright (C) 2009 Martin Storsjo.
+- URL: https://sourceforge.net/projects/opencore-amr/
+- Used in: decoding AMR-NB and AMR-WB speech on Windows and Linux.
+
+#### libmpeg2 (Linux)
+
+- Version: 0.5.1, `libmpeg2-0.5.1.tar.gz` from https://download.videolan.org/contrib/libmpeg2/ (SHA-256
+  `dee22e893cb5fc2b2b6ebd60b88478ab8556cb3b93f9a0d7ce8f3b61851871d4`), the library only.
+- Licence: GNU General Public License, version 2 or later (text of version 2 in appendix A.30); the app that links it is
+  distributed under version 3.
+- Copyright: Copyright (C) 2000-2004 Michel Lespinasse, Copyright (C) 1999-2000 Aaron Holtzman, and the others named in
+  `AUTHORS` of the archive.
+- URL: https://libmpeg2.sourceforge.io/
+- Used in: MPEG-1 and MPEG-2 video decoding on Linux.
+
+#### libjpeg-turbo (FFamp build, Linux)
+
+- Version: 3.2.1, `libjpeg-turbo-3.2.1.tar.gz` from https://github.com/libjpeg-turbo/libjpeg-turbo/releases (SHA-256
+  `c27ad72a68da151177929aa969ae773a2da5ac2af9ce946079314fdac8cece7f`), the libjpeg API library only.
+- Licence: IJG licence, Modified (3-clause) BSD licence and zlib licence (texts in appendix A.6).
+- Copyright: as for libjpeg-turbo above.
+- **This software is based in part on the work of the Independent JPEG Group.**
+- URL: https://libjpeg-turbo.org/
+- Used in: Motion JPEG video and JPEG pictures in videos on Linux.
+
+#### libva headers (Linux)
+
+- Version: 2.22.0, the header files of `libva-2.22.0.tar.bz2` from https://github.com/intel/libva/releases (SHA-256
+  `e3da2250654c8d52b3f59f8cb3f3d8e7fb1a2ee64378dbc400fbc5663de7edb8`).
+- Licence: MIT (text in appendix A.32).
+- Copyright: Copyright (c) 2007-2009 Intel Corporation.
+- URL: https://github.com/intel/libva
+- Used in: VA-API video decoding on Linux. Only the declarations are compiled in; the system's libva is opened at run
+  time.
 
 ### AppImage runtime (Linux AppImage only)
 
@@ -6098,4 +6186,202 @@ proprietary programs.  If your program is a subroutine library, you may
 consider it more useful to permit linking proprietary applications with the
 library.  If this is what you want to do, use the GNU Library General
 Public License instead of this License.
+~~~~
+
+### A.31 libde265 (GNU Lesser General Public License, version 3)
+
+From `COPYING` of libde265 1.1.3.
+
+~~~~
+                   GNU LESSER GENERAL PUBLIC LICENSE
+                       Version 3, 29 June 2007
+
+ Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
+ Everyone is permitted to copy and distribute verbatim copies
+ of this license document, but changing it is not allowed.
+
+
+  This version of the GNU Lesser General Public License incorporates
+the terms and conditions of version 3 of the GNU General Public
+License, supplemented by the additional permissions listed below.
+
+  0. Additional Definitions.
+
+  As used herein, "this License" refers to version 3 of the GNU Lesser
+General Public License, and the "GNU GPL" refers to version 3 of the GNU
+General Public License.
+
+  "The Library" refers to a covered work governed by this License,
+other than an Application or a Combined Work as defined below.
+
+  An "Application" is any work that makes use of an interface provided
+by the Library, but which is not otherwise based on the Library.
+Defining a subclass of a class defined by the Library is deemed a mode
+of using an interface provided by the Library.
+
+  A "Combined Work" is a work produced by combining or linking an
+Application with the Library.  The particular version of the Library
+with which the Combined Work was made is also called the "Linked
+Version".
+
+  The "Minimal Corresponding Source" for a Combined Work means the
+Corresponding Source for the Combined Work, excluding any source code
+for portions of the Combined Work that, considered in isolation, are
+based on the Application, and not on the Linked Version.
+
+  The "Corresponding Application Code" for a Combined Work means the
+object code and/or source code for the Application, including any data
+and utility programs needed for reproducing the Combined Work from the
+Application, but excluding the System Libraries of the Combined Work.
+
+  1. Exception to Section 3 of the GNU GPL.
+
+  You may convey a covered work under sections 3 and 4 of this License
+without being bound by section 3 of the GNU GPL.
+
+  2. Conveying Modified Versions.
+
+  If you modify a copy of the Library, and, in your modifications, a
+facility refers to a function or data to be supplied by an Application
+that uses the facility (other than as an argument passed when the
+facility is invoked), then you may convey a copy of the modified
+version:
+
+   a) under this License, provided that you make a good faith effort to
+   ensure that, in the event an Application does not supply the
+   function or data, the facility still operates, and performs
+   whatever part of its purpose remains meaningful, or
+
+   b) under the GNU GPL, with none of the additional permissions of
+   this License applicable to that copy.
+
+  3. Object Code Incorporating Material from Library Header Files.
+
+  The object code form of an Application may incorporate material from
+a header file that is part of the Library.  You may convey such object
+code under terms of your choice, provided that, if the incorporated
+material is not limited to numerical parameters, data structure
+layouts and accessors, or small macros, inline functions and templates
+(ten or fewer lines in length), you do both of the following:
+
+   a) Give prominent notice with each copy of the object code that the
+   Library is used in it and that the Library and its use are
+   covered by this License.
+
+   b) Accompany the object code with a copy of the GNU GPL and this license
+   document.
+
+  4. Combined Works.
+
+  You may convey a Combined Work under terms of your choice that,
+taken together, effectively do not restrict modification of the
+portions of the Library contained in the Combined Work and reverse
+engineering for debugging such modifications, if you also do each of
+the following:
+
+   a) Give prominent notice with each copy of the Combined Work that
+   the Library is used in it and that the Library and its use are
+   covered by this License.
+
+   b) Accompany the Combined Work with a copy of the GNU GPL and this license
+   document.
+
+   c) For a Combined Work that displays copyright notices during
+   execution, include the copyright notice for the Library among
+   these notices, as well as a reference directing the user to the
+   copies of the GNU GPL and this license document.
+
+   d) Do one of the following:
+
+       0) Convey the Minimal Corresponding Source under the terms of this
+       License, and the Corresponding Application Code in a form
+       suitable for, and under terms that permit, the user to
+       recombine or relink the Application with a modified version of
+       the Linked Version to produce a modified Combined Work, in the
+       manner specified by section 6 of the GNU GPL for conveying
+       Corresponding Source.
+
+       1) Use a suitable shared library mechanism for linking with the
+       Library.  A suitable mechanism is one that (a) uses at run time
+       a copy of the Library already present on the user's computer
+       system, and (b) will operate properly with a modified version
+       of the Library that is interface-compatible with the Linked
+       Version.
+
+   e) Provide Installation Information, but only if you would otherwise
+   be required to provide such information under section 6 of the
+   GNU GPL, and only to the extent that such information is
+   necessary to install and execute a modified version of the
+   Combined Work produced by recombining or relinking the
+   Application with a modified version of the Linked Version. (If
+   you use option 4d0, the Installation Information must accompany
+   the Minimal Corresponding Source and Corresponding Application
+   Code. If you use option 4d1, you must provide the Installation
+   Information in the manner specified by section 6 of the GNU GPL
+   for conveying Corresponding Source.)
+
+  5. Combined Libraries.
+
+  You may place library facilities that are a work based on the
+Library side by side in a single library together with other library
+facilities that are not Applications and are not covered by this
+License, and convey such a combined library under terms of your
+choice, if you do both of the following:
+
+   a) Accompany the combined library with a copy of the same work based
+   on the Library, uncombined with any other library facilities,
+   conveyed under the terms of this License.
+
+   b) Give prominent notice with the combined library that part of it
+   is a work based on the Library, and explaining where to find the
+   accompanying uncombined form of the same work.
+
+  6. Revised Versions of the GNU Lesser General Public License.
+
+  The Free Software Foundation may publish revised and/or new versions
+of the GNU Lesser General Public License from time to time. Such new
+versions will be similar in spirit to the present version, but may
+differ in detail to address new problems or concerns.
+
+  Each version is given a distinguishing version number. If the
+Library as you received it specifies that a certain numbered version
+of the GNU Lesser General Public License "or any later version"
+applies to it, you have the option of following the terms and
+conditions either of that published version or of any later version
+published by the Free Software Foundation. If the Library as you
+received it does not specify a version number of the GNU Lesser
+General Public License, you may choose any version of the GNU Lesser
+General Public License ever published by the Free Software Foundation.
+
+  If the Library as you received it specifies that a proxy can decide
+whether future versions of the GNU Lesser General Public License shall
+apply, that proxy's public statement of acceptance of any version is
+permanent authorization for you to choose that version for the
+Library.
+~~~~
+
+### A.32 libva (MIT)
+
+From `COPYING` of libva 2.22.0; the header files carry "Copyright (c) 2007-2009 Intel Corporation. All Rights Reserved."
+
+~~~~
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sub license, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice (including the
+    next paragraph) shall be included in all copies or substantial portions
+    of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT.
+    IN NO EVENT SHALL PRECISION INSIGHT AND/OR ITS SUPPLIERS BE LIABLE FOR
+    ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ~~~~

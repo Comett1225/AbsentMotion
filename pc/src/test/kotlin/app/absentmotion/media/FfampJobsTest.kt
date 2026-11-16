@@ -37,8 +37,8 @@ class FfampJobsTest {
     private val context = Context()
     private val source = File("../testdata/media/test-video.mp4").absoluteFile
 
-    @Before fun macOnly() {
-        assumeTrue(DeskOs.mac && MediaEngine.ffamp)
+    @Before fun withFfamp() {
+        assumeTrue(MediaEngine.ffamp)
         DesktopNative.hashCode()
     }
 
@@ -118,10 +118,11 @@ class FfampJobsTest {
         val old = app.absentmotion.Judge.engine.encoders()
         withoutFfmpeg {
             val names = MediaEngine.current.encoders()
-            assertTrue("$names", names.containsAll(listOf("h264_videotoolbox", "hevc_videotoolbox", "aac_at", "flac")))
+            val own = when { DeskOs.mac -> listOf("h264_videotoolbox", "hevc_videotoolbox", "aac_at"); DeskOs.windows -> listOf("h264_mf", "hevc_mf", "aac"); else -> listOf("libx264", "libx265", "aac") }
+            assertTrue("$names", names.containsAll(own + "flac"))
             assertTrue(names.all { it in old || it == "liboapv" })
-            assertTrue(MediaEngine.current.encoderWorks("h264_videotoolbox", ExportSettings(720, 30), 1280, 720))
-            assertTrue(MediaEngine.current.encoderWorks("hevc_videotoolbox", ExportSettings(720, 30, Codec.Hevc), 1280, 720))
+            assertTrue(MediaEngine.current.encoderWorks(own[0], ExportSettings(720, 30), 1280, 720))
+            assertTrue(MediaEngine.current.encoderWorks(own[1], ExportSettings(720, 30, Codec.Hevc), 1280, 720))
             assertTrue(!MediaEngine.current.encoderWorks("h264_nvenc", ExportSettings(720, 30), 1280, 720))
         }
     }
@@ -375,6 +376,7 @@ class FfampJobsTest {
     }
 
     @Test fun cameraRunsWithoutFfmpeg() {
+        assumeTrue(DeskOs.mac)
         val fake = app.absentmotion.ui.camera.DeskCameraSource.fakeDevices
         val record = File(dir, "camera.mp4").also { it.delete() }
         val shown = java.util.concurrent.atomic.AtomicInteger()

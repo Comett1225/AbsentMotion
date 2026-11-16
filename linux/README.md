@@ -9,7 +9,8 @@ driver, else on the CPU (a software Vulkan driver such as lavapipe is only used 
 Build on Linux (arm64 or x64), or in the Docker image on a Mac (`docs/BUILD.md` section 9 has the full commands):
 
     linux/skia.sh
-    FFMPEG_PREFIX=<unpacked BtbN linux64-gpl-shared-9.0 or linuxarm64-gpl-shared-9.0> ./gradlew -p pc test createDistributable packageDeb
+    third_party/FFamp/third_party/build_linux.sh <folder for FFamp's libraries>
+    FFMPEG_PREFIX=<unpacked BtbN linux64-gpl-shared-9.0 or linuxarm64-gpl-shared-9.0> FFAMP_DEPS=<that folder> ./gradlew -p pc test createDistributable packageDeb
     linux/package.sh 5.0.0
 
 `skia.sh` builds Skia for the running chip into `../third_party/skia/out/linux-arm64` or `out/linux-x64` (`SKIA_DIR`,
@@ -18,6 +19,13 @@ its own FreeType, because Debian 12's FreeType 2.12 draws no colour emoji. `buil
 `ffprobe` and the licence next to `libamdesktop.so` and sets their run path to `$ORIGIN`, so the app needs no system
 FFmpeg. The library links libstdc++ statically and `glibc_compat.c` maps the few newer glibc symbols an Ubuntu 24.04
 compiler picks to older ones, so a build made on Ubuntu 24.04 runs on glibc 2.35 and newer (Ubuntu 22.04, Debian 12).
+
+FFamp (`../third_party/FFamp`) is linked into `libamdesktop.so` next to FFmpeg when `FFAMP_DEPS` points at the codec
+libraries `build_linux.sh` builds (x86_64 only for now; it needs NASM). Without it, as on arm64, the library has FFmpeg
+only and the app hides the Media reader setting. The app reads with FFmpeg unless Settings > Playback > Media reader is set to FFamp (experimental)
+before the start; then a file FFamp cannot open or describe is still read with FFmpeg, and the camera always uses FFmpeg.
+FFamp decodes H.264, HEVC, VP9 and AV1 through VA-API when the system's libva loads, else in software. Tests pick the
+reader with `-PmediaReader=ffamp` (default `standard`).
 
 `package.sh` writes `pc/build/linux-release/AbsentMotion-<version>-linux-<arm64|x86_64>.deb`, `.AppImage` and `.tar.gz`. It takes the
 Compose `.deb` and replaces its `Depends` line (Compose lists Ubuntu 24.04 package names that Debian 12 lacks), adds

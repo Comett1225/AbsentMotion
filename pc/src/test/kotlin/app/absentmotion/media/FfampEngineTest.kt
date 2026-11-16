@@ -9,6 +9,7 @@ import app.absentmotion.desk.DeskProbe
 import app.absentmotion.pc.VideoDecodeTest
 import app.absentmotion.pc.engine.DesktopNative
 import app.absentmotion.pc.engine.NativeVideoSource
+import app.absentmotion.platform.PlatformFeatures
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import org.junit.Assert.assertArrayEquals
@@ -29,8 +30,8 @@ class FfampEngineTest {
     private val context = Context()
     private val source = File("../testdata/media/test-video.mp4").absoluteFile
 
-    @Before fun macOnly() {
-        assumeTrue(DeskOs.mac)
+    @Before fun withFfamp() {
+        assumeTrue(PlatformFeatures.ffamp)
         DesktopNative.hashCode()
     }
 
@@ -65,12 +66,14 @@ class FfampEngineTest {
         FloatArray(bytes.size / 4).also { ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).asFloatBuffer().get(it) }
     }
 
-    @Test fun macCarriesFfmpegAndFfampAndReadsWithTheChosenOne() {
+    @Test fun carriesFfmpegAndFfampAndReadsWithTheChosenOne() {
         System.getProperty("am.mediaReader")?.let { assertEquals(it == "ffamp", MediaEngine.ffamp) }
         assertSame(if (MediaEngine.ffamp) FfampFirst else FfmpegEngine, MediaEngine.current)
-        val linked = ProcessBuilder("otool", "-L", System.getProperty("am.native")).redirectErrorStream(true).start().let { p -> p.inputStream.bufferedReader().readText().also { p.waitFor() } }
-        for (name in listOf("libavformat", "libavcodec", "libavutil", "libswscale")) assertTrue("$name in\n$linked", name in linked)
-        assertTrue("h264_videotoolbox" in FfampNative.encoders())
+        if (DeskOs.mac) {
+            val linked = ProcessBuilder("otool", "-L", System.getProperty("am.native")).redirectErrorStream(true).start().let { p -> p.inputStream.bufferedReader().readText().also { p.waitFor() } }
+            for (name in listOf("libavformat", "libavcodec", "libavutil", "libswscale")) assertTrue("$name in\n$linked", name in linked)
+        }
+        assertTrue(when { DeskOs.mac -> "h264_videotoolbox"; DeskOs.windows -> "h264_mf"; else -> "libx264" } in FfampNative.encoders())
         NativeVideoSource(source, true).use { assertTrue(it.ffamp) }
         NativeVideoSource(source, false).use { assertTrue(!it.ffamp && it.info.width == 1280) }
     }
@@ -138,7 +141,7 @@ class FfampEngineTest {
             val native = NativeVideoSource(file)
             val handle = DesktopNative.create()
             try {
-                assertTrue(native.ffamp && native.hardware && native.hasAudio)
+                assertTrue(native.ffamp && (native.hardware || !DeskOs.mac) && native.hasAudio)
                 DesktopNative.setScene(handle, VideoDecodeTest().sceneXml(file, 1280, 720))
                 assertEquals(1, native.show(handle, file.absolutePath, 2_000_000, true))
                 val pixels = DesktopNative.still(handle, 2000.0, 1280, 720, true)!!
@@ -242,10 +245,12 @@ class FfampEngineTest {
         assertEquals(old.size, new.size)
         val worst = old.indices.maxOf { abs(old[it] - new[it]) }
         assertTrue("AAC differs by $worst", worst < 0.002f)
-        val apple = ProcessBuilder(app.absentmotion.Judge.ffmpeg, "-nostdin", "-v", "error", "-c:a", "aac_at", "-i", source.path, "-ac", "2", "-f", "f32le", "-").redirectError(ProcessBuilder.Redirect.DISCARD).start()
-        val same = floats(MediaStream(apple.inputStream, apple))
-        assertEquals(same.size, new.size)
-        assertTrue(same.indices.all { abs(same[it] - new[it]) <= 1.0f / 32768 })
+        if (DeskOs.mac) {
+            val apple = ProcessBuilder(app.absentmotion.Judge.ffmpeg, "-nostdin", "-v", "error", "-c:a", "aac_at", "-i", source.path, "-ac", "2", "-f", "f32le", "-").redirectError(ProcessBuilder.Redirect.DISCARD).start()
+            val same = floats(MediaStream(apple.inputStream, apple))
+            assertEquals(same.size, new.size)
+            assertTrue(same.indices.all { abs(same[it] - new[it]) <= 1.0f / 32768 })
+        }
         val shorts = FfampEngine.playback(flac, 250, 48000).use { it.input.readBytes() }
         val reference = app.absentmotion.Judge.engine.playback(flac, 250, 48000).use { it.input.readBytes() }
         assertEquals(reference.size, shorts.size)

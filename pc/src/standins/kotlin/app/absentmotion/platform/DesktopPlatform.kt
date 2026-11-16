@@ -230,7 +230,7 @@ object PlatformFeatures {
     const val tools = true
     const val userFiles = true
     const val linkFolders = true
-    val ffamp = app.absentmotion.desk.DeskOs.mac
+    val ffamp: Boolean by lazy { runCatching { app.absentmotion.media.FfampNative.divxDecoder() }.isSuccess }
 }
 
 fun textFieldFocused(): Boolean = app.absentmotion.desk.DeskTyping.active > 0

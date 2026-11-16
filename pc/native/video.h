@@ -9,6 +9,7 @@
 class GrDirectContext;
 struct AVBufferRef;
 struct AVFrame;
+namespace absent { struct Frame; }
 
 GrDirectContext* DesktopContext(jlong desktop);
 std::string DesktopString(JNIEnv* env, jstring s);
@@ -17,3 +18,5 @@ void DesktopInstallLayer(jlong desktop, const std::string& uri, int64_t layer, s
 
 AVBufferRef* VideoHwDevice();
 sk_sp<SkImage> VideoHwImage(GrDirectContext* context, const AVFrame* frame, SkYUVColorSpace space);
+sk_sp<SkImage> FfampImage(GrDirectContext* context, const absent::Frame& frame);
+sk_sp<SkImage> FfampCopy(GrDirectContext* context, const absent::Frame& frame, bool alpha);
