@@ -1389,13 +1389,14 @@ private fun DeskExport(
         onDispose { DeskModals.open--; if (DeskModals.open == 0) DeskModals.fade = 0f }
     }
     val idle = phase is Phase.Idle
-    val idleNow by rememberUpdatedState(idle)
+    val closable = phase !is Phase.Running
+    val closableNow by rememberUpdatedState(closable)
     val closeNow by rememberUpdatedState(onClose)
     val s = settings.getValue(kind)
     val onChange: (ExportSettings) -> Unit = { settings[kind] = it }
     val onReason = explain
     Box(
-        Modifier.fillMaxSize().background(Color.Black.copy(alpha = DeskModals.ScrimAlpha)).pointerInput(Unit) { detectTapGestures { if (idleNow) closeNow() } }
+        Modifier.fillMaxSize().background(Color.Black.copy(alpha = DeskModals.ScrimAlpha)).pointerInput(Unit) { detectTapGestures { if (closableNow) closeNow() } }
             .focusRequester(focus).focusable()
             .onKeyEvent {
                 if (it.type != KeyEventType.KeyDown || it.key != Key.Enter && it.key != Key.NumPadEnter) false
@@ -1411,7 +1412,7 @@ private fun DeskExport(
                 Row(Modifier.fillMaxWidth().height(56.dp).background(Am.Card).padding(start = 20.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text(stringResource(R.string.export_title), color = Navy, fontSize = 18.sp, fontWeight = FontWeight.Bold, maxLines = 1)
                     Text(scene.title, Modifier.weight(1f).padding(start = 12.dp), color = NoteGrey, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Box(Modifier.size(40.dp).clip(RoundedCornerShape(10.dp)).deskPress(10.dp).clickable(enabled = idle, onClick = onClose), Alignment.Center) {
+                    Box(Modifier.size(40.dp).clip(RoundedCornerShape(10.dp)).deskPress(10.dp).clickable(enabled = closable, onClick = onClose), Alignment.Center) {
                         Icon(ExportIcons.Close, stringResource(R.string.cancel), Modifier.size(22.dp), tint = Navy)
                     }
                 }
