@@ -95,11 +95,10 @@
     <string name="community_choose_thumbnail">選擇縮圖</string>
     <string name="community_confirm_thumbnail">確認縮圖</string>
     <string name="community_picker_hint">滑動時間軸，找到最能呈現專案的時刻。</string>
-    <string name="community_thumbnail_hint">拖曳至最能呈現專案的時刻。</string>
     <string name="community_title">標題</string>
     <string name="community_description">說明</string>
     <string name="community_tags">標籤</string>
-    <string name="community_tag_hint">新增自訂標籤</string>
+    <string name="community_tag_hint">新增自訂標籤（選填）</string>
     <string name="community_creator">建立者</string>
     <string name="community_by">作者：%1$s</string>
     <string name="transform_3d_rotation">3D旋轉</string>

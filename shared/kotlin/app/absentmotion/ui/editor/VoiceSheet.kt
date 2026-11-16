@@ -107,6 +107,8 @@ internal fun VoiceSheet(state: EditorState, onClose: () -> Unit) {
                         Text(stringResource(R.string.text_to_speech), Modifier.weight(1f), color = Am.OnDark, fontSize = 17.sp, fontWeight = FontWeight.Bold)
                         BarButton(ChromeIcons.Close, stringResource(R.string.action_close), Modifier.size(40.dp), onClick = ::dismiss)
                     }
+                    val wide = app.absentmotion.ui.adaptive.LocalAdaptiveSpace.current?.wide == true
+                    val input: @Composable () -> Unit = {
                     Box(Modifier.fillMaxWidth().height(112.dp).clip(RoundedCorner).background(Am.Field).padding(10.dp)) {
                         BasicTextField(
                             text, { text = it.take(Speech.MAX_CHARS) }, Modifier.fillMaxSize(),
@@ -114,6 +116,8 @@ internal fun VoiceSheet(state: EditorState, onClose: () -> Unit) {
                         )
                         if (text.isEmpty()) Text(stringResource(R.string.type_what_the_voice_says), color = Am.OnDarkDim, fontSize = 15.sp)
                     }
+                    }
+                    val controls: @Composable () -> Unit = {
                     Box {
                         Line(stringResource(R.string.voice_language), Modifier.clickable(enabled = languages.isNotEmpty()) { menu = "language" }) { Picked(voice?.language) }
                         Presence(menu == "language") {
@@ -126,6 +130,14 @@ internal fun VoiceSheet(state: EditorState, onClose: () -> Unit) {
                     }
                     Line(stringResource(R.string.voice_speed)) { Steps(speed, 50..200, 10, "$speed%") { speed = it } }
                     Line(stringResource(R.string.voice_pitch)) { Steps(pitch, 50..200, 10, "$pitch%") { pitch = it } }
+                    }
+                    if (wide) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+                        Column(Modifier.weight(1f)) { input() }
+                        Column(Modifier.weight(1f)) { controls() }
+                    } else {
+                        input()
+                        controls()
+                    }
                     Column(Modifier.fillMaxWidth().height(100.dp).padding(vertical = 12.dp)) {
                         val note = when {
                             message.isNotEmpty() -> message

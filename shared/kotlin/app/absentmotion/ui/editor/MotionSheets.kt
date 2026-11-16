@@ -258,7 +258,9 @@ internal fun MotionSheet(title: String, onClose: () -> Unit, content: @Composabl
 
 @Composable
 internal fun <T> TileGrid(items: List<T>, tile: @Composable (T, Modifier) -> Unit) {
-    LazyVerticalGrid(GridCells.Fixed(4), Modifier.fillMaxWidth().height(292.dp),
+    val space = app.absentmotion.ui.adaptive.LocalAdaptiveSpace.current
+    val columns = if (space?.wide == true) ((space.width - 24.dp) / 108.dp).toInt().coerceIn(4, 8) else 4
+    LazyVerticalGrid(GridCells.Fixed(columns), Modifier.fillMaxWidth().height(292.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         items(items.size) { tile(items[it], Modifier) }
     }

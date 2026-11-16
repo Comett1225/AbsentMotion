@@ -47,6 +47,9 @@ import app.absentmotion.R
 import app.absentmotion.export.formatBytes
 import app.absentmotion.platform.LocalContext
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.adaptive.AdaptiveWindow
+import app.absentmotion.ui.adaptive.adaptiveWindowIsWide
+import app.absentmotion.platform.sheetDialogProperties
 
 @Composable
 internal fun UpdateDialog() {
@@ -78,17 +81,13 @@ internal fun UpdateDialog() {
         android.widget.Toast.makeText(context, context.getString(R.string.update_open_failed), android.widget.Toast.LENGTH_LONG).show()
     }
     UpdateCard(HomeIcons.ArrowDown, stringResource(R.string.update_available, release.version), close) {
-        Detail(stringResource(R.string.update_installed, Updates.installed(context)))
-        release.apk?.let { Detail(stringResource(R.string.update_size, formatBytes(it.size))) }
-        if (available.external) Detail(stringResource(R.string.update_external))
-        if (warnMetered(available, remember(available) { Updater.metered(context) })) Detail(stringResource(R.string.update_metered))
-        Updates.source.label?.let { Detail(it) }
-        Buttons {
-            Secondary(stringResource(R.string.update_changelog)) { open(release.link) }
-            Secondary(stringResource(R.string.update_later), close)
-            if (release.apk != null) Primary(stringResource(R.string.update_download_update)) { close(); Updater.start(context, release) }
-            else if (!available.external) Primary(stringResource(R.string.update_download)) { close(); open(release.link) }
-        }
+        UpdateOfferContent(
+            available, Updates.installed(context), warnMetered(available, remember(available) { Updater.metered(context) }), Updates.source.label,
+            onChangelog = { open(release.link) }, onLater = close, onDownload = {
+                close()
+                if (release.apk != null) Updater.start(context, release) else open(release.link)
+            },
+        )
     }
 }
 
@@ -150,6 +149,13 @@ private fun UpdateFlowDialog(step: UpdateStep) {
 
 @Composable
 private fun UpdateCard(icon: ImageVector, title: String, onDismiss: () -> Unit, version: String? = null, content: @Composable () -> Unit) {
+    val wide = adaptiveWindowIsWide()
+    if (wide) {
+        Dialog(onDismiss, sheetDialogProperties()) {
+            AdaptiveWindow(1000.dp, 440.dp) { WideUpdateCard(icon, title, version, content) }
+        }
+        return
+    }
     Dialog(onDismiss, DialogProperties(usePlatformDefaultWidth = false)) {
         Box(Modifier.fillMaxWidth().padding(horizontal = 24.dp), contentAlignment = Alignment.Center) {
             Surface(Modifier.widthIn(max = 440.dp).fillMaxWidth(), shape = RoundedCornerShape(24.dp), color = Am.Card, shadowElevation = 6.dp) {
@@ -171,9 +177,6 @@ private fun UpdateCard(icon: ImageVector, title: String, onDismiss: () -> Unit, 
         }
     }
 }
-
-@Composable
-private fun Detail(text: String) = Text(text, Modifier.padding(top = 6.dp), color = Am.HomeMid, fontSize = 14.sp, lineHeight = 20.sp)
 
 @Composable
 private fun Body(text: String, live: Boolean) =

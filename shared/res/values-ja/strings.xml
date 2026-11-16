@@ -95,11 +95,10 @@
     <string name="community_choose_thumbnail">サムネイルを選択</string>
     <string name="community_confirm_thumbnail">サムネイルを確定</string>
     <string name="community_picker_hint">タイムラインをスライドして、プロジェクトを最もよく表す場面に合わせてください。</string>
-    <string name="community_thumbnail_hint">プロジェクトを最もよく表す場面までドラッグします。</string>
     <string name="community_title">タイトル</string>
     <string name="community_description">説明</string>
     <string name="community_tags">タグ</string>
-    <string name="community_tag_hint">独自のタグを追加</string>
+    <string name="community_tag_hint">独自のタグを追加（任意）</string>
     <string name="community_creator">作成者</string>
     <string name="community_by">%1$s作</string>
     <string name="transform_3d_rotation">3D回転</string>

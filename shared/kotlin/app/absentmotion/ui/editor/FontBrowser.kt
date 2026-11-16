@@ -123,7 +123,7 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
                     search = if (search == null) "" else null
                 }
             }
-            LazyVerticalGrid(GridCells.Fixed(2), Modifier.weight(1f)) {
+            LazyVerticalGrid(if (app.absentmotion.ui.adaptive.LocalAdaptiveSpace.current?.wide == true) GridCells.Adaptive(180.dp) else GridCells.Fixed(2), Modifier.weight(1f)) {
                 items(entries, key = { it.name.xml }) { entry ->
                     val needsDownload by produceState(false, entry.name.xml, downloads) {
                         value = !entry.bundled && entry.category != 100 && withContext(Dispatchers.IO) { library.localFile(entry.name.xml) == null }

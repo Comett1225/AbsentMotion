@@ -95,11 +95,10 @@
     <string name="community_choose_thumbnail">थंबनेल चुनें</string>
     <string name="community_confirm_thumbnail">थंबनेल की पुष्टि करें</string>
     <string name="community_picker_hint">टाइमलाइन को उस पल तक खिसकाएँ जो आपके प्रोजेक्ट को सबसे अच्छी तरह दिखाता है।</string>
-    <string name="community_thumbnail_hint">प्रोजेक्ट का सबसे अच्छा हिस्सा दिखाने वाले पल तक ड्रैग करें।</string>
     <string name="community_title">टाइटल</string>
     <string name="community_description">विवरण</string>
     <string name="community_tags">टैग</string>
-    <string name="community_tag_hint">अपना टैग जोड़ें</string>
+    <string name="community_tag_hint">अपना टैग जोड़ें (वैकल्पिक)</string>
     <string name="community_creator">बनाया है</string>
     <string name="community_by">%1$s द्वारा</string>
     <string name="transform_3d_rotation">3D रोटेशन</string>

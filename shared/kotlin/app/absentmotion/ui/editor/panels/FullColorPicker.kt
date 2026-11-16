@@ -124,6 +124,8 @@ internal fun FullColorPicker(state: EditorState, request: FullColor, modifier: M
                     PanelIcon(PanelIcons.Check, Am.OnDark, size = 27.dp, description = stringResource(R.string.done))
                 }
             }
+            val wide = app.absentmotion.ui.adaptive.LocalAdaptiveSpace.current?.wide == true
+            val wheel: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit = {
             BoxWithConstraints(Modifier.weight(1f).fillMaxWidth().padding(vertical = if (PlatformFeatures.desktop) 12.dp else 0.dp), Alignment.Center) {
                 val base = LocalDensity.current
                 val fit = minOf(1f, maxHeight / WHEEL.px, maxWidth / WHEEL.px).coerceAtLeast(.4f)
@@ -134,6 +136,8 @@ internal fun FullColorPicker(state: EditorState, request: FullColor, modifier: M
                     HexText(argb, ::enterHex)
                 }
             }
+            }
+            val sliders: @Composable () -> Unit = {
             if (tab == 0) {
                 SliderRow(hsva.s, listOf(Hsva(hsva.h, 0f, hsva.v, 1f).opaque(), Hsva(hsva.h, 1f, hsva.v, 1f).opaque()), false, "${(hsva.s * 100).roundToInt()}%", { setHsva(hsva.copy(s = it)) }, end) {
                     PanelIcon(PanelIcons.Saturation, Idle, size = 19.dp)
@@ -158,6 +162,8 @@ internal fun FullColorPicker(state: EditorState, request: FullColor, modifier: M
                     PanelIcon(PanelIcons.Opacity, Idle, size = 19.dp)
                 }
             }
+            }
+            val palette: @Composable () -> Unit = {
             val gridGap = if (PlatformFeatures.desktop) 16.dp else 0.dp
             Box(Modifier.fillMaxWidth().height(315.px + gridGap).background(GridBg)) {
                 PaletteChip(palettes.chosen, Am.OnDark, Modifier.offset(12.px, 16.px + gridGap / 2).size(190.px, 150.px), stacked = true) { library = true }
@@ -173,7 +179,19 @@ internal fun FullColorPicker(state: EditorState, request: FullColor, modifier: M
                         }
                     }
                 }
+            }            }
+            if (wide) Row(Modifier.weight(1f).fillMaxWidth().padding(horizontal = 24.dp), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+                Column(Modifier.weight(1f).fillMaxHeight(), content = wheel)
+                Column(Modifier.weight(1f).fillMaxHeight(), verticalArrangement = Arrangement.Center) {
+                    sliders()
+                    palette()
+                }
+            } else {
+                wheel()
+                sliders()
+                palette()
             }
+
         } }
         Swap(keypad, Modifier.fillMaxSize(), rise = 0.dp) { keypad?.let { ValueKeypad(it, { keypad = null }, Modifier.fillMaxSize()) } }
     }

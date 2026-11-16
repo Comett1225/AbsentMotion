@@ -186,7 +186,7 @@ private fun SidePanels(state: EditorState, addLibrary: AddLibrary, textEdit: Boo
 fun PhoneScreen(fillWidth: Dp = 0.dp, onDismiss: () -> Unit = {}, title: String? = null, sheet: Boolean = false, onConfirm: (() -> Unit)? = null, plain: Boolean = false, content: @Composable () -> Unit) {
     if (app.absentmotion.platform.PlatformFeatures.desktop && LocalDeskEditor.current) {
         if (sheet) DeskSheetHost(onDismiss, content)
-        else DeskDialog(title, if (fillWidth == Dp.Infinity) Dp.Infinity else if (fillWidth > 0.dp) fillWidth else 480.dp, onDismiss, height = if (fillWidth == Dp.Infinity) Dp.Infinity else null, onConfirm = onConfirm, outside = fillWidth != Dp.Infinity, content = content)
+        else DeskDialog(title, if (fillWidth == Dp.Infinity) Dp.Infinity else null, onDismiss, height = if (fillWidth == Dp.Infinity) Dp.Infinity else null, onConfirm = onConfirm, outside = fillWidth != Dp.Infinity, content = content)
         return
     }
     if (!LocalWide.current && !(LocalTablet.current && !plain)) {
@@ -199,12 +199,15 @@ fun PhoneScreen(fillWidth: Dp = 0.dp, onDismiss: () -> Unit = {}, title: String?
         }
         return
     }
-    Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.6f)).pointerInput(Unit) {}.systemBarsPadding().padding(24.dp), contentAlignment = Alignment.Center) {
-        BoxWithConstraints(Modifier.sizeIn(maxWidth = PhoneWidth * 1.2f, maxHeight = PhoneHeight * 1.2f), contentAlignment = Alignment.Center) {
-            val fit = minOf(maxWidth / PhoneWidth, maxHeight / PhoneHeight)
-            val density = LocalDensity.current
-            CompositionLocalProvider(LocalDensity provides Density(density.density * fit, density.fontScale), LocalWide provides false) {
-                Box(Modifier.requiredSize(PhoneWidth, PhoneHeight).clip(RoundedCornerShape(12.dp))) { content() }
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+        if (maxWidth > maxHeight) app.absentmotion.ui.adaptive.AdaptiveWindow(content)
+        else Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.6f)).pointerInput(Unit) {}.systemBarsPadding().padding(24.dp), contentAlignment = Alignment.Center) {
+            BoxWithConstraints(Modifier.sizeIn(maxWidth = PhoneWidth * 1.2f, maxHeight = PhoneHeight * 1.2f), contentAlignment = Alignment.Center) {
+                val fit = minOf(maxWidth / PhoneWidth, maxHeight / PhoneHeight)
+                val density = LocalDensity.current
+                CompositionLocalProvider(LocalDensity provides Density(density.density * fit, density.fontScale), LocalWide provides false) {
+                    Box(Modifier.requiredSize(PhoneWidth, PhoneHeight).clip(RoundedCornerShape(12.dp))) { content() }
+                }
             }
         }
     }

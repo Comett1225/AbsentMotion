@@ -95,11 +95,10 @@
     <string name="community_choose_thumbnail">Scegli miniatura</string>
     <string name="community_confirm_thumbnail">Conferma miniatura</string>
     <string name="community_picker_hint">Scorri la timeline fino al momento che rappresenta meglio il tuo progetto.</string>
-    <string name="community_thumbnail_hint">Trascina fino al momento che rappresenta meglio il progetto.</string>
     <string name="community_title">Titolo</string>
     <string name="community_description">Descrizione</string>
     <string name="community_tags">Tag</string>
-    <string name="community_tag_hint">Aggiungi un tuo tag</string>
+    <string name="community_tag_hint">Aggiungi un tuo tag (facoltativo)</string>
     <string name="community_creator">Creato da</string>
     <string name="community_by">di %1$s</string>
     <string name="transform_3d_rotation">Rotazione 3D</string>

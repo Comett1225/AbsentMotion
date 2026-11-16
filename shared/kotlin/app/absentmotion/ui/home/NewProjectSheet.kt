@@ -112,6 +112,8 @@ import app.absentmotion.library.NewProjectChoice
 import app.absentmotion.library.ProjectStore
 import app.absentmotion.model.Scene
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.adaptive.AdaptiveWindow
+import app.absentmotion.ui.adaptive.LocalAdaptiveSpace
 import app.absentmotion.ui.theme.presence
 import app.absentmotion.ui.theme.presenceScrim
 import kotlin.math.roundToInt
@@ -289,34 +291,39 @@ fun NewProjectSheet(
     val scope = rememberCoroutineScope()
     var creating by remember { mutableStateOf(false) }
     val card = app.absentmotion.ui.editor.LocalTablet.current
-    Box(Modifier.fillMaxSize()) {
-        Box(Modifier.fillMaxSize().presenceScrim(Color.Black.copy(alpha = 0.7f)).pointerInput(Unit) { detectTapGestures { } })
-        BoxWithConstraints(
-            if (card) Modifier.align(Alignment.Center).windowInsetsPadding(WindowInsets.systemBars.union(WindowInsets.ime)).padding(24.dp).widthIn(max = 480.dp).presence(scaleFrom = 0.96f)
-            else Modifier.align(Alignment.BottomCenter).widthIn(max = 480.dp).presence(slide = 1f, fade = false),
-        ) {
-            val density = LocalDensity.current
-            CompositionLocalProvider(LocalDensity provides Density(density.density * minOf(1f, maxWidth / SheetWidth), density.fontScale)) {
-                SheetBody(form, settings, card, onClose, onCreate = create@{
-                    if (creating) return@create
-                    creating = true
-                    settings.newProject = form.choice()
-                    val scene = form.scene()
-                    scope.launch {
-                        val id = try {
-                            withContext(Dispatchers.IO) { store.create(scene) }
-                        } catch (e: kotlinx.coroutines.CancellationException) {
-                            creating = false
-                            throw e
-                        } catch (e: Exception) {
-                            Toast.makeText(context, context.getString(R.string.home_create_project_failed), Toast.LENGTH_LONG).show()
-                            creating = false
-                            return@launch
-                        }
-                        onClose()
-                        onOpen(id)
-                    }
-                })
+    val create: () -> Unit = create@{
+        if (creating) return@create
+        creating = true
+        settings.newProject = form.choice()
+        val scene = form.scene()
+        scope.launch {
+            val id = try {
+                withContext(Dispatchers.IO) { store.create(scene) }
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                creating = false
+                throw e
+            } catch (e: Exception) {
+                Toast.makeText(context, context.getString(R.string.home_create_project_failed), Toast.LENGTH_LONG).show()
+                creating = false
+                return@launch
+            }
+            onClose()
+            onOpen(id)
+        }
+    }
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+        if (card && maxWidth > maxHeight && maxWidth - 48.dp >= 720.dp) {
+            AdaptiveWindow(1100.dp, 500.dp) { SheetBody(form, settings, true, onClose, create) }
+        } else {
+            Box(Modifier.fillMaxSize().presenceScrim(Color.Black.copy(alpha = 0.7f)).pointerInput(Unit) { detectTapGestures { } })
+            BoxWithConstraints(
+                if (card) Modifier.align(Alignment.Center).windowInsetsPadding(WindowInsets.systemBars.union(WindowInsets.ime)).padding(24.dp).widthIn(max = 480.dp).presence(scaleFrom = 0.96f)
+                else Modifier.align(Alignment.BottomCenter).widthIn(max = 480.dp).presence(slide = 1f, fade = false),
+            ) {
+                val density = LocalDensity.current
+                CompositionLocalProvider(LocalDensity provides Density(density.density * minOf(1f, maxWidth / SheetWidth), density.fontScale)) {
+                    SheetBody(form, settings, card, onClose, create)
+                }
             }
         }
     }
@@ -325,7 +332,7 @@ fun NewProjectSheet(
 @Composable
 private fun SheetBody(form: Form, settings: AppSettings, card: Boolean, onClose: () -> Unit, onCreate: () -> Unit) {
     Column(
-        if (card) Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(Am.SheetBg).verticalScroll(rememberScrollState())
+        if (card) (if (LocalAdaptiveSpace.current?.wide == true) Modifier.fillMaxSize() else Modifier.fillMaxWidth()).clip(RoundedCornerShape(22.dp)).background(Am.SheetBg).verticalScroll(rememberScrollState())
         else Modifier.fillMaxWidth().clip(RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp)).background(Am.SheetBg)
             .windowInsetsPadding(WindowInsets.navigationBars.union(WindowInsets.ime)).verticalScroll(rememberScrollState()),
     ) {
@@ -335,45 +342,55 @@ private fun SheetBody(form: Form, settings: AppSettings, card: Boolean, onClose:
             }
             Text(stringResource(R.string.home_new_project), Modifier.padding(start = 4.dp), color = Am.Navy, fontSize = 20.sp, fontWeight = FontWeight.Bold, maxLines = 1)
         }
-        Spacer(Modifier.height(if (card) 12.dp else 30.dp))
-        TypeToggle(form)
-        Spacer(Modifier.height(35.dp))
-        NameField(form)
-        Spacer(Modifier.height(10.dp))
         val pages = if (PlatformFeatures.desktop) null else rememberPagerState { if (settings.savedSizes.isEmpty()) 1 else 2 }
-        if (pages == null) AspectRow(form) else HorizontalPager(pages, Modifier.fillMaxWidth().height(56.dp), verticalAlignment = Alignment.Top) { page ->
-            if (page == 0) AspectRow(form) else SavedPage(form, settings)
+        val identity: @Composable ColumnScope.() -> Unit = {
+            Spacer(Modifier.height(if (card) 12.dp else 30.dp))
+            TypeToggle(form)
+            Spacer(Modifier.height(35.dp))
+            NameField(form)
+            Spacer(Modifier.height(10.dp))
+            if (pages == null) AspectRow(form) else HorizontalPager(pages, Modifier.fillMaxWidth().height(56.dp), verticalAlignment = Alignment.Top) { page ->
+                if (page == 0) AspectRow(form) else SavedPage(form, settings)
         }
         Row(Modifier.fillMaxWidth().height(16.dp), Arrangement.spacedBy(5.dp, Alignment.CenterHorizontally), Alignment.CenterVertically) {
             if (pages != null && pages.pageCount > 1) repeat(2) { Box(Modifier.size(4.dp).background(if (pages.currentPage == it) Am.Navy else Am.HomeFaint, CircleShape)) }
         }
-        SizeRow(form)
-        AnimatedVisibility(form.aspect == CUSTOM, enter = expandVertically() + fadeIn(), exit = shrinkVertically() + fadeOut()) {
-            val scope = rememberCoroutineScope()
-            SavedSizeStrip(form, settings, chips = pages == null) {
-                if (pages != null) scope.launch {
-                    androidx.compose.runtime.snapshotFlow { pages.pageCount }.first { it > 1 }
-                    pages.animateScrollToPage(1)
+        }
+        val dimensions: @Composable ColumnScope.() -> Unit = {
+            SizeRow(form)
+            AnimatedVisibility(form.aspect == CUSTOM, enter = expandVertically() + fadeIn(), exit = shrinkVertically() + fadeOut()) {
+                val scope = rememberCoroutineScope()
+                SavedSizeStrip(form, settings, chips = pages == null) {
+                    if (pages != null) scope.launch {
+                        androidx.compose.runtime.snapshotFlow { pages.pageCount }.first { it > 1 }
+                        pages.animateScrollToPage(1)
+                    }
                 }
-            }
         }
         Spacer(Modifier.height(16.dp))
         FormRow(stringResource(R.string.newproject_frame_rate)) { FrameRateField(form) }
         Spacer(Modifier.height(16.dp))
         FormRow(stringResource(R.string.newproject_background)) { BackgroundField(form) }
         Spacer(Modifier.height(16.dp))
+        }
+        if (LocalAdaptiveSpace.current?.wide == true) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+                Column(Modifier.weight(1f), content = identity)
+                Column(Modifier.weight(1f), content = dimensions)
+            }
+        } else {
+            identity()
+            dimensions()
+        }
         if (card) {
             Spacer(Modifier.height(12.dp))
             AccentPill(stringResource(if (form.element) R.string.newproject_create_asset else R.string.newproject_create_project), Modifier.padding(horizontal = 32.dp).fillMaxWidth(), onClick = onCreate)
             Spacer(Modifier.height(32.dp))
             return@Column
         }
-        Row(Modifier.padding(horizontal = 32.dp).fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            Box(Modifier.height(48.dp).clickable(onClick = onCreate), contentAlignment = Alignment.Center) {
-                Text(stringResource(if (form.element) R.string.newproject_create_asset else R.string.newproject_create_project), color = Ink, fontSize = 15.sp, fontWeight = FontWeight.Medium)
-            }
-        }
-        Spacer(Modifier.height(52.dp))
+        Spacer(Modifier.height(12.dp))
+        AccentPill(stringResource(if (form.element) R.string.newproject_create_asset else R.string.newproject_create_project), Modifier.padding(horizontal = 32.dp).fillMaxWidth(), onClick = onCreate)
+        Spacer(Modifier.height(28.dp))
         Box(
             Modifier.align(Alignment.CenterHorizontally).size(60.dp).clickable(onClick = onClose),
             contentAlignment = Alignment.Center,
@@ -555,15 +572,16 @@ private fun Modifier.corners(color: Color): Modifier = drawBehind {
 
 @Composable
 private fun FormRow(label: String, details: List<String> = emptyList(), field: @Composable () -> Unit) {
+    val wide = LocalAdaptiveSpace.current?.wide == true
     Row(Modifier.padding(horizontal = 32.dp).fillMaxWidth().heightIn(min = 45.dp), verticalAlignment = Alignment.CenterVertically) {
         Column(
-            Modifier.width(140.dp).align(if (details.isEmpty()) Alignment.CenterVertically else Alignment.Top)
+            (if (wide) Modifier.weight(0.44f) else Modifier.width(140.dp)).align(if (details.isEmpty()) Alignment.CenterVertically else Alignment.Top)
                 .wrapContentHeight(Alignment.Top, unbounded = true),
         ) {
             Text(label, color = Am.Navy, fontSize = 16.sp, lineHeight = 22.sp)
             details.forEach { Text(it, color = DimText, fontSize = 10.sp, lineHeight = 13.sp) }
         }
-        Box(Modifier.width(180.dp).height(45.dp)) { field() }
+        Box((if (wide) Modifier.weight(0.56f) else Modifier.width(180.dp)).height(45.dp)) { field() }
     }
 }
 

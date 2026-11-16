@@ -95,11 +95,10 @@
     <string name="community_choose_thumbnail">Вибрати мініатюру</string>
     <string name="community_confirm_thumbnail">Підтвердити мініатюру</string>
     <string name="community_picker_hint">Пересуньте таймлайн до моменту, який найкраще показує ваш проєкт.</string>
-    <string name="community_thumbnail_hint">Перетягніть до моменту, який найкраще показує ваш проєкт.</string>
     <string name="community_title">Назва</string>
     <string name="community_description">Опис</string>
     <string name="community_tags">Теги</string>
-    <string name="community_tag_hint">Додати власний тег</string>
+    <string name="community_tag_hint">Додати власний тег (необов\'язково)</string>
     <string name="community_creator">Автор</string>
     <string name="community_by">Автор: %1$s</string>
     <string name="transform_3d_rotation">3D-обертання</string>

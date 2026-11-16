@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -69,6 +71,9 @@ import app.absentmotion.platform.LocalContext
 import app.absentmotion.platform.versionName
 import app.absentmotion.ui.onboarding.ONBOARDING_DONE
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.adaptive.AdaptiveWindow
+import app.absentmotion.ui.adaptive.LocalAdaptiveSpace
+import app.absentmotion.ui.adaptive.adaptiveWindowIsWide
 import kotlinx.coroutines.launch
 
 data class WhatsNewGroup(val title: String, val items: List<String>)
@@ -193,37 +198,44 @@ fun WhatsNewCard(notes: WhatsNew, button: String, links: (String) -> String?, on
     val shape = RoundedCornerShape(18.dp)
     val style = Rich(SpanStyle(color = Am.HomeInk, fontWeight = FontWeight.Bold), TextLinkStyles(SpanStyle(color = Am.Navy, fontWeight = FontWeight.Bold, textDecoration = TextDecoration.Underline)), links)
     var open by remember(notes) { mutableStateOf(setOf(0)) }
-    val lines = remember(notes, open) { lines(notes, open) }
+    val wide = LocalAdaptiveSpace.current?.wide == true
+    val lines = remember(notes, open, wide) { lines(notes, open).let { if (wide) it.drop(1) else it } }
     val list = rememberLazyListState()
     val scope = rememberCoroutineScope()
     var labelHeight by remember { mutableIntStateOf(0) }
     val pinned = remember(lines) { derivedStateOf { pin(list, lines, labelHeight) } }
-    Column(modifier.widthIn(max = 560.dp).fillMaxWidth().clip(shape).background(Am.Card)) {
-        Box(Modifier.weight(1f, fill = false)) {
-            LazyColumn(state = list, contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 22.dp, bottom = 8.dp)) {
-                lines.forEachIndexed { index, line ->
-                    val section = notes.sections.getOrNull(line.section)
-                    when {
-                        section == null -> item("intro") {
-                            Column {
-                                Text(notes.title, Modifier.semantics { heading() }, color = Am.Navy, fontSize = 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.Bold)
-                                notes.intro.forEach { Text(rich(it, style), Modifier.padding(top = 8.dp), color = Am.HomeMid, fontSize = 15.sp, lineHeight = 21.sp) }
-                                Spacer(Modifier.height(16.dp))
+    Column((if (wide) modifier.fillMaxSize() else modifier.widthIn(max = 560.dp).fillMaxWidth()).clip(shape).background(Am.Card)) {
+        Row(Modifier.weight(1f, fill = wide)) {
+            if (wide) Column(Modifier.weight(0.38f).verticalScroll(rememberScrollState()).padding(start = 24.dp, end = 12.dp, top = 22.dp)) {
+                Text(notes.title, Modifier.semantics { heading() }, color = Am.Navy, fontSize = 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.Bold)
+                notes.intro.forEach { Text(rich(it, style), Modifier.padding(top = 8.dp), color = Am.HomeMid, fontSize = 15.sp, lineHeight = 21.sp) }
+            }
+            Box(Modifier.weight(if (wide) 0.62f else 1f)) {
+                LazyColumn(state = list, contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 22.dp, bottom = 8.dp)) {
+                    lines.forEachIndexed { index, line ->
+                        val section = notes.sections.getOrNull(line.section)
+                        when {
+                            section == null -> item("intro") {
+                                Column {
+                                    Text(notes.title, Modifier.semantics { heading() }, color = Am.Navy, fontSize = 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.Bold)
+                                    notes.intro.forEach { Text(rich(it, style), Modifier.padding(top = 8.dp), color = Am.HomeMid, fontSize = 15.sp, lineHeight = 21.sp) }
+                                    Spacer(Modifier.height(16.dp))
+                                }
                             }
-                        }
-                        line.header -> stickyHeader("s${line.section}") { _ ->
-                            WhatsNewHeader(section, line.section in open) {
-                                val stuck = list.firstVisibleItemIndex > index || list.firstVisibleItemIndex == index && list.firstVisibleItemScrollOffset > 0
-                                open = if (line.section in open) open - line.section else open + line.section
-                                if (stuck) scope.launch { list.scrollToItem(index) }
+                            line.header -> stickyHeader("s${line.section}") { _ ->
+                                WhatsNewHeader(section, line.section in open) {
+                                    val stuck = list.firstVisibleItemIndex > index || list.firstVisibleItemIndex == index && list.firstVisibleItemScrollOffset > 0
+                                    open = if (line.section in open) open - line.section else open + line.section
+                                    if (stuck) scope.launch { list.scrollToItem(index) }
+                                }
                             }
+                            line.text == null -> item("r${line.section}.${line.row}") { WhatsNewLabel(section.groups[line.group], Modifier.animateItem().part(line)) }
+                            else -> item("r${line.section}.${line.row}") { WhatsNewItem(line.text, style, Modifier.animateItem().part(line)) }
                         }
-                        line.text == null -> item("r${line.section}.${line.row}") { WhatsNewLabel(section.groups[line.group], Modifier.animateItem().part(line)) }
-                        else -> item("r${line.section}.${line.row}") { WhatsNewItem(line.text, style, Modifier.animateItem().part(line)) }
                     }
                 }
+                WhatsNewPinned(notes, pinned) { labelHeight = it }
             }
-            WhatsNewPinned(notes, pinned) { labelHeight = it }
         }
         Box(Modifier.fillMaxWidth().height(1.dp).background(Am.HomeLine))
         Box(Modifier.padding(16.dp).fillMaxWidth().heightIn(min = 48.dp).clip(RoundedCornerShape(12.dp)).background(Am.Navy).clickable(role = Role.Button, onClick = onClose).padding(10.dp), Alignment.Center) {
@@ -363,8 +375,11 @@ internal fun ChangelogIcon(dot: Boolean) {
 @Composable
 fun WhatsNewDialog(notes: WhatsNew, onClose: () -> Unit) {
     val links = rememberReportLinks()
+    val wide = adaptiveWindowIsWide()
     Dialog(onClose, DialogProperties(usePlatformDefaultWidth = false)) {
-        Box(Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 24.dp), Alignment.Center) {
+        if (wide) AdaptiveWindow(1000.dp, 720.dp) {
+            WhatsNewCard(notes, stringResource(R.string.action_continue), links::named, onClose)
+        } else Box(Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 24.dp), Alignment.Center) {
             WhatsNewCard(notes, stringResource(R.string.action_continue), links::named, onClose)
         }
     }

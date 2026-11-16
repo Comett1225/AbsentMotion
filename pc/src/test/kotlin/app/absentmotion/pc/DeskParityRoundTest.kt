@@ -332,6 +332,24 @@ class DeskParityRoundTest {
         }
     }
 
+    @Test fun theCloseButtonClosesTheFinishedExport() {
+        prepare("export-finished-close")
+        session(1280, 800) { app ->
+            val editor = openEditor(app, "styles.xml")
+            runOnIdle { editor.exportOpen = true }
+            settle(900)
+            onAllNodesWithText(text(R.string.export_kind_frame_png)).onFirst().performClick()
+            settle()
+            onAllNodesWithText(text(R.string.export)).filter(hasClickAction()).onLast().performClick()
+            waitUntil(timeoutMillis = 60_000) { onAllNodesWithText(text(R.string.saved_to_storage)).fetchSemanticsNodes().isNotEmpty() }
+            settle()
+            shot("export-finished")
+            onNode(hasContentDescription(text(R.string.cancel)) and hasClickAction()).performClick()
+            settle()
+            assertFalse(editor.exportOpen)
+        }
+    }
+
     @Test fun aCommunityBundleCarriesItsThumbnailAndDetails() {
         prepare("community-bundle")
         session(1280, 800) { app ->

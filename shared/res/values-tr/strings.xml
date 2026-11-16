@@ -95,11 +95,10 @@
     <string name="community_choose_thumbnail">Küçük resim seç</string>
     <string name="community_confirm_thumbnail">Küçük resmi onayla</string>
     <string name="community_picker_hint">Zaman çizelgesini projenizi en iyi gösteren ana kaydırın.</string>
-    <string name="community_thumbnail_hint">Projenizi en iyi gösteren ana sürükleyin.</string>
     <string name="community_title">Başlık</string>
     <string name="community_description">Açıklama</string>
     <string name="community_tags">Etiketler</string>
-    <string name="community_tag_hint">Kendi etiketinizi ekleyin</string>
+    <string name="community_tag_hint">Kendi etiketinizi ekleyin (isteğe bağlı)</string>
     <string name="community_creator">Oluşturan</string>
     <string name="community_by">%1$s tarafından</string>
     <string name="transform_3d_rotation">3D döndürme</string>

@@ -95,11 +95,10 @@
     <string name="community_choose_thumbnail">选择缩略图</string>
     <string name="community_confirm_thumbnail">确认缩略图</string>
     <string name="community_picker_hint">滑动时间轴，找到最能展示项目的时刻。</string>
-    <string name="community_thumbnail_hint">拖动到最能展示项目的时刻。</string>
     <string name="community_title">标题</string>
     <string name="community_description">描述</string>
     <string name="community_tags">标签</string>
-    <string name="community_tag_hint">添加自定义标签</string>
+    <string name="community_tag_hint">添加自定义标签（可选）</string>
     <string name="community_creator">创建者</string>
     <string name="community_by">作者：%1$s</string>
     <string name="transform_3d_rotation">3D旋转</string>

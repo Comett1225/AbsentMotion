@@ -117,11 +117,16 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
+import app.absentmotion.ui.adaptive.AdaptiveWindow
+import app.absentmotion.ui.adaptive.LocalAdaptiveSpace
+import app.absentmotion.ui.adaptive.adaptiveWindowIsWide
+import app.absentmotion.platform.sheetDialogProperties
 import app.absentmotion.library.AppSettings
 import app.absentmotion.library.CommunityInfo
 import app.absentmotion.library.ImportReport
@@ -444,31 +449,55 @@ internal fun UploadCard(onUpload: () -> Unit) {
 }
 
 @Composable
-private fun ImportDialog(reports: List<ImportReport>, onDismiss: () -> Unit, onOpen: () -> Unit) {
+internal fun ImportDialog(reports: List<ImportReport>, onDismiss: () -> Unit, onOpen: () -> Unit) {
+    if (adaptiveWindowIsWide()) {
+        Dialog(onDismiss, sheetDialogProperties()) {
+            AdaptiveWindow(1000.dp, 620.dp) {
+                Column(Modifier.fillMaxSize().background(Am.Card).padding(24.dp)) {
+                    Text(stringResource(R.string.import_complete), color = Am.Navy, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                    Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()).padding(vertical = 16.dp)) {
+                        ImportReports(reports)
+                    }
+                    ImportButtons(onDismiss, onOpen)
+                }
+            }
+        }
+        return
+    }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.import_complete), color = Am.Navy) },
         text = {
             Column {
                 Column(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState())) {
-                    for (report in reports) {
-                        report.community?.let { CommunityCard(it) }
-                        if (reports.size > 1 && report.community == null) Text(report.title, Modifier.padding(top = 8.dp), color = Am.Navy, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                        for ((heading, lines) in report.sections) {
-                            Text(heading.text(), Modifier.padding(top = 8.dp), color = Am.Navy, fontSize = 15.sp, fontWeight = FontWeight.Medium)
-                            for (line in lines) Text("\u2022 ${line.text()}", color = Am.Navy, fontSize = 14.sp, lineHeight = 19.sp)
-                        }
-                    }
+                    ImportReports(reports)
                 }
-                Row(Modifier.fillMaxWidth().padding(top = 16.dp).height(androidx.compose.foundation.layout.IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    BigButton(stringResource(R.string.ok), Modifier.weight(1f).fillMaxHeight(), primary = false, onClick = onDismiss)
-                    BigButton(stringResource(R.string.open), Modifier.weight(1f).fillMaxHeight(), onClick = onOpen)
-                }
+                ImportButtons(onDismiss, onOpen)
             }
         },
         confirmButton = {},
         containerColor = Am.Card,
     )
+}
+
+@Composable
+private fun ImportButtons(onDismiss: () -> Unit, onOpen: () -> Unit) {
+    Row(Modifier.fillMaxWidth().padding(top = 16.dp).height(androidx.compose.foundation.layout.IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        BigButton(stringResource(R.string.ok), Modifier.weight(1f).fillMaxHeight(), primary = false, onClick = onDismiss)
+        BigButton(stringResource(R.string.open), Modifier.weight(1f).fillMaxHeight(), onClick = onOpen)
+    }
+}
+
+@Composable
+private fun ImportReports(reports: List<ImportReport>) {
+    for (report in reports) {
+        report.community?.let { CommunityCard(it) }
+        if (reports.size > 1 && report.community == null) Text(report.title, Modifier.padding(top = 8.dp), color = Am.Navy, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        for ((heading, lines) in report.sections) {
+            Text(heading.text(), Modifier.padding(top = 8.dp), color = Am.Navy, fontSize = 15.sp, fontWeight = FontWeight.Medium)
+            for (line in lines) Text("\u2022 ${line.text()}", color = Am.Navy, fontSize = 14.sp, lineHeight = 19.sp)
+        }
+    }
 }
 
 @Composable
@@ -483,12 +512,20 @@ internal fun CommunityCard(info: CommunityInfo) {
             }.getOrNull()
         }
     }
-    Column(Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        picture?.let { Image(it, null, Modifier.fillMaxWidth().aspectRatio(it.width.toFloat() / it.height).clip(RoundedCornerShape(10.dp)), contentScale = ContentScale.Fit) }
+    val details: @Composable () -> Unit = {
         Text(info.title, Modifier.padding(top = 4.dp), color = Am.Navy, fontSize = 17.sp, fontWeight = FontWeight.Bold)
         if (info.creator.isNotEmpty()) Text(stringResource(R.string.community_by, info.creator), color = Am.Navy.copy(alpha = 0.7f), fontSize = 14.sp)
         if (info.description.isNotEmpty()) Text(info.description, color = Am.Navy, fontSize = 14.sp, lineHeight = 19.sp)
         if (info.tags.isNotEmpty()) Text(info.tags.joinToString("  \u00B7  "), color = Am.Navy.copy(alpha = 0.7f), fontSize = 13.sp)
+    }
+    if (LocalAdaptiveSpace.current?.wide == true && picture != null) {
+        Row(Modifier.fillMaxWidth().padding(vertical = 4.dp), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+            Image(picture, null, Modifier.weight(0.4f).heightIn(max = 300.dp).aspectRatio(picture.width.toFloat() / picture.height).clip(RoundedCornerShape(10.dp)), contentScale = ContentScale.Fit)
+            Column(Modifier.weight(0.6f), verticalArrangement = Arrangement.spacedBy(4.dp)) { details() }
+        }
+    } else Column(Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        picture?.let { Image(it, null, Modifier.fillMaxWidth().aspectRatio(it.width.toFloat() / it.height).clip(RoundedCornerShape(10.dp)), contentScale = ContentScale.Fit) }
+        details()
     }
 }
 

@@ -95,11 +95,10 @@
     <string name="community_choose_thumbnail">থাম্বনেইল বাছুন</string>
     <string name="community_confirm_thumbnail">থাম্বনেইল নিশ্চিত করুন</string>
     <string name="community_picker_hint">আপনার প্রজেক্টটি সবচেয়ে ভালো দেখায় এমন মুহূর্তে টাইমলাইন সরান।</string>
-    <string name="community_thumbnail_hint">প্রজেক্টের যে মুহূর্তটি সেটিকে সবচেয়ে ভালোভাবে দেখায় সেখানে টেনে নিন।</string>
     <string name="community_title">শিরোনাম</string>
     <string name="community_description">বিবরণ</string>
     <string name="community_tags">ট্যাগ</string>
-    <string name="community_tag_hint">নিজের ট্যাগ যোগ করুন</string>
+    <string name="community_tag_hint">নিজের ট্যাগ যোগ করুন (ঐচ্ছিক)</string>
     <string name="community_creator">তৈরি করেছেন</string>
     <string name="community_by">%1$s-এর তৈরি</string>
     <string name="transform_3d_rotation">3D রোটেশন</string>

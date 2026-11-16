@@ -95,11 +95,10 @@
     <string name="community_choose_thumbnail">Wybierz miniaturę</string>
     <string name="community_confirm_thumbnail">Potwierdź miniaturę</string>
     <string name="community_picker_hint">Przesuń oś czasu do momentu, który najlepiej pokazuje projekt.</string>
-    <string name="community_thumbnail_hint">Przeciągnij do momentu, który najlepiej przedstawia projekt.</string>
     <string name="community_title">Tytuł</string>
     <string name="community_description">Opis</string>
     <string name="community_tags">Tagi</string>
-    <string name="community_tag_hint">Dodaj własny tag</string>
+    <string name="community_tag_hint">Dodaj własny tag (opcjonalnie)</string>
     <string name="community_creator">Autor</string>
     <string name="community_by">autor: %1$s</string>
     <string name="transform_3d_rotation">Obrót 3D</string>

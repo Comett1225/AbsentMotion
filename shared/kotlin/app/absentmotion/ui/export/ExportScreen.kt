@@ -600,6 +600,8 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
     val info: @Composable () -> Unit = { InfoBlock(free, estimate, timeMs, calculating, storage) }
     val naming: @Composable (ExportKind) -> Unit = { FileNameField(exportName, it) }
     val card = !DESK && app.absentmotion.ui.editor.isTablet(androidx.compose.ui.platform.LocalConfiguration.current.smallestScreenWidthDp)
+    val cfg = androidx.compose.ui.platform.LocalConfiguration.current
+    val twoPane = card && cfg.screenWidthDp > cfg.screenHeightDp && cfg.screenWidthDp - 48 >= app.absentmotion.ui.adaptive.WideFrom.value
     val bar: @Composable () -> Unit = { ExportBar(enabled = phase == Phase.Idle, blocked = blocked, pill = card, onClick = ::start) }
 
     androidx.compose.runtime.CompositionLocalProvider(LocalRiskAsk provides askRisk) {
@@ -610,14 +612,13 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
         phase, progress, heat.level, note, { (phase as? Phase.Running)?.job?.cancel() }, { phase = Phase.Idle }, { (phase as? Phase.Done)?.let { share(context, it) } }, ::start, onClose,
     ) else Box(
         if (card) Modifier.fillMaxSize().background(Scrim).pointerInput(Unit) {}.windowInsetsPadding(WindowInsets.systemBars.union(WindowInsets.ime)).padding(24.dp).wrapContentSize()
-            .widthIn(max = 520.dp).heightIn(max = 760.dp).enterFade(12.dp).clip(RoundedCornerShape(18.dp)).background(Am.SheetBg)
+            .widthIn(max = if (twoPane) 980.dp else 520.dp).heightIn(max = 760.dp).enterFade(12.dp).clip(RoundedCornerShape(18.dp)).background(Am.SheetBg)
         else Modifier.fillMaxSize().background(Am.SheetBg).pointerInput(Unit) {}.enterFade(12.dp),
     ) {
-        Column(Modifier.align(Alignment.TopCenter).widthIn(max = SheetMaxWidth).fillMaxSize()) {
+        Column(Modifier.align(Alignment.TopCenter).widthIn(max = if (twoPane) Dp.Infinity else SheetMaxWidth).fillMaxSize()) {
             TitleBar(stringResource(R.string.export_title), ExportIcons.Close, stringResource(R.string.cancel)) { (phase as? Phase.Running)?.job?.cancel(); onClose() }
-            info()
-            ScrollArea(Modifier.weight(1f), Am.SheetBg, PaddingValues(15.dp), 10.dp) {
-                FileNameField(exportName, kind, options = false)
+            if (!twoPane) info()
+            val kindCards: @Composable ColumnScope.() -> Unit = {
                 kinds.forEachIndexed { i, k ->
                     val s = settings.getValue(k)
                     val silent = k == ExportKind.Audio && !hasAudio
@@ -632,8 +633,23 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
                     )
                 }
             }
-            TemplateToggle(asTemplate, { asTemplate = it }) { templateInfo = true }
-            bar()
+            if (twoPane) Row(Modifier.weight(1f).fillMaxWidth()) {
+                Column(Modifier.weight(0.4f).fillMaxHeight()) {
+                    info()
+                    ScrollArea(Modifier.weight(1f), Am.SheetBg, PaddingValues(15.dp), 10.dp) { FileNameField(exportName, kind, options = false) }
+                    TemplateToggle(asTemplate, { asTemplate = it }) { templateInfo = true }
+                    bar()
+                }
+                Box(Modifier.width(1.dp).fillMaxHeight().background(Line))
+                ScrollArea(Modifier.weight(0.6f).fillMaxHeight(), Am.SheetBg, PaddingValues(15.dp), 10.dp) { kindCards() }
+            } else {
+                ScrollArea(Modifier.weight(1f), Am.SheetBg, PaddingValues(15.dp), 10.dp) {
+                    FileNameField(exportName, kind, options = false)
+                    kindCards()
+                }
+                TemplateToggle(asTemplate, { asTemplate = it }) { templateInfo = true }
+                bar()
+            }
         }
 
         Presence(page == ExportKind.Video) {
@@ -1373,13 +1389,14 @@ private fun DeskExport(
         onDispose { DeskModals.open--; if (DeskModals.open == 0) DeskModals.fade = 0f }
     }
     val idle = phase is Phase.Idle
-    val idleNow by rememberUpdatedState(idle)
+    val closable = phase !is Phase.Running
+    val closableNow by rememberUpdatedState(closable)
     val closeNow by rememberUpdatedState(onClose)
     val s = settings.getValue(kind)
     val onChange: (ExportSettings) -> Unit = { settings[kind] = it }
     val onReason = explain
     Box(
-        Modifier.fillMaxSize().background(Color.Black.copy(alpha = DeskModals.ScrimAlpha)).pointerInput(Unit) { detectTapGestures { if (idleNow) closeNow() } }
+        Modifier.fillMaxSize().background(Color.Black.copy(alpha = DeskModals.ScrimAlpha)).pointerInput(Unit) { detectTapGestures { if (closableNow) closeNow() } }
             .focusRequester(focus).focusable()
             .onKeyEvent {
                 if (it.type != KeyEventType.KeyDown || it.key != Key.Enter && it.key != Key.NumPadEnter) false
@@ -1395,7 +1412,7 @@ private fun DeskExport(
                 Row(Modifier.fillMaxWidth().height(56.dp).background(Am.Card).padding(start = 20.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text(stringResource(R.string.export_title), color = Navy, fontSize = 18.sp, fontWeight = FontWeight.Bold, maxLines = 1)
                     Text(scene.title, Modifier.weight(1f).padding(start = 12.dp), color = NoteGrey, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Box(Modifier.size(40.dp).clip(RoundedCornerShape(10.dp)).deskPress(10.dp).clickable(enabled = idle, onClick = onClose), Alignment.Center) {
+                    Box(Modifier.size(40.dp).clip(RoundedCornerShape(10.dp)).deskPress(10.dp).clickable(enabled = closable, onClick = onClose), Alignment.Center) {
                         Icon(ExportIcons.Close, stringResource(R.string.cancel), Modifier.size(22.dp), tint = Navy)
                     }
                 }
@@ -1644,21 +1661,11 @@ private fun CommunityFields(scene: Scene, engine: EngineThread, settings: app.ab
             SquareChooser(scene.width, scene.height, community.square(scene.width, scene.height), 12.dp, Modifier.fillMaxSize(),
                 if (DESK) { square -> onChange(community.withSquare(square, scene.width, scene.height)) } else null)
         }
-        if (DESK) {
-            var at by remember { mutableFloatStateOf(community.thumbMs.toFloat()) }
-            androidx.compose.material3.Slider(
-                at, { at = it }, valueRange = 0f..(scene.totalTime - 1).coerceAtLeast(1).toFloat(),
-                onValueChangeFinished = { onChange(community.copy(thumbMs = at.toInt())) },
-                colors = androidx.compose.material3.SliderDefaults.colors(thumbColor = Navy, activeTrackColor = Navy),
-            )
-            Hint(stringResource(R.string.community_thumbnail_hint))
-        } else {
-            var picking by remember { mutableStateOf(false) }
-            Box(Modifier.fillMaxWidth().height(42.dp).clip(RoundedCornerShape(4.dp)).background(Navy).clickable { picking = true }, contentAlignment = Alignment.Center) {
-                Text(stringResource(R.string.community_choose_thumbnail), color = Am.OnNavy, fontSize = 15.sp, fontWeight = FontWeight.Medium, maxLines = 1, style = Mixed)
-            }
-            if (picking) ThumbnailPicker(scene, engine, community, { onChange(it); picking = false }) { picking = false }
+        var picking by remember { mutableStateOf(false) }
+        Box(Modifier.fillMaxWidth().height(42.dp).clip(RoundedCornerShape(4.dp)).background(Navy).clickable { picking = true }, contentAlignment = Alignment.Center) {
+            Text(stringResource(R.string.community_choose_thumbnail), color = Am.OnNavy, fontSize = 15.sp, fontWeight = FontWeight.Medium, maxLines = 1, style = Mixed)
         }
+        if (picking) ThumbnailPicker(scene, engine, community, { onChange(it); picking = false }) { picking = false }
     }
     TextBox(R.string.community_title, community.title, 80) { onChange(community.copy(title = it)) }
     TextBox(R.string.community_description, community.description, 500, lines = 3) { onChange(community.copy(description = it)) }
