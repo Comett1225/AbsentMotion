@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -32,6 +33,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -63,6 +65,9 @@ import app.absentmotion.platform.BackHandler
 import app.absentmotion.platform.DialogStatusBarIcons
 import app.absentmotion.platform.LocalContext
 import app.absentmotion.platform.sheetDialogProperties
+import app.absentmotion.ui.adaptive.AdaptiveSpace
+import app.absentmotion.ui.adaptive.LocalAdaptiveSpace
+import app.absentmotion.ui.adaptive.WideFrom
 import app.absentmotion.ui.editor.PanelIcons
 import app.absentmotion.ui.editor.PhoneScreen
 import app.absentmotion.ui.home.HomeIcons
@@ -109,21 +114,26 @@ fun Onboarding(settings: AppSettings, first: FirstRun, engine: () -> EngineThrea
     BackHandler(step == OnboardingStep.Check || step == OnboardingStep.Look && settings.onboarding < ONBOARDING_DONE) {
         step = if (step == OnboardingStep.Check) OnboardingStep.Look else OnboardingStep.Language
     }
-    Box(Modifier.fillMaxSize().background(Am.HomeBg).systemBarsPadding(), contentAlignment = Alignment.TopCenter) {
-        Box(Modifier.widthIn(max = 560.dp).fillMaxSize()) {
-            when (step) {
-                OnboardingStep.Language -> LanguageStep { language ->
-                    settings.onboarding = ONBOARDING_LANGUAGE_CHOSEN
-                    step = if (settings.lookChosen) OnboardingStep.Check else OnboardingStep.Look
-                    applyLanguage(context, language)
-                }
-                OnboardingStep.Look -> LookStep(settings) {
-                    if (settings.onboarding >= ONBOARDING_DONE) onDone() else step = OnboardingStep.Check
-                }
-                OnboardingStep.Check -> CheckStep(settings, engine) {
-                    settings.chooseUpdates(settings.checkUpdates)
-                    settings.onboarding = ONBOARDING_DONE
-                    onDone()
+    BoxWithConstraints(Modifier.fillMaxSize().background(Am.HomeBg).systemBarsPadding(), contentAlignment = Alignment.TopCenter) {
+        val wide = maxWidth > maxHeight && maxWidth >= WideFrom
+        val width = minOf(maxWidth, if (wide) 1100.dp else 560.dp)
+        val height = maxHeight
+        Box(Modifier.width(width).fillMaxSize()) {
+            CompositionLocalProvider(LocalAdaptiveSpace provides if (wide) AdaptiveSpace(width, height) else null) {
+                when (step) {
+                    OnboardingStep.Language -> LanguageStep { language ->
+                        settings.onboarding = ONBOARDING_LANGUAGE_CHOSEN
+                        step = if (settings.lookChosen) OnboardingStep.Check else OnboardingStep.Look
+                        applyLanguage(context, language)
+                    }
+                    OnboardingStep.Look -> LookStep(settings) {
+                        if (settings.onboarding >= ONBOARDING_DONE) onDone() else step = OnboardingStep.Check
+                    }
+                    OnboardingStep.Check -> CheckStep(settings, engine) {
+                        settings.chooseUpdates(settings.checkUpdates)
+                        settings.onboarding = ONBOARDING_DONE
+                        onDone()
+                    }
                 }
             }
         }
@@ -132,11 +142,12 @@ fun Onboarding(settings: AppSettings, first: FirstRun, engine: () -> EngineThrea
 
 @Composable
 fun LookStep(settings: AppSettings, onContinue: () -> Unit) {
+    val cardWidth = if (LocalAdaptiveSpace.current?.wide == true) 900.dp else 520.dp
     Column(Modifier.fillMaxSize().enterFade()) {
         Heading(stringResource(R.string.theme_select))
         Column(Modifier.fillMaxWidth().weight(1f).padding(horizontal = 16.dp, vertical = 12.dp), Arrangement.spacedBy(12.dp, Alignment.CenterVertically), Alignment.CenterHorizontally) {
-            SystemLook(settings, Modifier.widthIn(max = 520.dp).fillMaxWidth())
-            Row(Modifier.widthIn(max = 520.dp).fillMaxWidth().weight(1f, fill = false), Arrangement.spacedBy(12.dp), Alignment.CenterVertically) {
+            SystemLook(settings, Modifier.widthIn(max = cardWidth).fillMaxWidth())
+            Row(Modifier.widthIn(max = cardWidth).fillMaxWidth().weight(1f, fill = false), Arrangement.spacedBy(12.dp), Alignment.CenterVertically) {
                 LookCard(settings, "AbsentMotion", app.absentmotion.ui.theme.Palette.AbsentMotion, R.string.theme_light, Modifier.weight(1f))
                 LookCard(settings, "Dark", app.absentmotion.ui.theme.Palette.Dark, R.string.theme_dark, Modifier.weight(1f))
             }
@@ -259,21 +270,21 @@ private fun CheckStep(settings: AppSettings, engine: () -> EngineThread, onDone:
         }
     }
     fun skip() { job?.cancel(); onDone() }
-    Column(Modifier.fillMaxSize().enterFade()) {
-        Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState())) {
-            Heading(stringResource(R.string.onboarding_check_title))
-            Text(
-                stringResource(R.string.onboarding_check_body), Modifier.padding(horizontal = 20.dp),
-                color = Am.HomeInk, fontSize = 15.sp, lineHeight = 21.sp,
-            )
-            Spacer(Modifier.height(20.dp))
-            Results(result, running) { progress }
-            if (failed) Text(
-                stringResource(R.string.onboarding_check_failed), Modifier.padding(start = 20.dp, end = 20.dp, top = 12.dp),
-                color = Am.HomeInk, fontSize = 14.sp, lineHeight = 20.sp,
-            )
-            Spacer(Modifier.height(16.dp))
-        }
+    val main: @Composable () -> Unit = {
+        Heading(stringResource(R.string.onboarding_check_title))
+        Text(
+            stringResource(R.string.onboarding_check_body), Modifier.padding(horizontal = 20.dp),
+            color = Am.HomeInk, fontSize = 15.sp, lineHeight = 21.sp,
+        )
+        Spacer(Modifier.height(20.dp))
+        Results(result, running) { progress }
+        if (failed) Text(
+            stringResource(R.string.onboarding_check_failed), Modifier.padding(start = 20.dp, end = 20.dp, top = 12.dp),
+            color = Am.HomeInk, fontSize = 14.sp, lineHeight = 20.sp,
+        )
+        Spacer(Modifier.height(16.dp))
+    }
+    val actions: @Composable () -> Unit = {
         Footer {
             UpdateChoice(settings)
             Spacer(Modifier.height(10.dp))
@@ -284,6 +295,15 @@ private fun CheckStep(settings: AppSettings, engine: () -> EngineThread, onDone:
             Spacer(Modifier.height(6.dp))
             PlainButton(skipLabel, visible = !finished, onClick = ::skip)
         }
+    }
+    if (LocalAdaptiveSpace.current?.wide == true) {
+        Row(Modifier.fillMaxSize().enterFade()) {
+            Column(Modifier.weight(1f).fillMaxSize().verticalScroll(rememberScrollState())) { main() }
+            Column(Modifier.weight(1f).fillMaxSize().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.Center) { actions() }
+        }
+    } else Column(Modifier.fillMaxSize().enterFade()) {
+        Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState())) { main() }
+        actions()
     }
 }
 

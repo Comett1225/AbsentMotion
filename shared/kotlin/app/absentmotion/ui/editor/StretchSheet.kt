@@ -64,6 +64,8 @@ internal fun StretchSheet(state: EditorState, ids: Set<Long>, onClose: () -> Uni
                 Column(Modifier.fillMaxWidth().clip(SheetShape).background(Am.Panel).clickable(interactionSource = null, indication = null) {}.padding(16.dp)) {
                     Text(title, color = Am.OnDark, fontSize = 17.sp, fontWeight = FontWeight.Bold, maxLines = 1)
                     Text(pluralStringResource(R.plurals.structure_layers_selected, ids.size, ids.size.toString()), Modifier.padding(top = 4.dp, bottom = 12.dp), color = Am.OnDarkDim, fontSize = 13.sp, maxLines = 1)
+                    val wide = app.absentmotion.ui.adaptive.LocalAdaptiveSpace.current?.wide == true
+                    val controls: @Composable () -> Unit = {
                     Row(Modifier.fillMaxWidth().height(52.dp).clip(FieldShape).background(Am.Field), verticalAlignment = Alignment.CenterVertically) {
                         Box(Modifier.width(56.dp).fillMaxHeight().clickable { set((percent - 1) / 10 * 10f) }, Alignment.Center) {
                             Icon(ChromeIcons.Minus, shorter, Modifier.size(20.dp), tint = Am.Accent)
@@ -82,7 +84,17 @@ internal fun StretchSheet(state: EditorState, ids: Set<Long>, onClose: () -> Uni
                         Text(shorter, Modifier.weight(1f), color = Am.OnDarkDim, fontSize = 13.sp, maxLines = 1)
                         Text(longer, color = Am.OnDarkDim, fontSize = 13.sp, maxLines = 1)
                     }
+                    }
+                    val note: @Composable () -> Unit = {
                     Text(stringResource(R.string.multi_stretch_note), Modifier.padding(vertical = 12.dp), color = Am.OnDark, fontSize = 13.sp, lineHeight = 17.sp)
+                    }
+                    if (wide) Row(Modifier.fillMaxWidth().padding(bottom = 12.dp), horizontalArrangement = Arrangement.spacedBy(24.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f)) { controls() }
+                        Column(Modifier.weight(1f)) { note() }
+                    } else {
+                        controls()
+                        note()
+                    }
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         Action(stringResource(R.string.cancel), Modifier.weight(1f), onClick = onClose)
                         Action(stringResource(R.string.apply), Modifier.weight(1f), primary = true) {

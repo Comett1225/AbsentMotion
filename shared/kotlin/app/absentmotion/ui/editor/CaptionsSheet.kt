@@ -209,14 +209,16 @@ internal fun CaptionsSheet(state: EditorState, clipId: Long? = null, onClose: ()
     val working = phase == Phase.Download || phase == Phase.Work
     val scrimTap by rememberUpdatedState { if (!working && !browsing) dismiss() }
     Dialog(::dismiss, DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false, dismissOnClickOutside = false)) {
+        val wide = app.absentmotion.ui.adaptive.adaptiveWindowIsWide()
+        val content: @Composable () -> Unit = {
         BoxWithConstraints(
             Modifier.fillMaxSize().pointerInput(Unit) { detectTapGestures { scrimTap() } }.windowInsetsPadding(WindowInsets.safeDrawing),
             if (app.absentmotion.platform.PlatformFeatures.desktop) Alignment.Center else Alignment.BottomCenter,
         ) {
             val sheetMax = captionSheetHeight(maxWidth.value, maxHeight.value, browsing).dp
-            val sheetSize = if (browsing) Modifier.height(sheetMax) else Modifier.heightIn(max = sheetMax)
+            val sheetSize = if (wide) Modifier.fillMaxSize() else if (browsing) Modifier.height(sheetMax) else Modifier.heightIn(max = sheetMax)
             Column(
-                Modifier.widthIn(max = 560.dp).fillMaxWidth().then(sheetSize).clip(SheetShape).background(Am.Panel)
+                Modifier.then(if (wide) Modifier else Modifier.widthIn(max = 560.dp)).fillMaxWidth().then(sheetSize).clip(SheetShape).background(Am.Panel)
                     .pointerInput(Unit) { detectTapGestures { } },
             ) {
                 when {
@@ -255,6 +257,8 @@ internal fun CaptionsSheet(state: EditorState, clipId: Long? = null, onClose: ()
                 }
             }
         }
+        }
+        if (wide) app.absentmotion.ui.adaptive.AdaptiveWindow { content() } else content()
     }
     state.fullColor?.let { request ->
         Dialog({ state.fullColor = null }, DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
@@ -286,7 +290,8 @@ private fun SetupScreen(
             Text(stringResource(R.string.auto_captions), Modifier.weight(1f), color = Am.OnDark, fontSize = 18.sp, fontWeight = FontWeight.Bold)
             BarButton(ChromeIcons.Close, stringResource(R.string.action_close), Modifier.size(40.dp), onClick = onClose)
         }
-        Column(Modifier.weight(1f, fill = false).fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)) {
+        Column(Modifier.weight(1f, fill = app.absentmotion.ui.adaptive.LocalAdaptiveSpace.current?.wide == true).fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)) {
+            val sourceContent: @Composable () -> Unit = {
             Text(stringResource(if (locked) R.string.caption_scope_clip else R.string.caption_intro), Modifier.fillMaxWidth().padding(bottom = 16.dp), color = Am.OnDarkDim, fontSize = 13.sp, lineHeight = 18.sp)
             GroupTitle(stringResource(R.string.caption_source))
             if (locked) {
@@ -309,6 +314,8 @@ private fun SetupScreen(
                 }
             }
             Spacer(Modifier.height(8.dp))
+            }
+            val optionsContent: @Composable () -> Unit = {
             PreviewSample(style, state.engine.fonts)
             Line(stringResource(R.string.settings_language)) { Choices(listOf(stringResource(R.string.caption_language_auto), stringResource(R.string.caption_language_english)), if (style.english) 1 else 0) { onStyle(style.copy(english = it == 1)) } }
             Line(stringResource(R.string.caption_words_per_caption)) {
@@ -348,6 +355,16 @@ private fun SetupScreen(
                     state.fullColor = FullColor(style.outlineColor) { color, _ -> onStyle(style.copy(outlineColor = color)) }
                 }
             }
+            }
+            }
+            if (app.absentmotion.ui.adaptive.LocalAdaptiveSpace.current?.wide == true) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+                    Column(Modifier.weight(1f)) { sourceContent() }
+                    Column(Modifier.weight(1f)) { optionsContent() }
+                }
+            } else {
+                sourceContent()
+                optionsContent()
             }
             Spacer(Modifier.height(16.dp))
         }

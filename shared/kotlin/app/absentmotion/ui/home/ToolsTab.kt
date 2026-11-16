@@ -312,21 +312,31 @@ internal fun ToolSheet(
                 }
             }
         }
-        if (PlatformFeatures.desktop || app.absentmotion.ui.editor.LocalTablet.current) BoxWithConstraints(
-            Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.6f))
-                .pointerInput(Unit) { detectTapGestures { } }.systemBarsPadding().padding(24.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            val twoColumns = side != null && maxWidth >= FramedTwoColumns
-            val width = minOf(maxWidth, if (twoColumns) 1040.dp else 560.dp)
-            val height = minOf(maxHeight, 720.dp, if (twoColumns) width * 0.7f else 720.dp)
-            Box(Modifier.size(width, height).shadow(24.dp, RoundedCornerShape(12.dp)).clip(RoundedCornerShape(12.dp))) {
-                androidx.compose.runtime.CompositionLocalProvider(LocalWide provides false) { body(twoColumns) }
-            }
-        } else if (bounded || LocalWide.current) BoxWithConstraints(Modifier.fillMaxSize().background(Am.SheetBg), contentAlignment = Alignment.Center) {
-            val twoColumns = side != null && maxWidth >= WideToolSheet && maxWidth > maxHeight
-            Box(Modifier.widthIn(max = if (twoColumns) 1040.dp else 560.dp).fillMaxSize()) { body(twoColumns) }
-        } else PhoneScreen { body(false) }
+        BoxWithConstraints(Modifier.fillMaxSize()) {
+            if (maxWidth > maxHeight && maxWidth - 48.dp >= app.absentmotion.ui.adaptive.WideFrom) {
+                val twoColumns = side != null && maxWidth - 48.dp >= FramedTwoColumns
+                app.absentmotion.ui.adaptive.AdaptiveWindow(
+                    maxCardWidth = if (twoColumns) 1040.dp else 560.dp, maxCardHeight = 720.dp,
+                    heightRatio = if (twoColumns) 0.7f else null, corner = 12.dp,
+                ) {
+                    body(side != null && app.absentmotion.ui.adaptive.LocalAdaptiveSpace.current?.wide == true)
+                }
+            } else if (PlatformFeatures.desktop || app.absentmotion.ui.editor.LocalTablet.current) BoxWithConstraints(
+                Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.6f))
+                    .pointerInput(Unit) { detectTapGestures { } }.systemBarsPadding().padding(24.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                val twoColumns = side != null && maxWidth >= FramedTwoColumns
+                val width = minOf(maxWidth, if (twoColumns) 1040.dp else 560.dp)
+                val height = minOf(maxHeight, 720.dp, if (twoColumns) width * 0.7f else 720.dp)
+                Box(Modifier.size(width, height).shadow(24.dp, RoundedCornerShape(12.dp)).clip(RoundedCornerShape(12.dp))) {
+                    androidx.compose.runtime.CompositionLocalProvider(LocalWide provides false) { body(twoColumns) }
+                }
+            } else if (bounded || LocalWide.current) BoxWithConstraints(Modifier.fillMaxSize().background(Am.SheetBg), contentAlignment = Alignment.Center) {
+                val twoColumns = side != null && maxWidth >= WideToolSheet && maxWidth > maxHeight
+                Box(Modifier.widthIn(max = if (twoColumns) 1040.dp else 560.dp).fillMaxSize()) { body(twoColumns) }
+            } else PhoneScreen { body(false) }
+        }
     }
 }
 

@@ -31,6 +31,8 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.addPathNodes
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import app.absentmotion.ui.editor.LocalWide
@@ -51,13 +53,18 @@ private val CardMaxHeight = 800.dp
 
 @Composable
 fun AdaptiveWindow(content: @Composable () -> Unit) {
+    AdaptiveWindow(CardMaxWidth, CardMaxHeight, content = content)
+}
+
+@Composable
+fun AdaptiveWindow(maxCardWidth: Dp, maxCardHeight: Dp, heightRatio: Float? = null, corner: Dp = 16.dp, content: @Composable () -> Unit) {
     BoxWithConstraints(
         Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.6f)).pointerInput(Unit) { detectTapGestures { } }.systemBarsPadding().padding(24.dp),
         contentAlignment = Alignment.Center,
     ) {
-        val width = minOf(maxWidth, CardMaxWidth)
-        val height = minOf(maxHeight, CardMaxHeight)
-        Box(Modifier.size(width, height).shadow(24.dp, RoundedCornerShape(16.dp)).clip(RoundedCornerShape(16.dp))) {
+        val width = minOf(maxWidth, maxCardWidth)
+        val height = minOf(maxHeight, maxCardHeight, heightRatio?.let { width * it } ?: maxCardHeight)
+        Box(Modifier.size(width, height).shadow(24.dp, RoundedCornerShape(corner)).clip(RoundedCornerShape(corner))) {
             CompositionLocalProvider(LocalWide provides false, LocalAdaptiveSpace provides AdaptiveSpace(width, height)) { content() }
         }
     }
@@ -108,4 +115,11 @@ fun AppLogo(size: Dp, modifier: Modifier = Modifier) {
     Box(modifier.size(size).clip(RoundedCornerShape(size * 0.22f)).background(LogoOrange)) {
         Image(LogoMark, null, Modifier.fillMaxSize())
     }
+}
+
+@Composable
+fun adaptiveWindowIsWide(): Boolean {
+    val size = LocalWindowInfo.current.containerSize
+    val width = with(LocalDensity.current) { size.width.toDp() }
+    return size.width > size.height && width - 48.dp >= WideFrom
 }

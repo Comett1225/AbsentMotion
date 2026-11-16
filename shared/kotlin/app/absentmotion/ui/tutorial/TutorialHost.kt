@@ -83,6 +83,9 @@ import androidx.compose.ui.window.Dialog
 import app.absentmotion.R
 import app.absentmotion.editor.EditorState
 import app.absentmotion.library.AppSettings
+import app.absentmotion.platform.sheetDialogProperties
+import app.absentmotion.ui.adaptive.AdaptiveWindow
+import app.absentmotion.ui.adaptive.adaptiveWindowIsWide
 import app.absentmotion.library.ProjectStore
 import app.absentmotion.model.Scene
 import app.absentmotion.platform.BackHandler
@@ -523,22 +526,45 @@ private fun PausedBanner(onContinue: () -> Unit, onExit: () -> Unit) {
 }
 
 @Composable
-private fun OfferDialog(onStart: () -> Unit, onLater: () -> Unit, onNever: () -> Unit) {
+internal fun OfferDialog(onStart: () -> Unit, onLater: () -> Unit, onNever: () -> Unit) {
+    if (adaptiveWindowIsWide()) {
+        Dialog(onLater, sheetDialogProperties()) {
+            AdaptiveWindow(900.dp, 380.dp) {
+                ScaledFonts {
+                    Row(Modifier.fillMaxSize().background(Am.Card).padding(24.dp), horizontalArrangement = Arrangement.spacedBy(32.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
+                            Text(stringResource(R.string.tutorial_offer_title), Modifier.semantics { heading() }, color = Am.Navy, fontSize = 20.sp, lineHeight = 26.sp, fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.tutorial_offer_body), Modifier.padding(top = 8.dp), color = Am.HomeInk, fontSize = 15.sp, lineHeight = 21.sp)
+                        }
+                        Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
+                            OfferActions(onStart, onLater, onNever)
+                        }
+                    }
+                }
+            }
+        }
+        return
+    }
     Dialog(onDismissRequest = onLater) {
         ScaledFonts {
             val shape = RoundedCornerShape(18.dp)
             Column(Modifier.padding(horizontal = 16.dp).widthIn(max = 420.dp).clip(shape).background(Am.Card).verticalScroll(rememberScrollState()).padding(20.dp)) {
                 Text(stringResource(R.string.tutorial_offer_title), Modifier.semantics { heading() }, color = Am.Navy, fontSize = 20.sp, lineHeight = 26.sp, fontWeight = FontWeight.Bold)
                 Text(stringResource(R.string.tutorial_offer_body), Modifier.padding(top = 8.dp, bottom = 18.dp), color = Am.HomeInk, fontSize = 15.sp, lineHeight = 21.sp)
-                Box(Modifier.fillMaxWidth().heightIn(min = 48.dp).clip(RoundedCornerShape(12.dp)).background(Am.Navy).clickable(role = Role.Button, onClick = onStart).padding(10.dp), Alignment.Center) {
-                    Text(stringResource(R.string.tutorial_offer_start), color = Am.OnNavy, fontSize = 16.sp, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center)
-                }
-                Spacer(Modifier.height(6.dp))
-                OfferLink(stringResource(R.string.tutorial_offer_later), onLater)
-                OfferLink(stringResource(R.string.tutorial_offer_never), onNever)
+                OfferActions(onStart, onLater, onNever)
             }
         }
     }
+}
+
+@Composable
+private fun OfferActions(onStart: () -> Unit, onLater: () -> Unit, onNever: () -> Unit) {
+    Box(Modifier.fillMaxWidth().heightIn(min = 48.dp).clip(RoundedCornerShape(12.dp)).background(Am.Navy).clickable(role = Role.Button, onClick = onStart).padding(10.dp), Alignment.Center) {
+        Text(stringResource(R.string.tutorial_offer_start), color = Am.OnNavy, fontSize = 16.sp, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center)
+    }
+    Spacer(Modifier.height(6.dp))
+    OfferLink(stringResource(R.string.tutorial_offer_later), onLater)
+    OfferLink(stringResource(R.string.tutorial_offer_never), onNever)
 }
 
 @Composable

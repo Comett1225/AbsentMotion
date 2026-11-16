@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -178,8 +179,10 @@ fun PresetScreen(state: EditorState) {
         }
         Spacer(Modifier.height(16.dp))
         }
+        val wide = app.absentmotion.ui.adaptive.LocalAdaptiveSpace.current?.wide == true
+        val previewContent: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit = {
         Box(
-            Modifier.padding(horizontal = 16.dp).fillMaxWidth().then(if (desk) Modifier.weight(1f) else Modifier.height(352.dp)).clip(RowShape).background(Am.PreviewBg)
+            Modifier.padding(horizontal = 16.dp).fillMaxWidth().then(if (desk || wide) Modifier.weight(1f) else Modifier.height(352.dp)).clip(RowShape).background(Am.PreviewBg)
                 .onSizeChanged { box = it }.clickable { playing = !playing },
         ) {
             app.absentmotion.platform.SceneSurface(state.engine, 1, box, Modifier.fillMaxSize())
@@ -193,8 +196,10 @@ fun PresetScreen(state: EditorState) {
             Modifier.padding(horizontal = 16.dp).fillMaxWidth().height(80.dp),
         ) { playing = false; pos = (it * length).roundToInt() }
         Spacer(Modifier.height(16.dp))
+        }
+        val listContent: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit = {
         val presetList = rememberLazyListState()
-        LazyColumn(Modifier.padding(horizontal = 16.dp).fillMaxWidth().then(if (desk) Modifier.heightIn(min = 120.dp, max = 204.dp).deskScrollbar(presetList) else Modifier.weight(1f)), presetList) {
+        LazyColumn(Modifier.padding(horizontal = 16.dp).fillMaxWidth().then(if (wide) Modifier.fillMaxSize() else if (desk) Modifier.heightIn(min = 120.dp, max = 204.dp).deskScrollbar(presetList) else Modifier.weight(1f)), presetList) {
             if (loaded?.isEmpty() == true) item {
                 Column(Modifier.fillMaxWidth().padding(top = 24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(stringResource(R.string.no_presets_saved_yet), color = Am.OnDark, fontSize = 20.sp, fontWeight = FontWeight.Bold)
@@ -227,7 +232,16 @@ fun PresetScreen(state: EditorState) {
                 }
             }
         }
+        }
+        if (wide) Row(Modifier.weight(1f).fillMaxWidth()) {
+            Column(Modifier.weight(3f).fillMaxHeight(), content = previewContent)
+            Column(Modifier.weight(2f).fillMaxHeight(), content = listContent)
+        } else {
+            previewContent()
+            listContent()
+        }
     }
+
     renaming?.let { preset ->
         RenamePresetDialog(preset.title, onDone = { title ->
             scope.launch {

@@ -51,6 +51,7 @@ import app.absentmotion.library.CrashLogs
 import app.absentmotion.platform.DialogStatusBarIcons
 import app.absentmotion.platform.LocalContext
 import app.absentmotion.platform.sheetDialogProperties
+import app.absentmotion.ui.adaptive.LocalAdaptiveSpace
 import app.absentmotion.ui.editor.PhoneScreen
 import app.absentmotion.ui.export.ExportIcons
 import app.absentmotion.ui.theme.Am
@@ -66,7 +67,12 @@ fun CrashLogsScreen(onClose: () -> Unit) {
             DialogStatusBarIcons(darkIcons = Am.Card.luminance() > 0.5f)
             Box(Modifier.fillMaxSize().background(Am.SheetBg)) {
                 val shown = open
-                if (shown == null) CrashList(onClose) { open = it } else CrashDetails(shown) { open = null }
+                if (LocalAdaptiveSpace.current?.wide == true) {
+                    Row(Modifier.fillMaxSize()) {
+                        Box(Modifier.weight(0.42f).fillMaxSize()) { CrashList(onClose) { open = it } }
+                        Box(Modifier.weight(0.58f).fillMaxSize()) { if (shown != null) CrashDetails(shown) { open = null } }
+                    }
+                } else if (shown == null) CrashList(onClose) { open = it } else CrashDetails(shown) { open = null }
             }
         }
     }

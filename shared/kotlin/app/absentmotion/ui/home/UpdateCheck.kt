@@ -2,7 +2,30 @@ package app.absentmotion.ui.home
 
 import app.absentmotion.platform.readAtMost
 import android.os.Build
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
+import app.absentmotion.platform.sheetDialogProperties
+import app.absentmotion.ui.adaptive.AdaptiveWindow
+import app.absentmotion.ui.adaptive.adaptiveWindowIsWide
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Alignment
@@ -21,6 +44,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.R
+import app.absentmotion.export.formatBytes
 import app.absentmotion.library.AppSettings
 import app.absentmotion.platform.Context
 import app.absentmotion.platform.Log
@@ -242,6 +266,23 @@ internal class Version private constructor(private val numbers: List<Int>, priva
 
 @Composable
 internal fun UpdateAskDialog(settings: AppSettings) {
+    if (adaptiveWindowIsWide()) {
+        Dialog({}, sheetDialogProperties()) {
+            AdaptiveWindow(900.dp, 300.dp) {
+                Column(Modifier.fillMaxSize().background(Am.Card).padding(24.dp)) {
+                    Row(Modifier.weight(1f).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+                        Text(stringResource(R.string.update_check_on_open), Modifier.weight(1f).verticalScroll(rememberScrollState()), color = Am.Navy, fontSize = 17.sp, lineHeight = 23.sp, fontWeight = FontWeight.Medium)
+                        Text(stringResource(R.string.update_check_note), Modifier.weight(1f).verticalScroll(rememberScrollState()), color = Am.HomeMid, fontSize = 14.sp, lineHeight = 20.sp)
+                    }
+                    Row(Modifier.align(Alignment.End)) {
+                        TextButton({ settings.chooseUpdates(false) }) { Text(stringResource(R.string.update_not_now), color = Am.Navy) }
+                        TextButton({ settings.chooseUpdates(true) }) { Text(stringResource(R.string.update_turn_on), color = Am.Navy) }
+                    }
+                }
+            }
+        }
+        return
+    }
     AlertDialog(
         onDismissRequest = {},
         text = {
@@ -254,4 +295,40 @@ internal fun UpdateAskDialog(settings: AppSettings) {
         confirmButton = { TextButton({ settings.chooseUpdates(true) }) { Text(stringResource(R.string.update_turn_on), color = Am.Navy) } },
         containerColor = Am.Card,
     )
+}
+
+@Composable
+internal fun WideUpdateCard(icon: ImageVector, title: String, version: String?, content: @Composable () -> Unit) {
+    Row(Modifier.fillMaxSize().background(Am.Card).padding(24.dp), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+        Column(Modifier.weight(0.4f).verticalScroll(rememberScrollState())) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.size(44.dp).clip(CircleShape).background(Am.Navy.copy(alpha = 0.08f)), Alignment.Center) {
+                    Icon(icon, null, Modifier.size(22.dp), tint = Am.Navy)
+                }
+                if (version != null) Text(version, Modifier.padding(start = 12.dp).clip(RoundedCornerShape(10.dp)).background(Am.Navy.copy(alpha = 0.08f)).padding(horizontal = 10.dp, vertical = 4.dp), color = Am.Navy, fontSize = 13.sp, fontWeight = FontWeight.Medium, maxLines = 1)
+            }
+            Text(title, Modifier.padding(top = 16.dp).semantics { heading() }, color = Am.Navy, fontSize = 20.sp, lineHeight = 26.sp, fontWeight = FontWeight.SemiBold)
+        }
+        Column(Modifier.weight(0.6f).verticalScroll(rememberScrollState())) { content() }
+    }
+}
+
+@Composable
+internal fun UpdateOfferContent(available: UpdateAnswer.Available, installed: String, metered: Boolean, sourceLabel: String?, onChangelog: () -> Unit, onLater: () -> Unit, onDownload: () -> Unit) {
+    val release = available.release
+    @Composable fun detail(text: String) {
+        Text(text, Modifier.padding(top = 6.dp), color = Am.HomeMid, fontSize = 14.sp, lineHeight = 20.sp)
+    }
+    detail(stringResource(R.string.update_installed, installed))
+    release.apk?.let { detail(stringResource(R.string.update_size, formatBytes(it.size))) }
+    if (available.external) detail(stringResource(R.string.update_external))
+    if (metered) detail(stringResource(R.string.update_metered))
+    sourceLabel?.let { detail(it) }
+    FlowRow(Modifier.fillMaxWidth().padding(top = 20.dp), horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        TextButton(onChangelog, Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.update_changelog), color = Am.Navy, fontSize = 15.sp) }
+        TextButton(onLater, Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.update_later), color = Am.Navy, fontSize = 15.sp) }
+        if (release.apk != null || !available.external) Button(onDownload, Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.buttonColors(containerColor = Am.Navy, contentColor = Am.OnNavy)) {
+            Text(stringResource(if (release.apk != null) R.string.update_download_update else R.string.update_download), fontSize = 15.sp, fontWeight = FontWeight.Medium)
+        }
+    }
 }
