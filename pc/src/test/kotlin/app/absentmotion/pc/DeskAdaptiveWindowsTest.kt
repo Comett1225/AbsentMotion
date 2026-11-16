@@ -130,8 +130,8 @@ class DeskAdaptiveWindowsTest {
                     runOnIdle { mode = page }
                     settle()
                     val bounds = onNodeWithTag("content").getBoundsInRoot()
-                    assertTrue("landscape content $bounds", bounds.width > bounds.height)
-                    assertEquals(1100f, bounds.width.value, 1f)
+                    if (page != 1) assertTrue("landscape content $bounds", bounds.width > bounds.height)
+                    assertEquals(if (page == 1) 720f else 1100f, bounds.width.value, 1f)
                     assertTrue(space!!.wide)
                     assertEquals(bounds.width, space!!.width)
                     assertEquals(bounds.height, space!!.height)

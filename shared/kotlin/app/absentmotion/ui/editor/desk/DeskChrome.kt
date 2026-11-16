@@ -140,7 +140,19 @@ internal fun DeskIcon(icon: ImageVector, hint: String, enabled: Boolean = true, 
 
 @Composable
 internal fun DeskSheetHost(onDismiss: () -> Unit, content: @Composable () -> Unit) {
-    DeskDialog(null, onDismiss = onDismiss, content = content)
+    val focus = LocalFocusManager.current
+    fun close() { focus.clearFocus(); onDismiss() }
+    BackHandler { close() }
+    DisposableEffect(Unit) { onDispose { focus.clearFocus() } }
+    val fade = modalFade()
+    DeskCursorHost(Modifier.fillMaxSize().background(Color.Black.copy(alpha = DeskModals.ScrimAlpha * fade)).pointerInput(Unit) { detectTapGestures { close() } }.padding(24.dp), Alignment.Center) {
+        BoxWithConstraints(Modifier.fillMaxSize(), Alignment.Center) {
+            val size = adaptiveWindowSize(minOf(maxWidth, 720.dp), maxHeight)
+            Box(Modifier.size(size).clip(RoundedCornerShape(12.dp))) {
+                CompositionLocalProvider(LocalWide provides false, LocalAdaptiveSpace provides AdaptiveSpace(size.width, size.height)) { content() }
+            }
+        }
+    }
 }
 
 @Composable
