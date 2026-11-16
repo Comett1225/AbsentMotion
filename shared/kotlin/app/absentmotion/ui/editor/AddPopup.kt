@@ -218,6 +218,10 @@ private fun ToolsPage(state: EditorState, modifier: Modifier) {
         Triple(5, app.absentmotion.ui.home.HomeIcons.Gif, R.string.tools_gif),
         Triple(2, app.absentmotion.ui.home.HomeIcons.Download, R.string.tools_downloader).takeIf { app.absentmotion.platform.videoDownloader().available },
     )
+    val context = LocalContext.current
+    val custom by produceState(emptyList<app.absentmotion.tools.InstalledTool>(), app.absentmotion.tools.InstalledTools.revision) {
+        value = withContext(Dispatchers.IO) { app.absentmotion.tools.InstalledTools.list(context).filter { "editor" in it.tool.where } }
+    }
     LazyHorizontalGrid(AtLeastTwo(96.dp), modifier.clipToBounds()) {
         items(tools, key = { it.first }) { (id, icon, label) ->
             val press = remember { MutableInteractionSource() }
@@ -227,6 +231,16 @@ private fun ToolsPage(state: EditorState, modifier: Modifier) {
             ) {
                 Icon(icon, null, Modifier.size(28.dp), tint = Am.OnDark)
                 Text(stringResource(label), Modifier.padding(top = 6.dp, start = 4.dp, end = 4.dp), color = Am.OnDark, fontSize = 12.sp, lineHeight = 14.sp, textAlign = TextAlign.Center, maxLines = 2)
+            }
+        }
+        items(custom, key = { "custom/" + it.tool.id }) { installed ->
+            val press = remember { MutableInteractionSource() }
+            Column(
+                Modifier.size(80.dp, 96.dp).tutorialGuard().pressScale(press, TilePress).clickable(press, LocalIndication.current) { state.customTool = installed.tool.id; state.toolOpen = 6 },
+                horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
+            ) {
+                app.absentmotion.ui.home.ToolIcon(installed.icon, 28.dp)
+                Text(installed.tool.name, Modifier.padding(top = 6.dp, start = 4.dp, end = 4.dp), color = Am.OnDark, fontSize = 12.sp, lineHeight = 14.sp, textAlign = TextAlign.Center, maxLines = 2)
             }
         }
     }

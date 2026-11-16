@@ -2,6 +2,15 @@ package app.absentmotion.library
 
 import app.absentmotion.BuildConfig
 import app.absentmotion.model.Scene
+import app.absentmotion.tools.CustomTool
+import app.absentmotion.tools.InstalledTools
+import app.absentmotion.tools.TOOLS_API
+import app.absentmotion.tools.TOOL_ICON_MAX_BYTES
+import app.absentmotion.tools.TOOL_JSON_MAX_BYTES
+import app.absentmotion.tools.ToolPermissions
+import app.absentmotion.tools.ToolPlaces
+import app.absentmotion.tools.ToolProblem
+import app.absentmotion.tools.parseTool
 import app.absentmotion.ui.home.HOME_PAGE
 import app.absentmotion.ui.home.TrustedHttp
 import app.absentmotion.ui.home.UpdateSource
@@ -52,6 +61,10 @@ internal object CommunitySource : UpdateSource {
     }
 }
 
+internal object CommunityFeed {
+    @Volatile var source: UpdateSource = CommunitySource
+}
+
 enum class CommunityKind(
     val id: String,
     val folder: String,
@@ -59,7 +72,8 @@ enum class CommunityKind(
     val ext: String
 ) {
     Bundle("bundle", "bundles", 20L shl 20, "absproj"),
-    Preset("preset", "presets", 1L shl 20, "xml")
+    Preset("preset", "presets", 1L shl 20, "xml"),
+    Tool("tool", "tools", TOOL_JSON_MAX_BYTES, "json")
 }
 
 data class CommunityItem(
@@ -76,7 +90,12 @@ data class CommunityItem(
     val thumbnail: String? = null,
     val width: Int = 0,
     val height: Int = 0,
-    val lengthMs: Long = 0L
+    val lengthMs: Long = 0L,
+    val version: String = "",
+    val permissions: List<String> = emptyList(),
+    val where: List<String> = emptyList(),
+    val thumbnailBytes: Long = 0L,
+    val thumbnailSha256: String = ""
 )
 
 data class CommunityIndex(
@@ -112,6 +131,7 @@ fun parseCommunityIndex(text: String, versionCode: Int): CommunityIndex {
         val kind = when (obj.optString("kind", "")) {
             CommunityKind.Bundle.id -> CommunityKind.Bundle
             CommunityKind.Preset.id -> CommunityKind.Preset
+            CommunityKind.Tool.id -> CommunityKind.Tool
             else -> continue
         }
         val minVersion = obj.optInt("minVersion", 0)
@@ -143,6 +163,21 @@ fun parseCommunityIndex(text: String, versionCode: Int): CommunityIndex {
         val width = obj.optInt("width", 0).coerceAtLeast(0)
         val height = obj.optInt("height", 0).coerceAtLeast(0)
         val lengthMs = obj.optLong("lengthMs", 0L).coerceAtLeast(0L)
+        var version = ""
+        var permissions = emptyList<String>()
+        var where = emptyList<String>()
+        var thumbBytes = 0L
+        var thumbSha = ""
+        if (kind == CommunityKind.Tool) {
+            if (obj.optInt("api", -1) !in 1..TOOLS_API) continue
+            version = obj.optString("version", "").trim().take(16)
+            permissions = strings(obj, "permissions") ?: continue
+            where = strings(obj, "where") ?: continue
+            if (permissions.any { it !in ToolPermissions } || where.isEmpty() || where.any { it !in ToolPlaces }) continue
+            thumbBytes = obj.optLong("thumbnailBytes", -1L)
+            thumbSha = obj.optString("thumbnailSha256", "")
+            if (rawThumb.isEmpty() || thumbBytes !in 1L..TOOL_ICON_MAX_BYTES || !isSha256(thumbSha)) continue
+        }
         items.add(
             CommunityItem(
                 kind = kind,
@@ -158,11 +193,21 @@ fun parseCommunityIndex(text: String, versionCode: Int): CommunityIndex {
                 thumbnail = rawThumb.ifEmpty { null },
                 width = width,
                 height = height,
-                lengthMs = lengthMs
+                lengthMs = lengthMs,
+                version = version,
+                permissions = permissions,
+                where = where,
+                thumbnailBytes = thumbBytes,
+                thumbnailSha256 = thumbSha
             )
         )
     }
     return CommunityIndex(items)
+}
+
+private fun strings(obj: JSONObject, key: String): List<String>? {
+    val array = obj.optJSONArray(key) ?: return null
+    return List(array.length()) { array.opt(it) as? String ?: return null }
 }
 
 internal class CommunityClient(
@@ -170,7 +215,7 @@ internal class CommunityClient(
     private val http: () -> TrustedHttp
 ) {
     fun index(): CommunityIndex {
-        val text = http().get(CommunitySource.asset("", "index.json")) { conn ->
+        val text = http().get(CommunityFeed.source.asset("", "index.json")) { conn ->
             if (conn.responseCode !in 200..299) {
                 throw IOException("HTTP ${conn.responseCode}")
             }
@@ -195,7 +240,7 @@ internal class CommunityClient(
             }
         }
         return try {
-            val bytes = http().get(CommunitySource.asset("", rel)) { conn ->
+            val bytes = http().get(CommunityFeed.source.asset("", rel)) { conn ->
                 if (conn.responseCode !in 200..299) return@get null
                 val length = conn.contentLengthLong
                 if (length > THUMB_MAX_BYTES) return@get null
@@ -229,25 +274,37 @@ internal class CommunityClient(
         ) {
             throw CommunityDamagedException("Invalid community item metadata")
         }
+        return fetch(item.file, item.bytes, item.sha256, item.kind.maxBytes, "${item.name}.${item.kind.ext}")
+    }
+
+    fun icon(item: CommunityItem): File {
+        val path = item.thumbnail
+        if (path == null || !safeCommunityPath(path, "${item.kind.folder}/${item.name}/") || item.thumbnailBytes !in 1L..TOOL_ICON_MAX_BYTES || !isSha256(item.thumbnailSha256)) {
+            throw CommunityDamagedException("Invalid community item metadata")
+        }
+        return fetch(path, item.thumbnailBytes, item.thumbnailSha256, TOOL_ICON_MAX_BYTES, "${item.name}.icon")
+    }
+
+    private fun fetch(path: String, bytes: Long, sha256: String, maxBytes: Long, name: String): File {
         val dir = File(cacheDir, "community/files")
         dir.mkdirs()
-        val target = File(dir, "${item.name}.${item.kind.ext}")
+        val target = File(dir, name)
         if (target.isFile) {
-            if (target.length() == item.bytes && sha256Of(target) == item.sha256) {
+            if (target.length() == bytes && sha256Of(target) == sha256) {
                 return target
             }
             target.delete()
         }
-        val part = File(dir, "${item.name}.${item.kind.ext}.part")
+        val part = File(dir, "$name.part")
         part.delete()
         try {
-            val limit = minOf(item.bytes, item.kind.maxBytes)
-            http().get(CommunitySource.asset("", item.file)) { conn ->
+            val limit = minOf(bytes, maxBytes)
+            http().get(CommunityFeed.source.asset("", path)) { conn ->
                 if (conn.responseCode !in 200..299) {
                     throw IOException("HTTP ${conn.responseCode}")
                 }
                 val contentLength = conn.contentLengthLong
-                if (contentLength > 0L && contentLength != item.bytes) {
+                if (contentLength > 0L && contentLength != bytes) {
                     throw CommunityDamagedException("Content length mismatch")
                 }
                 if (contentLength > limit) {
@@ -270,7 +327,7 @@ internal class CommunityClient(
                     }
                 }
             }
-            if (part.length() != item.bytes || sha256Of(part) != item.sha256) {
+            if (part.length() != bytes || sha256Of(part) != sha256) {
                 throw CommunityDamagedException("Downloaded file verification failed")
             }
             if (!part.renameTo(target)) {
@@ -284,6 +341,20 @@ internal class CommunityClient(
             throw t
         }
     }
+}
+
+internal fun installCommunityTool(context: android.content.Context, client: CommunityClient, item: CommunityItem): CustomTool {
+    val json = client.download(item)
+    val icon = client.icon(item)
+    val tool = try {
+        parseTool(json.readText())
+    } catch (e: ToolProblem) {
+        throw CommunityDamagedException(e.message ?: "Invalid tool")
+    }
+    if (tool.id != item.name || tool.permissions.toSet() != item.permissions.toSet() || tool.where != item.where.toSet()) {
+        throw CommunityDamagedException("The tool does not match its index entry")
+    }
+    return InstalledTools.install(context, item.name, json, icon)
 }
 
 fun addCommunityPreset(file: File, store: PresetStore): String {

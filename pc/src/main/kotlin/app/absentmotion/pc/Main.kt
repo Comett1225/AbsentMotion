@@ -43,6 +43,7 @@ import kotlin.math.roundToInt
 fun main(args: Array<String>) {
     System.setProperty("apple.awt.application.appearance", "system")
     app.absentmotion.ui.home.localFeed()?.let { app.absentmotion.ui.home.Updates.source = it }
+    app.absentmotion.ui.home.localCommunity()?.let { app.absentmotion.library.CommunityFeed.source = it }
     when (args.firstOrNull()) {
         "--warmup" -> { warmup(); return }
         "--scene-check" -> { sceneCheck(); return }

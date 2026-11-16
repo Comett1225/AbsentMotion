@@ -37,6 +37,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -70,7 +71,9 @@ import app.absentmotion.library.CommunityDamagedException
 import app.absentmotion.library.CommunityIndex
 import app.absentmotion.library.CommunityItem
 import app.absentmotion.library.CommunityKind
-import app.absentmotion.library.CommunitySource
+import app.absentmotion.library.CommunityFeed
+import app.absentmotion.library.installCommunityTool
+import app.absentmotion.tools.InstalledTools
 import app.absentmotion.library.PresetStore
 import app.absentmotion.library.addCommunityPreset
 import app.absentmotion.media.pictureSample
@@ -92,7 +95,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.coroutineContext
 import kotlin.math.abs
 
-private var sessionIndex: CommunityIndex? = null
+internal var sessionIndex: CommunityIndex? = null
 
 private enum class CommunityCategory(val labelRes: Int) {
     Projects(R.string.community_filter_projects),
@@ -112,7 +115,7 @@ fun CommunityTab(modifier: Modifier, onImport: (File) -> Unit) {
     val isDesktop = PlatformFeatures.desktop
     val scope = rememberCoroutineScope()
     val pager = rememberPagerState { CommunityCategory.entries.size }
-    val client = remember(context) { CommunityClient(context.cacheDir) { TrustedHttp(CommunitySource) } }
+    val client = remember(context) { CommunityClient(context.cacheDir) { TrustedHttp(CommunityFeed.source) } }
     var index by remember { mutableStateOf(sessionIndex) }
     var loading by remember { mutableStateOf(sessionIndex == null) }
     var failed by remember { mutableStateOf(false) }
@@ -175,6 +178,9 @@ fun CommunityTab(modifier: Modifier, onImport: (File) -> Unit) {
             val presets = remember(current.items) {
                 current.items.filter { it.kind == CommunityKind.Preset }
             }
+            val tools = remember(current.items) {
+                current.items.filter { it.kind == CommunityKind.Tool }
+            }
             Column(modifier.fillMaxSize()) {
                 Spacer(Modifier.height(if (isDesktop) 16.dp else 8.dp))
                 CommunityCategoryBar(
@@ -215,10 +221,12 @@ fun CommunityTab(modifier: Modifier, onImport: (File) -> Unit) {
                                 thumbs = thumbs,
                                 onSelect = { selected = it }
                             )
-                            CommunityCategory.Tools -> CommunityMessageState(
-                                modifier = Modifier.fillMaxSize(),
-                                title = stringResource(R.string.community_tools_empty_title),
-                                note = stringResource(R.string.community_tools_empty_note)
+                            CommunityCategory.Tools -> CommunityItemsPage(
+                                items = tools,
+                                pad = pad,
+                                client = client,
+                                thumbs = thumbs,
+                                onSelect = { selected = it }
                             )
                         }
                     }
@@ -490,9 +498,18 @@ private fun CommunityItemSheet(
     val scope = rememberCoroutineScope()
     var activeDownload by remember(item) { mutableStateOf<ActiveDownload?>(null) }
     val downloading = activeDownload != null
+    val isTool = item.kind == CommunityKind.Tool
+    val installedSha by produceState<String?>(null, item, InstalledTools.revision) {
+        value = if (isTool) withContext(Dispatchers.IO) { InstalledTools.find(context, item.name)?.let { sha256Of(it.file) } } else null
+    }
     val addLabel = stringResource(
-        if (item.kind == CommunityKind.Bundle) R.string.community_add
-        else R.string.community_add_preset
+        when {
+            item.kind == CommunityKind.Bundle -> R.string.community_add
+            !isTool -> R.string.community_add_preset
+            installedSha == null -> R.string.community_add_tool
+            installedSha == item.sha256 -> R.string.community_tool_added
+            else -> R.string.custom_tool_update
+        }
     )
 
     fun stopDownload() {
@@ -510,13 +527,19 @@ private fun CommunityItemSheet(
 
     fun startDownload() {
         if (activeDownload != null) return
-        val http = TrustedHttp(CommunitySource)
+        val http = TrustedHttp(CommunityFeed.source)
         val cancelled = AtomicBoolean(false)
+        val updating = installedSha != null
         val job = scope.launch {
             val me = coroutineContext.job
             try {
                 val file = withContext(Dispatchers.IO) {
-                    val downloaded = CommunityClient(context.cacheDir) { http }.download(item)
+                    val client = CommunityClient(context.cacheDir) { http }
+                    if (item.kind == CommunityKind.Tool) {
+                        installCommunityTool(context, client, item)
+                        return@withContext File(InstalledTools.root(context), item.name)
+                    }
+                    val downloaded = client.download(item)
                     if (item.kind == CommunityKind.Preset) {
                         addCommunityPreset(downloaded, PresetStore(context))
                     }
@@ -529,6 +552,18 @@ private fun CommunityItemSheet(
                 onDismiss()
                 if (item.kind == CommunityKind.Bundle) {
                     onImport(file)
+                } else if (isTool) {
+                    Toast.makeText(
+                        context,
+                        context.getString(
+                            when {
+                                updating -> R.string.custom_tool_updated
+                                "home" in item.where -> R.string.community_added_tool
+                                else -> R.string.community_added_tool_editor
+                            }
+                        ),
+                        Toast.LENGTH_LONG
+                    ).show()
                 } else {
                     Toast.makeText(
                         context,
@@ -610,18 +645,30 @@ private fun CommunityItemSheet(
                     Modifier.fillMaxWidth().height(IntrinsicSize.Min),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    BigButton(
-                        label = stringResource(R.string.cancel),
-                        modifier = Modifier.weight(1f).fillMaxHeight(),
-                        primary = false
-                    ) {
-                        if (downloading) stopDownload() else closeSheet()
+                    if (isTool && installedSha != null && !downloading) {
+                        BigButton(
+                            label = stringResource(R.string.custom_tool_remove),
+                            modifier = Modifier.weight(1f).fillMaxHeight(),
+                            icon = HomeIcons.Delete,
+                            primary = false
+                        ) {
+                            InstalledTools.remove(context, item.name)
+                            Toast.makeText(context, context.getString(R.string.custom_tool_removed), Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        BigButton(
+                            label = stringResource(R.string.cancel),
+                            modifier = Modifier.weight(1f).fillMaxHeight(),
+                            primary = false
+                        ) {
+                            if (downloading) stopDownload() else closeSheet()
+                        }
                     }
                     BigButton(
                         label = addLabel,
                         modifier = Modifier.weight(1f).fillMaxHeight(),
-                        icon = HomeIcons.Plus,
-                        enabled = !downloading
+                        icon = if (!isTool || installedSha == null) HomeIcons.Plus else if (installedSha == item.sha256) null else HomeIcons.Download,
+                        enabled = !downloading && !(isTool && installedSha == item.sha256)
                     ) {
                         startDownload()
                     }
@@ -636,9 +683,7 @@ private fun CommunityItemSheet(
             1.5f
         }
         Box(
-            Modifier
-                .fillMaxWidth()
-                .aspectRatio(thumbRatio)
+            (if (isTool) Modifier.size(96.dp) else Modifier.fillMaxWidth().aspectRatio(thumbRatio))
                 .clip(RoundedCornerShape(12.dp))
                 .background(Am.Scrim),
             Alignment.Center
@@ -702,6 +747,10 @@ private fun CommunityItemSheet(
                     fontWeight = FontWeight.SemiBold
                 )
             }
+        }
+        if (isTool) {
+            Spacer(Modifier.height(16.dp))
+            ToolPermissionsList(item.permissions)
         }
         if (item.tags.isNotEmpty()) {
             Spacer(Modifier.height(14.dp))

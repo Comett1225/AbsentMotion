@@ -301,4 +301,30 @@ class CommunityTest {
             addCommunityPreset(bigFile, store)
         }
     }
+
+    @Test fun toolItemsNeedAKnownApiPermissionsAndACheckedIcon() {
+        fun tool(name: String, extra: String) = """
+            {"kind": "tool", "name": "$name", "title": "T", "creator": "C", "description": "D", "tags": [], "added": "2026-11-16",
+             "file": "tools/$name/tool.json", "bytes": 900, "sha256": "$shaA", "thumbnail": "tools/$name/icon.png",
+             "version": "1.0.0", $extra}
+        """
+        val good = "\"api\": 1, \"permissions\": [\"media.read\"], \"where\": [\"home\"], \"thumbnailBytes\": 4000, \"thumbnailSha256\": \"$shaB\""
+        val json = """{"format": "absentmotion-community", "version": 2, "items": [
+            ${tool("good", good)},
+            ${tool("future", good.replace("\"api\": 1", "\"api\": 2"))},
+            ${tool("network", good.replace("media.read", "network"))},
+            ${tool("unchecked", good.replace(", \"thumbnailSha256\": \"$shaB\"", ""))},
+            ${tool("nowhere", good.replace("[\"home\"]", "[]"))},
+            ${tool("newer", "$good, \"minVersion\": 99")}
+        ]}"""
+        val items = parseCommunityIndex(json, 52).items
+        assertEquals(listOf("good"), items.map { it.name })
+        val item = items.single()
+        assertEquals(CommunityKind.Tool, item.kind)
+        assertEquals(listOf("media.read"), item.permissions)
+        assertEquals(listOf("home"), item.where)
+        assertEquals("1.0.0", item.version)
+        assertEquals(4000L, item.thumbnailBytes)
+        assertEquals(shaB, item.thumbnailSha256)
+    }
 }

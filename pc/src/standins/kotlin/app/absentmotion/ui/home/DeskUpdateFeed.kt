@@ -14,3 +14,15 @@ internal class FeedSource(base: String) : UpdateSource {
 
 internal fun localFeed(property: String? = System.getProperty("am.updateFeed")): UpdateSource? =
     property?.trim()?.takeIf { it.startsWith("http://127.0.0.1:") || it.startsWith("http://localhost:") }?.let { runCatching { FeedSource(it) }.getOrNull() }
+
+internal class LocalCommunity(base: String) : UpdateSource {
+    private val root = URI(base.trimEnd('/'))
+    override val releases = "$root/"
+    override val https = false
+    override fun asset(tag: String, name: String) = "$root/${name.trimStart('/')}"
+    override fun allows(url: URI, first: Boolean) =
+        url.scheme == root.scheme && url.host == root.host && url.port == root.port && url.rawPath.orEmpty().startsWith(root.rawPath.orEmpty()) && ".." !in url.rawPath.orEmpty()
+}
+
+internal fun localCommunity(property: String? = System.getProperty("am.communityFeed")): UpdateSource? =
+    property?.trim()?.takeIf { it.startsWith("http://127.0.0.1:") || it.startsWith("http://localhost:") }?.let { runCatching { LocalCommunity(it) }.getOrNull() }

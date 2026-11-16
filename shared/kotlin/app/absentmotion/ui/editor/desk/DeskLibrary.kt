@@ -130,6 +130,13 @@ internal fun DeskLibrary(state: EditorState, library: AddLibrary, tab: Int, modi
                     DeskToolRow(app.absentmotion.ui.home.HomeIcons.Audio, stringResource(R.string.tools_extract), stringResource(R.string.tools_extract_about)) { state.toolOpen = 4 }
                     DeskToolRow(app.absentmotion.ui.home.HomeIcons.Gif, stringResource(R.string.tools_gif), stringResource(R.string.tools_gif_about)) { state.toolOpen = 5 }
                     if (app.absentmotion.platform.videoDownloader().available) DeskToolRow(app.absentmotion.ui.home.HomeIcons.Download, stringResource(R.string.tools_downloader), stringResource(R.string.tools_downloader_about)) { state.toolOpen = 2 }
+                    val context = app.absentmotion.platform.LocalContext.current
+                    val custom by androidx.compose.runtime.produceState(emptyList<app.absentmotion.tools.InstalledTool>(), app.absentmotion.tools.InstalledTools.revision) {
+                        value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { app.absentmotion.tools.InstalledTools.list(context).filter { "editor" in it.tool.where } }
+                    }
+                    custom.forEach { installed ->
+                        DeskToolRow(app.absentmotion.ui.home.HomeIcons.ToolsTab, installed.tool.name, installed.tool.description, picture = installed.icon) { state.customTool = installed.tool.id; state.toolOpen = 6 }
+                    }
                 }
                 else -> Column(Modifier.fillMaxSize().padding(horizontal = 12.dp, vertical = 4.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     DeskToolRow(ChromeIcons.Freehand, stringResource(R.string.add_quick_freehand_brush), stringResource(R.string.desk_draw_freehand_hint)) { state.startFreehand() }
@@ -178,14 +185,14 @@ internal fun DeskTile(state: EditorState, label: String, picture: @Composable ()
 }
 
 @Composable
-internal fun DeskToolRow(icon: ImageVector, title: String, description: String, add: () -> Unit) {
+internal fun DeskToolRow(icon: ImageVector, title: String, description: String, picture: java.io.File? = null, add: () -> Unit) {
     val source = remember { MutableInteractionSource() }
     val hovered by source.collectIsHoveredAsState()
     Row(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(if (hovered) Am.Button else Am.Field).hoverable(source).pointerHoverIcon(PointerIcon.Hand).clickable(onClick = add).padding(10.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(Modifier.size(44.dp).clip(RoundedCornerShape(6.dp)).background(Am.Panel), Alignment.Center) { Icon(icon, null, Modifier.size(26.dp), tint = Am.OnDark) }
+        Box(Modifier.size(44.dp).clip(RoundedCornerShape(6.dp)).background(Am.Panel), Alignment.Center) { if (picture != null) app.absentmotion.ui.home.ToolIcon(picture, 32.dp) else Icon(icon, null, Modifier.size(26.dp), tint = Am.OnDark) }
         Column(Modifier.weight(1f)) {
             Text(title, color = Am.OnDark, fontSize = 13.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(description, Modifier.padding(top = 2.dp), color = Am.OnDarkDim, fontSize = 12.sp, lineHeight = 15.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)

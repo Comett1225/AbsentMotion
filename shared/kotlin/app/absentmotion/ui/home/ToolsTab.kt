@@ -136,6 +136,10 @@ internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSett
     var open by rememberSaveable { mutableIntStateOf(0) }
     var compressFrom by remember { mutableStateOf<Uri?>(null) }
     var asking by remember { mutableStateOf(false) }
+    var openTool by rememberSaveable { mutableStateOf<String?>(null) }
+    val custom by produceState(emptyList<app.absentmotion.tools.InstalledTool>(), app.absentmotion.tools.InstalledTools.revision) {
+        value = withContext(Dispatchers.IO) { app.absentmotion.tools.InstalledTools.list(context).filter { "home" in it.tool.where } }
+    }
     LaunchedEffect(revision) {
         if (engine !is Engine.Getting) engine = if (!downloader.available) Engine.Unavailable else if (downloader.installed(context)) Engine.Ready else Engine.Missing
     }
@@ -189,10 +193,13 @@ internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSett
             }
         }
     }
+    val customCards = custom.map { installed ->
+        @Composable { m: Modifier -> ToolCard(HomeIcons.ToolsTab, installed.tool.name, installed.tool.description, modifier = m, picture = installed.icon) { openTool = installed.tool.id } }
+    }
     Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = if (PlatformFeatures.desktop) 28.dp else 16.dp)) {
         Spacer(Modifier.height(24.dp))
-        if (PlatformFeatures.desktop) ToolGrid(listOf(compressCard, trimCard, extractCard, gifCard, downloaderCard))
-        else if (LocalWide.current || app.absentmotion.ui.editor.LocalTablet.current) ToolGrid(listOf(compressCard, trimCard, extractCard, gifCard, downloaderCard))
+        if (PlatformFeatures.desktop) ToolGrid(listOf(compressCard, trimCard, extractCard, gifCard, downloaderCard) + customCards)
+        else if (LocalWide.current || app.absentmotion.ui.editor.LocalTablet.current) ToolGrid(listOf(compressCard, trimCard, extractCard, gifCard, downloaderCard) + customCards)
         else {
             compressCard(Modifier)
             Spacer(Modifier.height(12.dp))
@@ -203,6 +210,10 @@ internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSett
             gifCard(Modifier)
             Spacer(Modifier.height(12.dp))
             downloaderCard(Modifier)
+            customCards.forEach { card ->
+                Spacer(Modifier.height(12.dp))
+                card(Modifier)
+            }
         }
         Spacer(Modifier.height(28.dp))
         ToolsFooter()
@@ -223,6 +234,7 @@ internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSett
         4 -> ExtractAudioScreen { open = 0 }
         5 -> GifScreen { open = 0 }
     }
+    custom.firstOrNull { it.tool.id == openTool }?.let { CustomToolScreen(it, null) { openTool = null } }
 }
 
 @Composable
@@ -239,13 +251,14 @@ private fun ToolGrid(cards: List<@Composable (Modifier) -> Unit>) = BoxWithConst
 }
 
 @Composable
-private fun ToolCard(icon: ImageVector, title: String, about: String, engine: Engine? = null, modifier: Modifier = Modifier, onClick: () -> Unit) {
+private fun ToolCard(icon: ImageVector, title: String, about: String, engine: Engine? = null, modifier: Modifier = Modifier, picture: java.io.File? = null, onClick: () -> Unit) {
     val missing = engine == Engine.Missing || engine is Engine.Getting || engine is Engine.Failed
     Row(
         modifier.fillMaxWidth().heightIn(min = 104.dp).clip(RoundedCornerShape(12.dp)).background(Am.Card).deskPress(12.dp).clickable(onClick = onClick).padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(Modifier.size(56.dp).alpha(if (missing) 0.45f else 1f).background(Am.Navy, CircleShape), contentAlignment = Alignment.Center) {
+        if (picture != null) ToolIcon(picture, 56.dp)
+        else Box(Modifier.size(56.dp).alpha(if (missing) 0.45f else 1f).background(Am.Navy, CircleShape), contentAlignment = Alignment.Center) {
             Icon(icon, null, Modifier.size(28.dp), tint = Am.OnNavy)
         }
         Spacer(Modifier.width(16.dp))
