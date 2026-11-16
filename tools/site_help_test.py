@@ -208,5 +208,34 @@ class HelpLocaleTest(unittest.TestCase):
                 self.assertIn(MARK_OPEN + sb.escape(key.split("{")[0]).replace("\u2019", "&rsquo;"), text, key)
 
 
+
+class WebsiteSearchTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.files = sb.Site("site").build()
+
+    def test_sitemap_lists_every_page_once_with_its_clean_address(self):
+        locs = re.findall(r"<loc>([^<]+)</loc>", self.files["sitemap.xml"].decode())
+        pages = [p for p in self.files if p.endswith(".html")]
+        self.assertEqual(len(pages), len(locs))
+        self.assertEqual(len(locs), len(set(locs)))
+        self.assertEqual(sb.SITE_URL, locs[0])
+        self.assertIn(sb.SITE_URL + "effects/", locs)
+        self.assertFalse([u for u in locs if u.endswith(".html") or not u.startswith(sb.SITE_URL)])
+        self.assertIn("Sitemap: %ssitemap.xml" % sb.SITE_URL, self.files["robots.txt"].decode())
+
+    def test_pages_carry_canonical_and_share_tags_and_home_has_app_data(self):
+        for path, url in (("index.html", sb.SITE_URL), ("getting-started.html", sb.SITE_URL + "getting-started"), ("effects/index.html", sb.SITE_URL + "effects/")):
+            html = self.files[path].decode()
+            self.assertIn('<link rel="canonical" href="%s">' % url, html)
+            self.assertIn('<meta property="og:url" content="%s">' % url, html)
+            self.assertIn('og:image" content="%sassets/og.png"' % sb.SITE_URL, html)
+        data = json.loads(re.search(r'<script type="application/ld\+json">(.*?)</script>', self.files["index.html"].decode()).group(1))
+        app = data["@graph"][1]
+        self.assertEqual(("SoftwareApplication", "0"), (app["@type"], app["offers"]["price"]))
+        self.assertNotIn("ld+json", self.files["getting-started.html"].decode())
+        self.assertIn("assets/og.png", self.files)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=1)
