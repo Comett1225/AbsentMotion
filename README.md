@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="fastlane/metadata/android/en-US/images/icon.png" alt="AbsentMotion" width="128" height="128">
+  <img src="docs/logo.png" alt="AbsentMotion" width="128" height="128">
 </p>
 
 # AbsentMotion

@@ -368,12 +368,9 @@ private fun SheetBody(form: Form, settings: AppSettings, card: Boolean, onClose:
             Spacer(Modifier.height(32.dp))
             return@Column
         }
-        Row(Modifier.padding(horizontal = 32.dp).fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            Box(Modifier.height(48.dp).clickable(onClick = onCreate), contentAlignment = Alignment.Center) {
-                Text(stringResource(if (form.element) R.string.newproject_create_asset else R.string.newproject_create_project), color = Ink, fontSize = 15.sp, fontWeight = FontWeight.Medium)
-            }
-        }
-        Spacer(Modifier.height(52.dp))
+        Spacer(Modifier.height(12.dp))
+        AccentPill(stringResource(if (form.element) R.string.newproject_create_asset else R.string.newproject_create_project), Modifier.padding(horizontal = 32.dp).fillMaxWidth(), onClick = onCreate)
+        Spacer(Modifier.height(28.dp))
         Box(
             Modifier.align(Alignment.CenterHorizontally).size(60.dp).clickable(onClick = onClose),
             contentAlignment = Alignment.Center,
