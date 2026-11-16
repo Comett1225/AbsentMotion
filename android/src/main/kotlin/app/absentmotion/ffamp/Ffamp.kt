@@ -145,7 +145,7 @@ internal class FfampExtractor(private val source: FfampSource) : Demuxer {
 
     private val valid: Boolean get() = table?.let { at < it.count } == true
     override val sampleTime: Long get() = if (valid) table!!.pts[at] else -1L
-    override val sampleSize: Long get() = if (valid) table!!.sizes[at].toLong() else -1L
+    override val hasSample: Boolean get() = valid
     override val sampleFlags: Int get() = if (valid) (if (table!!.syncs[at]) MediaExtractor.SAMPLE_FLAG_SYNC else 0) else -1
 
     override fun advance(): Boolean {

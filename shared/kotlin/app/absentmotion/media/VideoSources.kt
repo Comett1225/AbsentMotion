@@ -31,7 +31,7 @@ internal object VideoSources {
             extractor.selectTrack(track)
             val samples = Stamps()
             val syncs = Stamps()
-            while (if (android.os.Build.VERSION.SDK_INT >= 28) extractor.sampleSize >= 0 else extractor.sampleTime >= 0) {
+            while (extractor.hasSample) {
                 val time = extractor.sampleTime
                 if (time >= 0) {
                     if (samples.count >= MAX_SAMPLES) throw IllegalStateException(AppText.get(R.string.media_error_too_many_frames))

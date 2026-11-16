@@ -14,7 +14,7 @@ import java.nio.ByteBuffer
 internal interface Demuxer {
     val trackCount: Int
     val sampleTime: Long
-    val sampleSize: Long
+    val hasSample: Boolean
     val sampleFlags: Int
     fun getTrackFormat(index: Int): MediaFormat
     fun selectTrack(index: Int)
@@ -73,7 +73,7 @@ internal fun openGrabber(context: Context, uri: Uri): FrameGrabber = ffampOrSyst
 private class SystemDemuxer(private val extractor: MediaExtractor) : Demuxer {
     override val trackCount get() = extractor.trackCount
     override val sampleTime get() = extractor.sampleTime
-    override val sampleSize get() = extractor.sampleSize
+    override val hasSample get() = if (android.os.Build.VERSION.SDK_INT >= 28) extractor.sampleSize >= 0 else extractor.sampleTime >= 0
     override val sampleFlags get() = extractor.sampleFlags
     override fun getTrackFormat(index: Int): MediaFormat = extractor.getTrackFormat(index)
     override fun selectTrack(index: Int) = extractor.selectTrack(index)
