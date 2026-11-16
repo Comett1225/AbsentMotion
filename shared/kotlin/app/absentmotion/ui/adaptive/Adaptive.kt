@@ -51,13 +51,18 @@ private val CardMaxHeight = 800.dp
 
 @Composable
 fun AdaptiveWindow(content: @Composable () -> Unit) {
+    AdaptiveWindow(CardMaxWidth, CardMaxHeight, content = content)
+}
+
+@Composable
+fun AdaptiveWindow(maxCardWidth: Dp, maxCardHeight: Dp, heightRatio: Float? = null, corner: Dp = 16.dp, content: @Composable () -> Unit) {
     BoxWithConstraints(
         Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.6f)).pointerInput(Unit) { detectTapGestures { } }.systemBarsPadding().padding(24.dp),
         contentAlignment = Alignment.Center,
     ) {
-        val width = minOf(maxWidth, CardMaxWidth)
-        val height = minOf(maxHeight, CardMaxHeight)
-        Box(Modifier.size(width, height).shadow(24.dp, RoundedCornerShape(16.dp)).clip(RoundedCornerShape(16.dp))) {
+        val width = minOf(maxWidth, maxCardWidth)
+        val height = minOf(maxHeight, maxCardHeight, heightRatio?.let { width * it } ?: maxCardHeight)
+        Box(Modifier.size(width, height).shadow(24.dp, RoundedCornerShape(corner)).clip(RoundedCornerShape(corner))) {
             CompositionLocalProvider(LocalWide provides false, LocalAdaptiveSpace provides AdaptiveSpace(width, height)) { content() }
         }
     }

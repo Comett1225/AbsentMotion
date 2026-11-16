@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.heightIn
@@ -103,6 +104,11 @@ import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.editor.panels.ThinSwitch
 import app.absentmotion.R
 import app.absentmotion.i18n.currentLanguage
+import app.absentmotion.ui.adaptive.AdaptiveSections
+import app.absentmotion.ui.adaptive.AdaptiveSpace
+import app.absentmotion.ui.adaptive.LocalAdaptiveSpace
+import app.absentmotion.ui.adaptive.WideFrom
+import androidx.compose.runtime.CompositionLocalProvider
 import app.absentmotion.ui.onboarding.LanguageDialog
 import androidx.compose.ui.res.stringResource
 
@@ -123,43 +129,54 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
     var language by remember { mutableStateOf(false) }
     var demoNote by remember { mutableStateOf(false) }
     var whatsNew by remember { mutableStateOf(false) }
-    ModalDrawerSheet(
-        drawer, Modifier.width(280.dp), drawerShape = RectangleShape, drawerContainerColor = Am.HomeDrawer,
-        windowInsets = WindowInsets(0),
-    ) {
-        Column(Modifier.fillMaxSize().background(Am.Card).windowInsetsPadding(WindowInsets.statusBars.union(WindowInsets.captionBar)).verticalScroll(rememberScrollState()).navigationBarsPadding().padding(bottom = 8.dp)) {
-            Text(
-                stringResource(R.string.settings), Modifier.fillMaxWidth().heightIn(min = 50.dp).wrapContentHeight(Alignment.CenterVertically).padding(start = 11.dp),
-                color = Am.HomeInk, fontSize = 18.sp, fontWeight = FontWeight.Bold,
-            )
-            AppCard(settings) { whatsNew = true }
-            Spacer(Modifier.height(CardGap))
-            Category(R.string.settings_group_editor, HomeIcons.Pencil) { EditorSettings(settings) }
-            Category(R.string.settings_group_playback, HomeIcons.ProjectsTabOff) { PlaybackSettings(settings) }
-            Category(R.string.settings_group_projects, HomeIcons.Folder) { ProjectsSettings(settings) { demoNote = it } }
-            Category(R.string.settings_group_backup, ChromeIcons.SavePreset) {
-                BackupRows(settings, onRestored)
+    BoxWithConstraints {
+        val wide = maxWidth > maxHeight && maxWidth - 56.dp >= WideFrom
+        val panelWidth = if (wide) minOf(maxWidth - 56.dp, 1100.dp) else 280.dp
+        val panelHeight = maxHeight
+        ModalDrawerSheet(
+            drawer, Modifier.width(panelWidth), drawerShape = RectangleShape, drawerContainerColor = Am.HomeDrawer,
+            windowInsets = WindowInsets(0),
+        ) {
+            Column(Modifier.fillMaxSize().background(Am.Card).windowInsetsPadding(WindowInsets.statusBars.union(WindowInsets.captionBar)).verticalScroll(rememberScrollState()).navigationBarsPadding().padding(bottom = 8.dp)) {
+                Text(
+                    stringResource(R.string.settings), Modifier.fillMaxWidth().heightIn(min = 50.dp).wrapContentHeight(Alignment.CenterVertically).padding(start = 11.dp),
+                    color = Am.HomeInk, fontSize = 18.sp, fontWeight = FontWeight.Bold,
+                )
+                CompositionLocalProvider(LocalAdaptiveSpace provides if (wide) AdaptiveSpace(panelWidth, panelHeight) else null) {
+                    AdaptiveSections(listOf({
+                        AppCard(settings) { whatsNew = true }
+                        Spacer(Modifier.height(CardGap))
+                        Category(R.string.settings_group_editor, HomeIcons.Pencil) { EditorSettings(settings) }
+                        Category(R.string.settings_group_playback, HomeIcons.ProjectsTabOff) { PlaybackSettings(settings) }
+                    }, {
+                        Category(R.string.settings_group_projects, HomeIcons.Folder) { ProjectsSettings(settings) { demoNote = it } }
+                        Category(R.string.settings_group_backup, ChromeIcons.SavePreset) {
+                            BackupRows(settings, onRestored)
+                        }
+                        LinkRow(stringResource(R.string.settings_language), currentLanguage(LocalContext.current).nativeName) { language = true }
+                        Spacer(Modifier.height(CardGap))
+                    }, {
+                        LinkRow(stringResource(R.string.settings_help)) { help = true }
+                        Spacer(Modifier.height(CardGap))
+                        app.absentmotion.ui.tutorial.TutorialRows(settings)
+                        Spacer(Modifier.height(CardGap))
+                        LinkRow(stringResource(R.string.settings_about)) { about = true }
+                        Spacer(Modifier.height(CardGap))
+                        val links = LocalUriHandler.current
+                        val found = rememberReportLinks()
+                        Row(Modifier.padding(horizontal = 6.dp).fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Pill(stringResource(R.string.settings_report_issue), PanelColor, Am.HomeInk, Modifier.weight(1f).fillMaxHeight(), pad = 8.dp) { runCatching { links.openUri(found.form) } }
+                            Pill(stringResource(R.string.settings_suggest_feature), PanelColor, Am.HomeInk, Modifier.weight(1f).fillMaxHeight(), pad = 8.dp) { runCatching { links.openUri(found.feature) } }
+                        }
+                        Text(
+                            stringResource(R.string.join_discord),
+                            Modifier.padding(horizontal = 6.dp).clickable { runCatching { links.openUri(found.discord) } }.padding(horizontal = 15.dp, vertical = 10.dp),
+                            color = Am.HomeInk, fontSize = 13.sp, textDecoration = TextDecoration.Underline,
+                        )
+                        LinkRow(stringResource(R.string.crash_logs)) { crashLogs = true }
+                    }))
+                }
             }
-            LinkRow(stringResource(R.string.settings_language), currentLanguage(LocalContext.current).nativeName) { language = true }
-            Spacer(Modifier.height(CardGap))
-            LinkRow(stringResource(R.string.settings_help)) { help = true }
-            Spacer(Modifier.height(CardGap))
-            app.absentmotion.ui.tutorial.TutorialRows(settings)
-            Spacer(Modifier.height(CardGap))
-            LinkRow(stringResource(R.string.settings_about)) { about = true }
-            Spacer(Modifier.height(CardGap))
-            val links = LocalUriHandler.current
-            val found = rememberReportLinks()
-            Row(Modifier.padding(horizontal = 6.dp).fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Pill(stringResource(R.string.settings_report_issue), PanelColor, Am.HomeInk, Modifier.weight(1f).fillMaxHeight(), pad = 8.dp) { runCatching { links.openUri(found.form) } }
-                Pill(stringResource(R.string.settings_suggest_feature), PanelColor, Am.HomeInk, Modifier.weight(1f).fillMaxHeight(), pad = 8.dp) { runCatching { links.openUri(found.feature) } }
-            }
-            Text(
-                stringResource(R.string.join_discord),
-                Modifier.padding(horizontal = 6.dp).clickable { runCatching { links.openUri(found.discord) } }.padding(horizontal = 15.dp, vertical = 10.dp),
-                color = Am.HomeInk, fontSize = 13.sp, textDecoration = TextDecoration.Underline,
-            )
-            LinkRow(stringResource(R.string.crash_logs)) { crashLogs = true }
         }
     }
     if (language) LanguageDialog { language = false }
