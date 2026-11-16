@@ -457,7 +457,7 @@ class Site:
             '<title>%s</title><meta name="description" content="%s"><meta name="color-scheme" content="light dark">'
             '%s%s%s</head>'
             '<body class="%s" data-page="%s">%s%s<div class="wrap">%s<main id="main">%s</main></div>%s</body></html>\n'
-        ) % (html, escape(title), escape(description), '<link rel="icon" type="image/png" href="%sassets/logo.png">' % base if site else "", style, script, "site" if site else "app", kind, '<a class="skip" href="#main">Skip to the content</a>' if site else "", top, side, body, foot)
+        ) % (html, escape(title), escape(description), '<link rel="icon" href="%sfavicon.ico" sizes="16x16 32x32 48x48"><link rel="icon" type="image/png" sizes="192x192" href="%sassets/icon-192.png"><link rel="apple-touch-icon" href="%sapple-touch-icon.png">' % (base, base, base) if site else "", style, script, "site" if site else "app", kind, '<a class="skip" href="#main">Skip to the content</a>' if site else "", top, side, body, foot)
 
     def add(self, path, text):
         if self.target == "site" and path.endswith(".html"):
@@ -730,8 +730,10 @@ class Site:
         return label, rng, value
 
     def add_site_assets(self):
-        for name in ("site.css", "site.js", "logo.png"):
+        for name in ("site.css", "site.js", "logo.png", "icon-192.png"):
             self.files["assets/" + name] = (SITE / "assets" / name).read_bytes()
+        for name in ("favicon.ico", "apple-touch-icon.png"):
+            self.files[name] = (SITE / "assets" / name).read_bytes()
         for url in self.images:
             self.files["assets/" + url] = (SITE / "assets" / url).read_bytes()
         for thumb in sorted((EFFECTS / "thumb").glob("*.webp")):
