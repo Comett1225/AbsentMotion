@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
@@ -116,7 +115,7 @@ class DeskAdaptiveWindowsTest {
                     val content: @Composable () -> Unit = {
                         val current = LocalAdaptiveSpace.current
                         SideEffect { space = current }
-                        Box(Modifier.fillMaxWidth().then(if (mode >= 3) Modifier.height(96.dp) else Modifier.fillMaxSize()).testTag("content").focusable()) { Text("AbsentMotion", color = Am.OnDark) }
+                        Box(Modifier.fillMaxWidth().then(if (mode >= 3) Modifier.height(96.dp) else Modifier.fillMaxSize()).testTag("content").focusable())
                     }
                     when (mode) {
                         0 -> DeskDialog("AbsentMotion", onDismiss = { closes++ }, onConfirm = { enters++ }, content = content)

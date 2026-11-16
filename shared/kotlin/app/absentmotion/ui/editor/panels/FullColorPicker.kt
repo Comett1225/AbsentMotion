@@ -229,7 +229,7 @@ private fun Wheel(hsva: Hsva, start: Int, argb: Int, onChange: (Hsva) -> Unit, o
             val degrees = Math.toDegrees(atan2(p.y - WHEEL / 2 * u, p.x - WHEEL / 2 * u).toDouble()).toFloat()
             onChange(hsva.copy(h = (degrees + 360f) % 360f))
         }
-        Text("${hsva.h.roundToInt() % 360}°", Modifier.offset(0.dp, 189.px).fillMaxWidth().height(80.px), color = Am.OnDark, fontSize = 30.sp, textAlign = TextAlign.Center)
+        Text("${hsva.h.roundToInt() % 360}°", Modifier.offset(0.dp, 189.px).fillMaxWidth(), color = Am.OnDark, fontSize = 30.sp, textAlign = TextAlign.Center)
         Box(Modifier.offset(((WHEEL - 197) / 2).px, 405.px)) { ColourCard(start, argb, 197.px, 141.px, onSave) }
         Box(Modifier.offset(0.dp, 560.px)) { HexText(argb, onHex) }
     }
