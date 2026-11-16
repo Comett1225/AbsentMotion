@@ -67,10 +67,10 @@ fun CrashLogsScreen(onClose: () -> Unit) {
             DialogStatusBarIcons(darkIcons = Am.Card.luminance() > 0.5f)
             Box(Modifier.fillMaxSize().background(Am.SheetBg)) {
                 val shown = open
-                if (LocalAdaptiveSpace.current?.wide == true) {
+                if (LocalAdaptiveSpace.current?.wide == true && shown != null) {
                     Row(Modifier.fillMaxSize()) {
                         Box(Modifier.weight(0.42f).fillMaxSize()) { CrashList(onClose) { open = it } }
-                        Box(Modifier.weight(0.58f).fillMaxSize()) { if (shown != null) CrashDetails(shown) { open = null } }
+                        Box(Modifier.weight(0.58f).fillMaxSize()) { CrashDetails(shown) { open = null } }
                     }
                 } else if (shown == null) CrashList(onClose) { open = it } else CrashDetails(shown) { open = null }
             }
