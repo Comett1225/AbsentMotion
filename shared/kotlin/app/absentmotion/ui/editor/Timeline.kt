@@ -872,12 +872,70 @@ private class TimelineView(val state: EditorState, density: Density, private val
         }
     }
 
+    private var rubberTime = 0f
+    private var rubberY = 0f
+    private var rubberAt: Offset? = null
+    private var rubberJob: Job? = null
+
+    fun rubberStart(at: Offset) {
+        rubberTime = timeScale().time(at.x)
+        rubberY = at.y + scroll
+    }
+
+    fun rubberTo(at: Offset) {
+        rubberAt = at
+        rubberRefresh()
+        if (rubberJob?.isActive != true) rubberJob = scope.launch { rubberLoop() }
+    }
+
+    fun rubberEnd() {
+        rubberAt = null
+        rubber = null
+    }
+
+    fun rubberRefresh() {
+        val at = rubberAt ?: return
+        val time = timeScale()
+        val x = at.x.coerceIn(headerWidth, size.width.toFloat().coerceAtLeast(headerWidth))
+        val y = at.y.coerceIn(rulerH, rowsBottom.coerceAtLeast(rulerH))
+        val startX = time.x(rubberTime)
+        val startY = rubberY - scroll
+        val rect = Rect(min(startX, x), min(startY, y), max(startX, x), max(startY, y))
+        rubberSelect(rect)
+        rubber = rect.intersect(Rect(headerWidth, rulerH, size.width.toFloat(), rowsBottom))
+    }
+
+    private suspend fun rubberLoop() {
+        var last = withFrameNanos { it }
+        while (true) {
+            val now = withFrameNanos { it }
+            val step = min((now - last) / 1e9f, 0.05f)
+            last = now
+            val at = rubberAt ?: break
+            val zone = 32.dp.px
+            val down = when {
+                at.y > rowsBottom - zone -> (at.y - (rowsBottom - zone)) / zone
+                at.y < rulerH + zone -> -(rulerH + zone - at.y) / zone
+                else -> 0f
+            }.coerceIn(-1.5f, 1.5f)
+            val right = when {
+                at.x > size.width - zone -> (at.x - (size.width - zone)) / zone
+                at.x < headerWidth + zone -> -(headerWidth + zone - at.x) / zone
+                else -> 0f
+            }.coerceIn(-1.5f, 1.5f)
+            if (down == 0f && right == 0f) break
+            if (down != 0f) scrollBy(-down * 600.dp.px * step)
+            if (right != 0f) pan(right * 700.dp.px * step)
+            rubberRefresh()
+        }
+    }
+
     fun rubberSelect(rect: Rect) {
         val time = timeScale()
-        val ids = visibleRows().mapNotNull { row ->
+        val ids = layers.indices.mapNotNull { row ->
             val layer = layerAt(row) ?: return@mapNotNull null
             val clip = Rect(time.x(layer.startTime.toFloat()), rowTop(row), time.x(layer.endTime + 1f), rowTop(row) + rowH)
-            layer.id.takeIf { clip.overlaps(rect) && clip.right > headerWidth }
+            layer.id.takeIf { clip.overlaps(rect) }
         }.toSet()
         state.deselectLayer()
         MultiSelect.ids = ids
@@ -1537,6 +1595,7 @@ private suspend fun PointerInputScope.desktopTimelineGestures(view: TimelineView
             when (event.type) {
                 PointerEventType.Scroll -> {
                     view.wheel(change.scrollDelta, at, modifiers.isCtrlPressed || modifiers.isMetaPressed, modifiers.isShiftPressed)
+                    if (rubbering) view.rubberRefresh()
                     if (down == null) view.hover(at)
                     change.consume()
                     continue
@@ -1601,9 +1660,10 @@ private suspend fun PointerInputScope.desktopTimelineGestures(view: TimelineView
                         if (plain && view.lift(h.id, at, 4.dp.toPx(), false)) drag = Drag.Lift
                     }
                     Hit.Ruler -> { view.state.transitionButtonDismissed = false; view.seek(at.x) }
+                    Hit.Empty, is Hit.Row -> view.rubberStart(at)
                     else -> Unit
                 }
-                view.cancelAction = { view.endDrag(drag, Velocity.Zero, false); view.rubber = null; drag = null }
+                view.cancelAction = { view.endDrag(drag, Velocity.Zero, false); view.rubberEnd(); drag = null }
                 change.consume()
                 continue
             }
@@ -1623,9 +1683,7 @@ private suspend fun PointerInputScope.desktopTimelineGestures(view: TimelineView
                     hit == Hit.Ruler || hit == Hit.Readout && moved -> view.seek(at.x)
                     moved && (hit == Hit.Empty || hit is Hit.Row) -> {
                         rubbering = true
-                        val rect = Rect(min(start.x, at.x), min(start.y, at.y), max(start.x, at.x), max(start.y, at.y))
-                        view.rubber = rect
-                        view.rubberSelect(rect)
+                        view.rubberTo(at)
                     }
                 }
                 previous = at
@@ -1663,7 +1721,8 @@ private suspend fun PointerInputScope.desktopTimelineGestures(view: TimelineView
                     else -> Unit
                 }
                 view.endDrag(drag, Velocity.Zero, true)
-                view.rubber = null
+                view.rubberEnd()
+                rubbering = false
                 view.desktopDragging = false
                 view.resizingHeader = false
                 view.cancelAction = null

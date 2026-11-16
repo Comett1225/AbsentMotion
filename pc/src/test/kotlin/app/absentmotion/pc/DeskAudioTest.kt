@@ -9,7 +9,6 @@ import app.absentmotion.audio.AudioEngine
 import app.absentmotion.audio.DeskOutput
 import app.absentmotion.audio.PcmDecoder
 import app.absentmotion.audio.Waveforms
-import app.absentmotion.audio.downmixGains
 import app.absentmotion.desk.DeskMedia
 import app.absentmotion.desk.DeskSounds
 import app.absentmotion.model.Scene
@@ -92,13 +91,21 @@ class DeskAudioTest {
         println("seek lag samples=$lag")
         assertEquals(0, lag)
         val (down, _) = decodeAll(surround)
-        val six = floats("-i", surround.path)
-        val gains = downmixGains(6, 0)
-        for (f in 0 until six.size / 6 step 97) {
-            var l = 0f; var r = 0f
-            for (c in 0 until 6) { l += gains[2 * c] * six[6 * f + c] * 32767f; r += gains[2 * c + 1] * six[6 * f + c] * 32767f }
-            assertEquals(l.toInt(), down[2 * f].toInt()); assertEquals(r.toInt(), down[2 * f + 1].toInt())
+        val stereo = floats("-i", surround.path, "-ac", "2")
+        for (f in 0 until stereo.size / 2 step 97) {
+            assertEquals((stereo[2 * f] * 32767f).toInt().toDouble(), down[2 * f].toDouble(), 1.0)
+            assertEquals((stereo[2 * f + 1] * 32767f).toInt().toDouble(), down[2 * f + 1].toDouble(), 1.0)
         }
+    }
+
+    @Test fun sixPointOneBackCentreAndSidesReachTheRightSpeakers() {
+        fun level(pcm: ShortArray, side: Int) = kotlin.math.sqrt((side until pcm.size step 2).sumOf { pcm[it].toDouble() * pcm[it] } / (pcm.size / 2))
+        val (back, _) = decodeAll(tone("back61.flac", "0|0|0|0|0.3*sin(2*PI*440*t)|0|0:c=6.1", 48000, 1.0))
+        val (left, _) = decodeAll(tone("side61.flac", "0|0|0|0|0|0.3*sin(2*PI*440*t)|0:c=6.1", 48000, 1.0))
+        println("6.1 back centre L=%.0f R=%.0f, side left L=%.0f R=%.0f".format(level(back, 0), level(back, 1), level(left, 0), level(left, 1)))
+        assertTrue(level(back, 0) > 1000)
+        assertEquals(1.0, level(back, 0) / level(back, 1), 0.02)
+        assertTrue(level(left, 0) > 1000 && level(left, 1) < level(left, 0) / 100)
     }
 
     private fun soundAt(file: File, seekUs: Long): Pair<Long, Long> {

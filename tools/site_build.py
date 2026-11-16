@@ -22,6 +22,7 @@ EFFECT_NAMES = EFFECTS / "i18n"
 LANGUAGES_KT = ROOT / "android/src/main/kotlin/app/absentmotion/i18n/AppLanguage.kt"
 RTL = {"ar", "fa", "ur"}
 REPO = "https://github.com/Comett1225/AbsentMotion"
+SITE_URL = "https://absentmotion.com/"
 OWNER = REPO.split("/")[3].lower()
 SHORT = {
     "repo": REPO,
@@ -451,13 +452,43 @@ class Site:
         script = '<script src="%sassets/site.js" defer></script>' % base if site else ""
         shared = "../" * (depth + self.up)
         html = '<html lang="%s" dir="%s">' % (self.locale.tag, "rtl" if self.rtl else "ltr") if self.locale else '<html lang="en">'
+        meta = ""
+        if site:
+            url = page_url(path)
+            meta = (
+                '<link rel="icon" href="%sfavicon.ico" sizes="16x16 32x32 48x48"><link rel="icon" type="image/png" sizes="192x192" href="%sassets/icon-192.png"><link rel="apple-touch-icon" href="%sapple-touch-icon.png">'
+                '<link rel="canonical" href="%s"><meta property="og:type" content="website"><meta property="og:site_name" content="AbsentMotion">'
+                '<meta property="og:title" content="%s"><meta property="og:description" content="%s"><meta property="og:url" content="%s">'
+                '<meta property="og:image" content="%sassets/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">'
+                '<meta property="og:image:alt" content="AbsentMotion"><meta name="twitter:card" content="summary_large_image">'
+                '<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#1c1e24" media="(prefers-color-scheme: dark)">'
+            ) % (base, base, base, url, escape(title), escape(description), url, SITE_URL)
+            if kind == "download":
+                meta += '<script type="application/ld+json">%s</script>' % self.app_data(description)
         style = '<link rel="stylesheet" href="%sassets/site.css">' % shared + ('<link rel="stylesheet" href="%sassets/rtl.css">' % shared if self.rtl else "")
         return (
             '<!doctype html>\n%s<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
             '<title>%s</title><meta name="description" content="%s"><meta name="color-scheme" content="light dark">'
             '%s%s%s</head>'
             '<body class="%s" data-page="%s">%s%s<div class="wrap">%s<main id="main">%s</main></div>%s</body></html>\n'
-        ) % (html, escape(title), escape(description), '<link rel="icon" href="%sfavicon.ico" sizes="16x16 32x32 48x48"><link rel="icon" type="image/png" sizes="192x192" href="%sassets/icon-192.png"><link rel="apple-touch-icon" href="%sapple-touch-icon.png">' % (base, base, base) if site else "", style, script, "site" if site else "app", kind, '<a class="skip" href="#main">Skip to the content</a>' if site else "", top, side, body, foot)
+        ) % (html, escape(title), escape(description), meta, style, script, "site" if site else "app", kind, '<a class="skip" href="#main">Skip to the content</a>' if site else "", top, side, body, foot)
+
+    def app_data(self, description):
+        data = {"@context": "https://schema.org", "@graph": [
+            {"@type": "WebSite", "name": "AbsentMotion", "url": SITE_URL},
+            {"@type": "SoftwareApplication", "name": "AbsentMotion", "url": SITE_URL, "description": description,
+             "applicationCategory": "MultimediaApplication", "applicationSubCategory": "Video editor",
+             "operatingSystem": "Android 8 or newer, macOS 11 or newer, Windows 10 and 11, Linux",
+             "softwareVersion": self.version, "downloadUrl": REPO + "/releases/latest", "image": SITE_URL + "assets/og.png",
+             "license": "https://www.gnu.org/licenses/gpl-3.0.html", "isAccessibleForFree": True,
+             "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}]}
+        return json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
+
+    def add_sitemap(self):
+        pages = sorted((p for p in self.files if p.endswith(".html")), key=lambda p: (p != "index.html", p))
+        self.files["sitemap.xml"] = ('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n%s</urlset>\n'
+                                     % "".join("<url><loc>%s</loc></url>\n" % escape(page_url(p)) for p in pages)).encode()
+        self.files["robots.txt"] = ("User-agent: *\nAllow: /\n\nSitemap: %ssitemap.xml\n" % SITE_URL).encode()
 
     def add(self, path, text):
         if self.target == "site" and path.endswith(".html"):
@@ -470,6 +501,7 @@ class Site:
         self.render_effects()
         if self.target == "site":
             self.add_site_assets()
+            self.add_sitemap()
         elif not self.locale:
             self.add_app_assets()
         return self.files
@@ -506,7 +538,7 @@ class Site:
             parts.append(body)
         parts.append(self.pager(page.slug, depth))
         title = "AbsentMotion: free video editor for Android, Mac, Windows and Linux" if page.kind == "download" else page.title + " | AbsentMotion"
-        description = page.summary or "AbsentMotion, a free open-source motion graphics and video editor for Android."
+        description = page.summary or "AbsentMotion is a free and open source video editor for Android, Mac, Windows and Linux."
         self.add(path, self.shell(path, title, re.sub(r"[`*]|\]\([^)]*\)|\[", "", description), "".join(parts), page.slug, page.kind, page.kind not in ("download",)))
 
     def toc(self, depth):
@@ -730,7 +762,7 @@ class Site:
         return label, rng, value
 
     def add_site_assets(self):
-        for name in ("site.css", "site.js", "logo.png", "icon-192.png"):
+        for name in ("site.css", "site.js", "logo.png", "icon-192.png", "og.png"):
             self.files["assets/" + name] = (SITE / "assets" / name).read_bytes()
         for name in ("favicon.ico", "apple-touch-icon.png"):
             self.files[name] = (SITE / "assets" / name).read_bytes()
@@ -794,6 +826,11 @@ def clean_link(ref):
     elif name.endswith(".html"):
         name = name[:-len(".html")]
     return name + mark + frag
+
+
+def page_url(path):
+    name = clean_link(path)
+    return SITE_URL + ("" if name == "./" else name)
 
 
 def clean_links(text):

@@ -61,6 +61,41 @@ class DeskTimelineTest {
 
     @Before @After fun resetHeader() { DeskTimelineControls.headerDp = 180f }
 
+    @Test fun boxSelectionKeepsItsStartRowWhileTheTimelineScrolls() {
+        System.setProperty("am.data", File("build/timeline-data-box").absolutePath)
+        val app = DeskAppState()
+        val shapes = (1..40).joinToString("") { """<shape id="${9000 + it}" label="S$it" startTime="0" endTime="999" fillType="color" mediaFillMode="fill" s=".rect"><fillColor value="#ff1d6bd6" /></shape>""" }
+        val id = app.store.create(Scene.parse("""<?xml version='1.0' encoding='UTF-8' ?><scene title="Many" width="1080" height="1920" totalTime="2999" fps="30" bgcolor="#ff000000">$shapes</scene>"""))
+        val state = runBlocking { app.openNow(id)!! }
+        val top = state.scene.layers.last().id
+        runSkikoComposeUiTest(size = Size(1280f, 360f)) {
+            setContent {
+                CompositionLocalProvider(LocalWide provides true) {
+                    Box(Modifier.fillMaxSize().background(Am.TimelineBg)) { Timeline(state, Modifier.fillMaxSize()) }
+                }
+            }
+            waitForIdle()
+            runOnIdle { state.clearForTest() }
+            onRoot().performMouseInput { moveTo(Offset(1100f, 52f)); press(); moveTo(Offset(220f, 200f)) }
+            waitForIdle()
+            val first = MultiSelect.ids.toSet()
+            assertTrue("first box $first", top in first && first.size in 3..10)
+            onRoot().performMouseInput { scroll(8f); moveTo(Offset(221f, 200f)) }
+            waitForIdle()
+            val wheeled = MultiSelect.ids.toSet()
+            assertTrue("after the wheel $wheeled", top in wheeled && wheeled.containsAll(first) && wheeled.size > first.size)
+            mainClock.autoAdvance = false
+            onRoot().performMouseInput { moveTo(Offset(221f, 355f)) }
+            mainClock.advanceTimeBy(1500)
+            onRoot().performMouseInput { release() }
+            mainClock.autoAdvance = true
+            waitForIdle()
+            val edged = MultiSelect.ids.toSet()
+            assertTrue("after the edge ${edged.size}", top in edged && edged.size > wheeled.size)
+            runOnIdle { state.clearForTest() }
+        }
+    }
+
     @Test fun mouseEditingAndScreenshots() {
         for (width in listOf(1280, 2560)) {
             System.setProperty("am.data", File("build/timeline-data-$width").absolutePath)
