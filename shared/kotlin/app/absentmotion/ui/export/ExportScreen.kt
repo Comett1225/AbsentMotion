@@ -600,6 +600,8 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
     val info: @Composable () -> Unit = { InfoBlock(free, estimate, timeMs, calculating, storage) }
     val naming: @Composable (ExportKind) -> Unit = { FileNameField(exportName, it) }
     val card = !DESK && app.absentmotion.ui.editor.isTablet(androidx.compose.ui.platform.LocalConfiguration.current.smallestScreenWidthDp)
+    val cfg = androidx.compose.ui.platform.LocalConfiguration.current
+    val twoPane = card && cfg.screenWidthDp > cfg.screenHeightDp && cfg.screenWidthDp - 48 >= app.absentmotion.ui.adaptive.WideFrom.value
     val bar: @Composable () -> Unit = { ExportBar(enabled = phase == Phase.Idle, blocked = blocked, pill = card, onClick = ::start) }
 
     androidx.compose.runtime.CompositionLocalProvider(LocalRiskAsk provides askRisk) {
@@ -610,14 +612,13 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
         phase, progress, heat.level, note, { (phase as? Phase.Running)?.job?.cancel() }, { phase = Phase.Idle }, { (phase as? Phase.Done)?.let { share(context, it) } }, ::start, onClose,
     ) else Box(
         if (card) Modifier.fillMaxSize().background(Scrim).pointerInput(Unit) {}.windowInsetsPadding(WindowInsets.systemBars.union(WindowInsets.ime)).padding(24.dp).wrapContentSize()
-            .widthIn(max = 520.dp).heightIn(max = 760.dp).enterFade(12.dp).clip(RoundedCornerShape(18.dp)).background(Am.SheetBg)
+            .widthIn(max = if (twoPane) 980.dp else 520.dp).heightIn(max = 760.dp).enterFade(12.dp).clip(RoundedCornerShape(18.dp)).background(Am.SheetBg)
         else Modifier.fillMaxSize().background(Am.SheetBg).pointerInput(Unit) {}.enterFade(12.dp),
     ) {
-        Column(Modifier.align(Alignment.TopCenter).widthIn(max = SheetMaxWidth).fillMaxSize()) {
+        Column(Modifier.align(Alignment.TopCenter).widthIn(max = if (twoPane) Dp.Infinity else SheetMaxWidth).fillMaxSize()) {
             TitleBar(stringResource(R.string.export_title), ExportIcons.Close, stringResource(R.string.cancel)) { (phase as? Phase.Running)?.job?.cancel(); onClose() }
-            info()
-            ScrollArea(Modifier.weight(1f), Am.SheetBg, PaddingValues(15.dp), 10.dp) {
-                FileNameField(exportName, kind, options = false)
+            if (!twoPane) info()
+            val kindCards: @Composable ColumnScope.() -> Unit = {
                 kinds.forEachIndexed { i, k ->
                     val s = settings.getValue(k)
                     val silent = k == ExportKind.Audio && !hasAudio
@@ -632,8 +633,23 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
                     )
                 }
             }
-            TemplateToggle(asTemplate, { asTemplate = it }) { templateInfo = true }
-            bar()
+            if (twoPane) Row(Modifier.weight(1f).fillMaxWidth()) {
+                Column(Modifier.weight(0.4f).fillMaxHeight()) {
+                    info()
+                    ScrollArea(Modifier.weight(1f), Am.SheetBg, PaddingValues(15.dp), 10.dp) { FileNameField(exportName, kind, options = false) }
+                    TemplateToggle(asTemplate, { asTemplate = it }) { templateInfo = true }
+                    bar()
+                }
+                Box(Modifier.width(1.dp).fillMaxHeight().background(Line))
+                ScrollArea(Modifier.weight(0.6f).fillMaxHeight(), Am.SheetBg, PaddingValues(15.dp), 10.dp) { kindCards() }
+            } else {
+                ScrollArea(Modifier.weight(1f), Am.SheetBg, PaddingValues(15.dp), 10.dp) {
+                    FileNameField(exportName, kind, options = false)
+                    kindCards()
+                }
+                TemplateToggle(asTemplate, { asTemplate = it }) { templateInfo = true }
+                bar()
+            }
         }
 
         Presence(page == ExportKind.Video) {

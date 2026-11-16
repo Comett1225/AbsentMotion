@@ -88,7 +88,7 @@ internal fun StretchSheet(state: EditorState, ids: Set<Long>, onClose: () -> Uni
                     val note: @Composable () -> Unit = {
                     Text(stringResource(R.string.multi_stretch_note), Modifier.padding(vertical = 12.dp), color = Am.OnDark, fontSize = 13.sp, lineHeight = 17.sp)
                     }
-                    if (wide) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(24.dp), verticalAlignment = Alignment.CenterVertically) {
+                    if (wide) Row(Modifier.fillMaxWidth().padding(bottom = 12.dp), horizontalArrangement = Arrangement.spacedBy(24.dp), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) { controls() }
                         Column(Modifier.weight(1f)) { note() }
                     } else {
