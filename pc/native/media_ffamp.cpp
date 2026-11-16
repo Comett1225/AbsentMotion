@@ -350,11 +350,6 @@ JNIEXPORT jboolean JNICALL JNI(divxDecoder)(JNIEnv*, jobject) {
 JNIEXPORT jstring JNICALL JNI(encoders)(JNIEnv* e, jobject) {
     std::string text;
     for (const absent::EncoderInfo& info : absent::encoders()) text += info.name + "\n";
-#if defined(_WIN32)
-    text += "h264_mf\nhevc_mf\naac\n";
-#elif !defined(__APPLE__)
-    text += "libx264\nlibx265\naac\n";
-#endif
     return e->NewStringUTF(text.c_str());
 }
 
