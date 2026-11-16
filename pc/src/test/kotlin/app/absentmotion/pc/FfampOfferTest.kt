@@ -42,6 +42,8 @@ class FfampOfferTest {
                 assertEquals("keep", answer)
             }
         }
-        assertEquals(emptyList<Any>(), ffampSpeeds(true, "windows 11"))
+        assertEquals(listOf(5.0, 2.5, 1.3, 3.8), ffampSpeeds(true, "windows 11").map { it.times })
+        assertEquals(listOf(29.0, 13.0), ffampSpeeds(true, "linux").map { it.times })
+        assertEquals(emptyList<Any>(), ffampSpeeds(true, "freebsd"))
     }
 }

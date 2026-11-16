@@ -44,6 +44,8 @@ internal class FfampSpeed(@StringRes val task: Int, val times: Double)
 internal fun ffampSpeeds(desktop: Boolean = PlatformFeatures.desktop, os: String = System.getProperty("os.name").orEmpty().lowercase()): List<FfampSpeed> = when {
     !desktop -> listOf(FfampSpeed(R.string.ffamp_speed_open, 25.0), FfampSpeed(R.string.ffamp_speed_thumbnails, 2.4), FfampSpeed(R.string.ffamp_speed_sound, 1.2))
     "mac" in os -> listOf(FfampSpeed(R.string.ffamp_speed_open, 4.0), FfampSpeed(R.string.ffamp_speed_decode, 7.0), FfampSpeed(R.string.ffamp_speed_export, 1.7), FfampSpeed(R.string.ffamp_speed_tools, 2.8))
+    "windows" in os -> listOf(FfampSpeed(R.string.ffamp_speed_open, 5.0), FfampSpeed(R.string.ffamp_speed_thumbnails, 2.5), FfampSpeed(R.string.ffamp_speed_decode, 1.3), FfampSpeed(R.string.ffamp_speed_tools, 3.8))
+    "linux" in os -> listOf(FfampSpeed(R.string.ffamp_speed_open, 29.0), FfampSpeed(R.string.ffamp_speed_tools, 13.0))
     else -> emptyList()
 }
 
