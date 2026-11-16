@@ -6,19 +6,22 @@ import app.absentmotion.audio.MAX_GAIN
 import app.absentmotion.audio.mutes
 import app.absentmotion.model.Layer
 import app.absentmotion.model.MediaDeclaration
+import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.formatFloats
 
 fun EditorState.addAudio(media: MediaDeclaration) {
-    if (media.duration <= 0) return
-    val document = scene
-    val duration = (media.duration / 1000).toInt()
-    val id = Layer.newId()
-    val layer = Layer(XmlNode("audio", linkedMapOf("id" to "$id", "label" to media.title,
-        "startTime" to "${document.frameStart(frame)}", "endTime" to "${document.endTimeFor(frame, duration)}",
-        "src" to media.uri, "outTime" to "$duration", "mediaFillMode" to "fill")))
+    val layer = scene.audioLayer(media, frame) ?: return
     edit { it.add(layer, listOf(media)) }
-    selectedId = id; panel = EditorPanel.Tools; addOpen = false
+    selectedId = layer.id; panel = EditorPanel.Tools; addOpen = false
+}
+
+fun Scene.audioLayer(media: MediaDeclaration, frame: Int): Layer? {
+    if (media.duration <= 0) return null
+    val duration = (media.duration / 1000).toInt()
+    return Layer(XmlNode("audio", linkedMapOf("id" to "${Layer.newId()}", "label" to media.title,
+        "startTime" to "${frameStart(frame)}", "endTime" to "${endTimeFor(frame, duration)}",
+        "src" to media.uri, "outTime" to "$duration", "mediaFillMode" to "fill")))
 }
 
 fun Layer.extractedAudio(id: Long): Layer? {

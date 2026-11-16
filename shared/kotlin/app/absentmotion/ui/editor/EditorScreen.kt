@@ -169,6 +169,7 @@ internal fun EditorTools(state: EditorState, scope: kotlinx.coroutines.Coroutine
                 3 -> app.absentmotion.ui.home.TrimScreen { close() }
                 4 -> app.absentmotion.ui.home.ExtractAudioScreen { close() }
                 5 -> app.absentmotion.ui.home.GifScreen { close() }
+                6 -> state.customTool?.let { id -> app.absentmotion.tools.InstalledTools.find(context, id) }?.let { app.absentmotion.ui.home.CustomToolScreen(it, state) { close() } }
             }
         }
     }

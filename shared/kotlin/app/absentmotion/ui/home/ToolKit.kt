@@ -76,7 +76,7 @@ internal class ToolWork(private val scope: CoroutineScope, private val context: 
         private set
     val running: Boolean get() = step is ToolStep.Running
 
-    fun start(block: suspend (progress: (Float) -> Unit) -> Compressed) {
+    fun start(block: suspend (progress: (Float) -> Unit) -> Compressed?) {
         if (running) return
         step = ToolStep.Running(0)
         job = scope.launch {
@@ -85,7 +85,7 @@ internal class ToolWork(private val scope: CoroutineScope, private val context: 
                     val percent = (fraction * 100).toInt().coerceIn(0, 100)
                     if (step != ToolStep.Running(percent)) step = ToolStep.Running(percent)
                 }
-                step = ToolStep.Done(result, result.file.length())
+                step = if (result == null) ToolStep.Ready else ToolStep.Done(result, result.file.length())
             } catch (e: CancellationException) {
                 step = ToolStep.Ready
                 throw e
