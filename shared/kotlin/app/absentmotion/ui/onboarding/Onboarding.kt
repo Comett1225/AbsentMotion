@@ -361,6 +361,24 @@ fun LanguageDialog(onClose: () -> Unit) {
 private fun LanguageList(top: AppLanguage, chosen: AppLanguage, modifier: Modifier, onPick: (AppLanguage) -> Unit) {
     val ui = LocalConfiguration.current.locales[0] ?: Locale.ENGLISH
     val order = remember(top) { AppLanguage.suggestedOrder(top) }
+    val columns = app.absentmotion.ui.adaptive.LocalAdaptiveSpace.current?.columns ?: 1
+    if (columns > 1) {
+        androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
+            androidx.compose.foundation.lazy.grid.GridCells.Fixed(columns), modifier.fillMaxWidth().selectableGroup(),
+            contentPadding = PaddingValues(start = 24.dp, end = 24.dp, top = 14.dp, bottom = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp), horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            item(key = top.tag, span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) { LanguageRow(top, top == chosen, ui) { onPick(top) } }
+            item(key = "others", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
+                Text(
+                    stringResource(R.string.onboarding_language_others), Modifier.padding(start = 4.dp, end = 4.dp, top = 12.dp),
+                    color = Am.HomeMid, fontSize = 13.sp, fontWeight = FontWeight.Medium,
+                )
+            }
+            items(order.drop(1).size, key = { order.drop(1)[it].tag }) { i -> order.drop(1)[i].let { language -> LanguageRow(language, language == chosen, ui) { onPick(language) } } }
+        }
+        return
+    }
     LazyColumn(
         modifier.fillMaxWidth().selectableGroup(),
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 10.dp, bottom = 12.dp),

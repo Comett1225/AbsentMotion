@@ -199,12 +199,15 @@ fun PhoneScreen(fillWidth: Dp = 0.dp, onDismiss: () -> Unit = {}, title: String?
         }
         return
     }
-    Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.6f)).pointerInput(Unit) {}.systemBarsPadding().padding(24.dp), contentAlignment = Alignment.Center) {
-        BoxWithConstraints(Modifier.sizeIn(maxWidth = PhoneWidth * 1.2f, maxHeight = PhoneHeight * 1.2f), contentAlignment = Alignment.Center) {
-            val fit = minOf(maxWidth / PhoneWidth, maxHeight / PhoneHeight)
-            val density = LocalDensity.current
-            CompositionLocalProvider(LocalDensity provides Density(density.density * fit, density.fontScale), LocalWide provides false) {
-                Box(Modifier.requiredSize(PhoneWidth, PhoneHeight).clip(RoundedCornerShape(12.dp))) { content() }
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+        if (maxWidth > maxHeight) app.absentmotion.ui.adaptive.AdaptiveWindow(content)
+        else Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.6f)).pointerInput(Unit) {}.systemBarsPadding().padding(24.dp), contentAlignment = Alignment.Center) {
+            BoxWithConstraints(Modifier.sizeIn(maxWidth = PhoneWidth * 1.2f, maxHeight = PhoneHeight * 1.2f), contentAlignment = Alignment.Center) {
+                val fit = minOf(maxWidth / PhoneWidth, maxHeight / PhoneHeight)
+                val density = LocalDensity.current
+                CompositionLocalProvider(LocalDensity provides Density(density.density * fit, density.fontScale), LocalWide provides false) {
+                    Box(Modifier.requiredSize(PhoneWidth, PhoneHeight).clip(RoundedCornerShape(12.dp))) { content() }
+                }
             }
         }
     }

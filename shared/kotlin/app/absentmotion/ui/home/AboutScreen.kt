@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -83,13 +84,20 @@ private fun AboutPage(onClose: () -> Unit, onLicences: () -> Unit, onWhatsNew: (
     val version = appVersion()
     val context = LocalContext.current
     val notes = remember { WhatsNewNotes.currentName(context) }
+    val wide = app.absentmotion.ui.adaptive.LocalAdaptiveSpace.current?.wide == true
     Column(Modifier.fillMaxSize().navigationBarsPadding()) {
         TitleBar(stringResource(R.string.settings_about), HomeIcons.Close, stringResource(R.string.action_close), onClose)
-        Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)) {
+        Row(Modifier.weight(1f).fillMaxWidth()) {
+        Column(Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState()).padding(horizontal = if (wide) 28.dp else 16.dp)) {
             Spacer(Modifier.height(24.dp))
-            Text("AbsentMotion", color = Am.Navy, fontSize = 26.sp, fontWeight = FontWeight.Bold)
-            if (version.isNotEmpty()) Text(stringResource(if (Tier.compatible) R.string.about_version_compatible else R.string.about_version, version),
-                Modifier.padding(top = 2.dp), color = Am.HomeMid, fontSize = 14.sp)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text("AbsentMotion", color = Am.Navy, fontSize = 26.sp, fontWeight = FontWeight.Bold)
+                    if (version.isNotEmpty()) Text(stringResource(if (Tier.compatible) R.string.about_version_compatible else R.string.about_version, version),
+                        Modifier.padding(top = 2.dp), color = Am.HomeMid, fontSize = 14.sp)
+                }
+                if (!wide) app.absentmotion.ui.adaptive.AppLogo(64.dp, Modifier.padding(start = 12.dp))
+            }
             if (notes != null) Box(
                 Modifier.padding(top = 14.dp).heightIn(min = 44.dp).clip(RoundedCornerShape(50)).background(Am.Navy)
                     .clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = onWhatsNew).padding(horizontal = 20.dp, vertical = 10.dp),
@@ -122,6 +130,8 @@ private fun AboutPage(onClose: () -> Unit, onLicences: () -> Unit, onWhatsNew: (
             Spacer(Modifier.height(16.dp))
             Link(stringResource(R.string.about_website), WEBSITE)
             Spacer(Modifier.height(24.dp))
+        }
+        if (wide) Box(Modifier.weight(0.7f).fillMaxHeight(), Alignment.Center) { app.absentmotion.ui.adaptive.AppLogo(200.dp) }
         }
     }
 }
