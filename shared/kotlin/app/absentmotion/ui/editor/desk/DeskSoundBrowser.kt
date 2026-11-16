@@ -58,7 +58,7 @@ internal fun DeskSoundBrowser(state: EditorState, all: List<DeviceAudio>, previe
     fun change(next: SoundView) { view = next; state.settings.soundView = next }
     fun close() { preview.stop(); onClose() }
     androidx.compose.ui.window.Dialog(::close, androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, dismissOnBackPress = false, dismissOnClickOutside = false)) {
-    DeskDialog(stringResource(R.string.sounds_title), 960.dp, ::close, height = 640.dp) {
+    DeskDialog(stringResource(R.string.sounds_title), onDismiss = ::close) {
         Column(Modifier.fillMaxSize()) {
             Row(Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 10.dp), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
                 SearchField(search, { search = it }, Modifier.weight(1f).height(36.dp), hint = stringResource(R.string.audiotab_search_hint))

@@ -186,7 +186,7 @@ private fun SidePanels(state: EditorState, addLibrary: AddLibrary, textEdit: Boo
 fun PhoneScreen(fillWidth: Dp = 0.dp, onDismiss: () -> Unit = {}, title: String? = null, sheet: Boolean = false, onConfirm: (() -> Unit)? = null, plain: Boolean = false, content: @Composable () -> Unit) {
     if (app.absentmotion.platform.PlatformFeatures.desktop && LocalDeskEditor.current) {
         if (sheet) DeskSheetHost(onDismiss, content)
-        else DeskDialog(title, if (fillWidth == Dp.Infinity) Dp.Infinity else if (fillWidth > 0.dp) fillWidth else 480.dp, onDismiss, height = if (fillWidth == Dp.Infinity) Dp.Infinity else null, onConfirm = onConfirm, outside = fillWidth != Dp.Infinity, content = content)
+        else DeskDialog(title, if (fillWidth == Dp.Infinity) Dp.Infinity else null, onDismiss, height = if (fillWidth == Dp.Infinity) Dp.Infinity else null, onConfirm = onConfirm, outside = fillWidth != Dp.Infinity, content = content)
         return
     }
     if (!LocalWide.current && !(LocalTablet.current && !plain)) {

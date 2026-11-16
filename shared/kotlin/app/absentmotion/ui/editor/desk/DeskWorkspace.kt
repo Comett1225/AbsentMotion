@@ -197,9 +197,9 @@ private fun DeskWorkspaceBody(state: EditorState, onExit: () -> Unit, library: A
         app.absentmotion.platform.BackHandler(!both && state.drawing !is PointMode && (soloLibrary || soloInspector)) { if (soloInspector) soloInspector = false else soloLibrary = false }
         DeskDropGhost { rootOrigin }
         if (settings) DeskProject(state) { settings = false }
-        if (state.effectBrowserOpen) DeskDialog(null, 1200.dp, { state.effectBrowserOpen = false }, height = 960.dp) { app.absentmotion.ui.editor.effects.EffectBrowser(state) }
-        if (state.toolOpen != 0) DeskDialog(null, 760.dp, { state.toolOpen = 0 }, height = 900.dp) { app.absentmotion.ui.editor.EditorTools(state, app.absentmotion.ui.editor.LocalEditorScope.current) }
-        if (state.presetsOpen) DeskDialog(null, 800.dp, { state.presetsOpen = false }, height = 880.dp) { PresetScreen(state) }
+        if (state.effectBrowserOpen) DeskDialog(null, onDismiss = { state.effectBrowserOpen = false }) { app.absentmotion.ui.editor.effects.EffectBrowser(state) }
+        if (state.toolOpen != 0) DeskDialog(null, onDismiss = { state.toolOpen = 0 }) { app.absentmotion.ui.editor.EditorTools(state, app.absentmotion.ui.editor.LocalEditorScope.current) }
+        if (state.presetsOpen) DeskDialog(null, onDismiss = { state.presetsOpen = false }) { PresetScreen(state) }
         if (state.drawing != null && state.drawing !is PointMode) PhoneScreen(Dp.Infinity, onDismiss = { state.stepBack(); focus.clearFocus() }) { DrawingEditor(state) }
         DeskTemplateEmbed(state)
     }
@@ -368,7 +368,9 @@ private fun DeskInspector(state: EditorState, library: AddLibrary, modifier: Mod
             else -> DeskLayerArea(state, Modifier.weight(1f).fillMaxWidth())
         }
     }
-    if (textUi.browser) DeskDialog(null, 560.dp, { textUi.browser = false }, height = 640.dp) { TextFontBrowser(state, textUi) }
+    if (textUi.browser) androidx.compose.ui.window.Dialog({ textUi.browser = false }, androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, dismissOnBackPress = false, dismissOnClickOutside = false)) {
+        DeskDialog(stringResource(R.string.show_all_fonts), onDismiss = { textUi.browser = false }) { TextFontBrowser(state, textUi) }
+    }
 }
 
 @Composable

@@ -244,6 +244,15 @@ fun VersionHistory(
 
 @Composable
 private fun SquareDialog(style: HistoryStyle, wanted: Float, onDismiss: () -> Unit, content: @Composable ColumnScope.(Float) -> Unit) {
+    if (app.absentmotion.platform.PlatformFeatures.desktop && wanted > VersionPanel.CONFIRM_WIDTH) {
+        app.absentmotion.ui.editor.DeskDialog(null, onDismiss = onDismiss) {
+            BoxWithConstraints(Modifier.fillMaxSize().background(style.surface)) {
+                val width = maxWidth.value
+                Column(Modifier.fillMaxSize()) { content(width) }
+            }
+        }
+        return
+    }
     val dismiss by rememberUpdatedState(onDismiss)
     Dialog(onDismiss, DialogProperties(usePlatformDefaultWidth = false)) {
         BoxWithConstraints(Modifier.fillMaxWidth().pointerInput(Unit) { detectTapGestures { dismiss() } }, contentAlignment = Alignment.Center) {

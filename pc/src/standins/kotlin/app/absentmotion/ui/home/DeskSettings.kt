@@ -28,6 +28,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,6 +61,8 @@ import app.absentmotion.ui.editor.ChromeIcons
 import app.absentmotion.ui.editor.PanelIcons
 import app.absentmotion.ui.export.ExportIcons
 import app.absentmotion.ui.editor.SizedBox
+import app.absentmotion.ui.adaptive.AdaptiveSpace
+import app.absentmotion.ui.adaptive.LocalAdaptiveSpace
 import app.absentmotion.ui.editor.deskScrollbar
 import app.absentmotion.ui.editor.deskVerticalScroll
 import app.absentmotion.ui.theme.Am
@@ -91,7 +94,7 @@ private fun deskIcon(name: String, path: String): ImageVector = ImageVector.Buil
 internal fun DeskSettings(settings: AppSettings, initial: SettingsPage, onClose: () -> Unit, onRestored: () -> Unit) {
     var page by remember { mutableStateOf(initial) }
     val links = LocalUriHandler.current
-    DeskModal(onClose, 900.dp, height = 660.dp) {
+    DeskModal(onClose) {
         DeskDialogHeader(stringResource(R.string.settings), onClose)
         SizedBox(Modifier.weight(1f).fillMaxWidth()) { maxWidth, _ ->
         val side = if (maxWidth < 720.dp) 224.dp else 236.dp
@@ -111,28 +114,30 @@ internal fun DeskSettings(settings: AppSettings, initial: SettingsPage, onClose:
                 if (version.isNotEmpty()) Text("V $version", Modifier.padding(start = 10.dp, top = 6.dp), color = Am.HomeDim, fontSize = 12.sp)
             }
             Box(Modifier.width(1.dp).fillMaxHeight().background(Am.HomeLine))
-            Box(Modifier.weight(1f).fillMaxHeight()) {
-                when (page) {
-                    SettingsPage.Help -> DeskHelpPage()
-                    SettingsPage.Tutorial -> DeskTutorialPage(settings, onClose)
-                    SettingsPage.About -> DeskAbout(settings)
-                    SettingsPage.Crash -> DeskCrashLogs()
-                    SettingsPage.Language -> DeskLanguages()
-                    else -> Column(Modifier.fillMaxSize().deskVerticalScroll(color = Am.Navy).padding(24.dp)) {
-                        Text(stringResource(page.title), color = Am.Navy, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                        Spacer(Modifier.height(16.dp))
-                        Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Am.HomePanel).padding(vertical = 6.dp)) {
-                            when (page) {
-                                SettingsPage.Editor -> {
-                                    EditorSettings(settings)
-                                    var systemBar by remember { mutableStateOf(app.absentmotion.desk.DeskWindow.systemBarChosen) }
-                                    SwitchRow(stringResource(R.string.desk_system_title_bar), systemBar, enabled = true) { systemBar = it; app.absentmotion.desk.DeskWindow.systemBarChosen = it }
-                                    Text(stringResource(R.string.desk_system_title_bar_note), Modifier.padding(start = 15.dp, end = 15.dp, bottom = 8.dp), color = Am.HomeMid, fontSize = 12.sp, lineHeight = 16.sp)
+            BoxWithConstraints(Modifier.weight(1f).fillMaxHeight()) {
+                CompositionLocalProvider(LocalAdaptiveSpace provides AdaptiveSpace(maxWidth, maxHeight)) {
+                    when (page) {
+                        SettingsPage.Help -> DeskHelpPage()
+                        SettingsPage.Tutorial -> DeskTutorialPage(settings, onClose)
+                        SettingsPage.About -> DeskAbout(settings)
+                        SettingsPage.Crash -> DeskCrashLogs()
+                        SettingsPage.Language -> DeskLanguages()
+                        else -> Column(Modifier.fillMaxSize().deskVerticalScroll(color = Am.Navy).padding(24.dp)) {
+                            Text(stringResource(page.title), color = Am.Navy, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                            Spacer(Modifier.height(16.dp))
+                            Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Am.HomePanel).padding(vertical = 6.dp)) {
+                                when (page) {
+                                    SettingsPage.Editor -> {
+                                        EditorSettings(settings)
+                                        var systemBar by remember { mutableStateOf(app.absentmotion.desk.DeskWindow.systemBarChosen) }
+                                        SwitchRow(stringResource(R.string.desk_system_title_bar), systemBar, enabled = true) { systemBar = it; app.absentmotion.desk.DeskWindow.systemBarChosen = it }
+                                        Text(stringResource(R.string.desk_system_title_bar_note), Modifier.padding(start = 15.dp, end = 15.dp, bottom = 8.dp), color = Am.HomeMid, fontSize = 12.sp, lineHeight = 16.sp)
+                                    }
+                                    SettingsPage.Playback -> PlaybackSettings(settings)
+                                    SettingsPage.Projects -> ProjectsSettings(settings) {}
+                                    SettingsPage.Backup -> BackupRows(settings, onRestored)
+                                    else -> UpdateSettings(settings)
                                 }
-                                SettingsPage.Playback -> PlaybackSettings(settings)
-                                SettingsPage.Projects -> ProjectsSettings(settings) {}
-                                SettingsPage.Backup -> BackupRows(settings, onRestored)
-                                else -> UpdateSettings(settings)
                             }
                         }
                     }

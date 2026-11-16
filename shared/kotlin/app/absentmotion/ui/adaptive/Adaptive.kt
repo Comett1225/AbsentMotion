@@ -34,6 +34,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import app.absentmotion.ui.editor.LocalWide
 
@@ -50,6 +51,8 @@ private val ColumnMin = 340.dp
 private val Gap = 24.dp
 private val CardMaxWidth = 1100.dp
 private val CardMaxHeight = 800.dp
+
+fun adaptiveWindowSize(width: Dp, height: Dp): DpSize = DpSize(minOf(width, CardMaxWidth), minOf(height, CardMaxHeight))
 
 @Composable
 fun AdaptiveWindow(content: @Composable () -> Unit) {
