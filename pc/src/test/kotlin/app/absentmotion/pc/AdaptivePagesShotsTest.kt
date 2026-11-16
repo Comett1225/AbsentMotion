@@ -20,6 +20,11 @@ import app.absentmotion.ui.editor.TransitionSheet
 import app.absentmotion.ui.home.CrashLogsScreen
 import app.absentmotion.ui.home.SettingsDrawer
 import app.absentmotion.ui.home.TrimScreen
+import app.absentmotion.ui.home.ExtractAudioScreen
+import app.absentmotion.ui.home.CompressScreen
+import app.absentmotion.ui.home.GifScreen
+import app.absentmotion.ui.home.DownloaderScreen
+import app.absentmotion.ui.home.NewProjectSheet
 import app.absentmotion.ui.onboarding.FirstRun
 import app.absentmotion.ui.onboarding.Onboarding
 import app.absentmotion.ui.onboarding.OnboardingStep
@@ -94,13 +99,34 @@ class AdaptivePagesShotsTest {
     }
 
     @Test fun tools() {
+        val app = DeskAppState()
+        for ((w, h) in sizes) for (page in listOf("trim", "extract", "compress", "gif", "downloader")) {
+            runSkikoComposeUiTest(size = Size(w.toFloat(), h.toFloat())) {
+                setContent {
+                    Box(Modifier.fillMaxSize().background(Am.HomeBg))
+                    when (page) {
+                        "trim" -> TrimScreen {}
+                        "extract" -> ExtractAudioScreen {}
+                        "compress" -> CompressScreen {}
+                        "gif" -> GifScreen {}
+                        else -> DownloaderScreen(app.store, app.settings, {}, {}, {})
+                    }
+                }
+                shot("tool-$page", w, h)
+            }
+        }
+    }
+
+    @Test fun newProjectTablet() {
+        val app = DeskAppState()
         for ((w, h) in sizes) runSkikoComposeUiTest(size = Size(w.toFloat(), h.toFloat())) {
             setContent {
-                Box(Modifier.fillMaxSize().background(Am.HomeBg))
-                TrimScreen {}
+                CompositionLocalProvider(LocalTablet provides true) {
+                    NewProjectSheet(app.store, app.settings, emptyList(), false, 0, {}, {})
+                }
             }
-            onAllNodesWithText("Trim").onFirst().assertExists()
-            shot("trim", w, h)
+            onNodeWithText("New project").assertExists()
+            shot("new-project-tablet", w, h)
         }
     }
 
