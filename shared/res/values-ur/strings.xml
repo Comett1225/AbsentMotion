@@ -95,11 +95,10 @@
     <string name="community_choose_thumbnail">تھمب نیل منتخب کریں</string>
     <string name="community_confirm_thumbnail">تھمب نیل کی تصدیق کریں</string>
     <string name="community_picker_hint">ٹائم لائن کو اس لمحے تک سلائیڈ کریں جو آپ کا پروجیکٹ بہترین انداز میں دکھاتا ہے۔</string>
-    <string name="community_thumbnail_hint">پروجیکٹ کے اس لمحے تک ڈریگ کریں جو اسے بہترین انداز میں دکھاتا ہے۔</string>
     <string name="community_title">عنوان</string>
     <string name="community_description">تفصیل</string>
     <string name="community_tags">ٹیگز</string>
-    <string name="community_tag_hint">اپنا ٹیگ شامل کریں</string>
+    <string name="community_tag_hint">اپنا ٹیگ شامل کریں (اختیاری)</string>
     <string name="community_creator">تخلیق کار</string>
     <string name="community_by">از %1$s</string>
     <string name="transform_3d_rotation">3D روٹیشن</string>

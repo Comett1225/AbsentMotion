@@ -91,13 +91,11 @@ private fun AboutPage(onClose: () -> Unit, onLicences: () -> Unit, onWhatsNew: (
         Column(Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState()).padding(horizontal = if (wide) 28.dp else 16.dp)) {
             Spacer(Modifier.height(24.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) {
-                    Text("AbsentMotion", color = Am.Navy, fontSize = 26.sp, fontWeight = FontWeight.Bold)
-                    if (version.isNotEmpty()) Text(stringResource(if (Tier.compatible) R.string.about_version_compatible else R.string.about_version, version),
-                        Modifier.padding(top = 2.dp), color = Am.HomeMid, fontSize = 14.sp)
-                }
-                if (!wide) app.absentmotion.ui.adaptive.AppLogo(64.dp, Modifier.padding(start = 12.dp))
+                Text("AbsentMotion", color = Am.Navy, fontSize = 26.sp, fontWeight = FontWeight.Bold)
+                app.absentmotion.ui.adaptive.AppLogo(30.dp, Modifier.padding(start = 10.dp))
             }
+            if (version.isNotEmpty()) Text(stringResource(if (Tier.compatible) R.string.about_version_compatible else R.string.about_version, version),
+                Modifier.padding(top = 2.dp), color = Am.HomeMid, fontSize = 14.sp)
             if (notes != null) Box(
                 Modifier.padding(top = 14.dp).heightIn(min = 44.dp).clip(RoundedCornerShape(50)).background(Am.Navy)
                     .clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = onWhatsNew).padding(horizontal = 20.dp, vertical = 10.dp),
@@ -131,7 +129,6 @@ private fun AboutPage(onClose: () -> Unit, onLicences: () -> Unit, onWhatsNew: (
             Link(stringResource(R.string.about_website), WEBSITE)
             Spacer(Modifier.height(24.dp))
         }
-        if (wide) Box(Modifier.weight(0.7f).fillMaxHeight(), Alignment.Center) { app.absentmotion.ui.adaptive.AppLogo(200.dp) }
         }
     }
 }

@@ -95,11 +95,10 @@
     <string name="community_choose_thumbnail">Miniaturansicht auswählen</string>
     <string name="community_confirm_thumbnail">Miniaturansicht bestätigen</string>
     <string name="community_picker_hint">Verschiebe die Zeitleiste zu dem Moment, der dein Projekt am besten zeigt.</string>
-    <string name="community_thumbnail_hint">Ziehe zum Zeitpunkt im Projekt, der es am besten zeigt.</string>
     <string name="community_title">Titel</string>
     <string name="community_description">Beschreibung</string>
     <string name="community_tags">Tags</string>
-    <string name="community_tag_hint">Eigenen Tag hinzufügen</string>
+    <string name="community_tag_hint">Eigenen Tag hinzufügen (optional)</string>
     <string name="community_creator">Erstellt von</string>
     <string name="community_by">von %1$s</string>
     <string name="transform_3d_rotation">3D-Drehung</string>

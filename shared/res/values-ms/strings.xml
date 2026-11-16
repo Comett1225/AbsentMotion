@@ -95,11 +95,10 @@
     <string name="community_choose_thumbnail">Pilih lakaran kecil</string>
     <string name="community_confirm_thumbnail">Sahkan lakaran kecil</string>
     <string name="community_picker_hint">Leret garis masa ke saat yang paling menyerlahkan projek anda.</string>
-    <string name="community_thumbnail_hint">Seret ke saat yang paling sesuai menggambarkan projek anda.</string>
     <string name="community_title">Tajuk</string>
     <string name="community_description">Perihalan</string>
     <string name="community_tags">Tag</string>
-    <string name="community_tag_hint">Tambah tag sendiri</string>
+    <string name="community_tag_hint">Tambah tag sendiri (pilihan)</string>
     <string name="community_creator">Dicipta oleh</string>
     <string name="community_by">oleh %1$s</string>
     <string name="transform_3d_rotation">Putaran 3D</string>

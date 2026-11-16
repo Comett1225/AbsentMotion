@@ -95,11 +95,10 @@
     <string name="community_choose_thumbnail">انتخاب تصویر بندانگشتی</string>
     <string name="community_confirm_thumbnail">تأیید تصویر بندانگشتی</string>
     <string name="community_picker_hint">تایم‌لاین را به لحظه‌ای ببرید که پروژه‌تان را به بهترین شکل نشان می‌دهد.</string>
-    <string name="community_thumbnail_hint">به لحظه‌ای از پروژه که آن را بهتر نشان می‌دهد بکشید.</string>
     <string name="community_title">عنوان</string>
     <string name="community_description">توضیحات</string>
     <string name="community_tags">برچسب‌ها</string>
-    <string name="community_tag_hint">برچسب خود را اضافه کنید</string>
+    <string name="community_tag_hint">برچسب خود را اضافه کنید (اختیاری)</string>
     <string name="community_creator">ساخته‌شده توسط</string>
     <string name="community_by">توسط %1$s</string>
     <string name="transform_3d_rotation">چرخش سه‌بعدی</string>

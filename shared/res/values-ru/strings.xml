@@ -95,11 +95,10 @@
     <string name="community_choose_thumbnail">Выбрать миниатюру</string>
     <string name="community_confirm_thumbnail">Подтвердить миниатюру</string>
     <string name="community_picker_hint">Переместите таймлайн к моменту, который лучше всего показывает ваш проект.</string>
-    <string name="community_thumbnail_hint">Перетащите ползунок к моменту, который лучше всего показывает проект.</string>
     <string name="community_title">Название</string>
     <string name="community_description">Описание</string>
     <string name="community_tags">Теги</string>
-    <string name="community_tag_hint">Добавить свой тег</string>
+    <string name="community_tag_hint">Добавить свой тег (необязательно)</string>
     <string name="community_creator">Автор</string>
     <string name="community_by">автор: %1$s</string>
     <string name="transform_3d_rotation">3D-поворот</string>

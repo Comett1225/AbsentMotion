@@ -95,11 +95,10 @@
     <string name="community_choose_thumbnail">Chọn hình thu nhỏ</string>
     <string name="community_confirm_thumbnail">Xác nhận hình thu nhỏ</string>
     <string name="community_picker_hint">Trượt dòng thời gian đến thời điểm thể hiện dự án của bạn tốt nhất.</string>
-    <string name="community_thumbnail_hint">Kéo đến thời điểm thể hiện dự án của bạn rõ nhất.</string>
     <string name="community_title">Tiêu đề</string>
     <string name="community_description">Mô tả</string>
     <string name="community_tags">Thẻ</string>
-    <string name="community_tag_hint">Thêm thẻ của bạn</string>
+    <string name="community_tag_hint">Thêm thẻ của bạn (không bắt buộc)</string>
     <string name="community_creator">Người tạo</string>
     <string name="community_by">bởi %1$s</string>
     <string name="transform_3d_rotation">Xoay 3D</string>

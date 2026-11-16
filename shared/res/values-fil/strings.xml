@@ -95,11 +95,10 @@
     <string name="community_choose_thumbnail">Pumili ng thumbnail</string>
     <string name="community_confirm_thumbnail">Kumpirmahin ang thumbnail</string>
     <string name="community_picker_hint">I-slide ang timeline sa sandaling pinakamahusay na nagpapakita ng proyekto mo.</string>
-    <string name="community_thumbnail_hint">I-drag sa sandali ng proyekto na pinakamainam na nagpapakita nito.</string>
     <string name="community_title">Pamagat</string>
     <string name="community_description">Paglalarawan</string>
     <string name="community_tags">Mga tag</string>
-    <string name="community_tag_hint">Magdagdag ng sariling tag</string>
+    <string name="community_tag_hint">Magdagdag ng sariling tag (opsyonal)</string>
     <string name="community_creator">Ginawa ni</string>
     <string name="community_by">ni %1$s</string>
     <string name="transform_3d_rotation">3D rotation</string>

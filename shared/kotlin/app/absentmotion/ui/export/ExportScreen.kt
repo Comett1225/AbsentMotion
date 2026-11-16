@@ -1644,21 +1644,11 @@ private fun CommunityFields(scene: Scene, engine: EngineThread, settings: app.ab
             SquareChooser(scene.width, scene.height, community.square(scene.width, scene.height), 12.dp, Modifier.fillMaxSize(),
                 if (DESK) { square -> onChange(community.withSquare(square, scene.width, scene.height)) } else null)
         }
-        if (DESK) {
-            var at by remember { mutableFloatStateOf(community.thumbMs.toFloat()) }
-            androidx.compose.material3.Slider(
-                at, { at = it }, valueRange = 0f..(scene.totalTime - 1).coerceAtLeast(1).toFloat(),
-                onValueChangeFinished = { onChange(community.copy(thumbMs = at.toInt())) },
-                colors = androidx.compose.material3.SliderDefaults.colors(thumbColor = Navy, activeTrackColor = Navy),
-            )
-            Hint(stringResource(R.string.community_thumbnail_hint))
-        } else {
-            var picking by remember { mutableStateOf(false) }
-            Box(Modifier.fillMaxWidth().height(42.dp).clip(RoundedCornerShape(4.dp)).background(Navy).clickable { picking = true }, contentAlignment = Alignment.Center) {
-                Text(stringResource(R.string.community_choose_thumbnail), color = Am.OnNavy, fontSize = 15.sp, fontWeight = FontWeight.Medium, maxLines = 1, style = Mixed)
-            }
-            if (picking) ThumbnailPicker(scene, engine, community, { onChange(it); picking = false }) { picking = false }
+        var picking by remember { mutableStateOf(false) }
+        Box(Modifier.fillMaxWidth().height(42.dp).clip(RoundedCornerShape(4.dp)).background(Navy).clickable { picking = true }, contentAlignment = Alignment.Center) {
+            Text(stringResource(R.string.community_choose_thumbnail), color = Am.OnNavy, fontSize = 15.sp, fontWeight = FontWeight.Medium, maxLines = 1, style = Mixed)
         }
+        if (picking) ThumbnailPicker(scene, engine, community, { onChange(it); picking = false }) { picking = false }
     }
     TextBox(R.string.community_title, community.title, 80) { onChange(community.copy(title = it)) }
     TextBox(R.string.community_description, community.description, 500, lines = 3) { onChange(community.copy(description = it)) }

@@ -95,11 +95,10 @@
     <string name="community_choose_thumbnail">เลือกภาพขนาดย่อ</string>
     <string name="community_confirm_thumbnail">ยืนยันภาพขนาดย่อ</string>
     <string name="community_picker_hint">เลื่อนไทม์ไลน์ไปยังช่วงเวลาที่แสดงโปรเจกต์ของคุณได้ดีที่สุด</string>
-    <string name="community_thumbnail_hint">ลากไปยังช่วงเวลาที่แสดงโปรเจกต์ของคุณได้ดีที่สุด</string>
     <string name="community_title">ชื่อ</string>
     <string name="community_description">คำอธิบาย</string>
     <string name="community_tags">แท็ก</string>
-    <string name="community_tag_hint">เพิ่มแท็กของคุณเอง</string>
+    <string name="community_tag_hint">เพิ่มแท็กของคุณเอง (ไม่บังคับ)</string>
     <string name="community_creator">สร้างโดย</string>
     <string name="community_by">โดย %1$s</string>
     <string name="transform_3d_rotation">การหมุน 3D</string>

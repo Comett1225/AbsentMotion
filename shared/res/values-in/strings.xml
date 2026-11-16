@@ -95,11 +95,10 @@
     <string name="community_choose_thumbnail">Pilih thumbnail</string>
     <string name="community_confirm_thumbnail">Konfirmasi thumbnail</string>
     <string name="community_picker_hint">Geser timeline ke momen yang paling menampilkan proyek Anda.</string>
-    <string name="community_thumbnail_hint">Geser ke momen yang paling menggambarkan proyek Anda.</string>
     <string name="community_title">Judul</string>
     <string name="community_description">Deskripsi</string>
     <string name="community_tags">Tag</string>
-    <string name="community_tag_hint">Tambahkan tag sendiri</string>
+    <string name="community_tag_hint">Tambahkan tag sendiri (opsional)</string>
     <string name="community_creator">Dibuat oleh</string>
     <string name="community_by">oleh %1$s</string>
     <string name="transform_3d_rotation">Rotasi 3D</string>

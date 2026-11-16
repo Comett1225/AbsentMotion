@@ -95,11 +95,10 @@
     <string name="community_choose_thumbnail">اختيار صورة مصغرة</string>
     <string name="community_confirm_thumbnail">تأكيد الصورة المصغرة</string>
     <string name="community_picker_hint">حرّك الخط الزمني إلى اللحظة التي تُظهر مشروعك بأفضل صورة.</string>
-    <string name="community_thumbnail_hint">اسحب إلى اللحظة التي تعرض مشروعك بأفضل صورة.</string>
     <string name="community_title">العنوان</string>
     <string name="community_description">الوصف</string>
     <string name="community_tags">الوسوم</string>
-    <string name="community_tag_hint">أضف وسمًا خاصًا بك</string>
+    <string name="community_tag_hint">أضف وسمًا خاصًا بك (اختياري)</string>
     <string name="community_creator">أنشأه</string>
     <string name="community_by">بواسطة %1$s</string>
     <string name="transform_3d_rotation">تدوير 3D</string>

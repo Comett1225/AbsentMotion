@@ -95,11 +95,10 @@
     <string name="community_choose_thumbnail">썸네일 선택</string>
     <string name="community_confirm_thumbnail">썸네일 확인</string>
     <string name="community_picker_hint">프로젝트를 가장 잘 보여주는 순간으로 타임라인을 밀어 주세요.</string>
-    <string name="community_thumbnail_hint">프로젝트를 가장 잘 보여 주는 순간으로 드래그하세요.</string>
     <string name="community_title">제목</string>
     <string name="community_description">설명</string>
     <string name="community_tags">태그</string>
-    <string name="community_tag_hint">직접 태그 추가</string>
+    <string name="community_tag_hint">직접 태그 추가 (선택 사항)</string>
     <string name="community_creator">제작자</string>
     <string name="community_by">제작: %1$s</string>
     <string name="transform_3d_rotation">3D 회전</string>

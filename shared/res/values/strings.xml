@@ -95,11 +95,10 @@
     <string name="community_choose_thumbnail">Choose thumbnail</string>
     <string name="community_confirm_thumbnail">Confirm thumbnail</string>
     <string name="community_picker_hint">Slide the timeline to the moment that shows your project best.</string>
-    <string name="community_thumbnail_hint">Drag to the moment of your project that shows it best.</string>
     <string name="community_title">Title</string>
     <string name="community_description">Description</string>
     <string name="community_tags">Tags</string>
-    <string name="community_tag_hint">Add your own tag</string>
+    <string name="community_tag_hint">Add your own tag (optional)</string>
     <string name="community_creator">Created by</string>
     <string name="community_by">by %1$s</string>
     <string name="transform_3d_rotation">3D rotation</string>
