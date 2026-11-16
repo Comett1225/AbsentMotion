@@ -53,6 +53,9 @@ import androidx.compose.ui.unit.sp
 import app.absentmotion.R
 import app.absentmotion.platform.BackHandler
 import app.absentmotion.platform.PlatformFeatures
+import app.absentmotion.ui.adaptive.AdaptiveSpace
+import app.absentmotion.ui.adaptive.LocalAdaptiveSpace
+import app.absentmotion.ui.adaptive.adaptiveWindowSize
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.home.DeskModals
 import app.absentmotion.ui.theme.HoverTargets
@@ -90,7 +93,7 @@ private fun modalFade(): Float {
 }
 
 @Composable
-internal fun DeskDialog(title: String?, width: Dp, onDismiss: () -> Unit, height: Dp? = null, onConfirm: (() -> Unit)? = null, outside: Boolean = true, content: @Composable () -> Unit) {
+internal fun DeskDialog(title: String?, width: Dp? = null, onDismiss: () -> Unit, height: Dp? = null, onConfirm: (() -> Unit)? = null, outside: Boolean = true, content: @Composable () -> Unit) {
     val focus = LocalFocusManager.current
     val requester = remember { FocusRequester() }
     fun close() { focus.clearFocus(); onDismiss() }
@@ -99,16 +102,21 @@ internal fun DeskDialog(title: String?, width: Dp, onDismiss: () -> Unit, height
     LaunchedEffect(Unit) { requester.requestFocus() }
     val fade = modalFade()
     DeskCursorHost(Modifier.fillMaxSize().background(Color.Black.copy(alpha = DeskModals.ScrimAlpha * fade)).pointerInput(outside) { detectTapGestures { if (outside) close() } }.padding(24.dp), Alignment.Center) {
-        val card = Modifier.widthIn(max = width).fillMaxWidth().let { if (height == Dp.Infinity) it.fillMaxHeight() else if (height != null) it.height(height) else it.heightIn(max = 720.dp) }
-        Column(card.shadow(24.dp, RoundedCornerShape(12.dp)).clip(RoundedCornerShape(12.dp)).background(Am.Panel).pointerInput(Unit) { detectTapGestures { } }
-            .onKeyEvent {
-                if (onConfirm != null && it.type == KeyEventType.KeyDown && (it.key == Key.Enter || it.key == Key.NumPadEnter)) { focus.clearFocus(); onConfirm(); true } else false
-            }.focusRequester(requester).focusTarget()) {
-            if (title != null) Row(Modifier.fillMaxWidth().height(48.dp).padding(start = 16.dp, end = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text(title, Modifier.weight(1f), color = Am.OnDark, fontSize = 15.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                DeskIcon(ChromeIcons.Close, deskShortcut(R.string.action_close, "Esc")) { close() }
+        BoxWithConstraints(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            val card = if (width == null) Modifier.size(adaptiveWindowSize(maxWidth, maxHeight))
+                else Modifier.widthIn(max = width).fillMaxWidth().let { if (height == Dp.Infinity) it.fillMaxHeight() else if (height != null) it.height(height) else it.heightIn(max = 720.dp) }
+            Column(card.shadow(24.dp, RoundedCornerShape(12.dp)).clip(RoundedCornerShape(12.dp)).background(Am.Panel).pointerInput(Unit) { detectTapGestures { } }
+                .onKeyEvent {
+                    if (onConfirm != null && it.type == KeyEventType.KeyDown && (it.key == Key.Enter || it.key == Key.NumPadEnter)) { focus.clearFocus(); onConfirm(); true } else false
+                }.focusRequester(requester).focusTarget()) {
+                if (title != null) Row(Modifier.fillMaxWidth().height(48.dp).padding(start = 16.dp, end = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(title, Modifier.weight(1f), color = Am.OnDark, fontSize = 15.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    DeskIcon(ChromeIcons.Close, deskShortcut(R.string.action_close, "Esc")) { close() }
+                }
+                BoxWithConstraints(Modifier.fillMaxWidth().weight(1f, fill = width == null || height != null || title == null)) {
+                    CompositionLocalProvider(LocalWide provides false, LocalAdaptiveSpace provides if (width == null || width == Dp.Infinity) AdaptiveSpace(maxWidth, maxHeight) else null) { content() }
+                }
             }
-            Box(Modifier.fillMaxWidth().weight(1f, fill = height != null || title == null)) { CompositionLocalProvider(LocalWide provides false) { content() } }
         }
     }
 }
@@ -132,14 +140,7 @@ internal fun DeskIcon(icon: ImageVector, hint: String, enabled: Boolean = true, 
 
 @Composable
 internal fun DeskSheetHost(onDismiss: () -> Unit, content: @Composable () -> Unit) {
-    val focus = LocalFocusManager.current
-    fun close() { focus.clearFocus(); onDismiss() }
-    BackHandler { close() }
-    DisposableEffect(Unit) { onDispose { focus.clearFocus() } }
-    val fade = modalFade()
-    DeskCursorHost(Modifier.fillMaxSize().background(Color.Black.copy(alpha = DeskModals.ScrimAlpha * fade)).pointerInput(Unit) { detectTapGestures { close() } }.padding(24.dp), Alignment.Center) {
-        Box(Modifier.widthIn(max = 560.dp).fillMaxWidth().fillMaxHeight().clip(RoundedCornerShape(12.dp))) { CompositionLocalProvider(LocalWide provides false) { content() } }
-    }
+    DeskDialog(null, onDismiss = onDismiss, content = content)
 }
 
 @Composable

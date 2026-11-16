@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.addPathNodes
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import app.absentmotion.ui.editor.LocalWide
 
@@ -49,14 +50,15 @@ private val Gap = 24.dp
 private val CardMaxWidth = 1100.dp
 private val CardMaxHeight = 800.dp
 
+fun adaptiveWindowSize(width: Dp, height: Dp): DpSize = DpSize(minOf(width, CardMaxWidth), minOf(height, CardMaxHeight))
+
 @Composable
 fun AdaptiveWindow(content: @Composable () -> Unit) {
     BoxWithConstraints(
         Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.6f)).pointerInput(Unit) { detectTapGestures { } }.systemBarsPadding().padding(24.dp),
         contentAlignment = Alignment.Center,
     ) {
-        val width = minOf(maxWidth, CardMaxWidth)
-        val height = minOf(maxHeight, CardMaxHeight)
+        val (width, height) = adaptiveWindowSize(maxWidth, maxHeight)
         Box(Modifier.size(width, height).shadow(24.dp, RoundedCornerShape(16.dp)).clip(RoundedCornerShape(16.dp))) {
             CompositionLocalProvider(LocalWide provides false, LocalAdaptiveSpace provides AdaptiveSpace(width, height)) { content() }
         }

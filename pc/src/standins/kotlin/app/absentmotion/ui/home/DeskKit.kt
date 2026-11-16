@@ -28,6 +28,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
@@ -70,13 +71,17 @@ import app.absentmotion.desk.DeskBack
 import app.absentmotion.desk.DeskTyping
 import app.absentmotion.platform.Hint
 import app.absentmotion.ui.editor.panels.ThinSwitch
+import app.absentmotion.ui.editor.LocalWide
+import app.absentmotion.ui.adaptive.AdaptiveSpace
+import app.absentmotion.ui.adaptive.LocalAdaptiveSpace
+import app.absentmotion.ui.adaptive.adaptiveWindowSize
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Motion
 
 @Composable
 internal fun DeskModal(
     onClose: () -> Unit,
-    width: Dp,
+    width: Dp? = null,
     height: Dp? = null,
     onEnter: (() -> Unit)? = null,
     dismissOnScrim: Boolean = true,
@@ -112,13 +117,16 @@ internal fun DeskModal(
         Alignment.Center,
     ) {
         BoxWithConstraints(Modifier.fillMaxSize().padding(24.dp), Alignment.Center) {
-            val w = minOf(width, maxWidth)
-            val cardModifier = if (height != null) Modifier.size(w, minOf(height, maxHeight)) else Modifier.width(w).heightIn(max = maxHeight)
+            val size = adaptiveWindowSize(maxWidth, maxHeight)
+            val w = width?.let { minOf(it, maxWidth) } ?: size.width
+            val h = if (width == null) size.height else height?.let { minOf(it, maxHeight) }
+            val cardModifier = if (h != null) Modifier.size(w, h) else Modifier.width(w).heightIn(max = maxHeight)
             Column(
                 cardModifier.alpha(fade).shadow(24.dp, RoundedCornerShape(16.dp)).clip(RoundedCornerShape(16.dp)).background(Am.Card)
                     .border(1.dp, Am.HomeLine, RoundedCornerShape(16.dp)).pointerInput(Unit) { detectTapGestures { } },
-                content = content,
-            )
+            ) {
+                CompositionLocalProvider(LocalWide provides false, LocalAdaptiveSpace provides if (width == null) AdaptiveSpace(w, size.height) else null) { content() }
+            }
         }
     }
 }
@@ -132,9 +140,8 @@ private fun confirmOnEnter(event: KeyEvent, action: (() -> Unit)?): Boolean {
 @Composable
 internal fun DeskDialogHeader(title: String, onClose: () -> Unit, subtitle: String? = null) {
     Row(Modifier.fillMaxWidth().height(56.dp).padding(start = 20.dp, end = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(title, color = Am.Navy, fontSize = 18.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+        Text(title, if (subtitle == null) Modifier.weight(1f) else Modifier, color = Am.Navy, fontSize = 18.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
         if (subtitle != null) Text(subtitle, Modifier.padding(start = 12.dp).weight(1f), color = Am.HomeDim, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-        else Spacer(Modifier.weight(1f))
         DeskIconButton(HomeIcons.Close, androidx.compose.ui.res.stringResource(app.absentmotion.R.string.action_close), onClose, tooltip = "Esc")
     }
     DeskDivider()

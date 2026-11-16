@@ -500,9 +500,9 @@ internal fun DeskConfirm(title: String, name: String?, body: String?, confirm: S
 
 @Composable
 private fun DeskImportReport(reports: List<ImportReport>, onDismiss: () -> Unit, onOpen: () -> Unit) {
-    DeskModal(onDismiss, 560.dp, onEnter = onOpen) {
+    DeskModal(onDismiss, onEnter = onOpen) {
         DeskDialogHeader(stringResource(R.string.import_complete), onDismiss)
-        Column(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()).padding(horizontal = 24.dp, vertical = 16.dp)) {
+        Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 24.dp, vertical = 16.dp)) {
             for (report in reports) {
                 report.community?.let { CommunityCard(it) }
                 if (reports.size > 1 && report.community == null) Text(report.title, Modifier.padding(top = 8.dp), color = Am.Navy, fontSize = 15.sp, fontWeight = FontWeight.Bold)

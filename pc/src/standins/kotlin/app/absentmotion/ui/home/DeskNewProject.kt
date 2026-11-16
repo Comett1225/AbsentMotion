@@ -96,9 +96,9 @@ internal fun DeskNewProject(
             onOpen(id)
         }
     }
-    DeskModal(onClose, 560.dp, onEnter = create) {
+    DeskModal(onClose, onEnter = create) {
         DeskDialogHeader(stringResource(if (form.element) R.string.desk_new_asset else R.string.home_new_project), onClose)
-        Column(Modifier.weight(1f, fill = false).deskVerticalScroll(color = Am.Navy).padding(horizontal = 24.dp, vertical = 20.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
+        Column(Modifier.weight(1f).fillMaxWidth().deskVerticalScroll(color = Am.Navy).padding(horizontal = 24.dp, vertical = 20.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
             TypeToggle(form)
             NameRow(form)
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {

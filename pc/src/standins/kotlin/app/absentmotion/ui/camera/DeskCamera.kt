@@ -219,10 +219,10 @@ fun CameraScreen(aspect: Float, onClose: () -> Unit, onCaptured: (Uri, Boolean) 
         else if (camera.recording) scope.launch { camera.stopRecording()?.let { onCaptured(Uri.fromFile(it), true) } }
         else camera.startRecording()
     }
-    DeskModal(onClose, 780.dp, onEnter = ::shutter, dismissOnScrim = false) {
+    DeskModal(onClose, onEnter = ::shutter, dismissOnScrim = false) {
         DeskDialogHeader(stringResource(R.string.camera), onClose)
-        Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            Box(Modifier.fillMaxWidth().aspectRatio(16f / 9f).clip(RoundedCornerShape(12.dp)).background(Color.Black), Alignment.Center) {
+        Column(Modifier.weight(1f).fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Box(Modifier.weight(1f).fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Color.Black), Alignment.Center) {
                 camera.frame?.let { Image(it, null, Modifier.fillMaxSize(), contentScale = ContentScale.Fit) }
                 when (camera.phase) {
                     CameraPhase.Starting -> Note(stringResource(R.string.desk_camera_starting))
