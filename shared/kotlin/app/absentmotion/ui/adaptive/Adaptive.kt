@@ -31,6 +31,8 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.addPathNodes
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import app.absentmotion.ui.editor.LocalWide
@@ -113,4 +115,11 @@ fun AppLogo(size: Dp, modifier: Modifier = Modifier) {
     Box(modifier.size(size).clip(RoundedCornerShape(size * 0.22f)).background(LogoOrange)) {
         Image(LogoMark, null, Modifier.fillMaxSize())
     }
+}
+
+@Composable
+fun adaptiveWindowIsWide(): Boolean {
+    val size = LocalWindowInfo.current.containerSize
+    val width = with(LocalDensity.current) { size.width.toDp() }
+    return size.width > size.height && width - 48.dp >= WideFrom
 }

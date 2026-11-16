@@ -3,6 +3,7 @@ package app.absentmotion.pc
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.unit.dp
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.rememberDrawerState
@@ -25,6 +26,20 @@ import app.absentmotion.ui.home.CompressScreen
 import app.absentmotion.ui.home.GifScreen
 import app.absentmotion.ui.home.DownloaderScreen
 import app.absentmotion.ui.home.NewProjectSheet
+import app.absentmotion.ui.home.ReportDialog
+import app.absentmotion.ui.home.VersionHistory
+import app.absentmotion.ui.home.ClosedDialog
+import app.absentmotion.ui.home.OpenFailedDialog
+import app.absentmotion.ui.home.UpdateAskDialog
+import app.absentmotion.ui.home.WideUpdateCard
+import app.absentmotion.ui.home.UpdateOfferContent
+import app.absentmotion.ui.home.UpdateAnswer
+import app.absentmotion.ui.home.Release
+import app.absentmotion.ui.home.ApkAsset
+import app.absentmotion.ui.home.HomeIcons
+import app.absentmotion.ui.home.WhatsNew
+import app.absentmotion.ui.home.WhatsNewDialog
+import app.absentmotion.ui.adaptive.AdaptiveWindow
 import app.absentmotion.ui.onboarding.FirstRun
 import app.absentmotion.ui.onboarding.Onboarding
 import app.absentmotion.ui.onboarding.OnboardingStep
@@ -127,6 +142,95 @@ class AdaptivePagesShotsTest {
             }
             onNodeWithText("New project").assertExists()
             shot("new-project-tablet", w, h)
+        }
+    }
+
+    @Test fun report() {
+        for ((w, h) in sizes) runSkikoComposeUiTest(size = Size(w.toFloat(), h.toFloat())) {
+            setContent {
+                Box(Modifier.fillMaxSize().background(Am.HomeBg))
+                ReportDialog("Example report") {}
+            }
+            onNodeWithText("Copy and Report").assertExists()
+            shot("report", w, h)
+        }
+    }
+
+    @Test fun projectSafety() {
+        val app = DeskAppState()
+        val xml = File("../testdata/scenes/styles.xml").readText()
+        val id = app.store.create(Scene.parse(xml))
+        val folder = app.store.versions.dir(id).also { it.mkdirs() }
+        repeat(4) { folder.resolve("${1700000000000L + it * 60000}.xml").writeText(xml) }
+        for ((w, h) in sizes) runSkikoComposeUiTest(size = Size(w.toFloat(), h.toFloat())) {
+            setContent {
+                Box(Modifier.fillMaxSize().background(Am.HomeBg))
+                VersionHistory(app.store, id, "Example project", app.engine, {}, damaged = true) {}
+            }
+            waitUntil(timeoutMillis = 10000) { onAllNodesWithText("Restore").fetchSemanticsNodes().size == 4 }
+            shot("project-safety", w, h)
+        }
+    }
+
+    @Test fun recoveryNotices() {
+        for ((w, h) in sizes) {
+            runSkikoComposeUiTest(size = Size(w.toFloat(), h.toFloat())) {
+                setContent {
+                    Box(Modifier.fillMaxSize().background(Am.HomeBg))
+                    ClosedDialog(null, "Example project", null, {}, {}, {})
+                }
+                onNodeWithText("Restore").assertExists()
+                shot("recovery-notice", w, h)
+            }
+            runSkikoComposeUiTest(size = Size(w.toFloat(), h.toFloat())) {
+                setContent {
+                    Box(Modifier.fillMaxSize().background(Am.HomeBg))
+                    OpenFailedDialog({}, null) {}
+                }
+                onNodeWithText("Version history").assertExists()
+                shot("open-failed", w, h)
+            }
+        }
+    }
+
+    @Test fun updateWindows() {
+        val app = DeskAppState()
+        for ((w, h) in sizes) {
+            runSkikoComposeUiTest(size = Size(w.toFloat(), h.toFloat())) {
+                setContent {
+                    Box(Modifier.fillMaxSize().background(Am.HomeBg))
+                    UpdateAskDialog(app.settings)
+                }
+                onNodeWithText("Check for a new version each time the app opens").assertExists()
+                shot("update-ask", w, h)
+            }
+            runSkikoComposeUiTest(size = Size(w.toFloat(), h.toFloat())) {
+                setContent {
+                    AdaptiveWindow(1000.dp, 440.dp) {
+                        val release = Release("5.2.0", "https://example.com", ApkAsset("update.apk", "https://example.com", 120L * 1024 * 1024, null, null))
+                        WideUpdateCard(HomeIcons.ArrowDown, "AbsentMotion 5.2.0 is available", null) {
+                            UpdateOfferContent(UpdateAnswer.Available(release), "5.1.1", false, null, {}, {}, {})
+                        }
+                    }
+                }
+                onNodeWithText("Download update").assertExists()
+                shot("update-available", w, h)
+            }
+        }
+    }
+
+    @Test fun whatsNew() {
+        val notes = WhatsNew.parse(File("../shared/assets/whats-new/5.1.1.md").readText())
+        for ((w, h) in sizes) runSkikoComposeUiTest(size = Size(w.toFloat(), h.toFloat())) {
+            setContent {
+                Box(Modifier.fillMaxSize().background(Am.HomeBg))
+                WhatsNewDialog(notes) {}
+            }
+            onNodeWithText(notes.title).assertExists()
+            onNodeWithText("New features").assertExists()
+            shot("whats-new", w, h)
+            onNodeWithText("Improvements").performClick()
+            shot("whats-new-expanded", w, h)
         }
     }
 

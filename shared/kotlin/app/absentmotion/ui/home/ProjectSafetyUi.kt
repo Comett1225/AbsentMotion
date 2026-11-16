@@ -26,6 +26,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import app.absentmotion.library.CrashEntry
@@ -67,6 +71,9 @@ import app.absentmotion.platform.BitmapFactory
 import app.absentmotion.platform.Log
 import app.absentmotion.platform.asImageBitmap
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.adaptive.adaptiveWindowIsWide
+import app.absentmotion.ui.adaptive.AdaptiveWindow
+import app.absentmotion.platform.sheetDialogProperties
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -166,7 +173,7 @@ fun VersionHistory(
     val list = items
     val chosen = chosenTime?.let { time -> list?.firstOrNull { it.version.time == time }?.version }
     if (chosenTime != null && list != null && chosen == null) LaunchedEffect(list) { chosenTime = null }
-    SquareDialog(style, VersionPanel.WIDTH, onDismiss) { width ->
+    SquareDialog(style, if (adaptiveWindowIsWide()) 1000f else VersionPanel.WIDTH, onDismiss) { width ->
         Column(Modifier.fillMaxWidth().background(style.bar).padding(horizontal = 16.dp, vertical = 12.dp)) {
             Text(
                 stringResource(if (damaged) R.string.library_damaged_project else R.string.version_history), Modifier.semantics { heading() },
@@ -177,6 +184,21 @@ fun VersionHistory(
         Rule(style)
         if (list == null) Box(Modifier.fillMaxWidth().heightIn(min = 112.dp).weight(1f, fill = false), Alignment.Center) {
             CircularProgressIndicator(Modifier.size(28.dp), color = style.accent, strokeWidth = 2.dp)
+        } else if (width >= 720f) LazyVerticalGrid(GridCells.Fixed(2), Modifier.fillMaxWidth().weight(1f, fill = false)) {
+            if (damaged) item(key = "explain", span = { GridItemSpan(maxLineSpan) }) {
+                Text(
+                    stringResource(if (list.isEmpty()) R.string.damaged_explain_no_versions else R.string.damaged_explain_versions),
+                    Modifier.fillMaxWidth().padding(16.dp), color = style.ink, fontSize = 15.sp, lineHeight = 21.sp,
+                )
+            } else if (list.isEmpty()) item(key = "empty", span = { GridItemSpan(maxLineSpan) }) {
+                Text(stringResource(R.string.no_earlier_versions_yet_a_version), Modifier.fillMaxWidth().padding(16.dp), color = style.ink, fontSize = 15.sp, lineHeight = 21.sp)
+            }
+            itemsIndexed(list, key = { _, item -> item.version.time }) { _, item ->
+                Column(Modifier.fillMaxWidth()) {
+                    Rule(style)
+                    VersionRow(style, item, engine, width / 2f) { chosenTime = item.version.time }
+                }
+            }
         } else LazyColumn(Modifier.fillMaxWidth().weight(1f, fill = false)) {
             if (damaged) item(key = "explain") {
                 Text(
@@ -335,6 +357,22 @@ internal fun ClosedDialog(
     val recovering = recoveryTitle != null
     var reporting by remember { mutableStateOf(false) }
     if (reporting && crash != null) CrashReportDialog(crash) { reporting = false }
+    if (adaptiveWindowIsWide()) {
+        SafetyNotice(stringResource(R.string.absentmotion_closed_unexpectedly), { if (!recovering) onClose() }, body = {
+            if (crash != null) Text(closedText(crash.time, locale = androidx.compose.ui.platform.LocalConfiguration.current.locales[0]).text() + " " + stringResource(crash.reason.sentence), color = Am.Navy)
+            OutdatedHint(outdated, Modifier.padding(top = 8.dp))
+            if (recoveryTitle != null) Text(
+                stringResource(R.string.safety_recovery_body, recoveryTitle.ifBlank { stringResource(R.string.recovery_your_project) }),
+                Modifier.padding(top = if (crash != null) 12.dp else 0.dp), color = Am.Navy,
+            )
+            if (crash != null) TextButton({ reporting = true }) { Text(stringResource(R.string.report_button), color = Am.Navy) }
+        }, actions = {
+            if (recovering) TextButton(onDiscard) { Text(stringResource(R.string.discard), color = Am.Navy) }
+            if (recovering) TextButton(onRestore) { Text(stringResource(R.string.restore), color = Am.Navy) }
+            else TextButton(onClose) { Text(stringResource(R.string.ok), color = Am.Navy) }
+        })
+        return
+    }
     AlertDialog(
         onDismissRequest = { if (!recovering) onClose() },
         title = { Text(stringResource(R.string.absentmotion_closed_unexpectedly), color = Am.Navy) },
@@ -367,6 +405,17 @@ internal fun closedText(time: Long, now: Long = System.currentTimeMillis(), loca
 internal fun OpenFailedDialog(onHistory: (() -> Unit)?, outdated: Outdated?, onDismiss: () -> Unit) {
     var reporting by remember { mutableStateOf(false) }
     if (reporting) ReportDialog(stringResource(R.string.report_open_failed)) { reporting = false }
+    if (adaptiveWindowIsWide()) {
+        SafetyNotice(stringResource(R.string.could_not_open_this_project), onDismiss, body = {
+            Text(stringResource(if (onHistory != null) R.string.safety_open_failed_with_history else R.string.the_project_file_is_missing_or), color = Am.Navy)
+            OutdatedHint(outdated, Modifier.padding(top = 8.dp))
+            TextButton({ reporting = true }) { Text(stringResource(R.string.report_button), color = Am.Navy) }
+        }, actions = {
+            if (onHistory != null) TextButton(onHistory) { Text(stringResource(R.string.version_history), color = Am.Navy) }
+            TextButton(onDismiss) { Text(stringResource(R.string.ok), color = Am.Navy) }
+        })
+        return
+    }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.could_not_open_this_project), color = Am.Navy) },
@@ -381,4 +430,19 @@ internal fun OpenFailedDialog(onHistory: (() -> Unit)?, outdated: Outdated?, onD
         confirmButton = { TextButton(onDismiss) { Text(stringResource(R.string.ok), color = Am.Navy) } },
         containerColor = Am.Card,
     )
+}
+
+@Composable
+private fun SafetyNotice(title: String, onDismiss: () -> Unit, body: @Composable ColumnScope.() -> Unit, actions: @Composable () -> Unit) {
+    Dialog(onDismiss, sheetDialogProperties()) {
+        AdaptiveWindow(900.dp, 320.dp) {
+            Column(Modifier.fillMaxSize().background(Am.Card).padding(24.dp)) {
+                Row(Modifier.weight(1f).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+                    Text(title, Modifier.weight(1f).verticalScroll(rememberScrollState()).semantics { heading() }, color = Am.Navy, fontSize = 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.Bold)
+                    Column(Modifier.weight(1f).verticalScroll(rememberScrollState()), content = body)
+                }
+                Row(Modifier.align(Alignment.End)) { actions() }
+            }
+        }
+    }
 }

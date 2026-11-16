@@ -6,6 +6,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,6 +34,10 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import app.absentmotion.platform.sheetDialogProperties
+import app.absentmotion.ui.adaptive.AdaptiveWindow
+import app.absentmotion.ui.adaptive.adaptiveWindowIsWide
 import app.absentmotion.R
 import app.absentmotion.library.CrashEntry
 import app.absentmotion.library.CrashLogs
@@ -156,6 +165,27 @@ internal fun ReportDialog(summary: String, onDismiss: () -> Unit) {
     val details = remember(summary) { reportDetails(context, summary) }
     val found = rememberReportLinks()
     LaunchedEffect(details) { clipboard.setText(AnnotatedString(details)) }
+    if (adaptiveWindowIsWide()) {
+        Dialog(onDismiss, sheetDialogProperties()) {
+            AdaptiveWindow(1000.dp, 400.dp) {
+                Column(Modifier.fillMaxSize().background(Am.Card).padding(24.dp)) {
+                    Text(stringResource(R.string.report_title), color = Am.Navy, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                    Row(Modifier.weight(1f).fillMaxWidth().padding(top = 24.dp), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+                        Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
+                            Text(stringResource(R.string.report_copied), color = Am.Navy, fontSize = 14.sp, lineHeight = 19.sp)
+                        }
+                        Column(Modifier.weight(1f).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            ReportLinkButton(stringResource(R.string.report_github)) { runCatching { opener.openUri(found.issues) } }
+                            ReportLinkButton(stringResource(R.string.report_discord)) { runCatching { opener.openUri(found.discord) } }
+                            ReportLinkButton(stringResource(R.string.report_form)) { runCatching { opener.openUri(found.form) } }
+                        }
+                    }
+                    TextButton(onDismiss, Modifier.align(Alignment.End)) { Text(stringResource(R.string.action_close), color = Am.Navy) }
+                }
+            }
+        }
+        return
+    }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.report_title), color = Am.Navy) },
