@@ -16,10 +16,12 @@ import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -27,6 +29,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
@@ -86,6 +90,7 @@ import app.absentmotion.ui.editor.ChromeIcons
 import app.absentmotion.ui.export.ExportIcons
 import app.absentmotion.ui.editor.TimelineMath
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.adaptive.WideFrom
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -273,7 +278,9 @@ fun TemplateEditor(templateId: String, engine: EngineThread, settings: AppSettin
     fun timecode(ms: Int) = TimelineMath.timecode((ms * template.fps / 1000f).roundToInt(), template.fps)
 
     Box(Modifier.fillMaxSize().background(Am.TopBar).systemBarsPadding().pointerInput(Unit) {}, Alignment.TopCenter) {
-    Column(Modifier.then(if (app.absentmotion.platform.PlatformFeatures.desktop) Modifier.widthIn(max = 1280.dp) else Modifier).fillMaxSize()) {
+    BoxWithConstraints(Modifier.then(if (app.absentmotion.platform.PlatformFeatures.desktop) Modifier.widthIn(max = 1280.dp) else Modifier).fillMaxSize()) {
+    val wide = maxWidth >= WideFrom && maxWidth > maxHeight
+    Column(Modifier.fillMaxSize()) {
         Spacer(Modifier.height(16.dp))
         val clip = trimming
         if (clip == null) {
@@ -285,7 +292,8 @@ fun TemplateEditor(templateId: String, engine: EngineThread, settings: AppSettin
             })
         }
         Spacer(Modifier.height(16.dp))
-        Box(Modifier.padding(horizontal = 16.dp).fillMaxWidth().weight(1f).clip(Rounded).background(Am.PreviewBg).onSizeChanged { box = it }
+        val preview: @Composable (Modifier) -> Unit = { modifier ->
+        Box(modifier.padding(horizontal = 16.dp).clip(Rounded).background(Am.PreviewBg).onSizeChanged { box = it }
             .clickable(enabled = clip == null) { playing = !playing }) {
             app.absentmotion.platform.SceneSurface(engine, 1, box, Modifier.fillMaxSize())
             if (clip == null && !playing) Box(Modifier.align(Alignment.Center).size(56.dp).clip(CircleShape).background(Color(0x66000000)), Alignment.Center) {
@@ -299,6 +307,8 @@ fun TemplateEditor(templateId: String, engine: EngineThread, settings: AppSettin
             }
             if (hint != null) Hint(hint.first, Modifier.align(Alignment.BottomCenter)) { hints = hints or hint.second; settings.templateHints = hints }
         }
+        }
+        val controls: @Composable () -> Unit = {
         Spacer(Modifier.height(12.dp))
         if (clip == null) {
             Ltr {
@@ -349,8 +359,17 @@ fun TemplateEditor(templateId: String, engine: EngineThread, settings: AppSettin
                 "${timecode(trimStart)} - ${timecode(trimStart + needed)}",
                 Modifier.fillMaxWidth().padding(vertical = 12.dp), color = Am.OnDarkDim, fontSize = 14.sp, textAlign = TextAlign.Center,
             )
-            Spacer(Modifier.height(166.dp))
+            if (!wide) Spacer(Modifier.height(166.dp))
         }
+        }
+        if (wide) Row(Modifier.weight(1f).fillMaxWidth()) {
+            preview(Modifier.weight(0.6f).fillMaxHeight())
+            Column(Modifier.weight(0.4f).fillMaxHeight().verticalScroll(rememberScrollState())) { controls() }
+        } else {
+            preview(Modifier.fillMaxWidth().weight(1f))
+            controls()
+        }
+    }
     }
     }
 

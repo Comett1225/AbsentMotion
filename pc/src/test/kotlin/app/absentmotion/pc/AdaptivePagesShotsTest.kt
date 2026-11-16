@@ -14,6 +14,14 @@ import androidx.compose.ui.graphics.toAwtImage
 import androidx.compose.ui.test.*
 import app.absentmotion.desk.DeskAppState
 import app.absentmotion.model.Scene
+import app.absentmotion.library.CommunityInfo
+import app.absentmotion.library.ImportReport
+import app.absentmotion.library.reportText
+import app.absentmotion.ui.home.ImportDialog
+import app.absentmotion.ui.home.TemplateEditor
+import app.absentmotion.ui.tutorial.OfferDialog
+import java.awt.image.BufferedImage
+import java.io.ByteArrayOutputStream
 import app.absentmotion.platform.Context
 import app.absentmotion.ui.editor.LocalTablet
 import app.absentmotion.ui.editor.LocalWide
@@ -231,6 +239,46 @@ class AdaptivePagesShotsTest {
             shot("whats-new", w, h)
             onNodeWithText("Improvements").performClick()
             shot("whats-new-expanded", w, h)
+        }
+    }
+
+    @Test fun importSheets() {
+        val bytes = ByteArrayOutputStream().also { ImageIO.write(BufferedImage(320, 180, BufferedImage.TYPE_INT_RGB), "png", it) }.toByteArray()
+        val community = CommunityInfo("Example item", "Example creator", "An example community item description.", listOf("Motion", "Design"), bytes)
+        val section = listOf(reportText("Import details") to listOf(reportText("Example imported project")))
+        for ((w, h) in sizes) for (withCommunity in listOf(false, true)) runSkikoComposeUiTest(size = Size(w.toFloat(), h.toFloat())) {
+            val report = ImportReport("example", "Example project", false, section, community = community.takeIf { withCommunity })
+            setContent {
+                Box(Modifier.fillMaxSize().background(Am.HomeBg))
+                ImportDialog(listOf(report), {}, {})
+            }
+            onNodeWithText("Import details").assertExists()
+            if (withCommunity) onNodeWithText("Example item").assertExists()
+            shot(if (withCommunity) "community-import" else "bundle-import", w, h)
+        }
+    }
+
+    @Test fun templateEditor() {
+        val app = DeskAppState()
+        val folder = Context().filesDir.resolve("templates/adaptive-shot").also { it.mkdirs() }
+        folder.resolve("scene.xml").writeText(File("../testdata/scenes/media.xml").readText())
+        try {
+            for ((w, h) in sizes) runSkikoComposeUiTest(size = Size(w.toFloat(), h.toFloat())) {
+                setContent { TemplateEditor("adaptive-shot", app.engine, app.settings, {}, {}) }
+                waitUntil(timeoutMillis = 10000) { onAllNodesWithText("Media slots").fetchSemanticsNodes().isNotEmpty() }
+                shot("template-editor", w, h)
+            }
+        } finally { folder.deleteRecursively() }
+    }
+
+    @Test fun tutorialOffer() {
+        for ((w, h) in sizes) runSkikoComposeUiTest(size = Size(w.toFloat(), h.toFloat())) {
+            setContent {
+                Box(Modifier.fillMaxSize().background(Am.HomeBg))
+                OfferDialog({}, {}, {})
+            }
+            onNodeWithText("Start the tour").assertExists()
+            shot("tutorial-offer", w, h)
         }
     }
 
