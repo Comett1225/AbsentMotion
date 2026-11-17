@@ -48,6 +48,51 @@ class DeskAiPortsTest {
         } finally { output.file.delete() }
     }
 
+    @Test fun maxModelsEnhanceSmallImagesWhenInstalled() = runBlocking {
+        for (model in listOf(AiModel.DetailMax, AiModel.CartoonMax)) {
+            assumeTrue(model.installed(context))
+            AiNet.open(context, model, gpu = false).use { net ->
+                val input = IntArray(16 * 16) { 0xff6080a0.toInt() }
+                val output = net.upscale(input, 16, 16, 2)
+                assertTrue(output.size == 32 * 32)
+                assertTrue(output.any { it and 0xffffff != 0 })
+            }
+        }
+    }
+
+    @Test fun stripsMatchTheWholeImageAndReportProgress() = runBlocking {
+        assumeTrue(AiModel.DetailMax.installed(context))
+        AiNet.open(context, AiModel.DetailMax, gpu = false).use { net ->
+            val width = 40
+            val height = 70
+            val input = IntArray(width * height) { 0xff000000.toInt() or ((it % width) * 6 shl 16) or ((it / width) * 3 shl 8) or 90 }
+            val whole = net.upscale(input, width, height, 2)
+            val steps = mutableListOf<Float>()
+            val strips = upscaleInStrips(net, input, width, height, 2, rows = 24) { steps += it }
+            assertTrue(strips.size == whole.size)
+            val diff = whole.indices.sumOf { i -> (0..2).sumOf { c -> kotlin.math.abs((whole[i] shr (c * 8) and 255) - (strips[i] shr (c * 8) and 255)) }.toLong() } / (whole.size * 3.0)
+            assertTrue("mean difference $diff", diff < 2.0)
+            assertTrue(steps == listOf(24f / 70, 48f / 70, 1f))
+        }
+    }
+
+    @Test fun maxImageEnhanceWritesPngWhenInstalled() = runBlocking {
+        assumeTrue(AiModel.DetailMax.installed(context))
+        val input = File.createTempFile("enhance-input-", ".png", File("build"))
+        try {
+            val pixels = java.awt.image.BufferedImage(16, 12, java.awt.image.BufferedImage.TYPE_INT_RGB)
+            for (y in 0 until pixels.height) for (x in 0 until pixels.width) pixels.setRGB(x, y, (x * 16 shl 16) or (y * 20 shl 8) or 80)
+            ImageIO.write(pixels, "png", input)
+            val uri = Uri.fromFile(input).toString()
+            val info = MediaDeclaration(XmlNode("media", mapOf("uri" to uri, "width" to "16", "height" to "12")))
+            val output = AiEnhance.image(context, uri, info, EnhanceOptions(max = true), { _, _ -> })
+            try {
+                val image = ImageIO.read(output.file)
+                assertTrue(image.width == 32 && image.height == 24)
+            } finally { output.file.delete() }
+        } finally { input.delete() }
+    }
+
     @Test fun aiSmoothWritesInterpolatedClip() = runBlocking {
         assumeTrue(AiModel.SmoothLow.installed(context))
         val (layer, info) = tinyVideo()

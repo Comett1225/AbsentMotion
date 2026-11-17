@@ -1,6 +1,7 @@
 package app.absentmotion.ui.editor
 
 import androidx.compose.foundation.background
+import app.absentmotion.ui.adaptive.deskLayout
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -85,7 +86,7 @@ import kotlin.coroutines.coroutineContext
 import java.io.IOException
 import kotlin.math.roundToInt
 
-internal val SheetShape get() = if (app.absentmotion.platform.PlatformFeatures.desktop) RoundedCornerShape(12.dp) else RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+internal val SheetShape get() = if (deskLayout) RoundedCornerShape(12.dp) else RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
 private val ChoiceShape = RoundedCornerShape(6.dp)
 private val Swatches = listOf(0xFFFFFFFF, 0xFFFFE14D, 0xFFFF9F1C, 0xFFFF4D4D, 0xFFFF5FC8, 0xFF00FFA8, 0xFF4DB8FF, 0xFF000000).map { it.toInt() }
 internal val Warning get() = Am.Warning
@@ -213,7 +214,7 @@ internal fun CaptionsSheet(state: EditorState, clipId: Long? = null, onClose: ()
         val content: @Composable () -> Unit = {
         BoxWithConstraints(
             Modifier.fillMaxSize().pointerInput(Unit) { detectTapGestures { scrimTap() } }.windowInsetsPadding(WindowInsets.safeDrawing),
-            if (app.absentmotion.platform.PlatformFeatures.desktop) Alignment.Center else Alignment.BottomCenter,
+            if (deskLayout) Alignment.Center else Alignment.BottomCenter,
         ) {
             val sheetMax = captionSheetHeight(maxWidth.value, maxHeight.value, browsing).dp
             val sheetSize = if (wide) Modifier.fillMaxSize() else if (browsing) Modifier.height(sheetMax) else Modifier.heightIn(max = sheetMax)

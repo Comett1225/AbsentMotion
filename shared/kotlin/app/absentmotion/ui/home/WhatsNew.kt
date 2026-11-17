@@ -386,3 +386,19 @@ fun WhatsNewDialog(notes: WhatsNew, onClose: () -> Unit) {
         }
     }
 }
+
+@Composable
+internal fun MarkdownBody(notes: WhatsNew) {
+    val style = Rich(SpanStyle(color = Am.HomeInk, fontWeight = FontWeight.Bold), TextLinkStyles(SpanStyle(color = Am.HomeAccent, textDecoration = TextDecoration.Underline))) { null }
+    Text(notes.title, Modifier.padding(top = 16.dp).semantics { heading() }, color = Am.Navy, fontSize = 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.Bold)
+    notes.intro.forEach { Text(rich(it, style), Modifier.padding(top = 12.dp), color = Am.HomeInk, fontSize = 15.sp, lineHeight = 22.sp) }
+    notes.sections.forEach { section ->
+        Text(section.title, Modifier.padding(top = 20.dp, bottom = 8.dp).semantics { heading() }, color = Am.Navy, fontSize = 18.sp, lineHeight = 24.sp, fontWeight = FontWeight.Bold)
+        section.items.forEach { WhatsNewItem(it, style, Modifier.padding(bottom = 8.dp)) }
+        section.groups.forEach { group ->
+            WhatsNewLabel(group, Modifier.padding(top = 12.dp, bottom = 8.dp))
+            group.items.forEach { WhatsNewItem(it, style, Modifier.padding(bottom = 8.dp)) }
+        }
+    }
+    Spacer(Modifier.height(24.dp))
+}

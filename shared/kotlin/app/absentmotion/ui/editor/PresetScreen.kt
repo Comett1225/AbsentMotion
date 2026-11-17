@@ -1,6 +1,7 @@
 package app.absentmotion.ui.editor
 
 import androidx.compose.foundation.layout.widthIn
+import app.absentmotion.ui.adaptive.deskLayout
 import app.absentmotion.platform.Toast
 import app.absentmotion.platform.BackHandler
 import androidx.compose.foundation.Canvas
@@ -155,7 +156,7 @@ fun PresetScreen(state: EditorState) {
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
     }
-    val desk = app.absentmotion.platform.PlatformFeatures.desktop
+    val desk = deskLayout
     Column(Modifier.fillMaxSize().background(Am.TopBar).systemBarsPadding()) {
         if (desk) Row(Modifier.fillMaxWidth().height(52.dp).padding(start = 16.dp, end = 6.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(R.string.try_a_preset), Modifier.weight(1f), color = Am.OnDark, fontSize = 15.sp, fontWeight = FontWeight.Medium, maxLines = 1)

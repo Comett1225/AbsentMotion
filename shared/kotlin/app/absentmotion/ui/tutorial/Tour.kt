@@ -1,6 +1,7 @@
 package app.absentmotion.ui.tutorial
 
 import androidx.annotation.StringRes
+import app.absentmotion.ui.adaptive.deskLayout
 import app.absentmotion.R
 import kotlin.math.abs
 
@@ -185,7 +186,7 @@ class Tour(val steps: List<TourStep> = TourSteps.current, startAt: String? = nul
 }
 
 object TourSteps {
-    val current: List<TourStep> get() = if (app.absentmotion.platform.PlatformFeatures.desktop) DeskTourSteps.all else all
+    val current: List<TourStep> get() = if (deskLayout) DeskTourSteps.all else all
 
     private fun pick(now: TourFacts, adding: List<String>): List<String> = when {
         now.adding -> adding

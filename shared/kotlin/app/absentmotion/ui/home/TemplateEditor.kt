@@ -279,7 +279,7 @@ fun TemplateEditor(templateId: String, engine: EngineThread, settings: AppSettin
     fun timecode(ms: Int) = TimelineMath.timecode((ms * template.fps / 1000f).roundToInt(), template.fps)
 
     Box(Modifier.fillMaxSize().background(Am.TopBar).systemBarsPadding().pointerInput(Unit) {}, Alignment.TopCenter) {
-    BoxWithConstraints(Modifier.then(if (app.absentmotion.platform.PlatformFeatures.desktop) Modifier.widthIn(max = 1280.dp) else Modifier).fillMaxSize()) {
+    BoxWithConstraints(Modifier.then(if (app.absentmotion.ui.adaptive.deskLayout) Modifier.widthIn(max = 1280.dp) else Modifier).fillMaxSize()) {
     val wide = maxWidth >= WideFrom && maxWidth > maxHeight
     Column(Modifier.fillMaxSize()) {
         Spacer(Modifier.height(16.dp))

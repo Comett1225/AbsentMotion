@@ -128,6 +128,7 @@ class MainActivity : ComponentActivity() {
     private var closingEditor = false
     private var cameFromEditor = false
     private var exportingFromList by mutableStateOf<Scene?>(null)
+    private var alightLink by mutableStateOf<String?>(null)
     private var imported by mutableStateOf<List<ImportReport>>(emptyList())
     private var editingTemplate by mutableStateOf<String?>(null)
     private var firstRun by mutableStateOf<FirstRun?>(null)
@@ -168,6 +169,7 @@ class MainActivity : ComponentActivity() {
         followScreenSize(resources.configuration)
         store = ProjectStore(this)
         settings = AppSettings(this)
+        app.absentmotion.platform.DeskDetect.refresh(this)
         templates = TemplateStore(this)
         recovery = Recovery(File(filesDir, "recovery"))
         CrashLogs.install(this)
@@ -288,7 +290,7 @@ class MainActivity : ComponentActivity() {
                         else {
                             val screen = LocalConfiguration.current
                             CompositionLocalProvider(LocalWide provides tabletEditor(screen.smallestScreenWidthDp, screen.screenWidthDp), LocalTablet provides isTablet(screen.smallestScreenWidthDp), app.absentmotion.ui.editor.panels.LocalVibration provides settings.vibration, LocalDensity provides dense) {
-                                key(open) { Ltr { EditorScreen(open, onExit = ::closeEditor) } }
+                                key(open) { Ltr { app.absentmotion.platform.DeskTyping.Track { EditorScreen(open, onExit = ::closeEditor) } } }
                             }
                         }
                         if (open.exportOpen) ExportScreen(open.project, open.exportFrame, engine, settings, fromProjectList = false, outdated) { open.exportOpen = false }
@@ -344,9 +346,10 @@ class MainActivity : ComponentActivity() {
                     else if (app.absentmotion.ui.home.FfampOffer.pending(settings)) app.absentmotion.ui.home.FfampOfferDialog(settings)
                     else if (settings.updatesAsked) UpdateDialog() else UpdateAskDialog(settings)
                 }
+                alightLink?.let { app.absentmotion.ui.home.AlightLinkHelper(it, { alightLink = null }) }
                 app.absentmotion.ui.tutorial.TutorialHost(
                     open, store, settings,
-                    homeFree = open == null && first == null && !opening && editingTemplate == null && exportingFromList == null && offer == null && crashed == null && !problemShown && imported.isEmpty() && whatsNew == null && !app.absentmotion.ui.home.FfampOffer.pending(settings),
+                    homeFree = alightLink == null && open == null && first == null && !opening && editingTemplate == null && exportingFromList == null && offer == null && crashed == null && !problemShown && imported.isEmpty() && whatsNew == null && !app.absentmotion.ui.home.FfampOffer.pending(settings),
                     onOpen = ::open, onCloseEditor = ::closeEditor, onChanged = { projectsChanged++ },
                 )
             }
@@ -360,10 +363,12 @@ class MainActivity : ComponentActivity() {
 
     private fun updateCalm() = lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED) && editor == null && !closingEditor && !opening && !openingProject &&
         editingTemplate == null && exportingFromList == null && firstRun == null && recovered == null && crashed == null && !problemShown && whatsNew == null && !app.absentmotion.ui.home.FfampOffer.pending(settings) &&
-        settings.updatesAsked && !app.absentmotion.export.ExportRun.running
+        settings.updatesAsked && alightLink == null && !app.absentmotion.export.ExportRun.running
 
     private fun importShared() {
-        val uris = ImportHandOff.take().map(Uri::parse)
+        val shared = ImportHandOff.take()
+        shared.firstOrNull { app.absentmotion.links.AlightLinks.parse(it) != null }?.let { alightLink = it }
+        val uris = shared.filterNot { app.absentmotion.links.AlightLinks.parse(it) != null }.map(Uri::parse)
         if (uris.isNotEmpty()) importUris(uris)
     }
 
@@ -659,6 +664,13 @@ class MainActivity : ComponentActivity() {
         if (effectLanguage.isNotEmpty() && language != effectLanguage) engine.relabelEffects(this)
         effectLanguage = language
         followScreenSize(newConfig)
+        app.absentmotion.platform.DeskDetect.refresh(this)
+    }
+
+    override fun dispatchKeyEvent(event: android.view.KeyEvent): Boolean {
+        val state = editor
+        if (state != null && event.action == android.view.KeyEvent.ACTION_DOWN && app.absentmotion.platform.DeskKeys.handle(state, androidx.compose.ui.input.key.KeyEvent(event))) return true
+        return super.dispatchKeyEvent(event)
     }
 
     private fun followScreenSize(config: Configuration) {

@@ -1,6 +1,7 @@
 package app.absentmotion.ui.editor
 
 import app.absentmotion.ui.editor.panels.buttonLabel
+import app.absentmotion.ui.adaptive.deskLayout
 import app.absentmotion.platform.Toast
 import app.absentmotion.editor.deselectLayer
 import androidx.compose.foundation.Canvas
@@ -151,7 +152,7 @@ internal fun MenuPopup(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Popup(position, onDismiss, PopupProperties(focusable = true)) {
-        Column(Modifier.deskCursor().presence(scaleFrom = 0.92f, origin = origin).width(if (app.absentmotion.platform.PlatformFeatures.desktop) 240.dp else 250.dp).clip(MenuShape).background(MenuBg).then(if (app.absentmotion.platform.PlatformFeatures.desktop) Modifier.border(1.dp, ListLine, MenuShape) else Modifier), content = content)
+        Column(Modifier.deskCursor().presence(scaleFrom = 0.92f, origin = origin).width(if (deskLayout) 240.dp else 250.dp).clip(MenuShape).background(MenuBg).then(if (deskLayout) Modifier.border(1.dp, ListLine, MenuShape) else Modifier), content = content)
     }
 }
 
@@ -167,14 +168,14 @@ internal fun MenuRow(
     onClick: () -> Unit = {},
 ) {
     Box(
-        Modifier.fillMaxWidth().height(if (app.absentmotion.platform.PlatformFeatures.desktop && subText == null) 36.dp else 40.dp)
+        Modifier.fillMaxWidth().height(if (deskLayout && subText == null) 36.dp else 40.dp)
             .then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier)
             .drawBehind { if (divider) drawRect(MenuLine, size = Size(size.width, 1.dp.toPx())) },
     ) {
         Row(Modifier.fillMaxSize().alpha(if (enabled) 1f else DimAlpha), verticalAlignment = Alignment.CenterVertically) {
             if (icon != null) Box(Modifier.size(40.dp), Alignment.Center) { Icon(icon, null, Modifier.size(24.dp), tint = Am.OnDark) }
             Column(Modifier.weight(1f).padding(start = 14.dp), verticalArrangement = Arrangement.Center) {
-                Text(text, color = Am.OnDark, fontSize = if (app.absentmotion.platform.PlatformFeatures.desktop) 14.sp else 15.sp, lineHeight = if (subText == null) 20.sp else 19.5.sp, maxLines = 1)
+                Text(text, color = Am.OnDark, fontSize = if (deskLayout) 14.sp else 15.sp, lineHeight = if (subText == null) 20.sp else 19.5.sp, maxLines = 1)
                 if (subText != null) Text(subText, color = Am.OnDark, fontSize = deskSp(10f), lineHeight = 20.5.sp, maxLines = 1)
             }
             if (trailing != null) Icon(trailing, null, Modifier.padding(end = 7.dp).size(24.dp), tint = Am.OnDark)
@@ -267,7 +268,7 @@ internal class DropOrRiseSide(private val rose: androidx.compose.runtime.Mutable
 
 internal object AboveLeft : PopupPositionProvider {
     override fun calculatePosition(anchorBounds: IntRect, windowSize: IntSize, layoutDirection: LayoutDirection, popupContentSize: IntSize) =
-        IntOffset(aboveLeftX(anchorBounds.left, windowSize.width, popupContentSize.width, app.absentmotion.platform.PlatformFeatures.desktop), anchorBounds.top - popupContentSize.height)
+        IntOffset(aboveLeftX(anchorBounds.left, windowSize.width, popupContentSize.width, deskLayout), anchorBounds.top - popupContentSize.height)
 }
 
 internal fun aboveLeftX(anchorLeft: Int, windowWidth: Int, popupWidth: Int, desktop: Boolean): Int =

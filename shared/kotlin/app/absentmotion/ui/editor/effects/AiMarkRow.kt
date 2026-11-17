@@ -50,6 +50,11 @@ internal fun AiMarkRow(state: EditorState, mark: AiMark) {
     Row(Modifier.padding(start = 6.5.dp, end = 6.5.dp, top = AiMarkRowGap).fillMaxWidth().height(AiMarkRowHeight).clip(RoundedCornerShape(5.dp)).background(Am.Field),
         verticalAlignment = Alignment.CenterVertically) {
         Text(name, Modifier.weight(1f).padding(start = 12.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        if (kind == AiKind.Enhance && mark.attribute == "fillImage" && mark.original != null && mark.result != null) {
+            Text(stringResource(R.string.ai_compare), Modifier.clickable {
+                state.enhanceCompare = CompareImages(mark.original!!, mark.result!!, mark.media?.orientation ?: 0, state.scene.media(mark.result!!)?.orientation ?: 0)
+            }.padding(horizontal = 6.dp), color = Am.Accent, fontSize = 12.sp, maxLines = 1)
+        }
         if (kind.ai) Text(stringResource(R.string.ai), Modifier.padding(horizontal = 6.dp).clip(RoundedCornerShape(3.dp)).background(Am.Accent).padding(horizontal = 5.dp, vertical = 1.dp),
             color = Am.OnAccent, fontSize = 10.sp, fontWeight = FontWeight.Bold, maxLines = 1)
         if (mark.restorable) Box(Modifier.size(36.dp).clickable { state.selectedId?.let { id -> state.edit { it.withoutAiMark(id, kind) } } }) {

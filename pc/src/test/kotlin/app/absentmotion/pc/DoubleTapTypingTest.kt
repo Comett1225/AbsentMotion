@@ -228,7 +228,7 @@ class DoubleTapTypingTest {
     @Test fun everyDoubleTapFieldShowsTheValueDoubleTapToTypeHandsIt() {
         val calls = listOf("../shared/kotlin", "src/standins").flatMap { File(it).walk().filter { file -> file.extension == "kt" && file.name != "PanelParts.kt" }.toList() }
             .flatMap { file -> file.readText().split("DoubleTapToType(").drop(1).map { file.name to it.substringAfter("BasicTextField(").trimStart() } }
-        assertEquals(6, calls.size)
+        assertEquals(5, calls.size)
         calls.forEach { (name, call) -> assertTrue(name, call.startsWith("typed, onTyped,")) }
     }
 }

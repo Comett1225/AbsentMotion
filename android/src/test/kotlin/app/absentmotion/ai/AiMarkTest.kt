@@ -56,6 +56,18 @@ class AiMarkTest {
         assertEquals("photo.png", cut.withoutAiMark(AiKind.Background).node["fillImage"])
     }
 
+    @Test fun imageEnhanceRestoresTheImageAndRespectsTheStack() {
+        val enhanced = scene.layer(2)!!.copy(node = scene.layer(2)!!.node.with("fillImage", "enhanced.png").with("fillType", "media"))
+            .withAiMark(AiKind.Enhance, "photo.png", "enhanced.png", "upscale2+max", extra = mapOf("attribute" to "fillImage"))
+        val saved = Scene.parse(scene.update(2) { enhanced }.node.toXml()).layer(2)!!
+        assertEquals("photo.png", saved.withoutAiMark(AiKind.Enhance).node["fillImage"])
+        assertEquals(true, saved.aiMarks.single().enhance?.max)
+        val cut = saved.copy(node = saved.node.with("fillImage", "cut.png")).withAiMark(AiKind.Background, "enhanced.png", "cut.png")
+        assertTrue(cut.aiBuried(AiKind.Enhance))
+        assertEquals("photo.png", cut.withoutAiMark(AiKind.Enhance).node["fillImage"])
+        assertNull(AiAction.Enhance.unavailable(saved))
+    }
+
     @Test fun mediaChangedAfterwardsIsNotOverwritten() {
         val noise = scene.layer(1)!!.withAiMark(AiKind.Noise, "raw.wav", "clean.wav", "voice")
         val replaced = noise.copy(node = noise.node.with("src", "newer.wav"))

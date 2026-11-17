@@ -1,6 +1,7 @@
 package app.absentmotion.ui.editor.panels
 
 import app.absentmotion.ui.editor.deskVerticalScroll
+import app.absentmotion.ui.adaptive.deskLayout
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.runtime.collectAsState
 import app.absentmotion.ui.editor.DeskTip
@@ -52,6 +53,7 @@ import app.absentmotion.ui.editor.MenuPopup
 import app.absentmotion.ui.editor.MenuRow
 import app.absentmotion.ui.editor.PanelHeight
 import app.absentmotion.ui.editor.PanelIcons
+import app.absentmotion.ui.editor.RecordingKeyframeButton
 import app.absentmotion.ui.editor.Reorder
 import app.absentmotion.ui.editor.rememberReorder
 import app.absentmotion.ui.export.ExportIcons
@@ -144,7 +146,11 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
             EffectFrameButton(PanelIcons.Back, stringResource(R.string.topbar_back), Modifier.weight(1f)) { state.stepBack() }
             val linked = target != null && layer.element(target.ref)?.children?.any { it.name == "valueLink" } == true
             val onKeyframe = target != null && layer.onKeyframe(target.ref)
-            EffectFrameButton(if (onKeyframe) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, stringResource(if (onKeyframe) R.string.a11y_remove_keyframe else R.string.a11y_add_keyframe), Modifier.weight(1f), target != null && !linked) { state.toggleKeyframe() }
+            RecordingKeyframeButton(state, Modifier.weight(1f).fillMaxWidth(), target != null && !linked, { state.toggleKeyframe() }) {
+                val description = stringResource(if (onKeyframe) R.string.a11y_remove_keyframe else R.string.a11y_add_keyframe)
+                Icon(if (onKeyframe) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, description, Modifier.size(24.dp), tint = Am.OnDark)
+                HoldName(description)
+            }
             EffectFrameButton(PanelIcons.Easing, stringResource(R.string.a11y_easing), Modifier.weight(1f), target != null && !linked) { if (target != null && layer.easing(target.ref) != null) state.easingOpen = true else state.hintEasing(target?.let { layer.keyframes(it.ref).size } ?: 0) }
             Box(Modifier.weight(1f).fillMaxWidth()) {
                 EffectFrameButton(PanelIcons.More, stringResource(R.string.effects_more), Modifier.fillMaxSize(), instance == null) { menu = true }
@@ -378,7 +384,7 @@ private val DeleteRed = Color(0xFFD93A3A)
 
 @Composable
 private fun Modifier.deleteWhenHovered(remove: () -> Unit): Modifier {
-    if (!PlatformFeatures.desktop) return this
+    if (!deskLayout) return this
     val source = remember { MutableInteractionSource() }
     val hovered by source.collectIsHoveredAsState()
     val latest by rememberUpdatedState(remove)

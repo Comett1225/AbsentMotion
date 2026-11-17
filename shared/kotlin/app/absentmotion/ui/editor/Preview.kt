@@ -1,6 +1,7 @@
 package app.absentmotion.ui.editor
 
 import androidx.compose.ui.semantics.contentDescription
+import app.absentmotion.ui.adaptive.deskLayout
 import androidx.compose.ui.semantics.semantics
 import app.absentmotion.ui.theme.pressShape
 import android.graphics.Rect
@@ -266,7 +267,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
     }
 
     var wheelEnd by remember { mutableStateOf<kotlinx.coroutines.Job?>(null) }
-    val wheelView = if (!app.absentmotion.platform.PlatformFeatures.desktop || fixedView) Modifier else app.absentmotion.platform.previewWheel { delta, at, zoom, alt, shift ->
+    val wheelView = if (!deskLayout || fixedView) Modifier else app.absentmotion.platform.previewWheel { delta, at, zoom, alt, shift ->
         if (alt && !zoom && state.selectedId != null && !state.playing) {
             val amount = if (delta.y != 0f) delta.y else delta.x
             if (shift) state.editSelected(key = WHEEL_KEY) { it.withRotation(it.rotation + wheelTurn(amount)) }
@@ -286,7 +287,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
         }
     }
     val panScale by rememberUpdatedState(scale)
-    val middlePan = if (!app.absentmotion.platform.PlatformFeatures.desktop || fixedView) Modifier else Modifier.pointerInput(state) {
+    val middlePan = if (!deskLayout || fixedView) Modifier else Modifier.pointerInput(state) {
         awaitPointerEventScope {
             var last: Offset? = null
             while (true) {
@@ -312,12 +313,16 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
     Box(modifier.background(Am.PreviewBg).onSizeChanged { size = it }.onGloballyPositioned { origin = it.positionInRoot() }.then(wheelView).then(middlePan).then(touchWatch)) {
         app.absentmotion.platform.SceneSurface(state.engine, divisor, size, Modifier.fillMaxSize()) { state.previewSurface = it }
         CachedFrame(state, cacheUsable, live, dx, dy, scene.width * scale, scene.height * scale)
+        if (state.countInRemaining > 0) Text(
+            state.countInRemaining.toString(), Modifier.align(Alignment.Center), color = Color.White,
+            fontSize = 96.sp, fontWeight = FontWeight.Bold, style = TextStyle(shadow = Shadow(Color.Black, Offset(2f, 2f), 8f)),
+        )
         Box(
             Modifier.fillMaxSize().pointerInput(state) {
                 var lastTwoFingerTap = -1_000_000L
                 awaitEachGesture {
                     val down = awaitFirstDown()
-                    if (app.absentmotion.platform.PlatformFeatures.desktop && app.absentmotion.platform.textFieldFocused()) focusManager.clearFocus()
+                    if (deskLayout && app.absentmotion.platform.textFieldFocused()) focusManager.clearFocus()
                     val canvasGesture = (state.selectedId == null && MultiSelect.ids.isEmpty()) || state.panZoomMode || state.livePanel == EditorPanel.Crop
                     val multi = MultiSelect.ids.takeIf { it.isNotEmpty() && state.selectedId == null && !canvasGesture && !state.playing && state.drawing == null }
                     val multiFrom = multi?.let { state.scene }
@@ -423,7 +428,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                             state.editSelected("text-wrap") { startLayer.withResizedTextWrap(width) }
                         } else if (moved && startLayer != null && handle >= 0 && startQuad != null) {
                             val pivot = startPivot ?: ((startQuad[0] + startQuad[2]) / 2f)
-                            if (app.absentmotion.platform.PlatformFeatures.desktop && event.keyboardModifiers.isAltPressed) {
+                            if (deskLayout && event.keyboardModifiers.isAltPressed) {
                                 val turn = handleTurn(down.position - pivot, position - pivot)
                                 state.editSelected(key = "preview-handle") { it.withRotation(startLayer.rotation + turn) }
                                 continue
@@ -446,7 +451,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                         } else if (moved && cropFrom != null && startQuad != null && cropGrab >= 0 && fingers == 1) {
                             val d = boxFraction(startQuad, position) - boxFraction(startQuad, down.position)
                             state.setCrop(if (cropGrab == CROP_INSIDE) cropFrom.moved(d.x, d.y) else cropFrom.dragged(cropGrab, d.x, d.y, cropLock), "crop-drag")
-                        } else if (moved && canvasGesture && (event.changes.size > 1 || app.absentmotion.platform.PlatformFeatures.desktop)) {
+                        } else if (moved && canvasGesture && (event.changes.size > 1 || deskLayout)) {
                             val move = (pan + held) / currentScale
                             held = Offset.Zero
                             val next = (state.canvasZoom * zoom).coerceIn(0.01f, 64f)

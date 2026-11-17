@@ -48,6 +48,8 @@ The catalog has 150 font families. 50 of them are built into the app. The other 
 
 The search field at the top is labeled "Type here to search". The star on a font marks it as a favorite.
 
+While you search, a row of chips under the field shows **All**, **Imported**, **App**, **Device** and **Google Fonts**; pick one to see only that source. Results come in this order: your imported fonts, the app's fonts, fonts already on this device, then a line labeled **Google Fonts** with the matching families from all of Google Fonts. The Google Fonts list needs an internet connection the first time (it is then kept for a week); without one, that section is simply missing. Tap a Google Fonts family to download its regular style and use it. Typing in the search is never sent anywhere: only the list and the font you choose are loaded from Google.
+
 ### Your own fonts
 
 **Import Fonts** lets you pick font files from your phone. If a file cannot be used, a list says which ones failed. Press and hold an imported font to remove it.

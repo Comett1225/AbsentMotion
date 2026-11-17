@@ -1,6 +1,7 @@
 package app.absentmotion.ui.editor.panels
 
 import app.absentmotion.ui.editor.deskSp
+import app.absentmotion.ui.adaptive.deskLayout
 import app.absentmotion.ui.editor.deskVerticalScroll
 import app.absentmotion.model.finiteFloat
 import androidx.annotation.StringRes
@@ -124,7 +125,7 @@ internal fun CameraPanel(state: EditorState, layer: Layer, modifier: Modifier = 
                 when (tab) {
                     0 -> {
                         SwitchRow(stringResource(R.string.depth_order), state.scene.depthOrder) { on -> state.edit { it.withDepthOrder(on) } }
-                        val desk = app.absentmotion.platform.PlatformFeatures.desktop
+                        val desk = deskLayout
                         @Composable fun SortRow() {
                             if (state.scene.depthOrder) Row(Modifier.fillMaxWidth().height(RowHeight).padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Text(stringResource(R.string.depth_sort), Modifier.weight(1f), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)

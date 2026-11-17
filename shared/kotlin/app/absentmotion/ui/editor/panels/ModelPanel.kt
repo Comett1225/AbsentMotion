@@ -1,6 +1,7 @@
 package app.absentmotion.ui.editor.panels
 
 import app.absentmotion.ui.editor.deskVerticalScroll
+import app.absentmotion.ui.adaptive.deskLayout
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -32,7 +33,7 @@ internal fun ModelPanel(state: EditorState, layer: Layer, modifier: Modifier = M
     var active by remember { mutableStateOf(ModelParams[0].first) }
     SideEffect { state.keyTarget = KeyTarget(PropRef.shape(active.id), active.default) }
     Column(modifier.deskVerticalScroll()) {
-        if (!app.absentmotion.platform.PlatformFeatures.desktop) MixPiecesRow(state, layer)
+        if (!deskLayout) MixPiecesRow(state, layer)
         for ((plain, label) in ModelParams) {
             val param = plain.copy(label = stringResource(label))
             EffectNumbers(state, param, layer.propText(param.id) ?: param.default, true, active.id == param.id, { active = plain }) { text, gesture ->
@@ -40,6 +41,6 @@ internal fun ModelPanel(state: EditorState, layer: Layer, modifier: Modifier = M
                 state.editSelected(if (gesture) "model-${param.id}" else null) { it.withProp(param.id, "float", text) }
             }
         }
-        if (app.absentmotion.platform.PlatformFeatures.desktop) MixPiecesRow(state, layer)
+        if (deskLayout) MixPiecesRow(state, layer)
     }
 }

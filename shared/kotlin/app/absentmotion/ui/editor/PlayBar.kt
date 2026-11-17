@@ -35,12 +35,7 @@ fun PlayBar(state: EditorState, modifier: Modifier = Modifier, transportOnly: Bo
             BarButton(ChromeIcons.Redo, stringResource(R.string.play_redo), cell.tutorialTarget("redo"), enabled = state.canRedo) { state.redo() }
         }
         BarButton(ChromeIcons.SkipBack, stringResource(R.string.play_skip_back), cell.tutorialTarget("skip_back")) { state.skipBack() }
-        val settings = state.settings
-        BarButton(
-            if (state.playing) ChromeIcons.Pause else if (settings.loopingPlay) ChromeIcons.PlayRepeat else ChromeIcons.Play,
-            stringResource(if (state.playing) R.string.play_pause else R.string.play_play), cell.tutorialTarget("play"),
-            onLongClick = if (state.playing) null else ({ settings.loopingPlay = !settings.loopingPlay }),
-        ) { state.playing = !state.playing }
+        PlaybackControl(state, cell.tutorialTarget("play"))
         BarButton(ChromeIcons.SkipForward, stringResource(R.string.play_skip_forward), cell.tutorialTarget("skip_forward")) { state.skipForward() }
         BarButton(ChromeIcons.CopyPaste, stringResource(R.string.play_copy_paste), cell) { menuOpen = true }
         if (!transportOnly) Box(cell) {

@@ -1,6 +1,7 @@
 package app.absentmotion.ui.editor
 
 import app.absentmotion.ui.tutorial.tutorialTarget
+import app.absentmotion.ui.adaptive.deskLayout
 import app.absentmotion.ui.tutorial.tutorialGuard
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
@@ -123,7 +124,7 @@ internal fun TransitionButton(state: EditorState, modifier: Modifier, compact: B
         var drag by remember { mutableFloatStateOf(0f) }
         val hide = stringResource(R.string.transition_hide)
         val press = remember { MutableInteractionSource() }
-        val desk = app.absentmotion.platform.PlatformFeatures.desktop
+        val desk = deskLayout
         Box(modifier.size(if (desk) 36.dp else if (compact) 46.dp else 73.dp).tutorialGuard()
             .semantics { customActions = listOf(CustomAccessibilityAction(hide) { state.transitionButtonDismissed = true; true }) }
             .pointerInput(state) {
@@ -154,12 +155,12 @@ internal fun AnimateButton(state: EditorState, modifier: Modifier) {
     Presence(shown) {
         val press = remember { MutableInteractionSource() }
         Box(
-            (if (app.absentmotion.platform.PlatformFeatures.desktop) modifier.presence(scaleFrom = 0.6f).size(30.dp) else modifier.offset { IntOffset(-clear.value.roundToPx(), 0) }.padding(12.dp).presence(scaleFrom = 0.6f).size(48.dp)).tutorialTarget("animate").tutorialGuard().pressScale(press)
-                .shadow(if (app.absentmotion.platform.PlatformFeatures.desktop) 0.dp else 4.dp, CircleShape).background(Am.Panel, CircleShape).border(if (app.absentmotion.platform.PlatformFeatures.desktop) 1.2.dp else 1.8.dp, Am.Accent, CircleShape)
+            (if (deskLayout) modifier.presence(scaleFrom = 0.6f).size(30.dp) else modifier.offset { IntOffset(-clear.value.roundToPx(), 0) }.padding(12.dp).presence(scaleFrom = 0.6f).size(48.dp)).tutorialTarget("animate").tutorialGuard().pressScale(press)
+                .shadow(if (deskLayout) 0.dp else 4.dp, CircleShape).background(Am.Panel, CircleShape).border(if (deskLayout) 1.2.dp else 1.8.dp, Am.Accent, CircleShape)
                 .clickable(press, null) { state.selectedId?.let { state.playing = false; open = it } },
             contentAlignment = Alignment.Center,
         ) {
-            Icon(PanelIcons.Animate, stringResource(R.string.a11y_animate), Modifier.size(if (app.absentmotion.platform.PlatformFeatures.desktop) 18.dp else 24.dp), tint = Am.Accent)
+            Icon(PanelIcons.Animate, stringResource(R.string.a11y_animate), Modifier.size(if (deskLayout) 18.dp else 24.dp), tint = Am.Accent)
             HoldName(stringResource(R.string.a11y_animate))
         }
     }
@@ -246,7 +247,7 @@ internal fun AnimationSheet(state: EditorState, ids: Set<Long>, onClose: () -> U
 internal fun MotionSheet(title: String, onClose: () -> Unit, content: @Composable () -> Unit) {
     Dialog(onClose, sheetDialogProperties()) {
         PhoneScreen(onDismiss = onClose, sheet = true) {
-            Box(Modifier.fillMaxSize().clickable(interactionSource = null, indication = null, onClick = onClose).systemBarsPadding(), if (app.absentmotion.platform.PlatformFeatures.desktop) Alignment.Center else Alignment.BottomCenter) {
+            Box(Modifier.fillMaxSize().clickable(interactionSource = null, indication = null, onClick = onClose).systemBarsPadding(), if (deskLayout) Alignment.Center else Alignment.BottomCenter) {
                 Column(Modifier.fillMaxWidth().clip(SheetShape).background(Am.Panel).clickable(interactionSource = null, indication = null) {}.padding(horizontal = 16.dp)) {
                     Row(Modifier.fillMaxWidth().height(48.dp), verticalAlignment = Alignment.CenterVertically) {
                         Text(title, Modifier.weight(1f), color = Am.OnDark, fontSize = 17.sp, fontWeight = FontWeight.Bold)

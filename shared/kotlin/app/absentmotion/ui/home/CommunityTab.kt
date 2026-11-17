@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -24,9 +26,12 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
@@ -37,7 +42,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -55,8 +59,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -68,39 +74,126 @@ import app.absentmotion.R
 import app.absentmotion.export.formatBytes
 import app.absentmotion.library.CommunityClient
 import app.absentmotion.library.CommunityDamagedException
+import app.absentmotion.library.CommunityFeed
 import app.absentmotion.library.CommunityIndex
 import app.absentmotion.library.CommunityItem
 import app.absentmotion.library.CommunityKind
-import app.absentmotion.library.CommunityFeed
-import app.absentmotion.library.installCommunityTool
-import app.absentmotion.tools.InstalledTools
+import app.absentmotion.library.CommunitySort
 import app.absentmotion.library.PresetStore
 import app.absentmotion.library.addCommunityPreset
+import app.absentmotion.library.communityMatches
 import app.absentmotion.media.pictureSample
 import app.absentmotion.platform.BitmapFactory
 import app.absentmotion.platform.LocalContext
 import app.absentmotion.platform.PlatformFeatures
 import app.absentmotion.platform.Toast
 import app.absentmotion.platform.asImageBitmap
+import app.absentmotion.ui.editor.ChromeIcons
+import app.absentmotion.ui.editor.PanelIcons
+import app.absentmotion.ui.editor.SearchField
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.ThemeFade
+import java.io.File
+import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.coroutines.coroutineContext
+import kotlin.math.abs
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
-import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.coroutines.coroutineContext
-import kotlin.math.abs
 
 internal var sessionIndex: CommunityIndex? = null
 
+internal class CommunityBrowseState {
+    var query by mutableStateOf("")
+    var sort by mutableStateOf(CommunitySort.Newest)
+    var include by mutableStateOf(emptySet<String>())
+    var exclude by mutableStateOf(emptySet<String>())
+    fun clear() { query = ""; include = emptySet(); exclude = emptySet() }
+    fun cycle(tag: String) {
+        when (tag) {
+            in include -> { include -= tag; exclude += tag }
+            in exclude -> exclude -= tag
+            else -> include += tag
+        }
+    }
+}
+
+private val sessionBrowse = CommunityBrowseState()
+
+@Composable
+internal fun CommunityBrowseControls(state: CommunityBrowseState, items: List<CommunityItem>, modifier: Modifier = Modifier) {
+    var sorting by remember { mutableStateOf(false) }
+    var tagsOpen by remember { mutableStateOf(false) }
+    val tags = remember(items) { items.flatMap { it.tags.distinct() }.groupingBy { it }.eachCount().toSortedMap(java.text.Collator.getInstance()) }
+    Column(modifier) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            SearchField(state.query, { state.query = it }, Modifier.weight(1f).heightIn(min = 48.dp),
+                hint = stringResource(R.string.community_search), background = Am.Card, content = Am.Navy, faint = Am.HomeDim)
+            Box {
+                Box(Modifier.size(48.dp).clip(RoundedCornerShape(8.dp)).background(Am.Card).clickable { sorting = true }, Alignment.Center) {
+                    Icon(HomeIcons.ArrowDown, stringResource(R.string.sounds_sort), Modifier.size(22.dp), tint = Am.Navy)
+                }
+                DropdownMenu(sorting, { sorting = false }, containerColor = Am.Card) {
+                    CommunitySort.entries.forEach { sort ->
+                        DropdownMenuItem(
+                            text = { Text(stringResource(if (sort == CommunitySort.Newest) R.string.sounds_order_newest else R.string.sounds_order_az), color = Am.Navy) },
+                            leadingIcon = { Box(Modifier.size(24.dp)) { if (state.sort == sort) Icon(PanelIcons.Check, null, tint = Am.HomeAccent) } },
+                            modifier = Modifier.semantics { selected = state.sort == sort },
+                            onClick = { state.sort = sort; sorting = false }
+                        )
+                    }
+                }
+            }
+            Box(Modifier.heightIn(min = 48.dp).clip(RoundedCornerShape(8.dp)).background(Am.Card).clickable { tagsOpen = true }.padding(horizontal = 10.dp, vertical = 8.dp), Alignment.Center) {
+                Text(stringResource(R.string.community_tags), color = Am.Navy, fontSize = 14.sp)
+            }
+        }
+        if (state.include.isNotEmpty() || state.exclude.isNotEmpty()) {
+            Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).heightIn(min = 44.dp),
+                verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                (state.include + state.exclude).forEach { tag ->
+                    val included = tag in state.include
+                    val colour = if (included) Am.HomeAccent else Am.Warning
+                    val remove = stringResource(R.string.community_remove_filter, tag)
+                    Row(Modifier.clip(RoundedCornerShape(16.dp)).background(Am.Card)
+                        .semantics { contentDescription = remove }
+                        .clickable { state.include -= tag; state.exclude -= tag }.padding(horizontal = 10.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Icon(if (included) PanelIcons.Check else ChromeIcons.Minus, null, Modifier.size(14.dp), tint = colour)
+                        Text(tag, color = colour, fontSize = 12.sp)
+                        Icon(HomeIcons.Close, null, Modifier.size(12.dp), tint = colour)
+                    }
+                }
+                Text(stringResource(R.string.community_clear), Modifier.clip(RoundedCornerShape(6.dp))
+                    .clickable { state.include = emptySet(); state.exclude = emptySet() }.padding(10.dp), color = Am.Navy, fontSize = 13.sp)
+            }
+        }
+    }
+    if (tagsOpen) ToolSheet(stringResource(R.string.community_tags), { tagsOpen = false }, closeButton = true) {
+        tags.forEach { (tag, count) ->
+            val included = tag in state.include
+            val excluded = tag in state.exclude
+            val colour = if (included) Am.HomeAccent else if (excluded) Am.Warning else Am.Navy
+            val status = if (included) stringResource(R.string.community_include_tag, tag) else if (excluded) stringResource(R.string.community_exclude_tag, tag) else tag
+            Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clip(RoundedCornerShape(8.dp))
+                .semantics { stateDescription = status }.clickable { state.cycle(tag) }.padding(vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Box(Modifier.size(24.dp), Alignment.Center) {
+                    if (included || excluded) Icon(if (included) PanelIcons.Check else ChromeIcons.Minus, null, tint = colour)
+                }
+                Text(tag, Modifier.weight(1f), color = colour, fontSize = 15.sp)
+                Text(count.toString(), color = Am.HomeDim, fontSize = 14.sp)
+            }
+        }
+    }
+}
+
 private enum class CommunityCategory(val labelRes: Int) {
     Projects(R.string.community_filter_projects),
-    Presets(R.string.community_filter_presets),
-    Tools(R.string.community_filter_tools)
+    Presets(R.string.community_filter_presets)
 }
 
 private class ActiveDownload(
@@ -111,6 +204,7 @@ private class ActiveDownload(
 
 @Composable
 fun CommunityTab(modifier: Modifier, onImport: (File) -> Unit) {
+    val browse = sessionBrowse
     val context = LocalContext.current
     val isDesktop = PlatformFeatures.desktop
     val scope = rememberCoroutineScope()
@@ -178,11 +272,13 @@ fun CommunityTab(modifier: Modifier, onImport: (File) -> Unit) {
             val presets = remember(current.items) {
                 current.items.filter { it.kind == CommunityKind.Preset }
             }
-            val tools = remember(current.items) {
-                current.items.filter { it.kind == CommunityKind.Tool }
-            }
             Column(modifier.fillMaxSize()) {
                 Spacer(Modifier.height(if (isDesktop) 16.dp else 8.dp))
+                CommunityBrowseControls(
+                    browse, if (pager.currentPage == 0) projects else presets,
+                    Modifier.padding(horizontal = pad).fillMaxWidth()
+                )
+                Spacer(Modifier.height(8.dp))
                 CommunityCategoryBar(
                     categories = CommunityCategory.entries,
                     currentPage = pager.currentPage,
@@ -208,21 +304,16 @@ fun CommunityTab(modifier: Modifier, onImport: (File) -> Unit) {
                     ) {
                         when (category) {
                             CommunityCategory.Projects -> CommunityItemsPage(
-                                items = projects,
+                                items = communityMatches(projects, browse.query, browse.sort, browse.include, browse.exclude),
+                                onClear = browse::clear,
                                 pad = pad,
                                 client = client,
                                 thumbs = thumbs,
                                 onSelect = { selected = it }
                             )
                             CommunityCategory.Presets -> CommunityItemsPage(
-                                items = presets,
-                                pad = pad,
-                                client = client,
-                                thumbs = thumbs,
-                                onSelect = { selected = it }
-                            )
-                            CommunityCategory.Tools -> CommunityItemsPage(
-                                items = tools,
+                                items = communityMatches(presets, browse.query, browse.sort, browse.include, browse.exclude),
+                                onClear = browse::clear,
                                 pad = pad,
                                 client = client,
                                 thumbs = thumbs,
@@ -389,19 +480,22 @@ private fun CommunityCategoryBar(
 @Composable
 private fun CommunityItemsPage(
     items: List<CommunityItem>,
+    onClear: () -> Unit,
     pad: Dp,
     client: CommunityClient,
     thumbs: MutableMap<String, ImageBitmap?>,
     onSelect: (CommunityItem) -> Unit
 ) {
     if (items.isEmpty()) {
-        Box(Modifier.fillMaxSize().padding(horizontal = 32.dp), Alignment.Center) {
+        Column(Modifier.fillMaxSize().padding(horizontal = 24.dp), Arrangement.Center, Alignment.CenterHorizontally) {
             Text(
-                text = stringResource(R.string.community_empty),
+                text = stringResource(R.string.community_no_matches),
                 color = Am.HomeMid,
                 fontSize = 15.sp,
                 textAlign = TextAlign.Center
             )
+            Spacer(Modifier.height(12.dp))
+            BigButton(stringResource(R.string.community_clear_search_filters), primary = false, onClick = onClear)
         }
     } else {
         LazyVerticalGrid(
@@ -498,18 +592,9 @@ private fun CommunityItemSheet(
     val scope = rememberCoroutineScope()
     var activeDownload by remember(item) { mutableStateOf<ActiveDownload?>(null) }
     val downloading = activeDownload != null
-    val isTool = item.kind == CommunityKind.Tool
-    val installedSha by produceState<String?>(null, item, InstalledTools.revision) {
-        value = if (isTool) withContext(Dispatchers.IO) { InstalledTools.find(context, item.name)?.let { sha256Of(it.file) } } else null
-    }
     val addLabel = stringResource(
-        when {
-            item.kind == CommunityKind.Bundle -> R.string.community_add
-            !isTool -> R.string.community_add_preset
-            installedSha == null -> R.string.community_add_tool
-            installedSha == item.sha256 -> R.string.community_tool_added
-            else -> R.string.custom_tool_update
-        }
+        if (item.kind == CommunityKind.Bundle) R.string.community_add
+        else R.string.community_add_preset
     )
 
     fun stopDownload() {
@@ -529,17 +614,11 @@ private fun CommunityItemSheet(
         if (activeDownload != null) return
         val http = TrustedHttp(CommunityFeed.source)
         val cancelled = AtomicBoolean(false)
-        val updating = installedSha != null
         val job = scope.launch {
             val me = coroutineContext.job
             try {
                 val file = withContext(Dispatchers.IO) {
-                    val client = CommunityClient(context.cacheDir) { http }
-                    if (item.kind == CommunityKind.Tool) {
-                        installCommunityTool(context, client, item)
-                        return@withContext File(InstalledTools.root(context), item.name)
-                    }
-                    val downloaded = client.download(item)
+                    val downloaded = CommunityClient(context.cacheDir) { http }.download(item)
                     if (item.kind == CommunityKind.Preset) {
                         addCommunityPreset(downloaded, PresetStore(context))
                     }
@@ -552,18 +631,6 @@ private fun CommunityItemSheet(
                 onDismiss()
                 if (item.kind == CommunityKind.Bundle) {
                     onImport(file)
-                } else if (isTool) {
-                    Toast.makeText(
-                        context,
-                        context.getString(
-                            when {
-                                updating -> R.string.custom_tool_updated
-                                "home" in item.where -> R.string.community_added_tool
-                                else -> R.string.community_added_tool_editor
-                            }
-                        ),
-                        Toast.LENGTH_LONG
-                    ).show()
                 } else {
                     Toast.makeText(
                         context,
@@ -645,30 +712,18 @@ private fun CommunityItemSheet(
                     Modifier.fillMaxWidth().height(IntrinsicSize.Min),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    if (isTool && installedSha != null && !downloading) {
-                        BigButton(
-                            label = stringResource(R.string.custom_tool_remove),
-                            modifier = Modifier.weight(1f).fillMaxHeight(),
-                            icon = HomeIcons.Delete,
-                            primary = false
-                        ) {
-                            InstalledTools.remove(context, item.name)
-                            Toast.makeText(context, context.getString(R.string.custom_tool_removed), Toast.LENGTH_SHORT).show()
-                        }
-                    } else {
-                        BigButton(
-                            label = stringResource(R.string.cancel),
-                            modifier = Modifier.weight(1f).fillMaxHeight(),
-                            primary = false
-                        ) {
-                            if (downloading) stopDownload() else closeSheet()
-                        }
+                    BigButton(
+                        label = stringResource(R.string.cancel),
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
+                        primary = false
+                    ) {
+                        if (downloading) stopDownload() else closeSheet()
                     }
                     BigButton(
                         label = addLabel,
                         modifier = Modifier.weight(1f).fillMaxHeight(),
-                        icon = if (!isTool || installedSha == null) HomeIcons.Plus else if (installedSha == item.sha256) null else HomeIcons.Download,
-                        enabled = !downloading && !(isTool && installedSha == item.sha256)
+                        icon = HomeIcons.Plus,
+                        enabled = !downloading
                     ) {
                         startDownload()
                     }
@@ -683,7 +738,9 @@ private fun CommunityItemSheet(
             1.5f
         }
         Box(
-            (if (isTool) Modifier.size(96.dp) else Modifier.fillMaxWidth().aspectRatio(thumbRatio))
+            Modifier
+                .fillMaxWidth()
+                .aspectRatio(thumbRatio)
                 .clip(RoundedCornerShape(12.dp))
                 .background(Am.Scrim),
             Alignment.Center
@@ -747,10 +804,6 @@ private fun CommunityItemSheet(
                     fontWeight = FontWeight.SemiBold
                 )
             }
-        }
-        if (isTool) {
-            Spacer(Modifier.height(16.dp))
-            ToolPermissionsList(item.permissions)
         }
         if (item.tags.isNotEmpty()) {
             Spacer(Modifier.height(14.dp))

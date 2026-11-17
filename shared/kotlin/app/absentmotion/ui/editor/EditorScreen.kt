@@ -1,9 +1,12 @@
 package app.absentmotion.ui.editor
 
 import kotlinx.coroutines.flow.drop
+import app.absentmotion.ui.adaptive.deskLayout
 import app.absentmotion.platform.Log
 import app.absentmotion.platform.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -69,7 +72,7 @@ internal val LocalEditorScope = staticCompositionLocalOf<CoroutineScope> { error
 @Composable
 fun EditorScreen(state: EditorState, onExit: () -> Unit) {
     val scope = rememberCoroutineScope()
-    CompositionLocalProvider(LocalEditorScope provides scope, LocalDeskEditor provides app.absentmotion.platform.PlatformFeatures.desktop) {
+    CompositionLocalProvider(LocalEditorScope provides scope, LocalDeskEditor provides deskLayout) {
         Box(Modifier.fillMaxSize().pointerInput(Unit) {
             awaitPointerEventScope {
                 while (true) {
@@ -79,6 +82,13 @@ fun EditorScreen(state: EditorState, onExit: () -> Unit) {
             }
         }) {
             EditorBody(state, onExit)
+            state.enhanceCompare?.let { images ->
+                app.absentmotion.ui.home.ToolSheet(stringResource(R.string.ai_compare), { state.enhanceCompare = null }, bottom = {
+                    app.absentmotion.ui.home.BigButton(stringResource(R.string.action_close), Modifier.fillMaxWidth().padding(16.dp)) { state.enhanceCompare = null }
+                }) {
+                    app.absentmotion.ui.editor.effects.EnhanceCompare(images, Modifier.padding(vertical = 16.dp))
+                }
+            }
             val color = remember { arrayOfNulls<FullColor>(1) }.also { if (state.fullColor != null) it[0] = state.fullColor }[0]
             Presence(state.fullColor != null) { color?.let { PhoneScreen(onDismiss = { state.endGesture(); state.fullColor = null }, title = stringResource(R.string.color), onConfirm = { state.endGesture(); state.fullColor = null }) { Box(Modifier.fillMaxSize().presence(rise = 16.dp)) { FullColorPicker(state, it) } } } }
             if (state.cameraOpen) EditorCamera(state, scope)
@@ -96,11 +106,11 @@ private fun EditorBody(state: EditorState, onExit: () -> Unit) {
         lifecycle.addObserver(observer)
         onDispose { lifecycle.removeObserver(observer) }
     }
-    if (!app.absentmotion.platform.PlatformFeatures.desktop && !wide && state.panel == EditorPanel.EditText && state.selectedId?.let { state.scene.layer(it) }?.kind == "text") {
+    if (!deskLayout && !wide && state.panel == EditorPanel.EditText && state.selectedId?.let { state.scene.layer(it) }?.kind == "text") {
         PhoneScreen(plain = true) { TextEditor(state) }
         return
     }
-    if (!app.absentmotion.platform.PlatformFeatures.desktop && state.drawing != null && state.drawing !is app.absentmotion.editor.PointMode) {
+    if (!deskLayout && state.drawing != null && state.drawing !is app.absentmotion.editor.PointMode) {
         PhoneScreen(fillWidth = Dp.Infinity) { DrawingEditor(state) }
         return
     }
@@ -136,13 +146,19 @@ private fun EditorBody(state: EditorState, onExit: () -> Unit) {
             containerColor = Am.Field,
         )
     }
-    if (app.absentmotion.platform.PlatformFeatures.desktop) {
-        DeskWorkspace(state, onExit, addLibrary)
+    if (deskLayout) {
+        if (app.absentmotion.platform.PlatformFeatures.desktop) DeskWorkspace(state, onExit, addLibrary)
+        else Column(Modifier.fillMaxSize().background(Am.TopBar).windowInsetsPadding(androidx.compose.foundation.layout.WindowInsets.safeDrawing)) {
+            androidx.compose.foundation.layout.Row(Modifier.fillMaxWidth().height(44.dp).padding(horizontal = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                DeskTopBar(state, onExit) {}
+            }
+            Box(Modifier.fillMaxWidth().weight(1f)) { DeskWorkspace(state, onExit, addLibrary) }
+        }
         return
     }
     Box(Modifier.fillMaxSize()) {
         if (wide) WideEditorBody(state, onExit, addLibrary) else PhoneEditorBody(state, onExit, addLibrary)
-        SlideOver(state.effectBrowserOpen) { PhoneScreen(fillWidth = if (!app.absentmotion.platform.PlatformFeatures.desktop && app.absentmotion.ui.adaptive.adaptiveWindowIsWide()) 0.dp else if (wide && LocalConfiguration.current.screenWidthDp >= 900) Dp.Infinity else 720.dp) { app.absentmotion.ui.editor.effects.EffectBrowser(state) } }
+        SlideOver(state.effectBrowserOpen) { PhoneScreen(fillWidth = if (!deskLayout && app.absentmotion.ui.adaptive.adaptiveWindowIsWide()) 0.dp else if (wide && LocalConfiguration.current.screenWidthDp >= 900) Dp.Infinity else 720.dp) { app.absentmotion.ui.editor.effects.EffectBrowser(state) } }
         SlideOver(state.presetsOpen) { PhoneScreen { PresetScreen(state) } }
         SlideOver(state.toolOpen != 0) { PhoneScreen(fillWidth = 720.dp) { EditorTools(state, LocalEditorScope.current) } }
     }
@@ -169,7 +185,6 @@ internal fun EditorTools(state: EditorState, scope: kotlinx.coroutines.Coroutine
                 3 -> app.absentmotion.ui.home.TrimScreen { close() }
                 4 -> app.absentmotion.ui.home.ExtractAudioScreen { close() }
                 5 -> app.absentmotion.ui.home.GifScreen { close() }
-                6 -> state.customTool?.let { id -> app.absentmotion.tools.InstalledTools.find(context, id) }?.let { app.absentmotion.ui.home.CustomToolScreen(it, state) { close() } }
             }
         }
     }
@@ -266,7 +281,10 @@ private fun Playback(state: EditorState) {
         view.keepScreenOn = state.playing
         onDispose { view.keepScreenOn = false }
     }
-    LaunchedEffect(state.playing) {
+    LaunchedEffect(state.countInRemaining) {
+        if (state.countInRemaining > 0) { kotlinx.coroutines.delay(1000); state.countInStep() }
+    }
+    LaunchedEffect(state.playing, state.settings.playbackSpeed) {
         if (!state.playing) return@LaunchedEffect
         if (state.frame >= state.scene.lastFrame) state.frame = 0
         state.engine.timing()
@@ -275,31 +293,32 @@ private fun Playback(state: EditorState) {
         try {
             var startFrame = state.frame
             var startMs = state.scene.frameStart(startFrame)
-            var audible = audio?.play(startMs.toDouble()) == true
+            val speed = state.settings.playbackSpeed
+            var audible = speed == 4 && audio?.play(startMs.toDouble()) == true
             var startNanos = withFrameNanos { it }
             var shown = startFrame
             while (state.playing) {
                 val now = withFrameNanos { it }
-                if (audio?.interrupted == true) { state.playing = false; break }
+                if (audible && audio?.interrupted == true) { state.playing = false; break }
                 if (state.frame != shown) {
                     startFrame = state.frame
                     startMs = state.scene.frameStart(startFrame)
                     startNanos = now
-                    audible = audio?.play(startMs.toDouble()) == true
+                    audible = speed == 4 && audio?.play(startMs.toDouble()) == true
                 }
                 val fps = state.scene.fps
                 val frame = if (audible) {
                     val ms = audio?.positionMs() ?: startMs.toDouble()
                     startFrame + ((ms - startMs).coerceAtLeast(0.0) * fps / 1000.0 + 0.25).toInt()
                 } else {
-                    startFrame + (((now - startNanos) * fps + 250_000_000L) / 1_000_000_000L).toInt()
+                    startFrame + previewFrameOffset(now - startNanos, fps, speed)
                 }
                 if (frame > state.scene.lastFrame) {
                     if (state.settings.loopingPlay && state.scene.lastFrame > 0) {
                         startFrame = 0
                         startMs = state.scene.frameStart(0)
                         startNanos = now
-                        audible = audio?.play(startMs.toDouble()) == true
+                        audible = speed == 4 && audio?.play(startMs.toDouble()) == true
                         state.frame = 0
                     } else {
                         state.parkAtEnd()
@@ -317,3 +336,6 @@ private fun Playback(state: EditorState) {
         }
     }
 }
+
+internal fun previewFrameOffset(elapsedNanos: Long, fps: Int, speed: Int): Int =
+    ((elapsedNanos.toDouble() * fps * speed / 4.0 + 250_000_000.0) / 1_000_000_000.0).toInt()

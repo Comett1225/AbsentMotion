@@ -57,7 +57,7 @@ internal fun aiDuration(seconds: Double): String {
 internal fun guessedRate(phone: AiPhone): Double {
     val gpu = when (phone.speed) { PhoneSpeed.Fast -> 400.0; PhoneSpeed.Good -> 120.0; PhoneSpeed.Basic -> 35.0 }
     val cpu = when (phone.speed) { PhoneSpeed.Fast -> 40.0; PhoneSpeed.Good -> 15.0; PhoneSpeed.Basic -> 6.0 }
-    return if (phone.usesGpu) gpu * (if (phone.gpu?.fp16 == true) 1.0 else 0.6) else cpu
+    return if (phone.usesGpu) gpu * (if (phone.gpu?.fp16 == true) 1.0 else 0.6) else if (app.absentmotion.platform.PlatformFeatures.desktop) DESKTOP_CPU_RATE else cpu
 }
 
 internal fun aiVerdict(phone: AiPhone, seconds: Double): AiVerdict = when {
@@ -72,6 +72,7 @@ internal fun aiEstimate(phone: AiPhone, gmac: Double, measuredRate: Double?): Ai
 }
 
 private const val MIN_RAM = 2_500_000_000L
+private const val DESKTOP_CPU_RATE = 60.0
 private const val GOOD_RAM = 4_000_000_000L
 private const val STRUGGLE_SECONDS = 45 * 60.0
 private const val CPU_STRUGGLE_SECONDS = 10 * 60.0

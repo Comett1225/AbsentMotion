@@ -1,6 +1,7 @@
 package app.absentmotion.ui.editor
 
 import app.absentmotion.ui.theme.pressShape
+import app.absentmotion.ui.adaptive.deskLayout
 import app.absentmotion.ui.tutorial.tutorialTarget
 import app.absentmotion.ui.tutorial.tutorialGuard
 import app.absentmotion.model.finiteFloat
@@ -195,7 +196,7 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
         if (kind == "camera" && moving) state.selectedId?.let { CameraMovesSheet(state, it) { moving = false } }
         val presets = Tile(Presets) { openPresets(state) }
         val effects = Tile(Effects) { state.effectIndex = -1; state.panel = EditorPanel.Effects }
-        val transform = Tile(MoveTransform, onLongClick = if (app.absentmotion.platform.PlatformFeatures.desktop) { { controls = true } } else null, menu = {
+        val transform = Tile(MoveTransform, onLongClick = if (deskLayout) { { controls = true } } else null, menu = {
             Presence(controls) { TransformControlsMenu(state) { basic -> controls = false; if (basic != null) state.panel = EditorPanel.MoveTransform } }
         }) { state.panel = EditorPanel.MoveTransform }
         val blending = Tile(Blending) { state.panel = EditorPanel.Blending }
@@ -348,7 +349,7 @@ private val SideToolsRow = 63.dp
 private fun TileRows(rows: List<List<Tile>>, columns: Int?) {
     rows.forEachIndexed { i, row ->
         if (i > 0) Spacer(Modifier.height(17.px))
-        Row(Modifier.fillMaxWidth().height(if (app.absentmotion.platform.PlatformFeatures.desktop) 68.dp else 160.px), Arrangement.spacedBy(17.px)) {
+        Row(Modifier.fillMaxWidth().height(if (deskLayout) 68.dp else 160.px), Arrangement.spacedBy(17.px)) {
             for (tile in row) ToolButton(tile.tool, Modifier.weight(1f).tutorialTarget(if (tile.tool === MoveTransform) "tool_transform" else if (tile.tool === Effects) "tool_effects" else null), tile.enabled, tile.active, tile.onLongClick, tile.menu, tile.onClick)
             if (columns != null) repeat(columns - row.size) { Spacer(Modifier.weight(1f)) }
         }
@@ -404,11 +405,11 @@ private val ScreenshotTool = Tool(R.string.layer_tool_screenshot, PanelIcons.Scr
 @Composable
 private fun SmallTool(icon: ImageVector, description: String, modifier: Modifier, shape: RoundedCornerShape, enabled: Boolean = true, iconSize: Dp = 24.dp, onClick: () -> Unit = {}) {
     val press = remember { MutableInteractionSource() }
-    val hovered = if (app.absentmotion.platform.PlatformFeatures.desktop) press.collectIsHoveredAsState().value else false
+    val hovered = if (deskLayout) press.collectIsHoveredAsState().value else false
     Box(
         modifier.tutorialGuard().fillMaxHeight().pressScale(press, TilePress).then(if (enabled) Modifier else Modifier.dimmed()).clip(shape)
-            .background(if (app.absentmotion.platform.PlatformFeatures.desktop && hovered) Am.Field else Am.Button)
-            .then(if (app.absentmotion.platform.PlatformFeatures.desktop && enabled) Modifier.hoverable(press).pointerHoverIcon(PointerIcon.Hand) else Modifier)
+            .background(if (deskLayout && hovered) Am.Field else Am.Button)
+            .then(if (deskLayout && enabled) Modifier.hoverable(press).pointerHoverIcon(PointerIcon.Hand) else Modifier)
             .then(if (enabled) Modifier.clickable(press, LocalIndication.current, onClick = onClick) else Modifier),
         contentAlignment = Alignment.Center,
     ) {
@@ -420,12 +421,12 @@ private fun SmallTool(icon: ImageVector, description: String, modifier: Modifier
 @Composable
 private fun ToolButton(tool: Tool, modifier: Modifier, enabled: Boolean = true, active: Boolean = false, onLongClick: (() -> Unit)? = null, menu: (@Composable () -> Unit)? = null, onClick: () -> Unit = {}) {
     val press = remember { MutableInteractionSource() }
-    val hovered = if (app.absentmotion.platform.PlatformFeatures.desktop) press.collectIsHoveredAsState().value else false
+    val hovered = if (deskLayout) press.collectIsHoveredAsState().value else false
     Box(
         modifier.tutorialGuard().fillMaxHeight().pressScale(press, TilePress).then(if (enabled) Modifier else Modifier.dimmed()).clip(ToolShape)
-            .background(if (app.absentmotion.platform.PlatformFeatures.desktop && hovered) Am.Field else Am.Button)
-            .then(if (app.absentmotion.platform.PlatformFeatures.desktop && enabled) Modifier.hoverable(press).pointerHoverIcon(PointerIcon.Hand) else Modifier)
-            .then(if (app.absentmotion.platform.PlatformFeatures.desktop && onLongClick != null) Modifier.pointerInput(onLongClick) {
+            .background(if (deskLayout && hovered) Am.Field else Am.Button)
+            .then(if (deskLayout && enabled) Modifier.hoverable(press).pointerHoverIcon(PointerIcon.Hand) else Modifier)
+            .then(if (deskLayout && onLongClick != null) Modifier.pointerInput(onLongClick) {
                 awaitPointerEventScope {
                     while (true) {
                         val event = awaitPointerEvent()
@@ -438,11 +439,11 @@ private fun ToolButton(tool: Tool, modifier: Modifier, enabled: Boolean = true, 
         menu?.invoke()
         PanelIcon(tool.icon, if (active) Am.Accent else Am.OnDark, Modifier.align(Alignment.TopCenter).offset(y = (tool.iconY - 12f).dp))
         Text(
-            stringResource(tool.label), Modifier.align(Alignment.TopCenter).offset(y = 32.dp).fillMaxWidth().height(if (app.absentmotion.platform.PlatformFeatures.desktop) 30.dp else 24.dp).padding(horizontal = 4.dp)
+            stringResource(tool.label), Modifier.align(Alignment.TopCenter).offset(y = 32.dp).fillMaxWidth().height(if (deskLayout) 30.dp else 24.dp).padding(horizontal = 4.dp)
                 .wrapContentHeight(Alignment.CenterVertically),
-            color = ToolLabel, fontSize = if (app.absentmotion.platform.PlatformFeatures.desktop) 12.sp else androidx.compose.ui.unit.TextUnit.Unspecified,
-            lineHeight = if (app.absentmotion.platform.PlatformFeatures.desktop) 14.sp else 11.5.sp, maxLines = 2, textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-            autoSize = if (app.absentmotion.platform.PlatformFeatures.desktop) null else androidx.compose.foundation.text.TextAutoSize.StepBased(7.sp, 10.sp, 0.5.sp),
+            color = ToolLabel, fontSize = if (deskLayout) 12.sp else androidx.compose.ui.unit.TextUnit.Unspecified,
+            lineHeight = if (deskLayout) 14.sp else 11.5.sp, maxLines = 2, textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            autoSize = if (deskLayout) null else androidx.compose.foundation.text.TextAutoSize.StepBased(7.sp, 10.sp, 0.5.sp),
         )
     }
 }
@@ -462,7 +463,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
         return
     }
     val move = panel == EditorPanel.MoveTransform
-    val desk = app.absentmotion.platform.PlatformFeatures.desktop
+    val desk = deskLayout
     var tab by remember(selected.kind) { mutableIntStateOf(0) }
     var pivotMode by remember(selected.kind) { mutableStateOf(false) }
     val basic = state.settings.basicTransform
@@ -490,15 +491,17 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
     }
     val target = if (named) known else state.keyTarget
     val buttons: @Composable (Modifier) -> Unit = { cell ->
-        FrameButton(PanelIcons.Back, stringResource(R.string.topbar_back), cell.tutorialTarget(if (app.absentmotion.platform.PlatformFeatures.desktop) "back" else null)) { state.stepBack() }
+        FrameButton(PanelIcons.Back, stringResource(R.string.topbar_back), cell.tutorialTarget(if (deskLayout) "back" else null)) { state.stepBack() }
         if (target == null) {
             FrameButton(PanelIcons.Keyframe, stringResource(R.string.a11y_add_keyframe), cell.dimmed(), enabled = false)
             FrameButton(PanelIcons.Easing, stringResource(R.string.a11y_easing), cell.dimmed(), enabled = false)
         } else {
             val linked = layer.element(target.ref)?.children?.any { it.name == "valueLink" } == true
             val onKeyframe = layer.onKeyframe(target.ref)
-            FrameButton(if (onKeyframe) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, stringResource(if (onKeyframe) R.string.a11y_remove_keyframe else R.string.a11y_add_keyframe), cell.tutorialTarget("keyframe"), enabled = !linked) {
-                state.toggleKeyframe()
+            RecordingKeyframeButton(state, cell.tutorialGuard().tutorialTarget("keyframe"), !linked, { state.toggleKeyframe() }) {
+                val description = stringResource(if (onKeyframe) R.string.a11y_remove_keyframe else R.string.a11y_add_keyframe)
+                PanelIcon(if (onKeyframe) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, Am.OnDark, description = description)
+                HoldName(description)
             }
             FrameButton(PanelIcons.Easing, stringResource(R.string.a11y_easing), cell.tutorialTarget("easing"), enabled = !linked) { if (layer.easing(target.ref) != null) state.easingOpen = true else state.hintEasing(layer.keyframes(target.ref).size) }
         }
@@ -520,7 +523,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
         }
     }
     val pad: @Composable androidx.compose.foundation.layout.BoxScope.() -> Unit = {
-        if (panel == EditorPanel.BorderShadow) BorderShadowTabs(Modifier.align(if (app.absentmotion.platform.PlatformFeatures.desktop) Alignment.TopEnd else Alignment.CenterEnd).width(168.px).then(if (app.absentmotion.platform.PlatformFeatures.desktop) Modifier.height(PanelHeight) else Modifier.fillMaxHeight()).background(Am.Panel))
+        if (panel == EditorPanel.BorderShadow) BorderShadowTabs(Modifier.align(if (deskLayout) Alignment.TopEnd else Alignment.CenterEnd).width(168.px).then(if (deskLayout) Modifier.height(PanelHeight) else Modifier.fillMaxHeight()).background(Am.Panel))
         when (panel) {
             EditorPanel.MoveTransform -> Swap(shown, Modifier.fillMaxSize().tutorialTarget("pad"), rise = 0.dp) { MoveTransformPanel(state, layer, shown, turn, Modifier.fillMaxSize(), if (canPivot) { { pivotMode = !pivotMode } } else null) }
             EditorPanel.ColorFill -> ColorFillPanel(state, layer, Modifier.fillMaxSize())
@@ -544,7 +547,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
         transformTabs(state.settings.basicTransform, desk).forEach { i ->
             val icon = if (i == 0 && shown == PIVOT_TAB) icons[PIVOT_TAB] else icons[i]
             val usable = i <= SIZE_TAB || selected.kind != "camera" || (i == TILT_TAB && state.scene.depthOrder)
-            val tip = if (!app.absentmotion.platform.PlatformFeatures.desktop) "" else when (i) {
+            val tip = if (!deskLayout) "" else when (i) {
                 SIZE_TAB -> deskShortcut(R.string.panel_size, "${DeskAlt}${stringResource(R.string.desk_scroll_key)}")
                 ROTATE_TAB -> deskShortcut(R.string.a11y_tab_rotate, "${DeskShift}${DeskAlt}${stringResource(R.string.desk_scroll_key)}")
                 else -> ""
@@ -562,9 +565,9 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
                     PanelIcon(icon, tint, size = 17.dp)
                     Text(
                         stringResource(names[if (i == 0 && shown == PIVOT_TAB) PIVOT_TAB else i]), Modifier.fillMaxWidth().padding(horizontal = 2.dp), color = animatedColor(tint), maxLines = 1, softWrap = false,
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center, lineHeight = if (app.absentmotion.platform.PlatformFeatures.desktop) 14.sp else 9.sp,
-                        fontSize = if (app.absentmotion.platform.PlatformFeatures.desktop) 12.sp else androidx.compose.ui.unit.TextUnit.Unspecified,
-                        autoSize = if (app.absentmotion.platform.PlatformFeatures.desktop) null else androidx.compose.foundation.text.TextAutoSize.StepBased(6.sp, 9.sp, 0.5.sp),
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center, lineHeight = if (deskLayout) 14.sp else 9.sp,
+                        fontSize = if (deskLayout) 12.sp else androidx.compose.ui.unit.TextUnit.Unspecified,
+                        autoSize = if (deskLayout) null else androidx.compose.foundation.text.TextAutoSize.StepBased(6.sp, 9.sp, 0.5.sp),
                     )
                 }
             } } }
@@ -601,7 +604,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
     } else Row(modifier.tutorialGuard(any = true).background(Am.Panel)) {
         Column(Modifier.width(168.px).heightIn(max = PanelHeight).fillMaxHeight()) { buttons(Modifier.weight(1f).fillMaxWidth()) }
         Box(Modifier.weight(1f).fillMaxHeight().tutorialGuard().background(if (move) Am.PanelInset else Am.Panel), content = pad)
-        if (move) Column(Modifier.width(168.px).then(if (app.absentmotion.platform.PlatformFeatures.desktop) Modifier.height(PanelHeight) else Modifier.fillMaxHeight()).tutorialGuard()) { tabs(Modifier.weight(1f).fillMaxWidth()) }
+        if (move) Column(Modifier.width(168.px).then(if (deskLayout) Modifier.height(PanelHeight) else Modifier.fillMaxHeight()).tutorialGuard()) { tabs(Modifier.weight(1f).fillMaxWidth()) }
     }
 }
 

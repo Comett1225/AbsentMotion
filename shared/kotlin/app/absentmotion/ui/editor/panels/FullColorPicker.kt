@@ -1,6 +1,7 @@
 package app.absentmotion.ui.editor.panels
 
 import androidx.compose.ui.res.stringResource
+import app.absentmotion.ui.adaptive.deskLayout
 import app.absentmotion.R
 import app.absentmotion.platform.BackHandler
 import app.absentmotion.platform.readPreviewPixel
@@ -130,7 +131,7 @@ internal fun FullColorPicker(settings: app.absentmotion.library.AppSettings, req
             }
             val wide = app.absentmotion.ui.adaptive.LocalAdaptiveSpace.current?.wide == true
             val wheel: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit = {
-            BoxWithConstraints(Modifier.weight(1f).fillMaxWidth().padding(vertical = if (PlatformFeatures.desktop) 12.dp else 0.dp), Alignment.Center) {
+            BoxWithConstraints(Modifier.weight(1f).fillMaxWidth().padding(vertical = if (deskLayout) 12.dp else 0.dp), Alignment.Center) {
                 val base = LocalDensity.current
                 val fit = minOf(1f, maxHeight / WHEEL.px, maxWidth / WHEEL.px).coerceAtLeast(.4f)
                 if (tab == 0) CompositionLocalProvider(LocalDensity provides Density(base.density * fit, base.fontScale)) { Wheel(hsva, request.start, argb, ::setHsva, end, ::enterHex, ::keepColour) }
@@ -168,7 +169,7 @@ internal fun FullColorPicker(settings: app.absentmotion.library.AppSettings, req
             }
             }
             val palette: @Composable () -> Unit = {
-            val gridGap = if (PlatformFeatures.desktop) 16.dp else 0.dp
+            val gridGap = if (deskLayout) 16.dp else 0.dp
             Box(Modifier.fillMaxWidth().height(315.px + gridGap).background(GridBg)) {
                 PaletteChip(palettes.chosen, Am.OnDark, Modifier.offset(12.px, 16.px + gridGap / 2).size(190.px, 150.px), stacked = true) { library = true }
                 Column(Modifier.offset(211.px, 5.px + gridGap / 2).size(658.px, 304.px).deskVerticalScroll().padding(5.px, 11.px), Arrangement.spacedBy(11.px)) {

@@ -1,6 +1,7 @@
 package app.absentmotion.ui.editor
 
 import androidx.compose.animation.core.animateFloatAsState
+import app.absentmotion.ui.adaptive.deskLayout
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -64,7 +65,7 @@ import app.absentmotion.ui.theme.withUiFont
 
 @Composable
 internal fun Modifier.deskCursor(): Modifier =
-    if (PlatformFeatures.desktop) pointerHoverIcon(if (HoverTargets.count > 0) PointerIcon.Hand else PointerIcon.Default) else this
+    if (deskLayout) pointerHoverIcon(if (HoverTargets.count > 0) PointerIcon.Hand else PointerIcon.Default) else this
 
 @Composable
 internal fun DeskCursorHost(modifier: Modifier, alignment: Alignment = Alignment.TopStart, content: @Composable BoxScope.() -> Unit) {
@@ -129,7 +130,7 @@ internal val DeskAlt = if (mac) "⌥" else "Alt+"
 internal val DeskShift = if (mac) "⇧" else "Shift+"
 internal val DeskRedoKeys = if (mac) "⇧⌘Z" else "Ctrl+Shift+Z"
 
-internal fun deskSp(phone: Float): TextUnit = if (PlatformFeatures.desktop && phone < 12f) 12.sp else phone.sp
+internal fun deskSp(phone: Float): TextUnit = if (deskLayout && phone < 12f) 12.sp else phone.sp
 
 @Composable
 internal fun deskShortcut(label: Int, keys: String): String = if (keys.isEmpty()) stringResource(label) else stringResource(R.string.desk_shortcut_hint, stringResource(label), keys)
@@ -160,7 +161,7 @@ internal fun DeskSheetHost(onDismiss: () -> Unit, content: @Composable () -> Uni
 
 @Composable
 internal fun DeskTip(text: String, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    if (PlatformFeatures.desktop && text.isNotEmpty()) app.absentmotion.platform.Hint(text, modifier, content) else content()
+    if (deskLayout && text.isNotEmpty()) app.absentmotion.platform.Hint(text, modifier, content) else content()
 }
 
 @Composable
@@ -199,7 +200,7 @@ internal fun DeskParentButton(onClick: () -> Unit) {
     }
 }
 
-internal fun Modifier.rightClick(action: () -> Unit): Modifier = if (!PlatformFeatures.desktop) this else pointerInput(action) {
+internal fun Modifier.rightClick(action: () -> Unit): Modifier = if (!deskLayout) this else pointerInput(action) {
     awaitPointerEventScope {
         while (true) {
             val event = awaitPointerEvent(PointerEventPass.Initial)

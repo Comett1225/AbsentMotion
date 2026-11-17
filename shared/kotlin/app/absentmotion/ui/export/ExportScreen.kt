@@ -1766,6 +1766,22 @@ private fun CommunityFields(scene: Scene, engine: EngineThread, settings: app.ab
             colors = androidx.compose.material3.CheckboxDefaults.colors(checkedColor = Navy, uncheckedColor = Navy, checkmarkColor = Am.OnNavy))
         Text(stringResource(R.string.community_confirm), color = Navy, fontSize = if (DESK) 13.sp else 15.sp)
     }
+    var guidelinesOpen by remember { mutableStateOf(false) }
+    Row(Modifier.fillMaxWidth().padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+        androidx.compose.material3.Checkbox(community.guidelinesConfirmed, { onChange(community.copy(guidelinesConfirmed = it)) },
+            colors = androidx.compose.material3.CheckboxDefaults.colors(checkedColor = Navy, uncheckedColor = Navy, checkmarkColor = Am.OnNavy))
+        val link = stringResource(R.string.community_guidelines_link)
+        val sentence = stringResource(R.string.community_follows_guidelines, link)
+        val start = sentence.indexOf(link)
+        val label = androidx.compose.ui.text.buildAnnotatedString {
+            append(sentence)
+            if (start >= 0) addLink(androidx.compose.ui.text.LinkAnnotation.Clickable("guidelines",
+                androidx.compose.ui.text.TextLinkStyles(androidx.compose.ui.text.SpanStyle(color = Am.HomeAccent, textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline))) { guidelinesOpen = true }, start, start + link.length)
+        }
+        Text(label, Modifier.weight(1f).padding(vertical = 8.dp), color = Navy, fontSize = if (DESK) 13.sp else 15.sp)
+    }
+    if (guidelinesOpen) app.absentmotion.ui.home.CommunityGuidelines { guidelinesOpen = false }
+
 }
 
 @Composable

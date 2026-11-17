@@ -43,7 +43,7 @@ internal fun DeskMedia(state: EditorState, library: AddLibrary) {
         Column(Modifier.fillMaxWidth().padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 DeskFileAction(stringResource(R.string.sounds_from_files), Modifier.weight(1f)) { MediaPicks.openFiles() }
-                DeskFileAction(app.absentmotion.platform.linkFolderLabel(), Modifier.weight(1f)) { app.absentmotion.platform.linkMediaFolder() }
+                if (app.absentmotion.platform.PlatformFeatures.linkFolders) DeskFileAction(app.absentmotion.platform.linkFolderLabel(), Modifier.weight(1f)) { app.absentmotion.platform.linkMediaFolder() }
             }
             if (app.absentmotion.platform.PlatformFeatures.camera) DeskFileAction(stringResource(R.string.camera), Modifier.fillMaxWidth()) { state.playing = false; state.cameraOpen = true }
             SearchField(query, { query = it }, Modifier.fillMaxWidth().height(36.dp), hint = stringResource(R.string.mediatab_search_hint))
@@ -78,7 +78,7 @@ internal fun DeskAudio(state: EditorState, library: AddLibrary) {
         Column(Modifier.fillMaxWidth().padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 DeskFileAction(stringResource(R.string.sounds_from_files), Modifier.weight(1f)) { MediaPicks.openSounds() }
-                DeskFileAction(app.absentmotion.platform.linkFolderLabel(), Modifier.weight(1f)) { app.absentmotion.platform.linkMediaFolder() }
+                if (app.absentmotion.platform.PlatformFeatures.linkFolders) DeskFileAction(app.absentmotion.platform.linkFolderLabel(), Modifier.weight(1f)) { app.absentmotion.platform.linkMediaFolder() }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 DeskFileAction(stringResource(R.string.view_all), Modifier.weight(1f)) { browsing = true }

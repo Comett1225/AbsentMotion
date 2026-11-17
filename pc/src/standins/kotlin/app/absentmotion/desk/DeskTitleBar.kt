@@ -379,7 +379,7 @@ fun deskMenus(app: DeskAppState, scope: kotlinx.coroutines.CoroutineScope): List
             DeskMenuItem(t(R.string.desk_menu_actual_size), DeskScale.percent != 100, key(Shortcut.ActualSize)) { DeskScale.reset() },
         )),
         DeskMenuItem(t(R.string.desk_menu_playback), children = listOf(
-            DeskMenuItem(if (editor?.playing == true) t(R.string.export_pause) else t(R.string.export_play), editor != null) { editor?.let { it.playing = !it.playing } },
+            DeskMenuItem(if (editor?.playing == true) t(R.string.export_pause) else t(R.string.export_play), editor != null) { editor?.togglePlayback() },
             DeskMenuItem(t(R.string.desk_menu_go_start), editor != null) { editor?.let { it.playing = false; it.frame = 0 } },
             DeskMenuItem(t(R.string.desk_menu_go_end), editor != null) { editor?.let { it.playing = false; it.frame = it.scene.lastFrame } },
             separator,

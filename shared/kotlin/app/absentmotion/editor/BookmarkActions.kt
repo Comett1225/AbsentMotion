@@ -9,7 +9,6 @@ import app.absentmotion.audio.Beats
 import app.absentmotion.audio.OfflineMix
 import app.absentmotion.audio.Resampler
 import app.absentmotion.audio.soundUri
-import app.absentmotion.model.Layer
 import app.absentmotion.model.Scene
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -38,7 +37,16 @@ suspend fun EditorState.markBeats(context: Context): Int {
     val layer = selectedId?.let(scene::layer)?.takeIf { it.soundUri != null } ?: error(AppText.get(R.string.edit_beats_select_layer))
     val fps = scene.fps
     val path = groupPath
-    val beats = layerBeats(context, scene, layer)
+    val alone = Scene(scene.node.copy(children = scene.node.children.filter { it.name !in Scene.LAYER_TAGS } +
+        layer.node.with("hidden", null).let { it.copy(children = it.children.filterNot { c -> c.name == "gain" }) }))
+    val mix = withContext(Dispatchers.IO) { OfflineMix.of(context, alone, Resampler.HIGH) } ?: error(AppText.get(R.string.edit_beats_no_sound))
+    val stream = Beats.Stream(SPEECH_RATE)
+    try {
+        withContext(Dispatchers.IO) { speechChunks(mix, layer.startTime, layer.endTime + 1, {}) { chunk, count -> stream.add(chunk, count) } }
+    } finally {
+        (mix as? Closeable)?.close()
+    }
+    val beats = withContext(Dispatchers.Default) { stream.beats() }
     val first = scene.frameAt(layer.startTime)
     val last = scene.frameAt(layer.endTime)
     val frames = beats.map { (((layer.startTime + it) * fps / 1000.0).roundToInt()) }.filter { it in first..last }.distinct()
@@ -51,17 +59,4 @@ suspend fun EditorState.markBeats(context: Context): Int {
         s.withBookmarks(times)
     }
     return added
-}
-
-internal suspend fun layerBeats(context: Context, scene: Scene, layer: Layer): List<Double> {
-    val alone = Scene(scene.node.copy(children = scene.node.children.filter { it.name !in Scene.LAYER_TAGS } +
-        layer.node.with("hidden", null).let { it.copy(children = it.children.filterNot { c -> c.name == "gain" }) }))
-    val mix = withContext(Dispatchers.IO) { OfflineMix.of(context, alone, Resampler.HIGH) } ?: error(AppText.get(R.string.edit_beats_no_sound))
-    val stream = Beats.Stream(SPEECH_RATE)
-    try {
-        withContext(Dispatchers.IO) { speechChunks(mix, layer.startTime, layer.endTime + 1, {}) { chunk, count -> stream.add(chunk, count) } }
-    } finally {
-        (mix as? Closeable)?.close()
-    }
-    return withContext(Dispatchers.Default) { stream.beats() }
 }

@@ -22,6 +22,12 @@ Good to know:
 - In a panel with several rows (Shape Options, Frame & Shadow, Camera Options), the selected row is the one that receives the keyframe. In **Transform**, **Move** animates X, Y and Z together; **Size**, **Rotate**, **3D rotation** (**Tilt** on a computer), **Skew** and **Pivot** are separate. A **Pivot** keyframe also keys the position, so the layer stays where it is.
 - In **Effects**, each parameter of an open effect has its own keyframes. Tap the name of the parameter to make it the target.
 
+## Record keyframes while playing
+
+Add a keyframe to a Transform property first, then press **Play** and drag the layer on the canvas or adjust the property in Transform while the preview plays. Release the drag to finish the recording; one undo removes the recording. The app keeps the keyframes needed to follow the motion.
+
+Hold **Play** to choose a count-in of one, two or three seconds and a preview speed of 0.25x, 0.5x or 1x. On a computer, you can also right-click **Play**. Sound is muted below 1x; export is unaffected. Hold or right-click the add-keyframe button to turn on **Overwrite while recording**, which replaces existing keyframes in the recorded span.
+
 ## Keyframes on the timeline
 
 Keyframes show as small diamonds on a layer's bar. On the selected layer they are larger, and the one under the playhead has a ring. While a property or an effect is open, only its diamonds show; with the tool grid showing, all the layer's diamonds show.

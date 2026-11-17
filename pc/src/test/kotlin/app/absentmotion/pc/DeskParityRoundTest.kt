@@ -47,6 +47,7 @@ import app.absentmotion.ui.editor.wheelFactor
 import app.absentmotion.ui.editor.wheelTurn
 import app.absentmotion.ui.onboarding.ONBOARDING_DONE
 import app.absentmotion.ui.tutorial.Tutorial
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
 import kotlinx.coroutines.CompletableDeferred
@@ -553,6 +554,7 @@ class DeskParityRoundTest {
 
     @Test fun aCommunityBundleCarriesItsThumbnailAndDetails() {
         prepare("community-bundle")
+        DeskExports.clearFinish()
         session(1280, 800) { app ->
             val editor = openEditor(app, "styles.xml")
             runOnIdle { editor.exportOpen = true }
@@ -561,6 +563,34 @@ class DeskParityRoundTest {
             settle()
             onAllNodesWithText(text(R.string.bundle_community)).onFirst().performClick()
             settle(1500)
+            fun refused(message: Int) {
+                onAllNodesWithText(text(R.string.export)).filter(hasClickAction()).onLast().performClick()
+                settle()
+                onNodeWithText(text(message)).assertExists()
+                assertNull(DeskExports.finish)
+                onNodeWithText(text(R.string.ok)).performClick()
+                settle()
+            }
+            refused(R.string.community_need_confirm)
+            onAllNodesWithText(text(R.string.community_confirm)).onFirst().performScrollTo().performClick()
+            settle()
+            refused(R.string.community_need_guidelines)
+            val sentence = text(R.string.community_follows_guidelines).replace("%1\$s", text(R.string.community_guidelines_link))
+            val consent = onNodeWithText(sentence).performScrollTo()
+            val layouts = mutableListOf<androidx.compose.ui.text.TextLayoutResult>()
+            consent.performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
+            val position = layouts.single().getBoundingBox(sentence.indexOf(text(R.string.community_guidelines_link)) + 1).center
+            consent.performTouchInput { click(position) }
+            settle()
+            onNodeWithText("Community Guidelines").assertExists()
+            shot("community-guidelines")
+            onNodeWithContentDescription(text(R.string.action_close)).performClick()
+            settle()
+            onNodeWithText(sentence).performScrollTo().onParent().onChildren().filter(isToggleable()).onFirst().performClick()
+            settle()
+            onAllNodesWithText(text(R.string.community_confirm)).onFirst().performScrollTo().performClick()
+            settle()
+            refused(R.string.community_need_confirm)
             onAllNodesWithText(text(R.string.community_confirm)).onFirst().performScrollTo().performClick()
             settle()
             shot("community-bundle")

@@ -1,6 +1,7 @@
 package app.absentmotion.ui.editor.panels
 
 import app.absentmotion.ui.editor.deskSp
+import app.absentmotion.ui.adaptive.deskLayout
 import app.absentmotion.ui.editor.deskVerticalScroll
 import android.content.Context
 import android.graphics.BitmapFactory
@@ -82,7 +83,7 @@ internal fun EffectSettings(state: EditorState, layer: Layer, instance: XmlNode,
         }
     }
     val mix = definition.key in PieceEffects && (definition.key != "particles" || instance.effectProperty("depth")?.valueAt(layer.t) == "true")
-    if (mix && !app.absentmotion.platform.PlatformFeatures.desktop) MixPiecesRow(state, layer, enabled)
+    if (mix && !deskLayout) MixPiecesRow(state, layer, enabled)
     definition.params.filter { definition.shown(it, instance, layer.t) }.forEach { param ->
         val raw = displayed[PropRef.effect(state.effectIndex, param.id)]?.take(param.default.split(',').size)?.joinToString(",") ?: instance.effectProperty(param.id)?.valueAt(layer.t) ?: param.missingDefault
         fun set(text: String, gesture: Boolean = false) {
@@ -109,7 +110,7 @@ internal fun EffectSettings(state: EditorState, layer: Layer, instance: XmlNode,
             }
         }
     }
-    if (mix && app.absentmotion.platform.PlatformFeatures.desktop) MixPiecesRow(state, layer, enabled)
+    if (mix && deskLayout) MixPiecesRow(state, layer, enabled)
 }
 
 private val PieceEffects = setOf("scatter3d", "fracture3d", "particles")

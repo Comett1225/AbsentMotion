@@ -1,6 +1,7 @@
 package app.absentmotion.ui.editor
 
 import app.absentmotion.ui.editor.panels.buttonLabel
+import app.absentmotion.ui.adaptive.deskLayout
 import app.absentmotion.ui.tutorial.tutorialTarget
 import app.absentmotion.ui.tutorial.tutorialGuard
 import androidx.compose.foundation.background
@@ -185,7 +186,7 @@ internal fun RowScope.GroupCrumbs(state: EditorState, fontSize: TextUnit, act: (
 
 @Composable
 private fun Modifier.crumbHover(radius: androidx.compose.ui.unit.Dp): Modifier =
-    if (PlatformFeatures.desktop) clip(RoundedCornerShape(radius)).hoverFill(radius).handCursor() else this
+    if (deskLayout) clip(RoundedCornerShape(radius)).hoverFill(radius).handCursor() else this
 
 internal fun typedName(typed: String, shown: String): String? = typed.trim().takeIf { typed != shown && it.isNotEmpty() && it != shown }
 

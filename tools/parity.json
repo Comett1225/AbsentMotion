@@ -1121,16 +1121,6 @@
       "note": "hidden on desktop; needs a bundled yt-dlp instead of the Android Python bundle; also hidden in the x86_64 Android APK (ChromeOS), whose Python bundle would be the x86_64-linux-android build"
     },
     {
-      "id": "home.tools_custom",
-      "name": "Custom tools from the community: Community > Tools > Add, installed tools in Home > Tools and the editor's + menu Tools, Update and Remove",
-      "where": "tools/CustomTools.kt, CustomToolScreen.kt, CommunityTab.kt, ToolsTab.kt, AddPopup.kt, desk/DeskLibrary.kt",
-      "android": "works",
-      "macos": "works",
-      "windows": "untested",
-      "linux": "untested",
-      "note": "recipe tools only (tool.json api 1); same runner and form on every platform; CustomToolsDeskTest on the Mac, CustomToolsTest unit tests"
-    },
-    {
       "id": "home.new_project",
       "name": "New project and new asset sheet",
       "where": "NewProjectSheet.kt, DeskNewProject.kt",

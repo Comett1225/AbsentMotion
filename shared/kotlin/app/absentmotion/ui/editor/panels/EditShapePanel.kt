@@ -1,6 +1,7 @@
 package app.absentmotion.ui.editor.panels
 
 import androidx.compose.foundation.selection.toggleable
+import app.absentmotion.ui.adaptive.deskLayout
 import app.absentmotion.ui.editor.deskSp
 import app.absentmotion.ui.editor.deskVerticalScroll
 import app.absentmotion.model.finiteFloat
@@ -150,7 +151,7 @@ private fun LabelTile(edit: ShapeEdit, active: Boolean, topPad: Dp, onActivate: 
     ) {
         Text(
             edit.label, Modifier.padding(horizontal = 1.dp), color = if (active) Am.Accent else Am.OnDark, fontSize = deskSp(10.5f),
-            lineHeight = 13.sp, maxLines = if (app.absentmotion.platform.PlatformFeatures.desktop) 2 else 1, softWrap = app.absentmotion.platform.PlatformFeatures.desktop, textAlign = TextAlign.Center,
+            lineHeight = 13.sp, maxLines = if (deskLayout) 2 else 1, softWrap = deskLayout, textAlign = TextAlign.Center,
         )
     }
 }

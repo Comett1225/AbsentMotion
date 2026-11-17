@@ -53,13 +53,13 @@ class CommunityTest {
                 },
                 {
                   "kind": "tool",
-                  "name": "custom-tool",
-                  "title": "Future Tool",
+                  "name": "future-item",
+                  "title": "Future Item",
                   "creator": "Carol",
                   "description": "Ignored kind",
                   "tags": [],
                   "added": "2026-04-03",
-                  "file": "tools/custom-tool/tool.zip",
+                  "file": "tools/future-item/item.zip",
                   "bytes": 100,
                   "sha256": "$shaA"
                 }
@@ -301,30 +301,64 @@ class CommunityTest {
             addCommunityPreset(bigFile, store)
         }
     }
+    private fun item(title: String = "Été Glow", creator: String = "Álîce", tags: List<String> = listOf("néon", "intro"), added: String = "2026-11-17") =
+        CommunityItem(CommunityKind.Bundle, title, title, creator, "Not searched", tags, added, "bundles/item/item.absproj", 100, shaA)
 
-    @Test fun toolItemsNeedAKnownApiPermissionsAndACheckedIcon() {
-        fun tool(name: String, extra: String) = """
-            {"kind": "tool", "name": "$name", "title": "T", "creator": "C", "description": "D", "tags": [], "added": "2026-11-16",
-             "file": "tools/$name/tool.json", "bytes": 900, "sha256": "$shaA", "thumbnail": "tools/$name/icon.png",
-             "version": "1.0.0", $extra}
-        """
-        val good = "\"api\": 1, \"permissions\": [\"media.read\"], \"where\": [\"home\"], \"thumbnailBytes\": 4000, \"thumbnailSha256\": \"$shaB\""
-        val json = """{"format": "absentmotion-community", "version": 2, "items": [
-            ${tool("good", good)},
-            ${tool("future", good.replace("\"api\": 1", "\"api\": 2"))},
-            ${tool("network", good.replace("media.read", "network"))},
-            ${tool("unchecked", good.replace(", \"thumbnailSha256\": \"$shaB\"", ""))},
-            ${tool("nowhere", good.replace("[\"home\"]", "[]"))},
-            ${tool("newer", "$good, \"minVersion\": 99")}
-        ]}"""
-        val items = parseCommunityIndex(json, 52).items
-        assertEquals(listOf("good"), items.map { it.name })
-        val item = items.single()
-        assertEquals(CommunityKind.Tool, item.kind)
-        assertEquals(listOf("media.read"), item.permissions)
-        assertEquals(listOf("home"), item.where)
-        assertEquals("1.0.0", item.version)
-        assertEquals(4000L, item.thumbnailBytes)
-        assertEquals(shaB, item.thumbnailSha256)
+    @Test fun searchMatchesTitleIgnoringCaseAndAccents() {
+        assertEquals(1, communityMatches(listOf(item()), "ETE GLOW").size)
+        assertTrue(communityMatches(listOf(item()), "unrelated").isEmpty())
     }
+
+    @Test fun searchMatchesCreatorIgnoringCaseAndAccents() {
+        assertEquals(1, communityMatches(listOf(item()), "ALICE").size)
+    }
+
+    @Test fun searchMatchesTagsIgnoringCaseAndAccents() {
+        assertEquals(1, communityMatches(listOf(item()), "NEON").size)
+    }
+
+    @Test fun everyWordMustMatchSomeField() {
+        assertEquals(1, communityMatches(listOf(item()), "  ete  ALICE\tneon ").size)
+        assertTrue(communityMatches(listOf(item()), "ete absent").isEmpty())
+        assertTrue(communityMatches(listOf(item()), "Not searched").isEmpty())
+    }
+
+    @Test fun blankSearchKeepsAllItems() {
+        assertEquals(2, communityMatches(listOf(item(), item("Other")), "  ").size)
+    }
+
+    @Test fun includedTagsMustAllBePresent() {
+        val both = item(tags = listOf("intro", "neon"))
+        val one = item("Other", tags = listOf("intro"))
+        assertEquals(listOf(both), communityMatches(listOf(one, both), include = setOf("intro", "neon")))
+    }
+
+    @Test fun anyExcludedTagRemovesAnItem() {
+        val safe = item(tags = listOf("intro"))
+        val blocked = item("Other", tags = listOf("neon"))
+        assertEquals(listOf(safe), communityMatches(listOf(blocked, safe), exclude = setOf("neon", "text")))
+        assertTrue(communityMatches(listOf(safe), include = setOf("intro"), exclude = setOf("intro")).isEmpty())
+    }
+
+    @Test fun queryAndTagFiltersWorkTogether() {
+        val wanted = item(tags = listOf("intro"))
+        assertEquals(listOf(wanted), communityMatches(listOf(wanted, item("Other")), "alice", include = setOf("intro"), exclude = setOf("néon")))
+    }
+
+    @Test fun newestFirstIsTheDefaultAndUnknownDatesAreLast() {
+        val old = item("Old", added = "2026-01-01")
+        val newest = item("Newest", added = "2026-11-17T12:00:00Z")
+        val unknown = item("Unknown", added = "")
+        val invalid = item("Invalid", added = "2026-02-30")
+        assertEquals(listOf(newest, old, unknown, invalid), communityMatches(listOf(unknown, old, invalid, newest)))
+    }
+
+    @Test fun aToZUsesTheChosenLocale() {
+        val z = item("Zebra")
+        val a = item("Apple")
+        val accent = item("Ängel")
+        assertEquals(listOf(accent, a, z), communityMatches(listOf(z, a, accent), sort = CommunitySort.Title, locale = java.util.Locale.ENGLISH))
+        assertEquals(listOf(a, z, accent), communityMatches(listOf(z, a, accent), sort = CommunitySort.Title, locale = java.util.Locale.forLanguageTag("sv")))
+    }
+
 }

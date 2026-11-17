@@ -76,7 +76,7 @@ internal class ToolWork(private val scope: CoroutineScope, private val context: 
         private set
     val running: Boolean get() = step is ToolStep.Running
 
-    fun start(block: suspend (progress: (Float) -> Unit) -> Compressed?) {
+    fun start(block: suspend (progress: (Float) -> Unit) -> Compressed) {
         if (running) return
         step = ToolStep.Running(0)
         job = scope.launch {
@@ -85,7 +85,7 @@ internal class ToolWork(private val scope: CoroutineScope, private val context: 
                     val percent = (fraction * 100).toInt().coerceIn(0, 100)
                     if (step != ToolStep.Running(percent)) step = ToolStep.Running(percent)
                 }
-                step = if (result == null) ToolStep.Ready else ToolStep.Done(result, result.file.length())
+                step = ToolStep.Done(result, result.file.length())
             } catch (e: CancellationException) {
                 step = ToolStep.Ready
                 throw e
@@ -126,6 +126,24 @@ internal class ToolWork(private val scope: CoroutineScope, private val context: 
             }
         }
         if (storage.ready { write() }) write()
+    }
+
+    fun saveTo(done: ToolStep.Done, uri: Uri) {
+        if (saving) return
+        saving = true
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    val output = checkNotNull(context.contentResolver.openOutputStream(uri))
+                    output.use { out -> done.result.file.inputStream().use { it.copyTo(out) } }
+                }
+                if (step == done) step = done.copy(saved = true)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Toast.makeText(context, context.getString(R.string.compress_save_failed, e.message.orEmpty()), Toast.LENGTH_LONG).show()
+            } finally { saving = false }
+        }
     }
 
     fun share(done: ToolStep.Done) { runCatching { shareCompressed(context, done.result) } }
@@ -170,7 +188,8 @@ internal fun rememberVideoPick(initial: Uri?, onNew: () -> Unit): VideoPick {
 
 @Composable
 internal fun ToolBar(
-    work: ToolWork, hint: String?, warn: Boolean, doneText: String, @StringRes running: Int, startLabel: String, startIcon: ImageVector, canStart: Boolean, onStart: () -> Unit,
+    work: ToolWork, hint: String?, warn: Boolean, doneText: String, @StringRes running: Int, startLabel: String, startIcon: ImageVector, canStart: Boolean,
+    onSave: ((ToolStep.Done) -> Unit)? = null, share: Boolean = true, onStart: () -> Unit,
 ) {
     val step = work.step
     val view = LocalView.current
@@ -201,8 +220,8 @@ internal fun ToolBar(
                 is ToolStep.Done -> {
                     val add = LocalAddToProject.current
                     if (add != null) BigButton(stringResource(R.string.tools_add_to_project), Modifier.weight(1f).fillMaxHeight(), HomeIcons.Plus) { add(Uri.fromFile(step.result.file)) }
-                    BigButton(stringResource(if (step.saved) R.string.compress_saved else R.string.tools_save), Modifier.weight(1f).fillMaxHeight(), HomeIcons.Download, enabled = !step.saved && !work.saving, primary = add == null) { work.save(step) }
-                    if (add == null) BigButton(stringResource(R.string.compress_share), Modifier.weight(1f).fillMaxHeight(), ExportIcons.Share, primary = false) { work.share(step) }
+                    BigButton(stringResource(if (step.saved) R.string.compress_saved else R.string.tools_save), Modifier.weight(1f).fillMaxHeight(), HomeIcons.Download, enabled = !step.saved && !work.saving, primary = add == null) { if (onSave != null) onSave(step) else work.save(step) }
+                    if (add == null && share) BigButton(stringResource(R.string.compress_share), Modifier.weight(1f).fillMaxHeight(), ExportIcons.Share, primary = false) { work.share(step) }
                 }
                 is ToolStep.Failed -> {
                     var reporting by remember { mutableStateOf(false) }

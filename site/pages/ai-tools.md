@@ -4,7 +4,7 @@ group: Sound and AI
 order: 2
 summary: Auto captions, background removal, noise reduction, AI Enhance and AI Smooth. They run on your phone, offline, and the page says exactly what is downloaded.
 ---
-Everything in this page **runs on your phone**. Your photos, videos and sound are never uploaded. The only downloads are listed in the table at the end.
+Everything in this page **runs on your device**. Your photos, videos and sound are never uploaded. The only downloads are listed in the table at the end.
 
 The AI tools are in three places: the **AI** category of the Effects Library (**Remove Background**, **Remove Background (video)**, **Reduce Noise** and **Enhance**), the **Captions** button of the Add menu, and **AI Smooth**, one of the smoothing methods in a clip's **Smooth** tool and on the Export screen. For an audio or video clip, **AI > Auto captions** captions just that clip. Audio clips also have **AI > Reduce Noise**. A tool that does not fit the selected layer is grayed with a note such as "Select an image layer". One AI job runs at a time, with a progress bar and a **Cancel** button.
 
@@ -90,7 +90,7 @@ Select a video layer and choose **Enhance** in the AI category. Pick what to do;
 | **Sharpen faces** | Finds faces looking at the camera and sharpens only them, blended softly into the picture | any size |
 
 - **Sharpen detail** has a **Quick, without AI** switch: it adds the normal **Sharpen** effect instead, which is instant and works on every phone.
-- **Cartoon or animation** uses a model made for drawn and animated video.
+- Choose **Realistic** for photos and real life or **Anime and cartoon** for drawings and animated video.
 - **Keep film grain** cleans less noise, so grain and fine texture stay (needs a second small download).
 - "Upscale 2x works on clips up to 720p" means the clip is too big for that choice; pick another choice or use a smaller clip.
 
@@ -99,6 +99,14 @@ Before you start, the dialog checks the phone and estimates the time, for exampl
 Every frame is processed once and saved as a new video for the clip, with the clip's sound. Only the trimmed part of the clip is processed, and a clip can be up to five minutes. The screen stays on while it works, you can cancel at any time, and the app pauses when the phone gets too hot. The original is kept: the clip's effect list shows an **Enhance** row with an AI badge and a button that brings the original back, and **Undo** works too.
 
 AI Enhance is slow on purpose: it draws real detail. On a recent top phone, 10 seconds of 540p video take about 5 to 10 minutes for **Upscale 2x**; mid-range and older phones take much longer. Short clips are the best fit.
+
+## Enhance (image)
+
+Select an image layer and choose **AI > Enhance**, or open **Tools > Enhance Image** on the Home screen and choose a photo. Choose **Realistic** for photos and real life, or **Anime and cartoon** for drawings. Both offer **Upscale 2x**, **Upscale 4x**, **Sharpen detail** and **Sharpen faces**. The dialog shows the image size limit for the chosen mode. Standard uses the same models as video; **Keep film grain** is available for realistic images with Standard.
+
+On computers, image enhancement also offers **Standard** and **Max** quality, with Max selected initially. Max uses larger models and takes longer. Phones and tablets use Standard.
+
+Tap **Start** and use **Cancel** to stop a job. The comparison opens when enhancement finishes. Drag anywhere across the image to move the divider: the original is on the left and the enhanced result is on the right. Move it to either edge to see one image completely. In the editor, **Compare** on the Enhance row opens it again; the row's restore button brings back the original, and Undo works. In the Home tool, tap **Save** to keep the result.
 
 ## AI Smooth
 
@@ -122,6 +130,7 @@ Each level has its own model, downloaded once (about 11 MB) after the app has sh
 | Background removal model | The first time you remove a background | about 3 MB | this project's GitHub releases |
 | Noise reduction | Never: it is inside the app | | |
 | AI Enhance models | The first time you use Enhance, after you tap Download and start | about 2.4 MB (cartoon 1.3 MB, film grain 2.4 MB more) | this project's GitHub releases |
+| AI Enhance Max models | The first time you choose Max for an image, computers only | about 32 MB Realistic or 8.6 MB Anime and cartoon | this project's GitHub releases |
 | AI background removal 2.0 | The first time you remove a background with AI background removal 2.0 | about 62 MB | this project's GitHub releases |
 | AI Smooth models | The first time you use AI Smooth at a level | about 11 MB per level | GitHub (the rife-ncnn-vulkan project) |
 | Sharpen faces | Never: it uses Android's own face finder | | |

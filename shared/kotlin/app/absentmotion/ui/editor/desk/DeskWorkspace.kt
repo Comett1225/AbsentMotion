@@ -318,7 +318,7 @@ private fun DeskTransport(state: EditorState, modifier: Modifier) {
             }
             if (skips) DeskIcon(ChromeIcons.SkipBack, deskShortcut(R.string.desk_start, deskKeys("GoStart", "Home")), size = 32.dp) { state.playing = false; state.frame = 0 }
             DeskIcon(DrawingIcons.Prev, deskShortcut(R.string.desk_previous_frame, deskKeys("PreviousFrame", "←")), size = 32.dp) { state.playing = false; state.stepTo(state.playheadFrame - 1) }
-            DeskIcon(if (state.playing) ChromeIcons.Pause else ChromeIcons.Play, deskShortcut(if (state.playing) R.string.play_pause else R.string.play_play, deskKeys("PlayPause", "Space")), size = 32.dp) { state.playing = !state.playing }
+            PlaybackControl(state, Modifier.size(32.dp), desktop = true)
             DeskIcon(DrawingIcons.Next, deskShortcut(R.string.desk_next_frame, deskKeys("NextFrame", "→")), size = 32.dp) { state.playing = false; state.stepTo(state.playheadFrame + 1) }
             if (skips) DeskIcon(ChromeIcons.SkipForward, deskShortcut(R.string.desk_end, deskKeys("GoEnd", "End")), size = 32.dp) { state.playing = false; state.parkAtEnd() }
             if (loop) DeskIcon(ChromeIcons.PlayRepeat, stringResource(R.string.desk_loop), active = state.settings.loopingPlay, size = 32.dp) { state.settings.loopingPlay = !state.settings.loopingPlay }

@@ -118,7 +118,7 @@ object DeskKeys {
         }
         fun delete() { if (MultiSelect.active) state.deleteChosen() else state.deleteSelected() }
         when (action) {
-            Shortcut.PlayPause -> state.playing = !state.playing
+            Shortcut.PlayPause -> state.togglePlayback()
             Shortcut.PreviousFrame -> step(-1)
             Shortcut.NextFrame -> step(1)
             Shortcut.Back10 -> step(-10)

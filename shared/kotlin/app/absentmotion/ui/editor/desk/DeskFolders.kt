@@ -66,6 +66,7 @@ internal fun <T> ColumnScope.DeskFolderContent(
     }
     DeskGrid(Modifier.fillMaxWidth().weight(1f), top = query to current) {
         when {
+            searching && !app.absentmotion.platform.PlatformFeatures.linkFolders -> items(items.filter { matchesSearch(query, *texts(it)) }, key = key) { tile(it) }
             searching -> {
                 val groups = groupByFolder(items, query, roots, file, texts)
                 for (group in groups) {

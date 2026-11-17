@@ -253,8 +253,8 @@ On another chip or an older system, build it from source ([`docs/BUILD.md`](docs
 
 ### 5.2
 
-- Custom tools made by the community: tools that people write themselves and add to AbsentMotion.
-- A community library, hosted on GitHub, where people share what they make with AbsentMotion.
+- A community library, hosted on GitHub, where people share what they make with AbsentMotion, under the
+  [Community Guidelines](COMMUNITY_GUIDELINES.md).
 
 ### 5.3
 
@@ -301,6 +301,9 @@ Read [`CONTRIBUTING.md`](CONTRIBUTING.md) before opening a pull request. To repo
 
 Thanks to [TrueMotion](https://github.com/Mushroom65/TrueMotion) by Mushroom65, a project based on AbsentMotion, for feature
 ideas, including the Particles effect planned for 4.4.
+
+Thanks to [Absent Motion Pro](https://github.com/duplexspy/AbsentMotion-pro) by duplexspy, a project based on AbsentMotion,
+for suggesting online font search.
 
 ## Licence
 

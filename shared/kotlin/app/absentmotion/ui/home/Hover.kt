@@ -1,6 +1,7 @@
 package app.absentmotion.ui.home
 
 import androidx.compose.foundation.hoverable
+import app.absentmotion.ui.adaptive.deskLayout
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.runtime.Composable
@@ -20,11 +21,11 @@ import androidx.compose.ui.unit.dp
 import app.absentmotion.platform.PlatformFeatures
 import app.absentmotion.ui.theme.Am
 
-internal fun Modifier.handCursor(): Modifier = if (PlatformFeatures.desktop) pointerHoverIcon(PointerIcon.Hand) else this
+internal fun Modifier.handCursor(): Modifier = if (deskLayout) pointerHoverIcon(PointerIcon.Hand) else this
 
 @Composable
 internal fun Modifier.hoverFill(radius: Dp = 0.dp, color: Color = Am.PressHome): Modifier {
-    if (!PlatformFeatures.desktop) return this
+    if (!deskLayout) return this
     val source = remember { MutableInteractionSource() }
     val hovered by source.collectIsHoveredAsState()
     return this.hoverable(source).drawBehind { if (hovered) drawRoundRect(color, cornerRadius = CornerRadius(radius.toPx())) }

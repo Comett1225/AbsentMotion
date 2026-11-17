@@ -26,6 +26,9 @@ class AppSettings(private val context: Context) {
     private var audioResamplingState by mutableIntStateOf(prefs.getInt("audioResampling", 2))
     private var demoModeState by mutableStateOf(prefs.getBoolean("demoMode", false))
     private var loopingPlayState by mutableStateOf(prefs.getBoolean("loopingPlay", false))
+    private var countInState by mutableIntStateOf(prefs.getInt("playCountIn", 0).coerceIn(0, 3))
+    private var overwriteRecordingState by mutableStateOf(prefs.getBoolean("overwriteRecording", false))
+    private var playbackSpeedState by mutableIntStateOf(prefs.getInt("playbackSpeed", 4).takeIf { it in listOf(1, 2, 4) } ?: 4)
     private var xmlUploadState by mutableStateOf(prefs.getBoolean("xmlUpload", false))
     private var vibrationState by mutableStateOf(prefs.getBoolean("trimLimitVibration", true))
     private var basicTransformState by mutableStateOf(prefs.getBoolean("basicTransform", true))
@@ -43,7 +46,10 @@ class AppSettings(private val context: Context) {
 
     private fun look(accent: Int? = accentState) = Accents.apply(Themes.palette(context, themeState, systemDarkState), accent)
 
+    private var layoutChoiceState by mutableStateOf(app.absentmotion.ui.adaptive.LayoutChoice.of(prefs.getString("computerLayout", null)))
+
     init {
+        app.absentmotion.ui.adaptive.DeskLayout.choice = layoutChoiceState
         if (!prefs.contains("theme")) prefs.edit().putString("theme", themeState).apply()
         Am.palette = look()
     }
@@ -88,6 +94,18 @@ class AppSettings(private val context: Context) {
         get() = loopingPlayState
         set(value) { loopingPlayState = value; prefs.edit().putBoolean("loopingPlay", value).apply() }
 
+    var overwriteRecording: Boolean
+        get() = overwriteRecordingState
+        set(value) { overwriteRecordingState = value; prefs.edit().putBoolean("overwriteRecording", value).apply() }
+
+    var countIn: Int
+        get() = countInState
+        set(value) { countInState = value.coerceIn(0, 3); prefs.edit().putInt("playCountIn", countInState).apply() }
+
+    var playbackSpeed: Int
+        get() = playbackSpeedState
+        set(value) { playbackSpeedState = value.takeIf { it in listOf(1, 2, 4) } ?: 4; prefs.edit().putInt("playbackSpeed", playbackSpeedState).apply() }
+
     var xmlUpload: Boolean
         get() = xmlUploadState
         set(value) { xmlUploadState = value; prefs.edit().putBoolean("xmlUpload", value).apply() }
@@ -103,6 +121,14 @@ class AppSettings(private val context: Context) {
     var rotateFree: Boolean
         get() = rotateFreeState
         set(value) { rotateFreeState = value; prefs.edit().putBoolean("rotateFree", value).apply() }
+
+    var layoutChoice: app.absentmotion.ui.adaptive.LayoutChoice
+        get() = layoutChoiceState
+        set(value) {
+            layoutChoiceState = value
+            app.absentmotion.ui.adaptive.DeskLayout.choice = value
+            prefs.edit().putString("computerLayout", value.name).apply()
+        }
 
     var openGl: Boolean
         get() = openGlState

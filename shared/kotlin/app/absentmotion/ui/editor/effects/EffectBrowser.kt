@@ -1,6 +1,7 @@
 package app.absentmotion.ui.editor.effects
 
 import app.absentmotion.platform.asImageBitmap
+import app.absentmotion.ui.adaptive.deskLayout
 import app.absentmotion.editor.addEffectToChosen
 import app.absentmotion.platform.BackHandler
 import androidx.compose.foundation.background
@@ -243,7 +244,7 @@ private fun BrowserBody(state: EditorState) {
         sliding[0] = scope.launch { animate(-way * EffectSwipe.SLIDE_DP * density.density, 0f, animationSpec = Motion.enter()) { v, _ -> shift = v } }
     }
     val rootFocus = remember { FocusRequester() }
-    if (PlatformFeatures.desktop) LaunchedEffect(Unit) { rootFocus.requestFocus() }
+    if (deskLayout) LaunchedEffect(Unit) { rootFocus.requestFocus() }
     fun keyPage(pull: Float, rtl: Boolean): Boolean {
         val to = EffectSwipe.page(pageAt(), listed.size, pull, rtl) ?: return false
         val next = listed[to].first
@@ -261,15 +262,15 @@ private fun BrowserBody(state: EditorState) {
         }
     }
     val latestKey by rememberUpdatedState<(androidx.compose.ui.input.key.KeyEvent) -> Boolean> { browserKey(it) }
-    if (PlatformFeatures.desktop) DisposableEffect(Unit) {
+    if (deskLayout) DisposableEffect(Unit) {
         val hook: (androidx.compose.ui.input.key.KeyEvent) -> Boolean = { latestKey(it) }
         app.absentmotion.ui.editor.DeskDrop.browserKey = hook
         onDispose { if (app.absentmotion.ui.editor.DeskDrop.browserKey === hook) app.absentmotion.ui.editor.DeskDrop.browserKey = null }
     }
     val twoPane = app.absentmotion.ui.adaptive.LocalAdaptiveSpace.current?.wide == true
-    Column(Modifier.fillMaxSize().background(BrowserBg).systemBarsPadding().then(if (PlatformFeatures.desktop) Modifier.focusRequester(rootFocus).onKeyEvent(::browserKey).focusable() else Modifier)) {
+    Column(Modifier.fillMaxSize().background(BrowserBg).systemBarsPadding().then(if (deskLayout) Modifier.focusRequester(rootFocus).onKeyEvent(::browserKey).focusable() else Modifier)) {
         helpPage?.let { page -> HelpScreen(page) { helpPage = null } }
-        if (PlatformFeatures.desktop) Row(Modifier.fillMaxWidth().height(52.dp).padding(start = 8.dp, end = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+        if (deskLayout) Row(Modifier.fillMaxWidth().height(52.dp).padding(start = 8.dp, end = 6.dp), verticalAlignment = Alignment.CenterVertically) {
             if (stepping) DeskIcon(ChromeIcons.Back, stringResource(R.string.topbar_back), action = ::back)
             Text(if (searching) stringResource(R.string.effectbrowser_title) else heading, Modifier.weight(1f).padding(start = if (stepping) 4.dp else 12.dp, end = 12.dp), color = Am.OnDark, fontSize = 15.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
             if (!audio) SearchField(query, {
@@ -336,7 +337,7 @@ private fun BrowserBody(state: EditorState) {
         } else if (!searching && (category == "audio" || category == "voice")) {
             val effects = layer?.audioEffects.orEmpty()
             val audioGrid = grids.getOrPut(category.orEmpty()) { androidx.compose.foundation.lazy.grid.LazyGridState() }
-            LazyVerticalGrid(if (PlatformFeatures.desktop || twoPane) GridCells.Adaptive(120.dp) else GridCells.Fixed(3), Modifier.fillMaxSize().then(slide).deskScrollbar(audioGrid), audioGrid, contentPadding = PaddingValues(if (PlatformFeatures.desktop) 16.dp else 10.dp)) {
+            LazyVerticalGrid(if (deskLayout || twoPane) GridCells.Adaptive(120.dp) else GridCells.Fixed(3), Modifier.fillMaxSize().then(slide).deskScrollbar(audioGrid), audioGrid, contentPadding = PaddingValues(if (deskLayout) 16.dp else 10.dp)) {
                 if (category == "audio") {
                     item(key = "voice-category", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) { AudioFolderTile(voiceName, VoiceOrder.count { it != FxKind.Voice } + VoicePresets.size) { fromAudio = true; category = "voice" } }
                     itemsIndexed(AudioOrder) { i, kind ->
@@ -353,14 +354,14 @@ private fun BrowserBody(state: EditorState) {
             val results = if (audio) emptyList() else if (searching) byName + byPreset else catalog.listed(category).sortedBy { it.name.lowercase() }
             val actions = if (app.absentmotion.platform.PlatformFeatures.ai && (searching || category == "ai")) AiAction.entries.filter { it.offered && (!audio || it == AiAction.Noise) && matchesSearch(query, stringResource(it.title)) } else emptyList()
             val resultGrid = grids.getOrPut(if (searching) "search:$query" else category.orEmpty()) { androidx.compose.foundation.lazy.grid.LazyGridState() }
-            LazyVerticalGrid(if (PlatformFeatures.desktop || twoPane) GridCells.Adaptive(120.dp) else GridCells.Fixed(3), Modifier.fillMaxSize().then(slide).deskScrollbar(resultGrid), resultGrid, contentPadding = PaddingValues(if (PlatformFeatures.desktop) 16.dp else 10.dp)) {
+            LazyVerticalGrid(if (deskLayout || twoPane) GridCells.Adaptive(120.dp) else GridCells.Fixed(3), Modifier.fillMaxSize().then(slide).deskScrollbar(resultGrid), resultGrid, contentPadding = PaddingValues(if (deskLayout) 16.dp else 10.dp)) {
                 if (app.absentmotion.platform.PlatformFeatures.ai && hasSound && (category == "ai" || searching && matchesSearch(query, context.getString(R.string.auto_captions)))) {
                     item(key = "ai-captions") { AudioTile(stringResource(R.string.auto_captions), 5, true) { state.playing = false; captionClip = layer.id } }
                 }
                 items(actions, key = { "ai-${it.name}" }) { action -> AiTile(action, state.selected, ai) }
                 items(results, key = { it.shortcut ?: it.id }) { effect -> EffectTile(catalog, effect, 100f, { if (effect in byPreset) detail = effect else pick(effect) }, { detail = effect }, effect.id in favourites) }
             }
-        } else if (PlatformFeatures.desktop) {
+        } else if (deskLayout) {
             DeskEffectsHome(homeScroll, catalog, recent, favourites, presetFavourites, favPage, { favPage = it }, hasSound, audioName, ::pick, { effect, preset -> if (effect.usable(blocked)) add(effect, preset) else detail = effect }, { detail = it }, { category = it })
         } else {
             Column(Modifier.fillMaxSize().verticalScroll(homeScroll)) {
@@ -527,10 +528,10 @@ private fun EffectTile(catalog: EffectCatalog, effect: EffectDefinition, width: 
             Thumbnail(catalog, preset?.let(effect::thumbnail) ?: effect.thumbnail, Modifier.size((width - 7).dp).clip(RoundedCornerShape(5.dp)))
             if (favourite) Icon(PanelIcons.StarFilled, null, Modifier.align(Alignment.TopEnd).size(14.dp), tint = Am.Accent)
             if (preset == null && catalog.isNew(effect)) Text(stringResource(R.string.t_new), Modifier.align(Alignment.TopStart).padding(3.dp).clip(RoundedCornerShape(3.dp)).background(Am.Accent)
-                .padding(horizontal = 3.dp), color = Am.OnAccent, fontSize = if (PlatformFeatures.desktop) 12.sp else 7.sp, lineHeight = if (PlatformFeatures.desktop) 14.sp else 9.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                .padding(horizontal = 3.dp), color = Am.OnAccent, fontSize = if (deskLayout) 12.sp else 7.sp, lineHeight = if (deskLayout) 14.sp else 9.sp, fontWeight = FontWeight.Bold, maxLines = 1)
         }
-        Text(preset?.name ?: effect.name, Modifier.fillMaxWidth().padding(top = 4.dp), color = Am.OnDark, fontSize = if (PlatformFeatures.desktop) 12.sp else if (width > 100) 10.sp else 8.sp,
-            lineHeight = if (PlatformFeatures.desktop) 14.sp else 9.sp, textAlign = TextAlign.Center, maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+        Text(preset?.name ?: effect.name, Modifier.fillMaxWidth().padding(top = 4.dp), color = Am.OnDark, fontSize = if (deskLayout) 12.sp else if (width > 100) 10.sp else 8.sp,
+            lineHeight = if (deskLayout) 14.sp else 9.sp, textAlign = TextAlign.Center, maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
     }
 }
 
@@ -595,7 +596,7 @@ internal object EffectSwipe {
 
 @Composable
 internal fun Modifier.effectSwipe(enabled: Boolean, accept: (Int) -> Boolean, drag: (Float, Float) -> Unit, end: (Float?, Float) -> Unit): Modifier {
-    if (PlatformFeatures.desktop) return this
+    if (deskLayout) return this
     val on by rememberUpdatedState(enabled)
     val begin by rememberUpdatedState(accept)
     val move by rememberUpdatedState(drag)

@@ -34,7 +34,8 @@ class AiModelsTest {
         }
         val rife = listOf(AiModel.SmoothLow, AiModel.SmoothMedium, AiModel.SmoothHigh)
         assertTrue(rife.all { m -> m.files.all { "/13338e38debe2e400b3eeecf6792312d01a692f9/models/${m.folder}/" in it.url } })
-        assertTrue((AiModel.entries - rife.toSet() - AiModel.Cutout).all { m -> m.files.all { it.url == MODEL_RELEASE + it.name } })
+        assertTrue((AiModel.entries - rife.toSet() - setOf(AiModel.Cutout, AiModel.DetailMax, AiModel.CartoonMax)).all { m -> m.files.all { it.url == MODEL_RELEASE + it.name } })
+        assertTrue(listOf(AiModel.DetailMax, AiModel.CartoonMax).all { model -> model.files.all { it.url == MODEL_RELEASE_5 + it.name } })
         assertTrue(MODEL_RELEASE.endsWith("/releases/download/ai-models-1/"))
         assertNull(AiModel.Grain.param)
         assertEquals("realesr-general-x4v3.param", AiModel.Detail.param)
@@ -80,6 +81,16 @@ class AiModelsTest {
             val options = EnhanceOptions(mode, cartoon, grain && !cartoon)
             assertEquals(options, EnhanceOptions.parse(options.xml))
         }
+        for (mode in EnhanceMode.entries) for (cartoon in listOf(false, true)) for (max in listOf(false, true)) {
+            val options = EnhanceOptions(mode, cartoon = cartoon, max = max)
+            assertEquals(options, EnhanceOptions.parse(options.xml))
+            assertEquals(max, options.forPlatform(image = true, desktop = true).max)
+            assertFalse(options.forPlatform(image = true, desktop = false).max)
+            assertFalse(options.forPlatform(image = false, desktop = true).max)
+        }
+        assertEquals(AiModel.DetailMax, plain.copy(max = true).model)
+        assertEquals(AiModel.CartoonMax, plain.copy(max = true, cartoon = true).model)
+        assertNull(plain.copy(max = true, grain = true).blend)
         assertNull(EnhanceOptions.parse("blur"))
         assertNull(EnhanceOptions.parse(null))
         assertEquals("upscale4+cartoon", EnhanceOptions(EnhanceMode.Upscale4, cartoon = true).xml)
@@ -105,6 +116,16 @@ class AiModelsTest {
         assertTrue(EnhanceMode.Faces.fits(3840, 2160))
         assertFalse(EnhanceMode.Upscale2.fits(0, 0))
         assertEquals(listOf(2, 4, 1, 1), EnhanceMode.entries.map { it.scale })
+    }
+
+    @Test fun imageCapsCheckPixelsAndExtremeSides() {
+        val standard = EnhanceOptions()
+        assertTrue(imageFits(1600, 1200, standard))
+        assertFalse(imageFits(2000, 1200, standard))
+        assertTrue(imageFits(2000, 1200, standard.copy(max = true)))
+        assertFalse(imageFits(9000, 1, standard))
+        assertTrue(imageFits(1000, 750, standard.copy(mode = EnhanceMode.Upscale4)))
+        assertFalse(imageFits(1001, 750, standard.copy(mode = EnhanceMode.Upscale4)))
     }
 
     @Test fun estimatesTurnIntoPlainVerdicts() {

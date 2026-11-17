@@ -1,6 +1,7 @@
 package app.absentmotion.ui.editor.panels
 
 import app.absentmotion.ui.editor.deskSp
+import app.absentmotion.ui.adaptive.deskLayout
 import androidx.compose.animation.core.AnimationState
 import androidx.compose.animation.core.animateDecay
 import androidx.compose.animation.splineBasedDecay
@@ -73,7 +74,7 @@ internal val Float.px: Dp get() = (this / 2.8125f).dp
 
 @Composable
 internal fun PhoneFit(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    if (app.absentmotion.platform.PlatformFeatures.desktop) {
+    if (deskLayout) {
         Box(modifier) { content() }
         return
     }

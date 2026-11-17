@@ -28,6 +28,7 @@ class AiMark(val node: XmlNode) {
     val kind: AiKind? get() = AiKind.entries.firstOrNull { it.xml == node["type"] }
     val source: NoiseSource? get() = NoiseSource.entries.firstOrNull { it.xml == node["option"] }
     val enhance: EnhanceOptions? get() = if (kind == AiKind.Enhance) EnhanceOptions.parse(node["option"]) else null
+    val attribute: String? get() = node["attribute"] ?: kind?.attribute
     val original: String? get() = node["original"]
     val result: String? get() = node["result"]
     val shift: Int get() = node["shift"]?.toIntOrNull() ?: 0
@@ -50,12 +51,13 @@ fun Layer.withAiMark(kind: AiKind, original: String?, result: String?, option: S
     return copy(node = node.copy(children = node.children.filterNot { it.name == AI_TAG && it["type"] == kind.xml } + XmlNode(AI_TAG, attrs, listOfNotNull(kept?.node))))
 }
 
-val AiMark.restorable: Boolean get() = kind?.attribute != null && original != null
+val AiMark.restorable: Boolean get() = attribute != null && original != null
 
 internal fun Layer.aiStack(kind: AiKind): List<AiMark> {
-    val key = kind.attribute ?: return emptyList()
-    val marks = aiMarks.filter { it.kind?.attribute == key }
-    var top = marks.firstOrNull { it.kind == kind } ?: return emptyList()
+    val first = aiMarks.firstOrNull { it.kind == kind } ?: return emptyList()
+    val key = first.attribute ?: return emptyList()
+    val marks = aiMarks.filter { it.attribute == key }
+    var top = first
     val stack = mutableListOf(top)
     while (top.result != node[key]) {
         val built = top
@@ -92,7 +94,7 @@ internal fun Layer.shiftedMedia(by: Int): Layer {
 
 fun Layer.withoutAiMark(kind: AiKind): Layer {
     val mark = aiMarks.firstOrNull { it.kind == kind } ?: return this
-    val key = kind.attribute
+    val key = mark.attribute
     val stack = aiStack(kind)
     val back = if (key != null && mark.original != null && stack.isNotEmpty()) Layer(node.with(key, mark.original)).shiftedMedia(stack.sumOf { it.shift }).node else node
     val gone = (stack.ifEmpty { listOf(mark) }).map { it.node }.toSet()

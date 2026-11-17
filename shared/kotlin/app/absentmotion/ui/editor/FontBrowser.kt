@@ -16,6 +16,8 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -54,7 +56,7 @@ private val Favourite get() = Am.Gold
 
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
-internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClose: () -> Unit) {
+internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClose: () -> Unit, googleList: (suspend () -> List<GoogleFamily>)? = null, deviceList: List<FontName>? = null) {
     val context = LocalContext.current
     val searchFocus = remember { FocusRequester() }
     val keyboard = LocalSoftwareKeyboardController.current
@@ -70,6 +72,12 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
     val downloads by library.revision.collectAsState()
     var error by remember { mutableStateOf<FontError?>(null) }
     val scope = rememberCoroutineScope()
+    var source by remember { mutableStateOf(FontSource.All) }
+    var google by remember { mutableStateOf(emptyList<GoogleFamily>()) }
+    var downloading by remember { mutableStateOf<String?>(null) }
+    val searching = !search.isNullOrBlank()
+    LaunchedEffect(searching) { if (searching && google.isEmpty()) google = (googleList ?: library::googleFonts)() }
+    val device by produceState(emptyList<FontName>(), deviceList) { value = deviceList ?: withContext(Dispatchers.IO) { library.deviceFonts() } }
     LaunchedEffect(search != null) { if (search != null) { searchFocus.requestFocus(); keyboard?.show() } else keyboard?.hide() }
     val importer = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
         scope.launch {
@@ -103,15 +111,26 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
     }
     BackHandler { when { drawer -> drawer = false; search != null -> search = null; else -> onClose() } }
     val favourites = remember(revision) { library.favourites.toSet() }
-    val entries = remember(revision, categories, sorting, language, search) {
-        val all = library.importedFonts().map { FontEntry(it, 100, emptySet()) } + FontCatalog.entries
-        val filtered = all.filter { entry ->
+    val results = remember(revision, categories, sorting, language, search, source, google, device) {
+        fun kept(all: List<FontEntry>) = all.filter { entry ->
             val matchesCategory = categories.isEmpty() || entry.category in categories || (110 in categories && entry.name.xml in favourites)
-            matchesCategory && (language == 0 || language in entry.languages || entry.category == 100) &&
-                matchesSearch(search.orEmpty(), entry.name.label)
+            matchesCategory && (language == 0 || language in entry.languages || entry.category == 100)
+        }.let { filtered -> if (sorting == "Alphabetical") filtered.sortedBy { it.name.label.lowercase() } else filtered }
+        val realCategories = categories.filter { it in 1..5 }
+        GoogleFonts.arrange(kept(library.importedFonts().map { FontEntry(it, 100, emptySet()) }), kept(FontCatalog.entries),
+            if (searching || source == FontSource.Device) device.map { FontEntry(it, 0, emptySet()) } else emptyList(),
+            google.filter { realCategories.isEmpty() || it.category in realCategories }, search.orEmpty(), source)
+    }
+    val entries = results.local
+    val familyChosen = { family: GoogleFamily ->
+        if (downloading == null) scope.launch {
+            val name = family.regular.xml
+            downloading = family.family
+            val file = library.resolve(name, download = true)
+            downloading = null
+            if (file != null) onSelect(name) else error = FontError(R.string.font_load_failed_title, R.string.font_load_failed_body)
         }
-        when (sorting) { "Alphabetical" -> filtered.sortedBy { it.name.label.lowercase() }
-            else -> filtered }
+        Unit
     }
     Box(Modifier.fillMaxSize().background(BrowserBg)) {
         Column(Modifier.fillMaxSize()) {
@@ -123,6 +142,13 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
                     singleLine = true, decorationBox = { inner -> if (search.isNullOrEmpty()) Text(stringResource(R.string.type_here_to_search), color = Am.OnDark.copy(alpha = .3f), fontSize = 16.sp); inner() })
                 FontIconButton(if (search == null) TextIcons.Search else TextIcons.Tick, if (search == null) stringResource(R.string.font_search) else stringResource(R.string.done)) {
                     search = if (search == null) "" else null
+                }
+            }
+            if (search != null) Row(Modifier.fillMaxWidth().height(44.dp).horizontalScroll(rememberScrollState()).padding(horizontal = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                FontSource.entries.forEach { option ->
+                    Box(Modifier.defaultMinSize(minHeight = 32.dp).clip(RoundedCornerShape(16.dp)).background(if (option == source) Am.Accent else Am.Field).clickable { source = option }.padding(horizontal = 14.dp, vertical = 6.dp), Alignment.Center) {
+                        Text(stringResource(SourceLabels.getValue(option)), color = if (option == source) Am.OnAccent else Am.OnDark, fontSize = 13.sp, maxLines = 1)
+                    }
                 }
             }
             LazyVerticalGrid(if (app.absentmotion.ui.adaptive.LocalAdaptiveSpace.current?.wide == true) GridCells.Adaptive(180.dp) else GridCells.Fixed(2), Modifier.weight(1f)) {
@@ -141,6 +167,28 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
                             if (entry.category != 100) HoldName(stringResource(R.string.font_favorite))
                         }
                     }
+                }
+                if (results.google.isNotEmpty() && source == FontSource.All) item(key = "google-divider", span = { GridItemSpan(maxLineSpan) }) {
+                    Row(Modifier.fillMaxWidth().height(40.dp).padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                        HorizontalDivider(Modifier.weight(1f), thickness = 1.dp, color = Am.Caption.copy(alpha = .4f))
+                        Text(stringResource(R.string.font_source_google), Modifier.padding(horizontal = 10.dp), color = Am.Caption, fontSize = 12.sp, maxLines = 1)
+                        HorizontalDivider(Modifier.weight(1f), thickness = 1.dp, color = Am.Caption.copy(alpha = .4f))
+                    }
+                }
+                items(results.google, key = { "google:" + it.family }, span = { GridItemSpan(maxLineSpan) }) { family ->
+                    Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).border(.5.dp, BrowserLine).clickable { familyChosen(family) }.padding(start = 14.dp, end = 8.dp, top = 6.dp, bottom = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f)) {
+                            Text(family.family, color = Am.OnDark, fontSize = 15.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, style = TextStyle().withUiFont())
+                            CategoryLabels[family.category]?.let { Text(stringResource(it), color = Am.Caption, fontSize = 11.sp, maxLines = 1) }
+                        }
+                        Box(Modifier.size(34.dp), Alignment.Center) {
+                            if (downloading == family.family) CircularProgressIndicator(Modifier.size(18.dp), color = Favourite, strokeWidth = 2.dp)
+                            else Icon(app.absentmotion.ui.home.HomeIcons.Download, stringResource(R.string.font_downloads_when_chosen), Modifier.size(18.dp), tint = Am.OnDark.copy(alpha = .38f))
+                        }
+                    }
+                }
+                if (source == FontSource.Google && !searching) item(key = "google-hint", span = { GridItemSpan(maxLineSpan) }) {
+                    Text(stringResource(R.string.font_google_hint), Modifier.fillMaxWidth().padding(16.dp), color = Am.Caption, fontSize = 13.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
                 }
             }
         }
@@ -221,6 +269,9 @@ private val CategoryLabels = mapOf(
     1 to R.string.font_category_sans_serif, 2 to R.string.font_category_serif, 3 to R.string.font_category_display,
     4 to R.string.font_category_handwriting, 5 to R.string.font_category_monospace, 110 to R.string.font_favorite, 100 to R.string.font_imported,
 )
+
+private val SourceLabels = mapOf(FontSource.All to R.string.font_source_all, FontSource.Imported to R.string.font_imported, FontSource.App to R.string.font_source_app,
+    FontSource.Device to R.string.font_source_device, FontSource.Google to R.string.font_source_google)
 
 private val SortingLabels = linkedMapOf("Popular" to R.string.font_sort_popular, "Alphabetical" to R.string.font_sort_alphabetical)
 

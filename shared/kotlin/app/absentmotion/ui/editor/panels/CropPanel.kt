@@ -1,6 +1,7 @@
 package app.absentmotion.ui.editor.panels
 
 import app.absentmotion.ui.editor.deskSp
+import app.absentmotion.ui.adaptive.deskLayout
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -59,6 +60,7 @@ import app.absentmotion.model.cropRatio
 import app.absentmotion.model.onCropKeyframe
 import app.absentmotion.ui.editor.PanelHeight
 import app.absentmotion.ui.editor.PanelIcons
+import app.absentmotion.ui.editor.RecordingKeyframeButton
 import app.absentmotion.ui.theme.Am
 import kotlinx.coroutines.launch
 import app.absentmotion.ui.HoldName
@@ -102,13 +104,15 @@ internal fun CropPanel(state: EditorState, modifier: Modifier) {
         Column(Modifier.width(168.px).heightIn(max = PanelHeight).fillMaxHeight()) {
             SideButton(PanelIcons.Back, stringResource(R.string.topbar_back), Modifier.weight(1f)) { state.stepBack() }
             val keyed = layer.onCropKeyframe(index)
-            SideButton(if (keyed) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, stringResource(if (keyed) R.string.a11y_remove_keyframe else R.string.a11y_add_keyframe), Modifier.weight(1f)) {
-                state.toggleCropKeyframes()
+            RecordingKeyframeButton(state, Modifier.weight(1f).fillMaxWidth(), onClick = { state.toggleCropKeyframes() }) {
+                val description = stringResource(if (keyed) R.string.a11y_remove_keyframe else R.string.a11y_add_keyframe)
+                PanelIcon(if (keyed) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, Am.OnDark, description = description)
+                HoldName(description)
             }
             Spacer(Modifier.weight(2f))
         }
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-            Column(Modifier.weight(1f).fillMaxHeight().background(Am.PanelInset).padding(horizontal = 8.dp, vertical = 6.dp), if (app.absentmotion.platform.PlatformFeatures.desktop) Arrangement.spacedBy(16.dp) else Arrangement.SpaceEvenly) {
+            Column(Modifier.weight(1f).fillMaxHeight().background(Am.PanelInset).padding(horizontal = 8.dp, vertical = 6.dp), if (deskLayout) Arrangement.spacedBy(16.dp) else Arrangement.SpaceEvenly) {
                 Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), Arrangement.spacedBy(6.dp)) {
                     val free = stringResource(R.string.crop_free)
                     for ((ratio, name) in CropAspects) {

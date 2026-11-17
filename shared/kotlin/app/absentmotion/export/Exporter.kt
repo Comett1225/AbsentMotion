@@ -41,13 +41,14 @@ import java.util.zip.ZipOutputStream
 class ExportResult(val uris: List<Uri>, val mime: String, val where: String, val verification: Verification? = null)
 
 data class CommunityDetails(val title: String, val description: String = "", val tags: List<String> = emptyList(), val creator: String = "", val thumbMs: Int = 0, val confirmed: Boolean = false,
-                            val squareX: Float = 0.5f, val squareY: Float = 0.5f, val squareSize: Float = 1f)
+                            val squareX: Float = 0.5f, val squareY: Float = 0.5f, val squareSize: Float = 1f, val guidelinesConfirmed: Boolean = false)
 
 const val CommunityLimitBytes = 20L shl 20
 
 internal fun CommunityDetails.problem(scene: Scene): UiText? = when {
     title.isBlank() -> txt(R.string.community_need_title)
     !confirmed -> txt(R.string.community_need_confirm)
+    !guidelinesConfirmed -> txt(R.string.community_need_guidelines)
     scene.communityBytes() > CommunityLimitBytes -> txt(R.string.community_too_big, formatBytes(scene.communityBytes()))
     else -> null
 }

@@ -1,6 +1,7 @@
 package app.absentmotion.ui.editor
 
 import androidx.compose.foundation.gestures.detectTapGestures
+import app.absentmotion.ui.adaptive.deskLayout
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -184,7 +185,7 @@ private fun SidePanels(state: EditorState, addLibrary: AddLibrary, textEdit: Boo
 
 @Composable
 fun PhoneScreen(fillWidth: Dp = 0.dp, onDismiss: () -> Unit = {}, title: String? = null, sheet: Boolean = false, onConfirm: (() -> Unit)? = null, plain: Boolean = false, content: @Composable () -> Unit) {
-    if (app.absentmotion.platform.PlatformFeatures.desktop && LocalDeskEditor.current) {
+    if (deskLayout && LocalDeskEditor.current) {
         if (sheet) DeskSheetHost(onDismiss, content)
         else DeskDialog(title, if (fillWidth == Dp.Infinity) Dp.Infinity else null, onDismiss, height = if (fillWidth == Dp.Infinity) Dp.Infinity else null, onConfirm = onConfirm, outside = fillWidth != Dp.Infinity, content = content)
         return

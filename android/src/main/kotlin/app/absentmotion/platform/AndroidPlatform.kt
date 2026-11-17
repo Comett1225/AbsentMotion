@@ -16,7 +16,10 @@ import kotlin.math.roundToInt
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.composed
+import androidx.compose.ui.input.pointer.isAltPressed
 import androidx.compose.ui.input.pointer.isCtrlPressed
+import androidx.compose.ui.input.pointer.isMetaPressed
+import androidx.compose.ui.input.pointer.isShiftPressed
 import androidx.compose.ui.input.pointer.pointerInput
 import app.absentmotion.library.openableUri
 
@@ -134,7 +137,22 @@ fun wheel(onScroll: (delta: androidx.compose.ui.geometry.Offset, at: androidx.co
         }
     }
 
-fun previewWheel(onScroll: (delta: androidx.compose.ui.geometry.Offset, at: androidx.compose.ui.geometry.Offset, zoom: Boolean, alt: Boolean, shift: Boolean) -> Unit): androidx.compose.ui.Modifier = androidx.compose.ui.Modifier
+fun previewWheel(onScroll: (delta: androidx.compose.ui.geometry.Offset, at: androidx.compose.ui.geometry.Offset, zoom: Boolean, alt: Boolean, shift: Boolean) -> Unit): androidx.compose.ui.Modifier =
+    androidx.compose.ui.Modifier.composed {
+        val latest by androidx.compose.runtime.rememberUpdatedState(onScroll)
+        androidx.compose.ui.Modifier.pointerInput(Unit) {
+            awaitPointerEventScope {
+                while (true) {
+                    val event = awaitPointerEvent()
+                    if (event.type != androidx.compose.ui.input.pointer.PointerEventType.Scroll) continue
+                    val change = event.changes.firstOrNull() ?: continue
+                    val keys = event.keyboardModifiers
+                    latest(change.scrollDelta, change.position, keys.isCtrlPressed || keys.isMetaPressed, keys.isAltPressed, keys.isShiftPressed)
+                    change.consume()
+                }
+            }
+        }
+    }
 
 fun makeBitmap(width: Int, height: Int): Bitmap = android.graphics.Bitmap.createBitmap(width, height, android.graphics.Bitmap.Config.ARGB_8888)
 fun recycleBitmap(bitmap: Bitmap) = bitmap.recycle()
@@ -217,7 +235,7 @@ object PlatformFeatures {
     val ffamp = android.os.Process.is64Bit()
 }
 
-fun textFieldFocused(): Boolean = false
+fun textFieldFocused(): Boolean = DeskTyping.active > 0
 
 fun systemDark(context: Context): Boolean =
     context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK == android.content.res.Configuration.UI_MODE_NIGHT_YES

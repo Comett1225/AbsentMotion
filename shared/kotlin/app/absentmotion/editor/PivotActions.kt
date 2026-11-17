@@ -419,7 +419,7 @@ internal fun Scene.withPivotMoved(id: Long, timeMs: Int, x: Float, y: Float, see
 fun EditorState.setPivot(x: Float, y: Float, key: Any? = null) {
     val id = selectedId ?: return
     if (scene.layer(id)?.kind == "camera") return
-    edit(key) { it.withPivotMoved(id, sampleMs, x, y, timeMs) }
+    edit(key, pivot = id) { it.withPivotMoved(id, sampleMs, x, y, timeMs) }
 }
 
 internal fun Scene.withPivotReset(id: Long, timeMs: Int, seenMs: Int = timeMs): Scene {
@@ -434,4 +434,47 @@ internal fun Scene.withPivotReset(id: Long, timeMs: Int, seenMs: Int = timeMs): 
 fun EditorState.resetPivot() {
     val id = selectedId ?: return
     edit { it.withPivotReset(id, sampleMs, timeMs) }
+}
+
+internal fun Scene.withRecordedPivot(id: Long, pivot: XmlNode): Scene {
+    val layer = layer(id) ?: return this
+    val oldPivot = layer.element(PropRef.Pivot) ?: return this
+    val pulls = HashMap<Double, Pull>()
+    fun pullAt(ms: Double): Pull = pulls.getOrPut(ms) {
+        val t = layer.tOf(ms)
+        val before = floats(oldPivot.valueAt(t), floatArrayOf(0f, 0f, 0f))
+        val after = floats(pivot.valueAt(t), floatArrayOf(0f, 0f, 0f))
+        pull(layer, ms, after[0] - before[0], after[1] - before[1])
+    }
+    fun compensate(target: Layer, ref: PropRef, fallback: FloatArray, pick: (Pull) -> DoubleArray): Layer {
+        val element = target.element(ref) ?: XmlNode(ref.name, mapOf("value" to formatFloats(fallback)))
+        val first = frameAt(target.startTime)
+        val last = frameAt(target.endTime)
+        val times = ((first..last).map { frameTime(it).toDouble().coerceIn(target.startTime.toDouble(), target.endTime.toDouble()) } +
+            element.keyframes.map { target.msOf(it.t) } + pivot.keyframes.map { layer.msOf(it.t) } +
+            listOf(target.startTime.toDouble(), target.endTime.toDouble())).distinct().sorted()
+        var moved = false
+        var tolerance = 0.05f
+        val samples = times.mapIndexed { index, ms ->
+            val t = target.tOf(ms)
+            val shift = pick(pullAt(ms))
+            if (shift.any { abs(it) > 1e-9 }) moved = true
+            val at = place(target, ms.toInt())
+            tolerance = minOf(tolerance, 0.05f / maxOf(1f, abs(at.sx), abs(at.sy)))
+            val value = formatFloats(floats(element.valueAt(t), fallback).plus(shift, 1.0))
+            RecordedSample(index, t, value, t, t)
+        }
+        if (!moved) return target
+        val keys = simplifyRecording(samples, tolerance).map { Keyframe(it.time, it.value) }
+        return target.withElement(ref, element.withKeyframes(keys))
+    }
+    var next = update(id) { compensate(it, PropRef.Location, floatArrayOf(0f, 0f, 0f), Pull::own).withElement(PropRef.Pivot, pivot) }
+    if (layer.followsPath(this)) {
+        val index = layer.effects.indexOfFirst { it["id"] == "absent.movealongpath" && it["hidden"] != "true" }
+        next = next.update(id) { compensate(it, PropRef.effect(index, "offset"), floatArrayOf(0f, 0f), Pull::world) }
+    }
+    for (child in layers.filter { it.id != id && it.node["parent"]?.toLongOrNull() == id }) {
+        next = next.update(child.id) { compensate(it, PropRef.Location, floatArrayOf(0f, 0f, 0f), Pull::child) }
+    }
+    return next
 }

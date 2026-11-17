@@ -1,6 +1,7 @@
 package app.absentmotion.ui.editor
 
 import app.absentmotion.ui.editor.panels.typeOnDoubleTap
+import app.absentmotion.ui.adaptive.deskLayout
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -62,7 +63,7 @@ internal fun StretchSheet(state: EditorState, ids: Set<Long>, onClose: () -> Uni
     fun set(value: Float) { percent = value.roundToInt().coerceIn(LeastPercent, MostPercent) }
     Dialog(onClose, sheetDialogProperties()) {
         PhoneScreen(onDismiss = onClose, sheet = true) {
-            Box(Modifier.fillMaxSize().clickable(interactionSource = null, indication = null, onClick = onClose).systemBarsPadding(), if (app.absentmotion.platform.PlatformFeatures.desktop) Alignment.Center else Alignment.BottomCenter) {
+            Box(Modifier.fillMaxSize().clickable(interactionSource = null, indication = null, onClick = onClose).systemBarsPadding(), if (deskLayout) Alignment.Center else Alignment.BottomCenter) {
                 Column(Modifier.fillMaxWidth().clip(SheetShape).background(Am.Panel).clickable(interactionSource = null, indication = null) {}.padding(16.dp)) {
                     Text(title, color = Am.OnDark, fontSize = 17.sp, fontWeight = FontWeight.Bold, maxLines = 1)
                     Text(pluralStringResource(R.plurals.structure_layers_selected, ids.size, ids.size.toString()), Modifier.padding(top = 4.dp, bottom = 12.dp), color = Am.OnDarkDim, fontSize = 13.sp, maxLines = 1)

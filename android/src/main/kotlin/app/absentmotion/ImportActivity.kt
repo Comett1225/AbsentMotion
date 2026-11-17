@@ -28,12 +28,24 @@ object ImportHandOff {
 class ImportActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val link = when (intent.action) {
+            Intent.ACTION_VIEW -> intent.dataString?.takeIf { app.absentmotion.links.AlightLinks.parse(it) != null }
+            Intent.ACTION_SEND -> if (intent.type == "text/plain") app.absentmotion.links.AlightLinks.extract(intent.getCharSequenceExtra(Intent.EXTRA_TEXT)?.toString()) else null
+            else -> null
+        }
+        if (link != null) {
+            ImportHandOff.start(listOf(link)) {
+                startActivity(Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP))
+            }
+            finish()
+            return
+        }
         val uris = when (intent.action) {
             Intent.ACTION_SEND -> listOfNotNull(streamExtra()).ifEmpty { clipUris().take(1) }
             Intent.ACTION_SEND_MULTIPLE -> streamExtras().ifEmpty { clipUris() }
             Intent.ACTION_VIEW -> listOfNotNull(intent.data)
             else -> emptyList()
-        }.filterNot(::isOwnPrivateFile)
+        }.filter { it.scheme == "content" || it.scheme == "file" }.filterNot(::isOwnPrivateFile)
         if (uris.isNotEmpty()) {
             val clip = ClipData.newRawUri("import", uris.first()).apply { uris.drop(1).forEach { addItem(ClipData.Item(it)) } }
             ImportHandOff.start(uris.map { it.toString() }) { grant ->

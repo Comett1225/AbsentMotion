@@ -1,6 +1,7 @@
 package app.absentmotion.ui.editor
 
 import androidx.compose.foundation.background
+import app.absentmotion.ui.adaptive.deskLayout
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -104,7 +105,7 @@ internal fun SearchField(
                 }
             },
         )
-        Box(Modifier.size(if (!clearable && app.absentmotion.platform.PlatformFeatures.desktop) 8.dp else 32.dp).then(if (!clearable) Modifier else Modifier.clickable {
+        Box(Modifier.size(if (!clearable && deskLayout) 8.dp else 32.dp).then(if (!clearable) Modifier else Modifier.clickable {
             onChange("")
             if (onClose != null) onClose() else { requester.requestFocus(); keyboard?.show() }
         }), Alignment.Center) {

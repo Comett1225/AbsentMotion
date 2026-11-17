@@ -1175,7 +1175,7 @@ AI Smooth models (RIFE)
 AI Enhance models (Real-ESRGAN)
 -------------------------------
 
-- Version: realesr-general-x4v3, realesr-general-wdn-x4v3 and realesr-animevideov3 from the Real-ESRGAN release v0.2.5.0, converted to ncnn (fp16). The general models were converted for AbsentMotion; the converted files are published as assets of this repository's ai-models-1 release.
+- Version: realesr-general-x4v3, realesr-general-wdn-x4v3 and realesr-animevideov3 from the Real-ESRGAN release v0.2.5.0, converted to ncnn (fp16). The general models were converted for AbsentMotion; the converted files are published as assets of this repository's ai-models-1 release. The computer-only realesrgan-x4plus and realesrgan-x4plus-anime ncnn models are distributed via this repository's ai-models-5 release.
 - Licence: BSD-3-Clause (text in appendix A.19).
 - Copyright: Copyright (c) 2021, Xintao Wang.
 - URL: https://github.com/xinntao/Real-ESRGAN

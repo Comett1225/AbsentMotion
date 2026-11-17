@@ -1,6 +1,7 @@
 package app.absentmotion.ui.editor.panels
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import app.absentmotion.ui.adaptive.deskLayout
 import app.absentmotion.ui.theme.pressShape
 import app.absentmotion.ui.editor.deskSp
 import androidx.compose.foundation.Canvas
@@ -86,7 +87,7 @@ internal fun MoveTransformPanel(state: EditorState, layer: Layer, tab: Int, turn
             0 -> PositionTab(state, layer, onFlip)
             1 -> when {
                 turn == null -> RotationTab(state, layer)
-                app.absentmotion.platform.PlatformFeatures.desktop || state.settings.rotateFree -> TurnTab(state, layer, turn)
+                deskLayout || state.settings.rotateFree -> TurnTab(state, layer, turn)
                 else -> AxesTab(state, layer, turn)
             }
             2 -> if (layer.kind == "camera") CameraSizeTab(state, layer) else SizeTab(state, layer)
@@ -132,8 +133,8 @@ private fun PositionTab(state: EditorState, layer: Layer, onFlip: (() -> Unit)?)
             detectDragGestures(
                 onDragStart = {
                     scale = if (timing.heldBeforeMoving(android.os.SystemClock.uptimeMillis(), viewConfiguration.longPressTimeoutMillis)) FINE_FACTOR else 1f
-                    axes = start(); origin = now.location; travel = Offset.Zero; shown = Offset.Zero
-                    state.snapGuides = if (deep) emptyList() else axes.first.guidesAt(0f) + axes.second.guidesAt(0f)
+                    axes = if (state.playing) SnapAxis(emptyList()) to SnapAxis(emptyList()) else start(); origin = now.location; travel = Offset.Zero; shown = Offset.Zero
+                    state.snapGuides = if (deep || state.playing) emptyList() else axes.first.guidesAt(0f) + axes.second.guidesAt(0f)
                 },
                 onDragEnd = ::done, onDragCancel = ::done,
             ) { change, drag ->
@@ -144,19 +145,19 @@ private fun PositionTab(state: EditorState, layer: Layer, onFlip: (() -> Unit)?)
                     return@detectDragGestures
                 }
                 travel += drag / density * scale
-                val snapped = Offset(axes.first.map(travel.x), axes.second.map(travel.y))
+                val snapped = if (state.playing) travel else Offset(axes.first.map(travel.x), axes.second.map(travel.y))
                 val step = snapped - shown
                 shown = snapped
-                val guides = (if (step.x == 0f) axes.first.guidesAt(snapped.x) else emptyList()) +
+                val guides = if (state.playing) emptyList() else (if (step.x == 0f) axes.first.guidesAt(snapped.x) else emptyList()) +
                     (if (step.y == 0f) axes.second.guidesAt(snapped.y) else emptyList())
                 if (guides.any { it !in state.snapGuides }) tick(HapticFeedbackType.SegmentTick)
-                state.snapGuides = guides
+                state.snapGuides = if (state.playing) emptyList() else guides
                 if (step != Offset.Zero) state.editSelected(key = "move") { l -> l.withTransform("location", origin[0] + snapped.x, origin[1] + snapped.y, l.location[2]) }
             }
         },
     ) {
         TrackpadCorners()
-        Box(if (app.absentmotion.platform.PlatformFeatures.desktop) Modifier.fillMaxWidth().height(app.absentmotion.ui.editor.PanelHeight) else Modifier.matchParentSize(), Alignment.Center) {
+        Box(if (deskLayout) Modifier.fillMaxWidth().height(app.absentmotion.ui.editor.PanelHeight) else Modifier.matchParentSize(), Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 TrackpadHint(stringResource(if (depth) R.string.drag_to_move_along_z else R.string.drag_here_to_move_the_layer), Modifier)
                 if (onFlip != null && !depth) FlipHint(stringResource(R.string.transform_double_tap_pivot))

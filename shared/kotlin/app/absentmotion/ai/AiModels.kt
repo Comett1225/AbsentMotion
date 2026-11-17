@@ -28,6 +28,7 @@ internal class ModelFile(val name: String, val url: String, val bytes: Long, val
 internal const val MODEL_RELEASE = "$HOME_PAGE/releases/download/ai-models-1/"
 internal const val MODEL_RELEASE_2 = "$HOME_PAGE/releases/download/ai-models-2/"
 internal const val MODEL_RELEASE_3 = "$HOME_PAGE/releases/download/ai-models-3/"
+internal const val MODEL_RELEASE_5 = "$HOME_PAGE/releases/download/ai-models-5/"
 
 internal object AddonRelease {
     @Volatile var base = "$HOME_PAGE/releases/download/ai-models-4/"
@@ -61,6 +62,12 @@ internal enum class AiModel(val folder: String, @StringRes val title: Int, val l
     Cartoon("realesr-animevideov3", R.string.ai_model_cartoon, "Real-ESRGAN animevideov3 (BSD-3-Clause)", 619.2, listOf(
         hosted("realesr-animevideov3-x4.param", 3_077, "850a248e7c14c27e5bd8cf7265113a9441036a7db63963bb8aa5169d788a435e"),
         hosted("realesr-animevideov3-x4.bin", 1_247_368, "548a36f9c3f4ab8da56cd3b13badf23968bee207b396dad14d04b830e5f2ab2d"))),
+    DetailMax("realesrgan-x4plus", R.string.ai_model_detail_max, "Real-ESRGAN x4plus (BSD-3-Clause)", 17926.848, listOf(
+        hosted("realesrgan-x4plus.param", 116_029, "35330ececcea33b6c397a72548e788d5d53becee4734c50b7fada36e89f10a86", MODEL_RELEASE_5),
+        hosted("realesrgan-x4plus.bin", 33_424_520, "713ee713b0353afaa27976f0563a64a5043bd70b9bd8936c2e26e25ebcdbcddf", MODEL_RELEASE_5))),
+    CartoonMax("realesrgan-x4plus-anime", R.string.ai_model_cartoon_max, "Real-ESRGAN x4plus anime (BSD-3-Clause)", 5706.432, listOf(
+        hosted("realesrgan-x4plus-anime.param", 30_290, "2b8fb6e0ae4d2d85704ca08c119a2f5ea40add4f2ecd512eb7f4cd44b6127ed4", MODEL_RELEASE_5),
+        hosted("realesrgan-x4plus-anime.bin", 8_943_500, "fe01c269cfd10cdef8e018ab66ebe750cf79c7af4d1f9c16c737e1295229bacc", MODEL_RELEASE_5))),
     Cutout("cutout-2", R.string.ai_model_cutout, "AbsentMotion cut-out (Apache-2.0)", 79.0, listOf(
         hosted(CUTOUT_PARAM_768, 19_350, "f5f6b00c7d7e313590c4150252bce38d292b51a77cc46f887175afe2a8577c48", MODEL_RELEASE_3),
         hosted(CUTOUT_PARAM_1024, 19_356, "12cbc7eb86afccbee2dbcd79bee799171ee4adcf4d59f1ff0e9278341885b262", MODEL_RELEASE_3),

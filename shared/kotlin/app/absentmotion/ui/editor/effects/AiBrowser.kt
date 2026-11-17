@@ -269,7 +269,7 @@ internal fun AiVideoDialog(tools: AiTools, scene: Scene) {
                 Row(Modifier.padding(top = 14.dp).fillMaxWidth().height(36.dp).clip(RoundedCornerShape(6.dp)).background(Am.PanelInset)) {
                     for ((side, name) in MatteSides.zip(sizeNames)) {
                         val on = side == tools.videoSide
-                        Box(Modifier.weight(1f).fillMaxHeight().padding(2.dp).clip(RoundedCornerShape(5.dp)).background(if (on) Am.FieldHi else Color.Transparent)
+                        Box(Modifier.weight(1f).padding(2.dp).heightIn(min = 32.dp).clip(RoundedCornerShape(5.dp)).background(if (on) Am.FieldHi else Color.Transparent)
                             .clickable { tools.videoSide = side }, Alignment.Center) {
                             Text(stringResource(R.string.aibrowser_size_option, stringResource(name), side.toString()), color = if (on) Am.Accent else Am.OnDark, fontSize = 12.sp, maxLines = 1)
                         }
@@ -377,9 +377,10 @@ internal fun AiEnhanceDialog(tools: AiTools, scene: Scene, onQuickSharpen: () ->
     val context = LocalContext.current
     val media = layer.mediaFill?.uri?.let(scene::media)
     val options = tools.enhance
-    val fits = media != null && options.mode.fits(media.width, media.height)
-    val seconds = media?.let(layer::matteSeconds) ?: 0.0
-    val tooLong = seconds > MAX_MATTE_SECONDS
+    val image = layer.mediaFill?.video == false
+    val fits = media != null && if (image) app.absentmotion.ai.imageFits(media.width, media.height, options) else options.mode.fits(media.width, media.height)
+    val seconds = if (image) 0.0 else media?.let(layer::matteSeconds) ?: 0.0
+    val tooLong = !image && seconds > MAX_MATTE_SECONDS
     var help by remember { mutableStateOf<EnhanceMode?>(null) }
     var estimate by remember { mutableStateOf<String?>(null) }
     var cannot by remember { mutableStateOf(false) }
@@ -389,14 +390,21 @@ internal fun AiEnhanceDialog(tools: AiTools, scene: Scene, onQuickSharpen: () ->
         cannot = false
         if (media == null || !options.usesAi || !fits) return@LaunchedEffect
         val phone = AiDevice.phone(context)
-        val gmac = seconds * (media.fps ?: 30f) * options.gmacPerFrame(media.width, media.height)
-        aiEstimate(phone, gmac, AiDevice.measured(options.model, phone.usesGpu)).let { estimate = it.text; cannot = it.verdict == AiVerdict.Cannot }
-        AiDevice.benchmark(context, options.model)?.let { rate -> aiEstimate(phone, gmac, rate).let { estimate = it.text; cannot = it.verdict == AiVerdict.Cannot } }
+        val gmac = (if (image) 1.0 else seconds * (media.fps ?: 30f)) * options.gmacPerFrame(media.width, media.height)
+        aiEstimate(phone, gmac, AiDevice.measured(options.model, phone.usesGpu)).let { estimate = if (image) app.absentmotion.ai.imageEstimateText(it) else it.text; cannot = it.verdict == AiVerdict.Cannot }
+        AiDevice.benchmark(context, options.model)?.let { rate -> aiEstimate(phone, gmac, rate).let { estimate = if (image) app.absentmotion.ai.imageEstimateText(it) else it.text; cannot = it.verdict == AiVerdict.Cannot } }
     }
     AlertDialog(onDismissRequest = { tools.enhanceSetup = null },
         title = { Text(stringResource(R.string.ai_enhance), color = Am.OnDark) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
+                Pills(listOf(false, true), options.cartoon, true, { stringResource(if (it) R.string.ai_enhance_anime else R.string.ai_enhance_realistic) }) { tools.enhance = options.copy(cartoon = it) }
+                Text(stringResource(if (options.cartoon) R.string.ai_enhance_anime_hint else R.string.ai_enhance_realistic_hint), Modifier.padding(top = 4.dp, bottom = 8.dp).heightIn(min = (40f * androidx.compose.ui.platform.LocalDensity.current.fontScale).dp), color = Am.Caption, fontSize = 12.sp, lineHeight = 16.sp)
+                if (image && app.absentmotion.platform.PlatformFeatures.desktop) {
+                    Text(stringResource(R.string.ai_enhance_quality), color = Am.OnDark, fontSize = 14.sp)
+                    Pills(listOf(false, true), options.max, true, { stringResource(if (it) R.string.ai_enhance_max else R.string.ai_enhance_standard) }) { tools.enhance = options.copy(max = it) }
+                    Spacer(Modifier.height(8.dp))
+                }
                 Column(Modifier.selectableGroup(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     for (mode in EnhanceMode.entries.filter { it != EnhanceMode.Faces || app.absentmotion.platform.PlatformFeatures.aiFaces }) {
                         val on = mode == options.mode
@@ -406,7 +414,7 @@ internal fun AiEnhanceDialog(tools: AiTools, scene: Scene, onQuickSharpen: () ->
                                 RadioButton(on, null, colors = RadioButtonDefaults.colors(selectedColor = Am.Accent, unselectedColor = Am.OnDark))
                                 Column(Modifier.weight(1f).padding(start = 10.dp)) {
                                     Text(stringResource(mode.title), color = if (on) Am.Accent else Am.OnDark, fontSize = 14.sp)
-                                    Text(stringResource(mode.hint), color = Am.Caption, fontSize = 12.sp, lineHeight = 16.sp)
+                                    Text(stringResource(if (image) mode.imageHint else mode.hint), color = Am.Caption, fontSize = 12.sp, lineHeight = 16.sp)
                                 }
                                 Box(Modifier.size(32.dp).clip(CircleShape).clickable { help = if (help == mode) null else mode }, Alignment.Center) {
                                     Box(Modifier.size(20.dp).border(1.5.dp, Am.OnDark, CircleShape), Alignment.Center) {
@@ -414,21 +422,22 @@ internal fun AiEnhanceDialog(tools: AiTools, scene: Scene, onQuickSharpen: () ->
                                     }
                                 }
                             }
-                            if (help == mode) Text(stringResource(mode.help), Modifier.padding(top = 6.dp), color = Am.OnDark, fontSize = 12.sp, lineHeight = 17.sp)
+                            if (help == mode) Text(stringResource(if (image) mode.imageHelp else mode.help), Modifier.padding(top = 6.dp), color = Am.OnDark, fontSize = 12.sp, lineHeight = 17.sp)
                         }
                     }
                 }
-                if (options.mode == EnhanceMode.Sharpen) EnhanceSwitch(stringResource(R.string.ai_enhance_quick), options.quick) { tools.enhance = options.copy(quick = it) }
-                if (options.usesAi) {
-                    EnhanceSwitch(stringResource(R.string.ai_enhance_cartoon), options.cartoon) { tools.enhance = options.copy(cartoon = it) }
-                    if (!options.cartoon) EnhanceSwitch(stringResource(R.string.ai_enhance_grain), options.grain) { tools.enhance = options.copy(grain = it) }
+                if (!image) Box(Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+                    if (options.mode == EnhanceMode.Sharpen) EnhanceSwitch(stringResource(R.string.ai_enhance_quick), options.quick) { tools.enhance = options.copy(quick = it) }
+                }
+                Box(Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+                    if (options.usesAi && !options.cartoon && !options.max) EnhanceSwitch(stringResource(R.string.ai_enhance_grain), options.grain) { tools.enhance = options.copy(grain = it) }
                 }
                 val note = when {
                     !options.usesAi -> stringResource(R.string.ai_enhance_quick_note)
                     media == null -> stringResource(R.string.aibrowser_no_size)
                     tooLong -> pluralStringResource(R.plurals.aibrowser_too_long, MAX_MATTE_SECONDS / 60, (MAX_MATTE_SECONDS / 60).toString())
-                    !fits -> AiEnhance.capText(options.mode)
-                    else -> listOfNotNull(estimate ?: stringResource(R.string.ai_checking_phone),
+                    !fits -> if (image) AiEnhance.imageCapText(options) else AiEnhance.capText(options.mode)
+                    else -> listOfNotNull(estimate ?: stringResource(if (image) R.string.ai_checking_device else R.string.ai_checking_phone),
                         if (missing > 0) stringResource(R.string.ai_download_once, formatBytes(missing)) else null).joinToString("\n")
                 }
                 Row(Modifier.padding(top = 12.dp).heightIn(min = 40.dp)) {
@@ -556,10 +565,10 @@ internal fun AiSmoothDialog(tools: AiTools, scene: Scene) {
 @Composable
 private fun <T> Pills(options: List<T>, selected: T, enabled: Boolean, label: @Composable (T) -> String, risk: (T) -> Risk? = { null },
                       ask: (Risk?, () -> Unit) -> Unit = { _, go -> go() }, onPick: (T) -> Unit) {
-    Row(Modifier.padding(top = 6.dp).fillMaxWidth().height(36.dp).alpha(if (enabled) 1f else 0.4f).clip(RoundedCornerShape(6.dp)).background(Am.PanelInset)) {
+    Row(Modifier.padding(top = 6.dp).fillMaxWidth().heightIn(min = 36.dp).alpha(if (enabled) 1f else 0.4f).clip(RoundedCornerShape(6.dp)).background(Am.PanelInset)) {
         for (option in options) {
             val on = option == selected
-            Box(Modifier.weight(1f).fillMaxHeight().padding(2.dp).clip(RoundedCornerShape(5.dp)).background(if (on) Am.FieldHi else Color.Transparent)
+            Box(Modifier.weight(1f).padding(2.dp).heightIn(min = 32.dp).clip(RoundedCornerShape(5.dp)).background(if (on) Am.FieldHi else Color.Transparent)
                 .clickable(enabled = enabled) { if (!on) ask(risk(option)) { onPick(option) } }, Alignment.Center) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     if (risk(option) != null) Icon(ExportIcons.Warning, null, Modifier.padding(end = 3.dp).size(12.dp), tint = Am.Warning)

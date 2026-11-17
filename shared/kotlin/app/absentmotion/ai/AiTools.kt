@@ -52,7 +52,11 @@ enum class AiAction(@StringRes val title: Int) {
     fun unavailable(layer: Layer?): UiText? = when (this) {
         Background -> if (layer?.mediaFill?.video == false) null else txt(R.string.ai_select_image_layer)
         Noise -> if (layer?.kind == "audio") null else txt(R.string.ai_select_audio_layer)
-        Enhance -> videoReason(layer, AiKind.Enhance)
+        Enhance -> when {
+            layer?.mediaFill == null -> txt(R.string.ai_select_media_layer)
+            layer.aiBuried(AiKind.Enhance) -> txt(R.string.ai_undo_newer_first)
+            else -> null
+        }
         Smooth -> videoReason(layer, AiKind.Smooth)
         Reverse -> videoReason(layer, null) ?: if (layer?.aiMarks.orEmpty().any { it.kind == AiKind.Smooth || it.kind == AiKind.Enhance }) txt(R.string.speed_reverse_remove_ai) else null
         Video -> videoReason(layer, null) ?: if (layer?.shape.isNullOrEmpty()) txt(R.string.ai_select_video_layer) else null
@@ -150,6 +154,7 @@ class AiTools(private val context: Context, private val state: EditorState, priv
         }
         if (action == AiAction.Enhance && !confirmed) {
             dismiss()
+            enhance = EnhanceOptions(max = !layer.mediaFill!!.video && app.absentmotion.platform.PlatformFeatures.desktop)
             enhanceSetup = layer
             return
         }
@@ -179,20 +184,29 @@ class AiTools(private val context: Context, private val state: EditorState, priv
                     withContext(Dispatchers.Main) { progress = fraction.coerceIn(0f, 1f); message = text }
                 }
                 if (action == AiAction.Enhance) {
-                    val options = enhance
+                    val options = enhance.forPlatform(layer.mediaFill?.video == false, app.absentmotion.platform.PlatformFeatures.desktop)
                     val media = checkNotNull(state.scene.media(layer.mediaFill!!.uri)) { AppText.get(R.string.ai_video_missing) }
                     for (model in options.models) if (!model.installed(context)) {
                         report(0f, AppText.get(R.string.ai_downloading_model))
                         model.download(context) { fraction -> progress = fraction.coerceIn(0f, 1f) }
                     }
-                    val output = withContext(Dispatchers.IO) { AiEnhance.run(context, layer, media, options, report).also { result = it } }
+                    val image = !layer.mediaFill!!.video
+                    val output = withContext(Dispatchers.IO) {
+                        (if (image) AiEnhance.image(context, layer.mediaFill!!.uri, media, options, report) else AiEnhance.run(context, layer, media, options, report)).also { result = it }
+                    }
                     ensureActive()
                     check(state.scene.layer(layer.id) == layer) { AppText.get(R.string.ai_layer_changed) }
                     state.edit { scene ->
                         scene.update(layer.id) {
-                            it.copy(node = it.node.with(AiKind.Enhance.attribute!!, output.declaration.uri))
-                                .withAiMark(AiKind.Enhance, it.node[AiKind.Enhance.attribute], output.declaration.uri, options.xml, media)
+                            val attribute = if (image) "fillImage" else "fillVideo"
+                            it.copy(node = it.node.with(attribute, output.declaration.uri))
+                                .withAiMark(AiKind.Enhance, it.node[attribute], output.declaration.uri, options.xml, media, extra = if (image) mapOf("attribute" to attribute) else emptyMap())
                         }.withMedia(output.declaration)
+                    }
+                    if (image) {
+                        val prior = layer.aiMarks.firstOrNull { it.kind == AiKind.Enhance }
+                        state.enhanceCompare = app.absentmotion.ui.editor.effects.CompareImages(prior?.original ?: media.uri, output.declaration.uri,
+                            prior?.media?.orientation ?: media.orientation, output.declaration.orientation)
                     }
                 } else if (action == AiAction.Video) {
                     val media = checkNotNull(state.scene.media(layer.mediaFill!!.uri)) { AppText.get(R.string.ai_video_missing) }

@@ -191,6 +191,14 @@ internal fun EditorSettings(settings: AppSettings) {
     ChoicesBlock(R.string.settings_emoji) {
         Choices(listOf(R.string.settings_emoji_system, R.string.settings_emoji_android), if (settings.androidEmoji) 1 else 0) { settings.androidEmoji = it == 1 }
     }
+    if (!app.absentmotion.platform.PlatformFeatures.desktop) {
+        Divider(10.dp)
+        ChoicesBlock(R.string.settings_layout, note = {
+            Text(stringResource(R.string.settings_layout_hint), Modifier.padding(horizontal = 10.dp), color = Am.HomeMid, fontSize = 12.sp, lineHeight = 16.sp)
+        }) {
+            Choices(listOf(R.string.camera_auto, R.string.camera_on, R.string.camera_off), settings.layoutChoice.ordinal) { settings.layoutChoice = app.absentmotion.ui.adaptive.LayoutChoice.entries[it] }
+        }
+    }
 }
 
 @Composable

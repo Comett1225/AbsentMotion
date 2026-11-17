@@ -85,9 +85,20 @@ class FontLibrary(context: Context) {
     private fun cachedFile(name: String): File = File(cache,
         MessageDigest.getInstance("SHA-256").digest(name.toByteArray()).joinToString("") { "%02x".format(it) } + ".ttf")
     private val systemFiles: Map<String, List<File>> by lazy {
-        listOf(File("/system/fonts"), File("/product/fonts")).flatMap { it.listFiles()?.toList().orEmpty() }
+        (listOf(File("/system/fonts"), File("/product/fonts")).flatMap { it.listFiles()?.toList().orEmpty() } +
+            if (Build.VERSION.SDK_INT >= 29) android.graphics.fonts.SystemFonts.getAvailableFonts().mapNotNull { it.file } else emptyList()).distinct()
             .filter { it.isFile && it.extension.lowercase() in setOf("ttf", "otf", "ttc") }
             .groupBy { familyKey(it.nameWithoutExtension.substringBefore('-')) }
+    }
+    fun deviceFonts(): List<FontName> = if (Build.VERSION.SDK_INT < 29) emptyList() else systemFiles.values.map { files ->
+        FontName("googlefonts", files.first().nameWithoutExtension.substringBefore('-').replace(Regex("(?<=[a-z])(?=[A-Z])"), " "))
+    }.sortedBy { it.family.lowercase() }
+    private val googleList = File(this.context.cacheDir, "google-fonts.json")
+    private var googleListFailed = 0L
+    suspend fun googleFonts(): List<GoogleFamily> = withContext(Dispatchers.IO) {
+        if (System.currentTimeMillis() - googleListFailed < 60_000) return@withContext emptyList()
+        GoogleFonts.load(googleList, System.currentTimeMillis()) { request(GoogleFonts.URL) { it.reader().readText() } }
+            .also { if (it.isEmpty()) googleListFailed = System.currentTimeMillis() }
     }
     private val systemFamilies = ConcurrentHashMap<String, List<Font>>()
     private fun familyKey(value: String) = value.lowercase().filter { it.isLetterOrDigit() }
@@ -203,7 +214,7 @@ class FontLibrary(context: Context) {
     }
     private fun <T> request(url: String, read: (java.io.InputStream) -> T): T {
         val target = URL(url)
-        require(target.protocol == "https" && target.host in listOf("fonts.googleapis.com", "fonts.gstatic.com"))
+        require(target.protocol == "https" && target.host in listOf("fonts.googleapis.com", "fonts.gstatic.com", "fonts.google.com"))
         val connection = target.openConnection() as HttpsURLConnection
         connection.instanceFollowRedirects = false
         connection.connectTimeout = 10000

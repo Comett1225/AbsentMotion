@@ -56,7 +56,7 @@ internal fun redirectTarget(from: URI, location: String?, source: UpdateSource):
 
 internal class UpdateProblem(val failure: UpdateFailure, cause: Throwable? = null) : IOException(failure.toString(), cause)
 
-internal class TrustedHttp(private val source: UpdateSource, private val connectMs: Int = 15_000, private val readMs: Int = 30_000) {
+internal class TrustedHttp(private val source: UpdateSource, private val connectMs: Int = 15_000, private val readMs: Int = 30_000, private val maxRedirects: Int = MAX_REDIRECTS, private val totalMs: Int? = null) {
     @Volatile private var current: HttpURLConnection? = null
     @Volatile private var aborted = false
 
@@ -66,9 +66,19 @@ internal class TrustedHttp(private val source: UpdateSource, private val connect
     }
 
     fun <T> get(url: String, headers: Map<String, String> = emptyMap(), read: (HttpURLConnection) -> T): T {
+        val timer = totalMs?.let { timeout ->
+            java.util.Timer(true).apply {
+                schedule(object : java.util.TimerTask() { override fun run() { abort() } }, timeout.toLong())
+            }
+        }
+        return try { getWithinDeadline(url, headers, read) } finally { timer?.cancel() }
+    }
+
+    private fun <T> getWithinDeadline(url: String, headers: Map<String, String>, read: (HttpURLConnection) -> T): T {
         var target = runCatching { URI(url) }.getOrNull() ?: throw UpdateProblem(UpdateFailure.Untrusted)
         if (!source.allows(target, first = true)) throw UpdateProblem(UpdateFailure.Untrusted)
-        repeat(MAX_REDIRECTS + 1) {
+        val deadline = totalMs?.let { System.nanoTime() + it * 1_000_000L }
+        repeat(maxRedirects + 1) { hop ->
             if (aborted) throw UpdateProblem(UpdateFailure.Connection)
             val connection = target.toURL().openConnection() as HttpURLConnection
             if (source.https && connection !is HttpsURLConnection) throw UpdateProblem(UpdateFailure.Untrusted)
@@ -76,13 +86,16 @@ internal class TrustedHttp(private val source: UpdateSource, private val connect
             try {
                 connection.instanceFollowRedirects = false
                 connection.useCaches = false
-                connection.connectTimeout = connectMs
-                connection.readTimeout = readMs
+                val remaining = deadline?.let { ((it - System.nanoTime()) / 1_000_000L).coerceAtMost(Int.MAX_VALUE.toLong()).toInt() }
+                if (remaining != null && remaining <= 0) throw UpdateProblem(UpdateFailure.Connection)
+                connection.connectTimeout = minOf(connectMs, remaining ?: connectMs)
+                connection.readTimeout = minOf(readMs, remaining ?: readMs)
                 connection.setRequestProperty("User-Agent", "AbsentMotion")
                 connection.setRequestProperty("Accept-Encoding", "identity")
                 headers.forEach { (key, value) -> connection.setRequestProperty(key, value) }
                 val code = connection.responseCode
                 if (code in REDIRECTS) {
+                    if (hop == maxRedirects) throw UpdateProblem(UpdateFailure.Untrusted)
                     target = redirectTarget(target, connection.getHeaderField("Location"), source) ?: throw UpdateProblem(UpdateFailure.Untrusted)
                 } else {
                     return read(connection)

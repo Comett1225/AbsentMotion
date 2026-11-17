@@ -1,0 +1,30 @@
+# Nguyên tắc cộng đồng
+
+Mọi thứ trên tab **Cộng đồng** đều được một người kiểm tra trước khi đăng. Các mục vi phạm những nguyên tắc này sẽ không được thêm, và các mục đã đăng sẽ bị gỡ xuống.
+
+## Những gì bạn có thể chia sẻ
+
+- Dự án và preset bạn đã tạo trong AbsentMotion: bản dựng, mẫu, đoạn mở đầu, hoạt ảnh văn bản, chuyển cảnh, bộ hiệu ứng.
+- Hình ảnh, video, âm thanh và phông chữ do chính bạn tạo, hoặc bạn được phép chia sẻ (ví dụ miễn phí sử dụng, hoặc Creative Commons có ghi công trong phần mô tả).
+
+## Không được phép
+
+- **Nội dung tình dục hoặc ảnh khỏa thân.** Mọi nội dung tình dục liên quan đến người dưới 18 tuổi đều bị báo cáo.
+- **Nội dung ghê rợn hoặc gây ám ảnh:** máu me, bạo lực dữ dội, tự làm hại bản thân, ngược đãi động vật, hoặc bất cứ thứ gì được làm ra để gây sốc hay dọa người khác.
+- **Thù ghét:** phân biệt chủng tộc, lời lẽ miệt thị, biểu tượng thù ghét, hoặc công kích người khác vì chủng tộc, dân tộc, quốc tịch, tôn giáo, giới tính, xu hướng tính dục, khuyết tật hay độ tuổi.
+- **Bắt nạt và quấy rối:** đe dọa, chế giễu hoặc nhắm vào một người có thật.
+- **Thông tin cá nhân:** tên thật, địa chỉ, số điện thoại, trường học, tài khoản hoặc khuôn mặt của người bình thường, kể cả của chính bạn.
+- **Những thứ bất hợp pháp hoặc nguy hiểm:** ma túy, vũ khí, lừa đảo, cờ bạc, hack hoặc phần mềm độc hại.
+- **Tác phẩm ăn cắp:** bản dựng, dự án hoặc preset của người khác được chia sẻ như của bạn, hoặc nhạc, đoạn phim, tranh ảnh hay tài nguyên trả phí mà bạn không có quyền chia sẻ.
+- **Mạo danh người khác:** dùng tên của người sáng tạo khác, hoặc tên hay logo của một thương hiệu, như thể mục đó đến từ họ.
+- **Spam:** quảng cáo, liên kết tới các trang web khác, cùng một mục đăng lại dưới tên khác, hoặc các mục không có tác dụng gì.
+- **Mục gây hiểu lầm:** tiêu đề, hình thu nhỏ hoặc thẻ không cho thấy đúng nội dung bên trong.
+
+## Cần biết
+
+- Hãy giữ nội dung phù hợp với mọi người. Mọi lứa tuổi đều dùng AbsentMotion.
+- Gói dự án có thể nặng tới 20 MB và preset tới 1 MB.
+- Các mục được chia sẻ theo CC BY 4.0: ai cũng có thể dùng và chỉnh sửa miễn là ghi công cho bạn.
+- Tên trên mục của bạn là tên người sáng tạo mà bạn nhập. Đừng đưa bất cứ thông tin cá nhân nào vào đó.
+- Người bảo trì quyết định những gì được đăng và có thể gỡ một mục xuống bất cứ lúc nào.
+- Để báo cáo một mục, hãy dùng biểu mẫu báo cáo trong **Giới thiệu** hoặc máy chủ Discord.

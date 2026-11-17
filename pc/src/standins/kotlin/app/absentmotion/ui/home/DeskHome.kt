@@ -1,5 +1,16 @@
 package app.absentmotion.ui.home
 
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.key.isMetaPressed
+import androidx.compose.ui.input.key.isCtrlPressed
+import androidx.compose.ui.input.key.isAltPressed
+import androidx.compose.ui.input.key.isShiftPressed
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -36,7 +47,6 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
@@ -67,11 +77,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.stringResource
@@ -145,6 +151,10 @@ internal fun DeskHome(
     var section by remember { mutableStateOf(DeskSection.Projects) }
     var search by remember { mutableStateOf("") }
     val query = debounced(search)
+    var importMenu by remember { mutableStateOf(false) }
+    var linkEntry by remember { mutableStateOf<String?>(null) }
+    var alightLink by remember { mutableStateOf<String?>(null) }
+    @Suppress("DEPRECATION") val linkClipboard = androidx.compose.ui.platform.LocalClipboardManager.current
     var creating by remember { mutableStateOf(false) }
     var opening by remember { mutableIntStateOf(0) }
     var initialElement by remember { mutableStateOf(false) }
@@ -165,9 +175,21 @@ internal fun DeskHome(
         if (toReport.isEmpty()) onImportShown()
     }
     val shown = remember(projects, section, query) { projects.filter { it.isElement == (section == DeskSection.Assets) && matchesSearch(query, it.title) } }
-    val import = {
+    val importFile = {
         val files = app.absentmotion.desk.DeskFiles.chooseFiles(media = false, multiple = true)
         if (files.isNotEmpty()) onImportFiles(files.map(Uri::fromFile))
+    }
+    val import = { importMenu = true }
+    val pasteLink by androidx.compose.runtime.rememberUpdatedState<() -> Boolean>({
+        if (!creating && !importMenu && linkEntry == null && alightLink == null) {
+            val link = app.absentmotion.links.AlightLinks.extract(linkClipboard.getText()?.text)
+            if (link != null) { linkEntry = link; true } else false
+        } else false
+    })
+    DisposableEffect(Unit) {
+        val handler = { pasteLink() }
+        app.absentmotion.desk.DeskGlobalKeys.homePaste = handler
+        onDispose { if (app.absentmotion.desk.DeskGlobalKeys.homePaste === handler) app.absentmotion.desk.DeskGlobalKeys.homePaste = null }
     }
     val duplicate: (String) -> Unit = { id ->
         if (!duplicating) {
@@ -183,7 +205,9 @@ internal fun DeskHome(
         }
     }
 
-    Box(Modifier.fillMaxSize().background(Am.HomeBg)) {
+    Box(Modifier.fillMaxSize().background(Am.HomeBg).onPreviewKeyEvent { event ->
+        if (event.type == KeyEventType.KeyDown && event.key == Key.V && (event.isMetaPressed || event.isCtrlPressed) && !event.isAltPressed && !event.isShiftPressed) pasteLink() else false
+    }) {
         Column(Modifier.fillMaxSize()) {
             DeskHeader(section, { section = it; if (it == DeskSection.Templates) selected = null }, search, { search = it }, templates = section == DeskSection.Templates, newProject, import, onSettings, settings)
             Box(Modifier.weight(1f).fillMaxWidth(), Alignment.TopCenter) {
@@ -202,6 +226,9 @@ internal fun DeskHome(
                 }
             }
         }
+        if (importMenu) HomeImportMenu({ importMenu = false }, importFile, { linkEntry = "" })
+        linkEntry?.let { initial -> AlightLinkEntry(initial, { linkEntry = null }, { linkEntry = null; alightLink = it }) }
+        alightLink?.let { AlightLinkHelper(it, { alightLink = null }) }
         if (creating) DeskNewProject(store, settings, projects.map { it.title }, initialElement, opening, onClose = { creating = false }, onOpen = { id -> version++; onOpen(id) })
         if (toReport.isNotEmpty()) DeskImportReport(toReport, onImportShown, onOpen = { onImportShown(); toReport.first().let { if (it.template) onTemplate(it.id) else onOpen(it.id) } })
         deleting?.let { target ->

@@ -110,7 +110,7 @@ private fun VolumeMain(state: EditorState, layer: Layer, modifier: Modifier, ope
         }
         Row(Modifier.fillMaxWidth().height(365.px).clip(BarShape).background(Am.TimelineBg)) {
             Column(Modifier.width(140.px).fillMaxHeight().padding(top = 11.px)) {
-                Box(Modifier.fillMaxWidth().height(118.px).clickable { state.toggleKeyframe() }, Alignment.Center) {
+                RecordingKeyframeButton(state, Modifier.fillMaxWidth().height(118.px), onClick = { state.toggleKeyframe() }) {
                     PanelIcon(if (layer.onKeyframe(GainRef)) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, Am.OnDark, description = stringResource(if (layer.onKeyframe(GainRef)) R.string.a11y_remove_keyframe else R.string.a11y_add_keyframe))
                     HoldName(stringResource(if (layer.onKeyframe(GainRef)) R.string.a11y_remove_keyframe else R.string.a11y_add_keyframe))
                 }

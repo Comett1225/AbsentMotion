@@ -179,7 +179,7 @@ class EditorState(
 
     var selectedId: Long?
         get() = selection
-        set(value) { if (value != selection) Glide.interrupt(); selection = value }
+        set(value) { if (value != selection) { Glide.interrupt(); if (liveRecording != null) endGesture() }; selection = value }
 
     private var frameState by mutableIntStateOf(0)
 
@@ -188,7 +188,13 @@ class EditorState(
 
     var frame: Int
         get() = frameState
-        set(value) { frameState = value; atEnd = false }
+        set(value) {
+            val old = frameState
+            frameState = value
+            atEnd = false
+            if (value > old) recordFrames(old + 1, value)
+            else if (value < old && liveRecording != null) endGesture()
+        }
 
     val playheadFrame: Int get() = if (atEnd) frameState + 1 else frameState
 
@@ -201,7 +207,26 @@ class EditorState(
         if (target > scene.lastFrame) parkAtEnd() else frame = target.coerceAtLeast(0)
     }
 
-    var playing by mutableStateOf(false)
+    private var playingState by mutableStateOf(false)
+    var countInRemaining by mutableIntStateOf(0)
+        private set
+
+    var playing: Boolean
+        get() = playingState
+        set(value) {
+            if (!value) { if (liveRecording != null) endGesture(); playingState = false; countInRemaining = 0 }
+            else if (!playingState && countInRemaining == 0) {
+                snapGuides = emptyList()
+                if (settings.countIn > 0) countInRemaining = settings.countIn else playingState = true
+            }
+        }
+
+    fun countInStep() {
+        if (countInRemaining > 1) countInRemaining--
+        else if (countInRemaining == 1) { countInRemaining = 0; playingState = true }
+    }
+
+    fun togglePlayback() { playing = !(playing || countInRemaining > 0) }
 
     var panel by mutableStateOf(EditorPanel.Tools)
 
@@ -215,8 +240,7 @@ class EditorState(
 
     var toolOpen by mutableStateOf(0)
 
-    var customTool by mutableStateOf<String?>(null)
-
+    internal var enhanceCompare by mutableStateOf<app.absentmotion.ui.editor.effects.CompareImages?>(null)
     var effectBrowserOpen by mutableStateOf(false)
     var effectCategory by mutableStateOf<String?>(null)
     var audioFxFocus by mutableStateOf<Int?>(null)
@@ -354,13 +378,32 @@ class EditorState(
         if (!lookOnly) engine.setScene(scene)
     }
 
-    fun edit(key: Any? = null, change: (Scene) -> Scene) {
+    fun edit(key: Any? = null, pivot: Long? = null, change: (Scene) -> Scene) {
         Glide.interrupt()
+        val previous = liveRecording
+        if (previous != null && (key != previous.key || pivot != previous.pivotId)) endGesture()
         val before = scene
-        history.edit(key, root.withFocused(groupPath, change(before).withValueLinksFollowing(before).withMattesFollowing(before).withOutlinesFollowing(before)))
+        val changed = change(before).withValueLinksFollowing(before).withMattesFollowing(before).withOutlinesFollowing(before)
+        if (playing) {
+            val recording = liveRecording ?: LiveRecording(before, key, settings.overwriteRecording, pivot)
+            if (recording.capture(before, changed, frame)) {
+                liveRecording = recording
+                record(recording.render(changed, false))
+                if (key == null) endGesture()
+                return
+            }
+        }
+        if (changed == before) return
+        if (liveRecording != null) {
+            endGesture()
+            edit(key, pivot, change)
+            return
+        }
+        history.edit(key, root.withFocused(groupPath, changed))
     }
 
     fun endGesture() {
+        finishRecording()
         val pending = drafted != null
         val ended = history.endGesture()
         if (pending || ended) {
@@ -389,13 +432,38 @@ class EditorState(
         Choreographer.getInstance().removeFrameCallback(sendDraft)
     }
 
-    fun cancelGesture(key: Any) = history.cancelGesture(key)
+    fun cancelGesture(key: Any) {
+        val session = liveRecording
+        if (session != null && session.key == key) { liveRecording = null; history.cancelGesture(recordingKey) }
+        else history.cancelGesture(key)
+    }
 
     val gestureOpen: Boolean get() = history.gesturing
 
     fun amend(next: Scene) = history.amend(root.withFocused(groupPath, next.withValueLinksFollowing(scene).withMattesFollowing(scene).withOutlinesFollowing(scene)))
 
     internal fun forgetEdit(after: Scene?): Boolean = after != null && scene.node === after.node && history.forget(root)
+
+    private var liveRecording: LiveRecording? = null
+    private val recordingKey = Any()
+
+    private fun record(next: Scene) {
+        val before = scene
+        history.edit(recordingKey, root.withFocused(groupPath, next.withValueLinksFollowing(before).withMattesFollowing(before).withOutlinesFollowing(before)), R.string.history_record_keyframes)
+    }
+
+    private fun recordFrames(first: Int, last: Int) {
+        val recording = liveRecording ?: return
+        var next = scene
+        for (frame in first..last) next = recording.hold(next, frame)
+        record(next)
+    }
+
+    private fun finishRecording() {
+        val recording = liveRecording ?: return
+        liveRecording = null
+        record(recording.render(scene, true))
+    }
 
     fun editSelected(key: Any? = null, change: (Layer) -> Layer) {
         val id = selectedId ?: return
@@ -408,7 +476,8 @@ class EditorState(
 
     private fun note(undone: Boolean, before: Scene, after: Scene) {
         val what = summarizeEdit(before, after, { engine.effects.value.find(it)?.name }, undone)
-        showNote(HistoryNote(++historyNoteCount, txt(if (undone) R.string.history_undid else R.string.history_redid, what.text), spot = what.spot))
+        val text = history.lastActionNote?.let { txt(it) } ?: what.text
+        showNote(HistoryNote(++historyNoteCount, txt(if (undone) R.string.history_undid else R.string.history_redid, text), spot = what.spot))
     }
 
     fun hint(@StringRes text: Int) = showNote(HistoryNote(++historyNoteCount, txt(text), faint = true))
@@ -420,12 +489,14 @@ class EditorState(
 
     fun undo() {
         Glide.interrupt()
+        if (liveRecording != null) endGesture()
         val before = root
         history.undo()?.let { note(true, it, before) }
     }
 
     fun redo() {
         Glide.interrupt()
+        if (liveRecording != null) endGesture()
         val before = root
         history.redo()?.let { note(false, before, it) }
     }
@@ -481,21 +552,24 @@ internal fun keptFrame(previous: Scene, next: Scene, frame: Int): Int =
     (if (next.fps != previous.fps) next.frameAt(previous.frameStart(frame)) else frame).coerceIn(0, maxOf(next.lastFrame, 0))
 
 internal class EditHistory(private val current: () -> Scene, private val show: (Scene, save: Boolean) -> Unit) {
-    private val undoStack = ArrayDeque<Scene>()
-    private val redoStack = ArrayDeque<Scene>()
+    private data class Entry(val scene: Scene, @StringRes val note: Int?)
+    private val undoStack = ArrayDeque<Entry>()
+    private val redoStack = ArrayDeque<Entry>()
+    var lastActionNote: Int? = null
+        private set
     private var lastEditKey: Any? = null
-    private var redoBeforeGesture: List<Scene> = emptyList()
-    private var droppedBeforeGesture: Scene? = null
+    private var redoBeforeGesture: List<Entry> = emptyList()
+    private var droppedBeforeGesture: Entry? = null
 
     val canUndo: Boolean get() = undoStack.isNotEmpty()
     val canRedo: Boolean get() = redoStack.isNotEmpty()
     val gesturing: Boolean get() = lastEditKey != null
 
-    fun edit(key: Any?, next: Scene) {
+    fun edit(key: Any?, next: Scene, @StringRes note: Int? = null) {
         val scene = current()
         if (next == scene) return
         if (key == null || key != lastEditKey) {
-            undoStack.addLast(scene)
+            undoStack.addLast(Entry(scene, note))
             droppedBeforeGesture = if (undoStack.size > MAX_UNDO) undoStack.removeFirst() else null
             redoBeforeGesture = redoStack.toList()
         }
@@ -514,7 +588,7 @@ internal class EditHistory(private val current: () -> Scene, private val show: (
         droppedBeforeGesture = null
         redoStack.clear()
         redoStack.addAll(redoBeforeGesture)
-        show(previous, false)
+        show(previous.scene, false)
     }
 
     fun amend(next: Scene) {
@@ -526,24 +600,26 @@ internal class EditHistory(private val current: () -> Scene, private val show: (
         val previous = undoStack.removeLastOrNull() ?: return false
         lastEditKey = null
         redoStack.clear()
-        show(previous, true)
+        show(previous.scene, true)
         return true
     }
 
     fun undo(): Scene? {
         val previous = undoStack.removeLastOrNull() ?: return null
-        redoStack.addLast(current())
+        redoStack.addLast(Entry(current(), previous.note))
+        lastActionNote = previous.note
         lastEditKey = null
-        show(previous, true)
-        return previous
+        show(previous.scene, true)
+        return previous.scene
     }
 
     fun redo(): Scene? {
         val next = redoStack.removeLastOrNull() ?: return null
-        undoStack.addLast(current())
+        undoStack.addLast(Entry(current(), next.note))
+        lastActionNote = next.note
         lastEditKey = null
-        show(next, true)
-        return next
+        show(next.scene, true)
+        return next.scene
     }
 
     companion object {

@@ -1,6 +1,7 @@
 package app.absentmotion.ui.editor
 
 import androidx.compose.animation.core.animateFloatAsState
+import app.absentmotion.ui.adaptive.deskLayout
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.lazy.LazyListState
@@ -36,7 +37,7 @@ private val MinThumb = 32.dp
 
 @Composable
 internal fun Modifier.deskVerticalScroll(state: ScrollState = rememberScrollState(), color: Color = Am.OnDark): Modifier =
-    if (PlatformFeatures.desktop) deskScrollbar(state, color).verticalScroll(state) else verticalScroll(state)
+    if (deskLayout) deskScrollbar(state, color).verticalScroll(state) else verticalScroll(state)
 
 @Composable
 internal fun Modifier.deskScrollbar(state: ScrollState, color: Color = Am.OnDark): Modifier =
@@ -75,7 +76,7 @@ internal fun Modifier.deskScrollbar(state: LazyGridState, color: Color = Am.OnDa
 
 @Composable
 private fun Modifier.bar(state: ScrollableState, color: Color, range: (Float) -> Range?): Modifier {
-    if (!PlatformFeatures.desktop) return this
+    if (!deskLayout) return this
     val measure by rememberUpdatedState(range)
     var hover by remember { mutableStateOf(false) }
     var drag by remember { mutableStateOf(false) }
