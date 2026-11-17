@@ -106,6 +106,7 @@ import app.absentmotion.ui.editor.debounced
 import app.absentmotion.ui.editor.matchesSearch
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.enterOnce
+import app.absentmotion.ui.theme.withUiFont
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -640,7 +641,7 @@ private fun DeskRename(title: String, onDone: (String) -> Unit, onDismiss: () ->
         BasicTextField(
             text, { text = it }, Modifier.padding(horizontal = 24.dp, vertical = 16.dp).fillMaxWidth().focusRequester(focus).clip(RoundedCornerShape(10.dp)).background(Am.HomeBg)
                 .border(1.dp, Am.HomeLine, RoundedCornerShape(10.dp)).padding(horizontal = 12.dp, vertical = 10.dp),
-            textStyle = TextStyle(color = Am.Navy, fontSize = 14.sp), singleLine = true, cursorBrush = SolidColor(Am.Navy),
+            textStyle = TextStyle(color = Am.Navy, fontSize = 14.sp).withUiFont(), singleLine = true, cursorBrush = SolidColor(Am.Navy),
         )
         Row(Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, bottom = 20.dp), Arrangement.spacedBy(10.dp, Alignment.End)) {
             DeskButton(stringResource(R.string.cancel), onDismiss, minWidth = 92.dp)

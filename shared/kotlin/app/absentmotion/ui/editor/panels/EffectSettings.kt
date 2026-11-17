@@ -42,6 +42,7 @@ import app.absentmotion.effects.Palettes
 import app.absentmotion.model.*
 import app.absentmotion.platform.readAtMost
 import app.absentmotion.platform.rememberDocumentPicker
+import app.absentmotion.ui.editor.pickBlipSound
 import app.absentmotion.ui.editor.DropOrRise
 import app.absentmotion.ui.editor.MenuPopup
 import app.absentmotion.ui.editor.MenuRow
@@ -56,6 +57,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Presence
+import app.absentmotion.ui.theme.withUiFont
 import kotlin.math.*
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -95,7 +97,8 @@ internal fun EffectSettings(state: EditorState, layer: Layer, instance: XmlNode,
                 PanelSwitch(raw == "true") { if (enabled) set(it.toString()) }
             }
             "color" -> EffectColor(state, param, raw, enabled, active == param, { select(param) }, { set(it) })
-            "choice" -> EffectChoice(param, raw, enabled, definition.key) { set(it) }
+            "choice" -> if (definition.key == "textblips" && param.id == "voice") BlipVoice(state, param, raw, instance["src"] != null, enabled) { set(it) }
+                else EffectChoice(param, raw, enabled, definition.key) { set(it) }
             "text" -> if (param.palette) EffectPalette(param, raw, enabled, "${layer.id}:${state.effectIndex}") { set(it) } else EffectText(param, raw, enabled, state::endGesture) { set(it, true) }
             else -> {
                 val shown = definition.bounded(param, (layer.endTime - layer.startTime) / 1000f) { p ->
@@ -124,7 +127,7 @@ internal fun MixPiecesRow(state: EditorState, layer: Layer, enabled: Boolean = t
 internal fun PropertyLabel(label: String, active: Boolean, enabled: Boolean, modifier: Modifier, onClick: () -> Unit) {
     Box(modifier.clip(PanelShape).background(if (active) PanelDark else Am.FieldHi.copy(alpha = 0.3f)).clickable(enabled = enabled, onClick = onClick), contentAlignment = Alignment.Center) {
         Text(label, Modifier.padding(3.dp), color = if (active) Am.Accent else Am.OnDark, fontSize = if (label.length <= 11) 12.sp else 10.sp,
-            lineHeight = 13.sp, textAlign = TextAlign.Center, maxLines = 2)
+            lineHeight = 13.sp, textAlign = TextAlign.Center, maxLines = 2, style = androidx.compose.ui.text.TextStyle(hyphens = androidx.compose.ui.text.style.Hyphens.Auto))
     }
 }
 
@@ -153,7 +156,7 @@ internal fun EffectNumbers(state: EditorState, param: EffectParam, raw: String, 
             set(stored(next.map { v -> (v/factor).coerceIn(param.min, param.max) }), false)
         }
     }
-    fun tap(index: Int) { if (active && component == index) keypad(index) else { component = index; select() } }
+    fun tap(index: Int) { component = index; select() }
     val scalarRuler = count == 1
     Row(Modifier.fillMaxWidth().height(57.dp)
         .then(if (scalarRuler) Modifier.padding(start = 3.dp) else Modifier.padding(3.dp))
@@ -167,7 +170,7 @@ internal fun EffectNumbers(state: EditorState, param: EffectParam, raw: String, 
                         Modifier.matchParentSize().padding(end = 45.dp, top = .5.dp, bottom = .5.dp), defaults.getOrNull(0), state.settings.vibration)
                 }
                 ValueBox(formatFixed(values[0] * factor, decimals) + unit, false, false,
-                    Modifier.align(Alignment.CenterEnd).padding(end = 2.dp).width(56.dp).height(45.dp), 8f, enabled) { tap(0) }
+                    Modifier.align(Alignment.CenterEnd).padding(end = 2.dp).width(56.dp).height(45.dp), 8f, enabled, { tap(0) }) { tap(0); keypad(0) }
             }
             return@Row
         }
@@ -179,7 +182,7 @@ internal fun EffectNumbers(state: EditorState, param: EffectParam, raw: String, 
             values.forEachIndexed { i, value ->
                 Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
                     Text(if (i == 0) "X:" else "Y:", Modifier.padding(end = 5.dp), color = Am.Caption, fontSize = deskSp(10f))
-                    ValueBox(formatFixed(value * factor, decimals), i == component, active && i == component, Modifier.width(55.dp).fillMaxHeight(), 5.5f, enabled) { tap(i) }
+                    ValueBox(formatFixed(value * factor, decimals), i == component, active && i == component, Modifier.width(55.dp).fillMaxHeight(), 5.5f, enabled, { tap(i) }) { tap(i); keypad(i) }
                 }
             }
         }
@@ -187,9 +190,23 @@ internal fun EffectNumbers(state: EditorState, param: EffectParam, raw: String, 
 }
 
 @Composable
-internal fun ValueBox(text: String, chosen: Boolean, lit: Boolean, modifier: Modifier, endPadding: Float, enabled: Boolean, onClick: () -> Unit) {
-    Box(modifier.clip(PanelShape).background(if (lit) PanelDark else Color(0x33000000)).clickable(enabled = enabled, onClick = onClick), contentAlignment = Alignment.CenterEnd) {
+internal fun ValueBox(text: String, chosen: Boolean, lit: Boolean, modifier: Modifier, endPadding: Float, enabled: Boolean, onSelect: () -> Unit = {}, onType: () -> Unit) {
+    Box(modifier.clip(PanelShape).background(if (lit) PanelDark else Color(0x33000000)).typeOnDoubleTap(enabled, onSelect = onSelect, onType = onType), contentAlignment = Alignment.CenterEnd) {
         Text(text, Modifier.padding(start = 2.dp, end = endPadding.dp), color = if (chosen) PanelGreen else Am.OnDark, fontSize = 14.sp, maxLines = 1, softWrap = false)
+    }
+}
+
+@Composable
+private fun BlipVoice(state: EditorState, param: EffectParam, raw: String, picked: Boolean, enabled: Boolean, set: (String) -> Unit) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val index = state.effectIndex
+    val layerId = state.selectedId
+    val picker = rememberDocumentPicker { uri -> if (uri != null && layerId != null) scope.launch { state.pickBlipSound(context, uri, layerId, index) } }
+    val custom = app.absentmotion.audio.TextBlips.CUSTOM
+    EffectChoice(param, raw, enabled, "textblips") { next ->
+        val chosen = next.finiteFloat()?.roundToInt() == custom
+        if (!chosen) set(next) else if (picked && raw.finiteFloat()?.roundToInt() != custom) set(next) else picker.launch()
     }
 }
 
@@ -244,7 +261,7 @@ private fun EffectText(param: EffectParam, raw: String, enabled: Boolean, end: (
         BasicTextField(raw, { if (enabled) set(it.replace('\n', ' ').take(200)) }, Modifier.weight(1f)
             .onFocusChanged { if (focused && !it.isFocused) end(); focused = it.isFocused }.clip(PanelShape).background(Color(0x33000000))
             .padding(horizontal = 10.dp, vertical = 6.dp), enabled = enabled, singleLine = true,
-            textStyle = TextStyle(color = Am.OnDark, fontSize = 14.sp, textDirection = androidx.compose.ui.text.style.TextDirection.Content), cursorBrush = SolidColor(Am.Accent))
+            textStyle = TextStyle(color = Am.OnDark, fontSize = 14.sp, textDirection = androidx.compose.ui.text.style.TextDirection.Content).withUiFont(), cursorBrush = SolidColor(Am.Accent))
     }
 }
 
@@ -377,7 +394,7 @@ private fun EffectColor(state: EditorState, param: EffectParam, raw: String, ena
         Row(Modifier.fillMaxWidth().height(38.dp).padding(3.dp).alpha(if (enabled) 1f else 0.35f), verticalAlignment = Alignment.CenterVertically) {
             PropertyLabel(param.label, active, enabled, Modifier.width(75.dp).fillMaxHeight(), select)
             Box(Modifier.weight(1f).fillMaxHeight().padding(5.dp).clip(PanelShape).background(Color(color)).clickable(enabled = enabled) { select(); expanded = !expanded })
-            Text(raw.uppercase(), Modifier.width(82.dp).clickable(enabled = enabled) {
+            Text(raw.uppercase(), Modifier.width(82.dp).typeOnDoubleTap(enabled, onSelect = select) {
                 select()
                 state.keypad = KeypadRequest(listOf("R", "G", "B", "A").mapIndexed { i, label -> KeypadField(label, ((color ushr intArrayOf(16,8,0,24)[i]) and 255).toFloat(), "", 0f, 255f) }, 0) { next ->
                     var out = 0

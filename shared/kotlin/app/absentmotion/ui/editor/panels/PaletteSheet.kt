@@ -68,6 +68,7 @@ import app.absentmotion.ui.editor.MotionSheet
 import app.absentmotion.ui.editor.deskVerticalScroll
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Presence
+import app.absentmotion.ui.theme.withUiFont
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -220,7 +221,7 @@ private fun PaletteEditor(library: PaletteLibrary, palette: ColourPalette, curre
         if (palette.editable) BasicTextField(
             name, { name = it.take(ColourPalette.MAX_NAME) },
             Modifier.weight(1f).clip(PanelShape).background(Am.Field).padding(horizontal = 10.dp, vertical = 8.dp), singleLine = true,
-            textStyle = TextStyle(color = Am.OnDark, fontSize = 15.sp), cursorBrush = SolidColor(Am.Accent),
+            textStyle = TextStyle(color = Am.OnDark, fontSize = 15.sp).withUiFont(), cursorBrush = SolidColor(Am.Accent),
         ) else Text(palette.label(), Modifier.weight(1f).padding(start = 6.dp), color = Am.OnDark, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         Spacer(Modifier.width(6.dp))
         if (library.chosenId == palette.id) Text(stringResource(R.string.palette_in_use), Modifier.padding(horizontal = 6.dp), color = Am.Accent, fontSize = 13.sp, maxLines = 1)

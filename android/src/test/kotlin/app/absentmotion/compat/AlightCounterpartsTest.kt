@@ -32,7 +32,7 @@ class AlightCounterpartsTest {
 
     private fun XmlNode.has(name: String) = children.any { it.name == "property" && it["name"] == name }
 
-    @Test fun halftoneDotsBecomeTheTwoColorStyleWithOneCellPerAmountAcrossTheLayerHeight() {
+    @Test fun halftoneDotsBecomeTheTwoColorStyleWithOneCellPerAmountAcrossTheScreen() {
         val e = convert("com.alightcreative.effects.halftonedots", f("amount", 60f) + f("angle", 45f) +
             """<property name="color1" type="color" value="#ff103152" /><property name="color2" type="color" value="#fffcecda" />""")
         assertEquals("absent.halftone", e["id"])
@@ -51,8 +51,8 @@ class AlightCounterpartsTest {
     }
 
     @Test fun zoomBlurStrengthFollowsTheFittedScale() {
-        assertEquals(0.115f, convert("com.alightcreative.effects.zoomblur", f("strength", 0.15f)).number("amount"), 2e-3f)
-        assertEquals(0.266f, convert("com.alightcreative.effects.zoomblur", f("strength", 0.35f)).number("amount"), 2e-3f)
+        assertEquals(0.6f, convert("com.alightcreative.effects.zoomblur", f("strength", 0.15f)).number("amount"), 2e-3f)
+        assertEquals(1.4f, convert("com.alightcreative.effects.zoomblur", f("strength", 0.35f)).number("amount"), 2e-3f)
     }
 
     @Test fun rgbSplitAndSpinBlurKeepTheirFittedValues() {
@@ -66,7 +66,7 @@ class AlightCounterpartsTest {
     @Test fun hexTileSizeBecomesTheHexagonTilingScale() {
         val e = convert("com.alightcreative.effects.hextile", """<property name="position" type="vec2" value="0.0,0.0" />""" + f("size", 30f) + f("angle", 20f))
         assertEquals("absent.hexagontiling", e["id"])
-        assertEquals(1.2f, e.number("scale"), 1e-3f)
+        assertEquals(0.6f, e.number("scale"), 1e-3f)
         assertEquals(20f, e.number("angle"), 1e-3f)
     }
 

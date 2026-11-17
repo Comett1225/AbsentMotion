@@ -2,7 +2,7 @@
  "id": "directionalblur",
  "name": "Directional Blur",
  "category": "blur",
- "description": "Motion blur by averaging samples along a directional angle.",
+ "description": "Motion blur by averaging samples along a directional angle. Spread Both Sides blurs evenly forward and back.",
  "params": [
   {
    "id": "blurLength",
@@ -21,7 +21,17 @@
    "min": 0,
    "max": 360,
    "step": 1
+  },
+  {
+   "id": "spread",
+   "label": "Spread",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "One Side",
+    "Both Sides"
+   ]
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float blurLength;\nuniform float angle;\n\nhalf4 main(float2 coord) {\n    float rad = radians(angle);\n    float2 dir = float2(cos(rad), sin(rad));\n    half4 accum = half4(0.0);\n    for (int i = 0; i < 32; ++i) {\n        float t = float(i) / 31.0;\n        float2 offset = dir * t * blurLength;\n        float2 sampleCoord = coord - offset;\n        accum += image.eval(sampleCoord);\n    }\n    return accum / 32.0;\n}"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float blurLength;\nuniform float angle;\nuniform float spread;\n\nhalf4 main(float2 coord) {\n    float rad = radians(angle);\n    float2 dir = float2(cos(rad), sin(rad));\n    bool both = spread > 0.5;\n    float n = both ? 128.0 : 32.0;\n    float4 accum = float4(0.0);\n    for (int i = 0; i < 128; ++i) {\n        if (float(i) >= n) break;\n        float t = float(i) / (n - 1.0);\n        float2 offset = dir * (t - (both ? 0.5 : 0.0)) * blurLength;\n        float2 sampleCoord = coord - offset;\n        accum += float4(image.eval(sampleCoord));\n    }\n    return half4(accum / n);\n}"
 }

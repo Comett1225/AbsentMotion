@@ -70,11 +70,13 @@ import app.absentmotion.tools.readPicked
 import app.absentmotion.tools.runTool
 import app.absentmotion.tools.toolRunFolder
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.theme.withUiFont
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import app.absentmotion.ui.editor.panels.DoubleTapToType
 
 @Composable
 internal fun rememberToolIcon(file: File): ImageBitmap? = produceState<ImageBitmap?>(null, file.path, InstalledTools.revision) {
@@ -243,16 +245,18 @@ private fun MediaInput(input: ToolInput, picked: PickedMedia?, enabled: Boolean,
 
 @Composable
 private fun ToolField(text: String, enabled: Boolean, keyboard: KeyboardType, unit: String, modifier: Modifier, onText: (String) -> Unit) {
-    Row(
-        modifier.height(42.dp).alpha(if (enabled) 1f else 0.5f).clip(RoundedCornerShape(14.dp)).background(Am.Card).padding(horizontal = 14.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        BasicTextField(
-            text, onText, Modifier.weight(1f), enabled = enabled, singleLine = true,
-            textStyle = TextStyle(color = Am.HomeInk, fontSize = 16.sp), cursorBrush = SolidColor(Am.Accent),
-            keyboardOptions = KeyboardOptions(keyboardType = keyboard),
-        )
-        if (unit.isNotEmpty()) Text(unit, color = Am.HomeDim, fontSize = 15.sp)
+    DoubleTapToType(text, onText, enabled = enabled, doubleTap = keyboard == KeyboardType.Decimal) { gate, typed, onTyped ->
+        Row(
+            modifier.height(42.dp).alpha(if (enabled) 1f else 0.5f).clip(RoundedCornerShape(14.dp)).background(Am.Card).padding(horizontal = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            BasicTextField(
+                typed, onTyped, gate.weight(1f), enabled = enabled, singleLine = true,
+                textStyle = TextStyle(color = Am.HomeInk, fontSize = 16.sp).withUiFont(), cursorBrush = SolidColor(Am.Accent),
+                keyboardOptions = KeyboardOptions(keyboardType = keyboard),
+            )
+            if (unit.isNotEmpty()) Text(unit, color = Am.HomeDim, fontSize = 15.sp)
+        }
     }
 }
 

@@ -18,6 +18,7 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.test.*
 import app.absentmotion.R
 import app.absentmotion.desk.DeskApp
+import app.absentmotion.desk.DeskBack
 import app.absentmotion.desk.DeskAppState
 import app.absentmotion.desk.DeskExportMini
 import app.absentmotion.desk.DeskInstance
@@ -25,8 +26,18 @@ import app.absentmotion.desk.DeskNotify
 import app.absentmotion.desk.DeskOpen
 import app.absentmotion.desk.DeskOs
 import app.absentmotion.desk.Strings
+import app.absentmotion.ai.AiSmooth
 import app.absentmotion.export.DeskExports
+import app.absentmotion.export.ExportAudio
+import app.absentmotion.export.ExportKind
+import app.absentmotion.export.ExportPrefs
+import app.absentmotion.export.ExportRecord
 import app.absentmotion.export.ExportRun
+import app.absentmotion.export.ExportTimes
+import app.absentmotion.export.FrameInterpolation
+import app.absentmotion.export.exportSize
+import app.absentmotion.export.frameCount
+import app.absentmotion.export.SmoothLevel
 import app.absentmotion.editor.EditorPanel
 import app.absentmotion.editor.renameLayer
 import app.absentmotion.model.Scene
@@ -36,7 +47,13 @@ import app.absentmotion.ui.editor.wheelFactor
 import app.absentmotion.ui.editor.wheelTurn
 import app.absentmotion.ui.onboarding.ONBOARDING_DONE
 import app.absentmotion.ui.tutorial.Tutorial
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.getOrNull
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -46,6 +63,8 @@ import org.junit.Test
 import app.absentmotion.export.CommunityThumbnail
 import androidx.compose.ui.test.performScrollTo
 import java.io.File
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import javax.imageio.ImageIO
 
 @OptIn(ExperimentalTestApi::class)
@@ -332,6 +351,104 @@ class DeskParityRoundTest {
         }
     }
 
+    private fun ComposeUiTest.timeLeft(percent: String): Int? {
+        val row = onNodeWithText(percent).onParent().onChildren().fetchSemanticsNodes().map { it.config.getOrNull(SemanticsProperties.Text)?.firstOrNull()?.text }
+        return row.getOrNull(row.indexOf(percent) + 1)?.split(":")?.takeIf { it.size == 2 }?.let { (minutes, seconds) -> minutes.toInt() * 60 + seconds.toInt() }
+    }
+
+    private fun ComposeUiTest.startAiExport() {
+        onAllNodesWithText(text(R.string.export)).filter(hasClickAction()).onLast().performClick()
+        waitUntil(timeoutMillis = 30_000) { onAllNodesWithText(text(R.string.ai_download_and_start)).fetchSemanticsNodes().isNotEmpty() }
+        onNodeWithText(text(R.string.ai_download_and_start)).performClick()
+    }
+
+    @Test fun theAiSmoothDownloadShowsBeforeTheExportStarts() {
+        prepare("ai-smooth-download")
+        val fetch = AiSmooth.fetch
+        val mix = ExportAudio.mixFor
+        val fetched = CompletableDeferred<Unit>()
+        val held = CountDownLatch(1)
+        val stuck = CountDownLatch(1)
+        AiSmooth.fetch = { _, _, progress ->
+            for (k in 1..12) { delay(200); progress(k / 32f) }
+            fetched.await()
+            progress(1f)
+        }
+        try {
+            session(1280, 800) { app ->
+                val editor = openEditor(app, "styles.xml")
+                val prefs = ExportPrefs(app.context)
+                val video = prefs.load(ExportKind.Video, editor.scene).copy(interpolation = FrameInterpolation.Ai, interpolationLevel = SmoothLevel.Low)
+                prefs.save(ExportKind.Video, video)
+                val (width, height) = exportSize(editor.scene, video.shortSide, even = true)
+                ExportTimes(app.context).record(ExportRecord(video.codec, width, height, video.fps, frameCount(editor.scene, video.fps), 120_000, FrameInterpolation.Ai))
+                DeskExports.engine()
+                val sound = ExportAudio.mixFor
+                ExportAudio.mixFor = { scene, rate -> held.await(60, TimeUnit.SECONDS); sound?.invoke(scene, rate) }
+                runOnIdle { editor.exportOpen = true }
+                settle(900)
+                startAiExport()
+                waitUntil(timeoutMillis = 30_000) { onAllNodesWithText("37%").fetchSemanticsNodes().isNotEmpty() && timeLeft("37%") != null }
+                onNodeWithText(text(R.string.export_running_ai_smooth)).assertExists()
+                onAllNodesWithText(text(R.string.export_running_video)).assertCountEquals(0)
+                assertEquals(R.string.export_running_ai_smooth, DeskExports.title)
+                assertEquals(0.375f, DeskExports.fraction)
+                assertTrue(timeLeft("37%")!! <= 5)
+                val row = onNodeWithText("37%").getBoundsInRoot().top
+                shot("ai-smooth-downloading")
+                Thread.sleep(4_000)
+                fetched.complete(Unit)
+                waitUntil(timeoutMillis = 30_000) { onAllNodesWithText(text(R.string.export_running_video)).fetchSemanticsNodes().isNotEmpty() && onAllNodesWithText("0%").fetchSemanticsNodes().isNotEmpty() && timeLeft("0%") != null }
+                onAllNodesWithText(text(R.string.export_running_ai_smooth)).assertCountEquals(0)
+                assertEquals(R.string.export_running_video, DeskExports.title)
+                assertEquals(0f, DeskExports.fraction)
+                assertEquals(row, onNodeWithText("0%").getBoundsInRoot().top)
+                assertTrue("${timeLeft("0%")} s left", timeLeft("0%")!! >= 117)
+                shot("ai-smooth-exporting")
+                onAllNodesWithText(text(R.string.cancel)).filter(hasClickAction()).onFirst().performClick()
+                held.countDown()
+                waitUntil(timeoutMillis = 60_000) { !ExportRun.running }
+                settle()
+                AiSmooth.fetch = { _, _, progress ->
+                    progress(0.25f)
+                    withContext(Dispatchers.IO) {
+                        stuck.await(60, TimeUnit.SECONDS)
+                        error(text(R.string.ai_model_download_failed))
+                    }
+                }
+                startAiExport()
+                waitUntil(timeoutMillis = 30_000) { onAllNodesWithText("25%").fetchSemanticsNodes().isNotEmpty() }
+                onAllNodesWithText(text(R.string.cancel)).filter(hasClickAction()).onFirst().performClick()
+                settle()
+                stuck.countDown()
+                waitUntil(timeoutMillis = 30_000) { !ExportRun.running }
+                settle()
+                onAllNodesWithText(text(R.string.ai_smooth_download_failed)).assertCountEquals(0)
+                onAllNodesWithText(text(R.string.export_running_ai_smooth)).assertCountEquals(0)
+                assertEquals(null, DeskExports.finish!!.ok)
+                AiSmooth.fetch = { _, _, _ -> error(text(R.string.ai_model_download_failed)) }
+                startAiExport()
+                waitUntil(timeoutMillis = 30_000) { onAllNodesWithText(text(R.string.ai_smooth_download_failed)).fetchSemanticsNodes().isNotEmpty() }
+                onNodeWithText(text(R.string.ai_model_download_failed)).assertExists()
+                onAllNodesWithText(text(R.string.export_failed_title)).assertCountEquals(0)
+                shot("ai-smooth-download-failed")
+                waitUntil(timeoutMillis = 30_000) { !ExportRun.running }
+                assertEquals(false, DeskExports.finish!!.ok)
+            }
+            runSkikoComposeUiTest(size = Size(460f, 220f)) {
+                setContent { DeskExportMini(DeskAppState()) }
+                settle()
+                onNodeWithText(text(R.string.ai_smooth_download_failed)).assertExists()
+                onAllNodesWithText(text(R.string.export_notify_failed)).assertCountEquals(0)
+            }
+        } finally {
+            held.countDown()
+            stuck.countDown()
+            AiSmooth.fetch = fetch
+            ExportAudio.mixFor = mix
+        }
+    }
+
     @Test fun theCloseButtonClosesTheFinishedExport() {
         prepare("export-finished-close")
         session(1280, 800) { app ->
@@ -347,6 +464,90 @@ class DeskParityRoundTest {
             onNode(hasContentDescription(text(R.string.cancel)) and hasClickAction()).performClick()
             settle()
             assertFalse(editor.exportOpen)
+        }
+    }
+
+    @Test fun theCurrentFrameExportIsItsOwnWindowAndItsCloseButtonWorksAfterExporting() {
+        prepare("frame-window")
+        session(1280, 800) { app ->
+            val editor = openEditor(app, "styles.xml")
+            runOnIdle { editor.exportOpen = true }
+            settle(900)
+            onAllNodesWithText(text(R.string.export_kind_frame_as)).onFirst().performClick()
+            settle()
+            assertTrue(onAllNodesWithText(text(R.string.export_kind_frame_png)).fetchSemanticsNodes().isEmpty())
+            assertTrue(onAllNodesWithText(text(R.string.export_format)).fetchSemanticsNodes().isNotEmpty())
+            assertTrue(onAllNodesWithText(text(R.string.export_transparent_becomes)).fetchSemanticsNodes().isNotEmpty())
+            assertTrue(onAllNodesWithText(text(R.string.also_keep_a_copy_as_a)).fetchSemanticsNodes().isEmpty())
+            shot("frame-window")
+            onAllNodesWithText(text(R.string.export)).filter(hasClickAction()).onLast().performClick()
+            waitUntil(timeoutMillis = 60_000) { onAllNodesWithText(text(R.string.saved_to_storage)).fetchSemanticsNodes().isNotEmpty() }
+            settle()
+            onNode(hasContentDescription(text(R.string.cancel)) and hasClickAction()).performClick()
+            settle()
+            assertTrue(editor.exportOpen)
+            assertTrue(onAllNodesWithText(text(R.string.export_kind_frame_png)).fetchSemanticsNodes().isNotEmpty())
+            assertTrue(onAllNodesWithText(text(R.string.export_transparent_becomes)).fetchSemanticsNodes().isEmpty())
+            assertTrue(onAllNodesWithText(text(R.string.also_keep_a_copy_as_a)).fetchSemanticsNodes().isNotEmpty())
+            onAllNodesWithText(text(R.string.export_kind_frame_as)).onFirst().performClick()
+            settle()
+            assertTrue(onAllNodesWithText(text(R.string.export_transparent_becomes)).fetchSemanticsNodes().isNotEmpty())
+            runOnIdle { DeskBack.back() }
+            settle()
+            assertTrue(editor.exportOpen)
+            assertTrue(onAllNodesWithText(text(R.string.export_transparent_becomes)).fetchSemanticsNodes().isEmpty())
+            onNode(hasContentDescription(text(R.string.cancel)) and hasClickAction()).performClick()
+            settle()
+            assertFalse(editor.exportOpen)
+        }
+    }
+
+    @Test fun valueBoxesSelectOnOneClickAndTypeOnADoubleClick() {
+        prepare("double-click-values")
+        session(1280, 800) { app ->
+            val editor = openEditor(app, "styles.xml")
+            runOnIdle { editor.settings.basicTransform = false; editor.selectedId = editor.scene.layers.last().id; editor.panel = EditorPanel.MoveTransform }
+            settle(600)
+            onAllNodes(hasText(text(R.string.a11y_tab_skew)) and hasClickAction()).onFirst().performClick()
+            settle(600)
+            val skew = onAllNodes(hasText("º", substring = true) and hasClickAction())
+            skew[1].performMouseInput { click() }
+            settle()
+            assertNull(editor.keypad)
+            skew[0].performMouseInput { doubleClick() }
+            settle()
+            assertEquals(0, editor.keypad?.active)
+            assertEquals(2, editor.keypad?.fields?.size)
+            runOnIdle { editor.keypad = null }
+            settle()
+            skew[1].performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.OnClick)
+            settle()
+            assertEquals(1, editor.keypad?.active)
+            runOnIdle { editor.keypad = null; editor.editSelected { it.withRotation(30f) } }
+            onAllNodes(hasText(text(R.string.a11y_tab_rotate)) and hasClickAction()).onFirst().performClick()
+            settle(600)
+            onNode(hasText("30º") and hasClickAction()).performMouseInput { click() }
+            settle()
+            assertNull(editor.keypad)
+            onNode(hasText("30º") and hasClickAction()).performMouseInput { doubleClick() }
+            settle()
+            assertNotNull(editor.keypad)
+            assertEquals(30f, editor.selected!!.rotation, 1e-3f)
+            runOnIdle { editor.keypad = null }
+            settle()
+            onNode(hasText("30º") and hasClickAction()).performTouchInput {
+                val pad = Offset(-80f, height / 2f)
+                down(pad)
+                up()
+                advanceEventTime(80)
+                down(pad)
+                moveBy(Offset(2f, 3f))
+                moveBy(Offset(1f, 2f))
+                up()
+            }
+            settle()
+            assertNull(editor.keypad)
+            assertEquals(0f, editor.selected!!.rotation, 0f)
         }
     }
 

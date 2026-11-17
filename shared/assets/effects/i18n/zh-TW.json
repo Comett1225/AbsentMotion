@@ -497,11 +497,18 @@
    }
   },
   "blur": {
-   "description": "平滑均勻的模糊。",
+   "description": "平滑均勻的模糊。形狀設為「方框」時，改為取每個點周圍均勻正方形範圍的平均。",
    "name": "模糊",
    "params": {
     "strength": {
      "label": "強度"
+    },
+    "shape": {
+     "label": "形狀",
+     "options": [
+      "平滑",
+      "方框"
+     ]
     }
    }
   },
@@ -547,6 +554,59 @@
     },
     "width": {
      "label": "寬度"
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "經典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光線顏色"
+    },
+    "glossiness": {
+     "label": "高光銳利度"
+    },
+    "texMode": {
+     "label": "紋理",
+     "options": [
+      "符合",
+      "平鋪",
+      "拉伸"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X軸重複"
+    },
+    "texRepeatY": {
+     "label": "Y軸重複"
+    },
+    "texMirror": {
+     "label": "鏡像"
+    },
+    "texAngle": {
+     "label": "紋理角度"
+    },
+    "texOffset": {
+     "label": "紋理偏移"
+    },
+    "texCrop": {
+     "label": "紋理裁切"
+    },
+    "texAnchor": {
+     "label": "紋理錨點",
+     "options": [
+      "中心",
+      "角落"
+     ]
     }
    }
   },
@@ -570,7 +630,7 @@
    }
   },
   "bulge": {
-   "description": "在指定半徑的圓形範圍內，讓圖層像鏡片般向外膨脹（強度為正），或向中心收縮（強度為負）。半徑依圖層大小而定。",
+   "description": "在半徑範圍的圓內，讓圖層像鏡片般向外膨脹（強度為正），或朝中心收縮（強度為負）；半徑以圖層大小的比例計算。測量基準設為「畫面」時，半徑改以畫面大小的比例計算。衰減設為「平滑」時，鏡片效果會更柔和地融入圖層其餘部分。",
    "name": "收縮／膨脹",
    "params": {
     "amount": {
@@ -581,6 +641,20 @@
     },
     "radius": {
      "label": "半徑"
+    },
+    "reach": {
+     "label": "測量基準",
+     "options": [
+      "圖層",
+      "畫面"
+     ]
+    },
+    "curve": {
+     "label": "衰減",
+     "options": [
+      "經典",
+      "平滑"
+     ]
     }
    }
   },
@@ -781,7 +855,7 @@
    }
   },
   "circularripple": {
-   "description": "從一個點向外擴散圓形漣漪，如同水滴落入水中。",
+   "description": "從一個點向外擴散圓形漣漪，如同水滴落入水中。測量基準設為「畫面」時，頻率、強度與半徑改以畫面而非圖層來測量。",
    "name": "圓形漣漪",
    "params": {
     "center": {
@@ -801,6 +875,13 @@
     },
     "strength": {
      "label": "強度"
+    },
+    "reach": {
+     "label": "測量基準",
+     "options": [
+      "圖層",
+      "畫面"
+     ]
     }
    }
   },
@@ -813,6 +894,9 @@
     },
     "color2": {
      "label": "顏色2"
+    },
+    "contrast": {
+     "label": "對比"
     },
     "intensity": {
      "label": "強度"
@@ -855,6 +939,13 @@
     },
     "strength": {
      "label": "強度"
+    },
+    "style": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "硬邊"
+     ]
     }
    }
   },
@@ -965,6 +1056,16 @@
     },
     "fill": {
      "label": "填色"
+    },
+    "spread": {
+     "label": "擴散",
+     "options": [
+      "模糊",
+      "距離"
+     ]
+    },
+    "offset": {
+     "label": "偏移"
     }
    }
   },
@@ -992,6 +1093,16 @@
     },
     "width": {
      "label": "寬度"
+    },
+    "spread": {
+     "label": "擴散",
+     "options": [
+      "模糊",
+      "距離"
+     ]
+    },
+    "offset": {
+     "label": "偏移"
     }
    }
   },
@@ -1041,6 +1152,13 @@
     },
     "thickness": {
      "label": "厚度"
+    },
+    "style": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "堆疊"
+     ]
     }
    }
   },
@@ -1141,6 +1259,62 @@
     },
     "thickness": {
      "label": "厚度"
+    },
+    "keep": {
+     "label": "保留圖層"
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "經典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光線顏色"
+    },
+    "glossiness": {
+     "label": "高光銳利度"
+    },
+    "texMode": {
+     "label": "紋理",
+     "options": [
+      "符合",
+      "平鋪",
+      "拉伸"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X軸重複"
+    },
+    "texRepeatY": {
+     "label": "Y軸重複"
+    },
+    "texMirror": {
+     "label": "鏡像"
+    },
+    "texAngle": {
+     "label": "紋理角度"
+    },
+    "texOffset": {
+     "label": "紋理偏移"
+    },
+    "texCrop": {
+     "label": "紋理裁切"
+    },
+    "texAnchor": {
+     "label": "紋理錨點",
+     "options": [
+      "中心",
+      "角落"
+     ]
     }
    }
   },
@@ -1180,6 +1354,59 @@
     },
     "smoothing": {
      "label": "平滑度"
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "經典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光線顏色"
+    },
+    "glossiness": {
+     "label": "高光銳利度"
+    },
+    "texMode": {
+     "label": "紋理",
+     "options": [
+      "符合",
+      "平鋪",
+      "拉伸"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X軸重複"
+    },
+    "texRepeatY": {
+     "label": "Y軸重複"
+    },
+    "texMirror": {
+     "label": "鏡像"
+    },
+    "texAngle": {
+     "label": "紋理角度"
+    },
+    "texOffset": {
+     "label": "紋理偏移"
+    },
+    "texCrop": {
+     "label": "紋理裁切"
+    },
+    "texAnchor": {
+     "label": "紋理錨點",
+     "options": [
+      "中心",
+      "角落"
+     ]
     }
    }
   },
@@ -1251,6 +1478,59 @@
     },
     "smoothing": {
      "label": "平滑度"
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "經典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光線顏色"
+    },
+    "glossiness": {
+     "label": "高光銳利度"
+    },
+    "texMode": {
+     "label": "紋理",
+     "options": [
+      "符合",
+      "平鋪",
+      "拉伸"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X軸重複"
+    },
+    "texRepeatY": {
+     "label": "Y軸重複"
+    },
+    "texMirror": {
+     "label": "鏡像"
+    },
+    "texAngle": {
+     "label": "紋理角度"
+    },
+    "texOffset": {
+     "label": "紋理偏移"
+    },
+    "texCrop": {
+     "label": "紋理裁切"
+    },
+    "texAnchor": {
+     "label": "紋理錨點",
+     "options": [
+      "中心",
+      "角落"
+     ]
     }
    }
   },
@@ -1369,7 +1649,7 @@
    }
   },
   "directionalblur": {
-   "description": "沿指定角度對取樣值取平均，產生動態模糊。",
+   "description": "沿指定角度對取樣值取平均，產生動態模糊。擴散設為「雙側」時，模糊會向前後均勻展開。",
    "name": "方向模糊",
    "params": {
     "angle": {
@@ -1377,6 +1657,13 @@
     },
     "blurLength": {
      "label": "長度"
+    },
+    "spread": {
+     "label": "擴散",
+     "options": [
+      "單側",
+      "雙側"
+     ]
     }
    }
   },
@@ -1571,6 +1858,22 @@
    "params": {
     "strength": {
      "label": "強度"
+    },
+    "style": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "墨線"
+     ]
+    },
+    "spacing": {
+     "label": "平滑度"
+    },
+    "threshold": {
+     "label": "閾值"
+    },
+    "invert": {
+     "label": "反轉"
     }
    }
   },
@@ -1613,6 +1916,9 @@
     },
     "tintColor": {
      "label": "色調顏色"
+    },
+    "mask": {
+     "label": "遮罩至圖層"
     }
    }
   },
@@ -1682,6 +1988,13 @@
     },
     "thickness": {
      "label": "厚度"
+    },
+    "contourStyle": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "細線"
+     ]
     }
    }
   },
@@ -1724,6 +2037,59 @@
     },
     "squeezeRatio": {
      "label": "擠壓"
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "經典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光線顏色"
+    },
+    "glossiness": {
+     "label": "高光銳利度"
+    },
+    "texMode": {
+     "label": "紋理",
+     "options": [
+      "符合",
+      "平鋪",
+      "拉伸"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X軸重複"
+    },
+    "texRepeatY": {
+     "label": "Y軸重複"
+    },
+    "texMirror": {
+     "label": "鏡像"
+    },
+    "texAngle": {
+     "label": "紋理角度"
+    },
+    "texOffset": {
+     "label": "紋理偏移"
+    },
+    "texCrop": {
+     "label": "紋理裁切"
+    },
+    "texAnchor": {
+     "label": "紋理錨點",
+     "options": [
+      "中心",
+      "角落"
+     ]
     }
    }
   },
@@ -1918,7 +2284,7 @@
   },
   "flicker": {
    "description": "隨機閃動圖層的不透明度。",
-   "name": "閃爍",
+   "name": "隨機閃爍",
    "params": {
     "intensity": {
      "label": "強度"
@@ -1982,6 +2348,65 @@
     },
     "shine": {
      "label": "光澤"
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "經典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光線顏色"
+    },
+    "glossiness": {
+     "label": "高光銳利度"
+    },
+    "pivot": {
+     "label": "錨點"
+    },
+    "pivotDepth": {
+     "label": "錨點深度"
+    },
+    "texMode": {
+     "label": "紋理",
+     "options": [
+      "符合",
+      "平鋪",
+      "拉伸"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X軸重複"
+    },
+    "texRepeatY": {
+     "label": "Y軸重複"
+    },
+    "texMirror": {
+     "label": "鏡像"
+    },
+    "texAngle": {
+     "label": "紋理角度"
+    },
+    "texOffset": {
+     "label": "紋理偏移"
+    },
+    "texCrop": {
+     "label": "紋理裁切"
+    },
+    "texAnchor": {
+     "label": "紋理錨點",
+     "options": [
+      "中心",
+      "角落"
+     ]
     }
    }
   },
@@ -2047,6 +2472,13 @@
     },
     "softness": {
      "label": "柔和度"
+    },
+    "falloff": {
+     "label": "衰減",
+     "options": [
+      "距離",
+      "平滑"
+     ]
     }
    }
   },
@@ -2116,6 +2548,13 @@
     },
     "strength": {
      "label": "強度"
+    },
+    "screenSize": {
+     "label": "尺寸依據",
+     "options": [
+      "圖層",
+      "畫面"
+     ]
     }
    }
   },
@@ -2198,7 +2637,7 @@
    }
   },
   "glass": {
-   "description": "將圖層形狀變成斜邊玻璃，折射後方圖層並在邊緣產生亮光。",
+   "description": "將圖層形狀變成有斜角的玻璃，折射後方圖層，並沿邊緣加上亮光。光照設為「柔和」時，依填色的比例顯示圖層，並以顏色照亮玻璃，斜角內緣朝向光源的一側最亮。",
    "name": "玻璃",
    "params": {
     "angle": {
@@ -2210,8 +2649,18 @@
     "color": {
      "label": "顏色"
     },
+    "fill": {
+     "label": "填色"
+    },
     "highlight": {
      "label": "亮光"
+    },
+    "light": {
+     "label": "光照",
+     "options": [
+      "邊緣光",
+      "柔和"
+     ]
     },
     "refraction": {
      "label": "折射"
@@ -2326,6 +2775,13 @@
     },
     "scaleBrightness": {
      "label": "縮放亮度"
+    },
+    "style": {
+     "label": "樣式",
+     "options": [
+      "漸層",
+      "光譜"
+     ]
     }
    }
   },
@@ -2401,6 +2857,14 @@
     },
     "offset": {
      "label": "偏移"
+    },
+    "origin": {
+     "label": "原點",
+     "options": [
+      "中心",
+      "圖層角落",
+      "畫面角落"
+     ]
     },
     "punch": {
      "label": "挖空"
@@ -2606,6 +3070,59 @@
     },
     "smoothing": {
      "label": "平滑度"
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "經典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光線顏色"
+    },
+    "glossiness": {
+     "label": "高光銳利度"
+    },
+    "texMode": {
+     "label": "紋理",
+     "options": [
+      "符合",
+      "平鋪",
+      "拉伸"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X軸重複"
+    },
+    "texRepeatY": {
+     "label": "Y軸重複"
+    },
+    "texMirror": {
+     "label": "鏡像"
+    },
+    "texAngle": {
+     "label": "紋理角度"
+    },
+    "texOffset": {
+     "label": "紋理偏移"
+    },
+    "texCrop": {
+     "label": "紋理裁切"
+    },
+    "texAnchor": {
+     "label": "紋理錨點",
+     "options": [
+      "中心",
+      "角落"
+     ]
     }
    }
   },
@@ -2661,11 +3178,33 @@
     "angle": {
      "label": "角度"
     },
+    "crop": {
+     "label": "裁切"
+    },
+    "fit": {
+     "label": "畫面",
+     "options": [
+      "原始尺寸",
+      "每塊磚內"
+     ]
+    },
+    "mask": {
+     "label": "遮罩至圖層"
+    },
     "mirror": {
      "label": "鏡像"
     },
+    "offset": {
+     "label": "偏移"
+    },
     "scale": {
      "label": "縮放"
+    },
+    "screenSpace": {
+     "label": "螢幕空間"
+    },
+    "stretch": {
+     "label": "拉伸"
     }
    }
   },
@@ -2769,6 +3308,59 @@
     },
     "smoothing": {
      "label": "平滑度"
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "經典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光線顏色"
+    },
+    "glossiness": {
+     "label": "高光銳利度"
+    },
+    "texMode": {
+     "label": "紋理",
+     "options": [
+      "符合",
+      "平鋪",
+      "拉伸"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X軸重複"
+    },
+    "texRepeatY": {
+     "label": "Y軸重複"
+    },
+    "texMirror": {
+     "label": "鏡像"
+    },
+    "texAngle": {
+     "label": "紋理角度"
+    },
+    "texOffset": {
+     "label": "紋理偏移"
+    },
+    "texCrop": {
+     "label": "紋理裁切"
+    },
+    "texAnchor": {
+     "label": "紋理錨點",
+     "options": [
+      "中心",
+      "角落"
+     ]
     }
    }
   },
@@ -2839,6 +3431,59 @@
     },
     "width": {
      "label": "寬度"
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "經典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光線顏色"
+    },
+    "glossiness": {
+     "label": "高光銳利度"
+    },
+    "texMode": {
+     "label": "紋理",
+     "options": [
+      "符合",
+      "平鋪",
+      "拉伸"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X軸重複"
+    },
+    "texRepeatY": {
+     "label": "Y軸重複"
+    },
+    "texMirror": {
+     "label": "鏡像"
+    },
+    "texAngle": {
+     "label": "紋理角度"
+    },
+    "texOffset": {
+     "label": "紋理偏移"
+    },
+    "texCrop": {
+     "label": "紋理裁切"
+    },
+    "texAnchor": {
+     "label": "紋理錨點",
+     "options": [
+      "中心",
+      "角落"
+     ]
     }
    }
   },
@@ -2964,7 +3609,8 @@
      "label": "樣式",
      "options": [
       "經典",
-      "保留亮度"
+      "保留亮度",
+      "視訊"
      ]
     },
     "vibrance": {
@@ -3002,6 +3648,23 @@
     },
     "intensity": {
      "label": "強度"
+    },
+    "blend": {
+     "label": "混合",
+     "options": [
+      "濾色",
+      "正常"
+     ]
+    },
+    "opacity": {
+     "label": "不透明度"
+    },
+    "corners": {
+     "label": "邊角",
+     "options": [
+      "圓角",
+      "直角"
+     ]
     }
    }
   },
@@ -3068,6 +3731,13 @@
     "center": {
      "label": "中心"
     },
+    "direction": {
+     "label": "方向",
+     "options": [
+      "順時針",
+      "逆時針"
+     ]
+    },
     "mirror": {
      "label": "鏡像"
     },
@@ -3077,9 +3747,16 @@
    }
   },
   "lensblur": {
-   "description": "旋轉模糊效果，中心區域保持清晰，越靠近邊緣越模糊。",
+   "description": "旋轉模糊效果，中心區域保持清晰，越靠近邊緣越模糊。模糊設為「縮放」時，改為從中心向外拉伸，並延伸到圖層邊緣之外。",
    "name": "鏡頭模糊",
    "params": {
+    "blur": {
+     "label": "模糊",
+     "options": [
+      "旋轉",
+      "縮放"
+     ]
+    },
     "center": {
      "label": "中心"
     },
@@ -3154,6 +3831,12 @@
     },
     "threshold": {
      "label": "臨界值"
+    },
+    "soften": {
+     "label": "柔化"
+    },
+    "mask": {
+     "label": "遮罩至圖層"
     }
    }
   },
@@ -3257,7 +3940,7 @@
    }
   },
   "linearstreaks": {
-   "description": "沿指定角度移動圖層副本，並混合重疊處，產生直線光痕。",
+   "description": "沿角度滑動圖層的多個複本，並混合重疊處，產生直線光痕。混合設為「關閉」時，圖層維持原樣。複本設為「每個像素」時，會在長度上的每個像素各放一個複本，而不是沿長度分布48個。",
    "name": "線性光痕",
    "params": {
     "alpha": {
@@ -3274,11 +3957,19 @@
      "options": [
       "變亮",
       "平均",
-      "變暗"
+      "變暗",
+      "關閉"
      ]
     },
     "reach": {
      "label": "長度"
+    },
+    "copies": {
+     "label": "複本",
+     "options": [
+      "間隔分布",
+      "每個像素"
+     ]
     }
    }
   },
@@ -3333,6 +4024,12 @@
     },
     "solidity": {
      "label": "實心度"
+    },
+    "fill": {
+     "label": "填色"
+    },
+    "samples": {
+     "label": "取樣數"
     }
    }
   },
@@ -3348,6 +4045,9 @@
     },
     "threshold": {
      "label": "臨界值"
+    },
+    "high": {
+     "label": "上限臨界值"
     }
    }
   },
@@ -3472,6 +4172,13 @@
    "description": "將圖層分成方塊，並以各方塊的平均顏色填滿。",
    "name": "馬賽克",
    "params": {
+    "average": {
+     "label": "平均",
+     "options": [
+      "方塊",
+      "角落"
+     ]
+    },
     "count": {
      "label": "數量"
     },
@@ -3594,6 +4301,59 @@
     },
     "shine": {
      "label": "光澤"
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "經典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光線顏色"
+    },
+    "glossiness": {
+     "label": "高光銳利度"
+    },
+    "texMode": {
+     "label": "紋理",
+     "options": [
+      "符合",
+      "平鋪",
+      "拉伸"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X軸重複"
+    },
+    "texRepeatY": {
+     "label": "Y軸重複"
+    },
+    "texMirror": {
+     "label": "鏡像"
+    },
+    "texAngle": {
+     "label": "紋理角度"
+    },
+    "texOffset": {
+     "label": "紋理偏移"
+    },
+    "texCrop": {
+     "label": "紋理裁切"
+    },
+    "texAnchor": {
+     "label": "紋理錨點",
+     "options": [
+      "中心",
+      "角落"
+     ]
     }
    }
   },
@@ -4144,6 +4904,13 @@
     "blockSize": {
      "label": "大小"
     },
+    "edges": {
+     "label": "邊緣",
+     "options": [
+      "鏡像",
+      "透明"
+     ]
+    },
     "offset": {
      "label": "位移"
     },
@@ -4244,7 +5011,7 @@
    }
   },
   "polar": {
-   "description": "將圖層繞中心彎曲，把直線變成圓形，或將圓形展開成直線。",
+   "description": "將圖層繞中心彎曲，把直線變成圓形，或將圓形展開成直線。版面決定圖層的哪一條邊匯聚到中心。",
    "name": "極座標",
    "params": {
     "amount": {
@@ -4255,6 +5022,13 @@
      "options": [
       "直角座標轉極座標",
       "極座標轉直角座標"
+     ]
+    },
+    "middle": {
+     "label": "版面",
+     "options": [
+      "頂邊在中心",
+      "底邊在中心"
      ]
     }
    }
@@ -4448,11 +5222,64 @@
     },
     "shine": {
      "label": "光澤"
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "經典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光線顏色"
+    },
+    "glossiness": {
+     "label": "高光銳利度"
+    },
+    "texMode": {
+     "label": "紋理",
+     "options": [
+      "符合",
+      "平鋪",
+      "拉伸"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X軸重複"
+    },
+    "texRepeatY": {
+     "label": "Y軸重複"
+    },
+    "texMirror": {
+     "label": "鏡像"
+    },
+    "texAngle": {
+     "label": "紋理角度"
+    },
+    "texOffset": {
+     "label": "紋理偏移"
+    },
+    "texCrop": {
+     "label": "紋理裁切"
+    },
+    "texAnchor": {
+     "label": "紋理錨點",
+     "options": [
+      "中心",
+      "角落"
+     ]
     }
    }
   },
   "radialblur": {
-   "description": "沿中心點向外的射線平均取樣，套用強度可調的放射狀縮放模糊。",
+   "description": "沿中心點向外的射線平均取樣，套用強度可調的放射狀縮放模糊。長度設為「均勻」時，所有條紋長度相同，而不會隨離中心的距離變長。",
    "name": "縮放模糊",
    "params": {
     "amount": {
@@ -4460,6 +5287,13 @@
     },
     "center": {
      "label": "中心"
+    },
+    "streak": {
+     "label": "長度",
+     "options": [
+      "依距離",
+      "均勻"
+     ]
     }
    }
   },
@@ -4586,11 +5420,14 @@
     },
     "reach": {
      "label": "長度"
+    },
+    "fill": {
+     "label": "填色"
     }
    }
   },
   "radialwipe": {
-   "description": "從起始角度繞中心掃過並隱藏扇形區域，如同時鐘指針。「進度」控制掃過的角度，「數量」沿圓周重複扇形，「雙向」則朝兩側掃過。為進度製作動畫即可建立轉場。",
+   "description": "從起始角度繞中心掃過，像時鐘指針一樣隱藏圖層的扇形區域。進度是掃過的角度，數量沿圓周重複扇形，「雙向」則朝兩個方向掃過。為進度加入動畫即可做出轉場。扇形設為「精確」時會保留數量的小數，最後一個扇形因此較窄；羽化則柔化每個扇形的兩側。",
    "name": "放射狀擦除",
    "params": {
     "center": {
@@ -4615,6 +5452,13 @@
     },
     "start": {
      "label": "起始角度"
+    },
+    "wedges": {
+     "label": "扇形",
+     "options": [
+      "完整",
+      "精確"
+     ]
     }
    }
   },
@@ -4699,6 +5543,26 @@
     },
     "shine": {
      "label": "光澤"
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "經典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光線顏色"
+    },
+    "glossiness": {
+     "label": "高光銳利度"
     }
    },
    "shortcuts": {
@@ -4914,6 +5778,13 @@
     },
     "threshold": {
      "label": "閾值"
+    },
+    "match": {
+     "label": "比對",
+     "options": [
+      "RGB",
+      "色度"
+     ]
     }
    }
   },
@@ -4964,7 +5835,7 @@
    }
   },
   "rgbsplit": {
-   "description": "分離紅、綠、藍色通道：中心通道保持不動，另外兩個通道沿角度向相反方向偏移。亮色會相加偏移的顏色，暗色保留實色，遮罩只保留三者重疊處，明度則依亮度決定邊緣色的不透明度。",
+   "description": "分離紅、綠、藍色通道：中心通道保持不動，另外兩個通道沿角度朝相反方向偏移。「亮色」會相加偏移的顏色，「暗色」保留實色，「遮罩」只保留三者重疊處，「明度」則讓邊緣色越亮越不透明。「平均」讓每個點的不透明度等於覆蓋它的通道所占比例。",
    "name": "RGB分離",
    "params": {
     "angle": {
@@ -4984,7 +5855,8 @@
       "亮色",
       "暗色",
       "遮罩",
-      "明度"
+      "明度",
+      "平均"
      ]
     },
     "strength": {
@@ -5492,6 +6364,13 @@
     },
     "outside": {
      "label": "外側光暈"
+    },
+    "falloff": {
+     "label": "衰減",
+     "options": [
+      "均勻",
+      "圖層"
+     ]
     }
    }
   },
@@ -5585,6 +6464,59 @@
     },
     "shine": {
      "label": "光澤"
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "經典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光線顏色"
+    },
+    "glossiness": {
+     "label": "高光銳利度"
+    },
+    "texMode": {
+     "label": "紋理",
+     "options": [
+      "符合",
+      "平鋪",
+      "拉伸"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X軸重複"
+    },
+    "texRepeatY": {
+     "label": "Y軸重複"
+    },
+    "texMirror": {
+     "label": "鏡像"
+    },
+    "texAngle": {
+     "label": "紋理角度"
+    },
+    "texOffset": {
+     "label": "紋理偏移"
+    },
+    "texCrop": {
+     "label": "紋理裁切"
+    },
+    "texAnchor": {
+     "label": "紋理錨點",
+     "options": [
+      "中心",
+      "角落"
+     ]
     }
    }
   },
@@ -5732,11 +6664,18 @@
     },
     "threshold": {
      "label": "閾值"
+    },
+    "grey": {
+     "label": "灰階",
+     "options": [
+      "HD",
+      "SD"
+     ]
     }
    }
   },
   "squeeze": {
-   "description": "強度為正時向內擠壓圖層中央，為負時向外凸出。舊版可保留舊專案的形狀。",
+   "description": "強度為正時向內擠壓圖層中央，為負時向外凸出。「舊版」可保留舊專案的形狀，「沙漏」還會把上下兩邊的中段往外推。",
    "name": "擠壓",
    "params": {
     "amount": {
@@ -5746,7 +6685,8 @@
      "label": "形狀",
      "options": [
       "擠壓／膨脹",
-      "舊版"
+      "舊版",
+      "沙漏"
      ]
     }
    }
@@ -5846,6 +6786,59 @@
     },
     "shine": {
      "label": "光澤"
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "經典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光線顏色"
+    },
+    "glossiness": {
+     "label": "高光銳利度"
+    },
+    "texMode": {
+     "label": "紋理",
+     "options": [
+      "符合",
+      "平鋪",
+      "拉伸"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X軸重複"
+    },
+    "texRepeatY": {
+     "label": "Y軸重複"
+    },
+    "texMirror": {
+     "label": "鏡像"
+    },
+    "texAngle": {
+     "label": "紋理角度"
+    },
+    "texOffset": {
+     "label": "紋理偏移"
+    },
+    "texCrop": {
+     "label": "紋理裁切"
+    },
+    "texAnchor": {
+     "label": "紋理錨點",
+     "options": [
+      "中心",
+      "角落"
+     ]
     }
    }
   },
@@ -5894,6 +6887,66 @@
     },
     "smoothing": {
      "label": "平滑"
+    },
+    "starStyle": {
+     "label": "樣式",
+     "options": [
+      "平頂",
+      "尖頂"
+     ]
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "經典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光線顏色"
+    },
+    "glossiness": {
+     "label": "高光銳利度"
+    },
+    "texMode": {
+     "label": "紋理",
+     "options": [
+      "符合",
+      "平鋪",
+      "拉伸"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X軸重複"
+    },
+    "texRepeatY": {
+     "label": "Y軸重複"
+    },
+    "texMirror": {
+     "label": "鏡像"
+    },
+    "texAngle": {
+     "label": "紋理角度"
+    },
+    "texOffset": {
+     "label": "紋理偏移"
+    },
+    "texCrop": {
+     "label": "紋理裁切"
+    },
+    "texAnchor": {
+     "label": "紋理錨點",
+     "options": [
+      "中心",
+      "角落"
+     ]
     }
    }
   },
@@ -5992,7 +7045,7 @@
   },
   "swing": {
    "description": "讓圖層在兩個角度之間來回旋轉。",
-   "name": "擺動",
+   "name": "擺盪",
    "params": {
     "angle1": {
      "label": "角度1"
@@ -6063,9 +7116,11 @@
       "低沉",
       "高音",
       "機器人",
-      "尖叫聲",
+      "吱吱聲",
       "打字機",
-      "晶片音樂"
+      "晶片音樂",
+      "骷髏",
+      "自訂聲音"
      ]
     },
     "volume": {
@@ -6285,7 +7340,7 @@
      "label": "樣式",
      "options": [
       "抖動",
-      "抖動",
+      "顫動",
       "波浪",
       "圓周",
       "搖晃"
@@ -6439,6 +7494,13 @@
     "count": {
      "label": "數量"
     },
+    "edges": {
+     "label": "邊緣",
+     "options": [
+      "鏡像",
+      "透明"
+     ]
+    },
     "offset": {
      "label": "位移"
     },
@@ -6447,6 +7509,9 @@
     },
     "rotation": {
      "label": "旋轉"
+    },
+    "screenSpace": {
+     "label": "螢幕空間"
     },
     "seed": {
      "label": "種子"
@@ -6457,7 +7522,7 @@
    }
   },
   "tiles": {
-   "description": "重複圖層以填滿畫面。提高裁切可得到更小的拼貼，並可搭配鏡像、列位移與旋轉。舊版縮放用於保留舊專案的外觀。",
+   "description": "重複圖層以填滿畫面。提高裁切可得到更小的拼貼，並可搭配鏡像、列位移與旋轉。「舊版縮放」可保留舊專案的外觀。「拼貼內縮放」讓每塊拼貼維持圖層大小，並在拼貼內縮放與旋轉畫面。",
    "name": "平鋪",
    "params": {
     "angle": {
@@ -6473,7 +7538,8 @@
      "label": "尺寸方式",
      "options": [
       "裁切",
-      "舊版縮放"
+      "舊版縮放",
+      "拼貼內縮放"
      ]
     },
     "vertical": {
@@ -6494,8 +7560,18 @@
     "count": {
      "label": "數量"
     },
+    "edges": {
+     "label": "邊緣",
+     "options": [
+      "鏡像",
+      "透明"
+     ]
+    },
     "offset": {
      "label": "位移"
+    },
+    "screenSpace": {
+     "label": "螢幕空間"
     },
     "seed": {
      "label": "種子"
@@ -6598,6 +7674,59 @@
     },
     "thickness": {
      "label": "粗細"
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "經典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光線顏色"
+    },
+    "glossiness": {
+     "label": "高光銳利度"
+    },
+    "texMode": {
+     "label": "紋理",
+     "options": [
+      "符合",
+      "平鋪",
+      "拉伸"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X軸重複"
+    },
+    "texRepeatY": {
+     "label": "Y軸重複"
+    },
+    "texMirror": {
+     "label": "鏡像"
+    },
+    "texAngle": {
+     "label": "紋理角度"
+    },
+    "texOffset": {
+     "label": "紋理偏移"
+    },
+    "texCrop": {
+     "label": "紋理裁切"
+    },
+    "texAnchor": {
+     "label": "紋理錨點",
+     "options": [
+      "中心",
+      "角落"
+     ]
     }
    }
   },
@@ -6739,11 +7868,14 @@
     },
     "stretch": {
      "label": "拉伸"
+    },
+    "screenSpace": {
+     "label": "螢幕空間"
     }
    }
   },
   "twirl": {
-   "description": "像漩渦一樣繞著中心扭轉圖層，中央最強，到半徑處（圖層大小的比例）逐漸消失。強度為負值時反向扭轉。",
+   "description": "像漩渦一樣繞著中心扭轉圖層，中央最強，到半徑處（圖層大小的比例）逐漸消失。強度為負值時反向扭轉。測量基準設為「畫面」時，半徑改以畫面大小的比例計算，扭轉也會平順地減弱。",
    "name": "漩渦",
    "params": {
     "center": {
@@ -6754,11 +7886,18 @@
     },
     "strength": {
      "label": "強度"
+    },
+    "reach": {
+     "label": "測量基準",
+     "options": [
+      "圖層",
+      "畫面"
+     ]
     }
    }
   },
   "unsharpmask": {
-   "description": "將圖層與其模糊複本之間的差異加回去，藉此銳利化。強度決定模糊範圍有多大，數量決定加回多少，臨界值高於 50% 時會忽略細微差異。",
+   "description": "將圖層與其模糊複本之間的差異加回去，藉此銳利化。強度決定模糊範圍有多大，數量決定加回多少，臨界值高於50%時會略過細微差異。遮罩顏色設為「紅色」時，凡亮度與模糊複本的差距大於臨界值超出50%部分的地方，都會以紅色顯示遮罩。",
    "name": "遮色片銳利化",
    "params": {
     "amount": {
@@ -6772,6 +7911,13 @@
     },
     "threshold": {
      "label": "臨界值"
+    },
+    "maskColor": {
+     "label": "遮罩顏色",
+     "options": [
+      "灰色",
+      "紅色"
+     ]
     }
    }
   },
@@ -6867,6 +8013,19 @@
     },
     "yaw": {
      "label": "偏航"
+    },
+    "projection": {
+     "label": "輸出",
+     "options": [
+      "檢視",
+      "全景"
+     ]
+    },
+    "eyeDistance": {
+     "label": "距離"
+    },
+    "frame": {
+     "label": "畫面長寬比"
     }
    }
   },
@@ -6932,7 +8091,7 @@
    }
   },
   "wavewarp": {
-   "description": "以正弦波彎曲圖層：間距決定有幾道波穿過，幅度決定推動多遠，角度決定波的行進方向，扭曲角度決定推動方向。",
+   "description": "以正弦波彎曲圖層：間距決定有幾道波穿過圖層，幅度決定推動多遠，角度決定波的行進方向，扭曲角度決定推動方向。開啟螢幕空間後，波的大小依畫面而非圖層計算。交叉幅度會加入第二道波，其大小由交叉間距決定，沿扭曲角度行進並沿角度推動。原點設為「畫面左下角」時，波會以畫面的這個角落為起點、依畫面短邊計算，相位則讓波沿行進方向滑動。",
    "name": "波浪扭曲",
    "params": {
     "angle": {
@@ -6952,6 +8111,22 @@
     },
     "warpAngle": {
      "label": "扭曲角度"
+    },
+    "screenSpace": {
+     "label": "螢幕空間"
+    },
+    "crossSpacing": {
+     "label": "交叉間距"
+    },
+    "crossMagnitude": {
+     "label": "交叉幅度"
+    },
+    "origin": {
+     "label": "原點",
+     "options": [
+      "圖層角落",
+      "畫面左下角"
+     ]
     }
    }
   },

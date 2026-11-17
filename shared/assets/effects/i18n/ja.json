@@ -497,11 +497,18 @@
    }
   },
   "blur": {
-   "description": "滑らかで均一なぼかしです。",
+   "description": "滑らかで均一なぼかしです。形状を「ボックス」にすると、各点の周りの正方形の範囲を均等に平均します。",
    "name": "ぼかし",
    "params": {
     "strength": {
      "label": "強さ"
+    },
+    "shape": {
+     "label": "形状",
+     "options": [
+      "スムーズ",
+      "ボックス"
+     ]
     }
    }
   },
@@ -547,6 +554,59 @@
     },
     "width": {
      "label": "幅"
+    },
+    "lighting": {
+     "label": "ライティング",
+     "options": [
+      "クラシック",
+      "ソフト",
+      "ダイレクト"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光の高さ"
+    },
+    "lightColor": {
+     "label": "光の色"
+    },
+    "glossiness": {
+     "label": "ハイライトの鋭さ"
+    },
+    "texMode": {
+     "label": "テクスチャ",
+     "options": [
+      "フィット",
+      "タイル",
+      "ストレッチ"
+     ]
+    },
+    "texRepeatX": {
+     "label": "繰り返しX"
+    },
+    "texRepeatY": {
+     "label": "繰り返しY"
+    },
+    "texMirror": {
+     "label": "ミラー"
+    },
+    "texAngle": {
+     "label": "テクスチャの角度"
+    },
+    "texOffset": {
+     "label": "テクスチャのオフセット"
+    },
+    "texCrop": {
+     "label": "テクスチャのクロップ"
+    },
+    "texAnchor": {
+     "label": "テクスチャのアンカー",
+     "options": [
+      "中心",
+      "角"
+     ]
     }
    }
   },
@@ -570,7 +630,7 @@
    }
   },
   "bulge": {
-   "description": "レイヤーをレンズのように膨らませ（正の強さ）、または半径内で中心に向かってピンチします（負、半径はレイヤーサイズに対する割合）。",
+   "description": "半径（レイヤーサイズに対する割合）の円の中で、レイヤーをレンズのように膨らませる（強さが正）か、中心に向かってつまみます（強さが負）。基準を「画面」にすると、半径を画面に対する割合として扱います。減衰を「スムーズ」にすると、レンズがレイヤーの周囲によりなめらかになじみます。",
    "name": "ピンチ/バルジ",
    "params": {
     "amount": {
@@ -581,6 +641,20 @@
     },
     "radius": {
      "label": "半径"
+    },
+    "reach": {
+     "label": "基準",
+     "options": [
+      "レイヤー",
+      "画面"
+     ]
+    },
+    "curve": {
+     "label": "減衰",
+     "options": [
+      "クラシック",
+      "スムーズ"
+     ]
     }
    }
   },
@@ -781,7 +855,7 @@
    }
   },
   "circularripple": {
-   "description": "水滴が落ちたように、点から円形の波紋を広げます。",
+   "description": "水滴が落ちたように、点から円形の波紋を広げます。基準を「画面」にすると、周波数・強さ・半径をレイヤーではなく画面で測ります。",
    "name": "円形リップル",
    "params": {
     "center": {
@@ -801,6 +875,13 @@
     },
     "strength": {
      "label": "強さ"
+    },
+    "reach": {
+     "label": "基準",
+     "options": [
+      "レイヤー",
+      "画面"
+     ]
     }
    }
   },
@@ -813,6 +894,9 @@
     },
     "color2": {
      "label": "色2"
+    },
+    "contrast": {
+     "label": "コントラスト"
     },
     "intensity": {
      "label": "強度"
@@ -855,6 +939,13 @@
     },
     "strength": {
      "label": "強さ"
+    },
+    "style": {
+     "label": "スタイル",
+     "options": [
+      "クラシック",
+      "くっきり"
+     ]
     }
    }
   },
@@ -965,6 +1056,16 @@
     },
     "fill": {
      "label": "塗り"
+    },
+    "spread": {
+     "label": "広がり",
+     "options": [
+      "ぼかし",
+      "距離"
+     ]
+    },
+    "offset": {
+     "label": "オフセット"
     }
    }
   },
@@ -992,6 +1093,16 @@
     },
     "width": {
      "label": "幅"
+    },
+    "spread": {
+     "label": "広がり",
+     "options": [
+      "ぼかし",
+      "距離"
+     ]
+    },
+    "offset": {
+     "label": "オフセット"
     }
    }
   },
@@ -1041,6 +1152,13 @@
     },
     "thickness": {
      "label": "太さ"
+    },
+    "style": {
+     "label": "スタイル",
+     "options": [
+      "クラシック",
+      "積み重ね"
+     ]
     }
    }
   },
@@ -1141,6 +1259,62 @@
     },
     "thickness": {
      "label": "太さ"
+    },
+    "keep": {
+     "label": "レイヤーを残す"
+    },
+    "lighting": {
+     "label": "ライティング",
+     "options": [
+      "クラシック",
+      "ソフト",
+      "ダイレクト"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光の高さ"
+    },
+    "lightColor": {
+     "label": "光の色"
+    },
+    "glossiness": {
+     "label": "ハイライトの鋭さ"
+    },
+    "texMode": {
+     "label": "テクスチャ",
+     "options": [
+      "フィット",
+      "タイル",
+      "ストレッチ"
+     ]
+    },
+    "texRepeatX": {
+     "label": "繰り返しX"
+    },
+    "texRepeatY": {
+     "label": "繰り返しY"
+    },
+    "texMirror": {
+     "label": "ミラー"
+    },
+    "texAngle": {
+     "label": "テクスチャの角度"
+    },
+    "texOffset": {
+     "label": "テクスチャのオフセット"
+    },
+    "texCrop": {
+     "label": "テクスチャのクロップ"
+    },
+    "texAnchor": {
+     "label": "テクスチャのアンカー",
+     "options": [
+      "中心",
+      "角"
+     ]
     }
    }
   },
@@ -1180,6 +1354,59 @@
     },
     "smoothing": {
      "label": "スムージング"
+    },
+    "lighting": {
+     "label": "ライティング",
+     "options": [
+      "クラシック",
+      "ソフト",
+      "ダイレクト"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光の高さ"
+    },
+    "lightColor": {
+     "label": "光の色"
+    },
+    "glossiness": {
+     "label": "ハイライトの鋭さ"
+    },
+    "texMode": {
+     "label": "テクスチャ",
+     "options": [
+      "フィット",
+      "タイル",
+      "ストレッチ"
+     ]
+    },
+    "texRepeatX": {
+     "label": "繰り返しX"
+    },
+    "texRepeatY": {
+     "label": "繰り返しY"
+    },
+    "texMirror": {
+     "label": "ミラー"
+    },
+    "texAngle": {
+     "label": "テクスチャの角度"
+    },
+    "texOffset": {
+     "label": "テクスチャのオフセット"
+    },
+    "texCrop": {
+     "label": "テクスチャのクロップ"
+    },
+    "texAnchor": {
+     "label": "テクスチャのアンカー",
+     "options": [
+      "中心",
+      "角"
+     ]
     }
    }
   },
@@ -1251,6 +1478,59 @@
     },
     "smoothing": {
      "label": "スムージング"
+    },
+    "lighting": {
+     "label": "ライティング",
+     "options": [
+      "クラシック",
+      "ソフト",
+      "ダイレクト"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光の高さ"
+    },
+    "lightColor": {
+     "label": "光の色"
+    },
+    "glossiness": {
+     "label": "ハイライトの鋭さ"
+    },
+    "texMode": {
+     "label": "テクスチャ",
+     "options": [
+      "フィット",
+      "タイル",
+      "ストレッチ"
+     ]
+    },
+    "texRepeatX": {
+     "label": "繰り返しX"
+    },
+    "texRepeatY": {
+     "label": "繰り返しY"
+    },
+    "texMirror": {
+     "label": "ミラー"
+    },
+    "texAngle": {
+     "label": "テクスチャの角度"
+    },
+    "texOffset": {
+     "label": "テクスチャのオフセット"
+    },
+    "texCrop": {
+     "label": "テクスチャのクロップ"
+    },
+    "texAnchor": {
+     "label": "テクスチャのアンカー",
+     "options": [
+      "中心",
+      "角"
+     ]
     }
    }
   },
@@ -1369,7 +1649,7 @@
    }
   },
   "directionalblur": {
-   "description": "指定した角度に沿ってサンプルを平均し、モーションブラーをかけます。",
+   "description": "指定した角度に沿ってサンプルを平均し、モーションブラーをかけます。広がりを「両側」にすると、前後に均等にぼかします。",
    "name": "方向ブラー",
    "params": {
     "angle": {
@@ -1377,6 +1657,13 @@
     },
     "blurLength": {
      "label": "長さ"
+    },
+    "spread": {
+     "label": "広がり",
+     "options": [
+      "片側",
+      "両側"
+     ]
     }
    }
   },
@@ -1571,6 +1858,22 @@
    "params": {
     "strength": {
      "label": "強さ"
+    },
+    "style": {
+     "label": "スタイル",
+     "options": [
+      "クラシック",
+      "インク"
+     ]
+    },
+    "spacing": {
+     "label": "スムージング"
+    },
+    "threshold": {
+     "label": "しきい値"
+    },
+    "invert": {
+     "label": "反転"
     }
    }
   },
@@ -1613,6 +1916,9 @@
     },
     "tintColor": {
      "label": "ティントの色"
+    },
+    "mask": {
+     "label": "レイヤーにマスク"
     }
    }
   },
@@ -1682,6 +1988,13 @@
     },
     "thickness": {
      "label": "太さ"
+    },
+    "contourStyle": {
+     "label": "スタイル",
+     "options": [
+      "クラシック",
+      "細線"
+     ]
     }
    }
   },
@@ -1724,6 +2037,59 @@
     },
     "squeezeRatio": {
      "label": "圧縮"
+    },
+    "lighting": {
+     "label": "ライティング",
+     "options": [
+      "クラシック",
+      "ソフト",
+      "ダイレクト"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光の高さ"
+    },
+    "lightColor": {
+     "label": "光の色"
+    },
+    "glossiness": {
+     "label": "ハイライトの鋭さ"
+    },
+    "texMode": {
+     "label": "テクスチャ",
+     "options": [
+      "フィット",
+      "タイル",
+      "ストレッチ"
+     ]
+    },
+    "texRepeatX": {
+     "label": "繰り返しX"
+    },
+    "texRepeatY": {
+     "label": "繰り返しY"
+    },
+    "texMirror": {
+     "label": "ミラー"
+    },
+    "texAngle": {
+     "label": "テクスチャの角度"
+    },
+    "texOffset": {
+     "label": "テクスチャのオフセット"
+    },
+    "texCrop": {
+     "label": "テクスチャのクロップ"
+    },
+    "texAnchor": {
+     "label": "テクスチャのアンカー",
+     "options": [
+      "中心",
+      "角"
+     ]
     }
    }
   },
@@ -1982,6 +2348,65 @@
     },
     "shine": {
      "label": "光沢"
+    },
+    "lighting": {
+     "label": "ライティング",
+     "options": [
+      "クラシック",
+      "ソフト",
+      "ダイレクト"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光の高さ"
+    },
+    "lightColor": {
+     "label": "光の色"
+    },
+    "glossiness": {
+     "label": "ハイライトの鋭さ"
+    },
+    "pivot": {
+     "label": "ピボット"
+    },
+    "pivotDepth": {
+     "label": "ピボットの奥行き"
+    },
+    "texMode": {
+     "label": "テクスチャ",
+     "options": [
+      "フィット",
+      "タイル",
+      "ストレッチ"
+     ]
+    },
+    "texRepeatX": {
+     "label": "繰り返しX"
+    },
+    "texRepeatY": {
+     "label": "繰り返しY"
+    },
+    "texMirror": {
+     "label": "ミラー"
+    },
+    "texAngle": {
+     "label": "テクスチャの角度"
+    },
+    "texOffset": {
+     "label": "テクスチャのオフセット"
+    },
+    "texCrop": {
+     "label": "テクスチャのクロップ"
+    },
+    "texAnchor": {
+     "label": "テクスチャのアンカー",
+     "options": [
+      "中心",
+      "角"
+     ]
     }
    }
   },
@@ -2047,6 +2472,13 @@
     },
     "softness": {
      "label": "ぼかし"
+    },
+    "falloff": {
+     "label": "減衰",
+     "options": [
+      "距離",
+      "スムーズ"
+     ]
     }
    }
   },
@@ -2116,6 +2548,13 @@
     },
     "strength": {
      "label": "強さ"
+    },
+    "screenSize": {
+     "label": "サイズの基準",
+     "options": [
+      "レイヤー",
+      "画面"
+     ]
     }
    }
   },
@@ -2198,7 +2637,7 @@
    }
   },
   "glass": {
-   "description": "レイヤーの形状をベベル付きガラスに変え、背後のレイヤーを屈折させ、縁にハイライトを加えます。",
+   "description": "レイヤーの形状をベベル付きのガラスに変えて背後のレイヤーを屈折させ、縁にハイライトを加えます。ライトを「ソフト」にすると、レイヤーを塗りの割合で表示し、ガラスを色で照らします。光の側を向いたベベルの内側の縁がいちばん明るくなります。",
    "name": "ガラス",
    "params": {
     "angle": {
@@ -2210,8 +2649,18 @@
     "color": {
      "label": "色"
     },
+    "fill": {
+     "label": "塗り"
+    },
     "highlight": {
      "label": "ハイライト"
+    },
+    "light": {
+     "label": "ライト",
+     "options": [
+      "縁",
+      "ソフト"
+     ]
     },
     "refraction": {
      "label": "屈折"
@@ -2326,6 +2775,13 @@
     },
     "scaleBrightness": {
      "label": "明るさスケール"
+    },
+    "style": {
+     "label": "スタイル",
+     "options": [
+      "グラデーション",
+      "スペクトル"
+     ]
     }
    }
   },
@@ -2401,6 +2857,14 @@
     },
     "offset": {
      "label": "オフセット"
+    },
+    "origin": {
+     "label": "原点",
+     "options": [
+      "中心",
+      "レイヤーの角",
+      "画面の角"
+     ]
     },
     "punch": {
      "label": "くり抜き"
@@ -2606,6 +3070,59 @@
     },
     "smoothing": {
      "label": "スムージング"
+    },
+    "lighting": {
+     "label": "ライティング",
+     "options": [
+      "クラシック",
+      "ソフト",
+      "ダイレクト"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光の高さ"
+    },
+    "lightColor": {
+     "label": "光の色"
+    },
+    "glossiness": {
+     "label": "ハイライトの鋭さ"
+    },
+    "texMode": {
+     "label": "テクスチャ",
+     "options": [
+      "フィット",
+      "タイル",
+      "ストレッチ"
+     ]
+    },
+    "texRepeatX": {
+     "label": "繰り返しX"
+    },
+    "texRepeatY": {
+     "label": "繰り返しY"
+    },
+    "texMirror": {
+     "label": "ミラー"
+    },
+    "texAngle": {
+     "label": "テクスチャの角度"
+    },
+    "texOffset": {
+     "label": "テクスチャのオフセット"
+    },
+    "texCrop": {
+     "label": "テクスチャのクロップ"
+    },
+    "texAnchor": {
+     "label": "テクスチャのアンカー",
+     "options": [
+      "中心",
+      "角"
+     ]
     }
    }
   },
@@ -2661,11 +3178,33 @@
     "angle": {
      "label": "角度"
     },
+    "crop": {
+     "label": "クロップ"
+    },
+    "fit": {
+     "label": "画像",
+     "options": [
+      "原寸",
+      "各タイル内"
+     ]
+    },
+    "mask": {
+     "label": "レイヤーにマスク"
+    },
     "mirror": {
      "label": "ミラー"
     },
+    "offset": {
+     "label": "オフセット"
+    },
     "scale": {
      "label": "スケール"
+    },
+    "screenSpace": {
+     "label": "スクリーン空間"
+    },
+    "stretch": {
+     "label": "ストレッチ"
     }
    }
   },
@@ -2769,6 +3308,59 @@
     },
     "smoothing": {
      "label": "スムージング"
+    },
+    "lighting": {
+     "label": "ライティング",
+     "options": [
+      "クラシック",
+      "ソフト",
+      "ダイレクト"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光の高さ"
+    },
+    "lightColor": {
+     "label": "光の色"
+    },
+    "glossiness": {
+     "label": "ハイライトの鋭さ"
+    },
+    "texMode": {
+     "label": "テクスチャ",
+     "options": [
+      "フィット",
+      "タイル",
+      "ストレッチ"
+     ]
+    },
+    "texRepeatX": {
+     "label": "繰り返しX"
+    },
+    "texRepeatY": {
+     "label": "繰り返しY"
+    },
+    "texMirror": {
+     "label": "ミラー"
+    },
+    "texAngle": {
+     "label": "テクスチャの角度"
+    },
+    "texOffset": {
+     "label": "テクスチャのオフセット"
+    },
+    "texCrop": {
+     "label": "テクスチャのクロップ"
+    },
+    "texAnchor": {
+     "label": "テクスチャのアンカー",
+     "options": [
+      "中心",
+      "角"
+     ]
     }
    }
   },
@@ -2839,6 +3431,59 @@
     },
     "width": {
      "label": "幅"
+    },
+    "lighting": {
+     "label": "ライティング",
+     "options": [
+      "クラシック",
+      "ソフト",
+      "ダイレクト"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光の高さ"
+    },
+    "lightColor": {
+     "label": "光の色"
+    },
+    "glossiness": {
+     "label": "ハイライトの鋭さ"
+    },
+    "texMode": {
+     "label": "テクスチャ",
+     "options": [
+      "フィット",
+      "タイル",
+      "ストレッチ"
+     ]
+    },
+    "texRepeatX": {
+     "label": "繰り返しX"
+    },
+    "texRepeatY": {
+     "label": "繰り返しY"
+    },
+    "texMirror": {
+     "label": "ミラー"
+    },
+    "texAngle": {
+     "label": "テクスチャの角度"
+    },
+    "texOffset": {
+     "label": "テクスチャのオフセット"
+    },
+    "texCrop": {
+     "label": "テクスチャのクロップ"
+    },
+    "texAnchor": {
+     "label": "テクスチャのアンカー",
+     "options": [
+      "中心",
+      "角"
+     ]
     }
    }
   },
@@ -2964,7 +3609,8 @@
      "label": "スタイル",
      "options": [
       "クラシック",
-      "明るさを保持"
+      "明るさを保持",
+      "ビデオ"
      ]
     },
     "vibrance": {
@@ -3002,6 +3648,23 @@
     },
     "intensity": {
      "label": "強度"
+    },
+    "blend": {
+     "label": "ブレンド",
+     "options": [
+      "スクリーン",
+      "通常"
+     ]
+    },
+    "opacity": {
+     "label": "不透明度"
+    },
+    "corners": {
+     "label": "角の形",
+     "options": [
+      "丸",
+      "四角"
+     ]
     }
    }
   },
@@ -3068,6 +3731,13 @@
     "center": {
      "label": "中心"
     },
+    "direction": {
+     "label": "方向",
+     "options": [
+      "時計回り",
+      "反時計回り"
+     ]
+    },
     "mirror": {
      "label": "ミラー"
     },
@@ -3077,9 +3747,16 @@
    }
   },
   "lensblur": {
-   "description": "中心付近はシャープなまま、外側に向かって強くなる回転ブラーです。",
+   "description": "中心付近はシャープなまま、外側に向かって強くなる回転ブラーです。ぼかしを「ズーム」にすると、代わりに中心から外側へ伸び、レイヤーの端の外まで広がります。",
    "name": "レンズブラー",
    "params": {
+    "blur": {
+     "label": "ぼかし",
+     "options": [
+      "スピン",
+      "ズーム"
+     ]
+    },
     "center": {
      "label": "中心"
     },
@@ -3154,6 +3831,12 @@
     },
     "threshold": {
      "label": "しきい値"
+    },
+    "soften": {
+     "label": "柔らかさ"
+    },
+    "mask": {
+     "label": "レイヤーにマスク"
     }
    }
   },
@@ -3257,7 +3940,7 @@
    }
   },
   "linearstreaks": {
-   "description": "レイヤーの複製を角度に沿ってスライドさせながら重ね、重なった部分をブレンドして直線の筋を作ります。",
+   "description": "レイヤーの複製を角度に沿ってスライドさせながら重ね、重なった部分をブレンドして直線の筋を作ります。ブレンドを「オフ」にすると、レイヤーはそのままです。コピー数を「全ピクセル」にすると、長さに沿って48個を散らす代わりに、長さの1ピクセルごとに1つずつコピーを置きます。",
    "name": "リニアストリーク",
    "params": {
     "alpha": {
@@ -3274,11 +3957,19 @@
      "options": [
       "明るく",
       "平均",
-      "暗く"
+      "暗く",
+      "オフ"
      ]
     },
     "reach": {
      "label": "長さ"
+    },
+    "copies": {
+     "label": "コピー数",
+     "options": [
+      "間隔あり",
+      "全ピクセル"
+     ]
     }
    }
   },
@@ -3333,6 +4024,12 @@
     },
     "solidity": {
      "label": "密度"
+    },
+    "fill": {
+     "label": "塗り"
+    },
+    "samples": {
+     "label": "サンプル数"
     }
    }
   },
@@ -3348,6 +4045,9 @@
     },
     "threshold": {
      "label": "しきい値"
+    },
+    "high": {
+     "label": "上限しきい値"
     }
    }
   },
@@ -3472,6 +4172,13 @@
    "description": "レイヤーを四角形に分割し、それぞれを平均色で塗りつぶします。",
    "name": "モザイク",
    "params": {
+    "average": {
+     "label": "平均",
+     "options": [
+      "セル",
+      "角"
+     ]
+    },
     "count": {
      "label": "数"
     },
@@ -3594,6 +4301,59 @@
     },
     "shine": {
      "label": "光沢"
+    },
+    "lighting": {
+     "label": "ライティング",
+     "options": [
+      "クラシック",
+      "ソフト",
+      "ダイレクト"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光の高さ"
+    },
+    "lightColor": {
+     "label": "光の色"
+    },
+    "glossiness": {
+     "label": "ハイライトの鋭さ"
+    },
+    "texMode": {
+     "label": "テクスチャ",
+     "options": [
+      "フィット",
+      "タイル",
+      "ストレッチ"
+     ]
+    },
+    "texRepeatX": {
+     "label": "繰り返しX"
+    },
+    "texRepeatY": {
+     "label": "繰り返しY"
+    },
+    "texMirror": {
+     "label": "ミラー"
+    },
+    "texAngle": {
+     "label": "テクスチャの角度"
+    },
+    "texOffset": {
+     "label": "テクスチャのオフセット"
+    },
+    "texCrop": {
+     "label": "テクスチャのクロップ"
+    },
+    "texAnchor": {
+     "label": "テクスチャのアンカー",
+     "options": [
+      "中心",
+      "角"
+     ]
     }
    }
   },
@@ -4144,6 +4904,13 @@
     "blockSize": {
      "label": "サイズ"
     },
+    "edges": {
+     "label": "端の処理",
+     "options": [
+      "ミラー",
+      "透明"
+     ]
+    },
     "offset": {
      "label": "オフセット"
     },
@@ -4244,7 +5011,7 @@
    }
   },
   "polar": {
-   "description": "レイヤーを中心を軸に曲げ、直線を円に、円を直線に変換します。",
+   "description": "中心を軸にレイヤーを曲げ、直線を円に、円を直線に変換します。配置で、レイヤーのどの辺が中心に集まるかを選びます。",
    "name": "極座標",
    "params": {
     "amount": {
@@ -4255,6 +5022,13 @@
      "options": [
       "直交座標から極座標",
       "極座標から直交座標"
+     ]
+    },
+    "middle": {
+     "label": "配置",
+     "options": [
+      "上端を中心に",
+      "下端を中心に"
      ]
     }
    }
@@ -4448,11 +5222,64 @@
     },
     "shine": {
      "label": "光沢"
+    },
+    "lighting": {
+     "label": "ライティング",
+     "options": [
+      "クラシック",
+      "ソフト",
+      "ダイレクト"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光の高さ"
+    },
+    "lightColor": {
+     "label": "光の色"
+    },
+    "glossiness": {
+     "label": "ハイライトの鋭さ"
+    },
+    "texMode": {
+     "label": "テクスチャ",
+     "options": [
+      "フィット",
+      "タイル",
+      "ストレッチ"
+     ]
+    },
+    "texRepeatX": {
+     "label": "繰り返しX"
+    },
+    "texRepeatY": {
+     "label": "繰り返しY"
+    },
+    "texMirror": {
+     "label": "ミラー"
+    },
+    "texAngle": {
+     "label": "テクスチャの角度"
+    },
+    "texOffset": {
+     "label": "テクスチャのオフセット"
+    },
+    "texCrop": {
+     "label": "テクスチャのクロップ"
+    },
+    "texAnchor": {
+     "label": "テクスチャのアンカー",
+     "options": [
+      "中心",
+      "角"
+     ]
     }
    }
   },
   "radialblur": {
-   "description": "中心点から放射状にサンプルを平均化し、強さを調整できる放射状のズームブラーをかけます。",
+   "description": "中心点から放射状にサンプルを平均し、強さを調整できるズームブラーをかけます。長さを「均一」にすると、中心からの距離に応じて伸びるのではなく、すべての筋が同じ長さになります。",
    "name": "ズームブラー",
    "params": {
     "amount": {
@@ -4460,6 +5287,13 @@
     },
     "center": {
      "label": "中心"
+    },
+    "streak": {
+     "label": "長さ",
+     "options": [
+      "距離に応じて",
+      "均一"
+     ]
     }
    }
   },
@@ -4586,12 +5420,15 @@
     },
     "reach": {
      "label": "長さ"
+    },
+    "fill": {
+     "label": "塗り"
     }
    }
   },
   "radialwipe": {
-   "description": "中心から開始角度まで、時計の針のように扇形にレイヤーを隠します。進行度は掃引する角度、回数は扇形の繰り返し、両方向は左右への掃引です。進行度をアニメーションするとトランジションになります。",
-   "name": "放射ワイプ",
+   "description": "時計の針のように、中心の周りで開始角度から扇形にレイヤーを隠していきます。進行度は隠す角度、回数は円周上に並ぶ扇形の数で、方向を「両方向」にすると時計回りと反時計回りの両方に広がります。進行度をアニメーションするとトランジションになります。扇形を「端数あり」にすると回数の小数部分が残り、最後の扇形が細くなります。ぼかしは各扇形の両側をなめらかにします。",
+   "name": "放射状ワイプ",
    "params": {
     "center": {
      "label": "中心"
@@ -4615,6 +5452,13 @@
     },
     "start": {
      "label": "開始角度"
+    },
+    "wedges": {
+     "label": "扇形",
+     "options": [
+      "整数",
+      "端数あり"
+     ]
     }
    }
   },
@@ -4699,6 +5543,26 @@
     },
     "shine": {
      "label": "光沢"
+    },
+    "lighting": {
+     "label": "ライティング",
+     "options": [
+      "クラシック",
+      "ソフト",
+      "ダイレクト"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光の高さ"
+    },
+    "lightColor": {
+     "label": "光の色"
+    },
+    "glossiness": {
+     "label": "ハイライトの鋭さ"
     }
    },
    "shortcuts": {
@@ -4914,6 +5778,13 @@
     },
     "threshold": {
      "label": "しきい値"
+    },
+    "match": {
+     "label": "一致方式",
+     "options": [
+      "RGB",
+      "クロマ"
+     ]
     }
    }
   },
@@ -4964,7 +5835,7 @@
    }
   },
   "rgbsplit": {
-   "description": "赤・緑・青のチャンネルを分離します。Centerで選んだチャンネルはそのままに、残り2つが角度に沿って逆方向へずれます。Lightはずれた色を加算し、Darkはそのまま重ね、Maskは3つすべてが重なる部分だけを残し、Lumaはフリンジを明るさに応じて半透明にします。",
+   "description": "赤・緑・青のチャンネルを分離します。中心で選んだチャンネルはそのままで、残りの2つが角度に沿って逆方向にずれます。「Light」はずれた色を加算し、「Dark」は不透明なまま重ね、「マスク」は3つすべてが重なる部分だけを残し、「Luma」はフリンジを明るいほど不透明にします。「平均」は各点を、そこを覆うチャンネルの割合に応じた不透明度にします。",
    "name": "RGB分離",
    "params": {
     "angle": {
@@ -4984,7 +5855,8 @@
       "Light",
       "Dark",
       "マスク",
-      "Luma"
+      "Luma",
+      "平均"
      ]
     },
     "strength": {
@@ -5492,6 +6364,13 @@
     },
     "outside": {
      "label": "外側のグロー"
+    },
+    "falloff": {
+     "label": "減衰",
+     "options": [
+      "均一",
+      "レイヤー"
+     ]
     }
    }
   },
@@ -5585,6 +6464,59 @@
     },
     "shine": {
      "label": "光沢"
+    },
+    "lighting": {
+     "label": "ライティング",
+     "options": [
+      "クラシック",
+      "ソフト",
+      "ダイレクト"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光の高さ"
+    },
+    "lightColor": {
+     "label": "光の色"
+    },
+    "glossiness": {
+     "label": "ハイライトの鋭さ"
+    },
+    "texMode": {
+     "label": "テクスチャ",
+     "options": [
+      "フィット",
+      "タイル",
+      "ストレッチ"
+     ]
+    },
+    "texRepeatX": {
+     "label": "繰り返しX"
+    },
+    "texRepeatY": {
+     "label": "繰り返しY"
+    },
+    "texMirror": {
+     "label": "ミラー"
+    },
+    "texAngle": {
+     "label": "テクスチャの角度"
+    },
+    "texOffset": {
+     "label": "テクスチャのオフセット"
+    },
+    "texCrop": {
+     "label": "テクスチャのクロップ"
+    },
+    "texAnchor": {
+     "label": "テクスチャのアンカー",
+     "options": [
+      "中心",
+      "角"
+     ]
     }
    }
   },
@@ -5732,11 +6664,18 @@
     },
     "threshold": {
      "label": "しきい値"
+    },
+    "grey": {
+     "label": "グレー",
+     "options": [
+      "HD",
+      "SD"
+     ]
     }
    }
   },
   "squeeze": {
-   "description": "正の強さでレイヤー中央を内側につまみ、負の強さで外側に膨らませます。レガシーは古いプロジェクトの形状を保ちます。",
+   "description": "強さが正のときはレイヤーの中央を内側につまみ、負のときは外側に膨らませます。「レガシー」は古いプロジェクトの形状を保ちます。「砂時計」は上下の辺の中央も外側に押し出します。",
    "name": "スクイーズ",
    "params": {
     "amount": {
@@ -5746,7 +6685,8 @@
      "label": "形状",
      "options": [
       "つまみ/膨らみ",
-      "レガシー"
+      "レガシー",
+      "砂時計"
      ]
     }
    }
@@ -5846,6 +6786,59 @@
     },
     "shine": {
      "label": "光沢"
+    },
+    "lighting": {
+     "label": "ライティング",
+     "options": [
+      "クラシック",
+      "ソフト",
+      "ダイレクト"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光の高さ"
+    },
+    "lightColor": {
+     "label": "光の色"
+    },
+    "glossiness": {
+     "label": "ハイライトの鋭さ"
+    },
+    "texMode": {
+     "label": "テクスチャ",
+     "options": [
+      "フィット",
+      "タイル",
+      "ストレッチ"
+     ]
+    },
+    "texRepeatX": {
+     "label": "繰り返しX"
+    },
+    "texRepeatY": {
+     "label": "繰り返しY"
+    },
+    "texMirror": {
+     "label": "ミラー"
+    },
+    "texAngle": {
+     "label": "テクスチャの角度"
+    },
+    "texOffset": {
+     "label": "テクスチャのオフセット"
+    },
+    "texCrop": {
+     "label": "テクスチャのクロップ"
+    },
+    "texAnchor": {
+     "label": "テクスチャのアンカー",
+     "options": [
+      "中心",
+      "角"
+     ]
     }
    }
   },
@@ -5894,6 +6887,66 @@
     },
     "smoothing": {
      "label": "スムージング"
+    },
+    "starStyle": {
+     "label": "スタイル",
+     "options": [
+      "フラット",
+      "とがった形"
+     ]
+    },
+    "lighting": {
+     "label": "ライティング",
+     "options": [
+      "クラシック",
+      "ソフト",
+      "ダイレクト"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光の高さ"
+    },
+    "lightColor": {
+     "label": "光の色"
+    },
+    "glossiness": {
+     "label": "ハイライトの鋭さ"
+    },
+    "texMode": {
+     "label": "テクスチャ",
+     "options": [
+      "フィット",
+      "タイル",
+      "ストレッチ"
+     ]
+    },
+    "texRepeatX": {
+     "label": "繰り返しX"
+    },
+    "texRepeatY": {
+     "label": "繰り返しY"
+    },
+    "texMirror": {
+     "label": "ミラー"
+    },
+    "texAngle": {
+     "label": "テクスチャの角度"
+    },
+    "texOffset": {
+     "label": "テクスチャのオフセット"
+    },
+    "texCrop": {
+     "label": "テクスチャのクロップ"
+    },
+    "texAnchor": {
+     "label": "テクスチャのアンカー",
+     "options": [
+      "中心",
+      "角"
+     ]
     }
    }
   },
@@ -6001,7 +7054,7 @@
      "label": "角度2"
     },
     "frequency": {
-     "label": "周波数"
+     "label": "頻度"
     },
     "phase": {
      "label": "位相"
@@ -6065,7 +7118,9 @@
       "ロボット",
       "キュッ",
       "タイプライター",
-      "チップチューン"
+      "チップチューン",
+      "ガイコツ",
+      "カスタム音"
      ]
     },
     "volume": {
@@ -6439,6 +7494,13 @@
     "count": {
      "label": "数"
     },
+    "edges": {
+     "label": "端の処理",
+     "options": [
+      "ミラー",
+      "透明"
+     ]
+    },
     "offset": {
      "label": "オフセット"
     },
@@ -6447,6 +7509,9 @@
     },
     "rotation": {
      "label": "回転"
+    },
+    "screenSpace": {
+     "label": "スクリーン空間"
     },
     "seed": {
      "label": "シード"
@@ -6457,7 +7522,7 @@
    }
   },
   "tiles": {
-   "description": "レイヤーを繰り返して画面を埋めます。クロップを上げるとタイルが小さくなり、ミラー、行オフセット、回転も設定できます。レガシースケールは古いプロジェクトを保持します。",
+   "description": "レイヤーを繰り返して画面を埋めます。クロップを上げるとタイルが小さくなり、ミラー、行のオフセット、回転も設定できます。「レガシースケール」は古いプロジェクトの見た目を保ちます。「タイル内」は各タイルをレイヤーと同じ大きさに保ち、その中で画像をズーム・回転します。",
    "name": "タイル",
    "params": {
     "angle": {
@@ -6473,7 +7538,8 @@
      "label": "サイズ設定",
      "options": [
       "クロップ",
-      "レガシースケール"
+      "レガシースケール",
+      "タイル内"
      ]
     },
     "vertical": {
@@ -6494,8 +7560,18 @@
     "count": {
      "label": "数"
     },
+    "edges": {
+     "label": "端の処理",
+     "options": [
+      "ミラー",
+      "透明"
+     ]
+    },
     "offset": {
      "label": "オフセット"
+    },
+    "screenSpace": {
+     "label": "スクリーン空間"
     },
     "seed": {
      "label": "シード"
@@ -6598,6 +7674,59 @@
     },
     "thickness": {
      "label": "太さ"
+    },
+    "lighting": {
+     "label": "ライティング",
+     "options": [
+      "クラシック",
+      "ソフト",
+      "ダイレクト"
+     ]
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightHeight": {
+     "label": "光の高さ"
+    },
+    "lightColor": {
+     "label": "光の色"
+    },
+    "glossiness": {
+     "label": "ハイライトの鋭さ"
+    },
+    "texMode": {
+     "label": "テクスチャ",
+     "options": [
+      "フィット",
+      "タイル",
+      "ストレッチ"
+     ]
+    },
+    "texRepeatX": {
+     "label": "繰り返しX"
+    },
+    "texRepeatY": {
+     "label": "繰り返しY"
+    },
+    "texMirror": {
+     "label": "ミラー"
+    },
+    "texAngle": {
+     "label": "テクスチャの角度"
+    },
+    "texOffset": {
+     "label": "テクスチャのオフセット"
+    },
+    "texCrop": {
+     "label": "テクスチャのクロップ"
+    },
+    "texAnchor": {
+     "label": "テクスチャのアンカー",
+     "options": [
+      "中心",
+      "角"
+     ]
     }
    }
   },
@@ -6739,11 +7868,14 @@
     },
     "stretch": {
      "label": "ストレッチ"
+    },
+    "screenSpace": {
+     "label": "スクリーン空間"
     }
    }
   },
   "twirl": {
-   "description": "レイヤーを中心の周りで渦のようにねじり、中心で最も強く、半径（レイヤーサイズに対する割合）に向かって弱まります。強さを負にすると逆方向にねじれます。",
+   "description": "レイヤーを中心の周りで渦のようにねじります。ねじれは中心で最も強く、半径（レイヤーサイズに対する割合）に向かって弱まります。強さを負にすると逆方向にねじれます。基準を「画面」にすると、半径は画面に対する割合になり、ねじれがなめらかに弱まります。",
    "name": "スワール",
    "params": {
     "center": {
@@ -6754,11 +7886,18 @@
     },
     "strength": {
      "label": "強さ"
+    },
+    "reach": {
+     "label": "基準",
+     "options": [
+      "レイヤー",
+      "画面"
+     ]
     }
    }
   },
   "unsharpmask": {
-   "description": "レイヤーとぼかしたコピーとの差を加えてシャープにします。強さはぼかしの広さ、量は加える差の大きさ、しきい値が50%を超えると小さな差は無視されます。",
+   "description": "レイヤーとそのぼかしたコピーとの差を加え直してシャープにします。強さはぼかしの広さ、量は加える差の大きさを決め、しきい値を50%より上げると小さな差は無視されます。マスクの色を「赤」にすると、ぼかしたコピーとの明るさの差が、しきい値の50%を超えた分より大きい部分を赤で表示します。",
    "name": "アンシャープマスク",
    "params": {
     "amount": {
@@ -6772,6 +7911,13 @@
     },
     "threshold": {
      "label": "しきい値"
+    },
+    "maskColor": {
+     "label": "マスクの色",
+     "options": [
+      "グレー",
+      "赤"
+     ]
     }
    }
   },
@@ -6867,6 +8013,19 @@
     },
     "yaw": {
      "label": "ヨー"
+    },
+    "projection": {
+     "label": "出力",
+     "options": [
+      "ビュー",
+      "パノラマ"
+     ]
+    },
+    "eyeDistance": {
+     "label": "距離"
+    },
+    "frame": {
+     "label": "フレームのアスペクト比"
     }
    }
   },
@@ -6932,7 +8091,7 @@
    }
   },
   "wavewarp": {
-   "description": "レイヤーをサイン波で曲げます。間隔は波の数、振幅は押し出す量、角度は波の向き、ワープ角度は押し出す向きを設定します。",
+   "description": "レイヤーをサイン波で曲げます。間隔は波の数、振幅は押し出す量、角度は波の進む向き、ワープ角度は押し出す向きを決めます。スクリーン空間をオンにすると、波の大きさをレイヤーではなく画面に合わせます。交差振幅は、交差間隔で大きさが決まる2つ目の波を加えます。この波はワープ角度の向きに進み、角度の向きに押し出します。原点を「画面の左下」にすると、波を画面のその角から短い辺を基準に測り、位相で波をずらします。",
    "name": "ウェーブワープ",
    "params": {
     "angle": {
@@ -6952,6 +8111,22 @@
     },
     "warpAngle": {
      "label": "ワープ角度"
+    },
+    "screenSpace": {
+     "label": "スクリーン空間"
+    },
+    "crossSpacing": {
+     "label": "交差間隔"
+    },
+    "crossMagnitude": {
+     "label": "交差振幅"
+    },
+    "origin": {
+     "label": "原点",
+     "options": [
+      "レイヤーの角",
+      "画面の左下"
+     ]
     }
    }
   },

@@ -113,11 +113,11 @@
    }
   },
   "backdrop": {
-   "description": "Anciennement appelé Calque de réglage. Copie ce qui est dessiné sous le calque afin que les effets suivants modifient cette copie. Masquer selon le calque limite la copie aux parties opaques du calque. Mélange rétablit le remplissage du calque. Effets hors du calque permet aux effets suivants, comme Étirement, de prolonger la copie au-delà des bords du calque.",
+   "description": "Anciennement appelé Calque de réglage. Copie ce qui est dessiné sous le calque afin que les effets suivants modifient cette copie. Limiter au calque restreint la copie aux parties opaques du calque. Mélange rétablit le remplissage du calque. Effets hors du calque permet aux effets suivants, comme Étirement, de prolonger la copie au-delà des bords du calque.",
    "name": "Copier l’arrière-plan",
    "params": {
     "mask": {
-     "label": "Masquer selon le calque"
+     "label": "Limiter au calque"
     },
     "mix": {
      "label": "Mélange"
@@ -497,11 +497,18 @@
    }
   },
   "blur": {
-   "description": "Un flou doux et uniforme.",
+   "description": "Un flou doux et uniforme. Avec Forme sur Carrée, le flou fait plutôt la moyenne d’un carré uniforme autour de chaque point.",
    "name": "Flou",
    "params": {
     "strength": {
      "label": "Intensité"
+    },
+    "shape": {
+     "label": "Forme",
+     "options": [
+      "Douce",
+      "Carrée"
+     ]
     }
    }
   },
@@ -516,7 +523,7 @@
      "label": "Hauteur"
     },
     "light": {
-     "label": "Angle de lumière"
+     "label": "Angle de la lumière"
     },
     "perspective": {
      "label": "Perspective"
@@ -547,6 +554,59 @@
     },
     "width": {
      "label": "Largeur"
+    },
+    "lighting": {
+     "label": "Éclairage",
+     "options": [
+      "Classique",
+      "Doux",
+      "Direct"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiant"
+    },
+    "lightHeight": {
+     "label": "Hauteur de la lumière"
+    },
+    "lightColor": {
+     "label": "Couleur de la lumière"
+    },
+    "glossiness": {
+     "label": "Netteté du reflet"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "Ajuster",
+      "Mosaïque",
+      "Étirer"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Répétition X"
+    },
+    "texRepeatY": {
+     "label": "Répétition Y"
+    },
+    "texMirror": {
+     "label": "Miroir"
+    },
+    "texAngle": {
+     "label": "Angle de la texture"
+    },
+    "texOffset": {
+     "label": "Décalage de la texture"
+    },
+    "texCrop": {
+     "label": "Recadrage de la texture"
+    },
+    "texAnchor": {
+     "label": "Ancrage de la texture",
+     "options": [
+      "Centre",
+      "Coin"
+     ]
     }
    }
   },
@@ -570,7 +630,7 @@
    }
   },
   "bulge": {
-   "description": "Bombe le calque comme une lentille (intensité positive) ou le pince vers le centre (négative), dans un cercle dont le rayon est une fraction de la taille du calque.",
+   "description": "Bombe le calque comme une lentille (Intensité positive) ou le pince vers le Centre (négative), dans un cercle dont le Rayon est une part de la taille du calque. Avec Mesurer sur Écran, Rayon devient une part de l’écran. Avec Atténuation sur Douce, la lentille se fond plus doucement dans le reste du calque.",
    "name": "Pincement et bombement",
    "params": {
     "amount": {
@@ -581,18 +641,32 @@
     },
     "radius": {
      "label": "Rayon"
+    },
+    "reach": {
+     "label": "Mesurer sur",
+     "options": [
+      "Calque",
+      "Écran"
+     ]
+    },
+    "curve": {
+     "label": "Atténuation",
+     "options": [
+      "Classique",
+      "Douce"
+     ]
     }
    }
   },
   "bumpmap": {
    "description": "Éclaire le calque comme si sa luminosité formait une surface en relief, pour un aspect texturé qui conserve les couleurs.",
-   "name": "Relief",
+   "name": "Placage de relief",
    "params": {
     "ambient": {
      "label": "Ambiant"
     },
     "angle": {
-     "label": "Angle de lumière"
+     "label": "Angle de la lumière"
     },
     "height": {
      "label": "Hauteur"
@@ -781,7 +855,7 @@
    }
   },
   "circularripple": {
-   "description": "Crée des ondulations circulaires à partir d’un point, comme une goutte tombant dans l’eau.",
+   "description": "Crée des ondulations circulaires qui partent d’un point, comme une goutte tombant dans l’eau. Avec Mesurer sur Écran, Fréquence, Intensité et Rayon se mesurent sur l’écran plutôt que sur le calque.",
    "name": "Ondulation circulaire",
    "params": {
     "center": {
@@ -801,6 +875,13 @@
     },
     "strength": {
      "label": "Intensité"
+    },
+    "reach": {
+     "label": "Mesurer sur",
+     "options": [
+      "Calque",
+      "Écran"
+     ]
     }
    }
   },
@@ -813,6 +894,9 @@
     },
     "color2": {
      "label": "Couleur 2"
+    },
+    "contrast": {
+     "label": "Contraste"
     },
     "intensity": {
      "label": "Intensité"
@@ -855,6 +939,13 @@
     },
     "strength": {
      "label": "Intensité"
+    },
+    "style": {
+     "label": "Style",
+     "options": [
+      "Classique",
+      "Net"
+     ]
     }
    }
   },
@@ -965,6 +1056,16 @@
     },
     "fill": {
      "label": "Remplissage"
+    },
+    "spread": {
+     "label": "Étendue",
+     "options": [
+      "Flou",
+      "Distance"
+     ]
+    },
+    "offset": {
+     "label": "Décalage"
     }
    }
   },
@@ -992,6 +1093,16 @@
     },
     "width": {
      "label": "Largeur"
+    },
+    "spread": {
+     "label": "Étendue",
+     "options": [
+      "Flou",
+      "Distance"
+     ]
+    },
+    "offset": {
+     "label": "Décalage"
     }
    }
   },
@@ -1041,6 +1152,13 @@
     },
     "thickness": {
      "label": "Épaisseur"
+    },
+    "style": {
+     "label": "Style",
+     "options": [
+      "Classique",
+      "Empilé"
+     ]
     }
    }
   },
@@ -1080,7 +1198,7 @@
   },
   "crop": {
    "description": "Découpe les bords du calque : Gauche, Haut, Droite et Bas indiquent la part de sa largeur ou de sa hauteur à retirer de chaque côté. Arrondi arrondit les coins et Contour progressif adoucit les bords. Le calque reste en place.",
-   "name": "Rogner",
+   "name": "Recadrer",
    "params": {
     "bottom": {
      "label": "Bas"
@@ -1141,6 +1259,62 @@
     },
     "thickness": {
      "label": "Épaisseur"
+    },
+    "keep": {
+     "label": "Conserver le calque"
+    },
+    "lighting": {
+     "label": "Éclairage",
+     "options": [
+      "Classique",
+      "Doux",
+      "Direct"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiant"
+    },
+    "lightHeight": {
+     "label": "Hauteur de la lumière"
+    },
+    "lightColor": {
+     "label": "Couleur de la lumière"
+    },
+    "glossiness": {
+     "label": "Netteté du reflet"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "Ajuster",
+      "Mosaïque",
+      "Étirer"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Répétition X"
+    },
+    "texRepeatY": {
+     "label": "Répétition Y"
+    },
+    "texMirror": {
+     "label": "Miroir"
+    },
+    "texAngle": {
+     "label": "Angle de la texture"
+    },
+    "texOffset": {
+     "label": "Décalage de la texture"
+    },
+    "texCrop": {
+     "label": "Recadrage de la texture"
+    },
+    "texAnchor": {
+     "label": "Ancrage de la texture",
+     "options": [
+      "Centre",
+      "Coin"
+     ]
     }
    }
   },
@@ -1180,6 +1354,59 @@
     },
     "smoothing": {
      "label": "Lissage"
+    },
+    "lighting": {
+     "label": "Éclairage",
+     "options": [
+      "Classique",
+      "Doux",
+      "Direct"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiant"
+    },
+    "lightHeight": {
+     "label": "Hauteur de la lumière"
+    },
+    "lightColor": {
+     "label": "Couleur de la lumière"
+    },
+    "glossiness": {
+     "label": "Netteté du reflet"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "Ajuster",
+      "Mosaïque",
+      "Étirer"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Répétition X"
+    },
+    "texRepeatY": {
+     "label": "Répétition Y"
+    },
+    "texMirror": {
+     "label": "Miroir"
+    },
+    "texAngle": {
+     "label": "Angle de la texture"
+    },
+    "texOffset": {
+     "label": "Décalage de la texture"
+    },
+    "texCrop": {
+     "label": "Recadrage de la texture"
+    },
+    "texAnchor": {
+     "label": "Ancrage de la texture",
+     "options": [
+      "Centre",
+      "Coin"
+     ]
     }
    }
   },
@@ -1251,6 +1478,59 @@
     },
     "smoothing": {
      "label": "Lissage"
+    },
+    "lighting": {
+     "label": "Éclairage",
+     "options": [
+      "Classique",
+      "Doux",
+      "Direct"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiant"
+    },
+    "lightHeight": {
+     "label": "Hauteur de la lumière"
+    },
+    "lightColor": {
+     "label": "Couleur de la lumière"
+    },
+    "glossiness": {
+     "label": "Netteté du reflet"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "Ajuster",
+      "Mosaïque",
+      "Étirer"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Répétition X"
+    },
+    "texRepeatY": {
+     "label": "Répétition Y"
+    },
+    "texMirror": {
+     "label": "Miroir"
+    },
+    "texAngle": {
+     "label": "Angle de la texture"
+    },
+    "texOffset": {
+     "label": "Décalage de la texture"
+    },
+    "texCrop": {
+     "label": "Recadrage de la texture"
+    },
+    "texAnchor": {
+     "label": "Ancrage de la texture",
+     "options": [
+      "Centre",
+      "Coin"
+     ]
     }
    }
   },
@@ -1369,7 +1649,7 @@
    }
   },
   "directionalblur": {
-   "description": "Crée un flou de mouvement en moyennant des échantillons selon un angle donné.",
+   "description": "Crée un flou de mouvement en faisant la moyenne d’échantillons le long d’un angle. Avec Étendue sur Deux côtés, le flou s’étale autant vers l’avant que vers l’arrière.",
    "name": "Flou directionnel",
    "params": {
     "angle": {
@@ -1377,6 +1657,13 @@
     },
     "blurLength": {
      "label": "Longueur"
+    },
+    "spread": {
+     "label": "Étendue",
+     "options": [
+      "Un côté",
+      "Deux côtés"
+     ]
     }
    }
   },
@@ -1571,6 +1858,22 @@
    "params": {
     "strength": {
      "label": "Intensité"
+    },
+    "style": {
+     "label": "Style",
+     "options": [
+      "Classique",
+      "Encre"
+     ]
+    },
+    "spacing": {
+     "label": "Lissage"
+    },
+    "threshold": {
+     "label": "Seuil"
+    },
+    "invert": {
+     "label": "Inverser"
     }
    }
   },
@@ -1613,6 +1916,9 @@
     },
     "tintColor": {
      "label": "Couleur de teinte"
+    },
+    "mask": {
+     "label": "Limiter au calque"
     }
    }
   },
@@ -1682,6 +1988,13 @@
     },
     "thickness": {
      "label": "Épaisseur"
+    },
+    "contourStyle": {
+     "label": "Style",
+     "options": [
+      "Classique",
+      "Traits fins"
+     ]
     }
    }
   },
@@ -1724,6 +2037,59 @@
     },
     "squeezeRatio": {
      "label": "Compression"
+    },
+    "lighting": {
+     "label": "Éclairage",
+     "options": [
+      "Classique",
+      "Doux",
+      "Direct"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiant"
+    },
+    "lightHeight": {
+     "label": "Hauteur de la lumière"
+    },
+    "lightColor": {
+     "label": "Couleur de la lumière"
+    },
+    "glossiness": {
+     "label": "Netteté du reflet"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "Ajuster",
+      "Mosaïque",
+      "Étirer"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Répétition X"
+    },
+    "texRepeatY": {
+     "label": "Répétition Y"
+    },
+    "texMirror": {
+     "label": "Miroir"
+    },
+    "texAngle": {
+     "label": "Angle de la texture"
+    },
+    "texOffset": {
+     "label": "Décalage de la texture"
+    },
+    "texCrop": {
+     "label": "Recadrage de la texture"
+    },
+    "texAnchor": {
+     "label": "Ancrage de la texture",
+     "options": [
+      "Centre",
+      "Coin"
+     ]
     }
    }
   },
@@ -1982,6 +2348,65 @@
     },
     "shine": {
      "label": "Brillance"
+    },
+    "lighting": {
+     "label": "Éclairage",
+     "options": [
+      "Classique",
+      "Doux",
+      "Direct"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiant"
+    },
+    "lightHeight": {
+     "label": "Hauteur de la lumière"
+    },
+    "lightColor": {
+     "label": "Couleur de la lumière"
+    },
+    "glossiness": {
+     "label": "Netteté du reflet"
+    },
+    "pivot": {
+     "label": "Pivot"
+    },
+    "pivotDepth": {
+     "label": "Profondeur du pivot"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "Ajuster",
+      "Mosaïque",
+      "Étirer"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Répétition X"
+    },
+    "texRepeatY": {
+     "label": "Répétition Y"
+    },
+    "texMirror": {
+     "label": "Miroir"
+    },
+    "texAngle": {
+     "label": "Angle de la texture"
+    },
+    "texOffset": {
+     "label": "Décalage de la texture"
+    },
+    "texCrop": {
+     "label": "Recadrage de la texture"
+    },
+    "texAnchor": {
+     "label": "Ancrage de la texture",
+     "options": [
+      "Centre",
+      "Coin"
+     ]
     }
    }
   },
@@ -2047,6 +2472,13 @@
     },
     "softness": {
      "label": "Douceur"
+    },
+    "falloff": {
+     "label": "Atténuation",
+     "options": [
+      "Distance",
+      "Douce"
+     ]
     }
    }
   },
@@ -2116,6 +2548,13 @@
     },
     "strength": {
      "label": "Intensité"
+    },
+    "screenSize": {
+     "label": "Taille selon",
+     "options": [
+      "Calque",
+      "Écran"
+     ]
     }
    }
   },
@@ -2198,7 +2637,7 @@
    }
   },
   "glass": {
-   "description": "Transforme la forme du calque en verre biseauté qui déforme les calques derrière lui et illumine son bord.",
+   "description": "Transforme la forme du calque en verre biseauté qui déforme les calques situés derrière, avec un reflet le long du bord. Avec Lumière sur Douce, le calque s’affiche selon le Remplissage et Couleur éclaire le verre, surtout le long du bord intérieur du biseau tourné vers la lumière.",
    "name": "Verre",
    "params": {
     "angle": {
@@ -2210,8 +2649,18 @@
     "color": {
      "label": "Couleur"
     },
+    "fill": {
+     "label": "Remplissage"
+    },
     "highlight": {
      "label": "Reflet"
+    },
+    "light": {
+     "label": "Lumière",
+     "options": [
+      "Bord",
+      "Douce"
+     ]
     },
     "refraction": {
      "label": "Réfraction"
@@ -2326,6 +2775,13 @@
     },
     "scaleBrightness": {
      "label": "Moduler la luminosité"
+    },
+    "style": {
+     "label": "Style",
+     "options": [
+      "Dégradé",
+      "Spectre"
+     ]
     }
    }
   },
@@ -2401,6 +2857,14 @@
     },
     "offset": {
      "label": "Décalage"
+    },
+    "origin": {
+     "label": "Origine",
+     "options": [
+      "Centre",
+      "Coin du calque",
+      "Coin de l’écran"
+     ]
     },
     "punch": {
      "label": "Découper"
@@ -2606,6 +3070,59 @@
     },
     "smoothing": {
      "label": "Lissage"
+    },
+    "lighting": {
+     "label": "Éclairage",
+     "options": [
+      "Classique",
+      "Doux",
+      "Direct"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiant"
+    },
+    "lightHeight": {
+     "label": "Hauteur de la lumière"
+    },
+    "lightColor": {
+     "label": "Couleur de la lumière"
+    },
+    "glossiness": {
+     "label": "Netteté du reflet"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "Ajuster",
+      "Mosaïque",
+      "Étirer"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Répétition X"
+    },
+    "texRepeatY": {
+     "label": "Répétition Y"
+    },
+    "texMirror": {
+     "label": "Miroir"
+    },
+    "texAngle": {
+     "label": "Angle de la texture"
+    },
+    "texOffset": {
+     "label": "Décalage de la texture"
+    },
+    "texCrop": {
+     "label": "Recadrage de la texture"
+    },
+    "texAnchor": {
+     "label": "Ancrage de la texture",
+     "options": [
+      "Centre",
+      "Coin"
+     ]
     }
    }
   },
@@ -2661,11 +3178,33 @@
     "angle": {
      "label": "Angle"
     },
+    "crop": {
+     "label": "Recadrage"
+    },
+    "fit": {
+     "label": "Image",
+     "options": [
+      "Taille réelle",
+      "Dans chaque tuile"
+     ]
+    },
+    "mask": {
+     "label": "Limiter au calque"
+    },
     "mirror": {
      "label": "Miroir"
     },
+    "offset": {
+     "label": "Décalage"
+    },
     "scale": {
      "label": "Échelle"
+    },
+    "screenSpace": {
+     "label": "Espace écran"
+    },
+    "stretch": {
+     "label": "Étirement"
     }
    }
   },
@@ -2769,6 +3308,59 @@
     },
     "smoothing": {
      "label": "Lissage"
+    },
+    "lighting": {
+     "label": "Éclairage",
+     "options": [
+      "Classique",
+      "Doux",
+      "Direct"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiant"
+    },
+    "lightHeight": {
+     "label": "Hauteur de la lumière"
+    },
+    "lightColor": {
+     "label": "Couleur de la lumière"
+    },
+    "glossiness": {
+     "label": "Netteté du reflet"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "Ajuster",
+      "Mosaïque",
+      "Étirer"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Répétition X"
+    },
+    "texRepeatY": {
+     "label": "Répétition Y"
+    },
+    "texMirror": {
+     "label": "Miroir"
+    },
+    "texAngle": {
+     "label": "Angle de la texture"
+    },
+    "texOffset": {
+     "label": "Décalage de la texture"
+    },
+    "texCrop": {
+     "label": "Recadrage de la texture"
+    },
+    "texAnchor": {
+     "label": "Ancrage de la texture",
+     "options": [
+      "Centre",
+      "Coin"
+     ]
     }
    }
   },
@@ -2839,6 +3431,59 @@
     },
     "width": {
      "label": "Largeur"
+    },
+    "lighting": {
+     "label": "Éclairage",
+     "options": [
+      "Classique",
+      "Doux",
+      "Direct"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiant"
+    },
+    "lightHeight": {
+     "label": "Hauteur de la lumière"
+    },
+    "lightColor": {
+     "label": "Couleur de la lumière"
+    },
+    "glossiness": {
+     "label": "Netteté du reflet"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "Ajuster",
+      "Mosaïque",
+      "Étirer"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Répétition X"
+    },
+    "texRepeatY": {
+     "label": "Répétition Y"
+    },
+    "texMirror": {
+     "label": "Miroir"
+    },
+    "texAngle": {
+     "label": "Angle de la texture"
+    },
+    "texOffset": {
+     "label": "Décalage de la texture"
+    },
+    "texCrop": {
+     "label": "Recadrage de la texture"
+    },
+    "texAnchor": {
+     "label": "Ancrage de la texture",
+     "options": [
+      "Centre",
+      "Coin"
+     ]
     }
    }
   },
@@ -2964,7 +3609,8 @@
      "label": "Style",
      "options": [
       "Classique",
-      "Conserver la luminosité"
+      "Conserver la luminosité",
+      "Vidéo"
      ]
     },
     "vibrance": {
@@ -3002,6 +3648,23 @@
     },
     "intensity": {
      "label": "Intensité"
+    },
+    "blend": {
+     "label": "Fusion",
+     "options": [
+      "Superposition",
+      "Normal"
+     ]
+    },
+    "opacity": {
+     "label": "Opacité"
+    },
+    "corners": {
+     "label": "Coins",
+     "options": [
+      "Arrondis",
+      "Carrés"
+     ]
     }
    }
   },
@@ -3068,6 +3731,13 @@
     "center": {
      "label": "Centre"
     },
+    "direction": {
+     "label": "Direction",
+     "options": [
+      "Sens horaire",
+      "Sens antihoraire"
+     ]
+    },
     "mirror": {
      "label": "Miroir"
     },
@@ -3077,9 +3747,16 @@
    }
   },
   "lensblur": {
-   "description": "Un flou tournant qui laisse une zone nette au centre et s’accentue vers les bords.",
-   "name": "Flou de rotation",
+   "description": "Un flou tournant qui laisse une zone nette autour du centre et s’accentue vers les bords. Avec Flou sur Zoom, il s’étire plutôt vers l’extérieur depuis le centre, au-delà des bords du calque.",
+   "name": "Flou d’objectif",
    "params": {
+    "blur": {
+     "label": "Flou",
+     "options": [
+      "Rotation",
+      "Zoom"
+     ]
+    },
     "center": {
      "label": "Centre"
     },
@@ -3154,6 +3831,12 @@
     },
     "threshold": {
      "label": "Seuil"
+    },
+    "soften": {
+     "label": "Adoucissement"
+    },
+    "mask": {
+     "label": "Limiter au calque"
     }
    }
   },
@@ -3257,7 +3940,7 @@
    }
   },
   "linearstreaks": {
-   "description": "Crée des traînées droites en décalant des copies du calque selon un angle et en fusionnant leurs zones de chevauchement.",
+   "description": "Crée des traînées droites en faisant glisser des copies du calque selon un angle et en les fusionnant là où elles se chevauchent. Avec Fusion sur Désactivé, le calque reste tel quel. Avec Copies sur Chaque pixel, une copie est posée sur chaque pixel de la Longueur au lieu de 48 réparties sur celle-ci.",
    "name": "Traînées linéaires",
    "params": {
     "alpha": {
@@ -3274,11 +3957,19 @@
      "options": [
       "Éclaircir",
       "Moyenne",
-      "Obscurcir"
+      "Obscurcir",
+      "Désactivé"
      ]
     },
     "reach": {
      "label": "Longueur"
+    },
+    "copies": {
+     "label": "Copies",
+     "options": [
+      "Espacées",
+      "Chaque pixel"
+     ]
     }
    }
   },
@@ -3333,6 +4024,12 @@
     },
     "solidity": {
      "label": "Densité"
+    },
+    "fill": {
+     "label": "Remplissage"
+    },
+    "samples": {
+     "label": "Échantillons"
     }
    }
   },
@@ -3348,6 +4045,9 @@
     },
     "threshold": {
      "label": "Seuil"
+    },
+    "high": {
+     "label": "Seuil haut"
     }
    }
   },
@@ -3472,6 +4172,13 @@
    "description": "Divise le calque en carrés et remplit chacun de sa couleur moyenne.",
    "name": "Mosaïque",
    "params": {
+    "average": {
+     "label": "Moyenne",
+     "options": [
+      "Cellule",
+      "Coin"
+     ]
+    },
     "count": {
      "label": "Nombre"
     },
@@ -3566,7 +4273,7 @@
    "name": "Octaèdre",
    "params": {
     "light": {
-     "label": "Angle de lumière"
+     "label": "Angle de la lumière"
     },
     "perspective": {
      "label": "Perspective"
@@ -3594,6 +4301,59 @@
     },
     "shine": {
      "label": "Brillance"
+    },
+    "lighting": {
+     "label": "Éclairage",
+     "options": [
+      "Classique",
+      "Doux",
+      "Direct"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiant"
+    },
+    "lightHeight": {
+     "label": "Hauteur de la lumière"
+    },
+    "lightColor": {
+     "label": "Couleur de la lumière"
+    },
+    "glossiness": {
+     "label": "Netteté du reflet"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "Ajuster",
+      "Mosaïque",
+      "Étirer"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Répétition X"
+    },
+    "texRepeatY": {
+     "label": "Répétition Y"
+    },
+    "texMirror": {
+     "label": "Miroir"
+    },
+    "texAngle": {
+     "label": "Angle de la texture"
+    },
+    "texOffset": {
+     "label": "Décalage de la texture"
+    },
+    "texCrop": {
+     "label": "Recadrage de la texture"
+    },
+    "texAnchor": {
+     "label": "Ancrage de la texture",
+     "options": [
+      "Centre",
+      "Coin"
+     ]
     }
    }
   },
@@ -3605,7 +4365,7 @@
      "label": "Contour progressif"
     },
     "mask": {
-     "label": "Masquer au calque"
+     "label": "Limiter au calque"
     },
     "offset": {
      "label": "Décalage"
@@ -4144,6 +4904,13 @@
     "blockSize": {
      "label": "Taille"
     },
+    "edges": {
+     "label": "Bords",
+     "options": [
+      "Miroir",
+      "Transparent"
+     ]
+    },
     "offset": {
      "label": "Décalage"
     },
@@ -4244,7 +5011,7 @@
    }
   },
   "polar": {
-   "description": "Courbe le calque autour de son centre pour transformer les lignes droites en cercles, ou déroule les cercles en lignes droites.",
+   "description": "Courbe le calque autour de son centre pour transformer les lignes droites en cercles, ou déroule les cercles en lignes droites. Disposition choisit quel bord du calque se retrouve au centre.",
    "name": "Coordonnées polaires",
    "params": {
     "amount": {
@@ -4255,6 +5022,13 @@
      "options": [
       "Rectangulaire vers polaire",
       "Polaire vers rectangulaire"
+     ]
+    },
+    "middle": {
+     "label": "Disposition",
+     "options": [
+      "Haut au centre",
+      "Bas au centre"
      ]
     }
    }
@@ -4423,7 +5197,7 @@
      "label": "Hauteur"
     },
     "light": {
-     "label": "Angle de lumière"
+     "label": "Angle de la lumière"
     },
     "perspective": {
      "label": "Perspective"
@@ -4448,11 +5222,64 @@
     },
     "shine": {
      "label": "Brillance"
+    },
+    "lighting": {
+     "label": "Éclairage",
+     "options": [
+      "Classique",
+      "Doux",
+      "Direct"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiant"
+    },
+    "lightHeight": {
+     "label": "Hauteur de la lumière"
+    },
+    "lightColor": {
+     "label": "Couleur de la lumière"
+    },
+    "glossiness": {
+     "label": "Netteté du reflet"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "Ajuster",
+      "Mosaïque",
+      "Étirer"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Répétition X"
+    },
+    "texRepeatY": {
+     "label": "Répétition Y"
+    },
+    "texMirror": {
+     "label": "Miroir"
+    },
+    "texAngle": {
+     "label": "Angle de la texture"
+    },
+    "texOffset": {
+     "label": "Décalage de la texture"
+    },
+    "texCrop": {
+     "label": "Recadrage de la texture"
+    },
+    "texAnchor": {
+     "label": "Ancrage de la texture",
+     "options": [
+      "Centre",
+      "Coin"
+     ]
     }
    }
   },
   "radialblur": {
-   "description": "Applique un flou de zoom radial en moyennant les échantillons le long de rayons issus d’un centre, avec une intensité réglable.",
+   "description": "Applique un flou de zoom radial en faisant la moyenne d’échantillons le long de rayons partant d’un point central, avec une intensité réglable. Avec Longueur sur Uniforme, toutes les traînées ont la même longueur au lieu de s’allonger avec la distance au centre.",
    "name": "Flou de zoom",
    "params": {
     "amount": {
@@ -4460,6 +5287,13 @@
     },
     "center": {
      "label": "Centre"
+    },
+    "streak": {
+     "label": "Longueur",
+     "options": [
+      "Selon la distance",
+      "Uniforme"
+     ]
     }
    }
   },
@@ -4586,11 +5420,14 @@
     },
     "reach": {
      "label": "Longueur"
+    },
+    "fill": {
+     "label": "Remplissage"
     }
    }
   },
   "radialwipe": {
-   "description": "Masque un secteur du calque qui balaie le cercle autour du Centre depuis l’Angle de départ, comme une aiguille d’horloge. Progression règle l’angle balayé, Nombre répète le secteur et Les deux balaie dans les deux sens. Animez Progression pour créer une transition.",
+   "description": "Masque un secteur du calque balayé autour du Centre depuis l’Angle de départ, comme une aiguille d’horloge. Progression règle l’angle balayé, Nombre répète le secteur tout autour du cercle et Les deux balaie dans les deux sens. Animez la Progression pour créer une transition. Avec Secteurs sur Exacts, Nombre garde sa partie décimale, si bien que le dernier secteur est plus étroit, et Contour progressif adoucit les deux côtés de chaque secteur.",
    "name": "Volet radial",
    "params": {
     "center": {
@@ -4615,6 +5452,13 @@
     },
     "start": {
      "label": "Angle de départ"
+    },
+    "wedges": {
+     "label": "Secteurs",
+     "options": [
+      "Entiers",
+      "Exacts"
+     ]
     }
    }
   },
@@ -4674,7 +5518,7 @@
      "label": "Couleur intérieure"
     },
     "light": {
-     "label": "Angle de lumière"
+     "label": "Angle de la lumière"
     },
     "perspective": {
      "label": "Perspective"
@@ -4699,6 +5543,26 @@
     },
     "shine": {
      "label": "Brillance"
+    },
+    "lighting": {
+     "label": "Éclairage",
+     "options": [
+      "Classique",
+      "Doux",
+      "Direct"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiant"
+    },
+    "lightHeight": {
+     "label": "Hauteur de la lumière"
+    },
+    "lightColor": {
+     "label": "Couleur de la lumière"
+    },
+    "glossiness": {
+     "label": "Netteté du reflet"
     }
    },
    "shortcuts": {
@@ -4709,7 +5573,7 @@
    }
   },
   "rastertransform": {
-   "description": "Redimensionne, fait pivoter et déplace l’image finale du calque après les effets précédents, afin de transformer aussi leur résultat. Remplissage conserve une partie de l’original en dessous et Masquer au calque limite le résultat à la forme d’origine.",
+   "description": "Redimensionne, fait pivoter et déplace l’image finale du calque après les effets précédents, afin de transformer aussi leur résultat. Remplissage conserve une partie de l’original en dessous et Limiter au calque garde le résultat dans la forme d’origine.",
    "name": "Transformation matricielle",
    "params": {
     "alpha": {
@@ -4722,7 +5586,7 @@
      "label": "Remplissage"
     },
     "mask": {
-     "label": "Masquer au calque"
+     "label": "Limiter au calque"
     },
     "offset": {
      "label": "Décalage"
@@ -4914,6 +5778,13 @@
     },
     "threshold": {
      "label": "Seuil"
+    },
+    "match": {
+     "label": "Correspondance",
+     "options": [
+      "RGB",
+      "Chrominance"
+     ]
     }
    }
   },
@@ -4964,7 +5835,7 @@
    }
   },
   "rgbsplit": {
-   "description": "Sépare les canaux rouge, vert et bleu : le canal central reste en place et les deux autres se décalent en sens opposés selon l’angle. Clair additionne les couleurs décalées, Sombre les garde opaques, Masque ne conserve que leur intersection et Luminance rend les franges aussi opaques que lumineuses.",
+   "description": "Sépare les canaux rouge, vert et bleu : le canal choisi dans Centre reste en place et les deux autres se décalent en sens opposés selon l’Angle. Clair additionne les couleurs décalées, Sombre les garde opaques, Masque ne garde que les zones où les trois se superposent et Luminance rend les franges aussi opaques que lumineuses. Moyenne rend chaque point aussi opaque que la part des canaux qui le couvrent.",
    "name": "Séparation RGB",
    "params": {
     "angle": {
@@ -4984,7 +5855,8 @@
       "Clair",
       "Sombre",
       "Masque",
-      "Luminance"
+      "Luminance",
+      "Moyenne"
      ]
     },
     "strength": {
@@ -5492,6 +6364,13 @@
     },
     "outside": {
      "label": "Lueur externe"
+    },
+    "falloff": {
+     "label": "Atténuation",
+     "options": [
+      "Uniforme",
+      "Calque"
+     ]
     }
    }
   },
@@ -5585,6 +6464,59 @@
     },
     "shine": {
      "label": "Brillance"
+    },
+    "lighting": {
+     "label": "Éclairage",
+     "options": [
+      "Classique",
+      "Doux",
+      "Direct"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiant"
+    },
+    "lightHeight": {
+     "label": "Hauteur de la lumière"
+    },
+    "lightColor": {
+     "label": "Couleur de la lumière"
+    },
+    "glossiness": {
+     "label": "Netteté du reflet"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "Ajuster",
+      "Mosaïque",
+      "Étirer"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Répétition X"
+    },
+    "texRepeatY": {
+     "label": "Répétition Y"
+    },
+    "texMirror": {
+     "label": "Miroir"
+    },
+    "texAngle": {
+     "label": "Angle de la texture"
+    },
+    "texOffset": {
+     "label": "Décalage de la texture"
+    },
+    "texCrop": {
+     "label": "Recadrage de la texture"
+    },
+    "texAnchor": {
+     "label": "Ancrage de la texture",
+     "options": [
+      "Centre",
+      "Coin"
+     ]
     }
    }
   },
@@ -5732,11 +6664,18 @@
     },
     "threshold": {
      "label": "Seuil"
+    },
+    "grey": {
+     "label": "Gris",
+     "options": [
+      "HD",
+      "SD"
+     ]
     }
    }
   },
   "squeeze": {
-   "description": "Pince le centre du calque vers l’intérieur avec une intensité positive et le bombe vers l’extérieur avec une intensité négative. Ancien conserve la forme des projets plus anciens.",
+   "description": "Pince le milieu du calque vers l’intérieur quand l’Intensité est positive et le bombe vers l’extérieur quand elle est négative. Ancien conserve la forme des anciens projets. Sablier repousse aussi vers l’extérieur le milieu des bords haut et bas.",
    "name": "Pincement",
    "params": {
     "amount": {
@@ -5746,7 +6685,8 @@
      "label": "Forme",
      "options": [
       "Pincement/Bombement",
-      "Ancien"
+      "Ancien",
+      "Sablier"
      ]
     }
    }
@@ -5846,6 +6786,59 @@
     },
     "shine": {
      "label": "Brillance"
+    },
+    "lighting": {
+     "label": "Éclairage",
+     "options": [
+      "Classique",
+      "Doux",
+      "Direct"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiant"
+    },
+    "lightHeight": {
+     "label": "Hauteur de la lumière"
+    },
+    "lightColor": {
+     "label": "Couleur de la lumière"
+    },
+    "glossiness": {
+     "label": "Netteté du reflet"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "Ajuster",
+      "Mosaïque",
+      "Étirer"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Répétition X"
+    },
+    "texRepeatY": {
+     "label": "Répétition Y"
+    },
+    "texMirror": {
+     "label": "Miroir"
+    },
+    "texAngle": {
+     "label": "Angle de la texture"
+    },
+    "texOffset": {
+     "label": "Décalage de la texture"
+    },
+    "texCrop": {
+     "label": "Recadrage de la texture"
+    },
+    "texAnchor": {
+     "label": "Ancrage de la texture",
+     "options": [
+      "Centre",
+      "Coin"
+     ]
     }
    }
   },
@@ -5894,6 +6887,66 @@
     },
     "smoothing": {
      "label": "Lissage"
+    },
+    "starStyle": {
+     "label": "Style",
+     "options": [
+      "Plat",
+      "Pointu"
+     ]
+    },
+    "lighting": {
+     "label": "Éclairage",
+     "options": [
+      "Classique",
+      "Doux",
+      "Direct"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiant"
+    },
+    "lightHeight": {
+     "label": "Hauteur de la lumière"
+    },
+    "lightColor": {
+     "label": "Couleur de la lumière"
+    },
+    "glossiness": {
+     "label": "Netteté du reflet"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "Ajuster",
+      "Mosaïque",
+      "Étirer"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Répétition X"
+    },
+    "texRepeatY": {
+     "label": "Répétition Y"
+    },
+    "texMirror": {
+     "label": "Miroir"
+    },
+    "texAngle": {
+     "label": "Angle de la texture"
+    },
+    "texOffset": {
+     "label": "Décalage de la texture"
+    },
+    "texCrop": {
+     "label": "Recadrage de la texture"
+    },
+    "texAnchor": {
+     "label": "Ancrage de la texture",
+     "options": [
+      "Centre",
+      "Coin"
+     ]
     }
    }
   },
@@ -6065,7 +7118,9 @@
       "Robot",
       "Couinement",
       "Machine à écrire",
-      "Chiptune"
+      "Chiptune",
+      "Squelette",
+      "Son personnalisé"
      ]
     },
     "volume": {
@@ -6175,7 +7230,7 @@
      "label": "Début"
     },
     "unit": {
-     "label": "Selon",
+     "label": "Basé sur",
      "options": [
       "Caractère",
       "Mot",
@@ -6248,7 +7303,7 @@
    }
   },
   "textshake": {
-   "description": "Anime chaque lettre séparément, comme un dialogue nerveux dans un jeu. Tremblement oscille entre plusieurs positions, Saccades saute à une nouvelle position à chaque étape, Onde fait monter et descendre les lettres, Cercle les déplace en petites boucles et Oscillation les incline d’avant en arrière. Réduisez le nombre de lettres animées pour n’en faire trembler que certaines, choisies à nouveau au hasard régulièrement.",
+   "description": "Anime chaque lettre séparément, comme un dialogue nerveux dans un jeu. Tremblement oscille entre plusieurs positions, Saccade saute à une nouvelle position à chaque étape, Vague fait monter et descendre les lettres, Cercle les déplace en petites boucles et Oscillation les incline d’avant en arrière. Réduisez le nombre de lettres animées pour n’en faire trembler que certaines, choisies à nouveau au hasard régulièrement.",
    "name": "Tremblement du texte",
    "params": {
     "amount": {
@@ -6270,7 +7325,7 @@
      "label": "Rotation"
     },
     "seed": {
-     "label": "Seed"
+     "label": "Graine"
     },
     "speed": {
      "label": "Vitesse"
@@ -6285,7 +7340,7 @@
      "label": "Style",
      "options": [
       "Tremblement",
-      "Tremblement",
+      "Saccade",
       "Vague",
       "Cercle",
       "Oscillation"
@@ -6346,7 +7401,7 @@
      "label": "Échelle"
     },
     "seed": {
-     "label": "Seed"
+     "label": "Graine"
     },
     "shape": {
      "label": "Forme",
@@ -6416,7 +7471,7 @@
   },
   "tile": {
    "description": "Répète l'image en grille.",
-   "name": "Mosaïque",
+   "name": "Pavage",
    "params": {
     "mirror": {
      "label": "Miroir"
@@ -6439,6 +7494,13 @@
     "count": {
      "label": "Nombre"
     },
+    "edges": {
+     "label": "Bords",
+     "options": [
+      "Miroir",
+      "Transparent"
+     ]
+    },
     "offset": {
      "label": "Décalage"
     },
@@ -6448,8 +7510,11 @@
     "rotation": {
      "label": "Rotation"
     },
+    "screenSpace": {
+     "label": "Espace écran"
+    },
     "seed": {
-     "label": "Seed"
+     "label": "Graine"
     },
     "stretch": {
      "label": "Étirement"
@@ -6457,7 +7522,7 @@
    }
   },
   "tiles": {
-   "description": "Répète le calque pour remplir l'écran. Augmentez Recadrage pour obtenir de plus petits carreaux, avec miroir, décalage des rangées et rotation en option. Échelle classique conserve le rendu des anciens projets.",
+   "description": "Répète le calque pour remplir l’écran. Augmentez le Recadrage pour obtenir des carreaux plus petits, avec miroir, décalage des rangées et rotation en option. Échelle classique conserve le rendu des anciens projets. Dans les carreaux garde chaque carreau à la taille du calque, puis zoome et fait pivoter l’image à l’intérieur.",
    "name": "Carreaux",
    "params": {
     "angle": {
@@ -6473,7 +7538,8 @@
      "label": "Dimensionnement",
      "options": [
       "Recadrage",
-      "Échelle classique"
+      "Échelle classique",
+      "Dans les carreaux"
      ]
     },
     "vertical": {
@@ -6494,11 +7560,21 @@
     "count": {
      "label": "Nombre"
     },
+    "edges": {
+     "label": "Bords",
+     "options": [
+      "Miroir",
+      "Transparent"
+     ]
+    },
     "offset": {
      "label": "Décalage"
     },
+    "screenSpace": {
+     "label": "Espace écran"
+    },
     "seed": {
-     "label": "Seed"
+     "label": "Graine"
     },
     "strength": {
      "label": "Force"
@@ -6598,6 +7674,59 @@
     },
     "thickness": {
      "label": "Épaisseur"
+    },
+    "lighting": {
+     "label": "Éclairage",
+     "options": [
+      "Classique",
+      "Doux",
+      "Direct"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiant"
+    },
+    "lightHeight": {
+     "label": "Hauteur de la lumière"
+    },
+    "lightColor": {
+     "label": "Couleur de la lumière"
+    },
+    "glossiness": {
+     "label": "Netteté du reflet"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "Ajuster",
+      "Mosaïque",
+      "Étirer"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Répétition X"
+    },
+    "texRepeatY": {
+     "label": "Répétition Y"
+    },
+    "texMirror": {
+     "label": "Miroir"
+    },
+    "texAngle": {
+     "label": "Angle de la texture"
+    },
+    "texOffset": {
+     "label": "Décalage de la texture"
+    },
+    "texCrop": {
+     "label": "Recadrage de la texture"
+    },
+    "texAnchor": {
+     "label": "Ancrage de la texture",
+     "options": [
+      "Centre",
+      "Coin"
+     ]
     }
    }
   },
@@ -6692,7 +7821,7 @@
      "label": "Échelle"
     },
     "seed": {
-     "label": "Seed"
+     "label": "Graine"
     },
     "stretch": {
      "label": "Étirement"
@@ -6732,18 +7861,21 @@
      "label": "Échelle"
     },
     "seed": {
-     "label": "Seed"
+     "label": "Graine"
     },
     "strength": {
      "label": "Force"
     },
     "stretch": {
      "label": "Étirement"
+    },
+    "screenSpace": {
+     "label": "Espace écran"
     }
    }
   },
   "twirl": {
-   "description": "Tord le calque autour du centre comme un tourbillon, avec un effet maximal au milieu qui s'estompe jusqu'au rayon (une part de la taille du calque). Une force négative tord dans l'autre sens.",
+   "description": "Tord le calque autour du Centre comme un tourbillon, plus fort au milieu et de plus en plus faible jusqu’au Rayon (une part de la taille du calque). Une Force négative tord dans l’autre sens. Avec Mesurer sur Écran, Rayon devient une part de l’écran et la torsion s’estompe en douceur.",
    "name": "Tourbillon",
    "params": {
     "center": {
@@ -6754,11 +7886,18 @@
     },
     "strength": {
      "label": "Force"
+    },
+    "reach": {
+     "label": "Mesurer sur",
+     "options": [
+      "Calque",
+      "Écran"
+     ]
     }
    }
   },
   "unsharpmask": {
-   "description": "Accentue la netteté en rajoutant la différence entre le calque et une copie floutée. La force définit l'étendue du flou, l'intensité la quantité rajoutée, et un seuil supérieur à 50 % ignore les petites différences.",
+   "description": "Accentue la netteté en rajoutant la différence entre le calque et une copie floutée de celui-ci. Force règle la largeur du flou, Intensité la quantité rajoutée, et un Seuil au-dessus de 50 % laisse de côté les petites différences. Avec Couleur du masque sur Rouge, le masque s’affiche en rouge là où la luminosité diffère de la copie floutée de plus que la part du Seuil au-delà de 50 %.",
    "name": "Masque flou",
    "params": {
     "amount": {
@@ -6772,6 +7911,13 @@
     },
     "threshold": {
      "label": "Seuil"
+    },
+    "maskColor": {
+     "label": "Couleur du masque",
+     "options": [
+      "Gris",
+      "Rouge"
+     ]
     }
    }
   },
@@ -6795,7 +7941,7 @@
      "label": "Lignes de balayage"
     },
     "seed": {
-     "label": "Seed"
+     "label": "Graine"
     },
     "smear": {
      "label": "Étalement"
@@ -6867,6 +8013,19 @@
     },
     "yaw": {
      "label": "Lacet"
+    },
+    "projection": {
+     "label": "Sortie",
+     "options": [
+      "Vue",
+      "Panorama"
+     ]
+    },
+    "eyeDistance": {
+     "label": "Distance"
+    },
+    "frame": {
+     "label": "Format du cadre"
     }
    }
   },
@@ -6927,12 +8086,12 @@
      "label": "Échelle"
     },
     "seed": {
-     "label": "Seed"
+     "label": "Graine"
     }
    }
   },
   "wavewarp": {
-   "description": "Courbe le calque avec une onde sinusoïdale : l'espacement définit le nombre d'ondes qui le traversent, l'amplitude leur force de poussée, l'angle la direction des ondes et l'angle de déformation la direction de la poussée.",
+   "description": "Courbe le calque avec une onde sinusoïdale : Espacement règle le nombre d’ondes qui le traversent, Amplitude leur force de poussée, Angle la direction des ondes et Angle de déformation la direction de la poussée. Espace écran dimensionne les ondes d’après l’écran plutôt que d’après le calque. Amplitude croisée ajoute une seconde onde, dimensionnée par l’Espacement croisé, qui suit l’Angle de déformation et pousse selon l’Angle. Avec Origine sur Coin bas gauche de l’écran, les ondes sont mesurées depuis ce coin d’après le petit côté de l’écran, puis Phase les fait glisser.",
    "name": "Déformation ondulatoire",
    "params": {
     "angle": {
@@ -6952,6 +8111,22 @@
     },
     "warpAngle": {
      "label": "Angle de déformation"
+    },
+    "screenSpace": {
+     "label": "Espace écran"
+    },
+    "crossSpacing": {
+     "label": "Espacement croisé"
+    },
+    "crossMagnitude": {
+     "label": "Amplitude croisée"
+    },
+    "origin": {
+     "label": "Origine",
+     "options": [
+      "Coin du calque",
+      "Coin bas gauche de l’écran"
+     ]
     }
    }
   },

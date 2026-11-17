@@ -80,7 +80,7 @@
   },
   "autoshake": {
    "description": "Sposta il livello in modo casuale nel tempo entro i limiti impostati.",
-   "name": "Oscillazione automatica",
+   "name": "Scuotimento automatico",
    "params": {
     "angle": {
      "label": "Angolo"
@@ -108,7 +108,7 @@
      "label": "Elasticità"
     },
     "zshake": {
-     "label": "Oscillazione Z"
+     "label": "Scuotimento Z"
     }
    }
   },
@@ -335,7 +335,7 @@
   },
   "beatshake": {
    "description": "A ogni battito scuote il livello in una nuova direzione e lo stabilizza prima del successivo. Seleziona la clip musicale, apri il suo menu e tocca prima Segna battiti; senza indicatori di battito usa l’impostazione BPM.",
-   "name": "Oscillazione a ritmo",
+   "name": "Scuotimento a ritmo",
    "params": {
     "beats": {
      "label": "Battiti",
@@ -497,11 +497,18 @@
    }
   },
   "blur": {
-   "description": "Una sfocatura morbida e uniforme.",
+   "description": "Una sfocatura morbida e uniforme. Con Forma su Riquadro calcola invece la media di un quadrato uniforme attorno a ogni punto.",
    "name": "Sfocatura",
    "params": {
     "strength": {
      "label": "Intensità"
+    },
+    "shape": {
+     "label": "Forma",
+     "options": [
+      "Morbida",
+      "Riquadro"
+     ]
     }
    }
   },
@@ -547,6 +554,59 @@
     },
     "width": {
      "label": "Larghezza"
+    },
+    "lighting": {
+     "label": "Illuminazione",
+     "options": [
+      "Classica",
+      "Morbida",
+      "Diretta"
+     ]
+    },
+    "ambient": {
+     "label": "Luce ambientale"
+    },
+    "lightHeight": {
+     "label": "Altezza luce"
+    },
+    "lightColor": {
+     "label": "Colore luce"
+    },
+    "glossiness": {
+     "label": "Lucidità"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "Adatta",
+      "Affianca",
+      "Estendi"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Ripetizioni X"
+    },
+    "texRepeatY": {
+     "label": "Ripetizioni Y"
+    },
+    "texMirror": {
+     "label": "Specchia"
+    },
+    "texAngle": {
+     "label": "Angolo texture"
+    },
+    "texOffset": {
+     "label": "Scostamento texture"
+    },
+    "texCrop": {
+     "label": "Ritaglio texture"
+    },
+    "texAnchor": {
+     "label": "Ancoraggio texture",
+     "options": [
+      "Centro",
+      "Angolo"
+     ]
     }
    }
   },
@@ -570,7 +630,7 @@
    }
   },
   "bulge": {
-   "description": "Gonfia il livello come una lente (Intensità positiva) o lo contrae verso il Centro (negativa) entro un cerchio il cui Raggio è una frazione della dimensione del livello.",
+   "description": "Gonfia il livello come una lente (Intensità positiva) o lo contrae verso il Centro (negativa) entro un cerchio il cui Raggio è una frazione della dimensione del livello. Con Misura su Schermo il Raggio è una frazione dello schermo. Con Attenuazione su Morbida la lente si fonde più dolcemente con il resto del livello.",
    "name": "Contrazione e rigonfiamento",
    "params": {
     "amount": {
@@ -581,6 +641,20 @@
     },
     "radius": {
      "label": "Raggio"
+    },
+    "reach": {
+     "label": "Misura su",
+     "options": [
+      "Livello",
+      "Schermo"
+     ]
+    },
+    "curve": {
+     "label": "Attenuazione",
+     "options": [
+      "Classica",
+      "Morbida"
+     ]
     }
    }
   },
@@ -781,7 +855,7 @@
    }
   },
   "circularripple": {
-   "description": "Crea increspature circolari da un punto, come una goccia nell'acqua.",
+   "description": "Crea increspature circolari che si allargano da un punto, come una goccia che cade nell'acqua. Con Misura su Schermo i valori di Frequenza, Intensità e Raggio si riferiscono allo schermo invece che al livello.",
    "name": "Increspatura circolare",
    "params": {
     "center": {
@@ -801,6 +875,13 @@
     },
     "strength": {
      "label": "Intensità"
+    },
+    "reach": {
+     "label": "Misura su",
+     "options": [
+      "Livello",
+      "Schermo"
+     ]
     }
    }
   },
@@ -813,6 +894,9 @@
     },
     "color2": {
      "label": "Colore 2"
+    },
+    "contrast": {
+     "label": "Contrasto"
     },
     "intensity": {
      "label": "Intensità"
@@ -855,6 +939,13 @@
     },
     "strength": {
      "label": "Intensità"
+    },
+    "style": {
+     "label": "Stile",
+     "options": [
+      "Classico",
+      "Netto"
+     ]
     }
    }
   },
@@ -965,6 +1056,16 @@
     },
     "fill": {
      "label": "Riempimento"
+    },
+    "spread": {
+     "label": "Diffusione",
+     "options": [
+      "Sfocatura",
+      "Distanza"
+     ]
+    },
+    "offset": {
+     "label": "Scostamento"
     }
    }
   },
@@ -992,6 +1093,16 @@
     },
     "width": {
      "label": "Larghezza"
+    },
+    "spread": {
+     "label": "Diffusione",
+     "options": [
+      "Sfocatura",
+      "Distanza"
+     ]
+    },
+    "offset": {
+     "label": "Scostamento"
     }
    }
   },
@@ -1041,6 +1152,13 @@
     },
     "thickness": {
      "label": "Spessore"
+    },
+    "style": {
+     "label": "Stile",
+     "options": [
+      "Classico",
+      "Sovrapposto"
+     ]
     }
    }
   },
@@ -1141,6 +1259,62 @@
     },
     "thickness": {
      "label": "Spessore"
+    },
+    "keep": {
+     "label": "Mantieni livello"
+    },
+    "lighting": {
+     "label": "Illuminazione",
+     "options": [
+      "Classica",
+      "Morbida",
+      "Diretta"
+     ]
+    },
+    "ambient": {
+     "label": "Luce ambientale"
+    },
+    "lightHeight": {
+     "label": "Altezza luce"
+    },
+    "lightColor": {
+     "label": "Colore luce"
+    },
+    "glossiness": {
+     "label": "Lucidità"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "Adatta",
+      "Affianca",
+      "Estendi"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Ripetizioni X"
+    },
+    "texRepeatY": {
+     "label": "Ripetizioni Y"
+    },
+    "texMirror": {
+     "label": "Specchia"
+    },
+    "texAngle": {
+     "label": "Angolo texture"
+    },
+    "texOffset": {
+     "label": "Scostamento texture"
+    },
+    "texCrop": {
+     "label": "Ritaglio texture"
+    },
+    "texAnchor": {
+     "label": "Ancoraggio texture",
+     "options": [
+      "Centro",
+      "Angolo"
+     ]
     }
    }
   },
@@ -1180,6 +1354,59 @@
     },
     "smoothing": {
      "label": "Uniformità"
+    },
+    "lighting": {
+     "label": "Illuminazione",
+     "options": [
+      "Classica",
+      "Morbida",
+      "Diretta"
+     ]
+    },
+    "ambient": {
+     "label": "Luce ambientale"
+    },
+    "lightHeight": {
+     "label": "Altezza luce"
+    },
+    "lightColor": {
+     "label": "Colore luce"
+    },
+    "glossiness": {
+     "label": "Lucidità"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "Adatta",
+      "Affianca",
+      "Estendi"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Ripetizioni X"
+    },
+    "texRepeatY": {
+     "label": "Ripetizioni Y"
+    },
+    "texMirror": {
+     "label": "Specchia"
+    },
+    "texAngle": {
+     "label": "Angolo texture"
+    },
+    "texOffset": {
+     "label": "Scostamento texture"
+    },
+    "texCrop": {
+     "label": "Ritaglio texture"
+    },
+    "texAnchor": {
+     "label": "Ancoraggio texture",
+     "options": [
+      "Centro",
+      "Angolo"
+     ]
     }
    }
   },
@@ -1251,6 +1478,59 @@
     },
     "smoothing": {
      "label": "Uniformità"
+    },
+    "lighting": {
+     "label": "Illuminazione",
+     "options": [
+      "Classica",
+      "Morbida",
+      "Diretta"
+     ]
+    },
+    "ambient": {
+     "label": "Luce ambientale"
+    },
+    "lightHeight": {
+     "label": "Altezza luce"
+    },
+    "lightColor": {
+     "label": "Colore luce"
+    },
+    "glossiness": {
+     "label": "Lucidità"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "Adatta",
+      "Affianca",
+      "Estendi"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Ripetizioni X"
+    },
+    "texRepeatY": {
+     "label": "Ripetizioni Y"
+    },
+    "texMirror": {
+     "label": "Specchia"
+    },
+    "texAngle": {
+     "label": "Angolo texture"
+    },
+    "texOffset": {
+     "label": "Scostamento texture"
+    },
+    "texCrop": {
+     "label": "Ritaglio texture"
+    },
+    "texAnchor": {
+     "label": "Ancoraggio texture",
+     "options": [
+      "Centro",
+      "Angolo"
+     ]
     }
    }
   },
@@ -1369,7 +1649,7 @@
    }
   },
   "directionalblur": {
-   "description": "Crea una sfocatura di movimento calcolando la media di campioni lungo una direzione.",
+   "description": "Crea una sfocatura di movimento calcolando la media di campioni lungo una direzione. Con Diffusione su Entrambi i lati la sfocatura si estende in modo uguale in avanti e all'indietro.",
    "name": "Sfocatura direzionale",
    "params": {
     "angle": {
@@ -1377,6 +1657,13 @@
     },
     "blurLength": {
      "label": "Lunghezza"
+    },
+    "spread": {
+     "label": "Diffusione",
+     "options": [
+      "Un lato",
+      "Entrambi i lati"
+     ]
     }
    }
   },
@@ -1571,6 +1858,22 @@
    "params": {
     "strength": {
      "label": "Intensità"
+    },
+    "style": {
+     "label": "Stile",
+     "options": [
+      "Classico",
+      "Inchiostro"
+     ]
+    },
+    "spacing": {
+     "label": "Levigatura"
+    },
+    "threshold": {
+     "label": "Soglia"
+    },
+    "invert": {
+     "label": "Inverti"
     }
    }
   },
@@ -1613,6 +1916,9 @@
     },
     "tintColor": {
      "label": "Colore tinta"
+    },
+    "mask": {
+     "label": "Maschera sul livello"
     }
    }
   },
@@ -1682,6 +1988,13 @@
     },
     "thickness": {
      "label": "Spessore"
+    },
+    "contourStyle": {
+     "label": "Stile",
+     "options": [
+      "Classico",
+      "Linee sottili"
+     ]
     }
    }
   },
@@ -1724,6 +2037,59 @@
     },
     "squeezeRatio": {
      "label": "Compressione"
+    },
+    "lighting": {
+     "label": "Illuminazione",
+     "options": [
+      "Classica",
+      "Morbida",
+      "Diretta"
+     ]
+    },
+    "ambient": {
+     "label": "Luce ambientale"
+    },
+    "lightHeight": {
+     "label": "Altezza luce"
+    },
+    "lightColor": {
+     "label": "Colore luce"
+    },
+    "glossiness": {
+     "label": "Lucidità"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "Adatta",
+      "Affianca",
+      "Estendi"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Ripetizioni X"
+    },
+    "texRepeatY": {
+     "label": "Ripetizioni Y"
+    },
+    "texMirror": {
+     "label": "Specchia"
+    },
+    "texAngle": {
+     "label": "Angolo texture"
+    },
+    "texOffset": {
+     "label": "Scostamento texture"
+    },
+    "texCrop": {
+     "label": "Ritaglio texture"
+    },
+    "texAnchor": {
+     "label": "Ancoraggio texture",
+     "options": [
+      "Centro",
+      "Angolo"
+     ]
     }
    }
   },
@@ -1982,6 +2348,65 @@
     },
     "shine": {
      "label": "Lucentezza"
+    },
+    "lighting": {
+     "label": "Illuminazione",
+     "options": [
+      "Classica",
+      "Morbida",
+      "Diretta"
+     ]
+    },
+    "ambient": {
+     "label": "Luce ambientale"
+    },
+    "lightHeight": {
+     "label": "Altezza luce"
+    },
+    "lightColor": {
+     "label": "Colore luce"
+    },
+    "glossiness": {
+     "label": "Lucidità"
+    },
+    "pivot": {
+     "label": "Perno"
+    },
+    "pivotDepth": {
+     "label": "Profondità perno"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "Adatta",
+      "Affianca",
+      "Estendi"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Ripetizioni X"
+    },
+    "texRepeatY": {
+     "label": "Ripetizioni Y"
+    },
+    "texMirror": {
+     "label": "Specchia"
+    },
+    "texAngle": {
+     "label": "Angolo texture"
+    },
+    "texOffset": {
+     "label": "Scostamento texture"
+    },
+    "texCrop": {
+     "label": "Ritaglio texture"
+    },
+    "texAnchor": {
+     "label": "Ancoraggio texture",
+     "options": [
+      "Centro",
+      "Angolo"
+     ]
     }
    }
   },
@@ -2047,6 +2472,13 @@
     },
     "softness": {
      "label": "Morbidezza"
+    },
+    "falloff": {
+     "label": "Attenuazione",
+     "options": [
+      "Distanza",
+      "Morbida"
+     ]
     }
    }
   },
@@ -2116,6 +2548,13 @@
     },
     "strength": {
      "label": "Intensità"
+    },
+    "screenSize": {
+     "label": "Dimensione in base a",
+     "options": [
+      "Livello",
+      "Schermo"
+     ]
     }
    }
   },
@@ -2198,7 +2637,7 @@
    }
   },
   "glass": {
-   "description": "Trasforma la forma del livello in vetro smussato che rifrange i livelli retrostanti, con un riflesso lungo il bordo.",
+   "description": "Trasforma la forma del livello in vetro smussato che rifrange i livelli retrostanti, con un riflesso lungo il bordo. Con Luce su Morbida mostra il livello in base a Riempimento e illumina il vetro con Colore, più intensamente lungo il bordo interno dello smusso rivolto verso la luce.",
    "name": "Vetro",
    "params": {
     "angle": {
@@ -2210,8 +2649,18 @@
     "color": {
      "label": "Colore"
     },
+    "fill": {
+     "label": "Riempimento"
+    },
     "highlight": {
      "label": "Riflesso"
+    },
+    "light": {
+     "label": "Luce",
+     "options": [
+      "Bordo",
+      "Morbida"
+     ]
     },
     "refraction": {
      "label": "Rifrazione"
@@ -2326,6 +2775,13 @@
     },
     "scaleBrightness": {
      "label": "Scala luminosità"
+    },
+    "style": {
+     "label": "Stile",
+     "options": [
+      "Sfumatura",
+      "Spettro"
+     ]
     }
    }
   },
@@ -2401,6 +2857,14 @@
     },
     "offset": {
      "label": "Scostamento"
+    },
+    "origin": {
+     "label": "Origine",
+     "options": [
+      "Centro",
+      "Angolo del livello",
+      "Angolo dello schermo"
+     ]
     },
     "punch": {
      "label": "Ritaglia"
@@ -2606,6 +3070,59 @@
     },
     "smoothing": {
      "label": "Smussatura"
+    },
+    "lighting": {
+     "label": "Illuminazione",
+     "options": [
+      "Classica",
+      "Morbida",
+      "Diretta"
+     ]
+    },
+    "ambient": {
+     "label": "Luce ambientale"
+    },
+    "lightHeight": {
+     "label": "Altezza luce"
+    },
+    "lightColor": {
+     "label": "Colore luce"
+    },
+    "glossiness": {
+     "label": "Lucidità"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "Adatta",
+      "Affianca",
+      "Estendi"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Ripetizioni X"
+    },
+    "texRepeatY": {
+     "label": "Ripetizioni Y"
+    },
+    "texMirror": {
+     "label": "Specchia"
+    },
+    "texAngle": {
+     "label": "Angolo texture"
+    },
+    "texOffset": {
+     "label": "Scostamento texture"
+    },
+    "texCrop": {
+     "label": "Ritaglio texture"
+    },
+    "texAnchor": {
+     "label": "Ancoraggio texture",
+     "options": [
+      "Centro",
+      "Angolo"
+     ]
     }
    }
   },
@@ -2661,11 +3178,33 @@
     "angle": {
      "label": "Angolo"
     },
+    "crop": {
+     "label": "Ritaglio"
+    },
+    "fit": {
+     "label": "Immagine",
+     "options": [
+      "Intera",
+      "In ogni tessera"
+     ]
+    },
+    "mask": {
+     "label": "Maschera sul livello"
+    },
     "mirror": {
      "label": "Specchio"
     },
+    "offset": {
+     "label": "Scostamento"
+    },
     "scale": {
      "label": "Scala"
+    },
+    "screenSpace": {
+     "label": "Spazio schermo"
+    },
+    "stretch": {
+     "label": "Allungamento"
     }
    }
   },
@@ -2769,6 +3308,59 @@
     },
     "smoothing": {
      "label": "Smussatura"
+    },
+    "lighting": {
+     "label": "Illuminazione",
+     "options": [
+      "Classica",
+      "Morbida",
+      "Diretta"
+     ]
+    },
+    "ambient": {
+     "label": "Luce ambientale"
+    },
+    "lightHeight": {
+     "label": "Altezza luce"
+    },
+    "lightColor": {
+     "label": "Colore luce"
+    },
+    "glossiness": {
+     "label": "Lucidità"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "Adatta",
+      "Affianca",
+      "Estendi"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Ripetizioni X"
+    },
+    "texRepeatY": {
+     "label": "Ripetizioni Y"
+    },
+    "texMirror": {
+     "label": "Specchia"
+    },
+    "texAngle": {
+     "label": "Angolo texture"
+    },
+    "texOffset": {
+     "label": "Scostamento texture"
+    },
+    "texCrop": {
+     "label": "Ritaglio texture"
+    },
+    "texAnchor": {
+     "label": "Ancoraggio texture",
+     "options": [
+      "Centro",
+      "Angolo"
+     ]
     }
    }
   },
@@ -2839,6 +3431,59 @@
     },
     "width": {
      "label": "Larghezza"
+    },
+    "lighting": {
+     "label": "Illuminazione",
+     "options": [
+      "Classica",
+      "Morbida",
+      "Diretta"
+     ]
+    },
+    "ambient": {
+     "label": "Luce ambientale"
+    },
+    "lightHeight": {
+     "label": "Altezza luce"
+    },
+    "lightColor": {
+     "label": "Colore luce"
+    },
+    "glossiness": {
+     "label": "Lucidità"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "Adatta",
+      "Affianca",
+      "Estendi"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Ripetizioni X"
+    },
+    "texRepeatY": {
+     "label": "Ripetizioni Y"
+    },
+    "texMirror": {
+     "label": "Specchia"
+    },
+    "texAngle": {
+     "label": "Angolo texture"
+    },
+    "texOffset": {
+     "label": "Scostamento texture"
+    },
+    "texCrop": {
+     "label": "Ritaglio texture"
+    },
+    "texAnchor": {
+     "label": "Ancoraggio texture",
+     "options": [
+      "Centro",
+      "Angolo"
+     ]
     }
    }
   },
@@ -2964,7 +3609,8 @@
      "label": "Stile",
      "options": [
       "Classico",
-      "Mantieni luminosità"
+      "Mantieni luminosità",
+      "Video"
      ]
     },
     "vibrance": {
@@ -3002,6 +3648,23 @@
     },
     "intensity": {
      "label": "Intensità"
+    },
+    "blend": {
+     "label": "Fusione",
+     "options": [
+      "Scolora",
+      "Normale"
+     ]
+    },
+    "opacity": {
+     "label": "Opacità"
+    },
+    "corners": {
+     "label": "Angoli",
+     "options": [
+      "Arrotondati",
+      "Squadrati"
+     ]
     }
    }
   },
@@ -3068,6 +3731,13 @@
     "center": {
      "label": "Centro"
     },
+    "direction": {
+     "label": "Direzione",
+     "options": [
+      "Senso orario",
+      "Senso antiorario"
+     ]
+    },
     "mirror": {
      "label": "Specchio"
     },
@@ -3077,9 +3747,16 @@
    }
   },
   "lensblur": {
-   "description": "Una sfocatura rotante che lascia nitida un'area intorno al centro e aumenta verso i bordi.",
+   "description": "Una sfocatura rotante che lascia nitida un'area intorno al centro e aumenta verso i bordi. Con Sfocatura su Zoom sfuma invece verso l'esterno dal centro, oltre i bordi del livello.",
    "name": "Sfocatura lente",
    "params": {
+    "blur": {
+     "label": "Sfocatura",
+     "options": [
+      "Rotazione",
+      "Zoom"
+     ]
+    },
     "center": {
      "label": "Centro"
     },
@@ -3154,6 +3831,12 @@
     },
     "threshold": {
      "label": "Soglia"
+    },
+    "soften": {
+     "label": "Ammorbidimento"
+    },
+    "mask": {
+     "label": "Maschera sul livello"
     }
    }
   },
@@ -3257,7 +3940,7 @@
    }
   },
   "linearstreaks": {
-   "description": "Crea scie dritte spostando copie del livello lungo un angolo e fondendole dove si sovrappongono.",
+   "description": "Crea scie dritte spostando copie del livello lungo un angolo e fondendole dove si sovrappongono. Con Fusione su Nessuna il livello resta com'è. Con Copie su Ogni pixel mette una copia su ogni pixel di Lunghezza invece di 48 distribuite lungo di essa.",
    "name": "Scie lineari",
    "params": {
     "alpha": {
@@ -3274,11 +3957,19 @@
      "options": [
       "Schiarisci",
       "Media",
-      "Scurisci"
+      "Scurisci",
+      "Nessuna"
      ]
     },
     "reach": {
      "label": "Lunghezza"
+    },
+    "copies": {
+     "label": "Copie",
+     "options": [
+      "Distanziate",
+      "Ogni pixel"
+     ]
     }
    }
   },
@@ -3333,6 +4024,12 @@
     },
     "solidity": {
      "label": "Compattezza"
+    },
+    "fill": {
+     "label": "Riempimento"
+    },
+    "samples": {
+     "label": "Campioni"
     }
    }
   },
@@ -3348,6 +4045,9 @@
     },
     "threshold": {
      "label": "Soglia"
+    },
+    "high": {
+     "label": "Soglia alta"
     }
    }
   },
@@ -3472,6 +4172,13 @@
    "description": "Divide il livello in quadrati e riempie ciascuno con il proprio colore medio.",
    "name": "Mosaico",
    "params": {
+    "average": {
+     "label": "Media",
+     "options": [
+      "Cella",
+      "Angolo"
+     ]
+    },
     "count": {
      "label": "Numero"
     },
@@ -3594,6 +4301,59 @@
     },
     "shine": {
      "label": "Lucentezza"
+    },
+    "lighting": {
+     "label": "Illuminazione",
+     "options": [
+      "Classica",
+      "Morbida",
+      "Diretta"
+     ]
+    },
+    "ambient": {
+     "label": "Luce ambientale"
+    },
+    "lightHeight": {
+     "label": "Altezza luce"
+    },
+    "lightColor": {
+     "label": "Colore luce"
+    },
+    "glossiness": {
+     "label": "Lucidità"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "Adatta",
+      "Affianca",
+      "Estendi"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Ripetizioni X"
+    },
+    "texRepeatY": {
+     "label": "Ripetizioni Y"
+    },
+    "texMirror": {
+     "label": "Specchia"
+    },
+    "texAngle": {
+     "label": "Angolo texture"
+    },
+    "texOffset": {
+     "label": "Scostamento texture"
+    },
+    "texCrop": {
+     "label": "Ritaglio texture"
+    },
+    "texAnchor": {
+     "label": "Ancoraggio texture",
+     "options": [
+      "Centro",
+      "Angolo"
+     ]
     }
    }
   },
@@ -4144,6 +4904,13 @@
     "blockSize": {
      "label": "Dimensione"
     },
+    "edges": {
+     "label": "Bordi",
+     "options": [
+      "Specchia",
+      "Trasparente"
+     ]
+    },
     "offset": {
      "label": "Scostamento"
     },
@@ -4244,7 +5011,7 @@
    }
   },
   "polar": {
-   "description": "Piega il livello attorno al suo centro trasformando le linee rette in cerchi, o svolge i cerchi in linee rette.",
+   "description": "Piega il livello attorno al suo centro trasformando le linee rette in cerchi, o svolge i cerchi in linee rette. Disposizione sceglie quale bordo del livello si unisce al centro.",
    "name": "Coordinate polari",
    "params": {
     "amount": {
@@ -4255,6 +5022,13 @@
      "options": [
       "Da rettangolare a polare",
       "Da polare a rettangolare"
+     ]
+    },
+    "middle": {
+     "label": "Disposizione",
+     "options": [
+      "Bordo superiore al centro",
+      "Bordo inferiore al centro"
      ]
     }
    }
@@ -4293,9 +5067,9 @@
      "label": "Bordi",
      "options": [
       "Ripeti",
-      "Specchio",
+      "Specchia",
       "Trasparente",
-      "Tessera"
+      "Affianca"
      ]
     },
     "fromCenter": {
@@ -4448,11 +5222,64 @@
     },
     "shine": {
      "label": "Lucentezza"
+    },
+    "lighting": {
+     "label": "Illuminazione",
+     "options": [
+      "Classica",
+      "Morbida",
+      "Diretta"
+     ]
+    },
+    "ambient": {
+     "label": "Luce ambientale"
+    },
+    "lightHeight": {
+     "label": "Altezza luce"
+    },
+    "lightColor": {
+     "label": "Colore luce"
+    },
+    "glossiness": {
+     "label": "Lucidità"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "Adatta",
+      "Affianca",
+      "Estendi"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Ripetizioni X"
+    },
+    "texRepeatY": {
+     "label": "Ripetizioni Y"
+    },
+    "texMirror": {
+     "label": "Specchia"
+    },
+    "texAngle": {
+     "label": "Angolo texture"
+    },
+    "texOffset": {
+     "label": "Scostamento texture"
+    },
+    "texCrop": {
+     "label": "Ritaglio texture"
+    },
+    "texAnchor": {
+     "label": "Ancoraggio texture",
+     "options": [
+      "Centro",
+      "Angolo"
+     ]
     }
    }
   },
   "radialblur": {
-   "description": "Applica una sfocatura zoom radiale con intensità regolabile, calcolando la media dei campioni lungo i raggi da un punto centrale.",
+   "description": "Applica una sfocatura zoom radiale con intensità regolabile, calcolando la media dei campioni lungo i raggi che partono da un punto centrale. Con Lunghezza su Uniforme tutte le scie hanno la stessa lunghezza invece di crescere con la distanza dal centro.",
    "name": "Sfocatura zoom",
    "params": {
     "amount": {
@@ -4460,6 +5287,13 @@
     },
     "center": {
      "label": "Centro"
+    },
+    "streak": {
+     "label": "Lunghezza",
+     "options": [
+      "In base alla distanza",
+      "Uniforme"
+     ]
     }
    }
   },
@@ -4586,11 +5420,14 @@
     },
     "reach": {
      "label": "Lunghezza"
+    },
+    "fill": {
+     "label": "Riempimento"
     }
    }
   },
   "radialwipe": {
-   "description": "Nasconde uno spicchio del livello attorno al Centro partendo dall’Angolo iniziale, come una lancetta. Avanzamento determina l’angolo percorso, Numero ripete lo spicchio nel cerchio ed Entrambe procede nei due sensi. Anima Avanzamento per creare una transizione.",
+   "description": "Nasconde uno spicchio del livello che ruota attorno al Centro partendo dall'Angolo iniziale, come una lancetta. Avanzamento è l'angolo percorso, Numero ripete lo spicchio lungo il cerchio ed Entrambe lo fa avanzare nei due sensi. Anima Avanzamento per creare una transizione. Con Spicchi su Esatti, Numero mantiene i decimali, quindi l'ultimo spicchio è più stretto, e Sfumatura ammorbidisce entrambi i lati di ogni spicchio.",
    "name": "Tendina radiale",
    "params": {
     "center": {
@@ -4615,6 +5452,13 @@
     },
     "start": {
      "label": "Angolo iniziale"
+    },
+    "wedges": {
+     "label": "Spicchi",
+     "options": [
+      "Interi",
+      "Esatti"
+     ]
     }
    }
   },
@@ -4699,6 +5543,26 @@
     },
     "shine": {
      "label": "Lucentezza"
+    },
+    "lighting": {
+     "label": "Illuminazione",
+     "options": [
+      "Classica",
+      "Morbida",
+      "Diretta"
+     ]
+    },
+    "ambient": {
+     "label": "Luce ambientale"
+    },
+    "lightHeight": {
+     "label": "Altezza luce"
+    },
+    "lightColor": {
+     "label": "Colore luce"
+    },
+    "glossiness": {
+     "label": "Lucidità"
     }
    },
    "shortcuts": {
@@ -4914,6 +5778,13 @@
     },
     "threshold": {
      "label": "Soglia"
+    },
+    "match": {
+     "label": "Corrispondenza",
+     "options": [
+      "RGB",
+      "Crominanza"
+     ]
     }
    }
   },
@@ -4964,7 +5835,7 @@
    }
   },
   "rgbsplit": {
-   "description": "Separa i canali rosso, verde e blu: il canale Centro resta fermo e gli altri due si spostano in direzioni opposte lungo l'angolo. Chiaro somma i colori spostati, Scuro li mantiene pieni, Maschera tiene solo dove tutti e tre si sovrappongono e Luma rende le frange tanto opache quanto sono luminose.",
+   "description": "Separa i canali rosso, verde e blu: il canale scelto in Centro resta fermo e gli altri due si spostano in direzioni opposte lungo Angolo. Chiaro somma i colori spostati, Scuro li mantiene pieni, Maschera tiene solo le zone in cui si sovrappongono tutti e tre e Luma rende le frange tanto opache quanto sono luminose. Media rende ogni punto tanto opaco quanto la quota di canali che lo coprono.",
    "name": "Separazione RGB",
    "params": {
     "angle": {
@@ -4984,7 +5855,8 @@
       "Chiaro",
       "Scuro",
       "Maschera",
-      "Luma"
+      "Luma",
+      "Media"
      ]
     },
     "strength": {
@@ -5492,6 +6364,13 @@
     },
     "outside": {
      "label": "Bagliore esterno"
+    },
+    "falloff": {
+     "label": "Attenuazione",
+     "options": [
+      "Uniforme",
+      "Livello"
+     ]
     }
    }
   },
@@ -5585,6 +6464,59 @@
     },
     "shine": {
      "label": "Lucentezza"
+    },
+    "lighting": {
+     "label": "Illuminazione",
+     "options": [
+      "Classica",
+      "Morbida",
+      "Diretta"
+     ]
+    },
+    "ambient": {
+     "label": "Luce ambientale"
+    },
+    "lightHeight": {
+     "label": "Altezza luce"
+    },
+    "lightColor": {
+     "label": "Colore luce"
+    },
+    "glossiness": {
+     "label": "Lucidità"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "Adatta",
+      "Affianca",
+      "Estendi"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Ripetizioni X"
+    },
+    "texRepeatY": {
+     "label": "Ripetizioni Y"
+    },
+    "texMirror": {
+     "label": "Specchia"
+    },
+    "texAngle": {
+     "label": "Angolo texture"
+    },
+    "texOffset": {
+     "label": "Scostamento texture"
+    },
+    "texCrop": {
+     "label": "Ritaglio texture"
+    },
+    "texAnchor": {
+     "label": "Ancoraggio texture",
+     "options": [
+      "Centro",
+      "Angolo"
+     ]
     }
    }
   },
@@ -5732,11 +6664,18 @@
     },
     "threshold": {
      "label": "Soglia"
+    },
+    "grey": {
+     "label": "Grigio",
+     "options": [
+      "HD",
+      "SD"
+     ]
     }
    }
   },
   "squeeze": {
-   "description": "Stringe il centro del livello verso l'interno con intensità positiva e lo gonfia verso l'esterno con intensità negativa. Legacy mantiene la forma dei progetti più vecchi.",
+   "description": "Stringe il centro del livello verso l'interno con Intensità positiva e lo gonfia verso l'esterno con Intensità negativa. Legacy mantiene la forma dei progetti meno recenti. Clessidra spinge anche verso l'esterno il centro dei bordi superiore e inferiore.",
    "name": "Strizzatura",
    "params": {
     "amount": {
@@ -5746,7 +6685,8 @@
      "label": "Forma",
      "options": [
       "Stringi/Gonfia",
-      "Legacy"
+      "Legacy",
+      "Clessidra"
      ]
     }
    }
@@ -5846,6 +6786,59 @@
     },
     "shine": {
      "label": "Lucentezza"
+    },
+    "lighting": {
+     "label": "Illuminazione",
+     "options": [
+      "Classica",
+      "Morbida",
+      "Diretta"
+     ]
+    },
+    "ambient": {
+     "label": "Luce ambientale"
+    },
+    "lightHeight": {
+     "label": "Altezza luce"
+    },
+    "lightColor": {
+     "label": "Colore luce"
+    },
+    "glossiness": {
+     "label": "Lucidità"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "Adatta",
+      "Affianca",
+      "Estendi"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Ripetizioni X"
+    },
+    "texRepeatY": {
+     "label": "Ripetizioni Y"
+    },
+    "texMirror": {
+     "label": "Specchia"
+    },
+    "texAngle": {
+     "label": "Angolo texture"
+    },
+    "texOffset": {
+     "label": "Scostamento texture"
+    },
+    "texCrop": {
+     "label": "Ritaglio texture"
+    },
+    "texAnchor": {
+     "label": "Ancoraggio texture",
+     "options": [
+      "Centro",
+      "Angolo"
+     ]
     }
    }
   },
@@ -5894,6 +6887,66 @@
     },
     "smoothing": {
      "label": "Levigatura"
+    },
+    "starStyle": {
+     "label": "Stile",
+     "options": [
+      "Piatto",
+      "Appuntito"
+     ]
+    },
+    "lighting": {
+     "label": "Illuminazione",
+     "options": [
+      "Classica",
+      "Morbida",
+      "Diretta"
+     ]
+    },
+    "ambient": {
+     "label": "Luce ambientale"
+    },
+    "lightHeight": {
+     "label": "Altezza luce"
+    },
+    "lightColor": {
+     "label": "Colore luce"
+    },
+    "glossiness": {
+     "label": "Lucidità"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "Adatta",
+      "Affianca",
+      "Estendi"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Ripetizioni X"
+    },
+    "texRepeatY": {
+     "label": "Ripetizioni Y"
+    },
+    "texMirror": {
+     "label": "Specchia"
+    },
+    "texAngle": {
+     "label": "Angolo texture"
+    },
+    "texOffset": {
+     "label": "Scostamento texture"
+    },
+    "texCrop": {
+     "label": "Ritaglio texture"
+    },
+    "texAnchor": {
+     "label": "Ancoraggio texture",
+     "options": [
+      "Centro",
+      "Angolo"
+     ]
     }
    }
   },
@@ -5992,7 +7045,7 @@
   },
   "swing": {
    "description": "Ruota il livello avanti e indietro tra due angoli.",
-   "name": "Oscillazione",
+   "name": "Dondolio",
    "params": {
     "angle1": {
      "label": "Angolo 1"
@@ -6065,7 +7118,9 @@
       "Robot",
       "Squittio",
       "Macchina da scrivere",
-      "Chiptune"
+      "Chiptune",
+      "Scheletro",
+      "Suono personalizzato"
      ]
     },
     "volume": {
@@ -6416,7 +7471,7 @@
   },
   "tile": {
    "description": "Ripete l'immagine in una griglia.",
-   "name": "Mosaico",
+   "name": "Affiancamento",
    "params": {
     "mirror": {
      "label": "Specchia"
@@ -6439,6 +7494,13 @@
     "count": {
      "label": "Numero"
     },
+    "edges": {
+     "label": "Bordi",
+     "options": [
+      "Specchia",
+      "Trasparente"
+     ]
+    },
     "offset": {
      "label": "Scostamento"
     },
@@ -6447,6 +7509,9 @@
     },
     "rotation": {
      "label": "Rotazione"
+    },
+    "screenSpace": {
+     "label": "Spazio schermo"
     },
     "seed": {
      "label": "Seme"
@@ -6457,7 +7522,7 @@
    }
   },
   "tiles": {
-   "description": "Ripete il livello per riempire lo schermo. Aumenta Ritaglio per ottenere tasselli più piccoli, con specchiatura, scostamento delle righe e rotazione facoltativi. Scala legacy mantiene i progetti più vecchi.",
+   "description": "Ripete il livello per riempire lo schermo. Aumenta Ritaglio per ottenere tasselli più piccoli, con specchiatura, scostamento delle righe e rotazione facoltativi. Scala legacy mantiene i progetti meno recenti. Dentro i tasselli mantiene ogni tassello grande quanto il livello e ingrandisce e ruota l'immagine al suo interno.",
    "name": "Tasselli",
    "params": {
     "angle": {
@@ -6473,7 +7538,8 @@
      "label": "Dimensionamento",
      "options": [
       "Ritaglio",
-      "Scala legacy"
+      "Scala legacy",
+      "Dentro i tasselli"
      ]
     },
     "vertical": {
@@ -6494,8 +7560,18 @@
     "count": {
      "label": "Numero"
     },
+    "edges": {
+     "label": "Bordi",
+     "options": [
+      "Specchia",
+      "Trasparente"
+     ]
+    },
     "offset": {
      "label": "Scostamento"
+    },
+    "screenSpace": {
+     "label": "Spazio schermo"
     },
     "seed": {
      "label": "Seme"
@@ -6598,6 +7674,59 @@
     },
     "thickness": {
      "label": "Spessore"
+    },
+    "lighting": {
+     "label": "Illuminazione",
+     "options": [
+      "Classica",
+      "Morbida",
+      "Diretta"
+     ]
+    },
+    "ambient": {
+     "label": "Luce ambientale"
+    },
+    "lightHeight": {
+     "label": "Altezza luce"
+    },
+    "lightColor": {
+     "label": "Colore luce"
+    },
+    "glossiness": {
+     "label": "Lucidità"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "Adatta",
+      "Affianca",
+      "Estendi"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Ripetizioni X"
+    },
+    "texRepeatY": {
+     "label": "Ripetizioni Y"
+    },
+    "texMirror": {
+     "label": "Specchia"
+    },
+    "texAngle": {
+     "label": "Angolo texture"
+    },
+    "texOffset": {
+     "label": "Scostamento texture"
+    },
+    "texCrop": {
+     "label": "Ritaglio texture"
+    },
+    "texAnchor": {
+     "label": "Ancoraggio texture",
+     "options": [
+      "Centro",
+      "Angolo"
+     ]
     }
    }
   },
@@ -6739,11 +7868,14 @@
     },
     "stretch": {
      "label": "Stiramento"
+    },
+    "screenSpace": {
+     "label": "Spazio schermo"
     }
    }
   },
   "twirl": {
-   "description": "Attorciglia il livello attorno al centro come un mulinello, con effetto massimo al centro e sempre più debole fino al raggio (una parte della dimensione del livello). Un'intensità negativa lo attorciglia nell'altro senso.",
+   "description": "Attorciglia il livello attorno al Centro come un mulinello, con effetto massimo al centro e sempre più debole fino al Raggio (una frazione della dimensione del livello). Un'Intensità negativa lo attorciglia nell'altro senso. Con Misura su Schermo il Raggio è una frazione dello schermo e la torsione si attenua dolcemente.",
    "name": "Vortice",
    "params": {
     "center": {
@@ -6754,11 +7886,18 @@
     },
     "strength": {
      "label": "Intensità"
+    },
+    "reach": {
+     "label": "Misura su",
+     "options": [
+      "Livello",
+      "Schermo"
+     ]
     }
    }
   },
   "unsharpmask": {
-   "description": "Aumenta la nitidezza riaggiungendo la differenza tra il livello e una sua copia sfocata. Intensità stabilisce l'ampiezza della sfocatura, Quantità quanto viene riaggiunto, e una soglia sopra il 50% ignora le piccole differenze.",
+   "description": "Aumenta la nitidezza riaggiungendo la differenza tra il livello e una sua copia sfocata. Intensità stabilisce l'ampiezza della sfocatura, Quantità quanto viene riaggiunto e Soglia sopra il 50% ignora le piccole differenze. Con Colore maschera su Rosso la maschera appare in rosso dove la luminosità differisce dalla copia sfocata più della parte di Soglia oltre il 50%.",
    "name": "Maschera di contrasto",
    "params": {
     "amount": {
@@ -6772,6 +7911,13 @@
     },
     "threshold": {
      "label": "Soglia"
+    },
+    "maskColor": {
+     "label": "Colore maschera",
+     "options": [
+      "Grigio",
+      "Rosso"
+     ]
     }
    }
   },
@@ -6867,6 +8013,19 @@
     },
     "yaw": {
      "label": "Imbardata"
+    },
+    "projection": {
+     "label": "Uscita",
+     "options": [
+      "Vista",
+      "Panorama"
+     ]
+    },
+    "eyeDistance": {
+     "label": "Distanza"
+    },
+    "frame": {
+     "label": "Proporzioni inquadratura"
     }
    }
   },
@@ -6932,7 +8091,7 @@
    }
   },
   "wavewarp": {
-   "description": "Piega il livello con un'onda sinusoidale: Spaziatura stabilisce quante onde lo attraversano, Ampiezza quanto spingono, Angolo la direzione in cui corrono le onde e Angolo distorsione la direzione in cui spingono.",
+   "description": "Piega il livello con un'onda sinusoidale: Spaziatura stabilisce quante onde lo attraversano, Ampiezza quanto spingono, Angolo la direzione in cui corrono le onde e Angolo distorsione la direzione in cui spingono. Spazio schermo dimensiona le onde in base allo schermo invece che al livello. Ampiezza trasversale aggiunge una seconda onda, dimensionata da Spaziatura trasversale, che corre lungo Angolo distorsione e spinge lungo Angolo. Con Origine su Schermo in basso a sinistra le onde si misurano da quell'angolo dello schermo in base al suo lato corto e Fase poi le fa scorrere.",
    "name": "Distorsione a onda",
    "params": {
     "angle": {
@@ -6952,6 +8111,22 @@
     },
     "warpAngle": {
      "label": "Angolo distorsione"
+    },
+    "screenSpace": {
+     "label": "Spazio schermo"
+    },
+    "crossSpacing": {
+     "label": "Spaziatura trasversale"
+    },
+    "crossMagnitude": {
+     "label": "Ampiezza trasversale"
+    },
+    "origin": {
+     "label": "Origine",
+     "options": [
+      "Angolo del livello",
+      "Schermo in basso a sinistra"
+     ]
     }
    }
   },

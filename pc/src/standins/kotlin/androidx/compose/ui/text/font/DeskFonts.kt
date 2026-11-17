@@ -11,3 +11,5 @@ fun FontFamily(typeface: android.graphics.Typeface): FontFamily {
         runCatching { FontFamily(FileFont(file, FontWeight(typeface.weight.coerceIn(1, 1000)), if (typeface.italic) FontStyle.Italic else FontStyle.Normal)) }.getOrDefault(FontFamily.SansSerif)
     }
 }
+
+fun Font(file: java.io.File, weight: FontWeight = FontWeight.Normal): Font = FileFont(file, weight)

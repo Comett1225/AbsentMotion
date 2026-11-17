@@ -77,6 +77,7 @@ import kotlin.math.hypot
 import kotlin.math.sin
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
+import app.absentmotion.ui.HoldName
 
 @Composable
 internal fun MoveTransformPanel(state: EditorState, layer: Layer, tab: Int, turn: Turn?, modifier: Modifier = Modifier, onFlip: (() -> Unit)? = null) {
@@ -164,11 +165,11 @@ private fun PositionTab(state: EditorState, layer: Layer, onFlip: (() -> Unit)?)
         Column(Modifier.align(Alignment.TopCenter).padding(top = 17.px)) {
             Row {
                 Row(Modifier.width(354.px).height(70.px).clip(PanelShape).background(Am.Field)) {
-                    ValueCell(formatFixed(at[0], 2), if (depth) Am.OnDark else Am.Accent, Modifier.weight(1f), "X") { if (depth) depth = false else openKeypad(0) }
-                    ValueCell(formatFixed(at[1], 2), if (depth) Am.OnDark else Am.Accent, Modifier.weight(1f), "Y") { if (depth) depth = false else openKeypad(1) }
+                    ValueCell(formatFixed(at[0], 2), if (depth) Am.OnDark else Am.Accent, Modifier.weight(1f), "X", { depth = false }) { depth = false; openKeypad(0) }
+                    ValueCell(formatFixed(at[1], 2), if (depth) Am.OnDark else Am.Accent, Modifier.weight(1f), "Y", { depth = false }) { depth = false; openKeypad(1) }
                 }
                 Spacer(Modifier.width(20.px))
-                NumberBox(formatFixed(at[2], 2), if (depth) Am.Accent else Am.OnDark, Modifier.width(177.px).height(70.px), fontSize = 10.5f) { if (depth) openKeypad(2) else depth = true }
+                NumberBox(formatFixed(at[2], 2), if (depth) Am.Accent else Am.OnDark, Modifier.width(177.px).height(70.px), fontSize = 10.5f, onSelect = { depth = true }) { depth = true; openKeypad(2) }
             }
             Row(Modifier.height(23.px)) {
                 Caption("X", Modifier.width(177.px).fillMaxHeight())
@@ -181,8 +182,8 @@ private fun PositionTab(state: EditorState, layer: Layer, onFlip: (() -> Unit)?)
 }
 
 @Composable
-private fun ValueCell(text: String, color: Color, modifier: Modifier, label: String? = null, onClick: () -> Unit) {
-    Box(modifier.fillMaxHeight().clickable(onClick = onClick).semantics(mergeDescendants = true) { if (label != null) contentDescription = "$label, $text" }, contentAlignment = Alignment.Center) {
+private fun ValueCell(text: String, color: Color, modifier: Modifier, label: String? = null, onSelect: () -> Unit = {}, onType: () -> Unit) {
+    Box(modifier.fillMaxHeight().typeOnDoubleTap(onSelect = onSelect, onType = onType).semantics(mergeDescendants = true) { if (label != null) contentDescription = "$label, $text" }, contentAlignment = Alignment.Center) {
         Text(text, color = color, fontSize = deskSp(10.5f), maxLines = 1, softWrap = false)
     }
 }
@@ -332,7 +333,7 @@ private fun RotationTab(state: EditorState, layer: Layer) {
             drawCircle(Am.OnDark, 49.px.toPx(), knob)
         }
         Box(
-            Modifier.align(Alignment.Center).height(140.px).widthIn(min = 267.px).clip(PanelShape).background(Am.Field).clickable {
+            Modifier.align(Alignment.Center).height(140.px).widthIn(min = 267.px).clip(PanelShape).background(Am.Field).typeOnDoubleTap {
                 state.keypad = KeypadRequest(listOf(KeypadField(ROTATION_LABEL, angle, "\u00B0")), 0) { v ->
                     state.editSelected { it.withRotation(v[0]) }
                 }
@@ -435,16 +436,17 @@ private fun SizeTab(state: EditorState, layer: Layer) {
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.align(Alignment.TopCenter).padding(top = 42.px)) {
             Row {
-                NumberBox(formatFixed(boxW, 1), colour(0), Modifier.width(177.px).height(70.px)) { openKeypad(true) }
+                NumberBox(formatFixed(boxW, 1), colour(0), Modifier.width(177.px).height(70.px), onSelect = { active = 0 }) { openKeypad(true) }
                 Spacer(Modifier.width(14.px))
                 Box(
                     Modifier.size(70.px).clip(PanelShape).background(Am.Inactive).clickable { state.editSelected { it.withScaleLinked(!it.scaleLinked) } },
                     contentAlignment = Alignment.Center,
                 ) {
                     PanelIcon(if (linked) PanelIcons.Link else PanelIcons.Unlink, Am.OnDark, size = 58.px, description = stringResource(R.string.a11y_keep_proportions))
+                    HoldName(stringResource(R.string.a11y_keep_proportions))
                 }
                 Spacer(Modifier.width(14.px))
-                NumberBox(formatFixed(boxH, 1), colour(1), Modifier.width(177.px).height(70.px)) { openKeypad(false) }
+                NumberBox(formatFixed(boxH, 1), colour(1), Modifier.width(177.px).height(70.px), onSelect = { active = 1 }) { openKeypad(false) }
             }
             Row(Modifier.height(23.px)) {
                 Caption(widthLabel, Modifier.width(177.px).fillMaxHeight())
@@ -496,9 +498,9 @@ private fun SkewTab(state: EditorState, layer: Layer) {
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.align(Alignment.TopCenter).padding(top = 42.px)) {
             Row {
-                NumberBox(formatFixed(skew[0], 1) + "º", colour(0), Modifier.width(177.px).height(70.px)) { openKeypad(0) }
+                NumberBox(formatFixed(skew[0], 1) + "º", colour(0), Modifier.width(177.px).height(70.px), onSelect = { active = 0 }) { openKeypad(0) }
                 Spacer(Modifier.width(14.px))
-                NumberBox(formatFixed(skew[1], 1) + "º", colour(1), Modifier.width(177.px).height(70.px)) { openKeypad(1) }
+                NumberBox(formatFixed(skew[1], 1) + "º", colour(1), Modifier.width(177.px).height(70.px), onSelect = { active = 1 }) { openKeypad(1) }
             }
             Row(Modifier.height(23.px)) {
                 Caption(xSkew, Modifier.width(177.px).fillMaxHeight())
@@ -542,9 +544,9 @@ private fun TiltTab(state: EditorState, layer: Layer, turn: Turn?) {
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.align(Alignment.TopCenter).padding(top = 42.px)) {
             Row {
-                NumberBox(formatFixed(tilt[0], 1) + "º", colour(0), Modifier.width(177.px).height(70.px)) { openKeypad(0) }
+                NumberBox(formatFixed(tilt[0], 1) + "º", colour(0), Modifier.width(177.px).height(70.px), onSelect = { active = 0 }) { openKeypad(0) }
                 Spacer(Modifier.width(14.px))
-                NumberBox(formatFixed(tilt[1], 1) + "º", colour(1), Modifier.width(177.px).height(70.px)) { openKeypad(1) }
+                NumberBox(formatFixed(tilt[1], 1) + "º", colour(1), Modifier.width(177.px).height(70.px), onSelect = { active = 1 }) { openKeypad(1) }
             }
             Row(Modifier.height(23.px)) {
                 Caption(labels[0], Modifier.width(177.px).fillMaxHeight())
@@ -666,6 +668,7 @@ private fun PivotTab(state: EditorState, layer: Layer, onFlip: (() -> Unit)?) {
                             contentAlignment = Alignment.Center,
                         ) {
                             Box(Modifier.size(14.px).clip(androidx.compose.foundation.shape.CircleShape).background(if (here) Am.Accent else Am.OnDark))
+                            if (x != null && y != null) HoldName(names[row * 3 + col])
                         }
                     }
                 }
@@ -704,7 +707,7 @@ private fun AxesTab(state: EditorState, layer: Layer, turn: Turn) {
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.align(Alignment.TopCenter).padding(top = 17.px)) {
             Row(horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(20.px)) {
-                for (i in 0..2) NumberBox(formatFixed(values[i], 1) + "º", colour(i), Modifier.width(177.px).height(70.px), fontSize = 13.5f) { openKeypad(i) }
+                for (i in 0..2) NumberBox(formatFixed(values[i], 1) + "º", colour(i), Modifier.width(177.px).height(70.px), fontSize = 13.5f, onSelect = { axis = i }) { openKeypad(i) }
             }
             Row(Modifier.height(23.px), androidx.compose.foundation.layout.Arrangement.spacedBy(20.px)) {
                 for (label in labels) Caption(label, Modifier.width(177.px).fillMaxHeight())

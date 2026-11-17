@@ -115,8 +115,8 @@ private fun EditorBody(state: EditorState, onExit: () -> Unit) {
         if (state.panel == EditorPanel.Tools) state.keyTarget = null
     }
     if (state.easingHint) AlertDialog(
-        onDismissRequest = { state.easingHint = false }, title = { Text(stringResource(R.string.add_keyframes_first)) },
-        text = { Text(stringResource(R.string.easing_needs_at_least_two_keyframes)) },
+        onDismissRequest = { state.easingHint = false }, title = { Text(stringResource(if (state.easingBetween) R.string.easing_between_title else R.string.add_keyframes_first)) },
+        text = { Text(stringResource(if (state.easingBetween) R.string.easing_between_text else R.string.easing_needs_at_least_two_keyframes)) },
         confirmButton = { TextButton({ state.easingHint = false }) { Text(stringResource(R.string.ok), color = Am.Accent) } },
         containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark,
     )

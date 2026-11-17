@@ -65,6 +65,23 @@ class TilesWholeLayerTest {
         assertEquals(listOf("blue", "red", "blue", "red"), render(100, 0))
     }
 
+    @Test fun insideTilesKeepMirroredLayerSizedTilesOverTheWholeFrameForAMovedScaledLayer() {
+        val root = File("..").canonicalFile
+        val scene = Scene.parse(
+            """<scene width="200" height="200" fps="30" totalTime="1000" bgcolor="#ff000000"><shape id="1" startTime="0" endTime="1000" fillType="media" mediaFillMode="stretch" s=".rect" fillImage="${picture().toURI().toString().replaceFirst("file:/", "file:///")}">
+            <transform><location value="60,60,0"/><scale value="0.5,0.5"/></transform><property name="size" type="vec2" value="50,50"/>
+            <effect id="absent.tiles" hidden="false"><property name="zoom" type="float" value="2"/><property name="mirror" type="bool" value="true"/><property name="sizing" type="float" value="2"/></effect></shape></scene>"""
+        )
+        DesktopEngine(root.resolve("shared/assets"), root).use { engine ->
+            engine.setScene(scene, null)
+            val image = engine.render(0, 200, 200)
+            for (y in listOf(15, 100, 190)) {
+                assertEquals("row $y", listOf("red", "red", "blue", "blue", "red", "red", "blue", "blue"), listOf(22, 47, 72, 97, 122, 147, 172, 192).map { colourAt(it, y, image) })
+            }
+            assertEquals(0, (0 until 200).sumOf { y -> (0 until 200).count { x -> colourAt(x, y, image) == "black" } })
+        }
+    }
+
     @Test fun aGroupBesideTheCanvasStillFillsItWithTiles() {
         val root = File("..").canonicalFile
         DesktopEngine(root.resolve("shared/assets"), root).use { engine ->

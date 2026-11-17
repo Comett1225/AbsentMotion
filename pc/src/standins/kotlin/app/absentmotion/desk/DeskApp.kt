@@ -435,6 +435,7 @@ class DeskAppState {
 
 @Composable
 fun DeskApp(app: DeskAppState) {
+    remember { DeskShortcuts.publish() }
     val base = LocalDensity.current
     val scale = DeskScale.percent / 100f
     val focused = LocalWindowInfo.current.isWindowFocused

@@ -1,5 +1,6 @@
 #include "text.h"
 #include <algorithm>
+#include <cctype>
 #include <bit>
 #include <cmath>
 #include <cstdlib>
@@ -41,14 +42,15 @@ using namespace skia::textlayout;
 struct TextLine {
     std::string content;
     float baseline = 0, wordSpacing = 0;
-    bool rtl = false;
+    bool rtl = false, split = false;
+    long start = -1;
     std::unique_ptr<Paragraph> paragraph;
 };
 struct TextLayout {
     std::string content, family, path, align, emoji, flags;
-    float size = 54, width = 512, height = 0, padTop = 0, letterSpacing = 0, lineSpacing = 1, lineHeight = 0;
+    float size = 54, width = 512, height = 0, padTop = 0, letterSpacing = 0, lineSpacing = 1, lineHeight = 0, step = 0;
     int weight = 400, index = 0;
-    bool italic = false, imported = false, axes = false;
+    bool italic = false, imported = false, axes = false, wrap = true;
     sk_sp<FontCollection> fonts;
     std::vector<TextLine> lines;
     std::unique_ptr<Paragraph> paragraph;
@@ -233,6 +235,217 @@ std::unique_ptr<Paragraph> paragraph(TextLayout& text, const std::string& conten
     result->layout(prepared ? std::max(text.width, text.size * content.size() * 2) : text.width);
     return result;
 }
+float Natural(TextLayout& text, const std::string& content, bool rtl) {
+    return content.empty() ? 0 : paragraph(text, content, rtl, 0, true)->getMaxIntrinsicWidth();
+}
+struct Span {
+    size_t from, to;
+};
+bool SpaceBefore(const std::string& s, size_t from, size_t end, size_t* at) {
+    if (end > from && s[end - 1] == ' ') *at = end - 1;
+    else if (end >= from + 3 && s.compare(end - 3, 3, "\xE3\x80\x80") == 0) *at = end - 3;
+    else return false;
+    return true;
+}
+bool Broken(const std::string& s, Span span) { return span.to > span.from && s[span.to - 1] == '\n'; }
+size_t Unbroken(const std::string& s, size_t from, size_t end) {
+    if (end > from && s[end - 1] == '\n') end--;
+    if (end > from && s[end - 1] == '\r') end--;
+    return end;
+}
+bool Overflows(TextLayout& text, const std::string& content, bool rtl) {
+    size_t at;
+    return SpaceBefore(content, 0, Unbroken(content, 0, content.size()), &at) && Natural(text, content.substr(0, at), rtl) > text.width + 0.5f;
+}
+float Spread(TextLayout& text, const std::string& content, bool rtl) {
+    const auto spaces = std::count(content.begin(), content.end(), ' ');
+    return spaces ? (text.width - Natural(text, content, rtl)) / spaces : 0;
+}
+float PlainStep(TextLayout& text) {
+    std::vector<LineMetrics> metrics;
+    paragraph(text, " \n \n ", false, 0, false, text.lineHeight)->getLineMetrics(metrics);
+    return metrics.size() == 3 ? (float)(metrics[2].fBaseline - metrics[1].fBaseline) : text.size;
+}
+std::string Visible(std::string raw) {
+    size_t at;
+    if (SpaceBefore(raw, 0, raw.size(), &at)) raw.resize(at);
+    else if (!raw.empty() && std::isspace((unsigned char)raw.back())) raw.pop_back();
+    if (!raw.empty() && raw.back() == '\r') raw.pop_back();
+    return raw;
+}
+bool RightToLeft(const std::string& s, size_t from, size_t to) {
+    for (uint32_t c : textanim::CodePoints(s.substr(from, to - from))) {
+        const UCharDirection d = u_charDirection((UChar32)c);
+        if (d == U_LEFT_TO_RIGHT) return false;
+        if (d == U_RIGHT_TO_LEFT || d == U_RIGHT_TO_LEFT_ARABIC) return true;
+    }
+    return false;
+}
+bool Rewrapped(TextLayout& text, const std::string& src, size_t from, size_t to, bool rtl, std::vector<TextLine>* made, std::vector<Span>* spans) {
+    const size_t close = Unbroken(src, from, to);
+    if (close <= from) return false;
+    auto p = paragraph(text, src.substr(from, close - from), rtl, 0, false, text.lineHeight);
+    const size_t count = p->lineNumber();
+    if (count == 0) return false;
+    size_t next = from + p->getActualTextRange(0, true).start;
+    for (size_t j = 0; j < count; j++) {
+        const size_t start = next;
+        next = j + 1 < count ? from + p->getActualTextRange((int)j + 1, true).start : to;
+        if (start > next || next > to) return false;
+        TextLine line;
+        line.content = Visible(src.substr(start, next - start));
+        line.rtl = rtl;
+        line.split = true;
+        line.wordSpacing = text.align == "justify" && j + 1 < count ? Spread(text, line.content, rtl) : 0;
+        made->push_back(std::move(line));
+        spans->push_back({start, next});
+    }
+    return true;
+}
+void Place(TextLayout& text, std::vector<TextLine>& made, float step, float plain) {
+    std::string joined;
+    for (size_t j = 0; j < made.size(); j++) joined += (j ? "\n" : "") + made[j].content;
+    std::vector<LineMetrics> metrics;
+    paragraph(text, joined, made[0].rtl, 0, false, text.lineHeight)->getLineMetrics(metrics);
+    for (size_t j = 1; j < made.size(); j++) {
+        const float extra = metrics.size() == made.size() ? (float)(metrics[j].fBaseline - metrics[j - 1].fBaseline) - plain : 0;
+        made[j].baseline = made[j - 1].baseline + step + extra;
+    }
+}
+bool Respace(TextLayout& text, const std::string& src, std::vector<TextLine>& lines, std::vector<Span>& spans, float step) {
+    bool changed = false;
+    float plain = 0;
+    const auto hard = [&](size_t i) { return i + 1 == lines.size() || Broken(src, spans[i]); };
+    for (size_t i = 0; i < lines.size();) {
+        const Span s = spans[i];
+        const bool rtl = lines[i].rtl;
+        const size_t end = Unbroken(src, s.from, s.to);
+        size_t run = end;
+        for (size_t at; SpaceBefore(src, s.from, run, &at);) run = at;
+        if (run == end || !Overflows(text, lines[i].content, rtl)) {
+            i++;
+            continue;
+        }
+        int count = 0;
+        for (size_t at = run; at < end; at += src[at] == ' ' ? 1 : 3) count++;
+        const float before = Natural(text, src.substr(s.from, run - s.from), rtl);
+        const std::vector<int> rows = textanim::SpaceRows(before, (Natural(text, src.substr(s.from, end - s.from), rtl) - before) / count, count, text.width);
+        if (rows.size() < 2) {
+            i++;
+            continue;
+        }
+        if (plain == 0) plain = PlainStep(text);
+        if (!(step > 0)) step = plain;
+        std::vector<size_t> cut{s.from};
+        size_t at = run;
+        for (int n : rows) {
+            for (int k = 0; k < n; k++) at += src[at] == ' ' ? 1 : 3;
+            cut.push_back(at);
+        }
+        size_t last = i;
+        while (!hard(last)) last++;
+        const bool soft = last > i;
+        const size_t keep = soft ? rows.size() - 1 : rows.size();
+        std::vector<TextLine> made;
+        std::vector<Span> placed;
+        for (size_t r = 0; r < keep; r++) {
+            TextLine part;
+            part.content = src.substr(cut[r], cut[r + 1] - cut[r]);
+            part.rtl = rtl;
+            part.split = true;
+            part.wordSpacing = text.align == "justify" && (soft || r + 1 < keep) ? Spread(text, part.content, rtl) : 0;
+            made.push_back(std::move(part));
+            placed.push_back({cut[r], r + 1 < keep || soft ? cut[r + 1] : s.to});
+        }
+        const bool merged = soft && Rewrapped(text, src, cut[keep], spans[last].to, rtl, &made, &placed);
+        if (soft && !merged) {
+            made.resize(keep);
+            placed.resize(keep);
+            last = i;
+            TextLine rest;
+            rest.content = src.substr(cut[keep], end - cut[keep]);
+            rest.rtl = rtl;
+            rest.split = true;
+            made.push_back(std::move(rest));
+            placed.push_back({cut[keep], s.to});
+        }
+        made[0].baseline = lines[i].baseline;
+        Place(text, made, step, plain);
+        const float grown = made.back().baseline - lines[last].baseline;
+        const size_t added = made.size();
+        lines.erase(lines.begin() + i, lines.begin() + last + 1);
+        spans.erase(spans.begin() + i, spans.begin() + last + 1);
+        lines.insert(lines.begin() + i, std::make_move_iterator(made.begin()), std::make_move_iterator(made.end()));
+        spans.insert(spans.begin() + i, placed.begin(), placed.end());
+        for (size_t k = i + added; k < lines.size(); k++) lines[k].baseline += grown;
+        text.height += grown;
+        changed = true;
+        i += merged ? keep : added;
+    }
+    return changed;
+}
+bool Located(TextLayout& text, std::vector<Span>* spans) {
+    const std::string& src = text.content;
+    size_t byte = 0;
+    long unit = 0;
+    for (const TextLine& line : text.lines) {
+        if (line.start < unit) return false;
+        while (unit < line.start && byte < src.size()) {
+            const unsigned char c = src[byte];
+            const size_t length = c < 0x80 ? 1 : c < 0xE0 ? 2 : c < 0xF0 ? 3 : 4;
+            unit += length == 4 ? 2 : 1;
+            byte += length;
+        }
+        if (unit != line.start || byte > src.size() || src.compare(byte, line.content.size(), line.content) != 0) return false;
+        if (!spans->empty()) spans->back().to = byte;
+        spans->push_back({byte, src.size()});
+    }
+    return true;
+}
+void Unhang(TextLayout& text) {
+    std::vector<Span> spans;
+    if (Located(text, &spans)) {
+        Respace(text, text.content, text.lines, spans, text.step);
+        return;
+    }
+    std::string joined;
+    spans.clear();
+    for (const TextLine& line : text.lines) {
+        spans.push_back({joined.size(), joined.size() + line.content.size() + 1});
+        joined += line.content + "\n";
+    }
+    Respace(text, joined, text.lines, spans, text.step);
+}
+void SplitParagraph(TextLayout& text) {
+    Paragraph& p = *text.paragraph;
+    const int count = (int)p.lineNumber();
+    const std::string& src = text.content;
+    std::vector<TextLine> lines(count);
+    std::vector<Span> spans(count);
+    bool over = false, rtl = false;
+    for (int i = 0; i < count; i++) {
+        const size_t from = p.getActualTextRange(i, true).start;
+        const size_t to = i + 1 < count ? p.getActualTextRange(i + 1, true).start : src.size();
+        if (from > to || to > src.size()) return;
+        if (i == 0 || Broken(src, spans[i - 1])) rtl = RightToLeft(src, from, std::min(src.find('\n', from), src.size()));
+        std::string raw = Visible(src.substr(from, to - from));
+        LineMetrics metrics;
+        p.getLineMetricsAt(i, &metrics);
+        lines[i].baseline = text.padTop + (float)metrics.fBaseline;
+        lines[i].rtl = rtl;
+        over = over || Overflows(text, raw, rtl);
+        lines[i].content = std::move(raw);
+        spans[i] = {from, to};
+    }
+    if (!over) return;
+    for (int i = 0; i + 1 < count && text.align == "justify"; i++) {
+        if (!Broken(src, spans[i])) lines[i].wordSpacing = Spread(text, lines[i].content, lines[i].rtl);
+    }
+    if (!Respace(text, src, lines, spans, 0)) return;
+    text.lines = std::move(lines);
+    text.paragraph.reset();
+    for (auto& line : text.lines) line.paragraph = paragraph(text, line.content, line.rtl, line.wordSpacing, true);
+}
 void layout(TextLayout& text) {
     if (text.fonts) return;
     auto manager = systemFonts();
@@ -256,19 +469,21 @@ void layout(TextLayout& text) {
     if (emoji) provider->registerTypeface(emoji, SkString(kEmojiFamily));
     if (flags) provider->registerTypeface(flags, SkString(kFlagFamily));
     text.fonts->setAssetFontManager(provider);
+    if (!face) face = manager->matchFamilyStyle(text.family.c_str(), SkFontStyle(text.weight, 5,
+        text.italic ? SkFontStyle::kItalic_Slant : SkFontStyle::kUpright_Slant));
+    SkFont font(face, text.size);
+    SkFontMetrics metrics;
+    font.getMetrics(&metrics);
+    const float natural = metrics.fDescent - metrics.fAscent + metrics.fLeading;
+    text.lineHeight = text.lineSpacing != 1 && natural > 0 ? text.lineSpacing * natural / text.size : 0;
     if (!text.lines.empty()) {
+        if (text.wrap) Unhang(text);
         for (auto& line : text.lines) line.paragraph = paragraph(text, line.content, line.rtl, line.wordSpacing, true);
     } else {
-        if (!face) face = manager->matchFamilyStyle(text.family.c_str(), SkFontStyle(text.weight, 5,
-            text.italic ? SkFontStyle::kItalic_Slant : SkFontStyle::kUpright_Slant));
-        SkFont font(face, text.size);
-        SkFontMetrics metrics;
-        font.getMetrics(&metrics);
-        const float natural = metrics.fDescent - metrics.fAscent + metrics.fLeading;
-        text.lineHeight = text.lineSpacing != 1 && natural > 0 ? text.lineSpacing * natural / text.size : 0;
         text.paragraph = paragraph(text, text.content, false, 0, false, text.lineHeight);
         text.padTop = std::max(0.f, metrics.fAscent - metrics.fTop);
         text.height = text.paragraph->getHeight() + text.padTop + std::max(0.f, metrics.fBottom - metrics.fDescent);
+        if (text.wrap) SplitParagraph(text);
     }
 }
 }
@@ -288,6 +503,9 @@ std::shared_ptr<TextLayout> ParseText(const XmlNode& n) {
     text->imported = attr(n, "font").starts_with("imported?");
     text->axes = attr(n, "_fontAxes") == "true";
     for (const auto& child : n.children) {
+        if (child->name == "effect" && attr(*child, "id") == "absent.textpath" && attr(*child, "hidden") != "true") text->wrap = false;
+    }
+    for (const auto& child : n.children) {
         if (child->name != "effect" || attr(*child, "id") != "com.alightcreative.effects.textspacing" || attr(*child, "hidden") == "true") continue;
         for (const auto& p : child->children) {
             if (attr(*p, "name") == "letterspacing") text->letterSpacing = number(*p, "value", 0);
@@ -299,12 +517,14 @@ std::shared_ptr<TextLayout> ParseText(const XmlNode& n) {
     text->lineSpacing = number(n, "_lineSpacing", text->lineSpacing);
     if (auto prepared = n.child("_layout")) {
         text->height = number(*prepared, "height", text->size);
+        text->step = number(*prepared, "step", 0);
         for (const auto& line : prepared->children) {
             TextLine l;
             l.content = line->text;
             l.baseline = number(*line, "baseline", text->size);
             l.rtl = attr(*line, "rtl") == "true";
             l.wordSpacing = number(*line, "wordSpacing", 0);
+            l.start = line->attr("from") ? std::strtol(line->attr("from"), nullptr, 10) : -1;
             text->lines.push_back(std::move(l));
         }
     }
@@ -321,15 +541,16 @@ SkPath TextPath(const Layer& layer, float t) {
     return SkPath::Rect(SkRect::MakeXYWH(-text.width / 2, -text.height / 2, text.width, text.height));
 }
 namespace {
+float LineX(const TextLayout& text, const TextLine& line, Paragraph& p) {
+    float x = -text.width / 2;
+    const float run = p.getMaxIntrinsicWidth();
+    if (text.align == "center") x += (text.width - run) / 2;
+    else if (text.align == "right") x += text.width - run;
+    return line.split && line.rtl ? x + run - p.getLongestLine() : x;
+}
 template <typename F> void EachParagraph(TextLayout& text, F&& at) {
     if (text.paragraph) at(*text.paragraph, -text.width / 2, -text.height / 2 + text.padTop);
-    for (auto& line : text.lines) {
-        float x = -text.width / 2;
-        const float runWidth = line.paragraph->getMaxIntrinsicWidth();
-        if (text.align == "center") x += (text.width - runWidth) / 2;
-        else if (text.align == "right") x += text.width - runWidth;
-        at(*line.paragraph, x, line.baseline - text.height / 2 - line.paragraph->getAlphabeticBaseline());
-    }
+    for (auto& line : text.lines) at(*line.paragraph, LineX(text, line, *line.paragraph), line.baseline - text.height / 2 - line.paragraph->getAlphabeticBaseline());
 }
 template <typename F> void EachGlyph(TextLayout& text, F&& at) {
     EachParagraph(text, [&](Paragraph& paragraph, float x, float y) {
@@ -459,11 +680,7 @@ std::vector<Piece> Pieces(TextLayout& text, const Layer& l, float t, int fps, st
     for (size_t i = 0; i < text.lines.size() && base <= shown->size(); i++) {
         const size_t end = std::min(shown->find('\n', base), shown->size());
         Paragraph* p = Laid(text, (int)i, shown->substr(base, end - base), tabular);
-        float x = -text.width / 2;
-        const float run = p->getMaxIntrinsicWidth();
-        if (text.align == "center") x += (text.width - run) / 2;
-        else if (text.align == "right") x += text.width - run;
-        pieces.push_back({p, x, text.lines[i].baseline - text.height / 2 - p->getAlphabeticBaseline(), (int)base, (int)i});
+        pieces.push_back({p, LineX(text, text.lines[i], *p), text.lines[i].baseline - text.height / 2 - p->getAlphabeticBaseline(), (int)base, (int)i});
         base = end + 1;
     }
     return pieces;

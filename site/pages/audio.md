@@ -45,7 +45,7 @@ For a sound clip, **Effects** opens the effects library already on the **Audio**
 
 ![Audio effects: the preset chips (1), Bypass (2) and Reorder (3) for each effect, bypass all (4) and Delete all (5).](img/audio-fx.webp)
 
-Each effect has a **Mix** slider (0 to 100 %) and its own sliders. Tap a value to type it.
+Each effect has a **Mix** slider (0 to 100 %) and its own sliders. Double-tap a value to type it.
 
 | Effect | Settings (range, default) |
 |---|---|

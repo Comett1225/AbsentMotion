@@ -341,6 +341,12 @@ class EditorState(
     var easingOpen by mutableStateOf(false)
 
     var easingHint by mutableStateOf(false)
+    var easingBetween by mutableStateOf(false)
+
+    fun hintEasing(keys: Int) {
+        easingBetween = keys >= 2
+        easingHint = true
+    }
 
     var overshoot by mutableStateOf(false)
 
@@ -397,11 +403,12 @@ class EditorState(
     }
 
     val historyNotes = mutableStateListOf<HistoryNote>()
+    var revealCount by mutableIntStateOf(0)
     private var historyNoteCount = 0L
 
-    private fun note(undone: Boolean, change: Pair<Scene, Scene>) {
-        val what = describeEdit(change.first, change.second)
-        showNote(HistoryNote(++historyNoteCount, txt(if (undone) R.string.history_undid else R.string.history_redid, what)))
+    private fun note(undone: Boolean, before: Scene, after: Scene) {
+        val what = summarizeEdit(before, after, { engine.effects.value.find(it)?.name }, undone)
+        showNote(HistoryNote(++historyNoteCount, txt(if (undone) R.string.history_undid else R.string.history_redid, what.text), spot = what.spot))
     }
 
     fun hint(@StringRes text: Int) = showNote(HistoryNote(++historyNoteCount, txt(text), faint = true))
@@ -413,16 +420,14 @@ class EditorState(
 
     fun undo() {
         Glide.interrupt()
-        val before = scene
-        val path = groupPath
-        history.undo()?.let { previous -> previous.focused(path)?.let { note(true, it to before) } }
+        val before = root
+        history.undo()?.let { note(true, it, before) }
     }
 
     fun redo() {
         Glide.interrupt()
-        val before = scene
-        val path = groupPath
-        history.redo()?.let { next -> next.focused(path)?.let { note(false, before to it) } }
+        val before = root
+        history.redo()?.let { note(false, before, it) }
     }
 
     private fun apply(next: Scene, save: Boolean) {

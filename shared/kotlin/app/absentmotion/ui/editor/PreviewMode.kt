@@ -47,6 +47,7 @@ import app.absentmotion.R
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.HoldName
 
 private val PanelBg = Color(0xFF333750)
 private val ZoomBg = Color(0xFF191B27)
@@ -82,7 +83,10 @@ internal fun PreviewModePanel(state: EditorState, modifier: Modifier = Modifier)
 @Composable
 private fun ModeCell(modifier: Modifier, enabled: Boolean, onClick: () -> Unit, description: String? = null, icon: @Composable () -> Unit) {
     Box(modifier.fillMaxWidth().then(if (description != null) Modifier.semantics { contentDescription = description } else Modifier)
-        .then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier), Alignment.Center) { icon() }
+        .then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier), Alignment.Center) {
+        icon()
+        if (description != null) HoldName(description)
+    }
 }
 
 @Composable
@@ -95,12 +99,14 @@ private fun ZoomBlock(state: EditorState) {
                 drawLine(Color.White, Offset(4f, 0.8f), Offset(4f, 7.2f), 1.2f, StrokeCap.Round)
                 drawLine(Color.White, Offset(7.2f, 4f), Offset(0.8f, 4f), 1.2f, StrokeCap.Round)
             } }
+            HoldName(zoomIn)
         }
         Box(Modifier.height(20.dp).fillMaxWidth(), Alignment.Center) {
             Text("${(state.canvasZoom * 100).toInt()}%", color = Color.White, fontSize = deskSp(10f), textAlign = TextAlign.Center, maxLines = 1)
         }
         Box(Modifier.weight(1f).fillMaxWidth().semantics { contentDescription = zoomOut }.clickable { state.zoomStep(false) }, Alignment.Center) {
             Canvas(Modifier.size(8.dp)) { units(8f) { drawLine(Color.White, Offset(7.2f, 4f), Offset(0.8f, 4f), 1.2f, StrokeCap.Round) } }
+            HoldName(zoomOut)
         }
     }
 }

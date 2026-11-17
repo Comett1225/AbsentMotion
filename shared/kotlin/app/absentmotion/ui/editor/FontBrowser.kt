@@ -6,6 +6,7 @@ import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Presence
 import app.absentmotion.ui.theme.presence
 import app.absentmotion.ui.theme.presenceScrim
+import app.absentmotion.ui.theme.withUiFont
 import app.absentmotion.platform.BackHandler
 import app.absentmotion.platform.rememberLauncherForActivityResult
 import app.absentmotion.platform.ActivityResultContracts
@@ -44,6 +45,7 @@ import kotlinx.coroutines.withContext
 import androidx.annotation.StringRes
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
+import app.absentmotion.ui.HoldName
 
 private val BrowserBg get() = Am.PanelInset
 private val DrawerBg get() = Am.Panel
@@ -117,7 +119,7 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
                 FontIconButton(TextIcons.Menu, stringResource(R.string.font_menu)) { drawer = true }
                 if (search == null) Text(title, Modifier.weight(1f), color = Am.OnDark, fontSize = 16.sp,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center)
-                else BasicTextField(search.orEmpty(), { search = it }, Modifier.weight(1f).focusRequester(searchFocus), textStyle = TextStyle(color = Favourite, fontSize = 16.sp, textDirection = androidx.compose.ui.text.style.TextDirection.Content),
+                else BasicTextField(search.orEmpty(), { search = it }, Modifier.weight(1f).focusRequester(searchFocus), textStyle = TextStyle(color = Favourite, fontSize = 16.sp, textDirection = androidx.compose.ui.text.style.TextDirection.Content).withUiFont(),
                     singleLine = true, decorationBox = { inner -> if (search.isNullOrEmpty()) Text(stringResource(R.string.type_here_to_search), color = Am.OnDark.copy(alpha = .3f), fontSize = 16.sp); inner() })
                 FontIconButton(if (search == null) TextIcons.Search else TextIcons.Tick, if (search == null) stringResource(R.string.font_search) else stringResource(R.string.done)) {
                     search = if (search == null) "" else null
@@ -134,9 +136,10 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
                             color = Am.OnDark, fontSize = 12.sp, maxLines = 2, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
                         if (entry.category == 100) Icon(TextIcons.Import, stringResource(R.string.font_imported), Modifier.padding(8.dp).size(13.dp), tint = Am.OnDark.copy(alpha = .38f))
                         if (needsDownload) Icon(TextIcons.Cloud, stringResource(R.string.font_downloads_when_chosen), Modifier.align(Alignment.TopEnd).padding(8.dp).size(15.dp), tint = Am.OnDark.copy(alpha = .38f))
-                        Icon(if (entry.name.xml in favourites) TextIcons.FilledStar else TextIcons.Star, stringResource(R.string.font_favorite), Modifier.align(Alignment.BottomEnd).size(34.dp).clickable {
-                            library.favourite(entry.name.xml); revision++
-                        }.padding(7.dp), tint = if (entry.name.xml in favourites) Favourite else Am.OnDark.copy(alpha = .38f))
+                        Box(Modifier.align(Alignment.BottomEnd).size(34.dp).clickable { library.favourite(entry.name.xml); revision++ }) {
+                            Icon(if (entry.name.xml in favourites) TextIcons.FilledStar else TextIcons.Star, stringResource(R.string.font_favorite), Modifier.fillMaxSize().padding(7.dp), tint = if (entry.name.xml in favourites) Favourite else Am.OnDark.copy(alpha = .38f))
+                            if (entry.category != 100) HoldName(stringResource(R.string.font_favorite))
+                        }
                     }
                 }
             }
@@ -234,6 +237,7 @@ private val LanguageLabels = mapOf(
 internal fun FontIconButton(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, modifier: Modifier = Modifier, tint: Color = Am.OnDark, onClick: () -> Unit) {
     Box(modifier.size(42.dp).tutorialGuard().clickable(onClick = onClick), contentAlignment = Alignment.Center) {
         Icon(icon, label, Modifier.size(24.dp), tint = tint)
+        HoldName(label)
     }
 }
 

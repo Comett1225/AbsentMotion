@@ -60,6 +60,7 @@ import app.absentmotion.ui.export.ExportIcons
 import app.absentmotion.ui.theme.Am
 import kotlinx.coroutines.delay
 import kotlin.math.abs
+import app.absentmotion.ui.HoldName
 
 private enum class Handle { Start, End }
 
@@ -178,6 +179,7 @@ private fun Stepper(label: String, timeUs: Long, enabled: Boolean, selected: Boo
     ) {
         Box(Modifier.size(48.dp).clickable(enabled = enabled, onClick = onLess), contentAlignment = Alignment.Center) {
             Icon(ExportIcons.Prev, stringResource(R.string.tools_earlier), Modifier.size(18.dp), tint = Am.Navy)
+            HoldName(stringResource(R.string.tools_earlier))
         }
         Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(label, color = Am.HomeDim, fontSize = 12.sp, lineHeight = 14.sp, maxLines = 1)
@@ -185,6 +187,7 @@ private fun Stepper(label: String, timeUs: Long, enabled: Boolean, selected: Boo
         }
         Box(Modifier.size(48.dp).clickable(enabled = enabled, onClick = onMore), contentAlignment = Alignment.Center) {
             Icon(ExportIcons.Next, stringResource(R.string.tools_later), Modifier.size(18.dp), tint = Am.Navy)
+            HoldName(stringResource(R.string.tools_later))
         }
     }
 }

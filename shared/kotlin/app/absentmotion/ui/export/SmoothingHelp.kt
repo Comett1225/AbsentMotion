@@ -25,6 +25,7 @@ import app.absentmotion.export.SmoothLevel
 import app.absentmotion.export.formatBytes
 import app.absentmotion.ai.AiDevice
 import app.absentmotion.ai.AiEstimate
+import app.absentmotion.ai.AiModel
 import app.absentmotion.ai.AiSmooth
 import app.absentmotion.ai.aiEstimate
 import app.absentmotion.ai.model
@@ -74,9 +75,9 @@ internal fun aiSmoothEstimate(gmac: Double, level: SmoothLevel): AiEstimate? {
 }
 
 @Composable
-internal fun aiSmoothNote(estimate: AiEstimate?, level: SmoothLevel, clip: Boolean): String {
+internal fun aiSmoothNote(estimate: AiEstimate?, level: SmoothLevel, clip: Boolean, idle: Boolean = false): String {
     val context = LocalContext.current
-    val download = if (AiSmooth.installed(context, level)) null else stringResource(R.string.ai_download_once, formatBytes(AiSmooth.downloadBytes(level)))
-    val time = estimate?.let { if (clip) it.text else it.extra } ?: stringResource(R.string.ai_checking_phone)
+    val download = if (AiModel.revision >= 0 && AiSmooth.installed(context, level)) null else stringResource(R.string.ai_download_once, formatBytes(AiSmooth.downloadBytes(level)))
+    val time = if (idle) null else estimate?.let { if (clip) it.text else it.extra } ?: stringResource(R.string.ai_checking_phone)
     return listOfNotNull(time, download).joinToString("\n")
 }

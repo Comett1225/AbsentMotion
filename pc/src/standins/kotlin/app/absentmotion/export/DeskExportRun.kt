@@ -61,7 +61,9 @@ object ExportRun {
         get() = DeskExports.fraction
         set(value) { DeskExports.fraction = value }
     @Volatile var visible = true
-    @Volatile internal var title = R.string.export_running
+    internal var title: Int
+        get() = DeskExports.title
+        set(value) { DeskExports.title = value }
     @Volatile var running = false
         internal set
     @Volatile internal var outcome: Boolean? = null
@@ -69,7 +71,6 @@ object ExportRun {
     @Volatile private var stopped = false
 
     fun begin(context: Context, @StringRes title: Int, stop: () -> Unit) {
-        this.title = title
         this.stop = stop
         outcome = null
         stopped = false

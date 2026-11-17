@@ -12,7 +12,7 @@ import org.junit.Test
 class EasingHandlesTest {
     private val ranges: Map<String, List<ClosedFloatingPointRange<Float>?>> = mapOf(
         "cubicBezier" to listOf(0f..1f, -2f..3f, 0f..1f, -2f..3f),
-        "bounce" to listOf(0.02f..1f, 0f..0.95f),
+        "bounce" to listOf(0.02f..1f, 0f..1f),
         "elastic" to listOf(0.02f..0.98f, null, 0f..1f, 0f..1f),
         "cyclic" to listOf(0.02f..1f, 0f..1f, 0.02f..0.98f, 0f..1f, null),
         "random" to List(6) { 0f..1f },
@@ -85,9 +85,9 @@ class EasingHandlesTest {
 
     @Test fun aStraightLineBecomesABezierWhenAHandleIsPulled() {
         val (first, second) = Easing.Linear.handles()
-        assertTrue(first.moved(first.x, first.y).isLinear)
-        assertEquals(Easing("cubicBezier", listOf(0.3f, 0.6f, 1f, 1f)), first.moved(0.3f, 0.6f))
-        assertEquals(Easing("cubicBezier", listOf(0f, 0f, 0.8f, 0.2f)), second.moved(0.8f, 0.2f))
+        assertEquals(Easing("cubicBezier", listOf(0.25f, 0.25f, 0.75f, 0.75f)), first.moved(first.x, first.y))
+        assertEquals(Easing("cubicBezier", listOf(0.3f, 0.6f, 0.75f, 0.75f)), first.moved(0.3f, 0.6f))
+        assertEquals(Easing("cubicBezier", listOf(0.25f, 0.25f, 0.8f, 0.2f)), second.moved(0.8f, 0.2f))
     }
 
     @Test fun handlesFollowTheFinger() {
@@ -97,7 +97,7 @@ class EasingHandlesTest {
         val bounce = Easing("bounce", listOf(0.3f, 0.8f)).handles()[0].moved(0.3f, 0.4f)
         assertEquals(0.375f, bounce.p[0], 1e-5f); assertEquals(0.6f, bounce.p[1], 1e-5f)
         bounce.handles()[0].let { assertEquals(0.3f, it.x, 1e-5f); assertEquals(0.4f, it.y, 1e-5f) }
-        assertEquals(0.4f, Easing("step", listOf(0.25f, 0f)).handles()[0].moved(0.5f, 0.3f).p[0], 1e-6f)
+        assertEquals(0.5f, Easing("step", listOf(0.25f, 0f)).handles()[0].moved(0.5f, 0.3f).p[0], 1e-6f)
     }
 
     @Test fun aReversedCurveShowsItsHandlesMirroredAndTakesMirroredDrags() {

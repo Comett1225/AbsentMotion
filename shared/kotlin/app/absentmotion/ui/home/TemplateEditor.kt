@@ -99,6 +99,7 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
+import app.absentmotion.ui.HoldName
 
 private val Rounded = RoundedCornerShape(12.dp)
 private const val ReplaceHint = 1
@@ -298,6 +299,7 @@ fun TemplateEditor(templateId: String, engine: EngineThread, settings: AppSettin
             app.absentmotion.platform.SceneSurface(engine, 1, box, Modifier.fillMaxSize())
             if (clip == null && !playing) Box(Modifier.align(Alignment.Center).size(56.dp).clip(CircleShape).background(Color(0x66000000)), Alignment.Center) {
                 Icon(ChromeIcons.Play, stringResource(R.string.template_play), Modifier.size(32.dp), tint = Color.White)
+                HoldName(stringResource(R.string.template_play))
             }
             val hint = when {
                 clip != null -> null
@@ -393,7 +395,7 @@ fun TemplateEditor(templateId: String, engine: EngineThread, settings: AppSettin
 private fun TopBar(title: String, icon: ImageVector, description: String, action: String, onBack: () -> Unit, onAction: () -> Unit) {
     val desk = app.absentmotion.platform.PlatformFeatures.desktop
     Box(Modifier.fillMaxWidth().height(48.dp)) {
-        Box(Modifier.size(48.dp).deskPress(8.dp).clickable(onClick = onBack), Alignment.Center) { Icon(icon, description, Modifier.size(24.dp), tint = Am.OnDark) }
+        Box(Modifier.size(48.dp).deskPress(8.dp).clickable(onClick = onBack), Alignment.Center) { Icon(icon, description, Modifier.size(24.dp), tint = Am.OnDark); HoldName(description) }
         Text(title, Modifier.align(Alignment.Center).padding(horizontal = 92.dp), color = Am.OnDark, fontWeight = FontWeight.Bold, maxLines = 1,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center, autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(11.sp, if (desk) 18.sp else 22.sp, 0.5.sp))
         Box(Modifier.align(Alignment.CenterEnd).height(48.dp).deskPress(8.dp).clickable(onClick = onAction).padding(horizontal = 16.dp), Alignment.Center) {
@@ -441,11 +443,13 @@ private fun SlotCell(picture: ImageBitmap?, selected: Boolean, mode: MediaFillMo
         if (selected) Box(Modifier.align(Alignment.Center).size(40.dp).clip(CircleShape).background(Color(0x99000000)), Alignment.Center) {
             Icon(HomeIcons.Replace, stringResource(R.string.template_replace), Modifier.size(24.dp), tint = Color.White)
         }
+        if (selected) HoldName(stringResource(R.string.template_replace))
         val press = remember { MutableInteractionSource() }
         Box(Modifier.align(Alignment.TopEnd).size(44.dp).clickable(press, null, onClick = onScale), Alignment.Center) {
             Box(Modifier.size(28.dp).pressShape(press, CircleShape).background(Color(0x99000000)), Alignment.Center) {
                 Icon(when (mode) { MediaFillMode.Fill -> HomeIcons.CropFill; MediaFillMode.Fit -> HomeIcons.CropFit; MediaFillMode.Stretch -> HomeIcons.CropStretch }, stringResource(R.string.template_scale), Modifier.size(20.dp), tint = Color.White)
             }
+            HoldName(stringResource(R.string.template_scale))
         }
     }
 }

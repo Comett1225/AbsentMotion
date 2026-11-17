@@ -84,6 +84,7 @@ import app.absentmotion.ui.theme.Motion
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
+import app.absentmotion.ui.HoldName
 
 @Composable
 internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
@@ -92,8 +93,6 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
     val index = state.effectIndex
     val instance = layer.effects.getOrNull(index)
     val definition = instance?.let { catalog.find(it["id"] ?: "") }
-    val shownFor = remember { longArrayOf(layer.id) }
-    LaunchedEffect(layer.id) { if (shownFor[0] != layer.id) { shownFor[0] = layer.id; state.effectIndex = -1 } }
     LaunchedEffect(instance == null) { if (instance == null && index >= 0) state.effectIndex = -1 }
     var active by remember(layer.id, index, definition?.id) { mutableStateOf(definition?.params?.firstOrNull { it.kind != "color" && it.kind != "switch" && it.kind != "choice" && it.kind != "text" && definition.shown(it, instance, layer.t) }) }
     LaunchedEffect(definition) { active = definition?.params?.firstOrNull { it.id == active?.id } }
@@ -146,7 +145,7 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
             val linked = target != null && layer.element(target.ref)?.children?.any { it.name == "valueLink" } == true
             val onKeyframe = target != null && layer.onKeyframe(target.ref)
             EffectFrameButton(if (onKeyframe) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, stringResource(if (onKeyframe) R.string.a11y_remove_keyframe else R.string.a11y_add_keyframe), Modifier.weight(1f), target != null && !linked) { state.toggleKeyframe() }
-            EffectFrameButton(PanelIcons.Easing, stringResource(R.string.a11y_easing), Modifier.weight(1f), target != null && !linked) { if (target != null && layer.easing(target.ref) != null) state.easingOpen = true else state.easingHint = true }
+            EffectFrameButton(PanelIcons.Easing, stringResource(R.string.a11y_easing), Modifier.weight(1f), target != null && !linked) { if (target != null && layer.easing(target.ref) != null) state.easingOpen = true else state.hintEasing(target?.let { layer.keyframes(it.ref).size } ?: 0) }
             Box(Modifier.weight(1f).fillMaxWidth()) {
                 EffectFrameButton(PanelIcons.More, stringResource(R.string.effects_more), Modifier.fillMaxSize(), instance == null) { menu = true }
                 Presence(menu) {
@@ -272,9 +271,11 @@ private fun EffectHeader(state: EditorState, index: Int, effect: XmlNode, defini
         }
         if (definition != null) Box(Modifier.size(36.dp).clickable { help = true }, contentAlignment = Alignment.Center) {
             DeskTip(stringResource(R.string.effect_help)) { Icon(ExportIcons.Help, stringResource(R.string.effect_help), Modifier.size(22.dp), tint = Am.OnDark) }
+            HoldName(stringResource(R.string.effect_help))
         }
         Box(Modifier.size(36.dp).clickable { menu = true }, contentAlignment = Alignment.Center) {
             DeskTip(stringResource(R.string.effects_more)) { Icon(EffectIcons.MoreVert, stringResource(R.string.effects_more), Modifier.size(24.dp), tint = Am.OnDark) }
+            HoldName(stringResource(R.string.effects_more))
             Presence(menu) {
                 MenuPopup(DropOrRise, { menu = false }) {
                     MenuRow(stringResource(R.string.effects_effect_info), enabled = definition != null) {
@@ -297,6 +298,7 @@ private fun EffectHeader(state: EditorState, index: Int, effect: XmlNode, defini
         }
         Box(Modifier.size(36.dp).clickable { state.editSelected { it.removeEffect(index) }; state.effectIndex = -1 }, contentAlignment = Alignment.Center) {
             DeskTip(stringResource(R.string.delete)) { Icon(ChromeIcons.Trash, stringResource(R.string.delete), Modifier.size(22.dp), tint = Am.OnDark) }
+            HoldName(stringResource(R.string.delete))
         }
     }
     if (help && definition != null) HelpScreen("effects/${definition.page}.html") { help = false }
@@ -360,9 +362,10 @@ private fun EffectListRow(state: EditorState, reorder: Reorder, index: Int, coun
                 Text(definition?.name ?: effect["id"]?.substringAfterLast('.') ?: "", Modifier.padding(start = 6.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
             }
             DeskTip(stringResource(R.string.effects_visibility)) {
-                Icon(if (visible) EffectIcons.Eye else EffectIcons.EyeOff, stringResource(R.string.effects_visibility), Modifier.width(36.dp).clickable {
-                    state.editSelected { it.withEffect(index) { node -> node.with("hidden", if (visible) "true" else null) } }
-                }, tint = Am.OnDark)
+                Box(Modifier.width(36.dp).clickable { state.editSelected { it.withEffect(index) { node -> node.with("hidden", if (visible) "true" else null) } } }) {
+                    Icon(if (visible) EffectIcons.Eye else EffectIcons.EyeOff, stringResource(R.string.effects_visibility), Modifier.width(36.dp), tint = Am.OnDark)
+                    HoldName(stringResource(R.string.effects_visibility))
+                }
             }
             Box(Modifier.width(36.dp).fillMaxHeight().clickable { state.effectIndex = index }.reorderGrip(reorder, index, count, move), Alignment.Center) {
                 Icon(EffectIcons.Grip, stringResource(R.string.effects_reorder), Modifier.size(20.dp), tint = Am.OnDark)
@@ -391,5 +394,6 @@ private fun Modifier.deleteWhenHovered(remove: () -> Unit): Modifier {
 private fun EffectFrameButton(icon: ImageVector, description: String, modifier: Modifier, enabled: Boolean = true, onClick: () -> Unit) {
     Box(modifier.fillMaxWidth().alpha(if (enabled) 1f else 0.35f).clickable(enabled = enabled, onClick = onClick), contentAlignment = Alignment.Center) {
         Icon(icon, description, Modifier.size(24.dp), tint = Am.OnDark)
+        HoldName(description)
     }
 }

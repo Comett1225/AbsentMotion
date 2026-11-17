@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor
 
+import app.absentmotion.ui.editor.panels.typeOnDoubleTap
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -80,6 +81,7 @@ import app.absentmotion.R
 import androidx.compose.ui.semantics.contentDescription
 import app.absentmotion.ui.editor.panels.sliderSemantics
 import androidx.compose.ui.semantics.semantics
+import app.absentmotion.ui.HoldName
 
 private val RowShape = RoundedCornerShape(5.dp)
 private val RowHeight = 37.dp
@@ -169,6 +171,7 @@ private fun EffectRow(state: EditorState, reorder: Reorder, index: Int, fx: Audi
         }
         Box(Modifier.width(36.dp).fillMaxHeight().clickable { state.editSelected { it.updateAudioEffect(index) { e -> e.withBypass(!e.bypass) } } }, Alignment.Center) {
             Icon(if (fx.bypass) EffectIcons.EyeOff else EffectIcons.Eye, stringResource(if (fx.bypass) R.string.audiofx_turn_on else R.string.audiofx_bypass), Modifier.size(22.dp), tint = Am.OnDark)
+            HoldName(stringResource(if (fx.bypass) R.string.audiofx_turn_on else R.string.audiofx_bypass))
         }
         Box(Modifier.width(36.dp).fillMaxHeight().clickable(enabled = known, onClick = open).reorderGrip(reorder, index, count, move), Alignment.Center) {
             Icon(EffectIcons.Grip, stringResource(R.string.audiofx_reorder), Modifier.size(20.dp), tint = Am.OnDark)
@@ -187,9 +190,11 @@ private fun EffectDetail(state: EditorState, index: Int, fx: AudioFx, cards: Car
             }
             Box(Modifier.size(36.dp).clickable { state.editSelected { it.updateAudioEffect(index) { e -> e.reset() } } }, Alignment.Center) {
                 DeskTip(stringResource(R.string.audiofx_reset)) { Icon(ChromeIcons.Undo, stringResource(R.string.audiofx_reset), Modifier.size(22.dp), tint = Am.OnDark) }
+                HoldName(stringResource(R.string.audiofx_reset))
             }
             Box(Modifier.size(36.dp).clickable { close(); state.editSelected { it.withAudioEffects(it.audioEffects.filterIndexed { i, _ -> i != index }) } }, Alignment.Center) {
                 DeskTip(stringResource(R.string.delete)) { Icon(ChromeIcons.Trash, stringResource(R.string.delete), Modifier.size(22.dp), tint = Am.OnDark) }
+                HoldName(stringResource(R.string.delete))
             }
         }
         Column(Modifier.weight(1f).fillMaxWidth().deskVerticalScroll()) {
@@ -242,7 +247,7 @@ private fun ParamSlider(
             drawLine(Am.AccentLit, Offset(pad, y), Offset(x, y), 2.dp.toPx(), StrokeCap.Round)
             drawCircle(Am.AccentLit, 6.dp.toPx(), Offset(x, y))
         }
-        Box(Modifier.width(76.dp).height(30.dp).clip(RoundedCornerShape(4.dp)).background(Am.PanelInset).clickable {
+        Box(Modifier.width(76.dp).height(30.dp).clip(RoundedCornerShape(4.dp)).background(Am.PanelInset).typeOnDoubleTap {
             state.keypad = KeypadRequest(listOf(KeypadField(label, toTyped(value), unit, toTyped(min), toTyped(max))), 0) { values -> set(fromTyped(values[0]).coerceIn(min, max)); state.endGesture() }
         }, Alignment.Center) {
             Text(text, color = Am.OnDark, fontSize = 12.sp, maxLines = 1, textAlign = TextAlign.Center)
@@ -270,6 +275,7 @@ private fun ChoiceRow(param: FxParam, value: Float, set: (Float) -> Unit) {
 private fun FrameButton(icon: androidx.compose.ui.graphics.vector.ImageVector, description: String, modifier: Modifier, enabled: Boolean = true, onClick: () -> Unit) {
     Box(modifier.fillMaxWidth().alpha(if (enabled) 1f else 0.35f).clickable(enabled = enabled, onClick = onClick), Alignment.Center) {
         Icon(icon, description, Modifier.size(24.dp), tint = Am.OnDark)
+        HoldName(description)
     }
 }
 

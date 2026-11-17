@@ -63,6 +63,8 @@ import app.absentmotion.ui.theme.pressScale
 import app.absentmotion.ui.theme.Presence
 import app.absentmotion.ui.theme.animatedBackground
 import app.absentmotion.ui.theme.enterFade
+import app.absentmotion.ui.theme.withUiFont
+import app.absentmotion.ui.HoldName
 
 private val Underline get() = Am.Deepest
 
@@ -141,12 +143,14 @@ fun EditorTopBar(state: EditorState, onExit: () -> Unit, modifier: Modifier = Mo
                 Box(Modifier.size(40.dp, 28.dp).pressScale(exportPress).background(Am.Accent, RoundedCornerShape(7.dp)), contentAlignment = Alignment.Center) {
                     Icon(ChromeIcons.Share, stringResource(R.string.topbar_export_share), Modifier.size(18.dp), tint = Am.OnAccent)
                 }
+                HoldName(stringResource(R.string.topbar_export_share))
             }
             else BarButton(ChromeIcons.Share, stringResource(R.string.topbar_export_share), cell.enterFade().tutorialTarget("export")) { act { state.playing = false; state.exportOpen = true } }
         } else if (!inPanel) {
             Spacer(Modifier.width(5.dp))
             Box(cell.enterFade().buttonLabel(stringResource(R.string.structure_link_parent)).clickable { act { parentMenuOpen = true } }, contentAlignment = Alignment.Center) {
                 LayerParentIcon()
+                HoldName(stringResource(R.string.structure_link_parent))
                 Presence(parentMenuOpen) { ParentMenu(state) { parentMenuOpen = false } }
             }
             Spacer(Modifier.width(6.dp))
@@ -210,7 +214,7 @@ private fun NameField(value: String, modifier: Modifier, onCommit: (String) -> U
                     if (focused && !it.isFocused) commit()
                     focused = it.isFocused
                 },
-            textStyle = TextStyle(color = Am.OnDark, fontSize = 15.sp, textDirection = androidx.compose.ui.text.style.TextDirection.Content),
+            textStyle = TextStyle(color = Am.OnDark, fontSize = 15.sp, textDirection = androidx.compose.ui.text.style.TextDirection.Content).withUiFont(),
             singleLine = true,
             cursorBrush = SolidColor(Am.Accent),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),

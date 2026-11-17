@@ -35,6 +35,7 @@ std::string FormatTimecode(double seconds, double fps, int format);
 std::string Scramble(const std::string& text, float progress, int direction, uint64_t seed, int64_t tick, int charset,
                      const std::string& custom, bool keepSpaces, float amount = 1, float start = 0, float end = 1);
 
+std::vector<int> SpaceRows(float before, float space, int count, float width);
 std::vector<float> TypeTimes(const std::string& text, float speed, float pause);
 std::vector<float> BlipTimes(const std::string& text, float speed, float pause, int every);
 bool Picked(int index, uint64_t seed, float seconds, float fraction, float every);

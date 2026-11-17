@@ -235,7 +235,7 @@ class MainActivity : ComponentActivity() {
         window.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(Am.HomeBg.toArgb()))
         importShared()
         setContent {
-            app.absentmotion.ui.theme.ThemeFadeHost {
+            app.absentmotion.ui.theme.ThemeFadeHost { app.absentmotion.ui.theme.UiFontHost(settings) {
             app.absentmotion.ui.theme.FollowSystemTheme(settings)
             val open = editor
             val light = if ((open == null || open.toolOpen != 0) && editingTemplate == null) Am.homeIsLight else Am.editorIsLight
@@ -350,7 +350,7 @@ class MainActivity : ComponentActivity() {
                     onOpen = ::open, onCloseEditor = ::closeEditor, onChanged = { projectsChanged++ },
                 )
             }
-        }
+        } }
         }
         Log.i("AMStart", "onCreate took ${SystemClock.elapsedRealtime() - started} ms")
         androidx.core.view.OneShotPreDrawListener.add(window.decorView) { Log.i("AMStart", "first frame after ${SystemClock.elapsedRealtime() - started} ms") }

@@ -123,11 +123,14 @@ import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Presence
 import app.absentmotion.ui.theme.presence
 import app.absentmotion.ui.theme.presenceScrim
+import app.absentmotion.ui.theme.withUiFont
 import kotlin.math.roundToInt
 import androidx.annotation.StringRes
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
+import app.absentmotion.ui.editor.panels.DoubleTapToType
+import app.absentmotion.ui.HoldName
 
 private val MenuBg get() = Am.Field
 private val MenuLine get() = Am.MenuLine
@@ -483,6 +486,7 @@ private fun SettingsPanel(state: EditorState, onDismiss: () -> Unit, modifier: M
     ) {
         Box(Modifier.size(40.dp).clickable(onClick = onDismiss), Alignment.Center) {
             Icon(ChromeIcons.Close, stringResource(R.string.action_close), Modifier.size(24.dp), tint = Am.OnDark)
+            HoldName(stringResource(R.string.action_close))
         }
         AspectRow(
             aspect,
@@ -569,6 +573,7 @@ private fun GroupSettingsPanel(state: EditorState, onDismiss: () -> Unit, modifi
     ) {
         Box(Modifier.size(40.dp).clickable(onClick = onDismiss), Alignment.Center) {
             Icon(ChromeIcons.Close, stringResource(R.string.action_close), Modifier.size(24.dp), tint = Am.OnDark)
+            HoldName(stringResource(R.string.action_close))
         }
         SettingRow(stringResource(R.string.menu_retiming)) {
             Dropdown(stringResource(options.firstOrNull { it.first == scene.retime }?.second ?: options[0].second)) { close ->
@@ -589,15 +594,16 @@ private fun AspectRow(selected: String, onPick: (Aspect) -> Unit, onCustom: () -
             }
         }
         val custom = selected == CUSTOM
-        AspectButton(31.dp, 31.dp, custom, onClick = onCustom) {
+        AspectButton(31.dp, 31.dp, custom, stringResource(R.string.menu_custom_aspect_ratio), onCustom) {
             Icon(ChromeIcons.Pencil, stringResource(R.string.menu_custom_aspect_ratio), Modifier.size(16.dp), tint = if (custom) Am.OnAccent else Am.HomeDim)
         }
     }
 }
 
 @Composable
-private fun AspectButton(w: Dp, h: Dp, selected: Boolean, onClick: () -> Unit, content: @Composable BoxScope.() -> Unit) {
+private fun AspectButton(w: Dp, h: Dp, selected: Boolean, name: String = "", onClick: () -> Unit, content: @Composable BoxScope.() -> Unit) {
     Box(Modifier.fillMaxHeight().clickable(onClick = onClick).padding(horizontal = 10.dp), Alignment.Center) {
+        HoldName(name)
         val shape = RoundedCornerShape(2.dp)
         Box(
             Modifier.size(w, h).background(if (selected) Am.Accent else Am.Card, shape)
@@ -724,6 +730,7 @@ private fun SavedSizesButton(settings: app.absentmotion.library.AppSettings, wid
     Box(Modifier.padding(start = 6.dp).fillMaxHeight().width(37.dp)) {
         Box(Modifier.fillMaxSize().clip(FieldShape).background(Am.Card).clickable { focus.clearFocus(); open = true }, Alignment.Center) {
             Icon(ChromeIcons.SavePreset, stringResource(R.string.newproject_saved_sizes), Modifier.size(22.dp), tint = Am.Navy)
+            HoldName(stringResource(R.string.newproject_saved_sizes))
         }
         Presence(open) {
             Popup(DropdownPosition, { open = false }, PopupProperties(focusable = true)) {
@@ -751,17 +758,19 @@ private fun SavedSizesButton(settings: app.absentmotion.library.AppSettings, wid
 private fun SizeField(value: String, onValue: (String) -> Unit, onLeave: () -> Unit, modifier: Modifier) {
     var focused by remember { mutableStateOf(false) }
     val focus = LocalFocusManager.current
-    BasicTextField(
-        value, onValue,
-        modifier.fillMaxHeight().clip(FieldShape).background(Am.Card).onFocusChanged {
-            if (focused && !it.isFocused) onLeave()
-            focused = it.isFocused
-        },
-        textStyle = TextStyle(color = Am.Navy, fontSize = 15.sp, textAlign = TextAlign.Center),
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
-        keyboardActions = KeyboardActions(onDone = { focus.clearFocus() }),
-        cursorBrush = SolidColor(Am.Navy),
-        decorationBox = { inner -> Box(Modifier.fillMaxSize(), Alignment.Center) { inner() } },
-    )
+    DoubleTapToType(value, onValue, modifier.fillMaxHeight()) { gate, typed, onTyped ->
+        BasicTextField(
+            typed, onTyped,
+            gate.clip(FieldShape).background(Am.Card).onFocusChanged {
+                if (focused && !it.isFocused) onLeave()
+                focused = it.isFocused
+            },
+            textStyle = TextStyle(color = Am.Navy, fontSize = 15.sp, textAlign = TextAlign.Center).withUiFont(),
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { focus.clearFocus() }),
+            cursorBrush = SolidColor(Am.Navy),
+            decorationBox = { inner -> Box(Modifier.fillMaxSize(), Alignment.Center) { inner() } },
+        )
+    }
 }

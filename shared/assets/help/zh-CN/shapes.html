@@ -21,10 +21,10 @@
 <h2 id="svg-files">SVG 文件</h2>
 <p>添加菜单中的 <strong>导入 SVG</strong> 会将矢量图转换为形状。保留的内容参见 <a href="add-menu.html">添加菜单</a>。</p>
 <h2 id="masks-and-clipping">蒙版和剪贴</h2>
-<ul><li><strong>创建剪贴蒙版</strong>（图层菜单）会将一个图层裁剪为其正下方图层的形状。<strong>释放剪贴蒙版</strong>可撤销此操作。在时间轴上，被剪贴的图层在其行末尾会显示一个小的弯钩箭头，指向它所被剪贴到的图层。</li><li><strong>编组并蒙版</strong>和<strong>编组并排除</strong>（多选）会将图层编组，并将顶层图层的混合模式设为“蒙版”或“排除”。你也可以在<strong>不透明度</strong>中为任何图层设置混合模式“蒙版”或“排除”。<strong>蒙版</strong>只保留该图层所在位置下方的内容；<strong>排除</strong>则将其裁去。</li><li>带动画的蒙版来自形状关键帧（见上文）。</li><li>照片和视频的 <strong>移除背景</strong> 在 <a href="ai-tools.html">AI 工具</a> 中说明。</li></ul>
+<ul><li><strong>创建剪贴蒙版</strong>（图层菜单）会将一个图层裁剪为其正下方图层的形状。<strong>释放剪贴蒙版</strong>可撤销此操作。在时间轴上，被剪贴的图层在其行末尾会显示一个小的弯钩箭头，指向它所被剪贴到的图层。</li><li><strong>编组并蒙版</strong>和<strong>编组并挖空</strong>（多选）会将图层编组，并将顶层图层的混合模式设为“蒙版”或“挖空”。你也可以在<strong>不透明度</strong>中为任何图层设置混合模式“蒙版”或“挖空”。<strong>蒙版</strong>只保留该图层所在位置下方的内容；<strong>挖空</strong>则将其裁去。</li><li>带动画的蒙版来自形状关键帧（见上文）。</li><li>照片和视频的 <strong>移除背景</strong> 在 <a href="ai-tools.html">AI 工具</a> 中说明。</li></ul>
 <figure><img src="../assets/img/sh-clip-marker.webp" width="720" height="320" alt="被剪裁的图层：它的箭头 (1) 向下指向所剪裁到的图层 (2)。" loading="lazy"><figcaption>被剪裁的图层：它的箭头 (1) 向下指向所剪裁到的图层 (2)。</figcaption></figure>
 <h2 id="groups-and-parents">组和父级</h2>
-<ul><li><strong>编组</strong>（多选）会把图层放入一个组图层。之后可以将组作为一个整体移动、缩放、淡入淡出并添加特效。参见 <a href="layer-menus.html">图层菜单和多选</a>。</li><li><strong>父级</strong>（顶栏中的父级按钮）可让一个图层跟随另一个图层，而无需编组。移动特效 <strong>父级助手</strong> 和 <strong>缩放辅助</strong> 会改变子图层跟随父图层的方式：参见 <a href="effects-guide.html">使用特效</a>。</li><li><strong>空对象</strong>图层（添加 &gt; 对象 / 素材）不可见。将它设为其他图层的父级，即可让它们一起移动，或让 <a href="tracking.html">运动跟踪</a> 来移动它。</li></ul>
+<ul><li><strong>编组</strong>（多选）会把图层放入一个组图层。之后可以将组作为一个整体移动、缩放、淡入淡出并添加特效。参见 <a href="layer-menus.html">图层菜单和多选</a>。</li><li><strong>父级</strong>（顶栏中的父级按钮）可让一个图层跟随另一个图层，而无需编组。移动特效 <strong>父子关联助手</strong> 和 <strong>缩放辅助</strong> 会改变子图层跟随父图层的方式：参见 <a href="effects-guide.html">使用特效</a>。</li><li><strong>空对象</strong>图层（添加 &gt; 对象 / 素材）不可见。将它设为其他图层的父级，即可让它们一起移动，或让 <a href="tracking.html">运动跟踪</a> 来移动它。</li></ul>
 <h3 id="edit-a-group">编辑组</h3>
 <p>选择一个组，然后点按其工具中的 <strong>编辑组</strong> 即可打开它。进入后，时间轴和预览只显示该组的图层，你可以像编辑其他图层一样编辑它们。组中也可以再打开组。</p>
 <ul><li>顶栏会显示你当前所在的位置：项目名称，然后是每个已打开组的名称。点按项目名称可返回整个项目，点按某个组的名称可返回该组。</li><li>选中一个图层时，图层名称旁会显示一个带有组名称的小标签。点按它即可离开该组。</li><li>未选中任何内容时，手机的返回按钮会离开你当前所在的组。</li><li>齿轮图标会打开你所在组的设置。其中只有一个设置，即 <strong>时间重映射</strong>：见下文。</li></ul>

@@ -159,7 +159,7 @@ object FfmpegEngine : MediaEngine {
     }
 
     private fun watched(command: List<String>, spanUs: Long, most: Float, failed: () -> ExportError, progress: (Float) -> Unit, alive: () -> Boolean) {
-        val process = start(command)
+        val process = try { start(command) } catch (_: java.io.IOException) { throw failed() }
         try {
             process.inputStream.bufferedReader().forEachLine { line ->
                 if (!alive()) throw CancellationException()
@@ -319,6 +319,11 @@ object FfmpegEngine : MediaEngine {
 
     override fun downloaded(plan: Plan, mode: SaveMode, dir: File): File? =
         dir.listFiles().orEmpty().filter { it.isFile && it.name.startsWith("item.") && !it.name.endsWith(".part") && !it.name.endsWith(".ytdl") }.maxByOrNull { it.length() }
+
+    fun merge(video: File, audio: File, out: File): Boolean = runCatching {
+        ProcessBuilder(ffmpeg, "-nostdin", "-v", "error", "-y", "-i", video.path, "-i", audio.path, "-map", "0:v:0", "-map", "1:a:0", "-c", "copy", out.path).redirectErrorStream(true).start()
+            .let { it.inputStream.readBytes(); it.waitFor() }
+    }.getOrDefault(-1) == 0 && out.length() > 0
 
     override fun withoutAudio(file: File): File {
         val out = File(file.parentFile, "silent." + file.extension)

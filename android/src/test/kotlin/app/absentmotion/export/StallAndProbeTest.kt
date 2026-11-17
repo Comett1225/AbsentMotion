@@ -106,6 +106,19 @@ class StallAndProbeTest {
         }
     }
 
+    @Test fun aCodecThatDiedInTheBackgroundIsRetriedWithAnotherEncoder() = runBlocking {
+        val died = IllegalStateException().apply { stackTrace = arrayOf(StackTraceElement("android.media.MediaCodec", "native_dequeueOutputBuffer", null, -2)) }
+        assertTrue(codecFailed(died))
+        assertTrue(encoderTrouble(RuntimeException(died)))
+        assertFalse(codecFailed(IllegalStateException("frame 3 cannot be read")))
+        assertFalse(codecFailed(ExportError(app.absentmotion.i18n.txt(app.absentmotion.R.string.export_error_codec_busy)).apply { stackTrace = died.stackTrace }))
+        EncoderTrouble.bad.clear()
+        var runs = 0
+        assertEquals("done", retryingEncoder({}) { runs++; EncoderTrouble.last = "encoder $runs"; if (runs == 1) throw died; "done" })
+        assertEquals(setOf("encoder 1"), EncoderTrouble.bad.toSet())
+        EncoderTrouble.bad.clear()
+    }
+
     @Test fun anEncoderListThatThrowsOrHangsGivesUpWithNoAnswer() = runBlocking {
         assertEquals(listOf(1), finishedWithin(1_000, "t") { listOf(1) })
         assertNull(finishedWithin(1_000, "t") { throw IllegalStateException("mediaserver died") })

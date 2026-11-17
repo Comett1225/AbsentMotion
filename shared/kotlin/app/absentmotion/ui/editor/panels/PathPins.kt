@@ -58,6 +58,7 @@ import app.absentmotion.model.withoutPuppetPin
 import app.absentmotion.ui.editor.ChromeIcons
 import app.absentmotion.ui.editor.PanelIcons
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.HoldName
 
 internal const val TEXT_PATH_ID = "absent.textpath"
 internal const val PUPPET_ID = "absent.puppet"
@@ -180,17 +181,19 @@ internal fun PuppetSection(state: EditorState, layer: Layer, index: Int, instanc
         Row(Modifier.fillMaxWidth().height(52.dp).padding(horizontal = 3.dp, vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
             PropertyLabel(label, chosen, true, Modifier.width(75.dp).fillMaxHeight()) { onPin(if (chosen) null else p.name) }
             Spacer(Modifier.width(4.dp))
-            ValueBox(formatFixed(p.at.x, 1), false, chosen, Modifier.weight(1f).fillMaxHeight(), 5.5f, true) { keypad(0) }
+            ValueBox(formatFixed(p.at.x, 1), false, chosen, Modifier.weight(1f).fillMaxHeight(), 5.5f, true, { onPin(p.name) }) { keypad(0) }
             Spacer(Modifier.width(3.dp))
-            ValueBox(formatFixed(p.at.y, 1), false, chosen, Modifier.weight(1f).fillMaxHeight(), 5.5f, true) { keypad(1) }
+            ValueBox(formatFixed(p.at.y, 1), false, chosen, Modifier.weight(1f).fillMaxHeight(), 5.5f, true, { onPin(p.name) }) { keypad(1) }
             Box(Modifier.size(48.dp).clickable { state.movePin(index, p, p.rest, null) }, contentAlignment = Alignment.Center) {
                 DeskTip("$label, ${stringResource(R.string.puppet_reset_pin)}") { Icon(ChromeIcons.Undo, "$label, ${stringResource(R.string.puppet_reset_pin)}", Modifier.size(20.dp), tint = Am.OnDark) }
+                HoldName(stringResource(R.string.audiofx_reset))
             }
             Box(Modifier.size(48.dp).clickable {
                 if (chosen) onPin(null)
                 state.editSelected { current -> current.withEffect(index) { it.withoutPuppetPin(p.number) } }
             }, contentAlignment = Alignment.Center) {
                 DeskTip("$label, ${stringResource(R.string.puppet_delete_pin)}") { Icon(ChromeIcons.Trash, "$label, ${stringResource(R.string.puppet_delete_pin)}", Modifier.size(20.dp), tint = Am.OnDark) }
+                HoldName(stringResource(R.string.puppet_delete_pin))
             }
         }
         if (chosen) {

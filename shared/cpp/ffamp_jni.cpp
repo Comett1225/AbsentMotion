@@ -6,6 +6,7 @@
 #include <deque>
 #include "absent/android.h"
 #include "absent/audio.h"
+#include "ffamp_clock.h"
 
 using namespace absent;
 
@@ -24,6 +25,7 @@ struct Video {
     std::vector<uint8_t> packet;
     std::deque<android::SoftPicture> ready;
     std::vector<int64_t> later;
+    double start;
 };
 
 struct Audio {
@@ -38,7 +40,9 @@ const Track* trackOf(jlong h, jint t) {
     return &f->reader->tracks()[size_t(t)];
 }
 
-int64_t micros(const Track& t, int64_t ticks) { return t.timescale ? int64_t(std::llround(double(ticks - t.mediaStart) * 1e6 / t.timescale)) : 0; }
+int64_t micros(const Track& t, int64_t ticks, double start) {
+    return t.timescale ? int64_t(std::llround(double(ticks - t.mediaStart + t.delay) * 1e6 / t.timescale - start * 1e6)) : 0;
+}
 
 }
 
@@ -74,7 +78,8 @@ JNIEXPORT jlongArray JNICALL Java_app_absentmotion_ffamp_FfampNative_track(JNIEn
     const jlong values[] = {jlong(k->kind == Kind::Video ? 1 : k->kind == Kind::Audio ? 2 : 0), jlong(k->width), jlong(k->height), jlong(k->rotation),
         jlong(k->sampleRate), jlong(k->channels), jlong(std::llround(k->seconds() * 1e6)), jlong(k->samples.size()), jlong(largest),
         jlong(k->color.known), jlong(k->color.primaries), jlong(k->color.transfer), jlong(k->color.matrix), jlong(k->color.full), jlong(k->alpha),
-        jlong(k->codec), jlong(k->bits), jlong(android::codecProfile(*k)), jlong(android::codecLevel(*k))};
+        jlong(k->codec), jlong(k->bits), jlong(android::codecProfile(*k)), jlong(android::codecLevel(*k)),
+        jlong(k->timescale ? std::llround((TrackStart(*k) - FileStart(*opened(h)->reader)) * 1e6) : 0)};
     const jsize n = jsize(sizeof(values) / sizeof(values[0]));
     jlongArray out = env->NewLongArray(n);
     env->SetLongArrayRegion(out, 0, n, values);
@@ -98,11 +103,12 @@ JNIEXPORT void JNICALL Java_app_absentmotion_ffamp_FfampNative_table(JNIEnv* env
     const Track* k = trackOf(h, t);
     if (!k) return;
     const size_t n = k->samples.size();
+    const double start = FileStart(*opened(h)->reader);
     std::vector<jlong> times(n);
     std::vector<jint> bytes(n);
     std::vector<jboolean> keys(n);
     for (size_t i = 0; i < n; ++i) {
-        times[i] = micros(*k, k->samples[i].pts);
+        times[i] = micros(*k, k->samples[i].pts, start);
         bytes[i] = jint(k->samples[i].size);
         keys[i] = k->samples[i].sync;
     }
@@ -133,11 +139,12 @@ JNIEXPORT jlong JNICALL Java_app_absentmotion_ffamp_FfampNative_videoOpen(JNIEnv
     const Track* k = trackOf(h, t);
     if (!k) return 0;
     std::string error;
-    auto soft = android::SoftVideo::open(*k, &error);
+    auto soft = android::SoftVideo::open(*opened(h)->reader, *k, &error);
     if (!soft) { lastError = error; return 0; }
+    const double start = FileStart(*opened(h)->reader);
     std::vector<int64_t> later(k->samples.size() + 1, INT64_MAX);
-    for (size_t i = k->samples.size(); i-- > 0;) later[i] = std::min(later[i + 1], micros(*k, k->samples[i].pts));
-    return reinterpret_cast<jlong>(new Video{opened(h), k, std::move(soft), {}, {}, std::move(later)});
+    for (size_t i = k->samples.size(); i-- > 0;) later[i] = std::min(later[i + 1], micros(*k, k->samples[i].pts, start));
+    return reinterpret_cast<jlong>(new Video{opened(h), k, std::move(soft), {}, {}, std::move(later), start});
 }
 
 JNIEXPORT jstring JNICALL Java_app_absentmotion_ffamp_FfampNative_videoName(JNIEnv* env, jobject, jlong v) { return env->NewStringUTF(reinterpret_cast<Video*>(v)->soft->name()); }
@@ -151,7 +158,7 @@ JNIEXPORT jint JNICALL Java_app_absentmotion_ffamp_FfampNative_videoFeed(JNIEnv*
         const Sample& s = d->track->samples[size_t(index)];
         d->packet.resize(s.size);
         if (!d->file->reader->read(*d->track, uint32_t(index), d->packet.data())) return -1;
-        d->soft->decode(d->packet.data(), d->packet.size(), micros(*d->track, s.pts), out, d->later[size_t(index) + 1]);
+        d->soft->decode(d->packet.data(), d->packet.size(), micros(*d->track, s.pts, d->start), out, d->later[size_t(index) + 1]);
     }
     for (auto& p : out) d->ready.push_back(std::move(p));
     return jint(d->ready.size());
@@ -162,8 +169,8 @@ JNIEXPORT jlong JNICALL Java_app_absentmotion_ffamp_FfampNative_videoTake(JNIEnv
     if (d->ready.empty()) return INT64_MIN;
     android::SoftPicture p = std::move(d->ready.front());
     d->ready.pop_front();
-    const jint dims[2] = {p.width, p.height};
-    env->SetIntArrayRegion(shape, 0, 2, dims);
+    const jint dims[3] = {p.width, p.height, p.rgb};
+    env->SetIntArrayRegion(shape, 0, 3, dims);
     auto* base = static_cast<uint8_t*>(env->GetDirectBufferAddress(buffer));
     if (!base || env->GetDirectBufferCapacity(buffer) < jlong(p.i420.size())) return INT64_MIN + 1;
     memcpy(base, p.i420.data(), p.i420.size());
@@ -203,11 +210,13 @@ JNIEXPORT jboolean JNICALL Java_app_absentmotion_ffamp_FfampNative_audioRead(JNI
     return JNI_TRUE;
 }
 
-JNIEXPORT jlong JNICALL Java_app_absentmotion_ffamp_FfampNative_picture(JNIEnv* env, jobject, jobject yPlane, jobject uPlane, jobject vPlane, jint yRow, jint uvRow, jint width, jint height, jboolean sd) {
+JNIEXPORT jlong JNICALL Java_app_absentmotion_ffamp_FfampNative_picture(JNIEnv* env, jobject, jobject yPlane, jobject uPlane, jobject vPlane, jint yRow, jint uvRow, jint width, jint height, jintArray coefficients) {
     auto* y = static_cast<const uint8_t*>(env->GetDirectBufferAddress(yPlane));
     auto* u = static_cast<const uint8_t*>(env->GetDirectBufferAddress(uPlane));
     auto* v = static_cast<const uint8_t*>(env->GetDirectBufferAddress(vPlane));
-    if (!y || !u || !v || width <= 0 || height <= 0) return 0;
+    if (!y || !u || !v || width <= 0 || height <= 0 || env->GetArrayLength(coefficients) != 6) return 0;
+    jint k[6];
+    env->GetIntArrayRegion(coefficients, 0, 6, k);
     AHardwareBuffer_Desc desc{};
     desc.width = uint32_t(width);
     desc.height = uint32_t(height);
@@ -222,17 +231,16 @@ JNIEXPORT jlong JNICALL Java_app_absentmotion_ffamp_FfampNative_picture(JNIEnv* 
         AHardwareBuffer_release(buffer);
         return 0;
     }
-    const int rv = sd ? 409 : 459, gu = sd ? 100 : 55, gv = sd ? 208 : 136, bu = sd ? 516 : 541;
     for (int row = 0; row < height; ++row) {
         auto* out = static_cast<uint8_t*>(pixels) + size_t(row) * desc.stride * 4;
         const uint8_t* ys = y + size_t(row) * size_t(yRow);
         const uint8_t* us = u + size_t(row / 2) * size_t(uvRow);
         const uint8_t* vs = v + size_t(row / 2) * size_t(uvRow);
         for (int x = 0; x < width; ++x) {
-            const int l = 298 * (ys[x] - 16), cb = us[x / 2] - 128, cr = vs[x / 2] - 128;
-            out[4 * x] = uint8_t(std::clamp((l + rv * cr + 128) >> 8, 0, 255));
-            out[4 * x + 1] = uint8_t(std::clamp((l - gu * cb - gv * cr + 128) >> 8, 0, 255));
-            out[4 * x + 2] = uint8_t(std::clamp((l + bu * cb + 128) >> 8, 0, 255));
+            const int l = k[1] * (ys[x] - k[0]), cb = us[x / 2] - 128, cr = vs[x / 2] - 128;
+            out[4 * x] = uint8_t(std::clamp((l + k[2] * cr + 128) >> 8, 0, 255));
+            out[4 * x + 1] = uint8_t(std::clamp((l - k[3] * cb - k[4] * cr + 128) >> 8, 0, 255));
+            out[4 * x + 2] = uint8_t(std::clamp((l + k[5] * cb + 128) >> 8, 0, 255));
             out[4 * x + 3] = 255;
         }
     }

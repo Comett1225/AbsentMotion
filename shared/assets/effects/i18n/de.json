@@ -1,7 +1,7 @@
 {
  "categories": {
   "3d": "3D",
-  "ai": "KI",
+  "ai": "AI",
   "beat": "Beat",
   "blur": "Unschärfe",
   "color": "Farbe",
@@ -274,7 +274,7 @@
   },
   "beatrgbsplit": {
    "description": "Zieht bei jedem Beat den roten und blauen Kanal auseinander. Wähle zuerst deinen Musikclip, öffne sein Menü und tippe auf „Beats markieren“. Ohne Beat-Markierungen gilt die BPM-Einstellung.",
-   "name": "Beat-RGB-Trennung",
+   "name": "Beat-RGB-Split",
    "params": {
     "angle": {
      "label": "Winkel"
@@ -497,11 +497,18 @@
    }
   },
   "blur": {
-   "description": "Eine weiche, gleichmäßige Unschärfe.",
+   "description": "Eine weiche, gleichmäßige Unschärfe. Mit „Form: Rechteck“ wird stattdessen ein gleichmäßiges Quadrat um jeden Punkt gemittelt.",
    "name": "Unschärfe",
    "params": {
     "strength": {
      "label": "Stärke"
+    },
+    "shape": {
+     "label": "Form",
+     "options": [
+      "Weich",
+      "Rechteck"
+     ]
     }
    }
   },
@@ -547,6 +554,59 @@
     },
     "width": {
      "label": "Breite"
+    },
+    "lighting": {
+     "label": "Beleuchtung",
+     "options": [
+      "Klassisch",
+      "Weich",
+      "Direkt"
+     ]
+    },
+    "ambient": {
+     "label": "Umgebungslicht"
+    },
+    "lightHeight": {
+     "label": "Lichthöhe"
+    },
+    "lightColor": {
+     "label": "Lichtfarbe"
+    },
+    "glossiness": {
+     "label": "Glanzschärfe"
+    },
+    "texMode": {
+     "label": "Textur",
+     "options": [
+      "Einpassen",
+      "Kacheln",
+      "Strecken"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Wiederholung X"
+    },
+    "texRepeatY": {
+     "label": "Wiederholung Y"
+    },
+    "texMirror": {
+     "label": "Spiegeln"
+    },
+    "texAngle": {
+     "label": "Texturwinkel"
+    },
+    "texOffset": {
+     "label": "Texturversatz"
+    },
+    "texCrop": {
+     "label": "Texturzuschnitt"
+    },
+    "texAnchor": {
+     "label": "Texturanker",
+     "options": [
+      "Mitte",
+      "Ecke"
+     ]
     }
    }
   },
@@ -570,7 +630,7 @@
    }
   },
   "bulge": {
-   "description": "Wölbt die Ebene innerhalb eines Kreises wie eine Linse nach außen (positive Stärke) oder zieht sie zur Mitte hin zusammen (negative Stärke). Der Radius ist ein Anteil der Ebenengröße.",
+   "description": "Wölbt die Ebene innerhalb eines Kreises wie eine Linse nach außen (positive Stärke) oder zieht sie zur Mitte hin zusammen (negative Stärke). Der Radius ist ein Anteil der Ebenengröße. Mit „Gemessen an: Bildschirm“ ist der Radius ein Anteil des Bildschirms. Mit „Abfall: Weich“ geht die Linse sanfter in den Rest der Ebene über.",
    "name": "Zusammenziehen/Aufwölben",
    "params": {
     "amount": {
@@ -581,6 +641,20 @@
     },
     "radius": {
      "label": "Radius"
+    },
+    "reach": {
+     "label": "Gemessen an",
+     "options": [
+      "Ebene",
+      "Bildschirm"
+     ]
+    },
+    "curve": {
+     "label": "Abfall",
+     "options": [
+      "Klassisch",
+      "Weich"
+     ]
     }
    }
   },
@@ -781,7 +855,7 @@
    }
   },
   "circularripple": {
-   "description": "Lässt von einem Punkt Kreiswellen ausgehen, wie bei einem Tropfen im Wasser.",
+   "description": "Lässt von einem Punkt Kreiswellen ausgehen, wie bei einem Tropfen im Wasser. Mit „Gemessen an: Bildschirm“ werden Frequenz, Stärke und Radius am Bildschirm statt an der Ebene gemessen.",
    "name": "Kreiswellen",
    "params": {
     "center": {
@@ -801,6 +875,13 @@
     },
     "strength": {
      "label": "Stärke"
+    },
+    "reach": {
+     "label": "Gemessen an",
+     "options": [
+      "Ebene",
+      "Bildschirm"
+     ]
     }
    }
   },
@@ -813,6 +894,9 @@
     },
     "color2": {
      "label": "Farbe 2"
+    },
+    "contrast": {
+     "label": "Kontrast"
     },
     "intensity": {
      "label": "Intensität"
@@ -855,6 +939,13 @@
     },
     "strength": {
      "label": "Stärke"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Hart"
+     ]
     }
    }
   },
@@ -965,6 +1056,16 @@
     },
     "fill": {
      "label": "Füllung"
+    },
+    "spread": {
+     "label": "Ausbreitung",
+     "options": [
+      "Unschärfe",
+      "Abstand"
+     ]
+    },
+    "offset": {
+     "label": "Versatz"
     }
    }
   },
@@ -992,6 +1093,16 @@
     },
     "width": {
      "label": "Breite"
+    },
+    "spread": {
+     "label": "Ausbreitung",
+     "options": [
+      "Unschärfe",
+      "Abstand"
+     ]
+    },
+    "offset": {
+     "label": "Versatz"
     }
    }
   },
@@ -1041,6 +1152,13 @@
     },
     "thickness": {
      "label": "Dicke"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Gestapelt"
+     ]
     }
    }
   },
@@ -1141,6 +1259,62 @@
     },
     "thickness": {
      "label": "Dicke"
+    },
+    "keep": {
+     "label": "Ebene behalten"
+    },
+    "lighting": {
+     "label": "Beleuchtung",
+     "options": [
+      "Klassisch",
+      "Weich",
+      "Direkt"
+     ]
+    },
+    "ambient": {
+     "label": "Umgebungslicht"
+    },
+    "lightHeight": {
+     "label": "Lichthöhe"
+    },
+    "lightColor": {
+     "label": "Lichtfarbe"
+    },
+    "glossiness": {
+     "label": "Glanzschärfe"
+    },
+    "texMode": {
+     "label": "Textur",
+     "options": [
+      "Einpassen",
+      "Kacheln",
+      "Strecken"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Wiederholung X"
+    },
+    "texRepeatY": {
+     "label": "Wiederholung Y"
+    },
+    "texMirror": {
+     "label": "Spiegeln"
+    },
+    "texAngle": {
+     "label": "Texturwinkel"
+    },
+    "texOffset": {
+     "label": "Texturversatz"
+    },
+    "texCrop": {
+     "label": "Texturzuschnitt"
+    },
+    "texAnchor": {
+     "label": "Texturanker",
+     "options": [
+      "Mitte",
+      "Ecke"
+     ]
     }
    }
   },
@@ -1180,6 +1354,59 @@
     },
     "smoothing": {
      "label": "Glättung"
+    },
+    "lighting": {
+     "label": "Beleuchtung",
+     "options": [
+      "Klassisch",
+      "Weich",
+      "Direkt"
+     ]
+    },
+    "ambient": {
+     "label": "Umgebungslicht"
+    },
+    "lightHeight": {
+     "label": "Lichthöhe"
+    },
+    "lightColor": {
+     "label": "Lichtfarbe"
+    },
+    "glossiness": {
+     "label": "Glanzschärfe"
+    },
+    "texMode": {
+     "label": "Textur",
+     "options": [
+      "Einpassen",
+      "Kacheln",
+      "Strecken"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Wiederholung X"
+    },
+    "texRepeatY": {
+     "label": "Wiederholung Y"
+    },
+    "texMirror": {
+     "label": "Spiegeln"
+    },
+    "texAngle": {
+     "label": "Texturwinkel"
+    },
+    "texOffset": {
+     "label": "Texturversatz"
+    },
+    "texCrop": {
+     "label": "Texturzuschnitt"
+    },
+    "texAnchor": {
+     "label": "Texturanker",
+     "options": [
+      "Mitte",
+      "Ecke"
+     ]
     }
    }
   },
@@ -1251,6 +1478,59 @@
     },
     "smoothing": {
      "label": "Glättung"
+    },
+    "lighting": {
+     "label": "Beleuchtung",
+     "options": [
+      "Klassisch",
+      "Weich",
+      "Direkt"
+     ]
+    },
+    "ambient": {
+     "label": "Umgebungslicht"
+    },
+    "lightHeight": {
+     "label": "Lichthöhe"
+    },
+    "lightColor": {
+     "label": "Lichtfarbe"
+    },
+    "glossiness": {
+     "label": "Glanzschärfe"
+    },
+    "texMode": {
+     "label": "Textur",
+     "options": [
+      "Einpassen",
+      "Kacheln",
+      "Strecken"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Wiederholung X"
+    },
+    "texRepeatY": {
+     "label": "Wiederholung Y"
+    },
+    "texMirror": {
+     "label": "Spiegeln"
+    },
+    "texAngle": {
+     "label": "Texturwinkel"
+    },
+    "texOffset": {
+     "label": "Texturversatz"
+    },
+    "texCrop": {
+     "label": "Texturzuschnitt"
+    },
+    "texAnchor": {
+     "label": "Texturanker",
+     "options": [
+      "Mitte",
+      "Ecke"
+     ]
     }
    }
   },
@@ -1369,7 +1649,7 @@
    }
   },
   "directionalblur": {
-   "description": "Erzeugt Bewegungsunschärfe durch Mittelung von Bildpunkten entlang eines Richtungswinkels.",
+   "description": "Erzeugt Bewegungsunschärfe durch Mittelung von Bildpunkten entlang eines Richtungswinkels. Mit „Ausbreitung: Beide Seiten“ verteilt sich die Unschärfe gleichmäßig nach vorn und hinten.",
    "name": "Gerichtete Unschärfe",
    "params": {
     "angle": {
@@ -1377,6 +1657,13 @@
     },
     "blurLength": {
      "label": "Länge"
+    },
+    "spread": {
+     "label": "Ausbreitung",
+     "options": [
+      "Eine Seite",
+      "Beide Seiten"
+     ]
     }
    }
   },
@@ -1571,6 +1858,22 @@
    "params": {
     "strength": {
      "label": "Stärke"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Tinte"
+     ]
+    },
+    "spacing": {
+     "label": "Glättung"
+    },
+    "threshold": {
+     "label": "Schwellenwert"
+    },
+    "invert": {
+     "label": "Umkehren"
     }
    }
   },
@@ -1613,6 +1916,9 @@
     },
     "tintColor": {
      "label": "Tönungsfarbe"
+    },
+    "mask": {
+     "label": "Auf Ebene maskieren"
     }
    }
   },
@@ -1682,6 +1988,13 @@
     },
     "thickness": {
      "label": "Dicke"
+    },
+    "contourStyle": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Dünne Linien"
+     ]
     }
    }
   },
@@ -1724,6 +2037,59 @@
     },
     "squeezeRatio": {
      "label": "Stauchen"
+    },
+    "lighting": {
+     "label": "Beleuchtung",
+     "options": [
+      "Klassisch",
+      "Weich",
+      "Direkt"
+     ]
+    },
+    "ambient": {
+     "label": "Umgebungslicht"
+    },
+    "lightHeight": {
+     "label": "Lichthöhe"
+    },
+    "lightColor": {
+     "label": "Lichtfarbe"
+    },
+    "glossiness": {
+     "label": "Glanzschärfe"
+    },
+    "texMode": {
+     "label": "Textur",
+     "options": [
+      "Einpassen",
+      "Kacheln",
+      "Strecken"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Wiederholung X"
+    },
+    "texRepeatY": {
+     "label": "Wiederholung Y"
+    },
+    "texMirror": {
+     "label": "Spiegeln"
+    },
+    "texAngle": {
+     "label": "Texturwinkel"
+    },
+    "texOffset": {
+     "label": "Texturversatz"
+    },
+    "texCrop": {
+     "label": "Texturzuschnitt"
+    },
+    "texAnchor": {
+     "label": "Texturanker",
+     "options": [
+      "Mitte",
+      "Ecke"
+     ]
     }
    }
   },
@@ -1982,6 +2348,65 @@
     },
     "shine": {
      "label": "Glanz"
+    },
+    "lighting": {
+     "label": "Beleuchtung",
+     "options": [
+      "Klassisch",
+      "Weich",
+      "Direkt"
+     ]
+    },
+    "ambient": {
+     "label": "Umgebungslicht"
+    },
+    "lightHeight": {
+     "label": "Lichthöhe"
+    },
+    "lightColor": {
+     "label": "Lichtfarbe"
+    },
+    "glossiness": {
+     "label": "Glanzschärfe"
+    },
+    "pivot": {
+     "label": "Drehpunkt"
+    },
+    "pivotDepth": {
+     "label": "Drehpunkttiefe"
+    },
+    "texMode": {
+     "label": "Textur",
+     "options": [
+      "Einpassen",
+      "Kacheln",
+      "Strecken"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Wiederholung X"
+    },
+    "texRepeatY": {
+     "label": "Wiederholung Y"
+    },
+    "texMirror": {
+     "label": "Spiegeln"
+    },
+    "texAngle": {
+     "label": "Texturwinkel"
+    },
+    "texOffset": {
+     "label": "Texturversatz"
+    },
+    "texCrop": {
+     "label": "Texturzuschnitt"
+    },
+    "texAnchor": {
+     "label": "Texturanker",
+     "options": [
+      "Mitte",
+      "Ecke"
+     ]
     }
    }
   },
@@ -2047,6 +2472,13 @@
     },
     "softness": {
      "label": "Weichheit"
+    },
+    "falloff": {
+     "label": "Abfall",
+     "options": [
+      "Abstand",
+      "Weich"
+     ]
     }
    }
   },
@@ -2116,6 +2548,13 @@
     },
     "strength": {
      "label": "Stärke"
+    },
+    "screenSize": {
+     "label": "Größe bezogen auf",
+     "options": [
+      "Ebene",
+      "Bildschirm"
+     ]
     }
    }
   },
@@ -2198,7 +2637,7 @@
    }
   },
   "glass": {
-   "description": "Verwandelt die Form der Ebene in abgeschrägtes Glas, das die Ebenen dahinter bricht und am Rand glänzt.",
+   "description": "Verwandelt die Form der Ebene in abgeschrägtes Glas, das die Ebenen dahinter verzerrt, mit einem Glanzlicht am Rand. Mit „Licht: Weich“ erscheint die Ebene selbst so stark, wie Füllung angibt, und das Glas wird mit Farbe beleuchtet, am hellsten an der Innenkante der Abschrägung, die zum Licht zeigt.",
    "name": "Glas",
    "params": {
     "angle": {
@@ -2210,8 +2649,18 @@
     "color": {
      "label": "Farbe"
     },
+    "fill": {
+     "label": "Füllung"
+    },
     "highlight": {
      "label": "Glanzlicht"
+    },
+    "light": {
+     "label": "Licht",
+     "options": [
+      "Rand",
+      "Weich"
+     ]
     },
     "refraction": {
      "label": "Lichtbrechung"
@@ -2326,6 +2775,13 @@
     },
     "scaleBrightness": {
      "label": "Helligkeit skalieren"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Verlauf",
+      "Spektrum"
+     ]
     }
    }
   },
@@ -2401,6 +2857,14 @@
     },
     "offset": {
      "label": "Versatz"
+    },
+    "origin": {
+     "label": "Ursprung",
+     "options": [
+      "Mitte",
+      "Ebenenecke",
+      "Bildschirmecke"
+     ]
     },
     "punch": {
      "label": "Ausschneiden"
@@ -2606,6 +3070,59 @@
     },
     "smoothing": {
      "label": "Glättung"
+    },
+    "lighting": {
+     "label": "Beleuchtung",
+     "options": [
+      "Klassisch",
+      "Weich",
+      "Direkt"
+     ]
+    },
+    "ambient": {
+     "label": "Umgebungslicht"
+    },
+    "lightHeight": {
+     "label": "Lichthöhe"
+    },
+    "lightColor": {
+     "label": "Lichtfarbe"
+    },
+    "glossiness": {
+     "label": "Glanzschärfe"
+    },
+    "texMode": {
+     "label": "Textur",
+     "options": [
+      "Einpassen",
+      "Kacheln",
+      "Strecken"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Wiederholung X"
+    },
+    "texRepeatY": {
+     "label": "Wiederholung Y"
+    },
+    "texMirror": {
+     "label": "Spiegeln"
+    },
+    "texAngle": {
+     "label": "Texturwinkel"
+    },
+    "texOffset": {
+     "label": "Texturversatz"
+    },
+    "texCrop": {
+     "label": "Texturzuschnitt"
+    },
+    "texAnchor": {
+     "label": "Texturanker",
+     "options": [
+      "Mitte",
+      "Ecke"
+     ]
     }
    }
   },
@@ -2661,11 +3178,33 @@
     "angle": {
      "label": "Winkel"
     },
+    "crop": {
+     "label": "Zuschnitt"
+    },
+    "fit": {
+     "label": "Bild",
+     "options": [
+      "Volle Größe",
+      "In jeder Kachel"
+     ]
+    },
+    "mask": {
+     "label": "Auf Ebene maskieren"
+    },
     "mirror": {
      "label": "Spiegeln"
     },
+    "offset": {
+     "label": "Versatz"
+    },
     "scale": {
      "label": "Skalierung"
+    },
+    "screenSpace": {
+     "label": "Bildschirmraum"
+    },
+    "stretch": {
+     "label": "Streckung"
     }
    }
   },
@@ -2769,6 +3308,59 @@
     },
     "smoothing": {
      "label": "Glättung"
+    },
+    "lighting": {
+     "label": "Beleuchtung",
+     "options": [
+      "Klassisch",
+      "Weich",
+      "Direkt"
+     ]
+    },
+    "ambient": {
+     "label": "Umgebungslicht"
+    },
+    "lightHeight": {
+     "label": "Lichthöhe"
+    },
+    "lightColor": {
+     "label": "Lichtfarbe"
+    },
+    "glossiness": {
+     "label": "Glanzschärfe"
+    },
+    "texMode": {
+     "label": "Textur",
+     "options": [
+      "Einpassen",
+      "Kacheln",
+      "Strecken"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Wiederholung X"
+    },
+    "texRepeatY": {
+     "label": "Wiederholung Y"
+    },
+    "texMirror": {
+     "label": "Spiegeln"
+    },
+    "texAngle": {
+     "label": "Texturwinkel"
+    },
+    "texOffset": {
+     "label": "Texturversatz"
+    },
+    "texCrop": {
+     "label": "Texturzuschnitt"
+    },
+    "texAnchor": {
+     "label": "Texturanker",
+     "options": [
+      "Mitte",
+      "Ecke"
+     ]
     }
    }
   },
@@ -2839,6 +3431,59 @@
     },
     "width": {
      "label": "Breite"
+    },
+    "lighting": {
+     "label": "Beleuchtung",
+     "options": [
+      "Klassisch",
+      "Weich",
+      "Direkt"
+     ]
+    },
+    "ambient": {
+     "label": "Umgebungslicht"
+    },
+    "lightHeight": {
+     "label": "Lichthöhe"
+    },
+    "lightColor": {
+     "label": "Lichtfarbe"
+    },
+    "glossiness": {
+     "label": "Glanzschärfe"
+    },
+    "texMode": {
+     "label": "Textur",
+     "options": [
+      "Einpassen",
+      "Kacheln",
+      "Strecken"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Wiederholung X"
+    },
+    "texRepeatY": {
+     "label": "Wiederholung Y"
+    },
+    "texMirror": {
+     "label": "Spiegeln"
+    },
+    "texAngle": {
+     "label": "Texturwinkel"
+    },
+    "texOffset": {
+     "label": "Texturversatz"
+    },
+    "texCrop": {
+     "label": "Texturzuschnitt"
+    },
+    "texAnchor": {
+     "label": "Texturanker",
+     "options": [
+      "Mitte",
+      "Ecke"
+     ]
     }
    }
   },
@@ -2964,7 +3609,8 @@
      "label": "Stil",
      "options": [
       "Klassisch",
-      "Helligkeit erhalten"
+      "Helligkeit erhalten",
+      "Video"
      ]
     },
     "vibrance": {
@@ -3002,6 +3648,23 @@
     },
     "intensity": {
      "label": "Intensität"
+    },
+    "blend": {
+     "label": "Mischmodus",
+     "options": [
+      "Negativ multiplizieren",
+      "Normal"
+     ]
+    },
+    "opacity": {
+     "label": "Deckkraft"
+    },
+    "corners": {
+     "label": "Ecken",
+     "options": [
+      "Rund",
+      "Eckig"
+     ]
     }
    }
   },
@@ -3068,6 +3731,13 @@
     "center": {
      "label": "Mittelpunkt"
     },
+    "direction": {
+     "label": "Richtung",
+     "options": [
+      "Im Uhrzeigersinn",
+      "Gegen den Uhrzeigersinn"
+     ]
+    },
     "mirror": {
      "label": "Spiegeln"
     },
@@ -3077,9 +3747,16 @@
    }
   },
   "lensblur": {
-   "description": "Eine kreisende Unschärfe, die um die Mitte einen scharfen Bereich lässt und zum Rand hin zunimmt.",
+   "description": "Eine kreisende Unschärfe, die um die Mitte einen scharfen Bereich lässt und zum Rand hin zunimmt. Mit „Unschärfe: Zoom“ verwischt sie stattdessen von der Mitte nach außen, über die Ränder der Ebene hinaus.",
    "name": "Linsenunschärfe",
    "params": {
+    "blur": {
+     "label": "Unschärfe",
+     "options": [
+      "Drehung",
+      "Zoom"
+     ]
+    },
     "center": {
      "label": "Mittelpunkt"
     },
@@ -3154,6 +3831,12 @@
     },
     "threshold": {
      "label": "Schwellenwert"
+    },
+    "soften": {
+     "label": "Weichzeichnen"
+    },
+    "mask": {
+     "label": "Auf Ebene maskieren"
     }
    }
   },
@@ -3257,7 +3940,7 @@
    }
   },
   "linearstreaks": {
-   "description": "Erzeugt gerade Streifen, indem Kopien der Ebene entlang eines Winkels verschoben und an Überlappungen gemischt werden.",
+   "description": "Erzeugt gerade Streifen, indem Kopien der Ebene entlang eines Winkels verschoben und an Überlappungen gemischt werden. Mit „Mischmodus: Aus“ bleibt die Ebene unverändert. Mit „Kopien: Jedes Pixel“ liegt auf jedem Pixel der Länge eine Kopie, statt 48 Kopien darüber zu verteilen.",
    "name": "Lineare Streifen",
    "params": {
     "alpha": {
@@ -3274,11 +3957,19 @@
      "options": [
       "Aufhellen",
       "Durchschnitt",
-      "Abdunkeln"
+      "Abdunkeln",
+      "Aus"
      ]
     },
     "reach": {
      "label": "Länge"
+    },
+    "copies": {
+     "label": "Kopien",
+     "options": [
+      "Verteilt",
+      "Jedes Pixel"
+     ]
     }
    }
   },
@@ -3333,6 +4024,12 @@
     },
     "solidity": {
      "label": "Deckung"
+    },
+    "fill": {
+     "label": "Füllung"
+    },
+    "samples": {
+     "label": "Samples"
     }
    }
   },
@@ -3348,6 +4045,9 @@
     },
     "threshold": {
      "label": "Schwellenwert"
+    },
+    "high": {
+     "label": "Oberer Schwellenwert"
     }
    }
   },
@@ -3472,6 +4172,13 @@
    "description": "Teilt die Ebene in Quadrate und füllt jedes mit seiner Durchschnittsfarbe.",
    "name": "Mosaik",
    "params": {
+    "average": {
+     "label": "Durchschnitt",
+     "options": [
+      "Zelle",
+      "Ecke"
+     ]
+    },
     "count": {
      "label": "Anzahl"
     },
@@ -3594,6 +4301,59 @@
     },
     "shine": {
      "label": "Glanz"
+    },
+    "lighting": {
+     "label": "Beleuchtung",
+     "options": [
+      "Klassisch",
+      "Weich",
+      "Direkt"
+     ]
+    },
+    "ambient": {
+     "label": "Umgebungslicht"
+    },
+    "lightHeight": {
+     "label": "Lichthöhe"
+    },
+    "lightColor": {
+     "label": "Lichtfarbe"
+    },
+    "glossiness": {
+     "label": "Glanzschärfe"
+    },
+    "texMode": {
+     "label": "Textur",
+     "options": [
+      "Einpassen",
+      "Kacheln",
+      "Strecken"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Wiederholung X"
+    },
+    "texRepeatY": {
+     "label": "Wiederholung Y"
+    },
+    "texMirror": {
+     "label": "Spiegeln"
+    },
+    "texAngle": {
+     "label": "Texturwinkel"
+    },
+    "texOffset": {
+     "label": "Texturversatz"
+    },
+    "texCrop": {
+     "label": "Texturzuschnitt"
+    },
+    "texAnchor": {
+     "label": "Texturanker",
+     "options": [
+      "Mitte",
+      "Ecke"
+     ]
     }
    }
   },
@@ -4144,6 +4904,13 @@
     "blockSize": {
      "label": "Größe"
     },
+    "edges": {
+     "label": "Kanten",
+     "options": [
+      "Spiegeln",
+      "Transparent"
+     ]
+    },
     "offset": {
      "label": "Versatz"
     },
@@ -4244,7 +5011,7 @@
    }
   },
   "polar": {
-   "description": "Biegt die Ebene um ihre Mitte und verwandelt gerade Linien in Kreise oder rollt Kreise zu geraden Linien ab.",
+   "description": "Biegt die Ebene um ihre Mitte und verwandelt gerade Linien in Kreise oder rollt Kreise zu geraden Linien ab. „Anordnung“ legt fest, welche Kante der Ebene in der Mitte zusammenläuft.",
    "name": "Polarkoordinaten",
    "params": {
     "amount": {
@@ -4255,6 +5022,13 @@
      "options": [
       "Rechteckig zu polar",
       "Polar zu rechteckig"
+     ]
+    },
+    "middle": {
+     "label": "Anordnung",
+     "options": [
+      "Oberkante in der Mitte",
+      "Unterkante in der Mitte"
      ]
     }
    }
@@ -4448,11 +5222,64 @@
     },
     "shine": {
      "label": "Glanz"
+    },
+    "lighting": {
+     "label": "Beleuchtung",
+     "options": [
+      "Klassisch",
+      "Weich",
+      "Direkt"
+     ]
+    },
+    "ambient": {
+     "label": "Umgebungslicht"
+    },
+    "lightHeight": {
+     "label": "Lichthöhe"
+    },
+    "lightColor": {
+     "label": "Lichtfarbe"
+    },
+    "glossiness": {
+     "label": "Glanzschärfe"
+    },
+    "texMode": {
+     "label": "Textur",
+     "options": [
+      "Einpassen",
+      "Kacheln",
+      "Strecken"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Wiederholung X"
+    },
+    "texRepeatY": {
+     "label": "Wiederholung Y"
+    },
+    "texMirror": {
+     "label": "Spiegeln"
+    },
+    "texAngle": {
+     "label": "Texturwinkel"
+    },
+    "texOffset": {
+     "label": "Texturversatz"
+    },
+    "texCrop": {
+     "label": "Texturzuschnitt"
+    },
+    "texAnchor": {
+     "label": "Texturanker",
+     "options": [
+      "Mitte",
+      "Ecke"
+     ]
     }
    }
   },
   "radialblur": {
-   "description": "Erzeugt eine radiale Zoom-Unschärfe durch Mittelung von Abtastwerten entlang von Strahlen aus einem Mittelpunkt; die Stärke ist einstellbar.",
+   "description": "Erzeugt eine radiale Zoom-Unschärfe durch Mittelung von Abtastwerten entlang von Strahlen aus einem Mittelpunkt; die Stärke ist einstellbar. Mit „Länge: Gleichmäßig“ sind alle Streifen gleich lang, statt mit dem Abstand zur Mitte zu wachsen.",
    "name": "Zoom-Unschärfe",
    "params": {
     "amount": {
@@ -4460,6 +5287,13 @@
     },
     "center": {
      "label": "Mitte"
+    },
+    "streak": {
+     "label": "Länge",
+     "options": [
+      "Nach Abstand",
+      "Gleichmäßig"
+     ]
     }
    }
   },
@@ -4586,11 +5420,14 @@
     },
     "reach": {
      "label": "Länge"
+    },
+    "fill": {
+     "label": "Füllung"
     }
    }
   },
   "radialwipe": {
-   "description": "Blendet einen keilförmigen Teil der Ebene vom Startwinkel aus um die Mitte aus, wie ein Uhrzeiger. Fortschritt bestimmt den überstrichenen Winkel, Anzahl wiederholt den Keil im Kreis und Beide bewegt ihn in beide Richtungen. Animiere Fortschritt für einen Übergang.",
+   "description": "Blendet einen Keil der Ebene aus, der wie ein Uhrzeiger vom Startwinkel aus um die Mitte streicht. Fortschritt ist der überstrichene Winkel, Anzahl wiederholt den Keil im Kreis, und mit „Richtung: Beide“ streicht er in beide Richtungen. Animiere Fortschritt für einen Übergang. Mit „Keile: Genau“ zählen auch Nachkommastellen von Anzahl, sodass der letzte Keil schmaler ist, und Weiche Kante macht beide Seiten jedes Keils weich.",
    "name": "Radiale Wischblende",
    "params": {
     "center": {
@@ -4615,6 +5452,13 @@
     },
     "start": {
      "label": "Startwinkel"
+    },
+    "wedges": {
+     "label": "Keile",
+     "options": [
+      "Ganz",
+      "Genau"
+     ]
     }
    }
   },
@@ -4699,6 +5543,26 @@
     },
     "shine": {
      "label": "Glanz"
+    },
+    "lighting": {
+     "label": "Beleuchtung",
+     "options": [
+      "Klassisch",
+      "Weich",
+      "Direkt"
+     ]
+    },
+    "ambient": {
+     "label": "Umgebungslicht"
+    },
+    "lightHeight": {
+     "label": "Lichthöhe"
+    },
+    "lightColor": {
+     "label": "Lichtfarbe"
+    },
+    "glossiness": {
+     "label": "Glanzschärfe"
     }
    },
    "shortcuts": {
@@ -4914,6 +5778,13 @@
     },
     "threshold": {
      "label": "Schwellenwert"
+    },
+    "match": {
+     "label": "Abgleich",
+     "options": [
+      "RGB",
+      "Chroma"
+     ]
     }
    }
   },
@@ -4964,7 +5835,7 @@
    }
   },
   "rgbsplit": {
-   "description": "Teilt die Kanäle Rot, Grün und Blau: Der Mittelkanal bleibt stehen, die anderen beiden verschieben sich entlang des Winkels in entgegengesetzte Richtungen. Hell addiert die verschobenen Farben, Dunkel lässt sie deckend, Maske behält nur den Bereich, in dem alle drei überlappen, und Luma macht die Ränder so deckend, wie sie hell sind.",
+   "description": "Teilt die Kanäle Rot, Grün und Blau auf: Der unter Mitte gewählte Kanal bleibt stehen, die anderen beiden verschieben sich entlang des Winkels in entgegengesetzte Richtungen. Hell addiert die verschobenen Farben, Dunkel lässt sie deckend, Maske behält nur die Stellen, an denen sich alle drei überlappen, und Luma macht die Farbsäume so deckend, wie sie hell sind. Durchschnitt macht jede Stelle so deckend, wie es dem Anteil der Kanäle entspricht, die sie bedecken.",
    "name": "RGB-Split",
    "params": {
     "angle": {
@@ -4984,7 +5855,8 @@
       "Hell",
       "Dunkel",
       "Maske",
-      "Luma"
+      "Luma",
+      "Durchschnitt"
      ]
     },
     "strength": {
@@ -5492,6 +6364,13 @@
     },
     "outside": {
      "label": "Äußeres Leuchten"
+    },
+    "falloff": {
+     "label": "Abfall",
+     "options": [
+      "Gleichmäßig",
+      "Ebene"
+     ]
     }
    }
   },
@@ -5585,6 +6464,59 @@
     },
     "shine": {
      "label": "Glanz"
+    },
+    "lighting": {
+     "label": "Beleuchtung",
+     "options": [
+      "Klassisch",
+      "Weich",
+      "Direkt"
+     ]
+    },
+    "ambient": {
+     "label": "Umgebungslicht"
+    },
+    "lightHeight": {
+     "label": "Lichthöhe"
+    },
+    "lightColor": {
+     "label": "Lichtfarbe"
+    },
+    "glossiness": {
+     "label": "Glanzschärfe"
+    },
+    "texMode": {
+     "label": "Textur",
+     "options": [
+      "Einpassen",
+      "Kacheln",
+      "Strecken"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Wiederholung X"
+    },
+    "texRepeatY": {
+     "label": "Wiederholung Y"
+    },
+    "texMirror": {
+     "label": "Spiegeln"
+    },
+    "texAngle": {
+     "label": "Texturwinkel"
+    },
+    "texOffset": {
+     "label": "Texturversatz"
+    },
+    "texCrop": {
+     "label": "Texturzuschnitt"
+    },
+    "texAnchor": {
+     "label": "Texturanker",
+     "options": [
+      "Mitte",
+      "Ecke"
+     ]
     }
    }
   },
@@ -5732,11 +6664,18 @@
     },
     "threshold": {
      "label": "Schwellenwert"
+    },
+    "grey": {
+     "label": "Grau",
+     "options": [
+      "HD",
+      "SD"
+     ]
     }
    }
   },
   "squeeze": {
-   "description": "Zieht die Mitte der Ebene bei positiver Stärke nach innen zusammen und wölbt sie bei negativer Stärke nach außen. „Alt“ erhält die Form älterer Projekte.",
+   "description": "Zieht die Mitte der Ebene bei positiver Stärke nach innen zusammen und wölbt sie bei negativer Stärke nach außen. „Alt“ erhält die Form älterer Projekte. „Sanduhr“ drückt zusätzlich die obere und untere Kante in der Mitte nach außen.",
    "name": "Quetschen",
    "params": {
     "amount": {
@@ -5746,7 +6685,8 @@
      "label": "Form",
      "options": [
       "Einziehen/Wölben",
-      "Alt"
+      "Alt",
+      "Sanduhr"
      ]
     }
    }
@@ -5846,6 +6786,59 @@
     },
     "shine": {
      "label": "Glanz"
+    },
+    "lighting": {
+     "label": "Beleuchtung",
+     "options": [
+      "Klassisch",
+      "Weich",
+      "Direkt"
+     ]
+    },
+    "ambient": {
+     "label": "Umgebungslicht"
+    },
+    "lightHeight": {
+     "label": "Lichthöhe"
+    },
+    "lightColor": {
+     "label": "Lichtfarbe"
+    },
+    "glossiness": {
+     "label": "Glanzschärfe"
+    },
+    "texMode": {
+     "label": "Textur",
+     "options": [
+      "Einpassen",
+      "Kacheln",
+      "Strecken"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Wiederholung X"
+    },
+    "texRepeatY": {
+     "label": "Wiederholung Y"
+    },
+    "texMirror": {
+     "label": "Spiegeln"
+    },
+    "texAngle": {
+     "label": "Texturwinkel"
+    },
+    "texOffset": {
+     "label": "Texturversatz"
+    },
+    "texCrop": {
+     "label": "Texturzuschnitt"
+    },
+    "texAnchor": {
+     "label": "Texturanker",
+     "options": [
+      "Mitte",
+      "Ecke"
+     ]
     }
    }
   },
@@ -5894,12 +6887,72 @@
     },
     "smoothing": {
      "label": "Glättung"
+    },
+    "starStyle": {
+     "label": "Stil",
+     "options": [
+      "Flach",
+      "Spitz"
+     ]
+    },
+    "lighting": {
+     "label": "Beleuchtung",
+     "options": [
+      "Klassisch",
+      "Weich",
+      "Direkt"
+     ]
+    },
+    "ambient": {
+     "label": "Umgebungslicht"
+    },
+    "lightHeight": {
+     "label": "Lichthöhe"
+    },
+    "lightColor": {
+     "label": "Lichtfarbe"
+    },
+    "glossiness": {
+     "label": "Glanzschärfe"
+    },
+    "texMode": {
+     "label": "Textur",
+     "options": [
+      "Einpassen",
+      "Kacheln",
+      "Strecken"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Wiederholung X"
+    },
+    "texRepeatY": {
+     "label": "Wiederholung Y"
+    },
+    "texMirror": {
+     "label": "Spiegeln"
+    },
+    "texAngle": {
+     "label": "Texturwinkel"
+    },
+    "texOffset": {
+     "label": "Texturversatz"
+    },
+    "texCrop": {
+     "label": "Texturzuschnitt"
+    },
+    "texAnchor": {
+     "label": "Texturanker",
+     "options": [
+      "Mitte",
+      "Ecke"
+     ]
     }
    }
   },
   "static": {
    "description": "Flackerndes graues Rauschen wie bei einem Fernseher ohne Signal.",
-   "name": "Rauschen",
+   "name": "TV-Rauschen",
    "params": {
     "amount": {
      "label": "Menge"
@@ -6065,7 +7118,9 @@
       "Roboter",
       "Quieken",
       "Schreibmaschine",
-      "Chiptune"
+      "Chiptune",
+      "Skelett",
+      "Eigener Sound"
      ]
     },
     "volume": {
@@ -6439,6 +7494,13 @@
     "count": {
      "label": "Anzahl"
     },
+    "edges": {
+     "label": "Kanten",
+     "options": [
+      "Spiegeln",
+      "Transparent"
+     ]
+    },
     "offset": {
      "label": "Versatz"
     },
@@ -6447,6 +7509,9 @@
     },
     "rotation": {
      "label": "Rotation"
+    },
+    "screenSpace": {
+     "label": "Bildschirmraum"
     },
     "seed": {
      "label": "Seed"
@@ -6457,7 +7522,7 @@
    }
   },
   "tiles": {
-   "description": "Wiederholt die Ebene, bis sie den Bildschirm füllt. Erhöhe „Zuschnitt“ für kleinere Kacheln, optional mit Spiegelung, Zeilenversatz und Rotation. „Alte Skalierung“ erhält ältere Projekte.",
+   "description": "Wiederholt die Ebene, bis sie den Bildschirm füllt. Erhöhe „Zuschnitt“ für kleinere Kacheln, optional mit Spiegelung, Zeilenversatz und Rotation. „Alte Skalierung“ erhält ältere Projekte. „In den Kacheln“ hält jede Kachel so groß wie die Ebene und zoomt und dreht das Bild darin.",
    "name": "Kachelung",
    "params": {
     "angle": {
@@ -6473,7 +7538,8 @@
      "label": "Größenanpassung",
      "options": [
       "Zuschnitt",
-      "Alte Skalierung"
+      "Alte Skalierung",
+      "In den Kacheln"
      ]
     },
     "vertical": {
@@ -6494,8 +7560,18 @@
     "count": {
      "label": "Anzahl"
     },
+    "edges": {
+     "label": "Kanten",
+     "options": [
+      "Spiegeln",
+      "Transparent"
+     ]
+    },
     "offset": {
      "label": "Versatz"
+    },
+    "screenSpace": {
+     "label": "Bildschirmraum"
     },
     "seed": {
      "label": "Seed"
@@ -6598,6 +7674,59 @@
     },
     "thickness": {
      "label": "Dicke"
+    },
+    "lighting": {
+     "label": "Beleuchtung",
+     "options": [
+      "Klassisch",
+      "Weich",
+      "Direkt"
+     ]
+    },
+    "ambient": {
+     "label": "Umgebungslicht"
+    },
+    "lightHeight": {
+     "label": "Lichthöhe"
+    },
+    "lightColor": {
+     "label": "Lichtfarbe"
+    },
+    "glossiness": {
+     "label": "Glanzschärfe"
+    },
+    "texMode": {
+     "label": "Textur",
+     "options": [
+      "Einpassen",
+      "Kacheln",
+      "Strecken"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Wiederholung X"
+    },
+    "texRepeatY": {
+     "label": "Wiederholung Y"
+    },
+    "texMirror": {
+     "label": "Spiegeln"
+    },
+    "texAngle": {
+     "label": "Texturwinkel"
+    },
+    "texOffset": {
+     "label": "Texturversatz"
+    },
+    "texCrop": {
+     "label": "Texturzuschnitt"
+    },
+    "texAnchor": {
+     "label": "Texturanker",
+     "options": [
+      "Mitte",
+      "Ecke"
+     ]
     }
    }
   },
@@ -6739,11 +7868,14 @@
     },
     "stretch": {
      "label": "Dehnung"
+    },
+    "screenSpace": {
+     "label": "Bildschirmraum"
     }
    }
   },
   "twirl": {
-   "description": "Verdreht die Ebene um die Mitte wie einen Wirbel, in der Mitte am stärksten und mit Ausblenden bis zum Radius (ein Anteil der Ebenengröße). Negative Stärke verdreht in die andere Richtung.",
+   "description": "Verdreht die Ebene wie einen Wirbel um die Mitte, in der Mitte am stärksten und zum Radius hin auslaufend (ein Anteil der Ebenengröße). Negative Stärke dreht in die andere Richtung. Mit „Gemessen an: Bildschirm“ ist der Radius ein Anteil des Bildschirms, und die Drehung läuft weich aus.",
    "name": "Strudel",
    "params": {
     "center": {
@@ -6754,11 +7886,18 @@
     },
     "strength": {
      "label": "Stärke"
+    },
+    "reach": {
+     "label": "Gemessen an",
+     "options": [
+      "Ebene",
+      "Bildschirm"
+     ]
     }
    }
   },
   "unsharpmask": {
-   "description": "Schärft, indem der Unterschied zwischen der Ebene und einer unscharfen Kopie wieder hinzugefügt wird. Stärke legt fest, wie breit die Unschärfe ist, Menge, wie viel hinzugefügt wird, und ein Schwellenwert über 50 % lässt kleine Unterschiede unberührt.",
+   "description": "Schärft, indem der Unterschied zwischen der Ebene und einer unscharfen Kopie davon wieder hinzugefügt wird. Stärke legt fest, wie breit die Unschärfe ist, Menge, wie viel hinzugefügt wird, und ein Schwellenwert über 50 % lässt kleine Unterschiede unberührt. Mit „Maskenfarbe: Rot“ erscheint die Maske rot, wo die Helligkeit um mehr von der unscharfen Kopie abweicht, als der Schwellenwert über 50 % liegt.",
    "name": "Unscharf maskieren",
    "params": {
     "amount": {
@@ -6772,6 +7911,13 @@
     },
     "threshold": {
      "label": "Schwellenwert"
+    },
+    "maskColor": {
+     "label": "Maskenfarbe",
+     "options": [
+      "Grau",
+      "Rot"
+     ]
     }
    }
   },
@@ -6867,6 +8013,19 @@
     },
     "yaw": {
      "label": "Gieren"
+    },
+    "projection": {
+     "label": "Ausgabe",
+     "options": [
+      "Ansicht",
+      "Panorama"
+     ]
+    },
+    "eyeDistance": {
+     "label": "Abstand"
+    },
+    "frame": {
+     "label": "Bildformat"
     }
    }
   },
@@ -6932,7 +8091,7 @@
    }
   },
   "wavewarp": {
-   "description": "Verbiegt die Ebene mit einer Sinuswelle: Abstand legt fest, wie viele Wellen sie durchlaufen, Ausmaß, wie weit sie schieben, Winkel, in welche Richtung die Wellen laufen, und Verzerrungswinkel, in welche Richtung sie schieben.",
+   "description": "Verbiegt die Ebene mit einer Sinuswelle: Abstand legt fest, wie viele Wellen sie durchlaufen, Ausmaß, wie weit sie schieben, Winkel, in welche Richtung die Wellen laufen, und Verzerrungswinkel, in welche Richtung sie schieben. Mit Bildschirmraum richtet sich die Wellengröße nach dem Bildschirm statt nach der Ebene. Querausmaß fügt eine zweite Welle hinzu, deren Größe Querabstand bestimmt; sie läuft entlang des Verzerrungswinkels und schiebt entlang des Winkels. Mit „Ursprung: Bildschirm unten links“ werden die Wellen von dieser Bildschirmecke aus an der kürzeren Bildschirmseite gemessen, und Phase verschiebt sie dann.",
    "name": "Wellenverzerrung",
    "params": {
     "angle": {
@@ -6952,6 +8111,22 @@
     },
     "warpAngle": {
      "label": "Verzerrungswinkel"
+    },
+    "screenSpace": {
+     "label": "Bildschirmraum"
+    },
+    "crossSpacing": {
+     "label": "Querabstand"
+    },
+    "crossMagnitude": {
+     "label": "Querausmaß"
+    },
+    "origin": {
+     "label": "Ursprung",
+     "options": [
+      "Ebenenecke",
+      "Bildschirm unten links"
+     ]
     }
    }
   },

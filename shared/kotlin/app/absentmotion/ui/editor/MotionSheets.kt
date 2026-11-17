@@ -111,6 +111,7 @@ import androidx.compose.ui.res.pluralStringResource
 import app.absentmotion.R
 import app.absentmotion.i18n.UiText
 import app.absentmotion.i18n.text
+import app.absentmotion.ui.HoldName
 
 private val TileShape = RoundedCornerShape(6.dp)
 
@@ -139,6 +140,7 @@ internal fun TransitionButton(state: EditorState, modifier: Modifier, compact: B
             ) {
                 Icon(ChromeIcons.Transition, stringResource(R.string.transition_title), Modifier.size(if (desk) 16.dp else if (compact) 18.dp else 22.dp), tint = Am.OnDark)
             }
+            HoldName(stringResource(R.string.transition_title))
         }
     }
     open?.let { (a, b) -> TransitionSheet(state, a, b) { open = null } }
@@ -158,6 +160,7 @@ internal fun AnimateButton(state: EditorState, modifier: Modifier) {
             contentAlignment = Alignment.Center,
         ) {
             Icon(PanelIcons.Animate, stringResource(R.string.a11y_animate), Modifier.size(if (app.absentmotion.platform.PlatformFeatures.desktop) 18.dp else 24.dp), tint = Am.Accent)
+            HoldName(stringResource(R.string.a11y_animate))
         }
     }
     open?.let { AnimationSheet(state, it) { open = null } }

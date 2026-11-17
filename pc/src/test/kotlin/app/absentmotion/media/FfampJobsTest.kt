@@ -11,6 +11,7 @@ import app.absentmotion.export.Codec
 import app.absentmotion.export.Container
 import app.absentmotion.export.DeskEncoders
 import app.absentmotion.export.Expectation
+import app.absentmotion.export.ExportError
 import app.absentmotion.export.ExportSettings
 import app.absentmotion.export.audioCodecsFor
 import app.absentmotion.export.verifyExport
@@ -424,7 +425,8 @@ class FfampJobsTest {
         ffmpeg("-i", source.path, "-vn", "-c", "copy", File(two, "item.140.m4a").path)
         val plan = app.absentmotion.tools.Plan(picture, sound)
         val options = MediaEngine.current.downloadOptions(plan, app.absentmotion.tools.SaveMode.Both, two)
-        assertTrue("$options", options.containsAll(listOf("--fixup", "never", "136,140", "m3u8:native", "dash:native")) && "ffmpeg" !in options && File(options[options.indexOf("--ffmpeg-location") + 1]).exists().not())
+        assertTrue("$options", options.containsAll(listOf("--fixup", "never", "136,140", "m3u8:native", "dash:native")))
+        assertEquals(FfmpegEngine.ffmpeg, options[options.indexOf("--ffmpeg-location") + 1])
         assertTrue(options.last().endsWith("item.%(format_id)s.%(ext)s"))
         val joined = withoutFfmpeg { MediaEngine.current.downloaded(plan, app.absentmotion.tools.SaveMode.Both, two)!! }
         assertEquals("mp4", joined.extension)
@@ -459,6 +461,38 @@ class FfampJobsTest {
         assertEquals("silent.mp4", silent.name)
         assertTrue(stream(judged(silent), "audio") == null)
         assertEquals(packets(source, "v"), packets(silent, "v"))
+    }
+
+    @Test fun copyJobsFfampCannotStoreAreLeftToFfmpeg() {
+        val surround = File(dir, "dts.mkv").also { ffmpeg("-i", source.path, "-c:v", "copy", "-c:a", "dca", "-strict", "-2", it.path) }
+        assertTrue(FfampFirst.reads(surround))
+        val cut = File(dir, "dts-cut.mp4").also { it.delete() }
+        FfampFirst.trim(surround, 1_000_000, 3_000_000, cut, {}) { true }
+        assertEquals("dts", stream(judged(cut), "audio")!!.getString("codec_name"))
+        assertEquals(2.0, seconds(cut), 0.1)
+        val installed = System.getProperty("am.ffmpeg")
+        System.setProperty("am.ffmpeg", File(dir, "missing/ffmpeg").path)
+        val stopped = try { runCatching { FfampFirst.trim(surround, 1_000_000, 3_000_000, File(dir, "dts-cut-alone.mp4"), {}) { true } }.exceptionOrNull() } finally {
+            if (installed == null) System.clearProperty("am.ffmpeg") else System.setProperty("am.ffmpeg", installed)
+        }
+        assertTrue("$stopped", stopped is ExportError)
+
+        val phone = File(dir, "h263.3gp").also { ffmpeg("-i", source.path, "-vf", "scale=176:144", "-c:v", "h263", "-c:a", "aac", it.path) }
+        assertTrue(FfampFirst.reads(phone))
+        val silent = FfampFirst.withoutAudio(phone)
+        assertEquals("silent.3gp", silent.name)
+        assertTrue(stream(judged(silent), "audio") == null)
+        assertEquals(packets(phone, "v"), packets(silent, "v"))
+
+        val pieces = File(dir, "pieces-dts").also { it.deleteRecursively(); it.mkdirs() }
+        ffmpeg("-i", source.path, "-an", "-c", "copy", File(pieces, "item.136.mp4").path)
+        ffmpeg("-i", surround.path, "-vn", "-c", "copy", File(pieces, "item.140.mp4").path)
+        val picture = app.absentmotion.tools.RemoteFormat("136", "mp4", app.absentmotion.tools.VideoCodec.Avc, app.absentmotion.tools.AudioCodec.None)
+        val sound = app.absentmotion.tools.RemoteFormat("140", "mp4", app.absentmotion.tools.VideoCodec.None, app.absentmotion.tools.AudioCodec.Unknown)
+        val joined = FfampFirst.downloaded(app.absentmotion.tools.Plan(picture, sound), app.absentmotion.tools.SaveMode.Both, pieces)!!
+        assertEquals("joined.mp4", joined.name)
+        assertEquals("dts", stream(judged(joined), "audio")!!.getString("codec_name"))
+        assertEquals(packets(source, "v"), packets(joined, "v"))
     }
 
     @Test fun cancelStopsJobsAndLeavesNoFile() {

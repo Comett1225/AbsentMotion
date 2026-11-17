@@ -73,6 +73,7 @@ import androidx.compose.material3.Icon
 import kotlinx.coroutines.launch
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
+import app.absentmotion.ui.HoldName
 
 private fun unsupportedPick(context: android.content.Context, uri: Uri) {
     android.widget.Toast.makeText(context, app.absentmotion.platform.mediaTrouble(context, uri) ?: context.getString(R.string.library_err_unsupported_type), android.widget.Toast.LENGTH_LONG).show()
@@ -204,7 +205,7 @@ internal fun MediaTab(state: EditorState, modifier: Modifier, library: AddLibrar
                     val press = remember { MutableInteractionSource() }
                     Box(Modifier.fillMaxWidth().weight(1f).pressScale(press, TilePress).background(Am.Well).semantics { contentDescription = viewAll }.clickable(press, LocalIndication.current) {
                         MediaPicks.openVisual()
-                    }, Alignment.Center) { MediaGridIcon(Modifier.size(24.dp)) }
+                    }, Alignment.Center) { MediaGridIcon(Modifier.size(24.dp)); HoldName(viewAll) }
                     Box(Modifier.fillMaxWidth().weight(1f).background(Am.Well).clickable { albumsOpen = true }, Alignment.Center) {
                         Text(media.firstOrNull { it.albumId == album }?.album ?: allLabel, color = Am.OnDark, fontSize = 16.sp, maxLines = 1)
                         MediaAlbumArrow(Modifier.align(Alignment.TopEnd).padding(3.dp).size(6.dp))

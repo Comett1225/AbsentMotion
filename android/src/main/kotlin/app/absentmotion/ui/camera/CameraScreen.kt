@@ -105,6 +105,7 @@ import java.util.Locale
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 import app.absentmotion.ui.editor.panels.buttonLabel
+import app.absentmotion.ui.HoldName
 
 private enum class Flash(@StringRes val label: Int, val mode: Int) {
     Off(R.string.camera_off, ImageCapture.FLASH_MODE_OFF), Auto(R.string.camera_auto, ImageCapture.FLASH_MODE_AUTO), On(R.string.camera_on, ImageCapture.FLASH_MODE_ON),
@@ -419,6 +420,7 @@ private fun CameraBody(ui: CameraUi, aspect: Float, mic: Boolean, askMic: () -> 
         Row(Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(56.dp).clickable { if (recording) ui.askDiscard = true else onClose() }, Alignment.Center) {
                 Icon(ChromeIcons.CloseThick, stringResource(R.string.camera_close), Modifier.size(26.dp), tint = Color.White)
+                HoldName(stringResource(R.string.camera_close))
             }
             Box(Modifier.weight(1f), Alignment.Center) {
                 if (recording) Row(
@@ -501,14 +503,20 @@ private fun CameraBody(ui: CameraUi, aspect: Float, mic: Boolean, askMic: () -> 
                     Modifier.size(52.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.18f))
                         .clickable { if (ui.paused) ui.recording?.resume() else ui.recording?.pause() },
                     Alignment.Center,
-                ) { Icon(if (ui.paused) ChromeIcons.Play else ChromeIcons.Pause, stringResource(if (ui.paused) R.string.camera_resume_recording else R.string.camera_pause_recording), Modifier.size(26.dp), tint = Color.White) }
+                ) {
+                    Icon(if (ui.paused) ChromeIcons.Play else ChromeIcons.Pause, stringResource(if (ui.paused) R.string.camera_resume_recording else R.string.camera_pause_recording), Modifier.size(26.dp), tint = Color.White)
+                    HoldName(stringResource(if (ui.paused) R.string.camera_resume_recording else R.string.camera_pause_recording))
+                }
             }
             Shutter(ui.video, recording, ui.busy || ui.countdown > 0, ready = recording || lenses?.let { it.first || it.second } == true, noCamera = lenses?.let { !it.first && !it.second } == true, ::shutter)
             val canSwitch = lenses?.let { it.first && it.second } == true && !locked
             Box(
                 Modifier.size(64.dp).alpha(if (canSwitch) 1f else 0.35f).clip(CircleShape).clickable(enabled = canSwitch) { ui.front = !ui.front },
                 Alignment.Center,
-            ) { Icon(CameraIcons.Switch, stringResource(R.string.camera_switch), Modifier.size(30.dp), tint = Color.White) }
+            ) {
+                Icon(CameraIcons.Switch, stringResource(R.string.camera_switch), Modifier.size(30.dp), tint = Color.White)
+                HoldName(stringResource(R.string.camera_switch))
+            }
         }
     }
 }
@@ -527,12 +535,12 @@ private fun Blink(count: Int) {
 
 @Composable
 private fun TopButton(icon: ImageVector, caption: String, description: String, enabled: Boolean = true, onClick: () -> Unit) {
-    Column(
-        Modifier.size(56.dp).alpha(if (enabled) 1f else 0.35f).clickable(enabled = enabled, onClick = onClick),
-        horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
-    ) {
-        Icon(icon, description, Modifier.size(22.dp), tint = Color.White)
-        Text(caption, color = Color.White, fontSize = 10.sp, maxLines = 1)
+    Box(Modifier.size(56.dp).alpha(if (enabled) 1f else 0.35f).clickable(enabled = enabled, onClick = onClick), Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(icon, description, Modifier.size(22.dp), tint = Color.White)
+            Text(caption, color = Color.White, fontSize = 10.sp, maxLines = 1)
+        }
+        HoldName(description)
     }
 }
 

@@ -75,6 +75,7 @@ import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.roundToInt
 import kotlin.math.sin
+import app.absentmotion.ui.HoldName
 
 private val ScreenBg get() = Am.PreviewBg
 private val GridBg get() = Am.Deepest
@@ -91,18 +92,21 @@ private const val SLIDER_PAD = 37f
 private const val SLIDER_SPAN = 680f
 
 @Composable
-internal fun FullColorPicker(state: EditorState, request: FullColor, modifier: Modifier = Modifier) {
+internal fun FullColorPicker(state: EditorState, request: FullColor, modifier: Modifier = Modifier) =
+    FullColorPicker(state.settings, request, { state.endGesture(); state.fullColor = null }, { state.endGesture() }, modifier)
+
+@Composable
+internal fun FullColorPicker(settings: app.absentmotion.library.AppSettings, request: FullColor, close: () -> Unit, end: () -> Unit, modifier: Modifier = Modifier) {
     var tab by remember { mutableIntStateOf(0) }
     var argb by remember { mutableIntStateOf(request.start) }
     var held by remember { mutableStateOf<Hsva?>(null) }
     var keypad by remember { mutableStateOf<KeypadRequest?>(null) }
     val hsva = held?.takeIf { it.toArgb() == argb } ?: Hsva.from(argb)
-    val saved = state.settings.savedColours
+    val saved = settings.savedColours
     val palettes = rememberPaletteLibrary()
     var library by remember { mutableStateOf(false) }
     if (library) PaletteSheet(argb) { library = false }
-    fun keepColour() = palettes.keep(argb and 0xFFFFFF, state.settings)
-    val close = { state.endGesture(); state.fullColor = null }
+    fun keepColour() = palettes.keep(argb and 0xFFFFFF, settings)
     BackHandler(onBack = close)
 
     fun setArgb(c: Int, drag: Boolean) { argb = c; request.apply(c, drag) }
@@ -113,7 +117,6 @@ internal fun FullColorPicker(state: EditorState, request: FullColor, modifier: M
             setArgb(v.indices.fold(0) { out, i -> out or (v[i].roundToInt().coerceIn(0, 255) shl shifts[i]) }, false)
         }
     }
-    val end = { state.endGesture() }
 
     Box(modifier.fillMaxSize().background(ScreenBg).pointerInput(Unit) {}) {
         PhoneFit(Modifier.fillMaxSize().systemBarsPadding()) { Column(Modifier.fillMaxSize()) {
@@ -122,6 +125,7 @@ internal fun FullColorPicker(state: EditorState, request: FullColor, modifier: M
                 TopTab(PanelIcons.RgbSliders, stringResource(R.string.a11y_color_sliders), tab == 1, Modifier.weight(470f)) { tab = 1 }
                 Box(Modifier.weight(141f).fillMaxHeight().background(CloseBg).clickable(onClick = close), Alignment.Center) {
                     PanelIcon(PanelIcons.Check, Am.OnDark, size = 27.dp, description = stringResource(R.string.done))
+                    HoldName(stringResource(R.string.done))
                 }
             }
             val wide = app.absentmotion.ui.adaptive.LocalAdaptiveSpace.current?.wide == true
@@ -201,7 +205,7 @@ private fun alphaTrack(colour: Color) = listOf(colour.copy(alpha = 0f), colour)
 
 @Composable
 private fun TopTab(icon: ImageVector, description: String, active: Boolean, modifier: Modifier, onClick: () -> Unit) {
-    Box(modifier.fillMaxHeight().clickable(onClick = onClick), Alignment.Center) { PanelIcon(icon, if (active) Am.Accent else Idle, size = 27.dp, description = description) }
+    Box(modifier.fillMaxHeight().clickable(onClick = onClick), Alignment.Center) { PanelIcon(icon, if (active) Am.Accent else Idle, size = 27.dp, description = description); HoldName(description) }
 }
 
 @Composable
@@ -237,19 +241,22 @@ private fun Wheel(hsva: Hsva, start: Int, argb: Int, onChange: (Hsva) -> Unit, o
 
 @Composable
 private fun ColourCard(start: Int, now: Int, width: Dp, height: Dp, onSave: () -> Unit) {
-    Canvas(Modifier.size(width, height).clip(RoundedCornerShape(20.px)).buttonLabel(stringResource(R.string.palette_add)).clickable(onClick = onSave)) {
-        val half = size.width / 2f
-        clipPath(Path().apply { addRoundRect(RoundRect(0f, 0f, size.width, size.height, CornerRadius(20 * 1.px.toPx()))) }) {
-            checker(Offset.Zero, size, 20 * 1.px.toPx())
-            drawRect(Color(start), Offset.Zero, Size(half, size.height))
-            drawRect(Color(now), Offset(half, 0f), Size(half, size.height))
+    Box(Modifier.size(width, height).clip(RoundedCornerShape(20.px)).buttonLabel(stringResource(R.string.palette_add)).clickable(onClick = onSave)) {
+        Canvas(Modifier.matchParentSize()) {
+            val half = size.width / 2f
+            clipPath(Path().apply { addRoundRect(RoundRect(0f, 0f, size.width, size.height, CornerRadius(20 * 1.px.toPx()))) }) {
+                checker(Offset.Zero, size, 20 * 1.px.toPx())
+                drawRect(Color(start), Offset.Zero, Size(half, size.height))
+                drawRect(Color(now), Offset(half, 0f), Size(half, size.height))
+            }
         }
+        HoldName(stringResource(R.string.palette_add))
     }
 }
 
 @Composable
 private fun HexText(argb: Int, onClick: () -> Unit) {
-    Box(Modifier.fillMaxWidth().height(57.px).clickable(onClick = onClick), Alignment.Center) {
+    Box(Modifier.fillMaxWidth().height(57.px).typeOnDoubleTap(onType = onClick), Alignment.Center) {
         Text(colourText(argb), color = Am.OnDark, fontSize = 15.sp, maxLines = 1, softWrap = false)
     }
 }

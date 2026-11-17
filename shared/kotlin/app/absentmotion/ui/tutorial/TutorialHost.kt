@@ -101,6 +101,7 @@ import kotlinx.coroutines.withContext
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.roundToInt
+import app.absentmotion.ui.HoldName
 
 @Composable
 fun TutorialHost(
@@ -492,6 +493,7 @@ private fun Pill(view: TourView, onOpen: () -> Unit) {
 private fun CardIcon(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, onClick: () -> Unit) {
     Box(Modifier.size(44.dp).clip(RoundedCornerShape(22.dp)).clickable(onClick = onClick, role = Role.Button, onClickLabel = label), Alignment.Center) {
         Icon(icon, label, Modifier.size(20.dp), tint = Am.OnDark)
+        HoldName(label)
     }
 }
 

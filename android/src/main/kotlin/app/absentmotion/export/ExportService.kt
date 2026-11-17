@@ -108,6 +108,7 @@ class ExportService : Service() {
     private val handler = Handler(Looper.getMainLooper())
     private val tick = Runnable { update() }
     private var shown = -1
+    private var titled = 0
     private var lock: PowerManager.WakeLock? = null
 
     override fun attachBaseContext(newBase: Context) = super.attachBaseContext(newBase.inAppLanguage())
@@ -125,6 +126,7 @@ class ExportService : Service() {
         val channel = NotificationChannelCompat.Builder(Channel, NotificationManagerCompat.IMPORTANCE_LOW).setName(getString(R.string.export_notify_channel)).build()
         NotificationManagerCompat.from(this).createNotificationChannel(channel)
         shown = percent()
+        titled = ExportRun.title
         try {
             val notification = progressNotification(shown)
             if (Build.VERSION.SDK_INT >= 29) startForeground(NotificationId, notification, serviceType()) else startForeground(NotificationId, notification)
@@ -146,8 +148,9 @@ class ExportService : Service() {
     private fun update() {
         if (!ExportRun.running) return finish()
         val now = percent()
-        if (now != shown) {
+        if (now != shown || ExportRun.title != titled) {
             shown = now
+            titled = ExportRun.title
             post(progressNotification(now))
         }
         handler.postDelayed(tick, TickMs)
@@ -166,7 +169,11 @@ class ExportService : Service() {
         } else {
             ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_DETACH)
             post(NotificationCompat.Builder(this, Channel).setSmallIcon(R.drawable.ic_notification)
-                .setContentTitle(getString(if (outcome) R.string.export_notify_done else R.string.export_notify_failed))
+                .setContentTitle(getString(when {
+                    outcome -> R.string.export_notify_done
+                    ExportRun.title == R.string.export_running_ai_smooth -> R.string.ai_smooth_download_failed
+                    else -> R.string.export_notify_failed
+                }))
                 .setContentIntent(openApp()).setAutoCancel(true).build())
         }
         stopSelf()

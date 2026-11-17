@@ -497,11 +497,18 @@
    }
   },
   "blur": {
-   "description": "부드럽고 균일하게 흐리게 합니다.",
+   "description": "부드럽고 균일한 블러를 적용합니다. 도형을 상자로 하면 대신 각 점 주변의 정사각형 영역을 균일하게 평균합니다.",
    "name": "블러",
    "params": {
     "strength": {
      "label": "강도"
+    },
+    "shape": {
+     "label": "도형",
+     "options": [
+      "부드럽게",
+      "상자"
+     ]
     }
    }
   },
@@ -547,6 +554,59 @@
     },
     "width": {
      "label": "너비"
+    },
+    "lighting": {
+     "label": "조명",
+     "options": [
+      "클래식",
+      "부드러움",
+      "직접광"
+     ]
+    },
+    "ambient": {
+     "label": "주변광"
+    },
+    "lightHeight": {
+     "label": "조명 높이"
+    },
+    "lightColor": {
+     "label": "조명 색상"
+    },
+    "glossiness": {
+     "label": "하이라이트 선명도"
+    },
+    "texMode": {
+     "label": "텍스처",
+     "options": [
+      "맞춤",
+      "타일",
+      "늘이기"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X 반복"
+    },
+    "texRepeatY": {
+     "label": "Y 반복"
+    },
+    "texMirror": {
+     "label": "미러"
+    },
+    "texAngle": {
+     "label": "텍스처 각도"
+    },
+    "texOffset": {
+     "label": "텍스처 오프셋"
+    },
+    "texCrop": {
+     "label": "텍스처 자르기"
+    },
+    "texAnchor": {
+     "label": "텍스처 기준점",
+     "options": [
+      "중심",
+      "모서리"
+     ]
     }
    }
   },
@@ -570,7 +630,7 @@
    }
   },
   "bulge": {
-   "description": "레이어 크기에 비례하는 반경의 원 안에서 레이어를 렌즈처럼 볼록하게 하거나(양의 강도) 중심으로 오목하게 만듭니다(음의 강도).",
+   "description": "반경(레이어 크기에 대한 비율) 크기의 원 안에서 레이어를 렌즈처럼 볼록하게 하거나(강도가 양수) 중심 쪽으로 오목하게 만듭니다(음수). 측정 기준을 화면으로 하면 반경을 화면 크기에 대한 비율로 잡습니다. 감쇠를 부드럽게로 하면 렌즈가 레이어의 나머지 부분과 더 부드럽게 이어집니다.",
    "name": "오목/볼록",
    "params": {
     "amount": {
@@ -581,6 +641,20 @@
     },
     "radius": {
      "label": "반경"
+    },
+    "reach": {
+     "label": "측정 기준",
+     "options": [
+      "레이어",
+      "화면"
+     ]
+    },
+    "curve": {
+     "label": "감쇠",
+     "options": [
+      "클래식",
+      "부드럽게"
+     ]
     }
    }
   },
@@ -781,7 +855,7 @@
    }
   },
   "circularripple": {
-   "description": "물에 떨어진 물방울처럼 한 지점에서 원형 물결이 퍼집니다.",
+   "description": "물에 떨어진 물방울처럼 한 지점에서 원형 물결이 퍼져 나가게 합니다. 측정 기준을 화면으로 하면 빈도, 강도, 반경을 레이어 대신 화면 기준으로 잽니다.",
    "name": "원형 물결",
    "params": {
     "center": {
@@ -801,6 +875,13 @@
     },
     "strength": {
      "label": "강도"
+    },
+    "reach": {
+     "label": "측정 기준",
+     "options": [
+      "레이어",
+      "화면"
+     ]
     }
    }
   },
@@ -813,6 +894,9 @@
     },
     "color2": {
      "label": "색상 2"
+    },
+    "contrast": {
+     "label": "대비"
     },
     "intensity": {
      "label": "강도"
@@ -855,6 +939,13 @@
     },
     "strength": {
      "label": "강도"
+    },
+    "style": {
+     "label": "스타일",
+     "options": [
+      "클래식",
+      "선명하게"
+     ]
     }
    }
   },
@@ -965,6 +1056,16 @@
     },
     "fill": {
      "label": "채우기"
+    },
+    "spread": {
+     "label": "퍼짐",
+     "options": [
+      "블러",
+      "거리"
+     ]
+    },
+    "offset": {
+     "label": "오프셋"
     }
    }
   },
@@ -992,6 +1093,16 @@
     },
     "width": {
      "label": "너비"
+    },
+    "spread": {
+     "label": "퍼짐",
+     "options": [
+      "블러",
+      "거리"
+     ]
+    },
+    "offset": {
+     "label": "오프셋"
     }
    }
   },
@@ -1041,6 +1152,13 @@
     },
     "thickness": {
      "label": "두께"
+    },
+    "style": {
+     "label": "스타일",
+     "options": [
+      "클래식",
+      "겹침"
+     ]
     }
    }
   },
@@ -1141,6 +1259,62 @@
     },
     "thickness": {
      "label": "두께"
+    },
+    "keep": {
+     "label": "레이어 유지"
+    },
+    "lighting": {
+     "label": "조명",
+     "options": [
+      "클래식",
+      "부드러움",
+      "직접광"
+     ]
+    },
+    "ambient": {
+     "label": "주변광"
+    },
+    "lightHeight": {
+     "label": "조명 높이"
+    },
+    "lightColor": {
+     "label": "조명 색상"
+    },
+    "glossiness": {
+     "label": "하이라이트 선명도"
+    },
+    "texMode": {
+     "label": "텍스처",
+     "options": [
+      "맞춤",
+      "타일",
+      "늘이기"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X 반복"
+    },
+    "texRepeatY": {
+     "label": "Y 반복"
+    },
+    "texMirror": {
+     "label": "미러"
+    },
+    "texAngle": {
+     "label": "텍스처 각도"
+    },
+    "texOffset": {
+     "label": "텍스처 오프셋"
+    },
+    "texCrop": {
+     "label": "텍스처 자르기"
+    },
+    "texAnchor": {
+     "label": "텍스처 기준점",
+     "options": [
+      "중심",
+      "모서리"
+     ]
     }
    }
   },
@@ -1180,6 +1354,59 @@
     },
     "smoothing": {
      "label": "매끄럽게"
+    },
+    "lighting": {
+     "label": "조명",
+     "options": [
+      "클래식",
+      "부드러움",
+      "직접광"
+     ]
+    },
+    "ambient": {
+     "label": "주변광"
+    },
+    "lightHeight": {
+     "label": "조명 높이"
+    },
+    "lightColor": {
+     "label": "조명 색상"
+    },
+    "glossiness": {
+     "label": "하이라이트 선명도"
+    },
+    "texMode": {
+     "label": "텍스처",
+     "options": [
+      "맞춤",
+      "타일",
+      "늘이기"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X 반복"
+    },
+    "texRepeatY": {
+     "label": "Y 반복"
+    },
+    "texMirror": {
+     "label": "미러"
+    },
+    "texAngle": {
+     "label": "텍스처 각도"
+    },
+    "texOffset": {
+     "label": "텍스처 오프셋"
+    },
+    "texCrop": {
+     "label": "텍스처 자르기"
+    },
+    "texAnchor": {
+     "label": "텍스처 기준점",
+     "options": [
+      "중심",
+      "모서리"
+     ]
     }
    }
   },
@@ -1251,6 +1478,59 @@
     },
     "smoothing": {
      "label": "매끄럽게"
+    },
+    "lighting": {
+     "label": "조명",
+     "options": [
+      "클래식",
+      "부드러움",
+      "직접광"
+     ]
+    },
+    "ambient": {
+     "label": "주변광"
+    },
+    "lightHeight": {
+     "label": "조명 높이"
+    },
+    "lightColor": {
+     "label": "조명 색상"
+    },
+    "glossiness": {
+     "label": "하이라이트 선명도"
+    },
+    "texMode": {
+     "label": "텍스처",
+     "options": [
+      "맞춤",
+      "타일",
+      "늘이기"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X 반복"
+    },
+    "texRepeatY": {
+     "label": "Y 반복"
+    },
+    "texMirror": {
+     "label": "미러"
+    },
+    "texAngle": {
+     "label": "텍스처 각도"
+    },
+    "texOffset": {
+     "label": "텍스처 오프셋"
+    },
+    "texCrop": {
+     "label": "텍스처 자르기"
+    },
+    "texAnchor": {
+     "label": "텍스처 기준점",
+     "options": [
+      "중심",
+      "모서리"
+     ]
     }
    }
   },
@@ -1369,7 +1649,7 @@
    }
   },
   "directionalblur": {
-   "description": "지정한 각도를 따라 샘플을 평균하여 모션 블러를 만듭니다.",
+   "description": "각도 방향을 따라 샘플을 평균해 모션 블러를 만듭니다. 퍼짐을 양쪽으로 하면 앞뒤로 고르게 흐려집니다.",
    "name": "방향 블러",
    "params": {
     "angle": {
@@ -1377,6 +1657,13 @@
     },
     "blurLength": {
      "label": "길이"
+    },
+    "spread": {
+     "label": "퍼짐",
+     "options": [
+      "한쪽",
+      "양쪽"
+     ]
     }
    }
   },
@@ -1571,6 +1858,22 @@
    "params": {
     "strength": {
      "label": "강도"
+    },
+    "style": {
+     "label": "스타일",
+     "options": [
+      "클래식",
+      "잉크"
+     ]
+    },
+    "spacing": {
+     "label": "매끄럽게"
+    },
+    "threshold": {
+     "label": "임계값"
+    },
+    "invert": {
+     "label": "반전"
     }
    }
   },
@@ -1613,6 +1916,9 @@
     },
     "tintColor": {
      "label": "색조 색상"
+    },
+    "mask": {
+     "label": "레이어에 마스크"
     }
    }
   },
@@ -1682,6 +1988,13 @@
     },
     "thickness": {
      "label": "두께"
+    },
+    "contourStyle": {
+     "label": "스타일",
+     "options": [
+      "클래식",
+      "가는 선"
+     ]
     }
    }
   },
@@ -1724,6 +2037,59 @@
     },
     "squeezeRatio": {
      "label": "늘이기"
+    },
+    "lighting": {
+     "label": "조명",
+     "options": [
+      "클래식",
+      "부드러움",
+      "직접광"
+     ]
+    },
+    "ambient": {
+     "label": "주변광"
+    },
+    "lightHeight": {
+     "label": "조명 높이"
+    },
+    "lightColor": {
+     "label": "조명 색상"
+    },
+    "glossiness": {
+     "label": "하이라이트 선명도"
+    },
+    "texMode": {
+     "label": "텍스처",
+     "options": [
+      "맞춤",
+      "타일",
+      "늘이기"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X 반복"
+    },
+    "texRepeatY": {
+     "label": "Y 반복"
+    },
+    "texMirror": {
+     "label": "미러"
+    },
+    "texAngle": {
+     "label": "텍스처 각도"
+    },
+    "texOffset": {
+     "label": "텍스처 오프셋"
+    },
+    "texCrop": {
+     "label": "텍스처 자르기"
+    },
+    "texAnchor": {
+     "label": "텍스처 기준점",
+     "options": [
+      "중심",
+      "모서리"
+     ]
     }
    }
   },
@@ -1982,6 +2348,65 @@
     },
     "shine": {
      "label": "광택"
+    },
+    "lighting": {
+     "label": "조명",
+     "options": [
+      "클래식",
+      "부드러움",
+      "직접광"
+     ]
+    },
+    "ambient": {
+     "label": "주변광"
+    },
+    "lightHeight": {
+     "label": "조명 높이"
+    },
+    "lightColor": {
+     "label": "조명 색상"
+    },
+    "glossiness": {
+     "label": "하이라이트 선명도"
+    },
+    "pivot": {
+     "label": "기준점"
+    },
+    "pivotDepth": {
+     "label": "기준점 깊이"
+    },
+    "texMode": {
+     "label": "텍스처",
+     "options": [
+      "맞춤",
+      "타일",
+      "늘이기"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X 반복"
+    },
+    "texRepeatY": {
+     "label": "Y 반복"
+    },
+    "texMirror": {
+     "label": "미러"
+    },
+    "texAngle": {
+     "label": "텍스처 각도"
+    },
+    "texOffset": {
+     "label": "텍스처 오프셋"
+    },
+    "texCrop": {
+     "label": "텍스처 자르기"
+    },
+    "texAnchor": {
+     "label": "텍스처 기준점",
+     "options": [
+      "중심",
+      "모서리"
+     ]
     }
    }
   },
@@ -2047,6 +2472,13 @@
     },
     "softness": {
      "label": "부드러움"
+    },
+    "falloff": {
+     "label": "감쇠",
+     "options": [
+      "거리",
+      "부드럽게"
+     ]
     }
    }
   },
@@ -2116,6 +2548,13 @@
     },
     "strength": {
      "label": "강도"
+    },
+    "screenSize": {
+     "label": "크기 기준",
+     "options": [
+      "레이어",
+      "화면"
+     ]
     }
    }
   },
@@ -2198,7 +2637,7 @@
    }
   },
   "glass": {
-   "description": "레이어 도형을 뒤쪽 레이어를 굴절시키는 경사진 유리로 바꾸고 가장자리에 하이라이트를 더합니다.",
+   "description": "레이어의 모양을 뒤쪽 레이어를 굴절시키는 베벨 유리로 바꾸고 가장자리를 따라 하이라이트를 넣습니다. 조명을 부드러움으로 하면 레이어가 채우기 값만큼 보이고 유리를 색상으로 비추며, 빛을 향한 베벨 안쪽 가장자리가 가장 밝습니다.",
    "name": "유리",
    "params": {
     "angle": {
@@ -2210,8 +2649,18 @@
     "color": {
      "label": "색상"
     },
+    "fill": {
+     "label": "채우기"
+    },
     "highlight": {
      "label": "하이라이트"
+    },
+    "light": {
+     "label": "조명",
+     "options": [
+      "가장자리",
+      "부드러움"
+     ]
     },
     "refraction": {
      "label": "굴절"
@@ -2326,6 +2775,13 @@
     },
     "scaleBrightness": {
      "label": "밝기 배율"
+    },
+    "style": {
+     "label": "스타일",
+     "options": [
+      "그라데이션",
+      "스펙트럼"
+     ]
     }
    }
   },
@@ -2401,6 +2857,14 @@
     },
     "offset": {
      "label": "오프셋"
+    },
+    "origin": {
+     "label": "기준점",
+     "options": [
+      "중심",
+      "레이어 모서리",
+      "화면 모서리"
+     ]
     },
     "punch": {
      "label": "잘라내기"
@@ -2606,6 +3070,59 @@
     },
     "smoothing": {
      "label": "매끄럽게"
+    },
+    "lighting": {
+     "label": "조명",
+     "options": [
+      "클래식",
+      "부드러움",
+      "직접광"
+     ]
+    },
+    "ambient": {
+     "label": "주변광"
+    },
+    "lightHeight": {
+     "label": "조명 높이"
+    },
+    "lightColor": {
+     "label": "조명 색상"
+    },
+    "glossiness": {
+     "label": "하이라이트 선명도"
+    },
+    "texMode": {
+     "label": "텍스처",
+     "options": [
+      "맞춤",
+      "타일",
+      "늘이기"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X 반복"
+    },
+    "texRepeatY": {
+     "label": "Y 반복"
+    },
+    "texMirror": {
+     "label": "미러"
+    },
+    "texAngle": {
+     "label": "텍스처 각도"
+    },
+    "texOffset": {
+     "label": "텍스처 오프셋"
+    },
+    "texCrop": {
+     "label": "텍스처 자르기"
+    },
+    "texAnchor": {
+     "label": "텍스처 기준점",
+     "options": [
+      "중심",
+      "모서리"
+     ]
     }
    }
   },
@@ -2661,11 +3178,33 @@
     "angle": {
      "label": "각도"
     },
+    "crop": {
+     "label": "자르기"
+    },
+    "fit": {
+     "label": "이미지",
+     "options": [
+      "원래 크기",
+      "타일마다"
+     ]
+    },
+    "mask": {
+     "label": "레이어에 마스크"
+    },
     "mirror": {
      "label": "거울"
     },
+    "offset": {
+     "label": "오프셋"
+    },
     "scale": {
      "label": "크기"
+    },
+    "screenSpace": {
+     "label": "화면 공간"
+    },
+    "stretch": {
+     "label": "늘이기"
     }
    }
   },
@@ -2769,6 +3308,59 @@
     },
     "smoothing": {
      "label": "매끄럽게"
+    },
+    "lighting": {
+     "label": "조명",
+     "options": [
+      "클래식",
+      "부드러움",
+      "직접광"
+     ]
+    },
+    "ambient": {
+     "label": "주변광"
+    },
+    "lightHeight": {
+     "label": "조명 높이"
+    },
+    "lightColor": {
+     "label": "조명 색상"
+    },
+    "glossiness": {
+     "label": "하이라이트 선명도"
+    },
+    "texMode": {
+     "label": "텍스처",
+     "options": [
+      "맞춤",
+      "타일",
+      "늘이기"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X 반복"
+    },
+    "texRepeatY": {
+     "label": "Y 반복"
+    },
+    "texMirror": {
+     "label": "미러"
+    },
+    "texAngle": {
+     "label": "텍스처 각도"
+    },
+    "texOffset": {
+     "label": "텍스처 오프셋"
+    },
+    "texCrop": {
+     "label": "텍스처 자르기"
+    },
+    "texAnchor": {
+     "label": "텍스처 기준점",
+     "options": [
+      "중심",
+      "모서리"
+     ]
     }
    }
   },
@@ -2839,6 +3431,59 @@
     },
     "width": {
      "label": "너비"
+    },
+    "lighting": {
+     "label": "조명",
+     "options": [
+      "클래식",
+      "부드러움",
+      "직접광"
+     ]
+    },
+    "ambient": {
+     "label": "주변광"
+    },
+    "lightHeight": {
+     "label": "조명 높이"
+    },
+    "lightColor": {
+     "label": "조명 색상"
+    },
+    "glossiness": {
+     "label": "하이라이트 선명도"
+    },
+    "texMode": {
+     "label": "텍스처",
+     "options": [
+      "맞춤",
+      "타일",
+      "늘이기"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X 반복"
+    },
+    "texRepeatY": {
+     "label": "Y 반복"
+    },
+    "texMirror": {
+     "label": "미러"
+    },
+    "texAngle": {
+     "label": "텍스처 각도"
+    },
+    "texOffset": {
+     "label": "텍스처 오프셋"
+    },
+    "texCrop": {
+     "label": "텍스처 자르기"
+    },
+    "texAnchor": {
+     "label": "텍스처 기준점",
+     "options": [
+      "중심",
+      "모서리"
+     ]
     }
    }
   },
@@ -2964,7 +3609,8 @@
      "label": "스타일",
      "options": [
       "클래식",
-      "밝기 유지"
+      "밝기 유지",
+      "비디오"
      ]
     },
     "vibrance": {
@@ -3002,6 +3648,23 @@
     },
     "intensity": {
      "label": "강도"
+    },
+    "blend": {
+     "label": "블렌딩",
+     "options": [
+      "스크린",
+      "일반"
+     ]
+    },
+    "opacity": {
+     "label": "불투명도"
+    },
+    "corners": {
+     "label": "모서리",
+     "options": [
+      "둥글게",
+      "각지게"
+     ]
     }
    }
   },
@@ -3068,6 +3731,13 @@
     "center": {
      "label": "중심"
     },
+    "direction": {
+     "label": "방향",
+     "options": [
+      "시계 방향",
+      "시계 반대 방향"
+     ]
+    },
     "mirror": {
      "label": "거울"
     },
@@ -3077,9 +3747,16 @@
    }
   },
   "lensblur": {
-   "description": "중심 주변은 선명하게 유지하고 가장자리로 갈수록 강해지는 회전 블러를 적용합니다.",
+   "description": "중심 주변은 선명하게 두고 가장자리로 갈수록 강해지는 회전 블러를 적용합니다. 블러를 줌으로 하면 대신 중심에서 바깥쪽으로 번지며 레이어 가장자리 밖까지 퍼집니다.",
    "name": "렌즈 블러",
    "params": {
+    "blur": {
+     "label": "블러",
+     "options": [
+      "회전",
+      "줌"
+     ]
+    },
     "center": {
      "label": "중심"
     },
@@ -3154,6 +3831,12 @@
     },
     "threshold": {
      "label": "기준값"
+    },
+    "soften": {
+     "label": "부드럽게"
+    },
+    "mask": {
+     "label": "레이어에 마스크"
     }
    }
   },
@@ -3257,7 +3940,7 @@
    }
   },
   "linearstreaks": {
-   "description": "레이어 복사본을 지정한 각도로 이동하고 겹치는 부분을 블렌딩해 직선 잔상을 만듭니다.",
+   "description": "레이어 복사본을 각도 방향으로 밀어 놓고 겹치는 부분을 섞어 직선 잔상을 만듭니다. 블렌딩을 끔으로 하면 레이어가 그대로 남습니다. 복사본을 모든 픽셀로 하면 길이를 따라 48개를 띄엄띄엄 놓는 대신 길이의 픽셀마다 복사본을 하나씩 놓습니다.",
    "name": "선형 잔상",
    "params": {
     "alpha": {
@@ -3274,11 +3957,19 @@
      "options": [
       "밝게",
       "평균",
-      "어둡게"
+      "어둡게",
+      "끔"
      ]
     },
     "reach": {
      "label": "길이"
+    },
+    "copies": {
+     "label": "복사본",
+     "options": [
+      "간격 두기",
+      "모든 픽셀"
+     ]
     }
    }
   },
@@ -3333,6 +4024,12 @@
     },
     "solidity": {
      "label": "선명도"
+    },
+    "fill": {
+     "label": "채우기"
+    },
+    "samples": {
+     "label": "샘플"
     }
    }
   },
@@ -3348,6 +4045,9 @@
     },
     "threshold": {
      "label": "기준값"
+    },
+    "high": {
+     "label": "상한 기준값"
     }
    }
   },
@@ -3472,6 +4172,13 @@
    "description": "레이어를 사각형으로 나누고 각 칸을 평균 색상으로 채웁니다.",
    "name": "모자이크",
    "params": {
+    "average": {
+     "label": "평균",
+     "options": [
+      "셀",
+      "모서리"
+     ]
+    },
     "count": {
      "label": "개수"
     },
@@ -3594,6 +4301,59 @@
     },
     "shine": {
      "label": "광택"
+    },
+    "lighting": {
+     "label": "조명",
+     "options": [
+      "클래식",
+      "부드러움",
+      "직접광"
+     ]
+    },
+    "ambient": {
+     "label": "주변광"
+    },
+    "lightHeight": {
+     "label": "조명 높이"
+    },
+    "lightColor": {
+     "label": "조명 색상"
+    },
+    "glossiness": {
+     "label": "하이라이트 선명도"
+    },
+    "texMode": {
+     "label": "텍스처",
+     "options": [
+      "맞춤",
+      "타일",
+      "늘이기"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X 반복"
+    },
+    "texRepeatY": {
+     "label": "Y 반복"
+    },
+    "texMirror": {
+     "label": "미러"
+    },
+    "texAngle": {
+     "label": "텍스처 각도"
+    },
+    "texOffset": {
+     "label": "텍스처 오프셋"
+    },
+    "texCrop": {
+     "label": "텍스처 자르기"
+    },
+    "texAnchor": {
+     "label": "텍스처 기준점",
+     "options": [
+      "중심",
+      "모서리"
+     ]
     }
    }
   },
@@ -4144,6 +4904,13 @@
     "blockSize": {
      "label": "크기"
     },
+    "edges": {
+     "label": "가장자리",
+     "options": [
+      "미러",
+      "투명"
+     ]
+    },
     "offset": {
      "label": "오프셋"
     },
@@ -4244,7 +5011,7 @@
    }
   },
   "polar": {
-   "description": "레이어를 중심으로 휘어 직선을 원으로 만들거나 원을 펼쳐 직선으로 만듭니다.",
+   "description": "레이어를 중심 주위로 휘어 직선을 원으로 만들거나, 원을 펼쳐 직선으로 만듭니다. 배치는 레이어의 어느 가장자리가 가운데에서 만날지 정합니다.",
    "name": "극좌표",
    "params": {
     "amount": {
@@ -4255,6 +5022,13 @@
      "options": [
       "직교좌표에서 극좌표로",
       "극좌표에서 직교좌표로"
+     ]
+    },
+    "middle": {
+     "label": "배치",
+     "options": [
+      "위쪽을 가운데로",
+      "아래쪽을 가운데로"
      ]
     }
    }
@@ -4448,11 +5222,64 @@
     },
     "shine": {
      "label": "광택"
+    },
+    "lighting": {
+     "label": "조명",
+     "options": [
+      "클래식",
+      "부드러움",
+      "직접광"
+     ]
+    },
+    "ambient": {
+     "label": "주변광"
+    },
+    "lightHeight": {
+     "label": "조명 높이"
+    },
+    "lightColor": {
+     "label": "조명 색상"
+    },
+    "glossiness": {
+     "label": "하이라이트 선명도"
+    },
+    "texMode": {
+     "label": "텍스처",
+     "options": [
+      "맞춤",
+      "타일",
+      "늘이기"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X 반복"
+    },
+    "texRepeatY": {
+     "label": "Y 반복"
+    },
+    "texMirror": {
+     "label": "미러"
+    },
+    "texAngle": {
+     "label": "텍스처 각도"
+    },
+    "texOffset": {
+     "label": "텍스처 오프셋"
+    },
+    "texCrop": {
+     "label": "텍스처 자르기"
+    },
+    "texAnchor": {
+     "label": "텍스처 기준점",
+     "options": [
+      "중심",
+      "모서리"
+     ]
     }
    }
   },
   "radialblur": {
-   "description": "중심점에서 뻗는 광선을 따라 샘플을 평균하여 방사형 줌 블러를 적용합니다. 강도를 조절할 수 있습니다.",
+   "description": "중심에서 뻗어 나가는 선을 따라 샘플을 평균해 방사형 줌 블러를 적용하며, 강도를 조절할 수 있습니다. 길이를 균일로 하면 번짐이 중심에서 멀어질수록 길어지지 않고 모두 같은 길이가 됩니다.",
    "name": "줌 블러",
    "params": {
     "amount": {
@@ -4460,6 +5287,13 @@
     },
     "center": {
      "label": "중심"
+    },
+    "streak": {
+     "label": "길이",
+     "options": [
+      "거리에 따라",
+      "균일"
+     ]
     }
    }
   },
@@ -4586,11 +5420,14 @@
     },
     "reach": {
      "label": "길이"
+    },
+    "fill": {
+     "label": "채우기"
     }
    }
   },
   "radialwipe": {
-   "description": "시계 바늘처럼 시작 각도에서 중심을 따라 회전하며 레이어의 부채꼴 영역을 숨깁니다. 진행률은 회전 각도를 정하고 개수는 부채꼴을 원형으로 반복하며 양방향은 양쪽으로 회전합니다. 진행률에 애니메이션을 적용해 전환 효과를 만드세요.",
+   "description": "시곗바늘처럼 시작 각도에서 중심을 축으로 돌며 레이어의 부채꼴 영역을 숨깁니다. 진행률은 돌아간 각도이고, 개수는 원을 따라 부채꼴을 반복하며, 양방향은 양쪽으로 돌아갑니다. 진행률에 키프레임을 넣으면 전환 효과로 쓸 수 있습니다. 부채꼴을 정확한 값으로 하면 개수의 소수 부분이 유지되어 마지막 부채꼴이 더 좁아지고, 페더는 각 부채꼴의 양쪽 가장자리를 부드럽게 합니다.",
    "name": "방사형 와이프",
    "params": {
     "center": {
@@ -4615,6 +5452,13 @@
     },
     "start": {
      "label": "시작 각도"
+    },
+    "wedges": {
+     "label": "부채꼴",
+     "options": [
+      "정수",
+      "정확한 값"
+     ]
     }
    }
   },
@@ -4699,6 +5543,26 @@
     },
     "shine": {
      "label": "광택"
+    },
+    "lighting": {
+     "label": "조명",
+     "options": [
+      "클래식",
+      "부드러움",
+      "직접광"
+     ]
+    },
+    "ambient": {
+     "label": "주변광"
+    },
+    "lightHeight": {
+     "label": "조명 높이"
+    },
+    "lightColor": {
+     "label": "조명 색상"
+    },
+    "glossiness": {
+     "label": "하이라이트 선명도"
     }
    },
    "shortcuts": {
@@ -4914,6 +5778,13 @@
     },
     "threshold": {
      "label": "임계값"
+    },
+    "match": {
+     "label": "일치 기준",
+     "options": [
+      "RGB",
+      "크로마"
+     ]
     }
    }
   },
@@ -4964,7 +5835,7 @@
    }
   },
   "rgbsplit": {
-   "description": "빨강, 초록, 파랑 채널을 분리합니다. 중심 채널은 그대로 두고 나머지 두 채널은 각도 방향으로 서로 반대로 이동합니다. 밝게는 이동한 색을 더하고, 어둡게는 단색으로 유지하며, 마스크는 세 채널이 모두 겹친 곳만 남기고, 루마는 가장자리를 밝기만큼 불투명하게 만듭니다.",
+   "description": "빨강, 초록, 파랑 채널을 분리합니다. 중심 채널은 제자리에 두고 나머지 두 채널은 각도를 따라 서로 반대 방향으로 이동합니다. 밝게는 이동한 색을 더하고, 어둡게는 불투명하게 유지하며, 마스크는 세 채널이 모두 겹치는 곳만 남기고, 루마는 색 테두리를 밝은 만큼 불투명하게 만듭니다. 평균은 각 지점을 덮는 채널의 비율만큼 불투명하게 만듭니다.",
    "name": "RGB 분리",
    "params": {
     "angle": {
@@ -4984,7 +5855,8 @@
       "밝게",
       "어둡게",
       "마스크",
-      "루마"
+      "루마",
+      "평균"
      ]
     },
     "strength": {
@@ -5492,6 +6364,13 @@
     },
     "outside": {
      "label": "바깥 글로우"
+    },
+    "falloff": {
+     "label": "감쇠",
+     "options": [
+      "균일",
+      "레이어"
+     ]
     }
    }
   },
@@ -5585,6 +6464,59 @@
     },
     "shine": {
      "label": "광택"
+    },
+    "lighting": {
+     "label": "조명",
+     "options": [
+      "클래식",
+      "부드러움",
+      "직접광"
+     ]
+    },
+    "ambient": {
+     "label": "주변광"
+    },
+    "lightHeight": {
+     "label": "조명 높이"
+    },
+    "lightColor": {
+     "label": "조명 색상"
+    },
+    "glossiness": {
+     "label": "하이라이트 선명도"
+    },
+    "texMode": {
+     "label": "텍스처",
+     "options": [
+      "맞춤",
+      "타일",
+      "늘이기"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X 반복"
+    },
+    "texRepeatY": {
+     "label": "Y 반복"
+    },
+    "texMirror": {
+     "label": "미러"
+    },
+    "texAngle": {
+     "label": "텍스처 각도"
+    },
+    "texOffset": {
+     "label": "텍스처 오프셋"
+    },
+    "texCrop": {
+     "label": "텍스처 자르기"
+    },
+    "texAnchor": {
+     "label": "텍스처 기준점",
+     "options": [
+      "중심",
+      "모서리"
+     ]
     }
    }
   },
@@ -5732,11 +6664,18 @@
     },
     "threshold": {
      "label": "임계값"
+    },
+    "grey": {
+     "label": "회색 변환",
+     "options": [
+      "HD",
+      "SD"
+     ]
     }
    }
   },
   "squeeze": {
-   "description": "강도가 양수이면 레이어 가운데를 안쪽으로 오므리고, 음수이면 바깥쪽으로 부풀립니다. 레거시는 이전 프로젝트의 모양을 유지합니다.",
+   "description": "강도가 양수이면 레이어 가운데를 안쪽으로 오므리고, 음수이면 바깥쪽으로 부풀립니다. 레거시는 이전 프로젝트의 모양을 유지합니다. 모래시계는 위아래 가장자리의 가운데도 바깥으로 밀어냅니다.",
    "name": "스퀴즈",
    "params": {
     "amount": {
@@ -5746,7 +6685,8 @@
      "label": "도형",
      "options": [
       "오므리기/부풀리기",
-      "레거시"
+      "레거시",
+      "모래시계"
      ]
     }
    }
@@ -5846,6 +6786,59 @@
     },
     "shine": {
      "label": "광택"
+    },
+    "lighting": {
+     "label": "조명",
+     "options": [
+      "클래식",
+      "부드러움",
+      "직접광"
+     ]
+    },
+    "ambient": {
+     "label": "주변광"
+    },
+    "lightHeight": {
+     "label": "조명 높이"
+    },
+    "lightColor": {
+     "label": "조명 색상"
+    },
+    "glossiness": {
+     "label": "하이라이트 선명도"
+    },
+    "texMode": {
+     "label": "텍스처",
+     "options": [
+      "맞춤",
+      "타일",
+      "늘이기"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X 반복"
+    },
+    "texRepeatY": {
+     "label": "Y 반복"
+    },
+    "texMirror": {
+     "label": "미러"
+    },
+    "texAngle": {
+     "label": "텍스처 각도"
+    },
+    "texOffset": {
+     "label": "텍스처 오프셋"
+    },
+    "texCrop": {
+     "label": "텍스처 자르기"
+    },
+    "texAnchor": {
+     "label": "텍스처 기준점",
+     "options": [
+      "중심",
+      "모서리"
+     ]
     }
    }
   },
@@ -5894,6 +6887,66 @@
     },
     "smoothing": {
      "label": "부드럽게"
+    },
+    "starStyle": {
+     "label": "스타일",
+     "options": [
+      "평평하게",
+      "뾰족하게"
+     ]
+    },
+    "lighting": {
+     "label": "조명",
+     "options": [
+      "클래식",
+      "부드러움",
+      "직접광"
+     ]
+    },
+    "ambient": {
+     "label": "주변광"
+    },
+    "lightHeight": {
+     "label": "조명 높이"
+    },
+    "lightColor": {
+     "label": "조명 색상"
+    },
+    "glossiness": {
+     "label": "하이라이트 선명도"
+    },
+    "texMode": {
+     "label": "텍스처",
+     "options": [
+      "맞춤",
+      "타일",
+      "늘이기"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X 반복"
+    },
+    "texRepeatY": {
+     "label": "Y 반복"
+    },
+    "texMirror": {
+     "label": "미러"
+    },
+    "texAngle": {
+     "label": "텍스처 각도"
+    },
+    "texOffset": {
+     "label": "텍스처 오프셋"
+    },
+    "texCrop": {
+     "label": "텍스처 자르기"
+    },
+    "texAnchor": {
+     "label": "텍스처 기준점",
+     "options": [
+      "중심",
+      "모서리"
+     ]
     }
    }
   },
@@ -6059,13 +7112,15 @@
      "label": "음성",
      "options": [
       "클래식",
-      "부드러운",
-      "낮은",
-      "높은",
+      "부드러움",
+      "저음",
+      "고음",
       "로봇",
       "삑삑",
       "타자기",
-      "칩튠"
+      "칩튠",
+      "해골",
+      "사용자 설정 소리"
      ]
     },
     "volume": {
@@ -6439,6 +7494,13 @@
     "count": {
      "label": "개수"
     },
+    "edges": {
+     "label": "가장자리",
+     "options": [
+      "미러",
+      "투명"
+     ]
+    },
     "offset": {
      "label": "오프셋"
     },
@@ -6447,6 +7509,9 @@
     },
     "rotation": {
      "label": "회전"
+    },
+    "screenSpace": {
+     "label": "화면 공간"
     },
     "seed": {
      "label": "시드"
@@ -6457,7 +7522,7 @@
    }
   },
   "tiles": {
-   "description": "레이어를 반복해 화면을 채웁니다. 자르기를 높이면 더 작은 타일이 만들어지며, 미러, 행 오프셋, 회전을 선택할 수 있습니다. 레거시 크기는 이전 프로젝트를 유지합니다.",
+   "description": "레이어를 반복해 화면을 채웁니다. 자르기를 높이면 타일이 작아지며, 미러, 행 오프셋, 회전을 더할 수 있습니다. 레거시 크기는 이전 프로젝트의 모양을 유지합니다. 타일 안은 모든 타일을 레이어 크기로 두고 그 안의 이미지를 확대하고 회전합니다.",
    "name": "타일 반복",
    "params": {
     "angle": {
@@ -6473,7 +7538,8 @@
      "label": "크기 조정",
      "options": [
       "자르기",
-      "레거시 크기"
+      "레거시 크기",
+      "타일 안"
      ]
     },
     "vertical": {
@@ -6494,8 +7560,18 @@
     "count": {
      "label": "개수"
     },
+    "edges": {
+     "label": "가장자리",
+     "options": [
+      "미러",
+      "투명"
+     ]
+    },
     "offset": {
      "label": "오프셋"
+    },
+    "screenSpace": {
+     "label": "화면 공간"
     },
     "seed": {
      "label": "시드"
@@ -6598,6 +7674,59 @@
     },
     "thickness": {
      "label": "두께"
+    },
+    "lighting": {
+     "label": "조명",
+     "options": [
+      "클래식",
+      "부드러움",
+      "직접광"
+     ]
+    },
+    "ambient": {
+     "label": "주변광"
+    },
+    "lightHeight": {
+     "label": "조명 높이"
+    },
+    "lightColor": {
+     "label": "조명 색상"
+    },
+    "glossiness": {
+     "label": "하이라이트 선명도"
+    },
+    "texMode": {
+     "label": "텍스처",
+     "options": [
+      "맞춤",
+      "타일",
+      "늘이기"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X 반복"
+    },
+    "texRepeatY": {
+     "label": "Y 반복"
+    },
+    "texMirror": {
+     "label": "미러"
+    },
+    "texAngle": {
+     "label": "텍스처 각도"
+    },
+    "texOffset": {
+     "label": "텍스처 오프셋"
+    },
+    "texCrop": {
+     "label": "텍스처 자르기"
+    },
+    "texAnchor": {
+     "label": "텍스처 기준점",
+     "options": [
+      "중심",
+      "모서리"
+     ]
     }
    }
   },
@@ -6739,11 +7868,14 @@
     },
     "stretch": {
      "label": "늘리기"
+    },
+    "screenSpace": {
+     "label": "화면 공간"
     }
    }
   },
   "twirl": {
-   "description": "레이어를 중심 주위로 소용돌이처럼 비틀어, 가운데는 가장 강하게 하고 반경(레이어 크기에 대한 비율)에서 서서히 사라지게 합니다. 강도가 음수이면 반대 방향으로 비틀립니다.",
+   "description": "레이어를 중심 주위로 소용돌이처럼 비틉니다. 가운데에서 가장 강하고 반경(레이어 크기에 대한 비율)으로 갈수록 약해집니다. 강도가 음수이면 반대 방향으로 비틉니다. 측정 기준을 화면으로 하면 반경을 화면 크기에 대한 비율로 잡고 비틀림이 부드럽게 줄어듭니다.",
    "name": "소용돌이",
    "params": {
     "center": {
@@ -6754,11 +7886,18 @@
     },
     "strength": {
      "label": "강도"
+    },
+    "reach": {
+     "label": "측정 기준",
+     "options": [
+      "레이어",
+      "화면"
+     ]
     }
    }
   },
   "unsharpmask": {
-   "description": "레이어와 흐린 복사본의 차이를 다시 더해 선명하게 합니다. 강도는 흐림 범위, 양은 다시 더하는 정도를 정하며, 임계값을 50% 이상으로 올리면 작은 차이는 그대로 둡니다.",
+   "description": "레이어와 흐린 복사본의 차이를 다시 더해 선명하게 합니다. 강도는 흐림의 폭을, 양은 다시 더하는 정도를 정하고, 임계값을 50%보다 높이면 작은 차이는 그대로 둡니다. 마스크 색상을 빨강으로 하면 밝기가 흐린 복사본과 임계값의 50% 초과분보다 더 많이 다른 곳에 마스크를 빨간색으로 표시합니다.",
    "name": "언샤프 마스크",
    "params": {
     "amount": {
@@ -6772,6 +7911,13 @@
     },
     "threshold": {
      "label": "임계값"
+    },
+    "maskColor": {
+     "label": "마스크 색상",
+     "options": [
+      "회색",
+      "빨강"
+     ]
     }
    }
   },
@@ -6867,6 +8013,19 @@
     },
     "yaw": {
      "label": "요"
+    },
+    "projection": {
+     "label": "출력",
+     "options": [
+      "보기",
+      "파노라마"
+     ]
+    },
+    "eyeDistance": {
+     "label": "거리"
+    },
+    "frame": {
+     "label": "프레임 비율"
     }
    }
   },
@@ -6932,7 +8091,7 @@
    }
   },
   "wavewarp": {
-   "description": "사인파로 레이어를 휘게 합니다. 간격은 지나가는 물결의 수를, 크기는 밀어내는 정도를, 각도는 물결이 흐르는 방향을, 워프 각도는 밀어내는 방향을 정합니다.",
+   "description": "사인파로 레이어를 휘게 합니다. 간격은 레이어를 지나는 물결의 수를, 크기는 밀어내는 정도를, 각도는 물결이 흐르는 방향을, 워프 각도는 밀어내는 방향을 정합니다. 화면 공간은 물결의 크기를 레이어 대신 화면에 맞춥니다. 교차 크기는 교차 간격으로 크기가 정해지는 두 번째 물결을 더하며, 이 물결은 워프 각도 방향으로 흐르고 각도 방향으로 밀어냅니다. 기준점을 화면 왼쪽 아래로 하면 화면의 짧은 변을 기준으로 그 모서리에서부터 물결을 재며, 이때 위상은 물결을 흐르는 방향으로 밀어 옮깁니다.",
    "name": "웨이브 워프",
    "params": {
     "angle": {
@@ -6952,6 +8111,22 @@
     },
     "warpAngle": {
      "label": "워프 각도"
+    },
+    "screenSpace": {
+     "label": "화면 공간"
+    },
+    "crossSpacing": {
+     "label": "교차 간격"
+    },
+    "crossMagnitude": {
+     "label": "교차 크기"
+    },
+    "origin": {
+     "label": "기준점",
+     "options": [
+      "레이어 모서리",
+      "화면 왼쪽 아래"
+     ]
     }
    }
   },

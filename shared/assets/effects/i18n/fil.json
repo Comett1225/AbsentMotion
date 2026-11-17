@@ -497,11 +497,18 @@
    }
   },
   "blur": {
-   "description": "Makinis at pantay na pag-blur.",
+   "description": "Makinis at pantay na pag-blur. Kapag Kahon ang Hugis, ina-average naman ang pantay na parisukat sa paligid ng bawat punto.",
    "name": "Pag-blur",
    "params": {
     "strength": {
      "label": "Lakas"
+    },
+    "shape": {
+     "label": "Hugis",
+     "options": [
+      "Makinis",
+      "Kahon"
+     ]
     }
    }
   },
@@ -540,13 +547,66 @@
      "label": "Shading"
     },
     "shine": {
-     "label": "Shine"
+     "label": "Kinang"
     },
     "smoothing": {
      "label": "Smoothing"
     },
     "width": {
      "label": "Lapad"
+    },
+    "lighting": {
+     "label": "Ilaw",
+     "options": [
+      "Klasiko",
+      "Malambot",
+      "Direkta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambient"
+    },
+    "lightHeight": {
+     "label": "Taas ng ilaw"
+    },
+    "lightColor": {
+     "label": "Kulay ng ilaw"
+    },
+    "glossiness": {
+     "label": "Kintab"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "I-fit",
+      "I-tile",
+      "I-stretch"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Ulitin X"
+    },
+    "texRepeatY": {
+     "label": "Ulitin Y"
+    },
+    "texMirror": {
+     "label": "Mirror"
+    },
+    "texAngle": {
+     "label": "Anggulo ng texture"
+    },
+    "texOffset": {
+     "label": "Offset ng texture"
+    },
+    "texCrop": {
+     "label": "Crop ng texture"
+    },
+    "texAnchor": {
+     "label": "Anchor ng texture",
+     "options": [
+      "Gitna",
+      "Sulok"
+     ]
     }
    }
   },
@@ -570,7 +630,7 @@
    }
   },
   "bulge": {
-   "description": "Itinutulak palabas ang layer na parang lente (positibong Strength) o pinipisil papasok patungo sa Center (negatibo) sa loob ng bilog na Radius, isang bahagi ng laki ng layer.",
+   "description": "Pinapaumbok ang layer na parang lente (positibong Strength) o pinipisil ito papasok patungo sa Center (negatibo) sa loob ng bilog na may Radius, na bahagi ng laki ng layer. Kapag Screen ang Batayan ng sukat, bahagi ng screen ang Radius. Kapag Makinis ang Falloff, mas banayad na humahalo ang lente sa natitirang bahagi ng layer.",
    "name": "Pinch/Bulge",
    "params": {
     "amount": {
@@ -581,6 +641,20 @@
     },
     "radius": {
      "label": "Radius"
+    },
+    "reach": {
+     "label": "Batayan ng sukat",
+     "options": [
+      "Layer",
+      "Screen"
+     ]
+    },
+    "curve": {
+     "label": "Falloff",
+     "options": [
+      "Klasiko",
+      "Makinis"
+     ]
     }
    }
   },
@@ -733,7 +807,7 @@
      "label": "Punch Out"
     },
     "screenSpace": {
-     "label": "Screen space"
+     "label": "Screen Space"
     },
     "stretch": {
      "label": "Iunat"
@@ -781,7 +855,7 @@
    }
   },
   "circularripple": {
-   "description": "Nagpapalabas ng pabilog na ripple mula sa isang punto, parang patak na bumabagsak sa tubig.",
+   "description": "Gumagawa ng pabilog na ripple na kumakalat mula sa isang punto, parang patak na nahuhulog sa tubig. Kapag Screen ang Batayan ng sukat, sinusukat ang Dalas, Lakas at Radius sa screen sa halip na sa layer.",
    "name": "Pabilog na Ripple",
    "params": {
     "center": {
@@ -801,6 +875,13 @@
     },
     "strength": {
      "label": "Lakas"
+    },
+    "reach": {
+     "label": "Batayan ng sukat",
+     "options": [
+      "Layer",
+      "Screen"
+     ]
     }
    }
   },
@@ -813,6 +894,9 @@
     },
     "color2": {
      "label": "Kulay 2"
+    },
+    "contrast": {
+     "label": "Kontrast"
     },
     "intensity": {
      "label": "Tindi"
@@ -855,6 +939,13 @@
     },
     "strength": {
      "label": "Lakas"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Matalas"
+     ]
     }
    }
   },
@@ -965,6 +1056,16 @@
     },
     "fill": {
      "label": "Fill"
+    },
+    "spread": {
+     "label": "Kalat",
+     "options": [
+      "Blur",
+      "Distansya"
+     ]
+    },
+    "offset": {
+     "label": "Offset"
     }
    }
   },
@@ -992,6 +1093,16 @@
     },
     "width": {
      "label": "Lapad"
+    },
+    "spread": {
+     "label": "Kalat",
+     "options": [
+      "Blur",
+      "Distansya"
+     ]
+    },
+    "offset": {
+     "label": "Offset"
     }
    }
   },
@@ -1012,7 +1123,7 @@
      "label": "Bilang"
     },
     "edgeColor": {
-     "label": "Kulay ng Gilid"
+     "label": "Kulay ng gilid"
     },
     "height": {
      "label": "Taas"
@@ -1021,10 +1132,10 @@
      "label": "I-invert"
     },
     "light": {
-     "label": "Kulay ng Ilaw"
+     "label": "Kulay ng ilaw"
     },
     "lightAngle": {
-     "label": "Angulo ng Ilaw"
+     "label": "Anggulo ng ilaw"
     },
     "map": {
      "label": "Height Map",
@@ -1034,13 +1145,20 @@
      ]
     },
     "mask": {
-     "label": "I-mask sa Layer"
+     "label": "I-mask sa layer"
     },
     "phase": {
      "label": "Phase"
     },
     "thickness": {
      "label": "Kapal"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Patong-patong"
+     ]
     }
    }
   },
@@ -1107,7 +1225,7 @@
    "name": "Krus na Tatlong Axis",
    "params": {
     "light": {
-     "label": "Anggulo ng Ilaw"
+     "label": "Anggulo ng ilaw"
     },
     "perspective": {
      "label": "Perspektibo"
@@ -1134,13 +1252,69 @@
      "label": "Shading"
     },
     "shine": {
-     "label": "Kislap"
+     "label": "Kinang"
     },
     "smoothing": {
      "label": "Pagpapakinis"
     },
     "thickness": {
      "label": "Kapal"
+    },
+    "keep": {
+     "label": "Panatilihin ang layer"
+    },
+    "lighting": {
+     "label": "Ilaw",
+     "options": [
+      "Klasiko",
+      "Malambot",
+      "Direkta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambient"
+    },
+    "lightHeight": {
+     "label": "Taas ng ilaw"
+    },
+    "lightColor": {
+     "label": "Kulay ng ilaw"
+    },
+    "glossiness": {
+     "label": "Kintab"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "I-fit",
+      "I-tile",
+      "I-stretch"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Ulitin X"
+    },
+    "texRepeatY": {
+     "label": "Ulitin Y"
+    },
+    "texMirror": {
+     "label": "Mirror"
+    },
+    "texAngle": {
+     "label": "Anggulo ng texture"
+    },
+    "texOffset": {
+     "label": "Offset ng texture"
+    },
+    "texCrop": {
+     "label": "Crop ng texture"
+    },
+    "texAnchor": {
+     "label": "Anchor ng texture",
+     "options": [
+      "Gitna",
+      "Sulok"
+     ]
     }
    }
   },
@@ -1152,7 +1326,7 @@
      "label": "Laki"
     },
     "light": {
-     "label": "Anggulo ng Ilaw"
+     "label": "Anggulo ng ilaw"
     },
     "perspective": {
      "label": "Perspektibo"
@@ -1176,10 +1350,63 @@
      "label": "Shading"
     },
     "shine": {
-     "label": "Kislap"
+     "label": "Kinang"
     },
     "smoothing": {
      "label": "Pagpapakinis"
+    },
+    "lighting": {
+     "label": "Ilaw",
+     "options": [
+      "Klasiko",
+      "Malambot",
+      "Direkta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambient"
+    },
+    "lightHeight": {
+     "label": "Taas ng ilaw"
+    },
+    "lightColor": {
+     "label": "Kulay ng ilaw"
+    },
+    "glossiness": {
+     "label": "Kintab"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "I-fit",
+      "I-tile",
+      "I-stretch"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Ulitin X"
+    },
+    "texRepeatY": {
+     "label": "Ulitin Y"
+    },
+    "texMirror": {
+     "label": "Mirror"
+    },
+    "texAngle": {
+     "label": "Anggulo ng texture"
+    },
+    "texOffset": {
+     "label": "Offset ng texture"
+    },
+    "texCrop": {
+     "label": "Crop ng texture"
+    },
+    "texAnchor": {
+     "label": "Anchor ng texture",
+     "options": [
+      "Gitna",
+      "Sulok"
+     ]
     }
    }
   },
@@ -1220,7 +1447,7 @@
      "label": "Taas"
     },
     "light": {
-     "label": "Anggulo ng Ilaw"
+     "label": "Anggulo ng ilaw"
     },
     "perspective": {
      "label": "Perspektibo"
@@ -1247,10 +1474,63 @@
      "label": "Shading"
     },
     "shine": {
-     "label": "Kislap"
+     "label": "Kinang"
     },
     "smoothing": {
      "label": "Pagpapakinis"
+    },
+    "lighting": {
+     "label": "Ilaw",
+     "options": [
+      "Klasiko",
+      "Malambot",
+      "Direkta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambient"
+    },
+    "lightHeight": {
+     "label": "Taas ng ilaw"
+    },
+    "lightColor": {
+     "label": "Kulay ng ilaw"
+    },
+    "glossiness": {
+     "label": "Kintab"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "I-fit",
+      "I-tile",
+      "I-stretch"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Ulitin X"
+    },
+    "texRepeatY": {
+     "label": "Ulitin Y"
+    },
+    "texMirror": {
+     "label": "Mirror"
+    },
+    "texAngle": {
+     "label": "Anggulo ng texture"
+    },
+    "texOffset": {
+     "label": "Offset ng texture"
+    },
+    "texCrop": {
+     "label": "Crop ng texture"
+    },
+    "texAnchor": {
+     "label": "Anchor ng texture",
+     "options": [
+      "Gitna",
+      "Sulok"
+     ]
     }
    }
   },
@@ -1369,7 +1649,7 @@
    }
   },
   "directionalblur": {
-   "description": "Gumagawa ng motion blur gamit ang pag-average ng mga sample sa isang direksyon.",
+   "description": "Gumagawa ng motion blur sa pamamagitan ng pag-average ng mga sample sa isang anggulo ng direksyon. Kapag Magkabilang panig ang Kalat, pantay ang blur pasulong at paatras.",
    "name": "Directional na pag-blur",
    "params": {
     "angle": {
@@ -1377,6 +1657,13 @@
     },
     "blurLength": {
      "label": "Haba"
+    },
+    "spread": {
+     "label": "Kalat",
+     "options": [
+      "Isang panig",
+      "Magkabilang panig"
+     ]
     }
    }
   },
@@ -1385,7 +1672,7 @@
    "name": "Displacement Map",
    "params": {
     "edges": {
-     "label": "Mga Gilid",
+     "label": "Mga gilid",
      "options": [
       "Ulitin",
       "Mirror",
@@ -1571,6 +1858,22 @@
    "params": {
     "strength": {
      "label": "Lakas"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Tinta"
+     ]
+    },
+    "spacing": {
+     "label": "Pagpapakinis"
+    },
+    "threshold": {
+     "label": "Threshold"
+    },
+    "invert": {
+     "label": "I-invert"
     }
    }
   },
@@ -1613,6 +1916,9 @@
     },
     "tintColor": {
      "label": "Kulay ng tint"
+    },
+    "mask": {
+     "label": "I-mask sa layer"
     }
    }
   },
@@ -1682,6 +1988,13 @@
     },
     "thickness": {
      "label": "Kapal"
+    },
+    "contourStyle": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Manipis na linya"
+     ]
     }
    }
   },
@@ -1720,10 +2033,63 @@
      "label": "Shading"
     },
     "shine": {
-     "label": "Shine"
+     "label": "Kinang"
     },
     "squeezeRatio": {
      "label": "Pisil"
+    },
+    "lighting": {
+     "label": "Ilaw",
+     "options": [
+      "Klasiko",
+      "Malambot",
+      "Direkta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambient"
+    },
+    "lightHeight": {
+     "label": "Taas ng ilaw"
+    },
+    "lightColor": {
+     "label": "Kulay ng ilaw"
+    },
+    "glossiness": {
+     "label": "Kintab"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "I-fit",
+      "I-tile",
+      "I-stretch"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Ulitin X"
+    },
+    "texRepeatY": {
+     "label": "Ulitin Y"
+    },
+    "texMirror": {
+     "label": "Mirror"
+    },
+    "texAngle": {
+     "label": "Anggulo ng texture"
+    },
+    "texOffset": {
+     "label": "Offset ng texture"
+    },
+    "texCrop": {
+     "label": "Crop ng texture"
+    },
+    "texAnchor": {
+     "label": "Anchor ng texture",
+     "options": [
+      "Gitna",
+      "Sulok"
+     ]
     }
    }
   },
@@ -1732,7 +2098,7 @@
    "name": "Emboss",
    "params": {
     "angle": {
-     "label": "Anggulo ng liwanag"
+     "label": "Anggulo ng ilaw"
     },
     "strength": {
      "label": "Lakas"
@@ -1981,7 +2347,66 @@
      "label": "Shading"
     },
     "shine": {
-     "label": "Shine"
+     "label": "Kinang"
+    },
+    "lighting": {
+     "label": "Ilaw",
+     "options": [
+      "Klasiko",
+      "Malambot",
+      "Direkta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambient"
+    },
+    "lightHeight": {
+     "label": "Taas ng ilaw"
+    },
+    "lightColor": {
+     "label": "Kulay ng ilaw"
+    },
+    "glossiness": {
+     "label": "Kintab"
+    },
+    "pivot": {
+     "label": "Pivot"
+    },
+    "pivotDepth": {
+     "label": "Lalim ng pivot"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "I-fit",
+      "I-tile",
+      "I-stretch"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Ulitin X"
+    },
+    "texRepeatY": {
+     "label": "Ulitin Y"
+    },
+    "texMirror": {
+     "label": "Mirror"
+    },
+    "texAngle": {
+     "label": "Anggulo ng texture"
+    },
+    "texOffset": {
+     "label": "Offset ng texture"
+    },
+    "texCrop": {
+     "label": "Crop ng texture"
+    },
+    "texAnchor": {
+     "label": "Anchor ng texture",
+     "options": [
+      "Gitna",
+      "Sulok"
+     ]
     }
    }
   },
@@ -2047,6 +2472,13 @@
     },
     "softness": {
      "label": "Lambot"
+    },
+    "falloff": {
+     "label": "Falloff",
+     "options": [
+      "Distansya",
+      "Makinis"
+     ]
     }
    }
   },
@@ -2109,13 +2541,20 @@
      "label": "Scale"
     },
     "screenSpace": {
-     "label": "Screen space"
+     "label": "Screen Space"
     },
     "seed": {
      "label": "Seed"
     },
     "strength": {
      "label": "Lakas"
+    },
+    "screenSize": {
+     "label": "Laki batay sa",
+     "options": [
+      "Layer",
+      "Screen"
+     ]
     }
    }
   },
@@ -2198,7 +2637,7 @@
    }
   },
   "glass": {
-   "description": "Ginagawang beveled glass ang hugis ng layer na nagbabaluktot sa mga layer sa likod nito, na may highlight sa gilid.",
+   "description": "Ginagawang beveled na salamin ang hugis ng layer na nagbabaluktot sa mga layer sa likod nito, na may highlight sa gilid. Kapag Malambot ang Ilaw, ipinapakita ang layer ayon sa Fill at iniilawan ang salamin ng Kulay, pinakamaliwanag sa panloob na gilid ng bevel na nakaharap sa ilaw.",
    "name": "Salamin",
    "params": {
     "angle": {
@@ -2210,8 +2649,18 @@
     "color": {
      "label": "Kulay"
     },
+    "fill": {
+     "label": "Fill"
+    },
     "highlight": {
      "label": "Highlight"
+    },
+    "light": {
+     "label": "Ilaw",
+     "options": [
+      "Gilid",
+      "Malambot"
+     ]
     },
     "refraction": {
      "label": "Refraction"
@@ -2326,6 +2775,13 @@
     },
     "scaleBrightness": {
      "label": "I-scale ang liwanag"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Gradient",
+      "Spectrum"
+     ]
     }
    }
   },
@@ -2401,6 +2857,14 @@
     },
     "offset": {
      "label": "Offset"
+    },
+    "origin": {
+     "label": "Origin",
+     "options": [
+      "Gitna",
+      "Sulok ng layer",
+      "Sulok ng screen"
+     ]
     },
     "punch": {
      "label": "Punch Out"
@@ -2606,6 +3070,59 @@
     },
     "smoothing": {
      "label": "Pagpapakinis"
+    },
+    "lighting": {
+     "label": "Ilaw",
+     "options": [
+      "Klasiko",
+      "Malambot",
+      "Direkta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambient"
+    },
+    "lightHeight": {
+     "label": "Taas ng ilaw"
+    },
+    "lightColor": {
+     "label": "Kulay ng ilaw"
+    },
+    "glossiness": {
+     "label": "Kintab"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "I-fit",
+      "I-tile",
+      "I-stretch"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Ulitin X"
+    },
+    "texRepeatY": {
+     "label": "Ulitin Y"
+    },
+    "texMirror": {
+     "label": "Mirror"
+    },
+    "texAngle": {
+     "label": "Anggulo ng texture"
+    },
+    "texOffset": {
+     "label": "Offset ng texture"
+    },
+    "texCrop": {
+     "label": "Crop ng texture"
+    },
+    "texAnchor": {
+     "label": "Anchor ng texture",
+     "options": [
+      "Gitna",
+      "Sulok"
+     ]
     }
    }
   },
@@ -2661,11 +3178,33 @@
     "angle": {
      "label": "Anggulo"
     },
+    "crop": {
+     "label": "Crop"
+    },
+    "fit": {
+     "label": "Larawan",
+     "options": [
+      "Buong laki",
+      "Sa bawat tile"
+     ]
+    },
+    "mask": {
+     "label": "I-mask sa layer"
+    },
     "mirror": {
-     "label": "Salamin"
+     "label": "Mirror"
+    },
+    "offset": {
+     "label": "Offset"
     },
     "scale": {
      "label": "Scale"
+    },
+    "screenSpace": {
+     "label": "Screen Space"
+    },
+    "stretch": {
+     "label": "Stretch"
     }
    }
   },
@@ -2769,6 +3308,59 @@
     },
     "smoothing": {
      "label": "Pagpapakinis"
+    },
+    "lighting": {
+     "label": "Ilaw",
+     "options": [
+      "Klasiko",
+      "Malambot",
+      "Direkta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambient"
+    },
+    "lightHeight": {
+     "label": "Taas ng ilaw"
+    },
+    "lightColor": {
+     "label": "Kulay ng ilaw"
+    },
+    "glossiness": {
+     "label": "Kintab"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "I-fit",
+      "I-tile",
+      "I-stretch"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Ulitin X"
+    },
+    "texRepeatY": {
+     "label": "Ulitin Y"
+    },
+    "texMirror": {
+     "label": "Mirror"
+    },
+    "texAngle": {
+     "label": "Anggulo ng texture"
+    },
+    "texOffset": {
+     "label": "Offset ng texture"
+    },
+    "texCrop": {
+     "label": "Crop ng texture"
+    },
+    "texAnchor": {
+     "label": "Anchor ng texture",
+     "options": [
+      "Gitna",
+      "Sulok"
+     ]
     }
    }
   },
@@ -2839,6 +3431,59 @@
     },
     "width": {
      "label": "Lapad"
+    },
+    "lighting": {
+     "label": "Ilaw",
+     "options": [
+      "Klasiko",
+      "Malambot",
+      "Direkta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambient"
+    },
+    "lightHeight": {
+     "label": "Taas ng ilaw"
+    },
+    "lightColor": {
+     "label": "Kulay ng ilaw"
+    },
+    "glossiness": {
+     "label": "Kintab"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "I-fit",
+      "I-tile",
+      "I-stretch"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Ulitin X"
+    },
+    "texRepeatY": {
+     "label": "Ulitin Y"
+    },
+    "texMirror": {
+     "label": "Mirror"
+    },
+    "texAngle": {
+     "label": "Anggulo ng texture"
+    },
+    "texOffset": {
+     "label": "Offset ng texture"
+    },
+    "texCrop": {
+     "label": "Crop ng texture"
+    },
+    "texAnchor": {
+     "label": "Anchor ng texture",
+     "options": [
+      "Gitna",
+      "Sulok"
+     ]
     }
    }
   },
@@ -2964,7 +3609,8 @@
      "label": "Estilo",
      "options": [
       "Klasiko",
-      "Panatilihin ang liwanag"
+      "Panatilihin ang liwanag",
+      "Bidyo"
      ]
     },
     "vibrance": {
@@ -3002,6 +3648,23 @@
     },
     "intensity": {
      "label": "Tindi"
+    },
+    "blend": {
+     "label": "Blend",
+     "options": [
+      "Screen",
+      "Normal"
+     ]
+    },
+    "opacity": {
+     "label": "Opacity"
+    },
+    "corners": {
+     "label": "Mga sulok",
+     "options": [
+      "Bilog",
+      "Parisukat"
+     ]
     }
    }
   },
@@ -3068,6 +3731,13 @@
     "center": {
      "label": "Gitna"
     },
+    "direction": {
+     "label": "Direksyon",
+     "options": [
+      "Clockwise",
+      "Counterclockwise"
+     ]
+    },
     "mirror": {
      "label": "Mirror"
     },
@@ -3077,9 +3747,16 @@
    }
   },
   "lensblur": {
-   "description": "Isang umiikot na blur na nag-iiwan ng matalim na bahagi sa gitna at lumalaki papunta sa mga gilid.",
+   "description": "Umiikot na blur na nag-iiwan ng malinaw na bahagi sa paligid ng gitna at lumalakas papunta sa mga gilid. Kapag Zoom ang Blur, pinapahid naman ito palabas mula sa gitna, lampas sa mga gilid ng layer.",
    "name": "Lens Blur",
    "params": {
+    "blur": {
+     "label": "Blur",
+     "options": [
+      "Ikot",
+      "Zoom"
+     ]
+    },
     "center": {
      "label": "Gitna"
     },
@@ -3154,6 +3831,12 @@
     },
     "threshold": {
      "label": "Hangganan"
+    },
+    "soften": {
+     "label": "Palambutin"
+    },
+    "mask": {
+     "label": "I-mask sa layer"
     }
    }
   },
@@ -3257,7 +3940,7 @@
    }
   },
   "linearstreaks": {
-   "description": "Gumagawa ng tuwid na mga guhit sa pamamagitan ng pag-slide ng mga kopya ng layer sa isang anggulo at pag-blend sa kanilang overlap.",
+   "description": "Gumagawa ng tuwid na mga guhit sa pamamagitan ng pag-slide ng mga kopya ng layer sa isang anggulo at pag-blend kung saan sila nagpapatong. Kapag Naka-off ang Blending, nananatili ang layer gaya ng dati. Kapag Bawat pixel ang Mga kopya, may isang kopya sa bawat pixel ng Haba sa halip na 48 na nakakalat dito.",
    "name": "Linear Streaks",
    "params": {
     "alpha": {
@@ -3274,11 +3957,19 @@
      "options": [
       "Lighten",
       "Average",
-      "Darken"
+      "Darken",
+      "Naka-off"
      ]
     },
     "reach": {
      "label": "Haba"
+    },
+    "copies": {
+     "label": "Mga kopya",
+     "options": [
+      "May pagitan",
+      "Bawat pixel"
+     ]
     }
    }
   },
@@ -3333,6 +4024,12 @@
     },
     "solidity": {
      "label": "Solidity"
+    },
+    "fill": {
+     "label": "Fill"
+    },
+    "samples": {
+     "label": "Mga sample"
     }
    }
   },
@@ -3348,6 +4045,9 @@
     },
     "threshold": {
      "label": "Hangganan"
+    },
+    "high": {
+     "label": "Mataas na hangganan"
     }
    }
   },
@@ -3472,6 +4172,13 @@
    "description": "Hinahati ang layer sa mga parisukat at pinupuno ang bawat isa ng average na kulay nito.",
    "name": "Mosaic",
    "params": {
+    "average": {
+     "label": "Average",
+     "options": [
+      "Cell",
+      "Sulok"
+     ]
+    },
     "count": {
      "label": "Bilang"
     },
@@ -3566,7 +4273,7 @@
    "name": "Oktaedro",
    "params": {
     "light": {
-     "label": "Anggulo ng Ilaw"
+     "label": "Anggulo ng ilaw"
     },
     "perspective": {
      "label": "Perspektibo"
@@ -3594,6 +4301,59 @@
     },
     "shine": {
      "label": "Kinang"
+    },
+    "lighting": {
+     "label": "Ilaw",
+     "options": [
+      "Klasiko",
+      "Malambot",
+      "Direkta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambient"
+    },
+    "lightHeight": {
+     "label": "Taas ng ilaw"
+    },
+    "lightColor": {
+     "label": "Kulay ng ilaw"
+    },
+    "glossiness": {
+     "label": "Kintab"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "I-fit",
+      "I-tile",
+      "I-stretch"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Ulitin X"
+    },
+    "texRepeatY": {
+     "label": "Ulitin Y"
+    },
+    "texMirror": {
+     "label": "Mirror"
+    },
+    "texAngle": {
+     "label": "Anggulo ng texture"
+    },
+    "texOffset": {
+     "label": "Offset ng texture"
+    },
+    "texCrop": {
+     "label": "Crop ng texture"
+    },
+    "texAnchor": {
+     "label": "Anchor ng texture",
+     "options": [
+      "Gitna",
+      "Sulok"
+     ]
     }
    }
   },
@@ -3605,7 +4365,7 @@
      "label": "Feather"
     },
     "mask": {
-     "label": "I-mask sa Layer"
+     "label": "I-mask sa layer"
     },
     "offset": {
      "label": "Offset"
@@ -3720,7 +4480,7 @@
      "label": "Tindi"
     },
     "light": {
-     "label": "Kulay ng Ilaw"
+     "label": "Kulay ng ilaw"
     },
     "refraction": {
      "label": "Refraction"
@@ -4144,6 +4904,13 @@
     "blockSize": {
      "label": "Laki"
     },
+    "edges": {
+     "label": "Mga gilid",
+     "options": [
+      "Mirror",
+      "I-clear"
+     ]
+    },
     "offset": {
      "label": "Offset"
     },
@@ -4244,7 +5011,7 @@
    }
   },
   "polar": {
-   "description": "Binabaluktot ang layer sa paligid ng gitna nito, ginagawang bilog ang mga tuwid na linya, o binubuklat ang mga bilog para maging tuwid na linya.",
+   "description": "Binabaluktot ang layer sa paligid ng gitna nito, ginagawang bilog ang mga tuwid na linya, o binubuklat ang mga bilog para maging tuwid na linya. Pinipili ng Ayos kung aling gilid ng layer ang nagtatagpo sa gitna.",
    "name": "Polar Coordinates",
    "params": {
     "amount": {
@@ -4255,6 +5022,13 @@
      "options": [
       "Parihaba papuntang Polar",
       "Polar papuntang Parihaba"
+     ]
+    },
+    "middle": {
+     "label": "Ayos",
+     "options": [
+      "Itaas sa gitna",
+      "Ibaba sa gitna"
      ]
     }
    }
@@ -4290,7 +5064,7 @@
      ]
     },
     "edges": {
-     "label": "Mga Gilid",
+     "label": "Mga gilid",
      "options": [
       "Ulitin",
       "Mirror",
@@ -4423,7 +5197,7 @@
      "label": "Taas"
     },
     "light": {
-     "label": "Anggulo ng Ilaw"
+     "label": "Anggulo ng ilaw"
     },
     "perspective": {
      "label": "Perspective"
@@ -4447,12 +5221,65 @@
      "label": "Shading"
     },
     "shine": {
-     "label": "Shine"
+     "label": "Kinang"
+    },
+    "lighting": {
+     "label": "Ilaw",
+     "options": [
+      "Klasiko",
+      "Malambot",
+      "Direkta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambient"
+    },
+    "lightHeight": {
+     "label": "Taas ng ilaw"
+    },
+    "lightColor": {
+     "label": "Kulay ng ilaw"
+    },
+    "glossiness": {
+     "label": "Kintab"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "I-fit",
+      "I-tile",
+      "I-stretch"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Ulitin X"
+    },
+    "texRepeatY": {
+     "label": "Ulitin Y"
+    },
+    "texMirror": {
+     "label": "Mirror"
+    },
+    "texAngle": {
+     "label": "Anggulo ng texture"
+    },
+    "texOffset": {
+     "label": "Offset ng texture"
+    },
+    "texCrop": {
+     "label": "Crop ng texture"
+    },
+    "texAnchor": {
+     "label": "Anchor ng texture",
+     "options": [
+      "Gitna",
+      "Sulok"
+     ]
     }
    }
   },
   "radialblur": {
-   "description": "Nagdadagdag ng radial zoom blur gamit ang mga sample sa mga sinag mula sa gitna, na may adjustable na lakas.",
+   "description": "Naglalapat ng radial zoom blur sa pamamagitan ng pag-average ng mga sample sa mga sinag mula sa gitnang punto, na may naaayos na lakas. Kapag Pantay ang Haba, pare-pareho ang haba ng bawat guhit sa halip na humaba ayon sa layo mula sa gitna.",
    "name": "Zoom Blur",
    "params": {
     "amount": {
@@ -4460,6 +5287,13 @@
     },
     "center": {
      "label": "Gitna"
+    },
+    "streak": {
+     "label": "Haba",
+     "options": [
+      "Ayon sa layo",
+      "Pantay"
+     ]
     }
    }
   },
@@ -4586,11 +5420,14 @@
     },
     "reach": {
      "label": "Haba"
+    },
+    "fill": {
+     "label": "Fill"
     }
    }
   },
   "radialwipe": {
-   "description": "Nagtatago ng isang wedge ng layer na umiikot sa Center mula sa Start Angle, parang kamay ng orasan. Ang Progress ay ang anggulong naisweep, inuulit ng Count ang wedge sa bilog at isinasalit ng Both ang dalawang direksyon. I-animate ang Progress para sa transition.",
+   "description": "Itinatago ang isang hiwa ng layer na iniikot sa paligid ng Gitna mula sa Panimulang Anggulo, parang kamay ng orasan. Ang Progress ang anggulong naikot, inuulit ng Count ang hiwa sa paligid ng bilog, at umiikot sa dalawang direksyon ang Both. I-animate ang Progress para sa transition. Kapag Eksakto ang Mga hiwa, pinapanatili ang fraction ng Count kaya mas makitid ang huling hiwa, at pinalalambot ng Feather ang magkabilang gilid ng bawat hiwa.",
    "name": "Radial na Wipe",
    "params": {
     "center": {
@@ -4615,6 +5452,13 @@
     },
     "start": {
      "label": "Panimulang Anggulo"
+    },
+    "wedges": {
+     "label": "Mga hiwa",
+     "options": [
+      "Buo",
+      "Eksakto"
+     ]
     }
    }
   },
@@ -4674,7 +5518,7 @@
      "label": "Kulay ng Interior"
     },
     "light": {
-     "label": "Anggulo ng Liwanag"
+     "label": "Anggulo ng ilaw"
     },
     "perspective": {
      "label": "Perspective"
@@ -4698,6 +5542,26 @@
      "label": "Shading"
     },
     "shine": {
+     "label": "Kinang"
+    },
+    "lighting": {
+     "label": "Ilaw",
+     "options": [
+      "Klasiko",
+      "Malambot",
+      "Direkta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambient"
+    },
+    "lightHeight": {
+     "label": "Taas ng ilaw"
+    },
+    "lightColor": {
+     "label": "Kulay ng ilaw"
+    },
+    "glossiness": {
      "label": "Kintab"
     }
    },
@@ -4914,6 +5778,13 @@
     },
     "threshold": {
      "label": "Threshold"
+    },
+    "match": {
+     "label": "Pagtutugma",
+     "options": [
+      "RGB",
+      "Chroma"
+     ]
     }
    }
   },
@@ -4964,7 +5835,7 @@
    }
   },
   "rgbsplit": {
-   "description": "Hinahati ang red, green at blue channels: nananatili ang Center channel at ang dalawa pa ay lumilipat sa magkasalungat na direksyon kasunod ng Angle. Idinadagdag ng Light ang mga inilipat na kulay, pinapanatiling solid ang Dark, pinapanatili ng Mask ang kung saan nag-overlap ang tatlo, at ginagawang kasing-opaque ng kanilang kaliwanagan ng Luma ang mga fringe.",
+   "description": "Hinahati ang mga channel na pula, berde at asul: hindi gumagalaw ang channel na pinili sa Center at lumilipat ang dalawa pa sa magkasalungat na direksyon ayon sa Anggulo. Idinadagdag ng Light ang mga nailipat na kulay, pinananatili itong solid ng Dark, itinitira lang ng Mask ang bahaging nagpapatong ang tatlo, at ginagawa ng Luma ang mga gilid ng kulay na kasing-opaque ng kanilang liwanag. Ginagawa ng Average ang bawat bahagi na kasing-opaque ng proporsyon ng mga channel na tumatakip dito.",
    "name": "RGB Split",
    "params": {
     "angle": {
@@ -4984,7 +5855,8 @@
       "Light",
       "Dark",
       "Mask",
-      "Luma"
+      "Luma",
+      "Average"
      ]
     },
     "strength": {
@@ -5492,6 +6364,13 @@
     },
     "outside": {
      "label": "Glow sa labas"
+    },
+    "falloff": {
+     "label": "Falloff",
+     "options": [
+      "Pantay",
+      "Layer"
+     ]
     }
    }
   },
@@ -5585,6 +6464,59 @@
     },
     "shine": {
      "label": "Kinang"
+    },
+    "lighting": {
+     "label": "Ilaw",
+     "options": [
+      "Klasiko",
+      "Malambot",
+      "Direkta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambient"
+    },
+    "lightHeight": {
+     "label": "Taas ng ilaw"
+    },
+    "lightColor": {
+     "label": "Kulay ng ilaw"
+    },
+    "glossiness": {
+     "label": "Kintab"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "I-fit",
+      "I-tile",
+      "I-stretch"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Ulitin X"
+    },
+    "texRepeatY": {
+     "label": "Ulitin Y"
+    },
+    "texMirror": {
+     "label": "Mirror"
+    },
+    "texAngle": {
+     "label": "Anggulo ng texture"
+    },
+    "texOffset": {
+     "label": "Offset ng texture"
+    },
+    "texCrop": {
+     "label": "Crop ng texture"
+    },
+    "texAnchor": {
+     "label": "Anchor ng texture",
+     "options": [
+      "Gitna",
+      "Sulok"
+     ]
     }
    }
   },
@@ -5732,11 +6664,18 @@
     },
     "threshold": {
      "label": "Threshold"
+    },
+    "grey": {
+     "label": "Gray",
+     "options": [
+      "HD",
+      "SD"
+     ]
     }
    }
   },
   "squeeze": {
-   "description": "Pinipisil ang gitna ng layer papasok kapag positibo ang Lakas at pinapauslog palabas kapag negatibo ang Lakas. Pinapanatili ng Legacy ang hugis ng mas lumang proyekto.",
+   "description": "Pinipisil papasok ang gitna ng layer kapag positibo ang Lakas at pinapaumbok ito palabas kapag negatibo ang Lakas. Pinapanatili ng Legacy ang hugis sa mga mas lumang proyekto. Itinutulak din ng Hourglass palabas ang gitna ng itaas at ibabang gilid.",
    "name": "Pisil",
    "params": {
     "amount": {
@@ -5746,7 +6685,8 @@
      "label": "Hugis",
      "options": [
       "Pisil/Lobo",
-      "Legacy"
+      "Legacy",
+      "Hourglass"
      ]
     }
    }
@@ -5818,7 +6758,7 @@
    "name": "Bituing Polyhedron",
    "params": {
     "light": {
-     "label": "Anggulo ng liwanag"
+     "label": "Anggulo ng ilaw"
     },
     "perspective": {
      "label": "Perspective"
@@ -5845,7 +6785,60 @@
      "label": "Shading"
     },
     "shine": {
-     "label": "Kislap"
+     "label": "Kinang"
+    },
+    "lighting": {
+     "label": "Ilaw",
+     "options": [
+      "Klasiko",
+      "Malambot",
+      "Direkta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambient"
+    },
+    "lightHeight": {
+     "label": "Taas ng ilaw"
+    },
+    "lightColor": {
+     "label": "Kulay ng ilaw"
+    },
+    "glossiness": {
+     "label": "Kintab"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "I-fit",
+      "I-tile",
+      "I-stretch"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Ulitin X"
+    },
+    "texRepeatY": {
+     "label": "Ulitin Y"
+    },
+    "texMirror": {
+     "label": "Mirror"
+    },
+    "texAngle": {
+     "label": "Anggulo ng texture"
+    },
+    "texOffset": {
+     "label": "Offset ng texture"
+    },
+    "texCrop": {
+     "label": "Crop ng texture"
+    },
+    "texAnchor": {
+     "label": "Anchor ng texture",
+     "options": [
+      "Gitna",
+      "Sulok"
+     ]
     }
    }
   },
@@ -5860,7 +6853,7 @@
      "label": "Panloob na radius"
     },
     "light": {
-     "label": "Anggulo ng liwanag"
+     "label": "Anggulo ng ilaw"
     },
     "perspective": {
      "label": "Perspective"
@@ -5890,10 +6883,70 @@
      "label": "Shading"
     },
     "shine": {
-     "label": "Kislap"
+     "label": "Kinang"
     },
     "smoothing": {
      "label": "Pagpapakinis"
+    },
+    "starStyle": {
+     "label": "Estilo",
+     "options": [
+      "Patag",
+      "Matulis"
+     ]
+    },
+    "lighting": {
+     "label": "Ilaw",
+     "options": [
+      "Klasiko",
+      "Malambot",
+      "Direkta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambient"
+    },
+    "lightHeight": {
+     "label": "Taas ng ilaw"
+    },
+    "lightColor": {
+     "label": "Kulay ng ilaw"
+    },
+    "glossiness": {
+     "label": "Kintab"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "I-fit",
+      "I-tile",
+      "I-stretch"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Ulitin X"
+    },
+    "texRepeatY": {
+     "label": "Ulitin Y"
+    },
+    "texMirror": {
+     "label": "Mirror"
+    },
+    "texAngle": {
+     "label": "Anggulo ng texture"
+    },
+    "texOffset": {
+     "label": "Offset ng texture"
+    },
+    "texCrop": {
+     "label": "Crop ng texture"
+    },
+    "texAnchor": {
+     "label": "Anchor ng texture",
+     "options": [
+      "Gitna",
+      "Sulok"
+     ]
     }
    }
   },
@@ -5965,7 +7018,7 @@
      "label": "Butasin"
     },
     "screenSpace": {
-     "label": "Screen space"
+     "label": "Screen Space"
     },
     "smoothing": {
      "label": "Pagpapakinis"
@@ -6010,7 +7063,7 @@
      "label": "Alon",
      "options": [
       "Sine",
-      "Triangle"
+      "Tatsulok"
      ]
     }
    }
@@ -6065,7 +7118,9 @@
       "Robot",
       "Squeak",
       "Typewriter",
-      "Chiptune"
+      "Chiptune",
+      "Kalansay",
+      "Sariling Tunog"
      ]
     },
     "volume": {
@@ -6177,7 +7232,7 @@
     "unit": {
      "label": "Batay sa",
      "options": [
-      "Character",
+      "Titik",
       "Salita",
       "Linya"
      ]
@@ -6297,7 +7352,7 @@
     "unit": {
      "label": "Batay sa",
      "options": [
-      "Character",
+      "Titik",
       "Salita",
       "Linya"
      ]
@@ -6419,7 +7474,7 @@
    "name": "Tile",
    "params": {
     "mirror": {
-     "label": "Salamin"
+     "label": "Mirror"
     },
     "offset": {
      "label": "Offset"
@@ -6439,6 +7494,13 @@
     "count": {
      "label": "Bilang"
     },
+    "edges": {
+     "label": "Mga gilid",
+     "options": [
+      "Mirror",
+      "I-clear"
+     ]
+    },
     "offset": {
      "label": "Offset"
     },
@@ -6447,6 +7509,9 @@
     },
     "rotation": {
      "label": "Pag-ikot"
+    },
+    "screenSpace": {
+     "label": "Screen Space"
     },
     "seed": {
      "label": "Seed"
@@ -6457,7 +7522,7 @@
    }
   },
   "tiles": {
-   "description": "Inuulit ang layer para mapuno ang screen. Taasan ang Crop para mas maliit ang mga tile, may opsyonal na mirroring, row offset at rotation. Pinapanatili ng Legacy Scale ang mga lumang proyekto.",
+   "description": "Inuulit ang layer para mapuno ang screen. Taasan ang Crop para lumiit ang mga tile, na may opsyonal na pag-mirror, offset ng mga row at pag-ikot. Pinapanatili ng Legacy scale ang mga lumang proyekto. Kapag Sa loob ng tile ang Sizing, kasinlaki ng layer ang bawat tile at ini-zoom at iniikot ang larawan sa loob nito.",
    "name": "Mga Tile",
    "params": {
     "angle": {
@@ -6473,7 +7538,8 @@
      "label": "Sizing",
      "options": [
       "Crop",
-      "Legacy scale"
+      "Legacy scale",
+      "Sa loob ng tile"
      ]
     },
     "vertical": {
@@ -6494,8 +7560,18 @@
     "count": {
      "label": "Bilang"
     },
+    "edges": {
+     "label": "Mga gilid",
+     "options": [
+      "Mirror",
+      "I-clear"
+     ]
+    },
     "offset": {
      "label": "Offset"
+    },
+    "screenSpace": {
+     "label": "Screen Space"
     },
     "seed": {
      "label": "Seed"
@@ -6598,6 +7674,59 @@
     },
     "thickness": {
      "label": "Kapal"
+    },
+    "lighting": {
+     "label": "Ilaw",
+     "options": [
+      "Klasiko",
+      "Malambot",
+      "Direkta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambient"
+    },
+    "lightHeight": {
+     "label": "Taas ng ilaw"
+    },
+    "lightColor": {
+     "label": "Kulay ng ilaw"
+    },
+    "glossiness": {
+     "label": "Kintab"
+    },
+    "texMode": {
+     "label": "Texture",
+     "options": [
+      "I-fit",
+      "I-tile",
+      "I-stretch"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Ulitin X"
+    },
+    "texRepeatY": {
+     "label": "Ulitin Y"
+    },
+    "texMirror": {
+     "label": "Mirror"
+    },
+    "texAngle": {
+     "label": "Anggulo ng texture"
+    },
+    "texOffset": {
+     "label": "Offset ng texture"
+    },
+    "texCrop": {
+     "label": "Crop ng texture"
+    },
+    "texAnchor": {
+     "label": "Anchor ng texture",
+     "options": [
+      "Gitna",
+      "Sulok"
+     ]
     }
    }
   },
@@ -6739,11 +7868,14 @@
     },
     "stretch": {
      "label": "Stretch"
+    },
+    "screenSpace": {
+     "label": "Screen Space"
     }
    }
   },
   "twirl": {
-   "description": "Pinipilipit ang layer sa paligid ng Center na parang whirlpool, pinakamalakas sa gitna at kumukupas sa Radius (isang bahagi ng laki ng layer). Pinipilipit ng negatibong Strength sa kabilang direksyon.",
+   "description": "Pinipilipit ang layer sa paligid ng Sentro na parang ipo-ipo sa tubig, pinakamalakas sa gitna at humihina hanggang sa Radius (bahagi ng laki ng layer). Pinipilipit ito sa kabilang direksyon kapag negatibo ang Strength. Kapag Screen ang Batayan ng sukat, bahagi ng screen ang Radius at unti-unting humihina ang pilipit.",
    "name": "Swirl",
    "params": {
     "center": {
@@ -6754,11 +7886,18 @@
     },
     "strength": {
      "label": "Strength"
+    },
+    "reach": {
+     "label": "Batayan ng sukat",
+     "options": [
+      "Layer",
+      "Screen"
+     ]
     }
    }
   },
   "unsharpmask": {
-   "description": "Nagpapatalas sa pamamagitan ng pagbabalik ng pagkakaiba ng layer at ng blurred na kopya nito. Itinatakda ng Strength kung gaano kalawak ang blur, ng Amount kung gaano karami ang ibinabalik, at ang Threshold na higit sa 50% ay hindi pinapansin ang maliliit na pagkakaiba.",
+   "description": "Pinapatalas ang layer sa pamamagitan ng pagbabalik ng pagkakaiba nito sa isang naka-blur na kopya. Itinatakda ng Lakas kung gaano kalapad ang blur, ng Dami kung gaano karami ang ibinabalik, at kapag lampas sa 50% ang Hangganan, hindi ginagalaw ang maliliit na pagkakaiba. Kapag Pula ang Kulay ng mask, ipinapakita nang pula ang mask kung saan naiiba ang liwanag sa naka-blur na kopya nang higit sa bahagi ng Hangganan na lampas sa 50%.",
    "name": "Unsharp Mask",
    "params": {
     "amount": {
@@ -6772,6 +7911,13 @@
     },
     "threshold": {
      "label": "Hangganan"
+    },
+    "maskColor": {
+     "label": "Kulay ng mask",
+     "options": [
+      "Gray",
+      "Pula"
+     ]
     }
    }
   },
@@ -6780,7 +7926,7 @@
    "name": "VHS",
    "params": {
     "chroma": {
-     "label": "Pagguho ng Kulay"
+     "label": "Pagkalat ng Kulay"
     },
     "headSwitch": {
      "label": "Pagpalit ng Head"
@@ -6867,6 +8013,19 @@
     },
     "yaw": {
      "label": "Yaw"
+    },
+    "projection": {
+     "label": "Output",
+     "options": [
+      "Tanaw",
+      "Panorama"
+     ]
+    },
+    "eyeDistance": {
+     "label": "Distansya"
+    },
+    "frame": {
+     "label": "Aspect ng frame"
     }
    }
   },
@@ -6932,7 +8091,7 @@
    }
   },
   "wavewarp": {
-   "description": "Binabaluktot ang layer gamit ang sine wave: Itinatakda ng Spacing kung ilang wave ang tumatawid, ng Magnitude kung gaano kalayo ang pagtulak, ng Anggulo ang direksyon ng pagtakbo ng waves at ng Warp Angle ang direksyon ng pagtulak.",
+   "description": "Binabaluktot ang layer gamit ang sine wave: itinatakda ng Spacing kung ilang alon ang tumatawid dito, ng Magnitude kung gaano kalayo ang tulak, ng Anggulo ang direksyon ng takbo ng mga alon, at ng Warp Angle ang direksyon ng tulak. Iniaangkop ng Screen Space ang laki ng mga alon sa screen sa halip na sa layer. Nagdadagdag ang Cross Magnitude ng ikalawang alon, na ang laki ay itinatakda ng Cross Spacing, na tumatakbo ayon sa Warp Angle at tumutulak ayon sa Anggulo. Kapag Kaliwang ibaba ng screen ang Origin, sinusukat ang mga alon mula sa sulok na iyon ng screen batay sa maikling gilid nito, at saka sila inuusog ng Phase.",
    "name": "Wave Warp",
    "params": {
     "angle": {
@@ -6952,6 +8111,22 @@
     },
     "warpAngle": {
      "label": "Warp Angle"
+    },
+    "screenSpace": {
+     "label": "Screen Space"
+    },
+    "crossSpacing": {
+     "label": "Cross Spacing"
+    },
+    "crossMagnitude": {
+     "label": "Cross Magnitude"
+    },
+    "origin": {
+     "label": "Origin",
+     "options": [
+      "Sulok ng layer",
+      "Kaliwang ibaba ng screen"
+     ]
     }
    }
   },

@@ -112,6 +112,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
+import app.absentmotion.ui.HoldName
 
 @Composable
 internal fun AiBackdrop(modifier: Modifier, action: AiAction? = null) {
@@ -506,6 +507,7 @@ internal fun AiSmoothDialog(tools: AiTools, scene: Scene) {
                 Text(stringResource(AiAction.Smooth.title), color = Am.OnDark)
                 Box(Modifier.size(36.dp).clickable { help = true }, Alignment.Center) {
                     Icon(app.absentmotion.ui.export.ExportIcons.Help, stringResource(R.string.export_what_is, stringResource(AiAction.Smooth.title)), Modifier.size(20.dp), tint = Am.Caption)
+                    HoldName(stringResource(R.string.export_what_is, stringResource(AiAction.Smooth.title)))
                 }
             }
         },

@@ -230,7 +230,8 @@ suspend fun mediaThumbnail(context: Context, uri: Uri): Bitmap? = withContext(Di
     val key = uri.toString()
     thumbnailLocks[key.hashCode().mod(thumbnailLocks.size)].withLock {
         cachedMediaThumbnail(uri) ?: try {
-            thumbnail(context.contentResolver, uri)?.also { thumbnailCache.put(key, it) }
+            val system = try { thumbnail(context.contentResolver, uri) } catch (_: java.io.IOException) { null }
+            (system ?: if ("video" in uri.pathSegments) firstFrame(context, uri, 272) else null)?.also { thumbnailCache.put(key, it) }
         } catch (_: Exception) { null } catch (_: OutOfMemoryError) { null }
     }
 }

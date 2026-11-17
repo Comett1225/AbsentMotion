@@ -79,6 +79,7 @@ import app.absentmotion.ui.theme.animatedColor
 import app.absentmotion.ui.theme.fadeBackground
 import kotlin.math.roundToInt
 import androidx.compose.runtime.SideEffect
+import app.absentmotion.ui.HoldName
 
 @Composable
 fun SpeedPanel(state: EditorState, layer: Layer, modifier: Modifier = Modifier) {
@@ -149,7 +150,7 @@ private fun RemapTime(state: EditorState, layer: Layer, modifier: Modifier) {
                 Modifier.weight(1f).fillMaxHeight(), null, state.settings.vibration)
             Box(
                 Modifier.padding(start = 8.dp).width(88.dp).height(40.dp).clip(PanelShape).background(Am.Field)
-                    .clickable(role = Role.Button) { state.askNumber(label, seconds, "s", 0f, longest) { state.setNumber(RemapRef, it); state.endGesture() } }
+                    .typeOnDoubleTap(role = Role.Button) { state.askNumber(label, seconds, "s", 0f, longest) { state.setNumber(RemapRef, it); state.endGesture() } }
                     .padding(horizontal = 8.dp),
                 Alignment.CenterEnd,
             ) { Text(formatFixed(seconds, 2) + "s", color = Am.OnDark, fontSize = 13.sp, maxLines = 1) }
@@ -193,7 +194,7 @@ private fun NormalSpeed(state: EditorState, layer: Layer, ai: AiTools, modifier:
 @Composable
 internal fun SpeedValue(speed: Float, modifier: Modifier, onClick: (() -> Unit)?) {
     Row(
-        modifier.clip(PanelShape).background(Am.Field).then(if (onClick != null) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier)
+        modifier.clip(PanelShape).background(Am.Field).then(if (onClick != null) Modifier.typeOnDoubleTap(role = Role.Button, onType = onClick) else Modifier)
             .padding(horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -222,6 +223,7 @@ private fun RetimeButtons(state: EditorState, usable: List<Boolean>, modifier: M
             Box(Modifier.weight(1f).fillMaxHeight().alpha(if (usable[i]) 1f else 0.35f)
                 .clip(shape).background(Am.Button).clickable(enabled = usable[i], role = Role.Button) { state.retimeVideo(i < 2) }.semantics { contentDescription = name }, Alignment.Center) {
                 RetimeGlyph(i, Modifier.size(23.dp))
+                HoldName(name)
             }
         }
     }

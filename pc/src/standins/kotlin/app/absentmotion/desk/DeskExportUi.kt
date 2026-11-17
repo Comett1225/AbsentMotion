@@ -69,6 +69,7 @@ internal fun DeskExportMini(app: DeskAppState) {
             when {
                 running -> stringResource(DeskExports.title)
                 finish?.ok == true -> stringResource(R.string.export_notify_done)
+                finish?.ok == false && finish.title == R.string.export_running_ai_smooth -> stringResource(R.string.ai_smooth_download_failed)
                 else -> stringResource(R.string.export_notify_failed)
             },
             color = Am.Navy, fontSize = 18.sp, fontWeight = FontWeight.Bold, maxLines = 1,

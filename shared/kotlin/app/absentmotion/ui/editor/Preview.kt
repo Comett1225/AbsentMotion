@@ -116,6 +116,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
+import app.absentmotion.ui.HoldName
 
 internal val EditorState.livePanel get() = if (selectedId == null) EditorPanel.Tools else panel
 
@@ -588,11 +589,14 @@ private fun CanvasZoomHud(state: EditorState, modifier: Modifier) {
             Modifier.size(40.dp).alpha(if (selected) 1f else shown.value)
                 .then(if (selected) Modifier.semantics { contentDescription = zoomLabel }.clickable(press, null, role = androidx.compose.ui.semantics.Role.Button) { state.panZoomMode = !state.panZoomMode } else Modifier),
             Alignment.Center,
-        ) { Box(Modifier.pressShape(press, RoundedCornerShape(3.dp))) { CanvasZoomIcon(on = state.panZoomMode, guide = !selected) } }
+        ) {
+            Box(Modifier.pressShape(press, RoundedCornerShape(3.dp))) { CanvasZoomIcon(on = state.panZoomMode, guide = !selected) }
+            if (selected) HoldName(zoomLabel)
+        }
         Text(
             "${(state.canvasZoom * 100).toInt()}%", Modifier.alpha(shown.value), color = Am.Caption.copy(alpha = 0.6f), fontSize = 12.sp,
             fontWeight = FontWeight.Bold, maxLines = 1,
-            style = TextStyle(shadow = Shadow(Color.Black.copy(alpha = 0.5f), blurRadius = 3f)),
+            style = TextStyle(shadow = Shadow(Color.Black.copy(alpha = 0.5f), blurRadius = 3f), fontFamily = androidx.compose.material3.LocalTextStyle.current.fontFamily),
         )
     }
 }

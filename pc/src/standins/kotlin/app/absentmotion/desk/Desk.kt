@@ -93,15 +93,14 @@ object DeskScale {
 
 object DeskGlobalKeys {
     fun handle(app: DeskAppState, event: KeyEvent): Boolean {
-        if (event.type != KeyEventType.KeyDown) return false
-        if (!DeskKeys.isCommand(event)) return false
-        when (event.key) {
-            Key.Equals, Key.Plus, Key.NumPadAdd -> DeskScale.zoomIn()
-            Key.Minus, Key.NumPadSubtract -> DeskScale.zoomOut()
-            Key.Zero, Key.NumPad0 -> DeskScale.reset()
-            Key.Comma -> app.openSettings()
-            Key.N -> if (app.editor == null && DeskModals.open == 0) app.newProjectTick++ else return false
-            Key.Q -> if (!DeskOs.mac) app.requestQuit() else return false
+        if (event.type != KeyEventType.KeyDown || DeskTyping.active > 0) return false
+        when (DeskShortcuts.find(DeskShortcuts.chord(event)) { it.global }) {
+            Shortcut.ZoomIn -> DeskScale.zoomIn()
+            Shortcut.ZoomOut -> DeskScale.zoomOut()
+            Shortcut.ActualSize -> DeskScale.reset()
+            Shortcut.Settings -> app.openSettings()
+            Shortcut.NewProject -> if (app.editor == null && DeskModals.open == 0) app.newProjectTick++ else return false
+            Shortcut.Quit -> if (!DeskOs.mac) app.requestQuit() else return false
             else -> return false
         }
         return true

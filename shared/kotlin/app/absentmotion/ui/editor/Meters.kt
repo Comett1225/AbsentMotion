@@ -53,7 +53,7 @@ import kotlin.math.roundToInt
 private val MixRed = Color(0xFFFF3B30)
 private val MixYellow = Color(0xFFFFCC00)
 private val MixGreen = Color(0xFF34C759)
-private val Digits = TextStyle(fontFeatureSettings = "tnum")
+private val Digits: TextStyle @Composable get() = TextStyle(fontFeatureSettings = "tnum", fontFamily = androidx.compose.material3.LocalTextStyle.current.fontFamily)
 private val BarWidth = 5.dp
 private val BarGap = 2.dp
 private val StripWidth = 18.dp

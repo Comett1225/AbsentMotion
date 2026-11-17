@@ -38,7 +38,17 @@
    "max": 5000,
    "step": 1,
    "pixels": true
+  },
+  {
+   "id": "average",
+   "label": "Average",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Cell",
+    "Corner"
+   ]
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float count;\nuniform float2 stretch;\nuniform float2 offset;\nhalf4 main(float2 coord) {\n    float2 dims = max(abs(stretch), float2(0.01)) * size.y / max(count, 1.0);\n    float2 o = size * 0.5 + offset;\n    float2 n = floor((coord - o) / dims);\n    float4 sum = float4(0.0);\n    for (int j = 0; j < 4; j++) {\n        for (int i = 0; i < 4; i++) {\n            sum += float4(image.eval(o + (n + (float2(float(i), float(j)) + 0.5) / 4.0) * dims));\n        }\n    }\n    return half4(sum / 16.0);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float count;\nuniform float2 stretch;\nuniform float2 offset;\nuniform float average;\nhalf4 main(float2 coord) {\n    float2 dims = max(abs(stretch), float2(0.01)) * size.y / max(count, 1.0);\n    float2 o = size * 0.5 + offset;\n    float2 n = floor((coord - o) / dims);\n    bool clear = average > 0.5;\n    float2 start = clear ? n + float2(-0.5, 0.5) : n;\n    float4 sum = float4(0.0);\n    for (int j = 0; j < 4; j++) {\n        for (int i = 0; i < 4; i++) {\n            float2 q = o + (start + (float2(float(i), float(j)) + 0.5) / 4.0) * dims;\n            if (!clear || (q.x >= 0.0 && q.y >= 0.0 && q.x <= size.x && q.y <= size.y)) sum += float4(image.eval(q));\n        }\n    }\n    return half4(sum / 16.0);\n}\n"
 }

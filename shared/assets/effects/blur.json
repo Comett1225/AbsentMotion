@@ -3,7 +3,7 @@
  "name": "Blur",
  "category": "blur",
  "native": true,
- "description": "A smooth, even blur.",
+ "description": "A smooth, even blur. Shape Box averages an even square around each point instead.",
  "params": [
   {
    "id": "strength",
@@ -13,6 +13,16 @@
    "min": 0,
    "max": 300,
    "step": 0.1
+  },
+  {
+   "id": "shape",
+   "label": "Shape",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Smooth",
+    "Box"
+   ]
   }
  ]
 }

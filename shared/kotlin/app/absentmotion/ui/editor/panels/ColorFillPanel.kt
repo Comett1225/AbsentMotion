@@ -75,6 +75,7 @@ import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.roundToInt
 import kotlin.math.sin
+import app.absentmotion.ui.HoldName
 
 @Composable
 internal fun ColorFillPanel(state: EditorState, layer: Layer, modifier: Modifier = Modifier) {
@@ -138,6 +139,7 @@ private fun RowScope.FillTab(icon: ImageVector, description: String, active: Boo
             drawRoundRect(Brush.horizontalGradient(listOf(tint, tint.copy(alpha = 0f))), cornerRadius = corner)
             drawRoundRect(tint, cornerRadius = corner, style = Stroke(1.5.dp.toPx()))
         } else PanelIcon(icon, tint)
+        HoldName(description)
     }
 }
 
@@ -174,20 +176,20 @@ internal fun ColorPicker(
     Box(modifier.clip(PanelShape).background(PanelDark)) {
         if (mini) MiniPicker(hsva, ::change) { state.endGesture() } else PaletteView(state, argb, onColor)
         Column(Modifier.offset(676.px, 0.dp).size(180.px, 359.px).background(PanelDark), Arrangement.spacedBy(3.px)) {
-            PickerButton(Modifier.semantics { contentDescription = eyedropper }.clickable { picking = !picking }, if (picking) Am.Accent else Am.PanelInset) {
+            PickerButton(Modifier.semantics { contentDescription = eyedropper }.clickable { picking = !picking }, if (picking) Am.Accent else Am.PanelInset, eyedropper) {
                 if (picking) PanelIcon(PanelIcons.CheckCircle, PanelDark, size = 30.dp) else PanelIcon(PanelIcons.Eyedropper, IconGrey)
             }
-            PickerButton(Modifier.semantics { contentDescription = sliders }.clickable { mini = !mini }, if (mini) PanelDark else Am.PanelInset) { MiniPickerIcon(mini) }
+            PickerButton(Modifier.semantics { contentDescription = sliders }.clickable { mini = !mini }, if (mini) PanelDark else Am.PanelInset, sliders) { MiniPickerIcon(mini) }
             PickerButton(
-                Modifier.semantics { contentDescription = full }.clickable { picking = false; state.fullColor = FullColor(argb) { c, drag -> latestApply(c, drag) } }, Am.PanelInset,
+                Modifier.semantics { contentDescription = full }.clickable { picking = false; state.fullColor = FullColor(argb) { c, drag -> latestApply(c, drag) } }, Am.PanelInset, full,
             ) { PanelIcon(PanelIcons.Palette, IconGrey) }
         }
     }
 }
 
 @Composable
-private fun ColumnScope.PickerButton(modifier: Modifier, background: Color, icon: @Composable () -> Unit) {
-    Box(modifier.weight(1f).fillMaxWidth().background(background), contentAlignment = Alignment.Center) { icon() }
+private fun ColumnScope.PickerButton(modifier: Modifier, background: Color, name: String, icon: @Composable () -> Unit) {
+    Box(modifier.weight(1f).fillMaxWidth().background(background), contentAlignment = Alignment.Center) { icon(); HoldName(name) }
 }
 
 @Composable
@@ -222,6 +224,7 @@ private fun PaletteView(state: EditorState, argb: Int, onColor: ((Int, key: Stri
         if (palettes.canKeep(rgb, saved)) {
             Box(Modifier.offset(603.px, 0.dp).size(73.px).clickable { palettes.keep(rgb, state.settings) }, contentAlignment = Alignment.Center) {
                 PanelIcon(PanelIcons.AddColor, textOn(argb).copy(alpha = 0.6f), size = 26.dp, description = stringResource(R.string.palette_add))
+                HoldName(stringResource(R.string.palette_add))
             }
         }
         Box(Modifier.offset(47.px, 81.px).size(591.px, 270.px).deskVerticalScroll()) {

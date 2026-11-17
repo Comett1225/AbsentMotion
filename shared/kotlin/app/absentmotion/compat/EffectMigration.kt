@@ -11,6 +11,8 @@ import app.absentmotion.platform.Context
 import org.json.JSONArray
 import org.json.JSONObject
 import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.hypot
 import kotlin.math.pow
 import kotlin.math.withSign
 
@@ -36,9 +38,17 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
         val blank: String? = null,
         val signs: List<Float> = emptyList(),
         val pre: List<Float> = emptyList(),
+        val absent: String? = null,
+        val pad: List<Float> = emptyList(),
+        val slot: Int = -1,
+        val texts: Map<String, String> = emptyMap(),
+        val plusScale: Float = 1f,
+        val over: String? = null,
+        val overDefault: String? = null,
+        val polar: Boolean = false,
     )
 
-    class Turn(val quat: String, val spin: String, val to: List<String>)
+    class Turn(val quat: String, val spin: String, val to: List<String>, val inverse: Boolean = false)
 
     class Rule(val to: String, val params: Map<String, List<Conversion?>>, val set: Map<String, String>, val onlyWith: String? = null, val turn: Turn? = null)
 
@@ -50,6 +60,11 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
         val converted = linkedMapOf<String, Int>()
         val dropped = sortedSetOf<String>()
         var renamed = false
+        val media = scene.node.children.filter { it.name == "media" }.mapNotNull { m ->
+            val w = m["width"]?.finiteFloat()?.takeIf { it > 0f } ?: return@mapNotNull null
+            val h = m["height"]?.finiteFloat()?.takeIf { it > 0f } ?: return@mapNotNull null
+            m["uri"]?.let { it to if (m["orientation"] in setOf("90", "270")) floatArrayOf(h, w) else floatArrayOf(w, h) }
+        }.toMap()
         fun visit(node: XmlNode, dims: FloatArray, clipped: Boolean = false): XmlNode {
             val rule = if (node.name == "effect") rules[node["id"]]?.takeIf { r -> r.onlyWith == null || node.children.any { c -> c.name == "property" && c["name"] == r.onlyWith } } else null
             val own = rule?.let { catalog.definitions.firstOrNull { d -> d.key == it.to } }
@@ -61,23 +76,31 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
                     if (it["name"] == "compositing") it.with("value", "0") else it
                 }) else convertedEffect
             }
-            val inner = if (node.name in Scene.LAYER_TAGS) layerDims(node, dims) else dims
+            val inner = if (node.name in Scene.LAYER_TAGS) layerDims(node, dims, media) else dims
             return if (node.children.isEmpty()) node else node.copy(children = node.children.map { visit(it, inner, node["clippingMask"] == "true") })
         }
         val w = scene.node["width"]?.finiteFloat()?.takeIf { it > 0f } ?: 1080f
         val h = scene.node["height"]?.finiteFloat()?.takeIf { it > 0f } ?: 1080f
-        var root = visit(scene.node, floatArrayOf(w, h, 0f, w, h))
+        var root = visit(scene.node, floatArrayOf(w, h, 0f, w, h, w, h))
         val foreign = root["am"]?.startsWith("com.alightcreative") == true
         if (foreign) root = root.copy(attrs = root.attrs + ("am" to "app.absentmotion"), children = root.children.map(::squaredBlendOpacity))
         return Result(if (converted.isEmpty() && !renamed && !foreign) scene else Scene(root), converted, dropped)
     }
 
-    private fun layerDims(layer: XmlNode, dims: FloatArray): FloatArray {
+    private fun layerDims(layer: XmlNode, dims: FloatArray, media: Map<String, FloatArray>): FloatArray {
         val size = sizeOf(layer)
         val scale = transformOf(layer, "scale")?.split(',')?.mapNotNull { it.trim().finiteFloat() }.orEmpty()
         val sx = abs(scale.getOrElse(0) { 1f }); val sy = abs(scale.getOrElse(1) { scale.getOrElse(0) { 1f } })
         val w = size?.get(0) ?: dims[0]; val h = size?.get(1) ?: dims[1]
-        return floatArrayOf(w, h, dims.getOrElse(2) { 0f } + rotationOf(layer), (size?.get(0) ?: dims.getOrElse(3) { w }) * sx, (size?.get(1) ?: dims.getOrElse(4) { h }) * sy)
+        val texture = (if (layer["fillType"] == "media") media[layer["fillImage"] ?: layer["fillVideo"]] else null)?.let { floatArrayOf(w / it[0], h / it[1]) }
+        val texel = when {
+            texture == null -> floatArrayOf(1f, 1f)
+            layer["mediaFillMode"] == "fill" -> FloatArray(2) { maxOf(texture[0], texture[1]) }
+            layer["mediaFillMode"] == "fit" -> FloatArray(2) { minOf(texture[0], texture[1]) }
+            else -> texture
+        }
+        return floatArrayOf(w, h, dims.getOrElse(2) { 0f } + rotationOf(layer), (size?.get(0) ?: dims.getOrElse(3) { w }) * sx, (size?.get(1) ?: dims.getOrElse(4) { h }) * sy,
+            dims.getOrElse(5) { w }, dims.getOrElse(6) { h }, texel[0], texel[1])
     }
 
     private fun transformOf(layer: XmlNode, name: String): String? =
@@ -119,11 +142,15 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
             conversions.forEachIndexed { i, c ->
                 val param = c?.to?.let { to -> own.params.firstOrNull { it.id == to } }
                 if (c?.ignore == true) return@forEachIndexed
+                if (c != null && c.texts.isNotEmpty() && values(child).any { textFor(it, c) == null }) { drop(name); return@forEachIndexed }
                 if (param != null) {
-                    val shift = c.plus?.let { other -> effect.children.firstOrNull { it.name == "property" && it["name"] == other }?.valueAt(0f)?.finiteFloat() } ?: 0f
+                    val shift = (c.plus?.let { other -> effect.children.firstOrNull { it.name == "property" && it["name"] == other }?.valueAt(0f)?.finiteFloat() } ?: 0f) * c.plusScale
+                    val divisor = c.over?.let { other -> length(effect.children.firstOrNull { it.name == "property" && it["name"] == other }?.valueAt(0f) ?: c.overDefault) } ?: 1f
                     val off = c.gate?.let { gate -> effect.children.firstOrNull { it.name == "property" && it["name"] == gate }?.valueAt(0f)?.trim() != "true" } ?: false
+                    val base = if (c.slot >= 0) (made[param.id]?.get("value") ?: rule.set[param.id] ?: param.default).split(',') else emptyList()
                     made[param.id] = if (off) XmlNode("property", mapOf("name" to param.id, "type" to param.type, "value" to "#00000000"))
-                        else property(child, param.id, param.type) { text -> convertValue(text, c, if (c.component >= 0) c.component else if (split && c.take == 0) i else -1, shift, dims) }
+                        else if (c.slot >= 0) property(child, param.id, param.type) { text -> base.mapIndexed { k, v -> if (k == c.slot) convertValue(text, c, -1, shift, dims, divisor) else v.trim() }.joinToString(",") }
+                        else property(child, param.id, param.type) { text -> convertValue(text, c, if (c.component >= 0) c.component else if (split && c.take == 0) i else -1, shift, dims, divisor) }
                 } else if (c?.neutral == null || values(child).any { !same(if (split) it.split(',').getOrElse(i) { "" } else it, c.neutral) }) {
                     drop(if (split) "$name (${i + 1})" else name)
                 }
@@ -134,7 +161,15 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
             val spin = effect.children.firstOrNull { it.name == "property" && it["name"] == turn.spin }
             if (quat != null || spin != null) {
                 val base = turn.to.map { id -> rule.set[id]?.toDoubleOrNull() ?: 0.0 }.toDoubleArray()
-                Orientation(quat, spin, base).properties(turn.to).forEach { made[it["name"]!!] = it }
+                Orientation(quat, spin, base, turn.inverse).properties(turn.to).forEach { made[it["name"]!!] = it }
+            }
+        }
+        for ((name, conversions) in rule.params) {
+            if (effect.children.any { it.name == "property" && it["name"] == name }) continue
+            for (c in conversions) {
+                val param = c?.absent?.let { c.to?.let { to -> own.params.firstOrNull { it.id == to } } } ?: continue
+                val shift = c.plus?.let { other -> effect.children.firstOrNull { it.name == "property" && it["name"] == other }?.valueAt(0f)?.finiteFloat() } ?: 0f
+                if (param.id !in made) made[param.id] = XmlNode("property", mapOf("name" to param.id, "type" to param.type, "value" to convertValue(c.absent, c, c.component, shift, dims)))
             }
         }
         val fixed = rule.set.filterKeys { it !in made }.mapNotNull { (id, value) ->
@@ -163,7 +198,13 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
         return if (x.all { it != null } && y.all { it != null }) x == y else a.trim() == b.trim()
     }
 
-    private fun convertValue(text: String, c: Conversion, component: Int, shift: Float, dims: FloatArray): String {
+    private fun textFor(value: String, c: Conversion): String? = c.texts[value.trim().finiteFloat()?.toInt()?.toString()]
+
+    private fun length(text: String?): Float =
+        text?.split(',')?.mapNotNull { it.trim().finiteFloat() }?.let { hypot(it.getOrElse(0) { 0f }, it.getOrElse(1) { 0f }) }?.takeIf { it > 0f } ?: 1f
+
+    private fun convertValue(text: String, c: Conversion, component: Int, shift: Float, dims: FloatArray, divisor: Float = 1f): String {
+        if (c.texts.isNotEmpty()) return textFor(text, c) ?: text
         val t = text.trim().let { s -> if (c.blank != null && s.split(',').all { it.trim().finiteFloat() == 0f }) c.blank else s }
         if (t == "true" || t == "false") return c.values[t]?.let { formatFloats(floatArrayOf(it)) } ?: t
         if (t.startsWith("#")) return t
@@ -172,13 +213,18 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
         val numbers = picked.map { p ->
             val n = p.trim().finiteFloat() ?: return t
             c.values[n.toInt().toString()]?.takeIf { n % 1f == 0f } ?: n
-        }
-        val size = when (c.per) { "width" -> dims[0]; "height" -> dims[1]; "spanWidth" -> dims.getOrElse(3) { dims[0] }; "spanHeight" -> dims.getOrElse(4) { dims[1] }; else -> 1f }
+        }.let { n -> if (n.size == 1 && component < 0 && c.pad.isNotEmpty()) c.pad.map { if (it.isNaN()) n[0] else it } else n }
+        if (c.polar && numbers.size >= 2) return formatFloats(floatArrayOf(Math.toDegrees(atan2(-numbers[1], numbers[0]).toDouble()).toFloat() * c.scale + c.offset))
+        val whole = when (c.per) { "width" -> dims[0]; "height" -> dims[1]; "short" -> minOf(dims[0], dims[1]); "spanWidth" -> dims.getOrElse(3) { dims[0] }; "spanHeight" -> dims.getOrElse(4) { dims[1] }
+            "screenShort" -> minOf(dims.getOrElse(5) { dims[0] }, dims.getOrElse(6) { dims[1] }); else -> 1f }
         return formatFloats(FloatArray(numbers.size) { i ->
-            val shown = if (c.relative) numbers[i] / dims[(if (component >= 0) component else i) % 2] + 0.5f else numbers[i]
+            val axis = (if (component >= 0) component else i) % 2
+            val size = if (c.per == "span") dims.getOrElse(3 + axis) { dims[axis] } else whole
+            val texel = if (c.per == "texture") dims.getOrElse(7 + axis) { 1f } else 1f
+            val shown = if (c.relative) numbers[i] * texel / dims[axis] + 0.5f else numbers[i]
             val base = shown * c.signs.getOrElse(i) { 1f } + c.pre.getOrElse(i) { 0f }
             val raised = if (c.power == 1f) base else abs(base).pow(c.power).withSign(base)
-            val moved = raised * c.scale * size + c.offset + shift + if (c.turn) dims.getOrElse(2) { 0f } else 0f
+            val moved = raised * c.scale * size / divisor + c.offset + shift + if (c.turn) dims.getOrElse(2) { 0f } else 0f
             (if (c.wrap > 0f) moved.mod(c.wrap) else moved).coerceIn(c.min, c.max)
         })
     }
@@ -206,7 +252,7 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
                     },
                     set.keys().asSequence().associateWith { set.get(it).let { v -> if (v is Number) formatFloats(floatArrayOf(v.toFloat())) else v.toString() } },
                     rule.optString("onlyWith").takeIf { it.isNotEmpty() },
-                    rule.optJSONObject("orientation")?.let { o -> Turn(o.getString("quat"), o.getString("euler"), o.getJSONArray("to").let { a -> List(a.length()) { a.getString(it) } }) },
+                    rule.optJSONObject("orientation")?.let { o -> Turn(o.getString("quat"), o.optString("euler"), o.getJSONArray("to").let { a -> List(a.length()) { a.getString(it) } }, o.optBoolean("inverse")) },
                 )
             }
             return EffectMigration(rules, catalog)
@@ -233,6 +279,14 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
             json.optString("blank").takeIf { it.isNotEmpty() },
             json.optJSONArray("signs")?.let { a -> List(a.length()) { a.getDouble(it).toFloat() } }.orEmpty(),
             json.optJSONArray("pre")?.let { a -> List(a.length()) { a.getDouble(it).toFloat() } }.orEmpty(),
+            json.opt("absent")?.toString(),
+            json.optJSONArray("pad")?.let { a -> List(a.length()) { a.optDouble(it).toFloat() } }.orEmpty(),
+            json.optInt("slot", -1),
+            json.optJSONObject("texts")?.let { v -> v.keys().asSequence().associateWith { v.getString(it) } }.orEmpty(),
+            json.optDouble("plusScale", 1.0).toFloat(),
+            json.optString("over").takeIf { it.isNotEmpty() },
+            json.optString("overDefault").takeIf { it.isNotEmpty() },
+            json.optBoolean("polar"),
         )
     }
 }

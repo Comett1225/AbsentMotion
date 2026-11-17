@@ -26,6 +26,7 @@ import app.absentmotion.model.shownFrame
 import app.absentmotion.ui.editor.DrawingIcons
 import app.absentmotion.ui.theme.Am
 import kotlin.math.roundToInt
+import app.absentmotion.ui.HoldName
 
 @Composable
 internal fun FramePanel(state: EditorState, layer: Layer, modifier: Modifier = Modifier) {
@@ -38,7 +39,7 @@ internal fun FramePanel(state: EditorState, layer: Layer, modifier: Modifier = M
         Step(DrawingIcons.Prev, stringResource(R.string.draw_previous_frame)) { pick(shown - 1) }
         Box(
             Modifier.width(300.px).height(113.px).clip(PanelShape).background(Am.Well)
-                .clickable { state.askNumber(label, (shown + 1).toFloat(), "", 1f, count.toFloat()) { pick(it.roundToInt() - 1) } },
+                .typeOnDoubleTap { state.askNumber(label, (shown + 1).toFloat(), "", 1f, count.toFloat()) { pick(it.roundToInt() - 1) } },
             Alignment.Center,
         ) { Text("${shown + 1} / $count", color = if (picking) Am.OnDark else Am.OnDarkDim, fontSize = 15.5.sp, maxLines = 1, softWrap = false) }
         Step(DrawingIcons.Next, stringResource(R.string.draw_next_frame)) { pick(shown + 1) }
@@ -54,5 +55,6 @@ internal fun FramePanel(state: EditorState, layer: Layer, modifier: Modifier = M
 private fun Step(icon: ImageVector, description: String, onClick: () -> Unit) {
     Box(Modifier.width(113.px).height(113.px).clip(PanelShape).background(Am.Button).clickable(onClick = onClick), Alignment.Center) {
         PanelIcon(icon, Am.OnDark, description = description)
+        HoldName(description)
     }
 }

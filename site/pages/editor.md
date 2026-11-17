@@ -80,13 +80,13 @@ The last button of the play bar (**Preview mode**) opens a narrow strip at the r
 ### Other things on the preview
 
 - The round **Animate** button at the bottom right appears when a visual layer is selected: it opens In, Out and Loop animations. See [Transitions and animations](@animations).
-- The Undid/Redid note at the bottom shows what the last undo or redo did.
+- The Undid/Redid note at the bottom shows what the last undo or redo did. Tap it (click it on a computer) to go to the change: the layer is selected, the playhead moves into it and the panel of that change opens, such as the effect's settings. If the layer or effect is gone, the note just closes. Swipe the note down to hide it.
 
 ## The play bar
 
 Seven buttons, left to right.
 
-1. **Undo** and 2. **Redo**. The app keeps up to 200 steps. A whole drag or slider move counts as one step. Each undo or redo shows a short note such as "Undid: Move".
+1. **Undo** and 2. **Redo**. The app keeps up to 200 steps. A whole drag or slider move counts as one step. Each undo or redo shows a short note such as "Undid: Move". A change to an effect names the effect, such as "Undid: Add Blur".
 3. **Skip back** and 5. **Skip forward** jump to the previous or next stop. With nothing selected the stops are the start and the end of the project; with a layer selected they are its start, its end and its keyframes. Bookmarks are always stops.
 4. **Play** / **Pause**. Press and hold Play while stopped to turn looping on or off. Playing from the end starts again at the beginning.
 6. **Copy and paste** opens a menu for duplicating, copying, pasting and saving presets: see [Layer menus and multi-select](@layer-menus).

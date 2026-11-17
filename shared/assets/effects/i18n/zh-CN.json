@@ -113,11 +113,11 @@
    }
   },
   "backdrop": {
-   "description": "原名“调整图层”。复制图层下方的画面，使后续特效作用于该副本。“蒙版限制到图层”将副本限制在图层的不透明区域。“混合”可恢复图层填充。“特效延伸至外部”允许拉伸等后续特效将副本延伸到图层边缘之外。",
+   "description": "原名“调整图层”。复制图层下方的画面，使后续特效作用于该副本。开启“限制在图层内”后，副本仅限于图层的不透明区域。“混合”可恢复图层填充。开启“特效延伸至外部”后，拉伸等后续特效可将副本延伸到图层边缘之外。",
    "name": "复制背景",
    "params": {
     "mask": {
-     "label": "蒙版限制到图层"
+     "label": "限制在图层内"
     },
     "mix": {
      "label": "混合"
@@ -497,17 +497,24 @@
    }
   },
   "blur": {
-   "description": "平滑均匀的模糊效果。",
+   "description": "平滑均匀的模糊。形状设为“方框”时，改为对每个点周围的正方形区域取平均值。",
    "name": "模糊",
    "params": {
     "strength": {
      "label": "强度"
+    },
+    "shape": {
+     "label": "形状",
+     "options": [
+      "平滑",
+      "方框"
+     ]
     }
    }
   },
   "box": {
-   "description": "将图层包裹到立方体上，可自行设置宽度、高度和深度。",
-   "name": "立方体",
+   "description": "将图层包裹到长方体上，可自行设置宽度、高度和深度。",
+   "name": "长方体",
    "params": {
     "depth": {
      "label": "深度"
@@ -547,6 +554,59 @@
     },
     "width": {
      "label": "宽度"
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "经典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "环境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光照颜色"
+    },
+    "glossiness": {
+     "label": "高光锐度"
+    },
+    "texMode": {
+     "label": "纹理",
+     "options": [
+      "适应",
+      "平铺",
+      "拉伸"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X轴重复"
+    },
+    "texRepeatY": {
+     "label": "Y轴重复"
+    },
+    "texMirror": {
+     "label": "镜像"
+    },
+    "texAngle": {
+     "label": "纹理角度"
+    },
+    "texOffset": {
+     "label": "纹理偏移"
+    },
+    "texCrop": {
+     "label": "纹理裁剪"
+    },
+    "texAnchor": {
+     "label": "纹理锚点",
+     "options": [
+      "中心",
+      "角落"
+     ]
     }
    }
   },
@@ -570,7 +630,7 @@
    }
   },
   "bulge": {
-   "description": "在指定半径的圆内使图层像透镜一样向外膨胀（强度为正）或向中心收缩（强度为负）。半径按图层尺寸的比例设置。",
+   "description": "在半径范围的圆内，让图层像透镜一样向外膨胀（强度为正），或向中心收缩（强度为负）；半径按图层尺寸的比例计算。测量基准设为“屏幕”时，半径改按屏幕尺寸的比例计算。衰减设为“平滑”时，透镜与图层其余部分的过渡更柔和。",
    "name": "收缩/膨胀",
    "params": {
     "amount": {
@@ -581,6 +641,20 @@
     },
     "radius": {
      "label": "半径"
+    },
+    "reach": {
+     "label": "测量基准",
+     "options": [
+      "图层",
+      "屏幕"
+     ]
+    },
+    "curve": {
+     "label": "衰减",
+     "options": [
+      "经典",
+      "平滑"
+     ]
     }
    }
   },
@@ -781,7 +855,7 @@
    }
   },
   "circularripple": {
-   "description": "从一点向外扩散圆形波纹，如同水滴落入水中。",
+   "description": "从一点向外扩散圆形波纹，就像水滴落入水中。测量基准设为“屏幕”时，频率、强度和半径按屏幕而非图层测量。",
    "name": "圆形波纹",
    "params": {
     "center": {
@@ -801,6 +875,13 @@
     },
     "strength": {
      "label": "强度"
+    },
+    "reach": {
+     "label": "测量基准",
+     "options": [
+      "图层",
+      "屏幕"
+     ]
     }
    }
   },
@@ -813,6 +894,9 @@
     },
     "color2": {
      "label": "颜色2"
+    },
+    "contrast": {
+     "label": "对比度"
     },
     "intensity": {
      "label": "强度"
@@ -855,6 +939,13 @@
     },
     "strength": {
      "label": "强度"
+    },
+    "style": {
+     "label": "样式",
+     "options": [
+      "经典",
+      "硬边"
+     ]
     }
    }
   },
@@ -965,6 +1056,16 @@
     },
     "fill": {
      "label": "填充"
+    },
+    "spread": {
+     "label": "扩散",
+     "options": [
+      "模糊",
+      "距离"
+     ]
+    },
+    "offset": {
+     "label": "偏移"
     }
    }
   },
@@ -992,6 +1093,16 @@
     },
     "width": {
      "label": "宽度"
+    },
+    "spread": {
+     "label": "扩散",
+     "options": [
+      "模糊",
+      "距离"
+     ]
+    },
+    "offset": {
+     "label": "偏移"
     }
    }
   },
@@ -1021,10 +1132,10 @@
      "label": "反转"
     },
     "light": {
-     "label": "光线颜色"
+     "label": "光照颜色"
     },
     "lightAngle": {
-     "label": "光线角度"
+     "label": "光照角度"
     },
     "map": {
      "label": "高度图",
@@ -1034,13 +1145,20 @@
      ]
     },
     "mask": {
-     "label": "遮罩至图层"
+     "label": "限制在图层内"
     },
     "phase": {
      "label": "相位"
     },
     "thickness": {
      "label": "粗细"
+    },
+    "style": {
+     "label": "样式",
+     "options": [
+      "经典",
+      "堆叠"
+     ]
     }
    }
   },
@@ -1107,7 +1225,7 @@
    "name": "三轴十字",
    "params": {
     "light": {
-     "label": "光线角度"
+     "label": "光照角度"
     },
     "perspective": {
      "label": "透视"
@@ -1141,6 +1259,62 @@
     },
     "thickness": {
      "label": "粗细"
+    },
+    "keep": {
+     "label": "保留图层"
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "经典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "环境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光照颜色"
+    },
+    "glossiness": {
+     "label": "高光锐度"
+    },
+    "texMode": {
+     "label": "纹理",
+     "options": [
+      "适应",
+      "平铺",
+      "拉伸"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X轴重复"
+    },
+    "texRepeatY": {
+     "label": "Y轴重复"
+    },
+    "texMirror": {
+     "label": "镜像"
+    },
+    "texAngle": {
+     "label": "纹理角度"
+    },
+    "texOffset": {
+     "label": "纹理偏移"
+    },
+    "texCrop": {
+     "label": "纹理裁剪"
+    },
+    "texAnchor": {
+     "label": "纹理锚点",
+     "options": [
+      "中心",
+      "角落"
+     ]
     }
    }
   },
@@ -1152,7 +1326,7 @@
      "label": "大小"
     },
     "light": {
-     "label": "光线角度"
+     "label": "光照角度"
     },
     "perspective": {
      "label": "透视"
@@ -1180,6 +1354,59 @@
     },
     "smoothing": {
      "label": "平滑"
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "经典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "环境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光照颜色"
+    },
+    "glossiness": {
+     "label": "高光锐度"
+    },
+    "texMode": {
+     "label": "纹理",
+     "options": [
+      "适应",
+      "平铺",
+      "拉伸"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X轴重复"
+    },
+    "texRepeatY": {
+     "label": "Y轴重复"
+    },
+    "texMirror": {
+     "label": "镜像"
+    },
+    "texAngle": {
+     "label": "纹理角度"
+    },
+    "texOffset": {
+     "label": "纹理偏移"
+    },
+    "texCrop": {
+     "label": "纹理裁剪"
+    },
+    "texAnchor": {
+     "label": "纹理锚点",
+     "options": [
+      "中心",
+      "角落"
+     ]
     }
    }
   },
@@ -1220,7 +1447,7 @@
      "label": "高度"
     },
     "light": {
-     "label": "光线角度"
+     "label": "光照角度"
     },
     "perspective": {
      "label": "透视"
@@ -1251,6 +1478,59 @@
     },
     "smoothing": {
      "label": "平滑"
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "经典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "环境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光照颜色"
+    },
+    "glossiness": {
+     "label": "高光锐度"
+    },
+    "texMode": {
+     "label": "纹理",
+     "options": [
+      "适应",
+      "平铺",
+      "拉伸"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X轴重复"
+    },
+    "texRepeatY": {
+     "label": "Y轴重复"
+    },
+    "texMirror": {
+     "label": "镜像"
+    },
+    "texAngle": {
+     "label": "纹理角度"
+    },
+    "texOffset": {
+     "label": "纹理偏移"
+    },
+    "texCrop": {
+     "label": "纹理裁剪"
+    },
+    "texAnchor": {
+     "label": "纹理锚点",
+     "options": [
+      "中心",
+      "角落"
+     ]
     }
    }
   },
@@ -1369,7 +1649,7 @@
    }
   },
   "directionalblur": {
-   "description": "沿指定方向对采样取平均值，产生运动模糊。",
+   "description": "沿指定角度对采样取平均，产生运动模糊。扩散设为“双侧”时，向前后两个方向均匀模糊。",
    "name": "方向模糊",
    "params": {
     "angle": {
@@ -1377,6 +1657,13 @@
     },
     "blurLength": {
      "label": "长度"
+    },
+    "spread": {
+     "label": "扩散",
+     "options": [
+      "单侧",
+      "双侧"
+     ]
     }
    }
   },
@@ -1571,6 +1858,22 @@
    "params": {
     "strength": {
      "label": "强度"
+    },
+    "style": {
+     "label": "样式",
+     "options": [
+      "经典",
+      "墨线"
+     ]
+    },
+    "spacing": {
+     "label": "平滑"
+    },
+    "threshold": {
+     "label": "阈值"
+    },
+    "invert": {
+     "label": "反相"
     }
    }
   },
@@ -1613,6 +1916,9 @@
     },
     "tintColor": {
      "label": "染色颜色"
+    },
+    "mask": {
+     "label": "限制在图层内"
     }
    }
   },
@@ -1682,6 +1988,13 @@
     },
     "thickness": {
      "label": "粗细"
+    },
+    "contourStyle": {
+     "label": "样式",
+     "options": [
+      "经典",
+      "细线"
+     ]
     }
    }
   },
@@ -1693,7 +2006,7 @@
      "label": "压扁"
     },
     "light": {
-     "label": "光线角度"
+     "label": "光照角度"
     },
     "perspective": {
      "label": "透视"
@@ -1724,15 +2037,68 @@
     },
     "squeezeRatio": {
      "label": "挤压"
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "经典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "环境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光照颜色"
+    },
+    "glossiness": {
+     "label": "高光锐度"
+    },
+    "texMode": {
+     "label": "纹理",
+     "options": [
+      "适应",
+      "平铺",
+      "拉伸"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X轴重复"
+    },
+    "texRepeatY": {
+     "label": "Y轴重复"
+    },
+    "texMirror": {
+     "label": "镜像"
+    },
+    "texAngle": {
+     "label": "纹理角度"
+    },
+    "texOffset": {
+     "label": "纹理偏移"
+    },
+    "texCrop": {
+     "label": "纹理裁剪"
+    },
+    "texAnchor": {
+     "label": "纹理锚点",
+     "options": [
+      "中心",
+      "角落"
+     ]
     }
    }
   },
   "emboss": {
-   "description": "沿指定光线角度使用亮度渐变生成浮雕效果。",
+   "description": "沿指定光照角度使用亮度渐变生成浮雕效果。",
    "name": "浮雕",
    "params": {
     "angle": {
-     "label": "光线角度"
+     "label": "光照角度"
     },
     "strength": {
      "label": "强度"
@@ -1918,7 +2284,7 @@
   },
   "flicker": {
    "description": "随机闪动图层的不透明度。",
-   "name": "闪烁",
+   "name": "随机闪烁",
    "params": {
     "intensity": {
      "label": "强度"
@@ -1957,7 +2323,7 @@
      "label": "背面颜色"
     },
     "light": {
-     "label": "光线角度"
+     "label": "光照角度"
     },
     "perspective": {
      "label": "透视"
@@ -1982,6 +2348,65 @@
     },
     "shine": {
      "label": "光泽"
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "经典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "环境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光照颜色"
+    },
+    "glossiness": {
+     "label": "高光锐度"
+    },
+    "pivot": {
+     "label": "锚点"
+    },
+    "pivotDepth": {
+     "label": "锚点深度"
+    },
+    "texMode": {
+     "label": "纹理",
+     "options": [
+      "适应",
+      "平铺",
+      "拉伸"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X轴重复"
+    },
+    "texRepeatY": {
+     "label": "Y轴重复"
+    },
+    "texMirror": {
+     "label": "镜像"
+    },
+    "texAngle": {
+     "label": "纹理角度"
+    },
+    "texOffset": {
+     "label": "纹理偏移"
+    },
+    "texCrop": {
+     "label": "纹理裁剪"
+    },
+    "texAnchor": {
+     "label": "纹理锚点",
+     "options": [
+      "中心",
+      "角落"
+     ]
     }
    }
   },
@@ -2047,6 +2472,13 @@
     },
     "softness": {
      "label": "柔和度"
+    },
+    "falloff": {
+     "label": "衰减",
+     "options": [
+      "距离",
+      "平滑"
+     ]
     }
    }
   },
@@ -2115,7 +2547,14 @@
      "label": "随机种子"
     },
     "strength": {
-     "label": "强度"
+     "label": "力度"
+    },
+    "screenSize": {
+     "label": "尺寸依据",
+     "options": [
+      "图层",
+      "屏幕"
+     ]
     }
    }
   },
@@ -2198,7 +2637,7 @@
    }
   },
   "glass": {
-   "description": "将图层形状变成带斜面的玻璃，折射后方图层并在边缘产生高光。",
+   "description": "将图层形状变成带斜面的玻璃，折射其后方的图层，并在边缘产生高光。光照设为“柔和”时，图层按填充值显示，并用颜色照亮玻璃，斜面朝向光源的内缘最亮。",
    "name": "玻璃",
    "params": {
     "angle": {
@@ -2210,8 +2649,18 @@
     "color": {
      "label": "颜色"
     },
+    "fill": {
+     "label": "填充"
+    },
     "highlight": {
      "label": "高光"
+    },
+    "light": {
+     "label": "光照",
+     "options": [
+      "边缘",
+      "柔和"
+     ]
     },
     "refraction": {
      "label": "折射"
@@ -2326,6 +2775,13 @@
     },
     "scaleBrightness": {
      "label": "缩放亮度"
+    },
+    "style": {
+     "label": "样式",
+     "options": [
+      "渐变",
+      "光谱"
+     ]
     }
    }
   },
@@ -2401,6 +2857,14 @@
     },
     "offset": {
      "label": "偏移"
+    },
+    "origin": {
+     "label": "原点",
+     "options": [
+      "中心",
+      "图层角落",
+      "屏幕角落"
+     ]
     },
     "punch": {
      "label": "镂空"
@@ -2606,6 +3070,59 @@
     },
     "smoothing": {
      "label": "平滑"
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "经典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "环境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光照颜色"
+    },
+    "glossiness": {
+     "label": "高光锐度"
+    },
+    "texMode": {
+     "label": "纹理",
+     "options": [
+      "适应",
+      "平铺",
+      "拉伸"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X轴重复"
+    },
+    "texRepeatY": {
+     "label": "Y轴重复"
+    },
+    "texMirror": {
+     "label": "镜像"
+    },
+    "texAngle": {
+     "label": "纹理角度"
+    },
+    "texOffset": {
+     "label": "纹理偏移"
+    },
+    "texCrop": {
+     "label": "纹理裁剪"
+    },
+    "texAnchor": {
+     "label": "纹理锚点",
+     "options": [
+      "中心",
+      "角落"
+     ]
     }
    }
   },
@@ -2661,11 +3178,33 @@
     "angle": {
      "label": "角度"
     },
+    "crop": {
+     "label": "裁剪"
+    },
+    "fit": {
+     "label": "画面",
+     "options": [
+      "完整尺寸",
+      "每个块内"
+     ]
+    },
+    "mask": {
+     "label": "限制在图层内"
+    },
     "mirror": {
      "label": "镜像"
     },
+    "offset": {
+     "label": "偏移"
+    },
     "scale": {
      "label": "缩放"
+    },
+    "screenSpace": {
+     "label": "屏幕空间"
+    },
+    "stretch": {
+     "label": "拉伸"
     }
    }
   },
@@ -2769,6 +3308,59 @@
     },
     "smoothing": {
      "label": "平滑"
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "经典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "环境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光照颜色"
+    },
+    "glossiness": {
+     "label": "高光锐度"
+    },
+    "texMode": {
+     "label": "纹理",
+     "options": [
+      "适应",
+      "平铺",
+      "拉伸"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X轴重复"
+    },
+    "texRepeatY": {
+     "label": "Y轴重复"
+    },
+    "texMirror": {
+     "label": "镜像"
+    },
+    "texAngle": {
+     "label": "纹理角度"
+    },
+    "texOffset": {
+     "label": "纹理偏移"
+    },
+    "texCrop": {
+     "label": "纹理裁剪"
+    },
+    "texAnchor": {
+     "label": "纹理锚点",
+     "options": [
+      "中心",
+      "角落"
+     ]
     }
    }
   },
@@ -2793,7 +3385,7 @@
   },
   "hollowbox": {
    "description": "上下开口的盒子：外部覆盖图层，内部使用内侧颜色。",
-   "name": "空心盒",
+   "name": "空心长方体",
    "params": {
     "depth": {
      "label": "深度"
@@ -2839,6 +3431,59 @@
     },
     "width": {
      "label": "宽度"
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "经典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "环境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光照颜色"
+    },
+    "glossiness": {
+     "label": "高光锐度"
+    },
+    "texMode": {
+     "label": "纹理",
+     "options": [
+      "适应",
+      "平铺",
+      "拉伸"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X轴重复"
+    },
+    "texRepeatY": {
+     "label": "Y轴重复"
+    },
+    "texMirror": {
+     "label": "镜像"
+    },
+    "texAngle": {
+     "label": "纹理角度"
+    },
+    "texOffset": {
+     "label": "纹理偏移"
+    },
+    "texCrop": {
+     "label": "纹理裁剪"
+    },
+    "texAnchor": {
+     "label": "纹理锚点",
+     "options": [
+      "中心",
+      "角落"
+     ]
     }
    }
   },
@@ -2964,7 +3609,8 @@
      "label": "样式",
      "options": [
       "经典",
-      "保留亮度"
+      "保留亮度",
+      "视频"
      ]
     },
     "vibrance": {
@@ -3002,6 +3648,23 @@
     },
     "intensity": {
      "label": "强度"
+    },
+    "blend": {
+     "label": "混合",
+     "options": [
+      "滤色",
+      "正常"
+     ]
+    },
+    "opacity": {
+     "label": "不透明度"
+    },
+    "corners": {
+     "label": "边角",
+     "options": [
+      "圆角",
+      "直角"
+     ]
     }
    }
   },
@@ -3068,6 +3731,13 @@
     "center": {
      "label": "中心"
     },
+    "direction": {
+     "label": "方向",
+     "options": [
+      "顺时针",
+      "逆时针"
+     ]
+    },
     "mirror": {
      "label": "镜像"
     },
@@ -3077,9 +3747,16 @@
    }
   },
   "lensblur": {
-   "description": "旋转模糊效果，中心区域保持清晰，越靠近边缘越模糊。",
+   "description": "旋转模糊，中心周围保持清晰，越靠近边缘越模糊。模糊设为“缩放”时，改为从中心向外拖尾，并延伸到图层边缘之外。",
    "name": "镜头模糊",
    "params": {
+    "blur": {
+     "label": "模糊",
+     "options": [
+      "旋转",
+      "缩放"
+     ]
+    },
     "center": {
      "label": "中心"
     },
@@ -3154,6 +3831,12 @@
     },
     "threshold": {
      "label": "阈值"
+    },
+    "soften": {
+     "label": "柔化"
+    },
+    "mask": {
+     "label": "限制在图层内"
     }
    }
   },
@@ -3257,7 +3940,7 @@
    }
   },
   "linearstreaks": {
-   "description": "沿指定角度移动图层副本，并混合重叠部分，形成直线条纹。",
+   "description": "沿某一角度滑动图层副本，并在重叠处混合，形成直线条纹。混合设为“关闭”时，图层保持原样。副本数设为“每个像素”时，长度上的每个像素各放一个副本，而不是沿长度分布48个。",
    "name": "线性条纹",
    "params": {
     "alpha": {
@@ -3274,11 +3957,19 @@
      "options": [
       "变亮",
       "平均",
-      "变暗"
+      "变暗",
+      "关闭"
      ]
     },
     "reach": {
      "label": "长度"
+    },
+    "copies": {
+     "label": "副本数",
+     "options": [
+      "间隔",
+      "每个像素"
+     ]
     }
    }
   },
@@ -3333,6 +4024,12 @@
     },
     "solidity": {
      "label": "实心度"
+    },
+    "fill": {
+     "label": "填充"
+    },
+    "samples": {
+     "label": "采样数"
     }
    }
   },
@@ -3348,6 +4045,9 @@
     },
     "threshold": {
      "label": "阈值"
+    },
+    "high": {
+     "label": "上限阈值"
     }
    }
   },
@@ -3472,6 +4172,13 @@
    "description": "将图层分成方块，并用每块的平均颜色填充。",
    "name": "马赛克",
    "params": {
+    "average": {
+     "label": "平均",
+     "options": [
+      "方块",
+      "角落"
+     ]
+    },
     "count": {
      "label": "数量"
     },
@@ -3590,10 +4297,63 @@
      "label": "缩放"
     },
     "shading": {
-     "label": "光照"
+     "label": "明暗"
     },
     "shine": {
      "label": "光泽"
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "经典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "环境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光照颜色"
+    },
+    "glossiness": {
+     "label": "高光锐度"
+    },
+    "texMode": {
+     "label": "纹理",
+     "options": [
+      "适应",
+      "平铺",
+      "拉伸"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X轴重复"
+    },
+    "texRepeatY": {
+     "label": "Y轴重复"
+    },
+    "texMirror": {
+     "label": "镜像"
+    },
+    "texAngle": {
+     "label": "纹理角度"
+    },
+    "texOffset": {
+     "label": "纹理偏移"
+    },
+    "texCrop": {
+     "label": "纹理裁剪"
+    },
+    "texAnchor": {
+     "label": "纹理锚点",
+     "options": [
+      "中心",
+      "角落"
+     ]
     }
    }
   },
@@ -3720,7 +4480,7 @@
      "label": "强度"
     },
     "light": {
-     "label": "光源颜色"
+     "label": "光照颜色"
     },
     "refraction": {
      "label": "折射"
@@ -4144,6 +4904,13 @@
     "blockSize": {
      "label": "大小"
     },
+    "edges": {
+     "label": "边缘",
+     "options": [
+      "镜像",
+      "透明"
+     ]
+    },
     "offset": {
      "label": "偏移"
     },
@@ -4244,7 +5011,7 @@
    }
   },
   "polar": {
-   "description": "围绕中心弯曲图层，将直线变成圆形，或将圆形展开成直线。",
+   "description": "围绕中心弯曲图层，把直线变成圆，或把圆展开成直线。布局决定图层的哪条边在中心汇合。",
    "name": "极坐标",
    "params": {
     "amount": {
@@ -4255,6 +5022,13 @@
      "options": [
       "直角坐标转极坐标",
       "极坐标转直角坐标"
+     ]
+    },
+    "middle": {
+     "label": "布局",
+     "options": [
+      "顶边在中心",
+      "底边在中心"
      ]
     }
    }
@@ -4444,15 +5218,68 @@
      "label": "缩放"
     },
     "shading": {
-     "label": "光照"
+     "label": "明暗"
     },
     "shine": {
      "label": "光泽"
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "经典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "环境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光照颜色"
+    },
+    "glossiness": {
+     "label": "高光锐度"
+    },
+    "texMode": {
+     "label": "纹理",
+     "options": [
+      "适应",
+      "平铺",
+      "拉伸"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X轴重复"
+    },
+    "texRepeatY": {
+     "label": "Y轴重复"
+    },
+    "texMirror": {
+     "label": "镜像"
+    },
+    "texAngle": {
+     "label": "纹理角度"
+    },
+    "texOffset": {
+     "label": "纹理偏移"
+    },
+    "texCrop": {
+     "label": "纹理裁剪"
+    },
+    "texAnchor": {
+     "label": "纹理锚点",
+     "options": [
+      "中心",
+      "角落"
+     ]
     }
    }
   },
   "radialblur": {
-   "description": "沿中心点向外的射线对采样取平均，生成强度可调的径向缩放模糊。",
+   "description": "沿从中心点发出的射线对采样取平均，生成强度可调的径向缩放模糊。长度设为“均匀”时，所有条纹长度相同，而不会随着与中心的距离增加而变长。",
    "name": "缩放模糊",
    "params": {
     "amount": {
@@ -4460,6 +5287,13 @@
     },
     "center": {
      "label": "中心"
+    },
+    "streak": {
+     "label": "长度",
+     "options": [
+      "按距离",
+      "均匀"
+     ]
     }
    }
   },
@@ -4586,11 +5420,14 @@
     },
     "reach": {
      "label": "长度"
+    },
+    "fill": {
+     "label": "填充"
     }
    }
   },
   "radialwipe": {
-   "description": "从起始角度绕中心扫过，像时针一样隐藏图层的扇形区域。进度控制扫过的角度，数量使扇形沿圆周重复，双向则向两侧扫掠。为进度添加动画即可创建转场。",
+   "description": "从起始角度开始绕中心扫过，像时钟指针一样隐藏图层的一块扇形区域。进度是扫过的角度，数量让扇形沿圆周重复，方向设为“双向”时向两侧扫过。为进度添加动画即可做出转场。扇形设为“精确”时，数量保留小数，最后一个扇形会更窄；羽化会柔化每个扇形的两侧。",
    "name": "径向擦除",
    "params": {
     "center": {
@@ -4615,6 +5452,13 @@
     },
     "start": {
      "label": "起始角度"
+    },
+    "wedges": {
+     "label": "扇形",
+     "options": [
+      "完整",
+      "精确"
+     ]
     }
    }
   },
@@ -4695,10 +5539,30 @@
      "label": "缩放"
     },
     "shading": {
-     "label": "光照"
+     "label": "明暗"
     },
     "shine": {
      "label": "光泽"
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "经典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "环境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光照颜色"
+    },
+    "glossiness": {
+     "label": "高光锐度"
     }
    },
    "shortcuts": {
@@ -4914,6 +5778,13 @@
     },
     "threshold": {
      "label": "阈值"
+    },
+    "match": {
+     "label": "匹配",
+     "options": [
+      "RGB",
+      "色度"
+     ]
     }
    }
   },
@@ -4931,7 +5802,7 @@
      "label": "调色板"
     },
     "pattern": {
-     "label": "抖动",
+     "label": "抖色",
      "options": [
       "无",
       "噪点",
@@ -4947,7 +5818,7 @@
       "斜线",
       "Floyd-Steinberg",
       "伪Floyd-Steinberg",
-      "Sierra精简版",
+      "Sierra Lite",
       "Fan",
       "Shiau-Fan",
       "Jarvis-Judice-Ninke",
@@ -4964,7 +5835,7 @@
    }
   },
   "rgbsplit": {
-   "description": "分离红、绿、蓝通道：中心通道保持不动，其余两个沿角度向相反方向偏移。亮色叠加偏移后的颜色，暗色保留实色，蒙版只保留三者重叠处，亮度则使边缘的不透明度随亮度变化。",
+   "description": "分离红、绿、蓝通道：中心所选的通道保持不动，另外两个沿角度向相反方向偏移。“亮色”叠加偏移后的颜色，“暗色”让它们保持实色，“蒙版”只保留三者重叠的部分，“亮度”让边缘的不透明度与其亮度一致。“平均”让每个点的不透明度等于覆盖它的通道所占的比例。",
    "name": "RGB分离",
    "params": {
     "angle": {
@@ -4984,7 +5855,8 @@
       "亮色",
       "暗色",
       "蒙版",
-      "亮度"
+      "亮度",
+      "平均"
      ]
     },
     "strength": {
@@ -5454,14 +6326,14 @@
    }
   },
   "smoothedges": {
-   "description": "圆滑图层不透明部分的边缘，保持内部颜色不变；蒙版限制在图层内时，边缘只能向内移动。",
+   "description": "圆滑图层不透明部分的边缘，保持内部颜色不变；开启“限制在图层内”后，边缘只能向内移动。",
    "name": "平滑边缘",
    "params": {
     "blur": {
      "label": "强度"
     },
     "mask": {
-     "label": "蒙版限制在图层内"
+     "label": "限制在图层内"
     }
    }
   },
@@ -5492,6 +6364,13 @@
     },
     "outside": {
      "label": "外部光晕"
+    },
+    "falloff": {
+     "label": "衰减",
+     "options": [
+      "均匀",
+      "图层"
+     ]
     }
    }
   },
@@ -5585,6 +6464,59 @@
     },
     "shine": {
      "label": "光泽"
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "经典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "环境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光照颜色"
+    },
+    "glossiness": {
+     "label": "高光锐度"
+    },
+    "texMode": {
+     "label": "纹理",
+     "options": [
+      "适应",
+      "平铺",
+      "拉伸"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X轴重复"
+    },
+    "texRepeatY": {
+     "label": "Y轴重复"
+    },
+    "texMirror": {
+     "label": "镜像"
+    },
+    "texAngle": {
+     "label": "纹理角度"
+    },
+    "texOffset": {
+     "label": "纹理偏移"
+    },
+    "texCrop": {
+     "label": "纹理裁剪"
+    },
+    "texAnchor": {
+     "label": "纹理锚点",
+     "options": [
+      "中心",
+      "角落"
+     ]
     }
    }
   },
@@ -5732,11 +6664,18 @@
     },
     "threshold": {
      "label": "阈值"
+    },
+    "grey": {
+     "label": "灰度",
+     "options": [
+      "高清",
+      "标清"
+     ]
     }
    }
   },
   "squeeze": {
-   "description": "强度为正时向内挤压图层中心，为负时向外膨胀。旧版模式保留旧项目的形状。",
+   "description": "强度为正时将图层中部向内挤压，为负时向外膨胀。“旧版”保留旧项目中的形状。“沙漏”还会把上下边缘的中部向外推。",
    "name": "挤压",
    "params": {
     "amount": {
@@ -5746,7 +6685,8 @@
      "label": "形状",
      "options": [
       "挤压/膨胀",
-      "旧版"
+      "旧版",
+      "沙漏"
      ]
     }
    }
@@ -5846,6 +6786,59 @@
     },
     "shine": {
      "label": "光泽"
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "经典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "环境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光照颜色"
+    },
+    "glossiness": {
+     "label": "高光锐度"
+    },
+    "texMode": {
+     "label": "纹理",
+     "options": [
+      "适应",
+      "平铺",
+      "拉伸"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X轴重复"
+    },
+    "texRepeatY": {
+     "label": "Y轴重复"
+    },
+    "texMirror": {
+     "label": "镜像"
+    },
+    "texAngle": {
+     "label": "纹理角度"
+    },
+    "texOffset": {
+     "label": "纹理偏移"
+    },
+    "texCrop": {
+     "label": "纹理裁剪"
+    },
+    "texAnchor": {
+     "label": "纹理锚点",
+     "options": [
+      "中心",
+      "角落"
+     ]
     }
    }
   },
@@ -5894,6 +6887,66 @@
     },
     "smoothing": {
      "label": "平滑"
+    },
+    "starStyle": {
+     "label": "样式",
+     "options": [
+      "平顶",
+      "尖顶"
+     ]
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "经典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "环境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光照颜色"
+    },
+    "glossiness": {
+     "label": "高光锐度"
+    },
+    "texMode": {
+     "label": "纹理",
+     "options": [
+      "适应",
+      "平铺",
+      "拉伸"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X轴重复"
+    },
+    "texRepeatY": {
+     "label": "Y轴重复"
+    },
+    "texMirror": {
+     "label": "镜像"
+    },
+    "texAngle": {
+     "label": "纹理角度"
+    },
+    "texOffset": {
+     "label": "纹理偏移"
+    },
+    "texCrop": {
+     "label": "纹理裁剪"
+    },
+    "texAnchor": {
+     "label": "纹理锚点",
+     "options": [
+      "中心",
+      "角落"
+     ]
     }
    }
   },
@@ -5938,7 +6991,7 @@
      "label": "角度"
     },
     "mask": {
-     "label": "蒙版限制在图层内"
+     "label": "限制在图层内"
     },
     "scale": {
      "label": "缩放"
@@ -5992,7 +7045,7 @@
   },
   "swing": {
    "description": "使图层在两个角度之间来回旋转。",
-   "name": "摆动",
+   "name": "摇摆",
    "params": {
     "angle1": {
      "label": "角度1"
@@ -6009,8 +7062,8 @@
     "wave": {
      "label": "波形",
      "options": [
-      "正弦",
-      "三角"
+      "正弦波",
+      "三角波"
      ]
     }
    }
@@ -6065,7 +7118,9 @@
       "机器人",
       "吱吱声",
       "打字机",
-      "芯片音乐"
+      "芯片音乐",
+      "骷髅",
+      "自定义声音"
      ]
     },
     "volume": {
@@ -6248,7 +7303,7 @@
    }
   },
   "textshake": {
-   "description": "让每个字符独立抖动，模拟游戏中紧张的对话。抖动在不同位置间漂移，跳动在每一步跳至新位置，波浪使字符上下起伏，圆周使其绕小圈移动，摇摆使其来回倾斜。降低抖动字符数可只让部分字符抖动，并每隔片刻重新随机选择。",
+   "description": "让每个字符独立抖动，模拟游戏中紧张的对话。抖动在不同位置间漂移，颤动在每一步跳至新位置，波浪使字符上下起伏，圆形使其绕小圈移动，摇晃使其来回倾斜。降低抖动字符数可只让部分字符抖动，并每隔片刻重新随机选择。",
    "name": "文本抖动",
    "params": {
     "amount": {
@@ -6285,7 +7340,7 @@
      "label": "样式",
      "options": [
       "抖动",
-      "抖动",
+      "颤动",
       "波浪",
       "圆形",
       "摇晃"
@@ -6439,6 +7494,13 @@
     "count": {
      "label": "数量"
     },
+    "edges": {
+     "label": "边缘",
+     "options": [
+      "镜像",
+      "透明"
+     ]
+    },
     "offset": {
      "label": "偏移"
     },
@@ -6447,6 +7509,9 @@
     },
     "rotation": {
      "label": "旋转"
+    },
+    "screenSpace": {
+     "label": "屏幕空间"
     },
     "seed": {
      "label": "种子"
@@ -6457,8 +7522,8 @@
    }
   },
   "tiles": {
-   "description": "重复图层以填满屏幕。提高裁剪值可缩小平铺块，并可设置镜像、行偏移和旋转。旧版缩放用于兼容旧项目。",
-   "name": "平铺",
+   "description": "重复图层以填满屏幕。调高裁剪可让拼贴块变小，还可选择镜像、行偏移和旋转。“旧版缩放”用于保留旧项目的效果。“块内缩放”让每个拼贴块保持图层大小，并在块内缩放和旋转画面。",
+   "name": "拼贴",
    "params": {
     "angle": {
      "label": "角度"
@@ -6473,7 +7538,8 @@
      "label": "尺寸模式",
      "options": [
       "裁剪",
-      "旧版缩放"
+      "旧版缩放",
+      "块内缩放"
      ]
     },
     "vertical": {
@@ -6494,8 +7560,18 @@
     "count": {
      "label": "数量"
     },
+    "edges": {
+     "label": "边缘",
+     "options": [
+      "镜像",
+      "透明"
+     ]
+    },
     "offset": {
      "label": "偏移"
+    },
+    "screenSpace": {
+     "label": "屏幕空间"
     },
     "seed": {
      "label": "种子"
@@ -6549,7 +7625,7 @@
   },
   "tint": {
    "description": "将画面亮度映射到阴影颜色和高光颜色之间，并调整混合量。",
-   "name": "着色",
+   "name": "色调",
    "params": {
     "amount": {
      "label": "数量"
@@ -6598,6 +7674,59 @@
     },
     "thickness": {
      "label": "厚度"
+    },
+    "lighting": {
+     "label": "光照",
+     "options": [
+      "经典",
+      "柔和",
+      "直射"
+     ]
+    },
+    "ambient": {
+     "label": "环境光"
+    },
+    "lightHeight": {
+     "label": "光源高度"
+    },
+    "lightColor": {
+     "label": "光照颜色"
+    },
+    "glossiness": {
+     "label": "高光锐度"
+    },
+    "texMode": {
+     "label": "纹理",
+     "options": [
+      "适应",
+      "平铺",
+      "拉伸"
+     ]
+    },
+    "texRepeatX": {
+     "label": "X轴重复"
+    },
+    "texRepeatY": {
+     "label": "Y轴重复"
+    },
+    "texMirror": {
+     "label": "镜像"
+    },
+    "texAngle": {
+     "label": "纹理角度"
+    },
+    "texOffset": {
+     "label": "纹理偏移"
+    },
+    "texCrop": {
+     "label": "纹理裁剪"
+    },
+    "texAnchor": {
+     "label": "纹理锚点",
+     "options": [
+      "中心",
+      "角落"
+     ]
     }
    }
   },
@@ -6739,11 +7868,14 @@
     },
     "stretch": {
      "label": "拉伸"
+    },
+    "screenSpace": {
+     "label": "屏幕空间"
     }
    }
   },
   "twirl": {
-   "description": "将图层围绕中心扭成旋涡，中心效果最强，到半径处逐渐消失。半径按图层尺寸的比例计算，强度为负值时反向扭曲。",
+   "description": "像旋涡一样围绕中心扭转图层，中间最强，到半径处逐渐消失（半径按图层尺寸的比例计算）。强度为负时反向扭转。测量基准设为“屏幕”时，半径改按屏幕尺寸的比例计算，扭转也会平滑减弱。",
    "name": "旋涡",
    "params": {
     "center": {
@@ -6754,11 +7886,18 @@
     },
     "strength": {
      "label": "强度"
+    },
+    "reach": {
+     "label": "测量基准",
+     "options": [
+      "图层",
+      "屏幕"
+     ]
     }
    }
   },
   "unsharpmask": {
-   "description": "通过加回图层与其模糊副本的差异来锐化。强度控制模糊范围，数量控制加回量；阈值高于50%时忽略细微差异。",
+   "description": "将图层与其模糊副本之间的差异叠加回图层来实现锐化。强度决定模糊范围，数量决定叠加回去的多少，阈值高于50%时会忽略细小的差异。蒙版颜色设为“红色”时，若某处亮度与模糊副本之差大于阈值超出50%的部分，该处就以红色显示蒙版。",
    "name": "USM锐化",
    "params": {
     "amount": {
@@ -6772,6 +7911,13 @@
     },
     "threshold": {
      "label": "阈值"
+    },
+    "maskColor": {
+     "label": "蒙版颜色",
+     "options": [
+      "灰色",
+      "红色"
+     ]
     }
    }
   },
@@ -6867,6 +8013,19 @@
     },
     "yaw": {
      "label": "偏航"
+    },
+    "projection": {
+     "label": "输出",
+     "options": [
+      "视图",
+      "全景"
+     ]
+    },
+    "eyeDistance": {
+     "label": "距离"
+    },
+    "frame": {
+     "label": "画面比例"
     }
    }
   },
@@ -6932,7 +8091,7 @@
    }
   },
   "wavewarp": {
-   "description": "用正弦波扭曲图层：间距控制波浪数量，幅度控制位移距离，角度控制波浪方向，扭曲角度控制位移方向。",
+   "description": "用正弦波弯曲图层：间距决定有多少道波穿过图层，幅度决定推移的距离，角度决定波的走向，扭曲角度决定推移的方向。开启屏幕空间后，波按屏幕而非图层确定大小。交叉幅度会添加第二道波，其大小由交叉间距决定，沿扭曲角度传播并沿角度推移。原点设为“屏幕左下角”时，波从屏幕的这个角开始、以屏幕短边为基准计算，相位再让波随之滑动。",
    "name": "波浪扭曲",
    "params": {
     "angle": {
@@ -6952,6 +8111,22 @@
     },
     "warpAngle": {
      "label": "扭曲角度"
+    },
+    "screenSpace": {
+     "label": "屏幕空间"
+    },
+    "crossSpacing": {
+     "label": "交叉间距"
+    },
+    "crossMagnitude": {
+     "label": "交叉幅度"
+    },
+    "origin": {
+     "label": "原点",
+     "options": [
+      "图层角落",
+      "屏幕左下角"
+     ]
     }
    }
   },

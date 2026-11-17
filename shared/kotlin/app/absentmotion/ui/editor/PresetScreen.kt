@@ -78,6 +78,7 @@ import app.absentmotion.library.SavedPreset
 import app.absentmotion.model.Scene
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Presence
+import app.absentmotion.ui.theme.withUiFont
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -85,6 +86,7 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
+import app.absentmotion.ui.HoldName
 
 private val RowShape = RoundedCornerShape(12.dp)
 private val Orange get() = Am.Accent
@@ -168,6 +170,7 @@ fun PresetScreen(state: EditorState) {
         Row(Modifier.fillMaxWidth().height(48.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(48.dp).padding(start = 4.dp).clickable { state.presetsOpen = false }, Alignment.Center) {
                 DeskTip(stringResource(R.string.preset_back)) { Icon(ChromeIcons.Back, stringResource(R.string.preset_back), Modifier.size(24.dp), tint = Am.OnDark) }
+                HoldName(stringResource(R.string.preset_back))
             }
             Text(stringResource(R.string.try_a_preset), Modifier.weight(1f).padding(horizontal = 4.dp), color = Am.OnDark, fontWeight = FontWeight.Bold, maxLines = 1,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center, autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(12.sp, 22.sp))
@@ -188,6 +191,7 @@ fun PresetScreen(state: EditorState) {
             app.absentmotion.platform.SceneSurface(state.engine, 1, box, Modifier.fillMaxSize())
             if (!playing) Box(Modifier.align(Alignment.Center).size(56.dp).clip(CircleShape).background(Color(0x66000000)), Alignment.Center) {
                 Icon(ChromeIcons.Play, stringResource(R.string.preset_play), Modifier.size(32.dp), tint = Color.White)
+                HoldName(stringResource(R.string.preset_play))
             }
         }
         Spacer(Modifier.height(16.dp))
@@ -222,6 +226,7 @@ fun PresetScreen(state: EditorState) {
                     )
                     Box(Modifier.size(48.dp).clickable { menuFor = preset.id }, Alignment.Center) {
                         DeskTip(stringResource(R.string.preset_more)) { Icon(PanelIcons.More, stringResource(R.string.preset_more), Modifier.size(24.dp), tint = Am.OnDark) }
+                HoldName(stringResource(R.string.preset_more))
                         Presence(menuFor == preset.id) {
                             MenuPopup(DropOrRise, { menuFor = null }) {
                                 MenuRow(stringResource(R.string.rename)) { menuFor = null; renaming = preset }
@@ -317,7 +322,7 @@ internal fun RenamePresetDialog(title: String, onDone: (String) -> Unit, onDismi
         text = {
             BasicTextField(
                 text, { text = it }, Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp)).background(Am.Panel).padding(12.dp),
-                textStyle = TextStyle(color = Am.OnDark, fontSize = 16.sp, textDirection = androidx.compose.ui.text.style.TextDirection.Content), singleLine = true, cursorBrush = SolidColor(Am.Accent),
+                textStyle = TextStyle(color = Am.OnDark, fontSize = 16.sp, textDirection = androidx.compose.ui.text.style.TextDirection.Content).withUiFont(), singleLine = true, cursorBrush = SolidColor(Am.Accent),
                 decorationBox = { field -> Box { if (text.isEmpty()) Text(title, color = Am.OnDarkDim, fontSize = 16.sp); field() } },
             )
         },

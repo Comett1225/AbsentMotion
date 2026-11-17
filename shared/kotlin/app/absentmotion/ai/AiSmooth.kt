@@ -39,7 +39,9 @@ class AiSmooth private constructor(private val net: AiNet, val level: SmoothLeve
 
         fun downloadBytes(level: SmoothLevel): Long = level.model.bytes
 
-        suspend fun download(context: Context, level: SmoothLevel, progress: (Float) -> Unit) = level.model.download(context, progress)
+        @Volatile internal var fetch: suspend (Context, SmoothLevel, (Float) -> Unit) -> Unit = { context, level, progress -> level.model.download(context, progress) }
+
+        suspend fun download(context: Context, level: SmoothLevel, progress: (Float) -> Unit) = fetch(context, level, progress)
 
         suspend fun open(context: Context, level: SmoothLevel): AiSmooth {
             AiDevice.probeGpu(context, level.model)

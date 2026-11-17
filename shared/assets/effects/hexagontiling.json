@@ -28,7 +28,63 @@
    "label": "Mirror",
    "type": "switch",
    "default": false
+  },
+  {
+   "id": "fit",
+   "label": "Picture",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Full Size",
+    "In Each Tile"
+   ]
+  },
+  {
+   "id": "crop",
+   "label": "Crop",
+   "type": "float",
+   "default": 1,
+   "min": 0.1,
+   "max": 10,
+   "step": 0.01
+  },
+  {
+   "id": "stretch",
+   "label": "Stretch",
+   "type": "point",
+   "default": [
+    1,
+    1
+   ],
+   "min": 0.01,
+   "max": 10,
+   "step": 0.01
+  },
+  {
+   "id": "offset",
+   "label": "Offset",
+   "type": "point",
+   "default": [
+    0,
+    0
+   ],
+   "min": -5000,
+   "max": 5000,
+   "step": 1,
+   "pixels": true
+  },
+  {
+   "id": "screenSpace",
+   "label": "Screen Space",
+   "type": "switch",
+   "default": false
+  },
+  {
+   "id": "mask",
+   "label": "Mask To Layer",
+   "type": "switch",
+   "default": false
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float scale;\nuniform float angle;\nuniform float mirror;\nhalf4 main(float2 coord) {\n    float2 c = size * 0.5;\n    float unit = 0.5 * min(size.x, size.y) * max(scale, 0.05);\n    float a = radians(angle);\n    float cs = cos(a);\n    float sn = sin(a);\n    float2 p = coord - c;\n    p = float2(cs * p.x + sn * p.y, -sn * p.x + cs * p.y) / unit;\n    float2 r = float2(1.0, 1.7320508);\n    float2 h = r * 0.5;\n    float2 ga = mod(p, r) - h;\n    float2 gb = mod(p - h, r) - h;\n    float2 g = dot(ga, ga) < dot(gb, gb) ? ga : gb;\n    if (mirror > 0.5) {\n        float2 id = p - g;\n        float k = mod(floor(id.x + 0.5) + floor(id.y / 1.7320508 * 2.0 + 0.5), 2.0);\n        g.x = mix(g.x, -g.x, k);\n    }\n    g *= unit;\n    g = float2(cs * g.x - sn * g.y, sn * g.x + cs * g.y);\n    return image.eval(clamp(c + g, float2(0.5), size - 0.5));\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float4 screen;\nuniform float time;\nuniform float scale;\nuniform float angle;\nuniform float mirror;\nuniform float fit;\nuniform float crop;\nuniform float2 stretch;\nuniform float2 offset;\nuniform float screenSpace;\nuniform float mask;\nhalf4 main(float2 coord) {\n    bool onScreen = screenSpace > 0.5;\n    float2 c = size * 0.5;\n    float2 o = onScreen ? screen.xy + screen.zw * 0.5 : c;\n    float unit = 0.5 * (onScreen ? screen.w : min(size.x, size.y)) * max(scale, 0.05);\n    float2 st = max(abs(stretch), float2(0.01));\n    float a = radians(angle);\n    float cs = cos(a);\n    float sn = sin(a);\n    float2 p = coord - o;\n    p = float2(cs * p.x + sn * p.y, -sn * p.x + cs * p.y) / (unit * st);\n    float2 r = float2(1.0, 1.7320508);\n    float2 h = r * 0.5;\n    float2 ga = mod(p, r) - h;\n    float2 gb = mod(p - h, r) - h;\n    float2 g = dot(ga, ga) < dot(gb, gb) ? ga : gb;\n    if (mirror > 0.5) {\n        float2 id = p - g;\n        float k = mod(floor(id.x + 0.5) + floor(id.y / 1.7320508 * 2.0 + 0.5), 2.0);\n        g.x = mix(g.x, -g.x, k);\n    }\n    bool cell = fit > 0.5;\n    g *= cell ? float2(min(size.x, size.y) * max(crop, 0.05)) : unit * st;\n    g = float2(cs * g.x - sn * g.y, sn * g.x + cs * g.y);\n    float2 q = c + g - offset;\n    bool outside = coord.x < 0.0 || coord.y < 0.0 || coord.x > size.x || coord.y > size.y;\n    if ((cell && (q.x < 0.0 || q.y < 0.0 || q.x > size.x || q.y > size.y)) || (mask > 0.5 && outside)) return half4(0.0);\n    half4 color = image.eval(clamp(q, float2(0.5), size - 0.5));\n    return mask > 0.5 ? color * image.eval(coord).a : color;\n}\n"
 }

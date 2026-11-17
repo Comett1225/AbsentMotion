@@ -76,7 +76,7 @@ internal fun AudioFolderTile(label: String, count: Int, onClick: () -> Unit) {
         WaveRow(Modifier.fillMaxSize(), 2)
         Row(Modifier.fillMaxSize().padding(horizontal = 14.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(HomeIcons.Folder, null, Modifier.size(26.dp), tint = Color.White)
-            val shade = androidx.compose.ui.text.TextStyle(shadow = androidx.compose.ui.graphics.Shadow(Color.Black, blurRadius = 10f))
+            val shade = androidx.compose.ui.text.TextStyle(shadow = androidx.compose.ui.graphics.Shadow(Color.Black, blurRadius = 10f), fontFamily = androidx.compose.material3.LocalTextStyle.current.fontFamily)
             Text(label, Modifier.weight(1f).padding(start = 10.dp), color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold, maxLines = 1, style = shade)
             Text(count.toString(), color = Color.White.copy(alpha = 0.85f), fontSize = 13.sp, style = shade)
             Icon(ChromeIcons.ChevronRight, null, Modifier.padding(start = 4.dp).size(20.dp), tint = Color.White.copy(alpha = 0.75f))

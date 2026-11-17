@@ -26,7 +26,19 @@ def turns(x, y, z=0):
 PLACE = [{"id": "position", "label": "Position", "type": "point", "default": [0, 0], "min": -5000, "max": 5000, "step": 1, "pixels": True},
          number("scale", "Scale", 1, 0.05, 10)]
 CAMERA = [number("perspective", "Perspective", 0.5, 0, 1)]
-LIGHT = [number("shading", "Shading", 0.6, 0, 1), angle("light", "Light Angle", 135), number("shine", "Shine", 0.3, 0, 1)]
+SOFT = {"lighting": [1, 2]}
+LIGHT = [number("shading", "Shading", 0.6, 0, 1), angle("light", "Light Angle", 135), number("shine", "Shine", 0.3, 0, 1),
+         {"id": "lighting", "label": "Lighting", "type": "choice", "default": 0, "options": ["Classic", "Soft", "Direct"]},
+         dict(number("ambient", "Ambient", 0.03, 0, 2), when=SOFT), dict(number("lightHeight", "Light Height", 3, 0, 20), when=SOFT),
+         dict(colour("lightColor", "Light Color", "#ffffffff"), when=SOFT), dict(number("glossiness", "Glossiness", 15, 1, 200, 0.1), when=SOFT)]
+TILED = {"texMode": [1, 2]}
+TEXTURE = [{"id": "texMode", "label": "Texture", "type": "choice", "default": 0, "options": ["Fit", "Tile", "Stretch"]},
+           dict(number("texRepeatX", "Repeat X", 1, 0.01, 100), when=TILED), dict(number("texRepeatY", "Repeat Y", 1, 0.01, 100), when=TILED),
+           dict({"id": "texMirror", "label": "Mirror", "type": "switch", "default": False}, when=TILED),
+           dict(angle("texAngle", "Texture Angle", 0), when=TILED),
+           dict({"id": "texOffset", "label": "Texture Offset", "type": "point", "default": [0, 0], "min": -100, "max": 100, "step": 0.01}, when=TILED),
+           dict(number("texCrop", "Texture Crop", 1, 0.05, 10), when=TILED),
+           dict({"id": "texAnchor", "label": "Texture Anchor", "type": "choice", "default": 0, "options": ["Center", "Corner"]}, when=TILED)]
 SMOOTH = number("smoothing", "Smoothing", 0.15, 0, 1)
 INSIDE = colour("interior", "Interior Color", "#ff3d4152")
 
@@ -51,6 +63,12 @@ float2 cover(float2 uv, float2 face) {
 
 float4 shade(float4 c, float3 n, float3 v) {
     float a = radians(light);
+    if (lighting > 0.5) {
+        float d = max(dot(n, normalize(float3(cos(a), -sin(a), -lightHeight))), 0.0);
+        float3 lit = c.rgb * ((lighting > 1.5 ? 0.0 : 0.38) + (ambient + shading * d) * float3(lightColor.rgb));
+        float g = shine * pow(d, glossiness);
+        return float4(min(lit + g * (1.0 - lit), float3(1.0)), c.a);
+    }
     float3 l = normalize(float3(cos(a), -sin(a), -1.2));
     float k = 1.0 - shading + shading * (0.3 + 0.85 * max(dot(n, l), 0.0));
     float s = shine * pow(max(dot(n, normalize(l + v)), 0.0), 40.0);
@@ -59,6 +77,22 @@ float4 shade(float4 c, float3 n, float3 v) {
 """
 
 SHAPES = """
+float4 tiled(float2 uv, float2 face) {
+    float2 q = uv - 0.5;
+    if (texMode < 1.5) q *= face / max(min(face.x, face.y), 0.0001);
+    float t = radians(texAngle);
+    q = float2(cos(t) * q.x + sin(t) * q.y, cos(t) * q.y - sin(t) * q.x) * float2(texRepeatX, texRepeatY) + 0.5 - texOffset - texAnchor * (0.5 * float2(texRepeatX, texRepeatY) + 0.5);
+    float2 f = fract(q);
+    if (texMirror > 0.5) f = mix(f, 1.0 - f, mod(floor(q), 2.0));
+    f = (f - 0.5) * texCrop + 0.5;
+    if (f.x < 0.0 || f.y < 0.0 || f.x > 1.0 || f.y > 1.0) return float4(0.0);
+    return pic(f);
+}
+
+float4 tex(float2 uv, float2 face) { return texMode < 0.5 ? pic(cover(uv, face)) : tiled(uv, face); }
+
+float4 wrap(float2 uv) { return texMode < 0.5 ? pic(uv) : tiled(uv, float2(1.0)); }
+
 float sdBox(float3 p, float3 h) {
     float3 q = abs(p) - h;
     return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
@@ -87,18 +121,18 @@ float4 boxFace(float3 p, float3 n, float3 h) {
         uv = float2(p.x, n.y < 0.0 ? -p.z : p.z) / h.xz;
         face = h.xz;
     }
-    return pic(cover(uv * 0.5 + 0.5, face));
+    return tex(uv * 0.5 + 0.5, face);
 }
 
 float4 front(float3 p, float3 n, float r) {
-    return pic(cover(float2(n.z > 0.0 ? -p.x : p.x, p.y) / r * 0.5 + 0.5, float2(1.0)));
+    return tex(float2(n.z > 0.0 ? -p.x : p.x, p.y) / r * 0.5 + 0.5, float2(1.0));
 }
 
 float4 facet(float3 p, float3 n, float r) {
     float3 f = normalize(sign(n));
     float3 w = float3(-f.z, 0.0, f.x);
     float3 u = dot(w, w) > 0.0 ? normalize(w) : float3(1.0, 0.0, 0.0);
-    return pic(cover(float2(dot(p, u), dot(p, cross(u, f))) / r * 0.5 + 0.5, float2(1.0)));
+    return tex(float2(dot(p, u), dot(p, cross(u, f))) / r * 0.5 + 0.5, float2(1.0));
 }
 """
 
@@ -146,7 +180,7 @@ half4 main(float2 coord) {
     float3 n = normal(p, e);
     if (!hit) p -= n * map(p);
     float4 c = paint(p, n, m, rw);
-    if (hit && c.a < 0.996) {
+    if (hit && c.a < 0.996 && lighting < 0.5) {
         float s = far;
         bool back = false;
         for (int i = 0; i < 64; i++) {
@@ -174,9 +208,12 @@ def uniforms(params, oriented=True):
     return "\n".join(lines) + "\n"
 
 
-def solid(key, name, description, dims, code, x=-20, y=-35, steps=96):
-    params = turns(x, y) + dims + PLACE + CAMERA + LIGHT
-    sksl = uniforms(params) + COMMON + SHAPES + code + MARCH.replace("STEPS", str(steps))
+def solid(key, name, description, dims, code, x=-20, y=-35, steps=96, after="", extra=()):
+    params = turns(x, y) + dims + PLACE + CAMERA + LIGHT + TEXTURE + list(extra)
+    march = MARCH.replace("STEPS", str(steps))
+    if after:
+        march = march.replace("half4 main(float2 coord)", "half4 shape(float2 coord)") + after
+    sksl = uniforms(params) + COMMON + SHAPES + code + march
     return key, name, description, params, sksl
 
 
@@ -217,8 +254,8 @@ float map(float3 p) {
     return min(max(d.x, d.y), 0.0) + length(max(d, 0.0)) - r;
 }
 float4 surface(float3 p, float3 n) {
-    if (abs(n.y) > 0.7) return pic(cover(float2(p.x, n.y < 0.0 ? -p.z : p.z) / radius * 0.5 + 0.5, float2(1.0)));
-    return pic(float2(atan(p.x, -p.z) / (2.0 * PI) + 0.5, p.y / height * 0.5 + 0.5));
+    if (abs(n.y) > 0.7) return tex(float2(p.x, n.y < 0.0 ? -p.z : p.z) / radius * 0.5 + 0.5, float2(1.0));
+    return wrap(float2(atan(p.x, -p.z) / (2.0 * PI) + 0.5, p.y / height * 0.5 + 0.5));
 }
 """),
     solid("ellipsoid", "Ellipsoid", "Wraps the layer around a sphere that you can squeeze and flatten.",
@@ -229,7 +266,7 @@ float bound() { return radius * max(1.0, squeezeRatio); }
 float map(float3 p) { float3 r = radii(); float k0 = length(p / r); float k1 = length(p / (r * r)); return k0 * (k0 - 1.0) / max(k1, 0.0001); }
 float4 surface(float3 p, float3 n) {
     float3 q = normalize(p / radii());
-    return pic(float2(atan(q.x, -q.z) / (2.0 * PI) + 0.5, acos(clamp(-q.y, -1.0, 1.0)) / PI));
+    return wrap(float2(atan(q.x, -q.z) / (2.0 * PI) + 0.5, acos(clamp(-q.y, -1.0, 1.0)) / PI));
 }
 """, x=-15, y=0, steps=64),
     solid("torus", "Torus", "Wraps the layer around a ring.",
@@ -237,7 +274,7 @@ float4 surface(float3 p, float3 n) {
 float bound() { return radius + thickness; }
 float map(float3 p) { return length(float2(length(p.xy) - radius, p.z)) - thickness; }
 float4 surface(float3 p, float3 n) {
-    return pic(float2(atan(p.x, -p.y) / (2.0 * PI) + 0.5, atan(p.z, length(p.xy) - radius) / (2.0 * PI) + 0.5));
+    return wrap(float2(atan(p.x, -p.y) / (2.0 * PI) + 0.5, atan(p.z, length(p.xy) - radius) / (2.0 * PI) + 0.5));
 }
 """, x=-35, y=-20),
     solid("pyramid", "Pyramid", "Puts the layer on the faces of a square pyramid.",
@@ -303,13 +340,23 @@ float star(float2 p, float outer, float inner, float n) {
     float d = length(w - e * clamp(dot(w, e) / dot(e, e), 0.0, 1.0));
     return e.x * w.y - e.y * w.x > 0.0 ? -d : d;
 }
+float pointed(float3 p, float outer, float low, float n, float h) {
+    float an = PI / n;
+    float b = mod(atan(p.x, -p.y), 2.0 * an);
+    b = b > an ? 2.0 * an - b : b;
+    float3 q = float3(length(p.xy) * float2(cos(b), sin(b)), abs(p.z));
+    float3 a = float3(0.0, 0.0, h);
+    float3 f = normalize(cross(float3(outer, 0.0, -h), float3(low * cos(an), low * sin(an), -h)));
+    return dot(q - a, f.z < 0.0 ? -f : f);
+}
 float bound() { return length(float2(radius, depth)); }
 float map(float3 p) {
+    if (starStyle > 0.5) return pointed(p, radius, radius * inner, floor(points + 0.5), depth);
     float r = smoothing * min(radius * inner, depth) * 0.5;
     return extrude(star(p.xy, radius, radius * inner, floor(points + 0.5)), p.z, depth, r);
 }
 float4 surface(float3 p, float3 n) { return front(p, n, radius); }
-""", steps=112),
+""", steps=112, extra=[{"id": "starStyle", "label": "Style", "type": "choice", "default": 0, "options": ["Flat", "Pointed"]}]),
     solid("starpolyhedron", "Star Polyhedron", "Puts the layer on a star made of two crossed pyramids.",
           [number("radius", "Radius", 0.95, 0.02, 5)], """
 float tetra(float3 q) { return (max(abs(q.x + q.y) - q.z, abs(q.x - q.y) + q.z) - 1.0) * 0.57735027; }
@@ -343,7 +390,13 @@ float map(float3 p) {
         sdRoundBox(p, float3(thickness, thickness, reach), r)));
 }
 float4 surface(float3 p, float3 n) { return boxFace(p, n, float3(reach)); }
-""", x=-25),
+""", x=-25, extra=[{"id": "keep", "label": "Keep Layer", "type": "switch", "default": False}], after="""
+half4 main(float2 coord) {
+    half4 c = shape(coord);
+    if (keep < 0.5 || coord.x < 0.0 || coord.y < 0.0 || coord.x > size.x || coord.y > size.y) return c;
+    return c + image.eval(coord) * (1.0 - c.a);
+}
+"""),
     solid("spherize", "Spherize", "Wraps the layer onto a sphere using a front projection or an equirectangular texture.",
           [number("radius", "Radius", 0.9, 0.02, 5), number("coverage", "Coverage", 0.5, 0.2, 1),
            {"id": "projection", "label": "Projection", "type": "choice", "default": 0, "options": ["Front", "Equirectangular"]}], """
@@ -353,11 +406,11 @@ float4 surface(float3 p, float3 n) {
     float3 q = normalize(p);
     if (projection > 0.5) {
         float longitude = length(q.xz) > 0.00001 ? atan(q.x, -q.z) : 0.0;
-        return pic(float2(longitude / (2.0 * PI) + 0.5, acos(clamp(-q.y, -1.0, 1.0)) / PI));
+        return wrap(float2(longitude / (2.0 * PI) + 0.5, acos(clamp(-q.y, -1.0, 1.0)) / PI));
     }
     float2 uv = 0.5 + q.xy / max(length(q.xy), 0.00001) * acos(clamp(-q.z, -1.0, 1.0)) / (PI * coverage) * 0.5;
     if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) return float4(0.0);
-    return pic(uv);
+    return wrap(uv);
 }
 """, x=0, y=0, steps=64),
 ]
@@ -431,8 +484,10 @@ half4 main(float2 coord) {
 """
 
 FLIP_PARAMS = turns(0, 35) + [angle("axis", "Axis", 0), {"id": "back", "label": "Back", "type": "choice", "default": 0, "options": ["See-through", "Picture", "Color"]},
-                              colour("backColor", "Back Color", "#ffffffff")] + PLACE + CAMERA + LIGHT
-FLIP = uniforms(FLIP_PARAMS) + COMMON + """
+                              colour("backColor", "Back Color", "#ffffffff")] + PLACE + CAMERA + LIGHT + TEXTURE + [
+    {"id": "pivot", "label": "Pivot", "type": "point", "default": [0, 0], "min": -5000, "max": 5000, "step": 1, "pixels": True},
+    number("pivotDepth", "Pivot Depth", 0, -10, 10)]
+FLIP = uniforms(FLIP_PARAMS) + COMMON + SHAPES + """
 float3x3 spin(float d) {
     float a = radians(d);
     return float3x3(cos(a), -sin(a), 0.0, sin(a), cos(a), 0.0, 0.0, 0.0, 1.0);
@@ -445,20 +500,21 @@ half4 main(float2 coord) {
     float dist = max(2.0 + 40.0 * pow(1.0 - clamp(perspective, 0.0, 1.0), 3.0), length(h) + 0.5);
     float3 rw = normalize(float3((coord - size * 0.5 - position) / unit, dist));
     float3x3 m = orient * spin(axis) * turn() * spin(-axis);
-    float3 ro = float3(0.0, 0.0, -dist) * m;
+    float3 pv = float3(pivot / unit, pivotDepth);
+    float3 ro = (float3(0.0, 0.0, -dist) - pv) * m;
     float3 rd = rw * m;
     if (abs(rd.z) < 0.000001) return half4(0.0);
-    float t = -ro.z / rd.z;
+    float t = (-pv.z - ro.z) / rd.z;
     if (t <= 0.0) return half4(0.0);
-    float2 p = (ro + rd * t).xy;
+    float2 p = (ro + rd * t).xy + pv.xy;
     float px = unit * dist / (t * rw.z);
     float edge = clamp(min(h.x - abs(p.x), h.y - abs(p.y)) * px + 0.5, 0.0, 1.0);
     if (edge <= 0.0) return half4(0.0);
     bool seen = rd.z > 0.0;
     float2 uv = p / h * 0.5 + 0.5;
-    float4 c = pic(uv);
+    float4 c = tex(uv, h);
     if (!seen && back > 1.5) c = float4(backColor.rgb * backColor.a, backColor.a);
-    else if (!seen && back > 0.5) c = pic(float2(1.0 - uv.x, uv.y));
+    else if (!seen && back > 0.5) c = tex(float2(1.0 - uv.x, uv.y), h);
     return half4(shade(c, normalize(m * float3(0.0, 0.0, seen ? -1.0 : 1.0)), -rw) * edge);
 }
 """

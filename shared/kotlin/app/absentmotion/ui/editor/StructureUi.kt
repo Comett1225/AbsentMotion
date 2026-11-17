@@ -115,6 +115,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import app.absentmotion.ui.HoldName
 
 private val ItemShape = RoundedCornerShape(4.dp)
 
@@ -409,6 +410,7 @@ internal fun MultiTopBar(state: EditorState, modifier: Modifier) {
                 Alignment.Center,
             ) {
                 LayerParentIcon(back = Am.Accent, ink = tint, dot = tint)
+                HoldName(linkLabel)
                 Presence(parentMenu) { MultiParentMenu(state) { parentMenu = false } }
             }
             SelectionButton(ChromeIcons.Trash, stringResource(R.string.structure_delete_selected), cell, tint, ids.isNotEmpty()) { state.deleteChosen() }
@@ -444,6 +446,7 @@ internal fun pasteEffectsOnSelection(state: EditorState, context: Context) {
 private fun SelectionButton(icon: ImageVector, description: String, modifier: Modifier, tint: Color, enabled: Boolean = true, action: () -> Unit) {
     Box(modifier.alpha(if (enabled) 1f else DimAlpha).clickable(enabled = enabled, onClick = action), Alignment.Center) {
         Icon(icon, description, Modifier.size(24.dp), tint = tint)
+        HoldName(description)
     }
 }
 

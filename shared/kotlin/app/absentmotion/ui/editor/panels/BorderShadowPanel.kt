@@ -87,6 +87,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
+import app.absentmotion.ui.HoldName
 
 private var tab by mutableIntStateOf(0)
 private var colourEditing by mutableStateOf<PropRef?>(null)
@@ -154,6 +155,7 @@ internal fun BorderShadowTabs(modifier: Modifier) {
                 Box(Modifier.fillMaxSize().pressShape(press, PanelShape).then(if (tab == i) Modifier.background(PanelDark) else Modifier), contentAlignment = Alignment.Center) {
                     PanelIcon(TabIcons[i], if (tab == i) Am.Accent else Am.OnDark, description = stringResource(TabNames[i]))
                 }
+                HoldName(stringResource(TabNames[i]))
             }
         }
     }
@@ -195,6 +197,7 @@ private fun ColourEditor(state: EditorState, layer: Layer, ref: PropRef) {
         Row(Modifier.offset(28.px, 37.px).size(856.px, 83.px).clip(PanelShape).background(Am.Field), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(83.px).clickable { colourEditing = null }, contentAlignment = Alignment.Center) {
                 PanelIcon(PanelIcons.Check, Am.Accent, description = stringResource(R.string.done))
+                HoldName(stringResource(R.string.done))
             }
             Text(stringResource(R.string.color), color = Am.OnDark, fontSize = 15.sp, maxLines = 1, softWrap = false)
         }
@@ -233,14 +236,15 @@ private fun StrokeTab(state: EditorState, layer: Layer) {
         Box(Modifier.at(0, 119, 721, 160)) {
             EffectRuler(s.width, 0.1f, 0f, 10000f, on, { strokeField = 0 }, { state.setRow(StrokeSize, "$it", true) }, state::endGesture,
                 Modifier.fillMaxSize().padding(end = 104.px), default = 4f, vibrate = state.settings.vibration)
-            ValueBox(formatFixed(s.width, 1), false, strokeField == 0, Modifier.align(Alignment.CenterEnd).size(155.px, 127.px), 8f, on) {
-                if (strokeField == 0) state.askNumber("", s.width, "", 0f, 10000f) { v -> state.setRow(StrokeSize, "${v.coerceAtLeast(0f)}", false) } else strokeField = 0
+            ValueBox(formatFixed(s.width, 1), false, strokeField == 0, Modifier.align(Alignment.CenterEnd).size(155.px, 127.px), 8f, on, { strokeField = 0 }) {
+                strokeField = 0
+                state.askNumber("", s.width, "", 0f, 10000f) { v -> state.setRow(StrokeSize, "${v.coerceAtLeast(0f)}", false) }
             }
         }
         val caps = listOf("butt", "round", "square")
         val joins = listOf("bevel", "round", "miter")
-        Choices(3, app.absentmotion.model.strokeCapIndex(s.cap), Modifier.at(23, 302, 338, 84), on, { state.editSelected { l -> l.withStrokeAttr("cap", caps[it]) } }) { i, lit -> capGlyph(i, lit) }
-        Choices(3, joins.indexOf(s.join).coerceAtLeast(0), Modifier.at(383, 302, 338, 84), on, { state.editSelected { l -> l.withStrokeAttr("join", joins[it]) } }) { i, lit -> joinGlyph(i, lit) }
+        Choices(CapNames, app.absentmotion.model.strokeCapIndex(s.cap), Modifier.at(23, 302, 338, 84), on, { state.editSelected { l -> l.withStrokeAttr("cap", caps[it]) } }) { i, lit -> capGlyph(i, lit) }
+        Choices(JoinNames, joins.indexOf(s.join).coerceAtLeast(0), Modifier.at(383, 302, 338, 84), on, { state.editSelected { l -> l.withStrokeAttr("join", joins[it]) } }) { i, lit -> joinGlyph(i, lit) }
         for (end in 0..1) {
             Box(
                 Modifier.at(if (end == 0) 23 else 383, 409, 338, 84).clip(PanelShape).background(ButtonBg)
@@ -254,23 +258,47 @@ private fun StrokeTab(state: EditorState, layer: Layer) {
                     drawPath(Path().apply { moveTo(x, 8 * u); lineTo(x + dx, 8 * u); lineTo(x, 18 * u); close() }, Am.Caption)
                 }
                 val style = if (end == 0) s.start else s.end
-                if (style == "none") Text(stringResource(if (end == 0) R.string.border_stroke_start else R.string.border_stroke_end), color = Am.OnDark, fontSize = 16.sp, maxLines = 1, softWrap = false)
-                else EndGlyph(style, Am.OnDark, 40.dp)
+                val name = stringResource(if (end == 0) R.string.border_stroke_start else R.string.border_stroke_end)
+                if (style == "none") Text(name, color = Am.OnDark, fontSize = 16.sp, maxLines = 1, softWrap = false)
+                else { EndGlyph(style, Am.OnDark, 40.dp); HoldName(name) }
             }
         }
     }
 }
 
+private val CapNames = listOf(R.string.stroke_cap_butt, R.string.stroke_cap_round, R.string.stroke_cap_square)
+private val JoinNames = listOf(R.string.stroke_join_bevel, R.string.stroke_join_round, R.string.stroke_join_miter)
+
 @Composable
-private fun Choices(count: Int, selected: Int, modifier: Modifier, enabled: Boolean, onPick: (Int) -> Unit, glyph: DrawScope.(Int, Boolean) -> Unit) {
+private fun Choices(names: List<Int>, selected: Int, modifier: Modifier, enabled: Boolean, onPick: (Int) -> Unit, glyph: DrawScope.(Int, Boolean) -> Unit) {
     Row(modifier.clip(PanelShape).background(ButtonBg), Arrangement.spacedBy(3.px)) {
-        for (i in 0 until count) {
-            Canvas(
-                Modifier.weight(1f).fillMaxHeight().clip(PanelShape).background(if (i == selected) CardBg else ButtonBg)
+        names.forEachIndexed { i, id ->
+            val name = stringResource(id)
+            Box(
+                Modifier.weight(1f).fillMaxHeight().clip(PanelShape).background(if (i == selected) CardBg else ButtonBg).buttonLabel(name)
                     .then(if (enabled) Modifier.clickable { onPick(i) } else Modifier),
-            ) { glyph(i, i == selected) }
+            ) {
+                Canvas(Modifier.matchParentSize()) { glyph(i, i == selected) }
+                HoldName(name)
+            }
         }
     }
+}
+
+private fun endName(style: String) = when (style) {
+    "arrow" -> R.string.stroke_end_arrow
+    "t-line" -> R.string.stroke_end_t_line
+    "square" -> R.string.stroke_end_square
+    "square-filled" -> R.string.stroke_end_square_filled
+    "diamond" -> R.string.stroke_end_diamond
+    "diamond-filled" -> R.string.stroke_end_diamond_filled
+    "arrow-hollow" -> R.string.stroke_end_arrow_hollow
+    "arrow-filled" -> R.string.stroke_end_arrow_filled
+    "circle-hollow" -> R.string.stroke_end_circle_hollow
+    "circle-filled" -> R.string.stroke_end_circle_filled
+    "teardrop-hollow" -> R.string.stroke_end_teardrop_hollow
+    "teardrop-filled" -> R.string.stroke_end_teardrop_filled
+    else -> R.string.none
 }
 
 private val GlyphFill get() = Am.OnDark
@@ -328,7 +356,7 @@ private fun EndPicker(state: EditorState, layer: Layer) {
     val current = if (which == 0) s.start else s.end
     Column(Modifier.fillMaxSize()) {
         Row(Modifier.fillMaxWidth().height(40.dp).padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(32.dp).clickable { endPicker = -1 }, contentAlignment = Alignment.Center) { PanelIcon(PanelIcons.Back, Am.OnDark, description = stringResource(R.string.topbar_back)) }
+            Box(Modifier.size(32.dp).clickable { endPicker = -1 }, contentAlignment = Alignment.Center) { PanelIcon(PanelIcons.Back, Am.OnDark, description = stringResource(R.string.topbar_back)); HoldName(stringResource(R.string.topbar_back)) }
             Text(stringResource(if (which == 0) R.string.border_stroke_start else R.string.border_stroke_end), Modifier.padding(start = 8.dp).weight(1f), color = Am.OnDark, fontSize = 15.sp)
         }
         EffectNumbers(state, spinner("Size", stringResource(R.string.panel_size), "0.1", default = "1"), "${s.endSize}", true, true, {}) { text, gesture ->
@@ -336,12 +364,14 @@ private fun EndPicker(state: EditorState, layer: Layer) {
         }
         Row(Modifier.fillMaxSize().horizontalScroll(rememberScrollState()).padding(8.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             StrokeEnds.forEach { style ->
+                val name = stringResource(endName(style))
                 Box(
-                    Modifier.size(52.dp, 50.dp).clip(PanelShape).background(if (style == current) CardBg else ButtonBg)
+                    Modifier.size(52.dp, 50.dp).clip(PanelShape).background(if (style == current) CardBg else ButtonBg).then(if (style == "none") Modifier else Modifier.buttonLabel(name))
                         .clickable { state.editSelected { it.withStrokeAttr(if (which == 0) "start" else "end", style) } },
                     contentAlignment = Alignment.Center,
                 ) {
-                    if (style == "none") Text(stringResource(R.string.none), color = if (style == current) Am.Accent else Am.OnDark, fontSize = deskSp(11f)) else EndGlyph(style, if (style == current) Am.Accent else Am.OnDark)
+                    if (style == "none") Text(name, color = if (style == current) Am.Accent else Am.OnDark, fontSize = deskSp(11f))
+                    else { EndGlyph(style, if (style == current) Am.Accent else Am.OnDark); HoldName(name) }
                 }
             }
         }
@@ -376,6 +406,7 @@ private fun BorderTab(state: EditorState, layer: Layer) {
                                         Text(stringResource(R.string.border), Modifier.padding(start = 30.px).weight(1f), color = Am.OnDark, fontSize = 16.sp, maxLines = 1)
                                         Box(Modifier.size(101.px).clickable { state.editSelected { it.withBorderRemoved(b.index) }; openBorder = -1 }, contentAlignment = Alignment.Center) {
                                             PanelIcon(ChromeIcons.Trash, Am.OnDark, size = 28.dp, description = stringResource(R.string.delete))
+                                            HoldName(stringResource(R.string.delete))
                                         }
                                     } else Row(verticalAlignment = Alignment.CenterVertically) {
                                         Text(formatPlain(b.size) + "px", Modifier.padding(start = 28.px).width(78.px), color = Am.OnDark, maxLines = 1, softWrap = false, autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(8.sp, 16.sp, 0.5.sp))

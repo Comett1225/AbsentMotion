@@ -90,11 +90,7 @@ fun androidx.compose.ui.graphics.drawscope.DrawScope.drawLiveStroke(path: DrawPa
 suspend fun slotPicture(context: Context, uri: String, video: Boolean): androidx.compose.ui.graphics.ImageBitmap? = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
     runCatching {
         if (video) {
-            val retriever = android.media.MediaMetadataRetriever()
-            try {
-                retriever.setDataSource(context, Uri.parse(openableUri(uri)))
-                retriever.scaledFrame(0, android.media.MediaMetadataRetriever.OPTION_CLOSEST_SYNC, 288, 288)
-            } finally { retriever.release() }
+            app.absentmotion.media.firstFrame(context, Uri.parse(openableUri(uri)), 288)
         } else {
             val resolver = context.contentResolver
             val bounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
@@ -238,6 +234,8 @@ fun Hint(text: String, content: @androidx.compose.runtime.Composable () -> Unit)
 fun Hint(text: String, modifier: androidx.compose.ui.Modifier, content: @androidx.compose.runtime.Composable () -> Unit) = content()
 
 fun linkFolderLabel(): String = ""
+
+val NameLabelWindow = androidx.compose.ui.window.PopupProperties(android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or android.view.WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
 
 fun libraryFolderName(uri: android.net.Uri): String? = null
 
@@ -451,7 +449,8 @@ internal fun desktopCutout(handle: Long, bitmap: android.graphics.Bitmap, size: 
 
 internal suspend fun desktopGifVideo(context: Context, uri: Uri): app.absentmotion.media.GifVideo? = null
 
-internal fun desktopFrameReader(context: Context, uri: String): app.absentmotion.media.DesktopFrameInput? = app.absentmotion.media.MediaBackend.ffamp(context)?.softFrames(context, uri)
+internal fun desktopFrameReader(context: Context, uri: String): app.absentmotion.media.DesktopFrameInput? =
+    app.absentmotion.media.MediaBackend.ffamp(context, Uri.parse(openableUri(uri)), "video/")?.softFrames(context, uri)
 
 fun rawFrameImage(rgba: ByteArray, width: Int, height: Int): androidx.compose.ui.graphics.ImageBitmap =
     android.graphics.Bitmap.createBitmap(width, height, android.graphics.Bitmap.Config.ARGB_8888).apply { copyPixelsFromBuffer(java.nio.ByteBuffer.wrap(rgba)) }.androidImageBitmap()

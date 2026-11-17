@@ -268,6 +268,8 @@ fun Hint(text: String, modifier: Modifier, content: @Composable () -> Unit) = an
 
 fun linkFolderLabel(): String = app.absentmotion.i18n.AppText.get(R.string.desk_link_folder)
 
+val NameLabelWindow = androidx.compose.ui.window.PopupProperties(focusable = false)
+
 fun libraryFolderName(uri: android.net.Uri): String? = app.absentmotion.desk.DeskLibrary.folderOf(uri)?.let { it.name.ifEmpty { it.path } }
 
 fun removeFromLibrary(uri: android.net.Uri, unlinkFolder: Boolean) = app.absentmotion.desk.DeskLibrary.hide(uri, unlinkFolder)

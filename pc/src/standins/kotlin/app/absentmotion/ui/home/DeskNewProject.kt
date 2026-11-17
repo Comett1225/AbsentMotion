@@ -62,9 +62,11 @@ import app.absentmotion.library.ProjectStore
 import app.absentmotion.platform.LocalContext
 import app.absentmotion.ui.editor.deskVerticalScroll
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.theme.withUiFont
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import app.absentmotion.ui.editor.panels.DoubleTapToType
 
 @Composable
 internal fun DeskNewProject(
@@ -172,7 +174,7 @@ private fun NameRow(form: Form) {
         Row(Modifier.fillMaxWidth().height(40.dp).clip(shape).background(Am.HomeBg).border(1.dp, Am.HomeLine, shape).padding(start = 12.dp), verticalAlignment = Alignment.CenterVertically) {
             BasicTextField(
                 value, { value = it; form.name = it.text }, Modifier.weight(1f).focusRequester(focus),
-                textStyle = TextStyle(color = Am.HomeInk, fontSize = 15.sp), singleLine = true, cursorBrush = SolidColor(Am.Navy),
+                textStyle = TextStyle(color = Am.HomeInk, fontSize = 15.sp).withUiFont(), singleLine = true, cursorBrush = SolidColor(Am.Navy),
             )
             DeskIconButton(HomeIcons.ClearCircle, stringResource(R.string.newproject_clear_title), { form.name = "" }, size = 36.dp, tooltip = null)
         }
@@ -230,12 +232,14 @@ private fun CustomSize(form: Form) {
 @Composable
 private fun NumberField(value: String, onChange: (String) -> Unit, onLeave: () -> Unit, modifier: Modifier) {
     val shape = RoundedCornerShape(10.dp)
-    BasicTextField(
-        value, onChange, modifier.height(36.dp).clip(shape).background(Am.Card).border(1.dp, Am.HomeLine, shape).onFocusChanged { if (!it.isFocused) onLeave() },
-        textStyle = TextStyle(color = Am.HomeInk, fontSize = 14.sp, textAlign = TextAlign.Center), singleLine = true,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), cursorBrush = SolidColor(Am.Navy),
-        decorationBox = { inner -> Box(Modifier.fillMaxWidth().height(36.dp), Alignment.Center) { inner() } },
-    )
+    DoubleTapToType(value, onChange, modifier.height(36.dp)) { gate, typed, onTyped ->
+        BasicTextField(
+            typed, onTyped, gate.clip(shape).background(Am.Card).border(1.dp, Am.HomeLine, shape).onFocusChanged { if (!it.isFocused) onLeave() },
+            textStyle = TextStyle(color = Am.HomeInk, fontSize = 14.sp, textAlign = TextAlign.Center).withUiFont(), singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), cursorBrush = SolidColor(Am.Navy),
+            decorationBox = { inner -> Box(Modifier.fillMaxWidth().height(36.dp), Alignment.Center) { inner() } },
+        )
+    }
 }
 
 @Composable
@@ -298,7 +302,7 @@ private fun DeskSizeName(title: String, initial: String, onDismiss: () -> Unit, 
         BasicTextField(
             text, { text = it.copy(text = it.text.take(SavedSizes.MAX_NAME)) }, Modifier.padding(horizontal = 24.dp, vertical = 16.dp).fillMaxWidth().focusRequester(focus).clip(RoundedCornerShape(10.dp)).background(Am.HomeBg)
                 .border(1.dp, Am.HomeLine, RoundedCornerShape(10.dp)).padding(horizontal = 12.dp, vertical = 10.dp),
-            textStyle = TextStyle(color = Am.Navy, fontSize = 14.sp), singleLine = true, cursorBrush = SolidColor(Am.Navy),
+            textStyle = TextStyle(color = Am.Navy, fontSize = 14.sp).withUiFont(), singleLine = true, cursorBrush = SolidColor(Am.Navy),
             decorationBox = { inner ->
                 Box {
                     if (hint != null && text.text.isEmpty()) Text(hint, color = Am.Navy.copy(alpha = 0.45f), fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)

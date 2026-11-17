@@ -1,5 +1,6 @@
 package app.absentmotion.media
 
+import app.absentmotion.export.ExportError
 import app.absentmotion.export.ExportSettings
 import app.absentmotion.platform.Context
 import app.absentmotion.platform.PlatformFeatures
@@ -101,11 +102,18 @@ object FfampFirst : MediaEngine by FfampEngine {
         of(input).compress(input, job, audio, durationUs, out, startUs, endUs, progress, alive)
     override fun extractAudio(input: File, job: AudioJob, durationUs: Long, out: File, progress: (Float) -> Unit, alive: () -> Boolean) =
         of(input).extractAudio(input, job, durationUs, out, progress, alive)
-    override fun trim(input: File, startUs: Long, endUs: Long, out: File, progress: (Float) -> Unit, alive: () -> Boolean) = of(input).trim(input, startUs, endUs, out, progress, alive)
+    override fun trim(input: File, startUs: Long, endUs: Long, out: File, progress: (Float) -> Unit, alive: () -> Boolean) {
+        if (reads(input)) try { return FfampEngine.trim(input, startUs, endUs, out, progress, alive) } catch (_: ExportError) {}
+        FfmpegEngine.trim(input, startUs, endUs, out, progress, alive)
+    }
     override fun reverse(parts: ReverseParts, progress: (Float) -> Unit, alive: () -> Boolean) = of(parts.input).reverse(parts, progress, alive)
     override fun steadyFrames(file: File, start: String, length: String, rate: String, width: Int, height: Int) = of(file).steadyFrames(file, start, length, rate, width, height)
     override fun frameSink(out: File, spec: FrameSinkSpec) = (spec.audioFrom?.let(::of) ?: FfampEngine).frameSink(out, spec)
-    override fun withoutAudio(file: File) = of(file).withoutAudio(file)
+    override fun withoutAudio(file: File) = (if (reads(file)) FfampEngine.withoutAudio(file) else file).takeIf { it != file } ?: FfmpegEngine.withoutAudio(file)
+    override fun downloadOptions(plan: Plan, mode: SaveMode, dir: File) =
+        FfampEngine.downloadOptions(plan, mode, dir).toMutableList().also { it[it.indexOf("--ffmpeg-location") + 1] = FfmpegEngine.ffmpeg }
+    override fun downloaded(plan: Plan, mode: SaveMode, dir: File) =
+        FfampEngine.downloaded(plan, mode, dir) { video, audio, out -> FfampNative.merge(video.path, audio.path, out.path) == null || FfmpegEngine.merge(video, audio, out) }
     override fun trouble(file: File) = of(file).trouble(file)
     override fun cameraDevices() = capture.cameraDevices()
     override fun cameraEncoder() = capture.cameraEncoder()

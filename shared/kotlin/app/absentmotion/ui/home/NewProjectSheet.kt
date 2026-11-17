@@ -116,10 +116,13 @@ import app.absentmotion.ui.adaptive.AdaptiveWindow
 import app.absentmotion.ui.adaptive.LocalAdaptiveSpace
 import app.absentmotion.ui.theme.presence
 import app.absentmotion.ui.theme.presenceScrim
+import app.absentmotion.ui.theme.withUiFont
 import kotlin.math.roundToInt
 import androidx.annotation.StringRes
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
+import app.absentmotion.ui.editor.panels.DoubleTapToType
+import app.absentmotion.ui.HoldName
 
 private val Ink get() = Am.HomeInk
 private val DimText get() = Am.HomeDim
@@ -339,6 +342,7 @@ private fun SheetBody(form: Form, settings: AppSettings, card: Boolean, onClose:
         if (card) Row(Modifier.padding(start = 20.dp, top = 12.dp).height(48.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(48.dp).clip(CircleShape).clickable(onClick = onClose), contentAlignment = Alignment.Center) {
                 Icon(HomeIcons.Close, stringResource(R.string.cancel), Modifier.size(22.dp), tint = Am.Navy)
+                HoldName(stringResource(R.string.cancel))
             }
             Text(stringResource(R.string.home_new_project), Modifier.padding(start = 4.dp), color = Am.Navy, fontSize = 20.sp, fontWeight = FontWeight.Bold, maxLines = 1)
         }
@@ -396,6 +400,7 @@ private fun SheetBody(form: Form, settings: AppSettings, card: Boolean, onClose:
             contentAlignment = Alignment.Center,
         ) {
             Icon(HomeIcons.Close, stringResource(R.string.cancel), Modifier.size(24.dp), tint = Am.Navy)
+            HoldName(stringResource(R.string.cancel))
         }
     }
 }
@@ -429,7 +434,7 @@ private fun NameField(form: Form) {
         BasicTextField(
             form.name, { form.name = it },
             Modifier.align(Alignment.CenterStart).fillMaxWidth().padding(start = 4.dp, end = 40.dp),
-            textStyle = TextStyle(color = Ink, fontSize = 16.sp), singleLine = true, cursorBrush = SolidColor(Am.Navy),
+            textStyle = TextStyle(color = Ink, fontSize = 16.sp).withUiFont(), singleLine = true, cursorBrush = SolidColor(Am.Navy),
         )
         Box(Modifier.align(Alignment.TopStart).offset(y = 31.dp).padding(horizontal = 4.dp).fillMaxWidth().height(1.dp).background(Am.HomeMid))
         Box(
@@ -437,6 +442,7 @@ private fun NameField(form: Form) {
             contentAlignment = Alignment.Center,
         ) {
             Icon(HomeIcons.ClearCircle, stringResource(R.string.newproject_clear_title), Modifier.size(24.dp), tint = Ink)
+            HoldName(stringResource(R.string.newproject_clear_title))
         }
     }
 }
@@ -450,15 +456,16 @@ private fun AspectRow(form: Form) {
             }
         }
         val custom = form.aspect == CUSTOM
-        AspectButton(31.dp, 31.dp, custom, onClick = { form.aspect = CUSTOM }) {
+        AspectButton(31.dp, 31.dp, custom, stringResource(R.string.newproject_custom_aspect), onClick = { form.aspect = CUSTOM }) {
             Icon(HomeIcons.Pencil, stringResource(R.string.newproject_custom_aspect), Modifier.size(16.dp), tint = if (custom) Am.OnAccent else Am.HomeDim)
         }
     }
 }
 
 @Composable
-private fun AspectButton(w: Dp, h: Dp, selected: Boolean, onClick: () -> Unit, content: @Composable BoxScope.() -> Unit) {
+private fun AspectButton(w: Dp, h: Dp, selected: Boolean, name: String = "", onClick: () -> Unit, content: @Composable BoxScope.() -> Unit) {
     Box(Modifier.height(56.dp).clickable(onClick = onClick).padding(horizontal = 9.25.dp), contentAlignment = Alignment.Center) {
+        HoldName(name)
         Box(Modifier.size(w, h).frameLook(selected), contentAlignment = Alignment.Center, content = content)
     }
 }
@@ -677,6 +684,7 @@ private fun CustomSize(form: Form) {
             Box(Modifier.size(27.dp).border(1.dp, tint, CircleShape), contentAlignment = Alignment.Center) {
                 Icon(HomeIcons.Link, stringResource(R.string.newproject_link), Modifier.size(20.dp), tint = tint)
             }
+            HoldName(stringResource(R.string.newproject_link))
         }
         NumberField(form.customH, form::editHeight, form::commitSides, Modifier.width(68.dp))
     }
@@ -684,15 +692,17 @@ private fun CustomSize(form: Form) {
 
 @Composable
 private fun NumberField(value: String, onChange: (String) -> Unit, onLeave: () -> Unit, modifier: Modifier) {
-    BasicTextField(
-        value, onChange,
-        modifier.fillMaxHeight().clip(FieldShape).background(Am.Card).onFocusChanged { if (!it.isFocused) onLeave() },
-        textStyle = TextStyle(color = Am.HomeInk, fontSize = 16.sp, textAlign = TextAlign.Center),
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-        cursorBrush = SolidColor(Am.Navy),
-        decorationBox = { inner -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { inner() } },
-    )
+    DoubleTapToType(value, onChange, modifier.fillMaxHeight()) { gate, typed, onTyped ->
+        BasicTextField(
+            typed, onTyped,
+            gate.clip(FieldShape).background(Am.Card).onFocusChanged { if (!it.isFocused) onLeave() },
+            textStyle = TextStyle(color = Am.HomeInk, fontSize = 16.sp, textAlign = TextAlign.Center).withUiFont(),
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            cursorBrush = SolidColor(Am.Navy),
+            decorationBox = { inner -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { inner() } },
+        )
+    }
 }
 
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
@@ -757,7 +767,7 @@ internal fun SizeNameDialog(title: String, initial: String, dark: Boolean, onDis
         text = {
             BasicTextField(
                 text, { text = it.copy(text = it.text.take(SavedSizes.MAX_NAME)) }, Modifier.fillMaxWidth().focusRequester(focus).clip(RoundedCornerShape(6.dp)).background(if (dark) Am.Panel else Am.HomeBg).padding(12.dp),
-                textStyle = TextStyle(color = ink, fontSize = 16.sp), singleLine = true, cursorBrush = SolidColor(accent),
+                textStyle = TextStyle(color = ink, fontSize = 16.sp).withUiFont(), singleLine = true, cursorBrush = SolidColor(accent),
                 keyboardOptions = KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Done),
                 keyboardActions = androidx.compose.foundation.text.KeyboardActions(onDone = { onDone(text.text) }),
                 decorationBox = { inner ->

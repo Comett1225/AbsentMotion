@@ -572,10 +572,45 @@ std::vector<float> columns3(const SkM44& m) {
     return {m.rc(0, 0), m.rc(1, 0), m.rc(2, 0), m.rc(0, 1), m.rc(1, 1), m.rc(2, 1), m.rc(0, 2), m.rc(1, 2), m.rc(2, 2)};
 }
 
+sk_sp<SkImageFilter> BoxPass(sk_sp<SkImageFilter> input, float reach, SkV2 dir, SkV2 shift) {
+    static const sk_sp<SkRuntimeEffect> effect = SkRuntimeEffect::MakeForShader(SkString(R"(
+uniform shader image;
+uniform float2 dir;
+uniform float2 shift;
+uniform float reach;
+half4 main(float2 p) {
+    float n = floor(reach);
+    float f = reach - n;
+    float2 c = p + shift;
+    float4 sum = float4(0.0);
+    float total = 0.0;
+    for (int i = 1; i <= 129; i++) {
+        float k = float(i);
+        if (k > n + 1.0) break;
+        float w = k <= n ? 1.0 : f;
+        float2 o = dir * (k - 0.5);
+        sum += w * (float4(image.eval(c + o)) + float4(image.eval(c - o)));
+        total += 2.0 * w;
+    }
+    return half4(total > 0.0 ? sum / total : float4(image.eval(p)));
+}
+)")).effect;
+    if (!effect) return input;
+    SkRuntimeShaderBuilder b(effect);
+    b.uniform("dir") = dir;
+    b.uniform("shift") = shift;
+    b.uniform("reach") = reach;
+    return SkImageFilters::RuntimeShader(b, reach + 1, "image", std::move(input));
+}
+
 sk_sp<SkImageFilter> BuiltInFilter(const std::string& id, const std::function<float(const char*, int, float)>& v,
                                    sk_sp<SkImageFilter> input) {
     if (id == "absent.blur") {
         const float sigma = std::max(v("strength", 0, 10), 0.0f) / 3;
+        if (v("shape", 0, 0) > 0.5f) {
+            const float reach = std::min(sigma, 128.0f);
+            return reach > 0 ? BoxPass(BoxPass(input, reach, {1, 0}, {-0.5f, 0}), reach, {0, 1}, {0, 0.5f}) : input;
+        }
         return sigma > 0 ? SkImageFilters::Blur(sigma, sigma, SkTileMode::kDecal, input) : input;
     }
     const float length = std::max(v("length", 0, 40), 0.0f), angle = v("angle", 0, 0);
@@ -1269,12 +1304,22 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
                 const SkRect grown = f->computeFastBounds(box);
                 if (grown.width() > box.width() + 8 || grown.height() > box.height() + 8) box = grown;
             }
+            const SkRect kept = box;
+            if (cells && e.id == "absent.mosaic" && Value(e, defaults, "average", 0, t, 0) > 0.5f) {
+                const float cell = area.height() / std::max(Value(e, defaults, "count", 0, t, 20), 1.0f);
+                box.outset(std::min(std::abs(Value(e, defaults, "stretch", 0, t, 1)) * cell, kWrapPixels),
+                           std::min(std::abs(Value(e, defaults, "stretch", 1, t, 1)) * cell, kWrapPixels));
+            }
             std::vector<std::string_view> names = {"image"};
-            std::vector<sk_sp<SkImageFilter>> inputs = {cells ? SkImageFilters::Crop(box.makeInset(1, 1), SkTileMode::kMirror, f) : f};
+            std::vector<sk_sp<SkImageFilter>> inputs = {cells ? SkImageFilters::Crop(kept.makeInset(1, 1), SkTileMode::kMirror, f) : f};
             if (d->blurred) {
                 const float spread = e.id == "absent.electricedges" ? Value(e, defaults, "strength", 0, t, -1) : -1;
-                const float sigma = spread >= 0 ? std::max(spread, 0.02f) * kEdgeSpread * std::hypot((float)scene.width, (float)scene.height)
-                                                : std::max(Value(e, defaults, "blur", 0, t, 0), 0.0f) / 3;
+                const bool redMask = e.id == "absent.unsharpmask" && Value(e, defaults, "showMask", 0, t, 0) > 0.5f &&
+                                     Value(e, defaults, "maskColor", 0, t, 0) > 0.5f;
+                const float sigma = e.id == "absent.unsharpmask"
+                                        ? redMask ? std::max(Value(e, defaults, "radius", 0, t, 0), 0.0f) * 25 * std::min(scene.width, scene.height) / 1080.0f : 0
+                                    : spread >= 0 ? std::max(spread, 0.02f) * kEdgeSpread * std::hypot((float)scene.width, (float)scene.height)
+                                                  : std::max(Value(e, defaults, "blur", 0, t, 0), 0.0f) / 3;
                 auto blurOf = [&](sk_sp<SkImageFilter> source) {
                     return sigma > 0 ? SkImageFilters::Blur(sigma, sigma, SkTileMode::kDecal, source) : source;
                 };

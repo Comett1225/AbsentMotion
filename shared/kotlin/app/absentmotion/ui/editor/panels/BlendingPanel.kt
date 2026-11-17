@@ -76,7 +76,7 @@ internal fun BlendingPanel(state: EditorState, layer: Layer, modifier: Modifier 
         OpacitySlider(state, opacity, Modifier.offset(122.px, 14.px).size(560.px, 113.px))
         Box(
             Modifier.offset(734.px, 14.px).size(158.px, 113.px).clip(PanelShape).background(ValueFill)
-                .clickable { state.askNumber("", opacity * 100, "%", 0f, 100f) { v -> state.setNumber(OpacityRef, (v / 100f).coerceIn(0f, 1f)) } },
+                .typeOnDoubleTap { state.askNumber("", opacity * 100, "%", 0f, 100f) { v -> state.setNumber(OpacityRef, (v / 100f).coerceIn(0f, 1f)) } },
             contentAlignment = Alignment.Center,
         ) { Text("${Math.round(opacity * 100)}%", color = Am.OnDark, fontSize = 15.5.sp, maxLines = 1, softWrap = false) }
         Column(

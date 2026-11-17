@@ -103,10 +103,12 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.layout.findRootCoordinates
 import app.absentmotion.ui.theme.Motion
+import app.absentmotion.ui.theme.withUiFont
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.sign
+import app.absentmotion.ui.HoldName
 
 internal val LocalBlockedCategory = androidx.compose.runtime.staticCompositionLocalOf<String?> { null }
 
@@ -281,7 +283,7 @@ private fun BrowserBody(state: EditorState) {
                 val focus = remember { FocusRequester() }
                 LaunchedEffect(Unit) { focus.requestFocus() }
                 BasicTextField(query, { query = it }, Modifier.weight(1f).padding(8.dp).focusRequester(focus), singleLine = true,
-                    textStyle = TextStyle(color = Am.OnDark, fontSize = 17.sp, textDirection = androidx.compose.ui.text.style.TextDirection.Content), cursorBrush = SolidColor(Am.Accent))
+                    textStyle = TextStyle(color = Am.OnDark, fontSize = 17.sp, textDirection = androidx.compose.ui.text.style.TextDirection.Content).withUiFont(), cursorBrush = SolidColor(Am.Accent))
             }
             else Text(heading, Modifier.weight(1f), color = Am.OnDark, fontSize = 17.sp, textAlign = TextAlign.Center, maxLines = 1)
             if (audio) Spacer(Modifier.size(44.dp))
@@ -304,7 +306,10 @@ private fun BrowserBody(state: EditorState) {
                     if (state.effectDetail == null) Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Text(stringResource(R.string.standard_settings), Modifier.weight(1f).height(48.dp).alpha(if (effect.usable(blocked)) 1f else 0.35f)
                             .clickable(enabled = effect.usable(blocked)) { add(effect) }.padding(12.dp), color = Am.OnDark, fontSize = 15.sp)
-                        FavouriteStar(effect.id in favourites, stringResource(R.string.effectbrowser_favorite), Modifier.size(48.dp).clickable { favourite(effect) }.padding(12.dp))
+                        Box(Modifier.size(48.dp).clickable { favourite(effect) }) {
+                            FavouriteStar(effect.id in favourites, stringResource(R.string.effectbrowser_favorite), Modifier.fillMaxSize().padding(12.dp))
+                            HoldName(stringResource(R.string.effectbrowser_favorite))
+                        }
                     }
                     if (state.effectDetail == null) effect.presets.forEach { preset ->
                         Row(Modifier.fillMaxWidth().height(72.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -451,6 +456,7 @@ private val RecommendedBg get() = Am.PanelInset
 private fun BrowserButton(icon: ImageVector, description: String, onClick: () -> Unit) {
     Box(Modifier.size(44.dp).clickable(onClick = onClick), contentAlignment = Alignment.Center) {
         Icon(icon, description, Modifier.size(24.dp), tint = Am.OnDark)
+        HoldName(description)
     }
 }
 
@@ -532,6 +538,7 @@ private fun EffectTile(catalog: EffectCatalog, effect: EffectDefinition, width: 
 internal fun PresetStar(favourite: Boolean, onToggle: () -> Unit) {
     Box(Modifier.size(48.dp).toggleable(favourite, role = Role.Checkbox) { onToggle() }, contentAlignment = Alignment.Center) {
         app.absentmotion.ui.editor.DeskTip(stringResource(R.string.effectbrowser_favorite_preset)) { FavouriteStar(favourite, stringResource(R.string.effectbrowser_favorite_preset), Modifier.size(24.dp)) }
+        HoldName(stringResource(R.string.effectbrowser_favorite_preset))
     }
 }
 

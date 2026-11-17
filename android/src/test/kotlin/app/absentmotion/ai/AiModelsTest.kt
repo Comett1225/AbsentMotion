@@ -12,6 +12,7 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlinx.coroutines.launch
 import java.io.File
 import java.security.MessageDigest
 
@@ -332,5 +333,40 @@ class AiModelsTest {
         assertNull(awaitProbe(hanging, 50))
         assertTrue(hanging.isCancelled)
         assertEquals(true, awaitProbe(kotlinx.coroutines.CompletableDeferred(true), 50))
+    }
+
+    @Test fun cancellingAStalledModelDownloadClosesTheConnectionAtOnce() = kotlinx.coroutines.runBlocking {
+        val closed = java.util.concurrent.CountDownLatch(1)
+        val open = modelConnection
+        modelConnection = { url ->
+            object : java.net.HttpURLConnection(java.net.URL(url)) {
+                override fun connect() {}
+                override fun usingProxy() = false
+                override fun disconnect() = closed.countDown()
+                override fun getResponseCode() = HTTP_OK
+                override fun getInputStream() = object : java.io.InputStream() {
+                    private var sent = false
+                    override fun read() = throw java.io.IOException()
+                    override fun read(b: ByteArray, off: Int, len: Int): Int {
+                        if (!sent) { sent = true; return 1_000 }
+                        closed.await(60, java.util.concurrent.TimeUnit.SECONDS)
+                        throw java.io.IOException("closed")
+                    }
+                }
+            }
+        }
+        val dir = java.nio.file.Files.createTempDirectory("ai-stall").toFile()
+        try {
+            val receiving = kotlinx.coroutines.CompletableDeferred<Unit>()
+            val file = ModelFile("model.bin", "https://example.invalid/model.bin", 200_000, "0".repeat(64))
+            val job = launch(kotlinx.coroutines.Dispatchers.IO) { runCatching { fetch(file, File(dir, "model.bin"), {}) { receiving.complete(Unit) } } }
+            kotlinx.coroutines.withTimeout(10_000) { receiving.await() }
+            job.cancel()
+            assertNotNull(kotlinx.coroutines.withTimeoutOrNull(3_000) { job.join() })
+        } finally {
+            closed.countDown()
+            modelConnection = open
+            dir.deleteRecursively()
+        }
     }
 }

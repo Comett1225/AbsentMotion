@@ -66,8 +66,10 @@ class AlightLookTest {
                 val dir = File(stillsPath!!, sheet)
                 val original = Scene.parse(dir.resolve("scene.xml").readText())
                 if (original.node["width"] != "1080" || original.node["height"] != "1080") return@runCatching
-                val imported = migration.migrate(Scene(picture(original.node))).scene
-                val explicitScene = migration.migrate(Scene(picture(explicit(original.node)))).scene
+                val dropped = System.getenv("ALIGHT_DROP").orEmpty().split(',').filter { it.startsWith("$sheet/") }.map { it.substringAfter('/') }.toSet()
+                val kept = original.node.copy(children = original.node.children.filter { it.name != "shape" || it["label"] !in dropped })
+                val imported = migration.migrate(Scene(picture(kept))).scene
+                val explicitScene = migration.migrate(Scene(picture(explicit(kept)))).scene
                 assertEquals("Empty and explicit defaults: $sheet", imported.node.toXml(), explicitScene.node.toXml())
                 engine.setScene(imported)
                 val frames = dir.resolve("frames.json").takeIf { it.isFile }?.let { JSONObject(it.readText()) }?.let { json -> json.keySet().sorted().associateWith { json.getInt(it) } } ?: mapOf("00000.png" to 0)
@@ -77,6 +79,7 @@ class AlightLookTest {
                     val ours = engine.render(time, 1080, 1080)
                     val alight = ImageIO.read(dir.resolve(file))
                     require(alight.width == 1080 && alight.height >= 1116)
+                    if (System.getenv("ALIGHT_LOOK_FULL") == "1") ImageIO.write(ours, "png", out.resolve("$sheet-full${if (frame == 0) "" else "-$frame"}.png"))
                     for (tile in original.node.children.filter { it.name == "shape" && it["label"] !in setOf("base", "clock") && time in (it["startTime"]?.toIntOrNull() ?: 0)..(it["endTime"]?.toIntOrNull() ?: Int.MAX_VALUE) }) {
                         val label = tile["label"].orEmpty()
                         val effect = tile.child("effect")?.get("id").orEmpty()

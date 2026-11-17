@@ -128,6 +128,7 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import app.absentmotion.platform.LocalContext
@@ -137,6 +138,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.engine.EngineThread
@@ -217,7 +219,7 @@ import app.absentmotion.export.resolutionLabel
 import app.absentmotion.export.sampleRateChoices
 import app.absentmotion.export.shortName
 import app.absentmotion.export.suggestionLabel
-import app.absentmotion.export.exportSecondsLeft
+import app.absentmotion.export.ExportClock
 import app.absentmotion.export.timeLabel
 import app.absentmotion.export.videoBitrate
 import app.absentmotion.export.withContainer
@@ -239,6 +241,8 @@ import kotlinx.coroutines.CancellationException
 import android.provider.OpenableColumns
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -247,6 +251,7 @@ import kotlin.math.roundToInt
 import androidx.compose.foundation.layout.aspectRatio
 import app.absentmotion.export.problem
 import app.absentmotion.export.communityBytes
+import app.absentmotion.ui.HoldName
 
 private val Navy get() = Am.Navy
 private val NoteGrey get() = Am.HomeDim
@@ -260,11 +265,13 @@ private val GroupGap = 18.dp
 private val FieldGap = 6.dp
 private const val Dimmed = 0.38f
 
-private val SheetKinds = setOf(ExportKind.Gif, ExportKind.Sequence, ExportKind.FrameAs)
+private val SheetKinds = setOf(ExportKind.Gif, ExportKind.Sequence)
 
 private sealed interface Phase {
     data object Idle : Phase
-    class Running(val kind: ExportKind, val startNs: Long, val job: Job, val plannedMs: Long? = null) : Phase
+    class Running(val kind: ExportKind, val job: Job, val clock: ExportClock, @StringRes val title: Int = runningTitle(kind), @StringRes val reserve: Int? = null) : Phase {
+        var progress by mutableFloatStateOf(0f)
+    }
     class Done(val kind: ExportKind, val result: ExportResult) : Phase
 }
 
@@ -298,6 +305,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
     }
     DisposableEffect(settings) { onDispose { persist() } }
     var page by remember { mutableStateOf<ExportKind?>(null) }
+    var beforeFrame by remember { mutableStateOf(ExportKind.Video) }
     var community by remember { mutableStateOf<app.absentmotion.export.CommunityDetails?>(null) }
     var lastPage by remember { mutableStateOf(ExportKind.Gif) }
     var audioPage by remember { mutableStateOf(false) }
@@ -311,7 +319,6 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
     var phase by remember { mutableStateOf<Phase>(Phase.Idle) }
     page?.let { if (it in SheetKinds) lastPage = it }
     if (phase !is Phase.Idle) lastPhase = phase
-    var progress by remember { mutableFloatStateOf(0f) }
     var note by remember { mutableStateOf<UiText?>(null) }
     DisposableEffect(engine) {
         engine.holdVideo()
@@ -398,9 +405,13 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
     val better = remember(video, support, check) { betterChoice(video, support, check) }
     val warning = codecWarning(video, support)?.takeIf { it != acknowledged || support is Support.Unsupported }
     val current = settings.getValue(kind)
-    val modelMs = remember(kind, current, report, heat.level, estimate, phase is Phase.Idle, gifSample, drawMs, sequenceMs) {
+    val aiMs = if (kind == ExportKind.Video && current.interpolation == FrameInterpolation.Ai) {
+        val gmac = remember(scene, current.interpolationLevel, current.fps, videoSize) { AiSmooth.exportGmac(scene, current.interpolationLevel, current.fps, videoSize.first, videoSize.second) }
+        if (gmac > 0) aiSmoothEstimate(gmac, current.interpolationLevel)?.let { (it.seconds * 1000).toLong() } ?: 0L else 0L
+    } else 0L
+    val modelMs = remember(kind, current, report, heat.level, estimate, phase is Phase.Idle, gifSample, drawMs, sequenceMs, aiMs) {
         when (kind) {
-            ExportKind.Video -> times.estimateMs(current, scene, report?.probe, heat.level, report, drawMs?.takeUnless(Double::isNaN))
+            ExportKind.Video -> times.estimateMs(current, scene, report?.probe, heat.level, report, drawMs?.takeUnless(Double::isNaN), aiMs)
                 ?: if (drawMs?.isNaN() == true) times.roughMs(current, scene) else null
             ExportKind.Gif -> gifSample?.let { gifTimeMs(frameCount(scene, current.fps), it, times.estimateMs(current, scene, report?.probe, heat.level)) }
             ExportKind.Sequence -> times.estimateMs(current, scene, report?.probe, heat.level, null, sequenceMs?.takeUnless(Double::isNaN))
@@ -416,7 +427,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
         ExportKind.Gif -> gifSample == null && !gifFailed
         else -> false
     }
-    val timeMs = remember(modelMs, kind, phase is Phase.Idle) { modelMs?.let { m -> timeKey(kind)?.let { (m * sizes.ratio(it)).toLong() } ?: m } }
+    val timeMs = remember(modelMs, kind, phase is Phase.Idle) { modelMs?.let { m -> timeKey(kind, current)?.let { (m * sizes.ratio(it)).toLong() } ?: m } }
     val storage = if (estimate < 0) StorageStatus.Enough else storageStatus(estimate, free)
     val audioOnly = settings.getValue(ExportKind.Audio)
     val audioProblem = remember(report, audioOnly) { caps.checkAudioOnly(audioOnly) }
@@ -435,13 +446,18 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
 
     app.absentmotion.platform.ExportBars(dark = false, running = phase is Phase.Running)
     app.absentmotion.ui.theme.ThemeFade.Hold(phase is Phase.Running)
+    fun closePage() {
+        if (DESK && page == ExportKind.FrameAs) kind = beforeFrame
+        page = null
+    }
+
     BackHandler {
         when (phase) {
             is Phase.Running -> if (DESK) onClose() else (phase as? Phase.Running)?.job?.cancel()
             is Phase.Done -> phase = Phase.Idle
             Phase.Idle -> when {
                 audioPage -> audioPage = false
-                page != null -> page = null
+                page != null -> closePage()
                 else -> onClose()
             }
         }
@@ -506,21 +522,24 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
                 txt(R.string.ai_download_and_start), proceed = { start(ignoreMissing, true) })
             return
         }
+        val fetching = aiLevel?.takeIf { !AiSmooth.installed(context, it) }
+        val needed = estimate + (fetching?.let(AiSmooth::downloadBytes) ?: 0L)
         free = freeSpace()
-        if (kind != ExportKind.Gif && storageStatus(estimate, free) is StorageStatus.NotEnough) {
-            failure = Failure(R.string.export_storage_title, (storageStatus(estimate, free) as StorageStatus.NotEnough).message)
+        if (kind != ExportKind.Gif && storageStatus(needed, free) is StorageStatus.NotEnough) {
+            failure = Failure(R.string.export_storage_title, (storageStatus(needed, free) as StorageStatus.NotEnough).message)
             return
         }
         val chosen = kind
         val estimated = rawEstimate
         val modelled = modelMs
         persist()
-        val alsoTemplate = asTemplate
+        val alsoTemplate = asTemplate && page != ExportKind.FrameAs
         val name = exportName.next(chosen)
-        progress = 0f
+        val planned = timeMs
         note = null
         val background = chosen in BackgroundKinds
         Log.i("AMExport", "start ${chosen.name.lowercase()} estimated ${timeMs ?: -1} ms, drawing ${drawMs ?: -1.0} ms per frame")
+        val report: (Float) -> Unit = { done -> (phase as? Phase.Running)?.let { it.clock.add(done); it.progress = done }; ExportRun.progress = done }
         val job = app.absentmotion.platform.exportScope(scope).launch {
             var outcome: Boolean? = null
             try {
@@ -539,6 +558,23 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
                     }
                     if (chosen != ExportKind.Package) exported = scene.withMissing(missing.toSet())
                 }
+                if (fetching != null) {
+                    try {
+                        AiSmooth.download(context, fetching, report)
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        ensureActive()
+                        Log.w("AMExport", "the AI Smooth download failed", e)
+                        outcome = false
+                        phase = Phase.Idle
+                        failure = Failure(R.string.ai_smooth_download_failed, e.message?.let { txt(R.string.library_text_value, it) } ?: txt(R.string.ai_model_download_failed))
+                        return@launch
+                    }
+                    phase = Phase.Running(chosen, coroutineContext.job, ExportClock(planned), reserve = R.string.export_running_ai_smooth)
+                    ExportRun.title = runningTitle(chosen)
+                    ExportRun.progress = 0f
+                }
                 var predicted = estimated
                 if (chosen == ExportKind.Gif) {
                     val measured = measureGif(engine, exported, s).bytes
@@ -550,16 +586,15 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
                         return@launch
                     }
                 }
-                if (aiLevel != null && !AiSmooth.installed(context, aiLevel)) AiSmooth.download(context, aiLevel) { progress = it }
                 val began = System.nanoTime()
                 unlock.spend()
                 val result = Tier.unlocking(risks.mapNotNull { it.key as? Feature }) {
-                    (if (background) Exporter(context.applicationContext, app.absentmotion.platform.exportEngine(engine), MediaStoreExport(context.applicationContext), bundles = bundles) else exporter).export(chosen, exported, s, frame, name, { note = it }, community.takeIf { chosen == ExportKind.Package }) { progress = it; ExportRun.progress = it }
+                    (if (background) Exporter(context.applicationContext, app.absentmotion.platform.exportEngine(engine), MediaStoreExport(context.applicationContext), bundles = bundles) else exporter).export(chosen, exported, s, frame, name, { note = it }, community.takeIf { chosen == ExportKind.Package }, report)
                 }
                 outcome = true
                 if (background) app.absentmotion.platform.exportDone(result)
                 phase = Phase.Done(chosen, result)
-                timeKey(chosen)?.let { key -> modelled?.let { sizes.record(key, it, (System.nanoTime() - began) / 1_000_000) } }
+                timeKey(chosen, s)?.let { key -> modelled?.let { sizes.record(key, it, (System.nanoTime() - began) / 1_000_000) } }
                 ExportSizes.key(chosen, s)?.let { key ->
                     withContext(Dispatchers.IO) {
                         val written = result.uris.sumOf { uri ->
@@ -592,8 +627,10 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
                 if (background) ExportRun.end(outcome)
             }
         }
-        phase = Phase.Running(chosen, System.nanoTime(), job, timeMs)
-        if (background) ExportRun.begin(context, runningTitle(chosen)) { job.cancel() }
+        val first = if (fetching == null) Phase.Running(chosen, job, ExportClock(planned))
+            else Phase.Running(chosen, job, ExportClock(null, skipsStalls = false), R.string.export_running_ai_smooth, runningTitle(chosen))
+        phase = first
+        if (background) ExportRun.begin(context, first.title) { job.cancel() }
         if (background && !ExportRun.running) phase = Phase.Idle
     }
 
@@ -604,12 +641,16 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
     val twoPane = card && cfg.screenWidthDp > cfg.screenHeightDp && cfg.screenWidthDp - 48 >= app.absentmotion.ui.adaptive.WideFrom.value
     val bar: @Composable () -> Unit = { ExportBar(enabled = phase == Phase.Idle, blocked = blocked, pill = card, onClick = ::start) }
 
+    val framing = page == ExportKind.FrameAs
+    val closeFrame = { if (phase is Phase.Done) phase = Phase.Idle; closePage() }
+
     androidx.compose.runtime.CompositionLocalProvider(LocalRiskAsk provides askRisk) {
     if (DESK) DeskExport(
-        scene, frame, fromProjectList, engine, kinds, kind, { kind = it }, hasAudio, settings, check, hasEncoder, bitrateFits, explain, { help = true }, exportName,
+        scene, frame, fromProjectList, engine, if (framing) listOf(ExportKind.FrameAs) else kinds, kind, { if (it == ExportKind.FrameAs) { beforeFrame = kind; page = it }; kind = it }, hasAudio, settings, check, hasEncoder, bitrateFits, explain, { help = true }, exportName,
         warning, support is Support.SlowSoftwareOnly, better?.let { suggestionLabel(video, it) }, ::useBetter, { acknowledged = warning },
         free, estimate, timeMs, calculating, storage, blocked, asTemplate, { asTemplate = it }, { templateInfo = true }, { packageInfo = true }, { BundleFields(scene, engine, appSettings, community) { community = it } },
-        phase, progress, heat.level, note, { (phase as? Phase.Running)?.job?.cancel() }, { phase = Phase.Idle }, { (phase as? Phase.Done)?.let { share(context, it) } }, ::start, onClose,
+        phase, heat.level, note, { (phase as? Phase.Running)?.job?.cancel() }, { phase = Phase.Idle }, { (phase as? Phase.Done)?.let { share(context, it) } }, ::start,
+        if (framing) closeFrame else onClose, stringResource(if (framing) R.string.export_kind_frame_as else R.string.export_title),
     ) else Box(
         if (card) Modifier.fillMaxSize().background(Scrim).pointerInput(Unit) {}.windowInsetsPadding(WindowInsets.systemBars.union(WindowInsets.ime)).padding(24.dp).wrapContentSize()
             .widthIn(max = if (twoPane) 980.dp else 520.dp).heightIn(max = 760.dp).enterFade(12.dp).clip(RoundedCornerShape(18.dp)).background(Am.SheetBg)
@@ -661,6 +702,18 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
                 onBack = { page = null },
             )
         }
+        Presence(framing) {
+            PageFrame(stringResource(R.string.export_kind_frame_as), closeFrame, ExportIcons.Close, stringResource(R.string.cancel)) {
+                info()
+                ScrollArea(Modifier.weight(1f).fillMaxWidth(), Am.SheetBg, PaddingValues(start = 15.dp, end = 15.dp, top = 16.dp, bottom = 20.dp), GroupGap) {
+                    naming(ExportKind.FrameAs)
+                    Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(Am.Card).padding(15.dp), verticalArrangement = Arrangement.spacedBy(GroupGap)) {
+                        OptionsPage(ExportKind.FrameAs, scene, settings.getValue(ExportKind.FrameAs), explain, { help = true }) { settings[ExportKind.FrameAs] = it }
+                    }
+                }
+                bar()
+            }
+        }
         Presence(audioPage) {
             AudioSettingsPage(video, hasAudio, hasEncoder, { bitrateFits(it, false) }, { settings[ExportKind.Video] = it }, explain) { audioPage = false }
         }
@@ -695,7 +748,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
             val shown = lastPhase
             val background = animatedColor(if (shown is Phase.Done) Am.DoneBg else Scrim)
             Box(Modifier.fillMaxSize().presenceScrim(background).pointerInput(Unit) {}, contentAlignment = Alignment.Center) {
-                if (shown is Phase.Running) RunningPanel(shown, progress, heat.level, note) { shown.job.cancel() }
+                if (shown is Phase.Running) RunningPanel(shown, heat.level, note) { shown.job.cancel() }
                 else if (shown is Phase.Done) DoneScreen(shown.kind, shown.result, { phase = Phase.Idle }) { share(context, shown) }
             }
         }
@@ -763,7 +816,7 @@ private fun <T> Choice<T>.tap(selected: Boolean, ask: (UiText, () -> Unit) -> Un
 private fun AiSmoothHint(scene: Scene, s: ExportSettings, width: Int, height: Int) {
     if (s.interpolation != FrameInterpolation.Ai) return
     val gmac = remember(scene, s.interpolationLevel, s.fps, width, height) { AiSmooth.exportGmac(scene, s.interpolationLevel, s.fps, width, height) }
-    Hint(aiSmoothNote(aiSmoothEstimate(gmac, s.interpolationLevel), s.interpolationLevel, clip = false))
+    Hint(aiSmoothNote(if (gmac > 0) aiSmoothEstimate(gmac, s.interpolationLevel) else null, s.interpolationLevel, clip = false, idle = gmac <= 0))
 }
 
 @StringRes
@@ -793,6 +846,7 @@ private fun TitleBar(title: String, icon: ImageVector, description: String, onCl
     Box(Modifier.fillMaxWidth().background(Am.Card).windowInsetsPadding(WindowInsets.statusBars.union(WindowInsets.captionBar)).height(49.dp)) {
         Box(Modifier.size(44.dp).clickable(onClick = onClick), contentAlignment = Alignment.Center) {
             Icon(icon, description, Modifier.size(24.dp), tint = Navy)
+            HoldName(description)
         }
         Text(title, Modifier.align(Alignment.Center), color = Navy, fontSize = 18.sp, fontWeight = FontWeight.Bold)
         Box(Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(0.7.dp).background(Line))
@@ -850,7 +904,10 @@ private fun TemplateToggle(checked: Boolean, onChange: (Boolean) -> Unit, onInfo
         Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(R.string.also_keep_a_copy_as_a), Modifier.weight(1f, fill = false), color = Navy, maxLines = 1, overflow = TextOverflow.Ellipsis,
                 autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(11.sp, 16.sp))
-            Box(Modifier.size(36.dp).clickable(onClick = onInfo), contentAlignment = Alignment.Center) { Icon(ExportIcons.Info, stringResource(R.string.export_info), Modifier.size(20.dp), tint = Am.HomeDim) }
+            Box(Modifier.size(36.dp).clickable(onClick = onInfo), contentAlignment = Alignment.Center) {
+                Icon(ExportIcons.Info, stringResource(R.string.export_info), Modifier.size(20.dp), tint = Am.HomeDim)
+                HoldName(stringResource(R.string.export_info))
+            }
         }
         Switch(
             checked, onChange,
@@ -898,7 +955,10 @@ private fun OptionCard(
                 }
             }
             Box(Modifier.width(38.dp).fillMaxSize().then(if (right != null) Modifier.clickable(onClick = onRight) else Modifier), contentAlignment = Alignment.Center) {
-                if (right != null) Icon(right, stringResource(if (right == ExportIcons.Info) R.string.export_info else R.string.settings), Modifier.size(24.dp).alpha(if (enabled || right == ExportIcons.Info) 1f else Dimmed), tint = Am.HomeDim)
+                if (right != null) {
+                    Icon(right, stringResource(if (right == ExportIcons.Info) R.string.export_info else R.string.settings), Modifier.size(24.dp).alpha(if (enabled || right == ExportIcons.Info) 1f else Dimmed), tint = Am.HomeDim)
+                    HoldName(stringResource(if (right == ExportIcons.Info) R.string.export_info else R.string.settings))
+                }
             }
         }
         below?.let {
@@ -951,10 +1011,10 @@ private fun ResolutionDropdown(shortSide: Int, choices: List<Choice<app.absentmo
 }
 
 @Composable
-private fun PageFrame(title: String, onBack: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
+private fun PageFrame(title: String, onBack: () -> Unit, icon: ImageVector = ExportIcons.Back, description: String = stringResource(R.string.export_back), content: @Composable ColumnScope.() -> Unit) {
     Box(Modifier.fillMaxSize().presence(slide = 1f, fade = false).background(Am.SheetBg).pointerInput(Unit) {}, contentAlignment = Alignment.TopCenter) {
         Column(Modifier.widthIn(max = SheetMaxWidth).fillMaxSize()) {
-            TitleBar(title, ExportIcons.Back, stringResource(R.string.export_back), onBack)
+            TitleBar(title, icon, description, onBack)
             content()
         }
     }
@@ -1101,6 +1161,7 @@ private fun Field(
             Text(title, color = Navy, fontSize = if (DESK) 14.sp else 17.sp, fontWeight = if (DESK) FontWeight.Medium else null, maxLines = 1)
             if (onHelp != null) Box(Modifier.size(32.dp).clickable(onClick = onHelp), contentAlignment = Alignment.Center) {
                 Icon(ExportIcons.Help, stringResource(R.string.export_what_is, title), Modifier.size(20.dp), tint = ValueGrey)
+                HoldName(stringResource(R.string.export_what_is, title))
             }
             Spacer(Modifier.weight(1f))
             if (value != null) Text(value, color = ValueGrey, fontSize = if (DESK) 13.sp else 14.sp, maxLines = 1, style = Mixed)
@@ -1151,7 +1212,7 @@ private fun Ends(left: String, right: String) = Ltr {
     }
 }
 
-private val Mixed = TextStyle(textDirection = TextDirection.Content)
+private val Mixed: TextStyle @Composable get() = TextStyle(textDirection = TextDirection.Content, fontFamily = androidx.compose.material3.LocalTextStyle.current.fontFamily)
 
 @Composable
 private fun NavRow(text: String, note: String?, onClick: () -> Unit) {
@@ -1296,15 +1357,14 @@ private fun Chip(label: String, selected: Boolean, enabled: Boolean = true, risk
 }
 
 @Composable
-private fun BoxScope.RunningPanel(p: Phase.Running, progress: Float, heat: ThermalLevel, note: UiText?, onCancel: () -> Unit) {
-    val percent = (progress * 100).toInt().coerceIn(0, 100)
-    val now by produceState(System.nanoTime(), p) { while (true) { value = System.nanoTime(); delay(250) } }
-    val left = exportSecondsLeft((now - p.startNs) / 1e9, progress, p.plannedMs)
+private fun BoxScope.RunningPanel(p: Phase.Running, heat: ThermalLevel, note: UiText?, onCancel: () -> Unit) {
+    val percent = (p.progress * 100).toInt().coerceIn(0, 100)
+    val left by produceState<Int?>(null, p) { while (true) { value = p.clock.secondsLeft(); delay(250) } }
     Column(Modifier.align(Alignment.Center).presence(), horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(stringResource(runningTitle(p.kind)), color = Am.OnScrim, fontSize = 18.sp, textAlign = TextAlign.Center)
+        RunningTitle(p, Am.OnScrim, 18.sp)
         Spacer(Modifier.height(15.dp))
         Box(Modifier.width(220.dp).height(7.dp).clip(RoundedCornerShape(5.dp)).background(Am.OnScrim.copy(alpha = 0.2f))) {
-            Box(Modifier.fillMaxWidth(progress.coerceIn(0f, 1f)).fillMaxHeight().background(Am.OnScrimAccent))
+            Box(Modifier.fillMaxWidth(p.progress.coerceIn(0f, 1f)).fillMaxHeight().background(Am.OnScrimAccent))
         }
         Spacer(Modifier.height(5.dp))
         Row(Modifier.width(220.dp)) {
@@ -1324,6 +1384,12 @@ private fun BoxScope.RunningPanel(p: Phase.Running, progress: Float, heat: Therm
     )
 }
 
+@Composable
+private fun RunningTitle(p: Phase.Running, color: Color, size: TextUnit, weight: FontWeight? = null) = Box(contentAlignment = Alignment.Center) {
+    p.reserve?.let { Text(stringResource(it), Modifier.alpha(0f).clearAndSetSemantics {}, fontSize = size, fontWeight = weight, textAlign = TextAlign.Center) }
+    Text(stringResource(p.title), color = color, fontSize = size, fontWeight = weight, textAlign = TextAlign.Center)
+}
+
 @StringRes
 private fun runningTitle(kind: ExportKind): Int = when (kind) {
     ExportKind.Video -> R.string.export_running_video
@@ -1335,8 +1401,8 @@ private fun runningTitle(kind: ExportKind): Int = when (kind) {
 
 private val BackgroundKinds = setOf(ExportKind.Video, ExportKind.Audio, ExportKind.Gif, ExportKind.Sequence, ExportKind.Package)
 
-private fun timeKey(kind: ExportKind): String? = when (kind) {
-    ExportKind.Video -> "time.video"
+private fun timeKey(kind: ExportKind, s: ExportSettings): String? = when (kind) {
+    ExportKind.Video -> if (s.interpolation == FrameInterpolation.Ai) "time.video.ai" else "time.video"
     ExportKind.Gif -> "time.gif"
     ExportKind.Sequence -> "time.sequence"
     else -> null
@@ -1378,9 +1444,10 @@ private fun DeskExport(
     warning: UiText?, slow: Boolean, use: UiText?, onUse: () -> Unit, onContinue: () -> Unit,
     free: Long, estimate: Long, timeMs: Long?, calculating: Boolean, storage: StorageStatus, blocked: UiText?,
     asTemplate: Boolean, onTemplate: (Boolean) -> Unit, onTemplateInfo: () -> Unit, onPackageInfo: () -> Unit, bundleFields: @Composable () -> Unit,
-    phase: Phase, progress: Float, heat: ThermalLevel, note: UiText?, onCancel: () -> Unit, onDone: () -> Unit, onShare: () -> Unit,
-    onStart: () -> Unit, onClose: () -> Unit,
+    phase: Phase, heat: ThermalLevel, note: UiText?, onCancel: () -> Unit, onDone: () -> Unit, onShare: () -> Unit,
+    onStart: () -> Unit, onClose: () -> Unit, title: String,
 ) {
+    val single = kinds.size == 1
     val focus = remember { FocusRequester() }
     LaunchedEffect(Unit) { runCatching { focus.requestFocus() } }
     DisposableEffect(Unit) {
@@ -1410,10 +1477,11 @@ private fun DeskExport(
             val height = minOf(maxHeight, 660.dp)
             Column(Modifier.size(width, height).shadow(24.dp, RoundedCornerShape(16.dp)).clip(RoundedCornerShape(16.dp)).background(Am.SheetBg).pointerInput(Unit) { detectTapGestures { } }) {
                 Row(Modifier.fillMaxWidth().height(56.dp).background(Am.Card).padding(start = 20.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(stringResource(R.string.export_title), color = Navy, fontSize = 18.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                    Text(title, color = Navy, fontSize = 18.sp, fontWeight = FontWeight.Bold, maxLines = 1)
                     Text(scene.title, Modifier.weight(1f).padding(start = 12.dp), color = NoteGrey, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Box(Modifier.size(40.dp).clip(RoundedCornerShape(10.dp)).deskPress(10.dp).clickable(enabled = closable, onClick = onClose), Alignment.Center) {
                         Icon(ExportIcons.Close, stringResource(R.string.cancel), Modifier.size(22.dp), tint = Navy)
+                        HoldName(stringResource(R.string.cancel))
                     }
                 }
                 Divider()
@@ -1434,7 +1502,7 @@ private fun DeskExport(
                             Phase.Idle -> Column(Modifier.fillMaxSize().deskVerticalScroll(color = Navy).padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                                 FileNameField(exportName, kind)
                                 Column(verticalArrangement = Arrangement.spacedBy(FieldGap)) {
-                                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    if (!single) Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                         kinds.chunked(2).forEach { pair ->
                                             Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(8.dp)) {
                                                 pair.forEach { k ->
@@ -1475,13 +1543,12 @@ private fun DeskExport(
                                 }
                             }
                             is Phase.Running -> Column(Modifier.fillMaxSize().padding(32.dp), Arrangement.Center, Alignment.CenterHorizontally) {
-                                val percent = (progress * 100).toInt().coerceIn(0, 100)
-                                val now by produceState(System.nanoTime(), phase) { while (true) { value = System.nanoTime(); delay(250) } }
-                                val left = exportSecondsLeft((now - phase.startNs) / 1e9, progress, phase.plannedMs)
-                                Text(stringResource(runningTitle(phase.kind)), color = Navy, fontSize = 20.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                                val percent = (phase.progress * 100).toInt().coerceIn(0, 100)
+                                val left by produceState<Int?>(null, phase) { while (true) { value = phase.clock.secondsLeft(); delay(250) } }
+                                RunningTitle(phase, Navy, 20.sp, FontWeight.Bold)
                                 Spacer(Modifier.height(20.dp))
                                 Box(Modifier.widthIn(max = 420.dp).fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)).background(Navy.copy(alpha = 0.12f))) {
-                                    Box(Modifier.fillMaxWidth(progress.coerceIn(0f, 1f)).fillMaxHeight().background(Am.Accent))
+                                    Box(Modifier.fillMaxWidth(phase.progress.coerceIn(0f, 1f)).fillMaxHeight().background(Am.Accent))
                                 }
                                 Row(Modifier.widthIn(max = 420.dp).fillMaxWidth().padding(top = 8.dp)) {
                                     Text("$percent%", Modifier.weight(1f), color = Navy, fontSize = 14.sp)
@@ -1530,9 +1597,12 @@ private fun DeskExport(
                     DeskStat(stringResource(R.string.export_estimated_size), if (estimate < 0) stringResource(R.string.export_calculating) else formatBytes(estimate), null)
                     DeskStat(stringResource(R.string.export_estimated_time), timeMs?.let { timeLabel(it).text() } ?: stringResource(if (estimate < 0 || calculating) R.string.export_calculating else R.string.export_time_unknown), null)
                     Spacer(Modifier.weight(1f))
-                    Row(Modifier.clip(RoundedCornerShape(8.dp)).deskPress(8.dp).clickable { onTemplate(!asTemplate) }.padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    if (!single) Row(Modifier.clip(RoundedCornerShape(8.dp)).deskPress(8.dp).clickable { onTemplate(!asTemplate) }.padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                         Text(stringResource(R.string.also_keep_a_copy_as_a), color = Navy, fontSize = 13.sp, maxLines = 1)
-                        Box(Modifier.size(32.dp).clickable(onClick = onTemplateInfo), Alignment.Center) { Icon(ExportIcons.Info, stringResource(R.string.export_info), Modifier.size(18.dp), tint = Am.HomeDim) }
+                        Box(Modifier.size(32.dp).clickable(onClick = onTemplateInfo), Alignment.Center) {
+                            Icon(ExportIcons.Info, stringResource(R.string.export_info), Modifier.size(18.dp), tint = Am.HomeDim)
+                            HoldName(stringResource(R.string.export_info))
+                        }
                         Switch(
                             asTemplate, onTemplate,
                             colors = SwitchDefaults.colors(
@@ -1737,6 +1807,7 @@ private fun ThumbnailPicker(scene: Scene, engine: EngineThread, community: app.a
                 Row(Modifier.fillMaxWidth().height(48.dp).padding(end = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                     Box(Modifier.size(48.dp).clickable(onClick = onCancel), contentAlignment = Alignment.Center) {
                         Icon(app.absentmotion.ui.editor.ChromeIcons.Back, stringResource(R.string.export_back), Modifier.size(22.dp), tint = Am.OnDark)
+                        HoldName(stringResource(R.string.export_back))
                     }
                     Text(stringResource(R.string.community_thumbnail), Modifier.weight(1f), color = Am.OnDark, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Box(Modifier.height(34.dp).alpha(if (ready) 1f else Dimmed).clip(RoundedCornerShape(4.dp)).background(Am.Accent).clickable(enabled = ready) { onConfirm(community.copy(thumbMs = state.timeMs).withSquare(square, scene.width, scene.height)) }.padding(horizontal = 14.dp), contentAlignment = Alignment.Center) {

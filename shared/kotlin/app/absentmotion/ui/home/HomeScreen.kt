@@ -157,6 +157,7 @@ import java.util.Locale
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 import app.absentmotion.i18n.text
+import app.absentmotion.ui.HoldName
 
 private val Grey get() = Am.HomeDim
 private val FactText get() = Am.HomeDim
@@ -297,6 +298,7 @@ private fun TopBar(onMenu: () -> Unit, search: String?, page: Int, onSearch: (St
     Box(Modifier.fillMaxWidth().height(57.dp)) {
         Box(Modifier.align(Alignment.CenterStart).size(50.dp).clickable(onClick = onMenu), contentAlignment = Alignment.Center) {
             Icon(HomeIcons.Menu, stringResource(R.string.settings), Modifier.size(24.dp), tint = Am.Navy)
+            HoldName(stringResource(R.string.settings))
         }
         if (search == null) Text("AbsentMotion", Modifier.align(Alignment.Center), color = Am.Navy, fontSize = 22.sp, fontWeight = FontWeight.Medium)
         else HomeSearchField(search, page == 1, onSearch, Modifier.align(Alignment.Center).padding(horizontal = 56.dp).fillMaxWidth())
@@ -315,6 +317,7 @@ internal fun HomeSearchField(search: String, templates: Boolean, onSearch: (Stri
 internal fun SearchButton(search: String?, onSearch: (String?) -> Unit, modifier: Modifier = Modifier) {
     Box(modifier.size(50.dp).clickable { onSearch(if (search == null) "" else null) }, contentAlignment = Alignment.Center) {
         Icon(if (search == null) TextIcons.Search else HomeIcons.Close, stringResource(if (search == null) R.string.home_search else R.string.home_close_search), Modifier.size(24.dp), tint = Am.Navy)
+        HoldName(stringResource(if (search == null) R.string.home_search else R.string.home_close_search))
     }
 }
 
@@ -875,6 +878,7 @@ private fun BottomBar(onNew: () -> Unit, page: Int, onPage: (Int) -> Unit, modif
             contentAlignment = Alignment.Center,
         ) {
             Icon(HomeIcons.Plus, stringResource(R.string.home_new_project), Modifier.size(24.dp), tint = Am.OnAccent)
+            HoldName(stringResource(R.string.home_new_project))
         }
     }
 }
@@ -897,7 +901,7 @@ private fun BarItem(label: String, icon: ImageVector, lit: Boolean, onClick: () 
     ) {
         Icon(icon, null, Modifier.size(24.dp).graphicsLayer { val s = 1f - 0.1f * glow; scaleX = s; scaleY = s }, tint = Am.Navy)
         Spacer(Modifier.height(8.dp))
-        Text(label, Modifier.padding(horizontal = 2.dp), color = Am.Navy, fontWeight = FontWeight.Medium, maxLines = 1, style = androidx.compose.ui.text.TextStyle(lineHeight = 16.sp),
+        Text(label, Modifier.padding(horizontal = 2.dp), color = Am.Navy, fontWeight = FontWeight.Medium, maxLines = 1, style = androidx.compose.ui.text.TextStyle(lineHeight = 16.sp, fontFamily = androidx.compose.material3.LocalTextStyle.current.fontFamily),
             autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(9.sp, 12.sp))
     }
 }

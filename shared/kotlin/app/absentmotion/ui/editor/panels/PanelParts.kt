@@ -8,6 +8,18 @@ import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.awaitHorizontalTouchSlopOrCancellation
 import androidx.compose.foundation.gestures.horizontalDrag
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerId
+import androidx.compose.ui.platform.LocalViewConfiguration
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.util.VelocityTracker
@@ -25,6 +37,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
@@ -39,6 +52,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -83,7 +98,8 @@ internal fun formatFixed(value: Float, decimals: Int): String =
     String.format(Locale.US, "%.${decimals}f", value).let { if (it.trimStart('-').all { c -> c == '0' || c == '.' }) it.removePrefix("-") else it }
 
 internal fun formatPlain(value: Float): String =
-    String.format(Locale.US, "%.5f", value).trimEnd('0').trimEnd('.').let { if (it == "-0" || it.isEmpty()) "0" else it }
+    if (!value.isFinite()) value.toString()
+    else java.math.BigDecimal(value.toDouble()).round(java.math.MathContext(6)).setScale(5, java.math.RoundingMode.HALF_UP).stripTrailingZeros().toPlainString().let { if (it == "-0") "0" else it }
 
 @Composable
 internal fun PanelIcon(icon: ImageVector, tint: Color, modifier: Modifier = Modifier, size: Dp = 24.dp, description: String? = null) {
@@ -98,10 +114,11 @@ internal fun NumberBox(
     modifier: Modifier = Modifier,
     shape: Shape = PanelShape,
     fontSize: Float = 15.5f,
-    onClick: (() -> Unit)? = null,
+    onSelect: () -> Unit = {},
+    onType: (() -> Unit)? = null,
 ) {
     Box(
-        modifier.clip(shape).background(Am.Field).then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier),
+        modifier.clip(shape).background(Am.Field).then(if (onType != null) Modifier.typeOnDoubleTap(onSelect = onSelect, onType = onType) else Modifier),
         contentAlignment = Alignment.Center,
     ) {
         Text(text, color = color, fontSize = fontSize.sp, maxLines = 1, softWrap = false, textAlign = TextAlign.Center)
@@ -264,6 +281,8 @@ internal fun rulerTip(context: android.content.Context) {
     android.widget.Toast.makeText(context, context.getString(app.absentmotion.R.string.ruler_tip), android.widget.Toast.LENGTH_LONG).show()
 }
 
+private var handedDown: PointerId? = null
+
 internal fun Modifier.holdAndDoubleTap(timing: LongArray, slop: Dp? = null, onDoubleTap: (() -> Unit)?): Modifier = pointerInput(onDoubleTap != null) {
     var lastTap = Offset.Zero
     awaitEachGesture {
@@ -273,7 +292,10 @@ internal fun Modifier.holdAndDoubleTap(timing: LongArray, slop: Dp? = null, onDo
         if (onDoubleTap != null && near && down.uptimeMillis - timing[1] < viewConfiguration.doubleTapTimeoutMillis) {
             timing[1] = 0L
             down.consume()
-            onDoubleTap()
+            handedDown = down.id
+            awaitPointerEvent(PointerEventPass.Final)
+            if (handedDown == down.id) onDoubleTap()
+            handedDown = null
             return@awaitEachGesture
         }
         var moved = false
@@ -289,3 +311,67 @@ internal fun Modifier.holdAndDoubleTap(timing: LongArray, slop: Dp? = null, onDo
 }
 
 internal fun LongArray.heldBeforeMoving(at: Long, longPressMillis: Long): Boolean = at - this[0] >= longPressMillis
+
+internal class TapPair {
+    private var down = 0L
+    private var up = 0L
+    private var last: Long? = null
+    private var fresh = false
+
+    fun pressed(at: Long) { down = at; fresh = true }
+
+    fun released(at: Long) { up = at }
+
+    fun cancelled() { fresh = false }
+
+    fun second(timeoutMillis: Long): Boolean {
+        val hit = !fresh || last?.let { down - it in 0 until timeoutMillis } == true
+        last = if (hit) null else up
+        fresh = false
+        return hit
+    }
+}
+
+@Composable
+internal fun Modifier.typeOnDoubleTap(enabled: Boolean = true, role: Role? = null, onSelect: () -> Unit = {}, onType: () -> Unit): Modifier {
+    val taps = remember { TapPair() }
+    val timeout = LocalViewConfiguration.current.doubleTapTimeoutMillis
+    val click = { if (taps.second(timeout)) onType() else onSelect() }
+    val latest by rememberUpdatedState(click)
+    return pointerInput(enabled) {
+        awaitEachGesture {
+            val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
+            taps.pressed(down.uptimeMillis)
+            val handed = enabled && handedDown == down.id
+            if (handed) handedDown = null
+            val up = waitForUpOrCancellation(PointerEventPass.Initial)
+            if (up == null) taps.cancelled() else { taps.released(up.uptimeMillis); if (handed) latest() }
+        }
+    }.clickable(enabled = enabled, role = role, onClick = click)
+}
+
+@Composable
+internal fun DoubleTapToType(
+    value: String, onValue: (String) -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true, doubleTap: Boolean = true,
+    field: @Composable (Modifier, TextFieldValue, (TextFieldValue) -> Unit) -> Unit,
+) {
+    val requester = remember { FocusRequester() }
+    val keyboard = LocalSoftwareKeyboardController.current
+    var focused by remember { mutableStateOf(false) }
+    var typed by remember { mutableStateOf(TextFieldValue(value)) }
+    val kept = remember { arrayOf(typed) }
+    var last by remember(value) { mutableStateOf(value) }
+    val shown = when (value) { typed.text -> typed; kept[0].text -> kept[0]; else -> typed.copy(text = value) }
+    SideEffect { kept[0] = shown }
+    Box(modifier, propagateMinConstraints = true) {
+        field(Modifier.focusRequester(requester).onFocusChanged { focused = it.isFocused }, shown) { next ->
+            typed = next
+            if (next.text != last) { last = next.text; onValue(next.text) }
+        }
+        if (doubleTap && !focused) Box(Modifier.matchParentSize().clearAndSetSemantics {}.focusProperties { canFocus = false }.typeOnDoubleTap(enabled) {
+            typed = TextFieldValue(value, TextRange(0, value.length))
+            requester.requestFocus()
+            keyboard?.show()
+        })
+    }
+}

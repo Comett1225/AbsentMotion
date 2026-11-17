@@ -101,6 +101,7 @@ import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.animatedColor
 import kotlin.math.ln
 import kotlin.math.roundToInt
+import app.absentmotion.ui.HoldName
 
 private val Flat = flatCurve(1f)
 private const val SNAP_DP = 3f
@@ -171,6 +172,7 @@ internal fun SpeedCurveEditor(state: EditorState, layer: Layer, ai: AiTools, bas
         Row(Modifier.fillMaxWidth().height(30.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(36.dp, 30.dp).clip(PanelShape).clickable(role = Role.Button, onClick = close), Alignment.Center) {
                 PanelIcon(PanelIcons.Back, Am.OnDark, size = 20.dp, description = stringResource(R.string.topbar_back))
+                HoldName(stringResource(R.string.topbar_back))
             }
             Text(stringResource(points.ramp()?.label ?: R.string.speed_curve_custom), Modifier.padding(start = 2.dp).width(84.dp), color = Am.OnDark,
                 fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -216,7 +218,7 @@ private fun CurveGraph(
     val haptic = rememberHaptic(state)
     val outline = remember(points) { points.outline() }
     val measurer = rememberTextMeasurer(cacheSize = 4)
-    val labelStyle = TextStyle(color = PanelCaption, fontSize = deskSp(9f))
+    val labelStyle = TextStyle(color = PanelCaption, fontSize = deskSp(9f), fontFamily = androidx.compose.material3.LocalTextStyle.current.fontFamily)
     val ink = Am.OnDark
     val accent = Am.Accent
     val guide = PanelCaption

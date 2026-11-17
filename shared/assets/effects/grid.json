@@ -68,7 +68,18 @@
    "min": -3600,
    "max": 3600,
    "step": 0.5
+  },
+  {
+   "id": "origin",
+   "label": "Origin",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Center",
+    "Layer Corner",
+    "Screen Corner"
+   ]
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 offset;\nuniform float count;\nuniform float2 stretch;\nuniform float width;\nlayout(color) uniform half4 color;\nuniform float punch;\nuniform float angle;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float cell = size.y / (2.475 * max(count, 0.5));\n    float a = radians(angle);\n    float2 dims = max(abs(stretch), float2(0.01)) * cell;\n    float2 p = coord - size * 0.5 - offset;\n    p = float2(cos(a) * p.x + sin(a) * p.y, -sin(a) * p.x + cos(a) * p.y) / dims;\n    float2 e = abs(fract(p + 0.5) - 0.5) * dims;\n    float half_ = width * 0.5 * cell;\n    float s = width > 0.0 ? clamp(half_ - min(e.x, e.y) + 0.5, 0.0, 1.0) : 0.0;\n    if (punch > 0.5) return src * half(1.0 - s);\n    float3 base = float3(src.rgb) / float(src.a);\n    float3 rgb = mix(base, float3(color.rgb), s * float(color.a));\n    return half4(half3(rgb) * src.a, src.a);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float4 screen;\nuniform float time;\nuniform float2 offset;\nuniform float count;\nuniform float2 stretch;\nuniform float width;\nlayout(color) uniform half4 color;\nuniform float punch;\nuniform float angle;\nuniform float origin;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float cell = (origin > 1.5 ? screen.w : size.y) / (2.475 * max(count, 0.5));\n    float a = radians(angle);\n    float2 dims = max(abs(stretch), float2(0.01)) * cell;\n    float2 start = origin > 1.5 ? screen.xy + 0.5 * dims : origin > 0.5 ? 0.5 * dims : size * 0.5;\n    float2 p = coord - start - offset;\n    p = float2(cos(a) * p.x + sin(a) * p.y, -sin(a) * p.x + cos(a) * p.y) / dims;\n    float2 e = abs(fract(p + 0.5) - 0.5) * dims;\n    float half_ = width * 0.5 * cell;\n    float s = width > 0.0 ? clamp(half_ - min(e.x, e.y) + 0.5, 0.0, 1.0) : 0.0;\n    if (punch > 0.5) return src * half(1.0 - s);\n    float3 base = float3(src.rgb) / float(src.a);\n    float3 rgb = mix(base, float3(color.rgb), s * float(color.a));\n    return half4(half3(rgb) * src.a, src.a);\n}\n"
 }

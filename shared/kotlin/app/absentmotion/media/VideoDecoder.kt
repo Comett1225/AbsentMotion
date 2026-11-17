@@ -26,7 +26,7 @@ internal fun MediaCodec.configureFitting(format: MediaFormat, surface: android.v
     }
 }
 
-internal fun openDecoder(format: MediaFormat, surface: android.view.Surface?): MediaCodec {
+internal fun decoderNames(format: MediaFormat, anySize: Boolean = false): List<String> {
     val mime = format.getString(MediaFormat.KEY_MIME).orEmpty()
     val list = MediaCodecList(MediaCodecList.REGULAR_CODECS)
     val width = format.intOr(MediaFormat.KEY_WIDTH, 0)
@@ -35,10 +35,17 @@ internal fun openDecoder(format: MediaFormat, surface: android.view.Surface?): M
         !info.isEncoder && !info.alias && mime in info.supportedTypes && info.getCapabilitiesForType(mime).let { caps ->
             !caps.isFeatureRequired(MediaCodecInfo.CodecCapabilities.FEATURE_SecurePlayback) &&
                 !caps.isFeatureRequired(MediaCodecInfo.CodecCapabilities.FEATURE_TunneledPlayback) &&
-                caps.videoCapabilities?.isSizeSupported(width, height) != false
+                (anySize || caps.videoCapabilities?.isSizeSupported(width, height) != false)
         }
     }.sortedByDescending { it.hardware }.map { it.name }
-    val names = (listOfNotNull(list.findDecoderForFormat(format)) + others).distinct()
+    return (listOfNotNull(list.findDecoderForFormat(format)) + others).distinct()
+}
+
+internal fun openDecoder(format: MediaFormat, surface: android.view.Surface?): MediaCodec {
+    val mime = format.getString(MediaFormat.KEY_MIME).orEmpty()
+    val width = format.intOr(MediaFormat.KEY_WIDTH, 0)
+    val height = format.intOr(MediaFormat.KEY_HEIGHT, 0)
+    val names = decoderNames(format).ifEmpty { decoderNames(format, anySize = true) }
     var last: Exception? = null
     for (attempt in 0..DECODER_WAITS) {
         if (attempt > 0) Thread.sleep(DECODER_WAIT_MS)
@@ -75,7 +82,7 @@ internal fun codecBusy(e: Throwable): Boolean = e is MediaCodec.CodecException &
 
 internal class VideoDecoder(private val context: Context, private val uri: String) : Closeable {
     private val extractor = openDemuxer(context, Uri.parse(openableUri(uri)), "video/")
-    private val ffamp = MediaBackend.ffamp(context)
+    private var ffamp = MediaBackend.ffamp(context, Uri.parse(openableUri(uri)), "video/")
     private var soft: DesktopFrameInput? = null
     private var codec: MediaCodec? = null
     private var frames: DecodedFrames? = null
@@ -112,8 +119,19 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
             format.setInteger(MediaFormat.KEY_ROTATION, 0)
             hdr = format.requestSdr()
             soft = ffamp?.softFrames(context, uri)
-            if (soft == null) codec = openDecoder(format, frames!!.surface)
+            if (soft == null) codec = systemOrFfamp({ openDecoder(format, frames!!.surface) }, ::rescued) { null }
         } catch (e: Exception) { close(); throw e }
+    }
+
+    private fun rescued(failed: Exception): DesktopFrameInput? {
+        val readers = MediaBackend.rescue ?: return null
+        val found = runCatching { readers.softFrames(context, uri, rescue = true) }.getOrNull() ?: return null
+        Log.w("AMVideo", "the system decoder failed on $uri, FFamp decodes it: $failed")
+        runCatching { codec?.release() }
+        codec = null
+        ffamp = readers
+        soft = found
+        return found
     }
 
     fun wantedPts(timeUs: Long): Long = timestamps.ptsAt(timeUs)
@@ -123,6 +141,10 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
         if (wanted == currentPts) return current
         soft?.let { return softFrame(it, wanted, exact) }
         val decoder = codec ?: return current
+        return systemOrFfamp({ decoded(decoder, wanted, exact, obsolete) }, ::rescued) { softFrame(it, wanted, exact) }
+    }
+
+    private fun decoded(decoder: MediaCodec, wanted: Long, exact: Boolean, obsolete: () -> Boolean): DecodedFrame? {
         val at = if (skipped) decodedTo else currentPts
         if (!positioned || (if (skipped) wanted <= at else wanted < at) || wanted - at > 1_000_000 || outputEnded) reposition(decoder, wanted)
         val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10)
@@ -220,7 +242,7 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
 
     private fun softFrame(source: DesktopFrameInput, wanted: Long, exact: Boolean): DecodedFrame? {
         var made: DecodedFrame? = null
-        kotlinx.coroutines.runBlocking { source.read(listOf(wanted)) { _, yuv -> made = ffamp!!.softFrame(yuv, wanted) } }
+        kotlinx.coroutines.runBlocking { source.read(listOf(wanted)) { _, yuv -> made = ffamp!!.softFrame(yuv, wanted, source.colorStandard, source.fullRange) } }
         val image = made ?: return if (exact) null else current
         current?.close()
         current = image

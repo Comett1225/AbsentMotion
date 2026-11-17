@@ -135,7 +135,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
 
     private fun plainCodecError(t: Throwable): Throwable {
         if (t is ExportError || t is kotlinx.coroutines.CancellationException) return t
-        if (generateSequence(t) { it.cause }.none { it is android.media.MediaCodec.CodecException }) return t
+        if (generateSequence(t) { it.cause }.take(16).none(::codecFailed)) return t
         android.util.Log.w("AMExport", "a media codec failed", t)
         return ExportError(txt(R.string.export_error_codec_busy), t)
     }
@@ -324,7 +324,10 @@ internal suspend fun <T> retryingEncoder(note: (UiText) -> Unit, attempt: suspen
 }
 
 internal fun encoderTrouble(t: Throwable): Boolean =
-    generateSequence(t) { it.cause }.take(16).any { it is ExportStalled || it is android.media.MediaCodec.CodecException }
+    generateSequence(t) { it.cause }.take(16).any { it is ExportStalled || codecFailed(it) }
+
+internal fun codecFailed(t: Throwable): Boolean = t is android.media.MediaCodec.CodecException ||
+    t.javaClass == IllegalStateException::class.java && t.stackTrace.firstOrNull()?.className == "android.media.MediaCodec"
 
 internal suspend fun <T> watched(stallMs: Long = StallMs, block: suspend (alive: () -> Unit) -> T): T {
     val last = java.util.concurrent.atomic.AtomicLong(System.nanoTime() + 2 * stallMs * 1_000_000L)

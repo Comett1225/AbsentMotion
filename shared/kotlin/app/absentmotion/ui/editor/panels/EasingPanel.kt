@@ -83,6 +83,7 @@ import app.absentmotion.ui.theme.presence
 import androidx.compose.ui.graphics.TransformOrigin
 import kotlin.math.ceil
 import kotlin.math.hypot
+import app.absentmotion.ui.HoldName
 
 private val GraphBg get() = Am.Chosen
 private val PresetTile get() = Am.Button
@@ -133,15 +134,17 @@ private fun ColumnScope.Cell(enabled: Boolean = true, onClick: () -> Unit = {}, 
 private fun LeftColumn(state: EditorState, easing: Easing, basic: Boolean, overshoot: Boolean, toggleOvershoot: () -> Unit, modifier: Modifier) {
     var menu by remember { mutableStateOf(false) }
     Column(modifier) {
-        Cell(onClick = { state.easingOpen = false }) { PanelIcon(PanelIcons.Back, Am.OnDark, size = 26.dp, description = stringResource(R.string.topbar_back)) }
+        Cell(onClick = { state.easingOpen = false }) { PanelIcon(PanelIcons.Back, Am.OnDark, size = 26.dp, description = stringResource(R.string.topbar_back)); HoldName(stringResource(R.string.topbar_back)) }
         Cell(enabled = false) {}
         val reversed = easing.reversed()
         Cell(enabled = reversed != null, onClick = { reversed?.let { state.setEasing(it) } }) {
             val reverse = stringResource(R.string.a11y_reverse_curve)
             ReverseIcon(Am.OnDark, (if (reversed != null) Modifier else Modifier.dimmed()).semantics { contentDescription = reverse })
+            HoldName(reverse)
         }
         Cell(onClick = { menu = true }) {
             PanelIcon(PanelIcons.More, Am.OnDark, size = 26.dp, description = stringResource(R.string.effects_more))
+            HoldName(stringResource(R.string.effects_more))
             Presence(menu) { OverflowMenu(state, basic, overshoot, toggleOvershoot) { menu = false } }
         }
     }
@@ -251,6 +254,7 @@ private fun StretchButton(state: EditorState, direction: Int) {
         Box(Modifier.size(70.px).pressShape(press, RoundedCornerShape(14.px)).background(NavButton), Alignment.Center) {
             ChevronIcon(next = direction > 0, tint = Am.OnDark.copy(alpha = if (enabled) 0.6f else 0.1f))
         }
+        HoldName(stringResource(if (direction > 0) R.string.export_next else R.string.export_previous))
     }
 }
 
@@ -296,30 +300,35 @@ private fun DrawScope.drawGraph(g: Geo, samples: FloatArray, handles: List<Easin
         if (i == 0) path.moveTo(p.x, p.y) else path.lineTo(p.x, p.y)
     }
     drawPath(path, Am.Accent, style = Stroke(8f, cap = StrokeCap.Round, join = StrokeJoin.Round))
-    drawCircle(Am.Accent, 8f, Offset(left, g.y(samples.first())))
-    drawCircle(Am.Accent, 8f, Offset(right, g.y(samples.last())))
+    drawCircle(Am.Accent, 8f, Offset(left, bottom))
+    drawCircle(Am.Accent, 8f, Offset(right, top))
     for (h in handles) drawCircle(if (h.param) Yellow else Am.OnDark, 33.5f, Offset(g.x(h.x), g.y(h.y)))
 }
 
 @Composable
 private fun Presets(state: EditorState, easing: Easing, family: Int, modifier: Modifier) {
     Column(modifier.background(Am.Field)) {
-        for (preset in EasingCatalog.families[family]) {
+        EasingCatalog.families[family].forEachIndexed { i, preset ->
             val lit = EasingCatalog.matches(preset.easing, easing.copy(prefixes = emptyList())) ||
                 (easing.type != "cubicBezier" && preset.easing.type == easing.type)
             val press = remember { MutableInteractionSource() }
+            val name = stringResource(if (family == 0) CurveNames[i] else preset.label)
             Box(
-                Modifier.weight(1f).fillMaxWidth().buttonLabel(stringResource(preset.label)).clickable(press, null) { state.setEasing(preset.easing) }
+                Modifier.weight(1f).fillMaxWidth().buttonLabel(name).clickable(press, null) { state.setEasing(preset.easing) }
                     .padding(start = 22.px, end = 22.px, top = 11.px, bottom = 12.px)
                     .pressShape(press, TileShape).then(if (lit) Modifier.background(PresetTile) else Modifier),
                 Alignment.Center,
             ) {
                 val icon = if (preset.easing.type == "linear") Easing("cubicBezier", listOf(0.25f, 0.25f, 0.75f, 0.75f)) else preset.easing
                 CurveThumb(icon, if (lit) Am.Accent else Am.OnDark)
+                HoldName(name)
             }
         }
     }
 }
+
+private val CurveNames = listOf(R.string.easing_linear, R.string.easing_ease_in, R.string.easing_ease_out, R.string.easing_ease_in_out)
+private val FamilyNames = listOf(R.string.easing_family_curves, R.string.easing_family_bounce, R.string.easing_family_steps)
 
 @Composable
 private fun Families(state: EditorState, family: Int, modifier: Modifier) {
@@ -337,14 +346,16 @@ private fun Families(state: EditorState, family: Int, modifier: Modifier) {
         for (i in 0..2) {
             val chosen = i == family
             val press = remember { MutableInteractionSource() }
+            val name = stringResource(FamilyNames[i])
             Box(
-                Modifier.weight(1f).fillMaxWidth().alpha(if (state.panel == EditorPanel.Speed && i != 0) 0.35f else 1f).clickable(press, null, enabled = state.panel != EditorPanel.Speed || i == 0) { if (!chosen) state.setEasing(EasingCatalog.families[i][0].easing) }
+                Modifier.weight(1f).fillMaxWidth().buttonLabel(name).alpha(if (state.panel == EditorPanel.Speed && i != 0) 0.35f else 1f).clickable(press, null, enabled = state.panel != EditorPanel.Speed || i == 0) { if (!chosen) state.setEasing(EasingCatalog.families[i][0].easing) }
                     .padding(start = 22.px, end = 22.px, top = 11.px, bottom = 12.px)
                     .pressShape(press, TileShape).then(if (chosen) Modifier.background(PanelDark) else Modifier),
                 Alignment.Center,
             ) {
                 val icon = EasingCatalog.families[i].let { it[if (i == 0) 3 else 0] }.easing
                 CurveThumb(icon, if (chosen) Am.Accent else Am.OnDark)
+                HoldName(name)
             }
         }
     }

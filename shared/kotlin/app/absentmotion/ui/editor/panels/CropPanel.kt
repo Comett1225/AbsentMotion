@@ -61,6 +61,7 @@ import app.absentmotion.ui.editor.PanelHeight
 import app.absentmotion.ui.editor.PanelIcons
 import app.absentmotion.ui.theme.Am
 import kotlinx.coroutines.launch
+import app.absentmotion.ui.HoldName
 
 internal val CropAspects = listOf(null to "", 1f to "1:1", 4f / 5f to "4:5", 3f / 4f to "3:4", 16f / 9f to "16:9", 9f / 16f to "9:16")
 
@@ -128,7 +129,7 @@ internal fun CropPanel(state: EditorState, modifier: Modifier) {
                         val value = formatFixed(box.side(i) * 100f, 1) + "%"
                         Column(
                             Modifier.weight(1f).fillMaxHeight().clip(PanelShape).background(Am.Field)
-                                .semantics(mergeDescendants = true) { contentDescription = "$label $value" }.clickable { keypad(i) },
+                                .semantics(mergeDescendants = true) { contentDescription = "$label $value" }.typeOnDoubleTap { keypad(i) },
                             Arrangement.Center, Alignment.CenterHorizontally,
                         ) {
                             Text(label, color = PanelCaption, fontSize = deskSp(11f), maxLines = 1)
@@ -149,6 +150,7 @@ internal fun CropPanel(state: EditorState, modifier: Modifier) {
 private fun SideButton(icon: androidx.compose.ui.graphics.vector.ImageVector, description: String, modifier: Modifier, onClick: () -> Unit) {
     Box(modifier.fillMaxWidth().clickable(onClick = onClick), contentAlignment = Alignment.Center) {
         PanelIcon(icon, Am.OnDark, description = description)
+        HoldName(description)
     }
 }
 

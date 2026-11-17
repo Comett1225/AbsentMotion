@@ -8,6 +8,7 @@ import android.media.MediaFormat
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.ParcelFileDescriptor
+import app.absentmotion.ai.argb
 import app.absentmotion.audio.PcmChunk
 import app.absentmotion.audio.PcmSource
 import app.absentmotion.audio.downmixGains
@@ -20,6 +21,7 @@ import app.absentmotion.media.FrameGrabber
 import app.absentmotion.media.FrameReader
 import app.absentmotion.media.VideoSources
 import app.absentmotion.media.Yuv
+import app.absentmotion.media.decoderNames
 import app.absentmotion.media.videoColorStandard
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.runBlocking
@@ -50,7 +52,7 @@ internal object FfampNative {
     external fun audioShape(audio: Long): LongArray
     external fun audioRead(audio: Long, start: Long, frames: Int, out: FloatArray): Boolean
     external fun audioClose(audio: Long)
-    external fun picture(y: ByteBuffer, u: ByteBuffer, v: ByteBuffer, yRow: Int, uvRow: Int, width: Int, height: Int, sd: Boolean): Long
+    external fun picture(y: ByteBuffer, u: ByteBuffer, v: ByteBuffer, yRow: Int, uvRow: Int, width: Int, height: Int, coefficients: IntArray): Long
     external fun pictureBuffer(picture: Long): android.hardware.HardwareBuffer?
     external fun pictureRelease(picture: Long)
 }
@@ -211,7 +213,7 @@ internal class FfampRetriever(context: Context, uri: Uri) : FrameGrabber {
             stamps.lastOrNull { it <= timeUs } ?: stamps.firstOrNull() ?: timeUs
         }
         var picture: Bitmap? = null
-        runBlocking { frames.read(listOf(wanted)) { _, yuv -> picture = yuv.toBitmap(width, height) } }
+        runBlocking { frames.read(listOf(wanted)) { _, yuv -> picture = yuv.toBitmap(width, height, frames.colorStandard, frames.fullRange) } }
         return picture
     }
 
@@ -225,12 +227,23 @@ internal class FfampRetriever(context: Context, uri: Uri) : FrameGrabber {
 internal object FfampMedia : FfampReaders {
     override fun demuxer(context: Context, uri: Uri): Demuxer = FfampExtractor(FfampSource.open(context, uri))
     override fun grabber(context: Context, uri: Uri): FrameGrabber = FfampRetriever(context, uri)
-    override fun softFrames(context: Context, uri: String): DesktopFrameInput? = FfampSoftFrames.openIfNeeded(context, uri)
-    override fun softFrame(yuv: Yuv, pts: Long): DecodedFrame = SoftFrame(yuv, pts)
+    override fun softFrames(context: Context, uri: String, rescue: Boolean): DesktopFrameInput? = FfampSoftFrames.openIfNeeded(context, uri, rescue)
+    override fun softFrame(yuv: Yuv, pts: Long, standard: Int, fullRange: Boolean): DecodedFrame = SoftFrame(yuv, pts, standard, fullRange)
+    override fun reads(context: Context, uri: Uri, kind: String): Boolean = runCatching {
+        FfampSource.open(context, uri).use { source ->
+            val audio = kind.startsWith("audio/")
+            val track = source.first(if (audio) 2 else 1)
+            track >= 0 && (decoderNames(source.format(track)).isNotEmpty() || if (audio) {
+                FfampNative.audioOpen(source.handle, track).also { if (it != 0L) FfampNative.audioClose(it) } != 0L
+            } else {
+                FfampNative.videoOpen(source.handle, track).also { if (it != 0L) FfampNative.videoClose(it) } != 0L
+            })
+        }
+    }.getOrDefault(false)
 }
 
-internal class SoftFrame(yuv: Yuv, pts: Long) : DecodedFrame {
-    private var picture = FfampNative.picture(yuv.y, yuv.u, yuv.v, yuv.yRow, yuv.uvRow, yuv.width, yuv.height, yuv.height <= 576).also { check(it != 0L) { "cannot make a ${yuv.width} x ${yuv.height} picture" } }
+internal class SoftFrame(yuv: Yuv, pts: Long, standard: Int, fullRange: Boolean) : DecodedFrame {
+    private var picture = FfampNative.picture(yuv.y, yuv.u, yuv.v, yuv.yRow, yuv.uvRow, yuv.width, yuv.height, yuvToRgb(shownStandard(standard, yuv.height), fullRange)).also { check(it != 0L) { "cannot make a ${yuv.width} x ${yuv.height} picture" } }
     override val timestamp: Long = pts * 1000
     override val cropRect = android.graphics.Rect(0, 0, yuv.width, yuv.height)
     override val hardwareBuffer: android.hardware.HardwareBuffer? get() = if (picture == 0L) null else FfampNative.pictureBuffer(picture)
@@ -240,42 +253,39 @@ internal class SoftFrame(yuv: Yuv, pts: Long) : DecodedFrame {
     }
 }
 
-internal fun Yuv.toBitmap(maxWidth: Int, maxHeight: Int): Bitmap {
+internal fun shownStandard(standard: Int, height: Int): Int = if (standard != 0) standard else if (height <= 576) MediaFormat.COLOR_STANDARD_BT601_PAL else MediaFormat.COLOR_STANDARD_BT709
+
+internal fun yuvToRgb(standard: Int, fullRange: Boolean): IntArray {
+    val kr = if (standard == MediaFormat.COLOR_STANDARD_BT709) 0.2126 else if (standard == MediaFormat.COLOR_STANDARD_BT2020) 0.2627 else 0.299
+    val kb = if (standard == MediaFormat.COLOR_STANDARD_BT709) 0.0722 else if (standard == MediaFormat.COLOR_STANDARD_BT2020) 0.0593 else 0.114
+    val kg = 1 - kr - kb
+    val ys = if (fullRange) 256.0 else 256 * 255.0 / 219
+    val cs = if (fullRange) 256.0 else 256 * 255.0 / 224
+    return intArrayOf(if (fullRange) 0 else 16, Math.round(ys).toInt(), Math.round(2 * (1 - kr) * cs).toInt(), Math.round(2 * kb * (1 - kb) / kg * cs).toInt(),
+        Math.round(2 * kr * (1 - kr) / kg * cs).toInt(), Math.round(2 * (1 - kb) * cs).toInt())
+}
+
+internal fun Yuv.toBitmap(maxWidth: Int, maxHeight: Int, standard: Int, fullRange: Boolean): Bitmap {
     val scale = minOf(maxWidth.toFloat() / width, maxHeight.toFloat() / height, 1f)
     val w = maxOf(1, Math.round(width * scale))
     val h = maxOf(1, Math.round(height * scale))
-    val pixels = IntArray(w * h)
-    val sd = height <= 576
-    for (py in 0 until h) {
-        val sy = top + py * height / h
-        for (px in 0 until w) {
-            val sx = left + px * width / w
-            val luma = (y.get(sy * yRow + sx * yPixel).toInt() and 255) - 16
-            val ci = (sy / 2) * uvRow + (sx / 2) * uvPixel
-            val cb = (u.get(ci).toInt() and 255) - 128
-            val cr = (v.get(ci).toInt() and 255) - 128
-            val l = 1.164f * luma
-            val r = (l + (if (sd) 1.596f else 1.793f) * cr).toInt().coerceIn(0, 255)
-            val g = (l - (if (sd) 0.392f else 0.213f) * cb - (if (sd) 0.813f else 0.533f) * cr).toInt().coerceIn(0, 255)
-            val b = (l + (if (sd) 2.017f else 2.112f) * cb).toInt().coerceIn(0, 255)
-            pixels[py * w + px] = (255 shl 24) or (r shl 16) or (g shl 8) or b
-        }
-    }
-    return Bitmap.createBitmap(pixels, w, h, Bitmap.Config.ARGB_8888)
+    return Bitmap.createBitmap(argb(w, h, shownStandard(standard, height), fullRange), w, h, Bitmap.Config.ARGB_8888)
 }
 
 internal class FfampSoftFrames private constructor(context: Context, uri: String, private val source: FfampSource, track: Int, private val video: Long) : DesktopFrameInput {
     private val table = Table(source, track)
     private val shape = source.info(track)
     private val frame = ByteBuffer.allocateDirect((shape[1] * shape[2] * 3 / 2 + shape[1] * 2 + shape[2] * 2 + 64).toInt())
-    private val dims = IntArray(2)
+    private val dims = IntArray(3)
     private var next = 0
     private var drained = false
     private var positioned = false
     private var lastPts = Long.MIN_VALUE
     override val timestamps: LongArray = VideoSources.timestamps(context, uri)
-    override val colorStandard: Int = source.format(track).let { if (it.containsKey(MediaFormat.KEY_COLOR_STANDARD)) videoColorStandard(it.getInteger(MediaFormat.KEY_COLOR_STANDARD)) else 0 }
-    override val fullRange: Boolean = shape[9] != 0L && shape[13] != 0L
+    override var colorStandard: Int = source.format(track).let { if (it.containsKey(MediaFormat.KEY_COLOR_STANDARD)) videoColorStandard(it.getInteger(MediaFormat.KEY_COLOR_STANDARD)) else 0 }
+        private set
+    override var fullRange: Boolean = shape[9] != 0L && shape[13] != 0L
+        private set
 
     override suspend fun read(wanted: List<Long>, consume: suspend (Long, Yuv) -> Unit): Int {
         if (wanted.isEmpty()) return 0
@@ -298,6 +308,10 @@ internal class FfampSoftFrames private constructor(context: Context, uri: String
                 val stamp = FfampNative.videoTake(video, frame, dims)
                 if (stamp > Long.MIN_VALUE + 1) {
                     lastPts = stamp
+                    if (dims[2] != 0) {
+                        colorStandard = MediaFormat.COLOR_STANDARD_BT709
+                        fullRange = false
+                    }
                     if (i < wanted.size && wanted[i] <= stamp) {
                         val luma = dims[0] * dims[1]
                         val cw = (dims[0] + 1) / 2
@@ -324,10 +338,10 @@ internal class FfampSoftFrames private constructor(context: Context, uri: String
         private const val SKIP_US = 2_000_000L
         private const val MPEG4_PART2 = 0x6d703476L
 
-        fun openIfNeeded(context: Context, uri: String): DesktopFrameInput? {
+        fun openIfNeeded(context: Context, uri: String, rescue: Boolean = false): DesktopFrameInput? {
             val source = runCatching { FfampSource.open(context, uri) }.getOrNull() ?: return null
             val track = source.first(1)
-            val video = if (track >= 0 && (source.info(track)[15] == MPEG4_PART2 || !source.systemDecodes(track))) FfampNative.videoOpen(source.handle, track) else 0L
+            val video = if (track >= 0 && (rescue || source.info(track)[15] == MPEG4_PART2 || !source.systemDecodes(track))) FfampNative.videoOpen(source.handle, track) else 0L
             if (video == 0L) { source.close(); return null }
             return try { FfampSoftFrames(context, uri, source, track, video) } catch (e: Exception) {
                 FfampNative.videoClose(video)
@@ -338,7 +352,7 @@ internal class FfampSoftFrames private constructor(context: Context, uri: String
     }
 }
 
-internal class FfampPcm private constructor(private val source: FfampSource, private val audio: Long) : PcmSource {
+internal class FfampPcm private constructor(private val source: FfampSource, private val audio: Long, private val lead: Long) : PcmSource {
     private val rate: Int
     private val channels: Int
     private val length: Long
@@ -360,7 +374,7 @@ internal class FfampPcm private constructor(private val source: FfampSource, pri
 
     override val durationUs: Long get() = length * 1_000_000L / rate
 
-    override fun seek(us: Long) { position = (us.coerceAtLeast(0) * rate / 1_000_000L).coerceAtMost(length) }
+    override fun seek(us: Long) { position = frameAt(us, lead, rate, length) }
 
     override fun next(): PcmChunk? {
         if (position >= length) return null
@@ -385,7 +399,7 @@ internal class FfampPcm private constructor(private val source: FfampSource, pri
             out[2 * f + 1] = (r * 32767f).toInt().coerceIn(-32768, 32767).toShort()
         }
         chunk.frames = frames
-        chunk.ptsUs = position * 1_000_000L / rate
+        chunk.ptsUs = ptsOf(position, lead, rate)
         position += frames
         return chunk
     }
@@ -397,13 +411,20 @@ internal class FfampPcm private constructor(private val source: FfampSource, pri
 
     companion object {
         private const val CHUNK = 4096
+        private const val LPCM = 0x6c70636dL
 
-        fun openIfNeeded(context: Context, uri: String): PcmSource? {
+        fun openIfNeeded(context: Context, uri: String, rescue: Boolean = false): PcmSource? {
             val source = runCatching { FfampSource.open(context, uri) }.getOrNull() ?: return null
             val track = source.first(2)
-            val audio = if (track >= 0 && !source.systemDecodes(track)) FfampNative.audioOpen(source.handle, track) else 0L
+            val audio = if (track >= 0 && (rescue || !source.systemDecodes(track) || source.info(track).let { pcmNeedsFfamp(it[15], it[16]) })) FfampNative.audioOpen(source.handle, track) else 0L
             if (audio == 0L) { source.close(); return null }
-            return FfampPcm(source, audio)
+            return FfampPcm(source, audio, source.info(track)[19])
         }
+
+        fun frameAt(us: Long, lead: Long, rate: Int, length: Long): Long = ((us - lead).coerceAtLeast(0) * rate / 1_000_000L).coerceAtMost(length)
+
+        fun ptsOf(frame: Long, lead: Long, rate: Int): Long = frame * 1_000_000L / rate + lead
+
+        fun pcmNeedsFfamp(codec: Long, bits: Long): Boolean = codec == LPCM && bits != 16L
     }
 }

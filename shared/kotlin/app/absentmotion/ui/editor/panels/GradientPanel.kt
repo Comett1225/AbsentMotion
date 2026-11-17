@@ -27,14 +27,18 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.stringResource
+import app.absentmotion.R
 import app.absentmotion.editor.EditorState
 import app.absentmotion.model.GradientStyle
 import app.absentmotion.model.Layer
 import app.absentmotion.model.gradient
 import app.absentmotion.model.withGradient
+import app.absentmotion.ui.HoldName
 import app.absentmotion.ui.theme.Am
 
 private val Types = listOf("linear", "radial", "sweep")
+private val TypeNames = listOf(R.string.gradient_type_linear, R.string.gradient_type_radial, R.string.gradient_type_sweep)
 private val TypeActive get() = Am.PanelInset
 private val TypeIdle get() = Am.Field
 private val Dark get() = Am.FieldHi
@@ -46,11 +50,15 @@ internal fun GradientPanel(state: EditorState, layer: Layer, modifier: Modifier)
     fun change(next: GradientStyle, key: Any? = null) = state.editSelected(key) { it.withGradient(next) }
     Box(modifier) {
         Row(Modifier.offset(198.px, 205.px).size(513.px, 77.px).clip(PanelShape), Arrangement.spacedBy(3.px)) {
-            Types.forEach { t ->
+            Types.forEachIndexed { i, t ->
+                val name = stringResource(TypeNames[i])
                 Box(
-                    Modifier.weight(1f).fillMaxHeight().background(if (t == g.type) TypeActive else TypeIdle).clickable { change(g.copy(type = t)) },
+                    Modifier.weight(1f).fillMaxHeight().background(if (t == g.type) TypeActive else TypeIdle).buttonLabel(name).clickable { change(g.copy(type = t)) },
                     contentAlignment = Alignment.Center,
-                ) { Canvas(Modifier.size(63.px, 47.px)) { typePicture(t) } }
+                ) {
+                    Canvas(Modifier.size(63.px, 47.px)) { typePicture(t) }
+                    HoldName(name)
+                }
             }
         }
         Canvas(Modifier.offset(97.px, 384.px).size(718.px, 34.px)) {

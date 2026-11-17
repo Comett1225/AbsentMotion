@@ -86,6 +86,7 @@ import kotlin.math.abs
 import kotlin.math.sin
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
+import app.absentmotion.ui.HoldName
 
 private val TilePalettes = listOf(
     0xFF85A776 to 0xFF8C7968, 0xFFE9B96A to 0xFF895060, 0xFFD26E72 to 0xFF772F54, 0xFFB1BD93 to 0xFF4F8F7A,
@@ -171,7 +172,10 @@ internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrar
                             Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(26.dp).background(Color(0x32000000))
                                 .clickable(enabled = !state.addingMedia) { add(listOf(Uri.parse(file.uri))) },
                             Alignment.Center,
-                        ) { Icon(ChromeIcons.Plus, stringResource(R.string.audiotab_add), Modifier.size(16.dp), tint = Color.White) }
+                        ) {
+                            Icon(ChromeIcons.Plus, stringResource(R.string.audiotab_add), Modifier.size(16.dp), tint = Color.White)
+                            HoldName(stringResource(R.string.audiotab_add))
+                        }
                     }
                 }
             }
@@ -234,6 +238,7 @@ private fun SoundLibrary(
             Row(Modifier.fillMaxWidth().height(52.dp), verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.size(52.dp).clickable { if (shelfKey != null) shelfKey = null else onClose() }, Alignment.Center) {
                     Icon(ExportIcons.Back, stringResource(R.string.action_close), Modifier.size(24.dp), tint = Am.OnDark)
+                    HoldName(stringResource(R.string.action_close))
                 }
                 Text(shelf?.let { shelfLabel(it, view.group) } ?: stringResource(R.string.sounds_title), Modifier.weight(1f), color = Am.OnDark, fontSize = 18.sp,
                     fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -346,6 +351,7 @@ private fun SoundRow(file: DeviceAudio, preview: SoundPreview, busy: Boolean, on
         }
         Box(Modifier.size(52.dp).clickable(enabled = !busy) { onAdd(file) }, Alignment.Center) {
             Icon(ChromeIcons.Plus, stringResource(R.string.audiotab_add), Modifier.size(20.dp), tint = Am.OnDark)
+            HoldName(stringResource(R.string.audiotab_add))
         }
     }
 }

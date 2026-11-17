@@ -77,7 +77,7 @@ class RemainingContracts(unittest.TestCase):
         text = kotlin('ui/export/ExportScreen.kt')
         self.assertIn('val measured = measureGif(engine, exported, s).bytes', text)
         self.assertIn('if (storageStatus(measured, free) is StorageStatus.NotEnough)', text)
-        self.assertIn('if (kind != ExportKind.Gif && storageStatus(estimate, free) is StorageStatus.NotEnough)', text)
+        self.assertIn('if (kind != ExportKind.Gif && storageStatus(needed, free) is StorageStatus.NotEnough)', text)
 
     def test_interpolation_errors_cannot_silently_choose_a_blend_or_plain_frame(self):
         text = source('shared/cpp/engine.cpp')

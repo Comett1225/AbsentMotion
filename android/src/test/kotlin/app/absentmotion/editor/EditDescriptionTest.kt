@@ -4,7 +4,10 @@ import app.absentmotion.R
 import app.absentmotion.audio.AudioFx
 import app.absentmotion.audio.FxKind
 import app.absentmotion.audio.withAudioEffects
+import app.absentmotion.model.PropRef
 import app.absentmotion.model.Scene
+import app.absentmotion.model.keyframes
+import app.absentmotion.model.withKeyframes
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -21,7 +24,7 @@ class EditDescriptionTest {
         assertEquals(R.string.history_opacity, say(base.update(1) { it.withTransform("opacity", 0.5f) }))
         assertEquals(R.string.history_size, say(base.update(1) { it.withTransform("scale", 2f, 2f) }))
         assertEquals(R.string.history_rotation, say(base.update(1) { it.withRotation(30f) }))
-        assertEquals(R.string.history_audio_effects, say(base.update(3) { it.withAudioEffects(listOf(AudioFx.of(FxKind.Reverb))) }))
+        assertEquals(R.string.history_add_effect, say(base.update(3) { it.withAudioEffects(listOf(AudioFx.of(FxKind.Reverb))) }))
         assertEquals(R.string.history_rename, say(base.update(2) { it.copy(node = it.node.with("label", "Two")) }))
         assertEquals(R.string.history_timing, say(base.update(2) { it.copy(node = it.node.with("endTime", "500")) }))
     }
@@ -41,6 +44,18 @@ class EditDescriptionTest {
         assertEquals(R.string.history_opacity, say(both))
         val different = base.update(1) { it.withTransform("opacity", 0.5f) }.update(2) { it.withTransform("location", 1f, 1f, 0f) }
         assertEquals(R.string.history_edit_layers, say(different))
+    }
+
+    @Test fun keyframeEditsSayWhatHappenedToTheKeyframe() {
+        val loc = PropRef(PropRef.Kind.Transform, "location")
+        val one = base.update(1, 0) { it.withKeyframeToggled(loc, "10,10,0") }
+        assertEquals(R.string.a11y_add_keyframe, say(one))
+        assertEquals(R.string.a11y_remove_keyframe, say(base, one))
+        val two = one.update(1, 500) { it.withTransform("location", 40f, 10f, 0f) }
+        assertEquals(R.string.a11y_add_keyframe, say(two, one))
+        assertEquals(R.string.history_position, say(two.update(1, 500) { it.withTransform("location", 60f, 10f, 0f) }, two))
+        val later = two.update(1) { l -> l.copy(node = l.node.withChild("transform", l.node.child("transform")!!.let { tr -> tr.withChild("location", tr.child("location")!!.let { e -> e.withKeyframes(e.keyframes.map { k -> if (k.t > 0.4f) k.copy(t = 0.8f) else k }) }) })) }
+        assertEquals(R.string.history_move_keyframe, say(later, two))
     }
 
     @Test fun projectSettingsAndUnknownChangesHaveAName() {

@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor
 
+import app.absentmotion.ui.editor.panels.formatPlain
 import app.absentmotion.ui.editor.panels.keypadChar
 import app.absentmotion.ui.editor.panels.keypadNumber
 import app.absentmotion.ui.editor.panels.keypadOutside
@@ -12,6 +13,16 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class NumberEntryTest {
+    @Test fun thePadShowsWhatWasTypedWithoutFloatNoise() {
+        assertEquals("500.7", formatPlain(500.7f))
+        assertEquals("20", formatPlain(Math.toDegrees(Math.toRadians(20.0).toFloat().toDouble()).toFloat() + 0.000013f))
+        assertEquals("0.25", formatPlain(0.25f))
+        assertEquals("-12.5", formatPlain(-12.5f))
+        assertEquals("0", formatPlain(-0.000001f))
+        assertEquals("1080", formatPlain(1080f))
+        assertEquals("0.00012", formatPlain(0.00012f))
+    }
+
     @Test fun latinArabicAndPersianDigitsParse() {
         assertEquals(12.5f, keypadNumber("12.5"))
         assertEquals(12.5f, keypadNumber("\u0661\u0662\u066B\u0665"))
@@ -67,5 +78,23 @@ class NumberEntryTest {
         assertEquals('.', keypadChar(','))
         assertEquals('-', keypadChar('\u2212'))
         assertNull(keypadChar('a'))
+    }
+
+    @Test fun typingNeedsASecondTapSoonAfterTheFirstOrAKeyPress() {
+        val taps = app.absentmotion.ui.editor.panels.TapPair()
+        fun tap(down: Long, up: Long): Boolean { taps.pressed(down); taps.released(up); return taps.second(300) }
+        assertFalse(tap(1_000, 1_080))
+        assertTrue(tap(1_250, 1_320))
+        assertFalse(tap(1_400, 1_450))
+        assertFalse(tap(2_000, 2_060))
+        assertTrue(tap(2_300, 2_350))
+        assertTrue(taps.second(300))
+        assertFalse(tap(3_000, 3_050))
+        assertTrue(taps.second(300))
+        assertFalse(tap(3_100, 3_150))
+        taps.pressed(3_200)
+        taps.cancelled()
+        assertTrue(taps.second(300))
+        assertFalse(tap(3_400, 3_450))
     }
 }

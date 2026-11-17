@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor
 
+import app.absentmotion.ui.editor.panels.typeOnDoubleTap
 import app.absentmotion.ui.editor.panels.buttonLabel
 import androidx.compose.ui.draw.clip
 import app.absentmotion.ui.tutorial.tutorialGuard
@@ -44,9 +45,11 @@ import app.absentmotion.ui.editor.panels.askNumber
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Swap
 import app.absentmotion.ui.theme.enterFade
+import app.absentmotion.ui.theme.withUiFont
 import kotlin.math.roundToInt
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
+import app.absentmotion.ui.HoldName
 
 private val TextControl get() = Am.Button
 private val TextSizes = listOf(5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 48, 56, 64, 72, 80, 96, 112, 144)
@@ -128,7 +131,10 @@ internal fun TextEditor(state: EditorState, ui: TextEditUi = remember { TextEdit
                     Box(Modifier.padding(1.5.dp).width(38.dp).fillMaxHeight().clip(RoundedCornerShape(2.dp)).background(TextControl).tutorialGuard().clickable {
                         val alignments = listOf("left", "center", "right", "justify")
                         state.editSelected { it.withTextAlign(alignments[(alignments.indexOf(it.textAlign) + 1) % alignments.size]) }
-                    }, contentAlignment = Alignment.Center) { DeskTip(stringResource(R.string.text_alignment)) { Icon(alignIcon, stringResource(R.string.text_alignment), Modifier.size(24.dp), tint = Am.OnDark) } }
+                    }, contentAlignment = Alignment.Center) {
+                        DeskTip(stringResource(R.string.text_alignment)) { Icon(alignIcon, stringResource(R.string.text_alignment), Modifier.size(24.dp), tint = Am.OnDark) }
+                        HoldName(stringResource(R.string.text_alignment))
+                    }
                     Row(Modifier.padding(1.5.dp).weight(1f).fillMaxHeight().background(TextControl).tutorialGuard().clickable { popup = if (popup == "font") "" else "font" },
                         verticalAlignment = Alignment.CenterVertically) {
                         Text(FontName.parse(layer.font).label, Modifier.weight(1f).padding(start = 6.dp), fontSize = 16.sp, fontFamily = rememberFontFamily(library, layer.font),
@@ -145,6 +151,7 @@ internal fun TextEditor(state: EditorState, ui: TextEditUi = remember { TextEdit
                     }
                     Box(Modifier.padding(1.5.dp).width(38.dp).fillMaxHeight().background(TextControl).tutorialGuard().buttonLabel(stringResource(R.string.color)).clickable { popup = if (popup == "color") "" else "color" }, contentAlignment = Alignment.Center) {
                         ColourSwatch(layer.fillColor, 24.dp)
+                        HoldName(stringResource(R.string.color))
                     }
                     FontIconButton(TextIcons.Tick, stringResource(R.string.done), Modifier.tutorialTarget("text_done"), tint = Am.Accent, onClick = finish)
                 }
@@ -157,7 +164,7 @@ internal fun TextEditor(state: EditorState, ui: TextEditUi = remember { TextEdit
                     "size" -> {
                         val index = TextSizes.indexOfFirst { it >= layer.textSize.roundToInt() }.let { if (it < 0) TextSizes.lastIndex else it }
                         Row(Modifier.padding(top = 42.dp).fillMaxWidth().height(40.dp).background(TextControl), verticalAlignment = Alignment.CenterVertically) {
-                            Box(Modifier.padding(start = 6.dp).width(54.dp).height(30.dp).clip(RoundedCornerShape(4.dp)).background(Am.Field).tutorialGuard().clickable {
+                            Box(Modifier.padding(start = 6.dp).width(54.dp).height(30.dp).clip(RoundedCornerShape(4.dp)).background(Am.Field).tutorialGuard().typeOnDoubleTap {
                                 state.askNumber("", layer.textSize, "", 1f, 1000f) { v -> state.editSelected { it.withTextSize(v) } }
                             }, contentAlignment = Alignment.Center) {
                                 Text(app.absentmotion.ui.editor.panels.formatPlain(layer.textSize), color = Am.Accent, fontSize = 14.sp, maxLines = 1, softWrap = false)
@@ -203,7 +210,7 @@ private fun TextContent(state: EditorState, layer: Layer, ui: TextEditUi, modifi
             }
         },
             Modifier.fillMaxWidth().padding(horizontal = 6.dp, vertical = 2.dp).onFocusChanged { ui.fieldFocused = it.isFocused }.focusRequester(ui.focus),
-            textStyle = TextStyle(color = Am.OnDark, fontSize = 18.sp, textDirection = androidx.compose.ui.text.style.TextDirection.Content), cursorBrush = SolidColor(Am.Accent),
+            textStyle = TextStyle(color = Am.OnDark, fontSize = 18.sp, textDirection = androidx.compose.ui.text.style.TextDirection.Content).withUiFont(), cursorBrush = SolidColor(Am.Accent),
             decorationBox = { inner -> if (value.text.isEmpty()) Text(stringResource(R.string.enter_your_text_here), color = Am.OnDark.copy(alpha = .19f), fontSize = 18.sp); inner() })
     }
 }

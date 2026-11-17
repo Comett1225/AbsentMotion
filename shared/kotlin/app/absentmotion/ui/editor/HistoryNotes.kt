@@ -5,6 +5,22 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.core.animate
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.onClick
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -43,13 +59,18 @@ import app.absentmotion.ai.SmoothKeeper
 import app.absentmotion.ai.withoutAiMark
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.HistoryNote
+import app.absentmotion.editor.goTo
 import app.absentmotion.i18n.text
 import app.absentmotion.ui.editor.effects.AiProgressDialog
 import app.absentmotion.ui.theme.Am
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 private const val SHOWN_MS = 2200L
 private const val FADE_MS = 300L
+private const val AWAY_DP = 40f
+private const val FLING_DP = 700f
 
 @Composable
 internal fun HistoryNotes(state: EditorState, modifier: Modifier = Modifier) {
@@ -87,15 +108,55 @@ private fun SmoothUpdates(state: EditorState) {
 @Composable
 private fun HistoryNoteRow(state: EditorState, note: HistoryNote) {
     var shown by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) {
+    var held by remember { mutableStateOf(false) }
+    var pull by remember { mutableFloatStateOf(0f) }
+    var settle by remember { mutableStateOf<Job?>(null) }
+    val scope = rememberCoroutineScope()
+    val density = LocalDensity.current
+    val away = with(density) { AWAY_DP.dp.toPx() }
+    val fling = with(density) { FLING_DP.dp.toPx() }
+    val close = { state.historyNotes.remove(note); Unit }
+    val go = { note.spot?.let(state::goTo); close() }
+    LaunchedEffect(held) {
         shown = true
+        if (held) return@LaunchedEffect
         delay(SHOWN_MS)
         shown = false
         delay(FADE_MS)
-        state.historyNotes.remove(note)
+        close()
     }
+    val goLabel = stringResource(R.string.history_go_to_change)
+    val closeLabel = stringResource(R.string.action_close)
     AnimatedVisibility(shown, enter = fadeIn() + slideInVertically { it }, exit = fadeOut() + slideOutVertically { it / 2 }) {
-        Row(Modifier.widthIn(max = 280.dp).semantics { liveRegion = LiveRegionMode.Polite }.clip(RoundedCornerShape(18.dp)).background(Color(if (note.faint) 0x99222222 else 0xE6222222))
+        Row(Modifier.widthIn(max = 280.dp)
+            .pointerInput(note.faint) {
+                awaitEachGesture {
+                    val down = awaitFirstDown(requireUnconsumed = false)
+                    held = true
+                    var tap = !note.faint
+                    while (true) {
+                        val event = awaitPointerEvent(PointerEventPass.Initial)
+                        val change = event.changes.firstOrNull { it.id == down.id }
+                        if (change == null || event.changes.size > 1 || (change.position - down.position).getDistance() > viewConfiguration.touchSlop ||
+                            change.uptimeMillis - down.uptimeMillis > viewConfiguration.longPressTimeoutMillis) tap = false
+                        if (event.changes.none { it.pressed }) { if (tap) { change?.consume(); go() }; break }
+                    }
+                    held = false
+                }
+            }
+            .draggable(rememberDraggableState { pull = (pull + it).coerceAtLeast(0f) }, Orientation.Vertical, onDragStarted = { settle?.cancel() }, onDragStopped = { velocity ->
+                if (velocity >= fling || pull >= away && velocity > -fling) {
+                    animate(pull, pull + away * 2, animationSpec = tween(FADE_MS.toInt())) { value, _ -> pull = value }
+                    close()
+                } else settle = scope.launch { animate(pull, 0f, animationSpec = spring()) { value, _ -> pull = value } }
+            })
+            .semantics(mergeDescendants = true) {
+                liveRegion = LiveRegionMode.Polite
+                customActions = listOf(CustomAccessibilityAction(closeLabel) { close(); true })
+                if (!note.faint) onClick(goLabel) { go(); true }
+            }
+            .graphicsLayer { translationY = pull; alpha = 1f - (pull / (away * 3)).coerceIn(0f, 1f) }
+            .clip(RoundedCornerShape(18.dp)).background(Color(if (note.faint) 0x99222222 else 0xE6222222))
             .padding(horizontal = 14.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             if (!note.faint) Icon(if (note.text.id == app.absentmotion.R.string.history_undid) ChromeIcons.Undo else ChromeIcons.Redo, null, Modifier.size(16.dp), tint = Am.OnDark)
             Text(note.text.text(), Modifier.padding(start = if (note.faint) 0.dp else 8.dp), color = if (note.faint) Am.OnDarkDim else Am.OnDark, fontSize = 13.sp, maxLines = if (note.faint) 2 else 1, overflow = TextOverflow.Ellipsis)

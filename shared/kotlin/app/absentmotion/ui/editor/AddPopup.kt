@@ -79,6 +79,7 @@ import androidx.compose.foundation.LocalIndication
 import androidx.annotation.StringRes
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
+import app.absentmotion.ui.HoldName
 
 internal val AddPopupHeight = 244.dp
 
@@ -96,6 +97,7 @@ fun AddButton(state: EditorState, modifier: Modifier = Modifier) {
         ) {
             Icon(ChromeIcons.Plus, stringResource(R.string.add_layer), Modifier.size(24.dp), tint = Am.Accent)
         }
+        HoldName(stringResource(R.string.add_layer))
     }
 }
 
@@ -197,6 +199,7 @@ private fun ShapePages(state: EditorState, modifier: Modifier) = androidx.compos
                                 contentAlignment = Alignment.TopCenter,
                             ) {
                                 ShapeThumbnail(def, state.engine, Modifier.size(40.2.dp))
+                                HoldName(stringResource(def.title))
                             }
                         }
                     }

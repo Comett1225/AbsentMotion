@@ -34,7 +34,7 @@ class ThreeDMigrationTest {
     private val targets = mapOf(
         "box" to "box", "cube" to "cube", "cube2" to "cube", "cylinder" to "cylinder", "ellipsoid" to "ellipsoid", "heart" to "heart", "heart2" to "heart",
         "hexprism" to "hexprism", "hollowbox" to "hollowbox", "octahedron" to "octahedron", "pyramid" to "pyramid", "extrude" to "rasterextrude",
-        "starpoly" to "starpolyhedron", "starprism" to "starprism", "torus" to "torus", "plus" to "cross", "tunnel" to "tunnel", "flip" to "flip",
+        "starpoly" to "starprism", "starprism" to "starprism", "torus" to "torus", "plus" to "cross", "tunnel" to "tunnel", "flip" to "flip",
         "flip2" to "flip", "flip3" to "flip", "spherize" to "spherize", "spherize2" to "spherize", "360-reorient-sphere" to "reorient360",
         "vrplayer" to "viewer360", "vrcombined" to "viewer360",
     )
@@ -53,7 +53,7 @@ class ThreeDMigrationTest {
         assertEquals(listOf(0f, 0f, 0f), listOf("rotX", "rotY", "rotZ").map { box.floats(it)[0] })
         assertEquals(listOf(0f, 0f), box.floats("position"))
         assertEquals(1f, box.floats("perspective")[0], 1e-6f)
-        assertEquals(1f, box.floats("shading")[0], 1e-6f)
+        assertEquals(0.525f, box.floats("shading")[0], 1e-6f)
         assertEquals(45f, box.floats("light")[0], 1e-6f)
         assertEquals(0f, box.floats("smoothing")[0], 1e-6f)
         assertEquals(0.87f, box.floats("height")[0], 1e-6f)
@@ -82,11 +82,14 @@ class ThreeDMigrationTest {
             <property name="lightColor" type="color" value="#ffffffff" /><property name="lightDir" type="vec2" value="75.000000,-75.000000" /><property name="lightDepth" type="float" value="100.000000" />
             <property name="mirror" type="bool" value="false" /><property name="texRepeatX" type="float" value="1.000000" /><property name="MAX_ITER" type="float" value="60.000000" /></effect>""")
         val cylinder = ok.scene.node.children.single { it.name == "shape" }.children.single { it.name == "effect" }
-        assertEquals(0.5f, cylinder.floats("shading")[0], 1e-6f)
+        assertEquals(0.5f * 0.525f, cylinder.floats("shading")[0], 1e-6f)
         assertEquals(0.4f, cylinder.floats("shine")[0], 1e-6f)
         assertTrue(ok.dropped.toString(), ok.dropped.isEmpty())
         val changed = result("""<effect id="com.alightcreative.effects.cylinder"><property name="lightColor" type="color" value="#FF3366CC" /><property name="texRepeatX" type="float" value="5.75" /></effect>""")
-        assertEquals(setOf("Cylinder: lightColor", "Cylinder: texRepeatX"), changed.dropped)
+        assertTrue(changed.dropped.toString(), changed.dropped.isEmpty())
+        val tinted = changed.scene.node.children.single { it.name == "shape" }.children.single { it.name == "effect" }
+        assertEquals("#FF3366CC", tinted.children.single { it["name"] == "lightColor" }["value"])
+        assertEquals(5.75f, tinted.floats("texRepeatX")[0], 1e-6f)
     }
 
     @Test fun boxFamilySizesFollowTheObservedDefaultsAndStaySharpUntilSmoothed() {
@@ -106,27 +109,27 @@ class ThreeDMigrationTest {
         assertEquals(0.8f, ratios.floats("squeezeRatio")[0], 1e-6f)
         assertEquals(0.5f, ratios.floats("flattenRatio")[0], 1e-6f)
         val cross = migrate(alight("plus", "size" to "2", "ratio" to "0.25"))
-        assertEquals(0.6f, cross.floats("reach")[0], 1e-5f)
-        assertEquals(0.075f, cross.floats("thickness")[0], 1e-5f)
+        assertEquals(0.72f, cross.floats("reach")[0], 1e-5f)
+        assertEquals(0.09f, cross.floats("thickness")[0], 1e-5f)
     }
 
     @Test fun flipTurnsAroundItsAxisTheOtherWayRound() {
         val flip = migrate(alight("flip", "angle" to "40", "axis" to "30"))
         assertEquals(-40f, flip.floats("rotY")[0], 1e-6f)
         assertEquals(30f, flip.floats("axis")[0], 1e-6f)
-        assertEquals(1f, flip.floats("back")[0], 1e-6f)
+        assertEquals(0f, flip.floats("back")[0], 1e-6f)
         val solid = migrate("""<effect id="com.alightcreative.effects.flip3"><property name="solid" type="bool" value="true" /><property name="solidColor" type="color" value="#ffdd4455" />
             <property name="enableLight" type="bool" value="false" /></effect>""")
-        assertEquals(2f, solid.floats("back")[0], 1e-6f)
+        assertEquals(0f, solid.floats("back")[0], 1e-6f)
         assertEquals(0f, solid.floats("shading")[0], 1e-6f)
-        assertEquals("#ffdd4455", solid.children.single { it["name"] == "backColor" }["value"])
+        assertTrue(solid.children.none { it["name"] == "backColor" })
     }
 
     @Test fun panoramaEffectsTurnTheSphereByAlightsRotation() {
         val r = migrate("""<effect id="com.alightcreative.effects.360-reorient-sphere"><property name="rotate" type="vec3" value="10.000000,20.000000,30.000000" /></effect>""")
         assertEquals(listOf(30f, -20f, -10f), listOf("yaw", "pitch", "roll").map { r.floats(it)[0] })
         val v = migrate("""<effect id="com.alightcreative.effects.vrplayer"><property name="rotate" type="vec3" value="-10.000000,0.000000,5.000000" /></effect>""")
-        assertEquals(listOf(5f, 0f, 10f), listOf("yaw", "pitch", "roll").map { v.floats(it)[0] })
+        assertEquals(listOf(95f, 0f, 10f), listOf("yaw", "pitch", "roll").map { v.floats(it)[0] })
     }
 
     @Test fun tunnelKeepsPhaseTwirlAndFog() {

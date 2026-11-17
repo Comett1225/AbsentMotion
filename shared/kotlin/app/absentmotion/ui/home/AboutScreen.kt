@@ -57,6 +57,7 @@ import kotlinx.coroutines.withContext
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 import app.absentmotion.Tier
+import app.absentmotion.ui.HoldName
 
 internal const val HOME_PAGE ="https://github.com/Comett1225/AbsentMotion"
 internal const val WEBSITE = "https://absentmotion.com/"
@@ -172,10 +173,12 @@ internal fun TitleBar(
     Box(Modifier.fillMaxWidth().background(Am.Card).windowInsetsPadding(WindowInsets.statusBars.union(WindowInsets.captionBar)).height(49.dp)) {
         Box(Modifier.size(44.dp).clickable(onClick = onClick), contentAlignment = Alignment.Center) {
             Icon(icon, description, Modifier.size(24.dp), tint = Am.Navy)
+            HoldName(description)
         }
         Text(title, Modifier.align(Alignment.Center), color = Am.Navy, fontSize = 18.sp, fontWeight = FontWeight.Bold)
         if (action != null) Box(Modifier.align(Alignment.TopEnd).size(44.dp).clickable(onClick = onAction), contentAlignment = Alignment.Center) {
             Icon(action, actionDescription, Modifier.size(24.dp), tint = Am.Navy)
+            HoldName(actionDescription)
         }
         Box(Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(0.7.dp).background(Am.HomeLine))
     }

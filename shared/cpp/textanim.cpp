@@ -339,6 +339,16 @@ float Signed(uint64_t h) { return (float)(h >> 40) / 8388607.5f - 1; }
 
 }
 
+std::vector<int> SpaceRows(float before, float space, int count, float width) {
+    if (count <= 0 || !(space > 0) || !std::isfinite(space) || !std::isfinite(before) || !std::isfinite(width)) return {std::max(count, 0)};
+    const auto fit = [&](float room) { return (int)std::clamp(std::floor(room / space + 1e-3f), 0.0f, (float)count); };
+    std::vector<int> rows{fit(width - before)};
+    if (!(before > 0)) rows[0] = std::max(rows[0], 1);
+    const int full = std::max(1, fit(width));
+    for (int left = count - rows[0]; left > 0; left -= rows.back()) rows.push_back(std::min(left, full));
+    return rows;
+}
+
 std::vector<float> TypeTimes(const std::string& text, float speed, float pause) { return Typed(Firsts(text), speed, pause); }
 
 std::vector<float> BlipTimes(const std::string& text, float speed, float pause, int every) {

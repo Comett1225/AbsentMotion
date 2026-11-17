@@ -69,6 +69,7 @@ import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.animatedColor
 import kotlin.math.hypot
 import kotlin.math.min
+import app.absentmotion.ui.HoldName
 
 private val Divider get() = Am.PreviewBg
 private val Guide get() = Am.Caption
@@ -207,10 +208,12 @@ internal fun PointPanel(state: EditorState, mode: PointMode) {
             val closable = contour?.canToggleClosed == true
             Box(Modifier.weight(1f).fillMaxWidth().alpha(if (closable) 1f else DimAlpha).clickable(enabled = closable) { state.toggleClosed(mode) }, Alignment.Center) {
                 Icon(if (contour?.closed == true) DrawingIcons.PathOpen else DrawingIcons.PathClosed, stringResource(if (contour?.closed == true) R.string.a11y_open_path else R.string.a11y_close_path), Modifier.size(24.dp), tint = Am.OnDark)
+                HoldName(stringResource(if (contour?.closed == true) R.string.a11y_open_path else R.string.a11y_close_path))
             }
             val curvable = knot != null && mode.handle != Handle.Add
             Box(Modifier.weight(1f).fillMaxWidth().alpha(if (curvable) 1f else DimAlpha).clickable(enabled = curvable) { state.toggleCurve(mode) }, Alignment.Center) {
                 Icon(if (knot?.sharp != false) DrawingIcons.VertexCurved else DrawingIcons.VertexSharp, stringResource(if (knot?.sharp != false) R.string.a11y_curved_point else R.string.a11y_sharp_point), Modifier.size(28.dp), tint = Am.OnDark)
+                HoldName(stringResource(if (knot?.sharp != false) R.string.a11y_curved_point else R.string.a11y_sharp_point))
             }
             val adding = mode.handle == Handle.Add
             val usable = if (adding) contour != null && (contour.endsAt(mode.point) || contour.knots.size > 1) else knot != null
@@ -218,6 +221,7 @@ internal fun PointPanel(state: EditorState, mode: PointMode) {
                 if (adding) state.placePoint(mode) else state.deletePoint(mode)
             }, Alignment.Center) {
                 Icon(if (adding) DrawingIcons.AddPoint else DrawingIcons.DeletePoint, stringResource(if (adding) R.string.a11y_add_point else R.string.a11y_delete_point), Modifier.size(24.dp), tint = Am.OnDark)
+                HoldName(stringResource(if (adding) R.string.a11y_add_point else R.string.a11y_delete_point))
             }
         }
         Box(Modifier.width(1.dp).fillMaxHeight().background(Divider))
@@ -229,7 +233,7 @@ internal fun PointPanel(state: EditorState, mode: PointMode) {
 
 @Composable
 private fun PanelButton(icon: androidx.compose.ui.graphics.vector.ImageVector, description: String, modifier: Modifier, onClick: () -> Unit) {
-    Box(modifier.fillMaxWidth().clickable(onClick = onClick), Alignment.Center) { Icon(icon, description, Modifier.size(24.dp), tint = Am.OnDark) }
+    Box(modifier.fillMaxWidth().clickable(onClick = onClick), Alignment.Center) { Icon(icon, description, Modifier.size(24.dp), tint = Am.OnDark); HoldName(description) }
 }
 
 @Composable
@@ -318,6 +322,7 @@ private fun ContourArrow(icon: androidx.compose.ui.graphics.vector.ImageVector, 
         Alignment.Center,
     ) {
         Icon(icon, null, Modifier.size(22.dp), tint = Am.Faint)
+        HoldName(label)
     }
 }
 
@@ -353,7 +358,10 @@ private fun HandleChip(present: Boolean, selected: Boolean, label: String, onCli
     Box(
         if (present) strip.selectable(selected, role = Role.RadioButton, onClick = onClick).semantics { contentDescription = label } else strip.clearAndSetSemantics {},
         Alignment.Center,
-    ) { Box(Modifier.size(12.dp).background(if (selected) Am.Accent else Am.Faint)) }
+    ) {
+        Box(Modifier.size(12.dp).background(if (selected) Am.Accent else Am.Faint))
+        if (present) HoldName(label)
+    }
 }
 
 @Composable
@@ -361,5 +369,6 @@ private fun PlusCell(selected: Boolean, onClick: () -> Unit) {
     val add = stringResource(R.string.a11y_add_point)
     Box(Modifier.fillMaxWidth().height(26.dp).clickable(role = Role.Button, onClick = onClick).semantics { contentDescription = add }, Alignment.Center) {
         Icon(DrawingIcons.AddPoint, null, Modifier.size(18.dp), tint = animatedColor(if (selected) Am.Accent else Am.Faint))
+        HoldName(add)
     }
 }

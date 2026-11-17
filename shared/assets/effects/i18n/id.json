@@ -497,11 +497,18 @@
    }
   },
   "blur": {
-   "description": "Blur yang halus dan merata.",
+   "description": "Blur yang halus dan merata. Dengan Bentuk Kotak, blur merata-ratakan area persegi yang seragam di sekitar setiap titik.",
    "name": "Blur",
    "params": {
     "strength": {
      "label": "Kekuatan"
+    },
+    "shape": {
+     "label": "Bentuk",
+     "options": [
+      "Halus",
+      "Kotak"
+     ]
     }
    }
   },
@@ -547,6 +554,59 @@
     },
     "width": {
      "label": "Lebar"
+    },
+    "lighting": {
+     "label": "Mode pencahayaan",
+     "options": [
+      "Klasik",
+      "Lembut",
+      "Langsung"
+     ]
+    },
+    "ambient": {
+     "label": "Ambien"
+    },
+    "lightHeight": {
+     "label": "Tinggi cahaya"
+    },
+    "lightColor": {
+     "label": "Warna cahaya"
+    },
+    "glossiness": {
+     "label": "Ketajaman kilau"
+    },
+    "texMode": {
+     "label": "Tekstur",
+     "options": [
+      "Pas",
+      "Ubin",
+      "Regangan"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Pengulangan X"
+    },
+    "texRepeatY": {
+     "label": "Pengulangan Y"
+    },
+    "texMirror": {
+     "label": "Cermin"
+    },
+    "texAngle": {
+     "label": "Sudut tekstur"
+    },
+    "texOffset": {
+     "label": "Offset tekstur"
+    },
+    "texCrop": {
+     "label": "Pangkas tekstur"
+    },
+    "texAnchor": {
+     "label": "Jangkar tekstur",
+     "options": [
+      "Pusat",
+      "Sudut"
+     ]
     }
    }
   },
@@ -570,7 +630,7 @@
    }
   },
   "bulge": {
-   "description": "Mencembungkan lapisan seperti lensa (Kekuatan positif) atau mencubitnya ke arah Tengah (negatif) di dalam lingkaran Radius, sebagian dari ukuran lapisan.",
+   "description": "Mencembungkan lapisan seperti lensa (Kekuatan positif) atau mencubitnya ke arah Pusat (negatif) di dalam lingkaran berjari-jari Radius, yang dihitung sebagai bagian dari ukuran lapisan. Dengan Ukur pada Layar, Radius dihitung sebagai bagian dari layar. Dengan Peluruhan Halus, lensa menyatu lebih lembut dengan bagian lapisan lainnya.",
    "name": "Cubit/Cembung",
    "params": {
     "amount": {
@@ -581,6 +641,20 @@
     },
     "radius": {
      "label": "Radius"
+    },
+    "reach": {
+     "label": "Ukur pada",
+     "options": [
+      "Lapisan",
+      "Layar"
+     ]
+    },
+    "curve": {
+     "label": "Peluruhan",
+     "options": [
+      "Klasik",
+      "Halus"
+     ]
     }
    }
   },
@@ -781,7 +855,7 @@
    }
   },
   "circularripple": {
-   "description": "Membuat riak melingkar menyebar dari satu titik, seperti tetesan yang jatuh ke air.",
+   "description": "Membuat riak melingkar menyebar dari satu titik, seperti tetesan yang jatuh ke air. Dengan Ukur pada Layar, Frekuensi, Kekuatan, dan Radius diukur pada layar, bukan pada lapisan.",
    "name": "Riak melingkar",
    "params": {
     "center": {
@@ -801,6 +875,13 @@
     },
     "strength": {
      "label": "Kekuatan"
+    },
+    "reach": {
+     "label": "Ukur pada",
+     "options": [
+      "Lapisan",
+      "Layar"
+     ]
     }
    }
   },
@@ -813,6 +894,9 @@
     },
     "color2": {
      "label": "Warna 2"
+    },
+    "contrast": {
+     "label": "Kontras"
     },
     "intensity": {
      "label": "Intensitas"
@@ -855,6 +939,13 @@
     },
     "strength": {
      "label": "Kekuatan"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Tegas"
+     ]
     }
    }
   },
@@ -965,6 +1056,16 @@
     },
     "fill": {
      "label": "Isi"
+    },
+    "spread": {
+     "label": "Sebaran",
+     "options": [
+      "Blur",
+      "Jarak"
+     ]
+    },
+    "offset": {
+     "label": "Offset"
     }
    }
   },
@@ -992,6 +1093,16 @@
     },
     "width": {
      "label": "Lebar"
+    },
+    "spread": {
+     "label": "Sebaran",
+     "options": [
+      "Blur",
+      "Jarak"
+     ]
+    },
+    "offset": {
+     "label": "Offset"
     }
    }
   },
@@ -1041,6 +1152,13 @@
     },
     "thickness": {
      "label": "Ketebalan"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Bertumpuk"
+     ]
     }
    }
   },
@@ -1141,6 +1259,62 @@
     },
     "thickness": {
      "label": "Ketebalan"
+    },
+    "keep": {
+     "label": "Pertahankan lapisan"
+    },
+    "lighting": {
+     "label": "Mode pencahayaan",
+     "options": [
+      "Klasik",
+      "Lembut",
+      "Langsung"
+     ]
+    },
+    "ambient": {
+     "label": "Ambien"
+    },
+    "lightHeight": {
+     "label": "Tinggi cahaya"
+    },
+    "lightColor": {
+     "label": "Warna cahaya"
+    },
+    "glossiness": {
+     "label": "Ketajaman kilau"
+    },
+    "texMode": {
+     "label": "Tekstur",
+     "options": [
+      "Pas",
+      "Ubin",
+      "Regangan"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Pengulangan X"
+    },
+    "texRepeatY": {
+     "label": "Pengulangan Y"
+    },
+    "texMirror": {
+     "label": "Cermin"
+    },
+    "texAngle": {
+     "label": "Sudut tekstur"
+    },
+    "texOffset": {
+     "label": "Offset tekstur"
+    },
+    "texCrop": {
+     "label": "Pangkas tekstur"
+    },
+    "texAnchor": {
+     "label": "Jangkar tekstur",
+     "options": [
+      "Pusat",
+      "Sudut"
+     ]
     }
    }
   },
@@ -1180,6 +1354,59 @@
     },
     "smoothing": {
      "label": "Pemulusan"
+    },
+    "lighting": {
+     "label": "Mode pencahayaan",
+     "options": [
+      "Klasik",
+      "Lembut",
+      "Langsung"
+     ]
+    },
+    "ambient": {
+     "label": "Ambien"
+    },
+    "lightHeight": {
+     "label": "Tinggi cahaya"
+    },
+    "lightColor": {
+     "label": "Warna cahaya"
+    },
+    "glossiness": {
+     "label": "Ketajaman kilau"
+    },
+    "texMode": {
+     "label": "Tekstur",
+     "options": [
+      "Pas",
+      "Ubin",
+      "Regangan"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Pengulangan X"
+    },
+    "texRepeatY": {
+     "label": "Pengulangan Y"
+    },
+    "texMirror": {
+     "label": "Cermin"
+    },
+    "texAngle": {
+     "label": "Sudut tekstur"
+    },
+    "texOffset": {
+     "label": "Offset tekstur"
+    },
+    "texCrop": {
+     "label": "Pangkas tekstur"
+    },
+    "texAnchor": {
+     "label": "Jangkar tekstur",
+     "options": [
+      "Pusat",
+      "Sudut"
+     ]
     }
    }
   },
@@ -1251,6 +1478,59 @@
     },
     "smoothing": {
      "label": "Pemulusan"
+    },
+    "lighting": {
+     "label": "Mode pencahayaan",
+     "options": [
+      "Klasik",
+      "Lembut",
+      "Langsung"
+     ]
+    },
+    "ambient": {
+     "label": "Ambien"
+    },
+    "lightHeight": {
+     "label": "Tinggi cahaya"
+    },
+    "lightColor": {
+     "label": "Warna cahaya"
+    },
+    "glossiness": {
+     "label": "Ketajaman kilau"
+    },
+    "texMode": {
+     "label": "Tekstur",
+     "options": [
+      "Pas",
+      "Ubin",
+      "Regangan"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Pengulangan X"
+    },
+    "texRepeatY": {
+     "label": "Pengulangan Y"
+    },
+    "texMirror": {
+     "label": "Cermin"
+    },
+    "texAngle": {
+     "label": "Sudut tekstur"
+    },
+    "texOffset": {
+     "label": "Offset tekstur"
+    },
+    "texCrop": {
+     "label": "Pangkas tekstur"
+    },
+    "texAnchor": {
+     "label": "Jangkar tekstur",
+     "options": [
+      "Pusat",
+      "Sudut"
+     ]
     }
    }
   },
@@ -1369,7 +1649,7 @@
    }
   },
   "directionalblur": {
-   "description": "Membuat blur gerak dengan merata-ratakan sampel sepanjang sudut tertentu.",
+   "description": "Membuat blur gerak dengan merata-ratakan sampel sepanjang sudut tertentu. Dengan Sebaran Kedua sisi, blur menyebar sama rata ke depan dan ke belakang.",
    "name": "Blur Arah",
    "params": {
     "angle": {
@@ -1377,6 +1657,13 @@
     },
     "blurLength": {
      "label": "Panjang"
+    },
+    "spread": {
+     "label": "Sebaran",
+     "options": [
+      "Satu sisi",
+      "Kedua sisi"
+     ]
     }
    }
   },
@@ -1571,6 +1858,22 @@
    "params": {
     "strength": {
      "label": "Kekuatan"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Tinta"
+     ]
+    },
+    "spacing": {
+     "label": "Penghalusan"
+    },
+    "threshold": {
+     "label": "Ambang"
+    },
+    "invert": {
+     "label": "Balik"
     }
    }
   },
@@ -1613,6 +1916,9 @@
     },
     "tintColor": {
      "label": "Warna Tint"
+    },
+    "mask": {
+     "label": "Masker ke Lapisan"
     }
    }
   },
@@ -1682,6 +1988,13 @@
     },
     "thickness": {
      "label": "Ketebalan"
+    },
+    "contourStyle": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Garis tipis"
+     ]
     }
    }
   },
@@ -1724,6 +2037,59 @@
     },
     "squeezeRatio": {
      "label": "Himpit"
+    },
+    "lighting": {
+     "label": "Mode pencahayaan",
+     "options": [
+      "Klasik",
+      "Lembut",
+      "Langsung"
+     ]
+    },
+    "ambient": {
+     "label": "Ambien"
+    },
+    "lightHeight": {
+     "label": "Tinggi cahaya"
+    },
+    "lightColor": {
+     "label": "Warna cahaya"
+    },
+    "glossiness": {
+     "label": "Ketajaman kilau"
+    },
+    "texMode": {
+     "label": "Tekstur",
+     "options": [
+      "Pas",
+      "Ubin",
+      "Regangan"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Pengulangan X"
+    },
+    "texRepeatY": {
+     "label": "Pengulangan Y"
+    },
+    "texMirror": {
+     "label": "Cermin"
+    },
+    "texAngle": {
+     "label": "Sudut tekstur"
+    },
+    "texOffset": {
+     "label": "Offset tekstur"
+    },
+    "texCrop": {
+     "label": "Pangkas tekstur"
+    },
+    "texAnchor": {
+     "label": "Jangkar tekstur",
+     "options": [
+      "Pusat",
+      "Sudut"
+     ]
     }
    }
   },
@@ -1982,6 +2348,65 @@
     },
     "shine": {
      "label": "Kilau"
+    },
+    "lighting": {
+     "label": "Mode pencahayaan",
+     "options": [
+      "Klasik",
+      "Lembut",
+      "Langsung"
+     ]
+    },
+    "ambient": {
+     "label": "Ambien"
+    },
+    "lightHeight": {
+     "label": "Tinggi cahaya"
+    },
+    "lightColor": {
+     "label": "Warna cahaya"
+    },
+    "glossiness": {
+     "label": "Ketajaman kilau"
+    },
+    "pivot": {
+     "label": "Pivot"
+    },
+    "pivotDepth": {
+     "label": "Kedalaman pivot"
+    },
+    "texMode": {
+     "label": "Tekstur",
+     "options": [
+      "Pas",
+      "Ubin",
+      "Regangan"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Pengulangan X"
+    },
+    "texRepeatY": {
+     "label": "Pengulangan Y"
+    },
+    "texMirror": {
+     "label": "Cermin"
+    },
+    "texAngle": {
+     "label": "Sudut tekstur"
+    },
+    "texOffset": {
+     "label": "Offset tekstur"
+    },
+    "texCrop": {
+     "label": "Pangkas tekstur"
+    },
+    "texAnchor": {
+     "label": "Jangkar tekstur",
+     "options": [
+      "Pusat",
+      "Sudut"
+     ]
     }
    }
   },
@@ -2047,6 +2472,13 @@
     },
     "softness": {
      "label": "Kelembutan"
+    },
+    "falloff": {
+     "label": "Peluruhan",
+     "options": [
+      "Jarak",
+      "Halus"
+     ]
     }
    }
   },
@@ -2116,6 +2548,13 @@
     },
     "strength": {
      "label": "Kekuatan"
+    },
+    "screenSize": {
+     "label": "Ukuran mengikuti",
+     "options": [
+      "Lapisan",
+      "Layar"
+     ]
     }
    }
   },
@@ -2198,7 +2637,7 @@
    }
   },
   "glass": {
-   "description": "Mengubah bentuk lapisan menjadi kaca berbevel yang membiaskan lapisan di belakangnya, dengan kilau di sepanjang tepinya.",
+   "description": "Mengubah bentuk lapisan menjadi kaca berbevel yang membiaskan lapisan di belakangnya, dengan sorotan di sepanjang tepinya. Dengan Cahaya Lembut, lapisan tampil sesuai Isi dan kaca diterangi Warna, paling terang di tepi dalam bevel yang menghadap cahaya.",
    "name": "Kaca",
    "params": {
     "angle": {
@@ -2210,8 +2649,18 @@
     "color": {
      "label": "Warna"
     },
+    "fill": {
+     "label": "Isi"
+    },
     "highlight": {
      "label": "Sorotan"
+    },
+    "light": {
+     "label": "Cahaya",
+     "options": [
+      "Tepi",
+      "Lembut"
+     ]
     },
     "refraction": {
      "label": "Refraksi"
@@ -2326,6 +2775,13 @@
     },
     "scaleBrightness": {
      "label": "Skala kecerahan"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Gradien",
+      "Spektrum"
+     ]
     }
    }
   },
@@ -2401,6 +2857,14 @@
     },
     "offset": {
      "label": "Offset"
+    },
+    "origin": {
+     "label": "Asal",
+     "options": [
+      "Pusat",
+      "Sudut lapisan",
+      "Sudut layar"
+     ]
     },
     "punch": {
      "label": "Lubangi"
@@ -2606,6 +3070,59 @@
     },
     "smoothing": {
      "label": "Penghalusan"
+    },
+    "lighting": {
+     "label": "Mode pencahayaan",
+     "options": [
+      "Klasik",
+      "Lembut",
+      "Langsung"
+     ]
+    },
+    "ambient": {
+     "label": "Ambien"
+    },
+    "lightHeight": {
+     "label": "Tinggi cahaya"
+    },
+    "lightColor": {
+     "label": "Warna cahaya"
+    },
+    "glossiness": {
+     "label": "Ketajaman kilau"
+    },
+    "texMode": {
+     "label": "Tekstur",
+     "options": [
+      "Pas",
+      "Ubin",
+      "Regangan"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Pengulangan X"
+    },
+    "texRepeatY": {
+     "label": "Pengulangan Y"
+    },
+    "texMirror": {
+     "label": "Cermin"
+    },
+    "texAngle": {
+     "label": "Sudut tekstur"
+    },
+    "texOffset": {
+     "label": "Offset tekstur"
+    },
+    "texCrop": {
+     "label": "Pangkas tekstur"
+    },
+    "texAnchor": {
+     "label": "Jangkar tekstur",
+     "options": [
+      "Pusat",
+      "Sudut"
+     ]
     }
    }
   },
@@ -2661,11 +3178,33 @@
     "angle": {
      "label": "Sudut"
     },
+    "crop": {
+     "label": "Pangkas"
+    },
+    "fit": {
+     "label": "Gambar",
+     "options": [
+      "Ukuran Penuh",
+      "Di Setiap Ubin"
+     ]
+    },
+    "mask": {
+     "label": "Masker ke Lapisan"
+    },
     "mirror": {
      "label": "Cermin"
     },
+    "offset": {
+     "label": "Offset"
+    },
     "scale": {
      "label": "Skala"
+    },
+    "screenSpace": {
+     "label": "Ruang layar"
+    },
+    "stretch": {
+     "label": "Regangan"
     }
    }
   },
@@ -2769,6 +3308,59 @@
     },
     "smoothing": {
      "label": "Penghalusan"
+    },
+    "lighting": {
+     "label": "Mode pencahayaan",
+     "options": [
+      "Klasik",
+      "Lembut",
+      "Langsung"
+     ]
+    },
+    "ambient": {
+     "label": "Ambien"
+    },
+    "lightHeight": {
+     "label": "Tinggi cahaya"
+    },
+    "lightColor": {
+     "label": "Warna cahaya"
+    },
+    "glossiness": {
+     "label": "Ketajaman kilau"
+    },
+    "texMode": {
+     "label": "Tekstur",
+     "options": [
+      "Pas",
+      "Ubin",
+      "Regangan"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Pengulangan X"
+    },
+    "texRepeatY": {
+     "label": "Pengulangan Y"
+    },
+    "texMirror": {
+     "label": "Cermin"
+    },
+    "texAngle": {
+     "label": "Sudut tekstur"
+    },
+    "texOffset": {
+     "label": "Offset tekstur"
+    },
+    "texCrop": {
+     "label": "Pangkas tekstur"
+    },
+    "texAnchor": {
+     "label": "Jangkar tekstur",
+     "options": [
+      "Pusat",
+      "Sudut"
+     ]
     }
    }
   },
@@ -2839,6 +3431,59 @@
     },
     "width": {
      "label": "Lebar"
+    },
+    "lighting": {
+     "label": "Mode pencahayaan",
+     "options": [
+      "Klasik",
+      "Lembut",
+      "Langsung"
+     ]
+    },
+    "ambient": {
+     "label": "Ambien"
+    },
+    "lightHeight": {
+     "label": "Tinggi cahaya"
+    },
+    "lightColor": {
+     "label": "Warna cahaya"
+    },
+    "glossiness": {
+     "label": "Ketajaman kilau"
+    },
+    "texMode": {
+     "label": "Tekstur",
+     "options": [
+      "Pas",
+      "Ubin",
+      "Regangan"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Pengulangan X"
+    },
+    "texRepeatY": {
+     "label": "Pengulangan Y"
+    },
+    "texMirror": {
+     "label": "Cermin"
+    },
+    "texAngle": {
+     "label": "Sudut tekstur"
+    },
+    "texOffset": {
+     "label": "Offset tekstur"
+    },
+    "texCrop": {
+     "label": "Pangkas tekstur"
+    },
+    "texAnchor": {
+     "label": "Jangkar tekstur",
+     "options": [
+      "Pusat",
+      "Sudut"
+     ]
     }
    }
   },
@@ -2964,7 +3609,8 @@
      "label": "Gaya",
      "options": [
       "Klasik",
-      "Pertahankan Kecerahan"
+      "Pertahankan Kecerahan",
+      "Video"
      ]
     },
     "vibrance": {
@@ -3002,6 +3648,23 @@
     },
     "intensity": {
      "label": "Intensitas"
+    },
+    "blend": {
+     "label": "Blending",
+     "options": [
+      "Screen",
+      "Normal"
+     ]
+    },
+    "opacity": {
+     "label": "Opasitas"
+    },
+    "corners": {
+     "label": "Sudut",
+     "options": [
+      "Bulat",
+      "Siku"
+     ]
     }
    }
   },
@@ -3068,6 +3731,13 @@
     "center": {
      "label": "Pusat"
     },
+    "direction": {
+     "label": "Arah",
+     "options": [
+      "Searah jarum jam",
+      "Berlawanan jarum jam"
+     ]
+    },
     "mirror": {
      "label": "Cermin"
     },
@@ -3077,9 +3747,16 @@
    }
   },
   "lensblur": {
-   "description": "Blur berputar yang menyisakan area tajam di sekitar pusat dan makin kuat ke arah tepi.",
+   "description": "Blur berputar yang menyisakan area tajam di sekitar pusat dan makin kuat ke arah tepi. Dengan Blur Zoom, blur justru melebar keluar dari pusat hingga melewati tepi lapisan.",
    "name": "Blur Lensa",
    "params": {
+    "blur": {
+     "label": "Blur",
+     "options": [
+      "Putar",
+      "Zoom"
+     ]
+    },
     "center": {
      "label": "Pusat"
     },
@@ -3154,6 +3831,12 @@
     },
     "threshold": {
      "label": "Ambang"
+    },
+    "soften": {
+     "label": "Haluskan"
+    },
+    "mask": {
+     "label": "Masker ke Lapisan"
     }
    }
   },
@@ -3257,7 +3940,7 @@
    }
   },
   "linearstreaks": {
-   "description": "Membuat goresan lurus dengan menggeser salinan lapisan sepanjang sudut dan memadukannya di bagian yang bertumpuk.",
+   "description": "Membuat goresan lurus dengan menggeser salinan lapisan sepanjang sudut dan memadukannya di bagian yang bertumpuk. Dengan Blending Nonaktif, lapisan tetap seperti semula. Dengan Salinan Setiap piksel, satu salinan diletakkan di setiap piksel Panjang, bukan 48 salinan yang tersebar di sepanjangnya.",
    "name": "Goresan Linear",
    "params": {
     "alpha": {
@@ -3274,11 +3957,19 @@
      "options": [
       "Cerahkan",
       "Rata-rata",
-      "Gelapkan"
+      "Gelapkan",
+      "Nonaktif"
      ]
     },
     "reach": {
      "label": "Panjang"
+    },
+    "copies": {
+     "label": "Salinan",
+     "options": [
+      "Berjarak",
+      "Setiap piksel"
+     ]
     }
    }
   },
@@ -3333,6 +4024,12 @@
     },
     "solidity": {
      "label": "Kepadatan"
+    },
+    "fill": {
+     "label": "Isi"
+    },
+    "samples": {
+     "label": "Sampel"
     }
    }
   },
@@ -3348,6 +4045,9 @@
     },
     "threshold": {
      "label": "Ambang"
+    },
+    "high": {
+     "label": "Ambang atas"
     }
    }
   },
@@ -3472,6 +4172,13 @@
    "description": "Membagi lapisan menjadi kotak-kotak dan mengisi tiap kotak dengan warna rata-ratanya.",
    "name": "Mosaik",
    "params": {
+    "average": {
+     "label": "Rata-rata",
+     "options": [
+      "Sel",
+      "Sudut"
+     ]
+    },
     "count": {
      "label": "Jumlah"
     },
@@ -3484,7 +4191,7 @@
    }
   },
   "motionblur": {
-   "description": "Membuat lapisan kabur mengikuti arah gerak, putaran dan pembesarannya, dari keyframe dan efek gerak seperti Auto-Shake dan Oscillate. Tune mengatur besar blur. Pratinjau menampilkan blur yang lebih cepat kecuali Full Blur aktif.",
+   "description": "Membuat lapisan kabur mengikuti arah gerak, putaran dan pembesarannya, dari keyframe dan efek gerak seperti Goyang otomatis dan Osilasi. Gunakan Atur untuk memperkuat atau memperlemah blur. Pratinjau menampilkan blur yang lebih cepat kecuali Blur Penuh aktif.",
    "name": "Blur gerak",
    "params": {
     "position": {
@@ -3594,6 +4301,59 @@
     },
     "shine": {
      "label": "Kilau"
+    },
+    "lighting": {
+     "label": "Mode pencahayaan",
+     "options": [
+      "Klasik",
+      "Lembut",
+      "Langsung"
+     ]
+    },
+    "ambient": {
+     "label": "Ambien"
+    },
+    "lightHeight": {
+     "label": "Tinggi cahaya"
+    },
+    "lightColor": {
+     "label": "Warna cahaya"
+    },
+    "glossiness": {
+     "label": "Ketajaman kilau"
+    },
+    "texMode": {
+     "label": "Tekstur",
+     "options": [
+      "Pas",
+      "Ubin",
+      "Regangan"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Pengulangan X"
+    },
+    "texRepeatY": {
+     "label": "Pengulangan Y"
+    },
+    "texMirror": {
+     "label": "Cermin"
+    },
+    "texAngle": {
+     "label": "Sudut tekstur"
+    },
+    "texOffset": {
+     "label": "Offset tekstur"
+    },
+    "texCrop": {
+     "label": "Pangkas tekstur"
+    },
+    "texAnchor": {
+     "label": "Jangkar tekstur",
+     "options": [
+      "Pusat",
+      "Sudut"
+     ]
     }
    }
   },
@@ -4144,6 +4904,13 @@
     "blockSize": {
      "label": "Ukuran"
     },
+    "edges": {
+     "label": "Tepi",
+     "options": [
+      "Cermin",
+      "Transparan"
+     ]
+    },
     "offset": {
      "label": "Offset"
     },
@@ -4244,7 +5011,7 @@
    }
   },
   "polar": {
-   "description": "Membengkokkan lapisan di sekitar pusatnya, mengubah garis lurus menjadi lingkaran, atau membuka lingkaran menjadi garis lurus.",
+   "description": "Membengkokkan lapisan di sekitar pusatnya, mengubah garis lurus menjadi lingkaran, atau membuka lingkaran menjadi garis lurus. Tata letak memilih tepi lapisan mana yang bertemu di tengah.",
    "name": "Koordinat polar",
    "params": {
     "amount": {
@@ -4255,6 +5022,13 @@
      "options": [
       "Kartesius ke polar",
       "Polar ke kartesius"
+     ]
+    },
+    "middle": {
+     "label": "Tata letak",
+     "options": [
+      "Atas di tengah",
+      "Bawah di tengah"
      ]
     }
    }
@@ -4448,11 +5222,64 @@
     },
     "shine": {
      "label": "Kilau"
+    },
+    "lighting": {
+     "label": "Mode pencahayaan",
+     "options": [
+      "Klasik",
+      "Lembut",
+      "Langsung"
+     ]
+    },
+    "ambient": {
+     "label": "Ambien"
+    },
+    "lightHeight": {
+     "label": "Tinggi cahaya"
+    },
+    "lightColor": {
+     "label": "Warna cahaya"
+    },
+    "glossiness": {
+     "label": "Ketajaman kilau"
+    },
+    "texMode": {
+     "label": "Tekstur",
+     "options": [
+      "Pas",
+      "Ubin",
+      "Regangan"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Pengulangan X"
+    },
+    "texRepeatY": {
+     "label": "Pengulangan Y"
+    },
+    "texMirror": {
+     "label": "Cermin"
+    },
+    "texAngle": {
+     "label": "Sudut tekstur"
+    },
+    "texOffset": {
+     "label": "Offset tekstur"
+    },
+    "texCrop": {
+     "label": "Pangkas tekstur"
+    },
+    "texAnchor": {
+     "label": "Jangkar tekstur",
+     "options": [
+      "Pusat",
+      "Sudut"
+     ]
     }
    }
   },
   "radialblur": {
-   "description": "Memberi blur zoom radial dengan merata-ratakan sampel dari titik pusat, kekuatannya bisa diatur.",
+   "description": "Memberi blur zoom radial dengan merata-ratakan sampel di sepanjang sinar dari titik pusat, dengan kekuatan yang bisa diatur. Dengan Panjang Merata, semua guratan sama panjang dan tidak memanjang sesuai jarak dari pusat.",
    "name": "Blur Zoom",
    "params": {
     "amount": {
@@ -4460,6 +5287,13 @@
     },
     "center": {
      "label": "Pusat"
+    },
+    "streak": {
+     "label": "Panjang",
+     "options": [
+      "Menurut jarak",
+      "Merata"
+     ]
     }
    }
   },
@@ -4586,11 +5420,14 @@
     },
     "reach": {
      "label": "Panjang"
+    },
+    "fill": {
+     "label": "Isi"
     }
    }
   },
   "radialwipe": {
-   "description": "Menyembunyikan sepotong lapisan yang disapu mengelilingi Tengah dari Sudut awal, seperti jarum jam. Progres adalah sudut yang disapu, Jumlah mengulang potongan di sekeliling lingkaran dan Keduanya menyapu ke dua arah. Animasikan Progres untuk transisi.",
+   "description": "Menyembunyikan sepotong lapisan yang tersapu mengelilingi Pusat mulai dari Sudut Awal, seperti jarum jam. Progres adalah sudut yang tersapu, Jumlah mengulang potongan di sekeliling lingkaran, dan Keduanya menyapu ke dua arah. Animasikan Progres untuk transisi. Dengan Potongan Tepat, Jumlah boleh berupa pecahan sehingga potongan terakhir lebih sempit, dan Feather melembutkan kedua sisi setiap potongan.",
    "name": "Sapuan Radial",
    "params": {
     "center": {
@@ -4615,6 +5452,13 @@
     },
     "start": {
      "label": "Sudut Awal"
+    },
+    "wedges": {
+     "label": "Potongan",
+     "options": [
+      "Utuh",
+      "Tepat"
+     ]
     }
    }
   },
@@ -4699,6 +5543,26 @@
     },
     "shine": {
      "label": "Kilau"
+    },
+    "lighting": {
+     "label": "Mode pencahayaan",
+     "options": [
+      "Klasik",
+      "Lembut",
+      "Langsung"
+     ]
+    },
+    "ambient": {
+     "label": "Ambien"
+    },
+    "lightHeight": {
+     "label": "Tinggi cahaya"
+    },
+    "lightColor": {
+     "label": "Warna cahaya"
+    },
+    "glossiness": {
+     "label": "Ketajaman kilau"
     }
    },
    "shortcuts": {
@@ -4914,6 +5778,13 @@
     },
     "threshold": {
      "label": "Ambang"
+    },
+    "match": {
+     "label": "Pencocokan",
+     "options": [
+      "RGB",
+      "Kroma"
+     ]
     }
    }
   },
@@ -4964,7 +5835,7 @@
    }
   },
   "rgbsplit": {
-   "description": "Memisahkan saluran merah, hijau, dan biru: saluran Tengah tetap di tempatnya dan dua lainnya bergeser ke arah berlawanan sepanjang Sudut; Terang menambahkan warna yang bergeser, Gelap membuatnya solid, Masker hanya menyisakan area yang ketiganya bertumpuk, dan Luma membuat pinggiran seopak sesuai kecerahannya.",
+   "description": "Memisahkan saluran merah, hijau, dan biru: saluran Pusat tetap di tempatnya dan dua lainnya bergeser ke arah berlawanan sepanjang Sudut. Terang menjumlahkan warna yang bergeser, Gelap membuatnya tetap solid, Masker hanya menyisakan area tempat ketiganya bertumpuk, dan Luma membuat opasitas pinggiran warna sesuai kecerahannya. Rata-rata membuat opasitas tiap titik sesuai porsi saluran yang menutupinya.",
    "name": "Pemisahan RGB",
    "params": {
     "angle": {
@@ -4984,7 +5855,8 @@
       "Terang",
       "Gelap",
       "Masker",
-      "Luma"
+      "Luma",
+      "Rata-rata"
      ]
     },
     "strength": {
@@ -5364,7 +6236,7 @@
    }
   },
   "shutterblur": {
-   "description": "Memblurkan lapisan mengikuti gerak, putaran dan pembesarannya yang sebenarnya, seperti rana kamera. Sudut rana yang lebih lebar memberi jejak lebih panjang dan sampel lebih banyak membuatnya lebih halus. Pratinjau menampilkan blur yang lebih cepat kecuali Full Blur aktif.",
+   "description": "Memblurkan lapisan mengikuti gerak, putaran dan pembesarannya yang sebenarnya, seperti rana kamera. Sudut rana yang lebih lebar memberi jejak lebih panjang dan sampel lebih banyak membuatnya lebih halus. Pratinjau menampilkan blur yang lebih cepat kecuali Blur Penuh aktif.",
    "name": "Blur Gerak Sejati",
    "params": {
     "samples": {
@@ -5492,6 +6364,13 @@
     },
     "outside": {
      "label": "Cahaya Luar"
+    },
+    "falloff": {
+     "label": "Peluruhan",
+     "options": [
+      "Merata",
+      "Lapisan"
+     ]
     }
    }
   },
@@ -5585,6 +6464,59 @@
     },
     "shine": {
      "label": "Kilau"
+    },
+    "lighting": {
+     "label": "Mode pencahayaan",
+     "options": [
+      "Klasik",
+      "Lembut",
+      "Langsung"
+     ]
+    },
+    "ambient": {
+     "label": "Ambien"
+    },
+    "lightHeight": {
+     "label": "Tinggi cahaya"
+    },
+    "lightColor": {
+     "label": "Warna cahaya"
+    },
+    "glossiness": {
+     "label": "Ketajaman kilau"
+    },
+    "texMode": {
+     "label": "Tekstur",
+     "options": [
+      "Pas",
+      "Ubin",
+      "Regangan"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Pengulangan X"
+    },
+    "texRepeatY": {
+     "label": "Pengulangan Y"
+    },
+    "texMirror": {
+     "label": "Cermin"
+    },
+    "texAngle": {
+     "label": "Sudut tekstur"
+    },
+    "texOffset": {
+     "label": "Offset tekstur"
+    },
+    "texCrop": {
+     "label": "Pangkas tekstur"
+    },
+    "texAnchor": {
+     "label": "Jangkar tekstur",
+     "options": [
+      "Pusat",
+      "Sudut"
+     ]
     }
    }
   },
@@ -5732,11 +6664,18 @@
     },
     "threshold": {
      "label": "Ambang"
+    },
+    "grey": {
+     "label": "Abu-abu",
+     "options": [
+      "HD",
+      "SD"
+     ]
     }
    }
   },
   "squeeze": {
-   "description": "Mencubit bagian tengah lapisan ke dalam dengan Kekuatan positif dan menggembungkannya ke luar dengan Kekuatan negatif. Legacy mempertahankan bentuk proyek lama.",
+   "description": "Mencubit bagian tengah lapisan ke dalam dengan Kekuatan positif dan menggembungkannya ke luar dengan Kekuatan negatif. Legacy mempertahankan bentuk proyek lama. Jam pasir juga mendorong bagian tengah tepi atas dan bawah ke luar.",
    "name": "Cubit",
    "params": {
     "amount": {
@@ -5746,7 +6685,8 @@
      "label": "Bentuk",
      "options": [
       "Cubit/Gembung",
-      "Legacy"
+      "Legacy",
+      "Jam pasir"
      ]
     }
    }
@@ -5846,6 +6786,59 @@
     },
     "shine": {
      "label": "Kilau"
+    },
+    "lighting": {
+     "label": "Mode pencahayaan",
+     "options": [
+      "Klasik",
+      "Lembut",
+      "Langsung"
+     ]
+    },
+    "ambient": {
+     "label": "Ambien"
+    },
+    "lightHeight": {
+     "label": "Tinggi cahaya"
+    },
+    "lightColor": {
+     "label": "Warna cahaya"
+    },
+    "glossiness": {
+     "label": "Ketajaman kilau"
+    },
+    "texMode": {
+     "label": "Tekstur",
+     "options": [
+      "Pas",
+      "Ubin",
+      "Regangan"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Pengulangan X"
+    },
+    "texRepeatY": {
+     "label": "Pengulangan Y"
+    },
+    "texMirror": {
+     "label": "Cermin"
+    },
+    "texAngle": {
+     "label": "Sudut tekstur"
+    },
+    "texOffset": {
+     "label": "Offset tekstur"
+    },
+    "texCrop": {
+     "label": "Pangkas tekstur"
+    },
+    "texAnchor": {
+     "label": "Jangkar tekstur",
+     "options": [
+      "Pusat",
+      "Sudut"
+     ]
     }
    }
   },
@@ -5894,6 +6887,66 @@
     },
     "smoothing": {
      "label": "Penghalusan"
+    },
+    "starStyle": {
+     "label": "Gaya",
+     "options": [
+      "Datar",
+      "Runcing"
+     ]
+    },
+    "lighting": {
+     "label": "Mode pencahayaan",
+     "options": [
+      "Klasik",
+      "Lembut",
+      "Langsung"
+     ]
+    },
+    "ambient": {
+     "label": "Ambien"
+    },
+    "lightHeight": {
+     "label": "Tinggi cahaya"
+    },
+    "lightColor": {
+     "label": "Warna cahaya"
+    },
+    "glossiness": {
+     "label": "Ketajaman kilau"
+    },
+    "texMode": {
+     "label": "Tekstur",
+     "options": [
+      "Pas",
+      "Ubin",
+      "Regangan"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Pengulangan X"
+    },
+    "texRepeatY": {
+     "label": "Pengulangan Y"
+    },
+    "texMirror": {
+     "label": "Cermin"
+    },
+    "texAngle": {
+     "label": "Sudut tekstur"
+    },
+    "texOffset": {
+     "label": "Offset tekstur"
+    },
+    "texCrop": {
+     "label": "Pangkas tekstur"
+    },
+    "texAnchor": {
+     "label": "Jangkar tekstur",
+     "options": [
+      "Pusat",
+      "Sudut"
+     ]
     }
    }
   },
@@ -6065,7 +7118,9 @@
       "Robot",
       "Cicit",
       "Mesin Tik",
-      "Chiptune"
+      "Chiptune",
+      "Kerangka",
+      "Suara Kustom"
      ]
     },
     "volume": {
@@ -6439,6 +7494,13 @@
     "count": {
      "label": "Jumlah"
     },
+    "edges": {
+     "label": "Tepi",
+     "options": [
+      "Cermin",
+      "Transparan"
+     ]
+    },
     "offset": {
      "label": "Offset"
     },
@@ -6447,6 +7509,9 @@
     },
     "rotation": {
      "label": "Rotasi"
+    },
+    "screenSpace": {
+     "label": "Ruang layar"
     },
     "seed": {
      "label": "Benih"
@@ -6457,7 +7522,7 @@
    }
   },
   "tiles": {
-   "description": "Mengulang lapisan untuk memenuhi layar. Naikkan Pangkas agar ubin lebih kecil, dengan opsi pencerminan, offset baris, dan rotasi. Skala Lama mempertahankan proyek lama.",
+   "description": "Mengulang lapisan untuk memenuhi layar. Naikkan Pangkas agar ubin lebih kecil, dengan opsi pencerminan, offset baris, dan rotasi. Skala Lama mempertahankan proyek lama. Dengan Ukuran Di dalam ubin, setiap ubin tetap seukuran lapisan, lalu gambar di dalamnya diperbesar dan diputar.",
    "name": "Ubin",
    "params": {
     "angle": {
@@ -6473,7 +7538,8 @@
      "label": "Ukuran",
      "options": [
       "Pangkas",
-      "Skala Lama"
+      "Skala Lama",
+      "Di dalam ubin"
      ]
     },
     "vertical": {
@@ -6494,8 +7560,18 @@
     "count": {
      "label": "Jumlah"
     },
+    "edges": {
+     "label": "Tepi",
+     "options": [
+      "Cermin",
+      "Transparan"
+     ]
+    },
     "offset": {
      "label": "Offset"
+    },
+    "screenSpace": {
+     "label": "Ruang layar"
     },
     "seed": {
      "label": "Benih"
@@ -6598,6 +7674,59 @@
     },
     "thickness": {
      "label": "Ketebalan"
+    },
+    "lighting": {
+     "label": "Mode pencahayaan",
+     "options": [
+      "Klasik",
+      "Lembut",
+      "Langsung"
+     ]
+    },
+    "ambient": {
+     "label": "Ambien"
+    },
+    "lightHeight": {
+     "label": "Tinggi cahaya"
+    },
+    "lightColor": {
+     "label": "Warna cahaya"
+    },
+    "glossiness": {
+     "label": "Ketajaman kilau"
+    },
+    "texMode": {
+     "label": "Tekstur",
+     "options": [
+      "Pas",
+      "Ubin",
+      "Regangan"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Pengulangan X"
+    },
+    "texRepeatY": {
+     "label": "Pengulangan Y"
+    },
+    "texMirror": {
+     "label": "Cermin"
+    },
+    "texAngle": {
+     "label": "Sudut tekstur"
+    },
+    "texOffset": {
+     "label": "Offset tekstur"
+    },
+    "texCrop": {
+     "label": "Pangkas tekstur"
+    },
+    "texAnchor": {
+     "label": "Jangkar tekstur",
+     "options": [
+      "Pusat",
+      "Sudut"
+     ]
     }
    }
   },
@@ -6739,11 +7868,14 @@
     },
     "stretch": {
      "label": "Regang"
+    },
+    "screenSpace": {
+     "label": "Ruang layar"
     }
    }
   },
   "twirl": {
-   "description": "Memelintir lapisan di sekitar Tengah seperti pusaran air, paling kuat di tengah dan memudar di Radius (sebagian dari ukuran lapisan). Kekuatan negatif memelintir ke arah sebaliknya.",
+   "description": "Memelintir lapisan di sekitar Pusat seperti pusaran air, paling kuat di tengah dan memudar di Radius (bagian dari ukuran lapisan). Kekuatan negatif memelintir ke arah sebaliknya. Dengan Ukur pada Layar, Radius dihitung sebagai bagian dari layar dan pelintiran memudar dengan halus.",
    "name": "Pusaran",
    "params": {
     "center": {
@@ -6754,11 +7886,18 @@
     },
     "strength": {
      "label": "Kekuatan"
+    },
+    "reach": {
+     "label": "Ukur pada",
+     "options": [
+      "Lapisan",
+      "Layar"
+     ]
     }
    }
   },
   "unsharpmask": {
-   "description": "Mempertajam dengan menambahkan kembali selisih antara lapisan dan salinan buramnya. Kekuatan mengatur lebar blur, Jumlah menentukan seberapa banyak yang ditambahkan kembali, dan Ambang di atas 50% membiarkan selisih kecil.",
+   "description": "Mempertajam dengan menambahkan kembali selisih antara lapisan dan salinan buramnya. Kekuatan mengatur lebar blur, Jumlah seberapa banyak yang ditambahkan kembali, dan Ambang batas di atas 50% membiarkan selisih kecil. Dengan Warna masker Merah, masker tampil merah di bagian yang kecerahannya berbeda dari salinan buram lebih dari Ambang batas di atas 50%.",
    "name": "Masker unsharp",
    "params": {
     "amount": {
@@ -6772,6 +7911,13 @@
     },
     "threshold": {
      "label": "Ambang batas"
+    },
+    "maskColor": {
+     "label": "Warna masker",
+     "options": [
+      "Abu-abu",
+      "Merah"
+     ]
     }
    }
   },
@@ -6867,6 +8013,19 @@
     },
     "yaw": {
      "label": "Yaw"
+    },
+    "projection": {
+     "label": "Keluaran",
+     "options": [
+      "Tampilan",
+      "Panorama"
+     ]
+    },
+    "eyeDistance": {
+     "label": "Jarak"
+    },
+    "frame": {
+     "label": "Rasio bingkai"
     }
    }
   },
@@ -6932,7 +8091,7 @@
    }
   },
   "wavewarp": {
-   "description": "Membengkokkan lapisan dengan gelombang sinus: Jarak mengatur berapa banyak gelombang melintasinya, Magnitudo seberapa jauh dorongannya, Sudut arah gelombang berjalan, dan Sudut warp arah dorongannya.",
+   "description": "Membengkokkan lapisan dengan gelombang sinus: Jarak mengatur berapa banyak gelombang melintasinya, Magnitudo seberapa jauh dorongannya, Sudut arah gelombang berjalan, dan Sudut warp arah dorongannya. Ruang layar mengukur besar gelombang menurut layar, bukan lapisan. Magnitudo silang menambahkan gelombang kedua yang ukurannya diatur Jarak silang, berjalan searah Sudut warp dan mendorong searah Sudut. Dengan Asal Kiri bawah layar, gelombang diukur dari sudut layar tersebut menurut sisi pendeknya, lalu Fase menggesernya.",
    "name": "Distorsi gelombang",
    "params": {
     "angle": {
@@ -6952,6 +8111,22 @@
     },
     "warpAngle": {
      "label": "Sudut warp"
+    },
+    "screenSpace": {
+     "label": "Ruang layar"
+    },
+    "crossSpacing": {
+     "label": "Jarak silang"
+    },
+    "crossMagnitude": {
+     "label": "Magnitudo silang"
+    },
+    "origin": {
+     "label": "Asal",
+     "options": [
+      "Sudut lapisan",
+      "Kiri bawah layar"
+     ]
     }
    }
   },

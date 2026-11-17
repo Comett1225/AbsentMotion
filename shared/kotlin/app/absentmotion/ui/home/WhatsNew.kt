@@ -75,6 +75,7 @@ import app.absentmotion.ui.adaptive.AdaptiveWindow
 import app.absentmotion.ui.adaptive.LocalAdaptiveSpace
 import app.absentmotion.ui.adaptive.adaptiveWindowIsWide
 import kotlinx.coroutines.launch
+import app.absentmotion.ui.HoldName
 
 data class WhatsNewGroup(val title: String, val items: List<String>)
 
@@ -360,6 +361,7 @@ internal fun ChangelogButton(settings: AppSettings, modifier: Modifier = Modifie
     var open by remember { mutableStateOf(false) }
     Box(modifier.size(50.dp).clickable(role = Role.Button) { open = true }, Alignment.Center) {
         ChangelogIcon(WhatsNewNotes.unseen(context, settings))
+        HoldName(stringResource(R.string.update_changelog))
     }
     if (open) CurrentWhatsNew(settings) { open = false }
 }

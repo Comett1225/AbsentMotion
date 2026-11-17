@@ -6,6 +6,40 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [5.2.0] - Unreleased
+
+### Added
+
+- Community library: the Community tab lists projects, presets and tools shared by other people, with filters, details and Add. Downloads are checked by size and SHA-256.
+- Phones open, preview and export AVI (DivX and Xvid), WMV and videos with AC-3 sound they could not play, plus 10-bit and 4:2:2 H.264, ProRes and DNxHD, through FFamp's own decoders. Files the phone plays stay on the phone's reader.
+- FFamp media reader (experimental) on every platform: the first start asks once whether to try it, with this device's measured speed-ups; Settings > Playback > Media reader changes it.
+- Double-tap to type: one tap on a number selects it for the ruler or slider, a double tap (double-click on computers) opens typing with the whole value selected.
+- Theme color and App font in Settings > Editor: an accent colour (presets or your own) and a font for the whole app.
+- Current Frame as... has its own export screen on phones and its own window on computers.
+- Text Blips: a Skeleton voice and Custom Sound, which plays a sound file you pick.
+- Keyboard shortcuts page in desktop Settings: every action with its keys, rebinding with conflict checks and reset; new shortcuts copy and paste keyframes, jump between keyframes and add bookmarks.
+- Hold an icon-only button on a phone to see its name; letting go does not press it.
+- Undo and redo notes name the change (for example "Undid: Add Blur"); tap a note to go to the change, swipe it down to close it.
+
+### Changed
+
+- Alight Motion import: many more effects look the same as or very close to Alight Motion (blurs, tiles and patterns, colour and key effects, shadows and glows, warps, wipes, easing curves). New settings added to match always go after the existing ones.
+- Landscape tablets and computers: pages and tools use the width and open as wide cards instead of a phone-shaped frame.
+- Export with AI Smooth shows Downloading AI Smooth as its own stage, and the time left follows the measured speed.
+- Computers: right-click a finished export's preview to copy the file; the export time estimate says Calculating until it knows; a timeline selection box keeps its corner while the timeline scrolls.
+- Phones get the big Create project button in New project.
+- Every new text and help page is translated into all 24 languages.
+
+### Fixed
+
+- Many spaces in a row in a text layer ran past the text box instead of wrapping.
+- Playback stopped one frame before the end.
+- Frame Rate on a Copy Background layer did not hold the background for each step.
+- An export on a phone failed with an error when the encoder stopped in the background; it now retries with another encoder.
+- 24-bit sound in camera videos was missing on phones.
+- The export window on computers could not be closed after the export finished.
+- The bottom of the colour wheel's degrees was cut off on Windows.
+
 ## [5.1.1] - 2026-11-14
 
 ### Added

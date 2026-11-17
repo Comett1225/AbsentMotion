@@ -125,11 +125,15 @@ internal class OfflineMix(
             val openable = runCatching { openableUri(uri) }.getOrNull() ?: return false
             val parsed = android.net.Uri.parse(uri)
             return soundTracks.getOrPut(uri + "\n" + app.absentmotion.media.fileVersion(context.contentResolver, parsed)) {
+                val file = android.net.Uri.parse(openable)
                 val extractor = android.media.MediaExtractor()
-                try {
-                    extractor.setDataSource(context.applicationContext, android.net.Uri.parse(openable), null)
+                val listed = try {
+                    extractor.setDataSource(context.applicationContext, file, null)
                     (0 until extractor.trackCount).any { extractor.getTrackFormat(it).getString(android.media.MediaFormat.KEY_MIME)?.startsWith("audio/") == true }
-                } catch (e: Exception) { true } finally { extractor.release() }
+                } catch (e: Exception) { null } finally { extractor.release() }
+                app.absentmotion.media.soundFound(listed, { app.absentmotion.media.MediaBackend.ffamp(context, file, "audio/")?.reads(context, file, "audio/") == true }) {
+                    app.absentmotion.media.ffampHasTrack(context, file, "audio/")
+                }
             }
         }
     }

@@ -3,7 +3,7 @@
  "name": "Circular Ripple",
  "category": "distort",
  "since": "3.0.0",
- "description": "Makes circular ripples spread out from a point, like a drop falling into water.",
+ "description": "Makes circular ripples spread out from a point, like a drop falling into water. Measure On Screen measures Frequency, Strength and Radius on the screen instead of the layer.",
  "params": [
   {
    "id": "center",
@@ -61,7 +61,17 @@
    "min": 0,
    "max": 1,
    "step": 0.001
+  },
+  {
+   "id": "reach",
+   "label": "Measure On",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Layer",
+    "Screen"
+   ]
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 center;\nuniform float frequency;\nuniform float strength;\nuniform float phase;\nuniform float radius;\nuniform float feather;\nhalf4 main(float2 coord) {\n    float m = min(size.x, size.y);\n    float2 d = coord - center * size;\n    float r = length(d) / m;\n    if (r <= 0.0) return image.eval(coord);\n    float edge = max(feather * radius, 0.0005);\n    float fade = 1.0 - smoothstep(radius - edge, radius, r);\n    float wave = sin(6.2831853 * (frequency * r - phase));\n    return image.eval(coord + d / (r * m) * wave * strength * m * 0.5 * fade);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float4 screen;\nuniform float time;\nuniform float2 center;\nuniform float frequency;\nuniform float strength;\nuniform float phase;\nuniform float radius;\nuniform float feather;\nuniform float reach;\nhalf4 main(float2 coord) {\n    float m = reach > 0.5 ? min(screen.z, screen.w) : min(size.x, size.y);\n    float2 d = coord - center * size;\n    float r = length(d) / m;\n    if (r <= 0.0) return image.eval(coord);\n    float edge = max(feather * radius, 0.0005);\n    float fade = 1.0 - smoothstep(radius - edge, radius, r);\n    float wave = sin(6.2831853 * (frequency * r - phase));\n    return image.eval(coord + d / (r * m) * wave * strength * m * 0.5 * fade);\n}\n"
 }

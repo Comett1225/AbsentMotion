@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -33,6 +35,7 @@ import app.absentmotion.ai.withoutAiMark
 import app.absentmotion.editor.EditorState
 import app.absentmotion.ui.editor.ChromeIcons
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.HoldName
 
 internal val AiMarkRowHeight = 37.dp
 internal val AiMarkRowGap = 6.5.dp
@@ -49,9 +52,10 @@ internal fun AiMarkRow(state: EditorState, mark: AiMark) {
         Text(name, Modifier.weight(1f).padding(start = 12.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         if (kind.ai) Text(stringResource(R.string.ai), Modifier.padding(horizontal = 6.dp).clip(RoundedCornerShape(3.dp)).background(Am.Accent).padding(horizontal = 5.dp, vertical = 1.dp),
             color = Am.OnAccent, fontSize = 10.sp, fontWeight = FontWeight.Bold, maxLines = 1)
-        if (mark.restorable) Icon(ChromeIcons.Trash, stringResource(R.string.ai_mark_restore), Modifier.size(36.dp).clickable {
-            state.selectedId?.let { id -> state.edit { it.withoutAiMark(id, kind) } }
-        }.padding(7.dp), tint = Am.OnDark)
+        if (mark.restorable) Box(Modifier.size(36.dp).clickable { state.selectedId?.let { id -> state.edit { it.withoutAiMark(id, kind) } } }) {
+            Icon(ChromeIcons.Trash, stringResource(R.string.ai_mark_restore), Modifier.fillMaxSize().padding(7.dp), tint = Am.OnDark)
+            HoldName(stringResource(R.string.restore))
+        }
         else Spacer(Modifier.width(12.dp))
     }
 }

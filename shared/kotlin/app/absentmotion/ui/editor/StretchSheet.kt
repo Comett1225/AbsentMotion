@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor
 
+import app.absentmotion.ui.editor.panels.typeOnDoubleTap
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -45,6 +46,7 @@ import app.absentmotion.ui.theme.Swap
 import kotlin.math.ln
 import kotlin.math.pow
 import kotlin.math.roundToInt
+import app.absentmotion.ui.HoldName
 
 private const val LeastPercent = 25
 private const val MostPercent = 400
@@ -69,14 +71,16 @@ internal fun StretchSheet(state: EditorState, ids: Set<Long>, onClose: () -> Uni
                     Row(Modifier.fillMaxWidth().height(52.dp).clip(FieldShape).background(Am.Field), verticalAlignment = Alignment.CenterVertically) {
                         Box(Modifier.width(56.dp).fillMaxHeight().clickable { set((percent - 1) / 10 * 10f) }, Alignment.Center) {
                             Icon(ChromeIcons.Minus, shorter, Modifier.size(20.dp), tint = Am.Accent)
+                    HoldName(shorter)
                         }
-                        Box(Modifier.weight(1f).fillMaxHeight().clickable {
+                        Box(Modifier.weight(1f).fillMaxHeight().typeOnDoubleTap {
                             keypad = KeypadRequest(listOf(KeypadField(title, percent.toFloat(), "%", LeastPercent.toFloat(), MostPercent.toFloat())), 0) { set(it[0]) }
                         }, Alignment.Center) {
                             Text("$percent%", color = Am.OnDark, fontSize = 22.sp, textAlign = TextAlign.Center, maxLines = 1)
                         }
                         Box(Modifier.width(56.dp).fillMaxHeight().clickable { set((percent / 10 + 1) * 10f) }, Alignment.Center) {
                             Icon(ChromeIcons.Plus, longer, Modifier.size(20.dp), tint = Am.Accent)
+                    HoldName(longer)
                         }
                     }
                     ThinSlider(ln(percent / 100f) / ln(4f), { set(100 * 4f.pow(it)) }, Modifier.fillMaxWidth().padding(top = 8.dp), valueRange = -1f..1f, inactive = Am.Field)

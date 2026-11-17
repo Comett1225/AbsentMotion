@@ -1,7 +1,7 @@
 {
  "categories": {
   "3d": "3D",
-  "ai": "AI",
+  "ai": "IA",
   "beat": "Ritmo",
   "blur": "Desfoque",
   "color": "Cor",
@@ -497,11 +497,18 @@
    }
   },
   "blur": {
-   "description": "Um desfoque suave e uniforme.",
+   "description": "Um desfoque suave e uniforme. Com Forma em Caixa, faz a média de um quadrado uniforme ao redor de cada ponto.",
    "name": "Desfoque",
    "params": {
     "strength": {
      "label": "Intensidade"
+    },
+    "shape": {
+     "label": "Forma",
+     "options": [
+      "Suave",
+      "Caixa"
+     ]
     }
    }
   },
@@ -547,6 +554,59 @@
     },
     "width": {
      "label": "Largura"
+    },
+    "lighting": {
+     "label": "Iluminação",
+     "options": [
+      "Clássica",
+      "Suave",
+      "Direta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura da luz"
+    },
+    "lightColor": {
+     "label": "Cor da luz"
+    },
+    "glossiness": {
+     "label": "Nitidez do brilho"
+    },
+    "texMode": {
+     "label": "Textura",
+     "options": [
+      "Ajustar",
+      "Mosaico",
+      "Esticar"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Repetir X"
+    },
+    "texRepeatY": {
+     "label": "Repetir Y"
+    },
+    "texMirror": {
+     "label": "Espelhar"
+    },
+    "texAngle": {
+     "label": "Ângulo da textura"
+    },
+    "texOffset": {
+     "label": "Deslocamento da textura"
+    },
+    "texCrop": {
+     "label": "Corte da textura"
+    },
+    "texAnchor": {
+     "label": "Âncora da textura",
+     "options": [
+      "Centro",
+      "Canto"
+     ]
     }
    }
   },
@@ -570,7 +630,7 @@
    }
   },
   "bulge": {
-   "description": "Incha a camada para fora como uma lente (Intensidade positiva) ou a comprime em direção ao Centro (negativa) dentro de um círculo de Raio, uma fração do tamanho da camada.",
+   "description": "Incha a camada para fora como uma lente (Intensidade positiva) ou a comprime em direção ao Centro (negativa) dentro de um círculo de Raio, uma fração do tamanho da camada. Com Medir em Tela, o Raio é uma fração da tela. Com Atenuação em Suave, a lente se funde de forma mais gradual com o resto da camada.",
    "name": "Compressão/Inchaço",
    "params": {
     "amount": {
@@ -581,6 +641,20 @@
     },
     "radius": {
      "label": "Raio"
+    },
+    "reach": {
+     "label": "Medir em",
+     "options": [
+      "Camada",
+      "Tela"
+     ]
+    },
+    "curve": {
+     "label": "Atenuação",
+     "options": [
+      "Clássica",
+      "Suave"
+     ]
     }
    }
   },
@@ -781,7 +855,7 @@
    }
   },
   "circularripple": {
-   "description": "Faz ondulações circulares se espalharem a partir de um ponto, como uma gota caindo na água.",
+   "description": "Faz ondulações circulares se espalharem a partir de um ponto, como uma gota caindo na água. Com Medir em Tela, Frequência, Intensidade e Raio são medidos na tela em vez de na camada.",
    "name": "Ondulação circular",
    "params": {
     "center": {
@@ -801,6 +875,13 @@
     },
     "strength": {
      "label": "Intensidade"
+    },
+    "reach": {
+     "label": "Medir em",
+     "options": [
+      "Camada",
+      "Tela"
+     ]
     }
    }
   },
@@ -813,6 +894,9 @@
     },
     "color2": {
      "label": "Cor 2"
+    },
+    "contrast": {
+     "label": "Contraste"
     },
     "intensity": {
      "label": "Intensidade"
@@ -855,6 +939,13 @@
     },
     "strength": {
      "label": "Intensidade"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clássico",
+      "Nítido"
+     ]
     }
    }
   },
@@ -965,6 +1056,16 @@
     },
     "fill": {
      "label": "Preenchimento"
+    },
+    "spread": {
+     "label": "Dispersão",
+     "options": [
+      "Desfoque",
+      "Distância"
+     ]
+    },
+    "offset": {
+     "label": "Deslocamento"
     }
    }
   },
@@ -992,6 +1093,16 @@
     },
     "width": {
      "label": "Largura"
+    },
+    "spread": {
+     "label": "Dispersão",
+     "options": [
+      "Desfoque",
+      "Distância"
+     ]
+    },
+    "offset": {
+     "label": "Deslocamento"
     }
    }
   },
@@ -1041,6 +1152,13 @@
     },
     "thickness": {
      "label": "Espessura"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clássico",
+      "Empilhado"
+     ]
     }
    }
   },
@@ -1141,6 +1259,62 @@
     },
     "thickness": {
      "label": "Espessura"
+    },
+    "keep": {
+     "label": "Manter camada"
+    },
+    "lighting": {
+     "label": "Iluminação",
+     "options": [
+      "Clássica",
+      "Suave",
+      "Direta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura da luz"
+    },
+    "lightColor": {
+     "label": "Cor da luz"
+    },
+    "glossiness": {
+     "label": "Nitidez do brilho"
+    },
+    "texMode": {
+     "label": "Textura",
+     "options": [
+      "Ajustar",
+      "Mosaico",
+      "Esticar"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Repetir X"
+    },
+    "texRepeatY": {
+     "label": "Repetir Y"
+    },
+    "texMirror": {
+     "label": "Espelhar"
+    },
+    "texAngle": {
+     "label": "Ângulo da textura"
+    },
+    "texOffset": {
+     "label": "Deslocamento da textura"
+    },
+    "texCrop": {
+     "label": "Corte da textura"
+    },
+    "texAnchor": {
+     "label": "Âncora da textura",
+     "options": [
+      "Centro",
+      "Canto"
+     ]
     }
    }
   },
@@ -1180,6 +1354,59 @@
     },
     "smoothing": {
      "label": "Suavização"
+    },
+    "lighting": {
+     "label": "Iluminação",
+     "options": [
+      "Clássica",
+      "Suave",
+      "Direta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura da luz"
+    },
+    "lightColor": {
+     "label": "Cor da luz"
+    },
+    "glossiness": {
+     "label": "Nitidez do brilho"
+    },
+    "texMode": {
+     "label": "Textura",
+     "options": [
+      "Ajustar",
+      "Mosaico",
+      "Esticar"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Repetir X"
+    },
+    "texRepeatY": {
+     "label": "Repetir Y"
+    },
+    "texMirror": {
+     "label": "Espelhar"
+    },
+    "texAngle": {
+     "label": "Ângulo da textura"
+    },
+    "texOffset": {
+     "label": "Deslocamento da textura"
+    },
+    "texCrop": {
+     "label": "Corte da textura"
+    },
+    "texAnchor": {
+     "label": "Âncora da textura",
+     "options": [
+      "Centro",
+      "Canto"
+     ]
     }
    }
   },
@@ -1251,6 +1478,59 @@
     },
     "smoothing": {
      "label": "Suavização"
+    },
+    "lighting": {
+     "label": "Iluminação",
+     "options": [
+      "Clássica",
+      "Suave",
+      "Direta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura da luz"
+    },
+    "lightColor": {
+     "label": "Cor da luz"
+    },
+    "glossiness": {
+     "label": "Nitidez do brilho"
+    },
+    "texMode": {
+     "label": "Textura",
+     "options": [
+      "Ajustar",
+      "Mosaico",
+      "Esticar"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Repetir X"
+    },
+    "texRepeatY": {
+     "label": "Repetir Y"
+    },
+    "texMirror": {
+     "label": "Espelhar"
+    },
+    "texAngle": {
+     "label": "Ângulo da textura"
+    },
+    "texOffset": {
+     "label": "Deslocamento da textura"
+    },
+    "texCrop": {
+     "label": "Corte da textura"
+    },
+    "texAnchor": {
+     "label": "Âncora da textura",
+     "options": [
+      "Centro",
+      "Canto"
+     ]
     }
    }
   },
@@ -1369,7 +1649,7 @@
    }
   },
   "directionalblur": {
-   "description": "Desfoque de movimento pela média de amostras ao longo de um ângulo.",
+   "description": "Desfoque de movimento pela média de amostras ao longo de um ângulo. Com Dispersão em Ambos os lados, o desfoque se espalha igualmente para frente e para trás.",
    "name": "Desfoque direcional",
    "params": {
     "angle": {
@@ -1377,6 +1657,13 @@
     },
     "blurLength": {
      "label": "Comprimento"
+    },
+    "spread": {
+     "label": "Dispersão",
+     "options": [
+      "Um lado",
+      "Ambos os lados"
+     ]
     }
    }
   },
@@ -1571,6 +1858,22 @@
    "params": {
     "strength": {
      "label": "Intensidade"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clássico",
+      "Tinta"
+     ]
+    },
+    "spacing": {
+     "label": "Suavização"
+    },
+    "threshold": {
+     "label": "Limite"
+    },
+    "invert": {
+     "label": "Inverter"
     }
    }
   },
@@ -1613,6 +1916,9 @@
     },
     "tintColor": {
      "label": "Cor da tonalidade"
+    },
+    "mask": {
+     "label": "Máscara para a camada"
     }
    }
   },
@@ -1682,6 +1988,13 @@
     },
     "thickness": {
      "label": "Espessura"
+    },
+    "contourStyle": {
+     "label": "Estilo",
+     "options": [
+      "Clássico",
+      "Linhas finas"
+     ]
     }
    }
   },
@@ -1724,6 +2037,59 @@
     },
     "squeezeRatio": {
      "label": "Compressão"
+    },
+    "lighting": {
+     "label": "Iluminação",
+     "options": [
+      "Clássica",
+      "Suave",
+      "Direta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura da luz"
+    },
+    "lightColor": {
+     "label": "Cor da luz"
+    },
+    "glossiness": {
+     "label": "Nitidez do brilho"
+    },
+    "texMode": {
+     "label": "Textura",
+     "options": [
+      "Ajustar",
+      "Mosaico",
+      "Esticar"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Repetir X"
+    },
+    "texRepeatY": {
+     "label": "Repetir Y"
+    },
+    "texMirror": {
+     "label": "Espelhar"
+    },
+    "texAngle": {
+     "label": "Ângulo da textura"
+    },
+    "texOffset": {
+     "label": "Deslocamento da textura"
+    },
+    "texCrop": {
+     "label": "Corte da textura"
+    },
+    "texAnchor": {
+     "label": "Âncora da textura",
+     "options": [
+      "Centro",
+      "Canto"
+     ]
     }
    }
   },
@@ -1982,6 +2348,65 @@
     },
     "shine": {
      "label": "Brilho"
+    },
+    "lighting": {
+     "label": "Iluminação",
+     "options": [
+      "Clássica",
+      "Suave",
+      "Direta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura da luz"
+    },
+    "lightColor": {
+     "label": "Cor da luz"
+    },
+    "glossiness": {
+     "label": "Nitidez do brilho"
+    },
+    "pivot": {
+     "label": "Pivô"
+    },
+    "pivotDepth": {
+     "label": "Profundidade do pivô"
+    },
+    "texMode": {
+     "label": "Textura",
+     "options": [
+      "Ajustar",
+      "Mosaico",
+      "Esticar"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Repetir X"
+    },
+    "texRepeatY": {
+     "label": "Repetir Y"
+    },
+    "texMirror": {
+     "label": "Espelhar"
+    },
+    "texAngle": {
+     "label": "Ângulo da textura"
+    },
+    "texOffset": {
+     "label": "Deslocamento da textura"
+    },
+    "texCrop": {
+     "label": "Corte da textura"
+    },
+    "texAnchor": {
+     "label": "Âncora da textura",
+     "options": [
+      "Centro",
+      "Canto"
+     ]
     }
    }
   },
@@ -2012,7 +2437,7 @@
       "Clarear",
       "Diferença",
       "Subexposição de cor",
-      "Subexposição de cor"
+      "Superexposição de cor"
      ]
     },
     "color1": {
@@ -2047,6 +2472,13 @@
     },
     "softness": {
      "label": "Suavidade"
+    },
+    "falloff": {
+     "label": "Atenuação",
+     "options": [
+      "Distância",
+      "Suave"
+     ]
     }
    }
   },
@@ -2116,6 +2548,13 @@
     },
     "strength": {
      "label": "Intensidade"
+    },
+    "screenSize": {
+     "label": "Tamanho com base em",
+     "options": [
+      "Camada",
+      "Tela"
+     ]
     }
    }
   },
@@ -2198,7 +2637,7 @@
    }
   },
   "glass": {
-   "description": "Transforma a forma da camada em vidro biselado que curva as camadas atrás, com um brilho na borda.",
+   "description": "Converte a forma da camada em vidro chanfrado que distorce as camadas atrás dela, com um realce ao longo da borda. Com Luz em Suave, mostra a camada conforme o Preenchimento e ilumina o vidro com a Cor, mais forte na borda interna do Chanfro voltada para a luz.",
    "name": "Vidro",
    "params": {
     "angle": {
@@ -2210,8 +2649,18 @@
     "color": {
      "label": "Cor"
     },
+    "fill": {
+     "label": "Preenchimento"
+    },
     "highlight": {
      "label": "Realce"
+    },
+    "light": {
+     "label": "Luz",
+     "options": [
+      "Borda",
+      "Suave"
+     ]
     },
     "refraction": {
      "label": "Refração"
@@ -2326,6 +2775,13 @@
     },
     "scaleBrightness": {
      "label": "Escala do brilho"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Gradiente",
+      "Espectro"
+     ]
     }
    }
   },
@@ -2349,8 +2805,8 @@
       "Escurecer",
       "Clarear",
       "Diferença",
-      "Superexposição de cor",
-      "Subexposição de cor"
+      "Subexposição de cor",
+      "Superexposição de cor"
      ]
     },
     "color1": {
@@ -2401,6 +2857,14 @@
     },
     "offset": {
      "label": "Deslocamento"
+    },
+    "origin": {
+     "label": "Origem",
+     "options": [
+      "Centro",
+      "Canto da camada",
+      "Canto da tela"
+     ]
     },
     "punch": {
      "label": "Recortar"
@@ -2606,6 +3070,59 @@
     },
     "smoothing": {
      "label": "Suavização"
+    },
+    "lighting": {
+     "label": "Iluminação",
+     "options": [
+      "Clássica",
+      "Suave",
+      "Direta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura da luz"
+    },
+    "lightColor": {
+     "label": "Cor da luz"
+    },
+    "glossiness": {
+     "label": "Nitidez do brilho"
+    },
+    "texMode": {
+     "label": "Textura",
+     "options": [
+      "Ajustar",
+      "Mosaico",
+      "Esticar"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Repetir X"
+    },
+    "texRepeatY": {
+     "label": "Repetir Y"
+    },
+    "texMirror": {
+     "label": "Espelhar"
+    },
+    "texAngle": {
+     "label": "Ângulo da textura"
+    },
+    "texOffset": {
+     "label": "Deslocamento da textura"
+    },
+    "texCrop": {
+     "label": "Corte da textura"
+    },
+    "texAnchor": {
+     "label": "Âncora da textura",
+     "options": [
+      "Centro",
+      "Canto"
+     ]
     }
    }
   },
@@ -2661,11 +3178,33 @@
     "angle": {
      "label": "Ângulo"
     },
+    "crop": {
+     "label": "Corte"
+    },
+    "fit": {
+     "label": "Imagem",
+     "options": [
+      "Tamanho total",
+      "Em cada bloco"
+     ]
+    },
+    "mask": {
+     "label": "Máscara para a camada"
+    },
     "mirror": {
      "label": "Espelhar"
     },
+    "offset": {
+     "label": "Deslocamento"
+    },
     "scale": {
      "label": "Escala"
+    },
+    "screenSpace": {
+     "label": "Espaço de tela"
+    },
+    "stretch": {
+     "label": "Alongamento"
     }
    }
   },
@@ -2769,6 +3308,59 @@
     },
     "smoothing": {
      "label": "Suavização"
+    },
+    "lighting": {
+     "label": "Iluminação",
+     "options": [
+      "Clássica",
+      "Suave",
+      "Direta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura da luz"
+    },
+    "lightColor": {
+     "label": "Cor da luz"
+    },
+    "glossiness": {
+     "label": "Nitidez do brilho"
+    },
+    "texMode": {
+     "label": "Textura",
+     "options": [
+      "Ajustar",
+      "Mosaico",
+      "Esticar"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Repetir X"
+    },
+    "texRepeatY": {
+     "label": "Repetir Y"
+    },
+    "texMirror": {
+     "label": "Espelhar"
+    },
+    "texAngle": {
+     "label": "Ângulo da textura"
+    },
+    "texOffset": {
+     "label": "Deslocamento da textura"
+    },
+    "texCrop": {
+     "label": "Corte da textura"
+    },
+    "texAnchor": {
+     "label": "Âncora da textura",
+     "options": [
+      "Centro",
+      "Canto"
+     ]
     }
    }
   },
@@ -2839,6 +3431,59 @@
     },
     "width": {
      "label": "Largura"
+    },
+    "lighting": {
+     "label": "Iluminação",
+     "options": [
+      "Clássica",
+      "Suave",
+      "Direta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura da luz"
+    },
+    "lightColor": {
+     "label": "Cor da luz"
+    },
+    "glossiness": {
+     "label": "Nitidez do brilho"
+    },
+    "texMode": {
+     "label": "Textura",
+     "options": [
+      "Ajustar",
+      "Mosaico",
+      "Esticar"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Repetir X"
+    },
+    "texRepeatY": {
+     "label": "Repetir Y"
+    },
+    "texMirror": {
+     "label": "Espelhar"
+    },
+    "texAngle": {
+     "label": "Ângulo da textura"
+    },
+    "texOffset": {
+     "label": "Deslocamento da textura"
+    },
+    "texCrop": {
+     "label": "Corte da textura"
+    },
+    "texAnchor": {
+     "label": "Âncora da textura",
+     "options": [
+      "Centro",
+      "Canto"
+     ]
     }
    }
   },
@@ -2964,7 +3609,8 @@
      "label": "Estilo",
      "options": [
       "Clássico",
-      "Manter brilho"
+      "Manter brilho",
+      "Vídeo"
      ]
     },
     "vibrance": {
@@ -3002,6 +3648,23 @@
     },
     "intensity": {
      "label": "Intensidade"
+    },
+    "blend": {
+     "label": "Mesclagem",
+     "options": [
+      "Tela",
+      "Normal"
+     ]
+    },
+    "opacity": {
+     "label": "Opacidade"
+    },
+    "corners": {
+     "label": "Cantos",
+     "options": [
+      "Arredondados",
+      "Retos"
+     ]
     }
    }
   },
@@ -3068,6 +3731,13 @@
     "center": {
      "label": "Centro"
     },
+    "direction": {
+     "label": "Direção",
+     "options": [
+      "Sentido horário",
+      "Sentido anti-horário"
+     ]
+    },
     "mirror": {
      "label": "Espelhar"
     },
@@ -3077,9 +3747,16 @@
    }
   },
   "lensblur": {
-   "description": "Um desfoque giratório que deixa uma área nítida ao redor do centro e aumenta em direção às bordas.",
+   "description": "Um desfoque giratório que deixa uma área nítida ao redor do centro e aumenta em direção às bordas. Com Desfoque em Zoom, o desfoque se espalha para fora a partir do centro, passando das bordas da camada.",
    "name": "Desfoque de lente",
    "params": {
+    "blur": {
+     "label": "Desfoque",
+     "options": [
+      "Giro",
+      "Zoom"
+     ]
+    },
     "center": {
      "label": "Centro"
     },
@@ -3154,6 +3831,12 @@
     },
     "threshold": {
      "label": "Limite"
+    },
+    "soften": {
+     "label": "Suavizar"
+    },
+    "mask": {
+     "label": "Máscara para a camada"
     }
    }
   },
@@ -3201,9 +3884,9 @@
      "label": "Suavização",
      "options": [
       "Linear",
-      "Suavizar entrada",
-      "Suavizar saída",
-      "Entrada e saída suave"
+      "Entrada suave",
+      "Saída suave",
+      "Entrada e saída suaves"
      ]
     },
     "fillAmount": {
@@ -3257,7 +3940,7 @@
    }
   },
   "linearstreaks": {
-   "description": "Cria rastros retos deslizando cópias da camada em um ângulo e mesclando onde elas se sobrepõem.",
+   "description": "Cria rastros retos deslizando cópias da camada ao longo de um ângulo e mesclando onde elas se sobrepõem. Com Mesclagem em Desativado, a camada fica como está. Com Cópias em Cada pixel, uma cópia é colocada em cada pixel do Comprimento, em vez de 48 espalhadas ao longo dele.",
    "name": "Rastros lineares",
    "params": {
     "alpha": {
@@ -3274,11 +3957,19 @@
      "options": [
       "Clarear",
       "Média",
-      "Escurecer"
+      "Escurecer",
+      "Desativado"
      ]
     },
     "reach": {
      "label": "Comprimento"
+    },
+    "copies": {
+     "label": "Cópias",
+     "options": [
+      "Espaçadas",
+      "Cada pixel"
+     ]
     }
    }
   },
@@ -3333,6 +4024,12 @@
     },
     "solidity": {
      "label": "Solidez"
+    },
+    "fill": {
+     "label": "Preenchimento"
+    },
+    "samples": {
+     "label": "Amostras"
     }
    }
   },
@@ -3348,6 +4045,9 @@
     },
     "threshold": {
      "label": "Limite"
+    },
+    "high": {
+     "label": "Limite superior"
     }
    }
   },
@@ -3472,6 +4172,13 @@
    "description": "Divide a camada em quadrados e preenche cada um com sua cor média.",
    "name": "Mosaico",
    "params": {
+    "average": {
+     "label": "Média",
+     "options": [
+      "Célula",
+      "Canto"
+     ]
+    },
     "count": {
      "label": "Quantidade"
     },
@@ -3484,7 +4191,7 @@
    }
   },
   "motionblur": {
-   "description": "Desfoca a camada conforme ela se move, gira e cresce, a partir dos quadros-chave e de efeitos de movimento como Auto-Shake e Oscillate. O Ajuste dimensiona o desfoque. A pré-visualização mostra um desfoque mais rápido, a menos que Desfoque total esteja ativado.",
+   "description": "Desfoca a camada conforme ela se move, gira e cresce, a partir dos quadros-chave e de efeitos de movimento como Tremor automático e Oscilar. O Ajuste dimensiona o desfoque. A pré-visualização mostra um desfoque mais rápido, a menos que Desfoque completo esteja ativado.",
    "name": "Desfoque de movimento",
    "params": {
     "position": {
@@ -3594,6 +4301,59 @@
     },
     "shine": {
      "label": "Brilho"
+    },
+    "lighting": {
+     "label": "Iluminação",
+     "options": [
+      "Clássica",
+      "Suave",
+      "Direta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura da luz"
+    },
+    "lightColor": {
+     "label": "Cor da luz"
+    },
+    "glossiness": {
+     "label": "Nitidez do brilho"
+    },
+    "texMode": {
+     "label": "Textura",
+     "options": [
+      "Ajustar",
+      "Mosaico",
+      "Esticar"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Repetir X"
+    },
+    "texRepeatY": {
+     "label": "Repetir Y"
+    },
+    "texMirror": {
+     "label": "Espelhar"
+    },
+    "texAngle": {
+     "label": "Ângulo da textura"
+    },
+    "texOffset": {
+     "label": "Deslocamento da textura"
+    },
+    "texCrop": {
+     "label": "Corte da textura"
+    },
+    "texAnchor": {
+     "label": "Âncora da textura",
+     "options": [
+      "Centro",
+      "Canto"
+     ]
     }
    }
   },
@@ -3780,8 +4540,8 @@
     "wave": {
      "label": "Onda",
      "options": [
-      "Seno",
-      "Triângulo"
+      "Senoidal",
+      "Triangular"
      ]
     }
    }
@@ -4135,7 +4895,7 @@
    }
   },
   "pixelate": {
-   "description": "Transforma a camada em blocos de uma cor cada, tirada do meio do bloco, em uma grade centralizada na camada (ou no quadro com Screen Space). Alongar, Deslocamento e Ângulo moldam a grade e a Vinheta escurece cada bloco em direção às bordas.",
+   "description": "Transforma a camada em blocos de uma cor cada, tirada do meio do bloco, em uma grade centralizada na camada (ou no quadro com Espaço de tela). Alongamento, Deslocamento e Ângulo moldam a grade e a Vinheta escurece cada bloco em direção às bordas.",
    "name": "Pixelizar",
    "params": {
     "angle": {
@@ -4143,6 +4903,13 @@
     },
     "blockSize": {
      "label": "Tamanho"
+    },
+    "edges": {
+     "label": "Bordas",
+     "options": [
+      "Espelhar",
+      "Limpar"
+     ]
     },
     "offset": {
      "label": "Deslocamento"
@@ -4244,7 +5011,7 @@
    }
   },
   "polar": {
-   "description": "Dobra a camada ao redor do centro, transformando linhas retas em círculos, ou desenrola círculos em linhas retas.",
+   "description": "Dobra a camada ao redor do centro, transformando linhas retas em círculos, ou desenrola círculos em linhas retas. Layout escolhe qual borda da camada se encontra no centro.",
    "name": "Coordenadas polares",
    "params": {
     "amount": {
@@ -4255,6 +5022,13 @@
      "options": [
       "Retangular para polar",
       "Polar para retangular"
+     ]
+    },
+    "middle": {
+     "label": "Layout",
+     "options": [
+      "Topo no centro",
+      "Base no centro"
      ]
     }
    }
@@ -4337,7 +5111,7 @@
     "wave": {
      "label": "Onda",
      "options": [
-      "Senoide",
+      "Senoidal",
       "Triangular"
      ]
     }
@@ -4362,7 +5136,7 @@
     "wave": {
      "label": "Onda",
      "options": [
-      "Senoide",
+      "Senoidal",
       "Triangular"
      ]
     }
@@ -4448,11 +5222,64 @@
     },
     "shine": {
      "label": "Brilho"
+    },
+    "lighting": {
+     "label": "Iluminação",
+     "options": [
+      "Clássica",
+      "Suave",
+      "Direta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura da luz"
+    },
+    "lightColor": {
+     "label": "Cor da luz"
+    },
+    "glossiness": {
+     "label": "Nitidez do brilho"
+    },
+    "texMode": {
+     "label": "Textura",
+     "options": [
+      "Ajustar",
+      "Mosaico",
+      "Esticar"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Repetir X"
+    },
+    "texRepeatY": {
+     "label": "Repetir Y"
+    },
+    "texMirror": {
+     "label": "Espelhar"
+    },
+    "texAngle": {
+     "label": "Ângulo da textura"
+    },
+    "texOffset": {
+     "label": "Deslocamento da textura"
+    },
+    "texCrop": {
+     "label": "Corte da textura"
+    },
+    "texAnchor": {
+     "label": "Âncora da textura",
+     "options": [
+      "Centro",
+      "Canto"
+     ]
     }
    }
   },
   "radialblur": {
-   "description": "Aplica um desfoque radial de zoom a partir de um ponto central, com intensidade ajustável.",
+   "description": "Aplica um desfoque radial de zoom pela média de amostras ao longo de raios que partem de um ponto central, com intensidade ajustável. Com Comprimento em Uniforme, todos os rastros têm o mesmo comprimento em vez de crescer com a distância do centro.",
    "name": "Desfoque de zoom",
    "params": {
     "amount": {
@@ -4460,6 +5287,13 @@
     },
     "center": {
      "label": "Centro"
+    },
+    "streak": {
+     "label": "Comprimento",
+     "options": [
+      "Pela distância",
+      "Uniforme"
+     ]
     }
    }
   },
@@ -4504,9 +5338,9 @@
      "label": "Suavização",
      "options": [
       "Linear",
-      "Suavizar entrada",
-      "Suavizar saída",
-      "Suavizar entrada e saída"
+      "Entrada suave",
+      "Saída suave",
+      "Entrada e saída suaves"
      ]
     },
     "fillAmount": {
@@ -4586,12 +5420,15 @@
     },
     "reach": {
      "label": "Comprimento"
+    },
+    "fill": {
+     "label": "Preenchimento"
     }
    }
   },
   "radialwipe": {
-   "description": "Oculta uma fatia da camada varrida ao redor do Centro a partir do Ângulo inicial, como um ponteiro de relógio. O Progresso é o ângulo varrido, a Contagem repete a fatia ao redor do círculo e Ambos varre nos dois sentidos. Anime o Progresso para criar uma transição.",
-   "name": "Transição radial",
+   "description": "Oculta uma fatia da camada varrida ao redor do Centro a partir do Ângulo inicial, como um ponteiro de relógio. O Progresso é o ângulo varrido, a Contagem repete a fatia ao redor do círculo e Ambos varre nos dois sentidos. Anime o Progresso para criar uma transição. Com Fatias em Exatas, a Contagem mantém a parte fracionária, então a última fatia fica mais estreita, e a Suavização das bordas suaviza os dois lados de cada fatia.",
+   "name": "Varredura radial",
    "params": {
     "center": {
      "label": "Centro"
@@ -4615,6 +5452,13 @@
     },
     "start": {
      "label": "Ângulo inicial"
+    },
+    "wedges": {
+     "label": "Fatias",
+     "options": [
+      "Inteiras",
+      "Exatas"
+     ]
     }
    }
   },
@@ -4699,6 +5543,26 @@
     },
     "shine": {
      "label": "Brilho"
+    },
+    "lighting": {
+     "label": "Iluminação",
+     "options": [
+      "Clássica",
+      "Suave",
+      "Direta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura da luz"
+    },
+    "lightColor": {
+     "label": "Cor da luz"
+    },
+    "glossiness": {
+     "label": "Nitidez do brilho"
     }
    },
    "shortcuts": {
@@ -4826,9 +5690,9 @@
      "label": "Suavização",
      "options": [
       "Linear",
-      "Entrada",
-      "Saída",
-      "Entrada e saída"
+      "Entrada suave",
+      "Saída suave",
+      "Entrada e saída suaves"
      ]
     },
     "end": {
@@ -4914,6 +5778,13 @@
     },
     "threshold": {
      "label": "Limite"
+    },
+    "match": {
+     "label": "Correspondência",
+     "options": [
+      "RGB",
+      "Croma"
+     ]
     }
    }
   },
@@ -4964,7 +5835,7 @@
    }
   },
   "rgbsplit": {
-   "description": "Separa os canais vermelho, verde e azul: o canal central fica no lugar e os outros dois se deslocam em direções opostas ao longo do ângulo. Claro soma as cores deslocadas, Escuro as mantém sólidas, Máscara mantém só onde os três se sobrepõem e Luma deixa as franjas tão opacas quanto claras.",
+   "description": "Separa os canais vermelho, verde e azul: o canal escolhido em Central fica no lugar e os outros dois se deslocam em direções opostas ao longo do Ângulo. Claro soma as cores deslocadas, Escuro as mantém sólidas, Máscara mantém só onde os três se sobrepõem e Luma deixa as franjas tão opacas quanto claras. Média deixa cada ponto tão opaco quanto a fração de canais que o cobrem.",
    "name": "Separação RGB",
    "params": {
     "angle": {
@@ -4984,7 +5855,8 @@
       "Claro",
       "Escuro",
       "Máscara",
-      "Luma"
+      "Luma",
+      "Média"
      ]
     },
     "strength": {
@@ -5364,7 +6236,7 @@
    }
   },
   "shutterblur": {
-   "description": "Desfoca a camada conforme ela realmente se move, gira e cresce, como um obturador de câmera. Um ângulo de obturador maior gera rastros mais longos e mais amostras os deixam mais suaves. A pré-visualização mostra um desfoque mais rápido, a menos que o desfoque total esteja ativado.",
+   "description": "Desfoca a camada conforme ela realmente se move, gira e cresce, como um obturador de câmera. Um ângulo de obturador maior gera rastros mais longos e mais amostras os deixam mais suaves. A pré-visualização mostra um desfoque mais rápido, a menos que o Desfoque completo esteja ativado.",
    "name": "Desfoque de movimento real",
    "params": {
     "samples": {
@@ -5492,6 +6364,13 @@
     },
     "outside": {
      "label": "Brilho externo"
+    },
+    "falloff": {
+     "label": "Atenuação",
+     "options": [
+      "Uniforme",
+      "Camada"
+     ]
     }
    }
   },
@@ -5585,6 +6464,59 @@
     },
     "shine": {
      "label": "Brilho"
+    },
+    "lighting": {
+     "label": "Iluminação",
+     "options": [
+      "Clássica",
+      "Suave",
+      "Direta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura da luz"
+    },
+    "lightColor": {
+     "label": "Cor da luz"
+    },
+    "glossiness": {
+     "label": "Nitidez do brilho"
+    },
+    "texMode": {
+     "label": "Textura",
+     "options": [
+      "Ajustar",
+      "Mosaico",
+      "Esticar"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Repetir X"
+    },
+    "texRepeatY": {
+     "label": "Repetir Y"
+    },
+    "texMirror": {
+     "label": "Espelhar"
+    },
+    "texAngle": {
+     "label": "Ângulo da textura"
+    },
+    "texOffset": {
+     "label": "Deslocamento da textura"
+    },
+    "texCrop": {
+     "label": "Corte da textura"
+    },
+    "texAnchor": {
+     "label": "Âncora da textura",
+     "options": [
+      "Centro",
+      "Canto"
+     ]
     }
    }
   },
@@ -5732,11 +6664,18 @@
     },
     "threshold": {
      "label": "Limiar"
+    },
+    "grey": {
+     "label": "Cinza",
+     "options": [
+      "HD",
+      "SD"
+     ]
     }
    }
   },
   "squeeze": {
-   "description": "Comprime o meio da camada para dentro com Intensidade positiva e o expande para fora com Intensidade negativa. Legado preserva a forma de projetos mais antigos.",
+   "description": "Comprime o meio da camada para dentro com Intensidade positiva e o expande para fora com Intensidade negativa. Legado preserva a forma de projetos mais antigos. Ampulheta também empurra para fora o meio das bordas de cima e de baixo.",
    "name": "Compressão",
    "params": {
     "amount": {
@@ -5746,7 +6685,8 @@
      "label": "Forma",
      "options": [
       "Comprimir/Expandir",
-      "Legado"
+      "Legado",
+      "Ampulheta"
      ]
     }
    }
@@ -5846,6 +6786,59 @@
     },
     "shine": {
      "label": "Luminosidade"
+    },
+    "lighting": {
+     "label": "Iluminação",
+     "options": [
+      "Clássica",
+      "Suave",
+      "Direta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura da luz"
+    },
+    "lightColor": {
+     "label": "Cor da luz"
+    },
+    "glossiness": {
+     "label": "Nitidez do brilho"
+    },
+    "texMode": {
+     "label": "Textura",
+     "options": [
+      "Ajustar",
+      "Mosaico",
+      "Esticar"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Repetir X"
+    },
+    "texRepeatY": {
+     "label": "Repetir Y"
+    },
+    "texMirror": {
+     "label": "Espelhar"
+    },
+    "texAngle": {
+     "label": "Ângulo da textura"
+    },
+    "texOffset": {
+     "label": "Deslocamento da textura"
+    },
+    "texCrop": {
+     "label": "Corte da textura"
+    },
+    "texAnchor": {
+     "label": "Âncora da textura",
+     "options": [
+      "Centro",
+      "Canto"
+     ]
     }
    }
   },
@@ -5894,6 +6887,66 @@
     },
     "smoothing": {
      "label": "Suavização"
+    },
+    "starStyle": {
+     "label": "Estilo",
+     "options": [
+      "Plano",
+      "Pontiagudo"
+     ]
+    },
+    "lighting": {
+     "label": "Iluminação",
+     "options": [
+      "Clássica",
+      "Suave",
+      "Direta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura da luz"
+    },
+    "lightColor": {
+     "label": "Cor da luz"
+    },
+    "glossiness": {
+     "label": "Nitidez do brilho"
+    },
+    "texMode": {
+     "label": "Textura",
+     "options": [
+      "Ajustar",
+      "Mosaico",
+      "Esticar"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Repetir X"
+    },
+    "texRepeatY": {
+     "label": "Repetir Y"
+    },
+    "texMirror": {
+     "label": "Espelhar"
+    },
+    "texAngle": {
+     "label": "Ângulo da textura"
+    },
+    "texOffset": {
+     "label": "Deslocamento da textura"
+    },
+    "texCrop": {
+     "label": "Corte da textura"
+    },
+    "texAnchor": {
+     "label": "Âncora da textura",
+     "options": [
+      "Centro",
+      "Canto"
+     ]
     }
    }
   },
@@ -6023,7 +7076,7 @@
      "label": "Temperatura"
     },
     "strength": {
-     "label": "Força"
+     "label": "Intensidade"
     }
    }
   },
@@ -6065,7 +7118,9 @@
       "Robô",
       "Chiado",
       "Máquina de escrever",
-      "Chiptune"
+      "Chiptune",
+      "Esqueleto",
+      "Som personalizado"
      ]
     },
     "volume": {
@@ -6439,6 +7494,13 @@
     "count": {
      "label": "Quantidade"
     },
+    "edges": {
+     "label": "Bordas",
+     "options": [
+      "Espelhar",
+      "Limpar"
+     ]
+    },
     "offset": {
      "label": "Deslocamento"
     },
@@ -6447,6 +7509,9 @@
     },
     "rotation": {
      "label": "Rotação"
+    },
+    "screenSpace": {
+     "label": "Espaço de tela"
     },
     "seed": {
      "label": "Semente"
@@ -6457,7 +7522,7 @@
    }
   },
   "tiles": {
-   "description": "Repete a camada para preencher a tela. Aumente Corte para criar blocos menores, com espelhamento, deslocamento de linha e rotação opcionais. Escala legada mantém projetos antigos.",
+   "description": "Repete a camada para preencher a tela. Aumente o Corte para criar blocos menores, com espelhamento, deslocamento de linha e rotação opcionais. Escala legada preserva projetos antigos. Dentro dos blocos mantém cada bloco do tamanho da camada e amplia e gira a imagem dentro dele.",
    "name": "Blocos",
    "params": {
     "angle": {
@@ -6473,7 +7538,8 @@
      "label": "Dimensionamento",
      "options": [
       "Corte",
-      "Escala legada"
+      "Escala legada",
+      "Dentro dos blocos"
      ]
     },
     "vertical": {
@@ -6494,8 +7560,18 @@
     "count": {
      "label": "Quantidade"
     },
+    "edges": {
+     "label": "Bordas",
+     "options": [
+      "Espelhar",
+      "Limpar"
+     ]
+    },
     "offset": {
      "label": "Deslocamento"
+    },
+    "screenSpace": {
+     "label": "Espaço de tela"
     },
     "seed": {
      "label": "Semente"
@@ -6598,6 +7674,59 @@
     },
     "thickness": {
      "label": "Espessura"
+    },
+    "lighting": {
+     "label": "Iluminação",
+     "options": [
+      "Clássica",
+      "Suave",
+      "Direta"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura da luz"
+    },
+    "lightColor": {
+     "label": "Cor da luz"
+    },
+    "glossiness": {
+     "label": "Nitidez do brilho"
+    },
+    "texMode": {
+     "label": "Textura",
+     "options": [
+      "Ajustar",
+      "Mosaico",
+      "Esticar"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Repetir X"
+    },
+    "texRepeatY": {
+     "label": "Repetir Y"
+    },
+    "texMirror": {
+     "label": "Espelhar"
+    },
+    "texAngle": {
+     "label": "Ângulo da textura"
+    },
+    "texOffset": {
+     "label": "Deslocamento da textura"
+    },
+    "texCrop": {
+     "label": "Corte da textura"
+    },
+    "texAnchor": {
+     "label": "Âncora da textura",
+     "options": [
+      "Centro",
+      "Canto"
+     ]
     }
    }
   },
@@ -6739,11 +7868,14 @@
     },
     "stretch": {
      "label": "Alongamento"
+    },
+    "screenSpace": {
+     "label": "Espaço de tela"
     }
    }
   },
   "twirl": {
-   "description": "Torce a camada ao redor do Centro como um redemoinho, mais forte no meio e diminuindo até o Raio (uma fração do tamanho da camada). Uma Intensidade negativa torce no sentido oposto.",
+   "description": "Torce a camada ao redor do Centro como um redemoinho, mais forte no meio e diminuindo até o Raio (uma fração do tamanho da camada). Uma Intensidade negativa torce no sentido oposto. Com Medir em Tela, o Raio é uma fração da tela e a torção diminui suavemente.",
    "name": "Redemoinho",
    "params": {
     "center": {
@@ -6754,11 +7886,18 @@
     },
     "strength": {
      "label": "Intensidade"
+    },
+    "reach": {
+     "label": "Medir em",
+     "options": [
+      "Camada",
+      "Tela"
+     ]
     }
    }
   },
   "unsharpmask": {
-   "description": "Aumenta a nitidez adicionando de volta a diferença entre a camada e uma cópia desfocada dela. Intensidade define o tamanho do desfoque, Quantidade quanto é adicionado de volta, e Limiar acima de 50% ignora pequenas diferenças.",
+   "description": "Aumenta a nitidez adicionando de volta a diferença entre a camada e uma cópia desfocada dela. Intensidade define a largura do desfoque, Quantidade quanto é adicionado de volta, e Limiar acima de 50% ignora pequenas diferenças. Com Cor da máscara em Vermelho, a máscara aparece em vermelho onde o brilho difere do da cópia desfocada por mais do que a parte do Limiar acima de 50%.",
    "name": "Máscara de nitidez",
    "params": {
     "amount": {
@@ -6772,6 +7911,13 @@
     },
     "threshold": {
      "label": "Limiar"
+    },
+    "maskColor": {
+     "label": "Cor da máscara",
+     "options": [
+      "Cinza",
+      "Vermelho"
+     ]
     }
    }
   },
@@ -6867,6 +8013,19 @@
     },
     "yaw": {
      "label": "Guinada"
+    },
+    "projection": {
+     "label": "Saída",
+     "options": [
+      "Visualização",
+      "Panorama"
+     ]
+    },
+    "eyeDistance": {
+     "label": "Distância"
+    },
+    "frame": {
+     "label": "Proporção do quadro"
     }
    }
   },
@@ -6932,7 +8091,7 @@
    }
   },
   "wavewarp": {
-   "description": "Curva a camada com uma onda senoidal: Espaçamento define quantas ondas a atravessam, Magnitude o quanto empurram, Ângulo a direção das ondas e Ângulo de distorção a direção do empurrão.",
+   "description": "Curva a camada com uma onda senoidal: Espaçamento define quantas ondas a atravessam, Magnitude o quanto empurram, Ângulo a direção das ondas e Ângulo de distorção a direção do empurrão. Espaço de tela dimensiona as ondas pela tela em vez da camada. Magnitude cruzada adiciona uma segunda onda, com tamanho dado por Espaçamento cruzado, que corre ao longo do Ângulo de distorção e empurra ao longo do Ângulo. Com Origem em Canto inferior esquerdo da tela, as ondas são medidas a partir desse canto da tela, pelo seu lado menor, e a Fase então as desliza.",
    "name": "Ondulação",
    "params": {
     "angle": {
@@ -6952,6 +8111,22 @@
     },
     "warpAngle": {
      "label": "Ângulo de distorção"
+    },
+    "screenSpace": {
+     "label": "Espaço de tela"
+    },
+    "crossSpacing": {
+     "label": "Espaçamento cruzado"
+    },
+    "crossMagnitude": {
+     "label": "Magnitude cruzada"
+    },
+    "origin": {
+     "label": "Origem",
+     "options": [
+      "Canto da camada",
+      "Canto inferior esquerdo da tela"
+     ]
     }
    }
   },
@@ -6966,7 +8141,7 @@
      "label": "Fim"
     },
     "feather": {
-     "label": "Suavidade"
+     "label": "Suavização"
     },
     "softness": {
      "label": "Suavidade"

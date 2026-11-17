@@ -169,7 +169,7 @@ internal fun TurnTab(state: EditorState, layer: Layer, turn: Turn) {
         Text(stringResource(R.string.drag_here_to_rotate_in_3d), Modifier.align(Alignment.Center).padding(horizontal = 22.px), color = PanelCaption, maxLines = 1, softWrap = false, autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(9.sp, 15.sp, 0.5.sp))
         Column(Modifier.align(Alignment.TopCenter).padding(top = 17.px)) {
             Row(horizontalArrangement = Arrangement.spacedBy(20.px)) {
-                for (i in 0..2) NumberBox(formatFixed(values[i], 1) + "º", if (turn.linked(i, axis)) Am.Accent else Am.OnDark, Modifier.width(177.px).height(70.px), fontSize = 13.5f) { openKeypad(i) }
+                for (i in 0..2) NumberBox(formatFixed(values[i], 1) + "º", if (turn.linked(i, axis)) Am.Accent else Am.OnDark, Modifier.width(177.px).height(70.px), fontSize = 13.5f, onSelect = { axis = i }) { openKeypad(i) }
             }
             Row(Modifier.height(23.px), Arrangement.spacedBy(20.px)) {
                 for (label in labels) Caption(label, Modifier.width(177.px).fillMaxHeight())

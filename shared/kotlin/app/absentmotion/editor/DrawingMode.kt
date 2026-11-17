@@ -128,17 +128,20 @@ fun EditorState.editPoints() {
     enter(layer, PointMode(layer.id, created = false, vector = false).apply { if (contours.none { it.knots.isNotEmpty() }) { point = -1; handle = Handle.Add } }, created = false)
 }
 
+internal fun EditorState.dropsOnLeave(mode: DrawingMode): Boolean {
+    val layer = scene.layer(mode.layerId) ?: return false
+    return mode.created && when (mode) {
+        is FreehandMode -> layer.strokes.isNullOrEmpty()
+        is PointMode -> layer.contours?.all { it.knots.isEmpty() } == true
+        is TrackMode -> false
+    }
+}
+
 fun EditorState.leaveDrawing() {
     val mode = drawing ?: return
     drawing = null
     endGesture()
-    val layer = scene.layer(mode.layerId)
-    val empty = when (mode) {
-        is FreehandMode -> layer?.strokes.isNullOrEmpty()
-        is PointMode -> layer?.contours?.all { it.knots.isEmpty() } == true
-        is TrackMode -> false
-    }
-    if (mode.created && empty && layer != null) {
+    if (dropsOnLeave(mode)) {
         if (!forgetEdit(mode.added)) edit { it.remove(mode.layerId) }
         if (selectedId == mode.layerId) selectedId = null
     }

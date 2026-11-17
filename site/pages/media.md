@@ -28,7 +28,7 @@ Select a video or sound clip and tap **Speed** (the first small button of the to
 
 - The buttons at the top set the start or the end of the clip to the playhead **without** trimming the video: the speed changes so that the same part of the video fits the new length. Only the buttons that fit where the playhead is are shown: **Extend the start to the playhead** before the clip, **Trim start** and **Trim end** inside it, **Extend the end to the playhead** after it.
 - The ruler sets one speed for the whole clip, from 0.05x to 100x. Drag it sideways; it clicks at 1x.
-- The box next to the ruler shows the speed and a small picture that changes with it: a snail, a turtle, a walking person, a rabbit, a horse and, at the top, a cheetah. Tap the box to type an exact value.
+- The box next to the ruler shows the speed and a small picture that changes with it: a snail, a turtle, a walking person, a rabbit, a horse and, at the top, a cheetah. Double-tap the box to type an exact value.
 - Under the ruler are the chips **Smooth**, **Reverse** and **Freeze Frame**. They are described below.
 
 ![The Time Remapping panel, Normal tab: the tabs (1), the buttons that set the start or the end (2), the ruler with the speed (3) and Smooth, Reverse and Freeze Frame (4).](img/media-speed.webp)
@@ -58,7 +58,7 @@ Tap the chosen tile again to edit its curve. The editor shows the clip's picture
 
 - **Move a point.** Touch a point and drag it. Up and down change its speed, and the speed snaps to 1x and gives a small tick; sideways changes its place in the clip. A touch or a drag on the empty graph moves the playhead along the clip instead.
 - **Add point** puts a new point at the playhead, up to ten in all. With a point selected, the button becomes **Delete point**; the first and the last point cannot be deleted.
-- The box at the bottom left shows the speed of the selected point, or the speed at the playhead when none is selected. Tap it to type a value.
+- The box at the bottom left shows the speed of the selected point, or the speed at the playhead when none is selected. Double-tap it to type a value.
 - The top bar shows the clip's length in the middle. While you drag it shows the old and the new length, for example "3.7 s → 4.2 s", and the change is applied when you let go.
 - **Reset** puts back the curve you opened (a flat 1x for **Custom**). The arrow at the top left closes the editor.
 - **Smooth** is a switch here: it is the same as the **Smooth** chip.
@@ -67,7 +67,7 @@ Tap the chosen tile again to edit its curve. The editor shows the clip's picture
 
 ### Remap
 
-**Remap** picks which moment of the video shows at each point of the layer. Tap **Turn on Time Remap**: the clip keeps playing as before, with a keyframe at its start and its end. **Clip time** is the moment of the video under the playhead; drag the ruler or tap the number to change it, and the keyframe button on the left adds a keyframe there. Keyframes that go up play the clip forward, the same value twice **freezes** it, and keyframes that go down play it **backwards**. Easing between keyframes works as on any other setting.
+**Remap** picks which moment of the video shows at each point of the layer. Tap **Turn on Time Remap**: the clip keeps playing as before, with a keyframe at its start and its end. **Clip time** is the moment of the video under the playhead; drag the ruler or double-tap the number to change it, and the keyframe button on the left adds a keyframe there. Keyframes that go up play the clip forward, the same value twice **freezes** it, and keyframes that go down play it **backwards**. Easing between keyframes works as on any other setting.
 
 - **Reverse** turns the keyframes around, so the clip plays backwards.
 - **Turn off** removes Time Remap; the Normal or Curve speed comes back.

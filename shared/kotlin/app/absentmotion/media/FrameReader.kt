@@ -14,6 +14,7 @@ import android.media.MediaCodecList
 import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.net.Uri
+import android.util.Log
 import kotlinx.coroutines.ensureActive
 import java.io.Closeable
 import java.util.concurrent.TimeUnit
@@ -27,8 +28,8 @@ internal interface DesktopFrameInput : Closeable {
     suspend fun read(wanted: List<Long>, consume: suspend (Long, Yuv) -> Unit): Int
 }
 
-internal class FrameReader(context: Context, uri: String) : Closeable {
-    private val desktop = app.absentmotion.platform.desktopFrameReader(context, uri)
+internal class FrameReader(private val context: Context, private val uri: String) : Closeable {
+    private var desktop = app.absentmotion.platform.desktopFrameReader(context, uri)
     private lateinit var extractor: Demuxer
     private var codec: MediaCodec? = null
     private val info by lazy { MediaCodec.BufferInfo() }
@@ -37,16 +38,15 @@ internal class FrameReader(context: Context, uri: String) : Closeable {
     private var inputEnded = false
     private var lastPts = 0L
     val timestamps: LongArray
-    var colorStandard = 0
-        private set
-    var fullRange = false
-        private set
+    private var systemStandard = 0
+    private var systemFull = false
+    val colorStandard: Int get() = desktop?.colorStandard ?: systemStandard
+    val fullRange: Boolean get() = desktop?.fullRange ?: systemFull
 
     init {
-        if (desktop != null) {
-            timestamps = desktop.timestamps
-            colorStandard = desktop.colorStandard
-            fullRange = desktop.fullRange
+        val ready = desktop
+        if (ready != null) {
+            timestamps = ready.timestamps
         } else try {
             extractor = openDemuxer(context, Uri.parse(openableUri(uri)), "video/")
             val track = (0 until extractor.trackCount).first { extractor.getTrackFormat(it).getString(MediaFormat.KEY_MIME)?.startsWith("video/") == true }
@@ -54,10 +54,12 @@ internal class FrameReader(context: Context, uri: String) : Closeable {
             extractor.selectTrack(track)
             timestamps = VideoSources.timestamps(context, uri)
             readColor(format)
-            MediaCodecList(MediaCodecList.REGULAR_CODECS).findDecoderForFormat(format) ?: throw ExportError(txt(R.string.media_error_no_decoder))
-            format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible)
-            format.requestSdr()
-            codec = openDecoder(format, null)
+            codec = systemOrFfamp({
+                MediaCodecList(MediaCodecList.REGULAR_CODECS).findDecoderForFormat(format) ?: throw ExportError(txt(R.string.media_error_no_decoder))
+                format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible)
+                format.requestSdr()
+                openDecoder(format, null)
+            }, ::rescued) { null }
         } catch (e: Exception) {
             close()
             throw e
@@ -65,14 +67,29 @@ internal class FrameReader(context: Context, uri: String) : Closeable {
     }
 
     private fun readColor(format: MediaFormat) {
-        if (format.containsKey(MediaFormat.KEY_COLOR_STANDARD)) colorStandard = videoColorStandard(format.getInteger(MediaFormat.KEY_COLOR_STANDARD))
-        if (format.containsKey(MediaFormat.KEY_COLOR_RANGE)) fullRange = format.getInteger(MediaFormat.KEY_COLOR_RANGE) == MediaFormat.COLOR_RANGE_FULL
+        if (format.containsKey(MediaFormat.KEY_COLOR_STANDARD)) systemStandard = videoColorStandard(format.getInteger(MediaFormat.KEY_COLOR_STANDARD))
+        if (format.containsKey(MediaFormat.KEY_COLOR_RANGE)) systemFull = format.getInteger(MediaFormat.KEY_COLOR_RANGE) == MediaFormat.COLOR_RANGE_FULL
+    }
+
+    private fun rescued(failed: Exception): DesktopFrameInput? {
+        val readers = MediaBackend.rescue ?: return null
+        val found = runCatching { readers.softFrames(context, uri, rescue = true) }.getOrNull() ?: return null
+        Log.w("AMVideo", "the system decoder failed on $uri, FFamp decodes it: $failed")
+        runCatching { codec?.release() }
+        codec = null
+        desktop = found
+        return found
     }
 
     suspend fun read(wanted: List<Long>, consume: suspend (Long, Yuv) -> Unit): Int {
         desktop?.let { return it.read(wanted, consume) }
         if (wanted.isEmpty()) return 0
         val decoder = checkNotNull(codec) { "The video reader is closed" }
+        var done = 0
+        return systemOrFfamp({ decoded(decoder, wanted) { at, yuv -> consume(at, yuv); done++ } }, ::rescued) { done + it.read(wanted.drop(done), consume) }
+    }
+
+    private suspend fun decoded(decoder: MediaCodec, wanted: List<Long>, consume: suspend (Long, Yuv) -> Unit): Int {
         if (!positioned || wanted.first() <= lastPts || wanted.first() - lastPts > SKIP_US) {
             if (queued) decoder.flush()
             extractor.seekTo(wanted.first(), MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
@@ -129,7 +146,7 @@ internal class FrameReader(context: Context, uri: String) : Closeable {
     }
 
     override fun close() {
-        if (desktop != null) { desktop.close(); return }
+        desktop?.close()
         runCatching { codec?.stop() }
         runCatching { codec?.release() }
         codec = null

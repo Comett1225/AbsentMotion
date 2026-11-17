@@ -516,15 +516,16 @@ object FfampEngine : MediaEngine {
             "-f", chosen.joinToString(","), "-o", File(dir, if (chosen.size > 1) "item.%(format_id)s.%(ext)s" else "item.%(ext)s").path)
     }
 
-    override fun downloaded(plan: Plan, mode: SaveMode, dir: File): File? {
+    override fun downloaded(plan: Plan, mode: SaveMode, dir: File): File? = downloaded(plan, mode, dir) { video, audio, out -> FfampNative.merge(video.path, audio.path, out.path) == null }
+
+    fun downloaded(plan: Plan, mode: SaveMode, dir: File, merge: (File, File, File) -> Boolean): File? {
         val pieces = dir.listFiles().orEmpty().filter { it.isFile && it.name.startsWith("item.") && !it.name.endsWith(".part") && !it.name.endsWith(".ytdl") }
         fun piece(id: String?) = pieces.firstOrNull { id != null && it.name.startsWith("item.$id.") }
         val video = piece(plan.video?.id)
         val audio = piece(plan.audio?.id)
         if (video != null && audio != null && video != audio) {
             val out = File(dir, if (plan.webm) "joined.webm" else "joined.mp4")
-            if (FfampNative.merge(video.path, audio.path, out.path) != null) return null
-            return out
+            return out.takeIf { merge(video, audio, out) }
         }
         val one = pieces.maxByOrNull { it.length() } ?: return null
         if (mode == SaveMode.AudioOnly) {

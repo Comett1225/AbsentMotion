@@ -33,14 +33,14 @@ The table lists page 1. Page 2 holds **Crop** for every layer you can see except
 
 Most panels share a narrow column on the left with these buttons: **Back**, **Add keyframe** or **Remove keyframe**, **Easing** and, in Transform and Effects only, **More**. A gray keyframe button means the setting cannot be animated. See [Keyframes and easing](@keyframes).
 
-Tap any number box to open the number pad. The first tap selects the whole value, so typing replaces it. A tick applies it; tapping outside closes the pad. Rulers (a strip with ticks and a center needle) change a number when you drag sideways.
+Double-tap a number box (double-click on a computer) to open the number pad; one tap only selects the value that the ruler or trackpad changes. The pad starts with the whole value selected, so typing replaces it. A tick applies it; tapping outside closes the pad. Rulers (a strip with ticks and a center needle) change a number when you drag sideways.
 
 ### Transform
 
 Tabs on the right: **Move**, **Rotate**, **Size**, **Skew**. The pivot is inside Move and 3D rotation is inside Rotate. For a camera only Move, Rotate and Size work; Skew is gray. On a computer the tabs are **Move**, **Rotate**, **Size**, **Tilt**, **Skew** and **Pivot**: hold **Transform** in the tools, or open **More**, to switch between **Basic Controls** (Move, Rotate, Size and Skew, the default) and **Advanced Controls** (all six tabs).
 
 - **Move.** A trackpad ("Drag here to move the layer") and X and Y boxes. Tap **Z** to move the layer along the depth axis. Thin red guides show when the layer lines up with the canvas or another layer. Double-tap the trackpad to move the **Pivot** instead: the tab then says **Pivot**, and a double-tap goes back. **More** has **Pivot** too.
-- **Rotate.** A dial: drag the knob around or tap the degrees to type. Turn on **3D rotation** in **More** to turn the layer around **X**, **Y** and **Z**: one ruler for each axis, or with **Free rotate** in **More** a trackpad where one finger tilts and two fingers twist. A layer that is already tilted, and a 3D object, always shows its 3D rotation; **Reset 3D Rotation** makes it flat again.
+- **Rotate.** A dial: drag the knob around or double-tap the degrees to type. Turn on **3D rotation** in **More** to turn the layer around **X**, **Y** and **Z**: one ruler for each axis, or with **Free rotate** in **More** a trackpad where one finger tilts and two fingers twist. A layer that is already tilted, and a 3D object, always shows its 3D rotation; **Reset 3D Rotation** makes it flat again.
 - **Size.** Width and height boxes and a **link** button (on by default) that keeps the proportions. For a camera this tab changes the view angle. The link is remembered for each layer and saved with the project, and the ruler keeps gliding after a flick.
 - **Tilt** (on a computer). **X ROTATION** and **Y ROTATION** in degrees, for 3D tilt. See [Camera layers and 3D](@camera-3d).
 - **Skew.** **X SKEW** and **Y SKEW** in degrees.
@@ -53,7 +53,7 @@ Move is the position, with X, Y and Z animated together. Rotate, Size, 3D rotati
 
 ### Crop
 
-Photos, videos and the other visible layers have a **Crop** button on page 2 of the tool grid. It dims the part of the layer that will be cut off and shows a frame with eight handles: drag a corner or an edge to crop, or drag inside the frame to move it. Two fingers still zoom the canvas. **Free**, **1:1**, **4:5**, **3:4**, **16:9** and **9:16** fit the largest centered crop of that shape and keep the shape while you drag. Tap a side to type its value, **Reset** removes the crop and **Done** closes the panel. The keyframe button keys all four sides together. The crop is the **Crop** effect, so you can also change it in **Effects**, with **Roundness** and **Feather**; the layer stays where it is.
+Photos, videos and the other visible layers have a **Crop** button on page 2 of the tool grid. It dims the part of the layer that will be cut off and shows a frame with eight handles: drag a corner or an edge to crop, or drag inside the frame to move it. Two fingers still zoom the canvas. **Free**, **1:1**, **4:5**, **3:4**, **16:9** and **9:16** fit the largest centered crop of that shape and keep the shape while you drag. Double-tap a side to type its value, **Reset** removes the crop and **Done** closes the panel. The keyframe button keys all four sides together. The crop is the **Crop** effect, so you can also change it in **Effects**, with **Roundness** and **Feather**; the layer stays where it is.
 
 ![The Crop panel: the crop frame on the picture (1), the aspect buttons (2), the four sides (3) and Reset and Done (4).](img/lt-crop.webp)
 
@@ -112,7 +112,7 @@ Opens the group, so the timeline and the preview show only the layers inside it 
 Groups and assets have a **Frame** button. It picks which frame of the group's own timeline shows, for example to switch between the mouths or eyes of a character, like the Frame Picker in Adobe Animate.
 
 - **Previous frame** and **Next frame** step one frame back or forward. After the last frame comes the first again.
-- The box between them shows the frame and the number of frames, for example 3 / 12. Tap it to type a frame number.
+- The box between them shows the frame and the number of frames, for example 3 / 12. Double-tap it to type a frame number.
 - Without keyframes, the frame you pick shows for the whole clip. The keyframe button keys it, and once there are keys, picking a frame at another time adds a key there. Each key holds its frame until the next key. Choose another easing for a key to count through the frames in between instead.
 - **Off** removes the chosen frame and its keys, so the group plays its own timeline again. It shows only while a frame is chosen.
 

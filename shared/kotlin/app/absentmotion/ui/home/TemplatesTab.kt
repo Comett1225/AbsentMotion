@@ -68,6 +68,7 @@ import app.absentmotion.ui.editor.matchesSearch
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.animatedColor
 import app.absentmotion.ui.theme.enterFade
+import app.absentmotion.ui.theme.withUiFont
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -75,6 +76,7 @@ import java.io.File
 import java.util.Locale
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
+import app.absentmotion.ui.HoldName
 
 private val Grey get() = Am.HomeDim
 private val FactText get() = Am.HomeDim
@@ -256,7 +258,10 @@ private fun Fact(icon: ImageVector, text: String) {
 @Composable
 private fun Menu(open: Boolean, onOpen: (Boolean) -> Unit, vararg rows: Pair<Pair<String, ImageVector>, () -> Unit>) {
     Box {
-        Box(Modifier.size(48.dp).clickable { onOpen(true) }, contentAlignment = Alignment.Center) { Icon(HomeIcons.More, stringResource(R.string.home_more), Modifier.size(24.dp), tint = Grey) }
+        Box(Modifier.size(48.dp).clickable { onOpen(true) }, contentAlignment = Alignment.Center) {
+            Icon(HomeIcons.More, stringResource(R.string.home_more), Modifier.size(24.dp), tint = Grey)
+            HoldName(stringResource(R.string.home_more))
+        }
         Box(Modifier.align(Alignment.BottomEnd).offset(y = 8.dp)) {
             RefMenu(open, { onOpen(false) }, Am.Card, RoundedCornerShape(14.dp), Modifier.width(246.dp)) {
                 for ((label, action) in rows) {
@@ -286,7 +291,7 @@ private fun RenameDialog(title: String, onDone: (String) -> Unit, onDismiss: () 
         text = {
             BasicTextField(
                 text, { text = it }, Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp)).background(Am.HomeBg).padding(12.dp),
-                textStyle = TextStyle(color = Am.Navy, fontSize = 16.sp), singleLine = true, cursorBrush = SolidColor(Am.Navy),
+                textStyle = TextStyle(color = Am.Navy, fontSize = 16.sp).withUiFont(), singleLine = true, cursorBrush = SolidColor(Am.Navy),
             )
         },
         confirmButton = { TextButton({ onDone(text.ifBlank { title }) }) { Text(stringResource(R.string.done), color = Am.Navy) } },

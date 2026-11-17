@@ -1,7 +1,7 @@
 {
  "categories": {
   "3d": "3D",
-  "ai": "AI",
+  "ai": "IA",
   "beat": "Ritmo",
   "blur": "Desenfoque",
   "color": "Color",
@@ -497,11 +497,18 @@
    }
   },
   "blur": {
-   "description": "Un desenfoque suave y uniforme.",
+   "description": "Un desenfoque suave y uniforme. Con Forma en Caja, en su lugar se promedia un cuadrado uniforme alrededor de cada punto.",
    "name": "Desenfoque",
    "params": {
     "strength": {
      "label": "Intensidad"
+    },
+    "shape": {
+     "label": "Forma",
+     "options": [
+      "Suave",
+      "Caja"
+     ]
     }
    }
   },
@@ -547,6 +554,59 @@
     },
     "width": {
      "label": "Anchura"
+    },
+    "lighting": {
+     "label": "Iluminación",
+     "options": [
+      "Clásica",
+      "Suave",
+      "Directa"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura de la luz"
+    },
+    "lightColor": {
+     "label": "Color de la luz"
+    },
+    "glossiness": {
+     "label": "Nitidez del brillo"
+    },
+    "texMode": {
+     "label": "Textura",
+     "options": [
+      "Ajustar",
+      "Mosaico",
+      "Estirar"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Repetir X"
+    },
+    "texRepeatY": {
+     "label": "Repetir Y"
+    },
+    "texMirror": {
+     "label": "Espejo"
+    },
+    "texAngle": {
+     "label": "Ángulo de textura"
+    },
+    "texOffset": {
+     "label": "Desplazamiento de textura"
+    },
+    "texCrop": {
+     "label": "Recorte de textura"
+    },
+    "texAnchor": {
+     "label": "Anclaje de textura",
+     "options": [
+      "Centro",
+      "Esquina"
+     ]
     }
    }
   },
@@ -570,7 +630,7 @@
    }
   },
   "bulge": {
-   "description": "Abomba la capa hacia fuera como una lente (Fuerza positiva) o la pellizca hacia el Centro (negativa) dentro de un círculo de Radio, una parte del tamaño de la capa.",
+   "description": "Abomba la capa hacia fuera como una lente (Fuerza positiva) o la pellizca hacia el Centro (negativa) dentro de un círculo de Radio, una fracción del tamaño de la capa. Con Medir en Pantalla, Radio es una fracción de la pantalla. Con Atenuación en Suave, la lente se funde con más suavidad con el resto de la capa.",
    "name": "Pellizco/Abultamiento",
    "params": {
     "amount": {
@@ -581,6 +641,20 @@
     },
     "radius": {
      "label": "Radio"
+    },
+    "reach": {
+     "label": "Medir en",
+     "options": [
+      "Capa",
+      "Pantalla"
+     ]
+    },
+    "curve": {
+     "label": "Atenuación",
+     "options": [
+      "Clásica",
+      "Suave"
+     ]
     }
    }
   },
@@ -781,7 +855,7 @@
    }
   },
   "circularripple": {
-   "description": "Hace que ondas circulares se propaguen desde un punto, como una gota que cae al agua.",
+   "description": "Hace que ondas circulares se propaguen desde un punto, como una gota que cae al agua. Con Medir en Pantalla, la Frecuencia, la Intensidad y el Radio se miden en la pantalla en vez de en la capa.",
    "name": "Ondulación circular",
    "params": {
     "center": {
@@ -801,6 +875,13 @@
     },
     "strength": {
      "label": "Intensidad"
+    },
+    "reach": {
+     "label": "Medir en",
+     "options": [
+      "Capa",
+      "Pantalla"
+     ]
     }
    }
   },
@@ -813,6 +894,9 @@
     },
     "color2": {
      "label": "Color 2"
+    },
+    "contrast": {
+     "label": "Contraste"
     },
     "intensity": {
      "label": "Intensidad"
@@ -855,6 +939,13 @@
     },
     "strength": {
      "label": "Intensidad"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clásico",
+      "Nítido"
+     ]
     }
    }
   },
@@ -965,6 +1056,16 @@
     },
     "fill": {
      "label": "Relleno"
+    },
+    "spread": {
+     "label": "Dispersión",
+     "options": [
+      "Desenfoque",
+      "Distancia"
+     ]
+    },
+    "offset": {
+     "label": "Desplazamiento"
     }
    }
   },
@@ -992,6 +1093,16 @@
     },
     "width": {
      "label": "Ancho"
+    },
+    "spread": {
+     "label": "Dispersión",
+     "options": [
+      "Desenfoque",
+      "Distancia"
+     ]
+    },
+    "offset": {
+     "label": "Desplazamiento"
     }
    }
   },
@@ -1034,13 +1145,20 @@
      ]
     },
     "mask": {
-     "label": "Enmascarar con capa"
+     "label": "Enmascarar a la capa"
     },
     "phase": {
      "label": "Fase"
     },
     "thickness": {
      "label": "Grosor"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clásico",
+      "Apilado"
+     ]
     }
    }
   },
@@ -1067,10 +1185,10 @@
     "separator": {
      "label": "Miles",
      "options": [
-      "1000,5",
+      "1000.5",
+      "1,000.5",
       "1.000,5",
-      "1.000,5",
-      "1 000,5"
+      "1 000.5"
      ]
     }
    },
@@ -1141,6 +1259,62 @@
     },
     "thickness": {
      "label": "Grosor"
+    },
+    "keep": {
+     "label": "Mantener capa"
+    },
+    "lighting": {
+     "label": "Iluminación",
+     "options": [
+      "Clásica",
+      "Suave",
+      "Directa"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura de la luz"
+    },
+    "lightColor": {
+     "label": "Color de la luz"
+    },
+    "glossiness": {
+     "label": "Nitidez del brillo"
+    },
+    "texMode": {
+     "label": "Textura",
+     "options": [
+      "Ajustar",
+      "Mosaico",
+      "Estirar"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Repetir X"
+    },
+    "texRepeatY": {
+     "label": "Repetir Y"
+    },
+    "texMirror": {
+     "label": "Espejo"
+    },
+    "texAngle": {
+     "label": "Ángulo de textura"
+    },
+    "texOffset": {
+     "label": "Desplazamiento de textura"
+    },
+    "texCrop": {
+     "label": "Recorte de textura"
+    },
+    "texAnchor": {
+     "label": "Anclaje de textura",
+     "options": [
+      "Centro",
+      "Esquina"
+     ]
     }
    }
   },
@@ -1180,6 +1354,59 @@
     },
     "smoothing": {
      "label": "Suavizado"
+    },
+    "lighting": {
+     "label": "Iluminación",
+     "options": [
+      "Clásica",
+      "Suave",
+      "Directa"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura de la luz"
+    },
+    "lightColor": {
+     "label": "Color de la luz"
+    },
+    "glossiness": {
+     "label": "Nitidez del brillo"
+    },
+    "texMode": {
+     "label": "Textura",
+     "options": [
+      "Ajustar",
+      "Mosaico",
+      "Estirar"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Repetir X"
+    },
+    "texRepeatY": {
+     "label": "Repetir Y"
+    },
+    "texMirror": {
+     "label": "Espejo"
+    },
+    "texAngle": {
+     "label": "Ángulo de textura"
+    },
+    "texOffset": {
+     "label": "Desplazamiento de textura"
+    },
+    "texCrop": {
+     "label": "Recorte de textura"
+    },
+    "texAnchor": {
+     "label": "Anclaje de textura",
+     "options": [
+      "Centro",
+      "Esquina"
+     ]
     }
    }
   },
@@ -1251,6 +1478,59 @@
     },
     "smoothing": {
      "label": "Suavizado"
+    },
+    "lighting": {
+     "label": "Iluminación",
+     "options": [
+      "Clásica",
+      "Suave",
+      "Directa"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura de la luz"
+    },
+    "lightColor": {
+     "label": "Color de la luz"
+    },
+    "glossiness": {
+     "label": "Nitidez del brillo"
+    },
+    "texMode": {
+     "label": "Textura",
+     "options": [
+      "Ajustar",
+      "Mosaico",
+      "Estirar"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Repetir X"
+    },
+    "texRepeatY": {
+     "label": "Repetir Y"
+    },
+    "texMirror": {
+     "label": "Espejo"
+    },
+    "texAngle": {
+     "label": "Ángulo de textura"
+    },
+    "texOffset": {
+     "label": "Desplazamiento de textura"
+    },
+    "texCrop": {
+     "label": "Recorte de textura"
+    },
+    "texAnchor": {
+     "label": "Anclaje de textura",
+     "options": [
+      "Centro",
+      "Esquina"
+     ]
     }
    }
   },
@@ -1349,7 +1629,7 @@
      "label": "Tinte"
     },
     "vibrance": {
-     "label": "Vibración"
+     "label": "Intensidad del color"
     }
    }
   },
@@ -1369,7 +1649,7 @@
    }
   },
   "directionalblur": {
-   "description": "Desenfoque de movimiento que promedia muestras a lo largo de un ángulo direccional.",
+   "description": "Desenfoque de movimiento que promedia muestras a lo largo de un ángulo direccional. Con Expansión en Ambos lados, el desenfoque se reparte por igual hacia delante y hacia atrás.",
    "name": "Desenfoque direccional",
    "params": {
     "angle": {
@@ -1377,6 +1657,13 @@
     },
     "blurLength": {
      "label": "Longitud"
+    },
+    "spread": {
+     "label": "Expansión",
+     "options": [
+      "Un lado",
+      "Ambos lados"
+     ]
     }
    }
   },
@@ -1571,6 +1858,22 @@
    "params": {
     "strength": {
      "label": "Intensidad"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clásico",
+      "Tinta"
+     ]
+    },
+    "spacing": {
+     "label": "Suavizado"
+    },
+    "threshold": {
+     "label": "Umbral"
+    },
+    "invert": {
+     "label": "Invertir"
     }
    }
   },
@@ -1613,6 +1916,9 @@
     },
     "tintColor": {
      "label": "Color de tinte"
+    },
+    "mask": {
+     "label": "Enmascarar a la capa"
     }
    }
   },
@@ -1682,6 +1988,13 @@
     },
     "thickness": {
      "label": "Grosor"
+    },
+    "contourStyle": {
+     "label": "Estilo",
+     "options": [
+      "Clásico",
+      "Líneas finas"
+     ]
     }
    }
   },
@@ -1724,6 +2037,59 @@
     },
     "squeezeRatio": {
      "label": "Compresión"
+    },
+    "lighting": {
+     "label": "Iluminación",
+     "options": [
+      "Clásica",
+      "Suave",
+      "Directa"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura de la luz"
+    },
+    "lightColor": {
+     "label": "Color de la luz"
+    },
+    "glossiness": {
+     "label": "Nitidez del brillo"
+    },
+    "texMode": {
+     "label": "Textura",
+     "options": [
+      "Ajustar",
+      "Mosaico",
+      "Estirar"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Repetir X"
+    },
+    "texRepeatY": {
+     "label": "Repetir Y"
+    },
+    "texMirror": {
+     "label": "Espejo"
+    },
+    "texAngle": {
+     "label": "Ángulo de textura"
+    },
+    "texOffset": {
+     "label": "Desplazamiento de textura"
+    },
+    "texCrop": {
+     "label": "Recorte de textura"
+    },
+    "texAnchor": {
+     "label": "Anclaje de textura",
+     "options": [
+      "Centro",
+      "Esquina"
+     ]
     }
    }
   },
@@ -1747,7 +2113,7 @@
      "label": "Fusión",
      "options": [
       "Añadir",
-      "Pantalla",
+      "Trama",
       "Normal"
      ]
     },
@@ -1982,6 +2348,65 @@
     },
     "shine": {
      "label": "Brillo"
+    },
+    "lighting": {
+     "label": "Iluminación",
+     "options": [
+      "Clásica",
+      "Suave",
+      "Directa"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura de la luz"
+    },
+    "lightColor": {
+     "label": "Color de la luz"
+    },
+    "glossiness": {
+     "label": "Nitidez del brillo"
+    },
+    "pivot": {
+     "label": "Pivote"
+    },
+    "pivotDepth": {
+     "label": "Profundidad del pivote"
+    },
+    "texMode": {
+     "label": "Textura",
+     "options": [
+      "Ajustar",
+      "Mosaico",
+      "Estirar"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Repetir X"
+    },
+    "texRepeatY": {
+     "label": "Repetir Y"
+    },
+    "texMirror": {
+     "label": "Espejo"
+    },
+    "texAngle": {
+     "label": "Ángulo de textura"
+    },
+    "texOffset": {
+     "label": "Desplazamiento de textura"
+    },
+    "texCrop": {
+     "label": "Recorte de textura"
+    },
+    "texAnchor": {
+     "label": "Anclaje de textura",
+     "options": [
+      "Centro",
+      "Esquina"
+     ]
     }
    }
   },
@@ -2047,6 +2472,13 @@
     },
     "softness": {
      "label": "Suavidad"
+    },
+    "falloff": {
+     "label": "Atenuación",
+     "options": [
+      "Distancia",
+      "Suave"
+     ]
     }
    }
   },
@@ -2116,6 +2548,13 @@
     },
     "strength": {
      "label": "Fuerza"
+    },
+    "screenSize": {
+     "label": "Tamaño según",
+     "options": [
+      "Capa",
+      "Pantalla"
+     ]
     }
    }
   },
@@ -2198,7 +2637,7 @@
    }
   },
   "glass": {
-   "description": "Convierte la forma de la capa en cristal biselado que curva las capas de detrás, con un brillo en el borde.",
+   "description": "Convierte la forma de la capa en un cristal biselado que refracta las capas de detrás, con un brillo a lo largo del borde. Con Luz en Suave, la capa se muestra según Relleno y el cristal se ilumina con Color, con más brillo en el borde interior del bisel que mira hacia la luz.",
    "name": "Cristal",
    "params": {
     "angle": {
@@ -2210,8 +2649,18 @@
     "color": {
      "label": "Color"
     },
+    "fill": {
+     "label": "Relleno"
+    },
     "highlight": {
      "label": "Brillo"
+    },
+    "light": {
+     "label": "Luz",
+     "options": [
+      "Borde",
+      "Suave"
+     ]
     },
     "refraction": {
      "label": "Refracción"
@@ -2326,6 +2775,13 @@
     },
     "scaleBrightness": {
      "label": "Escalar brillo"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Degradado",
+      "Espectro"
+     ]
     }
    }
   },
@@ -2344,7 +2800,7 @@
       "Trama",
       "Superponer",
       "Luz suave",
-      "Luz intensa",
+      "Luz fuerte",
       "Añadir",
       "Oscurecer",
       "Aclarar",
@@ -2401,6 +2857,14 @@
     },
     "offset": {
      "label": "Desplazamiento"
+    },
+    "origin": {
+     "label": "Origen",
+     "options": [
+      "Centro",
+      "Esquina de la capa",
+      "Esquina de la pantalla"
+     ]
     },
     "punch": {
      "label": "Perforar"
@@ -2606,6 +3070,59 @@
     },
     "smoothing": {
      "label": "Suavizado"
+    },
+    "lighting": {
+     "label": "Iluminación",
+     "options": [
+      "Clásica",
+      "Suave",
+      "Directa"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura de la luz"
+    },
+    "lightColor": {
+     "label": "Color de la luz"
+    },
+    "glossiness": {
+     "label": "Nitidez del brillo"
+    },
+    "texMode": {
+     "label": "Textura",
+     "options": [
+      "Ajustar",
+      "Mosaico",
+      "Estirar"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Repetir X"
+    },
+    "texRepeatY": {
+     "label": "Repetir Y"
+    },
+    "texMirror": {
+     "label": "Espejo"
+    },
+    "texAngle": {
+     "label": "Ángulo de textura"
+    },
+    "texOffset": {
+     "label": "Desplazamiento de textura"
+    },
+    "texCrop": {
+     "label": "Recorte de textura"
+    },
+    "texAnchor": {
+     "label": "Anclaje de textura",
+     "options": [
+      "Centro",
+      "Esquina"
+     ]
     }
    }
   },
@@ -2661,11 +3178,33 @@
     "angle": {
      "label": "Ángulo"
     },
+    "crop": {
+     "label": "Recorte"
+    },
+    "fit": {
+     "label": "Imagen",
+     "options": [
+      "Tamaño completo",
+      "En cada tesela"
+     ]
+    },
+    "mask": {
+     "label": "Enmascarar a la capa"
+    },
     "mirror": {
      "label": "Espejo"
     },
+    "offset": {
+     "label": "Desplazamiento"
+    },
     "scale": {
      "label": "Escala"
+    },
+    "screenSpace": {
+     "label": "Espacio de pantalla"
+    },
+    "stretch": {
+     "label": "Estirar"
     }
    }
   },
@@ -2684,8 +3223,8 @@
       "Trama",
       "Superponer",
       "Luz suave",
-      "Luz intensa",
-      "Sumar",
+      "Luz fuerte",
+      "Añadir",
       "Oscurecer",
       "Aclarar",
       "Diferencia",
@@ -2769,6 +3308,59 @@
     },
     "smoothing": {
      "label": "Suavizado"
+    },
+    "lighting": {
+     "label": "Iluminación",
+     "options": [
+      "Clásica",
+      "Suave",
+      "Directa"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura de la luz"
+    },
+    "lightColor": {
+     "label": "Color de la luz"
+    },
+    "glossiness": {
+     "label": "Nitidez del brillo"
+    },
+    "texMode": {
+     "label": "Textura",
+     "options": [
+      "Ajustar",
+      "Mosaico",
+      "Estirar"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Repetir X"
+    },
+    "texRepeatY": {
+     "label": "Repetir Y"
+    },
+    "texMirror": {
+     "label": "Espejo"
+    },
+    "texAngle": {
+     "label": "Ángulo de textura"
+    },
+    "texOffset": {
+     "label": "Desplazamiento de textura"
+    },
+    "texCrop": {
+     "label": "Recorte de textura"
+    },
+    "texAnchor": {
+     "label": "Anclaje de textura",
+     "options": [
+      "Centro",
+      "Esquina"
+     ]
     }
    }
   },
@@ -2839,6 +3431,59 @@
     },
     "width": {
      "label": "Anchura"
+    },
+    "lighting": {
+     "label": "Iluminación",
+     "options": [
+      "Clásica",
+      "Suave",
+      "Directa"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura de la luz"
+    },
+    "lightColor": {
+     "label": "Color de la luz"
+    },
+    "glossiness": {
+     "label": "Nitidez del brillo"
+    },
+    "texMode": {
+     "label": "Textura",
+     "options": [
+      "Ajustar",
+      "Mosaico",
+      "Estirar"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Repetir X"
+    },
+    "texRepeatY": {
+     "label": "Repetir Y"
+    },
+    "texMirror": {
+     "label": "Espejo"
+    },
+    "texAngle": {
+     "label": "Ángulo de textura"
+    },
+    "texOffset": {
+     "label": "Desplazamiento de textura"
+    },
+    "texCrop": {
+     "label": "Recorte de textura"
+    },
+    "texAnchor": {
+     "label": "Anclaje de textura",
+     "options": [
+      "Centro",
+      "Esquina"
+     ]
     }
    }
   },
@@ -2948,7 +3593,7 @@
    }
   },
   "huesaturation": {
-   "description": "Gira los colores alrededor de la rueda cromática y los hace más fuertes o más débiles; la vibración refuerza sobre todo los colores más apagados.",
+   "description": "Gira los colores alrededor de la rueda cromática y los hace más fuertes o más débiles; la intensidad refuerza sobre todo los colores más apagados.",
    "name": "Tono y saturación",
    "params": {
     "hue": {
@@ -2964,11 +3609,12 @@
      "label": "Estilo",
      "options": [
       "Clásico",
-      "Mantener brillo"
+      "Mantener brillo",
+      "Vídeo"
      ]
     },
     "vibrance": {
-     "label": "Vibración"
+     "label": "Intensidad"
     }
    }
   },
@@ -3002,6 +3648,23 @@
     },
     "intensity": {
      "label": "Intensidad"
+    },
+    "blend": {
+     "label": "Fusión",
+     "options": [
+      "Trama",
+      "Normal"
+     ]
+    },
+    "opacity": {
+     "label": "Opacidad"
+    },
+    "corners": {
+     "label": "Esquinas",
+     "options": [
+      "Redondeadas",
+      "Rectas"
+     ]
     }
    }
   },
@@ -3068,6 +3731,13 @@
     "center": {
      "label": "Centro"
     },
+    "direction": {
+     "label": "Dirección",
+     "options": [
+      "Horario",
+      "Antihorario"
+     ]
+    },
     "mirror": {
      "label": "Espejo"
     },
@@ -3077,9 +3747,16 @@
    }
   },
   "lensblur": {
-   "description": "Un desenfoque giratorio que deja una zona nítida alrededor del centro y aumenta hacia los bordes.",
+   "description": "Un desenfoque giratorio que deja una zona nítida alrededor del centro y aumenta hacia los bordes. Con Desenfoque en Zoom, en su lugar la imagen se difumina hacia fuera desde el centro, más allá de los bordes de la capa.",
    "name": "Desenfoque de lente",
    "params": {
+    "blur": {
+     "label": "Desenfoque",
+     "options": [
+      "Giro",
+      "Zoom"
+     ]
+    },
     "center": {
      "label": "Centro"
     },
@@ -3135,7 +3812,7 @@
   },
   "lightglow": {
    "description": "Añade un resplandor de color alrededor de las partes de la imagen más brillantes que un umbral.",
-   "name": "Resplandor",
+   "name": "Resplandor de luz",
    "params": {
     "blend": {
      "label": "Fusión"
@@ -3154,6 +3831,12 @@
     },
     "threshold": {
      "label": "Umbral"
+    },
+    "soften": {
+     "label": "Suavizar"
+    },
+    "mask": {
+     "label": "Enmascarar a la capa"
     }
    }
   },
@@ -3257,7 +3940,7 @@
    }
   },
   "linearstreaks": {
-   "description": "Crea estelas rectas deslizando copias de la capa en un ángulo y mezclándolas donde se solapan.",
+   "description": "Crea estelas rectas deslizando copias de la capa a lo largo de un ángulo y fusionándolas donde se solapan. Con Fusión en Desactivada, la capa se queda tal cual. Con Copias en Cada píxel, se coloca una copia en cada píxel de Longitud en lugar de 48 repartidas a lo largo de ella.",
    "name": "Estelas lineales",
    "params": {
     "alpha": {
@@ -3274,11 +3957,19 @@
      "options": [
       "Aclarar",
       "Media",
-      "Oscurecer"
+      "Oscurecer",
+      "Desactivada"
      ]
     },
     "reach": {
      "label": "Longitud"
+    },
+    "copies": {
+     "label": "Copias",
+     "options": [
+      "Espaciadas",
+      "Cada píxel"
+     ]
     }
    }
   },
@@ -3333,6 +4024,12 @@
     },
     "solidity": {
      "label": "Solidez"
+    },
+    "fill": {
+     "label": "Relleno"
+    },
+    "samples": {
+     "label": "Muestras"
     }
    }
   },
@@ -3348,6 +4045,9 @@
     },
     "threshold": {
      "label": "Umbral"
+    },
+    "high": {
+     "label": "Umbral alto"
     }
    }
   },
@@ -3472,6 +4172,13 @@
    "description": "Divide la capa en cuadrados y rellena cada uno con su color medio.",
    "name": "Mosaico",
    "params": {
+    "average": {
+     "label": "Promedio",
+     "options": [
+      "Celda",
+      "Esquina"
+     ]
+    },
     "count": {
      "label": "Cantidad"
     },
@@ -3594,6 +4301,59 @@
     },
     "shine": {
      "label": "Brillo"
+    },
+    "lighting": {
+     "label": "Iluminación",
+     "options": [
+      "Clásica",
+      "Suave",
+      "Directa"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura de la luz"
+    },
+    "lightColor": {
+     "label": "Color de la luz"
+    },
+    "glossiness": {
+     "label": "Nitidez del brillo"
+    },
+    "texMode": {
+     "label": "Textura",
+     "options": [
+      "Ajustar",
+      "Mosaico",
+      "Estirar"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Repetir X"
+    },
+    "texRepeatY": {
+     "label": "Repetir Y"
+    },
+    "texMirror": {
+     "label": "Espejo"
+    },
+    "texAngle": {
+     "label": "Ángulo de textura"
+    },
+    "texOffset": {
+     "label": "Desplazamiento de textura"
+    },
+    "texCrop": {
+     "label": "Recorte de textura"
+    },
+    "texAnchor": {
+     "label": "Anclaje de textura",
+     "options": [
+      "Centro",
+      "Esquina"
+     ]
     }
    }
   },
@@ -4144,6 +4904,13 @@
     "blockSize": {
      "label": "Tamaño"
     },
+    "edges": {
+     "label": "Bordes",
+     "options": [
+      "Espejo",
+      "Transparente"
+     ]
+    },
     "offset": {
      "label": "Desplazamiento"
     },
@@ -4244,7 +5011,7 @@
    }
   },
   "polar": {
-   "description": "Curva la capa alrededor de su centro, convirtiendo las líneas rectas en círculos, o desenrolla los círculos en líneas rectas.",
+   "description": "Curva la capa alrededor de su centro, convirtiendo las líneas rectas en círculos, o desenrolla los círculos en líneas rectas. Disposición elige qué borde de la capa se junta en el centro.",
    "name": "Coordenadas polares",
    "params": {
     "amount": {
@@ -4255,6 +5022,13 @@
      "options": [
       "Rectangulares a polares",
       "Polares a rectangulares"
+     ]
+    },
+    "middle": {
+     "label": "Disposición",
+     "options": [
+      "Borde superior al centro",
+      "Borde inferior al centro"
      ]
     }
    }
@@ -4448,11 +5222,64 @@
     },
     "shine": {
      "label": "Brillo"
+    },
+    "lighting": {
+     "label": "Iluminación",
+     "options": [
+      "Clásica",
+      "Suave",
+      "Directa"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura de la luz"
+    },
+    "lightColor": {
+     "label": "Color de la luz"
+    },
+    "glossiness": {
+     "label": "Nitidez del brillo"
+    },
+    "texMode": {
+     "label": "Textura",
+     "options": [
+      "Ajustar",
+      "Mosaico",
+      "Estirar"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Repetir X"
+    },
+    "texRepeatY": {
+     "label": "Repetir Y"
+    },
+    "texMirror": {
+     "label": "Espejo"
+    },
+    "texAngle": {
+     "label": "Ángulo de textura"
+    },
+    "texOffset": {
+     "label": "Desplazamiento de textura"
+    },
+    "texCrop": {
+     "label": "Recorte de textura"
+    },
+    "texAnchor": {
+     "label": "Anclaje de textura",
+     "options": [
+      "Centro",
+      "Esquina"
+     ]
     }
    }
   },
   "radialblur": {
-   "description": "Aplica un desenfoque de zoom radial promediando muestras a lo largo de rayos desde un punto central, con intensidad ajustable.",
+   "description": "Aplica un desenfoque de zoom radial promediando muestras a lo largo de rayos desde un punto central, con intensidad ajustable. Con Longitud en Uniforme, todas las estelas miden lo mismo en vez de crecer con la distancia al centro.",
    "name": "Desenfoque de zoom",
    "params": {
     "amount": {
@@ -4460,6 +5287,13 @@
     },
     "center": {
      "label": "Centro"
+    },
+    "streak": {
+     "label": "Longitud",
+     "options": [
+      "Según la distancia",
+      "Uniforme"
+     ]
     }
    }
   },
@@ -4506,7 +5340,7 @@
       "Lineal",
       "Entrada suave",
       "Salida suave",
-      "Suavizar entrada y salida"
+      "Entrada y salida suaves"
      ]
     },
     "fillAmount": {
@@ -4586,11 +5420,14 @@
     },
     "reach": {
      "label": "Longitud"
+    },
+    "fill": {
+     "label": "Relleno"
     }
    }
   },
   "radialwipe": {
-   "description": "Oculta una cuña de la capa que gira alrededor de Centro desde Ángulo inicial, como una aguja de reloj. Progreso es el ángulo barrido, Cantidad repite la cuña alrededor del círculo y la opción Ambos barre en ambos sentidos. Anima Progreso para crear una transición.",
+   "description": "Oculta una cuña de la capa que gira alrededor de Centro desde Ángulo inicial, como una aguja de reloj. Progreso es el ángulo barrido, Cantidad repite la cuña alrededor del círculo y la opción Ambos barre en ambos sentidos. Anima Progreso para crear una transición. Con Cuñas en Exactas, Cantidad admite fracciones, así que la última cuña es más estrecha, y Difuminado suaviza los dos lados de cada cuña.",
    "name": "Barrido radial",
    "params": {
     "center": {
@@ -4615,6 +5452,13 @@
     },
     "start": {
      "label": "Ángulo inicial"
+    },
+    "wedges": {
+     "label": "Cuñas",
+     "options": [
+      "Enteras",
+      "Exactas"
+     ]
     }
    }
   },
@@ -4699,6 +5543,26 @@
     },
     "shine": {
      "label": "Brillo"
+    },
+    "lighting": {
+     "label": "Iluminación",
+     "options": [
+      "Clásica",
+      "Suave",
+      "Directa"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura de la luz"
+    },
+    "lightColor": {
+     "label": "Color de la luz"
+    },
+    "glossiness": {
+     "label": "Nitidez del brillo"
     }
    },
    "shortcuts": {
@@ -4914,6 +5778,13 @@
     },
     "threshold": {
      "label": "Umbral"
+    },
+    "match": {
+     "label": "Coincidencia",
+     "options": [
+      "RGB",
+      "Croma"
+     ]
     }
    }
   },
@@ -4964,7 +5835,7 @@
    }
   },
   "rgbsplit": {
-   "description": "Separa los canales rojo, verde y azul: el canal central se queda quieto y los otros dos se desplazan en direcciones opuestas según Ángulo. Luz suma los colores desplazados, Oscuro los mantiene sólidos, Máscara conserva solo donde se superponen los tres y Luminancia hace que los bordes sean tan opacos como brillantes.",
+   "description": "Separa los canales rojo, verde y azul: el canal de Centro se queda fijo y los otros dos se desplazan en direcciones opuestas según Ángulo. Luz suma los colores desplazados, Oscuro los mantiene sólidos, Máscara conserva solo donde se superponen los tres y Luminancia hace que los bordes de color sean tan opacos como brillantes. Media hace que cada punto sea tan opaco como la proporción de canales que lo cubren.",
    "name": "Separación RGB",
    "params": {
     "angle": {
@@ -4984,7 +5855,8 @@
       "Luz",
       "Oscuro",
       "Máscara",
-      "Luminancia"
+      "Luminancia",
+      "Media"
      ]
     },
     "strength": {
@@ -5201,7 +6073,7 @@
      "options": [
       "Normal",
       "Añadir",
-      "Pantalla",
+      "Trama",
       "Multiplicar",
       "Aclarar",
       "Oscurecer",
@@ -5281,9 +6153,9 @@
      "label": "Suavizado",
      "options": [
       "Lineal",
-      "Suavizar entrada",
-      "Suavizar salida",
-      "Suavizar entrada y salida"
+      "Entrada suave",
+      "Salida suave",
+      "Entrada y salida suaves"
      ]
     },
     "evolution": {
@@ -5390,7 +6262,7 @@
      "options": [
       "Normal",
       "Añadir",
-      "Pantalla",
+      "Trama",
       "Multiplicar"
      ]
     },
@@ -5492,6 +6364,13 @@
     },
     "outside": {
      "label": "Resplandor exterior"
+    },
+    "falloff": {
+     "label": "Atenuación",
+     "options": [
+      "Uniforme",
+      "Capa"
+     ]
     }
    }
   },
@@ -5507,10 +6386,10 @@
      "options": [
       "Normal",
       "Multiplicar",
-      "Pantalla",
+      "Trama",
       "Superponer",
       "Luz suave",
-      "Luz intensa",
+      "Luz fuerte",
       "Añadir",
       "Oscurecer",
       "Aclarar",
@@ -5585,6 +6464,59 @@
     },
     "shine": {
      "label": "Brillo"
+    },
+    "lighting": {
+     "label": "Iluminación",
+     "options": [
+      "Clásica",
+      "Suave",
+      "Directa"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura de la luz"
+    },
+    "lightColor": {
+     "label": "Color de la luz"
+    },
+    "glossiness": {
+     "label": "Nitidez del brillo"
+    },
+    "texMode": {
+     "label": "Textura",
+     "options": [
+      "Ajustar",
+      "Mosaico",
+      "Estirar"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Repetir X"
+    },
+    "texRepeatY": {
+     "label": "Repetir Y"
+    },
+    "texMirror": {
+     "label": "Espejo"
+    },
+    "texAngle": {
+     "label": "Ángulo de textura"
+    },
+    "texOffset": {
+     "label": "Desplazamiento de textura"
+    },
+    "texCrop": {
+     "label": "Recorte de textura"
+    },
+    "texAnchor": {
+     "label": "Anclaje de textura",
+     "options": [
+      "Centro",
+      "Esquina"
+     ]
     }
    }
   },
@@ -5732,11 +6664,18 @@
     },
     "threshold": {
      "label": "Umbral"
+    },
+    "grey": {
+     "label": "Gris",
+     "options": [
+      "HD",
+      "SD"
+     ]
     }
    }
   },
   "squeeze": {
-   "description": "Pellizca el centro de la capa hacia dentro con una Intensidad positiva y lo abomba hacia fuera con una negativa. Heredado conserva la forma de los proyectos antiguos.",
+   "description": "Pellizca el centro de la capa hacia dentro con una Intensidad positiva y lo abomba hacia fuera con una negativa. Heredado conserva la forma de los proyectos antiguos. Reloj de arena también empuja hacia fuera el centro de los bordes superior e inferior.",
    "name": "Pellizco",
    "params": {
     "amount": {
@@ -5746,7 +6685,8 @@
      "label": "Forma",
      "options": [
       "Pellizco/Abultamiento",
-      "Heredado"
+      "Heredado",
+      "Reloj de arena"
      ]
     }
    }
@@ -5846,6 +6786,59 @@
     },
     "shine": {
      "label": "Brillo"
+    },
+    "lighting": {
+     "label": "Iluminación",
+     "options": [
+      "Clásica",
+      "Suave",
+      "Directa"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura de la luz"
+    },
+    "lightColor": {
+     "label": "Color de la luz"
+    },
+    "glossiness": {
+     "label": "Nitidez del brillo"
+    },
+    "texMode": {
+     "label": "Textura",
+     "options": [
+      "Ajustar",
+      "Mosaico",
+      "Estirar"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Repetir X"
+    },
+    "texRepeatY": {
+     "label": "Repetir Y"
+    },
+    "texMirror": {
+     "label": "Espejo"
+    },
+    "texAngle": {
+     "label": "Ángulo de textura"
+    },
+    "texOffset": {
+     "label": "Desplazamiento de textura"
+    },
+    "texCrop": {
+     "label": "Recorte de textura"
+    },
+    "texAnchor": {
+     "label": "Anclaje de textura",
+     "options": [
+      "Centro",
+      "Esquina"
+     ]
     }
    }
   },
@@ -5894,6 +6887,66 @@
     },
     "smoothing": {
      "label": "Suavizado"
+    },
+    "starStyle": {
+     "label": "Estilo",
+     "options": [
+      "Plano",
+      "Puntiagudo"
+     ]
+    },
+    "lighting": {
+     "label": "Iluminación",
+     "options": [
+      "Clásica",
+      "Suave",
+      "Directa"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura de la luz"
+    },
+    "lightColor": {
+     "label": "Color de la luz"
+    },
+    "glossiness": {
+     "label": "Nitidez del brillo"
+    },
+    "texMode": {
+     "label": "Textura",
+     "options": [
+      "Ajustar",
+      "Mosaico",
+      "Estirar"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Repetir X"
+    },
+    "texRepeatY": {
+     "label": "Repetir Y"
+    },
+    "texMirror": {
+     "label": "Espejo"
+    },
+    "texAngle": {
+     "label": "Ángulo de textura"
+    },
+    "texOffset": {
+     "label": "Desplazamiento de textura"
+    },
+    "texCrop": {
+     "label": "Recorte de textura"
+    },
+    "texAnchor": {
+     "label": "Anclaje de textura",
+     "options": [
+      "Centro",
+      "Esquina"
+     ]
     }
    }
   },
@@ -6065,7 +7118,9 @@
       "Robot",
       "Chillido",
       "Máquina de escribir",
-      "Chiptune"
+      "Chiptune",
+      "Esqueleto",
+      "Sonido personalizado"
      ]
     },
     "volume": {
@@ -6439,6 +7494,13 @@
     "count": {
      "label": "Cantidad"
     },
+    "edges": {
+     "label": "Bordes",
+     "options": [
+      "Espejo",
+      "Transparente"
+     ]
+    },
     "offset": {
      "label": "Desplazamiento"
     },
@@ -6447,6 +7509,9 @@
     },
     "rotation": {
      "label": "Rotación"
+    },
+    "screenSpace": {
+     "label": "Espacio de pantalla"
     },
     "seed": {
      "label": "Semilla"
@@ -6457,7 +7522,7 @@
    }
   },
   "tiles": {
-   "description": "Repite la capa para llenar la pantalla. Aumenta Recorte para hacer mosaicos más pequeños, con espejo, desplazamiento de filas y rotación opcionales. Escala heredada mantiene los proyectos antiguos.",
+   "description": "Repite la capa para llenar la pantalla. Aumenta Recorte para hacer mosaicos más pequeños, con espejo, desplazamiento de filas y rotación opcionales. Escala heredada conserva el aspecto de los proyectos antiguos. Dentro de los mosaicos mantiene cada mosaico del tamaño de la capa y amplía y gira la imagen dentro de él.",
    "name": "Mosaicos",
    "params": {
     "angle": {
@@ -6473,7 +7538,8 @@
      "label": "Tamaño",
      "options": [
       "Recorte",
-      "Escala heredada"
+      "Escala heredada",
+      "Dentro de los mosaicos"
      ]
     },
     "vertical": {
@@ -6494,8 +7560,18 @@
     "count": {
      "label": "Cantidad"
     },
+    "edges": {
+     "label": "Bordes",
+     "options": [
+      "Espejo",
+      "Transparente"
+     ]
+    },
     "offset": {
      "label": "Desplazamiento"
+    },
+    "screenSpace": {
+     "label": "Espacio de pantalla"
     },
     "seed": {
      "label": "Semilla"
@@ -6598,6 +7674,59 @@
     },
     "thickness": {
      "label": "Grosor"
+    },
+    "lighting": {
+     "label": "Iluminación",
+     "options": [
+      "Clásica",
+      "Suave",
+      "Directa"
+     ]
+    },
+    "ambient": {
+     "label": "Ambiente"
+    },
+    "lightHeight": {
+     "label": "Altura de la luz"
+    },
+    "lightColor": {
+     "label": "Color de la luz"
+    },
+    "glossiness": {
+     "label": "Nitidez del brillo"
+    },
+    "texMode": {
+     "label": "Textura",
+     "options": [
+      "Ajustar",
+      "Mosaico",
+      "Estirar"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Repetir X"
+    },
+    "texRepeatY": {
+     "label": "Repetir Y"
+    },
+    "texMirror": {
+     "label": "Espejo"
+    },
+    "texAngle": {
+     "label": "Ángulo de textura"
+    },
+    "texOffset": {
+     "label": "Desplazamiento de textura"
+    },
+    "texCrop": {
+     "label": "Recorte de textura"
+    },
+    "texAnchor": {
+     "label": "Anclaje de textura",
+     "options": [
+      "Centro",
+      "Esquina"
+     ]
     }
    }
   },
@@ -6739,11 +7868,14 @@
     },
     "stretch": {
      "label": "Estiramiento"
+    },
+    "screenSpace": {
+     "label": "Espacio de pantalla"
     }
    }
   },
   "twirl": {
-   "description": "Gira la capa alrededor de Centro como un remolino: más fuerte en el medio y se desvanece en Radio (una parte del tamaño de la capa). Una intensidad negativa la gira al revés.",
+   "description": "Gira la capa alrededor de Centro como un remolino: el giro es más fuerte en el medio y se desvanece en Radio (una fracción del tamaño de la capa). Una Intensidad negativa gira en el otro sentido. Con Medir en Pantalla, Radio es una fracción de la pantalla y el giro se desvanece de forma suave.",
    "name": "Remolino",
    "params": {
     "center": {
@@ -6754,11 +7886,18 @@
     },
     "strength": {
      "label": "Intensidad"
+    },
+    "reach": {
+     "label": "Medir en",
+     "options": [
+      "Capa",
+      "Pantalla"
+     ]
     }
    }
   },
   "unsharpmask": {
-   "description": "Aumenta la nitidez sumando de nuevo la diferencia entre la capa y una copia desenfocada de ella. Intensidad define lo amplio del desenfoque, Cantidad cuánto se suma y Umbral por encima del 50 % ignora las diferencias pequeñas.",
+   "description": "Aumenta la nitidez sumando de nuevo la diferencia entre la capa y una copia desenfocada de ella. Intensidad define la anchura del desenfoque, Cantidad cuánto se vuelve a sumar y Umbral por encima del 50 % deja sin tocar las diferencias pequeñas. Con Color de la máscara en Rojo, la máscara se ve en rojo donde el brillo difiere de la copia desenfocada en más de lo que Umbral supera el 50 %.",
    "name": "Máscara de enfoque",
    "params": {
     "amount": {
@@ -6772,6 +7911,13 @@
     },
     "threshold": {
      "label": "Umbral"
+    },
+    "maskColor": {
+     "label": "Color de la máscara",
+     "options": [
+      "Gris",
+      "Rojo"
+     ]
     }
    }
   },
@@ -6783,7 +7929,7 @@
      "label": "Sangrado de color"
     },
     "headSwitch": {
-     "label": "Conmutación de cabeza"
+     "label": "Conmutación de cabezal"
     },
     "noise": {
      "label": "Ruido"
@@ -6867,6 +8013,19 @@
     },
     "yaw": {
      "label": "Guiñada"
+    },
+    "projection": {
+     "label": "Salida",
+     "options": [
+      "Vista",
+      "Panorámica"
+     ]
+    },
+    "eyeDistance": {
+     "label": "Distancia"
+    },
+    "frame": {
+     "label": "Proporción del encuadre"
     }
    }
   },
@@ -6932,7 +8091,7 @@
    }
   },
   "wavewarp": {
-   "description": "Curva la capa con una onda sinusoidal: Espaciado define cuántas ondas la cruzan, Magnitud cuánto empujan, Ángulo la dirección en la que van las ondas y Ángulo de deformación la dirección en la que empujan.",
+   "description": "Curva la capa con una onda sinusoidal: Espaciado define cuántas ondas la cruzan, Magnitud cuánto empujan, Ángulo la dirección en la que avanzan las ondas y Ángulo de deformación la dirección en la que empujan. Espacio de pantalla ajusta el tamaño de las ondas a la pantalla en vez de a la capa. Magnitud cruzada añade una segunda onda, con el tamaño que marca Espaciado cruzado, que avanza según Ángulo de deformación y empuja según Ángulo. Con Origen en Inferior izquierda de pantalla, las ondas se miden desde esa esquina de la pantalla según su lado corto, y Fase las desplaza.",
    "name": "Deformación de onda",
    "params": {
     "angle": {
@@ -6952,6 +8111,22 @@
     },
     "warpAngle": {
      "label": "Ángulo de deformación"
+    },
+    "screenSpace": {
+     "label": "Espacio de pantalla"
+    },
+    "crossSpacing": {
+     "label": "Espaciado cruzado"
+    },
+    "crossMagnitude": {
+     "label": "Magnitud cruzada"
+    },
+    "origin": {
+     "label": "Origen",
+     "options": [
+      "Esquina de la capa",
+      "Inferior izquierda de pantalla"
+     ]
     }
    }
   },

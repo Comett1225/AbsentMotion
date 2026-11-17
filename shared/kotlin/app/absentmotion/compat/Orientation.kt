@@ -18,11 +18,13 @@ import kotlin.math.roundToInt
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-internal class Orientation(private val quat: XmlNode?, private val spin: XmlNode?, private val base: DoubleArray) {
+internal class Orientation(private val quat: XmlNode?, private val spin: XmlNode?, private val base: DoubleArray, private val inverse: Boolean = false) {
     private val quatKeys = quat?.takeIf { it.isKeyframed }?.keyframes
     private val spinKeys = spin?.takeIf { it.isKeyframed }?.keyframes
 
-    private fun quatAt(t: Float): DoubleArray {
+    private fun quatAt(t: Float): DoubleArray = rawQuatAt(t).let { if (inverse) doubleArrayOf(-it[0], -it[1], -it[2], it[3]) else it }
+
+    private fun rawQuatAt(t: Float): DoubleArray {
         quat ?: return IDENTITY
         val keys = quatKeys ?: return quaternion(quat.valueAt(0f)) ?: IDENTITY
         val (a, b, u) = segment(keys, t)

@@ -3,6 +3,7 @@ package app.absentmotion.ui.editor.panels
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -16,10 +17,13 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.vector.PathParser
+import app.absentmotion.engine.NativeEngine
 import app.absentmotion.model.Easing
+import app.absentmotion.model.handles
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.exp
+import kotlin.math.roundToInt
 
 private fun svg(data: String): Path = PathParser().parsePathString(data).toPath()
 
@@ -49,16 +53,17 @@ internal fun ChevronIcon(next: Boolean, tint: Color, modifier: Modifier = Modifi
 
 @Composable
 internal fun CurveThumb(easing: Easing, tint: Color, modifier: Modifier = Modifier) {
+    val bounce = remember(easing) { if (easing.type == "bounce") NativeEngine.ease(easing.toString(), FloatArray(60) { it / 59f }) else null }
     Canvas(modifier.size(68.px)) {
         val k = size.width / 68f
-        scale(k, k, Offset.Zero) { drawThumb(easing, tint) }
+        scale(k, k, Offset.Zero) { drawThumb(easing, tint, bounce) }
     }
 }
 
 private fun tx(u: Float) = 3f + 61f * u
 private fun ty(v: Float) = 64f - 60f * v
 
-private fun DrawScope.drawThumb(easing: Easing, tint: Color) {
+private fun DrawScope.drawThumb(easing: Easing, tint: Color, bounce: FloatArray?) {
     val line = if (tint == Color.White) tint.copy(alpha = 0.83f) else tint
     drawRoundRect(tint.copy(alpha = 0.16f), Offset(3f, 4f), Size(61f, 60f), CornerRadius(8f))
     drawRoundRect(tint.copy(alpha = 0.4f), Offset(3f, 4f), Size(61f, 60f), CornerRadius(8f), style = Stroke(3f))
@@ -86,7 +91,10 @@ private fun DrawScope.drawThumb(easing: Easing, tint: Color) {
             segment(0f, p[0], 0f, p[1]); dot(p[0], p[1])
             segment(1f, p[2], 1f, p[3]); dot(p[2], p[3])
         }
-        "bounce" -> { polyline(::bounceOut, 60); dot(1f / 2.75f, 1f) }
+        "bounce" -> if (bounce != null) {
+            polyline({ bounce[(it * (bounce.size - 1)).roundToInt()] }, bounce.size)
+            easing.handles().firstOrNull()?.let { dot(it.x, it.y) }
+        }
         "elastic" -> { polyline({ 1f - exp(-5f * it) * cos(2f * PI.toFloat() * 1.7f * it) }, 60, 0.8f); dot(0.15f, 0.8f) }
         "cyclic" -> { polyline({ 0.5f + 0.42f * cos(2f * PI.toFloat() * 1.25f * it) }, 60); dot(0f, 0.92f) }
         "random" -> {
@@ -94,7 +102,7 @@ private fun DrawScope.drawThumb(easing: Easing, tint: Color) {
             polyline({ 0.1f + 0.8f * it + 0.12f * noise[(it * 15f + 0.5f).toInt()] }, 16)
             dot(0.2f, 0.27f)
         }
-        "steps" -> {
+        "step" -> {
             segment(0f, 0.37f, 0f); dot(0.37f, 0f)
             segment(0.18f, 0.49f, 0.27f); segment(0.35f, 0.66f, 0.5f); segment(0.53f, 0.83f, 0.73f); segment(0.69f, 1f, 1f)
         }
@@ -108,16 +116,5 @@ private fun DrawScope.drawThumb(easing: Easing, tint: Color) {
                 drawPath(path, line, style = Stroke(3.2f, cap = StrokeCap.Round, join = StrokeJoin.Round))
             }
         }
-    }
-}
-
-private fun bounceOut(t: Float): Float {
-    val n = 7.5625f
-    val d = 2.75f
-    return when {
-        t < 1 / d -> n * t * t
-        t < 2 / d -> (t - 1.5f / d).let { n * it * it + 0.75f }
-        t < 2.5f / d -> (t - 2.25f / d).let { n * it * it + 0.9375f }
-        else -> (t - 2.625f / d).let { n * it * it + 0.984375f }
     }
 }

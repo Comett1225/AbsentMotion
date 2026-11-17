@@ -1,6 +1,7 @@
 package app.absentmotion.desk
 
 import app.absentmotion.editor.EditorState
+import app.absentmotion.editor.chosenLayers
 
 object DeskJump {
     internal fun previousFrame(marks: List<Int>, frame: Int): Int = marks.lastOrNull { it < frame } ?: 0
@@ -18,5 +19,18 @@ object DeskJump {
         state.playing = false
         val last = state.scene.lastFrame
         state.frame = nextFrame(frames(state), state.frame, last).coerceIn(0, last)
+    }
+
+    private fun keyFrames(state: EditorState): List<Int> =
+        (state.chosenLayers.ifEmpty { state.scene.layers }).flatMap { layer -> layer.keyframeTimes(if (layer.id == state.selectedId) state.keyScope else null) }.map(state.scene::frameAt)
+
+    fun previousKey(state: EditorState) {
+        state.playing = false
+        keyFrames(state).filter { it < state.frame }.maxOrNull()?.let { state.frame = it }
+    }
+
+    fun nextKey(state: EditorState) {
+        state.playing = false
+        keyFrames(state).filter { it > state.frame }.minOrNull()?.let { state.frame = it.coerceAtMost(state.scene.lastFrame) }
     }
 }

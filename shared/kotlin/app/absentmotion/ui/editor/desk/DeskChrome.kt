@@ -60,6 +60,7 @@ import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.home.DeskModals
 import app.absentmotion.ui.theme.HoverTargets
 import app.absentmotion.ui.theme.Motion
+import app.absentmotion.ui.theme.withUiFont
 
 @Composable
 internal fun Modifier.deskCursor(): Modifier =
@@ -131,7 +132,9 @@ internal val DeskRedoKeys = if (mac) "⇧⌘Z" else "Ctrl+Shift+Z"
 internal fun deskSp(phone: Float): TextUnit = if (PlatformFeatures.desktop && phone < 12f) 12.sp else phone.sp
 
 @Composable
-internal fun deskShortcut(label: Int, keys: String): String = stringResource(R.string.desk_shortcut_hint, stringResource(label), keys)
+internal fun deskShortcut(label: Int, keys: String): String = if (keys.isEmpty()) stringResource(label) else stringResource(R.string.desk_shortcut_hint, stringResource(label), keys)
+
+internal fun deskKeys(action: String, fallback: String): String = DeskDrop.keyNames[action] ?: fallback
 
 @Composable
 internal fun DeskIcon(icon: ImageVector, hint: String, enabled: Boolean = true, active: Boolean = false, size: Dp = 36.dp, iconSize: DpSize = DpSize(size - 14.dp, size - 14.dp), action: () -> Unit) {
@@ -179,7 +182,7 @@ internal fun DeskNameField(value: String, modifier: Modifier = Modifier, onCommi
             .onKeyEvent {
                 if (it.type == KeyEventType.KeyDown && (it.key == Key.Enter || it.key == Key.NumPadEnter)) { focus.clearFocus(); true } else false
             },
-        textStyle = TextStyle(color = Am.OnDark, fontSize = 14.sp, fontWeight = FontWeight.Medium),
+        textStyle = TextStyle(color = Am.OnDark, fontSize = 14.sp, fontWeight = FontWeight.Medium).withUiFont(),
         singleLine = true, cursorBrush = SolidColor(Am.Accent),
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done), keyboardActions = KeyboardActions(onDone = { focus.clearFocus() }),
         decorationBox = { inner -> Box(Modifier.fillMaxSize().padding(horizontal = 6.dp), Alignment.CenterStart) { inner() } },

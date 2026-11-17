@@ -8,9 +8,9 @@
 <h3 id="media-info-and-swapping-a-file">媒体信息和替换文件</h3>
 <p>图层菜单中的 <strong>媒体信息</strong> 会显示文件的名称、尺寸、帧率、时长、格式和大小。<strong>替换媒体文件</strong> 会打开照片选择器，并替换项目中所有使用该文件的图层。当图层的文件丢失时，可以用这种方法修复该图层。</p>
 <h2 id="speed">速度</h2>
-<p>选中视频或声音片段，然后点按 <strong>速度</strong>（工具网格的第一个小按钮）。将打开 <strong>时间重映射</strong> 面板。顶部有 <strong>正常</strong>、<strong>曲线</strong> 标签，视频还有 <strong>重映射</strong> 标签。若片段已有速度曲线，它会打开 <strong>曲线</strong>；若时间重映射已开启，则会打开 <strong>重映射</strong>。</p>
+<p>选中视频或声音片段，然后点按<strong>速度</strong>（工具网格的第一个小按钮）。将打开<strong>时间重映射</strong>面板。顶部有几个标签：<strong>正常</strong>、<strong>曲线</strong>，视频还有<strong>重映射</strong>。若片段已有速度曲线，面板会打开<strong>曲线</strong>；若已开启时间重映射，则会打开<strong>重映射</strong>。</p>
 <h3 id="normal">正常</h3>
-<ul><li>顶部的按钮会将片段的开头或结尾设置到播放头处，<strong>而不会修剪视频</strong>：速度会随之改变，使视频的同一部分适应新的时长。只显示适合播放头所在位置的按钮：片段之前为 <strong>将开头延伸至播放头</strong>，片段内部为 <strong>修剪开头</strong> 和 <strong>修剪结尾</strong>，片段之后为 <strong>将结尾延伸至播放头</strong>。</li><li>标尺为整个片段设置一个速度，范围从 0.05x 到 100x。左右拖动即可；它会在 1x 处发生吸附。</li><li>标尺旁边的框显示速度，以及一个随速度变化的小图片：蜗牛、乌龟、行走的人、兔子、马，以及顶部的猎豹。点按该框即可输入精确数值。</li><li>标尺下方是 <strong>流畅处理</strong>、<strong>倒放</strong> 和 <strong>定格</strong> 标签。它们在下文中有介绍。</li></ul>
+<ul><li>顶部的按钮会将片段的开头或结尾设置到播放头处，<strong>而不会修剪视频</strong>：速度会随之改变，使视频的同一部分适应新的时长。只显示适合播放头所在位置的按钮：片段之前为 <strong>将开头延伸至播放头</strong>，片段内部为 <strong>修剪开头</strong> 和 <strong>修剪结尾</strong>，片段之后为 <strong>将结尾延伸至播放头</strong>。</li><li>标尺为整个片段设置一个速度，范围从 0.05x 到 100x。左右拖动即可；它会在 1x 处发生吸附。</li><li>标尺旁边的框显示速度，以及一个随速度变化的小图片：蜗牛、乌龟、行走的人、兔子、马，以及顶部的猎豹。双击该框即可输入精确数值。</li><li>标尺下方是 <strong>流畅处理</strong>、<strong>倒放</strong> 和 <strong>定格</strong> 标签。它们在下文中有介绍。</li></ul>
 <figure><img src="../assets/img/media-speed.webp" width="720" height="572" alt="时间重映射面板的正常标签页：标签页 (1)、设置起点或终点的按钮 (2)、显示速度的标尺 (3)，以及流畅处理、倒放和定格 (4)。" loading="lazy"><figcaption>时间重映射面板的正常标签页：标签页 (1)、设置起点或终点的按钮 (2)、显示速度的标尺 (3)，以及流畅处理、倒放和定格 (4)。</figcaption></figure>
 <p>当片段有曲线时，标尺会显示其平均速度。更改它会使整条曲线整体变快或变慢，并保持其形状。</p>
 <p>片段的声音会随速度变化，因此其音调也会随之改变。</p>
@@ -19,12 +19,12 @@
 <div class="table-wrap"><table><thead><tr><th>方块</th><th>作用</th></tr></thead><tbody><tr><td data-label="方块"><strong>无</strong></td><td data-label="作用">移除曲线：片段将恢复以恒定的 1x 播放</td></tr><tr><td data-label="方块"><strong>自定义</strong></td><td data-label="作用">一条平坦的 1x 曲线，供你自行塑造；会立即打开编辑器</td></tr><tr><td data-label="方块"><strong>蒙太奇</strong></td><td data-label="作用">1x、2.5x、0.6x、2.5x、1x</td></tr><tr><td data-label="方块"><strong>主角</strong></td><td data-label="作用">两端快速，中间慢速（0.3x）</td></tr><tr><td data-label="方块"><strong>子弹</strong></td><td data-label="作用">两端更快（3x），中间非常慢（0.2x）</td></tr><tr><td data-label="方块"><strong>跳切</strong></td><td data-label="作用">1x，中间有一个冲高到 4x 的尖峰</td></tr><tr><td data-label="方块"><strong>闪入</strong></td><td data-label="作用">从 4x 开始，缓动到 1x</td></tr><tr><td data-label="方块"><strong>闪出</strong></td><td data-label="作用">保持 1x，然后在结尾加速到 4x</td></tr></tbody></table></div>
 <figure><img src="../assets/img/media-curve.webp" width="720" height="572" alt="曲线标签页：标签页 (1)、曲线图块 (2)、其下的提示 (3)。" loading="lazy"><figcaption>曲线标签页：标签页 (1)、曲线图块 (2)、其下的提示 (3)。</figcaption></figure>
 <p>再次点按所选方块即可编辑其曲线。编辑器会在片段的画面上叠加曲线显示，范围为 0.1x 到 10x，并在 1x 处显示虚线。</p>
-<ul><li><strong>移动一个点。</strong> 触摸一个点并拖动它。上下拖动会更改其速度，速度会吸附到 1x 并给出一个小刻度；左右拖动会更改其在片段中的位置。在空白图表上触摸或拖动，则会沿片段移动播放头。</li><li><strong>添加点</strong> 会在播放头处放置一个新点，最多共十个。选中某个点时，该按钮会变为 <strong>删除点</strong>；第一个和最后一个点无法删除。</li><li>左下角的框显示所选点的速度；若未选中任何点，则显示播放头处的速度。点按它即可输入数值。</li><li>顶部栏中间显示片段的时长。拖动时，它会显示旧时长和新时长，例如“3.7 s → 4.2 s”，松开后更改才会生效。</li><li><strong>重置</strong> 会恢复你打开时的曲线（对于<strong>自定义</strong>，即为平坦的 1x）。左上角的箭头会关闭编辑器。</li><li>这里的 <strong>流畅处理</strong> 是一个开关：它与 <strong>流畅处理</strong> 标签作用相同。</li></ul>
+<ul><li><strong>移动一个点。</strong> 触摸一个点并拖动它。上下拖动会更改其速度，速度会吸附到 1x 并给出一个小刻度；左右拖动会更改其在片段中的位置。在空白图表上触摸或拖动，则会沿片段移动播放头。</li><li><strong>添加点</strong> 会在播放头处放置一个新点，最多共十个。选中某个点时，该按钮会变为 <strong>删除点</strong>；第一个和最后一个点无法删除。</li><li>左下角的框显示所选点的速度；若未选中任何点，则显示播放头处的速度。双击它即可输入数值。</li><li>顶部栏中间显示片段的时长。拖动时，它会显示旧时长和新时长，例如“3.7 s → 4.2 s”，松开后更改才会生效。</li><li><strong>重置</strong> 会恢复你打开时的曲线（对于<strong>自定义</strong>，即为平坦的 1x）。左上角的箭头会关闭编辑器。</li><li>这里的 <strong>流畅处理</strong> 是一个开关：它与 <strong>流畅处理</strong> 标签作用相同。</li></ul>
 <figure><img src="../assets/img/media-curve-edit.webp" width="720" height="572" alt="速度曲线编辑器：含名称、长度和重置的顶部栏 (1)、曲线 (2)、速度、添加点和流畅处理 (3)。" loading="lazy"><figcaption>速度曲线编辑器：含名称、长度和重置的顶部栏 (1)、曲线 (2)、速度、添加点和流畅处理 (3)。</figcaption></figure>
 <h3 id="remap">重映射</h3>
-<p><strong>重映射</strong> 用于选择图层各个位置显示视频的哪个时刻。点按 <strong>启用时间重映射</strong>：片段会继续像之前一样播放，开头和结尾各有一个关键帧。 <strong>片段时间</strong> 是播放头下方的视频时刻；拖动标尺或点按数字即可更改，左侧的关键帧按钮会在该处添加关键帧。上升的关键帧使片段向前播放，两个相同的值会使画面<strong>冻结</strong>，下降的关键帧则使片段<strong>倒放</strong>。关键帧之间的缓动与其他设置中的用法相同。</p>
-<ul><li><strong>反向</strong> 会反转关键帧，让片段倒放。</li><li><strong>关闭</strong> 会移除时间重映射，恢复正常或曲线速度。</li></ul>
-<p>启用时间重映射时，片段的声音会静音。</p>
+<p><strong>重映射</strong>决定图层的每个时间点显示视频的哪一刻。点按<strong>启用时间重映射</strong>：片段会照常播放，并在开头和结尾各加一个关键帧。<strong>片段时间</strong>是播放头位置显示的视频时刻；拖动标尺或双击数字即可更改，左侧的关键帧按钮会在此处添加关键帧。关键帧数值上升时片段正向播放，连续两个相同的值会让画面<strong>定格</strong>，数值下降时片段则会<strong>倒放</strong>。关键帧之间的缓动与其他设置相同。</p>
+<ul><li><strong>反向</strong>会把关键帧前后颠倒，让片段倒放。</li><li><strong>关闭</strong>会移除时间重映射，恢复原来的正常或曲线速度。</li></ul>
+<p>启用时间重映射时，片段的声音会被静音。</p>
 <h3 id="reverse">倒放</h3>
 <p><strong>倒放</strong> 会让视频片段倒着播放，包括画面和声音。应用会制作一个倒放的片段副本，因此较长的片段需要一些时间：一个框会显示 <strong>正在倒放</strong> 和剩余时间，<strong>取消</strong> 会将其停止。已倒放的片段，其标签会以橙色亮起；再次点按 <strong>倒放</strong> 即可恢复原始片段。同一按钮也位于视频工具网格的第二页。若片段已启用 <strong>流畅处理</strong> 或 <strong>增强</strong>，必须先将其关闭：应用会提示“倒放此片段前，请先移除流畅处理和增强”。</p>
 <figure><img src="../assets/img/reverse-progress.webp" width="720" height="1487" alt="倒放处理中：显示剩余时间和取消的方框 (1)。" loading="lazy"><figcaption>倒放处理中：显示剩余时间和取消的方框 (1)。</figcaption></figure>

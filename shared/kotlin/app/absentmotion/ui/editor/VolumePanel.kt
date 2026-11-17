@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor
 
+import app.absentmotion.ui.editor.panels.typeOnDoubleTap
 import app.absentmotion.platform.BackHandler
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -21,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -58,6 +60,7 @@ import app.absentmotion.model.Layer
 import androidx.compose.foundation.layout.fillMaxSize
 import kotlin.math.roundToInt
 import app.absentmotion.ui.editor.panels.sliderSemantics
+import app.absentmotion.ui.HoldName
 
 private val VolumeGreen get() = Am.AccentLit
 private val TrackOff get() = Am.Well
@@ -70,10 +73,11 @@ private val BarShape = RoundedCornerShape(4.dp)
 internal fun VolumePanel(state: EditorState, modifier: Modifier = Modifier) {
     val layer = state.selected ?: return
     DisposableEffect(Unit) {
-        onDispose { if (!state.effectBrowserOpen) state.volumeOpen = false; state.easingOpen = false; state.keyTarget = null }
+        onDispose { if (!state.effectBrowserOpen && state.audioFxFocus == null) state.volumeOpen = false; state.easingOpen = false; state.keyTarget = null }
     }
     val direct = remember { state.audioFxFocus != null }
     var effects by remember { mutableStateOf(direct) }
+    LaunchedEffect(state.audioFxFocus) { if (state.audioFxFocus != null) effects = true }
     Swap(effects, modifier, rise = 0.dp) {
         if (effects) AudioEffectsPanel(state, Modifier.fillMaxSize()) { if (direct) state.volumeOpen = false else effects = false }
         else VolumeMain(state, layer, Modifier.fillMaxSize()) { state.easingOpen = false; effects = true }
@@ -98,6 +102,7 @@ private fun VolumeMain(state: EditorState, layer: Layer, modifier: Modifier, ope
             }
             Box(Modifier.width(183.px).fillMaxHeight().clickable { state.volumeOpen = false }, Alignment.Center) {
                 DeskTip(volumeLabel) { Icon(AudioIcons.Speaker, volumeLabel, Modifier.size(32.dp), tint = VolumeGreen) }
+                HoldName(volumeLabel)
                 Canvas(Modifier.align(Alignment.BottomStart).padding(start = 14.px, bottom = 14.px).size(4.dp)) {
                     drawPath(Path().apply { moveTo(0f, 0f); lineTo(0f, size.height); lineTo(size.width, size.height); close() }, Am.OnDark.copy(alpha = 0.3f))
                 }
@@ -107,9 +112,11 @@ private fun VolumeMain(state: EditorState, layer: Layer, modifier: Modifier, ope
             Column(Modifier.width(140.px).fillMaxHeight().padding(top = 11.px)) {
                 Box(Modifier.fillMaxWidth().height(118.px).clickable { state.toggleKeyframe() }, Alignment.Center) {
                     PanelIcon(if (layer.onKeyframe(GainRef)) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, Am.OnDark, description = stringResource(if (layer.onKeyframe(GainRef)) R.string.a11y_remove_keyframe else R.string.a11y_add_keyframe))
+                    HoldName(stringResource(if (layer.onKeyframe(GainRef)) R.string.a11y_remove_keyframe else R.string.a11y_add_keyframe))
                 }
-                Box(Modifier.fillMaxWidth().height(118.px).clickable { if (layer.easing(GainRef) != null) state.easingOpen = true else state.easingHint = true }, Alignment.Center) {
+                Box(Modifier.fillMaxWidth().height(118.px).clickable { if (layer.easing(GainRef) != null) state.easingOpen = true else state.hintEasing(layer.keyframes(GainRef).size) }, Alignment.Center) {
                     PanelIcon(PanelIcons.Easing, Am.OnDark, description = stringResource(R.string.a11y_easing))
+                    HoldName(stringResource(R.string.a11y_easing))
                 }
             }
             Row(Modifier.weight(1f).fillMaxHeight(), verticalAlignment = Alignment.CenterVertically) {
@@ -118,7 +125,7 @@ private fun VolumeMain(state: EditorState, layer: Layer, modifier: Modifier, ope
                 Spacer(Modifier.width(23.px))
                 VolumeSlider(percent, state, Modifier.width(440.px).height(113.px))
                 Spacer(Modifier.width(23.px))
-                Box(Modifier.width(158.px).height(101.px).clip(RoundedCornerShape(4.dp)).background(ValueBox).clickable {
+                Box(Modifier.width(158.px).height(101.px).clip(RoundedCornerShape(4.dp)).background(ValueBox).typeOnDoubleTap {
                     state.keypad = KeypadRequest(listOf(KeypadField(volumeLabel, layer.gain * 100, "%", 0f, MAX_GAIN * 100)), 0) { values ->
                         state.setGain(values[0].coerceIn(0f, MAX_GAIN * 100) / 100f)
                     }

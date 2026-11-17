@@ -48,6 +48,8 @@ import app.absentmotion.model.shownName
 import app.absentmotion.ui.home.handCursor
 import app.absentmotion.ui.home.hoverFill
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.theme.withUiFont
+import app.absentmotion.ui.editor.panels.DoubleTapToType
 
 @Composable
 internal fun DeskProject(state: EditorState, onDismiss: () -> Unit) {
@@ -246,9 +248,11 @@ private fun DeskNumber(value: Int, modifier: Modifier, commit: (Int) -> Unit) {
     fun save() { val number = text.toIntOrNull()?.coerceIn(MIN_SIDE, MAX_SIDE); if (number != null && number != value) commit(number); text = (number ?: value).toString() }
     val saveNow by rememberUpdatedState(::save)
     DisposableEffect(Unit) { onDispose { saveNow() } }
-    BasicTextField(text, { if (it.length <= 4 && it.all(Char::isDigit)) text = it }, modifier.height(32.dp).clip(RoundedCornerShape(6.dp)).background(Am.Field).padding(horizontal = 8.dp)
-        .onFocusChanged { if (focused && !it.isFocused) save(); focused = it.isFocused },
-        textStyle = TextStyle(color = Am.OnDark, fontSize = 13.sp, textAlign = TextAlign.Center), singleLine = true, cursorBrush = SolidColor(Am.Accent),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done), keyboardActions = KeyboardActions(onDone = { save(); focus.clearFocus() }),
-        decorationBox = { inner -> Box(Modifier.fillMaxHeight(), Alignment.Center) { inner() } })
+    DoubleTapToType(text, { if (it.length <= 4 && it.all(Char::isDigit)) text = it }, modifier.height(32.dp)) { gate, typed, onTyped ->
+        BasicTextField(typed, onTyped, gate.clip(RoundedCornerShape(6.dp)).background(Am.Field).padding(horizontal = 8.dp)
+            .onFocusChanged { if (focused && !it.isFocused) save(); focused = it.isFocused },
+            textStyle = TextStyle(color = Am.OnDark, fontSize = 13.sp, textAlign = TextAlign.Center).withUiFont(), singleLine = true, cursorBrush = SolidColor(Am.Accent),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done), keyboardActions = KeyboardActions(onDone = { save(); focus.clearFocus() }),
+            decorationBox = { inner -> Box(Modifier.fillMaxHeight(), Alignment.Center) { inner() } })
+    }
 }

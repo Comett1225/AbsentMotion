@@ -145,10 +145,10 @@ internal fun CameraPanel(state: EditorState, layer: Layer, modifier: Modifier = 
                         }
                         val angleLabel = stringResource(Angle.label)
                         val zoomLabel = stringResource(Zoom.label)
-                        NumberRow(angleLabel, formatFixed(angle, 1) + "º", active == 0, perspective, { d -> active = 0; write(Angle, true) { it + d * Angle.perDp } }, { state.endGesture() },
+                        NumberRow(angleLabel, formatFixed(angle, 1) + "º", active == 0, perspective, { d -> active = 0; write(Angle, true) { it + d * Angle.perDp } }, { state.endGesture() }, { active = 0 },
                             { active = 0; state.askNumber(angleLabel, angle, Angle.unit, Angle.min, Angle.max) { v -> write(Angle, false) { v } } })
                         val zoom = cameraZoomOf(angle, size)
-                        NumberRow(zoomLabel, "${zoom.toInt()}", active == 1, perspective, { d -> active = 1; writeZoom(true) { it + d * size / 200f } }, { state.endGesture() },
+                        NumberRow(zoomLabel, "${zoom.toInt()}", active == 1, perspective, { d -> active = 1; writeZoom(true) { it + d * size / 200f } }, { state.endGesture() }, { active = 1 },
                             { active = 1; state.askNumber(zoomLabel, zoom.toInt().toFloat(), "", cameraZoomOf(Angle.max, size), cameraZoomOf(Angle.min, size)) { v -> writeZoom(false) { v } } })
                         if (desk) SortRow()
                     }
@@ -272,21 +272,21 @@ private fun FieldRows(
     rows.forEachIndexed { i, f ->
         val v = layer.number(f)
         val label = stringResource(f.label)
-        NumberRow(label, formatFixed(v, f.decimals), active == i, on, { d -> select(i); write(f, true) { it + d * f.perDp } }, { state.endGesture() },
+        NumberRow(label, formatFixed(v, f.decimals), active == i, on, { d -> select(i); write(f, true) { it + d * f.perDp } }, { state.endGesture() }, { select(i) },
             { select(i); state.askNumber(label, v, f.unit, f.min, f.max) { typed -> write(f, false) { typed } } }, note(f))
     }
 }
 
 @Composable
 private fun NumberRow(
-    label: String, text: String, active: Boolean, enabled: Boolean, onDrag: (Float) -> Unit, onEnd: () -> Unit, onTap: () -> Unit, note: String? = null,
+    label: String, text: String, active: Boolean, enabled: Boolean, onDrag: (Float) -> Unit, onEnd: () -> Unit, onSelect: () -> Unit, onType: () -> Unit, note: String? = null,
 ) {
     Row(Modifier.fillMaxWidth().height(RowHeight).padding(horizontal = 8.dp).alpha(if (enabled) 1f else 0.35f), verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.width(96.dp)) {
             Text(label, color = Am.OnDark, lineHeight = 16.sp, maxLines = 1, softWrap = false, autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(9.sp, 14.sp, 0.5.sp))
             if (note != null) Text(note, color = Am.OnDarkDim, fontSize = deskSp(10f), lineHeight = 12.sp, maxLines = 1, softWrap = false)
         }
-        NumberBox(text, if (active) Am.Accent else Am.OnDark, Modifier.width(BoxWidth).height(32.dp), onClick = if (enabled) onTap else null)
+        NumberBox(text, if (active) Am.Accent else Am.OnDark, Modifier.width(BoxWidth).height(32.dp), onSelect = onSelect, onType = if (enabled) onType else null)
         Box(Modifier.weight(1f).fillMaxHeight().padding(start = 8.dp)) {
             if (enabled) RulerSpinner(if (active) Am.Accent else Am.OnDarkDim, onDrag, onEnd, Modifier.fillMaxSize(), tickInset = 6.dp)
         }

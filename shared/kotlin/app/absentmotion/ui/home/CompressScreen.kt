@@ -81,12 +81,15 @@ import app.absentmotion.tools.sizeChange
 import app.absentmotion.ui.export.ExportIcons
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.animatedColor
+import app.absentmotion.ui.theme.withUiFont
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
+import app.absentmotion.ui.editor.panels.DoubleTapToType
+import app.absentmotion.ui.HoldName
 
 private sealed interface Step {
     data object Ready : Step
@@ -237,7 +240,10 @@ private fun ResultPreview(result: Compressed, original: android.net.Uri) {
         Box(
             Modifier.align(Alignment.TopEnd).padding(10.dp).size(40.dp).clip(RoundedCornerShape(20.dp)).background(Color.Black.copy(alpha = 0.55f)).clickable { full = true },
             contentAlignment = Alignment.Center,
-        ) { Icon(app.absentmotion.ui.editor.ChromeIcons.Fullscreen, stringResource(R.string.compress_full_screen), Modifier.size(20.dp), tint = Color.White) }
+        ) {
+            Icon(app.absentmotion.ui.editor.ChromeIcons.Fullscreen, stringResource(R.string.compress_full_screen), Modifier.size(20.dp), tint = Color.White)
+            HoldName(stringResource(R.string.compress_full_screen))
+        }
     }
     if (full) androidx.compose.ui.window.Dialog({ full = false }, androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
         Column(Modifier.fillMaxSize().background(Color.Black).systemBarsPadding()) {
@@ -254,6 +260,7 @@ private fun ResultPreview(result: Compressed, original: android.net.Uri) {
                 }
                 Box(Modifier.size(48.dp).clip(RoundedCornerShape(24.dp)).clickable { full = false }, contentAlignment = Alignment.Center) {
                     Icon(app.absentmotion.ui.editor.ChromeIcons.Close, stringResource(R.string.action_close), Modifier.size(26.dp), tint = Color.White)
+                    HoldName(stringResource(R.string.action_close))
                 }
             }
             Box(Modifier.weight(1f).fillMaxWidth()) {
@@ -386,17 +393,19 @@ private fun CustomPanel(video: Boolean, custom: CustomChoice, enabled: Boolean, 
         ToolChip(stringResource(R.string.compress_aim_size), custom.bySize, enabled) { onChange(custom.copy(bySize = true)) }
         Spacer(Modifier.width(10.dp))
         val typing = enabled && custom.bySize
-        Row(
-            Modifier.height(42.dp).width(116.dp).alpha(if (typing) 1f else 0.5f).clip(RoundedCornerShape(14.dp)).background(Am.Card).padding(horizontal = 14.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            BasicTextField(
-                text, { typed -> text = typed.filter(Char::isDigit).take(4); onChange(custom.copy(targetMb = text.toIntOrNull() ?: 0)) },
-                Modifier.weight(1f), enabled = typing, singleLine = true,
-                textStyle = TextStyle(color = Am.HomeInk, fontSize = 16.sp), cursorBrush = SolidColor(Am.Accent),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            )
-            Text(stringResource(R.string.compress_megabytes), color = Am.HomeDim, fontSize = 15.sp)
+        DoubleTapToType(text, { typed -> text = typed.filter(Char::isDigit).take(4); onChange(custom.copy(targetMb = text.toIntOrNull() ?: 0)) }, enabled = typing) { gate, typed, onTyped ->
+            Row(
+                Modifier.height(42.dp).width(116.dp).alpha(if (typing) 1f else 0.5f).clip(RoundedCornerShape(14.dp)).background(Am.Card).padding(horizontal = 14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                BasicTextField(
+                    typed, onTyped,
+                    gate.weight(1f), enabled = typing, singleLine = true,
+                    textStyle = TextStyle(color = Am.HomeInk, fontSize = 16.sp).withUiFont(), cursorBrush = SolidColor(Am.Accent),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                )
+                Text(stringResource(R.string.compress_megabytes), color = Am.HomeDim, fontSize = 15.sp)
+            }
         }
     }
     if (video) {

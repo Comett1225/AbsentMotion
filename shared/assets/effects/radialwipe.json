@@ -3,7 +3,7 @@
  "name": "Radial Wipe",
  "category": "key",
  "since": "3.0.0",
- "description": "Hides a wedge of the layer swept round Center from Start Angle, like a clock hand. Progress is the angle swept, Count repeats the wedge round the circle and Both sweeps both ways. Animate Progress for a transition.",
+ "description": "Hides a wedge of the layer swept round Center from Start Angle, like a clock hand. Progress is the angle swept, Count repeats the wedge round the circle and Both sweeps both ways. Animate Progress for a transition. Wedges Exact keeps a fractional Count, so the last wedge is narrower, and Feather softens both sides of each wedge.",
  "params": [
   {
    "id": "progress",
@@ -63,7 +63,17 @@
    "min": 1,
    "max": 16,
    "step": 1
+  },
+  {
+   "id": "wedges",
+   "label": "Wedges",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Whole",
+    "Exact"
+   ]
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float progress;\nuniform float start;\nuniform float2 center;\nuniform float feather;\nuniform float direction;\nuniform float count;\nhalf4 main(float2 coord) {\n    float2 d = coord - center * size;\n    float n = max(floor(count + 0.5), 1.0);\n    float a = mod(degrees(atan(d.x, -d.y)) - start, 360.0);\n    if (direction > 0.5 && direction < 1.5) a = 360.0 - a;\n    a = mod(a, 360.0 / n) * n;\n    float sweep = clamp(progress, 0.0, 360.0);\n    if (sweep <= 0.0) return image.eval(coord);\n    if (direction > 1.5) {\n        a = min(a, 360.0 - a) * 2.0;\n    }\n    float soft = max(feather, 0.0001);\n    float hide = 1.0 - smoothstep(max(sweep - soft, 0.0), sweep, a);\n    if (sweep >= 360.0) hide = 1.0;\n    return image.eval(coord) * half(1.0 - hide);\n}"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float progress;\nuniform float start;\nuniform float2 center;\nuniform float feather;\nuniform float direction;\nuniform float count;\nuniform float wedges;\nhalf4 main(float2 coord) {\n    float2 d = coord - center * size;\n    float sweep = clamp(progress, 0.0, 360.0);\n    if (sweep <= 0.0) return image.eval(coord);\n    float a = mod(degrees(atan(d.x, -d.y)) - start, 360.0);\n    float soft = max(feather, 0.0001);\n    float hide = 0.0;\n    if (wedges > 0.5) {\n        float t = fract(a * max(count, 1.0) / 360.0);\n        if (direction > 0.5 && direction < 1.5) t = 1.0 - t;\n        if (direction > 1.5) t = min(t, 1.0 - t) * 2.0;\n        float s = t * 360.0;\n        float core = sweep * (360.0 + soft) / 360.0 - soft;\n        float near = direction > 1.5 ? 0.0 : clamp((core + soft) / soft, 0.0, 1.0) * (1.0 - smoothstep(0.0, soft, 360.0 - s));\n        hide = max(s <= core ? 1.0 : 1.0 - smoothstep(0.0, soft, s - core), near);\n    } else {\n        float n = max(floor(count + 0.5), 1.0);\n        if (direction > 0.5 && direction < 1.5) a = 360.0 - a;\n        a = mod(a, 360.0 / n) * n;\n        if (direction > 1.5) a = min(a, 360.0 - a) * 2.0;\n        hide = 1.0 - smoothstep(max(sweep - soft, 0.0), sweep, a);\n    }\n    if (sweep >= 360.0) hide = 1.0;\n    return image.eval(coord) * half(1.0 - hide);\n}"
 }

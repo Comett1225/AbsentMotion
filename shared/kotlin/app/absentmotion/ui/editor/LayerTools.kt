@@ -144,6 +144,7 @@ import androidx.compose.foundation.LocalIndication
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 import app.absentmotion.editor.markBeatsNote
+import app.absentmotion.ui.HoldName
 
 @Composable
 fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean = false) {
@@ -267,22 +268,29 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
         if (side) (rows.flatten() + more).let { tiles -> sideColumns(tiles.size, LocalSideHeight.current).let { TileRows(tiles.chunked(it), it) } }
         else if (more.isEmpty()) TileRows(rows, null)
         else key(state.selectedId) {
-            val pager = rememberPagerState(state.toolPage.takeIf { it.first == state.selectedId }?.second?.coerceIn(0, 1) ?: 0) { 2 }
+            val pages = listOf(rows) + more.chunked(4).chunked(rows.size)
+            val pager = rememberPagerState(state.toolPage.takeIf { it.first == state.selectedId }?.second?.coerceIn(0, pages.lastIndex) ?: 0) { pages.size }
             androidx.compose.runtime.LaunchedEffect(pager) { androidx.compose.runtime.snapshotFlow { pager.currentPage }.collect { state.toolPage = state.selectedId to it } }
             val height = (rows.size * 160 + (rows.size - 1) * 17).px
             Box {
                 HorizontalPager(pager, Modifier.fillMaxWidth().height(height), pageSpacing = 17.px, verticalAlignment = Alignment.Top,
                     flingBehavior = PagerDefaults.flingBehavior(pager, snapAnimationSpec = tween(ToolPageSnapMs, easing = FastOutSlowInEasing))) { page ->
-                    Column { TileRows(if (page == 0) rows else more.chunked(4), if (page == 0) null else 4) }
+                    Column { TileRows(pages[page], if (page == 0) null else 4) }
                 }
+                val at = { pager.currentPage + pager.currentPageOffsetFraction }
+                Box(
+                    Modifier.align(Alignment.TopStart).width(ToolPageEdge).height(height)
+                        .graphicsLayer { alpha = at().coerceIn(0f, 1f) }
+                        .background(androidx.compose.ui.graphics.Brush.horizontalGradient(listOf(ToolPageShade, Color.Transparent))),
+                )
                 Box(
                     Modifier.align(Alignment.TopEnd).width(ToolPageEdge).height(height)
-                        .graphicsLayer { alpha = 1f - (pager.currentPage + pager.currentPageOffsetFraction).coerceIn(0f, 1f) }
+                        .graphicsLayer { alpha = (pages.lastIndex - at()).coerceIn(0f, 1f) }
                         .background(androidx.compose.ui.graphics.Brush.horizontalGradient(listOf(Color.Transparent, ToolPageShade))),
                 )
             }
             Row(Modifier.fillMaxWidth().padding(top = 14.px, bottom = 14.px), Arrangement.Center) {
-                repeat(2) { i ->
+                repeat(pages.size) { i ->
                     Box(Modifier.padding(horizontal = 4.dp).size(6.dp).clip(androidx.compose.foundation.shape.CircleShape).background(animatedColor(if (pager.currentPage == i) Am.OnDark else Am.OnDarkDim.copy(alpha = 0.4f))))
                 }
             }
@@ -292,7 +300,7 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
 }
 
 private val ToolPageEdge = 28.dp
-private val ToolPageShade = Color.Black.copy(alpha = 0.6f)
+private val ToolPageShade = Color.Black.copy(alpha = 0.15f)
 
 @Composable
 internal fun PanelRail(state: EditorState, modifier: Modifier) {
@@ -405,6 +413,7 @@ private fun SmallTool(icon: ImageVector, description: String, modifier: Modifier
         contentAlignment = Alignment.Center,
     ) {
         PanelIcon(icon, Am.OnDark, size = iconSize, description = description)
+        HoldName(description)
     }
 }
 
@@ -445,7 +454,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
     app.absentmotion.ui.editor.panels.BorderShadowLifetime(state, selected.id, panel)
     val layer = selected.copy(displayNumbers = linkedNumbers(state, selected, listOf(PropRef.Location, PropRef.Scale, PropRef.Rotation, PropRef.Pivot, PropRef.Opacity, PropRef.Tilt, PropRef.Skew)))
     if (panel == EditorPanel.Effects) {
-        app.absentmotion.ui.editor.panels.EffectsPanel(state, modifier)
+        key(selected.id) { app.absentmotion.ui.editor.panels.EffectsPanel(state, modifier) }
         return
     }
     if (panel == EditorPanel.Crop) {
@@ -491,7 +500,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
             FrameButton(if (onKeyframe) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, stringResource(if (onKeyframe) R.string.a11y_remove_keyframe else R.string.a11y_add_keyframe), cell.tutorialTarget("keyframe"), enabled = !linked) {
                 state.toggleKeyframe()
             }
-            FrameButton(PanelIcons.Easing, stringResource(R.string.a11y_easing), cell.tutorialTarget("easing"), enabled = !linked) { if (layer.easing(target.ref) != null) state.easingOpen = true else state.easingHint = true }
+            FrameButton(PanelIcons.Easing, stringResource(R.string.a11y_easing), cell.tutorialTarget("easing"), enabled = !linked) { if (layer.easing(target.ref) != null) state.easingOpen = true else state.hintEasing(layer.keyframes(target.ref).size) }
         }
         if (move) {
             Box(cell) {
@@ -620,6 +629,7 @@ internal const val PIVOT_TAB = 5
 private fun FrameButton(icon: ImageVector, description: String, modifier: Modifier, enabled: Boolean = true, onClick: () -> Unit = {}) {
     Box(modifier.tutorialGuard().then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier), contentAlignment = Alignment.Center) {
         PanelIcon(icon, Am.OnDark, description = description)
+        HoldName(description)
     }
 }
 
@@ -653,7 +663,7 @@ fun ValueKeypad(request: KeypadRequest, onClose: () -> Unit, modifier: Modifier 
         selected = false
     }
     fun done() {
-        request.onDone(fields.indices.map { keypadValue(texts[it], fields[it].value, fields[it].min, fields[it].max) })
+        request.onDone(fields.indices.map { if (texts[it] == formatPlain(fields[it].value)) fields[it].value else keypadValue(texts[it], fields[it].value, fields[it].min, fields[it].max) })
         onClose()
     }
 
@@ -732,8 +742,8 @@ private fun KeyGrid(onDigit: (Char) -> Unit, onBackspace: () -> Unit, onSign: ()
         KeyCap(at(0, 3), SymbolKey, onSign) { KeyText("\u00B1") }
         KeyCap(at(1, 3), DigitKey, { onDigit('0') }) { KeyText("0") }
         KeyCap(at(2, 3), SymbolKey, { onDigit('.') }) { KeyText(".") }
-        KeyCap(at(3, 0), SymbolKey, onBackspace) { PanelIcon(PanelIcons.Backspace, Am.OnDark, description = stringResource(R.string.a11y_backspace)) }
-        KeyCap(at(3, 1, 3), TickKey, onDone) { PanelIcon(PanelIcons.Check, Am.OnDark, size = 30.dp, description = stringResource(R.string.done)) }
+        KeyCap(at(3, 0), SymbolKey, onBackspace) { PanelIcon(PanelIcons.Backspace, Am.OnDark, description = stringResource(R.string.a11y_backspace)); HoldName(stringResource(R.string.a11y_backspace)) }
+        KeyCap(at(3, 1, 3), TickKey, onDone) { PanelIcon(PanelIcons.Check, Am.OnDark, size = 30.dp, description = stringResource(R.string.done)); HoldName(stringResource(R.string.done)) }
     }
 }
 
@@ -742,7 +752,7 @@ private val SymbolKey get() = Am.KeySymbol
 private val TickKey get() = Am.Well
 
 @Composable
-private fun KeyCap(modifier: Modifier, color: Color, onClick: () -> Unit, content: @Composable () -> Unit) {
+private fun KeyCap(modifier: Modifier, color: Color, onClick: () -> Unit, content: @Composable androidx.compose.foundation.layout.BoxScope.() -> Unit) {
     Box(modifier.shadow(2.dp, KeyShape).clip(KeyShape).background(color).clickable(onClick = onClick), contentAlignment = Alignment.Center) {
         content()
     }

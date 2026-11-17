@@ -95,6 +95,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import java.util.Locale
+import app.absentmotion.ui.HoldName
 
 private val Dim get() = Am.OnScrim.copy(alpha = 0.4f)
 private val Track get() = Am.OnScrim.copy(alpha = 0.3f)
@@ -152,6 +153,7 @@ private fun SequencePreview(uris: List<Uri>) {
 private fun StepButton(icon: ImageVector, description: String, enabled: Boolean, onClick: () -> Unit) {
     Box(Modifier.size(62.dp).clickable(enabled = enabled, onClick = onClick), contentAlignment = Alignment.Center) {
         Icon(icon, description, tint = animatedColor(if (enabled) Am.OnScrim else Dim))
+        HoldName(description)
     }
 }
 
@@ -329,6 +331,7 @@ private fun VideoPreview(uri: Uri, large: Boolean = false, onTap: (() -> Unit)? 
                 Crossfade(playing, animationSpec = Motion.fast(), label = "play") {
                     Icon(if (it) ExportIcons.Pause else ExportIcons.Play, stringResource(if (it) R.string.export_pause else R.string.export_play), Modifier.size(if (large) 38.dp else 24.dp), tint = Am.OnScrim)
                 }
+                HoldName(stringResource(if (playing) R.string.export_pause else R.string.export_play))
             }
             SeekBar(
                 if (durationMs > 0) positionMs / durationMs.toFloat() else 0f,

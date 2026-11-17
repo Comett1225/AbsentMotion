@@ -53,6 +53,7 @@ import kotlinx.coroutines.launch
 import kotlin.math.hypot
 import kotlin.math.min
 import kotlin.math.roundToInt
+import app.absentmotion.ui.HoldName
 
 private fun DrawTool.labelRes() = when (this) {
     DrawTool.Pen -> R.string.draw_tool_pen
@@ -128,6 +129,7 @@ internal fun PointTopBar(state: EditorState, mode: PointMode, modifier: Modifier
         Box(cell.clickable { state.toggleShapeKey(mode) }, Alignment.Center) {
             Icon(if (on) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, stringResource(if (on) R.string.draw_remove_shape_keyframe else R.string.draw_add_shape_keyframe),
                 Modifier.size(26.dp), tint = if (keys.isNotEmpty()) Am.Accent else Am.OnDark)
+            HoldName(stringResource(if (on) R.string.draw_remove_shape_keyframe else R.string.draw_add_shape_keyframe))
         }
     }
 }
@@ -173,6 +175,7 @@ private fun DrawingTimeBar(state: EditorState, mode: DrawingMode, modifier: Modi
             Box(cell.clickable { state.toggleShapeKey(point) }, Alignment.Center) {
                 Icon(if (on) PanelIcons.KeyframeRemove else PanelIcons.Keyframe, stringResource(if (on) R.string.draw_remove_shape_keyframe else R.string.draw_add_shape_keyframe),
                     Modifier.size(26.dp), tint = if (keys.isNotEmpty()) Am.Accent else Am.OnDark)
+                HoldName(stringResource(if (on) R.string.draw_remove_shape_keyframe else R.string.draw_add_shape_keyframe))
             }
         }
     }
@@ -328,6 +331,7 @@ private fun FreehandPanel(mode: FreehandMode) {
             for ((tool, icon) in listOf(DrawTool.Pen to DrawingIcons.Pen, DrawTool.Brush to DrawingIcons.Brush, DrawTool.Fill to DrawingIcons.Fill, DrawTool.Eraser to DrawingIcons.Eraser)) {
                 Box(Modifier.weight(1f).fillMaxWidth().clickable { mode.pick(tool) }, Alignment.Center) {
                     Icon(icon, stringResource(tool.labelRes()), Modifier.size(26.dp), tint = app.absentmotion.ui.theme.animatedColor(if (mode.tool == tool) Am.Accent else Am.OnDark))
+            HoldName(stringResource(tool.labelRes()))
                 }
             }
         }

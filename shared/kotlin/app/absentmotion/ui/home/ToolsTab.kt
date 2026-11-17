@@ -114,6 +114,7 @@ import app.absentmotion.ui.editor.PhoneScreen
 import app.absentmotion.ui.export.ExportIcons
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.animatedColor
+import app.absentmotion.ui.theme.withUiFont
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -122,6 +123,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
 import kotlin.math.roundToInt
+import app.absentmotion.ui.HoldName
 
 private val installScope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + Dispatchers.Main.immediate)
 private var installPercent by mutableStateOf<Int?>(null)
@@ -579,12 +581,13 @@ internal fun DownloaderScreen(store: ProjectStore, settings: AppSettings, onOpen
                 if (text.isEmpty()) Text(stringResource(R.string.downloader_hint), color = Am.HomeDim, fontSize = 16.sp, maxLines = 1)
                 BasicTextField(
                     text, { typed -> change { text = typed; pasteMissed = false } }, Modifier.fillMaxWidth(), singleLine = true, enabled = !running,
-                    textStyle = TextStyle(color = Am.HomeInk, fontSize = 16.sp), cursorBrush = SolidColor(Am.Accent),
+                    textStyle = TextStyle(color = Am.HomeInk, fontSize = 16.sp).withUiFont(), cursorBrush = SolidColor(Am.Accent),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Done),
                 )
             }
             Box(Modifier.size(44.dp).alpha(if (text.isEmpty()) 0f else 1f).clickable(enabled = text.isNotEmpty() && !running) { text = ""; pasteMissed = false }, contentAlignment = Alignment.Center) {
                 Icon(HomeIcons.ClearCircle, stringResource(R.string.downloader_clear), Modifier.size(22.dp), tint = Am.HomeMid)
+                if (text.isNotEmpty()) HoldName(stringResource(R.string.downloader_clear))
             }
             Box(
                 Modifier.height(44.dp).clip(RoundedCornerShape(10.dp)).background(Am.Navy).clickable(enabled = !running) {

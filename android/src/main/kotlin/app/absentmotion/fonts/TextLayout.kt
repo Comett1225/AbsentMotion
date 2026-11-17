@@ -68,10 +68,14 @@ private fun FontLibrary.layoutText(input: TextInput, layer: Layer): XmlNode {
         "right" -> Layout.Alignment.ALIGN_OPPOSITE
         else -> Layout.Alignment.ALIGN_NORMAL
     }
-    val layout = StaticLayout.Builder.obtain(layer.content, 0, layer.content.length, paint, if (layer.onTextPath) UNWRAPPED else layer.wrapWidth.coerceAtLeast(1))
-        .setAlignment(alignment).setIncludePad(true).setBreakStrategy(LineBreaker.BREAK_STRATEGY_SIMPLE)
-        .setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_NONE)
-        .setLineSpacing(0f, input.lineSpacing).build()
+    val lay = { text: String ->
+        StaticLayout.Builder.obtain(text, 0, text.length, paint, if (layer.onTextPath) UNWRAPPED else layer.wrapWidth.coerceAtLeast(1))
+            .setAlignment(alignment).setIncludePad(true).setBreakStrategy(LineBreaker.BREAK_STRATEGY_SIMPLE)
+            .setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_NONE)
+            .setLineSpacing(0f, input.lineSpacing).build()
+    }
+    val layout = lay(layer.content)
+    val plain = lay(" \n \n ")
     val lines = List(layout.lineCount) { index ->
         val raw = layer.content.substring(layout.getLineStart(index), layout.getLineEnd(index))
         val line = if (raw.lastOrNull()?.isWhitespace() == true) raw.dropLast(1) else raw
@@ -79,11 +83,11 @@ private fun FontLibrary.layoutText(input: TextInput, layer: Layer): XmlNode {
         val spacing = if (layer.textAlign == "justify" && index < layout.lineCount - 1 && !raw.endsWith('\n') && spaces > 0)
             (layer.wrapWidth - paint.measureText(line)) / spaces else 0f
         XmlNode("_line", mapOf("baseline" to "${layout.getLineBaseline(index)}", "rtl" to "${layout.getParagraphDirection(index) < 0}",
-            "wordSpacing" to "$spacing"), text = line)
+            "wordSpacing" to "$spacing", "from" to "${layout.getLineStart(index)}"), text = line)
     }
     return node.with("_fontPath", input.file).with("_fontFamily", systemFamily(layer.font) ?: name.family)
         .with("_fontIndex", "${input.index}")
         .with("_letterSpacing", "${paint.letterSpacing}").with("_lineSpacing", "${input.lineSpacing}")
         .with("_fontWeight", "${weight ?: name.weight}").with("_fontAxes", if (weight != null) "true" else null).with("_fontItalic", "${name.italic}").with("_emoji", input.emoji).with("_emojiFlags", input.flags)
-        .withChild("_layout", XmlNode("_layout", mapOf("height" to "${layout.height}"), lines))
+        .withChild("_layout", XmlNode("_layout", mapOf("height" to "${layout.height}", "step" to "${plain.getLineBaseline(2) - plain.getLineBaseline(1)}"), lines))
 }

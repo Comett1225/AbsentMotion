@@ -1,6 +1,7 @@
 package app.absentmotion.ui.theme
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import app.absentmotion.R
 import app.absentmotion.i18n.UiText
 import app.absentmotion.i18n.txt
@@ -61,5 +62,50 @@ object Themes {
         val file = customFile(context)
         app.absentmotion.library.writeAtomically(file, text, sync = false)
         return theme
+    }
+}
+
+object Accents {
+    val Presets: List<Int> = listOf(0xFF3B82F6.toInt(), 0xFF22A861.toInt(), 0xFF9B6BFF.toInt(), 0xFFE8508F.toInt())
+    private val Dark = Color(0xFF17181B)
+
+    fun contrast(a: Color, b: Color): Float {
+        val x = a.luminance()
+        val y = b.luminance()
+        return (maxOf(x, y) + 0.05f) / (minOf(x, y) + 0.05f)
+    }
+
+    fun on(colour: Color): Color = if (contrast(colour, Dark) >= contrast(colour, Color.White)) Dark else Color.White
+
+    private fun hueAndSaturation(c: Color): Pair<Float, Float> {
+        val max = maxOf(c.red, c.green, c.blue)
+        val min = minOf(c.red, c.green, c.blue)
+        val d = max - min
+        if (d <= 0f) return 0f to 0f
+        val l = (max + min) / 2f
+        val s = d / (1f - kotlin.math.abs(2f * l - 1f))
+        val h = when (max) {
+            c.red -> 60f * (((c.green - c.blue) / d).mod(6f))
+            c.green -> 60f * ((c.blue - c.red) / d + 2f)
+            else -> 60f * ((c.red - c.green) / d + 4f)
+        }
+        return h to s.coerceIn(0f, 1f)
+    }
+
+    private fun lightness(c: Color): Float = (maxOf(c.red, c.green, c.blue) + minOf(c.red, c.green, c.blue)) / 2f
+
+    fun shade(accent: Color, like: Color): Color {
+        val (h, s) = hueAndSaturation(accent)
+        return Color.hsl(h, s, lightness(like), like.alpha)
+    }
+
+    fun apply(palette: Palette, accent: Int?): Palette {
+        if (accent == null) return palette
+        val c = Color(accent).copy(alpha = 1f)
+        return palette.copy(
+            Accent = c, HomeAccent = c, OnAccent = on(c),
+            AccentLit = shade(c, palette.AccentLit), AccentGlow = shade(c, palette.AccentGlow), AccentDeep = shade(c, palette.AccentDeep),
+            OnNavyAccent = shade(c, palette.OnNavyAccent),
+        )
     }
 }

@@ -425,7 +425,7 @@
   },
   "blink": {
    "description": "Włącza i wyłącza warstwę kilka razy na sekundę.",
-   "name": "Migotanie",
+   "name": "Miganie",
    "params": {
     "frequency": {
      "label": "Częstotliwość"
@@ -497,11 +497,18 @@
    }
   },
   "blur": {
-   "description": "Gładkie, równomierne rozmycie.",
+   "description": "Gładkie, równomierne rozmycie. Przy ustawieniu Kształt: Prostokątny rozmycie zamiast tego równomiernie uśrednia kwadratowy obszar wokół każdego punktu.",
    "name": "Rozmycie",
    "params": {
     "strength": {
      "label": "Siła"
+    },
+    "shape": {
+     "label": "Kształt",
+     "options": [
+      "Gładki",
+      "Prostokątny"
+     ]
     }
    }
   },
@@ -547,6 +554,59 @@
     },
     "width": {
      "label": "Szerokość"
+    },
+    "lighting": {
+     "label": "Oświetlenie",
+     "options": [
+      "Klasyczne",
+      "Miękkie",
+      "Bezpośrednie"
+     ]
+    },
+    "ambient": {
+     "label": "Światło otoczenia"
+    },
+    "lightHeight": {
+     "label": "Wysokość światła"
+    },
+    "lightColor": {
+     "label": "Kolor światła"
+    },
+    "glossiness": {
+     "label": "Ostrość połysku"
+    },
+    "texMode": {
+     "label": "Tekstura",
+     "options": [
+      "Dopasowanie",
+      "Kafelki",
+      "Rozciągnięcie"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Powtórzenia X"
+    },
+    "texRepeatY": {
+     "label": "Powtórzenia Y"
+    },
+    "texMirror": {
+     "label": "Odbicie lustrzane"
+    },
+    "texAngle": {
+     "label": "Kąt tekstury"
+    },
+    "texOffset": {
+     "label": "Przesunięcie tekstury"
+    },
+    "texCrop": {
+     "label": "Kadrowanie tekstury"
+    },
+    "texAnchor": {
+     "label": "Kotwica tekstury",
+     "options": [
+      "Środek",
+      "Narożnik"
+     ]
     }
    }
   },
@@ -570,7 +630,7 @@
    }
   },
   "bulge": {
-   "description": "Wybrzusza warstwę jak soczewka (dodatnia siła) lub ściska ją ku środkowi (ujemna) w obrębie koła o promieniu wyrażonym jako część rozmiaru warstwy.",
+   "description": "Wybrzusza warstwę jak soczewka (dodatnia Siła) lub ściska ją ku Środkowi (ujemna Siła) w obrębie koła o podanym Promieniu, wyrażonym jako część rozmiaru warstwy. Przy ustawieniu Mierz względem: Ekranu Promień jest wyrażony jako część rozmiaru ekranu. Przy ustawieniu Zanikanie: Gładkie soczewka łagodniej przechodzi w resztę warstwy.",
    "name": "Ściśnięcie/wybrzuszenie",
    "params": {
     "amount": {
@@ -581,6 +641,20 @@
     },
     "radius": {
      "label": "Promień"
+    },
+    "reach": {
+     "label": "Mierz względem",
+     "options": [
+      "Warstwy",
+      "Ekranu"
+     ]
+    },
+    "curve": {
+     "label": "Zanikanie",
+     "options": [
+      "Klasyczne",
+      "Gładkie"
+     ]
     }
    }
   },
@@ -781,7 +855,7 @@
    }
   },
   "circularripple": {
-   "description": "Tworzy fale rozchodzące się z jednego punktu, jak po kropli wpadającej do wody.",
+   "description": "Tworzy koliste fale rozchodzące się z jednego punktu, jak po kropli wpadającej do wody. Przy ustawieniu Mierz względem: Ekranu Częstotliwość, Siła i Promień są mierzone na ekranie, a nie na warstwie.",
    "name": "Koliste fale",
    "params": {
     "center": {
@@ -801,6 +875,13 @@
     },
     "strength": {
      "label": "Siła"
+    },
+    "reach": {
+     "label": "Mierz względem",
+     "options": [
+      "Warstwy",
+      "Ekranu"
+     ]
     }
    }
   },
@@ -813,6 +894,9 @@
     },
     "color2": {
      "label": "Kolor 2"
+    },
+    "contrast": {
+     "label": "Kontrast"
     },
     "intensity": {
      "label": "Intensywność"
@@ -855,6 +939,13 @@
     },
     "strength": {
      "label": "Siła"
+    },
+    "style": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Ostry"
+     ]
     }
    }
   },
@@ -965,6 +1056,16 @@
     },
     "fill": {
      "label": "Wypełnienie"
+    },
+    "spread": {
+     "label": "Rozprzestrzenienie",
+     "options": [
+      "Rozmycie",
+      "Odległość"
+     ]
+    },
+    "offset": {
+     "label": "Przesunięcie"
     }
    }
   },
@@ -992,6 +1093,16 @@
     },
     "width": {
      "label": "Szerokość"
+    },
+    "spread": {
+     "label": "Rozprzestrzenienie",
+     "options": [
+      "Rozmycie",
+      "Odległość"
+     ]
+    },
+    "offset": {
+     "label": "Przesunięcie"
     }
    }
   },
@@ -1041,6 +1152,13 @@
     },
     "thickness": {
      "label": "Grubość"
+    },
+    "style": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Nakładany"
+     ]
     }
    }
   },
@@ -1141,6 +1259,62 @@
     },
     "thickness": {
      "label": "Grubość"
+    },
+    "keep": {
+     "label": "Zachowaj warstwę"
+    },
+    "lighting": {
+     "label": "Oświetlenie",
+     "options": [
+      "Klasyczne",
+      "Miękkie",
+      "Bezpośrednie"
+     ]
+    },
+    "ambient": {
+     "label": "Światło otoczenia"
+    },
+    "lightHeight": {
+     "label": "Wysokość światła"
+    },
+    "lightColor": {
+     "label": "Kolor światła"
+    },
+    "glossiness": {
+     "label": "Ostrość połysku"
+    },
+    "texMode": {
+     "label": "Tekstura",
+     "options": [
+      "Dopasowanie",
+      "Kafelki",
+      "Rozciągnięcie"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Powtórzenia X"
+    },
+    "texRepeatY": {
+     "label": "Powtórzenia Y"
+    },
+    "texMirror": {
+     "label": "Odbicie lustrzane"
+    },
+    "texAngle": {
+     "label": "Kąt tekstury"
+    },
+    "texOffset": {
+     "label": "Przesunięcie tekstury"
+    },
+    "texCrop": {
+     "label": "Kadrowanie tekstury"
+    },
+    "texAnchor": {
+     "label": "Kotwica tekstury",
+     "options": [
+      "Środek",
+      "Narożnik"
+     ]
     }
    }
   },
@@ -1180,6 +1354,59 @@
     },
     "smoothing": {
      "label": "Wygładzanie"
+    },
+    "lighting": {
+     "label": "Oświetlenie",
+     "options": [
+      "Klasyczne",
+      "Miękkie",
+      "Bezpośrednie"
+     ]
+    },
+    "ambient": {
+     "label": "Światło otoczenia"
+    },
+    "lightHeight": {
+     "label": "Wysokość światła"
+    },
+    "lightColor": {
+     "label": "Kolor światła"
+    },
+    "glossiness": {
+     "label": "Ostrość połysku"
+    },
+    "texMode": {
+     "label": "Tekstura",
+     "options": [
+      "Dopasowanie",
+      "Kafelki",
+      "Rozciągnięcie"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Powtórzenia X"
+    },
+    "texRepeatY": {
+     "label": "Powtórzenia Y"
+    },
+    "texMirror": {
+     "label": "Odbicie lustrzane"
+    },
+    "texAngle": {
+     "label": "Kąt tekstury"
+    },
+    "texOffset": {
+     "label": "Przesunięcie tekstury"
+    },
+    "texCrop": {
+     "label": "Kadrowanie tekstury"
+    },
+    "texAnchor": {
+     "label": "Kotwica tekstury",
+     "options": [
+      "Środek",
+      "Narożnik"
+     ]
     }
    }
   },
@@ -1251,6 +1478,59 @@
     },
     "smoothing": {
      "label": "Wygładzanie"
+    },
+    "lighting": {
+     "label": "Oświetlenie",
+     "options": [
+      "Klasyczne",
+      "Miękkie",
+      "Bezpośrednie"
+     ]
+    },
+    "ambient": {
+     "label": "Światło otoczenia"
+    },
+    "lightHeight": {
+     "label": "Wysokość światła"
+    },
+    "lightColor": {
+     "label": "Kolor światła"
+    },
+    "glossiness": {
+     "label": "Ostrość połysku"
+    },
+    "texMode": {
+     "label": "Tekstura",
+     "options": [
+      "Dopasowanie",
+      "Kafelki",
+      "Rozciągnięcie"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Powtórzenia X"
+    },
+    "texRepeatY": {
+     "label": "Powtórzenia Y"
+    },
+    "texMirror": {
+     "label": "Odbicie lustrzane"
+    },
+    "texAngle": {
+     "label": "Kąt tekstury"
+    },
+    "texOffset": {
+     "label": "Przesunięcie tekstury"
+    },
+    "texCrop": {
+     "label": "Kadrowanie tekstury"
+    },
+    "texAnchor": {
+     "label": "Kotwica tekstury",
+     "options": [
+      "Środek",
+      "Narożnik"
+     ]
     }
    }
   },
@@ -1369,7 +1649,7 @@
    }
   },
   "directionalblur": {
-   "description": "Tworzy rozmycie ruchu przez uśrednienie próbek w wybranym kierunku.",
+   "description": "Tworzy rozmycie ruchu, uśredniając próbki pod wybranym Kątem. Przy ustawieniu Rozprzestrzenienie: W obie strony rozmycie rozchodzi się równo do przodu i do tyłu.",
    "name": "Rozmycie kierunkowe",
    "params": {
     "angle": {
@@ -1377,6 +1657,13 @@
     },
     "blurLength": {
      "label": "Długość"
+    },
+    "spread": {
+     "label": "Rozprzestrzenienie",
+     "options": [
+      "W jedną stronę",
+      "W obie strony"
+     ]
     }
    }
   },
@@ -1571,6 +1858,22 @@
    "params": {
     "strength": {
      "label": "Siła"
+    },
+    "style": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Tusz"
+     ]
+    },
+    "spacing": {
+     "label": "Wygładzanie"
+    },
+    "threshold": {
+     "label": "Próg"
+    },
+    "invert": {
+     "label": "Odwróć"
     }
    }
   },
@@ -1613,6 +1916,9 @@
     },
     "tintColor": {
      "label": "Kolor zabarwienia"
+    },
+    "mask": {
+     "label": "Maskuj do warstwy"
     }
    }
   },
@@ -1682,6 +1988,13 @@
     },
     "thickness": {
      "label": "Grubość"
+    },
+    "contourStyle": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Cienkie linie"
+     ]
     }
    }
   },
@@ -1724,6 +2037,59 @@
     },
     "squeezeRatio": {
      "label": "Ściśnięcie"
+    },
+    "lighting": {
+     "label": "Oświetlenie",
+     "options": [
+      "Klasyczne",
+      "Miękkie",
+      "Bezpośrednie"
+     ]
+    },
+    "ambient": {
+     "label": "Światło otoczenia"
+    },
+    "lightHeight": {
+     "label": "Wysokość światła"
+    },
+    "lightColor": {
+     "label": "Kolor światła"
+    },
+    "glossiness": {
+     "label": "Ostrość połysku"
+    },
+    "texMode": {
+     "label": "Tekstura",
+     "options": [
+      "Dopasowanie",
+      "Kafelki",
+      "Rozciągnięcie"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Powtórzenia X"
+    },
+    "texRepeatY": {
+     "label": "Powtórzenia Y"
+    },
+    "texMirror": {
+     "label": "Odbicie lustrzane"
+    },
+    "texAngle": {
+     "label": "Kąt tekstury"
+    },
+    "texOffset": {
+     "label": "Przesunięcie tekstury"
+    },
+    "texCrop": {
+     "label": "Kadrowanie tekstury"
+    },
+    "texAnchor": {
+     "label": "Kotwica tekstury",
+     "options": [
+      "Środek",
+      "Narożnik"
+     ]
     }
    }
   },
@@ -1982,6 +2348,65 @@
     },
     "shine": {
      "label": "Połysk"
+    },
+    "lighting": {
+     "label": "Oświetlenie",
+     "options": [
+      "Klasyczne",
+      "Miękkie",
+      "Bezpośrednie"
+     ]
+    },
+    "ambient": {
+     "label": "Światło otoczenia"
+    },
+    "lightHeight": {
+     "label": "Wysokość światła"
+    },
+    "lightColor": {
+     "label": "Kolor światła"
+    },
+    "glossiness": {
+     "label": "Ostrość połysku"
+    },
+    "pivot": {
+     "label": "Punkt obrotu"
+    },
+    "pivotDepth": {
+     "label": "Głębokość punktu obrotu"
+    },
+    "texMode": {
+     "label": "Tekstura",
+     "options": [
+      "Dopasowanie",
+      "Kafelki",
+      "Rozciągnięcie"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Powtórzenia X"
+    },
+    "texRepeatY": {
+     "label": "Powtórzenia Y"
+    },
+    "texMirror": {
+     "label": "Odbicie lustrzane"
+    },
+    "texAngle": {
+     "label": "Kąt tekstury"
+    },
+    "texOffset": {
+     "label": "Przesunięcie tekstury"
+    },
+    "texCrop": {
+     "label": "Kadrowanie tekstury"
+    },
+    "texAnchor": {
+     "label": "Kotwica tekstury",
+     "options": [
+      "Środek",
+      "Narożnik"
+     ]
     }
    }
   },
@@ -2047,6 +2472,13 @@
     },
     "softness": {
      "label": "Miękkość"
+    },
+    "falloff": {
+     "label": "Zanikanie",
+     "options": [
+      "Odległość",
+      "Gładkie"
+     ]
     }
    }
   },
@@ -2116,6 +2548,13 @@
     },
     "strength": {
      "label": "Siła"
+    },
+    "screenSize": {
+     "label": "Rozmiar względem",
+     "options": [
+      "Warstwy",
+      "Ekranu"
+     ]
     }
    }
   },
@@ -2198,7 +2637,7 @@
    }
   },
   "glass": {
-   "description": "Zmienia kształt warstwy w fazowane szkło, które załamuje warstwy za nim i ma rozświetloną krawędź.",
+   "description": "Zmienia kształt warstwy w fazowane szkło, które załamuje warstwy za nim, z rozświetleniem wzdłuż krawędzi. Przy ustawieniu Światło: Miękkie efekt pokazuje warstwę zgodnie z Wypełnieniem i oświetla szkło Kolorem, najjaśniej wzdłuż wewnętrznej krawędzi fazowania zwróconej ku światłu.",
    "name": "Szkło",
    "params": {
     "angle": {
@@ -2210,8 +2649,18 @@
     "color": {
      "label": "Kolor"
     },
+    "fill": {
+     "label": "Wypełnienie"
+    },
     "highlight": {
      "label": "Rozświetlenie"
+    },
+    "light": {
+     "label": "Światło",
+     "options": [
+      "Krawędziowe",
+      "Miękkie"
+     ]
     },
     "refraction": {
      "label": "Załamanie światła"
@@ -2326,6 +2775,13 @@
     },
     "scaleBrightness": {
      "label": "Skaluj jasność"
+    },
+    "style": {
+     "label": "Styl",
+     "options": [
+      "Gradient",
+      "Widmo"
+     ]
     }
    }
   },
@@ -2372,7 +2828,7 @@
      "label": "Kształt",
      "options": [
       "Liniowy",
-      "Promienisty",
+      "Radialny",
       "Odbity",
       "Kątowy"
      ]
@@ -2402,6 +2858,14 @@
     "offset": {
      "label": "Przesunięcie"
     },
+    "origin": {
+     "label": "Punkt początkowy",
+     "options": [
+      "Środek",
+      "Róg warstwy",
+      "Róg ekranu"
+     ]
+    },
     "punch": {
      "label": "Wytnij"
     },
@@ -2427,9 +2891,9 @@
      "label": "Wygładzanie",
      "options": [
       "Liniowe",
-      "Zwolnienie na początku",
-      "Zwolnienie na końcu",
-      "Początek i koniec"
+      "Łagodne wejście",
+      "Łagodne wyjście",
+      "Łagodne wejście i wyjście"
      ]
     },
     "fillAmount": {
@@ -2606,6 +3070,59 @@
     },
     "smoothing": {
      "label": "Wygładzanie"
+    },
+    "lighting": {
+     "label": "Oświetlenie",
+     "options": [
+      "Klasyczne",
+      "Miękkie",
+      "Bezpośrednie"
+     ]
+    },
+    "ambient": {
+     "label": "Światło otoczenia"
+    },
+    "lightHeight": {
+     "label": "Wysokość światła"
+    },
+    "lightColor": {
+     "label": "Kolor światła"
+    },
+    "glossiness": {
+     "label": "Ostrość połysku"
+    },
+    "texMode": {
+     "label": "Tekstura",
+     "options": [
+      "Dopasowanie",
+      "Kafelki",
+      "Rozciągnięcie"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Powtórzenia X"
+    },
+    "texRepeatY": {
+     "label": "Powtórzenia Y"
+    },
+    "texMirror": {
+     "label": "Odbicie lustrzane"
+    },
+    "texAngle": {
+     "label": "Kąt tekstury"
+    },
+    "texOffset": {
+     "label": "Przesunięcie tekstury"
+    },
+    "texCrop": {
+     "label": "Kadrowanie tekstury"
+    },
+    "texAnchor": {
+     "label": "Kotwica tekstury",
+     "options": [
+      "Środek",
+      "Narożnik"
+     ]
     }
    }
   },
@@ -2661,11 +3178,33 @@
     "angle": {
      "label": "Kąt"
     },
+    "crop": {
+     "label": "Kadrowanie"
+    },
+    "fit": {
+     "label": "Obraz",
+     "options": [
+      "Pełny rozmiar",
+      "W każdym kafelku"
+     ]
+    },
+    "mask": {
+     "label": "Maskuj do warstwy"
+    },
     "mirror": {
      "label": "Odbicie lustrzane"
     },
+    "offset": {
+     "label": "Przesunięcie"
+    },
     "scale": {
      "label": "Skala"
+    },
+    "screenSpace": {
+     "label": "Przestrzeń ekranu"
+    },
+    "stretch": {
+     "label": "Rozciągnięcie"
     }
    }
   },
@@ -2769,6 +3308,59 @@
     },
     "smoothing": {
      "label": "Wygładzanie"
+    },
+    "lighting": {
+     "label": "Oświetlenie",
+     "options": [
+      "Klasyczne",
+      "Miękkie",
+      "Bezpośrednie"
+     ]
+    },
+    "ambient": {
+     "label": "Światło otoczenia"
+    },
+    "lightHeight": {
+     "label": "Wysokość światła"
+    },
+    "lightColor": {
+     "label": "Kolor światła"
+    },
+    "glossiness": {
+     "label": "Ostrość połysku"
+    },
+    "texMode": {
+     "label": "Tekstura",
+     "options": [
+      "Dopasowanie",
+      "Kafelki",
+      "Rozciągnięcie"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Powtórzenia X"
+    },
+    "texRepeatY": {
+     "label": "Powtórzenia Y"
+    },
+    "texMirror": {
+     "label": "Odbicie lustrzane"
+    },
+    "texAngle": {
+     "label": "Kąt tekstury"
+    },
+    "texOffset": {
+     "label": "Przesunięcie tekstury"
+    },
+    "texCrop": {
+     "label": "Kadrowanie tekstury"
+    },
+    "texAnchor": {
+     "label": "Kotwica tekstury",
+     "options": [
+      "Środek",
+      "Narożnik"
+     ]
     }
    }
   },
@@ -2839,6 +3431,59 @@
     },
     "width": {
      "label": "Szerokość"
+    },
+    "lighting": {
+     "label": "Oświetlenie",
+     "options": [
+      "Klasyczne",
+      "Miękkie",
+      "Bezpośrednie"
+     ]
+    },
+    "ambient": {
+     "label": "Światło otoczenia"
+    },
+    "lightHeight": {
+     "label": "Wysokość światła"
+    },
+    "lightColor": {
+     "label": "Kolor światła"
+    },
+    "glossiness": {
+     "label": "Ostrość połysku"
+    },
+    "texMode": {
+     "label": "Tekstura",
+     "options": [
+      "Dopasowanie",
+      "Kafelki",
+      "Rozciągnięcie"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Powtórzenia X"
+    },
+    "texRepeatY": {
+     "label": "Powtórzenia Y"
+    },
+    "texMirror": {
+     "label": "Odbicie lustrzane"
+    },
+    "texAngle": {
+     "label": "Kąt tekstury"
+    },
+    "texOffset": {
+     "label": "Przesunięcie tekstury"
+    },
+    "texCrop": {
+     "label": "Kadrowanie tekstury"
+    },
+    "texAnchor": {
+     "label": "Kotwica tekstury",
+     "options": [
+      "Środek",
+      "Narożnik"
+     ]
     }
    }
   },
@@ -2964,7 +3609,8 @@
      "label": "Styl",
      "options": [
       "Klasyczny",
-      "Zachowaj jasność"
+      "Zachowaj jasność",
+      "Wideo"
      ]
     },
     "vibrance": {
@@ -3002,6 +3648,23 @@
     },
     "intensity": {
      "label": "Intensywność"
+    },
+    "blend": {
+     "label": "Mieszanie",
+     "options": [
+      "Ekran",
+      "Normalny"
+     ]
+    },
+    "opacity": {
+     "label": "Krycie"
+    },
+    "corners": {
+     "label": "Narożniki",
+     "options": [
+      "Zaokrąglone",
+      "Ostre"
+     ]
     }
    }
   },
@@ -3068,6 +3731,13 @@
     "center": {
      "label": "Środek"
     },
+    "direction": {
+     "label": "Kierunek",
+     "options": [
+      "Zgodnie z zegarem",
+      "Przeciwnie do zegara"
+     ]
+    },
     "mirror": {
      "label": "Odbicie lustrzane"
     },
@@ -3077,9 +3747,16 @@
    }
   },
   "lensblur": {
-   "description": "Obrotowe rozmycie, które pozostawia ostry obszar wokół środka i narasta ku krawędziom.",
+   "description": "Wirujące rozmycie, które pozostawia ostry obszar wokół środka i narasta ku krawędziom. Przy ustawieniu Rozmycie: Zoom obraz jest zamiast tego rozmazywany od środka na zewnątrz, także poza krawędzie warstwy.",
    "name": "Rozmycie obiektywu",
    "params": {
+    "blur": {
+     "label": "Rozmycie",
+     "options": [
+      "Wirowanie",
+      "Zoom"
+     ]
+    },
     "center": {
      "label": "Środek"
     },
@@ -3154,6 +3831,12 @@
     },
     "threshold": {
      "label": "Próg"
+    },
+    "soften": {
+     "label": "Zmiękczenie"
+    },
+    "mask": {
+     "label": "Maskuj do warstwy"
     }
    }
   },
@@ -3201,9 +3884,9 @@
      "label": "Wygładzanie",
      "options": [
       "Liniowe",
-      "Zwolnienie na początku",
-      "Zwolnienie na końcu",
-      "Początek i koniec"
+      "Łagodne wejście",
+      "Łagodne wyjście",
+      "Łagodne wejście i wyjście"
      ]
     },
     "fillAmount": {
@@ -3257,7 +3940,7 @@
    }
   },
   "linearstreaks": {
-   "description": "Tworzy proste smugi, przesuwając kopie warstwy pod wybranym kątem i mieszając je w miejscach nakładania.",
+   "description": "Tworzy proste smugi, przesuwając kopie warstwy pod wybranym Kątem i mieszając je tam, gdzie się nakładają. Gdy Mieszanie jest ustawione na Wył., warstwa pozostaje bez zmian. Przy ustawieniu Kopie: Każdy piksel jedna kopia przypada na każdy piksel Długości zamiast 48 kopii rozłożonych wzdłuż niej.",
    "name": "Liniowe smugi",
    "params": {
     "alpha": {
@@ -3274,11 +3957,19 @@
      "options": [
       "Rozjaśnianie",
       "Średnia",
-      "Przyciemnianie"
+      "Przyciemnianie",
+      "Wył."
      ]
     },
     "reach": {
      "label": "Długość"
+    },
+    "copies": {
+     "label": "Kopie",
+     "options": [
+      "Rozstawione",
+      "Każdy piksel"
+     ]
     }
    }
   },
@@ -3333,6 +4024,12 @@
     },
     "solidity": {
      "label": "Jednolitość"
+    },
+    "fill": {
+     "label": "Wypełnienie"
+    },
+    "samples": {
+     "label": "Próbki"
     }
    }
   },
@@ -3348,6 +4045,9 @@
     },
     "threshold": {
      "label": "Próg"
+    },
+    "high": {
+     "label": "Górny próg"
     }
    }
   },
@@ -3472,6 +4172,13 @@
    "description": "Dzieli warstwę na kwadraty i wypełnia każdy ich średnim kolorem.",
    "name": "Mozaika",
    "params": {
+    "average": {
+     "label": "Średnia",
+     "options": [
+      "Komórka",
+      "Narożnik"
+     ]
+    },
     "count": {
      "label": "Liczba"
     },
@@ -3594,6 +4301,59 @@
     },
     "shine": {
      "label": "Połysk"
+    },
+    "lighting": {
+     "label": "Oświetlenie",
+     "options": [
+      "Klasyczne",
+      "Miękkie",
+      "Bezpośrednie"
+     ]
+    },
+    "ambient": {
+     "label": "Światło otoczenia"
+    },
+    "lightHeight": {
+     "label": "Wysokość światła"
+    },
+    "lightColor": {
+     "label": "Kolor światła"
+    },
+    "glossiness": {
+     "label": "Ostrość połysku"
+    },
+    "texMode": {
+     "label": "Tekstura",
+     "options": [
+      "Dopasowanie",
+      "Kafelki",
+      "Rozciągnięcie"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Powtórzenia X"
+    },
+    "texRepeatY": {
+     "label": "Powtórzenia Y"
+    },
+    "texMirror": {
+     "label": "Odbicie lustrzane"
+    },
+    "texAngle": {
+     "label": "Kąt tekstury"
+    },
+    "texOffset": {
+     "label": "Przesunięcie tekstury"
+    },
+    "texCrop": {
+     "label": "Kadrowanie tekstury"
+    },
+    "texAnchor": {
+     "label": "Kotwica tekstury",
+     "options": [
+      "Środek",
+      "Narożnik"
+     ]
     }
    }
   },
@@ -4144,6 +4904,13 @@
     "blockSize": {
      "label": "Rozmiar"
     },
+    "edges": {
+     "label": "Krawędzie",
+     "options": [
+      "Odbij",
+      "Przezroczyste"
+     ]
+    },
     "offset": {
      "label": "Przesunięcie"
     },
@@ -4244,7 +5011,7 @@
    }
   },
   "polar": {
-   "description": "Wygina warstwę wokół jej środka, zamieniając linie proste w okręgi, albo rozwija okręgi w linie proste.",
+   "description": "Wygina warstwę wokół jej środka, zamieniając linie proste w okręgi, albo rozwija okręgi w linie proste. Układ wybiera, która krawędź warstwy schodzi się w środku.",
    "name": "Współrzędne biegunowe",
    "params": {
     "amount": {
@@ -4255,6 +5022,13 @@
      "options": [
       "Prostokątne na biegunowe",
       "Biegunowe na prostokątne"
+     ]
+    },
+    "middle": {
+     "label": "Układ",
+     "options": [
+      "Góra w środku",
+      "Dół w środku"
      ]
     }
    }
@@ -4448,11 +5222,64 @@
     },
     "shine": {
      "label": "Połysk"
+    },
+    "lighting": {
+     "label": "Oświetlenie",
+     "options": [
+      "Klasyczne",
+      "Miękkie",
+      "Bezpośrednie"
+     ]
+    },
+    "ambient": {
+     "label": "Światło otoczenia"
+    },
+    "lightHeight": {
+     "label": "Wysokość światła"
+    },
+    "lightColor": {
+     "label": "Kolor światła"
+    },
+    "glossiness": {
+     "label": "Ostrość połysku"
+    },
+    "texMode": {
+     "label": "Tekstura",
+     "options": [
+      "Dopasowanie",
+      "Kafelki",
+      "Rozciągnięcie"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Powtórzenia X"
+    },
+    "texRepeatY": {
+     "label": "Powtórzenia Y"
+    },
+    "texMirror": {
+     "label": "Odbicie lustrzane"
+    },
+    "texAngle": {
+     "label": "Kąt tekstury"
+    },
+    "texOffset": {
+     "label": "Przesunięcie tekstury"
+    },
+    "texCrop": {
+     "label": "Kadrowanie tekstury"
+    },
+    "texAnchor": {
+     "label": "Kotwica tekstury",
+     "options": [
+      "Środek",
+      "Narożnik"
+     ]
     }
    }
   },
   "radialblur": {
-   "description": "Stosuje promieniste rozmycie zoomem, uśredniając próbki wzdłuż promieni od punktu środkowego, z regulowaną siłą.",
+   "description": "Stosuje promieniste rozmycie zoomem, uśredniając próbki wzdłuż promieni od punktu środkowego, z regulowaną siłą. Przy ustawieniu Długość: Równa wszystkie smugi mają tę samą długość, zamiast rosnąć wraz z odległością od środka.",
    "name": "Rozmycie zoomem",
    "params": {
     "amount": {
@@ -4460,6 +5287,13 @@
     },
     "center": {
      "label": "Środek"
+    },
+    "streak": {
+     "label": "Długość",
+     "options": [
+      "Według odległości",
+      "Równa"
+     ]
     }
    }
   },
@@ -4504,9 +5338,9 @@
      "label": "Wygładzanie",
      "options": [
       "Liniowe",
-      "Wolny start",
-      "Wolny koniec",
-      "Początek i koniec"
+      "Łagodne wejście",
+      "Łagodne wyjście",
+      "Łagodne wejście i wyjście"
      ]
     },
     "fillAmount": {
@@ -4586,12 +5420,15 @@
     },
     "reach": {
      "label": "Długość"
+    },
+    "fill": {
+     "label": "Wypełnienie"
     }
    }
   },
   "radialwipe": {
-   "description": "Ukrywa wycinek warstwy omiatany wokół Środka od Kąta początkowego, jak wskazówka zegara. Postęp to omiatany kąt, Liczba powtarza wycinek wokół okręgu, a Oba omiata w obu kierunkach. Animuj Postęp, aby uzyskać przejście.",
-   "name": "Wycieraczka radialna",
+   "description": "Ukrywa wycinek warstwy omiatany wokół Środka od Kąta początkowego, jak wskazówka zegara. Postęp to omiatany kąt, Liczba powtarza wycinek wokół okręgu, a opcja Oba omiata w obie strony. Animuj Postęp, aby uzyskać przejście. Przy ustawieniu Wycinki: Dokładne zostaje zachowana część ułamkowa Liczby, więc ostatni wycinek jest węższy. Zmiękczenie łagodzi obie krawędzie każdego wycinka.",
+   "name": "Wycieranie radialne",
    "params": {
     "center": {
      "label": "Środek"
@@ -4615,6 +5452,13 @@
     },
     "start": {
      "label": "Kąt początkowy"
+    },
+    "wedges": {
+     "label": "Wycinki",
+     "options": [
+      "Całe",
+      "Dokładne"
+     ]
     }
    }
   },
@@ -4699,6 +5543,26 @@
     },
     "shine": {
      "label": "Połysk"
+    },
+    "lighting": {
+     "label": "Oświetlenie",
+     "options": [
+      "Klasyczne",
+      "Miękkie",
+      "Bezpośrednie"
+     ]
+    },
+    "ambient": {
+     "label": "Światło otoczenia"
+    },
+    "lightHeight": {
+     "label": "Wysokość światła"
+    },
+    "lightColor": {
+     "label": "Kolor światła"
+    },
+    "glossiness": {
+     "label": "Ostrość połysku"
     }
    },
    "shortcuts": {
@@ -4826,9 +5690,9 @@
      "label": "Wygładzanie",
      "options": [
       "Liniowe",
-      "Wolny start",
-      "Wolny koniec",
-      "Początek i koniec"
+      "Łagodne wejście",
+      "Łagodne wyjście",
+      "Łagodne wejście i wyjście"
      ]
     },
     "end": {
@@ -4914,6 +5778,13 @@
     },
     "threshold": {
      "label": "Próg"
+    },
+    "match": {
+     "label": "Dopasowanie",
+     "options": [
+      "RGB",
+      "Chrominancja"
+     ]
     }
    }
   },
@@ -4964,7 +5835,7 @@
    }
   },
   "rgbsplit": {
-   "description": "Rozdziela kanały czerwony, zielony i niebieski: kanał środkowy zostaje na miejscu, a pozostałe dwa przesuwają się w przeciwnych kierunkach wzdłuż kąta. Jasny dodaje przesunięte kolory, Ciemny zachowuje je pełne, Maska zostawia tylko miejsca, gdzie nakładają się wszystkie trzy, a Luma sprawia, że obwódki są tak kryjące, jak jasne.",
+   "description": "Rozdziela kanały czerwony, zielony i niebieski: kanał wybrany jako Środek zostaje na miejscu, a pozostałe dwa przesuwają się w przeciwnych kierunkach wzdłuż Kąta. Jasny dodaje przesunięte kolory, Ciemny zachowuje je pełne, Maska zostawia tylko miejsca, gdzie nakładają się wszystkie trzy, a Luma sprawia, że obwódki są tak kryjące, jak są jasne. Średnia sprawia, że każdy punkt jest tak kryjący, jak duża część kanałów go pokrywa.",
    "name": "Rozdzielenie RGB",
    "params": {
     "angle": {
@@ -4984,7 +5855,8 @@
       "Jasny",
       "Ciemny",
       "Maska",
-      "Luma"
+      "Luma",
+      "Średnia"
      ]
     },
     "strength": {
@@ -5492,6 +6364,13 @@
     },
     "outside": {
      "label": "Poświata zewnętrzna"
+    },
+    "falloff": {
+     "label": "Zanikanie",
+     "options": [
+      "Równomierne",
+      "Warstwa"
+     ]
     }
    }
   },
@@ -5585,6 +6464,59 @@
     },
     "shine": {
      "label": "Połysk"
+    },
+    "lighting": {
+     "label": "Oświetlenie",
+     "options": [
+      "Klasyczne",
+      "Miękkie",
+      "Bezpośrednie"
+     ]
+    },
+    "ambient": {
+     "label": "Światło otoczenia"
+    },
+    "lightHeight": {
+     "label": "Wysokość światła"
+    },
+    "lightColor": {
+     "label": "Kolor światła"
+    },
+    "glossiness": {
+     "label": "Ostrość połysku"
+    },
+    "texMode": {
+     "label": "Tekstura",
+     "options": [
+      "Dopasowanie",
+      "Kafelki",
+      "Rozciągnięcie"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Powtórzenia X"
+    },
+    "texRepeatY": {
+     "label": "Powtórzenia Y"
+    },
+    "texMirror": {
+     "label": "Odbicie lustrzane"
+    },
+    "texAngle": {
+     "label": "Kąt tekstury"
+    },
+    "texOffset": {
+     "label": "Przesunięcie tekstury"
+    },
+    "texCrop": {
+     "label": "Kadrowanie tekstury"
+    },
+    "texAnchor": {
+     "label": "Kotwica tekstury",
+     "options": [
+      "Środek",
+      "Narożnik"
+     ]
     }
    }
   },
@@ -5732,11 +6664,18 @@
     },
     "threshold": {
      "label": "Próg"
+    },
+    "grey": {
+     "label": "Szarość",
+     "options": [
+      "HD",
+      "SD"
+     ]
     }
    }
   },
   "squeeze": {
-   "description": "Ściska środek warstwy do wewnątrz przy dodatniej sile i wybrzusza go na zewnątrz przy ujemnej. Starszy zachowuje kształt ze starszych projektów.",
+   "description": "Ściska środek warstwy do wewnątrz przy dodatniej Sile i wybrzusza go na zewnątrz przy ujemnej. Opcja Starszy zachowuje wygląd starszych projektów. Opcja Klepsydra dodatkowo wypycha na zewnątrz środek górnej i dolnej krawędzi.",
    "name": "Ściśnięcie",
    "params": {
     "amount": {
@@ -5746,7 +6685,8 @@
      "label": "Kształt",
      "options": [
       "Ściśnięcie/wybrzuszenie",
-      "Starszy"
+      "Starszy",
+      "Klepsydra"
      ]
     }
    }
@@ -5846,6 +6786,59 @@
     },
     "shine": {
      "label": "Połysk"
+    },
+    "lighting": {
+     "label": "Oświetlenie",
+     "options": [
+      "Klasyczne",
+      "Miękkie",
+      "Bezpośrednie"
+     ]
+    },
+    "ambient": {
+     "label": "Światło otoczenia"
+    },
+    "lightHeight": {
+     "label": "Wysokość światła"
+    },
+    "lightColor": {
+     "label": "Kolor światła"
+    },
+    "glossiness": {
+     "label": "Ostrość połysku"
+    },
+    "texMode": {
+     "label": "Tekstura",
+     "options": [
+      "Dopasowanie",
+      "Kafelki",
+      "Rozciągnięcie"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Powtórzenia X"
+    },
+    "texRepeatY": {
+     "label": "Powtórzenia Y"
+    },
+    "texMirror": {
+     "label": "Odbicie lustrzane"
+    },
+    "texAngle": {
+     "label": "Kąt tekstury"
+    },
+    "texOffset": {
+     "label": "Przesunięcie tekstury"
+    },
+    "texCrop": {
+     "label": "Kadrowanie tekstury"
+    },
+    "texAnchor": {
+     "label": "Kotwica tekstury",
+     "options": [
+      "Środek",
+      "Narożnik"
+     ]
     }
    }
   },
@@ -5894,12 +6887,72 @@
     },
     "smoothing": {
      "label": "Wygładzanie"
+    },
+    "starStyle": {
+     "label": "Styl",
+     "options": [
+      "Płaski",
+      "Spiczasty"
+     ]
+    },
+    "lighting": {
+     "label": "Oświetlenie",
+     "options": [
+      "Klasyczne",
+      "Miękkie",
+      "Bezpośrednie"
+     ]
+    },
+    "ambient": {
+     "label": "Światło otoczenia"
+    },
+    "lightHeight": {
+     "label": "Wysokość światła"
+    },
+    "lightColor": {
+     "label": "Kolor światła"
+    },
+    "glossiness": {
+     "label": "Ostrość połysku"
+    },
+    "texMode": {
+     "label": "Tekstura",
+     "options": [
+      "Dopasowanie",
+      "Kafelki",
+      "Rozciągnięcie"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Powtórzenia X"
+    },
+    "texRepeatY": {
+     "label": "Powtórzenia Y"
+    },
+    "texMirror": {
+     "label": "Odbicie lustrzane"
+    },
+    "texAngle": {
+     "label": "Kąt tekstury"
+    },
+    "texOffset": {
+     "label": "Przesunięcie tekstury"
+    },
+    "texCrop": {
+     "label": "Kadrowanie tekstury"
+    },
+    "texAnchor": {
+     "label": "Kotwica tekstury",
+     "options": [
+      "Środek",
+      "Narożnik"
+     ]
     }
    }
   },
   "static": {
    "description": "Migotliwy szary szum, jak w telewizorze bez sygnału.",
-   "name": "Zakłócenia",
+   "name": "Szum telewizyjny",
    "params": {
     "amount": {
      "label": "Ilość"
@@ -6065,7 +7118,9 @@
       "Robot",
       "Piszczący",
       "Maszyna do pisania",
-      "Chiptune"
+      "Chiptune",
+      "Szkielet",
+      "Własny dźwięk"
      ]
     },
     "volume": {
@@ -6439,6 +7494,13 @@
     "count": {
      "label": "Liczba"
     },
+    "edges": {
+     "label": "Krawędzie",
+     "options": [
+      "Odbij",
+      "Przezroczyste"
+     ]
+    },
     "offset": {
      "label": "Przesunięcie"
     },
@@ -6447,6 +7509,9 @@
     },
     "rotation": {
      "label": "Obrót"
+    },
+    "screenSpace": {
+     "label": "Przestrzeń ekranu"
     },
     "seed": {
      "label": "Ziarno"
@@ -6457,8 +7522,8 @@
    }
   },
   "tiles": {
-   "description": "Powtarza warstwę, aby wypełnić ekran. Zwiększ Kadrowanie, aby uzyskać mniejsze kafelki, z opcjonalnym odbiciem, przesunięciem rzędów i obrotem. Skala dawna zachowuje starsze projekty.",
-   "name": "Mozaika",
+   "description": "Powtarza warstwę, aby wypełnić ekran. Zwiększ Kadrowanie, aby uzyskać mniejsze kafelki, z opcjonalnym odbiciem, przesunięciem rzędów i obrotem. Opcja Skala dawna zachowuje wygląd starszych projektów. Przy ustawieniu Rozmiar: Wewnątrz kafelków każdy kafelek ma rozmiar warstwy, a obraz w nim jest powiększany i obracany.",
+   "name": "Kafelkowanie",
    "params": {
     "angle": {
      "label": "Kąt"
@@ -6473,7 +7538,8 @@
      "label": "Rozmiar",
      "options": [
       "Kadrowanie",
-      "Skala dawna"
+      "Skala dawna",
+      "Wewnątrz kafelków"
      ]
     },
     "vertical": {
@@ -6494,8 +7560,18 @@
     "count": {
      "label": "Liczba"
     },
+    "edges": {
+     "label": "Krawędzie",
+     "options": [
+      "Odbij",
+      "Przezroczyste"
+     ]
+    },
     "offset": {
      "label": "Przesunięcie"
+    },
+    "screenSpace": {
+     "label": "Przestrzeń ekranu"
     },
     "seed": {
      "label": "Ziarno"
@@ -6598,6 +7674,59 @@
     },
     "thickness": {
      "label": "Grubość"
+    },
+    "lighting": {
+     "label": "Oświetlenie",
+     "options": [
+      "Klasyczne",
+      "Miękkie",
+      "Bezpośrednie"
+     ]
+    },
+    "ambient": {
+     "label": "Światło otoczenia"
+    },
+    "lightHeight": {
+     "label": "Wysokość światła"
+    },
+    "lightColor": {
+     "label": "Kolor światła"
+    },
+    "glossiness": {
+     "label": "Ostrość połysku"
+    },
+    "texMode": {
+     "label": "Tekstura",
+     "options": [
+      "Dopasowanie",
+      "Kafelki",
+      "Rozciągnięcie"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Powtórzenia X"
+    },
+    "texRepeatY": {
+     "label": "Powtórzenia Y"
+    },
+    "texMirror": {
+     "label": "Odbicie lustrzane"
+    },
+    "texAngle": {
+     "label": "Kąt tekstury"
+    },
+    "texOffset": {
+     "label": "Przesunięcie tekstury"
+    },
+    "texCrop": {
+     "label": "Kadrowanie tekstury"
+    },
+    "texAnchor": {
+     "label": "Kotwica tekstury",
+     "options": [
+      "Środek",
+      "Narożnik"
+     ]
     }
    }
   },
@@ -6739,11 +7868,14 @@
     },
     "stretch": {
      "label": "Rozciągnięcie"
+    },
+    "screenSpace": {
+     "label": "Przestrzeń ekranu"
     }
    }
   },
   "twirl": {
-   "description": "Skręca warstwę wokół środka jak wir wodny, najmocniej pośrodku i zanikając na promieniu (ułamku rozmiaru warstwy). Ujemna siła skręca w drugą stronę.",
+   "description": "Skręca warstwę wokół Środka jak wir wodny, najmocniej pośrodku, słabnąc aż do Promienia (wyrażonego jako część rozmiaru warstwy). Ujemna Siła skręca w drugą stronę. Przy ustawieniu Mierz względem: Ekranu Promień jest wyrażony jako część rozmiaru ekranu, a skręt łagodnie wygasa.",
    "name": "Wir",
    "params": {
     "center": {
@@ -6754,11 +7886,18 @@
     },
     "strength": {
      "label": "Siła"
+    },
+    "reach": {
+     "label": "Mierz względem",
+     "options": [
+      "Warstwy",
+      "Ekranu"
+     ]
     }
    }
   },
   "unsharpmask": {
-   "description": "Wyostrza, dodając z powrotem różnicę między warstwą a jej rozmytą kopią. Siła określa szerokość rozmycia, Ilość ile jest dodawane z powrotem, a Próg powyżej 50% pomija małe różnice.",
+   "description": "Wyostrza, dodając z powrotem różnicę między warstwą a jej rozmytą kopią. Siła określa szerokość rozmycia, Ilość to, ile jest dodawane z powrotem, a Próg powyżej 50% pomija małe różnice. Przy ustawieniu Kolor maski: Czerwony maska jest pokazywana na czerwono tam, gdzie jasność różni się od rozmytej kopii o więcej niż nadwyżka Progu ponad 50%.",
    "name": "Maska wyostrzająca",
    "params": {
     "amount": {
@@ -6772,6 +7911,13 @@
     },
     "threshold": {
      "label": "Próg"
+    },
+    "maskColor": {
+     "label": "Kolor maski",
+     "options": [
+      "Szary",
+      "Czerwony"
+     ]
     }
    }
   },
@@ -6867,6 +8013,19 @@
     },
     "yaw": {
      "label": "Odchylenie"
+    },
+    "projection": {
+     "label": "Wyjście",
+     "options": [
+      "Widok",
+      "Panorama"
+     ]
+    },
+    "eyeDistance": {
+     "label": "Odległość"
+    },
+    "frame": {
+     "label": "Proporcje kadru"
     }
    }
   },
@@ -6932,7 +8091,7 @@
    }
   },
   "wavewarp": {
-   "description": "Wygina warstwę sinusoidą: Odstęp ustala, ile fal ją przecina, Wielkość jak daleko pchają, Kąt kierunek biegu fal, a Kąt zniekształcenia kierunek, w którym pchają.",
+   "description": "Wygina warstwę sinusoidą: Odstęp ustala, ile fal ją przecina, Wielkość jak daleko pchają, Kąt kierunek biegu fal, a Kąt zniekształcenia kierunek, w którym pchają. Przestrzeń ekranu dopasowuje wielkość fal do ekranu zamiast do warstwy. Wielkość poprzeczna dodaje drugą falę, której rozmiar ustala Odstęp poprzeczny; biegnie ona wzdłuż Kąta zniekształcenia i pcha wzdłuż Kąta. Przy ustawieniu Punkt początkowy: Lewy dolny róg ekranu fale są mierzone od tego rogu według krótszego boku ekranu, a Faza je przesuwa.",
    "name": "Zniekształcenie falą",
    "params": {
     "angle": {
@@ -6952,6 +8111,22 @@
     },
     "warpAngle": {
      "label": "Kąt zniekształcenia"
+    },
+    "screenSpace": {
+     "label": "Przestrzeń ekranu"
+    },
+    "crossSpacing": {
+     "label": "Odstęp poprzeczny"
+    },
+    "crossMagnitude": {
+     "label": "Wielkość poprzeczna"
+    },
+    "origin": {
+     "label": "Punkt początkowy",
+     "options": [
+      "Róg warstwy",
+      "Lewy dolny róg ekranu"
+     ]
     }
    }
   },

@@ -1,4 +1,5 @@
 #include "video.h"
+#include "ffamp_clock.h"
 #include "absent/capture.h"
 #include "absent/encoders.h"
 #include "absent/tools.h"
@@ -29,23 +30,6 @@ struct Frames {
     std::unique_ptr<absent::FrameReader> reader;
     std::vector<uint8_t> pixels;
 };
-
-double OnFileClock(const absent::Track& t, int64_t stamp) {
-    return double(int64_t(uint64_t(stamp) - uint64_t(t.mediaStart) + uint64_t(t.delay))) / t.timescale;
-}
-
-double TrackStart(const absent::Track& t) {
-    if (t.order.empty()) return double(t.delay) / t.timescale;
-    return OnFileClock(t, std::max(t.samples[t.order.front()].pts, t.mediaStart));
-}
-
-double FileStart(const absent::Reader& reader) {
-    double begin = 1e300;
-    for (const absent::Track& t : reader.tracks()) {
-        if (t.timescale && !t.samples.empty() && t.kind != absent::Kind::Other) begin = std::min(begin, TrackStart(t));
-    }
-    return begin == 1e300 ? 0 : begin;
-}
 
 template <class R, class F> R Guarded(R fallback, F&& work) {
     try {
@@ -278,7 +262,9 @@ JNIEXPORT jint JNICALL JNI(pcmRead)(JNIEnv* e, jobject, jlong h, jbyteArray out,
     p.at += (int64_t)got;
     if (whole == JNI_TRUE) {
         std::vector<int16_t> shorts(p.samples.size());
-        for (size_t i = 0; i < shorts.size(); ++i) shorts[i] = (int16_t)std::clamp(std::lrintf(p.samples[i] * 32768.0f), -32768L, 32767L);
+        const double peak = p.reader->mixPeak();
+        const float gain = peak > 1 ? float(1 / peak) : 1.0f;
+        for (size_t i = 0; i < shorts.size(); ++i) shorts[i] = (int16_t)std::clamp(std::lrintf(p.samples[i] * gain * 32768.0f), -32768L, 32767L);
         e->SetByteArrayRegion(out, 0, (jsize)(shorts.size() * 2), reinterpret_cast<const jbyte*>(shorts.data()));
     } else {
         e->SetByteArrayRegion(out, 0, (jsize)(p.samples.size() * 4), reinterpret_cast<const jbyte*>(p.samples.data()));

@@ -51,6 +51,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.R
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.key
+import app.absentmotion.desk.DeskBack
+import app.absentmotion.desk.DeskKeys
+import app.absentmotion.desk.DeskShortcuts
+import app.absentmotion.desk.MenuKey
+import app.absentmotion.desk.Shortcut
 import app.absentmotion.i18n.AppLanguage
 import app.absentmotion.i18n.applyLanguage
 import app.absentmotion.i18n.currentLanguage
@@ -74,6 +85,7 @@ enum class SettingsPage(val title: Int, val icon: () -> ImageVector) {
     Projects(R.string.settings_group_projects, { HomeIcons.Folder }),
     Backup(R.string.settings_group_backup, { ChromeIcons.SavePreset }),
     Updates(R.string.desk_updates, { HomeIcons.Download }),
+    Shortcuts(R.string.desk_shortcuts, { DeskIcons.Keyboard }),
     Language(R.string.settings_language, { DeskIcons.Globe }),
     Help(R.string.settings_help, { ExportIcons.Help }),
     Tutorial(R.string.desk_tutorial_page, { ChromeIcons.Play }),
@@ -84,6 +96,7 @@ enum class SettingsPage(val title: Int, val icon: () -> ImageVector) {
 internal object DeskIcons {
     val Globe = deskIcon("Globe", "M2 12A10 10 0 1 0 22 12A10 10 0 1 0 2 12ZM2 12L22 12M12 2C14.5 4.7 15.8 8.2 15.8 12C15.8 15.8 14.5 19.3 12 22C9.5 19.3 8.2 15.8 8.2 12C8.2 8.2 9.5 4.7 12 2Z")
     val Warning = deskIcon("Warning", "M10.3 3.9L1.8 18A2 2 0 0 0 3.5 21L20.5 21A2 2 0 0 0 22.2 18L13.7 3.9A2 2 0 0 0 10.3 3.9ZM12 9L12 13M12 17L12.01 17")
+    val Keyboard = deskIcon("Keyboard", "M4 6L20 6A2 2 0 0 1 22 8L22 16A2 2 0 0 1 20 18L4 18A2 2 0 0 1 2 16L2 8A2 2 0 0 1 4 6ZM6 10L6.01 10M10 10L10.01 10M14 10L14.01 10M18 10L18.01 10M8 14L16 14")
 }
 
 private fun deskIcon(name: String, path: String): ImageVector = ImageVector.Builder(name, 24.dp, 24.dp, 24f, 24f).apply {
@@ -122,6 +135,7 @@ internal fun DeskSettings(settings: AppSettings, initial: SettingsPage, onClose:
                         SettingsPage.About -> DeskAbout(settings)
                         SettingsPage.Crash -> DeskCrashLogs()
                         SettingsPage.Language -> DeskLanguages()
+                        SettingsPage.Shortcuts -> DeskShortcutsPage()
                         else -> Column(Modifier.fillMaxSize().deskVerticalScroll(color = Am.Navy).padding(24.dp)) {
                             Text(stringResource(page.title), color = Am.Navy, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                             Spacer(Modifier.height(16.dp))
@@ -213,6 +227,90 @@ private fun DeskTutorialPage(settings: AppSettings, onClose: () -> Unit) {
                 DeskButton(stringResource(R.string.tutorial_settings_continue), { onClose(); app.absentmotion.ui.tutorial.Tutorial.start(resume = true) }, primary = true)
                 DeskButton(stringResource(R.string.tutorial_settings_restart), { onClose(); app.absentmotion.ui.tutorial.Tutorial.start(resume = false) })
             } else DeskButton(stringResource(R.string.tutorial_settings_start), { onClose(); app.absentmotion.ui.tutorial.Tutorial.start(resume = false) }, primary = true)
+        }
+    }
+}
+
+private val ModifierKeys = setOf(Key.ShiftLeft, Key.ShiftRight, Key.CtrlLeft, Key.CtrlRight, Key.AltLeft, Key.AltRight, Key.MetaLeft, Key.MetaRight, Key.CapsLock, Key.Function)
+
+@Composable
+internal fun DeskShortcutsPage() {
+    var capture by remember { mutableStateOf<Shortcut?>(null) }
+    var clash by remember { mutableStateOf<Pair<Shortcut, List<MenuKey>>?>(null) }
+    val custom = DeskShortcuts.custom
+    DeskBack.Handler(capture != null || clash != null) { capture = null; clash = null }
+    val listen = rememberUpdatedState<(KeyEvent) -> Boolean> { event ->
+        val target = capture
+        when {
+            target == null -> false
+            event.key in ModifierKeys || !DeskKeys.bindable(event) -> true
+            else -> {
+                val chord = DeskShortcuts.chord(event)
+                capture = null
+                if (DeskShortcuts.conflict(target, chord) == null) DeskShortcuts.bind(target, chord) else clash = target to listOf(chord)
+                true
+            }
+        }
+    }
+    DisposableEffect(capture) {
+        val active = capture != null
+        val before = DeskKeys.viewer
+        if (active) DeskKeys.viewer = { listen.value(it) }
+        onDispose { if (active) DeskKeys.viewer = before }
+    }
+    Column(Modifier.fillMaxSize().deskVerticalScroll(color = Am.Navy).padding(24.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(stringResource(R.string.desk_shortcuts), Modifier.weight(1f), color = Am.Navy, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            DeskButton(stringResource(R.string.desk_shortcuts_reset_all), { capture = null; clash = null; DeskShortcuts.resetAll() }, enabled = custom.isNotEmpty())
+        }
+        Text(stringResource(R.string.desk_shortcuts_note), Modifier.padding(top = 6.dp, bottom = 8.dp), color = Am.HomeMid, fontSize = 13.sp)
+        for ((group, actions) in DeskShortcuts.shown.groupBy { it.group }) {
+            Text(stringResource(group), Modifier.padding(start = 4.dp, top = 12.dp, bottom = 8.dp), color = Am.HomeMid, fontSize = 13.sp, fontWeight = FontWeight.Medium)
+            Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Am.HomePanel).padding(vertical = 6.dp)) {
+                actions.forEachIndexed { i, action ->
+                    if (i > 0) Divider(10.dp)
+                    val pending = clash?.takeIf { it.first == action }?.second
+                    ShortcutRow(
+                        action, capture == action, action in custom, pending,
+                        onPick = { clash = null; capture = if (capture == action) null else action },
+                        onReset = { capture = null; clash = null; if (DeskShortcuts.conflict(action, action.defaults) == null) DeskShortcuts.reset(action) else clash = action to action.defaults },
+                        onReplace = { pending?.let { DeskShortcuts.assign(action, it) }; clash = null },
+                        onCancel = { clash = null },
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ShortcutRow(action: Shortcut, capturing: Boolean, changed: Boolean, pending: List<MenuKey>?, onPick: () -> Unit, onReset: () -> Unit, onReplace: () -> Unit, onCancel: () -> Unit) {
+    val shape = RoundedCornerShape(8.dp)
+    val lit = capturing || pending != null
+    Column(Modifier.fillMaxWidth()) {
+        Row(Modifier.fillMaxWidth().heightIn(min = 44.dp).padding(start = 15.dp, end = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(action.text, Modifier.weight(1f).padding(end = 8.dp), color = Am.HomeInk, fontSize = 14.sp)
+            Box(
+                Modifier.widthIn(min = 132.dp).height(32.dp).clip(shape).background(if (lit) Am.Navy else Am.Card).border(1.dp, Am.HomeLine, shape)
+                    .deskPress(8.dp).clickable(role = Role.Button, onClick = onPick).padding(horizontal = 12.dp),
+                Alignment.Center,
+            ) {
+                val shown = when {
+                    capturing -> stringResource(R.string.desk_shortcuts_press)
+                    pending != null -> pending.firstOrNull()?.let { app.absentmotion.desk.shortcutText(it, app.absentmotion.desk.DeskOs.mac) } ?: "–"
+                    else -> DeskShortcuts.text(action).ifEmpty { "–" }
+                }
+                Text(shown, color = if (lit) Am.OnNavy else Am.Navy, fontSize = 13.sp, fontWeight = FontWeight.Medium, maxLines = 1)
+            }
+            Box(Modifier.padding(start = 4.dp).size(32.dp), Alignment.Center) {
+                if (changed) DeskIconButton(ChromeIcons.Undo, stringResource(R.string.audiofx_reset), onReset, size = 32.dp, tint = Am.HomeMid)
+            }
+        }
+        if (pending != null) Row(Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp, bottom = 10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            val other = DeskShortcuts.conflict(action, pending)?.text.orEmpty()
+            Text(stringResource(R.string.desk_shortcuts_conflict, other), Modifier.weight(1f), color = Am.HomeAccent, fontSize = 13.sp)
+            DeskButton(stringResource(R.string.cancel), onCancel)
+            DeskButton(stringResource(R.string.template_replace), onReplace, primary = true)
         }
     }
 }

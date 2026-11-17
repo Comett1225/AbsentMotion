@@ -88,7 +88,7 @@ class DistortTextAuditTest {
         assertEquals(-1000f, reach.min, 0f)
         assertEquals(1000f, reach.max, 0f)
         val result = migration.migrate(scene("<effect id=\"com.alightcreative.effects.stretchsegment\"/>"))
-        assertEquals("10.000000", values(effects(result.scene).single())["stretch"])
+        assertEquals(43.2f, values(effects(result.scene).single())["stretch"]!!.toFloat(), 1e-4f)
     }
 
     @Test fun importedMagnifierKeepsItsControls() {

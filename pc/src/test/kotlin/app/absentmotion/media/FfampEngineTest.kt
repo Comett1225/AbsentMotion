@@ -245,6 +245,14 @@ class FfampEngineTest {
         assertEquals(old.size, new.size)
         val worst = old.indices.maxOf { abs(old[it] - new[it]) }
         assertTrue("AAC differs by $worst", worst < 0.002f)
+        val ac3 = File(dir, "ac3.mp4")
+        ffmpeg("-i", source.path, "-c:v", "copy", "-c:a", "ac3", ac3.path)
+        val dolby = floats(app.absentmotion.Judge.engine.pcm(ac3, 0, 0, 44100, 2))
+        val ours = floats(FfampEngine.pcm(ac3, 0, 0, 44100, 2))
+        assertEquals(dolby.size, ours.size)
+        val noise = dolby.indices.sumOf { (dolby[it] - ours[it]).toDouble().let { d -> d * d } }
+        val level = 10 * log10(dolby.sumOf { it.toDouble() * it } / noise)
+        assertTrue("AC-3 in MP4 is $level dB from FFmpeg", level > 30)
         if (DeskOs.mac) {
             val apple = ProcessBuilder(app.absentmotion.Judge.ffmpeg, "-nostdin", "-v", "error", "-c:a", "aac_at", "-i", source.path, "-ac", "2", "-f", "f32le", "-").redirectError(ProcessBuilder.Redirect.DISCARD).start()
             val same = floats(MediaStream(apple.inputStream, apple))
@@ -257,5 +265,13 @@ class FfampEngineTest {
         val one = ByteBuffer.wrap(reference).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer()
         val two = ByteBuffer.wrap(shorts).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer()
         assertTrue((0 until one.remaining()).all { abs(one[it] - two[it]) <= 1 })
+
+        val loud = File(dir, "loud.wav")
+        ffmpeg("-f", "lavfi", "-i", "aevalsrc=0.9*sin(2*PI*200*t)|0.9*sin(2*PI*300*t)|0.9*sin(2*PI*400*t)|0.9*sin(2*PI*50*t)|0.9*sin(2*PI*500*t)|0.9*sin(2*PI*600*t):s=44100:d=1", "-channel_layout", "5.1", loud.path)
+        val mixed = ByteBuffer.wrap(FfampEngine.playback(loud, 0, 44100).use { it.input.readBytes() }).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer()
+        val wanted = ByteBuffer.wrap(app.absentmotion.Judge.engine.playback(loud, 0, 44100).use { it.input.readBytes() }).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer()
+        assertEquals(wanted.remaining(), mixed.remaining())
+        val off = (0 until wanted.remaining()).maxOf { abs(wanted[it] - mixed[it]) }
+        assertTrue("5.1 played as 16-bit stereo differs from FFmpeg by $off", off <= 2)
     }
 }

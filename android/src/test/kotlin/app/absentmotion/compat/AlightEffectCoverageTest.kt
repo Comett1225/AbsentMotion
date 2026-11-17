@@ -27,9 +27,9 @@ class AlightEffectCoverageTest {
         val blur = migrate("""<effect id="com.alightcreative.effects.zoomblur3"><property name="centerPoint" type="vec2" value="40.000000,-25.000000" /><property name="strength" type="float" value="0.3" /></effect>""")
         assertEquals("absent.radialblur", blur["id"])
         val c = blur.floats("center")
-        assertEquals(0.5f + 40f / 220f, c[0], 1e-4f)
-        assertEquals(0.5f - 25f / 165f, c[1], 1e-4f)
-        assertEquals(1.5f, blur.floats("amount")[0], 1e-5f)
+        assertEquals(0.5f + 0.45f * 40f / 220f, c[0], 1e-4f)
+        assertEquals(0.5f - 0.37f * 25f / 165f, c[1], 1e-4f)
+        assertEquals(1.2f, blur.floats("amount")[0], 1e-5f)
     }
 
     @Test fun pointsLeftAtAlightsDefaultTakeTheCurrentDefaultNotTheLegacyOne() {

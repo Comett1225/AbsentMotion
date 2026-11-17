@@ -2,7 +2,7 @@
  "id": "radialblur",
  "name": "Zoom Blur",
  "category": "blur",
- "description": "Applies a radial zoom blur by averaging samples along rays from a center point with adjustable strength.",
+ "description": "Applies a radial zoom blur by averaging samples along rays from a center point with adjustable strength. Length Even gives every streak the same length instead of growing with the distance from the center.",
  "params": [
   {
    "id": "center",
@@ -21,7 +21,17 @@
    "min": 0.0,
    "max": 1.9,
    "step": 0.01
+  },
+  {
+   "id": "streak",
+   "label": "Length",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "By Distance",
+    "Even"
+   ]
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float amount;\nuniform float2 center;\n\nhalf4 main(float2 coord) {\n    float2 c = center * size;\n    float2 d = coord - c;\n    float s = clamp(amount, 0.0, 1.9);\n    half4 sum = half4(0);\n    for (int i = 0; i < 48; ++i) {\n        sum += image.eval(c + d * (1.0 + s * (float(i) / 47.0 - 0.5)));\n    }\n    return sum / 48.0;\n}"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float amount;\nuniform float2 center;\nuniform float streak;\n\nhalf4 main(float2 coord) {\n    float2 c = center * size;\n    float2 d = coord - c;\n    float s = clamp(amount, 0.0, 1.9);\n    float n = streak > 0.5 ? 128.0 : 48.0;\n    float4 sum = float4(0.0);\n    float2 e = d * (sqrt(size.x * size.y) / max(length(d), 0.001));\n    for (int i = 0; i < 128; ++i) {\n        if (float(i) >= n) break;\n        float t = s * (float(i) / (n - 1.0) - 0.5);\n        sum += float4(image.eval(streak > 0.5 ? coord + e * t : c + d * (1.0 + t)));\n    }\n    return half4(sum / n);\n}"
 }

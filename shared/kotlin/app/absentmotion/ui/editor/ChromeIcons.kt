@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor
 
+import app.absentmotion.ui.HoldName
 import app.absentmotion.ui.tutorial.tutorialGuard
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -50,8 +51,16 @@ internal fun BarButton(
         contentAlignment = Alignment.Center,
     ) {
         if (app.absentmotion.platform.PlatformFeatures.desktop && (hint ?: description).isNotEmpty()) {
-            app.absentmotion.platform.Hint(hint ?: description) { Box(Modifier.fillMaxSize(), Alignment.Center) { Icon(icon, description, Modifier.size(iconSize), tint = Am.OnDark) } }
-        } else Icon(icon, description, Modifier.size(iconSize), tint = Am.OnDark)
+            app.absentmotion.platform.Hint(hint ?: description) {
+                Box(Modifier.fillMaxSize(), Alignment.Center) {
+                    Icon(icon, description, Modifier.size(iconSize), tint = Am.OnDark)
+                    if (onLongClick == null) HoldName(description)
+                }
+            }
+        } else {
+            Icon(icon, description, Modifier.size(iconSize), tint = Am.OnDark)
+            if (onLongClick == null) HoldName(description)
+        }
     }
 }
 

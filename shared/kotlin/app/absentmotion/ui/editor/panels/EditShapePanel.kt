@@ -156,9 +156,9 @@ private fun LabelTile(edit: ShapeEdit, active: Boolean, topPad: Dp, onActivate: 
 }
 
 @Composable
-private fun ValueTile(text: String, topPad: Dp, onClick: () -> Unit) {
+private fun ValueTile(text: String, topPad: Dp, onSelect: () -> Unit, onType: () -> Unit) {
     Box(
-        Modifier.padding(top = topPad).size(158.px, 127.px).clip(PanelShape).background(ValueTileBg).clickable(onClick = onClick),
+        Modifier.padding(top = topPad).size(158.px, 127.px).clip(PanelShape).background(ValueTileBg).typeOnDoubleTap(onSelect = onSelect, onType = onType),
         contentAlignment = Alignment.CenterEnd,
     ) {
         Text(text, Modifier.padding(end = 26.px), color = Am.OnDark, fontSize = 13.5.sp, maxLines = 1, softWrap = false)
@@ -181,7 +181,7 @@ private fun NumberRow(edit: ShapeEdit, active: Boolean, onActivate: () -> Unit) 
             tickSpacing = 5.33.dp,
         )
         Spacer(Modifier.width(3.px))
-        ValueTile(edit.show(edit.values[0]), RowTop) {
+        ValueTile(edit.show(edit.values[0]), RowTop, onActivate) {
             onActivate()
             edit.openKeypad(0)
         }
@@ -216,10 +216,10 @@ private fun PairRow(edit: ShapeEdit, active: Boolean, onActivate: () -> Unit) {
             for (i in 0..1) {
                 val on = box == i
                 Box(
-                    Modifier.fillMaxWidth().height(57.px).clip(PanelShape).background(if (on) PanelDark else Am.PanelInset).clickable {
-                        if (active && on) edit.openKeypad(i)
+                    Modifier.fillMaxWidth().height(57.px).clip(PanelShape).background(if (on) PanelDark else Am.PanelInset).typeOnDoubleTap(onSelect = { box = i; onActivate() }) {
                         box = i
                         onActivate()
+                        edit.openKeypad(i)
                     },
                     contentAlignment = Alignment.CenterEnd,
                 ) {
@@ -253,7 +253,7 @@ private fun CountRow(edit: ShapeEdit, active: Boolean, onActivate: () -> Unit) {
             Modifier.width(483.px).fillMaxHeight(),
         )
         Spacer(Modifier.width(23.px))
-        ValueTile(edit.show(edit.values[0]), top) {
+        ValueTile(edit.show(edit.values[0]), top, onActivate) {
             onActivate()
             edit.openKeypad(0)
         }

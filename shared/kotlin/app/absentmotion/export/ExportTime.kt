@@ -9,6 +9,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import kotlin.math.abs
 import kotlin.math.ln
+import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
 internal const val DefaultSetupMs = 300L
@@ -97,16 +98,83 @@ class ExportSizes(context: Context) {
     }
 }
 
-internal fun exportSecondsLeft(elapsedS: Double, progress: Float, plannedMs: Long?): Int? {
-    if (progress >= 1f) return 0
-    val planned = plannedMs?.takeIf { it > 0 }?.let { it / 1000.0 }
-    val measured = if (progress > 0.01f) elapsedS / progress else null
-    val trust = (progress / 0.25f).coerceIn(0f, 1f).toDouble()
-    val total = when {
-        planned != null && measured != null -> planned * (1 - trust) + measured * trust
-        else -> measured ?: planned ?: return null
+private const val WarmUpNs = 1_000_000_000L
+private const val WindowNs = 5_000_000_000L
+private const val TrustNs = 6_000_000_000L
+private const val HoldNs = 1_000_000_000L
+private const val RecentWeight = 0.5
+private const val DownSeconds = 1.0
+private const val UpSeconds = 3.0
+private const val StallNs = 3_000_000_000L
+private const val MostSeconds = 6000.0
+
+internal class ExportClock(private val plannedMs: Long?, private val startNs: Long = System.nanoTime(), private val skipsStalls: Boolean = true) {
+    private class Sample(val busyNs: Long, val done: Float)
+
+    private var lastDone = 0f
+    private var reports = 0
+    private var firstNs = 0L
+    private var lastNs = 0L
+    private var busyNs = 0L
+    private var asideNs = 0L
+    private var origin: Sample? = null
+    private val recent = ArrayDeque<Sample>()
+    private var leftAtLast = Double.NaN
+    private var shown = Double.NaN
+    private var shownNs = 0L
+
+    @Synchronized fun add(done: Float, nowNs: Long = System.nanoTime()) {
+        if (done < lastDone) restart()
+        if (done <= lastDone) return
+        lastDone = done
+        val usualNs = usualGapNs()
+        var gapNs = nowNs - lastNs
+        lastNs = nowNs
+        if (reports++ == 0) firstNs = nowNs
+        val start = origin ?: run {
+            if (nowNs - firstNs >= WarmUpNs) origin = Sample(0L, done).also(recent::addLast)
+            return
+        }
+        if (skipsStalls) {
+            val restoredNs = if (gapNs > 2 * usualNs) asideNs else 0L
+            asideNs = (gapNs - maxOf(HoldNs, 8 * usualNs)).coerceAtLeast(0L)
+            gapNs += restoredNs - asideNs
+        }
+        busyNs += gapNs
+        recent.addLast(Sample(busyNs, done))
+        val windowNs = maxOf(WindowNs, busyNs / 3)
+        while (recent.size > 2 && recent[1].busyNs <= busyNs - windowNs) recent.removeFirst()
+        val from = recent.first()
+        val recentPace = (busyNs - from.busyNs) / (done - from.done).toDouble()
+        val overallPace = busyNs / (done - start.done).toDouble()
+        val measured = (RecentWeight * recentPace + (1 - RecentWeight) * overallPace) * (1 - done) / 1e9
+        val trust = (busyNs.toDouble() / TrustNs).coerceAtLeast(done.toDouble()).coerceAtMost(1.0)
+        leftAtLast = planLeft(nowNs)?.let { it + (measured - it) * trust } ?: measured
     }
-    return (total - elapsedS).coerceAtLeast(0.0).roundToLong().toInt()
+
+    @Synchronized fun secondsLeft(nowNs: Long = System.nanoTime()): Int? {
+        if (lastDone >= 1f) return 0
+        val target = (if (leftAtLast.isNaN()) planLeft(nowNs) else leftAtLast - minOf(nowNs - lastNs, maxOf(HoldNs, 3 * usualGapNs())) / 1e9)?.coerceAtLeast(0.0)
+        if (target == null || !skipsStalls && (nowNs - lastNs > StallNs || target >= MostSeconds)) {
+            shown = Double.NaN
+            return null
+        }
+        shown = if (shown.isNaN()) target else {
+            val dt = (nowNs - shownNs) / 1e9
+            val counted = (shown - dt).coerceAtLeast(0.0)
+            counted + (target - counted) * (dt / if (target > counted) UpSeconds else DownSeconds).coerceAtMost(1.0)
+        }
+        shownNs = nowNs
+        return shown.roundToInt()
+    }
+
+    private fun restart() {
+        lastDone = 0f; reports = 0; busyNs = 0L; asideNs = 0L; origin = null; recent.clear(); leftAtLast = Double.NaN
+    }
+
+    private fun usualGapNs(): Long = if (reports > 1) (lastNs - firstNs) / (reports - 1) else 0L
+
+    private fun planLeft(nowNs: Long): Double? = plannedMs?.takeIf { it > 0 }?.let { (it / 1000.0 - (nowNs - startNs) / 1e9).coerceAtLeast(0.0) }
 }
 
 fun timeLabel(ms: Long): UiText = when {
@@ -153,7 +221,7 @@ class ExportTimes(context: Context) {
 
     fun estimateMs(
         s: ExportSettings, scene: Scene, probe: ProbeResult? = DeviceCapabilities.of(app).report.value?.probe,
-        thermal: ThermalLevel = ThermalLevel.Normal, encoders: DeviceReport? = null, drawMs: Double? = null,
+        thermal: ThermalLevel = ThermalLevel.Normal, encoders: DeviceReport? = null, drawMs: Double? = null, aiMs: Long = 0,
     ): Long? {
         val (w, h) = exportSize(scene, s.shortSide, even = true)
         val frames = frameCount(scene, s.fps)
@@ -162,6 +230,6 @@ class ExportTimes(context: Context) {
         val proven = history.any { it.codec == s.codec && it.width == w && it.height == h && it.fps == s.fps && it.interpolation == s.interpolation }
         val floor = encoders?.takeIf { !proven }?.let { report -> report.encodeSize(s, w, h).let { (ew, eh) -> encoderFloorMs(report.encoderFor(s.codec, ew, eh), ew, eh, s.fps, frames) } }
         val drawing = drawMs?.let { (DefaultSetupMs + frames * it).roundToLong() }
-        return listOfNotNull(learned, floor, drawing).maxOrNull()?.let { it + pauseMs(thermal) * frames }
+        return listOfNotNull(learned, floor?.plus(aiMs), drawing?.plus(aiMs)).maxOrNull()?.let { it + pauseMs(thermal) * frames }
     }
 }

@@ -267,6 +267,23 @@ int main() {
         const Wiggle other = Shake(1, 4, 7, 0.10f, 10, 1, 30, 4, 0);
         check(!near(a.x, other.x) || !near(a.y, other.y), "letters shake apart from each other");
     }
+    {
+        const auto rows = [](float before, int count) { return SpaceRows(before, 10, count, 100); };
+        check(rows(40, 6) == std::vector<int>{6}, "spaces that fit stay on the line");
+        check(rows(40, 7) == std::vector<int>({6, 1}), "the first space past the edge starts the next line");
+        check(rows(40, 30) == std::vector<int>({6, 10, 10, 4}), "a long run fills whole lines and ends on a short one");
+        check(rows(0, 25) == std::vector<int>({10, 10, 5}), "a run at the start of a line fills it from the edge");
+        check(rows(100, 3) == std::vector<int>({0, 3}), "after a full line every space moves down");
+        check(rows(130, 3) == std::vector<int>({0, 3}), "a line already past the edge keeps its text and moves its spaces down");
+        const std::vector<int> many = rows(55, 500);
+        int total = 0;
+        for (int n : many) total += n;
+        check(total == 500 && many.size() == 51 && many[0] == 4 && many.back() == 6, "hundreds of spaces keep their count over many lines");
+        check(SpaceRows(0, 150, 3, 100) == std::vector<int>({1, 1, 1}), "a space wider than the box still takes one per line");
+        check(SpaceRows(40, 0, 7, 100) == std::vector<int>{7} && SpaceRows(40, NAN, 7, 100) == std::vector<int>{7}, "no measured width keeps the line");
+        check(SpaceRows(40, 10, 0, 100) == std::vector<int>{0}, "no spaces keeps the line");
+        check(SpaceRows(40, 10.0f / 3, 18, 100) == std::vector<int>{18}, "rounding at the edge still fits");
+    }
     if (failures) return 1;
     printf("textanim: all checks passed\n");
     return 0;

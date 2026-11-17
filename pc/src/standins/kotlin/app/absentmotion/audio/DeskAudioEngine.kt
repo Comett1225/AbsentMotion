@@ -41,6 +41,7 @@ class AudioEngine(context: Context) {
 
     init {
         TextBlips.dir = java.io.File(this.context.cacheDir, "text-blips")
+        TextBlips.context = this.context
         TextBlips.listeners += blipsReady
         ExportAudio.mixFor = { scene, rate -> OfflineMix.of(this.context, scene, Resampler.ULTRA, rate) }
         DeskOutput.warm()

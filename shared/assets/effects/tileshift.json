@@ -65,7 +65,23 @@
    "min": 0,
    "max": 5,
    "step": 0.01
+  },
+  {
+   "id": "screenSpace",
+   "label": "Screen Space",
+   "type": "switch",
+   "default": false
+  },
+  {
+   "id": "edges",
+   "label": "Edges",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Mirror",
+    "Clear"
+   ]
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float strength;\nuniform float2 offset;\nuniform float count;\nuniform float2 stretch;\nuniform float angle;\nuniform float seed;\nfloat hash12(float2 p) {\n    float3 q = fract(float3(p.xyx) * 0.1031);\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.x + q.y) * q.z);\n}\nfloat2 hash22(float2 p) {\n    float3 q = fract(float3(p.xyx) * float3(0.1031, 0.1030, 0.0973));\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.xx + q.yz) * q.zy);\n}\nhalf4 main(float2 coord) {\n    float cell = size.y / (2.475 * max(count, 0.5));\n    float a = radians(angle);\n    float cs = cos(a);\n    float sn = sin(a);\n    float2 c = size * 0.5 + offset;\n    float2 p = coord - c;\n    p = float2(cs * p.x + sn * p.y, -sn * p.x + cs * p.y);\n    float2 dims = max(abs(stretch), float2(0.01)) * cell;\n    float2 g = p / dims;\n    float2 n = floor(g);\n    float2 h = hash22(n + seed * 13.17);\n    float t = h.x * 6.2831853;\n    float2 d = float2(cos(t), sin(t)) * h.y * strength * min(size.x, size.y);\n    float2 inside = step(float2(0.0), coord) * step(coord, size);\n    return image.eval(coord + d) * half(inside.x * inside.y);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float4 screen;\nuniform float time;\nuniform float strength;\nuniform float2 offset;\nuniform float count;\nuniform float2 stretch;\nuniform float angle;\nuniform float seed;\nuniform float screenSpace;\nuniform float edges;\nfloat hash12(float2 p) {\n    float3 q = fract(float3(p.xyx) * 0.1031);\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.x + q.y) * q.z);\n}\nfloat2 hash22(float2 p) {\n    float3 q = fract(float3(p.xyx) * float3(0.1031, 0.1030, 0.0973));\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.xx + q.yz) * q.zy);\n}\nhalf4 main(float2 coord) {\n    bool onScreen = screenSpace > 0.5;\n    float cell = (onScreen ? screen.w : size.y) / (2.475 * max(count, 0.5));\n    float a = radians(angle);\n    float cs = cos(a);\n    float sn = sin(a);\n    float2 c = (onScreen ? screen.xy + screen.zw * 0.5 : size * 0.5) + offset;\n    float2 p = coord - c;\n    p = float2(cs * p.x + sn * p.y, -sn * p.x + cs * p.y);\n    float2 dims = max(abs(stretch), float2(0.01)) * cell;\n    float2 g = p / dims;\n    float2 n = floor(g);\n    float2 h = hash22(n + seed * 13.17);\n    float t = h.x * 6.2831853;\n    float2 d = float2(cos(t), sin(t)) * h.y * strength * (onScreen ? min(screen.z, screen.w) : min(size.x, size.y));\n    float2 inside = step(float2(0.0), coord) * step(coord, size);\n    float2 q = coord + d;\n    if (edges > 0.5 && (q.x < 0.0 || q.y < 0.0 || q.x > size.x || q.y > size.y)) return half4(0.0);\n    return image.eval(q) * half(inside.x * inside.y);\n}\n"
 }

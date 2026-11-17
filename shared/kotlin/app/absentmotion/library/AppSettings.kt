@@ -4,6 +4,7 @@ import app.absentmotion.R
 import app.absentmotion.i18n.UiText
 import app.absentmotion.i18n.txt
 import app.absentmotion.platform.Context
+import app.absentmotion.ui.theme.Accents
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Palette
 import app.absentmotion.ui.theme.Themes
@@ -37,11 +38,31 @@ class AppSettings(private val context: Context) {
     private var themeState by mutableStateOf(Themes.firstChoice(prefs.getString("theme", null), prefs.getInt("onboarding", 0), prefs.getBoolean("lookChosen", false)))
     private var systemDarkState by mutableStateOf(app.absentmotion.platform.systemDark(context))
     private var customThemeState by mutableStateOf(Themes.custom(context)?.let { it.name ?: "" })
+    private var accentState by mutableStateOf(prefs.getString("accent", null)?.toLongOrNull(16)?.toInt())
+    private var uiFontState by mutableStateOf(prefs.getString("uiFont", null))
+
+    private fun look(accent: Int? = accentState) = Accents.apply(Themes.palette(context, themeState, systemDarkState), accent)
 
     init {
         if (!prefs.contains("theme")) prefs.edit().putString("theme", themeState).apply()
-        Am.palette = Themes.palette(context, themeState, systemDarkState)
+        Am.palette = look()
     }
+
+    var accent: Int?
+        get() = accentState
+        set(value) {
+            accentState = value
+            prefs.edit().putString("accent", value?.let(Integer::toHexString)).apply()
+            Am.palette = look()
+        }
+
+    fun showAccent(value: Int) { Am.palette = look(value) }
+
+    val themeAccent: androidx.compose.ui.graphics.Color get() = Themes.palette(context, themeState, systemDarkState).HomeAccent
+
+    var uiFont: String?
+        get() = uiFontState
+        set(value) { uiFontState = value; prefs.edit().putString("uiFont", value).apply() }
 
     private var savedColoursState by mutableStateOf(
         prefs.getString("savedColours", null)?.split(',')?.mapNotNull { it.toIntOrNull() } ?: listOf(0x264653, 0x2A9D8F, 0xE9C46A, 0xE76F51),
@@ -212,14 +233,14 @@ class AppSettings(private val context: Context) {
             themeState = value
             prefs.edit().putString("theme", value).apply()
             if (value == Themes.SYSTEM) systemDarkState = app.absentmotion.platform.systemDark(context)
-            Am.palette = Themes.palette(context, value, systemDarkState)
+            Am.palette = look()
         }
 
     var systemDark: Boolean
         get() = systemDarkState
         set(value) {
             systemDarkState = value
-            if (themeState == Themes.SYSTEM) Am.palette = Themes.palette(context, themeState, value)
+            if (themeState == Themes.SYSTEM) Am.palette = look()
         }
 
     val themes: List<Pair<String, UiText>>
@@ -298,6 +319,7 @@ class AppSettings(private val context: Context) {
 
     companion object {
         val LAYER_DURATIONS = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 45, 60)
+        fun vibrates(context: Context) = context.getSharedPreferences("settings", Context.MODE_PRIVATE).getBoolean("trimLimitVibration", true)
     }
 }
 

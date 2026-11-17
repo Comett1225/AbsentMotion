@@ -17,14 +17,14 @@
 <p>新增選單中的 <strong>手繪筆刷</strong> 會建立繪圖圖層，並開啟繪圖編輯器。</p>
 <ul><li><strong>鋼筆</strong>繪製均勻的線條，<strong>筆刷</strong>會依壓力改變線寬，<strong>填色</strong>會將您繪製的封閉圈轉為填色形狀，而<strong>橡皮擦</strong>則會移除部分內容。</li><li>大小滑桿（1 到 300），以及附有色相條與不透明度條的顏色選擇器。</li><li>頂端有 <strong>復原</strong> 與 <strong>重做</strong>。每一筆在您抬起手指時都會被保留。</li><li>工具、大小與顏色會被記住。若未繪製任何內容就離開，會刪除新建立的圖層。</li></ul>
 <figure><img src="../assets/img/shapes-draw.webp" width="720" height="1077" alt="繪圖編輯器：四種工具 (1)、大小滑桿 (2)、顏色選擇器 (3)。" loading="lazy"><figcaption>繪圖編輯器：四種工具 (1)、大小滑桿 (2)、顏色選擇器 (3)。</figcaption></figure>
-<p>繪圖本身沒有關鍵影格。若要為繪圖製作動畫，請使用如「繪圖進度」之類的特效；請參閱<a href="effects/index.html">特效庫</a>。</p>
+<p>繪圖本身沒有關鍵影格。若要為繪圖製作動畫，請使用如「繪製進度」之類的特效；請參閱<a href="effects/index.html">特效庫</a>。</p>
 <h2 id="svg-files">SVG 檔案</h2>
 <p>新增選單中的 <strong>匯入SVG</strong> 會將向量圖轉換為形狀。保留的內容請參閱<a href="add-menu.html">新增選單</a>。</p>
 <h2 id="masks-and-clipping">遮罩與剪裁</h2>
-<ul><li><strong>建立剪裁遮罩</strong>（圖層選單）會將圖層裁剪為其正下方圖層的形狀。<strong>釋放剪裁遮罩</strong>會將其復原。在時間軸中，被剪裁的圖層會在其列的末端顯示一個小型彎鉤箭頭，指向其被剪裁所依附的圖層。</li><li><strong>群組並遮罩</strong>與<strong>群組並排除</strong>（多選）會將圖層群組，並將最上層圖層的混合模式設為遮罩或排除。您也可以在任何圖層的<strong>不透明度</strong>中，將混合模式設為<strong>遮罩</strong>或<strong>排除</strong>。<strong>遮罩</strong>只會保留該圖層所在位置的下方內容；<strong>排除</strong>則會將其切除。</li><li>動畫遮罩來自形狀關鍵影格（見上文）。</li><li>相片與影片的<strong>移除背景</strong>請參閱 <a href="ai-tools.html">AI 工具</a>。</li></ul>
+<ul><li><strong>建立剪裁遮罩</strong>（圖層選單）會將圖層裁剪為其正下方圖層的形狀。<strong>釋放剪裁遮罩</strong>會將其復原。在時間軸中，被剪裁的圖層會在其列的末端顯示一個小型彎鉤箭頭，指向其被剪裁所依附的圖層。</li><li><strong>群組並遮罩</strong>與<strong>群組並挖空</strong>（多選）會將圖層群組，並將最上層圖層的混合模式設為遮罩或挖空。您也可以在任何圖層的<strong>不透明度</strong>中，將混合模式設為<strong>遮罩</strong>或<strong>挖空</strong>。<strong>遮罩</strong>只會保留該圖層所在位置的下方內容；<strong>挖空</strong>則會將其切除。</li><li>動畫遮罩來自形狀關鍵影格（見上文）。</li><li>相片與影片的<strong>移除背景</strong>請參閱 <a href="ai-tools.html">AI 工具</a>。</li></ul>
 <figure><img src="../assets/img/sh-clip-marker.webp" width="720" height="320" alt="被剪裁的圖層：它的箭頭 (1) 向下指向所剪裁的圖層 (2)。" loading="lazy"><figcaption>被剪裁的圖層：它的箭頭 (1) 向下指向所剪裁的圖層 (2)。</figcaption></figure>
 <h2 id="groups-and-parents">群組與父圖層</h2>
-<ul><li><strong>群組</strong>（多選）會將圖層放入一個群組圖層。您可以將群組整體移動、縮放、淡入淡出，並為其新增特效。請參閱<a href="layer-menus.html">圖層選單與多選</a>。</li><li><strong>父圖層</strong>（頂端列的父圖層按鈕）可讓一個圖層跟隨另一個圖層，而無需群組。移動類特效<strong>父層輔助</strong>與<strong>縮放輔助</strong>會改變子圖層跟隨父圖層的方式：請參閱<a href="effects-guide.html">使用特效</a>。</li><li><strong>空物件</strong>圖層（新增 &gt; 物件／素材）是不可見的。將它設為其他圖層的父圖層，即可一起移動它們，或讓<a href="tracking.html">動態追蹤</a>來移動它。</li></ul>
+<ul><li><strong>群組</strong>（多選）會將圖層放入一個群組圖層。您可以將群組整體移動、縮放、淡入淡出，並為其新增特效。請參閱<a href="layer-menus.html">圖層選單與多選</a>。</li><li><strong>父圖層</strong>（頂端列的父圖層按鈕）可讓一個圖層跟隨另一個圖層，而無需群組。移動類特效<strong>父子關係輔助</strong>與<strong>縮放輔助</strong>會改變子圖層跟隨父圖層的方式：請參閱<a href="effects-guide.html">使用特效</a>。</li><li><strong>空物件</strong>圖層（新增 &gt; 物件／素材）是不可見的。將它設為其他圖層的父圖層，即可一起移動它們，或讓<a href="tracking.html">動態追蹤</a>來移動它。</li></ul>
 <h3 id="edit-a-group">編輯群組</h3>
 <p>選取群組，然後在其工具中點選 <strong>編輯群組</strong> 以開啟。在群組內，時間軸與預覽只會顯示該群組的圖層，您可以像編輯其他圖層一樣變更它們。您也可以在群組中再開啟另一個群組。</p>
 <ul><li>頂端列會顯示您目前所在的位置：專案名稱，接著是每個已開啟群組的名稱。點選專案名稱即可回到整個專案，點選群組名稱則可回到該群組。</li><li>選取圖層時，圖層名稱旁會出現一個顯示群組名稱的小膠囊。點選它即可離開群組。</li><li>未選取任何項目時，手機的返回鍵會離開您目前所在的群組。</li><li>齒輪圖示會開啟您目前所在群組的設定。其中只有一項設定，即<strong>重新計時</strong>：請見下文。</li></ul>

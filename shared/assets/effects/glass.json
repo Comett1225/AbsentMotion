@@ -3,7 +3,7 @@
  "name": "Glass",
  "category": "distort",
  "since": "3.0.0",
- "description": "Turns the layer's shape into beveled glass that bends the layers behind it, with a highlight along the rim.",
+ "description": "Turns the layer's shape into beveled glass that bends the layers behind it, with a highlight along the rim. Light Soft shows the layer at Fill and lights the glass with Color, brightest along the inner edge of the bevel that faces the light.",
  "params": [
   {
    "id": "blur",
@@ -59,7 +59,32 @@
    "max": 1,
    "step": 0.001,
    "percent": true
+  },
+  {
+   "id": "light",
+   "label": "Light",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Rim",
+    "Soft"
+   ]
+  },
+  {
+   "id": "fill",
+   "label": "Fill",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "percent": true,
+   "when": {
+    "light": [
+     1
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader blurred;\nuniform shader backdrop;\nuniform float blur;\nuniform float refraction;\nuniform float angle;\nuniform float highlight;\nlayout(color) uniform half4 color;\nuniform float tint;\nfloat h(float2 p) { return float(blurred.eval(p).a); }\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return half4(0.0);\n    float e = max(blur * 0.15, 1.0);\n    float2 g = float2(h(coord + float2(e, 0.0)) - h(coord - float2(e, 0.0)), h(coord + float2(0.0, e)) - h(coord - float2(0.0, e))) / (2.0 * e);\n    float3 n = normalize(float3(-g * max(blur, 1.0), 1.0));\n    half4 bg = backdrop.eval(coord - n.xy * refraction);\n    float3 rgb = bg.a > 0.0 ? float3(bg.rgb) / float(bg.a) : float3(0.0);\n    rgb = mix(rgb, rgb * float3(color.rgb), clamp(tint, 0.0, 1.0) * float(color.a));\n    float a = radians(angle);\n    float3 l = normalize(float3(cos(a), -sin(a), 0.6));\n    float spec = pow(max(dot(reflect(-l, n), float3(0.0, 0.0, 1.0)), 0.0), 30.0);\n    float shine = clamp((spec + (1.0 - n.z) * 0.5) * highlight, 0.0, 1.0);\n    float alpha = max(float(bg.a), shine);\n    rgb = clamp(rgb * float(bg.a) / max(alpha, 0.001) + shine, 0.0, 1.0);\n    return half4(half3(rgb * alpha), half(alpha)) * src.a;\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader blurred;\nuniform shader backdrop;\nuniform float blur;\nuniform float refraction;\nuniform float angle;\nuniform float highlight;\nlayout(color) uniform half4 color;\nuniform float tint;\nuniform float light;\nuniform float fill;\nfloat h(float2 p) { return float(blurred.eval(p).a); }\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return half4(0.0);\n    float e = max(blur * 0.15, 1.0);\n    float2 g = float2(h(coord + float2(e, 0.0)) - h(coord - float2(e, 0.0)), h(coord + float2(0.0, e)) - h(coord - float2(0.0, e))) / (2.0 * e);\n    float3 n = normalize(float3(-g * max(blur, 1.0), 1.0));\n    half4 bg = backdrop.eval(coord - n.xy * refraction);\n    float3 rgb = bg.a > 0.0 ? float3(bg.rgb) / float(bg.a) : float3(0.0);\n    if (light > 0.5) {\n        float r = max(blur, 1.0);\n        float q = sqrt(-2.0 * log(1.0 - clamp(h(coord), 0.5, 0.99999)));\n        float d = r / 3.0 * (q - (2.515517 + 0.802853 * q + 0.010328 * q * q) / (1.0 + 1.432788 * q + 0.189269 * q * q + 0.001308 * q * q * q));\n        float t = clamp(d / r, 0.0, 1.0);\n        float s = radians(angle);\n        float c = length(g) > 0.0 ? dot(-normalize(g), float2(cos(s), -sin(s))) : 0.0;\n        float edge = 0.376 + 0.255 * c;\n        float k = (t - 0.812 + 0.282 * c) / 0.192;\n        float glow = tint * (edge + (1.0 - edge) * pow(t, 1.609)) + highlight * pow(max(c, 0.0), 2.581) * exp(-k * k);\n        float body = mix(float(bg.a), 1.0, fill);\n        float3 own = float3(unpremul(src).rgb);\n        float3 seen = (rgb * float(bg.a) * (1.0 - fill) + own * fill) / max(body, 0.001);\n        float3 lit = pow(pow(max(seen, 0.0), float3(2.2)) + glow * float(color.a) * pow(float3(color.rgb), float3(2.2)), float3(1.0 / 2.2));\n        float shown = max(body, clamp(glow, 0.0, 1.0));\n        return half4(half3(clamp(lit, 0.0, 1.0) * shown), half(shown)) * src.a;\n    }\n    rgb = mix(rgb, rgb * float3(color.rgb), clamp(tint, 0.0, 1.0) * float(color.a));\n    float a = radians(angle);\n    float3 l = normalize(float3(cos(a), -sin(a), 0.6));\n    float spec = pow(max(dot(reflect(-l, n), float3(0.0, 0.0, 1.0)), 0.0), 30.0);\n    float shine = clamp((spec + (1.0 - n.z) * 0.5) * highlight, 0.0, 1.0);\n    float alpha = max(float(bg.a), shine);\n    rgb = clamp(rgb * float(bg.a) / max(alpha, 0.001) + shine, 0.0, 1.0);\n    return half4(half3(rgb * alpha), half(alpha)) * src.a;\n}\n"
 }

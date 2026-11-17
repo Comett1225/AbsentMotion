@@ -107,7 +107,7 @@ internal fun DeskLibrary(state: EditorState, library: AddLibrary, tab: Int, modi
     Column(modifier.background(Am.Panel)) {
         Row(Modifier.fillMaxWidth().height(44.dp).padding(start = 12.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(Sections[tab].title), Modifier.weight(1f), color = Am.OnDark, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            DeskIcon(ChromeIcons.Close, deskShortcut(R.string.action_close, "${DeskMod}1"), action = close)
+            DeskIcon(ChromeIcons.Close, deskShortcut(R.string.action_close, deskKeys("Library", "${DeskMod}1")), action = close)
         }
         Box(Modifier.weight(1f).fillMaxWidth().tutorialTarget(when (tab) { 0 -> "lib_media"; 1 -> "lib_audio"; 3 -> "lib_text"; else -> null })) {
             when (tab) {

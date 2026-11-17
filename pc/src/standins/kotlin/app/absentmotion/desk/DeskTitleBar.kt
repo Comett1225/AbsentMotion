@@ -327,16 +327,16 @@ private object WindowGlyphs {
         .addPath(addPathNodes(path), stroke = SolidColor(Color.White), strokeLineWidth = 1.6f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round).build()
 }
 
-data class MenuKey(val key: Key, val command: Boolean = true, val alt: Boolean = false)
+data class MenuKey(val key: Key, val command: Boolean = true, val alt: Boolean = false, val shift: Boolean = false)
 
 class DeskMenuItem(val label: String, val enabled: Boolean = true, val keys: MenuKey? = null, val children: List<DeskMenuItem>? = null, val run: () -> Unit = {}) {
-    val shortcut: KeyShortcut? get() = keys?.let { KeyShortcut(it.key, meta = it.command && DeskOs.mac, ctrl = it.command && !DeskOs.mac, alt = it.alt) }
+    val shortcut: KeyShortcut? get() = keys?.let { KeyShortcut(it.key, meta = it.command && DeskOs.mac, ctrl = it.command && !DeskOs.mac, alt = it.alt, shift = it.shift) }
 
     companion object { val Separator = DeskMenuItem("") }
 }
 
 fun deskMenus(app: DeskAppState, scope: kotlinx.coroutines.CoroutineScope): List<DeskMenuItem> {
-    fun key(k: Key) = MenuKey(k)
+    fun key(action: Shortcut) = DeskShortcuts.keys(action).firstOrNull()
     fun t(id: Int) = AppText.get(id)
     val editor = app.editor
     val chosen = editor?.chosenLayers?.isNotEmpty() == true
@@ -345,8 +345,8 @@ fun deskMenus(app: DeskAppState, scope: kotlinx.coroutines.CoroutineScope): List
     val separator = DeskMenuItem.Separator
     return listOf(
         DeskMenuItem(t(R.string.desk_menu_file), children = listOfNotNull(
-            DeskMenuItem(t(R.string.desk_menu_new_project), editor == null, key(Key.N)) { app.newProjectTick++ },
-            DeskMenuItem(t(R.string.settings) + "…", keys = key(Key.Comma)) { app.openSettings() },
+            DeskMenuItem(t(R.string.desk_menu_new_project), editor == null, key(Shortcut.NewProject)) { app.newProjectTick++ },
+            DeskMenuItem(t(R.string.settings) + "…", keys = key(Shortcut.Settings)) { app.openSettings() },
             separator,
             DeskMenuItem(t(R.string.desk_menu_import_media), editor != null) {
                 val files = DeskFiles.chooseFiles(media = true, multiple = true).map(Uri::fromFile)
@@ -359,9 +359,9 @@ fun deskMenus(app: DeskAppState, scope: kotlinx.coroutines.CoroutineScope): List
             DeskMenuItem(t(R.string.desk_menu_link_folder)) { linkMediaFolder() },
             if (linked.isEmpty()) null else DeskMenuItem(t(R.string.desk_menu_unlink_folder), children = linked.map { folder -> DeskMenuItem(folder.name.ifEmpty { folder.path }) { DeskLibrary.unlink(folder) } }),
             separator,
-            DeskMenuItem(t(R.string.export) + "…", editor != null, key(Key.E)) { editor?.let { it.playing = false; it.exportOpen = true } },
-            DeskMenuItem(t(R.string.desk_menu_close_project), editor != null, key(Key.W)) { app.closeSoon() },
-        ) + if (DeskOs.mac) emptyList() else listOf(separator, DeskMenuItem(t(R.string.desk_export_quit), true, key(Key.Q)) { app.requestQuit() })),
+            DeskMenuItem(t(R.string.export) + "…", editor != null, key(Shortcut.Export)) { editor?.let { it.playing = false; it.exportOpen = true } },
+            DeskMenuItem(t(R.string.desk_menu_close_project), editor != null, key(Shortcut.CloseProject)) { app.closeSoon() },
+        ) + if (DeskOs.mac) emptyList() else listOf(separator, DeskMenuItem(t(R.string.desk_export_quit), true, key(Shortcut.Quit)) { app.requestQuit() })),
         DeskMenuItem(t(R.string.history_edit), children = listOf(
             DeskMenuItem(t(R.string.draw_undo), editor?.canUndo == true) { editor?.undo() },
             DeskMenuItem(t(R.string.draw_redo), editor?.canRedo == true) { editor?.redo() },
@@ -374,17 +374,17 @@ fun deskMenus(app: DeskAppState, scope: kotlinx.coroutines.CoroutineScope): List
             DeskMenuItem(t(R.string.delete), picked) { editor?.let { if (MultiSelect.active) it.deleteChosen() else it.deleteSelected() } },
         )),
         DeskMenuItem(t(R.string.desk_menu_view), children = listOf(
-            DeskMenuItem(t(R.string.desk_menu_zoom_in), DeskScale.percent < DeskScale.MAX, key(Key.Equals)) { DeskScale.zoomIn() },
-            DeskMenuItem(t(R.string.desk_menu_zoom_out), DeskScale.percent > DeskScale.MIN, key(Key.Minus)) { DeskScale.zoomOut() },
-            DeskMenuItem(t(R.string.desk_menu_actual_size), DeskScale.percent != 100, key(Key.Zero)) { DeskScale.reset() },
+            DeskMenuItem(t(R.string.desk_menu_zoom_in), DeskScale.percent < DeskScale.MAX, key(Shortcut.ZoomIn)) { DeskScale.zoomIn() },
+            DeskMenuItem(t(R.string.desk_menu_zoom_out), DeskScale.percent > DeskScale.MIN, key(Shortcut.ZoomOut)) { DeskScale.zoomOut() },
+            DeskMenuItem(t(R.string.desk_menu_actual_size), DeskScale.percent != 100, key(Shortcut.ActualSize)) { DeskScale.reset() },
         )),
         DeskMenuItem(t(R.string.desk_menu_playback), children = listOf(
             DeskMenuItem(if (editor?.playing == true) t(R.string.export_pause) else t(R.string.export_play), editor != null) { editor?.let { it.playing = !it.playing } },
             DeskMenuItem(t(R.string.desk_menu_go_start), editor != null) { editor?.let { it.playing = false; it.frame = 0 } },
             DeskMenuItem(t(R.string.desk_menu_go_end), editor != null) { editor?.let { it.playing = false; it.frame = it.scene.lastFrame } },
             separator,
-            DeskMenuItem(t(R.string.desk_menu_previous_bookmark), editor != null, MenuKey(Key.DirectionLeft, command = false, alt = true)) { editor?.let { DeskJump.previous(it) } },
-            DeskMenuItem(t(R.string.desk_menu_next_bookmark), editor != null, MenuKey(Key.DirectionRight, command = false, alt = true)) { editor?.let { DeskJump.next(it) } },
+            DeskMenuItem(t(R.string.desk_menu_previous_bookmark), editor != null, key(Shortcut.PreviousBookmark)) { editor?.let { DeskJump.previous(it) } },
+            DeskMenuItem(t(R.string.desk_menu_next_bookmark), editor != null, key(Shortcut.NextBookmark)) { editor?.let { DeskJump.next(it) } },
         )),
         DeskMenuItem(t(R.string.settings_help), children = listOf(
             DeskMenuItem(t(R.string.desk_menu_help)) { app.openSettings(SettingsPage.Help) },
@@ -397,14 +397,18 @@ fun deskMenus(app: DeskAppState, scope: kotlinx.coroutines.CoroutineScope): List
 internal fun shortcutText(shortcut: MenuKey, mac: Boolean): String {
     val key = when (shortcut.key) {
         Key.Comma -> ","
+        Key.Period -> "."
         Key.Equals -> "="
         Key.Minus -> "-"
+        Key.Plus -> "+"
         Key.DirectionLeft -> "←"
         Key.DirectionRight -> "→"
+        Key.DirectionUp -> "↑"
+        Key.DirectionDown -> "↓"
         else -> java.awt.event.KeyEvent.getKeyText(shortcut.key.nativeKeyCode)
     }
-    return if (mac) (if (shortcut.alt) "⌥" else "") + (if (shortcut.command) "⌘" else "") + key
-    else (if (shortcut.command) "Ctrl+" else "") + (if (shortcut.alt) "Alt+" else "") + key
+    return if (mac) (if (shortcut.alt) "⌥" else "") + (if (shortcut.shift) "⇧" else "") + (if (shortcut.command) "⌘" else "") + key
+    else (if (shortcut.command) "Ctrl+" else "") + (if (shortcut.alt) "Alt+" else "") + (if (shortcut.shift) "Shift+" else "") + key
 }
 
 @Composable

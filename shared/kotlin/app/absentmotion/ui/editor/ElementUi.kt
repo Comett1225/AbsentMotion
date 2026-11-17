@@ -55,6 +55,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
+import app.absentmotion.ui.HoldName
 
 internal val PrecomposeOptions = listOf("dynamicResolution" to R.string.element_adaptive_resolution, "fixedResolution" to R.string.element_locked_resolution)
 internal val RetimingOptions = listOf(
@@ -145,7 +146,7 @@ internal fun ElementProperties(state: EditorState, onBack: () -> Unit, modifier:
     }
     Column(modifier.background(Am.Panel)) {
         Row(Modifier.fillMaxWidth().height(40.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(40.dp).clickable(onClick = onBack), Alignment.Center) { Icon(ChromeIcons.Back, stringResource(R.string.topbar_back), Modifier.size(24.dp), tint = Am.OnDark) }
+            Box(Modifier.size(40.dp).clickable(onClick = onBack), Alignment.Center) { Icon(ChromeIcons.Back, stringResource(R.string.topbar_back), Modifier.size(24.dp), tint = Am.OnDark); HoldName(stringResource(R.string.topbar_back)) }
             Text(stringResource(R.string.asset_properties), color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
         }
         Row(Modifier.fillMaxWidth().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {

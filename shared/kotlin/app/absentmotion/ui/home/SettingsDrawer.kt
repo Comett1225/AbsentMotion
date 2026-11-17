@@ -99,7 +99,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import app.absentmotion.library.AppSettings
 import app.absentmotion.library.PreviewQuality
+import app.absentmotion.ui.theme.Accents
 import app.absentmotion.ui.theme.Am
+import androidx.compose.foundation.border
+import androidx.compose.ui.graphics.toArgb
 import app.absentmotion.ui.editor.panels.ThinSwitch
 import app.absentmotion.R
 import app.absentmotion.i18n.currentLanguage
@@ -179,6 +182,8 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
 @Composable
 internal fun EditorSettings(settings: AppSettings) {
     ThemeRow(settings)
+    AccentRow(settings)
+    FontRow(settings)
     DurationRow(settings)
     if (!DESK) SwitchRow(stringResource(R.string.settings_vibration), settings.vibration, enabled = true) { settings.vibration = it }
     SwitchRow(stringResource(R.string.settings_transition_in_preview), settings.transitionInPreview, enabled = true) { settings.transitionInPreview = it }
@@ -634,7 +639,6 @@ private fun DurationRow(settings: AppSettings) {
 private fun ThemeRow(settings: AppSettings) {
     val context = LocalContext.current
     var open by remember { mutableStateOf(false) }
-    val shape = RoundedCornerShape(10.dp)
     val scope = rememberCoroutineScope()
     val picker = rememberDocumentPicker { uri ->
         if (uri != null) {
@@ -652,21 +656,101 @@ private fun ThemeRow(settings: AppSettings) {
         }
     }
     Row(Modifier.fillMaxWidth().heightIn(min = 44.dp).padding(horizontal = 15.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(stringResource(R.string.theme_select), Modifier.weight(1f).padding(end = 8.dp), color = Am.HomeInk, fontSize = if (DESK) 14.sp else 12.sp, fontWeight = if (DESK) FontWeight.Normal else FontWeight.Bold)
-        Box(Modifier.size(if (DESK) 190.dp else 150.dp, if (DESK) 34.dp else 37.dp)) {
-            Row(
-                Modifier.fillMaxSize().clip(shape).background(Am.Card).deskPress(10.dp).clickable { open = true }.padding(start = 10.dp, end = 4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(settings.themeLabel.text(), Modifier.weight(1f), color = Am.Navy, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Icon(HomeIcons.ChevronDown, null, Modifier.size(24.dp), tint = Am.Navy)
-            }
-            RefMenu(open, { open = false }, Am.Navy, shape, Modifier.width(210.dp), maxHeight = 327.dp) {
-                for ((id, label) in settings.themes) ThemeItem(label.text(), id == settings.theme) { open = false; if (id != settings.theme) app.absentmotion.ui.theme.ThemeFade.change { settings.theme = id } }
-                Box(Modifier.fillMaxWidth().height(1.dp).background(ListLineColor))
-                ThemeItem(stringResource(R.string.settings_import_theme), false) { open = false; picker.launch() }
-            }
+        SettingLabel(R.string.theme_select, Modifier.weight(1f))
+        PickerBox(settings.themeLabel.text(), null, open, { open = true }, { open = false }) {
+            for ((id, label) in settings.themes) ThemeItem(label.text(), id == settings.theme) { open = false; if (id != settings.theme) app.absentmotion.ui.theme.ThemeFade.change { settings.theme = id } }
+            Box(Modifier.fillMaxWidth().height(1.dp).background(ListLineColor))
+            ThemeItem(stringResource(R.string.settings_import_theme), false) { open = false; picker.launch() }
         }
+    }
+}
+
+private val AccentNames = listOf(R.string.accent_blue, R.string.accent_green, R.string.accent_purple, R.string.accent_pink)
+
+@Composable
+private fun PickerBox(label: String, swatch: Color?, open: Boolean, onOpen: () -> Unit, onDismiss: () -> Unit, items: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit) {
+    val shape = RoundedCornerShape(10.dp)
+    Box(Modifier.size(if (DESK) 190.dp else 150.dp, if (DESK) 34.dp else 37.dp)) {
+        Row(
+            Modifier.fillMaxSize().clip(shape).background(Am.Card).deskPress(10.dp).clickable(onClick = onOpen).padding(start = 10.dp, end = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            if (swatch != null) Box(Modifier.padding(end = 8.dp).size(16.dp).clip(RoundedCornerShape(50)).background(swatch))
+            Text(label, Modifier.weight(1f), color = Am.Navy, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Icon(HomeIcons.ChevronDown, null, Modifier.size(24.dp), tint = Am.Navy)
+        }
+        RefMenu(open, onDismiss, Am.Navy, shape, Modifier.width(210.dp), maxHeight = 327.dp, content = items)
+    }
+}
+
+@Composable
+private fun SettingLabel(@StringRes label: Int, modifier: Modifier) =
+    Text(stringResource(label), modifier.padding(end = 8.dp), color = Am.HomeInk, fontSize = if (DESK) 14.sp else 12.sp, fontWeight = if (DESK) FontWeight.Normal else FontWeight.Bold)
+
+@Composable
+private fun AccentRow(settings: AppSettings) {
+    var open by remember { mutableStateOf(false) }
+    var picking by remember { mutableStateOf(false) }
+    val current = settings.accent
+    val preset = Accents.Presets.indexOf(current)
+    val ownColour = remember(settings.theme, settings.systemDark) { settings.themeAccent }
+    val label = when {
+        current == null -> stringResource(R.string.accent_default)
+        preset >= 0 -> stringResource(AccentNames[preset])
+        else -> stringResource(R.string.accent_custom)
+    }
+    fun choose(value: Int?) { open = false; if (value != settings.accent) app.absentmotion.ui.theme.ThemeFade.change { settings.accent = value } }
+    Row(Modifier.fillMaxWidth().heightIn(min = 44.dp).padding(horizontal = 15.dp), verticalAlignment = Alignment.CenterVertically) {
+        SettingLabel(R.string.settings_theme_color, Modifier.weight(1f))
+        PickerBox(label, current?.let(::Color) ?: ownColour, open, { open = true }, { open = false }) {
+            ThemeItem(stringResource(R.string.accent_default), current == null, ownColour) { choose(null) }
+            Accents.Presets.forEachIndexed { i, colour -> ThemeItem(stringResource(AccentNames[i]), current == colour, Color(colour)) { choose(colour) } }
+            Box(Modifier.fillMaxWidth().height(1.dp).background(ListLineColor))
+            ThemeItem(stringResource(R.string.accent_custom), current != null && preset < 0, current?.takeIf { preset < 0 }?.let(::Color)) { open = false; picking = true }
+        }
+    }
+    if (picking) AccentPicker(settings, current ?: ownColour.toArgb()) { picking = false }
+}
+
+@Composable
+private fun AccentPicker(settings: AppSettings, start: Int, onClose: () -> Unit) {
+    var latest by remember { androidx.compose.runtime.mutableStateOf<Int?>(null) }
+    val request = remember { app.absentmotion.editor.FullColor(start) { c, drag -> val v = c or 0xFF000000.toInt(); latest = v; if (drag) settings.showAccent(v) else settings.accent = v } }
+    val keep = { latest?.let { settings.accent = it } }
+    val close = { keep(); onClose() }
+    androidx.compose.ui.window.Dialog(close, app.absentmotion.platform.sheetDialogProperties()) {
+        app.absentmotion.ui.editor.PhoneScreen { app.absentmotion.ui.editor.panels.FullColorPicker(settings, request, close, { keep() }) }
+    }
+}
+
+@Composable
+private fun FontRow(settings: AppSettings) {
+    val context = LocalContext.current
+    var open by remember { mutableStateOf(false) }
+    val fonts = remember { app.absentmotion.ui.theme.UiFonts.bundled() + app.absentmotion.fonts.FontLibrary(context).importedFonts() }
+    val current = settings.uiFont
+    val label = current?.let { name -> fonts.firstOrNull { it.xml == name }?.let(::fontLabel) } ?: stringResource(R.string.ui_font_default)
+    fun choose(value: String?) { open = false; settings.uiFont = value }
+    Row(Modifier.fillMaxWidth().heightIn(min = 44.dp).padding(horizontal = 15.dp), verticalAlignment = Alignment.CenterVertically) {
+        SettingLabel(R.string.settings_app_font, Modifier.weight(1f))
+        PickerBox(label, null, open, { open = true }, { open = false }) {
+            ThemeItem(stringResource(R.string.ui_font_default), current == null) { choose(null) }
+            Box(Modifier.fillMaxWidth().height(1.dp).background(ListLineColor))
+            for (font in fonts) ThemeItem(fontLabel(font), font.xml == current) { choose(font.xml) }
+        }
+    }
+}
+
+private fun fontLabel(font: app.absentmotion.fonts.FontName): String = if (font.source == "imported") font.label else font.family
+
+@Composable
+private fun ThemeItem(label: String, chosen: Boolean, swatch: Color?, onClick: () -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().heightIn(min = 40.dp).background(if (chosen) ChosenRow else Color.Transparent).deskPress().clickable(onClick = onClick).padding(horizontal = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(Modifier.padding(end = 10.dp).size(18.dp).clip(RoundedCornerShape(50)).then(if (swatch != null) Modifier.background(swatch) else Modifier.border(1.dp, Am.OnNavy.copy(alpha = 0.5f), RoundedCornerShape(50))))
+        Text(label, color = Am.OnNavy, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 

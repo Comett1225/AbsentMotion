@@ -269,14 +269,14 @@ private val LimitColor get() = Am.Warning
 private val SnapColor get() = Am.Accent
 
 
-private class TimelineStyles {
-    val ruler = TextStyle(color = Am.OnDarkDim, fontSize = 12.sp)
-    val timecode = TextStyle(color = Am.OnDark, fontSize = 14.sp)
-    val label = TextStyle(color = Am.OnBar, fontSize = if (PlatformFeatures.desktop) 12.sp else 11.sp, textDirection = androidx.compose.ui.text.style.TextDirection.Content)
+private class TimelineStyles(font: androidx.compose.ui.text.font.FontFamily?) {
+    val ruler = TextStyle(color = Am.OnDarkDim, fontSize = 12.sp, fontFamily = font)
+    val timecode = TextStyle(color = Am.OnDark, fontSize = 14.sp, fontFamily = font)
+    val label = TextStyle(color = Am.OnBar, fontSize = if (PlatformFeatures.desktop) 12.sp else 11.sp, fontFamily = font, textDirection = androidx.compose.ui.text.style.TextDirection.Content)
     val mediaLabel = label.copy(color = Color.White)
     val audioLabel = label.copy(color = Am.OnAudioBar)
-    val header = TextStyle(color = Am.OnDark, fontSize = 13.sp)
-    val hiddenHeader = TextStyle(color = Am.OnDarkDim, fontSize = 13.sp)
+    val header = TextStyle(color = Am.OnDark, fontSize = 13.sp, fontFamily = font)
+    val hiddenHeader = TextStyle(color = Am.OnDarkDim, fontSize = 13.sp, fontFamily = font)
 }
 
 @Composable
@@ -294,7 +294,8 @@ fun Timeline(state: EditorState, modifier: Modifier = Modifier) {
     view.wide = wide
     view.rail = LocalRail.current
     val measurer = rememberTextMeasurer(cacheSize = if (PlatformFeatures.desktop) 128 else 64)
-    val styles = remember(Am.palette) { TimelineStyles() }
+    val font = androidx.compose.material3.LocalTextStyle.current.fontFamily
+    val styles = remember(Am.palette, font) { TimelineStyles(font) }
     val eye = rememberVectorPainter(TimelineIcons.Eye)
     val eyeOff = rememberVectorPainter(TimelineIcons.EyeOff)
     val outline = remember { Path() }
@@ -313,7 +314,7 @@ fun Timeline(state: EditorState, modifier: Modifier = Modifier) {
     }
 
     LoadWaveforms(state.scene)
-    LaunchedEffect(view, state.selectedId) { if (PlatformFeatures.desktop) view.revealRow() else view.revealSelected() }
+    LaunchedEffect(view, state.selectedId, state.revealCount) { if (PlatformFeatures.desktop) view.revealRow() else view.revealSelected() }
     if (PlatformFeatures.desktop) LaunchedEffect(view, view.layers.isEmpty()) { view.refit() }
     val appear = remember(state.selectedId) { Animatable(if (state.selectedId == null) 1f else 0f) }
     LaunchedEffect(appear) { appear.animateTo(1f, Motion.enter()) }

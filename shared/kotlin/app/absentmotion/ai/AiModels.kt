@@ -2,11 +2,18 @@ package app.absentmotion.ai
 
 import android.content.Context
 import androidx.annotation.StringRes
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.setValue
 import app.absentmotion.R
 import app.absentmotion.i18n.AppText
 import app.absentmotion.ui.home.HOME_PAGE
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
@@ -71,6 +78,7 @@ internal enum class AiModel(val folder: String, @StringRes val title: Int, val l
     fun delete(context: Context) {
         dir(context).deleteRecursively()
         stamps(context).edit().apply { files.forEach { remove(file(context, it.name).path) } }.apply()
+        revision++
     }
 
     fun verify(context: Context) {
@@ -104,9 +112,12 @@ internal enum class AiModel(val folder: String, @StringRes val title: Int, val l
             before += f.bytes
             progress(before / total)
         }
+        revision++
     }
 
     companion object {
+        var revision by mutableIntStateOf(0)
+
         private fun stamps(context: Context) = context.getSharedPreferences("ai_models", Context.MODE_PRIVATE)
 
         fun downloaded(context: Context) = entries.filter { it.onDisk(context) > 0 }
@@ -117,11 +128,14 @@ internal enum class AiModel(val folder: String, @StringRes val title: Int, val l
     }
 }
 
-internal fun fetch(file: ModelFile, target: File, active: () -> Unit, progress: (Float) -> Unit) {
+@Volatile internal var modelConnection: (String) -> HttpURLConnection = { URL(it).openConnection() as HttpURLConnection }
+
+internal suspend fun fetch(file: ModelFile, target: File, active: () -> Unit, progress: (Float) -> Unit) = coroutineScope {
     val part = File(target.path + ".part")
     if (part.length() >= file.bytes) part.delete()
     val have = part.length()
-    val connection = URL(file.url).openConnection() as HttpURLConnection
+    val connection = modelConnection(file.url)
+    val closer = launch(start = CoroutineStart.UNDISPATCHED) { try { awaitCancellation() } finally { connection.disconnect() } }
     try {
         connection.connectTimeout = 15_000
         connection.readTimeout = 30_000
@@ -131,6 +145,7 @@ internal fun fetch(file: ModelFile, target: File, active: () -> Unit, progress: 
         check(code == HttpURLConnection.HTTP_OK || resume) { AppText.get(R.string.ai_download_failed_http, code.toString()) }
         connection.inputStream.use { CaptionModel.receive(it, part, target, file.bytes, file.sha256, active, progress, resume, R.string.ai_model_download_wrong) }
     } finally {
+        closer.cancel()
         connection.disconnect()
     }
 }

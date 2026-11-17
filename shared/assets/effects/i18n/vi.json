@@ -497,11 +497,18 @@
    }
   },
   "blur": {
-   "description": "Làm mờ mượt và đều.",
+   "description": "Làm mờ mượt và đều. Khi Hình dạng là Hộp, hiệu ứng lấy trung bình một ô vuông đều quanh mỗi điểm.",
    "name": "Làm mờ",
    "params": {
     "strength": {
      "label": "Độ mạnh"
+    },
+    "shape": {
+     "label": "Hình dạng",
+     "options": [
+      "Mượt",
+      "Hộp"
+     ]
     }
    }
   },
@@ -516,7 +523,7 @@
      "label": "Chiều cao"
     },
     "light": {
-     "label": "Góc sáng"
+     "label": "Góc ánh sáng"
     },
     "perspective": {
      "label": "Phối cảnh"
@@ -543,10 +550,63 @@
      "label": "Độ bóng"
     },
     "smoothing": {
-     "label": "Làm mượt"
+     "label": "Độ mượt"
     },
     "width": {
      "label": "Chiều rộng"
+    },
+    "lighting": {
+     "label": "Chiếu sáng",
+     "options": [
+      "Cổ điển",
+      "Mềm",
+      "Trực tiếp"
+     ]
+    },
+    "ambient": {
+     "label": "Ánh sáng môi trường"
+    },
+    "lightHeight": {
+     "label": "Độ cao ánh sáng"
+    },
+    "lightColor": {
+     "label": "Màu ánh sáng"
+    },
+    "glossiness": {
+     "label": "Độ sắc nét điểm sáng"
+    },
+    "texMode": {
+     "label": "Kết cấu",
+     "options": [
+      "Vừa khít",
+      "Lát",
+      "Kéo giãn"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Lặp lại X"
+    },
+    "texRepeatY": {
+     "label": "Lặp lại Y"
+    },
+    "texMirror": {
+     "label": "Lật gương"
+    },
+    "texAngle": {
+     "label": "Góc kết cấu"
+    },
+    "texOffset": {
+     "label": "Độ lệch kết cấu"
+    },
+    "texCrop": {
+     "label": "Xén kết cấu"
+    },
+    "texAnchor": {
+     "label": "Điểm neo kết cấu",
+     "options": [
+      "Tâm",
+      "Góc"
+     ]
     }
    }
   },
@@ -570,7 +630,7 @@
    }
   },
   "bulge": {
-   "description": "Làm phồng lớp như thấu kính (Cường độ dương) hoặc chụm vào tâm (âm) trong vòng tròn Bán kính tính theo tỷ lệ kích thước lớp.",
+   "description": "Làm phồng lớp ra như thấu kính (Cường độ dương) hoặc chụm vào phía Tâm (Cường độ âm) trong một vòng tròn có Bán kính tính theo tỷ lệ kích thước lớp. Khi Đo theo Màn hình, Bán kính tính theo tỷ lệ màn hình. Khi Độ suy giảm là Mượt, thấu kính hòa vào phần còn lại của lớp nhẹ nhàng hơn.",
    "name": "Chụm/Phồng",
    "params": {
     "amount": {
@@ -581,6 +641,20 @@
     },
     "radius": {
      "label": "Bán kính"
+    },
+    "reach": {
+     "label": "Đo theo",
+     "options": [
+      "Lớp",
+      "Màn hình"
+     ]
+    },
+    "curve": {
+     "label": "Độ suy giảm",
+     "options": [
+      "Cổ điển",
+      "Mượt"
+     ]
     }
    }
   },
@@ -592,7 +666,7 @@
      "label": "Ánh sáng môi trường"
     },
     "angle": {
-     "label": "Góc sáng"
+     "label": "Góc ánh sáng"
     },
     "height": {
      "label": "Chiều cao"
@@ -781,7 +855,7 @@
    }
   },
   "circularripple": {
-   "description": "Tạo gợn sóng tròn lan ra từ một điểm, như giọt nước rơi xuống mặt nước.",
+   "description": "Tạo gợn sóng tròn lan ra từ một điểm, như giọt nước rơi xuống mặt nước. Khi Đo theo Màn hình, Tần số, Cường độ và Bán kính được đo trên màn hình thay vì trên lớp.",
    "name": "Gợn sóng tròn",
    "params": {
     "center": {
@@ -801,6 +875,13 @@
     },
     "strength": {
      "label": "Cường độ"
+    },
+    "reach": {
+     "label": "Đo theo",
+     "options": [
+      "Lớp",
+      "Màn hình"
+     ]
     }
    }
   },
@@ -813,6 +894,9 @@
     },
     "color2": {
      "label": "Màu 2"
+    },
+    "contrast": {
+     "label": "Độ tương phản"
     },
     "intensity": {
      "label": "Cường độ"
@@ -855,6 +939,13 @@
     },
     "strength": {
      "label": "Cường độ"
+    },
+    "style": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Sắc nét"
+     ]
     }
    }
   },
@@ -965,6 +1056,16 @@
     },
     "fill": {
      "label": "Tô"
+    },
+    "spread": {
+     "label": "Độ lan",
+     "options": [
+      "Làm mờ",
+      "Khoảng cách"
+     ]
+    },
+    "offset": {
+     "label": "Độ lệch"
     }
    }
   },
@@ -992,6 +1093,16 @@
     },
     "width": {
      "label": "Chiều rộng"
+    },
+    "spread": {
+     "label": "Độ lan",
+     "options": [
+      "Làm mờ",
+      "Khoảng cách"
+     ]
+    },
+    "offset": {
+     "label": "Độ lệch"
     }
    }
   },
@@ -1041,6 +1152,13 @@
     },
     "thickness": {
      "label": "Độ dày"
+    },
+    "style": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Xếp chồng"
+     ]
     }
    }
   },
@@ -1141,6 +1259,62 @@
     },
     "thickness": {
      "label": "Độ dày"
+    },
+    "keep": {
+     "label": "Giữ lớp"
+    },
+    "lighting": {
+     "label": "Chiếu sáng",
+     "options": [
+      "Cổ điển",
+      "Mềm",
+      "Trực tiếp"
+     ]
+    },
+    "ambient": {
+     "label": "Ánh sáng môi trường"
+    },
+    "lightHeight": {
+     "label": "Độ cao ánh sáng"
+    },
+    "lightColor": {
+     "label": "Màu ánh sáng"
+    },
+    "glossiness": {
+     "label": "Độ sắc nét điểm sáng"
+    },
+    "texMode": {
+     "label": "Kết cấu",
+     "options": [
+      "Vừa khít",
+      "Lát",
+      "Kéo giãn"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Lặp lại X"
+    },
+    "texRepeatY": {
+     "label": "Lặp lại Y"
+    },
+    "texMirror": {
+     "label": "Lật gương"
+    },
+    "texAngle": {
+     "label": "Góc kết cấu"
+    },
+    "texOffset": {
+     "label": "Độ lệch kết cấu"
+    },
+    "texCrop": {
+     "label": "Xén kết cấu"
+    },
+    "texAnchor": {
+     "label": "Điểm neo kết cấu",
+     "options": [
+      "Tâm",
+      "Góc"
+     ]
     }
    }
   },
@@ -1180,6 +1354,59 @@
     },
     "smoothing": {
      "label": "Độ mượt"
+    },
+    "lighting": {
+     "label": "Chiếu sáng",
+     "options": [
+      "Cổ điển",
+      "Mềm",
+      "Trực tiếp"
+     ]
+    },
+    "ambient": {
+     "label": "Ánh sáng môi trường"
+    },
+    "lightHeight": {
+     "label": "Độ cao ánh sáng"
+    },
+    "lightColor": {
+     "label": "Màu ánh sáng"
+    },
+    "glossiness": {
+     "label": "Độ sắc nét điểm sáng"
+    },
+    "texMode": {
+     "label": "Kết cấu",
+     "options": [
+      "Vừa khít",
+      "Lát",
+      "Kéo giãn"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Lặp lại X"
+    },
+    "texRepeatY": {
+     "label": "Lặp lại Y"
+    },
+    "texMirror": {
+     "label": "Lật gương"
+    },
+    "texAngle": {
+     "label": "Góc kết cấu"
+    },
+    "texOffset": {
+     "label": "Độ lệch kết cấu"
+    },
+    "texCrop": {
+     "label": "Xén kết cấu"
+    },
+    "texAnchor": {
+     "label": "Điểm neo kết cấu",
+     "options": [
+      "Tâm",
+      "Góc"
+     ]
     }
    }
   },
@@ -1251,6 +1478,59 @@
     },
     "smoothing": {
      "label": "Độ mượt"
+    },
+    "lighting": {
+     "label": "Chiếu sáng",
+     "options": [
+      "Cổ điển",
+      "Mềm",
+      "Trực tiếp"
+     ]
+    },
+    "ambient": {
+     "label": "Ánh sáng môi trường"
+    },
+    "lightHeight": {
+     "label": "Độ cao ánh sáng"
+    },
+    "lightColor": {
+     "label": "Màu ánh sáng"
+    },
+    "glossiness": {
+     "label": "Độ sắc nét điểm sáng"
+    },
+    "texMode": {
+     "label": "Kết cấu",
+     "options": [
+      "Vừa khít",
+      "Lát",
+      "Kéo giãn"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Lặp lại X"
+    },
+    "texRepeatY": {
+     "label": "Lặp lại Y"
+    },
+    "texMirror": {
+     "label": "Lật gương"
+    },
+    "texAngle": {
+     "label": "Góc kết cấu"
+    },
+    "texOffset": {
+     "label": "Độ lệch kết cấu"
+    },
+    "texCrop": {
+     "label": "Xén kết cấu"
+    },
+    "texAnchor": {
+     "label": "Điểm neo kết cấu",
+     "options": [
+      "Tâm",
+      "Góc"
+     ]
     }
    }
   },
@@ -1369,7 +1649,7 @@
    }
   },
   "directionalblur": {
-   "description": "Tạo nhòe chuyển động bằng cách lấy mẫu trung bình theo một góc.",
+   "description": "Tạo nhòe chuyển động bằng cách lấy trung bình các mẫu theo một góc. Khi Độ lan là Hai phía, vệt nhòe lan đều cả về phía trước và phía sau.",
    "name": "Làm mờ hướng",
    "params": {
     "angle": {
@@ -1377,6 +1657,13 @@
     },
     "blurLength": {
      "label": "Chiều dài"
+    },
+    "spread": {
+     "label": "Độ lan",
+     "options": [
+      "Một phía",
+      "Hai phía"
+     ]
     }
    }
   },
@@ -1389,7 +1676,7 @@
      "options": [
       "Lặp lại",
       "Phản chiếu",
-      "Xóa",
+      "Trong suốt",
       "Lát"
      ]
     },
@@ -1571,6 +1858,22 @@
    "params": {
     "strength": {
      "label": "Cường độ"
+    },
+    "style": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Mực"
+     ]
+    },
+    "spacing": {
+     "label": "Độ mượt"
+    },
+    "threshold": {
+     "label": "Ngưỡng"
+    },
+    "invert": {
+     "label": "Đảo ngược"
     }
    }
   },
@@ -1613,6 +1916,9 @@
     },
     "tintColor": {
      "label": "Màu phủ"
+    },
+    "mask": {
+     "label": "Mặt nạ theo lớp"
     }
    }
   },
@@ -1682,6 +1988,13 @@
     },
     "thickness": {
      "label": "Độ dày"
+    },
+    "contourStyle": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Nét mảnh"
+     ]
     }
    }
   },
@@ -1693,7 +2006,7 @@
      "label": "Dẹt"
     },
     "light": {
-     "label": "Góc sáng"
+     "label": "Góc ánh sáng"
     },
     "perspective": {
      "label": "Phối cảnh"
@@ -1724,6 +2037,59 @@
     },
     "squeezeRatio": {
      "label": "Ép"
+    },
+    "lighting": {
+     "label": "Chiếu sáng",
+     "options": [
+      "Cổ điển",
+      "Mềm",
+      "Trực tiếp"
+     ]
+    },
+    "ambient": {
+     "label": "Ánh sáng môi trường"
+    },
+    "lightHeight": {
+     "label": "Độ cao ánh sáng"
+    },
+    "lightColor": {
+     "label": "Màu ánh sáng"
+    },
+    "glossiness": {
+     "label": "Độ sắc nét điểm sáng"
+    },
+    "texMode": {
+     "label": "Kết cấu",
+     "options": [
+      "Vừa khít",
+      "Lát",
+      "Kéo giãn"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Lặp lại X"
+    },
+    "texRepeatY": {
+     "label": "Lặp lại Y"
+    },
+    "texMirror": {
+     "label": "Lật gương"
+    },
+    "texAngle": {
+     "label": "Góc kết cấu"
+    },
+    "texOffset": {
+     "label": "Độ lệch kết cấu"
+    },
+    "texCrop": {
+     "label": "Xén kết cấu"
+    },
+    "texAnchor": {
+     "label": "Điểm neo kết cấu",
+     "options": [
+      "Tâm",
+      "Góc"
+     ]
     }
    }
   },
@@ -1732,7 +2098,7 @@
    "name": "Chạm nổi",
    "params": {
     "angle": {
-     "label": "Góc chiếu sáng"
+     "label": "Góc ánh sáng"
     },
     "strength": {
      "label": "Cường độ"
@@ -1924,7 +2290,7 @@
      "label": "Cường độ"
     },
     "seed": {
-     "label": "Seed"
+     "label": "Hạt giống"
     },
     "speed": {
      "label": "Tần số"
@@ -1957,7 +2323,7 @@
      "label": "Màu mặt sau"
     },
     "light": {
-     "label": "Góc sáng"
+     "label": "Góc ánh sáng"
     },
     "perspective": {
      "label": "Phối cảnh"
@@ -1982,6 +2348,65 @@
     },
     "shine": {
      "label": "Độ bóng"
+    },
+    "lighting": {
+     "label": "Chiếu sáng",
+     "options": [
+      "Cổ điển",
+      "Mềm",
+      "Trực tiếp"
+     ]
+    },
+    "ambient": {
+     "label": "Ánh sáng môi trường"
+    },
+    "lightHeight": {
+     "label": "Độ cao ánh sáng"
+    },
+    "lightColor": {
+     "label": "Màu ánh sáng"
+    },
+    "glossiness": {
+     "label": "Độ sắc nét điểm sáng"
+    },
+    "pivot": {
+     "label": "Điểm xoay"
+    },
+    "pivotDepth": {
+     "label": "Độ sâu điểm xoay"
+    },
+    "texMode": {
+     "label": "Kết cấu",
+     "options": [
+      "Vừa khít",
+      "Lát",
+      "Kéo giãn"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Lặp lại X"
+    },
+    "texRepeatY": {
+     "label": "Lặp lại Y"
+    },
+    "texMirror": {
+     "label": "Lật gương"
+    },
+    "texAngle": {
+     "label": "Góc kết cấu"
+    },
+    "texOffset": {
+     "label": "Độ lệch kết cấu"
+    },
+    "texCrop": {
+     "label": "Xén kết cấu"
+    },
+    "texAnchor": {
+     "label": "Điểm neo kết cấu",
+     "options": [
+      "Tâm",
+      "Góc"
+     ]
     }
    }
   },
@@ -2047,6 +2472,13 @@
     },
     "softness": {
      "label": "Độ mềm"
+    },
+    "falloff": {
+     "label": "Độ suy giảm",
+     "options": [
+      "Khoảng cách",
+      "Mượt"
+     ]
     }
    }
   },
@@ -2116,6 +2548,13 @@
     },
     "strength": {
      "label": "Cường độ"
+    },
+    "screenSize": {
+     "label": "Kích thước theo",
+     "options": [
+      "Lớp",
+      "Màn hình"
+     ]
     }
    }
   },
@@ -2198,11 +2637,11 @@
    }
   },
   "glass": {
-   "description": "Biến hình dạng của lớp thành kính vát cạnh, bẻ cong các lớp phía sau và có điểm sáng dọc theo viền.",
+   "description": "Biến hình dạng của lớp thành kính vát cạnh, bẻ cong các lớp phía sau và có điểm sáng dọc theo viền. Khi Ánh sáng là Mềm, lớp hiện ra theo mức Tô và kính được chiếu sáng bằng Màu, sáng nhất dọc theo mép trong của phần vát cạnh hướng về phía ánh sáng.",
    "name": "Kính",
    "params": {
     "angle": {
-     "label": "Góc sáng"
+     "label": "Góc ánh sáng"
     },
     "blur": {
      "label": "Vát cạnh"
@@ -2210,8 +2649,18 @@
     "color": {
      "label": "Màu"
     },
+    "fill": {
+     "label": "Tô"
+    },
     "highlight": {
      "label": "Điểm sáng"
+    },
+    "light": {
+     "label": "Ánh sáng",
+     "options": [
+      "Viền",
+      "Mềm"
+     ]
     },
     "refraction": {
      "label": "Khúc xạ"
@@ -2232,7 +2681,7 @@
      "label": "Cường độ"
     },
     "seed": {
-     "label": "Seed"
+     "label": "Hạt giống"
     }
    }
   },
@@ -2326,6 +2775,13 @@
     },
     "scaleBrightness": {
      "label": "Nhân độ sáng"
+    },
+    "style": {
+     "label": "Kiểu",
+     "options": [
+      "Chuyển màu",
+      "Quang phổ"
+     ]
     }
    }
   },
@@ -2402,6 +2858,14 @@
     "offset": {
      "label": "Độ lệch"
     },
+    "origin": {
+     "label": "Gốc",
+     "options": [
+      "Tâm",
+      "Góc lớp",
+      "Góc màn hình"
+     ]
+    },
     "punch": {
      "label": "Khoét lỗ"
     },
@@ -2429,7 +2893,7 @@
       "Tuyến tính",
       "Vào chậm",
       "Ra chậm",
-      "Vào ra chậm"
+      "Vào và ra chậm"
      ]
     },
     "fillAmount": {
@@ -2578,7 +3042,7 @@
      "label": "Kích thước"
     },
     "light": {
-     "label": "Góc chiếu sáng"
+     "label": "Góc ánh sáng"
     },
     "perspective": {
      "label": "Phối cảnh"
@@ -2599,13 +3063,66 @@
      "label": "Tỷ lệ"
     },
     "shading": {
-     "label": "Độ đổ bóng"
+     "label": "Đổ bóng"
     },
     "shine": {
      "label": "Độ bóng"
     },
     "smoothing": {
-     "label": "Làm mượt"
+     "label": "Độ mượt"
+    },
+    "lighting": {
+     "label": "Chiếu sáng",
+     "options": [
+      "Cổ điển",
+      "Mềm",
+      "Trực tiếp"
+     ]
+    },
+    "ambient": {
+     "label": "Ánh sáng môi trường"
+    },
+    "lightHeight": {
+     "label": "Độ cao ánh sáng"
+    },
+    "lightColor": {
+     "label": "Màu ánh sáng"
+    },
+    "glossiness": {
+     "label": "Độ sắc nét điểm sáng"
+    },
+    "texMode": {
+     "label": "Kết cấu",
+     "options": [
+      "Vừa khít",
+      "Lát",
+      "Kéo giãn"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Lặp lại X"
+    },
+    "texRepeatY": {
+     "label": "Lặp lại Y"
+    },
+    "texMirror": {
+     "label": "Lật gương"
+    },
+    "texAngle": {
+     "label": "Góc kết cấu"
+    },
+    "texOffset": {
+     "label": "Độ lệch kết cấu"
+    },
+    "texCrop": {
+     "label": "Xén kết cấu"
+    },
+    "texAnchor": {
+     "label": "Điểm neo kết cấu",
+     "options": [
+      "Tâm",
+      "Góc"
+     ]
     }
    }
   },
@@ -2661,11 +3178,33 @@
     "angle": {
      "label": "Góc"
     },
+    "crop": {
+     "label": "Xén"
+    },
+    "fit": {
+     "label": "Hình ảnh",
+     "options": [
+      "Kích thước đầy đủ",
+      "Trong mỗi ô"
+     ]
+    },
+    "mask": {
+     "label": "Mặt nạ theo lớp"
+    },
     "mirror": {
      "label": "Lật gương"
     },
+    "offset": {
+     "label": "Độ lệch"
+    },
     "scale": {
      "label": "Tỷ lệ"
+    },
+    "screenSpace": {
+     "label": "Không gian màn hình"
+    },
+    "stretch": {
+     "label": "Kéo giãn"
     }
    }
   },
@@ -2738,7 +3277,7 @@
      "label": "Độ sâu"
     },
     "light": {
-     "label": "Góc chiếu sáng"
+     "label": "Góc ánh sáng"
     },
     "perspective": {
      "label": "Phối cảnh"
@@ -2762,13 +3301,66 @@
      "label": "Tỷ lệ"
     },
     "shading": {
-     "label": "Độ đổ bóng"
+     "label": "Đổ bóng"
     },
     "shine": {
      "label": "Độ bóng"
     },
     "smoothing": {
      "label": "Độ mượt"
+    },
+    "lighting": {
+     "label": "Chiếu sáng",
+     "options": [
+      "Cổ điển",
+      "Mềm",
+      "Trực tiếp"
+     ]
+    },
+    "ambient": {
+     "label": "Ánh sáng môi trường"
+    },
+    "lightHeight": {
+     "label": "Độ cao ánh sáng"
+    },
+    "lightColor": {
+     "label": "Màu ánh sáng"
+    },
+    "glossiness": {
+     "label": "Độ sắc nét điểm sáng"
+    },
+    "texMode": {
+     "label": "Kết cấu",
+     "options": [
+      "Vừa khít",
+      "Lát",
+      "Kéo giãn"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Lặp lại X"
+    },
+    "texRepeatY": {
+     "label": "Lặp lại Y"
+    },
+    "texMirror": {
+     "label": "Lật gương"
+    },
+    "texAngle": {
+     "label": "Góc kết cấu"
+    },
+    "texOffset": {
+     "label": "Độ lệch kết cấu"
+    },
+    "texCrop": {
+     "label": "Xén kết cấu"
+    },
+    "texAnchor": {
+     "label": "Điểm neo kết cấu",
+     "options": [
+      "Tâm",
+      "Góc"
+     ]
     }
    }
   },
@@ -2805,7 +3397,7 @@
      "label": "Màu bên trong"
     },
     "light": {
-     "label": "Góc chiếu sáng"
+     "label": "Góc ánh sáng"
     },
     "perspective": {
      "label": "Phối cảnh"
@@ -2826,7 +3418,7 @@
      "label": "Tỷ lệ"
     },
     "shading": {
-     "label": "Độ đổ bóng"
+     "label": "Đổ bóng"
     },
     "shine": {
      "label": "Độ bóng"
@@ -2839,6 +3431,59 @@
     },
     "width": {
      "label": "Chiều rộng"
+    },
+    "lighting": {
+     "label": "Chiếu sáng",
+     "options": [
+      "Cổ điển",
+      "Mềm",
+      "Trực tiếp"
+     ]
+    },
+    "ambient": {
+     "label": "Ánh sáng môi trường"
+    },
+    "lightHeight": {
+     "label": "Độ cao ánh sáng"
+    },
+    "lightColor": {
+     "label": "Màu ánh sáng"
+    },
+    "glossiness": {
+     "label": "Độ sắc nét điểm sáng"
+    },
+    "texMode": {
+     "label": "Kết cấu",
+     "options": [
+      "Vừa khít",
+      "Lát",
+      "Kéo giãn"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Lặp lại X"
+    },
+    "texRepeatY": {
+     "label": "Lặp lại Y"
+    },
+    "texMirror": {
+     "label": "Lật gương"
+    },
+    "texAngle": {
+     "label": "Góc kết cấu"
+    },
+    "texOffset": {
+     "label": "Độ lệch kết cấu"
+    },
+    "texCrop": {
+     "label": "Xén kết cấu"
+    },
+    "texAnchor": {
+     "label": "Điểm neo kết cấu",
+     "options": [
+      "Tâm",
+      "Góc"
+     ]
     }
    }
   },
@@ -2964,7 +3609,8 @@
      "label": "Kiểu",
      "options": [
       "Cổ điển",
-      "Giữ độ sáng"
+      "Giữ độ sáng",
+      "Video"
      ]
     },
     "vibrance": {
@@ -3002,6 +3648,23 @@
     },
     "intensity": {
      "label": "Cường độ"
+    },
+    "blend": {
+     "label": "Hòa trộn",
+     "options": [
+      "Màn hình",
+      "Thường"
+     ]
+    },
+    "opacity": {
+     "label": "Độ mờ"
+    },
+    "corners": {
+     "label": "Góc",
+     "options": [
+      "Bo tròn",
+      "Vuông"
+     ]
     }
    }
   },
@@ -3068,6 +3731,13 @@
     "center": {
      "label": "Tâm"
     },
+    "direction": {
+     "label": "Hướng",
+     "options": [
+      "Theo chiều kim đồng hồ",
+      "Ngược chiều kim đồng hồ"
+     ]
+    },
     "mirror": {
      "label": "Lật gương"
     },
@@ -3077,9 +3747,16 @@
    }
   },
   "lensblur": {
-   "description": "Hiệu ứng nhòe xoay tròn, giữ vùng quanh tâm sắc nét và tăng dần về phía mép.",
+   "description": "Làm mờ xoáy tròn, giữ vùng quanh tâm sắc nét và mạnh dần về phía mép. Khi Làm mờ là Thu phóng, vệt nhòe tỏa ra từ tâm, vượt qua cả mép lớp.",
    "name": "Làm mờ thấu kính",
    "params": {
+    "blur": {
+     "label": "Làm mờ",
+     "options": [
+      "Xoay",
+      "Thu phóng"
+     ]
+    },
     "center": {
      "label": "Tâm"
     },
@@ -3154,6 +3831,12 @@
     },
     "threshold": {
      "label": "Ngưỡng"
+    },
+    "soften": {
+     "label": "Làm mềm"
+    },
+    "mask": {
+     "label": "Mặt nạ theo lớp"
     }
    }
   },
@@ -3201,9 +3884,9 @@
      "label": "Làm mượt",
      "options": [
       "Tuyến tính",
-      "Vào mượt",
-      "Ra mượt",
-      "Làm mượt vào ra"
+      "Vào chậm",
+      "Ra chậm",
+      "Vào và ra chậm"
      ]
     },
     "fillAmount": {
@@ -3257,7 +3940,7 @@
    }
   },
   "linearstreaks": {
-   "description": "Tạo các vệt thẳng bằng cách trượt bản sao của lớp theo một góc và hòa trộn ở chỗ chúng chồng lên nhau.",
+   "description": "Tạo các vệt thẳng bằng cách trượt bản sao của lớp theo một góc và hòa trộn ở chỗ chúng chồng lên nhau. Khi Hòa trộn là Tắt, lớp được giữ nguyên. Khi Bản sao là Mỗi pixel, mỗi pixel trên Độ dài có một bản sao, thay vì 48 bản sao rải dọc theo đó.",
    "name": "Vệt thẳng",
    "params": {
     "alpha": {
@@ -3274,11 +3957,19 @@
      "options": [
       "Làm sáng",
       "Trung bình",
-      "Làm tối"
+      "Làm tối",
+      "Tắt"
      ]
     },
     "reach": {
      "label": "Độ dài"
+    },
+    "copies": {
+     "label": "Bản sao",
+     "options": [
+      "Giãn cách",
+      "Mỗi pixel"
+     ]
     }
    }
   },
@@ -3287,7 +3978,7 @@
    "name": "Liquid Glass",
    "params": {
     "angle": {
-     "label": "Góc sáng"
+     "label": "Góc ánh sáng"
     },
     "blur": {
      "label": "Viền"
@@ -3333,6 +4024,12 @@
     },
     "solidity": {
      "label": "Độ đặc"
+    },
+    "fill": {
+     "label": "Tô"
+    },
+    "samples": {
+     "label": "Số mẫu"
     }
    }
   },
@@ -3348,6 +4045,9 @@
     },
     "threshold": {
      "label": "Ngưỡng"
+    },
+    "high": {
+     "label": "Ngưỡng trên"
     }
    }
   },
@@ -3472,6 +4172,13 @@
    "description": "Chia lớp thành các ô vuông và tô mỗi ô bằng màu trung bình của nó.",
    "name": "Mosaic",
    "params": {
+    "average": {
+     "label": "Trung bình",
+     "options": [
+      "Ô",
+      "Góc"
+     ]
+    },
     "count": {
      "label": "Số lượng"
     },
@@ -3566,7 +4273,7 @@
    "name": "Bát diện",
    "params": {
     "light": {
-     "label": "Góc chiếu sáng"
+     "label": "Góc ánh sáng"
     },
     "perspective": {
      "label": "Phối cảnh"
@@ -3593,7 +4300,60 @@
      "label": "Đổ bóng"
     },
     "shine": {
-     "label": "Lấp lánh"
+     "label": "Độ bóng"
+    },
+    "lighting": {
+     "label": "Chiếu sáng",
+     "options": [
+      "Cổ điển",
+      "Mềm",
+      "Trực tiếp"
+     ]
+    },
+    "ambient": {
+     "label": "Ánh sáng môi trường"
+    },
+    "lightHeight": {
+     "label": "Độ cao ánh sáng"
+    },
+    "lightColor": {
+     "label": "Màu ánh sáng"
+    },
+    "glossiness": {
+     "label": "Độ sắc nét điểm sáng"
+    },
+    "texMode": {
+     "label": "Kết cấu",
+     "options": [
+      "Vừa khít",
+      "Lát",
+      "Kéo giãn"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Lặp lại X"
+    },
+    "texRepeatY": {
+     "label": "Lặp lại Y"
+    },
+    "texMirror": {
+     "label": "Lật gương"
+    },
+    "texAngle": {
+     "label": "Góc kết cấu"
+    },
+    "texOffset": {
+     "label": "Độ lệch kết cấu"
+    },
+    "texCrop": {
+     "label": "Xén kết cấu"
+    },
+    "texAnchor": {
+     "label": "Điểm neo kết cấu",
+     "options": [
+      "Tâm",
+      "Góc"
+     ]
     }
    }
   },
@@ -3781,7 +4541,7 @@
      "label": "Dạng sóng",
      "options": [
       "Hình sin",
-      "Tam giác"
+      "Hình tam giác"
      ]
     }
    }
@@ -4144,6 +4904,13 @@
     "blockSize": {
      "label": "Kích thước"
     },
+    "edges": {
+     "label": "Mép",
+     "options": [
+      "Phản chiếu",
+      "Trong suốt"
+     ]
+    },
     "offset": {
      "label": "Độ lệch"
     },
@@ -4244,7 +5011,7 @@
    }
   },
   "polar": {
-   "description": "Uốn lớp quanh tâm, biến đường thẳng thành vòng tròn hoặc mở cuộn vòng tròn thành đường thẳng.",
+   "description": "Uốn lớp quanh tâm, biến đường thẳng thành vòng tròn hoặc mở cuộn vòng tròn thành đường thẳng. Bố cục chọn cạnh nào của lớp gặp nhau ở giữa.",
    "name": "Tọa độ cực",
    "params": {
     "amount": {
@@ -4255,6 +5022,13 @@
      "options": [
       "Chữ nhật sang cực",
       "Cực sang chữ nhật"
+     ]
+    },
+    "middle": {
+     "label": "Bố cục",
+     "options": [
+      "Cạnh trên ở giữa",
+      "Cạnh dưới ở giữa"
      ]
     }
    }
@@ -4290,10 +5064,10 @@
      ]
     },
     "edges": {
-     "label": "Cạnh",
+     "label": "Mép",
      "options": [
       "Lặp lại",
-      "Gương",
+      "Phản chiếu",
       "Trong suốt",
       "Lát"
      ]
@@ -4423,7 +5197,7 @@
      "label": "Chiều cao"
     },
     "light": {
-     "label": "Góc chiếu sáng"
+     "label": "Góc ánh sáng"
     },
     "perspective": {
      "label": "Phối cảnh"
@@ -4448,11 +5222,64 @@
     },
     "shine": {
      "label": "Độ bóng"
+    },
+    "lighting": {
+     "label": "Chiếu sáng",
+     "options": [
+      "Cổ điển",
+      "Mềm",
+      "Trực tiếp"
+     ]
+    },
+    "ambient": {
+     "label": "Ánh sáng môi trường"
+    },
+    "lightHeight": {
+     "label": "Độ cao ánh sáng"
+    },
+    "lightColor": {
+     "label": "Màu ánh sáng"
+    },
+    "glossiness": {
+     "label": "Độ sắc nét điểm sáng"
+    },
+    "texMode": {
+     "label": "Kết cấu",
+     "options": [
+      "Vừa khít",
+      "Lát",
+      "Kéo giãn"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Lặp lại X"
+    },
+    "texRepeatY": {
+     "label": "Lặp lại Y"
+    },
+    "texMirror": {
+     "label": "Lật gương"
+    },
+    "texAngle": {
+     "label": "Góc kết cấu"
+    },
+    "texOffset": {
+     "label": "Độ lệch kết cấu"
+    },
+    "texCrop": {
+     "label": "Xén kết cấu"
+    },
+    "texAnchor": {
+     "label": "Điểm neo kết cấu",
+     "options": [
+      "Tâm",
+      "Góc"
+     ]
     }
    }
   },
   "radialblur": {
-   "description": "Tạo nhòe thu phóng tỏa tròn từ một điểm giữa với độ mạnh tùy chỉnh.",
+   "description": "Làm nhòe thu phóng tỏa tròn bằng cách lấy trung bình các mẫu dọc theo những tia từ một điểm tâm, với cường độ điều chỉnh được. Khi Độ dài là Đều, mọi vệt dài bằng nhau thay vì dài ra theo khoảng cách tới tâm.",
    "name": "Nhòe thu phóng",
    "params": {
     "amount": {
@@ -4460,6 +5287,13 @@
     },
     "center": {
      "label": "Tâm"
+    },
+    "streak": {
+     "label": "Độ dài",
+     "options": [
+      "Theo khoảng cách",
+      "Đều"
+     ]
     }
    }
   },
@@ -4586,12 +5420,15 @@
     },
     "reach": {
      "label": "Độ dài"
+    },
+    "fill": {
+     "label": "Tô"
     }
    }
   },
   "radialwipe": {
-   "description": "Ẩn một hình quạt của lớp quét quanh Tâm từ Góc bắt đầu, như kim đồng hồ. Tiến độ là góc đã quét, Số lần lặp hình quạt quanh vòng tròn và Cả hai quét cả hai chiều. Tạo hiệu ứng cho Tiến độ để làm chuyển cảnh.",
-   "name": "Xóa tỏa tròn",
+   "description": "Ẩn một hình quạt của lớp, quét quanh Tâm từ Góc bắt đầu như kim đồng hồ. Tiến độ là góc đã quét, Số lần đặt số hình quạt lặp lại quanh vòng tròn, còn Cả hai quét theo cả hai chiều. Tạo hoạt ảnh cho Tiến độ để làm chuyển cảnh. Khi Hình quạt là Chính xác, Số lần giữ cả phần lẻ nên hình quạt cuối hẹp hơn, còn Làm mềm viền làm mềm cả hai cạnh của mỗi hình quạt.",
+   "name": "Quét tỏa tròn",
    "params": {
     "center": {
      "label": "Tâm"
@@ -4615,6 +5452,13 @@
     },
     "start": {
      "label": "Góc bắt đầu"
+    },
+    "wedges": {
+     "label": "Hình quạt",
+     "options": [
+      "Nguyên vẹn",
+      "Chính xác"
+     ]
     }
    }
   },
@@ -4623,7 +5467,7 @@
    "name": "Dịch chuyển ngẫu nhiên",
    "params": {
     "evolution": {
-     "label": "Evolution"
+     "label": "Tiến triển"
     },
     "magnitude": {
      "label": "Biên độ"
@@ -4674,7 +5518,7 @@
      "label": "Màu bên trong"
     },
     "light": {
-     "label": "Góc sáng"
+     "label": "Góc ánh sáng"
     },
     "perspective": {
      "label": "Phối cảnh"
@@ -4695,10 +5539,30 @@
      "label": "Tỷ lệ"
     },
     "shading": {
-     "label": "Đổ sáng"
+     "label": "Đổ bóng"
     },
     "shine": {
      "label": "Độ bóng"
+    },
+    "lighting": {
+     "label": "Chiếu sáng",
+     "options": [
+      "Cổ điển",
+      "Mềm",
+      "Trực tiếp"
+     ]
+    },
+    "ambient": {
+     "label": "Ánh sáng môi trường"
+    },
+    "lightHeight": {
+     "label": "Độ cao ánh sáng"
+    },
+    "lightColor": {
+     "label": "Màu ánh sáng"
+    },
+    "glossiness": {
+     "label": "Độ sắc nét điểm sáng"
     }
    },
    "shortcuts": {
@@ -4826,9 +5690,9 @@
      "label": "Làm mượt",
      "options": [
       "Tuyến tính",
-      "Vào mượt",
-      "Ra mượt",
-      "Vào ra mượt"
+      "Vào chậm",
+      "Ra chậm",
+      "Vào và ra chậm"
      ]
     },
     "end": {
@@ -4914,6 +5778,13 @@
     },
     "threshold": {
      "label": "Ngưỡng"
+    },
+    "match": {
+     "label": "So khớp",
+     "options": [
+      "RGB",
+      "Sắc màu"
+     ]
     }
    }
   },
@@ -4964,7 +5835,7 @@
    }
   },
   "rgbsplit": {
-   "description": "Tách kênh đỏ, lục và lam: kênh Trung tâm đứng yên, hai kênh còn lại dịch ngược hướng nhau theo Góc. Light cộng màu đã dịch, Dark giữ màu đặc, Mask chỉ giữ nơi cả ba kênh trùng nhau và Luma làm viền càng sáng càng đục.",
+   "description": "Tách các kênh đỏ, lục và lam: kênh chọn ở Kênh tâm đứng yên, hai kênh còn lại dịch ngược chiều nhau theo Góc. Sáng cộng các màu đã dịch, Tối giữ màu đặc, Mặt nạ chỉ giữ chỗ cả ba kênh trùng nhau và Luma làm viền càng sáng càng đục. Trung bình làm mỗi điểm đục theo tỷ lệ số kênh phủ lên nó.",
    "name": "Tách RGB",
    "params": {
     "angle": {
@@ -4984,7 +5855,8 @@
       "Sáng",
       "Tối",
       "Mặt nạ",
-      "Luma"
+      "Luma",
+      "Trung bình"
      ]
     },
     "strength": {
@@ -5434,7 +6306,7 @@
    "name": "Vát mượt",
    "params": {
     "angle": {
-     "label": "Góc chiếu sáng"
+     "label": "Góc ánh sáng"
     },
     "blur": {
      "label": "Kích thước"
@@ -5492,6 +6364,13 @@
     },
     "outside": {
      "label": "Phát sáng bên ngoài"
+    },
+    "falloff": {
+     "label": "Độ suy giảm",
+     "options": [
+      "Đều",
+      "Lớp"
+     ]
     }
    }
   },
@@ -5550,7 +6429,7 @@
      "label": "Độ phủ"
     },
     "light": {
-     "label": "Góc chiếu sáng"
+     "label": "Góc ánh sáng"
     },
     "perspective": {
      "label": "Phối cảnh"
@@ -5584,7 +6463,60 @@
      "label": "Đổ bóng"
     },
     "shine": {
-     "label": "Độ sáng bóng"
+     "label": "Độ bóng"
+    },
+    "lighting": {
+     "label": "Chiếu sáng",
+     "options": [
+      "Cổ điển",
+      "Mềm",
+      "Trực tiếp"
+     ]
+    },
+    "ambient": {
+     "label": "Ánh sáng môi trường"
+    },
+    "lightHeight": {
+     "label": "Độ cao ánh sáng"
+    },
+    "lightColor": {
+     "label": "Màu ánh sáng"
+    },
+    "glossiness": {
+     "label": "Độ sắc nét điểm sáng"
+    },
+    "texMode": {
+     "label": "Kết cấu",
+     "options": [
+      "Vừa khít",
+      "Lát",
+      "Kéo giãn"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Lặp lại X"
+    },
+    "texRepeatY": {
+     "label": "Lặp lại Y"
+    },
+    "texMirror": {
+     "label": "Lật gương"
+    },
+    "texAngle": {
+     "label": "Góc kết cấu"
+    },
+    "texOffset": {
+     "label": "Độ lệch kết cấu"
+    },
+    "texCrop": {
+     "label": "Xén kết cấu"
+    },
+    "texAnchor": {
+     "label": "Điểm neo kết cấu",
+     "options": [
+      "Tâm",
+      "Góc"
+     ]
     }
    }
   },
@@ -5732,11 +6664,18 @@
     },
     "threshold": {
      "label": "Ngưỡng"
+    },
+    "grey": {
+     "label": "Xám",
+     "options": [
+      "HD",
+      "SD"
+     ]
     }
    }
   },
   "squeeze": {
-   "description": "Ép phần giữa của lớp vào trong với Cường độ dương và phồng ra ngoài với Cường độ âm. Kiểu cũ giữ nguyên hình dạng của dự án cũ.",
+   "description": "Ép phần giữa của lớp vào trong với Cường độ dương và phồng ra ngoài với Cường độ âm. Kiểu cũ giữ nguyên hình dạng của các dự án cũ. Đồng hồ cát còn đẩy phần giữa của cạnh trên và cạnh dưới ra ngoài.",
    "name": "Ép",
    "params": {
     "amount": {
@@ -5746,7 +6685,8 @@
      "label": "Hình dạng",
      "options": [
       "Ép/Phồng",
-      "Kiểu cũ"
+      "Kiểu cũ",
+      "Đồng hồ cát"
      ]
     }
    }
@@ -5818,7 +6758,7 @@
    "name": "Đa diện sao",
    "params": {
     "light": {
-     "label": "Góc sáng"
+     "label": "Góc ánh sáng"
     },
     "perspective": {
      "label": "Phối cảnh"
@@ -5845,7 +6785,60 @@
      "label": "Đổ bóng"
     },
     "shine": {
-     "label": "Độ lấp lánh"
+     "label": "Độ bóng"
+    },
+    "lighting": {
+     "label": "Chiếu sáng",
+     "options": [
+      "Cổ điển",
+      "Mềm",
+      "Trực tiếp"
+     ]
+    },
+    "ambient": {
+     "label": "Ánh sáng môi trường"
+    },
+    "lightHeight": {
+     "label": "Độ cao ánh sáng"
+    },
+    "lightColor": {
+     "label": "Màu ánh sáng"
+    },
+    "glossiness": {
+     "label": "Độ sắc nét điểm sáng"
+    },
+    "texMode": {
+     "label": "Kết cấu",
+     "options": [
+      "Vừa khít",
+      "Lát",
+      "Kéo giãn"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Lặp lại X"
+    },
+    "texRepeatY": {
+     "label": "Lặp lại Y"
+    },
+    "texMirror": {
+     "label": "Lật gương"
+    },
+    "texAngle": {
+     "label": "Góc kết cấu"
+    },
+    "texOffset": {
+     "label": "Độ lệch kết cấu"
+    },
+    "texCrop": {
+     "label": "Xén kết cấu"
+    },
+    "texAnchor": {
+     "label": "Điểm neo kết cấu",
+     "options": [
+      "Tâm",
+      "Góc"
+     ]
     }
    }
   },
@@ -5860,7 +6853,7 @@
      "label": "Bán kính trong"
     },
     "light": {
-     "label": "Góc sáng"
+     "label": "Góc ánh sáng"
     },
     "perspective": {
      "label": "Phối cảnh"
@@ -5890,10 +6883,70 @@
      "label": "Đổ bóng"
     },
     "shine": {
-     "label": "Độ lấp lánh"
+     "label": "Độ bóng"
     },
     "smoothing": {
-     "label": "Làm mượt"
+     "label": "Độ mượt"
+    },
+    "starStyle": {
+     "label": "Kiểu",
+     "options": [
+      "Phẳng",
+      "Nhọn"
+     ]
+    },
+    "lighting": {
+     "label": "Chiếu sáng",
+     "options": [
+      "Cổ điển",
+      "Mềm",
+      "Trực tiếp"
+     ]
+    },
+    "ambient": {
+     "label": "Ánh sáng môi trường"
+    },
+    "lightHeight": {
+     "label": "Độ cao ánh sáng"
+    },
+    "lightColor": {
+     "label": "Màu ánh sáng"
+    },
+    "glossiness": {
+     "label": "Độ sắc nét điểm sáng"
+    },
+    "texMode": {
+     "label": "Kết cấu",
+     "options": [
+      "Vừa khít",
+      "Lát",
+      "Kéo giãn"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Lặp lại X"
+    },
+    "texRepeatY": {
+     "label": "Lặp lại Y"
+    },
+    "texMirror": {
+     "label": "Lật gương"
+    },
+    "texAngle": {
+     "label": "Góc kết cấu"
+    },
+    "texOffset": {
+     "label": "Độ lệch kết cấu"
+    },
+    "texCrop": {
+     "label": "Xén kết cấu"
+    },
+    "texAnchor": {
+     "label": "Điểm neo kết cấu",
+     "options": [
+      "Tâm",
+      "Góc"
+     ]
     }
    }
   },
@@ -6065,7 +7118,9 @@
       "Robot",
       "Chít chít",
       "Máy đánh chữ",
-      "Chiptune"
+      "Chiptune",
+      "Bộ xương",
+      "Âm thanh tùy chỉnh"
      ]
     },
     "volume": {
@@ -6439,6 +7494,13 @@
     "count": {
      "label": "Số lượng"
     },
+    "edges": {
+     "label": "Mép",
+     "options": [
+      "Phản chiếu",
+      "Trong suốt"
+     ]
+    },
     "offset": {
      "label": "Độ lệch"
     },
@@ -6447,6 +7509,9 @@
     },
     "rotation": {
      "label": "Xoay"
+    },
+    "screenSpace": {
+     "label": "Không gian màn hình"
     },
     "seed": {
      "label": "Mã ngẫu nhiên"
@@ -6457,7 +7522,7 @@
    }
   },
   "tiles": {
-   "description": "Lặp lại lớp để lấp đầy màn hình. Tăng Xén để tạo các ô nhỏ hơn, có thể lật, dịch hàng và xoay. Tỷ lệ cũ giữ nguyên dự án cũ.",
+   "description": "Lặp lại lớp để lấp đầy màn hình. Tăng Xén để ô nhỏ hơn, có thể thêm lật gương, lệch hàng và xoay. Tỷ lệ cũ giữ nguyên các dự án cũ. Bên trong ô giữ mỗi ô bằng kích thước lớp, rồi phóng to và xoay hình bên trong ô.",
    "name": "Ô lát",
    "params": {
     "angle": {
@@ -6473,7 +7538,8 @@
      "label": "Kích thước",
      "options": [
       "Xén",
-      "Tỷ lệ cũ"
+      "Tỷ lệ cũ",
+      "Bên trong ô"
      ]
     },
     "vertical": {
@@ -6494,8 +7560,18 @@
     "count": {
      "label": "Số lượng"
     },
+    "edges": {
+     "label": "Mép",
+     "options": [
+      "Phản chiếu",
+      "Trong suốt"
+     ]
+    },
     "offset": {
      "label": "Độ lệch"
+    },
+    "screenSpace": {
+     "label": "Không gian màn hình"
     },
     "seed": {
      "label": "Mã ngẫu nhiên"
@@ -6567,7 +7643,7 @@
    "name": "Vòng xuyến",
    "params": {
     "light": {
-     "label": "Góc chiếu sáng"
+     "label": "Góc ánh sáng"
     },
     "perspective": {
      "label": "Phối cảnh"
@@ -6598,6 +7674,59 @@
     },
     "thickness": {
      "label": "Độ dày"
+    },
+    "lighting": {
+     "label": "Chiếu sáng",
+     "options": [
+      "Cổ điển",
+      "Mềm",
+      "Trực tiếp"
+     ]
+    },
+    "ambient": {
+     "label": "Ánh sáng môi trường"
+    },
+    "lightHeight": {
+     "label": "Độ cao ánh sáng"
+    },
+    "lightColor": {
+     "label": "Màu ánh sáng"
+    },
+    "glossiness": {
+     "label": "Độ sắc nét điểm sáng"
+    },
+    "texMode": {
+     "label": "Kết cấu",
+     "options": [
+      "Vừa khít",
+      "Lát",
+      "Kéo giãn"
+     ]
+    },
+    "texRepeatX": {
+     "label": "Lặp lại X"
+    },
+    "texRepeatY": {
+     "label": "Lặp lại Y"
+    },
+    "texMirror": {
+     "label": "Lật gương"
+    },
+    "texAngle": {
+     "label": "Góc kết cấu"
+    },
+    "texOffset": {
+     "label": "Độ lệch kết cấu"
+    },
+    "texCrop": {
+     "label": "Xén kết cấu"
+    },
+    "texAnchor": {
+     "label": "Điểm neo kết cấu",
+     "options": [
+      "Tâm",
+      "Góc"
+     ]
     }
    }
   },
@@ -6739,11 +7868,14 @@
     },
     "stretch": {
      "label": "Kéo giãn"
+    },
+    "screenSpace": {
+     "label": "Không gian màn hình"
     }
    }
   },
   "twirl": {
-   "description": "Xoắn lớp quanh Tâm như xoáy nước, mạnh nhất ở giữa và giảm dần tại Bán kính (theo tỷ lệ kích thước lớp). Cường độ âm xoắn theo chiều ngược lại.",
+   "description": "Xoắn lớp quanh Tâm như xoáy nước, mạnh nhất ở giữa và giảm dần tới Bán kính (theo tỷ lệ kích thước lớp). Cường độ âm xoắn theo chiều ngược lại. Khi Đo theo Màn hình, Bán kính tính theo tỷ lệ màn hình và độ xoắn giảm dần mượt mà.",
    "name": "Xoáy",
    "params": {
     "center": {
@@ -6754,11 +7886,18 @@
     },
     "strength": {
      "label": "Cường độ"
+    },
+    "reach": {
+     "label": "Đo theo",
+     "options": [
+      "Lớp",
+      "Màn hình"
+     ]
     }
    }
   },
   "unsharpmask": {
-   "description": "Làm nét bằng cách cộng lại phần chênh lệch giữa lớp và bản sao đã làm mờ của nó. Cường độ đặt độ rộng vùng mờ, Mức đặt mức cộng lại, và Ngưỡng trên 50% sẽ bỏ qua khác biệt nhỏ.",
+   "description": "Làm nét bằng cách cộng lại phần chênh lệch giữa lớp và một bản sao đã làm mờ của nó. Cường độ đặt độ rộng của vùng mờ, Mức đặt lượng được cộng lại, còn Ngưỡng trên 50% bỏ qua các khác biệt nhỏ. Khi Màu mặt nạ là Đỏ, mặt nạ hiện màu đỏ ở những chỗ độ sáng chênh với bản sao làm mờ nhiều hơn phần Ngưỡng vượt quá 50%.",
    "name": "Mặt nạ làm nét",
    "params": {
     "amount": {
@@ -6772,6 +7911,13 @@
     },
     "threshold": {
      "label": "Ngưỡng"
+    },
+    "maskColor": {
+     "label": "Màu mặt nạ",
+     "options": [
+      "Xám",
+      "Đỏ"
+     ]
     }
    }
   },
@@ -6795,7 +7941,7 @@
      "label": "Dòng quét"
     },
     "seed": {
-     "label": "Seed"
+     "label": "Hạt giống"
     },
     "smear": {
      "label": "Nhòe"
@@ -6867,6 +8013,19 @@
     },
     "yaw": {
      "label": "Xoay ngang"
+    },
+    "projection": {
+     "label": "Đầu ra",
+     "options": [
+      "Góc nhìn",
+      "Toàn cảnh"
+     ]
+    },
+    "eyeDistance": {
+     "label": "Khoảng cách"
+    },
+    "frame": {
+     "label": "Tỷ lệ khung hình"
     }
    }
   },
@@ -6932,7 +8091,7 @@
    }
   },
   "wavewarp": {
-   "description": "Uốn lớp bằng sóng sin: Khoảng cách đặt số sóng cắt qua, Độ lớn đặt độ đẩy, Góc đặt hướng sóng chạy và Góc uốn đặt hướng đẩy.",
+   "description": "Uốn lớp bằng sóng sin: Khoảng cách đặt số sóng cắt qua lớp, Độ lớn đặt độ đẩy, Góc đặt hướng sóng chạy và Góc uốn đặt hướng đẩy. Không gian màn hình đặt kích thước sóng theo màn hình thay vì theo lớp. Độ lớn chéo thêm một sóng thứ hai có kích thước theo Khoảng cách chéo, chạy theo Góc uốn và đẩy theo Góc. Khi Gốc là Góc dưới trái màn hình, sóng được đo từ góc đó theo cạnh ngắn của màn hình, rồi Pha trượt sóng đi.",
    "name": "Biến dạng sóng",
    "params": {
     "angle": {
@@ -6952,6 +8111,22 @@
     },
     "warpAngle": {
      "label": "Góc uốn"
+    },
+    "screenSpace": {
+     "label": "Không gian màn hình"
+    },
+    "crossSpacing": {
+     "label": "Khoảng cách chéo"
+    },
+    "crossMagnitude": {
+     "label": "Độ lớn chéo"
+    },
+    "origin": {
+     "label": "Gốc",
+     "options": [
+      "Góc lớp",
+      "Góc dưới trái màn hình"
+     ]
     }
    }
   },

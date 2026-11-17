@@ -48,13 +48,14 @@ double CubicBezier(double x1, double y1, double x2, double y2, double u) {
 }
 
 constexpr double kMinBounce = 0.0055;
+constexpr double kBounceSlack = 1e-6;
 
 double Bounce(double L, double b, double u) {
     if (!(L > 0)) return u;
     const double drop = L / 2;
     if (u < drop) return (u / drop) * (u / drop);
     double start = drop, length = L * b, height = b;
-    for (int i = 0; i < 10000 && height >= kMinBounce && start + length <= 1; i++) {
+    for (int i = 0; i < 10000 && height >= kMinBounce && start + length <= 1 + kBounceSlack; i++) {
         if (u < start + length) return 1 - 4 * height * (u - start) * (start + length - u) / (length * length);
         start += length;
         length *= b;

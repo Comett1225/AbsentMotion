@@ -6,7 +6,12 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.compose.runtime.mutableStateListOf
 import app.absentmotion.R
+import app.absentmotion.audio.TextBlips
 import app.absentmotion.audio.audioDeclaration
+import app.absentmotion.model.formatFloats
+import app.absentmotion.model.effects
+import app.absentmotion.model.withEffect
+import app.absentmotion.model.withEffectProperty
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.addAudio
 import app.absentmotion.editor.keepCopy
@@ -85,6 +90,21 @@ internal suspend fun EditorState.addSounds(context: Context, uris: List<Uri>) {
             else addAudio(media)
         }
     } finally { addingMedia = false }
+}
+
+internal suspend fun EditorState.pickBlipSound(context: Context, uri: Uri, layerId: Long, effect: Int) {
+    keepAccess(context, listOf(uri))
+    val media = audioDeclaration(context, uri)?.let { keepCopy(context, it) }?.takeIf { it.duration > 0 }
+    if (media == null) {
+        Toast.makeText(context, app.absentmotion.platform.mediaTrouble(context, uri) ?: AppText.get(R.string.library_err_unsupported_type), Toast.LENGTH_LONG).show()
+        return
+    }
+    if (scene.layer(layerId)?.effects?.getOrNull(effect)?.get("id") != "absent.textblips") return
+    edit { scene ->
+        scene.withMedia(media).update(layerId, sampleMs) { layer ->
+            layer.withEffect(effect) { it.with("src", media.uri).withEffectProperty("voice", "float", formatFloats(floatArrayOf(TextBlips.CUSTOM.toFloat())), layer.t, layer.snap) }
+        }
+    }
 }
 
 private fun EditorState.keepAccess(context: Context, uris: List<Uri>) {

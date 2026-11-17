@@ -5,7 +5,6 @@ import app.absentmotion.R
 import app.absentmotion.engine.NativeEngine
 import java.util.Locale
 import kotlin.math.abs
-import kotlin.math.log2
 import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.roundToInt
@@ -244,7 +243,7 @@ fun Easing.handles(): List<EasingHandle> {
 }
 
 private fun Easing.bezierHandles(): List<EasingHandle> {
-    val (x1, y1, x2, y2) = if (type == "linear") listOf(0f, 0f, 1f, 1f) else listOf(
+    val (x1, y1, x2, y2) = if (type == "linear") listOf(0.25f, 0.25f, 0.75f, 0.75f) else listOf(
         param(0, 0f, 0f, 1f), param(1, 0f, BEZIER_LOW, BEZIER_HIGH), param(2, 1f, 0f, 1f), param(3, 1f, BEZIER_LOW, BEZIER_HIGH),
     )
     fun curve(a: Float, b: Float, c: Float, d: Float) = Easing("cubicBezier", listOf(a, b, c, d), prefixes)
@@ -260,10 +259,10 @@ private fun Easing.bezierHandles(): List<EasingHandle> {
 
 private fun Easing.bounceHandles(): List<EasingHandle> {
     val length = param(0, 0.3f, SHORTEST, 1f)
-    val bounciness = param(1, 0.8f, 0f, 0.95f)
+    val bounciness = param(1, 0.8f, 0f, 1f)
     return listOf(
-        EasingHandle(length * (1 + bounciness) / 2, 1 - bounciness, param = true, fromX = length / 2, fromY = 1f) { x, y ->
-            val b = legal(1 - y, 0f, 0.95f, bounciness)
+        EasingHandle(length * (1 + bounciness) / 2, 1 - bounciness, param = true, dampingFactor = 0.85f) { x, y ->
+            val b = legal(1 - y, 0f, 1f, bounciness)
             copy(p = listOf(legal(2 * x / (1 + b), SHORTEST, 1f, length), b))
         },
     )
@@ -274,17 +273,15 @@ private fun Easing.elasticHandles(): List<EasingHandle> {
     val unused = p.getOrNull(1)?.takeIf { it.isFinite() } ?: 1f
     val decay = param(2, 0.5f, 0f, 1f)
     val strength = param(3, 1f, 0f, 1f)
-    fun left(a: Float, c: Float) = (1 - a).pow(1 + 15 * c * c)
-    fun curve(a: Float, c: Float, d: Float) = copy(p = listOf(a, unused, c, d))
-    val tail = (1 + half) / 2
+    fun curve(a: Float = half, c: Float = decay, d: Float = strength) = copy(p = listOf(a, unused, c, d))
+    val dip = min(1f, 2 * half)
+    val dipValue = 1 - strength * abs(1 - dip).pow(1 + 15 * decay * decay)
     return listOf(
-        EasingHandle(half, 1 + strength * left(half, decay), param = true, fromX = half, fromY = 1f, allowOvershoot = true) { x, y ->
-            val a = legal(x, SHORTEST, 1 - SHORTEST, half)
-            val room = left(a, decay)
-            curve(a, decay, if (room < 1e-4f) strength else legal((y - 1) / room, 0f, 1f, strength))
+        EasingHandle(0f, 1 + strength, param = true, fromX = 1f, fromY = 1 + strength, allowOvershoot = true) { _, y ->
+            curve(d = legal(y - 1, 0f, 1f, strength))
         },
-        EasingHandle(tail, 1.5f - decay / 2, param = true, fromX = tail, fromY = 1f, allowOvershoot = true) { _, y ->
-            curve(half, legal(3 - 2 * y, 0f, 1f, decay), strength)
+        EasingHandle(dip, decay, param = true, fromX = dip, fromY = dipValue) { x, y ->
+            curve(a = if (x == dip) half else legal(x / 2, SHORTEST, 1 - SHORTEST, half), c = legal(y, 0f, 1f, decay))
         },
     )
 }
@@ -298,12 +295,15 @@ private fun Easing.cyclicHandles(): List<EasingHandle> {
     fun curve(a: Float = period, b: Float = sharpness, c: Float = crest, d: Float = floor) = copy(p = listOf(a, b, c, d, unused))
     val top = crest * period
     return listOf(
-        EasingHandle(period, floor * period, param = true) { x, _ -> curve(a = legal(x, SHORTEST, 1f, period)) },
+        EasingHandle(sharpness * period, 1.5f, fromX = top, fromY = 1f) { x, _ -> curve(b = legal(x / period, 0f, 1f, sharpness)) },
         EasingHandle(top, 1f, param = true) { x, _ -> curve(c = legal(x / period, SHORTEST, 1 - SHORTEST, crest)) },
-        EasingHandle(top, sharpness / 2, param = true, fromX = top, fromY = 0f) { _, y -> curve(b = legal(2 * y, 0f, 1f, sharpness)) },
-        EasingHandle(1f, floor, param = true, fromX = 0f, fromY = 0f) { _, y -> curve(d = legal(y, 0f, 1f, floor)) },
+        EasingHandle(period, 0f, param = true) { x, _ -> curve(a = legal(x, SHORTEST, 1f, period)) },
+        EasingHandle(1f, floor, fromX = 0f, fromY = 0f) { _, y -> curve(d = legal(y, 0f, 1f, floor)) },
     )
 }
+
+private const val RANDOM_FREQUENCY_SPAN = 0.8f
+private const val RANDOM_MAGNITUDE_SPAN = 0.6f
 
 private fun Easing.randomHandles(): List<EasingHandle> {
     val frequency = param(0, 0.5f, 0f, 1f)
@@ -314,22 +314,14 @@ private fun Easing.randomHandles(): List<EasingHandle> {
     val tilt = param(5, 0f, 0f, 1f)
     fun curve(f: Float = frequency, m: Float = magnitude, s: Float = seed, att: Float = attenuation, w: Float = warp, t: Float = tilt) =
         copy(p = listOf(f, m, s, att, w, t))
-    val bent = 0.5f.pow(1 + 10 * abs(warp - 0.5f)).let { if (warp < 0.5f) it else 1 - it }
-    fun warpAt(y: Float): Float {
-        val v = y.coerceIn(1 / 64f, 63 / 64f)
-        val k = if (v < 0.5f) log2(1 / v) else log2(1 / (1 - v))
-        return (if (v < 0.5f) 0.5f - (k - 1) / 10 else 0.5f + (k - 1) / 10).coerceIn(0f, 1f)
-    }
-    val wobbleX = 0.85f - attenuation / 2
-    val wobbleY = 0.5f + magnitude / 2
     return listOf(
-        EasingHandle(0f, tilt, param = true) { _, y -> curve(t = legal(y, 0f, 1f, tilt)) },
-        EasingHandle(0.5f, bent, param = true, fromX = 0.5f, fromY = 0.5f) { _, y -> curve(w = if (y.isNaN()) warp else warpAt(y)) },
-        EasingHandle(wobbleX, wobbleY, param = true, fromX = wobbleX, fromY = wobbleY, dashed = true) { x, y ->
-            curve(m = legal(2 * y - 1, 0f, 1f, magnitude), att = legal(1.7f - 2 * x, 0f, 1f, attenuation))
+        EasingHandle(0f, seed, param = true, fromX = 0f, fromY = 1f, dashed = true) { _, y -> curve(s = legal(y, 0f, 1f, seed)) },
+        EasingHandle(RANDOM_FREQUENCY_SPAN * (1 - frequency), 1f, param = true) { x, _ -> curve(f = legal(1 - x / RANDOM_FREQUENCY_SPAN, 0f, 1f, frequency)) },
+        EasingHandle(warp, 1 - RANDOM_MAGNITUDE_SPAN * magnitude, param = true) { x, y ->
+            curve(w = legal(x, 0f, 1f, warp), m = legal((1 - y) / RANDOM_MAGNITUDE_SPAN, 0f, 1f, magnitude))
         },
-        EasingHandle(frequency, 1f, param = true) { x, _ -> curve(f = legal(x, 0f, 1f, frequency)) },
-        EasingHandle(seed, 0f, param = true) { x, _ -> curve(s = legal(x, 0f, 1f, seed)) },
+        EasingHandle(attenuation, 0f, param = true) { x, _ -> curve(att = legal(x, 0f, 1f, attenuation)) },
+        EasingHandle(1f, 1 - tilt) { _, y -> curve(t = legal(1 - y, 0f, 1f, tilt)) },
     )
 }
 
@@ -337,12 +329,9 @@ private fun Easing.stepHandles(): List<EasingHandle> {
     val length = param(0, 0.25f, SHORTEST, 1f)
     val smoothing = param(1, 0f, 0f, 1f)
     return listOf(
-        EasingHandle(length, length, param = true) { x, y ->
-            val along = if (x.isNaN()) y else if (y.isNaN()) x else (x + y) / 2
-            copy(p = listOf(legal(along, SHORTEST, 1f, length), smoothing))
-        },
-        EasingHandle(length * (1 - smoothing), 0f, param = true, fromX = length, fromY = 0f) { x, _ ->
-            copy(p = listOf(length, legal(1 - x / length, 0f, 1f, smoothing)))
+        EasingHandle(length, 0f, param = true) { x, _ -> copy(p = listOf(legal(x, SHORTEST, 1f, length), smoothing)) },
+        EasingHandle(length + smoothing * (1 - length), 1f, fromX = length, fromY = length) { x, _ ->
+            copy(p = listOf(length, legal((x - length) / (1 - length), 0f, 1f, smoothing)))
         },
     )
 }
@@ -350,12 +339,9 @@ private fun Easing.stepHandles(): List<EasingHandle> {
 private fun Easing.elasticStepHandles(): List<EasingHandle> {
     val length = param(0, 0.2f, SHORTEST, 1f)
     val overshoot = param(1, 0.5f, 0f, 1f)
-    val crest = min(1f, length * (1.5f - 0.45f * overshoot))
     return listOf(
         EasingHandle(length, 0f, param = true) { x, _ -> copy(p = listOf(legal(x, SHORTEST, 1f, length), overshoot)) },
-        EasingHandle(crest, length + overshoot / 4, param = true, fromX = crest, fromY = length, allowOvershoot = true, dampingFactor = 0.5f) { _, y ->
-            copy(p = listOf(length, legal(4 * (y - length), 0f, 1f, overshoot)))
-        },
+        EasingHandle(1f, overshoot, fromX = min(1f, 2 * length), fromY = length) { _, y -> copy(p = listOf(length, legal(y, 0f, 1f, overshoot))) },
     )
 }
 
