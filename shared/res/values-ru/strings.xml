@@ -142,8 +142,6 @@
     <string name="settings_graphics_opengl">OpenGL</string>
     <string name="settings_graphics_note">Сейчас используется %1$s.</string>
     <string name="settings_graphics_hint">Выберите OpenGL, если предпросмотр или экспорт выглядят неправильно на этом телефоне.</string>
-    <string name="settings_layout">Интерфейс для компьютера (экспериментальный)</string>
-    <string name="settings_layout_hint">Авто включает компьютерный интерфейс в Samsung DeX и в окнах на компьютере. Вкл позволяет попробовать его на любом планшете. Проект остаётся открытым при смене интерфейса.</string>
     <string name="settings_media">Медиадвижок</string>
     <string name="settings_media_standard">Стандартный</string>
     <string name="settings_media_ffamp">FFamp (экспериментальный)</string>
@@ -1142,6 +1140,8 @@
     <string name="font_reason_duplicate">этот шрифт уже импортирован</string>
     <string name="font_reason_corrupted">файл шрифта повреждён</string>
     <string name="font_reason_unreadable">не удалось открыть файл</string>
+    <string name="font_reason_zip_empty">в этом zip нет шрифтов (.ttf, .otf или .ttc)</string>
+    <string name="font_reason_zip_too_big">в zip больше 50 шрифтов или он больше 50 MB</string>
     <string name="font_load_failed_title">Не удалось загрузить шрифт</string>
     <string name="font_load_failed_body">Не удалось загрузить этот шрифт. Проверьте подключение к интернету и попробуйте снова.</string>
     <string name="font_title_language">Шрифты: %1$s</string>
@@ -2653,25 +2653,6 @@
     <string name="ai_image_under_minute">Меньше минуты для этого изображения</string>
     <string name="ai_image_about_time">Около %1$s для этого изображения</string>
     <string name="ai_checking_device">Проверяем это устройство…</string>
-    <string name="alight_link">Ссылка Alight</string>
-    <string name="alight_import_file">Импортировать файл</string>
-    <string name="alight_link_field">Ссылка Alight Motion</string>
-    <string name="alight_entry_hint">Вставьте HTTPS-ссылку с alight.link, alight.page.link или со страницы общего доступа Alight Motion.</string>
-    <string name="alight_invalid">Введите корректную ссылку общего доступа Alight Motion по HTTPS.</string>
-    <string name="alight_paste_empty">В буфере обмена нет текста. Вставьте или введите ссылку выше.</string>
-    <string name="alight_copy_link">Копировать ссылку</string>
-    <string name="alight_open_app">Открыть в Alight Motion</string>
-    <string name="alight_get_app">Скачать Alight Motion</string>
-    <string name="alight_open_failed">Не удалось открыть ссылку. Скопируйте её и откройте на телефоне.</string>
-    <string name="alight_loading">Загрузка публичной страницы…</string>
-    <string name="alight_preview_failed">Предпросмотр недоступен. Ссылкой всё равно можно пользоваться, следуя этим шагам.</string>
-    <string name="alight_preview_only">Это предпросмотр публичной страницы. AbsentMotion не может скачать проект по этой ссылке.</string>
-    <string name="alight_steps">Импорт проекта</string>
-    <string name="alight_phone_steps">На телефоне</string>
-    <string name="alight_step_import">1. Откройте ссылку в Alight Motion на телефоне и импортируйте проект.</string>
-    <string name="alight_step_open">2. Откройте проект в Alight Motion.</string>
-    <string name="alight_step_xml">3. Экспортируйте проект из Alight Motion в XML и выберите AbsentMotion, чтобы открыть его.</string>
-    <string name="alight_step_report">4. AbsentMotion импортирует XML и показывает обычный отчёт, включая всё, что не удалось преобразовать, и отсутствующие медиа.</string>
     <string name="play_count_in">Отсчёт</string>
     <string name="play_count_off">Выкл.</string>
     <string name="play_count_one">1 с</string>
@@ -2682,4 +2663,6 @@
     <string name="play_speed_normal">1x</string>
     <string name="record_overwrite">Перезапись при записи</string>
     <string name="history_record_keyframes">Запись ключевых кадров</string>
+    <string name="dafont_find">Найти больше шрифтов на DaFont</string>
+    <string name="dafont_hint">Скачайте шрифт, затем импортируйте .zip сюда. Проверьте лицензию, прежде чем использовать его в опубликованном видео.</string>
 </resources>

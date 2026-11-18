@@ -142,8 +142,6 @@
     <string name="settings_graphics_opengl">OpenGL</string>
     <string name="settings_graphics_note">Aktuell wird %1$s verwendet.</string>
     <string name="settings_graphics_hint">Wähle OpenGL, wenn die Vorschau oder Exporte auf diesem Gerät fehlerhaft aussehen.</string>
-    <string name="settings_layout">Computer-Layout (experimentell)</string>
-    <string name="settings_layout_hint">Auto nutzt das Computer-Layout in Samsung DeX und in Desktop-Fenstern. Mit „Ein“ kannst du es auf jedem Tablet ausprobieren. Dein Projekt bleibt offen, wenn sich das Layout ändert.</string>
     <string name="settings_media">Medien-Engine</string>
     <string name="settings_media_standard">Standard</string>
     <string name="settings_media_ffamp">FFamp (experimentell)</string>
@@ -1112,6 +1110,8 @@
     <string name="font_reason_duplicate">diese Schriftart wurde bereits importiert</string>
     <string name="font_reason_corrupted">die Schriftdatei ist beschädigt</string>
     <string name="font_reason_unreadable">die Datei konnte nicht geöffnet werden</string>
+    <string name="font_reason_zip_empty">keine Schriftarten (.ttf, .otf oder .ttc) in dieser Zip-Datei</string>
+    <string name="font_reason_zip_too_big">die Zip-Datei enthält mehr als 50 Schriftarten oder mehr als 50 MB</string>
     <string name="font_load_failed_title">Schriftart konnte nicht geladen werden</string>
     <string name="font_load_failed_body">Diese Schriftart konnte nicht geladen werden. Prüfe deine Internetverbindung und versuche es erneut.</string>
     <string name="font_title_language">%1$s-Schriftarten</string>
@@ -2595,25 +2595,6 @@
     <string name="ai_image_under_minute">Weniger als eine Minute für dieses Bild</string>
     <string name="ai_image_about_time">Etwa %1$s für dieses Bild</string>
     <string name="ai_checking_device">Dieses Gerät wird geprüft…</string>
-    <string name="alight_link">Alight-Link</string>
-    <string name="alight_import_file">Datei importieren</string>
-    <string name="alight_link_field">Alight Motion-Link</string>
-    <string name="alight_entry_hint">Füge einen HTTPS-Link von alight.link, alight.page.link oder einer öffentlichen Freigabeseite von Alight Motion ein.</string>
-    <string name="alight_invalid">Gib einen gültigen HTTPS-Freigabelink von Alight Motion ein.</string>
-    <string name="alight_paste_empty">Die Zwischenablage enthält keinen Text. Füge den Link oben ein oder tippe ihn ein.</string>
-    <string name="alight_copy_link">Link kopieren</string>
-    <string name="alight_open_app">In Alight Motion öffnen</string>
-    <string name="alight_get_app">Alight Motion laden</string>
-    <string name="alight_open_failed">Der Link konnte nicht geöffnet werden. Du kannst ihn kopieren und auf deinem Handy öffnen.</string>
-    <string name="alight_loading">Öffentliche Freigabeseite wird geladen…</string>
-    <string name="alight_preview_failed">Die Vorschau ist nicht verfügbar. Du kannst den Link trotzdem verwenden und diesen Schritten folgen.</string>
-    <string name="alight_preview_only">Das ist eine Vorschau der öffentlichen Freigabeseite. AbsentMotion kann das Projekt nicht über diesen Link herunterladen.</string>
-    <string name="alight_steps">Projekt importieren</string>
-    <string name="alight_phone_steps">Auf deinem Handy</string>
-    <string name="alight_step_import">1. Öffne den Link auf deinem Handy in Alight Motion und importiere das Projekt.</string>
-    <string name="alight_step_open">2. Öffne das Projekt in Alight Motion.</string>
-    <string name="alight_step_xml">3. Exportiere das Projekt aus Alight Motion als XML und wähle AbsentMotion zum Öffnen.</string>
-    <string name="alight_step_report">4. AbsentMotion importiert die XML-Datei und zeigt den üblichen Bericht, auch mit allem, was nicht umgewandelt werden konnte, und fehlenden Medien.</string>
     <string name="play_count_in">Einzähler</string>
     <string name="play_count_off">Aus</string>
     <string name="play_count_one">1 s</string>
@@ -2624,4 +2605,6 @@
     <string name="play_speed_normal">1x</string>
     <string name="record_overwrite">Beim Aufnehmen überschreiben</string>
     <string name="history_record_keyframes">Keyframes aufnehmen</string>
+    <string name="dafont_find">Weitere Schriftarten auf DaFont finden</string>
+    <string name="dafont_hint">Lade eine Schriftart herunter und importiere die .zip hier. Prüfe die Lizenz, bevor du sie in einem veröffentlichten Video verwendest.</string>
 </resources>

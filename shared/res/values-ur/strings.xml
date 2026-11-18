@@ -142,8 +142,6 @@
     <string name="settings_graphics_opengl">OpenGL</string>
     <string name="settings_graphics_note">اب %1$s استعمال ہو رہا ہے۔</string>
     <string name="settings_graphics_hint">اگر اس فون پر پری ویو یا ایکسپورٹس غلط دکھائی دیں تو OpenGL منتخب کریں۔</string>
-    <string name="settings_layout">کمپیوٹر لے آؤٹ (تجرباتی)</string>
-    <string name="settings_layout_hint">خودکار: Samsung DeX اور ڈیسک ٹاپ ونڈوز میں کمپیوٹر لے آؤٹ استعمال کرتا ہے۔ آن: آپ کو اسے کسی بھی ٹیبلٹ پر آزمانے دیتا ہے۔ لے آؤٹ بدلنے پر آپ کا پروجیکٹ کھلا رہتا ہے۔</string>
     <string name="settings_media">میڈیا انجن</string>
     <string name="settings_media_standard">معیاری</string>
     <string name="settings_media_ffamp">FFamp (تجرباتی)</string>
@@ -1112,6 +1110,8 @@
     <string name="font_reason_duplicate">یہ فونٹ پہلے ہی درآمد ہو چکا ہے</string>
     <string name="font_reason_corrupted">فونٹ فائل خراب ہے</string>
     <string name="font_reason_unreadable">فائل کھولی نہیں جا سکی</string>
+    <string name="font_reason_zip_empty">اس zip میں کوئی فونٹ (.ttf، .otf یا .ttc) نہیں ہے</string>
+    <string name="font_reason_zip_too_big">zip میں 50 سے زیادہ فونٹس ہیں یا وہ 50 MB سے بڑی ہے</string>
     <string name="font_load_failed_title">فونٹ لوڈ نہیں ہو سکا</string>
     <string name="font_load_failed_body">وہ فونٹ لوڈ نہیں ہو سکا۔ اپنا انٹرنیٹ کنکشن چیک کریں اور دوبارہ کوشش کریں۔</string>
     <string name="font_title_language">%1$s فونٹس</string>
@@ -2595,25 +2595,6 @@
     <string name="ai_image_under_minute">اس تصویر کے لیے ایک منٹ سے کم</string>
     <string name="ai_image_about_time">اس تصویر کے لیے تقریباً %1$s</string>
     <string name="ai_checking_device">اس ڈیوائس کی جانچ ہو رہی ہے…</string>
-    <string name="alight_link">Alight لنک</string>
-    <string name="alight_import_file">فائل درآمد کریں</string>
-    <string name="alight_link_field">Alight Motion لنک</string>
-    <string name="alight_entry_hint">alight.link، alight.page.link یا Alight Motion کے عوامی شیئر صفحے کا HTTPS لنک پیسٹ کریں۔</string>
-    <string name="alight_invalid">HTTPS والا درست Alight Motion شیئر لنک درج کریں۔</string>
-    <string name="alight_paste_empty">کلپ بورڈ میں کوئی ٹیکسٹ نہیں ہے۔ لنک اوپر پیسٹ کریں یا ٹائپ کریں۔</string>
-    <string name="alight_copy_link">لنک کاپی کریں</string>
-    <string name="alight_open_app">Alight Motion میں کھولیں</string>
-    <string name="alight_get_app">Alight Motion حاصل کریں</string>
-    <string name="alight_open_failed">لنک نہیں کھل سکا۔ آپ اسے کاپی کر کے اپنے فون پر کھول سکتے ہیں۔</string>
-    <string name="alight_loading">عوامی شیئر صفحہ لوڈ ہو رہا ہے…</string>
-    <string name="alight_preview_failed">پری ویو دستیاب نہیں ہے۔ آپ پھر بھی لنک استعمال کر سکتے ہیں اور ان مراحل پر عمل کر سکتے ہیں۔</string>
-    <string name="alight_preview_only">یہ عوامی شیئر صفحے کا پری ویو ہے۔ AbsentMotion اس لنک سے پروجیکٹ ڈاؤن لوڈ نہیں کر سکتا۔</string>
-    <string name="alight_steps">پروجیکٹ درآمد کریں</string>
-    <string name="alight_phone_steps">آپ کے فون پر</string>
-    <string name="alight_step_import">1. اپنے فون پر Alight Motion میں لنک کھولیں اور پروجیکٹ درآمد کریں۔</string>
-    <string name="alight_step_open">2. پروجیکٹ کو Alight Motion میں کھولیں۔</string>
-    <string name="alight_step_xml">3. پروجیکٹ کو Alight Motion سے XML کے طور پر ایکسپورٹ کریں اور اسے کھولنے کے لیے AbsentMotion منتخب کریں۔</string>
-    <string name="alight_step_report">4. AbsentMotion XML درآمد کرتا ہے اور اپنی معمول کی رپورٹ دکھاتا ہے، جس میں وہ سب شامل ہوتا ہے جو کنورٹ نہ ہو سکا اور کوئی بھی غائب میڈیا۔</string>
     <string name="play_count_in">کاؤنٹ اِن</string>
     <string name="play_count_off">بند</string>
     <string name="play_count_one">1 سیکنڈ</string>
@@ -2624,4 +2605,6 @@
     <string name="play_speed_normal">1x</string>
     <string name="record_overwrite">ریکارڈنگ کے دوران اوور رائٹ</string>
     <string name="history_record_keyframes">کی فریمز ریکارڈ کریں</string>
+    <string name="dafont_find">DaFont پر مزید فونٹس تلاش کریں</string>
+    <string name="dafont_hint">فونٹ ڈاؤن لوڈ کریں، پھر .zip یہاں امپورٹ کریں۔ شائع شدہ ویڈیو میں استعمال کرنے سے پہلے اس کا لائسنس چیک کریں۔</string>
 </resources>

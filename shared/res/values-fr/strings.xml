@@ -142,8 +142,6 @@
     <string name="settings_graphics_opengl">OpenGL</string>
     <string name="settings_graphics_note">Utilisation actuelle : %1$s.</string>
     <string name="settings_graphics_hint">Choisissez OpenGL si l’aperçu ou les exports s’affichent mal sur ce téléphone.</string>
-    <string name="settings_layout">Disposition ordinateur (expérimental)</string>
-    <string name="settings_layout_hint">Auto utilise la disposition ordinateur dans Samsung DeX et dans les fenêtres de bureau. Activé permet de l’essayer sur n’importe quelle tablette. Votre projet reste ouvert quand la disposition change.</string>
     <string name="settings_media">Moteur multimédia</string>
     <string name="settings_media_standard">Standard</string>
     <string name="settings_media_ffamp">FFamp (expérimental)</string>
@@ -1127,6 +1125,8 @@
     <string name="font_reason_duplicate">cette police est déjà importée</string>
     <string name="font_reason_corrupted">le fichier de police est endommagé</string>
     <string name="font_reason_unreadable">le fichier n’a pas pu être ouvert</string>
+    <string name="font_reason_zip_empty">aucune police (.ttf, .otf ou .ttc) dans ce zip</string>
+    <string name="font_reason_zip_too_big">le zip contient plus de 50 polices ou plus de 50 MB</string>
     <string name="font_load_failed_title">Impossible de charger la police</string>
     <string name="font_load_failed_body">Cette police n’a pas pu être chargée. Vérifiez votre connexion Internet et réessayez.</string>
     <string name="font_title_language">Polices : %1$s</string>
@@ -2624,25 +2624,6 @@
     <string name="ai_image_under_minute">Moins d’une minute pour cette image</string>
     <string name="ai_image_about_time">Environ %1$s pour cette image</string>
     <string name="ai_checking_device">Vérification de cet appareil…</string>
-    <string name="alight_link">Lien Alight</string>
-    <string name="alight_import_file">Importer un fichier</string>
-    <string name="alight_link_field">Lien Alight Motion</string>
-    <string name="alight_entry_hint">Collez un lien HTTPS provenant de alight.link, alight.page.link ou d’une page de partage publique d’Alight Motion.</string>
-    <string name="alight_invalid">Saisissez un lien de partage Alight Motion valide en HTTPS.</string>
-    <string name="alight_paste_empty">Le presse-papiers ne contient pas de texte. Collez ou saisissez le lien ci-dessus.</string>
-    <string name="alight_copy_link">Copier le lien</string>
-    <string name="alight_open_app">Ouvrir dans Alight Motion</string>
-    <string name="alight_get_app">Obtenir Alight Motion</string>
-    <string name="alight_open_failed">Impossible d’ouvrir le lien. Vous pouvez le copier et l’ouvrir sur votre téléphone.</string>
-    <string name="alight_loading">Chargement de la page de partage publique…</string>
-    <string name="alight_preview_failed">L’aperçu n’est pas disponible. Vous pouvez quand même utiliser le lien et suivre ces étapes.</string>
-    <string name="alight_preview_only">Ceci est un aperçu de la page de partage publique. AbsentMotion ne peut pas télécharger le projet à partir de ce lien.</string>
-    <string name="alight_steps">Importer le projet</string>
-    <string name="alight_phone_steps">Sur votre téléphone</string>
-    <string name="alight_step_import">1. Ouvrez le lien dans Alight Motion sur votre téléphone et importez le projet.</string>
-    <string name="alight_step_open">2. Ouvrez le projet dans Alight Motion.</string>
-    <string name="alight_step_xml">3. Exportez le projet depuis Alight Motion au format XML et choisissez AbsentMotion pour l’ouvrir.</string>
-    <string name="alight_step_report">4. AbsentMotion importe le XML et affiche son rapport habituel, y compris tout ce qu’il n’a pas pu convertir et les médias manquants.</string>
     <string name="play_count_in">Décompte</string>
     <string name="play_count_off">Désactivé</string>
     <string name="play_count_one">1 s</string>
@@ -2653,4 +2634,6 @@
     <string name="play_speed_normal">1x</string>
     <string name="record_overwrite">Écraser pendant l’enregistrement</string>
     <string name="history_record_keyframes">Enregistrer les images clés</string>
+    <string name="dafont_find">Trouver d’autres polices sur DaFont</string>
+    <string name="dafont_hint">Téléchargez une police, puis importez le .zip ici. Vérifiez sa licence avant de l’utiliser dans une vidéo publiée.</string>
 </resources>

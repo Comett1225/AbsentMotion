@@ -190,6 +190,7 @@ fun HomeScreen(
     onHistory: (ProjectInfo) -> Unit = {},
     onCollect: (String) -> Unit = {},
     changes: Int = 0,
+    engine: (() -> app.absentmotion.engine.EngineThread)? = null,
 ) {
     var projects by remember { mutableStateOf<List<ProjectInfo>>(emptyList()) }
     var loaded by remember { mutableStateOf(false) }
@@ -197,10 +198,6 @@ fun HomeScreen(
     var tab by rememberSaveable { mutableIntStateOf(lastTab) }
     var page by rememberSaveable { mutableIntStateOf(lastPage) }
     DisposableEffect(Unit) { onDispose { lastTab = tab; lastPage = page } }
-    var importMenu by remember { mutableStateOf(false) }
-    var addMenu by remember { mutableStateOf(false) }
-    var linkEntry by remember { mutableStateOf(false) }
-    var alightLink by remember { mutableStateOf<String?>(null) }
     var creating by remember { mutableStateOf(false) }
     var opening by remember { mutableIntStateOf(0) }
     var initialElement by remember { mutableStateOf(false) }
@@ -241,11 +238,11 @@ fun HomeScreen(
             Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars.union(WindowInsets.captionBar))) {
                 TopBar(onMenu = { scope.launch { drawer.open() } }, search, page, { search = it }, settings)
                 val fill = Modifier.weight(1f)
-                if (page == 3) CommunityTab(fill) { onImportFile(Uri.fromFile(it)) }
+                if (page == 3) CommunityTab(fill, engine) { onImportFile(Uri.fromFile(it)) }
                 else if (page == 2) ToolsTab(fill, store, settings) { id -> version++; onOpen(id) }
                 else if (page == 1) TemplatesTab(version, onTemplate, onTemplateProject, fill, query) else ProjectsPane(
                     Modifier.weight(1f), shown, loaded, tab, { tab = it }, settings, version, onOpen, onExport, query,
-                    onUpload = { importMenu = true },
+                    onUpload = { picker.launch(arrayOf("text/xml", "application/xml", "application/zip", "application/octet-stream")) },
                     onDuplicate = { id -> if (!duplicating) {
                         duplicating = true
                         app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.home_duplicating), app.absentmotion.platform.Toast.LENGTH_SHORT).show()
@@ -263,14 +260,7 @@ fun HomeScreen(
                 )
                 Spacer(Modifier.height(BarHeight + navInset))
             }
-            BottomBar(onNew = { addMenu = true }, page, { page = it; if (it >= 2) search = null }, Modifier.align(Alignment.BottomCenter), navInset, wide, settings.vibration)
-            if (importMenu || addMenu) HomeImportMenu(
-                onDismiss = { importMenu = false; addMenu = false },
-                onFile = { picker.launch(arrayOf("text/xml", "application/xml", "application/zip", "application/octet-stream")) },
-                onLink = { linkEntry = true }, onNew = if (addMenu) newProject else null,
-            )
-            if (linkEntry) AlightLinkEntry(onDismiss = { linkEntry = false }, onLink = { linkEntry = false; alightLink = it })
-            alightLink?.let { AlightLinkHelper(it, { alightLink = null }) }
+            BottomBar(onNew = newProject, page, { page = it; if (it >= 2) search = null }, Modifier.align(Alignment.BottomCenter), navInset, wide, settings.vibration)
             if (toReport.isNotEmpty()) ImportDialog(toReport, onDismiss = onImportShown, onOpen = { onImportShown(); toReport.first().let { if (it.template) onTemplate(it.id) else onOpen(it.id) } })
             Presence(creating) {
                 NewProjectSheet(

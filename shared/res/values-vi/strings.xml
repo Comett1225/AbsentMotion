@@ -142,8 +142,6 @@
     <string name="settings_graphics_opengl">OpenGL</string>
     <string name="settings_graphics_note">Hiện đang dùng %1$s.</string>
     <string name="settings_graphics_hint">Chọn OpenGL nếu bản xem trước hoặc video xuất ra trông sai trên điện thoại này.</string>
-    <string name="settings_layout">Bố cục máy tính (thử nghiệm)</string>
-    <string name="settings_layout_hint">Tự động dùng bố cục máy tính trong Samsung DeX và cửa sổ máy tính để bàn. Bật cho phép bạn thử trên mọi máy tính bảng. Dự án của bạn vẫn mở khi bố cục thay đổi.</string>
     <string name="settings_media">Trình xử lý phương tiện</string>
     <string name="settings_media_standard">Tiêu chuẩn</string>
     <string name="settings_media_ffamp">FFamp (thử nghiệm)</string>
@@ -1097,6 +1095,8 @@
     <string name="font_reason_duplicate">phông chữ này đã được nhập</string>
     <string name="font_reason_corrupted">tệp phông chữ bị hỏng</string>
     <string name="font_reason_unreadable">không thể mở tệp</string>
+    <string name="font_reason_zip_empty">không có phông chữ (.ttf, .otf hoặc .ttc) nào trong tệp zip này</string>
+    <string name="font_reason_zip_too_big">tệp zip chứa hơn 50 phông chữ hoặc nặng hơn 50 MB</string>
     <string name="font_load_failed_title">Không thể tải phông chữ</string>
     <string name="font_load_failed_body">Không thể tải phông chữ đó. Hãy kiểm tra kết nối internet và thử lại.</string>
     <string name="font_title_language">Phông chữ %1$s</string>
@@ -2566,25 +2566,6 @@
     <string name="ai_image_under_minute">Dưới một phút cho hình ảnh này</string>
     <string name="ai_image_about_time">Khoảng %1$s cho hình ảnh này</string>
     <string name="ai_checking_device">Đang kiểm tra thiết bị này…</string>
-    <string name="alight_link">Liên kết Alight</string>
-    <string name="alight_import_file">Nhập tệp</string>
-    <string name="alight_link_field">Liên kết Alight Motion</string>
-    <string name="alight_entry_hint">Dán liên kết HTTPS từ alight.link, alight.page.link hoặc trang chia sẻ công khai của Alight Motion.</string>
-    <string name="alight_invalid">Nhập liên kết chia sẻ Alight Motion hợp lệ dùng HTTPS.</string>
-    <string name="alight_paste_empty">Bộ nhớ tạm không có văn bản. Hãy dán hoặc nhập liên kết ở trên.</string>
-    <string name="alight_copy_link">Sao chép liên kết</string>
-    <string name="alight_open_app">Mở trong Alight Motion</string>
-    <string name="alight_get_app">Tải Alight Motion</string>
-    <string name="alight_open_failed">Không thể mở liên kết. Bạn có thể sao chép và mở nó trên điện thoại.</string>
-    <string name="alight_loading">Đang tải trang chia sẻ công khai…</string>
-    <string name="alight_preview_failed">Không có bản xem trước. Bạn vẫn có thể dùng liên kết và làm theo các bước sau.</string>
-    <string name="alight_preview_only">Đây là bản xem trước của trang chia sẻ công khai. AbsentMotion không thể tải dự án từ liên kết này.</string>
-    <string name="alight_steps">Nhập dự án</string>
-    <string name="alight_phone_steps">Trên điện thoại của bạn</string>
-    <string name="alight_step_import">1. Mở liên kết trong Alight Motion trên điện thoại và nhập dự án.</string>
-    <string name="alight_step_open">2. Mở dự án trong Alight Motion.</string>
-    <string name="alight_step_xml">3. Xuất dự án từ Alight Motion dưới dạng XML và chọn AbsentMotion để mở.</string>
-    <string name="alight_step_report">4. AbsentMotion nhập XML và hiển thị báo cáo thông thường, gồm cả những gì không thể chuyển đổi và phương tiện bị thiếu.</string>
     <string name="play_count_in">Đếm ngược</string>
     <string name="play_count_off">Tắt</string>
     <string name="play_count_one">1 giây</string>
@@ -2595,4 +2576,6 @@
     <string name="play_speed_normal">1x</string>
     <string name="record_overwrite">Ghi đè khi đang ghi</string>
     <string name="history_record_keyframes">Ghi keyframe</string>
+    <string name="dafont_find">Tìm thêm phông chữ trên DaFont</string>
+    <string name="dafont_hint">Tải phông chữ về, rồi nhập tệp .zip tại đây. Hãy kiểm tra giấy phép trước khi dùng trong video được đăng.</string>
 </resources>

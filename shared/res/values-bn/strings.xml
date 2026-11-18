@@ -142,8 +142,6 @@
     <string name="settings_graphics_opengl">OpenGL</string>
     <string name="settings_graphics_note">এখন %1$s ব্যবহার হচ্ছে।</string>
     <string name="settings_graphics_hint">এই ফোনে প্রিভিউ বা এক্সপোর্ট ভুল দেখালে OpenGL বেছে নিন।</string>
-    <string name="settings_layout">কম্পিউটার লেআউট (পরীক্ষামূলক)</string>
-    <string name="settings_layout_hint">অটো: Samsung DeX ও ডেস্কটপ উইন্ডোতে কম্পিউটার লেআউট ব্যবহার করে। চালু: যেকোনো ট্যাবলেটে এটি চেষ্টা করতে দেয়। লেআউট বদলালে আপনার প্রজেক্ট খোলা থাকে।</string>
     <string name="settings_media">মিডিয়া ইঞ্জিন</string>
     <string name="settings_media_standard">স্ট্যান্ডার্ড</string>
     <string name="settings_media_ffamp">FFamp (পরীক্ষামূলক)</string>
@@ -1112,6 +1110,8 @@
     <string name="font_reason_duplicate">এই ফন্টটি ইতিমধ্যে ইমপোর্ট করা হয়েছে</string>
     <string name="font_reason_corrupted">ফন্ট ফাইলটি ক্ষতিগ্রস্ত</string>
     <string name="font_reason_unreadable">ফাইলটি খোলা যায়নি</string>
+    <string name="font_reason_zip_empty">এই zip-এর ভেতরে কোনো ফন্ট (.ttf, .otf বা .ttc) নেই</string>
+    <string name="font_reason_zip_too_big">zip-এ ৫০টির বেশি ফন্ট বা 50 MB-এর বেশি আছে</string>
     <string name="font_load_failed_title">ফন্ট লোড করা যায়নি</string>
     <string name="font_load_failed_body">ওই ফন্টটি লোড করা যায়নি। আপনার ইন্টারনেট সংযোগ পরীক্ষা করে আবার চেষ্টা করুন।</string>
     <string name="font_title_language">%1$s ফন্ট</string>
@@ -2595,25 +2595,6 @@
     <string name="ai_image_under_minute">এই ইমেজের জন্য এক মিনিটেরও কম</string>
     <string name="ai_image_about_time">এই ইমেজের জন্য প্রায় %1$s</string>
     <string name="ai_checking_device">এই ডিভাইসটি পরীক্ষা করা হচ্ছে…</string>
-    <string name="alight_link">Alight লিংক</string>
-    <string name="alight_import_file">ফাইল ইমপোর্ট করুন</string>
-    <string name="alight_link_field">Alight Motion লিংক</string>
-    <string name="alight_entry_hint">alight.link, alight.page.link বা Alight Motion-এর পাবলিক শেয়ার পেজের একটি HTTPS লিংক পেস্ট করুন।</string>
-    <string name="alight_invalid">HTTPS সহ একটি বৈধ Alight Motion শেয়ার লিংক দিন।</string>
-    <string name="alight_paste_empty">ক্লিপবোর্ডে কোনো টেক্সট নেই। লিংকটি উপরে পেস্ট করুন বা টাইপ করুন।</string>
-    <string name="alight_copy_link">লিংক কপি করুন</string>
-    <string name="alight_open_app">Alight Motion-এ খুলুন</string>
-    <string name="alight_get_app">Alight Motion নিন</string>
-    <string name="alight_open_failed">লিংকটি খোলা যায়নি। আপনি এটি কপি করে আপনার ফোনে খুলতে পারেন।</string>
-    <string name="alight_loading">পাবলিক শেয়ার পেজ লোড হচ্ছে…</string>
-    <string name="alight_preview_failed">প্রিভিউ পাওয়া যাচ্ছে না। আপনি তবুও লিংকটি ব্যবহার করতে এবং এই ধাপগুলো অনুসরণ করতে পারেন।</string>
-    <string name="alight_preview_only">এটি পাবলিক শেয়ার পেজের প্রিভিউ। AbsentMotion এই লিংক থেকে প্রজেক্ট ডাউনলোড করতে পারে না।</string>
-    <string name="alight_steps">প্রজেক্ট ইমপোর্ট করুন</string>
-    <string name="alight_phone_steps">আপনার ফোনে</string>
-    <string name="alight_step_import">1. আপনার ফোনে Alight Motion-এ লিংকটি খুলুন এবং প্রজেক্ট ইমপোর্ট করুন।</string>
-    <string name="alight_step_open">2. প্রজেক্টটি Alight Motion-এ খুলুন।</string>
-    <string name="alight_step_xml">3. প্রজেক্টটি Alight Motion থেকে XML হিসেবে এক্সপোর্ট করুন এবং খোলার জন্য AbsentMotion বেছে নিন।</string>
-    <string name="alight_step_report">4. AbsentMotion XML ইমপোর্ট করে এবং তার সচরাচর রিপোর্ট দেখায়, যাতে যা কনভার্ট করা যায়নি এবং যেকোনো অনুপস্থিত মিডিয়া অন্তর্ভুক্ত থাকে।</string>
     <string name="play_count_in">কাউন্ট-ইন</string>
     <string name="play_count_off">বন্ধ</string>
     <string name="play_count_one">1 সেকেন্ড</string>
@@ -2624,4 +2605,6 @@
     <string name="play_speed_normal">1x</string>
     <string name="record_overwrite">রেকর্ডিংয়ের সময় ওভাররাইট</string>
     <string name="history_record_keyframes">কীফ্রেম রেকর্ড করুন</string>
+    <string name="dafont_find">DaFont-এ আরও ফন্ট খুঁজুন</string>
+    <string name="dafont_hint">একটি ফন্ট ডাউনলোড করুন, তারপর .zip ফাইলটি এখানে ইমপোর্ট করুন। প্রকাশিত ভিডিওতে ব্যবহারের আগে এর লাইসেন্স দেখে নিন।</string>
 </resources>

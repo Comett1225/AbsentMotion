@@ -142,8 +142,6 @@
     <string name="settings_graphics_opengl">OpenGL</string>
     <string name="settings_graphics_note">Şu anda %1$s kullanılıyor.</string>
     <string name="settings_graphics_hint">Önizleme veya dışa aktarmalar bu telefonda yanlış görünüyorsa OpenGL\'i seçin.</string>
-    <string name="settings_layout">Bilgisayar düzeni (deneysel)</string>
-    <string name="settings_layout_hint">Otomatik, Samsung DeX\'te ve masaüstü pencerelerinde bilgisayar düzenini kullanır. Açık, onu herhangi bir tablette denemenizi sağlar. Düzen değişse de projeniz açık kalır.</string>
     <string name="settings_media">Medya motoru</string>
     <string name="settings_media_standard">Standart</string>
     <string name="settings_media_ffamp">FFamp (deneysel)</string>
@@ -1112,6 +1110,8 @@
     <string name="font_reason_duplicate">bu yazı tipi zaten içe aktarılmış</string>
     <string name="font_reason_corrupted">yazı tipi dosyası bozuk</string>
     <string name="font_reason_unreadable">dosya açılamadı</string>
+    <string name="font_reason_zip_empty">bu zip içinde yazı tipi (.ttf, .otf veya .ttc) yok</string>
+    <string name="font_reason_zip_too_big">zip 50\'den fazla yazı tipi içeriyor veya 50 MB\'den büyük</string>
     <string name="font_load_failed_title">Yazı tipi yüklenemedi</string>
     <string name="font_load_failed_body">Bu yazı tipi yüklenemedi. İnternet bağlantınızı kontrol edip tekrar deneyin.</string>
     <string name="font_title_language">%1$s yazı tipleri</string>
@@ -2595,25 +2595,6 @@
     <string name="ai_image_under_minute">Bu görsel için bir dakikadan az</string>
     <string name="ai_image_about_time">Bu görsel için yaklaşık %1$s</string>
     <string name="ai_checking_device">Bu cihaz kontrol ediliyor…</string>
-    <string name="alight_link">Alight bağlantısı</string>
-    <string name="alight_import_file">Dosya içe aktar</string>
-    <string name="alight_link_field">Alight Motion bağlantısı</string>
-    <string name="alight_entry_hint">alight.link, alight.page.link veya herkese açık bir Alight Motion paylaşım sayfasından bir HTTPS bağlantısı yapıştırın.</string>
-    <string name="alight_invalid">HTTPS kullanan geçerli bir Alight Motion paylaşım bağlantısı girin.</string>
-    <string name="alight_paste_empty">Panoda metin yok. Bağlantıyı yukarıya yapıştırın veya yazın.</string>
-    <string name="alight_copy_link">Bağlantıyı kopyala</string>
-    <string name="alight_open_app">Alight Motion\'da aç</string>
-    <string name="alight_get_app">Alight Motion\'ı indirin</string>
-    <string name="alight_open_failed">Bağlantı açılamadı. Kopyalayıp telefonunuzda açabilirsiniz.</string>
-    <string name="alight_loading">Herkese açık paylaşım sayfası yükleniyor…</string>
-    <string name="alight_preview_failed">Önizleme kullanılamıyor. Bağlantıyı yine de kullanabilir ve bu adımları izleyebilirsiniz.</string>
-    <string name="alight_preview_only">Bu, herkese açık paylaşım sayfasının bir önizlemesidir. AbsentMotion projeyi bu bağlantıdan indiremez.</string>
-    <string name="alight_steps">Projeyi içe aktarın</string>
-    <string name="alight_phone_steps">Telefonunuzda</string>
-    <string name="alight_step_import">1. Bağlantıyı telefonunuzda Alight Motion\'da açın ve projeyi içe aktarın.</string>
-    <string name="alight_step_open">2. Projeyi Alight Motion\'da açın.</string>
-    <string name="alight_step_xml">3. Projeyi Alight Motion\'dan XML olarak dışa aktarın ve açmak için AbsentMotion\'ı seçin.</string>
-    <string name="alight_step_report">4. AbsentMotion XML\'i içe aktarır ve dönüştüremediği her şeyi ve eksik medyayı da içeren olağan raporu gösterir.</string>
     <string name="play_count_in">Geri sayım</string>
     <string name="play_count_off">Kapalı</string>
     <string name="play_count_one">1 sn</string>
@@ -2624,4 +2605,6 @@
     <string name="play_speed_normal">1x</string>
     <string name="record_overwrite">Kayıt sırasında üzerine yaz</string>
     <string name="history_record_keyframes">Anahtar kare kaydı</string>
+    <string name="dafont_find">DaFont\'ta daha fazla yazı tipi bul</string>
+    <string name="dafont_hint">Bir yazı tipi indirin, sonra .zip dosyasını burada içe aktarın. Yayımlanan bir videoda kullanmadan önce lisansını kontrol edin.</string>
 </resources>

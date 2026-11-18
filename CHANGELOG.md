@@ -14,9 +14,8 @@ Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stan
 - Community guidelines (COMMUNITY_GUIDELINES.md): the Community bundle checklist asks to confirm they are followed and opens them inside the app.
 - AI Enhance for images (Realistic or Anime and cartoon, Max quality on computers with Real-ESRGAN x4plus models), Tools > Enhance Image, and a before/after slider after every image enhance.
 - Record keyframes while playing, with a count-in and playback speed (hold Play), Overwrite while recording (hold the keyframe button), keyframe thinning and one undo step per recording.
-- Font search also lists Google Fonts families when online, under a Google Fonts divider, with source chips (All, Imported, App, Device, Google Fonts); device fonts are listed too.
-- Alight Motion links: paste, share or open a project link to see its public title and picture and the steps to export the project as XML into AbsentMotion. Nothing is downloaded from Alight's servers.
-- Computer layout on Android (experimental): Samsung DeX and desktop windows switch the editor to the desktop layout; Settings > Editor > Computer layout (Auto, On, Off).
+- Font search also lists Google Fonts families when online, under a Google Fonts divider, with source chips (All, Imported, App, Device, Google Fonts); device fonts are listed too. A "Find more fonts on DaFont" link opens dafont.com in the browser, and Import Fonts accepts .zip files (up to 50 fonts and 50 MB).
+- Computer layout in Samsung DeX (experimental): the editor turns the desktop layout on by itself in Samsung DeX and off when DeX ends, with the project kept open; there is no setting.
 - Phones open, preview and export AVI (DivX and Xvid), WMV and videos with AC-3 sound they could not play, plus 10-bit and 4:2:2 H.264, ProRes and DNxHD, through FFamp's own decoders. Files the phone plays stay on the phone's reader.
 - FFamp media reader (experimental) on every platform: the first start asks once whether to try it, with this device's measured speed-ups; Settings > Playback > Media reader changes it.
 - Double-tap to type: one tap on a number selects it for the ruler or slider, a double tap (double-click on computers) opens typing with the whole value selected.

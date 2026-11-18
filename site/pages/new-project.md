@@ -4,7 +4,7 @@ group: Interface
 order: 2
 summary: Every setting of the new project sheet.
 ---
-Tap the round **+** at the bottom of the home screen. A sheet slides up from the bottom. It opens with the values you used last time (shape, resolution, frame rate and background; the name is always new). Tap Back to close it without making anything.
+Tap the round **+** at the bottom of the home screen. A window opens in the middle of the screen, on phones and tablets alike. It opens with the values you used last time (shape, resolution, frame rate and background; the name is always new). Tap Back to close it without making anything.
 
 ![The new project sheet: PROJECT or ASSET (1), the name (2), the shape (3), Resolution (4), Frame Rate (5), Background (6) and CREATE PROJECT (7).](img/new-sheet.webp)
 
@@ -48,9 +48,9 @@ Choose 12, 15, 18, 20, 24, 25, 30, 48, 50, 60, 90 or 120 frames per second. The 
 
 The color behind your layers: **Black**, **White**, **Light Gray**, **Green**, **Blue** or **Transparent** (shown as a checkerboard). A new install starts with Transparent. Transparent areas of an exported video come out black; GIF and image exports let you choose what transparent areas become, and PNG keeps them.
 
-## Buttons at the bottom
+## Buttons
 
-- **CREATE PROJECT** (**CREATE ASSET** for an asset) makes the project and opens the editor on it.
-- The X below it closes the sheet.
+- **CREATE PROJECT** (**CREATE ASSET** for an asset) at the bottom makes the project and opens the editor on it.
+- The X at the top, next to **New project**, closes the window.
 
 If there is not enough storage the app says so and does not create the project.

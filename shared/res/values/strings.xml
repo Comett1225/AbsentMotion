@@ -142,8 +142,6 @@
     <string name="settings_graphics_opengl">OpenGL</string>
     <string name="settings_graphics_note">Now using %1$s.</string>
     <string name="settings_graphics_hint">Choose OpenGL if the preview or exports look wrong on this phone.</string>
-    <string name="settings_layout">Computer layout (experimental)</string>
-    <string name="settings_layout_hint">Auto uses the computer layout in Samsung DeX and on desktop windows. On lets you try it on any tablet. Your project stays open when the layout changes.</string>
     <string name="settings_media">Media engine</string>
     <string name="settings_media_standard">Standard</string>
     <string name="settings_media_ffamp">FFamp (experimental)</string>
@@ -1134,6 +1132,8 @@
     <string name="font_reason_duplicate">this font is already imported</string>
     <string name="font_reason_corrupted">the font file is damaged</string>
     <string name="font_reason_unreadable">the file could not be opened</string>
+    <string name="font_reason_zip_empty">no fonts (.ttf, .otf or .ttc) inside this zip</string>
+    <string name="font_reason_zip_too_big">the zip holds more than 50 fonts or more than 50 MB</string>
     <string name="font_load_failed_title">Could not load font</string>
     <string name="font_load_failed_body">That font couldn\'t be loaded. Check your internet connection and try again.</string>
     <string name="font_title_language">%1$s Fonts</string>
@@ -2621,25 +2621,6 @@
     <string name="ai_image_under_minute">Less than a minute for this image</string>
     <string name="ai_image_about_time">About %1$s for this image</string>
     <string name="ai_checking_device">Checking this device…</string>
-    <string name="alight_link">Alight link</string>
-    <string name="alight_import_file">Import a file</string>
-    <string name="alight_link_field">Alight Motion link</string>
-    <string name="alight_entry_hint">Paste an HTTPS link from alight.link, alight.page.link or an Alight Motion public share page.</string>
-    <string name="alight_invalid">Enter a valid Alight Motion share link using HTTPS.</string>
-    <string name="alight_paste_empty">The clipboard has no text. Paste or type the link above.</string>
-    <string name="alight_copy_link">Copy link</string>
-    <string name="alight_open_app">Open in Alight Motion</string>
-    <string name="alight_get_app">Get Alight Motion</string>
-    <string name="alight_open_failed">The link could not be opened. You can copy it and open it on your phone.</string>
-    <string name="alight_loading">Loading the public share page…</string>
-    <string name="alight_preview_failed">The preview is unavailable. You can still use the link and follow these steps.</string>
-    <string name="alight_preview_only">This is a preview of the public share page. AbsentMotion cannot download the project from this link.</string>
-    <string name="alight_steps">Import the project</string>
-    <string name="alight_phone_steps">On your phone</string>
-    <string name="alight_step_import">1. Open the link in Alight Motion on your phone and import the project.</string>
-    <string name="alight_step_open">2. Open the project in Alight Motion.</string>
-    <string name="alight_step_xml">3. Export the project from Alight Motion as XML and choose AbsentMotion to open it.</string>
-    <string name="alight_step_report">4. AbsentMotion imports the XML and shows its usual report, including anything it could not convert and any missing media.</string>
     <string name="play_count_in">Count-in</string>
     <string name="play_count_off">Off</string>
     <string name="play_count_one">1 s</string>
@@ -2650,4 +2631,6 @@
     <string name="play_speed_normal">1x</string>
     <string name="record_overwrite">Overwrite while recording</string>
     <string name="history_record_keyframes">Record keyframes</string>
+    <string name="dafont_find">Find more fonts on DaFont</string>
+    <string name="dafont_hint">Download a font, then import the .zip here. Check its licence before using it in a published video.</string>
 </resources>

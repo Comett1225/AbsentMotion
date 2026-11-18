@@ -55,7 +55,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -293,7 +292,6 @@ fun NewProjectSheet(
     val form = remember(opening) { Form(settings.newProject, existingTitles, DefaultNames(context), initialElement) }
     val scope = rememberCoroutineScope()
     var creating by remember { mutableStateOf(false) }
-    val card = app.absentmotion.ui.editor.LocalTablet.current
     val create: () -> Unit = create@{
         if (creating) return@create
         creating = true
@@ -315,17 +313,16 @@ fun NewProjectSheet(
         }
     }
     BoxWithConstraints(Modifier.fillMaxSize()) {
-        if (card && maxWidth > maxHeight && maxWidth - 48.dp >= 720.dp) {
-            AdaptiveWindow(1100.dp, 500.dp) { SheetBody(form, settings, true, onClose, create) }
+        if (maxWidth > maxHeight && maxWidth - 48.dp >= 720.dp) {
+            AdaptiveWindow(1100.dp, 500.dp) { SheetBody(form, settings, onClose, create) }
         } else {
             Box(Modifier.fillMaxSize().presenceScrim(Color.Black.copy(alpha = 0.7f)).pointerInput(Unit) { detectTapGestures { } })
             BoxWithConstraints(
-                if (card) Modifier.align(Alignment.Center).windowInsetsPadding(WindowInsets.systemBars.union(WindowInsets.ime)).padding(24.dp).widthIn(max = 480.dp).presence(scaleFrom = 0.96f)
-                else Modifier.align(Alignment.BottomCenter).widthIn(max = 480.dp).presence(slide = 1f, fade = false),
+                Modifier.align(Alignment.Center).windowInsetsPadding(WindowInsets.systemBars.union(WindowInsets.ime)).padding(24.dp).widthIn(max = 480.dp).presence(scaleFrom = 0.96f),
             ) {
                 val density = LocalDensity.current
                 CompositionLocalProvider(LocalDensity provides Density(density.density * minOf(1f, maxWidth / SheetWidth), density.fontScale)) {
-                    SheetBody(form, settings, card, onClose, create)
+                    SheetBody(form, settings, onClose, create)
                 }
             }
         }
@@ -333,13 +330,11 @@ fun NewProjectSheet(
 }
 
 @Composable
-private fun SheetBody(form: Form, settings: AppSettings, card: Boolean, onClose: () -> Unit, onCreate: () -> Unit) {
+private fun SheetBody(form: Form, settings: AppSettings, onClose: () -> Unit, onCreate: () -> Unit) {
     Column(
-        if (card) (if (LocalAdaptiveSpace.current?.wide == true) Modifier.fillMaxSize() else Modifier.fillMaxWidth()).clip(RoundedCornerShape(22.dp)).background(Am.SheetBg).verticalScroll(rememberScrollState())
-        else Modifier.fillMaxWidth().clip(RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp)).background(Am.SheetBg)
-            .windowInsetsPadding(WindowInsets.navigationBars.union(WindowInsets.ime)).verticalScroll(rememberScrollState()),
+        (if (LocalAdaptiveSpace.current?.wide == true) Modifier.fillMaxSize() else Modifier.fillMaxWidth()).clip(RoundedCornerShape(22.dp)).background(Am.SheetBg).verticalScroll(rememberScrollState()),
     ) {
-        if (card) Row(Modifier.padding(start = 20.dp, top = 12.dp).height(48.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.padding(start = 20.dp, top = 12.dp).height(48.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(48.dp).clip(CircleShape).clickable(onClick = onClose), contentAlignment = Alignment.Center) {
                 Icon(HomeIcons.Close, stringResource(R.string.cancel), Modifier.size(22.dp), tint = Am.Navy)
                 HoldName(stringResource(R.string.cancel))
@@ -348,7 +343,7 @@ private fun SheetBody(form: Form, settings: AppSettings, card: Boolean, onClose:
         }
         val pages = if (PlatformFeatures.desktop) null else rememberPagerState { if (settings.savedSizes.isEmpty()) 1 else 2 }
         val identity: @Composable ColumnScope.() -> Unit = {
-            Spacer(Modifier.height(if (card) 12.dp else 30.dp))
+            Spacer(Modifier.height(12.dp))
             TypeToggle(form)
             Spacer(Modifier.height(35.dp))
             NameField(form)
@@ -386,22 +381,9 @@ private fun SheetBody(form: Form, settings: AppSettings, card: Boolean, onClose:
             identity()
             dimensions()
         }
-        if (card) {
-            Spacer(Modifier.height(12.dp))
-            AccentPill(stringResource(if (form.element) R.string.newproject_create_asset else R.string.newproject_create_project), Modifier.padding(horizontal = 32.dp).fillMaxWidth(), onClick = onCreate)
-            Spacer(Modifier.height(32.dp))
-            return@Column
-        }
         Spacer(Modifier.height(12.dp))
         AccentPill(stringResource(if (form.element) R.string.newproject_create_asset else R.string.newproject_create_project), Modifier.padding(horizontal = 32.dp).fillMaxWidth(), onClick = onCreate)
-        Spacer(Modifier.height(28.dp))
-        Box(
-            Modifier.align(Alignment.CenterHorizontally).size(60.dp).clickable(onClick = onClose),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(HomeIcons.Close, stringResource(R.string.cancel), Modifier.size(24.dp), tint = Am.Navy)
-            HoldName(stringResource(R.string.cancel))
-        }
+        Spacer(Modifier.height(32.dp))
     }
 }
 

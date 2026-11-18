@@ -5,6 +5,7 @@ import app.absentmotion.library.AppSettings
 import app.absentmotion.model.CameraFov
 import app.absentmotion.model.PropRef
 import app.absentmotion.model.withCameraFov
+import app.absentmotion.model.Keyframe
 import app.absentmotion.model.Scene
 import app.absentmotion.ui.editor.previewFrameOffset
 import kotlinx.coroutines.runBlocking
@@ -121,5 +122,120 @@ class LivePlaybackTest {
         state.undo()
         assertEquals(2, state.scene.layer(1L)!!.keyframes(CameraFov).size)
         assertFalse(state.canUndo)
+    }
+
+    private val moving = """<scene title="Live" width="400" height="400" fps="30" totalTime="1999" bgcolor="#ff000000"><shape id="1" label="Cube" startTime="0" endTime="1999" fillType="color" s=".rect"><transform><location><kf t="0.000000" v="200,200,0"/><kf t="1.000000" v="200,200,0"/></location></transform></shape></scene>"""
+
+    private fun EditorState.locationKeys(): List<Keyframe> = scene.layer(1L)!!.keyframes(PropRef.Location)
+
+    private fun EditorState.fingerMove(dx: Float, dy: Float) =
+        editSelected("preview-gesture") { layer -> scene.withWorldLocation(layer, sampleMs) { x, y -> x + dx to y + dy } }
+
+    private fun EditorState.dragUpWiggling(frames: IntRange) {
+        for (f in frames) { frame = f; fingerMove(if (f % 2 == 0) 12f else -12f, -6f) }
+    }
+
+    private fun EditorState.dragRightWiggling(frames: IntRange) {
+        for (f in frames) { frame = f; fingerMove(6f, if (f % 2 == 0) 12f else -12f) }
+    }
+
+    private fun EditorState.undoSteps(): Int {
+        var steps = 0
+        while (canUndo) { undo(); steps++ }
+        return steps
+    }
+
+    @Test fun eachFingerActionWhilePlayingIsOneUndoStep() {
+        val state = opened("actions", moving)
+        state.selectedId = 1L
+        state.playing = true
+        val original = state.locationKeys()
+        state.dragUpWiggling(1..12)
+        state.endGesture()
+        val first = state.locationKeys()
+        assertTrue(first.size > 3)
+        state.dragRightWiggling(13..26)
+        state.endGesture()
+        val second = state.locationKeys()
+        assertTrue(second != first)
+        state.undo()
+        assertTrue(state.playing)
+        assertEquals(first, state.locationKeys())
+        state.undo()
+        assertEquals(original, state.locationKeys())
+        assertFalse(state.canUndo)
+        state.redo()
+        assertEquals(first, state.locationKeys())
+        state.redo()
+        assertEquals(second, state.locationKeys())
+        assertFalse(state.canRedo)
+        state.playing = false
+        state.undo()
+        assertEquals(first, state.locationKeys())
+        state.undo()
+        assertEquals(original, state.locationKeys())
+        assertFalse(state.canUndo)
+    }
+
+    @Test fun undoWhileTheFingerIsStillDownRemovesTheWholeCurrentAction() {
+        val state = opened("finger-down", moving)
+        state.selectedId = 1L
+        state.playing = true
+        state.dragUpWiggling(1..12)
+        state.endGesture()
+        val first = state.locationKeys()
+        state.dragRightWiggling(13..26)
+        state.undo()
+        assertEquals(first, state.locationKeys())
+        state.frame = 27
+        state.frame = 28
+        assertEquals(first, state.locationKeys())
+        state.endGesture()
+        assertEquals(first, state.locationKeys())
+        state.playing = false
+        assertEquals(1, state.undoSteps())
+    }
+
+    @Test fun loopingInTheMiddleOfOneDragStaysOneUndoStep() {
+        val state = opened("loop", moving)
+        state.selectedId = 1L
+        state.settings.loopingPlay = true
+        state.playing = true
+        val original = state.locationKeys()
+        state.dragUpWiggling(1..10)
+        state.endGesture()
+        val first = state.locationKeys()
+        state.dragRightWiggling(48..state.scene.lastFrame)
+        state.frame = 0
+        state.dragRightWiggling(0..8)
+        state.endGesture()
+        val looped = state.locationKeys()
+        assertTrue(looped.any { it.t > 0.75f && it.t < 1f })
+        assertTrue(looped.filter { it.t < 0.2f } != first.filter { it.t < 0.2f })
+        state.undo()
+        assertEquals(first, state.locationKeys())
+        state.undo()
+        assertEquals(original, state.locationKeys())
+        assertFalse(state.canUndo)
+        state.redo()
+        state.redo()
+        assertEquals(looped, state.locationKeys())
+    }
+
+    @Test fun pivotDragAcrossALoopIsOneUndoStepAndTapsStaySeparate() {
+        val state = opened("pivot-loop", """<scene title="Live" width="400" height="400" fps="30" totalTime="1999" bgcolor="#ff000000"><shape id="1" label="A" startTime="0" endTime="1999" fillType="color" s=".rect"><transform><location value="200,200,0"/><pivot><kf t="0.000000" v="0,0,0"/><kf t="1.000000" v="0,0,0"/></pivot><rotation><kf t="0.000000" v="0"/><kf t="1.000000" v="0"/></rotation></transform></shape></scene>""")
+        state.selectedId = 1L
+        state.playing = true
+        for (f in 50..state.scene.lastFrame) { state.frame = f; state.setPivot(f - 40f, 0f, "pivot") }
+        state.frame = 0
+        for (f in 0..6) { state.frame = f; state.setPivot(30f + f, 5f, "pivot") }
+        state.endGesture()
+        state.frame = 10
+        state.editSelected { it.withRotation(30f) }
+        state.frame = 14
+        state.editSelected { it.withRotation(60f) }
+        state.playing = false
+        assertEquals(3, state.undoSteps())
+        assertEquals(2, state.scene.layer(1L)!!.keyframes(PropRef.Pivot).size)
     }
 }

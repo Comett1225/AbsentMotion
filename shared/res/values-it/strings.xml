@@ -142,8 +142,6 @@
     <string name="settings_graphics_opengl">OpenGL</string>
     <string name="settings_graphics_note">In uso: %1$s.</string>
     <string name="settings_graphics_hint">Scegli OpenGL se l\'anteprima o le esportazioni non vengono visualizzate correttamente su questo telefono.</string>
-    <string name="settings_layout">Layout computer (sperimentale)</string>
-    <string name="settings_layout_hint">Auto usa il layout computer in Samsung DeX e nelle finestre desktop. Attivato permette di provarlo su qualsiasi tablet. Il progetto resta aperto quando il layout cambia.</string>
     <string name="settings_media">Motore multimediale</string>
     <string name="settings_media_standard">Standard</string>
     <string name="settings_media_ffamp">FFamp (sperimentale)</string>
@@ -1127,6 +1125,8 @@
     <string name="font_reason_duplicate">questo font è già stato importato</string>
     <string name="font_reason_corrupted">il file del font è danneggiato</string>
     <string name="font_reason_unreadable">impossibile aprire il file</string>
+    <string name="font_reason_zip_empty">nessun font (.ttf, .otf o .ttc) in questo zip</string>
+    <string name="font_reason_zip_too_big">lo zip contiene più di 50 font o più di 50 MB</string>
     <string name="font_load_failed_title">Impossibile caricare il font</string>
     <string name="font_load_failed_body">Impossibile caricare il font. Controlla la connessione Internet e riprova.</string>
     <string name="font_title_language">Font %1$s</string>
@@ -2624,25 +2624,6 @@
     <string name="ai_image_under_minute">Meno di un minuto per questa immagine</string>
     <string name="ai_image_about_time">Circa %1$s per questa immagine</string>
     <string name="ai_checking_device">Controllo di questo dispositivo…</string>
-    <string name="alight_link">Link Alight</string>
-    <string name="alight_import_file">Importa un file</string>
-    <string name="alight_link_field">Link Alight Motion</string>
-    <string name="alight_entry_hint">Incolla un link HTTPS da alight.link, alight.page.link o da una pagina di condivisione pubblica di Alight Motion.</string>
-    <string name="alight_invalid">Inserisci un link di condivisione Alight Motion valido con HTTPS.</string>
-    <string name="alight_paste_empty">Gli appunti non contengono testo. Incolla o digita il link qui sopra.</string>
-    <string name="alight_copy_link">Copia link</string>
-    <string name="alight_open_app">Apri in Alight Motion</string>
-    <string name="alight_get_app">Scarica Alight Motion</string>
-    <string name="alight_open_failed">Impossibile aprire il link. Puoi copiarlo e aprirlo sul telefono.</string>
-    <string name="alight_loading">Caricamento della pagina di condivisione pubblica…</string>
-    <string name="alight_preview_failed">L\'anteprima non è disponibile. Puoi comunque usare il link e seguire questi passaggi.</string>
-    <string name="alight_preview_only">Questa è un\'anteprima della pagina di condivisione pubblica. AbsentMotion non può scaricare il progetto da questo link.</string>
-    <string name="alight_steps">Importa il progetto</string>
-    <string name="alight_phone_steps">Sul tuo telefono</string>
-    <string name="alight_step_import">1. Apri il link in Alight Motion sul tuo telefono e importa il progetto.</string>
-    <string name="alight_step_open">2. Apri il progetto in Alight Motion.</string>
-    <string name="alight_step_xml">3. Esporta il progetto da Alight Motion come XML e scegli AbsentMotion per aprirlo.</string>
-    <string name="alight_step_report">4. AbsentMotion importa l\'XML e mostra il suo consueto rapporto, comprese le parti che non ha potuto convertire e i file multimediali mancanti.</string>
     <string name="play_count_in">Conteggio iniziale</string>
     <string name="play_count_off">Disattivato</string>
     <string name="play_count_one">1 s</string>
@@ -2653,4 +2634,6 @@
     <string name="play_speed_normal">1x</string>
     <string name="record_overwrite">Sovrascrivi durante la registrazione</string>
     <string name="history_record_keyframes">Registra keyframe</string>
+    <string name="dafont_find">Trova altri font su DaFont</string>
+    <string name="dafont_hint">Scarica un font, poi importa qui il .zip. Controlla la licenza prima di usarlo in un video pubblicato.</string>
 </resources>

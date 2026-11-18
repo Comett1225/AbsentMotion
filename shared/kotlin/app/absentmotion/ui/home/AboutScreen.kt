@@ -91,18 +91,20 @@ private fun AboutPage(onClose: () -> Unit, onLicences: () -> Unit, onWhatsNew: (
         Row(Modifier.weight(1f).fillMaxWidth()) {
         Column(Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState()).padding(horizontal = if (wide) 28.dp else 16.dp)) {
             Spacer(Modifier.height(24.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("AbsentMotion", color = Am.Navy, fontSize = 26.sp, fontWeight = FontWeight.Bold)
-                app.absentmotion.ui.adaptive.AppLogo(30.dp, Modifier.padding(start = 10.dp))
-            }
-            if (version.isNotEmpty()) Text(stringResource(if (Tier.compatible) R.string.about_version_compatible else R.string.about_version, version),
-                Modifier.padding(top = 2.dp), color = Am.HomeMid, fontSize = 14.sp)
-            if (notes != null) Box(
-                Modifier.padding(top = 14.dp).heightIn(min = 44.dp).clip(RoundedCornerShape(50)).background(Am.Navy)
-                    .clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = onWhatsNew).padding(horizontal = 20.dp, vertical = 10.dp),
-                Alignment.Center,
-            ) {
-                Text(stringResource(R.string.whats_new_see, WhatsNewNotes.key(version) ?: notes), color = Am.OnNavy, fontSize = 15.sp, fontWeight = FontWeight.Medium)
+            Row {
+                Column(Modifier.weight(1f, fill = false)) {
+                    Text("AbsentMotion", color = Am.Navy, fontSize = 26.sp, fontWeight = FontWeight.Bold)
+                    if (version.isNotEmpty()) Text(stringResource(if (Tier.compatible) R.string.about_version_compatible else R.string.about_version, version),
+                        Modifier.padding(top = 2.dp), color = Am.HomeMid, fontSize = 14.sp)
+                    if (notes != null) Box(
+                        Modifier.padding(top = 14.dp).heightIn(min = 44.dp).clip(RoundedCornerShape(50)).background(Am.Navy)
+                            .clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = onWhatsNew).padding(horizontal = 20.dp, vertical = 10.dp),
+                        Alignment.Center,
+                    ) {
+                        Text(stringResource(R.string.whats_new_see, WhatsNewNotes.key(version) ?: notes), color = Am.OnNavy, fontSize = 15.sp, fontWeight = FontWeight.Medium)
+                    }
+                }
+                app.absentmotion.ui.adaptive.AppLogo(76.dp, Modifier.padding(start = 24.dp, top = 4.dp))
             }
             Spacer(Modifier.height(20.dp))
             Body(stringResource(R.string.about_licence_line))

@@ -46,10 +46,7 @@ class AppSettings(private val context: Context) {
 
     private fun look(accent: Int? = accentState) = Accents.apply(Themes.palette(context, themeState, systemDarkState), accent)
 
-    private var layoutChoiceState by mutableStateOf(app.absentmotion.ui.adaptive.LayoutChoice.of(prefs.getString("computerLayout", null)))
-
     init {
-        app.absentmotion.ui.adaptive.DeskLayout.choice = layoutChoiceState
         if (!prefs.contains("theme")) prefs.edit().putString("theme", themeState).apply()
         Am.palette = look()
     }
@@ -121,14 +118,6 @@ class AppSettings(private val context: Context) {
     var rotateFree: Boolean
         get() = rotateFreeState
         set(value) { rotateFreeState = value; prefs.edit().putBoolean("rotateFree", value).apply() }
-
-    var layoutChoice: app.absentmotion.ui.adaptive.LayoutChoice
-        get() = layoutChoiceState
-        set(value) {
-            layoutChoiceState = value
-            app.absentmotion.ui.adaptive.DeskLayout.choice = value
-            prefs.edit().putString("computerLayout", value.name).apply()
-        }
 
     var openGl: Boolean
         get() = openGlState

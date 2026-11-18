@@ -52,7 +52,7 @@ While you search, a row of chips under the field shows **All**, **Imported**, **
 
 ### Your own fonts
 
-**Import Fonts** lets you pick font files from your phone. If a file cannot be used, a list says which ones failed. Press and hold an imported font to remove it.
+**Import Fonts** lets you pick font files from your phone. If a file cannot be used, a list says which ones failed. You can also pick a .zip file: every font inside it is imported. The font list ends with "Find more fonts on DaFont", which opens the DaFont website in your browser at your current search (AbsentMotion never downloads from DaFont itself): download a font there, import its .zip here, and check its licence before using it in a published video. Press and hold an imported font to remove it.
 
 ## Animate text
 

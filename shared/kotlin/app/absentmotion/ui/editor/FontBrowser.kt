@@ -60,6 +60,7 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
     val context = LocalContext.current
     val searchFocus = remember { FocusRequester() }
     val keyboard = LocalSoftwareKeyboardController.current
+    val links = androidx.compose.ui.platform.LocalUriHandler.current
     var drawer by remember { mutableStateOf(false) }
     var search by remember { mutableStateOf<String?>(null) }
     var categories by remember { mutableStateOf(library.browserCategories) }
@@ -82,13 +83,13 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
     val importer = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
         scope.launch {
             val failures = mutableListOf<String>()
+            var imported = 0
             uris.forEach { uri ->
-                val problem = try { library.import(uri); null } catch (e: kotlinx.coroutines.CancellationException) { throw e } catch (e: FontImportError) { e.problem } catch (_: Exception) { FontProblem.Corrupted }
-                if (problem != null) failures += app.absentmotion.i18n.AppText.get(R.string.font_import_reason_line,
-                    withContext(Dispatchers.IO) { runCatching { context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { if (it.moveToFirst()) it.getString(0) else null } }.getOrNull() } ?: uri.lastPathSegment ?: "",
-                    app.absentmotion.i18n.AppText.get(FontReasons.getValue(problem)))
+                val result = try { library.importAll(uri) } catch (e: kotlinx.coroutines.CancellationException) { throw e } catch (_: Exception) { FontLibrary.Imported(emptyList(), listOf((uri.lastPathSegment ?: "") to FontProblem.Corrupted)) }
+                imported += result.fonts.size
+                result.failures.forEach { (name, problem) -> failures += app.absentmotion.i18n.AppText.get(R.string.font_import_reason_line, name, app.absentmotion.i18n.AppText.get(FontReasons.getValue(problem))) }
             }
-            if (failures.isNotEmpty()) error = FontError(if (failures.size == uris.size) R.string.font_import_failed_title else R.string.font_import_some_failed_title, R.string.font_import_reasons_body, failures.joinToString("\n"))
+            if (failures.isNotEmpty()) error = FontError(if (imported == 0) R.string.font_import_failed_title else R.string.font_import_some_failed_title, R.string.font_import_reasons_body, failures.joinToString("\n"))
             revision++
         }
     }
@@ -190,6 +191,12 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
                 if (source == FontSource.Google && !searching) item(key = "google-hint", span = { GridItemSpan(maxLineSpan) }) {
                     Text(stringResource(R.string.font_google_hint), Modifier.fillMaxWidth().padding(16.dp), color = Am.Caption, fontSize = 13.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
                 }
+                item(key = "dafont", span = { GridItemSpan(maxLineSpan) }) {
+                    Column(Modifier.fillMaxWidth().clickable { runCatching { links.openUri(daFontUrl(search)) } }.padding(horizontal = 16.dp, vertical = 12.dp)) {
+                        Text(stringResource(R.string.dafont_find), color = Favourite, fontSize = 15.sp)
+                        Text(stringResource(R.string.dafont_hint), Modifier.padding(top = 4.dp), color = Am.Caption, fontSize = 12.sp)
+                    }
+                }
             }
         }
         Presence(drawer) {
@@ -260,6 +267,7 @@ private val FontReasons = mapOf(
     FontProblem.NotFont to R.string.font_reason_not_font, FontProblem.Unsupported to R.string.font_reason_unsupported,
     FontProblem.TooLarge to R.string.font_reason_too_large, FontProblem.AlreadyImported to R.string.font_reason_duplicate,
     FontProblem.Corrupted to R.string.font_reason_corrupted, FontProblem.Unreadable to R.string.font_reason_unreadable,
+    FontProblem.NoFonts to R.string.font_reason_zip_empty, FontProblem.ZipTooBig to R.string.font_reason_zip_too_big,
 )
 
 private val AllCategories = setOf(1, 2, 3, 4, 5, 100, 110)

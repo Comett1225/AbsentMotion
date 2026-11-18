@@ -142,8 +142,6 @@
     <string name="settings_graphics_opengl">OpenGL</string>
     <string name="settings_graphics_note">अभी %1$s इस्तेमाल हो रहा है।</string>
     <string name="settings_graphics_hint">अगर इस फ़ोन पर प्रीव्यू या एक्सपोर्ट गलत दिखें तो OpenGL चुनें।</string>
-    <string name="settings_layout">कंप्यूटर लेआउट (प्रायोगिक)</string>
-    <string name="settings_layout_hint">ऑटो: Samsung DeX और डेस्कटॉप विंडो में कंप्यूटर लेआउट इस्तेमाल करता है। चालू: आपको इसे किसी भी टैबलेट पर आज़माने देता है। लेआउट बदलने पर आपका प्रोजेक्ट खुला रहता है।</string>
     <string name="settings_media">मीडिया इंजन</string>
     <string name="settings_media_standard">स्टैंडर्ड</string>
     <string name="settings_media_ffamp">FFamp (प्रायोगिक)</string>
@@ -1112,6 +1110,8 @@
     <string name="font_reason_duplicate">यह फ़ॉन्ट पहले से इंपोर्ट है</string>
     <string name="font_reason_corrupted">फ़ॉन्ट फ़ाइल ख़राब है</string>
     <string name="font_reason_unreadable">फ़ाइल नहीं खोली जा सकी</string>
+    <string name="font_reason_zip_empty">इस zip के अंदर कोई फ़ॉन्ट (.ttf, .otf या .ttc) नहीं है</string>
+    <string name="font_reason_zip_too_big">zip में 50 से ज़्यादा फ़ॉन्ट हैं या वह 50 MB से बड़ी है</string>
     <string name="font_load_failed_title">फ़ॉन्ट लोड नहीं हो सका</string>
     <string name="font_load_failed_body">वह फ़ॉन्ट लोड नहीं हो सका। अपना इंटरनेट कनेक्शन जाँचें और फिर से कोशिश करें।</string>
     <string name="font_title_language">%1$s फ़ॉन्ट</string>
@@ -2595,25 +2595,6 @@
     <string name="ai_image_under_minute">इस इमेज के लिए एक मिनट से कम</string>
     <string name="ai_image_about_time">इस इमेज के लिए लगभग %1$s</string>
     <string name="ai_checking_device">इस डिवाइस की जाँच हो रही है…</string>
-    <string name="alight_link">Alight लिंक</string>
-    <string name="alight_import_file">फ़ाइल इम्पोर्ट करें</string>
-    <string name="alight_link_field">Alight Motion लिंक</string>
-    <string name="alight_entry_hint">alight.link, alight.page.link या Alight Motion के सार्वजनिक शेयर पेज का HTTPS लिंक पेस्ट करें।</string>
-    <string name="alight_invalid">HTTPS वाला मान्य Alight Motion शेयर लिंक डालें।</string>
-    <string name="alight_paste_empty">क्लिपबोर्ड में कोई टेक्स्ट नहीं है। लिंक ऊपर पेस्ट करें या टाइप करें।</string>
-    <string name="alight_copy_link">लिंक कॉपी करें</string>
-    <string name="alight_open_app">Alight Motion में खोलें</string>
-    <string name="alight_get_app">Alight Motion पाएँ</string>
-    <string name="alight_open_failed">लिंक खुल नहीं सका। आप उसे कॉपी करके अपने फ़ोन पर खोल सकते हैं।</string>
-    <string name="alight_loading">सार्वजनिक शेयर पेज लोड हो रहा है…</string>
-    <string name="alight_preview_failed">प्रीव्यू उपलब्ध नहीं है। आप फिर भी लिंक इस्तेमाल कर सकते हैं और इन चरणों का पालन कर सकते हैं।</string>
-    <string name="alight_preview_only">यह सार्वजनिक शेयर पेज का प्रीव्यू है। AbsentMotion इस लिंक से प्रोजेक्ट डाउनलोड नहीं कर सकता।</string>
-    <string name="alight_steps">प्रोजेक्ट इम्पोर्ट करें</string>
-    <string name="alight_phone_steps">आपके फ़ोन पर</string>
-    <string name="alight_step_import">1. अपने फ़ोन पर Alight Motion में लिंक खोलें और प्रोजेक्ट इम्पोर्ट करें।</string>
-    <string name="alight_step_open">2. प्रोजेक्ट को Alight Motion में खोलें।</string>
-    <string name="alight_step_xml">3. प्रोजेक्ट को Alight Motion से XML के रूप में एक्सपोर्ट करें और उसे खोलने के लिए AbsentMotion चुनें।</string>
-    <string name="alight_step_report">4. AbsentMotion XML इम्पोर्ट करता है और अपनी सामान्य रिपोर्ट दिखाता है, जिसमें वह सब शामिल होता है जो कन्वर्ट नहीं हो सका और कोई भी गुम मीडिया।</string>
     <string name="play_count_in">काउंट-इन</string>
     <string name="play_count_off">बंद</string>
     <string name="play_count_one">1 सेकंड</string>
@@ -2624,4 +2605,6 @@
     <string name="play_speed_normal">1x</string>
     <string name="record_overwrite">रिकॉर्डिंग के दौरान ओवरराइट</string>
     <string name="history_record_keyframes">कीफ़्रेम रिकॉर्ड करें</string>
+    <string name="dafont_find">DaFont पर और फ़ॉन्ट खोजें</string>
+    <string name="dafont_hint">कोई फ़ॉन्ट डाउनलोड करें, फिर .zip यहाँ इम्पोर्ट करें। प्रकाशित वीडियो में इस्तेमाल करने से पहले इसका लाइसेंस जाँच लें।</string>
 </resources>

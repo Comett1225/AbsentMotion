@@ -142,8 +142,6 @@
     <string name="settings_graphics_opengl">OpenGL</string>
     <string name="settings_graphics_note">Sekarang memakai %1$s.</string>
     <string name="settings_graphics_hint">Pilih OpenGL jika pratinjau atau hasil ekspor terlihat salah di ponsel ini.</string>
-    <string name="settings_layout">Tata letak komputer (eksperimental)</string>
-    <string name="settings_layout_hint">Otomatis memakai tata letak komputer di Samsung DeX dan jendela desktop. Nyala memungkinkan Anda mencobanya di tablet mana pun. Proyek Anda tetap terbuka saat tata letak berubah.</string>
     <string name="settings_media">Mesin media</string>
     <string name="settings_media_standard">Standar</string>
     <string name="settings_media_ffamp">FFamp (eksperimental)</string>
@@ -1097,6 +1095,8 @@
     <string name="font_reason_duplicate">font ini sudah diimpor</string>
     <string name="font_reason_corrupted">berkas font rusak</string>
     <string name="font_reason_unreadable">berkas tidak dapat dibuka</string>
+    <string name="font_reason_zip_empty">tidak ada font (.ttf, .otf atau .ttc) di dalam zip ini</string>
+    <string name="font_reason_zip_too_big">zip berisi lebih dari 50 font atau lebih dari 50 MB</string>
     <string name="font_load_failed_title">Tidak dapat memuat font</string>
     <string name="font_load_failed_body">Font tersebut tidak dapat dimuat. Periksa koneksi internet Anda dan coba lagi.</string>
     <string name="font_title_language">Font %1$s</string>
@@ -2566,25 +2566,6 @@
     <string name="ai_image_under_minute">Kurang dari semenit untuk gambar ini</string>
     <string name="ai_image_about_time">Sekitar %1$s untuk gambar ini</string>
     <string name="ai_checking_device">Memeriksa perangkat ini…</string>
-    <string name="alight_link">Tautan Alight</string>
-    <string name="alight_import_file">Impor file</string>
-    <string name="alight_link_field">Tautan Alight Motion</string>
-    <string name="alight_entry_hint">Tempel tautan HTTPS dari alight.link, alight.page.link, atau halaman berbagi publik Alight Motion.</string>
-    <string name="alight_invalid">Masukkan tautan berbagi Alight Motion yang valid dengan HTTPS.</string>
-    <string name="alight_paste_empty">Papan klip tidak berisi teks. Tempel atau ketik tautan di atas.</string>
-    <string name="alight_copy_link">Salin tautan</string>
-    <string name="alight_open_app">Buka di Alight Motion</string>
-    <string name="alight_get_app">Dapatkan Alight Motion</string>
-    <string name="alight_open_failed">Tautan tidak dapat dibuka. Anda bisa menyalinnya dan membukanya di ponsel.</string>
-    <string name="alight_loading">Memuat halaman berbagi publik…</string>
-    <string name="alight_preview_failed">Pratinjau tidak tersedia. Anda tetap bisa memakai tautan dan mengikuti langkah-langkah ini.</string>
-    <string name="alight_preview_only">Ini pratinjau halaman berbagi publik. AbsentMotion tidak dapat mengunduh proyek dari tautan ini.</string>
-    <string name="alight_steps">Impor proyek</string>
-    <string name="alight_phone_steps">Di ponsel Anda</string>
-    <string name="alight_step_import">1. Buka tautan di Alight Motion pada ponsel Anda dan impor proyek.</string>
-    <string name="alight_step_open">2. Buka proyek di Alight Motion.</string>
-    <string name="alight_step_xml">3. Ekspor proyek dari Alight Motion sebagai XML lalu pilih AbsentMotion untuk membukanya.</string>
-    <string name="alight_step_report">4. AbsentMotion mengimpor XML dan menampilkan laporan seperti biasa, termasuk apa pun yang tidak dapat dikonversi dan media yang hilang.</string>
     <string name="play_count_in">Hitung mundur</string>
     <string name="play_count_off">Mati</string>
     <string name="play_count_one">1 dtk</string>
@@ -2595,4 +2576,6 @@
     <string name="play_speed_normal">1x</string>
     <string name="record_overwrite">Timpa saat merekam</string>
     <string name="history_record_keyframes">Rekam keyframe</string>
+    <string name="dafont_find">Cari font lain di DaFont</string>
+    <string name="dafont_hint">Unduh sebuah font, lalu impor .zip-nya di sini. Periksa lisensinya sebelum memakainya di video yang dipublikasikan.</string>
 </resources>

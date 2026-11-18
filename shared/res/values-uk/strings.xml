@@ -142,8 +142,6 @@
     <string name="settings_graphics_opengl">OpenGL</string>
     <string name="settings_graphics_note">Зараз використовується %1$s.</string>
     <string name="settings_graphics_hint">Виберіть OpenGL, якщо попередній перегляд або експорт на цьому телефоні виглядає неправильно.</string>
-    <string name="settings_layout">Інтерфейс для комп\'ютера (експериментальний)</string>
-    <string name="settings_layout_hint">Авто вмикає комп\'ютерний інтерфейс у Samsung DeX і у вікнах на комп\'ютері. Увімк. дає змогу спробувати його на будь-якому планшеті. Проєкт лишається відкритим під час зміни інтерфейсу.</string>
     <string name="settings_media">Медіарушій</string>
     <string name="settings_media_standard">Стандартний</string>
     <string name="settings_media_ffamp">FFamp (експериментальний)</string>
@@ -1142,6 +1140,8 @@
     <string name="font_reason_duplicate">цей шрифт уже імпортовано</string>
     <string name="font_reason_corrupted">файл шрифту пошкоджено</string>
     <string name="font_reason_unreadable">не вдалося відкрити файл</string>
+    <string name="font_reason_zip_empty">у цьому zip немає шрифтів (.ttf, .otf або .ttc)</string>
+    <string name="font_reason_zip_too_big">у zip більше 50 шрифтів або він більший за 50 MB</string>
     <string name="font_load_failed_title">Не вдалося завантажити шрифт</string>
     <string name="font_load_failed_body">Не вдалося завантажити цей шрифт. Перевірте підключення до інтернету й спробуйте ще раз.</string>
     <string name="font_title_language">Шрифти: %1$s</string>
@@ -2653,25 +2653,6 @@
     <string name="ai_image_under_minute">Менше хвилини для цього зображення</string>
     <string name="ai_image_about_time">Близько %1$s для цього зображення</string>
     <string name="ai_checking_device">Перевірка цього пристрою…</string>
-    <string name="alight_link">Посилання Alight</string>
-    <string name="alight_import_file">Імпортувати файл</string>
-    <string name="alight_link_field">Посилання Alight Motion</string>
-    <string name="alight_entry_hint">Вставте HTTPS-посилання з alight.link, alight.page.link або зі сторінки спільного доступу Alight Motion.</string>
-    <string name="alight_invalid">Введіть чинне посилання спільного доступу Alight Motion через HTTPS.</string>
-    <string name="alight_paste_empty">У буфері обміну немає тексту. Вставте або введіть посилання вище.</string>
-    <string name="alight_copy_link">Копіювати посилання</string>
-    <string name="alight_open_app">Відкрити в Alight Motion</string>
-    <string name="alight_get_app">Отримати Alight Motion</string>
-    <string name="alight_open_failed">Не вдалося відкрити посилання. Скопіюйте його й відкрийте на телефоні.</string>
-    <string name="alight_loading">Завантаження публічної сторінки…</string>
-    <string name="alight_preview_failed">Попередній перегляд недоступний. Посиланням усе одно можна скористатися, виконавши ці кроки.</string>
-    <string name="alight_preview_only">Це попередній перегляд публічної сторінки. AbsentMotion не може завантажити проєкт за цим посиланням.</string>
-    <string name="alight_steps">Імпорт проєкту</string>
-    <string name="alight_phone_steps">На телефоні</string>
-    <string name="alight_step_import">1. Відкрийте посилання в Alight Motion на телефоні й імпортуйте проєкт.</string>
-    <string name="alight_step_open">2. Відкрийте проєкт в Alight Motion.</string>
-    <string name="alight_step_xml">3. Експортуйте проєкт з Alight Motion як XML і виберіть AbsentMotion, щоб відкрити його.</string>
-    <string name="alight_step_report">4. AbsentMotion імпортує XML і показує звичайний звіт, зокрема все, що не вдалося перетворити, та відсутні медіа.</string>
     <string name="play_count_in">Відлік</string>
     <string name="play_count_off">Вимк.</string>
     <string name="play_count_one">1 с</string>
@@ -2682,4 +2663,6 @@
     <string name="play_speed_normal">1x</string>
     <string name="record_overwrite">Перезапис під час запису</string>
     <string name="history_record_keyframes">Запис ключових кадрів</string>
+    <string name="dafont_find">Знайти більше шрифтів на DaFont</string>
+    <string name="dafont_hint">Завантажте шрифт, а потім імпортуйте .zip сюди. Перевірте ліцензію, перш ніж використовувати його в опублікованому відео.</string>
 </resources>

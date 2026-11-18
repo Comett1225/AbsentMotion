@@ -142,8 +142,6 @@
     <string name="settings_graphics_opengl">OpenGL</string>
     <string name="settings_graphics_note">ขณะนี้ใช้ %1$s</string>
     <string name="settings_graphics_hint">เลือก OpenGL หากตัวอย่างหรือไฟล์ที่ส่งออกดูผิดปกติบนโทรศัพท์นี้</string>
-    <string name="settings_layout">เลย์เอาต์คอมพิวเตอร์ (ทดลอง)</string>
-    <string name="settings_layout_hint">โหมดอัตโนมัติจะใช้เลย์เอาต์คอมพิวเตอร์ใน Samsung DeX และหน้าต่างเดสก์ท็อป โหมดเปิดให้คุณลองใช้บนแท็บเล็ตเครื่องใดก็ได้ โปรเจกต์ของคุณจะยังเปิดอยู่เมื่อเลย์เอาต์เปลี่ยน</string>
     <string name="settings_media">เอนจินสื่อ</string>
     <string name="settings_media_standard">มาตรฐาน</string>
     <string name="settings_media_ffamp">FFamp (ทดลอง)</string>
@@ -1097,6 +1095,8 @@
     <string name="font_reason_duplicate">นำเข้าฟอนต์นี้แล้ว</string>
     <string name="font_reason_corrupted">ไฟล์ฟอนต์เสียหาย</string>
     <string name="font_reason_unreadable">ไม่สามารถเปิดไฟล์ได้</string>
+    <string name="font_reason_zip_empty">ไม่มีฟอนต์ (.ttf, .otf หรือ .ttc) ใน zip นี้</string>
+    <string name="font_reason_zip_too_big">zip มีฟอนต์มากกว่า 50 ฟอนต์หรือมีขนาดเกิน 50 MB</string>
     <string name="font_load_failed_title">โหลดฟอนต์ไม่สำเร็จ</string>
     <string name="font_load_failed_body">ไม่สามารถโหลดฟอนต์นั้นได้ โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ตแล้วลองอีกครั้ง</string>
     <string name="font_title_language">ฟอนต์%1$s</string>
@@ -2566,25 +2566,6 @@
     <string name="ai_image_under_minute">ใช้เวลาไม่ถึงหนึ่งนาทีสำหรับรูปภาพนี้</string>
     <string name="ai_image_about_time">ประมาณ %1$s สำหรับรูปภาพนี้</string>
     <string name="ai_checking_device">กำลังตรวจสอบอุปกรณ์นี้…</string>
-    <string name="alight_link">ลิงก์ Alight</string>
-    <string name="alight_import_file">นำเข้าไฟล์</string>
-    <string name="alight_link_field">ลิงก์ Alight Motion</string>
-    <string name="alight_entry_hint">วางลิงก์ HTTPS จาก alight.link, alight.page.link หรือหน้าแชร์สาธารณะของ Alight Motion</string>
-    <string name="alight_invalid">ป้อนลิงก์แชร์ Alight Motion ที่ถูกต้องโดยใช้ HTTPS</string>
-    <string name="alight_paste_empty">คลิปบอร์ดไม่มีข้อความ วางหรือพิมพ์ลิงก์ด้านบน</string>
-    <string name="alight_copy_link">คัดลอกลิงก์</string>
-    <string name="alight_open_app">เปิดใน Alight Motion</string>
-    <string name="alight_get_app">รับ Alight Motion</string>
-    <string name="alight_open_failed">ไม่สามารถเปิดลิงก์ได้ คุณสามารถคัดลอกลิงก์แล้วเปิดบนโทรศัพท์ของคุณ</string>
-    <string name="alight_loading">กำลังโหลดหน้าแชร์สาธารณะ…</string>
-    <string name="alight_preview_failed">ไม่มีตัวอย่างให้ดู แต่คุณยังใช้ลิงก์และทำตามขั้นตอนเหล่านี้ได้</string>
-    <string name="alight_preview_only">นี่คือตัวอย่างของหน้าแชร์สาธารณะ AbsentMotion ไม่สามารถดาวน์โหลดโปรเจกต์จากลิงก์นี้ได้</string>
-    <string name="alight_steps">นำเข้าโปรเจกต์</string>
-    <string name="alight_phone_steps">บนโทรศัพท์ของคุณ</string>
-    <string name="alight_step_import">1. เปิดลิงก์ใน Alight Motion บนโทรศัพท์ของคุณแล้วนำเข้าโปรเจกต์</string>
-    <string name="alight_step_open">2. เปิดโปรเจกต์ใน Alight Motion</string>
-    <string name="alight_step_xml">3. ส่งออกโปรเจกต์จาก Alight Motion เป็น XML แล้วเลือก AbsentMotion เพื่อเปิด</string>
-    <string name="alight_step_report">4. AbsentMotion นำเข้า XML และแสดงรายงานตามปกติ รวมถึงสิ่งที่แปลงไม่ได้และสื่อที่ขาดหายไป</string>
     <string name="play_count_in">นับถอยหลัง</string>
     <string name="play_count_off">ปิด</string>
     <string name="play_count_one">1 วิ</string>
@@ -2595,4 +2576,6 @@
     <string name="play_speed_normal">1x</string>
     <string name="record_overwrite">เขียนทับขณะบันทึก</string>
     <string name="history_record_keyframes">บันทึกคีย์เฟรม</string>
+    <string name="dafont_find">ค้นหาฟอนต์เพิ่มเติมบน DaFont</string>
+    <string name="dafont_hint">ดาวน์โหลดฟอนต์ แล้วนำเข้าไฟล์ .zip ที่นี่ ตรวจสอบสิทธิ์การใช้งานก่อนนำไปใช้ในวิดีโอที่เผยแพร่</string>
 </resources>

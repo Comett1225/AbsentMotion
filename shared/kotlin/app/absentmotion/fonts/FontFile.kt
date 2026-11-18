@@ -3,13 +3,55 @@ package app.absentmotion.fonts
 import java.io.ByteArrayOutputStream
 import java.util.zip.Inflater
 
-enum class FontProblem { NotFont, Unsupported, TooLarge, AlreadyImported, Corrupted, Unreadable }
+enum class FontProblem { NotFont, Unsupported, TooLarge, AlreadyImported, Corrupted, Unreadable, NoFonts, ZipTooBig }
 
 class FontImportError(val problem: FontProblem) : Exception(problem.name)
 
 enum class FontKind(val extension: String) { Ttf("ttf"), Otf("otf"), Ttc("ttc"), Woff(""), Woff2("") }
 
 const val MAX_FONT_BYTES = 32 * 1024 * 1024
+const val MAX_ZIP_BYTES = 50 * 1024 * 1024
+const val MAX_ZIP_FONTS = 50
+
+private val ZipFontExtensions = setOf("ttf", "otf", "ttc")
+
+fun isZip(bytes: ByteArray) = bytes.size > 3 && bytes[0] == 0x50.toByte() && bytes[1] == 0x4B.toByte() && bytes[2] == 3.toByte() && bytes[3] == 4.toByte()
+
+fun zipFonts(input: java.io.InputStream): List<Pair<String, ByteArray>> {
+    val found = ArrayList<Pair<String, ByteArray>>()
+    var total = 0L
+    try {
+        java.util.zip.ZipInputStream(input).use { zip ->
+            val chunk = ByteArray(8192)
+            while (true) {
+                val entry = zip.nextEntry ?: break
+                if (entry.isDirectory) continue
+                val parts = entry.name.replace('\\', '/').split('/')
+                val wanted = "__MACOSX" !in parts && parts.none { it.startsWith(".") } && parts.last().substringAfterLast('.', "").lowercase() in ZipFontExtensions
+                val sink = if (wanted) ByteArrayOutputStream() else null
+                var size = 0L
+                while (true) {
+                    val count = zip.read(chunk)
+                    if (count < 0) break
+                    size += count
+                    total += count
+                    if (size > MAX_FONT_BYTES || total > MAX_ZIP_BYTES) throw FontImportError(FontProblem.ZipTooBig)
+                    sink?.write(chunk, 0, count)
+                }
+                if (sink != null) {
+                    if (found.size >= MAX_ZIP_FONTS) throw FontImportError(FontProblem.ZipTooBig)
+                    found += parts.last() to sink.toByteArray()
+                }
+            }
+        }
+    } catch (e: FontImportError) { throw e } catch (_: Exception) { throw FontImportError(FontProblem.Corrupted) }
+    return found
+}
+
+fun daFontUrl(query: String?): String {
+    val text = query?.trim().orEmpty()
+    return if (text.isEmpty()) "https://www.dafont.com/" else "https://www.dafont.com/search.php?q=" + java.net.URLEncoder.encode(text, "UTF-8")
+}
 
 private val RequiredTables = listOf("cmap", "head", "maxp")
 private val OutlineTables = listOf("glyf", "CFF ", "CFF2", "CBDT", "EBDT", "sbix", "SVG ")

@@ -142,8 +142,6 @@
     <string name="settings_graphics_opengl">OpenGL</string>
     <string name="settings_graphics_note">Usando %1$s agora.</string>
     <string name="settings_graphics_hint">Escolha OpenGL se a prévia ou as exportações parecerem erradas neste celular.</string>
-    <string name="settings_layout">Layout de computador (experimental)</string>
-    <string name="settings_layout_hint">Auto usa o layout de computador no Samsung DeX e em janelas de desktop. Ligado permite testá-lo em qualquer tablet. Seu projeto continua aberto quando o layout muda.</string>
     <string name="settings_media">Mecanismo de mídia</string>
     <string name="settings_media_standard">Padrão</string>
     <string name="settings_media_ffamp">FFamp (experimental)</string>
@@ -1127,6 +1125,8 @@
     <string name="font_reason_duplicate">esta fonte já foi importada</string>
     <string name="font_reason_corrupted">o arquivo da fonte está danificado</string>
     <string name="font_reason_unreadable">não foi possível abrir o arquivo</string>
+    <string name="font_reason_zip_empty">nenhuma fonte (.ttf, .otf ou .ttc) dentro deste zip</string>
+    <string name="font_reason_zip_too_big">o zip tem mais de 50 fontes ou mais de 50 MB</string>
     <string name="font_load_failed_title">Não foi possível carregar a fonte</string>
     <string name="font_load_failed_body">Não foi possível carregar essa fonte. Verifique sua conexão com a internet e tente novamente.</string>
     <string name="font_title_language">Fontes em %1$s</string>
@@ -2624,25 +2624,6 @@
     <string name="ai_image_under_minute">Menos de um minuto para esta imagem</string>
     <string name="ai_image_about_time">Cerca de %1$s para esta imagem</string>
     <string name="ai_checking_device">Verificando este dispositivo…</string>
-    <string name="alight_link">Link do Alight</string>
-    <string name="alight_import_file">Importar um arquivo</string>
-    <string name="alight_link_field">Link do Alight Motion</string>
-    <string name="alight_entry_hint">Cole um link HTTPS de alight.link, alight.page.link ou de uma página pública de compartilhamento do Alight Motion.</string>
-    <string name="alight_invalid">Digite um link de compartilhamento válido do Alight Motion usando HTTPS.</string>
-    <string name="alight_paste_empty">A área de transferência não tem texto. Cole ou digite o link acima.</string>
-    <string name="alight_copy_link">Copiar link</string>
-    <string name="alight_open_app">Abrir no Alight Motion</string>
-    <string name="alight_get_app">Obter o Alight Motion</string>
-    <string name="alight_open_failed">Não foi possível abrir o link. Você pode copiá-lo e abri-lo no celular.</string>
-    <string name="alight_loading">Carregando a página pública de compartilhamento…</string>
-    <string name="alight_preview_failed">A prévia não está disponível. Você ainda pode usar o link e seguir estes passos.</string>
-    <string name="alight_preview_only">Esta é uma prévia da página pública de compartilhamento. O AbsentMotion não pode baixar o projeto por este link.</string>
-    <string name="alight_steps">Importar o projeto</string>
-    <string name="alight_phone_steps">No seu celular</string>
-    <string name="alight_step_import">1. Abra o link no Alight Motion no celular e importe o projeto.</string>
-    <string name="alight_step_open">2. Abra o projeto no Alight Motion.</string>
-    <string name="alight_step_xml">3. Exporte o projeto do Alight Motion como XML e escolha o AbsentMotion para abri-lo.</string>
-    <string name="alight_step_report">4. O AbsentMotion importa o XML e mostra seu relatório habitual, incluindo o que não foi possível converter e qualquer mídia ausente.</string>
     <string name="play_count_in">Pré-contagem</string>
     <string name="play_count_off">Desligado</string>
     <string name="play_count_one">1 s</string>
@@ -2653,4 +2634,6 @@
     <string name="play_speed_normal">1x</string>
     <string name="record_overwrite">Sobrescrever ao gravar</string>
     <string name="history_record_keyframes">Gravar quadros-chave</string>
+    <string name="dafont_find">Encontrar mais fontes no DaFont</string>
+    <string name="dafont_hint">Baixe uma fonte e depois importe o .zip aqui. Confira a licença antes de usá-la em um vídeo publicado.</string>
 </resources>

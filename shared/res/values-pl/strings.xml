@@ -142,8 +142,6 @@
     <string name="settings_graphics_opengl">OpenGL</string>
     <string name="settings_graphics_note">Obecnie używany: %1$s.</string>
     <string name="settings_graphics_hint">Wybierz OpenGL, jeśli podgląd lub eksportowane pliki wyglądają nieprawidłowo na tym telefonie.</string>
-    <string name="settings_layout">Układ komputerowy (eksperymentalny)</string>
-    <string name="settings_layout_hint">Auto używa układu komputerowego w Samsung DeX i w oknach na komputerze. Wł. pozwala wypróbować go na dowolnym tablecie. Projekt pozostaje otwarty po zmianie układu.</string>
     <string name="settings_media">Silnik multimediów</string>
     <string name="settings_media_standard">Standardowy</string>
     <string name="settings_media_ffamp">FFamp (eksperymentalny)</string>
@@ -1142,6 +1140,8 @@
     <string name="font_reason_duplicate">ta czcionka została już zaimportowana</string>
     <string name="font_reason_corrupted">plik czcionki jest uszkodzony</string>
     <string name="font_reason_unreadable">nie udało się otworzyć pliku</string>
+    <string name="font_reason_zip_empty">w tym pliku zip nie ma czcionek (.ttf, .otf ani .ttc)</string>
+    <string name="font_reason_zip_too_big">zip zawiera więcej niż 50 czcionek lub ma ponad 50 MB</string>
     <string name="font_load_failed_title">Nie udało się wczytać czcionki</string>
     <string name="font_load_failed_body">Nie udało się wczytać tej czcionki. Sprawdź połączenie z internetem i spróbuj ponownie.</string>
     <string name="font_title_language">Czcionki: %1$s</string>
@@ -2653,25 +2653,6 @@
     <string name="ai_image_under_minute">Mniej niż minuta dla tego obrazu</string>
     <string name="ai_image_about_time">Około %1$s dla tego obrazu</string>
     <string name="ai_checking_device">Sprawdzanie urządzenia…</string>
-    <string name="alight_link">Link Alight</string>
-    <string name="alight_import_file">Importuj plik</string>
-    <string name="alight_link_field">Link Alight Motion</string>
-    <string name="alight_entry_hint">Wklej link HTTPS z alight.link, alight.page.link lub publicznej strony udostępniania Alight Motion.</string>
-    <string name="alight_invalid">Wpisz prawidłowy link udostępniania Alight Motion z HTTPS.</string>
-    <string name="alight_paste_empty">Schowek nie zawiera tekstu. Wklej lub wpisz link powyżej.</string>
-    <string name="alight_copy_link">Kopiuj link</string>
-    <string name="alight_open_app">Otwórz w Alight Motion</string>
-    <string name="alight_get_app">Pobierz Alight Motion</string>
-    <string name="alight_open_failed">Nie udało się otworzyć linku. Możesz go skopiować i otworzyć na telefonie.</string>
-    <string name="alight_loading">Wczytywanie publicznej strony udostępniania…</string>
-    <string name="alight_preview_failed">Podgląd jest niedostępny. Nadal możesz użyć linku i wykonać te kroki.</string>
-    <string name="alight_preview_only">To podgląd publicznej strony udostępniania. AbsentMotion nie może pobrać projektu z tego linku.</string>
-    <string name="alight_steps">Zaimportuj projekt</string>
-    <string name="alight_phone_steps">Na telefonie</string>
-    <string name="alight_step_import">1. Otwórz link w Alight Motion na telefonie i zaimportuj projekt.</string>
-    <string name="alight_step_open">2. Otwórz projekt w Alight Motion.</string>
-    <string name="alight_step_xml">3. Wyeksportuj projekt z Alight Motion jako XML i wybierz AbsentMotion, aby go otworzyć.</string>
-    <string name="alight_step_report">4. AbsentMotion importuje XML i pokazuje zwykły raport, w tym wszystko, czego nie udało się przekonwertować, oraz brakujące multimedia.</string>
     <string name="play_count_in">Odliczanie</string>
     <string name="play_count_off">Wył.</string>
     <string name="play_count_one">1 s</string>
@@ -2682,4 +2663,6 @@
     <string name="play_speed_normal">1x</string>
     <string name="record_overwrite">Nadpisywanie podczas nagrywania</string>
     <string name="history_record_keyframes">Nagrywanie klatek kluczowych</string>
+    <string name="dafont_find">Znajdź więcej czcionek w DaFont</string>
+    <string name="dafont_hint">Pobierz czcionkę, a potem zaimportuj tutaj plik .zip. Sprawdź jej licencję, zanim użyjesz jej w opublikowanym filmie.</string>
 </resources>

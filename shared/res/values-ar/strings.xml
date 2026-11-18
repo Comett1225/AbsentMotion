@@ -142,8 +142,6 @@
     <string name="settings_graphics_opengl">OpenGL</string>
     <string name="settings_graphics_note">يُستخدم الآن %1$s.</string>
     <string name="settings_graphics_hint">اختر OpenGL إذا بدت المعاينة أو الملفات المصدّرة غير صحيحة على هذا الهاتف.</string>
-    <string name="settings_layout">تخطيط الكمبيوتر (تجريبي)</string>
-    <string name="settings_layout_hint">تلقائي: يستخدم تخطيط الكمبيوتر في Samsung DeX وعلى نوافذ سطح المكتب. تشغيل: يتيح لك تجربته على أي جهاز لوحي. يبقى مشروعك مفتوحًا عند تغيير التخطيط.</string>
     <string name="settings_media">محرك الوسائط</string>
     <string name="settings_media_standard">قياسي</string>
     <string name="settings_media_ffamp">‏FFamp (تجريبي)</string>
@@ -1172,6 +1170,8 @@
     <string name="font_reason_duplicate">تم استيراد هذا الخط بالفعل</string>
     <string name="font_reason_corrupted">ملف الخط تالف</string>
     <string name="font_reason_unreadable">تعذر فتح الملف</string>
+    <string name="font_reason_zip_empty">لا توجد خطوط (.ttf أو .otf أو .ttc) داخل هذا الملف المضغوط</string>
+    <string name="font_reason_zip_too_big">يحتوي الملف المضغوط على أكثر من 50 خطًا أو أكثر من 50 MB</string>
     <string name="font_load_failed_title">تعذّر تحميل الخط</string>
     <string name="font_load_failed_body">تعذّر تحميل هذا الخط. تحقق من اتصالك بالإنترنت وحاول مرة أخرى.</string>
     <string name="font_title_language">خطوط %1$s</string>
@@ -2711,25 +2711,6 @@
     <string name="ai_image_under_minute">أقل من دقيقة لهذه الصورة</string>
     <string name="ai_image_about_time">نحو %1$s لهذه الصورة</string>
     <string name="ai_checking_device">جارٍ فحص هذا الجهاز…</string>
-    <string name="alight_link">رابط Alight</string>
-    <string name="alight_import_file">استيراد ملف</string>
-    <string name="alight_link_field">رابط Alight Motion</string>
-    <string name="alight_entry_hint">الصق رابط HTTPS من alight.link أو alight.page.link أو من صفحة مشاركة عامة في Alight Motion.</string>
-    <string name="alight_invalid">أدخل رابط مشاركة صالحًا من Alight Motion بصيغة HTTPS.</string>
-    <string name="alight_paste_empty">لا يوجد نص في الحافظة. الصق الرابط أعلاه أو اكتبه.</string>
-    <string name="alight_copy_link">نسخ الرابط</string>
-    <string name="alight_open_app">فتح في Alight Motion</string>
-    <string name="alight_get_app">الحصول على Alight Motion</string>
-    <string name="alight_open_failed">تعذّر فتح الرابط. يمكنك نسخه وفتحه على هاتفك.</string>
-    <string name="alight_loading">جارٍ تحميل صفحة المشاركة العامة…</string>
-    <string name="alight_preview_failed">المعاينة غير متاحة. لا يزال بإمكانك استخدام الرابط واتباع هذه الخطوات.</string>
-    <string name="alight_preview_only">هذه معاينة لصفحة المشاركة العامة. لا يستطيع AbsentMotion تنزيل المشروع من هذا الرابط.</string>
-    <string name="alight_steps">استيراد المشروع</string>
-    <string name="alight_phone_steps">على هاتفك</string>
-    <string name="alight_step_import">‏1. افتح الرابط في Alight Motion على هاتفك واستورد المشروع.</string>
-    <string name="alight_step_open">‏2. افتح المشروع في Alight Motion.</string>
-    <string name="alight_step_xml">‏3. صدّر المشروع من Alight Motion بصيغة XML واختر AbsentMotion لفتحه.</string>
-    <string name="alight_step_report">‏4. يستورد AbsentMotion ملف XML ويعرض تقريره المعتاد، بما في ذلك أي شيء تعذّر تحويله وأي وسائط مفقودة.</string>
     <string name="play_count_in">عدّ تمهيدي</string>
     <string name="play_count_off">إيقاف</string>
     <string name="play_count_one">‏1 ث</string>
@@ -2740,4 +2721,6 @@
     <string name="play_speed_normal">1x</string>
     <string name="record_overwrite">استبدال أثناء التسجيل</string>
     <string name="history_record_keyframes">تسجيل إطارات مفتاحية</string>
+    <string name="dafont_find">ابحث عن المزيد من الخطوط على DaFont</string>
+    <string name="dafont_hint">نزّل خطًا ثم استورد ملف .zip هنا. تحقّق من ترخيصه قبل استخدامه في فيديو منشور.</string>
 </resources>

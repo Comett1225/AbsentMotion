@@ -166,13 +166,26 @@ class FontLibrary(context: Context) {
         return (if (font.source == "imported" || variable) face else if (android.os.Build.VERSION.SDK_INT >= 28) Typeface.create(face, font.weight, font.italic)
             else Typeface.create(face, when { font.weight >= 600 && font.italic -> Typeface.BOLD_ITALIC; font.weight >= 600 -> Typeface.BOLD; font.italic -> Typeface.ITALIC; else -> Typeface.NORMAL })).also { faces[name] = stamp to it }
     }
-    suspend fun import(uri: Uri): FontName = withContext(Dispatchers.IO) {
-        val filename = runCatching { context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use {
-            if (it.moveToFirst()) it.getString(0) else null
-        } }.getOrNull() ?: uri.lastPathSegment ?: "font"
-        val raw = try {
-            context.contentResolver.openInputStream(uri)?.use { input -> ByteArrayOutputStream().also { copyLimited(input, it) }.toByteArray() }
-        } catch (e: FontImportError) { throw e } catch (_: Exception) { null } ?: throw FontImportError(FontProblem.Unreadable)
+    class Imported(val fonts: List<FontName>, val failures: List<Pair<String, FontProblem>>)
+    suspend fun import(uri: Uri): FontName = withContext(Dispatchers.IO) { store(displayName(uri), read(uri, MAX_FONT_BYTES)) }
+    suspend fun importAll(uri: Uri): Imported = withContext(Dispatchers.IO) {
+        val filename = displayName(uri)
+        val raw = try { read(uri, MAX_ZIP_BYTES) } catch (e: FontImportError) { return@withContext Imported(emptyList(), listOf(filename to e.problem)) }
+        if (!isZip(raw) && !filename.endsWith(".zip", ignoreCase = true)) return@withContext try { Imported(listOf(store(filename, raw)), emptyList()) } catch (e: FontImportError) { Imported(emptyList(), listOf(filename to e.problem)) }
+        val entries = try { zipFonts(raw.inputStream()) } catch (e: FontImportError) { return@withContext Imported(emptyList(), listOf(filename to e.problem)) }
+        if (entries.isEmpty()) return@withContext Imported(emptyList(), listOf(filename to FontProblem.NoFonts))
+        val fonts = mutableListOf<FontName>()
+        val failures = mutableListOf<Pair<String, FontProblem>>()
+        for ((name, bytes) in entries) try { fonts += store(name, bytes) } catch (e: FontImportError) { failures += name to e.problem }
+        Imported(fonts, failures)
+    }
+    private fun displayName(uri: Uri): String = runCatching { context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use {
+        if (it.moveToFirst()) it.getString(0) else null
+    } }.getOrNull() ?: uri.lastPathSegment ?: "font"
+    private fun read(uri: Uri, limit: Int): ByteArray = try {
+        context.contentResolver.openInputStream(uri)?.use { input -> ByteArrayOutputStream().also { copyLimited(input, it, limit) }.toByteArray() }
+    } catch (e: FontImportError) { throw e } catch (_: Exception) { null } ?: throw FontImportError(FontProblem.Unreadable)
+    private fun store(filename: String, raw: ByteArray): FontName {
         val (bytes, kind) = checkedFont(raw)
         imported.listFiles()?.firstOrNull { it.isFile && it.length() == bytes.size.toLong() && it.readBytes().contentEquals(bytes) }
             ?.let { throw FontImportError(FontProblem.AlreadyImported) }
@@ -186,7 +199,7 @@ class FontLibrary(context: Context) {
             if (Build.VERSION.SDK_INT >= 29) try { Font.Builder(temporary).build() } catch (_: Exception) { throw FontImportError(FontProblem.Corrupted) }
             if (!temporary.renameTo(destination)) throw FontImportError(FontProblem.Unreadable)
             fontRevision.update { it + 1 }
-            FontName("imported", destination.name)
+            return FontName("imported", destination.name)
         } finally { temporary.delete() }
     }
     private fun checkFont(file: File) = checkNotNull(Typeface.Builder(file).build()) { "Not a font." }
@@ -222,14 +235,14 @@ class FontLibrary(context: Context) {
         connection.setRequestProperty("User-Agent", "AbsentMotion/1.0")
         return try { check(connection.responseCode == 200); connection.inputStream.use(read) } finally { connection.disconnect() }
     }
-    private fun copyLimited(input: java.io.InputStream, output: java.io.OutputStream) {
+    private fun copyLimited(input: java.io.InputStream, output: java.io.OutputStream, limit: Int = MAX_FONT_BYTES) {
         val bytes = ByteArray(8192)
         var total = 0
         while (true) {
             val count = input.read(bytes)
             if (count < 0) break
             total += count
-            if (total > MAX_FONT_BYTES) throw FontImportError(FontProblem.TooLarge)
+            if (total > limit) throw FontImportError(FontProblem.TooLarge)
             output.write(bytes, 0, count)
         }
     }

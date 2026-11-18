@@ -528,7 +528,7 @@ private fun DeskContent(app: DeskAppState, scale: Float) {
                         imported = app.imported, onImportShown = { app.imported = emptyList() }, onImportFiles = { uris -> run { app.importFiles(uris) } },
                         onTemplate = { id -> app.editingTemplate = id }, onTemplateProject = { scene -> run { app.projectFromTemplate(scene) } },
                         onHistory = { app.historyFor = Triple(it.id, it.title, it.damaged) }, onSettings = { app.openSettings() }, changes = app.projectsChanged,
-                        newTick = app.newProjectTick, onCollect = { id -> scope.launch { app.collectMedia(id) } },
+                        newTick = app.newProjectTick, onCollect = { id -> scope.launch { app.collectMedia(id) } }, engine = { app.engine },
                     )
                     app.editingTemplate?.let { id ->
                         TemplateEditor(id, app.engine, app.settings, onClose = { app.editingTemplate = null }, onContinue = { scene -> run { app.projectFromTemplate(scene) } })

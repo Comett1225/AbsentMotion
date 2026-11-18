@@ -71,6 +71,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.R
+import app.absentmotion.engine.EngineThread
 import app.absentmotion.export.formatBytes
 import app.absentmotion.library.CommunityClient
 import app.absentmotion.library.CommunityDamagedException
@@ -203,7 +204,7 @@ private class ActiveDownload(
 )
 
 @Composable
-fun CommunityTab(modifier: Modifier, onImport: (File) -> Unit) {
+fun CommunityTab(modifier: Modifier, engine: (() -> EngineThread)? = null, onImport: (File) -> Unit) {
     val browse = sessionBrowse
     val context = LocalContext.current
     val isDesktop = PlatformFeatures.desktop
@@ -308,6 +309,7 @@ fun CommunityTab(modifier: Modifier, onImport: (File) -> Unit) {
                                 onClear = browse::clear,
                                 pad = pad,
                                 client = client,
+                                engine = engine,
                                 thumbs = thumbs,
                                 onSelect = { selected = it }
                             )
@@ -316,6 +318,7 @@ fun CommunityTab(modifier: Modifier, onImport: (File) -> Unit) {
                                 onClear = browse::clear,
                                 pad = pad,
                                 client = client,
+                                engine = engine,
                                 thumbs = thumbs,
                                 onSelect = { selected = it }
                             )
@@ -329,7 +332,7 @@ fun CommunityTab(modifier: Modifier, onImport: (File) -> Unit) {
     selected?.let { item ->
         CommunityItemSheet(
             item = item,
-            thumb = item.thumbnail?.let { thumbs[it] },
+            thumb = thumbs[item.thumbKey],
             onDismiss = { selected = null },
             onImport = onImport
         )
@@ -483,6 +486,7 @@ private fun CommunityItemsPage(
     onClear: () -> Unit,
     pad: Dp,
     client: CommunityClient,
+    engine: (() -> EngineThread)?,
     thumbs: MutableMap<String, ImageBitmap?>,
     onSelect: (CommunityItem) -> Unit
 ) {
@@ -506,20 +510,26 @@ private fun CommunityItemsPage(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(items, key = { "${it.kind.id}/${it.name}" }) { item ->
-                val thumbPath = item.thumbnail
-                if (thumbPath != null) {
-                    LaunchedEffect(thumbPath) {
-                        if (!thumbs.containsKey(thumbPath)) {
-                            val bmp = withContext(Dispatchers.IO) {
-                                decodeCommunityThumb(client.thumbnail(item))
+                val key = item.thumbKey
+                LaunchedEffect(key) {
+                    if (!thumbs.containsKey(key)) {
+                        val bmp = withContext(Dispatchers.IO) {
+                            val bytes = try {
+                                if (item.kind == CommunityKind.Preset) engine?.let { client.presetPicture(item, it()) }
+                                else client.thumbnail(item)
+                            } catch (e: CancellationException) {
+                                throw e
+                            } catch (_: Exception) {
+                                null
                             }
-                            thumbs[thumbPath] = bmp
+                            decodeCommunityThumb(bytes)
                         }
+                        thumbs[key] = bmp
                     }
                 }
                 CommunityGridCard(
                     item = item,
-                    thumb = thumbPath?.let { thumbs[it] },
+                    thumb = thumbs[key],
                     onClick = { onSelect(item) }
                 )
             }
@@ -549,11 +559,11 @@ private fun CommunityGridCard(
                 .fillMaxWidth()
                 .aspectRatio(1f)
                 .clip(RoundedCornerShape(10.dp))
-                .background(Am.HomePanel),
+                .then(if (thumb != null && item.kind == CommunityKind.Preset) Modifier.checkerboard(5.dp) else Modifier.background(Am.HomePanel)),
             Alignment.Center
         ) {
             if (thumb != null) {
-                Image(thumb, null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+                Image(thumb, null, Modifier.fillMaxSize(), contentScale = if (item.kind == CommunityKind.Preset) ContentScale.Fit else ContentScale.Crop)
             } else {
                 Icon(HomeIcons.CommunityTab, null, Modifier.size(36.dp), tint = Am.HomeMid)
             }
@@ -742,7 +752,7 @@ private fun CommunityItemSheet(
                 .fillMaxWidth()
                 .aspectRatio(thumbRatio)
                 .clip(RoundedCornerShape(12.dp))
-                .background(Am.Scrim),
+                .then(if (thumb != null && item.kind == CommunityKind.Preset) Modifier.checkerboard(8.dp) else Modifier.background(Am.Scrim)),
             Alignment.Center
         ) {
             if (thumb != null) {
@@ -817,6 +827,8 @@ private fun CommunityItemSheet(
         Spacer(Modifier.height(24.dp))
     }
 }
+
+private val CommunityItem.thumbKey: String get() = "${kind.id}/$name/$sha256"
 
 private fun decodeCommunityThumb(bytes: ByteArray?): ImageBitmap? {
     if (bytes == null || bytes.isEmpty()) return null

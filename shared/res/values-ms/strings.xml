@@ -142,8 +142,6 @@
     <string name="settings_graphics_opengl">OpenGL</string>
     <string name="settings_graphics_note">Kini menggunakan %1$s.</string>
     <string name="settings_graphics_hint">Pilih OpenGL jika pratonton atau eksport kelihatan salah pada telefon ini.</string>
-    <string name="settings_layout">Reka letak komputer (eksperimental)</string>
-    <string name="settings_layout_hint">Auto menggunakan reka letak komputer dalam Samsung DeX dan pada tetingkap desktop. Hidup membolehkan anda mencubanya pada mana-mana tablet. Projek anda kekal terbuka apabila reka letak berubah.</string>
     <string name="settings_media">Enjin media</string>
     <string name="settings_media_standard">Standard</string>
     <string name="settings_media_ffamp">FFamp (eksperimental)</string>
@@ -1097,6 +1095,8 @@
     <string name="font_reason_duplicate">fon ini sudah diimport</string>
     <string name="font_reason_corrupted">fail fon ini rosak</string>
     <string name="font_reason_unreadable">fail tidak dapat dibuka</string>
+    <string name="font_reason_zip_empty">tiada fon (.ttf, .otf atau .ttc) dalam zip ini</string>
+    <string name="font_reason_zip_too_big">zip ini mengandungi lebih daripada 50 fon atau lebih daripada 50 MB</string>
     <string name="font_load_failed_title">Tidak dapat memuatkan fon</string>
     <string name="font_load_failed_body">Fon itu tidak dapat dimuatkan. Semak sambungan internet anda dan cuba lagi.</string>
     <string name="font_title_language">Fon %1$s</string>
@@ -2566,25 +2566,6 @@
     <string name="ai_image_under_minute">Kurang daripada seminit untuk imej ini</string>
     <string name="ai_image_about_time">Kira-kira %1$s untuk imej ini</string>
     <string name="ai_checking_device">Menyemak peranti ini…</string>
-    <string name="alight_link">Pautan Alight</string>
-    <string name="alight_import_file">Import fail</string>
-    <string name="alight_link_field">Pautan Alight Motion</string>
-    <string name="alight_entry_hint">Tampal pautan HTTPS daripada alight.link, alight.page.link atau halaman kongsi awam Alight Motion.</string>
-    <string name="alight_invalid">Masukkan pautan kongsi Alight Motion yang sah menggunakan HTTPS.</string>
-    <string name="alight_paste_empty">Papan klip tiada teks. Tampal atau taip pautan di atas.</string>
-    <string name="alight_copy_link">Salin pautan</string>
-    <string name="alight_open_app">Buka dalam Alight Motion</string>
-    <string name="alight_get_app">Dapatkan Alight Motion</string>
-    <string name="alight_open_failed">Pautan tidak dapat dibuka. Anda boleh menyalinnya dan membukanya pada telefon anda.</string>
-    <string name="alight_loading">Memuatkan halaman kongsi awam…</string>
-    <string name="alight_preview_failed">Pratonton tidak tersedia. Anda masih boleh menggunakan pautan dan mengikuti langkah ini.</string>
-    <string name="alight_preview_only">Ini ialah pratonton halaman kongsi awam. AbsentMotion tidak dapat memuat turun projek daripada pautan ini.</string>
-    <string name="alight_steps">Import projek</string>
-    <string name="alight_phone_steps">Pada telefon anda</string>
-    <string name="alight_step_import">1. Buka pautan dalam Alight Motion pada telefon anda dan import projek.</string>
-    <string name="alight_step_open">2. Buka projek dalam Alight Motion.</string>
-    <string name="alight_step_xml">3. Eksport projek daripada Alight Motion sebagai XML dan pilih AbsentMotion untuk membukanya.</string>
-    <string name="alight_step_report">4. AbsentMotion mengimport XML dan menunjukkan laporan biasanya, termasuk apa-apa yang tidak dapat ditukar dan media yang hilang.</string>
     <string name="play_count_in">Kiraan detik</string>
     <string name="play_count_off">Mati</string>
     <string name="play_count_one">1 s</string>
@@ -2595,4 +2576,6 @@
     <string name="play_speed_normal">1x</string>
     <string name="record_overwrite">Tulis ganti semasa merakam</string>
     <string name="history_record_keyframes">Rakam bingkai kunci</string>
+    <string name="dafont_find">Cari lagi fon di DaFont</string>
+    <string name="dafont_hint">Muat turun fon, kemudian import .zip di sini. Semak lesennya sebelum menggunakannya dalam video yang diterbitkan.</string>
 </resources>

@@ -1,7 +1,10 @@
 package app.absentmotion.library
 
 import app.absentmotion.BuildConfig
+import app.absentmotion.engine.EngineThread
+import app.absentmotion.export.ExportSettings
 import app.absentmotion.model.Scene
+import app.absentmotion.platform.encodeRgba
 import app.absentmotion.ui.home.HOME_PAGE
 import app.absentmotion.ui.home.TrustedHttp
 import app.absentmotion.ui.home.UpdateSource
@@ -26,6 +29,9 @@ val COMMUNITY_RAW = "https://raw.githubusercontent.com/$COMMUNITY_OWNER/AbsentMo
 
 private const val INDEX_MAX_BYTES = 4L shl 20
 private const val THUMB_MAX_BYTES = 4L shl 20
+private const val PRESET_PROBES = 5
+private const val PRESET_PROBE_SIDE = 64
+private const val PRESET_PICTURE_SIDE = 512
 private val NAME_REGEX = Regex("^[a-z0-9-]{1,48}$")
 private val PATH_REGEX = Regex("^[A-Za-z0-9._/-]+$")
 
@@ -130,7 +136,7 @@ fun parseCommunityIndex(text: String, versionCode: Int): CommunityIndex {
         val folder = "${kind.folder}/$name/"
         val file = obj.optString("file", "")
         if (!safeCommunityPath(file, folder)) continue
-        val rawThumb = if (obj.isNull("thumbnail")) "" else obj.optString("thumbnail", "")
+        val rawThumb = if (kind == CommunityKind.Preset || obj.isNull("thumbnail")) "" else obj.optString("thumbnail", "")
         if (rawThumb.isNotEmpty() && !safeCommunityPath(rawThumb, folder)) continue
         val bytes = obj.optLong("bytes", -1L)
         if (bytes <= 0L || bytes > kind.maxBytes) continue
@@ -211,20 +217,38 @@ internal class CommunityClient(
                 conn.inputStream.use { readBounded(it, THUMB_MAX_BYTES) }
             } ?: return null
             if (bytes.isEmpty()) return null
-            dir.mkdirs()
-            val part = File(dir, "${cached.name}.part")
-            try {
-                part.writeBytes(bytes)
-                if (!part.renameTo(cached)) {
-                    part.copyTo(cached, overwrite = true)
-                    part.delete()
-                }
-            } catch (_: IOException) {
-                part.delete()
-            }
+            keep(cached, bytes)
             bytes
         } catch (_: IOException) {
             null
+        }
+    }
+
+    suspend fun presetPicture(item: CommunityItem, engine: EngineThread): ByteArray? {
+        if (item.kind != CommunityKind.Preset || !isSha256(item.sha256)) return null
+        val cached = File(cacheDir, "community/thumbs/${item.sha256}.png")
+        if (cached.isFile && cached.length() in 1L..THUMB_MAX_BYTES) {
+            try {
+                return cached.readBytes()
+            } catch (_: IOException) {
+            }
+        }
+        val picture = renderPresetPicture(engine, download(item).readText()) ?: return null
+        keep(cached, picture)
+        return picture
+    }
+
+    private fun keep(cached: File, bytes: ByteArray) {
+        cached.parentFile?.mkdirs()
+        val part = File(cached.parentFile, "${cached.name}.part")
+        try {
+            part.writeBytes(bytes)
+            if (!part.renameTo(cached)) {
+                part.copyTo(cached, overwrite = true)
+                part.delete()
+            }
+        } catch (_: IOException) {
+            part.delete()
         }
     }
 
@@ -306,6 +330,29 @@ fun addCommunityPreset(file: File, store: PresetStore): String {
         throw IllegalArgumentException("Preset does not contain any layers")
     }
     return store.save(scene)
+}
+
+private suspend fun renderPresetPicture(engine: EngineThread, xml: String): ByteArray? {
+    val scene = Scene.parse(xml)
+    val layers = scene.layers.takeIf { it.isNotEmpty() } ?: return null
+    val start = layers.minOf { it.startTime }.coerceAtLeast(0)
+    val span = (layers.maxOf { it.endTime } - start).coerceAtLeast(0)
+    val times = List(PRESET_PROBES) { start + (span * (2L * it + 1) / (2 * PRESET_PROBES)).toInt() }
+    val long = maxOf(scene.width, scene.height, 1)
+    fun size(edge: Int) = (edge * scene.width / long).coerceAtLeast(1) to (edge * scene.height / long).coerceAtLeast(1)
+    val (probeWidth, probeHeight) = size(PRESET_PROBE_SIDE)
+    val (width, height) = size(PRESET_PICTURE_SIDE)
+    val pixels = engine.exportSession(xml) {
+        val best = times.maxBy { still(it, probeWidth, probeHeight)?.let(::opacitySum) ?: -1L }
+        still(best, width, height)
+    } ?: return null
+    return ByteArrayOutputStream().also { encodeRgba(pixels, width, height, ExportSettings(minOf(width, height), scene.fps), null, it) }.toByteArray()
+}
+
+private fun opacitySum(rgba: ByteArray): Long {
+    var sum = 0L
+    for (i in 3 until rgba.size step 4) sum += rgba[i].toInt() and 0xff
+    return sum
 }
 
 private fun readBounded(input: InputStream, maxBytes: Long): ByteArray {

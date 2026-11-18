@@ -142,8 +142,6 @@
     <string name="settings_graphics_opengl">OpenGL</string>
     <string name="settings_graphics_note">현재 %1$s 사용 중.</string>
     <string name="settings_graphics_hint">이 기기에서 미리보기나 내보내기 결과가 잘못 표시되면 OpenGL을 선택하세요.</string>
-    <string name="settings_layout">컴퓨터 레이아웃(실험적)</string>
-    <string name="settings_layout_hint">자동은 Samsung DeX와 데스크톱 창에서 컴퓨터 레이아웃을 사용합니다. 켜기를 선택하면 모든 태블릿에서 사용해 볼 수 있습니다. 레이아웃이 바뀌어도 프로젝트는 열린 채로 유지됩니다.</string>
     <string name="settings_media">미디어 엔진</string>
     <string name="settings_media_standard">기본</string>
     <string name="settings_media_ffamp">FFamp (실험 기능)</string>
@@ -1097,6 +1095,8 @@
     <string name="font_reason_duplicate">이미 가져온 글꼴입니다</string>
     <string name="font_reason_corrupted">글꼴 파일이 손상됨</string>
     <string name="font_reason_unreadable">파일을 열 수 없음</string>
+    <string name="font_reason_zip_empty">이 zip 안에 글꼴(.ttf, .otf, .ttc)이 없음</string>
+    <string name="font_reason_zip_too_big">zip에 글꼴이 50개를 넘거나 50 MB보다 큼</string>
     <string name="font_load_failed_title">글꼴을 불러올 수 없습니다</string>
     <string name="font_load_failed_body">글꼴을 불러올 수 없습니다. 인터넷 연결을 확인하고 다시 시도하세요.</string>
     <string name="font_title_language">%1$s 글꼴</string>
@@ -2566,25 +2566,6 @@
     <string name="ai_image_under_minute">이 이미지는 1분 미만</string>
     <string name="ai_image_about_time">이 이미지는 약 %1$s</string>
     <string name="ai_checking_device">기기 확인 중…</string>
-    <string name="alight_link">Alight 링크</string>
-    <string name="alight_import_file">파일 가져오기</string>
-    <string name="alight_link_field">Alight Motion 링크</string>
-    <string name="alight_entry_hint">alight.link, alight.page.link 또는 Alight Motion 공개 공유 페이지의 HTTPS 링크를 붙여 넣으세요.</string>
-    <string name="alight_invalid">HTTPS를 사용하는 올바른 Alight Motion 공유 링크를 입력하세요.</string>
-    <string name="alight_paste_empty">클립보드에 텍스트가 없습니다. 위에 링크를 붙여 넣거나 입력하세요.</string>
-    <string name="alight_copy_link">링크 복사</string>
-    <string name="alight_open_app">Alight Motion에서 열기</string>
-    <string name="alight_get_app">Alight Motion 받기</string>
-    <string name="alight_open_failed">링크를 열 수 없습니다. 링크를 복사해 휴대폰에서 열 수 있습니다.</string>
-    <string name="alight_loading">공개 공유 페이지를 불러오는 중…</string>
-    <string name="alight_preview_failed">미리보기를 사용할 수 없습니다. 그래도 링크를 사용해 아래 단계를 따라 할 수 있습니다.</string>
-    <string name="alight_preview_only">공개 공유 페이지의 미리보기입니다. AbsentMotion은 이 링크에서 프로젝트를 다운로드할 수 없습니다.</string>
-    <string name="alight_steps">프로젝트 가져오기</string>
-    <string name="alight_phone_steps">휴대폰에서</string>
-    <string name="alight_step_import">1. 휴대폰의 Alight Motion에서 링크를 열고 프로젝트를 가져옵니다.</string>
-    <string name="alight_step_open">2. Alight Motion에서 프로젝트를 엽니다.</string>
-    <string name="alight_step_xml">3. Alight Motion에서 프로젝트를 XML로 내보내고, 열 앱으로 AbsentMotion을 선택합니다.</string>
-    <string name="alight_step_report">4. AbsentMotion이 XML을 가져와, 변환하지 못한 항목과 누락된 미디어를 포함한 평소의 보고서를 보여 줍니다.</string>
     <string name="play_count_in">카운트인</string>
     <string name="play_count_off">끄기</string>
     <string name="play_count_one">1초</string>
@@ -2595,4 +2576,6 @@
     <string name="play_speed_normal">1x</string>
     <string name="record_overwrite">기록 중 덮어쓰기</string>
     <string name="history_record_keyframes">키프레임 기록</string>
+    <string name="dafont_find">DaFont에서 글꼴 더 찾기</string>
+    <string name="dafont_hint">글꼴을 다운로드한 다음 여기서 .zip을 가져오세요. 공개하는 영상에 사용하기 전에 라이선스를 확인하세요.</string>
 </resources>

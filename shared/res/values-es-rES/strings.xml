@@ -142,8 +142,6 @@
     <string name="settings_graphics_opengl">OpenGL</string>
     <string name="settings_graphics_note">Ahora se usa %1$s.</string>
     <string name="settings_graphics_hint">Elige OpenGL si la vista previa o las exportaciones se ven mal en este móvil.</string>
-    <string name="settings_layout">Diseño para ordenador (experimental)</string>
-    <string name="settings_layout_hint">Auto usa el diseño para ordenador en Samsung DeX y en ventanas de escritorio. Activado te permite probarlo en cualquier tableta. Tu proyecto sigue abierto cuando cambia el diseño.</string>
     <string name="settings_media">Motor multimedia</string>
     <string name="settings_media_standard">Estándar</string>
     <string name="settings_media_ffamp">FFamp (experimental)</string>
@@ -1127,6 +1125,8 @@
     <string name="font_reason_duplicate">esta fuente ya está importada</string>
     <string name="font_reason_corrupted">el archivo de fuente está dañado</string>
     <string name="font_reason_unreadable">no se ha podido abrir el archivo</string>
+    <string name="font_reason_zip_empty">no hay fuentes (.ttf, .otf o .ttc) dentro de este zip</string>
+    <string name="font_reason_zip_too_big">el zip contiene más de 50 fuentes o más de 50 MB</string>
     <string name="font_load_failed_title">No se ha podido cargar la fuente</string>
     <string name="font_load_failed_body">No se ha podido cargar esa fuente. Comprueba tu conexión a internet e inténtalo de nuevo.</string>
     <string name="font_title_language">Fuentes en %1$s</string>
@@ -2624,25 +2624,6 @@
     <string name="ai_image_under_minute">Menos de un minuto para esta imagen</string>
     <string name="ai_image_about_time">Unos %1$s para esta imagen</string>
     <string name="ai_checking_device">Revisando este dispositivo…</string>
-    <string name="alight_link">Enlace de Alight</string>
-    <string name="alight_import_file">Importar un archivo</string>
-    <string name="alight_link_field">Enlace de Alight Motion</string>
-    <string name="alight_entry_hint">Pega un enlace HTTPS de alight.link, alight.page.link o de una página pública para compartir de Alight Motion.</string>
-    <string name="alight_invalid">Introduce un enlace válido de Alight Motion para compartir, con HTTPS.</string>
-    <string name="alight_paste_empty">El portapapeles no tiene texto. Pega o escribe el enlace arriba.</string>
-    <string name="alight_copy_link">Copiar enlace</string>
-    <string name="alight_open_app">Abrir en Alight Motion</string>
-    <string name="alight_get_app">Obtener Alight Motion</string>
-    <string name="alight_open_failed">No se ha podido abrir el enlace. Puedes copiarlo y abrirlo en tu móvil.</string>
-    <string name="alight_loading">Cargando la página pública para compartir…</string>
-    <string name="alight_preview_failed">La vista previa no está disponible. Aun así puedes usar el enlace y seguir estos pasos.</string>
-    <string name="alight_preview_only">Esta es una vista previa de la página pública para compartir. AbsentMotion no puede descargar el proyecto desde este enlace.</string>
-    <string name="alight_steps">Importar el proyecto</string>
-    <string name="alight_phone_steps">En tu móvil</string>
-    <string name="alight_step_import">1. Abre el enlace en Alight Motion en tu móvil e importa el proyecto.</string>
-    <string name="alight_step_open">2. Abre el proyecto en Alight Motion.</string>
-    <string name="alight_step_xml">3. Exporta el proyecto desde Alight Motion como XML y elige AbsentMotion para abrirlo.</string>
-    <string name="alight_step_report">4. AbsentMotion importa el XML y muestra su informe habitual, incluido lo que no pudo convertir y los archivos multimedia que falten.</string>
     <string name="play_count_in">Cuenta previa</string>
     <string name="play_count_off">Desactivado</string>
     <string name="play_count_one">1 s</string>
@@ -2653,4 +2634,6 @@
     <string name="play_speed_normal">1x</string>
     <string name="record_overwrite">Sobrescribir al grabar</string>
     <string name="history_record_keyframes">Grabar fotogramas clave</string>
+    <string name="dafont_find">Buscar más fuentes en DaFont</string>
+    <string name="dafont_hint">Descarga una fuente y luego importa el .zip aquí. Revisa su licencia antes de usarla en un vídeo publicado.</string>
 </resources>

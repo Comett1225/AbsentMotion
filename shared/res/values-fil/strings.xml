@@ -142,8 +142,6 @@
     <string name="settings_graphics_opengl">OpenGL</string>
     <string name="settings_graphics_note">Gumagamit ngayon ng %1$s.</string>
     <string name="settings_graphics_hint">Piliin ang OpenGL kung mali ang itsura ng preview o ng mga export sa phone na ito.</string>
-    <string name="settings_layout">Layout ng computer (eksperimental)</string>
-    <string name="settings_layout_hint">Auto: gumagamit ng layout ng computer sa Samsung DeX at sa mga desktop window. On: hinahayaan kang subukan ito sa anumang tablet. Nananatiling bukas ang proyekto mo kapag nagbago ang layout.</string>
     <string name="settings_media">Media engine</string>
     <string name="settings_media_standard">Karaniwan</string>
     <string name="settings_media_ffamp">FFamp (eksperimental)</string>
@@ -1112,6 +1110,8 @@
     <string name="font_reason_duplicate">na-import na ang font na ito</string>
     <string name="font_reason_corrupted">may sira ang font file</string>
     <string name="font_reason_unreadable">hindi mabuksan ang file</string>
+    <string name="font_reason_zip_empty">walang font (.ttf, .otf o .ttc) sa loob ng zip na ito</string>
+    <string name="font_reason_zip_too_big">may higit sa 50 font o higit sa 50 MB ang zip</string>
     <string name="font_load_failed_title">Hindi ma-load ang font</string>
     <string name="font_load_failed_body">Hindi ma-load ang font na iyon. Tingnan ang koneksyon sa internet at subukang muli.</string>
     <string name="font_title_language">Mga font na %1$s</string>
@@ -2595,25 +2595,6 @@
     <string name="ai_image_under_minute">Wala pang isang minuto para sa larawang ito</string>
     <string name="ai_image_about_time">Mga %1$s para sa larawang ito</string>
     <string name="ai_checking_device">Sinusuri ang device na ito…</string>
-    <string name="alight_link">Alight link</string>
-    <string name="alight_import_file">Mag-import ng file</string>
-    <string name="alight_link_field">Alight Motion link</string>
-    <string name="alight_entry_hint">Mag-paste ng HTTPS link mula sa alight.link, alight.page.link o pampublikong share page ng Alight Motion.</string>
-    <string name="alight_invalid">Maglagay ng wastong share link ng Alight Motion na gumagamit ng HTTPS.</string>
-    <string name="alight_paste_empty">Walang text sa clipboard. I-paste o i-type ang link sa itaas.</string>
-    <string name="alight_copy_link">Kopyahin ang link</string>
-    <string name="alight_open_app">Buksan sa Alight Motion</string>
-    <string name="alight_get_app">Kunin ang Alight Motion</string>
-    <string name="alight_open_failed">Hindi mabuksan ang link. Puwede mo itong kopyahin at buksan sa phone mo.</string>
-    <string name="alight_loading">Nilo-load ang pampublikong share page…</string>
-    <string name="alight_preview_failed">Hindi available ang preview. Magagamit mo pa rin ang link at masusundan ang mga hakbang na ito.</string>
-    <string name="alight_preview_only">Preview ito ng pampublikong share page. Hindi made-download ng AbsentMotion ang proyekto mula sa link na ito.</string>
-    <string name="alight_steps">I-import ang proyekto</string>
-    <string name="alight_phone_steps">Sa phone mo</string>
-    <string name="alight_step_import">1. Buksan ang link sa Alight Motion sa phone mo at i-import ang proyekto.</string>
-    <string name="alight_step_open">2. Buksan ang proyekto sa Alight Motion.</string>
-    <string name="alight_step_xml">3. I-export ang proyekto mula sa Alight Motion bilang XML at piliin ang AbsentMotion para buksan ito.</string>
-    <string name="alight_step_report">4. Ini-import ng AbsentMotion ang XML at ipinapakita ang karaniwan nitong ulat, kasama ang anumang hindi nito nakumberte at anumang nawawalang media.</string>
     <string name="play_count_in">Count-in</string>
     <string name="play_count_off">Off</string>
     <string name="play_count_one">1 s</string>
@@ -2624,4 +2605,6 @@
     <string name="play_speed_normal">1x</string>
     <string name="record_overwrite">I-overwrite habang nagre-record</string>
     <string name="history_record_keyframes">Mag-record ng keyframe</string>
+    <string name="dafont_find">Maghanap pa ng mga font sa DaFont</string>
+    <string name="dafont_hint">Mag-download ng font, tapos i-import ang .zip dito. Tingnan ang lisensya nito bago gamitin sa na-publish na video.</string>
 </resources>

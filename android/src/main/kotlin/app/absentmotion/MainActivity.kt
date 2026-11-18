@@ -128,7 +128,6 @@ class MainActivity : ComponentActivity() {
     private var closingEditor = false
     private var cameFromEditor = false
     private var exportingFromList by mutableStateOf<Scene?>(null)
-    private var alightLink by mutableStateOf<String?>(null)
     private var imported by mutableStateOf<List<ImportReport>>(emptyList())
     private var editingTemplate by mutableStateOf<String?>(null)
     private var firstRun by mutableStateOf<FirstRun?>(null)
@@ -169,6 +168,7 @@ class MainActivity : ComponentActivity() {
         followScreenSize(resources.configuration)
         store = ProjectStore(this)
         settings = AppSettings(this)
+        if (BuildConfig.DEBUG) app.absentmotion.platform.DeskDetect.forced = intent.getBooleanExtra("desklayout", false)
         app.absentmotion.platform.DeskDetect.refresh(this)
         templates = TemplateStore(this)
         recovery = Recovery(File(filesDir, "recovery"))
@@ -274,7 +274,7 @@ class MainActivity : ComponentActivity() {
                                 store, settings, onOpen = ::open, onExport = ::exportFromList,
                                 imported = imported, onImportShown = { imported = emptyList() }, onImportFile = { importUris(listOf(it)) },
                                 onTemplate = { id -> if (!opening && !openingProject) { openingProject = true; openJob = lifecycleScope.launch { try { if (engineWorks()) editingTemplate = id } finally { openingProject = false } } } }, onTemplateProject = ::projectFromTemplate,
-                                onHistory = { historyFor = Triple(it.id, it.title, it.damaged) }, onCollect = ::collectMedia, changes = projectsChanged,
+                                onHistory = { historyFor = Triple(it.id, it.title, it.damaged) }, onCollect = ::collectMedia, changes = projectsChanged, engine = { engine },
                             )
                         }
                         editingTemplate?.let { id ->
@@ -346,10 +346,9 @@ class MainActivity : ComponentActivity() {
                     else if (app.absentmotion.ui.home.FfampOffer.pending(settings)) app.absentmotion.ui.home.FfampOfferDialog(settings)
                     else if (settings.updatesAsked) UpdateDialog() else UpdateAskDialog(settings)
                 }
-                alightLink?.let { app.absentmotion.ui.home.AlightLinkHelper(it, { alightLink = null }) }
                 app.absentmotion.ui.tutorial.TutorialHost(
                     open, store, settings,
-                    homeFree = alightLink == null && open == null && first == null && !opening && editingTemplate == null && exportingFromList == null && offer == null && crashed == null && !problemShown && imported.isEmpty() && whatsNew == null && !app.absentmotion.ui.home.FfampOffer.pending(settings),
+                    homeFree = open == null && first == null && !opening && editingTemplate == null && exportingFromList == null && offer == null && crashed == null && !problemShown && imported.isEmpty() && whatsNew == null && !app.absentmotion.ui.home.FfampOffer.pending(settings),
                     onOpen = ::open, onCloseEditor = ::closeEditor, onChanged = { projectsChanged++ },
                 )
             }
@@ -363,12 +362,10 @@ class MainActivity : ComponentActivity() {
 
     private fun updateCalm() = lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED) && editor == null && !closingEditor && !opening && !openingProject &&
         editingTemplate == null && exportingFromList == null && firstRun == null && recovered == null && crashed == null && !problemShown && whatsNew == null && !app.absentmotion.ui.home.FfampOffer.pending(settings) &&
-        settings.updatesAsked && alightLink == null && !app.absentmotion.export.ExportRun.running
+        settings.updatesAsked && !app.absentmotion.export.ExportRun.running
 
     private fun importShared() {
-        val shared = ImportHandOff.take()
-        shared.firstOrNull { app.absentmotion.links.AlightLinks.parse(it) != null }?.let { alightLink = it }
-        val uris = shared.filterNot { app.absentmotion.links.AlightLinks.parse(it) != null }.map(Uri::parse)
+        val uris = ImportHandOff.take().map(Uri::parse)
         if (uris.isNotEmpty()) importUris(uris)
     }
 
@@ -686,6 +683,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        if (BuildConfig.DEBUG && intent.hasExtra("desklayout")) {
+            app.absentmotion.platform.DeskDetect.forced = intent.getBooleanExtra("desklayout", false)
+            app.absentmotion.platform.DeskDetect.refresh(this)
+        }
         importShared()
         TestHooks.newIntent(this, intent)
     }

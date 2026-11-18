@@ -193,7 +193,10 @@ class EditorState(
             frameState = value
             atEnd = false
             if (value > old) recordFrames(old + 1, value)
-            else if (value < old && liveRecording != null) endGesture()
+            else if (value < old) liveRecording?.let { lap ->
+                finishRecording()
+                liveRecording = LiveRecording(scene, lap.key, settings.overwriteRecording, lap.pivotId)
+            }
         }
 
     val playheadFrame: Int get() = if (atEnd) frameState + 1 else frameState

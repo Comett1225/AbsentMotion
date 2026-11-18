@@ -96,11 +96,8 @@ object DeskScale {
 }
 
 object DeskGlobalKeys {
-    internal var homePaste: (() -> Boolean)? = null
     fun handle(app: DeskAppState, event: KeyEvent): Boolean {
         if (event.type != KeyEventType.KeyDown || DeskTyping.active > 0) return false
-        if (app.editor == null && !app.settingsOpen && !app.opening && app.editingTemplate == null && app.exportingFromList == null && DeskModals.open == 0 &&
-            event.key == Key.V && (event.isMetaPressed || event.isCtrlPressed) && !event.isAltPressed && !event.isShiftPressed && homePaste?.invoke() == true) return true
         when (DeskShortcuts.find(DeskShortcuts.chord(event)) { it.global }) {
             Shortcut.ZoomIn -> DeskScale.zoomIn()
             Shortcut.ZoomOut -> DeskScale.zoomOut()

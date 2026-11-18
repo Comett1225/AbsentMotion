@@ -82,9 +82,14 @@ private fun AboutBody(onLicences: () -> Unit, onWhatsNew: () -> Unit) {
     val notes = remember { WhatsNewNotes.currentName(context) }
     val links = LocalUriHandler.current
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("AbsentMotion", color = Am.Navy, fontSize = 28.sp, fontWeight = FontWeight.Bold)
-        if (version.isNotEmpty()) Text(stringResource(if (Tier.compatible) R.string.about_version_compatible else R.string.about_version, version), color = Am.HomeMid, fontSize = 14.sp)
-        if (notes != null) DeskButton(stringResource(R.string.whats_new_see, WhatsNewNotes.key(version) ?: notes), onWhatsNew, icon = HomeIcons.Notes)
+        Row {
+            Column(Modifier.weight(1f, fill = false), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text("AbsentMotion", color = Am.Navy, fontSize = 28.sp, fontWeight = FontWeight.Bold)
+                if (version.isNotEmpty()) Text(stringResource(if (Tier.compatible) R.string.about_version_compatible else R.string.about_version, version), color = Am.HomeMid, fontSize = 14.sp)
+                if (notes != null) DeskButton(stringResource(R.string.whats_new_see, WhatsNewNotes.key(version) ?: notes), onWhatsNew, icon = HomeIcons.Notes)
+            }
+            app.absentmotion.ui.adaptive.AppLogo(84.dp, Modifier.padding(start = 28.dp, top = 4.dp))
+        }
         Spacer(Modifier.height(4.dp))
         AboutText(stringResource(R.string.about_licence_line))
         AboutText(stringResource(R.string.about_independent_note))

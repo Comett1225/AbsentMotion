@@ -142,8 +142,6 @@
     <string name="settings_graphics_opengl">OpenGL</string>
     <string name="settings_graphics_note">اکنون از %1$s استفاده می‌شود.</string>
     <string name="settings_graphics_hint">اگر پیش‌نمایش یا خروجی‌ها در این گوشی درست به نظر نمی‌رسند، OpenGL را انتخاب کنید.</string>
-    <string name="settings_layout">چیدمان رایانه (آزمایشی)</string>
-    <string name="settings_layout_hint">خودکار: در Samsung DeX و پنجره‌های دسکتاپ از چیدمان رایانه استفاده می‌کند. روشن: امکان امتحان آن را روی هر تبلتی می‌دهد. با تغییر چیدمان، پروژه شما باز می‌ماند.</string>
     <string name="settings_media">موتور رسانه</string>
     <string name="settings_media_standard">استاندارد</string>
     <string name="settings_media_ffamp">‏FFamp (آزمایشی)</string>
@@ -1112,6 +1110,8 @@
     <string name="font_reason_duplicate">این فونت قبلاً وارد شده است</string>
     <string name="font_reason_corrupted">فایل فونت خراب است</string>
     <string name="font_reason_unreadable">امکان باز کردن فایل نبود</string>
+    <string name="font_reason_zip_empty">هیچ فونتی (.ttf، .otf یا .ttc) داخل این zip نیست</string>
+    <string name="font_reason_zip_too_big">این zip بیش از 50 فونت یا بیش از 50 MB دارد</string>
     <string name="font_load_failed_title">بارگذاری فونت ممکن نشد</string>
     <string name="font_load_failed_body">این فونت بارگذاری نشد. اتصال اینترنت خود را بررسی کنید و دوباره تلاش کنید.</string>
     <string name="font_title_language">فونت‌های %1$s</string>
@@ -2595,25 +2595,6 @@
     <string name="ai_image_under_minute">کمتر از یک دقیقه برای این تصویر</string>
     <string name="ai_image_about_time">حدود %1$s برای این تصویر</string>
     <string name="ai_checking_device">در حال بررسی این دستگاه…</string>
-    <string name="alight_link">پیوند Alight</string>
-    <string name="alight_import_file">وارد کردن فایل</string>
-    <string name="alight_link_field">پیوند Alight Motion</string>
-    <string name="alight_entry_hint">یک پیوند HTTPS از alight.link، alight.page.link یا یک صفحه اشتراک عمومی Alight Motion جای‌گذاری کنید.</string>
-    <string name="alight_invalid">یک پیوند اشتراک معتبر Alight Motion با HTTPS وارد کنید.</string>
-    <string name="alight_paste_empty">کلیپ‌بورد متنی ندارد. پیوند را بالا جای‌گذاری یا تایپ کنید.</string>
-    <string name="alight_copy_link">کپی پیوند</string>
-    <string name="alight_open_app">باز کردن در Alight Motion</string>
-    <string name="alight_get_app">دریافت Alight Motion</string>
-    <string name="alight_open_failed">پیوند باز نشد. می‌توانید آن را کپی کنید و روی گوشی خود باز کنید.</string>
-    <string name="alight_loading">در حال بارگیری صفحه اشتراک عمومی…</string>
-    <string name="alight_preview_failed">پیش‌نمایش در دسترس نیست. همچنان می‌توانید از پیوند استفاده کنید و این مراحل را دنبال کنید.</string>
-    <string name="alight_preview_only">این پیش‌نمایشی از صفحه اشتراک عمومی است. AbsentMotion نمی‌تواند پروژه را از این پیوند دانلود کند.</string>
-    <string name="alight_steps">وارد کردن پروژه</string>
-    <string name="alight_phone_steps">روی گوشی شما</string>
-    <string name="alight_step_import">‏1. پیوند را روی گوشی خود در Alight Motion باز کنید و پروژه را وارد کنید.</string>
-    <string name="alight_step_open">‏2. پروژه را در Alight Motion باز کنید.</string>
-    <string name="alight_step_xml">‏3. پروژه را از Alight Motion با فرمت XML خروجی بگیرید و AbsentMotion را برای باز کردن آن انتخاب کنید.</string>
-    <string name="alight_step_report">‏4. AbsentMotion فایل XML را وارد می‌کند و گزارش همیشگی خود را نشان می‌دهد، شامل هر چیزی که نتوانسته تبدیل کند و هر رسانه گم‌شده.</string>
     <string name="play_count_in">شمارش قبل از شروع</string>
     <string name="play_count_off">خاموش</string>
     <string name="play_count_one">‏1 ثانیه</string>
@@ -2624,4 +2605,6 @@
     <string name="play_speed_normal">1x</string>
     <string name="record_overwrite">بازنویسی هنگام ضبط</string>
     <string name="history_record_keyframes">ضبط کی‌فریم‌ها</string>
+    <string name="dafont_find">فونت‌های بیشتر را در DaFont پیدا کنید</string>
+    <string name="dafont_hint">یک فونت دانلود کنید، سپس فایل .zip را اینجا وارد کنید. پیش از استفاده در ویدیوی منتشرشده، مجوز آن را بررسی کنید.</string>
 </resources>

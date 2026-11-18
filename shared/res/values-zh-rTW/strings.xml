@@ -142,8 +142,6 @@
     <string name="settings_graphics_opengl">OpenGL</string>
     <string name="settings_graphics_note">目前使用 %1$s。</string>
     <string name="settings_graphics_hint">如果此手機上的預覽或匯出結果有誤，請選擇OpenGL。</string>
-    <string name="settings_layout">電腦版面配置（實驗性）</string>
-    <string name="settings_layout_hint">「自動」會在三星 DeX 和桌面視窗中使用電腦版面配置。「開啟」可讓你在任何平板上試用。版面配置切換時，你的專案會保持開啟。</string>
     <string name="settings_media">媒體引擎</string>
     <string name="settings_media_standard">標準</string>
     <string name="settings_media_ffamp">FFamp（實驗性）</string>
@@ -1097,6 +1095,8 @@
     <string name="font_reason_duplicate">此字型已匯入</string>
     <string name="font_reason_corrupted">字型檔案已損毀</string>
     <string name="font_reason_unreadable">無法開啟檔案</string>
+    <string name="font_reason_zip_empty">此zip中沒有字型（.ttf、.otf或.ttc）</string>
+    <string name="font_reason_zip_too_big">zip包含超過50個字型或超過50 MB</string>
     <string name="font_load_failed_title">無法載入字型</string>
     <string name="font_load_failed_body">無法載入該字型。請檢查網路連線後再試。</string>
     <string name="font_title_language">%1$s 字型</string>
@@ -2566,25 +2566,6 @@
     <string name="ai_image_under_minute">這張圖片不到一分鐘</string>
     <string name="ai_image_about_time">這張圖片約需%1$s</string>
     <string name="ai_checking_device">正在檢查此裝置…</string>
-    <string name="alight_link">Alight連結</string>
-    <string name="alight_import_file">匯入檔案</string>
-    <string name="alight_link_field">Alight Motion連結</string>
-    <string name="alight_entry_hint">貼上來自alight.link、alight.page.link或Alight Motion公開分享頁面的HTTPS連結。</string>
-    <string name="alight_invalid">請輸入有效的HTTPS Alight Motion分享連結。</string>
-    <string name="alight_paste_empty">剪貼簿中沒有文字。請在上方貼上或輸入連結。</string>
-    <string name="alight_copy_link">複製連結</string>
-    <string name="alight_open_app">在Alight Motion中開啟</string>
-    <string name="alight_get_app">取得Alight Motion</string>
-    <string name="alight_open_failed">無法開啟連結。你可以複製連結，再在手機上開啟。</string>
-    <string name="alight_loading">正在載入公開分享頁面…</string>
-    <string name="alight_preview_failed">無法顯示預覽。你仍然可以使用該連結，並依照以下步驟操作。</string>
-    <string name="alight_preview_only">這是公開分享頁面的預覽。AbsentMotion無法從此連結下載專案。</string>
-    <string name="alight_steps">匯入專案</string>
-    <string name="alight_phone_steps">在手機上</string>
-    <string name="alight_step_import">1. 在手機上用Alight Motion開啟連結並匯入專案。</string>
-    <string name="alight_step_open">2. 在Alight Motion中開啟專案。</string>
-    <string name="alight_step_xml">3. 將專案從Alight Motion匯出為XML，並選擇AbsentMotion來開啟。</string>
-    <string name="alight_step_report">4. AbsentMotion會匯入XML，並顯示一般的報告，其中包括無法轉換的內容和遺失的媒體。</string>
     <string name="play_count_in">倒數</string>
     <string name="play_count_off">關閉</string>
     <string name="play_count_one">1秒</string>
@@ -2595,4 +2576,6 @@
     <string name="play_speed_normal">1x</string>
     <string name="record_overwrite">錄製時覆寫</string>
     <string name="history_record_keyframes">錄製關鍵影格</string>
+    <string name="dafont_find">在DaFont上尋找更多字型</string>
+    <string name="dafont_hint">下載字型後，在此匯入.zip檔案。在已發布的影片中使用前，請先查看其授權條款。</string>
 </resources>

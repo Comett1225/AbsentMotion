@@ -23,7 +23,6 @@
     <uses-feature android:name="android.hardware.microphone" android:required="false" />
 
     <queries>
-        <package android:name="com.alightcreative.motion" />
         <intent><action android:name="android.intent.action.TTS_SERVICE" /></intent>
     </queries>
 
@@ -54,24 +53,6 @@
             android:name=".ImportActivity"
             android:exported="true"
             android:theme="@android:style/Theme.NoDisplay">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" android:host="alight.link" />
-                <data android:scheme="https" android:host="alight.page.link" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" android:host="alightcreative.com" android:pathPrefix="/am/share/" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.SEND" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="text/plain" />
-            </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <action android:name="android.intent.action.SEND_MULTIPLE" />

@@ -88,14 +88,3 @@ Older `.fla` files from Flash CS4 and before use another format. The app then sa
 - **Shared storage** (stays when you uninstall): Movies/AbsentMotion (videos), Pictures/AbsentMotion (GIFs, still frames, image sequences and palette pictures), Music/AbsentMotion (audio exports), Documents/AbsentMotion (`.absproj`, XML, backups and palette files) and DCIM/AbsentMotion (photos and videos from the in-app camera).
 
 AbsentMotion does not use the broad "all files" permission: it saves through Android's media storage.
-
-## Project links from another editor
-
-Some editors share a project as a web link or a QR code. To use one, open Home's add or import menu, choose the link item and paste the link. On Android you can also open the link with AbsentMotion, or share it to AbsentMotion as text from a browser or another app. On a computer, press Cmd+V or Ctrl+V on Home to paste it.
-
-AbsentMotion shows the title, picture and description from the link's public page; offline, it still shows the link and the steps. It cannot download the project itself, because the file stays in the other editor's private storage.
-
-1. On your phone, open the link in the editor it came from with the first button (or get that editor with it) and import the project there. On a computer, copy the link and open it on your phone.
-2. Open the project in that editor.
-3. Export the project as XML and choose AbsentMotion to open it.
-4. AbsentMotion imports the XML and shows its usual report, including anything it could not convert and any missing media.
