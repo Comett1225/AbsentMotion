@@ -43,7 +43,7 @@ import app.absentmotion.editor.*
 import app.absentmotion.effects.EffectDefinition
 import app.absentmotion.effects.PresetFavouriteStore
 import app.absentmotion.platform.LocalContext
-import app.absentmotion.ui.editor.effects.PresetStar
+import app.absentmotion.ui.editor.FavouriteStar
 import app.absentmotion.model.*
 import app.absentmotion.ui.editor.AboveLeft
 import app.absentmotion.ui.editor.ChromeIcons
@@ -112,15 +112,15 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
         val fallback = when (pinField) { "rotation" -> "0"; "scale" -> "1"; else -> "0,0" }
         KeyTarget(PropRef.effect(index, prop), instance.effectProperty(prop)?.valueAt(layer.t) ?: fallback, if (pinField == "position") "vec2" else "float")
     } else null
-    val target = pinTarget ?: active?.takeIf { usable && definition.shown(it, instance, layer.t) }?.let { KeyTarget(PropRef.effect(index, it.id), it.missingDefault, it.type) }
+    val target = pinTarget ?: active?.takeIf { usable && it.kind != "text" && definition.shown(it, instance, layer.t) }?.let { KeyTarget(PropRef.effect(index, it.id), it.missingDefault, it.type) }
     val point = active?.takeIf { it.kind == "point" && usable && !pathText }
     val adjust = remember(layer.id, index, point?.id, point?.label) {
         point?.let { param ->
-            PointAdjust(param.label) { dx, dy ->
+            PointAdjust(param.label) { dx, dy, width, height ->
                 state.editSelected("effect-$index-${param.id}") { current ->
                     val old = (current.effects.getOrNull(index)?.effectProperty(param.id)?.valueAt(current.t) ?: param.missingDefault).split(',').map { it.trim().finiteFloat() ?: 0f }
-                    val x = (old.getOrElse(0) { 0f } + if (param.pixels) dx else dx / state.scene.width).coerceIn(param.min, param.max)
-                    val y = (old.getOrElse(1) { 0f } + if (param.pixels) dy else dy / state.scene.height).coerceIn(param.min, param.max)
+                    val x = (old.getOrElse(0) { 0f } + if (param.pixels) dx else dx / width).coerceIn(param.min, param.max)
+                    val y = (old.getOrElse(1) { 0f } + if (param.pixels) dy else dy / height).coerceIn(param.min, param.max)
                     current.withEffect(index) { it.withEffectProperty(param.id, param.type, formatFloats(floatArrayOf(x, y)), current.t, current.snap) }
                 }
             }
@@ -268,7 +268,7 @@ private fun EffectHeader(state: EditorState, index: Int, effect: XmlNode, defini
                                     Thumbnail(catalog, definition.thumbnail(preset), Modifier.size(40.dp).clip(RowShape))
                                     Text(preset.name, Modifier.weight(1f).padding(start = 12.dp), color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
                                 }
-                                PresetStar(presetFavourites.contains(definition, preset)) { presetFavourites.toggle(definition, preset) }
+                                FavouriteStar(presetFavourites.contains(definition, preset), { presetFavourites.toggle(definition, preset) }, stringResource(R.string.effectbrowser_favorite_preset), Modifier.size(48.dp))
                             }
                         }
                     }

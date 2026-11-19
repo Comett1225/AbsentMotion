@@ -23,8 +23,9 @@ internal class LayerStream(val uri: String, startMs: Double, val loopMs: Double?
     private var keepFrom = 0L
     private var valid = false
     private var eof = false
+    private var blank = false
     private var seekGen = 1
-    private var seekMs = startMs
+    private var seekMs = maxOf(0.0, startMs)
     private var head = ShortArray(0)
     private var headStart = 0L
     private var headEnd = 0L
@@ -58,14 +59,14 @@ internal class LayerStream(val uri: String, startMs: Double, val loopMs: Double?
                     if (seekGen != handled) { handled = seekGen; target = seekMs; fresh = true }
                 }
                 if (fresh) { decoder.seek((target * 1000).toLong()); placed = false }
-                val room = lock.withLock { if (!valid) Long.MAX_VALUE else if (eof) 0L else room() }
+                val room = lock.withLock { if (blank) 0L else if (!valid) Long.MAX_VALUE else if (eof) 0L else room() }
                 if (room < 2048) {
                     lock.withLock { if (seekGen == handled && !closed) changed.await(10, TimeUnit.MILLISECONDS) }
                     continue
                 }
                 val chunk = decoder.next()
                 if (chunk == null) {
-                    if (rate == 0) { failed = true; break }
+                    if (rate == 0) { lock.withLock { if (seekGen == handled) blank = true }; continue }
                     lock.withLock { if (seekGen == handled) { if (!placed) place(rate, target); placed = true; eof = true; keepHead(true) } }
                     continue
                 }
@@ -73,8 +74,8 @@ internal class LayerStream(val uri: String, startMs: Double, val loopMs: Double?
                 if (placed && append(chunk, handled)) keepHead(false)
             }
         } catch (e: Exception) {
-            Log.w("AMAudio", "Cannot decode $uri", e)
             failed = true
+            Log.w("AMAudio", "Cannot decode $uri", e)
         } finally {
             decoder?.close()
         }
@@ -176,6 +177,7 @@ internal class LayerStream(val uri: String, startMs: Double, val loopMs: Double?
         seekGen++
         valid = false
         eof = false
+        blank = false
         this.learn = learn
         changed.signalAll()
     }
@@ -202,7 +204,7 @@ internal class LayerStream(val uri: String, startMs: Double, val loopMs: Double?
     fun prepare(posMs: Double, aheadMs: Double = 150.0): Boolean = lock.withLock {
         if (failed) return true
         val r = rate
-        if (r == 0) { if (abs(seekMs - (posMs - LEAD_MS)) > 1.0) request(posMs - LEAD_MS); return false }
+        if (r == 0) { val target = maxOf(0.0, posMs - LEAD_MS); if (abs(seekMs - target) > 1.0) request(target); return blank }
         val lo = floor(posMs * r / 1000.0).toLong() - Resampler.TAPS
         keepFrom = lo - KEEP
         covers(lo, lo + (aheadMs * r / 1000).toLong() + 2 * Resampler.TAPS)
@@ -216,7 +218,11 @@ internal class LayerStream(val uri: String, startMs: Double, val loopMs: Double?
     ): Boolean {
         val r = rate
         val count = to - from
-        if (r == 0 || failed || count <= 0) { voice.ready = false; return false }
+        if (r == 0 || failed || count <= 0) {
+            voice.ready = false
+            if (r == 0 && !failed) lock.withLock { val target = maxOf(0.0, posMs - LEAD_MS); if (blank && target < seekMs - 1.0) request(target) }
+            return false
+        }
         val pos0 = posMs * r / 1000.0
         val step = stepMs * r / 1000.0
         voice.begin(pos0, step, count)

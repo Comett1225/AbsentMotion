@@ -100,8 +100,15 @@ private suspend fun EditorState.lifetimeBounds(layer: Layer): FloatArray? =
         floatArrayOf(min(a[0], b[0]), min(a[1], b[1]), maxOf(a[2], b[2]), maxOf(a[3], b[3]))
     }
 
-suspend fun EditorState.addElement(store: ProjectStore, id: String, link: Boolean) {
-    val element = withContext(Dispatchers.IO) { store.load(id)?.withCopiedLayerIds() } ?: return
+suspend fun EditorState.addElement(store: ProjectStore, id: String, link: Boolean): String? {
+    val element = try {
+        withContext(Dispatchers.IO) { store.load(id)?.withCopiedLayerIds() } ?: return null
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        app.absentmotion.platform.Log.w("AMElement", "cannot add $id", e)
+        return e.message ?: e.toString()
+    }
     val start = timeMs
     val attrs = linkedMapOf(
         "id" to "${Layer.newId()}", "label" to element.title,
@@ -117,6 +124,7 @@ suspend fun EditorState.addElement(store: ProjectStore, id: String, link: Boolea
     selectedId = layer.id
     panel = EditorPanel.Tools
     addOpen = false
+    return null
 }
 
 fun EditorState.unlinkElement() = editSelected { it.copy(node = it.node.with("link", null)) }

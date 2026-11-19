@@ -108,9 +108,9 @@
     <string name="transform_double_tap_pivot">برای جابه‌جایی محور دو بار ضربه بزنید</string>
     <string name="transform_double_tap_layer">برای جابه‌جایی لایه دو بار ضربه بزنید</string>
     <string name="community_size">حجم فایل</string>
-    <string name="community_confirm">این را خودم ساخته‌ام و با اشتراک‌گذاری آن موافقم</string>
+    <string name="community_confirm">این را خودم ساخته‌ام یا سازنده‌اش را ذکر کرده‌ام و با اشتراک‌گذاری آن موافقم</string>
     <string name="community_need_title">برای بسته انجمن خود عنوانی اضافه کنید.</string>
-    <string name="community_need_confirm">برای تأیید اینکه این را خودتان ساخته‌اید و با اشتراک‌گذاری آن موافقید، کادر را علامت بزنید.</string>
+    <string name="community_need_confirm">برای تأیید اینکه این را خودتان ساخته‌اید یا سازنده‌اش را ذکر کرده‌اید و با اشتراک‌گذاری آن موافقید، کادر را علامت بزنید.</string>
     <string name="community_too_big">حجم بسته‌های انجمن می‌تواند حداکثر 20 MB باشد و حجم این بسته حدود %1$s است. با ابزارها &gt; فشرده‌سازی ویدیوها را کوتاه‌تر یا کم‌حجم‌تر کنید یا از عکس‌ها و ویدیوهای کمتری استفاده کنید.</string>
     <string name="project_home_page">صفحه اصلی پروژه</string>
     <string name="about_website">وب‌سایت و راهنما</string>
@@ -348,6 +348,7 @@
     <string name="theme_error_no_colours">هیچ رنگ پوسته‌ای در این فایل نیست</string>
     <string name="library_err_no_data">هیچ داده‌ای دریافت نشد.</string>
     <string name="library_err_unsupported_type">نوع فایل پشتیبانی نمی‌شود</string>
+    <string name="library_err_is_model">این یک مدل سه‌بعدی است، نه پروژه. پروژه‌ای باز کنید و آن را از شیء / دارایی &gt; مدل سه‌بعدی اضافه کنید.</string>
     <string name="import_gif_converting">در حال آماده‌سازی GIF…</string>
     <string name="import_gif_too_large">این GIF برای واردکردن خیلی بزرگ است. GIF تا 2048 × 2048 پیکسل، 3000 فریم و 10 دقیقه پشتیبانی می‌شود.</string>
     <string name="import_gif_damaged">این GIF خراب است و نمی‌توان آن را وارد کرد.</string>
@@ -470,13 +471,21 @@
     <string name="community_too_new">برای مشاهده کتابخانه انجمن، AbsentMotion را به‌روزرسانی کنید</string>
     <string name="community_filter_projects">پروژه‌ها</string>
     <string name="community_filter_presets">پریست‌ها</string>
-    <string name="community_empty">هنوز چیزی اینجا نیست</string>
+    <string name="community_empty">به نظر می‌رسد هنوز هیچ ارسالی وجود ندارد</string>
     <string name="community_read_more">بیشتر بخوانید</string>
     <string name="community_show_less">نمایش کمتر</string>
     <string name="community_adding">در حال افزودن…</string>
     <string name="community_add">افزودن</string>
     <string name="community_add_preset">افزودن به پریست‌های من</string>
     <string name="community_added_preset">به پریست‌های من اضافه شد</string>
+    <string name="preset_share">اشتراک‌گذاری در انجمن</string>
+    <string name="preset_placeholder">جایگزین</string>
+    <string name="preset_placeholder_text">متن خودش</string>
+    <string name="preset_placeholder_shape">شکل خودش</string>
+    <string name="preset_placeholder_random">تصویر تصادفی</string>
+    <string name="preset_placeholder_choose">انتخاب تصویر یا ویدیو…</string>
+    <string name="preset_shuffle">بر زدن</string>
+    <string name="preset_placeholder_note">دیگران پریست شما را روی این می‌بینند. عکس‌ها و ویدیوهای خودتان در پریست هرگز به فایل اضافه نمی‌شوند.</string>
     <string name="community_download_failed">این مورد دانلود نشد. دوباره امتحان کنید.</string>
     <string name="community_download_damaged">فایل دانلودشده خراب است. دوباره امتحان کنید.</string>
     <string name="tools_compress">فشرده‌سازی</string>
@@ -570,7 +579,7 @@
     <string name="downloader_engine_missing">اول افزونه را دریافت کنید.</string>
     <string name="downloader_engine_blocked">برنامهٔ دانلود وجود ندارد یا آنتی‌ویروس آن را مسدود کرده است. به آن اجازه دهید یا آن را در تنظیمات حذف و دوباره دانلود کنید.</string>
     <string name="downloader_engine_broken">افزونه شروع نشد. آن را در تنظیمات حذف کنید و دوباره دریافت کنید.</string>
-    <string name="downloader_restart">AbsentMotion را ببندید و دوباره باز کنید تا راه‌اندازی افزونه تمام شود.</string>
+    <string name="downloader_restart">‏AbsentMotion را ببندید و دوباره باز کنید تا راه‌اندازی افزونه تمام شود.</string>
     <string name="downloader_engine_unavailable">دانلود ویدیو به گوشی با پردازنده 64 بیتی نیاز دارد.</string>
     <string name="downloader_engine_name">افزونه دانلود ویدیو</string>
     <string name="downloader_get_engine_first">برای دیدن محتوای این لینک، افزونه را دریافت کنید.</string>
@@ -588,7 +597,7 @@
     <string name="downloader_error_login">این پست به حساب واردشده نیاز دارد، بنابراین قابل دانلود نیست.</string>
     <string name="downloader_error_private">این ویدیو خصوصی است.</string>
     <string name="downloader_error_blocked">سایت دانلود را مسدود کرد. بعداً دوباره تلاش کنید.</string>
-    <string name="downloader_error_bot">YouTube خواست تأیید کنید که ربات نیستید. این معمولاً با VPN پیش می‌آید: آن را خاموش کنید یا بعداً دوباره امتحان کنید.</string>
+    <string name="downloader_error_bot">‏YouTube خواست تأیید کنید که ربات نیستید. این معمولاً با VPN پیش می‌آید: آن را خاموش کنید یا بعداً دوباره امتحان کنید.</string>
     <string name="downloader_error_gone">این ویدیو دیگر در دسترس نیست.</string>
     <string name="downloader_error_novideo">در این لینک چیزی برای دانلود نیست.</string>
     <string name="downloader_error_network">سایت در دسترس نبود. اتصال را بررسی کنید.</string>
@@ -853,7 +862,7 @@
     <string name="unsupported_title">این گوشی نمی‌تواند ویرایشگر را اجرا کند</string>
     <string name="unsupported_old_vulkan">‏AbsentMotion پیش‌نمایش و خروجی را با چیپ گرافیکی از طریق Vulkan 1.1 رسم می‌کند، و این گوشی فقط نسخه قدیمی‌تر Vulkan را دارد.</string>
     <string name="unsupported_no_vulkan">درایور گرافیک گوشی Vulkan را اجرا نکرد؛ AbsentMotion برای رسم پیش‌نمایش و خروجی به آن نیاز دارد.</string>
-    <string name="unsupported_no_opengl">AbsentMotion همچنین OpenGL ES 3.0 را امتحان کرد، اما آن هم اجرا نشد.</string>
+    <string name="unsupported_no_opengl">‏AbsentMotion همچنین OpenGL ES 3.0 را امتحان کرد، اما آن هم اجرا نشد.</string>
     <string name="unsupported_driver_features">درایور گرافیک گوشی فاقد قابلیت‌هایی است که AbsentMotion برای رسم پیش‌نمایش و خروجی لازم دارد.</string>
     <string name="unsupported_skia">موتور رسم AbsentMotion با درایور گرافیک این گوشی کار نمی‌کند.</string>
     <string name="unsupported_unknown">موتور رسم AbsentMotion روی این گوشی اجرا نشد.</string>
@@ -1254,6 +1263,7 @@
     <string name="structure_asset_project">دارایی / پروژه</string>
     <string name="structure_import_svg">واردکردن SVG</string>
     <string name="structure_svg_unreadable">این فایل SVG خوانده نشد.</string>
+    <string name="structure_svg_too_large">این فایل SVG برای واردکردن بیش از حد بزرگ است (بیشتر از 16 MB).</string>
     <string name="structure_svg_empty">این فایل SVG هیچ شکلی برای واردکردن ندارد.</string>
     <plurals name="structure_svg_imported">
         <item quantity="one">‏%1$s شکل وارد شد. کنار گذاشته شد: %2$s.</item>
@@ -1895,6 +1905,7 @@
     <string name="edit_panel_camera_options">تنظیمات دوربین</string>
     <string name="edit_keep_copying">در حال کپی «%1$s» به پروژه…</string>
     <string name="edit_keep_no_space">فضای ذخیره‌سازی کافی برای نگه‌داشتن یک کپی از «%1$s» در پروژه وجود ندارد. همچنان از فایل اصلی استفاده می‌شود.</string>
+    <string name="edit_keep_not_added">کپی «%1$s» به پروژه ممکن نشد، بنابراین اضافه نشد. فضای خالی ذخیره‌سازی را بررسی کنید و دوباره امتحان کنید.</string>
     <string name="edit_keep_failed">کپی «%1$s» به پروژه ممکن نشد. همچنان از فایل اصلی استفاده می‌شود، بنابراین اگر آن فایل جابه‌جا یا حذف شود ممکن است از کار بیفتد.</string>
     <string name="edit_keep_this_file">این فایل</string>
     <string name="edit_beats_select_layer">یک لایه صدا یا ویدیو انتخاب کنید</string>
@@ -2059,7 +2070,7 @@
     <string name="settings_clear_preview_copies">پاک کردن نسخه‌های پیش‌نمایش</string>
     <string name="settings_clear_preview_title">کپی‌های پیش‌نمایش پاک شوند؟</string>
     <string name="settings_clear_preview_text">کپی‌های پیش‌نمایش هر زمان پروژه به آن‌ها نیاز داشته باشد دوباره ساخته می‌شوند.</string>
-    <string name="settings_delete_model_title">%1$s حذف شود؟</string>
+    <string name="settings_delete_model_title">‏%1$s حذف شود؟</string>
     <string name="settings_delete_model_text">بعداً می‌توان دوباره آن را دانلود کرد.</string>
     <string name="preset_numbered">پریست %1$s</string>
     <string name="recovery_your_project">پروژه شما</string>
@@ -2223,8 +2234,8 @@
         <item quantity="other">روی %1$s لایه اعمال شد</item>
     </plurals>
     <plurals name="multi_transition_count">
-        <item quantity="one">%1$s برش</item>
-        <item quantity="other">%1$s برش</item>
+        <item quantity="one">‏%1$s برش</item>
+        <item quantity="other">‏%1$s برش</item>
     </plurals>
     <string name="layer_tool_screenshot">عکس صفحه</string>
     <string name="structure_svg_importing">در حال واردکردن SVG…</string>
@@ -2555,6 +2566,11 @@
     <string name="desk_key_timeline_zoom_in">بزرگ‌نمایی تایم‌لاین</string>
     <string name="desk_key_timeline_zoom_out">کوچک‌نمایی تایم‌لاین</string>
     <string name="desk_key_timeline_fit">متناسب کردن تایم‌لاین با پنجره</string>
+    <string name="community_share_title">پیش‌تنظیم یا پروژه‌تان را به اشتراک بگذارید</string>
+    <string name="community_share_hint">فایل را در یک سرویس میزبانی فایل (یکی ناشناس، Google Drive یا MEGA) بارگذاری کنید و سپس پیوند را با فرم بفرستید.</string>
+    <string name="community_share_button">باز کردن فرم</string>
+    <string name="community_share_hide">نمایش نده</string>
+    <string name="community_form_line">ارسال خود را با این فرم Google اضافه کنید</string>
     <string name="community_search">جستجو در انجمن</string>
     <string name="community_clear">پاک کردن</string>
     <string name="community_no_matches">موردی پیدا نشد</string>

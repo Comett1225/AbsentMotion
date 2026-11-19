@@ -32,9 +32,12 @@ FOLDERS = {'en': 'values', 'id': 'values-in', 'hi': 'values-hi', 'pt-BR': 'value
            'es-ES': 'values-es-rES', 'ur': 'values-ur', 'ja': 'values-ja', 'ko': 'values-ko', 'zh-TW': 'values-zh-rTW', 'zh-CN': 'values-zh-rCN',
            'fr': 'values-fr', 'de': 'values-de', 'it': 'values-it', 'pl': 'values-pl', 'uk': 'values-uk'}
 JAVA_WORDS = {'new', 'default', 'switch', 'case', 'do', 'final', 'private', 'public', 'static', 'void', 'int', 'char', 'this', 'super', 'throw', 'goto', 'const', 'package', 'native', 'long', 'short', 'byte', 'float', 'double', 'boolean', 'catch', 'enum', 'extends', 'implements', 'interface', 'instanceof', 'protected', 'synchronized', 'throws', 'transient', 'volatile', 'abstract', 'strictfp', 'null', 'true', 'false'}
-PLACEHOLDER = re.compile(r'%(\d+\$)?[sdf]')
+PLACEHOLDER = re.compile(r'%%|%(\d+\$)?[sdf]')
 SEVERAL = {'values-fil': {'one'}, 'values-hi': {'one'}, 'values-pt-rBR': {'one'}, 'values-ru': {'one', 'few', 'many'}, 'values-fa': {'one'}, 'values-ar': {'few', 'many'}, 'values-bn': {'one'}, 'values-fr': {'one'}, 'values-pl': {'few', 'many'}, 'values-uk': {'one', 'few', 'many'}}
 LETTER = re.compile('[A-Za-z\u00c0-\uffff]')
+ARABIC = re.compile('[\u0600-\u06ff\u0750-\u077f\u08a0-\u08ff\ufb50-\ufdff\ufe70-\ufeff]')
+RLM = '\u200f'
+RTL = ('ar', 'fa', 'ur')
 
 
 def literals(src):
@@ -241,6 +244,10 @@ def read_strings(path):
     return found
 
 
+def needs_rlm(text):
+    return bool(ARABIC.search(text)) and not text.startswith(RLM) and not ARABIC.match(text.lstrip())
+
+
 def xml_escape(text):
     s = text.replace('\\', '\\\\').replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
     s = s.replace("'", "\\'").replace('"', '\\"').replace('\n', '\\n').replace('\t', '\\t')
@@ -344,6 +351,10 @@ def coverage_problems(tags):
     return problems
 
 
+def stray_percent(reference, text):
+    return bool(PLACEHOLDER.search(reference)) and '%' in PLACEHOLDER.sub('', text)
+
+
 def check():
     english = read_strings(strings_file('values'))
     problems = []
@@ -375,12 +386,16 @@ def check():
             several = key.split('#')[-1] in SEVERAL.get(folder, ())
             if a != b and not ('#' in key and not key.endswith('#other') and not several and set(b) <= set(a)):
                 problems.append(f'{folder}: {key}: placeholders {a} in English but {b} here')
+            if stray_percent(reference or '', local[key]):
+                problems.append(f'{folder}: {key}: a % that is not a placeholder (write %% for a percent sign)')
             if '#' in key and base + '#other' not in local:
                 problems.append(f'{folder}: {base}: no "other" plural form')
             if re.search(r"(?<!\\)'", local[key]):
                 problems.append(f'{folder}: {key}: unescaped apostrophe')
             if not local[key].strip():
                 problems.append(f'{folder}: {key}: empty')
+            if tag in RTL and needs_rlm(xml_unescape(local[key])):
+                problems.append(f'{folder}: {key}: starts left to right without the U+200F mark')
     try:
         problems.extend(coverage_problems(tags))
     except (OSError, ValueError, TypeError, KeyError, AttributeError) as failure:
@@ -483,6 +498,19 @@ def selftest():
     assert xml_unescape(xml_escape("It's 100% <ok>\nnext")) == "It's 100% <ok>\nnext"
     assert add_imports('package app.absentmotion.ui\n\nimport a.B\n\nfun x() {}') == \
         'package app.absentmotion.ui\n\nimport a.B\n' + '\n'.join(REWRITE_IMPORTS) + '\n\nfun x() {}'
+    assert stray_percent('%1$d%%', '%1$d %') and stray_percent('%1$s', '%1$s 50%') and not stray_percent('%1$d%%', '%%%1$d') and not stray_percent('100%', '100 %')
+    assert needs_rlm('4K اور') and not needs_rlm(RLM + '4K اور') and not needs_rlm('اور 4K') and not needs_rlm('4K export')
+    import tempfile
+    import i18n_translate
+    assert i18n_translate.problem('Loading %1$d%%', 'Chargement %1$d %', 'fr') and i18n_translate.problem('Loading %1$d%%', 'Yükleniyor %%1$d', 'tr')
+    assert i18n_translate.problem('Loading %1$d%%', 'Chargement %1$d %%', 'fr') is None
+    assert 'one form' in i18n_translate.problem({'other': '%1$s at %2$d%%'}, {'one': '%1$s à %2$d %', 'many': '%1$s à %2$d %%', 'other': '%1$s à %2$d %%'}, 'fr')
+    assert i18n_translate.fix_direction('%1$s تک', 'ur') == RLM + '%1$s تک'
+    assert i18n_translate.fix_direction('%1$s تک', 'tr') == '%1$s تک'
+    with tempfile.TemporaryDirectory() as directory:
+        out = Path(directory) / 'strings.xml'
+        i18n_translate.write_resources(out, {'a': {'other': 'x'}, 'b': 'y'}, {}, {'a': 'old', 'b': {'other': 'z'}}, ['other'])
+        assert 'name=' not in out.read_text(encoding='utf-8')
     coverage_selftest()
     print('selftest ok')
 

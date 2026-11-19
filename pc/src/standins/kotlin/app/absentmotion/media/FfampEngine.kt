@@ -268,6 +268,7 @@ private class FfampVideoSource(file: File, maxSide: Int, maxPixels: Int) : Video
     override val info: VideoInfo
     private val frames: Frames
     private val fps: Double
+    private val shift: Double
     private val bytes: ByteArray
     private var decoded = -1
     private val exactFrames = object : LinkedHashMap<Long, VideoFrame>(4, 0.75f, true) {
@@ -282,6 +283,7 @@ private class FfampVideoSource(file: File, maxSide: Int, maxPixels: Int) : Video
         val height = maxOf(2, (video.height * scale).toInt() / 2 * 2)
         fps = (video.fps.takeIf { it > 0 && it.isFinite() } ?: 30.0).coerceIn(0.001, 1000.0)
         info = VideoInfo(video.width, video.height, (probe.durationUs / 1000).coerceAtLeast(0), fps)
+        shift = (video.startUs - probe.startUs).coerceAtLeast(0) / 1_000_000.0
         frames = Frames(file, width, height, RGBA, false)
         check(frames.open)
         bytes = ByteArray(frames.bytes)
@@ -289,7 +291,7 @@ private class FfampVideoSource(file: File, maxSide: Int, maxPixels: Int) : Video
 
     override fun frame(timeMs: Long): VideoFrame? {
         val target = (timeMs.coerceAtLeast(0) * fps / 1000.0).toLong()
-        val index = frames.indexAt(target / fps)
+        val index = frames.indexAt(target / fps + shift)
         if (index != decoded) {
             if (!frames.read(index, bytes)) return null
             decoded = index
@@ -300,7 +302,7 @@ private class FfampVideoSource(file: File, maxSide: Int, maxPixels: Int) : Video
     override fun frameExact(timeUs: Long): VideoFrame? {
         exactFrames[timeUs]?.let { return it }
         val data = ByteArray(frames.bytes)
-        return if (frames.read(frames.indexAt((timeUs - 1).coerceAtLeast(0) / 1_000_000.0), data)) VideoFrame(frames.width, frames.height, data).also { exactFrames[timeUs] = it } else null
+        return if (frames.read(frames.indexAt((timeUs - 1).coerceAtLeast(0) / 1_000_000.0 + shift), data)) VideoFrame(frames.width, frames.height, data).also { exactFrames[timeUs] = it } else null
     }
 
     override fun close() {
@@ -437,7 +439,7 @@ object FfampEngine : MediaEngine {
             progress(it.toFloat().coerceIn(0f, 1f))
             alive()
         }
-        told(problem, { ExportError(txt(R.string.compress_failed, problem.orEmpty())) }, alive)
+        told(problem, { ExportError(txt(R.string.library_text_value, problem.orEmpty().ifBlank { "ffamp" })) }, alive)
     }
 
     override fun extractAudio(input: File, job: AudioJob, durationUs: Long, out: File, progress: (Float) -> Unit, alive: () -> Boolean) {

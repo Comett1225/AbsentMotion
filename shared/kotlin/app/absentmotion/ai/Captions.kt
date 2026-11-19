@@ -45,7 +45,7 @@ import kotlin.coroutines.coroutineContext
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-data class Word(val text: String, val startMs: Int, val endMs: Int)
+data class Word(val text: String, val startMs: Int, val endMs: Int, val glued: Boolean = false)
 
 data class Chunk(val text: String, val startMs: Int, val endMs: Int)
 
@@ -68,7 +68,8 @@ fun chunkWords(words: List<Word>, maxWords: Int): List<Chunk> {
     fun flush() {
         if (current.isEmpty()) return
         val start = current.first().startMs
-        chunks += Chunk(current.joinToString(" ") { it.text }, start, min(current.last().endMs, start + MAX_CAPTION_MS))
+        val text = current.zipWithNext().joinToString("", current.first().text) { (_, b) -> (if (b.glued) "" else " ") + b.text }
+        chunks += Chunk(text, start, min(current.last().endMs, start + MAX_CAPTION_MS))
         current = mutableListOf()
     }
     for (word in words) {
@@ -155,7 +156,7 @@ internal suspend fun recogniseCaptions(
             val pcm = withContext(Dispatchers.IO) { speechPcm(mix, from, keepTo) { step(0.15f * it, R.string.ai_reading_audio) } }
             words += Whisper.transcribe(CaptionModel.file(context, style.highPrecision), pcm, style.english) { step(0.15f + 0.85f * it / 100f, R.string.ai_recognising_speech) }
                 .filter { it.startMs + from >= keepFrom && (it.startMs + from < keepTo || k == windows.lastIndex) }
-                .map { Word(it.text, min(it.startMs + from, endMs - 1), min(it.endMs + from, endMs)) }
+                .map { it.copy(startMs = min(it.startMs + from, endMs - 1), endMs = min(it.endMs + from, endMs)) }
         }
     } finally {
         (mix as? Closeable)?.close()
@@ -236,7 +237,56 @@ internal suspend fun speechChunks(mix: AudioMix, startMs: Int, endMs: Int, progr
     if (held > 0) sink(chunk, held)
 }
 
-internal data class RawWord(val text: String, val t0: Int, val t1: Int, val dtw: Int)
+internal data class RawWord(val text: String, val t0: Int, val t1: Int, val dtw: Int, val glued: Boolean = false)
+
+private val spacelessScripts = setOf(
+    Character.UnicodeScript.HAN, Character.UnicodeScript.HIRAGANA, Character.UnicodeScript.KATAKANA, Character.UnicodeScript.THAI,
+    Character.UnicodeScript.LAO, Character.UnicodeScript.KHMER, Character.UnicodeScript.MYANMAR,
+)
+
+private fun spaceless(char: Char) = Character.UnicodeScript.of(char.code) in spacelessScripts
+
+private const val SPACELESS_PIECE = 4
+
+private fun pieces(text: String, breaker: java.text.BreakIterator): List<String> {
+    breaker.setText(text)
+    val out = ArrayList<String>()
+    var start = breaker.first()
+    var end = breaker.next()
+    while (end != java.text.BreakIterator.DONE) {
+        out += text.substring(start, end)
+        start = end
+        end = breaker.next()
+    }
+    return out
+}
+
+internal fun splitSpaceless(raw: List<RawWord>): List<RawWord> = raw.flatMap { word ->
+    val text = word.text
+    if (text.none(::spaceless)) return@flatMap listOf(word)
+    val parts = ArrayList<String>()
+    val spaced = HashSet<Int>()
+    var gap = false
+    for (piece in pieces(text, java.text.BreakIterator.getWordInstance())) when {
+        piece.isBlank() -> gap = parts.isNotEmpty()
+        piece.none { it.isLetterOrDigit() } && parts.isNotEmpty() && !gap -> parts[parts.lastIndex] += piece
+        else -> {
+            if (gap) spaced += parts.size
+            gap = false
+            val letters = pieces(piece, java.text.BreakIterator.getCharacterInstance())
+            if (letters.size <= SPACELESS_PIECE || piece.none(::spaceless)) parts += piece
+            else letters.chunked(SPACELESS_PIECE).mapTo(parts) { it.joinToString("") }
+        }
+    }
+    if (parts.size < 2) return@flatMap listOf(word)
+    val total = parts.sumOf { it.length }.toLong()
+    var before = 0L
+    parts.mapIndexed { i, part ->
+        val t0 = word.t0 + ((word.t1 - word.t0) * before / total).toInt()
+        before += part.length
+        RawWord(part, t0, word.t0 + ((word.t1 - word.t0) * before / total).toInt(), if (i == 0) word.dtw else -1, i > 0 && i !in spaced)
+    }
+}
 
 internal data class SpeechEdges(val onsets: List<Int>, val offsets: List<Int>)
 
@@ -290,7 +340,7 @@ internal fun alignWords(raw: List<RawWord>, edges: SpeechEdges): List<Word> {
             next != null -> next
             else -> start + maxOf(LAST_WORD_MS, raw[i].t1 - raw[i].t0)
         }
-        Word(raw[i].text, start, maxOf(end, start + 1))
+        Word(raw[i].text, start, maxOf(end, start + 1), raw[i].glued)
     }
 }
 
@@ -320,7 +370,7 @@ internal object Whisper {
                 val word = parts.getOrNull(3)?.trim().orEmpty()
                 if (word.isEmpty()) null else RawWord(word, parts[0].toInt(), parts[1].toInt(), parts[2].toLongOrNull()?.toInt() ?: -1)
             }.toList()
-            alignWords(raw, speechEdges(pcm, SPEECH_RATE))
+            alignWords(splitSpaceless(raw), speechEdges(pcm, SPEECH_RATE))
         } finally {
             nativeClose(handle)
         }
@@ -399,7 +449,7 @@ internal object CaptionModel {
         val intact = hex(digest.digest()) == sha256
         if (!intact) part.delete()
         check(intact) { AppText.get(wrong) }
-        check(part.renameTo(target)) { AppText.get(R.string.ai_cannot_save_model) }
+        check(runCatching { java.nio.file.Files.move(part.toPath(), target.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING) }.isSuccess) { AppText.get(R.string.ai_cannot_save_model) }
     }
 
     internal fun sha256(input: InputStream): String {

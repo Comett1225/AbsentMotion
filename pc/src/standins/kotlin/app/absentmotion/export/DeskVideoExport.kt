@@ -197,6 +197,10 @@ internal suspend fun <T> beating(progress: (Float) -> Unit, at: Float, everyMs: 
     try { work() } finally { beat.cancel() }
 }
 
+internal fun ensureRoomFor(temp: File) {
+    if (freeSpace() < temp.length() + MinFreeBytes) throw StorageFullException()
+}
+
 internal fun exportTemp(ext: String): File =
     File(android.content.Desk.context.cacheDir, "export").also { it.mkdirs() }.resolve("${System.nanoTime()}.$ext")
 
@@ -287,7 +291,7 @@ internal suspend fun exportVideo(
                                     else -> throw ExportError(txt(R.string.export_error_draw_frame, k.toString()))
                                 }
                                 progress((k + 1f) / frames * 0.98f)
-                                if (k % 30 == 0) ensureStorage()
+                                if (k % 30 == 0) ensureRoomFor(result)
                                 pauseMs().takeIf { it > 0 }?.let { delay(it) }
                             }
                             buffer()?.let { pixels ->

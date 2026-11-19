@@ -20,7 +20,7 @@ On a computer, Settings is a window with its pages listed on the left. There the
 
 ## Editor
 
-- **Theme.** **Light** (the default: a dark editor and a warm light home screen), **Dark** (dark everywhere, Home included), **Daylight** (light everywhere) or **Custom**. The first start shows **Select your theme**, and so does the first start after updating to 5.1 if you never picked a theme. **Import theme file...** loads a theme from a small file (see below).
+- **Theme.** **System default** (the default on a new install: Light or Dark, following the dark mode of your phone or computer), **Light** (a dark editor and a warm light home screen), **Dark** (dark everywhere, Home included), **Daylight** (light everywhere) or **Custom**. The first start shows **Select your theme**, and so does the first start after updating to 5.1 if you never picked a theme. **Import theme file...** loads a theme from a small file (see below). Under it, **Theme color** sets the accent color of buttons, switches and other highlights: **Default** (the theme's own color), **Blue**, **Green**, **Purple**, **Pink** or **Custom...**, which opens a color picker. **App font** sets the font of the app's menus and labels, not the text in your projects: **Default** or one of the fonts that come with the app or that you imported.
 - **New Layer Length.** How long new layers last: 1 to 10, 15, 20, 25, 30, 45 or 60 seconds. The default is 2.
 - **Vibration.** Small vibrations on the timeline for snaps, long presses and reordering. On by default.
 - **Transition button in preview.** Off by default. The round button that adds a transition normally sits at the bottom right of the timeline area. Turn this on to have it at the bottom left of the preview instead. See [Transitions and animations](@animations).
@@ -36,7 +36,7 @@ A theme file is a small text file in JSON format of up to 64 KB with an optional
 {"name": "Mint", "Accent": "#5BD6A4", "HomeAccent": "#1B7A4A"}
 ```
 
-The color names are the editor and home screen colors: TopBar, PreviewBg, TimelineBg, Panel, PanelInset, Button, Field, FieldHi, Chosen, Well, Deepest, Line, MenuLine, KeyDigit, KeySymbol, Scrim, PressEditor, OnDark, OnDarkDim, Caption, Faint, Inactive, OnScrim, Accent, AccentLit, AccentGlow, AccentDeep, OnAccent, Cool, CoolDeep, Gold, Warning, Bookmark, LayerBar, LayerBarStripe, TextBar, TextBarStripe, AudioBar, AudioWave, OnBar, OnAudioBar, HomeBg, Card, SheetBg, Navy, HomeAccent, OnNavy, OnNavyAccent, NavyHi, NavyLine, HomeInk, HomeMid, HomeDim, HomeFaint, HomeLine, HomePanel, HomeDrawer, SwitchOff, Thumb, MenuScrim and PressHome. One custom theme is kept at a time; importing a new file replaces it and applies it at once.
+The color names are the editor and home screen colors: TopBar, PreviewBg, TimelineBg, Panel, PanelInset, Button, Field, FieldHi, Chosen, Well, Deepest, Line, MenuLine, KeyDigit, KeySymbol, Scrim, PressEditor, OnDark, OnDarkDim, Caption, Faint, Inactive, OnScrim, Accent, AccentLit, AccentGlow, AccentDeep, OnAccent, Cool, CoolDeep, Gold, Favorite, Warning, Bookmark, LayerBar, LayerBarStripe, TextBar, TextBarStripe, AudioBar, AudioWave, OnBar, OnAudioBar, HomeBg, Card, SheetBg, Navy, HomeAccent, OnNavy, OnNavyAccent, NavyHi, NavyLine, HomeInk, HomeMid, HomeDim, HomeFaint, HomeLine, HomePanel, HomeDrawer, SwitchOff, Thumb, MenuScrim and PressHome. One custom theme is kept at a time; importing a new file replaces it and applies it at once.
 
 ## Playback and preview
 
@@ -64,7 +64,7 @@ The color names are the editor and home screen colors: TopBar, PreviewBg, Timeli
 
 ## Language
 
-The **Language** row shows the current language and opens the list of the 25 languages: English, Indonesian, Hindi, Portuguese (Brazil), Spanish (Latin America), Spanish (Spain), Filipino, Vietnamese, Thai, Malay, Arabic, Persian, Urdu, Turkish, Russian, Bengali, Japanese, Korean, Chinese (Traditional), Chinese (Simplified), French, German, Italian, Polish and Ukrainian. Picking one applies it at once.
+The **Language** row shows the current language and opens the list of the 25 languages: English, Indonesian, Hindi, Portuguese (Brazil), Spanish (Latin America), Spanish (Spain), Filipino, Vietnamese, Thai, Malay, Arabic, Persian, Urdu, Turkish, Russian, Bengali, Japanese, Korean, Chinese (Traditional), Chinese (Simplified), French, German, Italian, Polish and Ukrainian. Picking one applies it at once. On Windows, Mac and Linux the new language is used after you restart the app.
 
 ## About, Help and other rows
 

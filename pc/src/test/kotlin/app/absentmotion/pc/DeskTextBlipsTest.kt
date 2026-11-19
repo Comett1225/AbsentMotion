@@ -57,6 +57,14 @@ class DeskTextBlipsTest {
         check(p.waitFor() == 0) { out }
     }
 
+    @Test fun fullWidthStopsPauseWithoutASpace() {
+        val times = NativeEngine.blipTimes("こんにちは。元気ですか！？終", 10f, 1f, 1)
+        assertEquals(11, times.size)
+        assertEquals(1.2f, times[5] - times[4], 1e-3f)
+        assertEquals(1.3f, times[10] - times[9], 1e-3f)
+        assertEquals(0.1f, times[1] - times[0], 1e-3f)
+    }
+
     @Test fun aPickedSoundBecomesTheBlipVoice() {
         val before = TextBlips.dir to TextBlips.context
         TextBlips.dir = File(dir, "cache")

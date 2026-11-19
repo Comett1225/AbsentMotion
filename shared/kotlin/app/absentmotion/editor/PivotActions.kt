@@ -261,12 +261,12 @@ private fun List<Keyframe>.split(t: Float, zeros: FloatArray): List<Keyframe> {
     val a = this[next - 1]
     val b = this[next]
     val u = ((t - a.t) / (b.t - a.t)).toDouble()
+    val left = part(b.e, 0.0, u) ?: return this
+    val right = part(b.e, u, 1.0) ?: return this
     val from = floats(a.v, zeros)
     val to = floats(b.v, zeros)
     val k = ease(b.e, u)
     val value = FloatArray(max(from.size, to.size)) { i -> (from.getOrElse(i) { 0f } + (to.getOrElse(i) { 0f } - from.getOrElse(i) { 0f }) * k).toFloat() }
-    val left = part(b.e, 0.0, u) ?: Easing.parse(b.e)
-    val right = part(b.e, u, 1.0) ?: Easing.parse(b.e)
     return toMutableList().apply {
         set(next, b.copy(e = right.text))
         add(next, Keyframe(t, formatFloats(value), left.text))
@@ -339,6 +339,10 @@ private fun Layer.withPivotKey(x: Float, y: Float): PivotEdit? {
     var j = keys.indexOfFirst { it.t in snap }
     if (j < 0) {
         keys = keys.split(t, zeros)
+        j = keys.indexOfFirst { abs(it.t - t) < 1e-6f }
+    }
+    if (j < 0) {
+        keys = (keys + Keyframe(t, pivot.valueAt(t) ?: formatFloats(zeros))).sortedBy { it.t }
         j = keys.indexOfFirst { abs(it.t - t) < 1e-6f }
     }
     val old = floats(keys[j].v, zeros)

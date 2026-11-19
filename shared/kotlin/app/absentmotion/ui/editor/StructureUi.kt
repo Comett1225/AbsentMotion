@@ -212,7 +212,7 @@ internal suspend fun EditorState.importSvgFile(context: Context, uri: Uri) {
                 if (c.moveToFirst()) c.getString(0) else null
             } ?: uri.lastPathSegment.orEmpty()
             val bytes = context.contentResolver.openInputStream(uri)?.use { it.readAtMost(MaxSvgBytes + 1) } ?: throw java.io.IOException("unreadable")
-            if (bytes.size > MaxSvgBytes) throw java.io.IOException("too large")
+            if (bytes.size > MaxSvgBytes) return@withContext null
             ensureActive()
             importSvg(String(bytes, Charsets.UTF_8), name.substringAfterLast('/').removeSuffix(".svg").removeSuffix(".SVG"), host, start, end)
         }
@@ -224,10 +224,14 @@ internal suspend fun EditorState.importSvgFile(context: Context, uri: Uri) {
         return
     } catch (e: OutOfMemoryError) {
         Log.w("AMSvg", "too large to import $uri", e)
-        say(context.getString(R.string.structure_svg_unreadable))
+        say(context.getString(R.string.crash_reason_memory))
         return
     } finally {
         working.cancel()
+    }
+    if (result == null) {
+        say(context.getString(R.string.structure_svg_too_large))
+        return
     }
     val layer = result.layer
     if (layer == null) {

@@ -46,6 +46,10 @@ import kotlin.math.roundToInt
 import kotlin.math.tan
 import kotlin.math.sin
 import app.absentmotion.model.remapped
+import app.absentmotion.model.effectProperty
+import app.absentmotion.model.effects
+import app.absentmotion.model.finiteFloat
+import app.absentmotion.model.valueAt
 
 object MultiSelect {
     var active by mutableStateOf(false)
@@ -258,22 +262,38 @@ private fun turnOf(rot: Float, tilt: FloatArray) = mul(spin(2, rot.toDouble()), 
 
 private class Pose(val place: Place, val turn: DoubleArray)
 
-private fun lifted(p: Place, q: Pose?): Place {
+internal class ParentPull(private val scale: Int, private val scaleWeight: Float, private val rotate: Int, private val rotateWeight: Float) {
+    private fun pulled(mode: Int, weight: Float, neutral: Float, parent: Float) = when (mode) { 1 -> neutral; 2 -> neutral + (parent - neutral) * weight; else -> parent }
+    fun scale(parent: Float) = pulled(scale, scaleWeight, 1f, parent)
+    fun rotation(parent: Float) = pulled(rotate, rotateWeight, 0f, parent)
+}
+
+internal fun Layer.pull(timeMs: Int, fps: Int): ParentPull? {
+    val helper = effects.firstOrNull { it["id"] == "absent.parenthelper" && it["hidden"] != "true" } ?: return null
+    val t = at(timeMs, fps).t
+    fun value(name: String, fallback: Float) = helper.effectProperty(name)?.valueAt(t)?.finiteFloat() ?: fallback
+    return ParentPull(value("scaleMode", 0f).roundToInt(), value("scaleWeight", 1f), value("rotateMode", 0f).roundToInt(), value("rotateWeight", 1f))
+}
+
+private fun lifted(p: Place, q: Pose?, pull: ParentPull? = null): Place {
     val o = q?.place ?: return p
     val v = q.turn.on((p.x * o.sx).toDouble(), (p.y * o.sy).toDouble(), p.z.toDouble())
-    return Place((o.x + v[0]).toFloat(), (o.y + v[1]).toFloat(), p.px, p.py, p.sx * o.sx, p.sy * o.sy, p.rot + o.rot, (o.z + v[2]).toFloat())
+    return Place((o.x + v[0]).toFloat(), (o.y + v[1]).toFloat(), p.px, p.py, p.sx * (pull?.scale(o.sx) ?: o.sx), p.sy * (pull?.scale(o.sy) ?: o.sy),
+        p.rot + (pull?.rotation(o.rot) ?: o.rot), (o.z + v[2]).toFloat())
 }
 
-private fun lowered(w: Place, q: Pose?): Place? {
+private fun lowered(w: Place, q: Pose?, pull: ParentPull? = null): Place? {
     val o = q?.place ?: return w
-    if (o.sx == 0f || o.sy == 0f) return null
+    val fx = pull?.scale(o.sx) ?: o.sx
+    val fy = pull?.scale(o.sy) ?: o.sy
+    if (o.sx == 0f || o.sy == 0f || fx == 0f || fy == 0f) return null
     val v = q.turn.inverse().on((w.x - o.x).toDouble(), (w.y - o.y).toDouble(), (w.z - o.z).toDouble())
-    return Place((v[0] / o.sx).toFloat(), (v[1] / o.sy).toFloat(), w.px, w.py, w.sx / o.sx, w.sy / o.sy, w.rot - o.rot, v[2].toFloat())
+    return Place((v[0] / o.sx).toFloat(), (v[1] / o.sy).toFloat(), w.px, w.py, w.sx / fx, w.sy / fy, w.rot - (pull?.rotation(o.rot) ?: o.rot), v[2].toFloat())
 }
 
-private fun compose(p: Place, q: Place?): Place = lifted(p, q?.let { Pose(it, spin(2, it.rot.toDouble())) })
+private fun compose(p: Place, q: Place?, pull: ParentPull? = null): Place = lifted(p, q?.let { Pose(it, spin(2, it.rot.toDouble())) }, pull)
 
-internal fun decompose(w: Place, q: Place): Place? = lowered(w, Pose(q, spin(2, q.rot.toDouble())))
+internal fun decompose(w: Place, q: Place, pull: ParentPull? = null): Place? = lowered(w, Pose(q, spin(2, q.rot.toDouble())), pull)
 
 private fun euler(m: DoubleArray, near: Float): Pair<Float, FloatArray> {
     val locked = abs(m[6]) > 1 - 1e-9
@@ -286,15 +306,20 @@ private fun euler(m: DoubleArray, near: Float): Pair<Float, FloatArray> {
 private fun Scene.parentOf(layer: Layer): Layer? =
     layer.node["parent"]?.toLongOrNull()?.takeIf { it != layer.id }?.let { id -> layers.firstOrNull { it.id == id } }
 
-internal fun Scene.place(layer: Layer, timeMs: Int, depth: Int = 0): Place =
-    compose(ownPlace(layer, timeMs, fps), parentOf(layer)?.takeIf { depth < 16 }?.let { place(it, timeMs, depth + 1) })
+internal fun Scene.place(layer: Layer, timeMs: Int, depth: Int = 0): Place {
+    val parent = parentOf(layer)?.takeIf { depth < 16 } ?: return ownPlace(layer, timeMs, fps)
+    return compose(ownPlace(layer, timeMs, fps), place(parent, timeMs, depth + 1), layer.pull(timeMs, fps))
+}
 
 private fun Scene.pose(layer: Layer, timeMs: Int, depth: Int = 0): Pose {
     val own = ownPlace(layer, timeMs, fps)
     val turn = turnOf(own.rot, layer.at(timeMs, fps).tilt)
     val parent = parentOf(layer)?.takeIf { depth < 16 }?.let { pose(it, timeMs, depth + 1) } ?: return Pose(own, turn)
-    return Pose(lifted(own, parent), mul(parent.turn, turn))
+    val pull = layer.pull(timeMs, fps)
+    return Pose(lifted(own, parent, pull), mul(parent.pulled(pull), turn))
 }
+
+private fun Pose.pulled(pull: ParentPull?) = if (pull == null) turn else mul(spin(2, (pull.rotation(place.rot) - place.rot).toDouble()), turn)
 
 internal fun Scene.chain(layer: Layer?): List<Layer> = generateSequence(layer) { parentOf(it) }.take(17).toList()
 
@@ -391,11 +416,12 @@ internal fun Scene.rebased(layer: Layer, parentId: Long?, atMs: Int = layer.star
     val to = parentId?.let { id -> layers.firstOrNull { it.id == id } }?.let { pose(it, ms) }
     val own = ownPlace(base, ms, fps)
     val tilt = base.at(ms, fps).tilt
-    val world = lowered(lifted(own, from), to) ?: return null
-    val turn = mul((to?.turn ?: SAME).inverse(), from?.turn ?: SAME)
+    val pull = base.pull(ms, fps)
+    val world = lowered(lifted(own, from, pull), to, pull) ?: return null
+    val turn = mul((to?.pulled(pull) ?: SAME).inverse(), from?.pulled(pull) ?: SAME)
     val flat = abs(turn[2]) + abs(turn[5]) + abs(turn[6]) + abs(turn[7]) < 1e-9
     val (rot, tilted) = if (flat) world.rot to tilt else euler(mul(turn, turnOf(own.rot, tilt)), world.rot)
-    val moved = base.converted(own) { p -> lowered(lifted(p, from), to)?.copy(rot = p.rot + rot - own.rot) } ?: return null
+    val moved = base.converted(own) { p -> lowered(lifted(p, from, pull), to, pull)?.copy(rot = p.rot + rot - own.rot) } ?: return null
     val node = if (tilted.contentEquals(tilt)) moved.node else moved.node.shifted("tilt", floatArrayOf(tilted[0] - tilt[0], tilted[1] - tilt[1]))
     return Layer(node.with("parent", parentId?.toString()))
 }
@@ -403,7 +429,8 @@ internal fun Scene.rebased(layer: Layer, parentId: Long?, atMs: Int = layer.star
 internal fun Scene.flattened(layer: Layer): Layer? {
     val old = parentOf(layer)
     val outer = chain(old)
-    val moved = Layer(layer.node).rebaked(outer.any { it.moves() }, outer.flatMap { it.keyframeTimes() }, fps) { own, ms -> compose(own, old?.let { place(it, ms) }) } ?: return null
+    val base = Layer(layer.node)
+    val moved = base.rebaked(outer.any { it.moves() }, outer.flatMap { it.keyframeTimes() }, fps) { own, ms -> compose(own, old?.let { place(it, ms) }, base.pull(ms, fps)) } ?: return null
     return moved.copy(node = moved.node.with("parent", null))
 }
 

@@ -15,10 +15,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 
-suspend fun EditorState.keepCopy(context: Context, media: MediaDeclaration): MediaDeclaration = keepCopy(context, settings, store, projectId, media, scene)
+suspend fun EditorState.keepCopy(context: Context, media: MediaDeclaration, always: Boolean = false): MediaDeclaration =
+    keepCopy(context, settings, store, projectId, media, scene, always)
 
-suspend fun keepCopy(context: Context, settings: AppSettings, store: ProjectStore, projectId: String, media: MediaDeclaration, scene: Scene?): MediaDeclaration {
-    if (!settings.keepMediaCopies) return media
+suspend fun keepCopy(context: Context, settings: AppSettings, store: ProjectStore, projectId: String, media: MediaDeclaration, scene: Scene?, always: Boolean = false): MediaDeclaration {
+    if (!always && !settings.keepMediaCopies) return media
     val name = media.title.ifEmpty { context.getString(R.string.edit_keep_this_file) }
     if (media.size > BIG_FILE && !store.inMediaFolder(media.uri)) Toast.makeText(context, context.getString(R.string.edit_keep_copying, name), Toast.LENGTH_SHORT).show()
     val keeper = MediaKeeper(store, { uri -> context.contentResolver.openInputStream(Uri.parse(uri)) })
@@ -27,13 +28,17 @@ suspend fun keepCopy(context: Context, settings: AppSettings, store: ProjectStor
     } catch (e: CancellationException) {
         throw e
     } catch (e: MediaKeeper.NoSpace) {
-        Toast.makeText(context, context.getString(R.string.edit_keep_no_space, name), Toast.LENGTH_LONG).show()
-        media
+        Toast.makeText(context, context.getString(if (always) R.string.edit_keep_not_added else R.string.edit_keep_no_space, name), Toast.LENGTH_LONG).show()
+        media.alsoKeepingAccess(context)
     } catch (e: Exception) {
         Log.w("AMStore", "cannot keep a copy of ${media.uri}", e)
-        Toast.makeText(context, context.getString(R.string.edit_keep_failed, name), Toast.LENGTH_LONG).show()
-        media
+        Toast.makeText(context, context.getString(if (always) R.string.edit_keep_not_added else R.string.edit_keep_failed, name), Toast.LENGTH_LONG).show()
+        media.alsoKeepingAccess(context)
     }
+}
+
+private fun MediaDeclaration.alsoKeepingAccess(context: Context): MediaDeclaration = also {
+    runCatching { context.contentResolver.takePersistableUriPermission(Uri.parse(uri), android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION) }
 }
 
 private const val BIG_FILE = 32L shl 20

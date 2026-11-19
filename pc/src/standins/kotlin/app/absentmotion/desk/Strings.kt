@@ -11,6 +11,11 @@ object Strings {
     private val strings = HashMap<String, String>()
     private val plurals = HashMap<String, Map<String, String>>()
     private var language = "en"
+    var loaded: app.absentmotion.i18n.AppLanguage = app.absentmotion.i18n.AppLanguage.English
+        private set
+    var locale: Locale = Locale.getDefault()
+        private set
+    val rtl: Boolean get() = language in setOf("ar", "fa", "ur")
 
     fun resDir(): File = System.getProperty("am.res")?.let(::File)
         ?: System.getProperty("am.assets")?.let { File(it).parentFile.resolve("res") }
@@ -18,9 +23,9 @@ object Strings {
 
     init {
         load(resDir().resolve("values/strings.xml"))
-        val tag = runCatching { android.content.SharedPreferences.named("language").getString("tag", null) }.getOrNull()
-            ?: java.util.Locale.getDefault().toLanguageTag()
-        folderFor(tag)?.let { load(resDir().resolve("$it/strings.xml")) }
+        val chosen = runCatching { android.content.SharedPreferences.named("language").getString("tag", null) }.getOrNull()
+        folderFor(chosen ?: Locale.getDefault().toLanguageTag())?.let { load(resDir().resolve("$it/strings.xml")) }
+        if (chosen != null) locale = Locale.forLanguageTag(chosen)
         val reveal = DeskOs.revealLabel
         listOf("export_share", "export_share_video", "export_share_gif", "export_share_sequence", "export_share_image", "export_share_xml", "compress_share").forEach { strings[it] = reveal }
     }
@@ -30,7 +35,7 @@ object Strings {
         val code = if (match.language == "id") "in" else match.language
         if (code == "en") return null
         return listOfNotNull(match.region?.let { "values-$code-r$it" }, "values-$code").firstOrNull { resDir().resolve("$it/strings.xml").isFile }
-            ?.also { language = code }
+            ?.also { language = code; loaded = match }
     }
 
     internal fun pluralCategory(language: String, count: Int): String {

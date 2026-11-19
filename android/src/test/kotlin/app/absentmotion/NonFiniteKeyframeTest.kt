@@ -24,6 +24,14 @@ class NonFiniteKeyframeTest {
         for (t in listOf(-1f, 0f, 0.5f, 1f, 2f)) assertTrue(node.valueAt(t) in setOf("1", "5"))
     }
 
+    @Test fun keyedSwitchesFlipHalfwayLikeTheEngine() {
+        val node = XmlNode("property", mapOf("type" to "bool"), listOf(
+            XmlNode("kf", linkedMapOf("t" to "0", "v" to "true")),
+            XmlNode("kf", linkedMapOf("t" to "1", "v" to "false")),
+        ))
+        assertEquals(listOf("true", "true", "false", "false"), listOf(0f, 0.4f, 0.6f, 1f).map { node.valueAt(it) })
+    }
+
     @Test fun aSpeedMapWithNonFiniteKeysOrValuesStillGivesFiniteTimes() {
         val map = XmlNode("speedMap", linkedMapOf("value" to "NaN"), listOf(
             XmlNode("kf", mapOf("t" to "0", "v" to "1")),

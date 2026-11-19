@@ -77,3 +77,15 @@ Select another layer and tap **Presets** in the tool grid. The **Try a Preset** 
 A preset replaces the border, shadow, blend mode and opacity, animated transform, effects, text style (text to text), volume and audio effects (sound to sound) and speed (clip to clip). It does not change the fill color, the shape, the content or the timing.
 
 There are no built-in presets: only the ones you save. They are listed on the home screen under **Templates**, **My Presets**, where you can rename and delete them.
+
+### Presets on My Presets
+
+Each card on **My Presets** shows the preset put on a placeholder, so you can see how it looks on something. A text preset shows its own text and a shape preset its own shape. A picture or video preset shows one of the app's sample pictures instead of your own media, picked at random once for each preset so the cards look different. If the preset has its own placeholder (you picked one when you shared it, or it came from the Community), the card shows that.
+
+### Share a preset to the Community
+
+In a preset's menu on **My Presets**, choose **Share to Community** (on a computer, the menu or a right-click on the card). It opens the same page as a Community bundle: **Title** (the preset's name), **Description**, up to 8 **Tags**, **Created by**, the two tick boxes and **Save in**.
+
+- **Placeholder** chooses what others see the preset on, with a live preview: **Random picture** (one of the app's sample pictures; **Shuffle** picks another) or **Choose picture or video…** (your own). A text or shape preset starts on **Its own text** or **Its own shape**.
+- The file is a normal `.absproj` package marked as a preset, at most 20 MB. It holds the preset and its placeholder, and fonts of a text preset. The photos and videos the preset was made on are never added.
+- Opening such a file on a phone, or dropping it on the computer app or choosing it with **Import**, adds it to **My Presets** with its placeholder and says "Added to My Presets"; it does not make a project. **Add to My Presets** in the **Community** tab does the same.

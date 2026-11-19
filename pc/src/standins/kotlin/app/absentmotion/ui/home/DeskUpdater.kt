@@ -133,6 +133,7 @@ internal object Updater {
     }
 
     fun notNow() {
+        if (quitting?.isActive == true) return
         UpdateInstall.cancel()
         pendingFile?.delete()
         pendingFile = null
@@ -161,7 +162,7 @@ internal object Updater {
                     }.getOrNull()
             }
             when {
-                pending == null -> { preparing = false; blocked?.let { report = it } ?: failed() }
+                pending == null -> { preparing = false; blocked?.let { step = DeskStep.Idle; report = it } ?: failed() }
                 step != ready -> { preparing = false; pending.discard() }
                 else -> {
                     val marker = File(context.filesDir, PENDING_FILE)
@@ -170,18 +171,33 @@ internal object Updater {
                         UpdateInstall.arm(pending)
                     }
                     preparing = false
-                    if (failure != null) {
-                        UpdateInstall.cancel()
-                        marker.delete()
-                        step = DeskStep.Idle
-                        report = failure
-                    } else {
-                        pendingFile = marker
-                        step = DeskStep.Opened(ready.release, ready.file)
-                        quit()
+                    when {
+                        failure != null -> {
+                            UpdateInstall.cancel()
+                            marker.delete()
+                            step = DeskStep.Idle
+                            report = failure
+                        }
+                        step != ready -> { UpdateInstall.cancel(); marker.delete() }
+                        else -> {
+                            pendingFile = marker
+                            step = DeskStep.Opened(ready.release, ready.file)
+                            quit()
+                        }
                     }
                 }
             }
+        }
+    }
+
+    private var quitting: Job? = null
+
+    fun quit(onQuit: () -> Unit) {
+        if (quitting?.isActive == true) return
+        quitting = scope.launch {
+            withContext(Dispatchers.IO) { UpdateInstall.rearm() }
+            later()
+            onQuit()
         }
     }
 
@@ -309,7 +325,7 @@ private fun UpdateFlow(step: DeskStep, onQuit: () -> Unit) {
     val toast = { app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.desk_update_prepare_failed), app.absentmotion.platform.Toast.LENGTH_LONG).show() }
     val install = { ready: DeskStep.Ready -> Updater.install(context, ready, onQuit, toast) }
     val open = { ready: DeskStep.Ready -> if (!Updater.open(ready)) app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.desk_update_open_failed, ready.file.path), app.absentmotion.platform.Toast.LENGTH_LONG).show() }
-    val quit = { UpdateInstall.rearm(); Updater.later(); onQuit() }
+    val quit = { Updater.quit(onQuit) }
     LaunchedEffect(step) {
         if (step is DeskStep.Ready && Updater.installs(step) && !Updater.preparing && !app.absentmotion.export.ExportRun.running) install(step)
     }

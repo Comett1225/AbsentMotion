@@ -64,21 +64,23 @@ internal object TextBlips {
         val seed = value("seed", 1f).roundToInt()
         val key = "$voice|$volume|$pitch|$variation|$seed|${times.joinToString(",")}" + (custom?.let { "|$it" } ?: "")
         val file = File(folder, "blips-${Integer.toHexString(key.hashCode())}-${key.length}.wav")
-        fun build() = synchronized(lock) {
-            if (file.isFile) file.setLastModified(System.currentTimeMillis())
-            else runCatching {
-                val sound = custom?.let { uri -> context?.let { soundOf(it, uri) } ?: return@runCatching }
-                folder.mkdirs()
-                sweep(folder)
-                val temp = File.createTempFile("blips", ".part", folder)
-                try {
-                    temp.outputStream().buffered().use { write(it, times, voice, volume, pitch, variation, seed, sound) }
-                    temp.renameTo(file)
-                } finally {
-                    temp.delete()
+        fun build(): Boolean {
+            if (file.isFile) { file.setLastModified(System.currentTimeMillis()); return true }
+            return synchronized(lock) {
+                if (!file.isFile) runCatching {
+                    val sound = custom?.let { uri -> context?.let { soundOf(it, uri) } ?: return@runCatching }
+                    folder.mkdirs()
+                    sweep(folder)
+                    val temp = File.createTempFile("blips", ".part", folder)
+                    try {
+                        temp.outputStream().buffered().use { write(it, times, voice, volume, pitch, variation, seed, sound) }
+                        temp.renameTo(file)
+                    } finally {
+                        temp.delete()
+                    }
                 }
+                file.isFile
             }
-            file.isFile
         }
         if (!file.isFile && !wait) {
             synchronized(pending) { pending[layer.id] = { build() } }

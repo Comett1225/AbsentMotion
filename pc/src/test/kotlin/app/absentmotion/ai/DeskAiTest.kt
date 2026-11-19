@@ -7,6 +7,7 @@ import app.absentmotion.desk.DeskProbe
 import app.absentmotion.model.Layer
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.XmlNode
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -19,6 +20,57 @@ import kotlin.math.abs
 class DeskAiTest {
     private val context = Context()
     private val media = File("../testdata/media").absoluteFile
+
+    @Test fun enhancedPicturesKeepSmoothEdgesWithoutDarkFringes() {
+        val clear = 0x00000000
+        val red = 0xFFFF0000.toInt()
+        val input = intArrayOf(red, clear, red, red)
+        bleedUnderClear(input, 2, 2)
+        assertEquals(0x00FF0000, input[1])
+        val output = IntArray(16) { 0xFF123456.toInt() }
+        scaledAlpha(intArrayOf(0xFF000000.toInt(), clear, 0xFF000000.toInt(), clear), 2, 2, 2, output)
+        assertEquals(listOf(255, 191, 64, 0), (0 until 4).map { output[it] ushr 24 })
+        assertEquals(0x123456, output[1] and 0xFFFFFF)
+    }
+
+    @Test fun cancellingAModelDownloadIsACancelNotAFailure() = runBlocking {
+        val closed = java.util.concurrent.CountDownLatch(1)
+        val open = modelConnection
+        modelConnection = { url ->
+            object : java.net.HttpURLConnection(java.net.URL(url)) {
+                override fun connect() {}
+                override fun usingProxy() = false
+                override fun disconnect() = closed.countDown()
+                override fun getResponseCode() = HTTP_OK
+                override fun getInputStream() = object : java.io.InputStream() {
+                    private var sent = false
+                    override fun read() = throw java.io.IOException()
+                    override fun read(b: ByteArray, off: Int, len: Int): Int {
+                        if (!sent) { sent = true; return 1_000 }
+                        closed.await(60, java.util.concurrent.TimeUnit.SECONDS)
+                        throw java.io.IOException("closed")
+                    }
+                }
+            }
+        }
+        val dir = java.nio.file.Files.createTempDirectory("ai-cancel").toFile()
+        try {
+            val receiving = kotlinx.coroutines.CompletableDeferred<Unit>()
+            var thrown: Throwable? = null
+            val file = ModelFile("model.bin", "https://example.invalid/model.bin", 200_000, "0".repeat(64))
+            val job = launch(kotlinx.coroutines.Dispatchers.IO) {
+                try { fetch(file, File(dir, "model.bin"), {}) { receiving.complete(Unit) } } catch (t: Throwable) { thrown = t }
+            }
+            kotlinx.coroutines.withTimeout(10_000) { receiving.await() }
+            job.cancel()
+            job.join()
+            assertTrue("$thrown", thrown is kotlinx.coroutines.CancellationException)
+        } finally {
+            closed.countDown()
+            modelConnection = open
+            dir.deleteRecursively()
+        }
+    }
 
     @Test fun captionsRunModel() = runBlocking {
         val model = File("../build/ai-test/ggml-base-q5_1.bin")

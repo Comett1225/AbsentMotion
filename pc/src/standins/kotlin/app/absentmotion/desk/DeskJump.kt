@@ -18,11 +18,14 @@ object DeskJump {
     fun next(state: EditorState) {
         state.playing = false
         val last = state.scene.lastFrame
-        state.frame = nextFrame(frames(state), state.frame, last).coerceIn(0, last)
+        val target = nextFrame(frames(state), state.frame, last)
+        if (target >= last) state.parkAtEnd() else state.frame = target.coerceAtLeast(0)
     }
 
     private fun keyFrames(state: EditorState): List<Int> =
-        (state.chosenLayers.ifEmpty { state.scene.layers }).flatMap { layer -> layer.keyframeTimes(if (layer.id == state.selectedId) state.keyScope else null) }.map(state.scene::frameAt)
+        (state.chosenLayers.ifEmpty { state.scene.layers }).flatMap { layer ->
+            layer.keyframeTimes(if (layer.id == state.selectedId) state.keyScope else null).filter { it in layer.startTime..layer.endTime }
+        }.map { state.scene.frameAt(it).coerceIn(0, maxOf(state.scene.lastFrame, 0)) }
 
     fun previousKey(state: EditorState) {
         state.playing = false
@@ -31,6 +34,6 @@ object DeskJump {
 
     fun nextKey(state: EditorState) {
         state.playing = false
-        keyFrames(state).filter { it > state.frame }.minOrNull()?.let { state.frame = it.coerceAtMost(state.scene.lastFrame) }
+        keyFrames(state).filter { it > state.frame }.minOrNull()?.let { state.frame = it }
     }
 }

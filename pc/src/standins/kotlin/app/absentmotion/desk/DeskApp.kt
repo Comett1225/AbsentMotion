@@ -41,11 +41,13 @@ import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.R
@@ -87,6 +89,8 @@ import app.absentmotion.ui.editor.LocalWide
 import app.absentmotion.ui.editor.MediaPicks
 import app.absentmotion.ui.editor.wideEditor
 import app.absentmotion.ui.export.ExportScreen
+import app.absentmotion.ui.export.PresetShareScreen
+import app.absentmotion.ui.export.PresetSharing
 import app.absentmotion.ui.home.DeskButton
 import app.absentmotion.ui.onboarding.DeskOnboarding
 import app.absentmotion.ui.onboarding.FirstRun
@@ -143,6 +147,7 @@ class DeskAppState {
     var settingsOpen by mutableStateOf(false)
     var settingsPage by mutableStateOf(SettingsPage.Editor)
     var newProjectTick by mutableIntStateOf(0)
+    val canStartProject: Boolean get() = editor == null && editingTemplate == null && exportingFromList == null && DeskModals.open == 0
     var saveFailed by mutableStateOf(false)
     var fontOffer by mutableStateOf<Pair<EditorState, List<String>>?>(null)
     var afterClose: (() -> Unit)? = null
@@ -163,7 +168,7 @@ class DeskAppState {
         RecoveryHandler.install(recovery) { editor?.let { it.projectId to it.project.toXml() } }
         runCatching { CrashLogs.install(context) }
         ElementNav.open = { id ->
-            editor?.let { it.playing = false; it.endGesture(); it.saver.snapshot(it.project.toXml()) }
+            editor?.let { it.playing = false; it.commitTyping(); it.endGesture(); it.saver.snapshot(it.project.toXml()) }
             MultiSelect.clear()
             background.launch { openNow(id) }
         }
@@ -294,6 +299,7 @@ class DeskAppState {
         val state = editor ?: return true
         state.playing = false
         PreviewCache.remove()
+        state.commitTyping()
         state.endGesture()
         state.leaveGroups()
         val scene = state.scene
@@ -371,11 +377,14 @@ class DeskAppState {
         if (projects.isNotEmpty()) {
             val reports = importFiles(projects.map(Uri::fromFile))
             val single = reports.singleOrNull()?.takeIf { !it.template }
-            if (single != null && editor == null) { imported = emptyList(); openNow(single.id) }
+            if (single != null && editor == null && single.sections.isEmpty() && single.community == null) { imported = emptyList(); openNow(single.id) }
         }
         if (media.isEmpty()) return
         val uris = media.map(Uri::fromFile)
         if (editor != null) return queueMedia(uris)
+        if (media.none { it.extension.lowercase() in DeskFiles.mediaExtensions || context.contentResolver.getType(Uri.fromFile(it))?.substringBefore('/') in setOf("image", "video", "audio") }) {
+            return toast(R.string.library_err_unsupported_type)
+        }
         val title = media.first().nameWithoutExtension.ifBlank { context.getString(R.string.home_new_project) }
         val id = try { withContext(Dispatchers.IO) { store.create(Scene.create(title, 1920, 1080, 30, 0xFF000000.toInt())) } }
         catch (e: java.io.IOException) { toast(R.string.home_create_project_failed); return }
@@ -386,15 +395,18 @@ class DeskAppState {
 
     suspend fun importFiles(uris: List<Uri>): List<ImportReport> {
         val reports = ArrayList<ImportReport>()
+        var presetsAdded = 0
         opening = true
         try {
             withContext(Dispatchers.IO) {
                 val importer = Importer.forApp(context, store)
+                val presets = app.absentmotion.library.PresetStore(context)
                 for (uri in uris) try {
                     val xfl = DeskOpen.xflZip(uri)
                     try {
-                        reports += importer.import { xfl?.inputStream() ?: context.contentResolver.openInputStream(uri) }.map {
-                            if (!it.template) it else templates.adopt(store, it.id, engine)?.let { id -> it.copy(id = id) } ?: it.copy(template = false)
+                        reports += importer.import { xfl?.inputStream() ?: context.contentResolver.openInputStream(uri) }.mapNotNull {
+                            if (it.community?.preset == true && presets.adopt(store, it.id, templates::localize) != null) null.also { presetsAdded++ }
+                            else if (!it.template) it else templates.adopt(store, it.id, engine)?.let { id -> it.copy(id = id) } ?: it.copy(template = false)
                         }
                     } finally {
                         xfl?.delete()
@@ -403,6 +415,7 @@ class DeskAppState {
                 catch (e: Exception) { importFailed = (e as? app.absentmotion.library.ImportFailed)?.text?.resolve(context) ?: e.message ?: context.getString(R.string.library_err_unsupported_type) }
             }
         } finally { opening = false; projectsChanged++ }
+        if (presetsAdded > 0) Toast.makeText(context, context.getString(R.string.community_added_preset), Toast.LENGTH_SHORT).show()
         if (reports.isNotEmpty()) imported = reports
         for (report in reports) if (!report.template) {
             val scene = withContext(Dispatchers.IO) { store.load(report.id) } ?: continue
@@ -421,7 +434,7 @@ class DeskAppState {
 
     suspend fun restoreVersion(id: String, version: ProjectVersions.Version) {
         val state = editor?.takeIf { it.projectId == id }
-        state?.let { it.playing = false; it.endGesture(); it.historyOpen = false }
+        state?.let { it.playing = false; it.commitTyping(); it.endGesture(); it.historyOpen = false }
         historyFor = null
         val failure = withContext(DiskThread.dispatcher) { runCatching { store.restore(id, version) }.exceptionOrNull() }
         projectsChanged++
@@ -442,7 +455,10 @@ fun DeskApp(app: DeskAppState) {
     LaunchedEffect(focused) { if (!focused) DeskKeys.releaseAll() }
     val clicks = LocalViewConfiguration.current
     val system = remember(clicks) { systemClicks(clicks) }
-    CompositionLocalProvider(LocalDensity provides Density(base.density * scale, base.fontScale), LocalViewConfiguration provides system) { DeskTyping.Track { DeskContent(app, scale) } }
+    CompositionLocalProvider(
+        LocalDensity provides Density(base.density * scale, base.fontScale), LocalViewConfiguration provides system,
+        LocalLayoutDirection provides if (Strings.rtl) LayoutDirection.Rtl else LayoutDirection.Ltr,
+    ) { DeskTyping.Track { DeskContent(app, scale) } }
 }
 
 internal fun systemClicks(base: ViewConfiguration): ViewConfiguration {
@@ -534,6 +550,7 @@ private fun DeskContent(app: DeskAppState, scale: Float) {
                         TemplateEditor(id, app.engine, app.settings, onClose = { app.editingTemplate = null }, onContinue = { scene -> run { app.projectFromTemplate(scene) } })
                     }
                     app.exportingFromList?.let { ExportScreen(it, 0, app.engine, app.settings, fromProjectList = true, null) { app.exportingFromList = null } }
+                    PresetSharing.preset?.let { PresetShareScreen(it, app.engine, app.settings) { PresetSharing.preset = null } }
                 }
             } else {
                 Box(Modifier.fillMaxSize().enterZoom()) {
@@ -552,15 +569,15 @@ private fun DeskContent(app: DeskAppState, scale: Float) {
             }
             if (app.settingsOpen) DeskSettings(app.settings, app.settingsPage, onClose = { app.settingsOpen = false }, onRestored = { app.projectsChanged++ })
             app.recovered?.takeIf { open == null }?.let { offer -> DeskRecovery(offer, { scope.launch { app.answerRecovery(offer, it) } }) { app.recovered = null } }
-            whatsNew?.takeIf { open == null && first == null && !app.opening && app.editingTemplate == null && app.exportingFromList == null && app.recovered == null && !app.settingsOpen }?.let { notes ->
+            whatsNew?.takeIf { open == null && first == null && !app.opening && app.editingTemplate == null && app.exportingFromList == null && PresetSharing.preset == null && app.recovered == null && !app.settingsOpen }?.let { notes ->
                 WhatsNewDialog(notes) { whatsNew = null; WhatsNewNotes.seen(context, app.settings) }
             }
-            if (whatsNew == null && open == null && first == null && !app.opening && app.editingTemplate == null && app.exportingFromList == null && app.recovered == null && !app.settingsOpen && FfampOffer.pending(app.settings)) {
+            if (whatsNew == null && open == null && first == null && !app.opening && app.editingTemplate == null && app.exportingFromList == null && PresetSharing.preset == null && app.recovered == null && !app.settingsOpen && FfampOffer.pending(app.settings)) {
                 FfampOfferDialog(app.settings)
             }
             TutorialHost(
                 open, app.store, app.settings,
-                homeFree = open == null && first == null && !app.opening && app.editingTemplate == null && app.exportingFromList == null && app.recovered == null && app.imported.isEmpty() && !app.settingsOpen && Updates.answer == null && whatsNew == null && !FfampOffer.pending(app.settings),
+                homeFree = open == null && first == null && !app.opening && app.editingTemplate == null && app.exportingFromList == null && PresetSharing.preset == null && app.recovered == null && app.imported.isEmpty() && !app.settingsOpen && Updates.answer == null && whatsNew == null && !FfampOffer.pending(app.settings),
                 onOpen = { id -> run { app.openNow(id) } }, onCloseEditor = { scope.launch { app.closeEditor() } }, onChanged = { app.projectsChanged++ },
             )
             app.fontOffer?.takeIf { it.first === open }?.let { (state, names) -> DeskFontOffer(names, { app.downloadFonts(names) }) { app.declineFonts(state) } }
@@ -568,7 +585,7 @@ private fun DeskContent(app: DeskAppState, scale: Float) {
             if (app.quitAsk) DeskQuitAsk(app)
             UpdateDialog(app::requestQuit)
             ToastHost(Modifier.align(Alignment.BottomCenter))
-            if (open?.exportOpen != true && app.exportingFromList == null) DeskExportPill(Modifier.align(Alignment.BottomEnd).padding(end = 20.dp, bottom = 20.dp))
+            if (open?.exportOpen != true && app.exportingFromList == null && PresetSharing.preset == null) DeskExportPill(Modifier.align(Alignment.BottomEnd).padding(end = 20.dp, bottom = 20.dp))
         }
     }
     }
@@ -625,7 +642,9 @@ private class DeskDrop(private val app: DeskAppState, private val run: (suspend 
         DeskLibrary.remember(files)
         val uris = files.map(Uri::fromFile)
         if (app.editor == null) { run { if (files.all(DeskOpen::isProject)) app.importFiles(uris) else app.openFiles(files) }; return true }
-        app.queueMedia(uris)
+        val (projects, media) = files.partition(DeskOpen::isProject)
+        if (projects.isNotEmpty()) run { app.importFiles(projects.map(Uri::fromFile)) }
+        if (media.isNotEmpty()) app.queueMedia(media.map(Uri::fromFile))
         return true
     }
 }

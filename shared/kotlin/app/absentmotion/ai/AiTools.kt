@@ -50,7 +50,11 @@ enum class AiAction(@StringRes val title: Int) {
     }
 
     fun unavailable(layer: Layer?): UiText? = when (this) {
-        Background -> if (layer?.mediaFill?.video == false) null else txt(R.string.ai_select_image_layer)
+        Background -> when {
+            layer?.mediaFill?.video != false -> txt(R.string.ai_select_image_layer)
+            layer.aiBuried(AiKind.Background) -> txt(R.string.ai_undo_newer_first)
+            else -> null
+        }
         Noise -> if (layer?.kind == "audio") null else txt(R.string.ai_select_audio_layer)
         Enhance -> when {
             layer?.mediaFill == null -> txt(R.string.ai_select_media_layer)

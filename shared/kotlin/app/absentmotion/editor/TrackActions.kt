@@ -24,7 +24,7 @@ val Layer.canTrack: Boolean get() = mediaFill?.video == true
 fun EditorState.startTracking() {
     val layer = selected?.takeIf { it.canTrack } ?: return
     val media = scene.media(layer.mediaFill!!.uri)?.takeIf { it.width > 0 && it.height > 0 } ?: return
-    if (!layer.activeAt(timeMs)) frame = scene.firstShownFrame(layer.startTime)
+    if (sampleMs !in layer.startTime..layer.endTime) frame = scene.firstShownFrame(layer.startTime)
     selectedId = layer.id
     playing = false
     panel = EditorPanel.Tools

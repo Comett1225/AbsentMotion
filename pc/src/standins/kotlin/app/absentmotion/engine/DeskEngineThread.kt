@@ -101,6 +101,7 @@ class EngineThread(private val background: Int, private val context: Context? = 
     private val videos = HashMap<String, AutoCloseable>()
     private val mosh = context?.let { DeskMosh(it) }
     private val trailed = HashSet<Pair<String, Long>>()
+    private var liveFrames: List<Pair<Long, Long?>> = emptyList()
     private val loadedModels = HashMap<String, Pair<String, Int>>()
     private var loadedPictures: Set<String> = emptySet()
     private var view: PreviewView? = null
@@ -266,7 +267,7 @@ class EngineThread(private val background: Int, private val context: Context? = 
         if (closed) return@withContext false
         val native = engine()
         textures.forEachIndexed { index, bitmap -> native.setPicture("$uri#$index", bitmap) }
-        native.setModel(uri, mesh).also { if (mesh != null) pictureRevision.update { it + 1 }; requestRender() }
+        native.setModel(uri, mesh).also { if (mesh != null) { native.forgetHeld(); pictureRevision.update { it + 1 } }; requestRender() }
     }
 
     suspend fun setPicture(uri: String, buffer: HardwareBuffer, layerId: Long = 0, opaque: Boolean = true): Boolean = false
@@ -297,7 +298,7 @@ class EngineThread(private val background: Int, private val context: Context? = 
         val next = xml?.value ?: shownXml.takeIf { again || timedText && preparedAt != timeMs } ?: return
         val scene = if (xml != null) parsed else shownScene
         try {
-            engine().setScene(fonts?.prepareText(next, timeMs, scene) ?: next)
+            engine().setScene(fonts?.prepareText(next, timeMs, scene) ?: next, keepHeld = xml == null && !again)
             if (next !== shownXml) timedText = animatesTextSpacing(next)
             preparedAt = timeMs
             shownXml = next
@@ -341,6 +342,11 @@ class EngineThread(private val background: Int, private val context: Context? = 
             if (engine().showVideoLayer(uri, id, pick.first, pick.second, false, left) == 0) { current = false; stale += id }
         }
         for ((track, at, localMs) in trails) if (track.layer.id !in stale && !syncTrail(track, at, localMs, exact)) current = false
+        if (!exact) {
+            val frames = trails.map { (track, at) -> track.layer.id to at.takeIf { track.layer.id !in stale && videos[track.layer.node["fillVideo"]] != null } }
+            if (!playing && frames != liveFrames) engine().forgetHeld()
+            liveFrames = frames
+        }
         return current
     }
 
@@ -432,9 +438,9 @@ class EngineThread(private val background: Int, private val context: Context? = 
         effectJob?.join()
         val document = withContext(Dispatchers.Default) { Scene.parse(xml) }
         fonts?.let { library -> document.fontNames().forEach { library.resolve(it) } }
-        loadMedia(document, announce = false)
         var shown: String? = null
         try {
+            loadMedia(document, announce = false)
             withContext(dispatcher) {
                 check(!closed) { "engine closed" }
                 applyPending(timeMs)
@@ -448,7 +454,7 @@ class EngineThread(private val background: Int, private val context: Context? = 
                 try { shown?.let { val at = view?.timeMs ?: 0; engine().setScene(fonts?.prepareText(it, at) ?: it); preparedAt = at } }
                 finally { capturing = false }
             }
-            mediaScene?.let { loadMedia(it, announce = false) }
+            withContext(NonCancellable) { mediaScene?.let { loadMedia(it, announce = false) } }
             requestRender()
         }
     }
@@ -487,7 +493,7 @@ class EngineThread(private val background: Int, private val context: Context? = 
             if (timeMs == textTime) return
             textTime = timeMs
             val xml = timedXml ?: return
-            engine().setScene(fonts?.prepareText(xml, timeMs, document) ?: xml)
+            engine().setScene(fonts?.prepareText(xml, timeMs, document) ?: xml, keepHeld = true)
         }
     }
 

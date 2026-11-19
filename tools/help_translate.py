@@ -170,9 +170,14 @@ def main():
         data["pages"] = {s: data["pages"][s] for s in sorted(data["pages"]) if s in pages}
         data["effects"] = {k: data["effects"][k] for k in sorted(data["effects"]) if k in effects}
         path.write_text(json.dumps(data, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        STATE.write_text(json.dumps(state, ensure_ascii=False, indent=1, sort_keys=True) + "\n")
         print(f"{language}: {sum(1 for a in results.values() if a)} of {len(todo)} translated", flush=True)
+        if tr.usage.get("stop"):
+            break
     STATE.write_text(json.dumps(state, ensure_ascii=False, indent=1, sort_keys=True) + "\n")
     print(f"{tr.usage['calls']} request(s), {tr.usage['prompt']} prompt + {tr.usage['completion']} completion tokens, {tr.usage['failed']} failed request(s)")
+    if tr.usage.get("stop"):
+        sys.exit(tr.usage["stop"])
 
 
 if __name__ == "__main__":

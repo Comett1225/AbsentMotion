@@ -97,6 +97,7 @@ import androidx.compose.ui.graphics.TransformOrigin
 import app.absentmotion.platform.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -234,14 +235,14 @@ fun HomeScreen(
         scrimColor = Color.Black.copy(alpha = 0.94f),
         gesturesEnabled = drawer.isOpen,
     ) {
-        Box(Modifier.fillMaxSize().background(Am.HomeBg).halfSwipeOpens(page != 3, rtl) { scope.launch { drawer.open() } }) {
+        Box(Modifier.fillMaxSize().background(Am.HomeBg).swipeOpens(page != 3 && !creating, rtl) { scope.launch { drawer.open() } }) {
             Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars.union(WindowInsets.captionBar))) {
                 TopBar(onMenu = { scope.launch { drawer.open() } }, search, page, { search = it }, settings)
                 val fill = Modifier.weight(1f)
                 if (page == 3) CommunityTab(fill, engine) { onImportFile(Uri.fromFile(it)) }
                 else if (page == 2) ToolsTab(fill, store, settings) { id -> version++; onOpen(id) }
-                else if (page == 1) TemplatesTab(version, onTemplate, onTemplateProject, fill, query) else ProjectsPane(
-                    Modifier.weight(1f), shown, loaded, tab, { tab = it }, settings, version, onOpen, onExport, query,
+                else if (page == 1) TemplatesTab(version + changes, onTemplate, onTemplateProject, fill, query, engine) else ProjectsPane(
+                    Modifier.weight(1f), shown, loaded, tab, { tab = it }, settings, version + changes, onOpen, onExport, query,
                     onUpload = { picker.launch(arrayOf("text/xml", "application/xml", "application/zip", "application/octet-stream")) },
                     onDuplicate = { id -> if (!duplicating) {
                         duplicating = true
@@ -272,11 +273,11 @@ fun HomeScreen(
     }
 }
 
-private fun Modifier.halfSwipeOpens(enabled: Boolean, rtl: Boolean, onOpen: () -> Unit): Modifier = if (!enabled) this else pointerInput(rtl) {
+internal fun Modifier.swipeOpens(enabled: Boolean, rtl: Boolean, anywhere: Boolean = false, onOpen: () -> Unit): Modifier = if (!enabled) this else pointerInput(rtl, anywhere) {
     val needed = 48.dp.toPx()
     awaitEachGesture {
         val down = awaitFirstDown(requireUnconsumed = false)
-        if ((down.position.x < size.width / 2f) == rtl) return@awaitEachGesture
+        if (down.type == PointerType.Mouse || (!anywhere && (down.position.x < size.width / 2f) == rtl)) return@awaitEachGesture
         var moved = 0f
         val start = awaitHorizontalTouchSlopOrCancellation(down.id) { change, over ->
             if ((over > 0f) != rtl) { change.consume(); moved = over }
@@ -524,11 +525,11 @@ internal fun CommunityCard(info: CommunityInfo) {
     }
     if (LocalAdaptiveSpace.current?.wide == true && picture != null) {
         Row(Modifier.fillMaxWidth().padding(vertical = 4.dp), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
-            Image(picture, null, Modifier.weight(0.4f).heightIn(max = 300.dp).aspectRatio(picture.width.toFloat() / picture.height).clip(RoundedCornerShape(10.dp)), contentScale = ContentScale.Fit)
+            Image(picture, null, Modifier.weight(0.4f).heightIn(max = 300.dp).aspectRatio((picture.width.toFloat() / picture.height).coerceIn(0.2f, 5f)).clip(RoundedCornerShape(10.dp)), contentScale = ContentScale.Fit)
             Column(Modifier.weight(0.6f), verticalArrangement = Arrangement.spacedBy(4.dp)) { details() }
         }
     } else Column(Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        picture?.let { Image(it, null, Modifier.fillMaxWidth().aspectRatio(it.width.toFloat() / it.height).clip(RoundedCornerShape(10.dp)), contentScale = ContentScale.Fit) }
+        picture?.let { Image(it, null, Modifier.fillMaxWidth().aspectRatio((it.width.toFloat() / it.height).coerceIn(0.2f, 5f)).clip(RoundedCornerShape(10.dp)), contentScale = ContentScale.Fit) }
         details()
     }
 }
@@ -540,7 +541,7 @@ internal fun DateLabel(text: String, first: Boolean) {
 
 internal fun listRows(list: List<ProjectInfo>, byName: Boolean, dates: DateTimeFormatter): List<ListRow> =
     if (byName) {
-        list.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.title }).map { ListRow.Card(it) }
+        list.sortedWith(compareBy(java.text.Collator.getInstance(dates.locale)) { it.title }).map { ListRow.Card(it) }
     } else {
         list.sortedByDescending { it.modified }
             .groupBy { Instant.ofEpochMilli(it.modified).atZone(ZoneId.systemDefault()).format(dates) }
@@ -735,7 +736,7 @@ private fun Thumbnail(info: ProjectInfo, version: Int, cache: MutableMap<String,
         }
         val stamp = withContext(Dispatchers.IO) { file.lastModified() }
         cache[info.id]?.takeIf { it.stamp == stamp }?.let { value = it.image; return@produceState }
-        val decoded = withContext(Dispatchers.IO) { BitmapFactory.decodeFile(file.path)?.asImageBitmap() }
+        val decoded = withContext(Dispatchers.IO) { decodeThumbnail(file) }
         if (decoded != null) {
             cache[info.id] = Thumb(stamp, decoded)
             value = decoded
@@ -915,12 +916,13 @@ internal fun RefMenu(
     shape: Shape,
     modifier: Modifier = Modifier,
     maxHeight: Dp = Dp.Unspecified,
+    scroll: androidx.compose.foundation.ScrollState? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Presence(expanded) {
         Popup(popupPositionProvider = MenuPosition, onDismissRequest = onDismiss, properties = PopupProperties(focusable = true)) {
             Surface(Modifier.presence(scaleFrom = 0.94f, origin = TransformOrigin(1f, 0f)), color = color, shape = shape, shadowElevation = 8.dp) {
-                Column(modifier.heightIn(max = maxHeight).verticalScroll(rememberScrollState()), content = content)
+                Column(modifier.heightIn(max = maxHeight).verticalScroll(scroll ?: rememberScrollState()), content = content)
             }
         }
     }

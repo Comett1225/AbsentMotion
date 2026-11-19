@@ -271,6 +271,13 @@ class MotionsTest {
         assertNull(s.layer(1)!!.motion(MotionSlot.Out))
     }
 
+    @Test fun replacingAnAnimationKeepsItsEffectWhereItWasInTheStack() {
+        val crop = XmlNode("effect", linkedMapOf("id" to "absent.crop"))
+        val s = scene(image(1, 0, 2000)).withAnimation(1, MotionSlot.In, "blur", 500).update(1) { it.copy(node = it.node.copy(children = it.node.children + crop)) }
+        val again = s.withAnimation(1, MotionSlot.In, "blur", 800).layer(1)!!.effects.map { it["id"] }
+        assertEquals(listOf("absent.blur", "absent.crop"), again)
+    }
+
     @Test fun userKeysInsideTheWindowGiveWayAndOthersStay() {
         val moving = image(1, 0, 2000).let { n ->
             val t = n.child("transform")!!

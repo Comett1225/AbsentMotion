@@ -183,7 +183,9 @@ private fun Fx.node(slot: MotionSlot, t0: Float, t1: Float, ease: String?, inSid
         },
 )
 
-private fun Layer.withSide(m: Motion, slot: MotionSlot, inSide: Boolean, from: Int, to: Int, w: Float, h: Float): Layer {
+private fun List<XmlNode>.insertedAt(at: Int, more: List<XmlNode>) = if (at in 0..size) take(at) + more + drop(at) else this + more
+
+private fun Layer.withSide(m: Motion, slot: MotionSlot, inSide: Boolean, from: Int, to: Int, w: Float, h: Float, at: Int = -1): Layer {
     val span = length.coerceAtLeast(1).toFloat()
     val t0 = ((from - startTime) / span).coerceIn(0f, 1f)
     val t1 = ((to - startTime) / span).coerceIn(t0, 1f)
@@ -200,7 +202,7 @@ private fun Layer.withSide(m: Motion, slot: MotionSlot, inSide: Boolean, from: I
         val keys = kept + Keyframe(t0, formatFloats(first), gen = slot.xml) + Keyframe(t1, formatFloats(second), ease, slot.xml)
         n = n.withChild("transform", transform.withChild(look.prop, element.withKeyframes(keys)))
     }
-    for (fx in m.fx) n = n.copy(children = n.children + fx.node(slot, t0, t1, ease, inSide))
+    n = n.copy(children = n.children.insertedAt(at, m.fx.map { it.node(slot, t0, t1, ease, inSide) }))
     return copy(node = n)
 }
 
@@ -245,13 +247,14 @@ fun Scene.withoutMotion(id: Long, slot: MotionSlot): Scene {
 }
 
 fun Scene.withAnimation(id: Long, slot: MotionSlot, motionId: String?, ms: Int): Scene {
+    val at = layer(id)?.node?.children?.indexOfFirst { it.name == "effect" && it["gen"] == slot.xml } ?: -1
     val s = withoutMotion(id, slot)
     val layer = s.layer(id) ?: return this
     if (motionId == null || !layer.canAnimate) return s
     if (slot == MotionSlot.Loop) {
         val d = ms.coerceIn(LOOP_MIN_MS, LOOP_MAX_MS)
         val fx = Animations.loop(motionId, d, height.toFloat()) ?: return s
-        return s.update(id) { it.copy(node = it.node.copy(children = it.node.children + fx.node(slot, 0f, 1f, null, true))
+        return s.update(id) { it.copy(node = it.node.copy(children = it.node.children.insertedAt(at, listOf(fx.node(slot, 0f, 1f, null, true))))
             .with(slot.attr, MotionRecord(false, motionId, d).toString())) }
     }
     val motion = Animations.find(motionId) ?: return s
@@ -259,7 +262,7 @@ fun Scene.withAnimation(id: Long, slot: MotionSlot, motionId: String?, ms: Int):
     val span = min(d, layer.length)
     val (from, to) = if (slot == MotionSlot.In) layer.startTime to layer.startTime + span else layer.endTime - span to layer.endTime
     return s.update(id) {
-        val done = it.withSide(motion, slot, slot == MotionSlot.In, from, to, width.toFloat(), height.toFloat())
+        val done = it.withSide(motion, slot, slot == MotionSlot.In, from, to, width.toFloat(), height.toFloat(), at)
         done.copy(node = done.node.with(slot.attr, MotionRecord(false, motionId, d).toString()))
     }
 }

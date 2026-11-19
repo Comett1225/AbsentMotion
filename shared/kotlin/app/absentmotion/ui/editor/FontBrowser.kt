@@ -48,11 +48,11 @@ import androidx.annotation.StringRes
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 import app.absentmotion.ui.HoldName
+import app.absentmotion.ui.home.swipeOpens
 
 private val BrowserBg get() = Am.PanelInset
 private val DrawerBg get() = Am.Panel
 private val BrowserLine get() = Am.Line
-private val Favourite get() = Am.Gold
 
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
@@ -85,7 +85,7 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
             val failures = mutableListOf<String>()
             var imported = 0
             uris.forEach { uri ->
-                val result = try { library.importAll(uri) } catch (e: kotlinx.coroutines.CancellationException) { throw e } catch (_: Exception) { FontLibrary.Imported(emptyList(), listOf((uri.lastPathSegment ?: "") to FontProblem.Corrupted)) }
+                val result = try { library.importAll(uri) } catch (e: kotlinx.coroutines.CancellationException) { throw e } catch (_: Exception) { FontLibrary.Imported(emptyList(), listOf((uri.lastPathSegment ?: "") to FontProblem.Corrupted)) } catch (_: OutOfMemoryError) { FontLibrary.Imported(emptyList(), listOf((uri.lastPathSegment ?: "") to FontProblem.TooLarge)) }
                 imported += result.fonts.size
                 result.failures.forEach { (name, problem) -> failures += app.absentmotion.i18n.AppText.get(R.string.font_import_reason_line, name, app.absentmotion.i18n.AppText.get(FontReasons.getValue(problem))) }
             }
@@ -110,7 +110,8 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
         language == 0 && categories.size == 1 -> stringResource(R.string.font_title_category, stringResource(CategoryLabels.getValue(categories.single())))
         else -> stringResource(R.string.font_title_filtered)
     }
-    BackHandler { when { drawer -> drawer = false; search != null -> search = null; else -> onClose() } }
+    val closeSearch = { search = null; source = FontSource.All }
+    BackHandler { when { drawer -> drawer = false; search != null -> closeSearch(); else -> onClose() } }
     val favourites = remember(revision) { library.favourites.toSet() }
     val results = remember(revision, categories, sorting, language, search, source, google, device) {
         fun kept(all: List<FontEntry>) = all.filter { entry ->
@@ -133,16 +134,17 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
         }
         Unit
     }
-    Box(Modifier.fillMaxSize().background(BrowserBg)) {
+    val rtl = androidx.compose.ui.platform.LocalLayoutDirection.current == androidx.compose.ui.unit.LayoutDirection.Rtl
+    Box(Modifier.fillMaxSize().background(BrowserBg).swipeOpens(!drawer && !loading, rtl, anywhere = true) { drawer = true }) {
         Column(Modifier.fillMaxSize()) {
             Row(Modifier.fillMaxWidth().height(42.dp).border(0.5.dp, BrowserLine), verticalAlignment = Alignment.CenterVertically) {
                 FontIconButton(TextIcons.Menu, stringResource(R.string.font_menu)) { drawer = true }
                 if (search == null) Text(title, Modifier.weight(1f), color = Am.OnDark, fontSize = 16.sp,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center)
-                else BasicTextField(search.orEmpty(), { search = it }, Modifier.weight(1f).focusRequester(searchFocus), textStyle = TextStyle(color = Favourite, fontSize = 16.sp, textDirection = androidx.compose.ui.text.style.TextDirection.Content).withUiFont(),
+                else BasicTextField(search.orEmpty(), { search = it }, Modifier.weight(1f).focusRequester(searchFocus), textStyle = TextStyle(color = Am.Gold, fontSize = 16.sp, textDirection = androidx.compose.ui.text.style.TextDirection.Content).withUiFont(),
                     singleLine = true, decorationBox = { inner -> if (search.isNullOrEmpty()) Text(stringResource(R.string.type_here_to_search), color = Am.OnDark.copy(alpha = .3f), fontSize = 16.sp); inner() })
                 FontIconButton(if (search == null) TextIcons.Search else TextIcons.Tick, if (search == null) stringResource(R.string.font_search) else stringResource(R.string.done)) {
-                    search = if (search == null) "" else null
+                    if (search == null) search = "" else closeSearch()
                 }
             }
             if (search != null) Row(Modifier.fillMaxWidth().height(44.dp).horizontalScroll(rememberScrollState()).padding(horizontal = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -163,10 +165,8 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
                             color = Am.OnDark, fontSize = 12.sp, maxLines = 2, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
                         if (entry.category == 100) Icon(TextIcons.Import, stringResource(R.string.font_imported), Modifier.padding(8.dp).size(13.dp), tint = Am.OnDark.copy(alpha = .38f))
                         if (needsDownload) Icon(TextIcons.Cloud, stringResource(R.string.font_downloads_when_chosen), Modifier.align(Alignment.TopEnd).padding(8.dp).size(15.dp), tint = Am.OnDark.copy(alpha = .38f))
-                        Box(Modifier.align(Alignment.BottomEnd).size(34.dp).clickable { library.favourite(entry.name.xml); revision++ }) {
-                            Icon(if (entry.name.xml in favourites) TextIcons.FilledStar else TextIcons.Star, stringResource(R.string.font_favorite), Modifier.fillMaxSize().padding(7.dp), tint = if (entry.name.xml in favourites) Favourite else Am.OnDark.copy(alpha = .38f))
-                            if (entry.category != 100) HoldName(stringResource(R.string.font_favorite))
-                        }
+                        FavouriteStar(entry.name.xml in favourites, { library.favourite(entry.name.xml); revision++ }, stringResource(R.string.font_favorite), Modifier.align(Alignment.BottomEnd).size(34.dp),
+                            starSize = 20.dp, offTint = Am.OnDark.copy(alpha = .38f), holdName = entry.category != 100)
                     }
                 }
                 if (results.google.isNotEmpty() && source == FontSource.All) item(key = "google-divider", span = { GridItemSpan(maxLineSpan) }) {
@@ -183,7 +183,7 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
                             CategoryLabels[family.category]?.let { Text(stringResource(it), color = Am.Caption, fontSize = 11.sp, maxLines = 1) }
                         }
                         Box(Modifier.size(34.dp), Alignment.Center) {
-                            if (downloading == family.family) CircularProgressIndicator(Modifier.size(18.dp), color = Favourite, strokeWidth = 2.dp)
+                            if (downloading == family.family) CircularProgressIndicator(Modifier.size(18.dp), color = Am.Gold, strokeWidth = 2.dp)
                             else Icon(app.absentmotion.ui.home.HomeIcons.Download, stringResource(R.string.font_downloads_when_chosen), Modifier.size(18.dp), tint = Am.OnDark.copy(alpha = .38f))
                         }
                     }
@@ -193,13 +193,13 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
                 }
                 item(key = "dafont", span = { GridItemSpan(maxLineSpan) }) {
                     Column(Modifier.fillMaxWidth().clickable { runCatching { links.openUri(daFontUrl(search)) } }.padding(horizontal = 16.dp, vertical = 12.dp)) {
-                        Text(stringResource(R.string.dafont_find), color = Favourite, fontSize = 15.sp)
+                        Text(stringResource(R.string.dafont_find), color = Am.Gold, fontSize = 15.sp)
                         Text(stringResource(R.string.dafont_hint), Modifier.padding(top = 4.dp), color = Am.Caption, fontSize = 12.sp)
                     }
                 }
             }
         }
-        Presence(drawer) {
+        Presence(drawer) { Box(Modifier.fillMaxSize().swipeOpens(drawer, !rtl, anywhere = true) { drawer = false }) {
             Box(Modifier.fillMaxSize().presenceScrim(Color.Black.copy(alpha = .6f)).clickable { drawer = false })
             Column(Modifier.presence(fade = false, slideX = -1f).width(280.dp).fillMaxHeight().background(DrawerBg).verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 12.dp)) {
                 listOf(2, 1, 3, 4, 5, 110, 100).forEach { category ->
@@ -243,9 +243,9 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
                     Text(stringResource(R.string.import_fonts), Modifier.padding(start = 10.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
                 }
             }
-        }
+        } }
         if (loading) Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = .5f)).clickable(interactionSource = null, indication = null) {}, contentAlignment = Alignment.Center) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) { CircularProgressIndicator(color = Favourite); Text(stringResource(R.string.loading_font), color = Color.White, fontSize = 16.sp) }
+            Column(horizontalAlignment = Alignment.CenterHorizontally) { CircularProgressIndicator(color = Am.Gold); Text(stringResource(R.string.loading_font), color = Color.White, fontSize = 16.sp) }
         }
     }
     deleting?.let { entry -> AlertDialog(onDismissRequest = { deleting = null }, title = { Text(stringResource(R.string.remove_this_imported_font)) }, text = { Text(entry.name.label) },

@@ -10,7 +10,6 @@ import android.graphics.ImageFormat
 import android.media.Image
 import android.media.MediaCodec
 import android.media.MediaCodecInfo
-import android.media.MediaCodecList
 import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.net.Uri
@@ -26,6 +25,10 @@ internal interface DesktopFrameInput : Closeable {
     val colorStandard: Int
     val fullRange: Boolean
     suspend fun read(wanted: List<Long>, consume: suspend (Long, Yuv) -> Unit): Int
+}
+
+internal class StopReading(val now: () -> Boolean) : kotlin.coroutines.AbstractCoroutineContextElement(StopReading) {
+    companion object Key : kotlin.coroutines.CoroutineContext.Key<StopReading>
 }
 
 internal class FrameReader(private val context: Context, private val uri: String) : Closeable {
@@ -55,7 +58,6 @@ internal class FrameReader(private val context: Context, private val uri: String
             timestamps = VideoSources.timestamps(context, uri)
             readColor(format)
             codec = systemOrFfamp({
-                MediaCodecList(MediaCodecList.REGULAR_CODECS).findDecoderForFormat(format) ?: throw ExportError(txt(R.string.media_error_no_decoder))
                 format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible)
                 format.requestSdr()
                 openDecoder(format, null)

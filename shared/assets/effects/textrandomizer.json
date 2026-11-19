@@ -11,6 +11,7 @@
    "label": "Amount",
    "type": "float",
    "default": 0,
+   "legacyDefault": 1,
    "min": 0,
    "max": 1,
    "step": 0.001,
@@ -72,6 +73,7 @@
    "label": "Characters",
    "type": "choice",
    "default": 1,
+   "legacyDefault": 0,
    "options": [
     "Letters",
     "Upper Case",
@@ -93,6 +95,7 @@
    "label": "Speed",
    "type": "float",
    "default": 0,
+   "legacyDefault": 12,
    "min": 0,
    "max": 60,
    "step": 0.1

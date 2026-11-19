@@ -10,6 +10,7 @@ import struct
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 import zipfile
 
@@ -173,6 +174,16 @@ class ToolRegressions(unittest.TestCase):
                     self.assertIn(message, output)
                     (repo / name).unlink()
             self.assertEqual(0, check()[0], check()[1])
+            (repo / 'notes.txt').write_text('a fixtureword here\n')
+            git('add', 'notes.txt')
+            git('commit', '-q', '-m', 'notes')
+            git('rm', '-q', 'notes.txt')
+            git('commit', '-q', '-m', 'drop notes')
+            code, output = check()
+            self.assertNotEqual(0, code, output)
+            self.assertIn('unpushed-commits', output)
+            git('reset', '-q', '--hard', 'HEAD~2')
+            self.assertEqual(0, check()[0], check()[1])
             git('commit', '-q', '--allow-empty', '-m', 'second', '-m', 'Co-Authored-By: Helper <helper@example.invalid>')
             code, output = check()
             self.assertNotEqual(0, code, output)
@@ -236,35 +247,54 @@ class ToolRegressions(unittest.TestCase):
             os.utime(dependency, (3000, 3000))
             self.assertIn('rc=1', run())
 
-    def test_check_waits_for_a_running_build_and_takes_over_from_a_dead_one(self):
+    def test_check_lock_is_exclusive_and_never_waits_for_a_dead_or_reused_holder(self):
         script = (ROOT / 'tools/check.sh').read_text()
-        function = script[script.index('lock() {'):script.index('\n}\n', script.index('lock() {')) + 3]
+        functions = script[script.index('lock() {'):script.index('\n', script.index('unlock() {')) + 1]
         with tempfile.TemporaryDirectory() as folder:
             folder = Path(folder)
-            def run():
-                return subprocess.run(['sh', '-c', 'dir=.; ' + function + '\nlock android; echo "held=$held by $(readlink android.lock)"'],
-                                      cwd=folder, capture_output=True, text=True, timeout=60).stdout
-            self.assertRegex(run(), r'^held=\./android\.lock by \d+\n$')
-            dead = subprocess.Popen(['true'])
-            dead.wait()
-            (folder / 'android.lock').unlink()
-            os.symlink(str(dead.pid), folder / 'android.lock')
-            self.assertRegex(run(), r'^held=\./android\.lock by \d+\n$')
-            (folder / 'android.lock').unlink()
-            if shutil.which('ps'):
-                ended = subprocess.Popen(['true'])
-                while subprocess.run(['ps', '-o', 'stat=', '-p', str(ended.pid)], capture_output=True, text=True).stdout.strip()[:1] != 'Z':
-                    pass
-                os.symlink(str(ended.pid), folder / 'android.lock')
-                self.assertRegex(run(), r'^held=\./android\.lock by \d+\n$')
-                ended.wait()
-                (folder / 'android.lock').unlink()
-            running = int(subprocess.run(['sh', '-c', 'sleep 4 >/dev/null 2>&1 & echo $!'], capture_output=True, text=True, check=True).stdout)
-            os.symlink(str(running), folder / 'android.lock')
-            waited = run()
-            self.assertIn('waiting for another check.sh (process %d)' % running, waited)
-            self.assertIn('held=./android.lock by ', waited)
-            self.assertNotIn('by %d\n' % running, waited)
+            def start(body):
+                return subprocess.Popen(['sh', '-c', 'dir=.; ' + functions + body], cwd=folder, stdout=subprocess.PIPE, text=True)
+            (folder / 'android.lock').write_text('%d\n' % os.getpid())
+            held = start('lock android; echo "held by $(cat android.lock)"').communicate(timeout=60)[0]
+            self.assertRegex(held, r'^held by \d+\n$')
+            self.assertNotEqual('held by %d\n' % os.getpid(), held)
+            runs = [start('lock android; mkdir inside || echo overlap; sleep 0.5; rmdir inside; unlock') for _ in range(3)]
+            output = ''.join(run.communicate(timeout=60)[0] for run in runs)
+            self.assertNotIn('overlap', output)
+            self.assertRegex(output, r'waiting for another check\.sh \(process \d*\) to finish its android build')
+            crashed = start('lock android; echo ready; exec sleep 30')
+            self.assertEqual('ready\n', crashed.stdout.readline())
+            crashed.kill()
+            crashed.wait()
+            crashed.stdout.close()
+            self.assertEqual('free\n', start('lock android; echo free').communicate(timeout=10)[0])
+
+    def test_check_stops_its_background_jobs_when_it_exits(self):
+        script = (ROOT / 'tools/check.sh').read_text()
+        traps = script[script.index('descendants() {'):script.index('mode=full')]
+        with tempfile.TemporaryDirectory() as folder:
+            body = 'status=$(mktemp -d ./run.XXXXXX)\n' + traps + "( sh -c 'sleep 60 & echo $! >job; wait' ) &\nwhile [ ! -s job ]; do sleep 0.1; done\necho ready\nwait\n"
+            shell = subprocess.Popen(['sh', '-c', body], cwd=folder, stdout=subprocess.PIPE, text=True)
+            self.assertEqual('ready\n', shell.stdout.readline())
+            job = int((Path(folder) / 'job').read_text())
+            shell.terminate()
+            self.assertEqual(130, shell.wait(timeout=30))
+            shell.stdout.close()
+            def gone():
+                try:
+                    os.kill(job, 0)
+                except ProcessLookupError:
+                    return True
+                try:
+                    return Path(f'/proc/{job}/stat').read_text().rsplit(')', 1)[1].split()[0] == 'Z'
+                except OSError:
+                    return False
+            for _ in range(100):
+                if gone():
+                    break
+                time.sleep(0.1)
+            else:
+                self.fail('a background job outlived check.sh')
 
     def test_python_policy_rejects_docstrings_but_allows_data_strings(self):
         scanner = ROOT / 'tools/source_policy.py'

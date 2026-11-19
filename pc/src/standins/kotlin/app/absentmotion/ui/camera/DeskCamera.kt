@@ -116,6 +116,7 @@ class DeskCameraController(private val folder: File, private val scope: Coroutin
         val mine = generation
         old?.stop()
         if (old != null) delay(350)
+        if (generation != mine) return
         if (record == null) { phase = CameraPhase.Starting; frame = null; latest = null }
         try {
             val input = CameraInput(chosen, if (record != null) audio else null, mode = mode)
@@ -177,6 +178,7 @@ class DeskCameraController(private val folder: File, private val scope: Coroutin
 
     suspend fun stopRecording(): File? {
         val file = target ?: return null
+        if (busy) return null
         busy = true
         try {
             val active = session
@@ -196,7 +198,7 @@ class DeskCameraController(private val folder: File, private val scope: Coroutin
         generation++
         session?.stop()
         session = null
-        if (recording) { target?.delete(); target = null; recording = false }
+        if (recording && !busy) { target?.delete(); target = null; recording = false }
     }
 }
 
@@ -214,13 +216,14 @@ fun CameraScreen(aspect: Float, onClose: () -> Unit, onCaptured: (Uri, Boolean) 
         while (camera.recording) { seconds = ((System.currentTimeMillis() - camera.startedAt) / 1000).toInt(); delay(250) }
     }
     fun shutter() {
-        if (camera.phase != CameraPhase.Live) return
+        if (camera.phase != CameraPhase.Live || camera.busy) return
         if (!video) camera.photo()?.let { onCaptured(Uri.fromFile(it), false) }
         else if (camera.recording) scope.launch { camera.stopRecording()?.let { onCaptured(Uri.fromFile(it), true) } }
         else camera.startRecording()
     }
-    DeskModal(onClose, onEnter = ::shutter, dismissOnScrim = false) {
-        DeskDialogHeader(stringResource(R.string.camera), onClose)
+    fun close() { if (!camera.busy) onClose() }
+    DeskModal(::close, onEnter = ::shutter, dismissOnScrim = false) {
+        DeskDialogHeader(stringResource(R.string.camera), ::close)
         Column(Modifier.weight(1f).fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Box(Modifier.weight(1f).fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Color.Black), Alignment.Center) {
                 camera.frame?.let { Image(it, null, Modifier.fillMaxSize(), contentScale = ContentScale.Fit) }

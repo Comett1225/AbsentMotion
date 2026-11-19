@@ -99,6 +99,7 @@ struct LayerEffect {
     std::string id;
     bool hidden = false, locallyApplied = false, toChildren = false;
     int64_t owner = 0;
+    int ownerStart = 0;
     std::vector<Property> props;
 
     float value(const char* name, float t, float fallback) const;
@@ -224,7 +225,7 @@ struct LightSet {
 };
 
 struct PieceView {
-    SkV3 origin;
+    SkV3 origin, shift{0, 0, 0};
     float unit = 1;
     SkM44 turn, lens;
     bool tilted = false;
@@ -307,7 +308,7 @@ double RetimedTime(const Retiming& r, int startTime, int endTime, double at);
 void SetCameraView(bool on);
 SkMatrix PlaneMatrix(const std::vector<Layer>& layers, const Layer& layer, int width, int height, double timeMs, bool depthOrder = false);
 bool CameraViewOn();
-bool CameraFrame(const std::vector<Layer>& layers, const Layer& camera, int width, int height, double timeMs, SkPoint corners[4]);
+bool CameraFrame(const std::vector<Layer>& layers, const Layer& camera, int width, int height, double timeMs, SkPoint corners[4], bool depthOrder = false);
 bool SeeLayers(const std::vector<Layer>& layers, int width, int height, bool top, int fps, double timeMs, bool depthOrder, std::vector<Layer>* seen,
                bool pieces = false);
 bool SeenPlacement(const Layer& layer, double timeMs, Placement* placement);
@@ -349,7 +350,7 @@ SkRect ModelBounds(const Layer& layer, double timeMs);
 struct LayerEffects {
     std::function<bool(const Layer&)> active;
     std::function<bool(const Layer&)> lifted;
-    std::function<bool(const Layer&)> spills;
+    std::function<bool(const Layer&, double)> spills;
     std::function<bool(const Layer&)> behind;
     std::function<bool(const Layer&)> wraps;
     std::function<bool(SkCanvas*, const Scene&, const Layer&, double, const SkRect&, const SkMatrix&, const std::function<void(SkCanvas*)>&,
@@ -374,6 +375,7 @@ private:
 void SetLayerBreak(const std::function<void()>* each);
 void NoteOrientedEffect(const std::string& id);
 bool WorldView();
+bool InsideGroup();
 bool EffectOwnerMatrix(int64_t owner, double timeMs, SkMatrix* matrix);
 
 }

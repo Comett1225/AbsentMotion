@@ -4,6 +4,8 @@ import android.content.Context
 import android.media.MediaFormat
 import android.net.Uri
 import app.absentmotion.ffamp.FfampPcm
+import app.absentmotion.ffamp.colorStandardOf
+import app.absentmotion.ffamp.nearestStamp
 import app.absentmotion.ffamp.shownStandard
 import app.absentmotion.ffamp.yuvToRgb
 import app.absentmotion.media.DecodedFrame
@@ -116,6 +118,27 @@ class FfampFallbackTest {
         val lpcm = 0x6c70636dL
         assertEquals(listOf(true, false, true, true, true), listOf(8L, 16L, 24L, 32L, 64L).map { FfampPcm.pcmNeedsFfamp(lpcm, it) })
         assertFalse(FfampPcm.pcmNeedsFfamp(0x6d703461L, 24L))
+        assertTrue(FfampPcm.pcmNeedsFfamp(lpcm, 16L, 1L))
+        assertFalse(FfampPcm.pcmNeedsFfamp(lpcm, 16L, 0L))
+    }
+
+    @Test fun theColourMatrixPicksTheStandardAndUnspecifiedFallsBackToThePrimaries() {
+        assertEquals(MediaFormat.COLOR_STANDARD_BT601_NTSC, colorStandardOf(1, 6))
+        assertEquals(MediaFormat.COLOR_STANDARD_BT709, colorStandardOf(2, 1))
+        assertEquals(MediaFormat.COLOR_STANDARD_BT2020, colorStandardOf(9, 10))
+        assertEquals(MediaFormat.COLOR_STANDARD_BT601_PAL, colorStandardOf(5, 2))
+        assertNull(colorStandardOf(2, 2))
+        assertNull(colorStandardOf(10, 2))
+    }
+
+    @Test fun theClosestFrameIsTheNearestStampOnEitherSide() {
+        val stamps = longArrayOf(0, 33_366, 66_733, 100_100)
+        assertEquals(33_366L, nearestStamp(stamps, 33_366))
+        assertEquals(33_366L, nearestStamp(stamps, 40_000))
+        assertEquals(66_733L, nearestStamp(stamps, 60_000))
+        assertEquals(100_100L, nearestStamp(stamps, 100_101))
+        assertEquals(0L, nearestStamp(stamps, -5))
+        assertEquals(7L, nearestStamp(LongArray(0), 7))
     }
 
     @Test fun aWorkingSystemDecoderNeverAsksFfamp() {

@@ -64,13 +64,13 @@ internal fun Modifier.deskScrollbar(state: LazyGridState, color: Color = Am.OnDa
         if (visible.isEmpty() || !(state.canScrollBackward || state.canScrollForward)) null
         else {
             val first = visible.first()
-            val perRow = visible.count { it.row == first.row }.coerceAtLeast(1)
-            val rows = visible.map { it.row }.distinct().size
-            val step = if (rows > 1) (visible.last().offset.y - first.offset.y).toFloat() / (visible.last().row - first.row).coerceAtLeast(1)
+            val last = visible.last()
+            val perRow = visible.groupingBy { it.row }.eachCount().values.max()
+            val step = if (last.row > first.row) (last.offset.y - first.offset.y).toFloat() / (last.row - first.row)
                 else (first.size.height + info.mainAxisItemSpacing).toFloat()
-            val lines = (info.totalItemsCount + perRow - 1) / perRow
+            val lines = last.row + 1 + (info.totalItemsCount - 1 - last.index + perRow - 1) / perRow
             val total = maxOf(step * lines + info.beforeContentPadding + info.afterContentPadding - info.mainAxisItemSpacing, viewport + 1f)
-            Range((state.firstVisibleItemIndex / perRow) * step + state.firstVisibleItemScrollOffset, total)
+            Range(first.row * step + state.firstVisibleItemScrollOffset, total)
         }
     }
 

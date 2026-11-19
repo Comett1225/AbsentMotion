@@ -12,25 +12,32 @@ import java.util.zip.ZipOutputStream
 class FontZipTest {
     private val font = File(TestData.project, "shared/assets/fonts/AbrilFatface/AbrilFatface-Regular.ttf").readBytes()
 
-    private fun zip(vararg entries: Pair<String, ByteArray>): ByteArray {
+    private fun zip(vararg entries: Pair<String, ByteArray>, names: java.nio.charset.Charset = Charsets.UTF_8): ByteArray {
         val out = ByteArrayOutputStream()
-        ZipOutputStream(out).use { zip -> for ((name, bytes) in entries) { zip.putNextEntry(ZipEntry(name)); zip.write(bytes); zip.closeEntry() } }
+        ZipOutputStream(out, names).use { zip -> for ((name, bytes) in entries) { zip.putNextEntry(ZipEntry(name)); zip.write(bytes); zip.closeEntry() } }
         return out.toByteArray()
     }
 
-    private fun problem(bytes: ByteArray): FontProblem? = try { zipFonts(bytes.inputStream()); null } catch (e: FontImportError) { e.problem }
+    private fun problem(bytes: ByteArray): FontProblem? = try { zipFonts(bytes); null } catch (e: FontImportError) { e.problem }
 
     @Test fun fontsAtAnyDepthAreFoundAndJunkIsSkipped() {
         val found = zipFonts(zip(
             "Pack/Fonts/One.ttf" to font, "Two.OTF" to font, "readme.txt" to "hi".toByteArray(), "__MACOSX/Pack/._One.ttf" to font,
             "Pack/.hidden.ttf" to font, "a/b/c/Three.ttc" to font, "Pack/" to ByteArray(0),
-        ).inputStream())
+        ))
         assertEquals(listOf("One.ttf", "Two.OTF", "Three.ttc"), found.map { it.first })
         assertTrue(found.all { it.second.contentEquals(font) })
     }
 
+    @Test fun namesThatAreNotUtf8StillImport() {
+        val found = zipFonts(zip("Léame.txt" to "hi".toByteArray(), "Café Bold.ttf" to font, "Plain.ttf" to font, names = Charsets.ISO_8859_1))
+        assertEquals(listOf("Café Bold.ttf", "Plain.ttf"), found.map { it.first })
+        assertEquals(listOf("けいふぉんと.ttf"), zipFonts(zip("けいふぉんと.ttf" to font)).map { it.first })
+        assertEquals(listOf("Café Bold.ttf"), zipFonts(zip("CafÃ© Bold.ttf" to font, names = Charsets.ISO_8859_1)).map { it.first })
+    }
+
     @Test fun aZipWithoutFontsGivesAnEmptyList() {
-        assertEquals(emptyList<Any>(), zipFonts(zip("readme.txt" to "hi".toByteArray(), "img/a.png" to ByteArray(10)).inputStream()))
+        assertEquals(emptyList<Any>(), zipFonts(zip("readme.txt" to "hi".toByteArray(), "img/a.png" to ByteArray(10))))
     }
 
     @Test fun anOversizedEntryAndTooManyFontsAreRefused() {

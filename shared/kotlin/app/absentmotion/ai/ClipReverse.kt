@@ -23,6 +23,7 @@ import app.absentmotion.library.openableUri
 import app.absentmotion.media.FrameReader
 import app.absentmotion.media.Stamps
 import app.absentmotion.media.VideoSources
+import app.absentmotion.media.openDemuxer
 import app.absentmotion.media.Yuv
 import app.absentmotion.media.YuvEncoder
 import app.absentmotion.media.estimatedFps
@@ -239,13 +240,12 @@ internal object ClipReverse {
     }
 
     private fun syncTimes(context: Context, uri: String): Pair<LongArray, MediaFormat> {
-        val extractor = MediaExtractor()
+        val extractor = openDemuxer(context, Uri.parse(openableUri(uri)), "video/")
         try {
-            extractor.setDataSource(context, Uri.parse(openableUri(uri)), null)
             val track = (0 until extractor.trackCount).first { extractor.getTrackFormat(it).getString(MediaFormat.KEY_MIME)?.startsWith("video/") == true }
             extractor.selectTrack(track)
             val syncs = Stamps()
-            while (extractor.sampleTime >= 0) {
+            while (extractor.hasSample) {
                 if (extractor.sampleFlags and MediaExtractor.SAMPLE_FLAG_SYNC != 0) syncs.add(extractor.sampleTime)
                 if (!extractor.advance()) break
             }

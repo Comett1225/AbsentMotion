@@ -29,6 +29,10 @@ class VideoSpeedTest {
         assertEquals("2000", retimed.node["endTime"])
     }
 
+    @Test fun aClipSqueezedPastTheTopSpeedIsPlayedAtTheTopSpeed() {
+        assertEquals(66 * 100.0, span(videoLayer(0, 66, speed = "18000")), 1.0)
+    }
+
     @Test fun retimingAConstantSpeedStillFitsTheSameMedia() {
         val layer = videoLayer(0, 2000).let { it.copy(node = it.node.with("speed", "2")) }
         val retimed = layer.retimedVideo(500, 2000)

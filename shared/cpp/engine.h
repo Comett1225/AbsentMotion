@@ -75,9 +75,11 @@ public:
 
     virtual std::string timing(Target* target) = 0;
 
-    virtual bool setScene(const std::string& xml, std::string* error) = 0;
+    virtual bool setScene(const std::string& xml, std::string* error, bool keepHeld = false) = 0;
 
     virtual std::string loadEffect(const std::string& xml) = 0;
+
+    virtual void forgetHeld() = 0;
 
     virtual int maxPictureSize() const = 0;
     virtual bool setPicture(const std::string& uri, int64_t layerId, AHardwareBuffer* buffer,

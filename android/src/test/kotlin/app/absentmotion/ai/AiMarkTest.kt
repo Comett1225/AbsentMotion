@@ -66,6 +66,10 @@ class AiMarkTest {
         assertTrue(cut.aiBuried(AiKind.Enhance))
         assertEquals("photo.png", cut.withoutAiMark(AiKind.Enhance).node["fillImage"])
         assertNull(AiAction.Enhance.unavailable(saved))
+        val cutOnly = scene.layer(2)!!.copy(node = scene.layer(2)!!.node.with("fillType", "media")).withAiMark(AiKind.Background, "photo.png", "cut.png")
+        assertNull(AiAction.Background.unavailable(cutOnly))
+        val cutThenEnhanced = cutOnly.copy(node = cutOnly.node.with("fillImage", "big.png")).withAiMark(AiKind.Enhance, "cut.png", "big.png", "upscale2", extra = mapOf("attribute" to "fillImage"))
+        assertEquals(txt(R.string.ai_undo_newer_first), AiAction.Background.unavailable(cutThenEnhanced))
     }
 
     @Test fun mediaChangedAfterwardsIsNotOverwritten() {
@@ -161,6 +165,8 @@ class AiMarkTest {
         assertEquals(Int.MAX_VALUE, video(inTime = 1000).shiftedMedia(-1000).mediaFill!!.outTime)
         val still = scene.layer(2)!!
         assertEquals(still.node, still.shiftedMedia(500).node)
+        val unlooped = clip.copy(node = clip.node.with("loopIn", "1000"))
+        assertEquals("1000", unlooped.shiftedMedia(-4000).node["loopIn"])
     }
 
     @Test fun shiftingMediaTimeMovesTheSpeedKeysWithIt() {

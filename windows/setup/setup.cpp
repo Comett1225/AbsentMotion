@@ -603,7 +603,9 @@ bool AppWindowVisible(const std::wstring& folder) {
             Ctx* c = reinterpret_cast<Ctx*>(l);
             if (!IsWindowVisible(h)) return TRUE;
             RECT r;
-            GetWindowRect(h, &r);
+            WINDOWPLACEMENT place{sizeof place};
+            if (IsIconic(h) && GetWindowPlacement(h, &place)) r = place.rcNormalPosition;
+            else GetWindowRect(h, &r);
             if (r.right - r.left < 320 || r.bottom - r.top < 200) return TRUE;
             DWORD pid = 0;
             GetWindowThreadProcessId(h, &pid);

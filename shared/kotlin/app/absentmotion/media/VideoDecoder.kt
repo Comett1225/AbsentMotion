@@ -14,6 +14,9 @@ import android.util.Log
 import java.io.Closeable
 import java.util.concurrent.TimeUnit
 import app.absentmotion.library.openableUri
+import app.absentmotion.R
+import app.absentmotion.export.ExportError
+import app.absentmotion.i18n.txt
 
 internal fun MediaCodec.configureFitting(format: MediaFormat, surface: android.view.Surface?, flags: Int = 0) {
     try {
@@ -70,7 +73,7 @@ internal fun openDecoder(format: MediaFormat, surface: android.view.Surface?): M
         }
         if (!busy) break
     }
-    throw last ?: IllegalArgumentException("no decoder for $mime")
+    throw last ?: ExportError(txt(R.string.media_error_no_decoder))
 }
 
 private const val MAX_IMAGES = 3
@@ -139,9 +142,9 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
     fun frame(timeUs: Long, exact: Boolean, obsolete: () -> Boolean): DecodedFrame? {
         val wanted = wantedPts(timeUs)
         if (wanted == currentPts) return current
-        soft?.let { return softFrame(it, wanted, exact) }
+        soft?.let { return softFrame(it, wanted, exact, obsolete) }
         val decoder = codec ?: return current
-        return systemOrFfamp({ decoded(decoder, wanted, exact, obsolete) }, ::rescued) { softFrame(it, wanted, exact) }
+        return systemOrFfamp({ decoded(decoder, wanted, exact, obsolete) }, ::rescued) { softFrame(it, wanted, exact, obsolete) }
     }
 
     private fun decoded(decoder: MediaCodec, wanted: Long, exact: Boolean, obsolete: () -> Boolean): DecodedFrame? {
@@ -240,14 +243,14 @@ internal class VideoDecoder(private val context: Context, private val uri: Strin
         return image
     }
 
-    private fun softFrame(source: DesktopFrameInput, wanted: Long, exact: Boolean): DecodedFrame? {
+    private fun softFrame(source: DesktopFrameInput, wanted: Long, exact: Boolean, obsolete: () -> Boolean): DecodedFrame? {
         var made: DecodedFrame? = null
-        kotlinx.coroutines.runBlocking { source.read(listOf(wanted)) { _, yuv -> made = ffamp!!.softFrame(yuv, wanted, source.colorStandard, source.fullRange) } }
-        val image = made ?: return if (exact) null else current
+        kotlinx.coroutines.runBlocking(StopReading(obsolete)) { source.read(listOf(wanted)) { _, yuv -> made = ffamp!!.softFrame(yuv, wanted, source.colorStandard, source.fullRange) } }
+        val image = made ?: return if (exact || obsolete()) null else current
+        if (currentPts == Long.MIN_VALUE || wanted < currentPts || wanted - currentPts > 1_000_000) seeks++
         current?.close()
         current = image
         currentPts = wanted
-        seeks++
         return image
     }
 

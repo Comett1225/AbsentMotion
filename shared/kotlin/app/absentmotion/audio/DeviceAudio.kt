@@ -1,10 +1,10 @@
 package app.absentmotion.audio
 
 import android.content.Context
-import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.net.Uri
 import android.provider.OpenableColumns
+import app.absentmotion.media.openDemuxer
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.platform.deviceSounds
 import app.absentmotion.model.XmlNode
@@ -93,9 +93,8 @@ fun List<DeviceAudio>.shelves(view: SoundView, names: Comparator<String> = sound
 suspend fun deviceAudio(context: Context): List<DeviceAudio> = withContext(Dispatchers.IO) { deviceSounds(context) }
 
 suspend fun audioDeclaration(context: Context, uri: Uri): MediaDeclaration? = withContext(Dispatchers.IO) {
-    val extractor = MediaExtractor()
+    val extractor = try { openDemuxer(context, uri, "audio/") } catch (_: Exception) { return@withContext null }
     try {
-        extractor.setDataSource(context, uri, null)
         val format = (0 until extractor.trackCount).map { extractor.getTrackFormat(it) }
             .firstOrNull { it.getString(MediaFormat.KEY_MIME)?.startsWith("audio/") == true } ?: return@withContext null
         var name = uri.lastPathSegment ?: ""

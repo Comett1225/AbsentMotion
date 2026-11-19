@@ -38,6 +38,7 @@ class DeskDownloaderTest {
 
     private fun fakeScript(): File = script(
         """
+        [ "${'$'}1" = "--ignore-config" ] || { echo "ERROR: user config was read" >&2; exit 1; }
         case "${'$'}*" in
           *Fail*) echo "ERROR: This video is private" >&2; exit 1;;
           *Slow*) sleep 30; exit 0;;

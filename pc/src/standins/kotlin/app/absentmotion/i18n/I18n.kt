@@ -105,7 +105,7 @@ enum class AppLanguage(val tag: String, val nativeName: String) {
 
 fun phoneLanguage(context: Context): AppLanguage = AppLanguage.preselect(listOf(java.util.Locale.getDefault().toLanguageTag()))
 
-fun currentLanguage(context: Context): AppLanguage = AppLanguage.match(listOfNotNull(context.getSharedPreferences("language", Context.MODE_PRIVATE).getString("tag", null))) ?: AppLanguage.English
+fun currentLanguage(context: Context): AppLanguage = AppLanguage.match(listOfNotNull(context.getSharedPreferences("language", Context.MODE_PRIVATE).getString("tag", null))) ?: Strings.loaded
 
 internal fun chosenTags(appLocales: List<String>?, legacy: String?): List<String> = appLocales?.ifEmpty { null } ?: listOfNotNull(legacy)
 

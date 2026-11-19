@@ -537,6 +537,7 @@ void DrawGroupBorders(SkCanvas* canvas, const Layer& l, float t, bool pixelEdged
 thread_local const LayerEffects* gEffects = nullptr;
 thread_local const Scene* gScene = nullptr;
 thread_local bool gWorld = false;
+thread_local int gGroupDepth = 0;
 
 int Fps() { return gScene ? gScene->fps : 30; }
 
@@ -548,6 +549,11 @@ bool EffectsApply(const std::vector<Layer>& siblings, const Layer& l) {
 
 bool SeesPrevious(const std::vector<Layer>& siblings, const Layer& l) {
     return EffectsApply(siblings, l) && (gEffects->lifted(l) || gEffects->behind(l));
+}
+
+bool EdgedByPixels(const std::vector<Layer>& siblings, const Layer& l, const MediaPictures& pictures) {
+    return PixelEdged(l, pictures) ||
+           (ShapeKind(l) && !l.text && l.fillType == "media" && EffectsApply(siblings, l) && !SeesPrevious(siblings, l));
 }
 
 struct Override {
@@ -587,8 +593,9 @@ void DrawGroup(SkCanvas* canvas, const Layer& l, double timeMs, const MediaPictu
                 scene.beats.erase(std::unique(scene.beats.begin(), scene.beats.end()), scene.beats.end());
             }
             gScene = &scene;
+            gGroupDepth++;
         }
-        ~Context() { gScene = previous; }
+        ~Context() { gScene = previous; gGroupDepth--; }
     } context(l);
     if (l.fixedPrecompose && l.innerWidth > 0 && l.innerHeight > 0) {
         if (auto surface = canvas->makeSurface(SkImageInfo::MakeN32Premul(l.innerWidth, l.innerHeight))) {
@@ -1167,7 +1174,7 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
     Drawn drawn;
     const SkPath scenePath = path.makeTransform(m);
     const bool effects = EffectsApply(siblings, l);
-    const bool pixelEdged = decorate && PixelEdged(l, pictures);
+    const bool pixelEdged = decorate && EdgedByPixels(siblings, l, pictures);
     const bool bordered = decorate && std::any_of(l.borders.begin(), l.borders.end(), [&](const Edge& e) { return ShaderBorder(l, e, t, pixelEdged); });
     const bool early = pixelEdged && bordered && SeesPrevious(siblings, l) && !gEffects->lifted(l);
     const auto order = [&](const LayerEffect& e) { return std::clamp((int)std::lround(Setting(e, "layer", t, 0)), 0, 2); };
@@ -1290,7 +1297,7 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
         }
     }
     if (!effects || !gEffects->draw(canvas, *gScene, l, timeMs, effectArea, effectMatrix, picture, below)) picture(canvas);
-    if (effects && gEffects->lifted(l) && !(gEffects->spills && gEffects->spills(l)) && !scenePath.isEmpty()) {
+    if (effects && gEffects->lifted(l) && !(gEffects->spills && gEffects->spills(l, timeMs)) && !scenePath.isEmpty()) {
         SkPaint mask;
         mask.setAntiAlias(true);
         if (copies || pixelEdged) {
@@ -1595,6 +1602,14 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
         }
         Override plain = ov;
         plain.feedback = true;
+        const bool grouped = !ov.blend && !IsNormal(l.blending) && !SeesPrevious(siblings, l);
+        if (grouped) {
+            SkPaint composite;
+            SetBlend(&composite, l.blending);
+            canvas->saveLayer(nullptr, &composite);
+            plain.blend = true;
+            plain.mode = SkBlendMode::kSrcOver;
+        }
         const bool inward = shrink < 1;
         float gain = 1;
         if (const sk_sp<SkImage> shown = trails && l.fillType == "media" ? pictures(l.mediaUri, l.id) : nullptr) {
@@ -1627,12 +1642,21 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
             if (gBreak) (*gBreak)();
         }
         if (!inward) DrawOne(canvas, siblings, l, timeMs, pictures, plain);
+        if (grouped) canvas->restore();
         return;
     }
     Echo echo;
     if (!ov.echoed && EchoOf(l, timeMs, &echo)) {
         Override plain = ov;
         plain.echoed = true;
+        const bool grouped = !ov.blend && !IsNormal(l.blending) && !SeesPrevious(siblings, l);
+        if (grouped) {
+            SkPaint composite;
+            SetBlend(&composite, l.blending);
+            canvas->saveLayer(nullptr, &composite);
+            plain.blend = true;
+            plain.mode = SkBlendMode::kSrcOver;
+        }
         auto past = [&](int i) {
             Override faded = plain;
             faded.alpha = ov.alpha * (1 + (echo.alpha - 1) * i / echo.count);
@@ -1643,6 +1667,7 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
         if (!echo.atop) for (int i = echo.count; i >= 1; i--) past(i);
         DrawOne(canvas, siblings, l, timeMs, pictures, plain);
         if (echo.atop) for (int i = 1; i <= echo.count; i++) past(i);
+        if (grouped) canvas->restore();
         return;
     }
     ShutterBlur shutter;
@@ -1655,7 +1680,7 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
     if (!(opacity > 0)) return;
     const bool group = l.kind == "embedScene";
     bool decorated = false;
-    const bool pixelEdged = PixelEdged(l, pictures);
+    const bool pixelEdged = EdgedByPixels(siblings, l, pictures);
     for (const Edge& e : l.borders) decorated |= ShaderBorder(l, e, t, pixelEdged);
     const bool shadow = ShadowOn(l);
     decorated = decorated || shadow || EffectsApply(siblings, l);
@@ -1683,7 +1708,7 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
             }
         }
     };
-    const bool spilled = EffectsApply(siblings, l) && gEffects->spills && gEffects->spills(l);
+    const bool spilled = EffectsApply(siblings, l) && gEffects->spills && gEffects->spills(l, timeMs);
     if (!group && !decorated && !blended && !spilled && (opacity >= 1 || !overlaps)) {
         DrawContent(canvas, siblings, l, timeMs, opacity, false, pictures, repeated ? &copies : nullptr);
         centredBorders(canvas, opacity);
@@ -1731,6 +1756,8 @@ void SetLayerEffects(const LayerEffects* effects, const Scene* scene, bool world
 }
 
 bool WorldView() { return gWorld; }
+
+bool InsideGroup() { return gGroupDepth > 0; }
 
 bool EffectOwnerMatrix(int64_t owner, double timeMs, SkMatrix* matrix) {
     if (!gEffectList) return false;
@@ -1880,12 +1907,22 @@ static bool CutoutContains(const Layer& l, float t, const SkPath& path, const Sk
     return false;
 }
 
+static bool CropFrame(const Layer& l, float t, SkRect* box) {
+    const bool on = std::any_of(l.effects.begin(), l.effects.end(), [&](const LayerEffect& e) {
+        return !e.hidden && e.id == "absent.crop" && (e.value("left", t, 0) > 0 || e.value("top", t, 0) > 0 || e.value("right", t, 0) > 0 || e.value("bottom", t, 0) > 0);
+    });
+    if (on) *box = CroppedBox(l, t, l.effects.size());
+    return on;
+}
+
 static bool ContainsOne(const std::vector<Layer>& siblings, const Layer& l, double timeMs, SkPoint p, const MediaPictures& masks) {
     const SkMatrix matrix = SiblingMatrix(siblings, l, timeMs);
     SkMatrix inverse;
     if (!matrix.invert(&inverse)) return false;
     if (matrix.hasPerspective() && !(inverse.mapPointToHomogeneous(p).fZ > 0)) return false;
     const SkPoint local = inverse.mapPoint(p);
+    SkRect crop;
+    if (CropFrame(l, l.localTime(timeMs), &crop) && !crop.contains(local.fX, local.fY)) return false;
     if (l.kind == "drawing") return DrawingContains(l, local);
     if (l.kind != "embedScene") {
         const float t = l.localTime(timeMs);
@@ -1916,11 +1953,14 @@ static float DrawnOutset(const Layer& l, float t) {
     return std::isfinite(most) ? most : 0;
 }
 
-static bool ContentRect(const Layer& l, double timeMs, const SkMatrix& matrix, SkRect* out, bool drawn = false) {
-    const SkPath shape = ShapePath(l, l.localTime(timeMs));
+static bool ContentRect(const Layer& l, double timeMs, const SkMatrix& matrix, SkRect* out, bool drawn = false, bool cropped = false) {
+    const float t = l.localTime(timeMs);
+    const SkPath shape = ShapePath(l, t);
     if (shape.isEmpty()) return false;
-    const float grow = drawn ? DrawnOutset(l, l.localTime(timeMs)) : 0;
-    *out = matrix.mapRect(shape.getBounds().makeOutset(grow, grow));
+    SkRect crop;
+    const bool cut = cropped && CropFrame(l, t, &crop);
+    const float grow = drawn ? DrawnOutset(l, t) : 0;
+    *out = matrix.mapRect((cut ? crop : shape.getBounds()).makeOutset(grow, grow));
     if (l.kind != "embedScene") return true;
     const double innerTime = NestedTime(l, timeMs);
     if (innerTime >= 0 && (l.innerBackground >> 24) != 0) return true;
@@ -1929,20 +1969,21 @@ static bool ContentRect(const Layer& l, double timeMs, const SkMatrix& matrix, S
     SkRect child;
     for (const Layer& c : l.inner()) {
         if (innerTime < 0 || !c.activeAt(innerTime) || c.kind == "nullobj" || c.kind == "camera" || c.kind == "light") continue;
-        if (!ContentRect(c, innerTime, SkMatrix::Concat(origin, SiblingMatrix(l.inner(), c, innerTime)), &child, drawn)) continue;
+        if (!ContentRect(c, innerTime, SkMatrix::Concat(origin, SiblingMatrix(l.inner(), c, innerTime)), &child, drawn, cropped)) continue;
         left = std::min(left, child.fLeft);
         top = std::min(top, child.fTop);
         right = std::max(right, child.fRight);
         bottom = std::max(bottom, child.fBottom);
     }
-    if (left <= right && top <= bottom) *out = SkRect::MakeLTRB(left, top, right, bottom);
+    SkRect content = SkRect::MakeLTRB(left, top, right, bottom);
+    if (left <= right && top <= bottom && (!cut || content.intersect(*out))) *out = content;
     return true;
 }
 
-SkRect SelectionBounds(const Layer& layer, double timeMs, const SkMatrix& matrix) {
+static SkRect FrameBounds(const Layer& layer, double timeMs, const SkMatrix& matrix, bool cropped) {
     if (matrix.hasPerspective()) {
         SkPoint corners[4];
-        SelectionBounds(layer, timeMs, SkMatrix::I()).toQuad(corners);
+        FrameBounds(layer, timeMs, SkMatrix::I(), cropped).toQuad(corners);
         for (int i = 0; i < 4; i++) {
             const SkPoint3 h = matrix.mapPointToHomogeneous(corners[i]);
             if (!(h.fZ >= 1)) return SkRect::MakeEmpty();
@@ -1952,14 +1993,20 @@ SkRect SelectionBounds(const Layer& layer, double timeMs, const SkMatrix& matrix
         bounds.setBounds({corners, 4});
         return bounds.isFinite() ? bounds : SkRect::MakeEmpty();
     }
-    if (layer.kind != "embedScene") return ShapePath(layer, layer.localTime(timeMs)).makeTransform(matrix).getBounds();
+    if (layer.kind != "embedScene") {
+        const float t = layer.localTime(timeMs);
+        SkRect crop;
+        return cropped && CropFrame(layer, t, &crop) ? matrix.mapRect(crop) : ShapePath(layer, t).makeTransform(matrix).getBounds();
+    }
     SkRect bounds = SkRect::MakeEmpty();
-    ContentRect(layer, timeMs, matrix, &bounds);
+    ContentRect(layer, timeMs, matrix, &bounds, false, cropped);
     return bounds;
 }
 
+SkRect SelectionBounds(const Layer& layer, double timeMs, const SkMatrix& matrix) { return FrameBounds(layer, timeMs, matrix, true); }
+
 SkRect DrawnBounds(const Layer& layer, double timeMs, const SkMatrix& matrix) {
-    if (matrix.hasPerspective() || layer.kind != "embedScene") return SelectionBounds(layer, timeMs, matrix);
+    if (matrix.hasPerspective() || layer.kind != "embedScene") return FrameBounds(layer, timeMs, matrix, false);
     SkRect bounds = SkRect::MakeEmpty();
     ContentRect(layer, timeMs, matrix, &bounds, true);
     return bounds;
@@ -1967,7 +2014,7 @@ SkRect DrawnBounds(const Layer& layer, double timeMs, const SkMatrix& matrix) {
 
 bool ContentIconBounds(const Layer& layer, SkRect* bounds) {
     if (layer.kind == "drawing") *bounds = DrawingBounds(layer).getBounds();
-    else if (layer.kind == "embedScene") *bounds = SelectionBounds(layer, 0, SkMatrix::I());
+    else if (layer.kind == "embedScene") *bounds = FrameBounds(layer, 0, SkMatrix::I(), false);
     else return false;
     return true;
 }
@@ -2014,7 +2061,7 @@ int64_t TopLayerAt(const Scene& scene, double timeMs, float x, float y, const Me
     if (CameraViewOn()) return 0;
     for (auto it = scene.layers.rbegin(); it != scene.layers.rend(); ++it) {
         SkPoint frame[4];
-        if (it->kind == "camera" && it->activeAt(timeMs) && CameraFrame(scene.layers, *it, scene.width, scene.height, timeMs, frame) &&
+        if (it->kind == "camera" && it->activeAt(timeMs) && CameraFrame(scene.layers, *it, scene.width, scene.height, timeMs, frame, scene.depthOrder) &&
             SkPath::Polygon({frame, 4}, true).contains(x, y)) return it->id;
     }
     return 0;
@@ -2085,10 +2132,17 @@ bool InheritEffects(const std::vector<Layer>& layers, std::vector<Layer>* out) {
         for (int depth = 0; up != 0 && depth < kMaxParentDepth; depth++) {
             auto parent = std::find_if(layers.begin(), layers.end(), [&](const Layer& p) { return p.id == up && p.id != l.id; });
             if (parent == layers.end()) break;
+            const double from = parent->startTime, span = parent->endTime - parent->startTime, own = std::max(1, l.endTime - l.startTime);
+            const auto retime = [&](float t) { return (float)((from + t * span - l.startTime) / own); };
             for (const LayerEffect& e : parent->effects) {
                 if (!Shared(e)) continue;
-                l.effects.push_back(e);
-                l.effects.back().owner = parent->id;
+                LayerEffect& copy = l.effects.emplace_back(e);
+                copy.owner = parent->id;
+                copy.ownerStart = parent->startTime;
+                for (Property& p : copy.props) {
+                    for (Keyframe& k : p.anim.keys) k.t = retime(k.t);
+                    p.anim.lead.t = retime(p.anim.lead.t);
+                }
             }
             up = parent->parent;
         }
@@ -2103,7 +2157,7 @@ bool Mixable(const std::vector<Layer>& layers, const Layer& l, double timeMs) {
     ShutterBlur shutter;
     if (EchoOf(l, timeMs, &echo) || ShutterBlurOf(l, timeMs, &shutter)) return false;
     const bool effects = EffectsApply(layers, l);
-    if (effects && (gEffects->lifted(l) || gEffects->behind(l) || (gEffects->spills && gEffects->spills(l)))) return false;
+    if (effects && (gEffects->lifted(l) || gEffects->behind(l) || (gEffects->spills && gEffects->spills(l, timeMs)))) return false;
     const float t = l.localTime(timeMs);
     int last = -1;
     bool emits = false, deep = false, tinted = false;
@@ -2171,10 +2225,14 @@ void DrawList(SkCanvas* canvas, const std::vector<Layer>& listed, int width, int
         SkPaint stack;
         stack.setAlphaf(std::clamp(base.opacity.get(0, t, 1) * MotionOpacity(base, timeMs), 0.0f, 1.0f));
         SetBlend(&stack, base.blending);
-        canvas->saveLayer(nullptr, &stack);
+        Echo echo;
+        const bool seeded = SeesPrevious(layers, base) && !EchoOf(base, timeMs, &echo) && !base.effect("absent.videofeedback") &&
+                            (base.fillType != "media" || pictures(base.mediaUri, base.id));
+        canvas->saveLayer(SkCanvas::SaveLayerRec(nullptr, &stack, seeded ? SkCanvas::kInitWithPrevious_SaveLayerFlag : 0));
         Override plain;
         plain.blend = true;
         plain.unitOpacity = true;
+        if (seeded) plain.mode = SkBlendMode::kSrc;
         DrawOne(canvas, layers, base, timeMs, pictures, plain);
         Override clipped;
         clipped.blend = true;

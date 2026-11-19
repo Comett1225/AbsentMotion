@@ -71,10 +71,12 @@ suspend fun trimVideo(context: Context, picked: PickedMedia, job: TrimJob, progr
     val range = job.range
     var finished = false
     try {
-        if (job.copy) {
+        val copied = job.copy && try {
             if (PlatformFeatures.desktop) trimCopyOnDesktop(uri, range.startUs, range.endUs, out, progress)
             else copyRange(app, uri, range.startUs, range.endUs, true, picked.rotation, out, progress, range.lengthUs)
-        } else {
+            true
+        } catch (_: CannotCopy) { false }
+        if (!copied) {
             val plan = encodable(trimVideoJob(picked.source))
             val encoded = plan.audioKbps > 0 && !plan.copyAudio && !PlatformFeatures.desktop
             if (encoded) encodeSound(app, uri, range.lengthUs, plan.audioKbps, sound, false, range.startUs) { progress(it * 0.1f) }

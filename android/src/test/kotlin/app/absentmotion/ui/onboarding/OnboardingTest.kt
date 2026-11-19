@@ -18,6 +18,7 @@ class OnboardingTest {
 
     @Test fun aChosenLanguageResumesAtThePhoneCheck() {
         assertEquals(OnboardingStep.Check, FirstRun.start(ONBOARDING_LANGUAGE_CHOSEN))
+        assertEquals(OnboardingStep.Look, FirstRun.start(ONBOARDING_LANGUAGE_CHOSEN, lookChosen = false))
     }
 
     @Test fun finishedOnboardingNeverShowsAgain() {

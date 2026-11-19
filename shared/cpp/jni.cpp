@@ -93,17 +93,21 @@ JNIEXPORT jstring JNICALL JNI_FN(nativeTiming)(JNIEnv* env, jclass, jlong engine
     return env->NewStringUTF(engineOf(engine)->timing(targetOf(target)).c_str());
 }
 
-JNIEXPORT jstring JNICALL JNI_FN(nativeSetScene)(JNIEnv* env, jclass, jlong engine, jbyteArray xml) {
+JNIEXPORT jstring JNICALL JNI_FN(nativeSetScene)(JNIEnv* env, jclass, jlong engine, jbyteArray xml, jboolean keepHeld) {
     std::string text((size_t)env->GetArrayLength(xml), '\0');
     env->GetByteArrayRegion(xml, 0, (jsize)text.size(), reinterpret_cast<jbyte*>(text.data()));
     std::string error;
-    return engineOf(engine)->setScene(text, &error) ? nullptr : env->NewStringUTF(error.c_str());
+    return engineOf(engine)->setScene(text, &error, keepHeld) ? nullptr : env->NewStringUTF(error.c_str());
 }
 
 JNIEXPORT jstring JNICALL JNI_FN(nativeLoadEffect)(JNIEnv* env, jclass, jlong engine, jbyteArray xml) {
     std::string text((size_t)env->GetArrayLength(xml), '\0');
     env->GetByteArrayRegion(xml, 0, (jsize)text.size(), reinterpret_cast<jbyte*>(text.data()));
     return env->NewStringUTF(engineOf(engine)->loadEffect(text).c_str());
+}
+
+JNIEXPORT void JNICALL JNI_FN(nativeForgetHeld)(JNIEnv*, jclass, jlong engine) {
+    engineOf(engine)->forgetHeld();
 }
 
 JNIEXPORT jint JNICALL JNI_FN(nativeMaxPictureSize)(JNIEnv*, jclass, jlong engine) {

@@ -38,6 +38,7 @@ data class Palette(
     val Cool: Color,
     val CoolDeep: Color,
     val Gold: Color,
+    val Favorite: Color,
     val Warning: Color,
     val Bookmark: Color,
     val LayerBar: Color,
@@ -101,6 +102,7 @@ data class Palette(
         "Cool" to Cool,
         "CoolDeep" to CoolDeep,
         "Gold" to Gold,
+        "Favorite" to Favorite,
         "Warning" to Warning,
         "Bookmark" to Bookmark,
         "LayerBar" to LayerBar,
@@ -166,6 +168,7 @@ data class Palette(
             "Cool",
             "CoolDeep",
             "Gold",
+            "Favorite",
             "Warning",
             "Bookmark",
             "LayerBar",
@@ -230,6 +233,7 @@ data class Palette(
             Cool = colours["Cool"] ?: base.Cool,
             CoolDeep = colours["CoolDeep"] ?: base.CoolDeep,
             Gold = colours["Gold"] ?: base.Gold,
+            Favorite = colours["Favorite"] ?: colours["Gold"] ?: base.Favorite,
             Warning = colours["Warning"] ?: base.Warning,
             Bookmark = colours["Bookmark"] ?: base.Bookmark,
             LayerBar = colours["LayerBar"] ?: base.LayerBar,
@@ -294,6 +298,7 @@ data class Palette(
             Cool = Color(0xFF6DB8FF),
             CoolDeep = Color(0xFF24466F),
             Gold = Color(0xFFFFD65C),
+            Favorite = Color(0xFFFFD83D),
             Warning = Color(0xFFFF8A94),
             Bookmark = Color(0xFFF26AA8),
             LayerBar = Color(0xFF5BB4A0),
@@ -381,6 +386,7 @@ data class Palette(
             Cool = Color(0xFF1A5BA8),
             CoolDeep = Color(0xFFBCD6F4),
             Gold = Color(0xFFA56A00),
+            Favorite = Color(0xFFAE7200),
             Warning = Color(0xFFB91F28),
             Bookmark = Color(0xFFD0357F),
             LayerBar = Color(0xFF5BB4A0),
@@ -464,6 +470,7 @@ object Am {
     val Cool: Color get() = palette.Cool
     val CoolDeep: Color get() = palette.CoolDeep
     val Gold: Color get() = palette.Gold
+    val Favorite: Color get() = palette.Favorite
     val Warning: Color get() = palette.Warning
     val Bookmark: Color get() = palette.Bookmark
     val LayerBar: Color get() = palette.LayerBar

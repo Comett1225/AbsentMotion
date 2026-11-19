@@ -25,7 +25,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
@@ -43,7 +42,6 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import app.absentmotion.platform.LocalContext
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -71,6 +69,7 @@ import app.absentmotion.model.addEffect
 import app.absentmotion.model.effects
 import app.absentmotion.ui.editor.CaptionsSheet
 import app.absentmotion.ui.editor.PanelIcons
+import app.absentmotion.ui.editor.FavouriteStar
 import app.absentmotion.ui.editor.matchesSearch
 import app.absentmotion.ui.export.ExportIcons
 import app.absentmotion.ui.home.HelpScreen
@@ -148,7 +147,7 @@ private fun BrowserBody(state: EditorState) {
     val keyboard = androidx.compose.ui.platform.LocalSoftwareKeyboardController.current
     val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
     fun hideKeyboard() { focusManager.clearFocus(force = true); keyboard?.hide() }
-    fun close() { hideKeyboard(); state.effectDetail = null; state.effectCategory = null; state.effectTargets = null; state.effectBrowserOpen = false }
+    fun close() { hideKeyboard(); state.effectBrowserOpen = false }
     var fromAudio by remember { mutableStateOf(false) }
     val homeScroll = rememberScrollState()
     val grids = remember { HashMap<String, androidx.compose.foundation.lazy.grid.LazyGridState>() }
@@ -307,10 +306,7 @@ private fun BrowserBody(state: EditorState) {
                     if (state.effectDetail == null) Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Text(stringResource(R.string.standard_settings), Modifier.weight(1f).height(48.dp).alpha(if (effect.usable(blocked)) 1f else 0.35f)
                             .clickable(enabled = effect.usable(blocked)) { add(effect) }.padding(12.dp), color = Am.OnDark, fontSize = 15.sp)
-                        Box(Modifier.size(48.dp).clickable { favourite(effect) }) {
-                            FavouriteStar(effect.id in favourites, stringResource(R.string.effectbrowser_favorite), Modifier.fillMaxSize().padding(12.dp))
-                            HoldName(stringResource(R.string.effectbrowser_favorite))
-                        }
+                        FavouriteStar(effect.id in favourites, { favourite(effect) }, stringResource(R.string.effectbrowser_favorite), Modifier.size(48.dp))
                     }
                     if (state.effectDetail == null) effect.presets.forEach { preset ->
                         Row(Modifier.fillMaxWidth().height(72.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -319,7 +315,7 @@ private fun BrowserBody(state: EditorState) {
                                 Thumbnail(catalog, effect.thumbnail(preset), Modifier.size(56.dp).clip(RoundedCornerShape(5.dp)))
                                 Text(preset.name, Modifier.weight(1f).padding(start = 12.dp), color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
                             }
-                            PresetStar(presetFavourites.contains(effect, preset)) { presetFavourites.toggle(effect, preset) }
+                            FavouriteStar(presetFavourites.contains(effect, preset), { presetFavourites.toggle(effect, preset) }, stringResource(R.string.effectbrowser_favorite_preset), Modifier.size(48.dp))
                         }
                     }
                     }
@@ -526,20 +522,12 @@ private fun EffectTile(catalog: EffectCatalog, effect: EffectDefinition, width: 
         .rightClick(onLongClick).combinedClickable(press, LocalIndication.current, onClick = onClick, onLongClick = onLongClick).padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Box {
             Thumbnail(catalog, preset?.let(effect::thumbnail) ?: effect.thumbnail, Modifier.size((width - 7).dp).clip(RoundedCornerShape(5.dp)))
-            if (favourite) Icon(PanelIcons.StarFilled, null, Modifier.align(Alignment.TopEnd).size(14.dp), tint = Am.Accent)
+            if (favourite) Icon(PanelIcons.StarFilled, null, Modifier.align(Alignment.TopEnd).size(14.dp), tint = Am.Favorite)
             if (preset == null && catalog.isNew(effect)) Text(stringResource(R.string.t_new), Modifier.align(Alignment.TopStart).padding(3.dp).clip(RoundedCornerShape(3.dp)).background(Am.Accent)
                 .padding(horizontal = 3.dp), color = Am.OnAccent, fontSize = if (deskLayout) 12.sp else 7.sp, lineHeight = if (deskLayout) 14.sp else 9.sp, fontWeight = FontWeight.Bold, maxLines = 1)
         }
         Text(preset?.name ?: effect.name, Modifier.fillMaxWidth().padding(top = 4.dp), color = Am.OnDark, fontSize = if (deskLayout) 12.sp else if (width > 100) 10.sp else 8.sp,
             lineHeight = if (deskLayout) 14.sp else 9.sp, textAlign = TextAlign.Center, maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
-    }
-}
-
-@Composable
-internal fun PresetStar(favourite: Boolean, onToggle: () -> Unit) {
-    Box(Modifier.size(48.dp).toggleable(favourite, role = Role.Checkbox) { onToggle() }, contentAlignment = Alignment.Center) {
-        app.absentmotion.ui.editor.DeskTip(stringResource(R.string.effectbrowser_favorite_preset)) { FavouriteStar(favourite, stringResource(R.string.effectbrowser_favorite_preset), Modifier.size(24.dp)) }
-        HoldName(stringResource(R.string.effectbrowser_favorite_preset))
     }
 }
 
@@ -630,18 +618,4 @@ internal fun Modifier.effectSwipe(enabled: Boolean, accept: (Int) -> Boolean, dr
             finish(tracker.calculateVelocity().x, width)
         }
     }
-}
-
-@Composable
-internal fun FavouriteStar(on: Boolean, description: String?, modifier: Modifier = Modifier) {
-    val pop = remember { androidx.compose.animation.core.Animatable(1f) }
-    val shown = remember { booleanArrayOf(on) }
-    LaunchedEffect(on) {
-        if (shown[0] == on) return@LaunchedEffect
-        shown[0] = on
-        pop.animateTo(0.85f, androidx.compose.animation.core.tween(70, easing = androidx.compose.animation.core.FastOutSlowInEasing))
-        pop.animateTo(1.15f, androidx.compose.animation.core.tween(90, easing = androidx.compose.animation.core.FastOutSlowInEasing))
-        pop.animateTo(1f, androidx.compose.animation.core.tween(90, easing = androidx.compose.animation.core.FastOutSlowInEasing))
-    }
-    Icon(if (on) PanelIcons.StarFilled else PanelIcons.Star, description, modifier.graphicsLayer { scaleX = pop.value; scaleY = pop.value }, tint = if (on) Am.Accent else Am.OnDark)
 }

@@ -88,15 +88,17 @@ internal class LiveRecording(
     val key: Any?,
     private val overwrite: Boolean,
     val pivotId: Long? = null,
+    private val normalized: (effect: String, name: String) -> Boolean = { _, _ -> false },
 ) {
-    private class Track(val original: XmlNode, var tolerance: Float, val samples: MutableList<RecordedSample> = mutableListOf())
+    private class Track(val original: XmlNode, var tolerance: Float, val effect: String?, val samples: MutableList<RecordedSample> = mutableListOf())
     private val tracks = linkedMapOf<RecordedProperty, Track>()
     val active: Boolean get() = tracks.isNotEmpty()
 
     private fun sampled(layer: Layer, node: XmlNode, frame: Int, scene: Scene): Layer =
         if (node.name == "speedMap") layer.atVideoTime(scene.frameTime(frame), scene.fps) else layer.at(scene.frameTime(frame), scene.fps)
 
-    private fun tolerance(scene: Scene, layer: Layer, node: XmlNode, frame: Int): Float = when {
+    private fun tolerance(scene: Scene, layer: Layer, node: XmlNode, frame: Int, effect: String?): Float = when {
+        effect != null && (node["type"] == "vec2" || node["type"] == "vec3") && normalized(effect, node["name"].orEmpty()) -> 0.5f / max(1, max(scene.width, scene.height))
         node.name == "location" || node.name == "pivot" || node["type"] == "vec2" || node["type"] == "vec3" -> {
             val place = scene.place(layer, scene.frameTime(frame))
             0.5f / max(1f, max(abs(place.sx), abs(place.sy)))
@@ -118,7 +120,7 @@ internal class LiveRecording(
         }
         val sample = RecordedSample(frame, at.t, recorded, at.snap.start, at.snap.endInclusive)
         if (track.samples.lastOrNull()?.frame == frame) track.samples[track.samples.lastIndex] = sample else track.samples.add(sample)
-        track.tolerance = minOf(track.tolerance, tolerance(scene, layer, node, frame))
+        track.tolerance = minOf(track.tolerance, tolerance(scene, layer, node, frame, track.effect))
     }
 
     fun capture(before: Scene, after: Scene, frame: Int): Boolean {
@@ -127,8 +129,10 @@ internal class LiveRecording(
             val next = after.layer(layer.id) ?: continue
             if (layer.startTime != next.startTime || layer.endTime != next.endTime) return false
         }
-        var changed = false
-        fun walk(layer: Layer, next: Layer, old: XmlNode, node: XmlNode, path: List<Int>) {
+        class Found(val address: RecordedProperty, val old: XmlNode, val layer: Layer, val node: XmlNode, val value: String, val effect: String?)
+        val found = ArrayList<Found>()
+        var whole = false
+        fun walk(layer: Layer, next: Layer, old: XmlNode, node: XmlNode, path: List<Int>, effect: String?) {
             if (old.name != node.name || old["name"] != node["name"] || old["id"] != node["id"] || node.name == "scene") return
             val address = RecordedProperty(layer.id, path)
             val pivot = pivotId == layer.id && node.name == "pivot" && path.size == 2
@@ -136,18 +140,31 @@ internal class LiveRecording(
                 val at = sampled(next, node, frame, after)
                 val was = old.valueAt(sampled(layer, old, frame, before).t)
                 val value = node.valueAt(at.t)
+                val keys = node.keyframes
                 if (old.isKeyframed && node.isKeyframed && node.children.none { it.name == "valueLink" } &&
-                    old.keyframes.map { it.t to it.v } != node.keyframes.map { it.t to it.v } && value != null && was != value) {
-                    val track = tracks.getOrPut(address) { Track(old, tolerance(after, next, node, frame)) }
-                    append(track, next, node, frame, value, after)
-                    changed = true
+                    old.keyframes.map { it.t to it.v } != keys.map { it.t to it.v } && value != null && was != value) {
+                    fun away(list: List<Keyframe>) = list.filter { it.t !in at.snap }.map { it.t to it.v }
+                    if (pivotId == null && (away(old.keyframes) != away(keys) || keys.none { it.t in at.snap })) whole = true
+                    else found += Found(address, old, next, node, value, effect)
                 }
             }
+            val inner = if (node.name == "effect") node["id"] else effect
             val previous = old.children.filter { it.name != "kf" }
-            node.children.filter { it.name != "kf" }.forEachIndexed { i, child -> previous.getOrNull(i)?.let { walk(layer, next, it, child, path + i) } }
+            node.children.filter { it.name != "kf" }.forEachIndexed { i, child -> previous.getOrNull(i)?.let { walk(layer, next, it, child, path + i, inner) } }
         }
-        for (layer in before.layers) walk(layer, after.layer(layer.id)!!, layer.node, after.layer(layer.id)!!.node, emptyList())
-        return changed
+        for (layer in before.layers) walk(layer, after.layer(layer.id)!!, layer.node, after.layer(layer.id)!!.node, emptyList(), null)
+        if (whole) return false
+        for (f in found) append(tracks.getOrPut(f.address) { Track(f.old, tolerance(after, f.layer, f.node, frame, f.effect), f.effect) }, f.layer, f.node, frame, f.value, after)
+        return found.isNotEmpty()
+    }
+
+    fun nextLap(scene: Scene, frame: Int): LiveRecording = LiveRecording(scene, key, overwrite, pivotId, normalized).also { lap ->
+        for ((address, track) in tracks) {
+            val layer = scene.layer(address.layer) ?: continue
+            val node = layer.node.propertyAt(address.path) ?: continue
+            val value = track.samples.lastOrNull()?.value ?: continue
+            lap.append(Track(node, track.tolerance, track.effect).also { lap.tracks[address] = it }, layer, node, frame, value, scene)
+        }
     }
 
     fun hold(scene: Scene, frame: Int): Scene {

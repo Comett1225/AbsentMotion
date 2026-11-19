@@ -174,9 +174,13 @@ object FfmpegEngine : MediaEngine {
 
     override fun compress(input: File, job: VideoJob, audio: Boolean, durationUs: Long, out: File, startUs: Long, endUs: Long, progress: (Float) -> Unit, alive: () -> Boolean) {
         val settings = ExportSettings(min(job.width, job.height), job.fps)
-        val encoder = DeskEncoders.video(Codec.H264).firstOrNull { DeskEncoders.works(it, settings, job.width, job.height) } ?: throw ExportError(txt(R.string.compress_failed, "no video encoder"))
+        val encoder = DeskEncoders.video(Codec.H264).firstOrNull { DeskEncoders.works(it, settings, job.width, job.height) } ?: throw ExportError(txt(R.string.library_text_value, "no video encoder"))
         val args = DeskEncoders.videoArgs(encoder, settings, job.width, job.height).toMutableList()
         args[args.indexOf("-b:v") + 1] = "${job.bitrate}"
+        val color = runCatching { app.absentmotion.desk.DeskProbe.of(input).video }.getOrNull()
+        for ((flag, value) in listOf("-colorspace" to color?.space, "-color_primaries" to color?.primaries, "-color_trc" to color?.transfer, "-color_range" to color?.range)) {
+            if (!value.isNullOrBlank() && value != "unknown" && value != "gbr" && !value.startsWith("reserved") && flag in args) args[args.indexOf(flag) + 1] = value
+        }
         val sound = when { !audio || job.audioKbps <= 0 -> listOf("-an"); job.copyAudio -> listOf("-c:a", "copy"); else -> listOf("-c:a", DeskEncoders.audio(AudioCodec.Aac, job.audioKbps).firstOrNull() ?: "aac", "-b:a", "${job.audioKbps}k") }
         val shownUs = if (startUs > 0 && endUs > startUs) shownFrom(input, startUs, endUs) else startUs
         val late = audio && shownUs < startUs
@@ -185,7 +189,7 @@ object FfmpegEngine : MediaEngine {
         val upload = if (encoder.endsWith("_vaapi")) ",format=nv12,hwupload" else ""
         val command = listOf(ffmpeg, "-y", "-v", "error", "-progress", "pipe:1", "-nostats") + DeskEncoders.device(encoder) + range + listOf("-map", "0:v:0") +
             (if (audio) listOf("-map", if (late) "1:a:0?" else "0:a:0?") else emptyList()) + listOf("-vf", "scale=${job.width}:${job.height},fps=${job.fps}$upload") + args + sound + listOf("-movflags", "+faststart", out.path)
-        watched(command, durationUs, 1f, { ExportError(txt(R.string.compress_failed, "ffmpeg")) }, progress, alive)
+        watched(command, durationUs, 1f, { ExportError(txt(R.string.library_text_value, "ffmpeg")) }, progress, alive)
     }
 
     private fun shownFrom(input: File, startUs: Long, endUs: Long): Long = runCatching {

@@ -47,6 +47,7 @@ class FfmpegVideoSource(private val file: File, private val ffmpeg: String, ffpr
     private val width: Int
     private val height: Int
     private val fps: Double
+    private val shiftUs: Long
     private var process: Process? = null
     private var stream: InputStream? = null
     private var decodedFrame = -1L
@@ -56,7 +57,8 @@ class FfmpegVideoSource(private val file: File, private val ffmpeg: String, ffpr
     }
 
     init {
-        val probe = ProcessBuilder(ffprobe, "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height,avg_frame_rate,r_frame_rate:format=duration", "-of", "json", file.absolutePath).start()
+        val probe = ProcessBuilder(ffprobe, "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height,avg_frame_rate,r_frame_rate,start_time:format=duration,start_time", "-of", "json", file.absolutePath)
+            .redirectError(ProcessBuilder.Redirect.DISCARD).start()
         val json = JSONObject(probe.inputStream.bufferedReader().readText())
         check(probe.waitFor() == 0)
         val video = json.getJSONArray("streams").getJSONObject(0)
@@ -73,6 +75,8 @@ class FfmpegVideoSource(private val file: File, private val ffmpeg: String, ffpr
         fps = (rate("avg_frame_rate") ?: rate("r_frame_rate") ?: 30.0).coerceIn(0.001, 1000.0)
         val duration = (json.optJSONObject("format")?.optString("duration")?.toDoubleOrNull()?.times(1000) ?: 0.0).toLong()
         info = VideoInfo(originalWidth, originalHeight, duration, fps)
+        fun start(node: JSONObject?) = node?.optString("start_time")?.toDoubleOrNull()?.takeIf { it.isFinite() }
+        shiftUs = start(video)?.let { stream -> ((stream - (start(json.optJSONObject("format")) ?: stream)) * 1_000_000).toLong().coerceAtLeast(0) } ?: 0L
         bytes = ByteArray(width * height * 4)
     }
 
@@ -81,7 +85,7 @@ class FfmpegVideoSource(private val file: File, private val ffmpeg: String, ffpr
         if (target == decodedFrame) return VideoFrame(width, height, bytes)
         if (stream == null || target < decodedFrame || target > decodedFrame + 3) {
             close()
-            process = ProcessBuilder(ffmpeg, "-v", "error", "-ss", "${target / fps}", "-noautorotate", "-i", file.absolutePath, "-an", "-vf", "scale=$width:$height", "-pix_fmt", "rgba", "-f", "rawvideo", "-").redirectError(ProcessBuilder.Redirect.DISCARD).start()
+            process = ProcessBuilder(ffmpeg, "-v", "error", "-ss", String.format(java.util.Locale.ROOT, "%.6f", target / fps + shiftUs / 1_000_000.0), "-noautorotate", "-i", file.absolutePath, "-an", "-vf", "scale=$width:$height", "-pix_fmt", "rgba", "-f", "rawvideo", "-").redirectError(ProcessBuilder.Redirect.DISCARD).start()
             stream = process!!.inputStream
             decodedFrame = target - 1
         }
@@ -100,7 +104,7 @@ class FfmpegVideoSource(private val file: File, private val ffmpeg: String, ffpr
 
     override fun frameExact(timeUs: Long): VideoFrame? {
         exactFrames[timeUs]?.let { return it }
-        val seconds = String.format(java.util.Locale.ROOT, "%.6f", (timeUs - 1).coerceAtLeast(0) / 1_000_000.0)
+        val seconds = String.format(java.util.Locale.ROOT, "%.6f", ((timeUs - 1).coerceAtLeast(0) + shiftUs) / 1_000_000.0)
         val process = ProcessBuilder(ffmpeg, "-nostdin", "-v", "error", "-ss", seconds, "-noautorotate", "-i", file.absolutePath,
             "-frames:v", "1", "-an", "-vf", "scale=$width:$height", "-pix_fmt", "rgba", "-f", "rawvideo", "-")
             .redirectError(ProcessBuilder.Redirect.DISCARD).start()

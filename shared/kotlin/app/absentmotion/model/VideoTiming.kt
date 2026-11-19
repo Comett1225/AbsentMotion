@@ -45,9 +45,9 @@ class VideoTiming(layer: Layer) {
         val keys = map?.keyframes.orEmpty().distinctBy { it.t }.filter { it.v.toDoubleOrNull()?.isFinite() == true }
         val samples = mutableListOf<Pair<Double, Double>>()
         if (keys.isEmpty()) {
-            samples += 0.0 to ((map?.get("value")?.toDoubleOrNull()?.takeIf { it.isFinite() } ?: layer.node["speed"]?.toDoubleOrNull()?.takeIf { it.isFinite() } ?: 1.0).coerceAtLeast(SLOWEST_SPEED.toDouble()))
+            samples += 0.0 to ((map?.get("value")?.toDoubleOrNull()?.takeIf { it.isFinite() } ?: layer.node["speed"]?.toDoubleOrNull()?.takeIf { it.isFinite() } ?: 1.0).coerceIn(SLOWEST_SPEED.toDouble(), FASTEST_SPEED.toDouble()))
         } else {
-            samples += keys.first().t.toDouble() / 1_000_000 to keys.first().v.toDouble().coerceAtLeast(MIN_SPEED)
+            samples += keys.first().t.toDouble() / 1_000_000 to keys.first().v.toDouble().coerceIn(MIN_SPEED, FASTEST_SPEED.toDouble())
             for ((a, b) in keys.zipWithNext()) {
                 val easing = Easing.parse(b.e)
                 val count = if (easing.isLinear) 1 else ceil((b.t - a.t) / 50_000_000.0).toInt().coerceIn(1, 250)
@@ -55,7 +55,7 @@ class VideoTiming(layer: Layer) {
                 for (i in 1..count) {
                     val u = i.toFloat() / count
                     val value = a.v.toDouble() + (b.v.toDouble() - a.v.toDouble()) * (eased?.get(i - 1) ?: u)
-                    samples += (a.t + (b.t - a.t) * u).toDouble() / 1_000_000 to value.coerceAtLeast(MIN_SPEED)
+                    samples += (a.t + (b.t - a.t) * u).toDouble() / 1_000_000 to value.coerceIn(MIN_SPEED, FASTEST_SPEED.toDouble())
                 }
             }
         }
@@ -335,7 +335,7 @@ fun Layer.withSpeedKeyframeToggled(projectTime: Int, fps: Int): Layer {
         val next = keys.indexOfFirst { it.t > media }
         val value = timing.speed(local).toString()
         val inserted = Keyframe(media, value)
-        if (next > 0 && !Easing.parse(keys[next].e).isLinear && keys[next - 1].v.finiteFloat() != null && keys[next].v.finiteFloat() != null && keys[next].t > keys[next - 1].t) {
+        if (next > 0 && Easing.parse(keys[next].e).let { it.type == "cubicBezier" && !it.isLinear } && keys[next - 1].v.finiteFloat() != null && keys[next].v.finiteFloat() != null && keys[next].t > keys[next - 1].t) {
             val a = keys[next - 1]; val b = keys[next]
             val curve = Easing.parse(b.e)
             val split = splitSpeedBezier(curve, (media - a.t) / (b.t - a.t))
@@ -457,6 +457,7 @@ private fun splitSpeedBezier(curve: Easing, x: Float): Pair<Easing, Easing> {
 }
 
 fun Layer.withSlowestSpeed(): Layer {
+    if (kind != "audio" && mediaFill?.video != true) return this
     val map = node.child("speedMap")
     if (map?.isKeyframed == true) return this
     val raw = (map?.get("value") ?: node["speed"])?.toDoubleOrNull()?.takeIf { it.isFinite() && it > 0 } ?: return this

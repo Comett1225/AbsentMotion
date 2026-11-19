@@ -138,6 +138,12 @@ class ImporterTest {
     @Test fun otherFilesAreRefusedWithTheImportersMessages() {
         fun failure(bytes: ByteArray) = try { Importer(store()).import { ByteArrayInputStream(bytes) }; fail("imported"); txt(0) } catch (e: ImportFailed) { e.text }
         assertEquals(txt(R.string.library_err_unsupported_type), failure("hello".toByteArray()))
+        assertEquals(txt(R.string.library_err_unsupported_type), failure(ByteArray(17 shl 20) { 'x'.code.toByte() }))
+        assertEquals(txt(R.string.library_err_is_model), failure("glTF".toByteArray() + ByteArray(17 shl 20)))
+        assertEquals(txt(R.string.library_err_is_model), failure("""{"asset":{"generator":"Blender","version":"2.0"},"scenes":[]}""".toByteArray()))
+        assertEquals(txt(R.string.library_err_is_model), failure("# Blender OBJ File\n\nmtllib cube.mtl\no Cube\nv 1.0 1.0 -1.0\n".toByteArray()))
+        assertEquals(txt(R.string.library_err_unsupported_type), failure("""{"name":"not a model"}""".toByteArray()))
+        assertEquals(txt(R.string.library_err_unsupported_type), failure("version 2 notes".toByteArray()))
         assertEquals(txt(R.string.library_err_missing_manifest), failure(zip(listOf("a.xml" to "<scene width=\"1\" height=\"1\"/>".toByteArray()))))
         assertEquals(R.string.library_err_scene_needs_size, failure("<html/>".toByteArray()).id)
         assertEquals(R.string.library_err_malformed_xml, failure("<scene width=\"1\"".toByteArray()).id)
@@ -217,16 +223,16 @@ class ImporterTest {
 
     @Test fun mediaWithTheSameNameInDifferentFoldersStaySeparate() {
         val scene = """<scene width="10" height="10"><shape id="1" fillType="media" fillImage="x://a" /><shape id="2" fillType="media" fillImage="x://b" /></scene>"""
-        val manifest = JSONObject().put("media", JSONArray().put(JSONObject().put("uri", "x://a").put("entry", "a/clip.jpg"))
-            .put(JSONObject().put("uri", "x://b").put("entry", "b/clip.jpg")))
-        for (top in listOf("", "Top/")) {
-            val bytes = zip(listOf("${top}p.xml" to scene.toByteArray(), "${top}a/clip.jpg" to "one".toByteArray(), "${top}b/clip.jpg" to "two".toByteArray(),
+        for (second in listOf("clip.jpg", "Clip.jpg")) for (top in listOf("", "Top/")) {
+            val manifest = JSONObject().put("media", JSONArray().put(JSONObject().put("uri", "x://a").put("entry", "a/clip.jpg"))
+                .put(JSONObject().put("uri", "x://b").put("entry", "b/$second")))
+            val bytes = zip(listOf("${top}p.xml" to scene.toByteArray(), "${top}a/clip.jpg" to "one".toByteArray(), "${top}b/$second" to "two".toByteArray(),
                 "${top}manifest.json" to manifest.toString().toByteArray()))
             val store = store()
             val node = saved(store, Importer(store).import { ByteArrayInputStream(bytes) }.single())
             val files = listOf("1", "2").map { id -> File(java.net.URI(node.children.first { it["id"] == id }["fillImage"]!!)) }
             assertEquals(listOf("one", "two"), files.map { it.readText() })
-            assertEquals(2, files.toSet().size)
+            assertEquals(2, files.map { it.name.lowercase() }.toSet().size)
         }
     }
 

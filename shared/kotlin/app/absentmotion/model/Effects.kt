@@ -9,7 +9,7 @@ fun Layer.withEffect(index: Int, change: (XmlNode) -> XmlNode): Layer {
     }))
 }
 
-fun Layer.addEffect(effect: XmlNode) = copy(node = node.copy(children = node.children + effect))
+fun Layer.addEffect(effect: XmlNode) = copy(node = node.copy(children = node.children + effect.copy()))
 
 fun Scene.effectTargets(ids: Set<Long>): List<Layer> = layers.filter { it.id in ids && it.canAnimate }
 
@@ -25,7 +25,7 @@ fun Layer.removeEffect(index: Int): Layer {
 
 fun Layer.duplicateEffect(index: Int): Layer {
     var current = -1
-    return copy(node = node.copy(children = node.children.flatMap { if (it.name == "effect" && ++current == index) listOf(it, it) else listOf(it) }))
+    return copy(node = node.copy(children = node.children.flatMap { if (it.name == "effect" && ++current == index) listOf(it, it.copy()) else listOf(it) }))
 }
 
 fun Layer.moveEffect(from: Int, to: Int): Layer {

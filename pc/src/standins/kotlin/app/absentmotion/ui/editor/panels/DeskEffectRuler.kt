@@ -24,6 +24,8 @@ import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
+private const val RestMs = 350L
+
 @Composable
 internal fun EffectRuler(
     value: Float, step: Float, min: Float, max: Float, enabled: Boolean,
@@ -64,12 +66,16 @@ internal fun EffectRuler(
                 var target = 0f
                 var open = false
                 var closing: Job? = null
+                var passing = Long.MIN_VALUE / 2
                 try {
                     awaitPointerEventScope {
                         while (true) {
                             val e = awaitPointerEvent()
+                            val now = e.changes.firstOrNull()?.uptimeMillis ?: continue
+                            if (e.type == PointerEventType.Enter) passing = now
                             if (e.type != PointerEventType.Scroll) continue
-                            val d = e.changes.firstOrNull()?.scrollDelta ?: continue
+                            if (!open && now - passing < RestMs) { passing = now; continue }
+                            val d = e.changes.first().scrollDelta
                             val amount = if (abs(d.x) > abs(d.y)) d.x else d.y
                             if (amount == 0f) continue
                             e.changes.forEach { it.consume() }

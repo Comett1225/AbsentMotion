@@ -42,6 +42,32 @@ class CaptionTimingTest {
         assertTrue(words.zipWithNext().all { (a, b) -> a.startMs < b.startMs && a.endMs <= b.startMs })
     }
 
+    @Test fun sentencesWithoutSpacesAreSplitAndTimedByLength() {
+        val sentence = "今日は天気がいいですね。我们今天去公园散步吧。"
+        val pieces = splitSpaceless(listOf(RawWord(sentence, 1000, 8000, 1100), RawWord("Hello", 8000, 8400, -1)))
+        assertEquals(RawWord("Hello", 8000, 8400, -1), pieces.last())
+        val split = pieces.dropLast(1)
+        assertTrue(split.size > 3)
+        assertEquals(sentence, split.joinToString("") { it.text })
+        assertEquals(1000, split.first().t0)
+        assertEquals(1100, split.first().dtw)
+        assertEquals(8000, split.last().t1)
+        assertTrue(split.zipWithNext().all { (a, b) -> a.t1 == b.t0 && b.dtw == -1 })
+        val chunks = chunkWords(alignWords(split, SpeechEdges(emptyList(), emptyList())), 100)
+        assertEquals(sentence, chunks.joinToString("") { it.text })
+        assertTrue(chunks.size > 1)
+        assertEquals("ok today", chunkWords(listOf(Word("ok", 0, 100), Word("today", 120, 300)), 4).single().text)
+    }
+
+    @Test fun splitPiecesKeepTheTranscriptSpacing() {
+        fun caption(vararg words: String) = chunkWords(alignWords(splitSpaceless(words.mapIndexed { i, w -> RawWord(w, i * 800, i * 800 + 800, -1) }),
+            SpeechEdges(emptyList(), emptyList())), 100).single().text
+        assertEquals("今日は2026年11月18日です。", caption("今日は2026年11月18日です。"))
+        assertEquals("iPhoneを買いました。", caption("iPhoneを買いました。"))
+        assertEquals("我们在3点见面吧。", caption("我们在3点见面吧。"))
+        assertEquals("สวัสดีครับ วันนี้อากาศดีมาก", caption("สวัสดีครับ", "วันนี้อากาศดีมาก"))
+    }
+
     @Test fun wordsWithoutAccurateTimesKeepTheirOwnStart() {
         val words = alignWords(listOf(RawWord("hi", 250, 600, -1)), SpeechEdges(emptyList(), emptyList()))
         assertEquals(250, words.single().startMs)

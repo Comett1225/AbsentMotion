@@ -31,6 +31,7 @@ import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.test.runSkikoComposeUiTest
 import androidx.compose.ui.unit.dp
 import app.absentmotion.desk.DeskAppState
+import app.absentmotion.desk.DeskJump
 import app.absentmotion.desk.DeskKeys
 import app.absentmotion.desk.DeskOs
 import app.absentmotion.desk.DeskShortcuts
@@ -155,6 +156,42 @@ class DeskShortcutsTest {
         assertFalse(DeskKeys.bindable(mac = false, windows = true, ctrl = false, meta = true, alt = false))
         assertTrue(DeskKeys.bindable(mac = false, windows = false, ctrl = true, meta = false, alt = true))
         assertFalse(DeskKeys.bindable(mac = false, windows = false, ctrl = false, meta = true, alt = false))
+    }
+
+    @Test fun aForeignModifierRunsNothingAndTheBookmarkKeyOnlyAdds() {
+        val s = session("foreign")
+        try {
+            val foreign = if (DeskOs.mac) InputEvent.CTRL_DOWN_MASK else InputEvent.META_DOWN_MASK
+            s.state.selectedId = s.state.scene.layers.last().id
+            val count = s.state.scene.layers.size
+            assertFalse(s.press(java.awt.event.KeyEvent.VK_DELETE, foreign))
+            assertEquals(count, s.state.scene.layers.size)
+            s.state.frame = 10
+            assertTrue(s.press(java.awt.event.KeyEvent.VK_M))
+            assertTrue(s.press(java.awt.event.KeyEvent.VK_M))
+            assertEquals(1, s.state.scene.bookmarks.count { s.state.scene.frameAt(it) == 10 })
+        } finally { s.close() }
+    }
+
+    @Test fun jumpsStayInsideTheClipsAndParkAtTheEnd() {
+        data("jumps")
+        val app = DeskAppState()
+        val id = app.store.create(Scene.parse("""<scene width="640" height="360" fps="30" totalTime="1999"><shape id="7" startTime="0" endTime="999" fillType="color" s=".rect"><transform><location><kf t="-1" v="0,0,0"/><kf t="0.5" v="10,0,0"/><kf t="1.5" v="20,0,0"/></location></transform><property name="size" type="vec2" value="20,20"/></shape></scene>"""))
+        val state = runBlocking { app.openNow(id)!! }
+        val s = Session(app, state)
+        try {
+            state.frame = 10
+            DeskJump.previousKey(state)
+            assertEquals(10, state.frame)
+            val inside = state.scene.frameAt(state.scene.layers.single().keyframeTimes().single { it in 0..999 })
+            DeskJump.nextKey(state)
+            assertEquals(inside, state.frame)
+            DeskJump.nextKey(state)
+            assertEquals(inside, state.frame)
+            DeskJump.next(state)
+            assertTrue(state.atEnd)
+            assertEquals(state.scene.lastFrame + 1, state.playheadFrame)
+        } finally { s.close() }
     }
 
     @Test fun earlierModifierVariantsStillWork() {

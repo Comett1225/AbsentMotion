@@ -165,23 +165,25 @@ internal fun DeskTip(text: String, modifier: Modifier = Modifier, content: @Comp
 }
 
 @Composable
-internal fun DeskNameField(value: String, modifier: Modifier = Modifier, onCommit: (String) -> Unit) {
+internal fun DeskNameField(value: String, modifier: Modifier = Modifier, state: app.absentmotion.editor.EditorState? = null, onCommit: (String) -> Unit) {
     var text by remember(value) { mutableStateOf(value) }
+    var shown by remember(value) { mutableStateOf(value) }
     var focused by remember { mutableStateOf(false) }
     val focus = LocalFocusManager.current
     fun commit() {
-        val name = typedName(text, value)
-        text = name ?: value
-        if (name != null) onCommit(name)
+        val name = typedName(text, shown)
+        text = name ?: shown
+        if (name != null) { shown = name; onCommit(name) }
     }
     val commitNow by rememberUpdatedState(::commit)
     DisposableEffect(Unit) { onDispose { commitNow() } }
     BasicTextField(
-        text, { text = it },
+        text, { text = it; state?.typing = commitNow },
         modifier.height(32.dp).clip(RoundedCornerShape(6.dp)).background(if (focused) Am.Field else Color.Transparent).hoverFill(6.dp, Am.Field).pointerHoverIcon(PointerIcon.Text)
             .onFocusChanged { if (focused && !it.isFocused) commit(); focused = it.isFocused }
             .onKeyEvent {
-                if (it.type == KeyEventType.KeyDown && (it.key == Key.Enter || it.key == Key.NumPadEnter)) { focus.clearFocus(); true } else false
+                if (it.type == KeyEventType.KeyDown && it.key == Key.Escape) { text = value; focus.clearFocus(); true }
+                else if (it.type == KeyEventType.KeyDown && (it.key == Key.Enter || it.key == Key.NumPadEnter)) { focus.clearFocus(); true } else false
             },
         textStyle = TextStyle(color = Am.OnDark, fontSize = 14.sp, fontWeight = FontWeight.Medium).withUiFont(),
         singleLine = true, cursorBrush = SolidColor(Am.Accent),

@@ -126,7 +126,7 @@ compose.desktop {
             jvmArgs += gcFlags + "-Dapple.awt.application.name=AbsentMotion"
             if (isMac && macArch == null) jvmArgs += "-XX:SharedArchiveFile=\$APPDIR/app.jsa"
             if (isWindows) jvmArgs += listOf("-XX:SharedArchiveFile=$appArchive", "-XX:+AutoCreateSharedArchive", "-Dam.cdsArchive=$appArchive")
-            modules("jdk.localedata")
+            modules("jdk.localedata", "jdk.management")
             if (macArch != null) jvmArgs += listOf("ffmpeg", "ffprobe").map { "-Dam.$it=\$APPDIR/resources/$it" }
             macOS {
                 bundleID = "app.absentmotion.desktop"

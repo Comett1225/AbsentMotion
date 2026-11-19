@@ -112,6 +112,55 @@ internal fun mixArgb(base: Int, top: Int, weight: Float): Int {
     return out
 }
 
+internal fun bleedUnderClear(pixels: IntArray, width: Int, height: Int, passes: Int = 4) {
+    val known = BooleanArray(pixels.size) { pixels[it] ushr 24 != 0 }
+    if (known.all { it } || known.none { it }) return
+    repeat(passes) {
+        val filled = ArrayList<Int>()
+        for (y in 0 until height) for (x in 0 until width) {
+            val i = y * width + x
+            if (known[i]) continue
+            var r = 0
+            var g = 0
+            var b = 0
+            var n = 0
+            for (ny in maxOf(0, y - 1)..minOf(height - 1, y + 1)) for (nx in maxOf(0, x - 1)..minOf(width - 1, x + 1)) {
+                val c = pixels[ny * width + nx]
+                if (!known[ny * width + nx]) continue
+                r += (c shr 16) and 0xFF
+                g += (c shr 8) and 0xFF
+                b += c and 0xFF
+                n++
+            }
+            if (n == 0) continue
+            pixels[i] = (pixels[i] and 0xFF000000.toInt()) or ((r / n) shl 16) or ((g / n) shl 8) or (b / n)
+            filled += i
+        }
+        if (filled.isEmpty()) return
+        for (i in filled) known[i] = true
+    }
+}
+
+internal fun scaledAlpha(input: IntArray, width: Int, height: Int, scale: Int, output: IntArray) {
+    fun a(px: Int, py: Int) = (input[py * width + px] ushr 24).toFloat()
+    for (y in 0 until height * scale) {
+        val sy = ((y + 0.5f) / scale - 0.5f).coerceIn(0f, height - 1f)
+        val y0 = sy.toInt()
+        val y1 = minOf(y0 + 1, height - 1)
+        val fy = sy - y0
+        for (x in 0 until width * scale) {
+            val sx = ((x + 0.5f) / scale - 0.5f).coerceIn(0f, width - 1f)
+            val x0 = sx.toInt()
+            val x1 = minOf(x0 + 1, width - 1)
+            val fx = sx - x0
+            val top = a(x0, y0) + (a(x1, y0) - a(x0, y0)) * fx
+            val bottom = a(x0, y1) + (a(x1, y1) - a(x0, y1)) * fx
+            val i = y * width * scale + x
+            output[i] = (output[i] and 0x00FFFFFF) or ((top + (bottom - top) * fy).roundToInt().coerceIn(0, 255) shl 24)
+        }
+    }
+}
+
 internal fun uprightToFrame(x: Float, y: Float, width: Float, height: Float, turn: Int): Pair<Float, Float> = when (turn) {
     90 -> y to height - x
     180 -> width - x to height - y
@@ -228,6 +277,7 @@ internal object AiEnhance {
             check(imageFits(width, height, options)) { imageCapText(options) }
             val input = IntArray(width * height)
             picture.getPixels(input, 0, width, 0, 0, width, height)
+            if (picture.hasAlpha()) bleedUnderClear(input, width, height)
             progress(0.1f, AppText.get(R.string.ai_preparing))
             val output = AiNet.open(context, options.model, options.blend, GRAIN_WEIGHT).use { net ->
                 if (options.mode == EnhanceMode.Faces) {
@@ -243,10 +293,7 @@ internal object AiEnhance {
             coroutineContext.ensureActive()
             val scale = options.mode.scale
             if (picture.hasAlpha() && scale > 1) {
-                for (y in 0 until height * scale) for (x in 0 until width * scale) {
-                    val i = y * width * scale + x
-                    output[i] = (output[i] and 0x00ffffff) or (input[(y / scale) * width + x / scale] and 0xff000000.toInt())
-                }
+                scaledAlpha(input, width, height, scale, output)
             } else if (picture.hasAlpha() && options.mode != EnhanceMode.Faces) {
                 for (i in output.indices) output[i] = (output[i] and 0x00ffffff) or (input[i] and 0xff000000.toInt())
             }

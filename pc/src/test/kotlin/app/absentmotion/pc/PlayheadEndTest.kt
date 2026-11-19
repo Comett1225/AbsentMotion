@@ -54,6 +54,9 @@ class PlayheadEndTest {
             press(Key.MoveEnd)
             waitForIdle()
             runOnIdle { assertTrue(editor.atEnd); assertEquals(last + 1, editor.playheadFrame) }
+            runOnIdle { editor.edit { it.withTitle("edited") } }
+            waitForIdle()
+            runOnIdle { assertTrue(editor.atEnd); assertEquals(last + 1, editor.playheadFrame) }
             runBlocking { app.closeEditor() }
         }
     }

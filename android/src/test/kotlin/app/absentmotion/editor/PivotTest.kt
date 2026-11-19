@@ -103,6 +103,14 @@ class PivotTest {
         assertSamePicture(s, out, 1, (0..1000 step 50).toList(), 0.6f)
     }
 
+    @Test fun aBouncingLocationIsNotSplitIntoTwoBounces() {
+        val bounce = XmlNode("location", children = listOf(XmlNode("kf", linkedMapOf("t" to "0", "v" to "0,0,0")), XmlNode("kf", linkedMapOf("t" to "1", "v" to "100,0,0", "e" to "bounce 0.4 0.5"))))
+        val s = sceneOf(layer(1, bounce, prop("rotation", 0f to "0", 0.5f to "40", 1f to "90")))
+        val keys = s.withPivotMoved(1, 0, 10f, 10f).layer(1)!!.node.child("transform")!!.child("location")!!.keyframes
+        assertEquals(listOf(0f, 1f), keys.map { it.t })
+        assertEquals("bounce 0.4 0.5", keys.last().e)
+    }
+
     @Test fun anAnimatedScaleNeedsOnlyItsTwoKeysAndKeepsEveryFrame() {
         val s = sceneOf(layer(1, prop("location", 0f to "100,50,0"), prop("rotation", 0f to "35"), prop("scale", 0f to "1,1", 1f to "3,2")))
         val out = s.withPivotMoved(1, 250, -20f, 14f)

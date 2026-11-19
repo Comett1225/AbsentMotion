@@ -128,7 +128,12 @@ fun PresetScreen(state: EditorState) {
     fun timecode(ms: Int) = TimelineMath.timecode((ms * fps / 1000f).roundToInt(), fps)
 
     LaunchedEffect(scene) { state.engine.setScene(scene) }
-    DisposableEffect(Unit) { onDispose { state.engine.setScene(state.scene) } }
+    DisposableEffect(Unit) {
+        onDispose {
+            state.engine.setScene(state.scene)
+            state.previewView?.let { state.engine.setView(it.copy(timeMs = state.timeMs)) }
+        }
+    }
     val fit = if (box.width == 0) 1f else min(box.width.toFloat() / scene.width, box.height.toFloat() / scene.height)
     LaunchedEffect(fit, pos, scene) {
         if (box.width > 0) state.engine.setView(PreviewView(shown.startTime + pos, fit, (box.width - scene.width * fit) / 2, (box.height - scene.height * fit) / 2, 0, -1))

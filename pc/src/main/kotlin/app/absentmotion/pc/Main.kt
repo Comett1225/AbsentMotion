@@ -27,6 +27,7 @@ import app.absentmotion.desk.DeskInstance
 import app.absentmotion.desk.DeskOpen
 import app.absentmotion.desk.DeskOs
 import app.absentmotion.desk.DeskTaskbar
+import app.absentmotion.desk.DeskTyping
 import app.absentmotion.desk.DeskWindow
 import app.absentmotion.export.DeskExports
 import app.absentmotion.export.ExportRun
@@ -60,6 +61,7 @@ fun main(args: Array<String>) {
             return
         }
     }
+    java.util.Locale.setDefault(app.absentmotion.desk.Strings.locale)
     val files = DeskOpen.fromArguments(args)
     if (!DeskInstance.claim(files)) return
     DeskOpen.offer(files)
@@ -80,13 +82,13 @@ fun main(args: Array<String>) {
         )
         val desk = remember { DeskAppState() }
         val scope = rememberCoroutineScope()
-        remember { desk.quitNow = ::exitApplication }
+        remember { desk.quitNow = { app.absentmotion.ui.home.UpdateInstall.rearm(); exitApplication() } }
         LaunchedEffect(DeskOpen.raised.intValue) { if (DeskOpen.raised.intValue > 0) desk.hidden = false }
         DisposableEffect(Unit) {
             val platform = runCatching { java.awt.Desktop.getDesktop().takeIf { java.awt.Desktop.isDesktopSupported() && it.isSupported(java.awt.Desktop.Action.APP_QUIT_HANDLER) } }.getOrNull()
             platform?.setQuitHandler { _, response ->
                 if (ExportRun.running) { response.cancelQuit(); desk.requestQuit() }
-                else scope.launch { if (desk.shutdown()) response.performQuit() else { response.cancelQuit(); desk.afterClose = desk.quitNow } }
+                else scope.launch { if (desk.shutdown()) { app.absentmotion.ui.home.UpdateInstall.rearm(); response.performQuit() } else { response.cancelQuit(); desk.afterClose = desk.quitNow } }
             }
             val reopen = object : java.awt.desktop.AppReopenedListener { override fun appReopened(e: java.awt.desktop.AppReopenedEvent) { desk.hidden = false } }
             val events = runCatching { java.awt.Desktop.getDesktop().takeIf { java.awt.Desktop.isDesktopSupported() && it.isSupported(java.awt.Desktop.Action.APP_EVENT_REOPENED) } }.getOrNull()
@@ -99,8 +101,8 @@ fun main(args: Array<String>) {
             DeskExportMini(desk)
         }
         Window(onCloseRequest = desk::requestQuit, visible = !desk.hidden, title = "AbsentMotion", state = state,
-            onPreviewKeyEvent = { it.type == KeyEventType.KeyDown && it.key == Key.Escape && DeskBack.back() || DeskKeys.handle(desk, it) },
-            onKeyEvent = { app.absentmotion.desk.DeskGlobalKeys.handle(desk, it) }) {
+            onPreviewKeyEvent = { it.type == KeyEventType.KeyDown && it.key == Key.Escape && DeskTyping.active == 0 && DeskBack.back() || DeskKeys.handle(desk, it) },
+            onKeyEvent = { it.type == KeyEventType.KeyDown && it.key == Key.Escape && DeskTyping.active > 0 && DeskBack.back() || app.absentmotion.desk.DeskGlobalKeys.handle(desk, it) }) {
             DeskFiles.window = window
             remember(window) { window.minimumSize = java.awt.Dimension(820, 560) }
             remember(window) { DeskWindow.attach(window) }

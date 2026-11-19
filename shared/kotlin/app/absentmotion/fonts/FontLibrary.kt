@@ -101,13 +101,21 @@ class FontLibrary(context: Context) {
             .also { if (it.isEmpty()) googleListFailed = System.currentTimeMillis() }
     }
     private val systemFamilies = ConcurrentHashMap<String, List<Font>>()
+    private val collectionFaces: Map<File, List<Font>> by lazy {
+        if (Build.VERSION.SDK_INT >= 29) android.graphics.fonts.SystemFonts.getAvailableFonts().filter { it.file != null }.groupBy { it.file!! } else emptyMap()
+    }
     private fun familyKey(value: String) = value.lowercase().filter { it.isLetterOrDigit() }
     fun systemFont(name: String): Font? {
         if (Build.VERSION.SDK_INT < 29) return null
         val wanted = FontName.parse(name)
         if (wanted.source != "googlefonts") return null
         val key = familyKey(wanted.family)
-        return systemFamilies.getOrPut(key) { systemFiles[key].orEmpty().mapNotNull { runCatching { Font.Builder(it).build() }.getOrNull() } }.minByOrNull { font -> kotlin.math.abs(font.style.weight - wanted.weight) +
+        val here = if (Build.VERSION.SDK_INT >= 33) java.util.Locale.getDefault() else java.util.Locale.forLanguageTag(app.absentmotion.i18n.currentLanguage(context).tag)
+        return systemFamilies.getOrPut("$key/${here.toLanguageTag()}") {
+            systemFiles[key].orEmpty().flatMap { file ->
+                collectionFaces[file]?.takeIf { file.extension.equals("ttc", ignoreCase = true) } ?: listOfNotNull(runCatching { Font.Builder(file).build() }.getOrNull())
+            }.sortedBy { font -> if ((0 until font.localeList.size()).any { sameWriting(font.localeList[it], here) }) 0 else 1 }
+        }.minByOrNull { font -> kotlin.math.abs(font.style.weight - wanted.weight) +
             if ((font.style.slant == 1) == wanted.italic) 0 else 1000 }
     }
     fun fontIndex(name: String): Int = if (Build.VERSION.SDK_INT < 29) 0 else systemFont(name)?.takeIf { it.file == localFile(name) }?.ttcIndex ?: 0
@@ -172,7 +180,7 @@ class FontLibrary(context: Context) {
         val filename = displayName(uri)
         val raw = try { read(uri, MAX_ZIP_BYTES) } catch (e: FontImportError) { return@withContext Imported(emptyList(), listOf(filename to e.problem)) }
         if (!isZip(raw) && !filename.endsWith(".zip", ignoreCase = true)) return@withContext try { Imported(listOf(store(filename, raw)), emptyList()) } catch (e: FontImportError) { Imported(emptyList(), listOf(filename to e.problem)) }
-        val entries = try { zipFonts(raw.inputStream()) } catch (e: FontImportError) { return@withContext Imported(emptyList(), listOf(filename to e.problem)) }
+        val entries = try { zipFonts(raw) } catch (e: FontImportError) { return@withContext Imported(emptyList(), listOf(filename to e.problem)) }
         if (entries.isEmpty()) return@withContext Imported(emptyList(), listOf(filename to FontProblem.NoFonts))
         val fonts = mutableListOf<FontName>()
         val failures = mutableListOf<Pair<String, FontProblem>>()
@@ -246,4 +254,9 @@ class FontLibrary(context: Context) {
             output.write(bytes, 0, count)
         }
     }
+}
+
+internal fun sameWriting(a: java.util.Locale, b: java.util.Locale): Boolean {
+    fun script(l: java.util.Locale) = l.script.ifEmpty { if (l.language == "zh") if (l.country in setOf("TW", "HK", "MO")) "Hant" else "Hans" else "" }
+    return a.language == b.language && script(a) == script(b)
 }

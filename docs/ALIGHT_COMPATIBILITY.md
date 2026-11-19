@@ -10,8 +10,8 @@ Export the project from Alight Motion as XML and open it in AbsentMotion. After 
 
 - **67** Alight effects look the same and **31** are very close.
 - **78** are converted to a similar effect that does not look identical.
-- **57** are converted but have not been compared side by side yet.
-- **44** are not converted yet (mostly very old effect versions, VR and some 3D solids).
+- **74** are converted but have not been compared side by side yet.
+- **29** are not converted yet (mostly very old effect versions, VR and some 3D solids).
 - **Blending modes:** all of Alight's blending modes come across. Multiply and Subtract get their opacity converted so they look the same.
 
 Something imports wrong? [Send the project as an Import problem](https://github.com/Comett1225/AbsentMotion/issues/new?template=import_problem.yml): the XML and a screenshot of the same moment in Alight Motion. That is the fastest way to get it fixed.
@@ -98,7 +98,7 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Grid | Grid | Very close |
 | grid | Grid | Very close |
 | Highlights and Shadows | Highlights & Shadows | Very close |
-| Inner Pinch/Bulge | Inner Pinch/Bulge | Very close |
+| Inner Pinch/Bulge | Pinch/Bulge | Very close |
 | Light Glow | Light Glow | Very close |
 | Luma Key | Luma Key | Very close |
 | lumakey2 | Luma Key | Very close |
@@ -198,18 +198,28 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Zoom Streaks | Zoom Streaks | Similar, not identical |
 | 360-reorient-sphere | 360° Reorient Sphere | Converted, not compared yet |
 | Box | Box | Converted, not compared yet |
+| boxblur | Blur | Converted, not compared yet |
+| boxblur2 | Blur | Converted, not compared yet |
+| brightcont | Brightness & Contrast | Converted, not compared yet |
 | bumpmap | Bump Map | Converted, not compared yet |
 | bumpmap2 | Bump Map | Converted, not compared yet |
+| checkerdissolve | Block Dissolve | Converted, not compared yet |
+| clouds | Clouds | Converted, not compared yet |
+| colorhot2 | Split Tone | Converted, not compared yet |
 | colorize | Colorize | Converted, not compared yet |
+| colortune | Lift Gamma Gain | Converted, not compared yet |
 | Cube | Cube | Converted, not compared yet |
 | cube | Cube | Converted, not compared yet |
 | Cylinder | Cylinder | Converted, not compared yet |
 | deepglow | Deep Glow | Converted, not compared yet |
 | Denoise | Denoise | Converted, not compared yet |
+| displacemap | Displacement Map | Converted, not compared yet |
 | drawing.progress | Drawing Progress | Converted, not compared yet |
 | drawing.stroketaper | Stroke Taper | Converted, not compared yet |
 | dropshadow.custom | Drop Shadow | Converted, not compared yet |
 | Echo Keyframes | Echo Keyframes | Converted, not compared yet |
+| effect.glass | Glass | Converted, not compared yet |
+| effect.glass2 | Glass | Converted, not compared yet |
 | effect.movealongpath3 | Move Along Path | Converted, not compared yet |
 | Ellipsoid | Ellipsoid | Converted, not compared yet |
 | energybeam | Energy Beam | Converted, not compared yet |
@@ -217,6 +227,9 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Flip Layer | Flip Layer | Converted, not compared yet |
 | flip2 | Flip Layer | Converted, not compared yet |
 | fourcolorgradientnew | Four-Color Gradient | Converted, not compared yet |
+| fractalwarp2 | Fractal Warp | Converted, not compared yet |
+| glowscan | Glow Scan | Converted, not compared yet |
+| gradientmap | Gradient Map | Converted, not compared yet |
 | Grid Repeat | Grid Repeat | Converted, not compared yet |
 | grunge | Grunge | Converted, not compared yet |
 | Heart | Heart | Converted, not compared yet |
@@ -229,6 +242,8 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | internal.smoothbevel | Smooth Bevel | Converted, not compared yet |
 | irridescence | Iridescence | Converted, not compared yet |
 | irridescence2 | Iridescence | Converted, not compared yet |
+| lensblur | Lens Blur | Converted, not compared yet |
+| lensblur2 | Lens Blur | Converted, not compared yet |
 | Linear Repeat | Linear Repeat | Converted, not compared yet |
 | mattefringe | Matte Fringe | Converted, not compared yet |
 | Octahedron | Octahedron | Converted, not compared yet |
@@ -244,8 +259,9 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Spherize | Spherize | Converted, not compared yet |
 | spherize | Spherize | Converted, not compared yet |
 | spill-cleanup | Key Spill Cleaner | Converted, not compared yet |
-| Star Polyhedron | Star Polyhedron | Converted, not compared yet |
+| Star Polyhedron | Star Prism | Converted, not compared yet |
 | Star Prism | Star Prism | Converted, not compared yet |
+| starfield | Starfield | Converted, not compared yet |
 | texttransform | Text Transform | Converted, not compared yet |
 | Three-axis Cross | Three-axis Cross | Converted, not compared yet |
 | Time Quantization | Frame Rate | Converted, not compared yet |
@@ -253,33 +269,21 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Tunnel | Tunnel | Converted, not compared yet |
 | vrcombined | 360° Viewer | Converted, not compared yet |
 | vrplayer | 360° Viewer | Converted, not compared yet |
-| boxblur | - | Not converted yet |
-| boxblur2 | - | Not converted yet |
-| brightcont | - | Not converted yet |
+| wavewarp | Wave Warp | Converted, not compared yet |
 | cartoon | - | Not converted yet |
-| checkerdissolve | - | Not converted yet |
 | chromakey-adv | - | Not converted yet |
 | chromaticvortexblur | - | Not converted yet |
-| clouds | - | Not converted yet |
 | coloradj | - | Not converted yet |
 | colorbalance | - | Not converted yet |
-| colorhot2 | - | Not converted yet |
 | colortint | - | Not converted yet |
-| colortune | - | Not converted yet |
 | diff | - | Not converted yet |
 | differencematte | - | Not converted yet |
-| displacemap | - | Not converted yet |
 | facemotion | - | Not converted yet |
 | findedges-edgeglow | - | Not converted yet |
 | fractalwarp | - | Not converted yet |
-| fractalwarp2 | - | Not converted yet |
 | glass | - | Not converted yet |
 | glass2 | - | Not converted yet |
-| glowscan | - | Not converted yet |
 | gradientdisplace | - | Not converted yet |
-| gradientmap | - | Not converted yet |
-| lensblur | - | Not converted yet |
-| lensblur2 | - | Not converted yet |
 | Move Along Path | - | Not converted yet |
 | oscillate | - | Not converted yet |
 | outline | - | Not converted yet |
@@ -289,11 +293,9 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | rgb-gamma | - | Not converted yet |
 | rgb-mixer | - | Not converted yet |
 | shadow | - | Not converted yet |
-| starfield | - | Not converted yet |
 | streakstrips | - | Not converted yet |
 | triprism | - | Not converted yet |
 | triprism2 | - | Not converted yet |
 | volumetricclouds | - | Not converted yet |
 | vortexblur | - | Not converted yet |
 | warpblur | - | Not converted yet |
-| wavewarp | - | Not converted yet |

@@ -607,7 +607,7 @@ internal fun DownloaderScreen(store: ProjectStore, settings: AppSettings, onOpen
         Box {
             Column(Modifier.alpha(if (pictures) 0f else 1f)) {
                 listOf(R.string.downloader_video_audio, R.string.downloader_video_only, R.string.downloader_audio_only).forEachIndexed { i, label ->
-                    ChoiceRow(stringResource(label), null, save == i, enabled = !pictures && !running && (info == null || single)) { change { save = i } }
+                    ChoiceRow(stringResource(label), null, if (info == null || single) save == i else i == 0, enabled = !pictures && !running && (info == null || single)) { change { save = i } }
                 }
                 SectionTitle(stringResource(R.string.downloader_quality))
                 QualityRow(check, single, options, choice, enabled = !running) { picked -> change { choice = picked } }
@@ -784,15 +784,17 @@ private fun SupportBlock(onWhy: (LinkSite, Int) -> Unit) {
     }
 }
 
-private fun folderOf(media: SavedMedia): String = when {
+private fun folderOf(store: app.absentmotion.export.ExportStore, media: SavedMedia): String = store.location(when {
     media.mime.startsWith("image/") -> Environment.DIRECTORY_PICTURES
     media.mime.startsWith("audio/") -> Environment.DIRECTORY_MUSIC
     else -> Environment.DIRECTORY_MOVIES
-} + "/" + AppFolder
+} + "/" + AppFolder)
 
 @Composable
 private fun DownloadBar(fetch: Fetch, enabled: Boolean, onStart: () -> Unit, onCancel: () -> Unit, onProject: (SavedMedia) -> Unit, onCompress: (SavedMedia) -> Unit) {
     val add = LocalAddToProject.current
+    val context = LocalContext.current
+    val store = remember { app.absentmotion.export.MediaStoreExport(context) }
     Column(Modifier.fillMaxWidth().background(Am.Card).padding(16.dp)) {
         Box(Modifier.fillMaxWidth().height(44.dp), contentAlignment = Alignment.CenterStart) {
             when (fetch) {
@@ -804,7 +806,7 @@ private fun DownloadBar(fetch: Fetch, enabled: Boolean, onStart: () -> Unit, onC
                     )
                 }
                 is Fetch.Done -> {
-                    val folders = fetch.saved.map(::folderOf).distinct().joinToString(" · ")
+                    val folders = fetch.saved.map { folderOf(store, it) }.distinct().joinToString(" · ")
                     val message = if (fetch.saved.size == 1) stringResource(R.string.compress_saved_to, folders) else stringResource(R.string.downloader_saved_many, fetch.saved.size, folders)
                     Text(message, color = Am.Navy, fontSize = 14.sp, lineHeight = 18.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 }

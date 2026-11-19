@@ -896,6 +896,12 @@ appendix A.13; the Apache License 2.0 text is in appendix A.21.
 
 The icon sets used in the user interface, and their licences, are listed in `docs/ICON_SOURCES.md`.
 
+### Preset placeholder pictures
+
+The placeholder pictures of My Presets (`shared/assets/presets/placeholders/*.webp`) are drawn by
+`tools/preset_placeholders.py` from code: gradients, circles, rectangles and lines, with no photographs and no third-party
+art. They are original to AbsentMotion and covered by its own licence, so no notice or credit is needed.
+
 ### Effect thumbnail photos
 
 The effect thumbnails (`shared/assets/effects/thumb/*.webp`, 192 x 192 pixels) are rendered by

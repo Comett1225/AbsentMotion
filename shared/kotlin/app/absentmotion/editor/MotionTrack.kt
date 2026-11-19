@@ -272,7 +272,7 @@ internal fun Scene.withTrack(apply: TrackApply, motion: Map<Int, Sim>): Scene {
         val at = s.map(Pt(o.x, o.y))
         val k = if (apply.rotateScale) s.scale.toFloat() else 1f
         val world = Place(at.x, at.y, o.px, o.py, o.sx * k, o.sy * k, if (apply.rotateScale) o.rot + turns[i].toFloat() else o.rot, o.z)
-        (if (parent == null) world else decompose(world, place(parent, frameStart(f))))?.let { f to it }
+        (if (parent == null) world else decompose(world, place(parent, frameStart(f)), target.pull(frameStart(f), fps)))?.let { f to it }
     }
     if (placed.isEmpty()) return this
     val frames = placed.map { it.first }

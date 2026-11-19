@@ -150,7 +150,7 @@ internal fun CameraPanel(state: EditorState, layer: Layer, modifier: Modifier = 
                             { active = 0; state.askNumber(angleLabel, angle, Angle.unit, Angle.min, Angle.max) { v -> write(Angle, false) { v } } })
                         val zoom = cameraZoomOf(angle, size)
                         NumberRow(zoomLabel, "${zoom.toInt()}", active == 1, perspective, { d -> active = 1; writeZoom(true) { it + d * size / 200f } }, { state.endGesture() }, { active = 1 },
-                            { active = 1; state.askNumber(zoomLabel, zoom.toInt().toFloat(), "", cameraZoomOf(Angle.max, size), cameraZoomOf(Angle.min, size)) { v -> writeZoom(false) { v } } })
+                            { active = 1; state.askNumber(zoomLabel, zoom, "", cameraZoomOf(Angle.max, size), cameraZoomOf(Angle.min, size)) { v -> if (v != zoom) writeZoom(false) { v } } })
                         if (desk) SortRow()
                     }
                     1 -> {

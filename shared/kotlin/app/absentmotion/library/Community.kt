@@ -4,6 +4,7 @@ import app.absentmotion.BuildConfig
 import app.absentmotion.engine.EngineThread
 import app.absentmotion.export.ExportSettings
 import app.absentmotion.model.Scene
+import app.absentmotion.model.mapMediaUris
 import app.absentmotion.platform.encodeRgba
 import app.absentmotion.ui.home.HOME_PAGE
 import app.absentmotion.ui.home.TrustedHttp
@@ -18,6 +19,7 @@ import java.io.InputStream
 import java.net.URI
 import java.security.MessageDigest
 import java.util.Locale
+import java.util.UUID
 import java.text.Collator
 import java.time.Instant
 import java.time.LocalDate
@@ -70,12 +72,14 @@ internal object CommunityFeed {
 enum class CommunityKind(
     val id: String,
     val folder: String,
-    val maxBytes: Long,
-    val ext: String
+    val maxBytes: Long
 ) {
-    Bundle("bundle", "bundles", 20L shl 20, "absproj"),
-    Preset("preset", "presets", 1L shl 20, "xml")
+    Bundle("bundle", "bundles", 20L shl 20),
+    Preset("preset", "presets", 1L shl 20)
 }
+
+internal fun communityLimit(kind: CommunityKind, file: String): Long =
+    if (file.endsWith(".absproj")) CommunityKind.Bundle.maxBytes else kind.maxBytes
 
 data class CommunityItem(
     val kind: CommunityKind,
@@ -122,6 +126,7 @@ fun parseCommunityIndex(text: String, versionCode: Int): CommunityIndex {
     }
     val arr = root.optJSONArray("items") ?: return CommunityIndex(emptyList())
     val items = ArrayList<CommunityItem>(arr.length())
+    val seen = HashSet<String>()
     for (i in 0 until arr.length()) {
         val obj = arr.optJSONObject(i) ?: continue
         val kind = when (obj.optString("kind", "")) {
@@ -139,9 +144,9 @@ fun parseCommunityIndex(text: String, versionCode: Int): CommunityIndex {
         val rawThumb = if (kind == CommunityKind.Preset || obj.isNull("thumbnail")) "" else obj.optString("thumbnail", "")
         if (rawThumb.isNotEmpty() && !safeCommunityPath(rawThumb, folder)) continue
         val bytes = obj.optLong("bytes", -1L)
-        if (bytes <= 0L || bytes > kind.maxBytes) continue
+        if (bytes <= 0L || bytes > communityLimit(kind, file)) continue
         val sha256 = obj.optString("sha256", "")
-        if (!isSha256(sha256)) continue
+        if (!isSha256(sha256) || !seen.add("${kind.id}/$name")) continue
         val title = obj.optString("title", "").trim().take(80)
         val creator = obj.optString("creator", "").trim().take(80)
         val description = obj.optString("description", "").trim().take(500)
@@ -209,19 +214,15 @@ internal class CommunityClient(
             } catch (_: IOException) {
             }
         }
-        return try {
-            val bytes = http().get(CommunityFeed.source.asset("", rel)) { conn ->
-                if (conn.responseCode !in 200..299) return@get null
-                val length = conn.contentLengthLong
-                if (length > THUMB_MAX_BYTES) return@get null
-                conn.inputStream.use { readBounded(it, THUMB_MAX_BYTES) }
-            } ?: return null
-            if (bytes.isEmpty()) return null
-            keep(cached, bytes)
-            bytes
-        } catch (_: IOException) {
-            null
-        }
+        val bytes = http().get(CommunityFeed.source.asset("", rel)) { conn ->
+            if (conn.responseCode !in 200..299) return@get null
+            val length = conn.contentLengthLong
+            if (length > THUMB_MAX_BYTES) return@get null
+            conn.inputStream.use { readBounded(it, THUMB_MAX_BYTES) }
+        } ?: return null
+        if (bytes.isEmpty()) return null
+        keepCached(cached, bytes)
+        return bytes
     }
 
     suspend fun presetPicture(item: CommunityItem, engine: EngineThread): ByteArray? {
@@ -233,23 +234,16 @@ internal class CommunityClient(
             } catch (_: IOException) {
             }
         }
-        val picture = renderPresetPicture(engine, download(item).readText()) ?: return null
-        keep(cached, picture)
+        val file = download(item)
+        val unpacked = File(cacheDir, "community/preview/${UUID.randomUUID()}")
+        val picture = (try {
+            val scene = if (file.extension == "absproj") bundleScene(file, unpacked) else communityScene(file, MediaAccess.forPhone(cacheDir))
+            scene?.let { renderPresetPicture(engine, it) }
+        } finally {
+            unpacked.deleteRecursively()
+        }) ?: return null
+        keepCached(cached, picture)
         return picture
-    }
-
-    private fun keep(cached: File, bytes: ByteArray) {
-        cached.parentFile?.mkdirs()
-        val part = File(cached.parentFile, "${cached.name}.part")
-        try {
-            part.writeBytes(bytes)
-            if (!part.renameTo(cached)) {
-                part.copyTo(cached, overwrite = true)
-                part.delete()
-            }
-        } catch (_: IOException) {
-            part.delete()
-        }
     }
 
     fun download(item: CommunityItem): File {
@@ -257,24 +251,28 @@ internal class CommunityClient(
         if (!NAME_REGEX.matches(item.name) ||
             !safeCommunityPath(item.file, folder) ||
             item.bytes <= 0L ||
-            item.bytes > item.kind.maxBytes ||
+            item.bytes > communityLimit(item.kind, item.file) ||
             !isSha256(item.sha256)
         ) {
             throw CommunityDamagedException("Invalid community item metadata")
         }
         val dir = File(cacheDir, "community/files")
         dir.mkdirs()
-        val target = File(dir, "${item.name}.${item.kind.ext}")
+        val target = File(dir, "${item.name}.${if (item.file.endsWith(".absproj")) "absproj" else "xml"}")
+        return synchronized(downloads.getOrPut(target.absolutePath) { Any() }) { fetch(item, target) }
+    }
+
+    private fun fetch(item: CommunityItem, target: File): File {
         if (target.isFile) {
             if (target.length() == item.bytes && sha256Of(target) == item.sha256) {
                 return target
             }
             target.delete()
         }
-        val part = File(dir, "${item.name}.${item.kind.ext}.part")
+        val part = File(target.parentFile, "${target.name}.part")
         part.delete()
         try {
-            val limit = minOf(item.bytes, item.kind.maxBytes)
+            val limit = minOf(item.bytes, communityLimit(item.kind, item.file))
             http().get(CommunityFeed.source.asset("", item.file)) { conn ->
                 if (conn.responseCode !in 200..299) {
                     throw IOException("HTTP ${conn.responseCode}")
@@ -317,23 +315,49 @@ internal class CommunityClient(
             throw t
         }
     }
+
+    private companion object {
+        val downloads = java.util.concurrent.ConcurrentHashMap<String, Any>()
+    }
 }
 
-fun addCommunityPreset(file: File, store: PresetStore): String {
+internal fun keepCached(cached: File, bytes: ByteArray) {
+    cached.parentFile?.mkdirs()
+    val part = File(cached.parentFile, "${cached.name}.part")
+    try {
+        part.writeBytes(bytes)
+        if (!part.renameTo(cached)) {
+            part.copyTo(cached, overwrite = true)
+            part.delete()
+        }
+    } catch (_: IOException) {
+        part.delete()
+    }
+}
+
+private fun communityScene(file: File, access: MediaAccess): Scene =
+    Scene(Scene.parse(file.readText().removePrefix("\uFEFF")).node.mapMediaUris(access::imported))
+
+private fun bundleScene(file: File, root: File): Scene? {
+    val store = ProjectStore(root)
+    return Importer(store, access = MediaAccess.forPhone(root)).import { file.inputStream() }.singleOrNull()?.let { store.load(it.id) }
+}
+
+fun addCommunityPreset(file: File, store: PresetStore, access: MediaAccess): String {
     if (!file.isFile) throw IllegalArgumentException("Preset file does not exist")
     val size = file.length()
     if (size <= 0L || size > CommunityKind.Preset.maxBytes) {
         throw IllegalArgumentException("Preset file exceeds size limit")
     }
-    val scene = Scene.parse(file.readText())
+    val scene = communityScene(file, access)
     if (scene.node.name != "scene" || scene.layers.isEmpty()) {
         throw IllegalArgumentException("Preset does not contain any layers")
     }
     return store.save(scene)
 }
 
-private suspend fun renderPresetPicture(engine: EngineThread, xml: String): ByteArray? {
-    val scene = Scene.parse(xml)
+internal suspend fun renderPresetPicture(engine: EngineThread, scene: Scene): ByteArray? {
+    val xml = scene.toXml()
     val layers = scene.layers.takeIf { it.isNotEmpty() } ?: return null
     val start = layers.minOf { it.startTime }.coerceAtLeast(0)
     val span = (layers.maxOf { it.endTime } - start).coerceAtLeast(0)
@@ -343,8 +367,9 @@ private suspend fun renderPresetPicture(engine: EngineThread, xml: String): Byte
     val (probeWidth, probeHeight) = size(PRESET_PROBE_SIDE)
     val (width, height) = size(PRESET_PICTURE_SIDE)
     val pixels = engine.exportSession(xml) {
-        val best = times.maxBy { still(it, probeWidth, probeHeight)?.let(::opacitySum) ?: -1L }
-        still(best, width, height)
+        val sums = times.map { still(it, probeWidth, probeHeight)?.let(::opacitySum) ?: -1L }
+        val best = sums.indices.maxBy { sums[it] }
+        if (sums[best] > 0) still(times[best], width, height) else null
     } ?: return null
     return ByteArrayOutputStream().also { encodeRgba(pixels, width, height, ExportSettings(minOf(width, height), scene.fps), null, it) }.toByteArray()
 }
@@ -370,7 +395,7 @@ private fun readBounded(input: InputStream, maxBytes: Long): ByteArray {
     return out.toByteArray()
 }
 
-private fun sha256String(text: String): String {
+internal fun sha256String(text: String): String {
     val digest = MessageDigest.getInstance("SHA-256").digest(text.toByteArray(Charsets.UTF_8))
     return digest.joinToString("") { String.format(Locale.ROOT, "%02x", it) }
 }

@@ -88,6 +88,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.isPrimaryPressed
 import androidx.compose.ui.input.pointer.isSecondaryPressed
 import androidx.compose.ui.input.pointer.isTertiaryPressed
@@ -329,13 +330,17 @@ fun Timeline(state: EditorState, modifier: Modifier = Modifier) {
     if (deskLayout) app.absentmotion.platform.BackHandler(view.menuAt != null) { view.menuAt = null }
     if (deskLayout) app.absentmotion.platform.BackHandler(view.renameId != null) { view.renameId = null }
     if (deskLayout) DisposableEffect(view) {
-        DeskTimelineControls.zoom = { view.zoomBy(it) }
-        DeskTimelineControls.fit = { view.fit() }
-        DeskDrop.frameAt = { point -> view.frameAtWindow(point) }
+        val zoom: (Float) -> Unit = { view.zoomBy(it) }
+        val fit = { view.fit() }
+        val frameAt: (Offset) -> Int? = { point -> view.frameAtWindow(point) }
+        val before = Triple(DeskTimelineControls.zoom, DeskTimelineControls.fit, DeskDrop.frameAt)
+        DeskTimelineControls.zoom = zoom
+        DeskTimelineControls.fit = fit
+        DeskDrop.frameAt = frameAt
         onDispose {
-            DeskTimelineControls.zoom = null
-            DeskTimelineControls.fit = null
-            DeskDrop.frameAt = { null }
+            if (DeskTimelineControls.zoom === zoom) DeskTimelineControls.zoom = before.first
+            if (DeskTimelineControls.fit === fit) DeskTimelineControls.fit = before.second
+            if (DeskDrop.frameAt === frameAt) DeskDrop.frameAt = before.third
         }
     }
 
@@ -853,7 +858,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
     var desktopDragging by mutableStateOf(false)
     private var desktopAnchor: Long? = null
     fun selectDesktop(id: Long, toggle: Boolean, range: Boolean) {
-        val anchor = desktopAnchor ?: state.selectedId ?: MultiSelect.ids.firstOrNull()
+        val anchor = state.selectedId ?: desktopAnchor?.takeIf { it in MultiSelect.ids } ?: MultiSelect.ids.firstOrNull()
         val a = if (range) anchor?.let { rowOf(it) } else null
         if (a == null) desktopAnchor = id
         if (a != null) {
@@ -1130,7 +1135,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
         keyFrame = hit.frame
         keyMs = TimelineMath.frameTimeMs(hit.frame, fps)
         keyId = hit.id
-        snapTargets = TimelineMath.snapTargets(state.scene, hit.id, state.frame)
+        snapTargets = TimelineMath.snapTargets(state.scene, hit.id, state.playheadFrame)
     }
 
     private fun snapNear(ms: Float): Int? = if (deskLayout && snapDisabled) null else TimelineMath.snapFrame(ms, snapTargets, fps, SnapZone.px / timeScale().pxPerMs)
@@ -1217,7 +1222,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
                 trimScene = state.scene
                 trimGroup = if (MultiSelect.active && hit.id in MultiSelect.ids) layers.filter { it.id in MultiSelect.ids && it.id != hit.id } else emptyList()
                 edgeMs = (if (hit.start) layer?.startTime else layer?.endTime?.plus(1))?.toFloat() ?: 0f
-                snapTargets = TimelineMath.snapTargets(state.scene, trimGroup.map { it.id }.toSet() + hit.id, state.frame)
+                snapTargets = TimelineMath.snapTargets(state.scene, trimGroup.map { it.id }.toSet() + hit.id, state.playheadFrame)
                 if (hit.start) Drag.TrimStart else Drag.TrimEnd
             }
             hit is Hit.Handle && !state.lookOnly -> {
@@ -1393,7 +1398,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
         moveDx = 0f
         moveSlide = 0f
         moveArmed = false
-        snapTargets = TimelineMath.snapTargets(state.scene, moveGroupIds + id, state.frame)
+        snapTargets = TimelineMath.snapTargets(state.scene, moveGroupIds + id, state.playheadFrame)
         return true
     }
 
@@ -1596,7 +1601,7 @@ private suspend fun PointerInputScope.desktopTimelineGestures(view: TimelineView
             val plain = !command && !modifiers.isShiftPressed
             when (event.type) {
                 PointerEventType.Scroll -> {
-                    view.wheel(change.scrollDelta, at, modifiers.isCtrlPressed || modifiers.isMetaPressed, modifiers.isShiftPressed)
+                    if (drag == null) view.wheel(change.scrollDelta, at, modifiers.isCtrlPressed || modifiers.isMetaPressed, modifiers.isShiftPressed)
                     if (rubbering) view.rubberRefresh()
                     if (down == null) view.hover(at)
                     change.consume()
@@ -1623,7 +1628,7 @@ private suspend fun PointerInputScope.desktopTimelineGestures(view: TimelineView
                 continue
             }
             if (event.type == PointerEventType.Press && down == null && app.absentmotion.platform.textFieldFocused()) focus.clearFocus()
-            if (event.type == PointerEventType.Press && (event.buttons.isSecondaryPressed || MacOs && modifiers.isCtrlPressed) && down == null) {
+            if (event.type == PointerEventType.Press && (event.buttons.isSecondaryPressed || MacOs && modifiers.isCtrlPressed) && down == null && !view.state.lookOnly) {
                 val id = view.clipId(view.hitAt(at))
                 if (id != null) view.selectDesktop(id, false, false)
                 view.menuId = id
@@ -1631,11 +1636,12 @@ private suspend fun PointerInputScope.desktopTimelineGestures(view: TimelineView
                 change.consume()
                 continue
             }
-            if (event.type == PointerEventType.Press && event.buttons.isPrimaryPressed && down == null && !view.isCovered(at)) {
+            val primary = event.buttons.isPrimaryPressed || change.type == PointerType.Touch || change.type == PointerType.Stylus
+            if (event.type == PointerEventType.Press && primary && down == null && !view.isCovered(at)) {
                 view.stopMotion()
                 down = at
                 previous = at
-                hit = view.hitAt(at)
+                hit = view.hitAt(at).takeIf { !view.state.lookOnly || it == Hit.Ruler }
                 moved = false
                 resizing = view.nearHeaderEdge(at.x)
                 view.resizingHeader = resizing

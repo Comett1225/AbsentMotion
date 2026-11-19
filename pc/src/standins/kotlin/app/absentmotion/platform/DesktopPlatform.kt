@@ -137,9 +137,9 @@ internal fun webpFormat(lossless: Boolean) = if (lossless) android.graphics.Bitm
 class MediaPicker(private val launchBlock: () -> Unit) { fun launch() = launchBlock() }
 
 @Composable
-fun rememberMediaPicker(videoOnly: Boolean = false, onResult: (Uri?) -> Unit): MediaPicker {
+fun rememberMediaPicker(videoOnly: Boolean = false, imageOnly: Boolean = false, onResult: (Uri?) -> Unit): MediaPicker {
     val latest by rememberUpdatedState(onResult)
-    return remember { MediaPicker { latest(DeskFiles.chooseOne(media = true, videoOnly = videoOnly)) } }
+    return remember { MediaPicker { latest(DeskFiles.chooseOne(media = true, videoOnly = videoOnly, imageOnly = imageOnly)) } }
 }
 
 class DocumentPicker(private val launchBlock: () -> Unit) { fun launch() = launchBlock() }
@@ -400,7 +400,7 @@ internal suspend fun desktopGifVideo(context: Context, uri: Uri): app.absentmoti
 internal fun desktopFrameReader(context: Context, uri: String): app.absentmotion.media.DesktopFrameInput = app.absentmotion.media.DeskFrameReader(context, uri)
 
 fun rawFrameImage(rgba: ByteArray, width: Int, height: Int): ImageBitmap = org.jetbrains.skia.Bitmap().apply {
-    installPixels(org.jetbrains.skia.ImageInfo(width, height, org.jetbrains.skia.ColorType.RGBA_8888, org.jetbrains.skia.ColorAlphaType.PREMUL), rgba, width * 4)
+    installPixels(org.jetbrains.skia.ImageInfo(width, height, org.jetbrains.skia.ColorType.RGBA_8888, org.jetbrains.skia.ColorAlphaType.UNPREMUL), rgba, width * 4)
     setImmutable()
 }.asComposeImageBitmap()
 

@@ -47,12 +47,13 @@ object Waveforms {
     }
 
     private const val RETRY_MS = 30_000L
+    private const val MAX_BINS = 24 * 3600 * 1000 / AudioPeaks.BIN_MS
 
     private fun cacheFile(context: Context, uri: String) = File(File(context.cacheDir, "waveforms"), "${uri.hashCode().toUInt().toString(16)}-${uri.length}.bin")
 
     private fun load(context: Context, uri: String): AudioPeaks {
         val file = cacheFile(context, uri)
-        val version = runCatching { app.absentmotion.media.fileVersion(context.contentResolver, android.net.Uri.parse(uri)) }.getOrNull().orEmpty()
+        val version = "pts|" + runCatching { app.absentmotion.media.fileVersion(context.contentResolver, android.net.Uri.parse(uri)) }.getOrNull().orEmpty()
         runCatching {
             DataInputStream(file.inputStream().buffered()).use { input ->
                 if (input.readUTF() == uri && input.readUTF() == version) return AudioPeaks(ByteArray(input.readInt()).also { input.readFully(it) })
@@ -71,24 +72,24 @@ object Waveforms {
         return peaks
     }
 
-    private fun decode(context: Context, uri: String): AudioPeaks {
-        PcmDecoder(context, uri).use { decoder ->
-            var bytes = ByteArray(if (decoder.durationUs > 0) (decoder.durationUs / 1000 / AudioPeaks.BIN_MS).toInt() + 16 else 4096)
-            var frame = 0L
-            var maxBin = 0
-            while (true) {
-                val chunk = decoder.next() ?: break
-                val perBin = chunk.rate * AudioPeaks.BIN_MS / 1000.0
-                for (i in 0 until chunk.frames) {
-                    val bin = ((frame + i) / perBin).toInt()
-                    if (bin >= bytes.size) bytes = bytes.copyOf(maxOf(bytes.size * 2, bin + 1))
-                    val v = maxOf(abs(chunk.pcm[2 * i].toInt()), abs(chunk.pcm[2 * i + 1].toInt())) / 128
-                    if (v > (bytes[bin].toInt() and 0xFF)) bytes[bin] = minOf(v, 255).toByte()
-                    if (bin > maxBin) maxBin = bin
-                }
-                frame += chunk.frames
+    private fun decode(context: Context, uri: String): AudioPeaks = PcmDecoder(context, uri).use(::peaksOf)
+
+    internal fun peaksOf(decoder: PcmSource): AudioPeaks {
+        var bytes = ByteArray(if (decoder.durationUs > 0) (decoder.durationUs / 1000 / AudioPeaks.BIN_MS).toInt() + 16 else 4096)
+        var maxBin = 0
+        while (true) {
+            val chunk = decoder.next() ?: break
+            val perBin = chunk.rate * AudioPeaks.BIN_MS / 1000.0
+            val first = chunk.ptsUs * chunk.rate / 1_000_000.0
+            for (i in 0 until chunk.frames) {
+                val bin = ((first + i) / perBin).toInt().coerceAtLeast(0)
+                if (bin >= MAX_BINS) break
+                if (bin >= bytes.size) bytes = bytes.copyOf(maxOf(bytes.size * 2, bin + 1))
+                val v = maxOf(abs(chunk.pcm[2 * i].toInt()), abs(chunk.pcm[2 * i + 1].toInt())) / 128
+                if (v > (bytes[bin].toInt() and 0xFF)) bytes[bin] = minOf(v, 255).toByte()
+                if (bin > maxBin) maxBin = bin
             }
-            return AudioPeaks(bytes.copyOf(maxBin + 1))
         }
+        return AudioPeaks(bytes.copyOf(maxBin + 1))
     }
 }

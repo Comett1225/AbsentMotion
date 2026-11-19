@@ -185,6 +185,8 @@ internal object AiDevice {
 
     fun gpuOn(context: Context): Boolean = !quarantined && aiUsesGpu(AiNative.gpu, gpuChoice(context))
 
+    private fun gpuUsable(context: Context): Boolean = !AiNet.cpuOnly && !app.absentmotion.Tier.openGl && gpuOn(context)
+
     fun gpuRisky(context: Context): Boolean = AiNative.gpu?.known != true || gpuPrefs(context).getBoolean(GPU_FAILED, false)
 
     fun setGpu(context: Context, on: Boolean) {
@@ -208,7 +210,7 @@ internal object AiDevice {
     fun gpuProven(context: Context, model: AiModel): Boolean = gpuOn(context) && gpuPrefs(context).getString(proofKey(context, model), null) == GPU_OK
 
     suspend fun probeGpu(context: Context, model: AiModel): Boolean = probing.withLock {
-        if (!withContext(Dispatchers.Default) { gpuOn(context) }) return false
+        if (!withContext(Dispatchers.Default) { gpuUsable(context) }) return false
         if (gpuProven(context, model)) return true
         if (!model.installed(context)) return false
         val work = running[model]?.takeIf { it.isActive } ?: probes.async {
@@ -251,7 +253,7 @@ internal object AiDevice {
     suspend fun phone(context: Context): AiPhone {
         val ram = aiRam(context)
         val speed = runCatching { DeviceCapabilities.of(context).load()?.let { phoneCheckResult(it, if (Build.VERSION.SDK_INT >= 31) Build.VERSION.MEDIA_PERFORMANCE_CLASS else 0).speed } }.getOrNull() ?: PhoneSpeed.Basic
-        return withContext(Dispatchers.Default) { AiPhone(AiNative.loaded, AiNative.gpu, ram, speed, gpuOn(context)) }
+        return withContext(Dispatchers.Default) { AiPhone(AiNative.loaded, AiNative.gpu, ram, speed, gpuUsable(context)) }
     }
 
     fun measured(model: AiModel, gpu: Boolean): Double? = rates[model to gpu]

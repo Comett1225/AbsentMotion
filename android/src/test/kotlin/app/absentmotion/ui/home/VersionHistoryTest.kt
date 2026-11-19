@@ -59,6 +59,8 @@ class VersionHistoryTest {
         val older = versionLabel(at(2026, 10, 20, 14, 32), now)
         assertEquals(R.string.safety_version_on_date, older.id)
         assertEquals("14:32", older.args[1])
+        assertEquals("20 October 2026", versionLabel(at(2026, 10, 20, 14, 32), now, java.util.Locale.ENGLISH).args[0])
+        assertEquals("2026年10月20日", versionLabel(at(2026, 10, 20, 14, 32), now, java.util.Locale.JAPANESE).args[0])
     }
 
     @Test fun closedTextUsesTheSameMomentRules() {

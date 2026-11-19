@@ -75,7 +75,8 @@ internal fun Layer.shiftedMedia(by: Int): Layer {
     val fill = mediaFill
     if (by == 0 || fill == null) return this
     val inTime = (fill.inTime.toLong() + by).coerceAtLeast(0)
-    val moved = node.with("inTime", "$inTime").let { n ->
+    val looped = node["loopIn"]?.toLongOrNull()?.takeIf { it <= fill.inTime && node["loop"] == "true" }?.let { node.with("loopIn", "${(it + inTime - fill.inTime).coerceAtLeast(0)}") } ?: node
+    val moved = looped.with("inTime", "$inTime").let { n ->
         val delta = (inTime - fill.inTime) * 1_000_000.0
         val map = n.child("speedMap")
         if (map == null || delta == 0.0) n

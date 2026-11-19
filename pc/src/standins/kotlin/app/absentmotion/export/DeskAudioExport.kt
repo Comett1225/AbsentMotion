@@ -41,7 +41,7 @@ internal suspend fun exportAudio(s: ExportSettings, totalUs: Long, mix: AudioMix
                     else ByteBuffer.allocate(wanted * 2).order(ByteOrder.LITTLE_ENDIAN).also { it.asShortBuffer().put(mix(from, to).copyOf(wanted)) }
                 stdin.write(bytes.array())
                 frame = next
-                ensureStorage()
+                ensureRoomFor(result)
                 progress(frame.toFloat() / totalFrames * 0.99f)
             }
             stdin.flush()

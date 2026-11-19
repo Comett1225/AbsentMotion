@@ -61,7 +61,8 @@ internal object ProxyRules {
         !hdr && width > 0 && height > 0 && (max(width, height) > MAX_LONG_SIDE || min(width, height) > MAX_SHORT_SIDE || syncGapUs > MAX_SYNC_GAP_US)
 
     fun size(width: Int, height: Int): Pair<Int, Int> {
-        val scale = min(1.0, SHORT_SIDE.toDouble() / min(width, height))
+        val big = max(width, height) > MAX_LONG_SIDE || min(width, height) > MAX_SHORT_SIDE
+        val scale = if (big) min(1.0, SHORT_SIDE.toDouble() / min(width, height)) else 1.0
         fun even(v: Double) = max(2, (v / 2).roundToInt() * 2)
         return even(width * scale) to even(height * scale)
     }
@@ -78,8 +79,12 @@ internal object ProxyRules {
 
     fun roomFor(freeBytes: Long, neededBytes: Long): Boolean = freeBytes >= neededBytes + FREE_RESERVE
 
-    fun key(uri: String, version: String?): String? = version?.let {
-        MessageDigest.getInstance("SHA-256").digest("$uri\n$it".toByteArray()).joinToString("") { b -> "%02x".format(b) }.take(32)
+    fun key(uri: String, version: String?): String? = digest(uri, version, "\nturned")
+
+    fun earlierKey(uri: String, version: String?): String? = digest(uri, version, "")
+
+    private fun digest(uri: String, version: String?, mark: String): String? = version?.let {
+        MessageDigest.getInstance("SHA-256").digest("$uri\n$it$mark".toByteArray()).joinToString("") { b -> "%02x".format(b) }.take(32)
     }
 
     fun sameFrames(source: LongArray, proxy: LongArray): Boolean =
@@ -162,6 +167,12 @@ object VideoProxies {
         if (done.isFile || failures >= ProxyRules.MAX_TRIES) { settled += uri; return }
         val info = sourceInfo(context, uri)
         if (!ProxyRules.needed(info.width, info.height, VideoSources.syncGapUs(context, uri), info.hdr)) { settled += uri; return }
+        if (reuseEarlier(context, File(folder, "${ProxyRules.earlierKey(uri, version)}.mp4"), done, info)) {
+            kept(key, uri)
+            settled += uri
+            made.update { it + 1 }
+            return
+        }
         val needed = ProxyRules.bytes(info.width, info.height, info.fps, info.durationUs)
         if (needed > BUDGET_BYTES) { settled += uri; return }
         trim(folder, BUDGET_BYTES - needed)
@@ -176,7 +187,7 @@ object VideoProxies {
         try {
             making.update { it + (uri to 0f) }
             var shown = 0f
-            val finished = transcode(context, uri, part, cancelled) { p ->
+            val finished = transcode(context, uri, part, cancelled, rotation = info.rotation) { p ->
                 if (p - shown >= 0.01f) { shown = p; making.update { it + (uri to p) } }
             }
             if (!finished) { part.delete(); return }
@@ -214,7 +225,14 @@ object VideoProxies {
     private fun kept(key: String, uri: String) { if (uri !in evicted) owners[key] = uri }
 }
 
-private class SourceInfo(val width: Int, val height: Int, val hdr: Boolean, val fps: Int, val durationUs: Long)
+private fun reuseEarlier(context: Context, earlier: File, done: File, source: SourceInfo): Boolean {
+    if (source.rotation != 0 || !earlier.isFile) return false
+    val copy = runCatching { sourceInfo(context, Uri.fromFile(earlier).toString()) }.getOrNull() ?: return false
+    if (copy.width to copy.height != ProxyRules.size(source.width, source.height)) return false
+    return earlier.renameTo(done)
+}
+
+private class SourceInfo(val width: Int, val height: Int, val hdr: Boolean, val fps: Int, val durationUs: Long, val rotation: Int)
 
 private fun sourceInfo(context: Context, uri: String): SourceInfo {
     val extractor = MediaExtractor()
@@ -224,7 +242,7 @@ private fun sourceInfo(context: Context, uri: String): SourceInfo {
         val (width, height) = visibleSize(format)
         val fps = (format.numberOf(MediaFormat.KEY_FRAME_RATE)?.toFloat() ?: 30f).roundToInt().coerceIn(1, 120)
         val durationUs = if (format.containsKey(MediaFormat.KEY_DURATION)) format.getLong(MediaFormat.KEY_DURATION) else 0L
-        return SourceInfo(width, height, isHdrTransfer(format.intOr(MediaFormat.KEY_COLOR_TRANSFER, 0)), fps, durationUs)
+        return SourceInfo(width, height, isHdrTransfer(format.intOr(MediaFormat.KEY_COLOR_TRANSFER, 0)), fps, durationUs, format.intOr(MediaFormat.KEY_ROTATION, 0))
     } finally { extractor.release() }
 }
 

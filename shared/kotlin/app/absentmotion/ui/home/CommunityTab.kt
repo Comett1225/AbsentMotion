@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -56,6 +57,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -80,6 +82,7 @@ import app.absentmotion.library.CommunityIndex
 import app.absentmotion.library.CommunityItem
 import app.absentmotion.library.CommunityKind
 import app.absentmotion.library.CommunitySort
+import app.absentmotion.library.MediaAccess
 import app.absentmotion.library.PresetStore
 import app.absentmotion.library.addCommunityPreset
 import app.absentmotion.library.communityMatches
@@ -113,6 +116,7 @@ internal class CommunityBrowseState {
     var include by mutableStateOf(emptySet<String>())
     var exclude by mutableStateOf(emptySet<String>())
     fun clear() { query = ""; include = emptySet(); exclude = emptySet() }
+    val filtered: Boolean get() = query.isNotBlank() || include.isNotEmpty() || exclude.isNotEmpty()
     fun cycle(tag: String) {
         when (tag) {
             in include -> { include -= tag; exclude += tag }
@@ -203,6 +207,53 @@ private class ActiveDownload(
     val cancelled: AtomicBoolean
 )
 
+internal const val COMMUNITY_FORM = "https://forms.gle/Xyn4TiKNJ9kUPQ7x8"
+
+@Composable
+private fun CommunityShareCard(modifier: Modifier) {
+    val links = LocalUriHandler.current
+    val context = LocalContext.current
+    val prefs = remember { context.getSharedPreferences("settings", android.content.Context.MODE_PRIVATE) }
+    var hidden by remember { mutableStateOf(prefs.getBoolean(SHARE_CARD_HIDDEN, false)) }
+    if (hidden) return
+    Column(
+        modifier.clip(RoundedCornerShape(12.dp)).background(Am.Card).clickable { runCatching { links.openUri(COMMUNITY_FORM) } }
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(stringResource(R.string.community_share_title), Modifier.weight(1f), color = Am.Navy, fontSize = 15.sp, fontWeight = FontWeight.Medium)
+            Spacer(Modifier.width(12.dp))
+            Box(Modifier.heightIn(min = 36.dp).clip(RoundedCornerShape(14.dp)).background(Am.Navy).padding(horizontal = 14.dp, vertical = 8.dp), contentAlignment = Alignment.Center) {
+                Text(stringResource(R.string.community_share_button), color = Am.OnNavy, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+            }
+        }
+        Row(Modifier.padding(top = 4.dp), verticalAlignment = Alignment.Bottom) {
+            Text(stringResource(R.string.community_share_hint), Modifier.weight(1f), color = Am.HomeDim, fontSize = 12.sp, lineHeight = 16.sp)
+            Text(
+                stringResource(R.string.community_share_hide),
+                Modifier.padding(start = 12.dp).clip(RoundedCornerShape(8.dp)).clickable {
+                    hidden = true
+                    prefs.edit().putBoolean(SHARE_CARD_HIDDEN, true).apply()
+                }.padding(horizontal = 6.dp, vertical = 4.dp),
+                color = Am.Navy, fontSize = 13.sp, fontWeight = FontWeight.Medium, maxLines = 1,
+            )
+        }
+    }
+}
+
+private const val SHARE_CARD_HIDDEN = "communityShareHidden"
+
+@Composable
+private fun CommunityFormLine(modifier: Modifier = Modifier) {
+    val links = LocalUriHandler.current
+    Text(
+        stringResource(R.string.community_form_line),
+        modifier.clip(RoundedCornerShape(8.dp)).clickable { runCatching { links.openUri(COMMUNITY_FORM) } }.padding(horizontal = 8.dp, vertical = 6.dp),
+        color = Am.Navy, fontSize = 14.sp, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center,
+        textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline,
+    )
+}
+
 @Composable
 fun CommunityTab(modifier: Modifier, engine: (() -> EngineThread)? = null, onImport: (File) -> Unit) {
     val browse = sessionBrowse
@@ -275,6 +326,8 @@ fun CommunityTab(modifier: Modifier, engine: (() -> EngineThread)? = null, onImp
             }
             Column(modifier.fillMaxSize()) {
                 Spacer(Modifier.height(if (isDesktop) 16.dp else 8.dp))
+                CommunityShareCard(Modifier.padding(horizontal = pad).fillMaxWidth())
+                Spacer(Modifier.height(8.dp))
                 CommunityBrowseControls(
                     browse, if (pager.currentPage == 0) projects else presets,
                     Modifier.padding(horizontal = pad).fillMaxWidth()
@@ -306,7 +359,7 @@ fun CommunityTab(modifier: Modifier, engine: (() -> EngineThread)? = null, onImp
                         when (category) {
                             CommunityCategory.Projects -> CommunityItemsPage(
                                 items = communityMatches(projects, browse.query, browse.sort, browse.include, browse.exclude),
-                                onClear = browse::clear,
+                                onClear = browse::clear.takeIf { browse.filtered },
                                 pad = pad,
                                 client = client,
                                 engine = engine,
@@ -315,7 +368,7 @@ fun CommunityTab(modifier: Modifier, engine: (() -> EngineThread)? = null, onImp
                             )
                             CommunityCategory.Presets -> CommunityItemsPage(
                                 items = communityMatches(presets, browse.query, browse.sort, browse.include, browse.exclude),
-                                onClear = browse::clear,
+                                onClear = browse::clear.takeIf { browse.filtered },
                                 pad = pad,
                                 client = client,
                                 engine = engine,
@@ -483,7 +536,7 @@ private fun CommunityCategoryBar(
 @Composable
 private fun CommunityItemsPage(
     items: List<CommunityItem>,
-    onClear: () -> Unit,
+    onClear: (() -> Unit)?,
     pad: Dp,
     client: CommunityClient,
     engine: (() -> EngineThread)?,
@@ -493,13 +546,18 @@ private fun CommunityItemsPage(
     if (items.isEmpty()) {
         Column(Modifier.fillMaxSize().padding(horizontal = 24.dp), Arrangement.Center, Alignment.CenterHorizontally) {
             Text(
-                text = stringResource(R.string.community_no_matches),
+                text = stringResource(if (onClear == null) R.string.community_empty else R.string.community_no_matches),
                 color = Am.HomeMid,
                 fontSize = 15.sp,
                 textAlign = TextAlign.Center
             )
-            Spacer(Modifier.height(12.dp))
-            BigButton(stringResource(R.string.community_clear_search_filters), primary = false, onClick = onClear)
+            if (onClear != null) {
+                Spacer(Modifier.height(12.dp))
+                BigButton(stringResource(R.string.community_clear_search_filters), primary = false, onClick = onClear)
+            } else {
+                Spacer(Modifier.height(8.dp))
+                CommunityFormLine()
+            }
         }
     } else {
         LazyVerticalGrid(
@@ -513,18 +571,16 @@ private fun CommunityItemsPage(
                 val key = item.thumbKey
                 LaunchedEffect(key) {
                     if (!thumbs.containsKey(key)) {
-                        val bmp = withContext(Dispatchers.IO) {
-                            val bytes = try {
-                                if (item.kind == CommunityKind.Preset) engine?.let { client.presetPicture(item, it()) }
-                                else client.thumbnail(item)
+                        val loaded = withContext(Dispatchers.IO) {
+                            try {
+                                Result.success(decodeCommunityThumb(if (item.kind == CommunityKind.Preset) engine?.let { client.presetPicture(item, it()) } else client.thumbnail(item)))
                             } catch (e: CancellationException) {
                                 throw e
-                            } catch (_: Exception) {
-                                null
+                            } catch (e: Exception) {
+                                Result.failure(e)
                             }
-                            decodeCommunityThumb(bytes)
                         }
-                        thumbs[key] = bmp
+                        loaded.onSuccess { thumbs[key] = it }
                     }
                 }
                 CommunityGridCard(
@@ -532,6 +588,9 @@ private fun CommunityItemsPage(
                     thumb = thumbs[key],
                     onClick = { onSelect(item) }
                 )
+            }
+            item(key = "form", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
+                Box(Modifier.fillMaxWidth().padding(top = 8.dp), contentAlignment = Alignment.Center) { CommunityFormLine() }
             }
         }
     }
@@ -630,7 +689,8 @@ private fun CommunityItemSheet(
                 val file = withContext(Dispatchers.IO) {
                     val downloaded = CommunityClient(context.cacheDir) { http }.download(item)
                     if (item.kind == CommunityKind.Preset) {
-                        addCommunityPreset(downloaded, PresetStore(context))
+                        if (downloaded.extension == "absproj") app.absentmotion.library.addPresetBundle(context, downloaded)
+                        else addCommunityPreset(downloaded, PresetStore(context), MediaAccess.forApp(context))
                     }
                     downloaded
                 }
@@ -743,7 +803,7 @@ private fun CommunityItemSheet(
     ) {
         Spacer(Modifier.height(16.dp))
         val thumbRatio = if (thumb != null && thumb.width > 0 && thumb.height > 0) {
-            thumb.width.toFloat() / thumb.height.toFloat()
+            (thumb.width.toFloat() / thumb.height.toFloat()).coerceIn(0.2f, 5f)
         } else {
             1.5f
         }
@@ -830,7 +890,7 @@ private fun CommunityItemSheet(
 
 private val CommunityItem.thumbKey: String get() = "${kind.id}/$name/$sha256"
 
-private fun decodeCommunityThumb(bytes: ByteArray?): ImageBitmap? {
+internal fun decodeCommunityThumb(bytes: ByteArray?): ImageBitmap? {
     if (bytes == null || bytes.isEmpty()) return null
     return try {
         val bounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }

@@ -26,6 +26,29 @@ class DeskModelEffectTest {
 <model id="1" startTime="0" endTime="999" src="$uri"><transform><location value="200,200,0"/><tilt value="90,30"/></transform>
 <property name="size" type="float" value="120"/><property name="ambient" type="float" value="1"/>$effect</model></scene>""")
 
+    @Test fun aMirroredModelIsLitOnTheSideFacingTheLight() = runBlocking {
+        out.mkdirs()
+        System.setProperty("am.data", out.resolve("data").path)
+        val uri = cube()
+        val engine = EngineThread(0xff000000.toInt(), Desk.context)
+        try {
+            engine.effects.first { it.definitions.isNotEmpty() }
+            for (mirror in listOf("1", "-1")) {
+                val s = Scene.parse("""<scene title="m" width="400" height="400" fps="30" totalTime="999" bgcolor="#ff000000">
+<media uri="$uri" filename="cube.obj" title="cube.obj" type="model/obj" />
+<model id="1" startTime="0" endTime="999" src="$uri"><transform><location value="200,200,0"/><scale value="$mirror,1"/><tilt value="0,45"/></transform>
+<property name="size" type="float" value="80"/><property name="ambient" type="float" value="0"/></model></scene>""")
+                val pixels = checkNotNull(engine.exportSession(s.toXml()) { still(s.frameStart(5), 400, 400) })
+                fun light(from: Int, to: Int) = (0 until 400).sumOf { y -> (from until to).sumOf { x -> pixels[(y * 400 + x) * 4 + 1].toInt() and 255 } }
+                val left = light(0, 200)
+                val right = light(200, 400)
+                assertTrue("scale $mirror: left $left, right $right", left > right && left > 0)
+            }
+        } finally {
+            engine.close()
+        }
+    }
+
     private fun bright(pixels: ByteArray): Int = (0 until 400 * 400).count { i -> (0..2).any { (pixels[i * 4 + it].toInt() and 255) > 128 } }
 
     @Test fun effectsOnAModelTurnedEdgeOnKeepTheWholeModel() = runBlocking {

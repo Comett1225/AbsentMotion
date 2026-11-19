@@ -73,7 +73,7 @@ private fun rememberStore(): ProjectStore {
 internal fun rememberSaveToMyElements(state: EditorState): (done: () -> Unit) -> Unit {
     val context = LocalContext.current
     val store = rememberStore()
-    val scope = rememberCoroutineScope()
+    val scope = LocalEditorScope.current
     return { done ->
         scope.launch {
             try {
@@ -90,6 +90,7 @@ internal fun rememberSaveToMyElements(state: EditorState): (done: () -> Unit) ->
 
 @Composable
 internal fun ElementPicker(state: EditorState, modifier: Modifier) {
+    val context = LocalContext.current
     val store = rememberStore()
     val scope = LocalEditorScope.current
     var items by remember { mutableStateOf<List<ProjectInfo>?>(null) }
@@ -111,7 +112,7 @@ internal fun ElementPicker(state: EditorState, modifier: Modifier) {
             shown.isEmpty() -> NoMatches(query, R.string.search_no_assets_or_projects, body)
             else -> LazyRow(body.padding(start = 8.5.dp), verticalAlignment = Alignment.CenterVertically) {
                 items(shown, key = { it.id }) { info -> ElementCard(info) {
-                    if (!state.addingMedia) scope.launch { state.addingMedia = true; try { state.addElement(store, info.id, link = info.isElement) } finally { state.addingMedia = false } }
+                    if (!state.addingMedia) scope.launch { state.addingMedia = true; try { state.addElement(store, info.id, link = info.isElement)?.let { Toast.makeText(context, it, Toast.LENGTH_LONG).show() } } finally { state.addingMedia = false } }
                 } }
             }
         }

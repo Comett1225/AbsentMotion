@@ -79,7 +79,7 @@ JNIEXPORT jlongArray JNICALL Java_app_absentmotion_ffamp_FfampNative_track(JNIEn
         jlong(k->sampleRate), jlong(k->channels), jlong(std::llround(k->seconds() * 1e6)), jlong(k->samples.size()), jlong(largest),
         jlong(k->color.known), jlong(k->color.primaries), jlong(k->color.transfer), jlong(k->color.matrix), jlong(k->color.full), jlong(k->alpha),
         jlong(k->codec), jlong(k->bits), jlong(android::codecProfile(*k)), jlong(android::codecLevel(*k)),
-        jlong(k->timescale ? std::llround((TrackStart(*k) - FileStart(*opened(h)->reader)) * 1e6) : 0)};
+        jlong(k->timescale ? std::llround((TrackStart(*k) - FileStart(*opened(h)->reader)) * 1e6) : 0), jlong(k->bigEndian)};
     const jsize n = jsize(sizeof(values) / sizeof(values[0]));
     jlongArray out = env->NewLongArray(n);
     env->SetLongArrayRegion(out, 0, n, values);
@@ -167,14 +167,19 @@ JNIEXPORT jint JNICALL Java_app_absentmotion_ffamp_FfampNative_videoFeed(JNIEnv*
 JNIEXPORT jlong JNICALL Java_app_absentmotion_ffamp_FfampNative_videoTake(JNIEnv* env, jobject, jlong v, jobject buffer, jintArray shape) {
     auto* d = reinterpret_cast<Video*>(v);
     if (d->ready.empty()) return INT64_MIN;
-    android::SoftPicture p = std::move(d->ready.front());
-    d->ready.pop_front();
+    const android::SoftPicture& p = d->ready.front();
     const jint dims[3] = {p.width, p.height, p.rgb};
     env->SetIntArrayRegion(shape, 0, 3, dims);
     auto* base = static_cast<uint8_t*>(env->GetDirectBufferAddress(buffer));
-    if (!base || env->GetDirectBufferCapacity(buffer) < jlong(p.i420.size())) return INT64_MIN + 1;
+    if (!base) {
+        d->ready.pop_front();
+        return INT64_MIN + 1;
+    }
+    if (env->GetDirectBufferCapacity(buffer) < jlong(p.i420.size())) return INT64_MIN + 2;
     memcpy(base, p.i420.data(), p.i420.size());
-    return p.stamp;
+    const int64_t stamp = p.stamp;
+    d->ready.pop_front();
+    return stamp;
 }
 
 JNIEXPORT void JNICALL Java_app_absentmotion_ffamp_FfampNative_videoReset(JNIEnv*, jobject, jlong v) {
@@ -196,9 +201,9 @@ JNIEXPORT jlong JNICALL Java_app_absentmotion_ffamp_FfampNative_audioOpen(JNIEnv
 
 JNIEXPORT jlongArray JNICALL Java_app_absentmotion_ffamp_FfampNative_audioShape(JNIEnv* env, jobject, jlong a) {
     auto& d = *reinterpret_cast<Audio*>(a)->decoder;
-    const jlong values[3] = {d.sampleRate(), d.channels(), d.length()};
-    jlongArray out = env->NewLongArray(3);
-    env->SetLongArrayRegion(out, 0, 3, values);
+    const jlong values[4] = {d.sampleRate(), d.channels(), d.length(), jlong(d.layout())};
+    jlongArray out = env->NewLongArray(4);
+    env->SetLongArrayRegion(out, 0, 4, values);
     return out;
 }
 

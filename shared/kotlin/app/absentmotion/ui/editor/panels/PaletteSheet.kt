@@ -119,7 +119,7 @@ internal enum class PaletteExport(val label: Int, val extension: String, val mim
 private val SortLabels = mapOf(PaletteSort.Hue to R.string.palette_sort_hue, PaletteSort.Lightness to R.string.palette_sort_lightness, PaletteSort.Saturation to R.string.palette_sort_saturation)
 
 internal fun readPaletteFile(context: Context, uri: Uri, picture: Boolean): Pair<String, List<Int>>? = runCatching {
-    val (name, bytes) = paletteSource(context, uri) ?: return null
+    val (name, bytes) = paletteSource(context, uri, if (picture) MaxPalettePictureBytes else MaxPaletteBytes) ?: return null
     val colors = (if (picture) null else Palettes.fromFile(name, bytes)) ?: pictureColors(bytes, Palettes.MAIN_COLORS)
     colors?.let { name.substringBeforeLast('.').ifBlank { name } to it }
 }.getOrNull()

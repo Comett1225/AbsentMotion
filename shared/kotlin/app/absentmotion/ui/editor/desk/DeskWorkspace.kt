@@ -150,7 +150,7 @@ private fun DeskWorkspaceBody(state: EditorState, onExit: () -> Unit, library: A
         onDispose { if (app.absentmotion.ui.editor.DeskDrop.panelKey === togglePanel) app.absentmotion.ui.editor.DeskDrop.panelKey = null }
     }
     SizedBox(Modifier.fillMaxSize().onGloballyPositioned { rootOrigin = it.positionInWindow() }.background(Am.TopBar).onPreviewKeyEvent {
-        val library = if (it.type == KeyEventType.KeyDown && !app.absentmotion.platform.textFieldFocused()) app.absentmotion.ui.editor.DeskDrop.panelChord(it) else null
+        val library = if (it.type == KeyEventType.KeyDown && !modal && app.absentmotion.ui.home.DeskModals.open == 0 && !app.absentmotion.platform.textFieldFocused()) app.absentmotion.ui.editor.DeskDrop.panelChord(it) else null
         if (library != null) togglePanel(library)
         library != null
     }.focusRequester(focusRequester).focusable()) { maxWidth, maxHeight ->
@@ -350,7 +350,7 @@ private fun DeskInspector(state: EditorState, library: AddLibrary, modifier: Mod
         Row(Modifier.fillMaxWidth().height(44.dp).padding(start = 8.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             if (state.selectedId != null && state.panel == EditorPanel.EditText) Box(Modifier.tutorialTarget("back")) { DeskIcon(ChromeIcons.Back, stringResource(R.string.topbar_back)) { state.stepBack() } }
             else if (layer != null && !MultiSelect.active) Icon(deskLayerIcon(layer), null, Modifier.padding(start = 4.dp).size(20.dp), tint = Am.OnDarkDim)
-            if (layer != null && !MultiSelect.active) key(layer.id) { DeskNameField(layer.shownName(), Modifier.weight(1f).padding(horizontal = 2.dp)) { state.renameLayer(layer.id, it) } }
+            if (layer != null && !MultiSelect.active) key(layer.id) { DeskNameField(layer.shownName(), Modifier.weight(1f).padding(horizontal = 2.dp), state) { state.renameLayer(layer.id, it) } }
             else Text(
                 if (MultiSelect.active) pluralStringResource(R.plurals.structure_layers_selected, MultiSelect.ids.size, MultiSelect.ids.size.toString()) else layer?.label ?: stringResource(R.string.desk_inspector),
                 Modifier.weight(1f).padding(horizontal = 8.dp), color = Am.OnDark, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis,

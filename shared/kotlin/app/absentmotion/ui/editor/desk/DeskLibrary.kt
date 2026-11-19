@@ -303,7 +303,7 @@ private fun DeskElementPicker(state: EditorState) {
                     val thumbnail by produceState<androidx.compose.ui.graphics.ImageBitmap?>(null, info.id, info.modified) {
                         value = withContext(Dispatchers.IO) { info.thumbnail?.let { BitmapFactory.decodeFile(it.path)?.asImageBitmap() } }
                     }
-                    val add = { if (!state.addingMedia) scope.launch { state.addingMedia = true; try { state.addElement(store, info.id, link = info.isElement) } finally { state.addingMedia = false } }; Unit }
+                    val add = { if (!state.addingMedia) scope.launch { state.addingMedia = true; try { state.addElement(store, info.id, link = info.isElement)?.let { app.absentmotion.platform.Toast.makeText(context, it, app.absentmotion.platform.Toast.LENGTH_LONG).show() } } finally { state.addingMedia = false } }; Unit }
                     DeskTile(state, info.title, {
                         thumbnail?.let { Image(it, null, Modifier.fillMaxSize(), contentScale = ContentScale.Fit) } ?: Icon(ChromeIcons.AssetProject, null, Modifier.size(36.dp), tint = Am.OnDarkDim)
                     }, add = add)
@@ -316,7 +316,7 @@ private fun DeskElementPicker(state: EditorState) {
 @Composable
 private fun DeskTemplates(state: EditorState) {
     val context = LocalContext.current
-    val saved by produceState<List<SavedTemplate>?>(null) { value = withContext(Dispatchers.IO) { TemplateStore(context).list() } }
+    val saved by produceState<List<SavedTemplate>?>(null, app.absentmotion.ui.export.SavedTemplates.revision) { value = withContext(Dispatchers.IO) { TemplateStore(context).list() } }
     val list = saved ?: return
     if (list.isEmpty()) Column(Modifier.fillMaxSize().padding(horizontal = 24.dp), Arrangement.spacedBy(8.dp, Alignment.CenterVertically), Alignment.CenterHorizontally) {
         Icon(ChromeIcons.TemplateTab, null, Modifier.size(40.dp), tint = Am.OnDarkDim)

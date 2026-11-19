@@ -132,7 +132,7 @@ fun EditorTopBar(state: EditorState, onExit: () -> Unit, modifier: Modifier = Mo
             }
             key(layer?.id) {
                 val id = layer?.id
-                NameField(layer?.label ?: state.scene.title, Modifier.weight(1f).fillMaxHeight().enterFade()) { name ->
+                NameField(state, layer?.label ?: state.scene.title, Modifier.weight(1f).fillMaxHeight().enterFade()) { name ->
                     if (id == null) state.rename(name) else state.renameLayer(id, name)
                 }
             }
@@ -191,14 +191,15 @@ private fun Modifier.crumbHover(radius: androidx.compose.ui.unit.Dp): Modifier =
 internal fun typedName(typed: String, shown: String): String? = typed.trim().takeIf { typed != shown && it.isNotEmpty() && it != shown }
 
 @Composable
-private fun NameField(value: String, modifier: Modifier, onCommit: (String) -> Unit) {
+private fun NameField(state: EditorState, value: String, modifier: Modifier, onCommit: (String) -> Unit) {
     var text by remember(value) { mutableStateOf(value) }
+    var shown by remember(value) { mutableStateOf(value) }
     var focused by remember { mutableStateOf(false) }
     val focus = LocalFocusManager.current
     fun commit() {
-        val name = typedName(text, value)
-        text = name ?: value
-        if (name != null) onCommit(name)
+        val name = typedName(text, shown)
+        text = name ?: shown
+        if (name != null) { shown = name; onCommit(name) }
     }
     val commitNow by rememberUpdatedState(::commit)
     DisposableEffect(Unit) { onDispose { commitNow() } }
@@ -209,7 +210,7 @@ private fun NameField(value: String, modifier: Modifier, onCommit: (String) -> U
         },
     ) {
         BasicTextField(
-            text, { text = it },
+            text, { text = it; state.typing = commitNow },
             Modifier.align(Alignment.CenterStart).fillMaxWidth().padding(horizontal = 4.dp)
                 .onFocusChanged {
                     if (focused && !it.isFocused) commit()

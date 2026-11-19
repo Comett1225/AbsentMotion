@@ -6,8 +6,9 @@ dir="build/check"
 mkdir -p "$dir"
 find "$dir" -maxdepth 1 -name 'run.*' -mtime +1 -exec rm -rf {} + 2>/dev/null
 status=$(mktemp -d "$dir/run.XXXXXX") || exit 1
-held=""
-trap 'rm -rf "$status"; [ -z "$held" ] || rm -f "$held"' EXIT
+descendants() { for p in $(children "$1"); do echo "$p"; descendants "$p"; done; }
+children() { if command -v pgrep >/dev/null 2>&1; then pgrep -P "$1" 2>/dev/null; else cat /proc/[0-9]*/stat 2>/dev/null | sed -n "s/^\([0-9]*\) .*) . $1 .*/\1/p"; fi; }
+trap 'kill $(descendants $$) 2>/dev/null; rm -rf "$status"' EXIT
 trap 'exit 130' INT TERM
 mode=full
 for arg in "$@"; do
@@ -21,20 +22,16 @@ failed=0
 skipped=""
 fail() { printf 'check.sh: FAILED: %s\n' "$1" >&2; failed=$((failed + 1)); }
 lock() {
+    exec 9>>"$dir/$1.lock"
     waited=""
-    until ln -sn $$ "$dir/$1.lock" 2>/dev/null; do
-        holder=$(readlink "$dir/$1.lock" 2>/dev/null)
-        if kill -0 "$holder" 2>/dev/null && ! { ps -o stat= -p "$holder" 2>/dev/null || sed -n 's/^.*) \(.\).*/\1/p' "/proc/$holder/stat" 2>/dev/null; } | grep -q '^Z'; then
-            [ "$waited" = "$holder" ] || printf 'waiting for another check.sh (process %s) to finish its %s build in this folder\n' "$holder" "$1"
-            waited=$holder
-            sleep 3
-        else
-            rm -f "$dir/$1.lock"
-        fi
+    until python3 -c 'import fcntl; fcntl.flock(9, fcntl.LOCK_EX | fcntl.LOCK_NB)' 2>/dev/null; do
+        [ -n "$waited" ] || printf 'waiting for another check.sh (process %s) to finish its %s build in this folder\n' "$(cat "$dir/$1.lock" 2>/dev/null)" "$1"
+        waited=1
+        sleep 3
     done
-    held="$dir/$1.lock"
+    echo $$ >"$dir/$1.lock"
 }
-unlock() { rm -f "$held"; held=""; }
+unlock() { python3 -c 'import fcntl; fcntl.flock(9, fcntl.LOCK_UN)'; exec 9>&-; }
 excerpt() {
     grep -E "$1" "$2" | sed 's|file://[^ ]*/shared/kotlin/app/absentmotion/||' | head -40 >&2
     sed -n '/What went wrong/,/^\* Try/p' "$2" | grep -v '^\* Try' | head -12 >&2
@@ -166,7 +163,7 @@ while IFS='|' read -r name command hint; do
         if [ -n "${CI:-}" ]; then cat "$status/$name.log" >&2; else tail -n 15 "$status/$name.log" >&2; fi
         static_failed=1
     fi
-    grep -h '^skipped:' "$status/$name.log" 2>/dev/null
+    if grep -h '^skipped:' "$status/$name.log" 2>/dev/null && [ "$mode" = full ] && [ "$name" != publish ]; then skipped="$skipped $name"; fi
 done <<EOF
 $CHECKS
 EOF
@@ -179,7 +176,7 @@ if [ "$failed" -gt 0 ]; then
     exit 1
 fi
 if [ -n "$skipped" ]; then
-    printf '\ncheck.sh: the full check is INCOMPLETE after %ss: the native API floor of%s was not checked, so it is not a release check (./gradlew :app:mergeFossReleaseNativeLibs :app:mergeCompatReleaseNativeLibs, then run it again).\n' "$elapsed" "$skipped" >&2
+    printf '\ncheck.sh: the full check is INCOMPLETE after %ss (skipped:%s), so it is not a release check: build what the skipped: lines above name, then run it again.\n' "$elapsed" "$skipped" >&2
     exit 3
 fi
 printf '\ncheck.sh: all %s checks passed in %ss; the app compiles and the tests pass.\n' "$mode" "$elapsed"

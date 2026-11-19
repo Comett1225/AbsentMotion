@@ -1,5 +1,7 @@
 package app.absentmotion.ui.home
 
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.captionBar
 import androidx.compose.foundation.layout.statusBars
@@ -91,8 +93,10 @@ private fun AboutPage(onClose: () -> Unit, onLicences: () -> Unit, onWhatsNew: (
         Row(Modifier.weight(1f).fillMaxWidth()) {
         Column(Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState()).padding(horizontal = if (wide) 28.dp else 16.dp)) {
             Spacer(Modifier.height(24.dp))
-            Row {
-                Column(Modifier.weight(1f, fill = false)) {
+            BoxWithConstraints(Modifier.fillMaxWidth()) {
+            val room = maxWidth
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.widthIn(max = room * 0.66f)) {
                     Text("AbsentMotion", color = Am.Navy, fontSize = 26.sp, fontWeight = FontWeight.Bold)
                     if (version.isNotEmpty()) Text(stringResource(if (Tier.compatible) R.string.about_version_compatible else R.string.about_version, version),
                         Modifier.padding(top = 2.dp), color = Am.HomeMid, fontSize = 14.sp)
@@ -104,7 +108,10 @@ private fun AboutPage(onClose: () -> Unit, onLicences: () -> Unit, onWhatsNew: (
                         Text(stringResource(R.string.whats_new_see, WhatsNewNotes.key(version) ?: notes), color = Am.OnNavy, fontSize = 15.sp, fontWeight = FontWeight.Medium)
                     }
                 }
-                app.absentmotion.ui.adaptive.AppLogo(76.dp, Modifier.padding(start = 24.dp, top = 4.dp))
+                BoxWithConstraints(Modifier.weight(1f).padding(start = 16.dp), contentAlignment = Alignment.Center) {
+                    app.absentmotion.ui.adaptive.AppLogo(minOf(maxWidth, 104.dp))
+                }
+            }
             }
             Spacer(Modifier.height(20.dp))
             Body(stringResource(R.string.about_licence_line))

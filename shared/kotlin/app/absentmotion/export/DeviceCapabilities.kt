@@ -92,6 +92,8 @@ data class DeviceReport(
     fun encoderFor(codec: Codec, width: Int, height: Int): EncoderCaps? =
         encodersFor(codec.mime).sortedByDescending { it.hardware }.firstOrNull { it.fitsSize(width, height) }
 
+    fun bitrates(s: ExportSettings, width: Int, height: Int): IntRange? = encodeSize(s, width, height).let { (ew, eh) -> encoderFor(s.codec, ew, eh)?.bitrates }
+
     fun encodeSize(s: ExportSettings, width: Int, height: Int): Pair<Int, Int> {
         val hardware = encodersFor(s.codec.mime).filter { it.hardware }
         val turned = turnsToLandscape(width, height, s.container, hardware.any { it.fitsSize(width, height) }, hardware.any { it.fitsSize(height, width) }, turns)

@@ -98,6 +98,7 @@ object DeskVideoDownloader : VideoFetcher {
                 throw e
             } catch (e: Exception) {
                 System.err.println("downloader update check failed: $e")
+                mark.setLastModified(System.currentTimeMillis())
             }
         }
     }
@@ -112,8 +113,10 @@ object DeskVideoDownloader : VideoFetcher {
             if (connection.responseCode != HttpURLConnection.HTTP_OK) throw DownloadProblem(R.string.downloader_engine_failed, "HTTP ${connection.responseCode}")
             val size = connection.contentLengthLong
             if (size !in 1..MAX_BINARY) throw DownloadProblem(R.string.downloader_engine_failed, "size $size")
+            val part = File(target.path + ".part")
+            if (!DeskOs.windows && (part.isFile || part.createNewFile())) part.setExecutable(true)
             connection.inputStream.use {
-                CaptionModel.receive(it, File(target.path + ".part"), target, size, sha, { job.ensureActive() }, progress, wrong = R.string.downloader_engine_failed)
+                CaptionModel.receive(it, part, target, size, sha, { job.ensureActive() }, progress, wrong = R.string.downloader_engine_failed)
             }
         } catch (e: IOException) {
             throw DownloadProblem(R.string.downloader_engine_failed, e.toString())
@@ -190,7 +193,7 @@ object DeskVideoDownloader : VideoFetcher {
         withContext(Dispatchers.IO) { dir.mkdirs() }
         val pieces = listOfNotNull(plan.video, plan.audio?.takeIf { it !== plan.video }).size.coerceAtLeast(1)
         val args = ArrayList<String>()
-        args += listOf("--no-playlist", "--no-warnings", "--newline", "--no-mtime") + MediaEngine.current.downloadOptions(plan, mode, dir)
+        args += listOf("--ignore-config", "--no-playlist", "--no-warnings", "--newline", "--no-mtime") + MediaEngine.current.downloadOptions(plan, mode, dir)
         if (entry > 0) args += listOf("--playlist-items", entry.toString())
         var stream = 0
         val result = execute(exe, args + url) { line ->
@@ -209,7 +212,7 @@ object DeskVideoDownloader : VideoFetcher {
     internal suspend fun readInfo(exe: File, url: String): LinkInfo = counted {
         if (!exe.isFile) throw DownloadProblem(R.string.downloader_engine_blocked)
         val out = StringBuilder()
-        val result = execute(exe, listOf("--dump-single-json", "--no-warnings", "--no-playlist", url)) { out.append(it) }
+        val result = execute(exe, listOf("--ignore-config", "--dump-single-json", "--no-warnings", "--no-playlist", url)) { out.append(it) }
         failIf(result)
         val json = try { JSONObject(out.toString()) } catch (e: Exception) { throw DownloadProblem(R.string.downloader_error_unknown, "bad json") }
         parseLinkInfo(toInfoJson(json).toString())

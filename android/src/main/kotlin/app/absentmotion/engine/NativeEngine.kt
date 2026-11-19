@@ -20,11 +20,13 @@ class NativeEngine(backend: Backend) : AutoCloseable {
 
     fun timing(target: Long): String = nativeTiming(handle, target)
 
-    fun setScene(xml: String) {
-        nativeSetScene(handle, xml.toByteArray())?.let { throw IllegalArgumentException(it) }
+    fun setScene(xml: String, keepHeld: Boolean = false) {
+        nativeSetScene(handle, xml.toByteArray(), keepHeld)?.let { throw IllegalArgumentException(it) }
     }
 
     fun loadEffect(xml: String): String = nativeLoadEffect(handle, xml.toByteArray())
+
+    fun forgetHeld() = nativeForgetHeld(handle)
 
     val maxPictureSize: Int get() = nativeMaxPictureSize(handle)
 
@@ -142,8 +144,9 @@ class NativeEngine(backend: Backend) : AutoCloseable {
         @JvmStatic private external fun nativeAttach(engine: Long, surface: Surface, forEncoder: Boolean): Long
         @JvmStatic private external fun nativeDetach(engine: Long, target: Long)
         @JvmStatic private external fun nativeTiming(engine: Long, target: Long): String
-        @JvmStatic private external fun nativeSetScene(engine: Long, xml: ByteArray): String?
+        @JvmStatic private external fun nativeSetScene(engine: Long, xml: ByteArray, keepHeld: Boolean): String?
         @JvmStatic private external fun nativeLoadEffect(engine: Long, xml: ByteArray): String
+        @JvmStatic private external fun nativeForgetHeld(engine: Long)
         @JvmStatic private external fun nativeMaxPictureSize(engine: Long): Int
         @JvmStatic private external fun nativeSetPicture(engine: Long, uri: ByteArray, layerId: Long,
                                                         bitmap: Bitmap?, buffer: HardwareBuffer?, opaque: Boolean, standard: Int, range: Int, left: Int, top: Int, right: Int, bottom: Int): Boolean

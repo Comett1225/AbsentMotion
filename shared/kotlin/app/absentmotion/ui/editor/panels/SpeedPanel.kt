@@ -180,7 +180,7 @@ private fun NormalSpeed(state: EditorState, layer: Layer, ai: AiTools, modifier:
                 { held[0] = state.selected }, { tick -> held[0]?.let { state.setVideoSpeed(tickSpeed(tick.roundToInt()), it) } }, state::endGesture,
                 Modifier.weight(1f).fillMaxHeight(), rulerTick(1f).toFloat(), state.settings.vibration)
             SpeedValue(speed, Modifier.padding(start = 8.dp).width(88.dp).height(40.dp)) {
-                state.askNumber(speedLabel, speed, "x", SLOWEST_SPEED, FASTEST_SPEED) { v -> state.selected?.let { state.setVideoSpeed(steppedSpeed(v), it); state.endGesture() } }
+                state.askNumber(speedLabel, speed, "x", SLOWEST_SPEED, FASTEST_SPEED) { v -> if (v != speed) state.selected?.let { state.setVideoSpeed(steppedSpeed(v), it); state.endGesture() } }
             }
         }
         Row(Modifier.fillMaxWidth().height(34.dp).horizontalScroll(rememberScrollState()).padding(horizontal = 15.dp), Arrangement.spacedBy(6.dp)) {

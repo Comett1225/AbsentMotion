@@ -514,6 +514,25 @@ class BackupTest {
         assertTrue(methods.keys.any { it.endsWith(".png") })
     }
 
+    @Test fun aThumbnailRewrittenWhileItIsCopiedStillGivesAValidBackup() {
+        val root = tmp.newFolder()
+        val store = ProjectStore(root)
+        val id = project(store, "A", "pixels")
+        val thumbnail = store.thumbnailFile(id).apply { writeBytes(ByteArray(100_000) { 1 }) }
+        val before = Backup.files(root, false).takeWhile { it.second != thumbnail }.sumOf { it.second.length() }
+        var rewritten = false
+        val bytes = ByteArrayOutputStream().also { out ->
+            Backup.write(root, out, false) { done, _ -> if (!rewritten && done > before) { rewritten = true; thumbnail.writeBytes(ByteArray(70_000) { 2 }) } }
+        }.toByteArray()
+        assertTrue(rewritten)
+        java.util.zip.ZipInputStream(ByteArrayInputStream(bytes)).use { zip ->
+            while (true) {
+                val entry = zip.nextEntry ?: break
+                if (entry.name.endsWith(".png")) assertEquals(100_000, zip.readBytes().size)
+            }
+        }
+    }
+
     @Test fun aHugeEntryTheRestoreSkipsStillCountsTowardsTheUnpackLimit() {
         val root = tmp.newFolder("root")
         val bytes = ByteArrayOutputStream().also { out ->
@@ -712,6 +731,19 @@ class BackupTest {
         File(same, "presets/p.xml").apply { parentFile.mkdirs(); writeText(File(oldRoot, "presets/p.xml").readText()) }
         Backup.restore(ProjectStore(same), same, ByteArrayInputStream(bytes))
         assertEquals(1, File(same, "presets").listFiles().orEmpty().size)
+    }
+
+    @Test fun anOldVersionPrunedWhileTheBackupRunsIsLeftOut() {
+        val root = tmp.newFolder("root")
+        val present = File(root, "projects/a.xml").apply { parentFile.mkdirs(); writeText("<scene/>") }
+        val thumb = File(root, "projects/a.png").apply { writeText("png") }
+        val pruned = File(root, "projects/versions/a/1.png")
+        val bytes = ByteArrayOutputStream().also {
+            Backup.writeFiles(root, listOf("projects/a.xml" to present, "projects/versions/a/1.png" to pruned, "projects/a.png" to thumb), it)
+        }.toByteArray()
+        val names = ArrayList<String>()
+        java.util.zip.ZipInputStream(ByteArrayInputStream(bytes)).use { zip -> while (true) { names += (zip.nextEntry ?: break).name; zip.readBytes() } }
+        assertEquals(listOf("absentmotion-backup.txt", "projects/a.xml", "projects/a.png"), names)
     }
 
     @Test fun aBackupFailsInsteadOfSilentlyOmittingAFileThatVanished() {

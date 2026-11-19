@@ -191,7 +191,8 @@ Video* Open(const std::string& path) {
     v->path = path;
     const absent::Track& t = *first->track;
     v->times.reserve((size_t)first->total);
-    for (int64_t i = 0; i < first->total; ++i) v->times.push_back((int64_t)std::llround((double)(first->decoder->pts((uint32_t)i) - t.mediaStart) * 1e6 / t.timescale));
+    const int64_t origin = std::max(first->decoder->pts(0), t.mediaStart);
+    for (int64_t i = 0; i < first->total; ++i) v->times.push_back((int64_t)std::llround((double)(first->decoder->pts((uint32_t)i) - origin) * 1e6 / t.timescale));
     const double rate = t.rate();
     const double values[7] = {(double)t.width, (double)t.height, t.seconds() * 1e6, rate > 0 ? rate : 30.0, (double)(((t.rotation % 360) + 360) % 360),
         first->file->first(absent::Kind::Audio) ? 1.0 : 0.0, Hardware(first->decoder->backend()) ? 1.0 : 0.0};

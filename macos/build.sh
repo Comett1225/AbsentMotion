@@ -10,7 +10,7 @@ case "$ARCH" in
         FFMPEG="${FFMPEG_PREFIX:?set FFMPEG_PREFIX to an $CPU FFmpeg build}"
         DEPS="${FFAMP_DEPS:?set FFAMP_DEPS to the folder third_party/FFamp/third_party/build_mac.sh made for $CPU}"
         [ -f "$DEPS/lib/libxvidcore.a" ] || { echo "$DEPS has no libxvidcore.a: run third_party/FFamp/third_party/build_mac.sh $CPU again" >&2; exit 1; }
-        set -- -DCMAKE_OSX_ARCHITECTURES=$CPU -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DAM_ARCH=$ARCH "-DFFMPEG_PREFIX=$FFMPEG" "-DFFAMP_DEPS=$DEPS" ;;
+        set -- -DCMAKE_OSX_ARCHITECTURES=$CPU -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DAM_ARCH=$ARCH "-DFFMPEG_PREFIX=$FFMPEG" "-DFFAMP_DEPS=$DEPS" -DABSENT_H264_ASM=OFF ;;
     *) echo "usage: macos/build.sh [arm64|x64]" >&2; exit 2 ;;
 esac
 cmake -S "$ROOT/pc/native" -B "$BUILD" -G Ninja -DCMAKE_BUILD_TYPE=None "$@" >/dev/null

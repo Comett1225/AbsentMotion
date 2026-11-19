@@ -5,6 +5,7 @@ import app.absentmotion.model.XmlNode
 import app.absentmotion.sceneOf
 import app.absentmotion.shapeLayer
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -19,6 +20,7 @@ class FrameScreenshotTest {
             XmlNode("effect", mapOf("id" to "absent.crop")),
             XmlNode("border"),
             XmlNode("speedMap", mapOf("value" to "2")),
+            XmlNode("timeRemap", children = listOf(XmlNode("kf", mapOf("t" to "0", "v" to "1")))),
         ),
         id = 5, start = 1000, end = 3000,
     )
@@ -37,8 +39,15 @@ class FrameScreenshotTest {
         assertTrue(layer.node.children.none { it.name == "effect" })
         assertTrue(layer.node.children.none { it.name == "border" })
         assertEquals("2", layer.node.child("speedMap")!!["value"])
+        assertEquals("1", layer.node.child("timeRemap")!!.children.single()["v"])
         assertEquals(90f, layer.node.child("transform")!!.child("rotation")!!["value"]!!.toFloat(), 0f)
         assertEquals(listOf("file:///v.mp4"), raw.scene.media.map { it.uri })
+    }
+
+    @Test fun aScreenshotLayerMovedIntoAGroupStillCounts() {
+        val group = XmlNode("embedScene", mapOf("id" to "9"), listOf(XmlNode("scene", children = listOf(clip().node))))
+        assertTrue(XmlNode("scene", children = listOf(group)).holdsLayer(5))
+        assertFalse(XmlNode("scene", children = listOf(group)).holdsLayer(6))
     }
 
     @Test fun rawFrameHalvesUntilItFits() {

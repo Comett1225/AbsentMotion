@@ -23,7 +23,7 @@ The notes open by themselves the first time you open the app after an update. **
 
 ## The bottom bar
 
-- **Projects**, **Community**, **Templates** and **Tools** switch between the pages of the home screen. **Community** lists projects and presets shared by the community, and tapping one shows its details with an Add button.
+- **Projects**, **Community**, **Templates** and **Tools** switch between the pages of the home screen. **Community** lists projects and presets shared by the community, and tapping one shows its details with an Add button. To share your own, tap **Open form** at the top of the Community page: upload the file to any file host (an anonymous one, Google Drive or MEGA) and send the link with the form.
 - The round **+** button between them creates a new project: see [Creating a project](@new-project).
 
 ## Projects and Assets

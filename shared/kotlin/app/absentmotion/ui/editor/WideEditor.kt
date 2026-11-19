@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import app.absentmotion.editor.EditorPanel
@@ -82,7 +83,7 @@ internal fun WideEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: 
         val textUi = remember { TextEditUi() }
         val side = textEdit || (state.selectedId != null && !state.addOpen && !MultiSelect.active)
         val reserve = if (side) SideWidth else 0.dp
-        Column(Modifier.fillMaxSize()) {
+        Column(Modifier.fillMaxSize().then(if (side) Modifier else Modifier.imePadding())) {
             EditorTopBar(state, onExit, Modifier.fillMaxWidth().height(42.dp).enterFade().tutorialGuard(any = true))
             Box(Modifier.fillMaxWidth().weight(1f)) {
                 Preview(state, Modifier.fillMaxSize().tutorialTarget("preview"), reserveEnd = reserve)
@@ -120,6 +121,7 @@ private fun RailEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: A
     val textEdit = state.panel == EditorPanel.EditText && state.selectedId?.let { state.scene.layer(it) }?.kind == "text"
     val textUi = remember { TextEditUi() }
     val layerSide = textEdit || state.drawing is app.absentmotion.editor.PointMode || MultiSelect.active || (state.selectedId != null && !state.addOpen)
+    SideEffect { if (state.previewPanelOpen) state.previewPanelOpen = false }
     Box(Modifier.fillMaxSize()) {
         Row(Modifier.fillMaxSize().padding(end = if (dock == null) SideWidth + SideRailWidth else SideRailWidth)) {
             Column(Modifier.width(LeftRailWidth).fillMaxHeight().background(Am.Button).tutorialGuard(any = true)) {

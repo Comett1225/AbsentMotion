@@ -47,13 +47,15 @@ object DeskTyping {
 object DeskKeys {
     private fun modal(state: EditorState): Boolean =
         state.exportOpen || state.effectBrowserOpen || state.historyOpen || state.presetsOpen || state.cameraOpen || state.toolOpen != 0 ||
-            state.drawing != null || state.fullColor != null || state.keypad != null || state.easingHint || state.ungroupAsk
+            state.drawing != null || state.fullColor != null || state.keypad != null || state.easingHint || state.ungroupAsk ||
+            app.absentmotion.ui.home.DeskModals.open > 0 || app.absentmotion.ui.home.EmbedRequest.templateId != null
 
     fun handle(state: EditorState, event: KeyEvent): Boolean {
         if (!deskLayout || event.type != KeyEventType.KeyDown || DeskTyping.active > 0 || modal(state)) return false
-        if (event.nativeKeyEvent.repeatCount > 0 && event.key !in setOf(Key.DirectionLeft, Key.DirectionRight, Key.Z, Key.Y)) return true
         val command = event.isCtrlPressed || event.isMetaPressed
         if (event.isAltPressed) return false
+        if (event.nativeKeyEvent.repeatCount > 0 && event.key !in setOf(Key.DirectionLeft, Key.DirectionRight, Key.Z, Key.Y))
+            return event.key in if (command) setOf(Key.C, Key.X, Key.V, Key.D, Key.B, Key.A, Key.E, Key.One, Key.Two) else setOf(Key.Spacebar, Key.MoveHome, Key.MoveEnd, Key.Delete, Key.Backspace)
         val shift = event.isShiftPressed
         val picked = MultiSelect.active || state.selectedId != null
         fun step(by: Int) { state.playing = false; state.stepTo(state.playheadFrame + by) }
@@ -69,12 +71,13 @@ object DeskKeys {
                 Key.B -> if (picked) state.split() else return false
                 Key.A -> { state.deselectLayer(); MultiSelect.ids = state.scene.layers.map { it.id }.toSet(); MultiSelect.active = MultiSelect.ids.isNotEmpty() }
                 Key.E -> { state.playing = false; state.exportOpen = true }
+                Key.One, Key.Two -> app.absentmotion.ui.editor.DeskDrop.panelKey?.invoke(event.key == Key.One) ?: return false
                 else -> return false
             }
             return true
         }
         when (event.key) {
-            Key.Spacebar -> state.playing = !state.playing
+            Key.Spacebar -> state.togglePlayback()
             Key.DirectionLeft -> step(if (shift) -10 else -1)
             Key.DirectionRight -> step(if (shift) 10 else 1)
             Key.MoveHome -> { state.playing = false; state.frame = 0 }

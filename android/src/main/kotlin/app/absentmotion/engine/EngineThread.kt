@@ -170,10 +170,23 @@ class EngineThread(private val background: Int, context: Context? = null, privat
     }
     private val effectJob = context?.let { app -> mediaScope.launch {
         val catalog = EffectCatalog.read(app)
-        effectCatalog.value = withContext(dispatcher) {
-            if (closed) catalog else catalog.loadInto { runCatching { engine().loadEffect(it) }.getOrElse { e -> "shader error: ${e.message}" } }
+        val sources = catalog.definitions.map { it.runtimeXml() }
+        val status = HashMap<String, String>()
+        var made = -1
+        var at = 0
+        while (at < sources.size && !closed) withContext(dispatcher) {
+            if (closed) return@withContext
+            val result = runCatching {
+                val native = engine()
+                if (made != generation) { made = generation; at = 0 }
+                if (mediaJob?.isActive == true) pauseWatch() else gpuCheck?.keep(native.openGl)
+                native.loadEffect(sources[at])
+            }.getOrElse { e -> "shader error: ${e.message}" }
+            status[sources[at]] = result
+            at++
         }
-        withContext(dispatcher) { renderNow() }
+        effectCatalog.value = if (closed) catalog else catalog.loadInto { status[it] ?: "" }
+        withContext(dispatcher) { surviveLater(); renderNow() }
     } }
 
     private fun engine(): NativeEngine {
@@ -189,20 +202,21 @@ class EngineThread(private val background: Int, context: Context? = null, privat
         }
         return engine ?: startEngine().also { next ->
             engine = next
-            scene?.let { next.setScene(fonts?.prepareText(it, textTime) ?: it) }
-            effects.value.loadInto(next::loadEffect)
             if (lost) {
                 lost = false
                 generation++
-                surface?.takeIf { it.isValid }?.let { target = next.attach(it, forEncoder = false) }
+                synchronized(shown) { topSurface() }?.let { attachSoon(it) }
                 Handler(android.os.Looper.getMainLooper()).post(::refreshMedia)
             }
+            scene?.let { next.setScene(fonts?.prepareText(it, textTime) ?: it) }
+            effects.value.loadInto(next::loadEffect)
         }
     }
 
     @Volatile private var startFailure: String? = null
     private var attachedOnce = false
     private var watchedFrames = -1
+    private var watchPaused = false
 
     private fun checked(engine: NativeEngine): NativeEngine {
         val check = gpuCheck ?: return engine
@@ -254,7 +268,7 @@ class EngineThread(private val background: Int, context: Context? = null, privat
                     val memory = android.app.ActivityManager.MemoryInfo().also(manager::getMemoryInfo)
                     it.setTrailBudget(app.absentmotion.model.trailBudgetMb(memory.totalMem shr 20, manager.isLowRamDevice, manager.memoryClass, app.absentmotion.Tier.compatible || it.openGl))
                 }
-                handler.postDelayed({ if (engine?.failed != true && watchedFrames < 0) gpuCheck?.survived() }, SURVIVE_MS)
+                surviveLater()
             }
         } catch (t: Throwable) {
             val reason = t.message ?: t.toString()
@@ -264,19 +278,56 @@ class EngineThread(private val background: Int, context: Context? = null, privat
         }
     }
 
-    val startProblem: Deferred<String?> by lazy {
-        mediaScope.async { withContext(dispatcher) { if (!closed) runCatching { engine() }; startFailure } }
+    private var problemCheck: Deferred<String?>? = null
+
+    @Synchronized fun startProblem(): Deferred<String?> =
+        problemCheck?.takeUnless { it.isCompleted && startFailure.let { failure -> failure != null && failure != GpuCheck.BOTH_CLOSED } }
+            ?: mediaScope.async {
+                withContext(dispatcher) {
+                    if (!closed) {
+                        if (startFailure != GpuCheck.BOTH_CLOSED) startFailure = null
+                        runCatching { engine() }
+                    }
+                    startFailure
+                }
+            }.also { problemCheck = it }
+
+    private class Shown(val owner: Any) {
+        var surface: Surface? = null
+        var view: PreviewView? = null
+    }
+
+    private val shown = ArrayList<Shown>()
+
+    private fun topSurface(): Surface? = shown.lastOrNull { it.surface?.isValid == true }?.surface
+
+    fun attach(owner: Any, surface: Surface? = null) {
+        val top = synchronized(shown) {
+            val entry = shown.firstOrNull { it.owner === owner } ?: Shown(owner).also { shown += it }
+            if (surface != null) entry.surface = surface
+            topSurface()
+        }
+        if (surface != null && top === surface) attachSoon(surface)
+    }
+
+    fun forget(owner: Any) {
+        val back = synchronized(shown) {
+            val wasTop = shown.lastOrNull()?.owner === owner
+            shown.removeAll { it.owner === owner }
+            if (wasTop) shown.lastOrNull()?.view else null
+        }
+        back?.let(::setView)
     }
 
     private val attachSerial = java.util.concurrent.atomic.AtomicInteger()
 
-    fun attach(surface: Surface, retry: Boolean = true): Boolean {
+    private fun attachSoon(surface: Surface, retry: Boolean = true): Boolean {
         val mine = attachSerial.incrementAndGet()
         return handler.post { if (mine == attachSerial.get()) attachNow(surface, retry) }
     }
 
     private fun attachNow(surface: Surface, retry: Boolean) {
-        if (closed) return
+        if (closed || synchronized(shown) { topSurface() } !== surface) return
         try {
             val previous = target
             target = 0L
@@ -286,7 +337,7 @@ class EngineThread(private val background: Int, context: Context? = null, privat
                 attachedOnce = true
                 gpuCheck?.trying(engine().openGl)
                 watchedFrames = 0
-                handler.postDelayed({ if (watchedFrames > 0 && engine?.failed != true) { watchedFrames = -1; gpuCheck?.survived() } }, SURVIVE_MS)
+                closeWatchLater()
             }
             target = engine().attach(surface, forEncoder = false)
             this.surface = surface
@@ -295,23 +346,27 @@ class EngineThread(private val background: Int, context: Context? = null, privat
         } catch (e: Exception) {
             Log.e("AMEngine", "preview attachment failed", e)
             if (target == 0L) this.surface = surface
-            if (retry) handler.postDelayed({ if (!closed && target == 0L && surface.isValid) attach(surface, retry = false) }, 250)
+            if (retry) handler.postDelayed({ if (!closed && target == 0L && synchronized(shown) { topSurface() } === surface) attachSoon(surface, retry = false) }, 250)
         }
     }
 
-    fun detach() {
+    fun detach(surface: Surface) {
+        synchronized(shown) { shown.forEach { if (it.surface === surface) it.surface = null } }
         val done = CountDownLatch(1)
         val release = Runnable {
             try {
-                val previous = target
-                target = 0L
-                surface = null
-                if (previous != 0L) engine?.detach(previous)
+                if (this.surface === surface) {
+                    val previous = target
+                    target = 0L
+                    this.surface = null
+                    if (previous != 0L) engine?.detach(previous)
+                }
             } finally { done.countDown() }
         }
         if (android.os.Looper.myLooper() == handler.looper) release.run()
         else if (handler.post(release)) done.await()
-        videos?.suspendPreview()
+        val back = synchronized(shown) { topSurface() }
+        if (back != null) attachSoon(back) else videos?.suspendPreview()
     }
 
     fun setScene(next: Scene, xml: String) = setScene(next, lazyOf(xml))
@@ -387,7 +442,7 @@ class EngineThread(private val background: Int, context: Context? = null, privat
     internal suspend fun setVideoPicture(uri: String, buffer: HardwareBuffer, layerId: Long,
                                          exact: Boolean, standard: Int, range: Int, crop: Rect, accept: () -> Boolean): Boolean = withContext(dispatcher) {
         if (closed || (!exact && capturing) || !accept()) return@withContext false
-        engine().setPicture(uri, buffer, layerId, standard = standard, range = range, crop = crop)
+        engine().setPicture(uri, buffer, layerId, standard = standard, range = range, crop = crop).also { if (it && !exact && !playing) engine().forgetHeld() }
     }
 
     internal suspend fun setVideoFrame(uri: String, buffer: HardwareBuffer, layerId: Long, pts: Long, standard: Int = 0, range: Int = 0, crop: Rect? = null): Boolean = withContext(dispatcher) {
@@ -431,7 +486,7 @@ class EngineThread(private val background: Int, context: Context? = null, privat
         if (closed) return@withContext false
         val engine = engine()
         textures.forEachIndexed { k, bitmap -> engine.setPicture("$uri#$k", bitmap) }
-        engine.setModel(uri, mesh).also { if (mesh != null) pictureRevision.update { it + 1 }; renderNow() }
+        engine.setModel(uri, mesh).also { if (mesh != null) { engine.forgetHeld(); pictureRevision.update { it + 1 } }; renderNow() }
     }
 
     suspend fun setPicture(uri: String, buffer: HardwareBuffer, layerId: Long = 0, opaque: Boolean = true): Boolean = withContext(dispatcher) {
@@ -441,6 +496,7 @@ class EngineThread(private val background: Int, context: Context? = null, privat
 
     fun setView(view: PreviewView): Long {
         requestedView = view
+        synchronized(shown) { shown.lastOrNull()?.view = view }
         mediaScene?.let { videos?.update(it, view.timeMs, playing) }
         val serial = viewSerial.incrementAndGet()
         pendingView.set(view to serial)
@@ -484,12 +540,12 @@ class EngineThread(private val background: Int, context: Context? = null, privat
 
     private var installed: String? = null
 
-    private fun setEngineScene(xml: String, timeMs: Int = view?.timeMs ?: 0) {
+    private fun setEngineScene(xml: String, timeMs: Int = view?.timeMs ?: 0, keepHeld: Boolean = false) {
         val native = engine()
         val parsed = sent?.takeIf { it.first.isInitialized() && it.first.value === xml }?.second
         val prepared = fonts?.prepareText(xml, timeMs, parsed) ?: xml
         if (prepared !== installed) {
-            native.setScene(prepared)
+            native.setScene(prepared, keepHeld)
             installed = prepared
         }
         rememberScene(xml, timeMs)
@@ -508,28 +564,47 @@ class EngineThread(private val background: Int, context: Context? = null, privat
     }
 
     private fun prepareTextTime(timeMs: Int) {
-        if (animatedText && textTime != timeMs) scene?.let { setEngineScene(it, timeMs) }
+        if (animatedText && textTime != timeMs) scene?.let { setEngineScene(it, timeMs, keepHeld = true) }
+    }
+
+    private fun pauseWatch() {
+        if (gpuCheck?.pause() == true) watchPaused = true
+    }
+
+    private fun surviveLater() {
+        handler.postDelayed({ if (engine?.failed != true && watchedFrames < 0) gpuCheck?.survived() }, SURVIVE_MS)
+    }
+
+    private fun closeWatchLater() {
+        handler.postDelayed({ if (watchedFrames > 0 && !watchPaused && engine?.failed != true) { watchedFrames = -1; gpuCheck?.survived() } }, SURVIVE_MS)
     }
 
     private fun renderNow() {
-        if (closed || capturing || mediaJob?.isActive == true) return
+        if (closed || capturing) return
+        if (mediaJob?.isActive == true) return pauseWatch()
         try {
             applyPending()
             val v = view ?: return
             val exact = mediaScene?.let { videos?.previewReady(it, v.timeMs, playing) } != false
-            if (!exact && mediaScene?.let { videos?.previewShown(it, v.timeMs, playing) } == false) return
+            if (!exact && mediaScene?.let { videos?.previewShown(it, v.timeMs, playing) } == false) return pauseWatch()
             if (target != 0L) {
                 val native = engine()
+                if (watchPaused) {
+                    watchPaused = false
+                    if (watchedFrames >= 0) { gpuCheck?.trying(native.openGl); closeWatchLater() }
+                }
                 val started = System.nanoTime()
                 if (target != 0L && native.renderScene(target, v.timeMs.toDouble(), v.scale, v.dx, v.dy, background, v.selectedId, v.handles, v) != 0) {
                     Log.e("AMEngine", "preview rendering failed")
-                } else if (watchedFrames >= 0 && ++watchedFrames >= GOOD_FRAMES) {
-                    watchedFrames = -1
-                    gpuCheck?.survived()
+                } else {
+                    if (watchedFrames >= 0 && ++watchedFrames >= GOOD_FRAMES) {
+                        watchedFrames = -1
+                        gpuCheck?.survived()
+                    }
+                    if (RenderStats.recording) RenderStats.add((System.nanoTime() - started) / 1e6, v.timeMs)
+                    renders++
+                    if (exact) renderedView.value = RenderedView(shownSerial, v.timeMs)
                 }
-                if (RenderStats.recording) RenderStats.add((System.nanoTime() - started) / 1e6, v.timeMs)
-                renders++
-                if (exact) renderedView.value = RenderedView(shownSerial, v.timeMs)
             }
         } catch (e: Exception) {
             if (!closed) Log.e("AMEngine", "preview rendering failed", e)

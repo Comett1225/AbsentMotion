@@ -105,7 +105,8 @@ SkColor shade(SkColor c, float light, float alpha = 1) {
 SkColor shadeWithLights(SkColor c, float fallback, const LightSet& lights, const PieceView& view, V normal, V position, float alpha = 1) {
     if (!lights.count) return shade(c, fallback, alpha);
     const bool turned = view.turn != SkM44();
-    const V n = turned ? map(view.turn, normal) : normal, at = turned ? map(view.turn, position * view.unit) : position * view.unit;
+    const V offset = (position + V{view.shift.x, view.shift.y, view.shift.z}) * view.unit;
+    const V n = turned ? map(view.turn, normal) : normal, at = turned ? map(view.turn, offset) : offset;
     const SkV3 lit = Illuminate(lights, {n.x, n.y, n.z}, {view.origin.x + at.x, view.origin.y + at.y, view.origin.z + at.z});
     const auto channel = [](int value, float intensity) { return (int)std::clamp(std::round(value * intensity), 0.0f, 255.0f); };
     return SkColorSetARGB((int)(SkColorGetA(c) * std::clamp(alpha, 0.0f, 1.0f)), channel(SkColorGetR(c), lit.x), channel(SkColorGetG(c), lit.y), channel(SkColorGetB(c), lit.z));

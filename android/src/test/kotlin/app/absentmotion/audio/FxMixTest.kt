@@ -117,7 +117,7 @@ class FxMixTest {
                     val span = clip.span(t0, 1024, dt, next) ?: break
                     next = span.to
                     if (!span.inMedia) { voices[clip.id]?.ready = false; continue }
-                    val source = sources.getOrPut(clip.id) { OfflineSource(clip.uri) { uri -> ToneSource(if (uri == "tone1") 440.0 else 660.0) } }
+                    val source = sources.getOrPut(clip.id) { OfflineSource(clip.uri, { uri -> ToneSource(if (uri == "tone1") 440.0 else 660.0) }) }
                     val r = source.open(span.pos)
                     val voice = voices.getOrPut(clip.id) { Voice() }
                     val count = span.to - span.from

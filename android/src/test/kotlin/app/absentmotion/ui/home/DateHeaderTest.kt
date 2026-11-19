@@ -27,4 +27,11 @@ class DateHeaderTest {
         assertTrue(header("ar").contains("أكتوبر") || header("ar").contains("تشرين"))
         assertTrue(header("ru").contains("октября"))
     }
+
+    @Test fun sortingByNameFollowsTheLanguage() {
+        fun project(title: String) = app.absentmotion.library.ProjectInfo(title, title, 1, 1, 30, 0, 0, 0, null, false)
+        val names = listRows(listOf("Zoo", "Été", "anniversaire").map(::project), true, dateHeader(Locale.FRENCH))
+            .map { (it as ListRow.Card).info.title }
+        assertEquals(listOf("anniversaire", "Été", "Zoo"), names)
+    }
 }

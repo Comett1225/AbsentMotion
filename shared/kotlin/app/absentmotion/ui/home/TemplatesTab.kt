@@ -82,7 +82,7 @@ private val Grey get() = Am.HomeDim
 private val FactText get() = Am.HomeDim
 
 @Composable
-fun TemplatesTab(version: Int, onTemplate: (String) -> Unit, onProject: (Scene) -> Unit, modifier: Modifier = Modifier, query: String = "") {
+fun TemplatesTab(version: Int, onTemplate: (String) -> Unit, onProject: (Scene) -> Unit, modifier: Modifier = Modifier, query: String = "", engine: (() -> app.absentmotion.engine.EngineThread)? = null) {
     val context = LocalContext.current
     val templates = remember { TemplateStore(context) }
     val presets = remember { PresetStore(context) }
@@ -93,7 +93,7 @@ fun TemplatesTab(version: Int, onTemplate: (String) -> Unit, onProject: (Scene) 
     var renaming by remember { mutableStateOf<Pair<String, String>?>(null) }
     var confirm by remember { mutableStateOf<Pair<Int, () -> Unit>?>(null) }
     val savedTemplates by produceState(emptyList<SavedTemplate>(), version, rev) { value = withContext(Dispatchers.IO) { templates.list() } }
-    val savedPresets by produceState(emptyList<SavedPreset>(), version, rev) { value = withContext(Dispatchers.IO) { presets.list() } }
+    val savedPresets by produceState(emptyList<SavedPreset>(), version, rev, app.absentmotion.ui.export.PresetSharing.revision) { value = withContext(Dispatchers.IO) { presets.list() } }
     val shownTemplates = remember(savedTemplates, query) { savedTemplates.filter { matchesSearch(query, it.title) } }
     val shownPresets = remember(savedPresets, query) { savedPresets.filter { matchesSearch(query, it.title) } }
     val wide = LocalWide.current || LocalTablet.current
@@ -136,12 +136,16 @@ fun TemplatesTab(version: Int, onTemplate: (String) -> Unit, onProject: (Scene) 
                         )
                     }
                     val presetCard: @Composable (SavedPreset) -> Unit = { p ->
-                        Card(Modifier.height(64.dp), onClick = null) {
-                            Text(p.title, Modifier.weight(1f).padding(start = 16.dp), color = Am.Navy, fontSize = 17.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Card(Modifier.heightIn(min = 96.dp), onClick = null) {
+                            Box(Modifier.padding(8.dp).size(80.dp).clip(RoundedCornerShape(8.dp)).checkerboard(5.dp)) {
+                                rememberPresetPicture(p, engine)?.let { Image(it, null, Modifier.fillMaxSize(), contentScale = ContentScale.Fit) }
+                            }
+                            Text(p.title, Modifier.weight(1f).padding(start = 8.dp), color = Am.Navy, fontSize = 17.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis)
                             Menu(
                                 menu == p.id, { menu = if (it) p.id else null },
                                 stringResource(R.string.rename) to HomeIcons.Pencil to { menu = null; renaming = p.id to p.title },
                                 stringResource(R.string.delete) to HomeIcons.Delete to { menu = null; confirm = R.string.template_delete_preset to { scope.launch { withContext(Dispatchers.IO) { presets.delete(p.id) }; rev++ } } },
+                                stringResource(R.string.preset_share) to HomeIcons.Export to { menu = null; app.absentmotion.ui.export.PresetSharing.preset = p },
                             )
                         }
                     }
@@ -276,12 +280,32 @@ private fun Menu(open: Boolean, onOpen: (Boolean) -> Unit, vararg rows: Pair<Pai
 }
 
 @Composable
+internal fun rememberPresetPicture(preset: SavedPreset, engine: (() -> app.absentmotion.engine.EngineThread)?): ImageBitmap? {
+    val context = LocalContext.current
+    val picture by produceState<ImageBitmap?>(null, preset, engine != null) {
+        value = engine?.let { make ->
+            try {
+                withContext(Dispatchers.IO) { decodeCommunityThumb(app.absentmotion.library.presetCardPicture(context, preset, make())) }
+            } catch (e: kotlinx.coroutines.CancellationException) { throw e } catch (e: Exception) { null }
+        }
+    }
+    return picture
+}
+
+@Composable
 internal fun rememberFileBitmap(file: File?, key: Any?): ImageBitmap? {
     val bitmap by produceState<ImageBitmap?>(null, file, key) {
-        value = file?.let { withContext(Dispatchers.IO) { BitmapFactory.decodeFile(it.path)?.asImageBitmap() } }
+        value = file?.let { withContext(Dispatchers.IO) { decodeThumbnail(it) } }
     }
     return bitmap
 }
+
+internal fun decodeThumbnail(file: File, limit: Int = 512): ImageBitmap? = try {
+    val bounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
+    BitmapFactory.decodeFile(file.path, bounds)
+    if (bounds.outWidth <= 0 || bounds.outHeight <= 0) null
+    else BitmapFactory.decodeFile(file.path, android.graphics.BitmapFactory.Options().apply { inSampleSize = app.absentmotion.media.pictureSample(maxOf(bounds.outWidth, bounds.outHeight), limit) })?.asImageBitmap()
+} catch (_: Exception) { null } catch (_: OutOfMemoryError) { null }
 
 @Composable
 private fun RenameDialog(title: String, onDone: (String) -> Unit, onDismiss: () -> Unit) {

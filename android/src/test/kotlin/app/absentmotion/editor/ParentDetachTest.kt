@@ -58,6 +58,22 @@ class ParentDetachTest {
         }
     }
 
+    @Test fun detachingAChildWithLockedScaleAndRotationKeepsItsOwnSizeAndTurn() {
+        val helper = XmlNode("effect", mapOf("id" to "absent.parenthelper"), listOf(
+            XmlNode("property", mapOf("name" to "scaleMode", "type" to "float", "value" to "1")),
+            XmlNode("property", mapOf("name" to "rotateMode", "type" to "float", "value" to "1"))))
+        val parent = layer(1, null, prop("location", 0f to "100,100,0"), prop("scale", 0f to "2,2"), prop("rotation", 0f to "30"))
+        val child = layer(2, 1, prop("location", 0f to "10,0,0"), prop("scale", 0f to "1,1")).let { it.copy(children = it.children + helper) }
+        val s = sceneOf(parent, child)
+        val before = s.place(s.layer(2)!!, 0)
+        assertEquals(1f, before.sx, 1e-4f)
+        assertEquals(0f, before.rot, 1e-4f)
+        val out = s.unparentChildrenOf(setOf(1)).remove(1)
+        val transform = out.layer(2)!!.node.child("transform")!!
+        assertEquals(listOf(1f, 1f), floats(transform.child("scale")!!["value"], floatArrayOf(1f, 1f)).toList())
+        assertSameAt(s, out, 2, 0)
+    }
+
     @Test fun deletingAStaticParentKeepsEveryChildKeyInPlace() {
         val s = sceneOf(staticParent, animatedChild)
         val out = s.unparentChildrenOf(setOf(1)).remove(1)

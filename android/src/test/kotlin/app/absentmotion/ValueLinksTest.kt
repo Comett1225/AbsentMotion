@@ -98,6 +98,14 @@ class ValueLinksTest {
         assertEquals(before.layer(2)!!.keyframes(rotation.ref), removed.layer(2)!!.keyframes(rotation.ref))
     }
 
+    @Test fun editingTheOriginalOfADuplicatedEffectKeepsItsLinks() {
+        val effect = XmlNode("effect", mapOf("id" to "absent.swing"), listOf(XmlNode("property", mapOf("name" to "angle", "type" to "float", "value" to "10"))))
+        val linked = scene().update(1) { it.addEffect(effect) }.withValueLink(2, rotation, ValueLink(1, NumberRef(PropRef.effect(0, "angle"))))
+        val duplicated = linked.update(1) { it.duplicateEffect(0) }.withValueLinksFollowing(linked)
+        val edited = duplicated.update(1) { l -> l.withEffect(0) { it.withEffectProperty("angle", "float", "40", 0f, 0f..0f) } }.withValueLinksFollowing(duplicated)
+        assertEquals(0, edited.layer(2)!!.element(rotation.ref)!!.valueLink(0)!!.source.ref.effectIndex)
+    }
+
     @Test fun parentAndEffectCyclesAreRefused() {
         val base = scene().update(2) { it.copy(node = it.node.with("parent", "1")) }
         assertFalse(base.canLink(1, x, ValueLink(2, x)))

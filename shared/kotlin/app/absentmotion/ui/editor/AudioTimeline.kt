@@ -1,6 +1,7 @@
 package app.absentmotion.ui.editor
 
 import app.absentmotion.model.finiteDouble
+import app.absentmotion.model.loopStart
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.geometry.CornerRadius
@@ -56,14 +57,17 @@ internal fun DrawScope.drawAudioBar(outline: Path, layer: Layer, left: Float, ri
         drawLine(AudioWave.copy(alpha = 0.6f), Offset(from, centre), Offset(to, centre), 1.dp.toPx())
         val peaks = layer.node["src"]?.let { Waveforms.peaks(it) } ?: return@clipPath
         val timing = timingOf(layer)
-        val inMs = layer.node["inTime"]?.finiteDouble() ?: 0.0
+        val loopFrom = layer.loopStart?.toDouble()
+        val inMs = loopFrom ?: layer.node["inTime"]?.finiteDouble() ?: 0.0
         val outMs = layer.node["outTime"]?.finiteDouble() ?: Double.MAX_VALUE
+        val span = (outMs - inMs).coerceAtLeast(1.0).takeIf { loopFrom != null && outMs != Double.MAX_VALUE }
         val column = 2.dp.toPx()
         val room = (bottom - top) / 2 - 3.dp.toPx()
         var x = left + column * kotlin.math.floor((from - left) / column)
         while (x < to) {
-            val a = timing.mediaMs((x - left) / pxPerMs.toDouble())
-            val b = timing.mediaMs((x + column - left) / pxPerMs.toDouble())
+            val raw = timing.mediaMs((x - left) / pxPerMs.toDouble())
+            val a = span?.let { inMs + ((raw - inMs) % it + it) % it } ?: raw
+            val b = a + timing.mediaMs((x + column - left) / pxPerMs.toDouble()) - raw
             if (a >= inMs && a < outMs) {
                 val half = max(0.5.dp.toPx(), peaks.peak(a, max(a, b)) * room)
                 drawLine(AudioWave, Offset(x + column / 2, centre - half), Offset(x + column / 2, centre + half), column * 0.6f)

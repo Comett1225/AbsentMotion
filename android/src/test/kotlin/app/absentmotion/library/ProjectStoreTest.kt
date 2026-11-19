@@ -54,6 +54,38 @@ class ProjectStoreTest {
         assertFalse(store.mediaDir(a).exists())
     }
 
+    @Test fun mediaWrittenWithThreeSlashesIsCopiedByDuplicateAndKeptByDelete() {
+        val store = ProjectStore(tmp.newFolder())
+        val a = store.create(scene())
+        store.mediaDir(a).mkdirs()
+        val sample = store.mediaDir(a).resolve("sample picture.jpg").apply { writeText("x") }
+        val wide = "file://" + sample.toURI().toString().removePrefix("file:")
+        store.save(a, scene(image(wide)))
+        val copy = store.duplicate(a)!!
+        assertEquals(store.mediaDir(copy).resolve("sample picture.jpg").toURI().toString(), store.load(copy)!!.layers.single().node["fillImage"])
+        val b = store.create(scene(image(wide)))
+        store.delete(a)
+        assertTrue(sample.exists())
+        store.delete(b)
+        assertFalse(sample.exists())
+    }
+
+    @Test fun deleteKeepsMediaOnTheClipboardWrittenWithThreeSlashes() {
+        val store = ProjectStore(tmp.newFolder())
+        val a = store.create(scene())
+        store.mediaDir(a).mkdirs()
+        val sample = store.mediaDir(a).resolve("copied.png").apply { writeText("x") }
+        val wide = "file://" + sample.toURI().toString().removePrefix("file:")
+        store.save(a, scene(image(wide)))
+        app.absentmotion.editor.EffectClipboard.copy(listOf(XmlNode("effect", children = listOf(XmlNode("ai", linkedMapOf("original" to wide))))), setOf(0))
+        try {
+            store.delete(a)
+            assertTrue(sample.exists())
+        } finally {
+            app.absentmotion.editor.EffectClipboard.copy(listOf(XmlNode("effect")), setOf(0))
+        }
+    }
+
     @Test fun deleteRemovesOnlyAiFilesThatNoProjectOrTemplateUses() {
         val root = tmp.newFolder()
         val ai = tmp.newFolder("ai")
@@ -291,6 +323,19 @@ class ProjectStoreTest {
         assertEquals("three", store.list().single().title)
         store.thumbnailFile(id).delete()
         assertEquals(null, store.list().single().thumbnail)
+    }
+
+    @Test fun theListedSizeCountsTheProjectsKeptMedia() {
+        val root = tmp.newFolder()
+        val store = ProjectStore(root)
+        val id = store.create(scene())
+        val xml = root.resolve("projects/$id.xml").length()
+        assertEquals(xml, store.list().single().sizeBytes)
+        store.mediaDir(id).resolve("clips").mkdirs()
+        store.mediaDir(id).resolve("clips/a.mp4").writeBytes(ByteArray(5000))
+        store.mediaDir(id).resolve("b.png").writeBytes(ByteArray(300))
+        assertEquals(xml + 5300, store.list().single().sizeBytes)
+        assertEquals(xml + 5300, ProjectStore(root).list().single().sizeBytes)
     }
 
     @Test fun xmlWithoutAnElementIsRejected() {
