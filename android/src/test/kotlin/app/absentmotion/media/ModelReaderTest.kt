@@ -219,6 +219,35 @@ class ModelReaderTest {
         readModel("tri.gltf", gltf("""{"byteLength":${triangle.size},"uri":"gone.bin"}""").toByteArray()) { null }
     }
 
+    @Test fun onlyTheDoubleSidedPartOfAModelIsSeenFromBehind() {
+        val uri = "data:application/octet-stream;base64," + Base64.getEncoder().encodeToString(triangle)
+        val primitive = """{"attributes":{"POSITION":0,"TEXCOORD_0":1},"indices":2,"material":%d}"""
+        val json = gltf("""{"byteLength":${triangle.size},"uri":"$uri"}""")
+            .replace(""""primitives":[${primitive.format(0)}]""", """"primitives":[${primitive.format(0)},${primitive.format(1)}]""")
+            .replace(""""materials":[{"doubleSided":true,""", """"materials":[{"doubleSided":false},{"doubleSided":true,""")
+        val mesh = readModel("tri.gltf", json.toByteArray()) { null }
+        assertEquals(false, mesh.twoSided)
+        assertEquals(3, mesh.triangleCount)
+        assertArrayEquals(floatArrayOf(0f, 0f, -1f), normal(mesh, 1), 1e-5f)
+        assertArrayEquals(floatArrayOf(0f, 0f, 1f), normal(mesh, 2), 1e-5f)
+    }
+
+    @Test fun wholeNumberPositionsAreNotShrunkUnlessMarkedNormalized() {
+        val data = shorts(0, 0, 0, 1, 0, 0, 0, 1, 0, 0) + shorts(0, 1, 2, 0)
+        val uri = "data:application/octet-stream;base64," + Base64.getEncoder().encodeToString(data)
+        val json = """
+            {"asset":{"version":"2.0"},"scene":0,"scenes":[{"nodes":[0,1]}],"nodes":[{"mesh":0},{"mesh":0,"translation":[10,0,0]}],
+             "meshes":[{"primitives":[{"attributes":{"POSITION":0},"indices":1}]}],
+             "buffers":[{"byteLength":${data.size},"uri":"$uri"}],
+             "bufferViews":[{"buffer":0,"byteOffset":0,"byteLength":18},{"buffer":0,"byteOffset":20,"byteLength":6}],
+             "accessors":[{"bufferView":0,"componentType":5123,"count":3,"type":"VEC3","normalized":false},
+                          {"bufferView":1,"componentType":5123,"count":3,"type":"SCALAR"}]}
+        """.trimIndent()
+        val mesh = readModel("quantized.gltf", json.toByteArray()) { null }
+        val xs = (0..2).map { mesh.positions[mesh.triangles[it] * 3] }
+        assertEquals(1f / 11f, (xs.max() - xs.min()) / extent(mesh, 0), 1e-3f)
+    }
+
     @Test fun aMirroredNodeKeepsItsTrianglesFacingOut() {
         val uri = "data:application/octet-stream;base64," + Base64.getEncoder().encodeToString(triangle)
         val mesh = readModel("tri.gltf", gltf("""{"byteLength":${triangle.size},"uri":"$uri"}""", """{"mesh":0,"scale":[-1,1,1]}""").toByteArray()) { null }
@@ -365,7 +394,7 @@ class ModelReaderTest {
         val hugeNormals = gltf(buffer).replace(""""TEXCOORD_0":1""", """"TEXCOORD_0":1,"NORMAL":3""")
             .replace("""{"bufferView":2,"componentType":5123,"count":3,"type":"SCALAR"}""", """{"bufferView":2,"componentType":5123,"count":3,"type":"SCALAR"},$noData""")
             .replace(""""meshes":[{"primitives":[""", """"meshes":[{"primitives":[""" + List(40) { """{"attributes":{"POSITION":0,"NORMAL":3},"indices":2},""" }.joinToString(""))
-        timed(5) { assertEquals(41, GltfReader.read(hugeNormals.toByteArray(), { null }).triangleCount) }
+        timed(5) { assertEquals(42, GltfReader.read(hugeNormals.toByteArray(), { null }).triangleCount) }
     }
 
     @Test fun anObjTextureNameKeepsItsSpaces() {

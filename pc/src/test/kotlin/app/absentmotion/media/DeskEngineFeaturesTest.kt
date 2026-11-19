@@ -143,6 +143,34 @@ class DeskEngineFeaturesTest {
         } finally { engine.close() }
     }
 
+    @Test fun lateVideoStreamsAreReadOnTheirOwnClock() = runBlocking {
+        val video = out.resolve("late-video.mkv").also { it.delete() }
+        val process = ProcessBuilder(app.absentmotion.Judge.ffmpeg, "-nostdin", "-v", "error", "-y", "-itsoffset", "0.5", "-f", "lavfi", "-i", "testsrc=size=64x48:rate=10:duration=2",
+            "-f", "lavfi", "-i", "sine=duration=2.5", "-c:v", "ffv1", "-c:a", "pcm_s16le", video.path).start()
+        assertEquals(0, process.waitFor())
+        val stamps = VideoSources.timestamps(context, Uri.fromFile(video).toString())
+        assertEquals(0L, stamps[0])
+        FfmpegVideoSource(video, app.absentmotion.Judge.ffmpeg, app.absentmotion.Judge.ffprobe).use { reader ->
+            val first = reader.frameExact(stamps[0])!!.rgba.copyOf()
+            val fifth = reader.frameExact(stamps[5])!!.rgba.copyOf()
+            assertTrue(!first.contentEquals(fifth))
+            assertTrue(reader.frame(0)!!.rgba.contentEquals(first))
+            assertTrue(reader.frame(500)!!.rgba.contentEquals(fifth))
+        }
+    }
+
+    @Test fun hdrClipsAreNotCompressedAsSdr() {
+        val hlg = out.resolve("hlg.mp4").also { it.delete() }
+        val made = ProcessBuilder(app.absentmotion.Judge.ffmpeg, "-nostdin", "-v", "error", "-y", "-f", "lavfi", "-i", "testsrc=size=64x48:rate=10:duration=1",
+            "-vf", "format=yuv420p10le,setparams=color_trc=arib-std-b67:color_primaries=bt2020:colorspace=bt2020nc", "-c:v", "libx264", hlg.path).start()
+        assertEquals(0, made.waitFor())
+        val small = out.resolve("hlg-small.mp4").also { it.delete() }
+        FfmpegEngine.compress(hlg, app.absentmotion.tools.VideoJob(64, 48, 10, 200_000, 0, false, 0), false, 1_000_000, small, 0, 0, {}) { true }
+        val color = ProcessBuilder(app.absentmotion.Judge.ffprobe, "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=color_space,color_transfer,color_primaries", "-of", "csv=p=0", small.path)
+            .start().inputStream.bufferedReader().readText().trim()
+        assertEquals("bt2020nc,arib-std-b67,bt2020", color)
+    }
+
     @Test fun highRateVideoKeepsItsFrameRate() {
         val video = out.resolve("high-rate.mkv")
         val process = ProcessBuilder(app.absentmotion.Judge.ffmpeg, "-nostdin", "-v", "error", "-y", "-f", "lavfi", "-i", "testsrc=size=64x48:rate=240",

@@ -5,10 +5,12 @@ import java.util.concurrent.atomic.AtomicLong
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
+const val NATIVE_AMVER = "1002592"
+
 @JvmInline
 value class Scene(val node: XmlNode) {
     val title: String get() = node["title"] ?: ""
-    val fromAlight: Boolean get() = node["amver"] != null || node["am"]?.startsWith("com.alightcreative") == true
+    val fromAlight: Boolean get() = node["am"]?.startsWith("com.alightcreative") == true || node["alightImport"] == "true" || node["amver"].let { it != null && it != NATIVE_AMVER }
     val width: Int get() = node["width"]?.toIntOrNull() ?: 1080
     val height: Int get() = node["height"]?.toIntOrNull() ?: 1080
     val fps: Int get() = node["fps"]?.toIntOrNull()?.takeIf { it > 0 } ?: 30
@@ -114,9 +116,12 @@ value class Scene(val node: XmlNode) {
         layer.node.mediaUris().forEach { uri ->
             next = next.withMedia(MediaDeclaration(XmlNode("media", mapOf("uri" to uri))))
         }
-        val unique = if (this.layer(layer.id) == null) layer else layer.withId(generateSequence { Layer.newId() }.first { this.layer(it) == null })
-        return next.withChildren(next.node.children + unique.node)
+        return next.withChildren(next.node.children + unique(layer).node)
     }
+
+    fun freeLayerId(): Long = generateSequence { Layer.newId() }.first { layer(it) == null }
+
+    private fun unique(layer: Layer): Layer = if (this.layer(layer.id) == null) layer else layer.withId(freeLayerId())
 
     fun remove(id: Long): Scene = withChildren(node.children.filterNot { it.name in LAYER_TAGS && Layer(it).id == id }.map { it.withoutValueLinks(setOf(id)) })
 
@@ -139,7 +144,8 @@ value class Scene(val node: XmlNode) {
         if (index < 0) return add(layer)
         var end = index + 1
         if (!list.isMask(index)) while (end < list.size && list[end].leansOnBelow) end++
-        return add(layer).move(layer.id, end)
+        val unique = unique(layer)
+        return add(unique).move(unique.id, end)
     }
 
     fun withCopiesAbove(copies: Map<Long, Layer>): Scene {
@@ -191,7 +197,7 @@ value class Scene(val node: XmlNode) {
                     "title" to title, "width" to "$width", "height" to "$height",
                     "exportWidth" to "$width", "exportHeight" to "$height", "precompose" to "dynamicResolution",
                     "bgcolor" to formatColor(bgColor), "totalTime" to "0", "fps" to "$fps", "depthOrder" to "true",
-                    "amver" to "1002592", "ffver" to "106",
+                    "amver" to NATIVE_AMVER, "ffver" to "106",
                     "am" to "app.absentmotion", "amplatform" to "android", "retime" to "freeze", "retimeAdaptFPS" to "false",
                 ),
             ),

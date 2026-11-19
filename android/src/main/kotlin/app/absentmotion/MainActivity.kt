@@ -205,7 +205,7 @@ class MainActivity : ComponentActivity() {
             runCatching { app.absentmotion.ai.AiModel.dropReplaced(applicationContext) }
         }
         val openElement: (String) -> Unit = { id ->
-            editor?.let { it.playing = false; it.endGesture(); it.saver.snapshot(it.project.toXml()) }
+            editor?.let { it.playing = false; it.commitTyping(); it.endGesture(); it.saver.snapshot(it.project.toXml()) }
             MultiSelect.clear()
             open(id)
         }
@@ -229,6 +229,7 @@ class MainActivity : ComponentActivity() {
         watchMemory()
         TestHooks.start(this)
         lifecycleScope.launch { androidx.compose.runtime.snapshotFlow { settings.openGl }.drop(1).collect { engine.restart() } }
+        engine.fonts?.let { fonts -> lifecycleScope.launch { fonts.revision.collect { settings.uiFont?.takeIf { FontName.parse(it).source == "imported" && fonts.localFile(it) == null }?.let { settings.uiFont = null } } } }
         app.absentmotion.ui.home.Updater.calm = ::updateCalm
         app.absentmotion.ui.home.Updater.atLaunch(applicationContext)
         lifecycleScope.launch { engineWorks() }
@@ -281,6 +282,7 @@ class MainActivity : ComponentActivity() {
                             CompositionLocalProvider(LocalDensity provides dense) { TemplateEditor(id, engine, settings, onClose = { editingTemplate = null }, onContinue = ::projectFromTemplate) }
                         }
                         exportingFromList?.let { ExportScreen(it, 0, engine, settings, fromProjectList = true, outdated) { exportingFromList = null } }
+                        app.absentmotion.ui.export.PresetSharing.preset?.let { app.absentmotion.ui.export.PresetShareScreen(it, engine, settings) { app.absentmotion.ui.export.PresetSharing.preset = null } }
                         LowMemoryNotice()
                     }
                 } else {
@@ -340,7 +342,7 @@ class MainActivity : ComponentActivity() {
                     onRestore = { seenCrash(outdated != null); offer?.let { answerRecovery(it, true) } },
                     onDiscard = { seenCrash(outdated != null); offer?.let { answerRecovery(it, false) } },
                     onClose = { seenCrash(outdated != null) },
-                ) else if (open == null && first == null && !opening && editingTemplate == null && exportingFromList == null) {
+                ) else if (open == null && first == null && !opening && editingTemplate == null && exportingFromList == null && app.absentmotion.ui.export.PresetSharing.preset == null) {
                     val notes = whatsNew
                     if (notes != null) app.absentmotion.ui.home.WhatsNewDialog(notes) { whatsNew = null; app.absentmotion.ui.home.WhatsNewNotes.seen(this, settings) }
                     else if (app.absentmotion.ui.home.FfampOffer.pending(settings)) app.absentmotion.ui.home.FfampOfferDialog(settings)
@@ -348,7 +350,7 @@ class MainActivity : ComponentActivity() {
                 }
                 app.absentmotion.ui.tutorial.TutorialHost(
                     open, store, settings,
-                    homeFree = open == null && first == null && !opening && editingTemplate == null && exportingFromList == null && offer == null && crashed == null && !problemShown && imported.isEmpty() && whatsNew == null && !app.absentmotion.ui.home.FfampOffer.pending(settings),
+                    homeFree = open == null && first == null && !opening && editingTemplate == null && exportingFromList == null && app.absentmotion.ui.export.PresetSharing.preset == null && offer == null && crashed == null && !problemShown && imported.isEmpty() && whatsNew == null && !app.absentmotion.ui.home.FfampOffer.pending(settings),
                     onOpen = ::open, onCloseEditor = ::closeEditor, onChanged = { projectsChanged++ },
                 )
             }
@@ -361,7 +363,7 @@ class MainActivity : ComponentActivity() {
 
 
     private fun updateCalm() = lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED) && editor == null && !closingEditor && !opening && !openingProject &&
-        editingTemplate == null && exportingFromList == null && firstRun == null && recovered == null && crashed == null && !problemShown && whatsNew == null && !app.absentmotion.ui.home.FfampOffer.pending(settings) &&
+        editingTemplate == null && exportingFromList == null && app.absentmotion.ui.export.PresetSharing.preset == null && firstRun == null && recovered == null && crashed == null && !problemShown && whatsNew == null && !app.absentmotion.ui.home.FfampOffer.pending(settings) &&
         settings.updatesAsked && !app.absentmotion.export.ExportRun.running
 
     private fun importShared() {
@@ -373,16 +375,19 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             val reports = ArrayList<ImportReport>()
             var failure: String? = null
+            var presetsAdded = 0
             val overlay = !opening
             if (overlay) { opening = true; openJob = coroutineContext.job }
             try {
                 CrashLogs.during("importing") { withContext(Dispatchers.IO) {
                     val job = coroutineContext.job
                     val importer = Importer.forApp(applicationContext, store)
+                    val presets = app.absentmotion.library.PresetStore(applicationContext)
                     for (uri in uris) try {
-                        reports += importer.import { contentResolver.openInputStream(uri)?.let { stoppable(it, job) } }.map {
+                        reports += importer.import { contentResolver.openInputStream(uri)?.let { stoppable(it, job) } }.mapNotNull {
                             afterImport()
-                            if (!it.template) it else templates.adopt(store, it.id, engine)?.let { id -> it.copy(id = id) } ?: it.copy(template = false)
+                            if (it.community?.preset == true && presets.adopt(store, it.id, templates::localize) != null) null.also { presetsAdded++ }
+                            else if (!it.template) it else templates.adopt(store, it.id, engine)?.let { id -> it.copy(id = id) } ?: it.copy(template = false)
                         }
                     } catch (e: kotlinx.coroutines.CancellationException) {
                         throw e
@@ -399,6 +404,7 @@ class MainActivity : ComponentActivity() {
                 projectsChanged++
             }
             failure?.let { importFailed = it }
+            if (presetsAdded > 0) Toast.makeText(this@MainActivity, getString(R.string.community_added_preset), Toast.LENGTH_SHORT).show()
             if (reports.isNotEmpty()) imported = reports
             var drawn = false
             for (report in reports) if (!report.template) {
@@ -436,9 +442,9 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private suspend fun saveThumbnail(scene: Scene, timeMs: Int, id: String, xml: String? = null): Boolean {
+    private suspend fun saveThumbnail(scene: Scene, timeMs: Int, id: String, xml: String? = null, file: java.io.File = store.thumbnailFile(id)): Boolean {
         val longSide = maxOf(scene.width, scene.height, 1)
-        return engine.stillPng(xml ?: withContext(Dispatchers.Default) { scene.toXml() }, timeMs, (256 * scene.width / longSide).coerceAtLeast(1), (256 * scene.height / longSide).coerceAtLeast(1), store.thumbnailFile(id))
+        return engine.stillPng(xml ?: withContext(Dispatchers.Default) { scene.toXml() }, timeMs, (256 * scene.width / longSide).coerceAtLeast(1), (256 * scene.height / longSide).coerceAtLeast(1), file)
     }
 
     private fun projectFromTemplate(scene: Scene) {
@@ -529,7 +535,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private suspend fun engineWorks(): Boolean {
-        val problem = (kotlinx.coroutines.withTimeoutOrNull(30_000) { engine.startProblem.await() ?: "" } ?: "engine start timed out").ifEmpty { return true }
+        val problem = (kotlinx.coroutines.withTimeoutOrNull(30_000) { engine.startProblem().await() ?: "" } ?: "engine start timed out").ifEmpty { return true }
         engineProblem = problem
         problemShown = true
         return false
@@ -605,7 +611,7 @@ class MainActivity : ComponentActivity() {
 
     private fun restoreVersion(id: String, version: ProjectVersions.Version) {
         val state = editor?.takeIf { it.projectId == id }
-        state?.let { it.playing = false; it.endGesture(); it.historyOpen = false }
+        state?.let { it.playing = false; it.commitTyping(); it.endGesture(); it.historyOpen = false }
         opening = true
         historyFor = null
         openJob = lifecycleScope.launch {
@@ -630,6 +636,7 @@ class MainActivity : ComponentActivity() {
         closingEditor = true
         closing.playing = false
         app.absentmotion.editor.PreviewCache.remove()
+        closing.commitTyping()
         closing.endGesture()
         closing.leaveGroups()
         val scene = closing.scene
@@ -644,13 +651,15 @@ class MainActivity : ComponentActivity() {
             val xml = withContext(Dispatchers.Default) { scene.toXml() }
             closing.saver.snapshot(xml)
             engine.audio?.release()
-            try {
-                saveThumbnail(scene, closing.timeMs, closing.projectId, xml)
-            } finally {
-                MultiSelect.clear()
-                if (editor === closing) editor = null
-                closingEditor = false
-            }
+            MultiSelect.clear()
+            if (editor === closing) editor = null
+            closingEditor = false
+            val id = closing.projectId
+            val thumbnail = store.thumbnailFile(id)
+            val temp = java.io.File(thumbnail.parentFile, thumbnail.name + ".tmp")
+            val saved = withContext(Dispatchers.IO) { store.text(id) }
+            val drawn = saveThumbnail(scene, closing.timeMs, id, xml, temp)
+            if (withContext(Dispatchers.IO) { (drawn && saved != null && store.text(id) == saved && temp.renameTo(thumbnail)).also { temp.delete() } }) projectsChanged++
         }
     }
 
@@ -664,6 +673,7 @@ class MainActivity : ComponentActivity() {
         app.absentmotion.platform.DeskDetect.refresh(this)
     }
 
+    @android.annotation.SuppressLint("RestrictedApi")
     override fun dispatchKeyEvent(event: android.view.KeyEvent): Boolean {
         val state = editor
         if (state != null && event.action == android.view.KeyEvent.ACTION_DOWN && app.absentmotion.platform.DeskKeys.handle(state, androidx.compose.ui.input.key.KeyEvent(event))) return true

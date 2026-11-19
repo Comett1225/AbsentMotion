@@ -212,11 +212,23 @@ private suspend fun encode(
                 fun perFrame(ns: Long) = "%.1f".format(java.util.Locale.ROOT, ns / 1e6 / frames.coerceAtLeast(1))
                 Log.i("AMExport", "$frames frames in ${spent[2] / 1_000_000} ms; per frame: ${perFrame(spent[2])} ms, drawing ${perFrame(spent[0] - spent[1])} ms, waiting for copies ${perFrame(spent[1])} ms")
             }
-            val buffers = turn || ExportDebug.forceBuffers || (Build.VERSION.SDK_INT < 33 && !openGl()) || !stampsPresentTime()
+            val copies = turn || ExportDebug.forceBuffers || (Build.VERSION.SDK_INT < 33 && !openGl()) || !stampsPresentTime()
+            var fellBack = false
+            val target = if (copies) 0L else try { attach(input) } catch (e: IllegalStateException) {
+                if (e is kotlinx.coroutines.CancellationException || e is ExportError) throw e
+                Log.w("AMExport", "cannot draw straight into the encoder, copying through buffers", e)
+                fellBack = true
+                0L
+            }
+            val buffers = copies || fellBack
+            fun <T> settingUp(make: () -> T): T = try { make() } catch (e: Exception) {
+                if (!fellBack || e is kotlinx.coroutines.CancellationException) throw e
+                throw ExportError(txt(R.string.export_error_codec_busy), e)
+            }
             Log.i("AMExport", "rendering $frames frames at ${width}x$height through ${if (buffers) "encoder buffers" else "the swapchain"}")
             if (buffers && !turn && Build.VERSION.SDK_INT >= 33) {
-                val writer = ImageWriter.Builder(input).setMaxImages(2).setHardwareBufferFormat(HardwareBuffer.RGBA_8888)
-                    .setUsage(HardwareBuffer.USAGE_GPU_COLOR_OUTPUT or HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE).build()
+                val writer = settingUp { ImageWriter.Builder(input).setMaxImages(2).setHardwareBufferFormat(HardwareBuffer.RGBA_8888)
+                    .setUsage(HardwareBuffer.USAGE_GPU_COLOR_OUTPUT or HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE).build() }
                 try {
                     eachFrame { k, presentNs ->
                         val image = writer.dequeueInputImage()
@@ -235,7 +247,7 @@ private suspend fun encode(
                     writer.close()
                 }
             } else if (buffers) {
-                val feed = EncoderFeed(input, width, height, turn)
+                val feed = settingUp { EncoderFeed(input, width, height, turn) }
                 try {
                     eachFrame({ exportCheck(feed.flush().also { spent[1] = feed.waitedNs }) { txt(R.string.export_error_draw_frame, (frames - 1).toString()) } }) { k, presentNs ->
                         exportCheck(feed.ready().also { spent[1] = feed.waitedNs }) { txt(R.string.export_error_draw_frame, (k - 2).toString()) }
@@ -247,7 +259,6 @@ private suspend fun encode(
                     releaseBuffers()
                 }
             } else {
-                val target = attach(input)
                 try {
                     eachFrame { k, presentNs -> exportCheck(render(target, frameTimeMs(scene, s.fps, k), presentNs)) { txt(R.string.export_error_draw_frame, k.toString()) } }
                 } finally {

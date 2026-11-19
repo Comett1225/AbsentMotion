@@ -25,8 +25,10 @@ import app.absentmotion.R
 import app.absentmotion.editor.EditorPanel
 import app.absentmotion.editor.EditorState
 import app.absentmotion.model.CropBox
+import app.absentmotion.model.Layer
 import app.absentmotion.model.cropBox
 import app.absentmotion.model.cropIndex
+import app.absentmotion.model.effects
 
 internal const val CROP_INSIDE = 8
 
@@ -36,6 +38,15 @@ internal fun cropCorners(q: List<Offset>, box: CropBox): List<Offset> {
     val y0 = box.top
     val y1 = 1f - box.bottom
     return listOf(boxPoint(q, x0, y0), boxPoint(q, x1, y0), boxPoint(q, x1, y1), boxPoint(q, x0, y1))
+}
+
+internal fun uncroppedQuad(q: FloatArray, layer: Layer): FloatArray {
+    val index = layer.cropIndex
+    if (index < 0 || layer.kind == "embedScene" || layer.effects[index]["hidden"] == "true") return q
+    val b = layer.cropBox(index)
+    if (b.left <= 0f && b.top <= 0f && b.right <= 0f && b.bottom <= 0f) return q
+    val c = cropCorners(List(4) { Offset(q[2 * it], q[2 * it + 1]) }, CropBox(-b.left / b.width, -b.top / b.height, -b.right / b.width, -b.bottom / b.height))
+    return FloatArray(8) { if (it % 2 == 0) c[it / 2].x else c[it / 2].y }
 }
 
 internal fun cropHandles(q: List<Offset>, box: CropBox): List<Offset> = cropCorners(q, box).let { c -> c + List(4) { (c[it] + c[(it + 1) % 4]) / 2f } }

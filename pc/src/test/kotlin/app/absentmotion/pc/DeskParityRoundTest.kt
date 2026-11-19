@@ -4,6 +4,21 @@ import app.absentmotion.ui.home.WhatsNew
 import app.absentmotion.ui.home.WhatsNewCard
 import app.absentmotion.ui.home.WhatsNewNotes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.Density
+import app.absentmotion.export.ExportName
+import app.absentmotion.export.StorageStatus
+import app.absentmotion.export.sequenceFrameName
+import app.absentmotion.ui.export.ExportBar
+import app.absentmotion.ui.export.FileNameField
+import app.absentmotion.ui.export.FormatPage
+import app.absentmotion.ui.export.InfoBlock
+import app.absentmotion.ui.theme.Am
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -465,6 +480,75 @@ class DeskParityRoundTest {
             onNode(hasContentDescription(text(R.string.cancel)) and hasClickAction()).performClick()
             settle()
             assertFalse(editor.exportOpen)
+        }
+    }
+
+    private val slider = SemanticsMatcher.keyIsDefined(SemanticsProperties.ProgressBarRangeInfo)
+
+    @Test fun gifAndSequenceUseTheVideoControlsAndExportStraightFromTheirPage() {
+        prepare("export-formats")
+        session(1280, 800) { app ->
+            val editor = openEditor(app, "text.xml")
+            val prefs = ExportPrefs(app.context)
+            prefs.save(ExportKind.Gif, prefs.load(ExportKind.Gif, editor.scene).copy(shortSide = 180, fps = 10))
+            prefs.save(ExportKind.Sequence, prefs.load(ExportKind.Sequence, editor.scene).copy(shortSide = 180, fps = 24))
+            runOnIdle { editor.exportOpen = true }
+            settle(900)
+            for ((kind, label, fps) in listOf(Triple(ExportKind.Gif, R.string.gif, 30), Triple(ExportKind.Sequence, R.string.export_kind_sequence, 10))) {
+                DeskExports.clearFinish()
+                onAllNodesWithText(text(label)).onFirst().performClick()
+                settle(900)
+                onNode(hasText("180p") and hasClickAction()).assertExists()
+                onAllNodesWithText(if (kind == ExportKind.Gif) "12fps" else "48fps").assertCountEquals(0)
+                onAllNodes(slider).assertCountEquals(if (kind == ExportKind.Gif) 1 else 2)
+                onAllNodes(slider).onFirst().performScrollTo().performTouchInput { click(if (fps == 30) centerRight else centerLeft) }
+                settle()
+                onAllNodesWithText("${fps}fps").assertCountEquals(2)
+                shot("export-${kind.name.lowercase()}")
+                onAllNodesWithText(text(R.string.export)).filter(hasClickAction()).onLast().performClick()
+                waitUntil(timeoutMillis = 120_000) { DeskExports.finish != null }
+                assertEquals(true, DeskExports.finish!!.ok)
+                assertEquals(fps, prefs.load(kind, editor.scene).fps)
+                val files = DeskExports.finish!!.files.map { it.toFile()!!.name }
+                if (kind == ExportKind.Gif) assertTrue(files.toString(), files.single().endsWith(".gif"))
+                else assertEquals(List(frameCount(editor.scene, fps)) { sequenceFrameName(it, "png") }, files.sorted())
+                settle()
+                onAllNodesWithText(text(R.string.ok)).filter(hasClickAction()).onLast().performClick()
+                settle()
+            }
+        }
+    }
+
+    @Test fun gifAndSequencePagesOnAPhoneATabletAndWithLargeText() {
+        prepare("export-format-pages")
+        val app = DeskAppState()
+        val scene = scene("text.xml")
+        for (kind in listOf(ExportKind.Gif, ExportKind.Sequence)) for ((name, size, density) in listOf(
+            Triple("phone", Size(720f, 1560f), Density(2f)),
+            Triple("phone-large-text", Size(720f, 1560f), Density(2f, 1.6f)),
+            Triple("tablet", Size(2560f, 1600f), Density(2f)),
+        )) runSkikoComposeUiTest(size = size, density = density) {
+            var s by mutableStateOf(ExportPrefs(app.context).load(kind, scene).copy(shortSide = 360, fps = if (kind == ExportKind.Gif) 15 else 30))
+            var exported = 0
+            val tablet = name == "tablet"
+            setContent {
+                Box(Modifier.fillMaxSize().background(if (tablet) Am.Scrim else Am.SheetBg), Alignment.Center) {
+                    Box(if (tablet) Modifier.size(980.dp, 752.dp).clip(RoundedCornerShape(18.dp)) else Modifier.fillMaxSize()) {
+                        FormatPage(kind, scene, s, { InfoBlock(48L shl 30, 2_400_000, 6_000, false, StorageStatus.Enough) }, { ExportBar(true, null, tablet) { exported++ } },
+                            { FileNameField(ExportName(scene.title), kind) }, { s = it }, {}, {}, {})
+                    }
+                }
+            }
+            settle()
+            onNode(hasText("360p") and hasClickAction()).assertExists()
+            onAllNodes(slider).assertCountEquals(if (kind == ExportKind.Gif) 1 else 2)
+            onAllNodesWithText(text(R.string.ok)).assertCountEquals(0)
+            shot("page-${kind.name.lowercase()}-$name")
+            onAllNodes(slider).onFirst().performScrollTo().performTouchInput { click(centerRight) }
+            settle()
+            assertEquals(if (kind == ExportKind.Gif) 30 else 60, s.fps)
+            onNode(hasText(text(R.string.export)) and hasClickAction()).performClick()
+            assertEquals(1, exported)
         }
     }
 

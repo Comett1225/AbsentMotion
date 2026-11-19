@@ -18,7 +18,10 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import app.absentmotion.Feature
 import app.absentmotion.R
+import app.absentmotion.RiskAsk
+import app.absentmotion.Tier
 import app.absentmotion.ai.AiEnhance
 import app.absentmotion.ai.AiDevice
 import app.absentmotion.ai.aiEstimate
@@ -38,6 +41,7 @@ import app.absentmotion.tools.PickedMedia
 import app.absentmotion.tools.compressFolder
 import app.absentmotion.tools.outputName
 import app.absentmotion.tools.readPicked
+import app.absentmotion.ui.RiskDialog
 import app.absentmotion.ui.editor.effects.CompareImages
 import app.absentmotion.ui.editor.effects.EnhanceCompare
 import app.absentmotion.ui.theme.Am
@@ -53,7 +57,9 @@ internal fun EnhanceImageScreen(onClose: () -> Unit) {
     var picked by remember { mutableStateOf<PickedMedia?>(null) }
     var unreadable by remember { mutableStateOf(false) }
     var options by remember { mutableStateOf(EnhanceOptions(max = PlatformFeatures.desktop)) }
-    val picker = rememberMediaPicker { uri ->
+    var risk by remember { mutableStateOf<RiskAsk?>(null) }
+    var unlocked by remember { mutableStateOf(false) }
+    val picker = rememberMediaPicker(imageOnly = true) { uri ->
         if (uri != null) scope.launch {
             val media = readPicked(context, uri)?.takeIf { !it.source.video }
             work.change { picked = media; unreadable = media == null }
@@ -80,25 +86,28 @@ internal fun EnhanceImageScreen(onClose: () -> Unit) {
     val note = listOfNotNull(AiEnhance.imageCapText(options), estimate, download).joinToString("\n")
     val barNote = if (source != null && !fits) AiEnhance.imageCapText(options) else listOfNotNull(download, estimate).joinToString("\n")
     val done = work.step as? ToolStep.Done
+    fun enhance() {
+        val media = picked ?: return
+        val chosen = options
+        val warning = Tier.risk(Feature.AiEnhance).takeUnless { unlocked }
+        if (warning != null) { risk = RiskAsk(listOf(warning)) { unlocked = true; enhance() }; return }
+        work.start { report ->
+            withContext(Dispatchers.IO) {
+                for (model in chosen.models) if (!model.installed(context)) model.download(context) { report(it * 0.1f) }
+                val declaration = MediaDeclaration(XmlNode("media", mapOf("uri" to media.uri.toString(), "width" to "${media.source.width}", "height" to "${media.source.height}", "orientation" to "${media.rotation}")))
+                val output = AiEnhance.image(context, media.uri.toString(), declaration, chosen, { fraction, _ -> withContext(Dispatchers.Main) { report(0.1f + fraction * 0.9f) } }, upright = true)
+                try {
+                    val target = java.io.File(compressFolder(context).apply { mkdirs() }, outputName(media, "png", "enhanced"))
+                    output.file.copyTo(target, overwrite = true)
+                    Compressed(target, "image/png", false)
+                } finally { output.file.delete() }
+            }
+        }
+    }
     ToolSheet(stringResource(R.string.tools_enhance_image), { if (work.running) work.cancel() else onClose() }, bottom = {
         ToolBar(work, barNote, source != null && !fits, stringResource(R.string.compress_result), R.string.tools_enhance_running,
             stringResource(if (missing > 0) R.string.ai_download_and_start else R.string.start), HomeIcons.Compress, fits,
-            onSave = if (PlatformFeatures.desktop) { result -> savePicker.launch(result.result.file.name) } else null, share = false) {
-            val media = picked ?: return@ToolBar
-            val chosen = options
-            work.start { report ->
-                withContext(Dispatchers.IO) {
-                    for (model in chosen.models) if (!model.installed(context)) model.download(context) { report(it * 0.1f) }
-                    val declaration = MediaDeclaration(XmlNode("media", mapOf("uri" to media.uri.toString(), "width" to "${media.source.width}", "height" to "${media.source.height}", "orientation" to "${media.rotation}")))
-                    val output = AiEnhance.image(context, media.uri.toString(), declaration, chosen, { fraction, _ -> withContext(Dispatchers.Main) { report(0.1f + fraction * 0.9f) } }, upright = true)
-                    try {
-                        val target = java.io.File(compressFolder(context).apply { mkdirs() }, outputName(media, "png", "enhanced"))
-                        output.file.copyTo(target, overwrite = true)
-                        Compressed(target, "image/png", false)
-                    } finally { output.file.delete() }
-                }
-            }
-        }
+            onSave = if (PlatformFeatures.desktop) { result -> savePicker.launch(result.result.file.name) } else null, share = false, onStart = ::enhance)
     }, side = {
         SectionTitle(stringResource(R.string.ai_enhance))
         Chips(listOf(stringResource(R.string.ai_enhance_realistic), stringResource(R.string.ai_enhance_anime)), if (options.cartoon) 1 else 0, !work.running) { i -> work.change { options = options.copy(cartoon = i == 1) } }
@@ -117,6 +126,7 @@ internal fun EnhanceImageScreen(onClose: () -> Unit) {
     }) {
         Spacer(Modifier.height(20.dp))
         PickCard(picked, unreadable, !work.running, R.string.tools_enhance_pick) { picker.launch() }
+        RiskDialog(risk, Am.Navy, Am.Navy, Am.Warning, Am.Card) { risk = null; it?.proceed?.invoke() }
         if (done != null && picked != null) {
             SectionTitle(stringResource(R.string.ai_compare))
             EnhanceCompare(CompareImages(picked!!.uri.toString(), android.net.Uri.fromFile(done.result.file).toString(), picked!!.rotation, 0))

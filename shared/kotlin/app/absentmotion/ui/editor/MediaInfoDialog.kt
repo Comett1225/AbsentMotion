@@ -30,7 +30,7 @@ import app.absentmotion.R
 import app.absentmotion.library.openableUri
 
 @Composable
-internal fun MediaInfoDialog(record: MediaDeclaration, onReplace: (suspend (MediaDeclaration) -> Unit)? = null, onDismiss: () -> Unit) {
+internal fun MediaInfoDialog(record: MediaDeclaration, video: Boolean, onReplace: (suspend (MediaDeclaration) -> Unit)? = null, onDismiss: () -> Unit) {
     val context = LocalContext.current
     val scope = LocalEditorScope.current
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
@@ -73,7 +73,7 @@ internal fun MediaInfoDialog(record: MediaDeclaration, onReplace: (suspend (Medi
                 Text(
                     stringResource(R.string.swap_media_file), Modifier.fillMaxWidth().padding(top = 12.dp).alpha(if (onReplace == null) 0.35f else 1f)
                         .clickable(enabled = onReplace != null) {
-                            picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.SingleMimeType(record.type.substringBefore('/', "image") + "/*")))
+                            picker.launch(PickVisualMediaRequest(if (video) ActivityResultContracts.PickVisualMedia.VideoOnly else ActivityResultContracts.PickVisualMedia.SingleMimeType(record.type.substringBefore('/', "image") + "/*")))
                         },
                     color = Am.Accent, fontSize = 14.sp,
                 )

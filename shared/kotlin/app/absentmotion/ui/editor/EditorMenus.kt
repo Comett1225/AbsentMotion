@@ -186,7 +186,7 @@ internal fun MenuRow(
 
 @Composable
 internal fun LayerMenu(state: EditorState, onDismiss: () -> Unit) {
-    val scope = rememberCoroutineScope()
+    val scope = LocalEditorScope.current
     val position = remember { RightEdge { it.bottom } }
     var mediaInfo by remember { mutableStateOf(false) }
     var marking by remember { mutableStateOf(false) }
@@ -195,7 +195,7 @@ internal fun LayerMenu(state: EditorState, onDismiss: () -> Unit) {
     val video = media?.takeIf { it.video }
     val mediaRecord = media?.let { state.scene.media(it.uri) }
     if (mediaInfo && mediaRecord != null) {
-        MediaInfoDialog(mediaRecord, onReplace = { picked -> val kept = state.keepCopy(context, picked); state.edit { s -> s.replaceMedia(mediaRecord.uri, kept, dropMarks = true) } }) { mediaInfo = false; onDismiss() }
+        MediaInfoDialog(mediaRecord, video != null, onReplace = { picked -> val kept = state.keepCopy(context, picked); state.edit { s -> s.replaceMedia(mediaRecord.uri, kept, dropMarks = true) } }) { mediaInfo = false; onDismiss() }
         return
     }
     val saveElement = rememberSaveToMyElements(state)

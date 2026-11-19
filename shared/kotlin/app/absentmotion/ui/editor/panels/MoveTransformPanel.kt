@@ -417,20 +417,10 @@ private fun SizeTab(state: EditorState, layer: Layer) {
     val heightLabel = stringResource(R.string.transform_height)
     fun openKeypad(isWidth: Boolean) {
         active = if (isWidth) 0 else 1
-        if (box == null) return
         val old = if (isWidth) boxW else boxH
+        if (box == null || !(old > 0f)) return
         val field = KeypadField(if (isWidth) widthLabel else heightLabel, old)
-        state.keypad = KeypadRequest(listOf(field), 0) { v ->
-            if (v[0] > 0f) {
-                if (old > 0f) stretch(v[0] / old, isWidth)
-                else state.editSelected { l ->
-                    val first = isWidth != upright
-                    val s = l.scale
-                    val set = v[0] / 100f
-                    l.withTransform("scale", if (first || linked) set else s[0], if (!first || linked) set else s[1])
-                }
-            }
-        }
+        state.keypad = KeypadRequest(listOf(field), 0) { v -> if (v[0] > 0f) stretch(v[0] / old, isWidth) }
     }
     fun colour(which: Int) = if (linked || active == which) Am.Accent else Am.OnDark
 

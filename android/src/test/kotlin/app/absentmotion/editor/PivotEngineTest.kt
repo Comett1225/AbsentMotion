@@ -314,4 +314,16 @@ class PivotEngineTest {
             for (out in listOf(linked, unlinked)) assertTrue(out.layer(2)!!.node.child("transform")!!.children.none { it.isKeyframed })
         }
     }
+
+    @Test fun aChildWithLockedOrWeightedRotationUnderATiltedTurnedParentKeepsItsPlaceWhenLinkedAndUnlinked() {
+        for (helper in listOf(effect("absent.parenthelper", "rotateMode" to "1"), effect("absent.parenthelper", "rotateMode" to "2", "rotateWeight" to "0.4"))) {
+            val s = sceneOf(
+                layer(1, prop("location", 0f to "200,200,0"), prop("rotation", 0f to "90"), prop("tilt", 0f to "45,20")),
+                layer(2, prop("location", 0f to "40,10,0"), prop("rotation", 0f to "10"), helper, parent = 1),
+                layer(3, prop("location", 0f to "120,260,0"), prop("rotation", 0f to "-15")),
+            )
+            assertStays(s, s.update(2) { s.rebased(it, null, 500)!! }, listOf(2), listOf(500), 0.05f)
+            assertStays(s, s.update(3) { s.rebased(it, 2, 500)!! }, listOf(3), listOf(500), 0.05f)
+        }
+    }
 }

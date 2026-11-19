@@ -1,7 +1,6 @@
 package app.absentmotion.ai
 
 import android.content.Context
-import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.net.Uri
 import app.absentmotion.R
@@ -21,6 +20,7 @@ import app.absentmotion.export.drain
 import app.absentmotion.export.feedAudio
 import app.absentmotion.i18n.AppText
 import app.absentmotion.library.openableUri
+import app.absentmotion.media.openDemuxer
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
@@ -134,15 +134,15 @@ internal class Downsampled(private val source: (Int) -> ShortArray, inRate: Int,
     }
 }
 
-internal fun soundMime(context: Context, uri: String): String? {
-    val extractor = MediaExtractor()
-    try {
-        extractor.setDataSource(context, Uri.parse(openableUri(uri)), null)
-        return (0 until extractor.trackCount).map { extractor.getTrackFormat(it).getString(MediaFormat.KEY_MIME) }.firstOrNull { it?.startsWith("audio/") == true }
-    } finally {
-        extractor.release()
+internal fun soundMime(context: Context, uri: String): String? = runCatching {
+    openDemuxer(context, Uri.parse(openableUri(uri)), "audio/").run {
+        try {
+            (0 until trackCount).map { getTrackFormat(it).getString(MediaFormat.KEY_MIME) }.firstOrNull { it != null && it.startsWith("audio/") && "/x-ffamp-" !in it }
+        } finally {
+            release()
+        }
     }
-}
+}.getOrNull()
 
 internal suspend fun keepSound(context: Context, uri: String, limitUs: Long): AiSound? {
     val mime = soundMime(context, uri) ?: return null

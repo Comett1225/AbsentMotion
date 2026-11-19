@@ -37,6 +37,7 @@ import app.absentmotion.model.VideoTiming
 import app.absentmotion.model.remapped
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.fpsText
+import app.absentmotion.model.keyframes
 import app.absentmotion.model.mediaLengthMs
 import app.absentmotion.model.mediaUris
 import app.absentmotion.model.trimmedTo
@@ -63,7 +64,7 @@ internal const val MAX_SMOOTH_FRAMES = 20_000
 private const val MAX_SMOOTH_STEPS = 8
 private const val MAX_SMOOTH_SIDE = 1080
 
-internal data class SmoothPlan(val fps: Int, val frames: Int, val width: Int, val height: Int, val seconds: Double, val blurScale: Float) {
+internal data class SmoothPlan(val fps: Int, val frames: Int, val width: Int, val height: Int, val seconds: Double, val blurScale: Float, val fromMs: Int) {
     val bitrate: Int get() = (width.toLong() * height * fps / 5).coerceIn(2_000_000, 120_000_000).toInt()
     val bytes: Long get() = (bitrate / 8.0 * seconds).roundToLong() + 1_000_000
 }
@@ -73,7 +74,8 @@ internal fun smoothPlan(layer: Layer, media: MediaDeclaration, projectFps: Int, 
     val source = media.fps ?: 30f
     val timing = VideoTiming(layer)
     val length = (layer.endTime - layer.startTime).coerceAtLeast(1)
-    val slowest = (0..64).minOf { timing.speed(length * it / 64.0).toDouble() }.coerceAtLeast(0.01)
+    val keys = if (layer.remapped) emptyList() else layer.node.child("speedMap")?.keyframes.orEmpty().map { timing.localMs(it.t / 1_000_000.0) }.filter { it in 0.0..length.toDouble() }
+    val slowest = ((0..64).map { length * it / 64.0 } + keys).minOf { timing.speed(it).toDouble() }.coerceAtLeast(0.01)
     val steps = if (smoothing.method == FrameInterpolation.Off) 1 else ceil(projectFps / slowest / source - 0.01).toInt().coerceIn(1, MAX_SMOOTH_STEPS)
     if (steps == 1 && smoothing.blur == MotionBlur.Off) return null
     val fps = (source * steps).roundToInt().coerceIn(1, 240)
@@ -81,7 +83,7 @@ internal fun smoothPlan(layer: Layer, media: MediaDeclaration, projectFps: Int, 
     val k = min(1.0, MAX_SMOOTH_SIDE.toDouble() / min(w, h))
     fun even(v: Double) = max(2, (v / 2).roundToInt() * 2)
     val seconds = layer.matteSeconds(media)
-    return SmoothPlan(fps, (seconds * fps).toInt() + 1, even(w * k), even(h * k), seconds, (layer.meanSpeed() * fps / projectFps).toFloat())
+    return SmoothPlan(fps, (seconds * fps).toInt() + 1, even(w * k), even(h * k), seconds, (layer.meanSpeed() * fps / projectFps).toFloat(), layer.processFromMs)
 }
 
 internal fun Layer.meanSpeed(): Double {
@@ -94,7 +96,7 @@ internal fun Layer.meanSpeed(): Double {
 internal fun Layer.speedSignature(projectFps: Int): Int = "${node["speed"]}|${node.child("speedMap")?.toXml()}|$projectFps".hashCode()
 
 internal fun smoothFacts(base: Layer, plan: SmoothPlan, projectFps: Int): Map<String, String> = linkedMapOf(
-    "from" to "${base.mediaFill?.inTime ?: 0}", "span" to "${(plan.seconds * 1000).toInt()}", "fps" to "${plan.fps}",
+    "from" to "${plan.fromMs}", "span" to "${(plan.seconds * 1000).toInt()}", "fps" to "${plan.fps}",
     "blur" to "${plan.blurScale}", "mean" to "${base.meanSpeed()}", "sig" to "${base.speedSignature(projectFps)}",
 )
 
@@ -221,7 +223,7 @@ internal class SmoothKeeper(private val context: Context, private val state: Edi
 internal fun smoothScene(fill: MediaFill, media: MediaDeclaration, plan: SmoothPlan): Scene {
     val span = (plan.seconds * 1000).toInt().coerceAtLeast(1)
     val clip = XmlNode("shape", linkedMapOf("id" to "1", "startTime" to "0", "endTime" to "$span", "fillType" to "media", "mediaFillMode" to "stretch",
-        "s" to ".rect", "fillVideo" to fill.uri, "inTime" to "${fill.inTime}", "outTime" to "${fill.inTime + span}"), listOf(
+        "s" to ".rect", "fillVideo" to fill.uri, "inTime" to "${plan.fromMs}", "outTime" to "${plan.fromMs + span}"), listOf(
         XmlNode("transform", children = listOf(XmlNode("location", mapOf("value" to "${plan.width / 2f},${plan.height / 2f},0")))),
         XmlNode("property", mapOf("name" to "size", "type" to "vec2", "value" to "${plan.width / 2f},${plan.height / 2f}")),
     ))
@@ -232,8 +234,8 @@ internal fun Layer.smoothSource(previous: AiMark?): Layer =
     previous?.original?.let { copy(node = node.with("fillVideo", it)).shiftedMedia(previous.shift) } ?: this
 
 internal fun Layer.withSmoothed(result: String, source: String, option: String, original: MediaDeclaration?, base: Layer, facts: Map<String, String> = emptyMap()): Layer =
-    copy(node = node.with("fillVideo", result)).shiftedMedia(-(mediaFill?.inTime ?: 0))
-        .withAiMark(AiKind.Smooth, source, result, option, original, base.mediaFill?.inTime ?: 0, facts)
+    copy(node = node.with("fillVideo", result)).shiftedMedia(-processFromMs)
+        .withAiMark(AiKind.Smooth, source, result, option, original, base.processFromMs, facts)
 
 internal val Smoothing.option: String get() = "${method.name}:${level.name}:${blur.name}"
 
@@ -259,13 +261,13 @@ internal object ClipSmooth {
         val scene = smoothScene(fill, media, plan)
         val frames = minOf(plan.frames, frameCount(scene, plan.fps))
         val spanUs = (plan.seconds * 1_000_000).roundToLong()
-        val kept = keepSound(context, fill.uri, fill.inTime * 1000L + spanUs)
+        val kept = keepSound(context, fill.uri, plan.fromMs * 1000L + spanUs)
         var sound: Pair<MediaExtractor, Int>? = null
         var success = false
         try {
             progress(0f, AppText.get(R.string.ai_preparing))
-            sound = kept?.let { soundTrack(context, it.uri) }?.takeIf { hasSound(it.first, fill.inTime * 1000L, spanUs) || run { it.first.release(); false } }
-            encode(engine, scene, plan, file.path, frames, fill.inTime * 1000L, spanUs, smoothing.copy(blurScale = plan.blurScale), sound) { done ->
+            sound = kept?.let { soundTrack(context, it.uri) }?.takeIf { hasSound(it.first, plan.fromMs * 1000L, spanUs) || run { it.first.release(); false } }
+            encode(engine, scene, plan, file.path, frames, plan.fromMs * 1000L, spanUs, smoothing.copy(blurScale = plan.blurScale), sound) { done ->
                 progress(0.98f * done / frames, AppText.get(R.string.smooth_frame, done.toString(), frames.toString()))
             }
             progress(0.99f, AppText.get(R.string.smooth_saving))

@@ -92,7 +92,7 @@ private val TilePalettes = listOf(
     0xFF85A776 to 0xFF8C7968, 0xFFE9B96A to 0xFF895060, 0xFFD26E72 to 0xFF772F54, 0xFFB1BD93 to 0xFF4F8F7A,
 )
 
-private val AudioPermission get() = if (android.os.Build.VERSION.SDK_INT >= 33) Manifest.permission.READ_MEDIA_AUDIO else Manifest.permission.READ_EXTERNAL_STORAGE
+internal val AudioPermission get() = if (android.os.Build.VERSION.SDK_INT >= 33) Manifest.permission.READ_MEDIA_AUDIO else Manifest.permission.READ_EXTERNAL_STORAGE
 
 @Composable
 internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrary) {

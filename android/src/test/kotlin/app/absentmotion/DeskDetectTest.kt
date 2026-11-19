@@ -58,6 +58,15 @@ class DeskDetectTest {
     }
 
     @Test
+    fun onlyWindowsAsBigAsTheComputerMinimumGetTheDeskLayout() {
+        assertTrue(DeskDetect.roomy(820, 560))
+        assertTrue(DeskDetect.roomy(1920, 1032))
+        assertFalse(DeskDetect.roomy(380, 400))
+        assertFalse(DeskDetect.roomy(640, 1000))
+        assertFalse(DeskDetect.roomy(1280, 500))
+    }
+
+    @Test
     fun manufacturerMatchIgnoresCase() {
         assertTrue(DeskDetect.samsung("samsung"))
         assertTrue(DeskDetect.samsung("Samsung"))

@@ -75,6 +75,15 @@ class ProjectSaver(
 
     private val drafts = SaveQueue(executor, DRAFT_DELAY_MS, { xml -> recovery.write(id, xml) })
 
+    init {
+        executor.submit {
+            runCatching {
+                val unanswered = recovery.file(id).takeIf { it.isFile }?.readText() ?: return@runCatching
+                if (store.text(id)?.let { sameScene(it, unanswered) } != true) store.versions.snapshot(id, unanswered)
+            }
+        }
+    }
+
     val failing: Boolean get() = project.failing
 
     fun commit(xml: String) = commit(lazyOf(xml))

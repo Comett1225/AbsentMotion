@@ -28,7 +28,7 @@ internal suspend fun desktopClipSmooth(context: Context, layer: Layer, media: Me
     check(plan.frames <= MAX_SMOOTH_FRAMES) { AppText.get(R.string.smooth_too_many_frames, MAX_SMOOTH_FRAMES.toString()) }
     check(plan.width.toLong() * plan.height <= 16_000_000L) { AppText.get(R.string.ai_unable_to_process) }
     val input = Uri.parse(openableUri(fill.uri)).toFile() ?: error(AppText.get(R.string.ai_unable_to_process))
-    val start = String.format(Locale.US, "%.6f", fill.inTime / 1000.0)
+    val start = String.format(Locale.US, "%.6f", plan.fromMs / 1000.0)
     val span = String.format(Locale.US, "%.6f", plan.seconds)
     val file = aiFile(context, "mp4")
     check(file.parentFile!!.usableSpace >= plan.bytes * 2) { AppText.get(R.string.ai_not_enough_storage, (plan.bytes * 2 / 1_000_000).toString()) }

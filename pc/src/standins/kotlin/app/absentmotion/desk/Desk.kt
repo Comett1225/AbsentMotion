@@ -19,7 +19,6 @@ import androidx.compose.ui.input.key.isAltPressed
 import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap
-import app.absentmotion.ui.home.DeskModals
 import java.io.File
 
 object DeskInfo {
@@ -50,17 +49,20 @@ object DeskFiles {
 
     val videoExtensions = setOf("mp4", "mov", "m4v", "webm", "mkv", "avi", "wmv", "asf")
 
-    fun chooseFiles(media: Boolean, multiple: Boolean, videoOnly: Boolean = false, title: String = when { videoOnly -> app.absentmotion.i18n.AppText.get(R.string.tools_choose_video); media -> app.absentmotion.i18n.AppText.get(R.string.desk_choose_media); else -> app.absentmotion.i18n.AppText.get(R.string.desk_choose_file) }): List<File> {
+    val imageExtensions = setOf("png", "jpg", "jpeg", "webp", "gif", "bmp", "heic", "svg")
+
+    fun chooseFiles(media: Boolean, multiple: Boolean, videoOnly: Boolean = false, imageOnly: Boolean = false, title: String = when { videoOnly -> app.absentmotion.i18n.AppText.get(R.string.tools_choose_video); media -> app.absentmotion.i18n.AppText.get(R.string.desk_choose_media); else -> app.absentmotion.i18n.AppText.get(R.string.desk_choose_file) }): List<File> {
         System.getProperty("am.pick")?.let { return listOf(File(it)) }
         val filters = when {
             !media -> emptyList()
             videoOnly -> listOf(DeskPicker.Filter(Strings.byName("export_kind_video") ?: "Video", videoExtensions))
+            imageOnly -> listOf(DeskPicker.Filter(Strings.byName("model_layer_image") ?: "Image", imageExtensions))
             else -> listOf(DeskPicker.Filter(Strings.byName("add_tab_media") ?: "Media", mediaExtensions))
         }
         return DeskPicker.openFiles(title, filters, multiple).also { DeskLibrary.remember(it) }
     }
 
-    fun chooseOne(media: Boolean, videoOnly: Boolean = false): Uri? = chooseFiles(media, false, videoOnly = videoOnly).firstOrNull()?.let(Uri::fromFile)
+    fun chooseOne(media: Boolean, videoOnly: Boolean = false, imageOnly: Boolean = false): Uri? = chooseFiles(media, false, videoOnly = videoOnly, imageOnly = imageOnly).firstOrNull()?.let(Uri::fromFile)
 
     fun chooseSave(name: String, title: String = app.absentmotion.i18n.AppText.get(R.string.tools_save)): File? = DeskPicker.saveFile(title, name)
 
@@ -97,13 +99,13 @@ object DeskScale {
 
 object DeskGlobalKeys {
     fun handle(app: DeskAppState, event: KeyEvent): Boolean {
-        if (event.type != KeyEventType.KeyDown || DeskTyping.active > 0) return false
+        if (event.type != KeyEventType.KeyDown || DeskTyping.active > 0 || !DeskKeys.bindable(event)) return false
         when (DeskShortcuts.find(DeskShortcuts.chord(event)) { it.global }) {
             Shortcut.ZoomIn -> DeskScale.zoomIn()
             Shortcut.ZoomOut -> DeskScale.zoomOut()
             Shortcut.ActualSize -> DeskScale.reset()
             Shortcut.Settings -> app.openSettings()
-            Shortcut.NewProject -> if (app.editor == null && DeskModals.open == 0) app.newProjectTick++ else return false
+            Shortcut.NewProject -> if (app.canStartProject) app.newProjectTick++ else return false
             Shortcut.Quit -> if (!DeskOs.mac) app.requestQuit() else return false
             else -> return false
         }

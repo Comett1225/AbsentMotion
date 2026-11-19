@@ -10,6 +10,7 @@
    "label": "Angle",
    "type": "angle",
    "default": 0,
+   "legacyDefault": 45,
    "min": -3600,
    "max": 3600,
    "step": 0.5

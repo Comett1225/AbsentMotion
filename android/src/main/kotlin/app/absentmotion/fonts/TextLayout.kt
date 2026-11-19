@@ -89,5 +89,6 @@ private fun FontLibrary.layoutText(input: TextInput, layer: Layer): XmlNode {
         .with("_fontIndex", "${input.index}")
         .with("_letterSpacing", "${paint.letterSpacing}").with("_lineSpacing", "${input.lineSpacing}")
         .with("_fontWeight", "${weight ?: name.weight}").with("_fontAxes", if (weight != null) "true" else null).with("_fontItalic", "${name.italic}").with("_emoji", input.emoji).with("_emojiFlags", input.flags)
+        .with("_locale", input.locales.takeUnless { it.isEmpty }?.get(0)?.toLanguageTag())
         .withChild("_layout", XmlNode("_layout", mapOf("height" to "${layout.height}", "step" to "${plain.getLineBaseline(2) - plain.getLineBaseline(1)}"), lines))
 }

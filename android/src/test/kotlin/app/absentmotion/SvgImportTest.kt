@@ -12,11 +12,13 @@ import app.absentmotion.model.parseColor
 import app.absentmotion.model.parseSvgColor
 import app.absentmotion.model.parseSvgPath
 import app.absentmotion.model.perpendicularAxis
+import app.absentmotion.model.plainSvgText
 import app.absentmotion.model.signedArea
 import app.absentmotion.model.withContours
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.lang.management.ManagementFactory
@@ -492,5 +494,17 @@ class SvgImportTest {
         val out = importSvg(svg, "Logo", host, 0, 2000)
         assertNotNull(out.layer)
         assertEquals(1, out.shapes)
+    }
+
+    @Test fun unclosedDoctypesAndEntityFloodsDoNotHangTheImport() {
+        val flood = "<!DOCTYPE [".repeat(100_000) + "<svg/>"
+        assertEquals(flood, plainSvgText(flood))
+        val bomb = "<!DOCTYPE svg [<!ENTITY a \"${"x".repeat(1000)}\">]><svg>${"&a;".repeat(10_000)}</svg>"
+        assertThrows(IllegalArgumentException::class.java) { plainSvgText(bomb) }
+    }
+
+    @Test(timeout = 10_000) fun manyReferencesToNestedEntitiesStayFast() {
+        val svg = "<!DOCTYPE svg [<!ENTITY a \"${"&b;".repeat(333)}x\">]><svg>${"&a;".repeat(1_000_000)}</svg>"
+        assertEquals("<svg>${"x".repeat(1_000_000)}</svg>", plainSvgText(svg))
     }
 }

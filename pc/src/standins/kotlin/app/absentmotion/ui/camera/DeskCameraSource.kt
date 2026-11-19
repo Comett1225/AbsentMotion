@@ -208,11 +208,12 @@ class DeskCameraSession(command: List<String>, private val onFrame: (ByteArray) 
                 }
             }
         }, "am-camera").apply { isDaemon = true }.start()
-        Thread({
-            runCatching { process.errorStream.bufferedReader().forEachLine { line -> synchronized(notes) { notes.addLast(line); if (notes.size > 12) notes.removeFirst() } } }
-        }, "am-camera-log").apply { isDaemon = true }.start()
+        val log = Thread({
+            runCatching { process.errorStream.bufferedReader().forEachLine { line -> synchronized(notes) { notes.addLast(line); if (notes.size > 400) notes.removeFirst() } } }
+        }, "am-camera-log").apply { isDaemon = true; start() }
         Thread({
             val code = runCatching { process.waitFor() }.getOrDefault(-1)
+            runCatching { log.join(2000) }
             onEnd(code, synchronized(notes) { notes.joinToString("\n") })
         }, "am-camera-wait").apply { isDaemon = true }.start()
     }

@@ -45,6 +45,12 @@ class DeskHelpTest {
         assertEquals(listOf("Strength", "10"), rows[1].cells.map { it.text })
     }
 
+    @Test fun emptyCellsKeepTheirColumn() {
+        val rows = helpBlocks("<table><tr><th></th><th>Animations</th><th>Duration</th></tr><tr><td>In</td><td>Fade</td><td> </td></tr></table>", SpanStyle(), {}).filterIsInstance<HelpBlock.Row>()
+        assertEquals(listOf("", "Animations", "Duration"), rows[0].cells.map { it.text })
+        assertEquals(listOf("In", "Fade", ""), rows[1].cells.map { it.text })
+    }
+
     @Test fun textBeforeATocAndHeaderIsKept() {
         val blocks = helpBlocks("<p>Intro<header>skip</header> tail</p><p>Second<details class=\"toc\"><summary>x</summary></details></p>", SpanStyle(), {})
         val texts = blocks.filterIsInstance<HelpBlock.Para>().map { it.text.text.trim() }

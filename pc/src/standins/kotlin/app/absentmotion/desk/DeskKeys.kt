@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.PlatformTextInputInterceptor
 import androidx.compose.ui.platform.PlatformTextInputMethodRequest
 import androidx.compose.ui.platform.PlatformTextInputSession
 import app.absentmotion.editor.EditorState
+import app.absentmotion.editor.PointMode
 import app.absentmotion.editor.MultiSelect
 import app.absentmotion.editor.deselectLayer
 import app.absentmotion.editor.chosenLayers
@@ -82,8 +83,12 @@ object DeskKeys {
 
     private fun modal(state: EditorState): Boolean =
         DeskModals.open > 0 || state.exportOpen || state.effectBrowserOpen || state.historyOpen || state.presetsOpen || state.cameraOpen ||
-            state.drawing != null || state.fullColor != null || state.keypad != null || state.easingHint || state.ungroupAsk ||
+            (state.drawing != null && state.drawing !is PointMode) || state.fullColor != null || state.keypad != null || state.easingHint || state.ungroupAsk ||
             app.absentmotion.ui.home.EmbedRequest.templateId != null
+
+    private val pointModeKeys = setOf(Shortcut.PlayPause, Shortcut.PreviousFrame, Shortcut.NextFrame, Shortcut.Back10, Shortcut.Forward10, Shortcut.GoStart, Shortcut.GoEnd,
+        Shortcut.PreviousBookmark, Shortcut.NextBookmark, Shortcut.PreviousKeyframe, Shortcut.NextKeyframe, Shortcut.TimelineFit, Shortcut.TimelineZoomIn,
+        Shortcut.TimelineZoomOut, Shortcut.Undo, Shortcut.Redo)
 
     var viewer: ((KeyEvent) -> Boolean)? = null
 
@@ -99,8 +104,9 @@ object DeskKeys {
         if (DeskTyping.active == 0 && DeskDrop.browserKey?.invoke(event) == true) return true
         val first = fresh(event.key)
         val state = app.editor ?: return false
-        if (modal(state) || altGr(windows, event.isCtrlPressed, event.isAltPressed) || DeskTyping.active > 0) return false
+        if (modal(state) || !bindable(event) || DeskTyping.active > 0) return false
         val action = DeskShortcuts.find(DeskShortcuts.chord(event)) { !it.global } ?: return false
+        if (state.drawing is PointMode && action !in pointModeKeys) return false
         if (!first && !action.repeats) return true
         return run(app, state, action)
     }
@@ -148,7 +154,7 @@ object DeskKeys {
             Shortcut.CopyKeyframes -> return state.copyKeyframes()
             Shortcut.PasteKeyframes -> return state.pasteKeyframes()
             Shortcut.AddKeyframe -> return state.addKeyframe()
-            Shortcut.AddBookmark -> state.toggleBookmark()
+            Shortcut.AddBookmark -> if (state.scene.bookmarks.none { state.scene.frameAt(it) == state.frame }) state.toggleBookmark()
             Shortcut.Library, Shortcut.Inspector -> DeskDrop.panelKey?.invoke(action == Shortcut.Library) ?: return false
             Shortcut.Export -> { state.playing = false; state.exportOpen = true }
             Shortcut.CloseProject -> app.closeSoon()

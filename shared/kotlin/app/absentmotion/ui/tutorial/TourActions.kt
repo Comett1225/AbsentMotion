@@ -196,9 +196,11 @@ internal class TourHands(private val context: Context, private val state: Editor
             scene.update(layer.id) { l ->
                 val at = l.location
                 val element = l.element(PropRef.Location) ?: XmlNode("location")
-                val kept = element.keyframes.filter { it.gen != null }
-                l.withElement(PropRef.Location, element.withKeyframes(kept + Keyframe(0f, formatFloats(floatArrayOf(at[0] - width, at[1], at[2]))) +
-                    Keyframe(1f, formatFloats(floatArrayOf(at[0] + width, at[1], at[2])))))
+                val kept = element.keyframes
+                val free = FreeKeyTimes.filter { t -> kept.none { kotlin.math.abs(it.t - t) < 0.001f } }.take(2).sorted()
+                if (free.size < 2) l
+                else l.withElement(PropRef.Location, element.withKeyframes(kept + Keyframe(free[0], formatFloats(floatArrayOf(at[0] - width, at[1], at[2]))) +
+                    Keyframe(free[1], formatFloats(floatArrayOf(at[0] + width, at[1], at[2])))))
             }
         }
         focus(layer, EditorPanel.MoveTransform)
@@ -233,5 +235,6 @@ internal class TourHands(private val context: Context, private val state: Editor
         private const val SAMPLE_MOTION = "pop"
         val EASED = listOf(PropRef.Location, PropRef.Scale, PropRef.Rotation)
         private val EASE_IN_OUT = Easing("cubicBezier", listOf(0.42f, 0f, 0.58f, 1f))
+        private val FreeKeyTimes = listOf(0f, 1f, 0.5f, 0.25f, 0.75f, 0.125f, 0.375f, 0.625f, 0.875f)
     }
 }

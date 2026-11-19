@@ -39,6 +39,11 @@ internal fun DeskMedia(state: EditorState, library: AddLibrary) {
     var query by remember { mutableStateOf("") }
     val settled = debounced(query)
     val shared = remember(library.media) { library.media.groupingBy { it.name }.eachCount().filterValues { it > 1 }.keys }
+    val partial = android.os.Build.VERSION.SDK_INT >= 34
+    val visual = if (android.os.Build.VERSION.SDK_INT >= 33) listOf(android.Manifest.permission.READ_MEDIA_IMAGES, android.Manifest.permission.READ_MEDIA_VIDEO)
+        else listOfNotNull(android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE.takeIf { android.os.Build.VERSION.SDK_INT < 29 })
+    AskOnce(visual + listOfNotNull(android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED.takeIf { partial }), "asked",
+        { granted -> !visual.all(granted) && !(partial && granted(android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)) }) { library.mediaRevision++; state.engine.refreshMedia() }
     Column(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxWidth().padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -70,6 +75,7 @@ internal fun DeskAudio(state: EditorState, library: AddLibrary) {
     var browsing by remember { mutableStateOf(false) }
     val preview = remember { SoundPreview(context) }
     DisposableEffect(preview) { onDispose { preview.stop() } }
+    AskOnce(listOf(AudioPermission), "askedAudio", { granted -> !granted(AudioPermission) }) { library.audioRevision++ }
     val settled = debounced(query)
     val shared = remember(library.audio) {
         library.audio.groupBy { it.title.ifBlank { it.name } }.filterValues { it.size > 1 }.mapValues { (_, group) -> group.map { it.name.substringAfterLast('.', "").uppercase() }.distinct().size > 1 }
@@ -112,6 +118,20 @@ internal fun DeskAudio(state: EditorState, library: AddLibrary) {
         onAdd = { file -> if (!state.addingMedia) scope.launch { state.addingMedia = true; try { state.addPicked(context, android.net.Uri.parse(file.uri)) } finally { state.addingMedia = false } } },
         onReveal = { file -> app.absentmotion.platform.revealDeskFile(android.net.Uri.parse(file.uri)) },
     ) { browsing = false }
+}
+
+@Composable
+private fun AskOnce(permissions: List<String>, key: String, needed: ((String) -> Boolean) -> Boolean, answered: () -> Unit) {
+    if (app.absentmotion.platform.PlatformFeatures.desktop) return
+    val context = LocalContext.current
+    val launcher = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions()) { answered() }
+    LaunchedEffect(Unit) {
+        val prefs = context.getSharedPreferences("media", android.content.Context.MODE_PRIVATE)
+        if (needed { context.checkSelfPermission(it) == android.content.pm.PackageManager.PERMISSION_GRANTED } && !prefs.getBoolean(key, false)) {
+            prefs.edit().putBoolean(key, true).apply()
+            launcher.launch(permissions.toTypedArray())
+        }
+    }
 }
 
 @Composable

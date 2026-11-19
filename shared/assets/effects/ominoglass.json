@@ -57,7 +57,8 @@
    "id": "color",
    "label": "Color",
    "type": "color",
-   "default": "#ff5566"
+   "default": "#ff5566",
+   "legacyDefault": "#ffffff"
   },
   {
    "id": "blend",

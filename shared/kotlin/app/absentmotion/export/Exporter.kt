@@ -16,6 +16,7 @@ import app.absentmotion.library.MediaAccess
 import app.absentmotion.library.modelFolder
 import app.absentmotion.model.Scene
 import app.absentmotion.model.fontNames
+import app.absentmotion.model.mapMediaUris
 import app.absentmotion.model.mediaName
 import app.absentmotion.model.storedMediaUris
 import kotlinx.coroutines.CoroutineScope
@@ -41,15 +42,18 @@ import java.util.zip.ZipOutputStream
 class ExportResult(val uris: List<Uri>, val mime: String, val where: String, val verification: Verification? = null)
 
 data class CommunityDetails(val title: String, val description: String = "", val tags: List<String> = emptyList(), val creator: String = "", val thumbMs: Int = 0, val confirmed: Boolean = false,
-                            val squareX: Float = 0.5f, val squareY: Float = 0.5f, val squareSize: Float = 1f, val guidelinesConfirmed: Boolean = false)
+                            val squareX: Float = 0.5f, val squareY: Float = 0.5f, val squareSize: Float = 1f, val guidelinesConfirmed: Boolean = false, val preset: Boolean = false)
 
 const val CommunityLimitBytes = 20L shl 20
 
-internal fun CommunityDetails.problem(scene: Scene): UiText? = when {
+fun communitySizeText(bytes: Long): String =
+    if (bytes > CommunityLimitBytes) String.format(java.util.Locale.ROOT, "%.1fMB", kotlin.math.ceil(bytes / 104857.6) / 10) else formatBytes(bytes)
+
+internal fun CommunityDetails.problem(scene: Scene, access: MediaAccess): UiText? = when {
     title.isBlank() -> txt(R.string.community_need_title)
     !confirmed -> txt(R.string.community_need_confirm)
     !guidelinesConfirmed -> txt(R.string.community_need_guidelines)
-    scene.communityBytes() > CommunityLimitBytes -> txt(R.string.community_too_big, formatBytes(scene.communityBytes()))
+    scene.communityBytes(access) > CommunityLimitBytes -> txt(R.string.community_too_big, communitySizeText(scene.communityBytes(access)))
     else -> null
 }
 
@@ -71,7 +75,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                         val written = retryingEncoder(note) {
                             progress(0f)
                             mix = ExportAudio.mixFor?.invoke(scene, f.audio.effectiveRate)
-                            try {
+                            closingUnlessAbandoned(mix) {
                                 direct(saved, name, f.container.ext, f.container.mime, "Movies/$AppFolder") { fd ->
                                     watched { alive ->
                                         cool { thermal ->
@@ -79,8 +83,6 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                                         }
                                     }
                                 }
-                            } finally {
-                                (mix as? java.io.Closeable)?.close()
                             }
                         }
                         note(txt(R.string.export_note_checking))
@@ -92,12 +94,10 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                     }
                     ExportKind.Audio -> {
                         val mix = ExportAudio.mixFor?.invoke(scene, audioRate(s)) ?: throw ExportError(txt(R.string.export_error_no_sound))
-                        try {
+                        closingUnlessAbandoned(mix) {
                             direct(saved, name, s.audioFormat.ext, s.audioFormat.mime, "Music/$AppFolder") { fd ->
                                 watched { alive -> exportAudio(s, (scene.totalTime + 1) * 1000L, mix, fd) { alive(); progress(it) } }
                             }.verified(kind, scene, s, true).unreadable(mix, scene)
-                        } finally {
-                            (mix as? java.io.Closeable)?.close()
                         }
                     }
                     ExportKind.Gif -> {
@@ -153,15 +153,16 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
     }
 
     private suspend fun direct(saved: MutableList<Uri>, name: String, ext: String, mime: String, where: String, target: ExportStore = store, make: suspend (java.io.FileDescriptor) -> Unit): ExportResult {
-        val (file, used) = withContext(Dispatchers.IO) {
+        val (file, used) = withContext(NonCancellable + Dispatchers.IO) {
             try { target.open(null, "$name.$ext", mime) to target } catch (e: ExportError) { if (target === store) throw e else store.open(null, "$name.$ext", mime) to store }
         }
         val uri = try {
+            currentCoroutineContext().ensureActive()
             make(file.fd)
             withContext(Dispatchers.IO) { file.publish() }
         } catch (t: Throwable) {
             val full = storageFull(t)
-            withContext(NonCancellable + Dispatchers.IO) { file.discard() }
+            if (!abandoned(t)) withContext(NonCancellable + Dispatchers.IO) { file.discard() }
             throw if (full) StorageFullException() else t
         }
         saved.add(uri)
@@ -253,6 +254,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                         }
                         while (saving.size >= lanes) saving.removeFirst().await()
                         progress((k + 1f - saving.size) / frames)
+                        if (k % 30 == 0) ensureStorage()
                     }
                     while (saving.isNotEmpty()) {
                         saving.removeFirst().await()
@@ -268,6 +270,8 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
     }
 
     private suspend fun communityPart(scene: Scene, xml: String, details: CommunityDetails): CommunityPart {
+        val info = communityInfo(scene, details, app.absentmotion.ui.home.Updates.installed(context))
+        if (details.preset) return CommunityPart(info, null)
         val square = details.square(scene.width, scene.height)
         val scale = minOf(CommunityThumbSide / square.side, CommunityRenderLimit / maxOf(scene.width, scene.height, 1).toFloat())
         val width = (scene.width * scale).roundToInt().coerceAtLeast(1)
@@ -278,11 +282,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
         val picture = java.io.ByteArrayOutputStream().also {
             app.absentmotion.platform.encodeRgba(cropped, side, side, ExportSettings(shortSide = side, fps = scene.fps, image = ImageKind.Webp, imageQuality = 85), null, it)
         }.toByteArray()
-        val info = JSONObject().put("title", details.title.trim()).put("description", details.description.trim())
-            .put("tags", JSONArray(details.tags)).put("creator", details.creator.trim()).put("thumbnail", CommunityThumbnail).put("thumbnailMs", time)
-            .put("madeWith", app.absentmotion.ui.home.Updates.installed(context)).put("width", scene.width).put("height", scene.height).put("fps", scene.fps)
-            .put("lengthMs", scene.totalTime).put("effects", JSONArray(scene.node.effectIds().sorted())).put("licence", "CC BY 4.0")
-        return CommunityPart(info, picture)
+        return CommunityPart(info.put("thumbnail", CommunityThumbnail).put("thumbnailMs", time), picture)
     }
 
     private suspend fun pack(scene: Scene, xml: String, out: OutputStream, community: CommunityPart? = null, progress: (Float) -> Unit) = withContext(Dispatchers.IO) {
@@ -301,7 +301,21 @@ private const val CommunityThumbSide = 640f
 private const val CommunityRenderLimit = 3072f
 private const val StallGraceMs = 5_000L
 
-internal class ExportStalled : Exception()
+internal class ExportStalled(val abandoned: Boolean = false) : Exception()
+
+internal fun abandoned(t: Throwable): Boolean = generateSequence(t) { it.cause }.take(16).any { c -> (sequenceOf(c) + c.suppressed).any { it is ExportStalled && it.abandoned } }
+
+internal inline fun <T> closingUnlessAbandoned(resource: Any?, block: () -> T): T {
+    var keep = false
+    try {
+        return block()
+    } catch (t: Throwable) {
+        keep = abandoned(t)
+        throw t
+    } finally {
+        if (!keep) (resource as? java.io.Closeable)?.close()
+    }
+}
 
 internal fun workLanes(bytesEach: Long, cores: Int = Runtime.getRuntime().availableProcessors(), memory: Long = Runtime.getRuntime().maxMemory()): Int =
     minOf(cores - 1L, minOf(memory / 4, 96L shl 20) / bytesEach.coerceAtLeast(1)).toInt().coerceIn(1, 8)
@@ -325,7 +339,7 @@ internal suspend fun <T> retryingEncoder(note: (UiText) -> Unit, attempt: suspen
 }
 
 internal fun encoderTrouble(t: Throwable): Boolean =
-    generateSequence(t) { it.cause }.take(16).any { it is ExportStalled || codecFailed(it) }
+    generateSequence(t) { it.cause }.take(16).any { it is ExportStalled && !it.abandoned || codecFailed(it) }
 
 internal fun codecFailed(t: Throwable): Boolean = t is android.media.MediaCodec.CodecException ||
     t.javaClass == IllegalStateException::class.java && t.stackTrace.firstOrNull()?.className == "android.media.MediaCodec"
@@ -338,21 +352,23 @@ internal suspend fun <T> watched(stallMs: Long = StallMs, block: suspend (alive:
             withTimeoutOrNull(minOf(1_000L, stallMs)) { work.join() }
             if (!work.isCompleted && System.nanoTime() - last.get() > stallMs * 1_000_000L) {
                 work.cancel()
-                withTimeoutOrNull(StallGraceMs) { work.join() }
-                throw ExportError(txt(R.string.export_error_stalled, (stallMs / 1000).toString()), ExportStalled())
+                val ended = withTimeoutOrNull(StallGraceMs) { work.join() } != null
+                throw ExportError(txt(R.string.export_error_stalled, (stallMs / 1000).toString()), ExportStalled(abandoned = !ended))
             }
         }
         return work.await()
     } catch (e: kotlinx.coroutines.CancellationException) {
         work.cancel()
-        withContext(NonCancellable) { withTimeoutOrNull(StallGraceMs) { work.join() } }
+        if (withContext(NonCancellable) { withTimeoutOrNull(StallGraceMs) { work.join() } } == null) e.addSuppressed(ExportStalled(abandoned = true))
         throw e
     } finally {
         work.cancel()
     }
 }
 
-internal fun Scene.communityBytes(): Long = packageBytes() + toXml().length + (128L shl 10)
+internal fun Scene.communityBytes(access: MediaAccess): Long = packageBytes() + packedFonts(access).sumOf { it.length() } + toXml().length + (128L shl 10)
+
+private fun Scene.packedFonts(access: MediaAccess): Set<File> = fontNames().mapNotNull { access.importedFont(it) }.toSet()
 
 internal fun Scene.packageBytes(): Long = node.storedMediaUris().sumOf { uri ->
     modelFolder(uri)?.listFiles { f -> f.isFile }?.sumOf { it.length() }
@@ -362,7 +378,14 @@ internal fun Scene.packageBytes(): Long = node.storedMediaUris().sumOf { uri ->
 
 private const val PACKAGE_MARGIN = 64L shl 20
 
-internal class CommunityPart(val info: JSONObject, val thumbnail: ByteArray)
+internal class CommunityPart(val info: JSONObject, val thumbnail: ByteArray?)
+
+internal fun communityInfo(scene: Scene, details: CommunityDetails, madeWith: String): JSONObject =
+    JSONObject().put("title", details.title.trim()).put("description", details.description.trim())
+        .put("tags", JSONArray(details.tags)).put("creator", details.creator.trim()).put("madeWith", madeWith)
+        .put("width", scene.width).put("height", scene.height).put("fps", scene.fps).put("lengthMs", scene.totalTime)
+        .put("effects", JSONArray(scene.node.effectIds().sorted())).put("licence", "CC BY 4.0")
+        .apply { if (details.preset) put("kind", "preset") }
 
 internal const val CommunityThumbnail = "community/thumb.webp"
 
@@ -379,20 +402,31 @@ internal suspend fun writeProjectPackage(
     if (scene.packageBytes() > allowed) throw ExportError(txt(R.string.export_package_too_large, (allowed shr 20).toString()))
     val uris = scene.node.storedMediaUris().toList()
     val limit = ImportLimits().entries
-    val entries = 2 + scene.fontNames().mapNotNull { access.importedFont(it) }.toSet().size +
+    val entries = 2 + scene.packedFonts(access).size +
         uris.sumOf { uri -> if (access.allows(uri)) modelFolder(uri)?.listFiles { f -> f.isFile }?.size ?: 1 else 0 }
     if (entries > limit) throw ExportError(txt(R.string.library_err_too_many_files, limit.toString()))
     val manifest = JSONObject().put("format", "absentmotion-package").put("version", 1)
         .put("title", scene.title).put("project", "project.xml")
     val media = JSONArray()
+    val shared = uris.withIndex().associate { (i, uri) ->
+        val folder = if (access.allows(uri)) modelFolder(uri) else null
+        uri to when {
+            folder != null -> "amproj:media/${i + 1}_model/${File(URI(uri)).canonicalFile.name}"
+            access.allows(uri) -> "amproj:media/${i + 1}_${safeName(scene.mediaName(uri))}"
+            uri.startsWith("file:", ignoreCase = true) -> scene.mediaName(uri)
+            else -> uri
+        }
+    }
+    val portable = if (shared.all { (old, new) -> old == new }) xml
+        else Scene(scene.node.mapMediaUris { shared[it] ?: if (it.startsWith("file:", ignoreCase = true)) scene.mediaName(it) else it }).toXml()
     ZipOutputStream(out.buffered()).use { zip ->
         zip.setLevel(0)
-        zip.putNextEntry(ZipEntry("project.xml")); zip.write(xml.toByteArray()); zip.closeEntry()
+        zip.putNextEntry(ZipEntry("project.xml")); zip.write(portable.toByteArray()); zip.closeEntry()
         uris.forEachIndexed { i, uri ->
             currentCoroutineContext().ensureActive()
             val file = scene.mediaName(uri)
             val folder = if (access.allows(uri)) modelFolder(uri) else null
-            val record = JSONObject().put("uri", uri).put("file", file)
+            val record = JSONObject().put("uri", shared.getValue(uri)).put("file", file)
             fun step(fraction: Float) = progress((i + fraction.coerceIn(0f, 1f)) / uris.size * 0.95f)
             if (folder != null) {
                 val main = File(URI(uri)).canonicalFile
@@ -432,7 +466,7 @@ internal suspend fun writeProjectPackage(
             fonts.put(JSONObject().put("font", font).put("entry", entry))
         }
         if (community != null) {
-            zip.putNextEntry(ZipEntry(CommunityThumbnail)); zip.write(community.thumbnail); zip.closeEntry()
+            community.thumbnail?.let { zip.putNextEntry(ZipEntry(CommunityThumbnail)); zip.write(it); zip.closeEntry() }
             manifest.put("community", community.info)
         }
         zip.putNextEntry(ZipEntry("manifest.json")); zip.write(manifest.put("media", media).put("fonts", fonts).toString(1).toByteArray()); zip.closeEntry()

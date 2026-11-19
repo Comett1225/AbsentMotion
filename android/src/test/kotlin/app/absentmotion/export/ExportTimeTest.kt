@@ -29,6 +29,19 @@ class ExportTimeTest {
         assertEquals(12700L, estimateExportMs(history, probe, Codec.H264, 1080, 1920, 30, 600))
     }
 
+    @Test fun onlyPastExportsCountAsLearnedTime() {
+        val history = listOf(ExportRecord(Codec.H264, 1080, 1920, 30, 300, 6400))
+        assertNull(historyExportMs(emptyList(), probe, Codec.H264, 1080, 1920, 30, 300))
+        assertNull(historyExportMs(listOf(ExportRecord(Codec.H264, 256, 256, 30, 60, 1000)), probe, Codec.H264, 1080, 1920, 30, 300))
+        assertEquals(12700L, historyExportMs(history, probe, Codec.H264, 1080, 1920, 30, 600))
+    }
+
+    @Test fun communitySizeOverTheLimitNeverRoundsDownToTheLimit() {
+        assertEquals("20.1MB", communitySizeText(CommunityLimitBytes + 1))
+        assertEquals("20.3MB", communitySizeText((20.3 * 1048576).toLong()))
+        assertEquals(formatBytes(CommunityLimitBytes), communitySizeText(CommunityLimitBytes))
+    }
+
     @Test fun farAwayHistoryFallsBackToTheProbe() {
         val history = listOf(ExportRecord(Codec.H264, 256, 256, 30, 60, 1000))
         assertEquals(5100L, estimateExportMs(history, probe, Codec.H264, 1080, 1920, 30, 300))

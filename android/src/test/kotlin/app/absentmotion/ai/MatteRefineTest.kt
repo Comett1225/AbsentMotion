@@ -201,6 +201,21 @@ class MatteRefineTest {
         assertEquals(1f to 0f, frameToView(0f, 0f, 90))
         assertEquals(0f to 1f, frameToView(0f, 0f, 270))
         assertEquals(1f to 1f, frameToView(0f, 0f, 180))
+        val tapped = Cutout(listOf(viewToFrame(0.25f, 0.5f, 90)), MatteEdge(2, 1)).turned(90)
+        assertEquals(listOf(0.25f to 0.5f), tapped.keep)
+        assertEquals(MatteEdge(2, 1), tapped.edge)
+    }
+
+    @Test fun aTapOnATurnedPhotoKeepsThePartUnderIt() {
+        val width = 40
+        val height = 20
+        val frame = ByteArray(width * height)
+        for (y in 4 until 16) for (x in 2 until 12) frame[y * width + x] = -1
+        for (y in 4 until 16) for (x in 28 until 38) frame[y * width + x] = -1
+        val upright = frame.turned(width, height, 90)
+        val kept = Cutout(listOf(0.15f to 0.5f)).turned(90).refine(upright, height, width).turned(height, width, 270)
+        assertEquals(-1, kept[10 * width + 6].toInt())
+        assertEquals(0, kept[10 * width + 33].toInt())
     }
 
     @Test fun theMatteScalesThePixelsOwnAlpha() {

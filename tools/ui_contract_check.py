@@ -40,7 +40,7 @@ def english(key):
 class UiContracts(unittest.TestCase):
     def test_export_rechecks_storage_on_retry_and_resume(self):
         text = source('ui/export/ExportScreen.kt')
-        self.assertIn('val needed = estimate + (fetching?.let(AiSmooth::downloadBytes) ?: 0L)\n        free = freeSpace()\n        if (kind != ExportKind.Gif && storageStatus(needed, free) is StorageStatus.NotEnough)', text)
+        self.assertIn('val needed = room + (fetching?.let(AiSmooth::downloadBytes) ?: 0L)\n        free = freeSpace()\n        if (kind != ExportKind.Gif && storageStatus(needed, free) is StorageStatus.NotEnough)', text)
         self.assertIn('Lifecycle.Event.ON_RESUME', text)
 
     def test_export_probes_missing_media_inside_the_export_job_on_io(self):
@@ -209,7 +209,9 @@ class UiContracts(unittest.TestCase):
         self.assertNotIn('fling = false', text)
 
     def test_every_ruler_spinner_path_moves_the_value_like_a_tape_measure(self):
-        self.assertEqual(4, source('ui/editor/panels/PanelParts.kt').count('dragging(RulerMath.travel('))
+        text = source('ui/editor/panels/PanelParts.kt')
+        self.assertEqual(4, text.count('val t = RulerMath.travel('))
+        self.assertEqual(4, text.count('if (limit?.invoke(t) != true) { shift +='))
 
     def test_rotate_and_tilt_tabs_turn_three_d_objects_on_the_preview(self):
         text = source('ui/editor/Preview.kt')
@@ -244,8 +246,8 @@ class UiContracts(unittest.TestCase):
 
     def test_camera_view_refreshes_selection_quad(self):
         text = source('ui/editor/Preview.kt')
-        self.assertIn('LaunchedEffect(state.selectedId, scene, mediaRevision, state.cameraMode) {', text)
-        self.assertIn('if (quadFor != state.selectedId) {', text)
+        self.assertIn('LaunchedEffect(state.selectedId, scene, mediaRevision, state.cameraMode, cropping, shownChange) {', text)
+        self.assertIn('if (quadFor != Triple(state.selectedId, cropping, shownChange)) {', text)
         self.assertIn('snapshotFlow { state.timeMs.takeUnless { state.playing } }.collectLatest', text)
 
     def test_curve_menu_and_both_paste_paths_share_compatibility_rules(self):
@@ -265,7 +267,7 @@ class UiContracts(unittest.TestCase):
 
     def test_single_group_duplicate_remaps_children(self):
         text = source('editor/EditorActions.kt').split('fun EditorState.duplicateSelected()', 1)[1].split('fun EditorState.toggleHidden', 1)[0]
-        self.assertIn('copyLayers(listOf(scene.pinnedPath(layer)), preserveOutsideParents = true)', text)
+        self.assertIn('copyLayers(listOf(scene.pinnedPath(layer)), preserveOutsideParents = true, newId = scene::freeLayerId)', text)
 
     def test_share_labels_match_export_names(self):
         text = source('ui/export/ExportDone.kt')

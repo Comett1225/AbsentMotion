@@ -18,6 +18,9 @@ class ProxyRulesTest {
         assertFalse(ProxyRules.needed(1280, 720, 2_000_000, hdr = false))
         assertTrue(ProxyRules.needed(1280, 720, 2_000_001, hdr = false))
         assertTrue(ProxyRules.needed(640, 360, Long.MAX_VALUE, hdr = false))
+        assertEquals(1280 to 720, ProxyRules.size(1280, 720))
+        assertEquals(1920 to 1080, ProxyRules.size(1920, 1080))
+        assertEquals(1080 to 1920, ProxyRules.size(1080, 1920))
         assertFalse(ProxyRules.needed(3840, 2160, 10_000_000, hdr = true))
         assertFalse(ProxyRules.needed(0, 0, 10_000_000, hdr = false))
     }

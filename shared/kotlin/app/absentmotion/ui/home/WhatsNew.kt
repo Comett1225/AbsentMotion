@@ -319,7 +319,12 @@ object WhatsNewNotes {
             settings.whatsNewSeen = key
             return null
         }
-        return read(context, notesFor(key, settings.whatsNewSeen) { exists(context, it) } ?: return null)
+        val name = notesFor(key, settings.whatsNewSeen) { exists(context, it) }
+        if (name == null) {
+            settings.whatsNewSeen = key
+            return null
+        }
+        return read(context, name)
     }
 
     fun currentName(context: Context): String? = key(versionName(context))?.let { key -> notesFor(key, null) { exists(context, it) } }

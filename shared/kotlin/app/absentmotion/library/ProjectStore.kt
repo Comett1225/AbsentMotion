@@ -83,7 +83,7 @@ class ProjectStore(private val root: File) {
                 thumbnail = null, isElement = scene.node["type"] == "element",
             )
         }.also { listed[id] = it }
-        return if (info.damaged && !includeDamaged) null else info.copy(thumbnail = thumbnailFile(id).takeIf { it.exists() })
+        return if (info.damaged && !includeDamaged) null else info.copy(thumbnail = thumbnailFile(id).takeIf { it.exists() }, sizeBytes = size + mediaDir(id).walkTopDown().filter { it.isFile }.sumOf { it.length() })
     }
 
     private fun damagedTitle(text: String?): String =
@@ -181,7 +181,7 @@ class ProjectStore(private val root: File) {
                 val old = folderUri(from)
                 val new = folderUri(mediaDir(copy))
                 from.copyRecursively(mediaDir(copy))
-                scene = Scene(scene.node.mapMediaUris { if (it.startsWith(old)) new + it.substring(old.length) else it })
+                scene = Scene(scene.node.mapMediaUris { uri -> fileForm(uri).let { if (it.startsWith(old)) new + it.substring(old.length) else uri } })
             }
             save(copy, scene)
         } catch (e: Exception) {
@@ -207,13 +207,13 @@ class ProjectStore(private val root: File) {
         }
         val projectFiles = dir.listFiles { f -> f.extension == "xml" }.orEmpty().toList()
         val templateFiles = File(root, "templates").listFiles { f -> f.isDirectory }.orEmpty().map { File(it, "scene.xml") }.filter { it.exists() }
-        val folders = owners.map { folderUri(mediaDir(it)) }
-        val used = HashSet<String>()
+        val folders = owners.map { folderUri(mediaDir(it)) }.flatMap { listOf(it, otherFileForm(it)) }
+        val used = app.absentmotion.editor.clipboardUris().mapTo(HashSet(), ::fileForm)
         val damaged = ArrayList<String>()
         var unreadable = false
         fun scan(text: String) {
             val uris = runCatching { Scene.parse(text).node.keptUris() }.getOrNull()
-            if (uris != null) used += uris else damaged += text
+            if (uris != null) uris.mapTo(used, ::fileForm) else damaged += text
         }
         fun scanFile(file: File): Boolean {
             val text = try { file.readText() } catch (e: Exception) { return false } catch (e: OutOfMemoryError) { return false }
@@ -230,7 +230,7 @@ class ProjectStore(private val root: File) {
             }
         }
         if (unreadable) return
-        fun mentioned(part: String) = damaged.any { it.contains(part) || it.contains(part.replace("&", "&amp;")) }
+        fun mentioned(part: String) = listOf(part, otherFileForm(part)).any { form -> damaged.any { it.contains(form) || it.contains(form.replace("&", "&amp;")) } }
         for (owner in targets) {
             val folder = mediaDir(owner)
             folder.listFiles()?.filter { f ->
@@ -246,12 +246,16 @@ class ProjectStore(private val root: File) {
 
     private fun ownerOf(uri: String): String? {
         val media = folderUri(File(root, "media"))
-        return uri.takeIf { it.startsWith(media) }?.removePrefix(media)?.substringBefore('/')?.takeIf(::safeSegment)
+        return fileForm(uri).takeIf { it.startsWith(media) }?.removePrefix(media)?.substringBefore('/')?.takeIf(::safeSegment)
     }
 
     fun thumbnailFile(id: String) = dir.child("$id.png")
 
     private fun folderUri(dir: File) = dir.toURI().toString().trimEnd('/') + "/"
+
+    private fun fileForm(uri: String) = if (uri.startsWith("file:")) runCatching { File(java.net.URI(uri)).toURI().toString() }.getOrDefault(uri) else uri
+
+    private fun otherFileForm(uri: String) = if (uri.startsWith("file:/") && !uri.startsWith("file://")) "file://" + uri.removePrefix("file:") else uri
 
     private fun sceneFile(id: String) = dir.child("$id.xml")
 

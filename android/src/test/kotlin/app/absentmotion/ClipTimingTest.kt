@@ -17,6 +17,10 @@ class ClipTimingTest {
         val s = scene("""<shape id="1" startTime="0" endTime="3999"/>""", """<text id="2" startTime="0" endTime="3999"/>""")
         assertEquals(listOf(1L, 3L, 2L), s.withSplit(s.layer(1)!!, 60, 3)!!.layers.map { it.id })
         assertEquals(listOf(1L, 4L, 2L), s.addAbove(Layer(XmlNode("shape", mapOf("id" to "4"))), 1).layers.map { it.id })
+        val clash = s.addAbove(Layer(XmlNode("shape", mapOf("id" to "2", "label" to "copy"))), 1).layers
+        assertEquals(listOf(1L, 2L), listOf(clash[0].id, clash[2].id))
+        assertEquals("copy", clash[1].label)
+        assertNotEquals(2L, clash[1].id)
     }
 
     @Test fun splittingOrTrimmingAGroupCutsItsHeadInsteadOfRestartingIt() {

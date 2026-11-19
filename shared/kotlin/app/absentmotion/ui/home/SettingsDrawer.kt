@@ -137,9 +137,9 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
             )
             AppCard(settings) { whatsNew = true }
             Spacer(Modifier.height(CardGap))
-            Category(R.string.settings_group_editor, HomeIcons.Pencil) { EditorSettings(settings) }
+            Category(R.string.settings_group_editor, HomeIcons.Pencil) { androidx.compose.runtime.key(drawer.targetValue) { EditorSettings(settings) } }
             Category(R.string.settings_group_playback, HomeIcons.ProjectsTabOff) { PlaybackSettings(settings) }
-            Category(R.string.settings_group_projects, HomeIcons.Folder) { ProjectsSettings(settings) { demoNote = it } }
+            Category(R.string.settings_group_projects, HomeIcons.Folder) { androidx.compose.runtime.key(drawer.targetValue) { ProjectsSettings(settings) { demoNote = it } } }
             Category(R.string.settings_group_backup, ChromeIcons.SavePreset) {
                 BackupRows(settings, onRestored)
             }
@@ -411,7 +411,8 @@ private fun DownloaderRow() {
 @Composable
 private fun AiModelRows() {
     val context = LocalContext.current
-    var models by remember { mutableStateOf(app.absentmotion.ai.AiModel.downloaded(context) - app.absentmotion.ai.AiModel.Cutout) }
+    fun deletable() = app.absentmotion.ai.AiModel.downloaded(context).filter { it != app.absentmotion.ai.AiModel.Cutout || !app.absentmotion.ai.BestCutout.kept }
+    var models by remember { mutableStateOf(deletable()) }
     var askFor by remember { mutableStateOf<app.absentmotion.ai.AiModel?>(null) }
     for (model in models) {
         ActionRow(stringResource(R.string.ai_delete_model, stringResource(model.title)), formatBytes(model.onDisk(context)), chevron = false) {
@@ -427,7 +428,7 @@ private fun AiModelRows() {
                 TextButton({
                     askFor = null
                     target.delete(context)
-                    models = app.absentmotion.ai.AiModel.downloaded(context) - app.absentmotion.ai.AiModel.Cutout
+                    models = deletable()
                 }) { Text(stringResource(R.string.delete), color = Am.Navy) }
             },
             dismissButton = { TextButton({ askFor = null }) { Text(stringResource(R.string.cancel), color = Am.Navy) } },
@@ -729,6 +730,7 @@ private fun FontRow(settings: AppSettings) {
     var open by remember { mutableStateOf(false) }
     val fonts = remember { app.absentmotion.ui.theme.UiFonts.bundled() + app.absentmotion.fonts.FontLibrary(context).importedFonts() }
     val current = settings.uiFont
+    LaunchedEffect(fonts, current) { if (current != null && fonts.none { it.xml == current }) settings.uiFont = null }
     val label = current?.let { name -> fonts.firstOrNull { it.xml == name }?.let(::fontLabel) } ?: stringResource(R.string.ui_font_default)
     fun choose(value: String?) { open = false; settings.uiFont = value }
     Row(Modifier.fillMaxWidth().heightIn(min = 44.dp).padding(horizontal = 15.dp), verticalAlignment = Alignment.CenterVertically) {

@@ -88,9 +88,9 @@ enum class OnboardingStep { Language, Look, Check }
 
 data class FirstRun(val step: OnboardingStep) {
     companion object {
-        fun start(stored: Int): OnboardingStep? = when {
+        fun start(stored: Int, lookChosen: Boolean = true): OnboardingStep? = when {
             stored >= ONBOARDING_DONE -> null
-            stored >= ONBOARDING_LANGUAGE_CHOSEN -> OnboardingStep.Check
+            stored >= ONBOARDING_LANGUAGE_CHOSEN -> if (lookChosen) OnboardingStep.Check else OnboardingStep.Look
             else -> OnboardingStep.Language
         }
 
@@ -101,7 +101,7 @@ data class FirstRun(val step: OnboardingStep) {
                 else -> 0
             }
             if (forced == "done") settings.lookChosen = true
-            val step = start(settings.onboarding) ?: (if (settings.lookChosen) return null else OnboardingStep.Look)
+            val step = start(settings.onboarding, settings.lookChosen) ?: (if (settings.lookChosen) return null else OnboardingStep.Look)
             return FirstRun(step)
         }
     }

@@ -122,9 +122,11 @@ fun TutorialHost(
     var exitAsk by remember { mutableStateOf(false) }
     var deleteAsk by remember { mutableStateOf<String?>(null) }
     var deleting by remember { mutableStateOf<String?>(null) }
+    var replaced by remember { mutableStateOf<EditorState?>(null) }
 
     suspend fun begin(resume: Boolean) {
         val saved = settings.tutorialProject?.takeIf { resume && withContext(Dispatchers.IO) { store.exists(it) } }
+        val stale = current?.takeIf { !resume && it.projectId == settings.tutorialProject }
         if (!resume) settings.tutorialProject?.takeIf { it != current?.projectId }?.let { old ->
             withContext(Dispatchers.IO) { runCatching { store.delete(old, context.getExternalFilesDir(null)?.resolve("ai")) } }
         }
@@ -140,6 +142,7 @@ fun TutorialHost(
         Tutorial.offerDismissed = true
         Tutorial.tour = Tour(startAt = if (saved != null) settings.tutorialStep else null).also { settings.tutorialStep = it.step.id }
         if (current?.projectId != id) onOpen(id)
+        if (stale != null) replaced = stale
     }
 
     LaunchedEffect(Unit) {
@@ -156,6 +159,14 @@ fun TutorialHost(
         if (editor != null) return@LaunchedEffect
         afterClose = null
         scope.launch { begin(resume) }
+    }
+    LaunchedEffect(replaced, editor?.projectId) {
+        val old = replaced ?: return@LaunchedEffect
+        if (editor?.projectId == old.projectId) return@LaunchedEffect
+        replaced = null
+        old.saver.flush()
+        withContext(app.absentmotion.library.DiskThread.dispatcher) { runCatching { store.delete(old.projectId, context.getExternalFilesDir(null)?.resolve("ai")) }.onFailure { Log.w("AMTutorial", "cannot delete the practice project", it) } }
+        onChanged()
     }
     LaunchedEffect(deleting, editor == null) {
         val id = deleting ?: return@LaunchedEffect
@@ -241,7 +252,12 @@ private class TourDriver(
     val watch = GripWatch { held = it }
     private var busy = false
 
-    fun facts(): TourFacts = tourFacts(editor, true).copy(held = held)
+    private var notes = 0L
+
+    fun facts(): TourFacts = tourFacts(editor, true).let { facts ->
+        notes = maxOf(notes, facts.undoMark)
+        facts.copy(held = held, undoMark = notes)
+    }
 
     private fun settle() {
         view = TourView.of(tour)

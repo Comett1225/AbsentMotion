@@ -101,7 +101,15 @@ private fun AdvancedRow(open: Boolean, onToggle: () -> Unit) {
     }
 }
 
-private class ShapeEdit(val state: EditorState, val layer: Layer, val param: ShapeParam, val label: String) {
+private fun ShapeParam.capped(layer: Layer): ShapeParam {
+    if (prop != "roundCorners" && prop != "cornerRadius") return this
+    val size = layer.propText("size")?.split(',')?.mapNotNull { it.trim().toFloatOrNull() }?.takeIf { it.size >= 2 } ?: return this
+    val full = minOf(kotlin.math.abs(size[0]), kotlin.math.abs(size[1]))
+    return if (full > 0f) copy(max = maxOf(full, 1f)) else this
+}
+
+private class ShapeEdit(val state: EditorState, val layer: Layer, raw: ShapeParam, val label: String) {
+    val param = raw.capped(layer)
     val values = numbers(layer, param)
     val isOn = (layer.propText(param.prop) ?: param.default).trim() == "true"
 
@@ -109,6 +117,18 @@ private class ShapeEdit(val state: EditorState, val layer: Layer, val param: Sha
         val v = numbers(l, param)
         v[box] = param.bounded(f(v[box]))
         l.withProp(param.prop, param.kind.type, formatFloats(v))
+    }
+
+    fun held(drag: FloatArray, raw: Float): Float {
+        val kept = param.bounded(raw)
+        if (kept != raw) { drag[0] = kept; drag[1] = 0f }
+        return kept
+    }
+
+    fun atLimit(box: Int, travel: Float): Boolean {
+        val v = live(box)
+        val next = step(param.kind, v, travel, param.decimals)
+        return (param.max?.let { v >= it && next > v } ?: false) || (param.min?.let { v <= it && next < v } ?: false)
     }
 
     fun live(box: Int): Float = (state.selected?.let { numbers(it, param) } ?: values).getOrElse(box) { 0f }
@@ -175,8 +195,9 @@ private fun NumberRow(edit: ShapeEdit, active: Boolean, onActivate: () -> Unit) 
         val drag = remember { floatArrayOf(0f, 0f) }
         RulerSpinner(
             PanelGreen,
-            onDrag = { dx -> drag[1] += dx; edit.change(0) { step(param.kind, drag[0], drag[1], param.decimals) } },
+            onDrag = { dx -> drag[1] += dx; edit.change(0) { edit.held(drag, step(param.kind, drag[0], drag[1], param.decimals)) } },
             onEnd = { edit.state.endGesture() },
+            atLimit = { t -> edit.atLimit(0, t) },
             modifier = Modifier.weight(1f).height(158.px),
             onStart = { onActivate(); drag[0] = edit.live(0); drag[1] = 0f },
             tickSpacing = 5.33.dp,
@@ -200,8 +221,9 @@ private fun PairRow(edit: ShapeEdit, active: Boolean, onActivate: () -> Unit) {
         val drag = remember { floatArrayOf(0f, 0f) }
         RulerSpinner(
             PanelGreen,
-            onDrag = { dx -> drag[1] += dx; edit.change(box) { step(param.kind, drag[0], drag[1], param.decimals) } },
+            onDrag = { dx -> drag[1] += dx; edit.change(box) { edit.held(drag, step(param.kind, drag[0], drag[1], param.decimals)) } },
             onEnd = { edit.state.endGesture() },
+            atLimit = { t -> edit.atLimit(box, t) },
             modifier = Modifier.weight(1f).height(158.px),
             onStart = { onActivate(); drag[0] = edit.live(box); drag[1] = 0f },
             tickSpacing = 5.33.dp,

@@ -100,7 +100,7 @@ internal object BestCutout {
             AiNet.open(context, model, paramName = if (side == CUTOUT_LARGE_SIDE) CUTOUT_PARAM_1024 else CUTOUT_PARAM_768).use { it.cutout(picture, side) }
             picture.setHasAlpha(true)
             picture.isPremultiplied = false
-            if (!cutout.plain) picture.refineAlpha(cutout)
+            if (!cutout.plain) picture.refineAlpha(cutout.turned(turn))
             progress(0.9f, AppText.get(R.string.ai_saving_transparent))
             val result = picture.turned(360 - turn).also { if (it !== picture) { bitmap = it; picture.recycle() } }
             file.outputStream().use { check(result.compress(Bitmap.CompressFormat.PNG, 100, it)) { AppText.get(R.string.ai_cannot_save_image) } }

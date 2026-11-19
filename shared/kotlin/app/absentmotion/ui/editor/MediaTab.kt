@@ -75,12 +75,15 @@ import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 import app.absentmotion.ui.HoldName
 
-private fun unsupportedPick(context: android.content.Context, uri: Uri) {
-    android.widget.Toast.makeText(context, app.absentmotion.platform.mediaTrouble(context, uri) ?: context.getString(R.string.library_err_unsupported_type), android.widget.Toast.LENGTH_LONG).show()
+internal suspend fun mediaTroubleOf(context: android.content.Context, uri: Uri): String? =
+    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { app.absentmotion.platform.mediaTrouble(context, uri) }
+
+internal suspend fun unsupportedPick(context: android.content.Context, uri: Uri) {
+    android.widget.Toast.makeText(context, mediaTroubleOf(context, uri) ?: context.getString(R.string.library_err_unsupported_type), android.widget.Toast.LENGTH_LONG).show()
 }
 
-private fun troubledPick(context: android.content.Context, uri: Uri) {
-    app.absentmotion.platform.mediaTrouble(context, uri)?.let { android.widget.Toast.makeText(context, it, android.widget.Toast.LENGTH_LONG).show() }
+private suspend fun troubledPick(context: android.content.Context, uri: Uri) {
+    mediaTroubleOf(context, uri)?.let { android.widget.Toast.makeText(context, it, android.widget.Toast.LENGTH_LONG).show() }
 }
 
 private suspend fun looksLikeGif(context: Context, uri: Uri): Boolean = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
@@ -89,12 +92,20 @@ private suspend fun looksLikeGif(context: Context, uri: Uri): Boolean = kotlinx.
 
 internal suspend fun EditorState.addToolResult(context: Context, uri: Uri) {
     if (uri.scheme != "file") return addPicked(context, uri)
-    val keeper = app.absentmotion.library.MediaKeeper(store, { u -> context.contentResolver.openInputStream(Uri.parse(u)) })
-    suspend fun kept(media: app.absentmotion.model.MediaDeclaration?) = media?.let { kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { keeper.keep(projectId, it, scene) } }
-    when (uri.lastPathSegment.orEmpty().substringAfterLast('.', "").lowercase()) {
-        "m4a", "mp3", "wav", "aac", "ogg", "opus", "flac" -> kept(audioDeclaration(context, uri))?.takeIf { it.duration > 0 }?.let { addAudio(it) } ?: unsupportedPick(context, uri)
-        "gif" -> kept(app.absentmotion.media.imageDeclaration(context, uri))?.let { addPicked(context, Uri.parse(it.uri)) } ?: unsupportedPick(context, uri)
-        else -> kept(app.absentmotion.media.videoDeclaration(context, uri))?.let { addVideo(it); troubledPick(context, uri) } ?: unsupportedPick(context, uri)
+    val ext = uri.lastPathSegment.orEmpty().substringAfterLast('.', "").lowercase()
+    val audio = ext in setOf("m4a", "mp3", "wav", "aac", "ogg", "opus", "flac")
+    val image = ext in setOf("jpg", "jpeg", "png", "webp")
+    if (ext == "gif" && looksLikeGif(context, uri) && addGif(context, uri)) return
+    val media = when {
+        audio -> audioDeclaration(context, uri)?.takeIf { it.duration > 0 }
+        image || ext == "gif" -> app.absentmotion.media.imageDeclaration(context, uri)
+        else -> app.absentmotion.media.videoDeclaration(context, uri)
+    } ?: return unsupportedPick(context, uri)
+    val kept = keepCopy(context, media, always = true).takeIf { store.inMediaFolder(it.uri) } ?: return
+    when {
+        audio -> addAudio(kept)
+        image || ext == "gif" -> addImage(kept)
+        else -> { addVideo(kept); troubledPick(context, uri) }
     }
 }
 

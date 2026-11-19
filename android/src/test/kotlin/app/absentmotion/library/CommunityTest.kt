@@ -260,6 +260,17 @@ class CommunityTest {
         assertFalse(allows("$index#frag"))
     }
 
+    @Test fun aRepeatedKindAndNameIsListedOnce() {
+        fun entry(kind: String, name: String, title: String) =
+            """{"kind":"$kind","name":"$name","title":"$title","file":"${kind}s/$name/$name.${if (kind == "preset") "xml" else "absproj"}","bytes":10,"sha256":"$shaA"}"""
+        val json = """{"format":"absentmotion-community","version":2,"items":[${entry("preset", "glow", "First")},${entry("preset", "glow", "Copy")},${entry("bundle", "glow", "Bundle")}]}"""
+        val items = parseCommunityIndex(json, 52).items
+        assertEquals(listOf("First", "Bundle"), items.map { it.title })
+        val misplaced = entry("preset", "glow", "Misplaced").replace("presets/glow/", "presets/glow-copy/")
+        val valid = """{"format":"absentmotion-community","version":2,"items":[$misplaced,${entry("preset", "glow", "First")}]}"""
+        assertEquals(listOf("First"), parseCommunityIndex(valid, 52).items.map { it.title })
+    }
+
     @Test fun addCommunityPresetSavesOneLayerSceneAndRejectsEmptyScene() {
         val dir = tmp.newFolder("presets")
         val store = PresetStore(dir)
@@ -273,32 +284,34 @@ class CommunityTest {
                     "startTime" to "0",
                     "endTime" to "1000",
                     "fillType" to "color",
-                    "s" to ".rect"
+                    "s" to ".rect",
+                    "fillImage" to "content://media/external/images/media/42"
                 ),
                 listOf(XmlNode("shadow"))
             )
         )
         val preset = presetScene(project, layer, "Pulse")
         val xmlFile = tmp.newFile("pulse.xml")
-        xmlFile.writeText(preset.toXml())
+        xmlFile.writeText("\uFEFF" + preset.toXml())
+        val access = MediaAccess.forPhone(tmp.root)
 
-        val id = addCommunityPreset(xmlFile, store)
+        val id = addCommunityPreset(xmlFile, store, access)
         val saved = store.list()
         assertEquals(1, saved.size)
         assertEquals(id, saved[0].id)
         assertEquals("Pulse", saved[0].title)
-        assertNotNull(saved[0].layer)
+        assertEquals("blocked-content://media/external/images/media/42", saved[0].layer!!.node["fillImage"])
 
         val emptyFile = tmp.newFile("empty.xml")
         emptyFile.writeText(Scene.create("Empty", 1080, 1920, 30, 0).toXml())
         assertThrows(IllegalArgumentException::class.java) {
-            addCommunityPreset(emptyFile, store)
+            addCommunityPreset(emptyFile, store, access)
         }
 
         val bigFile = File(tmp.newFolder("big"), "oversized.xml")
         bigFile.writeBytes(ByteArray((1L shl 20).toInt() + 1))
         assertThrows(IllegalArgumentException::class.java) {
-            addCommunityPreset(bigFile, store)
+            addCommunityPreset(bigFile, store, access)
         }
     }
     private fun item(title: String = "Été Glow", creator: String = "Álîce", tags: List<String> = listOf("néon", "intro"), added: String = "2026-11-17") =

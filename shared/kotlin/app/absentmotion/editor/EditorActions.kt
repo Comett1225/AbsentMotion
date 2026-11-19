@@ -1,6 +1,7 @@
 package app.absentmotion.editor
 
 import app.absentmotion.model.finiteFloat
+import app.absentmotion.library.keptUris
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -104,7 +105,7 @@ fun EditorState.deleteSelected() {
 
 fun EditorState.duplicateSelected() {
     val layer = selected ?: return
-    val copy = copyLayers(listOf(scene.pinnedPath(layer)), preserveOutsideParents = true).single().withLabel(AppText.get(R.string.edit_layer_copy_name, layer.label))
+    val copy = copyLayers(listOf(scene.pinnedPath(layer)), preserveOutsideParents = true, newId = scene::freeLayerId).single().withLabel(AppText.get(R.string.edit_layer_copy_name, layer.label))
     edit { it.addAbove(copy, layer.id) }
     selectedId = copy.id
 }
@@ -306,6 +307,8 @@ private var copiedMedia: List<MediaDeclaration> = emptyList()
 val EditorState.canPaste: Boolean get() = copiedLayers.isNotEmpty()
 val EditorState.pasteCount: Int get() = copiedLayers.size
 
+internal fun clipboardUris(): Set<String> = (copiedLayers.map { it.node } + EffectClipboard.effects).flatMapTo(HashSet()) { it.keptUris() }
+
 internal val copiedLayerForStyle: Layer? get() = copiedLayers.lastOrNull()
 internal val copiedMediaForStyle: List<MediaDeclaration> get() = copiedMedia
 
@@ -330,7 +333,7 @@ internal fun Scene.layersToCopy(ids: Set<Long>): List<Layer> {
 
 fun EditorState.duplicateChosen() {
     if (!MultiSelect.active) return duplicateSelected()
-    val copies = chosenLayers.zip(copyLayers(chosenLayers.map { scene.pinnedPath(it) }, preserveOutsideParents = true))
+    val copies = chosenLayers.zip(copyLayers(chosenLayers.map { scene.pinnedPath(it) }, preserveOutsideParents = true, newId = scene::freeLayerId))
         .associate { (source, copy) -> source.id to copy.withLabel(AppText.get(R.string.edit_layer_copy_name, source.label)) }
     if (copies.isEmpty()) return
     edit { it.withCopiesAbove(copies) }

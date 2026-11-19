@@ -17,6 +17,8 @@ import java.nio.ByteBuffer
 
 private const val MIN_BUFFER = 2 shl 20
 
+internal class CannotCopy(cause: Throwable) : Exception(cause)
+
 internal suspend fun copyRange(
     context: Context, uri: String, fromUs: Long, toUs: Long, withVideo: Boolean, rotation: Int, out: File, progress: (Float) -> Unit, spanUs: Long,
 ) {
@@ -36,7 +38,7 @@ internal suspend fun copyRange(
             val isVideo = mime.startsWith("video/")
             if (!(isVideo && withVideo && video < 0) && !(mime.startsWith("audio/") && audio < 0)) continue
             extractor.selectTrack(i)
-            tracks[i] = muxer.addTrack(format)
+            tracks[i] = try { muxer.addTrack(format) } catch (e: IllegalArgumentException) { throw CannotCopy(e) }
             if (format.containsKey(MediaFormat.KEY_MAX_INPUT_SIZE)) buffer = maxOf(buffer, format.getInteger(MediaFormat.KEY_MAX_INPUT_SIZE))
             if (isVideo) video = i else audio = i
         }

@@ -59,6 +59,17 @@ internal class GpuCheck(private val context: Context) {
         write()
     }
 
+    @Synchronized fun keep(gl: Boolean) {
+        if (backend == null) trying(gl)
+    }
+
+    @Synchronized fun pause(): Boolean {
+        if (backend == null) return false
+        backend = null
+        prefs.edit().remove(TRYING).apply()
+        return true
+    }
+
     @Synchronized fun survived() {
         if (backend == null) return
         backend = null

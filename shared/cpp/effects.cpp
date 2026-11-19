@@ -365,10 +365,7 @@ sk_sp<SkImageFilter> PuppetFilter(const LayerEffect& e, const std::map<std::stri
 
 float Value(const LayerEffect& e, const std::map<std::string, Anim>* defaults, const std::string& name, int i, float t,
             float fallback) {
-    if (e.id == "absent.stretch" && name == "stretch") fallback = 200;
-    else if (e.id == "absent.ominoglass" && name == "color") fallback = 1;
-    else if (e.id == "absent.polardisplacement" && name == "angle") fallback = 45;
-    else if (defaults) {
+    if (defaults) {
         if (auto d = defaults->find(name); d != defaults->end()) fallback = d->second.get(i, t, fallback);
     }
     for (const Property& p : e.props) {
@@ -1067,12 +1064,12 @@ bool EffectRuntime::wraps(const Layer& layer) const {
     return std::any_of(layer.effects.begin(), layer.effects.end(), [](const LayerEffect& e) { return !e.hidden && TilesLayer(e.id); });
 }
 
-bool EffectRuntime::spills(const Layer& layer) const {
+bool EffectRuntime::spills(const Layer& layer, double timeMs) const {
     const int lift = liftAt(layer);
     if (lift < 0) return false;
     const LayerEffect& e = layer.effects[lift];
     const Definition* d = find(e.id);
-    return Value(e, d ? &d->defaults : nullptr, "spill", 0, 0, 0) > 0.5f;
+    return Value(e, d ? &d->defaults : nullptr, "spill", 0, layer.localTime(timeMs), 0) > 0.5f;
 }
 
 bool EffectRuntime::needs(const Layer& layer, bool Definition::*input) const {
@@ -1162,9 +1159,13 @@ bool EffectRuntime::turnCorners(const Layer& layer, double timeMs, SkPoint corne
     const SkM44 turn = TurnOf(value("rotX", 0, 0), value("rotY", 0, 0), value("rotZ", 0, 0));
     const SkM44 m = Orientation(layer, timeMs) * (card ? SpinOf(value("axis", 0, 0)) * turn * SpinOf(-value("axis", 0, 0)) : turn);
     const SkPoint center = {area.centerX() + value("position", 0, 0), area.centerY() + value("position", 1, 0)};
+    const SkV3 pv = card ? SkV3{value("pivot", 0, 0) / unit, value("pivot", 1, 0) / unit, value("pivotDepth", 0, 0)} : SkV3{0, 0, 0};
     SkPoint out[4];
     for (int i = 0; i < 4; i++) {
-        const SkV4 w = m.map((corners[i].fX - area.centerX()) / (side * 0.5f), (corners[i].fY - area.centerY()) / (side * 0.5f), -depth, 0);
+        SkV4 w = m.map((corners[i].fX - area.centerX()) / (side * 0.5f) - pv.x, (corners[i].fY - area.centerY()) / (side * 0.5f) - pv.y, -depth - pv.z, 0);
+        w.x += pv.x;
+        w.y += pv.y;
+        w.z += pv.z;
         const float z = w.z + dist;
         if (!(z > 0.01f)) return false;
         out[i] = {center.fX + unit * dist * w.x / z, center.fY + unit * dist * w.y / z};
@@ -1259,7 +1260,7 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
                 std::vector<float> v(n);
                 const bool automatic = !(defaults && defaults->count(name));
                 if (automatic && name == "size") v = {area.width(), area.height()};
-                else if (automatic && name == "time") v = {seconds};
+                else if (automatic && name == "time") v = {e.owner ? (float)((layer.steppedMs(timeMs) - e.ownerStart) / 1000.0) : seconds};
                 else if (automatic && name == "layer") v = {std::max(own().width(), 1.0f), std::max(own().height(), 1.0f)};
                 else if (automatic && name == "fromLayer") v = columns(fromLayer());
                 else if (automatic && name == "toLayer") {
@@ -1371,7 +1372,9 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
                          const std::function<void(SkCanvas*)>& source, const std::function<void(SkCanvas*)>& below, const Grab& grab,
                          const Upload& upload) const {
     tUpload = upload;
-    const SkRect bounds = WorldView() ? canvas->getLocalClipBounds() : SkRect::MakeIWH(scene.width, scene.height);
+    SkRect frame = SkRect::MakeIWH(scene.width, scene.height);
+    if (InsideGroup() && area.isFinite()) frame.join(area);
+    const SkRect bounds = WorldView() ? canvas->getLocalClipBounds() : frame;
     const int lift = liftAt(layer);
     const float t = layer.localTime(timeMs);
     const SkRect at = area.isEmpty() ? bounds : area;
@@ -1449,6 +1452,9 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
             PieceView view;
             view.origin = {world.location.x(), world.location.y(), world.z};
             SeenPieces(layer, timeMs, at.center(), orientation, &view);
+            const SkPoint anchor = placed.mapPoint(world.pivot);
+            const SkV4 shift = orientation.map(at.centerX() - anchor.fX, at.centerY() - anchor.fY, 0, 0);
+            view.shift = {shift.x, shift.y, shift.z};
             pieces3d::Draw(out, e.id, at, orientation, value, pixels, width, height, image.get(), lights, view, handing ? pass : nullptr);
             if (handing) return true;
             sk_sp<SkPicture> result = recorder.finishRecordingAsPicture();

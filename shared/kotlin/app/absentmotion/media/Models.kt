@@ -104,6 +104,19 @@ private class MeshBuilder {
         return count - 1
     }
 
+    fun reversed(from: Int, n: Int, flat: Boolean): Int {
+        val start = count
+        reserve(n, 0)
+        for (v in from until from + n) {
+            for (i in 0..2) positions.add(positions.data[v * 3 + i])
+            if (flat) missing.add(count)
+            for (i in 0..2) normals.add(-normals.data[v * 3 + i])
+            uvs.add(uvs.data[v * 2]); uvs.add(uvs.data[v * 2 + 1])
+            colors.add(colors.data[v])
+        }
+        return start
+    }
+
     fun triangle(a: Int, b: Int, c: Int, slot: Int) {
         if (a == b || b == c || a == c) return
         triangles.add(a); triangles.add(b); triangles.add(c)
@@ -355,7 +368,9 @@ object GltfReader {
         val images = json.optJSONArray("images").objects()
         val textures = ArrayList<ByteArray>()
         val imageSlots = HashMap<Int, Int>()
-        var twoSided = false
+        fun doubleSided(primitive: JSONObject) = materials.getOrNull(primitive.optInt("material", -1))?.optBoolean("doubleSided") == true
+        val primitives = meshes.flatMap { it.optJSONArray("primitives").objects() }
+        val twoSided = primitives.isNotEmpty() && primitives.all(::doubleSided)
         val builder = MeshBuilder()
 
         fun slice(viewIndex: Int): Triple<ByteBuffer, Int, Int>? {
@@ -367,7 +382,7 @@ object GltfReader {
             return Triple(data.duplicate().apply { limit(offset + length) }.order(ByteOrder.LITTLE_ENDIAN), offset, view.optInt("byteStride", 0))
         }
 
-        fun read(index: Int, normalizeInts: Boolean = true, expect: Int = -1, matrices: Boolean = false): Pair<FloatArray, Int>? {
+        fun read(index: Int, normalizeInts: Boolean = true, expect: Int = -1, matrices: Boolean = false, flaggedOnly: Boolean = false): Pair<FloatArray, Int>? {
             val a = accessors.getOrNull(index) ?: return null
             val count = a.optInt("count", 0)
             require(count <= limit) { AppText.get(R.string.model_err_too_complex) }
@@ -379,7 +394,7 @@ object GltfReader {
             val (buffer, start, viewStride) = slice(a.optInt("bufferView", -1)) ?: return null
             val stride = if (viewStride > 0) viewStride else comps * size
             val base = start + a.optInt("byteOffset", 0).toLong()
-            val scaled = normalizeInts && (a.optBoolean("normalized") || type == 5121 || type == 5123)
+            val scaled = normalizeInts && (a.optBoolean("normalized") || !flaggedOnly && (type == 5121 || type == 5123))
             require(count >= 0 && base >= 0 && (count == 0 || base + (count - 1L) * stride + comps * size <= buffer.limit())) { AppText.get(R.string.model_err_accessor) }
             val out = FloatArray(count * comps)
             for (e in 0 until count) for (c in 0 until comps) {
@@ -459,14 +474,13 @@ object GltfReader {
                 val attributes = primitive.optJSONObject("attributes") ?: continue
                 charge(attributes.optInt("POSITION", -1))
                 charge(primitive.optInt("indices", -1))
-                val (positions, pc) = read(attributes.optInt("POSITION", -1)) ?: continue
+                val (positions, pc) = read(attributes.optInt("POSITION", -1), flaggedOnly = true) ?: continue
                 if (pc != 3) continue
                 val count = positions.size / 3
                 val normals = read(attributes.optInt("NORMAL", -1), expect = count)?.first?.takeIf { it.size == count * 3 }
                 val uvs = read(attributes.optInt("TEXCOORD_0", -1), expect = count)?.first?.takeIf { it.size == count * 2 }
                 val colours = read(attributes.optInt("COLOR_0", -1), expect = count)?.takeIf { it.first.size == count * it.second && it.second >= 3 }
                 val material = materials.getOrNull(primitive.optInt("material", -1))
-                twoSided = twoSided || material?.optBoolean("doubleSided") == true
                 val pbr = material?.optJSONObject("pbrMetallicRoughness")
                 val factor = pbr?.optJSONArray("baseColorFactor")?.let { f -> FloatArray(4) { f.optDouble(it, 1.0).toFloat() } } ?: floatArrayOf(1f, 1f, 1f, 1f)
                 val slot = pbr?.optJSONObject("baseColorTexture")?.optInt("index", -1)?.let { textureList.getOrNull(it) }?.optInt("source", -1)
@@ -506,9 +520,12 @@ object GltfReader {
                     builder.vertex(p[0], p[1], p[2], n, uvs?.get(v * 2) ?: 0f, uvs?.get(v * 2 + 1) ?: 0f,
                         argb(factor[0] * c[0], factor[1] * c[1], factor[2] * c[2], factor[3] * c[3]))
                 }
+                val back = if (!twoSided && doubleSided(primitive)) builder.reversed(first, count, normals == null) else -1
                 fun emit(a: Int, b: Int, c: Int) {
                     if (a !in 0 until count || b !in 0 until count || c !in 0 until count) return
                     if (flip) builder.triangle(first + a, first + c, first + b, slot) else builder.triangle(first + a, first + b, first + c, slot)
+                    if (back < 0) return
+                    if (flip) builder.triangle(back + a, back + b, back + c, slot) else builder.triangle(back + a, back + c, back + b, slot)
                 }
                 when (mode) {
                     4 -> for (k in 0 until list.size - 2 step 3) emit(list[k], list[k + 1], list[k + 2])

@@ -58,6 +58,7 @@ import app.absentmotion.desk.DeskBack
 import app.absentmotion.desk.DeskKeys
 import app.absentmotion.desk.DeskMedia
 import app.absentmotion.export.ExportKind
+import app.absentmotion.i18n.Ltr
 import app.absentmotion.platform.Hint
 import app.absentmotion.ui.home.DeskModals
 import app.absentmotion.ui.home.deskPress
@@ -163,7 +164,7 @@ private fun VideoStage(file: File, facts: Map<String, String>, playing: Boolean,
         Box(Modifier.weight(1f).fillMaxWidth().clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = toggle), Alignment.Center) {
             frame?.let { Image(it, null, Modifier.fillMaxSize().padding(24.dp), contentScale = ContentScale.Fit) }
         }
-        Row(Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 20.dp), verticalAlignment = Alignment.CenterVertically) {
+        Ltr { Row(Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 20.dp), verticalAlignment = Alignment.CenterVertically) {
             Hint(stringResource(if (playing) R.string.export_pause else R.string.export_play) + " (Space)") {
                 Box(Modifier.size(40.dp).clip(CircleShape).deskPress(20.dp).clickable(onClick = toggle), Alignment.Center) {
                     androidx.compose.material3.Icon(if (playing) ExportIcons.Pause else ExportIcons.Play, stringResource(if (playing) R.string.export_pause else R.string.export_play), Modifier.size(20.dp), tint = Color.White)
@@ -176,7 +177,7 @@ private fun VideoStage(file: File, facts: Map<String, String>, playing: Boolean,
                 if (done) restart++
             }
             Text(clock(duration), Modifier.padding(start = 10.dp).width(52.dp), color = Color.White.copy(alpha = 0.7f), fontSize = 13.sp, maxLines = 1)
-        }
+        } }
     }
 }
 

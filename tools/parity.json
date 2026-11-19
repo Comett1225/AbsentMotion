@@ -1723,6 +1723,14 @@
       "desktop": "pc/src/standins/kotlin/app/absentmotion/ui/tutorial/DeskGrip.kt",
       "feature": "home.tutorial",
       "reason": "touch grip detector of the tutorial"
+    },
+    "app/absentmotion/platform/DeskDetect.kt": {
+      "desktop": null,
+      "reason": "turns the computer layout on in Samsung DeX; the desktop app always uses the computer layout"
+    },
+    "app/absentmotion/platform/DeskKeys.kt": {
+      "desktop": "pc/src/standins/kotlin/app/absentmotion/desk/DeskApp.kt",
+      "reason": "keyboard shortcuts while the phone shows the computer layout in Samsung DeX; the desktop app handles its shortcuts in its own window"
     }
   }
 }

@@ -85,7 +85,7 @@ object ContentResolver {
     fun file(uri: Uri): File? = uri.toFile()
     fun openInputStream(uri: Uri): InputStream? = file(uri)?.takeIf { it.isFile }?.inputStream()
     fun openOutputStream(uri: Uri, mode: String = "w"): OutputStream? = file(uri)?.let { it.parentFile?.mkdirs(); java.io.FileOutputStream(it, mode.contains("a")) }
-    fun getType(uri: Uri): String? = file(uri)?.let { java.net.URLConnection.guessContentTypeFromName(it.name) ?: Desk.mime(it.name) }
+    fun getType(uri: Uri): String? = file(uri)?.let { Desk.mime(it.name) ?: java.net.URLConnection.guessContentTypeFromName(it.name) }
     fun delete(uri: Uri, where: String?, args: Array<String>?): Int = if (file(uri)?.delete() == true) 1 else 0
     fun query(uri: Uri, projection: Array<String>?, selection: String?, args: Array<String>?, sort: String?): android.database.Cursor? = app.absentmotion.desk.DeskGallery.query(uri, projection, selection, args) ?: fileQuery(uri, projection)
     private fun fileQuery(uri: Uri, projection: Array<String>?): android.database.Cursor? {
@@ -134,8 +134,9 @@ object ContentResolver {
 
 fun Desk.mime(name: String): String? = when (name.substringAfterLast('.', "").lowercase()) {
     "mp4", "m4v" -> "video/mp4"; "mov" -> "video/quicktime"; "webm" -> "video/webm"; "mkv" -> "video/x-matroska"
+    "avi" -> "video/x-msvideo"; "wmv" -> "video/x-ms-wmv"; "asf" -> "video/x-ms-asf"
     "png" -> "image/png"; "jpg", "jpeg" -> "image/jpeg"; "webp" -> "image/webp"; "gif" -> "image/gif"; "svg" -> "image/svg+xml"
-    "mp3" -> "audio/mpeg"; "wav" -> "audio/wav"; "m4a", "aac" -> "audio/mp4"; "ogg", "opus" -> "audio/ogg"; "flac" -> "audio/flac"
+    "mp3" -> "audio/mpeg"; "wav" -> "audio/wav"; "m4a", "aac" -> "audio/mp4"; "ogg", "opus" -> "audio/ogg"; "flac" -> "audio/flac"; "wma" -> "audio/x-ms-wma"
     "xml" -> "text/xml"; "json" -> "application/json"; "zip" -> "application/zip"
     else -> null
 }

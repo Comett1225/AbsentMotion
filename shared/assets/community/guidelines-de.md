@@ -5,7 +5,8 @@ Alles auf dem Tab **Community** wird von einer Person geprüft, bevor es online 
 ## Was du teilen kannst
 
 - Projekte und Voreinstellungen, die du in AbsentMotion erstellt hast: Edits, Vorlagen, Intros, Textanimationen, Übergänge, Effektstapel.
-- Bilder, Videos, Töne und Schriftarten, die du selbst erstellt hast oder die du teilen darfst (zum Beispiel frei nutzbar, oder Creative Commons mit der Namensnennung in der Beschreibung).
+- Der Edit, das Projekt, die Voreinstellung oder die Kunst eines anderen, solange du ihn nennst: Schreib in die Beschreibung, wer es gemacht hat.
+- Bilder, Videos, Musik, Töne und Schriftarten, die du selbst gemacht hast oder die jemand gemacht hat, den du in der Beschreibung nennst.
 
 ## Nicht erlaubt
 
@@ -15,7 +16,7 @@ Alles auf dem Tab **Community** wird von einer Person geprüft, bevor es online 
 - **Mobbing und Belästigung:** Drohungen, Verspottung oder gezieltes Anfeinden einer echten Person.
 - **Persönliche Daten:** echte Namen, Adressen, Telefonnummern, Schulen, Konten oder Gesichter von Privatpersonen, auch von dir selbst.
 - **Illegales oder Gefährliches:** Drogen, Waffen, Betrug, Glücksspiel, Hacking oder Schadsoftware.
-- **Gestohlene Arbeit:** der Edit, das Projekt oder die Voreinstellung eines anderen, als deine ausgegeben, oder Musik, Filmausschnitte, Kunst oder kostenpflichtige Assets, die du nicht teilen darfst.
+- **Fremde Arbeit als eigene ausgeben:** den Edit, das Projekt, die Voreinstellung, die Kunst oder die Musik eines anderen teilen, ohne zu sagen, wer sie gemacht hat, oder kostenpflichtige Assets erneut teilen.
 - **Sich als jemand anderes ausgeben:** den Namen eines anderen Creators oder den Namen oder das Logo einer Marke verwenden, als stamme das Element von ihnen.
 - **Spam:** Werbung, Links zu anderen Seiten, dasselbe Element noch einmal unter anderem Namen oder Elemente, die nichts tun.
 - **Irreführende Elemente:** ein Titel, Vorschaubild oder Tags, die nicht zeigen, was drin ist.
@@ -24,7 +25,8 @@ Alles auf dem Tab **Community** wird von einer Person geprüft, bevor es online 
 
 - Halte es für alle geeignet. Menschen jeden Alters nutzen AbsentMotion.
 - Projektpakete dürfen bis zu 20 MB groß sein und Voreinstellungen bis zu 1 MB.
-- Elemente werden unter CC BY 4.0 geteilt: Jeder darf sie nutzen und ändern, solange er dich nennt.
+- Elemente werden unter CC BY 4.0 geteilt: Jeder darf sie nutzen und ändern, solange er nennt, wer sie gemacht hat.
 - Der Name bei deinem Element ist der Creator-Name, den du eingibst. Gib darin nichts Persönliches an.
 - Der Betreiber entscheidet, was veröffentlicht wird, und kann ein Element jederzeit entfernen.
 - Um ein Element zu melden, nutze das Meldeformular unter **Über** oder den Discord-Server.
+- Wurde etwas, das du gemacht hast, hier geteilt und du möchtest es entfernen lassen, sag uns auf dem Discord-Server von AbsentMotion Bescheid (**Einstellungen > Discord beitreten**).

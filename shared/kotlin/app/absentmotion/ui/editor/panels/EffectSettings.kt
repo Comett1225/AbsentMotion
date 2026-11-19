@@ -140,7 +140,7 @@ internal fun EffectNumbers(state: EditorState, param: EffectParam, raw: String, 
     fun stored(v: List<Float>) = v.joinToString(",")
     val values = List(count) { parsed.getOrElse(it) { 0f } }
     val defaults = param.default.split(',').map { it.trim().finiteFloat() }
-    var component by remember(param.id) { mutableIntStateOf(0) }
+    var component by remember(param.id, count) { mutableIntStateOf(0) }
     val latest by rememberUpdatedState(values)
     val percent = param.percent
     val factor = if (percent) 100f else 1f
@@ -267,6 +267,7 @@ private fun EffectText(param: EffectParam, raw: String, enabled: Boolean, end: (
 }
 
 internal const val MaxPaletteBytes = 16 shl 20
+internal const val MaxPalettePictureBytes = 64 shl 20
 private const val MaxPalettePixels = 2_000_000
 private const val MaxSwatchRows = 12
 
@@ -360,11 +361,11 @@ private fun PaletteSwatches(colors: List<Int>, modifier: Modifier) {
     }
 }
 
-internal fun paletteSource(context: Context, uri: Uri): Pair<String, ByteArray>? = runCatching {
+internal fun paletteSource(context: Context, uri: Uri, limit: Int = MaxPaletteBytes): Pair<String, ByteArray>? = runCatching {
     val resolver = context.contentResolver
     val name = resolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c -> if (c.moveToFirst()) c.getString(0) else null }
         ?: uri.lastPathSegment.orEmpty()
-    resolver.openInputStream(uri)?.use { it.readAtMost(MaxPaletteBytes + 1) }?.takeIf { it.size <= MaxPaletteBytes }?.let { name to it }
+    resolver.openInputStream(uri)?.use { it.readAtMost(limit + 1) }?.takeIf { it.size <= limit }?.let { name to it }
 }.getOrNull()
 
 private fun readPalette(context: Context, uri: Uri): List<Int>? = runCatching {

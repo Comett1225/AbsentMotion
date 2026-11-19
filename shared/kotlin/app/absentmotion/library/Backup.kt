@@ -24,6 +24,7 @@ object Backup {
     private const val MAX_ENTRIES = 100_000
     private const val UNPACKED_HEADROOM = 64L shl 20
     private const val UNPACKED_RATIO = 200L
+    private const val SMALL_STORED = 4L shl 20
     private val VersionFile = Regex("[0-9]{1,19}\\.(?:xml|png|damaged)")
 
     data class Restored(val added: Int, val renamed: Int, val skipped: Int, val rejected: Int = 0)
@@ -52,10 +53,11 @@ object Backup {
             zip.closeEntry()
             val buffer = ByteArray(64 * 1024)
             for ((name, file) in files) {
-                val entry = if (name.endsWith(".xml")) ZipEntry(name) else storedEntry(name, file.inputStream())
-                val source = file.inputStream()
-                zip.putNextEntry(entry.apply { time = file.lastModified() })
-                source.use { input ->
+                val source = try { java.io.FileInputStream(file) } catch (e: java.io.FileNotFoundException) { if (name.startsWith("projects/versions/")) continue else throw e }
+                source.use { opened ->
+                    val input = if (!name.endsWith(".xml") && file.length() <= SMALL_STORED) opened.readBytes().inputStream() else opened
+                    val entry = if (name.endsWith(".xml")) ZipEntry(name) else storedEntry(name, input)
+                    zip.putNextEntry(entry.apply { time = file.lastModified() })
                     while (true) {
                         val n = input.read(buffer)
                         if (n < 0) break
@@ -63,8 +65,8 @@ object Backup {
                         done += n
                         progress(done, total)
                     }
+                    zip.closeEntry()
                 }
-                zip.closeEntry()
             }
         }
     }
@@ -343,15 +345,14 @@ object Backup {
     private fun storedEntry(name: String, input: InputStream): ZipEntry {
         val crc = java.util.zip.CRC32()
         var size = 0L
-        input.use {
-            val buffer = ByteArray(64 * 1024)
-            while (true) {
-                val n = it.read(buffer)
-                if (n < 0) break
-                crc.update(buffer, 0, n)
-                size += n
-            }
+        val buffer = ByteArray(64 * 1024)
+        while (true) {
+            val n = input.read(buffer)
+            if (n < 0) break
+            crc.update(buffer, 0, n)
+            size += n
         }
+        if (input is java.io.FileInputStream) input.channel.position(0) else input.reset()
         return ZipEntry(name).apply { method = ZipEntry.STORED; this.size = size; compressedSize = size; this.crc = crc.value }
     }
 

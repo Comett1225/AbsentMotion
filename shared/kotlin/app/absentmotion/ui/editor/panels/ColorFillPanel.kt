@@ -2,6 +2,7 @@ package app.absentmotion.ui.editor.panels
 
 import app.absentmotion.ui.editor.deskSp
 import app.absentmotion.ui.editor.deskVerticalScroll
+import app.absentmotion.ui.editor.unsupportedPick
 import app.absentmotion.platform.LocalContext
 import app.absentmotion.platform.rememberMediaPicker
 import androidx.compose.foundation.Canvas
@@ -96,7 +97,10 @@ private fun FillTabs(state: EditorState, layer: Layer, modifier: Modifier) {
     val scope = LocalEditorScope.current
     val id = layer.id
     val picker = rememberMediaPicker { uri ->
-        if (uri != null) scope.launch { mediaDeclaration(context, uri)?.let { state.keepCopy(context, it) }?.let { state.fillWithMedia(id, it) } }
+        if (uri != null) scope.launch {
+            val media = mediaDeclaration(context, uri)?.takeIf { !it.type.startsWith("video/") || it.duration > 0 }
+            if (media == null) unsupportedPick(context, uri) else state.fillWithMedia(id, state.keepCopy(context, media))
+        }
     }
     Row(modifier.clip(PanelShape), Arrangement.spacedBy(3.px)) {
         FillTab(PanelIcons.FillNone, stringResource(R.string.none), active = type == "none", enabled = true) { state.editSelected { it.withFill("none") } }

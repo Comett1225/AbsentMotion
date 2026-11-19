@@ -1,6 +1,7 @@
 package app.absentmotion.editor
 
 import app.absentmotion.model.*
+import kotlin.math.ceil
 import kotlin.math.roundToInt
 
 fun EditorState.addVideo(media: MediaDeclaration) {
@@ -36,8 +37,11 @@ fun EditorState.retimeVideo(start: Boolean) {
     var newEnd = if (start) layer.endTime else scene.frameEnd(frame)
     if (layer.node.child("speedMap")?.isKeyframed != true) {
         val timing = VideoTiming(layer)
-        val longest = ((timing.mediaMs((layer.endTime - layer.startTime).toDouble()) - timing.mediaMs(0.0)) / SLOWEST_SPEED).toInt()
+        val span = timing.mediaMs((layer.endTime - layer.startTime).toDouble()) - timing.mediaMs(0.0)
+        val longest = (span / SLOWEST_SPEED).toInt()
+        val shortest = ceil(span / FASTEST_SPEED).toInt()
         if (newEnd - newStart > longest) { if (start) newStart = newEnd - longest else newEnd = newStart + longest }
+        if (newEnd - newStart < shortest) { if (start) newStart = newEnd - shortest else newEnd = newStart + shortest }
     }
     val duration = newEnd - newStart
     if (duration < 1 || !scene.showsAnyFrame(newStart, newEnd)) return

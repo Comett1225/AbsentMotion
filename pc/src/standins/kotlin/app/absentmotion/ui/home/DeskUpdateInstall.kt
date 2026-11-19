@@ -225,7 +225,8 @@ internal object UpdateInstall {
         if (helper?.isAlive == true) return null
         install.result?.let { runCatching { it.delete() } }
         val process = try {
-            ProcessBuilder(detached(install.command)).redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.DISCARD).start()
+            ProcessBuilder(detached(install.command)).redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.DISCARD)
+                .apply { environment().remove("APPIMAGE"); environment().remove("APPDIR") }.start()
         } catch (e: IOException) {
             return startFailure(e.message.orEmpty())
         }

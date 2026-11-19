@@ -14,7 +14,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from i18n_extract import EFFECTS, FOLDERS, KOTLIN, PLACEHOLDER, RES, ROOT, SEVERAL, xml_escape
+from i18n_extract import EFFECTS, FOLDERS, KOTLIN, PLACEHOLDER, RES, RLM, ROOT, RTL, SEVERAL, needs_rlm, stray_percent, xml_escape
 
 LANGUAGES = {'id': 'Indonesian', 'hi': 'Hindi', 'pt-BR': 'Brazilian Portuguese', 'es': 'Latin American Spanish', 'fil': 'Filipino (Tagalog)',
              'vi': 'Vietnamese', 'th': 'Thai', 'ms': 'Malay (Malaysia)', 'ar': 'Arabic (Modern Standard)', 'fa': 'Persian (Farsi, Iran)', 'tr': 'Turkish', 'ru': 'Russian', 'bn': 'Bengali (Bangla)',
@@ -59,8 +59,6 @@ TERMS = ['layer', 'keyframe', 'effect', 'export', 'project', 'timeline', 'templa
          'playhead', 'undo', 'redo', 'duplicate', 'media', 'asset', 'caption', 'voice-over', 'background', 'parent layer', 'null object',
          'motion tracking', 'motion blur', 'chroma key', 'settings', 'preview', 'render', 'thumbnail', 'bookmark', 'vector', 'element']
 KEEP = ['AbsentMotion', 'Alight Motion', 'CapCut']
-ARABIC = re.compile('[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]')
-RLM = '‏'
 SOURCE_REF = re.compile(r'R\.(string|plurals)\.([A-Za-z0-9_]+)')
 lock = threading.Lock()
 usage = {'calls': 0, 'prompt': 0, 'completion': 0, 'failed': 0}
@@ -105,6 +103,8 @@ def write_resources(path, english, attrs, values, quantities):
             continue
         extra = ''.join(f' {k}="{v}"' for k, v in attrs.get(key, {}).items())
         value = values[key]
+        if isinstance(en, dict) != isinstance(value, dict):
+            continue
         if isinstance(en, dict):
             lines.append(f'    <plurals name="{key}"{extra}>')
             for q in quantities:
@@ -235,6 +235,8 @@ def problem(en, value, language):
                 return f'empty {q} form'
             if not set(placeholders(v)) <= set(placeholders(en['other'])):
                 return f'placeholders in {q} form do not match'
+            if stray_percent(en['other'], v):
+                return f'a % in the {q} form is not a placeholder: write %% for a percent sign'
             if q in SEVERAL.get(FOLDERS[language], ()) and placeholders(v) != placeholders(en['other']):
                 return f'the "{q}" form covers more than one number, so it must contain every placeholder of the English "other" form'
         if placeholders(value['other']) != placeholders(en['other']):
@@ -244,6 +246,8 @@ def problem(en, value, language):
         return 'empty'
     if placeholders(value) != placeholders(en):
         return f'placeholders {placeholders(en)} expected, got {placeholders(value)}'
+    if stray_percent(en, value):
+        return 'a % that is not a placeholder: write %% for a percent sign'
     for word in KEEP:
         if word in en and word not in value:
             return f'must keep "{word}" unchanged'
@@ -257,11 +261,11 @@ def problem(en, value, language):
 
 
 def fix_direction(value, language):
-    if language not in ('ar', 'fa'):
+    if language not in RTL:
         return value
     def one(v):
         v = v.lstrip(RLM)
-        return RLM + v if ARABIC.search(v) and not ARABIC.match(v.lstrip()) else v
+        return RLM + v if needs_rlm(v) else v
     return {q: one(v) for q, v in value.items()} if isinstance(value, dict) else one(value)
 
 
@@ -276,6 +280,8 @@ def call(system, payload, attempts=4):
     body = {'model': 'deepseek-flash', 'reasoning_effort': 'low', 'response_format': {'type': 'json_object'}, 'max_tokens': 24000,
             'temperature': 0.2, 'messages': [{'role': 'system', 'content': system}, {'role': 'user', 'content': json.dumps(payload, ensure_ascii=False)}]}
     for attempt in range(attempts):
+        if usage.get('stop'):
+            break
         try:
             req = urllib.request.Request(API, data=json.dumps(body).encode(), headers={'Content-Type': 'application/json', 'Authorization': 'Bearer ' + api_key()})
             with urllib.request.urlopen(req, timeout=300) as r:
@@ -290,9 +296,11 @@ def call(system, payload, attempts=4):
             error = 'empty answer'
         except urllib.error.HTTPError as e:
             if e.code in (401, 402, 403):
-                sys.exit(f'DeepSeek answered {e.code}: the API key is invalid or has no credit (check DEEPSEEK_API_KEY)')
+                with lock:
+                    usage['stop'] = f'DeepSeek answered {e.code}: the API key is invalid or has no credit (check DEEPSEEK_API_KEY)'
+                break
             error = e.code
-        except (urllib.error.URLError, TimeoutError, json.JSONDecodeError, KeyError, ConnectionError, OSError) as e:
+        except Exception as e:
             error = getattr(e, 'code', None) or type(e).__name__
         print(f'  retry {attempt + 1}: {error}', file=sys.stderr)
         time.sleep(3 * (attempt + 1))
@@ -331,7 +339,9 @@ def glossary_for(language):
               f'English video-editing term, the word that popular editing apps in {name} use (keep an English loanword if that is what those apps use). '
               f'Answer with a JSON object mapping each English term to the {name} term.')
     terms = call(system, {'terms': TERMS})
-    terms = {k: v for k, v in terms.items() if k in TERMS and isinstance(v, str) and v.strip()}
+    terms = {k: v for k, v in terms.items() if k in TERMS and isinstance(v, str) and v.strip()} if isinstance(terms, dict) else {}
+    if not terms:
+        return {t: t for t in TERMS}
     with lock:
         data = json.loads(GLOSSARY.read_text(encoding='utf-8')) if GLOSSARY.is_file() else {}
         data[language] = {t: terms.get(t, t) for t in TERMS}
@@ -350,6 +360,8 @@ def translate(language, items, glossary, batch):
         for chunk in chunks:
             payload = {'items': {k: items[k] for k in chunk}}
             answer = call(system, payload)
+            if not isinstance(answer, dict):
+                answer = {}
             for wrapper in ('items', 'translations', 'output'):
                 if isinstance(answer.get(wrapper), dict) and not any(k in answer for k in chunk):
                     answer = answer[wrapper]
@@ -437,8 +449,12 @@ def main():
         return language, got
 
     with ThreadPoolExecutor(args.workers) as pool:
-        for language, got in pool.map(work, languages):
-            results[language] = got
+        jobs = {language: pool.submit(work, language) for language in languages}
+    for language, job in jobs.items():
+        try:
+            results[language] = job.result()[1]
+        except Exception as e:
+            print(f'{language}: stopped ({type(e).__name__}: {e})', file=sys.stderr)
 
     failed = set()
     for language in languages:
@@ -459,6 +475,8 @@ def main():
     after, _ = balance()
     print(f'{usage["calls"]} request(s), {usage["prompt"]} prompt + {usage["completion"]} completion tokens, {usage["failed"]} failed request(s), '
           f'{time.time() - start:.0f} s, cost {before - after:.4f} {currency}')
+    if usage.get('stop'):
+        print(usage['stop'], file=sys.stderr)
     if failed:
         print(f'{len(failed)} text(s) still need a translation: run again', file=sys.stderr)
         return 1

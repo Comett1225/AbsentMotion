@@ -98,7 +98,7 @@ internal class OfflineMix(
     }
 
     private fun source(clip: AudioClip) = sources.getOrPut(clip.id) {
-        OfflineSource(clip.uri, open).also { if (!it.readable) unreadable += clip.uri }
+        OfflineSource(clip.uri, open) { unreadable += clip.uri }.also { if (!it.readable) unreadable += clip.uri }
     }
 
     override fun close() {
@@ -139,8 +139,8 @@ internal class OfflineMix(
     }
 }
 
-internal class OfflineSource(private val uri: String, open: (String) -> PcmSource) : Closeable {
-    private val decoder: PcmSource? = try { open(uri) } catch (e: Exception) { Log.w("AMAudio", "Cannot decode $uri for export", e); null }
+internal class OfflineSource(private val uri: String, open: (String) -> PcmSource, private val lost: () -> Unit = {}) : Closeable {
+    private var decoder: PcmSource? = try { open(uri) } catch (e: Exception) { Log.w("AMAudio", "Cannot decode $uri for export", e); null }
     val readable: Boolean get() = decoder != null
     val durationUs: Long get() = decoder?.durationUs ?: -1
     private var rate = 0
@@ -149,23 +149,45 @@ internal class OfflineSource(private val uri: String, open: (String) -> PcmSourc
     private var end = 0L
     private var eof = false
     private var positioned = false
+    private var emptyFrom = Double.POSITIVE_INFINITY
+
+    private inline fun <T> decoding(fallback: T, block: (PcmSource) -> T): T {
+        val d = decoder ?: return fallback
+        return try {
+            block(d)
+        } catch (e: java.util.concurrent.CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Log.w("AMAudio", "Cannot decode $uri for export", e)
+            decoder = null
+            runCatching { d.close() }
+            lost()
+            fallback
+        }
+    }
 
     fun open(posMs: Double): Int {
-        val d = decoder ?: return 0
         if (positioned) return rate
-        positioned = true
-        d.seek(((posMs - LayerStream.LEAD_MS).coerceAtLeast(0.0) * 1000).toLong())
-        val first = d.next() ?: return 0.also { eof = true }
-        rate = first.rate
-        start = Math.round((posMs - LayerStream.LEAD_MS).coerceAtLeast(0.0) * rate / 1000.0)
-        end = start
-        append(first)
-        return rate
+        if (posMs >= emptyFrom) return 0
+        return decoding(0) { d ->
+            val fromMs = (posMs - LayerStream.LEAD_MS).coerceAtLeast(0.0)
+            d.seek((fromMs * 1000).toLong())
+            val first = d.next()
+            if (first == null) {
+                emptyFrom = posMs
+                return@decoding 0
+            }
+            positioned = true
+            rate = first.rate
+            start = Math.round(fromMs * rate / 1000.0)
+            end = start
+            append(first)
+            rate
+        }
     }
 
     fun window(base: Long, frames: Int, out: FloatArray) {
-        val d = decoder
-        if (d != null && rate > 0) {
+        if (rate > 0) decoding(Unit) { d ->
             val from = maxOf(base, 0L)
             if (from < start || from > end + 2L * rate) {
                 start = maxOf(from - 256, 0L); end = start; eof = false

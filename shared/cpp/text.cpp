@@ -47,7 +47,7 @@ struct TextLine {
     std::unique_ptr<Paragraph> paragraph;
 };
 struct TextLayout {
-    std::string content, family, path, align, emoji, flags;
+    std::string content, family, path, align, emoji, flags, locale;
     float size = 54, width = 512, height = 0, padTop = 0, letterSpacing = 0, lineSpacing = 1, lineHeight = 0, step = 0;
     int weight = 400, index = 0;
     bool italic = false, imported = false, axes = false, wrap = true;
@@ -208,6 +208,7 @@ std::unique_ptr<Paragraph> paragraph(TextLayout& text, const std::string& conten
     style.setFontFamilies({SkString(text.family)});
     style.setLetterSpacing(text.letterSpacing * text.size);
     style.setWordSpacing(wordSpacing);
+    if (!text.locale.empty()) style.setLocale(SkString(text.locale));
     if (tabular) style.addFontFeature(SkString("tnum"), 1);
     if (height > 0) {
         style.setHeight(height);
@@ -419,10 +420,11 @@ void Unhang(TextLayout& text) {
 void SplitParagraph(TextLayout& text) {
     Paragraph& p = *text.paragraph;
     const int count = (int)p.lineNumber();
+    if (count == 0) return;
     const std::string& src = text.content;
     std::vector<TextLine> lines(count);
     std::vector<Span> spans(count);
-    bool over = false, rtl = false;
+    bool over = false, rtl = false, anyRtl = false;
     for (int i = 0; i < count; i++) {
         const size_t from = p.getActualTextRange(i, true).start;
         const size_t to = i + 1 < count ? p.getActualTextRange(i + 1, true).start : src.size();
@@ -433,15 +435,17 @@ void SplitParagraph(TextLayout& text) {
         p.getLineMetricsAt(i, &metrics);
         lines[i].baseline = text.padTop + (float)metrics.fBaseline;
         lines[i].rtl = rtl;
-        over = over || Overflows(text, raw, rtl);
+        anyRtl = anyRtl || rtl;
+        over = over || (text.wrap && Overflows(text, raw, rtl));
         lines[i].content = std::move(raw);
         spans[i] = {from, to};
     }
-    if (!over) return;
+    const bool always = anyRtl || !text.wrap;
+    if (!over && !always) return;
     for (int i = 0; i + 1 < count && text.align == "justify"; i++) {
         if (!Broken(src, spans[i])) lines[i].wordSpacing = Spread(text, lines[i].content, lines[i].rtl);
     }
-    if (!Respace(text, src, lines, spans, 0)) return;
+    if (!(text.wrap && Respace(text, src, lines, spans, 0)) && !always) return;
     text.lines = std::move(lines);
     text.paragraph.reset();
     for (auto& line : text.lines) line.paragraph = paragraph(text, line.content, line.rtl, line.wordSpacing, true);
@@ -480,10 +484,10 @@ void layout(TextLayout& text) {
         if (text.wrap) Unhang(text);
         for (auto& line : text.lines) line.paragraph = paragraph(text, line.content, line.rtl, line.wordSpacing, true);
     } else {
-        text.paragraph = paragraph(text, text.content, false, 0, false, text.lineHeight);
+        text.paragraph = paragraph(text, text.content, false, 0, !text.wrap, text.lineHeight);
         text.padTop = std::max(0.f, metrics.fAscent - metrics.fTop);
         text.height = text.paragraph->getHeight() + text.padTop + std::max(0.f, metrics.fBottom - metrics.fDescent);
-        if (text.wrap) SplitParagraph(text);
+        SplitParagraph(text);
     }
 }
 }
@@ -500,6 +504,7 @@ std::shared_ptr<TextLayout> ParseText(const XmlNode& n) {
     text->italic = attr(n, "_fontItalic") == "true";
     text->emoji = attr(n, "_emoji");
     text->flags = attr(n, "_emojiFlags");
+    text->locale = attr(n, "_locale");
     text->imported = attr(n, "font").starts_with("imported?");
     text->axes = attr(n, "_fontAxes") == "true";
     for (const auto& child : n.children) {
@@ -767,8 +772,8 @@ SkColor4f Blend(SkColor4f under, SkColor4f over) {
 
 void Type(const LayerEffect& e, float t, float seconds, const std::string& shown, const textanim::Segments& seg, std::vector<Glyph>* glyphs) {
     if (e.value("reveal", t, 1) < 0.5f) return;
-    const std::vector<float> at = textanim::TypeTimes(shown, e.value("speed", t, 30), e.value("pause", t, 0.25f));
-    const float now = seconds - e.value("delay", t, 0) + 1e-4f;
+    const std::vector<float> at = textanim::TypeTimes(shown, e.value("speed", 0, 30), e.value("pause", 0, 0.25f));
+    const float now = seconds - e.value("delay", 0, 0) + 1e-4f;
     for (Glyph& g : *glyphs) {
         const int c = g.offset >= 0 && g.offset < (int)seg.character.size() ? seg.character[g.offset] : -1;
         if (c >= 0 && c < (int)at.size() && at[c] > now) g.alpha = 0;
@@ -776,8 +781,12 @@ void Type(const LayerEffect& e, float t, float seconds, const std::string& shown
 }
 
 void Apply(const Layer& l, float t, float seconds, const std::string& shown, const textanim::Segments& seg, std::vector<Glyph>* glyphs) {
+    const LayerEffect* blips = nullptr;
     for (const LayerEffect& e : l.effects) {
-        if (!e.hidden && e.id == "absent.textblips") {
+        if (!e.hidden && e.id == "absent.textblips") blips = &e;
+    }
+    for (const LayerEffect& e : l.effects) {
+        if (&e == blips) {
             Type(e, t, seconds, shown, seg, glyphs);
             continue;
         }

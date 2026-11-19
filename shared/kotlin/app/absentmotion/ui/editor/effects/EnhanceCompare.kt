@@ -71,7 +71,7 @@ internal data class CompareView(val zoom: Float = 1f, val pan: Offset = Offset.Z
 
 internal fun CompareView.zoomed(factor: Float, focus: Offset, size: Size, moved: Offset = Offset.Zero): CompareView {
     val next = (zoom * factor).coerceIn(1f, COMPARE_MAX_ZOOM)
-    if (next == 1f) return CompareView()
+    if (next == 1f || factor < 1f && next < 1.001f) return CompareView()
     val pan = focus - (focus - pan - moved) * (next / zoom)
     return CompareView(next, Offset(pan.x.coerceIn(size.width * (1f - next), 0f), pan.y.coerceIn(size.height * (1f - next), 0f)))
 }
@@ -86,8 +86,9 @@ internal fun compareZoomLabel(zoom: Float): String? = if ((zoom * 10f).roundToIn
 internal fun EnhanceCompare(images: CompareImages, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     suspend fun load(uri: String, turn: Int): ImageBitmap? = withContext(Dispatchers.IO) {
-        val bitmap = decodePicture(context.contentResolver, Uri.parse(openableUri(uri)), 2048) ?: return@withContext null
-        bitmap.turned(turn).also { if (it !== bitmap) bitmap.recycle() }.asImageBitmap()
+        val bitmap = runCatching { decodePicture(context.contentResolver, Uri.parse(openableUri(uri)), 2048) }.getOrNull() ?: return@withContext null
+        val shown = try { bitmap.turned(turn) } catch (_: OutOfMemoryError) { bitmap }
+        shown.also { if (it !== bitmap) bitmap.recycle() }.asImageBitmap()
     }
     val before by produceState<ImageBitmap?>(null, images.before, images.beforeTurn) { value = load(images.before, images.beforeTurn) }
     val after by produceState<ImageBitmap?>(null, images.after, images.afterTurn) { value = load(images.after, images.afterTurn) }

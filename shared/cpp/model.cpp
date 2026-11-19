@@ -80,9 +80,11 @@ void DrawModel(SkCanvas* canvas, const Layer& l, double timeMs, float alpha, con
     const SkM44 spin = Spin(l, timeMs);
     const float sx = p.scale.fX, sy = p.scale.fY;
     const SkM44 full = canvas->getLocalToDevice() * Body(l, p, timeMs);
-    const SkM44 turn = p.turn * spin;
-    const SkM44 worldTurn = SkM44::Rotate({0, 0, 1}, p.rotation * kRadians) * p.tilt * spin;
-    const SkM44 worldPlace = SkM44::Rotate({0, 0, 1}, p.rotation * kRadians) * p.tilt * SkM44::Scale(sx, sy, std::sqrt(std::fabs(sx * sy))) *
+    const float sz = std::sqrt(std::fabs(sx * sy));
+    const SkM44 unscale = SkM44::Scale(sx != 0 ? 1 / sx : 0, sy != 0 ? 1 / sy : 0, sz != 0 ? 1 / sz : 0);
+    const SkM44 turn = p.turn * unscale * spin;
+    const SkM44 worldTurn = SkM44::Rotate({0, 0, 1}, p.rotation * kRadians) * p.tilt * unscale * spin;
+    const SkM44 worldPlace = SkM44::Rotate({0, 0, 1}, p.rotation * kRadians) * p.tilt * SkM44::Scale(sx, sy, sz) *
                              SkM44::Translate(-p.pivot.fX, -p.pivot.fY) * spin * SkM44::Scale(size, size, size);
     const LightSet lights = l.sight.layers ? SceneLights(*l.sight.layers, timeMs) : LightSet{};
     const float mirror = sx * sy < 0 ? -1.0f : 1.0f;

@@ -86,7 +86,7 @@ struct Desktop {
         am::LayerEffects fx;
         fx.active = [this](const am::Layer& l) { return runtime.active(l); };
         fx.lifted = [this](const am::Layer& l) { return runtime.lifted(l); };
-        fx.spills = [this](const am::Layer& l) { return runtime.spills(l); };
+        fx.spills = [this](const am::Layer& l, double t) { return runtime.spills(l, t); };
         fx.behind = [this](const am::Layer& l) { return runtime.behind(l); };
         fx.wraps = [this](const am::Layer& l) { return runtime.wraps(l); };
         fx.steady = [this](const am::Layer& l, float a, float b) { return runtime.steady(l, a, b); };
@@ -244,11 +244,11 @@ JNIEXPORT void JNICALL JNI(destroy)(JNIEnv*, jobject, jlong h) {
 JNIEXPORT jstring JNICALL JNI(loadEffect)(JNIEnv* e, jobject, jlong h, jstring xml) {
     return e->NewStringUTF(ptr(h)->runtime.load(str(e, xml)).c_str());
 }
-JNIEXPORT jstring JNICALL JNI(setScene)(JNIEnv* e, jobject, jlong h, jstring xml) {
+JNIEXPORT jstring JNICALL JNI(setScene)(JNIEnv* e, jobject, jlong h, jstring xml, jboolean keepHeld) {
     am::Scene next;
     std::string error;
     if (!am::ParseScene(str(e, xml), &next, &error)) return e->NewStringUTF(error.c_str());
-    ptr(h)->runtime.forgetHeld();
+    if (!keepHeld) ptr(h)->runtime.forgetHeld();
     ptr(h)->scene = std::move(next);
     return nullptr;
 }
@@ -269,6 +269,7 @@ JNIEXPORT jboolean JNICALL JNI(setPicture)(JNIEnv* e, jobject, jlong h, jstring 
             if (auto mask = surface->makeImageSnapshot()) d->masks[key] = std::move(mask);
         }
     }
+    if (!d->pictures.count(key)) d->runtime.forgetHeld();
     d->pictures[key] = image;
     return true;
 }
@@ -277,8 +278,11 @@ JNIEXPORT jboolean JNICALL JNI(setFrame)(JNIEnv* e, jobject, jlong h, jstring ur
     auto data = SkData::MakeUninitialized((size_t)w * height * 4);
     e->GetByteArrayRegion(bytes, 0, e->GetArrayLength(bytes), (jbyte*)data->writable_data());
     auto info = SkImageInfo::Make(w, height, kRGBA_8888_SkColorType, kUnpremul_SkAlphaType, SkColorSpace::MakeSRGB());
-    ptr(h)->masks.erase(str(e, uri));
-    ptr(h)->pictures[str(e, uri)] = SkImages::RasterFromData(info, data, (size_t)w * 4);
+    Desktop* d = ptr(h);
+    const auto key = str(e, uri);
+    d->masks.erase(key);
+    if (!d->pictures.count(key)) d->runtime.forgetHeld();
+    d->pictures[key] = SkImages::RasterFromData(info, data, (size_t)w * 4);
     return true;
 }
 static sk_sp<SkImage> frameImage(JNIEnv* e, jint w, jint height, jbyteArray bytes) {
@@ -289,6 +293,7 @@ static sk_sp<SkImage> frameImage(JNIEnv* e, jint w, jint height, jbyteArray byte
     return SkImages::RasterFromData(info, data, (size_t)w * 4);
 }
 JNIEXPORT void JNICALL JNI(clearLayerFrames)(JNIEnv*, jobject, jlong h) { ptr(h)->layerPictures.clear(); }
+JNIEXPORT void JNICALL JNI(forgetHeld)(JNIEnv*, jobject, jlong h) { ptr(h)->runtime.forgetHeld(); }
 JNIEXPORT void JNICALL JNI(dropVideo)(JNIEnv* e, jobject, jlong h, jstring uri) {
     auto* d = ptr(h);
     const auto key = str(e, uri);
@@ -518,7 +523,10 @@ JNIEXPORT jboolean JNICALL JNI(setPixels)(JNIEnv* e, jobject, jlong h, jstring u
     auto data = SkData::MakeUninitialized((size_t)w * height * 4);
     e->GetIntArrayRegion(argb, 0, w * height, (jint*)data->writable_data());
     auto info = SkImageInfo::Make(w, height, kBGRA_8888_SkColorType, kUnpremul_SkAlphaType, SkColorSpace::MakeSRGB());
-    ptr(h)->pictures[str(e, uri)] = SkImages::RasterFromData(info, data, (size_t)w * 4);
+    Desktop* d = ptr(h);
+    const auto key = str(e, uri);
+    if (!d->pictures.count(key)) d->runtime.forgetHeld();
+    d->pictures[key] = SkImages::RasterFromData(info, data, (size_t)w * 4);
     return true;
 }
 JNIEXPORT jboolean JNICALL JNI(setModel)(JNIEnv* e, jobject, jstring uri, jfloatArray positions, jfloatArray normals,
@@ -556,6 +564,7 @@ JNIEXPORT void JNICALL JNI(dropPicture)(JNIEnv* e, jobject, jlong h, jstring uri
 JNIEXPORT void JNICALL JNI(setCameraView)(JNIEnv*, jobject, jlong h, jboolean on) { ptr(h)->cameraView = on == JNI_TRUE; }
 JNIEXPORT void JNICALL JNI(setAccurateBlur)(JNIEnv*, jobject, jlong h, jboolean on) { ptr(h)->accurateBlur = on == JNI_TRUE; }
 JNIEXPORT jfloatArray JNICALL JNI(propertyNumbers)(JNIEnv* e, jobject, jlong h, jlong id, jint effect, jstring name, jdouble t) {
+    const am::SceneScope scope(ptr(h)->scene);
     const auto* layer = ptr(h)->scene.layer(id);
     float values[3];
     if (!layer || !am::PropertyNumbers(*layer, effect, str(e, name), t, values)) return nullptr;
@@ -563,6 +572,7 @@ JNIEXPORT jfloatArray JNICALL JNI(propertyNumbers)(JNIEnv* e, jobject, jlong h, 
 }
 JNIEXPORT jfloatArray JNICALL JNI(layerMatrix)(JNIEnv* e, jobject, jlong h, jlong id, jdouble t) {
     Desktop* d = ptr(h);
+    const am::SceneScope scope(d->scene);
     am::SetCameraView(d->cameraView);
     const auto* layer = d->scene.layer(id);
     if (!layer) return nullptr;

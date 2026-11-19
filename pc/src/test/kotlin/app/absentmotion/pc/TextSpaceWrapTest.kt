@@ -151,7 +151,13 @@ class TextSpaceWrapTest {
 
     @Test fun textOnAPathKeepsItsLines() {
         val path = effect("textpath", "shape" to 0f)
-        assertArrayEquals(shot(xml("hello\nworld", extra = path)).pixels, shot(xml("hello${run}world", extra = path)).pixels)
+        assertArrayEquals(shot(xml("hello world", width = 600, extra = path)).pixels, shot(xml("hello world", width = 40, extra = path)).pixels)
+    }
+
+    @Test fun rightToLeftTextEndsOnTheLeftOnTheComputerToo() {
+        for (align in listOf("left", "right")) {
+            assertArrayEquals(align, shot(xml("שלום עולם!\u200F", align)).pixels, shot(xml("שלום עולם!", align)).pixels)
+        }
     }
 
     @Test fun aSpaceOrTwoAtTheEndOfALineStillHangLikeBefore() {

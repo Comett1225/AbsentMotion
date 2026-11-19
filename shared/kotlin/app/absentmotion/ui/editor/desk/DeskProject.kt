@@ -57,7 +57,7 @@ internal fun DeskProject(state: EditorState, onDismiss: () -> Unit) {
         Column(Modifier.deskVerticalScroll().padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
             if (!state.inGroup) Row(Modifier.fillMaxWidth().padding(bottom = 4.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text(stringResource(R.string.desk_name), color = Am.OnDarkDim, fontSize = 13.sp, maxLines = 1)
-                DeskNameField(state.scene.title, Modifier.weight(1f)) { state.rename(it) }
+                DeskNameField(state.scene.title, Modifier.weight(1f), state) { state.rename(it) }
             }
             DeskSettings(state, heading = false)
         }
@@ -72,7 +72,7 @@ internal fun DeskProjectPanel(state: EditorState, modifier: Modifier = Modifier)
         if (!state.inGroup) item(key = "name") {
             Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text(stringResource(R.string.desk_name), color = Am.OnDarkDim, fontSize = 13.sp, maxLines = 1)
-                DeskNameField(state.scene.title, Modifier.weight(1f)) { state.rename(it) }
+                DeskNameField(state.scene.title, Modifier.weight(1f), state) { state.rename(it) }
             }
         }
         item(key = "settings") { DeskSettings(state) }
@@ -128,14 +128,14 @@ internal fun DeskSettings(state: EditorState, modifier: Modifier = Modifier, hea
     Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         if (heading) DeskHeading(stringResource(R.string.topbar_project_settings), Modifier.padding(top = 8.dp, bottom = 4.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            Aspects.forEach { a -> DeskChip(a.key, aspect == a.key, Modifier.weight(1f)) { focus.clearFocus(); custom = false; resize(a, resolution) } }
+            Aspects.forEach { a -> DeskChip(a.key, aspect == a.key, Modifier.weight(1f)) { state.commitTyping(); focus.clearFocus(); custom = false; resize(a, resolution) } }
             DeskChip(stringResource(R.string.menu_custom), aspect == CUSTOM, Modifier.weight(1.5f)) { focus.clearFocus(); custom = true }
         }
         DeskSetting(stringResource(if (scene.isElement) R.string.menu_asset_resolution else R.string.menu_resolution)) {
             if (aspect == CUSTOM) Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-                DeskNumber(scene.width, Modifier.width(64.dp)) { change(width = it) }
+                DeskNumber(state, scene.width, Modifier.width(64.dp)) { change(width = it) }
                 Text("×", color = Am.OnDarkDim, fontSize = 13.sp)
-                DeskNumber(scene.height, Modifier.width(64.dp)) { change(height = it) }
+                DeskNumber(state, scene.height, Modifier.width(64.dp)) { change(height = it) }
                 DeskSavedSizes(state.settings, scene.width, scene.height) { w, h -> change(width = w, height = h) }
             } else {
                 val ratio = Aspects.first { it.key == aspect }
@@ -241,14 +241,21 @@ private fun DeskSavedSizes(settings: app.absentmotion.library.AppSettings, width
 }
 
 @Composable
-private fun DeskNumber(value: Int, modifier: Modifier, commit: (Int) -> Unit) {
+private fun DeskNumber(state: EditorState, value: Int, modifier: Modifier, commit: (Int) -> Unit) {
     var text by remember(value) { mutableStateOf(value.toString()) }
     var focused by remember { mutableStateOf(false) }
+    var dirty by remember { mutableStateOf(false) }
     val focus = LocalFocusManager.current
-    fun save() { val number = text.toIntOrNull()?.coerceIn(MIN_SIDE, MAX_SIDE); if (number != null && number != value) commit(number); text = (number ?: value).toString() }
+    fun save() {
+        if (!dirty) return
+        dirty = false
+        val number = text.toIntOrNull()?.coerceIn(MIN_SIDE, MAX_SIDE)
+        if (number != null && number != value) commit(number)
+        text = (number ?: value).toString()
+    }
     val saveNow by rememberUpdatedState(::save)
     DisposableEffect(Unit) { onDispose { saveNow() } }
-    DoubleTapToType(text, { if (it.length <= 4 && it.all(Char::isDigit)) text = it }, modifier.height(32.dp)) { gate, typed, onTyped ->
+    DoubleTapToType(text, { if (it.length <= 4 && it.all(Char::isDigit)) { text = it; dirty = true; state.typing = saveNow } }, modifier.height(32.dp)) { gate, typed, onTyped ->
         BasicTextField(typed, onTyped, gate.clip(RoundedCornerShape(6.dp)).background(Am.Field).padding(horizontal = 8.dp)
             .onFocusChanged { if (focused && !it.isFocused) save(); focused = it.isFocused },
             textStyle = TextStyle(color = Am.OnDark, fontSize = 13.sp, textAlign = TextAlign.Center).withUiFont(), singleLine = true, cursorBrush = SolidColor(Am.Accent),

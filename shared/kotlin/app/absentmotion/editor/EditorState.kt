@@ -64,7 +64,7 @@ object Glide {
     internal fun interrupt() { if (!stepping) stop() }
 }
 
-class PointAdjust(val label: String, val move: (dx: Float, dy: Float) -> Unit)
+class PointAdjust(val label: String, val move: (dx: Float, dy: Float, width: Float, height: Float) -> Unit)
 
 class LayerPoints(
     val points: List<app.absentmotion.model.Pt>,
@@ -130,7 +130,7 @@ class EditorState(
         enteredMs = enteredMs.take(groupPath.size) + hostMs
         groupPath = groupPath + id
         frame = inner.frameAt(group.nestedTime(hostMs.toDouble(), hostFps, quantize = false).ms.toInt().coerceIn(0, maxOf(inner.totalTime, 0))).coerceIn(0, maxOf(scene.lastFrame, 0))
-        engine.setScene(scene)
+        if (!lookOnly) engine.setScene(scene)
     }
 
     fun exitGroup() {
@@ -145,7 +145,7 @@ class EditorState(
         val group = scene.layer(id)
         selectedId = group?.id
         frame = scene.frameAt(group?.let { hostMsOf(it, scene.fps, innerMs.toDouble(), entered).toInt() } ?: innerMs).coerceIn(0, maxOf(scene.lastFrame, 0))
-        engine.setScene(scene)
+        if (!lookOnly) engine.setScene(scene)
     }
 
     fun leaveGroups() { while (groupPath.isNotEmpty()) exitGroup() }
@@ -195,7 +195,9 @@ class EditorState(
             if (value > old) recordFrames(old + 1, value)
             else if (value < old) liveRecording?.let { lap ->
                 finishRecording()
-                liveRecording = LiveRecording(scene, lap.key, settings.overwriteRecording, lap.pivotId)
+                val next = lap.nextLap(scene, value)
+                liveRecording = next
+                if (next.active) recordFrames(value, value)
             }
         }
 
@@ -244,7 +246,13 @@ class EditorState(
     var toolOpen by mutableStateOf(0)
 
     internal var enhanceCompare by mutableStateOf<app.absentmotion.ui.editor.effects.CompareImages?>(null)
-    var effectBrowserOpen by mutableStateOf(false)
+    private var browserOpen by mutableStateOf(false)
+    var effectBrowserOpen: Boolean
+        get() = browserOpen
+        set(value) {
+            if (!value && browserOpen) { effectDetail = null; effectCategory = null; effectTargets = null }
+            browserOpen = value
+        }
     var effectCategory by mutableStateOf<String?>(null)
     var audioFxFocus by mutableStateOf<Int?>(null)
     var effectIndex by mutableIntStateOf(-1)
@@ -263,6 +271,7 @@ class EditorState(
     var eyedropper by mutableStateOf<((Int) -> Unit)?>(null)
 
     var previewSurface: Any? = null
+    var previewView: app.absentmotion.engine.PreviewView? = null
 
     var keypad by mutableStateOf<KeypadRequest?>(null)
 
@@ -349,14 +358,18 @@ class EditorState(
 
     var cropAspect by mutableStateOf<Float?>(null)
 
-    var previewChange: ((Scene) -> Scene)? = null
+    private var shownChange by mutableStateOf<((Scene) -> Scene)?>(null)
+
+    var previewChange: ((Scene) -> Scene)?
+        get() = shownChange
         set(value) {
-            if (field === value) return
-            field = value
-            engine.setScene(value?.invoke(scene) ?: scene)
+            if (shownChange === value) return
+            shownChange = value
+            if (!lookOnly) engine.setScene(value?.invoke(scene) ?: scene)
         }
 
     private fun show(next: Scene, xml: Lazy<String>) {
+        if (lookOnly) return
         val path = groupPath
         val shown = if (path.isEmpty()) next else next.focused(path) ?: next
         val change = previewChange
@@ -388,7 +401,7 @@ class EditorState(
         val before = scene
         val changed = change(before).withValueLinksFollowing(before).withMattesFollowing(before).withOutlinesFollowing(before)
         if (playing) {
-            val recording = liveRecording ?: LiveRecording(before, key, settings.overwriteRecording, pivot)
+            val recording = liveRecording ?: LiveRecording(before, key, settings.overwriteRecording, pivot, ::normalizedPoint)
             if (recording.capture(before, changed, frame)) {
                 liveRecording = recording
                 record(recording.render(changed, false))
@@ -403,6 +416,12 @@ class EditorState(
             return
         }
         history.edit(key, root.withFocused(groupPath, changed))
+    }
+
+    var typing: (() -> Unit)? = null
+
+    fun commitTyping() {
+        typing?.let { typing = null; it() }
     }
 
     fun endGesture() {
@@ -448,6 +467,7 @@ class EditorState(
     internal fun forgetEdit(after: Scene?): Boolean = after != null && scene.node === after.node && history.forget(root)
 
     private var liveRecording: LiveRecording? = null
+    private fun normalizedPoint(effect: String, name: String): Boolean = engine.effects.value.find(effect)?.params?.firstOrNull { it.id == name }?.pixels == false
     private val recordingKey = Any()
 
     private fun record(next: Scene) {
@@ -523,7 +543,8 @@ class EditorState(
             effectIndex = -1
             keyTarget = null
         }
-        frame = if (groupPath.size < oldPath.size) frameAfterLeaving(oldRoot, oldPath, previous, now, frame) else keptFrame(previous, now, frame)
+        val kept = if (groupPath.size < oldPath.size) frameAfterLeaving(oldRoot, oldPath, previous, now, frame) else keptFrame(previous, now, frame)
+        if (kept != frame) frame = kept
         if (!save) {
             if (drafted == null) Choreographer.getInstance().postFrameCallback(sendDraft)
             drafted = next

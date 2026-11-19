@@ -56,9 +56,20 @@ class ProjectPackageTest {
         val listed = JSONObject(entries.getValue("manifest.json")).getJSONArray("media")
         val byUri = (0 until listed.length()).map { listed.getJSONObject(it) }.associateBy { it.getString("uri") }
         assertEquals(5, byUri.size)
-        assertEquals("media/1_a.jpg", byUri.getValue(picture).getString("entry"))
-        for (refused in listOf(secret, project, "file:///etc/hosts")) assertFalse(refused, byUri.getValue(refused).has("entry"))
-        assertTrue(byUri.getValue("content://provider/1").has("entry"))
+        assertEquals("media/1_a.jpg", byUri.getValue("amproj:media/1_a.jpg").getString("entry"))
+        for (refused in listOf("settings.json", "p1.xml", "hosts")) assertFalse(refused, byUri.getValue(refused).has("entry"))
+        assertTrue(byUri.getValue("amproj:media/4_c.jpg").has("entry"))
+        for (text in listOf(entries.getValue("project.xml"), entries.getValue("manifest.json"))) {
+            assertFalse(text.contains(files.path) || text.contains("file:"))
+        }
+    }
+
+    @Test fun theCommunitySizeCountsThePackedFonts() {
+        val files = tmp.newFolder("files")
+        File(files, "fonts/imported/Big.ttf").apply { parentFile.mkdirs(); writeBytes(ByteArray(3 shl 20)) }
+        val plain = Scene.parse("""<scene title="T" width="10" height="10"><text id="1" font="imported?name=Big.ttf"/></scene>""")
+        val access = MediaAccess.forPhone(files)
+        assertEquals(3L shl 20, plain.communityBytes(access) - plain.communityBytes(MediaAccess.forPhone(tmp.newFolder("empty"))))
     }
 
     @Test fun aModelTravelsWithItsBufferMaterialsAndTexturesUnderTheirOwnNames() = runBlocking {

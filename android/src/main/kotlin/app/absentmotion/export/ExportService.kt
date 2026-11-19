@@ -73,9 +73,12 @@ object ExportRun {
 
 object ExportEngine {
     private var orphan: app.absentmotion.engine.EngineThread? = null
+    private var used: app.absentmotion.engine.EngineThread? = null
+
+    @Synchronized fun exporting(engine: app.absentmotion.engine.EngineThread) { used = engine }
 
     @Synchronized fun release(engine: app.absentmotion.engine.EngineThread) {
-        if (!ExportRun.running) return engine.close()
+        if (!ExportRun.running || (used ?: orphan ?: engine) !== engine) return engine.close()
         if (orphan !== engine) orphan?.close()
         orphan = engine
     }
@@ -83,6 +86,7 @@ object ExportEngine {
     @Synchronized internal fun ended() {
         orphan?.close()
         orphan = null
+        used = null
     }
 }
 

@@ -176,7 +176,7 @@ internal fun DeskHome(
             app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.home_duplicating), app.absentmotion.platform.Toast.LENGTH_SHORT).show()
             scope.launch {
                 try {
-                    val copied = withContext(Dispatchers.IO) { runCatching { store.duplicate(id) }.isSuccess }
+                    val copied = withContext(Dispatchers.IO) { runCatching { store.duplicate(id) }.getOrNull() != null }
                     if (!copied) app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.home_create_project_failed), app.absentmotion.platform.Toast.LENGTH_LONG).show()
                     version++
                 } finally { duplicating = false }
@@ -190,7 +190,7 @@ internal fun DeskHome(
             Box(Modifier.weight(1f).fillMaxWidth(), Alignment.TopCenter) {
                 Box(Modifier.widthIn(max = ContentMax).fillMaxSize()) {
                     when (section) {
-                        DeskSection.Templates -> DeskTemplates(version, query, onTemplate, onTemplateProject)
+                        DeskSection.Templates -> DeskTemplates(version + changes, query, onTemplate, onTemplateProject, engine)
                         DeskSection.Tools -> ToolsTab(Modifier, store, settings) { id -> version++; onOpen(id) }
                         DeskSection.Community -> CommunityTab(Modifier.fillMaxSize(), engine) { onImportFiles(listOf(Uri.fromFile(it))) }
                         else -> ProjectsPane(
@@ -294,6 +294,7 @@ private fun ProjectsPane(
     val ids = remember(cards) { cards.map { it.id }.toSet() }
 
     var columns by remember { mutableIntStateOf(1) }
+    val ahead = if (androidx.compose.ui.platform.LocalLayoutDirection.current == androidx.compose.ui.unit.LayoutDirection.Rtl) -1 else 1
 
     fun move(dx: Int, dy: Int) {
         val current = selected
@@ -334,8 +335,8 @@ private fun ProjectsPane(
             when (event.key) {
                 Key.Enter, Key.NumPadEnter -> info?.let { onOpen(it); true } ?: false
                 Key.Delete, Key.Backspace -> info?.let { onDelete(it); true } ?: false
-                Key.DirectionLeft -> { move(-1, 0); true }
-                Key.DirectionRight -> { move(1, 0); true }
+                Key.DirectionLeft -> { move(-ahead, 0); true }
+                Key.DirectionRight -> { move(ahead, 0); true }
                 Key.DirectionUp -> { move(0, -1); true }
                 Key.DirectionDown -> { move(0, 1); true }
                 else -> false
@@ -523,7 +524,7 @@ private fun DeskImportReport(reports: List<ImportReport>, onDismiss: () -> Unit,
 }
 
 @Composable
-private fun DeskTemplates(version: Int, query: String, onTemplate: (String) -> Unit, onProject: (Scene) -> Unit) {
+private fun DeskTemplates(version: Int, query: String, onTemplate: (String) -> Unit, onProject: (Scene) -> Unit, engine: (() -> app.absentmotion.engine.EngineThread)?) {
     val context = LocalContext.current
     val templates = remember { TemplateStore(context) }
     val presets = remember { PresetStore(context) }
@@ -534,7 +535,7 @@ private fun DeskTemplates(version: Int, query: String, onTemplate: (String) -> U
     var confirm by remember { mutableStateOf<Pair<Int, () -> Unit>?>(null) }
     var selected by remember { mutableStateOf<String?>(null) }
     val savedTemplates by produceState(emptyList<SavedTemplate>(), version, rev) { value = withContext(Dispatchers.IO) { templates.list() } }
-    val savedPresets by produceState(emptyList<SavedPreset>(), version, rev) { value = withContext(Dispatchers.IO) { presets.list() } }
+    val savedPresets by produceState(emptyList<SavedPreset>(), version, rev, app.absentmotion.ui.export.PresetSharing.revision) { value = withContext(Dispatchers.IO) { presets.list() } }
     val shownTemplates = remember(savedTemplates, query) { savedTemplates.filter { matchesSearch(query, it.title) } }
     val shownPresets = remember(savedPresets, query) { savedPresets.filter { matchesSearch(query, it.title) } }
     val seen = remember { HashSet<Any>() }
@@ -579,11 +580,15 @@ private fun DeskTemplates(version: Int, query: String, onTemplate: (String) -> U
                             }, HomeIcons.Delete, danger = true)
                         }
                     } else itemsIndexed(shownPresets, key = { _, p -> p.id }) { i, p ->
-                        DeskPresetCard(
-                            p.title, Modifier.enterOnce(seen, p.id, i),
-                            onRename = { renaming = p.id to p.title },
-                            onDelete = { confirm = R.string.template_delete_preset to { scope.launch { withContext(Dispatchers.IO) { presets.delete(p.id) }; rev++ } } },
-                        )
+                        DeskCard(p.title, null, rememberPresetPicture(p, engine), null, null, selected == p.id, { selected = p.id }, {}, Modifier.enterOnce(seen, p.id, i)) { close ->
+                            DeskMenuItem(stringResource(R.string.rename), { close(); renaming = p.id to p.title }, HomeIcons.Pencil)
+                            DeskMenuDivider()
+                            DeskMenuItem(stringResource(R.string.delete), {
+                                close(); confirm = R.string.template_delete_preset to { scope.launch { withContext(Dispatchers.IO) { presets.delete(p.id) }; rev++ } }
+                            }, HomeIcons.Delete, danger = true)
+                            DeskMenuDivider()
+                            DeskMenuItem(stringResource(R.string.preset_share), { close(); app.absentmotion.ui.export.PresetSharing.preset = p }, HomeIcons.Export)
+                        }
                     }
                 }
             }
@@ -602,32 +607,6 @@ private fun DeskTemplates(version: Int, query: String, onTemplate: (String) -> U
     }
     confirm?.let { (title, action) ->
         DeskConfirm(stringResource(title), null, null, stringResource(R.string.delete), danger = true, onCancel = { confirm = null }) { confirm = null; action() }
-    }
-}
-
-@Composable
-private fun DeskPresetCard(title: String, modifier: Modifier, onRename: () -> Unit, onDelete: () -> Unit) {
-    val source = remember { MutableInteractionSource() }
-    val hovered by source.collectIsHoveredAsState()
-    var menuAt by remember { mutableStateOf<IntOffset?>(null) }
-    var buttonMenu by remember { mutableStateOf(false) }
-    val shape = RoundedCornerShape(12.dp)
-    val items: @Composable ColumnScope.(() -> Unit) -> Unit = { close ->
-        DeskMenuItem(stringResource(R.string.rename), { close(); onRename() }, HomeIcons.Pencil)
-        DeskMenuDivider()
-        DeskMenuItem(stringResource(R.string.delete), { close(); onDelete() }, HomeIcons.Delete, danger = true)
-    }
-    Row(
-        modifier.fillMaxWidth().height(56.dp).hoverable(source).clip(shape).background(Am.Card).border(1.dp, if (hovered) Am.HomeFaint else Am.HomeLine, shape)
-            .handCursor().onSecondaryPress { menuAt = IntOffset(it.x.toInt(), it.y.toInt()) }.clickable { },
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(title, Modifier.weight(1f).padding(start = 16.dp), color = Am.Navy, fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-        Box(Modifier.padding(end = 10.dp).alpha(if (hovered || buttonMenu) 1f else 0f)) {
-            DeskIconButton(HomeIcons.More, stringResource(R.string.home_more), { buttonMenu = true }, size = 32.dp, tooltip = null)
-            if (buttonMenu) DeskPopupMenu(BelowAnchor(true), { buttonMenu = false }) { items { buttonMenu = false } }
-        }
-        menuAt?.let { at -> DeskPopupMenu(AtPosition(at), { menuAt = null }) { items { menuAt = null } } }
     }
 }
 

@@ -3,7 +3,7 @@ package android.content.res
 class Configuration() {
     constructor(other: Configuration) : this() { screenWidthDp = other.screenWidthDp; screenHeightDp = other.screenHeightDp; uiMode = other.uiMode; fontScale = other.fontScale }
     var uiMode = UI_MODE_NIGHT_YES
-    val locales: android.os.LocaleList get() = android.os.LocaleList.getDefault()
+    val locales: android.os.LocaleList get() = android.os.LocaleList(app.absentmotion.desk.Strings.locale)
     fun setLocales(list: android.os.LocaleList?) {}
     fun setLocale(locale: java.util.Locale?) {}
     var screenWidthDp = 1280

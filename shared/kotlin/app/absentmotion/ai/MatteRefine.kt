@@ -246,6 +246,8 @@ internal class Cutout(val keep: List<Tap> = emptyList(), val edge: MatteEdge = M
     val option: String? get() = if (plain) null else "soft=${edge.softness};grow=${edge.grow};keep=" +
         keep.joinToString(",") { (u, v) -> String.format(Locale.US, "%.4f:%.4f", u, v) }
 
+    fun turned(turn: Int): Cutout = if (keep.isEmpty()) this else Cutout(keep.map { (u, v) -> frameToView(u, v, turn) }, edge)
+
     fun refine(alpha: ByteArray, width: Int, height: Int): ByteArray {
         if (keep.isNotEmpty()) clearUnpicked(alpha, width, height, keep)
         return if (edge == MatteEdge()) alpha else bakeEdge(alpha, width, height, edge, pictureUnit(width, height))

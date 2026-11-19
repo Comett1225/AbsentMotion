@@ -55,6 +55,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -168,10 +169,11 @@ internal class Form(saved: NewProjectChoice, val titles: List<String>, val names
     var background by mutableIntStateOf(saved.background)
     var picked by mutableStateOf<SavedSize?>(null)
     private var ratio = 1f
+    private var fit by mutableStateOf<Pair<Int, Int>?>(null)
 
     val size: Pair<Int, Int>
         get() {
-            if (aspect == CUSTOM) return side(customW) to side(customH)
+            if (aspect == CUSTOM) return fit ?: (side(customW) to side(customH))
             val (a, b) = Aspects.firstOrNull { it.key == aspect }?.let { it.w to it.h } ?: (1 to 1)
             val long = ((resolution * maxOf(a, b) / minOf(a, b).toDouble()) / 2).roundToInt() * 2
             return if (a >= b) long to resolution else resolution to long
@@ -185,15 +187,18 @@ internal class Form(saved: NewProjectChoice, val titles: List<String>, val names
 
     fun editWidth(text: String) {
         customW = text.filter(Char::isDigit).take(4)
-        if (linked) customW.toIntOrNull()?.let { customH = (it / ratio).roundToInt().coerceIn(MIN_SIDE, MAX_SIDE).toString() }
+        fit = if (linked) customW.toIntOrNull()?.let { linkedSides(it.toFloat(), it / ratio) } else null
+        fit?.let { customH = it.second.toString() }
     }
 
     fun editHeight(text: String) {
         customH = text.filter(Char::isDigit).take(4)
-        if (linked) customH.toIntOrNull()?.let { customW = (it * ratio).roundToInt().coerceIn(MIN_SIDE, MAX_SIDE).toString() }
+        fit = if (linked) customH.toIntOrNull()?.let { linkedSides(it * ratio, it.toFloat()) } else null
+        fit?.let { customW = it.first.toString() }
     }
 
     fun pick(w: Int, h: Int) {
+        fit = null
         customW = w.toString()
         customH = h.toString()
         if (linked) ratio = w.toFloat() / h
@@ -209,15 +214,18 @@ internal class Form(saved: NewProjectChoice, val titles: List<String>, val names
 
     fun toggleLink() {
         linked = !linked
+        fit = null
         if (linked) ratio = side(customW).toFloat() / side(customH)
     }
 
     fun commitSides() {
+        fit?.let { (w, h) -> customW = w.toString(); customH = h.toString() }
+        fit = null
         customW = side(customW).toString()
         customH = side(customH).toString()
     }
 
-    fun choice() = NewProjectChoice(aspect, resolution, side(customW), side(customH), fps, background)
+    fun choice() = (fit ?: (side(customW) to side(customH))).let { (w, h) -> NewProjectChoice(aspect, resolution, w, h, fps, background) }
 
     fun scene(): Scene {
         val (w, h) = size
@@ -228,6 +236,11 @@ internal class Form(saved: NewProjectChoice, val titles: List<String>, val names
 }
 
 internal fun side(text: String) = text.toIntOrNull()?.coerceIn(MIN_SIDE, MAX_SIDE) ?: MIN_SIDE
+
+internal fun linkedSides(w: Float, h: Float): Pair<Int, Int> {
+    val k = if (w > 0f && h > 0f) minOf(MAX_SIDE / maxOf(w, h), maxOf(1f, MIN_SIDE / minOf(w, h))) else 1f
+    return (w * k).roundToInt().coerceIn(MIN_SIDE, MAX_SIDE) to (h * k).roundToInt().coerceIn(MIN_SIDE, MAX_SIDE)
+}
 
 internal fun tileFrame(width: Int, height: Int): Pair<Float, Float> {
     val ratio = maxOf(width, height).toFloat() / minOf(width, height).coerceAtLeast(1)
@@ -292,6 +305,7 @@ fun NewProjectSheet(
     val form = remember(opening) { Form(settings.newProject, existingTitles, DefaultNames(context), initialElement) }
     val scope = rememberCoroutineScope()
     var creating by remember { mutableStateOf(false) }
+    val card = app.absentmotion.ui.editor.LocalTablet.current
     val create: () -> Unit = create@{
         if (creating) return@create
         creating = true
@@ -313,16 +327,17 @@ fun NewProjectSheet(
         }
     }
     BoxWithConstraints(Modifier.fillMaxSize()) {
-        if (maxWidth > maxHeight && maxWidth - 48.dp >= 720.dp) {
-            AdaptiveWindow(1100.dp, 500.dp) { SheetBody(form, settings, onClose, create) }
+        if (card && maxWidth > maxHeight && maxWidth - 48.dp >= 720.dp) {
+            AdaptiveWindow(1100.dp, 500.dp) { SheetBody(form, settings, true, onClose, create) }
         } else {
             Box(Modifier.fillMaxSize().presenceScrim(Color.Black.copy(alpha = 0.7f)).pointerInput(Unit) { detectTapGestures { } })
             BoxWithConstraints(
-                Modifier.align(Alignment.Center).windowInsetsPadding(WindowInsets.systemBars.union(WindowInsets.ime)).padding(24.dp).widthIn(max = 480.dp).presence(scaleFrom = 0.96f),
+                if (card) Modifier.align(Alignment.Center).windowInsetsPadding(WindowInsets.systemBars.union(WindowInsets.ime)).padding(24.dp).widthIn(max = 480.dp).presence(scaleFrom = 0.96f)
+                else Modifier.align(Alignment.BottomCenter).widthIn(max = 480.dp).presence(slide = 1f, fade = false),
             ) {
                 val density = LocalDensity.current
                 CompositionLocalProvider(LocalDensity provides Density(density.density * minOf(1f, maxWidth / SheetWidth), density.fontScale)) {
-                    SheetBody(form, settings, onClose, create)
+                    SheetBody(form, settings, card, onClose, create)
                 }
             }
         }
@@ -330,29 +345,36 @@ fun NewProjectSheet(
 }
 
 @Composable
-private fun SheetBody(form: Form, settings: AppSettings, onClose: () -> Unit, onCreate: () -> Unit) {
+private fun SheetBody(form: Form, settings: AppSettings, card: Boolean, onClose: () -> Unit, onCreate: () -> Unit) {
     Column(
-        (if (LocalAdaptiveSpace.current?.wide == true) Modifier.fillMaxSize() else Modifier.fillMaxWidth()).clip(RoundedCornerShape(22.dp)).background(Am.SheetBg).verticalScroll(rememberScrollState()),
+        if (card) (if (LocalAdaptiveSpace.current?.wide == true) Modifier.fillMaxSize() else Modifier.fillMaxWidth()).clip(RoundedCornerShape(22.dp)).background(Am.SheetBg).verticalScroll(rememberScrollState())
+        else Modifier.fillMaxWidth().clip(RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp)).background(Am.SheetBg)
+            .windowInsetsPadding(WindowInsets.navigationBars.union(WindowInsets.ime)).verticalScroll(rememberScrollState()),
     ) {
-        Row(Modifier.padding(start = 20.dp, top = 12.dp).height(48.dp), verticalAlignment = Alignment.CenterVertically) {
+        if (card) Row(Modifier.padding(start = 20.dp, top = 12.dp).height(48.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(48.dp).clip(CircleShape).clickable(onClick = onClose), contentAlignment = Alignment.Center) {
                 Icon(HomeIcons.Close, stringResource(R.string.cancel), Modifier.size(22.dp), tint = Am.Navy)
                 HoldName(stringResource(R.string.cancel))
             }
             Text(stringResource(R.string.home_new_project), Modifier.padding(start = 4.dp), color = Am.Navy, fontSize = 20.sp, fontWeight = FontWeight.Bold, maxLines = 1)
         }
-        val pages = if (PlatformFeatures.desktop) null else rememberPagerState { if (settings.savedSizes.isEmpty()) 1 else 2 }
+        var savedPages by remember { mutableStateOf(emptyList<List<SavedSize>>()) }
+        val pages = if (PlatformFeatures.desktop) null else rememberPagerState { 1 + savedPages.size }
         val identity: @Composable ColumnScope.() -> Unit = {
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(if (card) 12.dp else 30.dp))
             TypeToggle(form)
             Spacer(Modifier.height(35.dp))
             NameField(form)
             Spacer(Modifier.height(10.dp))
-            if (pages == null) AspectRow(form) else HorizontalPager(pages, Modifier.fillMaxWidth().height(56.dp), verticalAlignment = Alignment.Top) { page ->
-                if (page == 0) AspectRow(form) else SavedPage(form, settings)
-        }
+            if (pages == null) AspectRow(form) else BoxWithConstraints(Modifier.fillMaxWidth()) {
+                val chunks = savedPagesFor(settings.savedSizes, maxWidth)
+                androidx.compose.runtime.SideEffect { if (savedPages != chunks) savedPages = chunks }
+                HorizontalPager(pages, Modifier.fillMaxWidth().height(56.dp), verticalAlignment = Alignment.Top, flingBehavior = androidx.compose.foundation.pager.PagerDefaults.flingBehavior(pages, snapPositionalThreshold = 0.25f)) { page ->
+                    if (page == 0) AspectRow(form) else SavedPage(form, settings, chunks.getOrElse(page - 1) { emptyList() })
+                }
+            }
         Row(Modifier.fillMaxWidth().height(16.dp), Arrangement.spacedBy(5.dp, Alignment.CenterHorizontally), Alignment.CenterVertically) {
-            if (pages != null && pages.pageCount > 1) repeat(2) { Box(Modifier.size(4.dp).background(if (pages.currentPage == it) Am.Navy else Am.HomeFaint, CircleShape)) }
+            if (pages != null && pages.pageCount > 1) repeat(pages.pageCount) { Box(Modifier.size(4.dp).background(if (pages.currentPage == it) Am.Navy else Am.HomeFaint, CircleShape)) }
         }
         }
         val dimensions: @Composable ColumnScope.() -> Unit = {
@@ -381,32 +403,43 @@ private fun SheetBody(form: Form, settings: AppSettings, onClose: () -> Unit, on
             identity()
             dimensions()
         }
+        if (card) {
+            Spacer(Modifier.height(12.dp))
+            AccentPill(stringResource(if (form.element) R.string.newproject_create_asset else R.string.newproject_create_project), Modifier.padding(horizontal = 32.dp).fillMaxWidth(), onClick = onCreate)
+            Spacer(Modifier.height(32.dp))
+            return@Column
+        }
         Spacer(Modifier.height(12.dp))
         AccentPill(stringResource(if (form.element) R.string.newproject_create_asset else R.string.newproject_create_project), Modifier.padding(horizontal = 32.dp).fillMaxWidth(), onClick = onCreate)
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(28.dp))
+        Box(
+            Modifier.align(Alignment.CenterHorizontally).size(60.dp).clickable(onClick = onClose),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(HomeIcons.Close, stringResource(R.string.cancel), Modifier.size(24.dp), tint = Am.Navy)
+            HoldName(stringResource(R.string.cancel))
+        }
     }
 }
 
 @Composable
 private fun TypeToggle(form: Form) {
-    Row(
-        Modifier.padding(horizontal = 32.dp).fillMaxWidth().height(44.dp).background(Am.Card, FieldShape).padding(3.dp),
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-    ) {
-        Segment(stringResource(R.string.newproject_segment_project), !form.element, Modifier.weight(1f)) { form.switchType(false) }
-        Segment(stringResource(R.string.newproject_segment_asset), form.element, Modifier.weight(1f)) { form.switchType(true) }
+    val shift by androidx.compose.animation.core.animateFloatAsState(if (form.element) 1f else 0f, androidx.compose.animation.core.tween(220), label = "type")
+    BoxWithConstraints(Modifier.padding(horizontal = 32.dp).fillMaxWidth().height(44.dp).background(Am.Card, FieldShape).padding(3.dp)) {
+        val gap = 6.dp
+        val half = (maxWidth - gap) / 2
+        Box(Modifier.offset(x = (half + gap) * shift).width(half).fillMaxHeight().shadow(3.dp, FieldShape).background(Am.Navy, FieldShape))
+        Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(gap)) {
+            Segment(stringResource(R.string.newproject_segment_project), 1f - shift, Modifier.weight(1f)) { form.switchType(false) }
+            Segment(stringResource(R.string.newproject_segment_asset), shift, Modifier.weight(1f)) { form.switchType(true) }
+        }
     }
 }
 
 @Composable
-private fun Segment(text: String, selected: Boolean, modifier: Modifier, onClick: () -> Unit) {
-    Box(
-        modifier.fillMaxHeight()
-            .then(if (selected) Modifier.shadow(3.dp, FieldShape).background(Am.Navy, FieldShape) else Modifier)
-            .clip(FieldShape).clickable(onClick = onClick),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(text, color = if (selected) Am.OnNavyAccent else Am.Navy, fontSize = 15.sp, fontWeight = FontWeight.Medium)
+private fun Segment(text: String, selected: Float, modifier: Modifier, onClick: () -> Unit) {
+    Box(modifier.fillMaxHeight().clip(FieldShape).clickable(onClick = onClick), contentAlignment = Alignment.Center) {
+        Text(text, color = androidx.compose.ui.graphics.lerp(Am.Navy, Am.OnNavyAccent, selected), fontSize = 15.sp, fontWeight = FontWeight.Medium)
     }
 }
 
@@ -460,10 +493,35 @@ private fun Modifier.frameLook(selected: Boolean): Modifier = if (selected) {
 }
 
 @Composable
-private fun SavedPage(form: Form, settings: AppSettings) {
+private fun savedPagesFor(sizes: List<SavedSize>, width: Dp): List<List<SavedSize>> {
+    val measurer = androidx.compose.ui.text.rememberTextMeasurer()
+    val density = LocalDensity.current
+    return remember(sizes, width, density) {
+        val room = width - 45.dp
+        val name = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium)
+        val label = TextStyle(fontSize = 11.sp)
+        val pages = mutableListOf<MutableList<SavedSize>>()
+        var used = 0.dp
+        sizes.forEach { size ->
+            val text = with(density) { maxOf(measurer.measure(size.name, name).size.width, measurer.measure(size.label, label).size.width).toDp() }
+            val tile = 24.5.dp + tileFrame(size.width, size.height).first.dp + 8.dp + minOf(text, 104.dp)
+            if (pages.isEmpty() || used + tile > room) {
+                pages += mutableListOf(size)
+                used = tile
+            } else {
+                pages.last() += size
+                used += tile
+            }
+        }
+        pages
+    }
+}
+
+@Composable
+private fun SavedPage(form: Form, settings: AppSettings, sizes: List<SavedSize>) {
     var renaming by remember { mutableStateOf<SavedSize?>(null) }
-    Row(Modifier.fillMaxSize().horizontalScroll(rememberScrollState()).padding(start = 27.dp, end = 18.dp)) {
-        settings.savedSizes.forEach { size ->
+    Row(Modifier.fillMaxSize().padding(start = 27.dp, end = 18.dp)) {
+        sizes.forEach { size ->
             SavedTile(size, form.shows(size), settings.vibration, { form.pick(size) }, { renaming = size }) {
                 settings.savedSizes = SavedSizes.without(settings.savedSizes, size)
             }
@@ -593,7 +651,7 @@ private fun ResolutionField(form: Form) {
 
 @Composable
 private fun FrameRateField(form: Form) {
-    DropdownField("${form.fps} fps") { close ->
+    DropdownField("${form.fps} fps", selected = FrameRates.indexOf(form.fps)) { close ->
         FrameRates.forEachIndexed { i, rate ->
             PickRow("$rate fps", divider = i < FrameRates.lastIndex) { form.fps = rate; close() }
         }
@@ -603,7 +661,7 @@ private fun FrameRateField(form: Form) {
 @Composable
 private fun BackgroundField(form: Form) {
     val shown = if (form.element) Backgrounds.last() else Backgrounds.firstOrNull { it.argb == form.background } ?: Backgrounds.last()
-    DropdownField(stringResource(shown.name), enabled = !form.element, swatch = shown.argb) { close ->
+    DropdownField(stringResource(shown.name), enabled = !form.element, swatch = shown.argb, selected = Backgrounds.indexOf(shown)) { close ->
         Backgrounds.forEachIndexed { i, choice ->
             PickRow(stringResource(choice.name), swatch = choice.argb, divider = i < Backgrounds.lastIndex) { form.background = choice.argb; close() }
         }
@@ -615,9 +673,12 @@ private fun DropdownField(
     text: String,
     enabled: Boolean = true,
     swatch: Int? = null,
+    selected: Int = -1,
     menu: @Composable ColumnScope.(close: () -> Unit) -> Unit,
 ) {
     var open by remember { mutableStateOf(false) }
+    val density = LocalDensity.current
+    val scroll = remember(open) { androidx.compose.foundation.ScrollState(with(density) { (selected * 49 - 141).dp.coerceAtLeast(0.dp).roundToPx() }) }
     Box(Modifier.fillMaxSize().alpha(if (enabled) 1f else 0.35f)) {
         Row(
             Modifier.fillMaxSize().clip(FieldShape).background(Am.Card).clickable(enabled = enabled) { open = true }
@@ -631,7 +692,7 @@ private fun DropdownField(
             Text(text, Modifier.weight(1f), color = Am.HomeInk, fontSize = 16.sp, maxLines = 1)
             Icon(HomeIcons.ChevronDown, null, Modifier.size(24.dp), tint = Am.HomeInk)
         }
-        RefMenu(open, { open = false }, ListColor, FieldShape, Modifier.width(180.dp), maxHeight = 330.dp) { menu { open = false } }
+        RefMenu(open, { open = false }, ListColor, FieldShape, Modifier.width(180.dp), maxHeight = 330.dp, scroll = scroll) { menu { open = false } }
     }
 }
 

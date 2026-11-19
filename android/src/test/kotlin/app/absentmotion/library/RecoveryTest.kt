@@ -91,6 +91,22 @@ class RecoveryTest {
         }
     }
 
+    @Test fun unansweredRecoveredEditsAreKeptAsAVersionBeforeTheNextSaveClearsThem() {
+        val (store, recovery, id) = setup()
+        recovery.write(id, xml("crashed"))
+        val executor = Executors.newSingleThreadScheduledExecutor()
+        try {
+            val saver = ProjectSaver(id, store, recovery, failed = { throw AssertionError(it) }, executor = executor)
+            saver.commit(xml("moved a layer"))
+            saver.flush().get(5, TimeUnit.SECONDS)
+            executor.submit { }.get(5, TimeUnit.SECONDS)
+            assertFalse(recovery.file(id).exists())
+            assertTrue(store.versions.list(id).any { Scene.parse(it.file.readText()).title == "crashed" })
+        } finally {
+            executor.shutdownNow()
+        }
+    }
+
     @Test fun deletingAProjectAlsoDropsItsUnsavedEdits() {
         val (store, recovery, id) = setup()
         recovery.write(id, xml("unsaved"))

@@ -245,7 +245,7 @@ fun TemplateEditor(templateId: String, engine: EngineThread, settings: AppSettin
             val media = mediaDeclaration(context, uri)
             val duration = (media?.duration ?: -1) / 1000
             when {
-                media == null -> Toast.makeText(context, app.absentmotion.platform.mediaTrouble(context, uri) ?: context.getString(R.string.library_err_unsupported_type), Toast.LENGTH_SHORT).show()
+                media == null -> Toast.makeText(context, app.absentmotion.ui.editor.mediaTroubleOf(context, uri) ?: context.getString(R.string.library_err_unsupported_type), Toast.LENGTH_SHORT).show()
                 !media.type.startsWith("video/") -> choose(slot, media, 0)
                 !slot.loop && slot.length - 300 > duration -> { frozen = true; choose(slot, media, 0) }
                 slot.length + 600 < duration -> { trimStart = 0; playing = false; trimming = Trimming(slot, media) }
@@ -267,13 +267,21 @@ fun TemplateEditor(templateId: String, engine: EngineThread, settings: AppSettin
         if (!playing) return@LaunchedEffect
         if (pos >= total) pos = 0
         val from = pos
+        val audio = engine.audio
+        audio?.quality = settings.audioResampling
+        val audible = audio?.play(from.toDouble()) == true
         val start = withFrameNanos { it }
-        while (true) {
-            val now = withFrameNanos { it }
-            if (!playing) break
-            val next = from + ((now - start) / 1_000_000).toInt()
-            if (next >= total) { pos = total; playing = false; break }
-            pos = next
+        try {
+            while (true) {
+                val now = withFrameNanos { it }
+                if (!playing) break
+                if (audible && audio.interrupted) { playing = false; break }
+                val next = if (audible) audio.positionMs()?.toInt()?.coerceAtLeast(from) ?: from else from + ((now - start) / 1_000_000).toInt()
+                if (next >= total) { pos = total; playing = false; break }
+                pos = next
+            }
+        } finally {
+            audio?.stop()
         }
     }
     fun timecode(ms: Int) = TimelineMath.timecode((ms * template.fps / 1000f).roundToInt(), template.fps)

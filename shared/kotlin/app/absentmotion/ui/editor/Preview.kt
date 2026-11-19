@@ -103,6 +103,7 @@ import app.absentmotion.model.wrapWidth
 import app.absentmotion.model.onTextPath
 import app.absentmotion.ui.editor.panels.EyedropperLoupe
 import app.absentmotion.ui.editor.panels.SnapScene
+import app.absentmotion.ui.editor.panels.pivotFrame
 import app.absentmotion.ui.editor.panels.previewSnapAxes
 import app.absentmotion.ui.editor.panels.snapScene
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -189,7 +190,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
             var wasCached = false
             snapshotFlow { state.timeMs to cachedPlaying.value }.collect { (timeMs, cached) ->
                 if (!cached) {
-                    val serial = state.engine.setView(baseView.copy(timeMs = timeMs))
+                    val serial = state.engine.setView(baseView.copy(timeMs = timeMs).also { state.previewView = it })
                     live.requested = serial
                     if (wasCached) live.handoff = serial
                 }
@@ -201,14 +202,17 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
     var quad by remember { mutableStateOf<FloatArray?>(null, SameFloats) }
     var plane by remember { mutableStateOf<FloatArray?>(null, SameFloats) }
     var world by remember { mutableStateOf<FloatArray?>(null, SameFloats) }
-    var quadFor by remember { mutableStateOf<Long?>(null) }
-    LaunchedEffect(state.selectedId, scene, mediaRevision, state.cameraMode) {
-        if (quadFor != state.selectedId) {
-            quadFor = state.selectedId
+    var quadFor by remember { mutableStateOf<Any?>(null) }
+    val cropping = state.livePanel == EditorPanel.Crop
+    val shownChange = state.previewChange
+    LaunchedEffect(state.selectedId, scene, mediaRevision, state.cameraMode, cropping, shownChange) {
+        if (quadFor != Triple(state.selectedId, cropping, shownChange)) {
+            quadFor = Triple(state.selectedId, cropping, shownChange)
             quad = null
             plane = null
             world = null
         }
+        if (cropping && shownChange == null) return@LaunchedEffect
         snapshotFlow { state.timeMs.takeUnless { state.playing } }.collectLatest { timeMs ->
             if (timeMs == null) return@collectLatest
             quad = state.selectedId?.let { state.engine.layerQuad(it, timeMs) }
@@ -322,6 +326,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                 var lastTwoFingerTap = -1_000_000L
                 awaitEachGesture {
                     val down = awaitFirstDown()
+                    tapGeneration++
                     if (deskLayout && app.absentmotion.platform.textFieldFocused()) focusManager.clearFocus()
                     val canvasGesture = (state.selectedId == null && MultiSelect.ids.isEmpty()) || state.panZoomMode || state.livePanel == EditorPanel.Crop
                     val multi = MultiSelect.ids.takeIf { it.isNotEmpty() && state.selectedId == null && !canvasGesture && !state.playing && state.drawing == null }
@@ -335,7 +340,10 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                     var drifted = false
                     val starts = HashMap<PointerId, Offset>()
                     val startLayer = state.selected
-                    val startQuad = quad?.takeUnless { state.playing }?.let { q -> List(4) { Offset(q[2 * it], q[2 * it + 1]) * currentScale + currentOffset } }
+                    val shownQuad = quad
+                    val frameQuad = shownQuad?.let { q -> startLayer?.let { uncroppedQuad(q, it) } ?: q }
+                    val startQuad = (if (state.livePanel == EditorPanel.ColorFill || state.livePanel == EditorPanel.EditText) frameQuad else shownQuad)?.takeUnless { state.playing }
+                        ?.let { q -> List(4) { Offset(q[2 * it], q[2 * it + 1]) * currentScale + currentOffset } }
                     val planeView = plane?.let { v -> Matrix().apply { setValues(v) } }
                     val adjusting = state.pointAdjust.takeIf { state.livePanel == EditorPanel.Effects }
                     val cropFrom = startLayer?.takeIf { state.livePanel == EditorPanel.Crop && startQuad != null && it.cropIndex >= 0 }?.cropBox()
@@ -346,6 +354,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                     val worldView = world?.takeUnless { state.playing }?.let { v -> Matrix().apply { setValues(v) } }?.takeIf { it.invert(Matrix()) }
                     fun onScreen(p: Pt): Offset? = world?.takeIf { worldView != null }?.projected(p)?.let { Offset(it.x, it.y) * currentScale + currentOffset }
                     fun inLayer(at: Offset): Pt? = worldView?.inverseMap(((at - currentOffset) / currentScale).let { Pt(it.x, it.y) })
+                    val adjustBox = if (adjusting != null && worldView != null) world?.let { pivotFrame(it, frameQuad).box } else null
                     val gradientMode = startLayer != null && startQuad != null && !state.panZoomMode && state.livePanel == EditorPanel.ColorFill && startLayer.fillType == "gradient"
                     val pointGrab = if (gradientMode) -1 else points?.points?.indices?.mapNotNull { i -> onScreen(points.points[i])?.let { i to (it - down.position).getDistance() } }
                         ?.filter { it.second < 24.dp.toPx() }?.minByOrNull { it.second }?.first ?: -1
@@ -387,7 +396,9 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                             moved = event.changes.size > 1 || (position - down.position).getDistance() > viewConfiguration.touchSlop
                             if (!moved) held += pan
                         }
-                        if (moved && multi != null && multiFrom != null) {
+                        if (moved && startLayer != null && state.selectedId != startLayer.id) {
+                            held = Offset.Zero
+                        } else if (moved && multi != null && multiFrom != null) {
                             multiMoving = true
                             val ms = state.sampleMs
                             if (multiCorner >= 0 && multiQuad != null) {
@@ -433,7 +444,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                                 state.editSelected(key = "preview-handle") { it.withRotation(startLayer.rotation + turn) }
                                 continue
                             }
-                            if (startLayer.kind == "embedScene") {
+                            if (startLayer.kind == "embedScene" || (frameQuad !== shownQuad && !inside(startQuad, pivot))) {
                                 val scaled = handleScale(handle, startQuad, (startQuad[0] + startQuad[2]) / 2f, position + handleGrab, startLayer.scale, 8.dp.toPx()) ?: continue
                                 val shift = (centreKept(startQuad, pivot, startLayer.scale, scaled) / currentScale).let { Pt(it.x, it.y) }.let { planeView?.unmapVector(it) ?: it }
                                 state.editSelected(key = "preview-handle") {
@@ -445,9 +456,16 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                             state.editSelected(key = "preview-handle") { it.withTransform("scale", scaled[0], scaled[1]) }
                         } else if (moved && adjusting != null) {
                             hint = false
-                            val move = (pan + held) / currentScale
+                            val step = pan + held
                             held = Offset.Zero
-                            if (move != Offset.Zero) adjusting.move(move.x, move.y)
+                            if (step != Offset.Zero) {
+                                val from = inLayer(position - step)
+                                val to = inLayer(position)
+                                val width = adjustBox?.let { it[2] - it[0] } ?: 0f
+                                val height = adjustBox?.let { it[3] - it[1] } ?: 0f
+                                if (from != null && to != null && width > 0f && height > 0f) adjusting.move(to.x - from.x, to.y - from.y, width, height)
+                                else (step / currentScale).let { adjusting.move(it.x, it.y, state.scene.width.toFloat(), state.scene.height.toFloat()) }
+                            }
                         } else if (moved && cropFrom != null && startQuad != null && cropGrab >= 0 && fingers == 1) {
                             val d = boxFraction(startQuad, position) - boxFraction(startQuad, down.position)
                             state.setCrop(if (cropGrab == CROP_INSIDE) cropFrom.moved(d.x, d.y) else cropFrom.dragged(cropGrab, d.x, d.y, cropLock), "crop-drag")
@@ -561,12 +579,13 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
         }
         Presence(state.cameraTip && !LocalWide.current) { CameraTip(state, Modifier.align(Alignment.BottomEnd).presence()) }
         EyedropperLoupe(state, Modifier.fillMaxSize())
-        GradientHandles(state, quad.takeUnless { state.playing }, scale, Offset(dx, dy))
+        val frame = quad.takeUnless { state.playing }?.takeIf { editingText || state.panel == EditorPanel.ColorFill }?.let { q -> state.selected?.let { uncroppedQuad(q, it) } ?: q }
+        GradientHandles(state, frame, scale, Offset(dx, dy))
         CropOverlay(state, quad.takeUnless { state.playing }, scale, Offset(dx, dy))
         CropAutoView(state, quad.takeUnless { state.playing }, size, with(LocalDensity.current) { reserveEnd.toPx() }, touching)
         state.layerPoints?.let { points -> world?.takeUnless { state.playing }?.let { LayerPointsOverlay(points, it, scale, Offset(dx, dy)) } }
         if (editingText) Canvas(Modifier.fillMaxSize()) {
-            val q = quad.takeUnless { state.playing } ?: return@Canvas
+            val q = frame ?: return@Canvas
             val points = List(4) { Offset(q[2 * it] * scale + dx, q[2 * it + 1] * scale + dy) }
             for (i in 0..3) drawLine(Am.Accent, points[i], points[(i + 1) % 4], 1.dp.toPx())
             if (state.selected?.onTextPath == true) return@Canvas

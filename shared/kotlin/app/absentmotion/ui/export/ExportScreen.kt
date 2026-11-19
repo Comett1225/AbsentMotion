@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.annotation.StringRes
 import app.absentmotion.ui.home.DeskModals
 import app.absentmotion.ui.home.deskPress
+import app.absentmotion.ui.home.checkerboard
 import app.absentmotion.export.verificationLine
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.focusable
@@ -131,6 +132,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
+import androidx.compose.ui.semantics.progressBarRangeInfo
+import androidx.compose.ui.semantics.setProgress
 import app.absentmotion.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -159,6 +163,7 @@ import app.absentmotion.export.savable
 import app.absentmotion.export.sizeLabel
 import app.absentmotion.export.DeviceCapabilities
 import app.absentmotion.export.ExportPrefs
+import app.absentmotion.export.codecFailed
 import app.absentmotion.export.ExportRun
 import app.absentmotion.export.NotifyAsk
 import app.absentmotion.export.imageProblem
@@ -265,7 +270,7 @@ private val GroupGap = 18.dp
 private val FieldGap = 6.dp
 private const val Dimmed = 0.38f
 
-private val SheetKinds = setOf(ExportKind.Gif, ExportKind.Sequence)
+private val FormatKinds = setOf(ExportKind.Gif, ExportKind.Sequence, ExportKind.FrameAs)
 
 private sealed interface Phase {
     data object Idle : Phase
@@ -275,16 +280,18 @@ private sealed interface Phase {
     class Done(val kind: ExportKind, val result: ExportResult) : Phase
 }
 
+internal object SavedTemplates { var revision by androidx.compose.runtime.mutableIntStateOf(0) }
+
 private class Failure(@StringRes val title: Int, val text: UiText, val action: UiText? = null, val proceed: (() -> Unit)? = null, val hint: Boolean = false)
 
 @Composable
-internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSettings: app.absentmotion.library.AppSettings, fromProjectList: Boolean, outdated: Outdated? = null, onClose: () -> Unit) {
+internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSettings: app.absentmotion.library.AppSettings, fromProjectList: Boolean, outdated: Outdated? = null, preset: PresetShare? = null, onClose: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val bundles = remember(appSettings.bundlesFolder) { app.absentmotion.platform.bundleStore(context, appSettings.bundlesFolder) }
     val exporter = remember(bundles) { Exporter(context, engine, MediaStoreExport(context), bundles = bundles) }
-    val kinds = remember { listOf(ExportKind.Video, ExportKind.Audio, ExportKind.Package, ExportKind.Frame, ExportKind.FrameAs, ExportKind.Sequence, ExportKind.Gif) + if (fromProjectList) listOf(ExportKind.Xml) else emptyList() }
-    var kind by remember { mutableStateOf(ExportKind.Video) }
+    val kinds = remember { if (preset != null) listOf(ExportKind.Package) else listOf(ExportKind.Video, ExportKind.Audio, ExportKind.Package, ExportKind.Frame, ExportKind.FrameAs, ExportKind.Sequence, ExportKind.Gif) + if (fromProjectList) listOf(ExportKind.Xml) else emptyList() }
+    var kind by remember { mutableStateOf(if (preset != null) ExportKind.Package else ExportKind.Video) }
     val exportName = remember(scene.title) { ExportName(scene.title) }
     val prefs = remember { ExportPrefs(context) }
     val settings = remember { mutableStateMapOf<ExportKind, ExportSettings>().apply { ExportKind.entries.forEach { put(it, prefs.load(it, scene)) } } }
@@ -306,18 +313,17 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
     DisposableEffect(settings) { onDispose { persist() } }
     var page by remember { mutableStateOf<ExportKind?>(null) }
     var beforeFrame by remember { mutableStateOf(ExportKind.Video) }
-    var community by remember { mutableStateOf<app.absentmotion.export.CommunityDetails?>(null) }
+    var community by remember { mutableStateOf(preset?.let { app.absentmotion.export.CommunityDetails(scene.title.trim().take(80), creator = appSettings.communityCreator, preset = true) }) }
     var lastPage by remember { mutableStateOf(ExportKind.Gif) }
     var audioPage by remember { mutableStateOf(false) }
     var help by remember { mutableStateOf(false) }
     var acknowledged by remember { mutableStateOf<UiText?>(null) }
     var lastPhase by remember { mutableStateOf<Phase>(Phase.Idle) }
-    var packageInfo by remember { mutableStateOf(false) }
     var asTemplate by remember { mutableStateOf(false) }
     var templateInfo by remember { mutableStateOf(false) }
     var failure by remember { mutableStateOf<Failure?>(null) }
     var phase by remember { mutableStateOf<Phase>(Phase.Idle) }
-    page?.let { if (it in SheetKinds) lastPage = it }
+    page?.let { if (it in FormatKinds) lastPage = it }
     if (phase !is Phase.Idle) lastPhase = phase
     var note by remember { mutableStateOf<UiText?>(null) }
     DisposableEffect(engine) {
@@ -341,7 +347,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
         }
     }
     val videoSettings = settings.getValue(ExportKind.Video)
-    val drawMs by produceState<Double?>(null, kind, scene, videoSettings.shortSide, videoSettings.smoothing, phase is Phase.Idle) {
+    val drawMs by produceState<Double?>(null, kind, scene, videoSettings.shortSide, videoSettings.smoothing, videoSettings.fps, phase is Phase.Idle) {
         value = null
         if (kind == ExportKind.Video && phase is Phase.Idle) {
             try { delay(MeasureDelayMs); value = measureVideoDraw(engine, scene, videoSettings) }
@@ -350,7 +356,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
         }
     }
     val sequenceSettings = settings.getValue(ExportKind.Sequence)
-    val sequenceMs by produceState<Double?>(null, kind, scene, sequenceSettings.shortSide, sequenceSettings.smoothing, sequenceSettings.image, phase is Phase.Idle) {
+    val sequenceMs by produceState<Double?>(null, kind, scene, sequenceSettings.shortSide, sequenceSettings.smoothing, sequenceSettings.fps, sequenceSettings.image, phase is Phase.Idle) {
         value = null
         if (kind == ExportKind.Sequence && phase is Phase.Idle) {
             try { delay(MeasureDelayMs); value = measureSequenceFrame(engine, scene, sequenceSettings) }
@@ -383,13 +389,12 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
     val sizes = remember { ExportSizes(context) }
     val rawEstimate = if (kind == ExportKind.Gif) gifSample?.bytes ?: -1L else remember(kind, scene, settings.getValue(kind), hasAudio, report) {
         val s = settings.getValue(kind)
-        val bitrates = if (kind == ExportKind.Video) exportSize(scene, s.shortSide, even = true).let { (w, h) ->
-            report?.let { r -> r.encodeSize(s, w, h).let { (ew, eh) -> r.encoderFor(s.codec, ew, eh)?.bitrates } }
-        } else null
+        val bitrates = if (kind == ExportKind.Video) exportSize(scene, s.shortSide, even = true).let { (w, h) -> report?.bitrates(s, w, h) } else null
         estimateBytes(kind, scene, s, hasAudio, bitrates)
     }
     val sizeKey = ExportSizes.key(kind, settings.getValue(kind))
     val estimate = remember(rawEstimate, sizeKey, phase is Phase.Idle) { if (rawEstimate < 0 || sizeKey == null) rawEstimate else (rawEstimate * sizes.ratio(sizeKey)).toLong() }
+    val room = if (DESK && (kind == ExportKind.Video || kind == ExportKind.Audio)) estimate * 2 else estimate
     val check: (ExportSettings) -> Support = remember(report, scene, hasAudio) { { caps.check(it, scene, hasAudio) } }
     val hasEncoder: (String) -> Boolean = remember(report) { { mime -> report?.encodersFor(mime)?.isNotEmpty() ?: true } }
     val bitrateFits: (ExportSettings, Boolean) -> Boolean = remember(report) { { s, audioOnly -> report?.takesBitrate(s, audioOnly) ?: true } }
@@ -400,6 +405,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
     }
     val heat by thermal.state.collectAsState()
     val times = remember { ExportTimes(context) }
+    fun ratioKey(k: ExportKind, s: ExportSettings) = timeKey(k, s)?.takeUnless { k == ExportKind.Video && times.learns(s, scene, report?.probe) }
     val video = settings.getValue(ExportKind.Video)
     val support = remember(video, check) { check(video) }
     val better = remember(video, support, check) { betterChoice(video, support, check) }
@@ -426,9 +432,9 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
         ExportKind.Sequence -> sequenceMs == null
         ExportKind.Gif -> gifSample == null && !gifFailed
         else -> false
-    }
-    val timeMs = remember(modelMs, kind, phase is Phase.Idle) { modelMs?.let { m -> timeKey(kind, current)?.let { (m * sizes.ratio(it)).toLong() } ?: m } }
-    val storage = if (estimate < 0) StorageStatus.Enough else storageStatus(estimate, free)
+    } || estimate < 0 && !gifFailed
+    val timeMs = remember(modelMs, kind, phase is Phase.Idle) { modelMs?.let { m -> ratioKey(kind, current)?.let { (m * sizes.ratio(it)).toLong() } ?: m } }
+    val storage = if (estimate < 0) StorageStatus.Enough else storageStatus(room, free)
     val audioOnly = settings.getValue(ExportKind.Audio)
     val audioProblem = remember(report, audioOnly) { caps.checkAudioOnly(audioOnly) }
     val blocked = if (checking) txt(R.string.export_calculating) else exportBlock(storage, when {
@@ -453,7 +459,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
 
     BackHandler {
         when (phase) {
-            is Phase.Running -> if (DESK) onClose() else (phase as? Phase.Running)?.job?.cancel()
+            is Phase.Running -> if (!DESK) (phase as? Phase.Running)?.job?.cancel() else if ((phase as? Phase.Running)?.kind in BackgroundKinds) onClose()
             is Phase.Done -> phase = Phase.Idle
             Phase.Idle -> when {
                 audioPage -> audioPage = false
@@ -472,7 +478,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
 
     fun start(ignoreMissing: Boolean = false, aiReady: Boolean = false) {
         if (phase !is Phase.Idle || checking || !storageAccess.ready { start(ignoreMissing, aiReady) }) return
-        if (DESK && ExportRun.running) {
+        if (ExportRun.running) {
             failure = Failure(R.string.export_failed_title, txt(R.string.desk_export_busy))
             return
         }
@@ -489,7 +495,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
         if (kind in BackgroundKinds && !notifyAsk.ready { start(ignoreMissing, aiReady) }) return
         val s = settings.getValue(kind)
         val aiLevel = s.interpolationLevel.takeIf { s.interpolation == FrameInterpolation.Ai && kind in SmoothedKinds }
-        if (kind == ExportKind.Package) community?.problem(scene)?.let {
+        if (kind == ExportKind.Package) community?.problem(scene, app.absentmotion.library.MediaAccess.forApp(context))?.let {
             failure = Failure(R.string.export_failed_title, it)
             return
         }
@@ -523,7 +529,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
             return
         }
         val fetching = aiLevel?.takeIf { !AiSmooth.installed(context, it) }
-        val needed = estimate + (fetching?.let(AiSmooth::downloadBytes) ?: 0L)
+        val needed = room + (fetching?.let(AiSmooth::downloadBytes) ?: 0L)
         free = freeSpace()
         if (kind != ExportKind.Gif && storageStatus(needed, free) is StorageStatus.NotEnough) {
             failure = Failure(R.string.export_storage_title, (storageStatus(needed, free) as StorageStatus.NotEnough).message)
@@ -532,6 +538,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
         val chosen = kind
         val estimated = rawEstimate
         val modelled = modelMs
+        val ratio = ratioKey(chosen, s)
         persist()
         val alsoTemplate = asTemplate && page != ExportKind.FrameAs
         val name = exportName.next(chosen)
@@ -594,7 +601,13 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
                 outcome = true
                 if (background) app.absentmotion.platform.exportDone(result)
                 phase = Phase.Done(chosen, result)
-                timeKey(chosen, s)?.let { key -> modelled?.let { sizes.record(key, it, (System.nanoTime() - began) / 1_000_000) } }
+                if (preset != null) {
+                    withContext(NonCancellable + Dispatchers.IO) {
+                        runCatching { app.absentmotion.library.PresetStore(context).setPlaceholder(preset.preset.id, preset.choice) }
+                    }
+                    PresetSharing.revision++
+                }
+                ratio?.let { key -> modelled?.let { sizes.record(key, it, (System.nanoTime() - began) / 1_000_000) } }
                 ExportSizes.key(chosen, s)?.let { key ->
                     withContext(Dispatchers.IO) {
                         val written = result.uris.sumOf { uri ->
@@ -606,6 +619,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
                 if (alsoTemplate) withContext(NonCancellable) {
                     try {
                         TemplateStore(context).add(scene, scene.frameStart(frame), engine)
+                        SavedTemplates.revision++
                     } catch (e: Exception) {
                         Log.w("AMExport", "could not store the template", e)
                         app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.export_template_failed), app.absentmotion.platform.Toast.LENGTH_LONG).show()
@@ -619,8 +633,8 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
                 outcome = false
                 phase = Phase.Idle
                 failure = Failure(R.string.export_failed_title, when {
-                    e is OutOfMemoryError -> txt(R.string.export_error_too_large, sizeLabel(s.shortSide))
-                    e is IllegalStateException && risks.any { it.key is String } -> txt(R.string.export_error_encoder_busy)
+                    e is OutOfMemoryError -> if (chosen in SizedKinds) txt(R.string.export_error_too_large, sizeLabel(s.shortSide)) else txt(R.string.crash_reason_memory_export)
+                    risks.any { it.key is String } && generateSequence(e) { it.cause }.take(16).any(::codecFailed) -> txt(R.string.export_error_encoder_busy)
                     else -> txt(R.string.library_text_value, e.message ?: e.toString())
                 }, hint = true)
             } finally {
@@ -648,15 +662,17 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
     if (DESK) DeskExport(
         scene, frame, fromProjectList, engine, if (framing) listOf(ExportKind.FrameAs) else kinds, kind, { if (it == ExportKind.FrameAs) { beforeFrame = kind; page = it }; kind = it }, hasAudio, settings, check, hasEncoder, bitrateFits, explain, { help = true }, exportName,
         warning, support is Support.SlowSoftwareOnly, better?.let { suggestionLabel(video, it) }, ::useBetter, { acknowledged = warning },
-        free, estimate, timeMs, calculating, storage, blocked, asTemplate, { asTemplate = it }, { templateInfo = true }, { packageInfo = true }, { BundleFields(scene, engine, appSettings, community) { community = it } },
+        free, estimate, timeMs, calculating, storage, blocked, asTemplate, { asTemplate = it }, { templateInfo = true }, { BundleFields(scene, engine, appSettings, community, preset) { community = it } },
         phase, heat.level, note, { (phase as? Phase.Running)?.job?.cancel() }, { phase = Phase.Idle }, { (phase as? Phase.Done)?.let { share(context, it) } }, ::start,
-        if (framing) closeFrame else onClose, stringResource(if (framing) R.string.export_kind_frame_as else R.string.export_title),
+        if (framing) closeFrame else onClose, stringResource(if (preset != null) R.string.preset_share else if (framing) R.string.export_kind_frame_as else R.string.export_title),
+        preset?.let { { modifier -> PresetStill(scene, engine, modifier) } },
     ) else Box(
         if (card) Modifier.fillMaxSize().background(Scrim).pointerInput(Unit) {}.windowInsetsPadding(WindowInsets.systemBars.union(WindowInsets.ime)).padding(24.dp).wrapContentSize()
             .widthIn(max = if (twoPane) 980.dp else 520.dp).heightIn(max = 760.dp).enterFade(12.dp).clip(RoundedCornerShape(18.dp)).background(Am.SheetBg)
         else Modifier.fillMaxSize().background(Am.SheetBg).pointerInput(Unit) {}.enterFade(12.dp),
     ) {
-        Column(Modifier.align(Alignment.TopCenter).widthIn(max = if (twoPane) Dp.Infinity else SheetMaxWidth).fillMaxSize()) {
+        if (preset != null) BundlePage(scene, engine, appSettings, community, { community = it }, info, bar, preset, onClose)
+        else Column(Modifier.align(Alignment.TopCenter).widthIn(max = if (twoPane) Dp.Infinity else SheetMaxWidth).fillMaxSize()) {
             TitleBar(stringResource(R.string.export_title), ExportIcons.Close, stringResource(R.string.cancel)) { (phase as? Phase.Running)?.job?.cancel(); onClose() }
             if (!twoPane) info()
             val kindCards: @Composable ColumnScope.() -> Unit = {
@@ -702,46 +718,18 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
                 onBack = { page = null },
             )
         }
-        Presence(framing) {
-            PageFrame(stringResource(R.string.export_kind_frame_as), closeFrame, ExportIcons.Close, stringResource(R.string.cancel)) {
-                info()
-                ScrollArea(Modifier.weight(1f).fillMaxWidth(), Am.SheetBg, PaddingValues(start = 15.dp, end = 15.dp, top = 16.dp, bottom = 20.dp), GroupGap) {
-                    naming(ExportKind.FrameAs)
-                    Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(Am.Card).padding(15.dp), verticalArrangement = Arrangement.spacedBy(GroupGap)) {
-                        OptionsPage(ExportKind.FrameAs, scene, settings.getValue(ExportKind.FrameAs), explain, { help = true }) { settings[ExportKind.FrameAs] = it }
-                    }
-                }
-                bar()
-            }
-        }
         Presence(audioPage) {
             AudioSettingsPage(video, hasAudio, hasEncoder, { bitrateFits(it, false) }, { settings[ExportKind.Video] = it }, explain) { audioPage = false }
         }
         Presence(page == ExportKind.Package) {
-            BundlePage(scene, engine, appSettings, community, { community = it }, info, bar) { page = null }
+            BundlePage(scene, engine, appSettings, community, { community = it }, info, bar, null) { page = null }
         }
         Presence(page == ExportKind.Audio) {
             AudioOnlyPage(settings.getValue(ExportKind.Audio), hasEncoder, { bitrateFits(it, true) }, info, bar, { settings[ExportKind.Audio] = it }, explain) { page = null }
         }
-        Presence(page in SheetKinds) {
+        Presence(page in FormatKinds) {
             val shown = lastPage
-            BoxWithConstraints(Modifier.fillMaxSize().presenceScrim(Color(0x66000000)).clickable(indication = null, interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }) { page = null }) {
-                Column(
-                    Modifier.align(Alignment.BottomCenter).widthIn(max = SheetMaxWidth).fillMaxWidth().heightIn(max = maxHeight * 0.82f).presence(slide = 1f, fade = false)
-                        .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)).background(Am.Card)
-                        .clickable(indication = null, interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }) {}
-                        .navigationBarsPadding(),
-                ) {
-                    Text(stringResource(shown.title()), Modifier.padding(start = 15.dp, end = 15.dp, top = 18.dp, bottom = 4.dp), color = Navy, fontSize = 20.sp, fontWeight = FontWeight.Bold, maxLines = 1)
-                    ScrollArea(Modifier.weight(1f, fill = false), Am.Card, PaddingValues(start = 15.dp, end = 15.dp, top = 10.dp, bottom = 18.dp), GroupGap) {
-                        naming(shown)
-                        OptionsPage(shown, scene, settings.getValue(shown), explain, { help = true }) { settings[shown] = it }
-                    }
-                    Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), horizontalArrangement = Arrangement.End) {
-                        TextButton({ page = null }) { Text(stringResource(R.string.ok), color = Am.Navy) }
-                    }
-                }
-            }
+            FormatPage(shown, scene, settings.getValue(shown), info, bar, { naming(shown) }, { settings[shown] = it }, explain, { help = true }, if (shown == ExportKind.FrameAs) closeFrame else { { page = null } })
         }
 
         Presence(phase !is Phase.Idle) {
@@ -756,15 +744,6 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
 
     }
     RiskDialog(risk, Navy, Navy, Alert, Am.Card) { risk = null; it?.proceed?.invoke() }
-    if (packageInfo) {
-        AlertDialog(
-            onDismissRequest = { packageInfo = false },
-            title = { Text(stringResource(R.string.project_bundle), color = Navy) },
-            text = { Text(stringResource(R.string.one_absproj_package_with_the_project), color = Navy) },
-            confirmButton = { TextButton({ packageInfo = false }) { Text(stringResource(R.string.ok), color = Navy) } },
-            containerColor = Am.Card,
-        )
-    }
     if (templateInfo) {
         AlertDialog(
             onDismissRequest = { templateInfo = false },
@@ -854,7 +833,7 @@ private fun TitleBar(title: String, icon: ImageVector, description: String, onCl
 }
 
 @Composable
-private fun InfoBlock(free: Long, estimate: Long, timeMs: Long?, calculating: Boolean, storage: StorageStatus) {
+internal fun InfoBlock(free: Long, estimate: Long, timeMs: Long?, calculating: Boolean, storage: StorageStatus) {
     val space = when (storage) {
         StorageStatus.Enough -> null
         is StorageStatus.Low -> stringResource(R.string.export_space_low)
@@ -863,9 +842,9 @@ private fun InfoBlock(free: Long, estimate: Long, timeMs: Long?, calculating: Bo
     Column(Modifier.fillMaxWidth().background(Am.Card).padding(horizontal = 15.dp)) {
         InfoRow(stringResource(R.string.export_available_space), formatBytes(free) + (space?.let { " · $it" } ?: ""), space != null)
         Divider()
-        InfoRow(stringResource(R.string.export_estimated_size), if (estimate < 0) stringResource(R.string.export_calculating) else formatBytes(estimate), false)
+        InfoRow(stringResource(R.string.export_estimated_size), if (estimate < 0) stringResource(if (calculating) R.string.export_calculating else R.string.export_time_unknown) else formatBytes(estimate), false)
         Divider()
-        InfoRow(stringResource(R.string.export_estimated_time), timeMs?.let { timeLabel(it).text() } ?: stringResource(if (estimate < 0 || calculating) R.string.export_calculating else R.string.export_time_unknown), false)
+        InfoRow(stringResource(R.string.export_estimated_time), timeMs?.let { timeLabel(it).text() } ?: stringResource(if (calculating) R.string.export_calculating else R.string.export_time_unknown), false)
     }
 }
 
@@ -920,7 +899,7 @@ private fun TemplateToggle(checked: Boolean, onChange: (Boolean) -> Unit, onInfo
 }
 
 @Composable
-private fun ExportBar(enabled: Boolean, blocked: UiText?, pill: Boolean, onClick: () -> Unit) {
+internal fun ExportBar(enabled: Boolean, blocked: UiText?, pill: Boolean, onClick: () -> Unit) {
     Box(Modifier.fillMaxWidth().background(Am.Card).navigationBarsPadding().padding(start = 15.dp, end = 15.dp, top = 12.dp, bottom = 15.dp)) {
         if (pill) Box(
             Modifier.fillMaxWidth().height(48.dp).clip(androidx.compose.foundation.shape.CircleShape)
@@ -1045,28 +1024,17 @@ private fun VideoFields(
     scene: Scene, s: ExportSettings, hasAudio: Boolean, check: (ExportSettings) -> Support,
     onChange: (ExportSettings) -> Unit, onReason: (UiText) -> Unit, onHelp: () -> Unit, audio: @Composable () -> Unit,
 ) {
-    val rates = (VideoFrameRates + scene.fps).distinct().sorted()
+    val rates = VideoFrameRates + scene.fps
     val (w, h) = exportSize(scene, s.shortSide, even = true)
     Field(stringResource(R.string.export_resolution_heading)) {
         Box(Modifier.clip(RoundedCornerShape(4.dp)).background(Am.Card)) { ResolutionDropdown(s.shortSide, resolutionChoices(s, check), onReason) { onChange(s.copy(shortSide = it)) } }
     }
     Field(stringResource(R.string.export_format)) { Segments(containerChoices(s, check), s.container, { it.label }, onReason) { onChange(withContainer(s, it, check)) } }
     Field(stringResource(R.string.export_codec)) { Segments(codecChoices(s, check), s.codec, { it.shortName }, onReason) { onChange(s.copy(codec = it)) } }
-    Field(stringResource(R.string.export_frame_rate), "${s.fps}fps") {
-        ExportSlider(rates.indexOf(s.fps).coerceAtLeast(0).toFloat() / (rates.size - 1)) { onChange(s.copy(fps = rates[(it * (rates.size - 1)).roundToInt()])) }
-        Ends("${rates.first()}fps", "${rates.last()}fps")
-    }
-    Field(stringResource(R.string.export_interpolation), onHelp = onHelp) {
-        Segments(FrameInterpolation.entries.map { if (it == FrameInterpolation.Ai) Tier.choice(it, Feature.AiSmooth) else Choice(it) }, s.interpolation, { stringResource(it.label) }, onReason) { onChange(s.copy(interpolation = it)) }
-        Segments(levelChoices(s), s.interpolationLevel, { stringResource(it.label) }, onReason) { onChange(s.copy(interpolationLevel = it)) }
-        Hint(stringResource(R.string.export_interpolation_hint))
-        AiSmoothHint(scene, s, w, h)
-    }
-    Field(stringResource(R.string.export_motion_blur), onHelp = onHelp) {
-        Segments(MotionBlur.entries.map { Choice(it) }, s.motionBlur, { stringResource(it.label) }, onReason) { onChange(s.copy(motionBlur = it)) }
-        Hint(stringResource(R.string.export_motion_blur_hint))
-    }
-    Field(stringResource(R.string.export_quality), "%.1f Mbps".format(Locale.ROOT, videoBitrate(w, h, s) / 1e6)) {
+    FrameRateField(rates, s, onChange)
+    SmoothingFields(scene, s, w, h, onChange, onReason, onHelp)
+    val report by DeviceCapabilities.of(LocalContext.current).report.collectAsState()
+    Field(stringResource(R.string.export_quality), "%.1f Mbps".format(Locale.ROOT, videoBitrate(w, h, s, report?.bitrates(s, w, h)) / 1e6)) {
         ExportSlider(s.quality) { onChange(s.copy(quality = it)) }
         Ends(stringResource(R.string.export_quality_low), stringResource(R.string.export_quality_high))
     }
@@ -1174,7 +1142,7 @@ private fun Field(
 }
 
 @Composable
-private fun FileNameField(name: ExportName, kind: ExportKind, options: Boolean = true) {
+internal fun FileNameField(name: ExportName, kind: ExportKind, options: Boolean = true) {
     val label = stringResource(R.string.export_filename)
     val random = name.random && kind.randomNameAllowed
     val keyboard = LocalSoftwareKeyboardController.current
@@ -1255,10 +1223,15 @@ private fun <T> Segments(options: List<Choice<T>>, selected: T, label: @Composab
 }
 
 @Composable
+private fun <T> StepSlider(values: List<T>, selected: T, onPick: (T) -> Unit) =
+    ExportSlider(values.indexOf(selected).coerceAtLeast(0).toFloat() / (values.size - 1)) { onPick(values[(it * (values.size - 1)).roundToInt()]) }
+
+@Composable
 private fun ExportSlider(value: Float, onChange: (Float) -> Unit) {
     val change by rememberUpdatedState(onChange)
     Box(
         Modifier.fillMaxWidth().height(36.dp)
+            .semantics { progressBarRangeInfo = ProgressBarRangeInfo(value, 0f..1f); setProgress { change(it.coerceIn(0f, 1f)); true } }
             .pointerInput(Unit) { detectTapGestures { change(along(it.x)) } }
             .pointerInput(Unit) { detectHorizontalDragGestures(onDragStart = { change(along(it.x)) }) { c, _ -> c.consume(); change(along(c.position.x)) } },
     ) {
@@ -1278,52 +1251,70 @@ private fun PointerInputScope.along(x: Float): Float {
     return ((x - inset) / (size.width - 2 * inset).coerceAtLeast(1f)).coerceIn(0f, 1f)
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun OptionsPage(kind: ExportKind, scene: Scene, s: ExportSettings, onReason: (UiText) -> Unit, onHelp: () -> Unit, onChange: (ExportSettings) -> Unit) {
-    if (kind == ExportKind.Frame) return
-    val ask = LocalRiskAsk.current
-    val rates = (if (kind == ExportKind.Gif) GifFrameRates else (VideoFrameRates + scene.fps)).distinct().sorted()
-    val images = kind == ExportKind.Sequence || kind == ExportKind.FrameAs
-    if (images) {
-        Chips(stringResource(R.string.export_format), if (kind == ExportKind.FrameAs) "${scene.width}x${scene.height}" else null) {
-            ImageKind.entries.forEach { image ->
-                val reason = imageProblem(image, android.os.Build.VERSION.SDK_INT)
-                Chip(stringResource(image.label), s.image == image, reason == null) { reason?.let(onReason) ?: onChange(s.copy(image = image)) }
-            }
-        }
-        Chips(stringResource(R.string.export_quality), reason = if (s.image.lossy) null else txt(R.string.export_reason_image_lossless, txt(s.image.label)), onReason = onReason) {
-            ImageQualities.forEach { Chip("$it%", s.imageQuality == it) { onChange(s.copy(imageQuality = it)) } }
-        }
+private fun FrameRateField(rates: List<Int>, s: ExportSettings, onChange: (ExportSettings) -> Unit) {
+    val sorted = rates.distinct().sorted()
+    Field(stringResource(R.string.export_frame_rate), "${s.fps}fps") {
+        StepSlider(sorted, s.fps) { onChange(s.copy(fps = it)) }
+        Ends("${sorted.first()}fps", "${sorted.last()}fps")
     }
-    Chips(stringResource(R.string.export_transparent_becomes), reason = if (images && s.image.alpha) txt(R.string.export_reason_image_alpha, txt(s.image.label)) else null, onReason = onReason) {
-        Chip(stringResource(R.string.export_white), s.background == BackgroundWhite) { onChange(s.copy(background = BackgroundWhite)) }
-        Chip(stringResource(R.string.export_black), s.background == BackgroundBlack) { onChange(s.copy(background = BackgroundBlack)) }
-    }
-    if (kind == ExportKind.FrameAs) return
-    val (w, h) = exportSize(scene, s.shortSide, even = false)
-    Chips(stringResource(if (kind == ExportKind.Gif) R.string.export_size else R.string.export_resolution), "${w}x$h") {
-        (if (kind == ExportKind.Gif) GifResolutions else VideoResolutions).forEach { Chip(it.label, s.shortSide == it.shortSide) { onChange(s.copy(shortSide = it.shortSide)) } }
-    }
-    Chips(stringResource(R.string.export_frame_rate)) { rates.forEach { Chip("${it}fps", s.fps == it) { onChange(s.copy(fps = it)) } } }
+}
+
+@Composable
+private fun SmoothingFields(scene: Scene, s: ExportSettings, w: Int, h: Int, onChange: (ExportSettings) -> Unit, onReason: (UiText) -> Unit, onHelp: () -> Unit) {
     Field(stringResource(R.string.export_interpolation), onHelp = onHelp) {
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            FrameInterpolation.entries.forEach {
-                val c = if (it == FrameInterpolation.Ai) Tier.choice(it, Feature.AiSmooth) else Choice(it)
-                Chip(stringResource(it.label), s.interpolation == it, risky = c.risky) { c.tap(s.interpolation == it, ask, onReason) { onChange(s.copy(interpolation = it)) } }
-            }
-        }
-        FlowRow(Modifier.alpha(if (s.interpolation == FrameInterpolation.Off) Dimmed else 1f), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            levelChoices(s).forEach { c -> Chip(stringResource(c.value.label), s.interpolationLevel == c.value, risky = c.risky) { c.tap(s.interpolationLevel == c.value, ask, onReason) { onChange(s.copy(interpolationLevel = c.value)) } } }
-        }
+        Segments(FrameInterpolation.entries.map { if (it == FrameInterpolation.Ai) Tier.choice(it, Feature.AiSmooth) else Choice(it) }, s.interpolation, { stringResource(it.label) }, onReason) { onChange(s.copy(interpolation = it)) }
+        Segments(levelChoices(s), s.interpolationLevel, { stringResource(it.label) }, onReason) { onChange(s.copy(interpolationLevel = it)) }
         Hint(stringResource(R.string.export_interpolation_hint))
         AiSmoothHint(scene, s, w, h)
     }
     Field(stringResource(R.string.export_motion_blur), onHelp = onHelp) {
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            MotionBlur.entries.forEach { Chip(stringResource(it.label), s.motionBlur == it) { onChange(s.copy(motionBlur = it)) } }
-        }
+        Segments(MotionBlur.entries.map { Choice(it) }, s.motionBlur, { stringResource(it.label) }, onReason) { onChange(s.copy(motionBlur = it)) }
         Hint(stringResource(R.string.export_motion_blur_hint))
+    }
+}
+
+@Composable
+internal fun FormatPage(
+    kind: ExportKind, scene: Scene, s: ExportSettings, info: @Composable () -> Unit, bar: @Composable () -> Unit, naming: @Composable () -> Unit,
+    onChange: (ExportSettings) -> Unit, onReason: (UiText) -> Unit, onHelp: () -> Unit, onBack: () -> Unit,
+) {
+    val close = kind == ExportKind.FrameAs
+    PageFrame(stringResource(kind.title()), onBack, if (close) ExportIcons.Close else ExportIcons.Back, stringResource(if (close) R.string.cancel else R.string.export_back)) {
+        info()
+        ScrollArea(Modifier.weight(1f).fillMaxWidth(), Am.SheetBg, PaddingValues(start = 15.dp, end = 15.dp, top = 16.dp, bottom = 20.dp), GroupGap) {
+            naming()
+            FormatFields(kind, scene, s, onReason, onHelp, onChange)
+        }
+        bar()
+    }
+}
+
+@Composable
+private fun FormatFields(kind: ExportKind, scene: Scene, s: ExportSettings, onReason: (UiText) -> Unit, onHelp: () -> Unit, onChange: (ExportSettings) -> Unit) {
+    val images = kind != ExportKind.Gif
+    val moving = kind != ExportKind.FrameAs
+    val (w, h) = exportSize(scene, s.shortSide, even = false)
+    if (moving) Field(stringResource(if (images) R.string.export_resolution else R.string.export_size), "${w}x$h") {
+        Box(Modifier.clip(RoundedCornerShape(4.dp)).background(Am.Card)) {
+            ResolutionDropdown(s.shortSide, (if (images) VideoResolutions else GifResolutions).map { Choice(it) }, onReason) { onChange(s.copy(shortSide = it)) }
+        }
+    }
+    if (images) Field(stringResource(R.string.export_format), if (moving) null else "${scene.width}x${scene.height}") {
+        ImageKind.entries.map { Choice(it, imageProblem(it, android.os.Build.VERSION.SDK_INT)) }.chunked(3).forEach { row ->
+            Segments(row, s.image, { stringResource(it.label) }, onReason) { onChange(s.copy(image = it)) }
+        }
+    }
+    if (moving) {
+        FrameRateField(if (images) VideoFrameRates + scene.fps else GifFrameRates, s, onChange)
+        SmoothingFields(scene, s, w, h, onChange, onReason, onHelp)
+    }
+    if (images) Field(stringResource(R.string.export_quality), "${s.imageQuality}%", if (s.image.lossy) null else txt(R.string.export_reason_image_lossless, txt(s.image.label)), onReason) {
+        StepSlider(ImageQualities, s.imageQuality) { onChange(s.copy(imageQuality = it)) }
+        Ends(stringResource(R.string.export_quality_low), stringResource(R.string.export_quality_high))
+    }
+    Field(stringResource(R.string.export_transparent_becomes), reason = if (images && s.image.alpha) txt(R.string.export_reason_image_alpha, txt(s.image.label)) else null, onReason = onReason) {
+        Segments(listOf(Choice(BackgroundWhite), Choice(BackgroundBlack)), s.background, { stringResource(if (it == BackgroundWhite) R.string.export_white else R.string.export_black) }, onReason) { onChange(s.copy(background = it)) }
     }
 }
 
@@ -1345,14 +1336,11 @@ private fun Chips(label: String, value: String? = null, reason: UiText? = null, 
 }
 
 @Composable
-private fun Chip(label: String, selected: Boolean, enabled: Boolean = true, risky: Boolean = false, onClick: () -> Unit) {
+private fun Chip(label: String, selected: Boolean, enabled: Boolean = true, onClick: () -> Unit) {
     val fill = animatedColor(if (selected) Navy else Am.SheetBg)
     val text = animatedColor(if (selected) Am.OnNavyAccent else Navy)
     Box(Modifier.height(if (DESK) 30.dp else 34.dp).alpha(if (enabled) 1f else Dimmed).clip(RoundedCornerShape(17.dp)).background(fill).deskPress(17.dp).clickable(onClick = onClick).padding(horizontal = 14.dp), contentAlignment = Alignment.Center) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            if (risky) Icon(ExportIcons.Warning, null, Modifier.padding(end = 4.dp).size(13.dp), tint = if (selected) text else Alert)
-            Text(label, color = text, fontSize = if (DESK) 13.sp else 15.sp, maxLines = 1, style = Mixed)
-        }
+        Text(label, color = text, fontSize = if (DESK) 13.sp else 15.sp, maxLines = 1, style = Mixed)
     }
 }
 
@@ -1400,6 +1388,7 @@ private fun runningTitle(kind: ExportKind): Int = when (kind) {
 }
 
 private val BackgroundKinds = setOf(ExportKind.Video, ExportKind.Audio, ExportKind.Gif, ExportKind.Sequence, ExportKind.Package)
+private val SizedKinds = setOf(ExportKind.Video, ExportKind.Gif, ExportKind.Sequence)
 
 private fun timeKey(kind: ExportKind, s: ExportSettings): String? = when (kind) {
     ExportKind.Video -> if (s.interpolation == FrameInterpolation.Ai) "time.video.ai" else "time.video"
@@ -1443,9 +1432,9 @@ private fun DeskExport(
     bitrateFits: (ExportSettings, Boolean) -> Boolean, explain: (UiText) -> Unit, onHelp: () -> Unit, exportName: ExportName,
     warning: UiText?, slow: Boolean, use: UiText?, onUse: () -> Unit, onContinue: () -> Unit,
     free: Long, estimate: Long, timeMs: Long?, calculating: Boolean, storage: StorageStatus, blocked: UiText?,
-    asTemplate: Boolean, onTemplate: (Boolean) -> Unit, onTemplateInfo: () -> Unit, onPackageInfo: () -> Unit, bundleFields: @Composable () -> Unit,
+    asTemplate: Boolean, onTemplate: (Boolean) -> Unit, onTemplateInfo: () -> Unit, bundleFields: @Composable () -> Unit,
     phase: Phase, heat: ThermalLevel, note: UiText?, onCancel: () -> Unit, onDone: () -> Unit, onShare: () -> Unit,
-    onStart: () -> Unit, onClose: () -> Unit, title: String,
+    onStart: () -> Unit, onClose: () -> Unit, title: String, still: (@Composable (Modifier) -> Unit)? = null,
 ) {
     val single = kinds.size == 1
     val focus = remember { FocusRequester() }
@@ -1491,7 +1480,8 @@ private fun DeskExport(
                         Box(Modifier.weight(1f).fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Am.PreviewBg)) {
                             val done = phase as? Phase.Done
                             if (done != null) app.absentmotion.platform.ExportMediaPreview(done.kind, done.result.uris)
-                            else DeskStill(scene, if (fromList) scene.totalTime / 2 else scene.frameStart(frame), engine, Modifier.fillMaxSize())
+                            else if (still != null) still(Modifier.fillMaxSize())
+                            else DeskStill(scene, if (fromList && kind != ExportKind.Frame && kind != ExportKind.FrameAs) scene.totalTime / 2 else scene.frameStart(frame), engine, Modifier.fillMaxSize())
                         }
                         Spacer(Modifier.height(12.dp))
                         Text("${scene.width} x ${scene.height}  \u00B7  ${((scene.totalTime + 500) / 1000).let { "%d:%02d".format(Locale.ROOT, it / 60, it % 60) }}  \u00B7  ${scene.fps}fps", color = NoteGrey, fontSize = 13.sp, maxLines = 1)
@@ -1517,7 +1507,7 @@ private fun DeskExport(
                                             }
                                         }
                                     }
-                                    optionNote(kind, scene, s)?.let { Hint(it.text()) }
+                                    optionNote(kind, scene, s)?.takeIf { still == null }?.let { Hint(it.text()) }
                                 }
                                 when (kind) {
                                     ExportKind.Video -> {
@@ -1534,11 +1524,7 @@ private fun DeskExport(
                                     }
                                     ExportKind.Audio -> AudioOnlyFields(s, hasEncoder, { bitrateFits(it, true) }, onChange, onReason)
                                     ExportKind.Package -> bundleFields()
-                                    ExportKind.Xml -> Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(Am.Card).deskPress(8.dp).clickable(onClick = onPackageInfo).padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(ExportIcons.Info, null, Modifier.size(20.dp), tint = Am.HomeDim)
-                                        Text(stringResource(R.string.one_absproj_package_with_the_project), Modifier.padding(start = 10.dp), color = Navy, fontSize = 13.sp, lineHeight = 18.sp)
-                                    }
-                                    ExportKind.FrameAs, ExportKind.Sequence, ExportKind.Gif -> OptionsPage(kind, scene, s, onReason, onHelp, onChange)
+                                    ExportKind.FrameAs, ExportKind.Sequence, ExportKind.Gif -> FormatFields(kind, scene, s, onReason, onHelp, onChange)
                                     else -> Unit
                                 }
                             }
@@ -1594,8 +1580,8 @@ private fun DeskExport(
                         is StorageStatus.NotEnough -> stringResource(R.string.export_space_not_enough)
                     }
                     DeskStat(stringResource(R.string.export_available_space), formatBytes(free), space)
-                    DeskStat(stringResource(R.string.export_estimated_size), if (estimate < 0) stringResource(R.string.export_calculating) else formatBytes(estimate), null)
-                    DeskStat(stringResource(R.string.export_estimated_time), timeMs?.let { timeLabel(it).text() } ?: stringResource(if (estimate < 0 || calculating) R.string.export_calculating else R.string.export_time_unknown), null)
+                    DeskStat(stringResource(R.string.export_estimated_size), if (estimate < 0) stringResource(if (calculating) R.string.export_calculating else R.string.export_time_unknown) else formatBytes(estimate), null)
+                    DeskStat(stringResource(R.string.export_estimated_time), timeMs?.let { timeLabel(it).text() } ?: stringResource(if (calculating) R.string.export_calculating else R.string.export_time_unknown), null)
                     Spacer(Modifier.weight(1f))
                     if (!single) Row(Modifier.clip(RoundedCornerShape(8.dp)).deskPress(8.dp).clickable { onTemplate(!asTemplate) }.padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                         Text(stringResource(R.string.also_keep_a_copy_as_a), color = Navy, fontSize = 13.sp, maxLines = 1)
@@ -1672,29 +1658,29 @@ private fun DeskStill(scene: Scene, time: Int, engine: EngineThread, modifier: M
 private val SuggestedTags = listOf("Edit", "Text", "Transition", "Intro", "Effects", "3D", "Shake", "Glow", "Template", "Preset")
 
 @Composable
-private fun BundlePage(
+internal fun BundlePage(
     scene: Scene, engine: EngineThread, settings: app.absentmotion.library.AppSettings, community: app.absentmotion.export.CommunityDetails?, onChange: (app.absentmotion.export.CommunityDetails?) -> Unit,
-    info: @Composable () -> Unit, bar: @Composable () -> Unit, onBack: () -> Unit,
+    info: @Composable () -> Unit, bar: @Composable () -> Unit, preset: PresetShare?, onBack: () -> Unit,
 ) {
-    PageFrame(stringResource(R.string.project_bundle), onBack) {
+    PageFrame(stringResource(if (preset != null) R.string.preset_share else R.string.project_bundle), onBack) {
         info()
         ScrollArea(Modifier.weight(1f).fillMaxWidth(), Am.SheetBg, PaddingValues(start = 15.dp, end = 15.dp, top = 16.dp, bottom = 20.dp), GroupGap) {
-            BundleFields(scene, engine, settings, community, onChange)
+            BundleFields(scene, engine, settings, community, preset, true, onChange)
         }
         bar()
     }
 }
 
 @Composable
-private fun BundleFields(scene: Scene, engine: EngineThread, settings: app.absentmotion.library.AppSettings, community: app.absentmotion.export.CommunityDetails?, onChange: (app.absentmotion.export.CommunityDetails?) -> Unit) {
-    Field(stringResource(R.string.project_bundle)) {
+private fun BundleFields(scene: Scene, engine: EngineThread, settings: app.absentmotion.library.AppSettings, community: app.absentmotion.export.CommunityDetails?, preset: PresetShare?, preview: Boolean = false, onChange: (app.absentmotion.export.CommunityDetails?) -> Unit) {
+    if (preset == null) Field(stringResource(R.string.project_bundle)) {
         Segments(listOf(Choice(false), Choice(true)), community != null, { stringResource(if (it) R.string.bundle_community else R.string.project_bundle) }, {}) { wanted ->
             if (!wanted) onChange(null)
-            else if (community == null) onChange(app.absentmotion.export.CommunityDetails(scene.title, creator = settings.communityCreator, thumbMs = scene.totalTime / 2))
+            else if (community == null) onChange(app.absentmotion.export.CommunityDetails(scene.title.trim().take(80), creator = settings.communityCreator, thumbMs = scene.totalTime / 2))
         }
         Hint(stringResource(if (community == null) R.string.one_absproj_package_with_the_project else R.string.bundle_community_note))
     }
-    if (community != null) CommunityFields(scene, engine, settings, community, onChange)
+    if (community != null) CommunityFields(scene, engine, settings, community, preset, preview, onChange)
     SaveInField(settings)
 }
 
@@ -1723,8 +1709,9 @@ private fun SaveInField(settings: app.absentmotion.library.AppSettings) {
 }
 
 @Composable
-private fun CommunityFields(scene: Scene, engine: EngineThread, settings: app.absentmotion.library.AppSettings, community: app.absentmotion.export.CommunityDetails, onChange: (app.absentmotion.export.CommunityDetails?) -> Unit) {
-    Field(stringResource(R.string.community_thumbnail)) {
+private fun CommunityFields(scene: Scene, engine: EngineThread, settings: app.absentmotion.library.AppSettings, community: app.absentmotion.export.CommunityDetails, preset: PresetShare?, preview: Boolean, onChange: (app.absentmotion.export.CommunityDetails?) -> Unit) {
+    if (preset != null) PlaceholderField(scene, engine, preset, preview)
+    else Field(stringResource(R.string.community_thumbnail)) {
         val ratio = scene.width.coerceAtLeast(1).toFloat() / scene.height.coerceAtLeast(1)
         Box(Modifier.fillMaxWidth().aspectRatio(ratio.coerceIn(0.5f, 2f)).clip(RoundedCornerShape(8.dp)).background(Am.Card)) {
             DeskStill(scene, community.thumbMs, engine, Modifier.fillMaxSize())
@@ -1754,9 +1741,10 @@ private fun CommunityFields(scene: Scene, engine: EngineThread, settings: app.ab
         }
     }) { custom = it }
     TextBox(R.string.community_creator, community.creator, 60) { settings.communityCreator = it; onChange(community.copy(creator = it)) }
-    val bytes = remember(scene) { scene.communityBytes() }
-    Field(stringResource(R.string.community_size), "${formatBytes(bytes)} / 20 MB") {
-        if (bytes > app.absentmotion.export.CommunityLimitBytes) Text(stringResource(R.string.community_too_big, formatBytes(bytes)), color = Am.HomeAccent, fontSize = 13.sp, lineHeight = 18.sp)
+    val context = LocalContext.current
+    val bytes = remember(scene) { scene.communityBytes(app.absentmotion.library.MediaAccess.forApp(context)) }
+    Field(stringResource(R.string.community_size), "${app.absentmotion.export.communitySizeText(bytes)} / 20 MB") {
+        if (bytes > app.absentmotion.export.CommunityLimitBytes) Text(stringResource(R.string.community_too_big, app.absentmotion.export.communitySizeText(bytes)), color = Am.HomeAccent, fontSize = 13.sp, lineHeight = 18.sp)
     }
     Row(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).clickable { onChange(community.copy(confirmed = !community.confirmed)) }.padding(vertical = 6.dp),
@@ -1839,7 +1827,7 @@ private fun ThumbnailPicker(scene: Scene, engine: EngineThread, community: app.a
                     Spacer(Modifier.width(14.dp))
                     Text(stringResource(R.string.community_picker_hint), Modifier.weight(1f), color = Am.OnDark.copy(alpha = 0.7f), fontSize = 12.sp, lineHeight = 15.sp, maxLines = 2)
                 }
-                Box(Modifier.fillMaxWidth().height(lower).background(Am.TimelineBg)) { app.absentmotion.ui.editor.Timeline(state, Modifier.fillMaxSize()) }
+                Box(Modifier.fillMaxWidth().height(lower).background(Am.TimelineBg)) { Ltr { app.absentmotion.ui.editor.Timeline(state, Modifier.fillMaxSize()) } }
             }
         }
     }
@@ -1950,3 +1938,80 @@ private fun SquareChooser(width: Int, height: Int, square: app.absentmotion.expo
 private const val PickerQuickEdge = 480
 private const val PickerSharpEdge = 900
 private const val PickerSettleMs = 180L
+
+internal class PresetShare(val preset: app.absentmotion.library.SavedPreset, val choice: app.absentmotion.library.PresetPlaceholder, val onChoice: (app.absentmotion.library.PresetPlaceholder) -> Unit)
+
+internal object PresetSharing {
+    var preset by mutableStateOf<app.absentmotion.library.SavedPreset?>(null)
+    var revision by androidx.compose.runtime.mutableIntStateOf(0)
+}
+
+@Composable
+internal fun PresetShareScreen(preset: app.absentmotion.library.SavedPreset, engine: EngineThread, settings: app.absentmotion.library.AppSettings, onClose: () -> Unit) {
+    val context = LocalContext.current
+    var choice by remember { mutableStateOf(preset.placeholder) }
+    val scene by produceState<Scene?>(null, choice) {
+        value = app.absentmotion.library.placeholderScene(context, preset, choice)
+            ?: app.absentmotion.library.PresetPlaceholder.Picture(preset.pictureIndex).let { fallback -> app.absentmotion.library.placeholderScene(context, preset, fallback)?.also { choice = fallback } }
+        if (value == null) onClose()
+    }
+    scene?.let { ExportScreen(it, 0, engine, settings, fromProjectList = true, preset = PresetShare(preset, choice) { picked -> choice = picked }, onClose = onClose) }
+}
+
+@Composable
+private fun PlaceholderField(scene: Scene, engine: EngineThread, share: PresetShare, preview: Boolean) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val picker = app.absentmotion.platform.rememberMediaPicker { uri ->
+        if (uri != null) scope.launch {
+            val media = app.absentmotion.media.mediaDeclaration(context, uri)
+            if (media != null) share.onChoice(app.absentmotion.library.PresetPlaceholder.Media(media))
+            else app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.library_err_unsupported_type), app.absentmotion.platform.Toast.LENGTH_SHORT).show()
+        }
+    }
+    val choice = share.choice
+    Field(stringResource(R.string.preset_placeholder)) {
+        if (preview) PresetStill(scene, engine, Modifier.fillMaxWidth().height(200.dp).clip(RoundedCornerShape(8.dp)).checkerboard(5.dp))
+        if (share.preset.ownLook) PlaceholderRow(stringResource(if (share.preset.layer?.kind == "text") R.string.preset_placeholder_text else R.string.preset_placeholder_shape), choice == app.absentmotion.library.PresetPlaceholder.Own) {
+            share.onChoice(app.absentmotion.library.PresetPlaceholder.Own)
+        }
+        val picture = choice as? app.absentmotion.library.PresetPlaceholder.Picture
+        PlaceholderRow(stringResource(R.string.preset_placeholder_random), picture != null, {
+            Box(
+                Modifier.heightIn(min = 40.dp).alpha(if (picture != null) 1f else 0f).clip(RoundedCornerShape(4.dp)).deskPress(4.dp)
+                    .clickable(enabled = picture != null) { picture?.let { share.onChoice(it.copy(index = (it.index + kotlin.random.Random.nextInt(1, app.absentmotion.library.PresetPictures.size)) % app.absentmotion.library.PresetPictures.size)) } }
+                    .padding(horizontal = 12.dp),
+                Alignment.Center,
+            ) { Text(stringResource(R.string.preset_shuffle), color = Navy, fontSize = if (DESK) 13.sp else 15.sp, fontWeight = FontWeight.Medium, maxLines = 1) }
+        }) {
+            if (picture == null) share.onChoice(app.absentmotion.library.PresetPlaceholder.Picture(share.preset.pictureIndex))
+        }
+        PlaceholderRow(stringResource(R.string.preset_placeholder_choose), choice is app.absentmotion.library.PresetPlaceholder.Media) { picker.launch() }
+        Hint(stringResource(R.string.preset_placeholder_note))
+    }
+}
+
+@Composable
+private fun PlaceholderRow(label: String, selected: Boolean, trailing: @Composable () -> Unit = {}, onClick: () -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().heightIn(min = if (DESK) 40.dp else 48.dp).clip(RoundedCornerShape(4.dp)).background(Am.Card).deskPress(4.dp)
+            .clickable(onClick = onClick).padding(start = 10.dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Radio(selected)
+        Text(label, Modifier.weight(1f).padding(start = 10.dp), color = Navy, fontSize = if (DESK) 13.sp else 15.sp, lineHeight = if (DESK) 17.sp else 19.sp, style = Mixed)
+        trailing()
+    }
+}
+
+@Composable
+private fun PresetStill(scene: Scene, engine: EngineThread, modifier: Modifier) {
+    val picture by produceState<ImageBitmap?>(null, scene) {
+        value = try {
+            withContext(Dispatchers.IO) { app.absentmotion.library.renderPresetPicture(engine, scene)?.let { app.absentmotion.ui.home.decodeCommunityThumb(it) } }
+        } catch (e: CancellationException) { throw e } catch (e: Exception) { null }
+    }
+    Box(modifier, Alignment.Center) {
+        picture?.let { Image(it, null, Modifier.fillMaxSize().padding(10.dp), contentScale = ContentScale.Fit) }
+    }
+}

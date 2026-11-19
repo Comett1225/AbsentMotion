@@ -18,6 +18,7 @@
    "label": "Stretch",
    "type": "float",
    "default": 10,
+   "legacyDefault": 200,
    "min": 0,
    "max": 5000,
    "step": 1

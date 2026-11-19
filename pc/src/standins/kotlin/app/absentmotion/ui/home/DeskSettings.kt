@@ -186,8 +186,8 @@ private fun SideLink(label: String, onClick: () -> Unit) {
 @Composable
 internal fun DeskLanguages() {
     val context = LocalContext.current
-    val top = remember { currentLanguage(context) }
-    var chosen by remember { mutableStateOf(top) }
+    val top = remember { app.absentmotion.desk.Strings.loaded }
+    var chosen by remember { mutableStateOf(context.getSharedPreferences("language", android.content.Context.MODE_PRIVATE).getString("tag", null)?.let { currentLanguage(context) } ?: top) }
     val ui = remember { Locale.getDefault() }
     Column(Modifier.fillMaxSize()) {
         Text(stringResource(R.string.settings_language), Modifier.padding(start = 24.dp, top = 24.dp, end = 24.dp), color = Am.Navy, fontSize = 20.sp, fontWeight = FontWeight.Bold)

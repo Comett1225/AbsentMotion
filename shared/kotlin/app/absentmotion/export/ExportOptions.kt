@@ -210,6 +210,9 @@ fun videoBitrate(width: Int, height: Int, s: ExportSettings): Int {
     return (width.toDouble() * height * s.fps * bitsPerPixel).coerceAtMost(Int.MAX_VALUE.toDouble()).roundToInt()
 }
 
+fun videoBitrate(width: Int, height: Int, s: ExportSettings, bitrates: IntRange?): Int =
+    videoBitrate(width, height, s).let { rate -> bitrates?.takeIf { it.last > 0 }?.let { rate.coerceIn(it) } ?: rate }
+
 fun audioRate(s: ExportSettings): Int = if (s.audioFormat == AudioFormat.Ogg) 48000 else s.audio.sampleRate
 
 fun audioBytesPerSecond(s: ExportSettings): Double = when (s.audioFormat) {
@@ -237,7 +240,7 @@ fun estimateBytes(kind: ExportKind, scene: Scene, s: ExportSettings, hasAudio: B
     val frames = frameCount(scene, s.fps)
     return when (kind) {
         ExportKind.Video -> exportSize(scene, s.shortSide, true).let {
-            val video = videoBitrate(it.first, it.second, s).let { rate -> bitrates?.takeIf { r -> r.last > 0 }?.let { r -> rate.coerceIn(r) } ?: rate }
+            val video = videoBitrate(it.first, it.second, s, bitrates)
             (video.toDouble() + if (hasAudio) s.audio.bitrateKbps * 1000 else 0) / 8 * seconds
         }.toLong()
         ExportKind.Gif -> exportSize(scene, s.shortSide, false).let { it.first.toLong() * it.second * frames * GifBytesPerPixel }.toLong()

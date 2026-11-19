@@ -7,7 +7,6 @@ import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Matrix
 import android.media.MediaCodecList
-import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.net.Uri
 import android.os.Environment
@@ -35,6 +34,7 @@ import app.absentmotion.i18n.txt
 import app.absentmotion.media.VideoPlan
 import app.absentmotion.media.decodePicture
 import app.absentmotion.media.exifTag
+import app.absentmotion.media.openDemuxer
 import app.absentmotion.media.transcode
 import app.absentmotion.media.videoDeclaration
 import app.absentmotion.model.Layer
@@ -78,11 +78,11 @@ suspend fun readPicked(context: Context, uri: Uri): PickedMedia? = withContext(D
         val (name, size) = facts(resolver, uri)
         if (resolver.getType(uri).orEmpty().startsWith("video/")) {
             val video = videoDeclaration(context, uri) ?: return@runCatching null
-            val extractor = MediaExtractor()
-            val audio = try {
-                extractor.setDataSource(context, uri, null)
-                (0 until extractor.trackCount).map(extractor::getTrackFormat).firstOrNull { it.getString(MediaFormat.KEY_MIME)?.startsWith("audio/") == true }
-            } finally { extractor.release() }
+            val audio = runCatching {
+                openDemuxer(context, uri, "audio/").run {
+                    try { (0 until trackCount).map { getTrackFormat(it) }.firstOrNull { it.getString(MediaFormat.KEY_MIME)?.startsWith("audio/") == true } } finally { release() }
+                }
+            }.getOrNull()
             PickedMedia(uri, name, video.orientation, CompressSource(
                 true, size, video.width, video.height, video.fps ?: 30f, video.duration, audio != null,
                 audio?.getString(MediaFormat.KEY_MIME) == MediaFormat.MIMETYPE_AUDIO_AAC, (audio?.intOr(MediaFormat.KEY_BIT_RATE, 0) ?: 0) / 1000,

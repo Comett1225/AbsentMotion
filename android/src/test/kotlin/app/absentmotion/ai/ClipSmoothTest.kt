@@ -15,6 +15,7 @@ import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.exportFrameMs
 import app.absentmotion.model.layerTracks
+import app.absentmotion.model.loopStart
 import app.absentmotion.model.retimedVideo
 import app.absentmotion.model.trimmedTo
 import app.absentmotion.model.videoTimeUs
@@ -256,5 +257,28 @@ class ClipSmoothTest {
         val blur = Smoothing(FrameInterpolation.Flow, blur = MotionBlur.Medium)
         assertEquals(1f, smoothPlan(forward, media, 30, blur)!!.blurScale, 0.02f)
         assertEquals(1f, smoothPlan(backward, media, 30, blur)!!.blurScale, 0.02f)
+    }
+
+    @Test fun aLoopThatStartsBeforeTheInPointIsSmoothedWholeAndKeepsLooping() {
+        val looped = videoLayer(0, 6000, inTime = 3000, outTime = 5000, speed = "0.5", uri = "raw.mp4", attrs = mapOf("loop" to "true", "loopIn" to "1000"))
+        val plan = smoothPlan(looped, media, 30, Smoothing(FrameInterpolation.Flow))!!
+        assertEquals(1000, plan.fromMs)
+        assertEquals(4.0, plan.seconds, 1e-9)
+        val baked = smoothScene(looped.mediaFill!!, media, plan).layers.single().mediaFill!!
+        assertEquals(1000 to 5000, baked.inTime to baked.outTime)
+        val smoothed = looped.withSmoothed("smooth.mp4", "raw.mp4", "Flow:Medium:Off", media, looped, smoothFacts(looped, plan, 30))
+        assertEquals(2000 to 4000, smoothed.mediaFill!!.let { it.inTime to it.outTime })
+        assertEquals(0, smoothed.loopStart)
+        assertEquals(1000, smoothed.aiMarks.single().shift)
+        assertEquals("1000", smoothed.aiMarks.single().node["from"])
+        val back = smoothed.withoutAiMark(AiKind.Smooth)
+        assertEquals(listOf("raw.mp4", "3000", "5000", "1000"), listOf(back.mediaFill!!.uri, "${back.mediaFill!!.inTime}", "${back.mediaFill!!.outTime}", back.node["loopIn"]))
+    }
+
+    @Test fun aShortSlowDownInALongClipIsStillSmoothed() {
+        val keys = listOf(60_000 to "1", 60_100 to "0.1", 60_200 to "1").map { (ms, v) -> XmlNode("kf", linkedMapOf("t" to "${ms * 1_000_000L}.000000", "v" to v)) }
+        val long = MediaDeclaration(media.node.with("duration", "120000000"))
+        val layer = videoLayer(0, 121_000, inTime = 0, outTime = 120_000, uri = "raw.mp4").let { it.copy(node = it.node.withChild("speedMap", XmlNode("speedMap", children = keys))) }
+        assertEquals(240, smoothPlan(layer, long, 30, Smoothing(FrameInterpolation.Flow))!!.fps)
     }
 }

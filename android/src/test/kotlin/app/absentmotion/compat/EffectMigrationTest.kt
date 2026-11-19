@@ -271,16 +271,38 @@ class EffectMigrationTest {
             <shape id="4" startTime="0" endTime="1000" fillType="color" s=".rect"><transform><scale value="5.4,6.75" /></transform>
               <effect id="com.alightcreative.effects.offset"><property name="offset" type="vec2" value="-239,0" /><property name="feather" type="float" value="1" /><property name="mask" type="bool" value="false" /></effect>
               <property name="size" type="vec2" value="100,100" /></shape>
+            <embedScene id="5" startTime="0" endTime="1000"><scene width="100" height="100" fps="30" totalTime="1000">
+              <shape id="6" startTime="0" endTime="1000" fillType="color" blending="multiply" s=".rect"><transform><opacity value="0.5" /></transform></shape></scene></embedScene>
           </scene>"""
         val once = migration.migrate(Scene.parse(xml))
         val layers = once.scene.node.children
         assertEquals("app.absentmotion", once.scene.node["am"])
+        assertTrue(once.scene.fromAlight)
         fun opacity(l: XmlNode) = l.children.single { it.name == "transform" }.children.single { it.name == "opacity" }
         close(0.25f, opacity(layers[0])["value"]!!.toFloat())
         assertEquals(listOf(0.16f, 1f), opacity(layers[1]).children.map { it["v"]!!.toFloat() })
         close(0.5f, opacity(layers[2])["value"]!!.toFloat())
         close(-258.12f, layers[3].children.single { it.name == "effect" }.prop("offset")["value"]!!.split(',')[0].toFloat())
+        close(0.25f, opacity(layers[4].children.single { it.name == "scene" }.children.single())["value"]!!.toFloat())
         assertEquals(once.scene.node, migration.migrate(once.scene).scene.node)
+    }
+
+    @Test fun twoAlightPropertiesMergedIntoOnePointKeepBothAnimations() {
+        fun clouds(x: String, y: String) = effects(migration.migrate(Scene.parse("""<scene width="100" height="100" fps="30" totalTime="1000" am="com.alightcreative.motion/5.0.273">
+            <shape id="1" startTime="0" endTime="1000" fillType="color" s=".rect"><effect id="com.alightcreative.effects.clouds">
+            <property name="offsx" type="float"$x</property><property name="offsy" type="float"$y</property></effect></shape></scene>""")).scene.node).single().prop("offset")
+        val keyedX = clouds("><kf t=\"0\" v=\"0\" /><kf t=\"1\" v=\"10\" />", " value=\"4\">")
+        assertEquals(listOf(0f to listOf(0f, 4f), 1f to listOf(10f, 4f)), keyedX.keyframes.map { k -> k.t to k.v.split(',').map { it.toFloat() } })
+        val both = clouds("><kf t=\"0\" v=\"0\" /><kf t=\"1\" v=\"10\" />", "><kf t=\"0.5\" v=\"2\" /><kf t=\"1\" v=\"6\" />")
+        assertEquals(listOf(0f, 0.5f, 1f), both.keyframes.map { it.t })
+        assertEquals(listOf(listOf(0f, 2f), listOf(5f, 2f), listOf(10f, 6f)), both.keyframes.map { k -> k.v.split(',').map { it.toFloat() } })
+    }
+
+    @Test fun currentAbsentEffectsWithAnUnknownSettingAreLeftAlone() {
+        val xml = """<scene width="100" height="100" fps="30" totalTime="1000"><shape id="1" startTime="0" endTime="1000" s=".rect">
+            <effect id="absent.swing"><property name="frequency" type="float" value="2" /><property name="phase" type="float" value="0.8" /><property name="future" type="float" value="1" /></effect></shape></scene>"""
+        val scene = Scene.parse(xml)
+        assertEquals(scene.node, migration.migrate(scene).scene.node)
     }
 
     @Test fun valuesKeyframesEasingsAndFlagsAreConverted() {

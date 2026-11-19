@@ -151,6 +151,9 @@ internal suspend fun fetch(file: ModelFile, target: File, active: () -> Unit, pr
         val resume = have > 0 && code == HttpURLConnection.HTTP_PARTIAL
         check(code == HttpURLConnection.HTTP_OK || resume) { AppText.get(R.string.ai_download_failed_http, code.toString()) }
         connection.inputStream.use { CaptionModel.receive(it, part, target, file.bytes, file.sha256, active, progress, resume, R.string.ai_model_download_wrong) }
+    } catch (e: IOException) {
+        ensureActive()
+        throw e
     } finally {
         closer.cancel()
         connection.disconnect()

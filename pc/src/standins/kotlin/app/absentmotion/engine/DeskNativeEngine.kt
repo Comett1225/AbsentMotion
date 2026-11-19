@@ -13,8 +13,8 @@ class NativeEngine(backend: Backend = Backend.GANESH) : AutoCloseable {
     val openGl: Boolean get() = false
     val maxPictureSize: Int get() = 8192
 
-    fun setScene(xml: String) {
-        val error = DesktopNative.setScene(handle, xml)
+    fun setScene(xml: String, keepHeld: Boolean = false) {
+        val error = DesktopNative.setScene(handle, xml, keepHeld)
         require(error == null) { error ?: "Invalid scene" }
     }
 
@@ -33,6 +33,7 @@ class NativeEngine(backend: Backend = Backend.GANESH) : AutoCloseable {
     fun setFrame(uri: String, width: Int, height: Int, rgba: ByteArray): Boolean = DesktopNative.setFrame(handle, uri, width, height, rgba)
 
     fun clearLayerFrames() = DesktopNative.clearLayerFrames(handle)
+    fun forgetHeld() = DesktopNative.forgetHeld(handle)
     fun dropVideo(uri: String) = DesktopNative.dropVideo(handle, uri)
     fun setLayerFrame(uri: String, layer: Long, width: Int, height: Int, rgba: ByteArray) = DesktopNative.setLayerFrame(handle, uri, layer, width, height, rgba)
     fun interpolate(uri: String, layer: Long, width: Int, height: Int, first: ByteArray, second: ByteArray, before: ByteArray?, after: ByteArray?, made: ByteArray?,

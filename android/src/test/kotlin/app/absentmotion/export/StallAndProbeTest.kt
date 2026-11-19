@@ -36,6 +36,7 @@ class StallAndProbeTest {
             fail("a stalled export must not finish")
         } catch (e: ExportError) {
             assertTrue(encoderTrouble(e))
+            assertFalse(abandoned(e))
         }
         assertTrue(cleaned.get())
         assertTrue(elapsedMs(start) < 3_000)
@@ -48,7 +49,14 @@ class StallAndProbeTest {
             watched(stallMs = 200) { release.await(30, TimeUnit.SECONDS) }
             fail("a stuck export must not finish")
         } catch (e: ExportError) {
-            assertTrue(encoderTrouble(e))
+            assertFalse(encoderTrouble(e))
+            assertTrue(abandoned(e))
+            val closed = AtomicBoolean()
+            val mix = java.io.Closeable { closed.set(true) }
+            try { closingUnlessAbandoned(mix) { throw e } } catch (_: ExportError) { }
+            assertFalse(closed.get())
+            try { closingUnlessAbandoned(mix) { throw IllegalStateException() } } catch (_: IllegalStateException) { }
+            assertTrue(closed.get())
         } finally {
             release.countDown()
         }

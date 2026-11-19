@@ -5,7 +5,8 @@ Mọi thứ trên tab **Cộng đồng** đều được một người kiểm t
 ## Những gì bạn có thể chia sẻ
 
 - Dự án và preset bạn đã tạo trong AbsentMotion: bản dựng, mẫu, đoạn mở đầu, hoạt ảnh văn bản, chuyển cảnh, bộ hiệu ứng.
-- Hình ảnh, video, âm thanh và phông chữ do chính bạn tạo, hoặc bạn được phép chia sẻ (ví dụ miễn phí sử dụng, hoặc Creative Commons có ghi công trong phần mô tả).
+- Bản dựng, dự án, preset hoặc tranh ảnh của người khác, miễn là bạn ghi công họ: hãy ghi tên người tạo trong phần mô tả.
+- Hình ảnh, video, nhạc, âm thanh và phông chữ do bạn tạo, hoặc do người khác tạo và bạn ghi công trong phần mô tả.
 
 ## Không được phép
 
@@ -15,7 +16,7 @@ Mọi thứ trên tab **Cộng đồng** đều được một người kiểm t
 - **Bắt nạt và quấy rối:** đe dọa, chế giễu hoặc nhắm vào một người có thật.
 - **Thông tin cá nhân:** tên thật, địa chỉ, số điện thoại, trường học, tài khoản hoặc khuôn mặt của người bình thường, kể cả của chính bạn.
 - **Những thứ bất hợp pháp hoặc nguy hiểm:** ma túy, vũ khí, lừa đảo, cờ bạc, hack hoặc phần mềm độc hại.
-- **Tác phẩm ăn cắp:** bản dựng, dự án hoặc preset của người khác được chia sẻ như của bạn, hoặc nhạc, đoạn phim, tranh ảnh hay tài nguyên trả phí mà bạn không có quyền chia sẻ.
+- **Nhận công của người khác:** chia sẻ bản dựng, dự án, preset, tranh ảnh hoặc nhạc của họ mà không nói ai là người tạo, hoặc chia sẻ lại tài nguyên trả phí.
 - **Mạo danh người khác:** dùng tên của người sáng tạo khác, hoặc tên hay logo của một thương hiệu, như thể mục đó đến từ họ.
 - **Spam:** quảng cáo, liên kết tới các trang web khác, cùng một mục đăng lại dưới tên khác, hoặc các mục không có tác dụng gì.
 - **Mục gây hiểu lầm:** tiêu đề, hình thu nhỏ hoặc thẻ không cho thấy đúng nội dung bên trong.
@@ -24,7 +25,8 @@ Mọi thứ trên tab **Cộng đồng** đều được một người kiểm t
 
 - Hãy giữ nội dung phù hợp với mọi người. Mọi lứa tuổi đều dùng AbsentMotion.
 - Gói dự án có thể nặng tới 20 MB và preset tới 1 MB.
-- Các mục được chia sẻ theo CC BY 4.0: ai cũng có thể dùng và chỉnh sửa miễn là ghi công cho bạn.
+- Các mục được chia sẻ theo CC BY 4.0: ai cũng có thể dùng và chỉnh sửa miễn là ghi công người tạo ra chúng.
 - Tên trên mục của bạn là tên người sáng tạo mà bạn nhập. Đừng đưa bất cứ thông tin cá nhân nào vào đó.
 - Người bảo trì quyết định những gì được đăng và có thể gỡ một mục xuống bất cứ lúc nào.
 - Để báo cáo một mục, hãy dùng biểu mẫu báo cáo trong **Giới thiệu** hoặc máy chủ Discord.
+- Nếu thứ bạn tạo đã được chia sẻ ở đây và bạn muốn gỡ xuống, hãy báo cho chúng tôi trên máy chủ Discord của AbsentMotion (**Cài đặt > Tham gia Discord**).

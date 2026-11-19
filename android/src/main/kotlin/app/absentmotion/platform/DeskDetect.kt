@@ -19,6 +19,8 @@ object DeskDetect {
 
     fun wanted(facts: DisplayFacts): Boolean = facts.dex || facts.samsung && (facts.deskMode || facts.otherDisplay)
 
+    fun roomy(widthDp: Int, heightDp: Int): Boolean = widthDp >= 820 && heightDp >= 560
+
     fun samsung(manufacturer: String?): Boolean = manufacturer.equals("samsung", ignoreCase = true)
 
     fun dexOn(type: Class<*>, config: Any): Boolean = runCatching {
@@ -29,10 +31,14 @@ object DeskDetect {
         dex = dexOn(Configuration::class.java, activity.resources.configuration),
         samsung = samsung(Build.MANUFACTURER),
         deskMode = runCatching { (activity.getSystemService(Activity.UI_MODE_SERVICE) as UiModeManager).currentModeType == Configuration.UI_MODE_TYPE_DESK }.getOrDefault(false),
-        otherDisplay = runCatching { (activity.display?.displayId ?: Display.DEFAULT_DISPLAY) != Display.DEFAULT_DISPLAY }.getOrDefault(false),
+        otherDisplay = runCatching { displayId(activity) != Display.DEFAULT_DISPLAY }.getOrDefault(false),
     )
 
+    @Suppress("DEPRECATION")
+    private fun displayId(activity: Activity): Int =
+        if (Build.VERSION.SDK_INT >= 30) activity.display?.displayId ?: Display.DEFAULT_DISPLAY else activity.windowManager.defaultDisplay.displayId
+
     fun refresh(activity: Activity) {
-        DeskLayout.detected = forced || wanted(facts(activity))
+        DeskLayout.detected = forced || wanted(facts(activity)) && activity.resources.configuration.let { roomy(it.screenWidthDp, it.screenHeightDp) }
     }
 }

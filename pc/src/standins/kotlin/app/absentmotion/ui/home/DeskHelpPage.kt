@@ -51,8 +51,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.R
 import app.absentmotion.desk.DeskBack
-import app.absentmotion.i18n.currentLanguage
-import app.absentmotion.platform.LocalContext
 import app.absentmotion.ui.theme.Am
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -165,7 +163,7 @@ internal fun helpBlocks(html: String, link: SpanStyle, open: (String) -> Unit): 
                     WidthAttr.find(attrs)?.groupValues?.get(1)?.toIntOrNull() ?: 0, HeightAttr.find(attrs)?.groupValues?.get(1)?.toIntOrNull() ?: 0,
                 )
             }
-            "h1", "h2", "h3", "p", "li", "td", "th", "figcaption" -> if (closing) { flush(); if (name == "li") marker = ""; if (name == "figcaption") kind = "p" } else {
+            "h1", "h2", "h3", "p", "li", "td", "th", "figcaption" -> if (closing) { if (!started && name == kind && (name == "td" || name == "th")) row += AnnotatedString(""); flush(); if (name == "li") marker = ""; if (name == "figcaption") kind = "p" } else {
                 flush()
                 kind = name
                 id = IdAttr.find(attrs)?.groupValues?.get(1)
@@ -211,9 +209,8 @@ private fun HelpPicture(file: File?, block: HelpBlock.Picture) {
 
 @Composable
 internal fun DeskHelpReader(start: String, onTitle: ((String) -> Unit)?, onClose: () -> Unit) {
-    val context = LocalContext.current
     val links = LocalUriHandler.current
-    val tag = remember { currentLanguage(context).tag }
+    val tag = remember { app.absentmotion.desk.Strings.loaded.tag }
     val history = remember { mutableStateListOf(start) }
     var anchor by remember { mutableStateOf<String?>(null) }
     LaunchedEffect(start) { if (history.last() != start) { history.clear(); history += start } }

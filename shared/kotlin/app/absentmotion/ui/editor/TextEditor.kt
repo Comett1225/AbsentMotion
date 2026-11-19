@@ -18,6 +18,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -95,6 +96,7 @@ internal fun TextEditor(state: EditorState, ui: TextEditUi = remember { TextEdit
     val layer = state.selected ?: return
     val context = LocalContext.current
     val library = remember { state.engine.fonts ?: FontLibrary(context) }
+    val scope = rememberCoroutineScope()
     val keyboard = LocalSoftwareKeyboardController.current
     var popup by remember { mutableStateOf("") }
     var leaving by remember { mutableStateOf(false) }
@@ -176,7 +178,11 @@ internal fun TextEditor(state: EditorState, ui: TextEditUi = remember { TextEdit
                         }
                     }
                     "font" -> FontStrip(library, layer.font, Modifier.padding(top = 42.dp),
-                        onPick = { name -> library.remember(name); state.editSelected { it.withFont(name) } },
+                        onPick = { name -> scope.launch {
+                            if (library.resolve(name, download = true) == null && FontName.parse(name).source == "googlefonts") {
+                                app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.font_load_failed_body), app.absentmotion.platform.Toast.LENGTH_LONG).show()
+                            } else { library.remember(name); state.edit { it.update(layer.id, state.sampleMs) { l -> l.withFont(name) } } }
+                        } },
                         onViewAll = { ui.restoreIme = ui.imeShown; keyboard?.hide(); ui.browser = true })
                     "color" -> ColorPicker(state, layer, Modifier.align(Alignment.TopEnd).padding(top = 42.dp).size(304.dp, 128.dp).background(Am.Panel))
                 }
@@ -202,7 +208,8 @@ private fun TextContent(state: EditorState, layer: Layer, ui: TextEditUi, modifi
         if (restore) ui.refocus(keyboard)
     }
     Box(modifier.background(Am.TimelineBg).padding(4.dp).border(1.dp, Am.Accent.copy(alpha = .5f), RoundedCornerShape(2.dp)), contentAlignment = Alignment.CenterStart) {
-        BasicTextField(value, { next ->
+        BasicTextField(value, { typed ->
+            val next = typed.copy(text = typed.text.withPlainLineBreaks())
             value = next
             if (next.text != sent) {
                 sent = next.text
@@ -233,7 +240,7 @@ private fun FontStrip(library: FontLibrary, current: String, modifier: Modifier,
                 val active = name == current
                 Row(Modifier.width(if (header != null) 85.dp else 65.dp).fillMaxHeight()
                     .then(if (header != null) Modifier.background(Brush.horizontalGradient(listOf(Am.Chosen.copy(alpha = 0.69f), Am.Chosen.copy(alpha = 0f))), RoundedCornerShape(topStart = 5.dp, bottomStart = 5.dp)) else Modifier)) {
-                    if (header != null) Icon(header, null, Modifier.width(20.dp).fillMaxHeight().padding(2.dp), tint = if (header == TextIcons.FilledStar) Am.Gold else Am.OnDark)
+                    if (header != null) Icon(header, null, Modifier.width(20.dp).fillMaxHeight().padding(2.dp), tint = if (header == TextIcons.FilledStar) Am.Favorite else Am.OnDark)
                     Column(Modifier.width(65.dp).fillMaxHeight().padding(3.dp).clip(RoundedCornerShape(5.dp))
                         .border(if (active) 1.dp else 0.dp, if (active) Am.Accent else Color.Transparent, RoundedCornerShape(5.dp))
                         .tutorialGuard().clickable { onPick(name) }.padding(horizontal = 2.dp), horizontalAlignment = Alignment.CenterHorizontally) {

@@ -241,14 +241,29 @@ SkV3 Illuminate(const LightSet& lights, SkV3 normal, SkV3 position) {
     return sum;
 }
 
-bool CameraFrame(const std::vector<Layer>& layers, const Layer& camera, int width, int height, double timeMs, SkPoint corners[4]) {
+bool CameraFrame(const std::vector<Layer>& layers, const Layer& camera, int width, int height, double timeMs, SkPoint corners[4], bool depthOrder) {
     if (width <= 0 || height <= 0) return false;
     const Placement p = EffectivePlacement(layers, camera, timeMs);
-    const float distance = camera.camera.orthographic ? std::max(-p.z, kNearest) : -p.z;
-    if (!(distance > 0)) return false;
-    const float reach = distance / FocalLength(width, height, camera.camera.fov.get(0, camera.localTime(timeMs), kDefaultFov));
+    const bool flat = camera.camera.orthographic;
+    const float focal = FocalLength(width, height, camera.camera.fov.get(0, camera.localTime(timeMs), kDefaultFov));
+    const float reach = (flat ? std::max(-p.z, kNearest) : 1) / focal;
+    const SkM44 turn = SkM44::Rotate({0, 0, 1}, p.rotation * 3.14159265f / 180) * (depthOrder ? p.tilt : SkM44());
     const float w = width * 0.5f * reach, h = height * 0.5f * reach;
-    SkRect::MakeLTRB(-w, -h, w, h).toQuad(corners);
+    const SkPoint offsets[4] = {{-w, -h}, {w, -h}, {w, h}, {-w, h}};
+    bool seen = true;
+    for (int i = 0; seen && i < 4; i++) {
+        const SkV4 side = turn.map(offsets[i].fX, offsets[i].fY, flat ? 0 : 1, 0);
+        const SkV4 ray = flat ? turn.map(0, 0, 1, 0) : side;
+        const SkV4 from = flat ? SkV4{p.location.fX + side.x, p.location.fY + side.y, p.z + side.z, 1} : SkV4{p.location.fX, p.location.fY, p.z, 1};
+        const float t = -from.z / ray.z;
+        seen = std::isfinite(t) && (flat || t > 0);
+        if (seen) corners[i] = {from.x + t * ray.x, from.y + t * ray.y};
+    }
+    if (seen) return true;
+    const float distance = flat ? std::max(-p.z, kNearest) : -p.z;
+    if (!(distance > 0)) return false;
+    const float side = distance / focal;
+    SkRect::MakeLTRB(-width * 0.5f * side, -height * 0.5f * side, width * 0.5f * side, height * 0.5f * side).toQuad(corners);
     SkMatrix::Translate(p.location.fX, p.location.fY).preRotate(p.rotation).mapPoints({corners, 4});
     return true;
 }

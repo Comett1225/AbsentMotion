@@ -35,16 +35,36 @@ fun importSvg(text: String, title: String, host: Scene, startTime: Int, endTime:
 }
 
 private val EntityDecl = Regex("<!ENTITY\\s+([^\\s%]+)\\s+(?:\"([^\"]*)\"|'([^']*)')\\s*>")
-private val DoctypeDecl = Regex("<!DOCTYPE[^\\[>]*(?:\\[(.*?)]\\s*)?>", RegexOption.DOT_MATCHES_ALL)
 private val EntityRef = Regex("&([A-Za-z_][\\w.-]*);")
 private val PredefinedEntities = setOf("amp", "lt", "gt", "quot", "apos")
 
 internal fun plainSvgText(text: String): String {
     val clean = text.removePrefix("\uFEFF").trimStart()
-    val doctype = DoctypeDecl.find(clean) ?: return clean
-    val values = EntityDecl.findAll(doctype.groupValues[1]).associate { it.groupValues[1] to it.groupValues[2].ifEmpty { it.groupValues[3] }.take(1000) }
-    return EntityRef.replace(clean.removeRange(doctype.range)) { ref ->
-        if (ref.groupValues[1] in PredefinedEntities) ref.value else (values[ref.groupValues[1]] ?: "").replace(EntityRef, "")
+    val start = clean.indexOf("<!DOCTYPE")
+    if (start < 0) return clean
+    val head = clean.indexOfAny(charArrayOf('[', '>'), start)
+    if (head < 0) return clean
+    var end = head
+    var subset = ""
+    if (clean[head] == '[') {
+        var close = clean.indexOf(']', head)
+        while (close >= 0) {
+            var i = close + 1
+            while (i < clean.length && clean[i].isWhitespace()) i++
+            if (i < clean.length && clean[i] == '>') break
+            close = clean.indexOf(']', close + 1)
+        }
+        if (close < 0) return clean
+        subset = clean.substring(head + 1, close)
+        end = clean.indexOf('>', close)
+    }
+    val values = EntityDecl.findAll(subset).associate { it.groupValues[1] to it.groupValues[2].ifEmpty { it.groupValues[3] }.take(1000).replace(EntityRef, "") }
+    var room = max(clean.length, 1 shl 20)
+    return EntityRef.replace(clean.removeRange(start, end + 1)) { ref ->
+        if (ref.groupValues[1] in PredefinedEntities) ref.value else (values[ref.groupValues[1]] ?: "").also {
+            room -= it.length
+            require(room >= 0) { AppText.get(R.string.svg_err_invalid) }
+        }
     }
 }
 

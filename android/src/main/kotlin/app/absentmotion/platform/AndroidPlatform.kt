@@ -58,13 +58,14 @@ fun SceneSurface(engine: app.absentmotion.engine.EngineThread, divisor: Int, siz
     androidx.compose.ui.viewinterop.AndroidView(modifier = if (Build.VERSION.SDK_INT < 33) modifier.clipToBounds() else modifier, factory = { context ->
         android.view.SurfaceView(context).apply {
             onView(this)
+            engine.attach(this)
             holder.addCallback(object : android.view.SurfaceHolder.Callback {
                 override fun surfaceCreated(holder: android.view.SurfaceHolder) {}
-                override fun surfaceChanged(holder: android.view.SurfaceHolder, format: Int, width: Int, height: Int) = engine.attach(holder.surface).let {}
-                override fun surfaceDestroyed(holder: android.view.SurfaceHolder) = engine.detach()
+                override fun surfaceChanged(holder: android.view.SurfaceHolder, format: Int, width: Int, height: Int) = engine.attach(this@apply, holder.surface)
+                override fun surfaceDestroyed(holder: android.view.SurfaceHolder) = engine.detach(holder.surface)
             })
         }
-    }, update = { view ->
+    }, onRelease = { engine.forget(it) }, update = { view ->
         if (divisor > 1 && size.width > 0) view.holder.setFixedSize((size.width / divisor).coerceAtLeast(1), (size.height / divisor).coerceAtLeast(1))
         else view.holder.setSizeFromLayout()
     })
@@ -106,13 +107,17 @@ suspend fun slotPicture(context: Context, uri: String, video: Boolean): androidx
 
 class MediaPicker(private val launchBlock: () -> Unit) { fun launch() = launchBlock() }
 @androidx.compose.runtime.Composable
-fun rememberMediaPicker(videoOnly: Boolean = false, onResult: (Uri?) -> Unit): MediaPicker {
+fun rememberMediaPicker(videoOnly: Boolean = false, imageOnly: Boolean = false, onResult: (Uri?) -> Unit): MediaPicker {
     val context = LocalContext.current
     val launcher = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri != null) runCatching { context.contentResolver.takePersistableUriPermission(uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION) }
         onResult(uri)
     }
-    val wanted = if (videoOnly) androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.VideoOnly else androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageAndVideo
+    val wanted = when {
+        videoOnly -> androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.VideoOnly
+        imageOnly -> androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly
+        else -> androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageAndVideo
+    }
     return MediaPicker { launcher.launch(androidx.activity.result.PickVisualMediaRequest(wanted)) }
 }
 class DocumentPicker(private val launchBlock: () -> Unit) { fun launch() = launchBlock() }
@@ -214,7 +219,7 @@ private val exportJobs = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Su
 
 fun exportScope(own: kotlinx.coroutines.CoroutineScope): kotlinx.coroutines.CoroutineScope = exportJobs
 
-fun exportEngine(engine: app.absentmotion.engine.EngineThread): app.absentmotion.engine.EngineThread = engine
+fun exportEngine(engine: app.absentmotion.engine.EngineThread): app.absentmotion.engine.EngineThread = engine.also(app.absentmotion.export.ExportEngine::exporting)
 
 fun exportDone(result: app.absentmotion.export.ExportResult) {}
 
@@ -471,7 +476,20 @@ internal fun desktopFrameReader(context: Context, uri: String): app.absentmotion
     app.absentmotion.media.MediaBackend.ffamp(context, Uri.parse(openableUri(uri)), "video/")?.softFrames(context, uri)
 
 fun rawFrameImage(rgba: ByteArray, width: Int, height: Int): androidx.compose.ui.graphics.ImageBitmap =
-    android.graphics.Bitmap.createBitmap(width, height, android.graphics.Bitmap.Config.ARGB_8888).apply { copyPixelsFromBuffer(java.nio.ByteBuffer.wrap(rgba)) }.androidImageBitmap()
+    android.graphics.Bitmap.createBitmap(width, height, android.graphics.Bitmap.Config.ARGB_8888).apply { copyPixelsFromBuffer(java.nio.ByteBuffer.wrap(premultiplied(rgba))) }.androidImageBitmap()
+
+internal fun premultiplied(rgba: ByteArray): ByteArray {
+    var i = 3
+    while (i < rgba.size && rgba[i] == (-1).toByte()) i += 4
+    if (i >= rgba.size) return rgba
+    val out = rgba.copyOf()
+    while (i < out.size) {
+        val a = out[i].toInt() and 0xFF
+        if (a != 255) for (c in i - 3 until i) out[c] = (((out[c].toInt() and 0xFF) * a + 127) / 255).toByte()
+        i += 4
+    }
+    return out
+}
 
 fun releaseFrameImage(image: androidx.compose.ui.graphics.ImageBitmap) = Unit
 
@@ -531,4 +549,13 @@ fun rememberFolderPicker(start: String?, onPicked: (String) -> Unit): () -> Unit
     return { runCatching { launcher.launch(initial) }.onFailure { runCatching { launcher.launch(null) } } }
 }
 
-fun mediaTrouble(context: android.content.Context, uri: android.net.Uri): String? = null
+fun mediaTrouble(context: android.content.Context, uri: android.net.Uri): String? {
+    val format = runCatching {
+        app.absentmotion.media.openDemuxer(context, uri, "video/").run {
+            try { (0 until trackCount).map { getTrackFormat(it) }.firstOrNull { it.getString(android.media.MediaFormat.KEY_MIME)?.startsWith("video/") == true } } finally { release() }
+        }
+    }.getOrNull() ?: return null
+    val decodable = runCatching { app.absentmotion.media.decoderNames(format, anySize = true).isNotEmpty() }.getOrDefault(true) ||
+        runCatching { app.absentmotion.media.MediaBackend.rescue?.reads(context, uri, "video/") == true }.getOrDefault(false)
+    return if (decodable) null else context.getString(R.string.media_error_no_decoder)
+}

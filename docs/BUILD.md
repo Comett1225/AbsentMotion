@@ -209,7 +209,8 @@ compiles the desktop app. `--full` compiles `foss`, `compat` and `compat32`, run
 floor and page alignment of the release libraries (when they are not built it ends as INCOMPLETE with exit code 3) and runs the desktop tests.
 Logs are in `build/check/`. Two runs can work in the same folder at the same time: each keeps its own results, and the second waits
 while the first runs its Gradle build (a second Gradle build in the same folder deletes class files the first one is using). A check that cannot run on this machine prints a line that starts
-with `skipped:` (the shader check needs `tools/sksl_check/build.sh` once, the publish check needs the private word list).
+with `skipped:` (the shader check needs `tools/sksl_check/build.sh` once, the publish check needs the private word list); in `--full`
+any skipped check except the publish check ends it as INCOMPLETE with exit code 3.
 
 The unit test tasks name what the tests read as inputs (the shared assets and texts, `testdata/`, the 12 fps pictures, the host libraries,
 `version.properties`), so Gradle runs the tests again when one of those changes and skips them otherwise. A test that reads another file needs
@@ -309,7 +310,7 @@ is the build time in hex, so every build gets a fresh name, and the app deletes 
 `~/.cache/absentmotion` through `linux/start.sh`. A JDK 21 dynamic archive is only made when none exists and is not
 rebuilt when it no longer matches, which is why the file name carries the key. A Mac build for a release
 (`-Ptarget=macos-<arch>`) gets the same base archive in its runtime image and no app archive, because the signed app must not be
-written to; `installMac` keeps making its own full archive in the installed copy. The runtime image also carries `jdk.localedata`, so dates use each language's own month names and order.
+written to; `installMac` keeps making its own full archive in the installed copy. The runtime image also carries `jdk.localedata`, so dates use each language's own month names and order, and `jdk.management`, so the AI time and memory checks see the computer's real memory.
 
 **Timing tests.** `AM_TIMING=1 ./gradlew test --tests app.absentmotion.pc.ExportTimingTest` exports a 10-second 1080x1920
 scene (a video, a picture and four effects) and prints frames per second for each stage (engine drawing and read-back,

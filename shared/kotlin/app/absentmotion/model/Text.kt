@@ -9,7 +9,9 @@ val Layer.textSize: Float get() = node["size"]?.finiteFloat() ?: 18f
 val Layer.wrapWidth: Int get() = node["wrapWidth"]?.toIntOrNull() ?: 512
 val Layer.textAlign: String get() = node["align"] ?: "left"
 val Layer.onTextPath: Boolean get() = kind == "text" && effects.any { it["id"] == "absent.textpath" && it["hidden"] != "true" }
-fun Layer.withContent(value: String) = copy(node = node.withChild("content", XmlNode("content", text = value)))
+private val ControlLineBreaks = Regex("[\u000B\u000C\u0085]")
+fun String.withPlainLineBreaks() = replace(ControlLineBreaks, "\n")
+fun Layer.withContent(value: String) = copy(node = node.withChild("content", XmlNode("content", text = value.withPlainLineBreaks())))
 fun Layer.withFont(value: String) = copy(node = node.with("font", value))
 fun Layer.withTextSize(value: Float) = copy(node = node.with("size", formatFloats(floatArrayOf(value))))
 fun Layer.withWrapWidth(value: Int) = copy(node = node.with("wrapWidth", "${value.coerceAtLeast(1)}"))

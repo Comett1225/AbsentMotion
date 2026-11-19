@@ -125,7 +125,7 @@ static void DrawCameraFrames(SkCanvas* canvas, const Scene& scene, double timeMs
         if (l.kind != "camera" || !l.activeAt(timeMs)) continue;
         const bool selected = l.id == selectedId;
         SkPoint q[4];
-        if (!(seenThrough && &l == active) && CameraFrame(scene.layers, l, scene.width, scene.height, timeMs, q)) {
+        if (!(seenThrough && &l == active) && CameraFrame(scene.layers, l, scene.width, scene.height, timeMs, q, scene.depthOrder)) {
             toTarget.mapPoints(q);
             const SkPath box = SkPath::Polygon({q, 4}, true);
             if (selected) {

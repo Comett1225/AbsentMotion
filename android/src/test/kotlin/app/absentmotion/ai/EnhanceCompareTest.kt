@@ -56,6 +56,13 @@ class EnhanceCompareTest {
         assertNear(seen, under(next, from + step))
     }
 
+    @Test fun wheelingInAndBackOutLandsUnzoomed() {
+        val focus = Offset(200f, 100f)
+        val view = (1..2).fold(CompareView()) { v, _ -> v.zoomed(compareWheel(-1f), focus, frame) }
+        assertEquals(CompareView(), (1..2).fold(view) { v, _ -> v.zoomed(compareWheel(1f), focus, frame) })
+        assertTrue(CompareView().zoomed(1.0005f, focus, frame).zoom > 1f)
+    }
+
     @Test fun zoomStaysBetweenOneAndEight() {
         assertEquals(CompareView(), CompareView().zoomed(0.5f, Offset(100f, 100f), frame))
         assertEquals(COMPARE_MAX_ZOOM, CompareView().zoomed(100f, Offset(100f, 100f), frame).zoom)

@@ -156,6 +156,12 @@ private fun blend(a: String, b: String, u: Float): String {
         }
         return formatColor(out)
     }
+    val p = a.toBooleanStrictOrNull()
+    val q = b.toBooleanStrictOrNull()
+    if (p != null && q != null) {
+        val from = if (p) 1f else 0f
+        return (from + ((if (q) 1f else 0f) - from) * u >= 0.5f).toString()
+    }
     val x = a.split(',').map { it.trim().finiteFloat() }
     val y = b.split(',').map { it.trim().finiteFloat() }
     if (x.size != y.size || x.any { it == null } || y.any { it == null }) return if (u < 1f) a else b

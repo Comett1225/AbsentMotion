@@ -201,11 +201,12 @@ public:
     Target* attach(ANativeWindow* window, bool forEncoder) override;
     void detach(Target* target) override;
     std::string timing(Target* target) override;
-    bool setScene(const std::string& xml, std::string* error) override {
-        fEffects.forgetHeld();
+    bool setScene(const std::string& xml, std::string* error, bool keepHeld) override {
+        if (!keepHeld) fEffects.forgetHeld();
         return ParseScene(xml, &fScene, error);
     }
     std::string loadEffect(const std::string& xml) override { return fEffects.load(xml); }
+    void forgetHeld() override { fEffects.forgetHeld(); }
     int maxPictureSize() const override { return fGraphite ? fGraphite->maxTextureSize() : fGanesh->maxTextureSize(); }
     bool setPicture(const std::string& uri, int64_t layerId, AHardwareBuffer* buffer,
                     const void* pixels, int width, int height, size_t rowBytes, bool opaque, int colorStandard, int colorRange, const FrameCrop& crop) override;
@@ -284,7 +285,7 @@ private:
         LayerEffects fx;
         fx.active = [this](const Layer& layer) { return fEffects.active(layer); };
         fx.lifted = [this](const Layer& layer) { return fEffects.lifted(layer); };
-        fx.spills = [this](const Layer& layer) { return fEffects.spills(layer); };
+        fx.spills = [this](const Layer& layer, double time) { return fEffects.spills(layer, time); };
         fx.behind = [this](const Layer& layer) { return fEffects.behind(layer); };
         fx.wraps = [this](const Layer& layer) { return fEffects.wraps(layer); };
         fx.steady = [this](const Layer& layer, float from, float to) { return fEffects.steady(layer, from, to); };
@@ -372,6 +373,7 @@ private:
         uint64_t seen = 0;
     };
     static constexpr uint64_t kUploadIdle = 32;
+    static constexpr uint64_t kEncoderWaitNs = 5'000'000'000ull;
     std::map<std::pair<uint32_t, bool>, Uploaded> fUploads;
     uint64_t fDraws = 0;
     sk_sp<SkImage> upload(const sk_sp<SkImage>& image, bool mipmapped);
@@ -532,8 +534,10 @@ bool EngineImpl::initGl(std::string* error) {
                        EGL_RED_SIZE, 8, EGL_GREEN_SIZE, 8, EGL_BLUE_SIZE, 8, EGL_ALPHA_SIZE, 8, EGL_STENCIL_SIZE, 8,
                        EGL_RECORDABLE_ANDROID, EGL_TRUE, EGL_NONE};
     EGLint count = 0;
+    bool recordable = true;
     if (!eglChooseConfig(fDisplay, wanted, &fConfig, 1, &count) || count < 1) {
         wanted[14] = EGL_NONE;
+        recordable = false;
         if (!eglChooseConfig(fDisplay, wanted, &fConfig, 1, &count) || count < 1) return fail("OpenGL ES 3 config");
     }
     const EGLint version[] = {EGL_CONTEXT_CLIENT_VERSION, 3, EGL_NONE};
@@ -552,7 +556,7 @@ bool EngineImpl::initGl(std::string* error) {
     if (!fGanesh) { *error = "Ganesh OpenGL context creation failed"; return false; }
     fInfo = std::string("{\"backend\":\"gl\",\"device\":\"") + Printable((const char*)glGetString(GL_RENDERER)) +
             "\",\"vendor\":\"" + Printable((const char*)glGetString(GL_VENDOR)) + "\",\"api\":\"" +
-            Printable((const char*)glGetString(GL_VERSION)) + "\",\"displayTiming\":" + (fPresentationTime ? "true" : "false") +
+            Printable((const char*)glGetString(GL_VERSION)) + "\",\"displayTiming\":" + (fPresentationTime && recordable ? "true" : "false") +
             ",\"deviceExtensions\":[]}";
     LOGI("engine ready: %s", fInfo.c_str());
     return true;
@@ -1016,6 +1020,7 @@ bool EngineImpl::setPicture(const std::string& uri, int64_t layerId, AHardwareBu
     fVideoFrames.erase(key);
     fMasks.erase(key);
     if (!image) { fPictures.erase(key); return false; }
+    if (!fPictures.count(key)) fEffects.forgetHeld();
     fPictures[key] = std::move(image);
     if (mask) fMasks[key] = std::move(mask);
     return true;
@@ -1411,11 +1416,13 @@ bool EngineImpl::layerQuad(int64_t layerId, double timeMs, float xy[8]) {
 }
 
 bool EngineImpl::propertyNumbers(int64_t layerId, int effect, const std::string& name, double timeMs, float values[3]) {
+    const SceneScope scope(fScene);
     const Layer* layer = fScene.layer(layerId);
     return layer && PropertyNumbers(*layer, effect, name, timeMs, values);
 }
 
 bool EngineImpl::layerMatrix(int64_t layerId, double timeMs, float m[18]) {
+    const SceneScope scope(fScene);
     SetCameraView(fCameraView);
     const Layer* layer = fScene.layer(layerId);
     if (!layer) return false;
@@ -1635,11 +1642,11 @@ int EngineImpl::frame(Target* target, int64_t presentTimeNs, bool sync,
         if (r != VK_SUCCESS) return r;
     }
     uint32_t index = 0;
-    r = vkAcquireNextImageKHR(fDevice, target->swapchain, UINT64_MAX, acquired, VK_NULL_HANDLE, &index);
+    r = vkAcquireNextImageKHR(fDevice, target->swapchain, target->encoder ? kEncoderWaitNs : UINT64_MAX, acquired, VK_NULL_HANDLE, &index);
     if (r != VK_SUCCESS && r != VK_SUBOPTIMAL_KHR) {
         vkDestroySemaphore(fDevice, acquired, nullptr);
         LOGE("vkAcquireNextImageKHR failed (%d)", r);
-        if (r != VK_ERROR_OUT_OF_DATE_KHR && r != VK_ERROR_SURFACE_LOST_KHR) this->failGpu(target);
+        if (r != VK_ERROR_OUT_OF_DATE_KHR && r != VK_ERROR_SURFACE_LOST_KHR && r != VK_TIMEOUT && r != VK_NOT_READY) this->failGpu(target);
         return r;
     }
 

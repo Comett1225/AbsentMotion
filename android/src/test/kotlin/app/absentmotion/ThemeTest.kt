@@ -108,7 +108,7 @@ class ThemeTest {
             for (surface in editorSurfaces) {
                 for ((label, text) in listOf("OnDark" to p.OnDark, "OnDarkDim" to p.OnDarkDim, "Caption" to p.Caption, "Accent" to p.Accent, "AccentGlow" to p.AccentGlow, "Warning" to p.Warning, "Cool" to p.Cool))
                     assertTrue("$name: $label on $surface is ${contrast(text, surface)}", contrast(text, surface) >= 4.5f)
-                for ((label, graphic) in listOf("Faint" to p.Faint, "AccentLit" to p.AccentLit, "Gold" to p.Gold))
+                for ((label, graphic) in listOf("Faint" to p.Faint, "AccentLit" to p.AccentLit, "Gold" to p.Gold, "Favorite" to p.Favorite))
                     assertTrue("$name: $label on $surface is ${contrast(graphic, surface)}", contrast(graphic, surface) >= 3f)
             }
             for (surface in listOf(p.FieldHi, p.Chosen, p.KeyDigit, p.KeySymbol, p.Deepest, p.AccentDeep, p.CoolDeep))

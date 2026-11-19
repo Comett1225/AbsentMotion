@@ -330,7 +330,7 @@ std::vector<float> Typed(const std::vector<uint32_t>& first, float speed, float 
         at[k] = clock;
         if (Space(first[k])) continue;
         clock += step;
-        if (Stop(first[k]) && (k + 1 == first.size() || Space(first[k + 1]))) clock += pause;
+        if (Stop(first[k]) && (k + 1 == first.size() || Space(first[k + 1]) || (first[k] >= 0x3000 && !Stop(first[k + 1])))) clock += pause;
     }
     return at;
 }

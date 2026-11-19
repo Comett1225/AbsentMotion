@@ -23,7 +23,7 @@ object ThemeFile {
     }
 
     fun parse(text: String): Theme {
-        val json = try { JSONObject(text.removePrefix("\uFEFF")) } catch (e: Exception) { throw ThemeError(txt(R.string.settings_theme_not_theme_file)) }
+        val json = try { JSONObject(text.removePrefix("\uFEFF")) } catch (e: Exception) { throw ThemeError(txt(R.string.settings_theme_not_theme_file)) } catch (e: StackOverflowError) { throw ThemeError(txt(R.string.settings_theme_not_theme_file)) }
         val colours = HashMap<String, Color>()
         for (key in Palette.Names) {
             if (!json.has(key)) continue

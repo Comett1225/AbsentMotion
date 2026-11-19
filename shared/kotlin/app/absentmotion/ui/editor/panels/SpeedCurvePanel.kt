@@ -73,9 +73,7 @@ import app.absentmotion.model.CURVE_FASTEST
 import app.absentmotion.model.CURVE_MOST_POINTS
 import app.absentmotion.model.CURVE_SLOWEST
 import app.absentmotion.model.CurvePoint
-import app.absentmotion.model.FASTEST_SPEED
 import app.absentmotion.model.Layer
-import app.absentmotion.model.SLOWEST_SPEED
 import app.absentmotion.model.SpeedRamp
 import app.absentmotion.model.VideoTiming
 import app.absentmotion.model.curve
@@ -187,7 +185,7 @@ internal fun SpeedCurveEditor(state: EditorState, layer: Layer, ai: AiTools, bas
             drop = { result -> if (result != stored) state.applySpeedCurve(result); dragged = null })
         Row(Modifier.fillMaxWidth().height(34.dp), Arrangement.spacedBy(6.dp), Alignment.CenterVertically) {
             SpeedValue(chosen?.let { points[it].speed } ?: points.speedAt(playhead ?: 0f), Modifier.width(84.dp).fillMaxHeight(), chosen?.let { i ->
-                { state.askNumber(speedLabel, points[i].speed, "x", SLOWEST_SPEED, FASTEST_SPEED) { v -> state.applySpeedCurve(points.moved(i, points[i].u, steppedSpeed(v))) } }
+                { state.askNumber(speedLabel, points[i].speed, "x", CURVE_SLOWEST, CURVE_FASTEST) { v -> if (v != points[i].speed) state.applySpeedCurve(points.moved(i, points[i].u, steppedSpeed(v).coerceIn(CURVE_SLOWEST, CURVE_FASTEST))) } }
             })
             if (chosen != null) RampChip(stringResource(R.string.speed_curve_delete_point), chosen in 1 until points.lastIndex, modifier = Modifier.weight(1f)) {
                 picked = -1

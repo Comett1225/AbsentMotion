@@ -190,6 +190,7 @@ internal class PcmDecoder(private val context: Context, private val uri: String)
 
     override fun close() {
         soft?.close()
+        soft = null
         runCatching { codec?.stop() }
         runCatching { codec?.release() }
         codec = null

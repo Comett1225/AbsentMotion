@@ -86,7 +86,7 @@ internal suspend fun EditorState.addSounds(context: Context, uris: List<Uri>) {
     try {
         for (uri in uris) {
             val media = audioDeclaration(context, uri)?.let { keepCopy(context, it) }
-            if (media == null || media.duration <= 0) Toast.makeText(context, app.absentmotion.platform.mediaTrouble(context, uri) ?: AppText.get(R.string.library_err_unsupported_type), Toast.LENGTH_LONG).show()
+            if (media == null || media.duration <= 0) Toast.makeText(context, mediaTroubleOf(context, uri) ?: AppText.get(R.string.library_err_unsupported_type), Toast.LENGTH_LONG).show()
             else addAudio(media)
         }
     } finally { addingMedia = false }
@@ -96,7 +96,7 @@ internal suspend fun EditorState.pickBlipSound(context: Context, uri: Uri, layer
     keepAccess(context, listOf(uri))
     val media = audioDeclaration(context, uri)?.let { keepCopy(context, it) }?.takeIf { it.duration > 0 }
     if (media == null) {
-        Toast.makeText(context, app.absentmotion.platform.mediaTrouble(context, uri) ?: AppText.get(R.string.library_err_unsupported_type), Toast.LENGTH_LONG).show()
+        Toast.makeText(context, mediaTroubleOf(context, uri) ?: AppText.get(R.string.library_err_unsupported_type), Toast.LENGTH_LONG).show()
         return
     }
     if (scene.layer(layerId)?.effects?.getOrNull(effect)?.get("id") != "absent.textblips") return

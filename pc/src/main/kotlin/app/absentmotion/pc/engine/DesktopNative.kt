@@ -17,10 +17,11 @@ object DesktopNative {
     external fun gpuState(): Int
     external fun destroy(handle: Long)
     external fun loadEffect(handle: Long, xml: String): String
-    external fun setScene(handle: Long, xml: String): String?
+    external fun setScene(handle: Long, xml: String, keepHeld: Boolean = false): String?
     external fun setPicture(handle: Long, uri: String, path: String, raw: Boolean): Boolean
     external fun setFrame(handle: Long, uri: String, width: Int, height: Int, rgba: ByteArray): Boolean
     external fun clearLayerFrames(handle: Long)
+    external fun forgetHeld(handle: Long)
     external fun dropVideo(handle: Long, uri: String)
     external fun setLayerFrame(handle: Long, uri: String, layerId: Long, width: Int, height: Int, rgba: ByteArray): Boolean
     external fun interpolate(handle: Long, uri: String, layerId: Long, width: Int, height: Int, first: ByteArray, second: ByteArray,

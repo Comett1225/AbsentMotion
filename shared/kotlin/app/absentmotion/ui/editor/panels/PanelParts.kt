@@ -161,6 +161,7 @@ internal fun RulerSpinner(
     tickInset: Dp = 8.5.dp,
     fling: Boolean = true,
     onReset: (() -> Unit)? = null,
+    atLimit: ((Float) -> Boolean)? = null,
 ) {
     val wheelDensity = androidx.compose.ui.platform.LocalDensity.current.density
     val haptics = androidx.compose.ui.platform.LocalHapticFeedback.current
@@ -172,6 +173,7 @@ internal fun RulerSpinner(
     val started by rememberUpdatedState(onStart)
     val ended by rememberUpdatedState(onEnd)
     val reset by rememberUpdatedState(onReset)
+    val limit by rememberUpdatedState(atLimit)
     val scope = rememberCoroutineScope()
     val running = remember { booleanArrayOf(false) }
     val lastTap = remember { longArrayOf(0L) }
@@ -182,7 +184,8 @@ internal fun RulerSpinner(
             Glide.stop()
             if (!running[0]) { started(); running[0] = true }
             val px = (delta.x + delta.y) * 10f * wheelDensity
-            shift += px; dragging(RulerMath.travel(px, wheelDensity))
+            val t = RulerMath.travel(px, wheelDensity)
+            if (limit?.invoke(t) != true) { shift += px; dragging(t) }
             wheelEnd[0]?.cancel()
             wheelEnd[0] = scope.launch { kotlinx.coroutines.delay(300); if (running[0]) { running[0] = false; ended() } }
         }).pointerInput(Unit) {
@@ -211,8 +214,8 @@ internal fun RulerSpinner(
                     horizontalDrag(down.id) { c ->
                         val dx = c.positionChange().x * FINE_FACTOR
                         c.consume()
-                        shift += dx
-                        dragging(RulerMath.travel(dx, density))
+                        val t = RulerMath.travel(dx, density)
+                        if (limit?.invoke(t) != true) { shift += dx; dragging(t) }
                     }
                     fine = false
                     running[0] = false
@@ -228,8 +231,8 @@ internal fun RulerSpinner(
                         val dx = c.positionChange().x
                         c.consume()
                         tracker.addPointerInputChange(c)
-                        shift += dx
-                        dragging(RulerMath.travel(dx, density))
+                        val t = RulerMath.travel(dx, density)
+                        if (limit?.invoke(t) != true) { shift += dx; dragging(t) }
                     }
                     val v = tracker.calculateVelocity().x.coerceIn(-viewConfiguration.maximumFlingVelocity, viewConfiguration.maximumFlingVelocity)
                     if (fling && abs(v) > viewConfiguration.minimumFlingVelocity) {
@@ -239,8 +242,8 @@ internal fun RulerSpinner(
                             AnimationState(0f, v).animateDecay(decay) {
                                 val dx = value - last
                                 last = value
-                                shift += dx
-                                Glide.step { dragging(RulerMath.travel(dx, density)) }
+                                val t = RulerMath.travel(dx, density)
+                                if (limit?.invoke(t) != true) { shift += dx; Glide.step { dragging(t) } }
                             }
                             Glide.finished(glide)
                             running[0] = false

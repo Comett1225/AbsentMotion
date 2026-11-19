@@ -139,5 +139,7 @@ suspend fun verifyPicture(context: Context, uri: Uri, expect: PictureExpectation
         Verification(problems, durationUs, codec != null, null, SystemClock.elapsedRealtime() - start)
     } catch (e: Exception) {
         Verification(listOf(txt(R.string.export_verify_unreadable, e.message ?: e.javaClass.simpleName)), 0, null, null, SystemClock.elapsedRealtime() - start)
+    } catch (e: OutOfMemoryError) {
+        Verification(emptyList(), 0, null, null, SystemClock.elapsedRealtime() - start, unchecked = true)
     }
 }

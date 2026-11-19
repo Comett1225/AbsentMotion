@@ -82,6 +82,22 @@ class TilesWholeLayerTest {
         }
     }
 
+    @Test fun tilesOnATurnedLayerMeetWithoutGaps() {
+        val root = File("..").canonicalFile
+        for (sizing in listOf(0, 2)) {
+            val scene = Scene.parse(
+                """<scene width="200" height="200" fps="30" totalTime="1000" bgcolor="#ff000000"><shape id="1" startTime="0" endTime="1000" fillType="media" mediaFillMode="stretch" s=".rect" fillImage="${picture().toURI().toString().replaceFirst("file:/", "file:///")}">
+                <transform><location value="100,100,0"/><rotation value="25"/></transform><property name="size" type="vec2" value="40,40"/>
+                <effect id="absent.tiles" hidden="false"><property name="zoom" type="float" value="1"/><property name="mirror" type="bool" value="true"/><property name="sizing" type="float" value="$sizing"/></effect></shape></scene>"""
+            )
+            DesktopEngine(root.resolve("shared/assets"), root).use { engine ->
+                engine.setScene(scene, null)
+                val image = engine.render(0, 200, 200)
+                assertEquals("sizing $sizing", 0, (0 until 200).sumOf { y -> (0 until 200).count { x -> colourAt(x, y, image) == "black" } })
+            }
+        }
+    }
+
     @Test fun aGroupBesideTheCanvasStillFillsItWithTiles() {
         val root = File("..").canonicalFile
         DesktopEngine(root.resolve("shared/assets"), root).use { engine ->

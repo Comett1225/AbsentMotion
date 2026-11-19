@@ -42,10 +42,11 @@ python3 tools/comment_check.py > "$tmp/comments" || problem "the source comment 
 grep -v '^comment_check:' "$tmp/comments" | while read -r l; do problem "$l"; done
 
 if git rev-parse --git-dir >/dev/null 2>&1 && git rev-parse HEAD >/dev/null 2>&1; then
-    echo "-- authors, committers, tags and messages in the history"
+    echo "-- authors, committers, tags and messages in the history, and what the commits not pushed yet add"
     git log --all --format='%an <%ae>%n%cn <%ce>%n%s%n%b' > "$tmp/history"
     git for-each-ref refs/tags --format='%(refname)%0a%(taggername) %(taggeremail)%0a%(contents)' >> "$tmp/history"
-    printf '%s\n' "$tmp/history" | python3 tools/publish_scan.py "$words" tools/publish_allowed.txt "history " > "$tmp/scan" || problem "the history scanner failed"
+    git -c core.quotePath=false log -p --no-color --no-ext-diff --format= HEAD --not --remotes | LC_ALL=C grep -a '^+' > "$tmp/unpushed-commits"
+    printf '%s\n' "$tmp/history" "$tmp/unpushed-commits" | python3 tools/publish_scan.py "$words" tools/publish_allowed.txt "history " > "$tmp/scan" || problem "the history scanner failed"
     while read -r l; do problem "${l#PROBLEM: }"; done < "$tmp/scan"
     { git log --all --format='%an <%ae>%n%cn <%ce>'; git for-each-ref refs/tags --format='%(taggername) %(taggeremail)'; } | sort -u \
         | grep -v -x -e 'AbsentMotion <noreply@absentmotion.invalid>' -e 'GitHub <noreply@github.com>' -e ' *' \

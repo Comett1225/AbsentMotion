@@ -98,7 +98,7 @@ private fun EditorState.newLayer(name: String, tag: String, fill: String, color:
 
 private fun EditorState.enter(layer: Layer, mode: DrawingMode, created: Boolean) {
     if (created) { edit { it.add(layer) }; mode.added = scene }
-    else if (!layer.activeAt(timeMs)) frame = scene.frameAt(layer.startTime)
+    else if (sampleMs !in layer.startTime..layer.endTime) frame = scene.firstShownFrame(layer.startTime)
     selectedId = layer.id
     playing = false
     addOpen = false

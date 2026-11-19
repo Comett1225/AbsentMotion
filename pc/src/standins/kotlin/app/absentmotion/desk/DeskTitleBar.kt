@@ -345,7 +345,7 @@ fun deskMenus(app: DeskAppState, scope: kotlinx.coroutines.CoroutineScope): List
     val separator = DeskMenuItem.Separator
     return listOf(
         DeskMenuItem(t(R.string.desk_menu_file), children = listOfNotNull(
-            DeskMenuItem(t(R.string.desk_menu_new_project), editor == null, key(Shortcut.NewProject)) { app.newProjectTick++ },
+            DeskMenuItem(t(R.string.desk_menu_new_project), app.canStartProject, key(Shortcut.NewProject)) { app.newProjectTick++ },
             DeskMenuItem(t(R.string.settings) + "…", keys = key(Shortcut.Settings)) { app.openSettings() },
             separator,
             DeskMenuItem(t(R.string.desk_menu_import_media), editor != null) {
@@ -381,7 +381,7 @@ fun deskMenus(app: DeskAppState, scope: kotlinx.coroutines.CoroutineScope): List
         DeskMenuItem(t(R.string.desk_menu_playback), children = listOf(
             DeskMenuItem(if (editor?.playing == true) t(R.string.export_pause) else t(R.string.export_play), editor != null) { editor?.togglePlayback() },
             DeskMenuItem(t(R.string.desk_menu_go_start), editor != null) { editor?.let { it.playing = false; it.frame = 0 } },
-            DeskMenuItem(t(R.string.desk_menu_go_end), editor != null) { editor?.let { it.playing = false; it.frame = it.scene.lastFrame } },
+            DeskMenuItem(t(R.string.desk_menu_go_end), editor != null) { editor?.let { it.playing = false; it.parkAtEnd() } },
             separator,
             DeskMenuItem(t(R.string.desk_menu_previous_bookmark), editor != null, key(Shortcut.PreviousBookmark)) { editor?.let { DeskJump.previous(it) } },
             DeskMenuItem(t(R.string.desk_menu_next_bookmark), editor != null, key(Shortcut.NextBookmark)) { editor?.let { DeskJump.next(it) } },

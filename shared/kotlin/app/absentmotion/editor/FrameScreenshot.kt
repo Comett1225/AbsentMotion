@@ -10,6 +10,7 @@ import app.absentmotion.media.mediaDeclaration
 import app.absentmotion.model.Layer
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.Scene
+import app.absentmotion.model.XmlNode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -23,7 +24,7 @@ import java.util.Locale
 
 const val SCREENSHOT_UNDO_MS = 10_000L
 
-private val RawParts = setOf("speedMap")
+private val RawParts = setOf("speedMap", "timeRemap")
 private val Dropped = setOf("blending", "parent", "clippingMask", "hidden", "pathLayer", "link")
 
 data class RawFrame(val scene: Scene, val width: Int, val height: Int)
@@ -61,16 +62,19 @@ suspend fun EditorState.screenshotFrame(context: Context, scope: CoroutineScope)
         val own = withContext(Dispatchers.IO) {
             runCatching { MediaKeeper(store, { uri -> context.contentResolver.openInputStream(Uri.parse(uri)) }).keep(projectId, picture, scene) }.getOrNull()
         }
-        addImage(own?.takeIf { store.inMediaFolder(it.uri) } ?: keepCopy(context, picture))
+        val kept = own?.takeIf { store.inMediaFolder(it.uri) } ?: keepCopy(context, picture)
+        addImage(kept)
         val added = selectedId ?: return true
-        scope.launch { dropIfRemoved(groupPath, added, saved, gallery) }
+        if (kept.uri != saved.toString()) scope.launch { dropIfRemoved(added, saved, gallery) }
         return true
     } finally {
         withContext(Dispatchers.IO) { png.delete() }
     }
 }
 
-private suspend fun EditorState.dropIfRemoved(path: List<Long>, id: Long, saved: Uri, store: MediaStoreExport) {
-    val gone = withTimeoutOrNull(SCREENSHOT_UNDO_MS) { snapshotFlow { project.focused(path)?.layer(id) == null }.first { it } } == true
+private suspend fun EditorState.dropIfRemoved(id: Long, saved: Uri, store: MediaStoreExport) {
+    val gone = withTimeoutOrNull(SCREENSHOT_UNDO_MS) { snapshotFlow { !project.node.holdsLayer(id) }.first { it } } == true
     if (gone) withContext(Dispatchers.IO) { runCatching { store.delete(saved) } }
 }
+
+internal fun XmlNode.holdsLayer(id: Long): Boolean = children.any { it.name in Scene.LAYER_TAGS && it["id"]?.toLongOrNull() == id || it.holdsLayer(id) }

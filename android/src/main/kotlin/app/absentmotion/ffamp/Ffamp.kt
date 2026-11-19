@@ -9,6 +9,7 @@ import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.ParcelFileDescriptor
 import app.absentmotion.ai.argb
+import app.absentmotion.ai.turned
 import app.absentmotion.audio.PcmChunk
 import app.absentmotion.audio.PcmSource
 import app.absentmotion.audio.downmixGains
@@ -19,6 +20,7 @@ import app.absentmotion.media.DesktopFrameInput
 import app.absentmotion.media.FfampReaders
 import app.absentmotion.media.FrameGrabber
 import app.absentmotion.media.FrameReader
+import app.absentmotion.media.StopReading
 import app.absentmotion.media.VideoSources
 import app.absentmotion.media.Yuv
 import app.absentmotion.media.decoderNames
@@ -81,8 +83,7 @@ internal class FfampSource private constructor(private val descriptor: ParcelFil
                     if (kotlin.math.abs(fps - Math.rint(fps)) < 0.01) setInteger(MediaFormat.KEY_FRAME_RATE, Math.rint(fps).toInt()) else setFloat(MediaFormat.KEY_FRAME_RATE, fps.toFloat())
                 }
                 if (v[9] != 0L) {
-                    when (v[10].toInt()) { 1 -> MediaFormat.COLOR_STANDARD_BT709; 5 -> MediaFormat.COLOR_STANDARD_BT601_PAL; 6 -> MediaFormat.COLOR_STANDARD_BT601_NTSC; 9 -> MediaFormat.COLOR_STANDARD_BT2020; else -> null }
-                        ?.let { setInteger(MediaFormat.KEY_COLOR_STANDARD, it) }
+                    colorStandardOf(v[10], v[12])?.let { setInteger(MediaFormat.KEY_COLOR_STANDARD, it) }
                     setInteger(MediaFormat.KEY_COLOR_TRANSFER, when (v[11].toInt()) { 16 -> MediaFormat.COLOR_TRANSFER_ST2084; 18 -> MediaFormat.COLOR_TRANSFER_HLG; else -> MediaFormat.COLOR_TRANSFER_SDR_VIDEO })
                     setInteger(MediaFormat.KEY_COLOR_RANGE, if (v[13] != 0L) MediaFormat.COLOR_RANGE_FULL else MediaFormat.COLOR_RANGE_LIMITED)
                 }
@@ -96,7 +97,11 @@ internal class FfampSource private constructor(private val descriptor: ParcelFil
 
     fun systemDecodes(track: Int): Boolean = MediaCodecList(MediaCodecList.REGULAR_CODECS).findDecoderForFormat(format(track)) != null
 
+    private var closed = false
+
     override fun close() {
+        if (closed) return
+        closed = true
         FfampNative.close(handle)
         descriptor?.close()
     }
@@ -115,6 +120,31 @@ internal class FfampSource private constructor(private val descriptor: ParcelFil
 
         fun open(context: Context, uri: String): FfampSource = open(context, Uri.parse(openableUri(uri)))
     }
+}
+
+internal fun colorStandardOf(primaries: Long, matrix: Long): Int? = when (matrix) {
+    1L -> MediaFormat.COLOR_STANDARD_BT709
+    5L -> MediaFormat.COLOR_STANDARD_BT601_PAL
+    6L -> MediaFormat.COLOR_STANDARD_BT601_NTSC
+    9L, 10L -> MediaFormat.COLOR_STANDARD_BT2020
+    2L -> when (primaries) {
+        1L -> MediaFormat.COLOR_STANDARD_BT709
+        5L -> MediaFormat.COLOR_STANDARD_BT601_PAL
+        6L -> MediaFormat.COLOR_STANDARD_BT601_NTSC
+        9L -> MediaFormat.COLOR_STANDARD_BT2020
+        else -> null
+    }
+    else -> null
+}
+
+internal fun nearestStamp(stamps: LongArray, timeUs: Long): Long {
+    if (stamps.isEmpty()) return timeUs
+    val at = stamps.binarySearch(timeUs)
+    if (at >= 0) return stamps[at]
+    val after = -at - 1
+    if (after == 0) return stamps[0]
+    if (after == stamps.size) return stamps[after - 1]
+    return if (timeUs - stamps[after - 1] <= stamps[after] - timeUs) stamps[after - 1] else stamps[after]
 }
 
 internal class Table(source: FfampSource, track: Int) {
@@ -209,12 +239,14 @@ internal class FfampRetriever(context: Context, uri: Uri) : FrameGrabber {
 
     override fun scaledFrame(timeUs: Long, option: Int, width: Int, height: Int): Bitmap? {
         val frames = reader ?: FrameReader(context, uri).also { reader = it }
-        val wanted = if (option == MediaMetadataRetriever.OPTION_CLOSEST) timeUs else frames.timestamps.let { stamps ->
+        val wanted = if (option == MediaMetadataRetriever.OPTION_CLOSEST) nearestStamp(frames.timestamps, timeUs) else frames.timestamps.let { stamps ->
             stamps.lastOrNull { it <= timeUs } ?: stamps.firstOrNull() ?: timeUs
         }
+        val turn = Math.floorMod(source.info(video)[3].toInt(), 360)
+        val sideways = turn % 180 != 0
         var picture: Bitmap? = null
-        runBlocking { frames.read(listOf(wanted)) { _, yuv -> picture = yuv.toBitmap(width, height, frames.colorStandard, frames.fullRange) } }
-        return picture
+        runBlocking { frames.read(listOf(wanted)) { _, yuv -> picture = yuv.toBitmap(if (sideways) height else width, if (sideways) width else height, frames.colorStandard, frames.fullRange) } }
+        return picture?.let { flat -> flat.turned(turn).also { if (it !== flat) flat.recycle() } }
     }
 
     override fun release() {
@@ -275,9 +307,10 @@ internal fun Yuv.toBitmap(maxWidth: Int, maxHeight: Int, standard: Int, fullRang
 internal class FfampSoftFrames private constructor(context: Context, uri: String, private val source: FfampSource, track: Int, private val video: Long) : DesktopFrameInput {
     private val table = Table(source, track)
     private val shape = source.info(track)
-    private val frame = ByteBuffer.allocateDirect((shape[1] * shape[2] * 3 / 2 + shape[1] * 2 + shape[2] * 2 + 64).toInt())
+    private var frame = ByteBuffer.allocateDirect((shape[1] * shape[2] * 3 / 2 + shape[1] * 2 + shape[2] * 2 + 64).toInt())
     private val dims = IntArray(3)
     private var next = 0
+    private var queued = 0
     private var drained = false
     private var positioned = false
     private var lastPts = Long.MIN_VALUE
@@ -294,42 +327,58 @@ internal class FfampSoftFrames private constructor(context: Context, uri: String
             next = table.syncBefore(wanted.first())
             drained = false
             positioned = true
+            queued = 0
         }
         var i = 0
+        val stop = coroutineContext[StopReading]
         while (i < wanted.size) {
             coroutineContext.ensureActive()
-            val count = when {
-                next < table.count -> FfampNative.videoFeed(video, next++)
-                !drained -> { drained = true; FfampNative.videoFeed(video, -1) }
-                else -> break
-            }
-            if (count < 0) break
-            repeat(count) {
-                val stamp = FfampNative.videoTake(video, frame, dims)
-                if (stamp > Long.MIN_VALUE + 1) {
-                    lastPts = stamp
-                    if (dims[2] != 0) {
-                        colorStandard = MediaFormat.COLOR_STANDARD_BT709
-                        fullRange = false
-                    }
-                    if (i < wanted.size && wanted[i] <= stamp) {
-                        val luma = dims[0] * dims[1]
-                        val cw = (dims[0] + 1) / 2
-                        val chroma = cw * ((dims[1] + 1) / 2)
-                        val y = frame.duplicate().apply { position(0); limit(luma) }.slice()
-                        val u = frame.duplicate().apply { position(luma); limit(luma + chroma) }.slice()
-                        val v = frame.duplicate().apply { position(luma + chroma); limit(luma + 2 * chroma) }.slice()
-                        val yuv = Yuv(y, dims[0], 1, u, v, cw, 1, 0, 0, dims[0], dims[1])
-                        while (i < wanted.size && wanted[i] <= stamp) consume(wanted[i++], yuv)
-                    }
+            if (stop?.now?.invoke() == true) break
+            if (queued == 0) {
+                val count = when {
+                    next < table.count -> FfampNative.videoFeed(video, next++)
+                    !drained -> { drained = true; FfampNative.videoFeed(video, -1) }
+                    else -> break
                 }
+                if (count < 0) break
+                queued = count
+                continue
+            }
+            val stamp = FfampNative.videoTake(video, frame, dims)
+            if (stamp == Long.MIN_VALUE + 2) {
+                val needed = dims[0] * dims[1] + 2 * ((dims[0] + 1) / 2) * ((dims[1] + 1) / 2)
+                if (needed <= frame.capacity()) throw IOException("FFamp cannot hand over a ${dims[0]} x ${dims[1]} picture")
+                frame = ByteBuffer.allocateDirect(needed)
+                continue
+            }
+            queued--
+            if (stamp == Long.MIN_VALUE) { queued = 0; continue }
+            if (stamp == Long.MIN_VALUE + 1) continue
+            lastPts = stamp
+            if (dims[2] != 0) {
+                colorStandard = MediaFormat.COLOR_STANDARD_BT709
+                fullRange = false
+            }
+            if (wanted[i] <= stamp) {
+                val luma = dims[0] * dims[1]
+                val cw = (dims[0] + 1) / 2
+                val chroma = cw * ((dims[1] + 1) / 2)
+                val y = frame.duplicate().apply { position(0); limit(luma) }.slice()
+                val u = frame.duplicate().apply { position(luma); limit(luma + chroma) }.slice()
+                val v = frame.duplicate().apply { position(luma + chroma); limit(luma + 2 * chroma) }.slice()
+                val yuv = Yuv(y, dims[0], 1, u, v, cw, 1, 0, 0, dims[0], dims[1])
+                while (i < wanted.size && wanted[i] <= stamp) consume(wanted[i++], yuv)
             }
         }
-        if (drained && next >= table.count) lastPts = Long.MAX_VALUE
+        if (drained && next >= table.count && queued == 0) lastPts = Long.MAX_VALUE
         return i
     }
 
+    private var closed = false
+
     override fun close() {
+        if (closed) return
+        closed = true
         FfampNative.videoClose(video)
         source.close()
     }
@@ -366,7 +415,7 @@ internal class FfampPcm private constructor(private val source: FfampSource, pri
         rate = s[0].toInt()
         channels = s[1].toInt()
         length = s[2]
-        gains = if (channels > 2) downmixGains(channels, 0) else null
+        gains = if (channels > 2) downmixGains(channels, (s.getOrElse(3) { 0L } shl 2).toInt()) else null
         floats = FloatArray(CHUNK * channels)
         chunk.pcm = ShortArray(CHUNK * 2)
         chunk.rate = rate
@@ -404,7 +453,11 @@ internal class FfampPcm private constructor(private val source: FfampSource, pri
         return chunk
     }
 
+    private var closed = false
+
     override fun close() {
+        if (closed) return
+        closed = true
         FfampNative.audioClose(audio)
         source.close()
     }
@@ -416,7 +469,7 @@ internal class FfampPcm private constructor(private val source: FfampSource, pri
         fun openIfNeeded(context: Context, uri: String, rescue: Boolean = false): PcmSource? {
             val source = runCatching { FfampSource.open(context, uri) }.getOrNull() ?: return null
             val track = source.first(2)
-            val audio = if (track >= 0 && (rescue || !source.systemDecodes(track) || source.info(track).let { pcmNeedsFfamp(it[15], it[16]) })) FfampNative.audioOpen(source.handle, track) else 0L
+            val audio = if (track >= 0 && (rescue || !source.systemDecodes(track) || source.info(track).let { pcmNeedsFfamp(it[15], it[16], it.getOrElse(20) { 0L }) })) FfampNative.audioOpen(source.handle, track) else 0L
             if (audio == 0L) { source.close(); return null }
             return FfampPcm(source, audio, source.info(track)[19])
         }
@@ -425,6 +478,6 @@ internal class FfampPcm private constructor(private val source: FfampSource, pri
 
         fun ptsOf(frame: Long, lead: Long, rate: Int): Long = frame * 1_000_000L / rate + lead
 
-        fun pcmNeedsFfamp(codec: Long, bits: Long): Boolean = codec == LPCM && bits != 16L
+        fun pcmNeedsFfamp(codec: Long, bits: Long, bigEndian: Long = 0L): Boolean = codec == LPCM && (bits != 16L || bigEndian != 0L)
     }
 }

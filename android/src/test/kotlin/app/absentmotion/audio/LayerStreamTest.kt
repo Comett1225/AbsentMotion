@@ -9,13 +9,13 @@ import org.junit.Test
 
 class LayerStreamTest {
     @Test fun aFailedStreamIsDroppedBeforeTheNextPlayAndAHealthyOneIsKept() {
-        val silent = object : PcmSource {
+        val damaged = object : PcmSource {
             override val durationUs = 0L
             override fun seek(us: Long) {}
-            override fun next(): PcmChunk? = null
+            override fun next(): PcmChunk? = throw IllegalStateException("damaged packet")
             override fun close() {}
         }
-        val broken = LayerStream("broken", 0.0) { silent }
+        val broken = LayerStream("broken", 0.0) { damaged }
         val healthy = LayerStream("healthy", 0.0) { ToneSource(440.0) }
         try {
             awaitCondition("the broken stream to fail") { broken.failed }
@@ -28,6 +28,52 @@ class LayerStreamTest {
             broken.close()
             healthy.close()
         }
+    }
+
+    @Test fun playingFromTheStartBeforeTheFirstSoundIsDecodedGetsReadyInsteadOfSeekingAgain() {
+        val tone = ToneSource(440.0)
+        val slow = object : PcmSource by tone { override fun seek(us: Long) { Thread.sleep(5); tone.seek(us) } }
+        val stream = LayerStream("tone", 1000.0 - LayerStream.LEAD_MS) { slow }
+        try {
+            awaitCondition("the stream to be ready at 0 ms", 5_000) { stream.prepare(0.0) }
+        } finally {
+            stream.close()
+        }
+    }
+
+    private class ShortTone(private val endUs: Long) : PcmSource {
+        private val tone = ToneSource(440.0)
+        private var at = 0L
+        override val durationUs = endUs
+        override fun seek(us: Long) { at = us; tone.seek(us) }
+        override fun next(): PcmChunk? {
+            if (at >= endUs) return null
+            return tone.next()?.also { at = it.ptsUs + it.frames * 1_000_000L / it.rate }
+        }
+        override fun close() {}
+    }
+
+    @Test fun startingPastTheEndOfTheSoundStaysSilentUntilTheLoopComesBack() {
+        val stream = LayerStream("tone", 2000.0) { ShortTone(1_000_000) }
+        try {
+            awaitCondition("the empty tail to be ready") { stream.prepare(2000.0 + LayerStream.LEAD_MS) }
+            assertFalse(stream.failed)
+            val out = FloatArray(2048)
+            awaitCondition("sound after the wrap") {
+                stream.mix(out, 0, 1024, 100.0, 1000.0 / 48_000, 1f, 1f, Resampler.ULTRA, 0.0, 1000.0 / 48_000, 3000.0)
+                stream.rate > 0
+            }
+            assertFalse(stream.failed)
+        } finally {
+            stream.close()
+        }
+        val clip = AudioClip.of(sceneXml("""<audio id="1" src="tone" startTime="0" endTime="5999" outTime="3000" loop="true"/>""")).single()
+        val lost = ArrayList<String>()
+        val export = OfflineMix({ ShortTone(1_000_000) }, listOf(clip), Resampler.ULTRA, { _, _ -> null }, FakeFx(), 48_000).use { mix ->
+            mix.floats(1_500_000, 4_000_000).also { lost += mix.unreadable }
+        }
+        assertTrue(export.copyOfRange(2 * 48_000 * 2, 2 * 48_000 * 2 + 4800).any { it != 0f })
+        assertTrue(lost.isEmpty())
     }
 
     @Test fun aLoopingClipPlaysOnAtItsLoopPointLikeTheExport() {

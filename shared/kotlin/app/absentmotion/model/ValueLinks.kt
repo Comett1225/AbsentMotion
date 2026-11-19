@@ -104,8 +104,8 @@ fun Scene.withValueLinksFollowing(before: Scene): Scene {
             val old = oldEffects.getOrNull(index) ?: return node
             val next = newLayers[id]?.effects ?: return null
             val moved = next.indexOfFirst { it === old }.takeIf { it >= 0 }
-                ?: next.indexOfFirst { it == old }.takeIf { it >= 0 }
                 ?: index.takeIf { next.size == oldEffects.size && next.getOrNull(index)?.get("id") == old["id"] }
+                ?: next.indexOfFirst { it == old }.takeIf { it >= 0 }
                 ?: return null
             return if (moved == index) node else node.with("effect", "$moved")
         }

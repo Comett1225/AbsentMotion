@@ -14,6 +14,7 @@ import app.absentmotion.compat.flaPicture
 import app.absentmotion.compat.flaSound
 import app.absentmotion.compat.readFla
 import app.absentmotion.effects.EffectCatalog
+import app.absentmotion.export.CommunityThumbnail
 import app.absentmotion.fonts.FontImportError
 import app.absentmotion.fonts.FontLibrary
 import app.absentmotion.fonts.MAX_FONT_BYTES
@@ -31,6 +32,7 @@ import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.Serializable
+import java.util.Locale
 import java.util.zip.ZipInputStream
 
 internal fun XmlNode.mapFonts(change: Map<String, String>): XmlNode =
@@ -55,6 +57,7 @@ class CommunityInfo(
     val description: String,
     val tags: List<String>,
     val thumbnail: ByteArray?,
+    val preset: Boolean = false,
 ) : Serializable {
     companion object {
         internal fun read(json: JSONObject, entries: Map<String, ByteArray>) = CommunityInfo(
@@ -63,6 +66,7 @@ class CommunityInfo(
             json.optString("description").trim().take(500),
             json.optJSONArray("tags")?.let { list -> List(list.length()) { list.optString(it).trim().take(30) }.filter { it.isNotEmpty() }.take(8) }.orEmpty(),
             entries[json.optString("thumbnail")],
+            json.optString("kind") == "preset",
         )
     }
 }
@@ -87,17 +91,20 @@ class Importer(
 ) {
     fun import(open: () -> InputStream?): List<ImportReport> = try {
         fun stream() = open() ?: throw ImportFailed(txt(R.string.library_err_no_data))
-        val head = stream().use { it.readAtMost(4) }
+        val head = stream().use { it.readAtMost(4096) }
         if (head.size >= 2 && head[0] == 'P'.code.toByte() && head[1] == 'K'.code.toByte()) fromPackage(::stream)
-        else if (head.contentEquals(byteArrayOf(0xD0.toByte(), 0xCF.toByte(), 0x11, 0xE0.toByte()))) throw ImportFailed(txt(R.string.fla_err_old))
+        else if (head.size >= 4 && head.copyOf(4).contentEquals(byteArrayOf(0xD0.toByte(), 0xCF.toByte(), 0x11, 0xE0.toByte()))) throw ImportFailed(txt(R.string.fla_err_old))
         else {
+            if (isModel(head)) throw ImportFailed(txt(R.string.library_err_is_model))
+            val start = head.toString(Charsets.UTF_8).removePrefix("\uFEFF").trimStart()
+            if (start.isNotEmpty() && !start.startsWith("<") && !start.startsWith("PROXY-CS5")) throw ImportFailed(txt(R.string.library_err_unsupported_type))
             val text = stream().use { readText(it, MaxXml) }.removePrefix("\uFEFF")
             if (text.startsWith("PROXY-CS5")) throw ImportFailed(txt(R.string.fla_err_xfl_alone))
             if (!text.trimStart().startsWith("<")) throw ImportFailed(txt(R.string.library_err_unsupported_type))
             listOf(add(store.newId(), check(text), emptyMap()))
         }
     } catch (e: OutOfMemoryError) {
-        throw ImportFailed(txt(R.string.library_err_xml_large))
+        throw ImportFailed(txt(R.string.crash_reason_memory))
     }
 
     private fun fromPackage(open: () -> InputStream): List<ImportReport> {
@@ -120,7 +127,7 @@ class Importer(
             eachEntry(open, limits) { name, input ->
                 files += name
                 when {
-                    name.startsWith("community/") -> input.readAtMost(MaxThumb + 1).takeIf { it.size <= MaxThumb }?.let { communityFiles[name] = it }
+                    name == CommunityThumbnail -> input.readAtMost(MaxThumb + 1).takeIf { it.size <= MaxThumb }?.let { communityFiles[name] = it }
                     leaf(name) == "manifest.txt" -> sigs = readText(input, MaxXml).lineSequence().map { it.trim().split(':', limit = 3) }.filter { it.size >= 2 }
                         .associate { p -> p[0] to p.last() }
                     leaf(name) == "manifest.json" -> {
@@ -172,14 +179,15 @@ class Importer(
                     entry?.let { find(it, files) }?.let { uri to it }
                 }.toMap()
                 val names = hashSetOf(ImportMarker)
-                fun unique(name: String) = (sequenceOf(name) + generateSequence(2) { it + 1 }.map { "${it}_$name" }).first { names.add(it) }
+                fun free(name: String) = names.add(name.lowercase(Locale.ROOT))
+                fun unique(name: String) = (sequenceOf(name) + generateSequence(2) { it + 1 }.map { "${it}_$name" }).first(::free)
                 val target = HashMap<String, File>()
                 for ((uri, path) in entries) {
                     if (path in target) continue
                     val parts = companions[uri]?.mapNotNull { find(it, files) }
                     if (parts == null) target[path] = File(store.mediaDir(id), unique(portable(leaf(path)!!)))
                     else {
-                        val folder = File(store.mediaDir(id), generateSequence(1) { it + 1 }.map { "model-$it" }.first { names.add(it) })
+                        val folder = File(store.mediaDir(id), generateSequence(1) { it + 1 }.map { "model-$it" }.first(::free))
                         (listOf(path) + parts).forEach { part -> target.putIfAbsent(part, File(folder, portable(leaf(part)!!))) }
                     }
                 }
@@ -391,6 +399,14 @@ class Importer(
             }
             made += target
             return "imported?name=${target.name}"
+        }
+
+        internal fun isModel(head: ByteArray): Boolean {
+            if (head.size >= 4 && head.copyOf(4).decodeToString() == "glTF") return true
+            val text = head.decodeToString().removePrefix("\uFEFF").trimStart()
+            if (text.startsWith("{")) return "\"asset\"" in text && "\"version\"" in text
+            val words = text.lineSequence().map { it.trim() }.firstOrNull { it.isNotEmpty() && !it.startsWith("#") }?.split(Regex("\\s+")) ?: return false
+            return words.size >= 2 && when (words[0]) { "v", "vt", "vn" -> words[1].toFloatOrNull() != null; "o", "g", "mtllib", "usemtl" -> true; else -> false }
         }
 
         private fun leaf(name: String): String? = name.substringAfterLast('/').substringAfterLast('\\').takeIf { it.isNotEmpty() && it != "." && it != ".." }

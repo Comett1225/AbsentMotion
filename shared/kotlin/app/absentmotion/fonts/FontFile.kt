@@ -17,11 +17,14 @@ private val ZipFontExtensions = setOf("ttf", "otf", "ttc")
 
 fun isZip(bytes: ByteArray) = bytes.size > 3 && bytes[0] == 0x50.toByte() && bytes[1] == 0x4B.toByte() && bytes[2] == 3.toByte() && bytes[3] == 4.toByte()
 
-fun zipFonts(input: java.io.InputStream): List<Pair<String, ByteArray>> {
+fun zipFonts(raw: ByteArray): List<Pair<String, ByteArray>> =
+    try { zipFonts(raw, Charsets.UTF_8) } catch (_: IllegalArgumentException) { zipFonts(raw, Charsets.ISO_8859_1) }
+
+private fun zipFonts(raw: ByteArray, names: java.nio.charset.Charset): List<Pair<String, ByteArray>> {
     val found = ArrayList<Pair<String, ByteArray>>()
     var total = 0L
     try {
-        java.util.zip.ZipInputStream(input).use { zip ->
+        java.util.zip.ZipInputStream(raw.inputStream(), names).use { zip ->
             val chunk = ByteArray(8192)
             while (true) {
                 val entry = zip.nextEntry ?: break
@@ -44,7 +47,7 @@ fun zipFonts(input: java.io.InputStream): List<Pair<String, ByteArray>> {
                 }
             }
         }
-    } catch (e: FontImportError) { throw e } catch (_: Exception) { throw FontImportError(FontProblem.Corrupted) }
+    } catch (e: Exception) { throw if (e is FontImportError || e is IllegalArgumentException && names == Charsets.UTF_8) e else FontImportError(FontProblem.Corrupted) }
     return found
 }
 

@@ -67,9 +67,7 @@ import app.absentmotion.engine.EngineThread
 import app.absentmotion.library.ProjectStore
 import app.absentmotion.library.ProjectVersions
 import app.absentmotion.model.Scene
-import app.absentmotion.platform.BitmapFactory
 import app.absentmotion.platform.Log
-import app.absentmotion.platform.asImageBitmap
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.adaptive.adaptiveWindowIsWide
 import app.absentmotion.ui.adaptive.AdaptiveWindow
@@ -334,7 +332,7 @@ private suspend fun versionThumbnail(version: ProjectVersions.Version, engine: E
         val temp = File(png.parentFile, png.name + ".tmp")
         if (engine.stillPng(xml, scene.totalTime / 2, (160 * scene.width / long).coerceAtLeast(1), (160 * scene.height / long).coerceAtLeast(1), temp)) withContext(Dispatchers.IO) { temp.renameTo(png) }
     }
-    withContext(Dispatchers.IO) { BitmapFactory.decodeFile(png.path)?.asImageBitmap() }
+    withContext(Dispatchers.IO) { decodeThumbnail(png) }
 } catch (e: CancellationException) {
     throw e
 } catch (e: Exception) {
@@ -355,7 +353,7 @@ private fun versionMoment(time: Long, now: Long, today: Int, yesterday: Int, oth
     return when (at.toLocalDate()) {
         current -> txt(today, clock)
         current.minusDays(1) -> txt(yesterday, clock)
-        else -> txt(other, at.format(DateTimeFormatter.ofPattern("d MMMM yyyy", locale).withDecimalStyle(DecimalStyle.STANDARD)), clock)
+        else -> txt(other, at.format(dateHeader(locale).withDecimalStyle(DecimalStyle.STANDARD)), clock)
     }
 }
 

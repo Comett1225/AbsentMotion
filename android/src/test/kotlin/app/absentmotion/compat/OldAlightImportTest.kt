@@ -22,4 +22,17 @@ class OldAlightImportTest {
         assertTrue(old.fromAlight)
         assertFalse(scene("""am="app.absentmotion"""", spill = true).fromAlight)
     }
+
+    @Test fun aProjectMadeInTheAppIsNotAnAlightImport() {
+        assertFalse(Scene.create("t", 100, 100, 30, 0).fromAlight)
+        assertFalse(scene("""amver="1002592" am="app.absentmotion"""", spill = false, soft = false).oldAlightImport())
+        assertTrue(scene("""amver="1002592" am="app.absentmotion" alightImport="true"""", spill = false).oldAlightImport())
+    }
+
+    @Test fun alightImportsWithLegacyScaleTilesGetTheTip() {
+        fun tiles(sizing: String) = Scene.parse("""<scene width="100" height="100" amver="1028425" am="app.absentmotion"><shape id="1" s=".rect">""" +
+            """<effect id="absent.tiles"><property name="sizing" type="float" value="$sizing" /></effect></shape></scene>""")
+        assertTrue(tiles("1.000000").oldAlightImport())
+        assertFalse(tiles("2.000000").oldAlightImport())
+    }
 }

@@ -6,6 +6,9 @@ import app.absentmotion.effects.EffectDefinition
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.formatFloats
+import app.absentmotion.model.isKeyframed
+import app.absentmotion.model.keyframes
+import app.absentmotion.model.withKeyframes
 import app.absentmotion.model.valueAt
 import app.absentmotion.platform.Context
 import org.json.JSONArray
@@ -69,7 +72,7 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
             val rule = if (node.name == "effect") rules[node["id"]]?.takeIf { r -> r.onlyWith == null || node.children.any { c -> c.name == "property" && c["name"] == r.onlyWith } } else null
             val own = rule?.let { catalog.definitions.firstOrNull { d -> d.key == it.to } }
             val older = own != null && node["id"] == own.id
-            if (rule != null && own != null && (!older || node.children.any { c -> c.name == "property" && own.params.none { it.id == c["name"] } })) {
+            if (rule != null && own != null && (!older || node.children.any { c -> c.name == "property" && own.params.none { it.id == c["name"] } && (rule.params.isEmpty() || c["name"] in rule.params) })) {
                 if (older) renamed = true else converted.merge("${node["id"]!!.substringAfterLast('.')} → ${own.name}", 1, Int::plus)
                 val convertedEffect = convert(node, rule, own, older, dims) { dropped += "${own.name}: $it" }
                 return if (node["id"] == "com.alightcreative.effects.lumastamper" && clipped) convertedEffect.copy(children = convertedEffect.children.map {
@@ -83,7 +86,7 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
         val h = scene.node["height"]?.finiteFloat()?.takeIf { it > 0f } ?: 1080f
         var root = visit(scene.node, floatArrayOf(w, h, 0f, w, h, w, h))
         val foreign = root["am"]?.startsWith("com.alightcreative") == true
-        if (foreign) root = root.copy(attrs = root.attrs + ("am" to "app.absentmotion"), children = root.children.map(::squaredBlendOpacity))
+        if (foreign) root = root.copy(attrs = root.attrs + ("am" to "app.absentmotion") + ("alightImport" to "true"), children = root.children.map(::squaredBlendOpacity))
         return Result(if (converted.isEmpty() && !renamed && !foreign) scene else Scene(root), converted, dropped)
     }
 
@@ -106,8 +109,10 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
     private fun transformOf(layer: XmlNode, name: String): String? =
         layer.children.firstOrNull { it.name == "transform" }?.children?.firstOrNull { it.name == name }?.valueAt(0f)
 
-    private fun squaredBlendOpacity(layer: XmlNode): XmlNode {
-        if (layer.name !in Scene.LAYER_TAGS || layer["blending"] !in setOf("multiply", "subtract")) return layer
+    private fun squaredBlendOpacity(node: XmlNode): XmlNode {
+        if (node.name !in Scene.LAYER_TAGS) return node
+        val layer = if (node.name != "embedScene") node else node.copy(children = node.children.map { s -> if (s.name == "scene") s.copy(children = s.children.map(::squaredBlendOpacity)) else s })
+        if (layer["blending"] !in setOf("multiply", "subtract")) return layer
         if (layer.children.any { it.name == "effect" && it["id"] in setOf(LIFT, "absent.backdrop") }) return layer
         val square = { v: String -> v.trim().finiteFloat()?.let { formatFloats(floatArrayOf(it * it)) } ?: v }
         return layer.copy(children = layer.children.map { t ->
@@ -147,9 +152,8 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
                     val shift = (c.plus?.let { other -> effect.children.firstOrNull { it.name == "property" && it["name"] == other }?.valueAt(0f)?.finiteFloat() } ?: 0f) * c.plusScale
                     val divisor = c.over?.let { other -> length(effect.children.firstOrNull { it.name == "property" && it["name"] == other }?.valueAt(0f) ?: c.overDefault) } ?: 1f
                     val off = c.gate?.let { gate -> effect.children.firstOrNull { it.name == "property" && it["name"] == gate }?.valueAt(0f)?.trim() != "true" } ?: false
-                    val base = if (c.slot >= 0) (made[param.id]?.get("value") ?: rule.set[param.id] ?: param.default).split(',') else emptyList()
                     made[param.id] = if (off) XmlNode("property", mapOf("name" to param.id, "type" to param.type, "value" to "#00000000"))
-                        else if (c.slot >= 0) property(child, param.id, param.type) { text -> base.mapIndexed { k, v -> if (k == c.slot) convertValue(text, c, -1, shift, dims, divisor) else v.trim() }.joinToString(",") }
+                        else if (c.slot >= 0) slotted(made[param.id], child, param.id, param.type, rule.set[param.id] ?: param.default, c.slot) { convertValue(it, c, -1, shift, dims, divisor) }
                         else property(child, param.id, param.type) { text -> convertValue(text, c, if (c.component >= 0) c.component else if (split && c.take == 0) i else -1, shift, dims, divisor) }
                 } else if (c?.neutral == null || values(child).any { !same(if (split) it.split(',').getOrElse(i) { "" } else it, c.neutral) }) {
                     drop(if (split) "$name (${i + 1})" else name)
@@ -187,6 +191,17 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
         source.attrs.forEach { (k, v) -> if (k != "name" && k != "type") attrs[k] = if (k == "value") change(v) else v }
         return source.copy(attrs = attrs, children = source.children.map { kf ->
             if (kf.name == "kf" && kf["v"] != null) kf.with("v", change(kf["v"]!!)) else kf
+        })
+    }
+
+    private fun slotted(prior: XmlNode?, source: XmlNode, name: String, type: String, fallback: String, slot: Int, change: (String) -> String): XmlNode {
+        fun put(base: String?, text: String) = (base ?: fallback).split(',').mapIndexed { k, v -> if (k == slot) change(text) else v.trim() }.joinToString(",")
+        if (prior == null || !prior.isKeyframed) return property(source, name, type) { put(prior?.get("value"), it) }
+        if (!source.isKeyframed) return source["value"]?.let { text -> prior.withKeyframes(prior.keyframes.map { it.copy(v = put(it.v, text)) }) } ?: prior
+        val mine = prior.keyframes
+        val theirs = source.keyframes
+        return prior.withKeyframes((mine.map { it.t } + theirs.map { it.t }).distinct().sorted().map { t ->
+            (mine.firstOrNull { it.t == t } ?: theirs.first { it.t == t }).copy(t = t, v = put(prior.valueAt(t), source.valueAt(t) ?: ""))
         })
     }
 
@@ -294,7 +309,8 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
 fun Scene.oldAlightImport(): Boolean {
     if (!fromAlight || node["reimportTip"] != null) return false
     fun lacks(effect: XmlNode, name: String) = effect.children.none { it.name == "property" && it["name"] == name }
-    fun stale(n: XmlNode): Boolean = n.name == "effect" && (n["id"] == "absent.backdrop" && lacks(n, "spill") || n["id"] == "absent.exposure" && lacks(n, "soft")) ||
+    fun stale(n: XmlNode): Boolean = n.name == "effect" && (n["id"] == "absent.backdrop" && lacks(n, "spill") || n["id"] == "absent.exposure" && lacks(n, "soft") ||
+        n["id"] == "absent.tiles" && n.children.any { it.name == "property" && it["name"] == "sizing" && it["value"]?.trim()?.finiteFloat() == 1f }) ||
         n.children.any(::stale)
     return stale(node)
 }

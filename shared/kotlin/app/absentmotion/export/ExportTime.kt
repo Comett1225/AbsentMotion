@@ -36,6 +36,16 @@ internal fun estimateExportMs(
     history: List<ExportRecord>, probe: ProbeResult?, codec: Codec, width: Int, height: Int, fps: Int, frames: Int,
     interpolation: FrameInterpolation = FrameInterpolation.Off,
 ): Long? {
+    historyExportMs(history, probe, codec, width, height, fps, frames, interpolation)?.let { return it }
+    probe ?: return null
+    val msPerMegapixel = 1000.0 / (probe.pixelsPerSecond / 1e6) * codecCost(codec) / codecCost(probe.codec)
+    return (probe.setupMs + msPerMegapixel * frames * (width.toDouble() * height / 1e6)).roundToLong()
+}
+
+internal fun historyExportMs(
+    history: List<ExportRecord>, probe: ProbeResult?, codec: Codec, width: Int, height: Int, fps: Int, frames: Int,
+    interpolation: FrameInterpolation = FrameInterpolation.Off,
+): Long? {
     val megapixels = width.toDouble() * height / 1e6
     val work = frames * megapixels
     val usable = history.filter { it.frames > 0 && it.width > 0 && it.height > 0 && it.ms > 0 }
@@ -55,9 +65,7 @@ internal fun estimateExportMs(
             return (overhead + msPerMegapixel * work).roundToLong()
         }
     }
-    probe ?: return null
-    val msPerMegapixel = 1000.0 / (probe.pixelsPerSecond / 1e6) * codecCost(codec) / codecCost(probe.codec)
-    return (probe.setupMs + msPerMegapixel * work).roundToLong()
+    return null
 }
 
 internal fun encoderFloorMs(encoder: EncoderCaps?, width: Int, height: Int, fps: Int, frames: Int): Long? {
@@ -216,7 +224,12 @@ class ExportTimes(context: Context) {
 
     fun roughMs(s: ExportSettings, scene: Scene): Long {
         val (w, h) = exportSize(scene, s.shortSide, even = true)
-        return (DefaultSetupMs + frameCount(scene, s.fps) * w * h / 1e6 * RoughMsPerMegapixel * codecCost(s.codec)).roundToLong()
+        return (DefaultSetupMs + frameCount(scene, s.fps).toDouble() * w * h / 1e6 * RoughMsPerMegapixel * codecCost(s.codec)).roundToLong()
+    }
+
+    fun learns(s: ExportSettings, scene: Scene, probe: ProbeResult?): Boolean {
+        val (w, h) = exportSize(scene, s.shortSide, even = true)
+        return historyExportMs(history(), probe, s.codec, w, h, s.fps, frameCount(scene, s.fps), s.interpolation) != null
     }
 
     fun estimateMs(

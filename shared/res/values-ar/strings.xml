@@ -108,9 +108,9 @@
     <string name="transform_double_tap_pivot">انقر مرتين لنقل المحور</string>
     <string name="transform_double_tap_layer">انقر مرتين لنقل الطبقة</string>
     <string name="community_size">حجم الملف</string>
-    <string name="community_confirm">أنشأت هذا العمل وأوافق على مشاركته</string>
+    <string name="community_confirm">أنشأت هذا العمل أو نسبته إلى صاحبه، وأوافق على مشاركته</string>
     <string name="community_need_title">أضف عنوانًا لحزمة المجتمع.</string>
-    <string name="community_need_confirm">ضع علامة في المربع لتأكيد أنك أنشأت هذا العمل وتوافق على مشاركته.</string>
+    <string name="community_need_confirm">ضع علامة في المربع لتأكيد أنك أنشأت هذا العمل أو نسبته إلى صاحبه، وأنك توافق على مشاركته.</string>
     <string name="community_too_big">يمكن أن يصل حجم حزم المجتمع إلى 20 MB، ويبلغ حجم هذه الحزمة نحو %1$s. اجعل مقاطع الفيديو أقصر أو أصغر باستخدام أدوات &gt; ضغط، أو استخدم صورًا ومقاطع فيديو أقل.</string>
     <string name="project_home_page">الصفحة الرئيسية للمشروع</string>
     <string name="about_website">الموقع والدليل</string>
@@ -348,6 +348,7 @@
     <string name="theme_error_no_colours">لا توجد ألوان سمة في هذا الملف</string>
     <string name="library_err_no_data">لم يتم استلام أي بيانات.</string>
     <string name="library_err_unsupported_type">نوع ملف غير مدعوم</string>
+    <string name="library_err_is_model">هذا نموذج 3D وليس مشروعًا. افتح مشروعًا وأضفه من كائن / أصل &gt; نموذج 3D.</string>
     <string name="import_gif_converting">جارٍ تجهيز GIF…</string>
     <string name="import_gif_too_large">ملف GIF هذا كبير جدًا للاستيراد. تُدعم ملفات GIF حتى 2048 × 2048 بكسل و3000 إطار و10 دقائق.</string>
     <string name="import_gif_damaged">ملف GIF هذا تالف ولا يمكن استيراده.</string>
@@ -474,13 +475,21 @@
     <string name="community_too_new">حدّث AbsentMotion لعرض مكتبة المجتمع</string>
     <string name="community_filter_projects">المشاريع</string>
     <string name="community_filter_presets">إعدادات مسبقة</string>
-    <string name="community_empty">لا يوجد شيء هنا بعد</string>
+    <string name="community_empty">يبدو أنه لا توجد مشاركات بعد</string>
     <string name="community_read_more">قراءة المزيد</string>
     <string name="community_show_less">عرض أقل</string>
     <string name="community_adding">جارٍ الإضافة…</string>
     <string name="community_add">إضافة</string>
     <string name="community_add_preset">إضافة إلى إعداداتي المسبقة</string>
     <string name="community_added_preset">تمت الإضافة إلى إعداداتي المسبقة</string>
+    <string name="preset_share">المشاركة مع المجتمع</string>
+    <string name="preset_placeholder">العنصر النائب</string>
+    <string name="preset_placeholder_text">نصه الخاص</string>
+    <string name="preset_placeholder_shape">شكله الخاص</string>
+    <string name="preset_placeholder_random">صورة عشوائية</string>
+    <string name="preset_placeholder_choose">اختيار صورة أو فيديو…</string>
+    <string name="preset_shuffle">تبديل</string>
+    <string name="preset_placeholder_note">يرى الآخرون إعدادك المسبق عليها. لا تُضاف صورك وفيديوهاتك الخاصة في الإعداد المسبق إلى الملف.</string>
     <string name="community_download_failed">تعذر تنزيل هذا العنصر. حاول مرة أخرى.</string>
     <string name="community_download_damaged">الملف الذي تم تنزيله تالف. حاول مرة أخرى.</string>
     <string name="tools_compress">ضغط</string>
@@ -1314,6 +1323,7 @@
     <string name="structure_asset_project">أصل / مشروع</string>
     <string name="structure_import_svg">استيراد SVG</string>
     <string name="structure_svg_unreadable">تعذّرت قراءة ملف SVG هذا.</string>
+    <string name="structure_svg_too_large">ملف SVG هذا كبير جدًا لاستيراده (أكثر من 16 MB).</string>
     <string name="structure_svg_empty">لا يحتوي ملف SVG هذا على أشكال قابلة للاستيراد.</string>
     <plurals name="structure_svg_imported">
         <item quantity="zero">تم استيراد %1$s أشكال. تم استبعاد: %2$s.</item>
@@ -1991,6 +2001,7 @@
     <string name="edit_panel_camera_options">خيارات الكاميرا</string>
     <string name="edit_keep_copying">جارٍ نسخ «%1$s» إلى المشروع…</string>
     <string name="edit_keep_no_space">لا توجد مساحة تخزين كافية للاحتفاظ بنسخة من «%1$s» في المشروع. ما زال يستخدم الملف الأصلي.</string>
+    <string name="edit_keep_not_added">تعذّر نسخ «%1$s» إلى المشروع، لذا لم تتم إضافته. تحقق من مساحة التخزين المتاحة وحاول مرة أخرى.</string>
     <string name="edit_keep_failed">تعذّر نسخ «%1$s» إلى المشروع. لا يزال يستخدم الملف الأصلي، لذا قد يتوقف عن العمل إذا نُقل هذا الملف أو حُذف.</string>
     <string name="edit_keep_this_file">هذا الملف</string>
     <string name="edit_beats_select_layer">حدّد طبقة صوت أو فيديو</string>
@@ -2245,9 +2256,9 @@
         <item quantity="zero">لا ألوان</item>
         <item quantity="one">لون واحد</item>
         <item quantity="two">لونان</item>
-        <item quantity="few">%1$s ألوان</item>
-        <item quantity="many">%1$s لونًا</item>
-        <item quantity="other">%1$s لون</item>
+        <item quantity="few">‏%1$s ألوان</item>
+        <item quantity="many">‏%1$s لونًا</item>
+        <item quantity="other">‏%1$s لون</item>
     </plurals>
     <string name="effect_palette_unreadable">تعذّرت قراءة أي ألوان من هذا الملف.</string>
     <string name="palettes">لوحات الألوان</string>
@@ -2335,12 +2346,12 @@
         <item quantity="other">طُبّق على %1$s طبقة</item>
     </plurals>
     <plurals name="multi_transition_count">
-        <item quantity="zero">%1$s قطع</item>
+        <item quantity="zero">‏%1$s قطع</item>
         <item quantity="one">قطع واحد (%1$s)</item>
         <item quantity="two">قطعان (%1$s)</item>
-        <item quantity="few">%1$s قطوع</item>
-        <item quantity="many">%1$s قطعًا</item>
-        <item quantity="other">%1$s قطع</item>
+        <item quantity="few">‏%1$s قطوع</item>
+        <item quantity="many">‏%1$s قطعًا</item>
+        <item quantity="other">‏%1$s قطع</item>
     </plurals>
     <string name="layer_tool_screenshot">لقطة شاشة</string>
     <string name="structure_svg_importing">جارٍ استيراد SVG…</string>
@@ -2671,6 +2682,11 @@
     <string name="desk_key_timeline_zoom_in">تكبير الخط الزمني</string>
     <string name="desk_key_timeline_zoom_out">تصغير الخط الزمني</string>
     <string name="desk_key_timeline_fit">ملاءمة الخط الزمني للنافذة</string>
+    <string name="community_share_title">شارك إعدادك المسبق أو مشروعك</string>
+    <string name="community_share_hint">ارفع الملف إلى أي موقع لاستضافة الملفات (موقع مجهول أو Google Drive أو MEGA) ثم أرسل الرابط مع النموذج.</string>
+    <string name="community_share_button">فتح النموذج</string>
+    <string name="community_share_hide">عدم الإظهار</string>
+    <string name="community_form_line">أضف مشاركتك عبر نموذج Google هذا</string>
     <string name="community_search">ابحث في المجتمع</string>
     <string name="community_clear">مسح</string>
     <string name="community_no_matches">لا توجد عناصر مطابقة</string>

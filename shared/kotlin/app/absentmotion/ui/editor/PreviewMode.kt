@@ -63,7 +63,8 @@ internal fun PreviewModePanel(state: EditorState, modifier: Modifier = Modifier)
         val cell = if (tight) Modifier.height(36.dp) else Modifier.weight(1f)
         ModeCell(cell, true, { state.pixelMode = !state.pixelMode }, stringResource(R.string.a11y_pixel_preview)) { PixelIcon(state.pixelMode) }
         ModeCell(cell, true, { state.gridMode = !state.gridMode }, stringResource(R.string.camera_grid)) { GridIcon(state.gridMode) }
-        ModeCell(cell, selected, { state.soloMode = (state.soloMode + 1) % 3 }, stringResource(R.string.a11y_solo)) { SoloIcon(state.soloMode, selected) }
+        val solo = selected || state.soloMode != 0
+        ModeCell(cell, solo, { state.soloMode = (state.soloMode + 1) % 3 }, stringResource(R.string.a11y_solo)) { SoloIcon(state.soloMode, solo) }
         ModeCell(cell, cameraToggle, { state.cameraMode = !state.cameraMode }, stringResource(R.string.camerapanel_tab_camera_view)) { CameraIcon(state.cameraMode, cameraToggle) }
         val quality = state.settings.previewQuality
         ModeCell(cell, true, { state.settings.previewQuality = PreviewQuality.entries[(quality.ordinal + 1) % PreviewQuality.entries.size] }) {

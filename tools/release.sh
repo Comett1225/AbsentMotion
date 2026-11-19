@@ -46,6 +46,7 @@ printf '\n== Android: release APKs (the standard build and the Compatible builds
 [ -f third_party/skia/out/android-arm-compat/libskia.a ] || sh tools/build_skia.sh compat32
 [ -f third_party/skia/out/android-x64/libskia.a ] || sh tools/build_skia.sh x64
 [ -f third_party/skia/out/android-x64-compat/libskia.a ] || sh tools/build_skia.sh compat-x64
+[ -x build/sksl_check/sksl_check ] || sh tools/sksl_check/build.sh
 out=build/release/AbsentMotion-$version
 mkdir -p build/release
 ./gradlew -PamAbi=x86_64 :app:assembleFossRelease :app:assembleCompatRelease -q

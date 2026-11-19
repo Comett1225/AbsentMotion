@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.StatFs
+import android.provider.DocumentsContract
 import android.provider.MediaStore
 import app.absentmotion.R
 import app.absentmotion.i18n.txt
@@ -71,6 +72,10 @@ class MediaStoreExport(context: Context) : ExportStore {
     private fun abandon(entry: String): Boolean {
         if (entry.startsWith("/")) return File(entry).let { !it.exists() || it.delete() }
         val uri = Uri.parse(entry)
+        if (DocumentsContract.isDocumentUri(app, uri)) {
+            val shown = runCatching { resolver.query(uri, arrayOf(DocumentsContract.Document.COLUMN_DISPLAY_NAME), null, null, null)?.use { if (it.moveToFirst()) it.getString(0) else null } }.getOrNull()
+            return shown?.endsWith(PartName) != true || DocumentsContract.deleteDocument(resolver, uri)
+        }
         return when (pendingState(uri) ?: return false) {
             -1, 0 -> true
             else -> { resolver.delete(uri, null, null); true }
@@ -179,6 +184,8 @@ class MediaStoreExport(context: Context) : ExportStore {
     }
 }
 
+private const val PartName = ".part"
+
 internal fun freeFile(dir: File, name: String): File {
     dir.mkdirs()
     val base = name.substringBeforeLast('.')
@@ -221,15 +228,33 @@ internal fun fdStream(fd: java.io.FileDescriptor): OutputStream = object : java.
 class TreeExport(context: Context, private val tree: Uri) : ExportStore {
     private val appContext = context.applicationContext
     private val resolver = context.contentResolver
+    private val pending = PendingExports(File(appContext.noBackupFilesDir, "export-pending.txt"))
 
-    private fun parent(): Uri = android.provider.DocumentsContract.buildDocumentUriUsingTree(tree, android.provider.DocumentsContract.getTreeDocumentId(tree))
+    private fun parent(): Uri = DocumentsContract.buildDocumentUriUsingTree(tree, DocumentsContract.getTreeDocumentId(tree))
+
+    private fun create(name: String, mime: String): Uri? = runCatching { DocumentsContract.createDocument(resolver, parent(), mime, name) }.getOrNull()
+
+    private fun renames(document: Uri): Boolean = runCatching {
+        resolver.query(document, arrayOf(DocumentsContract.Document.COLUMN_FLAGS), null, null, null)?.use { it.moveToFirst() && it.getInt(0) and DocumentsContract.Document.FLAG_SUPPORTS_RENAME != 0 }
+    }.getOrNull() == true
 
     override fun open(folder: String?, name: String, mime: String): OpenExport {
-        val document = runCatching { android.provider.DocumentsContract.createDocument(resolver, parent(), mime, name) }.getOrNull()
-            ?: throw ExportError(txt(R.string.export_error_create, name, location("")))
+        val part = create(name + PartName, "application/octet-stream")?.let { made ->
+            if (renames(made) && pending.add(made.toString())) made else { runCatching { DocumentsContract.deleteDocument(resolver, made) }; null }
+        }
+        val document = part ?: create(name, mime) ?: throw ExportError(txt(R.string.export_error_create, name, location("")))
+        fun discard() {
+            DocumentsContract.deleteDocument(resolver, document)
+            if (part != null) pending.remove(part.toString())
+        }
         val file = runCatching { resolver.openFileDescriptor(document, "rw") }.getOrNull() ?: runCatching { resolver.openFileDescriptor(document, "w") }.getOrNull()
-            ?: run { runCatching { android.provider.DocumentsContract.deleteDocument(resolver, document) }; throw ExportError(txt(R.string.export_error_create, name, location(""))) }
-        return OpenExport(file.fileDescriptor, file::close, { document }, { android.provider.DocumentsContract.deleteDocument(resolver, document) })
+            ?: run { runCatching { discard() }; throw ExportError(txt(R.string.export_error_create, name, location(""))) }
+        return OpenExport(file.fileDescriptor, file::close, {
+            if (part == null) document else {
+                pending.remove(part.toString())
+                runCatching { DocumentsContract.renameDocument(resolver, part, name) }.getOrNull() ?: part
+            }
+        }, ::discard)
     }
 
     override fun save(folder: String?, name: String, mime: String, write: (OutputStream) -> Unit): Uri {
@@ -245,7 +270,7 @@ class TreeExport(context: Context, private val tree: Uri) : ExportStore {
 
     override fun location(where: String): String = app.absentmotion.platform.folderLabel(appContext, tree.toString())
 
-    override fun delete(uri: Uri) { runCatching { android.provider.DocumentsContract.deleteDocument(resolver, uri) } }
+    override fun delete(uri: Uri) { runCatching { DocumentsContract.deleteDocument(resolver, uri) } }
 
     override fun sequenceFolder(name: String, mime: String): String = name
 }
