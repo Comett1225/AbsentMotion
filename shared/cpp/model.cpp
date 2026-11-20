@@ -50,6 +50,11 @@ SkM44 Body(const Layer& l, const Placement& p, double timeMs) {
 
 }
 
+size_t ModelFaces(const Layer& l) {
+    auto found = Models().find(l.mediaUri);
+    return found == Models().end() ? 0 : found->second->triangles.size() / 3;
+}
+
 SkRect ModelBounds(const Layer& l, double timeMs) {
     auto found = Models().find(l.mediaUri);
     Placement p;

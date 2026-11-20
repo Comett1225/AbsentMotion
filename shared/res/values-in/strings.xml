@@ -2594,4 +2594,23 @@
     <string name="history_record_keyframes">Rekam keyframe</string>
     <string name="dafont_find">Cari font lain di DaFont</string>
     <string name="dafont_hint">Unduh sebuah font, lalu impor .zip-nya di sini. Periksa lisensinya sebelum memakainya di video yang dipublikasikan.</string>
+    <string name="community_ask_title">Buka Komunitas?</string>
+    <string name="community_ask_note">Tab Komunitas terhubung ke internet untuk memuat proyek dan preset bersama dari GitHub. Tidak ada yang dimuat sampai Anda menekan Hubungkan.</string>
+    <string name="community_ask_button">Hubungkan</string>
+    <string name="settings_ask_mobile_data">Tanya sebelum memakai data seluler</string>
+    <string name="mobile_data_title">Pakai data seluler?</string>
+    <string name="mobile_data_body">Anda tidak terhubung ke Wi-Fi, jadi unduhan ini akan memakai data seluler. Anda dapat mematikan pertanyaan ini di Pengaturan > Proyek dan media.</string>
+    <string name="mobile_data_use">Pakai data seluler</string>
+    <string name="mobile_data_refused">Tidak diunduh: Anda memilih tidak memakai data seluler.</string>
+    <string name="history_lock">Kunci atau buka kunci lapisan</string>
+    <string name="layer_lock">Kunci lapisan</string>
+    <string name="layer_lock_timing">Kunci waktu saja</string>
+    <string name="layer_unlock">Buka kunci</string>
+    <string name="a11y_layer_locked">Terkunci</string>
+    <string name="a11y_layer_timing_locked">Waktu terkunci</string>
+    <string name="layer_locked_hint">Lapisan ini terkunci</string>
+    <string name="layer_timing_locked_hint">Waktu lapisan ini terkunci</string>
+    <string name="desk_shortcut_change">Ubah pintasan</string>
+    <string name="desk_shortcut_remove">Hapus pintasan</string>
+    <string name="desk_shortcut_reset">Reset ke default</string>
 </resources>

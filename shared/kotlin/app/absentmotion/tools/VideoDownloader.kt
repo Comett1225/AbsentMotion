@@ -95,6 +95,7 @@ object VideoDownloader : VideoFetcher {
     }
 
     override suspend fun install(context: Context, progress: (Float) -> Unit): Unit = withContext(Dispatchers.IO) {
+        app.absentmotion.platform.MobileData.check()
         val dir = folder(context)
         check(dir.isDirectory || dir.mkdirs()) { context.getString(R.string.downloader_engine_failed) }
         val home = home(context)
@@ -127,6 +128,7 @@ object VideoDownloader : VideoFetcher {
         val now = System.currentTimeMillis()
         if (now - prefs.getLong("checked", 0L) in 0 until DAY_MS) return@withContext
         try {
+            app.absentmotion.platform.MobileData.check(quiet = true)
             val (tag, sha) = latestEngine()
             prefs.edit().putLong("checked", now).apply()
             if (tag == prefs.getString("engine", null) || tag == prefs.getString("pending", null) || tag == prefs.getString("bad", null)) return@withContext
@@ -242,6 +244,7 @@ object VideoDownloader : VideoFetcher {
         withContext(Dispatchers.IO) {
             if (restartNeeded) throw DownloadProblem(R.string.downloader_restart)
             if (!installed(context)) throw DownloadProblem(R.string.downloader_engine_missing)
+            app.absentmotion.platform.MobileData.check()
             try {
                 start(context)
             } catch (e: DownloadProblem) {
@@ -304,6 +307,7 @@ object VideoDownloader : VideoFetcher {
 
     private fun thumbnail(url: String, side: Int): ImageBitmap? =
         runCatching {
+            app.absentmotion.platform.MobileData.check()
             val connection = URL(url).openConnection() as HttpURLConnection
             try {
                 connection.connectTimeout = 10_000

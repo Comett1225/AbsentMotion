@@ -109,6 +109,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 internal var sessionIndex: CommunityIndex? = null
+internal var sessionAllowed = false
 
 internal class CommunityBrowseState {
     var query by mutableStateOf("")
@@ -268,8 +269,11 @@ fun CommunityTab(modifier: Modifier, engine: (() -> EngineThread)? = null, onImp
     var attempt by remember { mutableIntStateOf(0) }
     var selected by remember { mutableStateOf<CommunityItem?>(null) }
     val thumbs = remember { mutableStateMapOf<String, ImageBitmap?>() }
+    var allowed by remember { mutableStateOf(sessionAllowed) }
+    var refused by remember { mutableStateOf(false) }
 
-    LaunchedEffect(attempt) {
+    LaunchedEffect(attempt, allowed) {
+        if (!allowed) return@LaunchedEffect
         val cached = sessionIndex
         if (cached != null) {
             index = cached
@@ -279,11 +283,15 @@ fun CommunityTab(modifier: Modifier, engine: (() -> EngineThread)? = null, onImp
         }
         loading = true
         failed = false
+        refused = false
         val fetched = withContext(Dispatchers.IO) {
             try {
                 client.index()
             } catch (e: CancellationException) {
                 throw e
+            } catch (_: app.absentmotion.platform.MobileDataRefused) {
+                refused = true
+                null
             } catch (_: Exception) {
                 null
             }
@@ -300,8 +308,19 @@ fun CommunityTab(modifier: Modifier, engine: (() -> EngineThread)? = null, onImp
 
     val current = index
     when {
+        !allowed -> CommunityErrorState(modifier, R.string.community_ask_title, R.string.community_ask_note, R.string.community_ask_button) {
+            sessionAllowed = true
+            allowed = true
+        }
+
         loading -> Box(modifier.fillMaxSize(), Alignment.Center) {
             CircularProgressIndicator(color = Am.Navy)
+        }
+
+        failed && refused -> CommunityErrorState(modifier, R.string.community_ask_title, R.string.mobile_data_refused, R.string.community_ask_button) {
+            failed = false
+            loading = true
+            attempt++
         }
 
         failed || current == null -> CommunityErrorState(modifier) {
@@ -393,7 +412,13 @@ fun CommunityTab(modifier: Modifier, engine: (() -> EngineThread)? = null, onImp
 }
 
 @Composable
-private fun CommunityErrorState(modifier: Modifier, onRetry: () -> Unit) {
+private fun CommunityErrorState(
+    modifier: Modifier,
+    title: Int = R.string.community_error_title,
+    note: Int = R.string.community_error_note,
+    button: Int = R.string.community_try_again,
+    onRetry: () -> Unit,
+) {
     Column(
         modifier.fillMaxSize().padding(horizontal = 32.dp),
         Arrangement.Center,
@@ -401,7 +426,7 @@ private fun CommunityErrorState(modifier: Modifier, onRetry: () -> Unit) {
     ) {
         Icon(HomeIcons.CommunityTab, null, Modifier.size(40.dp), tint = Am.HomeMid)
         Text(
-            text = stringResource(R.string.community_error_title),
+            text = stringResource(title),
             modifier = Modifier.padding(top = 14.dp),
             color = Am.Navy,
             fontSize = 19.sp,
@@ -409,7 +434,7 @@ private fun CommunityErrorState(modifier: Modifier, onRetry: () -> Unit) {
             textAlign = TextAlign.Center
         )
         Text(
-            text = stringResource(R.string.community_error_note),
+            text = stringResource(note),
             modifier = Modifier.padding(top = 8.dp),
             color = Am.HomeMid,
             fontSize = 14.sp,
@@ -427,7 +452,7 @@ private fun CommunityErrorState(modifier: Modifier, onRetry: () -> Unit) {
             Alignment.Center
         ) {
             Text(
-                text = stringResource(R.string.community_try_again),
+                text = stringResource(button),
                 color = Am.OnNavy,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold

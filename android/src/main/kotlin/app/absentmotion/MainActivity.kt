@@ -162,6 +162,9 @@ class MainActivity : ComponentActivity() {
         if (android.os.Build.VERSION.SDK_INT < 28) window.setSoftInputMode(window.attributes.softInputMode or android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
         app.absentmotion.i18n.keepLegacyLanguage(this)
         app.absentmotion.i18n.AppText.install(this)
+        app.absentmotion.platform.MobileData.install(this)
+        app.absentmotion.desk.ShortcutPlatform.prefs = getSharedPreferences("desk", MODE_PRIVATE)
+        app.absentmotion.desk.DeskShortcuts.reload()
         app.absentmotion.media.MediaBackend.ffampReaders = app.absentmotion.ffamp.FfampMedia
         android.util.Log.i("AMMedia", "Media reader: ${if (app.absentmotion.media.MediaReader.ffamp(this)) "FFamp" else "Standard"}")
         effectLanguage = app.absentmotion.i18n.currentLanguage(this).tag
@@ -298,6 +301,7 @@ class MainActivity : ComponentActivity() {
                         if (open.exportOpen) ExportScreen(open.project, open.exportFrame, engine, settings, fromProjectList = false, outdated) { open.exportOpen = false }
                     }
                 }
+                app.absentmotion.ui.home.MobileDataDialog()
                 if (opening || openingProject) OpeningOverlay { openJob?.cancel() }
                 engineProblem?.takeIf { problemShown }?.let { UnsupportedPhone(it) { problemShown = false } }
                 openFailed?.let { id -> OpenFailedDialog({ openFailed = null; historyFor = Triple(id, "", false) }, outdated) { openFailed = null } }
@@ -676,7 +680,7 @@ class MainActivity : ComponentActivity() {
     @android.annotation.SuppressLint("RestrictedApi")
     override fun dispatchKeyEvent(event: android.view.KeyEvent): Boolean {
         val state = editor
-        if (state != null && event.action == android.view.KeyEvent.ACTION_DOWN && app.absentmotion.platform.DeskKeys.handle(state, androidx.compose.ui.input.key.KeyEvent(event))) return true
+        if (state != null && event.action == android.view.KeyEvent.ACTION_DOWN && app.absentmotion.platform.DeskKeys.handle(state, androidx.compose.ui.input.key.KeyEvent(event), ::closeEditor)) return true
         return super.dispatchKeyEvent(event)
     }
 

@@ -2652,4 +2652,23 @@
     <string name="history_record_keyframes">Gravar quadros-chave</string>
     <string name="dafont_find">Encontrar mais fontes no DaFont</string>
     <string name="dafont_hint">Baixe uma fonte e depois importe o .zip aqui. Confira a licença antes de usá-la em um vídeo publicado.</string>
+    <string name="community_ask_title">Abrir a Comunidade?</string>
+    <string name="community_ask_note">A aba Comunidade se conecta à internet para carregar projetos e predefinições compartilhados do GitHub. Nada é carregado até você tocar em Conectar.</string>
+    <string name="community_ask_button">Conectar</string>
+    <string name="settings_ask_mobile_data">Perguntar antes de usar dados móveis</string>
+    <string name="mobile_data_title">Usar dados móveis?</string>
+    <string name="mobile_data_body">Você não está no Wi-Fi, então este download vai usar dados móveis. Você pode desativar esta pergunta em Configurações > Projetos e mídia.</string>
+    <string name="mobile_data_use">Usar dados móveis</string>
+    <string name="mobile_data_refused">Não baixado: você escolheu não usar dados móveis.</string>
+    <string name="history_lock">Bloquear ou desbloquear camada</string>
+    <string name="layer_lock">Bloquear camada</string>
+    <string name="layer_lock_timing">Bloquear só o tempo</string>
+    <string name="layer_unlock">Desbloquear</string>
+    <string name="a11y_layer_locked">Bloqueada</string>
+    <string name="a11y_layer_timing_locked">Tempo bloqueado</string>
+    <string name="layer_locked_hint">Esta camada está bloqueada</string>
+    <string name="layer_timing_locked_hint">O tempo desta camada está bloqueado</string>
+    <string name="desk_shortcut_change">Alterar atalho</string>
+    <string name="desk_shortcut_remove">Remover atalho</string>
+    <string name="desk_shortcut_reset">Redefinir para o padrão</string>
 </resources>

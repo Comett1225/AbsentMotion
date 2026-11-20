@@ -412,6 +412,7 @@ internal object CaptionModel {
         val part = File(target.path + ".part")
         try {
             check(target.parentFile!!.let { it.isDirectory || it.mkdirs() }) { AppText.get(R.string.ai_cannot_create_model_storage) }
+            app.absentmotion.platform.MobileData.check()
             val connection = URL("$RELEASE/${name(highPrecision)}").openConnection() as HttpURLConnection
             try {
                 connection.connectTimeout = 15_000

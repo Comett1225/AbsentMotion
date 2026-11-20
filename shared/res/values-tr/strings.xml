@@ -2623,4 +2623,23 @@
     <string name="history_record_keyframes">Anahtar kare kaydı</string>
     <string name="dafont_find">DaFont\'ta daha fazla yazı tipi bul</string>
     <string name="dafont_hint">Bir yazı tipi indirin, sonra .zip dosyasını burada içe aktarın. Yayımlanan bir videoda kullanmadan önce lisansını kontrol edin.</string>
+    <string name="community_ask_title">Topluluk açılsın mı?</string>
+    <string name="community_ask_note">Topluluk sekmesi, paylaşılan projeleri ve ön ayarları GitHub\'dan yüklemek için internete bağlanır. Bağlan\'a basana kadar hiçbir şey yüklenmez.</string>
+    <string name="community_ask_button">Bağlan</string>
+    <string name="settings_ask_mobile_data">Mobil veri kullanmadan önce sor</string>
+    <string name="mobile_data_title">Mobil veri kullanılsın mı?</string>
+    <string name="mobile_data_body">Wi-Fi\'ye bağlı değilsiniz, bu yüzden bu indirme mobil veri kullanacak. Bu soruyu Ayarlar > Projeler ve medya bölümünden kapatabilirsiniz.</string>
+    <string name="mobile_data_use">Mobil veri kullan</string>
+    <string name="mobile_data_refused">İndirilmedi: mobil veri kullanmamayı seçtiniz.</string>
+    <string name="history_lock">Katmanı kilitle veya kilidini aç</string>
+    <string name="layer_lock">Katmanı kilitle</string>
+    <string name="layer_lock_timing">Yalnızca zamanlamayı kilitle</string>
+    <string name="layer_unlock">Kilidi aç</string>
+    <string name="a11y_layer_locked">Kilitli</string>
+    <string name="a11y_layer_timing_locked">Zamanlama kilitli</string>
+    <string name="layer_locked_hint">Bu katman kilitli</string>
+    <string name="layer_timing_locked_hint">Bu katmanın zamanlaması kilitli</string>
+    <string name="desk_shortcut_change">Kısayolu değiştir</string>
+    <string name="desk_shortcut_remove">Kısayolu kaldır</string>
+    <string name="desk_shortcut_reset">Varsayılana sıfırla</string>
 </resources>

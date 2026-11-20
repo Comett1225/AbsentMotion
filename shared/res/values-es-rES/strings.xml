@@ -2652,4 +2652,23 @@
     <string name="history_record_keyframes">Grabar fotogramas clave</string>
     <string name="dafont_find">Buscar más fuentes en DaFont</string>
     <string name="dafont_hint">Descarga una fuente y luego importa el .zip aquí. Revisa su licencia antes de usarla en un vídeo publicado.</string>
+    <string name="community_ask_title">¿Abrir la Comunidad?</string>
+    <string name="community_ask_note">La pestaña Comunidad se conecta a internet para cargar proyectos y preajustes compartidos desde GitHub. No se carga nada hasta que pulses Conectar.</string>
+    <string name="community_ask_button">Conectar</string>
+    <string name="settings_ask_mobile_data">Preguntar antes de usar datos móviles</string>
+    <string name="mobile_data_title">¿Usar datos móviles?</string>
+    <string name="mobile_data_body">No estás conectado a una red Wi-Fi, así que esta descarga usará datos móviles. Puedes desactivar esta pregunta en Ajustes > Proyectos y medios.</string>
+    <string name="mobile_data_use">Usar datos móviles</string>
+    <string name="mobile_data_refused">No se ha descargado: has elegido no usar datos móviles.</string>
+    <string name="history_lock">Bloquear o desbloquear capa</string>
+    <string name="layer_lock">Bloquear capa</string>
+    <string name="layer_lock_timing">Bloquear solo el tiempo</string>
+    <string name="layer_unlock">Desbloquear</string>
+    <string name="a11y_layer_locked">Bloqueada</string>
+    <string name="a11y_layer_timing_locked">Tiempo bloqueado</string>
+    <string name="layer_locked_hint">Esta capa está bloqueada</string>
+    <string name="layer_timing_locked_hint">El tiempo de esta capa está bloqueado</string>
+    <string name="desk_shortcut_change">Cambiar atajo</string>
+    <string name="desk_shortcut_remove">Quitar atajo</string>
+    <string name="desk_shortcut_reset">Restablecer predeterminado</string>
 </resources>

@@ -22,6 +22,9 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.onAllNodesWithContentDescription
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.performMouseInput
+import androidx.compose.ui.test.rightClick
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
@@ -354,6 +357,55 @@ class DeskShortcutsTest {
                 waitForIdle()
                 assertEquals(emptyMap<Shortcut, List<MenuKey>>(), DeskShortcuts.custom)
                 onNodeWithText(shortcutText(MenuKey(Key.B), DeskOs.mac)).assertExists()
+            }
+        } finally { DeskShortcuts.resetAll() }
+    }
+    @Test fun removingAShortcutLeavesItEmptyAfterARestart() {
+        val s = session("remove")
+        try {
+            DeskShortcuts.clear(Shortcut.Split)
+            assertEquals(emptyList<MenuKey>(), DeskShortcuts.keys(Shortcut.Split))
+            DeskShortcuts.reload()
+            assertEquals(emptyList<MenuKey>(), DeskShortcuts.keys(Shortcut.Split))
+            assertEquals("", DeskShortcuts.text(Shortcut.Split))
+            assertFalse(s.press(VK_B, command))
+            DeskShortcuts.reset(Shortcut.Split)
+            assertEquals(Shortcut.Split.defaults, DeskShortcuts.keys(Shortcut.Split))
+        } finally { s.close() }
+    }
+
+    @Test fun rightClickChangesRemovesAndResetsAShortcut() {
+        data("rightclick")
+        try {
+            runSkikoComposeUiTest(size = Size(400f, 400f)) {
+                setContent { app.absentmotion.ui.editor.DeskIcon(app.absentmotion.ui.editor.ChromeIcons.Undo, "Undo", shortcut = Shortcut.Undo) {} }
+                onNodeWithContentDescription("Undo").performMouseInput { rightClick() }
+                waitForIdle()
+                onNodeWithText("Change shortcut").performClick()
+                waitForIdle()
+                onNodeWithText("Press keys…").assertExists()
+                runOnIdle { DeskKeys.viewer!!.invoke(event(java.awt.event.KeyEvent.VK_F7, true, 0)) }
+                waitForIdle()
+                assertEquals(listOf(MenuKey(Key.F7, command = false)), DeskShortcuts.keys(Shortcut.Undo))
+                assertNull(DeskKeys.viewer)
+                onNodeWithContentDescription("Undo").performMouseInput { rightClick() }
+                waitForIdle()
+                onNodeWithText("Change shortcut").performClick()
+                waitForIdle()
+                runOnIdle { DeskKeys.viewer!!.invoke(event(VK_D, true, command)) }
+                waitForIdle()
+                onNodeWithText("Already used by “Duplicate”.").assertExists()
+                onNodeWithText("Cancel").performClick()
+                waitForIdle()
+                assertEquals(listOf(MenuKey(Key.F7, command = false)), DeskShortcuts.keys(Shortcut.Undo))
+                onNodeWithText("Remove shortcut").performClick()
+                waitForIdle()
+                assertEquals(emptyList<MenuKey>(), DeskShortcuts.keys(Shortcut.Undo))
+                onNodeWithContentDescription("Undo").performMouseInput { rightClick() }
+                waitForIdle()
+                onNodeWithText("Reset to default").performClick()
+                waitForIdle()
+                assertEquals(Shortcut.Undo.defaults, DeskShortcuts.keys(Shortcut.Undo))
             }
         } finally { DeskShortcuts.resetAll() }
     }

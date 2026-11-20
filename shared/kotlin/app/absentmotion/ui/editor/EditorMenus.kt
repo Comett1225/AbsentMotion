@@ -3,7 +3,7 @@ package app.absentmotion.ui.editor
 import app.absentmotion.ui.editor.panels.buttonLabel
 import app.absentmotion.ui.adaptive.deskLayout
 import app.absentmotion.platform.Toast
-import app.absentmotion.editor.deselectLayer
+import app.absentmotion.editor.selectAll
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -325,9 +325,7 @@ internal fun CopyPasteMenu(state: EditorState, below: Boolean = false, onDismiss
     saved?.let { PresetSavedDialog(it, PresetStore(context), onDismiss); return }
     MenuPopup(position, onDismiss) {
         MenuRow(stringResource(R.string.menu_select_all_layers), enabled = state.scene.layers.isNotEmpty(), icon = ChromeIcons.SelectAll) {
-            state.deselectLayer()
-            MultiSelect.ids = state.scene.layers.map { it.id }.toSet()
-            MultiSelect.active = true
+            state.selectAll()
             onDismiss()
         }
         MenuRow(pluralStringResource(R.plurals.menu_duplicate_layers, count, count.toString()), enabled = count > 0, icon = ChromeIcons.Duplicate) {

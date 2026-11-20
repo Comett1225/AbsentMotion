@@ -2623,4 +2623,23 @@
     <string name="history_record_keyframes">Mag-record ng keyframe</string>
     <string name="dafont_find">Maghanap pa ng mga font sa DaFont</string>
     <string name="dafont_hint">Mag-download ng font, tapos i-import ang .zip dito. Tingnan ang lisensya nito bago gamitin sa na-publish na video.</string>
+    <string name="community_ask_title">Buksan ang Komunidad?</string>
+    <string name="community_ask_note">Kumokonekta sa internet ang tab na Komunidad para i-load ang mga ibinahaging proyekto at preset mula sa GitHub. Walang ilo-load hangga\'t hindi mo pinipindot ang Kumonekta.</string>
+    <string name="community_ask_button">Kumonekta</string>
+    <string name="settings_ask_mobile_data">Magtanong bago gumamit ng mobile data</string>
+    <string name="mobile_data_title">Gumamit ng mobile data?</string>
+    <string name="mobile_data_body">Wala ka sa Wi-Fi, kaya gagamit ng mobile data ang download na ito. Maaari mong i-off ang tanong na ito sa Mga setting > Mga proyekto at media.</string>
+    <string name="mobile_data_use">Gumamit ng mobile data</string>
+    <string name="mobile_data_refused">Hindi na-download: pinili mong huwag gumamit ng mobile data.</string>
+    <string name="history_lock">I-lock o i-unlock ang layer</string>
+    <string name="layer_lock">I-lock ang layer</string>
+    <string name="layer_lock_timing">I-lock ang timing lang</string>
+    <string name="layer_unlock">I-unlock</string>
+    <string name="a11y_layer_locked">Naka-lock</string>
+    <string name="a11y_layer_timing_locked">Naka-lock ang timing</string>
+    <string name="layer_locked_hint">Naka-lock ang layer na ito</string>
+    <string name="layer_timing_locked_hint">Naka-lock ang timing ng layer na ito</string>
+    <string name="desk_shortcut_change">Palitan ang shortcut</string>
+    <string name="desk_shortcut_remove">Alisin ang shortcut</string>
+    <string name="desk_shortcut_reset">I-reset sa default</string>
 </resources>

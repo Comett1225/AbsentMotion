@@ -1,5 +1,6 @@
 package app.absentmotion.ui.editor
 
+import app.absentmotion.desk.Shortcut
 import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.LocalIndication
@@ -270,11 +271,11 @@ private fun DeskDivider(horizontal: Boolean, drag: DividerDrag?) {
 
 @Composable
 private fun DeskInspectorRail(open: () -> Unit) {
-    Hint(deskShortcut(R.string.desk_inspector, deskKeys("Inspector", "${DeskMod}2"))) {
+    ShortcutMenuBox(Shortcut.Inspector) { Hint(deskShortcut(R.string.desk_inspector, deskKeys("Inspector", "${DeskMod}2"))) {
         Column(Modifier.width(InspectorRail.dp).fillMaxHeight().background(Am.Panel).hoverFill(0.dp, Am.Field).handCursor().clickable(onClick = open), horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(PanelIcons.RgbSliders, stringResource(R.string.desk_inspector), Modifier.padding(top = 12.dp).size(24.dp), tint = Am.OnDark)
         }
-    }
+    } }
 }
 
 internal object DeskGear { var open by mutableStateOf(false) }
@@ -288,14 +289,14 @@ internal fun RowScope.DeskTopBar(state: EditorState, onExit: () -> Unit, menu: @
         else Text(state.project.title, Modifier.weight(1f, fill = false), color = Am.OnDark, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
         Text("${state.scene.width} × ${state.scene.height} · ${state.scene.fps} fps", Modifier.padding(start = 12.dp), color = Am.OnDarkDim, fontSize = 12.sp, maxLines = 1, softWrap = false)
     }
-    Box(Modifier.tutorialTarget("undo")) { DeskIcon(ChromeIcons.Undo, deskShortcut(R.string.play_undo, deskKeys("Undo", "${DeskMod}Z")), state.canUndo) { state.undo() } }
-    Box(Modifier.tutorialTarget("redo")) { DeskIcon(ChromeIcons.Redo, deskShortcut(R.string.play_redo, deskKeys("Redo", DeskRedoKeys)), state.canRedo) { state.redo() } }
+    Box(Modifier.tutorialTarget("undo")) { DeskIcon(ChromeIcons.Undo, deskShortcut(R.string.play_undo, deskKeys("Undo", "${DeskMod}Z")), state.canUndo, shortcut = Shortcut.Undo) { state.undo() } }
+    Box(Modifier.tutorialTarget("redo")) { DeskIcon(ChromeIcons.Redo, deskShortcut(R.string.play_redo, deskKeys("Redo", DeskRedoKeys)), state.canRedo, shortcut = Shortcut.Redo) { state.redo() } }
     Box(Modifier.tutorialTarget("gear")) { DeskIcon(ChromeIcons.Gear, stringResource(R.string.topbar_project_settings)) { DeskGear.open = true } }
-    Hint(deskShortcut(R.string.desk_export, deskKeys("Export", "${DeskMod}E"))) {
+    ShortcutMenuBox(Shortcut.Export) { Hint(deskShortcut(R.string.desk_export, deskKeys("Export", "${DeskMod}E"))) {
         Box(Modifier.padding(start = 8.dp, end = 2.dp).height(32.dp).tutorialTarget("export").clip(RoundedCornerShape(8.dp)).background(Am.Accent).clickable { state.playing = false; state.exportOpen = true }.padding(horizontal = 16.dp), Alignment.Center) {
             Text(stringResource(R.string.desk_export), color = Am.OnAccent, fontSize = 13.sp, fontWeight = FontWeight.Medium)
         }
-    }
+    } }
 }
 
 private val Tabular: TextStyle @androidx.compose.runtime.Composable get() = TextStyle(fontFeatureSettings = "tnum", fontFamily = androidx.compose.material3.LocalTextStyle.current.fontFamily)
@@ -316,11 +317,11 @@ private fun DeskTransport(state: EditorState, modifier: Modifier) {
                 Text(TimelineMath.timecode(state.playheadFrame, state.scene.fps), color = Am.OnDark, fontSize = 13.sp, style = Tabular, maxLines = 1, softWrap = false)
                 if (total) Text(" / " + TimelineMath.timecode(state.scene.lastFrame + 1, state.scene.fps), color = Am.OnDarkDim, fontSize = 13.sp, style = Tabular, maxLines = 1, softWrap = false)
             }
-            if (skips) DeskIcon(ChromeIcons.SkipBack, deskShortcut(R.string.desk_start, deskKeys("GoStart", "Home")), size = 32.dp) { state.playing = false; state.frame = 0 }
-            DeskIcon(DrawingIcons.Prev, deskShortcut(R.string.desk_previous_frame, deskKeys("PreviousFrame", "←")), size = 32.dp) { state.playing = false; state.stepTo(state.playheadFrame - 1) }
+            if (skips) DeskIcon(ChromeIcons.SkipBack, deskShortcut(R.string.desk_start, deskKeys("GoStart", "Home")), size = 32.dp, shortcut = Shortcut.GoStart) { state.playing = false; state.frame = 0 }
+            DeskIcon(DrawingIcons.Prev, deskShortcut(R.string.desk_previous_frame, deskKeys("PreviousFrame", "←")), size = 32.dp, shortcut = Shortcut.PreviousFrame) { state.playing = false; state.stepTo(state.playheadFrame - 1) }
             PlaybackControl(state, Modifier.size(32.dp), desktop = true)
-            DeskIcon(DrawingIcons.Next, deskShortcut(R.string.desk_next_frame, deskKeys("NextFrame", "→")), size = 32.dp) { state.playing = false; state.stepTo(state.playheadFrame + 1) }
-            if (skips) DeskIcon(ChromeIcons.SkipForward, deskShortcut(R.string.desk_end, deskKeys("GoEnd", "End")), size = 32.dp) { state.playing = false; state.parkAtEnd() }
+            DeskIcon(DrawingIcons.Next, deskShortcut(R.string.desk_next_frame, deskKeys("NextFrame", "→")), size = 32.dp, shortcut = Shortcut.NextFrame) { state.playing = false; state.stepTo(state.playheadFrame + 1) }
+            if (skips) DeskIcon(ChromeIcons.SkipForward, deskShortcut(R.string.desk_end, deskKeys("GoEnd", "End")), size = 32.dp, shortcut = Shortcut.GoEnd) { state.playing = false; state.parkAtEnd() }
             if (loop) DeskIcon(ChromeIcons.PlayRepeat, stringResource(R.string.desk_loop), active = state.settings.loopingPlay, size = 32.dp) { state.settings.loopingPlay = !state.settings.loopingPlay }
             Row(if (centred) Modifier.weight(1f) else Modifier, Arrangement.End, Alignment.CenterVertically) {
                 Box(Modifier.size(32.dp), Alignment.Center) { Hint(stringResource(R.string.a11y_animate)) { AnimateButton(state, Modifier) } }
@@ -357,11 +358,11 @@ private fun DeskInspector(state: EditorState, library: AddLibrary, modifier: Mod
             )
             if (state.selectedId != null && !MultiSelect.active) {
                 Box { DeskParentButton { parentMenu = true }; Presence(parentMenu) { ParentMenu(state, below = true) { parentMenu = false } } }
-                DeskIcon(ChromeIcons.Duplicate, deskShortcut(R.string.effects_duplicate, deskKeys("Duplicate", "${DeskMod}D"))) { state.duplicateSelected() }
-                DeskIcon(ChromeIcons.Trash, deskShortcut(R.string.topbar_delete_layer, deskKeys("Delete", "Delete"))) { state.deleteSelected() }
+                DeskIcon(ChromeIcons.Duplicate, deskShortcut(R.string.effects_duplicate, deskKeys("Duplicate", "${DeskMod}D")), shortcut = Shortcut.Duplicate) { state.duplicateSelected() }
+                DeskIcon(ChromeIcons.Trash, deskShortcut(R.string.topbar_delete_layer, deskKeys("Delete", "Delete")), shortcut = Shortcut.Delete) { state.deleteSelected() }
                 Box { DeskIcon(ChromeIcons.More, stringResource(R.string.topbar_layer_menu)) { menu = true }; if (menu) LayerMenu(state) { menu = false } }
             }
-            DeskIcon(ChromeIcons.Close, deskShortcut(R.string.action_close, deskKeys("Inspector", "${DeskMod}2")), action = close)
+            DeskIcon(ChromeIcons.Close, deskShortcut(R.string.action_close, deskKeys("Inspector", "${DeskMod}2")), shortcut = Shortcut.Inspector, action = close)
         }
         when {
             MultiSelect.active -> DeskMulti(state, Modifier.weight(1f).fillMaxWidth())

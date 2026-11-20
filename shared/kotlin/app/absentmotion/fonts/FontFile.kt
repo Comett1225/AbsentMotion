@@ -18,7 +18,10 @@ private val ZipFontExtensions = setOf("ttf", "otf", "ttc")
 fun isZip(bytes: ByteArray) = bytes.size > 3 && bytes[0] == 0x50.toByte() && bytes[1] == 0x4B.toByte() && bytes[2] == 3.toByte() && bytes[3] == 4.toByte()
 
 fun zipFonts(raw: ByteArray): List<Pair<String, ByteArray>> =
-    try { zipFonts(raw, Charsets.UTF_8) } catch (_: IllegalArgumentException) { zipFonts(raw, Charsets.ISO_8859_1) }
+    try { zipFonts(raw, Charsets.UTF_8) } catch (e: Exception) {
+        if (e is FontImportError && e.problem != FontProblem.Corrupted) throw e
+        zipFonts(raw, Charsets.ISO_8859_1)
+    }
 
 private fun zipFonts(raw: ByteArray, names: java.nio.charset.Charset): List<Pair<String, ByteArray>> {
     val found = ArrayList<Pair<String, ByteArray>>()

@@ -81,6 +81,39 @@ class LivePlaybackTest {
         assertFalse(state.canUndo)
     }
 
+    @Test fun dragWhilePlayingStartsKeyframesOnAPropertyWithoutAny() {
+        val state = opened("unkeyed", """<scene title="Live" width="400" height="400" fps="30" totalTime="1999" bgcolor="#ff000000"><shape id="1" label="Shape" startTime="0" endTime="1999" fillType="color" s=".rect"><transform><location value="0,0,0"/><rotation value="0"/></transform></shape></scene>""")
+        state.selectedId = 1L
+        state.playing = true
+        state.frame = 2
+        state.editSelected("drag") { it.withTransform("location", 10f, 0f, 0f) }
+        state.frame = 10
+        state.editSelected("drag") { it.withTransform("location", 50f, 0f, 0f) }
+        state.frame = 20
+        state.editSelected("drag") { it.withTransform("location", 90f, 0f, 0f) }
+        state.endGesture()
+        state.playing = false
+        val keys = state.scene.layer(1L)!!.keyframes(PropRef.Location)
+        assertTrue(keys.size >= 2)
+        val xs = keys.map { it.v.substringBefore(',').toFloat() }
+        assertEquals(10f, xs.first(), 0.01f)
+        assertEquals(90f, xs.last(), 0.01f)
+        assertTrue(state.scene.layer(1L)!!.keyframes(PropRef.Rotation).isEmpty())
+        state.undo()
+        assertTrue(state.scene.layer(1L)!!.keyframes(PropRef.Location).isEmpty())
+        assertFalse(state.canUndo)
+    }
+
+    @Test fun aTapWhilePlayingOnAPropertyWithoutKeyframesStaysStatic() {
+        val state = opened("unkeyedtap", """<scene title="Live" width="400" height="400" fps="30" totalTime="1999" bgcolor="#ff000000"><shape id="1" label="Shape" startTime="0" endTime="1999" fillType="color" s=".rect"><transform><location value="0,0,0"/></transform></shape></scene>""")
+        state.selectedId = 1L
+        state.playing = true
+        state.frame = 5
+        state.editSelected { it.withTransform("location", 30f, 0f, 0f) }
+        state.playing = false
+        assertTrue(state.scene.layer(1L)!!.keyframes(PropRef.Location).isEmpty())
+    }
+
     private fun opened(name: String, xml: String): EditorState {
         val dir = File("build/live-playback-$name").also { it.deleteRecursively(); it.mkdirs() }
         System.setProperty("am.data", dir.absolutePath)

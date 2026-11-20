@@ -236,6 +236,7 @@ class FontLibrary(context: Context) {
     private fun <T> request(url: String, read: (java.io.InputStream) -> T): T {
         val target = URL(url)
         require(target.protocol == "https" && target.host in listOf("fonts.googleapis.com", "fonts.gstatic.com", "fonts.google.com"))
+        app.absentmotion.platform.MobileData.check()
         val connection = target.openConnection() as HttpsURLConnection
         connection.instanceFollowRedirects = false
         connection.connectTimeout = 10000

@@ -2594,4 +2594,23 @@
     <string name="history_record_keyframes">キーフレームを記録</string>
     <string name="dafont_find">DaFontでフォントをもっと探す</string>
     <string name="dafont_hint">フォントをダウンロードしてから、.zipをここで読み込んでください。公開する動画に使う前に、ライセンスを確認してください。</string>
+    <string name="community_ask_title">コミュニティを開きますか？</string>
+    <string name="community_ask_note">コミュニティタブはインターネットに接続し、GitHub から共有プロジェクトとプリセットを読み込みます。「接続」を押すまで何も読み込みません。</string>
+    <string name="community_ask_button">接続</string>
+    <string name="settings_ask_mobile_data">モバイルデータを使う前に確認する</string>
+    <string name="mobile_data_title">モバイルデータを使いますか？</string>
+    <string name="mobile_data_body">Wi-Fi に接続していないため、このダウンロードはモバイルデータを使います。この確認は 設定 > プロジェクトとメディア でオフにできます。</string>
+    <string name="mobile_data_use">モバイルデータを使う</string>
+    <string name="mobile_data_refused">ダウンロードしませんでした：モバイルデータを使わないことを選びました。</string>
+    <string name="history_lock">レイヤーのロック/ロック解除</string>
+    <string name="layer_lock">レイヤーをロック</string>
+    <string name="layer_lock_timing">タイミングのみロック</string>
+    <string name="layer_unlock">ロック解除</string>
+    <string name="a11y_layer_locked">ロック中</string>
+    <string name="a11y_layer_timing_locked">タイミングをロック中</string>
+    <string name="layer_locked_hint">このレイヤーはロックされています</string>
+    <string name="layer_timing_locked_hint">このレイヤーのタイミングはロックされています</string>
+    <string name="desk_shortcut_change">ショートカットを変更</string>
+    <string name="desk_shortcut_remove">ショートカットを削除</string>
+    <string name="desk_shortcut_reset">デフォルトに戻す</string>
 </resources>

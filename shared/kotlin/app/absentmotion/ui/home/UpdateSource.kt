@@ -56,7 +56,7 @@ internal fun redirectTarget(from: URI, location: String?, source: UpdateSource):
 
 internal class UpdateProblem(val failure: UpdateFailure, cause: Throwable? = null) : IOException(failure.toString(), cause)
 
-internal class TrustedHttp(private val source: UpdateSource, private val connectMs: Int = 15_000, private val readMs: Int = 30_000) {
+internal class TrustedHttp(private val source: UpdateSource, private val connectMs: Int = 15_000, private val readMs: Int = 30_000, private val quiet: Boolean = false) {
     @Volatile private var current: HttpURLConnection? = null
     @Volatile private var aborted = false
 
@@ -68,6 +68,7 @@ internal class TrustedHttp(private val source: UpdateSource, private val connect
     fun <T> get(url: String, headers: Map<String, String> = emptyMap(), read: (HttpURLConnection) -> T): T {
         var target = runCatching { URI(url) }.getOrNull() ?: throw UpdateProblem(UpdateFailure.Untrusted)
         if (!source.allows(target, first = true)) throw UpdateProblem(UpdateFailure.Untrusted)
+        app.absentmotion.platform.MobileData.check(quiet)
         repeat(MAX_REDIRECTS + 1) {
             if (aborted) throw UpdateProblem(UpdateFailure.Connection)
             val connection = target.toURL().openConnection() as HttpURLConnection

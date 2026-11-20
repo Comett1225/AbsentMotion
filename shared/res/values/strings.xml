@@ -170,6 +170,11 @@
     <string name="delete_all">Delete all</string>
     <string name="effects_not_loaded">The effects could not be loaded</string>
     <string name="settings_demo_mode">Demo Mode</string>
+    <string name="settings_ask_mobile_data">Ask before using mobile data</string>
+    <string name="mobile_data_title">Use mobile data?</string>
+    <string name="mobile_data_body">You are not on Wi-Fi, so this download will use mobile data. You can turn this question off in Settings > Projects and media.</string>
+    <string name="mobile_data_use">Use mobile data</string>
+    <string name="mobile_data_refused">Not downloaded: you chose not to use mobile data.</string>
     <string name="settings_open_xml">Show the import card in the project list</string>
     <string name="settings_vibration">Vibration</string>
     <string name="settings_emoji">Emoji Style</string>
@@ -468,6 +473,9 @@
     <string name="community_error_title">Can\'t reach the community library</string>
     <string name="community_error_note">Check your internet connection and try again.</string>
     <string name="community_try_again">Try again</string>
+    <string name="community_ask_title">Open the Community?</string>
+    <string name="community_ask_note">The Community tab connects to the internet to load shared projects and presets from GitHub. Nothing is loaded until you press Connect.</string>
+    <string name="community_ask_button">Connect</string>
     <string name="community_too_new">Update AbsentMotion to see the community library</string>
     <string name="community_filter_projects">Projects</string>
     <string name="community_filter_presets">Presets</string>
@@ -1683,6 +1691,7 @@
     <string name="history_blend">Blending</string>
     <string name="history_visibility">Show or hide layer</string>
     <string name="history_mask">Clipping mask</string>
+    <string name="history_lock">Lock or unlock layer</string>
     <string name="history_add_effect">Add %1$s</string>
     <string name="history_remove_effect">Remove %1$s</string>
     <string name="history_move_effect">Move %1$s</string>
@@ -1700,6 +1709,13 @@
     <string name="a11y_hide_layer">Hide layer</string>
     <string name="a11y_show_layer">Show layer</string>
     <string name="a11y_layer_hidden">Hidden</string>
+    <string name="layer_lock">Lock layer</string>
+    <string name="layer_lock_timing">Lock timing only</string>
+    <string name="layer_unlock">Unlock</string>
+    <string name="a11y_layer_locked">Locked</string>
+    <string name="a11y_layer_timing_locked">Timing locked</string>
+    <string name="layer_locked_hint">This layer is locked</string>
+    <string name="layer_timing_locked_hint">This layer\'s timing is locked</string>
     <string name="ai_noise_question">What do you want to reduce the noise from?</string>
     <string name="ai_noise_voice">Voice recording</string>
     <string name="ai_noise_voice_hint">Removes the background noise behind speech</string>
@@ -2579,6 +2595,9 @@
     <string name="desk_shortcuts_press">Press keys…</string>
     <string name="desk_shortcuts_reset_all">Reset all</string>
     <string name="desk_shortcuts_conflict">Already used by “%1$s”.</string>
+    <string name="desk_shortcut_change">Change shortcut</string>
+    <string name="desk_shortcut_remove">Remove shortcut</string>
+    <string name="desk_shortcut_reset">Reset to default</string>
     <string name="desk_key_back_10">Back 10 frames</string>
     <string name="desk_key_forward_10">Forward 10 frames</string>
     <string name="desk_key_previous_keyframe">Previous keyframe</string>

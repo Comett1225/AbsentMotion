@@ -62,6 +62,7 @@ internal fun PlaybackControl(state: EditorState, modifier: Modifier = Modifier, 
                 DropdownMenuItem(text = { Text(stringResource(label)) }, trailingIcon = { if (settings.playbackSpeed == value) Text("✓", color = Am.Accent) }, colors = colors, onClick = { settings.playbackSpeed = value; open = false })
             }
             if (!desktop) DropdownMenuItem(text = { Text(stringResource(R.string.desk_loop)) }, trailingIcon = { if (settings.loopingPlay) Text("✓", color = Am.Accent) }, colors = colors, onClick = { settings.loopingPlay = !settings.loopingPlay; open = false })
+            if (desktop && app.absentmotion.ui.adaptive.deskLayout) ShortcutItems(app.absentmotion.desk.Shortcut.PlayPause, divider = true) { open = false }
         }
     }
 }

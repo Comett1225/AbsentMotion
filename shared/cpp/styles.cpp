@@ -654,6 +654,11 @@ std::vector<LayerCopy> CopiesOf(const std::vector<Layer>& siblings, const Layer&
     }
     std::vector<RepeatCopy> copies;
     RepeatCopies(l, timeMs, space, &copies);
+    if (l.kind == "model" && std::any_of(copies.begin(), copies.end(), [](const RepeatCopy& c) { return c.shiftMs != 0; })) {
+        constexpr size_t kModelFaceBudget = 1000000;
+        const size_t keep = std::max<size_t>(1, kModelFaceBudget / std::max<size_t>(ModelFaces(l), 1));
+        if (copies.size() > keep) copies.erase(copies.begin(), copies.end() - (std::ptrdiff_t)keep);
+    }
     std::vector<LayerCopy> out;
     out.reserve(copies.size());
     double at = timeMs;
@@ -1192,8 +1197,43 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
         const float frame = std::max(1.0f, (float)seen.width() * (float)seen.height());
         const bool plainText = l.text && !TextAnimated(l);
         float spent = 0;
+        sk_sp<SkImage> sprite;
+        const SkRect area = l.kind == "model" ? ModelBounds(l, timeMs) : SkRect::MakeEmpty();
+        float k = 0;
+        if (!area.isEmpty()) {
+            for (const LayerCopy& c : *copies) {
+                const float s = c.timeMs == timeMs ? SkMatrix::Concat(canvas->getTotalMatrix(), c.scene).getMaxScale() : 0;
+                k = std::max(k, s > 0 ? s : c.timeMs == timeMs ? 1.0f : 0.0f);
+            }
+            k = std::min(k, 2048 / std::max(area.width(), area.height()));
+            const SkImageInfo info = SkImageInfo::MakeN32Premul((int)std::ceil(area.width() * k) + 2, (int)std::ceil(area.height() * k) + 2);
+            sk_sp<SkSurface> surface = k > 0 ? canvas->makeSurface(info) : nullptr;
+            if (!surface && k > 0) surface = SkSurfaces::Raster(info);
+            if (surface) {
+                SkCanvas* s = surface->getCanvas();
+                s->clear(SK_ColorTRANSPARENT);
+                s->translate(1, 1);
+                s->scale(k, k);
+                s->translate(-area.left(), -area.top());
+                DrawModel(s, l, timeMs, 1, pictures);
+                sprite = surface->makeImageSnapshot();
+            }
+        }
         for (const LayerCopy& c : *copies) {
             const bool now = c.timeMs == timeMs;
+            if (sprite && now) {
+                SkPaint paint;
+                paint.setAlphaf(std::clamp(alpha * c.look.alpha, 0.0f, 1.0f));
+                paint.setBlendMode(c.look.mode);
+                if (c.look.tinted > 0) paint.setColorFilter(CopyTint(c.look));
+                canvas->save();
+                canvas->concat(c.scene);
+                canvas->translate(area.left(), area.top());
+                canvas->scale(1 / k, 1 / k);
+                canvas->drawImage(sprite, -1, -1, SkSamplingOptions(SkFilterMode::kLinear), &paint);
+                canvas->restore();
+                continue;
+            }
             const float tc = now ? t : l.localTime(c.timeMs);
             const SkMatrix& mc = c.layer;
             const SkPath pc = now ? path : BodyPath(l, tc);

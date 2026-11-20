@@ -16,23 +16,7 @@ import androidx.compose.ui.platform.PlatformTextInputMethodRequest
 import androidx.compose.ui.platform.PlatformTextInputSession
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.PointMode
-import app.absentmotion.editor.MultiSelect
-import app.absentmotion.editor.deselectLayer
-import app.absentmotion.editor.chosenLayers
 import app.absentmotion.ui.editor.DeskDrop
-import app.absentmotion.ui.editor.DeskTimelineControls
-import app.absentmotion.ui.editor.TimelineMath
-import app.absentmotion.editor.copySelected
-import app.absentmotion.editor.deleteChosen
-import app.absentmotion.editor.deleteSelected
-import app.absentmotion.editor.duplicateChosen
-import app.absentmotion.editor.duplicateSelected
-import app.absentmotion.editor.pasteLayer
-import app.absentmotion.editor.split
-import app.absentmotion.editor.copyKeyframes
-import app.absentmotion.editor.pasteKeyframes
-import app.absentmotion.editor.addKeyframe
-import app.absentmotion.editor.toggleBookmark
 import app.absentmotion.ui.home.DeskModals
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -90,7 +74,9 @@ object DeskKeys {
         Shortcut.PreviousBookmark, Shortcut.NextBookmark, Shortcut.PreviousKeyframe, Shortcut.NextKeyframe, Shortcut.TimelineFit, Shortcut.TimelineZoomIn,
         Shortcut.TimelineZoomOut, Shortcut.Undo, Shortcut.Redo)
 
-    var viewer: ((KeyEvent) -> Boolean)? = null
+    var viewer: ((KeyEvent) -> Boolean)?
+        get() = DeskShortcuts.viewer
+        set(value) { DeskShortcuts.viewer = value }
 
     fun handle(app: DeskAppState, event: KeyEvent): Boolean {
         if (event.type == KeyEventType.KeyDown && viewer?.invoke(event) == true) return true
@@ -111,55 +97,5 @@ object DeskKeys {
         return run(app, state, action)
     }
 
-    internal fun run(app: DeskAppState, state: EditorState, action: Shortcut): Boolean {
-        val picked = MultiSelect.active || state.selectedId != null
-        fun step(by: Int) { state.playing = false; state.stepTo(state.playheadFrame + by) }
-        fun nudge(by: Int) {
-            val layers = state.chosenLayers
-            val firstLayer = layers.firstOrNull() ?: return
-            val earliest = layers.minOf { state.scene.firstShownFrame(it.startTime) }
-            val delta = by.coerceAtLeast(-earliest)
-            val frame = state.scene.firstShownFrame(firstLayer.startTime) + delta
-            if (delta != 0) state.edit { TimelineMath.movedClips(it, firstLayer, layers.drop(1), frame) }
-        }
-        fun delete() { if (MultiSelect.active) state.deleteChosen() else state.deleteSelected() }
-        when (action) {
-            Shortcut.PlayPause -> state.togglePlayback()
-            Shortcut.PreviousFrame -> step(-1)
-            Shortcut.NextFrame -> step(1)
-            Shortcut.Back10 -> step(-10)
-            Shortcut.Forward10 -> step(10)
-            Shortcut.GoStart -> { state.playing = false; state.frame = 0 }
-            Shortcut.GoEnd -> { state.playing = false; state.parkAtEnd() }
-            Shortcut.PreviousBookmark -> DeskJump.previous(state)
-            Shortcut.NextBookmark -> DeskJump.next(state)
-            Shortcut.PreviousKeyframe -> DeskJump.previousKey(state)
-            Shortcut.NextKeyframe -> DeskJump.nextKey(state)
-            Shortcut.NudgeEarlier -> nudge(-1)
-            Shortcut.NudgeLater -> nudge(1)
-            Shortcut.NudgeEarlier10 -> nudge(-10)
-            Shortcut.NudgeLater10 -> nudge(10)
-            Shortcut.SelectAll -> { state.deselectLayer(); MultiSelect.ids = state.scene.layers.map { it.id }.toSet(); MultiSelect.active = MultiSelect.ids.isNotEmpty() }
-            Shortcut.TimelineFit -> DeskTimelineControls.fit?.invoke() ?: return false
-            Shortcut.TimelineZoomIn -> DeskTimelineControls.zoom?.invoke(1.25f) ?: return false
-            Shortcut.TimelineZoomOut -> DeskTimelineControls.zoom?.invoke(0.8f) ?: return false
-            Shortcut.Undo -> if (state.canUndo) state.undo()
-            Shortcut.Redo -> if (state.canRedo) state.redo()
-            Shortcut.Delete -> DeskDrop.removeHovered?.invoke() ?: if (picked) delete() else return false
-            Shortcut.Duplicate -> if (picked) { if (MultiSelect.active) state.duplicateChosen() else state.duplicateSelected() } else return false
-            Shortcut.Copy -> if (state.chosenLayers.isNotEmpty()) state.copySelected() else return false
-            Shortcut.Cut -> if (state.chosenLayers.isNotEmpty()) { state.copySelected(); delete() } else return false
-            Shortcut.Paste -> state.pasteLayer()
-            Shortcut.Split -> if (picked) state.split() else return false
-            Shortcut.CopyKeyframes -> return state.copyKeyframes()
-            Shortcut.PasteKeyframes -> return state.pasteKeyframes()
-            Shortcut.AddKeyframe -> return state.addKeyframe()
-            Shortcut.AddBookmark -> if (state.scene.bookmarks.none { state.scene.frameAt(it) == state.frame }) state.toggleBookmark()
-            Shortcut.Library, Shortcut.Inspector -> DeskDrop.panelKey?.invoke(action == Shortcut.Library) ?: return false
-            Shortcut.Export -> { state.playing = false; state.exportOpen = true }
-            Shortcut.CloseProject -> app.closeSoon()
-            else -> return false
-        }
-        return true
-    }
+    internal fun run(app: DeskAppState, state: EditorState, action: Shortcut): Boolean = DeskShortcuts.run(state, action, app::closeSoon)
 }

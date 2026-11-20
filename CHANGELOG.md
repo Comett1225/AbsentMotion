@@ -6,6 +6,24 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [5.2.1] - 2026-11-20
+
+### Added
+
+- Layer locking: a padlock beside the eye on every timeline row (phone, tablet, computer and Samsung DeX). Tap locks or unlocks; holding it or right-clicking offers Lock layer, Lock timing only and Unlock. A locked layer cannot be selected or changed (canvas taps go to what is below it, its eye and padlock still work, a locked group cannot be opened); a timing-locked layer stays editable but cannot be moved, trimmed, split, stretched or nudged. The lock is saved with the project and survives undo, copy, duplicate and bundles.
+- The Community tab asks before it connects to the internet and loads nothing until Connect is pressed.
+- Right-click a button or menu item that has a keyboard shortcut (computer app and Samsung DeX) for Change shortcut, Remove shortcut and Reset to default; the Keyboard shortcuts page has a Remove button on each row, so a shortcut can be left empty.
+- Ask before using mobile data (Settings > Projects and media, on by default): Community, AI model, caption model, font, video downloader and app update downloads ask once per app start before they use mobile data instead of Wi-Fi. Automatic update and link checks skip mobile data instead of asking.
+
+### Changed
+
+- Samsung DeX uses the same keyboard shortcuts as the computer app, read from the same list, including changed and removed ones (it used to know only a fixed set).
+- Recording keyframes while playing also starts keyframes on a property that has none yet, for drags and slider changes; single taps still change the value without keyframes.
+
+### Fixed
+
+- A 3D model with Scatter Field could crash the app by running out of memory: the copies are now drawn from one picture of the model per frame, and copies at other times (Copy Delay) are limited to one million triangles.
+
 ## [5.2.0] - 2026-11-19
 
 ### Added

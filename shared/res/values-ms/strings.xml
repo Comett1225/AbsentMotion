@@ -2594,4 +2594,23 @@
     <string name="history_record_keyframes">Rakam bingkai kunci</string>
     <string name="dafont_find">Cari lagi fon di DaFont</string>
     <string name="dafont_hint">Muat turun fon, kemudian import .zip di sini. Semak lesennya sebelum menggunakannya dalam video yang diterbitkan.</string>
+    <string name="community_ask_title">Buka Komuniti?</string>
+    <string name="community_ask_note">Tab Komuniti bersambung ke internet untuk memuatkan projek dan pratetap yang dikongsi dari GitHub. Tiada apa-apa dimuatkan sehingga anda menekan Sambung.</string>
+    <string name="community_ask_button">Sambung</string>
+    <string name="settings_ask_mobile_data">Tanya sebelum menggunakan data mudah alih</string>
+    <string name="mobile_data_title">Gunakan data mudah alih?</string>
+    <string name="mobile_data_body">Anda tidak menggunakan Wi-Fi, jadi muat turun ini akan menggunakan data mudah alih. Anda boleh mematikan soalan ini dalam Tetapan > Projek dan media.</string>
+    <string name="mobile_data_use">Gunakan data mudah alih</string>
+    <string name="mobile_data_refused">Tidak dimuat turun: anda memilih untuk tidak menggunakan data mudah alih.</string>
+    <string name="history_lock">Kunci atau buka kunci lapisan</string>
+    <string name="layer_lock">Kunci lapisan</string>
+    <string name="layer_lock_timing">Kunci masa sahaja</string>
+    <string name="layer_unlock">Buka kunci</string>
+    <string name="a11y_layer_locked">Dikunci</string>
+    <string name="a11y_layer_timing_locked">Masa dikunci</string>
+    <string name="layer_locked_hint">Lapisan ini dikunci</string>
+    <string name="layer_timing_locked_hint">Masa lapisan ini dikunci</string>
+    <string name="desk_shortcut_change">Tukar pintasan</string>
+    <string name="desk_shortcut_remove">Buang pintasan</string>
+    <string name="desk_shortcut_reset">Set semula kepada lalai</string>
 </resources>

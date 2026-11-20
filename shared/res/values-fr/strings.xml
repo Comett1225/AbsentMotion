@@ -2652,4 +2652,23 @@
     <string name="history_record_keyframes">Enregistrer les images clés</string>
     <string name="dafont_find">Trouver d’autres polices sur DaFont</string>
     <string name="dafont_hint">Téléchargez une police, puis importez le .zip ici. Vérifiez sa licence avant de l’utiliser dans une vidéo publiée.</string>
+    <string name="community_ask_title">Ouvrir la Communauté ?</string>
+    <string name="community_ask_note">L’onglet Communauté se connecte à internet pour charger les projets et préréglages partagés depuis GitHub. Rien n’est chargé tant que vous n’appuyez pas sur Se connecter.</string>
+    <string name="community_ask_button">Se connecter</string>
+    <string name="settings_ask_mobile_data">Demander avant d’utiliser les données mobiles</string>
+    <string name="mobile_data_title">Utiliser les données mobiles ?</string>
+    <string name="mobile_data_body">Vous n’êtes pas en Wi-Fi, ce téléchargement utilisera donc les données mobiles. Vous pouvez désactiver cette question dans Paramètres > Projets et médias.</string>
+    <string name="mobile_data_use">Utiliser les données mobiles</string>
+    <string name="mobile_data_refused">Non téléchargé : vous avez choisi de ne pas utiliser les données mobiles.</string>
+    <string name="history_lock">Verrouiller ou déverrouiller le calque</string>
+    <string name="layer_lock">Verrouiller le calque</string>
+    <string name="layer_lock_timing">Verrouiller uniquement le timing</string>
+    <string name="layer_unlock">Déverrouiller</string>
+    <string name="a11y_layer_locked">Verrouillé</string>
+    <string name="a11y_layer_timing_locked">Timing verrouillé</string>
+    <string name="layer_locked_hint">Ce calque est verrouillé</string>
+    <string name="layer_timing_locked_hint">Le timing de ce calque est verrouillé</string>
+    <string name="desk_shortcut_change">Modifier le raccourci</string>
+    <string name="desk_shortcut_remove">Supprimer le raccourci</string>
+    <string name="desk_shortcut_reset">Rétablir par défaut</string>
 </resources>

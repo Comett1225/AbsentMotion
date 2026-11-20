@@ -24,7 +24,7 @@ Good to know:
 
 ## Record keyframes while playing
 
-Add a keyframe to a Transform property first, then press **Play** and drag the layer on the canvas or adjust the property in Transform while the preview plays. Release the drag to finish the recording; one undo removes the recording. The app keeps the keyframes needed to follow the motion.
+Press **Play** and drag the layer on the canvas or adjust a property in Transform while the preview plays. The change is recorded as keyframes, also on a property that has none yet. Release the drag to finish the recording; one undo removes the recording. The app keeps the keyframes needed to follow the motion.
 
 Hold **Play** to choose a count-in of one, two or three seconds and a preview speed of 0.25x, 0.5x or 1x. On a computer, you can also right-click **Play**. Sound is muted below 1x; export is unaffected. Hold or right-click the add-keyframe button to turn on **Overwrite while recording**, which replaces existing keyframes in the recorded span.
 

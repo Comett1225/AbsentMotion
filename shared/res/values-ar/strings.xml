@@ -2739,4 +2739,23 @@
     <string name="history_record_keyframes">تسجيل إطارات مفتاحية</string>
     <string name="dafont_find">ابحث عن المزيد من الخطوط على DaFont</string>
     <string name="dafont_hint">نزّل خطًا ثم استورد ملف .zip هنا. تحقّق من ترخيصه قبل استخدامه في فيديو منشور.</string>
+    <string name="community_ask_title">فتح المجتمع؟</string>
+    <string name="community_ask_note">يتصل تبويب المجتمع بالإنترنت لتحميل المشاريع والإعدادات المسبقة المشتركة من GitHub. لا يُحمَّل أي شيء حتى تضغط على اتصال.</string>
+    <string name="community_ask_button">اتصال</string>
+    <string name="settings_ask_mobile_data">السؤال قبل استخدام بيانات الجوال</string>
+    <string name="mobile_data_title">استخدام بيانات الجوال؟</string>
+    <string name="mobile_data_body">أنت غير متصل بشبكة Wi-Fi، لذا سيستخدم هذا التنزيل بيانات الجوال. يمكنك إيقاف هذا السؤال من إعدادات > المشاريع والوسائط.</string>
+    <string name="mobile_data_use">استخدام بيانات الجوال</string>
+    <string name="mobile_data_refused">لم يتم التنزيل: اخترت عدم استخدام بيانات الجوال.</string>
+    <string name="history_lock">قفل الطبقة أو فتحها</string>
+    <string name="layer_lock">قفل الطبقة</string>
+    <string name="layer_lock_timing">قفل التوقيت فقط</string>
+    <string name="layer_unlock">فتح القفل</string>
+    <string name="a11y_layer_locked">مقفلة</string>
+    <string name="a11y_layer_timing_locked">التوقيت مقفل</string>
+    <string name="layer_locked_hint">هذه الطبقة مقفلة</string>
+    <string name="layer_timing_locked_hint">توقيت هذه الطبقة مقفل</string>
+    <string name="desk_shortcut_change">تغيير الاختصار</string>
+    <string name="desk_shortcut_remove">إزالة الاختصار</string>
+    <string name="desk_shortcut_reset">إعادة الضبط إلى الافتراضي</string>
 </resources>

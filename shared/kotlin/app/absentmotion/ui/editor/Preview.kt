@@ -553,7 +553,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                         val point = (down.position - currentOffset) / currentScale
                         val generation = ++tapGeneration
                         scope.launch {
-                            val hit = state.engine.hitTest(point.x, point.y, state.timeMs)
+                            val hit = state.tapTarget(point.x, point.y)
                             if (generation != tapGeneration) return@launch
                             if (hit == 0L) {
                                 state.clearSelection()
@@ -735,6 +735,20 @@ private fun wheelScaleLayer(state: EditorState, at: Offset, factor: Float, plane
 }
 
 internal fun pinchedPan(pan: Offset, about: Offset, factor: Float): Offset = pan / factor + about * (1 / factor - 1)
+
+internal suspend fun EditorState.tapTarget(x: Float, y: Float): Long {
+    val time = timeMs
+    val hit = engine.hitTest(x, y, time)
+    val list = scene.layers
+    val index = list.indexOfFirst { it.id == hit }
+    if (index < 0 || !list[index].locked) return hit
+    for (layer in list.subList(0, index).asReversed()) {
+        if (layer.locked || !layer.activeAt(time) || layer.kind in setOf("nullobj", "camera", "light", "audio")) continue
+        val quad = engine.layerQuad(layer.id, time) ?: continue
+        if (inside(List(4) { Offset(quad[2 * it], quad[2 * it + 1]) }, Offset(x, y))) return layer.id
+    }
+    return 0L
+}
 
 private fun inside(quad: List<Offset>, at: Offset): Boolean {
     var sign = 0

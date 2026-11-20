@@ -239,6 +239,7 @@ internal fun ProjectsSettings(settings: AppSettings, onDemoMode: (Boolean) -> Un
     SwitchRow(stringResource(R.string.settings_keep_media_copies), settings.keepMediaCopies, enabled = true) { settings.keepMediaCopies = it }
     BundlesFolderRows(settings)
     if (settings.demoModeShown) SwitchRow(stringResource(R.string.settings_demo_mode), settings.demoMode, enabled = true) { settings.demoMode = it; onDemoMode(it) }
+    if (!DESK) SwitchRow(stringResource(R.string.settings_ask_mobile_data), settings.askMobileData, enabled = true) { settings.askMobileData = it }
     CaptionModelRow()
     CutoutRows()
     AiModelRows()

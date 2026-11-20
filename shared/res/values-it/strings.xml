@@ -2652,4 +2652,23 @@
     <string name="history_record_keyframes">Registra keyframe</string>
     <string name="dafont_find">Trova altri font su DaFont</string>
     <string name="dafont_hint">Scarica un font, poi importa qui il .zip. Controlla la licenza prima di usarlo in un video pubblicato.</string>
+    <string name="community_ask_title">Aprire la Community?</string>
+    <string name="community_ask_note">La scheda Community si connette a internet per caricare progetti e preset condivisi da GitHub. Non viene caricato nulla finché non tocchi Connetti.</string>
+    <string name="community_ask_button">Connetti</string>
+    <string name="settings_ask_mobile_data">Chiedi prima di usare i dati mobili</string>
+    <string name="mobile_data_title">Usare i dati mobili?</string>
+    <string name="mobile_data_body">Non sei connesso al Wi-Fi, quindi questo download userà i dati mobili. Puoi disattivare questa domanda in Impostazioni > Progetti e media.</string>
+    <string name="mobile_data_use">Usa dati mobili</string>
+    <string name="mobile_data_refused">Non scaricato: hai scelto di non usare i dati mobili.</string>
+    <string name="history_lock">Blocca o sblocca livello</string>
+    <string name="layer_lock">Blocca livello</string>
+    <string name="layer_lock_timing">Blocca solo i tempi</string>
+    <string name="layer_unlock">Sblocca</string>
+    <string name="a11y_layer_locked">Bloccato</string>
+    <string name="a11y_layer_timing_locked">Tempi bloccati</string>
+    <string name="layer_locked_hint">Questo livello è bloccato</string>
+    <string name="layer_timing_locked_hint">I tempi di questo livello sono bloccati</string>
+    <string name="desk_shortcut_change">Cambia scorciatoia</string>
+    <string name="desk_shortcut_remove">Rimuovi scorciatoia</string>
+    <string name="desk_shortcut_reset">Ripristina predefinita</string>
 </resources>

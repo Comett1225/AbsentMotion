@@ -823,7 +823,7 @@
     {
       "id": "tl.bookmark_jump",
       "name": "Alt+Left / Alt+Right jump to the previous or next bookmark, then the start or end; comma and period nudge clips",
-      "where": "desk/DeskKeys.kt, desk/DeskJump.kt (pc)",
+      "where": "desk/DeskKeys.kt (pc), desk/DeskJump.kt (shared)",
       "android": "missing",
       "macos": "works",
       "windows": "untested",
@@ -1723,6 +1723,10 @@
       "desktop": "pc/src/standins/kotlin/app/absentmotion/ui/tutorial/DeskGrip.kt",
       "feature": "home.tutorial",
       "reason": "touch grip detector of the tutorial"
+    },
+    "app/absentmotion/desk/ShortcutPlatform.kt": {
+      "desktop": "pc/src/standins/kotlin/app/absentmotion/desk/ShortcutPlatform.kt",
+      "reason": "where shortcuts are saved, the command key and key names on Android; the desktop file does the same for the computer app"
     },
     "app/absentmotion/platform/DeskDetect.kt": {
       "desktop": null,

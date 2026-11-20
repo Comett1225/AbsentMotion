@@ -138,8 +138,9 @@ internal fun deskShortcut(label: Int, keys: String): String = if (keys.isEmpty()
 internal fun deskKeys(action: String, fallback: String): String = DeskDrop.keyNames[action] ?: fallback
 
 @Composable
-internal fun DeskIcon(icon: ImageVector, hint: String, enabled: Boolean = true, active: Boolean = false, size: Dp = 36.dp, iconSize: DpSize = DpSize(size - 14.dp, size - 14.dp), action: () -> Unit) {
-    BarButton(icon, hint, Modifier.size(size).clip(RoundedCornerShape(6.dp)).background(if (active) Am.Field else Color.Transparent), enabled = enabled, iconSize = iconSize, hint = hint, onClick = action)
+internal fun DeskIcon(icon: ImageVector, hint: String, enabled: Boolean = true, active: Boolean = false, size: Dp = 36.dp, iconSize: DpSize = DpSize(size - 14.dp, size - 14.dp), shortcut: app.absentmotion.desk.Shortcut? = null, action: () -> Unit) {
+    val button = @Composable { BarButton(icon, hint, Modifier.size(size).clip(RoundedCornerShape(6.dp)).background(if (active) Am.Field else Color.Transparent), enabled = enabled, iconSize = iconSize, hint = hint, onClick = action) }
+    if (shortcut == null) button() else ShortcutMenuBox(shortcut) { button() }
 }
 
 @Composable

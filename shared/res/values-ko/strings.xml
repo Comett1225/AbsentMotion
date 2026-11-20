@@ -2594,4 +2594,23 @@
     <string name="history_record_keyframes">키프레임 기록</string>
     <string name="dafont_find">DaFont에서 글꼴 더 찾기</string>
     <string name="dafont_hint">글꼴을 다운로드한 다음 여기서 .zip을 가져오세요. 공개하는 영상에 사용하기 전에 라이선스를 확인하세요.</string>
+    <string name="community_ask_title">커뮤니티를 열까요?</string>
+    <string name="community_ask_note">커뮤니티 탭은 GitHub에서 공유된 프로젝트와 프리셋을 불러오기 위해 인터넷에 연결합니다. 연결을 누르기 전에는 아무것도 불러오지 않습니다.</string>
+    <string name="community_ask_button">연결</string>
+    <string name="settings_ask_mobile_data">모바일 데이터 사용 전에 묻기</string>
+    <string name="mobile_data_title">모바일 데이터를 사용할까요?</string>
+    <string name="mobile_data_body">Wi-Fi에 연결되어 있지 않아 이 다운로드는 모바일 데이터를 사용합니다. 설정 > 프로젝트 및 미디어에서 이 질문을 끌 수 있습니다.</string>
+    <string name="mobile_data_use">모바일 데이터 사용</string>
+    <string name="mobile_data_refused">다운로드하지 않음: 모바일 데이터를 사용하지 않기로 했습니다.</string>
+    <string name="history_lock">레이어 잠금 또는 잠금 해제</string>
+    <string name="layer_lock">레이어 잠금</string>
+    <string name="layer_lock_timing">타이밍만 잠금</string>
+    <string name="layer_unlock">잠금 해제</string>
+    <string name="a11y_layer_locked">잠김</string>
+    <string name="a11y_layer_timing_locked">타이밍 잠김</string>
+    <string name="layer_locked_hint">이 레이어는 잠겨 있습니다</string>
+    <string name="layer_timing_locked_hint">이 레이어의 타이밍은 잠겨 있습니다</string>
+    <string name="desk_shortcut_change">단축키 변경</string>
+    <string name="desk_shortcut_remove">단축키 삭제</string>
+    <string name="desk_shortcut_reset">기본값으로 초기화</string>
 </resources>

@@ -2594,4 +2594,23 @@
     <string name="history_record_keyframes">Ghi keyframe</string>
     <string name="dafont_find">Tìm thêm phông chữ trên DaFont</string>
     <string name="dafont_hint">Tải phông chữ về, rồi nhập tệp .zip tại đây. Hãy kiểm tra giấy phép trước khi dùng trong video được đăng.</string>
+    <string name="community_ask_title">Mở Cộng đồng?</string>
+    <string name="community_ask_note">Thẻ Cộng đồng kết nối internet để tải các dự án và preset được chia sẻ từ GitHub. Không có gì được tải cho đến khi bạn nhấn Kết nối.</string>
+    <string name="community_ask_button">Kết nối</string>
+    <string name="settings_ask_mobile_data">Hỏi trước khi dùng dữ liệu di động</string>
+    <string name="mobile_data_title">Dùng dữ liệu di động?</string>
+    <string name="mobile_data_body">Bạn không dùng Wi-Fi, nên lần tải này sẽ dùng dữ liệu di động. Bạn có thể tắt câu hỏi này trong Cài đặt > Dự án và phương tiện.</string>
+    <string name="mobile_data_use">Dùng dữ liệu di động</string>
+    <string name="mobile_data_refused">Chưa tải: bạn đã chọn không dùng dữ liệu di động.</string>
+    <string name="history_lock">Khóa hoặc mở khóa lớp</string>
+    <string name="layer_lock">Khóa lớp</string>
+    <string name="layer_lock_timing">Chỉ khóa thời gian</string>
+    <string name="layer_unlock">Mở khóa</string>
+    <string name="a11y_layer_locked">Đã khóa</string>
+    <string name="a11y_layer_timing_locked">Đã khóa thời gian</string>
+    <string name="layer_locked_hint">Lớp này đã bị khóa</string>
+    <string name="layer_timing_locked_hint">Thời gian của lớp này đã bị khóa</string>
+    <string name="desk_shortcut_change">Đổi phím tắt</string>
+    <string name="desk_shortcut_remove">Xóa phím tắt</string>
+    <string name="desk_shortcut_reset">Đặt lại mặc định</string>
 </resources>

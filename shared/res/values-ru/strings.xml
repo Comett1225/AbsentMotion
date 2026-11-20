@@ -2681,4 +2681,23 @@
     <string name="history_record_keyframes">Запись ключевых кадров</string>
     <string name="dafont_find">Найти больше шрифтов на DaFont</string>
     <string name="dafont_hint">Скачайте шрифт, затем импортируйте .zip сюда. Проверьте лицензию, прежде чем использовать его в опубликованном видео.</string>
+    <string name="community_ask_title">Открыть Сообщество?</string>
+    <string name="community_ask_note">Вкладка «Сообщество» подключается к интернету, чтобы загрузить общие проекты и пресеты с GitHub. Ничего не загружается, пока вы не нажмёте «Подключиться».</string>
+    <string name="community_ask_button">Подключиться</string>
+    <string name="settings_ask_mobile_data">Спрашивать перед использованием мобильных данных</string>
+    <string name="mobile_data_title">Использовать мобильные данные?</string>
+    <string name="mobile_data_body">Вы не подключены к Wi-Fi, поэтому эта загрузка будет использовать мобильные данные. Этот вопрос можно отключить в разделе Настройки > Проекты и медиа.</string>
+    <string name="mobile_data_use">Использовать мобильные данные</string>
+    <string name="mobile_data_refused">Не загружено: вы решили не использовать мобильные данные.</string>
+    <string name="history_lock">Заблокировать или разблокировать слой</string>
+    <string name="layer_lock">Заблокировать слой</string>
+    <string name="layer_lock_timing">Заблокировать только тайминг</string>
+    <string name="layer_unlock">Разблокировать</string>
+    <string name="a11y_layer_locked">Заблокирован</string>
+    <string name="a11y_layer_timing_locked">Тайминг заблокирован</string>
+    <string name="layer_locked_hint">Этот слой заблокирован</string>
+    <string name="layer_timing_locked_hint">Тайминг этого слоя заблокирован</string>
+    <string name="desk_shortcut_change">Изменить сочетание</string>
+    <string name="desk_shortcut_remove">Удалить сочетание</string>
+    <string name="desk_shortcut_reset">Сбросить по умолчанию</string>
 </resources>

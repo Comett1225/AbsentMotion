@@ -2594,4 +2594,23 @@
     <string name="history_record_keyframes">录制关键帧</string>
     <string name="dafont_find">在DaFont上查找更多字体</string>
     <string name="dafont_hint">下载字体后，在此导入.zip文件。在已发布的视频中使用前，请先查看其许可协议。</string>
+    <string name="community_ask_title">打开社区？</string>
+    <string name="community_ask_note">社区标签页会连接互联网，从 GitHub 加载共享的项目和预设。在你点按“连接”之前不会加载任何内容。</string>
+    <string name="community_ask_button">连接</string>
+    <string name="settings_ask_mobile_data">使用移动数据前询问</string>
+    <string name="mobile_data_title">使用移动数据？</string>
+    <string name="mobile_data_body">你未连接 Wi-Fi，因此此次下载将使用移动数据。你可以在 设置 > 项目和媒体 中关闭此询问。</string>
+    <string name="mobile_data_use">使用移动数据</string>
+    <string name="mobile_data_refused">未下载：你选择了不使用移动数据。</string>
+    <string name="history_lock">锁定或解锁图层</string>
+    <string name="layer_lock">锁定图层</string>
+    <string name="layer_lock_timing">仅锁定时间</string>
+    <string name="layer_unlock">解锁</string>
+    <string name="a11y_layer_locked">已锁定</string>
+    <string name="a11y_layer_timing_locked">时间已锁定</string>
+    <string name="layer_locked_hint">此图层已锁定</string>
+    <string name="layer_timing_locked_hint">此图层的时间已锁定</string>
+    <string name="desk_shortcut_change">更改快捷键</string>
+    <string name="desk_shortcut_remove">移除快捷键</string>
+    <string name="desk_shortcut_reset">恢复默认</string>
 </resources>

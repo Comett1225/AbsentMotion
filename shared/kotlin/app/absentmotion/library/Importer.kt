@@ -346,7 +346,7 @@ class Importer(
 
         private val KnownAttributes = setOf(
             "id", "label", "startTime", "endTime", "fillType", "fillImage", "fillVideo", "inTime", "outTime", "speed", "blending",
-            "parent", "hidden", "clippingMask", "mediaFillMode", "s", "tag", "align", "font", "size", "wrapWidth", "src", "type", "link",
+            "parent", "hidden", "lock", "clippingMask", "mediaFillMode", "s", "tag", "align", "font", "size", "wrapWidth", "src", "type", "link",
             "presetId", "templatePPId", "points", "color", "stroke", "style", "scaleLinked", "loop", "loopIn", "mixPieces", "threeD",
             "noiseId", "retimeLength", "pathLayer", "matteFrame", "matteEdge", "genIn", "genOut", "genLoop", "outlineShape", "outlineMark",
         )

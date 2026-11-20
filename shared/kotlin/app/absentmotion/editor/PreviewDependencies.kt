@@ -25,7 +25,7 @@ internal fun previewOrder(last: Int, playhead: Int, run: Int = 1): List<Int> {
     }
 }
 
-private fun XmlNode.visual(): XmlNode = copy(attrs = attrs - "label", children = children.map { it.visual() })
+private fun XmlNode.visual(): XmlNode = copy(attrs = attrs - setOf("label", "lock"), children = children.map { it.visual() })
 
 private fun sameVisual(a: XmlNode?, b: XmlNode?): Boolean = a === b || a != null && b != null && a.visual() == b.visual()
 

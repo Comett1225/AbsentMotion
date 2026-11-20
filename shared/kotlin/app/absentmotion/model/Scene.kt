@@ -257,6 +257,8 @@ data class Layer(val node: XmlNode, val t: Float = 0f, val snap: ClosedFloatingP
     val startTime: Int get() = node["startTime"]?.toIntOrNull() ?: 0
     val endTime: Int get() = maxOf(startTime, node["endTime"]?.toIntOrNull() ?: 0)
     val hidden: Boolean get() = node["hidden"] == "true"
+    val locked: Boolean get() = node["lock"] == "all"
+    val timingLocked: Boolean get() = node["lock"] == "all" || node["lock"] == "timing"
     val mixesPieces: Boolean get() = node["mixPieces"] != "false"
     fun withMixPieces(on: Boolean) = copy(node = node.with("mixPieces", if (on) null else "false"))
     val fillType: String get() = node["fillType"] ?: "none"
@@ -297,6 +299,7 @@ data class Layer(val node: XmlNode, val t: Float = 0f, val snap: ClosedFloatingP
 
     fun withLabelColour(colour: LabelColour?) = copy(node = node.with("tag", colour?.id))
     fun withHidden(hidden: Boolean) = copy(node = node.with("hidden", if (hidden) "true" else null))
+    fun withLock(lock: String?) = copy(node = node.with("lock", lock))
     fun withId(id: Long) = copy(node = node.with("id", "$id"))
 
     fun withTimes(startTime: Int, endTime: Int) = copy(

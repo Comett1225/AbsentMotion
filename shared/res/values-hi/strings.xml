@@ -2623,4 +2623,23 @@
     <string name="history_record_keyframes">कीफ़्रेम रिकॉर्ड करें</string>
     <string name="dafont_find">DaFont पर और फ़ॉन्ट खोजें</string>
     <string name="dafont_hint">कोई फ़ॉन्ट डाउनलोड करें, फिर .zip यहाँ इम्पोर्ट करें। प्रकाशित वीडियो में इस्तेमाल करने से पहले इसका लाइसेंस जाँच लें।</string>
+    <string name="community_ask_title">कम्युनिटी खोलें?</string>
+    <string name="community_ask_note">कम्युनिटी टैब GitHub से साझा किए गए प्रोजेक्ट और प्रीसेट लोड करने के लिए इंटरनेट से जुड़ता है। कनेक्ट करें दबाने तक कुछ भी लोड नहीं होता।</string>
+    <string name="community_ask_button">कनेक्ट करें</string>
+    <string name="settings_ask_mobile_data">मोबाइल डेटा इस्तेमाल करने से पहले पूछें</string>
+    <string name="mobile_data_title">मोबाइल डेटा इस्तेमाल करें?</string>
+    <string name="mobile_data_body">आप Wi-Fi पर नहीं हैं, इसलिए यह डाउनलोड मोबाइल डेटा इस्तेमाल करेगा। आप यह सवाल सेटिंग्स > प्रोजेक्ट और मीडिया में बंद कर सकते हैं।</string>
+    <string name="mobile_data_use">मोबाइल डेटा इस्तेमाल करें</string>
+    <string name="mobile_data_refused">डाउनलोड नहीं हुआ: आपने मोबाइल डेटा इस्तेमाल न करना चुना।</string>
+    <string name="history_lock">लेयर लॉक या अनलॉक करें</string>
+    <string name="layer_lock">लेयर लॉक करें</string>
+    <string name="layer_lock_timing">सिर्फ़ टाइमिंग लॉक करें</string>
+    <string name="layer_unlock">अनलॉक करें</string>
+    <string name="a11y_layer_locked">लॉक है</string>
+    <string name="a11y_layer_timing_locked">टाइमिंग लॉक है</string>
+    <string name="layer_locked_hint">यह लेयर लॉक है</string>
+    <string name="layer_timing_locked_hint">इस लेयर की टाइमिंग लॉक है</string>
+    <string name="desk_shortcut_change">शॉर्टकट बदलें</string>
+    <string name="desk_shortcut_remove">शॉर्टकट हटाएँ</string>
+    <string name="desk_shortcut_reset">डिफ़ॉल्ट पर रीसेट करें</string>
 </resources>

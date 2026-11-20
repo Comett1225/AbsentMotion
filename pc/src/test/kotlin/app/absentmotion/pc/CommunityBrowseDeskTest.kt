@@ -18,6 +18,7 @@ import app.absentmotion.ui.home.CommunityBrowseControls
 import app.absentmotion.ui.home.CommunityBrowseState
 import app.absentmotion.ui.home.CommunityTab
 import app.absentmotion.ui.home.communityGuidelines
+import app.absentmotion.ui.home.sessionAllowed
 import app.absentmotion.ui.home.sessionIndex
 import app.absentmotion.ui.theme.Am
 import org.junit.Assert.*
@@ -41,7 +42,10 @@ class CommunityBrowseDeskTest {
         sessionIndex = CommunityIndex(projects)
         try {
             runSkikoComposeUiTest(size = Size(1100f, 800f)) {
+                sessionAllowed = false
                 setContent { CommunityTab(Modifier.fillMaxSize().background(Am.HomeBg)) {} }
+                onNodeWithText("Été Glow").assertDoesNotExist()
+                onNodeWithText("Connect").performClick()
                 onNode(hasSetTextAction()).performTextReplacement("alice intro")
                 onNodeWithText("Été Glow").assertExists()
                 onNodeWithText("Apple").assertExists()
@@ -102,11 +106,13 @@ class CommunityBrowseDeskTest {
         try {
             for ((name, size) in listOf("phone-large-text" to Size(390f, 844f), "tablet-large-text" to Size(900f, 1100f), "desktop" to Size(1280f, 800f))) {
                 runSkikoComposeUiTest(size = size) {
+                    sessionAllowed = false
                     setContent {
                         CompositionLocalProvider(LocalDensity provides Density(1f, if (name == "desktop") 1f else 1.7f)) {
                             CommunityTab(Modifier.fillMaxSize().background(Am.HomeBg)) {}
                         }
                     }
+                    onNodeWithText("Connect").performClick()
                     onNodeWithText("Tags").assertIsDisplayed()
                     onNodeWithContentDescription("Sort").assertIsDisplayed()
                     onNode(hasSetTextAction()).performTextReplacement("")

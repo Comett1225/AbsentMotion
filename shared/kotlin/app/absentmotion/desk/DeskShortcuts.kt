@@ -9,10 +9,48 @@ import androidx.compose.ui.input.key.isAltPressed
 import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
 import app.absentmotion.R
+import app.absentmotion.editor.EditorState
+import app.absentmotion.editor.MultiSelect
+import app.absentmotion.editor.addKeyframe
+import app.absentmotion.editor.chosenLayers
+import app.absentmotion.editor.copyKeyframes
+import app.absentmotion.editor.copySelected
+import app.absentmotion.editor.deleteChosen
+import app.absentmotion.editor.deleteSelected
+import app.absentmotion.editor.selectAll
+import app.absentmotion.editor.duplicateChosen
+import app.absentmotion.editor.duplicateSelected
+import app.absentmotion.editor.pasteKeyframes
+import app.absentmotion.editor.pasteLayer
+import app.absentmotion.editor.split
+import app.absentmotion.editor.toggleBookmark
 import app.absentmotion.i18n.AppText
 import app.absentmotion.ui.editor.DeskDrop
+import app.absentmotion.ui.editor.DeskTimelineControls
+import app.absentmotion.ui.editor.TimelineMath
 import org.json.JSONArray
 import org.json.JSONObject
+
+data class MenuKey(val key: Key, val command: Boolean = true, val alt: Boolean = false, val shift: Boolean = false)
+
+val ModifierKeys = setOf(Key.ShiftLeft, Key.ShiftRight, Key.CtrlLeft, Key.CtrlRight, Key.AltLeft, Key.AltRight, Key.MetaLeft, Key.MetaRight, Key.CapsLock, Key.Function)
+
+internal fun shortcutText(shortcut: MenuKey, mac: Boolean): String {
+    val key = when (shortcut.key) {
+        Key.Comma -> ","
+        Key.Period -> "."
+        Key.Equals -> "="
+        Key.Minus -> "-"
+        Key.Plus -> "+"
+        Key.DirectionLeft -> "←"
+        Key.DirectionRight -> "→"
+        Key.DirectionUp -> "↑"
+        Key.DirectionDown -> "↓"
+        else -> ShortcutPlatform.keyName(shortcut.key)
+    }
+    return if (mac) (if (shortcut.alt) "⌥" else "") + (if (shortcut.shift) "⇧" else "") + (if (shortcut.command) "⌘" else "") + key
+    else (if (shortcut.command) "Ctrl+" else "") + (if (shortcut.alt) "Alt+" else "") + (if (shortcut.shift) "Shift+" else "") + key
+}
 
 private fun cmd(key: Key, shift: Boolean = false) = MenuKey(key, command = true, shift = shift)
 private fun plain(key: Key, shift: Boolean = false, alt: Boolean = false) = MenuKey(key, command = false, alt = alt, shift = shift)
@@ -65,18 +103,22 @@ enum class Shortcut(val group: Int, val label: Int, val defaults: List<MenuKey>,
 
 object DeskShortcuts {
     private const val PREF = "shortcuts"
-    private val prefs get() = android.content.SharedPreferences.named("desk")
+    private val prefs get() = ShortcutPlatform.prefs
 
-    var custom by mutableStateOf(decode(prefs.getString(PREF, null)))
+    var custom by mutableStateOf(decode(prefs?.getString(PREF, null)))
         private set
 
-    val shown: List<Shortcut> get() = Shortcut.entries.filter { it != Shortcut.Quit || !DeskOs.mac }
+    var viewer: ((KeyEvent) -> Boolean)? = null
 
-    fun reload() { custom = decode(prefs.getString(PREF, null)); publish() }
+    val shown: List<Shortcut> get() = Shortcut.entries.filter { it != Shortcut.Quit || !ShortcutPlatform.mac }
+
+    fun reload() { custom = decode(prefs?.getString(PREF, null)); publish() }
 
     fun keys(action: Shortcut): List<MenuKey> = custom[action] ?: action.defaults
 
-    fun chord(event: KeyEvent): MenuKey = MenuKey(event.key, command = DeskKeys.isCommand(event), alt = event.isAltPressed, shift = event.isShiftPressed)
+    fun chord(event: KeyEvent): MenuKey = MenuKey(event.key, command = ShortcutPlatform.isCommand(event), alt = event.isAltPressed, shift = event.isShiftPressed)
+
+    fun bindable(event: KeyEvent): Boolean = ShortcutPlatform.bindable(event)
 
     fun find(chord: MenuKey, among: (Shortcut) -> Boolean = { true }): Shortcut? = Shortcut.entries.firstOrNull { among(it) && chord in keys(it) }
 
@@ -90,6 +132,8 @@ object DeskShortcuts {
 
     fun reset(action: Shortcut) = assign(action, action.defaults)
 
+    fun clear(action: Shortcut) = assign(action, emptyList())
+
     fun resetAll() = save(emptyMap())
 
     private fun taken(chords: List<MenuKey>, by: Shortcut): Map<Shortcut, List<MenuKey>> =
@@ -97,11 +141,65 @@ object DeskShortcuts {
 
     private fun save(next: Map<Shortcut, List<MenuKey>>) {
         custom = next.filter { (action, keys) -> keys != action.defaults }
-        prefs.edit().putString(PREF, if (custom.isEmpty()) null else encode(custom)).apply()
+        prefs?.edit()?.putString(PREF, if (custom.isEmpty()) null else encode(custom))?.apply()
         publish()
     }
 
-    fun text(action: Shortcut): String = keys(action).firstOrNull()?.let { shortcutText(it, DeskOs.mac) } ?: ""
+    fun text(action: Shortcut): String = keys(action).firstOrNull()?.let { shortcutText(it, ShortcutPlatform.mac) } ?: ""
+
+    fun defaultText(action: Shortcut): String = action.defaults.firstOrNull()?.let { shortcutText(it, ShortcutPlatform.mac) } ?: ""
+
+    fun run(state: EditorState, action: Shortcut, close: () -> Unit): Boolean {
+        val picked = MultiSelect.active || state.selectedId != null
+        fun step(by: Int) { state.playing = false; state.stepTo(state.playheadFrame + by) }
+        fun nudge(by: Int) {
+            val layers = state.chosenLayers
+            val firstLayer = layers.firstOrNull() ?: return
+            val earliest = layers.minOf { state.scene.firstShownFrame(it.startTime) }
+            val delta = by.coerceAtLeast(-earliest)
+            val frame = state.scene.firstShownFrame(firstLayer.startTime) + delta
+            if (delta != 0) state.edit { TimelineMath.movedClips(it, firstLayer, layers.drop(1), frame) }
+        }
+        fun delete() { if (MultiSelect.active) state.deleteChosen() else state.deleteSelected() }
+        when (action) {
+            Shortcut.PlayPause -> state.togglePlayback()
+            Shortcut.PreviousFrame -> step(-1)
+            Shortcut.NextFrame -> step(1)
+            Shortcut.Back10 -> step(-10)
+            Shortcut.Forward10 -> step(10)
+            Shortcut.GoStart -> { state.playing = false; state.frame = 0 }
+            Shortcut.GoEnd -> { state.playing = false; state.parkAtEnd() }
+            Shortcut.PreviousBookmark -> DeskJump.previous(state)
+            Shortcut.NextBookmark -> DeskJump.next(state)
+            Shortcut.PreviousKeyframe -> DeskJump.previousKey(state)
+            Shortcut.NextKeyframe -> DeskJump.nextKey(state)
+            Shortcut.NudgeEarlier -> nudge(-1)
+            Shortcut.NudgeLater -> nudge(1)
+            Shortcut.NudgeEarlier10 -> nudge(-10)
+            Shortcut.NudgeLater10 -> nudge(10)
+            Shortcut.SelectAll -> state.selectAll()
+            Shortcut.TimelineFit -> DeskTimelineControls.fit?.invoke() ?: return false
+            Shortcut.TimelineZoomIn -> DeskTimelineControls.zoom?.invoke(1.25f) ?: return false
+            Shortcut.TimelineZoomOut -> DeskTimelineControls.zoom?.invoke(0.8f) ?: return false
+            Shortcut.Undo -> if (state.canUndo) state.undo()
+            Shortcut.Redo -> if (state.canRedo) state.redo()
+            Shortcut.Delete -> DeskDrop.removeHovered?.invoke() ?: if (picked) delete() else return false
+            Shortcut.Duplicate -> if (picked) { if (MultiSelect.active) state.duplicateChosen() else state.duplicateSelected() } else return false
+            Shortcut.Copy -> if (state.chosenLayers.isNotEmpty()) state.copySelected() else return false
+            Shortcut.Cut -> if (state.chosenLayers.isNotEmpty()) { state.copySelected(); delete() } else return false
+            Shortcut.Paste -> state.pasteLayer()
+            Shortcut.Split -> if (picked) state.split() else return false
+            Shortcut.CopyKeyframes -> return state.copyKeyframes()
+            Shortcut.PasteKeyframes -> return state.pasteKeyframes()
+            Shortcut.AddKeyframe -> return state.addKeyframe()
+            Shortcut.AddBookmark -> if (state.scene.bookmarks.none { state.scene.frameAt(it) == state.frame }) state.toggleBookmark()
+            Shortcut.Library, Shortcut.Inspector -> DeskDrop.panelKey?.invoke(action == Shortcut.Library) ?: return false
+            Shortcut.Export -> { state.playing = false; state.exportOpen = true }
+            Shortcut.CloseProject -> close()
+            else -> return false
+        }
+        return true
+    }
 
     fun publish() {
         DeskDrop.keyNames.clear()

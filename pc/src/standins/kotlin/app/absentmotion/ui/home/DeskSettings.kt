@@ -61,6 +61,7 @@ import app.absentmotion.desk.DeskBack
 import app.absentmotion.desk.DeskKeys
 import app.absentmotion.desk.DeskShortcuts
 import app.absentmotion.desk.MenuKey
+import app.absentmotion.desk.ModifierKeys
 import app.absentmotion.desk.Shortcut
 import app.absentmotion.i18n.AppLanguage
 import app.absentmotion.i18n.applyLanguage
@@ -231,8 +232,6 @@ private fun DeskTutorialPage(settings: AppSettings, onClose: () -> Unit) {
     }
 }
 
-private val ModifierKeys = setOf(Key.ShiftLeft, Key.ShiftRight, Key.CtrlLeft, Key.CtrlRight, Key.AltLeft, Key.AltRight, Key.MetaLeft, Key.MetaRight, Key.CapsLock, Key.Function)
-
 @Composable
 internal fun DeskShortcutsPage() {
     var capture by remember { mutableStateOf<Shortcut?>(null) }
@@ -274,6 +273,7 @@ internal fun DeskShortcutsPage() {
                         action, capture == action, action in custom, pending,
                         onPick = { clash = null; capture = if (capture == action) null else action },
                         onReset = { capture = null; clash = null; if (DeskShortcuts.conflict(action, action.defaults) == null) DeskShortcuts.reset(action) else clash = action to action.defaults },
+                        onRemove = { capture = null; clash = null; DeskShortcuts.clear(action) },
                         onReplace = { pending?.let { DeskShortcuts.assign(action, it) }; clash = null },
                         onCancel = { clash = null },
                     )
@@ -284,7 +284,7 @@ internal fun DeskShortcutsPage() {
 }
 
 @Composable
-private fun ShortcutRow(action: Shortcut, capturing: Boolean, changed: Boolean, pending: List<MenuKey>?, onPick: () -> Unit, onReset: () -> Unit, onReplace: () -> Unit, onCancel: () -> Unit) {
+private fun ShortcutRow(action: Shortcut, capturing: Boolean, changed: Boolean, pending: List<MenuKey>?, onPick: () -> Unit, onReset: () -> Unit, onRemove: () -> Unit, onReplace: () -> Unit, onCancel: () -> Unit) {
     val shape = RoundedCornerShape(8.dp)
     val lit = capturing || pending != null
     Column(Modifier.fillMaxWidth()) {
@@ -303,6 +303,9 @@ private fun ShortcutRow(action: Shortcut, capturing: Boolean, changed: Boolean, 
                 Text(shown, color = if (lit) Am.OnNavy else Am.Navy, fontSize = 13.sp, fontWeight = FontWeight.Medium, maxLines = 1)
             }
             Box(Modifier.padding(start = 4.dp).size(32.dp), Alignment.Center) {
+                if (DeskShortcuts.keys(action).isNotEmpty()) DeskIconButton(ChromeIcons.Close, stringResource(R.string.desk_shortcut_remove), onRemove, size = 32.dp, tint = Am.HomeMid)
+            }
+            Box(Modifier.size(32.dp), Alignment.Center) {
                 if (changed) DeskIconButton(ChromeIcons.Undo, stringResource(R.string.audiofx_reset), onReset, size = 32.dp, tint = Am.HomeMid)
             }
         }

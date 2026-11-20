@@ -141,6 +141,7 @@ internal suspend fun fetch(file: ModelFile, target: File, active: () -> Unit, pr
     val part = File(target.path + ".part")
     if (part.length() >= file.bytes) part.delete()
     val have = part.length()
+    app.absentmotion.platform.MobileData.check()
     val connection = modelConnection(file.url)
     val closer = launch(start = CoroutineStart.UNDISPATCHED) { try { awaitCancellation() } finally { connection.disconnect() } }
     try {

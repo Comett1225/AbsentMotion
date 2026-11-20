@@ -118,7 +118,7 @@ class EditorState(
     fun exitTo(depth: Int) { while (groupPath.size > depth.coerceAtLeast(0)) exitGroup() }
 
     fun enterGroup(id: Long) {
-        val group = scene.layer(id)?.takeIf { it.isPlainGroup } ?: return
+        val group = scene.layer(id)?.takeIf { it.isPlainGroup && !it.locked } ?: return
         val inner = group.nested ?: return
         endGesture()
         playing = false
@@ -179,7 +179,11 @@ class EditorState(
 
     var selectedId: Long?
         get() = selection
-        set(value) { if (value != selection) { Glide.interrupt(); if (liveRecording != null) endGesture() }; selection = value }
+        set(value) {
+            if (value != null && value != selection && scene.layer(value)?.locked == true) return hint(R.string.layer_locked_hint)
+            if (value != selection) { Glide.interrupt(); if (liveRecording != null) endGesture() }
+            selection = value
+        }
 
     private var frameState by mutableIntStateOf(0)
 
@@ -399,10 +403,13 @@ class EditorState(
         val previous = liveRecording
         if (previous != null && (key != previous.key || pivot != previous.pivotId)) endGesture()
         val before = scene
-        val changed = change(before).withValueLinksFollowing(before).withMattesFollowing(before).withOutlinesFollowing(before)
+        val direct = change(before)
+        val changed = direct.withValueLinksFollowing(before).withMattesFollowing(before).withOutlinesFollowing(before)
+        if (direct.node !== before.node) lockRefusal(before, direct, groupPath.indices.any { root.focused(groupPath.take(it))?.layer(groupPath[it])?.locked == true })?.let { return hint(it) }
         if (playing) {
             val recording = liveRecording ?: LiveRecording(before, key, settings.overwriteRecording, pivot, ::normalizedPoint)
-            if (recording.capture(before, changed, frame)) {
+            val fresh = if (key == null) emptySet() else direct.layers.filter { before.layer(it.id)?.node?.let { old -> old !== it.node && old != it.node } == true }.map { it.id }.toSet()
+            if (recording.capture(before, changed, frame, fresh)) {
                 liveRecording = recording
                 record(recording.render(changed, false))
                 if (key == null) endGesture()
@@ -503,7 +510,10 @@ class EditorState(
         showNote(HistoryNote(++historyNoteCount, txt(if (undone) R.string.history_undid else R.string.history_redid, text), spot = what.spot))
     }
 
-    fun hint(@StringRes text: Int) = showNote(HistoryNote(++historyNoteCount, txt(text), faint = true))
+    fun hint(@StringRes text: Int) {
+        if (historyNotes.lastOrNull()?.let { it.faint && it.text == txt(text) } == true) return
+        showNote(HistoryNote(++historyNoteCount, txt(text), faint = true))
+    }
 
     private fun showNote(note: HistoryNote) {
         historyNotes.add(note)
@@ -532,12 +542,12 @@ class EditorState(
         groupPath = next.openablePath(groupPath)
         val now = scene
         if (MultiSelect.active) {
-            val alive = now.layers.mapTo(HashSet()) { it.id }
+            val alive = now.layers.filterNot { it.locked }.mapTo(HashSet()) { it.id }
             MultiSelect.ids = MultiSelect.ids.filterTo(LinkedHashSet()) { it in alive }
         }
         canUndo = history.canUndo
         canRedo = history.canRedo
-        if (selectedId != null && now.layer(selectedId!!) == null) {
+        if (selectedId != null && now.layer(selectedId!!)?.locked != false) {
             selectedId = null
             panel = EditorPanel.Tools
             effectIndex = -1
@@ -570,6 +580,19 @@ class EditorState(
         const val MAX_NOTES = 2
         val ZOOM_STEPS = floatArrayOf(0.01f, 0.05f, 0.1f, 0.25f, 0.5f, 1f, 1.5f, 2f, 3f, 4f, 8f, 16f, 32f, 64f)
     }
+}
+
+@StringRes
+private fun lockRefusal(before: Scene, after: Scene, groupLocked: Boolean): Int? {
+    if (groupLocked) return R.string.layer_locked_hint
+    for (old in before.layers) {
+        if (old.node["lock"] == null) continue
+        val now = after.layer(old.id) ?: if (old.locked) return R.string.layer_locked_hint else continue
+        if (now.node === old.node) continue
+        if (now.startTime != old.startTime || now.endTime != old.endTime) return if (old.locked) R.string.layer_locked_hint else R.string.layer_timing_locked_hint
+        if (old.locked && now.node.with("lock", null).with("hidden", null) != old.node.with("lock", null).with("hidden", null)) return R.string.layer_locked_hint
+    }
+    return null
 }
 
 internal fun keptFrame(previous: Scene, next: Scene, frame: Int): Int =

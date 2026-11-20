@@ -2681,4 +2681,23 @@
     <string name="history_record_keyframes">Запис ключових кадрів</string>
     <string name="dafont_find">Знайти більше шрифтів на DaFont</string>
     <string name="dafont_hint">Завантажте шрифт, а потім імпортуйте .zip сюди. Перевірте ліцензію, перш ніж використовувати його в опублікованому відео.</string>
+    <string name="community_ask_title">Відкрити Спільноту?</string>
+    <string name="community_ask_note">Вкладка «Спільнота» під’єднується до інтернету, щоб завантажити спільні проєкти й пресети з GitHub. Нічого не завантажується, доки ви не натиснете «Під’єднатися».</string>
+    <string name="community_ask_button">Під’єднатися</string>
+    <string name="settings_ask_mobile_data">Питати перед використанням мобільних даних</string>
+    <string name="mobile_data_title">Використати мобільні дані?</string>
+    <string name="mobile_data_body">Ви не під’єднані до Wi-Fi, тому це завантаження використає мобільні дані. Це питання можна вимкнути в Налаштування > Проєкти та медіа.</string>
+    <string name="mobile_data_use">Використати мобільні дані</string>
+    <string name="mobile_data_refused">Не завантажено: ви вирішили не використовувати мобільні дані.</string>
+    <string name="history_lock">Заблокувати або розблокувати шар</string>
+    <string name="layer_lock">Заблокувати шар</string>
+    <string name="layer_lock_timing">Заблокувати лише таймінг</string>
+    <string name="layer_unlock">Розблокувати</string>
+    <string name="a11y_layer_locked">Заблоковано</string>
+    <string name="a11y_layer_timing_locked">Таймінг заблоковано</string>
+    <string name="layer_locked_hint">Цей шар заблоковано</string>
+    <string name="layer_timing_locked_hint">Таймінг цього шару заблоковано</string>
+    <string name="desk_shortcut_change">Змінити комбінацію</string>
+    <string name="desk_shortcut_remove">Видалити комбінацію</string>
+    <string name="desk_shortcut_reset">Скинути до типової</string>
 </resources>

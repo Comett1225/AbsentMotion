@@ -123,7 +123,7 @@ internal class LiveRecording(
         track.tolerance = minOf(track.tolerance, tolerance(scene, layer, node, frame, track.effect))
     }
 
-    fun capture(before: Scene, after: Scene, frame: Int): Boolean {
+    fun capture(before: Scene, after: Scene, frame: Int, fresh: Set<Long> = emptySet()): Boolean {
         if (before.fps != after.fps || before.layers.map { it.id } != after.layers.map { it.id }) return false
         for (layer in before.layers) {
             val next = after.layer(layer.id) ?: continue
@@ -146,6 +146,9 @@ internal class LiveRecording(
                     fun away(list: List<Keyframe>) = list.filter { it.t !in at.snap }.map { it.t to it.v }
                     if (pivotId == null && (away(old.keyframes) != away(keys) || keys.none { it.t in at.snap })) whole = true
                     else found += Found(address, old, next, node, value, effect)
+                } else if (pivotId == null && layer.id in fresh && !old.isKeyframed && !node.isKeyframed && node.children.none { it.name == "valueLink" } &&
+                    value != null && was != null && was != value && recordingNumbers(value) != null && recordingNumbers(was) != null) {
+                    found += Found(address, old, next, node, value, effect)
                 }
             }
             val inner = if (node.name == "effect") node["id"] else effect

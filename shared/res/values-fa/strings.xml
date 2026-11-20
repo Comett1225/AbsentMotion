@@ -2623,4 +2623,23 @@
     <string name="history_record_keyframes">ضبط کی‌فریم‌ها</string>
     <string name="dafont_find">فونت‌های بیشتر را در DaFont پیدا کنید</string>
     <string name="dafont_hint">یک فونت دانلود کنید، سپس فایل .zip را اینجا وارد کنید. پیش از استفاده در ویدیوی منتشرشده، مجوز آن را بررسی کنید.</string>
+    <string name="community_ask_title">انجمن باز شود؟</string>
+    <string name="community_ask_note">زبانه انجمن برای بارگیری پروژه‌ها و پریست‌های اشتراکی از GitHub به اینترنت وصل می‌شود. تا وقتی اتصال را نزنید چیزی بارگیری نمی‌شود.</string>
+    <string name="community_ask_button">اتصال</string>
+    <string name="settings_ask_mobile_data">پیش از استفاده از داده همراه بپرس</string>
+    <string name="mobile_data_title">از داده همراه استفاده شود؟</string>
+    <string name="mobile_data_body">به Wi-Fi وصل نیستید، پس این بارگیری از داده همراه استفاده می‌کند. می‌توانید این پرسش را در تنظیمات > پروژه‌ها و رسانه خاموش کنید.</string>
+    <string name="mobile_data_use">استفاده از داده همراه</string>
+    <string name="mobile_data_refused">بارگیری نشد: انتخاب کردید از داده همراه استفاده نشود.</string>
+    <string name="history_lock">قفل یا باز کردن لایه</string>
+    <string name="layer_lock">قفل لایه</string>
+    <string name="layer_lock_timing">فقط قفل زمان‌بندی</string>
+    <string name="layer_unlock">باز کردن قفل</string>
+    <string name="a11y_layer_locked">قفل‌شده</string>
+    <string name="a11y_layer_timing_locked">زمان‌بندی قفل‌شده</string>
+    <string name="layer_locked_hint">این لایه قفل است</string>
+    <string name="layer_timing_locked_hint">زمان‌بندی این لایه قفل است</string>
+    <string name="desk_shortcut_change">تغییر میان‌بر</string>
+    <string name="desk_shortcut_remove">حذف میان‌بر</string>
+    <string name="desk_shortcut_reset">بازنشانی به پیش‌فرض</string>
 </resources>

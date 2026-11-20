@@ -97,6 +97,12 @@ fun EditorState.clearSelection() {
     deselectLayer()
 }
 
+fun EditorState.selectAll() {
+    deselectLayer()
+    MultiSelect.ids = scene.layers.filterNot { it.locked }.map { it.id }.toSet()
+    MultiSelect.active = MultiSelect.ids.isNotEmpty()
+}
+
 fun EditorState.deleteSelected() {
     val id = selectedId ?: return
     edit { it.unparentChildrenOf(setOf(id), sampleMs).remove(id) }
@@ -111,6 +117,13 @@ fun EditorState.duplicateSelected() {
 }
 
 fun EditorState.toggleHidden(id: Long) = edit { it.update(id) { layer -> layer.withHidden(!layer.hidden) } }
+
+fun EditorState.setLock(id: Long, lock: String?) = edit { it.update(id) { layer -> layer.withLock(lock) } }
+
+fun EditorState.toggleLock(id: Long) {
+    val layer = scene.layer(id) ?: return
+    setLock(id, if (layer.node["lock"] == null) "all" else null)
+}
 
 fun EditorState.trimStart() {
     val trimmed = selected?.let { scene.trimStartAt(it, frame) } ?: return
@@ -141,6 +154,7 @@ internal fun Scene.withTrims(ids: List<Long>, frame: Int, sampleMs: Int, start: 
 fun EditorState.split() {
     val next = scene.withSplits(chosenLayers.map { it.id }, frame, sampleMs) ?: return
     edit { next }
+    if (scene.node !== next.node) return
     MultiSelect.clear()
     deselectLayer()
 }

@@ -285,6 +285,7 @@ private fun attributeArea(key: String): Int? = when (key) {
     "fillType" -> R.string.history_fill
     "speed" -> R.string.history_speed
     "hidden" -> R.string.history_visibility
+    "lock" -> R.string.history_lock
     "blending" -> R.string.history_blend
     "clippingMask" -> R.string.history_mask
     else -> null

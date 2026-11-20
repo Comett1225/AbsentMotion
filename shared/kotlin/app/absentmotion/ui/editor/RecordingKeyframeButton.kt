@@ -33,7 +33,7 @@ internal fun RecordingKeyframeButton(
     content: @Composable BoxScope.() -> Unit,
 ) {
     var open by remember { mutableStateOf(false) }
-    val secondary = if (enabled && app.absentmotion.platform.PlatformFeatures.desktop) Modifier.pointerInput(Unit) {
+    val secondary = if (enabled && app.absentmotion.ui.adaptive.deskLayout) Modifier.pointerInput(Unit) {
         awaitPointerEventScope {
             while (true) {
                 val event = awaitPointerEvent(PointerEventPass.Initial)
@@ -53,6 +53,7 @@ internal fun RecordingKeyframeButton(
                 colors = MenuDefaults.itemColors(textColor = Am.OnDark),
                 onClick = { state.settings.overwriteRecording = !state.settings.overwriteRecording; open = false },
             )
+            if (app.absentmotion.ui.adaptive.deskLayout) ShortcutItems(app.absentmotion.desk.Shortcut.AddKeyframe, divider = true) { open = false }
         }
     }
 }

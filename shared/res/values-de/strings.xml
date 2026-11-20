@@ -2623,4 +2623,23 @@
     <string name="history_record_keyframes">Keyframes aufnehmen</string>
     <string name="dafont_find">Weitere Schriftarten auf DaFont finden</string>
     <string name="dafont_hint">Lade eine Schriftart herunter und importiere die .zip hier. Prüfe die Lizenz, bevor du sie in einem veröffentlichten Video verwendest.</string>
+    <string name="community_ask_title">Community öffnen?</string>
+    <string name="community_ask_note">Der Community-Tab verbindet sich mit dem Internet, um geteilte Projekte und Voreinstellungen von GitHub zu laden. Es wird nichts geladen, bis du auf Verbinden tippst.</string>
+    <string name="community_ask_button">Verbinden</string>
+    <string name="settings_ask_mobile_data">Vor Nutzung mobiler Daten fragen</string>
+    <string name="mobile_data_title">Mobile Daten nutzen?</string>
+    <string name="mobile_data_body">Du bist nicht im WLAN, daher nutzt dieser Download mobile Daten. Du kannst diese Frage unter Einstellungen > Projekte und Medien ausschalten.</string>
+    <string name="mobile_data_use">Mobile Daten nutzen</string>
+    <string name="mobile_data_refused">Nicht heruntergeladen: Du hast mobile Daten abgelehnt.</string>
+    <string name="history_lock">Ebene sperren oder entsperren</string>
+    <string name="layer_lock">Ebene sperren</string>
+    <string name="layer_lock_timing">Nur Timing sperren</string>
+    <string name="layer_unlock">Entsperren</string>
+    <string name="a11y_layer_locked">Gesperrt</string>
+    <string name="a11y_layer_timing_locked">Timing gesperrt</string>
+    <string name="layer_locked_hint">Diese Ebene ist gesperrt</string>
+    <string name="layer_timing_locked_hint">Das Timing dieser Ebene ist gesperrt</string>
+    <string name="desk_shortcut_change">Tastenkürzel ändern</string>
+    <string name="desk_shortcut_remove">Tastenkürzel entfernen</string>
+    <string name="desk_shortcut_reset">Auf Standard zurücksetzen</string>
 </resources>

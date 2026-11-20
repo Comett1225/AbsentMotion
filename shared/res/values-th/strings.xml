@@ -2594,4 +2594,23 @@
     <string name="history_record_keyframes">บันทึกคีย์เฟรม</string>
     <string name="dafont_find">ค้นหาฟอนต์เพิ่มเติมบน DaFont</string>
     <string name="dafont_hint">ดาวน์โหลดฟอนต์ แล้วนำเข้าไฟล์ .zip ที่นี่ ตรวจสอบสิทธิ์การใช้งานก่อนนำไปใช้ในวิดีโอที่เผยแพร่</string>
+    <string name="community_ask_title">เปิดชุมชนไหม</string>
+    <string name="community_ask_note">แท็บชุมชนจะเชื่อมต่ออินเทอร์เน็ตเพื่อโหลดโปรเจกต์และพรีเซ็ตที่แชร์จาก GitHub จะไม่มีการโหลดอะไรจนกว่าคุณจะกดเชื่อมต่อ</string>
+    <string name="community_ask_button">เชื่อมต่อ</string>
+    <string name="settings_ask_mobile_data">ถามก่อนใช้อินเทอร์เน็ตมือถือ</string>
+    <string name="mobile_data_title">ใช้อินเทอร์เน็ตมือถือไหม</string>
+    <string name="mobile_data_body">คุณไม่ได้เชื่อมต่อ Wi-Fi การดาวน์โหลดนี้จึงจะใช้อินเทอร์เน็ตมือถือ คุณปิดคำถามนี้ได้ที่ การตั้งค่า > โปรเจกต์และสื่อ</string>
+    <string name="mobile_data_use">ใช้อินเทอร์เน็ตมือถือ</string>
+    <string name="mobile_data_refused">ไม่ได้ดาวน์โหลด: คุณเลือกไม่ใช้อินเทอร์เน็ตมือถือ</string>
+    <string name="history_lock">ล็อกหรือปลดล็อกเลเยอร์</string>
+    <string name="layer_lock">ล็อกเลเยอร์</string>
+    <string name="layer_lock_timing">ล็อกเฉพาะเวลา</string>
+    <string name="layer_unlock">ปลดล็อก</string>
+    <string name="a11y_layer_locked">ล็อกอยู่</string>
+    <string name="a11y_layer_timing_locked">ล็อกเวลาอยู่</string>
+    <string name="layer_locked_hint">เลเยอร์นี้ถูกล็อก</string>
+    <string name="layer_timing_locked_hint">เวลาของเลเยอร์นี้ถูกล็อก</string>
+    <string name="desk_shortcut_change">เปลี่ยนปุ่มลัด</string>
+    <string name="desk_shortcut_remove">ลบปุ่มลัด</string>
+    <string name="desk_shortcut_reset">รีเซ็ตเป็นค่าเริ่มต้น</string>
 </resources>

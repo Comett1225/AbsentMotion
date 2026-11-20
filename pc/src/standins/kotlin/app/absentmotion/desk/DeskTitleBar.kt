@@ -1,5 +1,8 @@
 package app.absentmotion.desk
 
+import androidx.compose.material3.DropdownMenu
+import app.absentmotion.ui.editor.ShortcutItems
+import app.absentmotion.ui.editor.rightClick
 import android.content.mime
 import app.absentmotion.i18n.AppText
 import android.net.Uri
@@ -327,9 +330,7 @@ private object WindowGlyphs {
         .addPath(addPathNodes(path), stroke = SolidColor(Color.White), strokeLineWidth = 1.6f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round).build()
 }
 
-data class MenuKey(val key: Key, val command: Boolean = true, val alt: Boolean = false, val shift: Boolean = false)
-
-class DeskMenuItem(val label: String, val enabled: Boolean = true, val keys: MenuKey? = null, val children: List<DeskMenuItem>? = null, val run: () -> Unit = {}) {
+class DeskMenuItem(val label: String, val enabled: Boolean = true, val keys: MenuKey? = null, val children: List<DeskMenuItem>? = null, val action: Shortcut? = null, val run: () -> Unit = {}) {
     val shortcut: KeyShortcut? get() = keys?.let { KeyShortcut(it.key, meta = it.command && DeskOs.mac, ctrl = it.command && !DeskOs.mac, alt = it.alt, shift = it.shift) }
 
     companion object { val Separator = DeskMenuItem("") }
@@ -345,8 +346,8 @@ fun deskMenus(app: DeskAppState, scope: kotlinx.coroutines.CoroutineScope): List
     val separator = DeskMenuItem.Separator
     return listOf(
         DeskMenuItem(t(R.string.desk_menu_file), children = listOfNotNull(
-            DeskMenuItem(t(R.string.desk_menu_new_project), app.canStartProject, key(Shortcut.NewProject)) { app.newProjectTick++ },
-            DeskMenuItem(t(R.string.settings) + "…", keys = key(Shortcut.Settings)) { app.openSettings() },
+            DeskMenuItem(t(R.string.desk_menu_new_project), app.canStartProject, key(Shortcut.NewProject), action = Shortcut.NewProject) { app.newProjectTick++ },
+            DeskMenuItem(t(R.string.settings) + "…", keys = key(Shortcut.Settings), action = Shortcut.Settings) { app.openSettings() },
             separator,
             DeskMenuItem(t(R.string.desk_menu_import_media), editor != null) {
                 val files = DeskFiles.chooseFiles(media = true, multiple = true).map(Uri::fromFile)
@@ -359,32 +360,32 @@ fun deskMenus(app: DeskAppState, scope: kotlinx.coroutines.CoroutineScope): List
             DeskMenuItem(t(R.string.desk_menu_link_folder)) { linkMediaFolder() },
             if (linked.isEmpty()) null else DeskMenuItem(t(R.string.desk_menu_unlink_folder), children = linked.map { folder -> DeskMenuItem(folder.name.ifEmpty { folder.path }) { DeskLibrary.unlink(folder) } }),
             separator,
-            DeskMenuItem(t(R.string.export) + "…", editor != null, key(Shortcut.Export)) { editor?.let { it.playing = false; it.exportOpen = true } },
-            DeskMenuItem(t(R.string.desk_menu_close_project), editor != null, key(Shortcut.CloseProject)) { app.closeSoon() },
-        ) + if (DeskOs.mac) emptyList() else listOf(separator, DeskMenuItem(t(R.string.desk_export_quit), true, key(Shortcut.Quit)) { app.requestQuit() })),
+            DeskMenuItem(t(R.string.export) + "…", editor != null, key(Shortcut.Export), action = Shortcut.Export) { editor?.let { it.playing = false; it.exportOpen = true } },
+            DeskMenuItem(t(R.string.desk_menu_close_project), editor != null, key(Shortcut.CloseProject), action = Shortcut.CloseProject) { app.closeSoon() },
+        ) + if (DeskOs.mac) emptyList() else listOf(separator, DeskMenuItem(t(R.string.desk_export_quit), true, key(Shortcut.Quit), action = Shortcut.Quit) { app.requestQuit() })),
         DeskMenuItem(t(R.string.history_edit), children = listOf(
-            DeskMenuItem(t(R.string.draw_undo), editor?.canUndo == true) { editor?.undo() },
-            DeskMenuItem(t(R.string.draw_redo), editor?.canRedo == true) { editor?.redo() },
+            DeskMenuItem(t(R.string.draw_undo), editor?.canUndo == true, action = Shortcut.Undo) { editor?.undo() },
+            DeskMenuItem(t(R.string.draw_redo), editor?.canRedo == true, action = Shortcut.Redo) { editor?.redo() },
             separator,
-            DeskMenuItem(t(R.string.desk_menu_cut_layer), chosen) { editor?.let { it.copySelected(); if (MultiSelect.active) it.deleteChosen() else it.deleteSelected() } },
-            DeskMenuItem(t(R.string.desk_menu_copy_layer), chosen) { editor?.copySelected() },
-            DeskMenuItem(t(R.string.desk_menu_paste_layer), editor != null) { editor?.pasteLayer() },
-            DeskMenuItem(t(R.string.home_duplicate), picked) { editor?.let { if (MultiSelect.active) it.duplicateChosen() else it.duplicateSelected() } },
-            DeskMenuItem(t(R.string.timeline_split), picked) { editor?.split() },
-            DeskMenuItem(t(R.string.delete), picked) { editor?.let { if (MultiSelect.active) it.deleteChosen() else it.deleteSelected() } },
+            DeskMenuItem(t(R.string.desk_menu_cut_layer), chosen, action = Shortcut.Cut) { editor?.let { it.copySelected(); if (MultiSelect.active) it.deleteChosen() else it.deleteSelected() } },
+            DeskMenuItem(t(R.string.desk_menu_copy_layer), chosen, action = Shortcut.Copy) { editor?.copySelected() },
+            DeskMenuItem(t(R.string.desk_menu_paste_layer), editor != null, action = Shortcut.Paste) { editor?.pasteLayer() },
+            DeskMenuItem(t(R.string.home_duplicate), picked, action = Shortcut.Duplicate) { editor?.let { if (MultiSelect.active) it.duplicateChosen() else it.duplicateSelected() } },
+            DeskMenuItem(t(R.string.timeline_split), picked, action = Shortcut.Split) { editor?.split() },
+            DeskMenuItem(t(R.string.delete), picked, action = Shortcut.Delete) { editor?.let { if (MultiSelect.active) it.deleteChosen() else it.deleteSelected() } },
         )),
         DeskMenuItem(t(R.string.desk_menu_view), children = listOf(
-            DeskMenuItem(t(R.string.desk_menu_zoom_in), DeskScale.percent < DeskScale.MAX, key(Shortcut.ZoomIn)) { DeskScale.zoomIn() },
-            DeskMenuItem(t(R.string.desk_menu_zoom_out), DeskScale.percent > DeskScale.MIN, key(Shortcut.ZoomOut)) { DeskScale.zoomOut() },
-            DeskMenuItem(t(R.string.desk_menu_actual_size), DeskScale.percent != 100, key(Shortcut.ActualSize)) { DeskScale.reset() },
+            DeskMenuItem(t(R.string.desk_menu_zoom_in), DeskScale.percent < DeskScale.MAX, key(Shortcut.ZoomIn), action = Shortcut.ZoomIn) { DeskScale.zoomIn() },
+            DeskMenuItem(t(R.string.desk_menu_zoom_out), DeskScale.percent > DeskScale.MIN, key(Shortcut.ZoomOut), action = Shortcut.ZoomOut) { DeskScale.zoomOut() },
+            DeskMenuItem(t(R.string.desk_menu_actual_size), DeskScale.percent != 100, key(Shortcut.ActualSize), action = Shortcut.ActualSize) { DeskScale.reset() },
         )),
         DeskMenuItem(t(R.string.desk_menu_playback), children = listOf(
-            DeskMenuItem(if (editor?.playing == true) t(R.string.export_pause) else t(R.string.export_play), editor != null) { editor?.togglePlayback() },
-            DeskMenuItem(t(R.string.desk_menu_go_start), editor != null) { editor?.let { it.playing = false; it.frame = 0 } },
-            DeskMenuItem(t(R.string.desk_menu_go_end), editor != null) { editor?.let { it.playing = false; it.parkAtEnd() } },
+            DeskMenuItem(if (editor?.playing == true) t(R.string.export_pause) else t(R.string.export_play), editor != null, action = Shortcut.PlayPause) { editor?.togglePlayback() },
+            DeskMenuItem(t(R.string.desk_menu_go_start), editor != null, action = Shortcut.GoStart) { editor?.let { it.playing = false; it.frame = 0 } },
+            DeskMenuItem(t(R.string.desk_menu_go_end), editor != null, action = Shortcut.GoEnd) { editor?.let { it.playing = false; it.parkAtEnd() } },
             separator,
-            DeskMenuItem(t(R.string.desk_menu_previous_bookmark), editor != null, key(Shortcut.PreviousBookmark)) { editor?.let { DeskJump.previous(it) } },
-            DeskMenuItem(t(R.string.desk_menu_next_bookmark), editor != null, key(Shortcut.NextBookmark)) { editor?.let { DeskJump.next(it) } },
+            DeskMenuItem(t(R.string.desk_menu_previous_bookmark), editor != null, key(Shortcut.PreviousBookmark), action = Shortcut.PreviousBookmark) { editor?.let { DeskJump.previous(it) } },
+            DeskMenuItem(t(R.string.desk_menu_next_bookmark), editor != null, key(Shortcut.NextBookmark), action = Shortcut.NextBookmark) { editor?.let { DeskJump.next(it) } },
         )),
         DeskMenuItem(t(R.string.settings_help), children = listOf(
             DeskMenuItem(t(R.string.desk_menu_help)) { app.openSettings(SettingsPage.Help) },
@@ -392,23 +393,6 @@ fun deskMenus(app: DeskAppState, scope: kotlinx.coroutines.CoroutineScope): List
             DeskMenuItem(t(R.string.desk_menu_crash_logs)) { app.openSettings(SettingsPage.Crash) },
         )),
     )
-}
-
-internal fun shortcutText(shortcut: MenuKey, mac: Boolean): String {
-    val key = when (shortcut.key) {
-        Key.Comma -> ","
-        Key.Period -> "."
-        Key.Equals -> "="
-        Key.Minus -> "-"
-        Key.Plus -> "+"
-        Key.DirectionLeft -> "←"
-        Key.DirectionRight -> "→"
-        Key.DirectionUp -> "↑"
-        Key.DirectionDown -> "↓"
-        else -> java.awt.event.KeyEvent.getKeyText(shortcut.key.nativeKeyCode)
-    }
-    return if (mac) (if (shortcut.alt) "⌥" else "") + (if (shortcut.shift) "⇧" else "") + (if (shortcut.command) "⌘" else "") + key
-    else (if (shortcut.command) "Ctrl+" else "") + (if (shortcut.alt) "Alt+" else "") + (if (shortcut.shift) "Shift+" else "") + key
 }
 
 @Composable
@@ -447,6 +431,7 @@ private fun step(items: List<DeskMenuItem>, from: Int, by: Int): Int {
 @Composable
 private fun DeskMenuPopup(menus: List<DeskMenuItem>, light: Boolean, run: (() -> Unit) -> Unit, onDismiss: () -> Unit) {
     var path by remember { mutableStateOf(listOf(-1)) }
+    var shortcutAt by remember { mutableStateOf<Pair<Int, Int>?>(null) }
     val focus = remember { FocusRequester() }
     DeskBack.Handler(true, onDismiss)
     fun levels(): List<List<DeskMenuItem>> {
@@ -504,8 +489,9 @@ private fun DeskMenuPopup(menus: List<DeskMenuItem>, light: Boolean, run: (() ->
                 ) {
                     items.forEachIndexed { index, item ->
                         if (item === DeskMenuItem.Separator) Box(Modifier.fillMaxWidth().height(SeparatorHeight.dp).padding(vertical = 4.dp, horizontal = 8.dp).background(edge))
-                        else Row(
+                        else Box { Row(
                             Modifier.fillMaxWidth().height(RowHeight.dp).padding(horizontal = 4.dp).clip(RoundedCornerShape(6.dp))
+                                .then(item.action?.let { Modifier.rightClick { shortcutAt = level to index } } ?: Modifier)
                                 .background(if (path.getOrNull(level) == index) hover else Color.Transparent)
                                 .onPointerEvent(PointerEventType.Enter) { path = if (item.children != null && item.enabled) path.take(level) + index + -1 else path.take(level) + index }
                                 .then(if (item.enabled) Modifier.handCursor().clickable { activate(level, index) } else Modifier)
@@ -516,6 +502,11 @@ private fun DeskMenuPopup(menus: List<DeskMenuItem>, light: Boolean, run: (() ->
                                 fontWeight = if (level == 0) FontWeight.Medium else FontWeight.Normal)
                             item.keys?.let { Text(shortcutText(it, DeskOs.mac), color = dim.copy(alpha = if (item.enabled) 1f else .6f), fontSize = 12.sp, maxLines = 1) }
                             if (item.children != null) Icon(ChromeIcons.ChevronRight, null, Modifier.size(16.dp), tint = if (item.enabled) dim else dim.copy(alpha = .6f))
+                        }
+                            val action = item.action
+                            if (action != null && shortcutAt == level to index) DropdownMenu(expanded = true, onDismissRequest = { shortcutAt = null }, containerColor = Am.Field) {
+                                ShortcutItems(action) { shortcutAt = null }
+                            }
                         }
                     }
                 }

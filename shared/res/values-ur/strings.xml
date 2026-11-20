@@ -2623,4 +2623,23 @@
     <string name="history_record_keyframes">کی فریمز ریکارڈ کریں</string>
     <string name="dafont_find">‏DaFont پر مزید فونٹس تلاش کریں</string>
     <string name="dafont_hint">فونٹ ڈاؤن لوڈ کریں، پھر .zip یہاں امپورٹ کریں۔ شائع شدہ ویڈیو میں استعمال کرنے سے پہلے اس کا لائسنس چیک کریں۔</string>
+    <string name="community_ask_title">کمیونٹی کھولیں؟</string>
+    <string name="community_ask_note">کمیونٹی ٹیب GitHub سے شیئر کیے گئے پروجیکٹس اور پریسیٹس لوڈ کرنے کے لیے انٹرنیٹ سے جڑتا ہے۔ جب تک آپ کنیکٹ نہیں دباتے، کچھ بھی لوڈ نہیں ہوتا۔</string>
+    <string name="community_ask_button">کنیکٹ</string>
+    <string name="settings_ask_mobile_data">موبائل ڈیٹا استعمال کرنے سے پہلے پوچھیں</string>
+    <string name="mobile_data_title">موبائل ڈیٹا استعمال کریں؟</string>
+    <string name="mobile_data_body">آپ Wi-Fi پر نہیں ہیں، اس لیے یہ ڈاؤن لوڈ موبائل ڈیٹا استعمال کرے گا۔ آپ یہ سوال سیٹنگز > پروجیکٹس اور میڈیا میں بند کر سکتے ہیں۔</string>
+    <string name="mobile_data_use">موبائل ڈیٹا استعمال کریں</string>
+    <string name="mobile_data_refused">ڈاؤن لوڈ نہیں ہوا: آپ نے موبائل ڈیٹا استعمال نہ کرنا چنا۔</string>
+    <string name="history_lock">لیئر لاک یا ان لاک کریں</string>
+    <string name="layer_lock">لیئر لاک کریں</string>
+    <string name="layer_lock_timing">صرف ٹائمنگ لاک کریں</string>
+    <string name="layer_unlock">ان لاک کریں</string>
+    <string name="a11y_layer_locked">لاک ہے</string>
+    <string name="a11y_layer_timing_locked">ٹائمنگ لاک ہے</string>
+    <string name="layer_locked_hint">یہ لیئر لاک ہے</string>
+    <string name="layer_timing_locked_hint">اس لیئر کی ٹائمنگ لاک ہے</string>
+    <string name="desk_shortcut_change">شارٹ کٹ بدلیں</string>
+    <string name="desk_shortcut_remove">شارٹ کٹ ہٹائیں</string>
+    <string name="desk_shortcut_reset">ڈیفالٹ پر ری سیٹ کریں</string>
 </resources>

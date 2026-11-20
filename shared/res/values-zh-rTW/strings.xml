@@ -2594,4 +2594,23 @@
     <string name="history_record_keyframes">錄製關鍵影格</string>
     <string name="dafont_find">在DaFont上尋找更多字型</string>
     <string name="dafont_hint">下載字型後，在此匯入.zip檔案。在已發布的影片中使用前，請先查看其授權條款。</string>
+    <string name="community_ask_title">要開啟社群嗎？</string>
+    <string name="community_ask_note">社群分頁會連上網際網路，從 GitHub 載入分享的專案與預設集。在你點按「連線」之前不會載入任何內容。</string>
+    <string name="community_ask_button">連線</string>
+    <string name="settings_ask_mobile_data">使用行動數據前先詢問</string>
+    <string name="mobile_data_title">要使用行動數據嗎？</string>
+    <string name="mobile_data_body">你未連上 Wi-Fi，因此這次下載會使用行動數據。你可以在 設定 > 專案與媒體 中關閉這個詢問。</string>
+    <string name="mobile_data_use">使用行動數據</string>
+    <string name="mobile_data_refused">未下載：你選擇不使用行動數據。</string>
+    <string name="history_lock">鎖定或解鎖圖層</string>
+    <string name="layer_lock">鎖定圖層</string>
+    <string name="layer_lock_timing">僅鎖定時間</string>
+    <string name="layer_unlock">解鎖</string>
+    <string name="a11y_layer_locked">已鎖定</string>
+    <string name="a11y_layer_timing_locked">時間已鎖定</string>
+    <string name="layer_locked_hint">此圖層已鎖定</string>
+    <string name="layer_timing_locked_hint">此圖層的時間已鎖定</string>
+    <string name="desk_shortcut_change">變更快速鍵</string>
+    <string name="desk_shortcut_remove">移除快速鍵</string>
+    <string name="desk_shortcut_reset">恢復預設</string>
 </resources>

@@ -2681,4 +2681,23 @@
     <string name="history_record_keyframes">Nagrywanie klatek kluczowych</string>
     <string name="dafont_find">Znajdź więcej czcionek w DaFont</string>
     <string name="dafont_hint">Pobierz czcionkę, a potem zaimportuj tutaj plik .zip. Sprawdź jej licencję, zanim użyjesz jej w opublikowanym filmie.</string>
+    <string name="community_ask_title">Otworzyć Społeczność?</string>
+    <string name="community_ask_note">Karta Społeczność łączy się z internetem, aby wczytać udostępnione projekty i presety z GitHub. Nic nie jest wczytywane, dopóki nie naciśniesz Połącz.</string>
+    <string name="community_ask_button">Połącz</string>
+    <string name="settings_ask_mobile_data">Pytaj przed użyciem danych komórkowych</string>
+    <string name="mobile_data_title">Użyć danych komórkowych?</string>
+    <string name="mobile_data_body">Nie masz połączenia Wi-Fi, więc to pobieranie użyje danych komórkowych. Możesz wyłączyć to pytanie w Ustawienia > Projekty i multimedia.</string>
+    <string name="mobile_data_use">Użyj danych komórkowych</string>
+    <string name="mobile_data_refused">Nie pobrano: wybrano, aby nie używać danych komórkowych.</string>
+    <string name="history_lock">Zablokuj lub odblokuj warstwę</string>
+    <string name="layer_lock">Zablokuj warstwę</string>
+    <string name="layer_lock_timing">Zablokuj tylko czas</string>
+    <string name="layer_unlock">Odblokuj</string>
+    <string name="a11y_layer_locked">Zablokowana</string>
+    <string name="a11y_layer_timing_locked">Czas zablokowany</string>
+    <string name="layer_locked_hint">Ta warstwa jest zablokowana</string>
+    <string name="layer_timing_locked_hint">Czas tej warstwy jest zablokowany</string>
+    <string name="desk_shortcut_change">Zmień skrót</string>
+    <string name="desk_shortcut_remove">Usuń skrót</string>
+    <string name="desk_shortcut_reset">Przywróć domyślny</string>
 </resources>

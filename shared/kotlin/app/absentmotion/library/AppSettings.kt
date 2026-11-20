@@ -28,6 +28,11 @@ class AppSettings(private val context: Context) {
     private var loopingPlayState by mutableStateOf(prefs.getBoolean("loopingPlay", false))
     private var countInState by mutableIntStateOf(prefs.getInt("playCountIn", 0).coerceIn(0, 3))
     private var overwriteRecordingState by mutableStateOf(prefs.getBoolean("overwriteRecording", false))
+    private var askMobileDataState by mutableStateOf(prefs.getBoolean(app.absentmotion.platform.MobileData.KEY, true))
+
+    var askMobileData: Boolean
+        get() = askMobileDataState
+        set(value) { askMobileDataState = value; prefs.edit().putBoolean(app.absentmotion.platform.MobileData.KEY, value).apply() }
     private var playbackSpeedState by mutableIntStateOf(prefs.getInt("playbackSpeed", 4).takeIf { it in listOf(1, 2, 4) } ?: 4)
     private var xmlUploadState by mutableStateOf(prefs.getBoolean("xmlUpload", false))
     private var vibrationState by mutableStateOf(prefs.getBoolean("trimLimitVibration", true))
