@@ -221,6 +221,11 @@ class LayerLockTest {
             runOnIdle { assertEquals(0, state.scene.layer(3L)!!.startTime); assertNull(state.selectedId) }
             onRoot().performMouseInput { moveTo(Offset(250f, 57f)); press(MouseButton.Secondary); release(MouseButton.Secondary) }
             assertTrue(onAllNodesWithText("Delete").fetchSemanticsNodes().isEmpty())
+            onNodeWithText("Unlock").performClick()
+            runOnIdle {
+                assertFalse(state.scene.layer(3L)!!.locked)
+                state.setLock(3L, "all")
+            }
             onRoot().performMouseInput { moveTo(Offset(230f, 87f)); press(); moveTo(Offset(320f, 87f)); release() }
             runOnIdle {
                 assertEquals(2L, state.selectedId)
@@ -231,7 +236,8 @@ class LayerLockTest {
             onRoot().performMouseInput { moveTo(Offset(478f, 87f)); press(); moveTo(Offset(420f, 87f)); release() }
             runOnIdle { assertEquals(2999, state.scene.layer(2L)!!.endTime); assertEquals(txt(R.string.layer_timing_locked_hint), state.lastHint()) }
             onRoot().performMouseInput { moveTo(Offset(600f, 50f)); press(); moveTo(Offset(200f, 125f)); release() }
-            runOnIdle { assertEquals(setOf(1L, 2L), MultiSelect.ids); MultiSelect.clear(); state.selectedId = null }
+            runOnIdle { assertEquals(setOf(1L, 2L), MultiSelect.ids); MultiSelect.clear(); state.selectedId = 2L }
+            waitForIdle()
             onRoot().performMouseInput { moveTo(Offset(47f, 117f)); press(); release() }
             runOnIdle { assertEquals("all", state.scene.layer(1L)!!.node["lock"]) }
             onRoot().performMouseInput { moveTo(Offset(47f, 117f)); press(MouseButton.Secondary); release(MouseButton.Secondary) }

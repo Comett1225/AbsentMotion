@@ -131,6 +131,7 @@ internal fun AudioTab(state: EditorState, modifier: Modifier, library: AddLibrar
     }
     fun fromFiles() = MediaPicks.openSounds()
     androidx.compose.runtime.LaunchedEffect(Unit) {
+        library.audioRevision++
         if (!allowed && !prefs.getBoolean("askedAudio", false)) {
             prefs.edit().putBoolean("askedAudio", true).apply()
             permission.launch(AudioPermission)

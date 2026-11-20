@@ -2642,4 +2642,36 @@
     <string name="desk_shortcut_change">Palitan ang shortcut</string>
     <string name="desk_shortcut_remove">Alisin ang shortcut</string>
     <string name="desk_shortcut_reset">I-reset sa default</string>
+    <string name="update_background_hint">Puwede mong iwan ang AbsentMotion. Tuloy ang pag-download, at may notification na magsasabi kapag handa na itong i-install.</string>
+    <string name="update_foreground_hint">Panatilihing bukas ang AbsentMotion hanggang matapos ang pag-download.</string>
+    <string name="update_hide">Itago</string>
+    <string name="update_channel">Mga update</string>
+    <string name="update_notification_downloading">Dina-download ang AbsentMotion %1$s</string>
+    <string name="update_notification_ready">Handa nang i-install ang AbsentMotion %1$s</string>
+    <string name="update_notification_install">I-tap para i-install ang update.</string>
+    <string name="tools_layout_more">Iba pang opsyon</string>
+    <string name="tools_layout_change">Baguhin ang layout</string>
+    <string name="tools_layout_hint">Gamitin ang mga arrow para baguhin ang pagkakasunod-sunod</string>
+    <string name="tools_layout_move_up">Ilipat pataas</string>
+    <string name="tools_layout_move_down">Ilipat pababa</string>
+    <string name="share_add_to_project">Idagdag sa isang project?</string>
+    <string name="share_or_add_to">O idagdag sa</string>
+    <plurals name="share_videos">
+        <item quantity="one">%1$d video</item>
+        <item quantity="other">%1$d na video</item>
+    </plurals>
+    <plurals name="share_pictures">
+        <item quantity="one">%1$d larawan</item>
+        <item quantity="other">%1$d na larawan</item>
+    </plurals>
+    <plurals name="share_sounds">
+        <item quantity="one">%1$d tunog</item>
+        <item quantity="other">%1$d na tunog</item>
+    </plurals>
+    <plurals name="share_files">
+        <item quantity="one">%1$d file</item>
+        <item quantity="other">%1$d na file</item>
+    </plurals>
+    <string name="media_drive_add_folder">Drive o folder</string>
+    <string name="media_drive_cannot_open">Hindi mabuksan ang pagpili ng folder</string>
 </resources>

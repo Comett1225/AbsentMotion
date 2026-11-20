@@ -2642,4 +2642,36 @@
     <string name="desk_shortcut_change">تغییر میان‌بر</string>
     <string name="desk_shortcut_remove">حذف میان‌بر</string>
     <string name="desk_shortcut_reset">بازنشانی به پیش‌فرض</string>
+    <string name="update_background_hint">می‌توانید از AbsentMotion خارج شوید. دانلود ادامه پیدا می‌کند و وقتی برای نصب آماده شد، یک اعلان به شما خبر می‌دهد.</string>
+    <string name="update_foreground_hint">تا پایان دانلود، AbsentMotion را باز نگه دارید.</string>
+    <string name="update_hide">پنهان کردن</string>
+    <string name="update_channel">به‌روزرسانی‌ها</string>
+    <string name="update_notification_downloading">در حال دانلود AbsentMotion %1$s</string>
+    <string name="update_notification_ready">‏AbsentMotion %1$s آماده نصب است</string>
+    <string name="update_notification_install">برای نصب به‌روزرسانی ضربه بزنید.</string>
+    <string name="tools_layout_more">گزینه‌های بیشتر</string>
+    <string name="tools_layout_change">تغییر چیدمان</string>
+    <string name="tools_layout_hint">برای تغییر ترتیب از پیکان‌ها استفاده کنید</string>
+    <string name="tools_layout_move_up">انتقال به بالا</string>
+    <string name="tools_layout_move_down">انتقال به پایین</string>
+    <string name="share_add_to_project">به یک پروژه اضافه شود؟</string>
+    <string name="share_or_add_to">یا اضافه کردن به</string>
+    <plurals name="share_videos">
+        <item quantity="one">‏%1$d ویدیو</item>
+        <item quantity="other">‏%1$d ویدیو</item>
+    </plurals>
+    <plurals name="share_pictures">
+        <item quantity="one">‏%1$d تصویر</item>
+        <item quantity="other">‏%1$d تصویر</item>
+    </plurals>
+    <plurals name="share_sounds">
+        <item quantity="one">‏%1$d صدا</item>
+        <item quantity="other">‏%1$d صدا</item>
+    </plurals>
+    <plurals name="share_files">
+        <item quantity="one">‏%1$d فایل</item>
+        <item quantity="other">‏%1$d فایل</item>
+    </plurals>
+    <string name="media_drive_add_folder">درایو یا پوشه</string>
+    <string name="media_drive_cannot_open">انتخابگر پوشه باز نشد</string>
 </resources>

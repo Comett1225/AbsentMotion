@@ -2613,4 +2613,32 @@
     <string name="desk_shortcut_change">Đổi phím tắt</string>
     <string name="desk_shortcut_remove">Xóa phím tắt</string>
     <string name="desk_shortcut_reset">Đặt lại mặc định</string>
+    <string name="update_background_hint">Bạn có thể rời AbsentMotion. Quá trình tải xuống vẫn tiếp tục và một thông báo sẽ cho bạn biết khi bản cập nhật sẵn sàng để cài đặt.</string>
+    <string name="update_foreground_hint">Hãy giữ AbsentMotion mở cho đến khi tải xuống xong.</string>
+    <string name="update_hide">Ẩn</string>
+    <string name="update_channel">Bản cập nhật</string>
+    <string name="update_notification_downloading">Đang tải xuống AbsentMotion %1$s</string>
+    <string name="update_notification_ready">AbsentMotion %1$s đã sẵn sàng để cài đặt</string>
+    <string name="update_notification_install">Nhấn để cài đặt bản cập nhật.</string>
+    <string name="tools_layout_more">Tùy chọn khác</string>
+    <string name="tools_layout_change">Đổi bố cục</string>
+    <string name="tools_layout_hint">Dùng các mũi tên để đổi thứ tự</string>
+    <string name="tools_layout_move_up">Di chuyển lên</string>
+    <string name="tools_layout_move_down">Di chuyển xuống</string>
+    <string name="share_add_to_project">Thêm vào một dự án?</string>
+    <string name="share_or_add_to">Hoặc thêm vào</string>
+    <plurals name="share_videos">
+        <item quantity="other">%1$d video</item>
+    </plurals>
+    <plurals name="share_pictures">
+        <item quantity="other">%1$d ảnh</item>
+    </plurals>
+    <plurals name="share_sounds">
+        <item quantity="other">%1$d âm thanh</item>
+    </plurals>
+    <plurals name="share_files">
+        <item quantity="other">%1$d tệp</item>
+    </plurals>
+    <string name="media_drive_add_folder">Ổ đĩa hoặc thư mục</string>
+    <string name="media_drive_cannot_open">Không mở được trình chọn thư mục</string>
 </resources>

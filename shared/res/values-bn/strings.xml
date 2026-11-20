@@ -2642,4 +2642,36 @@
     <string name="desk_shortcut_change">শর্টকাট বদলান</string>
     <string name="desk_shortcut_remove">শর্টকাট সরান</string>
     <string name="desk_shortcut_reset">ডিফল্টে রিসেট করুন</string>
+    <string name="update_background_hint">আপনি AbsentMotion থেকে বেরিয়ে যেতে পারেন। ডাউনলোড চলতে থাকবে, আর ইনস্টলের জন্য তৈরি হলে একটি নোটিফিকেশন জানাবে।</string>
+    <string name="update_foreground_hint">ডাউনলোড শেষ না হওয়া পর্যন্ত AbsentMotion খোলা রাখুন।</string>
+    <string name="update_hide">লুকান</string>
+    <string name="update_channel">আপডেট</string>
+    <string name="update_notification_downloading">AbsentMotion %1$s ডাউনলোড হচ্ছে</string>
+    <string name="update_notification_ready">AbsentMotion %1$s ইনস্টলের জন্য তৈরি</string>
+    <string name="update_notification_install">আপডেট ইনস্টল করতে ট্যাপ করুন।</string>
+    <string name="tools_layout_more">আরও বিকল্প</string>
+    <string name="tools_layout_change">লেআউট বদলান</string>
+    <string name="tools_layout_hint">ক্রম বদলাতে তীরগুলো ব্যবহার করুন</string>
+    <string name="tools_layout_move_up">উপরে সরান</string>
+    <string name="tools_layout_move_down">নিচে সরান</string>
+    <string name="share_add_to_project">প্রজেক্টে যোগ করবেন?</string>
+    <string name="share_or_add_to">অথবা যোগ করুন</string>
+    <plurals name="share_videos">
+        <item quantity="one">%1$dটি ভিডিও</item>
+        <item quantity="other">%1$dটি ভিডিও</item>
+    </plurals>
+    <plurals name="share_pictures">
+        <item quantity="one">%1$dটি ছবি</item>
+        <item quantity="other">%1$dটি ছবি</item>
+    </plurals>
+    <plurals name="share_sounds">
+        <item quantity="one">%1$dটি সাউন্ড</item>
+        <item quantity="other">%1$dটি সাউন্ড</item>
+    </plurals>
+    <plurals name="share_files">
+        <item quantity="one">%1$dটি ফাইল</item>
+        <item quantity="other">%1$dটি ফাইল</item>
+    </plurals>
+    <string name="media_drive_add_folder">ড্রাইভ বা ফোল্ডার</string>
+    <string name="media_drive_cannot_open">ফোল্ডার বাছাই খোলা যায়নি</string>
 </resources>

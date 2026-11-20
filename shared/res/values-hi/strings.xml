@@ -2642,4 +2642,36 @@
     <string name="desk_shortcut_change">शॉर्टकट बदलें</string>
     <string name="desk_shortcut_remove">शॉर्टकट हटाएँ</string>
     <string name="desk_shortcut_reset">डिफ़ॉल्ट पर रीसेट करें</string>
+    <string name="update_background_hint">आप AbsentMotion से बाहर जा सकते हैं। डाउनलोड चलता रहेगा, और इंस्टॉल के लिए तैयार होने पर एक सूचना आपको बताएगी।</string>
+    <string name="update_foreground_hint">डाउनलोड पूरा होने तक AbsentMotion खुला रखें।</string>
+    <string name="update_hide">छिपाएँ</string>
+    <string name="update_channel">अपडेट</string>
+    <string name="update_notification_downloading">AbsentMotion %1$s डाउनलोड हो रहा है</string>
+    <string name="update_notification_ready">AbsentMotion %1$s इंस्टॉल के लिए तैयार है</string>
+    <string name="update_notification_install">अपडेट इंस्टॉल करने के लिए टैप करें।</string>
+    <string name="tools_layout_more">और विकल्प</string>
+    <string name="tools_layout_change">लेआउट बदलें</string>
+    <string name="tools_layout_hint">क्रम बदलने के लिए तीरों का इस्तेमाल करें</string>
+    <string name="tools_layout_move_up">ऊपर ले जाएँ</string>
+    <string name="tools_layout_move_down">नीचे ले जाएँ</string>
+    <string name="share_add_to_project">किसी प्रोजेक्ट में जोड़ें?</string>
+    <string name="share_or_add_to">या इसमें जोड़ें</string>
+    <plurals name="share_videos">
+        <item quantity="one">%1$d वीडियो</item>
+        <item quantity="other">%1$d वीडियो</item>
+    </plurals>
+    <plurals name="share_pictures">
+        <item quantity="one">%1$d तस्वीर</item>
+        <item quantity="other">%1$d तस्वीरें</item>
+    </plurals>
+    <plurals name="share_sounds">
+        <item quantity="one">%1$d साउंड</item>
+        <item quantity="other">%1$d साउंड</item>
+    </plurals>
+    <plurals name="share_files">
+        <item quantity="one">%1$d फ़ाइल</item>
+        <item quantity="other">%1$d फ़ाइलें</item>
+    </plurals>
+    <string name="media_drive_add_folder">ड्राइव या फ़ोल्डर</string>
+    <string name="media_drive_cannot_open">फ़ोल्डर चुनने वाला नहीं खुल सका</string>
 </resources>

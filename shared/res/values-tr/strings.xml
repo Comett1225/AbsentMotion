@@ -2642,4 +2642,36 @@
     <string name="desk_shortcut_change">Kısayolu değiştir</string>
     <string name="desk_shortcut_remove">Kısayolu kaldır</string>
     <string name="desk_shortcut_reset">Varsayılana sıfırla</string>
+    <string name="update_background_hint">AbsentMotion\'dan çıkabilirsiniz. İndirme devam eder ve yüklemeye hazır olduğunda bir bildirim sizi haberdar eder.</string>
+    <string name="update_foreground_hint">İndirme bitene kadar AbsentMotion\'ı açık tutun.</string>
+    <string name="update_hide">Gizle</string>
+    <string name="update_channel">Güncellemeler</string>
+    <string name="update_notification_downloading">AbsentMotion %1$s indiriliyor</string>
+    <string name="update_notification_ready">AbsentMotion %1$s yüklemeye hazır</string>
+    <string name="update_notification_install">Güncellemeyi yüklemek için dokunun.</string>
+    <string name="tools_layout_more">Diğer seçenekler</string>
+    <string name="tools_layout_change">Düzeni değiştir</string>
+    <string name="tools_layout_hint">Sırayı değiştirmek için okları kullanın</string>
+    <string name="tools_layout_move_up">Yukarı taşı</string>
+    <string name="tools_layout_move_down">Aşağı taşı</string>
+    <string name="share_add_to_project">Bir projeye eklensin mi?</string>
+    <string name="share_or_add_to">Ya da şuraya ekle</string>
+    <plurals name="share_videos">
+        <item quantity="one">%1$d video</item>
+        <item quantity="other">%1$d video</item>
+    </plurals>
+    <plurals name="share_pictures">
+        <item quantity="one">%1$d resim</item>
+        <item quantity="other">%1$d resim</item>
+    </plurals>
+    <plurals name="share_sounds">
+        <item quantity="one">%1$d ses</item>
+        <item quantity="other">%1$d ses</item>
+    </plurals>
+    <plurals name="share_files">
+        <item quantity="one">%1$d dosya</item>
+        <item quantity="other">%1$d dosya</item>
+    </plurals>
+    <string name="media_drive_add_folder">Sürücü veya klasör</string>
+    <string name="media_drive_cannot_open">Klasör seçici açılamadı</string>
 </resources>

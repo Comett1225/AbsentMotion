@@ -28,6 +28,11 @@ object ImportHandOff {
 class ImportActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (intent.flags and Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY != 0) {
+            startActivity(Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            finish()
+            return
+        }
         val uris = when (intent.action) {
             Intent.ACTION_SEND -> listOfNotNull(streamExtra()).ifEmpty { clipUris().take(1) }
             Intent.ACTION_SEND_MULTIPLE -> streamExtras().ifEmpty { clipUris() }
@@ -50,12 +55,15 @@ class ImportActivity : Activity() {
     private fun clipUris(): List<Uri> = intent.clipData?.let { clip -> (0 until clip.itemCount).mapNotNull { clip.getItemAt(it).uri } }.orEmpty()
 
     @Suppress("DEPRECATION")
-    private fun streamExtra(): Uri? =
-        if (Build.VERSION.SDK_INT >= 33) intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java) else intent.getParcelableExtra(Intent.EXTRA_STREAM)
+    private fun streamExtra(): Uri? = runCatching {
+        if (Build.VERSION.SDK_INT >= 33) intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java) else intent.getParcelableExtra<android.os.Parcelable>(Intent.EXTRA_STREAM) as? Uri
+    }.getOrNull()
 
     @Suppress("DEPRECATION")
-    private fun streamExtras(): List<Uri> = (if (Build.VERSION.SDK_INT >= 33) intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM, Uri::class.java)
-        else intent.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM)).orEmpty()
+    private fun streamExtras(): List<Uri> = runCatching {
+        if (Build.VERSION.SDK_INT >= 33) intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM, Uri::class.java).orEmpty()
+        else intent.getParcelableArrayListExtra<android.os.Parcelable>(Intent.EXTRA_STREAM).orEmpty().filterIsInstance<Uri>()
+    }.getOrDefault(emptyList())
 
     private fun isOwnPrivateFile(uri: Uri): Boolean {
         if (uri.scheme != "file") return false

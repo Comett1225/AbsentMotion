@@ -2642,4 +2642,36 @@
     <string name="desk_shortcut_change">شارٹ کٹ بدلیں</string>
     <string name="desk_shortcut_remove">شارٹ کٹ ہٹائیں</string>
     <string name="desk_shortcut_reset">ڈیفالٹ پر ری سیٹ کریں</string>
+    <string name="update_background_hint">آپ AbsentMotion سے باہر جا سکتے ہیں۔ ڈاؤن لوڈ جاری رہے گا، اور انسٹال کے لیے تیار ہونے پر ایک اطلاع آپ کو بتائے گی۔</string>
+    <string name="update_foreground_hint">ڈاؤن لوڈ مکمل ہونے تک AbsentMotion کھلا رکھیں۔</string>
+    <string name="update_hide">چھپائیں</string>
+    <string name="update_channel">اپ ڈیٹس</string>
+    <string name="update_notification_downloading">‏AbsentMotion %1$s ڈاؤن لوڈ ہو رہا ہے</string>
+    <string name="update_notification_ready">‏AbsentMotion %1$s انسٹال کے لیے تیار ہے</string>
+    <string name="update_notification_install">اپ ڈیٹ انسٹال کرنے کے لیے تھپتھپائیں۔</string>
+    <string name="tools_layout_more">مزید اختیارات</string>
+    <string name="tools_layout_change">لے آؤٹ بدلیں</string>
+    <string name="tools_layout_hint">ترتیب بدلنے کے لیے تیر استعمال کریں</string>
+    <string name="tools_layout_move_up">اوپر لے جائیں</string>
+    <string name="tools_layout_move_down">نیچے لے جائیں</string>
+    <string name="share_add_to_project">کسی پروجیکٹ میں شامل کریں؟</string>
+    <string name="share_or_add_to">یا اس میں شامل کریں</string>
+    <plurals name="share_videos">
+        <item quantity="one">‏%1$d ویڈیو</item>
+        <item quantity="other">‏%1$d ویڈیوز</item>
+    </plurals>
+    <plurals name="share_pictures">
+        <item quantity="one">‏%1$d تصویر</item>
+        <item quantity="other">‏%1$d تصاویر</item>
+    </plurals>
+    <plurals name="share_sounds">
+        <item quantity="one">‏%1$d آواز</item>
+        <item quantity="other">‏%1$d آوازیں</item>
+    </plurals>
+    <plurals name="share_files">
+        <item quantity="one">‏%1$d فائل</item>
+        <item quantity="other">‏%1$d فائلیں</item>
+    </plurals>
+    <string name="media_drive_add_folder">ڈرائیو یا فولڈر</string>
+    <string name="media_drive_cannot_open">فولڈر منتخب کرنے والا نہیں کھل سکا</string>
 </resources>

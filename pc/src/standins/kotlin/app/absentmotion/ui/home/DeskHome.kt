@@ -144,6 +144,8 @@ internal fun DeskHome(
     var loaded by remember { mutableStateOf(false) }
     var version by remember { mutableIntStateOf(0) }
     var section by remember { mutableStateOf(DeskSection.Projects) }
+    var arrangingTools by remember { mutableStateOf(false) }
+    LaunchedEffect(section) { if (section != DeskSection.Tools) arrangingTools = false }
     var search by remember { mutableStateOf("") }
     val query = debounced(search)
     var creating by remember { mutableStateOf(false) }
@@ -186,12 +188,12 @@ internal fun DeskHome(
 
     Box(Modifier.fillMaxSize().background(Am.HomeBg)) {
         Column(Modifier.fillMaxSize()) {
-            DeskHeader(section, { section = it; if (it == DeskSection.Templates) selected = null }, search, { search = it }, templates = section == DeskSection.Templates, newProject, import, onSettings, settings)
+            DeskHeader(section, { section = it; if (it == DeskSection.Templates) selected = null; if (it != DeskSection.Tools) arrangingTools = false }, search, { search = it }, templates = section == DeskSection.Templates, newProject, import, onSettings, settings)
             Box(Modifier.weight(1f).fillMaxWidth(), Alignment.TopCenter) {
                 Box(Modifier.widthIn(max = ContentMax).fillMaxSize()) {
                     when (section) {
                         DeskSection.Templates -> DeskTemplates(version + changes, query, onTemplate, onTemplateProject, engine)
-                        DeskSection.Tools -> ToolsTab(Modifier, store, settings) { id -> version++; onOpen(id) }
+                        DeskSection.Tools -> ToolsTab(Modifier, store, settings, arrangingTools, { arrangingTools = it }) { id -> version++; onOpen(id) }
                         DeskSection.Community -> CommunityTab(Modifier.fillMaxSize(), engine) { onImportFiles(listOf(Uri.fromFile(it))) }
                         else -> ProjectsPane(
                             shown, loaded, section == DeskSection.Assets, query, settings, version, selected, { selected = it },

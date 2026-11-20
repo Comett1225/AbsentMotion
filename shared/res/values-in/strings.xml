@@ -2613,4 +2613,32 @@
     <string name="desk_shortcut_change">Ubah pintasan</string>
     <string name="desk_shortcut_remove">Hapus pintasan</string>
     <string name="desk_shortcut_reset">Reset ke default</string>
+    <string name="update_background_hint">Anda bisa keluar dari AbsentMotion. Unduhan tetap berjalan, dan notifikasi akan memberi tahu saat siap dipasang.</string>
+    <string name="update_foreground_hint">Biarkan AbsentMotion tetap terbuka sampai unduhan selesai.</string>
+    <string name="update_hide">Sembunyikan</string>
+    <string name="update_channel">Pembaruan</string>
+    <string name="update_notification_downloading">Mengunduh AbsentMotion %1$s</string>
+    <string name="update_notification_ready">AbsentMotion %1$s siap dipasang</string>
+    <string name="update_notification_install">Ketuk untuk memasang pembaruan.</string>
+    <string name="tools_layout_more">Opsi lainnya</string>
+    <string name="tools_layout_change">Ubah tata letak</string>
+    <string name="tools_layout_hint">Gunakan panah untuk mengubah urutan</string>
+    <string name="tools_layout_move_up">Pindah ke atas</string>
+    <string name="tools_layout_move_down">Pindah ke bawah</string>
+    <string name="share_add_to_project">Tambahkan ke proyek?</string>
+    <string name="share_or_add_to">Atau tambahkan ke</string>
+    <plurals name="share_videos">
+        <item quantity="other">%1$d video</item>
+    </plurals>
+    <plurals name="share_pictures">
+        <item quantity="other">%1$d gambar</item>
+    </plurals>
+    <plurals name="share_sounds">
+        <item quantity="other">%1$d suara</item>
+    </plurals>
+    <plurals name="share_files">
+        <item quantity="other">%1$d file</item>
+    </plurals>
+    <string name="media_drive_add_folder">Drive atau folder</string>
+    <string name="media_drive_cannot_open">Tidak dapat membuka pemilih folder</string>
 </resources>

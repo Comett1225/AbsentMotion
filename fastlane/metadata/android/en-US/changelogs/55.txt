@@ -1,0 +1,7 @@
+Background updates notify you when they're ready to install.
+Share clips into a project and link a USB drive or folder.
+Reorder Tools, close New project by tapping outside, and find more Add tabs by their edge shadows.
+Search opens more smoothly, and the padlock column shows during selection.
+Community bundle fields stay above the keyboard.
+Tapping Current Frame as... selects it.
+An import error no longer reappears every time the app is reopened.

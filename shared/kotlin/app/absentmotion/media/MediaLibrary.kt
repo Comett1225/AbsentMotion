@@ -186,6 +186,11 @@ internal fun exifTag(resolver: ContentResolver, uri: Uri): Int = runCatching {
     resolver.openInputStream(uri)?.use { ExifInterface(it).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL) }
 }.getOrNull() ?: ExifInterface.ORIENTATION_NORMAL
 
+internal object MediaLibrarySource {
+    @Volatile var linkedMedia: ((Context) -> List<DeviceMedia>)? = null
+    val revision = kotlinx.coroutines.flow.MutableStateFlow(0)
+}
+
 data class DeviceMedia(val uri: Uri, val name: String, val albumId: String, val album: String,
                        val video: Boolean, val durationMs: Long, val date: Long, val modified: Long, val svg: Boolean = false)
 
@@ -204,8 +209,13 @@ suspend fun deviceMedia(context: Context, demoOnly: Boolean = false): List<Devic
             }
         } catch (_: Exception) { }
     }
+    MediaLibrarySource.linkedMedia?.invoke(context)?.let { linked ->
+        val known = found.mapTo(HashSet()) { it.name to it.modified }
+        found += linked.filterNot { it.name to it.modified in known }
+    }
     refreshThumbnailVersions(found)
-    found.filter { !demoOnly || it.album.contains("demo", ignoreCase = true) }.sortedWith(compareByDescending<DeviceMedia> { it.date }.thenByDescending { it.uri.lastPathSegment?.toLongOrNull() ?: 0 })
+    found.filter { !demoOnly || it.album.contains("demo", ignoreCase = true) }
+        .sortedWith(compareByDescending<DeviceMedia> { it.date }.thenByDescending { it.uri.lastPathSegment?.toLongOrNull() ?: 0L }.thenBy { it.name })
 }
 
 private val thumbnailCache = object : android.util.LruCache<String, Bitmap>(12 * 1024 * 1024) {
@@ -226,22 +236,36 @@ private fun refreshThumbnailVersions(files: List<DeviceMedia>) {
 
 fun cachedMediaThumbnail(uri: Uri): Bitmap? = thumbnailCache.get(uri.toString())
 
-suspend fun mediaThumbnail(context: Context, uri: Uri): Bitmap? = withContext(Dispatchers.IO) {
+suspend fun mediaThumbnail(context: Context, uri: Uri, video: Boolean? = null): Bitmap? = withContext(Dispatchers.IO) {
     val key = uri.toString()
     thumbnailLocks[key.hashCode().mod(thumbnailLocks.size)].withLock {
         cachedMediaThumbnail(uri) ?: try {
-            val system = try { thumbnail(context.contentResolver, uri) } catch (_: java.io.IOException) { null }
-            (system ?: if ("video" in uri.pathSegments) firstFrame(context, uri, 272) else null)?.also { thumbnailCache.put(key, it) }
+            val isVideo = video ?: ("video" in uri.pathSegments || context.contentResolver.getType(uri)?.startsWith("video/") == true)
+            val system = try { thumbnail(context.contentResolver, uri, isVideo) } catch (_: Exception) { null }
+            (system ?: fallbackThumbnail(context, uri, isVideo))?.also { thumbnailCache.put(key, it) }
         } catch (_: Exception) { null } catch (_: OutOfMemoryError) { null }
     }
 }
 
-private fun thumbnail(resolver: ContentResolver, uri: Uri): Bitmap? {
+private fun thumbnail(resolver: ContentResolver, uri: Uri, isVideo: Boolean): Bitmap? {
     if (Build.VERSION.SDK_INT >= 29) return resolver.loadThumbnail(uri, Size(272, 272), null)
+    if (uri.authority != "media") return null
     val id = ContentUris.parseId(uri)
     @Suppress("DEPRECATION")
-    return if ("video" in uri.pathSegments) MediaStore.Video.Thumbnails.getThumbnail(resolver, id, MediaStore.Video.Thumbnails.MINI_KIND, null)
+    return if (isVideo) MediaStore.Video.Thumbnails.getThumbnail(resolver, id, MediaStore.Video.Thumbnails.MINI_KIND, null)
         else MediaStore.Images.Thumbnails.getThumbnail(resolver, id, MediaStore.Images.Thumbnails.MINI_KIND, null)
+}
+
+private fun fallbackThumbnail(context: Context, uri: Uri, isVideo: Boolean): Bitmap? {
+    if (isVideo) return firstFrame(context, uri, 272)
+    val mime = context.contentResolver.getType(uri)
+    if (mime == "image/svg+xml" || uri.lastPathSegment.orEmpty().endsWith(".svg", ignoreCase = true)) return null
+    val decoded = decodePicture(context.contentResolver, uri, 272) ?: return null
+    val turn = exifOrientation(exifTag(context.contentResolver, uri)).first
+    if (turn == 0) return decoded
+    val rotated = Bitmap.createBitmap(decoded, 0, 0, decoded.width, decoded.height, Matrix().apply { setRotate(turn.toFloat()) }, false)
+    if (rotated !== decoded) decoded.recycle()
+    return rotated
 }
 
 suspend fun imageDeclaration(context: Context, uri: Uri): MediaDeclaration? = withContext(Dispatchers.IO) {

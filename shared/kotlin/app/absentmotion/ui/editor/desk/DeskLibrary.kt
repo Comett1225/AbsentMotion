@@ -154,7 +154,7 @@ internal fun DeskGrid(modifier: Modifier, top: Any? = null, content: LazyGridSco
 internal fun DeskTile(state: EditorState, label: String, picture: @Composable () -> Unit, reveal: (() -> Unit)? = null, direct: Boolean = true, detail: String? = null, remove: DeskRemove? = null, add: () -> Unit) {
     val source = remember { MutableInteractionSource() }
     val hovered by source.collectIsHoveredAsState()
-    if (remove != null) {
+    if (remove != null && app.absentmotion.platform.PlatformFeatures.desktop) {
         val removeNow = remember { { remove.run(false) } }
         DisposableEffect(hovered) {
             if (hovered) DeskDrop.removeHovered = removeNow
@@ -244,8 +244,8 @@ internal fun DeskContext(add: () -> Unit, reveal: (() -> Unit)? = null, remove: 
                 MenuRow(stringResource(R.string.desk_add)) { at = null; add() }
                 if (reveal != null && app.absentmotion.platform.PlatformFeatures.userFiles) MenuRow(stringResource(R.string.desk_reveal_file)) { at = null; reveal() }
                 if (remove != null) {
-                    MenuRow(stringResource(R.string.desk_remove_media), subText = stringResource(if (remove.inUse) R.string.desk_remove_media_used else R.string.desk_remove_media_note), divider = true) { at = null; remove.run(false) }
-                    if (remove.folder != null) MenuRow(stringResource(R.string.desk_unlink_folder, remove.folder)) { at = null; remove.run(true) }
+                    if (app.absentmotion.platform.PlatformFeatures.desktop) MenuRow(stringResource(R.string.desk_remove_media), subText = stringResource(if (remove.inUse) R.string.desk_remove_media_used else R.string.desk_remove_media_note), divider = true) { at = null; remove.run(false) }
+                    if (remove.folder != null) MenuRow(stringResource(R.string.desk_unlink_folder, remove.folder), divider = !app.absentmotion.platform.PlatformFeatures.desktop) { at = null; remove.run(true) }
                 }
                 }
             }

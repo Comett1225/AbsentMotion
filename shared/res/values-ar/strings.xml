@@ -2758,4 +2758,52 @@
     <string name="desk_shortcut_change">تغيير الاختصار</string>
     <string name="desk_shortcut_remove">إزالة الاختصار</string>
     <string name="desk_shortcut_reset">إعادة الضبط إلى الافتراضي</string>
+    <string name="update_background_hint">يمكنك مغادرة AbsentMotion. سيستمر التنزيل، وسيُعلمك إشعار عندما يصبح جاهزًا للتثبيت.</string>
+    <string name="update_foreground_hint">أبقِ AbsentMotion مفتوحًا حتى ينتهي التنزيل.</string>
+    <string name="update_hide">إخفاء</string>
+    <string name="update_channel">التحديثات</string>
+    <string name="update_notification_downloading">جارٍ تنزيل AbsentMotion %1$s</string>
+    <string name="update_notification_ready">‏AbsentMotion %1$s جاهز للتثبيت</string>
+    <string name="update_notification_install">انقر لتثبيت التحديث.</string>
+    <string name="tools_layout_more">خيارات إضافية</string>
+    <string name="tools_layout_change">تغيير التخطيط</string>
+    <string name="tools_layout_hint">استخدم الأسهم لتغيير الترتيب</string>
+    <string name="tools_layout_move_up">نقل للأعلى</string>
+    <string name="tools_layout_move_down">نقل للأسفل</string>
+    <string name="share_add_to_project">إضافة إلى مشروع؟</string>
+    <string name="share_or_add_to">أو أضِفه إلى</string>
+    <plurals name="share_videos">
+        <item quantity="zero">‏%1$d فيديو</item>
+        <item quantity="one">‏فيديو واحد</item>
+        <item quantity="two">‏فيديوهان</item>
+        <item quantity="few">‏%1$d فيديوهات</item>
+        <item quantity="many">‏%1$d فيديو</item>
+        <item quantity="other">‏%1$d فيديو</item>
+    </plurals>
+    <plurals name="share_pictures">
+        <item quantity="zero">‏%1$d صورة</item>
+        <item quantity="one">‏صورة واحدة</item>
+        <item quantity="two">‏صورتان</item>
+        <item quantity="few">‏%1$d صور</item>
+        <item quantity="many">‏%1$d صورة</item>
+        <item quantity="other">‏%1$d صورة</item>
+    </plurals>
+    <plurals name="share_sounds">
+        <item quantity="zero">‏%1$d صوت</item>
+        <item quantity="one">‏صوت واحد</item>
+        <item quantity="two">‏صوتان</item>
+        <item quantity="few">‏%1$d أصوات</item>
+        <item quantity="many">‏%1$d صوتًا</item>
+        <item quantity="other">‏%1$d صوت</item>
+    </plurals>
+    <plurals name="share_files">
+        <item quantity="zero">‏%1$d ملف</item>
+        <item quantity="one">‏ملف واحد</item>
+        <item quantity="two">‏ملفان</item>
+        <item quantity="few">‏%1$d ملفات</item>
+        <item quantity="many">‏%1$d ملفًا</item>
+        <item quantity="other">‏%1$d ملف</item>
+    </plurals>
+    <string name="media_drive_add_folder">محرك أو مجلد</string>
+    <string name="media_drive_cannot_open">تعذّر فتح أداة اختيار المجلد</string>
 </resources>

@@ -1,8 +1,11 @@
 package app.absentmotion.ui.export
 
+import androidx.compose.foundation.layout.exclude
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.captionBar
 import androidx.compose.foundation.layout.statusBars
@@ -13,10 +16,15 @@ import app.absentmotion.ui.home.DeskModals
 import app.absentmotion.ui.home.deskPress
 import app.absentmotion.ui.home.checkerboard
 import app.absentmotion.export.verificationLine
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusEvent
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
@@ -113,6 +121,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -140,6 +149,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
@@ -669,7 +679,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
     ) else Box(
         if (card) Modifier.fillMaxSize().background(Scrim).pointerInput(Unit) {}.windowInsetsPadding(WindowInsets.systemBars.union(WindowInsets.ime)).padding(24.dp).wrapContentSize()
             .widthIn(max = if (twoPane) 980.dp else 520.dp).heightIn(max = 760.dp).enterFade(12.dp).clip(RoundedCornerShape(18.dp)).background(Am.SheetBg)
-        else Modifier.fillMaxSize().background(Am.SheetBg).pointerInput(Unit) {}.enterFade(12.dp),
+        else Modifier.fillMaxSize().background(Am.SheetBg).pointerInput(Unit) {}.imePadding().enterFade(12.dp),
     ) {
         if (preset != null) BundlePage(scene, engine, appSettings, community, { community = it }, info, bar, preset, onClose)
         else Column(Modifier.align(Alignment.TopCenter).widthIn(max = if (twoPane) Dp.Infinity else SheetMaxWidth).fillMaxSize()) {
@@ -683,7 +693,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
                         selected = kind == k, enabled = !silent, icon = k.icon(), title = stringResource(k.title()),
                         note = if (silent) stringResource(R.string.export_no_sound_short) else if (k == ExportKind.Package && community != null) stringResource(R.string.bundle_community) else optionNote(k, scene, s)?.text(),
                         right = when (k) { ExportKind.Video, ExportKind.Audio, ExportKind.Package, ExportKind.FrameAs, ExportKind.Sequence, ExportKind.Gif -> ExportIcons.ChevronRight; else -> null },
-                        onSelect = { if (silent) explain(NoSound) else { kind = k; if (k == ExportKind.FrameAs) page = k } },
+                        onSelect = { if (silent) explain(NoSound) else { kind = k } },
                         onRight = { if (silent) explain(NoSound) else { kind = k; page = k } },
                         modifier = Modifier.enterFade(10.dp, minOf(i, 6) * 30),
                         below = if (k == ExportKind.Video) { { ResolutionDropdown(s.shortSide, resolutionChoices(s, check), explain) { kind = k; settings[k] = s.copy(shortSide = it) } } } else null,
@@ -900,7 +910,7 @@ private fun TemplateToggle(checked: Boolean, onChange: (Boolean) -> Unit, onInfo
 
 @Composable
 internal fun ExportBar(enabled: Boolean, blocked: UiText?, pill: Boolean, onClick: () -> Unit) {
-    Box(Modifier.fillMaxWidth().background(Am.Card).navigationBarsPadding().padding(start = 15.dp, end = 15.dp, top = 12.dp, bottom = 15.dp)) {
+    Box(Modifier.fillMaxWidth().background(Am.Card).windowInsetsPadding(WindowInsets.navigationBars.exclude(WindowInsets.ime)).padding(start = 15.dp, end = 15.dp, top = 12.dp, bottom = 15.dp)) {
         if (pill) Box(
             Modifier.fillMaxWidth().height(48.dp).clip(androidx.compose.foundation.shape.CircleShape)
                 .background(animatedColor(if (blocked == null) Am.Accent else lerp(Navy, Am.Card, 0.8f)))
@@ -992,7 +1002,7 @@ private fun ResolutionDropdown(shortSide: Int, choices: List<Choice<app.absentmo
 @Composable
 private fun PageFrame(title: String, onBack: () -> Unit, icon: ImageVector = ExportIcons.Back, description: String = stringResource(R.string.export_back), content: @Composable ColumnScope.() -> Unit) {
     Box(Modifier.fillMaxSize().presence(slide = 1f, fade = false).background(Am.SheetBg).pointerInput(Unit) {}, contentAlignment = Alignment.TopCenter) {
-        Column(Modifier.widthIn(max = SheetMaxWidth).fillMaxSize()) {
+        Column(Modifier.widthIn(max = SheetMaxWidth).fillMaxSize().imePadding()) {
             TitleBar(title, icon, description, onBack)
             content()
         }
@@ -1489,7 +1499,7 @@ private fun DeskExport(
                     Box(Modifier.width(1.dp).fillMaxHeight().background(Line))
                     Box(Modifier.weight(1f).fillMaxHeight()) {
                         when (phase) {
-                            Phase.Idle -> Column(Modifier.fillMaxSize().deskVerticalScroll(color = Navy).padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                            Phase.Idle -> Column(Modifier.fillMaxSize().imePadding().deskVerticalScroll(color = Navy).padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                                 FileNameField(exportName, kind)
                                 Column(verticalArrangement = Arrangement.spacedBy(FieldGap)) {
                                     if (!single) Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -1772,10 +1782,25 @@ private fun CommunityFields(scene: Scene, engine: EngineThread, settings: app.ab
 
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun TextBox(@StringRes label: Int, value: String, limit: Int, lines: Int = 1, done: (() -> Unit)? = null, onChange: (String) -> Unit) {
     val title = stringResource(label)
     val keyboard = LocalSoftwareKeyboardController.current
+    val requester = remember { BringIntoViewRequester() }
+    val density = LocalDensity.current
+    val ime = WindowInsets.ime
+    var focused by remember { mutableStateOf(false) }
+    var box by remember { mutableStateOf(androidx.compose.ui.unit.IntSize.Zero) }
+    val below = with(density) { 52.dp.toPx() }
+    LaunchedEffect(focused) {
+        if (!focused) return@LaunchedEffect
+        snapshotFlow { ime.getBottom(density) }.collectLatest {
+            withFrameNanos { }
+            withFrameNanos { }
+            requester.bringIntoView(androidx.compose.ui.geometry.Rect(0f, 0f, box.width.toFloat(), box.height + below))
+        }
+    }
     Field(title) {
         BasicTextField(
             value = value, onValueChange = { onChange(it.take(limit)) },
@@ -1784,7 +1809,8 @@ private fun TextBox(@StringRes label: Int, value: String, limit: Int, lines: Int
             cursorBrush = SolidColor(Navy),
             keyboardOptions = KeyboardOptions(imeAction = if (lines == 1) ImeAction.Done else ImeAction.Default),
             keyboardActions = KeyboardActions(onDone = { done?.invoke(); keyboard?.hide() }),
-            modifier = Modifier.fillMaxWidth().semantics { contentDescription = title }
+            modifier = Modifier.fillMaxWidth().bringIntoViewRequester(requester).onSizeChanged { box = it }.onFocusEvent { focused = it.isFocused }
+                .semantics { contentDescription = title }
                 .clip(RoundedCornerShape(4.dp)).background(Am.Card).padding(horizontal = 12.dp, vertical = 13.dp),
         )
     }

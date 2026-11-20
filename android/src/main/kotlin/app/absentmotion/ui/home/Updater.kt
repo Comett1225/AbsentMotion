@@ -18,6 +18,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.app.NotificationManagerCompat
+import app.absentmotion.R
+import app.absentmotion.export.formatBytes
+import app.absentmotion.library.writeAtomically
 import app.absentmotion.platform.Context
 import app.absentmotion.platform.Log
 import app.absentmotion.platform.Uri
@@ -31,6 +34,7 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
@@ -52,7 +56,7 @@ internal sealed interface UpdateEvent {
     data class Resume(val release: Release) : UpdateEvent
     data class Progress(val done: Long) : UpdateEvent
     data object Waiting : UpdateEvent
-    data class Stopped(val release: Release) : UpdateEvent
+    data class Stopped(val release: Release, val failure: UpdateFailure = UpdateFailure.Interrupted) : UpdateEvent
     data object Downloaded : UpdateEvent
     data object NeedsPermission : UpdateEvent
     data class SettingsClosed(val granted: Boolean) : UpdateEvent
@@ -129,7 +133,7 @@ internal fun reduce(step: UpdateStep, event: UpdateEvent): UpdateStep {
         is UpdateEvent.Resume -> if (step == UpdateStep.Idle) UpdateStep.Checking(event.release) else step
         is UpdateEvent.Progress -> if (step is UpdateStep.Downloading) step.copy(done = event.done.coerceIn(0, step.total), waiting = false) else step
         UpdateEvent.Waiting -> if (step is UpdateStep.Downloading) step.copy(waiting = true) else step
-        is UpdateEvent.Stopped -> if (step == UpdateStep.Idle && event.release.apk != null) UpdateStep.Failed(event.release, UpdateFailure.Interrupted) else step
+        is UpdateEvent.Stopped -> if (step == UpdateStep.Idle && event.release.apk != null) UpdateStep.Failed(event.release, event.failure) else step
         UpdateEvent.Downloaded -> if (step is UpdateStep.Downloading) UpdateStep.Checking(step.release) else step
         UpdateEvent.NeedsPermission -> when (step) {
             is UpdateStep.Checking, is UpdateStep.NotInstalled -> UpdateStep.Permission(step.release!!, denied = false)
@@ -168,6 +172,17 @@ internal fun needsAttention(step: UpdateStep) =
 
 internal fun flowOver(step: UpdateStep) = step == UpdateStep.Idle || (step is UpdateStep.Failed && !step.failure.retry)
 
+private data class SavedUpdateFailure(override val message: Int, override val retry: Boolean, val argument: String?) : UpdateFailure
+
+private fun UpdateFailure.argument(): String? = when (this) {
+    is UpdateFailure.Server -> code.toString()
+    is UpdateFailure.Storage -> formatBytes(needed)
+    is SavedUpdateFailure -> argument
+    else -> null
+}
+
+internal fun UpdateFailure.text(context: Context): String = argument()?.let { context.getString(message, it) } ?: context.getString(message)
+
 internal fun CoroutineScope.launchAfter(before: Job?, block: suspend CoroutineScope.() -> Unit): Job =
     launch(start = CoroutineStart.UNDISPATCHED) {
         withContext(NonCancellable) { before?.join() }
@@ -178,11 +193,15 @@ internal object Updater {
     var step by mutableStateOf<UpdateStep>(UpdateStep.Idle)
         private set
     var hidden by mutableStateOf(false)
+        private set
+    var fromNotification by mutableStateOf(false)
+        private set
     var confirm by mutableStateOf<Intent?>(null)
         private set
     private val scope = MainScope()
     private var job: Job? = null
     private var tail: Job? = null
+    private var restoring: Job? = null
     private var http: TrustedHttp? = null
     @Volatile private var generation = 0
     var calm: () -> Boolean = { false }
@@ -199,6 +218,7 @@ internal object Updater {
         if (next == step) return
         val moved = next::class != step::class
         step = next
+        if (next == UpdateStep.Idle) fromNotification = false
         if (needsAttention(next)) hidden = false
         if (flowOver(next)) flow?.let { runCatching { it.delete() } }
         if (moved) Log.i(TAG, "update step ${next::class.simpleName}")
@@ -219,9 +239,14 @@ internal object Updater {
         return true
     }
 
+    fun hide() {
+        hidden = true
+        fromNotification = false
+    }
+
     fun start(context: Context, release: Release) {
         release.apk ?: return
-        if (job?.isActive == true || step is UpdateStep.Installing || step is UpdateStep.Checking || step is UpdateStep.Permission) {
+        if (job?.isActive == true || step is UpdateStep.Downloading || step is UpdateStep.Installing || step is UpdateStep.Checking || step is UpdateStep.Permission) {
             hidden = false
             return
         }
@@ -233,19 +258,43 @@ internal object Updater {
 
     private fun proceed(app: Context) {
         when (val now = step) {
-            is UpdateStep.Downloading -> download(app, now.release)
+            is UpdateStep.Downloading -> {
+                clearNotice(app)
+                val id = ++generation
+                try {
+                    UpdateService.start(app, id, now)
+                } catch (e: Exception) {
+                    Log.i(TAG, "update service could not start: $e")
+                    on(UpdateEvent.Fail(UpdateFailure.Interrupted))
+                }
+            }
             is UpdateStep.Installing -> commit(app, now.release)
             else -> Unit
         }
     }
 
-    private fun download(app: Context, release: Release) {
-        val apk = release.apk ?: return
-        if (step !is UpdateStep.Downloading) return
-        hidden = false
+    fun downloadStep(id: Int): UpdateStep? = step.takeIf { id != 0 && generation == id }
+
+    private fun downloading(id: Int) = downloadStep(id).let { it is UpdateStep.Downloading || it is UpdateStep.Checking }
+
+    fun cancelDownload(app: Context, id: Int) {
+        if (downloading(id)) cancel(app)
+    }
+
+    fun interruptDownload(id: Int): Boolean {
+        if (!downloading(id)) return false
+        job?.cancel()
+        http?.abort()
+        on(UpdateEvent.Fail(UpdateFailure.Interrupted))
+        return true
+    }
+
+    fun download(app: Context, mine: Int): Job? {
+        val release = (downloadStep(mine) as? UpdateStep.Downloading)?.release ?: return null
+        val apk = release.apk ?: return null
+        if (job?.isActive == true) return null
         val client = TrustedHttp(Updates.source)
         http = client
-        val mine = ++generation
         val files = files(app)
         flow = files.flow
         runCatching { writeFlow(files, System.currentTimeMillis(), release) }
@@ -258,15 +307,17 @@ internal object Updater {
                         delay(ms)
                     }
                     patiently(apk.size, { files.part.length() }, wait) {
-                        ensureActive()
-                        val sha = checksumFor(client, apk)
-                        claimSpace(spaceFor(files, release, sha), { freeBytes(app) }, { usableBytes(app) }) { allocate(app, it) }
-                        var shown = -1L
-                        val stride = (apk.size / 200).coerceAtLeast(64L * 1024)
-                        downloadApk(client, release, sha, files, { ensureActive() }) { done ->
-                            if (done == apk.size || done - shown >= stride || shown < 0) {
-                                shown = done
-                                scope.launch { if (generation == mine) on(UpdateEvent.Progress(done)) }
+                        runInterruptible {
+                            ensureActive()
+                            val sha = checksumFor(client, apk)
+                            claimSpace(spaceFor(files, release, sha), { freeBytes(app) }, { usableBytes(app) }) { allocate(app, it) }
+                            var shown = -1L
+                            val stride = (apk.size / 200).coerceAtLeast(64L * 1024)
+                            downloadApk(client, release, sha, files, { ensureActive() }) { done ->
+                                if (done == apk.size || done - shown >= stride || shown < 0) {
+                                    shown = done
+                                    scope.launch { if (generation == mine) on(UpdateEvent.Progress(done)) }
+                                }
                             }
                         }
                     }
@@ -279,15 +330,16 @@ internal object Updater {
             } catch (e: Exception) {
                 Log.i(TAG, "update download stopped: $e (${e.cause})")
                 val failure = failureOf(e, apk.size).let { if (it == UpdateFailure.Connection && online(app) == false) UpdateFailure.Offline else it }
-                if (generation == mine) on(UpdateEvent.Fail(failure))
+                if (downloading(mine)) on(UpdateEvent.Fail(failure))
             } finally {
                 if (generation == mine) http = null
             }
         }
         tail = job
+        return job
     }
 
-    private suspend fun verifyAndInstall(app: Context, release: Release, file: File) {
+    private suspend fun verifyAndInstall(app: Context, release: Release, file: File, hold: Boolean = false) {
         val problem = withContext(Dispatchers.IO) {
             val installed = installedApp(app, Updates.installed(app)) ?: return@withContext UpdateFailure.Signature
             judgeApk(apkFacts(app, file), installed, release.version)
@@ -297,7 +349,7 @@ internal object Updater {
             on(UpdateEvent.Fail(problem))
             return
         }
-        if (!calm() || hidden) {
+        if (hold || !calm() || hidden) {
             on(UpdateEvent.Hold)
             return
         }
@@ -351,26 +403,37 @@ internal object Updater {
         proceed(context.applicationContext)
     }
 
-    fun atLaunch(context: Context) {
-        if (busy) return
+    fun atLaunch(context: Context, open: Boolean = false) {
+        if (open) {
+            fromNotification = true
+            reveal()
+        }
+        if (busy || restoring?.isActive == true) return
         val app = context.applicationContext
         val files = files(app)
         flow = files.flow
-        scope.launch {
+        restoring = scope.launch {
             val now = System.currentTimeMillis()
             val (resume, asked, stopped) = withContext(Dispatchers.IO) {
                 tidy(app, files, now)
                 val resume = readResume(files, now)
                 val asked = readAsk(files, now)?.takeIf { isNewer(it.version, Updates.installed(app)) == true }
                 val stopped = if (resume != null || asked != null) null else readFlow(files, now)?.let { release ->
-                    release.takeIf { isNewer(it.version, Updates.installed(app)) == true && keptFor(files, it) } ?: run { files.flow.delete(); null }
+                    if (isNewer(release.version, Updates.installed(app)) == true) {
+                        readNotice(app, release) ?: release.takeIf { keptFor(files, it) }?.let { UpdateStep.Failed(it, UpdateFailure.Interrupted) }
+                    } else null
                 }
+                if (resume == null && asked == null && stopped == null) files.flow.delete()
                 Triple(resume, asked, stopped)
             }
             if (busy) return@launch
             if (resume == null) {
                 if (asked != null) restoreAsk(app, asked)
-                else if (stopped != null) on(UpdateEvent.Stopped(stopped))
+                else when (stopped) {
+                    is UpdateStep.Failed -> on(UpdateEvent.Stopped(stopped.release, stopped.failure))
+                    is UpdateStep.NotInstalled -> restoreReady(app, files, stopped.release)
+                    else -> fromNotification = false
+                }
                 return@launch
             }
             val release = resume.release
@@ -391,6 +454,50 @@ internal object Updater {
         }
     }
 
+    private suspend fun restoreReady(app: Context, files: UpdateFiles, release: Release) {
+        on(UpdateEvent.Resume(release))
+        val checking = step
+        val ready = withContext(Dispatchers.IO) {
+            val stamp = runCatching { files.stamp.readText() }.getOrNull() ?: return@withContext false
+            val cached = releaseOfStamp(stamp) ?: return@withContext false
+            val sha = cached.apk?.sha256 ?: return@withContext false
+            if (release.apk?.sha256?.let { it != sha } == true || files.stampOf(release, sha) != stamp) return@withContext false
+            cachedApkReady(files, UpdateResume(cached, stamp))
+        }
+        if (step !== checking) return
+        if (ready) verifyAndInstall(app, release, files.apk, hold = true) else on(UpdateEvent.Fail(UpdateFailure.Removed))
+    }
+
+    private fun notice(app: Context) = File(app.noBackupFilesDir, "update-notice.txt")
+
+    fun keepNotice(app: Context, step: UpdateStep) {
+        val release = step.release ?: return
+        val result = when (step) {
+            is UpdateStep.NotInstalled -> listOf(release.version)
+            is UpdateStep.Failed -> listOf(release.version, step.failure.message.toString(), step.failure.retry.toString(), step.failure.argument().orEmpty())
+            else -> return
+        }
+        runCatching {
+            writeAtomically(notice(app), result.joinToString("\n"))
+            writeFlow(files(app), System.currentTimeMillis(), release)
+        }
+    }
+
+    private fun readNotice(app: Context, release: Release): UpdateStep? {
+        val lines = runCatching { notice(app).readText().split('\n') }.getOrNull() ?: return null
+        if (lines.firstOrNull() != release.version) return null
+        if (lines.size == 1) return UpdateStep.NotInstalled(release, ready = true)
+        if (lines.size != 4) return null
+        val message = lines[1].toIntOrNull()?.takeIf { runCatching { app.resources.getResourceTypeName(it) }.getOrNull() == "string" } ?: return null
+        val retry = lines[2].toBooleanStrictOrNull() ?: return null
+        return UpdateStep.Failed(release, SavedUpdateFailure(message, retry, lines[3].ifEmpty { null }))
+    }
+
+    private fun clearNotice(app: Context) {
+        notice(app).delete()
+        UpdateService.clearResult(app)
+    }
+
     private fun restoreAsk(app: Context, release: Release) {
         on(UpdateEvent.Ask(release))
         if (step !is UpdateStep.Permission) return
@@ -408,6 +515,7 @@ internal object Updater {
 
     private fun commit(app: Context, release: Release) {
         val apk = release.apk ?: return
+        clearNotice(app)
         val mine = ++generation
         val silent = Build.VERSION.SDK_INT >= 31 && calm() && NotificationManagerCompat.from(app).areNotificationsEnabled()
         job = scope.launch {
@@ -509,7 +617,7 @@ internal object Updater {
     }
 
     fun cancel(context: Context) {
-        val wasDownloading = step is UpdateStep.Downloading
+        val wasDownloading = step is UpdateStep.Downloading || step is UpdateStep.Checking
         if (step is UpdateStep.Installing) tries(context).let { file -> readTries(file)?.let { writeTries(file, it.copy(open = false)) } }
         generation++
         job?.cancel()
@@ -520,6 +628,7 @@ internal object Updater {
         confirm = null
         awaitingSettings = false
         Updates.answer = null
+        clearNotice(context.applicationContext)
         flow = files(context.applicationContext).flow
         on(UpdateEvent.Cancel)
         if (wasDownloading) {

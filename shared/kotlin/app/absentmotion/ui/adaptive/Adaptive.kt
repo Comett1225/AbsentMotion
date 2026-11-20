@@ -20,6 +20,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,14 +62,25 @@ fun AdaptiveWindow(content: @Composable () -> Unit) {
 }
 
 @Composable
-fun AdaptiveWindow(maxCardWidth: Dp, maxCardHeight: Dp, heightRatio: Float? = null, corner: Dp = 16.dp, content: @Composable () -> Unit) {
+internal fun Modifier.scrimTap(onTap: () -> Unit): Modifier {
+    val tap by rememberUpdatedState(onTap)
+    return pointerInput(Unit) { detectTapGestures(onLongPress = {}) { tap() } }
+}
+
+@Composable
+fun AdaptiveWindow(maxCardWidth: Dp, maxCardHeight: Dp, heightRatio: Float? = null, corner: Dp = 16.dp, onDismiss: (() -> Unit)? = null, content: @Composable () -> Unit) {
     BoxWithConstraints(
-        Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.6f)).pointerInput(Unit) { detectTapGestures { } }.systemBarsPadding().padding(24.dp),
+        Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.6f))
+            .then(if (onDismiss != null) Modifier.scrimTap(onDismiss) else Modifier.pointerInput(Unit) { detectTapGestures { } })
+            .systemBarsPadding().padding(24.dp),
         contentAlignment = Alignment.Center,
     ) {
         val width = minOf(maxWidth, maxCardWidth)
         val height = minOf(maxHeight, maxCardHeight, heightRatio?.let { width * it } ?: maxCardHeight)
-        Box(Modifier.size(width, height).shadow(24.dp, RoundedCornerShape(corner)).clip(RoundedCornerShape(corner))) {
+        Box(
+            Modifier.size(width, height).shadow(24.dp, RoundedCornerShape(corner)).clip(RoundedCornerShape(corner))
+                .then(if (onDismiss != null) Modifier.pointerInput(Unit) { detectTapGestures { } } else Modifier),
+        ) {
             CompositionLocalProvider(LocalWide provides false, LocalAdaptiveSpace provides AdaptiveSpace(width, height)) { content() }
         }
     }

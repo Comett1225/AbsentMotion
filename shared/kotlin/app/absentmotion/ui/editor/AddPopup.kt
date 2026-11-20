@@ -1,6 +1,7 @@
 package app.absentmotion.ui.editor
 
 import app.absentmotion.platform.BackHandler
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -56,11 +57,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.editor.EditorState
@@ -70,6 +75,7 @@ import app.absentmotion.editor.startFreehand
 import app.absentmotion.editor.startVectorDrawing
 import app.absentmotion.model.ShapeCatalog
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.theme.Motion
 import app.absentmotion.ui.theme.Swap
 import app.absentmotion.ui.theme.TilePress
 import app.absentmotion.ui.theme.pressScale
@@ -84,6 +90,7 @@ import app.absentmotion.ui.HoldName
 internal val AddPopupHeight = 244.dp
 
 private val PopupBar get() = Am.Button
+private val TabShadow = Color.Black.copy(alpha = 0.3f)
 private val DotIdle get() = Am.Caption
 private val Disc get() = Am.Panel
 
@@ -141,9 +148,23 @@ internal fun AddPopup(state: EditorState, modifier: Modifier = Modifier, library
         Column(Modifier.weight(1f).fillMaxHeight()) {
             androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxWidth().height(58.dp)) {
                 val tabWidth = minOf(64.dp, (maxWidth - 6.dp) / (Tabs.size - 1))
-                Row(Modifier.fillMaxHeight().horizontalScroll(androidx.compose.foundation.rememberScrollState()).padding(start = 6.dp)) {
+                val scroll = androidx.compose.foundation.rememberScrollState()
+                val startFade by animateFloatAsState(if (scroll.canScrollBackward) 1f else 0f, Motion.fast(), label = "tabStart")
+                val endFade by animateFloatAsState(if (scroll.canScrollForward) 1f else 0f, Motion.fast(), label = "tabEnd")
+                val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+                Row(Modifier.fillMaxHeight().horizontalScroll(scroll).padding(start = 6.dp)) {
                     Tabs.forEachIndexed { i, tab -> TabButton(tab, active = i == selectedTab, enabled = true, Modifier.width(tabWidth).tutorialTarget(if (i == 1) "add_tab_media" else if (i == 2) "add_tab_audio" else null)) { selectedTab = i } }
                 }
+                Box(
+                    Modifier.align(Alignment.CenterStart).width(24.dp).fillMaxHeight()
+                        .graphicsLayer { alpha = startFade }
+                        .background(Brush.horizontalGradient(if (rtl) listOf(Color.Transparent, TabShadow) else listOf(TabShadow, Color.Transparent))),
+                )
+                Box(
+                    Modifier.align(Alignment.CenterEnd).width(24.dp).fillMaxHeight()
+                        .graphicsLayer { alpha = endFade }
+                        .background(Brush.horizontalGradient(if (rtl) listOf(TabShadow, Color.Transparent) else listOf(Color.Transparent, TabShadow))),
+                )
             }
             val body = Modifier.weight(1f).fillMaxWidth().background(Am.Panel).tutorialTarget(if (selectedTab == 1) "add_media" else if (selectedTab == 2) "add_audio" else null)
             Swap(selectedTab, body, rise = 0.dp) { TabPage(selectedTab, state, library) }

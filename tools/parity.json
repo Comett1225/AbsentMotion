@@ -1714,6 +1714,21 @@
       "feature": "home.updates",
       "reason": "notification that opens the app after Android replaced it; the desktop helper starts the app again itself"
     },
+    "app/absentmotion/SharedMedia.kt": {
+      "desktop": null,
+      "feature": "home.open_with",
+      "reason": "Android share sheet for videos, pictures and sounds; desktop adds media by drag and drop and File > Import"
+    },
+    "app/absentmotion/platform/LinkedMediaTrees.kt": {
+      "desktop": "shared/kotlin/app/absentmotion/ui/editor/desk/DeskLibrary.kt",
+      "feature": "add.media",
+      "reason": "Android drive and folder links through the system folder picker; desktop links folders directly"
+    },
+    "app/absentmotion/ui/home/UpdateService.kt": {
+      "desktop": "pc/src/standins/kotlin/app/absentmotion/ui/home/DeskUpdater.kt",
+      "feature": "home.updates",
+      "reason": "foreground service so the APK download keeps going in the background; desktop downloads inside the window"
+    },
     "app/absentmotion/ui/home/Updater.kt": {
       "desktop": "pc/src/standins/kotlin/app/absentmotion/ui/home/DeskUpdater.kt",
       "feature": "home.updates",

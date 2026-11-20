@@ -1,6 +1,13 @@
 package app.absentmotion.ui.home
 
+import android.Manifest
 import android.app.Activity
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,6 +51,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import app.absentmotion.R
+import app.absentmotion.export.NotifyAsk
 import app.absentmotion.export.formatBytes
 import app.absentmotion.platform.LocalContext
 import app.absentmotion.ui.theme.Am
@@ -51,9 +59,16 @@ import app.absentmotion.ui.adaptive.AdaptiveWindow
 import app.absentmotion.ui.adaptive.adaptiveWindowIsWide
 import app.absentmotion.platform.sheetDialogProperties
 
+internal fun updateDownloadHint(canNotify: Boolean) = if (canNotify) R.string.update_background_hint else R.string.update_foreground_hint
+
 @Composable
 internal fun UpdateDialog() {
     val context = LocalContext.current
+    val notify = rememberUpdateNotifyAsk()
+    fun start(release: Release) {
+        val download = { Updates.answer = null; Updater.start(context, release) }
+        if (notify.ready(download)) download()
+    }
     val step = Updater.step
     val prompt = Updater.confirm
     LaunchedEffect(prompt) {
@@ -63,7 +78,7 @@ internal fun UpdateDialog() {
         Updater.confirmShown(context, failed)
     }
     if (step != UpdateStep.Idle) {
-        if (!Updater.hidden) UpdateFlowDialog(step)
+        if (!Updater.hidden) UpdateFlowDialog(step, ::start)
         return
     }
     val shown = Updates.answer ?: return
@@ -84,29 +99,49 @@ internal fun UpdateDialog() {
         UpdateOfferContent(
             available, Updates.installed(context), warnMetered(available, remember(available) { Updater.metered(context) }), Updates.source.label,
             onChangelog = { open(release.link) }, onLater = close, onDownload = {
-                close()
-                if (release.apk != null) Updater.start(context, release) else open(release.link)
+                if (release.apk != null) start(release) else { close(); open(release.link) }
             },
         )
     }
 }
 
 @Composable
-private fun UpdateFlowDialog(step: UpdateStep) {
+private fun rememberUpdateNotifyAsk(): NotifyAsk {
+    val context = LocalContext.current
+    val launcher = remember { arrayOfNulls<ActivityResultLauncher<String>>(1) }
+    val ask = remember {
+        val prefs = context.getSharedPreferences("update_settings", Context.MODE_PRIVATE)
+        NotifyAsk(Build.VERSION.SDK_INT,
+            { context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED },
+            { prefs.getBoolean("notifyAsked", false) },
+            { prefs.edit().putBoolean("notifyAsked", true).apply() },
+            { launcher[0]?.launch(Manifest.permission.POST_NOTIFICATIONS) },
+        )
+    }
+    launcher[0] = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { ask.answered() }
+    return ask
+}
+
+@Composable
+private fun UpdateFlowDialog(step: UpdateStep, start: (Release) -> Unit) {
     val context = LocalContext.current
     val release = step.release ?: return
-    val hide = { Updater.hidden = true }
+    val hide = Updater::hide
     val cancel = { Updater.cancel(context) }
     when (step) {
         is UpdateStep.Downloading -> UpdateCard(HomeIcons.ArrowDown, stringResource(R.string.update_downloading), hide, release.version) {
+            Body(stringResource(updateDownloadHint(UpdateService.canNotify(context))), live = false)
             val fraction = if (step.total > 0) step.done.toFloat() / step.total else 0f
             LinearProgressIndicator(progress = { fraction }, Modifier.fillMaxWidth().padding(top = 18.dp).clip(RoundedCornerShape(4.dp)), color = Am.Accent, trackColor = Am.Navy.copy(alpha = 0.12f))
             Row(Modifier.fillMaxWidth().padding(top = 10.dp).semantics { liveRegion = LiveRegionMode.Polite }) {
                 Text(stringResource(R.string.update_progress, formatBytes(step.done), formatBytes(step.total)), Modifier.weight(1f), color = Am.HomeMid, fontSize = 14.sp)
-                Text("${(fraction * 100).toInt()}%", color = Am.Navy, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                Text("${updatePercent(step.done, step.total)}%", color = Am.Navy, fontSize = 14.sp, fontWeight = FontWeight.Medium)
             }
             if (step.waiting) Body(stringResource(R.string.update_reconnecting), live = true)
-            Buttons { Secondary(stringResource(R.string.cancel), cancel) }
+            Buttons {
+                Secondary(stringResource(R.string.cancel), cancel)
+                Secondary(stringResource(R.string.update_hide), hide)
+            }
         }
         is UpdateStep.Checking -> UpdateCard(app.absentmotion.ui.export.ExportIcons.Lock, stringResource(R.string.update_checking_download), {}, release.version) {
             LinearProgressIndicator(Modifier.fillMaxWidth().padding(top = 18.dp).clip(RoundedCornerShape(4.dp)), color = Am.Accent, trackColor = Am.Navy.copy(alpha = 0.12f))
@@ -132,15 +167,10 @@ private fun UpdateFlowDialog(step: UpdateStep) {
         }
         is UpdateStep.Failed -> UpdateCard(HomeIcons.ArrowDown, stringResource(R.string.update_stopped), cancel, release.version) {
             val failure = step.failure
-            val text = when (failure) {
-                is UpdateFailure.Server -> stringResource(failure.message, failure.code.toString())
-                is UpdateFailure.Storage -> stringResource(failure.message, formatBytes(failure.needed))
-                else -> stringResource(failure.message)
-            }
-            Body(text, live = true)
+            Body(failure.text(context), live = true)
             Buttons {
                 Secondary(stringResource(R.string.update_later), cancel)
-                if (failure.retry) Primary(stringResource(R.string.home_save_failed_retry)) { Updater.start(context, release) }
+                if (failure.retry) Primary(stringResource(R.string.home_save_failed_retry)) { start(release) }
             }
         }
         UpdateStep.Idle -> Unit

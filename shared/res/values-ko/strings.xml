@@ -2613,4 +2613,32 @@
     <string name="desk_shortcut_change">단축키 변경</string>
     <string name="desk_shortcut_remove">단축키 삭제</string>
     <string name="desk_shortcut_reset">기본값으로 초기화</string>
+    <string name="update_background_hint">AbsentMotion을 나가도 됩니다. 다운로드는 계속되며, 설치할 준비가 되면 알림으로 알려 드립니다.</string>
+    <string name="update_foreground_hint">다운로드가 끝날 때까지 AbsentMotion을 열어 두세요.</string>
+    <string name="update_hide">숨기기</string>
+    <string name="update_channel">업데이트</string>
+    <string name="update_notification_downloading">AbsentMotion %1$s 다운로드 중</string>
+    <string name="update_notification_ready">AbsentMotion %1$s 설치 준비 완료</string>
+    <string name="update_notification_install">탭하여 업데이트를 설치하세요.</string>
+    <string name="tools_layout_more">옵션 더보기</string>
+    <string name="tools_layout_change">레이아웃 변경</string>
+    <string name="tools_layout_hint">화살표로 순서를 바꾸세요</string>
+    <string name="tools_layout_move_up">위로 이동</string>
+    <string name="tools_layout_move_down">아래로 이동</string>
+    <string name="share_add_to_project">프로젝트에 추가할까요?</string>
+    <string name="share_or_add_to">또는 여기에 추가</string>
+    <plurals name="share_videos">
+        <item quantity="other">동영상 %1$d개</item>
+    </plurals>
+    <plurals name="share_pictures">
+        <item quantity="other">사진 %1$d장</item>
+    </plurals>
+    <plurals name="share_sounds">
+        <item quantity="other">사운드 %1$d개</item>
+    </plurals>
+    <plurals name="share_files">
+        <item quantity="other">파일 %1$d개</item>
+    </plurals>
+    <string name="media_drive_add_folder">드라이브 또는 폴더</string>
+    <string name="media_drive_cannot_open">폴더 선택기를 열 수 없습니다</string>
 </resources>

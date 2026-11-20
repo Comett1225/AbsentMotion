@@ -2700,4 +2700,44 @@
     <string name="desk_shortcut_change">Zmień skrót</string>
     <string name="desk_shortcut_remove">Usuń skrót</string>
     <string name="desk_shortcut_reset">Przywróć domyślny</string>
+    <string name="update_background_hint">Możesz wyjść z AbsentMotion. Pobieranie będzie trwać dalej, a powiadomienie da znać, gdy aktualizacja będzie gotowa do instalacji.</string>
+    <string name="update_foreground_hint">Nie zamykaj AbsentMotion, dopóki pobieranie się nie skończy.</string>
+    <string name="update_hide">Ukryj</string>
+    <string name="update_channel">Aktualizacje</string>
+    <string name="update_notification_downloading">Pobieranie AbsentMotion %1$s</string>
+    <string name="update_notification_ready">AbsentMotion %1$s jest gotowy do instalacji</string>
+    <string name="update_notification_install">Dotknij, aby zainstalować aktualizację.</string>
+    <string name="tools_layout_more">Więcej opcji</string>
+    <string name="tools_layout_change">Zmień układ</string>
+    <string name="tools_layout_hint">Użyj strzałek, aby zmienić kolejność</string>
+    <string name="tools_layout_move_up">Przenieś w górę</string>
+    <string name="tools_layout_move_down">Przenieś w dół</string>
+    <string name="share_add_to_project">Dodać do projektu?</string>
+    <string name="share_or_add_to">Lub dodaj do</string>
+    <plurals name="share_videos">
+        <item quantity="one">%1$d film</item>
+        <item quantity="few">%1$d filmy</item>
+        <item quantity="many">%1$d filmów</item>
+        <item quantity="other">%1$d filmy</item>
+    </plurals>
+    <plurals name="share_pictures">
+        <item quantity="one">%1$d obraz</item>
+        <item quantity="few">%1$d obrazy</item>
+        <item quantity="many">%1$d obrazów</item>
+        <item quantity="other">%1$d obrazy</item>
+    </plurals>
+    <plurals name="share_sounds">
+        <item quantity="one">%1$d dźwięk</item>
+        <item quantity="few">%1$d dźwięki</item>
+        <item quantity="many">%1$d dźwięków</item>
+        <item quantity="other">%1$d dźwięki</item>
+    </plurals>
+    <plurals name="share_files">
+        <item quantity="one">%1$d plik</item>
+        <item quantity="few">%1$d pliki</item>
+        <item quantity="many">%1$d plików</item>
+        <item quantity="other">%1$d pliki</item>
+    </plurals>
+    <string name="media_drive_add_folder">Dysk lub folder</string>
+    <string name="media_drive_cannot_open">Nie udało się otworzyć wyboru folderu</string>
 </resources>

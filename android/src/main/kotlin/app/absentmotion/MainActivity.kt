@@ -96,11 +96,15 @@ import androidx.compose.ui.unit.dp
 import app.absentmotion.ui.home.UnsupportedPhone
 import app.absentmotion.ui.home.UpdateAskDialog
 import app.absentmotion.ui.home.UpdateDialog
+import app.absentmotion.ui.home.UpdateService
+import app.absentmotion.ui.home.Updater
 import app.absentmotion.ui.home.Updates
 import app.absentmotion.ui.home.autoBackupIfDue
 import app.absentmotion.ui.home.VersionHistory
 import app.absentmotion.ui.theme.PressIndication
 import app.absentmotion.ui.theme.enterFade
+import app.absentmotion.ui.tutorial.Tutorial
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
@@ -118,6 +122,9 @@ class MainActivity : ComponentActivity() {
     }
     private val filePicker = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.OpenMultipleDocuments()) { MediaPicks.addPictures(it) }
     private val soundPicker = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.OpenMultipleDocuments()) { MediaPicks.addSounds(it) }
+    private val treePicker = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree()) { uri ->
+        if (uri != null) app.absentmotion.platform.LinkedMediaTrees.picked(applicationContext, uri)
+    }
     internal lateinit var store: ProjectStore
     internal lateinit var settings: AppSettings
     private lateinit var templates: TemplateStore
@@ -129,6 +136,7 @@ class MainActivity : ComponentActivity() {
     private var cameFromEditor = false
     private var exportingFromList by mutableStateOf<Scene?>(null)
     private var imported by mutableStateOf<List<ImportReport>>(emptyList())
+    private var sharedMedia by mutableStateOf<List<SharedMedia>>(emptyList())
     private var editingTemplate by mutableStateOf<String?>(null)
     private var firstRun by mutableStateOf<FirstRun?>(null)
     private var whatsNew by mutableStateOf<app.absentmotion.ui.home.WhatsNew?>(null)
@@ -220,6 +228,8 @@ class MainActivity : ComponentActivity() {
             { filePicker.launch(arrayOf("image/*", "video/*", "audio/*")) },
             { soundPicker.launch(arrayOf("audio/*", "application/ogg", "application/x-flac")) },
         ) { editor?.projectId }
+        app.absentmotion.platform.LinkedMediaTrees.install(this, applicationContext) { treePicker.launch(null) }
+        app.absentmotion.media.MediaLibrarySource.linkedMedia = app.absentmotion.platform.LinkedMediaTrees::listVisual
         lifecycleScope.launch {
             androidx.compose.runtime.snapshotFlow { editor }.collectLatest { state ->
                 if (state == null) return@collectLatest
@@ -233,8 +243,8 @@ class MainActivity : ComponentActivity() {
         TestHooks.start(this)
         lifecycleScope.launch { androidx.compose.runtime.snapshotFlow { settings.openGl }.drop(1).collect { engine.restart() } }
         engine.fonts?.let { fonts -> lifecycleScope.launch { fonts.revision.collect { settings.uiFont?.takeIf { FontName.parse(it).source == "imported" && fonts.localFile(it) == null }?.let { settings.uiFont = null } } } }
-        app.absentmotion.ui.home.Updater.calm = ::updateCalm
-        app.absentmotion.ui.home.Updater.atLaunch(applicationContext)
+        Updater.calm = ::updateCalm
+        Updater.atLaunch(applicationContext, open = intent.action == UpdateService.OpenUpdate)
         lifecycleScope.launch { engineWorks() }
         firstRun = FirstRun.of(settings, TestHooks.onboarding(intent).takeIf { savedInstanceState == null })
         whatsNew = app.absentmotion.ui.home.WhatsNewNotes.pending(this, settings)
@@ -340,7 +350,9 @@ class MainActivity : ComponentActivity() {
                     VersionHistory(store, id, title, engine, onRestore = { restoreVersion(id, it) }, onDelete = if (damaged) { { deleteDamaged(id) } } else null) { historyFor = null }
                 }
                 val offer = recovered
-                if (problemShown) Unit
+                val homeFree = open == null && first == null && !opening && editingTemplate == null && exportingFromList == null && app.absentmotion.ui.export.PresetSharing.preset == null && offer == null && crashed == null && !problemShown && imported.isEmpty() && whatsNew == null && !app.absentmotion.ui.home.FfampOffer.pending(settings)
+                if (Updater.fromNotification && !Updater.hidden && Updater.busy) UpdateDialog()
+                else if (problemShown) Unit
                 else if (open == null && !opening && (offer != null || crashed != null)) ClosedDialog(
                     crashed, offer?.title, outdated,
                     onRestore = { seenCrash(outdated != null); offer?.let { answerRecovery(it, true) } },
@@ -350,11 +362,15 @@ class MainActivity : ComponentActivity() {
                     val notes = whatsNew
                     if (notes != null) app.absentmotion.ui.home.WhatsNewDialog(notes) { whatsNew = null; app.absentmotion.ui.home.WhatsNewNotes.seen(this, settings) }
                     else if (app.absentmotion.ui.home.FfampOffer.pending(settings)) app.absentmotion.ui.home.FfampOfferDialog(settings)
-                    else if (settings.updatesAsked) UpdateDialog() else UpdateAskDialog(settings)
+                    else if (homeFree && !openingProject && openFailed == null && importFailed == null && historyFor == null && sharedMedia.isNotEmpty()) {
+                        if (Tutorial.running || Tutorial.offerDismissed || settings.tutorialAsk != Tutorial.ASK) {
+                            SharedMediaDialog(sharedMedia, store, projectsChanged, { openShared(null) }, ::openShared) { sharedMedia = emptyList() }
+                        }
+                    } else if (settings.updatesAsked) UpdateDialog() else UpdateAskDialog(settings)
                 }
                 app.absentmotion.ui.tutorial.TutorialHost(
                     open, store, settings,
-                    homeFree = open == null && first == null && !opening && editingTemplate == null && exportingFromList == null && app.absentmotion.ui.export.PresetSharing.preset == null && offer == null && crashed == null && !problemShown && imported.isEmpty() && whatsNew == null && !app.absentmotion.ui.home.FfampOffer.pending(settings),
+                    homeFree = homeFree,
                     onOpen = ::open, onCloseEditor = ::closeEditor, onChanged = { projectsChanged++ },
                 )
             }
@@ -366,13 +382,45 @@ class MainActivity : ComponentActivity() {
 
 
 
-    private fun updateCalm() = lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED) && editor == null && !closingEditor && !opening && !openingProject &&
+    private fun updateCalm() = updateVisible() && editor == null && !closingEditor && !opening && !openingProject &&
         editingTemplate == null && exportingFromList == null && app.absentmotion.ui.export.PresetSharing.preset == null && firstRun == null && recovered == null && crashed == null && !problemShown && whatsNew == null && !app.absentmotion.ui.home.FfampOffer.pending(settings) &&
         settings.updatesAsked && !app.absentmotion.export.ExportRun.running
 
+    private fun updateVisible() = lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED)
+
     private fun importShared() {
         val uris = ImportHandOff.take().map(Uri::parse)
-        if (uris.isNotEmpty()) importUris(uris)
+        if (uris.isEmpty()) return
+        val target = editor?.takeUnless { closingEditor }
+        lifecycleScope.launch {
+            val classified = withContext(Dispatchers.IO) { uris.map { it to readSharedMedia(it) } }
+            val projects = classified.filter { it.second == null }.map { it.first }
+            if (projects.isNotEmpty()) importUris(projects)
+            val media = classified.mapNotNull { it.second }
+            if (media.isEmpty()) return@launch
+            if (target != null && editor === target && !closingEditor) queueSharedMedia(target.projectId, media)
+            else sharedMedia += media
+        }
+    }
+
+    private fun openShared(id: String?) {
+        val media = sharedMedia
+        if (media.isEmpty() || editor != null || opening || openingProject) return
+        openingProject = true
+        openJob = lifecycleScope.launch {
+            try {
+                val project = id ?: try { createSharedProject(applicationContext, store, settings, media) }
+                catch (e: CancellationException) { throw e }
+                catch (e: Exception) { Log.w("AMImport", "cannot create a project from shared media", e); null }
+                if (project == null) {
+                    Toast.makeText(this@MainActivity, getString(R.string.home_create_project_failed), Toast.LENGTH_LONG).show()
+                    return@launch
+                }
+                val state = openNow(project) ?: return@launch
+                sharedMedia = sharedMedia.drop(media.size)
+                queueSharedMedia(state.projectId, media)
+            } finally { openingProject = false }
+        }
     }
 
     private fun importUris(uris: List<Uri>) {
@@ -697,6 +745,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        if (intent.action == UpdateService.OpenUpdate) Updater.atLaunch(applicationContext, open = true)
         if (BuildConfig.DEBUG && intent.hasExtra("desklayout")) {
             app.absentmotion.platform.DeskDetect.forced = intent.getBooleanExtra("desklayout", false)
             app.absentmotion.platform.DeskDetect.refresh(this)
@@ -731,8 +780,9 @@ class MainActivity : ComponentActivity() {
         if (app.absentmotion.editor.ElementNav.open === elementNav) app.absentmotion.editor.ElementNav.open = null
         elementNav = null
         MediaPicks.release(this)
+        app.absentmotion.platform.LinkedMediaTrees.release(this)
         crashSaver?.current = { null }
-        if (app.absentmotion.ui.home.Updater.calm == ::updateCalm) app.absentmotion.ui.home.Updater.calm = { false }
+        if (Updater.calm == ::updateCalm) Updater.calm = { false }
         app.absentmotion.export.ExportEngine.release(engine)
     }
 
@@ -775,7 +825,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        app.absentmotion.ui.home.Updater.resumed(this)
+        Updater.resumed(this)
         androidx.core.app.NotificationManagerCompat.from(this).cancel(app.absentmotion.ui.home.UPDATED_NOTIFICATION_ID)
         engine.refreshMedia()
         lifecycleScope.launch { recheckVideoThumbnails(applicationContext) }

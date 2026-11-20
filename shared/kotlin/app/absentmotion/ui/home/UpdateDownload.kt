@@ -225,7 +225,7 @@ internal fun retryable(failure: UpdateFailure) =
 internal const val RETRY_LIMIT = 8
 internal val RETRY_WAITS = listOf(2_000L, 5_000L, 10_000L)
 
-internal suspend fun <T> patiently(size: Long, have: () -> Long, wait: suspend (Long) -> Unit, attempt: () -> T): T {
+internal suspend fun <T> patiently(size: Long, have: () -> Long, wait: suspend (Long) -> Unit, attempt: suspend () -> T): T {
     var tries = 0
     var stalled = 0
     var restarted = false

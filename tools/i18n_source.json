@@ -5809,5 +5809,37 @@
  "layer_timing_locked_hint": "This layer's timing is locked",
  "desk_shortcut_change": "Change shortcut",
  "desk_shortcut_remove": "Remove shortcut",
- "desk_shortcut_reset": "Reset to default"
+ "desk_shortcut_reset": "Reset to default",
+ "update_background_hint": "You can leave AbsentMotion. The download keeps going, and a notification tells you when it's ready to install.",
+ "update_foreground_hint": "Keep AbsentMotion open until the download finishes.",
+ "update_hide": "Hide",
+ "update_channel": "Updates",
+ "update_notification_downloading": "Downloading AbsentMotion %1$s",
+ "update_notification_ready": "AbsentMotion %1$s is ready to install",
+ "update_notification_install": "Tap to install the update.",
+ "tools_layout_more": "More options",
+ "tools_layout_change": "Change layout",
+ "tools_layout_hint": "Use the arrows to change the order",
+ "tools_layout_move_up": "Move up",
+ "tools_layout_move_down": "Move down",
+ "share_add_to_project": "Add to a project?",
+ "share_or_add_to": "Or add it to",
+ "share_videos": {
+  "one": "%1$d video",
+  "other": "%1$d videos"
+ },
+ "share_pictures": {
+  "one": "%1$d picture",
+  "other": "%1$d pictures"
+ },
+ "share_sounds": {
+  "one": "%1$d sound",
+  "other": "%1$d sounds"
+ },
+ "share_files": {
+  "one": "%1$d file",
+  "other": "%1$d files"
+ },
+ "media_drive_add_folder": "Drive or folder",
+ "media_drive_cannot_open": "Could not open folder picker"
 }

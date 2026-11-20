@@ -2613,4 +2613,32 @@
     <string name="desk_shortcut_change">變更快速鍵</string>
     <string name="desk_shortcut_remove">移除快速鍵</string>
     <string name="desk_shortcut_reset">恢復預設</string>
+    <string name="update_background_hint">你可以離開 AbsentMotion。下載會繼續進行，準備好安裝時會有通知提醒你。</string>
+    <string name="update_foreground_hint">下載完成前請讓 AbsentMotion 保持開啟。</string>
+    <string name="update_hide">隱藏</string>
+    <string name="update_channel">更新</string>
+    <string name="update_notification_downloading">正在下載 AbsentMotion %1$s</string>
+    <string name="update_notification_ready">AbsentMotion %1$s 已可安裝</string>
+    <string name="update_notification_install">輕觸以安裝更新。</string>
+    <string name="tools_layout_more">更多選項</string>
+    <string name="tools_layout_change">變更版面配置</string>
+    <string name="tools_layout_hint">使用箭頭變更順序</string>
+    <string name="tools_layout_move_up">上移</string>
+    <string name="tools_layout_move_down">下移</string>
+    <string name="share_add_to_project">新增至專案？</string>
+    <string name="share_or_add_to">或新增至</string>
+    <plurals name="share_videos">
+        <item quantity="other">%1$d 部影片</item>
+    </plurals>
+    <plurals name="share_pictures">
+        <item quantity="other">%1$d 張圖片</item>
+    </plurals>
+    <plurals name="share_sounds">
+        <item quantity="other">%1$d 個聲音</item>
+    </plurals>
+    <plurals name="share_files">
+        <item quantity="other">%1$d 個檔案</item>
+    </plurals>
+    <string name="media_drive_add_folder">磁碟機或資料夾</string>
+    <string name="media_drive_cannot_open">無法開啟資料夾選擇器</string>
 </resources>

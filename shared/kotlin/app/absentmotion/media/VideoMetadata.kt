@@ -12,10 +12,10 @@ import app.absentmotion.model.fpsText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-suspend fun mediaDeclaration(context: Context, uri: Uri): MediaDeclaration? =
-    if (context.contentResolver.getType(uri)?.startsWith("video/") == true) videoDeclaration(context, uri) else imageDeclaration(context, uri)
+suspend fun mediaDeclaration(context: Context, uri: Uri, mime: String? = null): MediaDeclaration? =
+    if ((mime ?: context.contentResolver.getType(uri))?.startsWith("video/") == true) videoDeclaration(context, uri, mime) else imageDeclaration(context, uri)
 
-suspend fun videoDeclaration(context: Context, uri: Uri): MediaDeclaration? = withContext(Dispatchers.IO) {
+suspend fun videoDeclaration(context: Context, uri: Uri, mime: String? = null): MediaDeclaration? = withContext(Dispatchers.IO) {
     val extractor = try { openDemuxer(context, uri, "video/") } catch (_: Exception) { return@withContext null }
     try {
         val format = (0 until extractor.trackCount).map { extractor.getTrackFormat(it) }
@@ -35,7 +35,7 @@ suspend fun videoDeclaration(context: Context, uri: Uri): MediaDeclaration? = wi
         val fps = (if (format.containsKey(MediaFormat.KEY_FRAME_RATE)) format.numberOf(MediaFormat.KEY_FRAME_RATE)?.toFloat() else null)?.takeIf { it > 0 }
             ?: runCatching { estimatedFps(VideoSources.timestamps(context, uri.toString())) }.getOrNull()
         MediaDeclaration(XmlNode("media", listOfNotNull("uri" to uri.toString(), "filename" to name, "title" to name,
-            "type" to (context.contentResolver.getType(uri) ?: "video/mp4"), "size" to "$size", "orientation" to "$rotation",
+            "type" to (mime ?: context.contentResolver.getType(uri) ?: "video/mp4"), "size" to "$size", "orientation" to "$rotation",
             "duration" to "$duration",
             fps?.let { "fps" to fpsText(it) }, "infoUpdated" to "${System.currentTimeMillis()}",
             "width" to "${visibleSize(format).first}", "height" to "${visibleSize(format).second}").toMap(LinkedHashMap())))

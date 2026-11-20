@@ -6,6 +6,28 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [5.2.2] - 2026-11-20
+
+### Added
+
+- **Background updates on Android**. Leave the app or hide the card while it downloads. Notifications show progress with Cancel and tell you when the update is ready or stopped. When notifications are off, the card asks you to keep the app open.
+- **Change layout in Tools**. Open More options to move tools up or down, reset the order, or save it for next time.
+- **Share to AbsentMotion on Android**. Copy videos, pictures and sounds into the open project as top layers. From Home, choose an existing project, create one from the clip, or cancel.
+- **Drive or folder on Android**. Link a USB drive, SD card or folder from Media or Audio to browse its clips alongside the phone's library.
+
+### Changed
+
+- **New project**. Tap the dark area around the sheet to close it.
+- **Add menu**. A light shadow marks the edge of the tab row when more tabs are hidden.
+- **Projects and Templates search**. The search bar opens and closes more smoothly, and matching results ease into place.
+- **Timeline padlock**. The padlock column appears while clips are selected. Locked layers keep a small padlock on their thumbnails. Hold a locked clip to open its lock menu.
+
+### Fixed
+
+- **Community bundle and export fields** scroll above the keyboard as you type.
+- **Current Frame as...** is selected when tapped. The arrow opens its page.
+- An **import error** no longer reappears every time the app is reopened.
+
 ## [5.2.1] - 2026-11-20
 
 ### Added

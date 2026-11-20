@@ -2613,4 +2613,32 @@
     <string name="desk_shortcut_change">เปลี่ยนปุ่มลัด</string>
     <string name="desk_shortcut_remove">ลบปุ่มลัด</string>
     <string name="desk_shortcut_reset">รีเซ็ตเป็นค่าเริ่มต้น</string>
+    <string name="update_background_hint">คุณออกจาก AbsentMotion ได้ การดาวน์โหลดจะดำเนินต่อไป และจะมีการแจ้งเตือนเมื่อพร้อมติดตั้ง</string>
+    <string name="update_foreground_hint">เปิด AbsentMotion ไว้จนกว่าการดาวน์โหลดจะเสร็จ</string>
+    <string name="update_hide">ซ่อน</string>
+    <string name="update_channel">อัปเดต</string>
+    <string name="update_notification_downloading">กำลังดาวน์โหลด AbsentMotion %1$s</string>
+    <string name="update_notification_ready">AbsentMotion %1$s พร้อมติดตั้งแล้ว</string>
+    <string name="update_notification_install">แตะเพื่อติดตั้งอัปเดต</string>
+    <string name="tools_layout_more">ตัวเลือกเพิ่มเติม</string>
+    <string name="tools_layout_change">เปลี่ยนเลย์เอาต์</string>
+    <string name="tools_layout_hint">ใช้ลูกศรเพื่อเปลี่ยนลำดับ</string>
+    <string name="tools_layout_move_up">เลื่อนขึ้น</string>
+    <string name="tools_layout_move_down">เลื่อนลง</string>
+    <string name="share_add_to_project">เพิ่มลงในโปรเจกต์ไหม</string>
+    <string name="share_or_add_to">หรือเพิ่มลงใน</string>
+    <plurals name="share_videos">
+        <item quantity="other">วิดีโอ %1$d รายการ</item>
+    </plurals>
+    <plurals name="share_pictures">
+        <item quantity="other">รูปภาพ %1$d รูป</item>
+    </plurals>
+    <plurals name="share_sounds">
+        <item quantity="other">เสียง %1$d รายการ</item>
+    </plurals>
+    <plurals name="share_files">
+        <item quantity="other">ไฟล์ %1$d ไฟล์</item>
+    </plurals>
+    <string name="media_drive_add_folder">ไดรฟ์หรือโฟลเดอร์</string>
+    <string name="media_drive_cannot_open">เปิดตัวเลือกโฟลเดอร์ไม่ได้</string>
 </resources>

@@ -92,7 +92,7 @@ fun List<DeviceAudio>.shelves(view: SoundView, names: Comparator<String> = sound
 
 suspend fun deviceAudio(context: Context): List<DeviceAudio> = withContext(Dispatchers.IO) { deviceSounds(context) }
 
-suspend fun audioDeclaration(context: Context, uri: Uri): MediaDeclaration? = withContext(Dispatchers.IO) {
+suspend fun audioDeclaration(context: Context, uri: Uri, mime: String? = null): MediaDeclaration? = withContext(Dispatchers.IO) {
     val extractor = try { openDemuxer(context, uri, "audio/") } catch (_: Exception) { return@withContext null }
     try {
         val format = (0 until extractor.trackCount).map { extractor.getTrackFormat(it) }
@@ -103,7 +103,7 @@ suspend fun audioDeclaration(context: Context, uri: Uri): MediaDeclaration? = wi
             if (c.moveToFirst()) { name = c.getString(0) ?: name; if (!c.isNull(1)) size = c.getLong(1) }
         }
         MediaDeclaration(XmlNode("media", linkedMapOf("uri" to uri.toString(), "filename" to name, "title" to name,
-            "type" to (context.contentResolver.getType(uri) ?: "audio/mp4"),
+            "type" to (mime ?: context.contentResolver.getType(uri) ?: "audio/mp4"),
             "duration" to "${if (format.containsKey(MediaFormat.KEY_DURATION)) format.getLong(MediaFormat.KEY_DURATION) else 0L}",
             "size" to "$size", "infoUpdated" to "${System.currentTimeMillis()}")))
     } catch (_: Exception) { null } finally { extractor.release() }

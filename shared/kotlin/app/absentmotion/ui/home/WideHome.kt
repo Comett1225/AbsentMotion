@@ -54,8 +54,8 @@ internal fun ProjectGrid(rows: List<ListRow>, upload: Boolean, onUpload: () -> U
             span = { _, r -> GridItemSpan(if (r is ListRow.Date) maxLineSpan else 1) },
         ) { i, row ->
             when (row) {
-                is ListRow.Date -> DateLabel(row.text, first = i == 0)
-                is ListRow.Card -> card(row.info, i, Modifier.animateItem(fadeInSpec = null, placementSpec = Motion.enter(), fadeOutSpec = Motion.exit()))
+                is ListRow.Date -> DateLabel(row.text, first = i == 0, Modifier.animateItem(fadeInSpec = Motion.fast(), placementSpec = Motion.enter(), fadeOutSpec = Motion.exit()))
+                is ListRow.Card -> card(row.info, i, Modifier.animateItem(fadeInSpec = Motion.fast(), placementSpec = Motion.enter(), fadeOutSpec = Motion.exit()))
             }
         }
     }

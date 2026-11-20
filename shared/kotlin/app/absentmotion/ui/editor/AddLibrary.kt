@@ -12,10 +12,12 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import app.absentmotion.audio.DeviceAudio
 import app.absentmotion.audio.deviceAudio
 import app.absentmotion.media.DeviceMedia
+import app.absentmotion.media.MediaLibrarySource
 import app.absentmotion.media.deviceMedia
 import app.absentmotion.media.mediaThumbnail
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 
 internal class AddLibrary {
@@ -34,13 +36,16 @@ internal fun rememberAddLibrary(demoMode: Boolean): AddLibrary {
         library.media = deviceMedia(context, demoMode)
         coroutineScope {
             library.media.take(10).chunked(4).forEach { batch ->
-                coroutineScope { batch.forEach { file -> launch { mediaThumbnail(context, file.uri) } } }
+                coroutineScope { batch.forEach { file -> launch { mediaThumbnail(context, file.uri, file.video) } } }
             }
         }
     }
     LaunchedEffect(library.audioRevision) {
         if (library.audioRevision > 0) delay(400)
         library.audio = deviceAudio(context)
+    }
+    LaunchedEffect(Unit) {
+        MediaLibrarySource.revision.drop(1).collect { library.mediaRevision++; library.audioRevision++ }
     }
     DisposableEffect(context) {
         val main = Handler(Looper.getMainLooper())

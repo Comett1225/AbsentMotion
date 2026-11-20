@@ -44,6 +44,7 @@ internal fun DeskMedia(state: EditorState, library: AddLibrary) {
         else listOfNotNull(android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE.takeIf { android.os.Build.VERSION.SDK_INT < 29 })
     AskOnce(visual + listOfNotNull(android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED.takeIf { partial }), "asked",
         { granted -> !visual.all(granted) && !(partial && granted(android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)) }) { library.mediaRevision++; state.engine.refreshMedia() }
+    LaunchedEffect(Unit) { if (!app.absentmotion.platform.PlatformFeatures.desktop) library.mediaRevision++ }
     Column(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxWidth().padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -55,7 +56,7 @@ internal fun DeskMedia(state: EditorState, library: AddLibrary) {
         }
         if (library.media.isEmpty() && query.isEmpty() && app.absentmotion.platform.libraryFolders().isEmpty()) Text(stringResource(R.string.desk_media_empty), Modifier.padding(12.dp), color = Am.OnDarkDim, fontSize = 13.sp)
         DeskFolderContent(library.media, settled, { query = "" }, library, { File(app.absentmotion.platform.libraryFilePath(it.uri)) }, { arrayOf(it.name, it.album) }, { it.uri.toString() }) { file ->
-            val bitmap by produceState<android.graphics.Bitmap?>(cachedMediaThumbnail(file.uri), file.uri, file.modified, library.mediaRevision) { value = mediaThumbnail(context, file.uri) }
+            val bitmap by produceState<android.graphics.Bitmap?>(cachedMediaThumbnail(file.uri), file.uri, file.modified, library.mediaRevision) { value = mediaThumbnail(context, file.uri, file.video) }
             val add = { if (!state.addingMedia) scope.launch { state.addingMedia = true; try { state.addPicked(context, file.uri, video = file.video, svg = file.svg) } finally { state.addingMedia = false } }; Unit }
             DeskTile(state, file.name, {
                 bitmap?.let { Image(it.asImageBitmap(), null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop) }
@@ -76,6 +77,7 @@ internal fun DeskAudio(state: EditorState, library: AddLibrary) {
     val preview = remember { SoundPreview(context) }
     DisposableEffect(preview) { onDispose { preview.stop() } }
     AskOnce(listOf(AudioPermission), "askedAudio", { granted -> !granted(AudioPermission) }) { library.audioRevision++ }
+    LaunchedEffect(Unit) { if (!app.absentmotion.platform.PlatformFeatures.desktop) library.audioRevision++ }
     val settled = debounced(query)
     val shared = remember(library.audio) {
         library.audio.groupBy { it.title.ifBlank { it.name } }.filterValues { it.size > 1 }.mapValues { (_, group) -> group.map { it.name.substringAfterLast('.', "").uppercase() }.distinct().size > 1 }
@@ -143,8 +145,8 @@ private fun DeskFileAction(label: String, modifier: Modifier, action: () -> Unit
 
 @Composable
 private fun deskRemove(state: EditorState, uri: String, library: AddLibrary, audio: Boolean, run: (Boolean) -> Unit): DeskRemove? {
-    if (!app.absentmotion.platform.PlatformFeatures.desktop) return null
     val folder = remember(uri, library.mediaRevision, library.audioRevision) { app.absentmotion.platform.libraryFolderName(android.net.Uri.parse(uri)) }
+    if (!app.absentmotion.platform.PlatformFeatures.desktop && folder == null) return null
     val inUse = state.scene.media(uri) != null
     return DeskRemove(inUse, folder) { unlink ->
         run(unlink)

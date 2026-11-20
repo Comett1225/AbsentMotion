@@ -2668,4 +2668,36 @@
     <string name="history_record_keyframes">Record keyframes</string>
     <string name="dafont_find">Find more fonts on DaFont</string>
     <string name="dafont_hint">Download a font, then import the .zip here. Check its licence before using it in a published video.</string>
+    <string name="update_background_hint">You can leave AbsentMotion. The download keeps going, and a notification tells you when it\'s ready to install.</string>
+    <string name="update_foreground_hint">Keep AbsentMotion open until the download finishes.</string>
+    <string name="update_hide">Hide</string>
+    <string name="update_channel">Updates</string>
+    <string name="update_notification_downloading">Downloading AbsentMotion %1$s</string>
+    <string name="update_notification_ready">AbsentMotion %1$s is ready to install</string>
+    <string name="update_notification_install">Tap to install the update.</string>
+    <string name="tools_layout_more">More options</string>
+    <string name="tools_layout_change">Change layout</string>
+    <string name="tools_layout_hint">Use the arrows to change the order</string>
+    <string name="tools_layout_move_up">Move up</string>
+    <string name="tools_layout_move_down">Move down</string>
+    <string name="share_add_to_project">Add to a project?</string>
+    <string name="share_or_add_to">Or add it to</string>
+    <plurals name="share_videos">
+        <item quantity="one">%1$d video</item>
+        <item quantity="other">%1$d videos</item>
+    </plurals>
+    <plurals name="share_pictures">
+        <item quantity="one">%1$d picture</item>
+        <item quantity="other">%1$d pictures</item>
+    </plurals>
+    <plurals name="share_sounds">
+        <item quantity="one">%1$d sound</item>
+        <item quantity="other">%1$d sounds</item>
+    </plurals>
+    <plurals name="share_files">
+        <item quantity="one">%1$d file</item>
+        <item quantity="other">%1$d files</item>
+    </plurals>
+    <string name="media_drive_add_folder">Drive or folder</string>
+    <string name="media_drive_cannot_open">Could not open folder picker</string>
 </resources>

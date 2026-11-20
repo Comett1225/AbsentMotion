@@ -1,5 +1,14 @@
 package app.absentmotion.ui.home
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.EnterExitState
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.geometry.Size
@@ -80,6 +89,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithCache
@@ -198,6 +208,8 @@ fun HomeScreen(
     var version by remember { mutableIntStateOf(0) }
     var tab by rememberSaveable { mutableIntStateOf(lastTab) }
     var page by rememberSaveable { mutableIntStateOf(lastPage) }
+    var arrangingTools by remember { mutableStateOf(false) }
+    LaunchedEffect(page) { if (page != 2) arrangingTools = false }
     DisposableEffect(Unit) { onDispose { lastTab = tab; lastPage = page } }
     var creating by remember { mutableStateOf(false) }
     var opening by remember { mutableIntStateOf(0) }
@@ -237,10 +249,10 @@ fun HomeScreen(
     ) {
         Box(Modifier.fillMaxSize().background(Am.HomeBg).swipeOpens(page != 3 && !creating, rtl) { scope.launch { drawer.open() } }) {
             Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars.union(WindowInsets.captionBar))) {
-                TopBar(onMenu = { scope.launch { drawer.open() } }, search, page, { search = it }, settings)
+                TopBar(onMenu = { scope.launch { drawer.open() } }, search, page, { search = it }, settings, onArrangeTools = { arrangingTools = true })
                 val fill = Modifier.weight(1f)
                 if (page == 3) CommunityTab(fill, engine) { onImportFile(Uri.fromFile(it)) }
-                else if (page == 2) ToolsTab(fill, store, settings) { id -> version++; onOpen(id) }
+                else if (page == 2) ToolsTab(fill, store, settings, arrangingTools, { arrangingTools = it }) { id -> version++; onOpen(id) }
                 else if (page == 1) TemplatesTab(version + changes, onTemplate, onTemplateProject, fill, query, engine) else ProjectsPane(
                     Modifier.weight(1f), shown, loaded, tab, { tab = it }, settings, version + changes, onOpen, onExport, query,
                     onUpload = { picker.launch(arrayOf("text/xml", "application/xml", "application/zip", "application/octet-stream")) },
@@ -261,7 +273,7 @@ fun HomeScreen(
                 )
                 Spacer(Modifier.height(BarHeight + navInset))
             }
-            BottomBar(onNew = newProject, page, { page = it; if (it >= 2) search = null }, Modifier.align(Alignment.BottomCenter), navInset, wide, settings.vibration)
+            BottomBar(onNew = newProject, page, { page = it; if (it >= 2) search = null; if (it != 2) arrangingTools = false }, Modifier.align(Alignment.BottomCenter), navInset, wide, settings.vibration)
             if (toReport.isNotEmpty()) ImportDialog(toReport, onDismiss = onImportShown, onOpen = { onImportShown(); toReport.first().let { if (it.template) onTemplate(it.id) else onOpen(it.id) } })
             Presence(creating) {
                 NewProjectSheet(
@@ -295,30 +307,73 @@ private var lastTab = 0
 private var lastPage = 0
 private val lastScroll = intArrayOf(0, 0)
 
+private const val SearchAnimMs = 200
+
 @Composable
-private fun TopBar(onMenu: () -> Unit, search: String?, page: Int, onSearch: (String?) -> Unit, settings: AppSettings) {
+private fun TopBar(onMenu: () -> Unit, search: String?, page: Int, onSearch: (String?) -> Unit, settings: AppSettings, onArrangeTools: () -> Unit) {
+    val searching = search != null
+    var shownText by remember { mutableStateOf(search.orEmpty()) }
+    if (search != null) shownText = search
+    val focus = LocalFocusManager.current
+    var wasSearching by remember { mutableStateOf(searching) }
+    LaunchedEffect(searching) {
+        if (wasSearching && !searching) focus.clearFocus()
+        wasSearching = searching
+    }
+    val fade = remember { tween<Float>(SearchAnimMs, easing = FastOutSlowInEasing) }
+    val size = remember { tween<IntSize>(SearchAnimMs, easing = FastOutSlowInEasing) }
     Box(Modifier.fillMaxWidth().height(57.dp)) {
         Box(Modifier.align(Alignment.CenterStart).size(50.dp).clickable(onClick = onMenu), contentAlignment = Alignment.Center) {
             Icon(HomeIcons.Menu, stringResource(R.string.settings), Modifier.size(24.dp), tint = Am.Navy)
             HoldName(stringResource(R.string.settings))
         }
-        if (search == null) Text("AbsentMotion", Modifier.align(Alignment.Center), color = Am.Navy, fontSize = 22.sp, fontWeight = FontWeight.Medium)
-        else HomeSearchField(search, page == 1, onSearch, Modifier.align(Alignment.Center).padding(horizontal = 56.dp).fillMaxWidth())
-        if (search == null) ChangelogButton(settings, Modifier.align(Alignment.CenterEnd).padding(end = 50.dp))
+        AnimatedVisibility(
+            !searching,
+            Modifier.align(Alignment.Center),
+            enter = fadeIn(fade),
+            exit = fadeOut(fade),
+        ) {
+            Text("AbsentMotion", color = Am.Navy, fontSize = 22.sp, fontWeight = FontWeight.Medium)
+        }
+        AnimatedVisibility(
+            !searching,
+            Modifier.align(Alignment.CenterEnd).padding(end = 50.dp),
+            enter = fadeIn(fade),
+            exit = fadeOut(fade),
+        ) {
+            ChangelogButton(settings)
+        }
+        Box(Modifier.matchParentSize().padding(horizontal = 56.dp), contentAlignment = Alignment.CenterEnd) {
+            AnimatedVisibility(
+                searching,
+                enter = expandHorizontally(size, expandFrom = Alignment.End) + fadeIn(fade),
+                exit = shrinkHorizontally(size, shrinkTowards = Alignment.End) + fadeOut(fade),
+            ) {
+                val ready = transition.currentState == EnterExitState.Visible && transition.targetState == EnterExitState.Visible
+                HomeSearchField(shownText, page == 1, { if (searching) onSearch(it) }, Modifier.fillMaxWidth(), autoFocus = ready)
+            }
+        }
         if (page < 2) SearchButton(search, onSearch, Modifier.align(Alignment.CenterEnd))
+        else if (page == 2) ToolsMoreButton(onArrangeTools, Modifier.align(Alignment.CenterEnd))
     }
 }
 
 @Composable
-internal fun HomeSearchField(search: String, templates: Boolean, onSearch: (String?) -> Unit, modifier: Modifier) = SearchField(
+internal fun HomeSearchField(search: String, templates: Boolean, onSearch: (String?) -> Unit, modifier: Modifier, autoFocus: Boolean = true) = SearchField(
     search, { onSearch(it) }, modifier.height(40.dp),
-    hint = stringResource(if (templates) R.string.home_search_templates_hint else R.string.home_search_hint), background = Am.Card, content = Am.Navy, faint = Am.HomeDim, autoFocus = true,
+    hint = stringResource(if (templates) R.string.home_search_templates_hint else R.string.home_search_hint), background = Am.Card, content = Am.Navy, faint = Am.HomeDim, autoFocus = autoFocus,
 )
 
 @Composable
 internal fun SearchButton(search: String?, onSearch: (String?) -> Unit, modifier: Modifier = Modifier) {
     Box(modifier.size(50.dp).clickable { onSearch(if (search == null) "" else null) }, contentAlignment = Alignment.Center) {
-        Icon(if (search == null) TextIcons.Search else HomeIcons.Close, stringResource(if (search == null) R.string.home_search else R.string.home_close_search), Modifier.size(24.dp), tint = Am.Navy)
+        Crossfade(
+            search != null,
+            animationSpec = tween(SearchAnimMs, easing = FastOutSlowInEasing),
+            label = "searchIcon",
+        ) { open ->
+            Icon(if (!open) TextIcons.Search else HomeIcons.Close, stringResource(if (!open) R.string.home_search else R.string.home_close_search), Modifier.size(24.dp), tint = Am.Navy)
+        }
         HoldName(stringResource(if (search == null) R.string.home_search else R.string.home_close_search))
     }
 }
@@ -399,8 +454,8 @@ private fun ProjectsPane(
                     }
                     itemsIndexed(rows, key = { _, r -> if (r is ListRow.Card) "p-" + r.info.id else "date-${(r as ListRow.Date).text}" }) { i, row ->
                         when (row) {
-                            is ListRow.Date -> DateLabel(row.text, first = i == 0)
-                            is ListRow.Card -> card(row.info, i, Modifier.animateItem(fadeInSpec = null, placementSpec = Motion.enter(), fadeOutSpec = Motion.exit()))
+                            is ListRow.Date -> DateLabel(row.text, first = i == 0, Modifier.animateItem(fadeInSpec = Motion.fast(), placementSpec = Motion.enter(), fadeOutSpec = Motion.exit()))
+                            is ListRow.Card -> card(row.info, i, Modifier.animateItem(fadeInSpec = Motion.fast(), placementSpec = Motion.enter(), fadeOutSpec = Motion.exit()))
                         }
                     }
                 }
@@ -535,8 +590,8 @@ internal fun CommunityCard(info: CommunityInfo) {
 }
 
 @Composable
-internal fun DateLabel(text: String, first: Boolean) {
-    Text(text, Modifier.padding(top = if (first) 0.dp else 12.dp, bottom = 12.dp), color = Am.Navy, fontSize = 15.sp, lineHeight = 19.sp)
+internal fun DateLabel(text: String, first: Boolean, modifier: Modifier = Modifier) {
+    Text(text, modifier.padding(top = if (first) 0.dp else 12.dp, bottom = 12.dp), color = Am.Navy, fontSize = 15.sp, lineHeight = 19.sp)
 }
 
 internal fun listRows(list: List<ProjectInfo>, byName: Boolean, dates: DateTimeFormatter): List<ListRow> =

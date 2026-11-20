@@ -114,6 +114,8 @@ import app.absentmotion.model.Scene
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.adaptive.AdaptiveWindow
 import app.absentmotion.ui.adaptive.LocalAdaptiveSpace
+import app.absentmotion.ui.adaptive.scrimTap
+import app.absentmotion.ui.theme.LocalPresence
 import app.absentmotion.ui.theme.presence
 import app.absentmotion.ui.theme.presenceScrim
 import app.absentmotion.ui.theme.withUiFont
@@ -326,11 +328,13 @@ fun NewProjectSheet(
             onOpen(id)
         }
     }
+    val presence = LocalPresence.current
+    val dismiss = { if (presence?.leaving != true) onClose() }
     BoxWithConstraints(Modifier.fillMaxSize()) {
         if (card && maxWidth > maxHeight && maxWidth - 48.dp >= 720.dp) {
-            AdaptiveWindow(1100.dp, 500.dp) { SheetBody(form, settings, true, onClose, create) }
+            AdaptiveWindow(1100.dp, 500.dp, onDismiss = dismiss) { SheetBody(form, settings, true, onClose, create) }
         } else {
-            Box(Modifier.fillMaxSize().presenceScrim(Color.Black.copy(alpha = 0.7f)).pointerInput(Unit) { detectTapGestures { } })
+            Box(Modifier.fillMaxSize().presenceScrim(Color.Black.copy(alpha = 0.7f)).scrimTap(dismiss))
             BoxWithConstraints(
                 if (card) Modifier.align(Alignment.Center).windowInsetsPadding(WindowInsets.systemBars.union(WindowInsets.ime)).padding(24.dp).widthIn(max = 480.dp).presence(scaleFrom = 0.96f)
                 else Modifier.align(Alignment.BottomCenter).widthIn(max = 480.dp).presence(slide = 1f, fade = false),

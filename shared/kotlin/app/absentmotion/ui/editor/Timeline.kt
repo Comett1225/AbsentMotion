@@ -49,6 +49,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import kotlinx.coroutines.flow.collectLatest
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.ui.Modifier
@@ -206,14 +207,15 @@ private val BookmarkFlagSide = 2.1.dp
 private val BookmarkPeakHalf = 2.5.dp
 private val PillOutline = 1.1.dp
 
-internal val HeaderWidth = 84.dp
+private var lockReveal by mutableFloatStateOf(0f)
+internal val HeaderWidth: Dp get() = 62.dp + LockZone * lockReveal
 private val HeaderInset = 1.dp
 private val TagStripWidth = 2.1.dp
 private val EyeZone = 36.dp
 private val EyeCentre = 17.dp
 private val LockZone = 22.dp
 private val LockCentre = 45.dp
-private val ThumbLeft = EyeZone + LockZone
+private val ThumbLeft: Dp get() = EyeZone + LockZone * lockReveal
 private val ThumbSize = 16.dp
 private val ClipTrim = 8.dp
 private val DeskClipTrim = 12.dp
@@ -374,6 +376,12 @@ fun Timeline(state: EditorState, modifier: Modifier = Modifier) {
         HeaderPictures(view) { drawLifted(view, measurer, styles, eye, eyeOff, locks, outline, mediaPictures, appear.value) }
         RowSemantics(view)
         LockMenu(view)
+        if (!state.lookOnly) LaunchedEffect(view) {
+            val reveal = Animatable(lockReveal)
+            snapshotFlow { state.selectedId != null || MultiSelect.active && MultiSelect.ids.isNotEmpty() }.collectLatest { on ->
+                reveal.animateTo(if (on) 1f else 0f, tween(180)) { lockReveal = value }
+            }
+        }
         if (deskLayout) {
             DesktopTimelineMenu(view)
             DesktopTimelineRename(view)
@@ -510,7 +518,7 @@ private fun HeaderPictures(view: TimelineView, drawLift: DrawScope.() -> Unit) {
                             app.absentmotion.platform.Hint(eyeLabel) { Box(Modifier.size(28.dp).pointerHoverIcon(PointerIcon.Hand)) }
                         }
                         val lockLabel = stringResource(if (layer.node["lock"] == null) R.string.layer_lock else R.string.layer_unlock)
-                        Box(Modifier.offset { IntOffset(EyeZone.roundToPx(), (view.rowTop(row) - view.rulerH).roundToInt()) }) {
+                        if (lockReveal > 0.5f) Box(Modifier.offset { IntOffset(EyeZone.roundToPx(), (view.rowTop(row) - view.rulerH).roundToInt()) }) {
                             app.absentmotion.platform.Hint(lockLabel) { Box(Modifier.size(LockZone, 28.dp).pointerHoverIcon(PointerIcon.Hand)) }
                         }
                     }
@@ -869,7 +877,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
         val hit = at?.let { hitAt(it) }
         hoveredId = hit?.let { clipId(it) }
         resizeHover = hit is Hit.Grip || at != null && nearHeaderEdge(at.x)
-        handHover = hit is Hit.Eye || hit is Hit.Lock || hit is Hit.Header || hit is Hit.Bar || hit is Hit.Key || hit == Hit.Readout || hit == Hit.Ruler
+        handHover = hit is Hit.Eye || hit is Hit.Lock || hit is Hit.Locked || hit is Hit.Header || hit is Hit.Bar || hit is Hit.Key || hit == Hit.Readout || hit == Hit.Ruler
         hoveredKey = (hit as? Hit.Key)?.let { it.id to it.frame }
     }
 
@@ -1124,7 +1132,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
         val endReach = if (keyX != null && abs(keyX - right) <= zone) min(zone, GripStub.px) else zone
         return when {
             at.x < EyeZone.px -> Hit.Eye(layer.id)
-            at.x < ThumbLeft.px -> Hit.Lock(layer.id)
+            lockReveal > 0f && at.x < ThumbLeft.px -> Hit.Lock(layer.id)
             at.x < headerWidth -> Hit.Header(layer.id)
             deskLayout && at.x - left in -zone..startReach -> Hit.Grip(layer.id, start = true)
             deskLayout && right - at.x in -zone..endReach -> Hit.Grip(layer.id, start = false)
@@ -1691,7 +1699,7 @@ private suspend fun PointerInputScope.desktopTimelineGestures(view: TimelineView
             if (event.type == PointerEventType.Press && (event.buttons.isSecondaryPressed || MacOs && modifiers.isCtrlPressed) && down == null && !view.state.lookOnly) {
                 val pressed = view.hitAt(at)
                 if (pressed is Hit.Lock) view.openLockMenu(pressed.id)
-                else if (pressed is Hit.Locked) view.state.hint(R.string.layer_locked_hint)
+                else if (pressed is Hit.Locked) view.openLockMenu(pressed.id)
                 else {
                     val id = view.clipId(pressed)
                     if (id != null) view.selectDesktop(id, false, false)
@@ -1830,7 +1838,8 @@ private suspend fun PointerInputScope.timelineGestures(view: TimelineView, onLon
     var finger = down.position
     var second: PointerId? = null
     val dismissing = view.dismissZone(down.position)
-    val holdable = !view.state.lookOnly && !dismissing && (hit is Hit.Eye || hit is Hit.Lock || hit is Hit.Header || hit is Hit.Row || hit is Hit.Key || hit is Hit.Bar)
+    val holdable = !view.state.lookOnly && !dismissing &&
+        (hit is Hit.Eye || hit is Hit.Lock || hit is Hit.Locked || hit is Hit.Header || hit is Hit.Row || hit is Hit.Key || hit is Hit.Bar)
     val deadline = down.uptimeMillis + viewConfiguration.longPressTimeoutMillis
     try {
         while (true) {
@@ -1842,6 +1851,10 @@ private suspend fun PointerInputScope.timelineGestures(view: TimelineView, onLon
                     hit is Hit.Key -> {
                         view.grabKey(hit)
                         drag = Drag.Key
+                    }
+                    hit is Hit.Locked -> {
+                        view.openLockMenu(hit.id)
+                        held = true
                     }
                     hit is Hit.Row && view.lift(hit.id, finger, viewConfiguration.touchSlop, moves = false) -> drag = Drag.Lift
                     hit is Hit.Bar && view.lift(hit.id, finger, viewConfiguration.touchSlop, moves = true) -> drag = Drag.Lift
@@ -2156,7 +2169,7 @@ private fun DrawScope.drawRow(
         } else {
             drawGrabLines(Offset(size.width - HandleInset.toPx(), centre))
         }
-        drawHeader(top, eye, lock, layer.labelColour, layer.id in MultiSelect.ids, layer.node["clippingMask"] == "true")
+        drawHeader(top, eye, lock, layer.locked || layer.timingLocked, layer.labelColour, layer.id in MultiSelect.ids, layer.node["clippingMask"] == "true")
     }
 }
 
@@ -2196,7 +2209,7 @@ private fun DrawScope.drawDeskHeader(layer: Layer, chosen: Boolean, hovered: Boo
     layer.labelColour?.let { drawRect(Color(it.start), Offset(0f, pillTop.y), Size(3.dp.toPx(), pillHeight)) }
     val icon = eye.intrinsicSize
     translate(EyeCentre.toPx() - icon.width / 2, top + (height - icon.height) / 2) { with(eye) { draw(icon) } }
-    drawPadlock(lock, top, height)
+    drawPadlock(lock, layer.locked || layer.timingLocked, top, height)
     val left = (ThumbLeft + ThumbSize + 4.dp).toPx()
     val room = (width - trim - left - pillHeight / 2 - 4.dp.toPx()).toInt()
     if (room < 1) return
@@ -2315,12 +2328,16 @@ private fun DrawScope.drawGrabLines(centre: Offset) {
     }
 }
 
-private fun DrawScope.drawPadlock(lock: Painter, top: Float, height: Float) {
+private fun DrawScope.drawPadlock(lock: Painter, locked: Boolean, top: Float, height: Float) {
     val icon = lock.intrinsicSize
-    translate(LockCentre.toPx() - icon.width / 2, top + (height - icon.height) / 2) { with(lock) { draw(icon) } }
+    if (lockReveal > 0f) translate(LockCentre.toPx() - icon.width / 2, top + (height - icon.height) / 2) { with(lock) { draw(icon, alpha = lockReveal) } }
+    if (locked && lockReveal < 1f) {
+        val small = icon * 0.7f
+        translate((ThumbLeft + ThumbSize).toPx() - small.width * 0.6f, top + height / 2) { with(lock) { draw(small, alpha = 1f - lockReveal) } }
+    }
 }
 
-private fun DrawScope.drawHeader(top: Float, eye: Painter, lock: Painter, tag: LabelColour?, checked: Boolean, clipped: Boolean = false) {
+private fun DrawScope.drawHeader(top: Float, eye: Painter, lock: Painter, locked: Boolean, tag: LabelColour?, checked: Boolean, clipped: Boolean = false) {
     val height = (RowHeight - HeaderInset * 2).toPx()
     val topLeft = Offset(-height, top + HeaderInset.toPx())
     val trim = if (clipped) ClipTrim.toPx() else 0f
@@ -2330,7 +2347,7 @@ private fun DrawScope.drawHeader(top: Float, eye: Painter, lock: Painter, tag: L
     drawRoundRect(if (checked) Am.Accent else HeaderFill, topLeft, pill, radius)
     drawRoundRect(HeaderEdge, topLeft, pill, radius, style = Stroke(0.5.dp.toPx()))
     if (tag != null) drawRect(Color(tag.start), Offset(0f, topLeft.y + 0.7.dp.toPx()), Size(TagStripWidth.toPx(), height - 1.8.dp.toPx()))
-    drawPadlock(lock, top, RowHeight.toPx())
+    drawPadlock(lock, locked, top, RowHeight.toPx())
     if (MultiSelect.active) {
         if (checked) {
             val centre = Offset(EyeCentre.toPx(), top + RowHeight.toPx() / 2)

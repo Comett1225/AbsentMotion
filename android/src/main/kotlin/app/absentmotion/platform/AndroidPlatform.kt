@@ -236,7 +236,7 @@ object PlatformFeatures {
     const val camera = true
     const val tools = true
     const val userFiles = false
-    const val linkFolders = false
+    const val linkFolders = true
     val ffamp = android.os.Process.is64Bit()
 }
 
@@ -256,15 +256,17 @@ fun Hint(text: String, content: @androidx.compose.runtime.Composable () -> Unit)
 @androidx.compose.runtime.Composable
 fun Hint(text: String, modifier: androidx.compose.ui.Modifier, content: @androidx.compose.runtime.Composable () -> Unit) = content()
 
-fun linkFolderLabel(): String = ""
+fun linkFolderLabel(): String = app.absentmotion.i18n.AppText.get(R.string.media_drive_add_folder)
 
 val NameLabelWindow = androidx.compose.ui.window.PopupProperties(android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or android.view.WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
 
-fun libraryFolderName(uri: android.net.Uri): String? = null
+fun libraryFolderName(uri: android.net.Uri): String? = LinkedMediaTrees.folderName(uri)
 
-fun removeFromLibrary(uri: android.net.Uri, unlinkFolder: Boolean) {}
+fun removeFromLibrary(uri: android.net.Uri, unlinkFolder: Boolean) {
+    if (unlinkFolder) LinkedMediaTrees.unlinkFor(uri)
+}
 
-fun linkMediaFolder() {}
+fun linkMediaFolder() = LinkedMediaTrees.openPicker()
 
 fun libraryFilePath(uri: android.net.Uri): String = uri.path.orEmpty()
 
@@ -449,7 +451,9 @@ internal fun deviceSounds(context: Context): List<app.absentmotion.audio.DeviceA
             }
         }
     } catch (_: Exception) { }
-    return found
+    val known = found.mapTo(HashSet()) { it.name to it.durationMs }
+    val linked = LinkedMediaTrees.listSounds(context).filterNot { it.name to it.durationMs in known }
+    return if (linked.isEmpty()) found else (found + linked).sortedByDescending { it.date }
 }
 
 fun revealDeskFile(uri: android.net.Uri) {}

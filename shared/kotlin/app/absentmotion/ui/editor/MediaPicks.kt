@@ -1,8 +1,6 @@
 package app.absentmotion.ui.editor
 
-import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.widget.Toast
 import androidx.compose.runtime.mutableStateListOf
 import app.absentmotion.R
@@ -16,6 +14,9 @@ import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.addAudio
 import app.absentmotion.editor.keepCopy
 import app.absentmotion.i18n.AppText
+import app.absentmotion.model.MediaDeclaration
+import app.absentmotion.platform.Context
+import app.absentmotion.platform.Uri
 
 internal object MediaPicks {
     private const val FRESH_MS = 120_000L
@@ -54,20 +55,36 @@ internal object MediaPicks {
 
     private val pictures = mutableStateListOf<Pair<Uri, Long>>()
     private val sounds = mutableStateListOf<Pair<Uri, Long>>()
+    private val shared = mutableStateListOf<SharedPicks>()
 
-    val waiting: Int get() = pictures.size + sounds.size
+    private class SharedPicks(val project: String, val media: List<Pair<Uri, String>>)
+
+    val waiting: Int get() = pictures.size + sounds.size + shared.size
 
     fun addPictures(uris: List<Uri>) { pictures += uris.map { it to System.currentTimeMillis() } }
 
     fun addSounds(uris: List<Uri>) { sounds += uris.map { it to System.currentTimeMillis() } }
 
+    fun addShared(project: String, media: List<Pair<Uri, String>>) {
+        shared += SharedPicks(project, media)
+    }
+
     suspend fun deliver(state: EditorState, context: Context) {
         val now = System.currentTimeMillis()
         val pictures = take(pictures, now)
         val sounds = take(sounds, now)
-        if (target != null && target != state.projectId) return
-        if (pictures.isNotEmpty()) state.addPictures(context, pictures)
-        if (sounds.isNotEmpty()) state.addSounds(context, sounds)
+        if (target == null || target == state.projectId) {
+            if (pictures.isNotEmpty()) state.addPictures(context, pictures)
+            if (sounds.isNotEmpty()) state.addSounds(context, sounds)
+        }
+        while (shared.isNotEmpty()) {
+            val pick = shared.removeAt(0)
+            if (pick.project != state.projectId) continue
+            state.addingMedia = true
+            try {
+                for ((uri, mime) in pick.media) state.addPicked(context, uri, alwaysCopy = true, mime = mime)
+            } finally { state.addingMedia = false }
+        }
     }
 
     private fun take(list: MutableList<Pair<Uri, Long>>, now: Long): List<Uri> =
@@ -85,12 +102,16 @@ internal suspend fun EditorState.addSounds(context: Context, uris: List<Uri>) {
     addingMedia = true
     try {
         for (uri in uris) {
-            val media = audioDeclaration(context, uri)?.let { keepCopy(context, it) }
+            val declared = audioDeclaration(context, uri)
+            val media = if (declared == null) null else keepCopy(context, declared)
             if (media == null || media.duration <= 0) Toast.makeText(context, mediaTroubleOf(context, uri) ?: AppText.get(R.string.library_err_unsupported_type), Toast.LENGTH_LONG).show()
             else addAudio(media)
         }
     } finally { addingMedia = false }
 }
+
+internal suspend fun EditorState.keepPickedCopy(context: Context, media: MediaDeclaration, alwaysCopy: Boolean): MediaDeclaration? =
+    keepCopy(context, media, always = alwaysCopy).takeIf { !alwaysCopy || store.inMediaFolder(it.uri) }
 
 internal suspend fun EditorState.pickBlipSound(context: Context, uri: Uri, layerId: Long, effect: Int) {
     keepAccess(context, listOf(uri))

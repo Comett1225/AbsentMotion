@@ -66,6 +66,7 @@ import app.absentmotion.ui.editor.LocalWide
 import app.absentmotion.ui.editor.NoMatches
 import app.absentmotion.ui.editor.matchesSearch
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.theme.Motion
 import app.absentmotion.ui.theme.animatedColor
 import app.absentmotion.ui.theme.enterFade
 import app.absentmotion.ui.theme.withUiFont
@@ -109,20 +110,21 @@ fun TemplatesTab(version: Int, onTemplate: (String) -> Unit, onProject: (Scene) 
             if (sub == 0) {
                 if (savedTemplates.isEmpty()) EmptyText(stringResource(R.string.template_none))
                 else if (shownTemplates.isEmpty()) NoMatches(query, R.string.search_no_templates, Modifier.fillMaxWidth().padding(top = 120.dp), Am.Navy, 17.sp)
-                val templateCard: @Composable (SavedTemplate) -> Unit = { t ->
+                val templateCard: @Composable (SavedTemplate, Modifier) -> Unit = { t, itemModifier ->
                     TemplateCard(
                         t, menu == t.id, { menu = if (it) t.id else null }, { onTemplate(t.id) },
                         onProject = { menu = null; onProject(t.scene) },
                         onRename = { menu = null; renaming = t.id to t.title },
                         onDelete = { menu = null; confirm = R.string.template_delete_template to { scope.launch { withContext(Dispatchers.IO) { templates.delete(t.id) }; rev++ } } },
+                        modifier = itemModifier,
                     )
                 }
                 if (wide) LazyVerticalGrid(
                     GridCells.Adaptive(340.dp), Modifier.fillMaxSize(), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 28.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
-                ) { gridItems(shownTemplates, key = { it.id }) { templateCard(it) } }
+                ) { gridItems(shownTemplates, key = { it.id }) { templateCard(it, Modifier.animateItem(fadeInSpec = Motion.fast(), placementSpec = Motion.enter(), fadeOutSpec = Motion.exit())) } }
                 else LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 28.dp)) {
-                    items(shownTemplates, key = { it.id }) { templateCard(it) }
+                    items(shownTemplates, key = { it.id }) { templateCard(it, Modifier.animateItem(fadeInSpec = Motion.fast(), placementSpec = Motion.enter(), fadeOutSpec = Motion.exit())) }
                 }
             } else {
                 if (savedPresets.isEmpty()) EmptyText(stringResource(R.string.template_no_presets))
@@ -135,8 +137,8 @@ fun TemplatesTab(version: Int, onTemplate: (String) -> Unit, onProject: (Scene) 
                             color = Am.Navy, fontSize = 15.sp,
                         )
                     }
-                    val presetCard: @Composable (SavedPreset) -> Unit = { p ->
-                        Card(Modifier.heightIn(min = 96.dp), onClick = null) {
+                    val presetCard: @Composable (SavedPreset, Modifier) -> Unit = { p, itemModifier ->
+                        Card(itemModifier.heightIn(min = 96.dp), onClick = null) {
                             Box(Modifier.padding(8.dp).size(80.dp).clip(RoundedCornerShape(8.dp)).checkerboard(5.dp)) {
                                 rememberPresetPicture(p, engine)?.let { Image(it, null, Modifier.fillMaxSize(), contentScale = ContentScale.Fit) }
                             }
@@ -152,9 +154,9 @@ fun TemplatesTab(version: Int, onTemplate: (String) -> Unit, onProject: (Scene) 
                     if (wide) LazyVerticalGrid(
                         GridCells.Adaptive(340.dp), Modifier.weight(1f).fillMaxWidth(), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 28.dp),
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    ) { gridItems(shownPresets, key = { it.id }) { presetCard(it) } }
+                    ) { gridItems(shownPresets, key = { it.id }) { presetCard(it, Modifier.animateItem(fadeInSpec = Motion.fast(), placementSpec = Motion.enter(), fadeOutSpec = Motion.exit())) } }
                     else LazyColumn(Modifier.weight(1f).fillMaxWidth(), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 28.dp)) {
-                        items(shownPresets, key = { it.id }) { presetCard(it) }
+                        items(shownPresets, key = { it.id }) { presetCard(it, Modifier.animateItem(fadeInSpec = Motion.fast(), placementSpec = Motion.enter(), fadeOutSpec = Motion.exit())) }
                     }
                 }
             }
@@ -216,11 +218,11 @@ private fun Card(modifier: Modifier, onClick: (() -> Unit)?, content: @Composabl
 @Composable
 private fun TemplateCard(
     t: SavedTemplate, menuOpen: Boolean, onMenu: (Boolean) -> Unit, onOpen: () -> Unit,
-    onProject: () -> Unit, onRename: () -> Unit, onDelete: () -> Unit,
+    onProject: () -> Unit, onRename: () -> Unit, onDelete: () -> Unit, modifier: Modifier = Modifier,
 ) {
     val scene = t.scene
     val ratio = aspectName(scene.width, scene.height)
-    Card(Modifier.heightIn(min = 96.dp), onOpen) {
+    Card(modifier.heightIn(min = 96.dp), onOpen) {
         Box(Modifier.padding(8.dp).size(80.dp).clip(RoundedCornerShape(8.dp)).checkerboard(5.dp)) {
             rememberFileBitmap(t.thumbnail, t.modified)?.let { Image(it, null, Modifier.fillMaxSize(), contentScale = ContentScale.Fit) }
             val s = (scene.totalTime + 500) / 1000

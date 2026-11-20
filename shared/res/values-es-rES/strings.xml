@@ -2671,4 +2671,40 @@
     <string name="desk_shortcut_change">Cambiar atajo</string>
     <string name="desk_shortcut_remove">Quitar atajo</string>
     <string name="desk_shortcut_reset">Restablecer predeterminado</string>
+    <string name="update_background_hint">Puedes salir de AbsentMotion. La descarga continúa y una notificación te avisará cuando esté lista para instalar.</string>
+    <string name="update_foreground_hint">Mantén AbsentMotion abierta hasta que termine la descarga.</string>
+    <string name="update_hide">Ocultar</string>
+    <string name="update_channel">Actualizaciones</string>
+    <string name="update_notification_downloading">Descargando AbsentMotion %1$s</string>
+    <string name="update_notification_ready">AbsentMotion %1$s está lista para instalar</string>
+    <string name="update_notification_install">Toca para instalar la actualización.</string>
+    <string name="tools_layout_more">Más opciones</string>
+    <string name="tools_layout_change">Cambiar diseño</string>
+    <string name="tools_layout_hint">Usa las flechas para cambiar el orden</string>
+    <string name="tools_layout_move_up">Subir</string>
+    <string name="tools_layout_move_down">Bajar</string>
+    <string name="share_add_to_project">¿Añadir a un proyecto?</string>
+    <string name="share_or_add_to">O añadirlo a</string>
+    <plurals name="share_videos">
+        <item quantity="one">%1$d vídeo</item>
+        <item quantity="many">%1$d vídeos</item>
+        <item quantity="other">%1$d vídeos</item>
+    </plurals>
+    <plurals name="share_pictures">
+        <item quantity="one">%1$d imagen</item>
+        <item quantity="many">%1$d imágenes</item>
+        <item quantity="other">%1$d imágenes</item>
+    </plurals>
+    <plurals name="share_sounds">
+        <item quantity="one">%1$d sonido</item>
+        <item quantity="many">%1$d sonidos</item>
+        <item quantity="other">%1$d sonidos</item>
+    </plurals>
+    <plurals name="share_files">
+        <item quantity="one">%1$d archivo</item>
+        <item quantity="many">%1$d archivos</item>
+        <item quantity="other">%1$d archivos</item>
+    </plurals>
+    <string name="media_drive_add_folder">Unidad o carpeta</string>
+    <string name="media_drive_cannot_open">No se pudo abrir el selector de carpetas</string>
 </resources>

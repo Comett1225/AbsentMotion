@@ -282,6 +282,7 @@ class AppSettings(private val context: Context) {
     }
 
     private var savedSizesState by mutableStateOf(SavedSizes.decode(prefs.getString("savedSizes", null)))
+    private var toolOrderState by mutableStateOf(app.absentmotion.ui.home.toolOrder(prefs.getString("toolOrder", null)?.split(',').orEmpty()))
 
     var savedSizes: List<SavedSize>
         get() = savedSizesState
@@ -290,6 +291,14 @@ class AppSettings(private val context: Context) {
     var savedColours: List<Int>
         get() = savedColoursState
         set(value) { savedColoursState = value; prefs.edit().putString("savedColours", value.joinToString(",")).apply() }
+
+    var toolOrder: List<String>
+        get() = toolOrderState
+        set(value) {
+            val normalized = app.absentmotion.ui.home.toolOrder(value)
+            toolOrderState = normalized
+            prefs.edit().putString("toolOrder", normalized.joinToString(",")).apply()
+        }
 
     var templateHints: Int
         get() = prefs.getInt("templateHints", 0)

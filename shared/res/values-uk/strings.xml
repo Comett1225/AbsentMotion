@@ -2700,4 +2700,44 @@
     <string name="desk_shortcut_change">Змінити комбінацію</string>
     <string name="desk_shortcut_remove">Видалити комбінацію</string>
     <string name="desk_shortcut_reset">Скинути до типової</string>
+    <string name="update_background_hint">Можна вийти з AbsentMotion. Завантаження триватиме, а сповіщення повідомить, коли оновлення буде готове до встановлення.</string>
+    <string name="update_foreground_hint">Не закривайте AbsentMotion, доки завантаження не завершиться.</string>
+    <string name="update_hide">Сховати</string>
+    <string name="update_channel">Оновлення</string>
+    <string name="update_notification_downloading">Завантаження AbsentMotion %1$s</string>
+    <string name="update_notification_ready">AbsentMotion %1$s готове до встановлення</string>
+    <string name="update_notification_install">Торкніться, щоб установити оновлення.</string>
+    <string name="tools_layout_more">Інші параметри</string>
+    <string name="tools_layout_change">Змінити порядок</string>
+    <string name="tools_layout_hint">Змінюйте порядок стрілками</string>
+    <string name="tools_layout_move_up">Перемістити вгору</string>
+    <string name="tools_layout_move_down">Перемістити вниз</string>
+    <string name="share_add_to_project">Додати до проєкту?</string>
+    <string name="share_or_add_to">Або додати до</string>
+    <plurals name="share_videos">
+        <item quantity="one">%1$d відео</item>
+        <item quantity="few">%1$d відео</item>
+        <item quantity="many">%1$d відео</item>
+        <item quantity="other">%1$d відео</item>
+    </plurals>
+    <plurals name="share_pictures">
+        <item quantity="one">%1$d зображення</item>
+        <item quantity="few">%1$d зображення</item>
+        <item quantity="many">%1$d зображень</item>
+        <item quantity="other">%1$d зображення</item>
+    </plurals>
+    <plurals name="share_sounds">
+        <item quantity="one">%1$d звук</item>
+        <item quantity="few">%1$d звуки</item>
+        <item quantity="many">%1$d звуків</item>
+        <item quantity="other">%1$d звуки</item>
+    </plurals>
+    <plurals name="share_files">
+        <item quantity="one">%1$d файл</item>
+        <item quantity="few">%1$d файли</item>
+        <item quantity="many">%1$d файлів</item>
+        <item quantity="other">%1$d файли</item>
+    </plurals>
+    <string name="media_drive_add_folder">Диск або папка</string>
+    <string name="media_drive_cannot_open">Не вдалося відкрити вибір папки</string>
 </resources>

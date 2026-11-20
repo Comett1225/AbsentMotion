@@ -1,6 +1,7 @@
 package app.absentmotion.ui.home
 
 import android.content.pm.PackageInstaller
+import app.absentmotion.R
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -20,6 +21,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.nio.file.Files
+import java.util.Locale
 
 class UpdateFlowTest {
     private val release = Release("4.1.4", HOME_PAGE, ApkAsset("AbsentMotion-4.1.4-foss.apk", "$HOME_PAGE/releases/download/v4.1.4/AbsentMotion-4.1.4-foss.apk", 1000, "a".repeat(64), null))
@@ -41,6 +43,21 @@ class UpdateFlowTest {
         assertEquals(downloading.copy(done = 0), run(UpdateEvent.Start(release), UpdateEvent.Progress(-5)))
         assertEquals(UpdateStep.Idle, run(UpdateEvent.Start(release), UpdateEvent.Cancel, UpdateEvent.Progress(500)))
         assertEquals(UpdateStep.Idle, run(UpdateEvent.Start(release), UpdateEvent.Cancel, UpdateEvent.Downloaded))
+    }
+
+    @Test fun theNotificationShowsMegabytesAndDeterminateProgress() {
+        assertEquals("0", updateMegabytes(0, Locale.US))
+        assertEquals("1.5", updateMegabytes(3L shl 19, Locale.US))
+        assertEquals("1,5", updateMegabytes(3L shl 19, Locale.FRANCE))
+        assertEquals(0, updatePercent(10, 0))
+        assertEquals(0, updatePercent(-10, 1000))
+        assertEquals(33, updatePercent(333, 1000))
+        assertEquals(100, updatePercent(1100, 1000))
+    }
+
+    @Test fun theBackgroundHintDependsOnNotifications() {
+        assertEquals(R.string.update_background_hint, updateDownloadHint(canNotify = true))
+        assertEquals(R.string.update_foreground_hint, updateDownloadHint(canNotify = false))
     }
 
     @Test fun failuresCanBeRetriedOrClosed() {
@@ -198,6 +215,13 @@ class UpdateFlowTest {
         assertEquals(UpdateStep.Permission(release, denied = false, downloaded = false), begin(stopped, release, mayInstall = false))
         assertEquals(downloading, begin(stopped, release, mayInstall = true))
         assertEquals(UpdateStep.Idle, reduce(stopped, UpdateEvent.Cancel))
+    }
+
+    @Test fun aRestoredFailureKeepsItsOriginalReason() {
+        val failure = UpdateFailure.Server(503)
+        val stopped = UpdateEvent.Stopped(release, failure)
+        assertEquals(UpdateStep.Failed(release, failure), run(stopped))
+        assertSame(downloading, reduce(downloading, stopped))
     }
 
     @Test fun aReconnectIsShownUntilBytesMoveAgain() {

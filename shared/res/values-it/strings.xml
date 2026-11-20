@@ -2671,4 +2671,40 @@
     <string name="desk_shortcut_change">Cambia scorciatoia</string>
     <string name="desk_shortcut_remove">Rimuovi scorciatoia</string>
     <string name="desk_shortcut_reset">Ripristina predefinita</string>
+    <string name="update_background_hint">Puoi uscire da AbsentMotion. Il download continua e una notifica ti avviserà quando l’aggiornamento sarà pronto da installare.</string>
+    <string name="update_foreground_hint">Tieni AbsentMotion aperta finché il download non è terminato.</string>
+    <string name="update_hide">Nascondi</string>
+    <string name="update_channel">Aggiornamenti</string>
+    <string name="update_notification_downloading">Download di AbsentMotion %1$s</string>
+    <string name="update_notification_ready">AbsentMotion %1$s è pronta da installare</string>
+    <string name="update_notification_install">Tocca per installare l’aggiornamento.</string>
+    <string name="tools_layout_more">Altre opzioni</string>
+    <string name="tools_layout_change">Cambia disposizione</string>
+    <string name="tools_layout_hint">Usa le frecce per cambiare l’ordine</string>
+    <string name="tools_layout_move_up">Sposta su</string>
+    <string name="tools_layout_move_down">Sposta giù</string>
+    <string name="share_add_to_project">Aggiungere a un progetto?</string>
+    <string name="share_or_add_to">Oppure aggiungilo a</string>
+    <plurals name="share_videos">
+        <item quantity="one">%1$d video</item>
+        <item quantity="many">%1$d video</item>
+        <item quantity="other">%1$d video</item>
+    </plurals>
+    <plurals name="share_pictures">
+        <item quantity="one">%1$d immagine</item>
+        <item quantity="many">%1$d immagini</item>
+        <item quantity="other">%1$d immagini</item>
+    </plurals>
+    <plurals name="share_sounds">
+        <item quantity="one">%1$d suono</item>
+        <item quantity="many">%1$d suoni</item>
+        <item quantity="other">%1$d suoni</item>
+    </plurals>
+    <plurals name="share_files">
+        <item quantity="one">%1$d file</item>
+        <item quantity="many">%1$d file</item>
+        <item quantity="other">%1$d file</item>
+    </plurals>
+    <string name="media_drive_add_folder">Unità o cartella</string>
+    <string name="media_drive_cannot_open">Impossibile aprire la scelta della cartella</string>
 </resources>
