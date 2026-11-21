@@ -7,6 +7,7 @@ Alles auf dem Tab **Community** wird von einer Person geprüft, bevor es online 
 - Projekte und Voreinstellungen, die du in AbsentMotion erstellt hast: Edits, Vorlagen, Intros, Textanimationen, Übergänge, Effektstapel.
 - Der Edit, das Projekt, die Voreinstellung oder die Kunst eines anderen, solange du ihn nennst: Schreib in die Beschreibung, wer es gemacht hat.
 - Bilder, Videos, Musik, Töne und Schriftarten, die du selbst gemacht hast oder die jemand gemacht hat, den du in der Beschreibung nennst.
+- Effekte, die du selbst geschrieben hast, oder Effekte, deren Lizenz das Teilen erlaubt: Schreib in die Beschreibung, woher sie stammen.
 
 ## Nicht erlaubt
 
@@ -17,6 +18,7 @@ Alles auf dem Tab **Community** wird von einer Person geprüft, bevor es online 
 - **Persönliche Daten:** echte Namen, Adressen, Telefonnummern, Schulen, Konten oder Gesichter von Privatpersonen, auch von dir selbst.
 - **Illegales oder Gefährliches:** Drogen, Waffen, Betrug, Glücksspiel, Hacking oder Schadsoftware.
 - **Fremde Arbeit als eigene ausgeben:** den Edit, das Projekt, die Voreinstellung, die Kunst oder die Musik eines anderen teilen, ohne zu sagen, wer sie gemacht hat, oder kostenpflichtige Assets erneut teilen.
+- **Effekte aus anderen Apps:** Effekte, die aus den Dateien einer anderen App genommen oder umgewandelt wurden.
 - **Sich als jemand anderes ausgeben:** den Namen eines anderen Creators oder den Namen oder das Logo einer Marke verwenden, als stamme das Element von ihnen.
 - **Spam:** Werbung, Links zu anderen Seiten, dasselbe Element noch einmal unter anderem Namen oder Elemente, die nichts tun.
 - **Irreführende Elemente:** ein Titel, Vorschaubild oder Tags, die nicht zeigen, was drin ist.
@@ -24,7 +26,7 @@ Alles auf dem Tab **Community** wird von einer Person geprüft, bevor es online 
 ## Gut zu wissen
 
 - Halte es für alle geeignet. Menschen jeden Alters nutzen AbsentMotion.
-- Projektpakete dürfen bis zu 20 MB groß sein und Voreinstellungen bis zu 1 MB.
+- Projektpakete dürfen bis zu 20 MB groß sein, Voreinstellungen bis zu 1 MB und Effekte bis zu 512 KB.
 - Elemente werden unter CC BY 4.0 geteilt: Jeder darf sie nutzen und ändern, solange er nennt, wer sie gemacht hat.
 - Der Name bei deinem Element ist der Creator-Name, den du eingibst. Gib darin nichts Persönliches an.
 - Der Betreiber entscheidet, was veröffentlicht wird, und kann ein Element jederzeit entfernen.

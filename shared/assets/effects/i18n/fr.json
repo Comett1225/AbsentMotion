@@ -500,15 +500,19 @@
    "description": "Un flou doux et uniforme. Avec Forme sur Carrée, le flou fait plutôt la moyenne d’un carré uniforme autour de chaque point.",
    "name": "Flou",
    "params": {
-    "strength": {
-     "label": "Intensité"
+    "iterations": {
+     "label": "Itérations"
     },
     "shape": {
      "label": "Forme",
      "options": [
       "Douce",
-      "Carrée"
+      "Carrée",
+      "Moyenne rapide"
      ]
+    },
+    "strength": {
+     "label": "Intensité"
     }
    }
   },
@@ -2507,6 +2511,9 @@
     "offset": {
      "label": "Décalage"
     },
+    "parallax": {
+     "label": "Parallaxe"
+    },
     "scale": {
      "label": "Échelle"
     },
@@ -2997,6 +3004,12 @@
     },
     "paper": {
      "label": "Couleur du papier"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "strength": {
+     "label": "Intensité"
     },
     "style": {
      "label": "Style",
@@ -4215,6 +4228,9 @@
     "inset": {
      "label": "Retrait/extension"
     },
+    "legacyCoordinates": {
+     "label": "Anciennes coordonnées"
+    },
     "offset": {
      "label": "Décalage"
     },
@@ -4919,6 +4935,9 @@
     },
     "stretch": {
      "label": "Étirement"
+    },
+    "threshold": {
+     "label": "Seuil"
     },
     "vignette": {
      "label": "Vignettage"
@@ -7419,6 +7438,9 @@
     },
     "start": {
      "label": "Début"
+    },
+    "stretch": {
+     "label": "Étirement"
     },
     "tint": {
      "label": "Teinte"

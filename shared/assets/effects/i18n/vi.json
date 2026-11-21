@@ -500,15 +500,19 @@
    "description": "Làm mờ mượt và đều. Khi Hình dạng là Hộp, hiệu ứng lấy trung bình một ô vuông đều quanh mỗi điểm.",
    "name": "Làm mờ",
    "params": {
-    "strength": {
-     "label": "Độ mạnh"
+    "iterations": {
+     "label": "Số vòng lặp"
     },
     "shape": {
      "label": "Hình dạng",
      "options": [
       "Mượt",
-      "Hộp"
+      "Hộp",
+      "Hộp nhanh"
      ]
+    },
+    "strength": {
+     "label": "Độ mạnh"
     }
    }
   },
@@ -2507,6 +2511,9 @@
     "offset": {
      "label": "Độ lệch"
     },
+    "parallax": {
+     "label": "Thị sai"
+    },
     "scale": {
      "label": "Tỷ lệ"
     },
@@ -2997,6 +3004,12 @@
     },
     "paper": {
      "label": "Màu giấy"
+    },
+    "phase": {
+     "label": "Pha"
+    },
+    "strength": {
+     "label": "Cường độ"
     },
     "style": {
      "label": "Kiểu",
@@ -4215,6 +4228,9 @@
     "inset": {
      "label": "Thu vào/phình ra"
     },
+    "legacyCoordinates": {
+     "label": "Tọa độ kiểu cũ"
+    },
     "offset": {
      "label": "Độ lệch"
     },
@@ -4919,6 +4935,9 @@
     },
     "stretch": {
      "label": "Kéo giãn"
+    },
+    "threshold": {
+     "label": "Ngưỡng"
     },
     "vignette": {
      "label": "Viền tối"
@@ -7419,6 +7438,9 @@
     },
     "start": {
      "label": "Bắt đầu"
+    },
+    "stretch": {
+     "label": "Kéo giãn"
     },
     "tint": {
      "label": "Nhuộm màu"

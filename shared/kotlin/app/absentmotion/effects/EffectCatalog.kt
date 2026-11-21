@@ -18,6 +18,9 @@ data class EffectCatalog(
     private val open: ((String) -> InputStream)? = null,
     val newest: Set<String> = emptySet(),
     val categoryNames: Map<String, String> = emptyMap(),
+    private val addedPictures: Map<String, java.io.File> = emptyMap(),
+    private val shownAddedEffects: Set<String> = emptySet(),
+    internal val shownAddedCreators: Set<String> = emptySet(),
 ) {
     fun find(id: String): EffectDefinition? = definitions.firstOrNull { it.id == id }
 
@@ -25,8 +28,39 @@ data class EffectCatalog(
 
     private val tiles: List<EffectDefinition> get() = definitions + definitions.flatMap { it.shortcutTiles() }
 
-    fun listed(category: String? = null): List<EffectDefinition> =
-        tiles.filter { category == null || it.category == category || category in it.alsoIn || (category == "new" && isNew(it)) }
+    fun listed(category: String? = null): List<EffectDefinition> = tiles.filter {
+        when {
+            category == null -> true
+            category == AddedEffectCategory -> it.isAdded
+            it.isAdded -> category == it.category && isShownInCategory(it)
+            else -> it.category == category || category in it.alsoIn || (category == "new" && isNew(it))
+        }
+    }
+
+    internal fun isShownInCategory(effect: EffectDefinition) = effect.category != null && effect.id in shownAddedEffects
+
+    internal fun placeAddedEffect(store: AddedEffectStore, id: String, show: Boolean): EffectCatalog {
+        if (show && find(id)?.let { it.isAdded && it.category in Categories } != true) return this
+        return savePlacement(store, if (show) shownAddedEffects + id else shownAddedEffects - id, shownAddedCreators)
+    }
+
+    internal fun placeAddedCreator(store: AddedEffectStore, slug: String, show: Boolean): EffectCatalog {
+        if (show && definitions.none { it.isAdded && it.addedCreator == slug }) return this
+        return savePlacement(store, shownAddedEffects, if (show) shownAddedCreators + slug else shownAddedCreators - slug)
+    }
+
+    internal fun clearAddedPlacement(store: AddedEffectStore, effect: EffectDefinition): EffectCatalog {
+        val creators = if (definitions.any { it.isAdded && it.addedCreator == effect.addedCreator }) {
+            shownAddedCreators
+        } else shownAddedCreators - effect.addedCreator
+        return savePlacement(store, shownAddedEffects - effect.id, creators)
+    }
+
+    private fun savePlacement(store: AddedEffectStore, effects: Set<String>, creators: Set<String>): EffectCatalog {
+        if (effects == shownAddedEffects && creators == shownAddedCreators) return this
+        store.savePlacement(effects, creators)
+        return copy(shownAddedEffects = effects, shownAddedCreators = creators)
+    }
 
     fun search(query: String): List<EffectDefinition> {
         val all = tiles
@@ -37,7 +71,21 @@ data class EffectCatalog(
     val categories: List<Pair<String, String>> get() =
         ((if (definitions.any(::isNew)) listOf("new" to "New") else emptyList()) + EffectCategories).map { (k, v) -> k to (categoryNames[k] ?: v) }
 
-    fun bytes(path: String?): ByteArray? = path?.let { p -> runCatching { open?.invoke(p)?.use { it.readBytes() } }.getOrNull() }
+    internal fun withAdded(store: AddedEffectStore): EffectCatalog {
+        val pictures = mutableMapOf<String, java.io.File>()
+        val added = store.definitions().map { effect ->
+            val file = store.picture(effect.key)
+            if (!file.isFile) effect else {
+                val path = "added/${effect.key}/${java.util.UUID.randomUUID()}.webp"
+                pictures[path] = file
+                effect.copy(addedPicture = path)
+            }
+        }
+        return copy(definitions = definitions.filterNot { it.isAdded } + added, addedPictures = pictures,
+            shownAddedEffects = store.shownEffects, shownAddedCreators = store.shownCreators)
+    }
+
+    fun bytes(path: String?): ByteArray? = path?.let { p -> runCatching { (addedPictures[p]?.inputStream() ?: open?.invoke(p))?.use { it.readBytes() } }.getOrNull() }
 
     fun drawable(path: String?): Drawable? = bytes(path)?.let { bytes ->
         runCatching {
@@ -54,7 +102,9 @@ data class EffectCatalog(
     fun withRuntimeStatusFrom(previous: EffectCatalog): EffectCatalog {
         if (message != null && previous.definitions.isNotEmpty()) return previous
         val status = previous.definitions.associate { it.id to it.status }
-        return copy(definitions = definitions.map { it.copy(status = status[it.id] ?: it.status) })
+        return copy(definitions = definitions.filterNot { it.isAdded }.map { it.copy(status = status[it.id] ?: it.status) } +
+            previous.definitions.filter { it.isAdded }, addedPictures = previous.addedPictures,
+            shownAddedEffects = previous.shownAddedEffects, shownAddedCreators = previous.shownAddedCreators)
     }
 
     companion object {
@@ -66,6 +116,7 @@ data class EffectCatalog(
             app.absentmotion.i18n.LanguagePacks.prepare(context, tag)
             return parse(tag) { app.absentmotion.i18n.LanguagePacks.open(context, tag, "effects/$it") }
                 .let { if (it.message != null) it.copy(message = context.getString(R.string.effects_not_loaded)) else it }
+                .withAdded(AddedEffectStore(context))
         }
 
         fun parse(language: String = "en", open: (String) -> InputStream): EffectCatalog = runCatching {

@@ -1,0 +1,9 @@
+Add effects other people made, and find effects in the Community tab.
+Import a project from a link, with a preview.
+Smarter Recommended effects. Drag tools in Change layout.
+A labeled Group button; Mask and Exclude are in Group options.
+Alight Motion import keeps more settings in older projects.
+Tap an effect color for the full picker.
+Preview audio stops right away when paused.
+Vignette keeps its shading on screen when you zoom in.
+The dark area beside Settings only closes it.

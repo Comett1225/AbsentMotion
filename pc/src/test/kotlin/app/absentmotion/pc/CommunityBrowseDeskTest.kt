@@ -63,8 +63,8 @@ class CommunityBrowseDeskTest {
                 onNodeWithContentDescription("Close").performClick()
                 onNode(hasSetTextAction()).assertTextContains("alice intro")
                 onNode(hasSetTextAction()).performTextReplacement("missing")
-                onAllNodesWithText("No items match").onLast().assertIsDisplayed()
-                onAllNodesWithText("Clear search and filters").onLast().performClick()
+                onAllNodesWithText("No items match")[1].assertIsDisplayed()
+                onAllNodesWithText("Clear search and filters")[1].performClick()
                 onNodeWithText("Pulse").assertExists()
             }
         } finally {

@@ -7,6 +7,7 @@ Everything on the **Community** tab is checked by a person before it goes up. It
 - Projects and presets you made in AbsentMotion: edits, templates, intros, text animations, transitions, effect stacks.
 - Someone else's edit, project, preset or art, as long as you credit them: write who made it in the description.
 - Pictures, videos, music, sounds and fonts, made by you or by someone you credit in the description.
+- Effects you wrote, or effects whose licence lets you share them: say where they came from in the description.
 
 ## Not allowed
 
@@ -17,6 +18,7 @@ Everything on the **Community** tab is checked by a person before it goes up. It
 - **Personal information:** real names, addresses, phone numbers, schools, accounts or faces of private people, including your own.
 - **Illegal or dangerous things:** drugs, weapons, scams, gambling, hacking or malware.
 - **Taking credit for someone else's work:** sharing their edit, project, preset, art or music without saying who made it, or re-sharing paid assets.
+- **Effects from other apps:** effects taken or converted from another app's files.
 - **Pretending to be someone else:** using another creator's name, or a brand's name or logo, as if the item came from them.
 - **Spam:** adverts, links to other sites, the same item again under another name, or items that do nothing.
 - **Misleading items:** a title, thumbnail or tags that don't show what is inside.
@@ -24,7 +26,7 @@ Everything on the **Community** tab is checked by a person before it goes up. It
 ## Good to know
 
 - Keep it suitable for everyone. People of all ages use AbsentMotion.
-- Project bundles can be up to 20 MB and presets up to 1 MB.
+- Project bundles can be up to 20 MB, presets up to 1 MB and effects up to 512 KB.
 - Items are shared under CC BY 4.0: anyone can use and change them as long as they credit who made them.
 - The name on your item is the creator name you type. Don't put anything personal in it.
 - The maintainer decides what goes up, and can take an item down at any time.

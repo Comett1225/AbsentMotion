@@ -500,15 +500,19 @@
    "description": "Blur yang halus dan merata. Dengan Bentuk Kotak, blur merata-ratakan area persegi yang seragam di sekitar setiap titik.",
    "name": "Blur",
    "params": {
-    "strength": {
-     "label": "Kekuatan"
+    "iterations": {
+     "label": "Iterasi"
     },
     "shape": {
      "label": "Bentuk",
      "options": [
       "Halus",
-      "Kotak"
+      "Kotak",
+      "Kotak cepat"
      ]
+    },
+    "strength": {
+     "label": "Kekuatan"
     }
    }
   },
@@ -2507,6 +2511,9 @@
     "offset": {
      "label": "Offset"
     },
+    "parallax": {
+     "label": "Paralaks"
+    },
     "scale": {
      "label": "Skala"
     },
@@ -2997,6 +3004,12 @@
     },
     "paper": {
      "label": "Warna kertas"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "strength": {
+     "label": "Kekuatan"
     },
     "style": {
      "label": "Gaya",
@@ -4215,6 +4228,9 @@
     "inset": {
      "label": "Inset/Outset"
     },
+    "legacyCoordinates": {
+     "label": "Koordinat Lama"
+    },
     "offset": {
      "label": "Offset"
     },
@@ -4919,6 +4935,9 @@
     },
     "stretch": {
      "label": "Regangan"
+    },
+    "threshold": {
+     "label": "Ambang"
     },
     "vignette": {
      "label": "Vignette"
@@ -7419,6 +7438,9 @@
     },
     "start": {
      "label": "Awal"
+    },
+    "stretch": {
+     "label": "Regangkan"
     },
     "tint": {
      "label": "Pewarnaan"

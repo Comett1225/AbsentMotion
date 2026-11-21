@@ -7,6 +7,7 @@ Mọi thứ trên tab **Cộng đồng** đều được một người kiểm t
 - Dự án và preset bạn đã tạo trong AbsentMotion: bản dựng, mẫu, đoạn mở đầu, hoạt ảnh văn bản, chuyển cảnh, bộ hiệu ứng.
 - Bản dựng, dự án, preset hoặc tranh ảnh của người khác, miễn là bạn ghi công họ: hãy ghi tên người tạo trong phần mô tả.
 - Hình ảnh, video, nhạc, âm thanh và phông chữ do bạn tạo, hoặc do người khác tạo và bạn ghi công trong phần mô tả.
+- Hiệu ứng do bạn tự viết, hoặc hiệu ứng có giấy phép cho phép chia sẻ: ghi rõ nguồn gốc trong phần mô tả.
 
 ## Không được phép
 
@@ -17,6 +18,7 @@ Mọi thứ trên tab **Cộng đồng** đều được một người kiểm t
 - **Thông tin cá nhân:** tên thật, địa chỉ, số điện thoại, trường học, tài khoản hoặc khuôn mặt của người bình thường, kể cả của chính bạn.
 - **Những thứ bất hợp pháp hoặc nguy hiểm:** ma túy, vũ khí, lừa đảo, cờ bạc, hack hoặc phần mềm độc hại.
 - **Nhận công của người khác:** chia sẻ bản dựng, dự án, preset, tranh ảnh hoặc nhạc của họ mà không nói ai là người tạo, hoặc chia sẻ lại tài nguyên trả phí.
+- **Hiệu ứng từ ứng dụng khác:** hiệu ứng lấy hoặc chuyển đổi từ tệp của một ứng dụng khác.
 - **Mạo danh người khác:** dùng tên của người sáng tạo khác, hoặc tên hay logo của một thương hiệu, như thể mục đó đến từ họ.
 - **Spam:** quảng cáo, liên kết tới các trang web khác, cùng một mục đăng lại dưới tên khác, hoặc các mục không có tác dụng gì.
 - **Mục gây hiểu lầm:** tiêu đề, hình thu nhỏ hoặc thẻ không cho thấy đúng nội dung bên trong.
@@ -24,7 +26,7 @@ Mọi thứ trên tab **Cộng đồng** đều được một người kiểm t
 ## Cần biết
 
 - Hãy giữ nội dung phù hợp với mọi người. Mọi lứa tuổi đều dùng AbsentMotion.
-- Gói dự án có thể nặng tới 20 MB và preset tới 1 MB.
+- Gói dự án có thể nặng tới 20 MB, preset tới 1 MB và hiệu ứng tới 512 KB.
 - Các mục được chia sẻ theo CC BY 4.0: ai cũng có thể dùng và chỉnh sửa miễn là ghi công người tạo ra chúng.
 - Tên trên mục của bạn là tên người sáng tạo mà bạn nhập. Đừng đưa bất cứ thông tin cá nhân nào vào đó.
 - Người bảo trì quyết định những gì được đăng và có thể gỡ một mục xuống bất cứ lúc nào.

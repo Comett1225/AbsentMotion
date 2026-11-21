@@ -75,6 +75,7 @@ internal class TrustedHttp(private val source: UpdateSource, private val connect
             if (source.https && connection !is HttpsURLConnection) throw UpdateProblem(UpdateFailure.Untrusted)
             current = connection
             try {
+                if (aborted) throw UpdateProblem(UpdateFailure.Connection)
                 connection.instanceFollowRedirects = false
                 connection.useCaches = false
                 connection.connectTimeout = connectMs

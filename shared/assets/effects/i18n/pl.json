@@ -500,15 +500,19 @@
    "description": "Gładkie, równomierne rozmycie. Przy ustawieniu Kształt: Prostokątny rozmycie zamiast tego równomiernie uśrednia kwadratowy obszar wokół każdego punktu.",
    "name": "Rozmycie",
    "params": {
-    "strength": {
-     "label": "Siła"
+    "iterations": {
+     "label": "Iteracje"
     },
     "shape": {
      "label": "Kształt",
      "options": [
       "Gładki",
-      "Prostokątny"
+      "Prostokątny",
+      "Szybki prostokątny"
      ]
+    },
+    "strength": {
+     "label": "Siła"
     }
    }
   },
@@ -2507,6 +2511,9 @@
     "offset": {
      "label": "Przesunięcie"
     },
+    "parallax": {
+     "label": "Paralaksa"
+    },
     "scale": {
      "label": "Skala"
     },
@@ -2997,6 +3004,12 @@
     },
     "paper": {
      "label": "Kolor papieru"
+    },
+    "phase": {
+     "label": "Faza"
+    },
+    "strength": {
+     "label": "Siła"
     },
     "style": {
      "label": "Styl",
@@ -4215,6 +4228,9 @@
     "inset": {
      "label": "Do wewnątrz/na zewnątrz"
     },
+    "legacyCoordinates": {
+     "label": "Starsze współrzędne"
+    },
     "offset": {
      "label": "Przesunięcie"
     },
@@ -4919,6 +4935,9 @@
     },
     "stretch": {
      "label": "Rozciągnięcie"
+    },
+    "threshold": {
+     "label": "Próg"
     },
     "vignette": {
      "label": "Winieta"
@@ -7419,6 +7438,9 @@
     },
     "start": {
      "label": "Początek"
+    },
+    "stretch": {
+     "label": "Rozciągnięcie"
     },
     "tint": {
      "label": "Odcień"

@@ -18,7 +18,7 @@ import kotlin.math.roundToInt
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-internal class Orientation(private val quat: XmlNode?, private val spin: XmlNode?, private val base: DoubleArray, private val inverse: Boolean = false) {
+internal class Orientation(private val quat: XmlNode?, private val spin: XmlNode?, private val base: DoubleArray, private val inverse: Boolean = false, private val sphere: Boolean = false) {
     private val quatKeys = quat?.takeIf { it.isKeyframed }?.keyframes
     private val spinKeys = spin?.takeIf { it.isKeyframed }?.keyframes
 
@@ -52,10 +52,15 @@ internal class Orientation(private val quat: XmlNode?, private val spin: XmlNode
         return Triple(a, b, ((t - a.t) / (b.t - a.t)).toDouble())
     }
 
-    private fun naive(t: Float): DoubleArray = spinAt(t).let { doubleArrayOf(-it[0], it[1], -it[2]) }
+    private fun naive(t: Float): DoubleArray = spinAt(t).let { if (sphere) doubleArrayOf(-it[0], -it[1], it[2]) else doubleArrayOf(-it[0], it[1], -it[2]) }
 
     private fun solutions(t: Float): List<DoubleArray> {
         val s = spinAt(t)
+        if (sphere) {
+            val camera = times(times(turnY(s[2]), turnX(-s[1])), turnZ(-s[0]))
+            val (x, y, z, w) = quatAt(t)
+            return decomposeSphere(times(matrix(doubleArrayOf(y, -z, x, w)), camera))
+        }
         val m = times(times(flip(matrix(quatAt(t))), flip(spinMatrix(s[0], s[1], s[2]))), oursMatrix(base[0], base[1], base[2]))
         return decompose(m)
     }
@@ -190,6 +195,16 @@ internal class Orientation(private val quat: XmlNode?, private val spin: XmlNode
                 val c = cos(b)
                 val (x, z) = if (abs(c) > 1e-6) atan2(m[7] / c, m[8] / c) to atan2(m[3] / c, m[0] / c) else 0.0 to atan2(-m[1], m[4])
                 doubleArrayOf(-x, -b, -z).map { it * 180 / PI }.toDoubleArray()
+            }
+        }
+
+        private fun decomposeSphere(m: DoubleArray): List<DoubleArray> {
+            val pitch = asin((-m[5]).coerceIn(-1.0, 1.0))
+            return listOf(pitch, PI - pitch).map { p ->
+                val c = cos(p)
+                val roll = if (abs(c) > 1e-6) atan2(m[3] / c, m[4] / c) else atan2(-m[1], m[0])
+                val yaw = if (abs(c) > 1e-6) atan2(m[2] / c, m[8] / c) else 0.0
+                doubleArrayOf(roll * 180 / PI, p * 180 / PI, yaw * 180 / PI)
             }
         }
 

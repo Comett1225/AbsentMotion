@@ -54,6 +54,7 @@ import app.absentmotion.R
 import app.absentmotion.compat.EffectMigration
 import app.absentmotion.compat.oldAlightImport
 import app.absentmotion.compat.withReimportTipShown
+import app.absentmotion.effects.readAddedEffectUri
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.ElementNav
 import app.absentmotion.editor.MultiSelect
@@ -84,6 +85,8 @@ import app.absentmotion.library.TemplateStore
 import app.absentmotion.model.Scene
 import app.absentmotion.model.ShapeCatalog
 import app.absentmotion.ui.editor.DeskTopBar
+import app.absentmotion.ui.editor.effects.AddedEffectDialogs
+import app.absentmotion.ui.editor.effects.AddedEffectImport
 import app.absentmotion.ui.editor.EditorScreen
 import app.absentmotion.ui.editor.LocalWide
 import app.absentmotion.ui.editor.MediaPicks
@@ -103,6 +106,7 @@ import app.absentmotion.ui.home.DeskSettings
 import app.absentmotion.ui.home.SettingsPage
 import app.absentmotion.ui.home.UpdateDialog
 import app.absentmotion.ui.home.OpeningOverlay
+import app.absentmotion.ui.home.ProjectLinkDialog
 import app.absentmotion.ui.home.Updates
 import app.absentmotion.ui.home.OpenFailedDialog
 import app.absentmotion.ui.home.TemplateEditor
@@ -110,6 +114,8 @@ import app.absentmotion.ui.home.VersionHistory
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.PressIndication
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.job
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.sync.Mutex
@@ -134,6 +140,7 @@ class DeskAppState {
     val templates = TemplateStore(context)
     val recovery = Recovery(File(context.filesDir, "recovery"))
     val engine by lazy { EngineThread(background = Am.PreviewBg.toArgb(), context = context) { false } }
+    internal val addedEffects = AddedEffectImport(context) { engine }
     var editor by mutableStateOf<EditorState?>(null)
     var exportingFromList by mutableStateOf<Scene?>(null)
     var imported by mutableStateOf<List<ImportReport>>(emptyList())
@@ -141,6 +148,7 @@ class DeskAppState {
     var opening by mutableStateOf(false)
     var openFailed by mutableStateOf<String?>(null)
     var importFailed by mutableStateOf<String?>(null)
+    var importLinkOpen by mutableStateOf(false)
     var historyFor by mutableStateOf<Triple<String, String, Boolean>?>(null)
     var projectsChanged by mutableIntStateOf(0)
     var recovered by mutableStateOf<RecoveryOffer?>(null)
@@ -260,6 +268,7 @@ class DeskAppState {
 
     suspend fun openNow(id: String): EditorState? {
         val scene = load(id) ?: return null
+        addedEffects.confirmMissing(scene, id)
         val saver = ProjectSaver(id, store, recovery, failed = { javax.swing.SwingUtilities.invokeLater { toast(R.string.home_save_project_failed) } })
         return EditorState(id, scene, store, engine, settings, saver).also { DeskLibrary.open(id, it.scene.media.map { m -> m.uri }); editor = it; offerFonts(it) }
     }
@@ -393,7 +402,9 @@ class DeskAppState {
         openNow(id)
     }
 
-    suspend fun importFiles(uris: List<Uri>): List<ImportReport> {
+    suspend fun importFiles(uris: List<Uri>, asProjects: Boolean = false): List<ImportReport> {
+        val projects = takeEffectFiles(uris)
+        if (projects.isEmpty()) return emptyList()
         val reports = ArrayList<ImportReport>()
         var presetsAdded = 0
         opening = true
@@ -401,12 +412,14 @@ class DeskAppState {
             withContext(Dispatchers.IO) {
                 val importer = Importer.forApp(context, store)
                 val presets = app.absentmotion.library.PresetStore(context)
-                for (uri in uris) try {
+                for (uri in projects) try {
                     val xfl = DeskOpen.xflZip(uri)
                     try {
-                        reports += importer.import { xfl?.inputStream() ?: context.contentResolver.openInputStream(uri) }.mapNotNull {
+                        val items = importer.import { xfl?.inputStream() ?: context.contentResolver.openInputStream(uri) }
+                        withContext(Dispatchers.Main) { addedEffects.confirmImported(items, store) }
+                        reports += items.map { it.copy(bundledEffects = emptyMap()) }.mapNotNull {
                             if (it.community?.preset == true && presets.adopt(store, it.id, templates::localize) != null) null.also { presetsAdded++ }
-                            else if (!it.template) it else templates.adopt(store, it.id, engine)?.let { id -> it.copy(id = id) } ?: it.copy(template = false)
+                            else if (!it.template) it else if (asProjects) it.copy(template = false) else templates.adopt(store, it.id, engine)?.let { id -> it.copy(id = id) } ?: it.copy(template = false)
                         }
                     } finally {
                         xfl?.delete()
@@ -423,6 +436,14 @@ class DeskAppState {
         }
         projectsChanged++
         return reports
+    }
+
+    internal suspend fun takeEffectFiles(uris: List<Uri>): List<Uri> {
+        val (effects, remaining) = withContext(Dispatchers.IO) {
+            uris.map { uri -> uri to readAddedEffectUri(context, uri) }.partition { it.second != null }
+        }
+        addedEffects.present(effects.mapNotNull { it.second })
+        return remaining.map { it.first }
     }
 
     suspend fun projectFromTemplate(scene: Scene) {
@@ -560,7 +581,14 @@ private fun DeskContent(app: DeskAppState, scale: Float) {
                     if (open.exportOpen) ExportScreen(open.project, open.exportFrame, app.engine, app.settings, fromProjectList = false, null) { open.exportOpen = false }
                 }
             }
-            if (app.opening) OpeningOverlay { app.job?.cancel() }
+            if (app.opening && !app.addedEffects.handlingProject) OpeningOverlay { app.job?.cancel() }
+            AddedEffectDialogs(app.addedEffects)
+            if (open == null && app.importLinkOpen) {
+                ProjectLinkDialog({ app.importLinkOpen = false }) { uri, alightShare ->
+                    app.job = currentCoroutineContext().job
+                    app.importFiles(listOf(uri), asProjects = alightShare)
+                }
+            }
             app.openFailed?.let { id -> OpenFailedDialog({ app.openFailed = null; app.historyFor = Triple(id, "", false) }, null) { app.openFailed = null } }
             app.importFailed?.let { reason -> DeskMessage(stringResource(R.string.home_import_failed, reason)) { app.importFailed = null } }
             if (open?.historyOpen == true) VersionHistory(app.store, open.projectId, open.project.title, app.engine, onRestore = { v -> scope.launch { app.restoreVersion(open.projectId, v) } }, editor = true) { open.historyOpen = false }
@@ -639,12 +667,19 @@ private class DeskDrop(private val app: DeskAppState, private val run: (suspend 
         if (dropped.isEmpty()) return false
         val files = app.takePalettes(dropped)
         if (files.isEmpty()) return true
-        DeskLibrary.remember(files)
-        val uris = files.map(Uri::fromFile)
-        if (app.editor == null) { run { if (files.all(DeskOpen::isProject)) app.importFiles(uris) else app.openFiles(files) }; return true }
-        val (projects, media) = files.partition(DeskOpen::isProject)
-        if (projects.isNotEmpty()) run { app.importFiles(projects.map(Uri::fromFile)) }
-        if (media.isNotEmpty()) app.queueMedia(media.map(Uri::fromFile))
+        run {
+            val remaining = app.takeEffectFiles(files.map(Uri::fromFile)).toSet()
+            val regular = files.filter { Uri.fromFile(it) in remaining }
+            if (regular.isEmpty()) return@run
+            DeskLibrary.remember(regular)
+            if (app.editor == null) {
+                if (regular.all(DeskOpen::isProject)) app.importFiles(regular.map(Uri::fromFile)) else app.openFiles(regular)
+            } else {
+                val (projects, media) = regular.partition(DeskOpen::isProject)
+                if (projects.isNotEmpty()) app.importFiles(projects.map(Uri::fromFile))
+                if (media.isNotEmpty()) app.queueMedia(media.map(Uri::fromFile))
+            }
+        }
         return true
     }
 }

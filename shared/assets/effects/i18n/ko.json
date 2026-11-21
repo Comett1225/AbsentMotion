@@ -500,15 +500,19 @@
    "description": "부드럽고 균일한 블러를 적용합니다. 도형을 상자로 하면 대신 각 점 주변의 정사각형 영역을 균일하게 평균합니다.",
    "name": "블러",
    "params": {
-    "strength": {
-     "label": "강도"
+    "iterations": {
+     "label": "반복 횟수"
     },
     "shape": {
      "label": "도형",
      "options": [
       "부드럽게",
-      "상자"
+      "상자",
+      "고속 상자"
      ]
+    },
+    "strength": {
+     "label": "강도"
     }
    }
   },
@@ -2507,6 +2511,9 @@
     "offset": {
      "label": "오프셋"
     },
+    "parallax": {
+     "label": "시차"
+    },
     "scale": {
      "label": "크기"
     },
@@ -2997,6 +3004,12 @@
     },
     "paper": {
      "label": "종이 색상"
+    },
+    "phase": {
+     "label": "위상"
+    },
+    "strength": {
+     "label": "강도"
     },
     "style": {
      "label": "스타일",
@@ -4215,6 +4228,9 @@
     "inset": {
      "label": "안쪽/바깥쪽"
     },
+    "legacyCoordinates": {
+     "label": "이전 좌표"
+    },
     "offset": {
      "label": "오프셋"
     },
@@ -4919,6 +4935,9 @@
     },
     "stretch": {
      "label": "늘이기"
+    },
+    "threshold": {
+     "label": "기준값"
     },
     "vignette": {
      "label": "비네트"
@@ -7419,6 +7438,9 @@
     },
     "start": {
      "label": "시작"
+    },
+    "stretch": {
+     "label": "늘이기"
     },
     "tint": {
      "label": "색조"

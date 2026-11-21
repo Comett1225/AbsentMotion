@@ -20,6 +20,8 @@ import app.absentmotion.model.Layer
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.addEffect
+import app.absentmotion.model.effectProperty
+import app.absentmotion.model.effects
 import app.absentmotion.model.removeEffect
 import app.absentmotion.model.withEffect
 import app.absentmotion.model.withEffectProperty
@@ -213,6 +215,45 @@ class HistoryNoteTest {
         settle()
         assertNull(editor.selectedId)
         assertEquals(EditorPanel.Tools, editor.panel)
+    }
+
+    @Test fun effectColorsOpenTheFullPickerAndCanSampleThePreview() = session("effect-color") { editor ->
+        val glow = editor.engine.effects.value.find("absent.softglow")!!.instance()
+        runOnIdle {
+            editor.edit { it.update(1) { layer -> layer.addEffect(glow) } }
+            editor.selectedId = 1
+            editor.effectIndex = 0
+            editor.panel = EditorPanel.Effects
+        }
+        settle()
+        val picker = onNodeWithContentDescription(Strings.get(R.string.a11y_full_color_picker))
+        picker.performScrollTo().performMouseInput { click() }
+        settle()
+        onNodeWithContentDescription(Strings.get(R.string.a11y_color_wheel)).assertIsDisplayed()
+        runOnIdle {
+            editor.fullColor!!.apply(0x80147258.toInt(), false)
+            assertEquals("#80147258", editor.selected!!.effects.single().effectProperty("color")!!["value"]!!.lowercase())
+            editor.fullColor = null
+        }
+        settle()
+        onNodeWithContentDescription(Strings.get(R.string.palettes)).performClick()
+        settle()
+        onNodeWithText(Strings.get(R.string.a11y_eyedropper)).performClick()
+        settle()
+        runOnIdle {
+            editor.eyedropper!!(0xff236789.toInt())
+            assertEquals("#80236789", editor.selected!!.effects.single().effectProperty("color")!!["value"]!!.lowercase())
+            editor.panel = EditorPanel.ColorFill
+        }
+        settle()
+        picker.performMouseInput { click() }
+        settle()
+        onNodeWithContentDescription(Strings.get(R.string.a11y_color_wheel)).assertIsDisplayed()
+        runOnIdle {
+            editor.fullColor!!.apply(0xff137ac4.toInt(), false)
+            assertEquals(0xff137ac4.toInt(), editor.selected!!.fillColor)
+            editor.fullColor = null
+        }
     }
 
     @Test fun tappingGoesToMoveAndTransformAndIntoAGroup() = session("note-transform") { editor ->

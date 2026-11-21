@@ -500,15 +500,19 @@
    "description": "平滑均匀的模糊。形状设为“方框”时，改为对每个点周围的正方形区域取平均值。",
    "name": "模糊",
    "params": {
-    "strength": {
-     "label": "强度"
+    "iterations": {
+     "label": "迭代次数"
     },
     "shape": {
      "label": "形状",
      "options": [
       "平滑",
-      "方框"
+      "方框",
+      "快速方框"
      ]
+    },
+    "strength": {
+     "label": "强度"
     }
    }
   },
@@ -2507,6 +2511,9 @@
     "offset": {
      "label": "偏移"
     },
+    "parallax": {
+     "label": "视差"
+    },
     "scale": {
      "label": "缩放"
     },
@@ -2997,6 +3004,12 @@
     },
     "paper": {
      "label": "纸张颜色"
+    },
+    "phase": {
+     "label": "相位"
+    },
+    "strength": {
+     "label": "强度"
     },
     "style": {
      "label": "样式",
@@ -4215,6 +4228,9 @@
     "inset": {
      "label": "向内／向外偏移"
     },
+    "legacyCoordinates": {
+     "label": "旧版坐标"
+    },
     "offset": {
      "label": "偏移"
     },
@@ -4919,6 +4935,9 @@
     },
     "stretch": {
      "label": "拉伸"
+    },
+    "threshold": {
+     "label": "阈值"
     },
     "vignette": {
      "label": "暗角"
@@ -7419,6 +7438,9 @@
     },
     "start": {
      "label": "开始"
+    },
+    "stretch": {
+     "label": "拉伸"
     },
     "tint": {
      "label": "着色"

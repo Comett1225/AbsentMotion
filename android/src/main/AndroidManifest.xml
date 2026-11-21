@@ -24,6 +24,7 @@
 
     <queries>
         <intent><action android:name="android.intent.action.TTS_SERVICE" /></intent>
+        <package android:name="com.alightcreative.motion" />
     </queries>
 
     <application
@@ -47,6 +48,30 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:host="alight.link" />
+                <data android:host="alight.page.link" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:host="alightcreative.com" />
+                <data android:host="www.alightcreative.com" />
+                <data android:pathPrefix="/am/share/u/" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
         </activity>
 
         <activity
@@ -63,6 +88,8 @@
                 <data android:mimeType="text/xml" />
                 <data android:mimeType="application/xml" />
                 <data android:mimeType="application/zip" />
+                <data android:mimeType="application/json" />
+                <data android:mimeType="application/x-abmfx" />
                 <data android:mimeType="application/octet-stream" />
             </intent-filter>
             <intent-filter>
@@ -84,6 +111,8 @@
                 <data android:mimeType="text/xml" />
                 <data android:mimeType="application/xml" />
                 <data android:mimeType="application/zip" />
+                <data android:mimeType="application/json" />
+                <data android:mimeType="application/x-abmfx" />
                 <data android:mimeType="application/octet-stream" />
             </intent-filter>
             <intent-filter>
@@ -102,6 +131,22 @@
                 <data android:pathPattern=".*\\..*\\.fla" />
                 <data android:pathPattern=".*\\.xml" />
                 <data android:pathPattern=".*\\..*\\.xml" />
+                <data android:pathPattern=".*\\.abmfx" />
+                <data android:pathPattern=".*\\..*\\.abmfx" />
+                <data android:pathPattern=".*\\.json" />
+                <data android:pathPattern=".*\\..*\\.json" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+                <data android:host="*" />
+                <data android:pathPattern=".*\\.abmfx" />
+                <data android:pathPattern=".*\\..*\\.abmfx" />
+                <data android:pathPattern=".*\\.json" />
+                <data android:pathPattern=".*\\..*\\.json" />
             </intent-filter>
         </activity>
 

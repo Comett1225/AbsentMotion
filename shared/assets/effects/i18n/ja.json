@@ -500,15 +500,19 @@
    "description": "滑らかで均一なぼかしです。形状を「ボックス」にすると、各点の周りの正方形の範囲を均等に平均します。",
    "name": "ぼかし",
    "params": {
-    "strength": {
-     "label": "強さ"
+    "iterations": {
+     "label": "反復回数"
     },
     "shape": {
      "label": "形状",
      "options": [
       "スムーズ",
-      "ボックス"
+      "ボックス",
+      "高速ボックス"
      ]
+    },
+    "strength": {
+     "label": "強さ"
     }
    }
   },
@@ -2507,6 +2511,9 @@
     "offset": {
      "label": "オフセット"
     },
+    "parallax": {
+     "label": "視差"
+    },
     "scale": {
      "label": "スケール"
     },
@@ -2997,6 +3004,12 @@
     },
     "paper": {
      "label": "用紙の色"
+    },
+    "phase": {
+     "label": "フェーズ"
+    },
+    "strength": {
+     "label": "強さ"
     },
     "style": {
      "label": "スタイル",
@@ -4215,6 +4228,9 @@
     "inset": {
      "label": "インセット/アウトセット"
     },
+    "legacyCoordinates": {
+     "label": "従来の座標"
+    },
     "offset": {
      "label": "オフセット"
     },
@@ -4919,6 +4935,9 @@
     },
     "stretch": {
      "label": "伸縮"
+    },
+    "threshold": {
+     "label": "しきい値"
     },
     "vignette": {
      "label": "ビネット"
@@ -7419,6 +7438,9 @@
     },
     "start": {
      "label": "開始"
+    },
+    "stretch": {
+     "label": "ストレッチ"
     },
     "tint": {
      "label": "色合い"

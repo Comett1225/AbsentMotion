@@ -500,15 +500,19 @@
    "description": "Eine weiche, gleichmäßige Unschärfe. Mit „Form: Rechteck“ wird stattdessen ein gleichmäßiges Quadrat um jeden Punkt gemittelt.",
    "name": "Unschärfe",
    "params": {
-    "strength": {
-     "label": "Stärke"
+    "iterations": {
+     "label": "Durchläufe"
     },
     "shape": {
      "label": "Form",
      "options": [
       "Weich",
-      "Rechteck"
+      "Rechteck",
+      "Schneller Boxfilter"
      ]
+    },
+    "strength": {
+     "label": "Stärke"
     }
    }
   },
@@ -2507,6 +2511,9 @@
     "offset": {
      "label": "Versatz"
     },
+    "parallax": {
+     "label": "Parallaxe"
+    },
     "scale": {
      "label": "Skalierung"
     },
@@ -2997,6 +3004,12 @@
     },
     "paper": {
      "label": "Papierfarbe"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "strength": {
+     "label": "Stärke"
     },
     "style": {
      "label": "Stil",
@@ -4215,6 +4228,9 @@
     "inset": {
      "label": "Nach innen/außen"
     },
+    "legacyCoordinates": {
+     "label": "Alte Koordinaten"
+    },
     "offset": {
      "label": "Versatz"
     },
@@ -4919,6 +4935,9 @@
     },
     "stretch": {
      "label": "Streckung"
+    },
+    "threshold": {
+     "label": "Schwellenwert"
     },
     "vignette": {
      "label": "Vignette"
@@ -7419,6 +7438,9 @@
     },
     "start": {
      "label": "Start"
+    },
+    "stretch": {
+     "label": "Streckung"
     },
     "tint": {
      "label": "Tönung"

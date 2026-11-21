@@ -65,6 +65,59 @@ class DefaultsMigrationTest {
         assertEquals(5.4f, fx("halftonedots", "amount" to "200").number("cell"), 1e-3f)
     }
 
+    @Test fun legacyProjectControlsSurviveAlightConversion() {
+        for (id in listOf("ridges", "ridges2")) {
+            assertEquals(listOf(40f, -25f), fx(id, "parr" to "40,-25").numbers("parallax"))
+        }
+        val halftone = fx("halftonedots", "strength" to "0.625", "phase" to "250.375")
+        assertEquals(0.625f, halftone.number("strength"), 1e-5f)
+        assertEquals(250.375f, halftone.number("phase"), 1e-5f)
+        assertEquals(0.85f, fx("pinchbulgeinside", "radius" to "0.85").number("radius"), 1e-5f)
+        for (id in listOf("pixelate", "pixelate2")) {
+            assertEquals(0.25f, fx(id, "threshold" to "0.25").number("threshold"), 1e-5f)
+        }
+        val solid = result("com.alightcreative.solidcolor", "alphab" to "0", "bright" to "0", "alpha" to "0.75")
+        assertTrue(solid.dropped.isEmpty())
+        assertEquals(0.75f, migrate("com.alightcreative.solidcolor", "alpha" to "0.75").number("amount"), 1e-5f)
+        assertEquals(0.3f, fx("texttransform", "stretch" to "0.3").number("stretch"), 1e-5f)
+    }
+
+    @Test fun legacyCollabMotionControlsKeepTheirScaleAndPlacement() {
+        val oscillate = fx("oscillate", "angle" to "0", "freq" to "2", "mag" to "244.51")
+        assertEquals("absent.oscillate", oscillate["id"])
+        assertEquals(90f, oscillate.number("angle"), 1e-5f)
+        assertEquals(1f, oscillate.number("frequency"), 1e-5f)
+        assertEquals(244.51f, oscillate.number("magnitude"), 1e-4f)
+        val newer = fx("oscillate3", "angle" to "0", "freq" to "2")
+        assertEquals(0f, newer.number("angle"), 1e-5f)
+        assertEquals(2f, newer.number("frequency"), 1e-5f)
+        val move = migrate("com.alightcreative.effect.movealongpath2", "progress" to "0.12", "angle" to "-180",
+            "tangent" to "true", "inset" to "-500", "offset" to "17,0")
+        assertEquals("absent.movealongpath", move["id"])
+        assertEquals(0.12f, move.number("progress"), 1e-5f)
+        assertEquals(-500f, move.number("inset"), 1e-5f)
+        assertEquals(listOf(17f, 0f), move.numbers("offset"))
+        assertEquals("true", move.value("legacyCoordinates"))
+        val modernMove = migrate("com.alightcreative.effect.movealongpath3", "progress" to "0.12")
+        assertNull(modernMove.value("legacyCoordinates"))
+    }
+
+    @Test fun collabSphereAxesBlurPassesAndDisabledLightingAreRecognized() {
+        val roll = fx("360-reorient-sphere", "orient" to "0.382683432,0,0,0.923879533")
+        val pitch = fx("360-reorient-sphere", "orient" to "0,0.382683432,0,0.923879533")
+        val yaw = fx("360-reorient-sphere", "orient" to "0,0,0.382683432,0.923879533")
+        assertEquals(45f, roll.number("roll"), 1e-4f)
+        assertEquals(45f, pitch.number("pitch"), 1e-4f)
+        assertEquals(-45f, yaw.number("yaw"), 1e-4f)
+        val blur = fx("fastboxblur", "strength" to "0.15", "iter" to "5")
+        assertEquals(48f, blur.number("strength"), 1e-5f)
+        assertEquals(5f, blur.number("iterations"), 1e-5f)
+        assertEquals(2f, blur.number("shape"), 1e-5f)
+        val fields = arrayOf("lightIntensity" to "0.3", "lightColor" to "#ffdd4455", "lightDepth" to "0.3")
+        assertTrue(result("com.alightcreative.effects.flip2", *fields, "enableLight" to "false").dropped.isEmpty())
+        assertEquals(3, result("com.alightcreative.effects.flip2", *fields, "enableLight" to "true").dropped.size)
+    }
+
     @Test fun gradientMapRunsFromItsFirstColorToItsSecond() {
         val d = migrate("com.alightcreative.gradientmap")
         assertEquals("absent.gradientmap", d["id"])

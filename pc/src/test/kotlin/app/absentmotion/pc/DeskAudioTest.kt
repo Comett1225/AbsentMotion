@@ -6,6 +6,7 @@ import android.media.MediaFormat
 import android.media.MediaPlayer
 import android.net.Uri
 import app.absentmotion.audio.AudioEngine
+import app.absentmotion.audio.DeskClock
 import app.absentmotion.audio.DeskOutput
 import app.absentmotion.audio.PcmDecoder
 import app.absentmotion.audio.Waveforms
@@ -19,6 +20,8 @@ import org.junit.Test
 import java.io.File
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 import kotlin.math.log10
 import kotlin.math.sqrt
@@ -315,5 +318,41 @@ class DeskAudioTest {
         } finally {
             DeskOutput.capture = null
         }
+    }
+
+    @Test fun pausingDuringOutputStartupDropsTheRemainingBlocks() {
+        val entered = CountDownLatch(1)
+        val resume = CountDownLatch(1)
+        val extra = CountDownLatch(1)
+        DeskOutput.capture = { _, _ ->
+            if (entered.count > 0) {
+                entered.countDown()
+                check(resume.await(3, TimeUnit.SECONDS))
+            } else extra.countDown()
+        }
+        val engine = AudioEngine(context)
+        try {
+            engine.setScene(Scene.parse("""<scene width="16" height="16" fps="30" totalTime="3000">
+                <audio id="1" src="${Uri.fromFile(a)}" startTime="0" endTime="3000"/>
+                </scene>"""))
+            assertTrue(engine.play(0.0))
+            assertTrue(entered.await(5, TimeUnit.SECONDS))
+            engine.stop()
+            resume.countDown()
+            assertTrue("the halted mixer submitted another block", !extra.await(300, TimeUnit.MILLISECONDS))
+        } finally {
+            resume.countDown()
+            DeskOutput.capture = null
+            engine.close()
+        }
+    }
+
+    @Test fun desktopPlaybackClockHoldsWhenTheWriterStalls() {
+        val clock = DeskClock(1000.0, 48_000)
+        clock.latencyNs = 0
+        clock.wallStart = 1
+        clock.submittedFrames = 4800
+        for (i in 1L..6L) clock.observe(i * 480, i * 10_000_000)
+        assertEquals(1100.0, clock.positionMs(3_000_000_000L)!!, 1e-6)
     }
 }

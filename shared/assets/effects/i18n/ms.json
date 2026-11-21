@@ -500,15 +500,19 @@
    "description": "Kabur yang licin dan sekata. Bentuk Kotak pula mengambil purata segi empat sama yang sekata di sekeliling setiap titik.",
    "name": "Kabur",
    "params": {
-    "strength": {
-     "label": "Kekuatan"
+    "iterations": {
+     "label": "Lelaran"
     },
     "shape": {
      "label": "Bentuk",
      "options": [
       "Licin",
-      "Kotak"
+      "Kotak",
+      "Kotak pantas"
      ]
+    },
+    "strength": {
+     "label": "Kekuatan"
     }
    }
   },
@@ -2507,6 +2511,9 @@
     "offset": {
      "label": "Ofset"
     },
+    "parallax": {
+     "label": "Paralaks"
+    },
     "scale": {
      "label": "Skala"
     },
@@ -2997,6 +3004,12 @@
     },
     "paper": {
      "label": "Warna kertas"
+    },
+    "phase": {
+     "label": "Fasa"
+    },
+    "strength": {
+     "label": "Kekuatan"
     },
     "style": {
      "label": "Gaya",
@@ -4215,6 +4228,9 @@
     "inset": {
      "label": "Dalam/Luar"
     },
+    "legacyCoordinates": {
+     "label": "Koordinat Lama"
+    },
     "offset": {
      "label": "Ofset"
     },
@@ -4919,6 +4935,9 @@
     },
     "stretch": {
      "label": "Regangan"
+    },
+    "threshold": {
+     "label": "Ambang"
     },
     "vignette": {
      "label": "Vignet"
@@ -7419,6 +7438,9 @@
     },
     "start": {
      "label": "Mula"
+    },
+    "stretch": {
+     "label": "Regang"
     },
     "tint": {
      "label": "Warna"

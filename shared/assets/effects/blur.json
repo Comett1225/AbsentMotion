@@ -21,8 +21,23 @@
    "default": 0,
    "options": [
     "Smooth",
-    "Box"
+    "Box",
+    "Fast Box"
    ]
+  },
+  {
+   "id": "iterations",
+   "label": "Iterations",
+   "type": "float",
+   "default": 3,
+   "min": 1,
+   "max": 20,
+   "step": 1,
+   "when": {
+    "shape": [
+     2
+    ]
+   }
   }
  ]
 }

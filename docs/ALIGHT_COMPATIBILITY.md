@@ -10,8 +10,8 @@ Export the project from Alight Motion as XML and open it in AbsentMotion. After 
 
 - **67** Alight effects look the same and **31** are very close.
 - **78** are converted to a similar effect that does not look identical.
-- **74** are converted but have not been compared side by side yet.
-- **29** are not converted yet (mostly very old effect versions, VR and some 3D solids).
+- **76** are converted but have not been compared side by side yet.
+- **28** are not converted yet (mostly very old effect versions, VR and some 3D solids).
 - **Blending modes:** all of Alight's blending modes come across. Multiply and Subtract get their opacity converted so they look the same.
 
 Something imports wrong? [Send the project as an Import problem](https://github.com/Comett1225/AbsentMotion/issues/new?template=import_problem.yml): the XML and a screenshot of the same moment in Alight Motion. That is the fastest way to get it fixed.
@@ -220,6 +220,7 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Echo Keyframes | Echo Keyframes | Converted, not compared yet |
 | effect.glass | Glass | Converted, not compared yet |
 | effect.glass2 | Glass | Converted, not compared yet |
+| effect.movealongpath2 | Move Along Path | Converted, not compared yet |
 | effect.movealongpath3 | Move Along Path | Converted, not compared yet |
 | Ellipsoid | Ellipsoid | Converted, not compared yet |
 | energybeam | Energy Beam | Converted, not compared yet |
@@ -247,6 +248,7 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Linear Repeat | Linear Repeat | Converted, not compared yet |
 | mattefringe | Matte Fringe | Converted, not compared yet |
 | Octahedron | Octahedron | Converted, not compared yet |
+| oscillate | Oscillate | Converted, not compared yet |
 | Page Curl | Page Curl | Converted, not compared yet |
 | Pyramid | Pyramid | Converted, not compared yet |
 | Radial Repeat | Radial Repeat | Converted, not compared yet |
@@ -285,7 +287,6 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | glass2 | - | Not converted yet |
 | gradientdisplace | - | Not converted yet |
 | Move Along Path | - | Not converted yet |
-| oscillate | - | Not converted yet |
 | outline | - | Not converted yet |
 | outlinebad | - | Not converted yet |
 | outlinebasic | - | Not converted yet |

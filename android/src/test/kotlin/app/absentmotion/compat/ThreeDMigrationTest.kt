@@ -3,6 +3,7 @@ package app.absentmotion.compat
 import app.absentmotion.effects.EffectCatalog
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
+import app.absentmotion.model.keyframes
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -130,6 +131,13 @@ class ThreeDMigrationTest {
         assertEquals(listOf(30f, -20f, -10f), listOf("yaw", "pitch", "roll").map { r.floats(it)[0] })
         val v = migrate("""<effect id="com.alightcreative.effects.vrplayer"><property name="rotate" type="vec3" value="-10.000000,0.000000,5.000000" /></effect>""")
         assertEquals(listOf(95f, 0f, 10f), listOf("yaw", "pitch", "roll").map { v.floats(it)[0] })
+    }
+
+    @Test fun animatedSphereTurnsTheSameWayAsAlight() {
+        val r = migrate("""<effect id="com.alightcreative.effects.360-reorient-sphere"><property name="rotate" type="vec3"><kf t="0" v="0,0,0" /><kf t="1" v="0,40,170" /></property></effect>""")
+        fun keys(name: String) = r.children.single { it["name"] == name }.keyframes.map { it.v.toFloat() }
+        assertEquals(listOf(0f, 170f), keys("yaw").let { listOf(it.first(), it.last()) })
+        assertEquals(listOf(0f, -40f), keys("pitch").let { listOf(it.first(), it.last()) })
     }
 
     @Test fun tunnelKeepsPhaseTwirlAndFog() {

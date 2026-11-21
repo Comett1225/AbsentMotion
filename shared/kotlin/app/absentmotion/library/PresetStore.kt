@@ -103,6 +103,20 @@ fun addPresetBundle(context: Context, file: File): String {
     return PresetStore(context).addBundle(projects, Importer.forApp(context, projects), TemplateStore(context)::localize) { file.inputStream() }
 }
 
+internal suspend fun addPresetBundle(context: Context, file: File, review: suspend (List<ImportReport>, ProjectStore) -> Unit): String {
+    val projects = ProjectStore(context)
+    val reports = withContext(Dispatchers.IO) { Importer.forApp(context, projects).import { file.inputStream() } }
+    try {
+        val report = reports.singleOrNull() ?: throw IOException("Cannot add the preset")
+        review(reports, projects)
+        return withContext(Dispatchers.IO) { PresetStore(context).adopt(projects, report.id, TemplateStore(context)::localize) }
+            ?: throw IOException("Cannot add the preset")
+    } catch (failure: Exception) {
+        withContext(kotlinx.coroutines.NonCancellable + Dispatchers.IO) { reports.forEach { projects.delete(it.id) } }
+        throw failure
+    }
+}
+
 class PresetStore(private val dir: File) {
     constructor(context: Context) : this(File(context.filesDir, "presets"))
 

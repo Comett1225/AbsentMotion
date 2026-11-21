@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -28,12 +29,16 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.editor.EditorState
+import app.absentmotion.editor.FullColor
 import app.absentmotion.editor.KeypadField
 import app.absentmotion.editor.KeypadRequest
 import app.absentmotion.effects.EffectDefinition
@@ -48,6 +53,7 @@ import app.absentmotion.ui.editor.DropOrRise
 import app.absentmotion.ui.editor.MenuPopup
 import app.absentmotion.ui.editor.MenuRow
 import app.absentmotion.ui.editor.MotionSheet
+import app.absentmotion.ui.editor.PanelIcons
 import app.absentmotion.ui.editor.Tile
 import app.absentmotion.ui.editor.TileGrid
 import androidx.compose.ui.graphics.ImageBitmap
@@ -70,7 +76,8 @@ import kotlinx.coroutines.withContext
 @Composable
 internal fun EffectSettings(state: EditorState, layer: Layer, instance: XmlNode, definition: EffectDefinition,
                             active: EffectParam?, select: (EffectParam) -> Unit) {
-    val displayed = app.absentmotion.ui.editor.linkedNumbers(state, layer, definition.params.map { PropRef.effect(state.effectIndex, it.id) })
+    val index = state.effectIndex
+    val displayed = app.absentmotion.ui.editor.linkedNumbers(state, layer, definition.params.map { PropRef.effect(index, it.id) })
     val enabled = definition.available
     val turn = effectTurn(definition, state.effectIndex)
     if (turn != null && enabled) TurnHook(state, turn)
@@ -85,11 +92,12 @@ internal fun EffectSettings(state: EditorState, layer: Layer, instance: XmlNode,
     val mix = definition.key in PieceEffects && (definition.key != "particles" || instance.effectProperty("depth")?.valueAt(layer.t) == "true")
     if (mix && !deskLayout) MixPiecesRow(state, layer, enabled)
     definition.params.filter { definition.shown(it, instance, layer.t) }.forEach { param ->
-        val raw = displayed[PropRef.effect(state.effectIndex, param.id)]?.take(param.default.split(',').size)?.joinToString(",") ?: instance.effectProperty(param.id)?.valueAt(layer.t) ?: param.missingDefault
+        val raw = displayed[PropRef.effect(index, param.id)]?.take(param.default.split(',').size)?.joinToString(",") ?: instance.effectProperty(param.id)?.valueAt(layer.t) ?: param.missingDefault
         fun set(text: String, gesture: Boolean = false) {
+            if (state.selectedId != layer.id || state.effectIndex != index || state.selected?.effects?.getOrNull(index)?.get("id") != instance["id"]) return
             select(param)
-            state.editSelected(if (gesture) "effect-${state.effectIndex}-${param.id}" else null) { current ->
-                current.withEffect(state.effectIndex) { it.withEffectProperty(param.id, param.type, text, current.t, current.snap) }
+            state.editSelected(if (gesture) "effect-$index-${param.id}" else null) { current ->
+                current.withEffect(index) { it.withEffectProperty(param.id, param.type, text, current.t, current.snap) }
             }
         }
         when (param.kind) {
@@ -97,7 +105,7 @@ internal fun EffectSettings(state: EditorState, layer: Layer, instance: XmlNode,
                 Text(param.label, Modifier.weight(1f), color = Am.OnDark, fontSize = 14.sp)
                 PanelSwitch(raw == "true") { if (enabled) set(it.toString()) }
             }
-            "color" -> EffectColor(state, param, raw, enabled, active == param, { select(param) }, { set(it) })
+            "color" -> key(layer.id, index, param.id) { EffectColor(state, param, raw, enabled, active == param, { select(param) }, ::set) }
             "choice" -> if (definition.key == "textblips" && param.id == "voice") BlipVoice(state, param, raw, instance["src"] != null, enabled) { set(it) }
                 else EffectChoice(param, raw, enabled, definition.key) { set(it) }
             "text" -> if (param.palette) EffectPalette(param, raw, enabled, "${layer.id}:${state.effectIndex}") { set(it) } else EffectText(param, raw, enabled, state::endGesture) { set(it, true) }
@@ -387,21 +395,38 @@ internal fun pictureColors(bytes: ByteArray, limit: Int = Palettes.MAX_PICTURE_C
 }
 
 @Composable
-private fun EffectColor(state: EditorState, param: EffectParam, raw: String, enabled: Boolean, active: Boolean, select: () -> Unit, set: (String) -> Unit) {
+private fun EffectColor(state: EditorState, param: EffectParam, raw: String, enabled: Boolean, active: Boolean, select: () -> Unit, set: (String, Boolean) -> Unit) {
     val color = parseColor(raw) ?: 0xFFFFFFFF.toInt()
     var expanded by remember(param.id) { mutableStateOf(false) }
     var library by remember(param.id) { mutableStateOf(false) }
+    val latestColor by rememberUpdatedState(color)
+    val latestSet by rememberUpdatedState(set)
+    val apply = remember { { rgb: Int -> latestSet(formatColor((latestColor and 0xFF000000.toInt()) or (rgb and 0xFFFFFF)), true) } }
+    val picking = state.eyedropper === apply
+    val stopPicking = { if (state.eyedropper === apply) state.eyedropper = null }
+    DisposableEffect(state) { onDispose(stopPicking) }
     if (library) PaletteSheet(color) { library = false }
+    val picker = stringResource(R.string.a11y_full_color_picker)
+    val eyedropper = stringResource(R.string.a11y_eyedropper)
     Column {
         Row(Modifier.fillMaxWidth().height(38.dp).padding(3.dp).alpha(if (enabled) 1f else 0.35f), verticalAlignment = Alignment.CenterVertically) {
             PropertyLabel(param.label, active, enabled, Modifier.width(75.dp).fillMaxHeight(), select)
-            Box(Modifier.weight(1f).fillMaxHeight().padding(5.dp).clip(PanelShape).background(Color(color)).clickable(enabled = enabled) { select(); expanded = !expanded })
+            Box(Modifier.weight(1f).fillMaxHeight().padding(5.dp).clip(PanelShape).background(Color(color))
+                .semantics { contentDescription = picker }.clickable(enabled = enabled, role = Role.Button) {
+                    select()
+                    stopPicking()
+                    expanded = false
+                    state.fullColor = FullColor(color) { c, drag -> latestSet(formatColor(c), drag) }
+                })
+            Box(Modifier.size(32.dp).clickable(enabled = enabled, role = Role.Button) { select(); expanded = !expanded }, Alignment.Center) {
+                Icon(PanelIcons.Palette, stringResource(R.string.palettes), Modifier.size(20.dp), tint = Am.OnDark)
+            }
             Text(raw.uppercase(), Modifier.width(82.dp).typeOnDoubleTap(enabled, onSelect = select) {
                 select()
                 state.keypad = KeypadRequest(listOf("R", "G", "B", "A").mapIndexed { i, label -> KeypadField(label, ((color ushr intArrayOf(16,8,0,24)[i]) and 255).toFloat(), "", 0f, 255f) }, 0) { next ->
                     var out = 0
                     next.forEachIndexed { i, value -> out = out or (value.roundToInt().coerceIn(0,255) shl intArrayOf(16,8,0,24)[i]) }
-                    set(formatColor(out))
+                    set(formatColor(out), false)
                 }
             }, color = Am.OnDark, fontSize = deskSp(10f), textAlign = TextAlign.Center)
         }
@@ -410,11 +435,15 @@ private fun EffectColor(state: EditorState, param: EffectParam, raw: String, ena
         Presence(expanded) { MenuPopup(side, { expanded = false }) {
             val swatches = listOf(0xFF4444,0xF4B446,0xFAE965,0x1ED91E,0x17E1E1,0x3D4CF5,0xDD44DD,0xFFFFFF,0xBEBEBE,0x888888,0x444444,0x000000,0x5EB7D9,0x98C99C)
             @Composable fun Swatches(colours: List<Int>) = colours.chunked(7).forEach { row -> Row(Modifier.fillMaxWidth().height(32.dp).padding(3.dp), Arrangement.spacedBy(2.dp)) {
-                row.forEach { rgb -> Box(Modifier.width(30.dp).fillMaxHeight().background(Color(rgb or 0xFF000000.toInt())).clickable(enabled = enabled) { set(formatColor(rgb or 0xFF000000.toInt())); expanded = false }) }
+                row.forEach { rgb -> Box(Modifier.width(30.dp).fillMaxHeight().background(Color(rgb or 0xFF000000.toInt())).clickable(enabled = enabled) { stopPicking(); set(formatColor(rgb or 0xFF000000.toInt()), false); expanded = false }) }
             } }
             val palettes = rememberPaletteLibrary()
             val chip = @Composable { PaletteChip(palettes.chosen, Am.OnDark, Modifier.fillMaxWidth().height(36.dp).padding(3.dp)) { expanded = false; library = true } }
             val own = @Composable { Column(Modifier.heightIn(max = 160.dp).deskVerticalScroll()) { Swatches(palettes.swatches(state.settings.savedColours)) } }
+            MenuRow(eyedropper, icon = PanelIcons.Eyedropper, trailing = PanelIcons.Check.takeIf { picking }) {
+                expanded = false
+                if (picking) { stopPicking(); state.endGesture() } else state.eyedropper = apply
+            }
             if (rose.value) { own(); chip(); Swatches(swatches) } else { Swatches(swatches); chip(); own() }
         } }
     }

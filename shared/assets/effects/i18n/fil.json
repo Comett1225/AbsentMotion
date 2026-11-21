@@ -500,15 +500,19 @@
    "description": "Makinis at pantay na pag-blur. Kapag Kahon ang Hugis, ina-average naman ang pantay na parisukat sa paligid ng bawat punto.",
    "name": "Pag-blur",
    "params": {
-    "strength": {
-     "label": "Lakas"
+    "iterations": {
+     "label": "Mga pag-ulit"
     },
     "shape": {
      "label": "Hugis",
      "options": [
       "Makinis",
-      "Kahon"
+      "Kahon",
+      "Mabilis na kahon"
      ]
+    },
+    "strength": {
+     "label": "Lakas"
     }
    }
   },
@@ -2507,6 +2511,9 @@
     "offset": {
      "label": "Offset"
     },
+    "parallax": {
+     "label": "Parallax"
+    },
     "scale": {
      "label": "Scale"
     },
@@ -2997,6 +3004,12 @@
     },
     "paper": {
      "label": "Kulay ng papel"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "strength": {
+     "label": "Lakas"
     },
     "style": {
      "label": "Estilo",
@@ -4215,6 +4228,9 @@
     "inset": {
      "label": "Inset/Outset"
     },
+    "legacyCoordinates": {
+     "label": "Mga Lumang Coordinate"
+    },
     "offset": {
      "label": "Offset"
     },
@@ -4919,6 +4935,9 @@
     },
     "stretch": {
      "label": "Stretch"
+    },
+    "threshold": {
+     "label": "Hangganan"
     },
     "vignette": {
      "label": "Vignette"
@@ -7419,6 +7438,9 @@
     },
     "start": {
      "label": "Simula"
+    },
+    "stretch": {
+     "label": "Stretch"
     },
     "tint": {
      "label": "Tint"

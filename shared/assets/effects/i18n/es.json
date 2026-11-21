@@ -500,15 +500,19 @@
    "description": "Un desenfoque suave y uniforme. Con Forma en Caja, en cambio, promedia un cuadrado uniforme alrededor de cada punto.",
    "name": "Desenfoque",
    "params": {
-    "strength": {
-     "label": "Intensidad"
+    "iterations": {
+     "label": "Iteraciones"
     },
     "shape": {
      "label": "Forma",
      "options": [
       "Suave",
-      "Caja"
+      "Caja",
+      "Cuadro rápido"
      ]
+    },
+    "strength": {
+     "label": "Intensidad"
     }
    }
   },
@@ -2507,6 +2511,9 @@
     "offset": {
      "label": "Desplazamiento"
     },
+    "parallax": {
+     "label": "Paralaje"
+    },
     "scale": {
      "label": "Escala"
     },
@@ -2997,6 +3004,12 @@
     },
     "paper": {
      "label": "Color del papel"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "strength": {
+     "label": "Intensidad"
     },
     "style": {
      "label": "Estilo",
@@ -4215,6 +4228,9 @@
     "inset": {
      "label": "Interior/Exterior"
     },
+    "legacyCoordinates": {
+     "label": "Coordenadas antiguas"
+    },
     "offset": {
      "label": "Desplazamiento"
     },
@@ -4919,6 +4935,9 @@
     },
     "stretch": {
      "label": "Estiramiento"
+    },
+    "threshold": {
+     "label": "Umbral"
     },
     "vignette": {
      "label": "Viñeta"
@@ -7419,6 +7438,9 @@
     },
     "start": {
      "label": "Inicio"
+    },
+    "stretch": {
+     "label": "Estiramiento"
     },
     "tint": {
      "label": "Tinte"

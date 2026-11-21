@@ -39,6 +39,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import app.absentmotion.platform.LocalContext
@@ -60,20 +61,32 @@ import app.absentmotion.audio.withAudioEffects
 import app.absentmotion.audio.withVoicePreset
 import app.absentmotion.editor.EditorPanel
 import app.absentmotion.editor.EditorState
+import app.absentmotion.effects.AddedEffectCategory
 import app.absentmotion.effects.EffectCatalog
 import app.absentmotion.effects.EffectDefinition
 import app.absentmotion.effects.EffectPreset
+import app.absentmotion.effects.EffectRecommendationTarget
+import app.absentmotion.effects.EffectTargetKind
 import app.absentmotion.effects.PresetFavouriteStore
+import app.absentmotion.effects.recommendedEffects
 import app.absentmotion.ui.editor.rightClick
+import app.absentmotion.model.Layer
 import app.absentmotion.model.addEffect
+import app.absentmotion.model.canAnimate
+import app.absentmotion.model.effectTargets
 import app.absentmotion.model.effects
+import app.absentmotion.model.isKeyframed
 import app.absentmotion.ui.editor.CaptionsSheet
 import app.absentmotion.ui.editor.PanelIcons
 import app.absentmotion.ui.editor.FavouriteStar
+import app.absentmotion.ui.editor.DropOrRise
+import app.absentmotion.ui.editor.MenuPopup
+import app.absentmotion.ui.editor.MenuRow
 import app.absentmotion.ui.editor.matchesSearch
 import app.absentmotion.ui.export.ExportIcons
 import app.absentmotion.ui.home.HelpScreen
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.theme.Presence
 import app.absentmotion.ui.theme.Swap
 import app.absentmotion.ui.theme.TilePress
 import app.absentmotion.ui.theme.pressScale
@@ -102,6 +115,8 @@ import androidx.compose.ui.input.pointer.util.addPointerInputChange
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.layout.findRootCoordinates
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import app.absentmotion.ui.theme.Motion
 import app.absentmotion.ui.theme.withUiFont
 import kotlinx.coroutines.Job
@@ -112,18 +127,46 @@ import app.absentmotion.ui.HoldName
 
 internal val LocalBlockedCategory = androidx.compose.runtime.staticCompositionLocalOf<String?> { null }
 
-internal fun EffectDefinition.usable(blocked: String?): Boolean = available && category != blocked
+internal fun EffectDefinition.usable(blocked: String?): Boolean = available && (blocked == null || category != blocked)
 
 internal fun blockedCategory(layer: app.absentmotion.model.Layer?): String? = if (layer?.kind == "model") "3d" else null
+
+private val LocalAddedEffectImport = staticCompositionLocalOf<AddedEffectImport?> { null }
+private const val CreatorCategoryPrefix = "creator:"
+
+private val AnimatedTransforms = setOf("location", "rotation", "scale", "tilt", "skew")
+
+private fun Layer.recommendationTarget(look: app.absentmotion.effects.MediaLook, beats: Boolean, totalTime: Int): EffectRecommendationTarget {
+    val media = mediaFill
+    val target = when {
+        kind == "text" -> EffectTargetKind.Text
+        kind == "embedScene" -> EffectTargetKind.Group
+        kind == "model" -> EffectTargetKind.Model
+        media?.video == true -> EffectTargetKind.Video
+        media != null -> EffectTargetKind.Photo
+        else -> EffectTargetKind.Shape
+    }
+    val animated = node.child("transform")?.children.orEmpty().any {
+        it.name in AnimatedTransforms && it.isKeyframed
+    }
+    val (hidden, active) = effects.partition { it["hidden"] == "true" }
+    return EffectRecommendationTarget(target, animated, active.mapNotNull { it["id"] }.toSet(), hidden.mapNotNull { it["id"] }.toSet(), look, (endTime - startTime).let { it in 1..1500 && it * 3 <= totalTime }, beats)
+}
 
 @Composable
 fun EffectBrowser(state: EditorState) {
     val blocked = if (state.effectTargets == null) blockedCategory(state.selected) else null
-    androidx.compose.runtime.CompositionLocalProvider(LocalBlockedCategory provides blocked) { BrowserBody(state) }
+    val context = LocalContext.current
+    val importer = remember(state.engine, context) { AddedEffectImport(context) { state.engine } }
+    CompositionLocalProvider(LocalBlockedCategory provides blocked, LocalAddedEffectImport provides importer) {
+        val pickFile = rememberAddedEffectPicker(importer)
+        BrowserBody(state, pickFile)
+        AddedEffectDialogs(importer, pickFile = pickFile)
+    }
 }
 
 @Composable
-private fun BrowserBody(state: EditorState) {
+private fun BrowserBody(state: EditorState, pickFile: () -> Unit) {
     val blocked = LocalBlockedCategory.current
     val catalog by state.engine.effects.collectAsState()
     val context = LocalContext.current
@@ -138,6 +181,7 @@ private fun BrowserBody(state: EditorState) {
     val audio = layer?.kind == "audio"
     val hasSound = audio || layer?.mediaFill?.video == true
     var category by remember { mutableStateOf<String?>(state.effectCategory ?: if (audio) "audio" else null) }
+    var creator by remember { mutableStateOf<String?>(null) }
     var searching by remember { mutableStateOf(false) }
     var helpPage by remember { mutableStateOf<String?>(null) }
     var captionClip by remember { mutableStateOf<Long?>(null) }
@@ -150,11 +194,28 @@ private fun BrowserBody(state: EditorState) {
     fun close() { hideKeyboard(); state.effectBrowserOpen = false }
     var fromAudio by remember { mutableStateOf(false) }
     val homeScroll = rememberScrollState()
+    val definitions = catalog.definitions
+    val creators = remember(definitions) {
+        definitions.filter { it.isAdded }.groupBy { it.addedCreator }.mapValues { (_, effects) ->
+            effects.sortedBy { it.name.lowercase() }
+        }
+    }
+    val otherCreators = stringResource(R.string.added_effect_other_creators)
+    fun creatorName(effects: List<EffectDefinition>) =
+        effects.maxByOrNull { it.addedModified }?.addedAuthor?.ifBlank { otherCreators } ?: otherCreators
+    val categoryCreator = category?.takeIf { it.startsWith(CreatorCategoryPrefix) }?.removePrefix(CreatorCategoryPrefix)
+    val creatorPage = categoryCreator ?: creator
+    LaunchedEffect(creators, creatorPage) {
+        if (creatorPage != null && creatorPage !in creators) {
+            if (categoryCreator != null) category = null else creator = null
+        }
+    }
     val grids = remember { HashMap<String, androidx.compose.foundation.lazy.grid.LazyGridState>() }
     fun back() {
         when {
             detail != null -> if (state.effectDetail != null) close() else detail = null
             searching -> { hideKeyboard(); searching = false; query = ""; grids.keys.removeAll { it.startsWith("search:") } }
+            creator != null -> creator = null
             fromAudio -> { fromAudio = false; category = "audio" }
             category != null && !audio -> { category = null; grids.clear() }
             else -> close()
@@ -182,7 +243,7 @@ private fun BrowserBody(state: EditorState) {
         state.effectIndex = (state.selected?.effects?.size ?: 0) - 1
         close()
     }
-    fun pick(effect: EffectDefinition) { if (effect.usable(blocked)) add(effect) else detail = effect }
+    fun pick(effect: EffectDefinition) { if (!effect.isAdded && effect.usable(blocked)) add(effect) else detail = effect }
     fun editAudio(index: Int) {
         state.audioFxFocus = index
         state.panel = EditorPanel.Tools
@@ -201,13 +262,25 @@ private fun BrowserBody(state: EditorState) {
     }
     val audioName = stringResource(R.string.effects_category_audio)
     val voiceName = stringResource(R.string.layer_tool_voice_filters)
+    val addedName = stringResource(R.string.added_effect_category)
     val stepping = (category != null && !audio) || detail != null || searching || fromAudio
-    val heading = detail?.let { d -> catalog.categories.firstOrNull { it.first == d.category }?.second ?: d.name } ?: category?.let { key -> when (key) { "audio" -> audioName; "voice" -> voiceName; else -> catalog.categories.firstOrNull { it.first == key }?.second } } ?: stringResource(R.string.effectbrowser_title)
-    val listed = catalog.categories.let { all -> if (hasSound) all.filter { it.first != "ai" } + ("audio" to audioName) + all.filter { it.first == "ai" } else all }
-    val page = listOf(searching, category)
+    val categoryNames = catalog.categories.toMap()
+    val heading = detail?.let { categoryNames[it.category] ?: it.name } ?: when {
+        creatorPage != null -> creatorName(creators[creatorPage].orEmpty())
+        category == "audio" -> audioName
+        category == "voice" -> voiceName
+        category == AddedEffectCategory -> addedName
+        else -> categoryNames[category] ?: stringResource(R.string.effectbrowser_title)
+    }
+    val creatorTiles = creators.entries.sortedBy { creatorName(it.value).lowercase() }
+    val creatorCategories = creatorTiles.filter { it.key in catalog.shownAddedCreators }
+        .map { (slug, effects) -> (CreatorCategoryPrefix + slug) to creatorName(effects) }
+    val listed = catalog.categories.let { all -> if (hasSound) all.filter { it.first != "ai" } + ("audio" to audioName) + all.filter { it.first == "ai" } else all } +
+        (AddedEffectCategory to addedName) + creatorCategories
+    val page = listOf(searching, category, creator)
     var shownDetail by remember { mutableStateOf<EffectDefinition?>(null) }
     if (detail != null) shownDetail = detail
-    fun pageAt() = if (audio || searching || detail != null) -1 else listed.indexOfFirst { it.first == category }
+    fun pageAt() = if (audio || searching || detail != null || creator != null) -1 else listed.indexOfFirst { it.first == category }
     val at = pageAt()
     val rtl = androidx.compose.ui.platform.LocalLayoutDirection.current == androidx.compose.ui.unit.LayoutDirection.Rtl
     val tick = app.absentmotion.ui.editor.rememberHaptic(state)
@@ -217,7 +290,7 @@ private fun BrowserBody(state: EditorState) {
     val pull = remember { floatArrayOf(0f) }
     val sliding = remember { arrayOfNulls<Job>(1) }
     LaunchedEffect(page) { if (page != slid) slid = null }
-    val depth = if (searching || category != null) 1 else 0
+    val depth = when { creator != null && !searching -> 2; searching || category != null -> 1; else -> 0 }
     val lastDepth = remember { intArrayOf(depth) }
     val way = remember(page) { (depth - lastDepth[0]).sign.also { lastDepth[0] = depth } }
     val slide = Modifier.graphicsLayer { translationX = shift }
@@ -239,7 +312,7 @@ private fun BrowserBody(state: EditorState) {
         }
         val next = listed[to].first
         category = next
-        slid = listOf(null, false, next)
+        slid = listOf(false, next, null)
         sliding[0] = scope.launch { animate(-way * EffectSwipe.SLIDE_DP * density.density, 0f, animationSpec = Motion.enter()) { v, _ -> shift = v } }
     }
     val rootFocus = remember { FocusRequester() }
@@ -248,7 +321,7 @@ private fun BrowserBody(state: EditorState) {
         val to = EffectSwipe.page(pageAt(), listed.size, pull, rtl) ?: return false
         val next = listed[to].first
         category = next
-        slid = listOf(null, false, next)
+        slid = listOf(false, next, null)
         return true
     }
     fun browserKey(event: androidx.compose.ui.input.key.KeyEvent): Boolean {
@@ -267,6 +340,19 @@ private fun BrowserBody(state: EditorState) {
         onDispose { if (app.absentmotion.ui.editor.DeskDrop.browserKey === hook) app.absentmotion.ui.editor.DeskDrop.browserKey = null }
     }
     val twoPane = app.absentmotion.ui.adaptive.LocalAdaptiveSpace.current?.wide == true
+    val recommended = if (!audio && !searching && category == null && detail == null) {
+        val selected = state.effectTargets?.let { state.scene.effectTargets(it) } ?: listOfNotNull(layer?.takeIf { it.canAnimate })
+        val medias = selected.mapNotNull { it.mediaFill }.distinct()
+        val looks by androidx.compose.runtime.produceState(medias.associateWith { knownLook(it) }, medias) {
+            value = medias.associateWith { mediaLookOf(context, it) }
+        }
+        val beats = state.scene.bookmarks.size >= 4
+        val targets = selected.map { it.recommendationTarget(it.mediaFill?.let(looks::get) ?: app.absentmotion.effects.MediaLook(), beats, state.scene.totalTime) }
+        val blockedCategories = selected.mapNotNull(::blockedCategory).toSet()
+        remember(catalog, targets, blockedCategories, recent, favourites) {
+            recommendedEffects(catalog.definitions.filter { !it.isAdded && it.category !in blockedCategories }, targets, recent, favourites)
+        }
+    } else emptyList()
     Column(Modifier.fillMaxSize().background(BrowserBg).systemBarsPadding().then(if (deskLayout) Modifier.focusRequester(rootFocus).onKeyEvent(::browserKey).focusable() else Modifier)) {
         helpPage?.let { page -> HelpScreen(page) { helpPage = null } }
         if (deskLayout) Row(Modifier.fillMaxWidth().height(52.dp).padding(start = 8.dp, end = 6.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -299,7 +385,7 @@ private fun BrowserBody(state: EditorState) {
                 Column(Modifier.fillMaxSize().background(BrowserBg).pointerInput(Unit) {}.deskVerticalScroll()) {
                     EffectHero(catalog, effect)
                     Column(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
-                    Row(Modifier.fillMaxWidth().height(48.dp).clickable { helpPage = "effects/${effect.page}.html" }.padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    if (!effect.isAdded) Row(Modifier.fillMaxWidth().height(48.dp).clickable { helpPage = "effects/${effect.page}.html" }.padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                         Icon(ExportIcons.Help, null, Modifier.size(22.dp), tint = Am.OnDark)
                         Text(stringResource(R.string.effect_help), Modifier.padding(start = 12.dp), color = Am.OnDark, fontSize = 15.sp)
                     }
@@ -326,7 +412,10 @@ private fun BrowserBody(state: EditorState) {
         Row(Modifier.fillMaxSize()) {
         Box(Modifier.weight(2f).fillMaxHeight()) {
         Swap(page, Modifier.fillMaxSize().effectSwipe(at >= 0, ::swipeStart, ::swipeDrag, ::swipeEnd), rise = if (slid == page || way != 0) 0.dp else 8.dp, shift = if (slid == page) 0.dp else 48.dp * way * (if (rtl) -1 else 1)) {
-        if (catalog.message != null && !audio && (app.absentmotion.platform.effectsMessageOnHome() || (category != null && category != "ai" && category != "audio" && category != "voice" && !searching))) {
+        if (catalog.message != null && !audio && creatorPage == null && category != AddedEffectCategory &&
+            (app.absentmotion.platform.effectsMessageOnHome() ||
+                (category != null && category != "ai" && category != "audio" && category != "voice" && !searching && catalog.listed(category).isEmpty()))
+        ) {
             Box(Modifier.fillMaxSize().then(slide).padding(24.dp), contentAlignment = Alignment.Center) {
                 Text(catalog.message!!, color = Am.OnDark, fontSize = 14.sp, textAlign = TextAlign.Center)
             }
@@ -347,24 +436,34 @@ private fun BrowserBody(state: EditorState) {
         } else if (searching || category != null) {
             val byName = if (audio || !searching) emptyList() else catalog.search(query)
             val byPreset = if (audio || !searching) emptyList() else catalog.definitions.filter { d -> d !in byName && query.isNotBlank() && d.presets.any { matchesSearch(query, it.name) } }
-            val results = if (audio) emptyList() else if (searching) byName + byPreset else catalog.listed(category).sortedBy { it.name.lowercase() }
+            val addedPage = !searching && category == AddedEffectCategory
+            val results = when {
+                !searching && creatorPage != null -> creators[creatorPage].orEmpty()
+                addedPage || audio -> emptyList()
+                searching -> byName + byPreset
+                else -> catalog.listed(category).sortedWith(compareBy({ it.isAdded }, { it.name.lowercase() }))
+            }
             val actions = if (app.absentmotion.platform.PlatformFeatures.ai && (searching || category == "ai")) AiAction.entries.filter { it.offered && (!audio || it == AiAction.Noise) && matchesSearch(query, stringResource(it.title)) } else emptyList()
-            val resultGrid = grids.getOrPut(if (searching) "search:$query" else category.orEmpty()) { androidx.compose.foundation.lazy.grid.LazyGridState() }
+            val resultGrid = grids.getOrPut(if (searching) "search:$query" else creatorPage?.let { CreatorCategoryPrefix + it } ?: category.orEmpty()) { androidx.compose.foundation.lazy.grid.LazyGridState() }
             LazyVerticalGrid(if (deskLayout || twoPane) GridCells.Adaptive(120.dp) else GridCells.Fixed(3), Modifier.fillMaxSize().then(slide).deskScrollbar(resultGrid), resultGrid, contentPadding = PaddingValues(if (deskLayout) 16.dp else 10.dp)) {
                 if (app.absentmotion.platform.PlatformFeatures.ai && hasSound && (category == "ai" || searching && matchesSearch(query, context.getString(R.string.auto_captions)))) {
                     item(key = "ai-captions") { AudioTile(stringResource(R.string.auto_captions), 5, true) { state.playing = false; captionClip = layer.id } }
+                }
+                if (addedPage && creator == null) {
+                    item(key = "add-effect") { AddEffectTile(100f, pickFile) }
+                    items(creatorTiles, key = { "creator-${it.key}" }) { (slug, effects) ->
+                        AddedCreatorTile(catalog, slug, creatorName(effects), effects.firstNotNullOfOrNull { it.addedPicture }, 100f) { creator = slug }
+                    }
+                    if (creators.isEmpty()) item(key = "added-empty", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) { AddedEffectsEmpty() }
                 }
                 items(actions, key = { "ai-${it.name}" }) { action -> AiTile(action, state.selected, ai) }
                 items(results, key = { it.shortcut ?: it.id }) { effect -> EffectTile(catalog, effect, 100f, { if (effect in byPreset) detail = effect else pick(effect) }, { detail = effect }, effect.id in favourites) }
             }
         } else if (deskLayout) {
-            DeskEffectsHome(homeScroll, catalog, recent, favourites, presetFavourites, favPage, { favPage = it }, hasSound, audioName, ::pick, { effect, preset -> if (effect.usable(blocked)) add(effect, preset) else detail = effect }, { detail = it }, { category = it })
+            DeskEffectsHome(homeScroll, catalog, recommended, recent, favourites, presetFavourites, favPage, { favPage = it }, listed, creators, ::pick, { effect, preset -> if (effect.usable(blocked)) add(effect, preset) else detail = effect }, { detail = it }, { category = it })
         } else {
             Column(Modifier.fillMaxSize().verticalScroll(homeScroll)) {
-                val recommended = listOf("absent.chromakey", "absent.blur", "absent.glow").mapNotNull(catalog::find)
-                Row(Modifier.fillMaxWidth().height(186.dp).background(RecommendedBg).horizontalScroll(rememberScrollState()).padding(start = 7.5.dp, top = 16.dp), Arrangement.spacedBy(15.dp)) {
-                    recommended.forEach { effect -> EffectTile(catalog, effect, 121f, { pick(effect) }, { detail = effect }, effect.id in favourites) }
-                }
+                RecommendedEffects(catalog, recommended, favourites, ::pick) { detail = it }
                 Box(Modifier.fillMaxWidth().height(210.dp).then(if (twoPane) Modifier else Modifier.pageSwipe(favPage, rtl) { favPage = it })) {
                     Crossfade(favPage && !twoPane, Modifier.matchParentSize(), animationSpec = tween(Motion.FastMs), label = "pages") { fav ->
                     Box(Modifier.fillMaxSize()) {
@@ -405,15 +504,7 @@ private fun BrowserBody(state: EditorState) {
                 listed.chunked(if (twoPane) 4 else 2).forEach { row ->
                     Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(1.5.dp)) {
                         row.forEach { (key, name) ->
-                            val press = remember { MutableInteractionSource() }
-                            Box(Modifier.weight(1f).height(66.5.dp).padding(bottom = 1.5.dp).pressScale(press, TilePress).alpha(if (key == blocked) 0.35f else 1f)
-                                .clickable(press, LocalIndication.current, enabled = key != blocked) { category = key }, contentAlignment = Alignment.Center) {
-                                if (key == "ai") AiBackdrop(Modifier.fillMaxSize())
-                                else if (key == "audio") AudioBackdrop(Modifier.fillMaxSize())
-                                else Thumbnail(catalog, catalog.listed(key).firstOrNull()?.thumbnail, Modifier.fillMaxSize(), ContentScale.Crop)
-                                Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.55f)))
-                                Text(name, color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-                            }
+                            EffectsCategoryTile(catalog, key, name, creators, Modifier.weight(1f).height(66.5.dp).padding(bottom = 1.5.dp)) { category = key }
                         }
                         repeat((if (twoPane) 4 else 2) - row.size) { Spacer(Modifier.weight(1f)) }
                     }
@@ -457,23 +548,42 @@ private fun BrowserButton(icon: ImageVector, description: String, onClick: () ->
     }
 }
 
+@Composable
+private fun RecommendedEffects(
+    catalog: EffectCatalog, effects: List<EffectDefinition>, favourites: Set<String>,
+    pick: (EffectDefinition) -> Unit, detail: (EffectDefinition) -> Unit,
+) {
+    if (effects.isEmpty()) return
+    val padding = if (deskLayout) 8.dp else 10.dp
+    val gap = 8.dp
+    Column(
+        Modifier.fillMaxWidth().then(if (deskLayout) Modifier else Modifier.background(RecommendedBg).padding(top = 8.dp)),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Text(stringResource(R.string.desk_recommended), Modifier.semantics { heading() }.padding(start = if (deskLayout) 0.dp else padding),
+            color = Am.OnDarkDim, fontSize = 12.sp, fontWeight = FontWeight.Medium)
+        BoxWithConstraints(Modifier.fillMaxWidth()) {
+            val maximum = if (deskLayout) 112.dp else 121.dp
+            val width = ((maxWidth - padding * 2 - gap * 2) / 3).coerceIn(24.dp, maximum)
+            Row(Modifier.clip(RoundedCornerShape(8.dp)).background(RecommendedBg).padding(horizontal = padding, vertical = 4.dp), Arrangement.spacedBy(gap)) {
+                effects.forEach { effect ->
+                    EffectTile(catalog, effect, width.value, { pick(effect) }, { detail(effect) }, effect.id in favourites, recommended = true)
+                }
+            }
+        }
+    }
+}
+
 @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
 private fun DeskEffectsHome(
-    scroll: androidx.compose.foundation.ScrollState, catalog: EffectCatalog, recent: List<String>, favourites: Set<String>, presetFavourites: app.absentmotion.effects.PresetFavourites, favPage: Boolean, onFavPage: (Boolean) -> Unit,
-    hasSound: Boolean, audioName: String, pick: (EffectDefinition) -> Unit, addPreset: (EffectDefinition, EffectPreset) -> Unit, detail: (EffectDefinition) -> Unit, open: (String) -> Unit,
+    scroll: androidx.compose.foundation.ScrollState, catalog: EffectCatalog, recommended: List<EffectDefinition>, recent: List<String>, favourites: Set<String>, presetFavourites: app.absentmotion.effects.PresetFavourites, favPage: Boolean, onFavPage: (Boolean) -> Unit,
+    listed: List<Pair<String, String>>, creators: Map<String, List<EffectDefinition>>, pick: (EffectDefinition) -> Unit, addPreset: (EffectDefinition, EffectPreset) -> Unit, detail: (EffectDefinition) -> Unit, open: (String) -> Unit,
 ) {
-    val recommended = remember(catalog) { listOf("absent.chromakey", "absent.blur", "absent.glow").mapNotNull(catalog::find) }
     val shown: List<Pair<EffectDefinition, EffectPreset?>> = if (favPage) presetFavourites.resolve(catalog.definitions).map { it.first to it.second } + favourites.mapNotNull(catalog::find).map { it to null }
         else recent.mapNotNull(catalog::find).distinct().take(12).map { it to null }
-    val listed = catalog.categories.let { all -> if (hasSound) all.filter { it.first != "ai" } + ("audio" to audioName) + all.filter { it.first == "ai" } else all }
     Column(Modifier.fillMaxSize().deskVerticalScroll(scroll).padding(start = 20.dp, end = 20.dp, top = 4.dp, bottom = 20.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(stringResource(R.string.desk_recommended), color = Am.OnDarkDim, fontSize = 12.sp, fontWeight = FontWeight.Medium)
-            Row(Modifier.clip(RoundedCornerShape(8.dp)).background(RecommendedBg).padding(8.dp), Arrangement.spacedBy(8.dp)) {
-                recommended.forEach { effect -> EffectTile(catalog, effect, 112f, { pick(effect) }, { detail(effect) }, effect.id in favourites) }
-            }
-        }
+        RecommendedEffects(catalog, recommended, favourites, pick, detail)
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 DeskTab(stringResource(R.string.effectbrowser_recent), !favPage) { onFavPage(false) }
@@ -492,18 +602,49 @@ private fun DeskEffectsHome(
                 listed.chunked(columns).forEach { row ->
                     Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(8.dp)) {
                         row.forEach { (key, name) ->
-                            Box(Modifier.weight(1f).height(72.dp).clip(RoundedCornerShape(8.dp)).alpha(if (key == LocalBlockedCategory.current) 0.35f else 1f).hoverFill(8.dp, Color.White.copy(alpha = .12f)).handCursor().clickable(enabled = key != LocalBlockedCategory.current) { open(key) }, Alignment.Center) {
-                                if (key == "ai") AiBackdrop(Modifier.fillMaxSize())
-                                else if (key == "audio") AudioBackdrop(Modifier.fillMaxSize())
-                                else Thumbnail(catalog, catalog.listed(key).firstOrNull()?.thumbnail, Modifier.fillMaxSize(), ContentScale.Crop)
-                                Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.55f)))
-                                Text(name, Modifier.padding(horizontal = 8.dp), color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, maxLines = 1)
-                            }
+                            EffectsCategoryTile(catalog, key, name, creators, Modifier.weight(1f).height(72.dp)) { open(key) }
                         }
                         repeat(columns - row.size) { Spacer(Modifier.weight(1f)) }
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun EffectsCategoryTile(
+    catalog: EffectCatalog, key: String, name: String, creators: Map<String, List<EffectDefinition>>, modifier: Modifier, onClick: () -> Unit,
+) {
+    val slug = key.takeIf { it.startsWith(CreatorCategoryPrefix) }?.removePrefix(CreatorCategoryPrefix)
+    val enabled = key != LocalBlockedCategory.current
+    val press = remember { MutableInteractionSource() }
+    var menu by remember(key) { mutableStateOf(false) }
+    val hold = { menu = true }
+    val style = if (deskLayout) Modifier.clip(RoundedCornerShape(8.dp)).alpha(if (enabled) 1f else 0.35f)
+        .hoverFill(8.dp, Color.White.copy(alpha = .12f)).handCursor()
+    else Modifier.pressScale(press, TilePress).alpha(if (enabled) 1f else 0.35f)
+    val interaction = when {
+        slug != null -> Modifier.rightClick(hold).combinedClickable(press, LocalIndication.current, onClick = onClick, onLongClick = hold)
+        deskLayout -> Modifier.clickable(enabled = enabled, onClick = onClick)
+        else -> Modifier.clickable(press, LocalIndication.current, enabled = enabled, onClick = onClick)
+    }
+    Box(modifier.then(style).then(interaction), Alignment.Center) {
+        when {
+            slug != null -> Thumbnail(catalog, creators[slug]?.firstNotNullOfOrNull { it.addedPicture }, Modifier.fillMaxSize(), ContentScale.Crop)
+            key == "ai" -> AiBackdrop(Modifier.fillMaxSize())
+            key == "audio" -> AudioBackdrop(Modifier.fillMaxSize())
+            else -> Thumbnail(catalog, catalog.listed(key).firstOrNull { !it.isAdded || key == AddedEffectCategory }?.thumbnail, Modifier.fillMaxSize(), ContentScale.Crop)
+        }
+        Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.55f)))
+        if (deskLayout) {
+            Text(name, Modifier.padding(horizontal = 8.dp), color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, maxLines = 1)
+        } else {
+            Text(name, color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+        }
+        if (slug != null) {
+            AddedThumbnailBadge()
+            AddedCreatorMenu(slug, shown = true, expanded = menu) { menu = false }
         }
     }
 }
@@ -516,18 +657,112 @@ private fun DeskTab(label: String, selected: Boolean, onClick: () -> Unit) {
 }
 
 @Composable
-private fun EffectTile(catalog: EffectCatalog, effect: EffectDefinition, width: Float, onClick: () -> Unit, onLongClick: () -> Unit, favourite: Boolean, preset: EffectPreset? = null) {
+private fun EffectTile(catalog: EffectCatalog, effect: EffectDefinition, width: Float, onClick: () -> Unit, onLongClick: () -> Unit, favourite: Boolean, preset: EffectPreset? = null, recommended: Boolean = false) {
     val press = remember { MutableInteractionSource() }
+    val importer = LocalAddedEffectImport.current
+    val scope = rememberCoroutineScope()
+    var menu by remember(effect.id) { mutableStateOf(false) }
+    val hold: () -> Unit = if (effect.isAdded && importer != null) ({ menu = true }) else onLongClick
     Column(Modifier.width(width.dp).pressScale(press, TilePress).alpha(if (effect.usable(LocalBlockedCategory.current)) 1f else 0.35f).clip(RoundedCornerShape(6.dp)).hoverFill(6.dp, Am.Field).handCursor()
-        .rightClick(onLongClick).combinedClickable(press, LocalIndication.current, onClick = onClick, onLongClick = onLongClick).padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        .rightClick(hold).combinedClickable(press, LocalIndication.current, onClick = onClick, onLongClick = hold).padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Box {
             Thumbnail(catalog, preset?.let(effect::thumbnail) ?: effect.thumbnail, Modifier.size((width - 7).dp).clip(RoundedCornerShape(5.dp)))
+            if (effect.isAdded) {
+                AddedThumbnailBadge()
+                if (importer != null) Presence(menu) {
+                    MenuPopup(DropOrRise, { menu = false }, TransformOrigin(0.5f, 0f)) {
+                        val categoryName = catalog.categories.firstOrNull { it.first == effect.category }?.second
+                        if (categoryName != null) {
+                            val shown = catalog.isShownInCategory(effect)
+                            val label = if (shown) R.string.added_effect_remove_from_category else R.string.added_effect_show_in_category
+                            MenuRow(stringResource(label, categoryName), icon = if (shown) ChromeIcons.Minus else ChromeIcons.Plus) {
+                                menu = false
+                                scope.launch { importer.showInCategory(effect.id, !shown) }
+                            }
+                        }
+                        MenuRow(stringResource(R.string.added_effect_remove), icon = ChromeIcons.Trash) {
+                            menu = false
+                            importer.removing = effect
+                        }
+                    }
+                }
+            }
             if (favourite) Icon(PanelIcons.StarFilled, null, Modifier.align(Alignment.TopEnd).size(14.dp), tint = Am.Favorite)
             if (preset == null && catalog.isNew(effect)) Text(stringResource(R.string.t_new), Modifier.align(Alignment.TopStart).padding(3.dp).clip(RoundedCornerShape(3.dp)).background(Am.Accent)
                 .padding(horizontal = 3.dp), color = Am.OnAccent, fontSize = if (deskLayout) 12.sp else 7.sp, lineHeight = if (deskLayout) 14.sp else 9.sp, fontWeight = FontWeight.Bold, maxLines = 1)
         }
-        Text(preset?.name ?: effect.name, Modifier.fillMaxWidth().padding(top = 4.dp), color = Am.OnDark, fontSize = if (deskLayout) 12.sp else if (width > 100) 10.sp else 8.sp,
-            lineHeight = if (deskLayout) 14.sp else 9.sp, textAlign = TextAlign.Center, maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+        Text(preset?.name ?: effect.name, Modifier.fillMaxWidth().padding(top = 4.dp), color = Am.OnDark, fontSize = if (deskLayout) 12.sp else if (recommended || width > 100) 10.sp else 8.sp,
+            lineHeight = if (deskLayout) 14.sp else if (recommended) 12.sp else 9.sp, textAlign = TextAlign.Center, maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+    }
+}
+
+@Composable
+private fun AddedCreatorTile(catalog: EffectCatalog, slug: String, name: String, picture: String?, width: Float, onClick: () -> Unit) {
+    var menu by remember(slug) { mutableStateOf(false) }
+    val hold = { menu = true }
+    Column(Modifier.width(width.dp).clip(RoundedCornerShape(6.dp)).hoverFill(6.dp, Am.Field).handCursor()
+        .rightClick(hold).combinedClickable(onClick = onClick, onLongClick = hold).padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(Modifier.size((width - 7).dp).clip(RoundedCornerShape(5.dp)).background(RecommendedBg), Alignment.Center) {
+            if (picture != null) Thumbnail(catalog, picture, Modifier.fillMaxSize())
+            Box(
+                Modifier.align(Alignment.BottomEnd).padding(4.dp).size(24.dp).clip(RoundedCornerShape(4.dp)).background(RecommendedBg),
+                Alignment.Center,
+            ) {
+                Icon(app.absentmotion.ui.home.HomeIcons.Folder, null, Modifier.size(18.dp), tint = Am.OnDark)
+            }
+            AddedThumbnailBadge()
+            AddedCreatorMenu(slug, slug in catalog.shownAddedCreators, menu) { menu = false }
+        }
+        Text(name, Modifier.fillMaxWidth().padding(top = 4.dp), color = Am.OnDark, fontSize = if (deskLayout) 12.sp else 8.sp,
+            lineHeight = if (deskLayout) 14.sp else 9.sp, textAlign = TextAlign.Center, maxLines = 2, overflow = TextOverflow.Ellipsis)
+    }
+}
+
+@Composable
+private fun AddedCreatorMenu(slug: String, shown: Boolean, expanded: Boolean, dismiss: () -> Unit) {
+    val importer = LocalAddedEffectImport.current ?: return
+    val scope = rememberCoroutineScope()
+    Presence(expanded) {
+        MenuPopup(DropOrRise, dismiss, TransformOrigin(0.5f, 0f)) {
+            val label = if (shown) R.string.added_effect_remove_creator_category else R.string.added_effect_show_creator_category
+            MenuRow(stringResource(label), icon = if (shown) ChromeIcons.Minus else ChromeIcons.Plus) {
+                dismiss()
+                scope.launch { importer.showCreatorCategory(slug, !shown) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun BoxScope.AddedThumbnailBadge() {
+    AddedEffectBadge(Modifier.align(Alignment.BottomStart).padding(4.dp)
+        .clip(RoundedCornerShape(4.dp)).background(RecommendedBg).padding(2.dp))
+}
+
+@Composable
+internal fun AddedEffectBadge(modifier: Modifier = Modifier) {
+    Icon(EffectIcons.Added, stringResource(R.string.added_effect_badge), modifier.size(16.dp), tint = Am.OnDark)
+}
+
+@Composable
+private fun AddEffectTile(width: Float, onClick: () -> Unit) {
+    Column(Modifier.width(width.dp).clip(RoundedCornerShape(6.dp)).hoverFill(6.dp, Am.Field).handCursor().clickable(onClick = onClick).padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(Modifier.size((width - 7).dp).clip(RoundedCornerShape(5.dp)).background(RecommendedBg), Alignment.Center) {
+            Text(stringResource(R.string.added_effect_card), Modifier.padding(5.dp), color = Am.OnDark, fontSize = if (deskLayout) 13.sp else 12.sp, textAlign = TextAlign.Center)
+        }
+    }
+}
+
+@Composable
+private fun AddedEffectsEmpty() {
+    val links = androidx.compose.ui.platform.LocalUriHandler.current
+    Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(stringResource(R.string.added_effect_empty_title), color = Am.OnDark, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.added_effect_empty_body), color = Am.OnDarkDim, fontSize = 14.sp)
+        Text(stringResource(R.string.added_effect_safety), color = Am.OnDarkDim, fontSize = 14.sp)
+        Text(stringResource(R.string.added_effect_guide), Modifier.handCursor().clickable {
+            runCatching { links.openUri("https://github.com/Comett1225/AbsentMotion-Community/blob/main/effects/README.md") }
+        }.padding(vertical = 8.dp), color = Am.Accent, fontSize = 14.sp)
     }
 }
 

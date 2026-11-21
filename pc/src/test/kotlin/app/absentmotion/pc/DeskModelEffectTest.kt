@@ -5,6 +5,7 @@ import app.absentmotion.engine.EngineThread
 import app.absentmotion.model.Scene
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
@@ -50,6 +51,33 @@ class DeskModelEffectTest {
     }
 
     private fun bright(pixels: ByteArray): Int = (0 until 400 * 400).count { i -> (0..2).any { (pixels[i * 4 + it].toInt() and 255) > 128 } }
+
+    @Test fun vignetteShadesTheVisibleCornersOfAFullBleedLayer() = runBlocking {
+        val engine = EngineThread(0xff000000.toInt(), Desk.context)
+        try {
+            engine.effects.first { it.definitions.isNotEmpty() }
+            for ((scale, x) in listOf(1 to 160, 3 to 160, 3 to 481)) {
+                val s = Scene.parse("""<scene title="Vignette" width="320" height="240" fps="30" totalTime="1000" bgcolor="#ff000000">
+                    <shape id="1" startTime="0" endTime="1000" s=".rect" fillType="color">
+                        <transform><location value="$x,120,0"/><scale value="$scale,$scale"/></transform>
+                        <fillColor value="#ffffffff"/><property name="size" type="vec2" value="160,120"/>
+                        <effect id="absent.vignette"/>
+                    </shape></scene>""")
+                engine.setScene(s)
+                engine.awaitMedia()
+                val preview = checkNotNull(engine.capturePreviewFrame(s, 0, s.width, s.height, false) { true })
+                val export = checkNotNull(engine.exportSession(s.toXml()) { still(0, s.width, s.height) })
+                for ((view, pixels) in listOf("preview" to preview, "export" to export)) {
+                    fun grey(x: Int, y: Int) = pixels[(y * s.width + x) * 4].toInt() and 255
+                    assertEquals(255, grey(160, 120))
+                    assertTrue("$view at scale $scale x $x, corner intensity ${grey(8, 8)}", grey(8, 8) < 220)
+                    assertTrue("$view at scale $scale x $x, right corner intensity ${grey(s.width - 9, 8)}", grey(s.width - 9, 8) < 220)
+                }
+            }
+        } finally {
+            engine.close()
+        }
+    }
 
     @Test fun effectsOnAModelTurnedEdgeOnKeepTheWholeModel() = runBlocking {
         out.deleteRecursively()

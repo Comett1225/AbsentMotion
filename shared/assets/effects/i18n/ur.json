@@ -500,15 +500,19 @@
    "description": "ہموار اور یکساں بلر۔ شکل «باکس» پر اس کے بجائے ہر نقطے کے گرد ایک یکساں مربع کی اوسط لی جاتی ہے۔",
    "name": "بلر",
    "params": {
-    "strength": {
-     "label": "اسٹرینتھ"
+    "iterations": {
+     "label": "تکرار کی تعداد"
     },
     "shape": {
      "label": "شکل",
      "options": [
       "ہموار",
-      "باکس"
+      "باکس",
+      "تیز باکس"
      ]
+    },
+    "strength": {
+     "label": "اسٹرینتھ"
     }
    }
   },
@@ -2507,6 +2511,9 @@
     "offset": {
      "label": "آفسیٹ"
     },
+    "parallax": {
+     "label": "پیرالیکس"
+    },
     "scale": {
      "label": "اسکیل"
     },
@@ -2997,6 +3004,12 @@
     },
     "paper": {
      "label": "کاغذ کا رنگ"
+    },
+    "phase": {
+     "label": "فیز"
+    },
+    "strength": {
+     "label": "شدت"
     },
     "style": {
      "label": "اسٹائل",
@@ -4215,6 +4228,9 @@
     "inset": {
      "label": "انسیٹ/آؤٹ سیٹ"
     },
+    "legacyCoordinates": {
+     "label": "پرانے محددات"
+    },
     "offset": {
      "label": "آفسیٹ"
     },
@@ -4919,6 +4935,9 @@
     },
     "stretch": {
      "label": "اسٹریچ"
+    },
+    "threshold": {
+     "label": "حد"
     },
     "vignette": {
      "label": "ویگنیٹ"
@@ -7419,6 +7438,9 @@
     },
     "start": {
      "label": "شروع"
+    },
+    "stretch": {
+     "label": "اسٹریچ"
     },
     "tint": {
      "label": "ٹنٹ"

@@ -7,6 +7,7 @@
 - AbsentMotion'da yaptığınız projeler ve ön ayarlar: kurgular, şablonlar, introlar, metin animasyonları, geçişler, efekt yığınları.
 - Başkasının kurgusu, projesi, ön ayarı veya sanat eseri, yapanı belirttiğiniz sürece: açıklamaya kimin yaptığını yazın.
 - Kendi yaptığınız ya da yapanını açıklamada belirttiğiniz görseller, videolar, müzikler, sesler ve yazı tipleri.
+- Kendi yazdığınız efektler ya da lisansı paylaşmaya izin veren efektler: nereden geldiklerini açıklamaya yazın.
 
 ## İzin verilmeyenler
 
@@ -17,6 +18,7 @@
 - **Kişisel bilgiler:** gerçek adlar, adresler, telefon numaraları, okullar, hesaplar veya özel kişilerin yüzleri; kendinizinkiler de dahil.
 - **Yasa dışı veya tehlikeli şeyler:** uyuşturucu, silah, dolandırıcılık, kumar, bilgisayar korsanlığı veya kötü amaçlı yazılım.
 - **Başkasının emeğini sahiplenmek:** kurgusunu, projesini, ön ayarını, sanat eserini veya müziğini kimin yaptığını belirtmeden paylaşmak ya da ücretli varlıkları yeniden paylaşmak.
+- **Başka uygulamaların efektleri:** başka bir uygulamanın dosyalarından alınan veya dönüştürülen efektler.
 - **Başkası gibi davranmak:** öğe kendilerinden geliyormuş gibi başka bir yaratıcının adını ya da bir markanın adını veya logosunu kullanmak.
 - **Spam:** reklamlar, başka sitelere bağlantılar, aynı öğeyi başka bir adla yeniden paylaşmak veya hiçbir işe yaramayan öğeler.
 - **Yanıltıcı öğeler:** içindekini göstermeyen bir başlık, küçük resim veya etiketler.
@@ -24,7 +26,7 @@
 ## Bilmeniz gerekenler
 
 - Herkese uygun tutun. AbsentMotion'ı her yaştan insan kullanır.
-- Proje paketleri en fazla 20 MB, ön ayarlar en fazla 1 MB olabilir.
+- Proje paketleri en fazla 20 MB, ön ayarlar en fazla 1 MB, efektler en fazla 512 KB olabilir.
 - Öğeler CC BY 4.0 altında paylaşılır: yapanı belirttikleri sürece herkes onları kullanabilir ve değiştirebilir.
 - Öğenizdeki ad, yazdığınız yaratıcı adıdır. İçine kişisel hiçbir şey yazmayın.
 - Neyin yayınlanacağına bakımcı karar verir ve bir öğeyi istediği zaman kaldırabilir.

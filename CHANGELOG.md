@@ -6,6 +6,25 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [5.2.3] - 2026-11-21
+
+### Added
+
+- **Import projects from links**. Preview public Alight Motion shares before importing. On Android, open supported links with AbsentMotion or Alight Motion.
+- **Recommended effects**. The Effects browser opens with three effects picked for the selected layer from its type, its animation, its current effects, Recents and Favorites. A green or blue screen in the clip or picture brings Chroma Key first, beat marks bring a Beat effect, a quick clip in a longer edit brings Shake, a cut-out picture brings Drop Shadow and dark footage brings Exposure.
+- **Added effects**. Add effects other people made from an `.abmfx` pack or `.json` file in Effects > Added, on phones by opening or sharing the file and on computers by dropping it on the window. The app shows each effect on a sample picture and checks it works on the device first. Hold an added effect to remove it, and a project that uses an added effect you don't have says which one is missing. Added effects stay in Effects > Added, one folder per creator, with an added badge on every tile and in the layer's effect list. Hold an effect to show it in the category its creator chose (built-in categories only), or hold a creator folder to show it as its own category at the bottom of the Effects Library. Effects update by version, and Fun Pack by AbsentMotion is the first Community effect pack.
+- **Community effects**. The Community tab has an Effects page next to Projects and Presets, and the Community guide explains how to make and share an effect.
+- **Drag to reorder Tools**. In Change layout, hold a tool and drag it anywhere in the list, alongside the up and down arrows. The list scrolls when you drag near its top or bottom.
+
+### Fixed
+
+- **Alight Motion import** preserves more settings and animations in older projects, including Oscillate, Move Along Path, 360° Reorient Sphere and Blur.
+- **Grouping** has a labeled Group button. Mask and Exclude are in Group options.
+- **Preview audio** stops promptly when paused and stays in sync when the audio buffer runs low.
+- **Effect colors** can open the full picker or sample the preview with the eyedropper.
+- **Vignette** shades visible corners when a layer fills the project and extends beyond the frame.
+- **Settings menu on Android**: the dark area beside it blocks every tap while the menu is open, opening or closing, and a tap there only closes it.
+
 ## [5.2.2] - 2026-11-20
 
 ### Added

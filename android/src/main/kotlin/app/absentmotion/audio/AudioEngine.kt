@@ -16,8 +16,6 @@ import android.os.Process
 import android.util.Log
 import app.absentmotion.export.ExportAudio
 import app.absentmotion.model.Scene
-import kotlin.math.abs
-import kotlin.math.ceil
 import kotlin.math.max
 
 class AudioEngine(context: Context) {
@@ -138,13 +136,19 @@ class AudioEngine(context: Context) {
     private inner class Session(val startMs: Double, @Volatile private var previous: Session?) : Thread("am-audio-mixer") {
         @Volatile var stopRequested = false
         val rate = AudioTrack.getNativeOutputSampleRate(AudioManager.STREAM_MUSIC).takeIf { it > 0 } ?: 48_000
-        val clock = AudioClock(startMs, rate)
+        val clock = AudioClock(startMs, rate).apply { submittedFrames = 0 }
         private val rack = FxRack(rate)
         private val limiter = SafeLimiter(rate)
+        private val outputLock = Any()
+        private var output: AudioTrack? = null
 
         fun halt() {
-            clock.stop(System.nanoTime())
-            stopRequested = true
+            synchronized(outputLock) {
+                if (stopRequested) return
+                clock.stop(System.nanoTime())
+                stopRequested = true
+                output?.let { track -> runCatching { track.pause(); track.flush() } }
+            }
         }
 
         override fun run() {
@@ -153,6 +157,7 @@ class AudioEngine(context: Context) {
             previous = null
             var track: AudioTrack? = null
             try {
+                if (stopRequested) return
                 val bytes = AudioTrack.getMinBufferSize(rate, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_FLOAT)
                 val bufferFrames = max(bytes / 8, BLOCK * 6)
                 track = AudioTrack.Builder()
@@ -161,18 +166,27 @@ class AudioEngine(context: Context) {
                     .setBufferSizeInBytes(bufferFrames * 8)
                     .setTransferMode(AudioTrack.MODE_STREAM)
                     .build()
+                synchronized(outputLock) {
+                    if (stopRequested) return
+                    output = track
+                }
                 preroll()
                 val out = FloatArray(BLOCK * 2)
                 var written = 0L
                 repeat(3) {
+                    if (stopRequested) return
                     mixBlock(out, startMs + written * 1000.0 / rate)
-                    writeAll(track, out)
+                    if (!writeAll(track, out)) return
                     written += BLOCK
+                    clock.submittedFrames = written
                 }
                 clock.route = track.routedDevice?.id ?: 0
                 clock.latencyNs = AudioClock.learned[clock.route] ?: AudioClock.outputLatency(track, rate)
-                track.play()
-                clock.wallStart = System.nanoTime()
+                synchronized(outputLock) {
+                    if (stopRequested) return
+                    track.play()
+                    clock.wallStart = System.nanoTime()
+                }
                 var measured = false
                 val pending = ArrayDeque<Pair<Long, Double>>()
                 val stamp = AudioTimestamp()
@@ -180,9 +194,10 @@ class AudioEngine(context: Context) {
                     val t0 = startMs + written * 1000.0 / rate
                     keepStreams(t0)
                     mixBlock(out, t0)
-                    writeAll(track, out)
+                    if (!writeAll(track, out)) break
                     if (log) pending.addLast(written to t0)
                     written += BLOCK
+                    clock.submittedFrames = written
                     if (track.getTimestamp(stamp) && stamp.framePosition >= 0) {
                         clock.stamp(stamp.framePosition, stamp.nanoTime)
                         if (log && !measured && stamp.framePosition > 0) {
@@ -197,16 +212,17 @@ class AudioEngine(context: Context) {
                         }
                     }
                 }
-                for (i in 1..4) { track.setVolume(1f - i / 4f); Thread.sleep(3) }
-                track.pause()
-                track.flush()
             } catch (e: Exception) {
+                if (stopRequested) return
                 Log.w("AMAudio", "Audio stream failed", e)
                 clock.failed = true
                 if (clock.wallStart == 0L) clock.wallStart = System.nanoTime()
                 while (!stopRequested) Thread.sleep(20)
             } finally {
-                runCatching { track?.release() }
+                synchronized(outputLock) {
+                    output = null
+                    runCatching { track?.release() }
+                }
                 rack.close()
                 mix.master(0f, 0f)
                 if (releasing) closeStreams()
@@ -230,13 +246,14 @@ class AudioEngine(context: Context) {
             synchronized(streams) { streams.values.forEach { it.restart() } }
         }
 
-        private fun writeAll(track: AudioTrack, block: FloatArray) {
+        private fun writeAll(track: AudioTrack, block: FloatArray): Boolean {
             var offset = 0
             while (offset < block.size && !stopRequested) {
                 val n = track.write(block, offset, block.size - offset, AudioTrack.WRITE_BLOCKING)
                 check(n >= 0) { "AudioTrack.write returned $n" }
                 offset += n
             }
+            return !stopRequested
         }
 
         private fun mixBlock(out: FloatArray, t0: Double) {
@@ -276,31 +293,6 @@ class AudioEngine(context: Context) {
     }
 }
 
-internal fun List<AudioClip>.audibleAfter(startMs: Double, sound: (String) -> Boolean?): Boolean = any { it.endMs > startMs && sound(it.uri) != false }
-
-internal fun mixStreams(
-    clips: List<AudioClip>, out: FloatArray, frames: Int, t0: Double, rate: Int, quality: Int, rack: FxRack,
-    stream: (AudioClip) -> LayerStream?,
-) {
-    java.util.Arrays.fill(out, 0, 2 * frames, 0f)
-    val dt = 1000.0 / rate
-    for (clip in clips) {
-        stream(clip)?.let { clip.resolveDuration(it.durationUs) }
-        val dst = rack.target(clip, out, frames)
-        var rendered = false
-        var next = 0
-        while (true) {
-            val span = clip.span(t0, frames, dt, next) ?: break
-            next = span.to
-            val source = stream(clip) ?: break
-            if (!span.inMedia) { source.restart(); continue }
-            if (source.mix(dst, span.from, span.to, span.pos, span.step, span.g0, span.g1, quality, span.clipMs0, dt, span.lengthMs)) rendered = true
-        }
-        rack.finish(clip, out, frames, rendered)
-    }
-    rack.sweep()
-}
-
 internal class AudioClock(private val startMs: Double, private val rate: Int) {
     private class Stamp(val frames: Long, val nanos: Long)
     @Volatile private var stamp: Stamp? = null
@@ -308,6 +300,7 @@ internal class AudioClock(private val startMs: Double, private val rate: Int) {
     @Volatile private var reached = startMs
     @Volatile var wallStart = 0L
     @Volatile var failed = false
+    @Volatile var submittedFrames = Long.MAX_VALUE
     @Volatile var latencyNs = -1L
     @Volatile var route = 0
     @Volatile private var measured = false
@@ -329,7 +322,8 @@ internal class AudioClock(private val startMs: Double, private val rate: Int) {
             began > 0 && (lag >= 0 || at - began > 1_500_000_000L) -> startMs + (at - began - lag.coerceAtLeast(0)).coerceAtLeast(0) / 1e6
             else -> return null
         }
-        return maxOf(ms, reached).also { reached = it }
+        val available = if (failed) ms else minOf(ms, startMs + submittedFrames * 1000.0 / rate)
+        return maxOf(available, reached).also { reached = it }
     }
 
     companion object {

@@ -202,6 +202,7 @@ fun HomeScreen(
     onCollect: (String) -> Unit = {},
     changes: Int = 0,
     engine: (() -> app.absentmotion.engine.EngineThread)? = null,
+    onImportLink: (() -> Unit)? = null,
 ) {
     var projects by remember { mutableStateOf<List<ProjectInfo>>(emptyList()) }
     var loaded by remember { mutableStateOf(false) }
@@ -256,6 +257,7 @@ fun HomeScreen(
                 else if (page == 1) TemplatesTab(version + changes, onTemplate, onTemplateProject, fill, query, engine) else ProjectsPane(
                     Modifier.weight(1f), shown, loaded, tab, { tab = it }, settings, version + changes, onOpen, onExport, query,
                     onUpload = { picker.launch(arrayOf("text/xml", "application/xml", "application/zip", "application/octet-stream")) },
+                    onImportLink = onImportLink,
                     onDuplicate = { id -> if (!duplicating) {
                         duplicating = true
                         app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.home_duplicating), app.absentmotion.platform.Toast.LENGTH_SHORT).show()
@@ -274,6 +276,14 @@ fun HomeScreen(
                 Spacer(Modifier.height(BarHeight + navInset))
             }
             BottomBar(onNew = newProject, page, { page = it; if (it >= 2) search = null; if (it != 2) arrangingTools = false }, Modifier.align(Alignment.BottomCenter), navInset, wide, settings.vibration)
+            if (drawer.isOpen || drawer.targetValue == DrawerValue.Open || drawer.isAnimationRunning) Box(Modifier.fillMaxSize().pointerInput(Unit) {
+                awaitEachGesture {
+                    awaitFirstDown(requireUnconsumed = false).consume()
+                    val up = waitForUpOrCancellation()
+                    up?.consume()
+                    if (up != null) scope.launch { drawer.close() }
+                }
+            })
             if (toReport.isNotEmpty()) ImportDialog(toReport, onDismiss = onImportShown, onOpen = { onImportShown(); toReport.first().let { if (it.template) onTemplate(it.id) else onOpen(it.id) } })
             Presence(creating) {
                 NewProjectSheet(
@@ -391,6 +401,7 @@ private fun ProjectsPane(
     onExport: (String) -> Unit,
     query: String,
     onUpload: () -> Unit,
+    onImportLink: (() -> Unit)?,
     onDuplicate: (String) -> Unit,
     onDelete: (String) -> Unit,
     onHistory: (ProjectInfo) -> Unit,
@@ -417,7 +428,11 @@ private fun ProjectsPane(
     var origin by remember { mutableStateOf(Offset.Zero) }
     val byName = settings.sortBy == "name"
     val locale = androidx.compose.ui.platform.LocalConfiguration.current.locales[0]
-    val rows = remember(shown, byName, locale) { listRows(shown, byName, dateHeader(locale)) }
+    val rows = remember(shown, byName, locale) {
+        if (listState.firstVisibleItemIndex == 0 && listState.firstVisibleItemScrollOffset == 0) listState.requestScrollToItem(0)
+        if (gridState.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0) gridState.requestScrollToItem(0)
+        listRows(shown, byName, dateHeader(locale))
+    }
     val card: @Composable (ProjectInfo, Int, Modifier) -> Unit = { info, i, itemModifier ->
         ProjectCard(
             info, version, thumbs, itemModifier.enterOnce(seen, info.id, i), menuOpen = menu?.id == info.id,
@@ -436,7 +451,7 @@ private fun ProjectsPane(
     Box(modifier.fillMaxWidth().onGloballyPositioned { origin = it.positionInRoot() }) {
         Column(Modifier.fillMaxSize()) {
             Spacer(Modifier.height(if (wide) 8.dp else 24.dp))
-            Chips(tab, onTab, wide)
+            Chips(tab, onTab, wide, onImportLink)
             if (loaded && shown.isEmpty() && tab == 0 && settings.xmlUpload && query.isBlank()) {
                 Spacer(Modifier.height(13.dp))
                 Box(Modifier.padding(horizontal = 16.dp).then(if (wide) WideCard else Modifier)) { UploadCard(onUpload) }
@@ -604,10 +619,22 @@ internal fun listRows(list: List<ProjectInfo>, byName: Boolean, dates: DateTimeF
     }
 
 @Composable
-private fun Chips(tab: Int, onTab: (Int) -> Unit, crisp: Boolean) {
-    Row(Modifier.padding(start = 16.dp), horizontalArrangement = Arrangement.spacedBy(if (crisp) 8.dp else 12.dp)) {
+private fun Chips(tab: Int, onTab: (Int) -> Unit, crisp: Boolean, onImportLink: (() -> Unit)?) {
+    Row(
+        Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(if (crisp) 8.dp else 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         Chip(stringResource(R.string.home_tab_projects), tab == 0, crisp) { onTab(0) }
         Chip(stringResource(R.string.home_tab_assets), tab == 1, crisp) { onTab(1) }
+        if (tab == 0 && onImportLink != null) {
+            Spacer(Modifier.weight(1f))
+            val label = stringResource(R.string.project_link_import)
+            Box(Modifier.size(44.dp).clip(CircleShape).clickable(onClick = onImportLink), contentAlignment = Alignment.Center) {
+                Icon(HomeIcons.Link, label, Modifier.size(24.dp), tint = Am.Navy)
+                HoldName(label)
+            }
+        }
     }
 }
 

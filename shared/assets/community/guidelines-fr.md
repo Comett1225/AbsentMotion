@@ -7,6 +7,7 @@ Tout ce qui figure dans l’onglet **Communauté** est vérifié par une personn
 - Des projets et des préréglages que vous avez créés dans AbsentMotion : montages, modèles, intros, animations de texte, transitions, piles d’effets.
 - Le montage, le projet, le préréglage ou l’œuvre de quelqu’un d’autre, à condition de le citer : indiquez dans la description qui l’a réalisé.
 - Des images, vidéos, musiques, sons et polices créés par vous ou par quelqu’un que vous citez dans la description.
+- Des effets que vous avez écrits, ou des effets dont la licence permet le partage : indiquez leur origine dans la description.
 
 ## Interdit
 
@@ -17,6 +18,7 @@ Tout ce qui figure dans l’onglet **Communauté** est vérifié par une personn
 - **Informations personnelles :** vrais noms, adresses, numéros de téléphone, écoles, comptes ou visages de personnes privées, y compris les vôtres.
 - **Choses illégales ou dangereuses :** drogues, armes, arnaques, jeux d’argent, piratage ou logiciels malveillants.
 - **S’attribuer le travail d’un autre :** partager son montage, son projet, son préréglage, ses œuvres ou sa musique sans dire qui les a réalisés, ou repartager des ressources payantes.
+- **Effets d’autres applis :** des effets pris ou convertis à partir des fichiers d’une autre appli.
 - **Usurpation d’identité :** utiliser le nom d’un autre créateur, ou le nom ou le logo d’une marque, comme si l’élément venait d’eux.
 - **Spam :** publicités, liens vers d’autres sites, le même élément republié sous un autre nom, ou éléments qui ne font rien.
 - **Éléments trompeurs :** un titre, une miniature ou des tags qui ne montrent pas ce que contient l’élément.
@@ -24,7 +26,7 @@ Tout ce qui figure dans l’onglet **Communauté** est vérifié par une personn
 ## Bon à savoir
 
 - Restez adapté à tout le monde. Des personnes de tous âges utilisent AbsentMotion.
-- Les paquets de projet peuvent atteindre 20 MB et les préréglages 1 MB.
+- Les paquets de projet peuvent atteindre 20 MB, les préréglages 1 MB et les effets 512 KB.
 - Les éléments sont partagés sous CC BY 4.0 : chacun peut les utiliser et les modifier à condition de citer qui les a créés.
 - Le nom affiché sur votre élément est le nom de créateur que vous saisissez. N’y mettez rien de personnel.
 - Le mainteneur décide de ce qui est mis en ligne et peut retirer un élément à tout moment.

@@ -357,6 +357,9 @@ fun deskMenus(app: DeskAppState, scope: kotlinx.coroutines.CoroutineScope): List
                 val files = DeskFiles.chooseFiles(media = false, multiple = true).map(Uri::fromFile)
                 if (files.isNotEmpty()) scope.launch { app.importFiles(files) }
             },
+            DeskMenuItem(t(R.string.project_link_import), app.canStartProject && !app.opening && !app.importLinkOpen) {
+                app.importLinkOpen = true
+            },
             DeskMenuItem(t(R.string.desk_menu_link_folder)) { linkMediaFolder() },
             if (linked.isEmpty()) null else DeskMenuItem(t(R.string.desk_menu_unlink_folder), children = linked.map { folder -> DeskMenuItem(folder.name.ifEmpty { folder.path }) { DeskLibrary.unlink(folder) } }),
             separator,

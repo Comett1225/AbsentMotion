@@ -729,7 +729,7 @@ std::vector<int> Units(const std::vector<Glyph>& glyphs, const textanim::Segment
 
 struct Look {
     SkVector move = {0, 0};
-    float scale = 1, rotation = 0, alpha = 1, blur = 0;
+    float scale = 1, verticalStretch = 1, rotation = 0, alpha = 1, blur = 0;
     SkColor4f tint = {0, 0, 0, 0};
 };
 
@@ -755,6 +755,7 @@ Look Transform(const LayerEffect& e, float t, float w) {
     Look k;
     if (const Property* p = e.prop("position")) k.move = {p->anim.get(0, t, 0) * w, p->anim.get(1, t, 0) * w};
     k.scale = 1 + (e.value("scale", t, 1) - 1) * w;
+    k.verticalStretch = std::max(0.0f, 1 + e.value("stretch", t, 0) * w);
     k.rotation = e.value("rotation", t, 0) * w;
     k.alpha = 1 + (std::clamp(e.value("opacity", t, 1), 0.0f, 1.0f) - 1) * w;
     if (const Property* p = e.prop("tint")) {
@@ -827,9 +828,9 @@ void Apply(const Layer& l, float t, float seconds, const std::string& shown, con
             const SkPoint c = !progress && Choice(e, "anchor", t, 0, 1) == 1 ? SkPoint{0, 0}
                               : box[u].isEmpty() ? fallback[u] : box[u].center();
             matrices[u] = SkMatrix::Translate(-c.fX, -c.fY);
-            matrices[u].postScale(looks[u].scale, looks[u].scale);
+            matrices[u].postScale(looks[u].scale, looks[u].scale * looks[u].verticalStretch);
             matrices[u].postRotate(looks[u].rotation);
-            matrices[u].postTranslate(c.fX + looks[u].move.fX, c.fY + looks[u].move.fY);
+            matrices[u].postTranslate(c.fX + looks[u].move.fX, c.fY * looks[u].verticalStretch + looks[u].move.fY);
         }
         for (size_t i = 0; i < glyphs->size(); i++) {
             if (unit[i] < 0) continue;

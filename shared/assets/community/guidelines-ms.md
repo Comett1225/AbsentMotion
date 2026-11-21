@@ -7,6 +7,7 @@ Segala-galanya pada tab **Komuniti** disemak oleh seseorang sebelum ia dipaparka
 - Projek dan pratetap yang anda buat dalam AbsentMotion: suntingan, templat, intro, animasi teks, peralihan, timbunan kesan.
 - Suntingan, projek, pratetap atau seni orang lain, selagi anda memberi kredit kepada mereka: tulis siapa yang membuatnya dalam penerangan.
 - Gambar, video, muzik, bunyi dan fon, yang dibuat oleh anda atau seseorang yang anda beri kredit dalam penerangan.
+- Kesan yang anda tulis sendiri, atau kesan yang lesennya membenarkan perkongsian: nyatakan asalnya dalam penerangan.
 
 ## Tidak dibenarkan
 
@@ -17,6 +18,7 @@ Segala-galanya pada tab **Komuniti** disemak oleh seseorang sebelum ia dipaparka
 - **Maklumat peribadi:** nama sebenar, alamat, nombor telefon, sekolah, akaun atau wajah orang persendirian, termasuk milik anda sendiri.
 - **Perkara haram atau berbahaya:** dadah, senjata, penipuan, perjudian, penggodaman atau perisian hasad.
 - **Mengaku hasil kerja orang lain:** berkongsi suntingan, projek, pratetap, seni atau muzik mereka tanpa menyatakan siapa yang membuatnya, atau berkongsi semula aset berbayar.
+- **Kesan daripada apl lain:** kesan yang diambil atau ditukar daripada fail apl lain.
 - **Berpura-pura menjadi orang lain:** menggunakan nama pencipta lain, atau nama atau logo jenama, seolah-olah item itu datang daripada mereka.
 - **Spam:** iklan, pautan ke tapak lain, item yang sama sekali lagi dengan nama lain, atau item yang tidak berfungsi.
 - **Item mengelirukan:** tajuk, lakaran kecil atau teg yang tidak menunjukkan apa yang ada di dalamnya.
@@ -24,7 +26,7 @@ Segala-galanya pada tab **Komuniti** disemak oleh seseorang sebelum ia dipaparka
 ## Baik untuk diketahui
 
 - Pastikan ia sesuai untuk semua orang. Orang pelbagai peringkat umur menggunakan AbsentMotion.
-- Bundel projek boleh sehingga 20 MB dan pratetap sehingga 1 MB.
+- Bundel projek boleh sehingga 20 MB, pratetap sehingga 1 MB dan kesan sehingga 512 KB.
 - Item dikongsi di bawah CC BY 4.0: sesiapa sahaja boleh menggunakan dan mengubahnya selagi mereka memberi kredit kepada pembuatnya.
 - Nama pada item anda ialah nama pencipta yang anda taip. Jangan letakkan apa-apa yang peribadi di dalamnya.
 - Penyelenggara memutuskan apa yang dipaparkan, dan boleh menurunkan item pada bila-bila masa.

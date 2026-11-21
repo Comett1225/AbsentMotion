@@ -20,6 +20,7 @@ object MobileData {
     class Question {
         internal val answered = CountDownLatch(1)
         @Volatile internal var yes = false
+        internal var waiters = 0
     }
 
     @Volatile private var context: Context? = null
@@ -43,9 +44,17 @@ object MobileData {
         val app = context ?: return
         if (allowed || !app.getSharedPreferences("settings", Context.MODE_PRIVATE).getBoolean(KEY, true) || !cellular(app)) return
         if (quiet || Looper.myLooper() == Looper.getMainLooper()) throw MobileDataRefused()
-        val asked = synchronized(this) { question ?: Question().also { question = it } }
-        asked.answered.await()
-        if (asked.yes) allowed = true else throw MobileDataRefused()
+        val asked = synchronized(this) {
+            (question ?: Question().also { question = it }).also { it.waiters++ }
+        }
+        try {
+            asked.answered.await()
+            if (asked.yes) allowed = true else throw MobileDataRefused()
+        } finally {
+            synchronized(this) {
+                if (--asked.waiters == 0 && question === asked) question = null
+            }
+        }
     }
 
     fun answer(yes: Boolean) {

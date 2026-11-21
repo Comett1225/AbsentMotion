@@ -500,15 +500,19 @@
    "description": "Yumuşak, eşit bir bulanıklık. Şekil Kutu olduğunda bunun yerine her noktanın çevresindeki eşit bir karenin ortalaması alınır.",
    "name": "Bulanıklaştırma",
    "params": {
-    "strength": {
-     "label": "Güç"
+    "iterations": {
+     "label": "Yineleme sayısı"
     },
     "shape": {
      "label": "Şekil",
      "options": [
       "Yumuşak",
-      "Kutu"
+      "Kutu",
+      "Hızlı kutu"
      ]
+    },
+    "strength": {
+     "label": "Güç"
     }
    }
   },
@@ -2507,6 +2511,9 @@
     "offset": {
      "label": "Ofset"
     },
+    "parallax": {
+     "label": "Paralaks"
+    },
     "scale": {
      "label": "Ölçek"
     },
@@ -2997,6 +3004,12 @@
     },
     "paper": {
      "label": "Kağıt rengi"
+    },
+    "phase": {
+     "label": "Evre"
+    },
+    "strength": {
+     "label": "Güç"
     },
     "style": {
      "label": "Stil",
@@ -4215,6 +4228,9 @@
     "inset": {
      "label": "İçe/dışa"
     },
+    "legacyCoordinates": {
+     "label": "Eski Koordinatlar"
+    },
     "offset": {
      "label": "Kaydırma"
     },
@@ -4919,6 +4935,9 @@
     },
     "stretch": {
      "label": "Esnetme"
+    },
+    "threshold": {
+     "label": "Eşik"
     },
     "vignette": {
      "label": "Vinyet"
@@ -7419,6 +7438,9 @@
     },
     "start": {
      "label": "Başlangıç"
+    },
+    "stretch": {
+     "label": "Uzat"
     },
     "tint": {
      "label": "Renk tonu"

@@ -6,23 +6,28 @@ import javax.sound.sampled.DataLine
 import javax.sound.sampled.SourceDataLine
 
 internal class DeskOutput {
-    private var line: SourceDataLine? = null
+    @Volatile private var line: SourceDataLine? = null
+    @Volatile private var accepting = false
     private var bytes = ByteArray(0)
     var written = 0L
         private set
 
-    @Synchronized fun open(): SourceDataLine = line ?: run {
-        val r = nativeRate
-        val format = AudioFormat(r.toFloat(), 16, 2, true, false)
-        AudioSystem.getSourceDataLine(format).also {
-            it.open(format, r * BUFFER_MS / 1000 * 4)
-            written = 0
-            line = it
+    @Synchronized fun open() {
+        val opened = line ?: run {
+            val r = nativeRate
+            val format = AudioFormat(r.toFloat(), 16, 2, true, false)
+            AudioSystem.getSourceDataLine(format).also {
+                it.open(format, r * BUFFER_MS / 1000 * 4)
+                line = it
+            }
         }
+        opened.flush()
+        written = opened.longFramePosition
+        accepting = true
     }
 
-    fun write(block: FloatArray, frames: Int) {
-        val l = line ?: return
+    fun write(block: FloatArray, frames: Int): Boolean {
+        val l = line?.takeIf { accepting } ?: return false
         if (bytes.size < frames * 4) bytes = ByteArray(frames * 4)
         val sink = capture
         sink?.invoke(block, frames)
@@ -33,19 +38,30 @@ internal class DeskOutput {
             bytes[2 * i + 1] = (v shr 8).toByte()
         }
         var off = 0
-        while (off < frames * 4) {
+        while (off < frames * 4 && accepting) {
             val n = l.write(bytes, off, frames * 4 - off)
+            if (!accepting) return false
             check(n > 0) { "Audio output closed" }
             off += n
         }
-        written += frames
-        if (!l.isRunning) l.start()
+        return synchronized(this) {
+            if (!accepting || line !== l) return false
+            written += frames
+            if (!l.isRunning) l.start()
+            true
+        }
     }
 
     fun position(): Long = line?.longFramePosition ?: 0L
 
+    @Synchronized fun stop() {
+        accepting = false
+        line?.let { runCatching { it.stop(); it.flush() } }
+    }
+
     @Synchronized fun close() {
-        line?.let { runCatching { it.stop(); it.flush(); it.close() } }
+        stop()
+        line?.let { runCatching { it.close() } }
         line = null
     }
 
@@ -83,6 +99,7 @@ internal class DeskClock(private val startMs: Double, private val rate: Int) {
     @Volatile var latencyNs = -1L
     @Volatile var wallStart = 0L
     @Volatile var failed = false
+    @Volatile var submittedFrames = Long.MAX_VALUE
 
     fun observe(frames: Long, nanos: Long) {
         if (lastFrames >= 0 && frames > lastFrames && (step == 0L || frames - lastFrames < step)) step = frames - lastFrames
@@ -111,7 +128,8 @@ internal class DeskClock(private val startMs: Double, private val rate: Int) {
             began > 0 -> startMs
             else -> return null
         }
-        return maxOf(ms, reached).also { reached = it }
+        val available = if (failed) ms else minOf(ms, startMs + submittedFrames * 1000.0 / rate)
+        return maxOf(available, reached).also { reached = it }
     }
 
     private companion object {

@@ -12,6 +12,7 @@ internal object EffectIcons {
     val Close = icon("Close", "M18.9 5.1L5.1 18.9M5.1 5.1L18.9 18.9")
     val Search = icon("Search", "M21 21L16.66 16.66M3 11A8 8 0 1 0 19 11A8 8 0 1 0 3 11Z")
     val Add = icon("AddEffect", "M5 12L19 12M12 5L12 19")
+    val Added = icon("AddedEffect", "M6 3H18Q21 3 21 6V18Q21 21 18 21H6Q3 21 3 18V6Q3 3 6 3ZM8 12H16M12 8V16")
     val Expand = solid("ExpandEffect", "M8.5 6.5L16.5 12L8.5 17.5Z")
     val Expanded = solid("ExpandedEffect", "M6.5 8.5L17.5 8.5L12 16.5Z")
     val MoreVert = solid("MoreVert", "M11 12A1 1 0 1 0 13 12A1 1 0 1 0 11 12ZM11 5A1 1 0 1 0 13 5A1 1 0 1 0 11 5ZM11 19A1 1 0 1 0 13 19A1 1 0 1 0 11 19Z", 2.0f)

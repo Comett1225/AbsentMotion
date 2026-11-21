@@ -266,6 +266,9 @@ import kotlin.math.roundToInt
 import androidx.compose.foundation.layout.aspectRatio
 import app.absentmotion.export.problem
 import app.absentmotion.export.communityBytes
+import app.absentmotion.effects.AddedEffectStore
+import app.absentmotion.effects.addedEffectUses
+import app.absentmotion.ui.home.SwitchRow
 import app.absentmotion.ui.HoldName
 
 private val Navy get() = Am.Navy
@@ -324,6 +327,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
     var page by remember { mutableStateOf<ExportKind?>(null) }
     var beforeFrame by remember { mutableStateOf(ExportKind.Video) }
     var community by remember { mutableStateOf(preset?.let { app.absentmotion.export.CommunityDetails(scene.title.trim().take(80), creator = appSettings.communityCreator, preset = true) }) }
+    var includeAddedEffects by remember { mutableStateOf(true) }
     var lastPage by remember { mutableStateOf(ExportKind.Gif) }
     var audioPage by remember { mutableStateOf(false) }
     var help by remember { mutableStateOf(false) }
@@ -505,7 +509,8 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
         if (kind in BackgroundKinds && !notifyAsk.ready { start(ignoreMissing, aiReady) }) return
         val s = settings.getValue(kind)
         val aiLevel = s.interpolationLevel.takeIf { s.interpolation == FrameInterpolation.Ai && kind in SmoothedKinds }
-        if (kind == ExportKind.Package) community?.problem(scene, app.absentmotion.library.MediaAccess.forApp(context))?.let {
+        if (kind == ExportKind.Package) community?.problem(scene, app.absentmotion.library.MediaAccess.forApp(context),
+            if (includeAddedEffects) AddedEffectStore(context.filesDir).bundleBytes(scene) else 0L)?.let {
             failure = Failure(R.string.export_failed_title, it)
             return
         }
@@ -606,7 +611,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
                 val began = System.nanoTime()
                 unlock.spend()
                 val result = Tier.unlocking(risks.mapNotNull { it.key as? Feature }) {
-                    (if (background) Exporter(context.applicationContext, app.absentmotion.platform.exportEngine(engine), MediaStoreExport(context.applicationContext), bundles = bundles) else exporter).export(chosen, exported, s, frame, name, { note = it }, community.takeIf { chosen == ExportKind.Package }, report)
+                    (if (background) Exporter(context.applicationContext, app.absentmotion.platform.exportEngine(engine), MediaStoreExport(context.applicationContext), bundles = bundles) else exporter).export(chosen, exported, s, frame, name, { note = it }, community.takeIf { chosen == ExportKind.Package }, includeAddedEffects, report)
                 }
                 outcome = true
                 if (background) app.absentmotion.platform.exportDone(result)
@@ -672,7 +677,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
     if (DESK) DeskExport(
         scene, frame, fromProjectList, engine, if (framing) listOf(ExportKind.FrameAs) else kinds, kind, { if (it == ExportKind.FrameAs) { beforeFrame = kind; page = it }; kind = it }, hasAudio, settings, check, hasEncoder, bitrateFits, explain, { help = true }, exportName,
         warning, support is Support.SlowSoftwareOnly, better?.let { suggestionLabel(video, it) }, ::useBetter, { acknowledged = warning },
-        free, estimate, timeMs, calculating, storage, blocked, asTemplate, { asTemplate = it }, { templateInfo = true }, { BundleFields(scene, engine, appSettings, community, preset) { community = it } },
+        free, estimate, timeMs, calculating, storage, blocked, asTemplate, { asTemplate = it }, { templateInfo = true }, { BundleFields(scene, engine, appSettings, community, preset, includeAddedEffects = includeAddedEffects, onIncludeAddedEffects = { includeAddedEffects = it }) { community = it } },
         phase, heat.level, note, { (phase as? Phase.Running)?.job?.cancel() }, { phase = Phase.Idle }, { (phase as? Phase.Done)?.let { share(context, it) } }, ::start,
         if (framing) closeFrame else onClose, stringResource(if (preset != null) R.string.preset_share else if (framing) R.string.export_kind_frame_as else R.string.export_title),
         preset?.let { { modifier -> PresetStill(scene, engine, modifier) } },
@@ -681,7 +686,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
             .widthIn(max = if (twoPane) 980.dp else 520.dp).heightIn(max = 760.dp).enterFade(12.dp).clip(RoundedCornerShape(18.dp)).background(Am.SheetBg)
         else Modifier.fillMaxSize().background(Am.SheetBg).pointerInput(Unit) {}.imePadding().enterFade(12.dp),
     ) {
-        if (preset != null) BundlePage(scene, engine, appSettings, community, { community = it }, info, bar, preset, onClose)
+        if (preset != null) BundlePage(scene, engine, appSettings, community, { community = it }, info, bar, preset, onClose, includeAddedEffects) { includeAddedEffects = it }
         else Column(Modifier.align(Alignment.TopCenter).widthIn(max = if (twoPane) Dp.Infinity else SheetMaxWidth).fillMaxSize()) {
             TitleBar(stringResource(R.string.export_title), ExportIcons.Close, stringResource(R.string.cancel)) { (phase as? Phase.Running)?.job?.cancel(); onClose() }
             if (!twoPane) info()
@@ -732,7 +737,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
             AudioSettingsPage(video, hasAudio, hasEncoder, { bitrateFits(it, false) }, { settings[ExportKind.Video] = it }, explain) { audioPage = false }
         }
         Presence(page == ExportKind.Package) {
-            BundlePage(scene, engine, appSettings, community, { community = it }, info, bar, null) { page = null }
+            BundlePage(scene, engine, appSettings, community, { community = it }, info, bar, null, { page = null }, includeAddedEffects) { includeAddedEffects = it }
         }
         Presence(page == ExportKind.Audio) {
             AudioOnlyPage(settings.getValue(ExportKind.Audio), hasEncoder, { bitrateFits(it, true) }, info, bar, { settings[ExportKind.Audio] = it }, explain) { page = null }
@@ -1671,18 +1676,23 @@ private val SuggestedTags = listOf("Edit", "Text", "Transition", "Intro", "Effec
 internal fun BundlePage(
     scene: Scene, engine: EngineThread, settings: app.absentmotion.library.AppSettings, community: app.absentmotion.export.CommunityDetails?, onChange: (app.absentmotion.export.CommunityDetails?) -> Unit,
     info: @Composable () -> Unit, bar: @Composable () -> Unit, preset: PresetShare?, onBack: () -> Unit,
+    includeAddedEffects: Boolean = true, onIncludeAddedEffects: (Boolean) -> Unit = {},
 ) {
     PageFrame(stringResource(if (preset != null) R.string.preset_share else R.string.project_bundle), onBack) {
         info()
         ScrollArea(Modifier.weight(1f).fillMaxWidth(), Am.SheetBg, PaddingValues(start = 15.dp, end = 15.dp, top = 16.dp, bottom = 20.dp), GroupGap) {
-            BundleFields(scene, engine, settings, community, preset, true, onChange)
+            BundleFields(scene, engine, settings, community, preset, true, includeAddedEffects, onIncludeAddedEffects, onChange)
         }
         bar()
     }
 }
 
 @Composable
-private fun BundleFields(scene: Scene, engine: EngineThread, settings: app.absentmotion.library.AppSettings, community: app.absentmotion.export.CommunityDetails?, preset: PresetShare?, preview: Boolean = false, onChange: (app.absentmotion.export.CommunityDetails?) -> Unit) {
+private fun BundleFields(
+    scene: Scene, engine: EngineThread, settings: app.absentmotion.library.AppSettings, community: app.absentmotion.export.CommunityDetails?,
+    preset: PresetShare?, preview: Boolean = false, includeAddedEffects: Boolean, onIncludeAddedEffects: (Boolean) -> Unit,
+    onChange: (app.absentmotion.export.CommunityDetails?) -> Unit,
+) {
     if (preset == null) Field(stringResource(R.string.project_bundle)) {
         Segments(listOf(Choice(false), Choice(true)), community != null, { stringResource(if (it) R.string.bundle_community else R.string.project_bundle) }, {}) { wanted ->
             if (!wanted) onChange(null)
@@ -1690,8 +1700,12 @@ private fun BundleFields(scene: Scene, engine: EngineThread, settings: app.absen
         }
         Hint(stringResource(if (community == null) R.string.one_absproj_package_with_the_project else R.string.bundle_community_note))
     }
-    if (community != null) CommunityFields(scene, engine, settings, community, preset, preview, onChange)
+    if (community != null) CommunityFields(scene, engine, settings, community, preset, preview, includeAddedEffects, onChange)
     SaveInField(settings)
+    val effectCount = remember(scene) { scene.addedEffectUses().size }
+    if (effectCount > 0) {
+        SwitchRow(stringResource(R.string.bundle_include_added_effects, effectCount), includeAddedEffects, true, onIncludeAddedEffects)
+    }
 }
 
 @Composable
@@ -1719,7 +1733,7 @@ private fun SaveInField(settings: app.absentmotion.library.AppSettings) {
 }
 
 @Composable
-private fun CommunityFields(scene: Scene, engine: EngineThread, settings: app.absentmotion.library.AppSettings, community: app.absentmotion.export.CommunityDetails, preset: PresetShare?, preview: Boolean, onChange: (app.absentmotion.export.CommunityDetails?) -> Unit) {
+private fun CommunityFields(scene: Scene, engine: EngineThread, settings: app.absentmotion.library.AppSettings, community: app.absentmotion.export.CommunityDetails, preset: PresetShare?, preview: Boolean, includeAddedEffects: Boolean, onChange: (app.absentmotion.export.CommunityDetails?) -> Unit) {
     if (preset != null) PlaceholderField(scene, engine, preset, preview)
     else Field(stringResource(R.string.community_thumbnail)) {
         val ratio = scene.width.coerceAtLeast(1).toFloat() / scene.height.coerceAtLeast(1)
@@ -1752,7 +1766,10 @@ private fun CommunityFields(scene: Scene, engine: EngineThread, settings: app.ab
     }) { custom = it }
     TextBox(R.string.community_creator, community.creator, 60) { settings.communityCreator = it; onChange(community.copy(creator = it)) }
     val context = LocalContext.current
-    val bytes = remember(scene) { scene.communityBytes(app.absentmotion.library.MediaAccess.forApp(context)) }
+    val bytes = remember(scene, includeAddedEffects) {
+        scene.communityBytes(app.absentmotion.library.MediaAccess.forApp(context)) +
+            if (includeAddedEffects) AddedEffectStore(context.filesDir).bundleBytes(scene) else 0L
+    }
     Field(stringResource(R.string.community_size), "${app.absentmotion.export.communitySizeText(bytes)} / 20 MB") {
         if (bytes > app.absentmotion.export.CommunityLimitBytes) Text(stringResource(R.string.community_too_big, app.absentmotion.export.communitySizeText(bytes)), color = Am.HomeAccent, fontSize = 13.sp, lineHeight = 18.sp)
     }

@@ -104,6 +104,11 @@ internal fun thumbnailTimes(layer: Layer, scene: Scene, fromMs: Float, toMs: Flo
     }
 }
 
+internal suspend fun videoFrameSample(context: Context, uri: String, timeUs: Long): ImageBitmap? {
+    val version = withContext(Dispatchers.IO) { thumbnailVersion(context, uri) } ?: return null
+    return withContext(Dispatchers.IO) { retrieving.withLock { thumbnailsAt(context, uri, version, listOf(0 to timeUs)) } }.firstOrNull()?.second
+}
+
 private suspend fun thumbnailsAt(context: Context, uri: String, version: String, tiles: List<Pair<Int, Long>>): List<Pair<Int, ImageBitmap>> {
     var retriever: FrameGrabber? = null
     return try {

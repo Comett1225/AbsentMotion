@@ -13,7 +13,14 @@ import androidx.compose.ui.graphics.asComposeImageBitmap
 import androidx.compose.ui.unit.IntSize
 import app.absentmotion.R
 import app.absentmotion.audio.AudioEngine
+import app.absentmotion.effects.AddedEffect
+import app.absentmotion.effects.AddedEffectPreview
+import app.absentmotion.effects.AddedEffectStore
+import app.absentmotion.effects.addedEffectSample
+import app.absentmotion.effects.changeAddedEffects
+import app.absentmotion.effects.previewAddedEffect
 import app.absentmotion.effects.EffectCatalog
+import app.absentmotion.effects.EffectDefinition
 import app.absentmotion.fonts.FontLibrary
 import app.absentmotion.fonts.prepareText
 import app.absentmotion.i18n.AppText
@@ -47,6 +54,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import java.awt.image.BufferedImage
 import java.io.File
@@ -126,6 +134,47 @@ class EngineThread(private val background: Int, private val context: Context? = 
         }
         withContext(dispatcher) { renderNow() }
     } }
+
+    internal suspend fun awaitEffects() { effectJob?.join() }
+
+    internal suspend fun previewAddedEffects(context: Context, added: List<AddedEffect>): List<AddedEffectPreview> {
+        if (added.isEmpty()) return emptyList()
+        val sample = withContext(Dispatchers.IO) { runCatching { addedEffectSample(context) }.getOrNull() }
+        return try {
+            withContext(dispatcher) {
+                check(!closed)
+                NativeEngine().use { preview ->
+                    added.map {
+                        coroutineContext.ensureActive()
+                        previewAddedEffect(preview, it, sample)
+                    }
+                }
+            }
+        } finally {
+            sample?.recycle()
+        }
+    }
+
+    internal suspend fun updateAddedEffects(store: AddedEffectStore, add: List<AddedEffectPreview> = emptyList(), remove: EffectDefinition? = null, newerOnly: Boolean = false): Boolean {
+        awaitEffects()
+        return captureLock.withLock {
+            withContext(dispatcher) {
+                val native = engine()
+                val (catalog, success) = effects.value.changeAddedEffects(store, add, remove, native::loadEffect, newerOnly)
+                effectCatalog.value = catalog
+                native.forgetHeld()
+                requestRender()
+                success
+            }
+        }
+    }
+
+    internal suspend fun updateAddedEffectPlacement(change: (EffectCatalog) -> EffectCatalog) {
+        awaitEffects()
+        withContext(dispatcher) {
+            if (!closed) effectCatalog.value = change(effectCatalog.value)
+        }
+    }
 
     fun relabelEffects(context: Context) {}
 

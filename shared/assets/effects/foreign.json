@@ -544,6 +544,12 @@
      "1": 1,
      "2": 2
     }
+   },
+   "alphab": {
+    "ignore": true
+   },
+   "bright": {
+    "ignore": true
    }
   },
   "set": {
@@ -1014,6 +1020,29 @@
    }
   }
  },
+ "com.alightcreative.effect.movealongpath2": {
+  "to": "movealongpath",
+  "set": {
+   "legacyCoordinates": true
+  },
+  "params": {
+   "progress": {
+    "to": "progress"
+   },
+   "angle": {
+    "to": "orientation"
+   },
+   "tangent": {
+    "to": "rotate"
+   },
+   "inset": {
+    "to": "inset"
+   },
+   "offset": {
+    "to": "offset"
+   }
+  }
+ },
  "com.alightcreative.effect.movealongpath3": {
   "to": "movealongpath",
   "params": {
@@ -1028,6 +1057,9 @@
    },
    "inset": {
     "to": "inset"
+   },
+   "offset": {
+    "to": "offset"
    }
   }
  },
@@ -2866,6 +2898,15 @@
     "min": -1,
     "max": 1,
     "absent": 0.5
+   },
+   "radius": {
+    "to": "radius",
+    "min": 0,
+    "max": 8,
+    "unlessEnabled": "gaussian"
+   },
+   "gaussian": {
+    "neutral": "false"
    }
   },
   "set": {
@@ -3188,7 +3229,9 @@
     "to": "screenSpace"
    },
    "threshold": {
-    "neutral": 0
+    "to": "threshold",
+    "min": 0,
+    "max": 1
    },
    "saturation": {
     "neutral": 0
@@ -3526,6 +3569,14 @@
    },
    "color2": {
     "to": "paper"
+   },
+   "strength": {
+    "to": "strength",
+    "min": 0,
+    "max": 1
+   },
+   "phase": {
+    "to": "phase"
    }
   },
   "set": {
@@ -4217,7 +4268,7 @@
     "max": 9
    },
    "parr": {
-    "neutral": "0,0"
+    "to": "parallax"
    }
   }
  },
@@ -4819,12 +4870,18 @@
   "params": {
    "strength": {
     "to": "strength",
-    "scale": 120,
-    "min": 0
+    "scale": 320,
+    "min": 0,
+    "absent": 0.15
    },
    "iter": {
-    "neutral": 3
+    "to": "iterations",
+    "min": 1,
+    "max": 20
    }
+  },
+  "set": {
+   "shape": 2
   }
  },
  "com.alightcreative.effects.boxblur2": {
@@ -5358,6 +5415,30 @@
    "seed": 0
   }
  },
+ "com.alightcreative.effects.oscillate": {
+  "to": "oscillate",
+  "params": {
+   "angle": {
+    "to": "angle",
+    "scale": -1,
+    "absent": 45,
+    "offset": 90
+   },
+   "freq": {
+    "to": "frequency",
+    "scale": 0.5,
+    "absent": 2
+   },
+   "mag": {
+    "to": "magnitude"
+   },
+   "type": {
+    "to": "wave",
+    "min": 0,
+    "max": 1
+   }
+  }
+ },
  "com.alightcreative.effects.oscillate2": {
   "to": "oscillate",
   "params": {
@@ -5779,7 +5860,9 @@
     "to": "screenSpace"
    },
    "threshold": {
-    "neutral": 0
+    "to": "threshold",
+    "min": 0,
+    "max": 1
    },
    "saturation": {
     "neutral": 0
@@ -5832,10 +5915,16 @@
     "max": 9
    },
    "parr": {
-    "neutral": "0,0"
+    "to": "parallax"
    },
    "stretch": {
-    "neutral": 1
+    "to": "stretch",
+    "pad": [
+     null,
+     1
+    ],
+    "min": 0.01,
+    "max": 50
    }
   }
  },
@@ -6888,7 +6977,8 @@
     "max": 1
    },
    "stretch": {
-    "neutral": "0"
+    "to": "stretch",
+    "min": -1
    },
    "easeIn": {
     "neutral": "0"
@@ -10550,6 +10640,18 @@
     "to": "pivotDepth",
     "min": -10,
     "max": 10
+   },
+   "lightIntensity": {
+    "neutral": 1,
+    "ignoreWhenDisabled": "enableLight"
+   },
+   "lightColor": {
+    "neutral": "#ffffffff",
+    "ignoreWhenDisabled": "enableLight"
+   },
+   "lightDepth": {
+    "neutral": -100,
+    "ignoreWhenDisabled": "enableLight"
    }
   },
   "set": {
@@ -10603,13 +10705,16 @@
     }
    },
    "lightIntensity": {
-    "neutral": 1
+    "neutral": 1,
+    "ignoreWhenDisabled": "enableLight"
    },
    "lightColor": {
-    "neutral": "#ffffffff"
+    "neutral": "#ffffffff",
+    "ignoreWhenDisabled": "enableLight"
    },
    "lightDepth": {
-    "neutral": -100
+    "neutral": -100,
+    "ignoreWhenDisabled": "enableLight"
    },
    "light": {
     "to": "light"
@@ -10898,6 +11003,16 @@
    "yaw": 0,
    "pitch": 0,
    "roll": 0
+  },
+  "orientation": {
+   "quat": "orient",
+   "euler": "rotate",
+   "to": [
+    "roll",
+    "pitch",
+    "yaw"
+   ],
+   "sphere": true
   }
  },
  "com.alightcreative.effects.vrplayer": {

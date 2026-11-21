@@ -72,7 +72,9 @@ class WarpMigrationTest {
         assertEquals(1f, d.number("curve"), 1e-6f)
         val v = migrate("pinchbulgeinside", "centerPoint" to "40,-25", "strength" to "0.625", "radius" to "0.85")
         assertEquals(0.625f, v.number("amount"), 1e-6f)
-        assertEquals(0.3f, v.number("radius"), 1e-6f)
+        assertEquals(0.85f, v.number("radius"), 1e-6f)
+        val unsupported = migrate("pinchbulgeinside", "radius" to "0.85", "gaussian" to "true")
+        assertEquals(0.3f, unsupported.number("radius"), 1e-6f)
         assertEquals(0.5f + 40f * 0.165f / 220, v.numbers("center")[0], 1e-5f)
         assertEquals(0.5f - 25f * 0.165f / 165, v.numbers("center")[1], 1e-5f)
     }

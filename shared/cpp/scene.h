@@ -261,6 +261,7 @@ void ParentRoll(const Layer& layer, double timeMs, Placement* own);
 float MotionOpacity(const Layer& layer, double timeMs);
 bool EchoOf(const Layer& layer, double timeMs, Echo* echo);
 bool FollowsPath(const Layer& layer);
+bool UsesLegacyPathCoordinates(const Layer& layer, double timeMs);
 bool TextGuideBelow(const Layer& layer, float t, SkPath* path);
 void FollowPath(const Layer& layer, double timeMs, const SkPath& path, Placement* placement);
 void ParseSteps(Layer* layer);
@@ -374,7 +375,7 @@ private:
     const Scene* fPrevious;
 };
 void SetLayerBreak(const std::function<void()>* each);
-void NoteOrientedEffect(const std::string& id);
+void NoteOrientedEffect(const std::string& id, bool oriented = true);
 bool WorldView();
 bool InsideGroup();
 bool EffectOwnerMatrix(int64_t owner, double timeMs, SkMatrix* matrix);

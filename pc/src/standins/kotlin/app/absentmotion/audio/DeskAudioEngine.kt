@@ -112,7 +112,7 @@ class AudioEngine(context: Context) {
     private inner class Session(val startMs: Double, @Volatile private var previous: Session?) : Thread("am-audio-mixer") {
         @Volatile var stopRequested = false
         val rate = DeskOutput.nativeRate
-        val clock = DeskClock(startMs, rate)
+        val clock = DeskClock(startMs, rate).apply { submittedFrames = 0 }
         private val rack = FxRack(rate)
         private val limiter = SafeLimiter(rate)
 
@@ -121,6 +121,7 @@ class AudioEngine(context: Context) {
         fun halt() {
             clock.stop(System.nanoTime())
             stopRequested = true
+            output.stop()
         }
 
         override fun run() {
@@ -130,16 +131,18 @@ class AudioEngine(context: Context) {
                 if (stopRequested) return
                 keepStreams(startMs)
                 output.open()
-                if (stopRequested) return
+                if (stopRequested) { output.stop(); return }
                 clock.latencyNs = DeskOutput.latencyNs()
                 preroll()
                 val out = FloatArray(BLOCK * 2)
                 var written = 0L
                 clock.base = output.written
                 repeat(PRIME) {
+                    if (stopRequested) return
                     mixBlock(out, startMs + written * 1000.0 / rate)
-                    output.write(out, BLOCK)
+                    if (stopRequested || !output.write(out, BLOCK)) return
                     written += BLOCK
+                    clock.submittedFrames = written
                 }
                 clock.wallStart = System.nanoTime()
                 clock.observe(output.position(), System.nanoTime())
@@ -147,15 +150,14 @@ class AudioEngine(context: Context) {
                     val t0 = startMs + written * 1000.0 / rate
                     keepStreams(t0)
                     mixBlock(out, t0)
-                    output.write(out, BLOCK)
+                    if (stopRequested || !output.write(out, BLOCK)) break
+                    written += BLOCK
+                    clock.submittedFrames = written
                     clock.observe(output.position(), System.nanoTime())
                     if (log) Log.i("AMAudio", "block projectMs=%.3f playheadFrame=%d playheadMs=%d clockMs=%.3f".format(java.util.Locale.ROOT, t0, shownFrame, shownMs, clock.positionMs() ?: -1.0))
-                    written += BLOCK
                 }
-                mixBlock(out, startMs + written * 1000.0 / rate)
-                for (i in 0 until FADE) { val g = 1f - (i + 1f) / FADE; out[2 * i] *= g; out[2 * i + 1] *= g }
-                output.write(out, FADE)
             } catch (e: Exception) {
+                if (stopRequested) return
                 Log.w("AMAudio", "Audio stream failed", e)
                 clock.failed = true
                 if (clock.wallStart == 0L) clock.wallStart = System.nanoTime()
@@ -215,35 +217,9 @@ class AudioEngine(context: Context) {
     private companion object {
         const val BLOCK = 512
         val PRIME = if (app.absentmotion.desk.DeskOs.windows) 3 else 2
-        const val FADE = 256
         const val AHEAD_MS = 1500.0
         const val BEHIND_MS = 300.0
         const val IDLE_MS = 8000L
         val probe: java.util.concurrent.ExecutorService = java.util.concurrent.Executors.newSingleThreadExecutor { Thread(it, "am-audio-probe").apply { isDaemon = true } }
     }
-}
-
-internal fun List<AudioClip>.audibleAfter(startMs: Double, sound: (String) -> Boolean?): Boolean = any { it.endMs > startMs && sound(it.uri) != false }
-
-internal fun mixStreams(
-    clips: List<AudioClip>, out: FloatArray, frames: Int, t0: Double, rate: Int, quality: Int, rack: FxRack,
-    stream: (AudioClip) -> LayerStream?,
-) {
-    java.util.Arrays.fill(out, 0, 2 * frames, 0f)
-    val dt = 1000.0 / rate
-    for (clip in clips) {
-        stream(clip)?.let { clip.resolveDuration(it.durationUs) }
-        val dst = rack.target(clip, out, frames)
-        var rendered = false
-        var next = 0
-        while (true) {
-            val span = clip.span(t0, frames, dt, next) ?: break
-            next = span.to
-            val source = stream(clip) ?: break
-            if (!span.inMedia) { source.restart(); continue }
-            if (source.mix(dst, span.from, span.to, span.pos, span.step, span.g0, span.g1, quality, span.clipMs0, dt, span.lengthMs)) rendered = true
-        }
-        rack.finish(clip, out, frames, rendered)
-    }
-    rack.sweep()
 }

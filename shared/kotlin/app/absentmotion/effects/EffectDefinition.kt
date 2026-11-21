@@ -82,7 +82,7 @@ data class EffectDefinition(
     val id: String,
     val key: String,
     val name: String,
-    val category: String,
+    val category: String?,
     val description: String,
     val params: List<EffectParam>,
     val sksl: String? = null,
@@ -94,10 +94,17 @@ data class EffectDefinition(
     val shortcuts: List<EffectShortcut> = emptyList(),
     val shortcut: String? = null,
     val alsoIn: List<String> = emptyList(),
+    val addedPicture: String? = null,
+    internal val addedAuthor: String = "",
+    internal val addedCreator: String = "",
+    internal val addedVersion: Long = 1L,
+    internal val addedPack: String? = null,
+    internal val addedModified: Long = 0L,
 ) {
     val available: Boolean get() = status == "ok"
-    val thumbnail: String get() = "thumb/${shortcut ?: key}.webp"
-    val hero: String get() = "thumb/${shortcut ?: key}.hero.avif"
+    val isAdded: Boolean get() = id.startsWith(AddedEffectPrefix)
+    val thumbnail: String get() = if (isAdded) addedPicture ?: "added/$key.webp" else "thumb/${shortcut ?: key}.webp"
+    val hero: String get() = if (isAdded) thumbnail else "thumb/${shortcut ?: key}.hero.avif"
 
     fun shortcutTiles(): List<EffectDefinition> = shortcuts.map { s ->
         copy(name = s.name, description = s.description, since = s.since ?: since, shortcut = s.key, shortcuts = emptyList(), alsoIn = s.also)
@@ -123,9 +130,20 @@ data class EffectDefinition(
         })
     }
 
-    fun instance(): XmlNode = XmlNode("effect", mapOf("id" to id, "hidden" to "false"), params.map {
-        XmlNode("property", mapOf("name" to it.id, "type" to it.type, "value" to it.default))
-    })
+    fun instance(): XmlNode {
+        val attrs = buildMap {
+            put("id", id)
+            put("hidden", "false")
+            if (isAdded) {
+                put("name", name)
+                put("version", addedVersion.toString())
+                addedPack?.let { put("pack", it) }
+            }
+        }
+        return XmlNode("effect", attrs, params.map {
+            XmlNode("property", mapOf("name" to it.id, "type" to it.type, "value" to it.default))
+        })
+    }
 
     fun bounded(param: EffectParam, seconds: Float, value: (EffectParam) -> Float): EffectParam {
         if (!param.layerTime && param.after == null) return param
@@ -146,9 +164,13 @@ data class EffectDefinition(
 
     companion object {
         fun parse(json: JSONObject): EffectDefinition {
-            val key = json.getString("id")
             val category = json.getString("category")
-            require(category in EffectCatalog.Categories) { "$key: unknown category $category" }
+            require(category in EffectCatalog.Categories) { "${json.getString("id")}: unknown category $category" }
+            return parse(json, category)
+        }
+
+        internal fun parse(json: JSONObject, category: String?): EffectDefinition {
+            val key = json.getString("id")
             val params = json.optJSONArray("params") ?: JSONArray()
             val native = json.optBoolean("native")
             val sksl = json.optString("sksl").takeIf { it.isNotBlank() }

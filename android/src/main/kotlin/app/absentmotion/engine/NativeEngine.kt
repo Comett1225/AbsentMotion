@@ -5,7 +5,7 @@ import android.graphics.Rect
 import android.graphics.Bitmap
 import android.view.Surface
 
-class NativeEngine(backend: Backend) : AutoCloseable {
+class NativeEngine(internal val backend: Backend) : AutoCloseable {
     enum class Backend { GRAPHITE, GANESH, GL }
 
     private var handle = nativeCreate(backend.ordinal)

@@ -542,6 +542,13 @@ bool FollowsPath(const Layer& l) {
     return !l.placed && std::any_of(l.effects.begin(), l.effects.end(), [](const LayerEffect& e) { return !e.hidden && e.id == "absent.movealongpath"; });
 }
 
+bool UsesLegacyPathCoordinates(const Layer& l, double timeMs) {
+    for (const LayerEffect& e : l.effects) {
+        if (!e.hidden && e.id == "absent.movealongpath") return Param(e, "legacyCoordinates", l.localTime(timeMs), 0) >= 0.5f;
+    }
+    return false;
+}
+
 void FollowPath(const Layer& l, double timeMs, const SkPath& path, Placement* p) {
     for (const LayerEffect& e : l.effects) {
         if (e.hidden || e.id != "absent.movealongpath") continue;
@@ -580,8 +587,11 @@ void FollowPath(const Layer& l, double timeMs, const SkPath& path, Placement* p)
             area += (double)prev.fX * first.fY - (double)first.fX * prev.fY;
             if (area < -1e-3 * length * length) out = -out;
         }
-        const float turn = (Param(e, "rotate", t, 1) >= 0.5f ? (float)(std::atan2(tangent.fY, tangent.fX) * 360 / kTau) : 0.0f) + Param(e, "orientation", t, 0);
-        const SkVector shift = SkMatrix::RotateDeg(turn).mapVector(Param(e, "offset", t, 0, 0), Param(e, "offset", t, 0, 1));
+        const bool legacy = Param(e, "legacyCoordinates", t, 0) >= 0.5f;
+        const float heading = (float)(std::atan2(tangent.fY, tangent.fX) * 360 / kTau);
+        const float turn = Param(e, "orientation", t, 0) + (Param(e, "rotate", t, 1) >= 0.5f ? heading + (legacy ? 180.0f : 0.0f) : 0.0f);
+        const SkVector offset{Param(e, "offset", t, 0, 0), Param(e, "offset", t, 0, 1)};
+        const SkVector shift = legacy ? offset : SkMatrix::RotateDeg(turn).mapVector(offset.fX, offset.fY);
         p->location = pos + out * Param(e, "inset", t, 0) + shift;
         p->rotation += turn;
         return;

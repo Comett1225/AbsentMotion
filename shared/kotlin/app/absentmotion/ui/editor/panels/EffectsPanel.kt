@@ -40,6 +40,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.editor.*
+import app.absentmotion.effects.AddedEffectPrefix
 import app.absentmotion.effects.EffectDefinition
 import app.absentmotion.effects.PresetFavouriteStore
 import app.absentmotion.platform.LocalContext
@@ -66,6 +67,7 @@ import app.absentmotion.ui.editor.effects.AiMarkRow
 import app.absentmotion.ui.editor.effects.AiMarkRowGap
 import app.absentmotion.ui.editor.effects.AiMarkRowHeight
 import app.absentmotion.ui.editor.effects.EffectIcons
+import app.absentmotion.ui.editor.effects.AddedEffectBadge
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.Presence
 import androidx.compose.ui.res.stringResource
@@ -249,6 +251,7 @@ private fun EffectHeader(state: EditorState, index: Int, effect: XmlNode, defini
     var presets by remember { mutableStateOf(false) }
     Row(Modifier.fillMaxWidth().height(37.dp).background(Am.CardHeader).deleteWhenHovered { state.editSelected { it.removeEffect(index) }; state.effectIndex = -1 }.clickable { state.effectIndex = -1 }.padding(start = 3.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
         Icon(EffectIcons.Expanded, null, Modifier.padding(start = 8.dp).size(18.dp).alpha(0.9f), tint = Am.OnDark)
+        if (effect["id"]?.startsWith(AddedEffectPrefix) == true) AddedEffectBadge(Modifier.padding(start = 6.dp))
         Text(definition?.name ?: effect["id"]?.substringAfterLast('.') ?: "", Modifier.weight(1f).padding(start = 6.dp, end = 4.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
         if (definition != null && definition.presets.isNotEmpty()) Box {
             Text(stringResource(R.string.presets), Modifier.widthIn(max = 104.dp).clip(RowShape).background(Color(0x33000000)).clickable { presets = true }.padding(horizontal = 9.dp, vertical = 5.dp),
@@ -365,6 +368,7 @@ private fun EffectListRow(state: EditorState, reorder: Reorder, index: Int, coun
             Row(Modifier.weight(1f).fillMaxHeight().alpha(if (definition?.available == true && effect["locallyApplied"] != "true") 1f else 0.35f)
                 .clickable { state.effectIndex = index }.padding(start = 11.dp), verticalAlignment = Alignment.CenterVertically) {
                 Icon(EffectIcons.Expand, null, Modifier.size(18.dp).alpha(0.3f), tint = Am.OnDark)
+                if (effect["id"]?.startsWith(AddedEffectPrefix) == true) AddedEffectBadge(Modifier.padding(start = 6.dp))
                 Text(definition?.name ?: effect["id"]?.substringAfterLast('.') ?: "", Modifier.padding(start = 6.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
             }
             DeskTip(stringResource(R.string.effects_visibility)) {

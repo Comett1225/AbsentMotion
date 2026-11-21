@@ -500,15 +500,19 @@
    "description": "Una sfocatura morbida e uniforme. Con Forma su Riquadro calcola invece la media di un quadrato uniforme attorno a ogni punto.",
    "name": "Sfocatura",
    "params": {
-    "strength": {
-     "label": "Intensità"
+    "iterations": {
+     "label": "Iterazioni"
     },
     "shape": {
      "label": "Forma",
      "options": [
       "Morbida",
-      "Riquadro"
+      "Riquadro",
+      "Riquadro rapido"
      ]
+    },
+    "strength": {
+     "label": "Intensità"
     }
    }
   },
@@ -2507,6 +2511,9 @@
     "offset": {
      "label": "Spostamento"
     },
+    "parallax": {
+     "label": "Parallasse"
+    },
     "scale": {
      "label": "Scala"
     },
@@ -2997,6 +3004,12 @@
     },
     "paper": {
      "label": "Colore carta"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "strength": {
+     "label": "Intensità"
     },
     "style": {
      "label": "Stile",
@@ -4215,6 +4228,9 @@
     "inset": {
      "label": "Verso l'interno/esterno"
     },
+    "legacyCoordinates": {
+     "label": "Coordinate precedenti"
+    },
     "offset": {
      "label": "Scostamento"
     },
@@ -4919,6 +4935,9 @@
     },
     "stretch": {
      "label": "Allungamento"
+    },
+    "threshold": {
+     "label": "Soglia"
     },
     "vignette": {
      "label": "Vignettatura"
@@ -7419,6 +7438,9 @@
     },
     "start": {
      "label": "Inizio"
+    },
+    "stretch": {
+     "label": "Allungamento"
     },
     "tint": {
      "label": "Tinta"

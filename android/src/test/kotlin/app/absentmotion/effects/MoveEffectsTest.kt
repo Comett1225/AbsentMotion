@@ -69,7 +69,7 @@ class MoveEffectsTest {
             row("Mask To Layer", "switch", "false")), params("offset"))
         assertEquals(listOf(row("Progress", "float", "0.000000", "0.0..1.0", "%"), row("Orientation", "angle", "0.000000", "-3600.0..3600.0"),
             row("Rotate Automatically", "switch", "true"), row("Inset/Outset", "float", "0.000000", "-500.0..500.0"),
-            row("Offset", "point", "0.000000,0.000000", "-5000.0..5000.0")), params("movealongpath"))
+            row("Offset", "point", "0.000000,0.000000", "-5000.0..5000.0"), row("Legacy Coordinates", "switch", "false")), params("movealongpath"))
         assertEquals(listOf(row("Frames/sec", "float", "5.000000", "0.1..120.0")), params("timequant"))
     }
 

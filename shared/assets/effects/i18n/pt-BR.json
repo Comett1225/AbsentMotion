@@ -500,15 +500,19 @@
    "description": "Um desfoque suave e uniforme. Com Forma em Caixa, faz a média de um quadrado uniforme ao redor de cada ponto.",
    "name": "Desfoque",
    "params": {
-    "strength": {
-     "label": "Intensidade"
+    "iterations": {
+     "label": "Iterações"
     },
     "shape": {
      "label": "Forma",
      "options": [
       "Suave",
-      "Caixa"
+      "Caixa",
+      "Caixa rápida"
      ]
+    },
+    "strength": {
+     "label": "Intensidade"
     }
    }
   },
@@ -2507,6 +2511,9 @@
     "offset": {
      "label": "Deslocamento"
     },
+    "parallax": {
+     "label": "Paralaxe"
+    },
     "scale": {
      "label": "Escala"
     },
@@ -2997,6 +3004,12 @@
     },
     "paper": {
      "label": "Cor do papel"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "strength": {
+     "label": "Intensidade"
     },
     "style": {
      "label": "Estilo",
@@ -4215,6 +4228,9 @@
     "inset": {
      "label": "Dentro/Fora"
     },
+    "legacyCoordinates": {
+     "label": "Coordenadas antigas"
+    },
     "offset": {
      "label": "Deslocamento"
     },
@@ -4919,6 +4935,9 @@
     },
     "stretch": {
      "label": "Alongamento"
+    },
+    "threshold": {
+     "label": "Limite"
     },
     "vignette": {
      "label": "Vinheta"
@@ -7419,6 +7438,9 @@
     },
     "start": {
      "label": "Início"
+    },
+    "stretch": {
+     "label": "Alongamento"
     },
     "tint": {
      "label": "Tingir"

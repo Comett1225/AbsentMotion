@@ -66,8 +66,17 @@ internal class LayerStream(val uri: String, startMs: Double, val loopMs: Double?
                 }
                 val chunk = decoder.next()
                 if (chunk == null) {
-                    if (rate == 0) { lock.withLock { if (seekGen == handled) blank = true }; continue }
-                    lock.withLock { if (seekGen == handled) { if (!placed) place(rate, target); placed = true; eof = true; keepHead(true) } }
+                    lock.withLock {
+                        if (seekGen == handled) {
+                            if (rate == 0) blank = true else {
+                                if (!placed) place(rate, target)
+                                placed = true
+                                eof = true
+                                keepHead(true)
+                            }
+                            changed.signalAll()
+                        }
+                    }
                     continue
                 }
                 if (!placed) lock.withLock { if (seekGen == handled) { place(chunk.rate, target); placed = true } }
@@ -75,6 +84,7 @@ internal class LayerStream(val uri: String, startMs: Double, val loopMs: Double?
             }
         } catch (e: Exception) {
             failed = true
+            lock.withLock { changed.signalAll() }
             Log.w("AMAudio", "Cannot decode $uri", e)
         } finally {
             decoder?.close()
@@ -163,6 +173,7 @@ internal class LayerStream(val uri: String, startMs: Double, val loopMs: Double?
                     }
                     endAbs += n
                     startAbs = maxOf(startAbs, endAbs - cap)
+                    changed.signalAll()
                 } else changed.await(10, TimeUnit.MILLISECONDS)
             }
             done += n
@@ -214,7 +225,7 @@ internal class LayerStream(val uri: String, startMs: Double, val loopMs: Double?
 
     fun mix(
         dst: FloatArray, from: Int, to: Int, posMs: Double, stepMs: Double, g0: Float, g1: Float, quality: Int,
-        clipMs0: Double, dtMs: Double, clipLenMs: Double,
+        clipMs0: Double, dtMs: Double, clipLenMs: Double, waitUntil: Long = 0,
     ): Boolean {
         val r = rate
         val count = to - from
@@ -229,10 +240,14 @@ internal class LayerStream(val uri: String, startMs: Double, val loopMs: Double?
         val ok = lock.withLock {
             keepFrom = voice.base - KEEP
             changed.signalAll()
-            if (!covers(voice.base, voice.last)) return@withLock false
+            while (!covers(voice.base, voice.last)) {
+                val left = waitUntil - System.nanoTime()
+                if (waitUntil == 0L || left <= 0 || closed || failed || blank) return@withLock false
+                changed.awaitNanos(left)
+            }
             copyWindow(voice.base, voice.size, voice.win)
             if (voice.jump && holds(voice.ghostBase, voice.ghostBase + voice.ghostSize)) {
-                copyWindow(voice.ghostBase, voice.ghostSize, voice.ghostWindow())
+                copyWindow(voice.ghostBase, voice.ghostSize, voice.ghostWindow(), includePrevious = true)
                 voice.ghostOk = true
             }
             true
@@ -242,10 +257,10 @@ internal class LayerStream(val uri: String, startMs: Double, val loopMs: Double?
         return true
     }
 
-    private fun copyWindow(base: Long, frames: Int, out: FloatArray) {
+    private fun copyWindow(base: Long, frames: Int, out: FloatArray, includePrevious: Boolean = false) {
         for (i in 0 until frames) {
             val abs = base + i
-            if (abs >= 0 && abs >= startAbs && abs < endAbs) {
+            if ((valid || includePrevious) && abs >= 0 && abs >= startAbs && abs < endAbs) {
                 val at = (abs % cap).toInt() * 2
                 out[2 * i] = ring[at] * INV
                 out[2 * i + 1] = ring[at + 1] * INV
@@ -268,4 +283,30 @@ internal class LayerStream(val uri: String, startMs: Double, val loopMs: Double?
         private const val KEEP = 64L
         private const val INV = 1f / 32768f
     }
+}
+
+internal fun List<AudioClip>.audibleAfter(startMs: Double, sound: (String) -> Boolean?): Boolean = any { it.endMs > startMs && sound(it.uri) != false }
+
+internal fun mixStreams(
+    clips: List<AudioClip>, out: FloatArray, frames: Int, t0: Double, rate: Int, quality: Int, rack: FxRack,
+    stream: (AudioClip) -> LayerStream?,
+) {
+    java.util.Arrays.fill(out, 0, 2 * frames, 0f)
+    val dt = 1000.0 / rate
+    val waitUntil = System.nanoTime() + 4_000_000L
+    for (clip in clips) {
+        stream(clip)?.let { clip.resolveDuration(it.durationUs) }
+        val dst = rack.target(clip, out, frames)
+        var rendered = false
+        var next = 0
+        while (true) {
+            val span = clip.span(t0, frames, dt, next) ?: break
+            next = span.to
+            val source = stream(clip) ?: break
+            if (!span.inMedia) { source.restart(); continue }
+            if (source.mix(dst, span.from, span.to, span.pos, span.step, span.g0, span.g1, quality, span.clipMs0, dt, span.lengthMs, waitUntil)) rendered = true
+        }
+        rack.finish(clip, out, frames, rendered)
+    }
+    rack.sweep()
 }

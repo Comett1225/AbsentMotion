@@ -1,7 +1,15 @@
 package app.absentmotion.library
 
 import app.absentmotion.BuildConfig
+import app.absentmotion.effects.AddedEffectMaxBytes
+import app.absentmotion.effects.AddedEffectPrefix
+import app.absentmotion.effects.AddedEffectUse
+import app.absentmotion.effects.addedEffectKey
+import app.absentmotion.effects.addedEffectVersion
+import app.absentmotion.effects.readAddedEffectEntries
+import app.absentmotion.effects.isAddedEffectFile
 import app.absentmotion.engine.EngineThread
+import app.absentmotion.platform.Context
 import app.absentmotion.export.ExportSettings
 import app.absentmotion.model.Scene
 import app.absentmotion.model.mapMediaUris
@@ -16,6 +24,7 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
+import java.io.InterruptedIOException
 import java.net.URI
 import java.security.MessageDigest
 import java.util.Locale
@@ -75,11 +84,14 @@ enum class CommunityKind(
     val maxBytes: Long
 ) {
     Bundle("bundle", "bundles", 20L shl 20),
-    Preset("preset", "presets", 1L shl 20)
+    Preset("preset", "presets", 1L shl 20),
+    Effect("effect", "effects", AddedEffectMaxBytes.toLong())
 }
 
 internal fun communityLimit(kind: CommunityKind, file: String): Long =
     if (file.endsWith(".absproj")) CommunityKind.Bundle.maxBytes else kind.maxBytes
+
+data class CommunityEffectContent(val id: String, val name: String, val version: Long)
 
 data class CommunityItem(
     val kind: CommunityKind,
@@ -95,15 +107,42 @@ data class CommunityItem(
     val thumbnail: String? = null,
     val width: Int = 0,
     val height: Int = 0,
-    val lengthMs: Long = 0L
+    val lengthMs: Long = 0L,
+    val credit: String? = null,
+    val contents: List<CommunityEffectContent> = emptyList(),
+    val minVersion: Int = 0,
 )
 
 data class CommunityIndex(
     val items: List<CommunityItem>,
-    val tooNew: Boolean = false
+    val tooNew: Boolean = false,
+    val unavailableEffects: List<CommunityItem> = emptyList(),
 )
 
 class CommunityDamagedException(message: String) : IOException(message)
+
+internal class CommunityItemUnavailable : IOException()
+
+internal class CommunityWriteException(cause: Exception) : IOException(cause)
+
+internal fun CommunityIndex.effectPacks(missing: List<AddedEffectUse>): Map<CommunityItem, List<AddedEffectUse>> {
+    val remaining = missing.toMutableList()
+    val candidates = items.filter { it.kind == CommunityKind.Effect }.associateWith { pack ->
+        missing.filter { use -> pack.contents.any { it.id == use.id.removePrefix(AddedEffectPrefix) && it.version >= use.version } }
+    }.toMutableMap()
+    val chosen = linkedMapOf<CommunityItem, List<AddedEffectUse>>()
+    while (remaining.isNotEmpty()) {
+        val matches = candidates.mapValues { (_, uses) -> uses.filter { it in remaining } }
+        val best = matches.maxWithOrNull(compareBy<Map.Entry<CommunityItem, List<AddedEffectUse>>>(
+            { it.value.size }, { (item, uses) -> uses.count { it.pack == item.name } },
+        )) ?: break
+        if (best.value.isEmpty()) break
+        chosen[best.key] = candidates.getValue(best.key)
+        remaining.removeAll(best.value.toSet())
+        candidates.remove(best.key)
+    }
+    return chosen
+}
 
 fun safeCommunityPath(path: String, folder: String): Boolean {
     if (path.isEmpty() || folder.isEmpty()) return false
@@ -126,22 +165,24 @@ fun parseCommunityIndex(text: String, versionCode: Int): CommunityIndex {
     }
     val arr = root.optJSONArray("items") ?: return CommunityIndex(emptyList())
     val items = ArrayList<CommunityItem>(arr.length())
+    val unavailableEffects = ArrayList<CommunityItem>()
     val seen = HashSet<String>()
     for (i in 0 until arr.length()) {
         val obj = arr.optJSONObject(i) ?: continue
         val kind = when (obj.optString("kind", "")) {
             CommunityKind.Bundle.id -> CommunityKind.Bundle
             CommunityKind.Preset.id -> CommunityKind.Preset
+            CommunityKind.Effect.id -> CommunityKind.Effect
             else -> continue
         }
         val minVersion = obj.optInt("minVersion", 0)
-        if (minVersion > versionCode) continue
+        if (minVersion > versionCode && kind != CommunityKind.Effect) continue
         val name = obj.optString("name", "")
         if (!NAME_REGEX.matches(name)) continue
         val folder = "${kind.folder}/$name/"
         val file = obj.optString("file", "")
-        if (!safeCommunityPath(file, folder)) continue
-        val rawThumb = if (kind == CommunityKind.Preset || obj.isNull("thumbnail")) "" else obj.optString("thumbnail", "")
+        if (!safeCommunityPath(file, folder) || (kind == CommunityKind.Effect && !isAddedEffectFile(file))) continue
+        val rawThumb = if (kind != CommunityKind.Bundle || obj.isNull("thumbnail")) "" else obj.optString("thumbnail", "")
         if (rawThumb.isNotEmpty() && !safeCommunityPath(rawThumb, folder)) continue
         val bytes = obj.optLong("bytes", -1L)
         if (bytes <= 0L || bytes > communityLimit(kind, file)) continue
@@ -163,7 +204,16 @@ fun parseCommunityIndex(text: String, versionCode: Int): CommunityIndex {
         val width = obj.optInt("width", 0).coerceAtLeast(0)
         val height = obj.optInt("height", 0).coerceAtLeast(0)
         val lengthMs = obj.optLong("lengthMs", 0L).coerceAtLeast(0L)
-        items.add(
+        val entries = if (kind == CommunityKind.Effect) obj.optJSONArray("contents") else null
+        val contents = if (entries == null) emptyList() else (0 until entries.length()).mapNotNull { j ->
+            val entry = entries.optJSONObject(j) ?: return@mapNotNull null
+            val id = entry.opt("id") as? String ?: return@mapNotNull null
+            val label = (entry.opt("name") as? String)?.trim()?.take(80) ?: return@mapNotNull null
+            val version = addedEffectVersion(entry.opt("version")) ?: return@mapNotNull null
+            if (label.isEmpty() || !addedEffectKey.matches(id)) null else CommunityEffectContent(id, label, version)
+        }
+        val target = if (minVersion > versionCode) unavailableEffects else items
+        target.add(
             CommunityItem(
                 kind = kind,
                 name = name,
@@ -178,11 +228,14 @@ fun parseCommunityIndex(text: String, versionCode: Int): CommunityIndex {
                 thumbnail = rawThumb.ifEmpty { null },
                 width = width,
                 height = height,
-                lengthMs = lengthMs
+                lengthMs = lengthMs,
+                credit = (obj.opt("credit") as? String)?.trim()?.take(500)?.takeIf { it.isNotEmpty() },
+                contents = contents,
+                minVersion = minVersion,
             )
         )
     }
-    return CommunityIndex(items)
+    return CommunityIndex(items, unavailableEffects = unavailableEffects)
 }
 
 internal class CommunityClient(
@@ -246,10 +299,25 @@ internal class CommunityClient(
         return picture
     }
 
+    suspend fun effectPicture(item: CommunityItem, engine: EngineThread, context: Context): ByteArray? {
+        if (item.kind != CommunityKind.Effect || !isSha256(item.sha256)) return null
+        val cached = File(cacheDir, "community/thumbs/${item.sha256}.webp")
+        if (cached.isFile && cached.length() in 1L..THUMB_MAX_BYTES) {
+            runCatching { cached.readBytes() }.getOrNull()?.let { return it }
+        }
+        val file = download(item)
+        val effects = file.inputStream().use { readAddedEffectEntries(file.name, it, cacheDir) }.mapNotNull { it.second.getOrNull() }
+        val picture = engine.previewAddedEffects(context, effects).firstNotNullOfOrNull { it.picture } ?: return null
+        keepCached(cached, picture)
+        return picture
+    }
+
     fun download(item: CommunityItem): File {
+        if (item.minVersion > BuildConfig.VERSION_CODE) throw CommunityItemUnavailable()
         val folder = "${item.kind.folder}/${item.name}/"
         if (!NAME_REGEX.matches(item.name) ||
             !safeCommunityPath(item.file, folder) ||
+            (item.kind == CommunityKind.Effect && !isAddedEffectFile(item.file)) ||
             item.bytes <= 0L ||
             item.bytes > communityLimit(item.kind, item.file) ||
             !isSha256(item.sha256)
@@ -257,8 +325,9 @@ internal class CommunityClient(
             throw CommunityDamagedException("Invalid community item metadata")
         }
         val dir = File(cacheDir, "community/files")
-        dir.mkdirs()
-        val target = File(dir, "${item.name}.${if (item.file.endsWith(".absproj")) "absproj" else "xml"}")
+        cacheWrite { if (!dir.isDirectory && !dir.mkdirs()) throw IOException() }
+        val target = if (item.kind == CommunityKind.Effect) File(dir, "effect-${item.sha256}.${item.file.substringAfterLast('.')}")
+            else File(dir, "${item.name}.${if (item.file.endsWith(".absproj")) "absproj" else "xml"}")
         return synchronized(downloads.getOrPut(target.absolutePath) { Any() }) { fetch(item, target) }
     }
 
@@ -274,6 +343,7 @@ internal class CommunityClient(
         try {
             val limit = minOf(item.bytes, communityLimit(item.kind, item.file))
             http().get(CommunityFeed.source.asset("", item.file)) { conn ->
+                if (conn.responseCode in listOf(404, 410)) throw CommunityItemUnavailable()
                 if (conn.responseCode !in 200..299) {
                     throw IOException("HTTP ${conn.responseCode}")
                 }
@@ -287,8 +357,9 @@ internal class CommunityClient(
                 val buf = ByteArray(8192)
                 var total = 0L
                 conn.inputStream.use { input ->
-                    part.outputStream().use { output ->
+                    cacheWrite { part.outputStream() }.use { output ->
                         while (true) {
+                            if (Thread.currentThread().isInterrupted) throw InterruptedIOException()
                             val read = input.read(buf)
                             if (read < 0) break
                             if (read == 0) continue
@@ -296,16 +367,18 @@ internal class CommunityClient(
                             if (total > limit) {
                                 throw CommunityDamagedException("Download exceeds byte limit")
                             }
-                            output.write(buf, 0, read)
+                            cacheWrite { output.write(buf, 0, read) }
                         }
                     }
                 }
             }
+            if (Thread.currentThread().isInterrupted) throw InterruptedIOException()
             if (part.length() != item.bytes || sha256Of(part) != item.sha256) {
                 throw CommunityDamagedException("Downloaded file verification failed")
             }
+            if (Thread.currentThread().isInterrupted) throw InterruptedIOException()
             if (!part.renameTo(target)) {
-                part.copyTo(target, overwrite = true)
+                cacheWrite { part.copyTo(target, overwrite = true) }
                 part.delete()
             }
             return target
@@ -314,6 +387,14 @@ internal class CommunityClient(
             target.delete()
             throw t
         }
+    }
+
+    private inline fun <T> cacheWrite(write: () -> T): T = try {
+        write()
+    } catch (e: IOException) {
+        throw CommunityWriteException(e)
+    } catch (e: SecurityException) {
+        throw CommunityWriteException(e)
     }
 
     private companion object {

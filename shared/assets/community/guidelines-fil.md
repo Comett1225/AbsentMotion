@@ -7,6 +7,7 @@ Tinitingnan muna ng isang tao ang lahat ng nasa tab na **Komunidad** bago ito ma
 - Mga proyekto at preset na ginawa mo sa AbsentMotion: mga edit, template, intro, text animation, transition, effect stack.
 - Edit, proyekto, preset o sining ng iba, basta binibigyan mo sila ng credit: isulat sa paglalarawan kung sino ang gumawa.
 - Mga larawan, bidyo, musika, tunog at font, na ikaw ang gumawa o ng taong binigyan mo ng credit sa paglalarawan.
+- Mga effect na ikaw ang sumulat, o mga effect na pinapayagang i-share ng lisensya nila: isulat sa paglalarawan kung saan galing ang mga ito.
 
 ## Hindi pinapayagan
 
@@ -17,6 +18,7 @@ Tinitingnan muna ng isang tao ang lahat ng nasa tab na **Komunidad** bago ito ma
 - **Personal na impormasyon:** totoong pangalan, address, numero ng telepono, paaralan, account o mukha ng mga pribadong tao, kasama ang sarili mo.
 - **Ilegal o mapanganib na bagay:** droga, armas, scam, sugal, hacking o malware.
 - **Pag-angkin sa gawa ng iba:** pagbabahagi ng edit, proyekto, preset, sining o musika nila nang hindi sinasabi kung sino ang gumawa, o muling pagbabahagi ng bayad na asset.
+- **Mga effect mula sa ibang app:** mga effect na kinuha o kinonvert mula sa mga file ng ibang app.
 - **Pagpapanggap bilang iba:** paggamit ng pangalan ng ibang creator, o pangalan o logo ng brand, na parang galing sa kanila ang item.
 - **Spam:** mga patalastas, link sa ibang site, parehong item na inulit sa ibang pangalan, o mga item na walang ginagawa.
 - **Mapanlinlang na item:** pamagat, thumbnail o tag na hindi nagpapakita ng laman.
@@ -24,7 +26,7 @@ Tinitingnan muna ng isang tao ang lahat ng nasa tab na **Komunidad** bago ito ma
 ## Mabuting malaman
 
 - Panatilihin itong angkop para sa lahat. Mga tao sa lahat ng edad ang gumagamit ng AbsentMotion.
-- Hanggang 20 MB ang mga project bundle at hanggang 1 MB ang mga preset.
+- Hanggang 20 MB ang mga project bundle, hanggang 1 MB ang mga preset at hanggang 512 KB ang mga effect.
 - Ibinabahagi ang mga item sa ilalim ng CC BY 4.0: puwede itong gamitin at baguhin ng sinuman basta bibigyan nila ng credit ang gumawa.
 - Ang pangalan sa item mo ay ang pangalan ng creator na tina-type mo. Huwag maglagay ng anumang personal dito.
 - Ang maintainer ang nagpapasya kung ano ang ilalagay, at puwede niyang alisin ang isang item anumang oras.

@@ -251,7 +251,7 @@ const Layer* PathSource(const std::vector<Layer>& siblings, const Layer& l) {
     return nullptr;
 }
 
-Placement Effective(const std::vector<Layer>& siblings, const Layer& l, double timeMs, int depth) {
+Placement Effective(const std::vector<Layer>& siblings, const Layer& l, double timeMs, int depth, bool followPath = true) {
     Placement own = Own(l, timeMs);
     if (depth >= kMaxParentDepth) return own;
     const Layer* parent = nullptr;
@@ -274,13 +274,15 @@ Placement Effective(const std::vector<Layer>& siblings, const Layer& l, double t
         own.z = p.z + offset.z;
         ParentRoll(l, timeMs, &own);
     }
-    if (!FollowsPath(l)) return own;
+    if (!followPath || !FollowsPath(l)) return own;
     const Layer* source = PathSource(siblings, l);
     if (!source) return own;
     const Layer& below = *source;
     const float t = below.localTime(timeMs);
     const SkPath path = below.text ? TextGlyphPath(below, t, Fps()) : Cropped(below, t, ShapePath(below, t));
-    FollowPath(l, timeMs, path.makeTransform(MatrixOf(parent == &below ? p : Effective(siblings, below, timeMs, depth + 1), below, t)), &own);
+    const bool legacy = UsesLegacyPathCoordinates(l, timeMs);
+    const Placement guide = parent == &below && !legacy ? p : Effective(siblings, below, timeMs, depth + 1, !legacy);
+    FollowPath(l, timeMs, path.makeTransform(MatrixOf(guide, below, t)), &own);
     return own;
 }
 
@@ -2070,9 +2072,10 @@ void DrawContentIcon(SkCanvas* canvas, const Layer& layer, const MediaPictures& 
 static std::mutex gOrientedLock;
 static std::set<std::string> gOrientedIds;
 
-void NoteOrientedEffect(const std::string& id) {
+void NoteOrientedEffect(const std::string& id, bool oriented) {
     std::lock_guard<std::mutex> hold(gOrientedLock);
-    gOrientedIds.insert(id);
+    if (oriented) gOrientedIds.insert(id);
+    else gOrientedIds.erase(id);
 }
 
 static void FaceForward(std::vector<Layer>* seen) {

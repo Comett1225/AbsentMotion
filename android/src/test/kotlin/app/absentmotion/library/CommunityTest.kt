@@ -1,6 +1,7 @@
 package app.absentmotion.library
 
 import app.absentmotion.editor.presetScene
+import app.absentmotion.effects.AddedEffectUse
 import app.absentmotion.model.Layer
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
@@ -91,6 +92,49 @@ class CommunityTest {
         assertEquals(CommunityKind.Preset, preset.kind)
         assertEquals("pop-scale", preset.name)
         assertNull(preset.thumbnail)
+    }
+
+    @Test fun parseCommunityIndexReadsEffectsWithNoThumbnail() {
+        fun item(name: String, extension: String, bytes: Int) =
+            """{"kind":"effect","name":"$name","title":"Glow","creator":"Alice","description":"Soft colour","tags":["light"],"file":"effects/$name/item.$extension","bytes":$bytes,"sha256":"$shaA","added":"2026-04-03","thumbnail":"../ignored.webp"}"""
+        val entries = listOf(item("glow", "abmfx", 512 * 1024), item("light", "json", 230),
+            item("xml", "xml", 1024), item("large", "abmfx", 512 * 1024 + 1))
+        val items = parseCommunityIndex("""{"format":"absentmotion-community","version":2,"items":[${entries.joinToString()}]}""", 52).items
+        assertEquals(listOf("glow", "light"), items.map { it.name })
+        val effect = items.first()
+        assertEquals(CommunityKind.Effect, effect.kind)
+        assertEquals("Glow", effect.title)
+        assertEquals("Alice", effect.creator)
+        assertEquals("Soft colour", effect.description)
+        assertEquals(listOf("light"), effect.tags)
+        assertEquals("2026-04-03", effect.added)
+        assertEquals(shaA, effect.sha256)
+        assertNull(effect.thumbnail)
+    }
+
+    @Test fun parsesCreditAndUsableContentsAndPicksPacksForTheRequiredVersions() {
+        fun entry(id: String, version: String, name: String = "Colour") =
+            """{"id":"$id","name":"$name","version":$version}"""
+        fun pack(name: String, minVersion: Int, vararg entries: String) =
+            """{"kind":"effect","name":"$name","creator":"Alice","credit":"CC BY","file":"effects/$name/pack.abmfx","bytes":20,"sha256":"$shaA","minVersion":$minVersion,"contents":[${entries.joinToString()}]}"""
+        val packs = listOf(
+            pack("old-colour", 0, entry("alice.colour", "1")),
+            pack("both", 0, entry("alice.colour", "2"), entry("bob.glow", "1", "Glow"), entry("wrong", "2"), entry("alice.zero", "0")),
+            pack("without-contents", 0, entry("bob.glow", "1.5"), entry("bob.glow", "2", "")),
+            pack("future", 53, entry("alice.shadow", "1")),
+        )
+        val index = parseCommunityIndex("""{"format":"absentmotion-community","version":2,"items":[${packs.joinToString()}]}""", 52)
+        assertEquals(listOf("old-colour", "both", "without-contents"), index.items.map { it.name })
+        assertEquals("Alice", index.items[1].creator)
+        assertEquals("CC BY", index.items[1].credit)
+        assertEquals(listOf(CommunityEffectContent("alice.colour", "Colour", 2), CommunityEffectContent("bob.glow", "Glow", 1)), index.items[1].contents)
+        assertTrue(index.items.last().contents.isEmpty())
+        assertEquals("future", index.unavailableEffects.single().name)
+        val colour = AddedEffectUse("user.alice.colour", "Colour", 2, "old-colour")
+        val glow = AddedEffectUse("user.bob.glow", "Glow", 1, null)
+        val shadow = AddedEffectUse("user.alice.shadow", "Shadow", 1, null)
+        assertEquals(mapOf(index.items[1] to listOf(colour, glow)), index.effectPacks(listOf(colour, glow, shadow)))
+        assertTrue(index.effectPacks(listOf(colour.copy(version = 3))).isEmpty())
     }
 
     @Test fun parseCommunityIndexSkipsBadItemsClipsTextAndFiltersMinVersion() {

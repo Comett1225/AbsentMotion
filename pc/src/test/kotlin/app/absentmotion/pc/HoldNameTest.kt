@@ -88,15 +88,15 @@ class HoldNameTest {
             mainClock.autoAdvance = false
             val layers = state.scene.layers.size
 
-            press("Group", hold)
-            assertTrue(shown("Group"))
-            val button = onNodeWithContentDescription("Group").fetchSemanticsNode().boundsInWindow
-            val label = bounds("Group")
+            press("Group options", hold)
+            assertTrue(shown("Group options"))
+            val button = onNodeWithContentDescription("Group options").fetchSemanticsNode().boundsInWindow
+            val label = bounds("Group options")
             assertTrue("label $label beside the button $button", label.top < button.bottom && label.bottom > button.top && (label.left >= button.right || label.right <= button.left))
-            lift("Group")
-            assertTrue(shown("Group"))
+            lift("Group options")
+            assertTrue(shown("Group options"))
             mainClock.advanceTimeBy(NAME_LINGER_MS + 100)
-            assertTrue(!shown("Group"))
+            assertTrue(!shown("Group options"))
             assertEquals(layers, state.scene.layers.size)
             assertEquals(3, MultiSelect.ids.size)
 

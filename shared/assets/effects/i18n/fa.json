@@ -500,15 +500,19 @@
    "description": "یک بلور نرم و یکدست. با «شکل: جعبه»، به‌جای آن از مربعی یکنواخت دور هر نقطه میانگین گرفته می‌شود.",
    "name": "بلور",
    "params": {
-    "strength": {
-     "label": "شدت"
+    "iterations": {
+     "label": "تکرارها"
     },
     "shape": {
      "label": "شکل",
      "options": [
       "نرم",
-      "جعبه"
+      "جعبه",
+      "محو جعبه‌ای سریع"
      ]
+    },
+    "strength": {
+     "label": "شدت"
     }
    }
   },
@@ -2507,6 +2511,9 @@
     "offset": {
      "label": "افست"
     },
+    "parallax": {
+     "label": "پارالاکس"
+    },
     "scale": {
      "label": "مقیاس"
     },
@@ -2997,6 +3004,12 @@
     },
     "paper": {
      "label": "رنگ کاغذ"
+    },
+    "phase": {
+     "label": "فاز"
+    },
+    "strength": {
+     "label": "شدت"
     },
     "style": {
      "label": "سبک",
@@ -4215,6 +4228,9 @@
     "inset": {
      "label": "به داخل/بیرون"
     },
+    "legacyCoordinates": {
+     "label": "مختصات قدیمی"
+    },
     "offset": {
      "label": "جابه‌جایی"
     },
@@ -4919,6 +4935,9 @@
     },
     "stretch": {
      "label": "کشیدگی"
+    },
+    "threshold": {
+     "label": "آستانه"
     },
     "vignette": {
      "label": "وینیت"
@@ -7419,6 +7438,9 @@
     },
     "start": {
      "label": "شروع"
+    },
+    "stretch": {
+     "label": "کشیدگی"
     },
     "tint": {
      "label": "رنگ‌آمیزی"

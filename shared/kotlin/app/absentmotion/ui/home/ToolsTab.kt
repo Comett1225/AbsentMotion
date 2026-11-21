@@ -1,5 +1,14 @@
 package app.absentmotion.ui.home
 
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.zIndex
+import androidx.compose.runtime.withFrameNanos
+import androidx.compose.foundation.gestures.scrollBy
+import kotlin.math.abs
 import android.content.ClipboardManager
 import android.net.Uri
 import android.os.Environment
@@ -158,7 +167,8 @@ internal fun movedToolOrder(order: List<String>, from: Int, to: Int): List<Strin
 
 private class ToolSlide {
     var order: List<String> = emptyList()
-    var at: Offset? = null
+    var at by mutableStateOf<Offset?>(null)
+    var size = IntSize.Zero
     var from: Offset = Offset.Zero
     var pending by mutableStateOf(false)
     val progress = Animatable(1f)
@@ -167,7 +177,47 @@ private class ToolSlide {
 
 private class ToolBoard(var order: List<String>) {
     var coords: LayoutCoordinates? = null
+    var viewport: LayoutCoordinates? = null
     val slides = HashMap<String, ToolSlide>()
+    var dragging by mutableStateOf<String?>(null)
+    var dragAt by mutableStateOf(Offset.Zero)
+    var grab = Offset.Zero
+
+    fun lifted(id: String): Offset = dragAt - grab - (slides[id]?.at ?: Offset.Zero)
+
+    fun under(point: Offset): String? = order.firstOrNull { id ->
+        val slide = slides[id]
+        val at = slide?.at
+        slide != null && at != null && point.x in at.x..at.x + slide.size.width && point.y in at.y..at.y + slide.size.height
+    }
+
+    fun target(): Int? {
+        val id = dragging ?: return null
+        val size = slides[id]?.size ?: return null
+        val center = dragAt - grab + Offset(size.width / 2f, size.height / 2f)
+        return order.indexOfFirst { other ->
+            val slide = slides[other]
+            val at = slide?.at
+            other != id && slide != null && at != null && abs(center.x - at.x - slide.size.width / 2f) < slide.size.width / 4f &&
+                abs(center.y - at.y - slide.size.height / 2f) < slide.size.height / 4f
+        }.takeIf { it >= 0 }
+    }
+
+    fun drop(scope: kotlinx.coroutines.CoroutineScope) {
+        val id = dragging ?: return
+        slides[id]?.let { slide ->
+            slide.from = lifted(id)
+            slide.pending = true
+            slide.job?.cancel()
+            slide.job = scope.launch {
+                slide.progress.snapTo(0f)
+                slide.pending = false
+                slide.progress.animateTo(1f, Motion.enter())
+                slide.from = Offset.Zero
+            }
+        }
+        dragging = null
+    }
 }
 
 private fun Modifier.animateToolPlace(board: ToolBoard, id: String, scope: kotlinx.coroutines.CoroutineScope): Modifier {
@@ -178,6 +228,7 @@ private fun Modifier.animateToolPlace(board: ToolBoard, id: String, scope: kotli
         val current = host.localPositionOf(coords, Offset.Zero)
         val prev = slide.at
         slide.at = current
+        slide.size = coords.size
         if (slide.order != board.order) {
             slide.order = board.order
             if (prev != null) {
@@ -197,10 +248,13 @@ private fun Modifier.animateToolPlace(board: ToolBoard, id: String, scope: kotli
             }
         }
     }.graphicsLayer {
-        val d = if (slide.pending) slide.from else slide.from * (1f - slide.progress.value)
+        val lifted = board.dragging == id
+        val d = if (lifted) board.lifted(id) else if (slide.pending) slide.from else slide.from * (1f - slide.progress.value)
         translationX = d.x
         translationY = d.y
-    }
+        scaleX = if (lifted) 1.03f else 1f
+        scaleY = scaleX
+    }.zIndex(if (board.dragging == id) 1f else 0f)
 }
 
 @Composable
@@ -241,6 +295,38 @@ internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSett
     val order = settings.toolOrder
     val board = remember { ToolBoard(order) }
     board.order = order
+    val scroll = rememberScrollState()
+    val haptic = LocalHapticFeedback.current
+    val density = LocalDensity.current
+    fun reorder() {
+        val to = board.target() ?: return
+        val next = movedToolOrder(board.order, board.order.indexOf(board.dragging), to)
+        if (next != board.order) {
+            board.order = next
+            settings.toolOrder = next
+        }
+    }
+    LaunchedEffect(board.dragging != null) {
+        val edge = with(density) { 56.dp.toPx() }
+        while (board.dragging != null) {
+            withFrameNanos { }
+            val view = board.viewport
+            val host = board.coords
+            if (view == null || host == null || !view.isAttached || !host.isAttached) continue
+            val y = view.localPositionOf(host, board.dragAt).y
+            val speed = when {
+                y < edge -> -(edge - y) / edge
+                y > view.size.height - edge -> (y - view.size.height + edge) / edge
+                else -> 0f
+            }.coerceIn(-1.5f, 1.5f) * 22f
+            if (speed == 0f) continue
+            val used = scroll.scrollBy(speed)
+            if (used != 0f) {
+                board.dragAt += Offset(0f, used)
+                reorder()
+            }
+        }
+    }
     BackHandler(arranging && open == 0 && !asking) { onArranging(false) }
     LaunchedEffect(revision) {
         if (engine !is Engine.Getting) engine = if (!downloader.available) Engine.Unavailable else if (downloader.installed(context)) Engine.Ready else Engine.Missing
@@ -297,7 +383,7 @@ internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSett
             "enhance" -> ToolCard(HomeIcons.Compress, stringResource(R.string.tools_enhance_image), stringResource(R.string.tools_enhance_image_about), modifier = placed, arranging = arranging, onMoveUp = up, onMoveDown = down) { open = 6 }
         }
     }
-    Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = if (PlatformFeatures.desktop) 28.dp else 16.dp)) {
+    Column(modifier.fillMaxSize().onPlaced { board.viewport = it }.verticalScroll(scroll).padding(horizontal = if (PlatformFeatures.desktop) 28.dp else 16.dp)) {
         if (arranging) {
             Spacer(Modifier.height(if (PlatformFeatures.desktop) 12.dp else 16.dp))
             ArrangeBar(
@@ -313,8 +399,25 @@ internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSett
         } else {
             Spacer(Modifier.height(24.dp))
         }
-        Box(Modifier.fillMaxWidth().onPlaced { board.coords = it }) {
-            if (PlatformFeatures.desktop || LocalWide.current || app.absentmotion.ui.editor.LocalTablet.current) ToolGrid(order, cardFor)
+        Box(Modifier.fillMaxWidth().onPlaced { board.coords = it }.then(if (!arranging) Modifier else Modifier.pointerInput(Unit) {
+            detectDragGesturesAfterLongPress(
+                onDragStart = { at ->
+                    val id = board.under(at) ?: return@detectDragGesturesAfterLongPress
+                    board.grab = at - (board.slides[id]?.at ?: Offset.Zero)
+                    board.dragAt = at
+                    board.dragging = id
+                    if (settings.vibration) haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                },
+                onDragEnd = { board.drop(scope) },
+                onDragCancel = { board.drop(scope) },
+            ) { change, _ ->
+                if (board.dragging == null) return@detectDragGesturesAfterLongPress
+                change.consume()
+                board.dragAt = change.position
+                reorder()
+            }
+        })) {
+            if (PlatformFeatures.desktop || LocalWide.current || app.absentmotion.ui.editor.LocalTablet.current) ToolGrid(order, board.dragging, cardFor)
             else Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 order.forEachIndexed { index, id ->
                     key(id) {
@@ -373,11 +476,11 @@ private fun ArrangeBar(canReset: Boolean, onReset: () -> Unit, onDone: () -> Uni
 }
 
 @Composable
-private fun ToolGrid(order: List<String>, card: @Composable (String, Int, Modifier) -> Unit) = BoxWithConstraints(Modifier.fillMaxWidth()) {
+private fun ToolGrid(order: List<String>, lifted: String?, card: @Composable (String, Int, Modifier) -> Unit) = BoxWithConstraints(Modifier.fillMaxWidth()) {
     val columns = ((maxWidth + 16.dp) / 336.dp).toInt().coerceIn(1, 3)
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         order.withIndex().chunked(columns).forEach { row ->
-            Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min).zIndex(if (row.any { it.value == lifted }) 1f else 0f), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 row.forEach { (index, id) ->
                     key(id) {
                         card(id, index, Modifier.weight(1f).fillMaxHeight())

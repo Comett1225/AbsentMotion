@@ -6,8 +6,36 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 class LayerStreamTest {
+    @Test fun aLatePcmPacketCanStillCompleteTheCurrentBlock() {
+        val release = CountDownLatch(1)
+        val tone = ToneSource(440.0)
+        val source = object : PcmSource by tone {
+            private var chunks = 0
+            override fun next(): PcmChunk? {
+                if (chunks++ == 1) check(release.await(3, TimeUnit.SECONDS))
+                return tone.next()
+            }
+        }
+        val stream = LayerStream("late", 0.0) { source }
+        val out = FloatArray(1024)
+        val dt = 1000.0 / 48_000
+        fun mix(deadline: Long) = stream.mix(out, 0, 512, 15.0, dt, 1f, 1f, Resampler.ULTRA, 15.0, dt, 3000.0, deadline)
+        try {
+            awaitCondition("first decoded packet", 3_000) { stream.prepare(4.0, 5.0) }
+            assertFalse(mix(0))
+            Thread { Thread.sleep(20); release.countDown() }.start()
+            assertTrue(mix(System.nanoTime() + 1_000_000_000L))
+            assertTrue(out.any { it != 0f })
+        } finally {
+            release.countDown()
+            stream.close()
+        }
+    }
+
     @Test fun aFailedStreamIsDroppedBeforeTheNextPlayAndAHealthyOneIsKept() {
         val damaged = object : PcmSource {
             override val durationUs = 0L

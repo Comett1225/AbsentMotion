@@ -13,6 +13,10 @@ import app.absentmotion.compat.FlaPart
 import app.absentmotion.compat.flaPicture
 import app.absentmotion.compat.flaSound
 import app.absentmotion.compat.readFla
+import app.absentmotion.effects.AddedEffectBundleLimit
+import app.absentmotion.effects.AddedEffectMaxBytes
+import app.absentmotion.effects.AddedEffectPrefix
+import app.absentmotion.effects.addedEffectKey
 import app.absentmotion.effects.EffectCatalog
 import app.absentmotion.export.CommunityThumbnail
 import app.absentmotion.fonts.FontImportError
@@ -49,6 +53,7 @@ data class ImportReport(
     val sections: List<Pair<UiText, List<UiText>>>,
     val template: Boolean = false,
     val community: CommunityInfo? = null,
+    val bundledEffects: Map<String, ByteArray> = emptyMap(),
 ) : Serializable
 
 class CommunityInfo(
@@ -119,6 +124,8 @@ class Importer(
         var ours = false
         var community: JSONObject? = null
         val communityFiles = HashMap<String, ByteArray>()
+        val bundledEffects = linkedMapOf<String, ByteArray>()
+        var effectBytes = 0
         var sceneText = 0
         var written = limits.unpacked
         val ids = ArrayList<String>()
@@ -152,7 +159,12 @@ class Importer(
             val declaredProject = projectEntry?.let { find(it, files) ?: throw ImportFailed(txt(R.string.library_err_package_project_missing)) }
             val mediaEntries = (links.orEmpty().values + sigs.orEmpty().values).mapNotNull { find(it, files) }.toSet()
             eachEntry(open, limits) { name, input ->
-                if (name == declaredProject || declaredProject == null && name.endsWith(".xml", ignoreCase = true) && name !in mediaEntries) {
+                if (ours && name.startsWith("effects/") && name.endsWith(".json", ignoreCase = true)) {
+                    val cap = minOf(app.absentmotion.effects.AddedEffectStoredBytes, AddedEffectBundleLimit - effectBytes)
+                    val bytes = input.readAtMost(cap + 1)
+                    effectBytes += bytes.size.coerceAtMost(cap)
+                    bundledEffects[name] = if (bytes.size <= cap && name !in bundledEffects) bytes else ByteArray(0)
+                } else if (name == declaredProject || declaredProject == null && name.endsWith(".xml", ignoreCase = true) && name !in mediaEntries) {
                     val text = readText(input, MaxXml)
                     val isScene = declaredProject != null || runCatching { XmlNode.parse(text.removePrefix("\uFEFF"), XmlNode.IMPORT_NODES).name == "scene" }.getOrDefault(false)
                     if (isScene) {
@@ -209,7 +221,8 @@ class Importer(
             scenes.indices.mapTo(saved) { add(ids[it], check(scenes[it]).let { root -> if (renamedFonts.isEmpty()) root else root.mapFonts(renamedFonts) }, moved[it]) }
             ids.forEach { File(store.mediaDir(it), ImportMarker).delete(); store.mediaDir(it).delete() }
             val shared = community?.takeIf { saved.size == 1 }?.let { CommunityInfo.read(it, communityFiles) }
-            return if (!ours) saved.map { if (it.element) it else it.copy(template = true) } else if (shared != null) saved.map { it.copy(community = shared) } else saved
+            return if (!ours) saved.map { if (it.element) it else it.copy(template = true) }
+                else saved.map { it.copy(community = shared, bundledEffects = bundledEffects) }
         } catch (t: Throwable) {
             ids.forEach { store.mediaDir(it).deleteRecursively() }
             saved.forEach { store.delete(it.id) }
@@ -312,7 +325,9 @@ class Importer(
         scene.node.children.filter { it.name !in Scene.LAYER_TAGS && it.name != "media" && it.name != "bookmark" }.forEach { unknown += "<${it.name}>" }
         for (layer in layers) for (attr in layer.attrs.keys - KnownAttributes) unknown += "${layer.name} $attr"
         val effects = layers.flatMap { l -> l.children.filter { it.name == "effect" }.mapNotNull { it["id"] }.distinct() }
-            .groupingBy { it }.eachCount().filterKeys { !canRun(it) }
+            .groupingBy { it }.eachCount().filterKeys { id ->
+                !canRun(id) && !(id.startsWith(AddedEffectPrefix) && addedEffectKey.matches(id.removePrefix(AddedEffectPrefix)))
+            }
             .map { (id, n) -> UiText.plural(R.plurals.library_report_effect_layers, n, id.substringAfterLast('.'), n.toString()) }
         val fonts = layers.filter { it.name == "text" }.mapNotNull { it["font"] }.filter { it.startsWith("imported") && !hasFont(it) }
             .map { it.substringAfter("name=").substringBefore('&') }.distinct()

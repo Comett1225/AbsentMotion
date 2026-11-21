@@ -9,6 +9,7 @@ import android.os.HandlerThread
 import android.util.Log
 import android.view.Surface
 import kotlinx.coroutines.android.asCoroutineDispatcher
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,6 +32,12 @@ import app.absentmotion.export.Smoothing
 import app.absentmotion.media.VideoLibrary
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import app.absentmotion.effects.AddedEffect
+import app.absentmotion.effects.AddedEffectPreview
+import app.absentmotion.effects.AddedEffectStore
+import app.absentmotion.effects.addedEffectSample
+import app.absentmotion.effects.changeAddedEffects
+import app.absentmotion.effects.previewAddedEffect
 import app.absentmotion.effects.EffectCatalog
 import app.absentmotion.effects.EffectDefinition
 import org.json.JSONArray
@@ -79,6 +86,47 @@ class EngineThread(private val background: Int, context: Context? = null, privat
     @Volatile private var playing = false
     private val effectCatalog = MutableStateFlow(EffectCatalog(message = AppText.get(R.string.engine_loading_effects)))
     val effects = effectCatalog.asStateFlow()
+
+    internal suspend fun awaitEffects() { effectJob?.join() }
+
+    internal suspend fun previewAddedEffects(context: Context, added: List<AddedEffect>): List<AddedEffectPreview> {
+        if (added.isEmpty()) return emptyList()
+        val sample = withContext(Dispatchers.IO) { runCatching { addedEffectSample(context) }.getOrNull() }
+        return try {
+            withContext(dispatcher) {
+                check(!closed)
+                NativeEngine(engine().backend).use { preview ->
+                    added.map {
+                        coroutineContext.ensureActive()
+                        previewAddedEffect(preview, it, sample)
+                    }
+                }
+            }
+        } finally {
+            sample?.recycle()
+        }
+    }
+
+    internal suspend fun updateAddedEffects(store: AddedEffectStore, add: List<AddedEffectPreview> = emptyList(), remove: EffectDefinition? = null, newerOnly: Boolean = false): Boolean {
+        awaitEffects()
+        return captureLock.withLock {
+            withContext(dispatcher) {
+                val native = engine()
+                val (catalog, success) = effects.value.changeAddedEffects(store, add, remove, native::loadEffect, newerOnly)
+                effectCatalog.value = catalog
+                native.forgetHeld()
+                requestRender()
+                success
+            }
+        }
+    }
+
+    internal suspend fun updateAddedEffectPlacement(change: (EffectCatalog) -> EffectCatalog) {
+        awaitEffects()
+        withContext(dispatcher) {
+            if (!closed) effectCatalog.value = change(effectCatalog.value)
+        }
+    }
 
     fun relabelEffects(context: Context) {
         effectLabelsJob?.cancel()

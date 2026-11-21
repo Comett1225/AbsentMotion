@@ -603,9 +603,14 @@ half4 main(float2 p) {
 sk_sp<SkImageFilter> BuiltInFilter(const std::string& id, const std::function<float(const char*, int, float)>& v,
                                    sk_sp<SkImageFilter> input) {
     if (id == "absent.blur") {
-        const float sigma = std::max(v("strength", 0, 10), 0.0f) / 3;
-        if (v("shape", 0, 0) > 0.5f) {
-            const float reach = std::min(sigma, 128.0f);
+        float sigma = std::max(v("strength", 0, 10), 0.0f) / 3;
+        const float shape = v("shape", 0, 0), iterations = std::clamp(v("iterations", 0, 3), 1.0f, 20.0f);
+        if (shape > 1.5f) {
+            constexpr float baseVariance = 170, passVariance = 445, referencePasses = 5;
+            sigma *= std::sqrt((baseVariance + passVariance / iterations) / (baseVariance + passVariance / referencePasses));
+        }
+        if (shape > 0.5f && (shape < 1.5f || iterations <= 1.0f)) {
+            const float reach = std::min(shape > 1.5f ? sigma * std::sqrt(3.0f) : sigma, 128.0f);
             return reach > 0 ? BoxPass(BoxPass(input, reach, {1, 0}, {-0.5f, 0}), reach, {0, 1}, {0, 0.5f}) : input;
         }
         return sigma > 0 ? SkImageFilters::Blur(sigma, sigma, SkTileMode::kDecal, input) : input;
@@ -956,6 +961,13 @@ std::string EffectRuntime::load(const std::string& xml) {
         if (c->attr("value")) d.texts[c->attr("name")] = c->attr("value");
     }
     const std::string id = root->attr("id");
+    const bool added = id.compare(0, 5, "user.") == 0;
+    const char* remove = root->attr("remove");
+    if (added && remove && std::string(remove) == "true") {
+        fDefinitions.erase(id);
+        NoteOrientedEffect(id, false);
+        return "ok";
+    }
     const char* sksl = root->attr("sksl");
     if (!sksl || !*sksl) {
         if (!BuiltIn(id) && !pieces3d::IsEffect(id) && !MotionEffect(id) && !RepeatEffect(id) && !TextEffect(id) && !DrawingEffect(id) && !ParticleEffect(id)) return "shader error: no shader and no built-in called " + id;
@@ -968,6 +980,11 @@ std::string EffectRuntime::load(const std::string& xml) {
             return "shader error: " + text.substr(0, text.find('\n')) + "\n" + text;
         }
         if (!result.effect->findChild("image")) return "shader error: no 'uniform shader image'";
+        if (added) {
+            for (const auto& child : result.effect->children()) {
+                if (child.name != "image" || child.type != SkRuntimeEffect::ChildType::kShader) return "shader error: added effects can only read 'uniform shader image'";
+            }
+        }
         d.brightPass = result.effect->findChild("bright") != nullptr;
         d.plainBlur = result.effect->findChild("blurred") != nullptr;
         d.blurred = d.brightPass || d.plainBlur;
@@ -977,7 +994,8 @@ std::string EffectRuntime::load(const std::string& xml) {
         d.pointwise = Pointwise(sksl);
         d.timed = (result.effect->findUniform("time") && Mentions(sksl, "time") > 1) || result.effect->findUniform("beat") ||
                   result.effect->findUniform("beatTime") || result.effect->findUniform("beatIndex");
-        if (result.effect->findUniform("orient")) NoteOrientedEffect(id);
+        const bool oriented = result.effect->findUniform("orient") != nullptr;
+        if (added || oriented) NoteOrientedEffect(id, oriented);
         d.palette = result.effect->findChild("palette") != nullptr;
         d.matrix = result.effect->findChild("thresholds") != nullptr;
         d.glyphs = result.effect->findChild("glyphs") != nullptr;

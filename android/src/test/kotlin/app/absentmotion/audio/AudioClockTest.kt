@@ -88,4 +88,14 @@ class AudioClockTest {
         clock.stamp(48_000 * 3 / 2, 1700 * ms)
         assertEquals(1600.0, clock.positionMs(1710 * ms)!!, 1e-6)
     }
+
+    @Test fun aStalledWriterCannotAdvancePastTheSubmittedAudio() {
+        val clock = AudioClock(1000.0, 48_000)
+        clock.submittedFrames = 4800
+        clock.stamp(4320, 90 * ms)
+        assertEquals(1100.0, clock.positionMs(3000 * ms)!!, 1e-6)
+        clock.submittedFrames = 9600
+        clock.stamp(5280, 3010 * ms)
+        assertEquals(1120.0, clock.positionMs(3020 * ms)!!, 1e-6)
+    }
 }

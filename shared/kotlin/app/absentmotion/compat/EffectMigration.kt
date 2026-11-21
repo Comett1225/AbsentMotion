@@ -49,9 +49,11 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
         val over: String? = null,
         val overDefault: String? = null,
         val polar: Boolean = false,
+        val unlessEnabled: String? = null,
+        val ignoreWhenDisabled: String? = null,
     )
 
-    class Turn(val quat: String, val spin: String, val to: List<String>, val inverse: Boolean = false)
+    class Turn(val quat: String, val spin: String, val to: List<String>, val inverse: Boolean = false, val sphere: Boolean = false)
 
     class Rule(val to: String, val params: Map<String, List<Conversion?>>, val set: Map<String, String>, val onlyWith: String? = null, val turn: Turn? = null)
 
@@ -134,6 +136,8 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
         val others = ArrayList<XmlNode>()
         val gates = rule.params.values.flatten().mapNotNull { it?.gate }.toSet()
         val turn = rule.turn?.takeIf { t -> t.to.all { id -> own.params.any { it.id == id } } }
+        fun enabled(key: String) = effect.children.any { it.name == "property" && it["name"] == key &&
+            values(it).any { value -> value == "true" || (value.finiteFloat() ?: 0f) > 0f } }
         for (child in effect.children) {
             val name = child["name"]
             if (child.name != "property" || name == null) { others += child; continue }
@@ -146,7 +150,8 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
             val split = conversions.size > 1
             conversions.forEachIndexed { i, c ->
                 val param = c?.to?.let { to -> own.params.firstOrNull { it.id == to } }
-                if (c?.ignore == true) return@forEachIndexed
+                if (c?.ignore == true || c?.ignoreWhenDisabled?.let { !enabled(it) } == true) return@forEachIndexed
+                if (c?.unlessEnabled?.let(::enabled) == true) { drop(name); return@forEachIndexed }
                 if (c != null && c.texts.isNotEmpty() && values(child).any { textFor(it, c) == null }) { drop(name); return@forEachIndexed }
                 if (param != null) {
                     val shift = (c.plus?.let { other -> effect.children.firstOrNull { it.name == "property" && it["name"] == other }?.valueAt(0f)?.finiteFloat() } ?: 0f) * c.plusScale
@@ -165,7 +170,7 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
             val spin = effect.children.firstOrNull { it.name == "property" && it["name"] == turn.spin }
             if (quat != null || spin != null) {
                 val base = turn.to.map { id -> rule.set[id]?.toDoubleOrNull() ?: 0.0 }.toDoubleArray()
-                Orientation(quat, spin, base, turn.inverse).properties(turn.to).forEach { made[it["name"]!!] = it }
+                Orientation(quat, spin, base, turn.inverse, turn.sphere).properties(turn.to).forEach { made[it["name"]!!] = it }
             }
         }
         for ((name, conversions) in rule.params) {
@@ -267,7 +272,7 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
                     },
                     set.keys().asSequence().associateWith { set.get(it).let { v -> if (v is Number) formatFloats(floatArrayOf(v.toFloat())) else v.toString() } },
                     rule.optString("onlyWith").takeIf { it.isNotEmpty() },
-                    rule.optJSONObject("orientation")?.let { o -> Turn(o.getString("quat"), o.optString("euler"), o.getJSONArray("to").let { a -> List(a.length()) { a.getString(it) } }, o.optBoolean("inverse")) },
+                    rule.optJSONObject("orientation")?.let { o -> Turn(o.getString("quat"), o.optString("euler"), o.getJSONArray("to").let { a -> List(a.length()) { a.getString(it) } }, o.optBoolean("inverse"), o.optBoolean("sphere")) },
                 )
             }
             return EffectMigration(rules, catalog)
@@ -302,6 +307,8 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
             json.optString("over").takeIf { it.isNotEmpty() },
             json.optString("overDefault").takeIf { it.isNotEmpty() },
             json.optBoolean("polar"),
+            json.optString("unlessEnabled").takeIf { it.isNotEmpty() },
+            json.optString("ignoreWhenDisabled").takeIf { it.isNotEmpty() },
         )
     }
 }
