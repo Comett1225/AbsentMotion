@@ -464,7 +464,7 @@ class Site:
                 '<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#1c1e24" media="(prefers-color-scheme: dark)">'
             ) % (base, base, base, url, escape(title), escape(description), url, SITE_URL)
             if kind == "download":
-                meta += '<script type="application/ld+json">%s</script>' % self.app_data(description)
+                meta += self.app_data(description)
         style = '<link rel="stylesheet" href="%sassets/site.css">' % shared + ('<link rel="stylesheet" href="%sassets/rtl.css">' % shared if self.rtl else "")
         return (
             '<!doctype html>\n%s<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
@@ -474,15 +474,15 @@ class Site:
         ) % (html, escape(title), escape(description), meta, style, script, "site" if site else "app", kind, '<a class="skip" href="#main">Skip to the content</a>' if site else "", top, side, body, foot)
 
     def app_data(self, description):
+        site = {"@context": "https://schema.org", "@type": "WebSite", "name": "AbsentMotion", "alternateName": ["Absent Motion"], "url": SITE_URL}
         data = {"@context": "https://schema.org", "@graph": [
-            {"@type": "WebSite", "name": "AbsentMotion", "url": SITE_URL},
             {"@type": "SoftwareApplication", "name": "AbsentMotion", "url": SITE_URL, "description": description,
              "applicationCategory": "MultimediaApplication", "applicationSubCategory": "Video editor",
              "operatingSystem": "Android 8 or newer, macOS 11 or newer, Windows 10 and 11, Linux",
              "softwareVersion": self.version, "downloadUrl": REPO + "/releases/latest", "image": SITE_URL + "assets/og.png",
              "license": "https://www.gnu.org/licenses/gpl-3.0.html", "isAccessibleForFree": True,
              "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}]}
-        return json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
+        return "".join('<script type="application/ld+json">%s</script>' % json.dumps(d, ensure_ascii=False).replace("</", "<\\/") for d in (site, data))
 
     def add_sitemap(self):
         pages = sorted((p for p in self.files if p.endswith(".html")), key=lambda p: (p != "index.html", p))
